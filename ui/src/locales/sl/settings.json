@@ -684,8 +684,6 @@
     "keepRequests": "Sporočila standardnih odjemalcev shrani kot prošnje za sporočila",
     "keepRequestsHint": "Uporablja se samo pri »Samo prijatelji«. Če je izklopljeno, se ta sporočila zavržejo.",
     "overrideTitle": "Izjema za strežnik",
-    "overrideServer": "Strežnik",
-    "overrideRule": "Zasebna sporočila od",
     "overrideLabel": "Zasebna sporočila od na strežniku {{server}}",
     "useDefault": "Uporabi privzeto ({{rule}})",
     "noServers": "Shranjenih strežnikov še ni.",

@@ -684,8 +684,6 @@
     "keepRequests": "Správy zo štandardných klientov ukladať ako žiadosti o správy",
     "keepRequestsHint": "Platí len pri „Len priatelia“. Keď je vypnuté, tieto správy sa zahodia.",
     "overrideTitle": "Výnimka pre server",
-    "overrideServer": "Server",
-    "overrideRule": "Súkromné správy od",
     "overrideLabel": "Súkromné správy od na serveri {{server}}",
     "useDefault": "Použiť predvolené ({{rule}})",
     "noServers": "Zatiaľ žiadne uložené servery.",

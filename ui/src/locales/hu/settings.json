@@ -678,8 +678,6 @@
     "keepRequests": "Hagyományos kliensek üzeneteinek megtartása üzenetkérésként",
     "keepRequestsHint": "Csak a „Csak barátok” beállítással használatos. Kikapcsolva ezek az üzenetek elvesznek.",
     "overrideTitle": "Kiszolgálónkénti kivétel",
-    "overrideServer": "Szerver",
-    "overrideRule": "Privát üzenetek tőle",
     "overrideLabel": "Privát üzenetek tőle itt: {{server}}",
     "useDefault": "Alapértelmezés használata ({{rule}})",
     "noServers": "Még nincs mentett szerver.",

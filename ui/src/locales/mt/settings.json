@@ -687,8 +687,6 @@
     "keepRequests": "Żomm il-messaġġi minn klijenti standard bħala talbiet għal messaġġi",
     "keepRequestsHint": "Użat biss ma' “Ħbieb biss”. Meta jkun mitfi, dawn il-messaġġi jitwaqqgħu.",
     "overrideTitle": "Eċċezzjoni għal kull server",
-    "overrideServer": "Server",
-    "overrideRule": "Messaġġi privati minn",
     "overrideLabel": "Messaġġi privati minn fuq {{server}}",
     "useDefault": "Uża l-impostazzjoni awtomatika ({{rule}})",
     "noServers": "Għad m'hemm l-ebda server salvat.",

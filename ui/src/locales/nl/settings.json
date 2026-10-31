@@ -678,8 +678,6 @@
     "keepRequests": "Berichten van standaardclients bewaren als berichtverzoeken",
     "keepRequestsHint": "Alleen gebruikt bij ‘Alleen vrienden’. Als dit uit staat, worden deze berichten genegeerd.",
     "overrideTitle": "Uitzondering per server",
-    "overrideServer": "Server",
-    "overrideRule": "Privéberichten van",
     "overrideLabel": "Privéberichten van op {{server}}",
     "useDefault": "Standaard gebruiken ({{rule}})",
     "noServers": "Nog geen opgeslagen servers.",

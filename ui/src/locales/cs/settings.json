@@ -684,8 +684,6 @@
     "keepRequests": "Zprávy ze standardních klientů ukládat jako žádosti o zprávy",
     "keepRequestsHint": "Platí jen u „Jen přátelé“. Když je vypnuto, tyto zprávy se zahodí.",
     "overrideTitle": "Výjimka pro server",
-    "overrideServer": "Server",
-    "overrideRule": "Soukromé zprávy od",
     "overrideLabel": "Soukromé zprávy od na serveru {{server}}",
     "useDefault": "Použít výchozí ({{rule}})",
     "noServers": "Zatím žádné uložené servery.",

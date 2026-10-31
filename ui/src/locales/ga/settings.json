@@ -687,8 +687,6 @@
     "keepRequests": "Coinnigh teachtaireachtaí ó chliaint chaighdeánacha mar iarratais teachtaireachta",
     "keepRequestsHint": "Ní úsáidtear é ach le “Cairde amháin”. Nuair a bhíonn sé múchta, déantar na teachtaireachtaí seo a thitim.",
     "overrideTitle": "Sáruithe in aghaidh an fhreastalaí",
-    "overrideServer": "Freastalaí",
-    "overrideRule": "Teachtaireachtaí príobháideacha ó",
     "overrideLabel": "Teachtaireachtaí príobháideacha ó ar {{server}}",
     "useDefault": "Úsáid an réamhshocrú ({{rule}})",
     "noServers": "Gan aon fhreastalaí sábháilte go fóill.",

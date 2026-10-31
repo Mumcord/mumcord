@@ -681,8 +681,6 @@
     "keepRequests": "Saglabāt standarta klientu ziņas kā ziņu pieprasījumus",
     "keepRequestsHint": "Tiek izmantots tikai ar “Tikai draugi”. Ja izslēgts, šīs ziņas tiek atmestas.",
     "overrideTitle": "Izņēmums katram serverim",
-    "overrideServer": "Serveris",
-    "overrideRule": "Privātās ziņas no",
     "overrideLabel": "Privātās ziņas no serverī {{server}}",
     "useDefault": "Izmantot noklusējumu ({{rule}})",
     "noServers": "Saglabātu serveru vēl nav.",

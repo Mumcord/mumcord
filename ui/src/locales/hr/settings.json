@@ -681,8 +681,6 @@
     "keepRequests": "Zadrži poruke standardnih klijenata kao zahtjeve za poruke",
     "keepRequestsHint": "Koristi se samo uz „Samo prijatelji”. Kad je isključeno, te se poruke odbacuju.",
     "overrideTitle": "Iznimka po poslužitelju",
-    "overrideServer": "Poslužitelj",
-    "overrideRule": "Privatne poruke od",
     "overrideLabel": "Privatne poruke od na poslužitelju {{server}}",
     "useDefault": "Koristi zadano ({{rule}})",
     "noServers": "Još nema spremljenih poslužitelja.",

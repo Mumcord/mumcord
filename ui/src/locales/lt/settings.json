@@ -684,8 +684,6 @@
     "keepRequests": "Standartinių klientų žinutes laikyti kaip žinučių prašymus",
     "keepRequestsHint": "Naudojama tik su „Tik draugų“. Kai išjungta, šios žinutės atmetamos.",
     "overrideTitle": "Išimtis pagal serverį",
-    "overrideServer": "Serveris",
-    "overrideRule": "Privačios žinutės iš",
     "overrideLabel": "Privačios žinutės iš serveryje {{server}}",
     "useDefault": "Naudoti numatytąjį ({{rule}})",
     "noServers": "Išsaugotų serverių dar nėra.",

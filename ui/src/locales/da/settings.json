@@ -678,8 +678,6 @@
     "keepRequests": "Behold beskeder fra standardklienter som beskedanmodninger",
     "keepRequestsHint": "Bruges kun med »Kun venner«. Når det er slået fra, kasseres disse beskeder.",
     "overrideTitle": "Tilsidesættelse pr. server",
-    "overrideServer": "Server",
-    "overrideRule": "Private beskeder fra",
     "overrideLabel": "Private beskeder fra på {{server}}",
     "useDefault": "Brug standard ({{rule}})",
     "noServers": "Ingen gemte servere endnu.",

@@ -678,8 +678,6 @@
     "keepRequests": "Nachrichten von Standard-Clients als Nachrichtenanfragen behalten",
     "keepRequestsHint": "Wird nur bei „Nur Freunde“ verwendet. Ist die Option aus, werden diese Nachrichten verworfen.",
     "overrideTitle": "Ausnahme pro Server",
-    "overrideServer": "Server",
-    "overrideRule": "Private Nachrichten von",
     "overrideLabel": "Private Nachrichten von auf {{server}}",
     "useDefault": "Standard verwenden ({{rule}})",
     "noServers": "Noch keine gespeicherten Server.",

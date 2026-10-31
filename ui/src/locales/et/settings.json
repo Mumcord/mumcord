@@ -678,8 +678,6 @@
     "keepRequests": "Hoia tavaklientide sõnumeid sõnumitaotlustena",
     "keepRequestsHint": "Kasutusel ainult valikuga „Ainult sõbrad“. Kui see on väljas, jäetakse need sõnumid kõrvale.",
     "overrideTitle": "Erand serveri kohta",
-    "overrideServer": "Server",
-    "overrideRule": "Privaatsõnumid kasutajatelt",
     "overrideLabel": "Privaatsõnumid serveris {{server}}",
     "useDefault": "Kasuta vaikeväärtust ({{rule}})",
     "noServers": "Salvestatud servereid pole veel.",

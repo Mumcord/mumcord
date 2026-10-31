@@ -131,35 +131,25 @@ function ServerOverrides({
       {servers.length === 0 ? (
         <p className="settings-hint">{t("privateMessages.noServers")}</p>
       ) : (
-        <table className="pm-overrides">
-          <thead>
-            <tr>
-              <th scope="col">{t("privateMessages.overrideServer")}</th>
-              <th scope="col">{t("privateMessages.overrideRule")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {servers.map((server) => {
-              const name = displayName(server);
-              const current = settings.serverRules.find((r) => r.serverId === server.id);
-              return (
-                <tr key={server.id}>
-                  <th scope="row">{name}</th>
-                  <td>
-                    <Select
-                      ariaLabel={t("privateMessages.overrideLabel", { server: name })}
-                      value={current?.rule ?? USE_DEFAULT}
-                      options={options}
-                      onChange={(value) => {
-                        choose(server.id, value);
-                      }}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="pm-overrides">
+          {servers.map((server) => {
+            const name = displayName(server);
+            const current = settings.serverRules.find((r) => r.serverId === server.id);
+            return (
+              <div key={server.id} className="settings-control-row pm-overrides__row">
+                <span className="pm-overrides__server">{name}</span>
+                <Select
+                  ariaLabel={t("privateMessages.overrideLabel", { server: name })}
+                  value={current?.rule ?? USE_DEFAULT}
+                  options={options}
+                  onChange={(value) => {
+                    choose(server.id, value);
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
       )}
     </Group>
   );

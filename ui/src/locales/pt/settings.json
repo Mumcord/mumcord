@@ -681,8 +681,6 @@
     "keepRequests": "Manter as mensagens de clientes padrão como pedidos de mensagem",
     "keepRequestsHint": "Usado apenas com «Só amigos». Quando desativado, estas mensagens são descartadas.",
     "overrideTitle": "Exceção por servidor",
-    "overrideServer": "Servidor",
-    "overrideRule": "Mensagens privadas de",
     "overrideLabel": "Mensagens privadas de em {{server}}",
     "useDefault": "Usar o predefinido ({{rule}})",
     "noServers": "Ainda não há servidores guardados.",

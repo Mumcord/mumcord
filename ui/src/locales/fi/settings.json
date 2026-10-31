@@ -678,8 +678,6 @@
     "keepRequests": "Säilytä tavallisten asiakasohjelmien viestit viestipyyntöinä",
     "keepRequestsHint": "Käytössä vain asetuksella ”Vain kaverit”. Kun asetus on pois päältä, nämä viestit hylätään.",
     "overrideTitle": "Palvelinkohtainen poikkeus",
-    "overrideServer": "Palvelin",
-    "overrideRule": "Yksityisviestit keneltä",
     "overrideLabel": "Yksityisviestit keneltä palvelimella {{server}}",
     "useDefault": "Käytä oletusta ({{rule}})",
     "noServers": "Tallennettuja palvelimia ei vielä ole.",

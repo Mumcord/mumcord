@@ -678,8 +678,6 @@
     "keepRequests": "Behåll meddelanden från standardklienter som meddelandeförfrågningar",
     "keepRequestsHint": "Används bara med ”Bara vänner”. När den är av släpps dessa meddelanden.",
     "overrideTitle": "Undantag per server",
-    "overrideServer": "Server",
-    "overrideRule": "Privata meddelanden från",
     "overrideLabel": "Privata meddelanden från på {{server}}",
     "useDefault": "Använd standard ({{rule}})",
     "noServers": "Inga sparade servrar ännu.",

@@ -678,8 +678,6 @@
     "keepRequests": "Keep messages from standard clients as message requests",
     "keepRequestsHint": "Only used with “Friends only”. When off, these messages are dropped.",
     "overrideTitle": "Per-server override",
-    "overrideServer": "Server",
-    "overrideRule": "Private messages from",
     "overrideLabel": "Private messages from on {{server}}",
     "useDefault": "Use default ({{rule}})",
     "noServers": "No saved servers yet.",

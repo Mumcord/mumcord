@@ -681,8 +681,6 @@
     "keepRequests": "Păstrează mesajele de la clienții standard ca cereri de mesaje",
     "keepRequestsHint": "Se folosește doar cu „Doar prieteni”. Când este dezactivată, aceste mesaje sunt ignorate.",
     "overrideTitle": "Excepție pe server",
-    "overrideServer": "Server",
-    "overrideRule": "Mesaje private de la",
     "overrideLabel": "Mesaje private de la pe {{server}}",
     "useDefault": "Folosește valoarea implicită ({{rule}})",
     "noServers": "Încă nu există servere salvate.",

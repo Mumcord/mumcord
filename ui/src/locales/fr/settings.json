@@ -681,8 +681,6 @@
     "keepRequests": "Conserver les messages des clients standard comme demandes de message",
     "keepRequestsHint": "Utilisé uniquement avec « Amis uniquement ». Si désactivé, ces messages sont ignorés.",
     "overrideTitle": "Exception par serveur",
-    "overrideServer": "Serveur",
-    "overrideRule": "Messages privés de",
     "overrideLabel": "Messages privés de sur {{server}}",
     "useDefault": "Utiliser la valeur par défaut ({{rule}})",
     "noServers": "Aucun serveur enregistré pour l’instant.",
