@@ -6,7 +6,7 @@ use specta::Type;
 use tauri::State;
 use tauri_specta::Event;
 
-use super::chat::ChatMessage;
+use super::chat::{ChatMessage, rfc3339};
 use super::types::{ApiResult, ChannelId, Conversation, ServerId, to_engine_server_id};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -51,6 +51,21 @@ pub fn history_load(
 #[specta::specta]
 pub fn history_clear(engine: State<'_, Engine>, scope: HistoryScope) -> ApiResult<()> {
     Ok(engine.history_clear(scope.into())?)
+}
+
+/// When the user last cleared the history of a channel (RFC 3339), for channel info (issue
+/// #170); `null` if never.
+#[tauri::command]
+#[specta::specta]
+pub fn history_cleared_at(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<Option<String>> {
+    let conversation = Conversation::Channel { channel_id };
+    Ok(engine
+        .history_cleared_at(to_engine_server_id(server_id), &conversation.into())?
+        .map(rfc3339))
 }
 
 impl From<HistoryScope> for mumcord_engine::HistoryScope {

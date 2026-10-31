@@ -69,6 +69,9 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             listen: has(permissions::LISTEN),
             register_self: channel.id == ROOT_CHANNEL
                 && bits.is_some_and(|b| b & permissions::SELF_REGISTER != 0),
+            speak: has(permissions::SPEAK),
+            whisper: has(permissions::WHISPER),
+            write: bits.is_some_and(|b| b & permissions::WRITE != 0),
         },
         description: channel
             .description
@@ -76,6 +79,10 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             .filter(|t| !t.trim().is_empty())
             .map(sanitize_html),
         has_description: super::description::has_description(channel),
+        max_users: channel.max_users.filter(|&n| n > 0),
+        temporary: channel.temporary,
+        links: channel.links.iter().copied().collect(),
+        enter_restricted: channel.is_enter_restricted,
     }
 }
 
@@ -326,14 +333,40 @@ mod tests {
         let view = channel_view(&state, &raid);
         assert!(view.permissions.enter && view.permissions.text_message);
         assert!(!view.permissions.register_self);
+        assert!(view.permissions.speak && !view.permissions.write);
 
         state.permissions.insert(2, permissions::TRAVERSE);
         let view = channel_view(&state, &raid);
         assert!(!view.permissions.enter && !view.permissions.text_message);
+        assert!(!view.permissions.speak);
+
+        state
+            .permissions
+            .insert(2, permissions::WRITE | permissions::SPEAK);
+        let view = channel_view(&state, &raid);
+        assert!(view.permissions.write && view.permissions.speak);
 
         state.permissions.insert(0, permissions::SELF_REGISTER);
         let root = state.channels[&0].clone();
         assert!(channel_view(&state, &root).permissions.register_self);
+    }
+
+    #[test]
+    fn channel_details_for_channel_info() {
+        let mut state = tree();
+        let raid = state.channels.get_mut(&2).expect("raid");
+        raid.max_users = Some(10);
+        raid.temporary = true;
+        raid.links.extend([4, 3]);
+        raid.is_enter_restricted = true;
+        let view = channel_view(&state, &state.channels[&2]);
+        assert_eq!(view.max_users, Some(10));
+        assert!(view.temporary && view.enter_restricted);
+        assert_eq!(view.links, [3, 4]);
+
+        // Mumble sends 0 for "no limit".
+        state.channels.get_mut(&2).expect("raid").max_users = Some(0);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
     }
 
     #[test]

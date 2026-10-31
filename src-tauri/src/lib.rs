@@ -134,6 +134,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::conversation_mark_read,
             history::history_load,
             history::history_clear,
+            history::history_cleared_at,
             history::history_set_saving,
             history::history_sync_request,
             profile::set_own_avatar,

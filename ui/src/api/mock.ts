@@ -384,7 +384,15 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   latency: mockLatencyEstimate(false),
 };
 
-const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
+const allow = {
+  enter: true,
+  textMessage: true,
+  listen: true,
+  registerSelf: false,
+  speak: true,
+  whisper: true,
+  write: false,
+};
 
 function seedChannels(): ChannelInfo[] {
   return [
@@ -395,6 +403,10 @@ function seedChannels(): ChannelInfo[] {
       position: 0,
       permissions: { ...allow, registerSelf: true },
       ...noDescription,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     {
       id: 1,
@@ -404,6 +416,10 @@ function seedChannels(): ChannelInfo[] {
       permissions: { ...allow },
       description: MOCK_LOBBY_DESCRIPTION,
       hasDescription: true,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     // Like a long description on a real server: only announced, fetched on request.
     {
@@ -414,6 +430,10 @@ function seedChannels(): ChannelInfo[] {
       permissions: { ...allow },
       description: null,
       hasDescription: true,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     {
       id: 3,
@@ -422,6 +442,10 @@ function seedChannels(): ChannelInfo[] {
       position: 2,
       permissions: { ...allow, textMessage: false },
       ...noDescription,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
   ];
 }
@@ -443,13 +467,18 @@ function demoChannels(serverName: string): ChannelInfo[] {
     permissions: { ...allow },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
+    maxUsers: null,
+    temporary: false,
+    links: [],
+    enterRestricted: false,
   });
   return [
     { ...channel(0, 0, serverName, 0), parentId: null },
     channel(1, 0, "Lobby", 0),
     channel(2, 0, "Gaming", 1),
-    channel(4, 2, "Squad A", 0),
-    channel(5, 2, "Squad B", 1),
+    // A user limit and a link between the squads, for the channel info screenshots (#170).
+    { ...channel(4, 2, "Squad A", 0), maxUsers: 5, links: [5] },
+    { ...channel(5, 2, "Squad B", 1), links: [4] },
     channel(6, 0, "Music Room", 2),
     channel(7, 0, "Study Hall", 3),
     { ...channel(3, 0, "AFK", 4), permissions: { ...allow, textMessage: false } },
@@ -713,6 +742,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       ? [[1, new Map([[conversationKey({ kind: "channel", channelId: 1 }), demoHistory()]])]]
       : [],
   );
+  // When "Clear history" last ran (issue #119): per server and channel, per server, or for all.
+  const clearedAt = new Map<string, string>();
+  const clearedKey = (serverId: number | null, channelId: number | null) =>
+    `${String(serverId)}:${String(channelId)}`;
 
   function dispatch<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     const set = listeners.get(event);
@@ -1709,10 +1742,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(all.slice(Math.max(0, stop - limit), stop));
     },
     historyClear: (scope: HistoryScope) => {
-      if (scope.kind === "all") history.clear();
-      else if (scope.kind === "server") history.delete(scope.serverId);
-      else serverHistory(scope.serverId).delete(conversationKey(scope.conversation));
+      const now = new Date().toISOString();
+      if (scope.kind === "all") {
+        history.clear();
+        clearedAt.set(clearedKey(null, null), now);
+      } else if (scope.kind === "server") {
+        history.delete(scope.serverId);
+        clearedAt.set(clearedKey(scope.serverId, null), now);
+      } else {
+        serverHistory(scope.serverId).delete(conversationKey(scope.conversation));
+        if (scope.conversation.kind === "channel") {
+          clearedAt.set(clearedKey(scope.serverId, scope.conversation.channelId), now);
+        }
+      }
       return Promise.resolve(null);
+    },
+    historyClearedAt: (serverId, channelId) => {
+      requireSession(serverId);
+      const marks = [
+        clearedAt.get(clearedKey(serverId, channelId)),
+        clearedAt.get(clearedKey(serverId, null)),
+        clearedAt.get(clearedKey(null, null)),
+      ].filter((at) => at !== undefined);
+      return Promise.resolve(marks.sort().at(-1) ?? null);
     },
     historySetSaving: (serverId, enabled) => {
       requireServer(serverId);
@@ -2381,7 +2433,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       focused();
       const snap = requireSnapshot();
       const channel = requireChannel(channelId);
-      const locked = { ...channel, permissions: { ...channel.permissions, enter: false } };
+      const locked = {
+        ...channel,
+        enterRestricted: true,
+        permissions: { ...channel.permissions, enter: false },
+      };
       snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
       emitServer("channelUpserted", { channel: locked });
     },
@@ -2428,4 +2484,5 @@ const DEMO_DESCRIPTIONS = new Map<number, string>([
     "<p><b>Gaming</b>: find your squad below.</p><p>Push-to-talk in Squad channels, " +
       "and keep it friendly. Event nights are on Fridays at 20:00.</p>",
   ],
+  [4, "<p>Ranked queue for <b>Squad A</b>. Strategy notes are pinned in #Gaming.</p>"],
 ]);

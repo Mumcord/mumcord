@@ -641,6 +641,22 @@ impl Engine {
             .map_err(store_error)
     }
 
+    /// When the user last cleared the history of a channel (issue #119), for channel info
+    /// (issue #170); `None` if never, and for private chats.
+    pub fn history_cleared_at(
+        &self,
+        server_id: ServerId,
+        conversation: &ConversationRef,
+    ) -> EngineResult<Option<UnixMillis>> {
+        let key = unread_key(&self.session_ctx_for(server_id)?, conversation)?;
+        let UnreadKey::Stored(Conversation::Channel(path)) = key else {
+            return Ok(None);
+        };
+        lock(&self.store_handle())
+            .history_cleared_at(server_id, &path)
+            .map_err(store_error)
+    }
+
     /// Clears local history (FR-1.33); cleared conversations are no longer unread.
     pub fn history_clear(&self, scope: HistoryScope) -> EngineResult<()> {
         let store = self.store_handle();

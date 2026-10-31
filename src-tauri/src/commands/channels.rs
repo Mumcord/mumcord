@@ -18,6 +18,10 @@ pub struct ChannelPermissions {
     pub listen: bool,
     /// Only meaningful on the root channel: "Register self" (FR-1.34).
     pub register_self: bool,
+    pub speak: bool,
+    pub whisper: bool,
+    /// Edit the channel's ACL; only true once the server confirmed it.
+    pub write: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -35,6 +39,13 @@ pub struct ChannelInfo {
     /// True when the channel has a description, even if only its hash is known yet; then
     /// `channel_description_request` fetches the text (FR-1.48b).
     pub has_description: bool,
+    /// User limit; `null` when the channel has none (the server's limit still applies).
+    pub max_users: Option<u32>,
+    pub temporary: bool,
+    /// Channels linked to this one, sorted by id.
+    pub links: Vec<ChannelId>,
+    /// Entering needs a password (access token) or group membership.
+    pub enter_restricted: bool,
 }
 
 /// A channel was added or changed.
@@ -143,9 +154,16 @@ impl From<ChannelView> for ChannelInfo {
                 text_message: v.permissions.text_message,
                 listen: v.permissions.listen,
                 register_self: v.permissions.register_self,
+                speak: v.permissions.speak,
+                whisper: v.permissions.whisper,
+                write: v.permissions.write,
             },
             description: v.description,
             has_description: v.has_description,
+            max_users: v.max_users,
+            temporary: v.temporary,
+            links: v.links,
+            enter_restricted: v.enter_restricted,
         }
     }
 }

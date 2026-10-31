@@ -115,6 +115,10 @@ pub struct ChannelPermissions {
     pub text_message: bool,
     pub listen: bool,
     pub register_self: bool,
+    pub speak: bool,
+    pub whisper: bool,
+    /// Edit the channel's ACL; only true once the server confirmed it.
+    pub write: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -129,6 +133,13 @@ pub struct ChannelView {
     /// True when the channel has a description, even if its text still has to be requested
     /// (`Engine::channel_description_request`, FR-1.48b).
     pub has_description: bool,
+    /// User limit; `None` when the channel has none (the server's limit still applies).
+    pub max_users: Option<u32>,
+    pub temporary: bool,
+    /// Channels linked to this one, sorted by id.
+    pub links: Vec<u32>,
+    /// Entering needs a password (access token) or group membership.
+    pub enter_restricted: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

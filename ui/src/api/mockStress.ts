@@ -66,7 +66,15 @@ const SUFFIX = [
   "Storm", "2k", "Byte", "_88", "Fox", "Ace", "_pro", "Sky", "Moon", "Rex", "_tv", "Zen", "Dash",
 ]; // prettier-ignore
 
-const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
+const allow = {
+  enter: true,
+  textMessage: true,
+  listen: true,
+  registerSelf: false,
+  speak: true,
+  whisper: true,
+  write: false,
+};
 
 /** Channel the own user lands in: "Starfall › Squads › Squad 2 › Team Blue" (level 5). */
 export const STRESS_SELF_CHANNEL_PATH = ["Gaming", "Starfall", "Squads", "Squad 2", "Team Blue"];
@@ -81,6 +89,10 @@ export function stressChannels(rootName: string): ChannelInfo[] {
       permissions: { ...allow },
       description: null,
       hasDescription: false,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
   ];
   const add = (parentId: number, name: string): number => {
@@ -93,6 +105,10 @@ export function stressChannels(rootName: string): ChannelInfo[] {
       permissions: { ...allow },
       description: null,
       hasDescription: false,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     });
     return id;
   };

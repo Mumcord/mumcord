@@ -268,6 +268,11 @@ export const commands = {
 	 */
 	historyLoad: (serverId: number, conversation: Conversation, before: string | null, limit: number) => typedError<ChatMessage[], ApiError>(__TAURI_INVOKE("history_load", { serverId, conversation, before, limit })),
 	historyClear: (scope: HistoryScope) => typedError<null, ApiError>(__TAURI_INVOKE("history_clear", { scope })),
+	/**
+	 *  When the user last cleared the history of a channel (RFC 3339), for channel info (issue
+	 *  #170); `null` if never.
+	 */
+	historyClearedAt: (serverId: number, channelId: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("history_cleared_at", { serverId, channelId })),
 	/**  "Save history" switch per server (default on). */
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
 	/**
@@ -757,6 +762,13 @@ export type ChannelInfo = {
 	 *  `channel_description_request` fetches the text (FR-1.48b).
 	 */
 	hasDescription: boolean,
+	/**  User limit; `null` when the channel has none (the server's limit still applies). */
+	maxUsers: number | null,
+	temporary: boolean,
+	/**  Channels linked to this one, sorted by id. */
+	links: number[],
+	/**  Entering needs a password (access token) or group membership. */
+	enterRestricted: boolean,
 };
 
 export type ChannelPasswordPrompt = {
@@ -781,6 +793,10 @@ export type ChannelPermissions = {
 	listen: boolean,
 	/**  Only meaningful on the root channel: "Register self" (FR-1.34). */
 	registerSelf: boolean,
+	speak: boolean,
+	whisper: boolean,
+	/**  Edit the channel's ACL; only true once the server confirmed it. */
+	write: boolean,
 };
 
 export type ChannelRemoved = {

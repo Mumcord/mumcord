@@ -24,9 +24,21 @@ const channel = (id: number): ChannelInfo => ({
   parentId: id === 0 ? null : 0,
   name: `C${String(id)}`,
   position: 0,
-  permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
+  permissions: {
+    enter: true,
+    textMessage: true,
+    listen: true,
+    registerSelf: false,
+    speak: true,
+    whisper: true,
+    write: false,
+  },
   description: null,
   hasDescription: false,
+  maxUsers: null,
+  temporary: false,
+  links: [],
+  enterRestricted: false,
 });
 
 describe("server store", () => {
@@ -54,9 +66,21 @@ describe("server store", () => {
           parentId: 2,
           name: "Sub",
           position: 0,
-          permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
+          permissions: {
+            enter: true,
+            textMessage: true,
+            listen: true,
+            registerSelf: false,
+            speak: true,
+            whisper: true,
+            write: false,
+          },
           description: null,
           hasDescription: false,
+          maxUsers: null,
+          temporary: false,
+          links: [],
+          enterRestricted: false,
         },
       });
       api.mock.emit("userRemoved", { serverId: 1, session: 2 });
