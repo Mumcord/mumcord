@@ -55,8 +55,8 @@ pub use session::{
     ChannelAudioView, ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView,
     ChannelPermissions, ChannelView, ConnState, ConnectionStatsView, ConversationRef, EngineError,
     EngineEvent, EngineResult, ErrorKind, EventReceiver, Events, IdentityView,
-    MAX_RECONNECT_ATTEMPTS, MicTestPhase, PasswordChange, ProfileView, ServerFields,
-    ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot, TaggedEvent,
+    MAX_RECONNECT_ATTEMPTS, MicTestDevices, MicTestPhase, PasswordChange, ProfileView,
+    ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot, TaggedEvent,
     TestConnectionView, UnreadView, UserView, VoiceTransportKind,
 };
 pub use stats::UserStatsView;

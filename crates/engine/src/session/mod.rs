@@ -270,6 +270,17 @@ struct Core {
     mic_test: Option<MicTest>,
     /// The channel audio profile in effect (issue #171); `None` runs on the global settings.
     channel_audio: Option<ActiveAudioProfile>,
+    /// Devices to switch back to once the running mic test ends, when it ran on devices the
+    /// caller did not save (wizard rerun, #149).
+    mic_test_restore: Option<(Option<String>, Option<String>)>,
+}
+
+/// Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+/// They are never saved; the test switches to them and back to the stored ones.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MicTestDevices {
+    pub input: Option<String>,
+    pub output: Option<String>,
 }
 
 /// One server's connection.
@@ -1221,20 +1232,42 @@ impl Engine {
     }
 
     /// Microphone test: record up to 5 s, then play back (FR-1.4). Voice pauses meanwhile.
-    pub async fn mic_test_start(&self) -> EngineResult<()> {
+    /// `devices` lets the test run on devices the caller has not saved yet (wizard rerun, #149).
+    pub async fn mic_test_start(&self, devices: Option<MicTestDevices>) -> EngineResult<()> {
         self.inner.ensure_audio().await?;
+        if lock(&self.inner.core).mic_test.is_some() {
+            return Ok(());
+        }
+        // Unsaved devices are switched on the open streams for the test and switched back when it
+        // ends, so a cancelled wizard leaves the engine on the stored devices.
+        let restore = match devices {
+            Some(devices) => {
+                let saved = lock(&self.inner.store).settings().map_err(store_error)?;
+                let restore = (saved.input_device, saved.output_device);
+                self.inner
+                    .switch_audio_devices(devices.input, devices.output)
+                    .await?;
+                Some(restore)
+            }
+            None => None,
+        };
         let mut core = lock(&self.inner.core);
         if core.mic_test.is_some() {
+            // A concurrent start won the race; its test ends on the stored devices again.
+            drop(core);
+            self.inner.restore_audio_devices(restore);
             return Ok(());
         }
         self.inner.stop_pipeline(&mut core);
-        let audio = core
-            .audio
-            .as_mut()
-            .ok_or_else(|| EngineError::internal("audio not running"))?;
-        let test = match voice::start_mic_test(audio, self.inner.controls.clone()) {
+        let started = match core.audio.as_mut() {
+            Some(audio) => voice::start_mic_test(audio, self.inner.controls.clone()),
+            None => Err(EngineError::internal("audio not running")),
+        };
+        let test = match started {
             Ok(test) => test,
             Err(error) => {
+                drop(core);
+                self.inner.restore_audio_devices(restore);
                 self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
                     types::MicTestPhase::Failed,
                 ));
@@ -1242,6 +1275,7 @@ impl Engine {
             }
         };
         core.mic_test = Some(test);
+        core.mic_test_restore = restore;
         self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
             types::MicTestPhase::Recording,
         ));
@@ -2898,6 +2932,45 @@ impl Inner {
         Ok(())
     }
 
+    /// Switches the open device streams without saving anything (a mic test on devices the user
+    /// has not committed to yet, #149). Does nothing while no stream is open: the next start
+    /// opens the stored devices.
+    async fn switch_audio_devices(
+        self: &Arc<Self>,
+        input: Option<String>,
+        output: Option<String>,
+    ) -> EngineResult<()> {
+        let inner = self.clone();
+        self.rt
+            .spawn_blocking(move || {
+                let core = lock(&inner.core);
+                match &core.audio {
+                    Some(audio) => audio.set_devices(input, output),
+                    None => Ok(()),
+                }
+            })
+            .await
+            .map_err(|e| EngineError::internal(e.to_string()))??;
+        Ok(())
+    }
+
+    /// Switches back to `devices` in the background; the caller holds no lock, so a running
+    /// stream reopen never stalls it.
+    fn restore_audio_devices(self: &Arc<Self>, devices: Option<(Option<String>, Option<String>)>) {
+        let Some((input, output)) = devices else {
+            return;
+        };
+        let inner = self.clone();
+        self.rt.spawn_blocking(move || {
+            let core = lock(&inner.core);
+            if let Some(audio) = &core.audio
+                && let Err(e) = audio.set_devices(input, output)
+            {
+                tracing::warn!(error = %e, "switching the audio devices back failed");
+            }
+        });
+    }
+
     /// Starts voice for the pipeline's server if devices are free; otherwise it starts once
     /// the devices are up or the mic test is over.
     fn start_pipeline(self: &Arc<Self>, core: &mut Core) {
@@ -2993,7 +3066,9 @@ impl Inner {
     }
 
     fn finish_mic_test(self: &Arc<Self>, core: &mut Core) {
+        let restore = core.mic_test_restore.take();
         let Some(test) = core.mic_test.take() else {
+            self.restore_audio_devices(restore);
             return;
         };
         self.events
@@ -3005,6 +3080,7 @@ impl Inner {
         }
         self.start_pipeline(core);
         self.release_audio_if_idle(core);
+        self.restore_audio_devices(restore);
     }
 
     /// Identity `id` from secure storage; the secret store caches it for the session, so

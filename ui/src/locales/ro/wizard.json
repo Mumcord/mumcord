@@ -1,5 +1,24 @@
 {
   "progress": "Pasul {{current}} din {{total}}",
+  "rerun": {
+    "title": "Asistent de configurare",
+    "note": "Rulezi din nou configurarea. Identitatea ta nu este modificată.",
+    "manageIdentities": "Gestionează identitățile",
+    "stepsLabel": "Pașii configurării",
+    "stepsSkipped": "(omis, identitatea nu face parte din asta)",
+    "steps": {
+      "identity": "Identitate",
+      "mic": "Microfon",
+      "privacy": "Confidențialitate",
+      "updates": "Actualizări",
+      "talk": "Mod de vorbire"
+    },
+    "footer": "Anularea lasă totul așa cum este. La final se salvează doar pașii modificați.",
+    "discardTitle": "Renunți la modificări?",
+    "discardBody": "Nimic nu este salvat înainte de finalizare. Dacă anulezi acum, totul rămâne așa cum este.",
+    "discardKeep": "Continuă editarea",
+    "discardConfirm": "Renunță la modificări"
+  },
   "loadFailed": "Configurarea nu a putut fi încărcată.",
   "finish": "Gata",
   "errors": {

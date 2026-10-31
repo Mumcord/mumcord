@@ -64,7 +64,7 @@ export function ThresholdMeter({ value, onChange }: ThresholdMeterProps) {
     measuringRef.current = true;
     setMeasuring(true);
     getApi()
-      .micTestStart()
+      .micTestStart(null)
       .catch((error: unknown) => {
         console.error("Starting the level measurement failed", error);
         measuringRef.current = false;

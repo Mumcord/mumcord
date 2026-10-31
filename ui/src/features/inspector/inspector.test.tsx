@@ -2,6 +2,8 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type MockApi, type Settings } from "../../api";
 import { applyLanguage } from "../../i18n";
+import { fakeView } from "../../app/testView";
+import { ViewContext } from "../../app/view";
 import { AboutSection } from "../settings/sections/AboutSection";
 import { PacketInspectorSection } from "../settings/sections/PacketInspectorSection";
 import { reloadDevToolsUnlocked, setDevToolsUnlocked, UNLOCK_CLICKS } from "./devTools";
@@ -310,7 +312,11 @@ describe("sharing the main window's view", () => {
 
 describe("unlocking the developer tools", () => {
   it("takes seven clicks on the version in About", async () => {
-    render(<AboutSection settings={settings} update={vi.fn()} />);
+    render(
+      <ViewContext.Provider value={fakeView()}>
+        <AboutSection settings={settings} update={vi.fn()} />
+      </ViewContext.Provider>,
+    );
     const version = await screen.findByText(/^\d+\.\d+\.\d+/u);
     for (let i = 1; i < UNLOCK_CLICKS; i++) fireEvent.click(version);
     expect(screen.queryByText(/Developer tools unlocked/u)).toBeNull();

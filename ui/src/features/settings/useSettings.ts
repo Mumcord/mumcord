@@ -18,7 +18,7 @@ export interface SettingsState {
  * later change can never be overwritten by an earlier, slower one; a failed save rolls the
  * screen back to the last record the engine confirmed.
  */
-export function useSettings(): SettingsState {
+export function useSettings(revision = 0): SettingsState {
   const { applySettings } = usePreferences();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -30,6 +30,8 @@ export function useSettings(): SettingsState {
 
   useEffect(() => {
     let active = true;
+    // Unsaved edits win: a reload must never overwrite what the user is changing right now.
+    if (pending.current > 0) return;
     getApi()
       .settingsGet()
       .then(
@@ -47,7 +49,7 @@ export function useSettings(): SettingsState {
     return () => {
       active = false;
     };
-  }, []);
+  }, [revision]);
 
   const update = useCallback<UpdateSettings>(
     (patch) => {

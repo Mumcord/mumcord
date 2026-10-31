@@ -1,4 +1,12 @@
-import { useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
@@ -30,6 +38,9 @@ export interface TalkChoice {
 type Capture = "off" | "listening" | "pending";
 
 interface TalkModeStepProps {
+  /** 1-based step number and step count of this wizard pass (#149 rerun: 4 of 4). */
+  step: number;
+  total: number;
   settings: Settings;
   /** `null` when availability could not be determined; capture then reports any problem. */
   availability: PttAvailability | null;
@@ -41,25 +52,36 @@ interface TalkModeStepProps {
   ingameOverlaySupported: boolean;
   /** Portable Windows build (#181): system changes such as the link handler start unticked. */
   portable?: boolean;
+  /** The overlay is already on (#149): the rerun shows the saved choice, the first start off. */
+  initialIngameOverlay?: boolean;
   focusOnMount: boolean;
   onBack: () => void;
+  /** Rerun only: closes the wizard (#149). */
+  onCancel?: (() => void) | undefined;
+  /** Reports every change, so the rerun knows whether Cancel would drop anything (#149). */
+  onChange?: ((choice: TalkChoice) => void) | undefined;
   /** Saves the choice and leaves the wizard; rejects when saving failed. */
   onFinish: (choice: TalkChoice) => Promise<void>;
 }
 
 /**
- * Step 4: voice activation or push-to-talk with key capture, then the link handler,
- * start-at-login and link-preview choices.
+ * Step 5 on first start, step 4 in the rerun: voice activation or push-to-talk with key capture,
+ * then the link handler, start-at-login and link-preview choices.
  */
 export function TalkModeStep({
+  step,
+  total,
   settings,
   availability,
   mouseStatus = null,
   linkHandlerActive,
   ingameOverlaySupported,
   portable = false,
+  initialIngameOverlay = false,
   focusOnMount,
   onBack,
+  onCancel,
+  onChange,
   onFinish,
 }: TalkModeStepProps) {
   const { t } = useTranslation("wizard");
@@ -78,8 +100,8 @@ export function TalkModeStep({
   const [autostart, setAutostart] = useState(settings.autostart);
   const [linkPreviews, setLinkPreviews] = useState(settings.linkPreviews);
   const [historySharing, setHistorySharing] = useState(settings.historySharing);
-  // In-game overlay: default off (FR-1.46b, QA.55).
-  const [ingameOverlay, setIngameOverlay] = useState(false);
+  // In-game overlay: off on first start (FR-1.46b, QA.55), the saved mode in the rerun (#149).
+  const [ingameOverlay, setIngameOverlay] = useState(initialIngameOverlay);
   const [busy, setBusy] = useState(false);
   // Bumped on cancel so a late failure of the cancelled capture shows no error.
   const captureAttempt = useRef(0);
@@ -163,6 +185,33 @@ export function TalkModeStep({
     return mouse === null ? key : t(`talk.mouse.${mouse}`);
   }
 
+  const choice = useCallback(
+    (): TalkChoice => ({
+      talkMode: mode,
+      pttKey,
+      registerLinkHandler: linkHandlerActive !== true && registerLink,
+      autostart,
+      linkPreviews,
+      historySharing,
+      ingameOverlay: ingameOverlaySupported ? ingameOverlay : null,
+    }),
+    [
+      mode,
+      pttKey,
+      linkHandlerActive,
+      registerLink,
+      autostart,
+      linkPreviews,
+      historySharing,
+      ingameOverlaySupported,
+      ingameOverlay,
+    ],
+  );
+
+  useEffect(() => {
+    onChange?.(choice());
+  }, [choice, onChange]);
+
   async function submit() {
     if (mode === "pushToTalk" && pttKey === null) {
       setKeyError(t("talk.keyRequired"));
@@ -172,15 +221,7 @@ export function TalkModeStep({
     setBusy(true);
     setError(null);
     try {
-      await onFinish({
-        talkMode: mode,
-        pttKey,
-        registerLinkHandler: linkHandlerActive !== true && registerLink,
-        autostart,
-        linkPreviews,
-        historySharing,
-        ingameOverlay: ingameOverlaySupported ? ingameOverlay : null,
-      });
+      await onFinish(choice());
     } catch {
       setBusy(false);
       setError(t("errors.saveFailed"));
@@ -200,13 +241,15 @@ export function TalkModeStep({
 
   return (
     <StepFrame
-      step={5}
+      step={step}
+      total={total}
       title={t("talk.title")}
       focusOnMount={focusOnMount}
       busy={busy}
       submitLabel={t("finish")}
       onSubmit={() => void submit()}
       onBack={onBack}
+      onCancel={onCancel}
     >
       <fieldset className="wizard-choice">
         <legend className="visually-hidden">{t("talk.mode")}</legend>

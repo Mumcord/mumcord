@@ -1,5 +1,24 @@
 {
   "progress": "Céim {{current}} as {{total}}",
+  "rerun": {
+    "title": "Treoraí socraithe",
+    "note": "Tá tú ag rith an tsocraithe arís. Ní athraítear do chéannacht.",
+    "manageIdentities": "Bainistigh céannachtaí",
+    "stepsLabel": "Céimeanna an tsocraithe",
+    "stepsSkipped": "(scipta, níl an chéannacht mar chuid de seo)",
+    "steps": {
+      "identity": "Céannacht",
+      "mic": "Micreafón",
+      "privacy": "Príobháideachas",
+      "updates": "Nuashonruithe",
+      "talk": "Mód labhartha"
+    },
+    "footer": "Fágann Cealaigh gach rud mar atá. Ní shábháiltear ach na céimeanna a d'athraigh tú ag an deireadh.",
+    "discardTitle": "An bhfuil tú ag iarraidh do chuid athruithe a chaitheamh amach?",
+    "discardBody": "Ní shábháiltear aon rud sula gcríochnaíonn tú. Má chealaíonn tú anois, fanfaidh gach rud mar atá.",
+    "discardKeep": "Lean leis an eagarthóireacht",
+    "discardConfirm": "Caith athruithe amach"
+  },
   "loadFailed": "Níorbh fhéidir an socrú a luchtú.",
   "finish": "Críochnaigh",
   "errors": {

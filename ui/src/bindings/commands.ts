@@ -356,9 +356,10 @@ export const commands = {
 	activeAudioProfile: () => typedError<ActiveAudioProfile | null, ApiError>(__TAURI_INVOKE("active_audio_profile")),
 	/**
 	 *  Records up to 5 s of processed own voice with level metering, then plays it back.
-	 *  Voice of a connected session pauses meanwhile.
+	 *  Voice of a connected session pauses meanwhile. `devices` tests devices that are not saved
+	 *  yet, e.g. a microphone picked in the wizard rerun (#149).
 	 */
-	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
+	micTestStart: (devices: MicTestDevices | null) => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start", { devices })),
 	/**  Plays a short sound on the output device ("Test sound" in the output popover). */
 	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
 	/**  Ends the test wherever it is (recording or playback). */
@@ -1464,6 +1465,15 @@ export type MessageRequest = {
 export type MicLevel = {
 	/**  0.0 (silence) to 1.0 (full scale). */
 	level: number | null,
+};
+
+/**
+ *  Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+ *  They are not saved.
+ */
+export type MicTestDevices = {
+	inputDevice: string | null,
+	outputDevice: string | null,
 };
 
 /**

@@ -428,7 +428,12 @@
     "noticesFailed": "The third-party licences could not be opened.",
     "loading": "Loading…",
     "devToolsUnlocked": "Developer tools unlocked: the packet inspector is now in the settings list.",
-    "portable": "Portable"
+    "portable": "Portable",
+    "setup": "Setup",
+    "setupWizardHint": "Go through the first-start setup again to review your microphone, privacy choices, update check and talk mode. Your current choices are filled in.",
+    "setupWizardRun": "Run setup wizard again",
+    "setupWizardIdentityNote": "Your identity is not part of this. Your certificate, and with it your registered name and permissions on servers, stays exactly as it is.",
+    "setupWizardIdentityLink": "Manage it in Identity"
   },
   "profile": {
     "title": "Profile",

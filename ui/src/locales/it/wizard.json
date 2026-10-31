@@ -1,5 +1,24 @@
 {
   "progress": "Passo {{current}} di {{total}}",
+  "rerun": {
+    "title": "Procedura guidata",
+    "note": "Stai ripetendo la configurazione. La tua identità non viene modificata.",
+    "manageIdentities": "Gestisci le identità",
+    "stepsLabel": "Passaggi della configurazione",
+    "stepsSkipped": "(saltato, l'identità non ne fa parte)",
+    "steps": {
+      "identity": "Identità",
+      "mic": "Microfono",
+      "privacy": "Privacy",
+      "updates": "Aggiornamenti",
+      "talk": "Modalità di conversazione"
+    },
+    "footer": "Annulla lascia tutto com'è. Alla fine vengono salvati solo i passaggi che hai modificato.",
+    "discardTitle": "Scartare le modifiche?",
+    "discardBody": "Niente viene salvato prima della fine. Se annulli ora, tutto resta com'è.",
+    "discardKeep": "Continua a modificare",
+    "discardConfirm": "Scarta le modifiche"
+  },
   "loadFailed": "Non è stato possibile caricare la configurazione.",
   "finish": "Fine",
   "errors": {

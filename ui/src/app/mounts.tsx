@@ -209,6 +209,14 @@ export function WizardMount() {
 
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
-  const { settingsSection } = useView();
-  return <SettingsScreen {...(settingsSection ? { initialSection: settingsSection } : {})} />;
+  const { settingsSection, settingsRevision } = useView();
+  // A section requested while the settings are already open (e.g. "Manage identities" in the
+  // About page or the wizard rerun, #149) remounts the screen there.
+  return (
+    <SettingsScreen
+      key={settingsSection ?? "default"}
+      settingsRevision={settingsRevision}
+      {...(settingsSection ? { initialSection: settingsSection } : {})}
+    />
+  );
 }
