@@ -56,9 +56,15 @@ describe("DndIndicator", () => {
       api.mock.setSystemDnd({ desktop: "KDE Plasma", on: true });
     });
     expect(screen.getByRole("status")).toHaveTextContent("Do Not Disturb (system)");
-    expect(
-      screen.getByText("Turn it off in your desktop's notification settings."),
-    ).toBeInTheDocument();
+    // The hint sits behind a "?" (tooltip on hover and focus), not as permanent text (#217).
+    expect(screen.queryByText("Turn it off in your desktop's notification settings.")).toBeNull();
+    const tip = screen.getByRole("button", {
+      name: "More information: Do Not Disturb (system)",
+    });
+    expect(tip).toHaveAttribute(
+      "data-tooltip",
+      "Turn it off in your desktop's notification settings.",
+    );
   });
 });
 
