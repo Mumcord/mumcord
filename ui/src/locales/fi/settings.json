@@ -31,6 +31,7 @@
     "secureStorage": "Järjestelmäsi suojattu tallennustila ei ole käytettävissä tai pääsy evättiin.",
     "io": "Tiedostoa ei voitu lukea tai kirjoittaa. Tarkista sijainti ja yritä uudelleen.",
     "invalidInput": "Se ei onnistunut: tiedosto tai salasana ei kelpaa.",
+    "duplicateIdentity": "Tämä identiteetti on jo listallasi.",
     "notFound": "Tiedostoa tai kohdetta ei löytynyt.",
     "generic": "Jokin meni pieleen. Yritä uudelleen."
   },
@@ -69,7 +70,7 @@
     "fingerprintLine": "Sormenjälki {{fingerprint}}",
     "notUsed": "Ei vielä minkään palvelimen käytössä",
     "setDefault": "Aseta oletukseksi",
-    "setDefaultFor": "Aseta {{identity}} oletusidentiteetiksi",
+    "setDefaultFor": "Aseta oletukseksi – {{identity}}",
     "defaultSet": "{{identity}} on nyt oletusidentiteetti.",
     "details": "Tiedot",
     "detailsFor": "Näytä {{identity}}-identiteetin tiedot",

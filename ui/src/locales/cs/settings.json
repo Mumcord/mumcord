@@ -33,6 +33,7 @@
     "secureStorage": "Zabezpečené úložiště tvého systému není dostupné, nebo byl přístup odmítnut.",
     "io": "Soubor se nepodařilo přečíst ani zapsat. Zkontroluj umístění a zkus to znovu.",
     "invalidInput": "To se nepovedlo: soubor nebo heslo nejsou platné.",
+    "duplicateIdentity": "Tato identita je už ve vašem seznamu.",
     "notFound": "Soubor nebo položka nebyly nalezeny.",
     "generic": "Něco se pokazilo. Zkus to prosím znovu."
   },
@@ -71,7 +72,7 @@
     "fingerprintLine": "Otisk {{fingerprint}}",
     "notUsed": "Zatím ji nepoužívá žádný server",
     "setDefault": "Nastavit jako výchozí",
-    "setDefaultFor": "Nastavit {{identity}} jako výchozí identitu",
+    "setDefaultFor": "Nastavit jako výchozí – {{identity}}",
     "defaultSet": "{{identity}} je nyní výchozí identita.",
     "details": "Podrobnosti",
     "detailsFor": "Zobrazit podrobnosti {{identity}}",

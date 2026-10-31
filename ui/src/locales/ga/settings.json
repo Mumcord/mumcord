@@ -34,6 +34,7 @@
     "secureStorage": "Níl stóras slán do chórais ar fáil nó diúltaíodh an rochtain.",
     "io": "Níorbh fhéidir an comhad a léamh ná a scríobh. Seiceáil an suíomh agus bain triail eile as.",
     "invalidInput": "Níor oibrigh sé sin: níl an comhad ná an pasfhocal bailí.",
+    "duplicateIdentity": "Tá an t-aitheantas seo i do liosta cheana.",
     "notFound": "Níorbh fhéidir an comhad ná an mhír a aimsiú.",
     "generic": "Chuaigh rud éigin amú. Bain triail eile as."
   },
@@ -72,7 +73,7 @@
     "fingerprintLine": "Méarlorg {{fingerprint}}",
     "notUsed": "Ní úsáideann aon fhreastalaí é fós",
     "setDefault": "Socraigh mar réamhshocrú",
-    "setDefaultFor": "Socraigh {{identity}} mar an t-aitheantas réamhshocraithe",
+    "setDefaultFor": "Socraigh mar réamhshocrú – {{identity}}",
     "defaultSet": "Is é {{identity}} an t-aitheantas réamhshocraithe anois.",
     "details": "Sonraí",
     "detailsFor": "Taispeáin sonraí {{identity}}",

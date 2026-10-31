@@ -32,6 +32,7 @@
     "secureStorage": "Le stockage sécurisé de votre système n’est pas disponible ou l’accès a été refusé.",
     "io": "Le fichier n’a pas pu être lu ou écrit. Vérifiez l’emplacement et réessayez.",
     "invalidInput": "Cela n’a pas fonctionné : le fichier ou le mot de passe n’est pas valide.",
+    "duplicateIdentity": "Cette identité est déjà dans votre liste.",
     "notFound": "Le fichier ou l’élément est introuvable.",
     "generic": "Une erreur s’est produite. Veuillez réessayer."
   },
@@ -70,7 +71,7 @@
     "fingerprintLine": "Empreinte {{fingerprint}}",
     "notUsed": "Encore utilisée par aucun serveur",
     "setDefault": "Définir par défaut",
-    "setDefaultFor": "Définir {{identity}} comme identité par défaut",
+    "setDefaultFor": "Définir par défaut – {{identity}}",
     "defaultSet": "{{identity}} est maintenant l'identité par défaut.",
     "details": "Détails",
     "detailsFor": "Afficher les détails de {{identity}}",

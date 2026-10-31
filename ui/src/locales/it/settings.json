@@ -32,6 +32,7 @@
     "secureStorage": "L'archivio sicuro del tuo sistema non è disponibile o l'accesso è stato negato.",
     "io": "Non è stato possibile leggere o scrivere il file. Controlla la posizione e riprova.",
     "invalidInput": "Non ha funzionato: il file o la password non sono validi.",
+    "duplicateIdentity": "Questa identità è già nell'elenco.",
     "notFound": "Impossibile trovare il file o l'elemento.",
     "generic": "Qualcosa è andato storto. Riprova."
   },
@@ -70,7 +71,7 @@
     "fingerprintLine": "Impronta {{fingerprint}}",
     "notUsed": "Non ancora usata da nessun server",
     "setDefault": "Predefinita",
-    "setDefaultFor": "Imposta {{identity}} come identità predefinita",
+    "setDefaultFor": "Predefinita – {{identity}}",
     "defaultSet": "{{identity}} è ora l'identità predefinita.",
     "details": "Dettagli",
     "detailsFor": "Mostra i dettagli di {{identity}}",

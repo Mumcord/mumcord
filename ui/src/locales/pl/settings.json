@@ -33,6 +33,7 @@
     "secureStorage": "Bezpieczny magazyn systemu jest niedostępny lub odmówiono dostępu.",
     "io": "Nie udało się odczytać lub zapisać pliku. Sprawdź lokalizację i spróbuj ponownie.",
     "invalidInput": "To się nie udało: plik lub hasło jest nieprawidłowe.",
+    "duplicateIdentity": "Ta tożsamość jest już na Twojej liście.",
     "notFound": "Nie znaleziono pliku lub elementu.",
     "generic": "Coś poszło nie tak. Spróbuj ponownie."
   },
@@ -71,7 +72,7 @@
     "fingerprintLine": "Odcisk {{fingerprint}}",
     "notUsed": "Jeszcze nieużywana przez żaden serwer",
     "setDefault": "Ustaw jako domyślną",
-    "setDefaultFor": "Ustaw {{identity}} jako tożsamość domyślną",
+    "setDefaultFor": "Ustaw jako domyślną – {{identity}}",
     "defaultSet": "{{identity}} jest teraz tożsamością domyślną.",
     "details": "Szczegóły",
     "detailsFor": "Pokaż szczegóły {{identity}}",

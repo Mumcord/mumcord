@@ -31,6 +31,7 @@
     "secureStorage": "Der sichere Speicher deines Systems ist nicht verfügbar oder der Zugriff wurde verweigert.",
     "io": "Die Datei konnte nicht gelesen oder geschrieben werden. Prüfe den Speicherort und versuche es erneut.",
     "invalidInput": "Das hat nicht geklappt: Datei oder Passwort sind ungültig.",
+    "duplicateIdentity": "Diese Identität ist bereits in deiner Liste.",
     "notFound": "Die Datei oder das Element wurde nicht gefunden.",
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
   },
@@ -69,7 +70,7 @@
     "fingerprintLine": "Fingerabdruck {{fingerprint}}",
     "notUsed": "Noch von keinem Server genutzt",
     "setDefault": "Als Standard",
-    "setDefaultFor": "{{identity}} als Standardidentität festlegen",
+    "setDefaultFor": "Als Standard – {{identity}}",
     "defaultSet": "{{identity}} ist jetzt die Standardidentität.",
     "details": "Details",
     "detailsFor": "Details zu {{identity}} anzeigen",

@@ -32,6 +32,7 @@
     "secureStorage": "Tavas sistēmas drošā krātuve nav pieejama, vai piekļuve tika atteikta.",
     "io": "Failu neizdevās nolasīt vai ierakstīt. Pārbaudi atrašanās vietu un mēģini vēlreiz.",
     "invalidInput": "Tas neizdevās: fails vai parole nav derīga.",
+    "duplicateIdentity": "Šī identitāte jau ir sarakstā.",
     "notFound": "Failu vai vienumu neizdevās atrast.",
     "generic": "Kaut kas nogāja greizi. Lūdzu, mēģini vēlreiz."
   },
@@ -70,7 +71,7 @@
     "fingerprintLine": "Nospiedums {{fingerprint}}",
     "notUsed": "Vēl neizmanto neviens serveris",
     "setDefault": "Noteikt noklusējuma",
-    "setDefaultFor": "Noteikt {{identity}} par noklusējuma identitāti",
+    "setDefaultFor": "Noteikt noklusējuma – {{identity}}",
     "defaultSet": "{{identity}} tagad ir noklusējuma identitāte.",
     "details": "Detaļas",
     "detailsFor": "Rādīt {{identity}} detaļas",

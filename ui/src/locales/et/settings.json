@@ -31,6 +31,7 @@
     "secureStorage": "Sinu süsteemi turvahoidla pole saadaval või juurdepääs keelati.",
     "io": "Faili ei õnnestunud lugeda ega kirjutada. Kontrolli asukohta ja proovi uuesti.",
     "invalidInput": "See ei õnnestunud: fail või parool pole kehtiv.",
+    "duplicateIdentity": "See identiteet on juba sinu nimekirjas.",
     "notFound": "Faili või kirjet ei leitud.",
     "generic": "Midagi läks valesti. Proovi palun uuesti."
   },
@@ -69,7 +70,7 @@
     "fingerprintLine": "Sõrmejälg {{fingerprint}}",
     "notUsed": "Ükski server ei kasuta seda veel",
     "setDefault": "Vaikimisi",
-    "setDefaultFor": "Määra {{identity}} vaikimisi identiteediks",
+    "setDefaultFor": "Vaikimisi – {{identity}}",
     "defaultSet": "{{identity}} on nüüd vaikimisi identiteet.",
     "details": "Üksikasjad",
     "detailsFor": "Näita {{identity}} üksikasju",
