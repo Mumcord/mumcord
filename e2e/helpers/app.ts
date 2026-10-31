@@ -29,13 +29,21 @@ export interface LaunchOptions {
   audio?: string;
   /** Start with a new, empty profile (data dir + keyring). Default: keep the current one. */
   freshProfile?: boolean;
+  /**
+   * Extra environment for the app (e.g. a local update server). Replaces the extras of earlier
+   * launches; default: keep them. Every spec file starts without extras.
+   */
+  env?: Record<string, string>;
 }
+
+const noExtraEnv: Record<string, string> = {};
 
 // Shared with the wdio config (see state.ts): the hook starts the driver, the specs read it.
 const state = shared("app", {
   driver: undefined as ChildProcess | undefined,
   profileDir: "",
   audio: "null",
+  env: noExtraEnv,
 });
 
 /** The current profile's root (XDG data/config/cache dirs live below it). */
@@ -77,8 +85,8 @@ async function waitPort(port: number, open: boolean): Promise<void> {
 }
 
 /**
- * Starts tauri-driver. The app inherits its environment from the driver, so profile dirs and the
- * audio backend are fixed per driver process.
+ * Starts tauri-driver. The app inherits its environment from the driver, so profile dirs, the
+ * audio backend and extra env are fixed per driver process.
  */
 export async function startDriver(): Promise<void> {
   if (!state.profileDir) newProfile();
@@ -93,6 +101,7 @@ export async function startDriver(): Promise<void> {
       MUMCORD_AUDIO_BACKEND: state.audio,
       // Link previews may only fetch the local test page, never the internet (FR-1.49).
       MUMCORD_TEST_PREVIEW_ADDRESSES: "127.0.0.1",
+      ...state.env,
     },
   });
   await waitPort(driverPort, true);
@@ -179,6 +188,7 @@ export async function stopDriver(): Promise<void> {
 export async function prepareFresh(): Promise<void> {
   newProfile();
   state.audio = "null";
+  state.env = {};
   await killStrays(0);
   await clearKeyring();
   await startDriver();
@@ -199,6 +209,7 @@ export async function restart(opts: LaunchOptions = {}): Promise<void> {
     await clearKeyring();
   }
   if (opts.audio !== undefined) state.audio = opts.audio;
+  if (opts.env !== undefined) state.env = opts.env;
   await startDriver();
   // A healthy debug build starts in seconds even on a 2-core runner; fail clearly instead of
   // letting the test hit the mocha timeout.
