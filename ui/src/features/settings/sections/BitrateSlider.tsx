@@ -8,7 +8,7 @@ import type { SettingsSectionProps } from "./types";
 /** Lowest bitrate the slider offers (FR-2.64). */
 export const BITRATE_MIN_KBPS = 16;
 /** Opus' own limit; the range while no voice server tells a lower maximum. */
-const BITRATE_OPUS_MAX_KBPS = 510;
+export const BITRATE_OPUS_MAX_KBPS = 510;
 export const BITRATE_THROTTLE_MS = 100;
 
 /**
@@ -20,11 +20,14 @@ export function BitrateSlider({
   update,
   compact = false,
   tipLabel,
+  label,
 }: SettingsSectionProps & {
   /** Compact variant (quick panel): the hint sits behind a "?" button instead of a line of text. */
   compact?: boolean;
   /** Accessible name of the "?" button that carries the hint in the compact variant. */
   tipLabel?: string;
+  /** Replaces the "Bitrate" label, e.g. to name where the value comes from. */
+  label?: string;
 }) {
   const { t } = useTranslation("settings");
   const id = useId();
@@ -60,7 +63,7 @@ export function BitrateSlider({
 
   return (
     <div className="settings-field overlay-settings__slider">
-      <label htmlFor={id}>{t("audio.bitrate")}</label>
+      <label htmlFor={id}>{label ?? t("audio.bitrate")}</label>
       {compact && tipLabel !== undefined ? (
         <InfoTip
           label={tipLabel}

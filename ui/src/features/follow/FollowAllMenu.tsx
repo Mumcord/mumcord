@@ -23,8 +23,9 @@ function describeFailure(t: TFunction<"follow">, error: unknown, action: Action)
 type Action = "follow" | "unfollow";
 
 /**
- * Server name row above the channel tree with a "⋯" menu (also on right-click): "Follow all
- * channels" and "Unfollow all channels" (QA.13). Hidden on servers without follow support.
+ * The server's "⋯" menu in the section header above the channel tree (QA.13, issue #172), also on
+ * right-click: Server info, "Follow all channels" and "Unfollow all channels". Hidden on servers
+ * without follow support.
  */
 export function FollowAllMenu() {
   const { t } = useTranslation("follow");
@@ -81,7 +82,6 @@ export function FollowAllMenu() {
         setMenuAt({ x: event.clientX, y: event.clientY });
       }}
     >
-      <span className="follow-server__name">{name}</span>
       <button
         ref={buttonRef}
         type="button"

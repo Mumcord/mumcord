@@ -52,5 +52,9 @@
     "dismiss": "Elvetés",
     "unfollowFailed": "Az összes csatorna követésének megszüntetése nem sikerült. Próbáld újra."
   },
-  "mention": "megemlít téged"
+  "mention": "megemlít téged",
+  "header": {
+    "follow": "Csatorna követése",
+    "unfollow": "Követed, kattints a leállításhoz"
+  }
 }

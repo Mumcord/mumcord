@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (εκτίμηση)",
   "lowLatencyMode": "Λειτουργία χαμηλής καθυστέρησης",
   "identity": "Ταυτότητα",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (προφίλ καναλιού)",
+  "profile": {
+    "row": "Προφίλ ήχου",
+    "musicOn": "Ποιότητα μουσικής",
+    "musicOff": "Ποιότητα μουσικής ανενεργή",
+    "lowLatencyOn": "Λειτουργία χαμηλής καθυστέρησης",
+    "lowLatencyOff": "Λειτουργία χαμηλής καθυστέρησης ανενεργή",
+    "defaults": "Προεπιλογές"
+  }
 }

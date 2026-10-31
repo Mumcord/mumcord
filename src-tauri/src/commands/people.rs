@@ -122,6 +122,19 @@ pub fn person_set_volume(
     Ok(engine.person_set_volume(to_engine_server_id(server_id), session, volume)?)
 }
 
+/// Moves a person to another channel; the server checks the move permission and the result
+/// arrives as `userUpserted` (issue #172).
+#[tauri::command]
+#[specta::specta]
+pub fn person_move(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    channel_id: ChannelId,
+) -> ApiResult<()> {
+    Ok(engine.person_move(to_engine_server_id(server_id), session, channel_id)?)
+}
+
 /// Mutes a person locally; remembered by certificate hash per server.
 #[tauri::command]
 #[specta::specta]

@@ -107,6 +107,11 @@ export const commands = {
 	 *  as `ChannelUpserted`; repeated calls for the same description send nothing.
 	 */
 	channelDescriptionRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { serverId, channelId })),
+	/**
+	 *  Moves a person to another channel; the server checks the move permission and the result
+	 *  arrives as `userUpserted` (issue #172).
+	 */
+	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
@@ -300,6 +305,11 @@ export const commands = {
 	 */
 	historyLoad: (serverId: number, conversation: Conversation, before: string | null, limit: number) => typedError<ChatMessage[], ApiError>(__TAURI_INVOKE("history_load", { serverId, conversation, before, limit })),
 	historyClear: (scope: HistoryScope) => typedError<null, ApiError>(__TAURI_INVOKE("history_clear", { scope })),
+	/**
+	 *  When the user last cleared the history of a channel (RFC 3339), for channel info (issue
+	 *  #170); `null` if never.
+	 */
+	historyClearedAt: (serverId: number, channelId: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("history_cleared_at", { serverId, channelId })),
 	/**  "Save history" switch per server (default on). */
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
 	/**
@@ -342,6 +352,18 @@ export const commands = {
 	 *  server. Follow `BitrateMaxChanged` afterwards.
 	 */
 	bitrateMax: () => typedError<number | null, ApiError>(__TAURI_INVOKE("bitrate_max")),
+	/**  The channels of a connected server that have an audio profile. */
+	channelAudioProfiles: (serverId: number) => typedError<ChannelAudioEntry[], ApiError>(__TAURI_INVOKE("channel_audio_profiles", { serverId })),
+	/**
+	 *  Saves the audio profile of a channel, or removes it with `null` ("Remove profile"). Applies
+	 *  at once when the user is in that channel.
+	 */
+	channelAudioProfileSet: (serverId: number, channelId: number, profile: ChannelAudioProfile | null) => typedError<null, ApiError>(__TAURI_INVOKE("channel_audio_profile_set", { serverId, channelId, profile })),
+	/**
+	 *  The channel profile in effect now; `null` runs on the global settings. Follow
+	 *  `ActiveAudioProfileChanged` afterwards.
+	 */
+	activeAudioProfile: () => typedError<ActiveAudioProfile | null, ApiError>(__TAURI_INVOKE("active_audio_profile")),
 	/**
 	 *  Records up to 5 s of processed own voice with level metering, then plays it back.
 	 *  Voice of a connected session pauses meanwhile. `devices` tests devices that are not saved
@@ -582,10 +604,12 @@ export const commands = {
 /** Events */
 export const events = {
 	acceptedConversationsChanged: makeEvent<AcceptedConversationsChanged, AcceptedConversationsChanged>("accepted-conversations-changed"),
+	activeAudioProfileChanged: makeEvent<ActiveAudioProfileChanged, ActiveAudioProfileChanged>("active-audio-profile-changed"),
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
+	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
 	channelRemoved: makeEvent<ChannelRemoved, ChannelRemoved>("channel-removed"),
 	channelUpserted: makeEvent<ChannelUpserted, ChannelUpserted>("channel-upserted"),
@@ -644,6 +668,21 @@ export type AcceptedConversation = {
 
 export type AcceptedConversationsChanged = {
 	conversations: AcceptedConversation[],
+};
+
+/**  The profile in effect: the own channel's on the server that carries voice. */
+export type ActiveAudioProfile = {
+	serverId: number,
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**
+ *  The channel profile in effect changed: the user joined or left a channel with a profile, or
+ *  its profile was edited. `null` runs on the global settings.
+ */
+export type ActiveAudioProfileChanged = {
+	active: ActiveAudioProfile | null,
 };
 
 /**  Error returned by every failing command. */
@@ -801,6 +840,26 @@ export type CertTrustRequired = {
 /**  How a tested server certificate relates to the saved trust decision. */
 export type CertificateState = "trusted" | "unknown" | "changed";
 
+/**  A channel of the server that has a profile. */
+export type ChannelAudioEntry = {
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**  The overrides of a channel audio profile; `null` keeps the global setting ("default"). */
+export type ChannelAudioProfile = {
+	musicQuality: boolean | null,
+	lowLatency: boolean | null,
+	/**  Own bitrate cap in kbit/s, 16 to 510; the server's limit still wins. */
+	bitrateKbps: number | null,
+};
+
+/**  The audio profiles of a server's channels changed. */
+export type ChannelAudioProfilesChanged = {
+	serverId: number,
+	profiles: ChannelAudioEntry[],
+};
+
 export type ChannelInfo = {
 	id: number,
 	/**  `null` for the root channel. */
@@ -816,8 +875,13 @@ export type ChannelInfo = {
 	 *  `channel_description_request` fetches the text (FR-1.48b).
 	 */
 	hasDescription: boolean,
-	/**  The channel's user limit; `null` when it has none. */
+	/**  User limit; `null` when the channel has none (the server's limit still applies). */
 	maxUsers: number | null,
+	temporary: boolean,
+	/**  Channels linked to this one, sorted by id. */
+	links: number[],
+	/**  Entering needs a password (access token) or group membership. */
+	enterRestricted: boolean,
 };
 
 export type ChannelPasswordPrompt = {
@@ -842,6 +906,15 @@ export type ChannelPermissions = {
 	listen: boolean,
 	/**  Only meaningful on the root channel: "Register self" (FR-1.34). */
 	registerSelf: boolean,
+	speak: boolean,
+	whisper: boolean,
+	/**  Edit the channel's ACL; only true once the server confirmed it. */
+	write: boolean,
+	/**
+	 *  Move other people out of this channel (drag a person, "Move users here…"); only true
+	 *  once the server confirmed it.
+	 */
+	moveUsers: boolean,
 };
 
 export type ChannelRemoved = {

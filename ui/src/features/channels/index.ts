@@ -53,5 +53,5 @@ export {
   useSelectedConversation,
 } from "./selection";
 export { ChannelsPanel, type ChannelsPanelProps } from "./ChannelsPanel";
-export type { ChannelAction } from "./ChannelTree";
+export type { ChannelAction, ChannelMenuRequest } from "./ChannelTree";
 export { ProfileCard, type ProfileCardProps } from "../members/ProfileCard";

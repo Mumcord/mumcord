@@ -225,13 +225,13 @@ async function waitNoBar(timeout: number): Promise<void> {
   });
 }
 
-// The chat header follow button; the Clear history button uses the same class.
+// The follow eye in front of the channel name (issue #170).
 function followButton() {
   return $("//button[contains(@class,'follow-toggle') and @aria-pressed]");
 }
 
-async function followButtonText(): Promise<string> {
-  return await followButton().getText();
+async function isFollowing(): Promise<boolean> {
+  return (await followButton().getAttribute("aria-pressed")) === "true";
 }
 
 describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
@@ -268,10 +268,10 @@ describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
     // Select Lobby (single click) and follow it.
     await $("//*[@role='treeitem'][.//*[normalize-space()='Lobby']]").click();
     await followButton().waitForDisplayed();
-    if (!(await followButtonText()).includes("Following")) {
+    if (!(await isFollowing())) {
       await followButton().click();
     }
-    await browser.waitUntil(async () => (await followButtonText()).includes("Following"));
+    await browser.waitUntil(isFollowing);
     await bot(["expect", "user", ME, "--in", "Raid", "--listening", "Lobby"], {
       name: "Watcher",
       timeout: 15,
@@ -288,7 +288,7 @@ describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
       name: "Watcher",
       timeout: 30,
     });
-    expect(await followButtonText()).toContain("Following");
+    expect(await isFollowing()).toBe(true);
   });
 
   it("AC-1.21b: killing the TCP connection -> Reconnecting bar -> back in Raid, Lobby followed", async () => {

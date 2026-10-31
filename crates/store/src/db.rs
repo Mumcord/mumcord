@@ -222,6 +222,20 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, cert_hash)
     );
     ",
+    // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
+    // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
+    // path kept so a renamed or recreated channel still matches.
+    r"
+    CREATE TABLE channel_audio_profile (
+        server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        channel_id    INTEGER NOT NULL,
+        channel_path  TEXT    NOT NULL,
+        music_quality INTEGER CHECK (music_quality IN (0, 1)),
+        low_latency   INTEGER CHECK (low_latency IN (0, 1)),
+        bitrate_kbps  INTEGER CHECK (bitrate_kbps > 0),
+        PRIMARY KEY (server_id, channel_id)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

@@ -11,6 +11,7 @@
 //! Lock order: `core` before `store`. Neither lock is held across an `.await`.
 
 pub(crate) mod batch;
+mod channel_audio;
 mod channel_password;
 pub mod convert;
 mod description;
@@ -42,6 +43,7 @@ use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
+pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
 pub use types::*;
@@ -268,6 +270,8 @@ struct Core {
     audio: Option<Audio>,
     pipeline: Option<VoicePipeline>,
     mic_test: Option<MicTest>,
+    /// The channel audio profile in effect (issue #171); `None` runs on the global settings.
+    channel_audio: Option<ActiveAudioProfile>,
     /// Devices to switch back to once the running mic test ends, when it ran on devices the
     /// caller did not save (wizard rerun, #149).
     mic_test_restore: Option<(Option<String>, Option<String>)>,
@@ -1070,6 +1074,32 @@ impl Engine {
         Ok(())
     }
 
+    /// Moves a person to another channel (drag in the tree, "Move users here…"). The server
+    /// enforces the move permission; the result arrives as the person's `UserUpserted`.
+    pub fn person_move(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        channel_id: u32,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let (channel_known, user_known) = ctx.handle.with_state(|s| {
+            (
+                s.channels.contains_key(&channel_id),
+                s.users.contains_key(&session),
+            )
+        });
+        if !channel_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown channel"));
+        }
+        if !user_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
+        }
+        ctx.handle
+            .move_user(session, channel_id)
+            .map_err(convert::command_error)
+    }
+
     pub fn person_set_volume(
         &self,
         server_id: ServerId,
@@ -1711,6 +1741,7 @@ impl Inner {
             }
         }
         self.start_pipeline(core);
+        self.sync_channel_audio(core);
     }
 
     /// Self-deafens and mutes a still connected server; the user stays in their channel.
@@ -2096,6 +2127,7 @@ impl Inner {
             ctx.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
         }
+        self.sync_channel_audio(&mut lock(&self.core));
         // A link naming a channel is an explicit join (QA.23); after `ServerSynced`, which
         // resets the sound hub's view of the own state.
         if link_join
@@ -2438,6 +2470,7 @@ impl Inner {
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                     self.on_own_channel(ctx, user.channel_id);
+                    self.sync_channel_audio(&mut lock(&self.core));
                 }
                 if let Some(setting) = setting {
                     ctx.events.emit(EngineEvent::UserUpserted(

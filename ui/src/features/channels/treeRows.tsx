@@ -14,19 +14,18 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
+  type DragEvent,
+  type ReactNode,
 } from "react";
-import { createPortal } from "react-dom";
 import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
-import { descriptionKey, showInfo, useHiddenHash } from "../chat/hiddenInfo";
 import { ProfilePreviewTrigger } from "../members/ProfilePreview";
 import { openPersonMenuFromEvent } from "../members/personMenuStore";
 import { clickPerson, doubleClickPerson } from "../members/personClick";
 import { previewOnFocus, releasePreview } from "../members/profilePreviewStore";
-import { ServerMenu } from "../servers/ServerMenu";
 import { AvatarStack, type StackPerson } from "./AvatarStack";
 import { StatusIcons } from "./PersonStatus";
-import { shownServerId, type ServerState } from "./serverStore";
+import type { ServerState } from "./serverStore";
 import { useStatusText } from "./statusText";
 import { cachedSelector, sameValue } from "./cachedSelector";
 import { foldName, matchRange } from "./search";
@@ -81,6 +80,78 @@ function Highlighted({ text, query }: { text: string; query: string }) {
       <mark className="tree-match">{text.slice(range.start, range.end)}</mark>
       {text.slice(range.end)}
     </>
+  );
+}
+
+/** Drag data type of a person row (issue #172); its value is the session. */
+const PERSON_DRAG_TYPE = "application/x-mumcord-person";
+
+/** Small status icon after a channel name, with its meaning for screen readers. */
+const GLYPHS = {
+  // Speaker: the channel the user is in for voice.
+  voice: <path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />,
+  // Clock: a temporary channel, removed by the server once empty.
+  temporary: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
+  text: <path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18" />,
+};
+
+/**
+ * Glyph before every channel name, always in the same place (#172): 🔊 for the own voice channel,
+ * ⏱ for temporary channels and # for all others. Decorative: the row's name says the rest.
+ */
+function ChannelGlyph({ kind }: { kind: keyof typeof GLYPHS }) {
+  return (
+    <svg
+      className="tree-channel__glyph"
+      data-kind={kind}
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {GLYPHS[kind]}
+    </svg>
+  );
+}
+
+function StatusIcon({
+  label,
+  kind,
+  children,
+}: {
+  label: string;
+  kind: string;
+  children: ReactNode;
+}) {
+  return (
+    <span className={`tree-channel__status tree-channel__status--${kind}`}>
+      <svg
+        viewBox="0 0 24 24"
+        width="12"
+        height="12"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {children}
+      </svg>
+      <span className="visually-hidden">, {label}</span>
+    </span>
   );
 }
 
@@ -140,13 +211,13 @@ export const ChannelBranch = memo(function ChannelBranchRow({
   const showStack = stack.length > 0;
   const showAllLabel = listingAll ? t("tree.showFewer") : t("tree.showAll", { total: count });
   const actions = tree.actions;
-  // The right-click menu only exists to bring back a closed channel description (FR-2.66).
-  const descriptionHidden = useHiddenHash(descriptionKey(shownServerId(), id)) !== null;
-  const [menu, setMenu] = useState<{ x: number; y: number; opener: HTMLElement } | null>(null);
-  const closeMenu = (returnFocus: boolean) => {
-    if (returnFocus) menu?.opener.focus();
-    setMenu(null);
-  };
+  // User limit (FR-3.85): `(n/max)` after the name; full channels are dimmed.
+  const max = channel.maxUsers;
+  const full = max !== null && count >= max;
+  const places = max === null ? "" : t("tree.places", { count: max, taken: count });
+  const [dropping, setDropping] = useState(false);
+  const acceptsDrop = (event: DragEvent) =>
+    channel.permissions.moveUsers && event.dataTransfer.types.includes(PERSON_DRAG_TYPE);
   // Indent of the channel's people and sub-channels; also read by its avatar stack line, which is
   // indented like its people (QA.27).
   const indent = { "--tree-indent": `${String(indentRem(level + 1))}rem` } as CSSProperties;
@@ -167,6 +238,10 @@ export const ChannelBranch = memo(function ChannelBranchRow({
         aria-keyshortcuts="Shift+Enter"
         tabIndex={tabbable ? 0 : -1}
         data-row={rowId}
+        data-full={full || undefined}
+        data-tooltip={full ? t("tree.full") : undefined}
+        data-tooltip-detail={full ? places : undefined}
+        data-tooltip-placement={full ? "right" : undefined}
         className="tree-channel"
         style={indent}
         onFocus={(event) => {
@@ -184,18 +259,40 @@ export const ChannelBranch = memo(function ChannelBranchRow({
           actions.current.joinOnce(id, event.timeStamp);
         }}
         onContextMenu={(event) => {
-          if (!descriptionHidden) return;
           event.preventDefault();
+          event.stopPropagation();
+          actions.current.focus(rowId);
           const keyboard = event.clientX === 0 && event.clientY === 0;
           const rect = event.currentTarget.getBoundingClientRect();
-          setMenu({
+          actions.current.openMenu(id, {
             x: keyboard ? rect.left : event.clientX,
             y: keyboard ? rect.bottom : event.clientY,
-            opener: event.currentTarget,
           });
         }}
+        onDragOver={(event) => {
+          if (!acceptsDrop(event)) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+          if (!dropping) setDropping(true);
+        }}
+        onDragLeave={(event) => {
+          const to = event.relatedTarget;
+          if (!(to instanceof Node && event.currentTarget.contains(to))) setDropping(false);
+        }}
+        onDrop={(event) => {
+          setDropping(false);
+          if (!acceptsDrop(event)) return;
+          event.preventDefault();
+          const session = Number(event.dataTransfer.getData(PERSON_DRAG_TYPE));
+          if (Number.isInteger(session)) actions.current.movePerson(session, id);
+        }}
       >
-        <div className="tree-channel__row" data-selected={selected} data-voice={isOwn}>
+        <div
+          className="tree-channel__row"
+          data-selected={selected}
+          data-voice={isOwn}
+          data-drop={dropping || undefined}
+        >
           <span
             className="tree-channel__toggle"
             data-expandable={expandable}
@@ -209,13 +306,40 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               event.stopPropagation();
             }}
           >
-            {expanded ? "▾" : "▸"}
+            {/* Thin chevron like the mockup; it turns down while the channel is expanded. */}
+            <svg
+              className="tree-channel__chevron"
+              data-expanded={expanded}
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              focusable="false"
+            >
+              <path d="m9 6 6 6-6 6" />
+            </svg>
           </span>
+          <ChannelGlyph kind={isOwn ? "voice" : channel.temporary ? "temporary" : "text"} />
           <span id={labelId} className="tree-channel__label">
-            <span className="tree-channel__name" data-tooltip={channel.name}>
+            <span className="tree-channel__name" data-tooltip={channel.name} data-tooltip-overflow>
               <Highlighted text={channel.name} query={query} />
             </span>
-            {isOwn && <span className="visually-hidden">, {t("tree.voiceHere")}</span>}
+            {max !== null && (
+              // Generated text like the count below (WCAG 2.5.3); the spoken form follows it.
+              <span
+                className="tree-channel__limit"
+                data-limit={`(${String(count)}/${String(max)})`}
+                data-full={full}
+              >
+                <span className="visually-hidden">
+                  , {full ? t("tree.fullPlaces", { places }) : places}
+                </span>
+              </span>
+            )}
             {!channel.permissions.enter && (
               // The server's ACL refuses entering; joining asks for a channel password (FR-2.78).
               <span className="tree-channel__lock">
@@ -236,25 +360,28 @@ export const ChannelBranch = memo(function ChannelBranchRow({
                 <span className="visually-hidden">, {t("tree.locked")}</span>
               </span>
             )}
-            {count > 0 && (
+            {channel.temporary && (
+              // Shown by the ⏱ glyph before the name; here only for screen readers.
+              <span className="visually-hidden">, {t("tree.temporary")}</span>
+            )}
+            {channel.links.length > 0 && (
+              <StatusIcon kind="linked" label={t("tree.linked")}>
+                <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" />
+                <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" />
+              </StatusIcon>
+            )}
+            {count > 0 && max === null && (
               // The digits are CSS-generated (::before) so the row's visible text stays a run of
               // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
               <span className="tree-channel__count" data-count={count}>
-                <svg
-                  viewBox="0 0 24 24"
-                  width="12"
-                  height="12"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0" />
-                </svg>
                 <span className="visually-hidden">, {t("tree.people", { count })}</span>
+              </span>
+            )}
+            {isOwn && (
+              // Generated like the counts (WCAG 2.5.3): the visible "you are here" follows the
+              // count, so as text it would break the name's order; the spoken form is hidden text.
+              <span className="tree-channel__here" data-label={t("tree.youAreHere")}>
+                <span className="visually-hidden">, {t("tree.youAreHere")}</span>
               </span>
             )}
             {actions.current.channelBadge?.(id)}
@@ -318,26 +445,6 @@ export const ChannelBranch = memo(function ChannelBranchRow({
           </div>
         )}
       </div>
-      {menu &&
-        descriptionHidden &&
-        createPortal(
-          <ServerMenu
-            label={t("tree.menuLabel", { channel: channel.name })}
-            position={menu}
-            onClose={closeMenu}
-            items={[
-              {
-                id: "showDescription",
-                label: t("tree.showDescription"),
-                onSelect: () => {
-                  closeMenu(true);
-                  showInfo(descriptionKey(shownServerId(), id));
-                },
-              },
-            ]}
-          />,
-          document.body,
-        )}
       {expanded && (
         <div role="group" id={groupId} style={indent}>
           {(shown ?? (!crowded || listingAll ? node.members : NO_STACK)).map((user) => (
@@ -365,6 +472,13 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
   const isSelf = useSelect(tree.ui, (ui) => ui.selfSession === session);
   const query = useSelect(tree.ui, (ui) => ui.query);
   const src = useSelect(tree.avatars, (avatarOf) => avatarOf(user));
+  // Dragging a person onto a channel moves them; offered only with the move permission in
+  // their channel and never for oneself (joining is how one moves oneself, issue #172).
+  const movable = useSelect(
+    tree.server,
+    (s: ServerState) => s.channels.get(user.channelId)?.permissions.moveUsers === true,
+  );
+  const draggable = movable && !isSelf;
   const rowRef = useWatchOnScreen(tree, user.hasAvatar ? [session] : NO_SESSIONS);
   const status = statusText(user, talking);
   const actions = tree.actions;
@@ -381,6 +495,15 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
       data-row={rowId}
       className="tree-person"
       data-talking={talking}
+      draggable={draggable || undefined}
+      onDragStart={
+        draggable
+          ? (event) => {
+              event.dataTransfer.setData(PERSON_DRAG_TYPE, String(session));
+              event.dataTransfer.effectAllowed = "move";
+            }
+          : undefined
+      }
       onFocus={(event) => {
         if (event.target !== event.currentTarget) return;
         actions.current.focus(rowId);

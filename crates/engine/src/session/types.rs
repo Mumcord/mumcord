@@ -115,6 +115,12 @@ pub struct ChannelPermissions {
     pub text_message: bool,
     pub listen: bool,
     pub register_self: bool,
+    pub speak: bool,
+    pub whisper: bool,
+    /// Edit the channel's ACL; only true once the server confirmed it.
+    pub write: bool,
+    /// Move other people out of this channel; only true once the server confirmed it.
+    pub move_users: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -129,8 +135,13 @@ pub struct ChannelView {
     /// True when the channel has a description, even if its text still has to be requested
     /// (`Engine::channel_description_request`, FR-1.48b).
     pub has_description: bool,
-    /// The channel's user limit; `None` when it has none (0 on the wire).
+    /// User limit; `None` when the channel has none (the server's limit still applies).
     pub max_users: Option<u32>,
+    pub temporary: bool,
+    /// Channels linked to this one, sorted by id.
+    pub links: Vec<u32>,
+    /// Entering needs a password (access token) or group membership.
+    pub enter_restricted: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -466,6 +477,11 @@ pub enum EngineEvent {
     /// The highest bitrate the bitrate slider can reach changed (FR-2.64); `None` without a
     /// voice server.
     BitrateMaxChanged(Option<u32>),
+    /// The channel audio profile in effect changed (issue #171); `None` runs on the global
+    /// settings.
+    ActiveAudioProfileChanged(Option<super::ActiveAudioProfile>),
+    /// The audio profiles of the server's channels changed (issue #171).
+    ChannelAudioProfilesChanged(Vec<super::ChannelAudioView>),
     /// Microphone level 0.0–1.0.
     MicLevel(f32),
     /// The mic test moved to a new phase (FR-1.4).

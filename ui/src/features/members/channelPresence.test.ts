@@ -8,10 +8,22 @@ const lobby: ChannelInfo = {
   parentId: 0,
   name: "Lobby",
   position: 0,
-  permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
+  permissions: {
+    enter: true,
+    textMessage: true,
+    listen: true,
+    registerSelf: false,
+    speak: true,
+    whisper: true,
+    write: false,
+    moveUsers: false,
+  },
   description: null,
   hasDescription: false,
   maxUsers: null,
+  temporary: false,
+  links: [],
+  enterRestricted: false,
 };
 
 function user(session: number, name: string, change: Partial<User> = {}): User {

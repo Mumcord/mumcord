@@ -1,6 +1,8 @@
 import { useContext, useEffect, useId, useRef, useState } from "react";
+import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
-import type { ConnectionStats } from "../../bindings/commands";
+import type { ChannelAudioProfile, ConnectionStats } from "../../bindings/commands";
+import { useActiveAudioProfile } from "../channelaudio";
 import { shownServerId } from "../channels/serverStore";
 import { useServers } from "../servers";
 import { windowMinutes } from "./audioHealth";
@@ -14,8 +16,25 @@ import "./connection.css";
 
 const SIGNAL = "M4 20v-3M9 20v-7M14 20v-11M19 20V4";
 
+/** The values a channel audio profile sets, e.g. "Music quality, 256 kbit/s (channel profile)". */
+function profileText(profile: ChannelAudioProfile, t: TFunction<"connection">) {
+  const items = [
+    profile.musicQuality === null
+      ? null
+      : t(profile.musicQuality ? "profile.musicOn" : "profile.musicOff"),
+    profile.lowLatency === null
+      ? null
+      : t(profile.lowLatency ? "profile.lowLatencyOn" : "profile.lowLatencyOff"),
+    profile.bitrateKbps === null ? null : t("bitrateValue", { value: profile.bitrateKbps }),
+  ].filter((item) => item !== null);
+  return t("profileSource", {
+    label: items.length > 0 ? items.join(", ") : t("profile.defaults"),
+  });
+}
+
 function StatsList({ stats }: { stats: ConnectionStats }) {
   const { t, i18n } = useTranslation("connection");
+  const active = useActiveAudioProfile();
   const rows: [string, string][] = [
     [t("transport"), stats.transport ? t(`transportValue.${stats.transport}`) : t("none")],
     [
@@ -33,6 +52,7 @@ function StatsList({ stats }: { stats: ConnectionStats }) {
       : []),
     [t("loss"), t("lossValue", { value: stats.lossPercent })],
     [t("bitrate"), t("bitrateValue", { value: stats.sendBitrateKbps })],
+    ...(active ? [[t("profile.row"), profileText(active.profile, t)] as [string, string]] : []),
     [
       t("serverLimit"),
       stats.serverMaxBandwidthKbps === null

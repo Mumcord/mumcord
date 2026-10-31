@@ -93,5 +93,14 @@
   "endToEndValue": "≈ {{value}} ms (įvertis)",
   "lowLatencyMode": "Mažos delsos režimas",
   "identity": "Tapatybė",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (kanalo profilis)",
+  "profile": {
+    "row": "Garso profilis",
+    "musicOn": "Muzikos kokybė",
+    "musicOff": "Muzikos kokybė išjungta",
+    "lowLatencyOn": "Mažos delsos režimas",
+    "lowLatencyOff": "Mažos delsos režimas išjungtas",
+    "defaults": "Numatytieji"
+  }
 }

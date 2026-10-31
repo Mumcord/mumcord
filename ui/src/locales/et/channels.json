@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Serveri ülevaade",
   "tree": {
     "label": "Kanalid",
-    "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda",
+    "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda · Menüüklahv: kanali valikud",
     "join": "Liitu",
-    "menuLabel": "Valikud: {{channel}}",
-    "showDescription": "Näita kanali kirjeldust",
     "you": "(sina)",
-    "voiceHere": "oled siin (hääl)",
+    "youAreHere": "oled siin",
     "people_one": "{{count}} inimene",
     "people_other": "{{count}} inimest",
     "stack": {
@@ -19,7 +16,13 @@
     "showAll": "Näita kõiki ({{total}})",
     "showFewer": "Näita vähem",
     "jump": "Hüppa minu kanalisse",
-    "locked": "lukus"
+    "locked": "lukus",
+    "temporary": "ajutine",
+    "linked": "lingitud",
+    "full": "Kanal on täis",
+    "fullPlaces": "Kanal on täis, {{places}}",
+    "places_one": "{{taken}} / {{count}} koht hõivatud",
+    "places_other": "{{taken}} / {{count}} kohta hõivatud"
   },
   "status": {
     "listening": "ainult kuulab",
@@ -56,7 +59,8 @@
   "errors": {
     "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
     "joinFailed": "Kanaliga liitumine ei õnnestunud. Proovi palun uuesti.",
-    "notConnected": "Serveriga pole ühendatud."
+    "notConnected": "Serveriga pole ühendatud.",
+    "moveFailed": "Seda inimest ei õnnestunud teisaldada."
   },
   "empty": {
     "disconnected": "Ühendus puudub. Vali server, et selle kanaleid näha.",
@@ -71,6 +75,17 @@
     "channels_one": "{{count}} kanal",
     "channels_other": "{{count}} kanalit",
     "people_one": "{{count}} inimene",
-    "people_other": "{{count}} inimest"
+    "people_other": "{{count}} inimest",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Ühendatud",
+      "connecting": "Ühendamine",
+      "reconnecting": "Ühendan uuesti…",
+      "disconnected": "Ühendus katkenud"
+    },
+    "online": "{{count}} võrgus",
+    "onlinePing": "{{count}} võrgus · {{ping}} ms"
   }
 }

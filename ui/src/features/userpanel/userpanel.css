@@ -13,8 +13,12 @@
   min-width: 0;
 }
 
+/* With the split arrows (#153, #154, #155) the controls are wider than the default sidebar; they
+   wrap onto a second line instead of overflowing it, which cut off the settings button and let
+   keyboard focus scroll the whole column sideways. */
 .userpanel__row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-1);

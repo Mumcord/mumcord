@@ -92,5 +92,14 @@
   "endToEndValue": "≈ {{value}} ms (estimación)",
   "lowLatencyMode": "Modo de baja latencia",
   "identity": "Identidad",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (perfil del canal)",
+  "profile": {
+    "row": "Perfil de audio",
+    "musicOn": "Calidad de música",
+    "musicOff": "Calidad de música desactivada",
+    "lowLatencyOn": "Modo de baja latencia",
+    "lowLatencyOff": "Modo de baja latencia desactivado",
+    "defaults": "Predeterminados"
+  }
 }
