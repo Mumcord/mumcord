@@ -4,8 +4,10 @@ import { getApi, type PacketCounter, type VoiceCounter } from "../../api";
 import { Select } from "../../components/Select";
 import { AudioRatingBadge } from "../connection";
 import { Group } from "../settings/components/Section";
+import { Switch } from "../settings/components/Switch";
 import { errorText } from "../settings/errors";
 import { pickSavePath } from "../settings/fileDialogs";
+import { useFollowScroll } from "./follow";
 import { PacketTable } from "./PacketTable";
 import {
   exportJson,
@@ -42,6 +44,7 @@ export function PacketInspector({ names }: { names: Names }) {
   const [paused, setPaused] = useState(false);
   const [filter, setFilter] = useState<PacketFilter>(NO_FILTER);
   const [status, setStatus] = useState<Status>(null);
+  const [background, setBackground] = useState(false);
   const lastId = useRef<number | null>(null);
 
   useEffect(() => {
@@ -58,6 +61,7 @@ export function PacketInspector({ names }: { names: Names }) {
             setPackets((current) => mergePackets(current, capture.packets.map(fromApi)));
             setCounters(capture.counters);
             setVoice(capture.voice);
+            setBackground(capture.background);
           },
           (error: unknown) => {
             console.error("Fetching captured packets failed", error);
@@ -73,6 +77,7 @@ export function PacketInspector({ names }: { names: Names }) {
   }, [paused]);
 
   const shown = useMemo(() => filterPackets(packets, filter), [packets, filter]);
+  const follow = useFollowScroll(shown);
   const kinds = useMemo(() => packetKinds(packets), [packets]);
   const serverIds = useMemo(
     () => [...new Set([...packets.map((p) => p.serverId), ...voice.map((v) => v.serverId)])],
@@ -86,6 +91,16 @@ export function PacketInspector({ names }: { names: Names }) {
       .packetCaptureClear()
       .catch((error: unknown) => {
         console.error("Clearing the captured packets failed", error);
+      });
+  };
+
+  const keepCapturing = (on: boolean) => {
+    setBackground(on);
+    getApi()
+      .packetCaptureBackground(on)
+      .catch((error: unknown) => {
+        console.error("Switching the background capture failed", error);
+        setBackground(!on);
       });
   };
 
@@ -177,6 +192,16 @@ export function PacketInspector({ names }: { names: Names }) {
           >
             {t(paused ? "inspector.resume" : "inspector.pause")}
           </button>
+          <button
+            type="button"
+            className="settings-button"
+            aria-pressed={follow.follow}
+            onClick={() => {
+              follow.setFollow(!follow.follow);
+            }}
+          >
+            {t("inspector.follow")}
+          </button>
           <button type="button" className="settings-button" onClick={clear}>
             {t("inspector.clear")}
           </button>
@@ -187,6 +212,17 @@ export function PacketInspector({ names }: { names: Names }) {
             {t("inspector.exportMarkdown")}
           </button>
         </div>
+        <Switch
+          label={t("inspector.keepCapturing")}
+          description={t("inspector.keepCapturingHint")}
+          checked={background}
+          onChange={keepCapturing}
+        />
+        {background && (
+          <p role="status" className="settings-hint pi-background-on">
+            {t("inspector.keepCapturingOn")}
+          </p>
+        )}
         <p className="settings-hint">{t("inspector.exportWarning")}</p>
         <p
           role="status"
@@ -224,7 +260,18 @@ export function PacketInspector({ names }: { names: Names }) {
         {shown.length === 0 ? (
           <p className="settings-hint">{t("inspector.empty")}</p>
         ) : (
-          <PacketTable packets={shown} names={names} />
+          <PacketTable
+            packets={shown}
+            names={names}
+            attachScroller={follow.attachScroller}
+            onScroll={follow.onScroll}
+            onExpand={follow.pause}
+          />
+        )}
+        {follow.unseen > 0 && (
+          <button type="button" className="settings-button pi-jump" onClick={follow.jump}>
+            {t("inspector.jumpToLatest", { n: follow.unseen })}
+          </button>
         )}
       </Group>
     </>

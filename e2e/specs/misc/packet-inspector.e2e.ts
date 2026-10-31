@@ -93,6 +93,17 @@ describe("packet inspector (issue #60)", () => {
     await browser.keys(["Escape"]);
   });
 
+  it("opens the inspector before connecting, because capture runs only while it is open", async () => {
+    mainWindow = await browser.getWindowHandle();
+    await openSettings("Packet inspector");
+    expect(await $("table").isExisting()).toBe(false);
+    await button("Open packet inspector").click();
+    await switchToInspector();
+    await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
+    await browser.switchToWindow(mainWindow);
+    await browser.keys(["Escape"]);
+  });
+
   it("captures the Mumcord hello sent to a user already on the server", async () => {
     peer = botInBackground(["script"], { name: BOT_NAME, timeout: 60 });
     peer.send("sleep 55");
@@ -105,12 +116,8 @@ describe("packet inspector (issue #60)", () => {
     await button("Trust and connect").click();
     await waitConnected();
 
-    mainWindow = await browser.getWindowHandle();
     await openSettings("Packet inspector");
-    expect(await $("table").isExisting()).toBe(false);
-    await button("Open packet inspector").click();
     await switchToInspector();
-    await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
     const row = $("//tr[contains(@class,'pi-row-sent')][.//code[normalize-space()='mumcord.hello']]");
     await row.waitForDisplayed({ timeout: 15_000, timeoutMsg: "no sent hello row" });
     expect(await row.getText()).toContain("Mumcord hello");
@@ -140,6 +147,43 @@ describe("packet inspector (issue #60)", () => {
     expect(exported.packets.some((p) => p.kind === "mumcord.hello" && p.direction === "sent")).toBe(true);
   });
 
+  it("follows new packets and stops following when scrolled up", async () => {
+    const list = $(".pi-table-wrap");
+    const follow = button("Follow");
+    // Expanding a row in the earlier test paused following; the toggle resumes it.
+    expect(await follow.getAttribute("aria-pressed")).toBe("false");
+    await follow.click();
+    expect(await follow.getAttribute("aria-pressed")).toBe("true");
+    // A short list overflows with the few packets already there; the client's own pings
+    // (every few seconds) are the new packets that arrive while it is scrolled up.
+    await browser.execute((el: HTMLElement) => {
+      el.style.maxHeight = "80px";
+    }, await list);
+    await browser.waitUntil(async () => Number(await list.getProperty("scrollHeight")) > Number(await list.getProperty("clientHeight")), {
+      timeoutMsg: "the list never became scrollable",
+    });
+    const atBottom = async () => {
+      const [top, height, full] = await Promise.all([
+        list.getProperty("scrollTop"),
+        list.getProperty("clientHeight"),
+        list.getProperty("scrollHeight"),
+      ]);
+      return Number(full) - Number(top) - Number(height) <= 24;
+    };
+    expect(await atBottom()).toBe(true);
+    await browser.execute((el: HTMLElement) => {
+      el.scrollTop = 0;
+      el.dispatchEvent(new Event("scroll"));
+    }, await list);
+    await browser.waitUntil(async () => (await follow.getAttribute("aria-pressed")) === "false", {
+      timeoutMsg: "scrolling up did not pause following",
+    });
+    await $("button.pi-jump").waitForDisplayed({ timeout: 20_000, timeoutMsg: "no jump to latest button" });
+    await $("button.pi-jump").click();
+    expect(await follow.getAttribute("aria-pressed")).toBe("true");
+    expect(await atBottom()).toBe(true);
+  });
+
   it("keeps a single window: opening again brings the open one back", async () => {
     await browser.switchToWindow(mainWindow);
     await button("Open packet inspector").click();
@@ -163,5 +207,15 @@ describe("packet inspector (issue #60)", () => {
     });
     await browser.switchToWindow(mainWindow);
     await button("Open packet inspector").waitForDisplayed();
+  });
+
+  it("captures only while the window is open: a reopened inspector starts empty", async () => {
+    await browser.pause(1500);
+    await button("Open packet inspector").click();
+    await switchToInspector();
+    await $("//main[h1[normalize-space()='Packet inspector']]").waitForDisplayed();
+    // Nothing from before the window opened, such as the earlier hello, is listed.
+    await browser.pause(1000);
+    expect(await $("//tr[.//code[normalize-space()='mumcord.hello']]").isExisting()).toBe(false);
   });
 });
