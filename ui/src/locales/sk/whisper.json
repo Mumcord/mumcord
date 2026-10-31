@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Pošepkať…",
+    "noPermission": "Server tu šepkanie nepovoľuje"
+  },
+  "banner": {
+    "whisper": "Šepkáš: {{target}}",
+    "shout": "Kričíš na: {{target}}",
+    "releaseKey": "Počujú ťa iba ľudia tam. Pusť <key>{{key}}</key> a znova hovoríš do {{channel}}.",
+    "stopToReturn": "Počujú ťa iba ľudia tam. Zastav a znova hovoríš do {{channel}}.",
+    "onlyThere": "Počujú ťa iba ľudia tam.",
+    "stop": "Zastaviť"
+  },
+  "denied": {
+    "title": "Nepodarilo sa pošepkať: {{target}}",
+    "noVoiceServer": "Najprv vstúp do kanála: šepot ide cez server, na ktorom hovoríš.",
+    "muted": "Na šepkanie zapni mikrofón.",
+    "serverMuted": "Server ťa stlmil, preto neprenáša tvoj hlas.",
+    "nobodyHere": "Nikto z týchto ľudí teraz nie je na serveri.",
+    "channelNotFound": "Tento kanál na serveri neexistuje.",
+    "noPermission": "Server ti nedovoľuje šepkať do kanála {{channel}}.",
+    "unknownTarget": "Tento cieľ už neexistuje.",
+    "dismiss": "Zavrieť"
+  },
+  "badge": {
+    "whisper": "šepká",
+    "shout": "kričí",
+    "whisperLabel": "Šepká ti",
+    "shoutLabel": "Kričí na tvoj kanál",
+    "ownWhisper": "šepkáš",
+    "ownShout": "kričíš",
+    "ownWhisperLabel": "Šepkáš",
+    "ownShoutLabel": "Kričíš"
+  },
+  "panel": {
+    "open": "Šepkať alebo kričať",
+    "menu": "Ciele šepkania a kriku",
+    "manage": "Spravovať ciele…",
+    "none": "Zatiaľ žiadne ciele",
+    "indicatorWhisper": "Šepkáš: {{target}}",
+    "indicatorShout": "Kričíš na: {{target}}",
+    "stop": "Zastaviť"
+  }
+}

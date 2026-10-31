@@ -47,6 +47,7 @@ describe("PersonMenu", () => {
       "Add friend",
       "View profile",
       "Connection info…",
+      "Whisper to…",
       "Block…",
     ]);
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
@@ -72,6 +73,7 @@ describe("PersonMenu", () => {
       "menuitem",
       "menuitem",
       "menuitem",
+      "menuitem",
       "separator",
       "menuitemcheckbox",
       "range",
@@ -82,14 +84,15 @@ describe("PersonMenu", () => {
     expect(entries[1]).toHaveTextContent("Add friend");
     expect(entries[2]).toHaveTextContent("View profile");
     expect(entries[3]).toHaveTextContent("Connection info…");
-    expect(entries[8]).toHaveTextContent("Block…");
+    expect(entries[4]).toHaveTextContent("Whisper to…");
+    expect(entries[9]).toHaveTextContent("Block…");
   });
 
   it("shows a decorative icon on every entry", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
     const icons = [...(menu()?.querySelectorAll("svg") ?? [])];
-    expect(icons).toHaveLength(7);
+    expect(icons).toHaveLength(8);
     for (const icon of icons) expect(icon).toHaveAttribute("aria-hidden", "true");
   });
 
@@ -115,6 +118,8 @@ describe("PersonMenu", () => {
     expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitem", { name: "Connection info…" })).toHaveFocus();
+    keys("ArrowDown");
+    expect(screen.getByRole("menuitem", { name: "Whisper to…" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
     keys("ArrowDown");
@@ -356,6 +361,7 @@ describe("PersonMenu", () => {
         "Add friend",
         "View profile",
         "Connection info…",
+        "Whisper to…",
         "Block…",
       ]);
       fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));

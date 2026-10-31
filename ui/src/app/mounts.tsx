@@ -54,6 +54,7 @@ import {
   AudioDeviceNotice,
   type AudioDeviceNoticeApi,
 } from "../features/app";
+import { WhisperBanner } from "../features/whisper/WhisperBanner";
 
 /** Server bar (B19). */
 export function ServersMount() {
@@ -129,6 +130,7 @@ export function ChatStatusMount() {
   return (
     <>
       <ConnectionStatus />
+      <WhisperBanner />
       <RejoinPrompt />
       <CloseDialog />
       <ChannelAudioHost />

@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Sussurra a…",
+    "noPermission": "Il server non permette di sussurrare qui"
+  },
+  "banner": {
+    "whisper": "Sussurri a {{target}}",
+    "shout": "Gridi a {{target}}",
+    "releaseKey": "Solo le persone lì ti sentono. Rilascia <key>{{key}}</key> per parlare di nuovo in {{channel}}.",
+    "stopToReturn": "Solo le persone lì ti sentono. Interrompi per parlare di nuovo in {{channel}}.",
+    "onlyThere": "Solo le persone lì ti sentono.",
+    "stop": "Interrompi"
+  },
+  "denied": {
+    "title": "Impossibile sussurrare a {{target}}",
+    "noVoiceServer": "Entra prima in un canale: i sussurri passano dal server su cui parli.",
+    "muted": "Riattiva il microfono per sussurrare.",
+    "serverMuted": "Il server ti ha silenziato, quindi non inoltra la tua voce.",
+    "nobodyHere": "Nessuna di queste persone è su questo server in questo momento.",
+    "channelNotFound": "Questo canale non esiste su questo server.",
+    "noPermission": "Il server non ti permette di sussurrare a {{channel}}.",
+    "unknownTarget": "Questo destinatario non esiste più.",
+    "dismiss": "Chiudi"
+  },
+  "badge": {
+    "whisper": "sussurra",
+    "shout": "grida",
+    "whisperLabel": "Ti sussurra",
+    "shoutLabel": "Grida al tuo canale",
+    "ownWhisper": "sussurri",
+    "ownShout": "gridi",
+    "ownWhisperLabel": "Stai sussurrando",
+    "ownShoutLabel": "Stai gridando"
+  },
+  "panel": {
+    "open": "Sussurra o grida",
+    "menu": "Destinatari di sussurri e grida",
+    "manage": "Gestisci destinatari…",
+    "none": "Ancora nessun destinatario",
+    "indicatorWhisper": "Sussurri a {{target}}",
+    "indicatorShout": "Gridi a {{target}}",
+    "stop": "Interrompi"
+  }
+}

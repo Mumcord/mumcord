@@ -183,6 +183,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             audio::mic_test_start,
             audio::audio_test_sound,
             audio::mic_test_stop,
+            commands::whisper::whisper_setup,
+            commands::whisper::whisper_targets_save,
+            commands::whisper::whisper_key_check,
+            commands::whisper::whisper_start,
+            commands::whisper::whisper_stop,
             commands::ptt::ptt_availability,
             commands::ptt::ptt_capture_key,
             commands::ptt::ptt_capture_cancel,
@@ -310,6 +315,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::now_gaming::NowGamingChanged,
             commands::positional::PositionalStatusChanged,
             commands::positional::PositionalSendingChanged,
+            commands::whisper::WhisperStateChanged,
+            commands::whisper::IncomingWhisperChanged,
             commands::ingame_overlay::InGameOverlayChanged,
             session::VoiceServerChanged,
             commands::user_stats::UserStatsChanged,
@@ -477,6 +484,8 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     ptt::set_handler(move |pressed| controls.set_ptt_pressed(pressed));
     ptt::set_evdev_mouse_allowed(stored.allow_mouse_buttons);
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
+    commands::whisper::install_key_handler(app);
+    commands::whisper::configure_keys(app, &stored);
 
     let screen_frames = std::sync::Arc::new(screen_frames::ScreenFrames::default());
     engine.set_screen_frame_sink(screen_frames.clone());
@@ -781,6 +790,14 @@ fn emit_engine_event(
                 server_id,
                 session,
                 sending,
+            }
+            .emit(app)
+        }
+        EngineEvent::IncomingWhisperChanged { session, kind } => {
+            commands::whisper::IncomingWhisperChanged {
+                server_id,
+                session,
+                kind: kind.map(Into::into),
             }
             .emit(app)
         }

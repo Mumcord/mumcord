@@ -34,6 +34,7 @@ pub mod stats;
 pub mod voice;
 pub mod watch_party;
 pub mod web;
+pub mod whisper;
 
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
