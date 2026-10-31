@@ -219,6 +219,10 @@ pub struct ViewerMediaStats {
     pub session: u32,
     /// Highest temporal layer this viewer gets (2 is the full frame rate).
     pub max_layer: u8,
+    /// What that layer means in frames per second (issue #163).
+    pub fps: u32,
+    /// It lost every layer it can and still does not keep up: the quality step is lowered for it.
+    pub struggling: bool,
 }
 
 /// What the encode thread, the writer tasks and the engine share.
@@ -345,11 +349,18 @@ impl Media {
 
     pub fn stats(&self) -> ScreenMediaStats {
         let mut stats = lock(&self.hub.stats).clone();
+        let base_fps = STEPS[stats.step].fps;
         stats.viewers = lock(&self.hub.viewers)
             .iter()
-            .map(|(session, queue)| ViewerMediaStats {
-                session: *session,
-                max_layer: queue.with_policy(super::fanout::Policy::max_layer),
+            .map(|(session, queue)| {
+                let layer = queue.with_policy(super::fanout::Policy::max_layer);
+                ViewerMediaStats {
+                    session: *session,
+                    max_layer: layer,
+                    // Every layer below the top one halves the frame rate (fanout).
+                    fps: base_fps >> (super::fanout::TOP_LAYER - layer),
+                    struggling: queue.with_policy(super::fanout::Policy::struggling),
+                }
             })
             .collect();
         stats

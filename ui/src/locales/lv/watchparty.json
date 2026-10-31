@@ -42,7 +42,9 @@
     "nextFailed": "Nākamo video neizdevās sākt.",
     "move": "Pārvietot {{title}}",
     "upNext": "Nākamais: {{title}}",
-    "upNextNone": "Nekā nākamā"
+    "upNextNone": "Nekā nākamā",
+    "paste": "Ielīmējiet YouTube saiti",
+    "notALink": "Tas nav YouTube saite"
   },
   "widget": {
     "play": "Atskaņot",

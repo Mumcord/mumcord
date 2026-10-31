@@ -42,7 +42,9 @@
     "nextFailed": "Nästa video kunde inte startas.",
     "move": "Flytta {{title}}",
     "upNext": "Näst på tur: {{title}}",
-    "upNextNone": "Inget näst på tur"
+    "upNextNone": "Inget näst på tur",
+    "paste": "Klistra en YouTube-länk",
+    "notALink": "Det är inte en YouTube-länk"
   },
   "widget": {
     "play": "Spela",

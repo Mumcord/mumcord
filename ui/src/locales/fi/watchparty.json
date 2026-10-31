@@ -42,7 +42,9 @@
     "nextFailed": "Seuraavaa videota ei voitu aloittaa.",
     "move": "Siirrä {{title}}",
     "upNext": "Seuraavaksi: {{title}}",
-    "upNextNone": "Ei mitään seuraavaksi"
+    "upNextNone": "Ei mitään seuraavaksi",
+    "paste": "Liitä YouTube-linkki",
+    "notALink": "Tuo ei ole YouTube-linkki"
   },
   "widget": {
     "play": "Toista",

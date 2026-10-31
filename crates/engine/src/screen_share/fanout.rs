@@ -24,7 +24,7 @@ const LAG_AT: usize = 3;
 const DROP_PAUSE: Duration = Duration::from_millis(500);
 /// How long a viewer has to keep up before it gets the next layer back.
 const RAISE_AFTER: Duration = Duration::from_secs(3);
-const TOP_LAYER: u8 = TEMPORAL_LAYERS - 1;
+pub(crate) const TOP_LAYER: u8 = TEMPORAL_LAYERS - 1;
 /// Sound packets waiting for one viewer (half a second of 20 ms packets).
 const AUDIO_CAPACITY: usize = 25;
 

@@ -42,7 +42,9 @@
     "nextFailed": "La vidéo suivante n’a pas pu être lancée.",
     "move": "Déplacer {{title}}",
     "upNext": "À suivre : {{title}}",
-    "upNextNone": "Rien à suivre"
+    "upNextNone": "Rien à suivre",
+    "paste": "Collez un lien YouTube",
+    "notALink": "Ce n'est pas un lien YouTube"
   },
   "widget": {
     "play": "Lecture",

@@ -42,7 +42,9 @@
     "nextFailed": "Não foi possível iniciar o vídeo seguinte.",
     "move": "Mover {{title}}",
     "upNext": "A seguir: {{title}}",
-    "upNextNone": "Nada a seguir"
+    "upNextNone": "Nada a seguir",
+    "paste": "Colar um link do YouTube",
+    "notALink": "Isso não é um link do YouTube"
   },
   "widget": {
     "play": "Reproduzir",

@@ -521,3 +521,73 @@ async fn newcomers_in_the_channel_get_the_party_once() {
 
     b.engine.screen_share_stop(b.server()).expect("stop");
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn each_player_reports_where_it_is() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_watch_positions");
+    let mut a = start(&dir, "p163a").await;
+    let mut b = start(&dir, "p163b").await;
+    wait_mumcord(&mut a.rx, &b.name).await;
+    wait_mumcord(&mut b.rx, &a.name).await;
+    let started = a
+        .engine
+        .watch_party_start(a.server(), VIDEO)
+        .expect("start");
+    assert_eq!(started.host, a.session(), "who started it wears the crown");
+    wait_party(&mut b.rx, "the invitation", |p| p.is_some())
+        .await
+        .expect("invitation");
+    b.engine.watch_party_join(b.server()).expect("join");
+
+    // B is 2:11 in and buffering: A has to see that within a second (issue #163).
+    let sent = std::time::Instant::now();
+    b.engine
+        .watch_party_report(b.server(), 131_000, false, true)
+        .expect("report");
+    let b_session = b.session();
+    let seen = wait_party(&mut a.rx, "B's position", |p| {
+        p.is_some_and(|p| {
+            p.positions
+                .iter()
+                .any(|pos| pos.session == b_session && pos.buffering)
+        })
+    })
+    .await
+    .expect("position");
+    assert!(
+        sent.elapsed() < Duration::from_secs(1),
+        "{:?}",
+        sent.elapsed()
+    );
+    let pos = seen
+        .positions
+        .iter()
+        .find(|p| p.session == b_session)
+        .expect("B");
+    assert_eq!(pos.position_ms, 131_000);
+    assert!(pos.age_ms < 1000, "the report is fresh: {pos:?}");
+
+    // A reports as well, and the report reaches B fresh.
+    let a_session = a.session();
+    a.engine
+        .watch_party_report(a.server(), 40_000, true, false)
+        .expect("report");
+    let at_b = wait_party(&mut b.rx, "A's position", |p| {
+        p.is_some_and(|p| p.positions.iter().any(|x| x.session == a_session))
+    })
+    .await
+    .expect("position");
+    let at_b = at_b
+        .positions
+        .iter()
+        .find(|p| p.session == a_session)
+        .expect("A");
+    assert_eq!(at_b.position_ms, 40_000);
+    assert!(at_b.age_ms < 1000, "the report reaches B fresh: {at_b:?}");
+}

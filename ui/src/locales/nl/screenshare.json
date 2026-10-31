@@ -34,5 +34,8 @@
   "stopped": "Je bent gestopt met het delen van je scherm.",
   "pauseSharing": "Delen pauzeren",
   "resumeSharing": "Delen hervatten",
-  "viewersLabel": "Wie kijkt er"
+  "viewersLabel": "Wie kijkt er",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Venster wisselen",
+  "viewersTitle": "Kijkers"
 }

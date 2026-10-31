@@ -42,7 +42,9 @@
     "nextFailed": "Nie udało się uruchomić następnego filmu.",
     "move": "Przenieś {{title}}",
     "upNext": "Następne: {{title}}",
-    "upNextNone": "Nic więcej w kolejce"
+    "upNextNone": "Nic więcej w kolejce",
+    "paste": "Wklej link YouTube",
+    "notALink": "To nie jest link YouTube"
   },
   "widget": {
     "play": "Odtwórz",

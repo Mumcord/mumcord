@@ -36,5 +36,29 @@
     "output": "Medpomnilnik zvočnika",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Kontrole predvajalnika",
+    "nowPlaying": "Predvaja zdaj",
+    "watching": "Gledajo",
+    "open": "Odpri",
+    "next": "Naprej",
+    "seek": "Iskanje",
+    "volume": "Glasnost",
+    "syncedPlay": "Sinhronizirano",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} ima kontrol",
+    "inSync": "Usklajeno",
+    "inSyncAll": "Vsi usklajeni",
+    "inSyncExcept": "Vsi usklajeni razen {{count}}",
+    "buffering": "Medlite",
+    "behind": "{{seconds}} s zaostaj",
+    "ahead": "{{seconds}} s naprej",
+    "noReport": "Ni poročila",
+    "you": "ti",
+    "host": "Gostitelj",
+    "fullscreen": "Celozaslonsko",
+    "exitFullscreen": "Zapusti celozaslonski način",
+    "none": "Nihče"
   }
 }

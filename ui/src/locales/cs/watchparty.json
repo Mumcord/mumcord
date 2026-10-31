@@ -42,7 +42,9 @@
     "nextFailed": "Další video se nepodařilo spustit.",
     "move": "Přesunout {{title}}",
     "upNext": "Následuje: {{title}}",
-    "upNextNone": "Nic dalšího nenásleduje"
+    "upNextNone": "Nic dalšího nenásleduje",
+    "paste": "Vložte odkaz na YouTube",
+    "notALink": "To není odkaz na YouTube"
   },
   "widget": {
     "play": "Přehrát",

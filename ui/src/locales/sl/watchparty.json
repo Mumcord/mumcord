@@ -42,7 +42,9 @@
     "nextFailed": "Naslednjega videa ni bilo mogoče začeti.",
     "move": "Premakni {{title}}",
     "upNext": "Naslednje: {{title}}",
-    "upNextNone": "Nič ni na vrsti"
+    "upNextNone": "Nič ni na vrsti",
+    "paste": "Prilepi povezavo YouTube",
+    "notALink": "To ni povezava YouTube"
   },
   "widget": {
     "play": "Predvajaj",

@@ -6,10 +6,10 @@ import { useTranslation } from "react-i18next";
 import { getApi } from "../api";
 import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
+import { useServerStateOf, useVoiceServerId } from "../features/channels";
 import { useMembersColumn } from "./membersCollapse";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
-import { SharingBar } from "../features/screenshare";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
 import {
@@ -31,8 +31,14 @@ import {
   openPrivateConversation,
   useChannelPresence,
 } from "../features/members";
-import { ScreenShareWidget } from "../features/screenshare";
-import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
+import { ShareMiniBar, ScreenShareView, SharerBar, ViewerPanel } from "../features/screenshare";
+import {
+  VideoDucking,
+  WatchMiniBar,
+  WatchPartyPanel,
+  WatchTogetherView,
+} from "../features/watchparty";
+import { useMediaView } from "../features/media/mediaView";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
 import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
@@ -53,7 +59,6 @@ import {
   AudioDeviceNotice,
   type AudioDeviceNoticeApi,
 } from "../features/app";
-
 /** Server bar (B19). */
 export function ServersMount() {
   const messages = useMessagesOpen();
@@ -94,31 +99,26 @@ export function ChannelsMount() {
     </>
   );
 }
-
 /** User panel at the bottom of the channel column (B23). */
 export function UserPanelMount() {
   return (
     <>
-      <SharingBar />
       <UserPanel />
     </>
   );
 }
-
 const windowOverlayNoticeApi: WindowOverlayNoticeApi = {
   pending: () => getApi().windowOverlayNoticePending(),
   dismiss: async () => {
     await getApi().windowOverlayNoticeDismiss();
   },
 };
-
 const audioDeviceNoticeApi: AudioDeviceNoticeApi = {
   pending: () => getApi().audioDeviceNoticePending(),
   dismiss: async () => {
     await getApi().audioDeviceNoticeDismiss();
   },
 };
-
 /**
  * Thin status bar above the chat, e.g. "Reconnecting…" (B19), the rejoin offer (QA.9) and the
  * close question (B25). All render nothing when idle.
@@ -140,13 +140,14 @@ export function ChatStatusMount() {
     </>
   );
 }
-
 /** Chat header, message list and input (B21), or the message requests while they are open (#141). */
 export function ChatMount() {
   const requests = useRequestsView();
+  const serverId = useVoiceServerId();
+  const view = useMediaView();
   if (requests)
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
-  return (
+  const chat = (
     <ChatView
       renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
       renderHeaderActions={(conv) => (
@@ -157,8 +158,34 @@ export function ChatMount() {
       )}
     />
   );
+  if (serverId === null) return chat;
+  // The cinema view (issue #163): the player above the chat, which stays usable below it; the mini
+  // bar is what remains when the view is left. Focus shows the picture alone.
+  if (view.cinema === "watch") {
+    return (
+      <>
+        <WatchTogetherView serverId={serverId} />
+        {!view.focus && chat}
+      </>
+    );
+  }
+  if (view.cinema === "share") {
+    return (
+      <>
+        <ScreenShareView />
+        {!view.focus && chat}
+      </>
+    );
+  }
+  return (
+    <>
+      <SharerBar />
+      {view.mini.watch && <WatchMiniBar serverId={serverId} />}
+      {view.mini.share && <ShareMiniBar serverId={serverId} />}
+      {chat}
+    </>
+  );
 }
-
 /** The members button in the chat header, wired to the shell's member column (issue #165). */
 function MembersToggleMount() {
   const { t } = useTranslation("members");
@@ -177,23 +204,29 @@ function MembersToggleMount() {
     />
   );
 }
-
 /**
- * Floating media widgets over the main area (FR-2.70): the watched screen share and the watch
- * party. At shell level so they stay open while switching chats or servers.
+ * Media over the main area: the watched screen share widget (FR-2.70, until its own view, issue
+ * #163) and the ducking while people talk. At shell level so they stay open while switching chats
+ * or servers.
  */
 export function MediaWidgetsMount() {
   return (
     <>
-      <ScreenShareWidget />
-      <WatchPartyWidget />
       <VideoDucking />
     </>
   );
 }
-
-/** Member list (B20) with the friends list below (FR-1.64). */
+/** Member list (B20) with the friends list below (FR-1.64); the party's panel takes the column
+while its cinema view is open (issue #163). */
 export function MembersMount() {
+  const view = useMediaView();
+  const serverId = useVoiceServerId();
+  const { users, selfSession } = useServerStateOf(serverId);
+  const own = selfSession === null ? undefined : users.get(selfSession);
+  if (view.cinema === "watch" && serverId !== null && own !== undefined) {
+    return <WatchPartyPanel serverId={serverId} channelId={own.channelId} />;
+  }
+  if (view.cinema === "share") return <ViewerPanel />;
   return (
     <>
       <MembersPanel onSendPrivateMessage={openPrivateConversation} />
@@ -201,7 +234,6 @@ export function MembersMount() {
     </>
   );
 }
-
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */
 export function WizardMount() {
   const { t } = useTranslation("app");
@@ -212,7 +244,6 @@ export function WizardMount() {
     </>
   );
 }
-
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
   const { settingsSection, settingsRevision } = useView();

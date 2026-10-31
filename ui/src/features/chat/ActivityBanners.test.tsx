@@ -19,6 +19,10 @@ function share(session: number): ScreenShare {
     soundAvailable: false,
     viewers: [],
     blocked: null,
+
+    kind: null,
+
+    elapsedMs: 0,
   };
 }
 
@@ -34,6 +38,10 @@ function party(patch: Partial<WatchParty> = {}): WatchParty {
     currentEntry: 0,
     playlist: [],
     skippedBy: null,
+
+    positions: [],
+
+    host: 0,
     ...patch,
   };
 }

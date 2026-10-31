@@ -42,7 +42,9 @@
     "nextFailed": "A következő videót nem sikerült elindítani.",
     "move": "{{title}} áthelyezése",
     "upNext": "Következik: {{title}}",
-    "upNextNone": "Nincs következő"
+    "upNextNone": "Nincs következő",
+    "paste": "Illessz be egy YouTube linket",
+    "notALink": "Ez nem YouTube link"
   },
   "widget": {
     "play": "Lejátszás",

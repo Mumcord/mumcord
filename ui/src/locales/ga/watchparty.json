@@ -42,7 +42,9 @@
     "nextFailed": "Níorbh fhéidir an chéad fhíseán eile a thosú.",
     "move": "Bog {{title}}",
     "upNext": "Ar aghaidh: {{title}}",
-    "upNextNone": "Níl aon rud le teacht"
+    "upNextNone": "Níl aon rud le teacht",
+    "paste": "Cpasteáil nasc YouTube",
+    "notALink": "Ní nasc YouTube é sin"
   },
   "widget": {
     "play": "Seinn",

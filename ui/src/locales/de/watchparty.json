@@ -42,7 +42,9 @@
     "nextFailed": "Das nächste Video konnte nicht gestartet werden.",
     "move": "{{title}} verschieben",
     "upNext": "Als Nächstes: {{title}}",
-    "upNextNone": "Nichts als Nächstes"
+    "upNextNone": "Nichts als Nächstes",
+    "paste": "YouTube-Link einfügen",
+    "notALink": "Das ist kein YouTube-Link"
   },
   "widget": {
     "play": "Abspielen",

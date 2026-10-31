@@ -42,7 +42,9 @@
     "nextFailed": "Järgmist videot ei õnnestunud alustada.",
     "move": "Teisalda {{title}}",
     "upNext": "Järgmisena: {{title}}",
-    "upNextNone": "Järgmisena pole midagi"
+    "upNextNone": "Järgmisena pole midagi",
+    "paste": "Aseta YouTube'i link",
+    "notALink": "See ei ole YouTube'i link"
   },
   "widget": {
     "play": "Esita",

@@ -36,5 +36,29 @@
     "output": "Buffer degli altoparlanti",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Comandi del lettore",
+    "nowPlaying": "In riproduzione",
+    "watching": "Stanno guardando",
+    "open": "Apri",
+    "next": "Successivo",
+    "seek": "Vai a",
+    "volume": "Volume",
+    "syncedPlay": "Sincronizzato",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} ha il controllo",
+    "inSync": "Sincronizzato",
+    "inSyncAll": "Tutti sincronizzati",
+    "inSyncExcept": "Tutti sincronizzati tranne {{count}}",
+    "buffering": "In buffering",
+    "behind": "{{seconds}} s indietro",
+    "ahead": "{{seconds}} s avanti",
+    "noReport": "Nessuna segnalazione",
+    "you": "tu",
+    "host": "Host",
+    "fullscreen": "Schermo intero",
+    "exitFullscreen": "Esci dallo schermo intero",
+    "none": "Nessuno"
   }
 }

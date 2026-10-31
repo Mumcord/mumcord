@@ -42,7 +42,9 @@
     "nextFailed": "Nepavyko paleisti kito vaizdo įrašo.",
     "move": "Perkelti {{title}}",
     "upNext": "Toliau: {{title}}",
-    "upNextNone": "Toliau nieko nėra"
+    "upNextNone": "Toliau nieko nėra",
+    "paste": "Įklijuokite YouTube nuorodą",
+    "notALink": "Tai nėra YouTube nuoroda"
   },
   "widget": {
     "play": "Leisti",
