@@ -518,6 +518,8 @@ pub enum EngineEvent {
     PmRequestsChanged(crate::pm_rules::PmRequestsView),
     /// The accepted private conversations of any own identity changed (issue #141).
     AcceptedConversationsChanged(Vec<mumcord_store::AcceptedConversation>),
+    /// The blocked users of any own identity changed (issue #140).
+    BlockedUsersChanged(Vec<mumcord_store::BlockedUser>),
     /// Pinned or muted private conversations changed (issue #173).
     PmConversationPrefsChanged(Vec<mumcord_store::PmConversationPrefs>),
     /// Positional audio was switched, or the game delivering positions changed (FR-1.43).

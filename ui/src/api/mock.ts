@@ -16,6 +16,7 @@ import type {
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
+  BlockedUser,
   PmConversationPrefs,
   PrivateConversation,
   ApiError,
@@ -271,6 +272,7 @@ const DEFAULT_SETTINGS: Settings = {
     allowAccepted: true,
     keepRequests: true,
   },
+  blockedMessages: "collapse",
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
@@ -625,6 +627,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const pmRequestsByServer = new Map<number, PmRequests>();
   let nextPmRequestId = 1;
   let acceptedConversations: AcceptedConversation[] = [];
+  /** Blocked users of every own identity (issue #140). */
+  let blockedUsers: BlockedUser[] = [];
+  let nextBlockId = 1;
   let pmPrefs: PmConversationPrefs[] = [];
 
   function setPmPrefs(
@@ -906,6 +911,50 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       { ownCertHash: own, certHash, name, acceptedAt: new Date().toISOString() },
     ];
     emit("acceptedConversationsChanged", { conversations: acceptedConversations });
+  }
+
+  /** Whether a block of the mock's identity covers `user` on `serverId`, like the engine. */
+  function isBlocked(serverId: number, user: Pick<User, "name" | "certHash">): boolean {
+    const own = ownCertHash();
+    return blockedUsers.some(
+      (b) =>
+        b.ownCertHash === own &&
+        (b.certHash === null
+          ? b.serverId === serverId && b.name.toLowerCase() === user.name.toLowerCase()
+          : b.certHash === user.certHash),
+    );
+  }
+
+  function addBlock(serverId: number, name: string, certHash: string | null): void {
+    const own = ownCertHash();
+    const same = (b: BlockedUser) =>
+      b.ownCertHash === own &&
+      (certHash === null
+        ? b.certHash === null &&
+          b.serverId === serverId &&
+          b.name.toLowerCase() === name.toLowerCase()
+        : b.certHash === certHash);
+    if (!blockedUsers.some(same)) {
+      const serverLabel = servers.find((s) => s.id === serverId)?.label ?? "";
+      blockedUsers = [
+        ...blockedUsers,
+        {
+          id: nextBlockId++,
+          ownCertHash: own,
+          certHash,
+          name,
+          serverId,
+          serverLabel,
+          blockedAt: new Date().toISOString(),
+        },
+      ].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    for (const [id, requests] of pmRequestsByServer) {
+      const incoming = requests.incoming.filter((r) => !isBlocked(id, r));
+      if (incoming.length !== requests.incoming.length)
+        setPmRequests(id, { ...requests, incoming });
+    }
+    emit("blockedUsersChanged", { users: blockedUsers });
   }
 
   function setSnapshot(snapshot: ServerSnapshot): void {
@@ -1767,6 +1816,23 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       setPmPrefs(serverId, certHash, { mutedUntil: null, mutedForever: false });
       return Promise.resolve(null);
     },
+    blockedUsers: () => Promise.resolve(blockedUsers),
+    blockUser: (serverId, session) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      addBlock(serverId, user.name, user.certHash);
+      return Promise.resolve(null);
+    },
+    blockCert: (serverId, certHash, name) => {
+      if (certHash === "") return fail("invalidInput", "a certificate hash is needed");
+      addBlock(serverId, name, certHash);
+      return Promise.resolve(null);
+    },
+    unblock: (id) => {
+      blockedUsers = blockedUsers.filter((b) => b.id !== id);
+      emit("blockedUsersChanged", { users: blockedUsers });
+      return Promise.resolve(null);
+    },
     acceptedConversations: () => Promise.resolve(acceptedConversations),
     acceptedConversationRevoke: (ownCertHash, certHash) => {
       acceptedConversations = acceptedConversations.filter(
@@ -2518,6 +2584,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     receiveMessage: (conversation, body, senderSession) => {
       focused();
       const sender = requireUser(senderSession);
+      // Like the engine (issue #140): private messages of blocked people are dropped, their
+      // channel messages arrive without unread count.
+      const blocked = isBlocked(currentServerId, sender);
       const message: ChatMessage = {
         id: String(nextMessageId++),
         conversation,
@@ -2530,8 +2599,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         dismissedPreviews: [],
         syncedFrom: null,
       };
+      if (blocked && conversation.kind !== "channel") return message;
       store(message);
       emitServer("messageReceived", { message });
+      if (blocked) return message;
       const snap = requireSnapshot();
       const followed =
         conversation.kind === "channel" && snap.followedChannelIds.includes(conversation.channelId);

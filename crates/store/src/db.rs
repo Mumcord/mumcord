@@ -222,6 +222,27 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, cert_hash)
     );
     ",
+    // v18: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218's
+    // channel_audio migration. A certificate block (`cert_hash` set) covers every server of
+    // that identity (Q1.4); a name block (`cert_hash` NULL) is for people without a
+    // certificate and only applies on `server_id`. `server_label` keeps where the block was
+    // set readable after the server is removed.
+    r"
+    CREATE TABLE blocked_user (
+        id            INTEGER PRIMARY KEY,
+        own_cert_hash TEXT    NOT NULL,
+        cert_hash     TEXT,
+        name          TEXT    NOT NULL,
+        server_id     INTEGER REFERENCES saved_server (id) ON DELETE SET NULL,
+        server_label  TEXT    NOT NULL,
+        blocked_at    INTEGER NOT NULL
+    );
+    CREATE UNIQUE INDEX blocked_user_cert ON blocked_user (own_cert_hash, cert_hash)
+        WHERE cert_hash IS NOT NULL;
+    CREATE UNIQUE INDEX blocked_user_name
+        ON blocked_user (own_cert_hash, server_id, name COLLATE NOCASE)
+        WHERE cert_hash IS NULL;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
