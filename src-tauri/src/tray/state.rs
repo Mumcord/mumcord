@@ -347,9 +347,16 @@ pub mod fixtures {
                 text_message: true,
                 listen: true,
                 register_self: false,
+                speak: true,
+                whisper: true,
+                write: false,
             },
             description: None,
             has_description: false,
+            max_users: None,
+            temporary: false,
+            links: Vec::new(),
+            enter_restricted: false,
         }
     }
 
