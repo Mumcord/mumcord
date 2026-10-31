@@ -33,8 +33,11 @@
 
 - The "Direct messages" list below the channel tree is gone: the private messages overview (Messages button at the top of the server bar) shows every conversation with its unread count and opens it with mouse or keyboard (#219)
 
+- A new **search button in the server bar** opens the public server browser: the list of public Mumble servers the official Mumble client shows. Search by name, address or country, filter by country and ping, hide empty or full servers, and sort by name, country, ping or users. **Connect** saves the server and connects in one click; **Favourite** adds it to your servers. For privacy the list is loaded only when you open the browser, never in the background, and only the rows on screen are pinged (with the standard Mumble ping, one every 50 ms, a few at a time). Everything in the list is treated as untrusted and shown as plain text.
+
 ### Fixed
 
+- Your own messages never play the mention sound or show a notification, even when the server or another session of yours sends them back; they also no longer count as unread (#215)
 - When the desktop has Do Not Disturb on, the user panel no longer shows the long "Turn it off in your desktop's notification settings." line under "Do Not Disturb (system)": a small "?" next to it shows the hint on hover and keyboard focus, like the other explanations in the panels (#217)
 - The server info dialog is now translated in all 24 languages: its labels, permission names, trust status and limits were English everywhere because the English text had been copied into every language file (#207)
 - The watch party respects Settings > Privacy > "Show link previews and embeds": with it off, "Watch together" in the Apps menu stays listed but disabled with the reason and a link to the Privacy settings, a running party shows "A watch party is running: enable embedded players to join" with the same link instead of the banner's video title, the floating player and playlist (no player page, no thumbnails) — so nothing is requested from YouTube or Twitch (#160)

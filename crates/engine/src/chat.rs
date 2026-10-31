@@ -292,9 +292,10 @@ pub(crate) fn on_text(
             route,
             sender.map(|u| u.name.clone()).unwrap_or_default(),
             sender.and_then(|u| u.cert_hash.clone()),
+            is_own_sender(s, msg.actor),
         ))
     });
-    let Some((route, sender_name, sender_cert_hash)) = routed else {
+    let Some((route, sender_name, sender_cert_hash, own)) = routed else {
         return;
     };
     let conversation = match route {
@@ -312,7 +313,7 @@ pub(crate) fn on_text(
         sender_name,
         sender_cert_hash,
         sender_session: msg.actor,
-        own: false,
+        own,
         sent_at: now_millis(),
         body: sanitize_message_html(&msg.message),
         dismissed_previews: Vec::new(),
@@ -328,8 +329,23 @@ pub(crate) fn on_text(
             crate::pm_rules::Verdict::Drop => return,
         }
     }
-    let counts_unread = ctx.handle.with_state(|s| counts_unread(s, route));
+    // Own messages never count as unread, even when a server or another session of the user
+    // sends them back.
+    let counts_unread = !own && ctx.handle.with_state(|s| counts_unread(s, route));
     deliver(ctx, message, counts_unread);
+}
+
+/// Whether `actor` is the user's own session or another session with the user's certificate:
+/// those messages are the user's own and never notify (issue #215).
+fn is_own_sender(state: &ServerState, actor: Option<u32>) -> bool {
+    let Some(actor) = actor else {
+        return false;
+    };
+    if state.session == Some(actor) {
+        return true;
+    }
+    let own_hash = state.own_user().and_then(|u| u.cert_hash.as_deref());
+    own_hash.is_some() && state.users.get(&actor).and_then(|u| u.cert_hash.as_deref()) == own_hash
 }
 
 /// Stores, emits and counts an incoming message; also used for held message requests once
@@ -887,6 +903,43 @@ mod tests {
             route(&s, &text(Some(5), other_tree)),
             Some(Route::Channel(3))
         );
+    }
+
+    #[test]
+    fn messages_from_own_sessions_are_own() {
+        let mut s = state();
+        s.session = Some(10);
+        s.users.insert(
+            10,
+            User {
+                session: 10,
+                cert_hash: Some("me".into()),
+                ..Default::default()
+            },
+        );
+        s.users.insert(
+            11,
+            User {
+                session: 11,
+                cert_hash: Some("me".into()),
+                ..Default::default()
+            },
+        );
+        s.users.insert(
+            5,
+            User {
+                session: 5,
+                cert_hash: Some("other".into()),
+                ..Default::default()
+            },
+        );
+        assert!(is_own_sender(&s, Some(10)), "own session");
+        assert!(
+            is_own_sender(&s, Some(11)),
+            "second session, same certificate"
+        );
+        assert!(!is_own_sender(&s, Some(5)));
+        assert!(!is_own_sender(&s, None));
     }
 
     #[test]

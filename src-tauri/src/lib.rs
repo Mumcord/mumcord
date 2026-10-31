@@ -130,6 +130,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             links::open_link,
             links::mumble_link_stats,
             links::mumble_link_join,
+            commands::public_servers::public_servers_list,
+            commands::public_servers::public_server_ping,
             links::inline_image,
             links::preview_dismiss,
             links::embed_player_open,

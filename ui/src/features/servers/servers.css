@@ -139,6 +139,14 @@
   background: var(--color-text);
 }
 
+/* Beats the muted colour of icons without a connection state. */
+.server-bar__item .server-bar__browse[aria-pressed="true"] {
+  border-radius: var(--radius-tile);
+  background: var(--gradient-accent) border-box;
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-glow);
+}
+
 .server-bar__add {
   color: var(--color-success);
   font-size: var(--font-size-xl);

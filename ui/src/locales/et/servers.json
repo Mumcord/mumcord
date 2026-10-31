@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Salvestatud serverid",
     "add": "Lisa server",
+    "browse": "Sirvi avalikke servereid",
     "keyboardHint": "Enter ühendab. Alt + üles- või allanool liigutab serverit. Shift + F10 avab lisavalikud.",
     "label": "{{server}} ({{state}})",
     "state": {

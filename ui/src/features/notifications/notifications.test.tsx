@@ -263,6 +263,22 @@ describe("mentions", () => {
     expect(api.mock.messageSounds()).toEqual(["mention"]);
   });
 
+  it("stays silent when the user answers a mention with a reply quoting it (#215)", async () => {
+    await setup();
+    receive(RAID, "<p>hey @zoe @all</p>");
+    await within(toastRegion()).findByRole("button", { name: /#Raid/ });
+    await act(async () => {
+      await api.sendChannelMessage(
+        1,
+        2,
+        "<blockquote><b>Anna</b>: hey @zoe @all</blockquote>on it",
+      );
+    });
+    await act(() => Promise.resolve());
+    expect(api.mock.messageSounds()).toEqual(["mention"]);
+    expect(within(toastRegion()).getAllByRole("button", { name: /#Raid/ })).toHaveLength(1);
+  });
+
   it("does not treat a reply to someone else as a mention", async () => {
     await setup();
     receive(AFK, "<blockquote><b>Anna</b>: lunch at noon?</blockquote>sure");

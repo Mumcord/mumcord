@@ -33,6 +33,7 @@ pub mod pm_rules;
 pub mod positional;
 pub mod profile;
 pub mod ptt;
+pub mod public_servers;
 pub mod screen_share;
 pub mod servers;
 pub mod session;

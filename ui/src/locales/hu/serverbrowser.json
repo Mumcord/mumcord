@@ -1,0 +1,48 @@
+{
+  "title": "Nyilvános szerverek",
+  "loading": "A lista betöltése…",
+  "subtitle": "Betöltve, mert megnyitottad ezt az oldalt · {{total}} közül {{shown}} látható",
+  "search": "Keresés név, cím vagy ország szerint",
+  "refresh": "Frissítés",
+  "retry": "Újra",
+  "loadFailed": "A nyilvános szerverek listája nem tölthető be. Ellenőrizd az internetkapcsolatot, és próbáld újra.",
+  "noMatch": "Egy szerver sem felel meg a keresésnek és a szűrőknek.",
+  "saveFailed": "A szervert nem sikerült hozzáadni. Próbáld újra.",
+  "filters": {
+    "label": "Szűrők",
+    "country": "Ország",
+    "anyCountry": "Bármely ország",
+    "ping": "Ping",
+    "anyPing": "Bármely ping",
+    "pingBelow": "{{ms}} ms alatt",
+    "hideEmpty": "Üresek elrejtése",
+    "hideFull": "Teltek elrejtése"
+  },
+  "sortedBy": "Rendezés: {{column}}",
+  "columns": {
+    "name": "Név",
+    "country": "Ország",
+    "ping": "Ping",
+    "users": "Felhasználók",
+    "actions": "Műveletek"
+  },
+  "badge": {
+    "empty": "Üres",
+    "full": "Tele"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Még nem ismert",
+  "measuring": "Mérés",
+  "noAnswer": "Nincs válasz",
+  "ms": "{{ms}} ms",
+  "connect": "Csatlakozás",
+  "connectTo": "Csatlakozás ide: {{server}}",
+  "favourite": "Kedvenc",
+  "favouriteServer": "{{server}} hozzáadása a szervereidhez",
+  "saved": "Mentve",
+  "savedAs": "{{server}} a szervereid között van",
+  "announce": {
+    "saved": "{{server}} hozzáadva a szervereidhez"
+  },
+  "note": "Csak a látható sorok kapnak pinget, egyszerre néhány. Más semmi nem megy a szerverre, amíg nem csatlakozol."
+}

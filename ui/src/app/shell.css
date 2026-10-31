@@ -275,3 +275,18 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+/* A page in place of the columns right of the server bar (public server browser, #68). The
+   columns stay mounted, so the chat keeps its state; hidden, they leave the focus order, the a11y
+   tree and the grid's auto-placement. */
+.shell__page {
+  z-index: 5;
+  grid-row: 1;
+  grid-column: 2 / -1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.shell[data-page-open] > :not(.shell__servers, .shell__page) {
+  display: none;
+}

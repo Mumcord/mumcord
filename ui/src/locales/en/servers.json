@@ -12,6 +12,7 @@
   "bar": {
     "listLabel": "Saved servers",
     "add": "Add a server",
+    "browse": "Browse public servers",
     "keyboardHint": "Enter connects. Alt plus Up or Down arrow moves the server. Shift plus F10 opens more options.",
     "label": "{{server}} ({{state}})",
     "state": {

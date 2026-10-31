@@ -1,0 +1,48 @@
+{
+  "title": "Serwery publiczne",
+  "loading": "Wczytywanie listy…",
+  "subtitle": "Wczytano, bo otworzono tę stronę · pokazano {{shown}} z {{total}}",
+  "search": "Szukaj po nazwie, adresie lub kraju",
+  "refresh": "Odśwież",
+  "retry": "Spróbuj ponownie",
+  "loadFailed": "Nie udało się wczytać listy serwerów publicznych. Sprawdź połączenie z internetem i spróbuj ponownie.",
+  "noMatch": "Żaden serwer nie pasuje do wyszukiwania i filtrów.",
+  "saveFailed": "Nie udało się dodać serwera. Spróbuj ponownie.",
+  "filters": {
+    "label": "Filtry",
+    "country": "Kraj",
+    "anyCountry": "Dowolny kraj",
+    "ping": "Ping",
+    "anyPing": "Dowolny ping",
+    "pingBelow": "Poniżej {{ms}} ms",
+    "hideEmpty": "Ukryj puste",
+    "hideFull": "Ukryj pełne"
+  },
+  "sortedBy": "Sortowanie: {{column}}",
+  "columns": {
+    "name": "Nazwa",
+    "country": "Kraj",
+    "ping": "Ping",
+    "users": "Użytkownicy",
+    "actions": "Działania"
+  },
+  "badge": {
+    "empty": "Pusty",
+    "full": "Pełny"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Jeszcze nieznane",
+  "measuring": "Mierzenie",
+  "noAnswer": "Brak odpowiedzi",
+  "ms": "{{ms}} ms",
+  "connect": "Połącz",
+  "connectTo": "Połącz z {{server}}",
+  "favourite": "Ulubiony",
+  "favouriteServer": "Dodaj {{server}} do swoich serwerów",
+  "saved": "Zapisany",
+  "savedAs": "{{server}} jest na liście Twoich serwerów",
+  "announce": {
+    "saved": "Dodano {{server}} do Twoich serwerów"
+  },
+  "note": "Pingowane są tylko widoczne wiersze, po kilka naraz. Nic więcej nie jest wysyłane do serwera, dopóki się nie połączysz."
+}
