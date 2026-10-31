@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { ConnectionState } from "../../api";
 import { useConnectionStats } from "../connection/useConnectionStats";
@@ -24,7 +24,6 @@ export interface ServerSectionHeaderProps {
  */
 export function ServerSectionHeader(props: ServerSectionHeaderProps) {
   const { t } = useTranslation("channels");
-  const titleId = useId();
   // The same smoothed ping as the connection info; polled only while connected.
   const stats = useConnectionStats(props.connection === "connected");
   const ping = stats.status === "ready" ? stats.stats.rttMs : null;
@@ -34,8 +33,8 @@ export function ServerSectionHeader(props: ServerSectionHeaderProps) {
       : t("section.onlinePing", { count: props.online, ping: Math.round(ping) });
 
   return (
-    <div className="server-section" role="group" aria-labelledby={titleId}>
-      <h2 id={titleId} className="server-section__title">
+    <div className="server-section">
+      <h2 className="server-section__title">
         <button
           type="button"
           className="server-section__toggle"

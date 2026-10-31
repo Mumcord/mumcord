@@ -378,8 +378,10 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               </span>
             )}
             {isOwn && (
-              <span className="tree-channel__here">
-                <span className="visually-hidden">,</span> {t("tree.youAreHere")}
+              // Generated like the counts (WCAG 2.5.3): the visible "you are here" follows the
+              // count, so as text it would break the name's order; the spoken form is hidden text.
+              <span className="tree-channel__here" data-label={t("tree.youAreHere")}>
+                <span className="visually-hidden">, {t("tree.youAreHere")}</span>
               </span>
             )}
             {actions.current.channelBadge?.(id)}

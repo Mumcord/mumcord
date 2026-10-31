@@ -508,6 +508,10 @@
   white-space: nowrap;
 }
 
+.tree-channel__here::before {
+  content: attr(data-label);
+}
+
 @container (max-width: 12rem) {
   .tree-channel__here {
     position: absolute;
