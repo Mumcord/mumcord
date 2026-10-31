@@ -1,8 +1,8 @@
 #!/bin/bash
-# Downloads the pinned mumbot release (scripts/mumbot.env) for one target, checks its SHA256 and
+# Downloads the pinned mumbot tester release (scripts/mumbot.env) for one target, checks its SHA256 and
 # unpacks the binary into <dest> (dest/mumbot, or dest/mumbot.exe on Windows).
 #   scripts/fetch-mumbot.sh <linux-x86_64|linux-aarch64|windows-x86_64|macos-universal> <dest>
-# Archives are kept in MUMBOT_CACHE (default ~/.cache/mumbot) under their versioned name, so CI
+# The binary inside is still called mumbot. Archives are kept in MUMBOT_CACHE (default ~/.cache/mumbot) under their versioned name, so CI
 # can cache that directory by version and a re-run does not download again.
 set -euo pipefail
 target=${1:?target missing}
@@ -17,7 +17,7 @@ case $target in
   windows-*) ext=zip ;;
   *) ext=tar.gz ;;
 esac
-asset="mumbot-$MUMBOT_VERSION-$target.$ext"
+asset="mumbot-tester-$MUMBOT_VERSION-$target.$ext"
 cache=${MUMBOT_CACHE:-$HOME/.cache/mumbot}
 archive="$cache/$asset"
 
