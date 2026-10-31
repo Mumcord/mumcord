@@ -409,6 +409,8 @@ describe("screen share viewer", () => {
               viewers: [],
               blocked: null,
               relayReason: null,
+              kind: null,
+              elapsedMs: 0,
             },
           ],
         });
@@ -457,6 +459,8 @@ describe("screen share viewer", () => {
             viewers: [1],
             blocked: null,
             relayReason: null,
+            kind: null,
+            elapsedMs: 0,
           },
         ],
       });

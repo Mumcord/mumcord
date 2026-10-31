@@ -616,6 +616,8 @@ export const commands = {
 	watchPartyStart: (serverId: number, videoId: string) => typedError<WatchParty, ApiError>(__TAURI_INVOKE("watch_party_start", { serverId, videoId })),
 	/**  Sends a playback command to everyone in the party. */
 	watchPartyCommand: (serverId: number, command: WatchCommand) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_command", { serverId, command })),
+	/**  Where the user's player is, for the sync list (issue #163): remembered and told to the others. */
+	watchPartyReport: (serverId: number, positionMs: number, playing: boolean, buffering: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_report", { serverId, positionMs, playing, buffering })),
 	/**  Joins the party the user was invited to; its position is the current one. */
 	watchPartyJoin: (serverId: number) => typedError<WatchParty, ApiError>(__TAURI_INVOKE("watch_party_join", { serverId })),
 	/**  The party in the user's channel, if any (for a view opened after the last event). */
@@ -668,6 +670,13 @@ export const commands = {
 	screenShareRequestKeyframe: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_request_keyframe", { serverId, session })),
 	/**  The shares in the user's channel (for a view opened after the last event). */
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
+	/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
+	screenShareQuality: (serverId: number) => typedError<ShareQuality | null, ApiError>(__TAURI_INVOKE("screen_share_quality", { serverId })),
+	/**
+	 *  What the user's own watch of `session`'s share looks like (issue #163); the picture figures are
+	 *  counted in the UI from the frames. `None` while not watching.
+	 */
+	screenShareWatchStats: (serverId: number, session: number) => typedError<WatchStats | null, ApiError>(__TAURI_INVOKE("screen_share_watch_stats", { serverId, session })),
 	/**
 	 *  What blocks starting a share on the server right now; `null` when sharing is possible. The
 	 *  settings and the relay change without an event, so the UI asks again before starting.
@@ -2050,6 +2059,17 @@ export type PacketCounter = {
 
 export type PacketDirection = "sent" | "received";
 
+/**  Where one participant's player last said it is (issue #163). */
+export type ParticipantPosition = {
+	session: number,
+	positionMs: number,
+	/**  How old the report was when the view was made, in milliseconds. */
+	ageMs: number,
+	/**  The state that player reported for itself, not the party's. */
+	playing: boolean,
+	buffering: boolean,
+};
+
 /**  How a server edit treats the stored password. */
 export type PasswordUpdate = 
 /**  Leave the stored password as it is (on add: no password). */
@@ -2365,6 +2385,13 @@ export type ScreenShare = {
 	blocked: WatchBlock | null,
 	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
 	relayReason: RelayUnavailable | null,
+	/**
+	 *  What the sharer picked in the system picker (issue #163); `null` where the platform cannot
+	 *  tell a window from the whole screen.
+	 */
+	kind: ShareKind | null,
+	/**  How long the share has been running (issue #163). */
+	elapsedMs: number,
 };
 
 /**  The screen shares on the server changed; carries the full list. */
@@ -2663,6 +2690,21 @@ export type ShareStartBlock = {
 	relayReason: RelayUnavailable | null,
 };
 
+/**  What the sharer picked in the system picker (issue #163). */
+export type ShareKind = "window" | "screen";
+
+/**  How the frames of a watched share reach the viewer. */
+export type SharePath = "direct";
+
+/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
+export type ShareQuality = {
+	width: number,
+	height: number,
+	fps: number,
+	kbps: number,
+	viewers: ViewerQuality[],
+};
+
 /**  Notification sound toggles per event (FR-1.27). */
 export type SoundSettings = {
 	joinLeave: boolean,
@@ -2941,6 +2983,17 @@ export type VideoEmbed = {
 
 export type VideoSite = "youtube" | "twitch";
 
+/**  What one viewer gets (issue #163). */
+export type ViewerQuality = {
+	session: number,
+	fps: number,
+	/**
+	 *  It lost every layer it can and still does not keep up, so the quality step is lowered for
+	 *  everyone because of this viewer.
+	 */
+	struggling: boolean,
+};
+
 export type VoiceActivation = "automatic" | "manual";
 
 /**  Voice packets of a connected server since its voice link started. */
@@ -2995,6 +3048,10 @@ export type WatchParty = {
 	playlist: PlaylistEntry[],
 	/**  Who skipped to the current video ("Anna skipped"), until the next playback command. */
 	skippedBy: number | null,
+	/**  Where each participant last reported being (issue #163). */
+	positions: ParticipantPosition[],
+	/**  Who started the party (the crown in the watching list, issue #163). */
+	host: number,
 };
 
 /**  The party on the server started, changed or ended (`party` is `null`). */
@@ -3004,7 +3061,6 @@ export type WatchPartyChanged = {
 };
 
 export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
-
 /**  Why whisper keys cannot work in this session. */
 export type WhisperKeysUnavailable = 
 /**
@@ -3012,7 +3068,6 @@ export type WhisperKeysUnavailable =
  *  the keys.
  */
 "waylandPortal";
-
 export type WhisperReceivers = 
 /**  People by name: a whisper. */
 { kind: "people"; names: string[] } | 
@@ -3020,7 +3075,6 @@ export type WhisperReceivers =
 { kind: "channel"; path: string[]; children: boolean; links: boolean; 
 /**  Only members of this ACL group. */
 group: string | null };
-
 /**  The saved targets and whether their keys work. */
 export type WhisperSetup = {
 	targets: WhisperTarget[],
@@ -3029,19 +3083,16 @@ export type WhisperSetup = {
 	/**  Targets whose key could not be registered (e.g. another app holds it). */
 	failedKeys: string[],
 };
-
 /**  The own whisper or shout. */
 export type WhisperState = { state: "idle" } | 
 /**  `held`: started by holding the target's key (released, it ends), else from the UI. */
 { state: "active"; targetId: string; held: boolean } | 
 /**  The last start failed; `channel` names the channel without the Whisper permission. */
 { state: "denied"; targetId: string; reason: WhisperDeniedReason; channel: string | null };
-
 /**  The own whisper started, stopped or was refused (also when started by its key). */
 export type WhisperStateChanged = {
 	state: WhisperState,
 };
-
 export type WhisperTarget = {
 	id: string,
 	/**  Plain text, chosen by the user. */
@@ -3049,6 +3100,18 @@ export type WhisperTarget = {
 	receivers: WhisperReceivers,
 	/**  Hold-to-talk key in the push-to-talk key format, e.g. `"F9"` or `"Ctrl+W"`. */
 	hotkey: string | null,
+/**
+ *  What the user's own watch of a share looks like (issue #163); the picture figures come from
+ *  the frames themselves and are counted in the UI.
+ */
+export type WatchStats = {
+	/**
+	 *  Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
+	 *  second path.
+	 */
+	path: SharePath,
+	/**  Sound level of the shared sound at the viewer, 0.0–1.0. */
+	rms: number | null,
 };
 
 /**  The look of the main window's root element, for a window of its own to copy. */

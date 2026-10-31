@@ -3013,6 +3013,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         currentEntry: 0,
         playlist: [],
         skippedBy: null,
+        positions: [],
+        host: SELF_SESSION,
       };
       watchParties.set(serverId, party);
       emit("watchPartyChanged", { serverId, party });
@@ -3096,6 +3098,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     // No loopback server in the browser: the page URLs only let the player frames mount.
+    watchPartyReport: () => Promise.resolve(null),
+    screenShareQuality: () => Promise.resolve(null),
+    screenShareWatchStats: () => Promise.resolve(null),
     watchPartyPlayerUrl: () =>
       Promise.resolve("http://localhost:43215/0123456789abcdef0123456789abcdef/player.html"),
     embedPlayerOpen: () =>
@@ -3114,6 +3119,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         paused: false,
         sound: withSound,
         soundAvailable: withSound,
+        kind: null,
+        elapsedMs: 0,
         viewers: [],
         blocked: null,
         relayReason: null,
