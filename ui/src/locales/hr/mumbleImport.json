@@ -1,0 +1,102 @@
+{
+  "title": "Ponesi svoje postavke iz Mumblea",
+  "intro": "Pronašli smo službeni Mumble klijent na ovom računalu. Odaberi što želiš kopirati. U Mumbleu se ništa ne mijenja i ništa ne napušta tvoje računalo.",
+  "optional": "{{progress}} · neobavezno",
+  "listLabel": "Što kopirati iz Mumblea",
+  "favourites": {
+    "title": "Omiljeni poslužitelji",
+    "found_one": "{{count}} pronađen",
+    "found_few": "{{count}} pronađena",
+    "found_other": "{{count}} pronađenih",
+    "duplicates_one": "{{count}} već u Mumcordu (preskočen)",
+    "duplicates_few": "{{count}} već u Mumcordu (preskočena)",
+    "duplicates_other": "{{count}} već u Mumcordu (preskočenih)",
+    "failed": "Popis poslužitelja iz Mumblea nije se mogao pročitati.",
+    "review": "Pregledaj popis",
+    "hide": "Sakrij popis",
+    "listLabel": "Poslužitelji za kopiranje",
+    "duplicate": "Već u Mumcordu"
+  },
+  "passwords": {
+    "title": "Spremljene lozinke",
+    "count_one": "{{count}} omiljeni poslužitelj ima spremljenu lozinku",
+    "count_few": "{{count}} omiljena poslužitelja imaju spremljenu lozinku",
+    "count_other": "{{count}} omiljenih poslužitelja ima spremljenu lozinku",
+    "keychain": "Pohranjeno u sistemskom privjesku za ključeve"
+  },
+  "identity": {
+    "title": "Identitet (klijentski certifikat)",
+    "keeps": "Zadržava tvoje registrirano ime i dozvole",
+    "locked": "zaštićen lozinkom u Mumbleu",
+    "named": "Certifikat za „{{name}}“",
+    "validUntil": "vrijedi do {{date}}",
+    "passwordNeeded": "Potrebna je lozinka",
+    "already": "Već u Mumcordu",
+    "password": "Lozinka certifikata iz Mumblea",
+    "passwordRequired": "Unesi lozinku certifikata.",
+    "wrongPassword": "Ova lozinka ne otvara certifikat. Pokušaj ponovno."
+  },
+  "devices": {
+    "title": "Audio uređaji",
+    "input": "Mikrofon: {{name}}",
+    "output": "Izlaz: {{name}}",
+    "missing": "Uređaji iz Mumblea nisu spojeni na ovo računalo."
+  },
+  "ptt": {
+    "title": "Tipka push-to-talk",
+    "modifierOnly": "Tipka u Mumbleu je samo modifikatorska tipka koju Mumcord ne može koristiti. Tipku možeš odabrati kasnije.",
+    "tooManyKeys": "Prečac u Mumbleu ima više od jedne tipke, što Mumcord ne može koristiti. Tipku možeš odabrati kasnije.",
+    "unknown": "Prečac u Mumbleu koristi tipku ili uređaj koji Mumcord ne poznaje. Tipku možeš odabrati kasnije."
+  },
+  "volume": {
+    "title": "Glasnoća i postavke glasa",
+    "hint": "Mumble i Mumcord koriste različite skale pa se vrijednosti ne bi poklapale",
+    "notRecommended": "Ne preporučuje se"
+  },
+  "selected_one": "Odabrana je {{count}} stavka",
+  "selected_few": "Odabrane su {{count}} stavke",
+  "selected_other": "Odabrano je {{count}} stavki",
+  "import": "Uvezi",
+  "importing": "Uvoz…",
+  "skip": "Preskoči za sada",
+  "cancel": "Odustani",
+  "failed": "Uvoz se nije mogao dovršiti. Pokušaj ponovno.",
+  "secureStorage": "Mumcord ne može pristupiti sigurnoj pohrani tvog sustava. Otključaj privjesak za ključeve ili upravitelj lozinki i pokušaj ponovno.",
+  "settingsFailed": "Poslužitelji su kopirani, ali postavke se nisu mogle spremiti.",
+  "summary": {
+    "title": "Uvoz je dovršen",
+    "intro": "Tvoji podaci iz Mumblea su kopirani. Pogledaj što se dogodilo.",
+    "added_one": "{{count}} poslužitelj dodan u omiljene",
+    "added_few": "{{count}} poslužitelja dodana u omiljene",
+    "added_other": "{{count}} poslužitelja dodano u omiljene",
+    "skipped_one": "{{count}} poslužitelj preskočen",
+    "skipped_few": "{{count}} poslužitelja preskočena",
+    "skipped_other": "{{count}} poslužitelja preskočeno",
+    "skippedDetail_one": "{{names}} je već na tvom popisu",
+    "skippedDetail_few": "{{names}} su već na tvom popisu",
+    "skippedDetail_other": "{{names}} su već na tvom popisu",
+    "duplicate": "Duplikat",
+    "passwords_one": "{{count}} lozinka spremljena",
+    "passwords_few": "{{count}} lozinke spremljene",
+    "passwords_other": "{{count}} lozinki spremljeno",
+    "passwordsDetail": "Pohranjeno u sistemskom privjesku za ključeve, a ne u datoteci",
+    "identity": "Identitet uvezen",
+    "identityDefault": "Mumcord ga sada koristi",
+    "identityServers": "Koristi se za kopirane poslužitelje",
+    "identitySkipped": "Identitet je već u Mumcordu",
+    "identitySkippedDetail": "Ovaj certifikat već je jedan od tvojih identiteta",
+    "devicesAndPtt": "Audio uređaji i tipka push-to-talk",
+    "done": "Gotovo",
+    "undo": "Poništi uvoz",
+    "undone": "Uvoz je poništen.",
+    "undoFailed": "Uvoz se nije mogao u potpunosti poništiti. Provjeri svoje poslužitelje i identitete."
+  },
+  "settings": {
+    "title": "Uvoz iz Mumblea",
+    "hint": "Kopiraj omiljene poslužitelje, spremljene lozinke, svoj certifikat i audio postavke iz službenog Mumble klijenta.",
+    "button": "Uvezi iz Mumblea…",
+    "searching": "Traženje Mumblea…",
+    "notFound": "Službeni Mumble klijent nije pronađen na ovom računalu.",
+    "breadcrumb": "Postavke · Poslužitelji · Uvoz iz Mumblea"
+  }
+}

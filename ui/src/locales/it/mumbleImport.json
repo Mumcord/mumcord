@@ -1,0 +1,102 @@
+{
+  "title": "Porta con te la tua configurazione di Mumble",
+  "intro": "Abbiamo trovato il client ufficiale di Mumble su questo computer. Scegli cosa copiare. In Mumble non viene modificato nulla e nulla lascia il tuo computer.",
+  "optional": "{{progress}} · facoltativo",
+  "listLabel": "Cosa copiare da Mumble",
+  "favourites": {
+    "title": "Server preferiti",
+    "found_one": "{{count}} trovato",
+    "found_many": "{{count}} trovati",
+    "found_other": "{{count}} trovati",
+    "duplicates_one": "{{count}} già in Mumcord (saltato)",
+    "duplicates_many": "{{count}} già in Mumcord (saltati)",
+    "duplicates_other": "{{count}} già in Mumcord (saltati)",
+    "failed": "Non è stato possibile leggere l'elenco server di Mumble.",
+    "review": "Controlla l'elenco",
+    "hide": "Nascondi l'elenco",
+    "listLabel": "Server da copiare",
+    "duplicate": "Già in Mumcord"
+  },
+  "passwords": {
+    "title": "Password salvate",
+    "count_one": "{{count}} dei preferiti ha una password salvata",
+    "count_many": "{{count}} dei preferiti hanno una password salvata",
+    "count_other": "{{count}} dei preferiti hanno una password salvata",
+    "keychain": "Salvata nel portachiavi del sistema"
+  },
+  "identity": {
+    "title": "Identità (certificato client)",
+    "keeps": "Mantiene il tuo nome registrato e i tuoi permessi",
+    "locked": "protetto da una password in Mumble",
+    "named": "Certificato per «{{name}}»",
+    "validUntil": "valido fino al {{date}}",
+    "passwordNeeded": "Password necessaria",
+    "already": "Già in Mumcord",
+    "password": "Password del certificato in Mumble",
+    "passwordRequired": "Inserisci la password del certificato.",
+    "wrongPassword": "Questa password non apre il certificato. Riprova."
+  },
+  "devices": {
+    "title": "Dispositivi audio",
+    "input": "Microfono: {{name}}",
+    "output": "Uscita: {{name}}",
+    "missing": "I dispositivi di Mumble non sono collegati a questo computer."
+  },
+  "ptt": {
+    "title": "Tasto push-to-talk",
+    "modifierOnly": "Il tasto di Mumble è solo un tasto modificatore, che Mumcord non può usare. Potrai scegliere un tasto più tardi.",
+    "tooManyKeys": "La scorciatoia di Mumble ha più di un tasto, cosa che Mumcord non può usare. Potrai scegliere un tasto più tardi.",
+    "unknown": "La scorciatoia di Mumble usa un tasto o un dispositivo che Mumcord non conosce. Potrai scegliere un tasto più tardi."
+  },
+  "volume": {
+    "title": "Volume e impostazioni vocali",
+    "hint": "Mumble e Mumcord usano scale diverse, quindi i valori non corrisponderebbero",
+    "notRecommended": "Sconsigliato"
+  },
+  "selected_one": "{{count}} elemento selezionato",
+  "selected_many": "{{count}} di elementi selezionati",
+  "selected_other": "{{count}} elementi selezionati",
+  "import": "Importa",
+  "importing": "Importazione…",
+  "skip": "Salta per ora",
+  "cancel": "Annulla",
+  "failed": "Non è stato possibile completare l'importazione. Riprova.",
+  "secureStorage": "Mumcord non riesce ad accedere all'archivio sicuro del sistema. Sblocca il portachiavi o il gestore di password e riprova.",
+  "settingsFailed": "I tuoi server sono stati copiati, ma non è stato possibile salvare le impostazioni.",
+  "summary": {
+    "title": "Importazione completata",
+    "intro": "I tuoi dati di Mumble sono stati copiati. Controlla cos'è successo.",
+    "added_one": "{{count}} server aggiunto ai preferiti",
+    "added_many": "{{count}} di server aggiunti ai preferiti",
+    "added_other": "{{count}} server aggiunti ai preferiti",
+    "skipped_one": "{{count}} server saltato",
+    "skipped_many": "{{count}} di server saltati",
+    "skipped_other": "{{count}} server saltati",
+    "skippedDetail_one": "{{names}} è già nel tuo elenco",
+    "skippedDetail_many": "{{names}} sono già nel tuo elenco",
+    "skippedDetail_other": "{{names}} sono già nel tuo elenco",
+    "duplicate": "Duplicato",
+    "passwords_one": "{{count}} password salvata",
+    "passwords_many": "{{count}} di password salvate",
+    "passwords_other": "{{count}} password salvate",
+    "passwordsDetail": "Salvata nel portachiavi del sistema, non in un file",
+    "identity": "Identità importata",
+    "identityDefault": "Ora Mumcord la usa",
+    "identityServers": "Usata per i server copiati",
+    "identitySkipped": "Identità già in Mumcord",
+    "identitySkippedDetail": "Questo certificato è già una delle tue identità",
+    "devicesAndPtt": "Dispositivi audio e tasto push-to-talk",
+    "done": "Fatto",
+    "undo": "Annulla importazione",
+    "undone": "L'importazione è stata annullata.",
+    "undoFailed": "Non è stato possibile annullare completamente l'importazione. Controlla i tuoi server e le tue identità."
+  },
+  "settings": {
+    "title": "Importa da Mumble",
+    "hint": "Copia server preferiti, password salvate, il tuo certificato e le impostazioni audio dal client ufficiale di Mumble.",
+    "button": "Importa da Mumble…",
+    "searching": "Ricerca di Mumble…",
+    "notFound": "Il client ufficiale di Mumble non è stato trovato su questo computer.",
+    "breadcrumb": "Impostazioni · Server · Importa da Mumble"
+  }
+}

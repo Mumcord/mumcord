@@ -1,0 +1,94 @@
+{
+  "title": "Tag din Mumble-opsætning med",
+  "intro": "Vi fandt den officielle Mumble-klient på denne computer. Vælg, hvad der skal kopieres. Der ændres intet i Mumble, og intet forlader din computer.",
+  "optional": "{{progress}} · valgfrit",
+  "listLabel": "Hvad der skal kopieres fra Mumble",
+  "favourites": {
+    "title": "Serverfavoritter",
+    "found_one": "{{count}} fundet",
+    "found_other": "{{count}} fundet",
+    "duplicates_one": "{{count}} findes allerede i Mumcord (sprunget over)",
+    "duplicates_other": "{{count}} findes allerede i Mumcord (sprunget over)",
+    "failed": "Mumbles serverliste kunne ikke læses.",
+    "review": "Gennemse listen",
+    "hide": "Skjul listen",
+    "listLabel": "Servere der skal kopieres",
+    "duplicate": "Findes allerede i Mumcord"
+  },
+  "passwords": {
+    "title": "Gemte adgangskoder",
+    "count_one": "{{count}} af favoritterne har en gemt adgangskode",
+    "count_other": "{{count}} af favoritterne har en gemt adgangskode",
+    "keychain": "Gemt i systemets nøglering"
+  },
+  "identity": {
+    "title": "Identitet (klientcertifikat)",
+    "keeps": "Beholder dit registrerede navn og dine rettigheder",
+    "locked": "beskyttet med en adgangskode i Mumble",
+    "named": "Certifikat for “{{name}}”",
+    "validUntil": "gyldigt til {{date}}",
+    "passwordNeeded": "Adgangskode påkrævet",
+    "already": "Findes allerede i Mumcord",
+    "password": "Certifikatets adgangskode fra Mumble",
+    "passwordRequired": "Indtast certifikatets adgangskode.",
+    "wrongPassword": "Denne adgangskode kan ikke åbne certifikatet. Prøv igen."
+  },
+  "devices": {
+    "title": "Lydenheder",
+    "input": "Mikrofon: {{name}}",
+    "output": "Udgang: {{name}}",
+    "missing": "Mumbles enheder er ikke tilsluttet denne computer."
+  },
+  "ptt": {
+    "title": "Push-to-talk-tast",
+    "modifierOnly": "Tasten i Mumble er kun en modifikatortast, som Mumcord ikke kan bruge. Du kan vælge en tast senere.",
+    "tooManyKeys": "Genvejen i Mumble har mere end én tast, hvilket Mumcord ikke kan bruge. Du kan vælge en tast senere.",
+    "unknown": "Genvejen i Mumble bruger en tast eller en enhed, som Mumcord ikke kender. Du kan vælge en tast senere."
+  },
+  "volume": {
+    "title": "Lydstyrke og stemmeindstillinger",
+    "hint": "Mumble og Mumcord bruger forskellige skalaer, så værdierne ville ikke passe sammen",
+    "notRecommended": "Anbefales ikke"
+  },
+  "selected_one": "{{count}} element valgt",
+  "selected_other": "{{count}} elementer valgt",
+  "import": "Importér",
+  "importing": "Importerer…",
+  "skip": "Spring over for nu",
+  "cancel": "Annullér",
+  "failed": "Importen kunne ikke gennemføres. Prøv igen.",
+  "secureStorage": "Mumcord kan ikke nå systemets sikre lager. Lås din nøglering eller adgangskodeadministrator op, og prøv igen.",
+  "settingsFailed": "Dine servere blev kopieret, men indstillingerne kunne ikke gemmes.",
+  "summary": {
+    "title": "Import færdig",
+    "intro": "Dine Mumble-data er kopieret. Se, hvad der skete.",
+    "added_one": "{{count}} server føjet til favoritter",
+    "added_other": "{{count}} servere føjet til favoritter",
+    "skipped_one": "{{count}} server sprunget over",
+    "skipped_other": "{{count}} servere sprunget over",
+    "skippedDetail_one": "{{names}} er allerede på din liste",
+    "skippedDetail_other": "{{names}} er allerede på din liste",
+    "duplicate": "Dublet",
+    "passwords_one": "{{count}} adgangskode gemt",
+    "passwords_other": "{{count}} adgangskoder gemt",
+    "passwordsDetail": "Gemt i systemets nøglering, ikke i en fil",
+    "identity": "Identitet importeret",
+    "identityDefault": "Mumcord bruger den nu",
+    "identityServers": "Bruges til de kopierede servere",
+    "identitySkipped": "Identiteten findes allerede i Mumcord",
+    "identitySkippedDetail": "Dette certifikat er allerede en af dine identiteter",
+    "devicesAndPtt": "Lydenheder og push-to-talk-tast",
+    "done": "Færdig",
+    "undo": "Fortryd import",
+    "undone": "Importen blev fortrudt.",
+    "undoFailed": "Importen kunne ikke fortrydes helt. Tjek dine servere og identiteter."
+  },
+  "settings": {
+    "title": "Importér fra Mumble",
+    "hint": "Kopiér serverfavoritter, gemte adgangskoder, dit certifikat og lydindstillinger fra den officielle Mumble-klient.",
+    "button": "Importér fra Mumble…",
+    "searching": "Leder efter Mumble…",
+    "notFound": "Den officielle Mumble-klient blev ikke fundet på denne computer.",
+    "breadcrumb": "Indstillinger · Servere · Importér fra Mumble"
+  }
+}
