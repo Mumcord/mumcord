@@ -89,12 +89,17 @@
     "hideDescription": "Dölj kanalbeskrivning"
   },
   "mention": {
-    "list": "Personer att omnämna",
-    "found_one": "{{count}} person föreslås. Använd piltangenterna och sedan Enter för att infoga.",
-    "found_other": "{{count}} personer föreslås. Använd piltangenterna och sedan Enter för att infoga.",
+    "list": "Förslag på omnämnanden",
+    "found_one": "Förslag: {{count}}. Använd piltangenterna och sedan Enter för att infoga.",
+    "found_other": "Förslag: {{count}}. Använd piltangenterna och sedan Enter för att infoga.",
     "none": "Ingen hittades",
     "mentionsYou": "Omnämner dig",
-    "chipLabel": "{{name}}, omnämning"
+    "chipLabel": "{{name}}, omnämning",
+    "groupsHeading": "Omnämnanden",
+    "peopleHeading": "Personer",
+    "channelHint": "Meddela alla i {{channel}} ({{count}})",
+    "allHint": "Meddela alla som kan läsa den här kanalen ({{count}})",
+    "keys": "↑↓ välj · Enter infoga · Esc stäng"
   },
   "preview": {
     "open": "Öppna i webbläsaren",

@@ -92,13 +92,18 @@
     "hideDescription": "Paslēpt kanāla aprakstu"
   },
   "mention": {
-    "list": "Pieminamie cilvēki",
-    "found_zero": "Ieteikti {{count}} cilvēku. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
-    "found_one": "Ieteikts {{count}} cilvēks. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
-    "found_other": "Ieteikti {{count}} cilvēki. Izmanto bulttaustiņus, pēc tam Enter, lai ievietotu.",
+    "list": "Pieminējumu ieteikumi",
+    "found_zero": "Ieteikumi: {{count}}. Izmanto bultiņas, pēc tam Enter, lai ievietotu.",
+    "found_one": "Ieteikumi: {{count}}. Izmanto bultiņas, pēc tam Enter, lai ievietotu.",
+    "found_other": "Ieteikumi: {{count}}. Izmanto bultiņas, pēc tam Enter, lai ievietotu.",
     "none": "Neviens nav atrasts",
     "mentionsYou": "Piemin tevi",
-    "chipLabel": "{{name}}, pieminējums"
+    "chipLabel": "{{name}}, pieminējums",
+    "groupsHeading": "Pieminējumi",
+    "peopleHeading": "Cilvēki",
+    "channelHint": "Paziņot visiem kanālā {{channel}} ({{count}})",
+    "allHint": "Paziņot visiem, kas var lasīt šo kanālu ({{count}})",
+    "keys": "↑↓ izvēlēties · Enter ievietot · Esc aizvērt"
   },
   "preview": {
     "open": "Atvērt pārlūkā",

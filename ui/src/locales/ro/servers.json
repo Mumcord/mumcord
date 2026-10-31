@@ -36,6 +36,7 @@
     "reconnect": "Reconectează",
     "alwaysConnect": "Conectează mereu la pornire",
     "muteNotifications": "Dezactivează notificările",
+    "muteGroupMentions": "Dezactivează @all și @channel",
     "theme": "Temă…",
     "showWelcome": "Arată mesajul de bun venit",
     "identity": "Identitate…"

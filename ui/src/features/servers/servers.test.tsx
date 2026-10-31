@@ -222,6 +222,7 @@ describe("ServerBar", () => {
       "Connect",
       "Always connect at start",
       "Mute notifications",
+      "Mute @all and @channel",
       "Identity…",
       "Theme…",
       "Edit server",
@@ -408,6 +409,16 @@ describe("ServerBar with several servers (spec §5.2)", () => {
       expect((await api.serversList())[0]?.notificationsMuted).toBe(true);
     });
     expect(mute()).toHaveAttribute("aria-checked", "true");
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+
+    const group = () =>
+      within(openMenuOf(0)).getByRole("menuitemcheckbox", { name: "Mute @all and @channel" });
+    expect(group()).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(group());
+    await waitFor(async () => {
+      expect((await api.serversList())[0]?.groupMentionsMuted).toBe(true);
+    });
+    expect(group()).toHaveAttribute("aria-checked", "true");
   });
 
   it("refuses more Always connect servers than the limit, naming the setting (FR-2.7)", async () => {

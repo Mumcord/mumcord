@@ -3,8 +3,10 @@ import type { User } from "../../api";
 import {
   bodyMentions,
   findMentionQuery,
+  groupMentioned,
   insertMention,
   mentionsName,
+  rankGroupMentions,
   rankMentionCandidates,
 } from "./mentions";
 
@@ -90,5 +92,39 @@ describe("bodyMentions", () => {
     expect(bodyMentions("<p>hi <b>@Zoe</b></p>", ["Zoe"])).toBe(true);
     expect(bodyMentions('<a href="https://x/@Zoe">link</a>', ["Zoe"])).toBe(false);
     expect(bodyMentions("<p>@Old</p>", ["Zoe", "Old"])).toBe(true);
+  });
+});
+
+describe("rankGroupMentions", () => {
+  it("offers @channel before @all and filters by prefix", () => {
+    expect(rankGroupMentions("")).toEqual(["channel", "all"]);
+    expect(rankGroupMentions("A")).toEqual(["all"]);
+    expect(rankGroupMentions("ch")).toEqual(["channel"]);
+    expect(rankGroupMentions("bo")).toEqual([]);
+  });
+});
+
+describe("groupMentioned", () => {
+  const lobby = { kind: "channel", channelId: 1 } as const;
+  const here = { ownChannel: 1, muted: false };
+
+  it("counts @all and @channel in the user's own channel", () => {
+    expect(groupMentioned("<p>@all restart at 22:00</p>", lobby, here)).toBe(true);
+    expect(groupMentioned("@channel raid in 10", lobby, here)).toBe(true);
+    expect(groupMentioned("@ALL, heads up", lobby, here)).toBe(true);
+  });
+
+  it("counts @channel only for people in the channel, @all also for listeners", () => {
+    const listening = { ownChannel: 2, muted: false };
+    expect(groupMentioned("@channel raid", lobby, listening)).toBe(false);
+    expect(groupMentioned("@all restart", lobby, listening)).toBe(true);
+  });
+
+  it("ignores lookalikes, private chats and servers where it is turned off", () => {
+    expect(groupMentioned("mail me@all.example", lobby, here)).toBe(false);
+    expect(groupMentioned("@allison hi", lobby, here)).toBe(false);
+    expect(groupMentioned("@channels", lobby, here)).toBe(false);
+    expect(groupMentioned("@all hi", { kind: "privateSession", session: 3 }, here)).toBe(false);
+    expect(groupMentioned("@all hi", lobby, { ownChannel: 1, muted: true })).toBe(false);
   });
 });
