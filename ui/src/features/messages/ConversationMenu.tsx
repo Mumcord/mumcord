@@ -18,7 +18,7 @@ import {
   TRASH_ICON,
 } from "./icons";
 import type { Row } from "./overviewModel";
-import { personOf } from "./useOverviewRows";
+import { person } from "../follow/directEntries";
 
 /** Mute lengths offered, in minutes; `null` until turned back on. */
 const MUTE_CHOICES = [
@@ -103,7 +103,7 @@ export function ConversationMenu({ row, menu, onClose, onError }: ConversationMe
     icon: PERSON_ICON,
     onSelect: () => {
       const users = connected.get(serverId)?.users;
-      const session = users ? (personOf(users, conversation)?.session ?? null) : null;
+      const session = users ? (person(users, conversation)?.session ?? null) : null;
       if (menu.opener) pinPreview(session, menu.opener, row.name, false, serverId);
     },
   };

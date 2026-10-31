@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Conversation, User } from "../../api";
 import { useServers as useConnectedServers } from "../channels";
+import { person } from "../follow/directEntries";
 import { useFollowStates } from "../follow/followStore";
 import { useFriends } from "../friends";
 import { displayName } from "../servers/format";
@@ -23,13 +23,6 @@ export function useNow(): number {
     };
   }, []);
   return now;
-}
-
-/** The person of a private chat among the users of a server. */
-export function personOf(users: ReadonlyMap<number, User>, c: Conversation): User | undefined {
-  if (c.kind === "private") return [...users.values()].find((u) => u.certHash === c.certHash);
-  if (c.kind === "privateSession") return users.get(c.session);
-  return undefined;
 }
 
 /** Every private conversation of every connected server, as overview rows. */
@@ -61,7 +54,7 @@ export function useOverviewRows(): Row[] {
       friends: new Set(friends.map((f) => f.certHash)),
       liveName: (serverId, conversation) => {
         const users = connected.get(serverId)?.users;
-        return users ? personOf(users, conversation)?.name : undefined;
+        return users ? person(users, conversation)?.name : undefined;
       },
       serverName: (serverId) => {
         const server = servers.find((s) => s.id === serverId);
