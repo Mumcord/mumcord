@@ -4,16 +4,7 @@
   "loadFailed": "No se pudieron cargar tus ajustes. Cierra los ajustes e inténtalo de nuevo.",
   "saveFailed": "No se pudo guardar el último cambio. Inténtalo de nuevo.",
   "sections": {
-    "identity": "Identidad",
-    "audio": "Audio",
-    "voice": "Voz",
-    "chatHistory": "Chat e historial",
     "appearance": "Apariencia",
-    "accessibility": "Accesibilidad",
-    "language": "Idioma",
-    "sounds": "Sonidos y notificaciones",
-    "overlay": "Superposición",
-    "diagnostics": "Diagnóstico",
     "about": "Acerca de",
     "servers": "Servidores",
     "privacy": "Privacidad",
@@ -110,7 +101,6 @@
     "testStop": "Detener grabación",
     "testRecording": "Grabando… habla ahora.",
     "testPlaying": "Reproduciendo tu voz…",
-    "quality": "Calidad",
     "musicQuality": "Calidad de música",
     "musicQualityHint": "Usa más ancho de banda y desactiva la supresión de ruido y el volumen automático; para música. Pulsar para hablar funciona mejor.",
     "bitrate": "Tasa de bits",
@@ -251,7 +241,6 @@
     "noServers": "Todavía no hay servidores guardados.",
     "save": "Guardar historial de {{server}}",
     "clearServer": "Borrar historial de {{server}}…",
-    "all": "Todos los servidores",
     "clearAll": "Borrar todo el historial…",
     "confirmTitle": "¿Borrar historial?",
     "confirmServer": "Todos los mensajes guardados de {{server}} se borrarán de este ordenador. Las demás personas conservan sus copias. Sus copias no se volverán a sincronizar con este equipo. No se puede deshacer.",
@@ -263,7 +252,6 @@
     "autoDeleteHint": "Los mensajes más antiguos se eliminan de este equipo automáticamente, sin preguntar. Solo afecta al historial guardado aquí, no al servidor."
   },
   "fullImages": {
-    "title": "Imágenes a tamaño completo",
     "offer": "Ofrecer mis imágenes a tamaño completo",
     "offerHint": "Otros usuarios de Mumcord pueden abrir mis imágenes a tamaño completo. Desactivado: solo se envía la vista previa pequeña, no se guarda ningún original y no se comparte ninguno.",
     "load": "Cargar imágenes a tamaño completo de otros",
@@ -440,7 +428,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Registro",
     "logLevel": "Detalle del registro",
     "levels": {
       "error": "Solo errores",
@@ -491,7 +478,6 @@
     "skipped": "Tu avatar predeterminado no se envió: es demasiado grande para este servidor."
   },
   "linkPreviews": {
-    "title": "Vistas previas de enlaces",
     "switch": "Mostrar vistas previas de enlaces y vídeos incrustados",
     "hint": "Mumcord carga las páginas enlazadas para mostrar vistas previas y reproductores; esos sitios ven tu dirección IP."
   },
@@ -576,7 +562,6 @@
     "limitInvalid": "Introduce un número entero del 1 al 15."
   },
   "appearanceEffects": {
-    "title": "Efectos",
     "visualEffects": "Efectos visuales (cristal, grano)",
     "visualEffectsHint": "Menús de cristal esmerilado y un grano de película sutil. Se desactivan solos cuando tu sistema pide menos transparencia o movimiento."
   },
@@ -603,7 +588,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Conexiones directas",
     "allow": "Permitir conexiones directas con otros usuarios de Mumcord",
     "hint": "Las conexiones directas son más rápidas, pero la otra persona puede ver tu dirección IP. Hasta que decidas, Mumcord pregunta la primera vez que se vaya a usar una.",
     "notUsed": "No se usa en el modo peer-to-peer elegido: Mumcord nunca se conecta directamente con otras personas."

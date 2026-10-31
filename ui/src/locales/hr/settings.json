@@ -4,16 +4,7 @@
   "loadFailed": "Tvoje postavke nije bilo moguće učitati. Zatvori postavke i pokušaj ponovno.",
   "saveFailed": "Zadnju promjenu nije bilo moguće spremiti. Pokušaj ponovno.",
   "sections": {
-    "identity": "Identitet",
-    "audio": "Zvuk",
-    "voice": "Glas",
-    "chatHistory": "Chat i povijest",
     "appearance": "Izgled",
-    "accessibility": "Pristupačnost",
-    "language": "Jezik",
-    "sounds": "Zvukovi i obavijesti",
-    "overlay": "Overlay",
-    "diagnostics": "Dijagnostika",
     "about": "O aplikaciji",
     "servers": "Poslužitelji",
     "privacy": "Privatnost",
@@ -110,7 +101,6 @@
     "testStop": "Zaustavi snimanje",
     "testRecording": "Snimanje… govori sada.",
     "testPlaying": "Reprodukcija tvog glasa…",
-    "quality": "Kvaliteta",
     "musicQuality": "Kvaliteta za glazbu",
     "musicQualityHint": "Troši više propusnosti i isključuje suzbijanje šuma i automatsku glasnoću; za glazbu. Najbolje radi s Pritisni za govor.",
     "bitrate": "Brzina prijenosa",
@@ -251,7 +241,6 @@
     "noServers": "Još nema spremljenih poslužitelja.",
     "save": "Spremaj povijest na {{server}}",
     "clearServer": "Obriši povijest poslužitelja {{server}}…",
-    "all": "Svi poslužitelji",
     "clearAll": "Obriši svu povijest…",
     "confirmTitle": "Obrisati povijest?",
     "confirmServer": "Sve spremljene poruke s {{server}} bit će obrisane s ovog računala. Drugi zadržavaju svoje kopije. Njihove se kopije neće ponovno sinkronizirati na ovo računalo. Ovo se ne može poništiti.",
@@ -263,7 +252,6 @@
     "autoDeleteHint": "Starije poruke automatski se brišu s ovog računala, bez pitanja. To utječe samo na ovdje spremljenu povijest, ne na poslužitelj."
   },
   "fullImages": {
-    "title": "Slike pune veličine",
     "offer": "Nudi moje slike pune veličine",
     "offerHint": "Drugi korisnici Mumcorda mogu otvoriti moje slike u punoj veličini. Isključeno: šalje se samo mali pregled, original se ne čuva i ne dijeli.",
     "load": "Učitavaj slike pune veličine od drugih",
@@ -440,7 +428,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Zapisivanje",
     "logLevel": "Razina detalja zapisa",
     "levels": {
       "error": "Samo pogreške",
@@ -491,7 +478,6 @@
     "skipped": "Tvoj zadani avatar nije poslan: prevelik je za ovaj poslužitelj."
   },
   "linkPreviews": {
-    "title": "Pregledi poveznica",
     "switch": "Prikaži preglede i ugradnje poveznica",
     "hint": "Mumcord učitava povezane stranice za prikaz pregleda i videoplayera; te stranice vide tvoju IP adresu."
   },
@@ -576,7 +562,6 @@
     "limitInvalid": "Unesi cijeli broj od 1 do 15."
   },
   "appearanceEffects": {
-    "title": "Efekti",
     "visualEffects": "Vizualni efekti (staklo, zrno)",
     "visualEffectsHint": "Izbornici od mutnog stakla i blago filmsko zrno. Automatski isključeno kad sustav traži manje prozirnosti ili pokreta."
   },
@@ -603,7 +588,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Izravne veze",
     "allow": "Dopusti izravne veze s drugim korisnicima Mumcorda",
     "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila.",
     "notUsed": "Ne koristi se u odabranom peer-to-peer načinu: Mumcord se nikad ne povezuje izravno s drugima."

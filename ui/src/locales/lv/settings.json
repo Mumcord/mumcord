@@ -4,16 +4,7 @@
   "loadFailed": "Tavus iestatījumus neizdevās ielādēt. Aizver iestatījumus un mēģini vēlreiz.",
   "saveFailed": "Pēdējo izmaiņu neizdevās saglabāt. Lūdzu, mēģini vēlreiz.",
   "sections": {
-    "identity": "Identitāte",
-    "audio": "Audio",
-    "voice": "Balss",
-    "chatHistory": "Čats un vēsture",
     "appearance": "Izskats",
-    "accessibility": "Pieejamība",
-    "language": "Valoda",
-    "sounds": "Skaņas un paziņojumi",
-    "overlay": "Pārklājums",
-    "diagnostics": "Diagnostika",
     "about": "Par lietotni",
     "servers": "Serveri",
     "privacy": "Privātums",
@@ -110,7 +101,6 @@
     "testStop": "Apturēt ierakstu",
     "testRecording": "Ieraksta… runā tagad.",
     "testPlaying": "Atskaņo tavu balsi…",
-    "quality": "Kvalitāte",
     "musicQuality": "Mūzikas kvalitāte",
     "musicQualityHint": "Izmanto vairāk joslas platuma un izslēdz trokšņu slāpēšanu un automātisko skaļumu; paredzēts mūzikai. Push-to-talk darbojas vislabāk.",
     "bitrate": "Bitu pārraides ātrums",
@@ -251,7 +241,6 @@
     "noServers": "Saglabātu serveru vēl nav.",
     "save": "Saglabāt vēsturi serverī {{server}}",
     "clearServer": "Dzēst {{server}} vēsturi…",
-    "all": "Visi serveri",
     "clearAll": "Dzēst visu vēsturi…",
     "confirmTitle": "Dzēst vēsturi?",
     "confirmServer": "Visas saglabātās ziņas no {{server}} tiks izdzēstas no šī datora. Citiem cilvēkiem paliek viņu kopijas. Viņu kopijas netiks atkal sinhronizētas uz šo datoru. To nevar atsaukt.",
@@ -263,7 +252,6 @@
     "autoDeleteHint": "Vecākas ziņas no šī datora tiek dzēstas automātiski, nejautājot. Tas ietekmē tikai šeit saglabāto vēsturi, nevis serveri."
   },
   "fullImages": {
-    "title": "Pilna izmēra attēli",
     "offer": "Piedāvāt manus pilna izmēra attēlus",
     "offerHint": "Citi Mumcord lietotāji var atvērt manus attēlus pilnā izmērā. Izslēgts: tiek sūtīts tikai mazais priekšskatījums, oriģināls netiek paturēts un netiek kopīgots.",
     "load": "Ielādēt pilna izmēra attēlus no citiem",
@@ -440,7 +428,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Žurnalēšana",
     "logLevel": "Žurnāla detalizācija",
     "levels": {
       "error": "Tikai kļūdas",
@@ -491,7 +478,6 @@
     "skipped": "Tavs noklusējuma avatars netika nosūtīts: tas ir pārāk liels šim serverim."
   },
   "linkPreviews": {
-    "title": "Saišu priekšskatījumi",
     "switch": "Rādīt saišu priekšskatījumus un iegultos elementus",
     "hint": "Mumcord ielādē saistītās lapas, lai parādītu priekšskatījumus un video atskaņotājus; šīs vietnes redz tavu IP adresi."
   },
@@ -576,7 +562,6 @@
     "limitInvalid": "Ievadi veselu skaitli no 1 līdz 15."
   },
   "appearanceEffects": {
-    "title": "Efekti",
     "visualEffects": "Vizuālie efekti (stikls, graudainība)",
     "visualEffectsHint": "Matēta stikla izvēlnes un smalka filmas graudainība. Automātiski izslēgti, kad sistēma prasa mazāk caurspīdīguma vai kustību."
   },
@@ -603,7 +588,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Tiešie savienojumi",
     "allow": "Atļaut tiešos savienojumus ar citiem Mumcord lietotājiem",
     "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots.",
     "notUsed": "Izvēlētajā peer-to-peer režīmā netiek izmantots: Mumcord nekad neveido tiešu savienojumu ar citiem."

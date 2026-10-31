@@ -4,16 +4,7 @@
   "loadFailed": "Dina inställningar kunde inte läsas in. Stäng inställningarna och försök igen.",
   "saveFailed": "Den senaste ändringen kunde inte sparas. Försök igen.",
   "sections": {
-    "identity": "Identitet",
-    "audio": "Ljud",
-    "voice": "Röst",
-    "chatHistory": "Chatt och historik",
     "appearance": "Utseende",
-    "accessibility": "Tillgänglighet",
-    "language": "Språk",
-    "sounds": "Ljud och aviseringar",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostik",
     "about": "Om",
     "servers": "Servrar",
     "privacy": "Integritet",
@@ -109,7 +100,6 @@
     "testStop": "Stoppa inspelningen",
     "testRecording": "Spelar in… prata nu.",
     "testPlaying": "Spelar upp din röst…",
-    "quality": "Kvalitet",
     "musicQuality": "Musikkvalitet",
     "musicQualityHint": "Använder mer bandbredd och stänger av brusreducering och automatisk volym, för musik. Push-to-talk fungerar bäst.",
     "bitrate": "Bithastighet",
@@ -249,7 +239,6 @@
     "noServers": "Inga sparade servrar än.",
     "save": "Spara historik på {{server}}",
     "clearServer": "Rensa historiken för {{server}}…",
-    "all": "Alla servrar",
     "clearAll": "Rensa all historik…",
     "confirmTitle": "Rensa historiken?",
     "confirmServer": "Alla sparade meddelanden från {{server}} raderas från den här datorn. Andra behåller sina kopior. Deras kopior synkroniseras inte tillbaka till den här datorn. Det går inte att ångra.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "Äldre meddelanden raderas automatiskt från den här datorn, utan att du tillfrågas. Det påverkar bara historiken som sparas här, inte servern."
   },
   "fullImages": {
-    "title": "Bilder i full storlek",
     "offer": "Erbjud mina bilder i full storlek",
     "offerHint": "Andra Mumcord-användare kan öppna mina bilder i full storlek. Av: bara den lilla förhandsvisningen skickas, ingen original sparas och inget delas.",
     "load": "Läs in bilder i full storlek från andra",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Loggning",
     "logLevel": "Loggdetaljer",
     "levels": {
       "error": "Bara fel",
@@ -489,7 +476,6 @@
     "skipped": "Din standardavatar skickades inte: den är för stor för den här servern."
   },
   "linkPreviews": {
-    "title": "Länkförhandsvisningar",
     "switch": "Visa länkförhandsvisningar och inbäddningar",
     "hint": "Mumcord läser in länkade sidor för att visa förhandsvisningar och videospelare. Dessa webbplatser ser din IP-adress."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Ange ett heltal från 1 till 15."
   },
   "appearanceEffects": {
-    "title": "Effekter",
     "visualEffects": "Visuella effekter (glas, korn)",
     "visualEffectsHint": "Frostade glasmenyer och ett subtilt filmkorn. Stängs av automatiskt när systemet ber om mindre transparens eller rörelse."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Direktanslutningar",
     "allow": "Tillåt direktanslutningar till andra Mumcord-användare",
     "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas.",
     "notUsed": "Används inte i det valda peer-to-peer-läget: Mumcord ansluter aldrig direkt till andra."

@@ -4,16 +4,7 @@
   "loadFailed": "Níorbh fhéidir do shocruithe a luchtú. Dún na socruithe agus bain triail eile as.",
   "saveFailed": "Níorbh fhéidir an t-athrú deireanach a shábháil. Bain triail eile as.",
   "sections": {
-    "identity": "Aitheantas",
-    "audio": "Fuaim",
-    "voice": "Guth",
-    "chatHistory": "Comhrá agus stair",
     "appearance": "Cuma",
-    "accessibility": "Inrochtaineacht",
-    "language": "Teanga",
-    "sounds": "Fuaimeanna agus fógraí",
-    "overlay": "Forleagan",
-    "diagnostics": "Diagnóisic",
     "about": "Maidir le",
     "servers": "Freastalaithe",
     "privacy": "Príobháideachas",
@@ -112,7 +103,6 @@
     "testStop": "Stop an taifeadadh",
     "testRecording": "Ag taifead… labhair anois.",
     "testPlaying": "Ag seinm do ghutha ar ais…",
-    "quality": "Cáilíocht",
     "musicQuality": "Cáilíocht cheoil",
     "musicQualityHint": "Úsáideann sé níos mó bandaleithead agus cuireann sé cosc torainn agus airde fuaime uathoibríoch as; le haghaidh ceoil. Oibríonn brúigh-chun-cainte is fearr.",
     "bitrate": "Ráta giotán",
@@ -255,7 +245,6 @@
     "noServers": "Gan freastalaithe sábháilte fós.",
     "save": "Sábháil an stair ar {{server}}",
     "clearServer": "Glan stair {{server}}…",
-    "all": "Gach freastalaí",
     "clearAll": "Glan an stair ar fad…",
     "confirmTitle": "Glan an stair?",
     "confirmServer": "Scriosfar gach teachtaireacht shábháilte ó {{server}} den ríomhaire seo. Coinníonn daoine eile a gcóipeanna féin. Ní dhéanfar a gcóipeanna a shioncrónú ar ais chuig an ríomhaire seo. Ní féidir é seo a chealú.",
@@ -267,7 +256,6 @@
     "autoDeleteHint": "Scriosfar teachtaireachtaí níos sine den ríomhaire seo go huathoibríoch, gan fiafraí. Ní imríonn sé tionchar ach ar an stair a shábháiltear anseo, ní ar an bhfreastalaí."
   },
   "fullImages": {
-    "title": "Íomhánna ar a méid iomlán",
     "offer": "Tairg m'íomhánna ar a méid iomlán",
     "offerHint": "Is féidir le húsáideoirí Mumcord eile mo phictiúir a oscailt ar a méid iomlán. As: ní sheoltar ach an réamhamharc beag, ní choinnítear aon bhunleagan agus ní roinntear ceann.",
     "load": "Luchtaigh íomhánna ar a méid iomlán ó dhaoine eile",
@@ -444,7 +432,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Logáil",
     "logLevel": "Mionsonraí logála",
     "levels": {
       "error": "Earráidí amháin",
@@ -495,7 +482,6 @@
     "skipped": "Níor seoladh d'abhatár réamhshocraithe: tá sé rómhór don fhreastalaí seo."
   },
   "linkPreviews": {
-    "title": "Réamhamhairc nasc",
     "switch": "Taispeáin réamhamhairc agus leabuithe nasc",
     "hint": "Luchtaíonn Mumcord leathanaigh nasctha chun réamhamhairc agus seinnteoirí físe a thaispeáint; feiceann na suíomhanna sin do sheoladh IP."
   },
@@ -582,7 +568,6 @@
     "limitInvalid": "Cuir isteach slánuimhir ó 1 go 15."
   },
   "appearanceEffects": {
-    "title": "Maisíochtaí",
     "visualEffects": "Maisíochtaí amhairc (gloine, grán)",
     "visualEffectsHint": "Roghchláir ghloine shioctha agus grán scannáin caolchúiseach. Múchtar go huathoibríoch iad nuair a iarrann do chóras níos lú trédhearcachta nó gluaiseachta."
   },
@@ -609,7 +594,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Ceangail dhíreacha",
     "allow": "Ceadaigh ceangail dhíreacha le húsáideoirí eile Mumcord",
     "hint": "Bíonn ceangail dhíreacha níos tapúla, ach is féidir leis an duine eile do sheoladh IP a fheiceáil. Go dtí go gcinneann tú, fiafraíonn Mumcord an chéad uair a d’úsáidfí ceann.",
     "notUsed": "Ní úsáidtear é sa mhód piarbhrearthóireachta roghnaithe: ní cheanglaíonn Mumcord go díreach le daoine eile riamh."

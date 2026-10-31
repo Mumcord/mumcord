@@ -4,16 +4,7 @@
   "loadFailed": "Je instellingen konden niet worden geladen. Sluit de instellingen en probeer het opnieuw.",
   "saveFailed": "De laatste wijziging kon niet worden opgeslagen. Probeer het opnieuw.",
   "sections": {
-    "identity": "Identiteit",
-    "audio": "Audio",
-    "voice": "Spraak",
-    "chatHistory": "Chat en geschiedenis",
     "appearance": "Weergave",
-    "accessibility": "Toegankelijkheid",
-    "language": "Taal",
-    "sounds": "Geluiden en meldingen",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostiek",
     "about": "Over",
     "servers": "Servers",
     "privacy": "Privacy",
@@ -109,7 +100,6 @@
     "testStop": "Opname stoppen",
     "testRecording": "Opnemen… praat nu.",
     "testPlaying": "Je stem wordt afgespeeld…",
-    "quality": "Kwaliteit",
     "musicQuality": "Muziekkwaliteit",
     "musicQualityHint": "Gebruikt meer bandbreedte en schakelt ruisonderdrukking en automatisch volume uit; bedoeld voor muziek. Push-to-talk werkt het best.",
     "bitrate": "Bitrate",
@@ -249,7 +239,6 @@
     "noServers": "Nog geen opgeslagen servers.",
     "save": "Geschiedenis opslaan op {{server}}",
     "clearServer": "Geschiedenis van {{server}} wissen…",
-    "all": "Alle servers",
     "clearAll": "Alle geschiedenis wissen…",
     "confirmTitle": "Geschiedenis wissen?",
     "confirmServer": "Alle opgeslagen berichten van {{server}} worden van deze computer verwijderd. Anderen houden hun eigen kopieën. Hun kopieën worden niet opnieuw naar deze computer gesynchroniseerd. Dit kan niet ongedaan worden gemaakt.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "Oudere berichten worden automatisch en zonder te vragen van deze computer verwijderd. Dit geldt alleen voor de geschiedenis die hier is opgeslagen, niet voor de server."
   },
   "fullImages": {
-    "title": "Afbeeldingen op volledige grootte",
     "offer": "Mijn afbeeldingen op volledige grootte aanbieden",
     "offerHint": "Andere Mumcord-gebruikers kunnen mijn afbeeldingen op volledige grootte openen. Uit: alleen het kleine voorbeeld wordt verzonden, er wordt geen origineel bewaard en er wordt er niets van gedeeld.",
     "load": "Afbeeldingen op volledige grootte van anderen laden",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Logboek",
     "logLevel": "Logdetail",
     "levels": {
       "error": "Alleen fouten",
@@ -489,7 +476,6 @@
     "skipped": "Je standaardavatar is niet verzonden: hij is te groot voor deze server."
   },
   "linkPreviews": {
-    "title": "Linkvoorbeelden",
     "switch": "Linkvoorbeelden en insluitingen tonen",
     "hint": "Mumcord laadt gelinkte pagina's om voorbeelden en videospelers te tonen; die sites zien je IP-adres."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Voer een geheel getal van 1 tot 15 in."
   },
   "appearanceEffects": {
-    "title": "Effecten",
     "visualEffects": "Visuele effecten (glas, korrel)",
     "visualEffectsHint": "Matglazen menu's en een subtiele filmkorrel. Automatisch uit als je systeem om minder transparantie of beweging vraagt."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Directe verbindingen",
     "allow": "Directe verbindingen met andere Mumcord-gebruikers toestaan",
     "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden.",
     "notUsed": "Niet gebruikt in de gekozen peer-to-peer-modus: Mumcord maakt nooit rechtstreeks verbinding met anderen."

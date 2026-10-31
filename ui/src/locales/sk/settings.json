@@ -4,16 +4,7 @@
   "loadFailed": "Tvoje nastavenia sa nepodarilo načítať. Zavri nastavenia a skús to znova.",
   "saveFailed": "Poslednú zmenu sa nepodarilo uložiť. Skús to znova.",
   "sections": {
-    "identity": "Identita",
-    "audio": "Zvuk",
-    "voice": "Hlas",
-    "chatHistory": "Chat a história",
     "appearance": "Vzhľad",
-    "accessibility": "Prístupnosť",
-    "language": "Jazyk",
-    "sounds": "Zvuky a upozornenia",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostika",
     "about": "O aplikácii",
     "servers": "Servery",
     "privacy": "Súkromie",
@@ -111,7 +102,6 @@
     "testStop": "Zastaviť nahrávanie",
     "testRecording": "Nahrávam… hovor teraz.",
     "testPlaying": "Prehrávam tvoj hlas…",
-    "quality": "Kvalita",
     "musicQuality": "Kvalita pre hudbu",
     "musicQualityHint": "Využíva viac dát a vypína potlačenie šumu aj automatickú hlasitosť; vhodné pre hudbu. Najlepšie funguje s push-to-talk.",
     "bitrate": "Dátový tok",
@@ -253,7 +243,6 @@
     "noServers": "Zatiaľ žiadne uložené servery.",
     "save": "Ukladať históriu na {{server}}",
     "clearServer": "Vymazať históriu {{server}}…",
-    "all": "Všetky servery",
     "clearAll": "Vymazať celú históriu…",
     "confirmTitle": "Vymazať históriu?",
     "confirmServer": "Všetky uložené správy zo servera {{server}} sa z tohto počítača vymažú. Ostatní si svoje kópie ponechajú. Ich kópie sa do tohto počítača znova nesynchronizujú. Nedá sa to vrátiť späť.",
@@ -265,7 +254,6 @@
     "autoDeleteHint": "Staršie správy sa z tohto počítača mažú automaticky, bez opýtania. Týka sa to len histórie uloženej tu, nie servera."
   },
   "fullImages": {
-    "title": "Obrázky v plnej veľkosti",
     "offer": "Ponúkať moje obrázky v plnej veľkosti",
     "offerHint": "Ostatní používatelia Mumcordu môžu otvoriť moje obrázky v plnej veľkosti. Vypnuté: posiela sa len malý náhľad, originál sa neuchováva ani nezdieľa.",
     "load": "Načítavať obrázky v plnej veľkosti od ostatných",
@@ -442,7 +430,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Záznamy",
     "logLevel": "Podrobnosť záznamov",
     "levels": {
       "error": "Len chyby",
@@ -493,7 +480,6 @@
     "skipped": "Tvoj predvolený avatar sa neposlal: je pre tento server príliš veľký."
   },
   "linkPreviews": {
-    "title": "Náhľady odkazov",
     "switch": "Zobrazovať náhľady odkazov a vložený obsah",
     "hint": "Mumcord načítava odkazované stránky, aby zobrazil náhľady a prehrávače videa; tieto stránky uvidia tvoju IP adresu."
   },
@@ -579,7 +565,6 @@
     "limitInvalid": "Zadaj celé číslo od 1 do 15."
   },
   "appearanceEffects": {
-    "title": "Efekty",
     "visualEffects": "Vizuálne efekty (sklo, zrno)",
     "visualEffectsHint": "Ponuky z matného skla a jemné filmové zrno. Automaticky vypnuté, keď systém žiada menej priehľadnosti alebo pohybu."
   },
@@ -606,7 +591,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Priame pripojenia",
     "allow": "Povoliť priame pripojenia k ostatným používateľom Mumcordu",
     "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo.",
     "notUsed": "Vo zvolenom režime peer-to-peer sa nepoužíva: Mumcord sa nikdy nepripája priamo k ostatným."

@@ -4,16 +4,7 @@
   "loadFailed": "Setările tale nu au putut fi încărcate. Închide setările și încearcă din nou.",
   "saveFailed": "Ultima modificare nu a putut fi salvată. Încearcă din nou.",
   "sections": {
-    "identity": "Identitate",
-    "audio": "Audio",
-    "voice": "Voce",
-    "chatHistory": "Chat și istoric",
     "appearance": "Aspect",
-    "accessibility": "Accesibilitate",
-    "language": "Limbă",
-    "sounds": "Sunete și notificări",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnosticare",
     "about": "Despre",
     "servers": "Servere",
     "privacy": "Confidențialitate",
@@ -110,7 +101,6 @@
     "testStop": "Oprește înregistrarea",
     "testRecording": "Se înregistrează… vorbește acum.",
     "testPlaying": "Se redă vocea ta…",
-    "quality": "Calitate",
     "musicQuality": "Calitate pentru muzică",
     "musicQualityHint": "Folosește mai multă lățime de bandă și oprește suprimarea zgomotului și volumul automat; pentru muzică. Merge cel mai bine cu push-to-talk.",
     "bitrate": "Rată de biți",
@@ -251,7 +241,6 @@
     "noServers": "Încă nu ai servere salvate.",
     "save": "Salvează istoricul pe {{server}}",
     "clearServer": "Șterge istoricul pentru {{server}}…",
-    "all": "Toate serverele",
     "clearAll": "Șterge tot istoricul…",
     "confirmTitle": "Ștergi istoricul?",
     "confirmServer": "Toate mesajele salvate de pe {{server}} vor fi șterse de pe acest computer. Ceilalți își păstrează copiile. Copiile lor nu vor fi sincronizate înapoi pe acest computer. Acțiunea nu poate fi anulată.",
@@ -263,7 +252,6 @@
     "autoDeleteHint": "Mesajele mai vechi sunt șterse automat de pe acest computer, fără să fii întrebat. Asta afectează doar istoricul salvat aici, nu serverul."
   },
   "fullImages": {
-    "title": "Imagini la dimensiune completă",
     "offer": "Oferă imaginile mele la dimensiune completă",
     "offerHint": "Alți utilizatori Mumcord îmi pot deschide pozele la dimensiune completă. Oprit: se trimite doar previzualizarea mică, originalul nu e păstrat și nu e partajat.",
     "load": "Încarcă imagini la dimensiune completă de la alții",
@@ -440,7 +428,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Jurnalizare",
     "logLevel": "Nivel de detaliu al jurnalului",
     "levels": {
       "error": "Doar erori",
@@ -491,7 +478,6 @@
     "skipped": "Avatarul tău implicit nu a fost trimis: e prea mare pentru acest server."
   },
   "linkPreviews": {
-    "title": "Previzualizări de linkuri",
     "switch": "Arată previzualizări de linkuri și conținut încorporat",
     "hint": "Mumcord încarcă paginile din linkuri ca să afișeze previzualizări și playere video; acele site-uri îți văd adresa IP."
   },
@@ -576,7 +562,6 @@
     "limitInvalid": "Introdu un număr întreg de la 1 la 15."
   },
   "appearanceEffects": {
-    "title": "Efecte",
     "visualEffects": "Efecte vizuale (sticlă, granulație)",
     "visualEffectsHint": "Meniuri din sticlă mată și o granulație fină de film. Dezactivate automat când sistemul cere mai puțină transparență sau mișcare."
   },
@@ -603,7 +588,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Conexiuni directe",
     "allow": "Permite conexiuni directe cu alți utilizatori Mumcord",
     "hint": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Până decizi, Mumcord întreabă prima dată când ar fi folosită una.",
     "notUsed": "Nu se folosește în modul peer-to-peer ales: Mumcord nu se conectează niciodată direct la alte persoane."

@@ -4,16 +4,7 @@
   "loadFailed": "Vos paramètres n’ont pas pu être chargés. Fermez les paramètres et réessayez.",
   "saveFailed": "La dernière modification n’a pas pu être enregistrée. Veuillez réessayer.",
   "sections": {
-    "identity": "Identité",
-    "audio": "Audio",
-    "voice": "Voix",
-    "chatHistory": "Discussion et historique",
     "appearance": "Apparence",
-    "accessibility": "Accessibilité",
-    "language": "Langue",
-    "sounds": "Sons et notifications",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostic",
     "about": "À propos",
     "servers": "Serveurs",
     "privacy": "Confidentialité",
@@ -110,7 +101,6 @@
     "testStop": "Arrêter l’enregistrement",
     "testRecording": "Enregistrement… parlez maintenant.",
     "testPlaying": "Lecture de votre voix…",
-    "quality": "Qualité",
     "musicQuality": "Qualité musique",
     "musicQualityHint": "Utilise plus de bande passante et désactive la suppression de bruit et le volume automatique ; pour la musique. Le push-to-talk fonctionne le mieux.",
     "bitrate": "Débit",
@@ -251,7 +241,6 @@
     "noServers": "Aucun serveur enregistré pour l’instant.",
     "save": "Enregistrer l’historique sur {{server}}",
     "clearServer": "Effacer l’historique de {{server}}…",
-    "all": "Tous les serveurs",
     "clearAll": "Effacer tout l’historique…",
     "confirmTitle": "Effacer l’historique ?",
     "confirmServer": "Tous les messages enregistrés de {{server}} seront supprimés de cet ordinateur. Les autres personnes conservent leurs copies. Leurs copies ne seront pas resynchronisées sur cet ordinateur. Cette action est irréversible.",
@@ -263,7 +252,6 @@
     "autoDeleteHint": "Les messages plus anciens sont supprimés automatiquement de cet ordinateur, sans confirmation. Cela n’affecte que l’historique enregistré ici, pas le serveur."
   },
   "fullImages": {
-    "title": "Images en taille réelle",
     "offer": "Proposer mes images en taille réelle",
     "offerHint": "Les autres utilisateurs de Mumcord peuvent ouvrir mes images en taille réelle. Désactivé : seul le petit aperçu est envoyé, aucun original n’est conservé ni partagé.",
     "load": "Charger les images en taille réelle des autres",
@@ -440,7 +428,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Journalisation",
     "logLevel": "Niveau de détail du journal",
     "levels": {
       "error": "Erreurs uniquement",
@@ -491,7 +478,6 @@
     "skipped": "Votre avatar par défaut n’a pas été envoyé : il est trop volumineux pour ce serveur."
   },
   "linkPreviews": {
-    "title": "Aperçus de liens",
     "switch": "Afficher les aperçus et intégrations de liens",
     "hint": "Mumcord charge les pages liées pour afficher des aperçus et des lecteurs vidéo ; ces sites voient votre adresse IP."
   },
@@ -576,7 +562,6 @@
     "limitInvalid": "Saisissez un nombre entier de 1 à 15."
   },
   "appearanceEffects": {
-    "title": "Effets",
     "visualEffects": "Effets visuels (verre, grain)",
     "visualEffectsHint": "Menus en verre dépoli et léger grain de film. Désactivés automatiquement quand votre système demande moins de transparence ou d’animations."
   },
@@ -603,7 +588,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Connexions directes",
     "allow": "Autoriser les connexions directes avec d’autres utilisateurs de Mumcord",
     "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée.",
     "notUsed": "Non utilisé dans le mode pair à pair choisi : Mumcord ne se connecte jamais directement aux autres personnes."

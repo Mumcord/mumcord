@@ -4,16 +4,7 @@
   "loadFailed": "Tvojih nastavitev ni bilo mogoče naložiti. Zapri nastavitve in poskusi znova.",
   "saveFailed": "Zadnje spremembe ni bilo mogoče shraniti. Poskusi znova.",
   "sections": {
-    "identity": "Identiteta",
-    "audio": "Zvok",
-    "voice": "Glas",
-    "chatHistory": "Klepet in zgodovina",
     "appearance": "Videz",
-    "accessibility": "Dostopnost",
-    "language": "Jezik",
-    "sounds": "Zvoki in obvestila",
-    "overlay": "Prekrivni sloj",
-    "diagnostics": "Diagnostika",
     "about": "O aplikaciji",
     "servers": "Strežniki",
     "privacy": "Zasebnost",
@@ -111,7 +102,6 @@
     "testStop": "Ustavi snemanje",
     "testRecording": "Snemanje … zdaj govori.",
     "testPlaying": "Predvajanje tvojega glasu …",
-    "quality": "Kakovost",
     "musicQuality": "Kakovost za glasbo",
     "musicQualityHint": "Porabi več pasovne širine ter izklopi dušenje šuma in samodejno glasnost; za glasbo. Najbolje deluje s funkcijo pritisni za govor.",
     "bitrate": "Bitna hitrost",
@@ -253,7 +243,6 @@
     "noServers": "Še ni shranjenih strežnikov.",
     "save": "Shranjuj zgodovino za {{server}}",
     "clearServer": "Počisti zgodovino za {{server}} …",
-    "all": "Vsi strežniki",
     "clearAll": "Počisti vso zgodovino …",
     "confirmTitle": "Počistim zgodovino?",
     "confirmServer": "Vsa shranjena sporočila s strežnika {{server}} bodo izbrisana s tega računalnika. Drugi obdržijo svoje kopije. Njihove kopije se ne bodo znova sinhronizirale na ta računalnik. Tega ni mogoče razveljaviti.",
@@ -265,7 +254,6 @@
     "autoDeleteHint": "Starejša sporočila se s tega računalnika izbrišejo samodejno, brez vprašanja. To vpliva samo na tukaj shranjeno zgodovino, ne na strežnik."
   },
   "fullImages": {
-    "title": "Slike v polni velikosti",
     "offer": "Ponujaj moje slike v polni velikosti",
     "offerHint": "Drugi uporabniki Mumcorda lahko odprejo moje slike v polni velikosti. Izklopljeno: pošlje se samo majhen predogled, izvirnik se ne hrani in se ne deli.",
     "load": "Nalagaj slike drugih v polni velikosti",
@@ -442,7 +430,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Beleženje",
     "logLevel": "Podrobnost dnevnika",
     "levels": {
       "error": "Samo napake",
@@ -493,7 +480,6 @@
     "skipped": "Tvoj privzeti avatar ni bil poslan: za ta strežnik je prevelik."
   },
   "linkPreviews": {
-    "title": "Predogledi povezav",
     "switch": "Pokaži predoglede povezav in vdelave",
     "hint": "Mumcord naloži povezane strani za prikaz predogledov in predvajalnikov videa; ta spletna mesta vidijo tvoj naslov IP."
   },
@@ -579,7 +565,6 @@
     "limitInvalid": "Vpiši celo število od 1 do 15."
   },
   "appearanceEffects": {
-    "title": "Učinki",
     "visualEffects": "Vizualni učinki (steklo, zrnatost)",
     "visualEffectsHint": "Meniji iz motnega stekla in rahla filmska zrnatost. Samodejno izklopljeno, ko sistem zahteva manj prosojnosti ali gibanja."
   },
@@ -606,7 +591,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Neposredne povezave",
     "allow": "Dovoli neposredne povezave z drugimi uporabniki Mumcorda",
     "hint": "Neposredne povezave so hitrejše, vendar druga oseba vidi tvoj naslov IP. Dokler se ne odločiš, Mumcord vpraša, ko bi bila prvič uporabljena.",
     "notUsed": "V izbranem načinu peer-to-peer se ne uporablja: Mumcord se nikoli ne poveže neposredno z drugimi."

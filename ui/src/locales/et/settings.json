@@ -4,16 +4,7 @@
   "loadFailed": "Sinu seadeid ei õnnestunud laadida. Sulge seaded ja proovi uuesti.",
   "saveFailed": "Viimast muudatust ei õnnestunud salvestada. Proovi palun uuesti.",
   "sections": {
-    "identity": "Identiteet",
-    "audio": "Heli",
-    "voice": "Hääl",
-    "chatHistory": "Vestlus ja ajalugu",
     "appearance": "Välimus",
-    "accessibility": "Juurdepääsetavus",
-    "language": "Keel",
-    "sounds": "Helid ja teavitused",
-    "overlay": "Kattekiht",
-    "diagnostics": "Diagnostika",
     "about": "Teave",
     "servers": "Serverid",
     "privacy": "Privaatsus",
@@ -109,7 +100,6 @@
     "testStop": "Peata salvestus",
     "testRecording": "Salvestan… räägi nüüd.",
     "testPlaying": "Esitan sinu häält tagasi…",
-    "quality": "Kvaliteet",
     "musicQuality": "Muusikakvaliteet",
     "musicQualityHint": "Kasutab rohkem ribalaiust ning lülitab välja müravaigistuse ja automaatse helitugevuse; mõeldud muusikale. Vajuta ja räägi töötab kõige paremini.",
     "bitrate": "Bitikiirus",
@@ -249,7 +239,6 @@
     "noServers": "Salvestatud servereid veel pole.",
     "save": "Salvesta ajalugu serveril {{server}}",
     "clearServer": "Tühjenda serveri {{server}} ajalugu…",
-    "all": "Kõik serverid",
     "clearAll": "Tühjenda kogu ajalugu…",
     "confirmTitle": "Tühjendan ajaloo?",
     "confirmServer": "Kõik serveri {{server}} salvestatud sõnumid kustutatakse sellest arvutist. Teistel jäävad nende koopiad alles. Nende koopiaid ei sünkroonita sellesse arvutisse tagasi. Seda ei saa tagasi võtta.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "Vanemad sõnumid kustutatakse sellest arvutist automaatselt, küsimata. See mõjutab ainult siin salvestatud ajalugu, mitte serverit."
   },
   "fullImages": {
-    "title": "Täissuuruses pildid",
     "offer": "Paku minu täissuuruses pilte",
     "offerHint": "Teised Mumcordi kasutajad saavad minu pilte täissuuruses avada. Väljas: saadetakse ainult väike eelvaade, originaali ei hoita ega jagata.",
     "load": "Laadi teiste täissuuruses pildid",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Logimine",
     "logLevel": "Logi detailsus",
     "levels": {
       "error": "Ainult vead",
@@ -489,7 +476,6 @@
     "skipped": "Sinu vaikeavatari ei saadetud: see on sellele serverile liiga suur."
   },
   "linkPreviews": {
-    "title": "Linkide eelvaated",
     "switch": "Näita linkide eelvaateid ja manuseid",
     "hint": "Mumcord laadib lingitud lehed, et näidata eelvaateid ja videopleiereid; need saidid näevad sinu IP-aadressi."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Sisesta täisarv 1 kuni 15."
   },
   "appearanceEffects": {
-    "title": "Efektid",
     "visualEffects": "Visuaalsed efektid (klaas, teralisus)",
     "visualEffectsHint": "Mattklaasist menüüd ja peen filmiteralisus. Lülitub automaatselt välja, kui süsteem palub vähem läbipaistvust või liikumist."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Otseühendused",
     "allow": "Luba otseühendused teiste Mumcordi kasutajatega",
     "hint": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Kuni sa pole otsustanud, küsib Mumcord esimesel korral, kui mõnda kasutataks.",
     "notUsed": "Valitud peer-to-peer-režiimis ei kasutata: Mumcord ei loo kunagi otseühendust teistega."

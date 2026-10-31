@@ -4,16 +4,7 @@
   "loadFailed": "A beállításaidat nem sikerült betölteni. Zárd be a beállításokat, és próbáld újra.",
   "saveFailed": "Az utolsó módosítást nem sikerült menteni. Próbáld újra.",
   "sections": {
-    "identity": "Identitás",
-    "audio": "Audió",
-    "voice": "Hang",
-    "chatHistory": "Chat és előzmények",
     "appearance": "Megjelenés",
-    "accessibility": "Akadálymentesség",
-    "language": "Nyelv",
-    "sounds": "Hangok és értesítések",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnosztika",
     "about": "Névjegy",
     "servers": "Szerverek",
     "privacy": "Adatvédelem",
@@ -109,7 +100,6 @@
     "testStop": "Felvétel leállítása",
     "testRecording": "Felvétel… beszélj most.",
     "testPlaying": "A hangod visszajátszása…",
-    "quality": "Minőség",
     "musicQuality": "Zenei minőség",
     "musicQualityHint": "Több sávszélességet használ, és kikapcsolja a zajszűrést és az automatikus hangerőt; zenéhez. Push-to-talkkal működik a legjobban.",
     "bitrate": "Bitráta",
@@ -249,7 +239,6 @@
     "noServers": "Még nincsenek mentett szerverek.",
     "save": "Előzmények mentése itt: {{server}}",
     "clearServer": "{{server}} előzményeinek törlése…",
-    "all": "Összes szerver",
     "clearAll": "Összes előzmény törlése…",
     "confirmTitle": "Törlöd az előzményeket?",
     "confirmServer": "{{server}} összes mentett üzenete törlődik erről a számítógépről. Másoknál megmaradnak a saját példányaik. Az ő példányaik nem szinkronizálódnak vissza erre a számítógépre. Ez nem vonható vissza.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "A régebbi üzenetek automatikusan, kérdés nélkül törlődnek erről a számítógépről. Ez csak az itt mentett előzményeket érinti, a szervert nem."
   },
   "fullImages": {
-    "title": "Teljes méretű képek",
     "offer": "Teljes méretű képeim felkínálása",
     "offerHint": "Más Mumcord-felhasználók teljes méretben megnyithatják a képeimet. Kikapcsolva: csak a kis előnézet kerül elküldésre, eredeti nem marad meg, és nem is lesz megosztva.",
     "load": "Teljes méretű képek betöltése másoktól",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Naplózás",
     "logLevel": "Napló részletessége",
     "levels": {
       "error": "Csak hibák",
@@ -489,7 +476,6 @@
     "skipped": "Az alapértelmezett avatarod nem lett elküldve: túl nagy ehhez a szerverhez."
   },
   "linkPreviews": {
-    "title": "Linkelőnézetek",
     "switch": "Linkelőnézetek és beágyazások megjelenítése",
     "hint": "A Mumcord betölti a linkelt oldalakat az előnézetekhez és videólejátszókhoz; ezek a webhelyek látják az IP-címedet."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Adj meg egy egész számot 1 és 15 között."
   },
   "appearanceEffects": {
-    "title": "Effektek",
     "visualEffects": "Vizuális effektek (üveg, szemcsésség)",
     "visualEffectsHint": "Matt üveg menük és finom filmszemcse. Automatikusan kikapcsol, ha a rendszered kevesebb átlátszóságot vagy mozgást kér."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Közvetlen kapcsolatok",
     "allow": "Közvetlen kapcsolatok engedélyezése más Mumcord-felhasználókkal",
     "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet.",
     "notUsed": "A választott peer-to-peer módban nincs használatban: a Mumcord sosem kapcsolódik közvetlenül másokhoz."

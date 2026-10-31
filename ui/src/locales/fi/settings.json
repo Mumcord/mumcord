@@ -4,16 +4,7 @@
   "loadFailed": "Asetuksiasi ei voitu ladata. Sulje asetukset ja yritä uudelleen.",
   "saveFailed": "Viimeisintä muutosta ei voitu tallentaa. Yritä uudelleen.",
   "sections": {
-    "identity": "Identiteetti",
-    "audio": "Ääni",
-    "voice": "Puhe",
-    "chatHistory": "Chat ja historia",
     "appearance": "Ulkoasu",
-    "accessibility": "Saavutettavuus",
-    "language": "Kieli",
-    "sounds": "Äänet ja ilmoitukset",
-    "overlay": "Peittokuva",
-    "diagnostics": "Diagnostiikka",
     "about": "Tietoja",
     "servers": "Palvelimet",
     "privacy": "Yksityisyys",
@@ -109,7 +100,6 @@
     "testStop": "Lopeta tallennus",
     "testRecording": "Tallennetaan… puhu nyt.",
     "testPlaying": "Toistetaan ääntäsi…",
-    "quality": "Laatu",
     "musicQuality": "Musiikkilaatu",
     "musicQualityHint": "Käyttää enemmän kaistaa ja poistaa käytöstä kohinanvaimennuksen ja automaattisen äänenvoimakkuuden; musiikkia varten. Puhu painamalla toimii parhaiten.",
     "bitrate": "Bittinopeus",
@@ -249,7 +239,6 @@
     "noServers": "Ei vielä tallennettuja palvelimia.",
     "save": "Tallenna historia palvelimelta {{server}}",
     "clearServer": "Tyhjennä palvelimen {{server}} historia…",
-    "all": "Kaikki palvelimet",
     "clearAll": "Tyhjennä koko historia…",
     "confirmTitle": "Tyhjennetäänkö historia?",
     "confirmServer": "Kaikki palvelimen {{server}} tallennetut viestit poistetaan tältä tietokoneelta. Muiden kopiot säilyvät. Heidän kopioitaan ei synkronoida takaisin tälle tietokoneelle. Tätä ei voi kumota.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "Vanhemmat viestit poistetaan tältä tietokoneelta automaattisesti kysymättä. Tämä koskee vain tänne tallennettua historiaa, ei palvelinta."
   },
   "fullImages": {
-    "title": "Täysikokoiset kuvat",
     "offer": "Tarjoa täysikokoiset kuvani",
     "offerHint": "Muut Mumcord-käyttäjät voivat avata kuvani täysikokoisina. Pois päältä: vain pieni esikatselu lähetetään, alkuperäistä ei säilytetä eikä jaeta.",
     "load": "Lataa täysikokoiset kuvat muilta",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Lokit",
     "logLevel": "Lokin tarkkuus",
     "levels": {
       "error": "Vain virheet",
@@ -489,7 +476,6 @@
     "skipped": "Oletusprofiilikuvaasi ei lähetetty: se on liian suuri tälle palvelimelle."
   },
   "linkPreviews": {
-    "title": "Linkkien esikatselut",
     "switch": "Näytä linkkien esikatselut ja upotukset",
     "hint": "Mumcord lataa linkitetyt sivut näyttääkseen esikatseluja ja videosoittimia; nämä sivustot näkevät IP-osoitteesi."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Anna kokonaisluku väliltä 1–15."
   },
   "appearanceEffects": {
-    "title": "Tehosteet",
     "visualEffects": "Visuaaliset tehosteet (lasi, rakeisuus)",
     "visualEffectsHint": "Huurrelasivalikot ja hienovarainen filmirae. Pois päältä automaattisesti, kun järjestelmä pyytää vähemmän läpinäkyvyyttä tai liikettä."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Suorat yhteydet",
     "allow": "Salli suorat yhteydet muihin Mumcord-käyttäjiin",
     "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran.",
     "notUsed": "Ei käytössä valitussa peer-to-peer-tilassa: Mumcord ei koskaan yhdistä suoraan muihin."

@@ -4,16 +4,7 @@
   "loadFailed": "Dine indstillinger kunne ikke indlæses. Luk indstillingerne, og prøv igen.",
   "saveFailed": "Den sidste ændring kunne ikke gemmes. Prøv igen.",
   "sections": {
-    "identity": "Identitet",
-    "audio": "Lyd",
-    "voice": "Stemme",
-    "chatHistory": "Chat og historik",
     "appearance": "Udseende",
-    "accessibility": "Tilgængelighed",
-    "language": "Sprog",
-    "sounds": "Lyde og notifikationer",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostik",
     "about": "Om",
     "servers": "Servere",
     "privacy": "Privatliv",
@@ -109,7 +100,6 @@
     "testStop": "Stop optagelse",
     "testRecording": "Optager… tal nu.",
     "testPlaying": "Afspiller din stemme…",
-    "quality": "Kvalitet",
     "musicQuality": "Musikkvalitet",
     "musicQualityHint": "Bruger mere båndbredde og slår støjundertrykkelse og automatisk lydstyrke fra; til musik. Push-to-talk virker bedst.",
     "bitrate": "Bitrate",
@@ -249,7 +239,6 @@
     "noServers": "Ingen gemte servere endnu.",
     "save": "Gem historik på {{server}}",
     "clearServer": "Ryd historik for {{server}}…",
-    "all": "Alle servere",
     "clearAll": "Ryd al historik…",
     "confirmTitle": "Ryd historik?",
     "confirmServer": "Alle gemte beskeder fra {{server}} slettes fra denne computer. Andre beholder deres kopier. Deres kopier synkroniseres ikke tilbage til denne computer. Det kan ikke fortrydes.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "Ældre beskeder slettes automatisk fra denne computer uden at spørge. Det påvirker kun den historik, der er gemt her, ikke serveren."
   },
   "fullImages": {
-    "title": "Billeder i fuld størrelse",
     "offer": "Tilbyd mine billeder i fuld størrelse",
     "offerHint": "Andre Mumcord-brugere kan åbne mine billeder i fuld størrelse. Fra: kun den lille forhåndsvisning sendes, ingen original gemmes, og ingen deles.",
     "load": "Indlæs billeder i fuld størrelse fra andre",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Logning",
     "logLevel": "Logdetaljer",
     "levels": {
       "error": "Kun fejl",
@@ -489,7 +476,6 @@
     "skipped": "Din standardavatar blev ikke sendt: den er for stor til denne server."
   },
   "linkPreviews": {
-    "title": "Linkvisninger",
     "switch": "Vis linkvisninger og indlejringer",
     "hint": "Mumcord indlæser linkede sider for at vise forhåndsvisninger og videoafspillere; de websteder kan se din IP-adresse."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Indtast et helt tal fra 1 til 15."
   },
   "appearanceEffects": {
-    "title": "Effekter",
     "visualEffects": "Visuelle effekter (glas, kornethed)",
     "visualEffectsHint": "Menuer i frostet glas og en diskret filmkornethed. Slås automatisk fra, når dit system beder om mindre gennemsigtighed eller bevægelse."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Direkte forbindelser",
     "allow": "Tillad direkte forbindelser til andre Mumcord-brugere",
     "hint": "Direkte forbindelser er hurtigere, men den anden person kan se din IP-adresse. Indtil du beslutter dig, spørger Mumcord første gang, en ville blive brugt.",
     "notUsed": "Bruges ikke i den valgte peer-to-peer-tilstand: Mumcord forbinder aldrig direkte til andre."

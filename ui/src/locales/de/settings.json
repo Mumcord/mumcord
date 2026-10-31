@@ -4,16 +4,7 @@
   "loadFailed": "Deine Einstellungen konnten nicht geladen werden. Schließe die Einstellungen und versuche es erneut.",
   "saveFailed": "Die letzte Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.",
   "sections": {
-    "identity": "Identität",
-    "audio": "Audio",
-    "voice": "Stimme",
-    "chatHistory": "Chat & Verlauf",
     "appearance": "Darstellung",
-    "accessibility": "Barrierefreiheit",
-    "language": "Sprache",
-    "sounds": "Töne & Benachrichtigungen",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnose",
     "about": "Über",
     "servers": "Server",
     "privacy": "Datenschutz",
@@ -109,7 +100,6 @@
     "testStop": "Aufnahme beenden",
     "testRecording": "Aufnahme läuft… sprich jetzt.",
     "testPlaying": "Wiedergabe deiner Stimme…",
-    "quality": "Qualität",
     "musicQuality": "Musikqualität",
     "musicQualityHint": "Braucht mehr Bandbreite und schaltet Rauschunterdrückung und automatische Lautstärke ab; für Musik. Push-to-Talk funktioniert am besten.",
     "bitrate": "Bitrate",
@@ -249,7 +239,6 @@
     "noServers": "Noch keine gespeicherten Server.",
     "save": "Verlauf von {{server}} speichern",
     "clearServer": "Verlauf von {{server}} löschen…",
-    "all": "Alle Server",
     "clearAll": "Gesamten Verlauf löschen…",
     "confirmTitle": "Verlauf löschen?",
     "confirmServer": "Alle gespeicherten Nachrichten von {{server}} werden von diesem Computer gelöscht. Andere behalten ihre eigenen Kopien. Deren Kopien werden nicht wieder auf diesen Computer synchronisiert. Das kann nicht rückgängig gemacht werden.",
@@ -261,7 +250,6 @@
     "autoDeleteHint": "Ältere Nachrichten werden automatisch und ohne Nachfrage von diesem Computer gelöscht. Das betrifft nur den hier gespeicherten Verlauf, nicht den Server."
   },
   "fullImages": {
-    "title": "Bilder in Originalgröße",
     "offer": "Meine Bilder in Originalgröße anbieten",
     "offerHint": "Andere Mumcord-Nutzer können meine Bilder in Originalgröße öffnen. Aus: Es wird nur die kleine Vorschau gesendet, kein Original gespeichert und keins weitergegeben.",
     "load": "Bilder anderer in Originalgröße laden",
@@ -438,7 +426,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Protokoll",
     "logLevel": "Detailgrad des Protokolls",
     "levels": {
       "error": "Nur Fehler",
@@ -489,7 +476,6 @@
     "skipped": "Dein Standard-Avatar wurde nicht gesendet: Er ist zu groß für diesen Server."
   },
   "linkPreviews": {
-    "title": "Linkvorschauen",
     "switch": "Linkvorschauen und eingebettete Videos anzeigen",
     "hint": "Mumcord lädt verlinkte Seiten für Vorschauen und Videoplayer; diese Seiten sehen deine IP-Adresse."
   },
@@ -573,7 +559,6 @@
     "limitInvalid": "Gib eine ganze Zahl von 1 bis 15 ein."
   },
   "appearanceEffects": {
-    "title": "Effekte",
     "visualEffects": "Visuelle Effekte (Glas, Körnung)",
     "visualEffectsHint": "Milchglas-Menüs und eine dezente Filmkörnung. Automatisch aus, wenn dein System weniger Transparenz oder Bewegung verlangt."
   },
@@ -600,7 +585,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Direkte Verbindungen",
     "allow": "Direkte Verbindungen zu anderen Mumcord-Nutzern erlauben",
     "hint": "Direkte Verbindungen sind schneller, aber die andere Person kann deine IP-Adresse sehen. Bis du dich entscheidest, fragt Mumcord beim ersten Mal, wenn eine genutzt würde.",
     "notUsed": "Im gewählten Peer-to-Peer-Modus nicht verwendet: Mumcord verbindet sich nie direkt mit anderen."

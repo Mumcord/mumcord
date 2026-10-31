@@ -4,16 +4,7 @@
   "loadFailed": "Nepavyko įkelti tavo nustatymų. Uždaryk nustatymus ir bandyk dar kartą.",
   "saveFailed": "Nepavyko įrašyti paskutinio pakeitimo. Bandyk dar kartą.",
   "sections": {
-    "identity": "Tapatybė",
-    "audio": "Garsas",
-    "voice": "Balsas",
-    "chatHistory": "Pokalbiai ir istorija",
     "appearance": "Išvaizda",
-    "accessibility": "Pritaikymas neįgaliesiems",
-    "language": "Kalba",
-    "sounds": "Garsai ir pranešimai",
-    "overlay": "Perdanga",
-    "diagnostics": "Diagnostika",
     "about": "Apie",
     "servers": "Serveriai",
     "privacy": "Privatumas",
@@ -111,7 +102,6 @@
     "testStop": "Stabdyti įrašymą",
     "testRecording": "Įrašoma… kalbėk dabar.",
     "testPlaying": "Atkuriamas tavo balsas…",
-    "quality": "Kokybė",
     "musicQuality": "Muzikos kokybė",
     "musicQualityHint": "Naudoja daugiau pralaidumo ir išjungia triukšmo slopinimą bei automatinį garsumą; skirta muzikai. Geriausiai veikia su „Spausk ir kalbėk“.",
     "bitrate": "Bitų sparta",
@@ -253,7 +243,6 @@
     "noServers": "Įrašytų serverių dar nėra.",
     "save": "Įrašyti istoriją serveryje {{server}}",
     "clearServer": "Išvalyti {{server}} istoriją…",
-    "all": "Visi serveriai",
     "clearAll": "Išvalyti visą istoriją…",
     "confirmTitle": "Išvalyti istoriją?",
     "confirmServer": "Visos įrašytos žinutės iš {{server}} bus ištrintos iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka. Jų kopijos nebus vėl sinchronizuotos į šį kompiuterį. To atšaukti negalima.",
@@ -265,7 +254,6 @@
     "autoDeleteHint": "Senesnės žinutės iš šio kompiuterio ištrinamos automatiškai, neklausiant. Tai paveikia tik čia įrašytą istoriją, ne serverį."
   },
   "fullImages": {
-    "title": "Pilno dydžio paveikslėliai",
     "offer": "Siūlyti mano pilno dydžio paveikslėlius",
     "offerHint": "Kiti Mumcord naudotojai gali atidaryti mano paveikslėlius pilnu dydžiu. Išjungta: siunčiama tik maža peržiūra, originalas nesaugomas ir niekam neduodamas.",
     "load": "Įkelti pilno dydžio paveikslėlius iš kitų",
@@ -442,7 +430,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Žurnalas",
     "logLevel": "Žurnalo detalumas",
     "levels": {
       "error": "Tik klaidos",
@@ -493,7 +480,6 @@
     "skipped": "Tavo numatytasis avataras neišsiųstas: jis per didelis šiam serveriui."
   },
   "linkPreviews": {
-    "title": "Nuorodų peržiūros",
     "switch": "Rodyti nuorodų peržiūras ir įterpinius",
     "hint": "Mumcord įkelia nuorodų puslapius, kad parodytų peržiūras ir vaizdo grotuvus; tos svetainės mato tavo IP adresą."
   },
@@ -579,7 +565,6 @@
     "limitInvalid": "Įvesk sveikąjį skaičių nuo 1 iki 15."
   },
   "appearanceEffects": {
-    "title": "Efektai",
     "visualEffects": "Vaizdo efektai (stiklas, grūdėtumas)",
     "visualEffectsHint": "Matinio stiklo meniu ir subtilus juostos grūdėtumas. Išjungiama automatiškai, kai sistema prašo mažiau skaidrumo ar judesio."
   },
@@ -606,7 +591,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Tiesioginiai ryšiai",
     "allow": "Leisti tiesioginius ryšius su kitais Mumcord naudotojais",
     "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas.",
     "notUsed": "Pasirinktame peer-to-peer režime nenaudojama: Mumcord niekada nesijungia tiesiogiai prie kitų."

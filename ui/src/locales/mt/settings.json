@@ -4,16 +4,7 @@
   "loadFailed": "Is-settings tiegħek ma setgħux jitgħabbew. Agħlaq is-settings u erġa' pprova.",
   "saveFailed": "L-aħħar bidla ma setgħetx tiġi ssejvjata. Erġa' pprova.",
   "sections": {
-    "identity": "Identità",
-    "audio": "Awdjo",
-    "voice": "Vuċi",
-    "chatHistory": "Chat u storja",
     "appearance": "Dehra",
-    "accessibility": "Aċċessibilità",
-    "language": "Lingwa",
-    "sounds": "Ħsejjes u notifiki",
-    "overlay": "Overlay",
-    "diagnostics": "Dijanjostika",
     "about": "Dwar",
     "servers": "Servers",
     "privacy": "Privatezza",
@@ -112,7 +103,6 @@
     "testStop": "Waqqaf ir-reġistrazzjoni",
     "testRecording": "Qed jirreġistra… tkellem issa.",
     "testPlaying": "Qed jindaqq il-vuċi tiegħek…",
-    "quality": "Kwalità",
     "musicQuality": "Kwalità tal-mużika",
     "musicQualityHint": "Juża aktar bandwidth u jitfi t-tneħħija tal-istorbju u l-volum awtomatiku; għall-mużika. Push-to-talk jaħdem l-aħjar.",
     "bitrate": "Bitrate",
@@ -255,7 +245,6 @@
     "noServers": "Għad m'hemm l-ebda server issejvjat.",
     "save": "Issejvja l-istorja fuq {{server}}",
     "clearServer": "Ħassar l-istorja ta' {{server}}…",
-    "all": "Is-servers kollha",
     "clearAll": "Ħassar l-istorja kollha…",
     "confirmTitle": "Tħassar l-istorja?",
     "confirmServer": "Il-messaġġi ssejvjati kollha minn {{server}} se jitħassru minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom. Il-kopji tagħhom mhux se jerġgħu jiġu sinkronizzati ma' dan il-kompjuter. Dan ma jistax jiġi mreġġa' lura.",
@@ -267,7 +256,6 @@
     "autoDeleteHint": "Il-messaġġi eqdem jitħassru minn dan il-kompjuter awtomatikament, mingħajr ma jitolbu. Dan jaffettwa biss l-istorja ssejvjata hawn, mhux is-server."
   },
   "fullImages": {
-    "title": "Stampi b'daqs sħiħ",
     "offer": "Offri l-istampi tiegħi b'daqs sħiħ",
     "offerHint": "Utenti oħra ta' Mumcord jistgħu jiftħu l-istampi tiegħi b'daqs sħiħ. Mitfi: jintbagħat biss il-preview żgħir, l-ebda oriġinal ma jinżamm u l-ebda wieħed ma jinqasam.",
     "load": "Tgħabbi stampi b'daqs sħiħ mingħand l-oħrajn",
@@ -444,7 +432,6 @@
     }
   },
   "diagnostics": {
-    "logging": "Logging",
     "logLevel": "Dettall tal-log",
     "levels": {
       "error": "Żbalji biss",
@@ -495,7 +482,6 @@
     "skipped": "L-avatar default tiegħek ma ntbagħatx: huwa kbir wisq għal dan is-server."
   },
   "linkPreviews": {
-    "title": "Previews tal-links",
     "switch": "Uri previews u embeds tal-links",
     "hint": "Mumcord jgħabbi l-paġni marbuta biex juri previews u video players; dawk is-siti jaraw l-indirizz IP tiegħek."
   },
@@ -582,7 +568,6 @@
     "limitInvalid": "Daħħal numru sħiħ minn 1 sa 15."
   },
   "appearanceEffects": {
-    "title": "Effetti",
     "visualEffects": "Effetti viżivi (ħġieġ, granulu)",
     "visualEffectsHint": "Menus tal-ħġieġ smerilat u granulu tal-film sottili. Jintfew awtomatikament meta s-sistema titlob inqas trasparenza jew moviment."
   },
@@ -609,7 +594,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Konnessjonijiet diretti",
     "allow": "Ippermetti konnessjonijiet diretti ma' utenti oħra ta' Mumcord",
     "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda.",
     "notUsed": "Mhux użat fil-modalità peer-to-peer magħżula: Mumcord qatt ma jikkonnettja direttament ma' nies oħra."
