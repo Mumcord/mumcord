@@ -31,10 +31,7 @@ impl std::fmt::Debug for Favourite {
 /// Reads all favourites, in Mumble's order (by name). The file is opened read-only and as
 /// immutable, so Mumble's own database is never changed or locked, even while it runs.
 pub fn read(path: &Path) -> rusqlite::Result<Vec<Favourite>> {
-    let uri = format!(
-        "file:{}?mode=ro&immutable=1",
-        percent_encode(&path.to_string_lossy())
-    );
+    let uri = format!("{}?mode=ro&immutable=1", file_uri(&path.to_string_lossy()));
     let conn = Connection::open_with_flags(
         uri,
         OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_URI,
@@ -74,18 +71,22 @@ pub fn read(path: &Path) -> rusqlite::Result<Vec<Favourite>> {
     Ok(favourites)
 }
 
-/// SQLite URIs need `%`, `?` and `#` escaped in the path.
-fn percent_encode(path: &str) -> String {
-    let mut out = String::with_capacity(path.len());
+/// A `file:` URI for SQLite: forward slashes, an authority-less `file:///` prefix (also in front
+/// of a Windows drive letter, `file:///C:/...`), and `%`, `?`, `#` and spaces percent-encoded.
+fn file_uri(path: &str) -> String {
+    let mut encoded = String::with_capacity(path.len() + 8);
     for c in path.chars() {
         match c {
-            '%' | '?' | '#' => out.push_str(&format!("%{:02X}", u32::from(c))),
-            // Windows paths work with forward slashes in a URI.
-            '\\' => out.push('/'),
-            c => out.push(c),
+            '%' | '?' | '#' | ' ' => encoded.push_str(&format!("%{:02X}", u32::from(c))),
+            '\\' => encoded.push('/'),
+            c => encoded.push(c),
         }
     }
-    out
+    if encoded.starts_with('/') {
+        format!("file://{encoded}")
+    } else {
+        format!("file:///{encoded}")
+    }
 }
 
 #[cfg(test)]
@@ -113,7 +114,8 @@ pub(crate) mod tests {
     #[test]
     fn favourites_are_read_without_changing_the_file() {
         let dir = tempfile::tempdir().expect("tempdir");
-        let path = dir.path().join("mumble #1?.sqlite");
+        // Spaces, `#` and `%` must survive the URI (all valid in Windows file names, too).
+        let path = dir.path().join("my mumble #1 %20.sqlite");
         write_db(
             &path,
             &[
@@ -153,5 +155,17 @@ pub(crate) mod tests {
         let path = dir.path().join("empty.sqlite");
         Connection::open(&path).expect("open");
         assert!(read(&path).is_err());
+    }
+
+    #[test]
+    fn uris_for_unix_and_windows_paths() {
+        assert_eq!(
+            file_uri("/home/z/a b.sqlite"),
+            "file:///home/z/a%20b.sqlite"
+        );
+        assert_eq!(
+            file_uri(r"C:\Users\Zoë\AppData\Roaming\Mumble\#1.sqlite"),
+            "file:///C:/Users/Zoë/AppData/Roaming/Mumble/%231.sqlite"
+        );
     }
 }
