@@ -36,5 +36,29 @@
     "output": "Maolán callaire",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Rialtáin an fhoghraí",
+    "nowPlaying": "Ag imright anois",
+    "watching": "Ag breathnú",
+    "open": "Oscail",
+    "next": "Ar aghaidh",
+    "seek": "Lorg",
+    "volume": "Kreath",
+    "syncedPlay": "Sioncronaithe",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "Tá an rialú ag {{name}}",
+    "inSync": "Sioncronaithe",
+    "inSyncAll": "Tá allt sioncronaithe",
+    "inSyncExcept": "Tá allt sioncronaithe ach ocht {{count}}",
+    "buffering": "Ag maolú",
+    "behind": "{{seconds}} s i ndiaidh",
+    "ahead": "{{seconds}} s i gcoinne",
+    "noReport": "Níl tuarascáil",
+    "you": "tú",
+    "host": "Óstach",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Fág an scéalán iomlán",
+    "none": "Aon duine"
   }
 }

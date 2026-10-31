@@ -36,5 +36,29 @@
     "output": "Lautsprecherpuffer",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Player-Steuerung",
+    "nowPlaying": "Läuft gerade",
+    "watching": "Schauen zu",
+    "open": "Öffnen",
+    "next": "Weiter",
+    "seek": "Springen",
+    "volume": "Lautstärke",
+    "syncedPlay": "Synchron",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} steuert",
+    "inSync": "Im Takt",
+    "inSyncAll": "Alle im Takt",
+    "inSyncExcept": "Alle im Takt außer {{count}}",
+    "buffering": "Puffert",
+    "behind": "{{seconds}} s zurück",
+    "ahead": "{{seconds}} s voraus",
+    "noReport": "Kein Bericht",
+    "you": "du",
+    "host": "Host",
+    "fullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild verlassen",
+    "none": "Niemand"
   }
 }

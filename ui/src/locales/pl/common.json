@@ -36,5 +36,29 @@
     "output": "Bufor głośników",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Sterowanie odtwarzacza",
+    "nowPlaying": "Teraz odtwarza",
+    "watching": "Oglądają",
+    "open": "Otwórz",
+    "next": "Następny",
+    "seek": "Szukaj",
+    "volume": "Głośność",
+    "syncedPlay": "Zsynchronizowane",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} ma kontrolę",
+    "inSync": "Zsynchronizowany",
+    "inSyncAll": "Wszyscy zsynchronizowani",
+    "inSyncExcept": "Wszyscy zsynchronizowani poza {{count}}",
+    "buffering": "Buforowanie",
+    "behind": "{{seconds}} s w tyle",
+    "ahead": "{{seconds}} s przed",
+    "noReport": "Brak raportu",
+    "you": "ty",
+    "host": "Gospodarz",
+    "fullscreen": "Pełny ekran",
+    "exitFullscreen": "Opuść pełny ekran",
+    "none": "Nikt"
   }
 }

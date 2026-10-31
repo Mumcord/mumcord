@@ -36,5 +36,29 @@
     "output": "Tampon des haut-parleurs",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Commandes du lecteur",
+    "nowPlaying": "Lecture en cours",
+    "watching": "Regardent",
+    "open": "Ouvrir",
+    "next": "Suivant",
+    "seek": "Recherche",
+    "volume": "Volume",
+    "syncedPlay": "Synchro",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} a la main",
+    "inSync": "Synchro",
+    "inSyncAll": "Tout le monde est synchronisé",
+    "inSyncExcept": "Tous synchronisés sauf {{count}}",
+    "buffering": "Mise en mémoire tampon",
+    "behind": "{{seconds}} s en retard",
+    "ahead": "{{seconds}} s en avance",
+    "noReport": "Aucun rapport",
+    "you": "vous",
+    "host": "Hôte",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran",
+    "none": "Personne"
   }
 }

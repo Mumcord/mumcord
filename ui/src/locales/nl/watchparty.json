@@ -42,7 +42,9 @@
     "nextFailed": "De volgende video kon niet worden gestart.",
     "move": "{{title}} verplaatsen",
     "upNext": "Hierna: {{title}}",
-    "upNextNone": "Niets hierna"
+    "upNextNone": "Niets hierna",
+    "paste": "Plak een YouTube-link",
+    "notALink": "Dat is geen YouTube-link"
   },
   "widget": {
     "play": "Afspelen",

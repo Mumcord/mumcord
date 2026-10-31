@@ -36,5 +36,29 @@
     "output": "Hangszórópuffer",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Lejátszó vezérlői",
+    "nowPlaying": "Most játszik",
+    "watching": "Néz",
+    "open": "Megnyitás",
+    "next": "Következő",
+    "seek": "Ugrás",
+    "volume": "Hangerő",
+    "syncedPlay": "Szinkronban",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} irányít",
+    "inSync": "Szinkronban",
+    "inSyncAll": "Mindenki szinkronban",
+    "inSyncExcept": "Mindenki szinkronban, kivéve {{count}}",
+    "buffering": "Pufferel",
+    "behind": "{{seconds}} mp lemaradva",
+    "ahead": "{{seconds}} mp előrébb",
+    "noReport": "Nincs jelentés",
+    "you": "te",
+    "host": "Házigazda",
+    "fullscreen": "Teljes képernyő",
+    "exitFullscreen": "Kilépés a teljes képernyőről",
+    "none": "Senki"
   }
 }

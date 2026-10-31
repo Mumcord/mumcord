@@ -42,7 +42,9 @@
     "nextFailed": "Ďalšie video sa nepodarilo spustiť.",
     "move": "Presunúť {{title}}",
     "upNext": "Nasleduje: {{title}}",
-    "upNextNone": "Nič ďalšie nenasleduje"
+    "upNextNone": "Nič ďalšie nenasleduje",
+    "paste": "Vložte odkaz na YouTube",
+    "notALink": "Toto nie je odkaz na YouTube"
   },
   "widget": {
     "play": "Prehrať",

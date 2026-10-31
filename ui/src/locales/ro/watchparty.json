@@ -42,7 +42,9 @@
     "nextFailed": "Videoclipul următor nu a putut porni.",
     "move": "Mută {{title}}",
     "upNext": "Urmează: {{title}}",
-    "upNextNone": "Nu urmează nimic"
+    "upNextNone": "Nu urmează nimic",
+    "paste": "Lipește un link YouTube",
+    "notALink": "Acela nu este un link YouTube"
   },
   "widget": {
     "play": "Redă",

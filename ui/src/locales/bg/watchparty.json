@@ -42,7 +42,9 @@
     "nextFailed": "Следващото видео не можа да започне.",
     "move": "Премести {{title}}",
     "upNext": "Следва: {{title}}",
-    "upNextNone": "Нищо не следва"
+    "upNextNone": "Нищо не следва",
+    "paste": "Постави YouTube链接",
+    "notALink": "Това не е YouTube链接"
   },
   "widget": {
     "play": "Пусни",

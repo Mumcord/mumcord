@@ -36,5 +36,29 @@
     "output": "Međuspremnik zvučnika",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Kontrole playera",
+    "nowPlaying": "Sada se reproduktira",
+    "watching": "Gledaju",
+    "open": "Otvori",
+    "next": "Sljedeće",
+    "seek": "Traži",
+    "volume": "Glasnoća",
+    "syncedPlay": "Sinkronizirano",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} ima kontrolu",
+    "inSync": "Sinkronizirano",
+    "inSyncAll": "Svi su sinkronizirani",
+    "inSyncExcept": "Svi sinkronizirani osim {{count}}",
+    "buffering": "Baferira",
+    "behind": "{{seconds}} s zaostat",
+    "ahead": "{{seconds}} s ispred",
+    "noReport": "Nema izvještaja",
+    "you": "ti",
+    "host": "Domaćin",
+    "fullscreen": "Cijeli ekran",
+    "exitFullscreen": "Napusti cijeli ekran",
+    "none": "Nitko"
   }
 }

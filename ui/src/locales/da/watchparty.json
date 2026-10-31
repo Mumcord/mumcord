@@ -42,7 +42,9 @@
     "nextFailed": "Næste video kunne ikke startes.",
     "move": "Flyt {{title}}",
     "upNext": "Næste: {{title}}",
-    "upNextNone": "Intet i køen"
+    "upNextNone": "Intet i køen",
+    "paste": "Indsæt et YouTube-link",
+    "notALink": "Det er ikke et YouTube-link"
   },
   "widget": {
     "play": "Afspil",
