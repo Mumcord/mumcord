@@ -111,9 +111,9 @@ impl DspChain {
             .capture_config(stream)
             .render_config(stream)
             .build();
-        let backend = controls.take_backend().unwrap_or_else(|| {
-            controls.build(controls.noise_backend(), controls.suppression_level())
-        });
+        let mut backend = controls.build(controls.noise_backend(), controls.suppression_level());
+        // A switch prepared before the chain existed is taken over now rather than on a frame.
+        controls.exchange_backend(&mut backend);
         let detector = controls.build(Backend::Nnnoiseless, SuppressionLevel::default());
         Self {
             controls,
@@ -155,11 +155,9 @@ impl DspChain {
     /// [`DspControls`].
     pub fn process(&mut self, input: &Frame, out: &mut Frame) -> Gate {
         let controls = &*self.controls;
-        // A backend switch is only adopted here; the settings thread built it, so nothing is
-        // allocated in the frame path.
-        if let Some(backend) = controls.take_backend() {
-            self.backend = backend;
-        }
+        // A backend switch is only adopted here; the settings thread builds the new backend and
+        // frees the old one, so nothing is allocated or freed in the frame path.
+        controls.exchange_backend(&mut self.backend);
         // Low-latency mode keeps the signal untouched: these stages change the sound and the
         // echo canceller would need the far end it can no longer track at minimal buffering.
         let bypass = controls.low_latency();

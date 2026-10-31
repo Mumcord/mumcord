@@ -14,6 +14,7 @@ struct CountingAlloc;
 
 thread_local! {
     static ALLOCATIONS: Cell<usize> = const { Cell::new(0) };
+    static DEALLOCATIONS: Cell<usize> = const { Cell::new(0) };
 }
 
 // SAFETY: delegates to the system allocator; the counter is a const-initialised
@@ -26,6 +27,7 @@ unsafe impl GlobalAlloc for CountingAlloc {
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        DEALLOCATIONS.with(|a| a.set(a.get() + 1));
         // SAFETY: same contract as the caller's.
         unsafe { System.dealloc(ptr, layout) }
     }
@@ -42,6 +44,10 @@ static GLOBAL: CountingAlloc = CountingAlloc;
 
 fn allocations() -> usize {
     ALLOCATIONS.with(Cell::get)
+}
+
+fn deallocations() -> usize {
+    DEALLOCATIONS.with(Cell::get)
 }
 
 /// Deterministic white noise in [-1, 1].
@@ -787,13 +793,27 @@ fn adopting_a_backend_allocates_nothing_in_the_frame_path() {
     );
 
     let before_adopt = allocations();
+    let freed_before_adopt = deallocations();
     chain.process(&frame, &mut out);
     assert_eq!(
         allocations() - before_adopt,
         0,
         "adoption allocated in the frame path"
     );
+    assert_eq!(
+        deallocations() - freed_before_adopt,
+        0,
+        "adoption freed the replaced backend in the frame path"
+    );
     assert_eq!(chain.backend(), Backend::Rnnoise);
+
+    // The replaced backend went back to the slot; the next switch frees it on the settings thread.
+    let freed_before_switch = deallocations();
+    controls.set_noise_backend(Backend::Nnnoiseless, SuppressionLevel::High);
+    assert!(
+        deallocations() - freed_before_switch > 0,
+        "the settings thread did not free the replaced backend"
+    );
 }
 
 /// Only the sonora level is a real setting; its effect must be measurable.

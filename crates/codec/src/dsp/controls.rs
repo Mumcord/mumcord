@@ -49,8 +49,9 @@ pub struct DspControls {
     noise_suppression: AtomicBool,
     noise_backend: AtomicU32,
     suppression_level: AtomicU32,
-    /// Backend built by the settings thread and waiting for the processing thread. The frame path
-    /// only reads `backend_pending`; the mutex is entered on a switch, never per frame.
+    /// Backend built by the settings thread and waiting for the processing thread; after a switch
+    /// it holds the backend the chain handed back, so that one is freed off the frame path. The
+    /// frame path reads `backend_pending` and only ever tries the mutex, it never waits for it.
     backend_pending: AtomicBool,
     backend_slot: Mutex<Option<Box<dyn SuppressionBackend>>>,
     /// Implementations for backends `mumcord-codec` cannot carry, keyed by `Backend::code`. Entered
@@ -128,9 +129,17 @@ impl DspControls {
         self.suppression_level
             .store(level.code(), Ordering::Relaxed);
         if changed {
-            let mut slot = self.backend_slot.lock().expect("backend slot");
-            *slot = Some(self.build(kind, level));
-            self.backend_pending.store(true, Ordering::Release);
+            // Built before the slot is entered, so the processing thread never finds it held for
+            // the length of a model allocation.
+            let backend = self.build(kind, level);
+            let previous = {
+                let mut slot = self.backend_slot.lock().expect("backend slot");
+                self.backend_pending.store(true, Ordering::Release);
+                slot.replace(backend)
+            };
+            // A backend the chain handed back (or one it never took) is freed here, on the
+            // settings thread.
+            drop(previous);
         }
     }
 
@@ -173,15 +182,23 @@ impl DspControls {
         SuppressionLevel::from_code(self.suppression_level.load(Ordering::Relaxed))
     }
 
-    /// Takes the backend prepared by `set_noise_backend`, if one is waiting. Called by the
-    /// processing thread once per frame; it does not block.
-    pub fn take_backend(&self) -> Option<Box<dyn SuppressionBackend>> {
+    /// Swaps the backend prepared by `set_noise_backend` into `current`, if one is waiting, and
+    /// tells whether it did. Called by the processing thread once per frame: it never waits for
+    /// the lock (a busy slot means the switch happens on a later frame) and never frees memory,
+    /// because the replaced backend stays in the slot for the settings thread to drop.
+    pub fn exchange_backend(&self, current: &mut Box<dyn SuppressionBackend>) -> bool {
         if !self.backend_pending.load(Ordering::Acquire) {
-            return None;
+            return false;
         }
+        let Ok(mut slot) = self.backend_slot.try_lock() else {
+            return false;
+        };
+        let Some(next) = slot.as_mut() else {
+            return false;
+        };
+        std::mem::swap(current, next);
         self.backend_pending.store(false, Ordering::Release);
-        let mut slot = self.backend_slot.lock().expect("backend slot");
-        slot.take()
+        true
     }
 
     pub fn set_auto_gain(&self, on: bool) {
