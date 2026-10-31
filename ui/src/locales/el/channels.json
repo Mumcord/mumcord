@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Επισκόπηση διακομιστή",
   "tree": {
     "label": "Κανάλια",
     "hint": "Enter: εμφάνιση συνομιλίας · Shift+Enter ή διπλό κλικ: είσοδος · Βέλη: μετακίνηση, ανάπτυξη, σύμπτυξη · Πλήκτρο μενού: επιλογές καναλιού",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} κανάλια",
     "people_one": "{{count}} άτομο",
     "people_other": "{{count}} άτομα"
+  },
+  "section": {
+    "state": {
+      "connected": "Συνδεδεμένο",
+      "connecting": "Σύνδεση",
+      "reconnecting": "Επανασύνδεση…",
+      "disconnected": "Αποσυνδεδεμένο"
+    },
+    "online": "{{count}} σε σύνδεση",
+    "onlinePing": "{{count}} σε σύνδεση · {{ping}} ms"
   }
 }

@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Visão geral do servidor",
   "tree": {
     "label": "Canais",
     "hint": "Enter: mostrar chat · Shift+Enter ou duplo clique: entrar · Setas: mover, expandir, recolher · Tecla de menu: opções do canal",
@@ -82,5 +81,15 @@
     "people_one": "{{count}} pessoa",
     "people_many": "{{count}} pessoas",
     "people_other": "{{count}} pessoas"
+  },
+  "section": {
+    "state": {
+      "connected": "Ligado",
+      "connecting": "A ligar",
+      "reconnecting": "A religar…",
+      "disconnected": "Desligado"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

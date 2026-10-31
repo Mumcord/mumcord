@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Pregled poslužitelja",
   "tree": {
     "label": "Kanali",
     "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje · Tipka izbornika: mogućnosti kanala",
@@ -82,5 +81,15 @@
     "people_one": "{{count}} osoba",
     "people_few": "{{count}} osobe",
     "people_other": "{{count}} osoba"
+  },
+  "section": {
+    "state": {
+      "connected": "Povezano",
+      "connecting": "Povezivanje",
+      "reconnecting": "Ponovno povezivanje…",
+      "disconnected": "Nije povezano"
+    },
+    "online": "{{count}} na mreži",
+    "onlinePing": "{{count}} na mreži · {{ping}} ms"
   }
 }

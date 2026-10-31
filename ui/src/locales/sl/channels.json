@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Pregled strežnika",
   "tree": {
     "label": "Kanali",
     "hint": "Enter: pokaži klepet · Shift+Enter ali dvoklik: pridruži se · Puščice: premikanje, razširi, strni · Tipka menija: možnosti kanala",
@@ -87,5 +86,15 @@
     "people_two": "{{count}} osebi",
     "people_few": "{{count}} osebe",
     "people_other": "{{count}} oseb"
+  },
+  "section": {
+    "state": {
+      "connected": "Povezano",
+      "connecting": "Povezovanje",
+      "reconnecting": "Ponovno povezovanje…",
+      "disconnected": "Ni povezave"
+    },
+    "online": "{{count}} na spletu",
+    "onlinePing": "{{count}} na spletu · {{ping}} ms"
   }
 }

@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Vue d'ensemble du serveur",
   "tree": {
     "label": "Canaux",
     "hint": "Entrée : afficher la discussion · Maj+Entrée ou double-clic : rejoindre · Flèches : se déplacer, développer, réduire · Touche Menu : options du canal",
@@ -82,5 +81,15 @@
     "people_one": "{{count}} personne",
     "people_many": "{{count}} personnes",
     "people_other": "{{count}} personnes"
+  },
+  "section": {
+    "state": {
+      "connected": "Connecté",
+      "connecting": "Connexion",
+      "reconnecting": "Reconnexion…",
+      "disconnected": "Déconnecté"
+    },
+    "online": "{{count}} en ligne",
+    "onlinePing": "{{count}} en ligne · {{ping}} ms"
   }
 }

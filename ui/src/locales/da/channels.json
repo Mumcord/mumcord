@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Serveroversigt",
   "tree": {
     "label": "Kanaler",
     "hint": "Enter: vis chat · Shift+Enter eller dobbeltklik: join · Piletaster: flyt, udvid, skjul · Menutast: kanalindstillinger",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} kanaler",
     "people_one": "{{count}} person",
     "people_other": "{{count}} personer"
+  },
+  "section": {
+    "state": {
+      "connected": "Forbundet",
+      "connecting": "Forbinder",
+      "reconnecting": "Genforbinder…",
+      "disconnected": "Afbrudt"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

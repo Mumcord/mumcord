@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Servera pārskats",
   "tree": {
     "label": "Kanāli",
     "hint": "Enter: rādīt čatu · Shift+Enter vai dubultklikšķis: pievienoties · Bulttaustiņi: pārvietoties, izvērst, sakļaut · Izvēlnes taustiņš: kanāla opcijas",
@@ -82,5 +81,15 @@
     "people_zero": "{{count}} cilvēku",
     "people_one": "{{count}} cilvēks",
     "people_other": "{{count}} cilvēki"
+  },
+  "section": {
+    "state": {
+      "connected": "Savienots",
+      "connecting": "Savienojas",
+      "reconnecting": "Savienojas no jauna…",
+      "disconnected": "Atvienots"
+    },
+    "online": "{{count}} tiešsaistē",
+    "onlinePing": "{{count}} tiešsaistē · {{ping}} ms"
   }
 }

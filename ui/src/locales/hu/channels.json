@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Szerver áttekintése",
   "tree": {
     "label": "Csatornák",
     "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás · Menübillentyű: csatorna beállításai",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} csatorna",
     "people_one": "{{count}} személy",
     "people_other": "{{count}} személy"
+  },
+  "section": {
+    "state": {
+      "connected": "Csatlakozva",
+      "connecting": "Csatlakozás",
+      "reconnecting": "Újracsatlakozás…",
+      "disconnected": "Nincs kapcsolat"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

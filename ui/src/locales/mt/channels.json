@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Ħarsa ġenerali lejn is-server",
   "tree": {
     "label": "Kanali",
     "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa · Buttuna tal-menu: għażliet tal-kanal",
@@ -92,5 +91,15 @@
     "people_few": "{{count}} persuni",
     "people_many": "{{count}} persuna",
     "people_other": "{{count}} persuna"
+  },
+  "section": {
+    "state": {
+      "connected": "Konness",
+      "connecting": "Qed jikkonnettja",
+      "reconnecting": "Qed jerġa' jikkonnettja…",
+      "disconnected": "Skonness"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Serverio apžvalga",
   "tree": {
     "label": "Kanalai",
     "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti · Meniu klavišas: kanalo parinktys",
@@ -87,5 +86,15 @@
     "people_few": "{{count}} žmonės",
     "people_many": "{{count}} žmogaus",
     "people_other": "{{count}} žmonių"
+  },
+  "section": {
+    "state": {
+      "connected": "Prisijungta",
+      "connecting": "Jungiamasi",
+      "reconnecting": "Jungiamasi iš naujo…",
+      "disconnected": "Atsijungta"
+    },
+    "online": "{{count}} prisijungę",
+    "onlinePing": "{{count}} prisijungę · {{ping}} ms"
   }
 }

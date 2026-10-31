@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Panoramica del server",
   "tree": {
     "label": "Canali",
     "hint": "Invio: mostra la chat · Maiusc+Invio o doppio clic: entra · Frecce: sposta, espandi, comprimi · Tasto Menu: opzioni del canale",
@@ -82,5 +81,15 @@
     "people_one": "{{count}} persona",
     "people_many": "{{count}} persone",
     "people_other": "{{count}} persone"
+  },
+  "section": {
+    "state": {
+      "connected": "Connesso",
+      "connecting": "Connessione",
+      "reconnecting": "Riconnessione…",
+      "disconnected": "Disconnesso"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

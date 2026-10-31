@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Prehľad servera",
   "tree": {
     "label": "Kanály",
     "hint": "Enter: zobraziť chat · Shift+Enter alebo dvojklik: pripojiť sa · Šípky: presun, rozbalenie, zbalenie · Kláves ponuky: možnosti kanála",
@@ -87,5 +86,15 @@
     "people_few": "{{count}} osoby",
     "people_many": "{{count}} osoby",
     "people_other": "{{count}} osôb"
+  },
+  "section": {
+    "state": {
+      "connected": "Pripojené",
+      "connecting": "Pripája sa",
+      "reconnecting": "Znova sa pripája…",
+      "disconnected": "Odpojené"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

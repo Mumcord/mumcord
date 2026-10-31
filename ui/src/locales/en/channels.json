@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Server overview",
   "tree": {
     "label": "Channels",
     "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse · Menu key: channel options",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} channels",
     "people_one": "{{count}} person",
     "people_other": "{{count}} people"
+  },
+  "section": {
+    "state": {
+      "connected": "Connected",
+      "connecting": "Connecting",
+      "reconnecting": "Reconnecting…",
+      "disconnected": "Disconnected"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

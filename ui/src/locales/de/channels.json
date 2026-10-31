@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Serverübersicht",
   "tree": {
     "label": "Kanäle",
     "hint": "Enter: Chat anzeigen · Umschalt+Enter oder Doppelklick: beitreten · Pfeiltasten: bewegen, auf- und zuklappen · Menütaste: Kanaloptionen",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} Kanäle",
     "people_one": "{{count}} Person",
     "people_other": "{{count}} Personen"
+  },
+  "section": {
+    "state": {
+      "connected": "Verbunden",
+      "connecting": "Verbinde",
+      "reconnecting": "Verbinde erneut…",
+      "disconnected": "Getrennt"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

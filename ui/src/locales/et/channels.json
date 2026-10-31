@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Serveri ülevaade",
   "tree": {
     "label": "Kanalid",
     "hint": "Enter: näita vestlust · Shift+Enter või topeltklõps: liitu · Nooleklahvid: liigu, laienda, ahenda · Menüüklahv: kanali valikud",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} kanalit",
     "people_one": "{{count}} inimene",
     "people_other": "{{count}} inimest"
+  },
+  "section": {
+    "state": {
+      "connected": "Ühendatud",
+      "connecting": "Ühendamine",
+      "reconnecting": "Ühendan uuesti…",
+      "disconnected": "Ühendus katkenud"
+    },
+    "online": "{{count}} võrgus",
+    "onlinePing": "{{count}} võrgus · {{ping}} ms"
   }
 }

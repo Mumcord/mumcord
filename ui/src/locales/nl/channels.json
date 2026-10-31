@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Serveroverzicht",
   "tree": {
     "label": "Kanalen",
     "hint": "Enter: chat tonen · Shift+Enter of dubbelklik: deelnemen · Pijltjestoetsen: bewegen, uitklappen, inklappen · Menutoets: kanaalopties",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} kanalen",
     "people_one": "{{count}} persoon",
     "people_other": "{{count}} personen"
+  },
+  "section": {
+    "state": {
+      "connected": "Verbonden",
+      "connecting": "Verbinden",
+      "reconnecting": "Opnieuw verbinden…",
+      "disconnected": "Niet verbonden"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { subscribeAnnouncements, type Announcement } from "../../a11y/announcer";
 import { createMockApi, setApi, type MockApi } from "../../api";
@@ -55,9 +55,18 @@ describe("ChannelsPanel", () => {
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
   });
 
-  it("labels the channel tree with a server overview heading", async () => {
+  it("shows a collapsible server section header with connection state and people online", async () => {
     await renderPanel();
-    expect(screen.getByRole("heading", { level: 2, name: "Server overview" })).toBeInTheDocument();
+    const toggle = within(screen.getByRole("heading", { level: 2 })).getByRole("button");
+    expect(toggle).toHaveAccessibleName(/Connected/);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText(/\d+ online/)).toBeInTheDocument();
+    expect(screen.queryByText("Server overview")).toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("tree")).toBeNull();
+    fireEvent.click(toggle);
+    expect(screen.getByRole("tree")).toBeInTheDocument();
   });
 
   it("updates the talking ring and spoken status", async () => {

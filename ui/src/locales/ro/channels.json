@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Prezentare generală a serverului",
   "tree": {
     "label": "Canale",
     "hint": "Enter: arată chatul · Shift+Enter sau dublu clic: intră · Săgeți: mută, extinde, restrânge · Tasta meniu: opțiunile canalului",
@@ -82,5 +81,15 @@
     "people_one": "{{count}} persoană",
     "people_few": "{{count}} persoane",
     "people_other": "{{count}} de persoane"
+  },
+  "section": {
+    "state": {
+      "connected": "Conectat",
+      "connecting": "Se conectează",
+      "reconnecting": "Se reconectează…",
+      "disconnected": "Deconectat"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

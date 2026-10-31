@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Forbhreathnú ar an bhfreastalaí",
   "tree": {
     "label": "Cainéil",
     "hint": "Enter: taispeáin an comhrá · Shift+Enter nó dúbailt-chliceáil: téigh isteach · Eochracha saigheada: bog, leathnaigh, laghdaigh · Eochair roghchláir: roghanna an chainéil",
@@ -92,5 +91,15 @@
     "people_few": "{{count}} dhuine",
     "people_many": "{{count}} nduine",
     "people_other": "{{count}} duine"
+  },
+  "section": {
+    "state": {
+      "connected": "Ceangailte",
+      "connecting": "Ag ceangal",
+      "reconnecting": "Ag athcheangal…",
+      "disconnected": "Dícheangailte"
+    },
+    "online": "{{count}} ar líne",
+    "onlinePing": "{{count}} ar líne · {{ping}} ms"
   }
 }

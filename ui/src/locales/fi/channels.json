@@ -1,5 +1,4 @@
 {
-  "serverOverview": "Palvelimen yleiskatsaus",
   "tree": {
     "label": "Kanavat",
     "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista · Valikkonäppäin: kanavan asetukset",
@@ -77,5 +76,15 @@
     "channels_other": "{{count}} kanavaa",
     "people_one": "{{count}} henkilö",
     "people_other": "{{count}} henkilöä"
+  },
+  "section": {
+    "state": {
+      "connected": "Yhdistetty",
+      "connecting": "Yhdistetään",
+      "reconnecting": "Yhdistetään uudelleen…",
+      "disconnected": "Ei yhteyttä"
+    },
+    "online": "{{count}} paikalla",
+    "onlinePing": "{{count}} paikalla · {{ping}} ms"
   }
 }
