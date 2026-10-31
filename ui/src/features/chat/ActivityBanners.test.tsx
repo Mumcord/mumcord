@@ -19,6 +19,7 @@ function share(session: number): ScreenShare {
     soundAvailable: false,
     viewers: [],
     blocked: null,
+    relayReason: null,
   };
 }
 

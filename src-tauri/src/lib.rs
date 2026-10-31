@@ -229,6 +229,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::user_stats::user_stats_watch,
             commands::p2p::p2p_consent_decide,
             commands::p2p::relay_info,
+            commands::p2p::p2p_link,
             commands::p2p::relay_trust_new,
             commands::p2p::relay_keep_blocked,
             commands::p2p::relay_forget,
@@ -301,6 +302,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::user_stats::UserStatsChanged,
             commands::p2p::DirectConsentRequired,
             commands::p2p::RelayChanged,
+            commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
             commands::updates::UpdateAvailable,
@@ -781,6 +783,12 @@ fn emit_engine_event(
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),
+        }
+        .emit(app),
+        EngineEvent::P2pLinkChanged { session, link } => commands::p2p::P2pLinkChanged {
+            server_id,
+            session,
+            link: link.map(Into::into),
         }
         .emit(app),
         EngineEvent::ScreenSharesChanged(shares) => {

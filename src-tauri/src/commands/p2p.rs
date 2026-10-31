@@ -1,6 +1,7 @@
 //! Direct connections between Mumcord users (FR-2.35, FR-2.36).
 
 use mumcord_engine::Engine;
+use mumcord_engine::p2p::{self as engine_p2p, ConnectionPath, RelayTransport};
 use mumcord_engine::peer;
 use mumcord_engine::peer::RelayRefusal as EngineRefusal;
 use serde::{Deserialize, Serialize};
@@ -9,7 +10,7 @@ use tauri::State;
 use tauri_specta::Event;
 
 use super::chat::rfc3339;
-use super::types::{ApiResult, ServerId, to_engine_server_id};
+use super::types::{ApiResult, ServerId, SessionId, to_engine_server_id};
 
 /// A direct connection would be used for the first time while `allowDirectConnections` is
 /// still `unset`; the UI asks once and answers with `p2p_consent_decide`.
@@ -25,6 +26,63 @@ pub struct DirectConsentRequired {
 #[specta::specta]
 pub async fn p2p_consent_decide(engine: State<'_, Engine>, allow: bool) -> ApiResult<()> {
     Ok(engine.p2p_consent_decide(allow).await?)
+}
+
+/// How a P2P connection travels (FR-4.19): "Direct", "Via relay (UDP)" or
+/// "Via relay (TCP 443)".
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum P2pPath {
+    Direct,
+    RelayUdp,
+    RelayTcp,
+}
+
+/// The open P2P connection to a person, for the connection info in the user info and the
+/// screen share viewer header (FR-4.19).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct P2pLink {
+    pub path: P2pPath,
+    /// "IP hidden" when true, else "IP visible": this client sent no addresses and the
+    /// connection goes through the relay.
+    pub ip_hidden: bool,
+}
+
+/// A P2P connection to `session` opened or changed (`link` set) or closed (`null`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct P2pLinkChanged {
+    pub server_id: ServerId,
+    pub session: SessionId,
+    pub link: Option<P2pLink>,
+}
+
+impl From<engine_p2p::P2pLink> for P2pLink {
+    fn from(l: engine_p2p::P2pLink) -> Self {
+        Self {
+            path: match l.path {
+                ConnectionPath::Direct => P2pPath::Direct,
+                ConnectionPath::Relay(RelayTransport::Udp) => P2pPath::RelayUdp,
+                ConnectionPath::Relay(RelayTransport::Tcp) => P2pPath::RelayTcp,
+            },
+            ip_hidden: l.ip_hidden,
+        }
+    }
+}
+
+/// The open P2P connection to `session`, or `null` without one; changes arrive as
+/// `p2pLinkChanged`.
+#[tauri::command]
+#[specta::specta]
+pub fn p2p_link(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<Option<P2pLink>> {
+    Ok(engine
+        .p2p_link(to_engine_server_id(server_id), session)
+        .map(Into::into))
 }
 
 /// Why the relay refused a connection (spec 04 section 6.5).

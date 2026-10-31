@@ -556,6 +556,12 @@ pub enum EngineEvent {
     ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
     /// What the server info panel shows about the server's relay changed (FR-4.20).
     RelayChanged(crate::peer::RelayInfo),
+    /// A P2P connection to `session` opened (`Some`, with how it travels) or closed (`None`)
+    /// (FR-4.19).
+    P2pLinkChanged {
+        session: u32,
+        link: Option<crate::p2p::P2pLink>,
+    },
     /// The identity chosen for this server is gone, so the connect uses the default one
     /// (issue #148).
     ServerIdentityMissing {

@@ -14,8 +14,9 @@
 //! caller as Mumble plugin data with the id [`DATA_ID`].
 //!
 //! Flow:
-//! 1. Offering side: [`P2p::offer`] → send [`PendingOffer::signal`] to the peer.
-//! 2. Answering side: decode the offer, then either [`P2p::answer`] → send
+//! 1. Offering side: [`P2p::offer`] (or [`P2p::offer_with`]) → send [`PendingOffer::signal`] to
+//!    the peer.
+//! 2. Answering side: decode the offer, then either [`P2p::answer`] (or [`P2p::answer_with`]) → send
 //!    [`PendingAnswer::signal`] back and call [`PendingAnswer::connect`], or reply with
 //!    [`Signal::Decline`].
 //! 3. Offering side: [`PendingOffer::complete`] with the received answer.
@@ -27,7 +28,8 @@
 //! Consent (FR-2.36) is the caller's job: an offer or answer reveals this machine's addresses
 //! (it also opens a router port mapping), and [`PendingOffer::complete`] and
 //! [`PendingAnswer::connect`] are the only calls that dial the peer. Call `offer`/`answer` only
-//! after the user allowed direct connections.
+//! after the user allowed direct connections. [`Reveal`] without `direct` gathers nothing and
+//! opens no port, so the peer never learns this machine's addresses (spec 04, FR-4.13).
 
 mod gather;
 mod peer;
@@ -121,6 +123,24 @@ pub enum P2pError {
     RelayFailed,
 }
 
+/// What an offer or answer tells the peer (spec 04, FR-4.13).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Reveal {
+    /// Send this machine's addresses for a direct connection. Without it nothing is gathered,
+    /// no router port is opened and the candidate list stays empty (the IP stays hidden).
+    pub direct: bool,
+    /// Tell the peer this side can use the relay announced on the server (`rl`).
+    pub relay: bool,
+}
+
+impl Reveal {
+    /// A direct connection only, as before relays existed.
+    pub const DIRECT: Self = Self {
+        direct: true,
+        relay: false,
+    };
+}
+
 /// Which side of the signalling a relay connection is for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Side {
@@ -153,16 +173,25 @@ impl P2p {
         }
     }
 
-    /// Prepares a connection to the user whose certificate hash the server reports as
+    /// Prepares a direct connection to the user whose certificate hash the server reports as
     /// `peer_hash`. Binds a socket and gathers addresses; does not contact the peer.
     pub async fn offer(&self, peer_hash: &str) -> Result<PendingOffer, P2pError> {
-        let attempt = self.prepare(peer_hash).await?;
+        self.offer_with(peer_hash, Reveal::DIRECT).await
+    }
+
+    /// Like [`Self::offer`], revealing only what `reveal` allows.
+    pub async fn offer_with(
+        &self,
+        peer_hash: &str,
+        reveal: Reveal,
+    ) -> Result<PendingOffer, P2pError> {
+        let attempt = self.prepare_if(reveal.direct, peer_hash).await?;
         let session = SessionId::random();
         Ok(PendingOffer {
             signal: Signal::Offer {
                 session,
-                candidates: attempt.candidates.clone(),
-                relay: false,
+                candidates: candidates_of(attempt.as_ref()),
+                relay: reveal.relay,
             },
             attempt,
             session,
@@ -172,6 +201,16 @@ impl P2p {
     /// Prepares the reply to a received `offer` from the user with certificate hash
     /// `peer_hash`. Does not contact the peer until [`PendingAnswer::connect`].
     pub async fn answer(&self, offer: &Signal, peer_hash: &str) -> Result<PendingAnswer, P2pError> {
+        self.answer_with(offer, peer_hash, Reveal::DIRECT).await
+    }
+
+    /// Like [`Self::answer`], revealing only what `reveal` allows.
+    pub async fn answer_with(
+        &self,
+        offer: &Signal,
+        peer_hash: &str,
+        reveal: Reveal,
+    ) -> Result<PendingAnswer, P2pError> {
         let Signal::Offer {
             session,
             candidates,
@@ -180,16 +219,26 @@ impl P2p {
         else {
             return Err(SignalError::Unexpected.into());
         };
-        let attempt = self.prepare(peer_hash).await?;
+        let attempt = self.prepare_if(reveal.direct, peer_hash).await?;
         Ok(PendingAnswer {
             signal: Signal::Answer {
                 session: *session,
-                candidates: attempt.candidates.clone(),
-                relay: false,
+                candidates: candidates_of(attempt.as_ref()),
+                relay: reveal.relay,
             },
             targets: candidates.clone(),
             attempt,
         })
+    }
+
+    async fn prepare_if(&self, direct: bool, peer_hash: &str) -> Result<Option<Attempt>, P2pError> {
+        if direct {
+            self.prepare(peer_hash).await.map(Some)
+        } else {
+            // Still reject a malformed hash early, as a direct attempt would.
+            normalize_hash(peer_hash)?;
+            Ok(None)
+        }
     }
 
     async fn prepare(&self, peer_hash: &str) -> Result<Attempt, P2pError> {
@@ -319,6 +368,10 @@ impl P2p {
     }
 }
 
+fn candidates_of(attempt: Option<&Attempt>) -> Vec<SocketAddr> {
+    attempt.map(|a| a.candidates.clone()).unwrap_or_default()
+}
+
 /// Transport settings shared by direct and relayed connections.
 fn transport_config() -> TransportConfig {
     let mut transport = TransportConfig::default();
@@ -332,7 +385,8 @@ fn transport_config() -> TransportConfig {
 pub struct PendingOffer {
     signal: Signal,
     session: SessionId,
-    attempt: Attempt,
+    /// `None` when the offer hides this machine's addresses.
+    attempt: Option<Attempt>,
 }
 
 impl PendingOffer {
@@ -342,15 +396,17 @@ impl PendingOffer {
     }
 
     /// Connects with the peer's reply: dials its addresses, accepts its incoming dials and
-    /// keeps the first connection that passes the certificate check.
+    /// keeps the first connection that passes the certificate check. An offer that hid this
+    /// machine's addresses has no direct path ([`P2pError::NoDirectPath`]).
     pub async fn complete(self, reply: &Signal) -> Result<PeerConnection, P2pError> {
         if reply.session() != self.session {
             return Err(SignalError::Unexpected.into());
         }
         match reply {
-            Signal::Answer { candidates, .. } => {
-                self.attempt.establish(candidates, Role::Controlling).await
-            }
+            Signal::Answer { candidates, .. } => match self.attempt {
+                Some(attempt) => attempt.establish(candidates, Role::Controlling).await,
+                None => Err(P2pError::NoDirectPath),
+            },
             Signal::Decline { reason, .. } => Err(P2pError::Declined(*reason)),
             Signal::Offer { .. } => Err(SignalError::Unexpected.into()),
         }
@@ -361,7 +417,8 @@ impl PendingOffer {
 pub struct PendingAnswer {
     signal: Signal,
     targets: Vec<SocketAddr>,
-    attempt: Attempt,
+    /// `None` when the answer hides this machine's addresses.
+    attempt: Option<Attempt>,
 }
 
 impl PendingAnswer {
@@ -371,10 +428,13 @@ impl PendingAnswer {
     }
 
     /// Dials the offer's addresses and accepts the peer's dials until the offering side picks
-    /// one connection. Send [`Self::signal`] before or while awaiting this.
+    /// one connection. Send [`Self::signal`] before or while awaiting this. An answer that hid
+    /// this machine's addresses has no direct path ([`P2pError::NoDirectPath`]).
     pub async fn connect(self) -> Result<PeerConnection, P2pError> {
-        let targets = self.targets.clone();
-        self.attempt.establish(&targets, Role::Controlled).await
+        match self.attempt {
+            Some(attempt) => attempt.establish(&self.targets, Role::Controlled).await,
+            None => Err(P2pError::NoDirectPath),
+        }
     }
 }
 

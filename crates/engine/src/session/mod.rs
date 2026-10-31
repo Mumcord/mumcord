@@ -586,6 +586,7 @@ impl Engine {
         let engine = Self { inner };
         engine.inner.direct.bind(engine.downgrade());
         engine.inner.relays.bind(engine.downgrade());
+        lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
         engine.positional_poll_restart();
         engine
             .link_previews()

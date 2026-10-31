@@ -43,13 +43,15 @@ use std::time::{Duration, Instant};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_p2p::{DeclineReason, P2pError};
 use mumcord_protocol::{Handle, PluginData};
-use mumcord_store::Consent;
 use tokio::sync::oneshot;
 
 use crate::ServerId;
 use crate::mumcord::ServerPeers;
 use crate::p2p::DirectError;
-use crate::session::{Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, lock};
+use crate::peer::RelayUnavailable;
+use crate::session::{
+    Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, WeakEngine, lock,
+};
 use signal::{DATA_ID, FEATURE, Signal, decode, encode};
 use state::{Admit, Answer, OwnShare, Shares, Watching};
 
@@ -74,8 +76,12 @@ const WATCH_RESEND: [Duration; 3] = [
 /// Why the user cannot watch a share (FR-2.46).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WatchBlock {
-    /// The user said no to direct connections.
+    /// "Peer-to-peer is off" for this server (FR-4.3).
+    P2pOff,
+    /// The user said no to direct connections and the relay cannot be used either.
     ConsentOff,
+    /// The relay was needed but cannot be used, with the reason (FR-4.4, FR-4.11, FR-4.14).
+    Relay(RelayUnavailable),
     /// The sharer's client cannot or does not want to take direct connections.
     PeerUnsupported,
     /// No direct path was found (no relay exists, e.g. behind CGNAT).
@@ -86,7 +92,9 @@ impl WatchBlock {
     /// The reason as the `message` of a [`ErrorKind::DirectUnavailable`] error.
     pub fn code(self) -> &'static str {
         match self {
+            Self::P2pOff => "p2pOff",
             Self::ConsentOff => "consentOff",
+            Self::Relay(_) => "relayUnavailable",
             Self::PeerUnsupported => "peerUnsupported",
             Self::NoDirectPath => "noDirectPath",
         }
@@ -113,6 +121,26 @@ pub struct ScreenShareView {
 pub(crate) struct ScreenShares {
     servers: HashMap<ServerId, Shares>,
     sink: Option<Arc<dyn ScreenFrameSink>>,
+    /// Reaches the relay and P2P settings for what blocks watching; set once at start.
+    pub(crate) engine: Option<WeakEngine>,
+}
+
+impl WatchBlock {
+    /// The block for a P2P connection that cannot be made; `None` for errors that are no
+    /// block (the server connection is gone).
+    fn of(e: &DirectError) -> Option<Self> {
+        Some(match e {
+            DirectError::NotConnected => return None,
+            DirectError::Off => Self::P2pOff,
+            DirectError::NotAllowed => Self::ConsentOff,
+            DirectError::Relay(reason) => Self::Relay(*reason),
+            DirectError::Unsupported
+            | DirectError::P2p(P2pError::Declined(DeclineReason::Declined)) => {
+                Self::PeerUnsupported
+            }
+            _ => Self::NoDirectPath,
+        })
+    }
 }
 
 pub(crate) type ServerShares = Mutex<ScreenShares>;
@@ -204,14 +232,14 @@ fn send_viewers(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, oth
     }
 }
 
-fn consent_off(ctx: &SessionCtx) -> bool {
-    ctx.store().settings().map_or_else(
-        |e| {
-            tracing::warn!(error = %e, "reading the direct connection consent failed");
-            true
-        },
-        |s| s.allow_direct_connections == Consent::No,
-    )
+/// What blocks watching anyone on the server before trying: mode, relay, consent (FR-4.3,
+/// FR-4.4).
+fn static_block(state: &ServerShares, ctx: &SessionCtx) -> Option<WatchBlock> {
+    let engine = lock(state).engine.as_ref().and_then(WeakEngine::upgrade)?;
+    engine
+        .p2p_unavailable(ctx.server_id)
+        .as_ref()
+        .and_then(WatchBlock::of)
 }
 
 /// The shares in the user's channel with what blocks watching them.
@@ -219,7 +247,7 @@ fn views(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx) -> Vec<Scr
     let Some(own) = ctx.handle.with_state(|s| s.session) else {
         return Vec::new();
     };
-    let consent_off = consent_off(ctx);
+    let static_block = static_block(state, ctx);
     let mut views = lock(state)
         .servers
         .get(&ctx.server_id)
@@ -228,8 +256,8 @@ fn views(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx) -> Vec<Scr
     let sharers: Vec<u32> = views.iter().map(|v| v.session).collect();
     let direct = capable(peers, ctx.server_id, &sharers, crate::p2p::FEATURE);
     for view in views.iter_mut().filter(|v| v.session != own) {
-        if consent_off {
-            view.blocked = Some(WatchBlock::ConsentOff);
+        if let Some(block) = static_block {
+            view.blocked = Some(block);
         } else if !direct.contains(&view.session) {
             view.blocked = Some(WatchBlock::PeerUnsupported);
         }
@@ -723,8 +751,12 @@ impl Engine {
         if !here.others.contains(&sharer) {
             return Err(EngineError::invalid("that person is not in your channel"));
         }
-        if consent_off(&ctx) {
-            return Err(blocked(WatchBlock::ConsentOff));
+        if let Some(block) = self
+            .p2p_unavailable(server_id)
+            .as_ref()
+            .and_then(WatchBlock::of)
+        {
+            return Err(blocked(block));
         }
         if !self.mumcord_user_has_feature(server_id, sharer, crate::p2p::FEATURE) {
             return Err(blocked(WatchBlock::PeerUnsupported));
@@ -787,14 +819,8 @@ impl Engine {
                 }
                 Err(e) => {
                     tracing::info!(error = %e, "no direct connection for a screen share");
-                    let block = match e {
-                        DirectError::NotConnected => return Err(EngineError::not_connected()),
-                        DirectError::NotAllowed => WatchBlock::ConsentOff,
-                        DirectError::Unsupported
-                        | DirectError::P2p(P2pError::Declined(DeclineReason::Declined)) => {
-                            WatchBlock::PeerUnsupported
-                        }
-                        _ => WatchBlock::NoDirectPath,
+                    let Some(block) = WatchBlock::of(&e) else {
+                        return Err(EngineError::not_connected());
                     };
                     if let Some(shares) = shares
                         && shares.end_attempt(sharer, attempt)

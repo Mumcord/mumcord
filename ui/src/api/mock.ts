@@ -2565,6 +2565,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
       return Promise.resolve(null);
     },
+    // The mock has no peer-to-peer connections.
+    p2pLink: () => Promise.resolve(null),
     // The mock servers announce no relay.
     relayInfo: () =>
       Promise.resolve({ bots: [], host: null, status: { kind: "none" }, firstSeen: null }),
@@ -2687,6 +2689,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         soundAvailable: withSound,
         viewers: [],
         blocked: null,
+        relayReason: null,
       });
       return Promise.resolve(null);
     },

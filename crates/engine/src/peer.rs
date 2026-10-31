@@ -364,6 +364,16 @@ impl Relays {
             .unwrap_or_default()
     }
 
+    /// Whether the relay of `server_id` can be used right now, else why not (FR-4.11).
+    pub(crate) fn availability(&self, server_id: ServerId) -> Result<(), RelayUnavailable> {
+        lock(&self.state)
+            .servers
+            .get(&server_id)
+            .ok_or(RelayUnavailable::NoRelay)?
+            .usable()
+            .map(|_| ())
+    }
+
     /// Runs `change` on the server's relay; returns the new info if the panel changes.
     fn change(
         &self,
