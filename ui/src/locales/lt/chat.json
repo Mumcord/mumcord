@@ -95,14 +95,19 @@
     "hideDescription": "Slėpti kanalo aprašymą"
   },
   "mention": {
-    "list": "Paminimi žmonės",
-    "found_one": "Pasiūlytas {{count}} žmogus. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
-    "found_few": "Pasiūlyti {{count}} žmonės. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
-    "found_many": "Pasiūlyta {{count}} žmogaus. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
-    "found_other": "Pasiūlyta {{count}} žmonių. Naudok rodyklių klavišus, tada Enter, kad įterptum.",
+    "list": "Paminėjimų pasiūlymai",
+    "found_one": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_few": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_many": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
+    "found_other": "Pasiūlymai: {{count}}. Naudokite rodykles, tada Enter, kad įterptumėte.",
     "none": "Nieko nerasta",
     "mentionsYou": "Mini tave",
-    "chipLabel": "{{name}}, paminėjimas"
+    "chipLabel": "{{name}}, paminėjimas",
+    "groupsHeading": "Paminėjimai",
+    "peopleHeading": "Žmonės",
+    "channelHint": "Pranešti visiems kanale {{channel}} ({{count}})",
+    "allHint": "Pranešti visiems, kurie gali skaityti šį kanalą ({{count}})",
+    "keys": "↑↓ rinktis · Enter įterpti · Esc uždaryti"
   },
   "preview": {
     "open": "Atidaryti naršyklėje",
@@ -256,5 +261,27 @@
     "tooLarge": "Kodas per didelis atsisiųsti.",
     "fileType": "Kodo failas",
     "plainText": "Paprastas tekstas"
+  },
+  "mumbleCard": {
+    "addServer": "Pridėti prie serverių",
+    "channel": "Kanalas {{channel}}",
+    "copy": "Kopijuoti nuorodą",
+    "copyLabel": "Kopijuoti nuorodą į {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} iš {{max}} naudotojų · serveris {{version}}",
+    "goToChannel": "Eiti į kanalą",
+    "join": "Prisijungti",
+    "joinLabel": "Prisijungti prie {{server}}",
+    "joined": "Prisijungta",
+    "label": "Serverio kortelė {{server}}",
+    "privacyOff": "Serverio reikšmės išjungtos nustatymuose",
+    "querying": "Tikrinamas serveris…",
+    "retry": "Tikrinti dar kartą",
+    "retryLabel": "Tikrinti dar kartą {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Serveris nepasiekiamas",
+    "warning_few": "{{count}} nuorodos šiame pranešime rodo prisijungimo duomenis",
+    "warning_many": "{{count}} nurodų šiame pranešime rodo prisijungimo duomenis",
+    "warning_one": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis",
+    "warning_other": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis"
   }
 }

@@ -122,7 +122,15 @@
     "ducking": "Baisser le son des vidéos quand quelqu’un parle",
     "duckingHint": "Le son de la vidéo de la watch party et du partage d’écran baisse quand quelqu’un parle dans votre canal vocal.",
     "duckingLevel": "Volume réduit",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Mode faible latence",
+    "lowLatencyBeta": "Bêta",
+    "lowLatencyHint": "Pour jouer de la musique ensemble en temps réel",
+    "lowLatencyWarningTitle": "Sacrifie la robustesse pour la vitesse",
+    "lowLatencyBandwidth": "Utilise plus de bande passante (paquets de 10 ms).",
+    "lowLatencyWifi": "Peut produire des craquements en Wi-Fi ou sur une connexion chargée ; utilisez un câble si possible.",
+    "lowLatencyHeadphones": "Utilisez un casque : l'annulation d'écho est désactivée (la suppression du bruit et le volume automatique aussi).",
+    "lowLatencyPtt": "Le push-to-talk ou un seuil d'activation vocale manuel est recommandé."
   },
   "voice": {
     "talkMode": "Mode de parole",
@@ -320,6 +328,8 @@
     "selfMute": "Vous coupez ou réactivez votre micro",
     "selfDeaf": "Vous coupez ou réactivez votre son",
     "hangUp": "Vous vous déconnectez d’un serveur",
+    "kicked": "Vous êtes expulsé d’un serveur",
+    "banned": "Vous êtes banni d’un serveur",
     "messages": "Nouveau message dans un canal suivi ou une discussion privée",
     "mention": "Son lors d’une mention",
     "mentionNotify": "Notifier lors d’une mention",

@@ -41,6 +41,8 @@ export const commands = {
 	serverSetAlwaysConnect: (serverId: number, enabled: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_always_connect", { serverId, enabled })),
 	/**  Mutes or unmutes all notifications of the server, mentions included (FR-2.10). */
 	serverSetNotificationsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_notifications_muted", { serverId, muted })),
+	/**  Turns `@all` and `@channel` mentions on the server off or back on (issue #70). */
+	serverSetGroupMentionsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_group_mentions_muted", { serverId, muted })),
 	/**  Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17). */
 	serverSetTheme: (serverId: number, themeId: string | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_theme", { serverId, themeId })),
 	/**  Parses a pasted `mumble://` link; fails with `invalidInput` if malformed. */
@@ -68,6 +70,11 @@ export const commands = {
 	sessionSnapshot: (serverId: number) => typedError<ServerSnapshot | null, ApiError>(__TAURI_INVOKE("session_snapshot", { serverId })),
 	/**  Live link figures of the server, or `null` when it is not connected (AC-1.23). */
 	connectionStats: (serverId: number) => typedError<ConnectionStats | null, ApiError>(__TAURI_INVOKE("connection_stats", { serverId })),
+	/**
+	 *  Estimated mouth-to-ear latency for Settings → Audio (issue #156); `null` while no audio
+	 *  device runs. Includes the voice server's ping while connected.
+	 */
+	latencyEstimate: () => typedError<LatencyEstimate | null, ApiError>(__TAURI_INVOKE("latency_estimate")),
 	/**  Answers a `CertTrustRequired`; trusting is remembered for the server. */
 	certTrustDecide: (serverId: number, fingerprint: string, trust: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("cert_trust_decide", { serverId, fingerprint, trust })),
 	/**  Unmuting while deafened also undeafens. */
@@ -193,6 +200,17 @@ export const commands = {
 	 *  http(s) and mailto links open.
 	 */
 	openLink: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("open_link", { url })),
+	/**
+	 *  Live figures for the card of a `mumble://` link. Only the engine contacts the network, the
+	 *  query never connects, and nothing is asked while the link-preview switch is off (issue #175).
+	 */
+	mumbleLinkStats: (url: string, refresh: boolean) => typedError<MumbleLinkStats, ApiError>(__TAURI_INVOKE("mumble_link_stats", { url, refresh })),
+	/**
+	 *  A card's Join: the same handling as a `mumble://` link that came from outside (FR-2.13), so the
+	 *  server bar shows the server, a running connection joins the channel and an unknown server is
+	 *  offered for saving. Only a click on the card gets here.
+	 */
+	mumbleLinkJoin: (url: string) => typedError<LinkOutcome, ApiError>(__TAURI_INVOKE("mumble_link_join", { url })),
 	/**
 	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
 	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
@@ -856,6 +874,8 @@ export type ConnectionStats = {
 	packetsReceived: number,
 	/**  Health of the local audio path; `null` on a server without voice. */
 	audio: AudioHealth | null,
+	/**  Estimated mouth-to-ear latency; `null` on a server without voice. */
+	latency: LatencyEstimate | null,
 };
 
 /**  Answer to a question asked once (direct connections, update check, AppImage menu entry). */
@@ -1219,6 +1239,32 @@ export type KnownGame = {
 export type Language = "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "ga" | "hr" | "hu" | "it" | "lt" | "lv" | "mt" | "nl" | "pl" | "pt" | "ro" | "sk" | "sl" | "sv";
 
 /**
+ *  Estimated mouth-to-ear latency and its parts (issue #156), in microseconds (integers, as
+ *  specta exports floats as nullable). Assumes the other side runs in the same mode.
+ */
+export type LatencyEstimate = {
+	lowLatency: boolean,
+	/**  Audio per packet: 10 ms in low-latency mode, 20 ms otherwise. */
+	packetMs: number,
+	/**  Microphone device buffer. */
+	inputBufferUs: number,
+	/**  One packet plus the encoder look-ahead. */
+	encodeUs: number,
+	/**  Half the ping to the server; `null` until measured (not connected, TCP tunnel). */
+	networkUs: number | null,
+	/**  Jitter-buffer target for a clean stream. */
+	jitterUs: number,
+	/**  Measured processing: DSP and encoding out, decoding and mixing in. */
+	processingUs: number,
+	/**  Output queue and speaker device buffer. */
+	outputBufferUs: number,
+	/**  Sum of the parts (without the network while it is unknown). */
+	totalUs: number,
+	/**  The same estimate for the other mode. */
+	otherModeTotalUs: number,
+};
+
+/**
  *  What Mumcord did with a `mumble://` link (FR-2.13). The UI brings the named server into
  *  view and, for `unknownServer`, offers to save it (FR-1.11).
  */
@@ -1304,6 +1350,13 @@ export type MumbleLink = {
 	/**  Channel names from the root down; empty for no channel. */
 	channelPath: string[],
 };
+
+/**
+ *  What the public server query answered for a `mumble://` link (issue #175). `privacyOff` means
+ *  nothing was asked because the link-preview switch is off; `unreachable` means the server did not
+ *  answer within the query timeout. The figures are untrusted server data, shown as plain text.
+ */
+export type MumbleLinkStats = { kind: "privacyOff" } | { kind: "unreachable" } | { kind: "answered"; pingMs: number; users: number; maxUsers: number; version: string };
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -1599,6 +1652,8 @@ export type SavedServer = {
 	wasVoiceServerAtQuit: boolean,
 	/**  No toasts or desktop notifications from this server; badges stay (FR-2.10). */
 	notificationsMuted: boolean,
+	/**  `@all` and `@channel` do not count as mentions on this server (issue #70). */
+	groupMentionsMuted: boolean,
 	/**  Theme shown with this server; `null` uses the app theme (FR-2.17). */
 	themeId: string | null,
 	/**  Identity this server connects with; `null` uses the default identity (issue #148). */
@@ -1764,6 +1819,12 @@ export type Settings = {
 	 */
 	musicQuality: boolean,
 	/**
+	 *  "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+	 *  jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+	 *  volume bypassed, for playing music together. Applies live.
+	 */
+	lowLatency: boolean,
+	/**
 	 *  Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
 	 *  `bitrate_max`.
 	 */
@@ -1885,6 +1946,10 @@ export type SoundSettings = {
 	shareStopped: boolean,
 	viewerStarted: boolean,
 	viewerStopped: boolean,
+	/**  The server kicks you (#205). */
+	kicked: boolean,
+	/**  The server bans you (#205). */
+	banned: boolean,
 };
 
 /**  Channels received so far while a server is still syncing (FR-2.24). */

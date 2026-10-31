@@ -92,13 +92,18 @@
     "hideDescription": "Ocultar descripción del canal"
   },
   "mention": {
-    "list": "Personas que se pueden mencionar",
-    "found_one": "{{count}} persona sugerida. Usa las flechas y Enter para insertar.",
-    "found_many": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
-    "found_other": "{{count}} personas sugeridas. Usa las flechas y Enter para insertar.",
+    "list": "Sugerencias de menciones",
+    "found_one": "Sugerencias: {{count}}. Usa las flechas y luego Intro para insertar.",
+    "found_many": "Sugerencias: {{count}}. Usa las flechas y luego Intro para insertar.",
+    "found_other": "Sugerencias: {{count}}. Usa las flechas y luego Intro para insertar.",
     "none": "No se encontró a nadie",
     "mentionsYou": "Te menciona",
-    "chipLabel": "{{name}}, mención"
+    "chipLabel": "{{name}}, mención",
+    "groupsHeading": "Menciones",
+    "peopleHeading": "Personas",
+    "channelHint": "Avisar a todos en {{channel}} ({{count}})",
+    "allHint": "Avisar a todos los que pueden leer este canal ({{count}})",
+    "keys": "↑↓ elegir · Intro insertar · Esc cerrar"
   },
   "preview": {
     "open": "Abrir en el navegador",
@@ -252,5 +257,26 @@
     "tooLarge": "El código es demasiado grande para descargarlo.",
     "fileType": "Archivo de código",
     "plainText": "Texto sin formato"
+  },
+  "mumbleCard": {
+    "addServer": "Añadir a servidores",
+    "channel": "Canal {{channel}}",
+    "copy": "Copiar enlace",
+    "copyLabel": "Copiar el enlace a {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} de {{max}} usuarios · servidor {{version}}",
+    "goToChannel": "Ir al canal",
+    "join": "Unirse",
+    "joinLabel": "Unirse a {{server}}",
+    "joined": "Unido",
+    "label": "Tarjeta del servidor {{server}}",
+    "privacyOff": "Los valores del servidor están desactivados en la configuración",
+    "querying": "Comprobando el servidor…",
+    "retry": "Volver a comprobar",
+    "retryLabel": "Volver a comprobar {{server}}",
+    "server": "{{server}}",
+    "unreachable": "No se puede acceder al servidor",
+    "warning_many": "{{count}} millones de enlaces de este mensaje muestran credenciales",
+    "warning_one": "{{count}} enlace de este mensaje muestra credenciales",
+    "warning_other": "{{count}} enlaces de este mensaje muestran credenciales"
   }
 }

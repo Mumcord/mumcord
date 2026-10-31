@@ -89,12 +89,17 @@
     "hideDescription": "Hide channel description"
   },
   "mention": {
-    "list": "Mentionable people",
-    "found_one": "{{count}} person suggested. Use the arrow keys, then Enter to insert.",
-    "found_other": "{{count}} people suggested. Use the arrow keys, then Enter to insert.",
+    "list": "Mention suggestions",
+    "found_one": "Suggestions: {{count}}. Use the arrow keys, then Enter to insert.",
+    "found_other": "Suggestions: {{count}}. Use the arrow keys, then Enter to insert.",
     "none": "No one found",
     "mentionsYou": "Mentions you",
-    "chipLabel": "{{name}}, mention"
+    "chipLabel": "{{name}}, mention",
+    "groupsHeading": "Mentions",
+    "peopleHeading": "People",
+    "channelHint": "Notify everyone in {{channel}} ({{count}})",
+    "allHint": "Notify everyone who can read this channel ({{count}})",
+    "keys": "↑↓ choose · Enter insert · Esc close"
   },
   "preview": {
     "open": "Open in browser",
@@ -248,5 +253,25 @@
     "tooLarge": "The code is too large to download.",
     "fileType": "Code file",
     "plainText": "Plain text"
+  },
+  "mumbleCard": {
+    "addServer": "Add to servers",
+    "channel": "Channel {{channel}}",
+    "copy": "Copy link",
+    "copyLabel": "Copy the link to {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} of {{max}} users · server {{version}}",
+    "goToChannel": "Go to channel",
+    "join": "Join",
+    "joinLabel": "Join {{server}}",
+    "joined": "Joined",
+    "label": "Server card for {{server}}",
+    "privacyOff": "Server figures are switched off in the settings",
+    "querying": "Checking the server…",
+    "retry": "Check again",
+    "retryLabel": "Check again {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server not reachable",
+    "warning_one": "{{count}} link in this message shows credentials",
+    "warning_other": "{{count}} links in this message show credentials"
   }
 }

@@ -21,5 +21,20 @@
     "collapse": "Fäll ihop",
     "expand": "Fäll ut",
     "handle": "{{name}}: piltangenter flyttar, Skift+piltangenter ändrar storlek"
+  },
+  "latency": {
+    "summary": "≈ {{total}} ms från mun till öra (uppskattning)",
+    "otherNormal": "normalt läge ≈ {{value}} ms",
+    "otherLow": "läge för låg latens ≈ {{value}} ms",
+    "breakdown": "Fördelning av latensen",
+    "input": "Mikrofonbuffert",
+    "encode": "Opus-ram på {{ms}} ms + kodarens framförhållning",
+    "network": "Nätverk (halva pingen)",
+    "notConnected": "inte ansluten",
+    "jitter": "Jitterbuffert",
+    "processing": "Bearbetning",
+    "output": "Högtalarbuffert",
+    "value": "{{value}} ms",
+    "total": "≈ {{value}} ms"
   }
 }

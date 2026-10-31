@@ -123,7 +123,15 @@
     "ducking": "Stíšiť zvuk videa, keď niekto hovorí",
     "duckingHint": "Zvuk videa zo spoločného sledovania a zdieľania obrazovky sa stíši, keď niekto v tvojom hlasovom kanáli hovorí.",
     "duckingLevel": "Znížená hlasitosť",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Režim nízkej latencie",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Na spoločné hranie hudby v reálnom čase",
+    "lowLatencyWarningTitle": "Obetuje odolnosť v prospech rýchlosti",
+    "lowLatencyBandwidth": "Využíva viac šírky pásma (pakety po 10 ms).",
+    "lowLatencyWifi": "Na Wi-Fi alebo vyťaženom pripojení môže vypadávať; ak môžete, použite kábel.",
+    "lowLatencyHeadphones": "Používajte slúchadlá: potlačenie ozveny je vypnuté (potlačenie šumu a automatická hlasitosť tiež).",
+    "lowLatencyPtt": "Odporúča sa vysielanie na stlačenie alebo ručný prah hlasovej aktivácie."
   },
   "voice": {
     "talkMode": "Režim hovorenia",
@@ -321,6 +329,8 @@
     "selfMute": "Stlmíš alebo zapneš svoj mikrofón",
     "selfDeaf": "Stlmíš alebo zapneš svoj zvuk",
     "hangUp": "Odpojíš sa od servera",
+    "kicked": "Si vyhodený zo servera",
+    "banned": "Si zablokovaný na serveri",
     "messages": "Nová správa v sledovanom kanáli alebo súkromnom chate",
     "mention": "Zvuk pri zmienke",
     "mentionNotify": "Upozorniť pri zmienke",

@@ -244,6 +244,9 @@ pub struct ConnectionStatsView {
     pub packets_received: u64,
     /// Health of the local audio path; `None` on a server without the voice pipeline.
     pub audio: Option<AudioHealthView>,
+    /// Estimated mouth-to-ear latency (issue #156); `None` on a server without the voice
+    /// pipeline.
+    pub latency: Option<crate::latency::LatencyEstimateView>,
 }
 
 /// Glitch counters of the local audio path since the voice pipeline started (issue #123). A
@@ -342,6 +345,8 @@ pub struct ServerView {
     pub was_voice_server_at_quit: bool,
     /// No notifications from this server (FR-2.10).
     pub notifications_muted: bool,
+    /// `@all` and `@channel` do not count as mentions on this server (issue #70).
+    pub group_mentions_muted: bool,
     /// Theme for this server; `None` uses the app theme (FR-2.17).
     pub theme_id: Option<String>,
     /// Identity to connect with; `None` uses the default identity (issue #148).

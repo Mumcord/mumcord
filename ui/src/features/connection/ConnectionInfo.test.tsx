@@ -96,6 +96,7 @@ describe("ConnectionInfo", () => {
   it("shows the audio counters with their recent figures in the details", async () => {
     await setup();
     api.mock.setConnectionStats({
+      latency: null,
       audio: audio({
         dropouts: 2,
         lateFrames: 7,
@@ -216,6 +217,37 @@ describe("ConnectionInfo", () => {
     expect(valueOf(panel, "Send bitrate")).toBe("40 kbit/s");
     expect(valueOf(panel, "Transport")).toBe("TCP (tunnelled)");
     expect(valueOf(panel, "Latency")).toBe("–");
+  });
+
+  it("shows the end-to-end latency estimate with its breakdown", async () => {
+    await setup();
+    const panel = openPanel();
+    await within(panel).findByText("End-to-end latency");
+    expect(valueOf(panel, "End-to-end latency")).toBe("≈ 107.1 ms (estimate)");
+    expect(within(panel).queryByText("Low-latency mode")).toBeNull();
+    expect(
+      within(panel).getByRole("group", {
+        name: /^Latency breakdown: .*Jitter buffer 20 ms/,
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("marks low-latency mode and tolerates a missing estimate", async () => {
+    await setup();
+    const low = await api.latencyEstimate();
+    api.mock.setConnectionStats({ latency: low && { ...low, lowLatency: true, totalUs: 38000 } });
+    const panel = openPanel();
+    await within(panel).findByText("End-to-end latency");
+    expect(valueOf(panel, "End-to-end latency")).toBe("Low-latency mode · ≈ 38 ms (estimate)");
+  });
+
+  it("leaves the estimate out when there is none", async () => {
+    await setup();
+    api.mock.setConnectionStats({ latency: null });
+    const panel = openPanel();
+    await within(panel).findByText("Transport");
+    expect(within(panel).queryByText("End-to-end latency")).toBeNull();
   });
 
   it("stops polling when closed", async () => {

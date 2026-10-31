@@ -122,7 +122,15 @@
     "ducking": "Klusināt video skaņu, kamēr kāds runā",
     "duckingHint": "Kopīgās skatīšanās video un ekrāna kopīgošanas skaņa kļūst klusāka, kamēr kāds tavā balss kanālā runā.",
     "duckingLevel": "Samazināts skaļums",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Zemas aizkaves režīms",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Lai kopā spēlētu mūziku reāllaikā",
+    "lowLatencyWarningTitle": "Aizstāj izturību ar ātrumu",
+    "lowLatencyBandwidth": "Izmanto vairāk joslas platuma (10 ms paketes).",
+    "lowLatencyWifi": "Wi-Fi vai noslogotā savienojumā var traucēt; ja iespējams, izmantojiet kabeli.",
+    "lowLatencyHeadphones": "Izmantojiet austiņas: atbalss slāpēšana ir izslēgta (tāpat arī trokšņu slāpēšana un automātiskā skaļuma regulēšana).",
+    "lowLatencyPtt": "Ieteicams spiest un runāt vai manuāli iestatīts balss aktivizēšanas slieksnis."
   },
   "voice": {
     "talkMode": "Runāšanas režīms",
@@ -320,6 +328,8 @@
     "selfMute": "Tu izslēdz vai ieslēdz savu mikrofonu",
     "selfDeaf": "Tu izslēdz vai ieslēdz skaņu",
     "hangUp": "Tu atvienojies no servera",
+    "kicked": "Tevi izmet no servera",
+    "banned": "Tevi nobloķē serverī",
     "messages": "Jauna ziņa kanālā, kuram seko, vai privātā čatā",
     "mention": "Skaņa, kad tevi piemin",
     "mentionNotify": "Paziņot, kad tevi piemin",

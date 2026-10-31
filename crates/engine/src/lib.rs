@@ -11,6 +11,7 @@ pub mod full_image;
 pub mod history_sync;
 pub mod ingame_overlay;
 pub mod inspector;
+pub mod latency;
 mod maintenance;
 pub mod mumcord;
 pub mod now_gaming;
@@ -20,6 +21,7 @@ pub mod people;
 pub mod positional;
 pub mod profile;
 pub mod screen_share;
+pub mod server_query;
 pub mod session;
 pub mod sounds;
 pub mod stats;
@@ -33,6 +35,7 @@ pub use friends::{FriendPresence, FriendView};
 pub use ingame_overlay::{
     BlockedGame, Blocklist, OverlayDecision, blocklist, decide as decide_overlay,
 };
+pub use latency::LatencyEstimateView;
 /// Position sources (Mumble Link, plugin host) as the engine uses them.
 pub use mumcord_positional as positional_sources;
 /// Stored types (settings record etc.) as the engine hands them out.
@@ -41,6 +44,7 @@ pub use mumcord_store::{IdentityId, SecretStore, ServerId, Settings};
 pub use now_gaming::{GameSource, LocalGame, NowGamingView};
 pub use now_playing::{LocalTrack, NowPlayingView};
 pub use positional::PositionalStatus;
+pub use server_query::{QueryOutcome, ServerQueries, ServerQuery};
 pub use session::Engine;
 pub use session::{
     AudioDeviceList, AudioDeviceView, AudioHealthView, CertificateState, ChannelPasswordChannel,

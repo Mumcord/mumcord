@@ -8,6 +8,10 @@
 //! so the buffer grows only while packets arrive unevenly and shrinks back
 //! afterwards.
 //!
+//! Low-latency mode (issue #156) caps the target at one packet plus
+//! [`LOW_LATENCY_MAX_EXTRA_MS`] and drops frames above it much sooner, trading
+//! concealment and short glitches on an uneven network for a steady low delay.
+//!
 //! The target delay is one packet plus the jitter estimate. Each burst starts
 //! once that much audio is buffered (one packet on a clean connection). While
 //! playing, a buffer that stays above target drops a quiet 10 ms frame; an
@@ -33,6 +37,9 @@ const FRAME_MS: u64 = 10;
 const MAX_JITTER_MS: f32 = 120.0;
 /// Safety margin added once any jitter has been seen (scheduling noise).
 const JITTER_MARGIN_MS: f32 = 5.0;
+/// Low-latency mode (issue #156): the target never exceeds one packet plus this much, so an
+/// uneven network causes concealed frames instead of more delay.
+pub const LOW_LATENCY_MAX_EXTRA_MS: u64 = 10;
 /// How long a jitter peak is remembered before the estimate decays.
 const JITTER_HOLD_MS: u64 = 2_000;
 /// Decay of the jitter estimate after the hold time: 10 ms per second.
@@ -47,6 +54,10 @@ const END_TIMEOUT_MS: u64 = 100;
 const SHRINK_AFTER_MS: u64 = 300;
 /// …or this long before any frame is dropped.
 const FORCE_SHRINK_AFTER_MS: u64 = 1_500;
+/// The same two limits in low-latency mode: a late packet must not leave the delay raised for
+/// long, so a frame is dropped soon even while music plays (a short glitch instead of delay).
+const LOW_LATENCY_SHRINK_AFTER_MS: u64 = 30;
+const LOW_LATENCY_FORCE_SHRINK_AFTER_MS: u64 = 100;
 /// RMS below which a frame counts as quiet enough to drop unnoticed.
 const QUIET_RMS: f32 = 0.02;
 /// Gaps longer than this are skipped instead of concealed.
@@ -134,6 +145,7 @@ pub struct JitterBuffer {
     last_decay_ms: u64,
     packet_frames: u64,
     over_target_since: Option<u64>,
+    low_latency: bool,
     stats: JitterStats,
 }
 
@@ -158,6 +170,7 @@ impl JitterBuffer {
             last_decay_ms: 0,
             packet_frames: 2,
             over_target_since: None,
+            low_latency: false,
             stats: JitterStats::default(),
         })
     }
@@ -267,7 +280,8 @@ impl JitterBuffer {
         self.last_arrival_ms
     }
 
-    /// Current target delay: one packet plus the jitter estimate, in 10 ms steps.
+    /// Current target delay: one packet plus the jitter estimate, in 10 ms steps. In low-latency
+    /// mode at most one packet plus [`LOW_LATENCY_MAX_EXTRA_MS`].
     pub fn target_delay_ms(&self) -> u64 {
         let margin = if self.jitter_ms > 0.5 {
             JITTER_MARGIN_MS
@@ -275,7 +289,23 @@ impl JitterBuffer {
             0.0
         };
         let jitter = (self.jitter_ms + margin).ceil() as u64;
-        (self.packet_frames * FRAME_MS + jitter).div_ceil(FRAME_MS) * FRAME_MS
+        let packet_ms = self.packet_frames * FRAME_MS;
+        let target = (packet_ms + jitter).div_ceil(FRAME_MS) * FRAME_MS;
+        if self.low_latency {
+            target.min(packet_ms + LOW_LATENCY_MAX_EXTRA_MS)
+        } else {
+            target
+        }
+    }
+
+    /// Low-latency mode (issue #156): caps the target delay; takes effect on the next pull.
+    /// Concealment and FEC stay on.
+    pub fn set_low_latency(&mut self, on: bool) {
+        self.low_latency = on;
+    }
+
+    pub fn low_latency(&self) -> bool {
+        self.low_latency
     }
 
     /// Audio currently buffered (decoded and not yet decoded), in ms.
@@ -386,7 +416,15 @@ impl JitterBuffer {
         let over_for = now_ms - *self.over_target_since.get_or_insert(now_ms);
         let head = &self.pcm[self.pcm_read..self.pcm_read + FRAME_SAMPLES];
         let rms = (head.iter().map(|s| s * s).sum::<f32>() / FRAME_SAMPLES as f32).sqrt();
-        over_for >= FORCE_SHRINK_AFTER_MS || (over_for >= SHRINK_AFTER_MS && rms < QUIET_RMS)
+        let (quiet_after, force_after) = if self.low_latency {
+            (
+                LOW_LATENCY_SHRINK_AFTER_MS,
+                LOW_LATENCY_FORCE_SHRINK_AFTER_MS,
+            )
+        } else {
+            (SHRINK_AFTER_MS, FORCE_SHRINK_AFTER_MS)
+        };
+        over_for >= force_after || (over_for >= quiet_after && rms < QUIET_RMS)
     }
 
     /// Decodes until a frame is available or nothing more can be produced.

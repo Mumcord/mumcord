@@ -92,13 +92,18 @@
     "hideDescription": "Nascondi descrizione del canale"
   },
   "mention": {
-    "list": "Persone menzionabili",
-    "found_one": "{{count}} persona suggerita. Usa le frecce, poi Invio per inserire.",
-    "found_many": "{{count}} persone suggerite. Usa le frecce, poi Invio per inserire.",
-    "found_other": "{{count}} persone suggerite. Usa le frecce, poi Invio per inserire.",
+    "list": "Suggerimenti di menzioni",
+    "found_one": "Suggerimenti: {{count}}. Usa le frecce, poi Invio per inserire.",
+    "found_many": "Suggerimenti: {{count}}. Usa le frecce, poi Invio per inserire.",
+    "found_other": "Suggerimenti: {{count}}. Usa le frecce, poi Invio per inserire.",
     "none": "Nessuno trovato",
     "mentionsYou": "Ti menziona",
-    "chipLabel": "{{name}}, menzione"
+    "chipLabel": "{{name}}, menzione",
+    "groupsHeading": "Menzioni",
+    "peopleHeading": "Persone",
+    "channelHint": "Avvisa tutti in {{channel}} ({{count}})",
+    "allHint": "Avvisa tutti quelli che possono leggere questo canale ({{count}})",
+    "keys": "↑↓ scegli · Invio inserisci · Esc chiudi"
   },
   "preview": {
     "open": "Apri nel browser",
@@ -252,5 +257,26 @@
     "tooLarge": "Il codice è troppo grande per essere scaricato.",
     "fileType": "File di codice",
     "plainText": "Testo semplice"
+  },
+  "mumbleCard": {
+    "addServer": "Aggiungi ai server",
+    "channel": "Canale {{channel}}",
+    "copy": "Copia collegamento",
+    "copyLabel": "Copia il collegamento a {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} di {{max}} utenti · server {{version}}",
+    "goToChannel": "Vai al canale",
+    "join": "Unisciti",
+    "joinLabel": "Unisciti a {{server}}",
+    "joined": "Unito",
+    "label": "Scheda del server {{server}}",
+    "privacyOff": "I valori del server sono disattivati nelle impostazioni",
+    "querying": "Verifica del server…",
+    "retry": "Verifica di nuovo",
+    "retryLabel": "Verifica di nuovo {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server non raggiungibile",
+    "warning_many": "{{count}} milioni di collegamenti in questo messaggio mostrano le credenziali",
+    "warning_one": "{{count}} collegamento in questo messaggio mostra le credenziali",
+    "warning_other": "{{count}} collegamenti in questo messaggio mostrano le credenziali"
   }
 }

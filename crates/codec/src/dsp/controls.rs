@@ -44,6 +44,7 @@ pub struct DspControls {
     auto_gain: AtomicBool,
     input_gain: AtomicF32,
     music_quality: AtomicBool,
+    low_latency: AtomicBool,
     bitrate_cap_kbps: AtomicU32,
     push_to_talk: AtomicBool,
     manual_threshold: AtomicBool,
@@ -66,6 +67,7 @@ impl Default for DspControls {
             auto_gain: AtomicBool::new(true),
             input_gain: AtomicF32::new(1.0),
             music_quality: AtomicBool::new(false),
+            low_latency: AtomicBool::new(false),
             bitrate_cap_kbps: AtomicU32::new(0),
             push_to_talk: AtomicBool::new(false),
             manual_threshold: AtomicBool::new(false),
@@ -124,6 +126,18 @@ impl DspControls {
 
     pub fn music_quality(&self) -> bool {
         self.music_quality.load(Ordering::Relaxed)
+    }
+
+    /// "Low-latency mode" (issue #156): the chain bypasses echo cancellation, noise suppression
+    /// and automatic gain (music-quality signal path; the gate still decides when to send). The
+    /// engine also switches to 10 ms low-delay packets, a minimal jitter buffer and small device
+    /// buffers.
+    pub fn set_low_latency(&self, on: bool) {
+        self.low_latency.store(on, Ordering::Relaxed);
+    }
+
+    pub fn low_latency(&self) -> bool {
+        self.low_latency.load(Ordering::Relaxed)
     }
 
     /// Own bitrate cap in kbit/s (FR-2.64); `None` means "Max". The engine's bitrate controller

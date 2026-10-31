@@ -31,6 +31,7 @@ pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_auto_gain(settings.auto_gain);
     controls.set_input_gain_percent(settings.input_gain_percent);
     controls.set_music_quality(settings.music_quality);
+    controls.set_low_latency(settings.low_latency);
     controls.set_bitrate_cap_kbps(settings.bitrate_kbps);
     controls.set_manual_threshold(settings.voice_activation == VoiceActivation::Manual);
     controls.set_threshold_dbfs(settings.voice_threshold_dbfs as f32);
@@ -89,6 +90,7 @@ fn server_view(server: SavedServer, has_password: bool) -> ServerView {
         always_connect_at_start: server.always_connect_at_start,
         was_voice_server_at_quit: server.was_voice_server_at_quit,
         notifications_muted: server.notifications_muted,
+        group_mentions_muted: server.group_mentions_muted,
         theme_id: server.theme_id,
         identity_id: server.identity_id,
     }
@@ -572,6 +574,26 @@ impl Engine {
         Ok(server_view(saved, has_password))
     }
 
+    /// Turns `@all` and `@channel` mentions on this server off or back on (issue #70).
+    pub async fn server_set_group_mentions_muted(
+        &self,
+        id: ServerId,
+        muted: bool,
+    ) -> EngineResult<ServerView> {
+        let saved = {
+            let store = lock(&self.inner.store);
+            let mut saved = store
+                .server(id)
+                .map_err(store_error)?
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
+            saved.group_mentions_muted = muted;
+            store.update_server(&saved).map_err(store_error)?;
+            saved
+        };
+        let has_password = self.apply_password(id, PasswordChange::Keep).await?;
+        Ok(server_view(saved, has_password))
+    }
+
     /// Removes a server with password, trust decision, follows and history. Disconnects
     /// it first.
     pub async fn server_remove(&self, id: ServerId) -> EngineResult<()> {
@@ -650,6 +672,20 @@ impl Engine {
         }
         if settings.talk_mode != TalkMode::PushToTalk {
             self.inner.controls.set_ptt_pressed(false);
+        }
+        if previous.low_latency != settings.low_latency {
+            // Live, without reconnecting (issue #156): the capture thread follows the controls
+            // set above; devices and the receive side are switched here.
+            let mut core = lock(&self.inner.core);
+            if let Some(audio) = &core.audio {
+                audio.set_low_latency(settings.low_latency);
+            }
+            if let Some(pipeline) = core.pipeline.as_mut() {
+                pipeline.set_low_latency(settings.low_latency);
+            }
+            // Back to the safe queue at once; a lower one follows once the new device period
+            // is measured.
+            core.sync_queue_target(settings.low_latency);
         }
         if previous.output_volume_percent != settings.output_volume_percent
             && let Some(audio) = &lock(&self.inner.core).audio
@@ -1027,5 +1063,46 @@ mod tests {
             .await
             .expect("unmute");
         assert!(!view.notifications_muted);
+    }
+
+    #[tokio::test]
+    async fn group_mentions_mute_is_saved_per_server() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, _rx) = Engine::new(
+            dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        let muted = engine
+            .server_add(fields("a", "a.example", "me"))
+            .await
+            .expect("server");
+        let other = engine
+            .server_add(fields("b", "b.example", "me"))
+            .await
+            .expect("server");
+        assert!(!muted.group_mentions_muted);
+
+        let view = engine
+            .server_set_group_mentions_muted(muted.id, true)
+            .await
+            .expect("mute");
+        assert!(view.group_mentions_muted && !view.notifications_muted);
+        let servers = engine.servers().await.expect("servers");
+        let muted_of = |id| {
+            servers
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| s.group_mentions_muted)
+        };
+        assert_eq!(muted_of(muted.id), Some(true));
+        assert_eq!(muted_of(other.id), Some(false));
+
+        let view = engine
+            .server_set_group_mentions_muted(muted.id, false)
+            .await
+            .expect("unmute");
+        assert!(!view.group_mentions_muted);
     }
 }

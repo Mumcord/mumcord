@@ -66,8 +66,7 @@
     "title": "Jakość głosu",
     "status": "Ping {{latency}}, utrata {{loss}}",
     "lowLatency": "Tryb niskich opóźnień",
-    "lowLatencyHint": "Najmniejsze pakiety i bufory do wspólnego grania muzyki. Więcej przepustowości, mniejsza odporność.",
-    "lowLatencyComingSoon": "Wkrótce",
+    "lowLatencyHint": "Do wspólnego grania muzyki w czasie rzeczywistym. Najlepiej działa z push-to-talk.",
     "voiceSettings": "Ustawienia głosu…",
     "applies": "Działa od razu, zapisywane jak w Ustawienia → Dźwięk",
     "keys": "Esc zamyka · ↑↓ przesuwa · ← → reguluje",
@@ -80,8 +79,19 @@
     "beta": "Beta",
     "moreInfo": "Więcej informacji: {{topic}}",
     "effectiveShort": "Aktualnie wysyłane",
-    "effectiveTip": "Szybkość transmisji wysyłana w tej chwili, po dostosowaniu do utraty pakietów."
+    "effectiveTip": "Szybkość transmisji wysyłana w tej chwili, po dostosowaniu do utraty pakietów.",
+    "musicIncluded": "Uwzględnione, gdy tryb niskich opóźnień jest włączony: tłumienie szumów i automatyczna głośność są wyłączone, a enkoder pracuje w ustawieniu muzycznym o niskim opóźnieniu.",
+    "warningBandwidth": "Zużywa więcej przepustowości: ≈ {{on}} kbit/s zamiast ≈ {{off}}.",
+    "warningWifi": "Może się zacinać przy Wi-Fi lub obciążonym łączu.",
+    "warningHeadphones": "Użyj słuchawek: usuwanie echa jest wyłączone.",
+    "warningPtt": "Najlepiej działa z push-to-talk.",
+    "bandwidthLowLatencyWithin": "Pakiety po 10 ms zwiększają narzut nagłówków; w limicie. Wyłącz tryb, aby zaoszczędzić ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Pakiety po 10 ms zwiększają narzut nagłówków; ponad limitem. Wyłącz tryb, aby zaoszczędzić ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Pakiety po 10 ms zwiększają narzut nagłówków. Wyłącz tryb, aby zaoszczędzić ≈ {{value}} kbit/s."
   },
+  "endToEnd": "Opóźnienie całkowite",
+  "endToEndValue": "≈ {{value}} ms (szacunek)",
+  "lowLatencyMode": "Tryb niskich opóźnień",
   "identity": "Tożsamość",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -121,7 +121,15 @@
     "ducking": "Hiljennä videoiden ääntä, kun joku puhuu",
     "duckingHint": "Yhteiskatselun videon ja näytön jaon ääni hiljenee, kun joku puhekanavallasi puhuu.",
     "duckingLevel": "Hiljennetty äänenvoimakkuus",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Pienen viiveen tila",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Musiikin soittamiseen yhdessä reaaliajassa",
+    "lowLatencyWarningTitle": "Vaihtaa luotettavuutta nopeuteen",
+    "lowLatencyBandwidth": "Käyttää enemmän kaistaa (10 ms:n paketit).",
+    "lowLatencyWifi": "Voi pätkiä Wi-Fi-yhteydellä tai kuormitetulla yhteydellä; käytä kaapelia, jos mahdollista.",
+    "lowLatencyHeadphones": "Käytä kuulokkeita: kaiunpoisto on pois päältä (myös kohinanvaimennus ja automaattinen äänenvoimakkuus ovat pois päältä).",
+    "lowLatencyPtt": "Suositellaan painepuhetta tai manuaalista äänenaktivoinnin kynnystä."
   },
   "voice": {
     "talkMode": "Puhetila",
@@ -319,6 +327,8 @@
     "selfMute": "Mykistät itsesi tai poistat mykistyksen",
     "selfDeaf": "Mykistät kuulokkeesi tai poistat niiden mykistyksen",
     "hangUp": "Katkaiset yhteyden palvelimeen",
+    "kicked": "Sinut potkitaan palvelimelta",
+    "banned": "Sinulle annetaan porttikielto palvelimelle",
     "messages": "Uusi viesti seuratulla kanavalla tai yksityisessä chatissa",
     "mention": "Ääni, kun sinut mainitaan",
     "mentionNotify": "Ilmoita, kun sinut mainitaan",

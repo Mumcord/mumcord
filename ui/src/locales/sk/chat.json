@@ -95,14 +95,19 @@
     "hideDescription": "Skryť popis kanála"
   },
   "mention": {
-    "list": "Ľudia, ktorých môžeš spomenúť",
-    "found_one": "Navrhnutá {{count}} osoba. Vyber šípkami a vlož klávesom Enter.",
-    "found_few": "Navrhnuté {{count}} osoby. Vyber šípkami a vlož klávesom Enter.",
-    "found_many": "Navrhnutej {{count}} osoby. Vyber šípkami a vlož klávesom Enter.",
-    "found_other": "Navrhnutých {{count}} osôb. Vyber šípkami a vlož klávesom Enter.",
+    "list": "Návrhy zmienok",
+    "found_one": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_few": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_many": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
+    "found_other": "Návrhy: {{count}}. Vyberte šípkami a vložte klávesom Enter.",
     "none": "Nikto sa nenašiel",
     "mentionsYou": "Spomína ťa",
-    "chipLabel": "{{name}}, zmienka"
+    "chipLabel": "{{name}}, zmienka",
+    "groupsHeading": "Zmienky",
+    "peopleHeading": "Ľudia",
+    "channelHint": "Upozorniť všetkých v {{channel}} ({{count}})",
+    "allHint": "Upozorniť všetkých, ktorí môžu čítať tento kanál ({{count}})",
+    "keys": "↑↓ vybrať · Enter vložiť · Esc zavrieť"
   },
   "preview": {
     "open": "Otvoriť v prehliadači",
@@ -256,5 +261,27 @@
     "tooLarge": "Kód je príliš veľký na stiahnutie.",
     "fileType": "Súbor s kódom",
     "plainText": "Obyčajný text"
+  },
+  "mumbleCard": {
+    "addServer": "Pridať do serverov",
+    "channel": "Kanál {{channel}}",
+    "copy": "Kopírovať odkaz",
+    "copyLabel": "Kopírovať odkaz na {{server}}",
+    "figures": "Ping {{ping}} ms · {{users}} z {{max}} používateľov · server {{version}}",
+    "goToChannel": "Prejsť na kanál",
+    "join": "Pripojiť",
+    "joinLabel": "Pripojiť k {{server}}",
+    "joined": "Pripojené",
+    "label": "Karta servera {{server}}",
+    "privacyOff": "Hodnoty servera sú vo nastavení vypnuté",
+    "querying": "Kontrola servera…",
+    "retry": "Skontrolovať znova",
+    "retryLabel": "Skontrolovať znova {{server}}",
+    "server": "{{server}}",
+    "unreachable": "Server nie je dostupný",
+    "warning_few": "{{count}} odkazy v tejto správe zobrazujú prihlasovacie údaje",
+    "warning_many": "{{count}} odkazov v tejto správe zobrazuje prihlasovacie údaje",
+    "warning_one": "{{count}} odkaz v tejto správe zobrazuje prihlasovacie údaje",
+    "warning_other": "{{count}} odkazu v tejto správe zobrazuje prihlasovacie údaje"
   }
 }

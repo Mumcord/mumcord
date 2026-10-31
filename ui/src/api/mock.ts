@@ -6,11 +6,14 @@
 import type {
   DndState,
   InspectorView,
+  LinkOutcome,
   MessageNotice,
+  MumbleLinkStats,
   NotifyOutcome,
   SystemDnd,
   WindowLook,
 } from "../bindings/commands";
+import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   ApiError,
   AudioDevices,
@@ -18,6 +21,7 @@ import type {
   ChatMessage,
   ConnectionState,
   ConnectionStats,
+  LatencyEstimate,
   Conversation,
   ErrorCode,
   Friend,
@@ -145,6 +149,7 @@ const NEW_SERVER_FLAGS = {
   alwaysConnectAtStart: false,
   wasVoiceServerAtQuit: false,
   notificationsMuted: false,
+  groupMentionsMuted: false,
   themeId: null,
   identityId: null,
 } satisfies Partial<SavedServer>;
@@ -190,6 +195,7 @@ const DEFAULT_SETTINGS: Settings = {
   inputGainPercent: 100,
   outputVolumePercent: 100,
   musicQuality: false,
+  lowLatency: false,
   videoDucking: true,
   videoDuckingPercent: 30,
   bitrateKbps: 96,
@@ -209,6 +215,8 @@ const DEFAULT_SETTINGS: Settings = {
     shareStopped: true,
     viewerStarted: true,
     viewerStopped: true,
+    kicked: true,
+    banned: true,
   },
   closeBehaviour: "ask",
   chatDisplay: "cozy",
@@ -316,6 +324,35 @@ const DEVICES: AudioDevices = {
   ],
 };
 
+/** The figures measured on a PipeWire machine with an 18 ms ping (issue #156), for both modes. */
+function mockLatencyEstimate(lowLatency: boolean): LatencyEstimate {
+  return lowLatency
+    ? {
+        lowLatency,
+        packetMs: 10,
+        inputBufferUs: 2667,
+        encodeUs: 12500,
+        networkUs: 9000,
+        jitterUs: 10000,
+        processingUs: 100,
+        outputBufferUs: 13667,
+        totalUs: 47934,
+        otherModeTotalUs: 107134,
+      }
+    : {
+        lowLatency,
+        packetMs: 20,
+        inputBufferUs: 10667,
+        encodeUs: 26500,
+        networkUs: 9000,
+        jitterUs: 20000,
+        processingUs: 300,
+        outputBufferUs: 40667,
+        totalUs: 107134,
+        otherModeTotalUs: 47934,
+      };
+}
+
 const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   transport: "udp",
   rttMs: 24.5,
@@ -348,6 +385,7 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
       2900, 3100, 2800, 3300, 3000, 3600, 4800, 3900, 3500, 3200, 3700, 3400,
     ],
   },
+  latency: mockLatencyEstimate(false),
 };
 
 const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
@@ -538,26 +576,9 @@ function conversationKey(c: Conversation): string {
   }
 }
 
+/** The same rules as `parse_mumble_link` in the engine, through the UI's single parsing module. */
 function parseLink(url: string): MumbleLink {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return fail("invalidInput", "not a valid link");
-  }
-  if (parsed.protocol !== "mumble:" || parsed.hostname === "") {
-    return fail("invalidInput", "not a mumble:// link");
-  }
-  return {
-    address: parsed.hostname,
-    port: parsed.port === "" ? 64738 : Number(parsed.port),
-    username: parsed.username === "" ? null : decodeURIComponent(parsed.username),
-    password: parsed.password === "" ? null : decodeURIComponent(parsed.password),
-    channelPath: parsed.pathname
-      .split("/")
-      .filter((part) => part !== "")
-      .map(decodeURIComponent),
-  };
+  return parseMumbleLink(url) ?? fail("invalidInput", "not a mumble:// link");
 }
 
 /** Length of each mic-test phase (recording, playback) in the mock. */
@@ -568,6 +589,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
+  /** What the mock answered for each `mumble://` link in this run (issue #175). */
+  const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
@@ -1350,6 +1373,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     parseMumbleLink: (url) => Promise.resolve(parseLink(url)),
+    // The mock never contacts a server. It answers with figures of its own, and says that nothing
+    // was asked while the privacy switch is off — which is what the real command does (issue #175).
+    mumbleLinkStats: (url: string, refresh: boolean): Promise<MumbleLinkStats> => {
+      parseLink(url);
+      if (!settings.linkPreviews) return Promise.resolve({ kind: "privacyOff" });
+      // Like the engine, the mock keeps the answer for the session unless the card asks again.
+      const stored = queryAnswers.get(url);
+      const answer: MumbleLinkStats =
+        refresh || stored === undefined
+          ? { kind: "answered", pingMs: 12, users: 8, maxUsers: 24, version: serverVersion }
+          : stored;
+      queryAnswers.set(url, answer);
+      return Promise.resolve(answer);
+    },
+    mumbleLinkJoin: (url: string) => {
+      const link = parseLink(url);
+      const saved = servers.find((s) => s.address === link.address && s.port === link.port);
+      const outcome: LinkOutcome = saved
+        ? { kind: "connecting", serverId: saved.id }
+        : { kind: "unknownServer" };
+      emit("deepLinkOpened", { link, outcome });
+      return Promise.resolve(outcome);
+    },
 
     // session
     connect: (serverId, channelPath, password) => {
@@ -1383,7 +1429,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     sessionSnapshot: (serverId) => Promise.resolve(sessions.get(serverId)?.snapshot ?? null),
     connectionStats: (serverId) =>
       Promise.resolve(
-        sessions.get(serverId)?.state.state === "connected" ? { ...connectionStats } : null,
+        sessions.get(serverId)?.state.state === "connected"
+          ? {
+              ...connectionStats,
+              // Follows the setting like the engine, unless a test set its own figure.
+              latency:
+                connectionStats.latency === DEFAULT_CONNECTION_STATS.latency
+                  ? mockLatencyEstimate(settings.lowLatency)
+                  : connectionStats.latency,
+            }
+          : null,
       ),
     certTrustDecide: (serverId, _fingerprint, trust) => {
       const pending = pendingConnect;
@@ -1889,6 +1944,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // audio
     audioDevices: () => Promise.resolve(DEVICES),
     bitrateMax: () => Promise.resolve<number | null>(null),
+    latencyEstimate: () => Promise.resolve(mockLatencyEstimate(settings.lowLatency)),
     micTestStart: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);
@@ -2040,6 +2096,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     serverSetNotificationsMuted: (serverId, muted) => {
       requireServer(serverId);
       servers = servers.map((s) => (s.id === serverId ? { ...s, notificationsMuted: muted } : s));
+      return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetGroupMentionsMuted: (serverId, muted) => {
+      requireServer(serverId);
+      servers = servers.map((s) => (s.id === serverId ? { ...s, groupMentionsMuted: muted } : s));
       return Promise.resolve({ ...requireServer(serverId) });
     },
     serverSetIdentity: (serverId, identityId) =>

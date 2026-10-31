@@ -121,7 +121,15 @@
     "ducking": "Skru ned for videolyden, mens nogen taler",
     "duckingHint": "Lyden fra watch party-videoen og skærmdelingen bliver lavere, mens nogen i din talekanal taler.",
     "duckingLevel": "Sænket lydstyrke",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Tilstand med lav latenstid",
+    "lowLatencyBeta": "Beta",
+    "lowLatencyHint": "Til at spille musik sammen i realtid",
+    "lowLatencyWarningTitle": "Bytter robusthed for hastighed",
+    "lowLatencyBandwidth": "Bruger mere båndbredde (10 ms-pakker).",
+    "lowLatencyWifi": "Kan hakke på Wi-Fi eller en travl forbindelse; brug et kabel, hvis du kan.",
+    "lowLatencyHeadphones": "Brug hovedtelefoner: ekkoundertrykkelse er slået fra (støjdæmpning og automatisk lydstyrke er også slået fra).",
+    "lowLatencyPtt": "Push-to-talk eller en manuel tærskel for stemmeaktivering anbefales."
   },
   "voice": {
     "talkMode": "Taletilstand",
@@ -319,6 +327,8 @@
     "selfMute": "Du slår din mikrofon fra eller til",
     "selfDeaf": "Du slår din lyd fra eller til",
     "hangUp": "Du afbryder fra en server",
+    "kicked": "Du bliver smidt ud af en server",
+    "banned": "Du bliver udelukket fra en server",
     "messages": "Ny besked i en fulgt kanal eller privat chat",
     "mention": "Lyd ved omtale",
     "mentionNotify": "Giv besked ved omtale",

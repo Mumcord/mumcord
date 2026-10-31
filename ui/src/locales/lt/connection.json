@@ -66,8 +66,7 @@
     "title": "Balso kokybė",
     "status": "Ping {{latency}}, nuostoliai {{loss}}",
     "lowLatency": "Mažos delsos režimas",
-    "lowLatencyHint": "Mažiausi paketai ir buferiai muzikuoti kartu. Daugiau pralaidumo, mažiau patikima.",
-    "lowLatencyComingSoon": "Netrukus",
+    "lowLatencyHint": "Muzikuoti kartu realiuoju laiku. Geriausiai veikia su „Spausk ir kalbėk“.",
     "voiceSettings": "Balso nustatymai…",
     "applies": "Taikoma iškart, išsaugoma kaip Nustatymai → Garsas",
     "keys": "Esc uždaro · ↑↓ juda · ← → keičia",
@@ -80,8 +79,19 @@
     "beta": "Beta",
     "moreInfo": "Daugiau informacijos: {{topic}}",
     "effectiveShort": "Dabar siunčiama",
-    "effectiveTip": "Šiuo metu siunčiamas bitų greitis, prisitaikius prie paketų nuostolių."
+    "effectiveTip": "Šiuo metu siunčiamas bitų greitis, prisitaikius prie paketų nuostolių.",
+    "musicIncluded": "Įtraukta, kol įjungtas mažos delsos režimas: triukšmo slopinimas ir automatinis garsumas išjungti, o kodavimo įrankis veikia pagal mažos delsos muzikos nustatymą.",
+    "warningBandwidth": "Naudoja daugiau pralaidumo: ≈ {{on}} kbit/s vietoj ≈ {{off}}.",
+    "warningWifi": "Naudojant Wi-Fi ar apkrautą ryšį gali strigti.",
+    "warningHeadphones": "Naudok ausines: aido slopinimas išjungtas.",
+    "warningPtt": "Geriausiai veikia su „Spausk ir kalbėk“.",
+    "bandwidthLowLatencyWithin": "10 ms paketai padidina antraštės apkrovą; neviršija ribos. Išjunk režimą, kad sutaupytum ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "10 ms paketai padidina antraštės apkrovą; viršija ribą. Išjunk režimą, kad sutaupytum ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "10 ms paketai padidina antraštės apkrovą. Išjunk režimą, kad sutaupytum ≈ {{value}} kbit/s."
   },
+  "endToEnd": "Bendra delsa",
+  "endToEndValue": "≈ {{value}} ms (įvertis)",
+  "lowLatencyMode": "Mažos delsos režimas",
   "identity": "Tapatybė",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

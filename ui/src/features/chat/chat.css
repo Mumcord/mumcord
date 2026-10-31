@@ -654,7 +654,8 @@
   bottom: 100%;
   left: var(--space-4);
   z-index: 5;
-  min-width: 14rem;
+  /* Wide enough for the @channel / @all hints, which would otherwise shrink to nothing. */
+  min-width: min(24rem, calc(100% - 2 * var(--space-4)));
   max-width: calc(100% - 2 * var(--space-4));
   margin: 0 0 var(--space-1);
   padding: var(--space-1);
@@ -664,8 +665,43 @@
   box-shadow:
     inset 0 0 0 1px var(--color-border),
     0 4px 16px rgb(0 0 0 / 0.25);
+}
+
+.mention-picker__list {
   max-height: 16rem;
   overflow-y: auto;
+}
+
+.mention-picker__section {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.mention-picker__keyword {
+  flex: none;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  font-weight: 600;
+}
+
+.mention-picker__hint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+}
+
+.mention-picker__keys {
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1) var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-muted);
 }
 
 .mention-picker__option {
@@ -709,6 +745,76 @@
 
 .link-previews:empty {
   display: none;
+}
+
+/** Card under a message for a `mumble://` link (issue #175). */
+.mumble-card {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-start;
+  max-width: 32rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.mumble-card p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mumble-card__server {
+  flex: 1 1 12rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.mumble-card__channel {
+  flex: 1 1 12rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.mumble-card__warning {
+  flex: 1 1 100%;
+  color: var(--color-warning);
+  font-size: var(--font-size-sm);
+}
+
+.mumble-card__figures {
+  flex: 1 1 100%;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mumble-card__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mumble-card__join,
+.mumble-card__copy,
+.mumble-card__refresh {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.mumble-card__join:hover,
+.mumble-card__copy:hover,
+.mumble-card__refresh:hover,
+.mumble-card__join:focus-visible,
+.mumble-card__copy:focus-visible,
+.mumble-card__refresh:focus-visible {
+  background: var(--color-bg-hover);
 }
 
 .link-card {
@@ -1257,6 +1363,13 @@
   cursor: pointer;
 }
 
+.chat-mention-group {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  font-weight: 600;
+}
+
 .chat-mention:hover,
 .chat-mention:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 30%, transparent);
@@ -1694,6 +1807,13 @@
   .chat-message--highlight {
     transition: none;
   }
+}
+
+.chat-composer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
 .chat-composer__reply {

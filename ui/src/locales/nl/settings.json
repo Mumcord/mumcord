@@ -121,7 +121,15 @@
     "ducking": "Videogeluid zachter terwijl iemand praat",
     "duckingHint": "Het geluid van de watchparty-video en schermdeling wordt zachter terwijl iemand in je spraakkanaal praat.",
     "duckingLevel": "Verlaagd volume",
-    "duckingLevelValue": "{{percent}} %"
+    "duckingLevelValue": "{{percent}} %",
+    "lowLatency": "Modus voor lage latentie",
+    "lowLatencyBeta": "Bèta",
+    "lowLatencyHint": "Om samen muziek te maken in realtime",
+    "lowLatencyWarningTitle": "Ruilt robuustheid in voor snelheid",
+    "lowLatencyBandwidth": "Gebruikt meer bandbreedte (pakketten van 10 ms).",
+    "lowLatencyWifi": "Kan haperen op wifi of een drukke verbinding; gebruik een kabel als het kan.",
+    "lowLatencyHeadphones": "Gebruik een koptelefoon: echo-onderdrukking staat uit (ruisonderdrukking en automatisch volume ook).",
+    "lowLatencyPtt": "Push-to-talk of een handmatige drempel voor spraakactivering wordt aanbevolen."
   },
   "voice": {
     "talkMode": "Praatmodus",
@@ -319,6 +327,8 @@
     "selfMute": "Je dempt jezelf of heft de demping op",
     "selfDeaf": "Je zet jezelf doof of heft het doof zetten op",
     "hangUp": "Je verbreekt de verbinding met een server",
+    "kicked": "Je wordt van een server gekickt",
+    "banned": "Je wordt van een server verbannen",
     "messages": "Nieuw bericht in een gevolgd kanaal of privéchat",
     "mention": "Geluid bij vermelding",
     "mentionNotify": "Melding bij vermelding",

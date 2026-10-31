@@ -65,8 +65,7 @@
     "title": "Kvaliteta glasa",
     "status": "Ping {{latency}}, gubitak {{loss}}",
     "lowLatency": "Način niske latencije",
-    "lowLatencyHint": "Najmanji paketi i međuspremnici za zajedničko sviranje. Više propusnosti, manje robusnosti.",
-    "lowLatencyComingSoon": "Uskoro",
+    "lowLatencyHint": "Za zajedničko sviranje u stvarnom vremenu. Najbolje radi s funkcijom pritisni za govor.",
     "voiceSettings": "Postavke glasa…",
     "applies": "Primjenjuje se odmah, sprema se kao u Postavke → Zvuk",
     "keys": "Esc zatvara · ↑↓ pomiče · ← → podešava",
@@ -79,8 +78,19 @@
     "beta": "Beta",
     "moreInfo": "Više informacija: {{topic}}",
     "effectiveShort": "Trenutno se šalje",
-    "effectiveTip": "Brzina prijenosa koja se trenutno šalje, nakon prilagodbe gubitku paketa."
+    "effectiveTip": "Brzina prijenosa koja se trenutno šalje, nakon prilagodbe gubitku paketa.",
+    "musicIncluded": "Uključeno dok je način niske latencije aktivan: suzbijanje šuma i automatska glasnoća su isključeni, a koder radi u postavci za glazbu s malim kašnjenjem.",
+    "warningBandwidth": "Troši više propusnosti: ≈ {{on}} kbit/s umjesto ≈ {{off}}.",
+    "warningWifi": "Može zapinjati na Wi-Fi mreži ili opterećenoj vezi.",
+    "warningHeadphones": "Koristi slušalice: poništavanje jeke je isključeno.",
+    "warningPtt": "Najbolje radi s funkcijom pritisni za govor.",
+    "bandwidthLowLatencyWithin": "Paketi od 10 ms dodaju opterećenje zaglavlja; unutar ograničenja. Isključi način da uštediš ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyOver": "Paketi od 10 ms dodaju opterećenje zaglavlja; iznad ograničenja. Isključi način da uštediš ≈ {{value}} kbit/s.",
+    "bandwidthLowLatencyNoLimit": "Paketi od 10 ms dodaju opterećenje zaglavlja. Isključi način da uštediš ≈ {{value}} kbit/s."
   },
+  "endToEnd": "Ukupna latencija",
+  "endToEndValue": "≈ {{value}} ms (procjena)",
+  "lowLatencyMode": "Način niske latencije",
   "identity": "Identitet",
   "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
 }

@@ -4,6 +4,7 @@
     [
       "specs/chat/dnd.e2e.ts",
       "specs/chat/friends.e2e.ts",
+      "specs/chat/mumble-link-card.e2e.ts",
       "specs/profile/profile.e2e.ts",
       "specs/smoke/app.e2e.ts",
       "specs/voice/leave-voice-menu.e2e.ts",

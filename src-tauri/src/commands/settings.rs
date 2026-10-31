@@ -239,6 +239,10 @@ pub struct SoundSettings {
     pub share_stopped: bool,
     pub viewer_started: bool,
     pub viewer_stopped: bool,
+    /// The server kicks you (#205).
+    pub kicked: bool,
+    /// The server bans you (#205).
+    pub banned: bool,
 }
 
 /// Positional audio (FR-1.41): voices of people in the same game placed in 3D.
@@ -290,6 +294,10 @@ pub struct Settings {
     /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
     /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
     pub music_quality: bool,
+    /// "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+    /// jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+    /// volume bypassed, for playing music together. Applies live.
+    pub low_latency: bool,
     /// Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
     /// `bitrate_max`.
     pub bitrate_kbps: Option<u32>,
@@ -402,6 +410,7 @@ impl Settings {
             input_gain_percent: s.input_gain_percent,
             output_volume_percent: s.output_volume_percent,
             music_quality: s.music_quality,
+            low_latency: s.low_latency,
             bitrate_kbps: s.bitrate_kbps,
             video_ducking: s.video_ducking,
             video_ducking_percent: s.video_ducking_percent,
@@ -421,6 +430,8 @@ impl Settings {
                 share_stopped: s.sounds.share_stopped,
                 viewer_started: s.sounds.viewer_started,
                 viewer_stopped: s.sounds.viewer_stopped,
+                kicked: s.sounds.kicked,
+                banned: s.sounds.banned,
             },
             notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
@@ -516,6 +527,7 @@ impl Settings {
         s.input_gain_percent = self.input_gain_percent.min(200);
         s.output_volume_percent = self.output_volume_percent.min(100);
         s.music_quality = self.music_quality;
+        s.low_latency = self.low_latency;
         s.bitrate_kbps = self.bitrate_kbps;
         s.video_ducking = self.video_ducking;
         s.video_ducking_percent = self.video_ducking_percent.clamp(
@@ -538,6 +550,8 @@ impl Settings {
         s.sounds.share_stopped = self.sounds.share_stopped;
         s.sounds.viewer_started = self.sounds.viewer_started;
         s.sounds.viewer_stopped = self.sounds.viewer_stopped;
+        s.sounds.kicked = self.sounds.kicked;
+        s.sounds.banned = self.sounds.banned;
         s.notifications = self.notifications.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
@@ -804,6 +818,7 @@ mod tests {
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
         ui.sounds.share_stopped = false;
+        ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
@@ -852,6 +867,7 @@ mod tests {
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
         assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
+        assert!(!stored.sounds.banned && stored.sounds.kicked);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
         assert_eq!(
             stored.input_device, None,
