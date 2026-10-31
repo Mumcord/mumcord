@@ -8,9 +8,10 @@
   min-width: 0;
 }
 
-/* Also a .chat-header__title (E2E helpers find the chat by it); it only shrinks, the line grows. */
+/* Also a .chat-header__title: E2E helpers find the chat by it. */
 .chat-header__title.channel-header__title {
-  flex: 0 1 auto;
+  /* The description line gives way first; the name only truncates beyond 60 %. */
+  flex: 0 0 auto;
   max-width: 60%;
   overflow: visible;
 }

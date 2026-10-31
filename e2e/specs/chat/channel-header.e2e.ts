@@ -21,13 +21,14 @@ const infoRow = (label: string) =>
 describe("chat: channel header menu and channel info (AC-3.66)", () => {
   before(async () => {
     await testenv.up("v15");
-    await bot(["describe", "Raid", "<b>Raid</b> nights<script>window.pwned=1</script>"], {
-      superuser: true,
-    });
     await app.restart();
     await finishWizard();
     await addFirstServer(testenv.ports.v15);
     await joinChannel("Lobby");
+    // Once connected, the server certainly accepts the SuperUser bot too.
+    await bot(["describe", "Raid", "<b>Raid</b> nights<script>window.pwned=1</script>"], {
+      superuser: true,
+    });
     await selectChannel("Raid");
   });
 
