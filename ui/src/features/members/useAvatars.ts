@@ -4,7 +4,8 @@
  * entry is dropped when `hasAvatar` or `avatarHash` changes, the person leaves, or the connection is re-synced or
  * lost (sessions are reused across connections). An answer without an image (blob not received in
  * time, person not found) is fetched again on the person's next change, as the texture blob can
- * arrive later under the same hash.
+ * arrive later under the same hash. A render from before a drop never loads that person again: the
+ * render of the new state decides, so a person is never requested twice for the same change.
  *
  * Answers are applied once per animation frame, so a burst of them re-renders once.
  *
@@ -31,6 +32,11 @@ export function useAvatars(
   /** Answers waiting for the next frame: hundreds can arrive at once on a big server. */
   const arrived = useRef(new Map<number, { src: string | null; generation: number }>());
   const flushFrame = useRef<number | null>(null);
+  /** Counts drops from the cache; set together with the new map, so one render carries both. */
+  const invalidations = useRef(0);
+  const [knownInvalidations, setKnownInvalidations] = useState(0);
+  /** For each session: the invalidation count when it was last dropped from the cache. */
+  const invalidatedAt = useRef(new Map<number, number>());
 
   useEffect(
     () => () => {
@@ -48,6 +54,10 @@ export function useAvatars(
         generations.current.set(session, (generations.current.get(session) ?? 0) + 1);
       }
       if (list.length === 0) return;
+      invalidations.current += 1;
+      for (const session of list) invalidatedAt.current.set(session, invalidations.current);
+      // Batched with the new map below: one render that already reflects these drops.
+      setKnownInvalidations(invalidations.current);
       // Always a new map, so the fetch effect re-runs even for requests that were in flight.
       setImages((current) => {
         const next = new Map(current);
@@ -81,6 +91,13 @@ export function useAvatars(
   useEffect(() => {
     for (const session of wanted === "" ? [] : wanted.split(",").map(Number)) {
       if (requested.current.has(session)) continue;
+      // The person was invalidated after this render listed them (they lost their avatar, left, or
+      // the server was re-synced), so a fetch now would be dropped on arrival: the render of the
+      // newer state fetches them again if they are still wanted. React can run this effect before
+      // it renders that newer state, which otherwise made the same person load twice.
+      const invalidated = invalidatedAt.current.get(session) ?? 0;
+      if (invalidated > knownInvalidations) continue;
+      invalidatedAt.current.delete(session);
       requested.current.add(session);
       const generation = generations.current.get(session) ?? 0;
       const store = (src: string | null) => {
@@ -118,7 +135,7 @@ export function useAvatars(
           store(null);
         });
     }
-  }, [wanted, images, serverId]);
+  }, [wanted, images, serverId, knownInvalidations]);
 
   return useCallback(
     (user: User) => (user.hasAvatar ? (images.get(user.session) ?? null) : null),
