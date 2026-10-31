@@ -630,7 +630,7 @@ jobs:
           test -f "$portable/portable" || { echo "the portable marker is missing from the zip" >&2; exit 1; }
           scripts/smoke/smoke.sh --portable --app "$portable/Mumcord.exe" --seed target/release/mumcord-smoke-seed.exe --bot "$RUNNER_TEMP/mumbot/mumbot.exe" || { dump; exit 1; }
           test -d "$portable/MumcordData/local/EBWebView" || { echo "no web view data in MumcordData" >&2; exit 1; }
-          compgen -G "$portable/MumcordData/logs/*" >/dev/null || { echo "no logs in MumcordData" >&2; exit 1; }
+          [[ -n $(ls -A "$portable/MumcordData/logs" 2>/dev/null) ]] || { echo "no logs in MumcordData" >&2; exit 1; }
           for dir in "$appdata" "$localdata"; do
             if [[ -e $dir ]]; then
               echo "portable mode wrote to $dir:" >&2
