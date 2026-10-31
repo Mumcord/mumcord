@@ -18,6 +18,7 @@ import {
   UserPanelMount,
   WizardMount,
 } from "./mounts";
+import { useMediaView } from "../features/media/mediaView";
 import { PreferencesProvider } from "./PreferencesProvider";
 import { SettingsOverlay } from "./SettingsOverlay";
 import { setSettingsOpener } from "../features/settings/settingsOpener";
@@ -49,6 +50,7 @@ function MainScreen() {
     <>
       <AppShell
         inert={overlay !== null && !previewing}
+        focus={useMediaView().focus}
         slots={{
           servers: <ServersMount />,
           channels: <ChannelsMount />,

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { getApi } from "../api";
 import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
+import { useServerStateOf, useVoiceServerId } from "../features/channels";
 import { useMembersColumn } from "./membersCollapse";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
@@ -31,8 +32,9 @@ import {
   openPrivateConversation,
   useChannelPresence,
 } from "../features/members";
-import { ScreenShareWidget } from "../features/screenshare";
-import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
+import { ScreenShareWidget, ScreenShareView, ViewerPanel } from "../features/screenshare";
+import { VideoDucking, WatchMiniBar, WatchPartyPanel, WatchTogetherView } from "../features/watchparty";
+import { useMediaView } from "../features/media/mediaView";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
 import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
@@ -144,9 +146,11 @@ export function ChatStatusMount() {
 /** Chat header, message list and input (B21), or the message requests while they are open (#141). */
 export function ChatMount() {
   const requests = useRequestsView();
+  const serverId = useVoiceServerId();
+  const view = useMediaView();
   if (requests)
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
-  return (
+  const chat = (
     <ChatView
       renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
       renderHeaderActions={(conv) => (
@@ -156,6 +160,31 @@ export function ChatMount() {
         </>
       )}
     />
+  );
+  if (serverId === null) return chat;
+  // The cinema view (issue #163): the player above the chat, which stays usable below it; the mini
+  // bar is what remains when the view is left. Focus shows the picture alone.
+  if (view.cinema === "watch") {
+    return (
+      <>
+        <WatchTogetherView serverId={serverId} />
+        {!view.focus && chat}
+      </>
+    );
+  }
+  if (view.cinema === "share") {
+    return (
+      <>
+        <ScreenShareView />
+        {!view.focus && chat}
+      </>
+    );
+  }
+  return (
+    <>
+      {view.mini.watch && <WatchMiniBar serverId={serverId} />}
+      {chat}
+    </>
   );
 }
 
@@ -179,21 +208,30 @@ function MembersToggleMount() {
 }
 
 /**
- * Floating media widgets over the main area (FR-2.70): the watched screen share and the watch
- * party. At shell level so they stay open while switching chats or servers.
+ * Media over the main area: the watched screen share widget (FR-2.70, until its own view, issue
+ * #163) and the ducking while people talk. At shell level so they stay open while switching chats
+ * or servers.
  */
 export function MediaWidgetsMount() {
   return (
     <>
       <ScreenShareWidget />
-      <WatchPartyWidget />
       <VideoDucking />
     </>
   );
 }
 
-/** Member list (B20) with the friends list below (FR-1.64). */
+/** Member list (B20) with the friends list below (FR-1.64); the party's panel takes the column
+while its cinema view is open (issue #163). */
 export function MembersMount() {
+  const view = useMediaView();
+  const serverId = useVoiceServerId();
+  const { users, selfSession } = useServerStateOf(serverId);
+  const own = selfSession === null ? undefined : users.get(selfSession);
+  if (view.cinema === "watch" && serverId !== null && own !== undefined) {
+    return <WatchPartyPanel serverId={serverId} channelId={own.channelId} />;
+  }
+  if (view.cinema === "share") return <ViewerPanel />;
   return (
     <>
       <MembersPanel onSendPrivateMessage={openPrivateConversation} />
