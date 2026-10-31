@@ -1589,7 +1589,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function changeOwnShare(serverId: number, share: ScreenShare | null): void {
     if (share === null) ownShares.delete(serverId);
     else ownShares.set(serverId, share);
-    emit("screenSharesChanged", { serverId, shares: share === null ? [] : [share] });
+    const shares = share === null ? [] : [share];
+    if (mediaDemo.share !== null && serverId === 1 && share?.session !== mediaDemo.share.session) {
+      shares.push(mediaDemo.share);
+    }
+    emit("screenSharesChanged", { serverId, shares });
   }
 
   function requireOwnShare(serverId: number): ScreenShare {
@@ -3491,13 +3495,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
   };
 
-<<<<<<< HEAD
-  const api: MockApi = { ...guarded, kind: "mock", on, mock };
-  if (demo) window.__mumcordMock = api;
-=======
   const api: MockApi = { ...guarded, kind: "mock", on, mock, mediaDemo };
-  if (stress) window.__mumcordMock = api;
->>>>>>> 0e99d52 (feat(ui): the mock shows its own media data, so the media views can be rendered)
+  // The browser mock exposes itself for the measuring script and for the mock screenshots.
+  if (typeof window !== "undefined") window.__mumcordMock = api;
   return api;
 }
 
