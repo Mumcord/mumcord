@@ -586,7 +586,7 @@ describe("Voice section", () => {
       expect(radios.map((radio) => radio.closest("label")?.textContent)).toEqual([
         "Light",
         "Standard",
-        "Advanced (AI)Beta",
+        "Advanced (AI) Beta",
         "Off",
       ]);
       expect(within(group).getByRole("radio", { name: "Standard" })).toBeChecked();

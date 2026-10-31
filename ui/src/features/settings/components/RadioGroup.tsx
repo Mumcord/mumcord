@@ -45,8 +45,12 @@ export function RadioGroup<T extends string>({
               }}
             />
             {option.label}
+            {/* The space keeps label and badge apart in the radio's accessible name. */}
             {option.badge !== undefined && (
-              <span className="settings-switch__badge">{option.badge}</span>
+              <>
+                {" "}
+                <span className="settings-switch__badge">{option.badge}</span>
+              </>
             )}
           </label>
           {/* Outside the label, so the "?" is its own control and does not pick the option; to the
