@@ -17,6 +17,15 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* A row with a dropdown uses the shared label-left, control-right row, its hint below. */
+.upd-settings-row--control {
+  display: block;
+}
+
+.upd-settings-row--control .settings-hint {
+  margin-bottom: 0;
+}
+
 .upd-settings-row__text {
   flex: 1 1 16rem;
   min-width: 0;

@@ -144,26 +144,26 @@ function IntervalRow(props: {
     ? [...UPDATE_INTERVALS]
     : [...UPDATE_INTERVALS, props.hours].sort((a, b) => a - b);
   return (
-    <div className="upd-settings-row">
-      <div className="upd-settings-row__text">
+    <div className="upd-settings-row upd-settings-row--control">
+      <div className="settings-control-row">
         <label htmlFor={id} className="upd-settings-row__title">
           {t("updates.interval")}
         </label>
-        <p className="settings-hint">
-          {props.hours === 168
-            ? t("updates.intervalWeekHint")
-            : t("updates.intervalHint", { count: props.hours })}
-        </p>
+        <Select
+          id={id}
+          value={String(props.hours)}
+          disabled={props.disabled}
+          options={choices.map((hours) => ({ value: String(hours), label: label(hours) }))}
+          onChange={(value) => {
+            props.onChange(Number(value));
+          }}
+        />
       </div>
-      <Select
-        id={id}
-        value={String(props.hours)}
-        disabled={props.disabled}
-        options={choices.map((hours) => ({ value: String(hours), label: label(hours) }))}
-        onChange={(value) => {
-          props.onChange(Number(value));
-        }}
-      />
+      <p className="settings-hint">
+        {props.hours === 168
+          ? t("updates.intervalWeekHint")
+          : t("updates.intervalHint", { count: props.hours })}
+      </p>
     </div>
   );
 }
