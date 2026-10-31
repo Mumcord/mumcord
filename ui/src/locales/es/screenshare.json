@@ -35,5 +35,8 @@
   "stopped": "Has dejado de compartir tu pantalla.",
   "pauseSharing": "Pausar compartición",
   "resumeSharing": "Reanudar compartición",
-  "viewersLabel": "Quién está mirando"
+  "viewersLabel": "Quién está mirando",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Cambiar ventana",
+  "viewersTitle": "Viendo"
 }

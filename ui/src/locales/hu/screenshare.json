@@ -34,5 +34,8 @@
   "stopped": "Leállítottad a képernyőmegosztást.",
   "pauseSharing": "Megosztás szüneteltetése",
   "resumeSharing": "Megosztás folytatása",
-  "viewersLabel": "Kik nézik"
+  "viewersLabel": "Kik nézik",
+  "elapsed": "{{minutes}} perc",
+  "changeWindow": "Ablak váltása",
+  "viewersTitle": "Nézők"
 }

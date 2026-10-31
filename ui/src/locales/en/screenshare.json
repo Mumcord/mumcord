@@ -34,5 +34,8 @@
   "stopped": "You stopped sharing your screen.",
   "pauseSharing": "Pause sharing",
   "resumeSharing": "Resume sharing",
-  "viewersLabel": "Who is watching"
+  "viewersLabel": "Who is watching",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Change window",
+  "viewersTitle": "Viewers"
 }
