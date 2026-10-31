@@ -10,6 +10,7 @@
       "specs/profile/profile.e2e.ts",
       "specs/smoke/app.e2e.ts",
       "specs/voice/channel-audio.e2e.ts",
+      "specs/voice/global-hotkeys.e2e.ts",
       "specs/voice/leave-voice-menu.e2e.ts",
       "specs/voice/voice.e2e.ts",
       "specs/voice/whisper.e2e.ts",
