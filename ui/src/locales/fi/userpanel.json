@@ -97,10 +97,14 @@
     "dnd": "Älä häiritse",
     "dndHint": "Mykistää ilmoitusäänet ja -bannerit",
     "dndSystemHint": "Päällä työpöydän Älä häiritse -tilan kautta",
-    "privateMessages": "Yksityisviestit keneltä",
+    "privateMessages": "Viestit",
     "pm_everyone": "Kaikilta",
     "pm_friendsOnly": "Kaverit",
-    "pm_nobody": "Ei keneltäkään"
+    "pm_nobody": "Ei keneltäkään",
+    "notifications": "Ilmoitukset",
+    "sharing": "Jakaminen",
+    "appearance": "Ulkoasu",
+    "account": "Tili"
   },
   "voice": {
     "line": "Puhe: {{channel}} · {{server}}",

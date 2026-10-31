@@ -15,5 +15,60 @@
   "open": "Otvoriť chat",
   "close": "Zavrieť upozornenie",
   "mentionLine": "{{sender}} ťa spomenul(a): {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Upozornenia",
+    "bellUnread_one": "Upozornenia, {{count}} neprečítané",
+    "bellUnread_few": "Upozornenia, {{count}} neprečítané",
+    "bellUnread_many": "Upozornenia, {{count}} neprečítaného",
+    "bellUnread_other": "Upozornenia, {{count}} neprečítaných",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Označiť všetko ako prečítané",
+    "filterLabel": "Zobraziť upozornenia",
+    "filter": {
+      "all": "Všetko",
+      "mentions": "Zmienky",
+      "requests": "Žiadosti",
+      "invites": "Pozvánky"
+    },
+    "empty": "Všetko je prečítané.",
+    "unread": "Neprečítané",
+    "dndOn": "Režim Nerušiť je zapnutý",
+    "dndOff": "Režim Nerušiť je vypnutý",
+    "settings": "Nastavenia upozornení",
+    "someone": "Niekto",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} ťa spomenul(a)",
+    "mentionGroup": "{{name}} spomenul(a) všetkých",
+    "reply": "{{name}} odpovedal(a) na tvoju správu",
+    "chatRequest": "{{name}} chce s tebou chatovať",
+    "messageRequest": "Žiadosť o správu od {{name}}",
+    "messageRequestBody_one": "{{count}} správa zo štandardného klienta Mumble",
+    "messageRequestBody_few": "{{count}} správy zo štandardného klienta Mumble",
+    "messageRequestBody_many": "{{count}} správy zo štandardného klienta Mumble",
+    "messageRequestBody_other": "{{count}} správ zo štandardného klienta Mumble",
+    "invite": {
+      "watchParty": "{{name}} ťa pozval(a) na spoločné sledovanie",
+      "screenShare": "{{name}} zdieľa obrazovku",
+      "card": "{{name}} ti poslal(a) kartu",
+      "theme": "{{name}} s tebou zdieľal(a) tému"
+    },
+    "connection": "{{server}} je nedostupný",
+    "type": {
+      "chatRequest": "Žiadosť o chat",
+      "messageRequest": "Žiadosť o správu",
+      "invite": "Pozvánka",
+      "private": "Súkromná správa",
+      "connection": "Pripojenie"
+    },
+    "accept": "Prijať",
+    "decline": "Odmietnuť",
+    "join": "Pripojiť sa",
+    "watch": "Sledovať",
+    "open": "Otvoriť",
+    "dismiss": "Zavrieť",
+    "dismissItem": "Zavrieť: {{title}}",
+    "failed": "Nepodarilo sa. Skús to znova.",
+    "block": "Blokovať"
+  }
 }

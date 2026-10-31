@@ -116,5 +116,28 @@
     "message": "{{name}} va trebui să trimită o nouă cerere de mesaj înainte ca mesajele să ajungă din nou la tine. Istoricul chatului rămâne.",
     "confirm": "Retrage",
     "failed": "Retragerea acordului pentru chat a eșuat. Încearcă din nou."
+  },
+  "block": {
+    "menu": "Blochează…",
+    "unblock": "Deblochează",
+    "title": "Blochezi pe {{name}}?",
+    "onServer": "pe {{server}}",
+    "whatHappens": "Ce se întâmplă",
+    "private": "Mesajele private de la {{name}} nu sunt afișate și nu te notifică.",
+    "channelCollapsed": "Mesajele de canal ale lui {{name}} sunt restrânse. Le poți deschide în continuare.",
+    "channelHidden": "Mesajele de canal ale lui {{name}} sunt ascunse.",
+    "voice": "{{name}} este redus la tăcere pentru tine în voce, inclusiv șoaptele.",
+    "data": "Fără sincronizarea istoricului, invitații sau alte date Mumcord de la {{name}}.",
+    "followsCert": "Blocarea urmează certificatul lui {{name}}, așa că un nume nou nu o ocolește.",
+    "nameOnly": "{{name}} nu are certificat, așa că blocarea se aplică doar acestui nume pe {{server}}.",
+    "warning": "{{name}} te poate vedea în continuare și îți poate citi mesajele. Mumble nu are nicio cale de a opri asta doar din partea ta. {{name}} nu este anunțat despre blocare.",
+    "cancel": "Anulează",
+    "confirm": "Blochează-l pe {{name}}",
+    "done": "{{name}} este blocat.",
+    "failed": "Blocarea lui {{name}} a eșuat. Încearcă din nou.",
+    "badge": "Blocat",
+    "collapsed": "Mesaj de la un utilizator blocat",
+    "show": "Afișează",
+    "showLabel": "Afișează mesajul de la un utilizator blocat"
   }
 }

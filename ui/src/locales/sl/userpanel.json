@@ -97,10 +97,14 @@
     "dnd": "Ne moti",
     "dndHint": "Utiša zvoke in pasice obvestil",
     "dndSystemHint": "Vklopljeno prek načina Ne moti vašega namizja",
-    "privateMessages": "Zasebna sporočila od",
+    "privateMessages": "Sporočila od",
     "pm_everyone": "Vsi",
     "pm_friendsOnly": "Prijatelji",
-    "pm_nobody": "Nihče"
+    "pm_nobody": "Nihče",
+    "notifications": "Obvestila",
+    "sharing": "Deljenje",
+    "appearance": "Videz",
+    "account": "Račun"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",

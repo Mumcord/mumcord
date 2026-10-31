@@ -97,10 +97,14 @@
     "dnd": "Не безпокойте",
     "dndHint": "Заглушава звуците и банерите за известия",
     "dndSystemHint": "Включено чрез „Не безпокойте“ на работния плот",
-    "privateMessages": "Лични съобщения от",
+    "privateMessages": "Съобщения от",
     "pm_everyone": "Всички",
     "pm_friendsOnly": "Приятели",
-    "pm_nobody": "Никой"
+    "pm_nobody": "Никой",
+    "notifications": "Известия",
+    "sharing": "Споделяне",
+    "appearance": "Външен вид",
+    "account": "Акаунт"
   },
   "voice": {
     "line": "Глас: {{channel}} · {{server}}",

@@ -696,6 +696,10 @@ describe("UserPanel", () => {
     await setup();
     const { container } = { container: document.body };
     expect(await axeViolations(container)).toEqual([]);
+    fireEvent.click(screen.getByRole("button", { name: "Quick settings" }));
+    const menu = await screen.findByRole("menu", { name: "Quick settings" });
+    // The popover is a portal outside the app's landmarks; check its own tree.
+    expect(await axeViolations(menu)).toEqual([]);
     await openMenuItem("Edit profile");
     await act(async () => {
       await Promise.resolve();
@@ -837,7 +841,8 @@ describe("quick settings (FR-1.66)", () => {
     await setup();
     fireEvent.contextMenu(gear());
     const row = await screen.findByRole("menuitem", { name: /^Register on this server/u });
-    expect(row).toHaveTextContent("Keeps your name and avatar on this server");
+    const tip = screen.getByRole("menuitem", { name: "About Register on this server" });
+    expect(tip).toHaveAttribute("data-tooltip", "Keeps your name and avatar on this server");
     fireEvent.click(row);
     expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
@@ -854,11 +859,66 @@ describe("quick settings (FR-1.66)", () => {
     });
   });
 
-  describe("Beta group (FR-1.73)", () => {
-    beforeEach(() => {
-      localStorage.clear();
-    });
+  it("groups the rows and keeps every explanation behind a ?", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    const links = await screen.findByRole("menuitemcheckbox", { name: /^Link previews/u });
+    const notifications = screen.getByRole("group", { name: "Notifications" });
+    expect(notifications).toContainElement(
+      screen.getByRole("menuitemcheckbox", { name: /^Do Not Disturb/u }),
+    );
+    expect(notifications).toContainElement(
+      screen.getByRole("menuitemradio", { name: "Everyone" }).closest(".quick-settings__row"),
+    );
+    for (const name of ["Notifications", "Sharing", "Appearance", "Account"]) {
+      expect(screen.getByRole("group", { name })).toBeInTheDocument();
+    }
+    const row = links.closest(".quick-settings__row");
+    expect(row?.querySelector(".quick-settings__hint")).toBeNull();
+    expect(
+      screen.getByRole("menuitem", { name: "About Link previews and embeds" }),
+    ).toHaveAttribute("data-tooltip", "Sites see your IP address");
+  });
 
+  it("reaches a row's ? with the arrow keys and closes the tip before the popover", async () => {
+    await setup();
+    fireEvent.contextMenu(gear());
+    const dnd = await screen.findByRole("menuitemcheckbox", { name: /^Do Not Disturb/u });
+    await waitFor(() => {
+      expect(dnd).toHaveFocus();
+    });
+    fireEvent.keyDown(dnd, { key: "ArrowRight" });
+    const tip = screen.getByRole("menuitem", { name: "About Do Not Disturb" });
+    expect(tip).toHaveFocus();
+    fireEvent.keyDown(tip, { key: "ArrowLeft" });
+    expect(dnd).toHaveFocus();
+
+    // While a tooltip is on screen, Escape only closes that tip (the shared TooltipLayer owns it).
+    fireEvent.keyDown(dnd, { key: "ArrowRight" });
+    const shown = document.createElement("div");
+    shown.setAttribute("role", "tooltip");
+    document.body.append(shown);
+    fireEvent.keyDown(tip, { key: "Escape" });
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeInTheDocument();
+    shown.remove();
+    fireEvent.keyDown(tip, { key: "Escape" });
+    expect(screen.queryByRole("menu", { name: "Quick settings" })).toBeNull();
+  });
+
+  it("keeps the unsupported hint in the tip of a dimmed row", async () => {
+    await setup();
+    vi.spyOn(api, "nowPlayingStatus").mockResolvedValue({ supported: false, track: null });
+    fireEvent.contextMenu(gear());
+    const row = await screen.findByRole("menuitemcheckbox", {
+      name: /^Share what I.m listening to/u,
+    });
+    expect(row).toHaveAttribute("aria-disabled", "true");
+    expect(
+      screen.getByRole("menuitem", { name: "About Share what I'm listening to" }),
+    ).toHaveAttribute("data-tooltip", "Not available on macOS");
+  });
+
+  describe("Beta group (FR-1.73)", () => {
     const header = () => screen.findByRole("menuitem", { name: "Beta" });
 
     it("is collapsed by default and expands and collapses", async () => {
@@ -875,13 +935,14 @@ describe("quick settings (FR-1.66)", () => {
       expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
     });
 
-    it("remembers the open state", async () => {
+    it("starts collapsed again on every open", async () => {
       await setup();
       fireEvent.contextMenu(gear());
       fireEvent.click(await header());
       fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
       fireEvent.click(gear());
-      expect(await header()).toHaveAttribute("aria-expanded", "true");
+      expect(await header()).toHaveAttribute("aria-expanded", "false");
+      expect(screen.queryByRole("menuitemcheckbox", { name: /^Positional audio/u })).toBeNull();
     });
 
     it("binds the three switches to the settings", async () => {

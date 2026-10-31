@@ -66,6 +66,8 @@ import { findOriginal, parseReply, quoteFor, replyOf, type ReplyQuote } from "./
 import { SAFE_LINK, sanitizeHtml } from "./sanitize";
 import { ImageMenu, type ImageMenuState } from "./ImageMenu";
 import { selectedText } from "./selectionText";
+import { revealDone, usePendingReveal } from "./reveal";
+import { CollapsedMessage } from "../blocking/CollapsedMessage";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -97,6 +99,10 @@ export interface MessageListProps {
   onReply?: ((quote: ReplyQuote) => void) | undefined;
   /** Identifies the conversation (and its server); a newly shown one draws its newest first. */
   listKey?: string;
+  /**
+   * Ids of messages from blocked users drawn collapsed (issue #140) until the user shows one.
+   */
+  collapsedIds?: ReadonlySet<string> | undefined;
 }
 
 /** Messages drawn when a conversation is shown, and drawn more each time the user scrolls up. */
@@ -337,6 +343,7 @@ export function MessageList({
   linkPreviews = false,
   onReply,
   listKey = "",
+  collapsedIds,
 }: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
   // Own messages not confirmed yet show at the end, greyed (FR-2.74).
@@ -392,6 +399,8 @@ export function MessageList({
   const [copyNote, setCopyNote] = useState<string | null>(null);
   // The original of a reply that was jumped to, highlighted for a moment.
   const [highlighted, setHighlighted] = useState<string | null>(null);
+  // Collapsed messages of blocked users the user chose to show.
+  const [shownBlocked, setShownBlocked] = useState<ReadonlySet<string>>(() => new Set());
   const serverLabel = useServers().servers.find((s) => s.id === shownServerId())?.label;
   const serverName = serverLabel ?? t("list.server");
   const imageLabel = t("reply.image");
@@ -636,7 +645,9 @@ export function MessageList({
 
   function reply(index: number) {
     const message = messages[index];
-    if (message && onReply) onReply(quoteFor(message, names[index] ?? "", imageLabel));
+    if (!message || !onReply) return;
+    if (collapsedIds?.has(message.id) === true && !shownBlocked.has(message.id)) return;
+    onReply(quoteFor(message, names[index] ?? "", imageLabel));
   }
 
   function jumpTo(index: number) {
@@ -761,6 +772,16 @@ export function MessageList({
   useEffect(() => {
     latest.current = { reply, openMenu, jumpTo, openViewer };
   });
+
+  // Another feature asked to show a message (notification centre, #143): jump once it is here.
+  const reveal = usePendingReveal();
+  useEffect(() => {
+    if (reveal === null) return;
+    const index = messages.findIndex((message) => message.id === reveal);
+    if (index < 0) return;
+    latest.current.jumpTo(index);
+    revealDone(reveal);
+  }, [reveal, messages]);
   const itemActions = useMemo<MessageItemActions>(
     () => ({
       setRef: (index, element) => {
@@ -777,6 +798,9 @@ export function MessageList({
       },
       onImageClick: (image, opener) => {
         latest.current.openViewer(image, opener);
+      },
+      showBlocked: (id) => {
+        setShownBlocked((before) => new Set(before).add(id));
       },
     }),
     [],
@@ -894,6 +918,9 @@ export function MessageList({
                   highlighted={highlighted === message.id}
                   canReply={onReply !== undefined}
                   original={originals[index] ?? null}
+                  collapsed={
+                    collapsedIds?.has(message.id) === true && !shownBlocked.has(message.id)
+                  }
                   actions={itemActions}
                 />
               ))}
@@ -1035,6 +1062,7 @@ interface MessageItemActions {
   openMenu: (index: number, event: ReactMouseEvent<HTMLLIElement>) => void;
   jumpTo: (index: number) => void;
   onImageClick: ImageClickHandler;
+  showBlocked: (id: string) => void;
 }
 
 interface MessageItemProps {
@@ -1060,6 +1088,8 @@ interface MessageItemProps {
   actions: MessageItemActions;
   /** Set while the own message is not confirmed: sending, or failed with a reason. */
   outgoing: OutgoingSend | null;
+  /** From a blocked user and not shown yet: only a placeholder with "Show" (issue #140). */
+  collapsed: boolean;
 }
 
 const MessageItem = memo(function MessageItem({
@@ -1079,6 +1109,7 @@ const MessageItem = memo(function MessageItem({
   highlighted,
   canReply,
   original,
+  collapsed,
   actions,
 }: MessageItemProps) {
   const t = useT("chat");
@@ -1089,12 +1120,15 @@ const MessageItem = memo(function MessageItem({
     },
     [actions, index],
   );
-  const onReply = canReply
-    ? () => {
-        actions.reply(index);
-      }
-    : null;
+  const onReply =
+    canReply && !collapsed
+      ? () => {
+          actions.reply(index);
+        }
+      : null;
   const onContextMenu = (event: ReactMouseEvent<HTMLLIElement>) => {
+    // A collapsed message offers nothing that would show or copy its text.
+    if (collapsed) return;
     actions.openMenu(index, event);
   };
   const onJump =
@@ -1103,7 +1137,7 @@ const MessageItem = memo(function MessageItem({
       : () => {
           actions.jumpTo(original);
         };
-  const mentioned = useIsMention(message);
+  const mentioned = useIsMention(message) && !collapsed;
   const sentAt = new Date(message.sentAt);
   const session = message.senderSession;
   const fromServer = message.senderName === "" && session === null && !message.own;
@@ -1168,7 +1202,26 @@ const MessageItem = memo(function MessageItem({
   );
 
   let row;
-  if (display === "compact") {
+  if (collapsed) {
+    // Nothing of the message itself, not even the name: only that one is hidden here.
+    row = (
+      <div className="chat-message__row">
+        {display === "cozy" && (
+          <div className="chat-message__gutter">
+            {start ? <Avatar name={senderName} src={avatar} /> : null}
+          </div>
+        )}
+        <div className="chat-message__content">
+          <CollapsedMessage
+            tabIndex={tabIndex}
+            onShow={() => {
+              actions.showBlocked(message.id);
+            }}
+          />
+        </div>
+      </div>
+    );
+  } else if (display === "compact") {
     row = (
       <div className="chat-message__row">
         {stamp("chat-message__time")} {sender}{" "}

@@ -720,5 +720,22 @@
     "revoke": "Revocar",
     "revokeLabel": "Revocar la conversación aceptada con {{name}}",
     "revokeFailed": "No se pudo revocar. Inténtalo de nuevo."
+  },
+  "blocked": {
+    "title": "Usuarios bloqueados",
+    "hint": "Los bloqueos se guardan solo en este equipo. Los usuarios bloqueados están silenciados para ti y se ignoran sus mensajes y datos de Mumcord.",
+    "empty": "No has bloqueado a nadie.",
+    "user": "Usuario",
+    "server": "Servidor",
+    "since": "Bloqueado desde",
+    "actions": "Acciones",
+    "unblock": "Desbloquear",
+    "unblockLabel": "Desbloquear a {{name}}",
+    "unblockFailed": "No se pudo desbloquear. Inténtalo de nuevo.",
+    "messagesTitle": "Mensajes bloqueados en el chat del canal",
+    "collapse": "Contraerlos",
+    "collapseHint": "Muestra «Mensaje de un usuario bloqueado» con un botón «Mostrar».",
+    "hide": "Ocultarlos por completo",
+    "hideHint": "No se muestra nada en el chat."
   }
 }

@@ -97,10 +97,14 @@
     "dnd": "Nie przeszkadzać",
     "dndHint": "Wycisza dźwięki i banery powiadomień",
     "dndSystemHint": "Włączone przez tryb Nie przeszkadzać pulpitu",
-    "privateMessages": "Wiadomości prywatne od",
+    "privateMessages": "Wiadomości od",
     "pm_everyone": "Wszystkich",
     "pm_friendsOnly": "Znajomych",
-    "pm_nobody": "Nikogo"
+    "pm_nobody": "Nikogo",
+    "notifications": "Powiadomienia",
+    "sharing": "Udostępnianie",
+    "appearance": "Wygląd",
+    "account": "Konto"
   },
   "voice": {
     "line": "Głos: {{channel}} · {{server}}",

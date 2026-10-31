@@ -325,7 +325,6 @@
     "requestMetaMessages": "{{server}} · poslal(a) ti správy · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokovať",
-    "blockLater": "Blokovanie zatiaľ nie je dostupné.",
     "showMore_one": "Zobraziť ďalšiu {{count}} žiadosť",
     "showMore_few": "Zobraziť ďalšie {{count}} žiadosti",
     "showMore_many": "Zobraziť ďalších {{count}} žiadosti",

@@ -311,7 +311,6 @@
     "requestMetaMessages": "{{server}} · har skickat meddelanden till dig · {{time}}",
     "quote": "”{{text}}”",
     "block": "Blockera",
-    "blockLater": "Blockering är inte tillgänglig ännu.",
     "showMore_one": "Visa {{count}} förfrågan till",
     "showMore_other": "Visa {{count}} förfrågningar till",
     "showFewer": "Visa färre förfrågningar",

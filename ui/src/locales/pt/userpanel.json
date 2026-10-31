@@ -97,10 +97,14 @@
     "dnd": "Não incomodar",
     "dndHint": "Silencia sons e faixas de notificação",
     "dndSystemHint": "Ativado pelo Não incomodar do ambiente de trabalho",
-    "privateMessages": "Mensagens privadas de",
+    "privateMessages": "Mensagens de",
     "pm_everyone": "Todos",
     "pm_friendsOnly": "Amigos",
-    "pm_nobody": "Ninguém"
+    "pm_nobody": "Ninguém",
+    "notifications": "Notificações",
+    "sharing": "Partilha",
+    "appearance": "Aspeto",
+    "account": "Conta"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",

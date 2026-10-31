@@ -112,5 +112,28 @@
     "message": "Käyttäjän {{name}} täytyy lähettää uusi viestipyyntö, ennen kuin hänen viestinsä tulevat taas perille. Keskusteluhistoria säilyy.",
     "confirm": "Peru",
     "failed": "Keskustelusuostumuksen peruminen epäonnistui. Yritä uudelleen."
+  },
+  "block": {
+    "menu": "Estä…",
+    "unblock": "Poista esto",
+    "title": "Estetäänkö {{name}}?",
+    "onServer": "palvelimella {{server}}",
+    "whatHappens": "Mitä tapahtuu",
+    "private": "Käyttäjän {{name}} yksityisviestejä ei näytetä, eivätkä ne ilmoita sinulle.",
+    "channelCollapsed": "Käyttäjän {{name}} kanavaviestit on tiivistetty. Voit silti avata ne.",
+    "channelHidden": "Käyttäjän {{name}} kanavaviestit on piilotettu.",
+    "voice": "{{name}} on mykistetty sinulta puheessa, myös kuiskaukset.",
+    "data": "Ei historian synkronointia, kutsuja tai muuta Mumcord-dataa käyttäjältä {{name}}.",
+    "followsCert": "Esto seuraa käyttäjän {{name}} varmennetta, joten uusi nimi ei kierrä sitä.",
+    "nameOnly": "Käyttäjällä {{name}} ei ole varmennetta, joten esto koskee vain tätä nimeä palvelimella {{server}}.",
+    "warning": "{{name}} voi yhä nähdä sinut ja lukea viestisi. Mumble ei voi estää sitä pelkästään sinun puolellasi. {{name}} ei saa tietoa estosta.",
+    "cancel": "Peruuta",
+    "confirm": "Estä {{name}}",
+    "done": "{{name}} on estetty.",
+    "failed": "Käyttäjän {{name}} estäminen epäonnistui. Yritä uudelleen.",
+    "badge": "Estetty",
+    "collapsed": "Viesti estetyltä käyttäjältä",
+    "show": "Näytä",
+    "showLabel": "Näytä viesti estetyltä käyttäjältä"
   }
 }

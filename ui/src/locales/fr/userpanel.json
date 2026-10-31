@@ -97,10 +97,14 @@
     "dnd": "Ne pas déranger",
     "dndHint": "Coupe les sons et bannières de notification",
     "dndSystemHint": "Activé par le mode Ne pas déranger de votre bureau",
-    "privateMessages": "Messages privés de",
+    "privateMessages": "Messages de",
     "pm_everyone": "Tout le monde",
     "pm_friendsOnly": "Amis",
-    "pm_nobody": "Personne"
+    "pm_nobody": "Personne",
+    "notifications": "Notifications",
+    "sharing": "Partage",
+    "appearance": "Apparence",
+    "account": "Compte"
   },
   "voice": {
     "line": "Vocal : {{channel}} · {{server}}",

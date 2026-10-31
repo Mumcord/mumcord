@@ -112,5 +112,28 @@
     "message": "{{name}} muss wieder eine Nachrichtenanfrage senden, bevor Nachrichten bei dir ankommen. Dein Chatverlauf bleibt erhalten.",
     "confirm": "Widerrufen",
     "failed": "Das Widerrufen der Chat-Zustimmung hat nicht geklappt. Bitte versuche es noch einmal."
+  },
+  "block": {
+    "menu": "Blockieren…",
+    "unblock": "Blockierung aufheben",
+    "title": "{{name}} blockieren?",
+    "onServer": "auf {{server}}",
+    "whatHappens": "Was passiert",
+    "private": "Private Nachrichten von {{name}} werden nicht angezeigt und benachrichtigen dich nicht.",
+    "channelCollapsed": "Kanalnachrichten von {{name}} sind eingeklappt. Du kannst sie weiterhin öffnen.",
+    "channelHidden": "Kanalnachrichten von {{name}} werden ausgeblendet.",
+    "voice": "{{name}} ist für dich im Sprachchat stummgeschaltet, auch beim Flüstern.",
+    "data": "Keine Verlaufssynchronisierung, Einladungen oder andere Mumcord-Daten von {{name}}.",
+    "followsCert": "Die Blockierung folgt dem Zertifikat von {{name}}, ein neuer Name umgeht sie also nicht.",
+    "nameOnly": "{{name}} hat kein Zertifikat, daher gilt die Blockierung nur für diesen Namen auf {{server}}.",
+    "warning": "{{name}} kann dich weiterhin sehen und deine Nachrichten lesen. Mumble bietet keine Möglichkeit, das nur auf deiner Seite zu verhindern. {{name}} wird nicht über die Blockierung informiert.",
+    "cancel": "Abbrechen",
+    "confirm": "{{name}} blockieren",
+    "done": "{{name}} ist blockiert.",
+    "failed": "{{name}} konnte nicht blockiert werden. Bitte versuche es erneut.",
+    "badge": "Blockiert",
+    "collapsed": "Nachricht eines blockierten Nutzers",
+    "show": "Anzeigen",
+    "showLabel": "Nachricht eines blockierten Nutzers anzeigen"
   }
 }

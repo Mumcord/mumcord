@@ -120,5 +120,28 @@
     "message": "{{name}} turės vėl išsiųsti žinutės užklausą, kad jo žinutės tave pasiektų. Pokalbio istorija lieka.",
     "confirm": "Atšaukti",
     "failed": "Nepavyko atšaukti pokalbio sutikimo. Bandyk dar kartą."
+  },
+  "block": {
+    "menu": "Blokuoti…",
+    "unblock": "Atblokuoti",
+    "title": "Blokuoti {{name}}?",
+    "onServer": "serveryje {{server}}",
+    "whatHappens": "Kas įvyksta",
+    "private": "Privačios {{name}} žinutės nerodomos ir tau nepranešama.",
+    "channelCollapsed": "{{name}} kanalo žinutės suskleistos. Vis tiek gali jas atidaryti.",
+    "channelHidden": "{{name}} kanalo žinutės paslėptos.",
+    "voice": "{{name}} tau nutildytas balse, įskaitant šnabždesius.",
+    "data": "Jokio istorijos sinchronizavimo, kvietimų ar kitų Mumcord duomenų iš {{name}}.",
+    "followsCert": "Blokavimas seka {{name}} sertifikatą, todėl naujas vardas jo neapeina.",
+    "nameOnly": "{{name}} neturi sertifikato, todėl blokavimas galioja tik šiam vardui serveryje {{server}}.",
+    "warning": "{{name}} vis dar gali tave matyti ir skaityti tavo žinutes. Mumble negali to sustabdyti tik tavo pusėje. {{name}} apie blokavimą nepranešama.",
+    "cancel": "Atšaukti",
+    "confirm": "Blokuoti {{name}}",
+    "done": "{{name}} užblokuotas.",
+    "failed": "Nepavyko užblokuoti {{name}}. Bandyk dar kartą.",
+    "badge": "Užblokuotas",
+    "collapsed": "Žinutė nuo užblokuoto naudotojo",
+    "show": "Rodyti",
+    "showLabel": "Rodyti žinutę nuo užblokuoto naudotojo"
   }
 }

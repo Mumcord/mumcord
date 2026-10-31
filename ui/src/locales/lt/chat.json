@@ -325,7 +325,6 @@
     "requestMetaMessages": "{{server}} · atsiuntė tau žinučių · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokuoti",
-    "blockLater": "Blokavimas dar nepasiekiamas.",
     "showMore_one": "Rodyti dar {{count}} prašymą",
     "showMore_few": "Rodyti dar {{count}} prašymus",
     "showMore_many": "Rodyti dar {{count}} prašymo",

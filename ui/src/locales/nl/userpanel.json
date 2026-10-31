@@ -97,10 +97,14 @@
     "dnd": "Niet storen",
     "dndHint": "Dempt meldingsgeluiden en -banners",
     "dndSystemHint": "Aan via Niet storen van je bureaublad",
-    "privateMessages": "Privéberichten van",
+    "privateMessages": "Berichten van",
     "pm_everyone": "Iedereen",
     "pm_friendsOnly": "Vrienden",
-    "pm_nobody": "Niemand"
+    "pm_nobody": "Niemand",
+    "notifications": "Meldingen",
+    "sharing": "Delen",
+    "appearance": "Weergave",
+    "account": "Account"
   },
   "voice": {
     "line": "Spraak: {{channel}} · {{server}}",

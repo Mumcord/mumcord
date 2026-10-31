@@ -318,7 +318,6 @@
     "requestMetaMessages": "{{server}} · t’a envoyé des messages · {{time}}",
     "quote": "« {{text}} »",
     "block": "Bloquer",
-    "blockLater": "Le blocage n’est pas encore disponible.",
     "showMore_one": "Afficher {{count}} demande de plus",
     "showMore_many": "Afficher {{count}} de demandes de plus",
     "showMore_other": "Afficher {{count}} demandes de plus",

@@ -97,10 +97,14 @@
     "dnd": "Ne ometaj",
     "dndHint": "Utišava zvukove i natpise obavijesti",
     "dndSystemHint": "Uključeno putem načina Ne ometaj vaše radne površine",
-    "privateMessages": "Privatne poruke od",
+    "privateMessages": "Poruke od",
     "pm_everyone": "Svi",
     "pm_friendsOnly": "Prijatelji",
-    "pm_nobody": "Nitko"
+    "pm_nobody": "Nitko",
+    "notifications": "Obavijesti",
+    "sharing": "Dijeljenje",
+    "appearance": "Izgled",
+    "account": "Račun"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",

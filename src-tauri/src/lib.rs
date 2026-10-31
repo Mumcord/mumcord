@@ -37,9 +37,9 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channel_audio, channels, chat, diagnostics, dropped, follow, friends, history,
-    identity, links, mumble_import, notifications as notify, people, pm_overview, pm_rules,
-    profile, servers, session, settings,
+    app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow, friends,
+    history, identity, links, mumble_import, notifications as notify, people, pm_overview,
+    pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -112,6 +112,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             pm_rules::chat_request_send,
             pm_rules::accepted_conversations,
             pm_rules::accepted_conversation_revoke,
+            blocking::blocked_users,
+            blocking::block_user,
+            blocking::block_cert,
+            blocking::unblock,
             pm_overview::private_conversations,
             pm_overview::pm_conversation_prefs,
             pm_overview::pm_conversation_set_pinned,
@@ -271,6 +275,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             friends::FriendsChanged,
             pm_rules::PmRequestsChanged,
             pm_rules::AcceptedConversationsChanged,
+            blocking::BlockedUsersChanged,
             pm_overview::PmConversationPrefsChanged,
             chat::MessageReceived,
             history::HistorySynced,
@@ -725,6 +730,10 @@ fn emit_engine_event(
         .emit(app),
         EngineEvent::AcceptedConversationsChanged(list) => pm_rules::AcceptedConversationsChanged {
             conversations: pm_rules::to_api_accepted(list),
+        }
+        .emit(app),
+        EngineEvent::BlockedUsersChanged(list) => blocking::BlockedUsersChanged {
+            users: blocking::to_api_blocked(list),
         }
         .emit(app),
         EngineEvent::PmConversationPrefsChanged(list) => pm_overview::PmConversationPrefsChanged {

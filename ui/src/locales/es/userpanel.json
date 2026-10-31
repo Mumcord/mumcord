@@ -97,10 +97,14 @@
     "dnd": "No molestar",
     "dndHint": "Silencia los sonidos y avisos de notificación",
     "dndSystemHint": "Activado por el modo No molestar de tu escritorio",
-    "privateMessages": "Mensajes privados de",
+    "privateMessages": "Mensajes de",
     "pm_everyone": "Todos",
     "pm_friendsOnly": "Amigos",
-    "pm_nobody": "Nadie"
+    "pm_nobody": "Nadie",
+    "notifications": "Notificaciones",
+    "sharing": "Compartir",
+    "appearance": "Apariencia",
+    "account": "Cuenta"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",

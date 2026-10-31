@@ -31,6 +31,7 @@ import { cachedSelector, sameValue } from "./cachedSelector";
 import { foldName, matchRange } from "./search";
 import { TreeContext, type TreeContextValue, type ValueStore } from "./treeContext";
 import { MumcordBadge } from "./MumcordBadge";
+import { BlockedBadge } from "../blocking/BlockedBadge";
 import { LiveAvatar, LiveBadge } from "../screenshare/LiveBadge";
 import {
   channelRowId,
@@ -530,6 +531,7 @@ const PersonRow = memo(function PersonTreeRow({ user, level }: { user: User; lev
             <Highlighted text={user.name} query={query} />
             {isSelf && <span className="tree-person__you"> {t("tree.you")}</span>}
             <MumcordBadge user={user} />
+            {!isSelf && <BlockedBadge user={user} />}
             <LiveBadge session={session} />
             {status.length > 0 && <span className="visually-hidden">, {status.join(", ")}</span>}
           </span>

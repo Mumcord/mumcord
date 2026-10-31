@@ -311,7 +311,6 @@
     "requestMetaMessages": "{{server}} · saatis sulle sõnumeid · {{time}}",
     "quote": "„{{text}}“",
     "block": "Blokeeri",
-    "blockLater": "Blokeerimine ei ole veel saadaval.",
     "showMore_one": "Kuva veel {{count}} taotlus",
     "showMore_other": "Kuva veel {{count}} taotlust",
     "showFewer": "Kuva vähem taotlusi",

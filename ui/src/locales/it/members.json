@@ -116,5 +116,28 @@
     "message": "{{name}} dovrà inviare una nuova richiesta di messaggio prima che i suoi messaggi ti arrivino di nuovo. La cronologia della chat resta.",
     "confirm": "Revoca",
     "failed": "Non è stato possibile revocare il consenso alla chat. Riprova."
+  },
+  "block": {
+    "menu": "Blocca…",
+    "unblock": "Sblocca",
+    "title": "Bloccare {{name}}?",
+    "onServer": "su {{server}}",
+    "whatHappens": "Cosa succede",
+    "private": "I messaggi privati di {{name}} non vengono mostrati e non ti inviano notifiche.",
+    "channelCollapsed": "I messaggi di canale di {{name}} sono compressi. Puoi comunque aprirli.",
+    "channelHidden": "I messaggi di canale di {{name}} sono nascosti.",
+    "voice": "{{name}} è silenziato per te nella voce, sussurri inclusi.",
+    "data": "Nessuna sincronizzazione della cronologia, nessun invito né altri dati Mumcord da {{name}}.",
+    "followsCert": "Il blocco segue il certificato di {{name}}, quindi un nuovo nome non lo aggira.",
+    "nameOnly": "{{name}} non ha un certificato, quindi il blocco vale solo per questo nome su {{server}}.",
+    "warning": "{{name}} può ancora vederti e leggere i tuoi messaggi. Mumble non ha modo di impedirlo solo dalla tua parte. {{name}} non viene avvisato del blocco.",
+    "cancel": "Annulla",
+    "confirm": "Blocca {{name}}",
+    "done": "{{name}} è bloccato.",
+    "failed": "Impossibile bloccare {{name}}. Riprova.",
+    "badge": "Bloccato",
+    "collapsed": "Messaggio di un utente bloccato",
+    "show": "Mostra",
+    "showLabel": "Mostra il messaggio di un utente bloccato"
   }
 }

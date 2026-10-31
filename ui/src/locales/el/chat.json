@@ -311,7 +311,6 @@
     "requestMetaMessages": "{{server}} · σου έστειλε μηνύματα · {{time}}",
     "quote": "«{{text}}»",
     "block": "Αποκλεισμός",
-    "blockLater": "Ο αποκλεισμός δεν είναι ακόμη διαθέσιμος.",
     "showMore_one": "Εμφάνιση {{count}} ακόμη αιτήματος",
     "showMore_other": "Εμφάνιση {{count}} ακόμη αιτημάτων",
     "showFewer": "Εμφάνιση λιγότερων αιτημάτων",
