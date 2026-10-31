@@ -358,6 +358,17 @@ pub enum P2pMode {
     Off,
 }
 
+/// The setup style chosen in the setup wizard (issue #159). Settings shows it as "Balanced" or
+/// "Balanced, customised" and counts the differences from the preset.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SetupPreset {
+    EverythingOn,
+    Balanced,
+    MaximumPrivacy,
+    Custom,
+}
+
 impl P2pMode {
     /// The snake_case name, as in the settings JSON; stored for per-server overrides.
     pub fn as_str(self) -> &'static str {
@@ -596,6 +607,8 @@ pub struct Settings {
     /// The version whose "What's new" the user has seen; `None` before the first start that
     /// knew about it.
     pub whats_new_seen: Option<String>,
+    /// The setup style chosen in the wizard (issue #159); `None` until the wizard stored one.
+    pub setup_preset: Option<SetupPreset>,
     /// The user had Epic 1's window overlay enabled before it was removed (FR-2.33). Derived once
     /// from the old record on first load, then persisted.
     pub legacy_window_overlay_enabled: bool,
@@ -674,6 +687,7 @@ impl Default for Settings {
             audio_device_notice: false,
             whats_new_auto: true,
             whats_new_seen: None,
+            setup_preset: None,
             legacy_window_overlay_enabled: false,
             private_messages: PrivateMessageSettings::default(),
             blocked_messages: BlockedMessages::default(),
@@ -822,6 +836,7 @@ mod tests {
         changed.audio_device_notice = true;
         changed.whats_new_auto = false;
         changed.whats_new_seen = Some("0.4.4".into());
+        changed.setup_preset = Some(SetupPreset::MaximumPrivacy);
         changed.enabled_plugins = vec!["gtav".into()];
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
@@ -967,6 +982,7 @@ mod tests {
         assert!(!loaded.window_overlay_notice_shown);
         assert!(loaded.whats_new_auto);
         assert_eq!(loaded.whats_new_seen, None);
+        assert_eq!(loaded.setup_preset, None);
         assert!(loaded.legacy_window_overlay_enabled);
     }
 

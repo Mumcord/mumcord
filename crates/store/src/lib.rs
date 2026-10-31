@@ -45,8 +45,8 @@ pub use settings::{
     GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, LogLevel,
     MAX_MAX_CONNECTED_SERVERS, MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS,
     MIN_VIDEO_DUCKING_PERCENT, NotificationMode, OverlayCorner, OwnVoice, P2pMode, PmRule,
-    PositionalSettings, PrivateMessageSettings, Settings, SoundSettings, TalkMode, Theme,
-    ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
+    PositionalSettings, PrivateMessageSettings, Settings, SetupPreset, SoundSettings, TalkMode,
+    Theme, ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

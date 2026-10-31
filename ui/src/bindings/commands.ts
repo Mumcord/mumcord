@@ -2506,11 +2506,21 @@ export type Settings = {
 	 *  that knew about it.
 	 */
 	whatsNewSeen: string | null,
+	/**
+	 *  The setup style chosen in the wizard (issue #159); `null` until the wizard stored one.
+	 *  Settings compares it with the current values ("Balanced, customised").
+	 */
+	setupPreset: SetupPreset | null,
 	/**  "Private messages from" (issue #141). */
 	privateMessages: PrivateMessageSettings,
 	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
 	blockedMessages: BlockedMessages,
 };
+
+/**  The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom. */
+export type SetupPreset = "everythingOn" | 
+/**  "Balanced (Recommended)". */
+"balanced" | "maximumPrivacy" | "custom";
 
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
 export type ShareStartBlock = {

@@ -303,6 +303,7 @@ const DEFAULT_SETTINGS: Settings = {
   windowOverlayNoticeShown: false,
   whatsNewAuto: true,
   whatsNewSeen: null,
+  setupPreset: null,
   privateMessages: {
     rule: "everyone",
     serverRules: [],
