@@ -179,11 +179,7 @@ export function SharerBar(): ReactNode {
           )}
         </div>
       )}
-      <button
-        type="button"
-        className="button button--danger"
-        onClick={stop}
-      >
+      <button type="button" className="button button--danger" onClick={stop}>
         {t("stop")}
       </button>
     </div>

@@ -215,9 +215,7 @@ function Chips({
 }): ReactNode {
   return (
     <span className="media-frame__chips">
-      <span
-        data-tooltip={t("resolution")}
-      >{dimension(shown.width, shown.height)}</span>
+      <span data-tooltip={t("resolution")}>{dimension(shown.width, shown.height)}</span>
       <span data-tooltip={t("frameRate")}>{`${String(shown.fps)} fps`}</span>
       <span data-tooltip={t("bitrate")}>{bitrate(shown.kbps)}</span>
       <span data-tooltip={t("path")}>{t(path === null ? "pathUnknown" : "pathDirect")}</span>

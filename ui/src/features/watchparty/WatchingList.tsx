@@ -39,7 +39,9 @@ export function WatchingList({
       {people.map((person) => {
         const report = party.positions.find((p) => p.session === person.session);
         const state =
-          report === undefined ? { kind: "unknown" as const } : syncState(report, positionMs, live.atMs, nowMs);
+          report === undefined
+            ? { kind: "unknown" as const }
+            : syncState(report, positionMs, live.atMs, nowMs);
         return (
           <li key={person.session} className="watch-list__person">
             <Avatar name={person.name} src={avatarOf(person)} size="sm" />
@@ -53,7 +55,9 @@ export function WatchingList({
                 <span className="visually-hidden">{t("media.host")}</span>
               </span>
             )}
-            <span className={`watch-list__state watch-list__state--${state.kind}`}>{stateLabel(t, state)}</span>
+            <span className={`watch-list__state watch-list__state--${state.kind}`}>
+              {stateLabel(t, state)}
+            </span>
           </li>
         );
       })}

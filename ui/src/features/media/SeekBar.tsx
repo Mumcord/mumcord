@@ -42,11 +42,7 @@ export function SeekBar({
 
   return (
     <div className="seek-bar" style={{ "--played": percent(played) } as CSSProperties}>
-      <div
-        className="seek-bar__buffer"
-        aria-hidden="true"
-        style={{ width: percent(buffered) }}
-      />
+      <div className="seek-bar__buffer" aria-hidden="true" style={{ width: percent(buffered) }} />
       <input
         type="range"
         className="seek-bar__input"

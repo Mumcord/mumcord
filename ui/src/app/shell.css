@@ -296,4 +296,3 @@
 .shell[data-page-open] > :not(.shell__servers, .shell__page) {
   display: none;
 }
-

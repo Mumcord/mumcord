@@ -41,7 +41,10 @@ export function MiniBar({
         {thumbnail}
       </span>
       <span className="mini-bar__text">
-        <span className="mini-bar__title" data-tooltip={typeof title === "string" ? title : undefined}>
+        <span
+          className="mini-bar__title"
+          data-tooltip={typeof title === "string" ? title : undefined}
+        >
           {title}
         </span>
         {progress !== undefined && <span className="mini-bar__progress">{progress}</span>}

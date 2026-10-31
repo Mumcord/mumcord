@@ -122,12 +122,22 @@ export function useWatchPlayer(
     const control = new PartySync({
       now: () => Date.now(),
       player: {
-        play: () => { post({ type: "play" }); },
-        pause: () => { post({ type: "pause" }); },
-        seekTo: (ms) => { post({ type: "seek", seconds: ms / 1000 }); },
+        play: () => {
+          post({ type: "play" });
+        },
+        pause: () => {
+          post({ type: "pause" });
+        },
+        seekTo: (ms) => {
+          post({ type: "seek", seconds: ms / 1000 });
+        },
       },
-      send: (command) => { optionsRef.current.onCommand(command); },
-      ended: (entry) => { optionsRef.current.onEnded(entry); },
+      send: (command) => {
+        optionsRef.current.onCommand(command);
+      },
+      ended: (entry) => {
+        optionsRef.current.onEnded(entry);
+      },
     });
     syncRef.current = control;
     control.update(liveRef.current);
@@ -208,26 +218,23 @@ export function useWatchPlayer(
     postRef.current(toPlayer);
     syncRef.current?.act(command);
   }, []);
-  const play = useCallback(
-    () => { act({ kind: "play", positionMs: localRef.current.ms }, { type: "play" }); },
-    [act],
-  );
-  const pause = useCallback(
-    () => { act({ kind: "pause", positionMs: localRef.current.ms }, { type: "pause" }); },
-    [act],
-  );
+  const play = useCallback(() => {
+    act({ kind: "play", positionMs: localRef.current.ms }, { type: "play" });
+  }, [act]);
+  const pause = useCallback(() => {
+    act({ kind: "pause", positionMs: localRef.current.ms }, { type: "pause" });
+  }, [act]);
   const seekTo = useCallback(
-    (ms: number) => { act({ kind: "seek", positionMs: ms }, { type: "seek", seconds: ms / 1000 }); },
+    (ms: number) => {
+      act({ kind: "seek", positionMs: ms }, { type: "seek", seconds: ms / 1000 });
+    },
     [act],
   );
-  const setVolume = useCallback(
-    (level: number) => {
-      setLevel(level);
-      const command = userVolumeCommand(level);
-      if (command !== null) postRef.current(command);
-    },
-    [],
-  );
+  const setVolume = useCallback((level: number) => {
+    setLevel(level);
+    const command = userVolumeCommand(level);
+    if (command !== null) postRef.current(command);
+  }, []);
 
   return {
     pageUrl,

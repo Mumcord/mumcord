@@ -36,7 +36,10 @@ describe("sync state", () => {
 
   it("names a player that is behind", () => {
     expect(syncState(report, 12000, 0, 0)).toEqual({ kind: "behind", seconds: 4 });
-    expect(syncState({ ...report, positionMs: 20000 }, 12000, 0, 0)).toEqual({ kind: "ahead", seconds: 8 });
+    expect(syncState({ ...report, positionMs: 20000 }, 12000, 0, 0)).toEqual({
+      kind: "ahead",
+      seconds: 8,
+    });
   });
 
   it("shows buffering first, and nothing for a report that is too old", () => {

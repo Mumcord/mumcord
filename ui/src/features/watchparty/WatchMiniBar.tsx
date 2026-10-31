@@ -26,7 +26,10 @@ export function WatchMiniBar({ serverId }: { serverId: number }): ReactNode {
   if (!view.mini.watch || live === null || !live.party.joined) return null;
   const title = preview?.title ?? tp("playlist.videoTitle");
   const state = live.party.positions.find((p) => p.session === live.party.host);
-  const sync = state === undefined ? { kind: "unknown" as const } : syncState(state, positionAt(live, nowMs), live.atMs, nowMs);
+  const sync =
+    state === undefined
+      ? { kind: "unknown" as const }
+      : syncState(state, positionAt(live, nowMs), live.atMs, nowMs);
 
   return (
     <MiniBar

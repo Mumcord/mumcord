@@ -106,15 +106,23 @@ export function WatchPartyPanel({ serverId, channelId }: { serverId: number; cha
           ]}
           active={view.tab}
           onSelect={(id) => {
-          if (id === "playlist" || id === "watching") setTab(id);
-        }}
+            if (id === "playlist" || id === "watching") setTab(id);
+          }}
         >
           <button type="button" className="button" onClick={leave}>
             {t("leave")}
           </button>
-          {view.tab === "watching"
-            ? <WatchingList serverId={serverId} live={live} users={users} selfSession={selfSession} nowMs={nowMs} />
-            : <Playlist serverId={serverId} party={party} users={users} paste />}
+          {view.tab === "watching" ? (
+            <WatchingList
+              serverId={serverId}
+              live={live}
+              users={users}
+              selfSession={selfSession}
+              nowMs={nowMs}
+            />
+          ) : (
+            <Playlist serverId={serverId} party={party} users={users} paste />
+          )}
         </MediaPanel>
       </section>
     );

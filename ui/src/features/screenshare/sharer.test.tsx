@@ -90,13 +90,17 @@ describe("sharer control bar", () => {
     const call = vi.spyOn(api, "screenShareSetPaused");
     fireEvent.click(screen.getByRole("button", { name: "Pause" }));
     expect(call).toHaveBeenCalledWith(1, true);
-    await vi.waitFor(() => expect(screen.getByRole("status", { name: BAR_NAME })).toHaveTextContent("Paused"));
+    await vi.waitFor(() =>
+      expect(screen.getByRole("status", { name: BAR_NAME })).toHaveTextContent("Paused"),
+    );
   });
 
   it("stop ends the share and the bar is the entry point again", async () => {
     render(<SharerBar />);
     await api.screenShareStart(1, false);
     fireEvent.click(screen.getByRole("button", { name: "Stop sharing" }));
-    await vi.waitFor(() => expect(screen.getByRole("button", { name: /^Share screen/ })).toBeInTheDocument());
+    await vi.waitFor(() =>
+      expect(screen.getByRole("button", { name: /^Share screen/ })).toBeInTheDocument(),
+    );
   });
 });

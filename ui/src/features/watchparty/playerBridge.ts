@@ -68,7 +68,8 @@ export function parseBridgeReport(data: unknown): BridgeReport | null {
     case "error":
       return { type: "error", code: isNumber(data.code) ? data.code : 0 };
     case "meta":
-      return isNumber(data.seconds) && (data.bufferedSeconds === null || isNumber(data.bufferedSeconds))
+      return isNumber(data.seconds) &&
+        (data.bufferedSeconds === null || isNumber(data.bufferedSeconds))
         ? { type: "meta", seconds: data.seconds, bufferedSeconds: data.bufferedSeconds ?? null }
         : null;
     default:

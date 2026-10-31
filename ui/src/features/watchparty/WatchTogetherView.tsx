@@ -44,7 +44,9 @@ export function WatchTogetherView({ serverId }: { serverId: number }): ReactNode
 function useTick(ms: number): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    const timer = window.setInterval(() => { setNow(Date.now()); }, ms);
+    const timer = window.setInterval(() => {
+      setNow(Date.now());
+    }, ms);
     return () => {
       window.clearInterval(timer);
     };
@@ -129,10 +131,16 @@ export function Cinema({
       if (player.state === PLAYING) player.pause();
       else player.play();
     },
-    seek: (seconds) => { player.seekTo(Math.max(0, player.positionMs + seconds * 1000)); },
-    mute: () => { player.setVolume(player.volume === 0 ? 1 : 0); },
+    seek: (seconds) => {
+      player.seekTo(Math.max(0, player.positionMs + seconds * 1000));
+    },
+    mute: () => {
+      player.setVolume(player.volume === 0 ? 1 : 0);
+    },
     fullscreen: toggle,
-    focus: () => { setFocus(!focus); },
+    focus: () => {
+      setFocus(!focus);
+    },
     escape: () => {
       if (fullscreen) exit();
       else if (focus) setFocus(false);
@@ -144,13 +152,17 @@ export function Cinema({
   const reportOf = (session: number) => party.positions.find((p) => p.session === session);
   const states: SyncState[] = party.participants.map((session) => {
     const report = reportOf(session);
-    return report === undefined ? { kind: "unknown" } : syncState(report, positionMs, live.atMs, nowMs);
+    return report === undefined
+      ? { kind: "unknown" }
+      : syncState(report, positionMs, live.atMs, nowMs);
   });
   const markers: SeekMarker[] = party.participants
     .filter((session) => session !== selfSession)
     .flatMap((session) => {
       const report = reportOf(session);
-      return report === undefined ? [] : [{ session, positionMs: report.positionMs, name: nameOf(session) }];
+      return report === undefined
+        ? []
+        : [{ session, positionMs: report.positionMs, name: nameOf(session) }];
     });
   const adder = party.playlist.find((entry) => entry.id === party.currentEntry);
   const control = party.lastAction?.session ?? party.skippedBy ?? null;
@@ -175,7 +187,9 @@ export function Cinema({
           <span className="media-frame__titles">
             <span className="media-frame__title">{title}</span>
             <span className="media-frame__sub">
-              {adder !== undefined ? t("playlist.addedBy", { name: nameOf(adder.addedBy) }) : t("someone")}
+              {adder !== undefined
+                ? t("playlist.addedBy", { name: nameOf(adder.addedBy) })
+                : t("someone")}
               {control !== null && ` · ${tc("media.inControl", { name: nameOf(control) })}`}
             </span>
           </span>
@@ -205,7 +219,11 @@ export function Cinema({
             <div className="media-frame__unavailable" role="status">
               <p>{t("cantPlay")}</p>
               <CodecHint
-                failure={player.youTubeError === null ? null : { kind: "youtube", code: player.youTubeError }}
+                failure={
+                  player.youTubeError === null
+                    ? null
+                    : { kind: "youtube", code: player.youTubeError }
+                }
                 className="watch-party__codec-hint"
               />
               <button
@@ -238,14 +256,24 @@ export function Cinema({
             durationMs={player.durationMs}
             bufferedMs={player.bufferedMs}
             markers={markers}
-            onSeek={(ms) => { player.seekTo(ms); }}
+            onSeek={(ms) => {
+              player.seekTo(ms);
+            }}
           />
-          <VolumeControl label={tc("media.volume")} level={player.volume} onSet={(level) => { player.setVolume(level); }} />
+          <VolumeControl
+            label={tc("media.volume")}
+            level={player.volume}
+            onSet={(level) => {
+              player.setVolume(level);
+            }}
+          />
           <span className="media-frame__time">{clockTime(player.positionMs / 1000)}</span>
           <span className="media-frame__action" data-tooltip={tc("media.syncedPlay")}>
             {party.lastAction === null
               ? tc("media.syncedPlay")
-              : t(`other.${party.lastAction.command.kind}`, { name: nameOf(party.lastAction.session) })}
+              : t(`other.${party.lastAction.command.kind}`, {
+                  name: nameOf(party.lastAction.session),
+                })}
           </span>
         </>
       }

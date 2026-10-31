@@ -51,7 +51,6 @@ export function VolumeControl({ label, level, onSet, meter = null }: VolumeContr
           style={{ width: `${String(Math.min(100, Math.round(meter * 100)))}%` }}
         />
       )}
-
     </div>
   );
 }
