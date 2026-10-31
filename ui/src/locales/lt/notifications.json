@@ -15,5 +15,60 @@
   "open": "Atidaryti pokalbį",
   "close": "Atmesti pranešimą",
   "mentionLine": "{{sender}} paminėjo tave: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Pranešimai",
+    "bellUnread_one": "Pranešimai, {{count}} neperskaitytas",
+    "bellUnread_few": "Pranešimai, {{count}} neperskaityti",
+    "bellUnread_many": "Pranešimai, {{count}} neperskaityto",
+    "bellUnread_other": "Pranešimai, {{count}} neperskaitytų",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Pažymėti viską kaip perskaitytą",
+    "filterLabel": "Rodyti pranešimus",
+    "filter": {
+      "all": "Visi",
+      "mentions": "Paminėjimai",
+      "requests": "Prašymai",
+      "invites": "Kvietimai"
+    },
+    "empty": "Viską peržiūrėjai.",
+    "unread": "Neperskaityta",
+    "dndOn": "Netrukdyti įjungta",
+    "dndOff": "Netrukdyti išjungta",
+    "settings": "Pranešimų nustatymai",
+    "someone": "Kažkas",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} tave paminėjo",
+    "mentionGroup": "{{name}} paminėjo visus",
+    "reply": "{{name}} atsakė į tavo žinutę",
+    "chatRequest": "{{name}} nori su tavimi kalbėtis",
+    "messageRequest": "Žinutės prašymas nuo {{name}}",
+    "messageRequestBody_one": "{{count}} žinutė iš standartinio Mumble kliento",
+    "messageRequestBody_few": "{{count}} žinutės iš standartinio Mumble kliento",
+    "messageRequestBody_many": "{{count}} žinutės iš standartinio Mumble kliento",
+    "messageRequestBody_other": "{{count}} žinučių iš standartinio Mumble kliento",
+    "invite": {
+      "watchParty": "{{name}} pakvietė tave į bendrą peržiūrą",
+      "screenShare": "{{name}} bendrina ekraną",
+      "card": "{{name}} atsiuntė tau kortelę",
+      "theme": "{{name}} pasidalijo tema su tavimi"
+    },
+    "connection": "{{server}} nepasiekiamas",
+    "type": {
+      "chatRequest": "Pokalbio prašymas",
+      "messageRequest": "Žinutės prašymas",
+      "invite": "Kvietimas",
+      "private": "Privati žinutė",
+      "connection": "Ryšys"
+    },
+    "accept": "Priimti",
+    "decline": "Atmesti",
+    "join": "Prisijungti",
+    "watch": "Žiūrėti",
+    "open": "Atidaryti",
+    "dismiss": "Paslėpti",
+    "dismissItem": "Paslėpti: {{title}}",
+    "failed": "Nepavyko. Bandyk dar kartą.",
+    "block": "Blokuoti"
+  }
 }

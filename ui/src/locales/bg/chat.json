@@ -313,7 +313,6 @@
     "requestMetaMessages": "{{server}} · ти изпрати съобщения · {{time}}",
     "quote": "„{{text}}“",
     "block": "Блокиране",
-    "blockLater": "Блокирането още не е налично.",
     "showMore_one": "Покажи още {{count}} заявка",
     "showMore_other": "Покажи още {{count}} заявки",
     "showFewer": "Покажи по-малко заявки",

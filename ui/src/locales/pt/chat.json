@@ -320,7 +320,6 @@
     "requestMetaMessages": "{{server}} · enviou-te mensagens · {{time}}",
     "quote": "«{{text}}»",
     "block": "Bloquear",
-    "blockLater": "O bloqueio ainda não está disponível.",
     "showMore_one": "Mostrar mais {{count}} pedido",
     "showMore_many": "Mostrar mais {{count}} de pedidos",
     "showMore_other": "Mostrar mais {{count}} pedidos",

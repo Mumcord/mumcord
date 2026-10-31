@@ -116,5 +116,28 @@
     "message": "{{name}} devra envoyer une nouvelle demande de message avant que ses messages vous parviennent à nouveau. Votre historique est conservé.",
     "confirm": "Retirer",
     "failed": "Le retrait du consentement au chat a échoué. Veuillez réessayer."
+  },
+  "block": {
+    "menu": "Bloquer…",
+    "unblock": "Débloquer",
+    "title": "Bloquer {{name}} ?",
+    "onServer": "sur {{server}}",
+    "whatHappens": "Ce qui se passe",
+    "private": "Les messages privés de {{name}} ne sont pas affichés et ne vous notifient pas.",
+    "channelCollapsed": "Les messages de canal de {{name}} sont repliés. Vous pouvez toujours les ouvrir.",
+    "channelHidden": "Les messages de canal de {{name}} sont masqués.",
+    "voice": "{{name}} est mis en sourdine pour vous en vocal, chuchotements compris.",
+    "data": "Aucune synchronisation d’historique, invitation ni autre donnée Mumcord de la part de {{name}}.",
+    "followsCert": "Le blocage suit le certificat de {{name}} : changer de pseudo ne le contourne donc pas.",
+    "nameOnly": "{{name}} n’a pas de certificat : le blocage s’applique donc uniquement à ce nom sur {{server}}.",
+    "warning": "{{name}} peut toujours vous voir et lire vos messages. Mumble ne permet pas de l’empêcher de votre seul côté. {{name}} n’est pas informé du blocage.",
+    "cancel": "Annuler",
+    "confirm": "Bloquer {{name}}",
+    "done": "{{name}} est bloqué.",
+    "failed": "Le blocage de {{name}} a échoué. Veuillez réessayer.",
+    "badge": "Bloqué",
+    "collapsed": "Message d’un utilisateur bloqué",
+    "show": "Afficher",
+    "showLabel": "Afficher le message d’un utilisateur bloqué"
   }
 }

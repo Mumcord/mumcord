@@ -718,5 +718,22 @@
     "revoke": "Atšaukti",
     "revokeLabel": "Atšaukti priimtą pokalbį su {{name}}",
     "revokeFailed": "Atšaukti nepavyko. Bandyk dar kartą."
+  },
+  "blocked": {
+    "title": "Užblokuoti naudotojai",
+    "hint": "Blokavimai saugomi tik šiame kompiuteryje. Užblokuoti naudotojai tau nutildyti, o jų žinutės ir Mumcord duomenys ignoruojami.",
+    "empty": "Nieko neužblokavai.",
+    "user": "Naudotojas",
+    "server": "Serveris",
+    "since": "Užblokuotas nuo",
+    "actions": "Veiksmai",
+    "unblock": "Atblokuoti",
+    "unblockLabel": "Atblokuoti {{name}}",
+    "unblockFailed": "Nepavyko atblokuoti. Bandyk dar kartą.",
+    "messagesTitle": "Užblokuotos žinutės kanalo pokalbyje",
+    "collapse": "Suskleisti jas",
+    "collapseHint": "Rodo „Žinutė nuo užblokuoto naudotojo“ su mygtuku „Rodyti“.",
+    "hide": "Visiškai paslėpti",
+    "hideHint": "Pokalbyje nieko nerodoma."
   }
 }

@@ -712,5 +712,22 @@
     "revoke": "Træk tilbage",
     "revokeLabel": "Træk den accepterede samtale med {{name}} tilbage",
     "revokeFailed": "Tilbagetrækningen mislykkedes. Prøv igen."
+  },
+  "blocked": {
+    "title": "Blokerede brugere",
+    "hint": "Blokeringer gemmes kun på denne computer. Blokerede brugere er slået fra for dig, og deres beskeder og Mumcord-data ignoreres.",
+    "empty": "Du har ikke blokeret nogen.",
+    "user": "Bruger",
+    "server": "Server",
+    "since": "Blokeret siden",
+    "actions": "Handlinger",
+    "unblock": "Fjern blokering",
+    "unblockLabel": "Fjern blokeringen af {{name}}",
+    "unblockFailed": "Det lykkedes ikke at fjerne blokeringen. Prøv igen.",
+    "messagesTitle": "Blokerede beskeder i kanalchatten",
+    "collapse": "Fold dem sammen",
+    "collapseHint": "Viser »Besked fra en blokeret bruger« med en knap, der hedder Vis.",
+    "hide": "Skjul dem helt",
+    "hideHint": "Intet vises i chatten."
   }
 }

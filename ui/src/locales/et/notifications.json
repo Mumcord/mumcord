@@ -11,5 +11,56 @@
   "open": "Ava vestlus",
   "close": "Sulge teavitus",
   "mentionLine": "{{sender}} mainis sind: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Teavitused",
+    "bellUnread_one": "Teavitused, {{count}} lugemata",
+    "bellUnread_other": "Teavitused, {{count}} lugemata",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Märgi kõik loetuks",
+    "filterLabel": "Kuva teavitused",
+    "filter": {
+      "all": "Kõik",
+      "mentions": "Mainimised",
+      "requests": "Taotlused",
+      "invites": "Kutsed"
+    },
+    "empty": "Kõik on loetud.",
+    "unread": "Lugemata",
+    "dndOn": "Ära sega on sees",
+    "dndOff": "Ära sega on väljas",
+    "settings": "Teavituste seaded",
+    "someone": "Keegi",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} mainis sind",
+    "mentionGroup": "{{name}} mainis kõiki",
+    "reply": "{{name}} vastas sinu sõnumile",
+    "chatRequest": "{{name}} tahab sinuga vestelda",
+    "messageRequest": "Sõnumitaotlus kasutajalt {{name}}",
+    "messageRequestBody_one": "{{count}} sõnum tavalisest Mumble’i kliendist",
+    "messageRequestBody_other": "{{count}} sõnumit tavalisest Mumble’i kliendist",
+    "invite": {
+      "watchParty": "{{name}} kutsus sind ühisvaatamisele",
+      "screenShare": "{{name}} jagab oma ekraani",
+      "card": "{{name}} saatis sulle kaardi",
+      "theme": "{{name}} jagas sinuga teemat"
+    },
+    "connection": "{{server}} ei ole kättesaadav",
+    "type": {
+      "chatRequest": "Vestlustaotlus",
+      "messageRequest": "Sõnumitaotlus",
+      "invite": "Kutse",
+      "private": "Privaatsõnum",
+      "connection": "Ühendus"
+    },
+    "accept": "Nõustu",
+    "decline": "Keeldu",
+    "join": "Liitu",
+    "watch": "Vaata",
+    "open": "Ava",
+    "dismiss": "Sulge",
+    "dismissItem": "Sulge: {{title}}",
+    "failed": "See ei õnnestunud. Proovi uuesti.",
+    "block": "Blokeeri"
+  }
 }

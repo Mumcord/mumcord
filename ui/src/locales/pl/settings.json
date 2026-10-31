@@ -718,5 +718,22 @@
     "revoke": "Cofnij",
     "revokeLabel": "Cofnij zaakceptowaną rozmowę z {{name}}",
     "revokeFailed": "Cofnięcie nie powiodło się. Spróbuj ponownie."
+  },
+  "blocked": {
+    "title": "Zablokowani użytkownicy",
+    "hint": "Blokady są przechowywane tylko na tym komputerze. Zablokowani użytkownicy są dla ciebie wyciszeni, a ich wiadomości i dane Mumcord są ignorowane.",
+    "empty": "Nie zablokowałeś nikogo.",
+    "user": "Użytkownik",
+    "server": "Serwer",
+    "since": "Zablokowany od",
+    "actions": "Akcje",
+    "unblock": "Odblokuj",
+    "unblockLabel": "Odblokuj użytkownika {{name}}",
+    "unblockFailed": "Nie udało się odblokować. Spróbuj ponownie.",
+    "messagesTitle": "Zablokowane wiadomości na czacie kanału",
+    "collapse": "Zwiń je",
+    "collapseHint": "Wyświetla „Wiadomość od zablokowanego użytkownika” z przyciskiem Pokaż.",
+    "hide": "Ukryj je całkowicie",
+    "hideHint": "Na czacie nic się nie wyświetla."
   }
 }

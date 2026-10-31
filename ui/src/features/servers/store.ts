@@ -359,6 +359,11 @@ export function useServers(): ServersState {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
+/** The current state outside React, e.g. for checks in event handlers. */
+export function getServersState(): ServersState {
+  return getSnapshot();
+}
+
 /** The user turned `@all` and `@channel` off for this server (issue #70). */
 export function groupMentionsMuted(serverId: number): boolean {
   return getSnapshot().servers.find((s) => s.id === serverId)?.groupMentionsMuted ?? false;

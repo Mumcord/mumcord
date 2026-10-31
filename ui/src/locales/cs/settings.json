@@ -718,5 +718,22 @@
     "revoke": "Odvolat",
     "revokeLabel": "Odvolat přijatou konverzaci s uživatelem {{name}}",
     "revokeFailed": "Odvolání se nepodařilo. Zkus to prosím znovu."
+  },
+  "blocked": {
+    "title": "Zablokovaní uživatelé",
+    "hint": "Blokování se ukládá jen v tomto počítači. Zablokovaní uživatelé jsou pro tebe ztlumeni a jejich zprávy a data z Mumcordu se ignorují.",
+    "empty": "Zatím nemáš nikoho zablokovaného.",
+    "user": "Uživatel",
+    "server": "Server",
+    "since": "Zablokován od",
+    "actions": "Akce",
+    "unblock": "Odblokovat",
+    "unblockLabel": "Odblokovat uživatele {{name}}",
+    "unblockFailed": "Odblokování se nezdařilo. Zkus to prosím znovu.",
+    "messagesTitle": "Zablokované zprávy v chatu kanálu",
+    "collapse": "Sbalit je",
+    "collapseHint": "Zobrazí „Zpráva od zablokovaného uživatele“ s tlačítkem Zobrazit.",
+    "hide": "Úplně je skrýt",
+    "hideHint": "V chatu se nezobrazí nic."
   }
 }

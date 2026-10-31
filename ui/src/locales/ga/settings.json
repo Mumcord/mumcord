@@ -721,5 +721,22 @@
     "revoke": "Cealaigh",
     "revokeLabel": "Cealaigh an comhrá glactha le {{name}}",
     "revokeFailed": "Theip ar an gcealú. Bain triail eile as."
+  },
+  "blocked": {
+    "title": "Úsáideoirí bactha",
+    "hint": "Coimeádtar bacanna ar an ríomhaire seo amháin. Tá úsáideoirí bactha balbhaithe duit agus déantar neamhaird dá dteachtaireachtaí agus dá sonraí Mumcord.",
+    "empty": "Níor bhac tú aon duine.",
+    "user": "Úsáideoir",
+    "server": "Freastalaí",
+    "since": "Bactha ó",
+    "actions": "Gníomhartha",
+    "unblock": "Díbhac",
+    "unblockLabel": "Díbhac {{name}}",
+    "unblockFailed": "Theip ar an díbhacadh. Bain triail eile as.",
+    "messagesTitle": "Teachtaireachtaí bactha i gcomhrá an chainéil",
+    "collapse": "Fill iad",
+    "collapseHint": "Taispeánann sé “Teachtaireacht ó úsáideoir bactha” le cnaipe Taispeáin.",
+    "hide": "Folaigh go hiomlán iad",
+    "hideHint": "Ní thaispeántar aon rud sa chomhrá."
   }
 }

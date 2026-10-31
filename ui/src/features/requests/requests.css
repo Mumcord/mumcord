@@ -271,7 +271,8 @@
   color: var(--color-danger);
 }
 
-.request-card__block[aria-disabled="true"] {
-  opacity: 0.55;
-  cursor: not-allowed;
+.request-card__block {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }

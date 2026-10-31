@@ -100,6 +100,17 @@ impl PrivateMessageSettings {
     }
 }
 
+/// How channel messages of blocked users are shown (issue #140, FR-3.98). They are still
+/// received; only the display changes.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BlockedMessages {
+    /// A collapsed line the user can open.
+    #[default]
+    Collapse,
+    Hide,
+}
+
 /// How chat messages are laid out (FR-1.48a, QA.25).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -503,6 +514,8 @@ pub struct Settings {
     pub legacy_window_overlay_enabled: bool,
     /// "Private messages from" (issue #141).
     pub private_messages: PrivateMessageSettings,
+    /// Channel messages of blocked users: collapsed or hidden (issue #140).
+    pub blocked_messages: BlockedMessages,
 }
 
 /// Default own bitrate cap in kbit/s: today's speech cap (FR-2.64).
@@ -574,6 +587,7 @@ impl Default for Settings {
             whats_new_seen: None,
             legacy_window_overlay_enabled: false,
             private_messages: PrivateMessageSettings::default(),
+            blocked_messages: BlockedMessages::default(),
         }
     }
 }

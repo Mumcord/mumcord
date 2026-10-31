@@ -715,5 +715,22 @@
     "revoke": "Atsaukt",
     "revokeLabel": "Atsaukt pieņemto sarunu ar {{name}}",
     "revokeFailed": "Atsaukšana neizdevās. Lūdzu, mēģini vēlreiz."
+  },
+  "blocked": {
+    "title": "Bloķētie lietotāji",
+    "hint": "Bloķēšanas tiek glabātas tikai šajā datorā. Bloķētie lietotāji tev ir apklusināti, un viņu ziņas un Mumcord dati tiek ignorēti.",
+    "empty": "Tu neesi nevienu bloķējis.",
+    "user": "Lietotājs",
+    "server": "Serveris",
+    "since": "Bloķēts kopš",
+    "actions": "Darbības",
+    "unblock": "Atbloķēt",
+    "unblockLabel": "Atbloķēt {{name}}",
+    "unblockFailed": "Neizdevās atbloķēt. Mēģini vēlreiz.",
+    "messagesTitle": "Bloķētās ziņas kanāla tērzēšanā",
+    "collapse": "Sakļaut tās",
+    "collapseHint": "Rāda „Ziņa no bloķēta lietotāja” ar pogu „Rādīt”.",
+    "hide": "Paslēpt pilnībā",
+    "hideHint": "Tērzēšanā nekas netiek rādīts."
   }
 }

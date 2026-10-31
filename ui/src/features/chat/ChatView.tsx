@@ -29,6 +29,7 @@ import { conversationInfo } from "./conversationInfo";
 import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
+import { useBlockedView } from "./blockedView";
 import { PinnedInfoBox, type PinnedBlock } from "./PinnedInfo";
 import { pinnedInfo } from "./pinnedInfoModel";
 import { descriptionKey, hideInfo, useHiddenHash, welcomeKey } from "./hiddenInfo";
@@ -71,11 +72,13 @@ interface ConversationChatProps {
 function ConversationChat({ conversation, renderHeaderActions }: ConversationChatProps) {
   const { t } = useTranslation("chat");
   const server = useServerState();
-  const log = useConversationLog(conversation);
-  const info = conversationInfo(server, conversation, log.messages);
+  const fullLog = useConversationLog(conversation);
+  const serverId = shownServerId();
+  const blocked = useBlockedView(fullLog, serverId, conversation);
+  const log = blocked.log;
+  const info = conversationInfo(server, conversation, fullLog.messages);
   const limits = useMemo(() => messageLimits(server.info), [server.info]);
   const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
-  const serverId = shownServerId();
   const channelKey = descriptionKey(serverId, pinnedChannelId ?? -1);
   const hiddenWelcome = useHiddenHash(welcomeKey(serverId));
   const hiddenDescription = useHiddenHash(channelKey);
@@ -249,6 +252,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         linkPreviews={linkPreviews}
         onReply={blockedReason === null ? setReplyTo : undefined}
         listKey={`${String(serverId)}:${JSON.stringify(conversation)}`}
+        collapsedIds={blocked.collapsedIds}
       />
       <Composer
         target={info.target}

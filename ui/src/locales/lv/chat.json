@@ -320,7 +320,6 @@
     "requestMetaMessages": "{{server}} · tev nosūtīja ziņojumus · {{time}}",
     "quote": "„{{text}}“",
     "block": "Bloķēt",
-    "blockLater": "Bloķēšana vēl nav pieejama.",
     "showMore_zero": "Rādīt vēl {{count}} pieprasījumu",
     "showMore_one": "Rādīt vēl {{count}} pieprasījumu",
     "showMore_other": "Rādīt vēl {{count}} pieprasījumus",
