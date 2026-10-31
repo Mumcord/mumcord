@@ -158,26 +158,17 @@
     "processing": "Obrada glasa",
     "noiseSuppression": "Suzbijanje šuma",
     "noiseSuppressionHint": "Filtrira pozadinsku buku poput tipkovnice i ventilatora.",
-    "noiseSuppressionBackend": "Backend za suzbijanje šuma",
-    "backendHint": {
-      "nnnoiseless": "Lagani AI: mala upotreba procesora, dobar za stalan pozadinski šum.",
-      "rnnoise": "Moderni AI: novija neuronska mreža, često čistija; dodaje oko 10 ms kašnjenja.",
-      "sonora": "Klasični DSP: bez neuronske mreže, malo opterećenja. Nema model govora, pa aktivacija glasa koristi detekciju razine."
+    "noiseChoice": {
+      "standard": "Standardno (lagano)",
+      "highQuality": "Visoka kvaliteta (beta, više CPU-a)",
+      "off": "Isključeno"
     },
-    "noBackendSettings": "Nema dodatnih postavki za ovaj backend.",
-    "noiseSuppressionLevel": "Snaga suzbijanja",
-    "levels": {
-      "low": "Nizak",
-      "moderate": "Srednji",
-      "high": "Visok",
-      "veryHigh": "Vrlo visok"
+    "noiseChoiceHint": {
+      "standard": "Malo opterećuje procesor; dobro za stalnu buku.",
+      "highQuality": "Noviji model koji uklanja više buke. Koristi oko tri puta više procesora i dodaje 10 ms kašnjenja.",
+      "off": "Mikrofon se šalje bez filtriranja."
     },
     "detectorHint": "Aktivacija glasa prepoznaje govor modelom RNNoise; on ne mijenja tvoj zvuk.",
-    "rnnoiseSource": "rnnoise-rs nije objavljen na crates.io. Mumcord ga već ima u svojoj build verziji, preuzet izravno s GitHuba na commitu {{commit}}, bez pregleda koda.",
-    "rnnoiseCost": "Košta oko 3× više procesora od nnnoiseless i dodaje jedan okvir (10 ms) kašnjenja.",
-    "rnnoiseConsent": "Prihvaćam da ova nepregledana biblioteka obrađuje moj mikrofon.",
-    "rnnoiseInactive": "Nije aktivno dok ne prihvatite.",
-    "processingIndependent": "Poništavanje jeke i Automatska glasnoća rade isto za svaki backend.",
     "echoCancellation": "Poništavanje jeke",
     "echoCancellationHint": "Sprječava da drugi čuju sami sebe kad koristiš zvučnike.",
     "autoGain": "Automatska glasnoća",

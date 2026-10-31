@@ -160,26 +160,17 @@
     "processing": "Ipproċessar tal-vuċi",
     "noiseSuppression": "Tneħħija tal-istorbju",
     "noiseSuppressionHint": "Jiffiltra l-istorbju fl-isfond bħal tastieri u fannijiet.",
-    "noiseSuppressionBackend": "Backend ta' tneħħija tal-istorbju",
-    "backendHint": {
-      "nnnoiseless": "AI ħafifa: użu baxx tal-proċessur, tajjeb għall-istorbju tal-isfond kostanti.",
-      "rnnoise": "AI moderna: network neuronali ġdid, spiss aktar nadif; iżda madwar 10 ms ta' dewmien.",
-      "sonora": "DSP tradizzjonali: ebda network neuronali, tagħbija baxxa. Mħax għandux model tal-kliem, għalhekk il-attivazzjoni tal-vuċi tuża sejbien tal-livell."
+    "noiseChoice": {
+      "standard": "Standard (ħafif)",
+      "highQuality": "Kwalità għolja (Beta, aktar CPU)",
+      "off": "Mitfi"
     },
-    "noBackendSettings": "Mhemm settings addizzjonali għal dan il-backend.",
-    "noiseSuppressionLevel": "Is-saħħa tat-tneħħija",
-    "levels": {
-      "low": "Baxx",
-      "moderate": "Modat",
-      "high": "Għoli",
-      "veryHigh": "Għoli ħafna"
+    "noiseChoiceHint": {
+      "standard": "Ftit użu tal-CPU; tajjeb għal storbju kostanti.",
+      "highQuality": "Mudell aktar ġdid li jneħħi aktar storbju. Juża madwar tliet darbiet aktar CPU u jżid dewmien ta' 10 ms.",
+      "off": "Il-mikrofonu tiegħek jintbagħat mingħajr filtru."
     },
     "detectorHint": "Il-attivazzjoni tal-vuċi ssib il-kliem bil-mudell RNNoise; ma jbiddilx l-awdjo tiegħek.",
-    "rnnoiseSource": "rnnoise-rs mhux ippubblikat fuq crates.io. Mumcord diġà għandhu fil-bini tiegħu, meħud direttament minn GitHub fil-commit {{commit}}, bla reviżjoni tal-kodiċi.",
-    "rnnoiseCost": "Jiswa madwar 3× aktar CPU minn nnnoiseless u jżied qafas (10 ms) ta' dewmien.",
-    "rnnoiseConsent": "Naqbel li din il-librerija mhux irriveduta taħdem fuq il-mikrofon tiegħi.",
-    "rnnoiseInactive": "Mhux attiv sakemm taqbel.",
-    "processingIndependent": "Il-Tneħħija tal-eku u l-Volum awtomatiku jaħdmu l-istess għal kull backend.",
     "echoCancellation": "Tneħħija tal-eku",
     "echoCancellationHint": "Iwaqqaf lill-oħrajn milli jisimgħu lilhom infushom meta tuża l-ispikers.",
     "autoGain": "Volum awtomatiku",

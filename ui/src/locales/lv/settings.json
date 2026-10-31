@@ -158,26 +158,17 @@
     "processing": "Balss apstrāde",
     "noiseSuppression": "Trokšņu slāpēšana",
     "noiseSuppressionHint": "Filtrē fona troksni, piemēram, tastatūras un ventilatorus.",
-    "noiseSuppressionBackend": "Trokšņu slāpēšanas backend",
-    "backendHint": {
-      "nnnoiseless": "Viegls AI: zems procesora patēriņš, labs pastāvīgam fona troksnim.",
-      "rnnoise": "Modern AI: jaunāks neironu tīkls, bieži tīrāks; pievieno aptuveni 10 ms kavējumu.",
-      "sonora": "Tradicionāls DSP: bez neironu tīkla, maza slodze. Tam nav runas modeļa, tāpēc balsa aktivizēšana izmanto līmeņa noteikšanu."
+    "noiseChoice": {
+      "standard": "Standarta (viegla)",
+      "highQuality": "Augsta kvalitāte (beta, vairāk CPU)",
+      "off": "Izslēgta"
     },
-    "noBackendSettings": "Šim backend nav papildu iestatījumu.",
-    "noiseSuppressionLevel": "Slāpēšanas stiprums",
-    "levels": {
-      "low": "Zems",
-      "moderate": "Mērens",
-      "high": "Augsts",
-      "veryHigh": "Ļoti augsts"
+    "noiseChoiceHint": {
+      "standard": "Maz noslogo procesoru; piemērota vienmērīgam troksnim.",
+      "highQuality": "Jaunāks modelis, kas noņem vairāk trokšņa. Izmanto aptuveni trīs reizes vairāk procesora un pievieno 10 ms aizkavi.",
+      "off": "Mikrofons tiek sūtīts bez filtrēšanas."
     },
     "detectorHint": "Balsa aktivizēšana atpazīst runu ar RNNoise modeli; tas nemaina tavu audio.",
-    "rnnoiseSource": "rnnoise-rs nav publicēts vietnē crates.io. Mumcord to jau iekļauj savā būvē, ņemot tieši no GitHub pie commita {{commit}}, bez koda pārskatīšanas.",
-    "rnnoiseCost": "Tas patērē apmēram 3× vairāk CPU nekā nnnoiseless un pievieno vienu kadru (10 ms) kavējumu.",
-    "rnnoiseConsent": "Es piekrītu, ka šī nepārskatītā bibliotēka apstrādā manu mikrofonu.",
-    "rnnoiseInactive": "Nav aktīvs, līdz tu apstiprināsi.",
-    "processingIndependent": "Atbalss slāpēšana un Automātiskais skaļums darbojas vienādi katram backend.",
     "echoCancellation": "Atbalss slāpēšana",
     "echoCancellationHint": "Neļauj citiem dzirdēt sevi, kad izmanto skaļruņus.",
     "autoGain": "Automātiskais skaļums",

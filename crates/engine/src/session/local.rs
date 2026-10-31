@@ -13,9 +13,8 @@ use mumcord_audio::dsp::{
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{ClientIdentity, ConnectConfig, ConnectError};
 use mumcord_store::{
-    Consent, Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, NoiseBackend,
-    NoiseSuppressionLevel, SavedServer, SecretStore, ServerId, Settings, TalkMode, UnixMillis,
-    VoiceActivation,
+    Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, NoiseBackend, SavedServer,
+    SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
 };
 
 use super::channel_audio::effective_settings;
@@ -33,24 +32,14 @@ const TEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
 pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_echo_cancellation(settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
-    // The backend is built here, on the settings thread, never in the audio path.
-    // `rnnoise-rs` is an unreviewed GitHub dependency, so it stays off until the user accepted it.
-    let backend = match settings.noise_suppression_backend {
-        NoiseBackend::Rnnoise if settings.noise_suppression_rnnoise_consent != Consent::Yes => {
-            DspBackend::Nnnoiseless
-        }
-        NoiseBackend::Nnnoiseless => DspBackend::Nnnoiseless,
-        NoiseBackend::Rnnoise => DspBackend::Rnnoise,
-        NoiseBackend::Sonora => DspBackend::Sonora,
-    };
+    // The backend is built here, on the settings thread, never in the audio path. Neither backend
+    // has a strength setting, so the level is the library default.
     controls.set_noise_backend(
-        backend,
-        match settings.noise_suppression_level {
-            NoiseSuppressionLevel::Low => DspSuppressionLevel::Low,
-            NoiseSuppressionLevel::Moderate => DspSuppressionLevel::Moderate,
-            NoiseSuppressionLevel::High => DspSuppressionLevel::High,
-            NoiseSuppressionLevel::VeryHigh => DspSuppressionLevel::VeryHigh,
+        match settings.noise_suppression_backend {
+            NoiseBackend::Standard => DspBackend::Nnnoiseless,
+            NoiseBackend::HighQuality => DspBackend::Rnnoise,
         },
+        DspSuppressionLevel::default(),
     );
     controls.set_auto_gain(settings.auto_gain);
     controls.set_input_gain_percent(settings.input_gain_percent);
@@ -872,21 +861,16 @@ mod tests {
         assert!(validated(&zero).is_err());
     }
 
-    /// `rnnoise-rs` reaches the client as an unreviewed GitHub dependency, so it must not run
-    /// before the user accepted it.
+    /// The two Settings choices (FR-3.65) select the two libraries.
     #[test]
-    fn the_unreviewed_backend_stays_off_until_the_user_accepts() {
+    fn standard_and_high_quality_select_their_backends() {
         let controls = DspControls::default();
-        let settings = Settings {
-            noise_suppression_backend: NoiseBackend::Rnnoise,
-            ..Settings::default()
-        };
-        apply_dsp(&controls, &settings);
+        apply_dsp(&controls, &Settings::default());
         assert_eq!(controls.noise_backend(), DspBackend::Nnnoiseless);
 
         let settings = Settings {
-            noise_suppression_rnnoise_consent: Consent::Yes,
-            ..settings
+            noise_suppression_backend: NoiseBackend::HighQuality,
+            ..Settings::default()
         };
         apply_dsp(&controls, &settings);
         assert_eq!(controls.noise_backend(), DspBackend::Rnnoise);

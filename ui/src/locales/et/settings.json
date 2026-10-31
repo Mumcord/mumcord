@@ -157,26 +157,17 @@
     "processing": "Hääle töötlus",
     "noiseSuppression": "Müravaigistus",
     "noiseSuppressionHint": "Filtreerib välja taustamüra, nagu klaviatuur ja ventilaatorid.",
-    "noiseSuppressionBackend": "Müravaigistuse meetod",
-    "backendHint": {
-      "nnnoiseless": "Kerge tehisintellekt: väike protsessori koormus, hea püsiva taustamüra jaoks.",
-      "rnnoise": "Uus tehisintellekt: uuem närvivõrgu, sageli puhtam; lisab umbes 10 ms viivlust.",
-      "sonora": "Klassikaline signaalitöötlus: ilma närvivõrguta, väike koormus. Sel pole jutumudelit, seega kõnetuvastus kasutab tasemetuvastust."
+    "noiseChoice": {
+      "standard": "Tavaline (kerge)",
+      "highQuality": "Kõrge kvaliteet (beeta, rohkem protsessorit)",
+      "off": "Väljas"
     },
-    "noBackendSettings": "Selle meetodi jaoks pole lisaseadeid.",
-    "noiseSuppressionLevel": "Vaigistuse tugevus",
-    "levels": {
-      "low": "Madal",
-      "moderate": "Keskmine",
-      "high": "Kõrge",
-      "veryHigh": "Väga kõrge"
+    "noiseChoiceHint": {
+      "standard": "Väike protsessorikoormus; sobib ühtlase müra jaoks.",
+      "highQuality": "Uuem mudel, mis eemaldab rohkem müra. Kasutab umbes kolm korda rohkem protsessorit ja lisab 10 ms viivitust.",
+      "off": "Mikrofoni heli saadetakse filtreerimata."
     },
     "detectorHint": "Kõnetuvastus tuvastab kõnet RNNoise'i mudeliga; see ei muuda sinu heli.",
-    "rnnoiseSource": "rnnoise-rs pole avaldatud cratesios. Mumcord sisaldab seda juba oma ehituses, otse GitHubist commitist {{commit}}, koodi kontrollimata.",
-    "rnnoiseCost": "See maksab umbes 3× rohkem protsessorit kui nnnoiseless ja lisab ühe raami (10 ms) viivlust.",
-    "rnnoiseConsent": "Nõustun, et seda kontrollimata raamatukogu kasutatakse minu mikrofonil.",
-    "rnnoiseInactive": "Pole aktiivne, kuni nõustud.",
-    "processingIndependent": "Kajasummutus ja Automaatne helitugevus töötavad iga meetodi jaoks samamoodi.",
     "echoCancellation": "Kajasummutus",
     "echoCancellationHint": "Takistab teistel iseennast kuulmast, kui kasutad kõlareid.",
     "autoGain": "Automaatne helitugevus",

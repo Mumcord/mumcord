@@ -157,26 +157,17 @@
     "processing": "Sprachverarbeitung",
     "noiseSuppression": "Rauschunterdrückung",
     "noiseSuppressionHint": "Filtert Hintergrundgeräusche wie Tastaturen und Lüfter heraus.",
-    "noiseSuppressionBackend": "Backend für Rauschunterdrückung",
-    "backendHint": {
-      "nnnoiseless": "Leichte KI: geringer CPU-Verbrauch, gut für gleichmäßigen Hintergrundlärm.",
-      "rnnoise": "Moderne KI: das neuere neuronale Netz, oft sauberer; es kommen etwa 10 ms Verzögerung dazu.",
-      "sonora": "Klassische Signalverarbeitung: kein neuronales Netz, geringer Aufwand. Sie hat kein Sprachmodell, deshalb nutzt die Sprachaktivierung die Pegelerkennung."
+    "noiseChoice": {
+      "standard": "Standard (leicht)",
+      "highQuality": "Hohe Qualität (Beta, mehr CPU)",
+      "off": "Aus"
     },
-    "noBackendSettings": "Für dieses Backend gibt es keine weiteren Einstellungen.",
-    "noiseSuppressionLevel": "Stärke der Unterdrückung",
-    "levels": {
-      "low": "Niedrig",
-      "moderate": "Mittel",
-      "high": "Hoch",
-      "veryHigh": "Sehr hoch"
+    "noiseChoiceHint": {
+      "standard": "Wenig CPU-Last; gut für gleichmäßige Geräusche.",
+      "highQuality": "Ein neueres Modell, das mehr Rauschen entfernt. Braucht etwa dreimal so viel CPU und fügt 10 ms Verzögerung hinzu.",
+      "off": "Dein Mikrofon wird ungefiltert gesendet."
     },
     "detectorHint": "Die Sprachaktivierung erkennt Sprache mit dem RNNoise-Modell; es ändert dein Audio nicht.",
-    "rnnoiseSource": "rnnoise-rs ist nicht auf crates.io veröffentlicht. Mumcord enthält es bereits in seinem Build, direkt aus GitHub von Commit {{commit}}, ohne Überprüfung des Codes.",
-    "rnnoiseCost": "Es kostet etwa 3× so viel CPU wie nnnoiseless und fügt einen Rahmen (10 ms) Verzögerung hinzu.",
-    "rnnoiseConsent": "Ich akzeptiere, dass diese ungeprüfte Bibliothek mein Mikrofon verarbeitet.",
-    "rnnoiseInactive": "Erst aktiv, nachdem du zustimmst.",
-    "processingIndependent": "Echounterdrückung und Automatische Lautstärke funktionieren für jedes Backend gleich.",
     "echoCancellation": "Echounterdrückung",
     "echoCancellationHint": "Verhindert, dass andere sich selbst hören, wenn du Lautsprecher nutzt.",
     "autoGain": "Automatische Lautstärke",

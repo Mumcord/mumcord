@@ -157,26 +157,17 @@
     "processing": "Stemverwerking",
     "noiseSuppression": "Ruisonderdrukking",
     "noiseSuppressionHint": "Filtert achtergrondgeluid zoals toetsenborden en ventilatoren.",
-    "noiseSuppressionBackend": "Backend voor ruisonderdrukking",
-    "backendHint": {
-      "nnnoiseless": "Lichte AI: laag CPU-gebruik, goed voor constante achtergrondruis.",
-      "rnnoise": "Moderne AI: nieuwer neuraal netwerk, vaak schoner; voegt ongeveer 10 ms vertraging toe.",
-      "sonora": "Traditionele DSP: geen neuraal netwerk, lage belasting. Het heeft geen spraakmodel, dus spraakactivering gebruikt de niveaudetectie."
+    "noiseChoice": {
+      "standard": "Standaard (licht)",
+      "highQuality": "Hoge kwaliteit (bèta, meer CPU)",
+      "off": "Uit"
     },
-    "noBackendSettings": "Er zijn geen extra instellingen voor deze backend.",
-    "noiseSuppressionLevel": "Sterkte van de onderdrukking",
-    "levels": {
-      "low": "Laag",
-      "moderate": "Medium",
-      "high": "Hoog",
-      "veryHigh": "Zeer hoog"
+    "noiseChoiceHint": {
+      "standard": "Lichte belasting voor de processor; goed voor constant geluid.",
+      "highQuality": "Een nieuwer model dat meer ruis verwijdert. Gebruikt ongeveer drie keer zoveel CPU en voegt 10 ms vertraging toe.",
+      "off": "Je microfoon wordt ongefilterd verstuurd."
     },
     "detectorHint": "Spraakactivering herkent spraak met het RNNoise-model; het verandert je audio niet.",
-    "rnnoiseSource": "rnnoise-rs is niet gepubliceerd op crates.io. Mumcord bevat het al in zijn build, rechtstreeks van GitHub bij commit {{commit}}, zonder code-review.",
-    "rnnoiseCost": "Het kost ongeveer 3× meer CPU dan nnnoiseless en voegt één frame (10 ms) vertraging toe.",
-    "rnnoiseConsent": "Ik accepteer dat deze ongecontroleerde bibliotheek mijn microfoon verwerkt.",
-    "rnnoiseInactive": "Niet actief totdat je accepteert.",
-    "processingIndependent": "Echo-onderdrukking en Automatisch volume werken voor elke backend hetzelfde.",
     "echoCancellation": "Echo-onderdrukking",
     "echoCancellationHint": "Voorkomt dat anderen zichzelf horen als je luidsprekers gebruikt.",
     "autoGain": "Automatisch volume",

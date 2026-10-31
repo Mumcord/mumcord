@@ -158,23 +158,14 @@ pub enum VoiceActivation {
     Manual,
 }
 
-/// Which local noise suppression backend processes the microphone (Settings → Voice).
+/// Which noise suppression runs while it is on (Settings → Voice, FR-3.65).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum NoiseBackend {
-    Nnnoiseless,
-    Rnnoise,
-    Sonora,
-}
-
-/// Aggressiveness of the `sonora-ns` backend; the neural backends have no settings.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
-#[serde(rename_all = "camelCase")]
-pub enum NoiseSuppressionLevel {
-    Low,
-    Moderate,
-    High,
-    VeryHigh,
+    /// "Standard (light)", the default.
+    Standard,
+    /// "High quality (Beta)".
+    HighQuality,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -421,12 +412,8 @@ pub struct Settings {
     pub input_device: Option<String>,
     pub output_device: Option<String>,
     pub noise_suppression: bool,
-    /// Selected noise suppression backend (default nnnoiseless).
+    /// Selected noise suppression (default Standard).
     pub noise_suppression_backend: NoiseBackend,
-    /// Aggressiveness of the sonora backend only; ignored by the neural backends.
-    pub noise_suppression_level: NoiseSuppressionLevel,
-    /// Acceptance of the unreviewed `rnnoise-rs` dependency (`yes` before that backend may run).
-    pub noise_suppression_rnnoise_consent: Consent,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     /// Manual microphone gain in percent, 0–200 (default 100).
@@ -552,17 +539,9 @@ impl Settings {
             output_device: s.output_device.clone(),
             noise_suppression: s.noise_suppression,
             noise_suppression_backend: match s.noise_suppression_backend {
-                store::NoiseBackend::Nnnoiseless => NoiseBackend::Nnnoiseless,
-                store::NoiseBackend::Rnnoise => NoiseBackend::Rnnoise,
-                store::NoiseBackend::Sonora => NoiseBackend::Sonora,
+                store::NoiseBackend::Standard => NoiseBackend::Standard,
+                store::NoiseBackend::HighQuality => NoiseBackend::HighQuality,
             },
-            noise_suppression_level: match s.noise_suppression_level {
-                store::NoiseSuppressionLevel::Low => NoiseSuppressionLevel::Low,
-                store::NoiseSuppressionLevel::Moderate => NoiseSuppressionLevel::Moderate,
-                store::NoiseSuppressionLevel::High => NoiseSuppressionLevel::High,
-                store::NoiseSuppressionLevel::VeryHigh => NoiseSuppressionLevel::VeryHigh,
-            },
-            noise_suppression_rnnoise_consent: s.noise_suppression_rnnoise_consent.into(),
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
             input_gain_percent: s.input_gain_percent,
@@ -683,17 +662,9 @@ impl Settings {
         s.output_device = self.output_device.clone().filter(|d| !d.is_empty());
         s.noise_suppression = self.noise_suppression;
         s.noise_suppression_backend = match self.noise_suppression_backend {
-            NoiseBackend::Nnnoiseless => store::NoiseBackend::Nnnoiseless,
-            NoiseBackend::Rnnoise => store::NoiseBackend::Rnnoise,
-            NoiseBackend::Sonora => store::NoiseBackend::Sonora,
+            NoiseBackend::Standard => store::NoiseBackend::Standard,
+            NoiseBackend::HighQuality => store::NoiseBackend::HighQuality,
         };
-        s.noise_suppression_level = match self.noise_suppression_level {
-            NoiseSuppressionLevel::Low => store::NoiseSuppressionLevel::Low,
-            NoiseSuppressionLevel::Moderate => store::NoiseSuppressionLevel::Moderate,
-            NoiseSuppressionLevel::High => store::NoiseSuppressionLevel::High,
-            NoiseSuppressionLevel::VeryHigh => store::NoiseSuppressionLevel::VeryHigh,
-        };
-        s.noise_suppression_rnnoise_consent = self.noise_suppression_rnnoise_consent.into();
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
         s.input_gain_percent = self.input_gain_percent.min(200);

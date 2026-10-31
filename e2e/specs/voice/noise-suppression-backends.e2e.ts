@@ -1,7 +1,7 @@
-// Noise suppression backends (spec 23, AC-23.5, AC-23.7, AC-23.8, AC-23.11): the settings UI offers
-// the three backends, only sonora-ns has its own strength setting, rnnoise-rs needs the user's
-// acceptance, and every backend has to lower noise while keeping the voice. The client reads the test
-// clip as its microphone through the file audio backend, so the bot records what the app sends.
+// Noise suppression (FR-3.65, AC-3.56, PR #126): Settings → Voice offers Standard (light), High
+// quality (Beta, more CPU) and Off, both backends have to lower noise while keeping the voice, and the
+// choice changes while the microphone runs. The client reads the test clip as its microphone through
+// the file audio backend, so the bot records what the app sends.
 // Voice activation is put on the manual threshold with the slider at its minimum and the automatic
 // volume off, so the recorded pauses show the suppressor instead of the gate or the gain.
 //
@@ -71,24 +71,24 @@ const SPEECH_TOLERANCE_DB = 6;
 async function openVoiceSettings(): Promise<void> {
   const overlay = await $(".overlay__dialog");
   if (!(await overlay.isDisplayed())) await openSettings();
-  // The backend, the strength and the acceptance live in the voice section. Clicking the tab keeps
-  // the run independent of where the keyboard focus currently is.
+  // The noise suppression choice lives in the voice section. Clicking the tab keeps the run
+  // independent of where the keyboard focus currently is.
   const tab = await $("button[id$='-tab-voice']");
   await tab.waitForDisplayed({ timeout: 30_000 });
   await tab.click();
-  await (await $("//label[contains(., 'Noise suppression backend')]")).waitForDisplayed({ timeout: 30_000 });
+  await (await $(NOISE_LABEL)).waitForDisplayed({ timeout: 30_000 });
 }
 
-async function backendBox() {
-  return $("//label[contains(., 'Noise suppression backend')]/following::button[@role='combobox'][1]");
+const NOISE_LABEL = "//label[normalize-space(.)='Noise suppression']";
+const STANDARD = "Standard (light)";
+const HIGH_QUALITY = "High quality (Beta, more CPU)";
+
+async function choiceBox() {
+  return $(`${NOISE_LABEL}/following::button[@role='combobox'][1]`);
 }
 
-async function levelBox() {
-  return $("//label[contains(., 'Suppression strength')]/following::button[@role='combobox'][1]");
-}
-
-async function backendValue(): Promise<string> {
-  return browser.execute((element: HTMLElement) => element.textContent, await backendBox());
+async function choiceValue(): Promise<string> {
+  return browser.execute((element: HTMLElement) => element.textContent, await choiceBox());
 }
 
 async function switchByText(text: string) {
@@ -99,7 +99,7 @@ async function switchByText(text: string) {
   return control;
 }
 
-async function pick(box: Awaited<ReturnType<typeof backendBox>>, text: string): Promise<void> {
+async function pick(box: Awaited<ReturnType<typeof choiceBox>>, text: string): Promise<void> {
   await box.click();
   const option = await $(`//div[@role='option' and contains(., '${text}')]`);
   await option.waitForDisplayed({ timeout: 10_000 });
@@ -123,15 +123,9 @@ async function sendContinuously(): Promise<void> {
   await browser.keys(["Home"]);
 }
 
-async function setSuppression(on: boolean): Promise<void> {
+async function choose(text: string): Promise<void> {
   await openVoiceSettings();
-  const control = await switchByText("Noise suppression");
-  if ((await control.isSelected()) !== on) await control.click();
-}
-
-async function selectBackend(text: string): Promise<void> {
-  await openVoiceSettings();
-  await pick(await backendBox(), text);
+  await pick(await choiceBox(), text);
 }
 
 /** Reconnects after an app restart; the server bar label can carry extra text. */
@@ -206,16 +200,14 @@ function levelsAt(received: Float32Array, offset: number, label: string): Levels
   return { speechDb: measured.speechDb, gapDb: measured.gapDb };
 }
 
-/** Records one run with `backend` selected. */
-async function measure(label: string, backend?: string): Promise<Levels> {
-  if (backend !== undefined) await selectBackend(backend);
+/** Records one run with the current choice. */
+async function measure(label: string): Promise<Levels> {
   const { received, lag } = await record(label, concat(silence(PREFIX), noisy, silence(8)), 45);
   return levelsAt(received, lag, label);
 }
 
 describe("noise suppression backends", () => {
   let off: Levels = { speechDb: 0, gapDb: 0 };
-  let refused: Levels = { speechDb: 0, gapDb: 0 };
   const sent = new Map<string, Levels>();
 
   before(async () => {
@@ -240,8 +232,6 @@ describe("noise suppression backends", () => {
     await sendContinuously();
     const gain = await switchByText("Automatic volume");
     if (await gain.isSelected()) await gain.click();
-    const suppression = await switchByText("Noise suppression");
-    if (await suppression.isSelected()) await suppression.click();
     await $("button.overlay__close").click();
     await connectFromEmptyState();
     await waitFor("[role='tree']", 30_000);
@@ -251,65 +241,26 @@ describe("noise suppression backends", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("shows nnnoiseless as the default and offers all three backends", async () => {
+  it("offers Standard, High quality (Beta) and Off with Standard selected", async () => {
     await openVoiceSettings();
-    expect(await backendValue()).toContain("nnnoiseless");
-    await (await backendBox()).click();
+    expect(await choiceValue()).toContain(STANDARD);
+    await (await choiceBox()).click();
     const labels = await (await $$("//div[@role='option']")).map((option) => option.getText());
-    expect(labels).toContain("nnnoiseless");
-    expect(labels).toContain("rnnoise-rs");
-    expect(labels).toContain("sonora-ns");
-  });
-
-  it("shows settings only for the backend that has them", async () => {
-    await openVoiceSettings();
-    for (const name of ["nnnoiseless", "rnnoise-rs"]) {
-      await selectBackend(name);
-      expect(await $$("//label[contains(., 'Suppression strength')]").then((l) => l.length)).toBe(0);
-    }
-    await selectBackend("sonora-ns");
-    expect(await (await levelBox()).isDisplayed()).toBe(true);
+    expect(labels).toEqual([STANDARD, HIGH_QUALITY, "Off"]);
+    await browser.keys(["Escape"]);
   });
 
   it("sends the audio unchanged while suppression is off", async () => {
-    await openVoiceSettings();
-    expect(await (await switchByText("Noise suppression")).isSelected()).toBe(false);
+    await choose("Off");
     off = await measure("off");
     expect(Math.abs(off.gapDb - input.gapDb)).toBeLessThan(4);
     expect(Math.abs(off.speechDb - input.speechDb)).toBeLessThan(SPEECH_TOLERANCE_DB);
   });
 
-  it("warns for rnnoise-rs and does not run it before the acceptance", async () => {
-    await setSuppression(true);
-    await selectBackend("rnnoise-rs");
-    const warning = await $("//p[contains(., 'rnnoise-rs')]");
-    await warning.scrollIntoView();
-    expect(await warning.isDisplayed()).toBe(true);
-    const consent = await switchByText("accept running this unreviewed");
-    expect(await consent.isSelected()).toBe(false);
-    const inactive = await $("//p[contains(., 'Not active until you accept')]");
-    await inactive.scrollIntoView();
-    expect(await inactive.isDisplayed()).toBe(true);
-    // The engine keeps the refused library out of the frame path, so the audio arrives through the
-    // nnnoiseless fallback. Which backend processes a refused frame is proven in the engine test
-    // (crates/engine/src/session/local.rs); here the settings gate is checked through the UI, and the
-    // run has to show a working suppressor. The nnnoiseless run below has to measure like this one.
-    refused = await measure("rnnoise-refused");
-    expect(refused.gapDb).toBeLessThan(off.gapDb - MIN_REDUCTION_DB);
-    expect(refused.speechDb).toBeGreaterThan(off.speechDb - SPEECH_TOLERANCE_DB);
-    await openVoiceSettings();
-    const again = await switchByText("accept running this unreviewed");
-    await again.click();
-    expect(await again.isSelected()).toBe(true);
-    expect(await (await $("//p[contains(., 'Not active until you accept')]")).isDisplayed()).toBe(false);
-  });
-
-  it("reduces noise with every backend and keeps the voice", async () => {
-    await setSuppression(true);
-    for (const name of ["nnnoiseless", "rnnoise-rs", "sonora-ns"]) {
-      await selectBackend(name);
-      if (name === "sonora-ns") await pick(await levelBox(), "Very high");
-      sent.set(name, await measure(name));
+  it("reduces noise with both backends and keeps the voice", async () => {
+    for (const name of [STANDARD, HIGH_QUALITY]) {
+      await choose(name);
+      sent.set(name, await measure(name === STANDARD ? "standard" : "high-quality"));
     }
     // How much a backend removes on its own is proven in crates/codec/src/dsp/tests.rs and, for
     // rnnoise-rs, in crates/engine/src/noise_backend.rs. Through the network path the encoder and the
@@ -319,25 +270,21 @@ describe("noise suppression backends", () => {
     for (const [name, levels] of sent) {
       expect(levels.gapDb).toBeLessThan(off.gapDb);
       expect(levels.speechDb).toBeGreaterThan(levels.gapDb);
-      if (name !== "rnnoise-rs") {
+      if (name === STANDARD) {
         expect(levels.speechDb).toBeGreaterThan(off.speechDb - SPEECH_TOLERANCE_DB);
         expect(levels.gapDb).toBeLessThan(off.gapDb - MIN_REDUCTION_DB);
       }
     }
-    // nnnoiseless measuring like the refused run shows that the refused run used the fallback.
-    expect(Math.abs((sent.get("nnnoiseless") as Levels).gapDb - refused.gapDb)).toBeLessThan(
-      RUN_TOLERANCE_DB,
-    );
   });
 
   it("changes the backend while the microphone keeps running", async () => {
-    // The strength stays on Very high, so the second copy measures like the sonora run above.
-    await selectBackend("sonora-ns");
-    await pick(await levelBox(), "Very high");
-    await selectBackend("nnnoiseless");
+    // Off with Standard as the last backend: choosing High quality in the pause switches the
+    // suppression on and the backend over in one step, without restarting the app.
+    await choose(STANDARD);
+    await choose("Off");
     // Two copies of the clip in one run, with a pause between them long enough for the switch to
-    // land in it: the first copy goes out with nnnoiseless, the second with sonora-ns, without
-    // restarting the app. Both are measured in the same run, so only the backend differs.
+    // land in it: the first copy goes out unsuppressed, the second with High quality. Both are
+    // measured in the same run, so only the choice differs.
     const pause = 24;
     const copyWindows = Math.floor(noisy.length / WINDOW);
     const twoCopies = concat(silence(PREFIX), noisy, silence(pause), noisy, silence(8));
@@ -351,19 +298,18 @@ describe("noise suppression backends", () => {
         const wait = (PREFIX + CLIP_SECONDS + 3) * 1000 - elapsed;
         if (wait > 0) await sleep(wait);
         await openVoiceSettings();
-        await pick(await backendBox(), "sonora-ns");
+        await pick(await choiceBox(), HIGH_QUALITY);
       },
       150,
     );
-    const start = lag;
-    const first = levelsAt(received, start, "switch first copy");
-    const second = levelsAt(received, start + copyWindows + pause * 100, "switch second copy");
-    // The two copies measure like the two backends, and they are further apart than the run noise:
-    // only a backend that changed while the chain was running can do that.
-    expect(Math.abs(first.gapDb - (sent.get("nnnoiseless") as Levels).gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
-    expect(Math.abs(second.gapDb - (sent.get("sonora-ns") as Levels).gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
-    expect(Math.abs(first.gapDb - second.gapDb)).toBeGreaterThan(2);
+    const first = levelsAt(received, lag, "switch first copy");
+    const second = levelsAt(received, lag + copyWindows + pause * 100, "switch second copy");
+    // The two copies measure like the off run and the High quality run, and the second is quieter:
+    // only a chain that changed while it was running can do that.
+    expect(Math.abs(first.gapDb - off.gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
+    expect(Math.abs(second.gapDb - (sent.get(HIGH_QUALITY) as Levels).gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
+    expect(second.gapDb).toBeLessThan(first.gapDb);
     await openVoiceSettings();
-    expect(await backendValue()).toContain("sonora-ns");
+    expect(await choiceValue()).toContain(HIGH_QUALITY);
   });
 });

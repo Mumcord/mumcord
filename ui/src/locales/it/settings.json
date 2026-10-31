@@ -158,26 +158,17 @@
     "processing": "Elaborazione della voce",
     "noiseSuppression": "Soppressione del rumore",
     "noiseSuppressionHint": "Filtra i rumori di fondo come tastiere e ventole.",
-    "noiseSuppressionBackend": "Backend di soppressione del rumore",
-    "backendHint": {
-      "nnnoiseless": "IA leggera: poco uso della CPU, adatta al rumore di fondo costante.",
-      "rnnoise": "IA moderna: rete neurale più recente, spesso più pulita; aggiunge circa 10 ms di ritardo.",
-      "sonora": "DSP classico: nessuna rete neurale, basso carico. Non ha un modello di voce, quindi l'attivazione vocale usa il rilevamento del livello."
+    "noiseChoice": {
+      "standard": "Standard (leggera)",
+      "highQuality": "Alta qualità (beta, più CPU)",
+      "off": "Disattivata"
     },
-    "noBackendSettings": "Non ci sono impostazioni aggiuntive per questo backend.",
-    "noiseSuppressionLevel": "Intensità della soppressione",
-    "levels": {
-      "low": "Basso",
-      "moderate": "Moderato",
-      "high": "Alto",
-      "veryHigh": "Molto alto"
+    "noiseChoiceHint": {
+      "standard": "Poco carico sulla CPU; adatta al rumore costante.",
+      "highQuality": "Un modello più recente che rimuove più rumore. Usa circa il triplo della CPU e aggiunge 10 ms di ritardo.",
+      "off": "Il microfono viene inviato senza filtri."
     },
     "detectorHint": "L'attivazione vocale riconosce il parlato con il modello RNNoise; non cambia il tuo audio.",
-    "rnnoiseSource": "rnnoise-rs non è pubblicato su crates.io. Mumcord lo include già nella sua build, preso direttamente da GitHub al commit {{commit}}, senza revisione del codice.",
-    "rnnoiseCost": "Costa circa 3× più CPU di nnnoiseless e aggiunge un frame (10 ms) di ritardo.",
-    "rnnoiseConsent": "Accetto che questa libreria non revisionata elabori il mio microfono.",
-    "rnnoiseInactive": "Non è attivo finché non accetti.",
-    "processingIndependent": "Cancellazione dell'eco e Volume automatico funzionano allo stesso modo per ogni backend.",
     "echoCancellation": "Cancellazione dell'eco",
     "echoCancellationHint": "Evita che gli altri sentano sé stessi quando usi gli altoparlanti.",
     "autoGain": "Volume automatico",

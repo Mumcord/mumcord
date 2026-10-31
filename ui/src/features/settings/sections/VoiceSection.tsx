@@ -4,7 +4,6 @@ import {
   getApi,
   toEngineError,
   type NoiseBackend,
-  type NoiseSuppressionLevel,
   type PttAvailability,
   type PttMouseStatus,
   type PttSession,
@@ -23,18 +22,9 @@ import type { SettingsSectionProps } from "./types";
 /** The command that adds the user to the `input` group (FR-1.21, AC-1.37). */
 const INPUT_GROUP_COMMAND = "sudo usermod -aG input $USER";
 
-/** The three local backends; the names are the library names, so they are not translated. */
-const BACKENDS: { value: NoiseBackend; label: string }[] = [
-  { value: "nnnoiseless", label: "nnnoiseless" },
-  { value: "rnnoise", label: "rnnoise-rs" },
-  { value: "sonora", label: "sonora-ns" },
-];
-
-/** Aggressiveness of `sonora-ns`; the neural backends expose no setting at all. */
-const LEVELS: NoiseSuppressionLevel[] = ["low", "moderate", "high", "veryHigh"];
-
-/** The commit `rnnoise-rs` is pinned to in Cargo.toml; the settings text names it. */
-const RNNOISE_COMMIT = "74b46b10";
+/** The noise suppression choices of FR-3.65 (Q1.13): one of the two backends, or off. */
+type NoiseChoice = NoiseBackend | "off";
+const NOISE_CHOICES: NoiseChoice[] = ["standard", "highQuality", "off"];
 
 /** Whether mouse buttons may be captured: natively, or on Wayland after opting in (QA.4). */
 function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolean {
@@ -46,6 +36,9 @@ function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolea
 /** Voice: talk mode with push-to-talk key capture, and the voice processing switches. */
 export function VoiceSection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
+  const noiseChoice: NoiseChoice = settings.noiseSuppression
+    ? settings.noiseSuppressionBackend
+    : "off";
   const [availability, setAvailability] = useState<PttAvailability | null>(null);
   const [mouseStatus, setMouseStatus] = useState<PttMouseStatus | null>(null);
   const [session, setSession] = useState<PttSession | null>(null);
@@ -206,64 +199,25 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
         />
       </Group>
       <Group title={t("voice.processing")}>
-        <Switch
-          label={t("voice.noiseSuppression")}
-          description={t("voice.noiseSuppressionHint")}
-          checked={settings.noiseSuppression}
-          onChange={(noiseSuppression) => {
-            update({ noiseSuppression });
-          }}
-        />
         <LabeledSelect
-          label={t("voice.noiseSuppressionBackend")}
-          value={settings.noiseSuppressionBackend}
-          options={BACKENDS.map((backend) => ({ value: backend.value, label: backend.label }))}
+          label={t("voice.noiseSuppression")}
+          value={noiseChoice}
+          options={NOISE_CHOICES.map((choice) => ({
+            value: choice,
+            label: t(`voice.noiseChoice.${choice}`),
+          }))}
           onChange={(value) => {
-            const backend = BACKENDS.find((option) => option.value === value);
-            if (backend) update({ noiseSuppressionBackend: backend.value });
+            const choice = NOISE_CHOICES.find((option) => option === value);
+            if (choice === "off") update({ noiseSuppression: false });
+            else if (choice) update({ noiseSuppression: true, noiseSuppressionBackend: choice });
           }}
         />
         <p className="settings-hint">
-          {t(`voice.backendHint.${settings.noiseSuppressionBackend}`)}
+          {t("voice.noiseSuppressionHint")} {t(`voice.noiseChoiceHint.${noiseChoice}`)}
         </p>
-        <p className="settings-hint">{t("voice.processingIndependent")}</p>
-        {settings.noiseSuppressionBackend === "sonora" ? (
-          <LabeledSelect
-            label={t("voice.noiseSuppressionLevel")}
-            value={settings.noiseSuppressionLevel}
-            options={LEVELS.map((level) => ({ value: level, label: t(`voice.levels.${level}`) }))}
-            onChange={(value) => {
-              const level = LEVELS.find((option) => option === value);
-              if (level) update({ noiseSuppressionLevel: level });
-            }}
-          />
-        ) : (
-          <p className="settings-hint">{t("voice.noBackendSettings")}</p>
+        {settings.talkMode === "voiceActivation" && !settings.noiseSuppression && (
+          <p className="settings-hint">{t("voice.detectorHint")}</p>
         )}
-        {settings.noiseSuppressionBackend === "rnnoise" && (
-          <>
-            <p className="settings-warning" role="status">
-              {t("voice.rnnoiseSource", { commit: RNNOISE_COMMIT })}
-            </p>
-            <p className="settings-hint">{t("voice.rnnoiseCost")}</p>
-            <Switch
-              label={t("voice.rnnoiseConsent")}
-              checked={settings.noiseSuppressionRnnoiseConsent === "yes"}
-              onChange={(accept) => {
-                update({ noiseSuppressionRnnoiseConsent: accept ? "yes" : "no" });
-              }}
-            />
-            {settings.noiseSuppressionRnnoiseConsent !== "yes" && (
-              <p className="settings-warning" role="status">
-                {t("voice.rnnoiseInactive")}
-              </p>
-            )}
-          </>
-        )}
-        {settings.talkMode === "voiceActivation" &&
-          (settings.noiseSuppressionBackend === "sonora" || !settings.noiseSuppression) && (
-            <p className="settings-hint">{t("voice.detectorHint")}</p>
-          )}
         <Switch
           label={t("voice.echoCancellation")}
           description={t("voice.echoCancellationHint")}

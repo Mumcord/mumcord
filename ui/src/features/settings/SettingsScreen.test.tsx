@@ -578,67 +578,51 @@ describe("Voice section", () => {
     });
   });
 
-  describe("noise suppression backends", () => {
-    it("offers the three local backends with nnnoiseless selected", async () => {
+  describe("noise suppression (FR-3.65)", () => {
+    it("offers Standard, High quality (Beta) and Off with Standard selected", async () => {
       await openSection("Voice");
-      const backend = await screen.findByRole("combobox", { name: "Noise suppression backend" });
-      expect(backend).toHaveTextContent("nnnoiseless");
-      expect(optionLabels(backend)).toEqual(["nnnoiseless", "rnnoise-rs", "sonora-ns"]);
+      const choice = await screen.findByRole("combobox", { name: "Noise suppression" });
+      expect(choice).toHaveTextContent("Standard (light)");
+      expect(optionLabels(choice)).toEqual([
+        "Standard (light)",
+        "High quality (Beta, more CPU)",
+        "Off",
+      ]);
     });
 
-    it("shows settings only for the backend that has them and saves the choice", async () => {
+    it("saves the choice and names the CPU cost of High quality", async () => {
       const update = vi.spyOn(api, "settingsUpdate");
       await openSection("Voice");
-      const backend = await screen.findByRole("combobox", { name: "Noise suppression backend" });
-      const noneText = "No additional settings available for this backend.";
-      expect(await screen.findByText(noneText)).toBeInTheDocument();
-      expect(screen.queryByRole("combobox", { name: "Suppression strength" })).toBeNull();
+      const choice = await screen.findByRole("combobox", { name: "Noise suppression" });
+      expect(screen.queryByText(/three times the CPU/)).toBeNull();
 
-      // sonora-ns is the only backend with a setting: its aggressiveness level.
-      chooseOption(backend, "sonora-ns");
+      chooseOption(choice, "High quality (Beta, more CPU)");
       await waitFor(() => {
         expect(update).toHaveBeenLastCalledWith(
-          expect.objectContaining({ noiseSuppressionBackend: "sonora" }),
+          expect.objectContaining({
+            noiseSuppression: true,
+            noiseSuppressionBackend: "highQuality",
+          }),
         );
       });
-      const level = await screen.findByRole("combobox", { name: "Suppression strength" });
-      expect(screen.queryByText(noneText)).toBeNull();
-      chooseOption(level, "High");
+      expect(await screen.findByText(/three times the CPU/)).toBeInTheDocument();
+
+      chooseOption(choice, "Off");
       await waitFor(() => {
         expect(update).toHaveBeenLastCalledWith(
-          expect.objectContaining({ noiseSuppressionLevel: "high" }),
+          expect.objectContaining({
+            noiseSuppression: false,
+            noiseSuppressionBackend: "highQuality",
+          }),
         );
       });
-    });
-    it("warns for rnnoise-rs only and keeps that backend off until the acceptance is given", async () => {
-      const update = vi.spyOn(api, "settingsUpdate");
-      await openSection("Voice");
-      const backend = await screen.findByRole("combobox", { name: "Noise suppression backend" });
-      expect(screen.queryByText(/not published on crates\.io/)).toBeNull();
-
-      chooseOption(backend, "rnnoise-rs");
-      expect(await screen.findByText(/not published on crates\.io/)).toBeInTheDocument();
-      expect(await screen.findByText(/74b46b10/)).toBeInTheDocument();
-      const consent = await screen.findByRole("switch", {
-        name: /accept running this unreviewed library/,
-      });
-      expect(consent).not.toBeChecked();
-      expect(await screen.findByText(/Not active until you accept/)).toBeInTheDocument();
-
-      fireEvent.click(consent);
-      await waitFor(() => {
-        expect(update).toHaveBeenLastCalledWith(
-          expect.objectContaining({ noiseSuppressionRnnoiseConsent: "yes" }),
-        );
-      });
-      expect(screen.queryByText(/Not active until you accept/)).toBeNull();
     });
   });
 
   describe("compatibility mode (FR-1.48)", () => {
     it("is hidden outside Linux Wayland", async () => {
       await openSection("Voice");
-      await screen.findByRole("switch", { name: /Noise suppression/ });
+      await screen.findByRole("combobox", { name: "Noise suppression" });
       expect(screen.queryByRole("switch", { name: /Compatibility mode/ })).not.toBeInTheDocument();
     });
 
@@ -825,13 +809,11 @@ describe("Voice section", () => {
   it("saves the voice processing switches", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Voice");
-    fireEvent.click(screen.getByRole("switch", { name: "Noise suppression" }));
     fireEvent.click(screen.getByRole("switch", { name: "Echo cancellation" }));
     fireEvent.click(screen.getByRole("switch", { name: "Automatic volume" }));
     await waitFor(() => {
       expect(update).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          noiseSuppression: false,
           echoCancellation: false,
           autoGain: false,
         }),
@@ -1406,11 +1388,11 @@ describe("Settings search", () => {
     expect(screen.getByRole("tablist", { hidden: true })).not.toBeVisible();
     const results = screen.getByRole("list", { name: "Search results" });
     fireEvent.click(within(results).getByRole("button", { name: "Voice › Noise suppression" }));
-    const toggle = await screen.findByRole("switch", { name: "Noise suppression" });
+    const choice = await screen.findByRole("combobox", { name: "Noise suppression" });
     await waitFor(() => {
-      expect(toggle).toHaveFocus();
+      expect(choice).toHaveFocus();
     });
-    expect(toggle.closest(".settings-switch")).toHaveClass("settings-highlight");
+    expect(choice.closest(".settings-control-row")).toHaveClass("settings-highlight");
     expect(search()).toHaveValue("");
     expect(screen.getByRole("tab", { name: "Voice" })).toHaveAttribute("aria-selected", "true");
   });

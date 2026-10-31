@@ -159,26 +159,17 @@
     "processing": "Zpracování hlasu",
     "noiseSuppression": "Potlačení šumu",
     "noiseSuppressionHint": "Odfiltruje zvuky na pozadí, jako jsou klávesnice a větráky.",
-    "noiseSuppressionBackend": "Backend potlačení šumu",
-    "backendHint": {
-      "nnnoiseless": "Lehká AI: nízká zátěž CPU, vhodná na stálý šum na pozadí.",
-      "rnnoise": "Moderní AI: novší neuronová síť, často čistší; přidává asi 10 ms zpoždění.",
-      "sonora": "Klasické DSP: bez neuronové sítě, nízká režie. Nemá model řeči, takže aktivace hlasu používá detekci úrovni."
+    "noiseChoice": {
+      "standard": "Standardní (lehké)",
+      "highQuality": "Vysoká kvalita (beta, více CPU)",
+      "off": "Vypnuto"
     },
-    "noBackendSettings": "Pro tento backend nejsou k dispozici žádná další nastavení.",
-    "noiseSuppressionLevel": "Síla potlačení",
-    "levels": {
-      "low": "Nízká",
-      "moderate": "Střední",
-      "high": "Vysoká",
-      "veryHigh": "Velmi vysoká"
+    "noiseChoiceHint": {
+      "standard": "Nenáročné na procesor; vhodné pro stálý šum.",
+      "highQuality": "Novější model, který odstraní více šumu. Využívá asi trojnásobek procesoru a přidává 10 ms zpoždění.",
+      "off": "Mikrofon se odesílá bez filtrování."
     },
     "detectorHint": "Aktivace hlasu detekuje řeč modelem RNNoise; ten nemění tvůj zvuk.",
-    "rnnoiseSource": "rnnoise-rs není publikován na crates.io. Mumcord ho už má ve své sestavené verzi, převzatý přímo z GitHubu na commitu {{commit}}, bez revize kódu.",
-    "rnnoiseCost": "Stojí asi 3× více CPU než nnnoiseless a přidává jeden rámec (10 ms) zpoždění.",
-    "rnnoiseConsent": "Přijímám, že tato nezrevizovaná knihovna zpracovává můj mikrofon.",
-    "rnnoiseInactive": "Není aktivní, dokud nepřijmete.",
-    "processingIndependent": "Potlačení ozvěny a Automatická hlasitost fungují stejně u každého backendu.",
     "echoCancellation": "Potlačení ozvěny",
     "echoCancellationHint": "Zabrání tomu, aby se ostatní slyšeli, když používáš reproduktory.",
     "autoGain": "Automatická hlasitost",

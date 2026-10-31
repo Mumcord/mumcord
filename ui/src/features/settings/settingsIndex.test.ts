@@ -70,10 +70,8 @@ describe("settings search index", () => {
       "appearanceEffects.visualEffects",
     ]);
     expect(labels(searchSettings("allow direct connections", t))).toContain("privacyDirect.allow");
-    // "GitHub" also finds the unreviewed rnnoise-rs backend, whose warning names where it comes from.
-    expect(labels(searchSettings("github", t))).toEqual(
-      expect.arrayContaining(["updates.check", "voice.rnnoiseConsent"]),
-    );
+    expect(labels(searchSettings("github", t))).toEqual(["updates.check"]);
+    expect(labels(searchSettings("high quality", t))).toEqual(["voice.noiseSuppression"]);
   });
 
   it("finds the history sharing switch (FR-1.60)", () => {
