@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Șoptește către…",
+    "noPermission": "Serverul nu permite șoptitul aici"
+  },
+  "banner": {
+    "whisper": "Șoptești către {{target}}",
+    "shout": "Strigi către {{target}}",
+    "releaseKey": "Doar oamenii de acolo te aud. Eliberează <key>{{key}}</key> ca să vorbești din nou în {{channel}}.",
+    "stopToReturn": "Doar oamenii de acolo te aud. Oprește ca să vorbești din nou în {{channel}}.",
+    "onlyThere": "Doar oamenii de acolo te aud.",
+    "stop": "Oprește"
+  },
+  "denied": {
+    "title": "Nu s-a putut șopti către {{target}}",
+    "noVoiceServer": "Intră mai întâi într-un canal: șoaptele trec prin serverul pe care vorbești.",
+    "muted": "Pornește microfonul ca să șoptești.",
+    "serverMuted": "Serverul ți-a dezactivat sunetul, deci nu transmite vocea ta.",
+    "nobodyHere": "Niciuna dintre aceste persoane nu este acum pe acest server.",
+    "channelNotFound": "Acest canal nu există pe acest server.",
+    "noPermission": "Serverul nu îți permite să șoptești în {{channel}}.",
+    "unknownTarget": "Această țintă nu mai există.",
+    "dismiss": "Închide"
+  },
+  "badge": {
+    "whisper": "șoptește",
+    "shout": "strigă",
+    "whisperLabel": "Îți șoptește",
+    "shoutLabel": "Strigă către canalul tău",
+    "ownWhisper": "șoptești",
+    "ownShout": "strigi",
+    "ownWhisperLabel": "Șoptești",
+    "ownShoutLabel": "Strigi"
+  },
+  "panel": {
+    "open": "Șoptește sau strigă",
+    "menu": "Ținte pentru șoapte și strigăte",
+    "manage": "Gestionează țintele…",
+    "none": "Încă nu există ținte",
+    "indicatorWhisper": "Șoptești către {{target}}",
+    "indicatorShout": "Strigi către {{target}}",
+    "stop": "Oprește"
+  }
+}

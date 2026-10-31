@@ -32,6 +32,11 @@
 //!   ways keeps the smallest context, so `LISTEN` only appears when listening is the only reason.
 //!
 //! So `via_listener` is "legacy target bits == 3" / "protobuf context == 3".
+//!
+//! # Whisper and shout (`whisper`)
+//! Audio sent to a voice target arrives with `SpeechFlags::Shout = 1` / `AudioContext::SHOUT`
+//! when a channel of the target reached us, and `Whisper = 2` / `AudioContext::WHISPER` when we
+//! were named directly (`Server::processMsg` in both versions).
 
 mod crypt;
 mod link;
@@ -65,6 +70,32 @@ const OVERSIZE_LOG_INTERVAL: Duration = Duration::from_secs(10);
 
 /// Legacy target / protobuf context value of audio delivered because we listen to the channel.
 const CONTEXT_LISTEN: u8 = 3;
+/// Context of audio that reached us through a channel of the speaker's voice target.
+const CONTEXT_SHOUT: u8 = 1;
+/// Context of audio whose voice target names us directly.
+const CONTEXT_WHISPER: u8 = 2;
+
+/// Highest voice target id a client may define; 0 is normal talking and 31 the server loopback.
+pub const VOICE_TARGET_MAX: u8 = 30;
+
+/// How a whisper or shout reached us.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WhisperKind {
+    /// The speaker's target names a channel we are in (or its sub-channels or links).
+    Shout,
+    /// The speaker's target names us.
+    Whisper,
+}
+
+impl WhisperKind {
+    fn from_context(context: u8) -> Option<Self> {
+        match context {
+            CONTEXT_SHOUT => Some(Self::Shout),
+            CONTEXT_WHISPER => Some(Self::Whisper),
+            _ => None,
+        }
+    }
+}
 
 /// One outgoing Opus packet.
 #[derive(Debug, Clone, PartialEq)]
@@ -93,6 +124,12 @@ impl OutgoingAudio {
         }
     }
 
+    /// The same packet sent to voice target `target` (0 = the own channel).
+    pub fn to_target(mut self, target: u8) -> Self {
+        self.target = target;
+        self
+    }
+
     /// The same packet carrying the sender's position.
     pub fn with_position(mut self, positional: Option<[f32; 3]>) -> Self {
         self.positional = positional;
@@ -113,6 +150,8 @@ pub struct VoicePacket {
     pub is_last: bool,
     /// The audio reaches us only because we listen to (follow) the speaker's channel.
     pub via_listener: bool,
+    /// Set when the speaker whispers or shouts to us instead of talking in a channel.
+    pub whisper: Option<WhisperKind>,
     pub positional: Option<[f32; 3]>,
     /// The path this packet arrived on.
     pub transport: Transport,
@@ -362,6 +401,7 @@ impl Worker {
             payload: audio.payload,
             is_last: audio.is_last,
             via_listener: audio.context == CONTEXT_LISTEN,
+            whisper: WhisperKind::from_context(audio.context),
             positional: audio.positional,
             transport,
         }));

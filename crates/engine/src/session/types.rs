@@ -550,6 +550,12 @@ pub enum EngineEvent {
         session: u32,
         sending: bool,
     },
+    /// A person started or stopped whispering (`Whisper`) or shouting (`Shout`) to us
+    /// (issue #67); `None` ends the mark.
+    IncomingWhisperChanged {
+        session: u32,
+        kind: Option<mumcord_protocol::WhisperKind>,
+    },
     /// New UserStats of a person on the server (FR-2.25).
     UserStatsChanged(crate::stats::UserStatsView),
     /// The watch party in the user's channel started, changed or ended (`None`) (FR-2.39).

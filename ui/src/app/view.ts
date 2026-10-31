@@ -6,7 +6,7 @@ export type Screen = "loading" | "startupError" | "wizard" | "main";
 export type Overlay = "settings" | null;
 
 /** Settings sections other screens can lead to directly. */
-export type SettingsSection = "overlay" | "audio" | "privacy" | "identity" | "sounds";
+export type SettingsSection = "overlay" | "audio" | "privacy" | "identity" | "sounds" | "voice";
 
 export interface ViewState {
   screen: Screen;

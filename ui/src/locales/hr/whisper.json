@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Šapni…",
+    "noPermission": "Poslužitelj ovdje ne dopušta šaptanje"
+  },
+  "banner": {
+    "whisper": "Šapćeš: {{target}}",
+    "shout": "Vičeš: {{target}}",
+    "releaseKey": "Čuju te samo ljudi tamo. Pusti <key>{{key}}</key> da opet govoriš u {{channel}}.",
+    "stopToReturn": "Čuju te samo ljudi tamo. Zaustavi da opet govoriš u {{channel}}.",
+    "onlyThere": "Čuju te samo ljudi tamo.",
+    "stop": "Zaustavi"
+  },
+  "denied": {
+    "title": "Šaptanje nije uspjelo: {{target}}",
+    "noVoiceServer": "Prvo uđi u kanal: šapat ide preko poslužitelja na kojem govoriš.",
+    "muted": "Uključi mikrofon da bi šaptao.",
+    "serverMuted": "Poslužitelj te je utišao pa ne prosljeđuje tvoj glas.",
+    "nobodyHere": "Nitko od tih osoba trenutačno nije na ovom poslužitelju.",
+    "channelNotFound": "Ovaj kanal ne postoji na ovom poslužitelju.",
+    "noPermission": "Poslužitelj ti ne dopušta šaptanje u {{channel}}.",
+    "unknownTarget": "Ovaj cilj više ne postoji.",
+    "dismiss": "Odbaci"
+  },
+  "badge": {
+    "whisper": "šapće",
+    "shout": "viče",
+    "whisperLabel": "Šapće ti",
+    "shoutLabel": "Viče na tvoj kanal",
+    "ownWhisper": "šapćeš",
+    "ownShout": "vičeš",
+    "ownWhisperLabel": "Šapćeš",
+    "ownShoutLabel": "Vičeš"
+  },
+  "panel": {
+    "open": "Šapni ili viči",
+    "menu": "Ciljevi šaptanja i vikanja",
+    "manage": "Upravljaj ciljevima…",
+    "none": "Još nema ciljeva",
+    "indicatorWhisper": "Šapćeš: {{target}}",
+    "indicatorShout": "Vičeš: {{target}}",
+    "stop": "Zaustavi"
+  }
+}
