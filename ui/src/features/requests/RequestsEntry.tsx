@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useShownServerId } from "../channels";
 import { usePmRequests } from "./requestsStore";
-import { openRequestsView, useRequestsView } from "./requestsView";
+import { openRequestsView, useRequestsView } from "./useRequestsView";
 import "./requests.css";
 
 /** "Message requests" with its count at the top of the channel column; only while some wait. */

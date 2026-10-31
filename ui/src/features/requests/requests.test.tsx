@@ -14,7 +14,7 @@ import { closeChatRequestDialog } from "./chatRequestDialogStore";
 import { RequestsEntry } from "./RequestsEntry";
 import { RequestsView } from "./RequestsView";
 import { resetRequestsStore, usePmRequests } from "./requestsStore";
-import { resetRequestsView, useRequestsView } from "./requestsView";
+import { resetRequestsView, useRequestsView } from "./useRequestsView";
 
 let api: MockApi;
 

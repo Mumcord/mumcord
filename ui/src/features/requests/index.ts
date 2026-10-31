@@ -7,7 +7,7 @@ export { ChatRequestDialogHost } from "./ChatRequestDialog";
 export { openChatRequestDialog } from "./chatRequestDialogStore";
 export { RequestsEntry } from "./RequestsEntry";
 export { RequestsView } from "./RequestsView";
-export { useRequestsView } from "./requestsView";
+export { useRequestsView } from "./useRequestsView";
 export {
   acceptRequest,
   declineRequest,

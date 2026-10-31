@@ -4,7 +4,7 @@ import type { MessageRequest } from "../../api";
 import { Avatar } from "../members/Avatar";
 import { RequestCard } from "./RequestCard";
 import { usePmRequests } from "./requestsStore";
-import { selectRequest } from "./requestsView";
+import { selectRequest } from "./useRequestsView";
 import "../chat/chat.css";
 import "./requests.css";
 
