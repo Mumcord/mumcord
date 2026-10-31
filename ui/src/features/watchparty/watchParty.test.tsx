@@ -717,7 +717,7 @@ describe("playlist", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 
-  it("goes back to the video that played before, with nothing to go back to at first", async () => {
+  it("goes back to the video that played before, with nothing to go back to at first", () => {
     const previous = vi.spyOn(api, "watchPartyPrevious").mockResolvedValue(null);
     resetMediaView();
     openMedia("watch");
