@@ -1216,7 +1216,7 @@ mod tests {
         // A command is a report too, and a player that left is gone from the list.
         party.apply(7, WatchCommand::Pause { position_ms: 1300 });
         assert_eq!(party.view().positions.len(), 2);
-        assert_eq!(party.view().positions[1].buffering, false);
+        assert!(!party.view().positions[1].buffering);
         party.add(9);
         assert_eq!(
             party.view().positions.len(),
