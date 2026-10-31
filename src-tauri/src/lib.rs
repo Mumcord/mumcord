@@ -38,8 +38,8 @@ use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
     app, audio, channel_audio, channels, chat, diagnostics, dropped, follow, friends, history,
-    identity, links, notifications as notify, people, pm_overview, pm_rules, profile, servers,
-    session, settings,
+    identity, links, mumble_import, notifications as notify, people, pm_overview, pm_rules,
+    profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -66,6 +66,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             identity::identity_delete,
             identity::identity_set_default,
             identity::server_set_identity,
+            mumble_import::mumble_import_scan,
+            mumble_import::mumble_import_apply,
+            mumble_import::mumble_import_undo,
             servers::servers_list,
             servers::server_add,
             servers::server_test_connection,
