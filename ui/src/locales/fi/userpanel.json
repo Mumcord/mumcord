@@ -94,6 +94,9 @@
     "offerImagesHint": "Anna muiden ladata alkuperäiset kuvasi",
     "loadImages": "Lataa täysikokoiset kuvat",
     "loadImagesHint": "Hae alkuperäiset kuvat muilta",
+    "dnd": "Älä häiritse",
+    "dndHint": "Mykistää ilmoitusäänet ja -bannerit",
+    "dndSystemHint": "Päällä työpöydän Älä häiritse -tilan kautta",
     "privateMessages": "Yksityisviestit keneltä",
     "pm_everyone": "Kaikilta",
     "pm_friendsOnly": "Kaverit",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Lähtölaite irrotettiin. Käytössä on järjestelmän oletus.",
     "volume": "Äänenvoimakkuus",
     "level": "Taso"
+  },
+  "dnd": {
+    "label": "Älä häiritse",
+    "manual": "käsin",
+    "system": "Älä häiritse (järjestelmä)",
+    "systemHint": "Poista se käytöstä työpöydän ilmoitusasetuksista."
   }
 }

@@ -441,8 +441,15 @@ export const commands = {
 	whatsNewMarkSeen: () => typedError<null, ApiError>(__TAURI_INVOKE("whats_new_mark_seen")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
+	dndState: () => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_state")),
+	/**  Turns the Mumcord switch on or off; it is saved and applies to all servers at once. */
+	dndSet: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set", { on })),
+	/**  "Follow system Do Not Disturb". */
+	dndSetFollowSystem: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set_follow_system", { on })),
 	/**  The user opened this chat: its system notification is outdated. */
 	notificationDismiss: (serverId: number, conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { serverId, conversation })),
+	/**  Replaces the tray's unread summary and recent chats. */
+	trayAttentionSet: (attention: TrayAttention) => typedError<null, ApiError>(__TAURI_INVOKE("tray_attention_set", { attention })),
 	/**  Platform support and the own shared track (for the settings). */
 	nowPlayingStatus: () => typedError<NowPlayingStatus, ApiError>(__TAURI_INVOKE("now_playing_status")),
 	/**
@@ -577,6 +584,7 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	directConsentRequired: makeEvent<DirectConsentRequired, DirectConsentRequired>("direct-consent-required"),
+	dndChanged: makeEvent<DndChanged, DndChanged>("dnd-changed"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
@@ -601,6 +609,7 @@ export const events = {
 	syncProgress: makeEvent<SyncProgress, SyncProgress>("sync-progress"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
 	transportChanged: makeEvent<TransportChanged, TransportChanged>("transport-changed"),
+	traySettingsRequested: makeEvent<TraySettingsRequested, TraySettingsRequested>("tray-settings-requested"),
 	unreadChanged: makeEvent<UnreadChanged, UnreadChanged>("unread-changed"),
 	updateAvailable: makeEvent<UpdateAvailable, UpdateAvailable>("update-available"),
 	userRemoved: makeEvent<UserRemoved, UserRemoved>("user-removed"),
@@ -948,6 +957,20 @@ export type DefaultAvatarSkipped = {
  */
 export type DirectConsentRequired = {
 	serverId: number,
+};
+
+/**  The switch, the follow setting or the system state changed (also from the tray). */
+export type DndChanged = {
+	state: DndState,
+};
+
+/**  Everything the UI shows about Do Not Disturb. */
+export type DndState = {
+	/**  The Mumcord switch (quick settings, settings, tray). */
+	manual: boolean,
+	/**  "Follow system Do Not Disturb". */
+	followSystem: boolean,
+	system: SystemDnd,
 };
 
 /**  A dropped image file, ready to go into the attachment tray. */
@@ -2074,6 +2097,14 @@ export type SyncProgress = {
 	channels: number,
 };
 
+/**  The desktop's own Do Not Disturb or Focus mode as far as Mumcord can read it. */
+export type SystemDnd = {
+	/**  The desktop whose state is read, e.g. "KDE Plasma"; `null` when none can be read. */
+	desktop: string | null,
+	/**  Whether the system's Do Not Disturb is on; `null` when it can't be read. */
+	on: boolean | null,
+};
+
 export type TalkMode = "voiceActivation" | "pushToTalk";
 
 /**  Someone (including the own user) started or stopped talking. */
@@ -2125,6 +2156,29 @@ export type TransportChanged = {
 	serverId: number,
 	transport: Transport,
 };
+
+/**
+ *  Unread messages, mentions and recent private chats across all servers, for the tray icon's
+ *  badge and menu.
+ */
+export type TrayAttention = {
+	unread: number,
+	mentions: number,
+	/**  Most recent first. */
+	chats: TrayChat[],
+};
+
+/**  A recent private chat for the tray's "Recent chats" menu. */
+export type TrayChat = {
+	serverId: number,
+	conversation: Conversation,
+	/**  Display name of the person (plain text). */
+	name: string,
+	unread: number,
+};
+
+/**  "Settings…" was chosen in the tray menu; the window is already in front. */
+export type TraySettingsRequested = Record<string, never>;
 
 export type UnreadChanged = {
 	serverId: number,

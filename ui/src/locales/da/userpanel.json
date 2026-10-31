@@ -94,6 +94,9 @@
     "offerImagesHint": "Lad andre indlæse dine originale billeder",
     "loadImages": "Indlæs billeder i fuld størrelse",
     "loadImagesHint": "Hent originale billeder fra andre",
+    "dnd": "Forstyr ikke",
+    "dndHint": "Slår lyde og bannere for notifikationer fra",
+    "dndSystemHint": "Slået til via skrivebordets Forstyr ikke",
     "privateMessages": "Private beskeder fra",
     "pm_everyone": "Alle",
     "pm_friendsOnly": "Venner",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Outputenheden blev frakoblet. Systemstandarden bruges.",
     "volume": "Lydstyrke",
     "level": "Niveau"
+  },
+  "dnd": {
+    "label": "Forstyr ikke",
+    "manual": "manuelt",
+    "system": "Forstyr ikke (system)",
+    "systemHint": "Slå det fra i skrivebordets indstillinger for notifikationer."
   }
 }

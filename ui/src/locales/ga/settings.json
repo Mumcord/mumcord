@@ -680,6 +680,18 @@
     "entries": "Iontrálacha: {{count}}",
     "englishNote": "Tá an loga athruithe scríofa i mBéarla."
   },
+  "dnd": {
+    "title": "Ná Cuir Isteach",
+    "label": "Ná Cuir Isteach",
+    "description": "Gan fuaimeanna ná meirgí fógraí ar aon fhreastalaí. Leanann guth agus comhrá ag obair, agus leanann na comhairimh neamhléite ag comhaireamh.",
+    "follow": "Lean Ná Cuir Isteach an chórais",
+    "followDescription": "Cuireann sé Ná Cuir Isteach ar siúl aon uair a bhíonn Ná Cuir Isteach nó mód Fócais do dheisce ar siúl.",
+    "detected": "Aimsithe",
+    "detectedOn": "{{desktop}} · Tá Ná Cuir Isteach ar siúl (córas). Tógtar athruithe isteach láithreach.",
+    "detectedOff": "{{desktop}} · Tá Ná Cuir Isteach as. Tógtar athruithe isteach láithreach.",
+    "unavailable": "Níl ar fáil",
+    "unavailableText": "Ní féidir le Mumcord staid Ná Cuir Isteach do chórais a léamh anseo. Ní oibríonn ach a lasc féin."
+  },
   "privateMessages": {
     "title": "Teachtaireachtaí príobháideacha",
     "legend": "Teachtaireachtaí príobháideacha ó",

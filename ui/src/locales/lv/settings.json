@@ -674,6 +674,18 @@
     "entries": "Ieraksti: {{count}}",
     "englishNote": "Izmaiņu žurnāls ir angļu valodā."
   },
+  "dnd": {
+    "title": "Netraucēt",
+    "label": "Netraucēt",
+    "description": "Nevienā serverī nav paziņojumu skaņu vai reklāmkarogu. Balss un tērzēšana darbojas, un nelasīto skaitītāji turpina skaitīt.",
+    "follow": "Sekot sistēmas režīmam “Netraucēt”",
+    "followDescription": "Ieslēdz “Netraucēt” ikreiz, kad darbvirsmā ir ieslēgts “Netraucēt” vai fokusa režīms.",
+    "detected": "Noteikts",
+    "detectedOn": "{{desktop}} · “Netraucēt” ir ieslēgts (sistēma). Izmaiņas tiek ņemtas vērā uzreiz.",
+    "detectedOff": "{{desktop}} · “Netraucēt” ir izslēgts. Izmaiņas tiek ņemtas vērā uzreiz.",
+    "unavailable": "Nav pieejams",
+    "unavailableText": "Mumcord šeit nevar nolasīt sistēmas režīma “Netraucēt” stāvokli. Darbojas tikai tā paša slēdzis."
+  },
   "privateMessages": {
     "title": "Privātās ziņas",
     "legend": "Privātās ziņas no",

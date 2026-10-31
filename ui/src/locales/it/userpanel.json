@@ -94,6 +94,9 @@
     "offerImagesHint": "Permetti agli altri di caricare le tue immagini originali",
     "loadImages": "Carica immagini a dimensione intera",
     "loadImagesHint": "Scarica le immagini originali degli altri",
+    "dnd": "Non disturbare",
+    "dndHint": "Silenzia suoni e banner delle notifiche",
+    "dndSystemHint": "Attivo tramite il Non disturbare del desktop",
     "privateMessages": "Messaggi privati da",
     "pm_everyone": "Tutti",
     "pm_friendsOnly": "Amici",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Dispositivo di uscita scollegato. Viene usato il predefinito di sistema.",
     "volume": "Volume",
     "level": "Livello"
+  },
+  "dnd": {
+    "label": "Non disturbare",
+    "manual": "manuale",
+    "system": "Non disturbare (sistema)",
+    "systemHint": "Disattivalo nelle impostazioni delle notifiche del desktop."
   }
 }

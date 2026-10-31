@@ -94,6 +94,9 @@
     "offerImagesHint": "Ostatní si môžu načítať tvoje originálne obrázky",
     "loadImages": "Načítavať obrázky v plnej veľkosti",
     "loadImagesHint": "Sťahovať originálne obrázky od ostatných",
+    "dnd": "Nerušiť",
+    "dndHint": "Stlmí zvuky a bannery upozornení",
+    "dndSystemHint": "Zapnuté cez režim Nerušiť vášho prostredia",
     "privateMessages": "Súkromné správy od",
     "pm_everyone": "Všetci",
     "pm_friendsOnly": "Priatelia",
@@ -133,5 +136,11 @@
     "fallbackOutput": "Výstupné zariadenie bolo odpojené. Používa sa predvolené zariadenie systému.",
     "volume": "Hlasitosť",
     "level": "Úroveň"
+  },
+  "dnd": {
+    "label": "Nerušiť",
+    "manual": "ručne",
+    "system": "Nerušiť (systém)",
+    "systemHint": "Vypnite ho v nastaveniach upozornení vášho prostredia."
   }
 }
