@@ -36,5 +36,29 @@
     "output": "Kõlari puhver",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Meelerduri juhtimine",
+    "nowPlaying": "Praegu mängitakse",
+    "watching": "Vaatab",
+    "open": "Ava",
+    "next": "Järgmine",
+    "seek": "Liikumine",
+    "volume": "Helitugevus",
+    "syncedPlay": "Sünkroniseeritud",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} juhib",
+    "inSync": "Sünkroonis",
+    "inSyncAll": "Kõik sünkroonis",
+    "inSyncExcept": "Kõik sünkroonis, välja arvatud {{count}}",
+    "buffering": "Puhvris",
+    "behind": "{{seconds}} s maha",
+    "ahead": "{{seconds}} s ees",
+    "noReport": "Puudub teade",
+    "you": "sina",
+    "host": "Host",
+    "fullscreen": "Täisekraan",
+    "exitFullscreen": "Välju täisekraanilt",
+    "none": "Keegi"
   }
 }

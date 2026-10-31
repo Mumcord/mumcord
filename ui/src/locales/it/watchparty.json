@@ -42,7 +42,9 @@
     "nextFailed": "Impossibile avviare il video successivo.",
     "move": "Sposta {{title}}",
     "upNext": "A seguire: {{title}}",
-    "upNextNone": "Niente a seguire"
+    "upNextNone": "Niente a seguire",
+    "paste": "Incolla un link YouTube",
+    "notALink": "Non è un link YouTube"
   },
   "widget": {
     "play": "Riproduci",

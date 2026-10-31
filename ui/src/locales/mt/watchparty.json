@@ -42,7 +42,9 @@
     "nextFailed": "Il-video li jmiss ma setax jibda.",
     "move": "Ċaqlaq {{title}}",
     "upNext": "Li jmiss: {{title}}",
-    "upNextNone": "Xejn ma jmiss"
+    "upNextNone": "Xejn ma jmiss",
+    "paste": "Imla link ta' YouTube",
+    "notALink": "Dan mhux link ta' YouTube"
   },
   "widget": {
     "play": "Play",

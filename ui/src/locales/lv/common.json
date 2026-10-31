@@ -36,5 +36,29 @@
     "output": "Skaļruņa buferis",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Atskaņotāja kontroles",
+    "nowPlaying": "Pašlaik atskaņo",
+    "watching": "Skatās",
+    "open": "Atvērt",
+    "next": "Nākamais",
+    "seek": "Meklēt",
+    "volume": "Skaļums",
+    "syncedPlay": "Sinhronizēts",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} kontrolē",
+    "inSync": "Sinhronizēts",
+    "inSyncAll": "Visi sinhronizēti",
+    "inSyncExcept": "Visi sinhronizēti, izņemot {{count}}",
+    "buffering": "Buferē",
+    "behind": "{{seconds}} s atpalikis",
+    "ahead": "{{seconds}} s priekšā",
+    "noReport": "Nav ziņojuma",
+    "you": "tu",
+    "host": "Saimnieks",
+    "fullscreen": "Pilns ekrāns",
+    "exitFullscreen": "Iziet no pilna ekrāna",
+    "none": "Neviens"
   }
 }

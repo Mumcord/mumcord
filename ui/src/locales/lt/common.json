@@ -36,5 +36,29 @@
     "output": "Garsiakalbio buferis",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Grotuvo valdikliai",
+    "nowPlaying": "Dabar grojama",
+    "watching": "Žiūri",
+    "open": "Atidaryti",
+    "next": "Paskesnis",
+    "seek": "Peržiūra",
+    "volume": "Garsumas",
+    "syncedPlay": "Sinchronizuota",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} valdo",
+    "inSync": "Sinchronizuota",
+    "inSyncAll": "Visi sinchronizuoti",
+    "inSyncExcept": "Visi sinchronizuoti, išskyrus {{count}}",
+    "buffering": "Buferizuoja",
+    "behind": "{{seconds}} s atsilikęs",
+    "ahead": "{{seconds}} s priekyje",
+    "noReport": "Nėra pranešimo",
+    "you": "tu",
+    "host": "Šeimininkas",
+    "fullscreen": "Visas ekranas",
+    "exitFullscreen": "Išjungti visą ekraną",
+    "none": "Niekas"
   }
 }
