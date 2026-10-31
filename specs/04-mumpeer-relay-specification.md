@@ -82,11 +82,11 @@ The client only displays relay state; every access decision is made by the bot (
 
 ### 4.3 Client: connecting
 
-- **FR-4.13** The `mumcord.p2p` signalling (spec 02) gains one optional field `r` (`1` = "I can use the relay announced on this server") in offer and answer. A side that hides its IP (`relay_first`/`relay_only` with relay available, or consent No) sends an empty candidate list; an empty list is valid only together with `r = 1`. Old clients ignore `r`.
+- **FR-4.13** The `mumcord.p2p` signalling (spec 02) gains one optional field `rl` (`1` = "I can use the relay announced on this server") in offer and answer. It is not called `r` because `mumcord.p2p` already uses `r` as the decline-reason string, and released clients would reject a number there. A side that hides its IP (`relay_first`/`relay_only` with relay available, or consent No) sends an empty candidate list together with `rl = 1`. An empty list without `rl` (older clients with no usable address) still means "no direct path", as today. Old clients ignore `rl`.
 - **FR-4.14** Decision after offer and answer:
   1. Both sides sent candidates and the effective mode of the offering side tries direct first → direct attempt as today.
-  2. Direct failed (`NoDirectPath`) or either side sent no candidates, and both sent `r = 1` → relay.
-  3. Relay needed but the peer did not send `r = 1` → unavailable, reason "The other person can't use the relay (older Mumcord or relay turned off)."
+  2. Direct failed (`NoDirectPath`) or either side sent no candidates, and both sent `rl = 1` → relay.
+  3. Relay needed but the peer did not send `rl = 1` → unavailable, reason "The other person can't use the relay (older Mumcord or relay turned off)."
   The offering side requests the token (`token-req`, section 6.4); the bot sends the token to both sides. No answer from the bot within 5 s → unavailable with "The relay bot did not answer."
 - **FR-4.15** Relay transport: the client opens the outer connection to the relay over QUIC on the announced UDP port. If that hasn't completed after 2 s, it starts TLS over TCP on the announced TCP port in parallel and keeps whichever completes first. Total relay setup timeout 10 s. Then it sends `BIND` (section 6.5) and waits for `READY`.
 - **FR-4.16** The inner `mumcord-p2p` QUIC connection runs unchanged over the relay link: same mutual TLS, same pinning against the Mumble server's certificate hashes, same streams. The relay is a virtual socket for it. A relay that forwards to the wrong person cannot complete the inner handshake.
@@ -197,9 +197,9 @@ sequenceDiagram
     participant B as mumbot peer
     participant R as mumpeer
     participant Z as Client B
-    A->>M: mumcord.p2p offer {c:[…] or [], r:1}
+    A->>M: mumcord.p2p offer {c:[…] or [], rl:1}
     M->>Z: offer
-    Z->>M: mumcord.p2p answer {c:[…] or [], r:1}
+    Z->>M: mumcord.p2p answer {c:[…] or [], rl:1}
     M->>A: answer
     Note over A,Z: direct attempt if FR-4.14 says so; fails or skipped
     A->>M: mumcord.peer token-req {rid, peer:Z}
@@ -296,7 +296,7 @@ stateDiagram-v2
     Signalling --> TokenRequest: relay chosen (FR-4.14)
     Signalling --> Unavailable: mode off / no usable path
     Direct --> Connected: inner QUIC up (direct)
-    Direct --> TokenRequest: NoDirectPath and both r=1
+    Direct --> TokenRequest: NoDirectPath and both rl=1
     Direct --> Unavailable: NoDirectPath, no relay
     TokenRequest --> RelayConnect: token received
     TokenRequest --> Unavailable: token-err or 5 s timeout
@@ -358,7 +358,7 @@ mumbot `[peer]` section: `api_url`, `api_secret_file` or env `MUMBOT_PEER_API_SE
 - **mumpeer API: small HTTP/1.1 handler on `tokio::net`, no web framework,** like mumbot's webhook: three endpoints don't justify a framework.
 - **mumpeer modules:** `config`, `tls` (identity, client-hash extraction), `relay` (pairs, sessions, forwarding), `udp` (QUIC listener), `tcp` (TLS listener and framing), `api`, `limits`. Forwarding is one task per session copying bytes between two links.
 - **mumbot:** new module `src/peer/` (config, announcement state, API client, request handling) next to `src/webhook/`. The bot logic talks to the API client through a narrow trait so tests use a fake relay. Needs plugin data send/receive from `mumcord-protocol` (`send_plugin_data` exists).
-- **Mumcord:** `mumcord-p2p` gains `relay.rs` (outer link over quinn or tokio-rustls, and a virtual socket implementing quinn's `AsyncUdpSocket` so the inner endpoint runs unchanged); `signal.rs` gains the `r` field and the empty-candidate rule. `mumcord-engine` gains `peer.rs` (announcement decode, pin, availability state, token requests) and wires the decision of FR-4.14 into `p2p.rs`. `mumcord-store` gets `p2p_mode`, override and relay pin. UI shows state only; it never talks to bot or relay.
+- **Mumcord:** `mumcord-p2p` gains `relay.rs` (outer link over quinn or tokio-rustls, and a virtual socket implementing quinn's `AsyncUdpSocket` so the inner endpoint runs unchanged); `signal.rs` gains the `rl` field and the empty-candidate rule. `mumcord-engine` gains `peer.rs` (announcement decode, pin, availability state, token requests) and wires the decision of FR-4.14 into `p2p.rs`. `mumcord-store` gets `p2p_mode`, override and relay pin. UI shows state only; it never talks to bot or relay.
 - **Shared format:** the `mumcord.peer` message types live in `mumcord-p2p` (published on crates.io like `mumcord-protocol`) so mumbot uses the same encoder/decoder; mumpeer does not depend on Mumcord crates.
 
 ## 9. Non-functional requirements
@@ -436,6 +436,7 @@ Setup for all: local mumble-server ≥ 1.4, local mumpeer, local mumbot `peer` r
 | Who requests the token | The offering side; the bot sends it to both | Keeps the answering side passive |
 | Shared message types | `mumcord.peer` encoder/decoder in `mumcord-p2p` (crates.io), used by mumbot | One format, no drift |
 | Announcer trust | Registered sender + TOFU pin of bot hash and relay fingerprint per server | Open point Q1.3 |
+| Relay flag name (2026-10-31) | The `mumcord.p2p` relay flag is `rl`, not `r` | `r` is already the decline-reason string; released clients would fail to parse `"r":1` and drop the offer. FR-4.13 |
 
 ## 13. Open points & risks
 
@@ -470,7 +471,7 @@ Three build tracks. They meet at two contracts written in this spec: the `mumcor
 
 | Order | mumpeer repo | mumbot repo | mumcord repo |
 |---|---|---|---|
-| Step 0 (first, small) | — | — | `mumcord-p2p`: `peer` message types (encode/decode, limits, tests) + `r` field and empty-candidate rule in `signal.rs`; publish to crates.io |
+| Step 0 (first, small) | — | — | `mumcord-p2p`: `peer` message types (encode/decode, limits, tests) + `rl` field and empty-candidate rule in `signal.rs`; publish to crates.io |
 | Step 1 (parallel) | Skeleton, config, identity/fingerprint, API (`status`, `pairs`, `peers`) with tests, limits module | `peer` module against a fake relay API: hello tracking, announcement, token-req handling, revocation, status polling; server cert pin | Store (`p2p_mode`, override, migration, relay pin), engine `peer.rs` (decode, trust, availability state machine), Settings/wizard/server dialog UI, server info panel lines, inspector decoding |
 | Step 2 (parallel) | UDP QUIC listener + TCP 443 listener, `bind`/`ready`, forwarding, session end rules, live tests for AC-4.15 … AC-4.17 | Wire the real API client; live tests against a local mumpeer | `relay.rs` in `mumcord-p2p` (outer link UDP/TCP, virtual socket) tested against a local mumpeer; FR-4.14 decision in `p2p.rs`; connection info |
 | Step 3 | Docker image, release workflow, operator README, `testenv/` (compose + `netns.sh`) | Docker/compose example, docs, CHANGELOG | E2E along AC-4.1 … AC-4.25 using mumpeer's `testenv/`; PRIVACY.md, p2p README update; 24 locales |
