@@ -177,6 +177,10 @@ jobs:
         with:
           sparse-checkout: |
             scripts/install.sh
+            scripts/sign-updater-bundles.sh
+            scripts/verify-updater-signature.js
+            src-tauri/tauri.conf.json
+            package.json
             CHANGELOG.md
           sparse-checkout-cone-mode: false
 
@@ -192,6 +196,19 @@ jobs:
           name: mumcord-sbom
           path: dist
 
+      # Updater signatures and the update manifest latest.json for the in-app updater (issue #168,
+      # docs/release-signing.md). Fails the release when the signing secret or the public key in
+      # the app is missing, or when the key does not match the app's public key.
+      - name: Sign updater bundles
+        working-directory: dist
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Set only for the one release of a key rotation (docs/release-signing.md).
+          UPDATER_ROTATION_OLD_PUBKEY: ${{ vars.UPDATER_ROTATION_OLD_PUBKEY }}
+          VERSION: ${{ needs.guard.outputs.version }}
+        run: ../scripts/sign-updater-bundles.sh "$VERSION" ..
+
       - name: Write checksums and release notes
         working-directory: dist
         env:
@@ -200,9 +217,9 @@ jobs:
         run: |
           # Fails if any bundle is missing; Linux has three packages for each of two CPUs.
           linux=(*_amd64.AppImage *_aarch64.AppImage *_amd64.deb *_arm64.deb *.x86_64.rpm *.aarch64.rpm)
-          ls -l -- "${linux[@]}" *-setup.exe *-portable.zip *.dmg *.cdx.json
+          ls -l -- "${linux[@]}" *-setup.exe *-portable.zip *.dmg *.app.tar.gz *.cdx.json *.sig latest.json
           cp ../scripts/install.sh .
-          sha256sum -- "${linux[@]}" *-setup.exe *-portable.zip *.dmg *.cdx.json install.sh > SHA256SUMS
+          sha256sum -- "${linux[@]}" *-setup.exe *-portable.zip *.dmg *.app.tar.gz *.cdx.json *.sig latest.json install.sh > SHA256SUMS
           cat SHA256SUMS
           # A warning box as soon as one platform is unsigned, a plain note otherwise.
           callout=NOTE
@@ -273,7 +290,7 @@ jobs:
         run: |
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
             --title "Mumcord $VERSION" --notes-file notes.md --generate-notes \
-            dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.cdx.json dist/install.sh dist/SHA256SUMS
+            dist/*.AppImage dist/*.deb dist/*.rpm dist/*-setup.exe dist/*-portable.zip dist/*.dmg dist/*.app.tar.gz dist/*.sig dist/latest.json dist/*.cdx.json dist/install.sh dist/SHA256SUMS
 
   # After the draft exists, so a failed build never leaves a crate on crates.io without a
   # release (published versions cannot be removed). Pre-releases are skipped inside the workflow.
