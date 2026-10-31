@@ -46,12 +46,12 @@ Acceptance criteria (from the issue, verified in the running client against the 
 | T9 | UI: who's watching list with per-person sync state and host crown | done | lead | T2, T6 | complex | AC-2 | `ui/src/features/watchparty/WatchingList.tsx` |
 | T10 | UI: mini player bar at the top of the chat | done | lead | T6 | simple | AC-1 | `ui/src/features/media/MiniBar.tsx` |
 | T11 | UI: screen share viewer view (header chips, stream details, bottom overlay, panel) | partly: no Chat tab | lead | T3, T6 | complex | AC-4 | `ui/src/features/screenshare/ScreenShareView.tsx` |
-| T12 | UI: sharer control bar | open | lead | T3, T6 | complex | AC-5 | `ui/src/features/screenshare/SharerBar.tsx` |
+| T12 | UI: sharer control bar | done | lead | T3, T6 | complex | AC-5 | `ui/src/features/screenshare/SharerBar.tsx` |
 | T13 | Translations: 24 locales | done (needs a human pass) | lead | T7–T12 | simple | AC-7 | `ui/src/locales/*/watchparty.json`, `*/screenviewer.json`, `*/screenshare.json` |
 | T14 | Tests: engine, player bridge, UI units | done (units) | lead | T2–T12 | complex | AC-2, AC-3, AC-4 | `crates/engine/src/*/tests`, `ui/src/features/**` |
 | T15 | Verification: build, tests, type checks, linters | done | lead | T14 | simple | – | – |
 | T16 | Verification in the running client against the local test server + dark/light screenshots | open | lead | T15 | complex | AC-1–AC-6 | `e2e/specs/media/`, `docs/images/screenshots/` |
-| T17 | Report `specs/03-163-watch-together-and-screen-share-implementation.md` | open | lead | T16 | simple | – | – |
+| T17 | Report `specs/03-163-watch-together-and-screen-share-implementation.md` | done | lead | T16 | simple | – | – |
 
 ## Notes
 
