@@ -268,10 +268,25 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               event.stopPropagation();
             }}
           >
-            {expanded ? "▾" : "▸"}
+            {/* Thin chevron like the mockup; it turns down while the channel is expanded. */}
+            <svg
+              className="tree-channel__chevron"
+              data-expanded={expanded}
+              viewBox="0 0 24 24"
+              width="14"
+              height="14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              focusable="false"
+            >
+              <path d="m9 6 6 6-6 6" />
+            </svg>
           </span>
           <span id={labelId} className="tree-channel__label">
-            <span className="tree-channel__name" data-tooltip={channel.name}>
+            <span className="tree-channel__name" data-tooltip={channel.name} data-tooltip-overflow>
               <Highlighted text={channel.name} query={query} />
             </span>
             {max !== null && (
@@ -322,20 +337,6 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               // The digits are CSS-generated (::before) so the row's visible text stays a run of
               // its accessible name (WCAG 2.5.3); the spoken form is the visually hidden phrase.
               <span className="tree-channel__count" data-count={count}>
-                <svg
-                  viewBox="0 0 24 24"
-                  width="12"
-                  height="12"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8M4 21a8 8 0 0 1 16 0" />
-                </svg>
                 <span className="visually-hidden">, {t("tree.people", { count })}</span>
               </span>
             )}

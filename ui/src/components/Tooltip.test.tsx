@@ -47,6 +47,25 @@ describe("themed tooltip", () => {
     expect(button).not.toHaveAttribute("aria-describedby");
   });
 
+  it("with data-tooltip-overflow appears only while the text is cut off", () => {
+    setup(
+      <span data-testid="name" data-tooltip="Study Hall" data-tooltip-overflow>
+        Study Hall
+      </span>,
+    );
+    const name = screen.getByTestId("name");
+    fireEvent.pointerOver(name);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+
+    fireEvent.pointerOut(name, { relatedTarget: document.body });
+    Object.defineProperty(name, "scrollWidth", { configurable: true, value: 120 });
+    Object.defineProperty(name, "clientWidth", { configurable: true, value: 60 });
+    fireEvent.pointerOver(name);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Study Hall");
+  });
+
   it("shows a shortcut chip and a detail line, and describes the trigger with them", () => {
     setup(
       <button

@@ -174,6 +174,12 @@
   background: var(--color-bg-hover);
 }
 
+/* Keyboard focus also gets the focus-coloured ring of the #172 mockup. */
+.server-menu__item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
 .server-menu__item:has(.server-menu__text) {
   display: flex;
   align-items: center;
@@ -208,7 +214,26 @@
 .server-menu__icon {
   display: inline-flex;
   flex: none;
-  color: var(--color-text-muted);
+  color: inherit;
+}
+
+.server-menu__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Menus with icons (channel menus, #170/#172) follow the mockups: roomier panel, body-size text. */
+.server-menu:has(.server-menu__icon) {
+  min-width: 18rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+}
+
+.server-menu:has(.server-menu__icon) .server-menu__item {
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
 }
 
 .server-menu__item--danger .server-menu__icon {

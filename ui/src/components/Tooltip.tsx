@@ -6,7 +6,9 @@ import { parsePlacement, placeTooltip } from "./tooltipPlacement";
 /**
  * Themed tooltips (FR-2.79). Any element with `data-tooltip="…"` gets one, optionally with
  * `data-tooltip-placement="top|bottom|left|right"` (default top), a keyboard shortcut chip
- * (`data-tooltip-shortcut`) and a highlighted second line (`data-tooltip-detail`). One layer listens on the
+ * (`data-tooltip-shortcut`) and a highlighted second line (`data-tooltip-detail`).
+ * `data-tooltip-overflow` shows it only while the trigger's text is cut off (e.g. a truncated
+ * name whose tooltip would otherwise repeat the visible text). One layer listens on the
  * document instead of a component per trigger, so long member lists pay nothing per row and
  * any element can opt in without a wrapper. Mount `<TooltipLayer />` once at the app root.
  *
@@ -101,6 +103,12 @@ export function TooltipLayer() {
     const show = (trigger: HTMLElement) => {
       const content = contentOf(trigger);
       if (!trigger.isConnected || content.label === "") return;
+      if (
+        trigger.hasAttribute("data-tooltip-overflow") &&
+        trigger.scrollWidth <= trigger.clientWidth
+      ) {
+        return;
+      }
       current = trigger;
       setShown({ trigger, ...content });
       // The trigger can lose its tooltip, change it or leave the page while it is shown.

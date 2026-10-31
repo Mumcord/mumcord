@@ -37,12 +37,13 @@
 
 .tree-channel__row,
 .tree-person__row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-height: 2rem;
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   user-select: none;
 }
@@ -52,17 +53,19 @@
   background: var(--color-bg-hover);
 }
 
-/* Violet inset bar instead of a border, so the selected row keeps its size. */
+/* Selected channel (its chat is open), as in the #172 mockup: a 2px focus-coloured ring and a
+   faint tint. Inset shadows instead of borders, so the row keeps its size. */
 .tree-channel__row[data-selected="true"] {
-  background: var(--color-bg-selected);
-  box-shadow: inset 3px 0 0 var(--color-accent);
+  background: color-mix(in srgb, var(--color-focus) 8%, transparent);
+  box-shadow: inset 0 0 0 2px var(--color-focus);
   color: var(--color-text);
   font-weight: var(--font-weight-bold);
 }
 
-/* Voice channel: green bar and speaker icon, distinct from the violet selected bar. Both bars
-   stack (voice on the outer edge) as box-shadows, so nothing shifts. */
+/* Own voice channel: green bar on the left, green tint and speaker icon. With the chat open as
+   well, the bar and the ring stack. */
 .tree-channel__row[data-voice="true"] {
+  background: color-mix(in srgb, var(--color-talking) 12%, transparent);
   box-shadow: inset 3px 0 0 var(--color-talking);
   font-weight: var(--font-weight-bold);
 }
@@ -70,7 +73,7 @@
 .tree-channel__row[data-voice="true"][data-selected="true"] {
   box-shadow:
     inset 3px 0 0 var(--color-talking),
-    inset 6px 0 0 var(--color-accent);
+    inset 0 0 0 2px var(--color-focus);
 }
 
 .tree-channel__row[data-voice="true"] .tree-channel__name::before {
@@ -87,9 +90,25 @@
 }
 
 .tree-channel__toggle {
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
   width: 1rem;
   color: var(--color-text-secondary);
-  text-align: center;
+}
+
+.tree-channel__chevron {
+  transition: transform 120ms ease;
+}
+
+.tree-channel__chevron[data-expanded="true"] {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-channel__chevron {
+    transition: none;
+  }
 }
 
 .tree-channel__toggle[data-expandable="false"] {
@@ -120,16 +139,12 @@
   color: var(--color-text-secondary);
 }
 
+/* Plain muted number after the name, as in the mockup. */
 .tree-channel__count {
-  display: inline-flex;
   flex: none;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-full);
-  background: var(--color-bg-hover);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
 }
 
 /* Generated, so the digit is not treeitem text: visible text must be part of the name (WCAG 2.5.3). */
@@ -145,9 +160,14 @@
   width: 1rem;
 }
 
-/* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). */
+/* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). It
+   floats over the row's end, left of the action slot, so showing it never truncates the name. */
 .tree-channel__join {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--space-2) + 1rem + var(--space-2));
   display: none;
+  transform: translateY(-50%);
   padding: 0 var(--space-2);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-full);
@@ -399,7 +419,7 @@
   white-space: nowrap;
 }
 
-@container (max-width: 19rem) {
+@container (max-width: 12rem) {
   .tree-channel__here {
     position: absolute;
     width: 1px;

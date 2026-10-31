@@ -65,7 +65,7 @@ export function ChevronIcon() {
       aria-hidden="true"
       focusable="false"
     >
-      <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.5" />
+      <path d="M5 8h14l-7 9z" fill="currentColor" />
     </svg>
   );
 }
