@@ -3,6 +3,7 @@
   "copyFailed": "Linkkiä ei voitu kopioida",
   "menu": {
     "label": "Kanavan {{channel}} asetukset",
+    "join": "Liity kanavalle",
     "follow": "Seuraa kanavaa",
     "unfollow": "Lopeta kanavan seuraaminen",
     "following": "Seurataan",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Musiikki",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Siirrä käyttäjiä tänne…"
   },
   "info": {
     "title": "Kanavan tiedot: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Poista profiili",
     "cancel": "Peruuta",
     "save": "Tallenna"
+  },
+  "moveDialog": {
+    "title": "Siirrä henkilöitä kanavalle {{channel}}",
+    "legend": "Siirrettävät henkilöt",
+    "empty": "Muilla kanavilla ei ole ketään, jota saat siirtää.",
+    "failed": "Joitakin henkilöitä ei voitu siirtää.",
+    "cancel": "Peruuta",
+    "submit": "Siirrä"
   }
 }

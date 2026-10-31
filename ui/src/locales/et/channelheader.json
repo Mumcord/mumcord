@@ -3,6 +3,7 @@
   "copyFailed": "Linki ei õnnestunud kopeerida",
   "menu": {
     "label": "Kanali {{channel}} valikud",
+    "join": "Liitu kanaliga",
     "follow": "Jälgi kanalit",
     "unfollow": "Lõpeta kanali jälgimine",
     "following": "Jälgin",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Muusika",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Teisalda kasutajad siia…"
   },
   "info": {
     "title": "Kanali info: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Eemalda profiil",
     "cancel": "Tühista",
     "save": "Salvesta"
+  },
+  "moveDialog": {
+    "title": "Teisalda inimesed kanalisse {{channel}}",
+    "legend": "Teisaldatavad inimesed",
+    "empty": "Teistes kanalites pole kedagi, keda sa võid teisaldada.",
+    "failed": "Mõnda inimest ei õnnestunud teisaldada.",
+    "cancel": "Loobu",
+    "submit": "Teisalda"
   }
 }

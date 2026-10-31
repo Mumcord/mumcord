@@ -3,6 +3,7 @@
   "copyFailed": "Nepavyko nukopijuoti nuorodos",
   "menu": {
     "label": "Kanalo {{channel}} parinktys",
+    "join": "Prisijungti prie kanalo",
     "follow": "Sekti kanalą",
     "unfollow": "Nebesekti kanalo",
     "following": "Sekama",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Muzika",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Perkelti naudotojus čia…"
   },
   "info": {
     "title": "Kanalo informacija: {{channel}}",
@@ -105,5 +107,13 @@
     "remove": "Pašalinti profilį",
     "cancel": "Atšaukti",
     "save": "Išsaugoti"
+  },
+  "moveDialog": {
+    "title": "Perkelti žmones į {{channel}}",
+    "legend": "Perkeliami žmonės",
+    "empty": "Kituose kanaluose nėra nė vieno, kurį galėtum perkelti.",
+    "failed": "Kai kurių žmonių nepavyko perkelti.",
+    "cancel": "Atšaukti",
+    "submit": "Perkelti"
   }
 }

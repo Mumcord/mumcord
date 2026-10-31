@@ -3,6 +3,7 @@
   "copyFailed": "Det gick inte att kopiera länken",
   "menu": {
     "label": "Kanalalternativ för {{channel}}",
+    "join": "Gå in i kanalen",
     "follow": "Följ kanal",
     "unfollow": "Sluta följa kanalen",
     "following": "Följer",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Musik",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Flytta användare hit…"
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Ta bort profil",
     "cancel": "Avbryt",
     "save": "Spara"
+  },
+  "moveDialog": {
+    "title": "Flytta personer till {{channel}}",
+    "legend": "Personer att flytta",
+    "empty": "Det finns ingen i andra kanaler som du får flytta.",
+    "failed": "Några personer kunde inte flyttas.",
+    "cancel": "Avbryt",
+    "submit": "Flytta"
   }
 }

@@ -3,6 +3,7 @@
   "copyFailed": "Não foi possível copiar o link",
   "menu": {
     "label": "Opções do canal {{channel}}",
+    "join": "Entrar no canal",
     "follow": "Seguir canal",
     "unfollow": "Deixar de seguir o canal",
     "following": "A seguir",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Música",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Mover utilizadores para aqui…"
   },
   "info": {
     "title": "Informações do canal: {{channel}}",
@@ -103,5 +105,13 @@
     "remove": "Remover perfil",
     "cancel": "Cancelar",
     "save": "Guardar"
+  },
+  "moveDialog": {
+    "title": "Mover pessoas para {{channel}}",
+    "legend": "Pessoas a mover",
+    "empty": "Não há ninguém noutros canais que possas mover.",
+    "failed": "Não foi possível mover algumas pessoas.",
+    "cancel": "Cancelar",
+    "submit": "Mover"
   }
 }

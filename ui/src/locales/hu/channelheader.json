@@ -3,6 +3,7 @@
   "copyFailed": "A hivatkozást nem sikerült másolni",
   "menu": {
     "label": "{{channel}} csatorna beállításai",
+    "join": "Belépés a csatornába",
     "follow": "Csatorna követése",
     "unfollow": "Csatorna követésének leállítása",
     "following": "Követed",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Zene",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Felhasználók áthelyezése ide…"
   },
   "info": {
     "title": "Csatorna adatai: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Profil eltávolítása",
     "cancel": "Mégse",
     "save": "Mentés"
+  },
+  "moveDialog": {
+    "title": "Személyek áthelyezése ide: {{channel}}",
+    "legend": "Áthelyezendő személyek",
+    "empty": "Más csatornákban nincs senki, akit áthelyezhetsz.",
+    "failed": "Néhány személyt nem sikerült áthelyezni.",
+    "cancel": "Mégse",
+    "submit": "Áthelyezés"
   }
 }

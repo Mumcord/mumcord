@@ -3,6 +3,7 @@
   "copyFailed": "Odkaz sa nepodarilo skopírovať",
   "menu": {
     "label": "Možnosti kanála {{channel}}",
+    "join": "Pripojiť sa ku kanálu",
     "follow": "Sledovať kanál",
     "unfollow": "Prestať sledovať kanál",
     "following": "Sleduješ",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Hudba",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Presunúť používateľov sem…"
   },
   "info": {
     "title": "Informácie o kanáli: {{channel}}",
@@ -105,5 +107,13 @@
     "remove": "Odstrániť profil",
     "cancel": "Zrušiť",
     "save": "Uložiť"
+  },
+  "moveDialog": {
+    "title": "Presunúť ľudí do {{channel}}",
+    "legend": "Ľudia na presun",
+    "empty": "V iných kanáloch nie je nikto, koho smieš presunúť.",
+    "failed": "Niektorých ľudí sa nepodarilo presunúť.",
+    "cancel": "Zrušiť",
+    "submit": "Presunúť"
   }
 }

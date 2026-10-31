@@ -3,6 +3,7 @@
   "copyFailed": "Saiti neizdevās nokopēt",
   "menu": {
     "label": "Kanāla {{channel}} opcijas",
+    "join": "Pievienoties kanālam",
     "follow": "Sekot kanālam",
     "unfollow": "Pārtraukt sekot kanālam",
     "following": "Seko",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Mūzika",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Pārvietot lietotājus šeit…"
   },
   "info": {
     "title": "Kanāla informācija: {{channel}}",
@@ -103,5 +105,13 @@
     "remove": "Noņemt profilu",
     "cancel": "Atcelt",
     "save": "Saglabāt"
+  },
+  "moveDialog": {
+    "title": "Pārvietot cilvēkus uz {{channel}}",
+    "legend": "Pārvietojamie cilvēki",
+    "empty": "Citos kanālos nav neviena, ko tu drīksti pārvietot.",
+    "failed": "Dažus cilvēkus neizdevās pārvietot.",
+    "cancel": "Atcelt",
+    "submit": "Pārvietot"
   }
 }

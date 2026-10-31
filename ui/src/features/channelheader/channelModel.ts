@@ -61,3 +61,28 @@ export function permissionList(
   const order: Permission[] = ["enter", "speak", "textMessage", "whisper", "listen", "write"];
   return order.map((permission) => ({ permission, allowed: permissions[permission] }));
 }
+
+/**
+ * People who can be moved into `channelId`: everyone else on the server who is in another channel
+ * the own user may move people out of. Sorted by their channel, then by name.
+ */
+export function movablePeople(
+  users: ReadonlyMap<number, User>,
+  channels: ReadonlyMap<number, ChannelInfo>,
+  selfSession: number | null,
+  channelId: number,
+): User[] {
+  return [...users.values()]
+    .filter(
+      (user) =>
+        user.session !== selfSession &&
+        user.channelId !== channelId &&
+        channels.get(user.channelId)?.permissions.moveUsers === true,
+    )
+    .sort(
+      (a, b) =>
+        (channels.get(a.channelId)?.name ?? "").localeCompare(
+          channels.get(b.channelId)?.name ?? "",
+        ) || a.name.localeCompare(b.name),
+    );
+}

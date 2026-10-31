@@ -3,6 +3,7 @@
   "copyFailed": "Níorbh fhéidir an nasc a chóipeáil",
   "menu": {
     "label": "Roghanna cainéil do {{channel}}",
+    "join": "Téigh isteach sa chainéal",
     "follow": "Lean an cainéal",
     "unfollow": "Éirigh as an gcainéal a leanúint",
     "following": "Ag leanúint",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Ceol",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Bog úsáideoirí anseo…"
   },
   "info": {
     "title": "Eolas faoin gcainéal: {{channel}}",
@@ -107,5 +109,13 @@
     "remove": "Bain an phróifíl",
     "cancel": "Cealaigh",
     "save": "Sábháil"
+  },
+  "moveDialog": {
+    "title": "Bog daoine go {{channel}}",
+    "legend": "Daoine le bogadh",
+    "empty": "Níl aon duine i gcainéil eile ar féidir leat é a bhogadh.",
+    "failed": "Níorbh fhéidir roinnt daoine a bhogadh.",
+    "cancel": "Cealaigh",
+    "submit": "Bog"
   }
 }

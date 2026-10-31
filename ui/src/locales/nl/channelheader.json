@@ -3,6 +3,7 @@
   "copyFailed": "Link kopiëren mislukt",
   "menu": {
     "label": "Kanaalopties voor {{channel}}",
+    "join": "Kanaal betreden",
     "follow": "Kanaal volgen",
     "unfollow": "Kanaal niet meer volgen",
     "following": "Volgend",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Muziek",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Gebruikers hierheen verplaatsen…"
   },
   "info": {
     "title": "Kanaalinfo: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Profiel verwijderen",
     "cancel": "Annuleren",
     "save": "Opslaan"
+  },
+  "moveDialog": {
+    "title": "Mensen naar {{channel}} verplaatsen",
+    "legend": "Te verplaatsen mensen",
+    "empty": "Er is niemand in andere kanalen die je mag verplaatsen.",
+    "failed": "Sommige mensen konden niet worden verplaatst.",
+    "cancel": "Annuleren",
+    "submit": "Verplaatsen"
   }
 }

@@ -3,6 +3,7 @@
   "copyFailed": "Couldn't copy the link",
   "menu": {
     "label": "Channel options for {{channel}}",
+    "join": "Join channel",
     "follow": "Follow channel",
     "unfollow": "Unfollow channel",
     "following": "Following",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Music",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Move users here…"
   },
   "info": {
     "title": "Channel info: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Remove profile",
     "cancel": "Cancel",
     "save": "Save"
+  },
+  "moveDialog": {
+    "title": "Move people to {{channel}}",
+    "legend": "People to move",
+    "empty": "Nobody in another channel can be moved by you.",
+    "failed": "Some people could not be moved.",
+    "cancel": "Cancel",
+    "submit": "Move"
   }
 }

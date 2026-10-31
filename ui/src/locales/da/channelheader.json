@@ -3,6 +3,7 @@
   "copyFailed": "Linket kunne ikke kopieres",
   "menu": {
     "label": "Kanalindstillinger for {{channel}}",
+    "join": "Gå ind i kanalen",
     "follow": "Følg kanal",
     "unfollow": "Følg ikke kanalen længere",
     "following": "Følger",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Musik",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Flyt brugere hertil…"
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",
@@ -101,5 +103,13 @@
     "remove": "Fjern profil",
     "cancel": "Annuller",
     "save": "Gem"
+  },
+  "moveDialog": {
+    "title": "Flyt personer til {{channel}}",
+    "legend": "Personer der skal flyttes",
+    "empty": "Der er ingen i andre kanaler, som du må flytte.",
+    "failed": "Nogle personer kunne ikke flyttes.",
+    "cancel": "Annuller",
+    "submit": "Flyt"
   }
 }

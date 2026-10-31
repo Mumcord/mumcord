@@ -3,6 +3,7 @@
   "copyFailed": "Ir-rabta ma setgħetx tiġi kkupjata",
   "menu": {
     "label": "Għażliet tal-kanal għal {{channel}}",
+    "join": "Idħol fil-kanal",
     "follow": "Segwi l-kanal",
     "unfollow": "Waqqaf is-segwiment tal-kanal",
     "following": "Qed issegwi",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Mużika",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Mexxi utenti hawn…"
   },
   "info": {
     "title": "Informazzjoni dwar il-kanal: {{channel}}",
@@ -107,5 +109,13 @@
     "remove": "Neħħi l-profil",
     "cancel": "Ikkanċella",
     "save": "Issejvja"
+  },
+  "moveDialog": {
+    "title": "Mexxi nies għal {{channel}}",
+    "legend": "Nies li għandhom jitmexxew",
+    "empty": "M'hemm ħadd f'kanali oħra li tista' tmexxi.",
+    "failed": "Xi nies ma setgħux jitmexxew.",
+    "cancel": "Ikkanċella",
+    "submit": "Mexxi"
   }
 }

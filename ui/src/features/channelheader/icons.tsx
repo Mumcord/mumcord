@@ -79,3 +79,20 @@ export function MusicIcon() {
     </Icon>
   );
 }
+
+export function JoinIcon() {
+  return (
+    <Icon>
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+    </Icon>
+  );
+}
+
+export function PeopleIcon() {
+  return (
+    <Icon>
+      <circle cx="9" cy="7" r="4" />
+      <path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3" />
+    </Icon>
+  );
+}

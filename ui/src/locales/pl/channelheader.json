@@ -3,6 +3,7 @@
   "copyFailed": "Nie udało się skopiować linku",
   "menu": {
     "label": "Opcje kanału {{channel}}",
+    "join": "Dołącz do kanału",
     "follow": "Obserwuj kanał",
     "unfollow": "Przestań obserwować kanał",
     "following": "Obserwujesz",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Muzyka",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Przenieś użytkowników tutaj…"
   },
   "info": {
     "title": "Informacje o kanale: {{channel}}",
@@ -105,5 +107,13 @@
     "remove": "Usuń profil",
     "cancel": "Anuluj",
     "save": "Zapisz"
+  },
+  "moveDialog": {
+    "title": "Przenieś osoby do {{channel}}",
+    "legend": "Osoby do przeniesienia",
+    "empty": "W innych kanałach nie ma nikogo, kogo możesz przenieść.",
+    "failed": "Nie udało się przenieść niektórych osób.",
+    "cancel": "Anuluj",
+    "submit": "Przenieś"
   }
 }

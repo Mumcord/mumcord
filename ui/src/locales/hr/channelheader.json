@@ -3,6 +3,7 @@
   "copyFailed": "Poveznicu nije moguće kopirati",
   "menu": {
     "label": "Opcije kanala {{channel}}",
+    "join": "Uđi u kanal",
     "follow": "Prati kanal",
     "unfollow": "Prestani pratiti kanal",
     "following": "Pratiš",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Glazba",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Premjesti korisnike ovamo…"
   },
   "info": {
     "title": "Informacije o kanalu: {{channel}}",
@@ -103,5 +105,13 @@
     "remove": "Ukloni profil",
     "cancel": "Odustani",
     "save": "Spremi"
+  },
+  "moveDialog": {
+    "title": "Premjesti osobe u {{channel}}",
+    "legend": "Osobe za premještanje",
+    "empty": "U drugim kanalima nema nikoga koga smiješ premjestiti.",
+    "failed": "Neke osobe nije moguće premjestiti.",
+    "cancel": "Odustani",
+    "submit": "Premjesti"
   }
 }

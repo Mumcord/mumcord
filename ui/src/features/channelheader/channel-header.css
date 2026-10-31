@@ -181,3 +181,48 @@
   gap: var(--space-2);
   align-items: baseline;
 }
+
+/* "Move users here…" (issue #172). */
+.move-users__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 20rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+}
+
+.move-users__person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.move-users__person:hover {
+  background: var(--color-bg-hover);
+}
+
+.move-users__from {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.move-users__empty {
+  color: var(--color-text-secondary);
+}
+
+.move-users__error {
+  color: var(--color-danger);
+}
+
+.move-users__footer {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}

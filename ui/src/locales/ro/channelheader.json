@@ -3,6 +3,7 @@
   "copyFailed": "Linkul nu a putut fi copiat",
   "menu": {
     "label": "Opțiuni pentru canalul {{channel}}",
+    "join": "Intră în canal",
     "follow": "Urmărește canalul",
     "unfollow": "Nu mai urmări canalul",
     "following": "Urmărești",
@@ -14,7 +15,8 @@
     "audioHint": {
       "music": "♪ Muzică",
       "jam": "⚡ Jam"
-    }
+    },
+    "move": "Mută utilizatori aici…"
   },
   "info": {
     "title": "Informații despre canal: {{channel}}",
@@ -103,5 +105,13 @@
     "remove": "Elimină profilul",
     "cancel": "Anulează",
     "save": "Salvează"
+  },
+  "moveDialog": {
+    "title": "Mută persoane în {{channel}}",
+    "legend": "Persoane de mutat",
+    "empty": "Nu există nimeni în alte canale pe care să-l poți muta.",
+    "failed": "Unele persoane nu au putut fi mutate.",
+    "cancel": "Anulează",
+    "submit": "Mută"
   }
 }
