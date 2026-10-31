@@ -17,6 +17,7 @@
     "about": "Teave",
     "servers": "Serverid",
     "privacy": "Privaatsus",
+    "updates": "Uuendused",
     "packetInspector": "Pakettide inspektor"
   },
   "search": {
@@ -433,14 +434,6 @@
       "unsupported": "Mängusisene kattekiht pole sellel süsteemil saadaval. Selle asemel kasutatakse ülalolevat akna kattekihti.",
       "loadFailed": "Mängusisese kattekihi seadeid ei õnnestunud laadida.",
       "saveFailed": "Mängusisese kattekihi muudatust ei õnnestunud rakendada.",
-      "confirmTitle": "Lülitan mängu {{game}} kattekihi sisse?",
-      "confirmMessage": "Hoiatus: {{game}} kasutab petmisvastast kaitset ({{reason}}). Kattekihte võidakse tuvastada petmisena ja sinu konto võidakse blokeerida. Mumcord ei vastuta selle eest. Jätka ainult siis, kui aktsepteerid selle riski.",
-      "confirmEnable": "Lülita sellegipoolest sisse",
-      "limits": {
-        "libraryMissing": "Mängusisene kattekiht pole saadaval: selle kattekihi teeki (libmumcord_overlay_layer.so) ei leitud Mumcordi kõrvalt. Selle taastamiseks installi Mumcord uuesti. Selle asemel kasutatakse ülalolevat akna kattekihti.",
-        "windowsFullscreen": "Kasuta mängus ääristeta või aknas täisekraani.",
-        "macos": "macOS ei toeta mängusiseseid kattekihte. Selle asemel kasutatakse ülalolevat akna kattekihti."
-      },
       "opengl": {
         "title": "OpenGL-mängud",
         "explanation": "Vajalik ainult OpenGL-mängudele: kleebi mängu Steami käivitusvalikutesse.",
@@ -448,6 +441,14 @@
         "copy": "Kopeeri",
         "copied": "Kopeeritud",
         "copyFailed": "Kopeerimine ebaõnnestus. Vali tekst ja kopeeri see käsitsi."
+      },
+      "confirmTitle": "Lülitan mängu {{game}} kattekihi sisse?",
+      "confirmMessage": "Hoiatus: {{game}} kasutab petmisvastast kaitset ({{reason}}). Kattekihte võidakse tuvastada petmisena ja sinu konto võidakse blokeerida. Mumcord ei vastuta selle eest. Jätka ainult siis, kui aktsepteerid selle riski.",
+      "confirmEnable": "Lülita sellegipoolest sisse",
+      "limits": {
+        "libraryMissing": "Mängusisene kattekiht pole saadaval: selle kattekihi teeki (libmumcord_overlay_layer.so) ei leitud Mumcordi kõrvalt. Selle taastamiseks installi Mumcord uuesti. Selle asemel kasutatakse ülalolevat akna kattekihti.",
+        "windowsFullscreen": "Kasuta mängus ääristeta või aknas täisekraani.",
+        "macos": "macOS ei toeta mängusiseseid kattekihte. Selle asemel kasutatakse ülalolevat akna kattekihti."
       }
     }
   },
@@ -618,11 +619,6 @@
     "allow": "Luba otseühendused teiste Mumcordi kasutajatega",
     "hint": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Kuni sa pole otsustanud, küsib Mumcord esimesel korral, kui mõnda kasutataks.",
     "notUsed": "Valitud peer-to-peer-režiimis ei kasutata: Mumcord ei loo kunagi otseühendust teistega."
-  },
-  "updates": {
-    "title": "Uuendused",
-    "check": "Otsi uusi versioone",
-    "hint": "Kord päevas küsib Mumcord GitHubilt uusimat väljalaset. Midagi muud ei saadeta."
   },
   "appImageMenu": {
     "label": "Lisa Mumcord rakenduste menüüsse",
@@ -805,5 +801,61 @@
     "collapseHint": "Näitab teadet „Sõnum blokeeritud kasutajalt“ ja nuppu „Näita“.",
     "hide": "Peida need täielikult",
     "hideHint": "Vestluses ei näidata midagi."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · paigaldatud allikast: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage kirjutuskaitstud kaustas",
+      "windowsInstaller": "Windowsi paigaldaja",
+      "windowsPortable": "kaasaskantav Windowsi zip",
+      "macApp": "macOS-i rakendus",
+      "otherMac": "macOS-i koopia väljaspool rakenduse paketti",
+      "deb": ".deb-pakett",
+      "rpm": ".rpm-pakett",
+      "aur": "AUR",
+      "otherLinux": "Linuxi pakett"
+    },
+    "checking": "Kontrollin",
+    "mode": "Kui uuendus leitakse",
+    "modeHint": "Uuendusi kontrollitakse ja verifitseeritakse alati enne paigaldamist.",
+    "modeAuto": "Laadi automaatselt alla",
+    "modeNotify": "Anna ainult teada",
+    "modeOff": "Väljas",
+    "autoUnavailable": "See koopia ei saa end ise uuendada, seega annab Mumcord uutest versioonidest ainult teada.",
+    "interval": "Kontrolli uuendusi",
+    "intervalHint_one": "Käivitamisel ja iga tunni järel",
+    "intervalHint_other": "Käivitamisel ja iga {{count}} tunni järel",
+    "intervalWeekHint": "Käivitamisel ja kord nädalas",
+    "intervalHours_one": "Iga tunni järel",
+    "intervalHours_other": "Iga {{count}} tunni järel",
+    "intervalWeek": "Kord nädalas",
+    "status": "Olek",
+    "state": {
+      "idle": "Pole veel kontrollitud",
+      "off": "Uuenduste kontroll on välja lülitatud",
+      "checking": "Uuendusi kontrollitakse…",
+      "upToDate": "Mumcord on ajakohane",
+      "available": "Mumcord {{version}} on saadaval",
+      "downloading": "Mumcord {{version}} laaditakse alla…",
+      "verifying": "Mumcord {{version}} allalaadimist kontrollitakse…",
+      "installing": "Mumcord {{version}} paigaldatakse…",
+      "ready": "Mumcord {{version}} on valmis. Uuendamiseks käivita uuesti.",
+      "failed": "Viimane uuendus ei õnnestunud",
+      "offline": "GitHubiga ei saanud ühendust. Mumcord proovib hiljem uuesti."
+    },
+    "devBuild": "Arendusversioon: uuendused on välja lülitatud",
+    "lastCheckedToday": "Viimati kontrollitud täna kell {{time}}",
+    "lastCheckedYesterday": "Viimati kontrollitud eile kell {{time}}",
+    "lastCheckedOn": "Viimati kontrollitud {{date}} kell {{time}}",
+    "checkNow": "Kontrolli kohe",
+    "showUpdate": "Näita uuendust",
+    "checkFailed": "Kontrolli ei saanud käivitada. Proovi uuesti.",
+    "skipped": "Vahele jäetud versioon",
+    "skippedHint": "Versioon {{version}} jäetakse vahele ja seda enam ei pakuta.",
+    "stopSkipping": "Lõpeta vahelejätmine",
+    "whatsNew": "Mis on uut",
+    "whatsNewHint": "Vaata iga versiooni muudatusi.",
+    "openChangelog": "Ava muudatuste logi"
   }
 }

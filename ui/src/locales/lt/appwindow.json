@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Ieškoti naujų versijų?",
-    "description": "Mumcord gali kartą per dieną paklausti GitHub, ar yra naujesnė versija, ir parodyti patarimą su nuoroda. Niekas neatsisiunčiama ir nediegiama, ir nieko nesiunčiama, išskyrus pačią užklausą bei programos pavadinimą ir versiją. Vėliau tai gali pakeisti nustatymuose.",
+    "description": "Mumcord gali reguliariai klausti GitHub, ar yra naujesnė versija, ir tau apie tai pranešti. Be tavo sutikimo niekas nesiunčiamas ir neįdiegiamas, o siunčiama tik pati užklausa bei programos pavadinimas ir versija. Vėliau tai gali pakeisti nustatymuose.",
     "no": "Ne",
     "yes": "Taip",
     "failed": "Nepavyko. Bandyk dar kartą."
-  },
-  "updateHint": {
-    "message": "Pasiekiama Mumcord {{version}}.",
-    "open": "Žiūrėti leidimą",
-    "dismiss": "Uždaryti",
-    "portable": "Atsisiųskite naują nešiojamąjį zip ir išskleiskite jį į šį aplanką; jūsų duomenys MumcordData išliks."
   },
   "directConsent": {
     "title": "Leisti tiesioginius ryšius?",
@@ -46,5 +40,88 @@
     "no": "Ne",
     "yes": "Taip",
     "failed": "Nepavyko. Bandyk dar kartą."
+  },
+  "updater": {
+    "stable": "Stabili",
+    "available": {
+      "title": "Yra naujinimas",
+      "subtitle": "Mumcord {{version}} paruoštas atsisiųsti. Tu turi {{current}}.",
+      "subtitleManual": "Išleista Mumcord {{version}}. Tu turi {{current}}.",
+      "whatsNew": "Kas nauja nuo {{current}}",
+      "trust": "Atsisiunčiama tik iš github.com per HTTPS ir prieš diegiant patikrinama pagal parašą ir kontrolinę sumą.",
+      "skip": "Praleisti šią versiją",
+      "later": "Priminti vėliau",
+      "download": "Atsisiųsti ir įdiegti",
+      "openReleasePage": "Atidaryti leidimo puslapį",
+      "manual": "Atsisiųsk naują versiją iš leidimo puslapio.",
+      "manualPackage": "Atsisiųsk paketą iš leidimo puslapio ir įdiek jį komanda:",
+      "manualAur": "Atnaujink jį savo AUR pagalbininku:"
+    },
+    "tags": {
+      "added": "Pridėta",
+      "changed": "Pakeista",
+      "fixed": "Ištaisyta",
+      "removed": "Pašalinta"
+    },
+    "noNotes": "Šiai versijai pastabų nėra.",
+    "steps": {
+      "download": "Atsisiuntimas",
+      "verify": "Parašo ir kontrolinės sumos patikra",
+      "install": "Diegimas",
+      "done": "atlikta",
+      "current": "vykdoma",
+      "pending": "dar nepradėta"
+    },
+    "progress": {
+      "title": "Atsisiunčiama Mumcord {{version}}",
+      "subtitle": "Kol tai vyksta, gali toliau naudoti Mumcord.",
+      "label": "Naujinimo eiga",
+      "unknown": "Dydis dar nežinomas",
+      "size": "{{received}} iš {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "liko apie {{count}} sekundė",
+      "secondsLeft_few": "liko apie {{count}} sekundės",
+      "secondsLeft_many": "liko apie {{count}} sekundės",
+      "secondsLeft_other": "liko apie {{count}} sekundžių",
+      "minutesLeft_one": "liko apie {{count}} minutė",
+      "minutesLeft_few": "liko apie {{count}} minutės",
+      "minutesLeft_many": "liko apie {{count}} minutės",
+      "minutesLeft_other": "liko apie {{count}} minučių",
+      "cancel": "Atšaukti"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} paruoštas",
+      "subtitle": "Paleisk iš naujo, kad baigtum naujinimą.",
+      "verified": "Patikrinta",
+      "downloaded": "Atsisiųsta",
+      "checked": "Parašas ir kontrolinė suma patikrinti",
+      "installed": "Įdiegta",
+      "installsOnRestart": "Įdiegiama, kai Mumcord paleidžiamas iš naujo",
+      "connected_one": "Esi prisijungęs prie {{count}} serverio. Po paleidimo iš naujo Mumcord vėl prisijungs ir grįš į tavo kanalus.",
+      "connected_few": "Esi prisijungęs prie {{count}} serverių. Po paleidimo iš naujo Mumcord vėl prisijungs ir grįš į tavo kanalus.",
+      "connected_many": "Esi prisijungęs prie {{count}} serverio. Po paleidimo iš naujo Mumcord vėl prisijungs ir grįš į tavo kanalus.",
+      "connected_other": "Esi prisijungęs prie {{count}} serverių. Po paleidimo iš naujo Mumcord vėl prisijungs ir grįš į tavo kanalus.",
+      "later": "Vėliau",
+      "restart": "Paleisti iš naujo ir naujinti",
+      "announce": "Mumcord {{version}} paruoštas. Paleisk iš naujo, kad atnaujintum."
+    },
+    "failed": {
+      "title": "Naujinimas nepavyko",
+      "subtitle": "Mumcord {{version}} neįdiegta. Tavo dabartinė versija toliau veikia.",
+      "network": "Mumcord nepavyko pasiekti GitHub. Patikrink interneto ryšį ir bandyk dar kartą.",
+      "manifest": "Naujinimo informacija GitHub neišsami arba sugadinta, todėl niekas neįdiegta.",
+      "signature": "Atsisiuntimo parašas nesutapo, todėl atsisiuntimas atmestas.",
+      "checksum": "Atsisiuntimas nesutapo su savo kontroline suma, todėl buvo atmestas.",
+      "install": "Naujinimo diegimas nepavyko. Tavo įdiegta versija nepasikeitė.",
+      "retry": "Bandyti dar kartą",
+      "close": "Uždaryti"
+    },
+    "actionFailed": "Nepavyko. Bandyk dar kartą.",
+    "toast": {
+      "title": "Mumcord {{version}} paruoštas",
+      "body": "Paleisk iš naujo, kad atnaujintum.",
+      "restart": "Paleisti iš naujo",
+      "later": "Vėliau"
+    }
   }
 }

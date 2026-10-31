@@ -609,8 +609,16 @@ pub struct Settings {
     pub allow_direct_connections: Consent,
     /// Global P2P mode (FR-4.1); a server entry may override it (FR-4.2).
     pub p2p_mode: P2pMode,
-    /// Daily check for a new version (FR-2.56); `Unset` asks.
+    /// Check for new versions (FR-2.56, FR-3.146); `Unset` asks, `No` is "Off": nothing is
+    /// contacted.
     pub update_check: Consent,
+    /// "Download automatically" instead of "Notify only" (FR-3.146); only used while
+    /// `update_check` is `Yes`. A restart is always asked for.
+    pub update_auto_download: bool,
+    /// Hours between two update checks (FR-3.144). Clamped on load.
+    pub update_interval_hours: u32,
+    /// "Skip this version": this version is never offered again (FR-3.144).
+    pub update_skipped: Option<String>,
     /// When the last update check ran, in milliseconds since the Unix epoch.
     pub last_update_check: Option<i64>,
     /// AppImage only: the user's answer to "Add Mumcord to the app menu" (FR-2.55). The menu
@@ -637,6 +645,12 @@ pub struct Settings {
     /// Channel messages of blocked users: collapsed or hidden (issue #140).
     pub blocked_messages: BlockedMessages,
 }
+
+/// Default hours between two update checks (FR-3.144).
+pub const DEFAULT_UPDATE_INTERVAL_HOURS: u32 = 12;
+/// Bounds of the update check interval: hourly up to weekly.
+pub const MIN_UPDATE_INTERVAL_HOURS: u32 = 1;
+pub const MAX_UPDATE_INTERVAL_HOURS: u32 = 168;
 
 /// Default own bitrate cap in kbit/s: today's speech cap (FR-2.64).
 pub const DEFAULT_BITRATE_KBPS: u32 = 96;
@@ -702,6 +716,9 @@ impl Default for Settings {
             allow_direct_connections: Consent::Unset,
             p2p_mode: P2pMode::DirectRelay,
             update_check: Consent::Unset,
+            update_auto_download: false,
+            update_interval_hours: DEFAULT_UPDATE_INTERVAL_HOURS,
+            update_skipped: None,
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
             window_overlay_notice_shown: false,
@@ -769,6 +786,9 @@ impl Store {
                 settings.video_ducking_percent = settings
                     .video_ducking_percent
                     .clamp(MIN_VIDEO_DUCKING_PERCENT, MAX_VIDEO_DUCKING_PERCENT);
+                settings.update_interval_hours = settings
+                    .update_interval_hours
+                    .clamp(MIN_UPDATE_INTERVAL_HOURS, MAX_UPDATE_INTERVAL_HOURS);
                 settings.input_gain_percent = settings.input_gain_percent.min(200);
                 settings.output_volume_percent = settings.output_volume_percent.min(100);
                 Ok(settings)
@@ -1002,6 +1022,9 @@ mod tests {
         assert_eq!(loaded.update_check, Consent::Unset);
         assert_eq!(loaded.appimage_menu_entry, Consent::Unset);
         assert_eq!(loaded.last_update_check, None);
+        assert!(!loaded.update_auto_download);
+        assert_eq!(loaded.update_interval_hours, DEFAULT_UPDATE_INTERVAL_HOURS);
+        assert_eq!(loaded.update_skipped, None);
         assert!(!loaded.window_overlay_notice_shown);
         assert!(loaded.whats_new_auto);
         assert_eq!(loaded.whats_new_seen, None);
@@ -1102,6 +1125,25 @@ mod tests {
                     .settings()
                     .expect("reload")
                     .legacy_window_overlay_enabled,
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn update_interval_is_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        for (stored, expected) in [(0, 1), (12, 12), (10_000, 168)] {
+            store
+                .conn
+                .execute(
+                    "INSERT INTO settings (id, data) VALUES (1, ?1)
+                     ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                    params![format!(r#"{{"update_interval_hours":{stored}}}"#)],
+                )
+                .expect("write");
+            assert_eq!(
+                store.settings().expect("load").update_interval_hours,
                 expected
             );
         }

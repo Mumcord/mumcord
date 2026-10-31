@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Check for new versions?",
-    "description": "Mumcord can ask GitHub once a day whether a newer version exists and show a hint with a link. Nothing is downloaded or installed, and nothing is sent except the request itself and the app name and version. You can change this later in Settings.",
+    "description": "Mumcord can ask GitHub regularly whether a newer version exists and tell you about it. Nothing is downloaded or installed without asking you, and nothing is sent except the request itself and the app name and version. You can change this later in Settings.",
     "no": "No",
     "yes": "Yes",
     "failed": "That did not work. Please try again."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} is available.",
-    "open": "View release",
-    "dismiss": "Dismiss",
-    "portable": "Download the new portable zip and unpack it into the folder with Mumcord.exe; your data in MumcordData stays."
   },
   "directConsent": {
     "title": "Allow direct connections?",
@@ -46,5 +40,82 @@
     "no": "No",
     "yes": "Yes",
     "failed": "That did not work. Please try again."
+  },
+  "updater": {
+    "stable": "Stable",
+    "available": {
+      "title": "Update available",
+      "subtitle": "Mumcord {{version}} is ready to download. You have {{current}}.",
+      "subtitleManual": "Mumcord {{version}} is out. You have {{current}}.",
+      "whatsNew": "What's new since {{current}}",
+      "trust": "Downloaded only from github.com over HTTPS and checked against its signature and checksum before it is installed.",
+      "skip": "Skip this version",
+      "later": "Remind me later",
+      "download": "Download and install",
+      "openReleasePage": "Open release page",
+      "manual": "Download the new version from the release page.",
+      "manualPackage": "Download the package from the release page, then install it with:",
+      "manualAur": "Update it with your AUR helper:"
+    },
+    "tags": {
+      "added": "Added",
+      "changed": "Changed",
+      "fixed": "Fixed",
+      "removed": "Removed"
+    },
+    "noNotes": "No notes for this version.",
+    "steps": {
+      "download": "Download",
+      "verify": "Verify signature and checksum",
+      "install": "Install",
+      "done": "done",
+      "current": "in progress",
+      "pending": "not started yet"
+    },
+    "progress": {
+      "title": "Downloading Mumcord {{version}}",
+      "subtitle": "Keep using Mumcord while this runs.",
+      "label": "Update progress",
+      "unknown": "Size not known yet",
+      "size": "{{received}} of {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "about {{count}} second left",
+      "secondsLeft_other": "about {{count}} seconds left",
+      "minutesLeft_one": "about {{count}} minute left",
+      "minutesLeft_other": "about {{count}} minutes left",
+      "cancel": "Cancel"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} is ready",
+      "subtitle": "Restart to finish the update.",
+      "verified": "Verified",
+      "downloaded": "Downloaded",
+      "checked": "Signature and checksum verified",
+      "installed": "Installed",
+      "installsOnRestart": "Installs when Mumcord restarts",
+      "connected_one": "You are connected to {{count}} server. Mumcord will reconnect and rejoin your channels after the restart.",
+      "connected_other": "You are connected to {{count}} servers. Mumcord will reconnect and rejoin your channels after the restart.",
+      "later": "Later",
+      "restart": "Restart to update",
+      "announce": "Mumcord {{version}} is ready. Restart to update."
+    },
+    "failed": {
+      "title": "The update did not work",
+      "subtitle": "Mumcord {{version}} was not installed. Your current version keeps working.",
+      "network": "Mumcord could not reach GitHub. Check your internet connection and try again.",
+      "manifest": "The update information on GitHub is incomplete or broken, so nothing was installed.",
+      "signature": "The signature of the download did not match, so the download was discarded.",
+      "checksum": "The download did not match its checksum, so the download was discarded.",
+      "install": "Installing the update failed. Your installed version is unchanged.",
+      "retry": "Retry",
+      "close": "Close"
+    },
+    "actionFailed": "That did not work. Please try again.",
+    "toast": {
+      "title": "Mumcord {{version}} is ready",
+      "body": "Restart to update.",
+      "restart": "Restart",
+      "later": "Later"
+    }
   }
 }

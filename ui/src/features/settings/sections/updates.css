@@ -1,0 +1,85 @@
+/* Updates section (FR-3.146): a title with its hint on the left, the control on the right. */
+.upd-settings-origin {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+.upd-settings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  padding: var(--space-3) 0;
+}
+
+.upd-settings-row + .upd-settings-row {
+  border-top: 1px solid var(--color-border);
+}
+
+/* A row with a dropdown uses the shared label-left, control-right row, its hint below. */
+.upd-settings-row--control {
+  display: block;
+}
+
+.upd-settings-row--control .settings-hint {
+  margin-bottom: 0;
+}
+
+.upd-settings-row__text {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.upd-settings-row__title {
+  display: block;
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.upd-settings-row__title--quiet {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+}
+
+.upd-settings-row__text .settings-hint {
+  margin-bottom: 0;
+}
+
+.upd-segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.upd-segmented__option {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: background-color var(--duration-fast);
+}
+
+.upd-segmented__option:hover:not(.upd-segmented__option--on) {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.upd-segmented__option--on {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
+}
+
+.upd-segmented__option:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upd-segmented__option:has(input:focus-visible) {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}

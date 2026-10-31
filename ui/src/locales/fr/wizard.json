@@ -1,24 +1,5 @@
 {
   "progress": "Étape {{current}} sur {{total}}",
-  "rerun": {
-    "title": "Assistant de configuration",
-    "note": "Vous relancez la configuration. Votre identité n'est pas modifiée.",
-    "manageIdentities": "Gérer les identités",
-    "stepsLabel": "Étapes de la configuration",
-    "stepsSkipped": "(ignorée, l'identité n'en fait pas partie)",
-    "steps": {
-      "identity": "Identité",
-      "mic": "Microphone",
-      "privacy": "Confidentialité",
-      "updates": "Mises à jour",
-      "talk": "Mode de parole"
-    },
-    "footer": "Annuler laisse tout en l'état. Seules les étapes modifiées sont enregistrées à la fin.",
-    "discardTitle": "Abandonner vos modifications ?",
-    "discardBody": "Rien n'est enregistré avant la fin. Si vous annulez maintenant, tout reste en l'état.",
-    "discardKeep": "Continuer la modification",
-    "discardConfirm": "Abandonner les modifications"
-  },
   "loadFailed": "La configuration n’a pas pu être chargée.",
   "finish": "Terminer",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Tout ce que Mumcord enregistre reste sur votre ordinateur.",
     "statement": "Déclaration de confidentialité complète"
   },
+  "updates": {
+    "title": "Nouvelles versions",
+    "choice": "Quand une nouvelle version est disponible",
+    "auto": "Télécharger automatiquement",
+    "autoHint": "Mumcord télécharge et vérifie la mise à jour en arrière-plan, puis vous demande avant de redémarrer.",
+    "notify": "Notifier seulement",
+    "notifyHint": "Mumcord vous signale une nouvelle version et montre ce qui a changé. Rien n'est téléchargé tant que vous ne le décidez pas.",
+    "off": "Désactivé",
+    "offHint": "Mumcord ne demande jamais à GitHub de nouvelles versions. Vous faites la mise à jour vous-même.",
+    "privacy": "La vérification envoie à GitHub uniquement la requête elle-même, le nom de l'application et sa version. Vous pouvez modifier cela plus tard dans les Paramètres."
+  },
   "talk": {
     "title": "Comment voulez-vous parler ?",
     "mode": "Mode de parole",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Certains jeux dotés d’un anti-triche peuvent signaler ou bloquer les overlays en jeu. Mumcord désactive par défaut les jeux connus pour être risqués (comme Valorant ou League of Legends). Activez-le uniquement pour les jeux de confiance.",
     "ingameOverlayAlt": "Exemple de l’overlay en jeu indiquant qui parle"
   },
-  "updates": {
-    "title": "Nouvelles versions",
-    "check": "Rechercher les nouvelles versions",
-    "hint": "Mumcord peut demander une fois par jour à GitHub si une version plus récente existe et afficher un avis avec un lien. Rien n’est téléchargé ni installé, et rien n’est envoyé à part la requête elle-même, le nom et la version de l’application. Vous pourrez modifier ce choix plus tard dans les paramètres."
+  "rerun": {
+    "title": "Assistant de configuration",
+    "note": "Vous relancez la configuration. Votre identité n'est pas modifiée.",
+    "manageIdentities": "Gérer les identités",
+    "stepsLabel": "Étapes de la configuration",
+    "stepsSkipped": "(ignorée, l'identité n'en fait pas partie)",
+    "steps": {
+      "identity": "Identité",
+      "mic": "Microphone",
+      "privacy": "Confidentialité",
+      "updates": "Mises à jour",
+      "talk": "Mode de parole"
+    },
+    "footer": "Annuler laisse tout en l'état. Seules les étapes modifiées sont enregistrées à la fin.",
+    "discardTitle": "Abandonner vos modifications ?",
+    "discardBody": "Rien n'est enregistré avant la fin. Si vous annulez maintenant, tout reste en l'état.",
+    "discardKeep": "Continuer la modification",
+    "discardConfirm": "Abandonner les modifications"
   }
 }

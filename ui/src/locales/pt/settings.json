@@ -17,6 +17,7 @@
     "about": "Acerca de",
     "servers": "Servidores",
     "privacy": "Privacidade",
+    "updates": "Atualizações",
     "packetInspector": "Inspetor de pacotes"
   },
   "search": {
@@ -435,14 +436,6 @@
       "unsupported": "O overlay no jogo não está disponível neste sistema. É usado o overlay em janela acima.",
       "loadFailed": "Não foi possível carregar as definições do overlay no jogo.",
       "saveFailed": "Não foi possível aplicar a alteração do overlay no jogo.",
-      "confirmTitle": "Ativar o overlay para {{game}}?",
-      "confirmMessage": "Aviso: {{game}} usa proteção anti-cheat ({{reason}}). Os overlays podem ser detetados como batota e a tua conta pode ser banida. O Mumcord não se responsabiliza por isso. Continua apenas se aceitares este risco.",
-      "confirmEnable": "Ativar mesmo assim",
-      "limits": {
-        "libraryMissing": "O overlay no jogo não está disponível: a sua biblioteca (libmumcord_overlay_layer.so) não foi encontrada junto ao Mumcord. Reinstala o Mumcord para a repor. É usado o overlay em janela acima.",
-        "windowsFullscreen": "Use ecrã inteiro sem margens ou em janela no jogo.",
-        "macos": "O macOS não suporta overlays no jogo. É usado o overlay em janela acima."
-      },
       "opengl": {
         "title": "Jogos OpenGL",
         "explanation": "Só é preciso para jogos OpenGL: cola nas opções de arranque do Steam do jogo.",
@@ -450,6 +443,14 @@
         "copy": "Copiar",
         "copied": "Copiado",
         "copyFailed": "A cópia falhou. Seleciona o texto e copia-o à mão."
+      },
+      "confirmTitle": "Ativar o overlay para {{game}}?",
+      "confirmMessage": "Aviso: {{game}} usa proteção anti-cheat ({{reason}}). Os overlays podem ser detetados como batota e a tua conta pode ser banida. O Mumcord não se responsabiliza por isso. Continua apenas se aceitares este risco.",
+      "confirmEnable": "Ativar mesmo assim",
+      "limits": {
+        "libraryMissing": "O overlay no jogo não está disponível: a sua biblioteca (libmumcord_overlay_layer.so) não foi encontrada junto ao Mumcord. Reinstala o Mumcord para a repor. É usado o overlay em janela acima.",
+        "windowsFullscreen": "Use ecrã inteiro sem margens ou em janela no jogo.",
+        "macos": "O macOS não suporta overlays no jogo. É usado o overlay em janela acima."
       }
     }
   },
@@ -621,11 +622,6 @@
     "allow": "Permitir ligações diretas a outros utilizadores do Mumcord",
     "hint": "As ligações diretas são mais rápidas, mas a outra pessoa pode ver o teu endereço IP. Até decidires, o Mumcord pergunta na primeira vez que uma seria usada.",
     "notUsed": "Não é usado no modo peer-to-peer escolhido: o Mumcord nunca se liga diretamente a outras pessoas."
-  },
-  "updates": {
-    "title": "Atualizações",
-    "check": "Procurar novas versões",
-    "hint": "Uma vez por dia, o Mumcord pergunta ao GitHub pela versão mais recente. Mais nada é enviado."
   },
   "appImageMenu": {
     "label": "Adicionar o Mumcord ao menu de aplicações",
@@ -809,5 +805,63 @@
     "collapseHint": "Mostra «Mensagem de um utilizador bloqueado» com um botão «Mostrar».",
     "hide": "Ocultá-las por completo",
     "hideHint": "Nada é mostrado no chat."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · instalado a partir de {{source}}",
+    "install": {
+      "appImage": "o AppImage",
+      "appImageReadOnly": "um AppImage numa pasta só de leitura",
+      "windowsInstaller": "o instalador do Windows",
+      "windowsPortable": "o zip portátil do Windows",
+      "macApp": "a aplicação para macOS",
+      "otherMac": "uma cópia do macOS fora de um pacote de aplicação",
+      "deb": "o pacote .deb",
+      "rpm": "o pacote .rpm",
+      "aur": "o AUR",
+      "otherLinux": "um pacote Linux"
+    },
+    "checking": "A verificar",
+    "mode": "Quando for encontrada uma atualização",
+    "modeHint": "As atualizações são sempre verificadas e validadas antes de serem instaladas.",
+    "modeAuto": "Transferir automaticamente",
+    "modeNotify": "Apenas notificar",
+    "modeOff": "Desativado",
+    "autoUnavailable": "Esta cópia não se consegue atualizar sozinha, por isso o Mumcord só te avisa das novas versões.",
+    "interval": "Procurar atualizações",
+    "intervalHint_one": "Ao iniciar e a cada hora",
+    "intervalHint_many": "Ao iniciar e a cada {{count}} horas",
+    "intervalHint_other": "Ao iniciar e a cada {{count}} de horas",
+    "intervalWeekHint": "Ao iniciar e uma vez por semana",
+    "intervalHours_one": "A cada hora",
+    "intervalHours_many": "A cada {{count}} horas",
+    "intervalHours_other": "A cada {{count}} de horas",
+    "intervalWeek": "Uma vez por semana",
+    "status": "Estado",
+    "state": {
+      "idle": "Ainda não verificado",
+      "off": "A procura de atualizações está desativada",
+      "checking": "A procurar atualizações…",
+      "upToDate": "O Mumcord está atualizado",
+      "available": "O Mumcord {{version}} está disponível",
+      "downloading": "A transferir o Mumcord {{version}}…",
+      "verifying": "A verificar a transferência do Mumcord {{version}}…",
+      "installing": "A instalar o Mumcord {{version}}…",
+      "ready": "O Mumcord {{version}} está pronto. Reinicia para atualizar.",
+      "failed": "A última atualização não funcionou",
+      "offline": "Não foi possível aceder ao GitHub. O Mumcord tenta novamente mais tarde."
+    },
+    "devBuild": "Versão de desenvolvimento: as atualizações estão desativadas",
+    "lastCheckedToday": "Última verificação hoje às {{time}}",
+    "lastCheckedYesterday": "Última verificação ontem às {{time}}",
+    "lastCheckedOn": "Última verificação em {{date}} às {{time}}",
+    "checkNow": "Verificar agora",
+    "showUpdate": "Mostrar atualização",
+    "checkFailed": "Não foi possível iniciar a verificação. Tenta novamente.",
+    "skipped": "Versão ignorada",
+    "skippedHint": "A {{version}} é ignorada e não voltará a ser oferecida.",
+    "stopSkipping": "Deixar de ignorar",
+    "whatsNew": "Novidades",
+    "whatsNewHint": "Vê as alterações de cada versão.",
+    "openChangelog": "Abrir o registo de alterações"
   }
 }

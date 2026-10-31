@@ -1,9 +1,9 @@
 /** Real engine client: thin wrapper over the generated Tauri bindings. */
 import { commands, events } from "../bindings/commands";
 import {
+  isCommandResult,
   toEngineError,
   unwrap,
-  type CommandResult,
   type EngineCommands,
   type EventName,
   type EventPayloads,
@@ -11,7 +11,7 @@ import {
   type Unsubscribe,
 } from "./client";
 
-type AnyCommand = (...args: unknown[]) => Promise<CommandResult<unknown>>;
+type AnyCommand = (...args: unknown[]) => Promise<unknown>;
 
 /**
  * Listener registrations still on their way to the backend. Commands wait for them: a store
@@ -23,14 +23,15 @@ const registering = new Set<Promise<unknown>>();
 function wrap(fn: AnyCommand) {
   return async (...args: unknown[]): Promise<unknown> => {
     if (registering.size > 0) await Promise.all(registering);
-    let result: CommandResult<unknown>;
+    let result: unknown;
     try {
       result = await fn(...args);
     } catch (err) {
       // The generated runtime rethrows genuine JS errors (e.g. IPC unavailable).
       throw toEngineError(err);
     }
-    return unwrap(result);
+    // Commands that cannot fail (e.g. `update_status`) answer with the plain value.
+    return isCommandResult(result) ? unwrap(result) : result;
   };
 }
 

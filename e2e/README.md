@@ -88,7 +88,7 @@ from `@wdio/globals`). Import helpers from `e2e/helpers/index.ts`:
 | `netsim.start(svc)`, `netsim.ctl(...args)`, `netsim.stop()`                               | proxy `127.0.0.1:64800` → server; e.g. `ctl("loss","both","10")`, `ctl("block-udp","on")`                        |
 | `netsim.startProxy(svc, {listen, control})`                                               | extra proxy (own `ctl`, `stop`, `listenPort`), e.g. a bot behind its own proxy: `bot(cmd, {port: p.listenPort})` |
 | `testenv.address(svc)`, `testenv.project`                                                 | `localhost:<port>` for the add-server form; compose project (`MUMCORD_PROJECT`)                                  |
-| `app.restart({freshProfile, audio})`                                                      | quit and restart the app (keeps the profile unless `freshProfile`)                                               |
+| `app.restart({freshProfile, audio, env})`                                                 | quit and restart the app (keeps the profile unless `freshProfile`; `env`: extra app env for this spec file)      |
 | `app.profile()`                                                                           | current profile root (check files in `data/app.mumcord.client/` etc.)                                            |
 | `app.invoke(command, args)`                                                               | calls a Tauri command of the app and returns its result (state the UI does not show)                             |
 | `axe.scan(label, options)`, `axe.summarize(violations)`                                   | axe-core WCAG 2.2 AA scan of the current screen; returns violations                                              |

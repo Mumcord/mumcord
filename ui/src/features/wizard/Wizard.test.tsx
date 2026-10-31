@@ -311,23 +311,24 @@ describe("Wizard", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
-  it("asks about the update hint, off by default, and saves the answer", async () => {
+  it("asks what to do about new versions, off by default, and saves the answer", async () => {
     renderInWizard(harness, <Wizard />);
     await createIdentity();
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "Your privacy" });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "New versions" });
-    const check = screen.getByRole("checkbox", { name: "Check for new versions" });
-    expect(check).not.toBeChecked();
-    fireEvent.click(check);
+    expect(screen.getByRole("radio", { name: "Off" })).toBeChecked();
+    fireEvent.click(screen.getByRole("radio", { name: "Download automatically" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
     await waitFor(() => {
       expect(harness.finishWizard).toHaveBeenCalledOnce();
     });
-    expect((await harness.api.settingsGet()).updateCheck).toBe("yes");
+    const saved = await harness.api.settingsGet();
+    expect(saved.updateCheck).toBe("yes");
+    expect(saved.updateAutoDownload).toBe(true);
   });
 });
 
@@ -415,7 +416,7 @@ describe("Wizard rerun from Settings (#149)", () => {
     await screen.findByRole("heading", { name: "Your privacy" });
     next();
     await screen.findByRole("heading", { name: "New versions" });
-    expect(screen.getByRole("checkbox", { name: "Check for new versions" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Notify only" })).toBeChecked();
     next();
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     expect(screen.getByRole("radio", { name: /Push to talk/ })).toBeChecked();
@@ -504,9 +505,8 @@ describe("Wizard rerun from Settings (#149)", () => {
     await screen.findByRole("heading", { name: "Your privacy" });
     next();
     await screen.findByRole("heading", { name: "New versions" });
-    const check = screen.getByRole("checkbox", { name: "Check for new versions" });
-    expect(check).not.toBeChecked();
-    fireEvent.click(check);
+    expect(screen.getByRole("radio", { name: "Off" })).toBeChecked();
+    fireEvent.click(screen.getByRole("radio", { name: "Notify only" }));
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
   });
@@ -518,14 +518,16 @@ describe("Wizard rerun from Settings (#149)", () => {
     await screen.findByRole("heading", { name: "Your privacy" });
     next();
     await screen.findByRole("heading", { name: "New versions" });
-    fireEvent.click(screen.getByRole("checkbox", { name: "Check for new versions" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Notify only" }));
     next();
     await screen.findByRole("heading", { name: "How do you want to talk?" });
     fireEvent.click(screen.getByRole("button", { name: "Finish" }));
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledOnce();
     });
-    expect((await harness.api.settingsGet()).updateCheck).toBe("yes");
+    const saved = await harness.api.settingsGet();
+    expect(saved.updateCheck).toBe("yes");
+    expect(saved.updateAutoDownload).toBe(false);
   });
 
   it("asks before Cancel drops a changed microphone, and keeps everything on discard", async () => {

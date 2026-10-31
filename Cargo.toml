@@ -186,6 +186,7 @@ tauri-plugin-global-shortcut = "2.4"
 tauri-plugin-dialog = "2.8"
 tauri-plugin-opener = "2.7"
 tauri-plugin-clipboard-manager = "2.5"
+tauri-plugin-updater = { version = "2.10", default-features = false, features = ["rustls-tls", "zip"] }
 tauri-specta = { version = "=2.0.0-rc.26", features = ["derive", "typescript"] }
 specta = { version = "=2.0.0-rc.26", features = ["derive"] }
 specta-typescript = "0.0.13"

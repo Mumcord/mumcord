@@ -1,24 +1,5 @@
 {
   "progress": "Korak {{current}} od {{total}}",
-  "rerun": {
-    "title": "Čarobnjak za postavljanje",
-    "note": "Ponovno prolaziš kroz postavljanje. Tvoj identitet se ne mijenja.",
-    "manageIdentities": "Upravljaj identitetima",
-    "stepsLabel": "Koraci postavljanja",
-    "stepsSkipped": "(preskočeno, identitet nije dio ovoga)",
-    "steps": {
-      "identity": "Identitet",
-      "mic": "Mikrofon",
-      "privacy": "Privatnost",
-      "updates": "Ažuriranja",
-      "talk": "Način govora"
-    },
-    "footer": "Odustajanje ostavlja sve kako jest. Na kraju se spremaju samo promijenjeni koraci.",
-    "discardTitle": "Odbaciti promjene?",
-    "discardBody": "Ništa se ne sprema prije završetka. Ako sada odustaneš, sve ostaje kako jest.",
-    "discardKeep": "Nastavi uređivati",
-    "discardConfirm": "Odbaci promjene"
-  },
   "loadFailed": "Postavljanje nije bilo moguće učitati.",
   "finish": "Završi",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Sve što Mumcord sprema ostaje na vašem računalu.",
     "statement": "Cjelovita izjava o privatnosti"
   },
+  "updates": {
+    "title": "Nove verzije",
+    "choice": "Kad izađe nova verzija",
+    "auto": "Preuzmi automatski",
+    "autoHint": "Mumcord u pozadini preuzima i provjerava ažuriranje te te pita prije ponovnog pokretanja.",
+    "notify": "Samo obavijesti",
+    "notifyHint": "Mumcord te obavještava o novoj verziji i prikazuje što se promijenilo. Ništa se ne preuzima dok ti to ne kažeš.",
+    "off": "Isključeno",
+    "offHint": "Mumcord nikad ne pita GitHub za nove verzije. Ažuriraš sam.",
+    "privacy": "Provjera GitHubu šalje samo sam upit te naziv i verziju aplikacije. To možeš kasnije promijeniti u Postavkama."
+  },
   "talk": {
     "title": "Kako želiš govoriti?",
     "mode": "Način govora",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Neke igre s anti-cheatom mogu označiti ili blokirati overlaye u igri. Mumcord poznate rizične igre (poput Valoranta ili League of Legends) po zadanom drži isključenima. Uključi ga samo za igre kojima vjeruješ.",
     "ingameOverlayAlt": "Primjer overlaya u igri koji prikazuje tko govori"
   },
-  "updates": {
-    "title": "Nove verzije",
-    "check": "Provjeravaj nove verzije",
-    "hint": "Mumcord može jednom dnevno pitati GitHub postoji li novija verzija i prikazati savjet s poveznicom. Ništa se ne preuzima ni instalira, i ništa se ne šalje osim samog upita te naziva i verzije aplikacije. To možeš kasnije promijeniti u Postavkama."
+  "rerun": {
+    "title": "Čarobnjak za postavljanje",
+    "note": "Ponovno prolaziš kroz postavljanje. Tvoj identitet se ne mijenja.",
+    "manageIdentities": "Upravljaj identitetima",
+    "stepsLabel": "Koraci postavljanja",
+    "stepsSkipped": "(preskočeno, identitet nije dio ovoga)",
+    "steps": {
+      "identity": "Identitet",
+      "mic": "Mikrofon",
+      "privacy": "Privatnost",
+      "updates": "Ažuriranja",
+      "talk": "Način govora"
+    },
+    "footer": "Odustajanje ostavlja sve kako jest. Na kraju se spremaju samo promijenjeni koraci.",
+    "discardTitle": "Odbaciti promjene?",
+    "discardBody": "Ništa se ne sprema prije završetka. Ako sada odustaneš, sve ostaje kako jest.",
+    "discardKeep": "Nastavi uređivati",
+    "discardConfirm": "Odbaci promjene"
   }
 }

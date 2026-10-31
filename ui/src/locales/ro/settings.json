@@ -17,6 +17,7 @@
     "about": "Despre",
     "servers": "Servere",
     "privacy": "Confidențialitate",
+    "updates": "Actualizări",
     "packetInspector": "Inspector de pachete"
   },
   "search": {
@@ -435,14 +436,6 @@
       "unsupported": "Overlay-ul în joc nu e disponibil pe acest sistem. Se folosește în schimb overlay-ul în fereastră de mai sus.",
       "loadFailed": "Setările overlay-ului în joc nu au putut fi încărcate.",
       "saveFailed": "Modificarea overlay-ului în joc nu a putut fi aplicată.",
-      "confirmTitle": "Activezi overlay-ul pentru {{game}}?",
-      "confirmMessage": "Atenție: {{game}} folosește protecție anti-cheat ({{reason}}). Overlay-urile pot fi detectate ca trișare, iar contul tău poate fi banat. Mumcord nu răspunde pentru asta. Continuă doar dacă accepți acest risc.",
-      "confirmEnable": "Activează oricum",
-      "limits": {
-        "libraryMissing": "Overlay-ul în joc nu e disponibil: biblioteca sa (libmumcord_overlay_layer.so) nu a fost găsită lângă Mumcord. Reinstalează Mumcord ca s-o restaurezi. Se folosește în schimb overlay-ul în fereastră de mai sus.",
-        "windowsFullscreen": "Folosește în joc ecran complet fără margini sau în fereastră.",
-        "macos": "macOS nu acceptă overlay-uri în joc. Se folosește în schimb overlay-ul în fereastră de mai sus."
-      },
       "opengl": {
         "title": "Jocuri OpenGL",
         "explanation": "Necesar doar pentru jocurile OpenGL: lipește în opțiunile de lansare Steam ale jocului.",
@@ -450,6 +443,14 @@
         "copy": "Copiază",
         "copied": "Copiat",
         "copyFailed": "Copierea a eșuat. Selectează textul și copiază-l manual."
+      },
+      "confirmTitle": "Activezi overlay-ul pentru {{game}}?",
+      "confirmMessage": "Atenție: {{game}} folosește protecție anti-cheat ({{reason}}). Overlay-urile pot fi detectate ca trișare, iar contul tău poate fi banat. Mumcord nu răspunde pentru asta. Continuă doar dacă accepți acest risc.",
+      "confirmEnable": "Activează oricum",
+      "limits": {
+        "libraryMissing": "Overlay-ul în joc nu e disponibil: biblioteca sa (libmumcord_overlay_layer.so) nu a fost găsită lângă Mumcord. Reinstalează Mumcord ca s-o restaurezi. Se folosește în schimb overlay-ul în fereastră de mai sus.",
+        "windowsFullscreen": "Folosește în joc ecran complet fără margini sau în fereastră.",
+        "macos": "macOS nu acceptă overlay-uri în joc. Se folosește în schimb overlay-ul în fereastră de mai sus."
       }
     }
   },
@@ -621,11 +622,6 @@
     "allow": "Permite conexiuni directe cu alți utilizatori Mumcord",
     "hint": "Conexiunile directe sunt mai rapide, dar cealaltă persoană îți poate vedea adresa IP. Până decizi, Mumcord întreabă prima dată când ar fi folosită una.",
     "notUsed": "Nu se folosește în modul peer-to-peer ales: Mumcord nu se conectează niciodată direct la alte persoane."
-  },
-  "updates": {
-    "title": "Actualizări",
-    "check": "Caută versiuni noi",
-    "hint": "O dată pe zi, Mumcord întreabă GitHub de cea mai nouă versiune. Nu se trimite nimic altceva."
   },
   "appImageMenu": {
     "label": "Adaugă Mumcord în meniul de aplicații",
@@ -809,5 +805,63 @@
     "collapseHint": "Afișează „Mesaj de la un utilizator blocat” cu un buton „Afișează”.",
     "hide": "Ascunde-le complet",
     "hideHint": "În chat nu se afișează nimic."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · instalat din {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "un AppImage într-un dosar doar pentru citire",
+      "windowsInstaller": "programul de instalare pentru Windows",
+      "windowsPortable": "zip-ul portabil pentru Windows",
+      "macApp": "aplicația macOS",
+      "otherMac": "o copie macOS în afara unui pachet de aplicație",
+      "deb": "pachetul .deb",
+      "rpm": "pachetul .rpm",
+      "aur": "AUR",
+      "otherLinux": "un pachet Linux"
+    },
+    "checking": "Se verifică",
+    "mode": "Când se găsește o actualizare",
+    "modeHint": "Actualizările sunt întotdeauna verificate și validate înainte de a fi instalate.",
+    "modeAuto": "Descarcă automat",
+    "modeNotify": "Doar notifică",
+    "modeOff": "Dezactivat",
+    "autoUnavailable": "Această copie nu se poate actualiza singură, așa că Mumcord doar te anunță despre versiunile noi.",
+    "interval": "Caută actualizări",
+    "intervalHint_one": "La pornire și în fiecare oră",
+    "intervalHint_few": "La pornire și la fiecare {{count}} ore",
+    "intervalHint_other": "La pornire și la fiecare {{count}} de ore",
+    "intervalWeekHint": "La pornire și o dată pe săptămână",
+    "intervalHours_one": "În fiecare oră",
+    "intervalHours_few": "La fiecare {{count}} ore",
+    "intervalHours_other": "La fiecare {{count}} de ore",
+    "intervalWeek": "O dată pe săptămână",
+    "status": "Stare",
+    "state": {
+      "idle": "Încă nu s-a verificat",
+      "off": "Căutarea actualizărilor este dezactivată",
+      "checking": "Se caută actualizări…",
+      "upToDate": "Mumcord este la zi",
+      "available": "Mumcord {{version}} este disponibil",
+      "downloading": "Se descarcă Mumcord {{version}}…",
+      "verifying": "Se verifică descărcarea Mumcord {{version}}…",
+      "installing": "Se instalează Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} este gata. Repornește pentru a actualiza.",
+      "failed": "Ultima actualizare nu a reușit",
+      "offline": "GitHub nu a putut fi contactat. Mumcord încearcă din nou mai târziu."
+    },
+    "devBuild": "Versiune de dezvoltare: actualizările sunt dezactivate",
+    "lastCheckedToday": "Ultima verificare azi la {{time}}",
+    "lastCheckedYesterday": "Ultima verificare ieri la {{time}}",
+    "lastCheckedOn": "Ultima verificare pe {{date}} la {{time}}",
+    "checkNow": "Verifică acum",
+    "showUpdate": "Arată actualizarea",
+    "checkFailed": "Verificarea nu a putut fi pornită. Încearcă din nou.",
+    "skipped": "Versiune omisă",
+    "skippedHint": "Versiunea {{version}} este omisă și nu va mai fi oferită.",
+    "stopSkipping": "Nu mai omite",
+    "whatsNew": "Ce e nou",
+    "whatsNewHint": "Vezi modificările din fiecare versiune.",
+    "openChangelog": "Deschide jurnalul de modificări"
   }
 }

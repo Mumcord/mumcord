@@ -11,6 +11,7 @@ export const SECTION_IDS = [
   "sounds",
   "overlay",
   "privacy",
+  "updates",
   "diagnostics",
   "about",
   "packetInspector",

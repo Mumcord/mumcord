@@ -1,24 +1,5 @@
 {
   "progress": "Vaihe {{current}}/{{total}}",
-  "rerun": {
-    "title": "Asennusvelho",
-    "note": "Käyt asetusta uudelleen läpi. Identiteettisi ei muutu.",
-    "manageIdentities": "Hallitse identiteettejä",
-    "stepsLabel": "Asetuksen vaiheet",
-    "stepsSkipped": "(ohitettu, identiteetti ei kuulu tähän)",
-    "steps": {
-      "identity": "Identiteetti",
-      "mic": "Mikrofoni",
-      "privacy": "Yksityisyys",
-      "updates": "Päivitykset",
-      "talk": "Puhumistila"
-    },
-    "footer": "Peruutus jättää kaiken ennalleen. Vain muuttuneet vaiheet tallennetaan lopussa.",
-    "discardTitle": "Hylätäänkö muutokset?",
-    "discardBody": "Mitään ei tallenneta ennen lopetusta. Jos peruutat nyt, kaikki pysyy ennallaan.",
-    "discardKeep": "Jatka muokkaamista",
-    "discardConfirm": "Hylkää muutokset"
-  },
   "loadFailed": "Käyttöönottoa ei voitu ladata.",
   "finish": "Valmis",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Kaikki, mitä Mumcord tallentaa, pysyy tietokoneellasi.",
     "statement": "Täydellinen tietosuojaseloste"
   },
+  "updates": {
+    "title": "Uudet versiot",
+    "choice": "Kun uusi versio on julkaistu",
+    "auto": "Lataa automaattisesti",
+    "autoHint": "Mumcord lataa ja varmentaa päivityksen taustalla ja kysyy sinulta ennen uudelleenkäynnistystä.",
+    "notify": "Vain ilmoita",
+    "notifyHint": "Mumcord kertoo uudesta versiosta ja näyttää, mikä on muuttunut. Mitään ei ladata, ennen kuin niin sanot.",
+    "off": "Pois",
+    "offHint": "Mumcord ei koskaan kysy GitHubilta uusia versioita. Päivität itse.",
+    "privacy": "Tarkistus lähettää GitHubille vain itse pyynnön sekä sovelluksen nimen ja version. Voit muuttaa tätä myöhemmin Asetuksissa."
+  },
   "talk": {
     "title": "Miten haluat puhua?",
     "mode": "Puhetila",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Jotkin huijauksenestoa käyttävät pelit voivat merkitä tai estää pelinsisäiset peittokuvat. Mumcord pitää tunnetusti riskialttiit pelit (kuten Valorant tai League of Legends) oletuksena pois päältä. Ota se käyttöön vain peleissä, joihin luotat.",
     "ingameOverlayAlt": "Esimerkki pelinsisäisestä peittokuvasta, joka näyttää kuka puhuu"
   },
-  "updates": {
-    "title": "Uudet versiot",
-    "check": "Etsi uusia versioita",
-    "hint": "Mumcord voi kysyä GitHubilta kerran päivässä, onko uudempaa versiota, ja näyttää vihjeen linkin kera. Mitään ei ladata eikä asenneta, eikä mitään lähetetä itse pyynnön sekä sovelluksen nimen ja version lisäksi. Voit muuttaa tätä myöhemmin asetuksista."
+  "rerun": {
+    "title": "Asennusvelho",
+    "note": "Käyt asetusta uudelleen läpi. Identiteettisi ei muutu.",
+    "manageIdentities": "Hallitse identiteettejä",
+    "stepsLabel": "Asetuksen vaiheet",
+    "stepsSkipped": "(ohitettu, identiteetti ei kuulu tähän)",
+    "steps": {
+      "identity": "Identiteetti",
+      "mic": "Mikrofoni",
+      "privacy": "Yksityisyys",
+      "updates": "Päivitykset",
+      "talk": "Puhumistila"
+    },
+    "footer": "Peruutus jättää kaiken ennalleen. Vain muuttuneet vaiheet tallennetaan lopussa.",
+    "discardTitle": "Hylätäänkö muutokset?",
+    "discardBody": "Mitään ei tallenneta ennen lopetusta. Jos peruutat nyt, kaikki pysyy ennallaan.",
+    "discardKeep": "Jatka muokkaamista",
+    "discardConfirm": "Hylkää muutokset"
   }
 }

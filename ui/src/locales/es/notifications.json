@@ -55,7 +55,8 @@
       "messageRequest": "Solicitud de mensaje",
       "invite": "Invitación",
       "private": "Mensaje privado",
-      "connection": "Conexión"
+      "connection": "Conexión",
+      "update": "Actualización"
     },
     "accept": "Aceptar",
     "decline": "Rechazar",
@@ -65,6 +66,12 @@
     "dismiss": "Descartar",
     "dismissItem": "Descartar: {{title}}",
     "failed": "No ha funcionado. Inténtalo de nuevo.",
-    "block": "Bloquear"
+    "block": "Bloquear",
+    "update": {
+      "title": "Mumcord {{version}} está listo",
+      "body": "Reinicia para actualizar",
+      "restart": "Reiniciar para actualizar",
+      "whatsNew": "Novedades"
+    }
   }
 }

@@ -51,7 +51,8 @@
       "messageRequest": "Berichtverzoek",
       "invite": "Uitnodiging",
       "private": "Privébericht",
-      "connection": "Verbinding"
+      "connection": "Verbinding",
+      "update": "Update"
     },
     "accept": "Accepteren",
     "decline": "Weigeren",
@@ -61,6 +62,12 @@
     "dismiss": "Sluiten",
     "dismissItem": "Sluiten: {{title}}",
     "failed": "Dat is niet gelukt. Probeer het opnieuw.",
-    "block": "Blokkeren"
+    "block": "Blokkeren",
+    "update": {
+      "title": "Mumcord {{version}} is klaar",
+      "body": "Herstart om bij te werken",
+      "restart": "Herstarten en bijwerken",
+      "whatsNew": "Wat is er nieuw"
+    }
   }
 }

@@ -43,10 +43,11 @@ pub use settings::{
     BlockedMessages, ChatDisplay, CloseBehaviour, Consent, DEFAULT_APP_THEME_ID,
     DEFAULT_INGAME_OPACITY_PERCENT, DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS,
     GameKey, GameOverlayEntry, InGameOverlayMode, InGameOverlaySettings, LogLevel,
-    MAX_MAX_CONNECTED_SERVERS, MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS,
-    MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, P2pMode,
-    PmRule, PositionalSettings, PrivateMessageSettings, Settings, SetupPreset, SoundSettings,
-    TalkMode, Theme, ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
+    MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS, MAX_VIDEO_DUCKING_PERCENT,
+    MIN_MAX_CONNECTED_SERVERS, MIN_UPDATE_INTERVAL_HOURS, MIN_VIDEO_DUCKING_PERCENT, NoiseBackend,
+    NotificationMode, OverlayCorner, OwnVoice, P2pMode, PmRule, PositionalSettings,
+    PrivateMessageSettings, Settings, SetupPreset, SoundSettings, TalkMode, Theme, ThemePreference,
+    VoiceActivation, WhisperReceivers, WhisperTarget,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;
