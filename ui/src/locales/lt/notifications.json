@@ -59,7 +59,8 @@
       "messageRequest": "Žinutės prašymas",
       "invite": "Kvietimas",
       "private": "Privati žinutė",
-      "connection": "Ryšys"
+      "connection": "Ryšys",
+      "update": "Naujinys"
     },
     "accept": "Priimti",
     "decline": "Atmesti",
@@ -69,6 +70,12 @@
     "dismiss": "Paslėpti",
     "dismissItem": "Paslėpti: {{title}}",
     "failed": "Nepavyko. Bandyk dar kartą.",
-    "block": "Blokuoti"
+    "block": "Blokuoti",
+    "update": {
+      "title": "Mumcord {{version}} paruoštas",
+      "body": "Paleiskite iš naujo, kad atnaujintumėte",
+      "restart": "Paleisti iš naujo ir atnaujinti",
+      "whatsNew": "Kas naujo"
+    }
   }
 }

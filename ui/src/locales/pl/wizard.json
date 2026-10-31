@@ -1,24 +1,5 @@
 {
   "progress": "Krok {{current}} z {{total}}",
-  "rerun": {
-    "title": "Kreator konfiguracji",
-    "note": "Uruchamiasz konfigurację ponownie. Twoja tożsamość się nie zmienia.",
-    "manageIdentities": "Zarządzaj tożsamościami",
-    "stepsLabel": "Kroki konfiguracji",
-    "stepsSkipped": "(pominięty, tożsamość nie jest jego częścią)",
-    "steps": {
-      "identity": "Tożsamość",
-      "mic": "Mikrofon",
-      "privacy": "Prywatność",
-      "updates": "Aktualizacje",
-      "talk": "Tryb mówienia"
-    },
-    "footer": "Anulowanie zostawia wszystko bez zmian. Na końcu zapisywane są tylko zmienione kroki.",
-    "discardTitle": "Odrzucić zmiany?",
-    "discardBody": "Nic nie jest zapisywane przed zakończeniem. Jeśli teraz anulujesz, wszystko zostanie bez zmian.",
-    "discardKeep": "Kontynuuj edycję",
-    "discardConfirm": "Odrzuć zmiany"
-  },
   "loadFailed": "Nie udało się wczytać kreatora.",
   "finish": "Zakończ",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Wszystko, co zapisuje Mumcord, zostaje na Twoim komputerze.",
     "statement": "Pełna informacja o prywatności"
   },
+  "updates": {
+    "title": "Nowe wersje",
+    "choice": "Gdy pojawi się nowa wersja",
+    "auto": "Pobieraj automatycznie",
+    "autoHint": "Mumcord pobiera i weryfikuje aktualizację w tle i pyta cię przed ponownym uruchomieniem.",
+    "notify": "Tylko powiadamiaj",
+    "notifyHint": "Mumcord informuje o nowej wersji i pokazuje, co się zmieniło. Nic nie jest pobierane, dopóki tego nie zdecydujesz.",
+    "off": "Wyłączone",
+    "offHint": "Mumcord nigdy nie pyta GitHuba o nowe wersje. Aktualizujesz sam.",
+    "privacy": "Sprawdzanie wysyła do GitHuba tylko samo zapytanie oraz nazwę i wersję aplikacji. Możesz to później zmienić w Ustawieniach."
+  },
   "talk": {
     "title": "Jak chcesz mówić?",
     "mode": "Tryb mówienia",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Niektóre gry z anti-cheatem mogą oznaczać lub blokować nakładki w grze. Mumcord domyślnie wyłącza gry znane z ryzyka (takie jak Valorant czy League of Legends). Włączaj ją tylko w grach, którym ufasz.",
     "ingameOverlayAlt": "Przykład nakładki w grze pokazującej, kto mówi"
   },
-  "updates": {
-    "title": "Nowe wersje",
-    "check": "Sprawdzaj nowe wersje",
-    "hint": "Mumcord może raz dziennie zapytać GitHub, czy jest nowsza wersja, i pokazać wskazówkę z linkiem. Nic nie jest pobierane ani instalowane i nic nie jest wysyłane poza samym zapytaniem oraz nazwą i wersją aplikacji. Możesz to później zmienić w Ustawieniach."
+  "rerun": {
+    "title": "Kreator konfiguracji",
+    "note": "Uruchamiasz konfigurację ponownie. Twoja tożsamość się nie zmienia.",
+    "manageIdentities": "Zarządzaj tożsamościami",
+    "stepsLabel": "Kroki konfiguracji",
+    "stepsSkipped": "(pominięty, tożsamość nie jest jego częścią)",
+    "steps": {
+      "identity": "Tożsamość",
+      "mic": "Mikrofon",
+      "privacy": "Prywatność",
+      "updates": "Aktualizacje",
+      "talk": "Tryb mówienia"
+    },
+    "footer": "Anulowanie zostawia wszystko bez zmian. Na końcu zapisywane są tylko zmienione kroki.",
+    "discardTitle": "Odrzucić zmiany?",
+    "discardBody": "Nic nie jest zapisywane przed zakończeniem. Jeśli teraz anulujesz, wszystko zostanie bez zmian.",
+    "discardKeep": "Kontynuuj edycję",
+    "discardConfirm": "Odrzuć zmiany"
   }
 }

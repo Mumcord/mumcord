@@ -55,7 +55,8 @@
       "messageRequest": "Pedido de mensagem",
       "invite": "Convite",
       "private": "Mensagem privada",
-      "connection": "Ligação"
+      "connection": "Ligação",
+      "update": "Atualização"
     },
     "accept": "Aceitar",
     "decline": "Recusar",
@@ -65,6 +66,12 @@
     "dismiss": "Dispensar",
     "dismissItem": "Dispensar: {{title}}",
     "failed": "Não funcionou. Tenta novamente.",
-    "block": "Bloquear"
+    "block": "Bloquear",
+    "update": {
+      "title": "O Mumcord {{version}} está pronto",
+      "body": "Reinicie para atualizar",
+      "restart": "Reiniciar para atualizar",
+      "whatsNew": "Novidades"
+    }
   }
 }

@@ -17,6 +17,7 @@
     "about": "À propos",
     "servers": "Serveurs",
     "privacy": "Confidentialité",
+    "updates": "Mises à jour",
     "packetInspector": "Inspecteur de paquets"
   },
   "search": {
@@ -380,14 +381,6 @@
       "unsupported": "L’overlay en jeu n’est pas disponible sur ce système. L’overlay en fenêtre ci-dessus est utilisé à la place.",
       "loadFailed": "Les paramètres de l’overlay en jeu n’ont pas pu être chargés.",
       "saveFailed": "La modification de l’overlay en jeu n’a pas pu être appliquée.",
-      "confirmTitle": "Activer l’overlay pour {{game}} ?",
-      "confirmMessage": "Attention : {{game}} utilise une protection anti-triche ({{reason}}). Les overlays peuvent être détectés comme de la triche et votre compte risque d’être banni. Mumcord n’en est pas responsable. Ne continuez que si vous acceptez ce risque.",
-      "confirmEnable": "Activer quand même",
-      "limits": {
-        "libraryMissing": "L’overlay en jeu n’est pas disponible : sa bibliothèque d’overlay (libmumcord_overlay_layer.so) est introuvable à côté de Mumcord. Réinstallez Mumcord pour la restaurer. L’overlay en fenêtre ci-dessus est utilisé à la place.",
-        "windowsFullscreen": "Utilisez le plein écran sans bordure ou fenêtré dans le jeu.",
-        "macos": "macOS ne prend pas en charge les overlays en jeu. L’overlay en fenêtre ci-dessus est utilisé à la place."
-      },
       "opengl": {
         "title": "Jeux OpenGL",
         "explanation": "Uniquement pour les jeux OpenGL : à coller dans les options de lancement Steam du jeu.",
@@ -395,6 +388,14 @@
         "copy": "Copier",
         "copied": "Copié",
         "copyFailed": "La copie a échoué. Sélectionnez le texte et copiez-le à la main."
+      },
+      "confirmTitle": "Activer l’overlay pour {{game}} ?",
+      "confirmMessage": "Attention : {{game}} utilise une protection anti-triche ({{reason}}). Les overlays peuvent être détectés comme de la triche et votre compte risque d’être banni. Mumcord n’en est pas responsable. Ne continuez que si vous acceptez ce risque.",
+      "confirmEnable": "Activer quand même",
+      "limits": {
+        "libraryMissing": "L’overlay en jeu n’est pas disponible : sa bibliothèque d’overlay (libmumcord_overlay_layer.so) est introuvable à côté de Mumcord. Réinstallez Mumcord pour la restaurer. L’overlay en fenêtre ci-dessus est utilisé à la place.",
+        "windowsFullscreen": "Utilisez le plein écran sans bordure ou fenêtré dans le jeu.",
+        "macos": "macOS ne prend pas en charge les overlays en jeu. L’overlay en fenêtre ci-dessus est utilisé à la place."
       }
     }
   },
@@ -566,11 +567,6 @@
     "allow": "Autoriser les connexions directes avec d’autres utilisateurs de Mumcord",
     "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée.",
     "notUsed": "Non utilisé dans le mode pair à pair choisi : Mumcord ne se connecte jamais directement aux autres personnes."
-  },
-  "updates": {
-    "title": "Mises à jour",
-    "check": "Rechercher les nouvelles versions",
-    "hint": "Une fois par jour, Mumcord demande à GitHub la dernière version. Rien d’autre n’est envoyé."
   },
   "appImageMenu": {
     "label": "Ajouter Mumcord au menu des applications",
@@ -754,5 +750,63 @@
     "collapseHint": "Affiche « Message d’un utilisateur bloqué » avec un bouton « Afficher ».",
     "hide": "Les masquer complètement",
     "hideHint": "Rien n’est affiché dans le chat."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · installé depuis {{source}}",
+    "install": {
+      "appImage": "l'AppImage",
+      "appImageReadOnly": "une AppImage dans un dossier en lecture seule",
+      "windowsInstaller": "l'installateur Windows",
+      "windowsPortable": "le zip portable Windows",
+      "macApp": "l'application macOS",
+      "otherMac": "une copie macOS hors d'un bundle d'application",
+      "deb": "le paquet .deb",
+      "rpm": "le paquet .rpm",
+      "aur": "l'AUR",
+      "otherLinux": "un paquet Linux"
+    },
+    "checking": "Vérification",
+    "mode": "Quand une mise à jour est trouvée",
+    "modeHint": "Les mises à jour sont toujours vérifiées et contrôlées avant d'être installées.",
+    "modeAuto": "Télécharger automatiquement",
+    "modeNotify": "Notifier seulement",
+    "modeOff": "Désactivé",
+    "autoUnavailable": "Cette copie ne peut pas se mettre à jour elle-même, donc Mumcord vous informe seulement des nouvelles versions.",
+    "interval": "Rechercher des mises à jour",
+    "intervalHint_one": "Au démarrage et toutes les heures",
+    "intervalHint_many": "Au démarrage et toutes les {{count}} heures",
+    "intervalHint_other": "Au démarrage et toutes les {{count}} d'heures",
+    "intervalWeekHint": "Au démarrage et une fois par semaine",
+    "intervalHours_one": "Toutes les heures",
+    "intervalHours_many": "Toutes les {{count}} heures",
+    "intervalHours_other": "Toutes les {{count}} d'heures",
+    "intervalWeek": "Une fois par semaine",
+    "status": "État",
+    "state": {
+      "idle": "Pas encore vérifié",
+      "off": "La recherche de mises à jour est désactivée",
+      "checking": "Recherche de mises à jour…",
+      "upToDate": "Mumcord est à jour",
+      "available": "Mumcord {{version}} est disponible",
+      "downloading": "Téléchargement de Mumcord {{version}}…",
+      "verifying": "Vérification du téléchargement de Mumcord {{version}}…",
+      "installing": "Installation de Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} est prêt. Redémarrez pour mettre à jour.",
+      "failed": "La dernière mise à jour a échoué",
+      "offline": "GitHub est injoignable. Mumcord réessaiera plus tard."
+    },
+    "devBuild": "Version de développement : les mises à jour sont désactivées",
+    "lastCheckedToday": "Dernière vérification aujourd'hui à {{time}}",
+    "lastCheckedYesterday": "Dernière vérification hier à {{time}}",
+    "lastCheckedOn": "Dernière vérification le {{date}} à {{time}}",
+    "checkNow": "Vérifier maintenant",
+    "showUpdate": "Afficher la mise à jour",
+    "checkFailed": "La vérification n'a pas pu être lancée. Veuillez réessayer.",
+    "skipped": "Version ignorée",
+    "skippedHint": "La version {{version}} est ignorée et ne sera plus proposée.",
+    "stopSkipping": "Ne plus ignorer",
+    "whatsNew": "Nouveautés",
+    "whatsNewHint": "Consultez les changements de chaque version.",
+    "openChangelog": "Ouvrir le journal des modifications"
   }
 }

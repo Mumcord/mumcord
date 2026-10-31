@@ -1,24 +1,5 @@
 {
   "progress": "Passo {{current}} de {{total}}",
-  "rerun": {
-    "title": "Assistente de configuração",
-    "note": "Está a repetir a configuração. A sua identidade não é alterada.",
-    "manageIdentities": "Gerir identidades",
-    "stepsLabel": "Passos da configuração",
-    "stepsSkipped": "(ignorado, a identidade não faz parte)",
-    "steps": {
-      "identity": "Identidade",
-      "mic": "Microfone",
-      "privacy": "Privacidade",
-      "updates": "Atualizações",
-      "talk": "Modo de fala"
-    },
-    "footer": "Cancelar mantém tudo como está. Só os passos alterados são guardados no fim.",
-    "discardTitle": "Descartar as alterações?",
-    "discardBody": "Nada é guardado antes de terminar. Se cancelar agora, tudo fica como está.",
-    "discardKeep": "Continuar a editar",
-    "discardConfirm": "Descartar alterações"
-  },
   "loadFailed": "Não foi possível carregar a configuração.",
   "finish": "Concluir",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Tudo o que o Mumcord guarda fica no seu computador.",
     "statement": "Declaração de privacidade completa"
   },
+  "updates": {
+    "title": "Novas versões",
+    "choice": "Quando sair uma nova versão",
+    "auto": "Transferir automaticamente",
+    "autoHint": "O Mumcord transfere e verifica a atualização em segundo plano e pergunta-te antes de reiniciar.",
+    "notify": "Apenas notificar",
+    "notifyHint": "O Mumcord avisa-te de uma nova versão e mostra o que mudou. Nada é transferido até o dizeres.",
+    "off": "Desativado",
+    "offHint": "O Mumcord nunca pergunta ao GitHub por novas versões. Atualizas tu.",
+    "privacy": "A verificação envia ao GitHub apenas o próprio pedido e o nome e a versão da aplicação. Podes alterar isto mais tarde nas Definições."
+  },
   "talk": {
     "title": "Como queres falar?",
     "mode": "Modo de fala",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Alguns jogos com anti-cheat podem sinalizar ou bloquear overlays no jogo. O Mumcord mantém desativados por predefinição os jogos conhecidos como arriscados (como Valorant ou League of Legends). Ativa-o apenas para jogos em que confies.",
     "ingameOverlayAlt": "Exemplo do overlay no jogo a mostrar quem está a falar"
   },
-  "updates": {
-    "title": "Novas versões",
-    "check": "Procurar novas versões",
-    "hint": "O Mumcord pode perguntar ao GitHub uma vez por dia se existe uma versão mais recente e mostrar um aviso com uma ligação. Nada é transferido nem instalado, e nada é enviado além do próprio pedido e do nome e versão da aplicação. Podes alterar isto mais tarde nas Definições."
+  "rerun": {
+    "title": "Assistente de configuração",
+    "note": "Está a repetir a configuração. A sua identidade não é alterada.",
+    "manageIdentities": "Gerir identidades",
+    "stepsLabel": "Passos da configuração",
+    "stepsSkipped": "(ignorado, a identidade não faz parte)",
+    "steps": {
+      "identity": "Identidade",
+      "mic": "Microfone",
+      "privacy": "Privacidade",
+      "updates": "Atualizações",
+      "talk": "Modo de fala"
+    },
+    "footer": "Cancelar mantém tudo como está. Só os passos alterados são guardados no fim.",
+    "discardTitle": "Descartar as alterações?",
+    "discardBody": "Nada é guardado antes de terminar. Se cancelar agora, tudo fica como está.",
+    "discardKeep": "Continuar a editar",
+    "discardConfirm": "Descartar alterações"
   }
 }

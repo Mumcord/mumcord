@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Zoeken naar nieuwe versies?",
-    "description": "Mumcord kan GitHub één keer per dag vragen of er een nieuwere versie is en dan een melding met een link tonen. Er wordt niets gedownload of geïnstalleerd, en er wordt niets verstuurd behalve het verzoek zelf en de naam en versie van de app. Je kunt dit later wijzigen in Instellingen.",
+    "description": "Mumcord kan regelmatig bij GitHub navragen of er een nieuwere versie is en je daarover informeren. Zonder jouw toestemming wordt er niets gedownload of geïnstalleerd, en er wordt niets verzonden behalve het verzoek zelf en de naam en versie van de app. Je kunt dit later wijzigen in de Instellingen.",
     "no": "Nee",
     "yes": "Ja",
     "failed": "Dat is niet gelukt. Probeer het opnieuw."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} is beschikbaar.",
-    "open": "Release bekijken",
-    "dismiss": "Sluiten",
-    "portable": "Download de nieuwe draagbare zip en pak hem uit in deze map; je gegevens in MumcordData blijven bewaard."
   },
   "directConsent": {
     "title": "Directe verbindingen toestaan?",
@@ -46,5 +40,82 @@
     "no": "Nee",
     "yes": "Ja",
     "failed": "Dat is niet gelukt. Probeer het opnieuw."
+  },
+  "updater": {
+    "stable": "Stabiel",
+    "available": {
+      "title": "Update beschikbaar",
+      "subtitle": "Mumcord {{version}} staat klaar om te downloaden. Jij hebt {{current}}.",
+      "subtitleManual": "Mumcord {{version}} is uit. Jij hebt {{current}}.",
+      "whatsNew": "Wat is er nieuw sinds {{current}}",
+      "trust": "Wordt alleen van github.com via HTTPS gedownload en vóór de installatie gecontroleerd op handtekening en controlesom.",
+      "skip": "Deze versie overslaan",
+      "later": "Herinner me later",
+      "download": "Downloaden en installeren",
+      "openReleasePage": "Releasepagina openen",
+      "manual": "Download de nieuwe versie van de releasepagina.",
+      "manualPackage": "Download het pakket van de releasepagina en installeer het daarna met:",
+      "manualAur": "Werk het bij met je AUR-helper:"
+    },
+    "tags": {
+      "added": "Toegevoegd",
+      "changed": "Gewijzigd",
+      "fixed": "Opgelost",
+      "removed": "Verwijderd"
+    },
+    "noNotes": "Geen notities voor deze versie.",
+    "steps": {
+      "download": "Downloaden",
+      "verify": "Handtekening en controlesom controleren",
+      "install": "Installeren",
+      "done": "klaar",
+      "current": "bezig",
+      "pending": "nog niet begonnen"
+    },
+    "progress": {
+      "title": "Mumcord {{version}} wordt gedownload",
+      "subtitle": "Je kunt Mumcord blijven gebruiken terwijl dit loopt.",
+      "label": "Voortgang van de update",
+      "unknown": "Grootte nog niet bekend",
+      "size": "{{received}} van {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "nog ongeveer {{count}} seconde",
+      "secondsLeft_other": "nog ongeveer {{count}} seconden",
+      "minutesLeft_one": "nog ongeveer {{count}} minuut",
+      "minutesLeft_other": "nog ongeveer {{count}} minuten",
+      "cancel": "Annuleren"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} is klaar",
+      "subtitle": "Start opnieuw op om de update af te ronden.",
+      "verified": "Gecontroleerd",
+      "downloaded": "Gedownload",
+      "checked": "Handtekening en controlesom gecontroleerd",
+      "installed": "Geïnstalleerd",
+      "installsOnRestart": "Wordt geïnstalleerd als Mumcord opnieuw start",
+      "connected_one": "Je bent verbonden met {{count}} server. Na het herstarten verbindt Mumcord opnieuw en neemt het weer deel aan je kanalen.",
+      "connected_other": "Je bent verbonden met {{count}} servers. Na het herstarten verbindt Mumcord opnieuw en neemt het weer deel aan je kanalen.",
+      "later": "Later",
+      "restart": "Opnieuw opstarten om bij te werken",
+      "announce": "Mumcord {{version}} is klaar. Start opnieuw op om bij te werken."
+    },
+    "failed": {
+      "title": "De update is mislukt",
+      "subtitle": "Mumcord {{version}} is niet geïnstalleerd. Je huidige versie blijft gewoon werken.",
+      "network": "Mumcord kon GitHub niet bereiken. Controleer je internetverbinding en probeer het opnieuw.",
+      "manifest": "De update-informatie op GitHub is onvolledig of beschadigd, dus er is niets geïnstalleerd.",
+      "signature": "De handtekening van de download klopte niet, dus de download is verwijderd.",
+      "checksum": "De download kwam niet overeen met de controlesom, dus de download is verwijderd.",
+      "install": "Het installeren van de update is mislukt. Je geïnstalleerde versie is ongewijzigd.",
+      "retry": "Opnieuw proberen",
+      "close": "Sluiten"
+    },
+    "actionFailed": "Dat is niet gelukt. Probeer het opnieuw.",
+    "toast": {
+      "title": "Mumcord {{version}} is klaar",
+      "body": "Start opnieuw op om bij te werken.",
+      "restart": "Opnieuw opstarten",
+      "later": "Later"
+    }
   }
 }

@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Meklēt jaunas versijas?",
-    "description": "Mumcord var reizi dienā pajautāt GitHub, vai ir jaunāka versija, un parādīt padomu ar saiti. Nekas netiek lejupielādēts vai instalēts, un nekas netiek sūtīts, izņemot pašu pieprasījumu un lietotnes nosaukumu un versiju. To vari vēlāk mainīt iestatījumos.",
+    "description": "Mumcord var regulāri pajautāt GitHub, vai ir jaunāka versija, un tev par to paziņot. Bez tavas piekrišanas nekas netiek lejupielādēts vai instalēts, un netiek sūtīts nekas, izņemot pašu pieprasījumu un lietotnes nosaukumu un versiju. To vari vēlāk mainīt iestatījumos.",
     "no": "Nē",
     "yes": "Jā",
     "failed": "Neizdevās. Mēģini vēlreiz."
-  },
-  "updateHint": {
-    "message": "Pieejams Mumcord {{version}}.",
-    "open": "Skatīt laidienu",
-    "dismiss": "Aizvērt",
-    "portable": "Lejupielādējiet jauno portatīvo zip un izpakojiet to šajā mapē; jūsu dati mapē MumcordData saglabāsies."
   },
   "directConsent": {
     "title": "Atļaut tiešos savienojumus?",
@@ -46,5 +40,85 @@
     "no": "Nē",
     "yes": "Jā",
     "failed": "Neizdevās. Mēģini vēlreiz."
+  },
+  "updater": {
+    "stable": "Stabilā",
+    "available": {
+      "title": "Pieejams atjauninājums",
+      "subtitle": "Mumcord {{version}} ir gatavs lejupielādei. Tev ir {{current}}.",
+      "subtitleManual": "Iznācis Mumcord {{version}}. Tev ir {{current}}.",
+      "whatsNew": "Kas jauns kopš {{current}}",
+      "trust": "Lejupielādē tikai no github.com, izmantojot HTTPS, un pirms instalēšanas pārbauda pēc paraksta un kontrolsummas.",
+      "skip": "Izlaist šo versiju",
+      "later": "Atgādināt vēlāk",
+      "download": "Lejupielādēt un instalēt",
+      "openReleasePage": "Atvērt laidiena lapu",
+      "manual": "Lejupielādē jauno versiju no laidiena lapas.",
+      "manualPackage": "Lejupielādē pakotni no laidiena lapas un pēc tam instalē to ar:",
+      "manualAur": "Atjaunini to ar savu AUR palīgu:"
+    },
+    "tags": {
+      "added": "Pievienots",
+      "changed": "Mainīts",
+      "fixed": "Labots",
+      "removed": "Noņemts"
+    },
+    "noNotes": "Šai versijai nav piezīmju.",
+    "steps": {
+      "download": "Lejupielāde",
+      "verify": "Paraksta un kontrolsummas pārbaude",
+      "install": "Instalēšana",
+      "done": "gatavs",
+      "current": "notiek",
+      "pending": "vēl nav sācies"
+    },
+    "progress": {
+      "title": "Lejupielādē Mumcord {{version}}",
+      "subtitle": "Kamēr tas notiek, vari turpināt lietot Mumcord.",
+      "label": "Atjauninājuma gaita",
+      "unknown": "Izmērs vēl nav zināms",
+      "size": "{{received}} no {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_zero": "atlikušas aptuveni {{count}} sekundes",
+      "secondsLeft_one": "atlikusi aptuveni {{count}} sekunde",
+      "secondsLeft_other": "atlikušas aptuveni {{count}} sekundes",
+      "minutesLeft_zero": "atlikušas aptuveni {{count}} minūtes",
+      "minutesLeft_one": "atlikusi aptuveni {{count}} minūte",
+      "minutesLeft_other": "atlikušas aptuveni {{count}} minūtes",
+      "cancel": "Atcelt"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} ir gatavs",
+      "subtitle": "Restartē, lai pabeigtu atjaunināšanu.",
+      "verified": "Pārbaudīts",
+      "downloaded": "Lejupielādēts",
+      "checked": "Paraksts un kontrolsumma pārbaudīti",
+      "installed": "Instalēts",
+      "installsOnRestart": "Instalēsies, kad Mumcord restartēsies",
+      "connected_zero": "Tu esi savienots ar {{count}} serveriem. Pēc restartēšanas Mumcord atkal pieslēgsies un atgriezīsies tavos kanālos.",
+      "connected_one": "Tu esi savienots ar {{count}} serveri. Pēc restartēšanas Mumcord atkal pieslēgsies un atgriezīsies tavos kanālos.",
+      "connected_other": "Tu esi savienots ar {{count}} serveriem. Pēc restartēšanas Mumcord atkal pieslēgsies un atgriezīsies tavos kanālos.",
+      "later": "Vēlāk",
+      "restart": "Restartēt un atjaunināt",
+      "announce": "Mumcord {{version}} ir gatavs. Restartē, lai atjauninātu."
+    },
+    "failed": {
+      "title": "Atjaunināšana neizdevās",
+      "subtitle": "Mumcord {{version}} netika instalēts. Tava pašreizējā versija turpina darboties.",
+      "network": "Mumcord nevarēja sasniegt GitHub. Pārbaudi interneta savienojumu un mēģini vēlreiz.",
+      "manifest": "Atjauninājuma informācija GitHub ir nepilnīga vai bojāta, tāpēc nekas netika instalēts.",
+      "signature": "Lejupielādes paraksts nesakrita, tāpēc lejupielāde tika atmesta.",
+      "checksum": "Lejupielāde nesakrita ar savu kontrolsummu, tāpēc tā tika atmesta.",
+      "install": "Atjauninājuma instalēšana neizdevās. Tava instalētā versija nav mainīta.",
+      "retry": "Mēģināt vēlreiz",
+      "close": "Aizvērt"
+    },
+    "actionFailed": "Tas neizdevās. Mēģini vēlreiz.",
+    "toast": {
+      "title": "Mumcord {{version}} ir gatavs",
+      "body": "Restartē, lai atjauninātu.",
+      "restart": "Restartēt",
+      "later": "Vēlāk"
+    }
   }
 }

@@ -17,6 +17,7 @@
     "about": "Acerca de",
     "servers": "Servidores",
     "privacy": "Privacidad",
+    "updates": "Actualizaciones",
     "packetInspector": "Inspector de paquetes"
   },
   "search": {
@@ -24,8 +25,8 @@
     "results": "Resultados de búsqueda",
     "empty": "Ningún ajuste coincide con «{{query}}».",
     "count_one": "{{count}} ajuste encontrado",
-    "count_other": "{{count}} ajustes encontrados",
-    "count_many": "{{count}} ajustes encontrados"
+    "count_many": "{{count}} ajustes encontrados",
+    "count_other": "{{count}} ajustes encontrados"
   },
   "errors": {
     "secureStorage": "El almacenamiento seguro del sistema no está disponible o se denegó el acceso.",
@@ -380,14 +381,6 @@
       "unsupported": "La superposición en el juego no está disponible en este sistema. Se usa la superposición en ventana de arriba.",
       "loadFailed": "No se pudieron cargar los ajustes de la superposición en el juego.",
       "saveFailed": "No se pudo aplicar el cambio de la superposición en el juego.",
-      "confirmTitle": "¿Activar la superposición en {{game}}?",
-      "confirmMessage": "Advertencia: {{game}} usa protección anti-trampas ({{reason}}). Las superposiciones pueden detectarse como trampas y tu cuenta podría ser baneada. Mumcord no se hace responsable. Continúa solo si aceptas este riesgo.",
-      "confirmEnable": "Activar de todos modos",
-      "limits": {
-        "libraryMissing": "La superposición en el juego no está disponible: no se encontró su biblioteca (libmumcord_overlay_layer.so) junto a Mumcord. Reinstala Mumcord para restaurarla. Se usa la superposición en ventana de arriba.",
-        "windowsFullscreen": "Usa pantalla completa sin bordes o en ventana en el juego.",
-        "macos": "macOS no admite superposiciones en el juego. Se usa la superposición en ventana de arriba."
-      },
       "opengl": {
         "title": "Juegos OpenGL",
         "explanation": "Solo hace falta para juegos OpenGL: pégalo en las opciones de lanzamiento de Steam del juego.",
@@ -395,6 +388,14 @@
         "copy": "Copiar",
         "copied": "Copiado",
         "copyFailed": "No se pudo copiar. Selecciona el texto y cópialo a mano."
+      },
+      "confirmTitle": "¿Activar la superposición en {{game}}?",
+      "confirmMessage": "Advertencia: {{game}} usa protección anti-trampas ({{reason}}). Las superposiciones pueden detectarse como trampas y tu cuenta podría ser baneada. Mumcord no se hace responsable. Continúa solo si aceptas este riesgo.",
+      "confirmEnable": "Activar de todos modos",
+      "limits": {
+        "libraryMissing": "La superposición en el juego no está disponible: no se encontró su biblioteca (libmumcord_overlay_layer.so) junto a Mumcord. Reinstala Mumcord para restaurarla. Se usa la superposición en ventana de arriba.",
+        "windowsFullscreen": "Usa pantalla completa sin bordes o en ventana en el juego.",
+        "macos": "macOS no admite superposiciones en el juego. Se usa la superposición en ventana de arriba."
       }
     }
   },
@@ -488,8 +489,8 @@
   },
   "retention": {
     "days_one": "{{count}} día",
-    "days_other": "{{count}} días",
-    "days_many": "{{count}} días"
+    "days_many": "{{count}} días",
+    "days_other": "{{count}} días"
   },
   "nowGaming": {
     "title": "Jugando ahora",
@@ -566,11 +567,6 @@
     "allow": "Permitir conexiones directas con otros usuarios de Mumcord",
     "hint": "Las conexiones directas son más rápidas, pero la otra persona puede ver tu dirección IP. Hasta que decidas, Mumcord pregunta la primera vez que se vaya a usar una.",
     "notUsed": "No se usa en el modo peer-to-peer elegido: Mumcord nunca se conecta directamente con otras personas."
-  },
-  "updates": {
-    "title": "Actualizaciones",
-    "check": "Buscar nuevas versiones",
-    "hint": "Una vez al día, Mumcord pregunta a GitHub por la última versión. No se envía nada más."
   },
   "appImageMenu": {
     "label": "Añadir Mumcord al menú de aplicaciones",
@@ -754,5 +750,63 @@
     "collapseHint": "Muestra «Mensaje de un usuario bloqueado» con un botón «Mostrar».",
     "hide": "Ocultarlos por completo",
     "hideHint": "No se muestra nada en el chat."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · instalado desde {{source}}",
+    "install": {
+      "appImage": "el AppImage",
+      "appImageReadOnly": "un AppImage en una carpeta de solo lectura",
+      "windowsInstaller": "el instalador de Windows",
+      "windowsPortable": "el zip portátil de Windows",
+      "macApp": "la app de macOS",
+      "otherMac": "una copia de macOS fuera de un paquete de aplicación",
+      "deb": "el paquete .deb",
+      "rpm": "el paquete .rpm",
+      "aur": "el AUR",
+      "otherLinux": "un paquete de Linux"
+    },
+    "checking": "Comprobando",
+    "mode": "Cuando se encuentre una actualización",
+    "modeHint": "Las actualizaciones siempre se comprueban y verifican antes de instalarse.",
+    "modeAuto": "Descargar automáticamente",
+    "modeNotify": "Solo avisar",
+    "modeOff": "Desactivado",
+    "autoUnavailable": "Esta copia no puede actualizarse sola, así que Mumcord solo te avisa de las versiones nuevas.",
+    "interval": "Buscar actualizaciones",
+    "intervalHint_one": "Al iniciar y cada hora",
+    "intervalHint_many": "Al iniciar y cada {{count}} horas",
+    "intervalHint_other": "Al iniciar y cada {{count}} de horas",
+    "intervalWeekHint": "Al iniciar y una vez por semana",
+    "intervalHours_one": "Cada hora",
+    "intervalHours_many": "Cada {{count}} horas",
+    "intervalHours_other": "Cada {{count}} de horas",
+    "intervalWeek": "Una vez por semana",
+    "status": "Estado",
+    "state": {
+      "idle": "Aún no comprobado",
+      "off": "La búsqueda de actualizaciones está desactivada",
+      "checking": "Buscando actualizaciones…",
+      "upToDate": "Mumcord está al día",
+      "available": "Mumcord {{version}} está disponible",
+      "downloading": "Descargando Mumcord {{version}}…",
+      "verifying": "Comprobando la descarga de Mumcord {{version}}…",
+      "installing": "Instalando Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} está listo. Reinicia para actualizar.",
+      "failed": "La última actualización no funcionó",
+      "offline": "No se pudo conectar con GitHub. Mumcord lo intentará de nuevo más tarde."
+    },
+    "devBuild": "Versión de desarrollo: las actualizaciones están desactivadas",
+    "lastCheckedToday": "Última comprobación hoy a las {{time}}",
+    "lastCheckedYesterday": "Última comprobación ayer a las {{time}}",
+    "lastCheckedOn": "Última comprobación el {{date}} a las {{time}}",
+    "checkNow": "Comprobar ahora",
+    "showUpdate": "Mostrar actualización",
+    "checkFailed": "No se pudo iniciar la comprobación. Inténtalo de nuevo.",
+    "skipped": "Versión omitida",
+    "skippedHint": "La {{version}} se omite y no se volverá a ofrecer.",
+    "stopSkipping": "Dejar de omitir",
+    "whatsNew": "Novedades",
+    "whatsNewHint": "Consulta los cambios de cada versión.",
+    "openChangelog": "Abrir el registro de cambios"
   }
 }

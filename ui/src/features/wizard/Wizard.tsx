@@ -17,6 +17,7 @@ import { ImportStep } from "./ImportStep";
 import { MicStep } from "./MicStep";
 import { PrivacyStep } from "./PrivacyStep";
 import { UpdatesStep } from "./UpdatesStep";
+import { updateModeOf, updateModePatch, type UpdateMode } from "../updates/updateMode";
 import { TalkModeStep, type TalkChoice } from "./TalkModeStep";
 import { WizardSteps } from "./WizardSteps";
 import { WizardCancelDialog } from "./WizardCancelDialog";
@@ -122,7 +123,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   const [step, setStep] = useState(1);
   // Saved settings plus the rerun's not yet saved devices (#149).
   const [draft, setDraft] = useState<Settings | null>(null);
-  const [updateCheck, setUpdateCheck] = useState(false);
+  const [updateMode, setUpdateMode] = useState<UpdateMode>("off");
   // The privacy step's peer-to-peer mode (spec 04, FR-4.1), saved with the final step.
   const [p2pMode, setP2pMode] = useState<P2pMode>("directRelay");
   // The talk mode step's current choices, for the "would Cancel drop something?" question.
@@ -141,7 +142,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
         // The optional import from Mumble (#66) comes before the identity step.
         if (loaded.mumble !== null) setStep(0);
         setDraft(loaded.settings);
-        setUpdateCheck(loaded.settings.updateCheck === "yes");
+        setUpdateMode(updateModeOf(loaded.settings));
         setP2pMode(loaded.settings.p2pMode);
       })
       .catch((cause: unknown) => {
@@ -222,7 +223,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       pttKey: choice.pttKey,
       linkPreviews: choice.linkPreviews,
       historySharing: choice.historySharing,
-      updateCheck: updateCheck ? "yes" : "no",
+      ...updateModePatch(updateMode),
       p2pMode,
       wizardCompleted: true,
     });
@@ -255,7 +256,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       ...current,
       inputDevice: settings.inputDevice,
       outputDevice: settings.outputDevice,
-      updateCheck: updateCheck ? "yes" : "no",
+      ...updateModePatch(updateMode),
       p2pMode,
       talkMode: choice.talkMode,
       pttKey: choice.pttKey,
@@ -267,6 +268,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       next.inputDevice !== current.inputDevice ||
       next.outputDevice !== current.outputDevice ||
       next.updateCheck !== current.updateCheck ||
+      next.updateAutoDownload !== current.updateAutoDownload ||
       next.p2pMode !== current.p2pMode ||
       next.talkMode !== current.talkMode ||
       next.pttKey !== current.pttKey ||
@@ -298,7 +300,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
     const pending = rerun
       ? settings.inputDevice !== saved.inputDevice ||
         settings.outputDevice !== saved.outputDevice ||
-        updateCheck !== (saved.updateCheck === "yes") ||
+        updateMode !== updateModeOf(saved) ||
         p2pMode !== saved.p2pMode ||
         (startOptions !== null && startOptionsChanged(startOptions, saved, ingameOverlayOn))
       : false;
@@ -359,13 +361,13 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       <UpdatesStep
         step={number + shift}
         total={total}
-        initial={updateCheck}
+        initial={updateMode}
         focusOnMount={focusOnMount}
         onBack={() => {
           goTo(number - 1);
         }}
         // Saved with the final step; going Back keeps the choice in the form state.
-        onChange={setUpdateCheck}
+        onChange={setUpdateMode}
         onNext={() => {
           goTo(number + 1);
         }}

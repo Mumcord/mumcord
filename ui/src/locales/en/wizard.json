@@ -55,8 +55,14 @@
   },
   "updates": {
     "title": "New versions",
-    "check": "Check for new versions",
-    "hint": "Once a day Mumcord asks GitHub whether a newer version exists and shows a hint with a link. Nothing is downloaded or installed, and nothing is sent except the request itself and the app name and version. You can change this later in Settings."
+    "choice": "When a new version is out",
+    "auto": "Download automatically",
+    "autoHint": "Mumcord downloads and verifies the update in the background and asks you before restarting.",
+    "notify": "Notify only",
+    "notifyHint": "Mumcord tells you about a new version and shows what changed. Nothing is downloaded until you say so.",
+    "off": "Off",
+    "offHint": "Mumcord never asks GitHub for new versions. You update it yourself.",
+    "privacy": "Checking sends only the request itself and the app name and version to GitHub. You can change this later in Settings."
   },
   "talk": {
     "title": "How do you want to talk?",

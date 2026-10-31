@@ -73,6 +73,7 @@ import {
 } from "./client";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 import { createMockInspector } from "./mockInspector";
+import { createMockUpdater } from "./mockUpdater";
 
 export interface MockOptions {
   /**
@@ -292,6 +293,9 @@ const DEFAULT_SETTINGS: Settings = {
   allowDirectConnections: "unset",
   p2pMode: "directRelay",
   updateCheck: "unset",
+  updateAutoDownload: false,
+  updateIntervalHours: 12,
+  updateSkipped: null,
   appimageMenuEntry: "unset",
   windowOverlayNoticeShown: false,
   whatsNewAuto: true,
@@ -881,7 +885,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     emit("pmConversationPrefsChanged", { prefs: pmPrefs });
   }
   const failures = new Map<CommandName, ApiError>();
+  // `?mockUpdate` on a demo seed: someone who chose "Notify only" while a new version is out,
+  // for trying and photographing the updater.
+  const mockUpdate = demo && new URLSearchParams(window.location.search).has("mockUpdate");
   const inspector = createMockInspector();
+  const updater = createMockUpdater({
+    demo,
+    startupCheck: mockUpdate,
+    settings: () => settings,
+    emit: (status, prompt) => {
+      emit("updateStatusChanged", { status, prompt });
+    },
+  });
   let inspectorView: InspectorView | null = null;
   let windowLook: WindowLook | null = null;
   const certPrompts = new Map<number, string | null>();
@@ -901,7 +916,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         },
       ];
   let nextIdentityId = identities.length + 1;
-  let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
+  let settings: Settings = {
+    ...DEFAULT_SETTINGS,
+    wizardCompleted: !fresh,
+    ...(mockUpdate ? { updateCheck: "yes" } : {}),
+  };
   // One official game plugin as found in a Mumble installation; no game runs in the mock.
   let gamePlugins: GamePlugin[] = [
     {
@@ -3005,7 +3024,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     screenShareUnwatch: () => notImplemented("screenShareUnwatch"),
     screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
-    updateCheckNow: () => notImplemented("updateCheckNow"),
+    updateStatus: () => Promise.resolve(updater.status()),
+    updateCheckNow: () => Promise.resolve(updater.checkNow()),
+    updateDownload: () => {
+      updater.download();
+      return Promise.resolve(null);
+    },
+    updateCancel: () => {
+      updater.cancel();
+      return Promise.resolve();
+    },
+    updateRestart: () => {
+      updater.restart();
+      return Promise.resolve(null);
+    },
     appimageMenuEntryAdd: () => Promise.resolve(null),
     // Nobody has the removed window overlay switched on in the browser mock.
     windowOverlayNoticePending: () => Promise.resolve(false),

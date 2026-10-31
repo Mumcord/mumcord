@@ -1,0 +1,369 @@
+/* In-app updater (FR-3.145): the update dialog and the "ready" toast. Colours come from theme
+   tokens, so every built-in and custom theme stays readable. */
+.upd-dialog {
+  width: min(38rem, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100vh - 2 * var(--space-4));
+  padding: var(--space-6);
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+.upd-dialog::backdrop {
+  background: var(--color-backdrop);
+}
+
+.upd-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.upd-logo {
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-md);
+}
+
+.upd-header__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.upd-title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.upd-subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.upd-badge {
+  flex: 0 0 auto;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-chat);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.upd-section-title {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.upd-notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 18rem;
+  overflow: auto;
+}
+
+.upd-note {
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+}
+
+.upd-note__heading {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.upd-note__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.upd-note__toggle:hover {
+  background: var(--color-bg-hover);
+}
+
+.upd-chevron::before {
+  display: inline-block;
+  width: 1ch;
+  content: "▸";
+  color: var(--color-text-muted);
+  transition: transform var(--duration-fast) var(--ease-out, ease-out);
+}
+
+[aria-expanded="true"] > .upd-chevron::before {
+  transform: rotate(90deg);
+}
+
+.upd-note__version {
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.upd-note__date {
+  margin-inline-start: auto;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.upd-note__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-3) calc(var(--space-4) + 1ch + var(--space-3));
+  list-style: none;
+}
+
+.upd-note__empty {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+.upd-tag {
+  margin-inline-end: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.upd-tag--added,
+.upd-tag--changed {
+  color: var(--color-accent-text);
+}
+
+.upd-tag--fixed {
+  color: var(--color-success);
+}
+
+.upd-tag--removed {
+  color: var(--color-danger);
+}
+
+.upd-note-text {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.upd-manual .upd-note-text {
+  margin-bottom: var(--space-2);
+}
+
+.upd-command {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-sidebar);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.upd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.upd-actions__main {
+  margin-inline-start: auto;
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-md);
+}
+
+.upd-text-button {
+  padding: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.upd-text-button:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.upd-text-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.upd-note__toggle:focus-visible,
+.upd-text-button:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.upd-error {
+  margin: var(--space-4) 0 0;
+  color: var(--color-danger);
+}
+
+.upd-bar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-sidebar);
+}
+
+.upd-bar__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gradient-accent);
+  transition: width var(--duration-normal) linear;
+}
+
+.upd-progress-text {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.upd-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.upd-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+.upd-step--current {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.upd-step--done {
+  color: var(--color-text);
+}
+
+.upd-step__mark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.upd-step--done .upd-step__mark {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  color: var(--color-on-accent);
+}
+
+.upd-step--current .upd-step__mark {
+  border-color: var(--color-accent);
+  border-top-color: transparent;
+}
+
+/* The spinning ring only for people who did not ask for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .upd-step--current .upd-step__mark {
+    animation: upd-spin 0.9s linear infinite;
+  }
+
+  .upd-bar__fill--unknown {
+    animation: upd-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes upd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes upd-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.upd-toast {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  gap: var(--space-4);
+  width: min(26rem, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-4) var(--space-5);
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+  transform: translateX(-50%);
+}
+
+.upd-toast__logo {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+}
+
+.upd-toast__title {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.upd-toast__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}

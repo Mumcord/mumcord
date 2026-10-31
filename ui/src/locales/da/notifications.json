@@ -51,7 +51,8 @@
       "messageRequest": "Beskedanmodning",
       "invite": "Invitation",
       "private": "Privat besked",
-      "connection": "Forbindelse"
+      "connection": "Forbindelse",
+      "update": "Opdatering"
     },
     "accept": "Accepter",
     "decline": "Afvis",
@@ -61,6 +62,12 @@
     "dismiss": "Luk",
     "dismissItem": "Luk: {{title}}",
     "failed": "Det virkede ikke. Prøv igen.",
-    "block": "Bloker"
+    "block": "Bloker",
+    "update": {
+      "title": "Mumcord {{version}} er klar",
+      "body": "Genstart for at opdatere",
+      "restart": "Genstart for at opdatere",
+      "whatsNew": "Nyheder"
+    }
   }
 }

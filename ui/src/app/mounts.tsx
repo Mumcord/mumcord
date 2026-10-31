@@ -24,6 +24,7 @@ import {
 import { ChannelAudioHost } from "../features/channelaudio";
 import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
+import { Updater } from "../features/updates";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
 import {
@@ -47,7 +48,6 @@ import {
   AppImageMenuPrompt,
   DirectConsentPrompt,
   UpdateCheckPrompt,
-  UpdateHint,
   CloseDialog,
   WindowOverlayNotice,
   type WindowOverlayNoticeApi,
@@ -134,7 +134,7 @@ export function ChatStatusMount() {
       <ChannelAudioHost />
       <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
       <AudioDeviceNotice api={audioDeviceNoticeApi} onOpenSettings={openAudioSettings} />
-      <UpdateHint />
+      <Updater />
       <UpdateCheckPrompt />
       <AppImageMenuPrompt />
       <DirectConsentPrompt />

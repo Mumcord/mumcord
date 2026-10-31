@@ -51,7 +51,8 @@
       "messageRequest": "Meddelandeförfrågan",
       "invite": "Inbjudan",
       "private": "Privat meddelande",
-      "connection": "Anslutning"
+      "connection": "Anslutning",
+      "update": "Uppdatering"
     },
     "accept": "Acceptera",
     "decline": "Avböj",
@@ -61,6 +62,12 @@
     "dismiss": "Avfärda",
     "dismissItem": "Avfärda: {{title}}",
     "failed": "Det fungerade inte. Försök igen.",
-    "block": "Blockera"
+    "block": "Blockera",
+    "update": {
+      "title": "Mumcord {{version}} är redo",
+      "body": "Starta om för att uppdatera",
+      "restart": "Starta om och uppdatera",
+      "whatsNew": "Nyheter"
+    }
   }
 }

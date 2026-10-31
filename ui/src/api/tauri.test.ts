@@ -28,6 +28,14 @@ describe("tauri client", () => {
     });
   });
 
+  it("resolves commands that cannot fail with their plain value", async () => {
+    const status = { phase: "idle", offer: null };
+    invoke.mockResolvedValue(status);
+    const api = createTauriApi();
+    expect(await api.updateStatus()).toEqual(status);
+    expect(invoke).toHaveBeenCalledWith("update_status");
+  });
+
   it("sends a command only after the listeners subscribed before it are registered", async () => {
     // An event between a state fetch and the registration of its listener would be lost: the
     // fetch misses the change and the listener never sees it.
