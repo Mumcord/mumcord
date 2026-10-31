@@ -34,13 +34,13 @@ describe("column resize handles", () => {
     const { container } = render(<AppShell slots={slots} />);
     const channels = handle("Resize channel list");
     expect(channels).toHaveAttribute("aria-orientation", "vertical");
-    expect(channels).toHaveAttribute("aria-valuenow", "15");
+    expect(channels).toHaveAttribute("aria-valuenow", "18.8");
     expect(channels).toHaveAttribute("aria-valuemin", "15");
     expect(channels).toHaveAttribute("aria-valuemax", "28");
     expect(channels).toHaveAttribute("aria-controls", "channels");
     expect(channels).toHaveAttribute("tabindex", "0");
     expect(handle("Resize member list")).toHaveAttribute("aria-controls", "members");
-    expect(shell().style.getPropertyValue("--channels-width")).toBe("15rem");
+    expect(shell().style.getPropertyValue("--channels-width")).toBe("18.75rem");
     expect(await axeViolations(container)).toEqual([]);
   });
 
@@ -49,9 +49,9 @@ describe("column resize handles", () => {
     const channels = handle("Resize channel list");
     fireEvent.keyDown(channels, { key: "ArrowRight" });
     fireEvent.keyDown(channels, { key: "ArrowRight" });
-    expect(channels).toHaveAttribute("aria-valuenow", "17");
-    expect(shell().style.getPropertyValue("--channels-width")).toBe("17rem");
-    expect(stored()).toEqual({ channels: 17, members: 15 });
+    expect(channels).toHaveAttribute("aria-valuenow", "20.8");
+    expect(shell().style.getPropertyValue("--channels-width")).toBe("20.75rem");
+    expect(stored()).toEqual({ channels: 20.75, members: 15 });
 
     const members = handle("Resize member list");
     fireEvent.keyDown(members, { key: "End" });
@@ -73,8 +73,8 @@ describe("column resize handles", () => {
     localStorage.setItem("mumcord.columnWidths", JSON.stringify({ channels: 21, members: 19 }));
     render(<AppShell slots={slots} />);
     fireEvent.doubleClick(handle("Resize channel list"));
-    expect(handle("Resize channel list")).toHaveAttribute("aria-valuenow", "15");
-    expect(stored()).toEqual({ channels: 15, members: 19 });
+    expect(handle("Resize channel list")).toHaveAttribute("aria-valuenow", "18.8");
+    expect(stored()).toEqual({ channels: 18.75, members: 19 });
   });
 
   it("follows the pointer while dragging and saves on release", () => {
@@ -91,12 +91,12 @@ describe("column resize handles", () => {
     });
     vi.useRealTimers();
     // 64px at the 16px root size.
-    expect(channels).toHaveAttribute("aria-valuenow", "19");
+    expect(channels).toHaveAttribute("aria-valuenow", "22.8");
     expect(stored()).toBeNull();
 
     fireEvent.pointerUp(channels, { clientX: 380, pointerId: 1 });
-    expect(channels).toHaveAttribute("aria-valuenow", "20");
-    expect(stored()).toEqual({ channels: 20, members: 15 });
+    expect(channels).toHaveAttribute("aria-valuenow", "23.8");
+    expect(stored()).toEqual({ channels: 23.75, members: 15 });
     expect(document.documentElement.dataset.columnResizing).toBeUndefined();
   });
 
