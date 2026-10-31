@@ -818,7 +818,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (607 crates)
+* MIT License (617 crates)
 * BSD 3-Clause "New" or "Revised" License (29 crates)
 * ISC License (20 crates)
 * Unicode License v3 (19 crates)
@@ -4545,6 +4545,7 @@ MIT License
 
 Used by:
   - cfg-if 1.0.5 (https://github.com/rust-lang/cfg-if)
+  - filetime 0.2.29 (https://github.com/alexcrichton/filetime)
   - openssl-probe 0.2.1 (https://github.com/rustls/openssl-probe)
   - socket2 0.6.5 (https://github.com/rust-lang/socket2)
   - toml_datetime 0.6.3 (https://github.com/toml-rs/toml)
@@ -5250,6 +5251,7 @@ MIT License
 
 Used by:
   - tempfile 3.27.0 (https://github.com/Stebalien/tempfile)
+  - xattr 1.6.1 (https://github.com/Stebalien/xattr)
 
 Copyright (c) 2015 Steven Allen
 
@@ -8750,6 +8752,40 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - osakit 0.3.1 (https://github.com/mdevils/rust-osakit)
+
+Copyright (c) 2024 Marat Dulin
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - lru-slab 0.1.3 (https://github.com/Ralith/lru-slab)
 
 Copyright (c) 2024 The lru-slab Developers
@@ -9148,6 +9184,40 @@ Used by:
   - idna_adapter 1.2.2 (https://github.com/hsivonen/idna_adapter)
 
 Copyright (c) The rust-url developers
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - tar 0.4.46 (https://github.com/composefs/tar-rs)
+
+Copyright (c) The tar-rs Project Contributors
 
 Permission is hereby granted, free of charge, to any
 person obtaining a copy of this software and associated
@@ -10745,6 +10815,7 @@ Used by:
   - libappindicator-sys 0.9.0
   - libm 0.2.16 (https://github.com/rust-lang/compiler-builtins)
   - mac-notification-sys 0.6.15 (https://github.com/h4llow3En/mac-notification-sys)
+  - minisign-verify 0.3.0 (https://github.com/jedisct1/rust-minisign-verify)
   - netlink-packet-core 0.9.0 (https://github.com/rust-netlink/netlink-packet-core)
   - netlink-sys 0.9.0 (https://github.com/rust-netlink/netlink-sys)
   - objc2-app-kit 0.3.2 (https://github.com/madsmtm/objc2)
@@ -10758,6 +10829,7 @@ Used by:
   - objc2-encode 4.1.0 (https://github.com/madsmtm/objc2)
   - objc2-exception-helper 0.1.1 (https://github.com/madsmtm/objc2)
   - objc2-foundation 0.3.2 (https://github.com/madsmtm/objc2)
+  - objc2-osa-kit 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-quartz-core 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-screen-capture-kit 0.3.2 (https://github.com/madsmtm/objc2)
   - objc2-system-configuration 0.3.2 (https://github.com/madsmtm/objc2)
@@ -10778,6 +10850,7 @@ Used by:
   - tauri-plugin-global-shortcut 2.4.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-opener 2.7.2 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-single-instance 2.5.4 (https://github.com/tauri-apps/plugins-workspace)
+  - tauri-plugin-updater 2.14.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-winrt-notification 0.8.1 (https://github.com/tauri-apps/winrt-notification)
   - webview2-com-macros 0.8.1 (https://github.com/wravery/webview2-rs)
   - webview2-com-sys 0.39.1 (https://github.com/wravery/webview2-rs)
@@ -11168,6 +11241,7 @@ Used by:
   - thiserror-impl 2.0.21 (https://github.com/dtolnay/thiserror)
   - thiserror 1.0.69 (https://github.com/dtolnay/thiserror)
   - thiserror 2.0.21 (https://github.com/dtolnay/thiserror)
+  - typed-path 0.13.0 (https://github.com/chipsenkbeil/typed-path)
   - typeid 1.0.3 (https://github.com/dtolnay/typeid)
   - unicode-ident 1.0.27 (https://github.com/dtolnay/unicode-ident)
   - x11-dl 2.21.0 (https://github.com/AltF02/x11-rs.git)
@@ -11486,6 +11560,7 @@ MIT License
 
 Used by:
   - tracing-core 0.1.36 (https://github.com/tokio-rs/tracing)
+  - zip 9.2.0 (https://github.com/zip-rs/zip2)
 
 The MIT License (MIT)
 
@@ -11666,6 +11741,36 @@ Used by:
 The MIT License (MIT)
 
 Copyright (c) 2015 Andrew Gallant
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - nix 0.31.3 (https://github.com/nix-rust/nix)
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Carl Lerche + nix-rust Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
