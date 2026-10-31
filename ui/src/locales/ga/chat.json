@@ -377,5 +377,17 @@
       "deleteHistory": "Scrios an stair",
       "deleteHint": "An gléas seo amháin · coinníonn {{name}} a chóip féin"
     }
+  },
+  "embedHint": {
+    "image": "Íomhá i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "gif": "GIF i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "video": "Seinnteoir físe i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "audio": "Seinnteoir fuaime i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "link": "Réamhamharc ar nasc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_one": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_two": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_few": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_many": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_other": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>."
   }
 }

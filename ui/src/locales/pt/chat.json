@@ -361,5 +361,15 @@
       "deleteHistory": "Eliminar histórico",
       "deleteHint": "Apenas este dispositivo · {{name}} mantém a sua cópia"
     }
+  },
+  "embedHint": {
+    "image": "Imagem oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "gif": "GIF oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "video": "Leitor de vídeo oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "audio": "Leitor de áudio oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "link": "Pré-visualização da ligação oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "several_one": "{{count}} pré-visualização oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "several_many": "{{count}} pré-visualizações ocultas, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "several_other": "{{count}} pré-visualizações ocultas, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>."
   }
 }

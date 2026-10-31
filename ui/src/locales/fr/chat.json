@@ -361,5 +361,15 @@
       "deleteHistory": "Supprimer l’historique",
       "deleteHint": "Cet appareil uniquement · {{name}} garde sa copie"
     }
+  },
+  "embedHint": {
+    "image": "Image masquée, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "gif": "GIF masqué, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "video": "Lecteur vidéo masqué, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "audio": "Lecteur audio masqué, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "link": "Aperçu du lien masqué, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "several_one": "{{count}} aperçu masqué, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "several_many": "{{count}} aperçus masqués, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
+    "several_other": "{{count}} aperçus masqués, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>."
   }
 }
