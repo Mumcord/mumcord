@@ -71,7 +71,7 @@ describe("settings search index", () => {
     ]);
     expect(labels(searchSettings("allow direct connections", t))).toContain("privacyDirect.allow");
     expect(labels(searchSettings("github", t))).toEqual(["updates.check"]);
-    expect(labels(searchSettings("high quality", t))).toEqual(["voice.noiseSuppression"]);
+    expect(labels(searchSettings("advanced (ai)", t))).toEqual(["voice.noiseSuppression"]);
   });
 
   it("finds the history sharing switch (FR-1.60)", () => {

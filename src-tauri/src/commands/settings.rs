@@ -200,10 +200,12 @@ pub enum VoiceActivation {
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum NoiseBackend {
-    /// "Standard (light)", the default.
+    /// "Light".
+    Light,
+    /// "Standard", the default.
     Standard,
-    /// "High quality (Beta)".
-    HighQuality,
+    /// "Advanced (AI)", Beta.
+    Advanced,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -580,8 +582,9 @@ impl Settings {
             output_device: s.output_device.clone(),
             noise_suppression: s.noise_suppression,
             noise_suppression_backend: match s.noise_suppression_backend {
+                store::NoiseBackend::Light => NoiseBackend::Light,
                 store::NoiseBackend::Standard => NoiseBackend::Standard,
-                store::NoiseBackend::HighQuality => NoiseBackend::HighQuality,
+                store::NoiseBackend::Advanced => NoiseBackend::Advanced,
             },
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
@@ -704,8 +707,9 @@ impl Settings {
         s.output_device = self.output_device.clone().filter(|d| !d.is_empty());
         s.noise_suppression = self.noise_suppression;
         s.noise_suppression_backend = match self.noise_suppression_backend {
+            NoiseBackend::Light => store::NoiseBackend::Light,
             NoiseBackend::Standard => store::NoiseBackend::Standard,
-            NoiseBackend::HighQuality => store::NoiseBackend::HighQuality,
+            NoiseBackend::Advanced => store::NoiseBackend::Advanced,
         };
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;

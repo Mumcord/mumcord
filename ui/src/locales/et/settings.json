@@ -158,15 +158,18 @@
     "noiseSuppression": "Müravaigistus",
     "noiseSuppressionHint": "Filtreerib välja taustamüra, nagu klaviatuur ja ventilaatorid.",
     "noiseChoice": {
-      "standard": "Tavaline (kerge)",
-      "highQuality": "Kõrge kvaliteet (beeta, rohkem protsessorit)",
+      "light": "Nõrk",
+      "standard": "Tavaline",
+      "advanced": "Täiustatud (AI)",
       "off": "Väljas"
     },
     "noiseChoiceHint": {
-      "standard": "Väike protsessorikoormus; sobib ühtlase müra jaoks.",
-      "highQuality": "Uuem mudel, mis eemaldab rohkem müra. Kasutab umbes kolm korda rohkem protsessorit ja lisab 10 ms viivitust.",
-      "off": "Mikrofoni heli saadetakse filtreerimata."
+      "light": "Klassikaline filter ühtlase müra jaoks, nagu ventilaatorid või sumin. Väikseim protsessorikoormus.",
+      "standard": "AI-filter igapäevase müra jaoks, nagu klaviatuurid ja ventilaatorid. Väike protsessorikoormus.",
+      "advanced": "Uuem AI-mudel, mis eemaldab ka muutuvat müra. Umbes kolm korda rohkem protsessorit kui Tavaline ja 10 ms rohkem viivitust."
     },
+    "noiseChoiceBeta": "Beeta",
+    "noiseChoiceTipLabel": "Teave: {{choice}}",
     "detectorHint": "Kõnetuvastus tuvastab kõnet RNNoise'i mudeliga; see ei muuda sinu heli.",
     "echoCancellation": "Kajasummutus",
     "echoCancellationHint": "Takistab teistel iseennast kuulmast, kui kasutad kõlareid.",

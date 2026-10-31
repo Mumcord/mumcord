@@ -158,15 +158,18 @@
     "noiseSuppression": "Støjundertrykkelse",
     "noiseSuppressionHint": "Filtrerer baggrundsstøj som tastatur og blæsere fra.",
     "noiseChoice": {
-      "standard": "Standard (let)",
-      "highQuality": "Høj kvalitet (beta, mere CPU)",
+      "light": "Let",
+      "standard": "Standard",
+      "advanced": "Avanceret (AI)",
       "off": "Fra"
     },
     "noiseChoiceHint": {
-      "standard": "Let for processoren; god til jævn støj.",
-      "highQuality": "En nyere model, der fjerner mere støj. Bruger cirka tre gange så meget CPU og tilføjer 10 ms forsinkelse.",
-      "off": "Din mikrofon sendes uden filtrering."
+      "light": "Klassisk filter til jævn støj som blæsere eller brum. Laveste CPU-forbrug.",
+      "standard": "AI-filter til hverdagsstøj som tastaturer og blæsere. Lavt CPU-forbrug.",
+      "advanced": "Nyere AI-model, der også fjerner skiftende støj. Cirka tre gange så meget CPU som Standard og 10 ms mere forsinkelse."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Om {{choice}}",
     "detectorHint": "Stemmeaktivering opdager tale med RNNoise-modellen; den ændrer ikke din lyd.",
     "echoCancellation": "Ekkoundertrykkelse",
     "echoCancellationHint": "Forhindrer, at andre hører sig selv, når du bruger højttalere.",

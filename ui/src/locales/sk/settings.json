@@ -160,15 +160,18 @@
     "noiseSuppression": "Potlačenie šumu",
     "noiseSuppressionHint": "Odfiltruje hluk v pozadí, napríklad klávesnicu či ventilátory.",
     "noiseChoice": {
-      "standard": "Štandardné (ľahké)",
-      "highQuality": "Vysoká kvalita (beta, viac CPU)",
+      "light": "Slabé",
+      "standard": "Štandardné",
+      "advanced": "Pokročilé (AI)",
       "off": "Vypnuté"
     },
     "noiseChoiceHint": {
-      "standard": "Málo zaťažuje procesor; vhodné na stály šum.",
-      "highQuality": "Novší model, ktorý odstráni viac šumu. Využíva asi trojnásobok procesora a pridáva 10 ms oneskorenia.",
-      "off": "Mikrofón sa odosiela bez filtrovania."
+      "light": "Klasický filter na stály šum, ako sú ventilátory alebo brum. Najnižšie zaťaženie procesora.",
+      "standard": "AI filter na bežný hluk, ako sú klávesnice a ventilátory. Nízke zaťaženie procesora.",
+      "advanced": "Novší AI model, ktorý odstráni aj premenlivý hluk. Asi trojnásobné zaťaženie procesora oproti Štandardnému a o 10 ms väčšie oneskorenie."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "O voľbe {{choice}}",
     "detectorHint": "Aktivácia hlasu deteguje reč modelom RNNoise; ten nemení tvoje audio.",
     "echoCancellation": "Potlačenie ozveny",
     "echoCancellationHint": "Zabráni tomu, aby sa ostatní počuli, keď používaš reproduktory.",

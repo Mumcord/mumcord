@@ -1716,10 +1716,12 @@ export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMus
 
 /**  Which noise suppression runs while it is on (Settings → Voice, FR-3.65). */
 export type NoiseBackend = 
-/**  "Standard (light)", the default. */
+/**  "Light". */
+"light" | 
+/**  "Standard", the default. */
 "standard" | 
-/**  "High quality (Beta)". */
-"highQuality";
+/**  "Advanced (AI)", Beta. */
+"advanced";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server

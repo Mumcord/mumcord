@@ -1,5 +1,5 @@
-// Noise suppression (FR-3.65, AC-3.56, PR #126): Settings → Voice offers Standard (light), High
-// quality (Beta, more CPU) and Off, both backends have to lower noise while keeping the voice, and the
+// Noise suppression (FR-3.65, AC-3.56, PR #126): Settings → Voice offers Light, Standard, Advanced
+// (AI) with a Beta badge and Off, every backend has to lower noise while keeping the voice, and the
 // choice changes while the microphone runs. The client reads the test clip as its microphone through
 // the file audio backend, so the bot records what the app sends.
 // Voice activation is put on the manual threshold with the slider at its minimum and the automatic
@@ -76,19 +76,26 @@ async function openVoiceSettings(): Promise<void> {
   const tab = await $("button[id$='-tab-voice']");
   await tab.waitForDisplayed({ timeout: 30_000 });
   await tab.click();
-  await (await $(NOISE_LABEL)).waitForDisplayed({ timeout: 30_000 });
+  await (await $(NOISE_GROUP)).waitForDisplayed({ timeout: 30_000 });
 }
 
-const NOISE_LABEL = "//label[normalize-space(.)='Noise suppression']";
-const STANDARD = "Standard (light)";
-const HIGH_QUALITY = "High quality (Beta, more CPU)";
+const NOISE_GROUP = "//fieldset[legend[normalize-space(.)='Noise suppression']]";
+const LIGHT = "Light";
+const STANDARD = "Standard";
+const ADVANCED = "Advanced (AI)";
+/** The value each choice saves, which is also the radio's value. */
+const VALUES: Record<string, string> = { [LIGHT]: "light", [STANDARD]: "standard", [ADVANCED]: "advanced", Off: "off" };
 
-async function choiceBox() {
-  return $(`${NOISE_LABEL}/following::button[@role='combobox'][1]`);
+async function choiceRadio(text: string) {
+  return $(`${NOISE_GROUP}//input[@type='radio' and @value='${VALUES[text] ?? ""}']`);
 }
 
+/** Label text of the selected choice, badge included. */
 async function choiceValue(): Promise<string> {
-  return browser.execute((element: HTMLElement) => element.textContent, await choiceBox());
+  for (const radio of await $$(`${NOISE_GROUP}//input[@type='radio']`)) {
+    if (await radio.isSelected()) return (await radio.parentElement()).getText();
+  }
+  return "";
 }
 
 async function switchByText(text: string) {
@@ -99,11 +106,10 @@ async function switchByText(text: string) {
   return control;
 }
 
-async function pick(box: Awaited<ReturnType<typeof choiceBox>>, text: string): Promise<void> {
-  await box.click();
-  const option = await $(`//div[@role='option' and contains(., '${text}')]`);
-  await option.waitForDisplayed({ timeout: 10_000 });
-  await option.click();
+async function pick(text: string): Promise<void> {
+  const radio = await choiceRadio(text);
+  await radio.scrollIntoView();
+  await radio.click();
   // A settings change needs a moment to reach the engine.
   await sleep(1500);
 }
@@ -125,7 +131,7 @@ async function sendContinuously(): Promise<void> {
 
 async function choose(text: string): Promise<void> {
   await openVoiceSettings();
-  await pick(await choiceBox(), text);
+  await pick(text);
 }
 
 /** Reconnects after an app restart; the server bar label can carry extra text. */
@@ -241,13 +247,11 @@ describe("noise suppression backends", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
-  it("offers Standard, High quality (Beta) and Off with Standard selected", async () => {
+  it("offers Light, Standard, Advanced (AI) with a Beta badge and Off, Standard selected", async () => {
     await openVoiceSettings();
-    expect(await choiceValue()).toContain(STANDARD);
-    await (await choiceBox()).click();
-    const labels = await (await $$("//div[@role='option']")).map((option) => option.getText());
-    expect(labels).toEqual([STANDARD, HIGH_QUALITY, "Off"]);
-    await browser.keys(["Escape"]);
+    expect(await choiceValue()).toBe(STANDARD);
+    const labels = await (await $$(`${NOISE_GROUP}//label`)).map((label) => label.getText());
+    expect(labels.map((label) => label.replace(/\s+/g, " ").trim())).toEqual([LIGHT, STANDARD, `${ADVANCED} Beta`, "Off"]);
   });
 
   it("sends the audio unchanged while suppression is off", async () => {
@@ -258,9 +262,9 @@ describe("noise suppression backends", () => {
   });
 
   it("reduces noise with both backends and keeps the voice", async () => {
-    for (const name of [STANDARD, HIGH_QUALITY]) {
+    for (const name of [LIGHT, STANDARD, ADVANCED]) {
       await choose(name);
-      sent.set(name, await measure(name === STANDARD ? "standard" : "high-quality"));
+      sent.set(name, await measure(VALUES[name] ?? name));
     }
     // How much a backend removes on its own is proven in crates/codec/src/dsp/tests.rs and, for
     // rnnoise-rs, in crates/engine/src/noise_backend.rs. Through the network path the encoder and the
@@ -278,12 +282,12 @@ describe("noise suppression backends", () => {
   });
 
   it("changes the backend while the microphone keeps running", async () => {
-    // Off with Standard as the last backend: choosing High quality in the pause switches the
+    // Off with Standard as the last backend: choosing Advanced in the pause switches the
     // suppression on and the backend over in one step, without restarting the app.
     await choose(STANDARD);
     await choose("Off");
     // Two copies of the clip in one run, with a pause between them long enough for the switch to
-    // land in it: the first copy goes out unsuppressed, the second with High quality. Both are
+    // land in it: the first copy goes out unsuppressed, the second with Advanced. Both are
     // measured in the same run, so only the choice differs.
     const pause = 24;
     const copyWindows = Math.floor(noisy.length / WINDOW);
@@ -298,18 +302,18 @@ describe("noise suppression backends", () => {
         const wait = (PREFIX + CLIP_SECONDS + 3) * 1000 - elapsed;
         if (wait > 0) await sleep(wait);
         await openVoiceSettings();
-        await pick(await choiceBox(), HIGH_QUALITY);
+        await pick(ADVANCED);
       },
       150,
     );
     const first = levelsAt(received, lag, "switch first copy");
     const second = levelsAt(received, lag + copyWindows + pause * 100, "switch second copy");
-    // The two copies measure like the off run and the High quality run, and the second is quieter:
+    // The two copies measure like the off run and the Advanced run, and the second is quieter:
     // only a chain that changed while it was running can do that.
     expect(Math.abs(first.gapDb - off.gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
-    expect(Math.abs(second.gapDb - (sent.get(HIGH_QUALITY) as Levels).gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
+    expect(Math.abs(second.gapDb - (sent.get(ADVANCED) as Levels).gapDb)).toBeLessThan(RUN_TOLERANCE_DB);
     expect(second.gapDb).toBeLessThan(first.gapDb);
     await openVoiceSettings();
-    expect(await choiceValue()).toContain(HIGH_QUALITY);
+    expect(await choiceValue()).toContain(ADVANCED);
   });
 });

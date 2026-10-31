@@ -161,15 +161,18 @@
     "noiseSuppression": "Cosc torainn",
     "noiseSuppressionHint": "Scagann sé torann cúlra amach, ar nós méarchláir agus fan.",
     "noiseChoice": {
-      "standard": "Caighdeánach (éadrom)",
-      "highQuality": "Ardcháilíocht (Béite, níos mó LAP)",
+      "light": "Éadrom",
+      "standard": "Caighdeánach",
+      "advanced": "Ardleibhéal (IS)",
       "off": "As"
     },
     "noiseChoiceHint": {
-      "standard": "Ualach beag ar an LAP; oiriúnach do thorann seasta.",
-      "highQuality": "Múnla níos nuaí a bhaineann níos mó torainn. Úsáideann sé thart ar trí oiread an LAP agus cuireann sé moill 10 ms leis.",
-      "off": "Seoltar do mhicreafón gan scagadh."
+      "light": "Scagaire clasaiceach do thorann seasta mar ghaothráin nó crónán. An t-ualach LAP is lú.",
+      "standard": "Scagaire IS do thorann laethúil mar mhéarchláir agus ghaothráin. Ualach LAP íseal.",
+      "advanced": "Múnla IS níos nuaí a bhaineann torann athraitheach freisin. Thart ar trí oiread LAP an Chaighdeánaigh agus moill 10 ms níos mó."
     },
+    "noiseChoiceBeta": "Béite",
+    "noiseChoiceTipLabel": "Faoi {{choice}}",
     "detectorHint": "Braitheann an ghnáthacht gutha caint leis an múnla RNNoise; ní athraíonn sé an fhuaim.",
     "echoCancellation": "Cealú macalla",
     "echoCancellationHint": "Cuireann sé stop le daoine eile iad féin a chloisteáil nuair a úsáideann tú callairí.",

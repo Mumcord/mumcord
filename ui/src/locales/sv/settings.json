@@ -158,15 +158,18 @@
     "noiseSuppression": "Brusreducering",
     "noiseSuppressionHint": "Filtrerar bort bakgrundsljud som tangentbord och fläktar.",
     "noiseChoice": {
-      "standard": "Standard (lätt)",
-      "highQuality": "Hög kvalitet (beta, mer CPU)",
+      "light": "Lätt",
+      "standard": "Standard",
+      "advanced": "Avancerad (AI)",
       "off": "Av"
     },
     "noiseChoiceHint": {
-      "standard": "Lätt för processorn; bra för jämnt brus.",
-      "highQuality": "En nyare modell som tar bort mer brus. Använder ungefär tre gånger så mycket CPU och lägger till 10 ms fördröjning.",
-      "off": "Din mikrofon skickas ofiltrerad."
+      "light": "Klassiskt filter för jämnt brus som fläktar eller brum. Lägst CPU-användning.",
+      "standard": "AI-filter för vardagsljud som tangentbord och fläktar. Låg CPU-användning.",
+      "advanced": "Nyare AI-modell som även tar bort växlande brus. Ungefär tre gånger så mycket CPU som Standard och 10 ms mer fördröjning."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Om {{choice}}",
     "detectorHint": "Röstaktiveringen använder RNNoise-modellen för att upptäcka tal; den ändrar inte ditt ljud.",
     "echoCancellation": "Ekoreducering",
     "echoCancellationHint": "Hindrar andra från att höra sig själva när du använder högtalare.",

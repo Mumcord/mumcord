@@ -158,15 +158,18 @@
     "noiseSuppression": "Zajszűrés",
     "noiseSuppressionHint": "Kiszűri a háttérzajt, például a billentyűzetet és a ventilátorokat.",
     "noiseChoice": {
-      "standard": "Normál (könnyű)",
-      "highQuality": "Magas minőség (béta, több CPU)",
+      "light": "Gyenge",
+      "standard": "Normál",
+      "advanced": "Speciális (MI)",
       "off": "Ki"
     },
     "noiseChoiceHint": {
-      "standard": "Kevés processzort használ; egyenletes zajhoz jó.",
-      "highQuality": "Újabb modell, amely több zajt távolít el. Körülbelül háromszor annyi processzort használ, és 10 ms késleltetést ad hozzá.",
-      "off": "A mikrofonod szűrés nélkül megy ki."
+      "light": "Klasszikus szűrő egyenletes zajhoz, például ventilátorhoz vagy zúgáshoz. A legkisebb processzorterhelés.",
+      "standard": "MI-szűrő hétköznapi zajhoz, például billentyűzethez és ventilátorhoz. Kis processzorterhelés.",
+      "advanced": "Újabb MI-modell, amely a változó zajt is eltávolítja. Körülbelül háromszor annyi processzor, mint a Normál, és 10 ms-mal több késleltetés."
     },
+    "noiseChoiceBeta": "Béta",
+    "noiseChoiceTipLabel": "Erről: {{choice}}",
     "detectorHint": "A beszédaktiválás a RNNoise modellel ismeri fel a beszédet; nem módosítja a hangot.",
     "echoCancellation": "Visszhangszűrés",
     "echoCancellationHint": "Megakadályozza, hogy mások visszahallják magukat, ha hangszórót használsz.",

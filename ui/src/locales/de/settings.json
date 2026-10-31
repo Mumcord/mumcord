@@ -158,15 +158,18 @@
     "noiseSuppression": "Rauschunterdrückung",
     "noiseSuppressionHint": "Filtert Hintergrundgeräusche wie Tastaturen und Lüfter heraus.",
     "noiseChoice": {
-      "standard": "Standard (leicht)",
-      "highQuality": "Hohe Qualität (Beta, mehr CPU)",
+      "light": "Schwach",
+      "standard": "Standard",
+      "advanced": "Erweitert (KI)",
       "off": "Aus"
     },
     "noiseChoiceHint": {
-      "standard": "Wenig CPU-Last; gut für gleichmäßige Geräusche.",
-      "highQuality": "Ein neueres Modell, das mehr Rauschen entfernt. Braucht etwa dreimal so viel CPU und fügt 10 ms Verzögerung hinzu.",
-      "off": "Dein Mikrofon wird ungefiltert gesendet."
+      "light": "Klassischer Filter für gleichmäßige Geräusche wie Lüfter oder Brummen. Geringste CPU-Last.",
+      "standard": "KI-Filter für alltägliche Geräusche wie Tastaturen und Lüfter. Geringe CPU-Last.",
+      "advanced": "Neueres KI-Modell, das auch wechselnde Geräusche entfernt. Etwa dreimal so viel CPU wie Standard und 10 ms mehr Verzögerung."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Mehr zu {{choice}}",
     "detectorHint": "Die Sprachaktivierung erkennt Sprache mit dem RNNoise-Modell; es ändert dein Audio nicht.",
     "echoCancellation": "Echounterdrückung",
     "echoCancellationHint": "Verhindert, dass andere sich selbst hören, wenn du Lautsprecher nutzt.",

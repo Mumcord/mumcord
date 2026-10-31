@@ -160,15 +160,18 @@
     "noiseSuppression": "Dušenje šuma",
     "noiseSuppressionHint": "Odstrani hrup iz ozadja, kot so tipkovnice in ventilatorji.",
     "noiseChoice": {
-      "standard": "Standardno (lahko)",
-      "highQuality": "Visoka kakovost (beta, več CPE)",
+      "light": "Šibko",
+      "standard": "Standardno",
+      "advanced": "Napredno (UI)",
       "off": "Izklopljeno"
     },
     "noiseChoiceHint": {
-      "standard": "Malo obremeni procesor; primerno za stalen hrup.",
-      "highQuality": "Novejši model, ki odstrani več hrupa. Porabi približno trikrat več procesorja in doda 10 ms zakasnitve.",
-      "off": "Mikrofon se pošilja brez filtriranja."
+      "light": "Klasičen filter za stalen hrup, kot so ventilatorji ali brnenje. Najmanjša obremenitev procesorja.",
+      "standard": "Filter UI za vsakdanji hrup, kot so tipkovnice in ventilatorji. Majhna obremenitev procesorja.",
+      "advanced": "Novejši model UI, ki odstrani tudi spremenljiv hrup. Približno trikrat več procesorja kot Standardno in 10 ms več zakasnitve."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "O možnosti {{choice}}",
     "detectorHint": "Aktivacija glasa prepozna govor z modelom RNNoise; ta ne spremeni tvojega zvoka.",
     "echoCancellation": "Odpravljanje odmeva",
     "echoCancellationHint": "Prepreči, da bi drugi slišali sami sebe, ko uporabljaš zvočnike.",

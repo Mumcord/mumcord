@@ -159,15 +159,18 @@
     "noiseSuppression": "Suprimarea zgomotului",
     "noiseSuppressionHint": "Filtrează zgomotul de fundal, cum ar fi tastaturile și ventilatoarele.",
     "noiseChoice": {
-      "standard": "Standard (ușoară)",
-      "highQuality": "Calitate înaltă (beta, mai mult CPU)",
+      "light": "Slabă",
+      "standard": "Standard",
+      "advanced": "Avansată (AI)",
       "off": "Dezactivată"
     },
     "noiseChoiceHint": {
-      "standard": "Solicită puțin procesorul; potrivită pentru zgomot constant.",
-      "highQuality": "Un model mai nou care elimină mai mult zgomot. Folosește de aproximativ trei ori mai mult procesor și adaugă 10 ms de întârziere.",
-      "off": "Microfonul este trimis fără filtrare."
+      "light": "Filtru clasic pentru zgomot constant, cum ar fi ventilatoarele sau bâzâitul. Cea mai mică utilizare a procesorului.",
+      "standard": "Filtru AI pentru zgomotul de zi cu zi, cum ar fi tastaturile și ventilatoarele. Utilizare redusă a procesorului.",
+      "advanced": "Model AI mai nou care elimină și zgomotul variabil. Aproximativ de trei ori procesorul variantei Standard și 10 ms întârziere în plus."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Despre {{choice}}",
     "detectorHint": "Activarea vocală detectează vorbirea cu modelul RNNoise; nu îți schimbă audio-ul.",
     "echoCancellation": "Anularea ecoului",
     "echoCancellationHint": "Îi împiedică pe ceilalți să se audă pe ei înșiși când folosești difuzoare.",

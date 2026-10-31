@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { InfoTip } from "../../../components/InfoTip";
 
 interface RadioOption<T extends string> {
   value: T;
@@ -6,6 +7,10 @@ interface RadioOption<T extends string> {
   disabled?: boolean;
   /** Language of the label when it differs from the UI, so screen readers pronounce it right. */
   lang?: string;
+  /** Small marker after the label, such as "Beta". */
+  badge?: string | undefined;
+  /** A "?" next to the option that explains it. */
+  tip?: { label: string; text: string } | undefined;
 }
 
 interface RadioGroupProps<T extends string> {
@@ -27,19 +32,26 @@ export function RadioGroup<T extends string>({
     <fieldset className="settings-radios">
       <legend>{legend}</legend>
       {options.map((option) => (
-        <label key={option.value} className="settings-radios__option" lang={option.lang}>
-          <input
-            type="radio"
-            name={name}
-            value={option.value}
-            checked={option.value === value}
-            disabled={option.disabled ?? false}
-            onChange={() => {
-              onChange(option.value);
-            }}
-          />
-          {option.label}
-        </label>
+        <div key={option.value} className="settings-radios__row">
+          <label className="settings-radios__option" lang={option.lang}>
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={option.value === value}
+              disabled={option.disabled ?? false}
+              onChange={() => {
+                onChange(option.value);
+              }}
+            />
+            {option.label}
+            {option.badge !== undefined && (
+              <span className="settings-switch__badge">{option.badge}</span>
+            )}
+          </label>
+          {/* Outside the label, so the "?" is its own control and does not pick the option. */}
+          {option.tip !== undefined && <InfoTip label={option.tip.label} text={option.tip.text} />}
+        </div>
       ))}
     </fieldset>
   );

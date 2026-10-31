@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
@@ -10,7 +10,6 @@ import {
   type Settings,
 } from "../../../api";
 import { RadioGroup } from "../components/RadioGroup";
-import { Select } from "../../../components/Select";
 import { Group, Section } from "../components/Section";
 import { CompatibilityModeSwitch } from "./CompatibilityModeSwitch";
 import { Switch } from "../components/Switch";
@@ -22,9 +21,9 @@ import type { SettingsSectionProps } from "./types";
 /** The command that adds the user to the `input` group (FR-1.21, AC-1.37). */
 const INPUT_GROUP_COMMAND = "sudo usermod -aG input $USER";
 
-/** The noise suppression choices of FR-3.65 (Q1.13): one of the two backends, or off. */
+/** The noise suppression choices of FR-3.65 (Q1.13), weakest first: one of the backends, or off. */
 type NoiseChoice = NoiseBackend | "off";
-const NOISE_CHOICES: NoiseChoice[] = ["standard", "highQuality", "off"];
+const NOISE_CHOICES: NoiseChoice[] = ["light", "standard", "advanced", "off"];
 
 /** Whether mouse buttons may be captured: natively, or on Wayland after opting in (QA.4). */
 function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolean {
@@ -199,25 +198,33 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
         />
       </Group>
       <Group title={t("voice.processing")}>
-        <LabeledSelect
-          label={t("voice.noiseSuppression")}
+        <RadioGroup
+          legend={t("voice.noiseSuppression")}
           value={noiseChoice}
           options={NOISE_CHOICES.map((choice) => ({
             value: choice,
             label: t(`voice.noiseChoice.${choice}`),
+            badge: choice === "advanced" ? t("voice.noiseChoiceBeta") : undefined,
+            tip:
+              choice === "off"
+                ? undefined
+                : {
+                    label: t("voice.noiseChoiceTipLabel", {
+                      choice: t(`voice.noiseChoice.${choice}`),
+                    }),
+                    text: t(`voice.noiseChoiceHint.${choice}`),
+                  },
           }))}
-          onChange={(value) => {
-            const choice = NOISE_CHOICES.find((option) => option === value);
+          onChange={(choice) => {
             if (choice === "off") update({ noiseSuppression: false });
-            else if (choice) update({ noiseSuppression: true, noiseSuppressionBackend: choice });
+            else update({ noiseSuppression: true, noiseSuppressionBackend: choice });
           }}
         />
-        <p className="settings-hint">
-          {t("voice.noiseSuppressionHint")} {t(`voice.noiseChoiceHint.${noiseChoice}`)}
-        </p>
-        {settings.talkMode === "voiceActivation" && !settings.noiseSuppression && (
-          <p className="settings-hint">{t("voice.detectorHint")}</p>
-        )}
+        <p className="settings-hint">{t("voice.noiseSuppressionHint")}</p>
+        {settings.talkMode === "voiceActivation" &&
+          (settings.noiseSuppressionBackend === "light" || !settings.noiseSuppression) && (
+            <p className="settings-hint">{t("voice.detectorHint")}</p>
+          )}
         <Switch
           label={t("voice.echoCancellation")}
           description={t("voice.echoCancellationHint")}
@@ -236,24 +243,6 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
         />
       </Group>
     </Section>
-  );
-}
-
-interface LabeledSelectProps {
-  label: string;
-  value: string;
-  options: { value: string; label: string }[];
-  onChange: (value: string) => void;
-}
-
-/** A dropdown with a visible label, as the other settings controls have. */
-function LabeledSelect({ label, value, options, onChange }: LabeledSelectProps) {
-  const id = useId();
-  return (
-    <div className="settings-control-row">
-      <label htmlFor={id}>{label}</label>
-      <Select id={id} value={value} options={options} onChange={onChange} />
-    </div>
   );
 }
 

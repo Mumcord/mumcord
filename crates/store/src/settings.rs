@@ -41,15 +41,21 @@ pub enum VoiceActivation {
 }
 
 /// Which noise suppression runs while `Settings::noise_suppression` is on (Settings → Voice,
-/// FR-3.65). The names are the product names, not the libraries behind them.
+/// FR-3.65). The names are the product names, not the libraries behind them; the aliases read rows
+/// written by development builds of PR #126, which stored the library names.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum NoiseBackend {
-    /// "Standard (light)": `nnnoiseless`, the 2018 RNNoise model, low CPU (default).
+    /// "Light": `sonora-ns`, WebRTC's classical suppressor at one fixed strength, lowest CPU.
+    #[serde(alias = "sonora")]
+    Light,
+    /// "Standard": `nnnoiseless`, the 2018 RNNoise model (default).
     #[default]
+    #[serde(alias = "nnnoiseless")]
     Standard,
-    /// "High quality (Beta)": `rnnoise-rs`, the 2024 RNNoise model, more CPU (issue #176).
-    HighQuality,
+    /// "Advanced (AI)", Beta: `rnnoise-rs`, the 2024 RNNoise model, more CPU (issue #176).
+    #[serde(alias = "rnnoise")]
+    Advanced,
 }
 
 /// Default manual threshold in dBFS.
@@ -807,7 +813,7 @@ mod tests {
         changed.wizard_completed = true;
         changed.log_level = LogLevel::Debug;
         changed.ptt_compatibility_mode = true;
-        changed.noise_suppression_backend = NoiseBackend::HighQuality;
+        changed.noise_suppression_backend = NoiseBackend::Advanced;
         changed.notifications = NotificationMode::InApp;
         changed.connect_muted = false;
         store.save_settings(&changed).expect("save");
@@ -1186,6 +1192,25 @@ mod tests {
         assert_eq!(store.settings().expect("chosen").bitrate_kbps, Some(64));
         save_raw(r#"{"music_quality":false,"bitrate_kbps":null}"#);
         assert_eq!(store.settings().expect("max").bitrate_kbps, None);
+    }
+
+    /// Development builds of PR #126 stored the library names; those rows load as the choice
+    /// that runs the same library, and the extra fields they carried are ignored.
+    #[test]
+    fn library_names_of_old_rows_load_as_choices() {
+        for (stored, choice) in [
+            ("sonora", NoiseBackend::Light),
+            ("nnnoiseless", NoiseBackend::Standard),
+            ("rnnoise", NoiseBackend::Advanced),
+            ("light", NoiseBackend::Light),
+            ("advanced", NoiseBackend::Advanced),
+        ] {
+            let json = format!(
+                r#"{{"noise_suppression_backend":"{stored}","noise_suppression_level":"very_high","noise_suppression_rnnoise_consent":"yes"}}"#
+            );
+            let parsed: Settings = serde_json::from_str(&json).expect("parse");
+            assert_eq!(parsed.noise_suppression_backend, choice, "{stored}");
+        }
     }
 
     #[test]

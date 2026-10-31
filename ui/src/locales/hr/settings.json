@@ -159,15 +159,18 @@
     "noiseSuppression": "Suzbijanje šuma",
     "noiseSuppressionHint": "Filtrira pozadinsku buku poput tipkovnice i ventilatora.",
     "noiseChoice": {
-      "standard": "Standardno (lagano)",
-      "highQuality": "Visoka kvaliteta (beta, više CPU-a)",
+      "light": "Slabo",
+      "standard": "Standardno",
+      "advanced": "Napredno (AI)",
       "off": "Isključeno"
     },
     "noiseChoiceHint": {
-      "standard": "Malo opterećuje procesor; dobro za stalnu buku.",
-      "highQuality": "Noviji model koji uklanja više buke. Koristi oko tri puta više procesora i dodaje 10 ms kašnjenja.",
-      "off": "Mikrofon se šalje bez filtriranja."
+      "light": "Klasični filtar za stalnu buku poput ventilatora ili zujanja. Najmanje opterećenje procesora.",
+      "standard": "AI filtar za svakodnevnu buku poput tipkovnica i ventilatora. Malo opterećenje procesora.",
+      "advanced": "Noviji AI model koji uklanja i promjenjivu buku. Oko tri puta više procesora od Standardnog i 10 ms više kašnjenja."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "O opciji {{choice}}",
     "detectorHint": "Aktivacija glasa prepoznaje govor modelom RNNoise; on ne mijenja tvoj zvuk.",
     "echoCancellation": "Poništavanje jeke",
     "echoCancellationHint": "Sprječava da drugi čuju sami sebe kad koristiš zvučnike.",

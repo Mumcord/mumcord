@@ -158,15 +158,18 @@
     "noiseSuppression": "Ruisonderdrukking",
     "noiseSuppressionHint": "Filtert achtergrondgeluid zoals toetsenborden en ventilatoren.",
     "noiseChoice": {
-      "standard": "Standaard (licht)",
-      "highQuality": "Hoge kwaliteit (bèta, meer CPU)",
+      "light": "Licht",
+      "standard": "Standaard",
+      "advanced": "Geavanceerd (AI)",
       "off": "Uit"
     },
     "noiseChoiceHint": {
-      "standard": "Lichte belasting voor de processor; goed voor constant geluid.",
-      "highQuality": "Een nieuwer model dat meer ruis verwijdert. Gebruikt ongeveer drie keer zoveel CPU en voegt 10 ms vertraging toe.",
-      "off": "Je microfoon wordt ongefilterd verstuurd."
+      "light": "Klassiek filter voor constant geluid zoals ventilatoren of brom. Laagste CPU-gebruik.",
+      "standard": "AI-filter voor alledaags geluid zoals toetsenborden en ventilatoren. Laag CPU-gebruik.",
+      "advanced": "Nieuwer AI-model dat ook wisselend geluid verwijdert. Ongeveer drie keer de CPU van Standaard en 10 ms meer vertraging."
     },
+    "noiseChoiceBeta": "Bèta",
+    "noiseChoiceTipLabel": "Over {{choice}}",
     "detectorHint": "Spraakactivering herkent spraak met het RNNoise-model; het verandert je audio niet.",
     "echoCancellation": "Echo-onderdrukking",
     "echoCancellationHint": "Voorkomt dat anderen zichzelf horen als je luidsprekers gebruikt.",

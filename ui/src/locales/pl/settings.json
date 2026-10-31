@@ -160,15 +160,18 @@
     "noiseSuppression": "Tłumienie szumów",
     "noiseSuppressionHint": "Odfiltrowuje szumy w tle, np. klawiatury i wentylatory.",
     "noiseChoice": {
-      "standard": "Standardowe (lekkie)",
-      "highQuality": "Wysoka jakość (beta, więcej CPU)",
+      "light": "Słabe",
+      "standard": "Standardowe",
+      "advanced": "Zaawansowane (AI)",
       "off": "Wyłączone"
     },
     "noiseChoiceHint": {
-      "standard": "Małe obciążenie procesora; dobre na stały szum.",
-      "highQuality": "Nowszy model, który usuwa więcej szumu. Zużywa około trzy razy więcej procesora i dodaje 10 ms opóźnienia.",
-      "off": "Mikrofon jest wysyłany bez filtrowania."
+      "light": "Klasyczny filtr na stały szum, np. wentylatory lub buczenie. Najmniejsze obciążenie procesora.",
+      "standard": "Filtr AI na codzienny hałas, np. klawiatury i wentylatory. Małe obciążenie procesora.",
+      "advanced": "Nowszy model AI, który usuwa też zmienny hałas. Około trzy razy więcej procesora niż Standardowe i 10 ms większe opóźnienie."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Informacje: {{choice}}",
     "detectorHint": "Aktywacja głosu wykrywa mowę modelem RNNoise; nie zmienia Twojego audio.",
     "echoCancellation": "Usuwanie echa",
     "echoCancellationHint": "Zapobiega temu, by inni słyszeli siebie, gdy używasz głośników.",

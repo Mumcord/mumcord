@@ -579,41 +579,48 @@ describe("Voice section", () => {
   });
 
   describe("noise suppression (FR-3.65)", () => {
-    it("offers Standard, High quality (Beta) and Off with Standard selected", async () => {
+    it("offers Light, Standard, Advanced (AI) with a Beta badge and Off, Standard selected", async () => {
       await openSection("Voice");
-      const choice = await screen.findByRole("combobox", { name: "Noise suppression" });
-      expect(choice).toHaveTextContent("Standard (light)");
-      expect(optionLabels(choice)).toEqual([
-        "Standard (light)",
-        "High quality (Beta, more CPU)",
+      const group = await screen.findByRole("group", { name: "Noise suppression" });
+      const radios = within(group).getAllByRole("radio");
+      expect(radios.map((radio) => radio.closest("label")?.textContent)).toEqual([
+        "Light",
+        "Standard",
+        "Advanced (AI)Beta",
         "Off",
       ]);
+      expect(within(group).getByRole("radio", { name: "Standard" })).toBeChecked();
     });
 
-    it("saves the choice and names the CPU cost of High quality", async () => {
+    it("explains each level behind a ? and saves the choice", async () => {
       const update = vi.spyOn(api, "settingsUpdate");
       await openSection("Voice");
-      const choice = await screen.findByRole("combobox", { name: "Noise suppression" });
-      expect(screen.queryByText(/three times the CPU/)).toBeNull();
+      const group = await screen.findByRole("group", { name: "Noise suppression" });
+      expect(within(group).getByRole("button", { name: "About Advanced (AI)" })).toHaveAttribute(
+        "data-tooltip",
+        expect.stringMatching(/three times the CPU/),
+      );
+      expect(within(group).getByRole("button", { name: "About Light" })).toHaveAttribute(
+        "data-tooltip",
+        expect.stringMatching(/Lowest CPU/),
+      );
 
-      chooseOption(choice, "High quality (Beta, more CPU)");
+      fireEvent.click(within(group).getByRole("radio", { name: /Advanced/ }));
       await waitFor(() => {
         expect(update).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            noiseSuppression: true,
-            noiseSuppressionBackend: "highQuality",
-          }),
+          expect.objectContaining({ noiseSuppression: true, noiseSuppressionBackend: "advanced" }),
         );
       });
-      expect(await screen.findByText(/three times the CPU/)).toBeInTheDocument();
-
-      chooseOption(choice, "Off");
+      fireEvent.click(within(group).getByRole("radio", { name: "Light" }));
       await waitFor(() => {
         expect(update).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            noiseSuppression: false,
-            noiseSuppressionBackend: "highQuality",
-          }),
+          expect.objectContaining({ noiseSuppression: true, noiseSuppressionBackend: "light" }),
+        );
+      });
+      fireEvent.click(within(group).getByRole("radio", { name: "Off" }));
+      await waitFor(() => {
+        expect(update).toHaveBeenLastCalledWith(
+          expect.objectContaining({ noiseSuppression: false, noiseSuppressionBackend: "light" }),
         );
       });
     });
@@ -622,7 +629,7 @@ describe("Voice section", () => {
   describe("compatibility mode (FR-1.48)", () => {
     it("is hidden outside Linux Wayland", async () => {
       await openSection("Voice");
-      await screen.findByRole("combobox", { name: "Noise suppression" });
+      await screen.findByRole("group", { name: "Noise suppression" });
       expect(screen.queryByRole("switch", { name: /Compatibility mode/ })).not.toBeInTheDocument();
     });
 
@@ -1388,11 +1395,11 @@ describe("Settings search", () => {
     expect(screen.getByRole("tablist", { hidden: true })).not.toBeVisible();
     const results = screen.getByRole("list", { name: "Search results" });
     fireEvent.click(within(results).getByRole("button", { name: "Voice › Noise suppression" }));
-    const choice = await screen.findByRole("combobox", { name: "Noise suppression" });
+    const choice = await screen.findByRole("radio", { name: "Standard" });
     await waitFor(() => {
       expect(choice).toHaveFocus();
     });
-    expect(choice.closest(".settings-control-row")).toHaveClass("settings-highlight");
+    expect(choice.closest("fieldset")).toHaveClass("settings-highlight");
     expect(search()).toHaveValue("");
     expect(screen.getByRole("tab", { name: "Voice" })).toHaveAttribute("aria-selected", "true");
   });

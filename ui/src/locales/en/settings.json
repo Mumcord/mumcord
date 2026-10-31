@@ -158,15 +158,18 @@
     "noiseSuppression": "Noise suppression",
     "noiseSuppressionHint": "Filters out background noise like keyboards and fans.",
     "noiseChoice": {
-      "standard": "Standard (light)",
-      "highQuality": "High quality (Beta, more CPU)",
+      "light": "Light",
+      "standard": "Standard",
+      "advanced": "Advanced (AI)",
       "off": "Off"
     },
     "noiseChoiceHint": {
-      "standard": "Light on CPU; good for steady noise.",
-      "highQuality": "A newer model that removes more noise. Uses about three times the CPU and adds 10 ms of delay.",
-      "off": "Your microphone is sent unfiltered."
+      "light": "Classic filter for steady noise such as fans or hum. Lowest CPU use.",
+      "standard": "AI filter for everyday noise such as keyboards and fans. Low CPU use.",
+      "advanced": "Newer AI model that also removes changing noise. About three times the CPU of Standard and 10 ms more delay."
     },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "About {{choice}}",
     "detectorHint": "Voice activation detects speech with the RNNoise model; it does not change your audio.",
     "echoCancellation": "Echo cancellation",
     "echoCancellationHint": "Stops others from hearing themselves when you use speakers.",
