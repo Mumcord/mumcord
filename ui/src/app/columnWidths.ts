@@ -7,18 +7,21 @@ export type ResizableColumn = "channels" | "members";
 
 export type ColumnWidths = Record<ResizableColumn, number>;
 
-/** Today's fixed width is the minimum and the default. */
 export const COLUMN_MIN_REM = 15;
 export const COLUMN_MAX_REM = 28;
-export const COLUMN_DEFAULT_REM = COLUMN_MIN_REM;
+/** The channel tree starts 25% wider than the minimum; the member list starts at the minimum. */
+export const COLUMN_DEFAULT_REM: Record<ResizableColumn, number> = {
+  channels: COLUMN_MIN_REM * 1.25,
+  members: COLUMN_MIN_REM,
+};
 /** One arrow key press moves the border by this much. */
 export const COLUMN_STEP_REM = 1;
 /** The chat column keeps at least this much room (360px at the default text size). */
 export const CHAT_MIN_REM = 22.5;
 
 export const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
-  channels: COLUMN_DEFAULT_REM,
-  members: COLUMN_DEFAULT_REM,
+  channels: COLUMN_DEFAULT_REM.channels,
+  members: COLUMN_DEFAULT_REM.members,
 };
 
 /** What the window leaves for the columns, measured in rem. */
@@ -117,9 +120,14 @@ export function loadColumnWidths(storage?: Storage): ColumnWidths {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== "object" || parsed === null) return DEFAULT_COLUMN_WIDTHS;
     const record = parsed as Partial<Record<ResizableColumn, unknown>>;
-    const read = (value: unknown) =>
-      typeof value === "number" && Number.isFinite(value) ? clampWidth(value) : COLUMN_DEFAULT_REM;
-    return { channels: read(record.channels), members: read(record.members) };
+    const read = (value: unknown, column: ResizableColumn) =>
+      typeof value === "number" && Number.isFinite(value)
+        ? clampWidth(value)
+        : COLUMN_DEFAULT_REM[column];
+    return {
+      channels: read(record.channels, "channels"),
+      members: read(record.members, "members"),
+    };
   } catch (error) {
     console.warn("Reading the column widths failed; using the defaults", error);
     return DEFAULT_COLUMN_WIDTHS;
