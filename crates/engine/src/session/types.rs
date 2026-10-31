@@ -554,6 +554,8 @@ pub enum EngineEvent {
     WatchPartyChanged(Option<crate::watch_party::WatchPartyView>),
     /// The screen shares in the user's channel changed; the full list (FR-2.42 – FR-2.46).
     ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
+    /// What the server info panel shows about the server's relay changed (FR-4.20).
+    RelayChanged(crate::peer::RelayInfo),
     /// The identity chosen for this server is gone, so the connect uses the default one
     /// (issue #148).
     ServerIdentityMissing {

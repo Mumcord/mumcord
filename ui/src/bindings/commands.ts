@@ -544,6 +544,14 @@ export const commands = {
 	 *  drops the waiting direct connection.
 	 */
 	p2pConsentDecide: (allow: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("p2p_consent_decide", { allow })),
+	/**  The relay of a server for the server info panel; "no relay" when not connected. */
+	relayInfo: (serverId: number) => typedError<RelayInfo, ApiError>(__TAURI_INVOKE("relay_info", { serverId })),
+	/**  "Trust new relay": pins the changed relay of a connected server. */
+	relayTrustNew: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("relay_trust_new", { serverId })),
+	/**  "Keep blocked": the changed relay stays unused. */
+	relayKeepBlocked: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("relay_keep_blocked", { serverId })),
+	/**  "Forget relay": removes the relay pin of a server. */
+	relayForget: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("relay_forget", { serverId })),
 	/**  Starts a party for the YouTube video and invites the Mumcord users in the user's channel. */
 	watchPartyStart: (serverId: number, videoId: string) => typedError<WatchParty, ApiError>(__TAURI_INVOKE("watch_party_start", { serverId, videoId })),
 	/**  Sends a playback command to everyone in the party. */
@@ -648,6 +656,7 @@ export const events = {
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
+	relayChanged: makeEvent<RelayChanged, RelayChanged>("relay-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverIdentityMissing: makeEvent<ServerIdentityMissing, ServerIdentityMissing>("server-identity-missing"),
@@ -1951,6 +1960,59 @@ export type PublicServerPing = {
 	users: number,
 	maxUsers: number,
 };
+
+/**  The relay of a server changed (FR-4.20). */
+export type RelayChanged = {
+	serverId: number,
+	info: RelayInfo,
+};
+
+/**  The relay of a connected server as the server info panel shows it (FR-4.20). */
+export type RelayInfo = {
+	/**  User names of the announcing relay bots ("Mumbot: Yes"); empty for "No". */
+	bots: string[],
+	/**  Host of the announced relay. */
+	host: string | null,
+	status: RelayStatus,
+	/**  When the pinned relay was first accepted (RFC 3339). */
+	firstSeen: string | null,
+};
+
+/**  Why the relay refused a connection (spec 04 section 6.5). */
+export type RelayRefusal = "unknownToken" | "expired" | "notAllowed" | "botGone" | "relayFull" | "peerLimit" | "rateLimited" | "version" | "badRequest";
+
+/**  State of the server's relay in the server info panel (FR-4.20). */
+export type RelayStatus = 
+/**  No relay announced: "Mumpeer relay: No". */
+{ kind: "none" } | { kind: "available" } | { kind: "unavailable"; reason: RelayUnavailable } | 
+/**
+ *  "The relay of this server changed" with "Trust new relay" / "Keep blocked";
+ *  `keptBlocked` once the user chose to keep it blocked.
+ */
+{ kind: "untrusted"; keptBlocked: boolean } | 
+/**  "Two relays are announced on this server; none is used." */
+{ kind: "conflict" };
+
+/**  Why the relay cannot be used; the UI shows the text of FR-4.4, FR-4.11 or FR-4.14. */
+export type RelayUnavailable = 
+/**  "This server has no relay". */
+{ kind: "noRelay" } | { kind: "notConnected" } | 
+/**  The announced relay changed and is not trusted. */
+{ kind: "untrusted" } | 
+/**  Two relays are announced. */
+{ kind: "conflict" } | 
+/**  "The relay bot left the server." */
+{ kind: "botLeft" } | 
+/**  "The relay is not reachable right now (reported by the relay bot)." */
+{ kind: "relayDown" } | 
+/**  "The relay bot did not answer." */
+{ kind: "botNoAnswer" } | 
+/**  "The relay refused the connection: {reason}". */
+{ kind: "refused"; refusal: RelayRefusal } | 
+/**  "The relay could not be reached over UDP or TCP 443." */
+{ kind: "unreachable" } | 
+/**  "The other person can't use the relay (older Mumcord or relay turned off)." */
+{ kind: "peerCannotRelay" } | { kind: "denied" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" };
 
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {

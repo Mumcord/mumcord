@@ -2565,6 +2565,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
       return Promise.resolve(null);
     },
+    // The mock servers announce no relay.
+    relayInfo: () =>
+      Promise.resolve({ bots: [], host: null, status: { kind: "none" }, firstSeen: null }),
+    relayTrustNew: () => Promise.resolve(null),
+    relayKeepBlocked: () => Promise.resolve(null),
+    relayForget: () => Promise.resolve(null),
     // watch party: only the user's own party; other people's actions come from `mock.emit`.
     watchPartyStart: (serverId, videoId) => {
       const party: WatchParty = {
