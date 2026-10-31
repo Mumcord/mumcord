@@ -206,7 +206,7 @@
   font-size: var(--font-size-sm);
 }
 
-/* Heading above the channel tree, styled like the "Direct messages" heading (follow.css). */
+/* Heading above the channel tree, in the style of the sidebar section headings. */
 .server-overview {
   padding: var(--space-2) var(--space-2) 0;
 }

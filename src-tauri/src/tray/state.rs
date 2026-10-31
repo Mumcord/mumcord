@@ -350,6 +350,7 @@ pub mod fixtures {
             },
             description: None,
             has_description: false,
+            max_users: None,
         }
     }
 

@@ -2,7 +2,14 @@
  * Small context menu (chat images and messages, theme cards): positioned at the pointer, kept
  * inside the window, arrow keys between items, Escape or Tab closes it and returns the focus.
  */
-import { useEffect, useId, useLayoutEffect, useRef, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 
 /** Gap kept between the menu and the window edge. */
@@ -24,6 +31,10 @@ export interface MenuItem {
   icon?: string;
   /** Marks a destructive action. */
   danger?: boolean;
+  /** Shown but not available; stays reachable with the arrow keys so it can be read. */
+  disabled?: boolean;
+  /** Selecting it opens another menu: shows an arrow and announces the popup. */
+  submenu?: boolean;
   onSelect: () => void;
 }
 
@@ -32,6 +43,8 @@ export interface ContextMenuProps {
   /** Accessible name of the menu. */
   label: string;
   items: readonly MenuItem[];
+  /** Shown above the items, e.g. who the menu is about; not an item itself. */
+  header?: ReactNode;
   onClose: () => void;
 }
 
@@ -51,7 +64,7 @@ function restoreSelection(ranges: readonly Range[]) {
   for (const range of ranges) selection.addRange(range);
 }
 
-export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
+export function ContextMenu({ menu, label, items, header, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
   const idBase = useId();
   // Focusing a menu button (or the opener again on close) collapses the selection in some
@@ -131,6 +144,7 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
+      {header}
       {items.map((item, index) => {
         const labelId = `${idBase}-label-${String(index)}`;
         const hintId = `${idBase}-hint-${String(index)}`;
@@ -143,7 +157,10 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
             className={`server-menu__item${item.danger ? " server-menu__item--danger" : ""}`}
             aria-labelledby={item.hint ? labelId : undefined}
             aria-describedby={item.hint ? hintId : undefined}
+            aria-disabled={item.disabled === true ? true : undefined}
+            aria-haspopup={item.submenu === true ? "menu" : undefined}
             onClick={() => {
+              if (item.disabled === true) return;
               close(true);
               restoreSelection(selection.current);
               item.onSelect();
@@ -168,6 +185,18 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
                 </span>
               ) : null}
             </span>
+            {item.submenu === true ? (
+              <svg
+                className="server-menu__submenu"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            ) : null}
           </button>
         );
       })}

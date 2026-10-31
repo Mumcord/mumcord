@@ -56,12 +56,14 @@
   "menu": {
     "label": "Acciones para {{name}}",
     "viewProfile": "Ver perfil",
+    "sendMessage": "Enviar mensaje",
     "join": "Unirse a {{channel}}",
-    "joinDenied": "No tienes permiso para entrar en este canal.",
+    "joinFull": "Este canal está lleno.",
+    "joinLocked": "No puedes entrar en este canal o necesita una contraseña.",
     "mute": "Silenciar para mí",
     "connectionInfo": "Info de conexión…",
-    "chatRequest": "Enviar solicitud de chat…",
-    "chatRequestPending": "Solicitud de chat pendiente"
+    "chatRequestPending": "Solicitud de chat pendiente",
+    "revokeConsent": "Retirar el consentimiento de chat…"
   },
   "nowPlaying": {
     "label": "Reproduciendo",
@@ -108,5 +110,11 @@
     "talkingMore_many": "{{name}} y {{count}} más están hablando",
     "talkingMore_other": "{{name}} y {{count}} más están hablando",
     "shortcut": "Ctrl+Mayús+M"
+  },
+  "revokeConsent": {
+    "title": "¿Retirar el consentimiento de chat de {{name}}?",
+    "message": "{{name}} tendrá que enviar una nueva solicitud de mensaje antes de que sus mensajes te lleguen de nuevo. Tu historial de chat se conserva.",
+    "confirm": "Retirar",
+    "failed": "No se pudo retirar el consentimiento de chat. Inténtalo de nuevo."
   }
 }

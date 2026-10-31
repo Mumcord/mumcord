@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toEngineError, type MessageRequest, type User } from "../../api";
 import { useServerStateOf } from "../channels";
@@ -7,7 +7,8 @@ import { Avatar } from "../members/Avatar";
 import { openPrivateConversation } from "../members/privateMessage";
 import type { ConversationLog } from "../chat/chatStore";
 import { MessageList } from "../chat/MessageList";
-import { displayName } from "../servers/format";
+import { plainPreview } from "../notifications/preview";
+import { displayName, initials } from "../servers/format";
 import { useServers } from "../servers/store";
 import { relativeTime } from "./relativeTime";
 import { acceptRequest, declineRequest } from "./requestsStore";
@@ -44,8 +45,20 @@ function useNow(): number {
   return now;
 }
 
-/** One held request with Accept / Decline (issue #141); a message request also offers Add friend. */
-export function RequestCard({ serverId, request }: { serverId: number; request: MessageRequest }) {
+/**
+ * One held request with Accept / Decline (issue #141); a message request also offers Add friend.
+ * `compact` is the short card of the private messages overview (issue #173): who, where, the note
+ * or the newest held message, and the answers.
+ */
+export function RequestCard({
+  serverId,
+  request,
+  compact = false,
+}: {
+  serverId: number;
+  request: MessageRequest;
+  compact?: boolean;
+}) {
   const { t, i18n } = useTranslation("chat");
   const { users } = useServerStateOf(serverId);
   const { servers } = useServers();
@@ -60,6 +73,7 @@ export function RequestCard({ serverId, request }: { serverId: number; request: 
   const serverName = saved ? displayName(saved) : "";
   const time = relativeTime(request.receivedAt, useNow(), i18n.language);
   const name = request.name;
+  const blockHintId = useId();
 
   const run = (action: () => Promise<unknown>, opensChat: boolean) => {
     setBusy(true);
@@ -129,6 +143,86 @@ export function RequestCard({ serverId, request }: { serverId: number; request: 
       {t("requests.failed")}
     </p>
   );
+
+  if (compact) {
+    const newest = request.messages.at(-1);
+    const quote = request.chatRequest ? request.note : newest ? plainPreview(newest.body) : null;
+    return (
+      <section
+        className="request-card request-card--compact"
+        aria-label={
+          request.chatRequest
+            ? t("requests.wantsToChat", { name })
+            : t("requests.sentMessages", { name, count: request.messages.length })
+        }
+        data-testid="pm-request"
+      >
+        <div className="request-card__who">
+          <span className="request-card__avatar">
+            <Avatar name={name} />
+            <span className="pm-row__presence" data-online={sender !== undefined} />
+          </span>
+          <span className="request-card__name">
+            {/* Untrusted plain text, like everything the server sends. */}
+            <span className="request-card__title">{name}</span>
+            {serverName !== "" && (
+              <span className="pm-row__server" data-tooltip={serverName}>
+                {initials(serverName)}
+              </span>
+            )}
+          </span>
+          <span className="request-card__meta">
+            {request.chatRequest
+              ? t("overview.requestMetaChat", { server: serverName, time })
+              : t("overview.requestMetaMessages", {
+                  server: serverName,
+                  time,
+                  count: request.messages.length,
+                })}
+          </span>
+        </div>
+        {quote !== null && quote !== "" && (
+          <p className="request-card__quote" data-testid="request-note">
+            {t("overview.quote", { text: quote })}
+          </p>
+        )}
+        <div className="request-card__actions">
+          <button
+            type="button"
+            className="button button--primary"
+            disabled={busy}
+            data-testid="request-accept"
+            onClick={accept}
+          >
+            {t("requests.accept")}
+          </button>
+          <button
+            type="button"
+            className="button"
+            disabled={busy}
+            data-testid="request-decline"
+            onClick={decline}
+          >
+            {t("requests.decline")}
+          </button>
+          {/* Blocking (#140) is not built yet: shown as in the design, but not available. */}
+          <button
+            type="button"
+            className="button request-card__block"
+            aria-disabled="true"
+            aria-describedby={blockHintId}
+            data-tooltip={t("overview.blockLater")}
+          >
+            {t("overview.block")}
+          </button>
+          <span id={blockHintId} className="visually-hidden">
+            {t("overview.blockLater")}
+          </span>
+        </div>
+        {error}
+      </section>
+    );
+  }
 
   if (request.chatRequest) {
     return (

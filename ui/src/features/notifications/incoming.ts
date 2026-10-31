@@ -21,8 +21,8 @@ export interface IncomingContext {
   overlayOpen: boolean;
   /** Saved name of a server (FR-2.10), `undefined` if unknown. */
   serverName: (serverId: number) => string | undefined;
-  /** Notifications of this server are muted (FR-2.10). */
-  muted: (serverId: number) => boolean;
+  /** Notifications of this server (FR-2.10) or of this private conversation (#173) are muted. */
+  muted: (serverId: number, conversation: Conversation) => boolean;
 }
 
 export interface NoticeTexts {
@@ -80,7 +80,7 @@ export async function handleIncoming(
   serverId: number,
   context: IncomingContext,
 ): Promise<void> {
-  if (message.own || context.muted(serverId)) return;
+  if (message.own || context.muted(serverId, message.conversation)) return;
   const { conversation } = message;
   const key = noticeKey(serverId, conversationKey(conversation));
   const onScreen = isOnScreen(serverId, conversation, context.overlayOpen);

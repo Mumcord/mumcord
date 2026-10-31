@@ -6,7 +6,7 @@ import { useChannelPasswordPrompt } from "./channelPasswordStore";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { displayName } from "./format";
 import { PasswordDialog } from "./PasswordDialog";
-import { ServerBar } from "./ServerBar";
+import { ServerBar, type ServerBarProps } from "./ServerBar";
 import { ServerDialog } from "./ServerDialog";
 import { ServerIdentityDialog } from "./ServerIdentityDialog";
 import { ServerThemeDialog } from "./ServerThemeDialog";
@@ -87,13 +87,13 @@ function ChannelPasswordHost() {
 }
 
 /** Content of the server bar mount: the bar plus the server, confirmation and trust dialogs. */
-export function ServersRoot() {
+export function ServersRoot(props: ServerBarProps) {
   const state = useServers();
   const prompt = state.certPrompt;
   const firstPrompt = state.passwordPrompts[0];
   return (
     <>
-      <ServerBar />
+      <ServerBar {...props} />
       <ServerDialogs />
       <ChannelPasswordHost />
       {firstPrompt && (

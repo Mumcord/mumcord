@@ -2,13 +2,13 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { axeViolations } from "../../test/axe";
-import { ChannelsPanel, selectConversation, getSelectedConversation } from "../channels";
+import { ChannelsPanel, selectConversation } from "../channels";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
-import { getShownServerId, resetServerStore } from "../channels/serverStore";
+import { resetServerStore } from "../channels/serverStore";
 import { ChatView } from "../chat";
 import { resetChatStore } from "../chat/chatStore";
 import { privateConversation, ProfilePreviewHost } from "../members";
-import { ChannelUnreadBadge, DirectMessages, FollowHeaderActions, resetFollowStore } from ".";
+import { ChannelUnreadBadge, FollowHeaderActions, MessageNotifications, resetFollowStore } from ".";
 
 const RAID = { kind: "channel", channelId: 2 } as const;
 let api: MockApi;
@@ -22,7 +22,7 @@ async function setup() {
     <>
       <nav>
         <ChannelsPanel channelBadge={(id) => <ChannelUnreadBadge channelId={id} />} />
-        <DirectMessages />
+        <MessageNotifications />
       </nav>
       <ProfilePreviewHost />
       <main>
@@ -178,7 +178,7 @@ describe("follow", () => {
     expect(await axeViolations(raid.parentElement ?? document.body)).toEqual([]);
   });
 
-  it("lists private chats and clears a conversation after confirmation", async () => {
+  it("clears a private conversation after confirmation", async () => {
     await setup();
     const users = (await api.sessionSnapshot(1))?.users ?? [];
     const anna = users.find((u) => u.name === "Anna");
@@ -186,17 +186,9 @@ describe("follow", () => {
     act(() => {
       api.mock.receiveMessage(privateConversation(anna), "psst", anna.session);
     });
-    const entry = await screen.findByRole("button", { name: /Anna/ });
-    expect(entry).toHaveTextContent(/1/);
-    const name = entry.querySelector(".direct-messages__name");
-    const server = entry.querySelector(".direct-messages__server");
-    expect(name).toHaveTextContent("Anna");
-    expect(server).not.toBeNull();
-    expect(server).not.toBe(name);
-    expect(server).toHaveAttribute("data-tooltip", server?.textContent ?? "");
-    expect(entry).toHaveAccessibleName(new RegExp(`^Anna, on ${server?.textContent ?? ""}`));
-    fireEvent.click(entry);
-    expect(getSelectedConversation()).toEqual(privateConversation(anna));
+    act(() => {
+      selectConversation(privateConversation(anna));
+    });
     await screen.findByText("psst");
     fireEvent.click(screen.getByRole("button", { name: "Clear history" }));
     const dialog = screen.getByRole("alertdialog");
@@ -208,52 +200,5 @@ describe("follow", () => {
       expect(screen.queryByText("psst")).toBeNull();
     });
     expect(screen.queryByRole("alertdialog")).toBeNull();
-  });
-
-  it("shows the profile preview of the right person when hovering a direct message", async () => {
-    await setup();
-    const users = (await api.sessionSnapshot(1))?.users ?? [];
-    const anna = users.find((u) => u.name === "Anna");
-    if (!anna) throw new Error("seed user missing");
-    act(() => {
-      api.mock.receiveMessage(privateConversation(anna), "psst", anna.session);
-    });
-    const entry = await screen.findByRole("button", { name: /Anna/ });
-    fireEvent.pointerEnter(entry);
-    const preview = await screen.findByRole("tooltip");
-    expect(preview).toHaveTextContent("Anna");
-    expect(entry.getAttribute("aria-describedby")).toContain("profile-preview");
-    fireEvent.pointerLeave(entry);
-    await waitFor(() => {
-      expect(screen.queryByRole("tooltip")).toBeNull();
-    });
-    expect(entry.querySelector(".direct-messages__server")).toHaveAttribute("data-tooltip");
-  });
-
-  it("shows the preview with the data of the person's own server for a row of another server", async () => {
-    await setup();
-    await api.serverAdd({
-      label: "Second",
-      address: "two.example.org",
-      port: 64738,
-      username: "Zoe",
-      password: { kind: "clear" },
-    });
-    await act(() => api.connect(2, null, null));
-    const users = (await api.sessionSnapshot(2))?.users ?? [];
-    const anna = users.find((u) => u.name === "Anna");
-    if (!anna) throw new Error("seed user missing");
-    act(() => {
-      api.mock.focusServer(2);
-      api.mock.receiveMessage(privateConversation(anna), "psst", anna.session);
-      api.mock.setTalking(anna.session, true);
-    });
-    expect(getShownServerId()).toBe(1);
-    const entry = await screen.findByRole("button", { name: /Anna/ });
-    fireEvent.pointerEnter(entry);
-    const preview = await screen.findByRole("tooltip");
-    expect(preview).toHaveTextContent("Anna");
-    // Only server 2 has her talking; the shown server 1 does not.
-    expect(preview).toHaveTextContent("talking");
   });
 });

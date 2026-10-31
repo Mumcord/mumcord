@@ -81,6 +81,7 @@ export function stressChannels(rootName: string): ChannelInfo[] {
       permissions: { ...allow },
       description: null,
       hasDescription: false,
+      maxUsers: null,
     },
   ];
   const add = (parentId: number, name: string): number => {
@@ -93,6 +94,7 @@ export function stressChannels(rootName: string): ChannelInfo[] {
       permissions: { ...allow },
       description: null,
       hasDescription: false,
+      maxUsers: null,
     });
     return id;
   };

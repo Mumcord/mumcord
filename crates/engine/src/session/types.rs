@@ -129,6 +129,8 @@ pub struct ChannelView {
     /// True when the channel has a description, even if its text still has to be requested
     /// (`Engine::channel_description_request`, FR-1.48b).
     pub has_description: bool,
+    /// The channel's user limit; `None` when it has none (0 on the wire).
+    pub max_users: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -518,6 +520,8 @@ pub enum EngineEvent {
     PmRequestsChanged(crate::pm_rules::PmRequestsView),
     /// The accepted private conversations of any own identity changed (issue #141).
     AcceptedConversationsChanged(Vec<mumcord_store::AcceptedConversation>),
+    /// Pinned or muted private conversations changed (issue #173).
+    PmConversationPrefsChanged(Vec<mumcord_store::PmConversationPrefs>),
     /// Positional audio was switched, or the game delivering positions changed (FR-1.43).
     PositionalStatusChanged(crate::positional::PositionalStatus),
     /// A person (or the user, with the own session) started or stopped sending positions

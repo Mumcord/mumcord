@@ -102,6 +102,7 @@ let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 const incomingListeners = new Set<(message: ChatMessage, serverId: number) => void>();
+const sentListeners = new Set<(message: ChatMessage, serverId: number) => void>();
 /** Channels whose running sync the user asked for; only those report their result. */
 const syncRequested = new Set<string>();
 
@@ -336,6 +337,7 @@ export async function requestSync(
 export function addSentMessage(message: ChatMessage, serverId = shownServerId()): void {
   ensureBound();
   append(serverId, message);
+  for (const listener of sentListeners) listener(message, serverId);
 }
 
 let nextOutgoingId = 1;
@@ -409,6 +411,7 @@ export function confirmOutgoing(entry: OutgoingSend, sent: ChatMessage): void {
   logs.set(from, { ...log, outgoing });
   logs.set(to, withMessage(getLog(to), sent));
   notify();
+  for (const listener of sentListeners) listener(sent, entry.serverId);
 }
 
 /** Forgets a conversation's messages, e.g. after its history was cleared (B22). */
@@ -418,6 +421,17 @@ export function clearConversation(conversation: Conversation, serverId = shownSe
   logs = new Map(logs);
   logs.delete(key);
   notify();
+}
+
+/** Called for every own message the engine confirmed as sent, on any connected server. */
+export function subscribeSent(
+  listener: (message: ChatMessage, serverId: number) => void,
+): () => void {
+  ensureBound();
+  sentListeners.add(listener);
+  return () => {
+    sentListeners.delete(listener);
+  };
 }
 
 /** Called for every incoming message of any conversation on any connected server. */
@@ -479,6 +493,7 @@ export function resetChatStore(): void {
   renderKeys = new Map();
   bumpAll();
   incomingListeners.clear();
+  sentListeners.clear();
   syncRequested.clear();
 }
 

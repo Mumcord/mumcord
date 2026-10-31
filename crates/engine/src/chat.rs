@@ -434,7 +434,7 @@ pub(crate) fn forget_unread(server: ServerId, channel_path: &str) -> bool {
         .is_some_and(|n| n > 0)
 }
 
-fn history_view(
+pub(crate) fn history_view(
     m: ChatMessage,
     conversation: &ConversationRef,
     own_hash: Option<&str>,

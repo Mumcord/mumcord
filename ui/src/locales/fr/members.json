@@ -56,12 +56,14 @@
   "menu": {
     "label": "Actions pour {{name}}",
     "viewProfile": "Voir le profil",
+    "sendMessage": "Envoyer un message",
     "join": "Rejoindre {{channel}}",
-    "joinDenied": "Vous n'êtes pas autorisé à entrer dans ce canal.",
+    "joinFull": "Ce canal est plein.",
+    "joinLocked": "Vous n'êtes pas autorisé à entrer dans ce canal, ou il demande un mot de passe.",
     "mute": "Mettre en sourdine pour moi",
     "connectionInfo": "Infos de connexion…",
-    "chatRequest": "Envoyer une demande de chat…",
-    "chatRequestPending": "Demande de chat en attente"
+    "chatRequestPending": "Demande de chat en attente",
+    "revokeConsent": "Retirer le consentement au chat…"
   },
   "nowPlaying": {
     "label": "En écoute",
@@ -108,5 +110,11 @@
     "talkingMore_many": "{{name}} et {{count}} autres parlent",
     "talkingMore_other": "{{name}} et {{count}} autres parlent",
     "shortcut": "Ctrl+Maj+M"
+  },
+  "revokeConsent": {
+    "title": "Retirer le consentement au chat pour {{name}} ?",
+    "message": "{{name}} devra envoyer une nouvelle demande de message avant que ses messages vous parviennent à nouveau. Votre historique est conservé.",
+    "confirm": "Retirer",
+    "failed": "Le retrait du consentement au chat a échoué. Veuillez réessayer."
   }
 }

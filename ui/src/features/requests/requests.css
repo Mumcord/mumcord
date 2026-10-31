@@ -198,3 +198,80 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
+
+/* Compact card in the private messages overview (issue #173); the avatar dot and server tag
+   come from the overview's styles. */
+.request-card--compact {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  width: 100%;
+  margin: 0;
+  padding: var(--space-3);
+  text-align: start;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.request-card__who {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-2);
+  align-items: center;
+}
+
+.request-card__who .request-card__avatar {
+  grid-row: span 2;
+}
+
+.request-card__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.request-card--compact .request-card__title {
+  overflow: hidden;
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.request-card--compact .request-card__meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.request-card__quote {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.request-card--compact .request-card__actions {
+  justify-content: flex-start;
+  gap: var(--space-1);
+  margin-top: 0;
+}
+
+.request-card--compact .request-card__actions .button {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+.request-card__block {
+  margin-inline-start: auto;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.request-card__block[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

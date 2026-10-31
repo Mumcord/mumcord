@@ -56,12 +56,14 @@
   "menu": {
     "label": "Azioni per {{name}}",
     "viewProfile": "Vedi profilo",
+    "sendMessage": "Invia messaggio",
     "join": "Entra in {{channel}}",
-    "joinDenied": "Non hai il permesso di entrare in questo canale.",
+    "joinFull": "Questo canale è pieno.",
+    "joinLocked": "Non puoi entrare in questo canale, oppure richiede una password.",
     "mute": "Silenzia per me",
     "connectionInfo": "Info connessione…",
-    "chatRequest": "Invia richiesta di chat…",
-    "chatRequestPending": "Richiesta di chat in sospeso"
+    "chatRequestPending": "Richiesta di chat in sospeso",
+    "revokeConsent": "Revoca il consenso alla chat…"
   },
   "nowPlaying": {
     "label": "In riproduzione",
@@ -108,5 +110,11 @@
     "talkingMore_many": "{{name}} e altri {{count}} stanno parlando",
     "talkingMore_other": "{{name}} e altri {{count}} stanno parlando",
     "shortcut": "Ctrl+Maiusc+M"
+  },
+  "revokeConsent": {
+    "title": "Revocare il consenso alla chat per {{name}}?",
+    "message": "{{name}} dovrà inviare una nuova richiesta di messaggio prima che i suoi messaggi ti arrivino di nuovo. La cronologia della chat resta.",
+    "confirm": "Revoca",
+    "failed": "Non è stato possibile revocare il consenso alla chat. Riprova."
   }
 }

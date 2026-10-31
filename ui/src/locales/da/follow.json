@@ -12,9 +12,7 @@
     "generic": "Det lykkedes ikke at følge denne kanal. Prøv igen."
   },
   "dm": {
-    "title": "Direkte beskeder",
-    "unknown": "Ukendt person",
-    "withServer": "{{name}}, på {{server}}"
+    "unknown": "Ukendt person"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
