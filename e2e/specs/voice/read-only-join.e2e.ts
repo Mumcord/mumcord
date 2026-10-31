@@ -65,9 +65,10 @@ async function waitVoiceState(readOnly: boolean): Promise<void> {
 async function expectReadOnlyUi(): Promise<void> {
   await waitVoiceState(true);
   await notice().waitForDisplayed({ timeout: 15_000 });
-  expect(await notice().getText()).toContain("Read-only");
+  // textContent, not getText: WebKit's getText skips the ellipsized strip text span.
+  expect(await notice().getProperty("textContent")).toContain("Read-only");
   await noticeJoin().waitForDisplayed();
-  expect(await noticeJoin().getText()).toMatch(/^Join /);
+  expect(await noticeJoin().getProperty("textContent")).toMatch(/^Join /);
 }
 
 async function expectVoiceOnUi(): Promise<void> {
