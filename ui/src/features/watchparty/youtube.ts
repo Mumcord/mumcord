@@ -36,6 +36,8 @@ export function watchUrl(videoId: string): string {
 export const ENDED = 0;
 export const PLAYING = 1;
 export const PAUSED = 2;
+/** Buffering: the player is waiting for data, so it is behind the party. */
+export const BUFFERING = 3;
 
 const LINK_HOSTS = new Set([
   "youtube.com",
