@@ -208,6 +208,17 @@ impl Engine {
         let data = tokio::fs::read(&path).await.map_err(|e| {
             EngineError::new(ErrorKind::Io, format!("reading the file failed: {e}"))
         })?;
+        self.identity_import_data(data, password, label).await
+    }
+
+    /// Imports PKCS#12 data as an additional identity; shared by the file import and the
+    /// import from the official client (issue #66).
+    pub(crate) async fn identity_import_data(
+        &self,
+        data: Vec<u8>,
+        password: Option<String>,
+        label: Option<String>,
+    ) -> EngineResult<IdentityView> {
         let store = self.inner.store.clone();
         let record = self
             .blocking(move |secrets| {
@@ -228,6 +239,18 @@ impl Engine {
             .await?;
         tracing::info!(identity = record.id, "identity imported");
         Ok(identity_view(record, Vec::new()))
+    }
+
+    /// Takes back an identity the import from the official client just added (issue #66).
+    /// Unlike [`Engine::identity_delete`] this may remove the last identity: the user
+    /// undoes the import, e.g. in the first-start wizard before any identity existed.
+    pub(crate) async fn identity_undo_import(&self, id: IdentityId) -> EngineResult<()> {
+        let store = self.inner.store.clone();
+        self.blocking(move |secrets| {
+            secrets.delete_identity(id)?;
+            lock(&store).discard_identity(id)
+        })
+        .await
     }
 
     /// Changes the local label of an identity; the certificate is untouched (issue #148).
