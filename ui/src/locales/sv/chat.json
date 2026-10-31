@@ -391,5 +391,15 @@
     "limits": "Tjänsten bestämmer uppspelningsgränserna",
     "noPlayer": "Ingen spelare tillgänglig för den här tjänsten",
     "output": "Spelas upp på din utgångsenhet, inte in i mikrofonen"
+  },
+  "embedHint": {
+    "image": "Bild dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "gif": "GIF dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "video": "Videospelare dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "audio": "Ljudspelare dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "music": "Musikspelare dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "link": "Länkförhandsvisning dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "several_one": "{{count}} förhandsvisning dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
+    "several_other": "{{count}} förhandsvisningar dolda, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>."
   }
 }

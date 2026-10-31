@@ -415,5 +415,18 @@
     "limits": "Socraíonn an tseirbhís na teorainneacha seinnte",
     "noPlayer": "Níl seinnteoir ar fáil don tseirbhís seo",
     "output": "Á sheinm ar do ghléas aschuir, ní isteach i do mhicreafón"
+  },
+  "embedHint": {
+    "image": "Íomhá i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "gif": "GIF i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "video": "Seinnteoir físe i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "audio": "Seinnteoir fuaime i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "music": "Seinnteoir ceoil i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "link": "Réamhamharc ar nasc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_one": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_two": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_few": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_many": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
+    "several_other": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>."
   }
 }

@@ -415,5 +415,18 @@
     "limits": "Il-limiti tat-tmexxija jiddefinihom is-servizz",
     "noPlayer": "M’hemm l-ebda plejer disponibbli għal dan is-servizz",
     "output": "Qed jindaqq fuq l-apparat tal-output tiegħek, mhux fil-mikrofonu"
+  },
+  "embedHint": {
+    "image": "Stampa moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "gif": "GIF moħbi, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "video": "Player tal-vidjo moħbi, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "audio": "Player tal-awdjo moħbi, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "music": "Player tal-mużika moħbi, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "link": "Preview tal-link moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "several_one": "{{count}} preview moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "several_two": "{{count}} previews moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "several_few": "{{count}} previews moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "several_many": "{{count}} preview moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
+    "several_other": "{{count}} preview moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>."
   }
 }

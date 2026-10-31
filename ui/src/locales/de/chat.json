@@ -391,5 +391,15 @@
     "limits": "Wiedergabegrenzen legt der Dienst fest",
     "noPlayer": "Für diesen Dienst ist kein Player verfügbar",
     "output": "Wird auf deinem Ausgabegerät abgespielt, nicht in dein Mikrofon"
+  },
+  "embedHint": {
+    "image": "Bild ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "gif": "GIF ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "video": "Videoplayer ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "audio": "Audioplayer ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "music": "Musikplayer ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "link": "Linkvorschau ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "several_one": "{{count}} Vorschau ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
+    "several_other": "{{count}} Vorschauen ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind."
   }
 }

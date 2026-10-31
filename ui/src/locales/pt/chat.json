@@ -399,5 +399,16 @@
     "limits": "Os limites de reprodução são definidos pelo serviço",
     "noPlayer": "Nenhum leitor disponível para este serviço",
     "output": "A reproduzir no dispositivo de saída, não no microfone"
+  },
+  "embedHint": {
+    "image": "Imagem oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "gif": "GIF oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "video": "Leitor de vídeo oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "audio": "Leitor de áudio oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "music": "Leitor de música oculto, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "link": "Pré-visualização da ligação oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "several_one": "{{count}} pré-visualização oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "several_many": "{{count}} pré-visualizações ocultas, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
+    "several_other": "{{count}} pré-visualizações ocultas, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>."
   }
 }

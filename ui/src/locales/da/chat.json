@@ -391,5 +391,15 @@
     "limits": "Afspilningsgrænser fastsættes af tjenesten",
     "noPlayer": "Ingen afspiller tilgængelig for denne tjeneste",
     "output": "Afspilles på din udgangsenhed, ikke ind i din mikrofon"
+  },
+  "embedHint": {
+    "image": "Billede skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "gif": "GIF skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "video": "Videoafspiller skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "audio": "Lydafspiller skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "music": "Musikafspiller skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "link": "Linkvisning skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "several_one": "{{count}} visning skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
+    "several_other": "{{count}} visninger skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>."
   }
 }

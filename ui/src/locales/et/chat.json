@@ -391,5 +391,15 @@
     "limits": "Esituse piirangud määrab teenus",
     "noPlayer": "Selle teenuse jaoks pole pleierit saadaval",
     "output": "Esitatakse sinu väljundseadmes, mitte mikrofoni"
+  },
+  "embedHint": {
+    "image": "Pilt on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "gif": "GIF on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "video": "Videopleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "audio": "Helipleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "music": "Muusikapleier on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "link": "Lingi eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "several_one": "{{count}} eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
+    "several_other": "{{count}} eelvaadet on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>."
   }
 }

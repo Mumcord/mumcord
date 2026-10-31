@@ -399,5 +399,16 @@
     "limits": "Atskaņošanas ierobežojumus nosaka pakalpojums",
     "noPlayer": "Šim pakalpojumam atskaņotājs nav pieejams",
     "output": "Atskaņo izvades ierīcē, nevis mikrofonā"
+  },
+  "embedHint": {
+    "image": "Attēls paslēpts, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "gif": "GIF paslēpts, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "video": "Video atskaņotājs paslēpts, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "audio": "Audio atskaņotājs paslēpts, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "music": "Mūzikas atskaņotājs paslēpts, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "link": "Saites priekšskatījums paslēpts, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "several_zero": "Paslēpti {{count}} priekšskatījumi, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "several_one": "Paslēpts {{count}} priekšskatījums, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
+    "several_other": "Paslēpti {{count}} priekšskatījumi, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>."
   }
 }

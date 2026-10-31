@@ -399,5 +399,16 @@
     "limits": "Los límites de reproducción los define el servicio",
     "noPlayer": "No hay reproductor disponible para este servicio",
     "output": "Se reproduce en tu dispositivo de salida, no en tu micrófono"
+  },
+  "embedHint": {
+    "image": "Imagen oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "gif": "GIF oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "video": "Reproductor de vídeo oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "audio": "Reproductor de audio oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "music": "Reproductor de música oculto, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "link": "Vista previa del enlace oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "several_one": "{{count}} vista previa oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "several_many": "{{count}} vistas previas ocultas, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
+    "several_other": "{{count}} vistas previas ocultas, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>."
   }
 }
