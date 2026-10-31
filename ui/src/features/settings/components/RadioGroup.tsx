@@ -49,8 +49,11 @@ export function RadioGroup<T extends string>({
               <span className="settings-switch__badge">{option.badge}</span>
             )}
           </label>
-          {/* Outside the label, so the "?" is its own control and does not pick the option. */}
-          {option.tip !== undefined && <InfoTip label={option.tip.label} text={option.tip.text} />}
+          {/* Outside the label, so the "?" is its own control and does not pick the option; to the
+              right, so the tip does not cover the neighbouring options. */}
+          {option.tip !== undefined && (
+            <InfoTip label={option.tip.label} text={option.tip.text} placement="right" />
+          )}
         </div>
       ))}
     </fieldset>
