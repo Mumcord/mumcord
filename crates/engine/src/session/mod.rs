@@ -18,6 +18,7 @@ mod description;
 pub mod extension;
 mod local;
 mod machine;
+mod mumble_import;
 mod types;
 
 use std::cmp::Reverse;
@@ -46,6 +47,10 @@ use tokio::task::JoinHandle;
 pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
+pub use mumble_import::{
+    ImportDevice, ImportFavouriteView, ImportIdentityView, MumbleImportChoice, MumbleImportPreview,
+    MumbleImportResult,
+};
 pub use types::*;
 
 use crate::audio_rating::AudioRatingView;
@@ -245,6 +250,8 @@ struct Inner {
     pm_requests: crate::pm_rules::ServerRequests,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
+    /// What the last import from the official Mumble client added, for its undo (issue #66).
+    mumble_import: Mutex<Option<mumble_import::LastImport>>,
     /// Positional audio (FR-1.41).
     positional: crate::positional::Positional,
     /// Watch parties in the user's channels (FR-2.39).
@@ -564,6 +571,7 @@ impl Engine {
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             history_sync: Arc::default(),
+            mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
             inspector: Arc::default(),
