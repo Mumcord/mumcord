@@ -5,12 +5,13 @@
 
 use std::collections::BTreeMap;
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use mumcord_engine::Engine;
 use mumcord_engine::inspector::{InspectorPoll, PacketCount, PacketView, TapDirection, VoiceCount};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 use tauri_specta::Event;
 
 use super::session::AudioRatingLabel;
@@ -86,6 +87,8 @@ pub struct VoiceCounter {
 #[serde(rename_all = "camelCase")]
 pub struct PacketCapture {
     pub capturing: bool,
+    /// Capture keeps running while the inspector window is closed.
+    pub background: bool,
     /// Packets newer than the requested id, oldest first.
     pub packets: Vec<Packet>,
     /// Packets per server, kind and direction since capture started or was cleared.
@@ -143,10 +146,11 @@ impl From<VoiceCount> for VoiceCounter {
     }
 }
 
-impl From<InspectorPoll> for PacketCapture {
-    fn from(p: InspectorPoll) -> Self {
+impl PacketCapture {
+    fn new(p: InspectorPoll, background: bool) -> Self {
         Self {
             capturing: p.capturing,
+            background,
             packets: p.packets.into_iter().map(Into::into).collect(),
             counters: p.counts.into_iter().map(Into::into).collect(),
             voice: p.voice.into_iter().map(Into::into).collect(),
@@ -154,19 +158,76 @@ impl From<InspectorPoll> for PacketCapture {
     }
 }
 
-/// Starts or stops capturing packets. The UI turns it on while the developer tools are
-/// unlocked; turning it off drops everything captured.
+/// Why packets are captured: only while the inspector window is open, or, if the user asked for
+/// it, also while it is closed. With neither the engine's taps do nothing and nothing is stored.
+#[derive(Default)]
+pub struct CaptureMode {
+    window_open: AtomicBool,
+    background: AtomicBool,
+}
+
+impl CaptureMode {
+    fn wanted(&self) -> bool {
+        self.window_open.load(Ordering::Relaxed) || self.background.load(Ordering::Relaxed)
+    }
+
+    fn apply(&self, engine: &Engine) {
+        engine.set_packet_capture(self.wanted());
+    }
+
+    /// The inspector window opened or closed. Closing drops the capture unless it was asked to
+    /// continue in the background.
+    pub fn set_window_open(&self, engine: &Engine, open: bool) {
+        self.window_open.store(open, Ordering::Relaxed);
+        self.apply(engine);
+    }
+}
+
+/// Window event hook: when the inspector window is gone, capture stops (and the buffer is
+/// dropped) unless it was asked to continue in the background.
+pub fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
+    if window.label() == crate::aux_window::INSPECTOR.label
+        && matches!(event, tauri::WindowEvent::Destroyed)
+    {
+        let app = window.app_handle();
+        // The engine is gone while the app shuts down; there is nothing left to stop then.
+        if let (Some(mode), Some(engine)) =
+            (app.try_state::<CaptureMode>(), app.try_state::<Engine>())
+        {
+            mode.set_window_open(&engine, false);
+        }
+    }
+}
+
+/// The developer tools were unlocked (`true`) or hidden again (`false`). Hiding them stops any
+/// capture and closes the inspector window; capture itself starts with the window.
 #[tauri::command]
 #[specta::specta]
 pub fn packet_capture_set(
     app: AppHandle,
     engine: State<'_, Engine>,
+    mode: State<'_, CaptureMode>,
     enabled: bool,
 ) -> ApiResult<()> {
-    engine.set_packet_capture(enabled);
     if !enabled {
+        mode.background.store(false, Ordering::Relaxed);
+        mode.apply(&engine);
         crate::aux_window::close(&app, &crate::aux_window::INSPECTOR);
     }
+    Ok(())
+}
+
+/// Keeps capturing while the inspector window is closed (`true`), or stops doing so; turning
+/// it off with the window closed drops what was captured.
+#[tauri::command]
+#[specta::specta]
+pub fn packet_capture_background(
+    engine: State<'_, Engine>,
+    mode: State<'_, CaptureMode>,
+    enabled: bool,
+) -> ApiResult<()> {
+    mode.background.store(enabled, Ordering::Relaxed);
+    mode.apply(&engine);
     Ok(())
 }
 
@@ -176,9 +237,14 @@ pub fn packet_capture_set(
 #[specta::specta]
 pub fn packet_capture_poll(
     engine: State<'_, Engine>,
+    mode: State<'_, CaptureMode>,
     after: Option<u32>,
 ) -> ApiResult<PacketCapture> {
-    Ok(engine.poll_packet_capture(after.map(u64::from)).into())
+    let background = mode.background.load(Ordering::Relaxed);
+    Ok(PacketCapture::new(
+        engine.poll_packet_capture(after.map(u64::from)),
+        background,
+    ))
 }
 
 /// Drops the captured packets and resets the counters.
@@ -242,9 +308,16 @@ pub struct SharedView(Mutex<Option<InspectorView>>);
 /// Opens the packet inspector window, or brings it to the front if it is already open.
 #[tauri::command]
 #[specta::specta]
-pub async fn packet_inspector_open(app: AppHandle) -> ApiResult<()> {
+pub async fn packet_inspector_open(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    mode: State<'_, CaptureMode>,
+) -> ApiResult<()> {
+    // Capture starts before the window so its first poll already sees packets.
+    mode.set_window_open(&engine, true);
     // Async: creating a window from a synchronous command deadlocks on Windows.
     crate::aux_window::open(&app, &crate::aux_window::INSPECTOR).map_err(|e| {
+        mode.set_window_open(&engine, false);
         tracing::warn!(error = %e, "opening the packet inspector window failed");
         ApiError::new(
             ErrorCode::Io,
@@ -290,4 +363,21 @@ pub fn packet_inspector_view(shared: State<'_, SharedView>) -> ApiResult<Option<
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner)
         .clone())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn capture_is_wanted_only_with_the_window_open_or_in_the_background() {
+        let mode = CaptureMode::default();
+        assert!(!mode.wanted(), "nothing is captured by default");
+        mode.window_open.store(true, Ordering::Relaxed);
+        assert!(mode.wanted());
+        mode.window_open.store(false, Ordering::Relaxed);
+        assert!(!mode.wanted(), "closing the window stops the capture");
+        mode.background.store(true, Ordering::Relaxed);
+        assert!(mode.wanted(), "the background switch keeps it going");
+    }
 }

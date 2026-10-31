@@ -1988,6 +1988,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       inspector.set(enabled);
       return Promise.resolve(null);
     },
+    packetCaptureBackground: (enabled) => {
+      inspector.setBackground(enabled);
+      return Promise.resolve(null);
+    },
     packetCapturePoll: (after) => Promise.resolve(inspector.poll(after)),
     packetCaptureClear: () => {
       inspector.clear();

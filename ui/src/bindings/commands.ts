@@ -377,10 +377,15 @@ export const commands = {
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
 	/**
-	 *  Starts or stops capturing packets. The UI turns it on while the developer tools are
-	 *  unlocked; turning it off drops everything captured.
+	 *  The developer tools were unlocked (`true`) or hidden again (`false`). Hiding them stops any
+	 *  capture and closes the inspector window; capture itself starts with the window.
 	 */
 	packetCaptureSet: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_set", { enabled })),
+	/**
+	 *  Keeps capturing while the inspector window is closed (`true`), or stops doing so; turning
+	 *  it off with the window closed drops what was captured.
+	 */
+	packetCaptureBackground: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_background", { enabled })),
 	/**
 	 *  Packets captured after the packet with id `after` (all kept packets with `null`), plus the
 	 *  counters.
@@ -1462,6 +1467,8 @@ export type Packet = {
 
 export type PacketCapture = {
 	capturing: boolean,
+	/**  Capture keeps running while the inspector window is closed. */
+	background: boolean,
 	/**  Packets newer than the requested id, oldest first. */
 	packets: Packet[],
 	/**  Packets per server, kind and direction since capture started or was cleared. */

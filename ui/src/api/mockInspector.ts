@@ -105,11 +105,15 @@ function samplePackets(start: number): Packet[] {
 /** The mock's capture switch and buffer. */
 export function createMockInspector() {
   let capturing = false;
+  let background = false;
   let packets: Packet[] = [];
   return {
     set(enabled: boolean) {
       capturing = enabled;
       packets = enabled ? samplePackets(Date.now()) : [];
+    },
+    setBackground(enabled: boolean) {
+      background = enabled;
     },
     poll(after: number | null): PacketCapture {
       const counts = new Map<string, number>();
@@ -119,6 +123,7 @@ export function createMockInspector() {
       }
       return {
         capturing,
+        background,
         packets: packets.filter((p) => after === null || p.id > after),
         counters: Array.from(counts, ([key, count]) => {
           const [kind = "", direction] = key.split("\n");
