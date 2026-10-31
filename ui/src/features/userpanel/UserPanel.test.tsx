@@ -518,14 +518,14 @@ describe("UserPanel", () => {
       "More disconnect options",
     ]);
     // The gear sits in the identity row (it is no voice control); the connection quality is a
-    // chip in the status strip, its voice quality panel on the same button (#246).
+    // chip in the status strip, with the voice quality arrow beside it.
     const identity = document.querySelector(".userpanel__identity");
     expect(
       [...(identity?.querySelectorAll("button") ?? [])].map((b) => b.getAttribute("aria-label")),
     ).toEqual(["Quick settings"]);
     const strip = document.querySelector(".userpanel-strip");
     expect(strip?.querySelector("button[aria-label='Connection info']")).not.toBeNull();
-    expect(screen.queryByRole("button", { name: "Voice quality" })).not.toBeInTheDocument();
+    expect(strip?.querySelector("button[aria-label='Voice quality']")).not.toBeNull();
     await joinVoice();
     expect(profile?.querySelector(".userpanel__status")).not.toHaveTextContent("Read-only");
     expect(profile?.querySelector(".userpanel__status")?.textContent).not.toBe("");

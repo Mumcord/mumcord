@@ -136,8 +136,7 @@ function Panel({ open }: { open: boolean }) {
 /**
  * Button with a non-modal popover showing the live link figures (AC-1.23): transport,
  * latency, loss and the current send bitrate. Refreshes about once per second while open.
- * `compact` (the user panel's status strip, #246) leaves out the separate arrow: the voice
- * quality panel then opens from the same button with right-click, the menu key or Shift+F10.
+ * `compact` (the user panel's status strip, #246) adds a tooltip to the button.
  */
 export function ConnectionInfo({
   className,
@@ -231,23 +230,21 @@ export function ConnectionInfo({
           />
         </svg>
       </button>
-      {compact ? null : (
-        <button
-          type="button"
-          className={`${className ?? ""} connection-info__more`}
-          aria-label={t("quick.open")}
-          aria-haspopup="dialog"
-          aria-expanded={mode === "quick"}
-          onClick={() => {
-            if (mode === "quick") setMode(null);
-            else openQuick();
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
-            <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="3" />
-          </svg>
-        </button>
-      )}
+      <button
+        type="button"
+        className={`${className ?? ""} connection-info__more`}
+        aria-label={t("quick.open")}
+        aria-haspopup="dialog"
+        aria-expanded={mode === "quick"}
+        onClick={() => {
+          if (mode === "quick") setMode(null);
+          else openQuick();
+        }}
+      >
+        <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
+          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="3" />
+        </svg>
+      </button>
       {open ? (
         <div
           ref={panel}
