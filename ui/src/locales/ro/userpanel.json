@@ -96,7 +96,11 @@
     "loadImagesHint": "Preia imaginile originale de la ceilalți",
     "dnd": "Nu deranja",
     "dndHint": "Dezactivează sunetele și bannerele de notificare",
-    "dndSystemHint": "Activat prin modul Nu deranja al desktopului"
+    "dndSystemHint": "Activat prin modul Nu deranja al desktopului",
+    "privateMessages": "Mesaje private de la",
+    "pm_everyone": "Oricine",
+    "pm_friendsOnly": "Prieteni",
+    "pm_nobody": "Nimeni"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",

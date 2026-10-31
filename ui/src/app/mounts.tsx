@@ -4,7 +4,9 @@
  */
 import { useTranslation } from "react-i18next";
 import { getApi } from "../api";
+import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
+import { useMembersColumn } from "./membersCollapse";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
 import { SharingBar } from "../features/screenshare";
@@ -21,10 +23,16 @@ import {
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
-import { MembersPanel, openPrivateConversation } from "../features/members";
+import {
+  MembersPanel,
+  MembersToggle,
+  openPrivateConversation,
+  useChannelPresence,
+} from "../features/members";
 import { ScreenShareWidget } from "../features/screenshare";
 import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
+import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
 import {
   AppImageMenuPrompt,
   DirectConsentPrompt,
@@ -48,6 +56,7 @@ export function ChannelsMount() {
     <>
       <ChannelsPanel
         header={<FollowAllMenu />}
+        aboveTree={<RequestsEntry />}
         channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />}
         channelAction={(channel) => <FollowStar {...channel} />}
       />
@@ -103,9 +112,40 @@ export function ChatStatusMount() {
   );
 }
 
-/** Chat header, message list and input (B21). */
+/** Chat header, message list and input (B21), or the message requests while they are open (#141). */
 export function ChatMount() {
-  return <ChatView renderHeaderActions={(conv) => <FollowHeaderActions conversation={conv} />} />;
+  const requests = useRequestsView();
+  if (requests)
+    return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
+  return (
+    <ChatView
+      renderHeaderActions={(conv) => (
+        <>
+          <FollowHeaderActions conversation={conv} />
+          <MembersToggleMount />
+        </>
+      )}
+    />
+  );
+}
+
+/** The members button in the chat header, wired to the shell's member column (issue #165). */
+function MembersToggleMount() {
+  const { t } = useTranslation("members");
+  const column = useMembersColumn();
+  const presence = useChannelPresence();
+  const macos = useIsMacos();
+  if (column === null) return null;
+  return (
+    <MembersToggle
+      expanded={column.shown}
+      controls={column.controls}
+      presence={presence}
+      shortcut={macos ? "⌘⇧M" : t("toggle.shortcut")}
+      onToggle={column.toggle}
+      buttonRef={column.buttonRef}
+    />
+  );
 }
 
 /**

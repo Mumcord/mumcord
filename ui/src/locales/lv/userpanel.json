@@ -96,7 +96,11 @@
     "loadImagesHint": "Iegūt oriģinālos attēlus no citiem",
     "dnd": "Netraucēt",
     "dndHint": "Izslēdz paziņojumu skaņas un reklāmkarogus",
-    "dndSystemHint": "Ieslēgts ar darbvirsmas režīmu “Netraucēt”"
+    "dndSystemHint": "Ieslēgts ar darbvirsmas režīmu “Netraucēt”",
+    "privateMessages": "Privātās ziņas no",
+    "pm_everyone": "Visiem",
+    "pm_friendsOnly": "Draugi",
+    "pm_nobody": "Nevienam"
   },
   "voice": {
     "line": "Balss: {{channel}} · {{server}}",

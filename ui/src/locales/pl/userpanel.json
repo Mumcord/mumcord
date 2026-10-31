@@ -96,7 +96,11 @@
     "loadImagesHint": "Pobieraj oryginalne obrazy od innych",
     "dnd": "Nie przeszkadzać",
     "dndHint": "Wycisza dźwięki i banery powiadomień",
-    "dndSystemHint": "Włączone przez tryb Nie przeszkadzać pulpitu"
+    "dndSystemHint": "Włączone przez tryb Nie przeszkadzać pulpitu",
+    "privateMessages": "Wiadomości prywatne od",
+    "pm_everyone": "Wszystkich",
+    "pm_friendsOnly": "Znajomych",
+    "pm_nobody": "Nikogo"
   },
   "voice": {
     "line": "Głos: {{channel}} · {{server}}",

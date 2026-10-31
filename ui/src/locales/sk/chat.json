@@ -283,5 +283,32 @@
     "warning_many": "{{count}} odkazov v tejto správe zobrazuje prihlasovacie údaje",
     "warning_one": "{{count}} odkaz v tejto správe zobrazuje prihlasovacie údaje",
     "warning_other": "{{count}} odkazu v tejto správe zobrazuje prihlasovacie údaje"
+  },
+  "requests": {
+    "entry": "Žiadosti o správy",
+    "entryCount_one": "{{count}} žiadosť",
+    "entryCount_few": "{{count}} žiadosti",
+    "entryCount_many": "{{count}} žiadosti",
+    "entryCount_other": "{{count}} žiadostí",
+    "title": "Žiadosti o správy",
+    "listLabel": "Žiadosti",
+    "chatRequestTag": "Žiadosť o chat",
+    "messageRequestTag": "Žiadosť o správu",
+    "wantsToChat": "{{name}} sa s tebou chce rozprávať",
+    "metaMumcord": "Používateľ Mumcordu · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Poznámka od {{name}}",
+    "explain": "Súkromné správy máš nastavené na „Len priatelia“. Po prijatí ti bude môcť {{name}} písať. Odmietnutie je tiché: {{name}} uvidí iba „čaká sa“. Žiadosti sa vymažú, keď ukončíš Mumcord.",
+    "sentMessages_one": "{{name}} ti poslal(a) {{count}} správu",
+    "sentMessages_few": "{{name}} ti poslal(a) {{count}} správy",
+    "sentMessages_many": "{{name}} ti poslal(a) {{count}} správy",
+    "sentMessages_other": "{{name}} ti poslal(a) {{count}} správ",
+    "messagesLabel": "Správy od {{name}}",
+    "accept": "Prijať",
+    "decline": "Odmietnuť",
+    "addFriend": "Pridať priateľa",
+    "replyBlocked": "Ak chceš odpovedať používateľovi {{name}}, prijmi žiadosť.",
+    "empty": "Žiadne žiadosti o správy.",
+    "failed": "Nepodarilo sa. Skús to znova."
   }
 }

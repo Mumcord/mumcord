@@ -11,10 +11,6 @@
     "chat": "Skip to chat",
     "channels": "Skip to channels"
   },
-  "members": {
-    "show": "Show members",
-    "hide": "Hide members"
-  },
   "resize": {
     "channels": "Resize channel list",
     "members": "Resize member list"

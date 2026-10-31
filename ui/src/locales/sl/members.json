@@ -60,7 +60,9 @@
     "join": "Pridruži se kanalu {{channel}}",
     "joinDenied": "Nimate dovoljenja za vstop v ta kanal.",
     "mute": "Utišaj zame",
-    "connectionInfo": "Podatki o povezavi…"
+    "connectionInfo": "Podatki o povezavi…",
+    "chatRequest": "Pošlji prošnjo za klepet…",
+    "chatRequestPending": "Prošnja za klepet čaka"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",
@@ -87,5 +89,28 @@
   "preview": {
     "privateMessage": "Zasebno sporočilo",
     "fullProfile": "Celoten profil"
+  },
+  "chatRequest": {
+    "title": "Prošnja za klepet za {{name}}",
+    "note": "Opomba (neobvezno)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Porabljeno {{count}} od {{max}} znakov",
+    "send": "Pošlji",
+    "failed": "Prošnje za klepet ni bilo mogoče poslati. Poskusi znova."
+  },
+  "toggle": {
+    "show": "Pokaži člane",
+    "hide": "Skrij člane",
+    "showCount_one": "Pokaži člane ({{count}})",
+    "showCount_two": "Pokaži člane ({{count}})",
+    "showCount_few": "Pokaži člane ({{count}})",
+    "showCount_other": "Pokaži člane ({{count}})",
+    "talkingOne": "{{name}} govori",
+    "talkingTwo": "{{first}} in {{second}} govorita",
+    "talkingMore_one": "{{name}} in še {{count}} govorita",
+    "talkingMore_two": "{{name}} in še {{count}} govorijo",
+    "talkingMore_few": "{{name}} in še {{count}} govorijo",
+    "talkingMore_other": "{{name}} in še {{count}} govorijo",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

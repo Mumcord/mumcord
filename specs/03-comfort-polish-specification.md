@@ -126,7 +126,7 @@ Everything in this epic is local to the client. The server enforces only what it
 - **FR-3.89** Channel info: name and path, sanitised description, users / max users, temporary or permanent, password indicator and whether a saved password unlocks it (#146), linked channels, own permissions, follow state and last history clear, Copy link.
 
 **Collapsible member column (#165, PR #177, done)**
-- **FR-3.90** A chevron at the top of the member column (and a shortcut) hides it completely (variant C); the chat uses the full width and a small "Show members" button stays at the edge. The state is remembered.
+- **FR-3.90** The member column can be hidden completely so the chat uses the full width (variant C2). A members button in the chat header shows and hides it; while the column is hidden the button shows the member count and a talking dot when someone speaks. In a narrow window the column opens as an overlay over the chat. The shortcut is the fixed Ctrl+Shift+M until configurable shortcuts exist (#64). The state is remembered globally, not per server.
 
 **Public server browser (#68)**
 - **FR-3.91** Browse and search the public Mumble server list (the list the official client uses) by name, country, ping and user count; connect or add to favourites in one click.

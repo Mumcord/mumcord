@@ -16,7 +16,12 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
 import { shownServerId, useServerState } from "../channels/serverStore";
+import { hasMumcordFeature } from "../channels/mumcord";
 import { setFriend, useFriend } from "../friends";
+import { openChatRequestDialog } from "../requests/chatRequestDialogStore";
+import { ownCertHash } from "../requests/ownIdentity";
+import { useAcceptedConversations, usePmRequests } from "../requests/requestsStore";
+import { useServers } from "../servers/store";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { joinTarget } from "./joinTarget";
@@ -90,6 +95,9 @@ function PersonMenu({
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
   const friend = useFriend(user?.certHash ?? null);
+  const { sent } = usePmRequests(state.serverId);
+  const acceptedConversations = useAcceptedConversations();
+  const { servers, identities } = useServers();
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -149,6 +157,23 @@ function PersonMenu({
   const isSelf = user?.session === state.selfSession;
 
   const join = user && !isSelf ? joinTarget(state, user) : null;
+
+  // Chat requests (issue #141) reach Mumcord users who announced them, and only make sense for
+  // people who may not write yet: not friends, no accepted conversation, no accepted request.
+  const sentRequest = user ? sent.find((r) => r.session === user.session) : undefined;
+  const own = state.serverId === null ? null : ownCertHash(servers, identities, state.serverId);
+  const alreadyAccepted =
+    sentRequest?.accepted === true ||
+    (user?.certHash != null &&
+      acceptedConversations.some((c) => c.ownCertHash === own && c.certHash === user.certHash));
+  const chatRequest =
+    user && !isSelf && friend === undefined && !alreadyAccepted
+      ? hasMumcordFeature(user, "chat-request")
+        ? sentRequest
+          ? "pending"
+          : "offer"
+        : null
+      : null;
 
   const report = (cause: unknown) => {
     console.error("Changing a person's local settings failed", toEngineError(cause).code);
@@ -249,6 +274,30 @@ function PersonMenu({
             closePersonMenu();
             openPrivateConversation(user);
           })}
+          {chatRequest === "offer" &&
+            item("chatRequest", <ChatRequestIcon />, t("menu.chatRequest"), () => {
+              closePersonMenu();
+              openChatRequestDialog({
+                serverId: shownServerId(),
+                session: user.session,
+                name: user.name,
+                opener: open.opener,
+              });
+            })}
+          {chatRequest === "pending" && (
+            <button
+              type="button"
+              role="menuitem"
+              aria-disabled="true"
+              tabIndex={-1}
+              className="server-menu__item person-menu__item"
+            >
+              <MenuIcon>
+                <ChatRequestIcon />
+              </MenuIcon>
+              {t("menu.chatRequestPending")}
+            </button>
+          )}
           {join &&
             (join.allowed ? (
               item(
@@ -400,6 +449,10 @@ function IdentityCardIcon() {
 
 function ChatBubbleIcon() {
   return <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />;
+}
+
+function ChatRequestIcon() {
+  return <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM12 7v6M9 10h6" />;
 }
 
 function EnterChannelIcon() {

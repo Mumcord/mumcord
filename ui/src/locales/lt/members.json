@@ -60,7 +60,9 @@
     "join": "Prisijungti prie {{channel}}",
     "joinDenied": "Neturite teisės įeiti į šį kanalą.",
     "mute": "Nutildyti man",
-    "connectionInfo": "Ryšio informacija…"
+    "connectionInfo": "Ryšio informacija…",
+    "chatRequest": "Siųsti pokalbio prašymą…",
+    "chatRequestPending": "Pokalbio prašymas laukia"
   },
   "nowPlaying": {
     "label": "Dabar groja",
@@ -87,5 +89,28 @@
   "preview": {
     "privateMessage": "Privati žinutė",
     "fullProfile": "Visas profilis"
+  },
+  "chatRequest": {
+    "title": "Pokalbio prašymas naudotojui {{name}}",
+    "note": "Pastaba (nebūtina)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Panaudota {{count}} iš {{max}} simbolių",
+    "send": "Siųsti",
+    "failed": "Nepavyko išsiųsti pokalbio prašymo. Bandyk dar kartą."
+  },
+  "toggle": {
+    "show": "Rodyti narius",
+    "hide": "Slėpti narius",
+    "showCount_one": "Rodyti narius ({{count}})",
+    "showCount_few": "Rodyti narius ({{count}})",
+    "showCount_many": "Rodyti narius ({{count}})",
+    "showCount_other": "Rodyti narius ({{count}})",
+    "talkingOne": "{{name}} kalba",
+    "talkingTwo": "{{first}} ir {{second}} kalba",
+    "talkingMore_one": "{{name}} ir dar {{count}} kalba",
+    "talkingMore_few": "{{name}} ir dar {{count}} kalba",
+    "talkingMore_many": "{{name}} ir dar {{count}} kalba",
+    "talkingMore_other": "{{name}} ir dar {{count}} kalba",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

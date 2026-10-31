@@ -96,7 +96,11 @@
     "loadImagesHint": "Obter imagens originais dos outros",
     "dnd": "Não incomodar",
     "dndHint": "Silencia sons e faixas de notificação",
-    "dndSystemHint": "Ativado pelo Não incomodar do ambiente de trabalho"
+    "dndSystemHint": "Ativado pelo Não incomodar do ambiente de trabalho",
+    "privateMessages": "Mensagens privadas de",
+    "pm_everyone": "Todos",
+    "pm_friendsOnly": "Amigos",
+    "pm_nobody": "Ninguém"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",

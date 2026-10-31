@@ -96,7 +96,11 @@
     "loadImagesHint": "Dohvaćaj originalne slike od drugih",
     "dnd": "Ne ometaj",
     "dndHint": "Utišava zvukove i natpise obavijesti",
-    "dndSystemHint": "Uključeno putem načina Ne ometaj vaše radne površine"
+    "dndSystemHint": "Uključeno putem načina Ne ometaj vaše radne površine",
+    "privateMessages": "Privatne poruke od",
+    "pm_everyone": "Svi",
+    "pm_friendsOnly": "Prijatelji",
+    "pm_nobody": "Nitko"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",

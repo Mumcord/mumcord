@@ -96,7 +96,11 @@
     "loadImagesHint": "Eredeti képek lekérése másoktól",
     "dnd": "Ne zavarjanak",
     "dndHint": "Elnémítja az értesítési hangokat és szalagokat",
-    "dndSystemHint": "Bekapcsolva az asztali környezet Ne zavarjanak módja miatt"
+    "dndSystemHint": "Bekapcsolva az asztali környezet Ne zavarjanak módja miatt",
+    "privateMessages": "Privát üzenetek tőle",
+    "pm_everyone": "Bárki",
+    "pm_friendsOnly": "Barátok",
+    "pm_nobody": "Senki"
   },
   "voice": {
     "line": "Hang: {{channel}} · {{server}}",

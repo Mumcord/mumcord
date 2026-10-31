@@ -27,6 +27,7 @@ pub mod now_gaming;
 pub mod now_playing;
 pub mod p2p;
 pub mod people;
+pub mod pm_rules;
 pub mod positional;
 pub mod profile;
 pub mod ptt;

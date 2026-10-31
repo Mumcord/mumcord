@@ -571,6 +571,11 @@
     "pause": "Pause",
     "resume": "Genoptag",
     "paused": "På pause: nye pakker vises, når du genoptager.",
+    "follow": "Følg",
+    "jumpToLatest": "↓ {{n}} nye pakker, spring til seneste",
+    "keepCapturing": "Fortsæt optagelsen i baggrunden",
+    "keepCapturingHint": "Optagelsen stopper og ryddes, når dette vindue lukkes. Slå til for at blive ved med at indsamle pakker, mens det er lukket.",
+    "keepCapturingOn": "Optagelsen fortsætter, efter at dette vindue er lukket.",
     "clear": "Ryd",
     "exportJson": "Eksportér JSON",
     "exportMarkdown": "Eksportér Markdown",
@@ -677,5 +682,35 @@
     "detectedOff": "{{desktop}} · Forstyr ikke er slået fra. Ændringer opfanges med det samme.",
     "unavailable": "Ikke tilgængelig",
     "unavailableText": "Mumcord kan ikke læse systemets Forstyr ikke-tilstand her. Kun Mumcords egen kontakt virker."
+  },
+  "privateMessages": {
+    "title": "Private beskeder",
+    "legend": "Private beskeder fra",
+    "everyone": "Alle",
+    "everyoneHint": "Alle på en server kan skrive til dig.",
+    "friendsOnly": "Kun venner",
+    "friendsOnlyHint": "Andre Mumcord-brugere kan sende en chatanmodning i stedet. Beskeder fra standardklienter havner i »Beskedanmodninger«.",
+    "nobody": "Ingen",
+    "nobodyHint": "Der vises ingen private beskeder og ingen chatanmodninger. Afsendere får ikke besked.",
+    "keepRequests": "Behold beskeder fra standardklienter som beskedanmodninger",
+    "keepRequestsHint": "Bruges kun med »Kun venner«. Når det er slået fra, kasseres disse beskeder.",
+    "overrideTitle": "Tilsidesættelse pr. server",
+    "overrideLabel": "Private beskeder fra på {{server}}",
+    "useDefault": "Brug standard ({{rule}})",
+    "noServers": "Ingen gemte servere endnu.",
+    "alwaysTitle": "Altid tilladt",
+    "currentChannel": "Personer i min nuværende kanal",
+    "currentChannelHint": "Tilsidesætter »Kun venner« og »Ingen«, så længe vi er i samme kanal.",
+    "accepted": "Samtaler, jeg allerede har accepteret",
+    "acceptedHint": "Personer, hvis chatanmodning du har accepteret, kan blive ved med at skrive til dig."
+  },
+  "acceptedConversations": {
+    "title": "Accepterede samtaler",
+    "empty": "Ingen accepterede samtaler endnu.",
+    "acceptedAt": "Accepteret {{date}}",
+    "identity": "Identitet: {{label}}",
+    "revoke": "Træk tilbage",
+    "revokeLabel": "Træk den accepterede samtale med {{name}} tilbage",
+    "revokeFailed": "Tilbagetrækningen mislykkedes. Prøv igen."
   }
 }

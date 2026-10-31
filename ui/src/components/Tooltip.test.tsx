@@ -47,6 +47,27 @@ describe("themed tooltip", () => {
     expect(button).not.toHaveAttribute("aria-describedby");
   });
 
+  it("shows a shortcut chip and a detail line, and describes the trigger with them", () => {
+    setup(
+      <button
+        type="button"
+        aria-label="Show members"
+        data-tooltip="Show members"
+        data-tooltip-shortcut="Ctrl+Shift+M"
+        data-tooltip-detail="Freya is talking"
+      >
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Show members" });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    const tip = screen.getByRole("tooltip");
+    expect(tip.querySelector("kbd")).toHaveTextContent("Ctrl+Shift+M");
+    expect(tip.querySelector(".tooltip__detail")).toHaveTextContent("Freya is talking");
+    expect(button).toHaveAttribute("aria-describedby", tip.id);
+  });
+
   it("appears on keyboard focus and hides on blur", () => {
     setup(
       <button type="button" aria-label="Settings" data-tooltip="Settings">

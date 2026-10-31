@@ -575,6 +575,11 @@
     "pause": "Wstrzymaj",
     "resume": "Wznów",
     "paused": "Wstrzymano: nowe pakiety pojawią się po wznowieniu.",
+    "follow": "Śledź",
+    "jumpToLatest": "↓ {{n}} nowych pakietów, przejdź do najnowszego",
+    "keepCapturing": "Przechwytuj dalej w tle",
+    "keepCapturingHint": "Przechwytywanie kończy się i jest czyszczone po zamknięciu tego okna. Włącz, aby zbierać pakiety także przy zamkniętym oknie.",
+    "keepCapturingOn": "Przechwytywanie trwa po zamknięciu tego okna.",
     "clear": "Wyczyść",
     "exportJson": "Eksportuj JSON",
     "exportMarkdown": "Eksportuj Markdown",
@@ -683,5 +688,35 @@
     "detectedOff": "{{desktop}} · Nie przeszkadzać jest wyłączone. Zmiany są uwzględniane na bieżąco.",
     "unavailable": "Niedostępne",
     "unavailableText": "Mumcord nie może tu odczytać stanu trybu Nie przeszkadzać systemu. Działa tylko jego własny przełącznik."
+  },
+  "privateMessages": {
+    "title": "Wiadomości prywatne",
+    "legend": "Wiadomości prywatne od",
+    "everyone": "Wszystkich",
+    "everyoneHint": "Każdy na serwerze może do Ciebie pisać.",
+    "friendsOnly": "Tylko znajomych",
+    "friendsOnlyHint": "Inni użytkownicy Mumcorda mogą zamiast tego wysłać prośbę o czat. Wiadomości od standardowych klientów trafiają do „Próśb o wiadomości”.",
+    "nobody": "Nikogo",
+    "nobodyHint": "Wiadomości prywatne i prośby o czat nie są wyświetlane. Nadawcy nie są o tym informowani.",
+    "keepRequests": "Zachowuj wiadomości od standardowych klientów jako prośby o wiadomości",
+    "keepRequestsHint": "Używane tylko przy ustawieniu „Tylko znajomych”. Gdy wyłączone, te wiadomości są odrzucane.",
+    "overrideTitle": "Wyjątek dla serwera",
+    "overrideLabel": "Wiadomości prywatne od na serwerze {{server}}",
+    "useDefault": "Użyj domyślnego ({{rule}})",
+    "noServers": "Brak zapisanych serwerów.",
+    "alwaysTitle": "Zawsze dozwolone",
+    "currentChannel": "Osoby w moim bieżącym kanale",
+    "currentChannelHint": "Ma pierwszeństwo przed „Tylko znajomych” i „Nikogo”, dopóki jesteśmy na tym samym kanale.",
+    "accepted": "Rozmowy, które już zaakceptowałem(-am)",
+    "acceptedHint": "Osoby, których prośbę o czat zaakceptowano, mogą dalej do Ciebie pisać."
+  },
+  "acceptedConversations": {
+    "title": "Zaakceptowane rozmowy",
+    "empty": "Brak zaakceptowanych rozmów.",
+    "acceptedAt": "Zaakceptowano {{date}}",
+    "identity": "Tożsamość: {{label}}",
+    "revoke": "Cofnij",
+    "revokeLabel": "Cofnij zaakceptowaną rozmowę z {{name}}",
+    "revokeFailed": "Cofnięcie nie powiodło się. Spróbuj ponownie."
   }
 }

@@ -575,6 +575,11 @@
     "pause": "Pozastaviť",
     "resume": "Pokračovať",
     "paused": "Pozastavené: nové pakety sa zobrazia po pokračovaní.",
+    "follow": "Sledovať",
+    "jumpToLatest": "↓ {{n}} nových paketov, preskočiť na najnovší",
+    "keepCapturing": "Pokračovať v zachytávaní na pozadí",
+    "keepCapturingHint": "Zachytávanie sa po zatvorení tohto okna zastaví a vymaže. Zapnite, ak chcete zbierať pakety aj pri zatvorenom okne.",
+    "keepCapturingOn": "Zachytávanie pokračuje aj po zatvorení tohto okna.",
     "clear": "Vymazať",
     "exportJson": "Exportovať JSON",
     "exportMarkdown": "Exportovať Markdown",
@@ -683,5 +688,35 @@
     "detectedOff": "{{desktop}} · Nerušiť je vypnuté. Zmeny sa prejavia hneď.",
     "unavailable": "Nedostupné",
     "unavailableText": "Mumcord tu nedokáže zistiť stav režimu Nerušiť vášho systému. Funguje len jeho vlastný prepínač."
+  },
+  "privateMessages": {
+    "title": "Súkromné správy",
+    "legend": "Súkromné správy od",
+    "everyone": "Všetci",
+    "everyoneHint": "Správu ti môže poslať ktokoľvek na serveri.",
+    "friendsOnly": "Len priatelia",
+    "friendsOnlyHint": "Iní používatelia Mumcordu ti namiesto toho môžu poslať žiadosť o chat. Správy zo štandardných klientov idú do „Žiadostí o správy“.",
+    "nobody": "Nikto",
+    "nobodyHint": "Súkromné správy ani žiadosti o chat sa nezobrazujú. Odosielatelia sa to nedozvedia.",
+    "keepRequests": "Správy zo štandardných klientov ukladať ako žiadosti o správy",
+    "keepRequestsHint": "Platí len pri „Len priatelia“. Keď je vypnuté, tieto správy sa zahodia.",
+    "overrideTitle": "Výnimka pre server",
+    "overrideLabel": "Súkromné správy od na serveri {{server}}",
+    "useDefault": "Použiť predvolené ({{rule}})",
+    "noServers": "Zatiaľ žiadne uložené servery.",
+    "alwaysTitle": "Vždy povolené",
+    "currentChannel": "Ľudia v mojom aktuálnom kanáli",
+    "currentChannelHint": "Má prednosť pred „Len priatelia“ a „Nikto“, kým sme v rovnakom kanáli.",
+    "accepted": "Konverzácie, ktoré som už prijal(a)",
+    "acceptedHint": "Ľudia, ktorých žiadosť o chat si prijal(a), ti môžu naďalej písať."
+  },
+  "acceptedConversations": {
+    "title": "Prijaté konverzácie",
+    "empty": "Zatiaľ žiadne prijaté konverzácie.",
+    "acceptedAt": "Prijaté {{date}}",
+    "identity": "Identita: {{label}}",
+    "revoke": "Odvolať",
+    "revokeLabel": "Odvolať prijatú konverzáciu s používateľom {{name}}",
+    "revokeFailed": "Odvolanie sa nepodarilo. Skús to znova."
   }
 }

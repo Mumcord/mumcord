@@ -283,5 +283,32 @@
     "warning_one": "{{count}} povezava v tem sporočilu prikazuje poverilnice",
     "warning_other": "{{count}} povezke v tem sporočilu prikazuje poverilnice",
     "warning_two": "{{count}} povezavi v tem sporočilu prikazujeta poverilnice"
+  },
+  "requests": {
+    "entry": "Prošnje za sporočila",
+    "entryCount_one": "{{count}} prošnja",
+    "entryCount_two": "{{count}} prošnji",
+    "entryCount_few": "{{count}} prošnje",
+    "entryCount_other": "{{count}} prošenj",
+    "title": "Prošnje za sporočila",
+    "listLabel": "Prošnje",
+    "chatRequestTag": "Prošnja za klepet",
+    "messageRequestTag": "Prošnja za sporočilo",
+    "wantsToChat": "{{name}} se želi pogovarjati s tabo",
+    "metaMumcord": "Uporabnik Mumcorda · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "Opomba od {{name}}",
+    "explain": "Zasebna sporočila si nastavil/a na »Samo prijatelji«. Če sprejmeš, ti bo {{name}} lahko pisal(a). Zavrnitev je tiha: {{name}} vidi samo »v čakanju«. Prošnje se izbrišejo, ko zapreš Mumcord.",
+    "sentMessages_one": "{{name}} ti je poslal(a) {{count}} sporočilo",
+    "sentMessages_two": "{{name}} ti je poslal(a) {{count}} sporočili",
+    "sentMessages_few": "{{name}} ti je poslal(a) {{count}} sporočila",
+    "sentMessages_other": "{{name}} ti je poslal(a) {{count}} sporočil",
+    "messagesLabel": "Sporočila od {{name}}",
+    "accept": "Sprejmi",
+    "decline": "Zavrni",
+    "addFriend": "Dodaj prijatelja",
+    "replyBlocked": "Sprejmi prošnjo, da lahko odgovoriš uporabniku {{name}}.",
+    "empty": "Ni prošenj za sporočila.",
+    "failed": "To ni uspelo. Poskusi znova."
   }
 }

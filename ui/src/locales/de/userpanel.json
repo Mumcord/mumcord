@@ -96,7 +96,11 @@
     "loadImagesHint": "Originalbilder von anderen abrufen",
     "dnd": "Nicht stören",
     "dndHint": "Stellt Benachrichtigungstöne und -banner stumm",
-    "dndSystemHint": "An über „Nicht stören“ deines Desktops"
+    "dndSystemHint": "An über „Nicht stören“ deines Desktops",
+    "privateMessages": "Private Nachrichten von",
+    "pm_everyone": "Alle",
+    "pm_friendsOnly": "Freunde",
+    "pm_nobody": "Niemand"
   },
   "voice": {
     "line": "Sprache: {{channel}} · {{server}}",

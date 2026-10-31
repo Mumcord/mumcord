@@ -96,7 +96,11 @@
     "loadImagesHint": "Too teistelt originaalpildid",
     "dnd": "Ära sega",
     "dndHint": "Vaigistab teavituste helid ja bännerid",
-    "dndSystemHint": "Sees töölaua režiimi „Ära sega“ kaudu"
+    "dndSystemHint": "Sees töölaua režiimi „Ära sega“ kaudu",
+    "privateMessages": "Privaatsõnumid kasutajatelt",
+    "pm_everyone": "Kõigilt",
+    "pm_friendsOnly": "Sõbrad",
+    "pm_nobody": "Mitte keegi"
   },
   "voice": {
     "line": "Hääl: {{channel}} · {{server}}",

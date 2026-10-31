@@ -11,10 +11,6 @@
     "chat": "Mine vestlusesse",
     "channels": "Mine kanalite juurde"
   },
-  "members": {
-    "show": "Näita liikmeid",
-    "hide": "Peida liikmed"
-  },
   "resize": {
     "channels": "Muuda kanalite loendi suurust",
     "members": "Muuda liikmete loendi suurust"

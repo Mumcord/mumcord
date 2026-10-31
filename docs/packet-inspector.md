@@ -27,16 +27,20 @@ open brings that window to the front; there is never more than one.
   the names the main window knows.
 - **Ctrl+W** (⌘W on macOS) or the window's close button closes it; Esc does nothing, so it cannot
   be closed by accident. Closing it does not quit Mumcord; quitting Mumcord closes it.
-- Capture does not depend on the window: it runs while the developer tools are unlocked, so
-  packets sent while the window was closed are there when it opens (within the ring buffer).
+- Capture is tied to the window: it starts when the window opens and stops, with the captured
+  packets dropped, when it closes. Packets sent while the window was closed are not there when
+  it opens. The **Keep capturing in the background** switch in the window (off by default)
+  keeps capturing, and keeps the packets, while the window is closed; the window says so while
+  it is on. It is not stored: it is off again after a restart or when the developer tools are
+  hidden.
 - The window can only read the capture. It may call the inspector commands (fetch, clear, export)
   and the app version for exports, listen to events and show the save dialog for exports; every
   other command (connecting, sending, settings, deep links) is refused for it.
 
 ## What is captured
 
-Capture runs only while the developer tools are unlocked. When they are locked, each connection
-checks one flag per message and does nothing else.
+Capture runs only while the inspector window is open (or **Keep capturing in the background** is
+on). Otherwise each connection checks one flag per message and does nothing else.
 
 | What                                              | Kept                                                            |
 | ------------------------------------------------- | --------------------------------------------------------------- |
@@ -62,7 +66,8 @@ to), or of the whole message for other types.
 
 - Captured packets live in memory only, in a ring buffer of the last **2,000** packets for all
   servers together. Nothing is logged or sent anywhere.
-- Hiding the developer tools (or quitting the app) drops everything captured.
+- Closing the inspector window, hiding the developer tools or quitting the app drops everything
+  captured (closing the window keeps it only while **Keep capturing in the background** is on).
 - Content leaves the device only when the user exports it. Exports start with a warning that they
   can contain personal data such as names and chat text.
 - Everything shown is treated as untrusted input and rendered as plain text.
@@ -75,6 +80,12 @@ received, also told apart by colour), type (plain name plus the internal id such
 "→ N users", which expands), and pacer state.
 
 Names are the ones the app knows right now; someone who has left shows as `session 7`.
+
+New packets appear at the bottom and the list scrolls down to follow them. Scrolling up pauses
+following and shows a **↓ N new packets, jump to latest** button below the list; the button, or
+scrolling back to the bottom, resumes following. The **Follow** toggle next to Pause and Clear
+does the same by hand, and expanding a row pauses following so the list does not jump. Follow
+only controls scrolling; **Pause** is what stops the list from receiving packets.
 
 Click a row (or press Enter on its time) to expand it:
 

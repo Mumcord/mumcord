@@ -573,6 +573,11 @@
     "pause": "Pauziraj",
     "resume": "Nastavi",
     "paused": "Pauzirano: novi paketi pojavit će se kad nastaviš.",
+    "follow": "Prati",
+    "jumpToLatest": "↓ {{n}} novih paketa, idi na najnoviji",
+    "keepCapturing": "Nastavi snimanje u pozadini",
+    "keepCapturingHint": "Snimanje se zaustavlja i briše kad se ovaj prozor zatvori. Uključite za prikupljanje paketa dok je prozor zatvoren.",
+    "keepCapturingOn": "Snimanje se nastavlja nakon zatvaranja ovog prozora.",
     "clear": "Očisti",
     "exportJson": "Izvezi JSON",
     "exportMarkdown": "Izvezi Markdown",
@@ -680,5 +685,35 @@
     "detectedOff": "{{desktop}} · Ne ometaj je isključeno. Promjene se primjenjuju odmah.",
     "unavailable": "Nedostupno",
     "unavailableText": "Mumcord ovdje ne može pročitati stanje načina Ne ometaj vašeg sustava. Radi samo njegov vlastiti prekidač."
+  },
+  "privateMessages": {
+    "title": "Privatne poruke",
+    "legend": "Privatne poruke od",
+    "everyone": "Svi",
+    "everyoneHint": "Svatko na poslužitelju može ti pisati.",
+    "friendsOnly": "Samo prijatelji",
+    "friendsOnlyHint": "Ostali korisnici Mumcorda mogu ti umjesto toga poslati zahtjev za razgovor. Poruke standardnih klijenata idu u „Zahtjevi za poruke”.",
+    "nobody": "Nitko",
+    "nobodyHint": "Privatne poruke i zahtjevi za razgovor ne prikazuju se. Pošiljatelji o tome nisu obaviješteni.",
+    "keepRequests": "Zadrži poruke standardnih klijenata kao zahtjeve za poruke",
+    "keepRequestsHint": "Koristi se samo uz „Samo prijatelji”. Kad je isključeno, te se poruke odbacuju.",
+    "overrideTitle": "Iznimka po poslužitelju",
+    "overrideLabel": "Privatne poruke od na poslužitelju {{server}}",
+    "useDefault": "Koristi zadano ({{rule}})",
+    "noServers": "Još nema spremljenih poslužitelja.",
+    "alwaysTitle": "Uvijek dopušteno",
+    "currentChannel": "Osobe u mom trenutnom kanalu",
+    "currentChannelHint": "Nadjačava „Samo prijatelji” i „Nitko” dok smo u istom kanalu.",
+    "accepted": "Razgovori koje sam već prihvatio/la",
+    "acceptedHint": "Osobe čiji si zahtjev za razgovor prihvatio/la mogu ti nastaviti pisati."
+  },
+  "acceptedConversations": {
+    "title": "Prihvaćeni razgovori",
+    "empty": "Još nema prihvaćenih razgovora.",
+    "acceptedAt": "Prihvaćeno {{date}}",
+    "identity": "Identitet: {{label}}",
+    "revoke": "Opozovi",
+    "revokeLabel": "Opozovi prihvaćeni razgovor s korisnikom {{name}}",
+    "revokeFailed": "Opoziv nije uspio. Pokušaj ponovno."
   }
 }

@@ -58,7 +58,9 @@
     "join": "Gå med i {{channel}}",
     "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
     "mute": "Stäng av för mig",
-    "connectionInfo": "Anslutningsinfo…"
+    "connectionInfo": "Anslutningsinfo…",
+    "chatRequest": "Skicka chattförfrågan…",
+    "chatRequestPending": "Chattförfrågan väntar"
   },
   "nowPlaying": {
     "label": "Spelas nu",
@@ -83,5 +85,24 @@
   "preview": {
     "privateMessage": "Privat meddelande",
     "fullProfile": "Hela profilen"
+  },
+  "chatRequest": {
+    "title": "Chattförfrågan till {{name}}",
+    "note": "Anteckning (valfri)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} av {{max}} tecken använda",
+    "send": "Skicka",
+    "failed": "Chattförfrågan kunde inte skickas. Försök igen."
+  },
+  "toggle": {
+    "show": "Visa medlemmar",
+    "hide": "Dölj medlemmar",
+    "showCount_one": "Visa medlemmar ({{count}})",
+    "showCount_other": "Visa medlemmar ({{count}})",
+    "talkingOne": "{{name}} pratar",
+    "talkingTwo": "{{first}} och {{second}} pratar",
+    "talkingMore_one": "{{name}} och {{count}} annan pratar",
+    "talkingMore_other": "{{name}} och {{count}} andra pratar",
+    "shortcut": "Ctrl+Skift+M"
   }
 }

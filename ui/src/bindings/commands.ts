@@ -127,6 +127,18 @@ export const commands = {
 	friendAdd: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("friend_add", { serverId, session })),
 	/**  Removes a friend by certificate hash. */
 	friendRemove: (certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("friend_remove", { certHash })),
+	/**  Held and sent requests of a connected server. */
+	pmRequests: (serverId: number) => typedError<PmRequests, ApiError>(__TAURI_INVOKE("pm_requests", { serverId })),
+	/**  Accepts a request: held messages are shown and the sender may keep messaging. */
+	pmRequestAccept: (serverId: number, id: number) => typedError<null, ApiError>(__TAURI_INVOKE("pm_request_accept", { serverId, id })),
+	/**  Declines a request silently. */
+	pmRequestDecline: (serverId: number, id: number) => typedError<null, ApiError>(__TAURI_INVOKE("pm_request_decline", { serverId, id })),
+	/**  Sends a chat request with an optional note to another Mumcord user. */
+	chatRequestSend: (serverId: number, session: number, note: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("chat_request_send", { serverId, session, note })),
+	/**  Accepted conversations of every own identity, by name. */
+	acceptedConversations: () => typedError<AcceptedConversation[], ApiError>(__TAURI_INVOKE("accepted_conversations")),
+	/**  Revokes an accepted conversation of one own identity. */
+	acceptedConversationRevoke: (ownCertHash: string, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("accepted_conversation_revoke", { ownCertHash, certHash })),
 	/**
 	 *  Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
 	 *  Waits briefly for the server's refusal (FR-2.47). Fails with `messageTooLarge` above the
@@ -377,10 +389,15 @@ export const commands = {
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
 	/**
-	 *  Starts or stops capturing packets. The UI turns it on while the developer tools are
-	 *  unlocked; turning it off drops everything captured.
+	 *  The developer tools were unlocked (`true`) or hidden again (`false`). Hiding them stops any
+	 *  capture and closes the inspector window; capture itself starts with the window.
 	 */
 	packetCaptureSet: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_set", { enabled })),
+	/**
+	 *  Keeps capturing while the inspector window is closed (`true`), or stops doing so; turning
+	 *  it off with the window closed drops what was captured.
+	 */
+	packetCaptureBackground: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_background", { enabled })),
 	/**
 	 *  Packets captured after the packet with id `after` (all kept packets with `null`), plus the
 	 *  counters.
@@ -543,6 +560,7 @@ export const commands = {
 
 /** Events */
 export const events = {
+	acceptedConversationsChanged: makeEvent<AcceptedConversationsChanged, AcceptedConversationsChanged>("accepted-conversations-changed"),
 	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
@@ -570,6 +588,7 @@ export const events = {
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
+	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
@@ -591,6 +610,20 @@ export const events = {
 };
 
 /* Types */
+/**  A person who may keep sending private messages to one own identity. */
+export type AcceptedConversation = {
+	/**  Certificate hash of the own identity. */
+	ownCertHash: string,
+	certHash: string,
+	name: string,
+	/**  RFC 3339. */
+	acceptedAt: string,
+};
+
+export type AcceptedConversationsChanged = {
+	conversations: AcceptedConversation[],
+};
+
 /**  Error returned by every failing command. */
 export type ApiError = {
 	code: ErrorCode,
@@ -1324,6 +1357,23 @@ export type MessageReceived = {
 	message: ChatMessage,
 };
 
+/**  A held chat request (from a Mumcord user) or held messages (from a standard client). */
+export type MessageRequest = {
+	/**  Id for accept and decline; unique per server while the client runs. */
+	id: number,
+	session: number,
+	/**  Untrusted: render as plain text. */
+	name: string,
+	certHash: string | null,
+	chatRequest: boolean,
+	/**  Plain text note of a chat request (at most 200 characters). Untrusted: plain text only. */
+	note: string | null,
+	/**  Held messages, oldest first. */
+	messages: ChatMessage[],
+	/**  RFC 3339. */
+	receivedAt: string,
+};
+
 /**  Processed input level, about 20 times per second while the mic test runs or while connected. */
 export type MicLevel = {
 	/**  0.0 (silence) to 1.0 (full scale). */
@@ -1485,6 +1535,8 @@ export type Packet = {
 
 export type PacketCapture = {
 	capturing: boolean,
+	/**  Capture keeps running while the inspector window is closed. */
+	background: boolean,
 	/**  Packets newer than the requested id, oldest first. */
 	packets: Packet[],
 	/**  Packets per server, kind and direction since capture started or was cleared. */
@@ -1524,6 +1576,20 @@ export type PlaylistEntry = {
 	/**  Their name when the entry arrived, for when they have left the server since. */
 	addedByName: string | null,
 };
+
+export type PmRequests = {
+	incoming: MessageRequest[],
+	sent: SentChatRequest[],
+};
+
+/**  The requests of one server changed. Memory only: gone after disconnect or quit. */
+export type PmRequestsChanged = {
+	serverId: number,
+	requests: PmRequests,
+};
+
+/**  "Private messages from" (issue #141). */
+export type PmRule = "everyone" | "friendsOnly" | "nobody";
 
 /**
  *  A person (or the user, with the own session) started or stopped sending positions: show or
@@ -1568,6 +1634,23 @@ export type PositionalStatus = {
  */
 export type PositionalStatusChanged = {
 	status: PositionalStatus,
+};
+
+/**  Private message rule, per-server overrides and exceptions (issue #141). */
+export type PrivateMessageSettings = {
+	/**  Default everyone. */
+	rule: PmRule,
+	/**  Servers that do not use `rule`. */
+	serverRules: ServerPmRule[],
+	/**  "People in my current channel" (default on). */
+	allowCurrentChannel: boolean,
+	/**  "Conversations I already accepted" (default on). */
+	allowAccepted: boolean,
+	/**
+	 *  Keep filtered messages from standard clients as message requests (default on); off
+	 *  drops them.
+	 */
+	keepRequests: boolean,
 };
 
 export type PttAvailability = { status: "available" } | { status: "unavailable"; reason: PttUnavailableReason };
@@ -1680,6 +1763,14 @@ export type ScreenSharesChanged = {
 	shares: ScreenShare[],
 };
 
+/**  A chat request the user sent; a decline is never told, so it stays pending. */
+export type SentChatRequest = {
+	session: number,
+	name: string,
+	certHash: string | null,
+	accepted: boolean,
+};
+
 /**  One server's connection state, as listed by `connections_list`. */
 export type ServerConnection = {
 	serverId: number,
@@ -1745,6 +1836,12 @@ export type ServerInput = {
 	port: number,
 	username: string,
 	password: PasswordUpdate,
+};
+
+/**  A server with its own "Private messages from" rule. */
+export type ServerPmRule = {
+	serverId: number,
+	rule: PmRule,
 };
 
 /**  Complete view of the connected server. */
@@ -1923,6 +2020,8 @@ export type Settings = {
 	 *  that knew about it.
 	 */
 	whatsNewSeen: string | null,
+	/**  "Private messages from" (issue #141). */
+	privateMessages: PrivateMessageSettings,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

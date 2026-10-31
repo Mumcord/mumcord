@@ -32,6 +32,7 @@ pub const FEATURES: &[&str] = &[
     crate::p2p::FEATURE,
     crate::watch_party::FEATURE,
     crate::screen_share::signal::FEATURE,
+    crate::pm_rules::FEATURE,
 ];
 const MAX_FEATURES: usize = 16;
 const MAX_FEATURE_LEN: usize = 32;
@@ -266,6 +267,7 @@ mod tests {
         assert_eq!(
             features,
             [
+                "chat-request",
                 "full-image",
                 "now-gaming",
                 "now-playing",

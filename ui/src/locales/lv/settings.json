@@ -573,6 +573,11 @@
     "pause": "Pauze",
     "resume": "Turpināt",
     "paused": "Apturēts: jaunās paketes parādīsies, kad turpināsiet.",
+    "follow": "Sekot",
+    "jumpToLatest": "↓ {{n}} jaunas paketes, pāriet uz jaunāko",
+    "keepCapturing": "Turpināt tvert fonā",
+    "keepCapturingHint": "Tveršana apstājas un tiek notīrīta, kad šis logs tiek aizvērts. Ieslēdziet, lai paketes tiktu vāktas arī ar aizvērtu logu.",
+    "keepCapturingOn": "Tveršana turpinās pēc šī loga aizvēršanas.",
     "clear": "Notīrīt",
     "exportJson": "Eksportēt JSON",
     "exportMarkdown": "Eksportēt Markdown",
@@ -680,5 +685,35 @@
     "detectedOff": "{{desktop}} · “Netraucēt” ir izslēgts. Izmaiņas tiek ņemtas vērā uzreiz.",
     "unavailable": "Nav pieejams",
     "unavailableText": "Mumcord šeit nevar nolasīt sistēmas režīma “Netraucēt” stāvokli. Darbojas tikai tā paša slēdzis."
+  },
+  "privateMessages": {
+    "title": "Privātās ziņas",
+    "legend": "Privātās ziņas no",
+    "everyone": "Visiem",
+    "everyoneHint": "Ikviens serverī var tev rakstīt.",
+    "friendsOnly": "Tikai draugi",
+    "friendsOnlyHint": "Citi Mumcord lietotāji tā vietā var nosūtīt tērzēšanas pieprasījumu. Standarta klientu ziņas nonāk sadaļā “Ziņu pieprasījumi”.",
+    "nobody": "Nevienam",
+    "nobodyHint": "Privātās ziņas un tērzēšanas pieprasījumi netiek rādīti. Sūtītāji netiek informēti.",
+    "keepRequests": "Saglabāt standarta klientu ziņas kā ziņu pieprasījumus",
+    "keepRequestsHint": "Tiek izmantots tikai ar “Tikai draugi”. Ja izslēgts, šīs ziņas tiek atmestas.",
+    "overrideTitle": "Izņēmums katram serverim",
+    "overrideLabel": "Privātās ziņas no serverī {{server}}",
+    "useDefault": "Izmantot noklusējumu ({{rule}})",
+    "noServers": "Saglabātu serveru vēl nav.",
+    "alwaysTitle": "Vienmēr atļauts",
+    "currentChannel": "Cilvēki manā pašreizējā kanālā",
+    "currentChannelHint": "Ir svarīgāks par “Tikai draugi” un “Nevienam”, kamēr atrodamies vienā kanālā.",
+    "accepted": "Sarunas, ko jau esmu pieņēmis",
+    "acceptedHint": "Cilvēki, kuru tērzēšanas pieprasījumu esi pieņēmis, var turpināt tev rakstīt."
+  },
+  "acceptedConversations": {
+    "title": "Pieņemtās sarunas",
+    "empty": "Pieņemtu sarunu vēl nav.",
+    "acceptedAt": "Pieņemts {{date}}",
+    "identity": "Identitāte: {{label}}",
+    "revoke": "Atsaukt",
+    "revokeLabel": "Atsaukt pieņemto sarunu ar {{name}}",
+    "revokeFailed": "Atsaukšana neizdevās. Lūdzu, mēģini vēlreiz."
   }
 }

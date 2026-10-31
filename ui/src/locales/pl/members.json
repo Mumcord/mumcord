@@ -60,7 +60,9 @@
     "join": "Dołącz do {{channel}}",
     "joinDenied": "Nie masz uprawnień do wejścia na ten kanał.",
     "mute": "Wycisz dla mnie",
-    "connectionInfo": "Informacje o połączeniu…"
+    "connectionInfo": "Informacje o połączeniu…",
+    "chatRequest": "Wyślij prośbę o czat…",
+    "chatRequestPending": "Prośba o czat oczekuje"
   },
   "nowPlaying": {
     "label": "Teraz gra",
@@ -87,5 +89,28 @@
   "preview": {
     "privateMessage": "Wiadomość prywatna",
     "fullProfile": "Pełny profil"
+  },
+  "chatRequest": {
+    "title": "Prośba o czat do {{name}}",
+    "note": "Notatka (opcjonalnie)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Wykorzystano {{count}} z {{max}} znaków",
+    "send": "Wyślij",
+    "failed": "Nie udało się wysłać prośby o czat. Spróbuj ponownie."
+  },
+  "toggle": {
+    "show": "Pokaż członków",
+    "hide": "Ukryj członków",
+    "showCount_one": "Pokaż członków ({{count}})",
+    "showCount_few": "Pokaż członków ({{count}})",
+    "showCount_many": "Pokaż członków ({{count}})",
+    "showCount_other": "Pokaż członków ({{count}})",
+    "talkingOne": "{{name}} mówi",
+    "talkingTwo": "{{first}} i {{second}} mówią",
+    "talkingMore_one": "{{name}} i {{count}} inna osoba mówią",
+    "talkingMore_few": "{{name}} i {{count}} inne osoby mówią",
+    "talkingMore_many": "{{name}} i {{count}} innych osób mówi",
+    "talkingMore_other": "{{name}} i {{count}} innych osób mówi",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

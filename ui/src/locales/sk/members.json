@@ -60,7 +60,9 @@
     "join": "Pripojiť sa k {{channel}}",
     "joinDenied": "Do tohto kanála nemáte povolený vstup.",
     "mute": "Stlmiť pre mňa",
-    "connectionInfo": "Informácie o pripojení…"
+    "connectionInfo": "Informácie o pripojení…",
+    "chatRequest": "Poslať žiadosť o chat…",
+    "chatRequestPending": "Žiadosť o chat čaká na vybavenie"
   },
   "nowPlaying": {
     "label": "Práve hrá",
@@ -87,5 +89,28 @@
   "preview": {
     "privateMessage": "Súkromná správa",
     "fullProfile": "Celý profil"
+  },
+  "chatRequest": {
+    "title": "Žiadosť o chat pre {{name}}",
+    "note": "Poznámka (voliteľné)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Využité {{count}} z {{max}} znakov",
+    "send": "Odoslať",
+    "failed": "Žiadosť o chat sa nepodarilo odoslať. Skús to znova."
+  },
+  "toggle": {
+    "show": "Zobraziť členov",
+    "hide": "Skryť členov",
+    "showCount_one": "Zobraziť členov ({{count}})",
+    "showCount_few": "Zobraziť členov ({{count}})",
+    "showCount_many": "Zobraziť členov ({{count}})",
+    "showCount_other": "Zobraziť členov ({{count}})",
+    "talkingOne": "{{name}} hovorí",
+    "talkingTwo": "{{first}} a {{second}} hovoria",
+    "talkingMore_one": "{{name}} a {{count}} ďalší hovoria",
+    "talkingMore_few": "{{name}} a {{count}} ďalší hovoria",
+    "talkingMore_many": "{{name}} a {{count}} ďalších hovorí",
+    "talkingMore_other": "{{name}} a {{count}} ďalších hovorí",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

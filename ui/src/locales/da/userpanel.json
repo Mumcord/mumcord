@@ -96,7 +96,11 @@
     "loadImagesHint": "Hent originale billeder fra andre",
     "dnd": "Forstyr ikke",
     "dndHint": "Slår lyde og bannere for notifikationer fra",
-    "dndSystemHint": "Slået til via skrivebordets Forstyr ikke"
+    "dndSystemHint": "Slået til via skrivebordets Forstyr ikke",
+    "privateMessages": "Private beskeder fra",
+    "pm_everyone": "Alle",
+    "pm_friendsOnly": "Venner",
+    "pm_nobody": "Ingen"
   },
   "voice": {
     "line": "Tale: {{channel}} · {{server}}",

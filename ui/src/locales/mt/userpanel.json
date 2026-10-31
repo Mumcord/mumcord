@@ -96,7 +96,11 @@
     "loadImagesHint": "Ġib l-istampi oriġinali mingħand l-oħrajn",
     "dnd": "Tiddisturbax",
     "dndHint": "Isikket il-ħsejjes u l-banners tan-notifiki",
-    "dndSystemHint": "Mixgħul permezz ta' Tiddisturbax tad-desktop tiegħek"
+    "dndSystemHint": "Mixgħul permezz ta' Tiddisturbax tad-desktop tiegħek",
+    "privateMessages": "Messaġġi privati minn",
+    "pm_everyone": "Kulħadd",
+    "pm_friendsOnly": "Ħbieb",
+    "pm_nobody": "Ħadd"
   },
   "voice": {
     "line": "Vuċi: {{channel}} · {{server}}",

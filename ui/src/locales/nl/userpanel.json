@@ -96,7 +96,11 @@
     "loadImagesHint": "Originele afbeeldingen van anderen ophalen",
     "dnd": "Niet storen",
     "dndHint": "Dempt meldingsgeluiden en -banners",
-    "dndSystemHint": "Aan via Niet storen van je bureaublad"
+    "dndSystemHint": "Aan via Niet storen van je bureaublad",
+    "privateMessages": "Privéberichten van",
+    "pm_everyone": "Iedereen",
+    "pm_friendsOnly": "Vrienden",
+    "pm_nobody": "Niemand"
   },
   "voice": {
     "line": "Spraak: {{channel}} · {{server}}",

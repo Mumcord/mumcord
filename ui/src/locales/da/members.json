@@ -58,7 +58,9 @@
     "join": "Gå til {{channel}}",
     "joinDenied": "Du har ikke adgang til denne kanal.",
     "mute": "Slå lyden fra for mig",
-    "connectionInfo": "Forbindelsesinfo…"
+    "connectionInfo": "Forbindelsesinfo…",
+    "chatRequest": "Send chatanmodning…",
+    "chatRequestPending": "Chatanmodning afventer"
   },
   "nowPlaying": {
     "label": "Spiller nu",
@@ -83,5 +85,24 @@
   "preview": {
     "privateMessage": "Privat besked",
     "fullProfile": "Hele profilen"
+  },
+  "chatRequest": {
+    "title": "Chatanmodning til {{name}}",
+    "note": "Note (valgfri)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} af {{max}} tegn brugt",
+    "send": "Send",
+    "failed": "Chatanmodningen kunne ikke sendes. Prøv igen."
+  },
+  "toggle": {
+    "show": "Vis medlemmer",
+    "hide": "Skjul medlemmer",
+    "showCount_one": "Vis medlemmer ({{count}})",
+    "showCount_other": "Vis medlemmer ({{count}})",
+    "talkingOne": "{{name}} taler",
+    "talkingTwo": "{{first}} og {{second}} taler",
+    "talkingMore_one": "{{name}} og {{count}} anden taler",
+    "talkingMore_other": "{{name}} og {{count}} andre taler",
+    "shortcut": "Ctrl+Skift+M"
   }
 }

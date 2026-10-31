@@ -273,5 +273,28 @@
     "unreachable": "A kiszolgáló nem érhető el",
     "warning_one": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat",
     "warning_other": "{{count}} link az üzenetben megjeleníti a hitelesítési adatokat"
+  },
+  "requests": {
+    "entry": "Üzenetkérések",
+    "entryCount_one": "{{count}} kérés",
+    "entryCount_other": "{{count}} kérés",
+    "title": "Üzenetkérések",
+    "listLabel": "Kérések",
+    "chatRequestTag": "Csevegési kérés",
+    "messageRequestTag": "Üzenetkérés",
+    "wantsToChat": "{{name}} csevegni szeretne veled",
+    "metaMumcord": "Mumcord-felhasználó · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "{{name}} megjegyzése",
+    "explain": "A privát üzeneteket „Csak barátok” értékre állítottad. Ha elfogadod, {{name}} írhat neked. Az elutasítás néma: {{name}} csak annyit lát, hogy „függőben”. A kérések törlődnek, amikor kilépsz a Mumcordból.",
+    "sentMessages_one": "{{name}} küldött neked {{count}} üzenetet",
+    "sentMessages_other": "{{name}} küldött neked {{count}} üzenetet",
+    "messagesLabel": "{{name}} üzenetei",
+    "accept": "Elfogadás",
+    "decline": "Elutasítás",
+    "addFriend": "Barát hozzáadása",
+    "replyBlocked": "Fogadd el a kérést, hogy válaszolhass neki: {{name}}.",
+    "empty": "Nincsenek üzenetkérések.",
+    "failed": "Ez nem sikerült. Próbáld újra."
   }
 }

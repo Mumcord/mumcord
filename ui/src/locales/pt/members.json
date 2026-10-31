@@ -59,7 +59,9 @@
     "join": "Entrar em {{channel}}",
     "joinDenied": "Não tens permissão para entrar neste canal.",
     "mute": "Silenciar para mim",
-    "connectionInfo": "Informações da ligação…"
+    "connectionInfo": "Informações da ligação…",
+    "chatRequest": "Enviar pedido de chat…",
+    "chatRequestPending": "Pedido de chat pendente"
   },
   "nowPlaying": {
     "label": "A reproduzir",
@@ -85,5 +87,26 @@
   "preview": {
     "privateMessage": "Mensagem privada",
     "fullProfile": "Perfil completo"
+  },
+  "chatRequest": {
+    "title": "Pedido de chat para {{name}}",
+    "note": "Nota (opcional)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} de {{max}} carateres usados",
+    "send": "Enviar",
+    "failed": "Não foi possível enviar o pedido de chat. Tenta novamente."
+  },
+  "toggle": {
+    "show": "Mostrar membros",
+    "hide": "Ocultar membros",
+    "showCount_one": "Mostrar membros ({{count}})",
+    "showCount_many": "Mostrar membros ({{count}})",
+    "showCount_other": "Mostrar membros ({{count}})",
+    "talkingOne": "{{name}} está a falar",
+    "talkingTwo": "{{first}} e {{second}} estão a falar",
+    "talkingMore_one": "{{name}} e mais {{count}} pessoa estão a falar",
+    "talkingMore_many": "{{name}} e mais {{count}} estão a falar",
+    "talkingMore_other": "{{name}} e mais {{count}} estão a falar",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

@@ -96,7 +96,11 @@
     "loadImagesHint": "Fetch original images from others",
     "dnd": "Do Not Disturb",
     "dndHint": "Silences notification sounds and banners",
-    "dndSystemHint": "On through your desktop's Do Not Disturb"
+    "dndSystemHint": "On through your desktop's Do Not Disturb",
+    "privateMessages": "Private messages from",
+    "pm_everyone": "Everyone",
+    "pm_friendsOnly": "Friends",
+    "pm_nobody": "Nobody"
   },
   "voice": {
     "line": "Voice: {{channel}} · {{server}}",

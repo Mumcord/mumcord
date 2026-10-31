@@ -1,0 +1,59 @@
+/* Members button in the chat header (issue #165): the same pill as Follow and Clear history. */
+.members-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 2.75rem;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.members-toggle svg {
+  flex: none;
+}
+
+.members-toggle:hover {
+  border-color: var(--color-text-secondary);
+  background: var(--color-bg-hover);
+}
+
+/* Highlighted while the column is open. */
+.members-toggle[aria-expanded="true"] {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color: var(--color-text);
+}
+
+.members-toggle__count {
+  color: var(--color-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Someone in the channel is talking. */
+.members-toggle__talking {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.2rem;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--color-talking);
+  box-shadow: var(--glow-talking);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .members-toggle {
+    transition: none;
+  }
+}

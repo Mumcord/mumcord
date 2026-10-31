@@ -96,7 +96,11 @@
     "loadImagesHint": "Stahovat originální obrázky od ostatních",
     "dnd": "Nerušit",
     "dndHint": "Ztlumí zvuky a bannery oznámení",
-    "dndSystemHint": "Zapnuto přes režim Nerušit vašeho prostředí"
+    "dndSystemHint": "Zapnuto přes režim Nerušit vašeho prostředí",
+    "privateMessages": "Soukromé zprávy od",
+    "pm_everyone": "Všichni",
+    "pm_friendsOnly": "Přátelé",
+    "pm_nobody": "Nikdo"
   },
   "voice": {
     "line": "Hlas: {{channel}} · {{server}}",

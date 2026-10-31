@@ -96,7 +96,11 @@
     "loadImagesHint": "Pridobi izvirne slike od drugih",
     "dnd": "Ne moti",
     "dndHint": "Utiša zvoke in pasice obvestil",
-    "dndSystemHint": "Vklopljeno prek načina Ne moti vašega namizja"
+    "dndSystemHint": "Vklopljeno prek načina Ne moti vašega namizja",
+    "privateMessages": "Zasebna sporočila od",
+    "pm_everyone": "Vsi",
+    "pm_friendsOnly": "Prijatelji",
+    "pm_nobody": "Nihče"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",

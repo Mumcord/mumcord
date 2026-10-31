@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::db::Store;
 use crate::error::Result;
+use crate::servers::ServerId;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -51,6 +52,52 @@ pub enum CloseBehaviour {
     Ask,
     MinimizeToTray,
     Quit,
+}
+
+/// Who may send the user private messages (issue #141). The filter is local: the server still
+/// delivers every message.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PmRule {
+    #[default]
+    Everyone,
+    FriendsOnly,
+    Nobody,
+}
+
+/// "Private messages from" with its per-server override and exceptions (issue #141).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct PrivateMessageSettings {
+    /// The rule of every server without an override.
+    pub rule: PmRule,
+    /// Servers with their own rule; a missing server uses `rule`.
+    pub server_rules: BTreeMap<ServerId, PmRule>,
+    /// People in the own current channel may always send private messages.
+    pub allow_current_channel: bool,
+    /// People with an accepted conversation may keep sending private messages ("Friends only").
+    pub allow_accepted: bool,
+    /// Filtered messages from standard clients are kept as message requests; off drops them.
+    pub keep_requests: bool,
+}
+
+impl Default for PrivateMessageSettings {
+    fn default() -> Self {
+        Self {
+            rule: PmRule::Everyone,
+            server_rules: BTreeMap::new(),
+            allow_current_channel: true,
+            allow_accepted: true,
+            keep_requests: true,
+        }
+    }
+}
+
+impl PrivateMessageSettings {
+    /// The rule that applies on `server`.
+    pub fn rule_for(&self, server: ServerId) -> PmRule {
+        self.server_rules.get(&server).copied().unwrap_or(self.rule)
+    }
 }
 
 /// How chat messages are laid out (FR-1.48a, QA.25).
@@ -454,6 +501,8 @@ pub struct Settings {
     /// The user had Epic 1's window overlay enabled before it was removed (FR-2.33). Derived once
     /// from the old record on first load, then persisted.
     pub legacy_window_overlay_enabled: bool,
+    /// "Private messages from" (issue #141).
+    pub private_messages: PrivateMessageSettings,
 }
 
 /// Default own bitrate cap in kbit/s: today's speech cap (FR-2.64).
@@ -524,6 +573,7 @@ impl Default for Settings {
             whats_new_auto: true,
             whats_new_seen: None,
             legacy_window_overlay_enabled: false,
+            private_messages: PrivateMessageSettings::default(),
         }
     }
 }
@@ -703,6 +753,23 @@ mod tests {
         };
         store.save_own_voice(both).expect("overwrite");
         assert_eq!(store.own_voice().expect("reload"), both);
+    }
+
+    #[test]
+    fn private_message_rule_with_server_override_round_trips() {
+        let (_dir, store) = temp_store();
+        let mut changed = store.settings().expect("defaults");
+        assert_eq!(changed.private_messages.rule, PmRule::Everyone);
+        assert!(changed.private_messages.allow_current_channel);
+        changed.private_messages.rule = PmRule::FriendsOnly;
+        changed
+            .private_messages
+            .server_rules
+            .insert(7, PmRule::Nobody);
+        store.save_settings(&changed).expect("save");
+        let loaded = store.settings().expect("load").private_messages;
+        assert_eq!(loaded.rule_for(7), PmRule::Nobody);
+        assert_eq!(loaded.rule_for(8), PmRule::FriendsOnly);
     }
 
     #[test]

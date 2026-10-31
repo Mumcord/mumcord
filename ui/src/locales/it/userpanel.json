@@ -96,7 +96,11 @@
     "loadImagesHint": "Scarica le immagini originali degli altri",
     "dnd": "Non disturbare",
     "dndHint": "Silenzia suoni e banner delle notifiche",
-    "dndSystemHint": "Attivo tramite il Non disturbare del desktop"
+    "dndSystemHint": "Attivo tramite il Non disturbare del desktop",
+    "privateMessages": "Messaggi privati da",
+    "pm_everyone": "Tutti",
+    "pm_friendsOnly": "Amici",
+    "pm_nobody": "Nessuno"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",

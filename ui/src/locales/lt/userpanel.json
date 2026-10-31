@@ -96,7 +96,11 @@
     "loadImagesHint": "Gauti originalius paveikslėlius iš kitų",
     "dnd": "Netrukdyti",
     "dndHint": "Nutildo pranešimų garsus ir reklamjuostes",
-    "dndSystemHint": "Įjungta per darbalaukio režimą „Netrukdyti“"
+    "dndSystemHint": "Įjungta per darbalaukio režimą „Netrukdyti“",
+    "privateMessages": "Privačios žinutės iš",
+    "pm_everyone": "Visų",
+    "pm_friendsOnly": "Draugų",
+    "pm_nobody": "Niekieno"
   },
   "voice": {
     "line": "Balsas: {{channel}} · {{server}}",

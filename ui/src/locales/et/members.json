@@ -58,7 +58,9 @@
     "join": "Liitu kanaliga {{channel}}",
     "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
     "mute": "Vaigista minu jaoks",
-    "connectionInfo": "Ühenduse teave…"
+    "connectionInfo": "Ühenduse teave…",
+    "chatRequest": "Saada vestlustaotlus…",
+    "chatRequestPending": "Vestlustaotlus ootel"
   },
   "nowPlaying": {
     "label": "Praegu mängib",
@@ -83,5 +85,24 @@
   "preview": {
     "privateMessage": "Privaatsõnum",
     "fullProfile": "Täielik profiil"
+  },
+  "chatRequest": {
+    "title": "Vestlustaotlus kasutajale {{name}}",
+    "note": "Märge (valikuline)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Kasutatud {{count}} / {{max}} tähemärki",
+    "send": "Saada",
+    "failed": "Vestlustaotlust ei õnnestunud saata. Proovi palun uuesti."
+  },
+  "toggle": {
+    "show": "Näita liikmeid",
+    "hide": "Peida liikmed",
+    "showCount_one": "Näita liikmeid ({{count}})",
+    "showCount_other": "Näita liikmeid ({{count}})",
+    "talkingOne": "{{name}} räägib",
+    "talkingTwo": "{{first}} ja {{second}} räägivad",
+    "talkingMore_one": "{{name}} ja veel {{count}} räägivad",
+    "talkingMore_other": "{{name}} ja veel {{count}} räägivad",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

@@ -22,9 +22,16 @@ export interface ChannelsPanelProps {
   channelAction?: ((channel: ChannelAction) => ReactNode) | undefined;
   /** Row above the tree, e.g. the server name with its menu (QA.13); "Jump to my channel" follows it. */
   header?: ReactNode;
+  /** Entry between the search and the tree, e.g. "Message requests" (issue #141). */
+  aboveTree?: ReactNode;
 }
 
-export function ChannelsPanel({ channelBadge, channelAction, header }: ChannelsPanelProps) {
+export function ChannelsPanel({
+  channelBadge,
+  channelAction,
+  header,
+  aboveTree,
+}: ChannelsPanelProps) {
   const { t } = useTranslation("channels");
   const readOnly = useReadOnly();
   const state = useServerState();
@@ -121,6 +128,7 @@ export function ChannelsPanel({ channelBadge, channelAction, header }: ChannelsP
           requestAnimationFrame(() => treeRef.current?.openFirstMatch());
         }}
       />
+      {aboveTree}
       <section className="server-overview" aria-labelledby="server-overview-title">
         <h2 id="server-overview-title">{t("serverOverview")}</h2>
       </section>

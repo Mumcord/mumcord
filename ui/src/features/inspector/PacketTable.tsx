@@ -2,7 +2,7 @@
  * The packet list: one row per packet, each expandable to its decoded content. Everything
  * shown besides times, sizes and the pacer comes from other clients and is rendered as text.
  */
-import { memo, useState } from "react";
+import { memo, useState, type UIEvent } from "react";
 import { getApi } from "../../api";
 import { useTranslation } from "react-i18next";
 import { JsonView } from "./JsonView";
@@ -21,9 +21,14 @@ import {
 interface TableProps {
   packets: readonly Packet[];
   names: Names;
+  /** The scrolling container, for follow mode. */
+  attachScroller?: (element: HTMLDivElement | null) => void;
+  onScroll?: (event: UIEvent<HTMLDivElement>) => void;
+  /** A row was expanded; the list should stay where it is. */
+  onExpand?: () => void;
 }
 
-export function PacketTable({ packets, names }: TableProps) {
+export function PacketTable({ packets, names, attachScroller, onScroll, onExpand }: TableProps) {
   const { t } = useTranslation("settings");
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set());
   const toggle = (id: number) => {
@@ -32,9 +37,10 @@ export function PacketTable({ packets, names }: TableProps) {
       if (!next.delete(id)) next.add(id);
       return next;
     });
+    if (!expanded.has(id)) onExpand?.();
   };
   return (
-    <div className="pi-table-wrap">
+    <div className="pi-table-wrap" ref={attachScroller} onScroll={onScroll}>
       <table className="pi-table">
         <caption className="visually-hidden">{t("inspector.tableCaption")}</caption>
         <thead>

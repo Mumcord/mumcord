@@ -283,5 +283,32 @@
     "warning_many": "{{count}} nurodų šiame pranešime rodo prisijungimo duomenis",
     "warning_one": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis",
     "warning_other": "{{count}} nuoroda šiame pranešime rodo prisijungimo duomenis"
+  },
+  "requests": {
+    "entry": "Žinučių prašymai",
+    "entryCount_one": "{{count}} prašymas",
+    "entryCount_few": "{{count}} prašymai",
+    "entryCount_many": "{{count}} prašymo",
+    "entryCount_other": "{{count}} prašymų",
+    "title": "Žinučių prašymai",
+    "listLabel": "Prašymai",
+    "chatRequestTag": "Pokalbio prašymas",
+    "messageRequestTag": "Žinutės prašymas",
+    "wantsToChat": "{{name}} nori su tavimi kalbėtis",
+    "metaMumcord": "„Mumcord“ naudotojas · {{server}} · {{time}}",
+    "metaStandard": "{{server}} · {{time}}",
+    "noteFrom": "{{name}} pastaba",
+    "explain": "Privačias žinutes nustatei į „Tik draugai“. Jei priimsi, {{name}} galės tau rašyti. Atmetimas tylus: {{name}} mato tik „laukiama“. Prašymai išvalomi, kai uždarai Mumcord.",
+    "sentMessages_one": "{{name}} atsiuntė tau {{count}} žinutę",
+    "sentMessages_few": "{{name}} atsiuntė tau {{count}} žinutes",
+    "sentMessages_many": "{{name}} atsiuntė tau {{count}} žinutės",
+    "sentMessages_other": "{{name}} atsiuntė tau {{count}} žinučių",
+    "messagesLabel": "{{name}} žinutės",
+    "accept": "Priimti",
+    "decline": "Atmesti",
+    "addFriend": "Pridėti draugą",
+    "replyBlocked": "Priimk prašymą, kad galėtum atsakyti naudotojui {{name}}.",
+    "empty": "Žinučių prašymų nėra.",
+    "failed": "Nepavyko. Bandyk dar kartą."
   }
 }

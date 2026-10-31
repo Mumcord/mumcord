@@ -96,7 +96,11 @@
     "loadImagesHint": "Hae alkuperäiset kuvat muilta",
     "dnd": "Älä häiritse",
     "dndHint": "Mykistää ilmoitusäänet ja -bannerit",
-    "dndSystemHint": "Päällä työpöydän Älä häiritse -tilan kautta"
+    "dndSystemHint": "Päällä työpöydän Älä häiritse -tilan kautta",
+    "privateMessages": "Yksityisviestit keneltä",
+    "pm_everyone": "Kaikilta",
+    "pm_friendsOnly": "Kaverit",
+    "pm_nobody": "Ei keneltäkään"
   },
   "voice": {
     "line": "Puhe: {{channel}} · {{server}}",
