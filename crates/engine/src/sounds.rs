@@ -1207,6 +1207,8 @@ mod tests {
             current_entry: 0,
             playlist: Vec::new(),
             skipped_by: None,
+            positions: Vec::new(),
+            host: 1,
         }))
     }
 
@@ -1220,6 +1222,8 @@ mod tests {
                     sound_available: false,
                     viewers: viewers.to_vec(),
                     blocked: None,
+                    kind: None,
+                    elapsed_ms: 0,
                 })
                 .collect(),
         )

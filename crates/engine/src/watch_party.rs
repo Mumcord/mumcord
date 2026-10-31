@@ -25,6 +25,8 @@
 //! end at once advance the party just once.
 //!
 //! Version 2 added the playlist: new messages (`pl`, `next`) and optional fields in `state`.
+//! Version 3 adds the position report (`pos`, issue #163): every player says where it is and
+//! whether it is buffering, so the party can show each person as in sync, buffering or behind.
 //! Version 1 clients drop messages they cannot read and ignore unknown fields.
 
 mod playlist;
@@ -48,7 +50,7 @@ pub const DATA_ID: &str = "mumcord.watch";
 /// Hello feature of clients that take part in watch parties.
 pub const FEATURE: &str = "watch-party";
 /// The message version this client sends; higher versions are still read.
-const VERSION: u32 = 2;
+const VERSION: u32 = 3;
 /// More people than this in one party are not tracked; it bounds the state message too.
 const MAX_PARTICIPANTS: usize = 32;
 /// When a newcomer gets the state a second time. The server silently drops plugin data over its
@@ -72,6 +74,18 @@ impl WatchCommand {
             | Self::Seek { position_ms } => position_ms,
         }
     }
+}
+
+/// Where one participant's player was when it last reported (issue #163).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ParticipantPosition {
+    pub session: u32,
+    pub position_ms: u32,
+    /// How old the report was when the view was made, in milliseconds.
+    pub age_ms: u32,
+    /// The player's own state, not the party's.
+    pub playing: bool,
+    pub buffering: bool,
 }
 
 /// Who did what last, for the "Anna paused" line.
@@ -100,6 +114,10 @@ pub struct WatchPartyView {
     pub playlist: Vec<PlaylistEntry>,
     /// Who skipped to the current video, until the next playback command.
     pub skipped_by: Option<u32>,
+    /// Where each participant last reported being, sorted by session.
+    pub positions: Vec<ParticipantPosition>,
+    /// Who started the party (the crown in the watching list, issue #163).
+    pub host: u32,
 }
 
 /// What travels over plugin data.
@@ -149,6 +167,12 @@ enum Msg {
         video: String,
         #[serde(default)]
         skip: bool,
+    },
+    /// Where the sender's player is (version 3, issue #163).
+    Pos {
+        pos: u32,
+        play: bool,
+        buf: bool,
     },
 }
 
@@ -206,6 +230,17 @@ pub(crate) struct Party {
     /// Newcomers this client already sent the state to, with when to send it once more;
     /// cleared when they leave the channel.
     announced: BTreeMap<u32, Option<Instant>>,
+    /// What each participant last said about its own player (issue #163).
+    reports: BTreeMap<u32, Report>,
+}
+
+/// What one player last said about itself.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct Report {
+    position_ms: u32,
+    at: Instant,
+    playing: bool,
+    buffering: bool,
 }
 
 impl Party {
@@ -225,6 +260,7 @@ impl Party {
             skipped_by: None,
             ended: false,
             announced: BTreeMap::new(),
+            reports: BTreeMap::new(),
         }
     }
 
@@ -247,6 +283,24 @@ impl Party {
         self.last_action = Some(WatchAction { session, command });
         self.skipped_by = None;
         self.ended = false;
+        // The command itself says where that player is.
+        self.record(session, command.position_ms(), self.playing, false);
+    }
+
+    /// Remembers where `session` said its player is.
+    fn record(&mut self, session: u32, position_ms: u32, playing: bool, buffering: bool) {
+        if self.reports.len() >= MAX_PARTICIPANTS && !self.reports.contains_key(&session) {
+            return;
+        }
+        self.reports.insert(
+            session,
+            Report {
+                position_ms,
+                at: Instant::now(),
+                playing,
+                buffering,
+            },
+        );
     }
 
     /// Goes on to entry `id`, playing from the start; `skipped_by` names who skipped.
@@ -347,7 +401,25 @@ impl Party {
             current_entry: self.current,
             playlist: self.playlist.view(),
             skipped_by: self.skipped_by,
+            positions: self.positions(),
+            host: self.starter,
         }
+    }
+
+    /// Each participant's last report, sorted by session, with its age when the view is made.
+    fn positions(&self) -> Vec<ParticipantPosition> {
+        let now = Instant::now();
+        self.reports
+            .iter()
+            .map(|(session, report)| ParticipantPosition {
+                session: *session,
+                position_ms: report.position_ms,
+                age_ms: u32::try_from(now.saturating_duration_since(report.at).as_millis())
+                    .unwrap_or(u32::MAX),
+                playing: report.playing,
+                buffering: report.buffering,
+            })
+            .collect()
     }
 
     fn state_msg(&self) -> Msg {
@@ -534,6 +606,13 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
             }
             _ => false,
         },
+        Msg::Pos { pos, play, buf } => match servers.get_mut(&ctx.server_id) {
+            Some(party) if party.participants.contains(&sender) => {
+                party.record(sender, pos, play, buf);
+                true
+            }
+            _ => false,
+        },
         Msg::Pl { ops } => match servers.get_mut(&ctx.server_id) {
             Some(party) if party.participants.contains(&sender) => {
                 party
@@ -580,6 +659,7 @@ fn remove_participant(
     if !party.participants.remove(&session) {
         return false;
     }
+    party.reports.remove(&session);
     if party.participants.is_empty() {
         servers.remove(&server_id);
     }
@@ -787,6 +867,41 @@ impl Engine {
         };
         let receivers = capable(self.mumcord_state(), server_id, &here.others);
         send(&ctx.handle, &receivers, Msg::Cmd { cmd: command });
+        ctx.events.emit(EngineEvent::WatchPartyChanged(Some(view)));
+        Ok(())
+    }
+
+    /// Where this client's player is (issue #163): remembered for the sync list and told to the
+    /// other participants. The UI sends it when its player begins buffering and otherwise at most
+    /// every ten seconds, so the party stays under the server's plugin data rate limit.
+    pub fn watch_party_report(
+        &self,
+        server_id: ServerId,
+        position_ms: u32,
+        playing: bool,
+        buffering: bool,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
+        let view = {
+            let mut servers = lock(self.watch_party_state());
+            let party = servers
+                .get_mut(&server_id)
+                .filter(|p| p.joined)
+                .ok_or_else(no_party)?;
+            party.record(here.own, position_ms, playing, buffering);
+            party.view()
+        };
+        let receivers = capable(self.mumcord_state(), server_id, &here.others);
+        send(
+            &ctx.handle,
+            &receivers,
+            Msg::Pos {
+                pos: position_ms,
+                play: playing,
+                buf: buffering,
+            },
+        );
         ctx.events.emit(EngineEvent::WatchPartyChanged(Some(view)));
         Ok(())
     }
@@ -1025,6 +1140,11 @@ mod tests {
                 video: "dQw4w9WgXcQ".into(),
                 skip: true,
             },
+            Msg::Pos {
+                pos: u32::MAX,
+                play: true,
+                buf: true,
+            },
             Msg::Pl {
                 ops: vec![
                     Op::Rm { id: u32::MAX },
@@ -1050,7 +1170,7 @@ mod tests {
         });
         assert_eq!(
             std::str::from_utf8(&data).expect("utf-8"),
-            r#"{"v":2,"t":"cmd","cmd":{"kind":"pause","position_ms":1500}}"#
+            r#"{"v":3,"t":"cmd","cmd":{"kind":"pause","position_ms":1500}}"#
         );
         let data = encode(Msg::Pl {
             ops: vec![Op::Add {
@@ -1063,7 +1183,45 @@ mod tests {
         });
         assert_eq!(
             std::str::from_utf8(&data).expect("utf-8"),
-            r#"{"v":2,"t":"pl","ops":[{"o":"add","id":7,"v":"dQw4w9WgXcQ","k":1.5,"c":3}]}"#
+            r#"{"v":3,"t":"pl","ops":[{"o":"add","id":7,"v":"dQw4w9WgXcQ","k":1.5,"c":3}]}"#
+        );
+    }
+
+    #[test]
+    fn reports_keep_the_sync_state_of_every_player() {
+        let mut party = Party::new(1, "dQw4w9WgXcQ".into(), 5);
+        party.record(5, 4000, true, false);
+        party.record(7, 1200, true, true);
+        let view = party.view();
+        assert_eq!(
+            view.positions,
+            [
+                ParticipantPosition {
+                    session: 5,
+                    position_ms: 4000,
+                    age_ms: 0,
+                    playing: true,
+                    buffering: false,
+                },
+                ParticipantPosition {
+                    session: 7,
+                    position_ms: 1200,
+                    age_ms: 0,
+                    playing: true,
+                    buffering: true,
+                },
+            ],
+            "sorted by session, so every client lists them the same way"
+        );
+        // A command is a report too, and a player that left is gone from the list.
+        party.apply(7, WatchCommand::Pause { position_ms: 1300 });
+        assert_eq!(party.view().positions.len(), 2);
+        assert_eq!(party.view().positions[1].buffering, false);
+        party.add(9);
+        assert_eq!(
+            party.view().positions.len(),
+            2,
+            "only players that reported show up"
         );
     }
 
