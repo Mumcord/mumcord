@@ -1,0 +1,185 @@
+/* Import from the official Mumble client (issue #66, mockups 66-import-wizard / -summary). */
+
+.mumble-import {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mumble-import__list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-chat);
+  list-style: none;
+}
+
+.mumble-import__row {
+  padding: var(--space-3) var(--space-4);
+}
+
+.mumble-import__row + .mumble-import__row {
+  border-top: 1px solid var(--color-border);
+}
+
+/* In a narrow window the badge moves below the text instead of squeezing it. */
+.mumble-import__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.mumble-import__check {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.mumble-import__text {
+  display: flex;
+  flex: 1 1 16rem;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mumble-import__title {
+  font-weight: 600;
+}
+
+.mumble-import__detail {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.mumble-import__pill,
+.mumble-import__pill-button {
+  flex: none;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.mumble-import__pill--warning {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.mumble-import__aside {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.mumble-import__status {
+  flex: none;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.mumble-import__mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  /* Like the checked checkboxes of the preview, in both themes. */
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.mumble-import__mark--failed {
+  background: var(--color-danger);
+}
+
+.mumble-import__favourites {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0 0 0 calc(1.25rem + var(--space-3));
+  list-style: none;
+}
+
+.mumble-import__favourites li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mumble-import__password {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-3) 0 0 calc(1.25rem + var(--space-3));
+  max-width: 22rem;
+}
+
+.mumble-import__password input {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+}
+
+.mumble-import__error {
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.mumble-import__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.mumble-import__submit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.mumble-import__count {
+  color: var(--color-text-secondary);
+}
+
+.mumble-import__eyebrow {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mumble-import__heading:focus {
+  outline: none;
+}
+
+.mumble-import__heading:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* The wizard step and the Settings dialog are wider than their defaults: the rows carry a
+   title, a detail line and a badge side by side. */
+.wizard-step.wizard-step--wide {
+  width: min(46rem, 100%);
+}
+
+.settings-dialog.mumble-import-dialog {
+  width: min(46rem, calc(100vw - 2 * var(--space-4)));
+}

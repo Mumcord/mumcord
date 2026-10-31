@@ -1,0 +1,94 @@
+{
+  "title": "Hozd magaddal a Mumble-beállításaidat",
+  "intro": "Megtaláltuk a hivatalos Mumble klienst ezen a számítógépen. Válaszd ki, mit másoljunk át. A Mumble-ben semmi sem változik, és semmi sem hagyja el a számítógépedet.",
+  "optional": "{{progress}} · nem kötelező",
+  "listLabel": "Mit másoljunk a Mumble-ből",
+  "favourites": {
+    "title": "Kedvenc szerverek",
+    "found_one": "{{count}} találat",
+    "found_other": "{{count}} találat",
+    "duplicates_one": "{{count}} már a Mumcordban van (kihagyva)",
+    "duplicates_other": "{{count}} már a Mumcordban van (kihagyva)",
+    "failed": "A Mumble szerverlistáját nem sikerült beolvasni.",
+    "review": "Lista megtekintése",
+    "hide": "Lista elrejtése",
+    "listLabel": "Átmásolandó szerverek",
+    "duplicate": "Már a Mumcordban van"
+  },
+  "passwords": {
+    "title": "Mentett jelszavak",
+    "count_one": "{{count}} kedvenchez van mentett jelszó",
+    "count_other": "{{count}} kedvenchez van mentett jelszó",
+    "keychain": "A rendszer kulcstartójában tárolva"
+  },
+  "identity": {
+    "title": "Azonosító (kliens tanúsítvány)",
+    "keeps": "Megőrzi a regisztrált neved és a jogosultságaidat",
+    "locked": "jelszóval védett a Mumble-ben",
+    "named": "Tanúsítvány – „{{name}}”",
+    "validUntil": "érvényes eddig: {{date}}",
+    "passwordNeeded": "Jelszó szükséges",
+    "already": "Már a Mumcordban van",
+    "password": "A tanúsítvány jelszava a Mumble-ből",
+    "passwordRequired": "Add meg a tanúsítvány jelszavát.",
+    "wrongPassword": "Ez a jelszó nem nyitja meg a tanúsítványt. Próbáld újra."
+  },
+  "devices": {
+    "title": "Hangeszközök",
+    "input": "Mikrofon: {{name}}",
+    "output": "Kimenet: {{name}}",
+    "missing": "A Mumble eszközei nincsenek csatlakoztatva ehhez a számítógéphez."
+  },
+  "ptt": {
+    "title": "Push-to-talk billentyű",
+    "modifierOnly": "A Mumble billentyűje csak módosító billentyű, amelyet a Mumcord nem tud használni. Később választhatsz másik billentyűt.",
+    "tooManyKeys": "A Mumble gyorsbillentyűje több billentyűből áll, amit a Mumcord nem tud használni. Később választhatsz billentyűt.",
+    "unknown": "A Mumble gyorsbillentyűje olyan billentyűt vagy eszközt használ, amelyet a Mumcord nem ismer. Később választhatsz billentyűt."
+  },
+  "volume": {
+    "title": "Hangerő és hangbeállítások",
+    "hint": "A Mumble és a Mumcord eltérő skálát használ, ezért az értékek nem egyeznének",
+    "notRecommended": "Nem ajánlott"
+  },
+  "selected_one": "{{count}} elem kiválasztva",
+  "selected_other": "{{count}} elem kiválasztva",
+  "import": "Importálás",
+  "importing": "Importálás…",
+  "skip": "Kihagyás egyelőre",
+  "cancel": "Mégse",
+  "failed": "Az importálást nem sikerült befejezni. Próbáld újra.",
+  "secureStorage": "A Mumcord nem éri el a rendszered biztonságos tárolóját. Oldd fel a kulcstartódat vagy jelszókezelődet, és próbáld újra.",
+  "settingsFailed": "A szervereid átmásolódtak, de a beállításokat nem sikerült menteni.",
+  "summary": {
+    "title": "Az importálás kész",
+    "intro": "A Mumble-adataid átmásolódtak. Nézd meg, mi történt.",
+    "added_one": "{{count}} szerver hozzáadva a kedvencekhez",
+    "added_other": "{{count}} szerver hozzáadva a kedvencekhez",
+    "skipped_one": "{{count}} szerver kihagyva",
+    "skipped_other": "{{count}} szerver kihagyva",
+    "skippedDetail_one": "{{names}} már szerepel a listádon",
+    "skippedDetail_other": "{{names}} már szerepel a listádon",
+    "duplicate": "Duplikátum",
+    "passwords_one": "{{count}} jelszó mentve",
+    "passwords_other": "{{count}} jelszó mentve",
+    "passwordsDetail": "A rendszer kulcstartójában tárolva, nem fájlban",
+    "identity": "Azonosító importálva",
+    "identityDefault": "A Mumcord mostantól ezt használja",
+    "identityServers": "Az átmásolt szerverekhez használatos",
+    "identitySkipped": "Az azonosító már a Mumcordban van",
+    "identitySkippedDetail": "Ez a tanúsítvány már az egyik azonosítód",
+    "devicesAndPtt": "Hangeszközök és push-to-talk billentyű",
+    "done": "Kész",
+    "undo": "Importálás visszavonása",
+    "undone": "Az importálás vissza lett vonva.",
+    "undoFailed": "Az importálást nem sikerült teljesen visszavonni. Ellenőrizd a szervereidet és az azonosítóidat."
+  },
+  "settings": {
+    "title": "Importálás a Mumble-ből",
+    "hint": "Másold át a kedvenc szervereket, a mentett jelszavakat, a tanúsítványodat és a hangbeállításokat a hivatalos Mumble kliensből.",
+    "button": "Importálás a Mumble-ből…",
+    "searching": "Mumble keresése…",
+    "notFound": "A hivatalos Mumble kliens nem található ezen a számítógépen.",
+    "breadcrumb": "Beállítások · Szerverek · Importálás a Mumble-ből"
+  }
+}

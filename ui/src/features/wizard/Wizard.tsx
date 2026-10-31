@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import {
   getApi,
   type Identity,
+  type MumbleImportFound,
   type PttAvailability,
   type PttMouseStatus,
   type Settings,
@@ -11,6 +12,7 @@ import {
 import { usePreferences } from "../../app/preferences";
 import { useView } from "../../app/view";
 import { IdentityStep } from "./IdentityStep";
+import { ImportStep } from "./ImportStep";
 import { MicStep } from "./MicStep";
 import { PrivacyStep } from "./PrivacyStep";
 import { UpdatesStep } from "./UpdatesStep";
@@ -19,7 +21,7 @@ import { WizardSteps } from "./WizardSteps";
 import { WizardCancelDialog } from "./WizardCancelDialog";
 import "./wizard.css";
 
-/** First start: identity → microphone → privacy → update hint → talk mode and start options. */
+/** First start: [import from Mumble →] identity → microphone → privacy → update hint → talk mode and start options. */
 const FIRST_START_STEPS = 5;
 /** Rerun from Settings (#149): the same steps, without the identity step. */
 const RERUN_STEPS = 4;
@@ -33,6 +35,8 @@ interface Loaded {
   ingameOverlaySupported: boolean;
   ingameOverlayOn: boolean;
   portable: boolean;
+  /** The official Mumble client's data, when it is installed (first start only, issue #66). */
+  mumble: MumbleImportFound | null;
 }
 
 type Load = { state: "loading" } | { state: "failed" } | ({ state: "ready" } & Loaded);
@@ -45,18 +49,29 @@ function optional<T>(promise: Promise<T>, what: string): Promise<T | null> {
   });
 }
 
-async function loadWizard(): Promise<Loaded> {
+async function loadWizard(rerun: boolean): Promise<Loaded> {
   const api = getApi();
-  const [settings, identity, availability, mouseStatus, linkHandlerActive, ingameOverlay, info] =
-    await Promise.all([
-      api.settingsGet(),
-      api.identityGet(),
-      optional(api.pttAvailability(), "ptt availability"),
-      optional(api.pttMouseStatus(), "ptt mouse status"),
-      optional(api.linkHandlerStatus(), "link handler status"),
-      optional(api.ingameOverlayState(), "in-game overlay state"),
-      optional(api.appInfo(), "app info"),
-    ]);
+  const [
+    settings,
+    identity,
+    availability,
+    mouseStatus,
+    linkHandlerActive,
+    ingameOverlay,
+    info,
+    mumble,
+  ] = await Promise.all([
+    api.settingsGet(),
+    api.identityGet(),
+    optional(api.pttAvailability(), "ptt availability"),
+    optional(api.pttMouseStatus(), "ptt mouse status"),
+    optional(api.linkHandlerStatus(), "link handler status"),
+    optional(api.ingameOverlayState(), "in-game overlay state"),
+    optional(api.appInfo(), "app info"),
+    rerun
+      ? Promise.resolve(null)
+      : optional(api.mumbleImportScan(), "looking for the official Mumble client"),
+  ]);
   return {
     settings,
     identity,
@@ -66,6 +81,7 @@ async function loadWizard(): Promise<Loaded> {
     ingameOverlaySupported: ingameOverlay?.supported ?? false,
     ingameOverlayOn: ingameOverlay?.mode === "on",
     portable: info?.portable ?? false,
+    mumble,
   };
 }
 
@@ -111,11 +127,16 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   const [cancelAsked, setCancelAsked] = useState(false);
   // Focus follows step changes only, not the initial render; the rerun starts with its heading.
   const [navigated, setNavigated] = useState(false);
+  // The identity before an import from Mumble, restored when the user undoes it (#66).
+  const firstIdentity = useRef<Identity | null>(null);
 
   const start = useCallback(() => {
-    loadWizard()
+    loadWizard(rerun)
       .then((loaded) => {
+        firstIdentity.current = loaded.identity;
         setLoad({ state: "ready", ...loaded });
+        // The optional import from Mumble (#66) comes before the identity step.
+        if (loaded.mumble !== null) setStep(0);
         setDraft(loaded.settings);
         setUpdateCheck(loaded.settings.updateCheck === "yes");
       })
@@ -123,7 +144,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
         console.error("loading the wizard failed", cause);
         setLoad({ state: "failed" });
       });
-  }, []);
+  }, [rerun]);
 
   useEffect(start, [start]);
 
@@ -160,11 +181,14 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
     ingameOverlayOn,
     portable,
     identity,
+    mumble,
   } = load;
   // Rerun steps show the draft; the first start shows what is saved (the microphone step saves
   // its devices at once, so the test runs on them).
   const settings = rerun ? (draft ?? saved) : saved;
-  const total = rerun ? RERUN_STEPS : FIRST_START_STEPS;
+  // The import step (#66) moves every later step's number up by one.
+  const shift = mumble === null ? 0 : 1;
+  const total = (rerun ? RERUN_STEPS : FIRST_START_STEPS) + shift;
   const focusOnMount = rerun || navigated;
 
   function goTo(next: number) {
@@ -282,7 +306,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   function micStep(number: number, back: (() => void) | undefined) {
     return (
       <MicStep
-        step={number}
+        step={number + shift}
         total={total}
         settings={settings}
         stagedDevices={rerun}
@@ -306,7 +330,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   function privacyStep(number: number) {
     return (
       <PrivacyStep
-        step={number}
+        step={number + shift}
         total={total}
         focusOnMount={focusOnMount}
         onBack={() => {
@@ -323,7 +347,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   function updatesStep(number: number) {
     return (
       <UpdatesStep
-        step={number}
+        step={number + shift}
         total={total}
         initial={updateCheck}
         focusOnMount={focusOnMount}
@@ -343,7 +367,7 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   function talkStep(number: number) {
     return (
       <TalkModeStep
-        step={number}
+        step={number + shift}
         total={total}
         settings={settings}
         availability={availability}
@@ -377,10 +401,30 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
       }
     }
     switch (step) {
+      case 0:
+        return mumble === null ? null : (
+          <ImportStep
+            step={1}
+            total={total}
+            found={mumble}
+            settings={settings}
+            saveSettings={saveSettings}
+            onIdentityChange={(imported) => {
+              setLoad((current) =>
+                current.state === "ready"
+                  ? { ...current, identity: imported ?? firstIdentity.current }
+                  : current,
+              );
+            }}
+            onNext={() => {
+              goTo(1);
+            }}
+          />
+        );
       case 1:
         return (
           <IdentityStep
-            step={1}
+            step={1 + shift}
             total={total}
             identity={identity}
             focusOnMount={navigated}

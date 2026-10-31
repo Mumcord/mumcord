@@ -9,6 +9,8 @@ import type {
   InspectorView,
   LinkOutcome,
   MessageNotice,
+  MumbleImportDone,
+  MumbleImportFound,
   MumbleLinkStats,
   NotifyOutcome,
   SystemDnd,
@@ -80,6 +82,11 @@ export interface MockOptions {
   maxListeners?: number;
   /** Delay before connection events fire; 0 emits them synchronously (handy in tests). */
   connectDelayMs?: number;
+  /**
+   * What the import from the official Mumble client finds (issue #66); `null` = not installed.
+   * Defaults to fictional data in the demo seeds and to `null` otherwise.
+   */
+  mumble?: MumbleImportFound | null;
 }
 
 /** Test and dev controls on top of the normal API. */
@@ -481,6 +488,43 @@ function seedChannels(): ChannelInfo[] {
     },
   ];
 }
+
+/** A fictional official Mumble client for screenshots (issue #66); "Book Club" is a duplicate. */
+export const DEMO_MUMBLE: MumbleImportFound = {
+  format: "json",
+  favourites: [
+    ["Nordic Gamers", "nordic.example.org", true],
+    ["Retro LAN", "retro.example.net", true],
+    ["Coffee Club", "coffee.example.com", false],
+    ["Pixel Harbor", "pixel.example.org", true],
+    ["Silent Orbit", "orbit.example.net", false],
+    ["Book Club", "books.example.com", false],
+  ].map(([label, host, hasPassword]) => ({
+    label: label as string,
+    host: host as string,
+    port: 64738,
+    username: "Zoe",
+    hasPassword: hasPassword as boolean,
+    duplicate: false,
+  })),
+  favouritesFailed: false,
+  certificate: {
+    name: "",
+    validUntil: null,
+    needsPassword: true,
+    alreadyImported: false,
+  },
+  inputDevice: { id: "pipewire:usb-headset", name: "USB Headset" },
+  outputDevice: { id: "pipewire:speakers", name: "Speakers" },
+  devicesMissing: false,
+  pttKey: "Ctrl+Space",
+  pttIssue: null,
+  talkMode: "pushToTalk",
+  outputVolumePercent: 80,
+};
+
+/** Password of the locked certificate in {@link DEMO_MUMBLE}. */
+export const DEMO_MUMBLE_CERT_PASSWORD = "mumble";
 
 /** Fictional demo data for screenshots (seed "demo"); example.org addresses only. */
 const DEMO_SERVERS: [string, string][] = [
@@ -1434,6 +1478,83 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return message;
   }
 
+  // Import from the official Mumble client (issue #66).
+  const mumble = options.mumble !== undefined ? options.mumble : demo ? DEMO_MUMBLE : null;
+  let lastMumbleImport: { servers: number[]; identity: number | null } | null = null;
+
+  function mumbleScan(): MumbleImportFound | null {
+    if (mumble === null) return null;
+    const known = new Set(servers.map((s) => `${s.address.toLowerCase()}:${String(s.port)}`));
+    return {
+      ...mumble,
+      favourites: mumble.favourites.map((f) => ({
+        ...f,
+        duplicate: known.has(`${f.host.toLowerCase()}:${String(f.port)}`),
+      })),
+    };
+  }
+
+  function mumbleApply(
+    request: Parameters<EngineCommands["mumbleImportApply"]>[0],
+  ): MumbleImportDone {
+    const found = mumbleScan();
+    if (found === null) fail("notFound", "Mumble data not found");
+    const cert = found.certificate;
+    if (request.certificate && cert?.needsPassword === true) {
+      if (request.certificatePassword !== DEMO_MUMBLE_CERT_PASSWORD)
+        fail("wrongPassword", "the certificate could not be opened");
+    }
+    const done: MumbleImportDone = {
+      added: [],
+      skipped: [],
+      passwordsSaved: 0,
+      identity: null,
+      identitySkipped: false,
+      identityValidUntil: null,
+    };
+    if (request.certificate && cert) {
+      if (cert.alreadyImported) done.identitySkipped = true;
+      else {
+        done.identity = addIdentity("Zoe", "Zoe", mockCertHash("mumble-import"));
+        done.identityValidUntil = "2029-03-14T00:00:00Z";
+      }
+    }
+    for (const f of found.favourites) {
+      if (!request.favourites.some((k) => k.host === f.host && k.port === f.port)) continue;
+      if (f.duplicate) {
+        done.skipped.push(f.label);
+        continue;
+      }
+      const hasPassword = request.passwords && f.hasPassword;
+      const server: SavedServer = {
+        id: nextServerId++,
+        label: f.label,
+        address: f.host,
+        port: f.port,
+        username: f.username,
+        hasPassword,
+        saveHistory: true,
+        ...NEW_SERVER_FLAGS,
+      };
+      if (hasPassword) done.passwordsSaved += 1;
+      servers = [...servers, server];
+      done.added.push({ ...server });
+    }
+    lastMumbleImport = {
+      servers: done.added.map((s) => s.id),
+      identity: done.identity?.id ?? null,
+    };
+    return done;
+  }
+
+  function mumbleUndo(): void {
+    const last = lastMumbleImport;
+    if (last === null) fail("notFound", "nothing to undo");
+    lastMumbleImport = null;
+    servers = servers.filter((s) => !last.servers.includes(s.id));
+    if (last.identity !== null) identities = identities.filter((i) => i.id !== last.identity);
+  }
+
   const commands: EngineCommands = {
     // identity
     identityGet: () => Promise.resolve(defaultIdentity()),
@@ -1474,6 +1595,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       requireIdentity(id);
       identities = identities.map((i) => ({ ...i, isDefault: i.id === id }));
       return Promise.resolve(orderedIdentities().map((i) => ({ ...i })));
+    },
+
+    mumbleImportScan: () => Promise.resolve(mumbleScan()),
+    mumbleImportApply: (request) => Promise.resolve(mumbleApply(request)),
+    mumbleImportUndo: () => {
+      mumbleUndo();
+      return Promise.resolve(null);
     },
 
     // servers
