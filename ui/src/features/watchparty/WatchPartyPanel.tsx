@@ -13,6 +13,10 @@ import { useEmbedsAllowed } from "../../app/preferences";
 import { useServerStateOf } from "../channels";
 import { EmbedsOffNotice } from "./EmbedsOffNotice";
 import { PlayPause } from "./PlayPause";
+import { MediaPanel } from "../media/MediaPanel";
+import { closeMedia, setTab, useMediaView } from "../media/mediaView";
+import { useTick } from "../media/useTick";
+import { WatchingList } from "./WatchingList";
 import { Playlist } from "./Playlist";
 import { playNext } from "./playlistActions";
 import { WatchPartyPlayer } from "./WatchPartyPlayer";
@@ -27,10 +31,24 @@ function reportError(message: string, error: unknown): void {
 /** The party of `serverId`, which need not be the shown server (the party follows the voice server). */
 export function WatchPartyPanel({ serverId, channelId }: { serverId: number; channelId: number }) {
   const { t } = useTranslation("watchparty");
+  const { t: tc } = useTranslation("common");
   const live = useWatchParty(serverId);
   const embeds = useEmbedsAllowed();
   const { users, selfSession } = useServerStateOf(serverId);
   const party = live?.party ?? null;
+  const view = useMediaView();
+  const nowMs = useTick(1000);
+  const leave = () => {
+    getApi()
+      .watchPartyLeave(serverId)
+      .then(() => {
+        closeMedia("watch");
+      })
+      .catch((error: unknown) => {
+        console.error(t("leaveFailed"), error);
+        announce(t("leaveFailed"), "assertive");
+      });
+  };
 
   const onCommand = useCallback(
     (command: WatchCommand) => {
@@ -68,6 +86,36 @@ export function WatchPartyPanel({ serverId, channelId }: { serverId: number; cha
     return (
       <section className="watch-party" aria-label={t("title")}>
         <EmbedsOffNotice />
+      </section>
+    );
+  }
+
+  // With the cinema view open the panel is the right column's tab panel (issue #163).
+  if (view.cinema === "watch" && party.joined) {
+    const people = party.participants.flatMap((session) => {
+      const user = users.get(session);
+      return user ? [user] : [];
+    });
+    return (
+      <section className="watch-party" aria-label={t("title")}>
+        <MediaPanel
+          label={t("title")}
+          tabs={[
+            { id: "playlist", label: tc("media.nowPlaying"), count: party.playlist.length },
+            { id: "watching", label: tc("media.watching"), count: people.length },
+          ]}
+          active={view.tab}
+          onSelect={(id) => {
+          if (id === "playlist" || id === "watching") setTab(id);
+        }}
+        >
+          <button type="button" className="button" onClick={leave}>
+            {t("leave")}
+          </button>
+          {view.tab === "watching"
+            ? <WatchingList serverId={serverId} live={live} users={users} selfSession={selfSession} nowMs={nowMs} />
+            : <Playlist serverId={serverId} party={party} users={users} paste />}
+        </MediaPanel>
       </section>
     );
   }

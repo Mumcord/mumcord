@@ -15,7 +15,8 @@ import { connectedMock, resetAll } from "../channels/testUtils";
 import { PartySync } from "./partySync";
 import { ducker, RELEASE_DELAY_MS } from "./ducking";
 import { VideoDucking } from "./VideoDucking";
-import { MediaWidgetsMount } from "../../app/mounts";
+
+import { WatchTogetherView } from "./WatchTogetherView";
 import { NOTICE_MS, WatchPartyPanel } from "./WatchPartyPanel";
 import { READY_TIMEOUT_MS } from "./WatchPartyPlayer";
 import { WatchTogetherButton } from "./WatchTogetherButton";
@@ -41,6 +42,10 @@ function party(patch: Partial<WatchParty> = {}): WatchParty {
     currentEntry: 0,
     playlist: [],
     skippedBy: null,
+
+    positions: [],
+
+    host: 0,
     ...patch,
   };
 }
@@ -505,7 +510,8 @@ describe("panel", () => {
     });
     render(
       <>
-        <MediaWidgetsMount />
+        <WatchPartyPanel serverId={1} channelId={channelId} />
+        <WatchTogetherView serverId={1} />
         <WatchTogetherButton
           playerUrl={`https://www.youtube-nocookie.com/embed/${VIDEO}`}
           title="Song"

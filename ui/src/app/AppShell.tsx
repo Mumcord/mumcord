@@ -48,7 +48,16 @@ const SHELL_IDS = {
  * header, which reaches the shell through `MembersColumnContext`. The channel and member columns
  * are resizable by their inner border (QA.29).
  */
-export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: boolean }) {
+export function AppShell({
+  slots,
+  inert = false,
+  focus = false,
+}: {
+  slots: ShellSlots;
+  inert?: boolean;
+  /** Focus mode of a media view: only the picture (issue #163, Z or Esc leaves it). */
+  focus?: boolean;
+}) {
   const { t } = useTranslation("app");
   const [collapsed, setCollapsed] = useState(loadMembersCollapsed);
   const [overlayOpen, setOverlayOpen] = useState(false);
@@ -163,6 +172,7 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
       data-members-collapsed={!narrow && collapsed}
       data-members-open={overlayShown}
       data-page-open={slots.page ? true : undefined}
+      data-focus={focus || undefined}
       inert={inert}
     >
       <MembersColumnContext value={column}>
