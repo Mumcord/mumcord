@@ -178,7 +178,27 @@ export interface MockControls {
   focusServer(serverId: number): void;
 }
 
-export type MockApi = MumcordApi & { readonly mock: MockControls };
+export type MockApi = MumcordApi & {
+  readonly mock: MockControls;
+  /**
+   * Fictional media data for the demo seeds (issue #163). The mock has no peer, so the media views
+   * show this placeholder picture instead of a stream; it lets the views be seen and screenshotted.
+   */
+  readonly mediaDemo: MockMediaDemo;
+};
+
+export interface MockMediaDemo {
+  readonly picture: string;
+  readonly share: ScreenShare | null;
+  readonly party: WatchParty | null;
+  readonly quality: {
+    width: number;
+    height: number;
+    fps: number;
+    kbps: number;
+    viewers: { session: number; fps: number; struggling: boolean }[];
+  } | null;
+}
 
 interface MockSession {
   state: ConnectionState;
@@ -883,6 +903,65 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
+
+  /**
+   * Fictional media data for the demo seeds (issue #163): a share from another person, a watch
+   * party and a placeholder picture. The mock has no peer, so it cannot deliver frames; the media
+   * views show this picture instead.
+   */
+  const mediaDemo: MockMediaDemo = demo
+    ? {
+        picture: DEMO_PHOTO,
+        share: {
+          session: 7,
+          paused: false,
+          sound: false,
+          soundAvailable: false,
+          kind: "window",
+          elapsedMs: 126000,
+          viewers: [1, 2, 5],
+          blocked: null,
+          relayReason: null,
+        },
+        party: {
+          channelId: 1,
+          videoId: "dQw4w9WgXcQ",
+          playing: true,
+          positionMs: 431000,
+          participants: [1, 2, 5, 7, 9],
+          lastAction: { session: 2, command: { kind: "seek", positionMs: 431000 } },
+          joined: true,
+          currentEntry: 0,
+          skippedBy: null,
+          host: 2,
+          playlist: [
+            { id: 1, videoId: "dQw4w9WgXcQ", addedBy: 2, addedByName: "Maya" },
+            { id: 2, videoId: "tk1a2b3c4d5", addedBy: 5, addedByName: "Jonas" },
+            { id: 3, videoId: "pr7c8d9e0f1", addedBy: 7, addedByName: "Priya" },
+          ],
+          positions: [
+            { session: 1, positionMs: 431000, ageMs: 900, playing: true, buffering: false },
+            { session: 2, positionMs: 431000, ageMs: 700, playing: true, buffering: false },
+            { session: 5, positionMs: 431000, ageMs: 400, playing: true, buffering: true },
+          ],
+          history: [
+            { id: 0, videoId: "dQw4w9WgXcQ" },
+            { id: 1, videoId: "tk1a2b3c4d5" },
+          ],
+        },
+        quality: {
+          width: 1920,
+          height: 1080,
+          fps: 60,
+          kbps: 4230,
+          viewers: [
+            { session: 1, fps: 60, struggling: false },
+            { session: 2, fps: 60, struggling: false },
+            { session: 5, fps: 20, struggling: true },
+          ],
+        },
+      }
+    : { picture: "", share: null, party: null, quality: null };
 
   const listeners = new Map<EventName, Set<(payload: never) => void>>();
   /** Private notes by session (FR-1.63); the engine keys them by certificate hash. */
@@ -1741,6 +1820,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     setState({ state: "connected", serverId });
     emitServer("transportChanged", { transport: "udp" });
     emit("serverSynced", { snapshot: requireSnapshot() });
+    // The demo seeds show the media views with the mock's own fictional data (issue #163).
+    if (mediaDemo.share !== null) emitServer("screenSharesChanged", { shares: [mediaDemo.share] });
+    if (mediaDemo.party !== null) emitServer("watchPartyChanged", { party: mediaDemo.party });
   }
 
   function proceedConnect(
@@ -3047,7 +3129,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       emit("watchPartyChanged", { serverId, party });
       return Promise.resolve(null);
     },
-    watchPartyGet: (serverId) => Promise.resolve(watchParties.get(serverId) ?? null),
+    watchPartyGet: (serverId) => Promise.resolve(watchParties.get(serverId) ?? mediaDemo.party),
     watchPartyAdd: (serverId, videoId) => {
       const current = watchParties.get(serverId);
       if (!current?.joined) fail("notFound", "no watch party in this channel");
@@ -3121,13 +3203,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     // No loopback server in the browser: the page URLs only let the player frames mount.
     watchPartyReport: () => Promise.resolve(null),
-    screenShareQuality: () => Promise.resolve(null),
+    screenShareQuality: (serverId) => {
+      // The mock's fictional share carries the fictional figures, so the media views show numbers.
+      return Promise.resolve(mediaDemo.share !== null && serverId === 1 ? mediaDemo.quality : null);
+    },
     // The mock has no capture, so the bar shows its own placeholder picture.
     screenShareThumbnail: (serverId) => {
       if (!ownShares.has(serverId)) return Promise.resolve(null);
       return Promise.resolve({ width: 320, height: 180, dataUrl: DEMO_PHOTO });
     },
-    screenShareWatchStats: () => Promise.resolve(null),
+    screenShareWatchStats: (_serverId, session) => {
+      if (mediaDemo.share !== null && mediaDemo.share.session === session) {
+        return Promise.resolve({ path: "direct", rms: 0.42 });
+      }
+      return Promise.resolve(null);
+    },
     watchPartyPlayerUrl: () =>
       Promise.resolve("http://localhost:43215/0123456789abcdef0123456789abcdef/player.html"),
     embedPlayerOpen: () =>
@@ -3173,10 +3263,18 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     screenShareList: (serverId) => {
       const own = ownShares.get(serverId);
-      return Promise.resolve(own ? [own] : []);
+      const others = mediaDemo.share !== null && serverId === 1 ? [mediaDemo.share] : [];
+      return Promise.resolve((own ? [own] : []).concat(others));
+    },
+    // The mock cannot send frames, so watching only acknowledges the request; the UI shows
+    // `mediaDemo.picture` as the picture. Test data, nothing else.
+    screenShareWatch: (_serverId, session) => {
+      if (mediaDemo.share === null || mediaDemo.share.session !== session) {
+        return notImplemented("screenShareWatch");
+      }
+      return Promise.resolve(null);
     },
     screenShareBlock: (serverId) => Promise.resolve(shareStartBlock(serverId)),
-    screenShareWatch: () => notImplemented("screenShareWatch"),
     screenShareUnwatch: () => notImplemented("screenShareUnwatch"),
     screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
@@ -3393,8 +3491,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
   };
 
+<<<<<<< HEAD
   const api: MockApi = { ...guarded, kind: "mock", on, mock };
   if (demo) window.__mumcordMock = api;
+=======
+  const api: MockApi = { ...guarded, kind: "mock", on, mock, mediaDemo };
+  if (stress) window.__mumcordMock = api;
+>>>>>>> 0e99d52 (feat(ui): the mock shows its own media data, so the media views can be rendered)
   return api;
 }
 

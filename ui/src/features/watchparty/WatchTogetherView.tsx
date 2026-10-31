@@ -13,6 +13,8 @@ import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
 import { clockTime } from "../media/format";
 import { MediaFrame } from "../media/MediaFrame";
+import { MockPicture } from "../media/MockPicture";
+import { mockPlaceholder } from "../media/mockPlaceholder";
 import { SeekBar, type SeekMarker } from "../media/SeekBar";
 import { ShortcutHint, useFirstUse } from "../media/ShortcutHint";
 import { VolumeControl } from "../media/VolumeControl";
@@ -198,7 +200,8 @@ export function Cinema({
       }
       picture={
         <div className="media-frame__screen">
-          {origin !== null && !player.failed && (
+          {mockPlaceholder() !== null && <MockPicture label={title} />}
+          {origin !== null && mockPlaceholder() === null && !player.failed && (
             <iframe
               key={party.videoId}
               ref={embedRef}
@@ -215,7 +218,7 @@ export function Cinema({
               }}
             />
           )}
-          {player.failed && (
+          {player.failed && mockPlaceholder() === null && (
             <div className="media-frame__unavailable" role="status">
               <p>{t("cantPlay")}</p>
               <CodecHint

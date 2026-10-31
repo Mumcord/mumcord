@@ -6,6 +6,8 @@
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { p2pBlockText } from "../p2p/relayReason";
+import { MockPicture } from "../media/MockPicture";
+import { mockPlaceholder } from "../media/mockPlaceholder";
 import { useScreenShareOf } from "./sharesStore";
 import { useScreenWatch } from "./useScreenWatch";
 import type { StreamMeter } from "./streamStats";
@@ -42,9 +44,13 @@ export function ScreenStage({ serverId, session, name, paused, meter }: ScreenSt
         className="screen-stage__picture"
         role="img"
         aria-label={t("picture", { name })}
-        hidden={status.state === "failed"}
+        hidden={status.state === "failed" && mockPlaceholder() === null}
       >
-        <canvas ref={canvasRef} className="screen-stage__canvas" />
+        {mockPlaceholder() === null ? (
+          <canvas ref={canvasRef} className="screen-stage__canvas" />
+        ) : (
+          <MockPicture label={t("picture", { name })} />
+        )}
       </div>
       <div className="screen-stage__status" role="status">
         {message !== null && <p className="screen-stage__message">{message}</p>}

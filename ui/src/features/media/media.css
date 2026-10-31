@@ -425,3 +425,10 @@
   border-radius: 4px;
   background: var(--color-bg-elevated);
 }
+
+/* The mock's placeholder picture (issue #163): the mock has no peer, so it shows its own demo image. */
+.media-frame__mockpicture {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: var(--radius-md);
+}
