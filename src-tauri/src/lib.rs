@@ -78,6 +78,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             servers::server_set_always_connect,
             servers::server_set_notifications_muted,
             servers::server_set_group_mentions_muted,
+            servers::server_set_p2p_mode_override,
             servers::server_set_theme,
             servers::parse_mumble_link,
             session::connect,

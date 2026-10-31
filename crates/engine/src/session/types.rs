@@ -4,7 +4,7 @@
 use std::fmt;
 
 use crate::audio_rating::HealthTotals;
-use mumcord_store::{IdentityId, ServerId, UnixMillis};
+use mumcord_store::{IdentityId, P2pMode, ServerId, UnixMillis};
 
 /// Error category; mirrors the command contract's `ErrorCode` (docs/engine-api.md).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -364,6 +364,8 @@ pub struct ServerView {
     pub theme_id: Option<String>,
     /// Identity to connect with; `None` uses the default identity (issue #148).
     pub identity_id: Option<IdentityId>,
+    /// P2P mode for this server; `None` uses the global setting (spec 04, FR-4.2).
+    pub p2p_mode_override: Option<P2pMode>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

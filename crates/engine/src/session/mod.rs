@@ -3245,6 +3245,7 @@ mod declined_kind_tests {
             group_mentions_muted: false,
             theme_id: None,
             identity_id: None,
+            p2p_mode_override: None,
         }
     }
 

@@ -52,6 +52,8 @@ export const commands = {
 	serverSetNotificationsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_notifications_muted", { serverId, muted })),
 	/**  Turns `@all` and `@channel` mentions on the server off or back on (issue #70). */
 	serverSetGroupMentionsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_group_mentions_muted", { serverId, muted })),
+	/**  Sets the P2P mode of the server; `null` goes back to the global setting (spec 04, FR-4.2). */
+	serverSetP2pModeOverride: (serverId: number, mode: P2pMode | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_p2p_mode_override", { serverId, mode })),
 	/**  Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17). */
 	serverSetTheme: (serverId: number, themeId: string | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_theme", { serverId, themeId })),
 	/**  Parses a pasted `mumble://` link; fails with `invalidInput` if malformed. */
@@ -1697,6 +1699,16 @@ export type NowPlayingStatus = {
 };
 
 /**
+ *  How peer-to-peer features reach another Mumcord user (spec 04, FR-4.1). Also the value of
+ *  a server's override (FR-4.2), where `null` means "Use global setting".
+ */
+export type P2pMode = 
+/**  "Direct + relay (direct first)"; the default. */
+"directRelay" | 
+/**  "Direct + relay (always relay, hides my IP)". */
+"relayFirst" | "directOnly" | "relayOnly" | "off";
+
+/**
  *  One captured control-channel packet. Everything except `id`, `atMs`, `direction`, `size`
  *  and the pacer fields comes from the server or other clients: render it as plain text only.
  */
@@ -1981,6 +1993,8 @@ export type SavedServer = {
 	themeId: string | null,
 	/**  Identity this server connects with; `null` uses the default identity (issue #148). */
 	identityId: number | null,
+	/**  P2P mode on this server; `null` is "Use global setting" (spec 04, FR-4.2). */
+	p2pModeOverride: P2pMode | null,
 };
 
 /**  One person sharing their screen in the voice channel. */
@@ -2245,8 +2259,13 @@ export type Settings = {
 	talkingFirst: boolean,
 	/**  Default on (FR-2.26). */
 	showWeakConnectionIcon: boolean,
-	/**  "Allow direct connections to other Mumcord users" (FR-2.36). */
+	/**
+	 *  "Allow direct connections to other Mumcord users" (FR-2.36); the answer to the consent
+	 *  question before the first direct connection (FR-4.5).
+	 */
 	allowDirectConnections: Consent,
+	/**  Global P2P mode (FR-4.1). */
+	p2pMode: P2pMode,
 	/**  "Check for new versions" (FR-2.56). */
 	updateCheck: Consent,
 	/**  AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55). */

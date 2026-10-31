@@ -21,6 +21,44 @@ pub enum Consent {
     No,
 }
 
+/// How peer-to-peer features reach another Mumcord user (spec 04, FR-4.1). Also the value of
+/// a server's override (FR-4.2), where `null` means "Use global setting".
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum P2pMode {
+    /// "Direct + relay (direct first)"; the default.
+    DirectRelay,
+    /// "Direct + relay (always relay, hides my IP)".
+    RelayFirst,
+    DirectOnly,
+    RelayOnly,
+    Off,
+}
+
+impl From<store::P2pMode> for P2pMode {
+    fn from(mode: store::P2pMode) -> Self {
+        match mode {
+            store::P2pMode::DirectRelay => Self::DirectRelay,
+            store::P2pMode::RelayFirst => Self::RelayFirst,
+            store::P2pMode::DirectOnly => Self::DirectOnly,
+            store::P2pMode::RelayOnly => Self::RelayOnly,
+            store::P2pMode::Off => Self::Off,
+        }
+    }
+}
+
+impl From<P2pMode> for store::P2pMode {
+    fn from(mode: P2pMode) -> Self {
+        match mode {
+            P2pMode::DirectRelay => Self::DirectRelay,
+            P2pMode::RelayFirst => Self::RelayFirst,
+            P2pMode::DirectOnly => Self::DirectOnly,
+            P2pMode::RelayOnly => Self::RelayOnly,
+            P2pMode::Off => Self::Off,
+        }
+    }
+}
+
 /// A custom or imported colour theme (FR-2.14 – FR-2.16) with a dark and a light version. Each
 /// colour map holds the key colours (background, surface, text, accent, talking, warning, error)
 /// as `#rrggbb`; values that are not such a colour are dropped on save. Built-in presets live in
@@ -455,8 +493,11 @@ pub struct Settings {
     pub talking_first: bool,
     /// Default on (FR-2.26).
     pub show_weak_connection_icon: bool,
-    /// "Allow direct connections to other Mumcord users" (FR-2.36).
+    /// "Allow direct connections to other Mumcord users" (FR-2.36); the answer to the consent
+    /// question before the first direct connection (FR-4.5).
     pub allow_direct_connections: Consent,
+    /// Global P2P mode (FR-4.1).
+    pub p2p_mode: P2pMode,
     /// "Check for new versions" (FR-2.56).
     pub update_check: Consent,
     /// AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55).
@@ -582,6 +623,7 @@ impl Settings {
             talking_first: s.talking_first,
             show_weak_connection_icon: s.show_weak_connection_icon,
             allow_direct_connections: s.allow_direct_connections.into(),
+            p2p_mode: s.p2p_mode.into(),
             update_check: s.update_check.into(),
             appimage_menu_entry: s.appimage_menu_entry.into(),
             window_overlay_notice_shown: s.window_overlay_notice_shown,
@@ -694,6 +736,7 @@ impl Settings {
         s.talking_first = self.talking_first;
         s.show_weak_connection_icon = self.show_weak_connection_icon;
         s.allow_direct_connections = self.allow_direct_connections.into();
+        s.p2p_mode = self.p2p_mode.into();
         s.update_check = self.update_check.into();
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
@@ -1058,6 +1101,7 @@ mod tests {
         assert!(ui.visual_effects && ui.show_weak_connection_icon);
         assert!(!ui.hide_empty_channels && !ui.talking_first);
         assert_eq!(ui.allow_direct_connections, Consent::Unset);
+        assert_eq!(ui.p2p_mode, P2pMode::DirectRelay);
         assert_eq!(ui.update_check, Consent::Unset);
 
         ui.max_connected_servers = 40;
@@ -1076,6 +1120,7 @@ mod tests {
         }];
         ui.talking_first = true;
         ui.allow_direct_connections = Consent::No;
+        ui.p2p_mode = P2pMode::RelayFirst;
         ui.update_check = Consent::Yes;
         ui.window_overlay_notice_shown = true;
         assert!(ui.whats_new_auto);
@@ -1097,6 +1142,8 @@ mod tests {
         assert!(!back.whats_new_auto);
         assert_eq!(back.whats_new_seen.as_deref(), Some("0.4.4"));
         assert_eq!(back.allow_direct_connections, Consent::No);
+        assert_eq!(stored.p2p_mode, store::P2pMode::RelayFirst);
+        assert_eq!(back.p2p_mode, P2pMode::RelayFirst);
         assert_eq!(back.update_check, Consent::Yes);
         assert_eq!(back.custom_themes[0].name, "Mine");
 

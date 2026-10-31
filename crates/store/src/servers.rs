@@ -4,6 +4,7 @@ use crate::db::{Store, UnixMillis};
 use crate::error::{Error, Result};
 use crate::identities::IdentityId;
 use crate::secrets::SecretStore;
+use crate::settings::{P2pMode, Settings};
 
 /// Mumble's default server port.
 pub const DEFAULT_PORT: u16 = 64738;
@@ -64,11 +65,20 @@ pub struct SavedServer {
     pub theme_id: Option<String>,
     /// Identity to connect with; `None` uses the default identity (issue #148).
     pub identity_id: Option<IdentityId>,
+    /// P2P mode for this server; `None` uses the global setting (FR-4.2).
+    pub p2p_mode_override: Option<P2pMode>,
+}
+
+impl SavedServer {
+    /// The P2P mode that applies on this server: the override if set, else the global one.
+    pub fn effective_p2p_mode(&self, settings: &Settings) -> P2pMode {
+        self.p2p_mode_override.unwrap_or(settings.p2p_mode)
+    }
 }
 
 const SERVER_COLUMNS: &str = "id, label, address, port, username, last_channel, save_history, \
      sort_order, always_connect_at_start, connected_at_quit, was_voice_server_at_quit, \
-     notifications_muted, theme_id, identity_id, group_mentions_muted";
+     notifications_muted, theme_id, identity_id, group_mentions_muted, p2p_mode_override";
 
 fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
     Ok(SavedServer {
@@ -87,6 +97,7 @@ fn server_from_row(row: &Row<'_>) -> rusqlite::Result<SavedServer> {
         theme_id: row.get(12)?,
         identity_id: row.get(13)?,
         group_mentions_muted: row.get(14)?,
+        p2p_mode_override: row.get(15)?,
     })
 }
 
@@ -140,7 +151,8 @@ impl Store {
     }
 
     /// Updates label, address, port, username, last channel, the save-history switch, the
-    /// multi-server settings (always connect, muted notifications, theme) and the identity.
+    /// multi-server settings (always connect, muted notifications, theme), the identity and the
+    /// P2P mode override.
     /// The order is changed with [`Store::reorder_servers`], the quit state with
     /// [`Store::set_quit_state`].
     pub fn update_server(&self, server: &SavedServer) -> Result<()> {
@@ -151,7 +163,8 @@ impl Store {
             "UPDATE saved_server
              SET label = ?2, address = ?3, port = ?4, username = ?5, last_channel = ?6,
                  save_history = ?7, always_connect_at_start = ?8, notifications_muted = ?9,
-                 theme_id = ?10, identity_id = ?11, group_mentions_muted = ?12
+                 theme_id = ?10, identity_id = ?11, group_mentions_muted = ?12,
+                 p2p_mode_override = ?13
              WHERE id = ?1",
             params![
                 server.id,
@@ -165,7 +178,8 @@ impl Store {
                 server.notifications_muted,
                 server.theme_id,
                 server.identity_id,
-                server.group_mentions_muted
+                server.group_mentions_muted,
+                server.p2p_mode_override
             ],
         )?;
         expect_one(changed, server.id)
@@ -374,6 +388,32 @@ mod tests {
             store.set_voice_channel(999, "Root"),
             Err(Error::UnknownServer(999))
         ));
+    }
+
+    #[test]
+    fn p2p_mode_override_defaults_to_global_and_round_trips() {
+        let (_dir, store) = temp_store();
+        let added = store
+            .add_server(&NewServer::new("A", "localhost", "Tester"))
+            .expect("add");
+        assert_eq!(added.p2p_mode_override, None);
+        let global = Settings {
+            p2p_mode: P2pMode::RelayFirst,
+            ..Settings::default()
+        };
+        assert_eq!(added.effective_p2p_mode(&global), P2pMode::RelayFirst);
+
+        let mut edited = added.clone();
+        edited.p2p_mode_override = Some(P2pMode::Off);
+        store.update_server(&edited).expect("update");
+        let loaded = store.server(added.id).expect("read").expect("exists");
+        assert_eq!(loaded.p2p_mode_override, Some(P2pMode::Off));
+        assert_eq!(loaded.effective_p2p_mode(&global), P2pMode::Off);
+
+        edited.p2p_mode_override = None;
+        store.update_server(&edited).expect("reset");
+        let loaded = store.server(added.id).expect("read").expect("exists");
+        assert_eq!(loaded.effective_p2p_mode(&global), P2pMode::RelayFirst);
     }
 
     #[test]

@@ -179,6 +179,7 @@ const NEW_SERVER_FLAGS = {
   groupMentionsMuted: false,
   themeId: null,
   identityId: null,
+  p2pModeOverride: null,
 } satisfies Partial<SavedServer>;
 /** The one channel password the mock accepts (FR-2.78). */
 export const MOCK_CHANNEL_PASSWORD = "secret";
@@ -273,6 +274,7 @@ const DEFAULT_SETTINGS: Settings = {
   talkingFirst: false,
   showWeakConnectionIcon: true,
   allowDirectConnections: "unset",
+  p2pMode: "directRelay",
   updateCheck: "unset",
   appimageMenuEntry: "unset",
   windowOverlayNoticeShown: false,
@@ -2523,6 +2525,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     serverSetGroupMentionsMuted: (serverId, muted) => {
       requireServer(serverId);
       servers = servers.map((s) => (s.id === serverId ? { ...s, groupMentionsMuted: muted } : s));
+      return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetP2pModeOverride: (serverId, mode) => {
+      requireServer(serverId);
+      servers = servers.map((s) => (s.id === serverId ? { ...s, p2pModeOverride: mode } : s));
       return Promise.resolve({ ...requireServer(serverId) });
     },
     serverSetIdentity: (serverId, identityId) =>

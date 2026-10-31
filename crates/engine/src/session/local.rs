@@ -10,8 +10,8 @@ use mumcord_audio::dsp::{DspControls, TalkMode as DspTalkMode};
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{ClientIdentity, ConnectConfig, ConnectError};
 use mumcord_store::{
-    Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, SavedServer, SecretStore,
-    ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
+    Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, P2pMode, SavedServer,
+    SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
 };
 
 use super::channel_audio::effective_settings;
@@ -94,6 +94,7 @@ fn server_view(server: SavedServer, has_password: bool) -> ServerView {
         group_mentions_muted: server.group_mentions_muted,
         theme_id: server.theme_id,
         identity_id: server.identity_id,
+        p2p_mode_override: server.p2p_mode_override,
     }
 }
 
@@ -618,6 +619,27 @@ impl Engine {
         Ok(server_view(saved, has_password))
     }
 
+    /// Sets the P2P mode of this server; `None` goes back to the global setting (spec 04,
+    /// FR-4.2).
+    pub async fn server_set_p2p_mode_override(
+        &self,
+        id: ServerId,
+        mode: Option<P2pMode>,
+    ) -> EngineResult<ServerView> {
+        let saved = {
+            let store = lock(&self.inner.store);
+            let mut saved = store
+                .server(id)
+                .map_err(store_error)?
+                .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown server"))?;
+            saved.p2p_mode_override = mode;
+            store.update_server(&saved).map_err(store_error)?;
+            saved
+        };
+        let has_password = self.apply_password(id, PasswordChange::Keep).await?;
+        Ok(server_view(saved, has_password))
+    }
+
     /// Removes a server with password, trust decision, follows and history. Disconnects
     /// it first.
     pub async fn server_remove(&self, id: ServerId) -> EngineResult<()> {
@@ -1124,5 +1146,35 @@ mod tests {
             .await
             .expect("unmute");
         assert!(!view.group_mentions_muted);
+    }
+
+    #[tokio::test]
+    async fn p2p_mode_override_is_saved_per_server() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, _rx) = Engine::new(
+            dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        let server = engine
+            .server_add(fields("a", "a.example", "me"))
+            .await
+            .expect("server");
+        assert_eq!(server.p2p_mode_override, None);
+
+        let view = engine
+            .server_set_p2p_mode_override(server.id, Some(P2pMode::RelayOnly))
+            .await
+            .expect("override");
+        assert_eq!(view.p2p_mode_override, Some(P2pMode::RelayOnly));
+        let servers = engine.servers().await.expect("servers");
+        assert_eq!(servers[0].p2p_mode_override, Some(P2pMode::RelayOnly));
+
+        let view = engine
+            .server_set_p2p_mode_override(server.id, None)
+            .await
+            .expect("reset");
+        assert_eq!(view.p2p_mode_override, None);
     }
 }
