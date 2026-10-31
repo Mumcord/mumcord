@@ -60,7 +60,8 @@ Both views are rebuilt on one shared "media view" layer: the watch party and a w
 | `npm run lint` | 0 errors, 4 fast-refresh warnings (same class as existing files) |
 | `cargo test -p mumcord-engine --lib` | 402 pass |
 | i18n tests | 102 pass |
-| E2E against the local test server | **not run** |
+| Live tests against the local test server (`testenv/up.sh v15`) | ✅ 2026-11-01: `live_watch_party` 4 pass (new: each player reports where it is, host/crown), `live_screen_share` 2 pass (new: source + elapsed reach the viewer), `live_screen_share_media` 1 pass |
+| E2E specs for the two views (UI) | **not written yet** |
 | Dark/light screenshots | **not produced** |
 
 ## Acceptance criteria status
@@ -70,16 +71,16 @@ Both views are rebuilt on one shared "media view" layer: the watch party and a w
 | AC-3.119 (media views exist) | code done | not verified in the running client |
 | AC-3.120 (single media store) | code done | unit-tested |
 | AC-3.121 (reduced motion, overlays) | code done | needs a real client run |
-| AC-3.122 (watch view, sync state) | code done | needs two clients against the local server |
+| AC-3.122 (watch view, sync state) | code done; protocol part verified live | UI part needs a running client |
 | AC-3.123 (focus mode) | code done | needs a real client run |
 | AC-3.124 (mini bar + shortcuts) | code done | needs a real client run |
 | AC-3.125 (share view) | code done | needs a real client run |
-| AC-3.126 (quality figures live) | code done | figures unit-tested, live path untested |
+| AC-3.126 (quality figures live) | code done; media path verified live (`live_screen_share_media`) | figures unit-tested |
 | AC-3.127 (sharer control bar) | code done | needs a real client run |
 
 ## Next steps
 
-1. Run the two e2e specs against the local test server (watch together: second client joins, control moves, sync within 2 s; screen share: figures change, viewer count, quality for one viewer).
+1. Write and run the two e2e specs (UI) against the local test server (watch together: second client joins, control moves, sync within 2 s; screen share: figures change, viewer count, quality for one viewer).
 2. Dark and light screenshots of all three views in the running client → `docs/images/screenshots/`, embedded in the PR description.
 3. Human pass on the new translations (ga, mt, hu, hr, et, lv especially).
 4. Decide: "Previous" button, playlist durations, Chat tab in the panel.
