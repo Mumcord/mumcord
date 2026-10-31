@@ -12,9 +12,7 @@
     "generic": "Following this channel didn't work. Please try again."
   },
   "dm": {
-    "title": "Direct messages",
-    "unknown": "Unknown person",
-    "withServer": "{{name}}, on {{server}}"
+    "unknown": "Unknown person"
   },
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",

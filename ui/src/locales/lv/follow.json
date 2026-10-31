@@ -13,9 +13,7 @@
     "generic": "Sekošana šim kanālam neizdevās. Lūdzu, mēģini vēlreiz."
   },
   "dm": {
-    "title": "Tiešās ziņas",
-    "unknown": "Nezināms cilvēks",
-    "withServer": "{{name}}, serverī {{server}}"
+    "unknown": "Nezināms cilvēks"
   },
   "notify": {
     "channel": "{{name}} kanālā {{channel}}: {{text}}",

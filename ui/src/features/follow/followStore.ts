@@ -77,6 +77,14 @@ export function rememberDirectChat(
   set(serverId, { ...state, chats: [...state.chats.filter((c) => c.key !== key), chat] });
 }
 
+/** Drops a private chat from the list of `serverId`, e.g. after its history was deleted. */
+export function forgetDirectChat(conversation: Conversation, serverId: number): void {
+  const state = stateOf(serverId);
+  const key = conversationKey(conversation);
+  if (!state.chats.some((c) => c.key === key)) return;
+  set(serverId, { ...state, chats: state.chats.filter((c) => c.key !== key) });
+}
+
 function fromSnapshot(snapshot: ServerSnapshot): FollowState {
   const unread = new Map(snapshot.unread.map((u) => [conversationKey(u.conversation), u.count]));
   const chats = snapshot.unread

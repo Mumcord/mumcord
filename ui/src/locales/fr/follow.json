@@ -13,9 +13,7 @@
     "generic": "Le suivi de ce canal n’a pas fonctionné. Veuillez réessayer."
   },
   "dm": {
-    "title": "Messages privés",
-    "unknown": "Personne inconnue",
-    "withServer": "{{name}}, sur {{server}}"
+    "unknown": "Personne inconnue"
   },
   "notify": {
     "channel": "{{name}} dans {{channel}} : {{text}}",

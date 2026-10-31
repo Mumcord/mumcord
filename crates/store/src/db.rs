@@ -210,10 +210,21 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (own_cert_hash, cert_hash)
     );
     ",
+    // v17: pinned and muted private conversations in the private messages overview (issue
+    // #173), by server and the other person's certificate hash. `muted_until` is Unix millis,
+    // i64::MAX for "until turned back on", NULL when not muted.
+    r"
+    CREATE TABLE pm_conversation (
+        server_id   INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        cert_hash   TEXT    NOT NULL,
+        pinned      INTEGER NOT NULL DEFAULT 0 CHECK (pinned IN (0, 1)),
+        muted_until INTEGER,
+        PRIMARY KEY (server_id, cert_hash)
+    );
+    ",
     // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
     // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
-    // path kept so a renamed or recreated channel still matches. v17 is `pm_conversation`
-    // (issue #173), which lands first; until then this entry is the 17th.
+    // path kept so a renamed or recreated channel still matches.
     r"
     CREATE TABLE channel_audio_profile (
         server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,

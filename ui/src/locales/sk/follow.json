@@ -14,9 +14,7 @@
     "generic": "Sledovanie kanála sa nepodarilo. Skús to znova."
   },
   "dm": {
-    "title": "Súkromné správy",
-    "unknown": "Neznáma osoba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Neznáma osoba"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",

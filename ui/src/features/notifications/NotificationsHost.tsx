@@ -8,6 +8,7 @@ import {
   useShownServerId,
 } from "../channels";
 import { conversationKey, subscribeIncoming } from "../chat";
+import { isConversationMuted } from "../messages/conversationsStore";
 import { useServers } from "../servers";
 import { handleIncoming } from "./incoming";
 import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
@@ -56,7 +57,9 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     [servers],
   );
   const muted = useCallback(
-    (id: number) => servers.find((s) => s.id === id)?.notificationsMuted ?? false,
+    (id: number, conversation: Conversation) =>
+      (servers.find((s) => s.id === id)?.notificationsMuted ?? false) ||
+      isConversationMuted(id, conversation),
     [servers],
   );
   const live = useRef({ t, overlayOpen, onOpenChat, selected, shown, serverName, muted });
@@ -87,7 +90,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
           t: live.current.t,
           overlayOpen: live.current.overlayOpen,
           serverName: (id) => live.current.serverName(id),
-          muted: (id) => live.current.muted(id),
+          muted: (id, conversation) => live.current.muted(id, conversation),
         });
       }),
       getApi().on("notificationActivated", ({ serverId, conversation }) => {

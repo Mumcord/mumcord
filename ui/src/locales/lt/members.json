@@ -57,12 +57,14 @@
   "menu": {
     "label": "{{name}} veiksmai",
     "viewProfile": "Peržiūrėti profilį",
+    "sendMessage": "Siųsti žinutę",
     "join": "Prisijungti prie {{channel}}",
-    "joinDenied": "Neturite teisės įeiti į šį kanalą.",
+    "joinFull": "Šis kanalas pilnas.",
+    "joinLocked": "Tau negalima įeiti į šį kanalą arba jam reikia slaptažodžio.",
     "mute": "Nutildyti man",
     "connectionInfo": "Ryšio informacija…",
-    "chatRequest": "Siųsti pokalbio prašymą…",
-    "chatRequestPending": "Pokalbio prašymas laukia"
+    "chatRequestPending": "Pokalbio prašymas laukia",
+    "revokeConsent": "Atšaukti pokalbio sutikimą…"
   },
   "nowPlaying": {
     "label": "Dabar groja",
@@ -112,5 +114,11 @@
     "talkingMore_many": "{{name}} ir dar {{count}} kalba",
     "talkingMore_other": "{{name}} ir dar {{count}} kalba",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Atšaukti pokalbio sutikimą naudotojui {{name}}?",
+    "message": "{{name}} turės vėl išsiųsti žinutės užklausą, kad jo žinutės tave pasiektų. Pokalbio istorija lieka.",
+    "confirm": "Atšaukti",
+    "failed": "Nepavyko atšaukti pokalbio sutikimo. Bandyk dar kartą."
   }
 }

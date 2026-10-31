@@ -389,6 +389,16 @@ mod tests {
     }
 
     #[test]
+    fn user_limit_zero_means_none() {
+        let mut state = tree();
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+        state.channels.get_mut(&2).expect("raid").max_users = Some(0);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+        state.channels.get_mut(&2).expect("raid").max_users = Some(5);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, Some(5));
+    }
+
+    #[test]
     fn welcome_text_is_sanitized() {
         let clean = sanitize_html("<b>hi</b><script>alert(1)</script><img src=x onerror=y>");
         assert!(clean.contains("<b>hi</b>"));

@@ -15,9 +15,7 @@
     "generic": "Is-segwiment ta' dan il-kanal ma ħadimx. Erġa' pprova."
   },
   "dm": {
-    "title": "Messaġġi diretti",
-    "unknown": "Persuna mhux magħrufa",
-    "withServer": "{{name}}, fuq {{server}}"
+    "unknown": "Persuna mhux magħrufa"
   },
   "notify": {
     "channel": "{{name}} f'{{channel}}: {{text}}",

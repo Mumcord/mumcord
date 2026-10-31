@@ -14,9 +14,7 @@
     "generic": "Nie udało się obserwować tego kanału. Spróbuj ponownie."
   },
   "dm": {
-    "title": "Wiadomości prywatne",
-    "unknown": "Nieznana osoba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Nieznana osoba"
   },
   "notify": {
     "channel": "{{name}} na {{channel}}: {{text}}",

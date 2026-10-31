@@ -15,6 +15,7 @@ mod friends;
 mod history;
 mod identities;
 mod identity;
+mod pm_overview;
 mod secrets;
 mod servers;
 mod settings;
@@ -31,6 +32,7 @@ pub use friends::Friend;
 pub use history::{ChatMessage, Conversation, NewChatMessage};
 pub use identities::{IdentityId, IdentityRecord, MAX_IDENTITY_LABEL, NewIdentity};
 pub use identity::{Identity, cert_hash};
+pub use pm_overview::{MUTED_FOREVER, PmConversationPrefs, PrivateConversationSummary};
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{

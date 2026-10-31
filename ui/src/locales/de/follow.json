@@ -12,9 +12,7 @@
     "generic": "Das Folgen hat nicht geklappt. Bitte versuche es noch einmal."
   },
   "dm": {
-    "title": "Direktnachrichten",
-    "unknown": "Unbekannte Person",
-    "withServer": "{{name}}, auf {{server}}"
+    "unknown": "Unbekannte Person"
   },
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",

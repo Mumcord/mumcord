@@ -56,12 +56,14 @@
   "menu": {
     "label": "Acțiuni pentru {{name}}",
     "viewProfile": "Vezi profilul",
+    "sendMessage": "Trimite mesaj",
     "join": "Intră în {{channel}}",
-    "joinDenied": "Nu ai voie să intri pe acest canal.",
+    "joinFull": "Acest canal este plin.",
+    "joinLocked": "Nu ai voie să intri pe acest canal sau acesta necesită o parolă.",
     "mute": "Fără sunet pentru mine",
     "connectionInfo": "Informații conexiune…",
-    "chatRequest": "Trimite cerere de chat…",
-    "chatRequestPending": "Cerere de chat în așteptare"
+    "chatRequestPending": "Cerere de chat în așteptare",
+    "revokeConsent": "Retrage acordul pentru chat…"
   },
   "nowPlaying": {
     "label": "Ascultă acum",
@@ -108,5 +110,11 @@
     "talkingMore_few": "{{name}} și încă {{count}} persoane vorbesc",
     "talkingMore_other": "{{name}} și încă {{count}} de persoane vorbesc",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Retragi acordul pentru chat cu {{name}}?",
+    "message": "{{name}} va trebui să trimită o nouă cerere de mesaj înainte ca mesajele să ajungă din nou la tine. Istoricul chatului rămâne.",
+    "confirm": "Retrage",
+    "failed": "Retragerea acordului pentru chat a eșuat. Încearcă din nou."
   }
 }

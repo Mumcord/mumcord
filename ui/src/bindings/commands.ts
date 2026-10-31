@@ -144,6 +144,16 @@ export const commands = {
 	acceptedConversations: () => typedError<AcceptedConversation[], ApiError>(__TAURI_INVOKE("accepted_conversations")),
 	/**  Revokes an accepted conversation of one own identity. */
 	acceptedConversationRevoke: (ownCertHash: string, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("accepted_conversation_revoke", { ownCertHash, certHash })),
+	/**  The newest stored message of every private conversation on a connected server, newest first. */
+	privateConversations: (serverId: number) => typedError<PrivateConversation[], ApiError>(__TAURI_INVOKE("private_conversations", { serverId })),
+	/**  Pin and mute state of every private conversation that has any. */
+	pmConversationPrefs: () => typedError<PmConversationPrefs[], ApiError>(__TAURI_INVOKE("pm_conversation_prefs")),
+	/**  Pins a private conversation to the top of the overview, or unpins it. */
+	pmConversationSetPinned: (serverId: number, certHash: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("pm_conversation_set_pinned", { serverId, certHash, pinned })),
+	/**  Mutes a private conversation for `minutes`, or until turned back on (`null`). */
+	pmConversationMute: (serverId: number, certHash: string, minutes: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("pm_conversation_mute", { serverId, certHash, minutes })),
+	/**  Turns notifications of a muted private conversation back on. */
+	pmConversationUnmute: (serverId: number, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("pm_conversation_unmute", { serverId, certHash })),
 	/**
 	 *  Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
 	 *  Waits briefly for the server's refusal (FR-2.47). Fails with `messageTooLarge` above the
@@ -612,6 +622,7 @@ export const events = {
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
+	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
@@ -1652,6 +1663,25 @@ export type PlaylistEntry = {
 	addedByName: string | null,
 };
 
+/**  Pin and mute state of a private conversation, by server and the person's certificate hash. */
+export type PmConversationPrefs = {
+	serverId: number,
+	certHash: string,
+	pinned: boolean,
+	/**
+	 *  RFC 3339 end of a timed mute; `null` when not muted or muted until turned back on.
+	 *  A time in the past means the mute is over.
+	 */
+	mutedUntil: string | null,
+	/**  Muted until turned back on. */
+	mutedForever: boolean,
+};
+
+/**  Pinned or muted private conversations changed: the full list. */
+export type PmConversationPrefsChanged = {
+	prefs: PmConversationPrefs[],
+};
+
 export type PmRequests = {
 	incoming: MessageRequest[],
 	sent: SentChatRequest[],
@@ -1709,6 +1739,16 @@ export type PositionalStatus = {
  */
 export type PositionalStatusChanged = {
 	status: PositionalStatus,
+};
+
+/**
+ *  A stored private conversation: its newest message (with the conversation) and the name the
+ *  other person last wrote under, `null` when only own messages are stored.
+ */
+export type PrivateConversation = {
+	last: ChatMessage,
+	/**  Untrusted: render as plain text. */
+	peerName: string | null,
 };
 
 /**  Private message rule, per-server overrides and exceptions (issue #141). */

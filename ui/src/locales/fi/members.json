@@ -55,12 +55,14 @@
   "menu": {
     "label": "Toiminnot: {{name}}",
     "viewProfile": "Näytä profiili",
+    "sendMessage": "Lähetä viesti",
     "join": "Liity kanavalle {{channel}}",
-    "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
+    "joinFull": "Tämä kanava on täynnä.",
+    "joinLocked": "Et voi liittyä tälle kanavalle, tai se vaatii salasanan.",
     "mute": "Mykistä minulta",
     "connectionInfo": "Yhteyden tiedot…",
-    "chatRequest": "Lähetä keskustelupyyntö…",
-    "chatRequestPending": "Keskustelupyyntö odottaa"
+    "chatRequestPending": "Keskustelupyyntö odottaa",
+    "revokeConsent": "Peru keskustelusuostumus…"
   },
   "nowPlaying": {
     "label": "Nyt soi",
@@ -104,5 +106,11 @@
     "talkingMore_one": "{{name}} ja {{count}} muu puhuvat",
     "talkingMore_other": "{{name}} ja {{count}} muuta puhuvat",
     "shortcut": "Ctrl+Vaihto+M"
+  },
+  "revokeConsent": {
+    "title": "Perutaanko keskustelusuostumus käyttäjältä {{name}}?",
+    "message": "Käyttäjän {{name}} täytyy lähettää uusi viestipyyntö, ennen kuin hänen viestinsä tulevat taas perille. Keskusteluhistoria säilyy.",
+    "confirm": "Peru",
+    "failed": "Keskustelusuostumuksen peruminen epäonnistui. Yritä uudelleen."
   }
 }

@@ -12,9 +12,7 @@
     "generic": "Selle kanali jälgimine ei õnnestunud. Proovi palun uuesti."
   },
   "dm": {
-    "title": "Otsesõnumid",
-    "unknown": "Tundmatu inimene",
-    "withServer": "{{name}}, serveris {{server}}"
+    "unknown": "Tundmatu inimene"
   },
   "notify": {
     "channel": "{{name}} kanalis {{channel}}: {{text}}",

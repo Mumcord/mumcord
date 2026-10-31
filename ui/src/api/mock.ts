@@ -17,6 +17,8 @@ import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
   ActiveAudioProfile,
+  PmConversationPrefs,
+  PrivateConversation,
   ApiError,
   AudioDevices,
   ChannelAudioProfile,
@@ -132,6 +134,8 @@ export interface MockControls {
   updateChannel(channelId: number, patch: Partial<Omit<ChannelInfo, "id">>): void;
   /** Renames a channel, like an admin on the server would. */
   renameChannel(channelId: number, name: string): void;
+  /** Sets a channel's user limit, like an admin on the server would. */
+  limitChannel(channelId: number, maxUsers: number): void;
   /** Stores a channel password without any details, like one saved before issue #146. */
   addBareChannelPassword(serverId: number, password: string): void;
   /**
@@ -659,6 +663,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const pmRequestsByServer = new Map<number, PmRequests>();
   let nextPmRequestId = 1;
   let acceptedConversations: AcceptedConversation[] = [];
+  let pmPrefs: PmConversationPrefs[] = [];
+
+  function setPmPrefs(
+    serverId: number,
+    certHash: string,
+    change: Partial<Omit<PmConversationPrefs, "serverId" | "certHash">>,
+  ): void {
+    const same = (p: PmConversationPrefs) => p.serverId === serverId && p.certHash === certHash;
+    const old = pmPrefs.find(same) ?? {
+      serverId,
+      certHash,
+      pinned: false,
+      mutedUntil: null,
+      mutedForever: false,
+    };
+    const next = { ...old, ...change };
+    const kept = next.pinned || next.mutedUntil !== null || next.mutedForever;
+    pmPrefs = [...pmPrefs.filter((p) => !same(p)), ...(kept ? [next] : [])];
+    emit("pmConversationPrefsChanged", { prefs: pmPrefs });
+  }
   const failures = new Map<CommandName, ApiError>();
   const inspector = createMockInspector();
   let inspectorView: InspectorView | null = null;
@@ -1792,6 +1816,41 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       });
       return Promise.resolve(null);
     },
+    privateConversations: (serverId) => {
+      requireSession(serverId);
+      const list: PrivateConversation[] = [];
+      for (const messages of serverHistory(serverId).values()) {
+        const last = messages.at(-1);
+        if (last?.conversation.kind !== "private") continue;
+        const { certHash } = last.conversation;
+        const peer = [...messages].reverse().find((m) => m.senderCertHash === certHash);
+        list.push({ last, peerName: peer?.senderName ?? null });
+      }
+      list.sort((a, b) => Date.parse(b.last.sentAt) - Date.parse(a.last.sentAt));
+      return Promise.resolve(list);
+    },
+    pmConversationPrefs: () => Promise.resolve(pmPrefs),
+    pmConversationSetPinned: (serverId, certHash, pinned) => {
+      setPmPrefs(serverId, certHash, { pinned });
+      return Promise.resolve(null);
+    },
+    pmConversationMute: (serverId, certHash, minutes) => {
+      setPmPrefs(
+        serverId,
+        certHash,
+        minutes === null
+          ? { mutedUntil: null, mutedForever: true }
+          : {
+              mutedUntil: new Date(Date.now() + minutes * 60_000).toISOString(),
+              mutedForever: false,
+            },
+      );
+      return Promise.resolve(null);
+    },
+    pmConversationUnmute: (serverId, certHash) => {
+      setPmPrefs(serverId, certHash, { mutedUntil: null, mutedForever: false });
+      return Promise.resolve(null);
+    },
     acceptedConversations: () => Promise.resolve(acceptedConversations),
     acceptedConversationRevoke: (ownCertHash, certHash) => {
       acceptedConversations = acceptedConversations.filter(
@@ -2683,6 +2742,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       snap.channels = snap.channels.map((c) => (c.id === channelId ? renamed : c));
       emitServer("channelUpserted", { channel: renamed });
     },
+    limitChannel: (channelId, maxUsers) => {
+      focused();
+      const snap = requireSnapshot();
+      const limited = { ...requireChannel(channelId), maxUsers };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? limited : c));
+      emitServer("channelUpserted", { channel: limited });
+    },
     addBareChannelPassword: (serverId, password) => {
       const token = { token: password, label: null, channels: [], lastUsedAt: null };
       channelTokens.set(serverId, [...(channelTokens.get(serverId) ?? []), token]);
@@ -2698,7 +2764,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 }
 
 /** Pinned channel info (FR-1.48b): demo descriptions and the text behind a hash-only one. */
-const noDescription = { description: null, hasDescription: false };
+const noDescription = { description: null, hasDescription: false, maxUsers: null };
 
 const MOCK_LOBBY_DESCRIPTION = "<p><b>Welcome to the Lobby!</b> Say hi and pick a channel.</p>";
 
