@@ -191,3 +191,7 @@ or a shared screen. The three #163 media shots are 1280×800.
    viewer the script replaces `screenShareWatch` on the mock with one that sends a generated
    picture as RGBA frames (with `VideoDecoder` removed so the RGBA path is used).
 4. Copy `main-dark.png` to `docs/images/mumcord-main.png` for the README.
+
+The media views of issue #163 run against the mock, which has no peer: they show the mock's own
+placeholder picture, its fictional viewers and its fictional stream figures. The picture areas cannot
+show a real frame in a browser mock, so the shots show the layout, not a live stream.
