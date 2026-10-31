@@ -2,7 +2,7 @@
 
 Screenshots for the project website, the wiki and the README. All of them show the UI running on
 the built-in mock engine with fictional demo data (people, servers, messages, games and videos are
-made up; addresses use `example.org`). Size: 1440×900 pixels (1×); only `main-dark.png` and `main-light.png` are 2880×1800 (2×). All files are 8-bit palette PNGs to keep the repository small. The default
+made up; addresses use `example.org`). Size: 1440×900 pixels (1×); only `main-dark.png` and `main-light.png` are 2880×1800 (2×), and `settings-privacy-messages-*.png` are 1440×1040 so the whole "Private messages" group fits. All files are 8-bit palette PNGs to keep the repository small. The default
 look is the dark Mumcord theme; the main view, the theme editor and some settings also have a light
 version.
 
