@@ -1,5 +1,24 @@
 {
   "progress": "Steg {{current}} av {{total}}",
+  "rerun": {
+    "title": "Installationsguiden",
+    "note": "Du går igenom installationen igen. Din identitet ändras inte.",
+    "manageIdentities": "Hantera identiteter",
+    "stepsLabel": "Installationens steg",
+    "stepsSkipped": "(överhoppat, identiteten är inte en del av det)",
+    "steps": {
+      "identity": "Identitet",
+      "mic": "Mikrofon",
+      "privacy": "Integritet",
+      "updates": "Uppdateringar",
+      "talk": "Talläge"
+    },
+    "footer": "Avbryt lämnar allt som det är. Bara de steg du ändrade sparas i slutet.",
+    "discardTitle": "Kasta ändringarna?",
+    "discardBody": "Inget sparas innan du är klar. Avbryter du nu förblir allt som det är.",
+    "discardKeep": "Fortsätt redigera",
+    "discardConfirm": "Kasta ändringarna"
+  },
   "loadFailed": "Konfigurationen kunde inte läsas in.",
   "finish": "Slutför",
   "errors": {

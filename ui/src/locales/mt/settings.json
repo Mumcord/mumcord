@@ -431,7 +431,12 @@
     "noticesFailed": "Il-liċenzji ta’ partijiet terzi ma setgħux jinfetħu.",
     "loading": "Qed jitgħabba…",
     "devToolsUnlocked": "L-għodod tal-iżviluppatur infetħu: l-ispettur tal-pakketti issa jinsab fil-lista tas-settings.",
-    "portable": "Portabbli"
+    "portable": "Portabbli",
+    "setup": "Setup",
+    "setupWizardHint": "Erġa' għaddi mill-ewwel setup biex tirrevedi l-mikrofonu, l-għażliet tal-privatezza, il-kontroll tal-aġġornamenti u l-mod kif titkellem. L-għażliet attwali tiegħek huma mimlija.",
+    "setupWizardRun": "Erġa' ħaddem il-wiżard tas-setup",
+    "setupWizardIdentityNote": "L-identità tiegħek mhijiex parti minn dan. Iċ-ċertifikat tiegħek, u miegħu l-isem irreġistrat u l-permessi tiegħek fuq is-servers, jibqa' eżatt kif inhu.",
+    "setupWizardIdentityLink": "Immaniġġjaha f'Identità"
   },
   "profile": {
     "title": "Profil",

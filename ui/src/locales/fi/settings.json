@@ -428,7 +428,12 @@
     "noticesFailed": "Kolmansien osapuolten lisenssejä ei voitu avata.",
     "loading": "Ladataan…",
     "devToolsUnlocked": "Kehittäjätyökalut avattu: pakettitarkastin on nyt asetusluettelossa.",
-    "portable": "Siirrettävä"
+    "portable": "Siirrettävä",
+    "setup": "Asetus",
+    "setupWizardHint": "Käy ensiasennus uudelleen läpi ja tarkista mikrofoni, yksityisyysvalinnat, päivitysten tarkistus ja puhumistila. Nykyiset valintasi on täytetty valmiiksi.",
+    "setupWizardRun": "Suorita asennusvelho uudelleen",
+    "setupWizardIdentityNote": "Identiteettisi ei kuulu tähän. Sertifikaattisi ja sen mukana rekisteröity nimesi ja käyttöoikeutesi palvelimilla pysyvät täsmälleen sellaisina kuin ne ovat.",
+    "setupWizardIdentityLink": "Hallitse sitä kohdassa Identiteetti"
   },
   "profile": {
     "title": "Profiili",

@@ -431,7 +431,12 @@
     "noticesFailed": "Níorbh fhéidir na ceadúnais tríú páirtí a oscailt.",
     "loading": "Ag luchtú…",
     "devToolsUnlocked": "Díghlasáladh uirlisí forbróra: tá an cigire paicéad anois sa liosta socruithe.",
-    "portable": "Iniompartha"
+    "portable": "Iniompartha",
+    "setup": "Socrú",
+    "setupWizardHint": "Téigh tríd an gcéad socrú arís chun do mhicreafón, do roghanna príobháideachais, an tseiceáil nuashonraithe agus an mód labhartha a athbhreithniú. Tá do roghanna reatha réamhlíonta.",
+    "setupWizardRun": "Rith an treoraí socraithe arís",
+    "setupWizardIdentityNote": "Níl do chéannacht mar chuid de seo. Fanann do theastas, agus leis an ainm cláraithe agus na ceadanna atá agat ar fhreastalaithe, go díreach mar atá siad.",
+    "setupWizardIdentityLink": "Bainistigh í i gCéannacht"
   },
   "profile": {
     "title": "Próifíl",

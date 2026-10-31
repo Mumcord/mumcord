@@ -21,11 +21,14 @@ afterEach(() => {
   setApi(undefined);
 });
 
-function renderStep() {
+function renderStep(stagedDevices = false) {
   return renderInWizard(
     harness,
     <MicStep
+      step={stagedDevices ? 1 : 2}
+      total={stagedDevices ? 4 : 5}
       settings={settings}
+      stagedDevices={stagedDevices}
       focusOnMount={false}
       onDevicesChange={onDevicesChange}
       onBack={vi.fn()}
@@ -71,6 +74,21 @@ describe("MicStep", () => {
     chooseOption(mic, "USB Headset");
     await waitFor(() => {
       expect(onDevicesChange).toHaveBeenCalledWith({ inputDevice: "mic-usb", outputDevice: null });
+    });
+  });
+
+  it("tests devices that are not saved yet (#149)", async () => {
+    const start = vi.spyOn(harness.api, "micTestStart");
+    settings = { ...settings, inputDevice: "mic-usb" };
+    renderStep(true);
+    await waitFor(() => {
+      expect(optionLabels(screen.getByRole("combobox", { name: "Microphone" }))).toContain(
+        "USB Headset",
+      );
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Test" }));
+    await waitFor(() => {
+      expect(start).toHaveBeenCalledWith({ inputDevice: "mic-usb", outputDevice: null });
     });
   });
 

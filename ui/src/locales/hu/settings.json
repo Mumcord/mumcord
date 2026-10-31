@@ -428,7 +428,12 @@
     "noticesFailed": "A harmadik féltől származó licenceket nem sikerült megnyitni.",
     "loading": "Betöltés…",
     "devToolsUnlocked": "Fejlesztői eszközök feloldva: a csomagvizsgáló mostantól szerepel a beállítások listájában.",
-    "portable": "Hordozható"
+    "portable": "Hordozható",
+    "setup": "Beállítás",
+    "setupWizardHint": "Fuss végig újra az első beállításon, hogy átnézd a mikrofont, az adatvédelmi döntéseket, a frissítéskeresést és a beszédmódot. A jelenlegi értékek előre ki vannak töltve.",
+    "setupWizardRun": "Beállítási varázsló futtatása újra",
+    "setupWizardIdentityNote": "Az identitásod nem része ennek. A tanúsítványod, és vele a regisztrált neved és a szerverekre vonatkozó jogosultságaid, pontosan úgy maradnak, ahogy vannak.",
+    "setupWizardIdentityLink": "Kezeld az Identitás alatt"
   },
   "profile": {
     "title": "Profil",

@@ -93,10 +93,17 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
  * sections on the left (one Tab stop, arrow keys move) and the selected section on the right.
  * `initialSection` picks the section shown first. Both columns scroll on their own. Every change is saved immediately.
  */
-export function SettingsScreen({ initialSection }: { initialSection?: SectionId }) {
+export function SettingsScreen({
+  initialSection,
+  settingsRevision,
+}: {
+  initialSection?: SectionId;
+  /** Changes when something outside the settings wrote them, e.g. the setup wizard rerun (#149). */
+  settingsRevision?: number;
+}) {
   const { t } = useTranslation("settings");
   const baseId = useId();
-  const { settings, loadFailed, saveFailed, update } = useSettings();
+  const { settings, loadFailed, saveFailed, update } = useSettings(settingsRevision);
   // macOS has no overlay at all (QA.58).
   const macos = useIsMacos();
   // The packet inspector stays hidden until the developer tools are unlocked (issue #60).

@@ -1,5 +1,24 @@
 {
   "progress": "Schritt {{current}} von {{total}}",
+  "rerun": {
+    "title": "Einrichtungsassistent",
+    "note": "Du führst die Einrichtung erneut aus. Deine Identität wird nicht verändert.",
+    "manageIdentities": "Identitäten verwalten",
+    "stepsLabel": "Schritte der Einrichtung",
+    "stepsSkipped": "(übersprungen, die Identität gehört nicht dazu)",
+    "steps": {
+      "identity": "Identität",
+      "mic": "Mikrofon",
+      "privacy": "Privatsphäre",
+      "updates": "Updates",
+      "talk": "Sprechmodus"
+    },
+    "footer": "Abbrechen lässt alles, wie es ist. Nur geänderte Schritte werden am Ende gespeichert.",
+    "discardTitle": "Änderungen verwerfen?",
+    "discardBody": "Nichts wird vor dem Abschluss gespeichert. Wenn du jetzt abbrichst, bleibt alles, wie es ist.",
+    "discardKeep": "Weiter bearbeiten",
+    "discardConfirm": "Änderungen verwerfen"
+  },
   "loadFailed": "Die Einrichtung konnte nicht geladen werden.",
   "finish": "Fertig",
   "errors": {

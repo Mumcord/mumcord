@@ -126,3 +126,75 @@
   margin: 0;
   padding-inline-start: var(--space-5);
 }
+
+/* ---- Running the wizard again from Settings (#149) ---- */
+
+/* The rerun covers the settings window completely, like the first start covers the app. */
+.centered-screen.wizard-rerun-overlay {
+  flex: 1;
+  background-color: var(--color-bg-chat);
+  background-image: var(--glow-backdrop);
+}
+
+.wizard-rerun__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+/* The step list: the first-start steps, the identity step marked as skipped. */
+.wizard-steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  width: min(32rem, 100%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-steps__item {
+  display: flex;
+  align-items: center;
+}
+
+.wizard-steps__chip {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.wizard-steps__item[aria-current="step"] .wizard-steps__chip {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* Not colour alone: the skipped step is struck through as well. */
+.wizard-steps__item--skipped .wizard-steps__chip {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.wizard-rerun__note,
+.wizard-rerun__footer {
+  width: min(32rem, 100%);
+  text-align: start;
+}
+
+/* Cancel sits on its own side, away from Back and Next. */
+.wizard-nav__cancel {
+  margin-inline-end: auto;
+}
+
+/* A link inside running text; a button for keyboard and screen-reader semantics. */
+.wizard-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

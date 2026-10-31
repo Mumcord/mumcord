@@ -178,7 +178,7 @@ function MicTest() {
     setProblem(null);
     setPhase("recording");
     try {
-      await getApi().micTestStart();
+      await getApi().micTestStart(null);
       runningRef.current = true;
       if (!mounted.current) {
         stop();

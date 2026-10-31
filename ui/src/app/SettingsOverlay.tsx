@@ -5,9 +5,16 @@ import { SettingsMount } from "./mounts";
 
 /**
  * Full-window modal for the settings screen. The shell behind it is made inert by the caller;
- * Escape closes it and focus returns to the element that opened it.
+ * Escape closes it and focus returns to the element that opened it. `blocked` hands Escape and
+ * the focus ring to a modal on top (the wizard rerun, #149) while keeping the settings mounted.
  */
-export function SettingsOverlay({ onClose }: { onClose: () => void }) {
+export function SettingsOverlay({
+  onClose,
+  blocked = false,
+}: {
+  onClose: () => void;
+  blocked?: boolean;
+}) {
   const { t } = useTranslation(["app", "common"]);
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -18,25 +25,32 @@ export function SettingsOverlay({ onClose }: { onClose: () => void }) {
     previewingRef.current = previewing;
   }, [previewing]);
 
+  // Focus moves in once and returns to the opener on unmount, whatever blocks the dialog later.
   useEffect(() => {
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     dialogRef.current?.focus();
+    return () => {
+      opener?.focus();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (blocked) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !previewingRef.current) onClose();
     };
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      opener?.focus();
     };
-  }, [onClose]);
+  }, [onClose, blocked]);
 
   // Hidden, not unmounted, so the settings state and the editor draft survive the preview.
   return (
     <div
       className="overlay"
       hidden={previewing}
-      inert={previewing}
+      inert={previewing || blocked}
       style={previewing ? { display: "none" } : undefined}
     >
       <div

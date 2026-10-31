@@ -103,5 +103,24 @@
     "ingameOverlayHint": "Draws who is talking on top of your game (Linux). You can turn it on or off per game later in Settings.",
     "ingameOverlayWarning": "Some games with anti-cheat may flag or block in-game overlays. Mumcord keeps known-risky games (such as Valorant or League of Legends) off by default. Enable it only for games you trust.",
     "ingameOverlayAlt": "Example of the in-game overlay showing who is talking"
+  },
+  "rerun": {
+    "title": "Setup wizard",
+    "note": "You are running the setup again. Your identity is not changed.",
+    "manageIdentities": "Manage identities",
+    "stepsLabel": "Setup steps",
+    "stepsSkipped": "(skipped, the identity is not part of this)",
+    "steps": {
+      "identity": "Identity",
+      "mic": "Microphone",
+      "privacy": "Privacy",
+      "updates": "Updates",
+      "talk": "Talk mode"
+    },
+    "footer": "Cancel keeps everything as it is. Only the steps you changed are saved at the end.",
+    "discardTitle": "Discard your changes?",
+    "discardBody": "Nothing you changed is saved before you finish. Cancel now and everything stays as it is.",
+    "discardKeep": "Keep editing",
+    "discardConfirm": "Discard changes"
   }
 }

@@ -1,5 +1,24 @@
 {
   "progress": "Korak {{current}} od {{total}}",
+  "rerun": {
+    "title": "Čarovnik za nastavitev",
+    "note": "Znova greš skozi nastavitev. Tvoja identiteta se ne spremeni.",
+    "manageIdentities": "Upravljaj identitete",
+    "stepsLabel": "Koraki nastavitve",
+    "stepsSkipped": "(preskočeno, identiteta ni del tega)",
+    "steps": {
+      "identity": "Identiteta",
+      "mic": "Mikrofon",
+      "privacy": "Zasebnost",
+      "updates": "Posodobitve",
+      "talk": "Način govora"
+    },
+    "footer": "Preklic pusti vse tako, kot je. Na koncu se shranijo samo spremenjeni koraki.",
+    "discardTitle": "Zavržeš spremembe?",
+    "discardBody": "Nič se ne shrani pred zaključkom. Če zdaj prekličeš, vse ostane tako, kot je.",
+    "discardKeep": "Nadaljuj z urejanjem",
+    "discardConfirm": "Zavrzi spremembe"
+  },
   "loadFailed": "Nastavitve ni bilo mogoče naložiti.",
   "finish": "Dokončaj",
   "errors": {

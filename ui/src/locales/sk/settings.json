@@ -430,7 +430,12 @@
     "noticesFailed": "Licencie tretích strán sa nepodarilo otvoriť.",
     "loading": "Načítava sa…",
     "devToolsUnlocked": "Vývojárske nástroje odomknuté: inšpektor paketov je teraz v zozname nastavení.",
-    "portable": "Prenosná"
+    "portable": "Prenosná",
+    "setup": "Nastavenie",
+    "setupWizardHint": "Prejdi znova úvodné nastavenie a skontroluj mikrofón, voľby súkromia, kontrolu aktualizácií a režim rozprávania. Tvoje aktuálne voľby sú predvyplnené.",
+    "setupWizardRun": "Spustiť sprievodcu nastavením znova",
+    "setupWizardIdentityNote": "Tvoja identita do toho nepatrí. Tvoj certifikát a s ním registrované meno a oprávnenia na serveroch zostávajú presne také, aké sú.",
+    "setupWizardIdentityLink": "Spravuj ju v časti Identita"
   },
   "profile": {
     "title": "Profil",
