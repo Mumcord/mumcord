@@ -37,7 +37,8 @@
       "specs/chat/render-send.e2e.ts",
       "specs/positional/positional.e2e.ts",
       "specs/voice/rejoin-prompt.e2e.ts",
-      "specs/wizard/ac-1.2-import-identity.e2e.ts"
+      "specs/wizard/ac-1.2-import-identity.e2e.ts",
+      "specs/chat/block.e2e.ts"
     ],
     [
       "specs/app/keyboard-a11y.e2e.ts",
