@@ -109,9 +109,9 @@ const neutral = (t: string) =>
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
   // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
   /^(Beta|Details)$/.test(t) ||
-  // "Apps" is also the German and Spanish word, "Bitrate" and "Updates" the German ones; preset
-  // theme names are names, not translated.
-  /^(Apps|Bitrate|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  // "Apps" is also the German and Spanish word, "Bitrate", "Status" and "Updates" the German ones;
+  // preset theme names are names, not translated.
+  /^(Apps|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
