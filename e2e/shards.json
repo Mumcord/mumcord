@@ -34,6 +34,7 @@
       "specs/app/keyboard-a11y.e2e.ts",
       "specs/app/sounds-close.e2e.ts",
       "specs/app/themes.e2e.ts",
+      "specs/chat/channel-header.e2e.ts",
       "specs/chat/follow-v13.e2e.ts",
       "specs/chat/notifications.e2e.ts",
       "specs/misc/diagnostics-about.e2e.ts",
