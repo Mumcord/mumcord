@@ -210,9 +210,10 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (own_cert_hash, cert_hash)
     );
     ",
-    // v17: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
+    // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
     // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
-    // path kept so a renamed or recreated channel still matches.
+    // path kept so a renamed or recreated channel still matches. v17 is `pm_conversation`
+    // (issue #173), which lands first; until then this entry is the 17th.
     r"
     CREATE TABLE channel_audio_profile (
         server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
