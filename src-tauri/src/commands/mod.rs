@@ -45,3 +45,4 @@ pub mod types;
 pub mod updates;
 pub mod user_stats;
 pub mod watch_party;
+pub mod whisper;
