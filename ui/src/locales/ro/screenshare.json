@@ -35,5 +35,8 @@
   "stopped": "Ai oprit partajarea ecranului.",
   "pauseSharing": "Pune partajarea pe pauză",
   "resumeSharing": "Reia partajarea",
-  "viewersLabel": "Cine urmărește"
+  "viewersLabel": "Cine urmărește",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Schimbă fereastra",
+  "viewersTitle": "Spectatori"
 }

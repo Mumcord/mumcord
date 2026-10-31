@@ -37,5 +37,8 @@
   "stopped": "Stop tú ag comhroinnt do scáileáin.",
   "pauseSharing": "Cuir an chomhroinnt ar sos",
   "resumeSharing": "Lean leis an gcomhroinnt",
-  "viewersLabel": "Cé atá ag féachaint"
+  "viewersLabel": "Cé atá ag féachaint",
+  "elapsed": "{{minutes}} nóiméad",
+  "changeWindow": "Athraigh fuinneog",
+  "viewersTitle": "Breathnóirí"
 }

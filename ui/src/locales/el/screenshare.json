@@ -34,5 +34,8 @@
   "stopped": "Σταμάτησες την κοινή χρήση της οθόνης σου.",
   "pauseSharing": "Παύση κοινής χρήσης",
   "resumeSharing": "Συνέχεια κοινής χρήσης",
-  "viewersLabel": "Ποιος βλέπει"
+  "viewersLabel": "Ποιος βλέπει",
+  "elapsed": "{{minutes}} λεπ",
+  "changeWindow": "Αλλαγή παραθύρου",
+  "viewersTitle": "Θεατές"
 }

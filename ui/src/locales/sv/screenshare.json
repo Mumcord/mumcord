@@ -34,5 +34,8 @@
   "stopped": "Du slutade dela din skärm.",
   "pauseSharing": "Pausa delning",
   "resumeSharing": "Återuppta delning",
-  "viewersLabel": "Vem som tittar"
+  "viewersLabel": "Vem som tittar",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Byt fönster",
+  "viewersTitle": "Tittare"
 }

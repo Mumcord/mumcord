@@ -10,7 +10,6 @@ import { useServerStateOf, useVoiceServerId } from "../features/channels";
 import { useMembersColumn } from "./membersCollapse";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
-import { SharingBar } from "../features/screenshare";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
 import {
@@ -32,8 +31,18 @@ import {
   openPrivateConversation,
   useChannelPresence,
 } from "../features/members";
-import { ScreenShareWidget, ScreenShareView, ViewerPanel } from "../features/screenshare";
-import { VideoDucking, WatchMiniBar, WatchPartyPanel, WatchTogetherView } from "../features/watchparty";
+import {
+  ScreenShareWidget,
+  ScreenShareView,
+  SharerBar,
+  ViewerPanel,
+} from "../features/screenshare";
+import {
+  VideoDucking,
+  WatchMiniBar,
+  WatchPartyPanel,
+  WatchTogetherView,
+} from "../features/watchparty";
 import { useMediaView } from "../features/media/mediaView";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
@@ -55,7 +64,6 @@ import {
   AudioDeviceNotice,
   type AudioDeviceNoticeApi,
 } from "../features/app";
-
 /** Server bar (B19). */
 export function ServersMount() {
   const messages = useMessagesOpen();
@@ -96,31 +104,26 @@ export function ChannelsMount() {
     </>
   );
 }
-
 /** User panel at the bottom of the channel column (B23). */
 export function UserPanelMount() {
   return (
     <>
-      <SharingBar />
       <UserPanel />
     </>
   );
 }
-
 const windowOverlayNoticeApi: WindowOverlayNoticeApi = {
   pending: () => getApi().windowOverlayNoticePending(),
   dismiss: async () => {
     await getApi().windowOverlayNoticeDismiss();
   },
 };
-
 const audioDeviceNoticeApi: AudioDeviceNoticeApi = {
   pending: () => getApi().audioDeviceNoticePending(),
   dismiss: async () => {
     await getApi().audioDeviceNoticeDismiss();
   },
 };
-
 /**
  * Thin status bar above the chat, e.g. "Reconnecting…" (B19), the rejoin offer (QA.9) and the
  * close question (B25). All render nothing when idle.
@@ -142,7 +145,6 @@ export function ChatStatusMount() {
     </>
   );
 }
-
 /** Chat header, message list and input (B21), or the message requests while they are open (#141). */
 export function ChatMount() {
   const requests = useRequestsView();
@@ -182,12 +184,12 @@ export function ChatMount() {
   }
   return (
     <>
+      <SharerBar />
       {view.mini.watch && <WatchMiniBar serverId={serverId} />}
       {chat}
     </>
   );
 }
-
 /** The members button in the chat header, wired to the shell's member column (issue #165). */
 function MembersToggleMount() {
   const { t } = useTranslation("members");
@@ -206,7 +208,6 @@ function MembersToggleMount() {
     />
   );
 }
-
 /**
  * Media over the main area: the watched screen share widget (FR-2.70, until its own view, issue
  * #163) and the ducking while people talk. At shell level so they stay open while switching chats
@@ -220,7 +221,6 @@ export function MediaWidgetsMount() {
     </>
   );
 }
-
 /** Member list (B20) with the friends list below (FR-1.64); the party's panel takes the column
 while its cinema view is open (issue #163). */
 export function MembersMount() {
@@ -239,7 +239,6 @@ export function MembersMount() {
     </>
   );
 }
-
 /** First-start wizard content (B18); calls `useView().finishWizard()` when done. */
 export function WizardMount() {
   const { t } = useTranslation("app");
@@ -250,7 +249,6 @@ export function WizardMount() {
     </>
   );
 }
-
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
   const { settingsSection, settingsRevision } = useView();

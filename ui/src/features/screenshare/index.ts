@@ -7,6 +7,6 @@ export { ScreenShareWidget } from "./ScreenShareViewer";
 export { ScreenShareView } from "./ScreenShareView";
 export { ViewerPanel } from "./ViewerPanel";
 export { resetWatchingStore, startWatching, stopWatching, useWatchedShare } from "./watching";
-export { SharingBar } from "./SharingBar";
-export { Viewers } from "./SharerControls";
+export { SharerBar } from "./SharerBar";
+export { Viewers, MAX_VIEWERS } from "./Viewers";
 export { useShareActions } from "./useShareActions";

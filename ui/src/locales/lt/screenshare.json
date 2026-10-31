@@ -36,5 +36,8 @@
   "stopped": "Baigei bendrinti savo ekraną.",
   "pauseSharing": "Pristabdyti bendrinimą",
   "resumeSharing": "Tęsti bendrinimą",
-  "viewersLabel": "Kas žiūri"
+  "viewersLabel": "Kas žiūri",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Keisti langą",
+  "viewersTitle": "Žiūrovai"
 }

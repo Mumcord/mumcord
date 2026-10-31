@@ -6,7 +6,7 @@ import { ChannelsPanel } from "../channels";
 import { MembersPanel } from "../members/MembersPanel";
 import { platformOf, shareBlock } from "./availability";
 import { SharePanel } from "./SharePanel";
-import { SharingBar } from "./SharingBar";
+import { SharerBar } from "./SharerBar";
 import { resetScreenShareStore } from "./sharesStore";
 
 const SELF = 1;
@@ -77,14 +77,19 @@ describe("share availability", () => {
 describe("sound of the own share", () => {
   async function sharing(soundAvailable: boolean): Promise<void> {
     const api = await linuxMock();
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     act(() => {
       api.mock.emit("screenSharesChanged", {
         serverId: 1,
         shares: [share({ soundAvailable, sound: soundAvailable })],
       });
     });
-    await screen.findByRole("region", { name: "Your screen share" });
+    await screen.findByRole("status", { name: "Your screen share" });
   }
 
   it("hints and hides the sound switch when the share has no source", async () => {
@@ -97,7 +102,12 @@ describe("sound of the own share", () => {
     const api = await connectedMock({ bindStore: true });
     onOs(api, "windows x86_64");
     api.mock.emit("voiceServerChanged", { serverId: 1 });
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     act(() => {
       api.mock.emit("screenSharesChanged", { serverId: 1, shares: [share()] });
     });
@@ -116,13 +126,18 @@ describe("share button", () => {
   it("starts a share in the voice channel and shows the controls", async () => {
     const api = await linuxMock();
     const start = vi.spyOn(api, "screenShareStart");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).not.toHaveAttribute("aria-disabled");
     });
     fireEvent.click(button);
-    await screen.findByRole("region", { name: "Your screen share" });
+    await screen.findByRole("status", { name: "Your screen share" });
     expect(start).toHaveBeenCalledWith(1, false);
     expect(screen.getByText("Nobody is watching yet")).toBeInTheDocument();
     expect(screen.getByText(/Linux shares no sound/)).toBeInTheDocument();
@@ -133,7 +148,12 @@ describe("share button", () => {
     const api = await connectedMock({ bindStore: true });
     onOs(api, "linux x86_64");
     const start = vi.spyOn(api, "screenShareStart");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     expect(button).toHaveAttribute("aria-disabled", "true");
     expect(button).toHaveAttribute("data-tooltip", "Join a voice channel to share your screen.");
@@ -145,7 +165,12 @@ describe("share button", () => {
   it("is disabled when direct connections are turned off", async () => {
     const api = await linuxMock();
     await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).toHaveAccessibleDescription(/needs direct connections/);
@@ -156,7 +181,12 @@ describe("share button", () => {
   it("notices consent turned off since the last read when clicked", async () => {
     const api = await linuxMock();
     const start = vi.spyOn(api, "screenShareStart");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).not.toHaveAttribute("aria-disabled");
@@ -173,7 +203,12 @@ describe("share button", () => {
     const api = await linuxMock();
     vi.mocked(api.appInfo).mockRestore();
     onOs(api, "freebsd x86_64");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).toHaveAccessibleDescription(
@@ -191,7 +226,12 @@ describe("share button", () => {
       }),
     );
     const error = vi.spyOn(console, "error");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).not.toHaveAttribute("aria-disabled");
@@ -211,7 +251,12 @@ describe("share button", () => {
     const api = await linuxMock();
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     api.mock.failNext("screenShareStart", "internal", "capture failed");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).not.toHaveAttribute("aria-disabled");
@@ -224,7 +269,12 @@ describe("share button", () => {
     const api = await linuxMock();
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     api.mock.failNext("screenShareStart", "permissionDenied", "screenRecording");
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     const button = await shareButton();
     await waitFor(() => {
       expect(button).not.toHaveAttribute("aria-disabled");
@@ -237,7 +287,12 @@ describe("share button", () => {
 describe("sharer controls", () => {
   it("pauses, resumes and stops the own share", async () => {
     const api = await linuxMock();
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     await shareButton();
     await act(async () => {
       await api.screenShareStart(1, false);
@@ -252,7 +307,12 @@ describe("sharer controls", () => {
 
   it("lists who is watching and says when the share is full", async () => {
     const api = await linuxMock();
-    render(<SharePanel />);
+    render(
+      <>
+        <SharePanel />
+        <SharerBar />
+      </>,
+    );
     await shareButton();
     act(() => {
       api.mock.emit("screenSharesChanged", {
@@ -316,7 +376,7 @@ describe("Live marker", () => {
   });
 });
 
-describe("Sharing bar and live ring", () => {
+describe("sharer control bar and live ring", () => {
   const sharing = (api: MockApi, viewers: number[] = []) => {
     act(() => {
       api.mock.emit("screenSharesChanged", { serverId: 1, shares: [share({ viewers })] });
@@ -326,12 +386,12 @@ describe("Sharing bar and live ring", () => {
   it("shows the bar only while sharing, with viewers, and End stops the share", async () => {
     const api = await linuxMock();
     const stop = vi.spyOn(api, "screenShareStop").mockResolvedValue(null);
-    render(<SharingBar />);
+    render(<SharerBar />);
     expect(screen.queryByRole("status")).toBeNull();
     sharing(api, [ANNA, BEN]);
     const bar = await screen.findByRole("status");
     expect(bar).toHaveTextContent("You are sharing your screen");
-    expect(bar).toHaveTextContent("Viewers: 2");
+    expect(bar).toHaveTextContent("2 watching: Anna, Ben");
     fireEvent.click(screen.getByRole("button", { name: "End screen share" }));
     expect(stop).toHaveBeenCalledWith(1);
     act(() => {

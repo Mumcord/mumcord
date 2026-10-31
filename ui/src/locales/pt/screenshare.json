@@ -35,5 +35,8 @@
   "stopped": "Paraste de partilhar o teu ecrã.",
   "pauseSharing": "Pausar partilha",
   "resumeSharing": "Retomar partilha",
-  "viewersLabel": "Quem está a ver"
+  "viewersLabel": "Quem está a ver",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Mudar janela",
+  "viewersTitle": "Espetadores"
 }
