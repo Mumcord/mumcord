@@ -12,9 +12,7 @@
     "generic": "Dit kanaal volgen is mislukt. Probeer het opnieuw."
   },
   "dm": {
-    "title": "Privéberichten",
-    "unknown": "Onbekende persoon",
-    "withServer": "{{name}}, op {{server}}"
+    "unknown": "Onbekende persoon"
   },
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",

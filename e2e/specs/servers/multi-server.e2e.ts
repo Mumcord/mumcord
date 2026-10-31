@@ -241,7 +241,7 @@ describe("multiple servers (AC-2.1–2.10)", function () {
       const person = $(`//div[${hasClass('tree-person')} and contains(.,'FriendyB')]`);
       await person.waitForDisplayed({ timeout: 15_000 });
       await person.click({ button: "right" });
-      const row = $("//*[@role='menuitemcheckbox'][starts-with(normalize-space(),'Friend')]");
+      const row = $("//*[@role='menuitem'][normalize-space()='Add friend']");
       await row.waitForClickable();
       await row.click();
       await browser.keys("Escape");

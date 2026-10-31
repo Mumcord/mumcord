@@ -845,6 +845,8 @@ export type ChannelInfo = {
 	 *  `channel_description_request` fetches the text (FR-1.48b).
 	 */
 	hasDescription: boolean,
+	/**  The channel's user limit; `null` when it has none. */
+	maxUsers: number | null,
 };
 
 export type ChannelPasswordPrompt = {

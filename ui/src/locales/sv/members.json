@@ -55,12 +55,14 @@
   "menu": {
     "label": "Åtgärder för {{name}}",
     "viewProfile": "Visa profil",
+    "sendMessage": "Skicka meddelande",
     "join": "Gå med i {{channel}}",
-    "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
+    "joinFull": "Den här kanalen är full.",
+    "joinLocked": "Du får inte gå in i den här kanalen, eller så kräver den ett lösenord.",
     "mute": "Stäng av för mig",
     "connectionInfo": "Anslutningsinfo…",
-    "chatRequest": "Skicka chattförfrågan…",
-    "chatRequestPending": "Chattförfrågan väntar"
+    "chatRequestPending": "Chattförfrågan väntar",
+    "revokeConsent": "Återkalla chattsamtycke …"
   },
   "nowPlaying": {
     "label": "Spelas nu",
@@ -104,5 +106,11 @@
     "talkingMore_one": "{{name}} och {{count}} annan pratar",
     "talkingMore_other": "{{name}} och {{count}} andra pratar",
     "shortcut": "Ctrl+Skift+M"
+  },
+  "revokeConsent": {
+    "title": "Återkalla chattsamtycket för {{name}}?",
+    "message": "{{name}} måste skicka en ny meddelandeförfrågan innan meddelandena når dig igen. Din chatthistorik finns kvar.",
+    "confirm": "Återkalla",
+    "failed": "Det gick inte att återkalla chattsamtycket. Försök igen."
   }
 }

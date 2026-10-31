@@ -21,6 +21,26 @@ const TALKER = "Freya";
 
 const toggle = () => $("button.members-toggle");
 
+/**
+ * Hover the members button until its tooltip is open. The tooltip layer only reacts when the
+ * pointer *enters* a trigger, and the click in the test before keeps this button's tooltip away
+ * until the pointer leaves it, so a plain `moveTo()` can do nothing at all. Moving off and back
+ * and retrying also survives a slow CI worker racing the tooltip delay or an unrelated scroll
+ * closing it again (issue #216).
+ */
+async function hoverUntilTooltip(): Promise<string> {
+  const detail = $("[role='tooltip'] .tooltip__detail");
+  await browser.waitUntil(
+    async () => {
+      await $(".chat-header__title").moveTo(); // the pointer leaves the button
+      await toggle().moveTo(); // ...and enters it again: that schedules the tooltip
+      return detail.waitForDisplayed({ timeout: 3_000 }).catch(() => false);
+    },
+    { timeout: 20_000, timeoutMsg: "tooltip not displayed after repeated hovers" },
+  );
+  return detail.getText();
+}
+
 async function expectShown(shown: boolean): Promise<void> {
   await browser.waitUntil(async () => (await toggle().getAttribute("aria-expanded")) === String(shown), {
     timeoutMsg: `member column not ${shown ? "shown" : "hidden"}`,
@@ -67,12 +87,12 @@ describe("member column (#165)", () => {
   });
 
   it("shows the talking dot and names the talker in the tooltip", async () => {
-    const playing = freya.run(`play ${speech}`, 60_000);
+    // Talk for longer than the audio itself: the hover checks below must not run after the play
+    // ended, when the tooltip has no talker to name (issue #216).
+    const playing = freya.run(`play ${speech} --loop --seconds 30`, 60_000);
+    // The talking state has to be there before hovering: the tooltip only names the talker then.
     await $(".members-toggle__talking").waitForExist({ timeout: 15_000 });
-    await toggle().moveTo();
-    const tip = $("[role='tooltip'] .tooltip__detail");
-    await tip.waitForDisplayed({ timeout: 5_000 });
-    expect(await tip.getText()).toBe(`${TALKER} is talking`);
+    expect(await hoverUntilTooltip()).toBe(`${TALKER} is talking`);
     await playing;
     await $(".members-toggle__talking").waitForExist({ reverse: true, timeout: 15_000 });
   });

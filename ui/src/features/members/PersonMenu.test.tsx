@@ -38,24 +38,25 @@ afterEach(() => {
 });
 
 describe("PersonMenu", () => {
-  it("opens on right-click with the four actions and focuses the first", async () => {
+  it("opens on right-click with message and friend first and focuses the first", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
     expect(menu()).toHaveAccessibleName(/Anna/);
     expect(screen.getAllByRole("menuitem").map((i) => i.textContent)).toEqual([
+      "Send message",
+      "Add friend",
       "View profile",
       "Connection info…",
-      "Send private message",
     ]);
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveAttribute(
       "aria-checked",
       "false",
     );
     expect(screen.getByRole("slider", { name: "Volume" })).toBeInTheDocument();
-    expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Send message" })).toHaveFocus();
   });
 
-  it("lists profile and message first, then a separator, then the settings", async () => {
+  it("lists the actions first, then a separator, then the settings", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 30, clientY: 40 });
     const entries = [
@@ -69,14 +70,15 @@ describe("PersonMenu", () => {
       "menuitem",
       "menuitem",
       "menuitem",
+      "menuitem",
       "separator",
-      "menuitemcheckbox",
       "menuitemcheckbox",
       "range",
     ]);
-    expect(entries[0]).toHaveTextContent("View profile");
-    expect(entries[1]).toHaveTextContent("Connection info…");
-    expect(entries[2]).toHaveTextContent("Send private message");
+    expect(entries[0]).toHaveTextContent("Send message");
+    expect(entries[1]).toHaveTextContent("Add friend");
+    expect(entries[2]).toHaveTextContent("View profile");
+    expect(entries[3]).toHaveTextContent("Connection info…");
   });
 
   it("shows a decorative icon on every entry", async () => {
@@ -104,17 +106,17 @@ describe("PersonMenu", () => {
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
     const keys = (key: string) => fireEvent.keyDown(document.activeElement as Element, { key });
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Connection info…" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Add friend" })).toHaveFocus();
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "Send private message" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
+    keys("ArrowDown");
+    expect(screen.getByRole("menuitem", { name: "Connection info…" })).toHaveFocus();
     keys("ArrowDown");
     expect(screen.getByRole("menuitemcheckbox", { name: "Mute for me" })).toHaveFocus();
     keys("ArrowDown");
-    expect(screen.getByRole("menuitemcheckbox", { name: /^Friend/ })).toHaveFocus();
-    keys("ArrowDown");
     expect(screen.getByRole("slider")).toHaveFocus();
     keys("ArrowDown");
-    expect(screen.getByRole("menuitem", { name: "View profile" })).toHaveFocus();
+    expect(screen.getByRole("menuitem", { name: "Send message" })).toHaveFocus();
   });
 
   it("toggles local mute in place and keeps the menu open", async () => {
@@ -141,14 +143,12 @@ describe("PersonMenu", () => {
     const add = vi.spyOn(api, "friendAdd");
     const remove = vi.spyOn(api, "friendRemove");
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    fireEvent.click(screen.getByRole("menuitemcheckbox", { name: /^Friend/ }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Add friend" }));
     expect(add).toHaveBeenCalledWith(1, 2);
     await act(async () => {
       await Promise.resolve();
     });
-    const row = screen.getByRole("menuitemcheckbox", { name: /^Friend/ });
-    expect(row).toHaveAttribute("aria-checked", "true");
-    fireEvent.click(row);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Remove friend" }));
     expect(remove).toHaveBeenCalledWith("annahash");
   });
 
@@ -156,9 +156,9 @@ describe("PersonMenu", () => {
     await renderPanel();
     const add = vi.spyOn(api, "friendAdd");
     fireEvent.contextMenu(member(/^Ben/), { clientX: 1, clientY: 1 });
-    const row = screen.getByRole("menuitemcheckbox", { name: /^Friend/ });
+    const row = screen.getByRole("menuitem", { name: "Add friend" });
     expect(row).toHaveAttribute("aria-disabled", "true");
-    expect(row).toHaveTextContent("without a certificate");
+    expect(row).toHaveAccessibleDescription(/without a certificate/);
     fireEvent.click(row);
     expect(add).not.toHaveBeenCalled();
   });
@@ -179,7 +179,7 @@ describe("PersonMenu", () => {
   it("opens the private conversation", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
-    fireEvent.click(screen.getByRole("menuitem", { name: "Send private message" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Send message" }));
     expect(getSelectedConversation()?.kind).toMatch(/^private/);
   });
 
@@ -337,7 +337,7 @@ describe("PersonMenu", () => {
       expect(screen.queryByRole("menuitem", { name: /^Join/ })).not.toBeInTheDocument();
     });
 
-    it("sits after the private message and moves you into their channel", async () => {
+    it("sits after the message entry and moves you into their channel", async () => {
       await renderPanel();
       const join = vi.spyOn(api, "channelJoin");
       act(() => {
@@ -345,10 +345,11 @@ describe("PersonMenu", () => {
       });
       const items = screen.getAllByRole("menuitem").map((i) => i.textContent);
       expect(items).toEqual([
+        "Send message",
+        "Join Raid",
+        "Add friend",
         "View profile",
         "Connection info…",
-        "Send private message",
-        "Join Raid",
       ]);
       fireEvent.click(screen.getByRole("menuitem", { name: "Join Raid" }));
       expect(join).toHaveBeenCalledWith(1, 2);
@@ -367,10 +368,40 @@ describe("PersonMenu", () => {
       expect(await screen.findByRole("alert")).toHaveTextContent(/not allowed/);
       expect(menu()).toBeInTheDocument();
     });
+
+    it("is disabled with the reason when the channel is full", async () => {
+      await renderPanel();
+      const join = vi.spyOn(api, "channelJoin");
+      act(() => {
+        api.mock.limitChannel(2, 1);
+        openPersonMenu({ session: 4, x: 1, y: 1, opener: null });
+      });
+      const entry = screen.getByRole("menuitem", { name: "Join Raid" });
+      expect(entry).toHaveAttribute("aria-disabled", "true");
+      expect(entry).toHaveAccessibleDescription("This channel is full.");
+      fireEvent.click(entry);
+      expect(join).not.toHaveBeenCalled();
+    });
   });
 });
 
 describe("joinTarget", () => {
+  it("reports a full channel once its user limit is reached", async () => {
+    api = await connectedMock();
+    await waitFor(() => {
+      expect(getServerState().users.get(4)).toBeDefined();
+    });
+    const state = getServerState();
+    const carla = state.users.get(4);
+    const raid = state.channels.get(carla?.channelId ?? -1);
+    if (!carla || !raid) throw new Error("seed data missing");
+    const inside = [...state.users.values()].filter((u) => u.channelId === raid.id).length;
+    const limited = (maxUsers: number) =>
+      new Map(state.channels).set(raid.id, { ...raid, maxUsers });
+    expect(joinTarget({ ...state, channels: limited(inside) }, carla)?.blocked).toBe("full");
+    expect(joinTarget({ ...state, channels: limited(inside + 1) }, carla)?.blocked).toBeNull();
+  });
+
   it("disables the entry when the channel cannot be entered", async () => {
     api = await connectedMock();
     await waitFor(() => {
@@ -385,7 +416,7 @@ describe("joinTarget", () => {
       ...gaming,
       permissions: { ...gaming.permissions, enter: false },
     });
-    expect(joinTarget({ ...state, channels: denied }, carla)?.allowed).toBe(false);
-    expect(joinTarget(state, carla)?.allowed).toBe(true);
+    expect(joinTarget({ ...state, channels: denied }, carla)?.blocked).toBe("locked");
+    expect(joinTarget(state, carla)?.blocked).toBeNull();
   });
 });

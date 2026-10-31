@@ -129,6 +129,8 @@ pub struct ChannelView {
     /// True when the channel has a description, even if its text still has to be requested
     /// (`Engine::channel_description_request`, FR-1.48b).
     pub has_description: bool,
+    /// The channel's user limit; `None` when it has none (0 on the wire).
+    pub max_users: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

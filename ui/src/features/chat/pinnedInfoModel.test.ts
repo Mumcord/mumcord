@@ -14,6 +14,7 @@ function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {
     permissions: allow,
     description: null,
     hasDescription: false,
+    maxUsers: null,
     ...patch,
   };
 }

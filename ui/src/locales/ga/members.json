@@ -58,12 +58,14 @@
   "menu": {
     "label": "Gníomhartha do {{name}}",
     "viewProfile": "Féach ar an bpróifíl",
+    "sendMessage": "Seol teachtaireacht",
     "join": "Téigh isteach i {{channel}}",
-    "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
+    "joinFull": "Tá an cainéal seo lán.",
+    "joinLocked": "Níl cead agat dul isteach sa chainéal seo, nó teastaíonn pasfhocal uaidh.",
     "mute": "Balbhaigh dom",
     "connectionInfo": "Faisnéis cheangail…",
-    "chatRequest": "Seol iarratas comhrá…",
-    "chatRequestPending": "Iarratas comhrá ar feitheamh"
+    "chatRequestPending": "Iarratas comhrá ar feitheamh",
+    "revokeConsent": "Cúlghair toiliú comhrá…"
   },
   "nowPlaying": {
     "label": "Ag seinm anois",
@@ -116,5 +118,11 @@
     "talkingMore_many": "Tá {{name}} agus {{count}} eile ag caint",
     "talkingMore_other": "Tá {{name}} agus {{count}} eile ag caint",
     "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "An gcúlghairfear an toiliú comhrá do {{name}}?",
+    "message": "Beidh ar {{name}} iarratas teachtaireachta nua a sheoladh sula sroichfidh a t(h)eachtaireachtaí thú arís. Fanfaidh do stair chomhrá.",
+    "confirm": "Cúlghair",
+    "failed": "Theip ar chúlghairm an toilithe comhrá. Bain triail eile as."
   }
 }

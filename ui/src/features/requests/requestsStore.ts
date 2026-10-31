@@ -12,6 +12,8 @@ import {
   type PmRequests,
   type Unsubscribe,
 } from "../../api";
+import { useServers } from "../servers/store";
+import { ownCertHash } from "./ownIdentity";
 
 const NO_REQUESTS: PmRequests = { incoming: [], sent: [] };
 
@@ -151,6 +153,18 @@ export function declineRequest(serverId: number, id: number): Promise<null> {
 export function sendChatRequest(serverId: number, session: number, note: string): Promise<null> {
   const trimmed = note.trim();
   return getApi().chatRequestSend(serverId, session, trimmed === "" ? null : trimmed);
+}
+
+/** The accepted conversation between the own identity on `serverId` and `certHash`, if any. */
+export function useAcceptedConsent(
+  serverId: number | null,
+  certHash: string | null,
+): AcceptedConversation | undefined {
+  const accepted = useAcceptedConversations();
+  const { servers, identities } = useServers();
+  if (serverId === null || certHash === null) return undefined;
+  const own = ownCertHash(servers, identities, serverId);
+  return accepted.find((c) => c.ownCertHash === own && c.certHash === certHash);
 }
 
 export function revokeAccepted(conversation: AcceptedConversation): Promise<null> {

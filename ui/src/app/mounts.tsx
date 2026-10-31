@@ -14,11 +14,11 @@ import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
 import {
   ChannelUnreadBadge,
-  DirectMessages,
   FollowAllMenu,
   FollowHeaderActions,
   FollowNoticeLine,
   FollowStar,
+  MessageNotifications,
 } from "../features/follow";
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
@@ -67,7 +67,7 @@ export function ChannelsMount() {
       <>
         <MessagesOverview />
         <UserStatsWatcher />
-        <DirectMessages listHidden />
+        <MessageNotifications />
       </>
     );
   }
@@ -81,7 +81,7 @@ export function ChannelsMount() {
       />
       <FollowNoticeLine />
       <UserStatsWatcher />
-      <DirectMessages />
+      <MessageNotifications />
     </>
   );
 }

@@ -76,6 +76,7 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             .filter(|t| !t.trim().is_empty())
             .map(sanitize_html),
         has_description: super::description::has_description(channel),
+        max_users: channel.max_users.filter(|&max| max > 0),
     }
 }
 
@@ -334,6 +335,16 @@ mod tests {
         state.permissions.insert(0, permissions::SELF_REGISTER);
         let root = state.channels[&0].clone();
         assert!(channel_view(&state, &root).permissions.register_self);
+    }
+
+    #[test]
+    fn user_limit_zero_means_none() {
+        let mut state = tree();
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+        state.channels.get_mut(&2).expect("raid").max_users = Some(0);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+        state.channels.get_mut(&2).expect("raid").max_users = Some(5);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, Some(5));
     }
 
     #[test]

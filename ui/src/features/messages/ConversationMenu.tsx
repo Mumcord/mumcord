@@ -6,6 +6,7 @@ import { useServers as useConnectedServers } from "../channels";
 import { clearConversation } from "../chat";
 import { forgetDirectChat } from "../follow/followStore";
 import { pinPreview } from "../members/profilePreviewStore";
+import { openRevokeConsentDialog, useAcceptedConsent } from "../requests";
 import { ConfirmDialog } from "../servers";
 import { forgetConversation } from "./conversationsStore";
 import {
@@ -15,6 +16,7 @@ import {
   CHECK_ICON,
   PERSON_ICON,
   PIN_ICON,
+  REVOKE_ICON,
   TRASH_ICON,
 } from "./icons";
 import type { Row } from "./overviewModel";
@@ -37,11 +39,12 @@ export interface ConversationMenuProps {
 
 /**
  * Right-click (Menu key, Shift+F10) menu of a conversation: mark as read, pin, mute (a second
- * menu with the lengths), view profile, block (not available yet) and delete history on this
+ * menu with the lengths), view profile, revoke chat consent, block (not available yet) and delete history on this
  * device after a confirmation.
  */
 export function ConversationMenu({ row, menu, onClose, onError }: ConversationMenuProps) {
   const { t } = useTranslation("chat");
+  const { t: tMembers } = useTranslation("members");
   const connected = useConnectedServers();
   // Choosing an item closes the menu first, then may open the next step in the same batch.
   const [step, setStep] = useState<"menu" | "mute" | "delete" | "closed">("menu");
@@ -107,6 +110,17 @@ export function ConversationMenu({ row, menu, onClose, onError }: ConversationMe
       if (menu.opener) pinPreview(session, menu.opener, row.name, false, serverId);
     },
   };
+  // Only a conversation the user accepted (issue #141) has a consent to take back.
+  const consent = useAcceptedConsent(serverId, certHash);
+  const revoke: MenuItem | null = consent
+    ? {
+        label: tMembers("menu.revokeConsent"),
+        icon: REVOKE_ICON,
+        onSelect: () => {
+          openRevokeConsentDialog({ conversation: consent, opener: menu.opener });
+        },
+      }
+    : null;
   const block: MenuItem = {
     label: t("overview.menu.block", { name: row.name }),
     hint: t("overview.blockLater"),
@@ -181,7 +195,7 @@ export function ConversationMenu({ row, menu, onClose, onError }: ConversationMe
           </span>
         </div>
       }
-      items={[markRead, pin, mute, profile, block, deleteHistory]}
+      items={[markRead, pin, mute, profile, ...(revoke ? [revoke] : []), block, deleteHistory]}
       onClose={close}
     />
   );

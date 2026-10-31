@@ -3,10 +3,12 @@ import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, artifactsDir, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
   addFirstServer,
-  composer,
+  closeMessagesOverview,
   finishWizard,
   joinChannel,
+  openMessagesOverview,
   OutputWav,
+  pmRow,
   ScriptBot,
   selectChannel,
   sendText,
@@ -18,10 +20,6 @@ import {
 } from "../../helpers/chat-ui.ts";
 
 const speech = join(repoRoot, "testenv", "audio", "speech.wav");
-
-function dmItem() {
-  return $("//section[contains(@class,'direct-messages')]//button[contains(.,'RaidBot')]");
-}
 
 function privateHeader() {
   return $("//h2[contains(@class,'chat-header__title') and contains(.,'RaidBot')]");
@@ -179,7 +177,8 @@ describe("chat: follow and private messages (AC-1.15, AC-1.16, AC-1.18)", () => 
     const before = out.length();
     const baseline = out.peakDb(Math.max(0, before - 48_000), before);
     await raidBot.run(`pm ${USER} "secret hello"`);
-    await dmItem().waitForDisplayed({ timeout: 10_000 });
+    await openMessagesOverview();
+    await pmRow("RaidBot").waitForDisplayed({ timeout: 10_000 });
     await sleep(1500);
     const after = out.length();
     expect(after).toBeGreaterThan(before);
@@ -188,9 +187,9 @@ describe("chat: follow and private messages (AC-1.15, AC-1.16, AC-1.18)", () => 
     expect(soundDb).toBeGreaterThan(-50);
     expect(soundDb).toBeGreaterThan(baseline + 20);
     // Open it with the keyboard (focus + Enter); the mouse path is checked separately below.
-    await browser.execute(() => {
-      document.querySelector<HTMLButtonElement>(".direct-messages__item")?.focus();
-    });
+    await browser.execute((el: HTMLElement) => {
+      el.focus();
+    }, await pmRow("RaidBot"));
     await browser.keys("Enter");
     await privateHeader().waitForDisplayed();
     await waitMessage("secret hello");
@@ -198,25 +197,11 @@ describe("chat: follow and private messages (AC-1.15, AC-1.16, AC-1.18)", () => 
     await raidBot.run(`expect message --from ${USER} --private true --contains "private pong"`);
   });
 
-  it("AC-1.18 a mouse click on the Direct messages entry opens the chat (tree focused)", async () => {
-    await selectChannel("Lobby"); // leaves focus in the channel tree, as after any channel click
-    await dmItem().click();
-    const opened = await privateHeader()
-      .waitForDisplayed({ timeout: 5_000 })
-      .then(() => true)
-      .catch(() => false);
-    if (!opened) {
-      // Diagnose: same click with focus moved out of the tree first (the tree's keyboard hint
-      // is only shown while the tree has focus, so blurring it shifts the list below).
-      await composer().click();
-      await dmItem().click();
-      const afterBlur = await privateHeader()
-        .waitForDisplayed({ timeout: 5_000 })
-        .then(() => true)
-        .catch(() => false);
-      throw new Error(
-        `mouse click on the DM entry did not open the chat while the tree had focus (works after blurring the tree: ${String(afterBlur)})`,
-      );
-    }
+  it("AC-1.18 a mouse click on the overview row opens the chat", async () => {
+    await closeMessagesOverview();
+    await selectChannel("Lobby");
+    await openMessagesOverview();
+    await pmRow("RaidBot").click();
+    await privateHeader().waitForDisplayed({ timeout: 5_000 });
   });
 });
