@@ -75,7 +75,8 @@
     "channels_one": "{{count}} канал",
     "channels_other": "{{count}} канала",
     "people_one": "{{count}} човек",
-    "people_other": "{{count}} души"
+    "people_other": "{{count}} души",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

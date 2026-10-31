@@ -87,6 +87,44 @@ function Highlighted({ text, query }: { text: string; query: string }) {
 const PERSON_DRAG_TYPE = "application/x-mumcord-person";
 
 /** Small status icon after a channel name, with its meaning for screen readers. */
+const GLYPHS = {
+  // Speaker: the channel the user is in for voice.
+  voice: <path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />,
+  // Clock: a temporary channel, removed by the server once empty.
+  temporary: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </>
+  ),
+  text: <path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18" />,
+};
+
+/**
+ * Glyph before every channel name, always in the same place (#172): 🔊 for the own voice channel,
+ * ⏱ for temporary channels and # for all others. Decorative: the row's name says the rest.
+ */
+function ChannelGlyph({ kind }: { kind: keyof typeof GLYPHS }) {
+  return (
+    <svg
+      className="tree-channel__glyph"
+      data-kind={kind}
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {GLYPHS[kind]}
+    </svg>
+  );
+}
+
 function StatusIcon({
   label,
   kind,
@@ -285,6 +323,7 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               <path d="m9 6 6 6-6 6" />
             </svg>
           </span>
+          <ChannelGlyph kind={isOwn ? "voice" : channel.temporary ? "temporary" : "text"} />
           <span id={labelId} className="tree-channel__label">
             <span className="tree-channel__name" data-tooltip={channel.name} data-tooltip-overflow>
               <Highlighted text={channel.name} query={query} />
@@ -322,10 +361,8 @@ export const ChannelBranch = memo(function ChannelBranchRow({
               </span>
             )}
             {channel.temporary && (
-              <StatusIcon kind="temporary" label={t("tree.temporary")}>
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v5l3 2" />
-              </StatusIcon>
+              // Shown by the ⏱ glyph before the name; here only for screen readers.
+              <span className="visually-hidden">, {t("tree.temporary")}</span>
             )}
             {channel.links.length > 0 && (
               <StatusIcon kind="linked" label={t("tree.linked")}>

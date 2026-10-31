@@ -90,7 +90,8 @@
     "people_two": "{{count}} dhuine",
     "people_few": "{{count}} dhuine",
     "people_many": "{{count}} nduine",
-    "people_other": "{{count}} duine"
+    "people_other": "{{count}} duine",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

@@ -75,7 +75,8 @@
     "channels_one": "{{count}} κανάλι",
     "channels_other": "{{count}} κανάλια",
     "people_one": "{{count}} άτομο",
-    "people_other": "{{count}} άτομα"
+    "people_other": "{{count}} άτομα",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

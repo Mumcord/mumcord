@@ -90,7 +90,8 @@
     "people_two": "{{count}} persuni",
     "people_few": "{{count}} persuni",
     "people_many": "{{count}} persuna",
-    "people_other": "{{count}} persuna"
+    "people_other": "{{count}} persuna",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

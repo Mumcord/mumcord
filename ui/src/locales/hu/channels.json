@@ -75,7 +75,8 @@
     "channels_one": "{{count}} csatorna",
     "channels_other": "{{count}} csatorna",
     "people_one": "{{count}} személy",
-    "people_other": "{{count}} személy"
+    "people_other": "{{count}} személy",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

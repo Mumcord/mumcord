@@ -55,6 +55,15 @@ describe("ChannelsPanel", () => {
     expect(screen.getByText(/Shift\+Enter or double-click: join/)).toBeInTheDocument();
   });
 
+  it("puts a glyph before every channel: speaker for the own voice channel, # for others", async () => {
+    const { container } = await renderPanel();
+    const kinds = [...container.querySelectorAll(".tree-channel__glyph")].map((g) =>
+      g.getAttribute("data-kind"),
+    );
+    expect(kinds).toContain("text");
+    expect(kinds.filter((kind) => kind === "voice").length).toBeLessThanOrEqual(1);
+  });
+
   it("shows a collapsible server section header with connection state and people online", async () => {
     await renderPanel();
     const toggle = within(screen.getByRole("heading", { level: 2 })).getByRole("button");

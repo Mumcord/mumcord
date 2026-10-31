@@ -75,7 +75,8 @@
     "channels_one": "{{count}} kanal",
     "channels_other": "{{count}} kanalit",
     "people_one": "{{count}} inimene",
-    "people_other": "{{count}} inimest"
+    "people_other": "{{count}} inimest",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

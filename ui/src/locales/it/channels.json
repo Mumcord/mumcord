@@ -80,7 +80,8 @@
     "channels_other": "{{count}} canali",
     "people_one": "{{count}} persona",
     "people_many": "{{count}} persone",
-    "people_other": "{{count}} persone"
+    "people_other": "{{count}} persone",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

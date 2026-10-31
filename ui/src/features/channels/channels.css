@@ -76,17 +76,13 @@
     inset 0 0 0 2px var(--color-focus);
 }
 
-.tree-channel__row[data-voice="true"] .tree-channel__name::before {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-right: var(--space-1);
-  background: var(--color-talking);
-  content: "";
-  vertical-align: -0.125em;
-  /* Speaker icon (stroke path, same style as the person icons). */
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E")
-    center / contain no-repeat;
+.tree-channel__glyph {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.tree-channel__glyph[data-kind="voice"] {
+  color: var(--color-talking);
 }
 
 .tree-channel__toggle {
@@ -390,9 +386,9 @@
 .channel-search__input {
   width: 100%;
   min-width: 0;
-  padding: var(--space-1) 1.75rem var(--space-1) var(--space-2);
+  padding: var(--space-2) 3.25rem var(--space-2) calc(var(--space-2) + 16px + var(--space-2));
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-bg-servers);
   color: var(--color-text);
   font-size: var(--font-size-sm);
@@ -405,6 +401,26 @@
 .channel-search__input:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: -1px;
+}
+
+.channel-search__icon {
+  position: absolute;
+  left: var(--space-2);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* "Ctrl K" chip at the field's end while it is empty, as in the #172 mockup. */
+.channel-search__key {
+  position: absolute;
+  right: var(--space-2);
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  pointer-events: none;
 }
 
 /* Own clear button instead of the engine's, which looks different per platform. */

@@ -75,7 +75,8 @@
     "channels_one": "{{count}} kanaal",
     "channels_other": "{{count}} kanalen",
     "people_one": "{{count}} persoon",
-    "people_other": "{{count}} personen"
+    "people_other": "{{count}} personen",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

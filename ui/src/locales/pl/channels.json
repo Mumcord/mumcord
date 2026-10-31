@@ -85,7 +85,8 @@
     "people_one": "{{count}} osoba",
     "people_few": "{{count}} osoby",
     "people_many": "{{count}} osób",
-    "people_other": "{{count}} osoby"
+    "people_other": "{{count}} osoby",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

@@ -9,7 +9,16 @@ import { EyeIcon } from "../follow/EyeIcon";
 import type { MenuItem } from "../servers/ServerMenu";
 import { ChannelInfoDialog } from "./ChannelInfoDialog";
 import { channelLink, channelPath } from "./channelModel";
-import { InfoIcon, JoinIcon, KeyIcon, LinkIcon, MusicIcon, PeopleIcon, TrashIcon } from "./icons";
+import {
+  EraserIcon,
+  EyeOffIcon,
+  InfoIcon,
+  JoinIcon,
+  KeyIcon,
+  LinkIcon,
+  MusicIcon,
+  PeopleIcon,
+} from "./icons";
 import { MoveUsersDialog } from "./MoveUsersDialog";
 
 /** Where the menu opens: the channel name in the chat header, or a channel row in the tree. */
@@ -107,7 +116,8 @@ export function useChannelActions(
     ? {
         id: "follow",
         label: follow.following ? t("menu.unfollow") : t("menu.follow"),
-        icon: <EyeIcon />,
+        // The icon shows the action, like the label: an open eye to follow, a crossed one to stop.
+        icon: follow.following ? <EyeOffIcon /> : <EyeIcon />,
         ...(follow.following ? { hint: t("menu.following") } : {}),
         disabled: follow.busy,
         onSelect: () => {
@@ -177,7 +187,7 @@ export function useChannelActions(
     ? {
         id: "clear",
         label: t("menu.clear"),
-        icon: <TrashIcon />,
+        icon: <EraserIcon />,
         danger: true,
         separatorBefore: moveItem === null,
         onSelect: () => {

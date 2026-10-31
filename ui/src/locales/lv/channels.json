@@ -80,7 +80,8 @@
     "channels_other": "{{count}} kanāli",
     "people_zero": "{{count}} cilvēku",
     "people_one": "{{count}} cilvēks",
-    "people_other": "{{count}} cilvēki"
+    "people_other": "{{count}} cilvēki",
+    "shortcut": "Ctrl K"
   },
   "section": {
     "state": {

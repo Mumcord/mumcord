@@ -47,10 +47,22 @@ export function InfoIcon() {
   );
 }
 
-export function TrashIcon() {
+/** Eraser, as in the #172 mockup: clearing history wipes the local copy. */
+export function EraserIcon() {
   return (
     <Icon>
-      <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6" />
+      <path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21" />
+      <path d="M22 21H7M5 11l9 9" />
+    </Icon>
+  );
+}
+
+/** Crossed-out eye for "Unfollow channel"; the open eye stands for "Follow". */
+export function EyeOffIcon() {
+  return (
+    <Icon>
+      <path d="M10.7 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6" />
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M2 2l20 20" />
     </Icon>
   );
 }
