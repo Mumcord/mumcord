@@ -142,8 +142,8 @@ describe("private messages overview", () => {
   it("collapses more than one message request", async () => {
     render(<MessagesOverview />);
     act(() => {
-      api.mock.receivePmRequest(2, { chatRequest: true, note: "<b>Hi!</b> cup?" });
       api.mock.receivePmRequest(4, { chatRequest: true, note: null });
+      api.mock.receivePmRequest(2, { chatRequest: true, note: "<b>Hi!</b> cup?" });
     });
     expect(await screen.findByRole("button", { name: "Show 1 more request" })).toBeInTheDocument();
     expect(screen.getAllByTestId("pm-request")).toHaveLength(1);

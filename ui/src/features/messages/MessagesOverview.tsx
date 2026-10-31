@@ -34,7 +34,12 @@ function usePendingRequests(): PendingRequest[] {
     () =>
       [...all]
         .flatMap(([serverId, r]) => r.incoming.map((request) => ({ serverId, request })))
-        .sort((a, b) => Date.parse(b.request.receivedAt) - Date.parse(a.request.receivedAt)),
+        .sort(
+          (a, b) =>
+            Date.parse(b.request.receivedAt) - Date.parse(a.request.receivedAt) ||
+            // Same millisecond: the later request (higher id) is the newer one.
+            b.request.id - a.request.id,
+        ),
     [all],
   );
 }
