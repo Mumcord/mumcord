@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Etsitäänkö uusia versioita?",
-    "description": "Mumcord voi kysyä GitHubilta kerran päivässä, onko uudempaa versiota, ja näyttää vihjeen linkin kera. Mitään ei ladata eikä asenneta, eikä mitään lähetetä itse pyynnön sekä sovelluksen nimen ja version lisäksi. Voit muuttaa tätä myöhemmin asetuksista.",
+    "description": "Mumcord voi kysyä GitHubilta säännöllisesti, onko uudempaa versiota, ja kertoa siitä sinulle. Mitään ei ladata tai asenneta kysymättä, eikä mitään lähetetä itse pyynnön sekä sovelluksen nimen ja version lisäksi. Voit muuttaa tätä myöhemmin Asetuksissa.",
     "no": "Ei",
     "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} on saatavilla.",
-    "open": "Näytä julkaisu",
-    "dismiss": "Ohita",
-    "portable": "Lataa uusi siirrettävä zip ja pura se tähän kansioon; tietosi MumcordData-kansiossa säilyvät."
   },
   "directConsent": {
     "title": "Sallitaanko suorat yhteydet?",
@@ -46,5 +40,82 @@
     "no": "Ei",
     "yes": "Kyllä",
     "failed": "Se ei onnistunut. Yritä uudelleen."
+  },
+  "updater": {
+    "stable": "Vakaa",
+    "available": {
+      "title": "Päivitys saatavilla",
+      "subtitle": "Mumcord {{version}} on valmis ladattavaksi. Sinulla on {{current}}.",
+      "subtitleManual": "Mumcord {{version}} on julkaistu. Sinulla on {{current}}.",
+      "whatsNew": "Uutta version {{current}} jälkeen",
+      "trust": "Ladataan vain osoitteesta github.com HTTPS-yhteydellä, ja se tarkistetaan allekirjoituksen ja tarkistussumman avulla ennen asennusta.",
+      "skip": "Ohita tämä versio",
+      "later": "Muistuta myöhemmin",
+      "download": "Lataa ja asenna",
+      "openReleasePage": "Avaa julkaisusivu",
+      "manual": "Lataa uusi versio julkaisusivulta.",
+      "manualPackage": "Lataa paketti julkaisusivulta ja asenna se sitten komennolla:",
+      "manualAur": "Päivitä se AUR-apuohjelmallasi:"
+    },
+    "tags": {
+      "added": "Lisätty",
+      "changed": "Muutettu",
+      "fixed": "Korjattu",
+      "removed": "Poistettu"
+    },
+    "noNotes": "Tälle versiolle ei ole muistiinpanoja.",
+    "steps": {
+      "download": "Lataus",
+      "verify": "Tarkista allekirjoitus ja tarkistussumma",
+      "install": "Asennus",
+      "done": "valmis",
+      "current": "käynnissä",
+      "pending": "ei vielä alkanut"
+    },
+    "progress": {
+      "title": "Ladataan Mumcord {{version}}",
+      "subtitle": "Voit jatkaa Mumcordin käyttöä tämän aikana.",
+      "label": "Päivityksen edistyminen",
+      "unknown": "Kokoa ei vielä tiedetä",
+      "size": "{{received}} / {{total}} Mt",
+      "received": "{{received}} Mt",
+      "secondsLeft_one": "noin {{count}} sekunti jäljellä",
+      "secondsLeft_other": "noin {{count}} sekuntia jäljellä",
+      "minutesLeft_one": "noin {{count}} minuutti jäljellä",
+      "minutesLeft_other": "noin {{count}} minuuttia jäljellä",
+      "cancel": "Peruuta"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} on valmis",
+      "subtitle": "Viimeistele päivitys käynnistämällä uudelleen.",
+      "verified": "Tarkistettu",
+      "downloaded": "Ladattu",
+      "checked": "Allekirjoitus ja tarkistussumma tarkistettu",
+      "installed": "Asennettu",
+      "installsOnRestart": "Asennetaan, kun Mumcord käynnistyy uudelleen",
+      "connected_one": "Olet yhteydessä {{count}} palvelimeen. Uudelleenkäynnistyksen jälkeen Mumcord muodostaa yhteyden uudelleen ja liittyy kanaviisi uudelleen.",
+      "connected_other": "Olet yhteydessä {{count}} palvelimeen. Uudelleenkäynnistyksen jälkeen Mumcord muodostaa yhteyden uudelleen ja liittyy kanaviisi uudelleen.",
+      "later": "Myöhemmin",
+      "restart": "Päivitä käynnistämällä uudelleen",
+      "announce": "Mumcord {{version}} on valmis. Päivitä käynnistämällä uudelleen."
+    },
+    "failed": {
+      "title": "Päivitys ei onnistunut",
+      "subtitle": "Mumcord {{version}} jäi asentamatta. Nykyinen versiosi toimii edelleen.",
+      "network": "Mumcord ei tavoittanut GitHubia. Tarkista internetyhteytesi ja yritä uudelleen.",
+      "manifest": "GitHubin päivitystiedot ovat puutteelliset tai rikkinäiset, joten mitään ei asennettu.",
+      "signature": "Latauksen allekirjoitus ei täsmännyt, joten lataus hylättiin.",
+      "checksum": "Lataus ei täsmännyt tarkistussummaansa, joten lataus hylättiin.",
+      "install": "Päivityksen asennus epäonnistui. Asennettu versiosi ei muuttunut.",
+      "retry": "Yritä uudelleen",
+      "close": "Sulje"
+    },
+    "actionFailed": "Se ei onnistunut. Yritä uudelleen.",
+    "toast": {
+      "title": "Mumcord {{version}} on valmis",
+      "body": "Päivitä käynnistämällä uudelleen.",
+      "restart": "Käynnistä uudelleen",
+      "later": "Myöhemmin"
+    }
   }
 }

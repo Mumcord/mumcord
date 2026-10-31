@@ -1,24 +1,5 @@
 {
   "progress": "{{current}}. solis no {{total}}",
-  "rerun": {
-    "title": "Iestatīšanas vednis",
-    "note": "Tu atkārto iestatīšanu. Tava identitāte netiek mainīta.",
-    "manageIdentities": "Pārvaldīt identitātes",
-    "stepsLabel": "Iestatīšanas soļi",
-    "stepsSkipped": "(izlaists, identitāte tam nepieder)",
-    "steps": {
-      "identity": "Identitāte",
-      "mic": "Mikrofons",
-      "privacy": "Privātums",
-      "updates": "Atjauninājumi",
-      "talk": "Runāšanas režīms"
-    },
-    "footer": "Atcelšana visu atstāj kā ir. Beigās saglabā tikai mainītos soļus.",
-    "discardTitle": "Atmest izmaiņas?",
-    "discardBody": "Nekas netiek saglabāts pirms pabeigšanas. Ja tagad atcelsi, viss paliks kā ir.",
-    "discardKeep": "Turpināt rediģēt",
-    "discardConfirm": "Atmest izmaiņas"
-  },
   "loadFailed": "Iestatīšanu neizdevās ielādēt.",
   "finish": "Pabeigt",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Viss, ko Mumcord saglabā, paliek jūsu datorā.",
     "statement": "Pilns privātuma paziņojums"
   },
+  "updates": {
+    "title": "Jaunas versijas",
+    "choice": "Kad iznāk jauna versija",
+    "auto": "Lejupielādēt automātiski",
+    "autoHint": "Mumcord fonā lejupielādē un pārbauda atjauninājumu un pirms restartēšanas pajautā tev.",
+    "notify": "Tikai paziņot",
+    "notifyHint": "Mumcord paziņo par jaunu versiju un parāda, kas mainījies. Nekas netiek lejupielādēts, kamēr tu to nepasaki.",
+    "off": "Izslēgts",
+    "offHint": "Mumcord nekad nejautā GitHub par jaunām versijām. Atjaunini pats.",
+    "privacy": "Pārbaude GitHub nosūta tikai pašu pieprasījumu un lietotnes nosaukumu un versiju. To vari vēlāk mainīt iestatījumos."
+  },
   "talk": {
     "title": "Kā tu vēlies runāt?",
     "mode": "Runāšanas režīms",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Dažas spēles ar pretkrāpšanās aizsardzību var atzīmēt vai bloķēt pārklājumus spēlēs. Mumcord pēc noklusējuma atstāj izslēgtu zināmi riskantām spēlēm (piemēram, Valorant vai League of Legends). Ieslēdz to tikai spēlēm, kurām uzticies.",
     "ingameOverlayAlt": "Spēles pārklājuma piemērs, kas rāda, kas runā"
   },
-  "updates": {
-    "title": "Jaunas versijas",
-    "check": "Meklēt jaunas versijas",
-    "hint": "Mumcord var reizi dienā pajautāt GitHub, vai ir jaunāka versija, un parādīt padomu ar saiti. Nekas netiek lejupielādēts vai instalēts, un nekas netiek sūtīts, izņemot pašu pieprasījumu un lietotnes nosaukumu un versiju. To vari vēlāk mainīt iestatījumos."
+  "rerun": {
+    "title": "Iestatīšanas vednis",
+    "note": "Tu atkārto iestatīšanu. Tava identitāte netiek mainīta.",
+    "manageIdentities": "Pārvaldīt identitātes",
+    "stepsLabel": "Iestatīšanas soļi",
+    "stepsSkipped": "(izlaists, identitāte tam nepieder)",
+    "steps": {
+      "identity": "Identitāte",
+      "mic": "Mikrofons",
+      "privacy": "Privātums",
+      "updates": "Atjauninājumi",
+      "talk": "Runāšanas režīms"
+    },
+    "footer": "Atcelšana visu atstāj kā ir. Beigās saglabā tikai mainītos soļus.",
+    "discardTitle": "Atmest izmaiņas?",
+    "discardBody": "Nekas netiek saglabāts pirms pabeigšanas. Ja tagad atcelsi, viss paliks kā ir.",
+    "discardKeep": "Turpināt rediģēt",
+    "discardConfirm": "Atmest izmaiņas"
   }
 }

@@ -1,24 +1,5 @@
 {
   "progress": "Céim {{current}} as {{total}}",
-  "rerun": {
-    "title": "Treoraí socraithe",
-    "note": "Tá tú ag rith an tsocraithe arís. Ní athraítear do chéannacht.",
-    "manageIdentities": "Bainistigh céannachtaí",
-    "stepsLabel": "Céimeanna an tsocraithe",
-    "stepsSkipped": "(scipta, níl an chéannacht mar chuid de seo)",
-    "steps": {
-      "identity": "Céannacht",
-      "mic": "Micreafón",
-      "privacy": "Príobháideachas",
-      "updates": "Nuashonruithe",
-      "talk": "Mód labhartha"
-    },
-    "footer": "Fágann Cealaigh gach rud mar atá. Ní shábháiltear ach na céimeanna a d'athraigh tú ag an deireadh.",
-    "discardTitle": "An bhfuil tú ag iarraidh do chuid athruithe a chaitheamh amach?",
-    "discardBody": "Ní shábháiltear aon rud sula gcríochnaíonn tú. Má chealaíonn tú anois, fanfaidh gach rud mar atá.",
-    "discardKeep": "Lean leis an eagarthóireacht",
-    "discardConfirm": "Caith athruithe amach"
-  },
   "loadFailed": "Níorbh fhéidir an socrú a luchtú.",
   "finish": "Críochnaigh",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Fanann gach rud a stórálann Mumcord ar do ríomhaire.",
     "statement": "Ráiteas iomlán príobháideachais"
   },
+  "updates": {
+    "title": "Leaganacha nua",
+    "choice": "Nuair a bhíonn leagan nua amuigh",
+    "auto": "Íoslódáil go huathoibríoch",
+    "autoHint": "Íoslódálann Mumcord an nuashonrú agus fíoraíonn sé é sa chúlra agus fiafraíonn sé díot sula n-atosaíonn sé.",
+    "notify": "Fógair amháin",
+    "notifyHint": "Cuireann Mumcord leagan nua in iúl duit agus taispeánann sé cad a d'athraigh. Ní íoslódáiltear aon rud go dtí go ndéarfaidh tú.",
+    "off": "Díghníomhaithe",
+    "offHint": "Ní fhiafraíonn Mumcord de GitHub faoi leaganacha nua choíche. Nuashonraíonn tú féin é.",
+    "privacy": "Ní sheolann an tseiceáil ach an t-iarratas féin agus ainm agus leagan na haipe chuig GitHub. Is féidir leat é seo a athrú níos déanaí sna Socruithe."
+  },
   "talk": {
     "title": "Conas ba mhaith leat labhairt?",
     "mode": "Mód cainte",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "D'fhéadfadh roinnt cluichí le frithcheilg forleagain sa chluiche a bhrath nó a bhlocáil. Coinníonn Mumcord cluichí a bhfuil riosca ar eolas leo (ar nós Valorant nó League of Legends) as de réir réamhshocraithe. Ná cuir air é ach do chluichí a bhfuil muinín agat astu.",
     "ingameOverlayAlt": "Sampla den fhorleagan sa chluiche ag taispeáint cé atá ag caint"
   },
-  "updates": {
-    "title": "Leaganacha nua",
-    "check": "Seiceáil le haghaidh leaganacha nua",
-    "hint": "Is féidir le Mumcord fiafraí de GitHub uair sa lá an bhfuil leagan níos nuaí ann agus leid le nasc a thaispeáint. Ní íoslódáiltear ná ní shuiteáiltear aon rud, agus ní sheoltar aon rud ach an t-iarratas féin agus ainm agus leagan na haipe. Is féidir leat é seo a athrú níos déanaí sna Socruithe."
+  "rerun": {
+    "title": "Treoraí socraithe",
+    "note": "Tá tú ag rith an tsocraithe arís. Ní athraítear do chéannacht.",
+    "manageIdentities": "Bainistigh céannachtaí",
+    "stepsLabel": "Céimeanna an tsocraithe",
+    "stepsSkipped": "(scipta, níl an chéannacht mar chuid de seo)",
+    "steps": {
+      "identity": "Céannacht",
+      "mic": "Micreafón",
+      "privacy": "Príobháideachas",
+      "updates": "Nuashonruithe",
+      "talk": "Mód labhartha"
+    },
+    "footer": "Fágann Cealaigh gach rud mar atá. Ní shábháiltear ach na céimeanna a d'athraigh tú ag an deireadh.",
+    "discardTitle": "An bhfuil tú ag iarraidh do chuid athruithe a chaitheamh amach?",
+    "discardBody": "Ní shábháiltear aon rud sula gcríochnaíonn tú. Má chealaíonn tú anois, fanfaidh gach rud mar atá.",
+    "discardKeep": "Lean leis an eagarthóireacht",
+    "discardConfirm": "Caith athruithe amach"
   }
 }

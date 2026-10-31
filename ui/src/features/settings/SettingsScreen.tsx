@@ -25,6 +25,7 @@ import { PacketInspectorSection } from "./sections/PacketInspectorSection";
 import { PrivacySection } from "./sections/PrivacySection";
 import { ServersSection } from "./sections/ServersSection";
 import { SoundsSection } from "./sections/SoundsSection";
+import { UpdatesSection } from "./sections/UpdatesSection";
 import { VoiceSection } from "./sections/VoiceSection";
 import { SettingsNavigationContext, type SettingsNavigation } from "./settingsNavigation";
 import { SettingsSearch } from "./SettingsSearch";
@@ -79,6 +80,8 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
       return <SoundsSection {...props} />;
     case "overlay":
       return <OverlaySection />;
+    case "updates":
+      return <UpdatesSection {...props} />;
     case "diagnostics":
       return <DiagnosticsSection {...props} />;
     case "about":

@@ -1,24 +1,5 @@
 {
   "progress": "Stap {{current}} van {{total}}",
-  "rerun": {
-    "title": "Installatiewizard",
-    "note": "Je doorloopt de installatie opnieuw. Je identiteit wordt niet gewijzigd.",
-    "manageIdentities": "Identiteiten beheren",
-    "stepsLabel": "Stappen van de installatie",
-    "stepsSkipped": "(overgeslagen, de identiteit hoort er niet bij)",
-    "steps": {
-      "identity": "Identiteit",
-      "mic": "Microfoon",
-      "privacy": "Privacy",
-      "updates": "Updates",
-      "talk": "Spraakmodus"
-    },
-    "footer": "Annuleren laat alles zoals het is. Alleen gewijzigde stappen worden aan het eind opgeslagen.",
-    "discardTitle": "Wijzigingen weggooien?",
-    "discardBody": "Er wordt niets opgeslagen voordat je klaar bent. Als je nu annuleert, blijft alles zoals het is.",
-    "discardKeep": "Verder bewerken",
-    "discardConfirm": "Wijzigingen weggooien"
-  },
   "loadFailed": "De installatie kon niet worden geladen.",
   "finish": "Voltooien",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Alles wat Mumcord opslaat, blijft op je computer.",
     "statement": "Volledige privacyverklaring"
   },
+  "updates": {
+    "title": "Nieuwe versies",
+    "choice": "Als er een nieuwe versie uit is",
+    "auto": "Automatisch downloaden",
+    "autoHint": "Mumcord downloadt en controleert de update op de achtergrond en vraagt het je voordat het opnieuw opstart.",
+    "notify": "Alleen melden",
+    "notifyHint": "Mumcord meldt een nieuwe versie en laat zien wat er is veranderd. Er wordt pas iets gedownload als jij dat wilt.",
+    "off": "Uit",
+    "offHint": "Mumcord vraagt GitHub nooit naar nieuwe versies. Je werkt zelf bij.",
+    "privacy": "Bij het controleren worden alleen het verzoek zelf en de naam en versie van de app naar GitHub gestuurd. Je kunt dit later wijzigen in de Instellingen."
+  },
   "talk": {
     "title": "Hoe wil je praten?",
     "mode": "Praatmodus",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Sommige games met anticheat kunnen overlays in de game markeren of blokkeren. Mumcord laat bekende risicogames (zoals Valorant of League of Legends) standaard uit. Schakel hem alleen in voor games die je vertrouwt.",
     "ingameOverlayAlt": "Voorbeeld van de overlay in de game die toont wie er praat"
   },
-  "updates": {
-    "title": "Nieuwe versies",
-    "check": "Zoeken naar nieuwe versies",
-    "hint": "Mumcord kan GitHub één keer per dag vragen of er een nieuwere versie is en dan een melding met een link tonen. Er wordt niets gedownload of geïnstalleerd, en er wordt niets verstuurd behalve het verzoek zelf en de naam en versie van de app. Je kunt dit later wijzigen in Instellingen."
+  "rerun": {
+    "title": "Installatiewizard",
+    "note": "Je doorloopt de installatie opnieuw. Je identiteit wordt niet gewijzigd.",
+    "manageIdentities": "Identiteiten beheren",
+    "stepsLabel": "Stappen van de installatie",
+    "stepsSkipped": "(overgeslagen, de identiteit hoort er niet bij)",
+    "steps": {
+      "identity": "Identiteit",
+      "mic": "Microfoon",
+      "privacy": "Privacy",
+      "updates": "Updates",
+      "talk": "Spraakmodus"
+    },
+    "footer": "Annuleren laat alles zoals het is. Alleen gewijzigde stappen worden aan het eind opgeslagen.",
+    "discardTitle": "Wijzigingen weggooien?",
+    "discardBody": "Er wordt niets opgeslagen voordat je klaar bent. Als je nu annuleert, blijft alles zoals het is.",
+    "discardKeep": "Verder bewerken",
+    "discardConfirm": "Wijzigingen weggooien"
   }
 }

@@ -1,24 +1,5 @@
 {
   "progress": "Korak {{current}} od {{total}}",
-  "rerun": {
-    "title": "Čarovnik za nastavitev",
-    "note": "Znova greš skozi nastavitev. Tvoja identiteta se ne spremeni.",
-    "manageIdentities": "Upravljaj identitete",
-    "stepsLabel": "Koraki nastavitve",
-    "stepsSkipped": "(preskočeno, identiteta ni del tega)",
-    "steps": {
-      "identity": "Identiteta",
-      "mic": "Mikrofon",
-      "privacy": "Zasebnost",
-      "updates": "Posodobitve",
-      "talk": "Način govora"
-    },
-    "footer": "Preklic pusti vse tako, kot je. Na koncu se shranijo samo spremenjeni koraki.",
-    "discardTitle": "Zavržeš spremembe?",
-    "discardBody": "Nič se ne shrani pred zaključkom. Če zdaj prekličeš, vse ostane tako, kot je.",
-    "discardKeep": "Nadaljuj z urejanjem",
-    "discardConfirm": "Zavrzi spremembe"
-  },
   "loadFailed": "Nastavitve ni bilo mogoče naložiti.",
   "finish": "Dokončaj",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Vse, kar Mumcord shrani, ostane v vašem računalniku.",
     "statement": "Celotna izjava o zasebnosti"
   },
+  "updates": {
+    "title": "Nove različice",
+    "choice": "Ko izide nova različica",
+    "auto": "Samodejno prenesi",
+    "autoHint": "Mumcord posodobitev prenese in preveri v ozadju ter te vpraša, preden se znova zažene.",
+    "notify": "Samo obvesti",
+    "notifyHint": "Mumcord te obvesti o novi različici in pokaže, kaj se je spremenilo. Nič se ne prenese, dokler ne rečeš.",
+    "off": "Izključeno",
+    "offHint": "Mumcord nikoli ne sprašuje GitHuba po novih različicah. Posodobiš sam.",
+    "privacy": "Preverjanje GitHubu pošlje samo samo zahtevo ter ime in različico aplikacije. To lahko pozneje spremeniš v Nastavitvah."
+  },
   "talk": {
     "title": "Kako želiš govoriti?",
     "mode": "Način govora",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Nekatere igre s protigoljufijsko zaščito lahko prekrivne sloje v igri označijo ali blokirajo. Mumcord ima znane tvegane igre (na primer Valorant ali League of Legends) privzeto izklopljene. Vklopi ga samo za igre, ki jim zaupaš.",
     "ingameOverlayAlt": "Primer prekrivnega sloja v igri, ki prikazuje, kdo govori"
   },
-  "updates": {
-    "title": "Nove različice",
-    "check": "Preverjaj nove različice",
-    "hint": "Mumcord lahko enkrat na dan vpraša GitHub, ali obstaja novejša različica, in pokaže namig s povezavo. Nič se ne prenese ali namesti in nič se ne pošlje razen same zahteve ter imena in različice aplikacije. To lahko pozneje spremeniš v Nastavitvah."
+  "rerun": {
+    "title": "Čarovnik za nastavitev",
+    "note": "Znova greš skozi nastavitev. Tvoja identiteta se ne spremeni.",
+    "manageIdentities": "Upravljaj identitete",
+    "stepsLabel": "Koraki nastavitve",
+    "stepsSkipped": "(preskočeno, identiteta ni del tega)",
+    "steps": {
+      "identity": "Identiteta",
+      "mic": "Mikrofon",
+      "privacy": "Zasebnost",
+      "updates": "Posodobitve",
+      "talk": "Način govora"
+    },
+    "footer": "Preklic pusti vse tako, kot je. Na koncu se shranijo samo spremenjeni koraki.",
+    "discardTitle": "Zavržeš spremembe?",
+    "discardBody": "Nič se ne shrani pred zaključkom. Če zdaj prekličeš, vse ostane tako, kot je.",
+    "discardKeep": "Nadaljuj z urejanjem",
+    "discardConfirm": "Zavrzi spremembe"
   }
 }

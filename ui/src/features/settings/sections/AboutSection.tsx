@@ -82,6 +82,7 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
             {t("about.setupWizardIdentityLink")}
           </button>
         </p>
+        {info?.appimage === true && <AppImageMenuEntrySwitch />}
       </Group>
       <div className="settings-group">
         <button
@@ -112,17 +113,6 @@ export function AboutSection({ settings, update }: SettingsSectionProps) {
           }}
         />
       </div>
-      <Group title={t("updates.title")}>
-        <Switch
-          label={t("updates.check")}
-          description={t("updates.hint")}
-          checked={settings.updateCheck === "yes"}
-          onChange={(on) => {
-            update({ updateCheck: on ? "yes" : "no" });
-          }}
-        />
-        {info?.appimage === true && <AppImageMenuEntrySwitch />}
-      </Group>
       <Group title={t("about.support")}>
         <div className="settings-actions">
           <button
