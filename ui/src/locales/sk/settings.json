@@ -17,6 +17,7 @@
     "about": "O aplikácii",
     "servers": "Servery",
     "privacy": "Súkromie",
+    "updates": "Aktualizácie",
     "packetInspector": "Inšpektor paketov"
   },
   "search": {
@@ -437,14 +438,6 @@
       "unsupported": "Overlay v hre nie je na tomto systéme dostupný. Namiesto neho sa použije overlay v okne vyššie.",
       "loadFailed": "Nastavenia overlayu v hre sa nepodarilo načítať.",
       "saveFailed": "Zmenu overlayu v hre sa nepodarilo použiť.",
-      "confirmTitle": "Zapnúť overlay pre {{game}}?",
-      "confirmMessage": "Upozornenie: {{game}} používa ochranu anti-cheat ({{reason}}). Overlay môže byť rozpoznaný ako podvádzanie a tvoj účet môže byť zablokovaný. Mumcord za to nezodpovedá. Pokračuj, len ak toto riziko akceptuješ.",
-      "confirmEnable": "Napriek tomu zapnúť",
-      "limits": {
-        "libraryMissing": "Overlay v hre nie je dostupný: jeho knižnica (libmumcord_overlay_layer.so) sa nenašla vedľa Mumcordu. Na obnovenie preinštaluj Mumcord. Namiesto neho sa použije overlay v okne vyššie.",
-        "windowsFullscreen": "V hre použite režim celej obrazovky bez okraja alebo v okne.",
-        "macos": "macOS nepodporuje overlay v hrách. Namiesto neho sa použije overlay v okne vyššie."
-      },
       "opengl": {
         "title": "Hry OpenGL",
         "explanation": "Potrebné len pre hry OpenGL: vlož do možností spustenia hry v Steame.",
@@ -452,6 +445,14 @@
         "copy": "Kopírovať",
         "copied": "Skopírované",
         "copyFailed": "Kopírovanie zlyhalo. Označ text a skopíruj ho ručne."
+      },
+      "confirmTitle": "Zapnúť overlay pre {{game}}?",
+      "confirmMessage": "Upozornenie: {{game}} používa ochranu anti-cheat ({{reason}}). Overlay môže byť rozpoznaný ako podvádzanie a tvoj účet môže byť zablokovaný. Mumcord za to nezodpovedá. Pokračuj, len ak toto riziko akceptuješ.",
+      "confirmEnable": "Napriek tomu zapnúť",
+      "limits": {
+        "libraryMissing": "Overlay v hre nie je dostupný: jeho knižnica (libmumcord_overlay_layer.so) sa nenašla vedľa Mumcordu. Na obnovenie preinštaluj Mumcord. Namiesto neho sa použije overlay v okne vyššie.",
+        "windowsFullscreen": "V hre použite režim celej obrazovky bez okraja alebo v okne.",
+        "macos": "macOS nepodporuje overlay v hrách. Namiesto neho sa použije overlay v okne vyššie."
       }
     }
   },
@@ -624,11 +625,6 @@
     "allow": "Povoliť priame pripojenia k ostatným používateľom Mumcordu",
     "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo.",
     "notUsed": "Vo zvolenom režime peer-to-peer sa nepoužíva: Mumcord sa nikdy nepripája priamo k ostatným."
-  },
-  "updates": {
-    "title": "Aktualizácie",
-    "check": "Kontrolovať nové verzie",
-    "hint": "Raz denne sa Mumcord opýta GitHubu na najnovšie vydanie. Nič iné sa neodosiela."
   },
   "appImageMenu": {
     "label": "Pridať Mumcord do ponuky aplikácií",
@@ -813,5 +809,65 @@
     "collapseHint": "Zobrazí „Správa od zablokovaného používateľa“ s tlačidlom Zobraziť.",
     "hide": "Úplne ich skryť",
     "hideHint": "V chate sa nezobrazí nič."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · nainštalované z: {{source}}",
+    "install": {
+      "appImage": "AppImage",
+      "appImageReadOnly": "AppImage v priečinku len na čítanie",
+      "windowsInstaller": "inštalačný program pre Windows",
+      "windowsPortable": "prenosný zip pre Windows",
+      "macApp": "aplikácia pre macOS",
+      "otherMac": "kópia pre macOS mimo balíka aplikácie",
+      "deb": "balík .deb",
+      "rpm": "balík .rpm",
+      "aur": "AUR",
+      "otherLinux": "balík pre Linux"
+    },
+    "checking": "Kontroluje sa",
+    "mode": "Keď sa nájde aktualizácia",
+    "modeHint": "Aktualizácie sa pred inštaláciou vždy kontrolujú a overujú.",
+    "modeAuto": "Sťahovať automaticky",
+    "modeNotify": "Iba upozorniť",
+    "modeOff": "Vypnuté",
+    "autoUnavailable": "Táto kópia sa nemôže aktualizovať sama, preto ťa Mumcord iba upozorní na nové verzie.",
+    "interval": "Kontrolovať aktualizácie",
+    "intervalHint_one": "Pri spustení a každú hodinu",
+    "intervalHint_few": "Pri spustení a každé {{count}} hodiny",
+    "intervalHint_many": "Pri spustení a každých {{count}} hodiny",
+    "intervalHint_other": "Pri spustení a každých {{count}} hodín",
+    "intervalWeekHint": "Pri spustení a raz týždenne",
+    "intervalHours_one": "Každú hodinu",
+    "intervalHours_few": "Každé {{count}} hodiny",
+    "intervalHours_many": "Každých {{count}} hodiny",
+    "intervalHours_other": "Každých {{count}} hodín",
+    "intervalWeek": "Raz týždenne",
+    "status": "Stav",
+    "state": {
+      "idle": "Zatiaľ nekontrolované",
+      "off": "Kontrola aktualizácií je vypnutá",
+      "checking": "Kontrolujú sa aktualizácie…",
+      "upToDate": "Mumcord je aktuálny",
+      "available": "Mumcord {{version}} je k dispozícii",
+      "downloading": "Sťahuje sa Mumcord {{version}}…",
+      "verifying": "Kontroluje sa stiahnutie Mumcordu {{version}}…",
+      "installing": "Inštaluje sa Mumcord {{version}}…",
+      "ready": "Mumcord {{version}} je pripravený. Reštartuj a aktualizuj.",
+      "failed": "Posledná aktualizácia sa nepodarila",
+      "offline": "GitHub nie je dostupný. Mumcord to skúsi neskôr znova."
+    },
+    "devBuild": "Vývojová verzia: aktualizácie sú vypnuté",
+    "lastCheckedToday": "Naposledy skontrolované dnes o {{time}}",
+    "lastCheckedYesterday": "Naposledy skontrolované včera o {{time}}",
+    "lastCheckedOn": "Naposledy skontrolované {{date}} o {{time}}",
+    "checkNow": "Skontrolovať teraz",
+    "showUpdate": "Zobraziť aktualizáciu",
+    "checkFailed": "Kontrolu sa nepodarilo spustiť. Skús to znova.",
+    "skipped": "Preskočená verzia",
+    "skippedHint": "Verzia {{version}} je preskočená a už sa nebude ponúkať.",
+    "stopSkipping": "Prestať preskakovať",
+    "whatsNew": "Čo je nové",
+    "whatsNewHint": "Pozri si zmeny v každej verzii.",
+    "openChangelog": "Otvoriť zoznam zmien"
   }
 }

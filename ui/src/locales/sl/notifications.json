@@ -59,7 +59,8 @@
       "messageRequest": "Prošnja za sporočilo",
       "invite": "Povabilo",
       "private": "Zasebno sporočilo",
-      "connection": "Povezava"
+      "connection": "Povezava",
+      "update": "Posodobitev"
     },
     "accept": "Sprejmi",
     "decline": "Zavrni",
@@ -69,6 +70,12 @@
     "dismiss": "Opusti",
     "dismissItem": "Opusti: {{title}}",
     "failed": "To ni uspelo. Poskusi znova.",
-    "block": "Blokiraj"
+    "block": "Blokiraj",
+    "update": {
+      "title": "Mumcord {{version}} je pripravljen",
+      "body": "Za posodobitev znova zaženite",
+      "restart": "Znova zaženi in posodobi",
+      "whatsNew": "Kaj je novega"
+    }
   }
 }

@@ -19,10 +19,14 @@ export const FILTERS: readonly CentreFilter[] = ["all", "mentions", "requests", 
 interface Base {
   /** Unique across the centre; see the `*Id` helpers. */
   id: string;
-  serverId: number;
   /** Unix milliseconds; the list is newest first. */
   at: number;
   read: boolean;
+}
+
+/** An entry that happened on one server. */
+interface OnServer {
+  serverId: number;
 }
 
 /** An entry that points at one chat message. */
@@ -38,53 +42,69 @@ interface MessageRef {
 }
 
 export type MentionItem = Base &
+  OnServer &
   MessageRef & {
     kind: "mention";
     /** `@all` / `@channel` (#70) rather than the user's name. */
     group: boolean;
   };
 
-export type ReplyItem = Base & MessageRef & { kind: "reply" };
+export type ReplyItem = Base & OnServer & MessageRef & { kind: "reply" };
 
 /** A message card or a shared theme sent in a private chat. */
 export type CardInviteItem = Base &
+  OnServer &
   MessageRef & {
     kind: "invite";
     invite: "card" | "theme";
   };
 
 /** A watch party started in the user's channel that they have not joined (FR-2.39). */
-export type WatchPartyInviteItem = Base & {
-  kind: "invite";
-  invite: "watchParty";
-  sender: string;
-  senderCertHash?: string | null;
-  channelId: number;
-};
+export type WatchPartyInviteItem = Base &
+  OnServer & {
+    kind: "invite";
+    invite: "watchParty";
+    sender: string;
+    senderCertHash?: string | null;
+    channelId: number;
+  };
 
 /** Someone in the user's voice channel shares their screen (FR-2.42). */
-export type ScreenShareInviteItem = Base & {
-  kind: "invite";
-  invite: "screenShare";
-  sender: string;
-  senderCertHash?: string | null;
-  session: number;
-};
+export type ScreenShareInviteItem = Base &
+  OnServer & {
+    kind: "invite";
+    invite: "screenShare";
+    sender: string;
+    senderCertHash?: string | null;
+    session: number;
+  };
 
 export type InviteItem = CardInviteItem | WatchPartyInviteItem | ScreenShareInviteItem;
 
 /** The banner of an ended connection hid itself unseen (#88, Q1.18). */
-export type ConnectionItem = Base & {
-  kind: "connection";
-  /** The banner's text, already translated. */
-  text: string;
+export type ConnectionItem = Base &
+  OnServer & {
+    kind: "connection";
+    /** The banner's text, already translated. */
+    text: string;
+  };
+
+/**
+ * An installed update waits for a restart (#168). Belongs to no server; at most one exists and it
+ * goes away when the updater leaves the "ready" phase.
+ */
+export type UpdateItem = Base & {
+  kind: "update";
+  version: string;
+  /** The release page with the changelog; built by the engine from the version. */
+  url: string;
 };
 
 /** Everything the centre stores itself. */
-export type StoredItem = MentionItem | ReplyItem | InviteItem | ConnectionItem;
+export type StoredItem = MentionItem | ReplyItem | InviteItem | ConnectionItem | UpdateItem;
 
 /** A held chat or message request (#141), built from the requests store on every render. */
-export type RequestItem = Base & { kind: "request"; request: MessageRequest };
+export type RequestItem = Base & OnServer & { kind: "request"; request: MessageRequest };
 
 export type CentreItem = StoredItem | RequestItem;
 
@@ -105,6 +125,14 @@ export function requestItemId(serverId: number, requestId: number): string {
   return `request/${String(serverId)}/${String(requestId)}`;
 }
 
+/** The one update entry: a newer version replaces it. */
+export const UPDATE_ITEM_ID = "update";
+
+/** The server an entry belongs to; `null` for app-wide entries such as an update. */
+export function serverOf(item: CentreItem): number | null {
+  return item.kind === "update" ? null : item.serverId;
+}
+
 export function watchPartyItemId(serverId: number): string {
   return `watchParty/${String(serverId)}`;
 }
@@ -113,7 +141,7 @@ export function screenShareItemId(serverId: number, session: number): string {
   return `screenShare/${String(serverId)}/${String(session)}`;
 }
 
-/** The filter chip an entry counts under; connection events only show under "All". */
+/** The filter chip an entry counts under; connection events and updates only show under "All". */
 export function filterOf(item: CentreItem): Exclude<CentreFilter, "all"> | null {
   switch (item.kind) {
     case "mention":
@@ -124,6 +152,7 @@ export function filterOf(item: CentreItem): Exclude<CentreFilter, "all"> | null 
     case "invite":
       return "invites";
     case "connection":
+    case "update":
       return null;
   }
 }
@@ -150,6 +179,7 @@ export function buildItems(
   const all: CentreItem[] = state.items.filter(
     (item) =>
       item.kind === "connection" ||
+      item.kind === "update" ||
       !isBlocked(item.serverId, item.senderCertHash ?? null, item.sender),
   );
   for (const [serverId, { incoming }] of requests) {

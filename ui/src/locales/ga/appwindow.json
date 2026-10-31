@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Seiceáil le haghaidh leaganacha nua?",
-    "description": "Is féidir le Mumcord fiafraí de GitHub uair sa lá an bhfuil leagan níos nuaí ann agus leid le nasc a thaispeáint. Ní íoslódáiltear ná ní shuiteáiltear aon rud, agus ní sheoltar aon rud ach an t-iarratas féin agus ainm agus leagan na haipe. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",
+    "description": "Is féidir le Mumcord fiafraí de GitHub go rialta an bhfuil leagan níos nuaí ann agus é a chur in iúl duit. Ní íoslódáiltear ná ní shuiteáiltear aon rud gan do thoiliú, agus ní sheoltar aon rud ach an t-iarratas féin agus ainm agus leagan na haipe. Is féidir leat é seo a athrú níos déanaí sna Socruithe.",
     "no": "Níl",
     "yes": "Tá",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
-  },
-  "updateHint": {
-    "message": "Tá Mumcord {{version}} ar fáil.",
-    "open": "Féach ar an eisiúint",
-    "dismiss": "Ruaig",
-    "portable": "Íoslódáil an zip iniompartha nua agus díphacáil isteach san fhillteán seo é; fanann do shonraí in MumcordData."
   },
   "directConsent": {
     "title": "Ceangail dhíreacha a cheadú?",
@@ -46,5 +40,91 @@
     "no": "Níl",
     "yes": "Tá",
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
+  },
+  "updater": {
+    "stable": "Cobhsaí",
+    "available": {
+      "title": "Nuashonrú ar fáil",
+      "subtitle": "Tá Mumcord {{version}} réidh le híoslódáil. Tá {{current}} agat.",
+      "subtitleManual": "Tá Mumcord {{version}} amuigh. Tá {{current}} agat.",
+      "whatsNew": "Cad atá nua ó {{current}}",
+      "trust": "Íoslódáiltear é ó github.com amháin thar HTTPS agus seiceáiltear a shíniú agus a shuim seiceála sula suiteáiltear é.",
+      "skip": "Scipeáil an leagan seo",
+      "later": "Meabhraigh dom níos déanaí",
+      "download": "Íoslódáil agus suiteáil",
+      "openReleasePage": "Oscail leathanach an eisiúna",
+      "manual": "Íoslódáil an leagan nua ó leathanach an eisiúna.",
+      "manualPackage": "Íoslódáil an pacáiste ó leathanach an eisiúna agus suiteáil ansin é le:",
+      "manualAur": "Nuashonraigh é le do chúntóir AUR:"
+    },
+    "tags": {
+      "added": "Curtha leis",
+      "changed": "Athraithe",
+      "fixed": "Socraithe",
+      "removed": "Bainte"
+    },
+    "noNotes": "Níl nótaí ar bith ann don leagan seo.",
+    "steps": {
+      "download": "Íoslódáil",
+      "verify": "Seiceáil an síniú agus an tsuim seiceála",
+      "install": "Suiteáil",
+      "done": "déanta",
+      "current": "ar siúl",
+      "pending": "gan tosú fós"
+    },
+    "progress": {
+      "title": "Mumcord {{version}} á íoslódáil",
+      "subtitle": "Is féidir leat leanúint ar aghaidh ag úsáid Mumcord agus é seo ar siúl.",
+      "label": "Dul chun cinn an nuashonraithe",
+      "unknown": "Níl an méid ar eolas fós",
+      "size": "{{received}} as {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "thart ar {{count}} soicind fágtha",
+      "secondsLeft_two": "thart ar {{count}} soicind fágtha",
+      "secondsLeft_few": "thart ar {{count}} soicind fágtha",
+      "secondsLeft_many": "thart ar {{count}} soicind fágtha",
+      "secondsLeft_other": "thart ar {{count}} soicind fágtha",
+      "minutesLeft_one": "thart ar {{count}} nóiméad fágtha",
+      "minutesLeft_two": "thart ar {{count}} nóiméad fágtha",
+      "minutesLeft_few": "thart ar {{count}} nóiméad fágtha",
+      "minutesLeft_many": "thart ar {{count}} nóiméad fágtha",
+      "minutesLeft_other": "thart ar {{count}} nóiméad fágtha",
+      "cancel": "Cealaigh"
+    },
+    "ready": {
+      "title": "Tá Mumcord {{version}} réidh",
+      "subtitle": "Atosaigh chun an nuashonrú a chur i gcrích.",
+      "verified": "Fíoraithe",
+      "downloaded": "Íoslódáilte",
+      "checked": "Síniú agus suim seiceála fíoraithe",
+      "installed": "Suiteáilte",
+      "installsOnRestart": "Suiteálfar é nuair a atosóidh Mumcord",
+      "connected_one": "Tá tú ceangailte le {{count}} fhreastalaí. Tar éis an atosaithe, athcheanglóidh Mumcord agus rachaidh sé isteach i do chainéil arís.",
+      "connected_two": "Tá tú ceangailte le {{count}} fhreastalaí. Tar éis an atosaithe, athcheanglóidh Mumcord agus rachaidh sé isteach i do chainéil arís.",
+      "connected_few": "Tá tú ceangailte le {{count}} fhreastalaí. Tar éis an atosaithe, athcheanglóidh Mumcord agus rachaidh sé isteach i do chainéil arís.",
+      "connected_many": "Tá tú ceangailte le {{count}} bhfreastalaí. Tar éis an atosaithe, athcheanglóidh Mumcord agus rachaidh sé isteach i do chainéil arís.",
+      "connected_other": "Tá tú ceangailte le {{count}} freastalaí. Tar éis an atosaithe, athcheanglóidh Mumcord agus rachaidh sé isteach i do chainéil arís.",
+      "later": "Níos déanaí",
+      "restart": "Atosaigh chun nuashonrú",
+      "announce": "Tá Mumcord {{version}} réidh. Atosaigh chun nuashonrú."
+    },
+    "failed": {
+      "title": "Níor oibrigh an nuashonrú",
+      "subtitle": "Níor suiteáladh Mumcord {{version}}. Leanann do leagan reatha ag obair.",
+      "network": "Níorbh fhéidir le Mumcord teacht ar GitHub. Seiceáil do cheangal idirlín agus bain triail eile as.",
+      "manifest": "Tá an fhaisnéis nuashonraithe ar GitHub easnamhach nó briste, mar sin níor suiteáladh aon rud.",
+      "signature": "Níor mheaitseáil síniú na híoslóide, mar sin caitheadh uaidh í.",
+      "checksum": "Níor mheaitseáil an íoslódáil lena suim seiceála, mar sin caitheadh uaidh í.",
+      "install": "Theip ar shuiteáil an nuashonraithe. Níor athraigh do leagan suiteáilte.",
+      "retry": "Bain triail eile as",
+      "close": "Dún"
+    },
+    "actionFailed": "Níor oibrigh sé sin. Bain triail eile as.",
+    "toast": {
+      "title": "Tá Mumcord {{version}} réidh",
+      "body": "Atosaigh chun nuashonrú.",
+      "restart": "Atosaigh",
+      "later": "Níos déanaí"
+    }
   }
 }

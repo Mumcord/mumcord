@@ -59,7 +59,8 @@
       "messageRequest": "Žádost o zprávu",
       "invite": "Pozvánka",
       "private": "Soukromá zpráva",
-      "connection": "Připojení"
+      "connection": "Připojení",
+      "update": "Aktualizace"
     },
     "accept": "Přijmout",
     "decline": "Odmítnout",
@@ -69,6 +70,12 @@
     "dismiss": "Zavřít",
     "dismissItem": "Zavřít: {{title}}",
     "failed": "To se nepodařilo. Zkus to znovu.",
-    "block": "Blokovat"
+    "block": "Blokovat",
+    "update": {
+      "title": "Mumcord {{version}} je připraven",
+      "body": "Restartujte pro aktualizaci",
+      "restart": "Restartovat a aktualizovat",
+      "whatsNew": "Co je nového"
+    }
   }
 }

@@ -1,24 +1,5 @@
 {
   "progress": "Pass {{current}} minn {{total}}",
-  "rerun": {
-    "title": "Wiżard tas-setup",
-    "note": "Qed terġa' tgħaddi mis-setup. L-identità tiegħek ma tinbidilx.",
-    "manageIdentities": "Immaniġġja l-identitajiet",
-    "stepsLabel": "Passi tas-setup",
-    "stepsSkipped": "(maqbuża, l-identità mhijiex parti minn dan)",
-    "steps": {
-      "identity": "Identità",
-      "mic": "Mikrofonu",
-      "privacy": "Privatezza",
-      "updates": "Aġġornamenti",
-      "talk": "Mod kif titkellem"
-    },
-    "footer": "Ikkanċella jħalli kollox kif inhu. Fl-aħħar jiġu salvati biss il-passi li biddilt.",
-    "discardTitle": "Tarmi l-bidliet?",
-    "discardBody": "Xejn mhu jiġi salvat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
-    "discardKeep": "Kompli teditja",
-    "discardConfirm": "Armi l-bidliet"
-  },
   "loadFailed": "Is-setup ma setax jitgħabba.",
   "finish": "Spiċċa",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Kull ma jaħżen Mumcord jibqa' fuq il-kompjuter tiegħek.",
     "statement": "Dikjarazzjoni sħiħa tal-privatezza"
   },
+  "updates": {
+    "title": "Verżjonijiet ġodda",
+    "choice": "Meta toħroġ verżjoni ġdida",
+    "auto": "Niżżel awtomatikament",
+    "autoHint": "Mumcord jniżżel u jivverifika l-aġġornament fl-isfond u jistaqsik qabel ma jerġa' jibda.",
+    "notify": "Ibgħat notifika biss",
+    "notifyHint": "Mumcord jgħarrfek dwar verżjoni ġdida u juri x'inbidel. Xejn ma jitniżżel sakemm ma tgħidx int.",
+    "off": "Mitfi",
+    "offHint": "Mumcord ma jistaqsix lil GitHub dwar verżjonijiet ġodda qatt. Taġġorna int stess.",
+    "privacy": "Iċ-ċekk jibgħat lil GitHub biss it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings."
+  },
   "talk": {
     "title": "Kif trid titkellem?",
     "mode": "Mod tat-tkellim",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Xi logħob b'anti-cheat jistgħu jimmarkaw jew jimblukkaw overlays fil-logħba. Mumcord iżomm logħob magħruf bħala riskjuż (bħal Valorant jew League of Legends) mitfi b'mod default. Ixgħelha biss għal logħob li tafda.",
     "ingameOverlayAlt": "Eżempju tal-overlay fil-logħba li juri min qed jitkellem"
   },
-  "updates": {
-    "title": "Verżjonijiet ġodda",
-    "check": "Fittex verżjonijiet ġodda",
-    "hint": "Mumcord jista' jistaqsi lil GitHub darba kuljum jekk hemmx verżjoni aktar ġdida u juri ħjiel b'link. Xejn ma jitniżżel jew jiġi installat, u xejn ma jintbagħat ħlief it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings."
+  "rerun": {
+    "title": "Wiżard tas-setup",
+    "note": "Qed terġa' tgħaddi mis-setup. L-identità tiegħek ma tinbidilx.",
+    "manageIdentities": "Immaniġġja l-identitajiet",
+    "stepsLabel": "Passi tas-setup",
+    "stepsSkipped": "(maqbuża, l-identità mhijiex parti minn dan)",
+    "steps": {
+      "identity": "Identità",
+      "mic": "Mikrofonu",
+      "privacy": "Privatezza",
+      "updates": "Aġġornamenti",
+      "talk": "Mod kif titkellem"
+    },
+    "footer": "Ikkanċella jħalli kollox kif inhu. Fl-aħħar jiġu salvati biss il-passi li biddilt.",
+    "discardTitle": "Tarmi l-bidliet?",
+    "discardBody": "Xejn mhu jiġi salvat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
+    "discardKeep": "Kompli teditja",
+    "discardConfirm": "Armi l-bidliet"
   }
 }

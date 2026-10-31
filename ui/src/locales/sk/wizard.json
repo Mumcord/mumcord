@@ -1,24 +1,5 @@
 {
   "progress": "Krok {{current}} z {{total}}",
-  "rerun": {
-    "title": "Sprievodca nastavením",
-    "note": "Prechádzaš nastavením znova. Tvoja identita sa nemení.",
-    "manageIdentities": "Spravovať identity",
-    "stepsLabel": "Kroky nastavenia",
-    "stepsSkipped": "(preskočené, identita do toho nepatrí)",
-    "steps": {
-      "identity": "Identita",
-      "mic": "Mikrofón",
-      "privacy": "Súkromie",
-      "updates": "Aktualizácie",
-      "talk": "Režim rozprávania"
-    },
-    "footer": "Zrušenie nechá všetko tak, ako to je. Na konci sa uložia len zmenené kroky.",
-    "discardTitle": "Zahodiť zmeny?",
-    "discardBody": "Nič sa neukladá pred dokončením. Ak teraz zrušíš, všetko zostane tak, ako to je.",
-    "discardKeep": "Pokračovať v úpravách",
-    "discardConfirm": "Zahodiť zmeny"
-  },
   "loadFailed": "Nastavenie sa nepodarilo načítať.",
   "finish": "Dokončiť",
   "errors": {
@@ -72,6 +53,17 @@
     "local": "Všetko, čo Mumcord ukladá, zostáva vo vašom počítači.",
     "statement": "Úplné vyhlásenie o ochrane súkromia"
   },
+  "updates": {
+    "title": "Nové verzie",
+    "choice": "Keď vyjde nová verzia",
+    "auto": "Sťahovať automaticky",
+    "autoHint": "Mumcord stiahne a overí aktualizáciu na pozadí a pred reštartom sa spýta.",
+    "notify": "Iba upozorniť",
+    "notifyHint": "Mumcord ťa upozorní na novú verziu a ukáže, čo sa zmenilo. Nič sa nestiahne, kým to nepovieš.",
+    "off": "Vypnuté",
+    "offHint": "Mumcord sa GitHubu na nové verzie nikdy nepýta. Aktualizuješ sám.",
+    "privacy": "Kontrola odošle GitHubu iba samotnú požiadavku a názov a verziu aplikácie. Neskôr to môžeš zmeniť v Nastaveniach."
+  },
   "talk": {
     "title": "Ako chceš hovoriť?",
     "mode": "Režim hovorenia",
@@ -118,9 +110,23 @@
     "ingameOverlayWarning": "Niektoré hry s anti-cheatom môžu overlay v hre označiť alebo zablokovať. Mumcord má známe rizikové hry (napríklad Valorant alebo League of Legends) predvolene vypnuté. Zapni ho len pre hry, ktorým dôveruješ.",
     "ingameOverlayAlt": "Príklad overlayu v hre, ktorý ukazuje, kto hovorí"
   },
-  "updates": {
-    "title": "Nové verzie",
-    "check": "Kontrolovať nové verzie",
-    "hint": "Mumcord sa môže raz denne opýtať GitHubu, či existuje novšia verzia, a zobraziť tip s odkazom. Nič sa nesťahuje ani neinštaluje a nič sa neodosiela okrem samotnej požiadavky a názvu a verzie aplikácie. Neskôr to môžeš zmeniť v Nastaveniach."
+  "rerun": {
+    "title": "Sprievodca nastavením",
+    "note": "Prechádzaš nastavením znova. Tvoja identita sa nemení.",
+    "manageIdentities": "Spravovať identity",
+    "stepsLabel": "Kroky nastavenia",
+    "stepsSkipped": "(preskočené, identita do toho nepatrí)",
+    "steps": {
+      "identity": "Identita",
+      "mic": "Mikrofón",
+      "privacy": "Súkromie",
+      "updates": "Aktualizácie",
+      "talk": "Režim rozprávania"
+    },
+    "footer": "Zrušenie nechá všetko tak, ako to je. Na konci sa uložia len zmenené kroky.",
+    "discardTitle": "Zahodiť zmeny?",
+    "discardBody": "Nič sa neukladá pred dokončením. Ak teraz zrušíš, všetko zostane tak, ako to je.",
+    "discardKeep": "Pokračovať v úpravách",
+    "discardConfirm": "Zahodiť zmeny"
   }
 }

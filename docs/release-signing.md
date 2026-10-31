@@ -4,6 +4,7 @@ Release builds (`vX.Y.Z` tags) sign the Windows and macOS bundles only when the 
 
 - [Windows signing (Azure Artifact Signing)](#windows-signing-azure-artifact-signing)
 - [macOS signing and notarization](#macos-signing-and-notarization)
+- [Updater signing (in-app updater)](#updater-signing-in-app-updater)
 
 ## Windows signing (Azure Artifact Signing)
 
@@ -177,3 +178,60 @@ item once ("Always Allow"); after quitting and starting again nothing is asked.
 - Rotating a secret: replace it in the GitHub settings; no code change is needed.
 - Global shortcuts and mouse buttons need the user to grant _Input Monitoring_ or _Accessibility_
   in System Settings; macOS asks at runtime, no entitlement is involved.
+
+## Updater signing (in-app updater)
+
+The in-app updater (issue #168) installs only bundles signed with Mumcord's own **updater key**: a minisign (Ed25519) key pair as required by Tauri's updater plugin. It is separate from the Windows and macOS code signing above and does not depend on it. The app carries the **public key** (`plugins.updater.pubkey` in `src-tauri/tauri.conf.json`); the **private key** exists only as a GitHub Actions secret and never in this repository, on a build machine's disk or in a log.
+
+### What the app checks
+
+Before anything is installed, the app downloads the bundle from the release's own download folder (`https://github.com/Mumcord/mumcord/releases/download/vX.Y.Z/`), then
+
+1. verifies the minisign signature against the public key it carries, including the version the signature was made for (so an old signed bundle cannot be passed off as a newer release),
+2. compares the bundle's SHA-256 with the release's `SHA256SUMS`.
+
+Any mismatch discards the download and shows an error; the installed version stays as it is. As long as `pubkey` is empty (the placeholder in the repository today), the app cannot verify anything and only notifies about new versions with a link to the release page.
+
+### How the workflow signs
+
+The **Create draft release** job in `.github/workflows/release.yml` runs `scripts/sign-updater-bundles.sh` on the finished release files:
+
+- it signs `Mumcord_X.Y.Z_amd64.AppImage`, `Mumcord_X.Y.Z_aarch64.AppImage`, `Mumcord_X.Y.Z_x64-setup.exe` (after its Windows signature) and `Mumcord_X.Y.Z_universal.app.tar.gz` (the signed and notarized `.app`, packed by the macOS build job) with `tauri signer sign --app-version X.Y.Z`, which writes a `.sig` next to each file,
+- it checks every signature against the public key in `src-tauri/tauri.conf.json` with `scripts/verify-updater-signature.js`, so a private key that does not match the app fails the release instead of every user's update,
+- it writes the update manifest `latest.json` (Tauri's static format; keys `linux-x86_64-appimage`, `linux-aarch64-appimage`, `windows-x86_64-nsis`, `darwin-aarch64-app`, `darwin-x86_64-app`).
+
+The `.sig` files, `latest.json` and the `.app.tar.gz` are release assets and are listed in `SHA256SUMS`, so `releases/X.Y.Z.json` (post-release sync) records them like every other asset. The release **fails** when the secret is missing or `pubkey` is empty: a release never ships without updater signatures. The `.deb`, `.rpm`, AUR package and the portable Windows zip are not signed for the updater; they are updated by the package manager or by hand.
+
+### One-time setup (maintainer)
+
+1. On your own computer (not a shared or CI machine), with the project's npm dependencies installed, create the key pair with a strong password:
+
+   ```sh
+   npx tauri signer generate -w ~/.tauri/mumcord-updater.key
+   ```
+
+   It writes the private key to `~/.tauri/mumcord-updater.key` and the public key to `~/.tauri/mumcord-updater.key.pub`. Never commit or share the private key file.
+
+2. Store a backup of the private key file and its password in your password manager. **If the private key is lost, installed apps can no longer be updated automatically**: users would have to install the next version by hand once.
+3. In the repository _Settings → Secrets and variables → Actions → Secrets_, add two repository secrets with exactly these names:
+
+   | Secret                               | Value                                      |
+   | ------------------------------------ | ------------------------------------------ |
+   | `TAURI_SIGNING_PRIVATE_KEY`          | the whole content of `mumcord-updater.key` |
+   | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | the password chosen in step 1              |
+
+4. Put the content of `mumcord-updater.key.pub` (one base64 line) into `plugins.updater.pubkey` in `src-tauri/tauri.conf.json` and merge that change through a normal pull request. The public key is not secret.
+5. Delete the private key file from your computer once the backup from step 2 is safe.
+
+The first release built after these steps carries the public key, so it is the first version that can update itself; versions before it show a notice with a link to the release page.
+
+### Rotating the key
+
+Rotate when the private key may have leaked, its password is known to someone who should not have it, or a maintainer with access leaves.
+
+1. Create a new key pair (step 1 above).
+2. Release one version **signed with the old key** whose app already carries the **new** public key: put the new public key into `plugins.updater.pubkey` in `src-tauri/tauri.conf.json` (normal pull request), keep the old private key in the secrets, and add the repository **variable** `UPDATER_ROTATION_OLD_PUBKEY` with the old public key, so the release job checks the signatures against the key the installed apps still trust. Installed apps accept this release; once it is installed they trust the new key. Delete the variable after this release.
+3. Replace both secrets with the new private key and password. Every later release is signed with the new key.
+4. If the old key leaked, skip step 2: replace the key and public key at once and tell users in the release notes that this one update must be installed by hand from the release page. A leaked key must not sign anything again.
+
+Never reuse a key after rotation, and never put a private key into a pull request, an issue, a log or a chat.

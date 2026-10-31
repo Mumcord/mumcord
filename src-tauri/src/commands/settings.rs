@@ -538,8 +538,14 @@ pub struct Settings {
     pub allow_direct_connections: Consent,
     /// Global P2P mode (FR-4.1).
     pub p2p_mode: P2pMode,
-    /// "Check for new versions" (FR-2.56).
+    /// "Check for new versions" (FR-2.56); `no` is the updater's "Off" (FR-3.146).
     pub update_check: Consent,
+    /// "Download automatically" instead of "Notify only" (FR-3.146).
+    pub update_auto_download: bool,
+    /// Hours between two update checks, 1–168 (FR-3.144).
+    pub update_interval_hours: u32,
+    /// The version the user skipped; `null` when none is (FR-3.144).
+    pub update_skipped: Option<String>,
     /// AppImage only: the one-time "Add Mumcord to the app menu" offer (FR-2.55).
     pub appimage_menu_entry: Consent,
     /// The one-time "window overlay removed" notice was shown (FR-2.33).
@@ -672,6 +678,9 @@ impl Settings {
             allow_direct_connections: s.allow_direct_connections.into(),
             p2p_mode: s.p2p_mode.into(),
             update_check: s.update_check.into(),
+            update_auto_download: s.update_auto_download,
+            update_interval_hours: s.update_interval_hours,
+            update_skipped: s.update_skipped.clone(),
             appimage_menu_entry: s.appimage_menu_entry.into(),
             window_overlay_notice_shown: s.window_overlay_notice_shown,
             whats_new_auto: s.whats_new_auto,
@@ -791,6 +800,12 @@ impl Settings {
         s.allow_direct_connections = self.allow_direct_connections.into();
         s.p2p_mode = self.p2p_mode.into();
         s.update_check = self.update_check.into();
+        s.update_auto_download = self.update_auto_download;
+        s.update_interval_hours = self.update_interval_hours.clamp(
+            store::MIN_UPDATE_INTERVAL_HOURS,
+            store::MAX_UPDATE_INTERVAL_HOURS,
+        );
+        s.update_skipped.clone_from(&self.update_skipped);
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s.whats_new_auto = self.whats_new_auto;

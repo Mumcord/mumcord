@@ -11,7 +11,12 @@ type GeneratedEvents = typeof events;
 /** Command result as produced by the generated bindings. */
 export type CommandResult<T> = { status: "ok"; data: T } | { status: "error"; error: ApiError };
 
-type OkData<R> = R extends { status: "ok"; data: infer T } ? T : never;
+/** The data of a fallible command, or the plain value of a command that cannot fail. */
+type OkData<R> = R extends { status: "error"; error: ApiError }
+  ? never
+  : R extends { status: "ok"; data: infer T }
+    ? T
+    : R;
 
 /** All engine commands; they resolve with the data or reject with an {@link EngineError}. */
 export type EngineCommands = {
@@ -73,6 +78,16 @@ export function toEngineError(value: unknown): EngineError {
   if (isApiError(value)) return new EngineError(value.code, value.message);
   if (value instanceof Error) return new EngineError("internal", value.message);
   return new EngineError("internal", String(value));
+}
+
+/** Whether a generated command answered with a result wrapper rather than a plain value. */
+export function isCommandResult(value: unknown): value is CommandResult<unknown> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "status" in value &&
+    ((value.status === "ok" && "data" in value) || (value.status === "error" && "error" in value))
+  );
 }
 
 export function unwrap<T>(result: CommandResult<T>): T {

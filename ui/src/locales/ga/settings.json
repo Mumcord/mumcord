@@ -17,6 +17,7 @@
     "about": "Maidir le",
     "servers": "Freastalaithe",
     "privacy": "Príobháideachas",
+    "updates": "Nuashonruithe",
     "packetInspector": "Cigire paicéad"
   },
   "search": {
@@ -439,14 +440,6 @@
       "unsupported": "Níl an forleagan sa chluiche ar fáil ar an gcóras seo. Úsáidtear an forleagan fuinneoige thuas ina ionad.",
       "loadFailed": "Níorbh fhéidir socruithe an fhorleagain sa chluiche a luchtú.",
       "saveFailed": "Níorbh fhéidir an t-athrú ar an bhforleagan sa chluiche a chur i bhfeidhm.",
-      "confirmTitle": "Cuir an forleagan ar siúl do {{game}}?",
-      "confirmMessage": "Rabhadh: úsáideann {{game}} cosaint frithcheilge ({{reason}}). Is féidir forleagain a bhrath mar chaimiléireacht agus d'fhéadfaí do chuntas a thoirmeasc. Níl Mumcord freagrach as sin. Ná lean ar aghaidh ach má ghlacann tú leis an riosca seo.",
-      "confirmEnable": "Cuir ar siúl ar aon nós",
-      "limits": {
-        "libraryMissing": "Níl an forleagan sa chluiche ar fáil: níor aimsíodh a leabharlann forleagain (libmumcord_overlay_layer.so) in aice le Mumcord. Athshuiteáil Mumcord chun é a athchur. Úsáidtear an forleagan fuinneoige thuas ina ionad.",
-        "windowsFullscreen": "Úsáid lánscáileán gan imlíne nó i bhfuinneog sa chluiche.",
-        "macos": "Ní thacaíonn macOS le forleagain sa chluiche. Úsáidtear an forleagan fuinneoige thuas ina ionad."
-      },
       "opengl": {
         "title": "Cluichí OpenGL",
         "explanation": "Ag teastáil do chluichí OpenGL amháin: greamaigh i roghanna seolta Steam an chluiche.",
@@ -454,6 +447,14 @@
         "copy": "Cóipeáil",
         "copied": "Cóipeáilte",
         "copyFailed": "Theip ar an gcóipeáil. Roghnaigh an téacs agus cóipeáil de láimh é."
+      },
+      "confirmTitle": "Cuir an forleagan ar siúl do {{game}}?",
+      "confirmMessage": "Rabhadh: úsáideann {{game}} cosaint frithcheilge ({{reason}}). Is féidir forleagain a bhrath mar chaimiléireacht agus d'fhéadfaí do chuntas a thoirmeasc. Níl Mumcord freagrach as sin. Ná lean ar aghaidh ach má ghlacann tú leis an riosca seo.",
+      "confirmEnable": "Cuir ar siúl ar aon nós",
+      "limits": {
+        "libraryMissing": "Níl an forleagan sa chluiche ar fáil: níor aimsíodh a leabharlann forleagain (libmumcord_overlay_layer.so) in aice le Mumcord. Athshuiteáil Mumcord chun é a athchur. Úsáidtear an forleagan fuinneoige thuas ina ionad.",
+        "windowsFullscreen": "Úsáid lánscáileán gan imlíne nó i bhfuinneog sa chluiche.",
+        "macos": "Ní thacaíonn macOS le forleagain sa chluiche. Úsáidtear an forleagan fuinneoige thuas ina ionad."
       }
     }
   },
@@ -627,11 +628,6 @@
     "allow": "Ceadaigh ceangail dhíreacha le húsáideoirí eile Mumcord",
     "hint": "Bíonn ceangail dhíreacha níos tapúla, ach is féidir leis an duine eile do sheoladh IP a fheiceáil. Go dtí go gcinneann tú, fiafraíonn Mumcord an chéad uair a d’úsáidfí ceann.",
     "notUsed": "Ní úsáidtear é sa mhód piarbhrearthóireachta roghnaithe: ní cheanglaíonn Mumcord go díreach le daoine eile riamh."
-  },
-  "updates": {
-    "title": "Nuashonruithe",
-    "check": "Seiceáil le haghaidh leaganacha nua",
-    "hint": "Uair sa lá fiafraíonn Mumcord de GitHub faoin eisiúint is déanaí. Ní sheoltar aon rud eile."
   },
   "appImageMenu": {
     "label": "Cuir Mumcord le roghchlár na n-aipeanna",
@@ -817,5 +813,67 @@
     "collapseHint": "Taispeánann sé “Teachtaireacht ó úsáideoir bactha” le cnaipe Taispeáin.",
     "hide": "Folaigh go hiomlán iad",
     "hideHint": "Ní thaispeántar aon rud sa chomhrá."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · suiteáilte ó {{source}}",
+    "install": {
+      "appImage": "an AppImage",
+      "appImageReadOnly": "AppImage i bhfillteán léite amháin",
+      "windowsInstaller": "suiteálaí Windows",
+      "windowsPortable": "zip iniompartha Windows",
+      "macApp": "an aip macOS",
+      "otherMac": "cóip macOS lasmuigh de phacáiste aipe",
+      "deb": "an pacáiste .deb",
+      "rpm": "an pacáiste .rpm",
+      "aur": "an AUR",
+      "otherLinux": "pacáiste Linux"
+    },
+    "checking": "Ag seiceáil",
+    "mode": "Nuair a aimsítear nuashonrú",
+    "modeHint": "Seiceáiltear agus fíoraítear nuashonruithe i gcónaí sula suiteáiltear iad.",
+    "modeAuto": "Íoslódáil go huathoibríoch",
+    "modeNotify": "Fógair amháin",
+    "modeOff": "Díghníomhaithe",
+    "autoUnavailable": "Ní féidir leis an gcóip seo í féin a nuashonrú, mar sin ní dhéanann Mumcord ach leaganacha nua a chur in iúl duit.",
+    "interval": "Seiceáil le haghaidh nuashonruithe",
+    "intervalHint_one": "Ag tosú agus gach uair an chloig",
+    "intervalHint_two": "Ag tosú agus gach {{count}} uair an chloig",
+    "intervalHint_few": "Ag tosú agus gach {{count}} uair an chloig",
+    "intervalHint_many": "Ag tosú agus gach {{count}} uair an chloig",
+    "intervalHint_other": "Ag tosú agus gach {{count}} uair an chloig",
+    "intervalWeekHint": "Ag tosú agus uair sa tseachtain",
+    "intervalHours_one": "Gach uair an chloig",
+    "intervalHours_two": "Gach {{count}} uair an chloig",
+    "intervalHours_few": "Gach {{count}} uair an chloig",
+    "intervalHours_many": "Gach {{count}} uair an chloig",
+    "intervalHours_other": "Gach {{count}} uair an chloig",
+    "intervalWeek": "Uair sa tseachtain",
+    "status": "Stádas",
+    "state": {
+      "idle": "Gan seiceáil fós",
+      "off": "Tá seiceáil nuashonruithe múchta",
+      "checking": "Ag seiceáil le haghaidh nuashonruithe…",
+      "upToDate": "Tá Mumcord cothrom le dáta",
+      "available": "Tá Mumcord {{version}} ar fáil",
+      "downloading": "Mumcord {{version}} á íoslódáil…",
+      "verifying": "Íoslódáil Mumcord {{version}} á seiceáil…",
+      "installing": "Mumcord {{version}} á shuiteáil…",
+      "ready": "Tá Mumcord {{version}} réidh. Atosaigh chun nuashonrú.",
+      "failed": "Níor oibrigh an nuashonrú deireanach",
+      "offline": "Níorbh fhéidir teacht ar GitHub. Déanfaidh Mumcord iarracht arís níos déanaí."
+    },
+    "devBuild": "Leagan forbartha: tá nuashonruithe múchta",
+    "lastCheckedToday": "Seiceáilte go deireanach inniu ag {{time}}",
+    "lastCheckedYesterday": "Seiceáilte go deireanach inné ag {{time}}",
+    "lastCheckedOn": "Seiceáilte go deireanach ar {{date}} ag {{time}}",
+    "checkNow": "Seiceáil anois",
+    "showUpdate": "Taispeáin an nuashonrú",
+    "checkFailed": "Níorbh fhéidir an tseiceáil a thosú. Bain triail eile as.",
+    "skipped": "Leagan scipeáilte",
+    "skippedHint": "Scipeáiltear {{version}} agus ní thairgfear arís é.",
+    "stopSkipping": "Stop ag scipeáil",
+    "whatsNew": "Cad atá nua",
+    "whatsNewHint": "Féach ar na hathruithe i ngach leagan.",
+    "openChangelog": "Oscail an loga athruithe"
   }
 }

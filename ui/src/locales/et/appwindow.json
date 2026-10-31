@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Kas otsida uusi versioone?",
-    "description": "Mumcord võib kord päevas GitHubilt küsida, kas on uuem versioon, ja näidata lingiga vihjet. Midagi ei laadita alla ega paigaldata ning peale päringu enda ja rakenduse nime ja versiooni ei saadeta midagi. Saad seda hiljem seadetes muuta.",
+    "description": "Mumcord saab GitHubilt regulaarselt küsida, kas uuem versioon on olemas, ja sellest sulle teada anda. Midagi ei laadita alla ega paigaldata sinu nõusolekuta ning peale päringu enda ja rakenduse nime ning versiooni ei saadeta midagi. Seda saad hiljem seadetes muuta.",
     "no": "Ei",
     "yes": "Jah",
     "failed": "See ei õnnestunud. Proovi uuesti."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} on saadaval.",
-    "open": "Vaata väljalaset",
-    "dismiss": "Peida",
-    "portable": "Laadi alla uus kaasaskantav zip ja paki see sellesse kausta lahti; sinu andmed kaustas MumcordData jäävad alles."
   },
   "directConsent": {
     "title": "Kas lubada otseühendused?",
@@ -46,5 +40,82 @@
     "no": "Ei",
     "yes": "Jah",
     "failed": "See ei õnnestunud. Proovi uuesti."
+  },
+  "updater": {
+    "stable": "Stabiilne",
+    "available": {
+      "title": "Uuendus on saadaval",
+      "subtitle": "Mumcord {{version}} on allalaadimiseks valmis. Sul on {{current}}.",
+      "subtitleManual": "Mumcord {{version}} on ilmunud. Sul on {{current}}.",
+      "whatsNew": "Mis on uut alates versioonist {{current}}",
+      "trust": "Laaditakse alla ainult aadressilt github.com HTTPS-i kaudu ning enne paigaldamist kontrollitakse allkirja ja kontrollsummat.",
+      "skip": "Jäta see versioon vahele",
+      "later": "Tuleta hiljem meelde",
+      "download": "Laadi alla ja paigalda",
+      "openReleasePage": "Ava väljaandelehekülg",
+      "manual": "Laadi uus versioon alla väljaandelehelt.",
+      "manualPackage": "Laadi pakett alla väljaandelehelt ja paigalda see seejärel käsuga:",
+      "manualAur": "Uuenda see oma AUR-abilisega:"
+    },
+    "tags": {
+      "added": "Lisatud",
+      "changed": "Muudetud",
+      "fixed": "Parandatud",
+      "removed": "Eemaldatud"
+    },
+    "noNotes": "Selle versiooni kohta pole märkmeid.",
+    "steps": {
+      "download": "Allalaadimine",
+      "verify": "Allkirja ja kontrollsumma kontroll",
+      "install": "Paigaldamine",
+      "done": "valmis",
+      "current": "käib",
+      "pending": "pole veel alanud"
+    },
+    "progress": {
+      "title": "Mumcord {{version}} laaditakse alla",
+      "subtitle": "Võid Mumcordi selle ajal edasi kasutada.",
+      "label": "Uuenduse edenemine",
+      "unknown": "Suurus pole veel teada",
+      "size": "{{received}} / {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "umbes {{count}} sekund jäänud",
+      "secondsLeft_other": "umbes {{count}} sekundit jäänud",
+      "minutesLeft_one": "umbes {{count}} minut jäänud",
+      "minutesLeft_other": "umbes {{count}} minutit jäänud",
+      "cancel": "Tühista"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} on valmis",
+      "subtitle": "Uuenduse lõpetamiseks käivita uuesti.",
+      "verified": "Kontrollitud",
+      "downloaded": "Alla laaditud",
+      "checked": "Allkiri ja kontrollsumma on kontrollitud",
+      "installed": "Paigaldatud",
+      "installsOnRestart": "Paigaldatakse, kui Mumcord uuesti käivitub",
+      "connected_one": "Oled ühendatud {{count}} serveriga. Pärast taaskäivitust ühendub Mumcord uuesti ja liitub taas sinu kanalitega.",
+      "connected_other": "Oled ühendatud {{count}} serveriga. Pärast taaskäivitust ühendub Mumcord uuesti ja liitub taas sinu kanalitega.",
+      "later": "Hiljem",
+      "restart": "Uuenda taaskäivitusega",
+      "announce": "Mumcord {{version}} on valmis. Uuendamiseks käivita uuesti."
+    },
+    "failed": {
+      "title": "Uuendamine ei õnnestunud",
+      "subtitle": "Mumcord {{version}} jäi paigaldamata. Sinu praegune versioon töötab edasi.",
+      "network": "Mumcord ei saanud GitHubiga ühendust. Kontrolli oma internetiühendust ja proovi uuesti.",
+      "manifest": "GitHubi uuenduseteave on poolik või rikutud, seega ei paigaldatud midagi.",
+      "signature": "Allalaadimise allkiri ei klappinud, seega visati allalaadimine ära.",
+      "checksum": "Allalaaditu ei klappinud oma kontrollsummaga, seega visati see ära.",
+      "install": "Uuenduse paigaldamine ebaõnnestus. Sinu paigaldatud versioon on muutmata.",
+      "retry": "Proovi uuesti",
+      "close": "Sulge"
+    },
+    "actionFailed": "See ei õnnestunud. Proovi uuesti.",
+    "toast": {
+      "title": "Mumcord {{version}} on valmis",
+      "body": "Uuendamiseks käivita uuesti.",
+      "restart": "Käivita uuesti",
+      "later": "Hiljem"
+    }
   }
 }

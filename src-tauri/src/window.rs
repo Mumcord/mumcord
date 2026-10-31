@@ -159,7 +159,9 @@ pub fn restart(app: &AppHandle) {
     after_disconnect(app, AppHandle::request_restart);
 }
 
-fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
+/// Saves the windows, disconnects cleanly (keeping what the next start rejoins), then runs
+/// `then`.
+pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 'static) {
     crate::aux_window::save_before_exit(app);
     if connected_servers(&app.state::<Engine>()) == 0 {
         then(app);

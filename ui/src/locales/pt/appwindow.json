@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Procurar novas versões?",
-    "description": "O Mumcord pode perguntar ao GitHub uma vez por dia se existe uma versão mais recente e mostrar um aviso com uma ligação. Nada é transferido nem instalado, e nada é enviado além do próprio pedido e do nome e versão da aplicação. Podes alterar isto mais tarde nas Definições.",
+    "description": "O Mumcord pode perguntar regularmente ao GitHub se existe uma versão mais recente e avisar-te. Nada é transferido nem instalado sem te perguntar, e não é enviado nada além do próprio pedido e do nome e versão da aplicação. Podes alterar isto mais tarde nas Definições.",
     "no": "Não",
     "yes": "Sim",
     "failed": "Não funcionou. Tenta novamente."
-  },
-  "updateHint": {
-    "message": "O Mumcord {{version}} está disponível.",
-    "open": "Ver versão",
-    "dismiss": "Dispensar",
-    "portable": "Transfira o novo zip portátil e descompacte-o nesta pasta; os seus dados em MumcordData mantêm-se."
   },
   "directConsent": {
     "title": "Permitir ligações diretas?",
@@ -46,5 +40,85 @@
     "no": "Não",
     "yes": "Sim",
     "failed": "Não funcionou. Tenta novamente."
+  },
+  "updater": {
+    "stable": "Estável",
+    "available": {
+      "title": "Atualização disponível",
+      "subtitle": "O Mumcord {{version}} está pronto para transferir. Tens a {{current}}.",
+      "subtitleManual": "Saiu o Mumcord {{version}}. Tens a {{current}}.",
+      "whatsNew": "Novidades desde a {{current}}",
+      "trust": "É transferida apenas de github.com por HTTPS e verificada com a assinatura e a soma de verificação antes de ser instalada.",
+      "skip": "Ignorar esta versão",
+      "later": "Lembrar-me mais tarde",
+      "download": "Transferir e instalar",
+      "openReleasePage": "Abrir a página da versão",
+      "manual": "Transfere a nova versão a partir da página da versão.",
+      "manualPackage": "Transfere o pacote a partir da página da versão e instala-o depois com:",
+      "manualAur": "Atualiza-o com o teu assistente de AUR:"
+    },
+    "tags": {
+      "added": "Adicionado",
+      "changed": "Alterado",
+      "fixed": "Corrigido",
+      "removed": "Removido"
+    },
+    "noNotes": "Sem notas para esta versão.",
+    "steps": {
+      "download": "Transferência",
+      "verify": "Verificar assinatura e soma de verificação",
+      "install": "Instalação",
+      "done": "concluído",
+      "current": "em curso",
+      "pending": "ainda não começou"
+    },
+    "progress": {
+      "title": "A transferir o Mumcord {{version}}",
+      "subtitle": "Podes continuar a usar o Mumcord enquanto isto decorre.",
+      "label": "Progresso da atualização",
+      "unknown": "Tamanho ainda desconhecido",
+      "size": "{{received}} de {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "falta cerca de {{count}} segundo",
+      "secondsLeft_many": "faltam cerca de {{count}} de segundos",
+      "secondsLeft_other": "faltam cerca de {{count}} segundos",
+      "minutesLeft_one": "falta cerca de {{count}} minuto",
+      "minutesLeft_many": "faltam cerca de {{count}} de minutos",
+      "minutesLeft_other": "faltam cerca de {{count}} minutos",
+      "cancel": "Cancelar"
+    },
+    "ready": {
+      "title": "O Mumcord {{version}} está pronto",
+      "subtitle": "Reinicia para concluir a atualização.",
+      "verified": "Verificada",
+      "downloaded": "Transferida",
+      "checked": "Assinatura e soma de verificação verificadas",
+      "installed": "Instalada",
+      "installsOnRestart": "Instala-se quando o Mumcord reiniciar",
+      "connected_one": "Estás ligado a {{count}} servidor. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
+      "connected_many": "Estás ligado a {{count}} de servidores. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
+      "connected_other": "Estás ligado a {{count}} servidores. Depois de reiniciar, o Mumcord volta a ligar-se e a entrar nos teus canais.",
+      "later": "Mais tarde",
+      "restart": "Reiniciar para atualizar",
+      "announce": "O Mumcord {{version}} está pronto. Reinicia para atualizar."
+    },
+    "failed": {
+      "title": "A atualização não funcionou",
+      "subtitle": "O Mumcord {{version}} não foi instalado. A tua versão atual continua a funcionar.",
+      "network": "O Mumcord não conseguiu aceder ao GitHub. Verifica a tua ligação à internet e tenta novamente.",
+      "manifest": "As informações de atualização no GitHub estão incompletas ou danificadas, por isso nada foi instalado.",
+      "signature": "A assinatura da transferência não correspondia, por isso a transferência foi descartada.",
+      "checksum": "A transferência não correspondia à sua soma de verificação, por isso foi descartada.",
+      "install": "A instalação da atualização falhou. A tua versão instalada não mudou.",
+      "retry": "Tentar novamente",
+      "close": "Fechar"
+    },
+    "actionFailed": "Isso não funcionou. Tenta novamente.",
+    "toast": {
+      "title": "O Mumcord {{version}} está pronto",
+      "body": "Reinicia para atualizar.",
+      "restart": "Reiniciar",
+      "later": "Mais tarde"
+    }
   }
 }

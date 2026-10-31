@@ -29,16 +29,10 @@
   },
   "updateCheck": {
     "title": "Želiš preverjati nove različice?",
-    "description": "Mumcord lahko enkrat na dan vpraša GitHub, ali obstaja novejša različica, in pokaže namig s povezavo. Nič se ne prenese ali namesti in nič se ne pošlje razen same zahteve ter imena in različice aplikacije. To lahko pozneje spremeniš v Nastavitvah.",
+    "description": "Mumcord lahko redno vpraša GitHub, ali obstaja novejša različica, in te o tem obvesti. Brez tvojega dovoljenja se nič ne prenese ali namesti, poslano pa ni nič razen same zahteve ter imena in različice aplikacije. To lahko pozneje spremeniš v Nastavitvah.",
     "no": "Ne",
     "yes": "Da",
     "failed": "Ni uspelo. Poskusi znova."
-  },
-  "updateHint": {
-    "message": "Mumcord {{version}} je na voljo.",
-    "open": "Poglej izdajo",
-    "dismiss": "Zapri",
-    "portable": "Prenesite novi prenosni zip in ga razširite v to mapo; vaši podatki v MumcordData ostanejo."
   },
   "directConsent": {
     "title": "Dovolim neposredne povezave?",
@@ -46,5 +40,88 @@
     "no": "Ne",
     "yes": "Da",
     "failed": "Ni uspelo. Poskusi znova."
+  },
+  "updater": {
+    "stable": "Stabilna",
+    "available": {
+      "title": "Na voljo je posodobitev",
+      "subtitle": "Mumcord {{version}} je pripravljen za prenos. Imaš {{current}}.",
+      "subtitleManual": "Izšel je Mumcord {{version}}. Imaš {{current}}.",
+      "whatsNew": "Kaj je novega od {{current}}",
+      "trust": "Prenese se samo z github.com prek HTTPS, pred namestitvijo pa se preveri po podpisu in nadzorni vsoti.",
+      "skip": "Preskoči to različico",
+      "later": "Opomni me pozneje",
+      "download": "Prenesi in namesti",
+      "openReleasePage": "Odpri stran izdaje",
+      "manual": "Prenesi novo različico s strani izdaje.",
+      "manualPackage": "Prenesi paket s strani izdaje in ga nato namesti z:",
+      "manualAur": "Posodobi ga s svojim pomočnikom za AUR:"
+    },
+    "tags": {
+      "added": "Dodano",
+      "changed": "Spremenjeno",
+      "fixed": "Popravljeno",
+      "removed": "Odstranjeno"
+    },
+    "noNotes": "Za to različico ni zapiskov.",
+    "steps": {
+      "download": "Prenos",
+      "verify": "Preverjanje podpisa in nadzorne vsote",
+      "install": "Namestitev",
+      "done": "končano",
+      "current": "poteka",
+      "pending": "se še ni začelo"
+    },
+    "progress": {
+      "title": "Prenašanje Mumcorda {{version}}",
+      "subtitle": "Medtem lahko Mumcord uporabljaš naprej.",
+      "label": "Napredek posodobitve",
+      "unknown": "Velikost še ni znana",
+      "size": "{{received}} od {{total}} MB",
+      "received": "{{received}} MB",
+      "secondsLeft_one": "še približno {{count}} sekunda",
+      "secondsLeft_two": "še približno {{count}} sekundi",
+      "secondsLeft_few": "še približno {{count}} sekunde",
+      "secondsLeft_other": "še približno {{count}} sekund",
+      "minutesLeft_one": "še približno {{count}} minuta",
+      "minutesLeft_two": "še približno {{count}} minuti",
+      "minutesLeft_few": "še približno {{count}} minute",
+      "minutesLeft_other": "še približno {{count}} minut",
+      "cancel": "Prekliči"
+    },
+    "ready": {
+      "title": "Mumcord {{version}} je pripravljen",
+      "subtitle": "Znova zaženi, da dokončaš posodobitev.",
+      "verified": "Preverjeno",
+      "downloaded": "Preneseno",
+      "checked": "Podpis in nadzorna vsota sta preverjena",
+      "installed": "Nameščeno",
+      "installsOnRestart": "Namesti se ob ponovnem zagonu Mumcorda",
+      "connected_one": "Povezan si z {{count}} strežnikom. Po ponovnem zagonu se bo Mumcord znova povezal in se vrnil v tvoje kanale.",
+      "connected_two": "Povezan si z {{count}} strežnikoma. Po ponovnem zagonu se bo Mumcord znova povezal in se vrnil v tvoje kanale.",
+      "connected_few": "Povezan si s {{count}} strežniki. Po ponovnem zagonu se bo Mumcord znova povezal in se vrnil v tvoje kanale.",
+      "connected_other": "Povezan si s {{count}} strežniki. Po ponovnem zagonu se bo Mumcord znova povezal in se vrnil v tvoje kanale.",
+      "later": "Pozneje",
+      "restart": "Znova zaženi in posodobi",
+      "announce": "Mumcord {{version}} je pripravljen. Znova zaženi za posodobitev."
+    },
+    "failed": {
+      "title": "Posodobitev ni uspela",
+      "subtitle": "Mumcord {{version}} ni bil nameščen. Tvoja trenutna različica še naprej deluje.",
+      "network": "Mumcord ni mogel doseči GitHuba. Preveri internetno povezavo in poskusi znova.",
+      "manifest": "Podatki o posodobitvi na GitHubu so nepopolni ali pokvarjeni, zato ni bilo nameščeno nič.",
+      "signature": "Podpis prenosa se ni ujemal, zato je bil prenos zavržen.",
+      "checksum": "Prenos se ni ujemal s svojo nadzorno vsoto, zato je bil zavržen.",
+      "install": "Namestitev posodobitve ni uspela. Tvoja nameščena različica je nespremenjena.",
+      "retry": "Poskusi znova",
+      "close": "Zapri"
+    },
+    "actionFailed": "To ni uspelo. Poskusi znova.",
+    "toast": {
+      "title": "Mumcord {{version}} je pripravljen",
+      "body": "Znova zaženi za posodobitev.",
+      "restart": "Znova zaženi",
+      "later": "Pozneje"
+    }
   }
 }

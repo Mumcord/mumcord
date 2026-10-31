@@ -63,7 +63,8 @@
       "messageRequest": "Iarratas teachtaireachta",
       "invite": "Cuireadh",
       "private": "Teachtaireacht phríobháideach",
-      "connection": "Nasc"
+      "connection": "Nasc",
+      "update": "Nuashonrú"
     },
     "accept": "Glac leis",
     "decline": "Diúltaigh",
@@ -73,6 +74,12 @@
     "dismiss": "Cuir ar leataobh",
     "dismissItem": "Cuir ar leataobh: {{title}}",
     "failed": "Níor oibrigh sé sin. Bain triail eile as.",
-    "block": "Bac"
+    "block": "Bac",
+    "update": {
+      "title": "Tá Mumcord {{version}} réidh",
+      "body": "Atosaigh chun nuashonrú",
+      "restart": "Atosaigh chun nuashonrú",
+      "whatsNew": "Cad atá nua"
+    }
   }
 }

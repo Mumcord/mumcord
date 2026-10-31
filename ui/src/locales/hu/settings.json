@@ -17,6 +17,7 @@
     "about": "Névjegy",
     "servers": "Szerverek",
     "privacy": "Adatvédelem",
+    "updates": "Frissítések",
     "packetInspector": "Csomagvizsgáló"
   },
   "search": {
@@ -433,14 +434,6 @@
       "unsupported": "A játékon belüli overlay nem érhető el ezen a rendszeren. Helyette a fenti ablakos overlay használatos.",
       "loadFailed": "A játékon belüli overlay beállításait nem sikerült betölteni.",
       "saveFailed": "A játékon belüli overlay módosítását nem sikerült alkalmazni.",
-      "confirmTitle": "Bekapcsolod az overlayt ehhez: {{game}}?",
-      "confirmMessage": "Figyelem: a(z) {{game}} csalásvédelmet használ ({{reason}}). Az overlayek csalásnak minősülhetnek, és a fiókodat kitilthatják. A Mumcord ezért nem vállal felelősséget. Csak akkor folytasd, ha elfogadod ezt a kockázatot.",
-      "confirmEnable": "Bekapcsolás mégis",
-      "limits": {
-        "libraryMissing": "A játékon belüli overlay nem érhető el: az overlay könyvtára (libmumcord_overlay_layer.so) nem található a Mumcord mellett. Telepítsd újra a Mumcordot a helyreállításához. Helyette a fenti ablakos overlay használatos.",
-        "windowsFullscreen": "A játékban használj keret nélküli vagy ablakos teljes képernyőt.",
-        "macos": "A macOS nem támogatja a játékon belüli overlayeket. Helyette a fenti ablakos overlay használatos."
-      },
       "opengl": {
         "title": "OpenGL-játékok",
         "explanation": "Csak OpenGL-játékokhoz kell: illeszd be a játék Steam-indítási beállításaiba.",
@@ -448,6 +441,14 @@
         "copy": "Másolás",
         "copied": "Másolva",
         "copyFailed": "A másolás nem sikerült. Jelöld ki a szöveget, és másold kézzel."
+      },
+      "confirmTitle": "Bekapcsolod az overlayt ehhez: {{game}}?",
+      "confirmMessage": "Figyelem: a(z) {{game}} csalásvédelmet használ ({{reason}}). Az overlayek csalásnak minősülhetnek, és a fiókodat kitilthatják. A Mumcord ezért nem vállal felelősséget. Csak akkor folytasd, ha elfogadod ezt a kockázatot.",
+      "confirmEnable": "Bekapcsolás mégis",
+      "limits": {
+        "libraryMissing": "A játékon belüli overlay nem érhető el: az overlay könyvtára (libmumcord_overlay_layer.so) nem található a Mumcord mellett. Telepítsd újra a Mumcordot a helyreállításához. Helyette a fenti ablakos overlay használatos.",
+        "windowsFullscreen": "A játékban használj keret nélküli vagy ablakos teljes képernyőt.",
+        "macos": "A macOS nem támogatja a játékon belüli overlayeket. Helyette a fenti ablakos overlay használatos."
       }
     }
   },
@@ -618,11 +619,6 @@
     "allow": "Közvetlen kapcsolatok engedélyezése más Mumcord-felhasználókkal",
     "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet.",
     "notUsed": "A választott peer-to-peer módban nincs használatban: a Mumcord sosem kapcsolódik közvetlenül másokhoz."
-  },
-  "updates": {
-    "title": "Frissítések",
-    "check": "Új verziók keresése",
-    "hint": "A Mumcord naponta egyszer megkérdezi a GitHubot a legújabb kiadásról. Semmi más nem kerül elküldésre."
   },
   "appImageMenu": {
     "label": "Mumcord hozzáadása az alkalmazásmenühöz",
@@ -805,5 +801,61 @@
     "collapseHint": "Az „Üzenet egy letiltott felhasználótól” szöveget mutatja egy Megjelenítés gombbal.",
     "hide": "Teljes elrejtés",
     "hideHint": "A csevegésben semmi sem jelenik meg."
+  },
+  "updates": {
+    "installedFrom": "Mumcord {{version}} · telepítés forrása: {{source}}",
+    "install": {
+      "appImage": "az AppImage",
+      "appImageReadOnly": "egy AppImage egy csak olvasható mappában",
+      "windowsInstaller": "a Windows-telepítő",
+      "windowsPortable": "a hordozható Windows-zip",
+      "macApp": "a macOS-alkalmazás",
+      "otherMac": "egy macOS-másolat alkalmazáscsomagon kívül",
+      "deb": "a .deb csomag",
+      "rpm": "az .rpm csomag",
+      "aur": "az AUR",
+      "otherLinux": "egy Linux-csomag"
+    },
+    "checking": "Ellenőrzés",
+    "mode": "Ha frissítés található",
+    "modeHint": "A frissítéseket telepítés előtt mindig ellenőrizzük és hitelesítjük.",
+    "modeAuto": "Automatikus letöltés",
+    "modeNotify": "Csak értesítés",
+    "modeOff": "Ki",
+    "autoUnavailable": "Ez a példány nem tudja önmagát frissíteni, ezért a Mumcord csak az új verziókról értesít.",
+    "interval": "Frissítések keresése",
+    "intervalHint_one": "Indításkor és óránként",
+    "intervalHint_other": "Indításkor és {{count}} óránként",
+    "intervalWeekHint": "Indításkor és hetente egyszer",
+    "intervalHours_one": "Óránként",
+    "intervalHours_other": "{{count}} óránként",
+    "intervalWeek": "Hetente egyszer",
+    "status": "Állapot",
+    "state": {
+      "idle": "Még nem ellenőrizve",
+      "off": "A frissítések keresése ki van kapcsolva",
+      "checking": "Frissítések keresése…",
+      "upToDate": "A Mumcord naprakész",
+      "available": "A Mumcord {{version}} elérhető",
+      "downloading": "A Mumcord {{version}} letöltése…",
+      "verifying": "A Mumcord {{version}} letöltésének ellenőrzése…",
+      "installing": "A Mumcord {{version}} telepítése…",
+      "ready": "A Mumcord {{version}} készen áll. Indítsd újra a frissítéshez.",
+      "failed": "Az utolsó frissítés nem sikerült",
+      "offline": "A GitHub nem érhető el. A Mumcord később újra próbálkozik."
+    },
+    "devBuild": "Fejlesztői verzió: a frissítések ki vannak kapcsolva",
+    "lastCheckedToday": "Utoljára ma ellenőrizve ekkor: {{time}}",
+    "lastCheckedYesterday": "Utoljára tegnap ellenőrizve ekkor: {{time}}",
+    "lastCheckedOn": "Utoljára ellenőrizve: {{date}}, {{time}}",
+    "checkNow": "Ellenőrzés most",
+    "showUpdate": "Frissítés megjelenítése",
+    "checkFailed": "Az ellenőrzést nem sikerült elindítani. Próbáld újra.",
+    "skipped": "Kihagyott verzió",
+    "skippedHint": "A(z) {{version}} kihagyva, és nem ajánljuk fel újra.",
+    "stopSkipping": "Kihagyás megszüntetése",
+    "whatsNew": "Újdonságok",
+    "whatsNewHint": "Nézd meg az egyes verziók változásait.",
+    "openChangelog": "Változásnapló megnyitása"
   }
 }
