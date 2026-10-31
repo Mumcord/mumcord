@@ -57,6 +57,7 @@ describe("chat: channel tree right-click menu (AC-3.65)", () => {
       "Join channel",
       "Follow channel",
       "Audio for this channel…",
+      "Whisper to…",
       "Copy channel link",
       "Channel info",
       "Clear chat history…",

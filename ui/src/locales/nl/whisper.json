@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Fluister naar…",
+    "noPermission": "De server staat hier geen fluisteren toe"
+  },
+  "banner": {
+    "whisper": "Fluistert naar {{target}}",
+    "shout": "Roept naar {{target}}",
+    "releaseKey": "Alleen de mensen daar horen je. Laat <key>{{key}}</key> los om weer in {{channel}} te praten.",
+    "stopToReturn": "Alleen de mensen daar horen je. Stop om weer in {{channel}} te praten.",
+    "onlyThere": "Alleen de mensen daar horen je.",
+    "stop": "Stoppen"
+  },
+  "denied": {
+    "title": "Kon niet fluisteren naar {{target}}",
+    "noVoiceServer": "Ga eerst naar een kanaal: fluisteren loopt via de server waarop je praat.",
+    "muted": "Zet je microfoon aan om te fluisteren.",
+    "serverMuted": "De server heeft je gedempt en geeft je stem daarom niet door.",
+    "nobodyHere": "Niemand hiervan zit nu op deze server.",
+    "channelNotFound": "Dit kanaal bestaat niet op deze server.",
+    "noPermission": "De server staat niet toe dat je naar {{channel}} fluistert.",
+    "unknownTarget": "Dit doel bestaat niet meer.",
+    "dismiss": "Sluiten"
+  },
+  "badge": {
+    "whisper": "fluistert",
+    "shout": "roept",
+    "whisperLabel": "Fluistert naar jou",
+    "shoutLabel": "Roept naar je kanaal",
+    "ownWhisper": "fluisteren",
+    "ownShout": "roepen",
+    "ownWhisperLabel": "Je fluistert",
+    "ownShoutLabel": "Je roept"
+  },
+  "panel": {
+    "open": "Fluisteren of roepen",
+    "menu": "Fluister- en roepdoelen",
+    "manage": "Doelen beheren…",
+    "none": "Nog geen doelen",
+    "indicatorWhisper": "Fluistert naar {{target}}",
+    "indicatorShout": "Roept naar {{target}}",
+    "stop": "Stoppen"
+  }
+}

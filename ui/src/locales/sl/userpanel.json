@@ -145,6 +145,8 @@
     "label": "Ne moti",
     "manual": "ročno",
     "system": "Ne moti (sistem)",
-    "systemHint": "Izklopite ga v nastavitvah obvestil vašega namizja."
-  }
+    "systemHint": "Izklopite ga v nastavitvah obvestil vašega namizja.",
+    "short": "Ne moti"
+  },
+  "dismissError": "Zapri"
 }

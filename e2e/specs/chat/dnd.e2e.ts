@@ -10,6 +10,7 @@ import {
   unreadBadge,
   USER,
 } from "../../helpers/chat-ui.ts";
+import { userPanelLayout } from "../../helpers/voice-ui.ts";
 
 function anyToast() {
   return $("//section[@aria-label='Notifications']//button[contains(@class,'toast__open')]");
@@ -23,8 +24,9 @@ function dndRow() {
   return $("//button[@role='menuitemcheckbox'][starts-with(normalize-space(.), 'Do Not Disturb')]");
 }
 
+// A compact "DND" chip in the user panel's status strip (#246); the source is its accessible name.
 function indicator() {
-  return $("//div[contains(@class,'dnd-indicator')]");
+  return $(".dnd-indicator");
 }
 
 async function openQuickSettings(): Promise<void> {
@@ -60,13 +62,17 @@ describe("chat: Do Not Disturb (AC-3.76)", () => {
   });
 
   it("turns on from quick settings and shows the manual indicator", async () => {
+    const before = await userPanelLayout();
     await openQuickSettings();
     await expect(dndRow()).toHaveAttribute("aria-checked", "false");
     await dndRow().click();
     await expect(dndRow()).toHaveAttribute("aria-checked", "true");
     await browser.keys("Escape");
     await indicator().waitForDisplayed();
-    await expect(indicator()).toHaveText(expect.stringContaining("Do Not Disturb · manual"));
+    await expect(indicator()).toHaveAttribute("aria-label", "Do Not Disturb · manual");
+    // The chip joins the status strip: the panel keeps its height and nothing wraps.
+    expect(await userPanelLayout()).toEqual(before);
+    expect(before.overflows).toBe(false);
   });
 
   it("collects a mention without a toast while the badge counts", async () => {

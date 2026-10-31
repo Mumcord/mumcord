@@ -145,6 +145,8 @@
     "label": "Älä häiritse",
     "manual": "käsin",
     "system": "Älä häiritse (järjestelmä)",
-    "systemHint": "Poista se käytöstä työpöydän ilmoitusasetuksista."
-  }
+    "systemHint": "Poista se käytöstä työpöydän ilmoitusasetuksista.",
+    "short": "Älä häiritse"
+  },
+  "dismissError": "Sulje"
 }

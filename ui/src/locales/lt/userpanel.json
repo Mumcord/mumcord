@@ -145,6 +145,8 @@
     "label": "Netrukdyti",
     "manual": "rankiniu būdu",
     "system": "Netrukdyti (sistema)",
-    "systemHint": "Išjunkite jį darbalaukio pranešimų nustatymuose."
-  }
+    "systemHint": "Išjunkite jį darbalaukio pranešimų nustatymuose.",
+    "short": "Netrukdyti"
+  },
+  "dismissError": "Uždaryti"
 }

@@ -145,6 +145,8 @@
     "label": "Nie przeszkadzać",
     "manual": "ręcznie",
     "system": "Nie przeszkadzać (system)",
-    "systemHint": "Wyłącz go w ustawieniach powiadomień pulpitu."
-  }
+    "systemHint": "Wyłącz go w ustawieniach powiadomień pulpitu.",
+    "short": "Nie przeszkadzać"
+  },
+  "dismissError": "Zamknij"
 }

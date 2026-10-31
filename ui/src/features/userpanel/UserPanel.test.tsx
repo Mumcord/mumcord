@@ -91,7 +91,7 @@ afterEach(() => {
 
 const mute = () => screen.getByRole("button", { name: "Mute microphone" });
 const deafen = () => screen.getByRole("button", { name: "Deafen" });
-const READ_ONLY = /Join a channel to talk/;
+const READ_ONLY = /^Read-only$/;
 
 /** Leaves the read-only start of a fresh connect through the notice's join button. */
 async function joinVoice() {
@@ -242,12 +242,14 @@ describe("UserPanel", () => {
 
   it("shows the voice location after a join; clicking it shows the voice server (FR-2.5)", async () => {
     await setup();
-    expect(screen.queryByRole("button", { name: /^Voice: / })).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Voice: /)).not.toBeInTheDocument();
     await joinVoice();
-    const line = await screen.findByRole("button", {
-      name: /^Voice: .+ · Local test server – show this server$/,
-    });
-    expect(line.textContent).toMatch(/^Voice: .+ · Local test server$/);
+    // Voice on the shown server: the strip shows the channel (the server is the subtitle), screen
+    // readers get the whole location.
+    expect(await screen.findByText(/^Voice: .+ · Local test server$/)).toHaveClass(
+      "visually-hidden",
+    );
+    expect(screen.queryByRole("button", { name: /^Voice: / })).not.toBeInTheDocument();
 
     const second = await api.serverAdd({
       label: "Second",
@@ -261,7 +263,10 @@ describe("UserPanel", () => {
       showServer(second.id);
     });
     // Second is read-only, but voice (and the mute buttons) stay on the first server.
-    expect(screen.getByRole("button", { name: /^Voice: .+ · Local test server/ })).toBeVisible();
+    const line = screen.getByRole("button", {
+      name: /^Voice: .+ · Local test server – show this server$/,
+    });
+    expect(line.textContent).toMatch(/^Voice: .+ · Local test server$/);
     expect(screen.queryByText(READ_ONLY)).not.toBeInTheDocument();
     expect(deafen()).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(screen.getByRole("button", { name: /^Voice: / }));
@@ -511,10 +516,16 @@ describe("UserPanel", () => {
       "Speaker options",
       expect.stringMatching(/^Disconnect from /),
       "More disconnect options",
-      "Connection info",
-      "Voice quality",
-      "Quick settings",
     ]);
+    // The gear sits in the identity row (it is no voice control); the connection quality is a
+    // chip in the status strip, with the voice quality arrow beside it.
+    const identity = document.querySelector(".userpanel__identity");
+    expect(
+      [...(identity?.querySelectorAll("button") ?? [])].map((b) => b.getAttribute("aria-label")),
+    ).toEqual(["Quick settings"]);
+    const strip = document.querySelector(".userpanel-strip");
+    expect(strip?.querySelector("button[aria-label='Connection info']")).not.toBeNull();
+    expect(strip?.querySelector("button[aria-label='Voice quality']")).not.toBeNull();
     await joinVoice();
     expect(profile?.querySelector(".userpanel__status")).not.toHaveTextContent("Read-only");
     expect(profile?.querySelector(".userpanel__status")?.textContent).not.toBe("");
@@ -594,7 +605,7 @@ describe("UserPanel", () => {
     expect(status()).toHaveTextContent("Band – Song");
   });
 
-  it("keeps important states over the own track", async () => {
+  it("shows the own track under the name while the strip keeps the read-only state", async () => {
     await setup();
     const self = (await api.sessionSnapshot(1))?.selfSession ?? -1;
     act(() => {
@@ -612,10 +623,11 @@ describe("UserPanel", () => {
         },
       });
     });
-    expect(document.querySelector(".userpanel__status")).toHaveTextContent("Read-only");
+    expect(document.querySelector(".userpanel__status")).toHaveTextContent("Song");
+    expect(document.querySelector(".userpanel-strip")).toHaveTextContent("Read-only");
   });
 
-  it("lets a long name wrap to two lines instead of cutting it off", async () => {
+  it("cuts a long name off on one line, with the full name as tooltip (#246)", async () => {
     await setup();
     const snapshot = await api.sessionSnapshot(1);
     const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
@@ -627,6 +639,7 @@ describe("UserPanel", () => {
     const name = await screen.findByText(long);
     expect(name).toHaveClass("userpanel__name");
     expect(name).toHaveAttribute("data-tooltip", long);
+    expect(name).toHaveAttribute("data-tooltip-overflow");
     // jsdom does not apply the stylesheet, so assert the rules themselves.
     const css = readFileSync(
       resolve(process.cwd(), "ui/src/features/userpanel/userpanel.css"),
@@ -634,9 +647,8 @@ describe("UserPanel", () => {
     );
     const rule = (selector: string) =>
       new RegExp(`^${selector.replace(".", "\\.")} \\{([^}]*)\\}`, "m").exec(css)?.[1] ?? "";
-    expect(rule(".userpanel__name")).toMatch(/-webkit-line-clamp: 2;/);
-    expect(rule(".userpanel__name")).toMatch(/overflow-wrap: anywhere;/);
-    expect(rule(".userpanel__name")).not.toMatch(/nowrap/);
+    expect(rule(".userpanel__name")).toMatch(/white-space: nowrap;/);
+    expect(rule(".userpanel__name")).toMatch(/text-overflow: ellipsis;/);
     expect(rule(".userpanel__text")).toMatch(/min-width: 0;/);
     expect(rule(".userpanel__toggle")).toMatch(/flex: none;/);
     expect(rule(".userpanel")).not.toMatch(/border-top/);
@@ -1102,5 +1114,175 @@ describe("quick settings (FR-1.66)", () => {
       });
       expect(await api.connectionsList()).toHaveLength(0);
     });
+  });
+});
+
+describe("states (#246)", () => {
+  const strip = () => {
+    const element = document.querySelector<HTMLElement>(".userpanel-strip");
+    if (!element) throw new Error("status strip missing");
+    return element;
+  };
+  const avatar = () => document.querySelector<HTMLElement>(".userpanel__avatar");
+  const hangUpSlot = () => document.querySelector(".userpanel__split--empty");
+
+  it("idle in voice: the channel with a live dot, the server as the subtitle", async () => {
+    await setup();
+    await joinVoice();
+    expect(strip()).toHaveAttribute("data-message", "voice");
+    expect(strip().querySelector(".userpanel-strip__dot")).not.toBeNull();
+    expect(document.querySelector(".userpanel__status")).toHaveTextContent("Local test server");
+    expect(avatar()).not.toHaveAttribute("data-talking");
+    expect(document.querySelector(".userpanel__badge")).toBeNull();
+  });
+
+  it("talking: a ring on the avatar", async () => {
+    await setup();
+    await joinVoice();
+    const session = (await api.sessionSnapshot(1))?.selfSession ?? -1;
+    act(() => {
+      api.mock.emit("talkStateChanged", { serverId: 1, session, talking: true });
+    });
+    expect(avatar()).toHaveAttribute("data-talking");
+    act(() => {
+      api.mock.emit("talkStateChanged", { serverId: 1, session, talking: false });
+    });
+    expect(avatar()).not.toHaveAttribute("data-talking");
+  });
+
+  it("muted and deafened: pressed buttons and a badge on the avatar", async () => {
+    await setup();
+    await joinVoice();
+    fireEvent.click(mute());
+    await waitFor(() => {
+      expect(mute()).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(document.querySelector(".userpanel__badge")).not.toBeNull();
+    fireEvent.click(deafen());
+    await waitFor(() => {
+      expect(deafen()).toHaveAttribute("aria-pressed", "true");
+    });
+    expect(document.querySelector(".userpanel__badge")).not.toBeNull();
+    expect(strip()).toHaveAttribute("data-message", "voice");
+  });
+
+  it("reconnecting: the attempt in the strip, controls off except hang-up", async () => {
+    await setup();
+    await joinVoice();
+    act(() => {
+      api.mock.loseConnection();
+    });
+    expect(strip()).toHaveAttribute("data-message", "reconnecting");
+    expect(strip().querySelector(".userpanel-strip__message")).toHaveTextContent(
+      "Reconnecting… 1/10",
+    );
+    expect(strip().querySelector(".userpanel-strip__spinner")).not.toBeNull();
+    expect(mute()).toBeDisabled();
+    expect(deafen()).toBeDisabled();
+    expect(screen.getByRole("button", { name: /^Disconnect from / })).toBeEnabled();
+    act(() => {
+      api.mock.completeReconnect();
+    });
+    expect(strip()).toHaveAttribute("data-message", "voice");
+  });
+
+  it("connecting: the strip says so and the hang-up pill stays", async () => {
+    await setup();
+    act(() => {
+      api.mock.emit("connectionStateChanged", {
+        serverId: 1,
+        state: { state: "connecting", serverId: 1 },
+      });
+    });
+    expect(strip().querySelector(".userpanel-strip__message")).toHaveTextContent("Connecting…");
+    expect(screen.getByRole("button", { name: /^Disconnect from / })).toBeInTheDocument();
+    expect(hangUpSlot()).toBeNull();
+  });
+
+  it("not connected: same rows, controls off and an empty slot for hang-up", async () => {
+    await setup(false);
+    expect(strip()).toHaveAttribute("data-message", "disconnected");
+    expect(strip().querySelector(".userpanel-strip__message")).toHaveTextContent("Not connected");
+    expect(document.querySelector(".userpanel__status")).toHaveTextContent("Not connected");
+    expect(mute()).toBeDisabled();
+    expect(deafen()).toBeDisabled();
+    expect(hangUpSlot()).not.toBeNull();
+    expect(screen.queryByRole("button", { name: "Connection info" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Quick settings" })).toBeEnabled();
+  });
+
+  it("Do Not Disturb: a chip beside the message, nothing added", async () => {
+    await setup();
+    await joinVoice();
+    await act(async () => {
+      await api.dndSet(true);
+    });
+    const chip = within(strip()).getByRole("button", { name: "Do Not Disturb · manual" });
+    expect(chip).toHaveTextContent("DND");
+    expect(strip()).toHaveAttribute("data-message", "voice");
+    expect(document.querySelectorAll(".userpanel > div")).toHaveLength(3);
+  });
+
+  it("low latency: a bolt chip while the channel's profile turns it on", async () => {
+    await setup();
+    await joinVoice();
+    expect(screen.queryByRole("button", { name: "Low-latency mode" })).not.toBeInTheDocument();
+    const snapshot = await api.sessionSnapshot(1);
+    const channel = snapshot?.users.find((u) => u.session === snapshot.selfSession)?.channelId;
+    await act(async () => {
+      await api.channelAudioProfileSet(1, channel ?? 0, {
+        musicQuality: null,
+        lowLatency: true,
+        bitrateKbps: null,
+      });
+    });
+    expect(
+      await within(strip()).findByRole("button", { name: "Low-latency mode" }),
+    ).toHaveAttribute("data-tooltip", "Low-latency mode");
+  });
+
+  it("error: replaces the message as an alert until dismissed; the chips stay", async () => {
+    await setup();
+    await joinVoice();
+    vi.spyOn(api, "setSelfMute").mockRejectedValueOnce(new Error("boom"));
+    fireEvent.click(mute());
+    const alert = await within(strip()).findByRole("alert");
+    expect(alert).toHaveTextContent("Something went wrong. Please try again.");
+    expect(strip()).toHaveAttribute("data-message", "error");
+    expect(within(strip()).getByRole("button", { name: "Connection info" })).toBeInTheDocument();
+    fireEvent.click(within(strip()).getByRole("button", { name: "Dismiss" }));
+    expect(strip()).toHaveAttribute("data-message", "voice");
+    expect(within(strip()).queryByRole("alert")).toBeNull();
+  });
+
+  it("read-only: the message with a Join button", async () => {
+    await setup();
+    expect(strip()).toHaveAttribute("data-message", "readOnly");
+    expect(within(strip()).getByRole("button", { name: /^Join / })).toBeInTheDocument();
+  });
+
+  it("keeps three fixed-height rows that never wrap and fit the 15 rem sidebar", () => {
+    // jsdom does not lay out, so check the rules (the E2E specs measure the real panel).
+    const css = readFileSync(
+      resolve(process.cwd(), "ui/src/features/userpanel/userpanel.css"),
+      "utf8",
+    );
+    const rule = (selector: string) =>
+      new RegExp(`^${selector.replace(/\./g, "\\.")} \\{([^}]*)\\}`, "m").exec(css)?.[1] ?? "";
+    const rem = (selector: string, property: string) =>
+      Number(new RegExp(`\\b${property}: ([\\d.]+)rem;`).exec(rule(selector))?.[1] ?? NaN);
+    expect(rem(".userpanel__identity", "height")).toBe(2.5);
+    expect(rem(".userpanel-strip", "height")).toBe(1.5);
+    expect(rem(".userpanel__row", "height")).toBe(2);
+    expect(rule(".userpanel__row")).toMatch(/flex-wrap: nowrap;/);
+    // Rows 2.5 + 1.5 + 2, two 0.5 gaps, 0.75 + 0.5 padding: 8.25 rem in every state.
+    expect(rule(".userpanel")).toMatch(/gap: var\(--space-2\);/);
+    expect(rule(".userpanel")).toMatch(
+      /padding: var\(--space-3\) var\(--space-3\) var\(--space-2\);/,
+    );
+    // Three pills (toggle and arrow) plus two gaps fit the 13.5 rem inside a 15 rem sidebar.
+    const pill = rem(".userpanel__toggle", "width") + rem(".userpanel__arrow", "width");
+    expect(pill).toBe(rem(".userpanel__split--empty", "width"));
+    expect(3 * pill + 2 * 0.25).toBeLessThanOrEqual(15 - 2 * 0.75);
   });
 });

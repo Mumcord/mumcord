@@ -145,6 +145,8 @@
     "label": "Tiddisturbax",
     "manual": "manwali",
     "system": "Tiddisturbax (sistema)",
-    "systemHint": "Itfih fis-settings tan-notifiki tad-desktop tiegħek."
-  }
+    "systemHint": "Itfih fis-settings tan-notifiki tad-desktop tiegħek.",
+    "short": "Tiddisturbax"
+  },
+  "dismissError": "Ċaħħad"
 }

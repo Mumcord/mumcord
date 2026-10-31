@@ -444,6 +444,38 @@ pub const MIN_VIDEO_DUCKING_PERCENT: u8 = 10;
 pub const MAX_VIDEO_DUCKING_PERCENT: u8 = 80;
 pub const DEFAULT_VIDEO_DUCKING_PERCENT: u8 = 30;
 
+/// A saved whisper or shout target (issue #67). Targets and their hotkeys are global: they
+/// name people and channels, which are looked up on the server the user talks on.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WhisperTarget {
+    /// Stable id the UI and the hotkeys refer to.
+    pub id: String,
+    pub name: String,
+    pub receivers: WhisperReceivers,
+    /// Hold-to-talk key in the push-to-talk key format; none by default (Q1.7).
+    #[serde(default)]
+    pub hotkey: Option<String>,
+}
+
+/// Who hears a whisper target: what Mumble's `VoiceTarget` message can name.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum WhisperReceivers {
+    /// People by name (whisper).
+    People { names: Vec<String> },
+    /// Everyone in a channel, found by its name path below the root (shout).
+    Channel {
+        path: Vec<String>,
+        #[serde(default)]
+        children: bool,
+        #[serde(default)]
+        links: bool,
+        /// Only members of this ACL group, e.g. `admin`.
+        #[serde(default)]
+        group: Option<String>,
+    },
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -464,6 +496,8 @@ pub struct Settings {
     /// Linux Wayland: start through XWayland and use the X11 push-to-talk path
     /// (FR-1.48, QA.5). Read before the window system starts; applies on restart.
     pub ptt_compatibility_mode: bool,
+    /// Whisper and shout targets (issue #67), in the user's order.
+    pub whisper_targets: Vec<WhisperTarget>,
     /// Device names; `None` uses the system default device.
     pub input_device: Option<String>,
     pub output_device: Option<String>,
@@ -606,6 +640,7 @@ impl Default for Settings {
             ptt_key: None,
             allow_mouse_buttons: false,
             ptt_compatibility_mode: false,
+            whisper_targets: Vec::new(),
             input_device: None,
             output_device: None,
             noise_suppression: true,
@@ -866,6 +901,38 @@ mod tests {
         let loaded = store.settings().expect("load").private_messages;
         assert_eq!(loaded.rule_for(7), PmRule::Nobody);
         assert_eq!(loaded.rule_for(8), PmRule::FriendsOnly);
+    }
+
+    #[test]
+    fn whisper_targets_round_trip() {
+        let (_dir, store) = temp_store();
+        let mut changed = store.settings().expect("defaults");
+        changed.whisper_targets = vec![
+            WhisperTarget {
+                id: "a".into(),
+                name: "Raid Night + sub-channels".into(),
+                receivers: WhisperReceivers::Channel {
+                    path: vec!["Raid Night".into()],
+                    children: true,
+                    links: false,
+                    group: Some("admin".into()),
+                },
+                hotkey: Some("F9".into()),
+            },
+            WhisperTarget {
+                id: "b".into(),
+                name: "Maya and Priya".into(),
+                receivers: WhisperReceivers::People {
+                    names: vec!["Maya".into(), "Priya".into()],
+                },
+                hotkey: None,
+            },
+        ];
+        store.save_settings(&changed).expect("save");
+        assert_eq!(
+            store.settings().expect("load").whisper_targets,
+            changed.whisper_targets
+        );
     }
 
     #[test]
@@ -1261,6 +1328,10 @@ mod tests {
             "the modern Wayland path stays the default"
         );
         assert!(!parsed.autostart, "starting at login is opt-in");
+        assert!(
+            parsed.whisper_targets.is_empty(),
+            "no whisper targets or hotkeys by default"
+        );
         assert!(parsed.start_minimized);
         assert!(parsed.connect_muted, "read-only connect stays the default");
     }

@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Hvisk til…",
+    "noPermission": "Serveren tillader ikke at hviske her"
+  },
+  "banner": {
+    "whisper": "Hvisker til {{target}}",
+    "shout": "Råber til {{target}}",
+    "releaseKey": "Kun folk dér kan høre dig. Slip <key>{{key}}</key> for at tale til {{channel}} igen.",
+    "stopToReturn": "Kun folk dér kan høre dig. Stop for at tale til {{channel}} igen.",
+    "onlyThere": "Kun folk dér kan høre dig.",
+    "stop": "Stop"
+  },
+  "denied": {
+    "title": "Kunne ikke hviske til {{target}}",
+    "noVoiceServer": "Gå først ind i en kanal: hvisken går via den server, du taler på.",
+    "muted": "Slå lyden til på din mikrofon for at hviske.",
+    "serverMuted": "Serveren har gjort dig tavs, så den sender ikke din stemme videre.",
+    "nobodyHere": "Ingen af disse personer er på serveren lige nu.",
+    "channelNotFound": "Kanalen findes ikke på denne server.",
+    "noPermission": "Serveren tillader ikke, at du hvisker til {{channel}}.",
+    "unknownTarget": "Dette mål findes ikke længere.",
+    "dismiss": "Luk"
+  },
+  "badge": {
+    "whisper": "hvisker",
+    "shout": "råber",
+    "whisperLabel": "Hvisker til dig",
+    "shoutLabel": "Råber til din kanal",
+    "ownWhisper": "hvisker",
+    "ownShout": "råber",
+    "ownWhisperLabel": "Du hvisker",
+    "ownShoutLabel": "Du råber"
+  },
+  "panel": {
+    "open": "Hvisk eller råb",
+    "menu": "Mål for hvisken og råb",
+    "manage": "Administrer mål…",
+    "none": "Ingen mål endnu",
+    "indicatorWhisper": "Hvisker til {{target}}",
+    "indicatorShout": "Råber til {{target}}",
+    "stop": "Stop"
+  }
+}

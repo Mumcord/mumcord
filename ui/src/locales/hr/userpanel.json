@@ -145,6 +145,8 @@
     "label": "Ne ometaj",
     "manual": "ručno",
     "system": "Ne ometaj (sustav)",
-    "systemHint": "Isključite ga u postavkama obavijesti radne površine."
-  }
+    "systemHint": "Isključite ga u postavkama obavijesti radne površine.",
+    "short": "Ne smetaj"
+  },
+  "dismissError": "Odbaci"
 }

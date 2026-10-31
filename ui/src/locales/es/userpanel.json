@@ -145,6 +145,8 @@
     "label": "No molestar",
     "manual": "manual",
     "system": "No molestar (sistema)",
-    "systemHint": "Desactívalo en los ajustes de notificaciones de tu escritorio."
-  }
+    "systemHint": "Desactívalo en los ajustes de notificaciones de tu escritorio.",
+    "short": "No molestar"
+  },
+  "dismissError": "Descartar"
 }

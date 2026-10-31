@@ -33,6 +33,7 @@ mod mouse_macos;
 mod mouse_windows;
 #[cfg(target_os = "linux")]
 mod mouse_x11;
+pub mod whisper;
 
 use mouse::MouseButton;
 

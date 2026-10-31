@@ -129,6 +129,16 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   },
   {
     section: "voice",
+    group: "voice.whisper.title",
+    terms: [
+      "voice.whisper.hint",
+      "voice.whisper.people",
+      "voice.whisper.channel",
+      "voice.whisper.hotkey",
+    ],
+  },
+  {
+    section: "voice",
     group: "voice.connecting",
     control: "voice.connectMuted",
     terms: ["voice.connectMutedHint"],

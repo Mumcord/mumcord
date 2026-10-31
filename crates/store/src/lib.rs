@@ -46,7 +46,7 @@ pub use settings::{
     MAX_MAX_CONNECTED_SERVERS, MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS,
     MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, P2pMode,
     PmRule, PositionalSettings, PrivateMessageSettings, Settings, SoundSettings, TalkMode, Theme,
-    ThemePreference, VoiceActivation,
+    ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

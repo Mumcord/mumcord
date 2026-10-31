@@ -3,7 +3,7 @@
 
 use std::collections::HashMap;
 use std::sync::Mutex;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
 
 use super::noise_suppression::{
     Backend, BackendBuilder, SuppressionBackend, SuppressionLevel, build_backend,
@@ -66,6 +66,7 @@ pub struct DspControls {
     manual_threshold: AtomicBool,
     threshold_dbfs: AtomicF32,
     ptt_pressed: AtomicBool,
+    voice_target: AtomicU8,
     voice_active: AtomicBool,
     transmitting: AtomicBool,
     peak: AtomicF32,
@@ -94,6 +95,7 @@ impl Default for DspControls {
             manual_threshold: AtomicBool::new(false),
             threshold_dbfs: AtomicF32::new(THRESHOLD_DEFAULT_DBFS),
             ptt_pressed: AtomicBool::new(false),
+            voice_target: AtomicU8::new(0),
             voice_active: AtomicBool::new(false),
             transmitting: AtomicBool::new(false),
             peak: AtomicF32::new(0.0),
@@ -293,6 +295,17 @@ impl DspControls {
 
     pub fn ptt_pressed(&self) -> bool {
         self.ptt_pressed.load(Ordering::Relaxed)
+    }
+
+    /// Voice target being held for whisper or shout (issue #67); 0 = none, i.e. talk to the
+    /// own channel. A held target transmits like a pressed push-to-talk key. One atomic, so the
+    /// capture thread never sees a target without the matching transmit state.
+    pub fn set_voice_target(&self, target: u8) {
+        self.voice_target.store(target, Ordering::Relaxed);
+    }
+
+    pub fn voice_target(&self) -> u8 {
+        self.voice_target.load(Ordering::Relaxed)
     }
 
     /// Whether voice activity detection currently hears speech (including

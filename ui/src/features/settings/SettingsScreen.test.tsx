@@ -63,6 +63,7 @@ function renderScreen() {
     hideEmptyChannels: false,
     talkingFirst: false,
     showWeakConnectionIcon: true,
+    lowLatency: false,
     applySettings,
   };
   return render(

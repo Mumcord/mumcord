@@ -1265,6 +1265,15 @@ impl Handle {
         self.send(Frame::from_message(MessageType::ChannelState, &state))
     }
 
+    /// Defines (or replaces) voice target `target.id` (1..=[`VOICE_TARGET_MAX`]) for whisper and
+    /// shout. Audio sent to that id afterwards reaches its receivers; the server silently leaves
+    /// out receivers the Whisper permission does not allow.
+    ///
+    /// [`VOICE_TARGET_MAX`]: crate::VOICE_TARGET_MAX
+    pub fn send_voice_target(&self, target: &proto::VoiceTarget) -> Result<(), CommandError> {
+        self.send(Frame::from_message(MessageType::VoiceTarget, target))
+    }
+
     /// Voice hook: sends a raw Mumble UDP packet through the TCP tunnel.
     pub fn send_tunnel(&self, packet: Bytes) -> Result<(), CommandError> {
         self.send(Frame {

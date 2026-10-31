@@ -1,0 +1,44 @@
+{
+  "menu": {
+    "whisper": "Kuiskaa…",
+    "noPermission": "Palvelin ei salli kuiskaamista täällä"
+  },
+  "banner": {
+    "whisper": "Kuiskaat: {{target}}",
+    "shout": "Huudat: {{target}}",
+    "releaseKey": "Vain siellä olevat kuulevat sinut. Vapauta <key>{{key}}</key>, niin puhut taas kanavalle {{channel}}.",
+    "stopToReturn": "Vain siellä olevat kuulevat sinut. Lopeta, niin puhut taas kanavalle {{channel}}.",
+    "onlyThere": "Vain siellä olevat kuulevat sinut.",
+    "stop": "Lopeta"
+  },
+  "denied": {
+    "title": "Kuiskaaminen ei onnistunut: {{target}}",
+    "noVoiceServer": "Liity ensin kanavalle: kuiskaukset kulkevat palvelimen kautta, jolla puhut.",
+    "muted": "Poista mikrofonin mykistys kuiskataksesi.",
+    "serverMuted": "Palvelin on mykistänyt sinut, joten se ei välitä ääntäsi.",
+    "nobodyHere": "Yksikään näistä henkilöistä ei ole nyt tällä palvelimella.",
+    "channelNotFound": "Tätä kanavaa ei ole tällä palvelimella.",
+    "noPermission": "Palvelin ei salli sinun kuiskata kanavalle {{channel}}.",
+    "unknownTarget": "Tätä kohdetta ei enää ole.",
+    "dismiss": "Sulje"
+  },
+  "badge": {
+    "whisper": "kuiskaa",
+    "shout": "huutaa",
+    "whisperLabel": "Kuiskaa sinulle",
+    "shoutLabel": "Huutaa kanavallesi",
+    "ownWhisper": "kuiskaat",
+    "ownShout": "huudat",
+    "ownWhisperLabel": "Kuiskaat",
+    "ownShoutLabel": "Huudat"
+  },
+  "panel": {
+    "open": "Kuiskaa tai huuda",
+    "menu": "Kuiskaus- ja huutokohteet",
+    "manage": "Hallitse kohteita…",
+    "none": "Ei vielä kohteita",
+    "indicatorWhisper": "Kuiskaat: {{target}}",
+    "indicatorShout": "Huudat: {{target}}",
+    "stop": "Lopeta"
+  }
+}

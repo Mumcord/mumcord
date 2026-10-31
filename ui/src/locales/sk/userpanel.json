@@ -145,6 +145,8 @@
     "label": "Nerušiť",
     "manual": "ručne",
     "system": "Nerušiť (systém)",
-    "systemHint": "Vypnite ho v nastaveniach upozornení vášho prostredia."
-  }
+    "systemHint": "Vypnite ho v nastaveniach upozornení vášho prostredia.",
+    "short": "Nerušiť"
+  },
+  "dismissError": "Zavrieť"
 }

@@ -15,6 +15,7 @@ import { CompatibilityModeSwitch } from "./CompatibilityModeSwitch";
 import { Switch } from "../components/Switch";
 import { ThresholdMeter } from "../components/ThresholdMeter";
 import { errorText } from "../errors";
+import { WhisperTargetsGroup } from "../../whisper/WhisperTargetsGroup";
 import { keyCombo, mouseKey, mouseLabel } from "../pttKey";
 import type { SettingsSectionProps } from "./types";
 
@@ -187,6 +188,7 @@ export function VoiceSection({ settings, update }: SettingsSectionProps) {
           <p className="settings-warning">{t("voice.mouseAccessibility")}</p>
         )}
       </Group>
+      <WhisperTargetsGroup />
       <Group title={t("voice.connecting")}>
         <Switch
           label={t("voice.connectMuted")}

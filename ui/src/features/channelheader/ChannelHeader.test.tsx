@@ -66,6 +66,7 @@ describe("channel header", () => {
     expect(items.map((item) => item.textContent)).toEqual([
       "Follow channel",
       "Audio for this channel…",
+      "Whisper to…",
       "Copy channel linkmumble://",
       "Channel info",
       "Clear chat history…",

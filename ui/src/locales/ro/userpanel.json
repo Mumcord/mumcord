@@ -145,6 +145,8 @@
     "label": "Nu deranja",
     "manual": "manual",
     "system": "Nu deranja (sistem)",
-    "systemHint": "Dezactivează-l în setările de notificări ale desktopului."
-  }
+    "systemHint": "Dezactivează-l în setările de notificări ale desktopului.",
+    "short": "Nu deranja"
+  },
+  "dismissError": "Închide"
 }
