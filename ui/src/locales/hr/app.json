@@ -11,10 +11,6 @@
     "chat": "Preskoči na chat",
     "channels": "Preskoči na kanale"
   },
-  "members": {
-    "show": "Prikaži članove",
-    "hide": "Sakrij članove"
-  },
   "resize": {
     "channels": "Promijeni veličinu popisa kanala",
     "members": "Promijeni veličinu popisa članova"

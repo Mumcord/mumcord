@@ -87,5 +87,20 @@
   "preview": {
     "privateMessage": "Wiadomość prywatna",
     "fullProfile": "Pełny profil"
+  },
+  "toggle": {
+    "show": "Pokaż członków",
+    "hide": "Ukryj członków",
+    "showCount_one": "Pokaż członków ({{count}})",
+    "showCount_few": "Pokaż członków ({{count}})",
+    "showCount_many": "Pokaż członków ({{count}})",
+    "showCount_other": "Pokaż członków ({{count}})",
+    "talkingOne": "{{name}} mówi",
+    "talkingTwo": "{{first}} i {{second}} mówią",
+    "talkingMore_one": "{{name}} i {{count}} inna osoba mówią",
+    "talkingMore_few": "{{name}} i {{count}} inne osoby mówią",
+    "talkingMore_many": "{{name}} i {{count}} innych osób mówi",
+    "talkingMore_other": "{{name}} i {{count}} innych osób mówi",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

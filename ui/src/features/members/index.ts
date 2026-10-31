@@ -20,3 +20,5 @@ export { PersonMenuHost } from "./PersonMenu";
 export { openPersonMenu, openPersonMenuFromEvent, openPersonMenuFromKey } from "./personMenuStore";
 export { CollapsibleSection, type CollapsibleSectionProps } from "./CollapsibleSection";
 export { useSectionOpen } from "./useSectionOpen";
+export { MembersToggle, type MembersToggleProps } from "./MembersToggle";
+export { channelPresence, useChannelPresence, type ChannelPresence } from "./channelPresence";

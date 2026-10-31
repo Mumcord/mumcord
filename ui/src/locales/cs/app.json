@@ -11,10 +11,6 @@
     "chat": "Přejít na chat",
     "channels": "Přejít na kanály"
   },
-  "members": {
-    "show": "Zobrazit členy",
-    "hide": "Skrýt členy"
-  },
   "resize": {
     "channels": "Změnit velikost seznamu kanálů",
     "members": "Změnit velikost seznamu členů"

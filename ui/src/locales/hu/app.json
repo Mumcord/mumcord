@@ -11,10 +11,6 @@
     "chat": "Ugrás a chathez",
     "channels": "Ugrás a csatornákhoz"
   },
-  "members": {
-    "show": "Tagok megjelenítése",
-    "hide": "Tagok elrejtése"
-  },
   "resize": {
     "channels": "Csatornalista átméretezése",
     "members": "Taglista átméretezése"

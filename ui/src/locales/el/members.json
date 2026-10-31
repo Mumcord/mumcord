@@ -83,5 +83,16 @@
   "preview": {
     "privateMessage": "Ιδιωτικό μήνυμα",
     "fullProfile": "Πλήρες προφίλ"
+  },
+  "toggle": {
+    "show": "Εμφάνιση μελών",
+    "hide": "Απόκρυψη μελών",
+    "showCount_one": "Εμφάνιση μελών ({{count}})",
+    "showCount_other": "Εμφάνιση μελών ({{count}})",
+    "talkingOne": "{{name}} μιλάει",
+    "talkingTwo": "{{first}} και {{second}} μιλάνε",
+    "talkingMore_one": "{{name}} και {{count}} ακόμη μιλάνε",
+    "talkingMore_other": "{{name}} και {{count}} ακόμη μιλάνε",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

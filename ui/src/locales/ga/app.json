@@ -11,10 +11,6 @@
     "chat": "Léim go dtí an comhrá",
     "channels": "Léim go dtí na cainéil"
   },
-  "members": {
-    "show": "Taispeáin baill",
-    "hide": "Folaigh baill"
-  },
   "resize": {
     "channels": "Athraigh méid liosta na gcainéal",
     "members": "Athraigh méid liosta na mball"

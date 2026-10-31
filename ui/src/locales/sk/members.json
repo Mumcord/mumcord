@@ -87,5 +87,20 @@
   "preview": {
     "privateMessage": "Súkromná správa",
     "fullProfile": "Celý profil"
+  },
+  "toggle": {
+    "show": "Zobraziť členov",
+    "hide": "Skryť členov",
+    "showCount_one": "Zobraziť členov ({{count}})",
+    "showCount_few": "Zobraziť členov ({{count}})",
+    "showCount_many": "Zobraziť členov ({{count}})",
+    "showCount_other": "Zobraziť členov ({{count}})",
+    "talkingOne": "{{name}} hovorí",
+    "talkingTwo": "{{first}} a {{second}} hovoria",
+    "talkingMore_one": "{{name}} a {{count}} ďalší hovoria",
+    "talkingMore_few": "{{name}} a {{count}} ďalší hovoria",
+    "talkingMore_many": "{{name}} a {{count}} ďalších hovorí",
+    "talkingMore_other": "{{name}} a {{count}} ďalších hovorí",
+    "shortcut": "Ctrl+Shift+M"
   }
 }
