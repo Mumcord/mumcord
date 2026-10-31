@@ -123,10 +123,18 @@ objc2-core-video = { version = "0.3", default-features = false, features = ["std
 objc2-core-graphics = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-audio-types = { version = "0.3", default-features = false, features = ["std"] }
 
+# Plugins (Epic 3.1, #268): WebAssembly components run in wasmtime without WASI, so a plugin can
+# only call what Mumcord defines. Only the runtime, the Cranelift compiler and the component model:
+# no async, GC, threads, profiling, cache or pooling allocator (smaller binary, less attack surface).
+wasmtime = { version = "50", default-features = false, features = ["runtime", "cranelift", "component-model", "std"] }
 # Plugin packages (#269): `.mcplugin` zips, stored or deflate only.
 zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 # Plugin and host API version ranges (#269).
 semver = "1"
+# Test fixtures only: turn core-module text into plugin components.
+wat = "1"
+wit-component = "0.263"
+wit-parser = "0.263"
 
 # Storage & secrets
 rusqlite = { version = "0.41", features = ["bundled"] }
