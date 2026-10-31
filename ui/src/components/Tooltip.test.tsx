@@ -47,6 +47,46 @@ describe("themed tooltip", () => {
     expect(button).not.toHaveAttribute("aria-describedby");
   });
 
+  it("with data-tooltip-overflow appears only while the text is cut off", () => {
+    setup(
+      <span data-testid="name" data-tooltip="Study Hall" data-tooltip-overflow>
+        Study Hall
+      </span>,
+    );
+    const name = screen.getByTestId("name");
+    fireEvent.pointerOver(name);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+
+    fireEvent.pointerOut(name, { relatedTarget: document.body });
+    Object.defineProperty(name, "scrollWidth", { configurable: true, value: 120 });
+    Object.defineProperty(name, "clientWidth", { configurable: true, value: 60 });
+    fireEvent.pointerOver(name);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Study Hall");
+  });
+
+  it("shows a shortcut chip and a detail line, and describes the trigger with them", () => {
+    setup(
+      <button
+        type="button"
+        aria-label="Show members"
+        data-tooltip="Show members"
+        data-tooltip-shortcut="Ctrl+Shift+M"
+        data-tooltip-detail="Freya is talking"
+      >
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Show members" });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    const tip = screen.getByRole("tooltip");
+    expect(tip.querySelector("kbd")).toHaveTextContent("Ctrl+Shift+M");
+    expect(tip.querySelector(".tooltip__detail")).toHaveTextContent("Freya is talking");
+    expect(button).toHaveAttribute("aria-describedby", tip.id);
+  });
+
   it("appears on keyboard focus and hides on blur", () => {
     setup(
       <button type="button" aria-label="Settings" data-tooltip="Settings">
@@ -103,6 +143,53 @@ describe("themed tooltip", () => {
     fireEvent.pointerOver(button);
     wait(TOOLTIP_DELAY_MS);
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
+  });
+
+  it("hides when the page scrolls, so the spec has to hover again to see it", () => {
+    setup(
+      <button type="button" aria-label="Send" data-tooltip="Send message">
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Send" });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+    // A scroll anywhere moves the page under the tooltip, so the layer drops it: it only comes
+    // back when the pointer enters the trigger again.
+    fireEvent.scroll(document);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.getByRole("tooltip")).toBeInTheDocument();
+  });
+
+  it("stays away after a click on the trigger until the pointer enters it again", () => {
+    setup(
+      <button
+        type="button"
+        aria-label="Show members"
+        data-tooltip="Show members"
+        data-tooltip-detail="Freya is talking"
+      >
+        x
+      </button>,
+    );
+    const button = screen.getByRole("button", { name: "Show members" });
+    // What the E2E spec (#216) has to do: a click dismisses this trigger, and the pointer must
+    // leave and enter again before the tooltip – with the talking detail – comes back.
+    fireEvent.pointerOver(button);
+    fireEvent.pointerDown(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    expect(screen.queryByRole("tooltip")).toBeNull();
+    fireEvent.pointerOut(button, { relatedTarget: document.body });
+    fireEvent.pointerOver(button);
+    wait(TOOLTIP_DELAY_MS);
+    const tip = screen.getByRole("tooltip");
+    expect(tip.querySelector(".tooltip__detail")).toHaveTextContent("Freya is talking");
   });
 
   it("does not show for a click before the delay ran out", () => {

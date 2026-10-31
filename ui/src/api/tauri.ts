@@ -13,8 +13,16 @@ import {
 
 type AnyCommand = (...args: unknown[]) => Promise<CommandResult<unknown>>;
 
+/**
+ * Listener registrations still on their way to the backend. Commands wait for them: a store
+ * subscribes and then fetches the current state, and an event sent between the fetch and the
+ * registration would otherwise be lost (e.g. a server connecting right at start).
+ */
+const registering = new Set<Promise<unknown>>();
+
 function wrap(fn: AnyCommand) {
   return async (...args: unknown[]): Promise<unknown> => {
+    if (registering.size > 0) await Promise.all(registering);
     let result: CommandResult<unknown>;
     try {
       result = await fn(...args);
@@ -36,17 +44,22 @@ function on<K extends EventName>(
   const listen = events[event].listen as unknown as (
     cb: (e: { payload: EventPayloads[K] }) => void,
   ) => Promise<() => void>;
-  listen((e) => {
+  const registered = listen((e) => {
     handler(e.payload);
-  }).then(
-    (fn) => {
-      if (stopped) fn();
-      else unlisten = fn;
-    },
-    (err: unknown) => {
-      console.error(`failed to listen to engine event ${event}`, err);
-    },
-  );
+  })
+    .then(
+      (fn) => {
+        if (stopped) fn();
+        else unlisten = fn;
+      },
+      (err: unknown) => {
+        console.error(`failed to listen to engine event ${event}`, err);
+      },
+    )
+    .finally(() => {
+      registering.delete(registered);
+    });
+  registering.add(registered);
   return () => {
     stopped = true;
     unlisten?.();

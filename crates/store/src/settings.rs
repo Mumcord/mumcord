@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::db::Store;
 use crate::error::Result;
+use crate::servers::ServerId;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -81,6 +82,63 @@ pub enum CloseBehaviour {
     Quit,
 }
 
+/// Who may send the user private messages (issue #141). The filter is local: the server still
+/// delivers every message.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PmRule {
+    #[default]
+    Everyone,
+    FriendsOnly,
+    Nobody,
+}
+
+/// "Private messages from" with its per-server override and exceptions (issue #141).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct PrivateMessageSettings {
+    /// The rule of every server without an override.
+    pub rule: PmRule,
+    /// Servers with their own rule; a missing server uses `rule`.
+    pub server_rules: BTreeMap<ServerId, PmRule>,
+    /// People in the own current channel may always send private messages.
+    pub allow_current_channel: bool,
+    /// People with an accepted conversation may keep sending private messages ("Friends only").
+    pub allow_accepted: bool,
+    /// Filtered messages from standard clients are kept as message requests; off drops them.
+    pub keep_requests: bool,
+}
+
+impl Default for PrivateMessageSettings {
+    fn default() -> Self {
+        Self {
+            rule: PmRule::Everyone,
+            server_rules: BTreeMap::new(),
+            allow_current_channel: true,
+            allow_accepted: true,
+            keep_requests: true,
+        }
+    }
+}
+
+impl PrivateMessageSettings {
+    /// The rule that applies on `server`.
+    pub fn rule_for(&self, server: ServerId) -> PmRule {
+        self.server_rules.get(&server).copied().unwrap_or(self.rule)
+    }
+}
+
+/// How channel messages of blocked users are shown (issue #140, FR-3.98). They are still
+/// received; only the display changes.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BlockedMessages {
+    /// A collapsed line the user can open.
+    #[default]
+    Collapse,
+    Hide,
+}
+
 /// How chat messages are laid out (FR-1.48a, QA.25).
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -149,6 +207,10 @@ pub struct SoundSettings {
     pub viewer_started: bool,
     /// Someone stops watching your screen share (FR-2.77).
     pub viewer_stopped: bool,
+    /// The server kicks you (#205).
+    pub kicked: bool,
+    /// The server bans you (#205).
+    pub banned: bool,
 }
 
 impl Default for SoundSettings {
@@ -170,6 +232,8 @@ impl Default for SoundSettings {
             share_stopped: true,
             viewer_started: true,
             viewer_stopped: true,
+            kicked: true,
+            banned: true,
         }
     }
 }
@@ -373,10 +437,18 @@ pub struct Settings {
     pub noise_suppression_rnnoise_consent: Consent,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// Manual microphone gain in percent, 0–200 (100 = unchanged); the voice-bar popover slider.
+    pub input_gain_percent: u16,
+    /// Master volume of everything played, in percent, 0–100 (100 = unchanged).
+    pub output_volume_percent: u16,
     /// "Music quality" (Settings → Audio, FR-1.24, QA.37): the bitrate cap rises from 96 kbit/s to
     /// the server limit (at most 510 kbit/s), the encoder is tuned for music and noise
     /// suppression and automatic gain are bypassed. Off by default.
     pub music_quality: bool,
+    /// "Low-latency mode" (Settings → Audio, issue #156) for playing music together: 10 ms
+    /// low-delay Opus packets, a minimal jitter buffer, small device buffers, and echo
+    /// cancellation, noise suppression and automatic gain bypassed. Off by default.
+    pub low_latency: bool,
     /// Own bitrate cap in kbit/s (Settings → Audio, FR-2.64), independent of `music_quality`;
     /// `None` is "Max": the highest bitrate the server and the packet size allow. Defaults to
     /// 96 kbit/s (lower if the server allows less). Automatic lowering on packet loss works below it.
@@ -389,6 +461,12 @@ pub struct Settings {
     pub video_ducking_percent: u8,
     pub sounds: SoundSettings,
     pub notifications: NotificationMode,
+    /// The Mumcord "Do Not Disturb" switch (FR-3.111): no notification sounds and no toasts or
+    /// system notifications on any server. Badges still count. Off by default.
+    pub do_not_disturb: bool,
+    /// "Follow system Do Not Disturb" (FR-3.112): the desktop's Do Not Disturb or Focus mode
+    /// also turns Do Not Disturb on. On by default.
+    pub follow_system_dnd: bool,
     pub close_behaviour: CloseBehaviour,
     pub chat_display: ChatDisplay,
     pub log_level: LogLevel,
@@ -457,6 +535,10 @@ pub struct Settings {
     pub appimage_menu_entry: Consent,
     /// The one-time notice about the removed window overlay was shown (FR-2.33).
     pub window_overlay_notice_shown: bool,
+    /// A device choice saved from the old ALSA device list could not be matched to one of the
+    /// sound server's devices and was reset to the system default (issue #183); the user has
+    /// not been told yet.
+    pub audio_device_notice: bool,
     /// Open the "What's new" window once after an update (issue #145). On by default.
     pub whats_new_auto: bool,
     /// The version whose "What's new" the user has seen; `None` before the first start that
@@ -465,6 +547,10 @@ pub struct Settings {
     /// The user had Epic 1's window overlay enabled before it was removed (FR-2.33). Derived once
     /// from the old record on first load, then persisted.
     pub legacy_window_overlay_enabled: bool,
+    /// "Private messages from" (issue #141).
+    pub private_messages: PrivateMessageSettings,
+    /// Channel messages of blocked users: collapsed or hidden (issue #140).
+    pub blocked_messages: BlockedMessages,
 }
 
 /// Default own bitrate cap in kbit/s: today's speech cap (FR-2.64).
@@ -490,12 +576,17 @@ impl Default for Settings {
             noise_suppression_rnnoise_consent: Consent::Unset,
             echo_cancellation: true,
             auto_gain: true,
+            input_gain_percent: 100,
+            output_volume_percent: 100,
             music_quality: false,
+            low_latency: false,
             bitrate_kbps: Some(DEFAULT_BITRATE_KBPS),
             video_ducking: true,
             video_ducking_percent: DEFAULT_VIDEO_DUCKING_PERCENT,
             sounds: SoundSettings::default(),
             notifications: NotificationMode::default(),
+            do_not_disturb: false,
+            follow_system_dnd: true,
             close_behaviour: CloseBehaviour::default(),
             chat_display: ChatDisplay::default(),
             log_level: LogLevel::default(),
@@ -529,9 +620,12 @@ impl Default for Settings {
             last_update_check: None,
             appimage_menu_entry: Consent::Unset,
             window_overlay_notice_shown: false,
+            audio_device_notice: false,
             whats_new_auto: true,
             whats_new_seen: None,
             legacy_window_overlay_enabled: false,
+            private_messages: PrivateMessageSettings::default(),
+            blocked_messages: BlockedMessages::default(),
         }
     }
 }
@@ -584,6 +678,8 @@ impl Store {
                 settings.video_ducking_percent = settings
                     .video_ducking_percent
                     .clamp(MIN_VIDEO_DUCKING_PERCENT, MAX_VIDEO_DUCKING_PERCENT);
+                settings.input_gain_percent = settings.input_gain_percent.min(200);
+                settings.output_volume_percent = settings.output_volume_percent.min(100);
                 Ok(settings)
             }
             None => Ok(Settings::default()),
@@ -676,6 +772,7 @@ mod tests {
         changed.last_update_check = Some(1_700_000_000_000);
         changed.appimage_menu_entry = Consent::Yes;
         changed.window_overlay_notice_shown = true;
+        changed.audio_device_notice = true;
         changed.whats_new_auto = false;
         changed.whats_new_seen = Some("0.4.4".into());
         changed.enabled_plugins = vec!["gtav".into()];
@@ -720,6 +817,23 @@ mod tests {
         };
         store.save_own_voice(both).expect("overwrite");
         assert_eq!(store.own_voice().expect("reload"), both);
+    }
+
+    #[test]
+    fn private_message_rule_with_server_override_round_trips() {
+        let (_dir, store) = temp_store();
+        let mut changed = store.settings().expect("defaults");
+        assert_eq!(changed.private_messages.rule, PmRule::Everyone);
+        assert!(changed.private_messages.allow_current_channel);
+        changed.private_messages.rule = PmRule::FriendsOnly;
+        changed
+            .private_messages
+            .server_rules
+            .insert(7, PmRule::Nobody);
+        store.save_settings(&changed).expect("save");
+        let loaded = store.settings().expect("load").private_messages;
+        assert_eq!(loaded.rule_for(7), PmRule::Nobody);
+        assert_eq!(loaded.rule_for(8), PmRule::FriendsOnly);
     }
 
     #[test]
@@ -851,6 +965,37 @@ mod tests {
     }
 
     #[test]
+    fn low_latency_is_off_by_default_and_persists() {
+        let (_dir, store) = temp_store();
+        assert!(!store.settings().expect("load").low_latency);
+        let settings = Settings {
+            low_latency: true,
+            ..Settings::default()
+        };
+        store.save_settings(&settings).expect("save");
+        assert!(store.settings().expect("reload").low_latency);
+    }
+
+    #[test]
+    fn gain_and_volume_default_to_unchanged_and_are_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        let defaults = store.settings().expect("load");
+        assert_eq!(defaults.input_gain_percent, 100);
+        assert_eq!(defaults.output_volume_percent, 100);
+        store
+            .conn
+            .execute(
+                "INSERT INTO settings (id, data) VALUES (1, ?1)
+                 ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                params![r#"{"input_gain_percent":900,"output_volume_percent":250}"#],
+            )
+            .expect("insert");
+        let loaded = store.settings().expect("load");
+        assert_eq!(loaded.input_gain_percent, 200);
+        assert_eq!(loaded.output_volume_percent, 100);
+    }
+
+    #[test]
     fn music_quality_is_off_by_default_and_persists() {
         let (_dir, store) = temp_store();
         assert!(!store.settings().expect("load").music_quality);
@@ -860,6 +1005,23 @@ mod tests {
         };
         store.save_settings(&settings).expect("save");
         assert!(store.settings().expect("reload").music_quality);
+    }
+
+    #[test]
+    fn do_not_disturb_is_off_and_follows_the_system_by_default_and_persists() {
+        let (_dir, store) = temp_store();
+        let loaded = store.settings().expect("load");
+        assert!(!loaded.do_not_disturb);
+        assert!(loaded.follow_system_dnd);
+        let settings = Settings {
+            do_not_disturb: true,
+            follow_system_dnd: false,
+            ..Settings::default()
+        };
+        store.save_settings(&settings).expect("save");
+        let reloaded = store.settings().expect("reload");
+        assert!(reloaded.do_not_disturb);
+        assert!(!reloaded.follow_system_dnd);
     }
 
     #[test]
@@ -946,6 +1108,10 @@ mod tests {
         assert!(
             parsed.sounds.party_started && parsed.sounds.viewer_stopped,
             "activity sounds are on for older settings"
+        );
+        assert!(
+            parsed.sounds.kicked && parsed.sounds.banned,
+            "kick and ban sounds are on for older settings"
         );
         assert!(parsed.noise_suppression);
         assert!(

@@ -11,7 +11,10 @@ use rtrb::{Consumer, Producer};
 use super::cpal_backend::CpalBackend;
 use super::frames::{CaptureEndpoint, FrameSink, FrameSource, PlaybackEndpoint};
 use super::ring::Counters;
-use super::{BackendKind, DeviceEvent, DeviceInfo, Direction, IoError, IoStats};
+use super::{
+    BackendKind, DeviceEvent, DeviceInfo, DeviceMigration, DevicePeriods, Direction, IoError,
+    IoStats,
+};
 
 /// How often the control thread checks for device changes and failed streams.
 const POLL_INTERVAL: Duration = Duration::from_secs(2);
@@ -34,25 +37,33 @@ pub(crate) struct Opened<R> {
     pub(crate) device: DeviceInfo,
 }
 
-/// A device backend. `id: None` opens the OS default device.
+/// A device backend. `id: None` opens the OS default device. `low_latency` asks for the
+/// smallest safe device buffer; a backend that cannot honour it opens with its default.
 pub(crate) trait Backend {
     fn devices(&self, direction: Direction) -> Result<Vec<DeviceInfo>, IoError>;
     /// Whether the device list can change at runtime and should be polled.
     fn polls_devices(&self) -> bool;
+    /// Maps a saved id from an older device list onto this one (issue #183).
+    fn migrate(&self, _direction: Direction, _saved: &str) -> Result<DeviceMigration, IoError> {
+        Ok(DeviceMigration::Keep)
+    }
     fn open_input(
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
+        low_latency: bool,
     ) -> Result<Opened<Consumer<f32>>, IoError>;
     fn open_output(
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
+        low_latency: bool,
     ) -> Result<Opened<Producer<f32>>, IoError>;
 }
 
 enum Command {
     SetDevice(Direction, Option<String>),
+    SetLowLatency(bool),
     Devices(Direction, Sender<Result<Vec<DeviceInfo>, IoError>>),
     Shutdown,
 }
@@ -90,6 +101,16 @@ impl AudioIo {
         Self::list_devices_with(BackendKind::from_env()?, direction)
     }
 
+    /// Maps a saved device id onto the device list of the backend chosen by
+    /// [`BackendKind::from_env`], for settings stored by an older version (issue #183).
+    pub fn migrate_device(direction: Direction, saved: &str) -> Result<DeviceMigration, IoError> {
+        // Only ids from cpal's ALSA host can be outdated; the others need no sound server query.
+        if !saved.starts_with("alsa:") {
+            return Ok(DeviceMigration::Keep);
+        }
+        make_backend(BackendKind::from_env()?).migrate(direction, saved)
+    }
+
     pub fn list_devices_with(
         kind: BackendKind,
         direction: Direction,
@@ -122,6 +143,7 @@ impl AudioIo {
                     input: Slot::new(input),
                     output: Slot::new(output),
                     known_devices: None,
+                    low_latency: false,
                 };
                 control.run(command_rx);
             })
@@ -155,8 +177,20 @@ impl AudioIo {
         self.send(Command::SetDevice(Direction::Output, id))
     }
 
+    /// Low-latency mode (issue #156): reopens both streams with the smallest safe device buffer
+    /// ([`LOW_LATENCY_BUFFER_FRAMES`](super::LOW_LATENCY_BUFFER_FRAMES)), or with the host
+    /// default again. Frame handles keep working across the reopen.
+    pub fn set_low_latency(&self, on: bool) -> Result<(), IoError> {
+        self.send(Command::SetLowLatency(on))
+    }
+
     pub fn stats(&self) -> IoStats {
         self.counters.snapshot()
+    }
+
+    /// The buffer periods the open device streams actually run with.
+    pub fn device_periods(&self) -> DevicePeriods {
+        self.counters.periods()
     }
 
     fn send(&self, command: Command) -> Result<(), IoError> {
@@ -265,6 +299,7 @@ struct Control<'a> {
     output: Slot,
     /// Last seen device list (ids and default flags), to detect hot-plug.
     known_devices: Option<Vec<(String, bool)>>,
+    low_latency: bool,
 }
 
 impl Control<'_> {
@@ -278,6 +313,13 @@ impl Control<'_> {
                 Ok(Command::SetDevice(direction, id)) => {
                     self.slot(direction).choose(id);
                     self.reopen(direction, Instant::now());
+                }
+                Ok(Command::SetLowLatency(on)) => {
+                    if on != self.low_latency {
+                        self.low_latency = on;
+                        self.reopen(Direction::Input, Instant::now());
+                        self.reopen(Direction::Output, Instant::now());
+                    }
                 }
                 Ok(Command::Devices(direction, reply)) => {
                     // The caller may have given up waiting; nothing to do then.
@@ -486,14 +528,20 @@ impl Control<'_> {
         // simply has no reader, which is harmless.
         match direction {
             Direction::Input => {
-                let opened = self.backend.open_input(id, &self.counters)?;
+                let opened = self
+                    .backend
+                    .open_input(id, &self.counters, self.low_latency)?;
+                self.counters.stream_opened(direction, opened.rate);
                 let _ = self
                     .capture
                     .send(CaptureEndpoint::new(opened.ring, opened.rate)?);
                 Ok((opened.guard, opened.device))
             }
             Direction::Output => {
-                let opened = self.backend.open_output(id, &self.counters)?;
+                let opened = self
+                    .backend
+                    .open_output(id, &self.counters, self.low_latency)?;
+                self.counters.stream_opened(direction, opened.rate);
                 let _ = self
                     .playback
                     .send(PlaybackEndpoint::new(opened.ring, opened.rate)?);
@@ -861,12 +909,80 @@ mod tests {
         let id = std::env::var("MUMCORD_TEST_DEVICE").expect("MUMCORD_TEST_DEVICE");
         let backend = CpalBackend::new();
         let counters = Arc::new(Counters::default());
-        if let Err(e) = backend.open_input(Some(&id), &counters) {
+        if let Err(e) = backend.open_input(Some(&id), &counters, false) {
             panic!("opening the input failed: {e}");
         }
-        if let Err(e) = backend.open_output(Some(&id), &counters) {
+        if let Err(e) = backend.open_output(Some(&id), &counters, false) {
             panic!("opening the output failed: {e}");
         }
+    }
+
+    /// Prints the device periods the default devices run with in normal and low-latency mode
+    /// (issue #156). Opens the default microphone and plays silence:
+    /// `cargo test -p mumcord-audio --release -- --ignored --nocapture low_latency_periods`.
+    #[test]
+    #[ignore = "needs audio hardware"]
+    fn low_latency_periods_on_the_default_devices() {
+        let handles = AudioIo::start_with(BackendKind::Cpal, None, None).expect("start");
+        let mut source = handles.source;
+        let mut frame: Frame = [0.0; FRAME_SAMPLES];
+        let mut measure = |label: &str| {
+            let started = Instant::now();
+            while started.elapsed() < Duration::from_secs(1) {
+                source.wait_frame(&mut frame, Duration::from_millis(50));
+            }
+            let periods = handles.io.device_periods();
+            eprintln!("{label}: {periods:?}");
+            periods
+        };
+        let normal = measure("normal");
+        let sink = Arc::new(std::sync::Mutex::new(handles.sink));
+        let normal_glitches = play_quietly(&sink, &handles.io, 25);
+        handles.io.set_low_latency(true).expect("low latency");
+        let low = measure("low latency");
+        assert!(low.input.is_some() && normal.input.is_some());
+        assert!(low.input <= normal.input);
+        // The engine's low-latency output queue: one period plus 3 ms, at least 5 ms.
+        let period_ms = low.output.expect("output period").as_secs_f32() * 1000.0;
+        let queue_ms = ((period_ms + 3.0).ceil() as u32).max(crate::mixer::LOW_LATENCY_QUEUE_MS);
+        let low_glitches = play_quietly(&sink, &handles.io, queue_ms);
+        eprintln!(
+            "underruns, late wake-ups: normal {normal_glitches:?}, low latency ({queue_ms} ms queue) {low_glitches:?}"
+        );
+    }
+
+    /// Plays 5 s of an inaudible signal (-120 dBFS) through the mixer thread with an output
+    /// queue of `queue_ms`; returns the device underruns and late wake-ups it caused.
+    fn play_quietly(
+        sink: &Arc<std::sync::Mutex<FrameSink>>,
+        io: &AudioIo,
+        queue_ms: u32,
+    ) -> (u64, u64) {
+        use crate::mixer::{Playback, PlaybackConfig, PlaybackSink};
+        struct Sink(Arc<std::sync::Mutex<FrameSink>>);
+        impl PlaybackSink for Sink {
+            fn write_frame(&mut self, frame: &Frame) -> bool {
+                self.0.lock().expect("sink").write_frame(frame)
+            }
+            fn queued_samples(&mut self) -> usize {
+                self.0.lock().expect("sink").queued_samples()
+            }
+        }
+        let before = io.stats().playback_underruns;
+        let config = PlaybackConfig {
+            target_queue_ms: queue_ms,
+            ..PlaybackConfig::default()
+        };
+        let (playback, mut ports) =
+            Playback::start(Sink(Arc::clone(sink)), config).expect("playback");
+        let started = Instant::now();
+        while started.elapsed() < Duration::from_secs(5) {
+            while ports.mix_in.push(1e-6).is_ok() {}
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        let late = playback.stats().late_wakeups;
+        drop(playback);
+        (io.stats().playback_underruns - before, late)
     }
 
     #[test]
@@ -930,6 +1046,8 @@ mod tests {
             attempts: RefCell<Vec<String>>,
             /// Streams currently running.
             live: Rc<Cell<usize>>,
+            /// The low-latency flag of every open request, both directions.
+            low_latency: RefCell<Vec<bool>>,
         }
 
         struct Guard(Rc<Cell<usize>>);
@@ -1011,7 +1129,9 @@ mod tests {
                 &self,
                 id: Option<&str>,
                 _counters: &Arc<Counters>,
+                low_latency: bool,
             ) -> Result<Opened<Consumer<f32>>, IoError> {
+                self.low_latency.borrow_mut().push(low_latency);
                 self.open(Direction::Input, id, RingBuffer::new(64).1)
             }
 
@@ -1019,7 +1139,9 @@ mod tests {
                 &self,
                 id: Option<&str>,
                 _counters: &Arc<Counters>,
+                low_latency: bool,
             ) -> Result<Opened<Producer<f32>>, IoError> {
+                self.low_latency.borrow_mut().push(low_latency);
                 self.open(Direction::Output, id, RingBuffer::new(64).0)
             }
         }
@@ -1036,6 +1158,7 @@ mod tests {
                 input: Slot::new(Some(CHOSEN.to_owned())),
                 output: Slot::new(None),
                 known_devices: None,
+                low_latency: false,
             };
             (control, events_rx)
         }
@@ -1052,6 +1175,50 @@ mod tests {
                     _ => None,
                 })
                 .collect()
+        }
+
+        /// Issue #156: switching low-latency mode reopens both streams with the new buffer
+        /// request once, and repeating the same mode does nothing.
+        #[test]
+        fn low_latency_switch_reopens_both_streams() {
+            let fake = Fake::new(&[DEFAULT, CHOSEN], &[DEFAULT, CHOSEN]);
+            let (mut control, _events) = control(&fake);
+            let (commands, rx) = mpsc::channel();
+            for command in [
+                Command::SetLowLatency(true),
+                Command::SetLowLatency(true),
+                Command::SetLowLatency(false),
+                Command::Shutdown,
+            ] {
+                commands.send(command).expect("queue");
+            }
+            control.run(rx);
+            assert_eq!(
+                *fake.low_latency.borrow(),
+                [false, false, true, true, false, false]
+            );
+            assert_eq!(fake.live.get(), 2, "old streams were stopped");
+        }
+
+        #[test]
+        fn period_is_learned_from_the_callbacks() {
+            let counters = Counters::default();
+            assert_eq!(counters.periods(), DevicePeriods::default());
+            counters.stream_opened(Direction::Input, SAMPLE_RATE);
+            let (mut producer, _consumer) = RingBuffer::new(4096);
+            crate::io::ring::capture(&[0.0f32; 256], 2, &mut producer, &counters);
+            let periods = counters.periods();
+            assert_eq!(
+                periods.input,
+                Some(Duration::from_secs_f64(128.0 / 48_000.0))
+            );
+            assert_eq!(periods.output, None);
+            counters.stream_opened(Direction::Input, SAMPLE_RATE);
+            assert_eq!(
+                counters.periods().input,
+                None,
+                "a new stream starts unknown"
+            );
         }
 
         #[test]

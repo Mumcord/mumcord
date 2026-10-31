@@ -1,3 +1,5 @@
+import { createContext, useContext, type RefObject } from "react";
+
 /**
  * Remembers whether the member column is collapsed (issue #165). A layout preference of this
  * window, like the column widths, so it lives in the webview's storage rather than the engine's
@@ -33,4 +35,24 @@ export function isMembersShortcut(event: ShortcutEvent): boolean {
     !event.altKey &&
     event.key.toLowerCase() === "m"
   );
+}
+
+/**
+ * What the members button in the chat header needs from the shell: whether the column is shown,
+ * whether it is the narrow-window overlay, and how to toggle it. The button registers itself in
+ * `buttonRef` so the shell can hand it the focus when the column closes around the focus.
+ */
+export interface MembersColumn {
+  shown: boolean;
+  overlay: boolean;
+  controls: string;
+  toggle: () => void;
+  buttonRef: RefObject<HTMLButtonElement | null>;
+}
+
+export const MembersColumnContext = createContext<MembersColumn | null>(null);
+
+/** The shell's member column, or `null` outside the shell (e.g. in feature tests). */
+export function useMembersColumn(): MembersColumn | null {
+  return useContext(MembersColumnContext);
 }

@@ -7,24 +7,89 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{
     BufferSize, Device, DeviceId, ErrorKind, FromSample, SampleFormat, SizedSample, StreamConfig,
-    SupportedStreamConfig,
+    SupportedBufferSize, SupportedStreamConfig,
 };
 use rtrb::{Consumer, Producer};
 
+#[cfg(target_os = "linux")]
+use super::DeviceMigration;
 use super::controller::{Backend, Opened, StreamGuard};
 use super::ring::{self, Counters};
-use super::{DeviceInfo, Direction, IoError};
+#[cfg(target_os = "linux")]
+use super::sound_server::{ID_PREFIX, SoundServer};
+use super::{DeviceInfo, Direction, IoError, LOW_LATENCY_BUFFER_FRAMES};
 use crate::SAMPLE_RATE;
 
 pub(crate) struct CpalBackend {
+    /// Lists and opens the devices, except on a PipeWire desktop.
     host: cpal::Host,
+    /// On a PipeWire desktop: the sound server, which lists its sinks and sources as the
+    /// devices; streams open on them through cpal's PipeWire host (issue #183).
+    #[cfg(target_os = "linux")]
+    server: Option<SoundServer>,
 }
 
 impl CpalBackend {
     pub(crate) fn new() -> Self {
+        #[cfg(target_os = "linux")]
+        {
+            // cpal's default host would be PipeWire, whose device list is a snapshot taken when
+            // the host is created; without the sound server keep the ALSA host as before.
+            let server = SoundServer::connect();
+            let host = cpal::host_from_id(cpal::HostId::Alsa).unwrap_or_else(|e| {
+                tracing::warn!("ALSA host unavailable ({e}); using cpal's default host");
+                cpal::default_host()
+            });
+            Self { host, server }
+        }
+        #[cfg(not(target_os = "linux"))]
         Self {
             host: cpal::default_host(),
         }
+    }
+
+    /// The device to open and how it is listed.
+    fn open_device(
+        &self,
+        direction: Direction,
+        id: Option<&str>,
+    ) -> Result<(Device, DeviceInfo), IoError> {
+        #[cfg(target_os = "linux")]
+        if self.server.is_some() {
+            return self.server_device(direction, id);
+        }
+        let device = self.device(direction, id)?;
+        let info = self.info(direction, &device)?;
+        Ok((device, info))
+    }
+
+    /// Opens the listed node `id` (`None`: the current default node) on a fresh PipeWire host,
+    /// since a host only knows the nodes that existed when it was created.
+    #[cfg(target_os = "linux")]
+    fn server_device(
+        &self,
+        direction: Direction,
+        id: Option<&str>,
+    ) -> Result<(Device, DeviceInfo), IoError> {
+        let listed = self.devices(direction)?;
+        let info = match id {
+            Some(id) => listed.into_iter().find(|d| d.id == id),
+            None => listed.into_iter().find(|d| d.is_default),
+        }
+        .ok_or(IoError::DeviceNotFound)?;
+        let host = cpal::host_from_id(cpal::HostId::PipeWire).map_err(backend_err)?;
+        let device = host
+            .devices()
+            .map_err(backend_err)?
+            .find(|d| {
+                let usable = match direction {
+                    Direction::Input => d.supports_input(),
+                    Direction::Output => d.supports_output(),
+                };
+                usable && d.id().is_ok_and(|node| node.to_string() == info.id)
+            })
+            .ok_or(IoError::DeviceNotFound)?;
+        Ok((device, info))
     }
 
     fn default_device(&self, direction: Direction) -> Option<Device> {
@@ -86,6 +151,15 @@ impl CpalBackend {
 
 impl Backend for CpalBackend {
     fn devices(&self, direction: Direction) -> Result<Vec<DeviceInfo>, IoError> {
+        #[cfg(target_os = "linux")]
+        if let Some(server) = &self.server {
+            let (nodes, default) = server.nodes(direction)?;
+            return Ok(super::devices::server_devices(
+                ID_PREFIX,
+                &nodes,
+                default.as_deref(),
+            ));
+        }
         let devices: Vec<Device> = match direction {
             Direction::Input => self.host.input_devices().map_err(backend_err)?.collect(),
             Direction::Output => self.host.output_devices().map_err(backend_err)?.collect(),
@@ -106,25 +180,72 @@ impl Backend for CpalBackend {
         true
     }
 
+    #[cfg(target_os = "linux")]
+    fn migrate(&self, direction: Direction, saved: &str) -> Result<DeviceMigration, IoError> {
+        match &self.server {
+            Some(server) => {
+                let (nodes, _) = server.nodes(direction)?;
+                Ok(super::devices::migrate(saved, ID_PREFIX, &nodes))
+            }
+            None => Ok(DeviceMigration::Keep),
+        }
+    }
+
     fn open_input(
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
+        low_latency: bool,
     ) -> Result<Opened<Consumer<f32>>, IoError> {
-        let device = self.device(Direction::Input, id)?;
-        let info = self.info(Direction::Input, &device)?;
+        let (device, info) = self.open_device(Direction::Input, id)?;
         let supported = pick_config(&device, Direction::Input)?;
-        let config = stream_config(&supported);
-        let (producer, consumer) = ring::ring(config.sample_rate);
+        let mut config = stream_config(&supported);
         let failed = Arc::new(AtomicBool::new(false));
-        let stream = build_input(
-            &device,
-            &supported,
-            config,
-            producer,
-            counters.clone(),
-            failed.clone(),
-        )?;
+        let small = low_latency
+            .then(|| low_latency_buffer(&supported))
+            .flatten();
+        let mut stream = None;
+        if let Some(frames) = small {
+            let (producer, consumer) = ring::ring(config.sample_rate);
+            let small_config = StreamConfig {
+                buffer_size: BufferSize::Fixed(frames),
+                ..config
+            };
+            match build_input(
+                &device,
+                &supported,
+                small_config,
+                producer,
+                counters.clone(),
+                failed.clone(),
+            ) {
+                Ok(built) => {
+                    config = small_config;
+                    stream = Some((built, consumer));
+                }
+                Err(e) => tracing::warn!(
+                    frames,
+                    "input device refused the low-latency buffer ({e}); using its default"
+                ),
+            }
+        } else if low_latency {
+            tracing::info!("input device reports no buffer range; using its default buffer");
+        }
+        let (stream, consumer) = match stream {
+            Some(opened) => opened,
+            None => {
+                let (producer, consumer) = ring::ring(config.sample_rate);
+                let built = build_input(
+                    &device,
+                    &supported,
+                    config,
+                    producer,
+                    counters.clone(),
+                    failed.clone(),
+                )?;
+                (built, consumer)
+            }
+        };
         stream.play().map_err(backend_err)?;
         Ok(Opened {
             guard: Box::new(CpalStream {
@@ -141,21 +262,57 @@ impl Backend for CpalBackend {
         &self,
         id: Option<&str>,
         counters: &Arc<Counters>,
+        low_latency: bool,
     ) -> Result<Opened<Producer<f32>>, IoError> {
-        let device = self.device(Direction::Output, id)?;
-        let info = self.info(Direction::Output, &device)?;
+        let (device, info) = self.open_device(Direction::Output, id)?;
         let supported = pick_config(&device, Direction::Output)?;
-        let config = stream_config(&supported);
-        let (producer, consumer) = ring::stereo_ring(config.sample_rate);
+        let mut config = stream_config(&supported);
         let failed = Arc::new(AtomicBool::new(false));
-        let stream = build_output(
-            &device,
-            &supported,
-            config,
-            consumer,
-            counters.clone(),
-            failed.clone(),
-        )?;
+        let small = low_latency
+            .then(|| low_latency_buffer(&supported))
+            .flatten();
+        let mut stream = None;
+        if let Some(frames) = small {
+            let (producer, consumer) = ring::stereo_ring(config.sample_rate);
+            let small_config = StreamConfig {
+                buffer_size: BufferSize::Fixed(frames),
+                ..config
+            };
+            match build_output(
+                &device,
+                &supported,
+                small_config,
+                consumer,
+                counters.clone(),
+                failed.clone(),
+            ) {
+                Ok(built) => {
+                    config = small_config;
+                    stream = Some((built, producer));
+                }
+                Err(e) => tracing::warn!(
+                    frames,
+                    "output device refused the low-latency buffer ({e}); using its default"
+                ),
+            }
+        } else if low_latency {
+            tracing::info!("output device reports no buffer range; using its default buffer");
+        }
+        let (stream, producer) = match stream {
+            Some(opened) => opened,
+            None => {
+                let (producer, consumer) = ring::stereo_ring(config.sample_rate);
+                let built = build_output(
+                    &device,
+                    &supported,
+                    config,
+                    consumer,
+                    counters.clone(),
+                    failed.clone(),
+                )?;
+                (built, producer)
+            }
+        };
         stream.play().map_err(backend_err)?;
         Ok(Opened {
             guard: Box::new(CpalStream {
@@ -208,6 +365,25 @@ fn pick_config(device: &Device, direction: Direction) -> Result<SupportedStreamC
         .filter_map(|r| r.try_with_sample_rate(SAMPLE_RATE))
         .min_by_key(|c| c.channels().abs_diff(default.channels()));
     Ok(at_48k.unwrap_or(default))
+}
+
+/// The low-latency buffer (issue #156) in device frames, or `None` when the device does not
+/// report a range: forcing a size it may not support could fail late or glitch, so such
+/// devices keep the host default. Hosts that map the period to their own graph (PipeWire via
+/// ALSA, CoreAudio's buffer frame size, WASAPI) take the request as a quantum hint.
+fn low_latency_buffer(supported: &SupportedStreamConfig) -> Option<u32> {
+    match *supported.buffer_size() {
+        SupportedBufferSize::Range { min, max } if min <= max => {
+            Some(low_latency_frames(supported.sample_rate(), min, max))
+        }
+        _ => None,
+    }
+}
+
+/// [`LOW_LATENCY_BUFFER_FRAMES`] at 48 kHz, scaled to `rate` and clamped to `min..=max`.
+fn low_latency_frames(rate: u32, min: u32, max: u32) -> u32 {
+    let wanted = u64::from(LOW_LATENCY_BUFFER_FRAMES) * u64::from(rate) / u64::from(SAMPLE_RATE);
+    u32::try_from(wanted).unwrap_or(u32::MAX).clamp(min, max)
 }
 
 fn stream_config(supported: &SupportedStreamConfig) -> StreamConfig {
@@ -370,5 +546,15 @@ mod tests {
 
         on_error(cpal::Error::new(ErrorKind::DeviceNotAvailable));
         assert!(failed.load(Ordering::Relaxed), "a lost device is reopened");
+    }
+
+    #[test]
+    fn low_latency_buffer_scales_and_clamps_to_the_device_range() {
+        assert_eq!(low_latency_frames(48_000, 16, 8192), 128);
+        assert_eq!(low_latency_frames(96_000, 16, 8192), 256);
+        assert_eq!(low_latency_frames(44_100, 16, 8192), 117);
+        // A device that cannot go that low gets its smallest buffer, never less.
+        assert_eq!(low_latency_frames(48_000, 256, 8192), 256);
+        assert_eq!(low_latency_frames(48_000, 16, 64), 64);
     }
 }

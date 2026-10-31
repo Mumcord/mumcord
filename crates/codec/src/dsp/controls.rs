@@ -57,7 +57,9 @@ pub struct DspControls {
     /// on the settings thread, never in the frame path.
     builders: Mutex<HashMap<u32, BackendBuilder>>,
     auto_gain: AtomicBool,
+    input_gain: AtomicF32,
     music_quality: AtomicBool,
+    low_latency: AtomicBool,
     bitrate_cap_kbps: AtomicU32,
     push_to_talk: AtomicBool,
     manual_threshold: AtomicBool,
@@ -83,7 +85,9 @@ impl Default for DspControls {
             backend_slot: Mutex::new(None),
             builders: Mutex::new(HashMap::new()),
             auto_gain: AtomicBool::new(true),
+            input_gain: AtomicF32::new(1.0),
             music_quality: AtomicBool::new(false),
+            low_latency: AtomicBool::new(false),
             bitrate_cap_kbps: AtomicU32::new(0),
             push_to_talk: AtomicBool::new(false),
             manual_threshold: AtomicBool::new(false),
@@ -188,6 +192,16 @@ impl DspControls {
         self.auto_gain.load(Ordering::Relaxed)
     }
 
+    /// Manual microphone gain in percent (100 = unchanged), applied before noise suppression.
+    pub fn set_input_gain_percent(&self, percent: u16) {
+        self.input_gain.store(f32::from(percent) / 100.0);
+    }
+
+    /// The manual microphone gain as a factor (1.0 = unchanged).
+    pub fn input_gain(&self) -> f32 {
+        self.input_gain.load()
+    }
+
     /// "Music quality" (QA.37): the chain skips noise suppression and the speech gain control,
     /// which damage music; with automatic gain on, a slow leveler keeps music as loud as speech.
     /// The engine tunes the encoder for music and lifts the bitrate cap.
@@ -197,6 +211,18 @@ impl DspControls {
 
     pub fn music_quality(&self) -> bool {
         self.music_quality.load(Ordering::Relaxed)
+    }
+
+    /// "Low-latency mode" (issue #156): the chain bypasses echo cancellation, noise suppression
+    /// and automatic gain (music-quality signal path; the gate still decides when to send). The
+    /// engine also switches to 10 ms low-delay packets, a minimal jitter buffer and small device
+    /// buffers.
+    pub fn set_low_latency(&self, on: bool) {
+        self.low_latency.store(on, Ordering::Relaxed);
+    }
+
+    pub fn low_latency(&self) -> bool {
+        self.low_latency.load(Ordering::Relaxed)
     }
 
     /// Own bitrate cap in kbit/s (FR-2.64); `None` means "Max". The engine's bitrate controller

@@ -1,0 +1,48 @@
+{
+  "title": "Server pubblici",
+  "loading": "Caricamento dell’elenco…",
+  "subtitle": "Caricato perché hai aperto questa pagina · {{shown}} di {{total}} mostrati",
+  "search": "Cerca per nome, indirizzo o paese",
+  "refresh": "Aggiorna",
+  "retry": "Riprova",
+  "loadFailed": "Impossibile caricare l’elenco dei server pubblici. Controlla la connessione a Internet e riprova.",
+  "noMatch": "Nessun server corrisponde alla ricerca e ai filtri.",
+  "saveFailed": "Impossibile aggiungere il server. Riprova.",
+  "filters": {
+    "label": "Filtri",
+    "country": "Paese",
+    "anyCountry": "Qualsiasi paese",
+    "ping": "Ping",
+    "anyPing": "Qualsiasi ping",
+    "pingBelow": "Sotto {{ms}} ms",
+    "hideEmpty": "Nascondi vuoti",
+    "hideFull": "Nascondi pieni"
+  },
+  "sortedBy": "Ordine: {{column}}",
+  "columns": {
+    "name": "Nome",
+    "country": "Paese",
+    "ping": "Ping",
+    "users": "Utenti",
+    "actions": "Azioni"
+  },
+  "badge": {
+    "empty": "Vuoto",
+    "full": "Pieno"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Non ancora noto",
+  "measuring": "Misurazione",
+  "noAnswer": "Nessuna risposta",
+  "ms": "{{ms}} ms",
+  "connect": "Connetti",
+  "connectTo": "Connetti a {{server}}",
+  "favourite": "Preferito",
+  "favouriteServer": "Aggiungi {{server}} ai tuoi server",
+  "saved": "Salvato",
+  "savedAs": "{{server}} è tra i tuoi server",
+  "announce": {
+    "saved": "{{server}} aggiunto ai tuoi server"
+  },
+  "note": "Il ping viene inviato solo alle righe visibili, poche alla volta. Nient’altro viene inviato a un server finché non ti connetti."
+}

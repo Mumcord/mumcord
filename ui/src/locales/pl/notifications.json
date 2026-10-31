@@ -15,5 +15,60 @@
   "open": "Otwórz czat",
   "close": "Zamknij powiadomienie",
   "mentionLine": "{{sender}} wspomina o Tobie: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Powiadomienia",
+    "bellUnread_one": "Powiadomienia, {{count}} nieprzeczytane",
+    "bellUnread_few": "Powiadomienia, {{count}} nieprzeczytane",
+    "bellUnread_many": "Powiadomienia, {{count}} nieprzeczytanych",
+    "bellUnread_other": "Powiadomienia, {{count}} nieprzeczytanego",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Oznacz wszystko jako przeczytane",
+    "filterLabel": "Pokaż powiadomienia",
+    "filter": {
+      "all": "Wszystkie",
+      "mentions": "Wzmianki",
+      "requests": "Prośby",
+      "invites": "Zaproszenia"
+    },
+    "empty": "Wszystko przeczytane.",
+    "unread": "Nieprzeczytane",
+    "dndOn": "Tryb Nie przeszkadzać jest włączony",
+    "dndOff": "Tryb Nie przeszkadzać jest wyłączony",
+    "settings": "Ustawienia powiadomień",
+    "someone": "Ktoś",
+    "quoted": "„{{text}}”",
+    "mention": "{{name}} wspomniał(a) o tobie",
+    "mentionGroup": "{{name}} wspomniał(a) o wszystkich",
+    "reply": "{{name}} odpowiedział(a) na twoją wiadomość",
+    "chatRequest": "{{name}} chce z tobą pisać",
+    "messageRequest": "Prośba o wiadomość od {{name}}",
+    "messageRequestBody_one": "{{count}} wiadomość ze standardowego klienta Mumble",
+    "messageRequestBody_few": "{{count}} wiadomości ze standardowego klienta Mumble",
+    "messageRequestBody_many": "{{count}} wiadomości ze standardowego klienta Mumble",
+    "messageRequestBody_other": "{{count}} wiadomości ze standardowego klienta Mumble",
+    "invite": {
+      "watchParty": "{{name}} zaprosił(a) cię do wspólnego oglądania",
+      "screenShare": "{{name}} udostępnia ekran",
+      "card": "{{name}} wysłał(a) ci kartę",
+      "theme": "{{name}} udostępnił(a) ci motyw"
+    },
+    "connection": "{{server}} jest niedostępny",
+    "type": {
+      "chatRequest": "Prośba o czat",
+      "messageRequest": "Prośba o wiadomość",
+      "invite": "Zaproszenie",
+      "private": "Wiadomość prywatna",
+      "connection": "Połączenie"
+    },
+    "accept": "Akceptuj",
+    "decline": "Odrzuć",
+    "join": "Dołącz",
+    "watch": "Oglądaj",
+    "open": "Otwórz",
+    "dismiss": "Zamknij",
+    "dismissItem": "Zamknij: {{title}}",
+    "failed": "Nie udało się. Spróbuj ponownie.",
+    "block": "Zablokuj"
+  }
 }

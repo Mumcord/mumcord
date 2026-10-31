@@ -55,10 +55,14 @@
   "menu": {
     "label": "Åtgärder för {{name}}",
     "viewProfile": "Visa profil",
+    "sendMessage": "Skicka meddelande",
     "join": "Gå med i {{channel}}",
-    "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
+    "joinFull": "Den här kanalen är full.",
+    "joinLocked": "Du får inte gå in i den här kanalen, eller så kräver den ett lösenord.",
     "mute": "Stäng av för mig",
-    "connectionInfo": "Anslutningsinfo…"
+    "connectionInfo": "Anslutningsinfo…",
+    "chatRequestPending": "Chattförfrågan väntar",
+    "revokeConsent": "Återkalla chattsamtycke …"
   },
   "nowPlaying": {
     "label": "Spelas nu",
@@ -83,5 +87,53 @@
   "preview": {
     "privateMessage": "Privat meddelande",
     "fullProfile": "Hela profilen"
+  },
+  "chatRequest": {
+    "title": "Chattförfrågan till {{name}}",
+    "note": "Anteckning (valfri)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} av {{max}} tecken använda",
+    "send": "Skicka",
+    "failed": "Chattförfrågan kunde inte skickas. Försök igen."
+  },
+  "toggle": {
+    "show": "Visa medlemmar",
+    "hide": "Dölj medlemmar",
+    "showCount_one": "Visa medlemmar ({{count}})",
+    "showCount_other": "Visa medlemmar ({{count}})",
+    "talkingOne": "{{name}} pratar",
+    "talkingTwo": "{{first}} och {{second}} pratar",
+    "talkingMore_one": "{{name}} och {{count}} annan pratar",
+    "talkingMore_other": "{{name}} och {{count}} andra pratar",
+    "shortcut": "Ctrl+Skift+M"
+  },
+  "revokeConsent": {
+    "title": "Återkalla chattsamtycket för {{name}}?",
+    "message": "{{name}} måste skicka en ny meddelandeförfrågan innan meddelandena når dig igen. Din chatthistorik finns kvar.",
+    "confirm": "Återkalla",
+    "failed": "Det gick inte att återkalla chattsamtycket. Försök igen."
+  },
+  "block": {
+    "menu": "Blockera…",
+    "unblock": "Avblockera",
+    "title": "Blockera {{name}}?",
+    "onServer": "på {{server}}",
+    "whatHappens": "Vad som händer",
+    "private": "Privata meddelanden från {{name}} visas inte och aviserar dig inte.",
+    "channelCollapsed": "{{name}}s kanalmeddelanden är hopfällda. Du kan fortfarande öppna dem.",
+    "channelHidden": "{{name}}s kanalmeddelanden är dolda.",
+    "voice": "{{name}} är ljudavstängd för dig i tal, även viskningar.",
+    "data": "Ingen historiksynkronisering, inbjudningar eller andra Mumcord-data från {{name}}.",
+    "followsCert": "Blockeringen följer {{name}}s certifikat, så ett nytt namn kringgår den inte.",
+    "nameOnly": "{{name}} har inget certifikat, så blockeringen gäller bara det här namnet på {{server}}.",
+    "warning": "{{name}} kan fortfarande se dig och läsa dina meddelanden. Mumble har inget sätt att stoppa det bara på din sida. {{name}} får inte veta om blockeringen.",
+    "cancel": "Avbryt",
+    "confirm": "Blockera {{name}}",
+    "done": "{{name}} är blockerad.",
+    "failed": "Det gick inte att blockera {{name}}. Försök igen.",
+    "badge": "Blockerad",
+    "collapsed": "Meddelande från en blockerad användare",
+    "show": "Visa",
+    "showLabel": "Visa meddelande från en blockerad användare"
   }
 }

@@ -8,7 +8,10 @@
     "muted": "Microfoon gedempt",
     "unmuted": "Microfoon niet meer gedempt",
     "deafened": "Doof gezet. Je hoort anderen niet en je microfoon is gedempt",
-    "undeafened": "Niet meer doof gezet"
+    "undeafened": "Niet meer doof gezet",
+    "leftVoice": "Spraak verlaten op {{server}}",
+    "disconnected": "Verbinding met {{server}} verbroken",
+    "disconnectedAll": "Verbinding met alle servers verbroken"
   },
   "readOnly": {
     "text": "Je leest alleen mee – neem deel aan een kanaal om te praten.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Voer een wachtwoord in om het back-upbestand te beveiligen.",
     "exported": "Back-up van identiteit opgeslagen.",
     "confirm": "Registreren",
-    "done": "Geregistreerd op deze server"
+    "done": "Geregistreerd op deze server",
+    "identity": "De geregistreerde naam hoort bij de identiteit {{identity}}."
   },
   "errors": {
     "tooLarge": "Dit is te groot voor de server. Kies een kleinere foto of schrijf een kortere tekst.",
@@ -89,11 +93,54 @@
     "offerImages": "Afbeeldingen op volledige grootte aanbieden",
     "offerImagesHint": "Laat anderen je originele afbeeldingen laden",
     "loadImages": "Afbeeldingen op volledige grootte laden",
-    "loadImagesHint": "Originele afbeeldingen van anderen ophalen"
+    "loadImagesHint": "Originele afbeeldingen van anderen ophalen",
+    "dnd": "Niet storen",
+    "dndHint": "Dempt meldingsgeluiden en -banners",
+    "dndSystemHint": "Aan via Niet storen van je bureaublad",
+    "privateMessages": "Privéberichten van",
+    "pm_everyone": "Iedereen",
+    "pm_friendsOnly": "Vrienden",
+    "pm_nobody": "Niemand"
   },
   "voice": {
     "line": "Spraak: {{channel}} · {{server}}",
     "server": "Spraak: {{server}}",
     "show": "{{location}} – deze server tonen"
+  },
+  "disconnectMenu": {
+    "label": "Opties voor verbreken",
+    "open": "Meer opties voor verbreken",
+    "leaveVoice": "Spraak verlaten",
+    "leaveVoiceHint": "Stop met praten en luisteren, blijf verbonden voor de chat",
+    "disconnectHint": "De verbinding met deze server sluiten",
+    "switchTo": "Spraak overzetten naar {{server}}",
+    "all": "Verbinding met alle servers verbreken…",
+    "allHint": "Alle serververbindingen sluiten"
+  },
+  "disconnectAll": {
+    "title": "Verbinding met alle servers verbreken?",
+    "message": "Verbinding met alle {{total}} servers verbreken?",
+    "confirm": "Verbreken"
+  },
+  "audio": {
+    "inputOptions": "Microfoonopties",
+    "outputOptions": "Luidsprekeropties",
+    "inputDevices": "Invoerapparaat",
+    "outputDevices": "Uitvoerapparaat",
+    "systemDefault": "Systeemstandaard",
+    "noDevices": "Geen apparaten gevonden",
+    "noiseSuppression": "Ruisonderdrukking",
+    "testSound": "Testgeluid",
+    "voiceSettings": "Spraakinstellingen…",
+    "fallbackInput": "Microfoon losgekoppeld. De systeemstandaard wordt gebruikt.",
+    "fallbackOutput": "Uitvoerapparaat losgekoppeld. De systeemstandaard wordt gebruikt.",
+    "volume": "Volume",
+    "level": "Niveau"
+  },
+  "dnd": {
+    "label": "Niet storen",
+    "manual": "handmatig",
+    "system": "Niet storen (systeem)",
+    "systemHint": "Zet het uit in de meldingsinstellingen van je bureaublad."
   }
 }

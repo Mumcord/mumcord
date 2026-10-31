@@ -8,7 +8,10 @@
     "muted": "Mikrofon némítva",
     "unmuted": "Mikrofon némítása feloldva",
     "deafened": "Süketítve. Nem hallasz másokat, és a mikrofonod némítva van",
-    "undeafened": "Süketítés feloldva"
+    "undeafened": "Süketítés feloldva",
+    "leftVoice": "Elhagyta a hangot itt: {{server}}",
+    "disconnected": "Lekapcsolódva innen: {{server}}",
+    "disconnectedAll": "Lekapcsolódva az összes szerverről"
   },
   "readOnly": {
     "text": "Csak olvasol – lépj be egy csatornába a beszélgetéshez.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Adj meg egy jelszót a biztonsági mentés fájl védelméhez.",
     "exported": "Az identitás biztonsági mentése elkészült.",
     "confirm": "Regisztráció",
-    "done": "Regisztrálva ezen a szerveren"
+    "done": "Regisztrálva ezen a szerveren",
+    "identity": "A regisztrált név a(z) {{identity}} identitáshoz tartozik."
   },
   "errors": {
     "tooLarge": "Ez túl nagy a szervernek. Válassz kisebb képet, vagy írj rövidebb szöveget.",
@@ -89,11 +93,54 @@
     "offerImages": "Teljes méretű képek felkínálása",
     "offerImagesHint": "Mások betölthetik az eredeti képeidet",
     "loadImages": "Teljes méretű képek betöltése",
-    "loadImagesHint": "Eredeti képek lekérése másoktól"
+    "loadImagesHint": "Eredeti képek lekérése másoktól",
+    "dnd": "Ne zavarjanak",
+    "dndHint": "Elnémítja az értesítési hangokat és szalagokat",
+    "dndSystemHint": "Bekapcsolva az asztali környezet Ne zavarjanak módja miatt",
+    "privateMessages": "Privát üzenetek tőle",
+    "pm_everyone": "Bárki",
+    "pm_friendsOnly": "Barátok",
+    "pm_nobody": "Senki"
   },
   "voice": {
     "line": "Hang: {{channel}} · {{server}}",
     "server": "Hang: {{server}}",
     "show": "{{location}} – szerver megjelenítése"
+  },
+  "disconnectMenu": {
+    "label": "Lekapcsolódási lehetőségek",
+    "open": "További lekapcsolódási lehetőségek",
+    "leaveVoice": "Hang elhagyása",
+    "leaveVoiceHint": "Beszéd és hallgatás leállítása, csevegéshez kapcsolatban marad",
+    "disconnectHint": "A kapcsolat bontása ezzel a szerverrel",
+    "switchTo": "Hang áthelyezése ide: {{server}}",
+    "all": "Lekapcsolódás az összes szerverről…",
+    "allHint": "Minden szerverkapcsolat bontása"
+  },
+  "disconnectAll": {
+    "title": "Lekapcsolódik az összes szerverről?",
+    "message": "Lekapcsolódik mind a(z) {{total}} szerverről?",
+    "confirm": "Lekapcsolódás"
+  },
+  "audio": {
+    "inputOptions": "Mikrofon beállításai",
+    "outputOptions": "Hangszórók beállításai",
+    "inputDevices": "Bemeneti eszköz",
+    "outputDevices": "Kimeneti eszköz",
+    "systemDefault": "Rendszer alapértelmezett",
+    "noDevices": "Nem található eszköz",
+    "noiseSuppression": "Zajszűrés",
+    "testSound": "Hangpróba",
+    "voiceSettings": "Hangbeállítások…",
+    "fallbackInput": "A mikrofon le lett választva. A rendszer alapértelmezett eszköze van használatban.",
+    "fallbackOutput": "A kimeneti eszköz le lett választva. A rendszer alapértelmezett eszköze van használatban.",
+    "volume": "Hangerő",
+    "level": "Szint"
+  },
+  "dnd": {
+    "label": "Ne zavarjanak",
+    "manual": "kézi",
+    "system": "Ne zavarjanak (rendszer)",
+    "systemHint": "Kapcsold ki az asztali környezet értesítési beállításaiban."
   }
 }

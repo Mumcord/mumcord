@@ -57,10 +57,14 @@
   "menu": {
     "label": "{{name}} veiksmai",
     "viewProfile": "Peržiūrėti profilį",
+    "sendMessage": "Siųsti žinutę",
     "join": "Prisijungti prie {{channel}}",
-    "joinDenied": "Neturite teisės įeiti į šį kanalą.",
+    "joinFull": "Šis kanalas pilnas.",
+    "joinLocked": "Tau negalima įeiti į šį kanalą arba jam reikia slaptažodžio.",
     "mute": "Nutildyti man",
-    "connectionInfo": "Ryšio informacija…"
+    "connectionInfo": "Ryšio informacija…",
+    "chatRequestPending": "Pokalbio prašymas laukia",
+    "revokeConsent": "Atšaukti pokalbio sutikimą…"
   },
   "nowPlaying": {
     "label": "Dabar groja",
@@ -87,5 +91,57 @@
   "preview": {
     "privateMessage": "Privati žinutė",
     "fullProfile": "Visas profilis"
+  },
+  "chatRequest": {
+    "title": "Pokalbio prašymas naudotojui {{name}}",
+    "note": "Pastaba (nebūtina)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Panaudota {{count}} iš {{max}} simbolių",
+    "send": "Siųsti",
+    "failed": "Nepavyko išsiųsti pokalbio prašymo. Bandyk dar kartą."
+  },
+  "toggle": {
+    "show": "Rodyti narius",
+    "hide": "Slėpti narius",
+    "showCount_one": "Rodyti narius ({{count}})",
+    "showCount_few": "Rodyti narius ({{count}})",
+    "showCount_many": "Rodyti narius ({{count}})",
+    "showCount_other": "Rodyti narius ({{count}})",
+    "talkingOne": "{{name}} kalba",
+    "talkingTwo": "{{first}} ir {{second}} kalba",
+    "talkingMore_one": "{{name}} ir dar {{count}} kalba",
+    "talkingMore_few": "{{name}} ir dar {{count}} kalba",
+    "talkingMore_many": "{{name}} ir dar {{count}} kalba",
+    "talkingMore_other": "{{name}} ir dar {{count}} kalba",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Atšaukti pokalbio sutikimą naudotojui {{name}}?",
+    "message": "{{name}} turės vėl išsiųsti žinutės užklausą, kad jo žinutės tave pasiektų. Pokalbio istorija lieka.",
+    "confirm": "Atšaukti",
+    "failed": "Nepavyko atšaukti pokalbio sutikimo. Bandyk dar kartą."
+  },
+  "block": {
+    "menu": "Blokuoti…",
+    "unblock": "Atblokuoti",
+    "title": "Blokuoti {{name}}?",
+    "onServer": "serveryje {{server}}",
+    "whatHappens": "Kas įvyksta",
+    "private": "Privačios {{name}} žinutės nerodomos ir tau nepranešama.",
+    "channelCollapsed": "{{name}} kanalo žinutės suskleistos. Vis tiek gali jas atidaryti.",
+    "channelHidden": "{{name}} kanalo žinutės paslėptos.",
+    "voice": "{{name}} tau nutildytas balse, įskaitant šnabždesius.",
+    "data": "Jokio istorijos sinchronizavimo, kvietimų ar kitų Mumcord duomenų iš {{name}}.",
+    "followsCert": "Blokavimas seka {{name}} sertifikatą, todėl naujas vardas jo neapeina.",
+    "nameOnly": "{{name}} neturi sertifikato, todėl blokavimas galioja tik šiam vardui serveryje {{server}}.",
+    "warning": "{{name}} vis dar gali tave matyti ir skaityti tavo žinutes. Mumble negali to sustabdyti tik tavo pusėje. {{name}} apie blokavimą nepranešama.",
+    "cancel": "Atšaukti",
+    "confirm": "Blokuoti {{name}}",
+    "done": "{{name}} užblokuotas.",
+    "failed": "Nepavyko užblokuoti {{name}}. Bandyk dar kartą.",
+    "badge": "Užblokuotas",
+    "collapsed": "Žinutė nuo užblokuoto naudotojo",
+    "show": "Rodyti",
+    "showLabel": "Rodyti žinutę nuo užblokuoto naudotojo"
   }
 }

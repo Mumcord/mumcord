@@ -1,0 +1,48 @@
+{
+  "title": "Offentliga servrar",
+  "loading": "Läser in listan…",
+  "subtitle": "Inläst för att du öppnade sidan · {{shown}} av {{total}} visas",
+  "search": "Sök på namn, adress eller land",
+  "refresh": "Uppdatera",
+  "retry": "Försök igen",
+  "loadFailed": "Listan över offentliga servrar kunde inte läsas in. Kontrollera internetanslutningen och försök igen.",
+  "noMatch": "Ingen server matchar sökningen och filtren.",
+  "saveFailed": "Servern kunde inte läggas till. Försök igen.",
+  "filters": {
+    "label": "Filter",
+    "country": "Land",
+    "anyCountry": "Alla länder",
+    "ping": "Ping",
+    "anyPing": "Alla pingtider",
+    "pingBelow": "Under {{ms}} ms",
+    "hideEmpty": "Dölj tomma",
+    "hideFull": "Dölj fulla"
+  },
+  "sortedBy": "Sortering: {{column}}",
+  "columns": {
+    "name": "Namn",
+    "country": "Land",
+    "ping": "Ping",
+    "users": "Användare",
+    "actions": "Åtgärder"
+  },
+  "badge": {
+    "empty": "Tom",
+    "full": "Full"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Inte känt än",
+  "measuring": "Mäter",
+  "noAnswer": "Inget svar",
+  "ms": "{{ms}} ms",
+  "connect": "Anslut",
+  "connectTo": "Anslut till {{server}}",
+  "favourite": "Favorit",
+  "favouriteServer": "Lägg till {{server}} i dina servrar",
+  "saved": "Sparad",
+  "savedAs": "{{server}} finns bland dina servrar",
+  "announce": {
+    "saved": "{{server}} har lagts till i dina servrar"
+  },
+  "note": "Bara de rader du ser pingas, några åt gången. Inget annat skickas till en server förrän du ansluter."
+}

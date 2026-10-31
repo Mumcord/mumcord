@@ -57,10 +57,14 @@
   "menu": {
     "label": "Dejanja za {{name}}",
     "viewProfile": "Ogled profila",
+    "sendMessage": "Pošlji sporočilo",
     "join": "Pridruži se kanalu {{channel}}",
-    "joinDenied": "Nimate dovoljenja za vstop v ta kanal.",
+    "joinFull": "Ta kanal je poln.",
+    "joinLocked": "V ta kanal ne smeš vstopiti ali pa zahteva geslo.",
     "mute": "Utišaj zame",
-    "connectionInfo": "Podatki o povezavi…"
+    "connectionInfo": "Podatki o povezavi…",
+    "chatRequestPending": "Prošnja za klepet čaka",
+    "revokeConsent": "Prekliči soglasje za klepet…"
   },
   "nowPlaying": {
     "label": "Zdaj se predvaja",
@@ -87,5 +91,57 @@
   "preview": {
     "privateMessage": "Zasebno sporočilo",
     "fullProfile": "Celoten profil"
+  },
+  "chatRequest": {
+    "title": "Prošnja za klepet za {{name}}",
+    "note": "Opomba (neobvezno)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Porabljeno {{count}} od {{max}} znakov",
+    "send": "Pošlji",
+    "failed": "Prošnje za klepet ni bilo mogoče poslati. Poskusi znova."
+  },
+  "toggle": {
+    "show": "Pokaži člane",
+    "hide": "Skrij člane",
+    "showCount_one": "Pokaži člane ({{count}})",
+    "showCount_two": "Pokaži člane ({{count}})",
+    "showCount_few": "Pokaži člane ({{count}})",
+    "showCount_other": "Pokaži člane ({{count}})",
+    "talkingOne": "{{name}} govori",
+    "talkingTwo": "{{first}} in {{second}} govorita",
+    "talkingMore_one": "{{name}} in še {{count}} govorita",
+    "talkingMore_two": "{{name}} in še {{count}} govorijo",
+    "talkingMore_few": "{{name}} in še {{count}} govorijo",
+    "talkingMore_other": "{{name}} in še {{count}} govorijo",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Prekličem soglasje za klepet za {{name}}?",
+    "message": "{{name}} bo moral(a) znova poslati prošnjo za sporočilo, preden te bodo sporočila spet dosegla. Zgodovina klepeta ostane.",
+    "confirm": "Prekliči",
+    "failed": "Preklic soglasja za klepet ni uspel. Poskusi znova."
+  },
+  "block": {
+    "menu": "Blokiraj…",
+    "unblock": "Odblokiraj",
+    "title": "Blokiram uporabnika {{name}}?",
+    "onServer": "na strežniku {{server}}",
+    "whatHappens": "Kaj se zgodi",
+    "private": "Zasebna sporočila uporabnika {{name}} se ne prikažejo in te ne obvestijo.",
+    "channelCollapsed": "Kanalna sporočila uporabnika {{name}} so strnjena. Še vedno jih lahko odpreš.",
+    "channelHidden": "Kanalna sporočila uporabnika {{name}} so skrita.",
+    "voice": "Uporabnik {{name}} je zate v glasovnem klepetu utišan, vključno s šepetanjem.",
+    "data": "Brez sinhronizacije zgodovine, povabil ali drugih podatkov Mumcord od uporabnika {{name}}.",
+    "followsCert": "Blokada sledi potrdilu uporabnika {{name}}, zato je novo ime ne zaobide.",
+    "nameOnly": "Uporabnik {{name}} nima potrdila, zato blokada velja samo za to ime na strežniku {{server}}.",
+    "warning": "Uporabnik {{name}} te še vedno vidi in lahko bere tvoja sporočila. Mumble tega ne more preprečiti samo na tvoji strani. Uporabnik {{name}} o blokadi ni obveščen.",
+    "cancel": "Prekliči",
+    "confirm": "Blokiraj uporabnika {{name}}",
+    "done": "Uporabnik {{name}} je blokiran.",
+    "failed": "Blokiranje uporabnika {{name}} ni uspelo. Poskusi znova.",
+    "badge": "Blokiran",
+    "collapsed": "Sporočilo blokiranega uporabnika",
+    "show": "Prikaži",
+    "showLabel": "Prikaži sporočilo blokiranega uporabnika"
   }
 }

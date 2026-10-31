@@ -6,6 +6,7 @@ import { shownServerId } from "../channels/serverStore";
 import { useServerState } from "../channels";
 import { useServers } from "../servers";
 import { displayName } from "../servers/format";
+import { ServerInfoPanel } from "../servers/ServerInfoPanel";
 import { ServerMenu } from "../servers/ServerMenu";
 import { describeFollowError } from "./errors";
 import { setFollowNotice, useFollowNotice } from "./notice";
@@ -22,16 +23,19 @@ function describeFailure(t: TFunction<"follow">, error: unknown, action: Action)
 type Action = "follow" | "unfollow";
 
 /**
- * Server name row above the channel tree with a "⋯" menu (also on right-click): "Follow all
- * channels" and "Unfollow all channels" (QA.13). Hidden on servers without follow support.
+ * The server's "⋯" menu in the section header above the channel tree (QA.13, issue #172), also on
+ * right-click: Server info, "Follow all channels" and "Unfollow all channels". Hidden on servers
+ * without follow support.
  */
 export function FollowAllMenu() {
   const { t } = useTranslation("follow");
+  const { t: tServers } = useTranslation("servers");
   const server = useServerState();
   const { servers } = useServers();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [menuAt, setMenuAt] = useState<{ x: number; y: number } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [serverInfoOpen, setServerInfoOpen] = useState(false);
 
   const close = useCallback((returnFocus: boolean) => {
     setMenuAt(null);
@@ -78,7 +82,6 @@ export function FollowAllMenu() {
         setMenuAt({ x: event.clientX, y: event.clientY });
       }}
     >
-      <span className="follow-server__name">{name}</span>
       <button
         ref={buttonRef}
         type="button"
@@ -108,6 +111,14 @@ export function FollowAllMenu() {
           onClose={close}
           items={[
             {
+              id: "server-info",
+              label: tServers("serverInfo.title"),
+              onSelect: () => {
+                setMenuAt(null);
+                setServerInfoOpen(true);
+              },
+            },
+            {
               id: "follow-all",
               label: t("all.follow"),
               onSelect: () => {
@@ -122,6 +133,14 @@ export function FollowAllMenu() {
               },
             },
           ]}
+        />
+      )}
+      {serverInfoOpen && (
+        <ServerInfoPanel
+          serverState={server}
+          onClose={() => {
+            setServerInfoOpen(false);
+          }}
         />
       )}
     </div>

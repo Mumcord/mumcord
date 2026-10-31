@@ -79,10 +79,11 @@ async fn wait_unread(rx: &mut EventReceiver, conversation: &ConversationRef) -> 
     .await
 }
 
-async fn start_engine(dir: &Path) -> (Engine, EventReceiver) {
+async fn start_engine(dir: &Path, secrets: &SecretStore) -> (Engine, EventReceiver) {
+    // `reopen()` hands the same secure-storage items to the restarted engine, like the OS store.
     Engine::new(
         &dir.join("data"),
-        SecretStore::in_memory(),
+        secrets.reopen(),
         tokio::runtime::Handle::current(),
     )
     .expect("engine")
@@ -158,11 +159,12 @@ async fn chat_follow_history_and_profile() {
     }
     null_audio();
     let dir = work_dir("engine-live-chat");
+    let secrets = SecretStore::in_memory();
     let name = unique("mc-chat");
     let bot_name = unique("mc-pal");
-    let (engine, mut rx) = start_engine(&dir).await;
+    let (engine, mut rx) = start_engine(&dir, &secrets).await;
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = add_server(&engine, &name, common::v15()).await;
@@ -348,19 +350,10 @@ async fn chat_follow_history_and_profile() {
     assert_eq!(older, lobby_history[..2].to_vec());
 
     // Restart: history, follows and unread badges come back (AC-1.17).
-    let pkcs12 = dir.join("identity.p12");
-    engine
-        .identity_export(pkcs12.clone(), "pw".into())
-        .await
-        .expect("export");
     engine.disconnect(only_server(&engine));
     drop(engine);
     drop(rx);
-    let (engine, mut rx) = start_engine(&dir).await;
-    engine
-        .identity_import(pkcs12, Some("pw".into()))
-        .await
-        .expect("import");
+    let (engine, mut rx) = start_engine(&dir, &secrets).await;
     let snapshot = connect(&engine, &mut rx, &server).await;
     assert_eq!(snapshot.followed_channel_ids, vec![raid]);
     assert!(
@@ -447,10 +440,11 @@ async fn follow_refused_when_listener_limit_reached() {
     }
     null_audio();
     let dir = work_dir("engine-live-limit");
+    let secrets = SecretStore::in_memory();
     let name = unique("mc-limit");
-    let (engine, mut rx) = start_engine(&dir).await;
+    let (engine, mut rx) = start_engine(&dir, &secrets).await;
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = add_server(&engine, &name, common::limit()).await;
@@ -471,10 +465,11 @@ async fn follow_needs_server_1_4() {
     }
     null_audio();
     let dir = work_dir("engine-live-v13");
+    let secrets = SecretStore::in_memory();
     let name = unique("mc-old");
-    let (engine, mut rx) = start_engine(&dir).await;
+    let (engine, mut rx) = start_engine(&dir, &secrets).await;
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = add_server(&engine, &name, common::v13()).await;
@@ -505,10 +500,11 @@ async fn follow_all_and_unfollow_all() {
     }
     null_audio();
     let dir = work_dir("engine-live-follow-all");
+    let secrets = SecretStore::in_memory();
     let name = unique("mc-all");
-    let (engine, mut rx) = start_engine(&dir).await;
+    let (engine, mut rx) = start_engine(&dir, &secrets).await;
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = add_server(&engine, &name, common::v15()).await;
@@ -565,10 +561,11 @@ async fn follow_all_stops_at_the_listener_limit() {
     }
     null_audio();
     let dir = work_dir("engine-live-limit-all");
+    let secrets = SecretStore::in_memory();
     let name = unique("mc-limall");
-    let (engine, mut rx) = start_engine(&dir).await;
+    let (engine, mut rx) = start_engine(&dir, &secrets).await;
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = add_server(&engine, &name, common::limit()).await;

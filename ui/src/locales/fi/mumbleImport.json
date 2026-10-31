@@ -1,0 +1,94 @@
+{
+  "title": "Tuo Mumble-asetuksesi mukaan",
+  "intro": "Löysimme virallisen Mumble-asiakasohjelman tältä tietokoneelta. Valitse, mitä kopioidaan. Mumblessa ei muuteta mitään, eikä mitään lähde tietokoneeltasi.",
+  "optional": "{{progress}} · valinnainen",
+  "listLabel": "Mitä Mumblesta kopioidaan",
+  "favourites": {
+    "title": "Palvelinsuosikit",
+    "found_one": "{{count}} löytyi",
+    "found_other": "{{count}} löytyi",
+    "duplicates_one": "{{count}} on jo Mumcordissa (ohitettu)",
+    "duplicates_other": "{{count}} on jo Mumcordissa (ohitettu)",
+    "failed": "Mumblen palvelinluetteloa ei voitu lukea.",
+    "review": "Tarkista luettelo",
+    "hide": "Piilota luettelo",
+    "listLabel": "Kopioitavat palvelimet",
+    "duplicate": "Jo Mumcordissa"
+  },
+  "passwords": {
+    "title": "Tallennetut salasanat",
+    "count_one": "{{count}} suosikilla on tallennettu salasana",
+    "count_other": "{{count}} suosikilla on tallennettu salasana",
+    "keychain": "Tallennettu järjestelmän avainnippuun"
+  },
+  "identity": {
+    "title": "Identiteetti (asiakasvarmenne)",
+    "keeps": "Säilyttää rekisteröidyn nimesi ja oikeutesi",
+    "locked": "suojattu salasanalla Mumblessa",
+    "named": "Varmenne käyttäjälle “{{name}}”",
+    "validUntil": "voimassa {{date}} asti",
+    "passwordNeeded": "Salasana tarvitaan",
+    "already": "Jo Mumcordissa",
+    "password": "Varmenteen salasana Mumblesta",
+    "passwordRequired": "Anna varmenteen salasana.",
+    "wrongPassword": "Tämä salasana ei avaa varmennetta. Yritä uudelleen."
+  },
+  "devices": {
+    "title": "Äänilaitteet",
+    "input": "Mikrofoni: {{name}}",
+    "output": "Toisto: {{name}}",
+    "missing": "Mumblen laitteita ei ole liitetty tähän tietokoneeseen."
+  },
+  "ptt": {
+    "title": "Push-to-talk-näppäin",
+    "modifierOnly": "Mumblen näppäin on pelkkä muokkausnäppäin, jota Mumcord ei voi käyttää. Voit valita näppäimen myöhemmin.",
+    "tooManyKeys": "Mumblen pikanäppäimessä on useampi kuin yksi näppäin, jota Mumcord ei voi käyttää. Voit valita näppäimen myöhemmin.",
+    "unknown": "Mumblen pikanäppäin käyttää näppäintä tai laitetta, jota Mumcord ei tunne. Voit valita näppäimen myöhemmin."
+  },
+  "volume": {
+    "title": "Äänenvoimakkuus ja ääniasetukset",
+    "hint": "Mumble ja Mumcord käyttävät eri asteikkoja, joten arvot eivät täsmäisi",
+    "notRecommended": "Ei suositeltu"
+  },
+  "selected_one": "{{count}} kohde valittu",
+  "selected_other": "{{count}} kohdetta valittu",
+  "import": "Tuo",
+  "importing": "Tuodaan…",
+  "skip": "Ohita toistaiseksi",
+  "cancel": "Peruuta",
+  "failed": "Tuontia ei voitu viimeistellä. Yritä uudelleen.",
+  "secureStorage": "Mumcord ei saa yhteyttä järjestelmäsi suojattuun tallennustilaan. Avaa avainnippusi tai salasanahallintasi lukitus ja yritä uudelleen.",
+  "settingsFailed": "Palvelimesi kopioitiin, mutta asetuksia ei voitu tallentaa.",
+  "summary": {
+    "title": "Tuonti valmis",
+    "intro": "Mumble-tietosi on kopioitu. Katso, mitä tapahtui.",
+    "added_one": "{{count}} palvelin lisätty suosikkeihin",
+    "added_other": "{{count}} palvelinta lisätty suosikkeihin",
+    "skipped_one": "{{count}} palvelin ohitettu",
+    "skipped_other": "{{count}} palvelinta ohitettu",
+    "skippedDetail_one": "{{names}} on jo luettelossasi",
+    "skippedDetail_other": "{{names}} ovat jo luettelossasi",
+    "duplicate": "Kaksoiskappale",
+    "passwords_one": "{{count}} salasana tallennettu",
+    "passwords_other": "{{count}} salasanaa tallennettu",
+    "passwordsDetail": "Tallennettu järjestelmän avainnippuun, ei tiedostoon",
+    "identity": "Identiteetti tuotu",
+    "identityDefault": "Mumcord käyttää sitä nyt",
+    "identityServers": "Käytetään kopioiduille palvelimille",
+    "identitySkipped": "Identiteetti on jo Mumcordissa",
+    "identitySkippedDetail": "Tämä varmenne on jo yksi identiteeteistäsi",
+    "devicesAndPtt": "Äänilaitteet ja push-to-talk-näppäin",
+    "done": "Valmis",
+    "undo": "Kumoa tuonti",
+    "undone": "Tuonti kumottiin.",
+    "undoFailed": "Tuontia ei voitu kumota kokonaan. Tarkista palvelimesi ja identiteettisi."
+  },
+  "settings": {
+    "title": "Tuo Mumblesta",
+    "hint": "Kopioi palvelinsuosikit, tallennetut salasanat, varmenteesi ja ääniasetukset viralliselta Mumble-asiakasohjelmalta.",
+    "button": "Tuo Mumblesta…",
+    "searching": "Etsitään Mumblea…",
+    "notFound": "Virallista Mumble-asiakasohjelmaa ei löytynyt tältä tietokoneelta.",
+    "breadcrumb": "Asetukset · Palvelimet · Tuo Mumblesta"
+  }
+}

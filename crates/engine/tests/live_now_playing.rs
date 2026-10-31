@@ -165,7 +165,7 @@ async fn now_playing_reaches_others_and_goes_away_when_turned_off() {
     )
     .expect("engine");
     engine
-        .identity_create("Now Playing Tester".into())
+        .identity_create("Now Playing Tester".into(), None)
         .await
         .expect("identity");
     let mut settings = engine.settings().expect("settings");

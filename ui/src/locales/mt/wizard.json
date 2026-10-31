@@ -1,5 +1,24 @@
 {
   "progress": "Pass {{current}} minn {{total}}",
+  "rerun": {
+    "title": "Wiżard tas-setup",
+    "note": "Qed terġa' tgħaddi mis-setup. L-identità tiegħek ma tinbidilx.",
+    "manageIdentities": "Immaniġġja l-identitajiet",
+    "stepsLabel": "Passi tas-setup",
+    "stepsSkipped": "(maqbuża, l-identità mhijiex parti minn dan)",
+    "steps": {
+      "identity": "Identità",
+      "mic": "Mikrofonu",
+      "privacy": "Privatezza",
+      "updates": "Aġġornamenti",
+      "talk": "Mod kif titkellem"
+    },
+    "footer": "Ikkanċella jħalli kollox kif inhu. Fl-aħħar jiġu salvati biss il-passi li biddilt.",
+    "discardTitle": "Tarmi l-bidliet?",
+    "discardBody": "Xejn mhu jiġi salvat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
+    "discardKeep": "Kompli teditja",
+    "discardConfirm": "Armi l-bidliet"
+  },
   "loadFailed": "Is-setup ma setax jitgħabba.",
   "finish": "Spiċċa",
   "errors": {

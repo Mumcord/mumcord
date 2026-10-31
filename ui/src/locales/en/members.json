@@ -55,10 +55,14 @@
   "menu": {
     "label": "Actions for {{name}}",
     "viewProfile": "View profile",
+    "sendMessage": "Send message",
     "join": "Join {{channel}}",
-    "joinDenied": "You are not allowed to enter this channel.",
+    "joinFull": "This channel is full.",
+    "joinLocked": "You may not enter this channel, or it needs a password.",
     "mute": "Mute for me",
-    "connectionInfo": "Connection info…"
+    "connectionInfo": "Connection info…",
+    "chatRequestPending": "Chat request pending",
+    "revokeConsent": "Revoke chat consent…"
   },
   "nowPlaying": {
     "label": "Now playing",
@@ -83,5 +87,53 @@
   "preview": {
     "privateMessage": "Private message",
     "fullProfile": "Full profile"
+  },
+  "chatRequest": {
+    "title": "Chat request to {{name}}",
+    "note": "Note (optional)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} of {{max}} characters used",
+    "send": "Send",
+    "failed": "The chat request could not be sent. Please try again."
+  },
+  "toggle": {
+    "show": "Show members",
+    "hide": "Hide members",
+    "showCount_one": "Show members ({{count}})",
+    "showCount_other": "Show members ({{count}})",
+    "talkingOne": "{{name}} is talking",
+    "talkingTwo": "{{first}} and {{second}} are talking",
+    "talkingMore_one": "{{name}} and {{count}} other are talking",
+    "talkingMore_other": "{{name}} and {{count}} others are talking",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Revoke chat consent for {{name}}?",
+    "message": "{{name}} will need to send a new message request before their messages reach you again. Your chat history stays.",
+    "confirm": "Revoke",
+    "failed": "Revoking the chat consent failed. Please try again."
+  },
+  "block": {
+    "menu": "Block…",
+    "unblock": "Unblock",
+    "title": "Block {{name}}?",
+    "onServer": "on {{server}}",
+    "whatHappens": "What happens",
+    "private": "Private messages from {{name}} are not shown and don't notify you.",
+    "channelCollapsed": "{{name}}'s channel messages are collapsed. You can still open them.",
+    "channelHidden": "{{name}}'s channel messages are hidden.",
+    "voice": "{{name}} is muted for you in voice, including whispers.",
+    "data": "No history sync, invites or other Mumcord data from {{name}}.",
+    "followsCert": "The block follows {{name}}'s certificate, so a new name does not get around it.",
+    "nameOnly": "{{name}} has no certificate, so the block applies to this name on {{server}} only.",
+    "warning": "{{name}} can still see you and read your messages. Mumble has no way to stop that on your side only. {{name}} is not told about the block.",
+    "cancel": "Cancel",
+    "confirm": "Block {{name}}",
+    "done": "{{name}} is blocked.",
+    "failed": "Blocking {{name}} failed. Please try again.",
+    "badge": "Blocked",
+    "collapsed": "Message from a blocked user",
+    "show": "Show",
+    "showLabel": "Show message from a blocked user"
   }
 }

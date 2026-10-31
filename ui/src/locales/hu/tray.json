@@ -1,11 +1,23 @@
 {
-  "show": "Mumcord megjelenítése",
+  "show": "Mumcord megnyitása",
+  "settings": "Beállítások…",
   "mute": "Mikrofon némítása",
   "deafen": "Süketítés",
+  "dnd": "Ne zavarjanak",
+  "dndSystem": "Ne zavarjanak (rendszer)",
   "quit": "Kilépés",
   "disconnected": "Nincs kapcsolat",
   "connecting": "Csatlakozás…",
+  "reconnecting": "Újracsatlakozás…",
   "connected": "Csatlakozva",
+  "connectedIn": "Csatlakozva · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Csatlakozva – beszél",
-  "muted": "Csatlakozva – némítva"
+  "muted": "Csatlakozva – némítva",
+  "voiceMenu": "Hangszerver és csatorna",
+  "voiceServer": "Hangszerver",
+  "channelsOf": "Csatornák · {server}",
+  "moreChannels": "További csatornák a Mumcordban…",
+  "recentChats": "Legutóbbi csevegések",
+  "chatUnread": "{name} – {count} olvasatlan"
 }

@@ -8,7 +8,10 @@
     "muted": "Microphone muted",
     "unmuted": "Microphone unmuted",
     "deafened": "Deafened. You cannot hear others and your microphone is muted",
-    "undeafened": "Undeafened"
+    "undeafened": "Undeafened",
+    "leftVoice": "Left voice on {{server}}",
+    "disconnected": "Disconnected from {{server}}",
+    "disconnectedAll": "Disconnected from all servers"
   },
   "readOnly": {
     "text": "Read-only – Join a channel to talk.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Enter a password to protect the backup file.",
     "exported": "Identity backup saved.",
     "confirm": "Register",
-    "done": "Registered on this server"
+    "done": "Registered on this server",
+    "identity": "The registered name belongs to the identity {{identity}}."
   },
   "errors": {
     "tooLarge": "This is too large for the server. Choose a smaller picture or write a shorter text.",
@@ -89,11 +93,54 @@
     "offerImages": "Offer full-size images",
     "offerImagesHint": "Let others load your original images",
     "loadImages": "Load full-size images",
-    "loadImagesHint": "Fetch original images from others"
+    "loadImagesHint": "Fetch original images from others",
+    "dnd": "Do Not Disturb",
+    "dndHint": "Silences notification sounds and banners",
+    "dndSystemHint": "On through your desktop's Do Not Disturb",
+    "privateMessages": "Private messages from",
+    "pm_everyone": "Everyone",
+    "pm_friendsOnly": "Friends",
+    "pm_nobody": "Nobody"
   },
   "voice": {
     "line": "Voice: {{channel}} · {{server}}",
     "server": "Voice: {{server}}",
     "show": "{{location}} – show this server"
+  },
+  "disconnectMenu": {
+    "label": "Disconnect options",
+    "open": "More disconnect options",
+    "leaveVoice": "Leave voice",
+    "leaveVoiceHint": "Stop talking and listening, stay connected for chat",
+    "disconnectHint": "Close the connection to this server",
+    "switchTo": "Switch voice to {{server}}",
+    "all": "Disconnect from all servers…",
+    "allHint": "Close every server connection"
+  },
+  "disconnectAll": {
+    "title": "Disconnect from all servers?",
+    "message": "Disconnect from all {{total}} servers?",
+    "confirm": "Disconnect"
+  },
+  "audio": {
+    "inputOptions": "Microphone options",
+    "outputOptions": "Speaker options",
+    "inputDevices": "Input device",
+    "outputDevices": "Output device",
+    "systemDefault": "System default",
+    "noDevices": "No devices found",
+    "noiseSuppression": "Noise suppression",
+    "testSound": "Test sound",
+    "voiceSettings": "Voice settings…",
+    "fallbackInput": "Microphone unplugged. Using the system default.",
+    "fallbackOutput": "Output device unplugged. Using the system default.",
+    "volume": "Volume",
+    "level": "Level"
+  },
+  "dnd": {
+    "label": "Do Not Disturb",
+    "manual": "manual",
+    "system": "Do Not Disturb (system)",
+    "systemHint": "Turn it off in your desktop's notification settings."
   }
 }

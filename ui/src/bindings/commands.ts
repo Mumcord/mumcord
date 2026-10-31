@@ -5,18 +5,39 @@ import * as __TAURI_EVENT from "@tauri-apps/api/event";
 
 /** Commands */
 export const commands = {
-	/**  Current identity, or `null` before the wizard created one (first start). */
+	/**  The default identity, or `null` before the wizard created one (first start). */
 	identityGet: () => typedError<Identity | null, ApiError>(__TAURI_INVOKE("identity_get")),
+	/**  Every identity: the default first, then by the date it was added. */
+	identityList: () => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_list")),
 	/**  Creates a new self-signed identity and stores it in the OS secure storage. */
-	identityCreate: (name: string) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_create", { name })),
-	/**  Imports a PKCS#12 file (e.g. exported from the official client), replacing the current identity. */
-	identityImport: (path: string, password: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_import", { path, password })),
+	identityCreate: (name: string, label: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_create", { name, label })),
+	/**  Imports a PKCS#12 file (e.g. exported from the official client) as another identity. */
+	identityImport: (path: string, password: string | null, label: string | null) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_import", { path, password, label })),
+	/**  Changes the local label of an identity; the certificate stays the same. */
+	identityRename: (id: number, label: string) => typedError<Identity, ApiError>(__TAURI_INVOKE("identity_rename", { id, label })),
 	/**  Exports the identity as a password-protected PKCS#12 file. */
-	identityExport: (path: string, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("identity_export", { path, password })),
+	identityExport: (id: number, path: string, password: string) => typedError<null, ApiError>(__TAURI_INVOKE("identity_export", { id, path, password })),
+	/**  Removes an identity with its key material; the last identity cannot be removed. */
+	identityDelete: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("identity_delete", { id })),
+	/**  Makes an identity the default one; returns the new list. */
+	identitySetDefault: (id: number) => typedError<Identity[], ApiError>(__TAURI_INVOKE("identity_set_default", { id })),
+	/**  Chooses the identity a saved server connects with; `null` uses the default. */
+	serverSetIdentity: (serverId: number, identityId: number | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_identity", { serverId, identityId })),
+	/**  Looks for an installed official Mumble client; `null` when there is none. */
+	mumbleImportScan: () => typedError<MumbleImportFound | null, ApiError>(__TAURI_INVOKE("mumble_import_scan")),
+	/**
+	 *  Imports the chosen favourites, passwords and certificate into Mumcord. Settings are saved
+	 *  by the UI with `settings_update`.
+	 */
+	mumbleImportApply: (request: MumbleImportRequest) => typedError<MumbleImportDone, ApiError>(__TAURI_INVOKE("mumble_import_apply", { request })),
+	/**  Removes the servers and the identity the last import added. */
+	mumbleImportUndo: () => typedError<null, ApiError>(__TAURI_INVOKE("mumble_import_undo")),
 	/**  Saved servers in server-bar order. */
 	serversList: () => typedError<SavedServer[], ApiError>(__TAURI_INVOKE("servers_list")),
 	/**  Adds a server at the end of the server bar. */
 	serverAdd: (input: ServerInput) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_add", { input })),
+	/**  One-shot login probe for the add/edit dialog: ping, server version and certificate state. */
+	serverTestConnection: (input: ServerTestInput) => typedError<TestConnection, ApiError>(__TAURI_INVOKE("server_test_connection", { input })),
 	serverUpdate: (id: number, input: ServerInput) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_update", { id, input })),
 	/**  Removes the server with its password, trust decision, follows and history. */
 	serverRemove: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("server_remove", { id })),
@@ -29,6 +50,8 @@ export const commands = {
 	serverSetAlwaysConnect: (serverId: number, enabled: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_always_connect", { serverId, enabled })),
 	/**  Mutes or unmutes all notifications of the server, mentions included (FR-2.10). */
 	serverSetNotificationsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_notifications_muted", { serverId, muted })),
+	/**  Turns `@all` and `@channel` mentions on the server off or back on (issue #70). */
+	serverSetGroupMentionsMuted: (serverId: number, muted: boolean) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_group_mentions_muted", { serverId, muted })),
 	/**  Sets the theme shown with the server; `null` goes back to the app theme (FR-2.17). */
 	serverSetTheme: (serverId: number, themeId: string | null) => typedError<SavedServer, ApiError>(__TAURI_INVOKE("server_set_theme", { serverId, themeId })),
 	/**  Parses a pasted `mumble://` link; fails with `invalidInput` if malformed. */
@@ -56,6 +79,11 @@ export const commands = {
 	sessionSnapshot: (serverId: number) => typedError<ServerSnapshot | null, ApiError>(__TAURI_INVOKE("session_snapshot", { serverId })),
 	/**  Live link figures of the server, or `null` when it is not connected (AC-1.23). */
 	connectionStats: (serverId: number) => typedError<ConnectionStats | null, ApiError>(__TAURI_INVOKE("connection_stats", { serverId })),
+	/**
+	 *  Estimated mouth-to-ear latency for Settings → Audio (issue #156); `null` while no audio
+	 *  device runs. Includes the voice server's ping while connected.
+	 */
+	latencyEstimate: () => typedError<LatencyEstimate | null, ApiError>(__TAURI_INVOKE("latency_estimate")),
 	/**  Answers a `CertTrustRequired`; trusting is remembered for the server. */
 	certTrustDecide: (serverId: number, fingerprint: string, trust: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("cert_trust_decide", { serverId, fingerprint, trust })),
 	/**  Unmuting while deafened also undeafens. */
@@ -64,6 +92,11 @@ export const commands = {
 	setSelfDeaf: (deafened: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("set_self_deaf", { deafened })),
 	/**  Enters the channel's voice; fails with `permissionDenied` if not permitted. */
 	channelJoin: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_join", { serverId, channelId })),
+	/**
+	 *  Stops voice on the voice server but keeps every connection: the server turns read-only
+	 *  (self-deafened) and no server has voice until the next explicit join.
+	 */
+	voiceLeave: () => typedError<null, ApiError>(__TAURI_INVOKE("voice_leave")),
 	/**
 	 *  Retries a refused join with a channel password, which is stored for the server; the
 	 *  outcome arrives as `channelPasswordPrompt` (FR-2.78).
@@ -83,6 +116,11 @@ export const commands = {
 	 *  as `ChannelUpserted`; repeated calls for the same description send nothing.
 	 */
 	channelDescriptionRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("channel_description_request", { serverId, channelId })),
+	/**
+	 *  Moves a person to another channel; the server checks the move permission and the result
+	 *  arrives as `userUpserted` (issue #172).
+	 */
+	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
@@ -103,6 +141,39 @@ export const commands = {
 	friendAdd: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("friend_add", { serverId, session })),
 	/**  Removes a friend by certificate hash. */
 	friendRemove: (certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("friend_remove", { certHash })),
+	/**  Held and sent requests of a connected server. */
+	pmRequests: (serverId: number) => typedError<PmRequests, ApiError>(__TAURI_INVOKE("pm_requests", { serverId })),
+	/**  Accepts a request: held messages are shown and the sender may keep messaging. */
+	pmRequestAccept: (serverId: number, id: number) => typedError<null, ApiError>(__TAURI_INVOKE("pm_request_accept", { serverId, id })),
+	/**  Declines a request silently. */
+	pmRequestDecline: (serverId: number, id: number) => typedError<null, ApiError>(__TAURI_INVOKE("pm_request_decline", { serverId, id })),
+	/**  Sends a chat request with an optional note to another Mumcord user. */
+	chatRequestSend: (serverId: number, session: number, note: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("chat_request_send", { serverId, session, note })),
+	/**  Accepted conversations of every own identity, by name. */
+	acceptedConversations: () => typedError<AcceptedConversation[], ApiError>(__TAURI_INVOKE("accepted_conversations")),
+	/**  Revokes an accepted conversation of one own identity. */
+	acceptedConversationRevoke: (ownCertHash: string, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("accepted_conversation_revoke", { ownCertHash, certHash })),
+	/**  Blocked users of every own identity, by name. */
+	blockedUsers: () => typedError<BlockedUser[], ApiError>(__TAURI_INVOKE("blocked_users")),
+	/**
+	 *  Blocks a person on a connected server: by certificate, or by name on this server when
+	 *  they have none.
+	 */
+	blockUser: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("block_user", { serverId, session })),
+	/**  Blocks a person by certificate who need not be online, for the identity `serverId` uses. */
+	blockCert: (serverId: number, certHash: string, name: string) => typedError<null, ApiError>(__TAURI_INVOKE("block_cert", { serverId, certHash, name })),
+	/**  Removes a block. */
+	unblock: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("unblock", { id })),
+	/**  The newest stored message of every private conversation on a connected server, newest first. */
+	privateConversations: (serverId: number) => typedError<PrivateConversation[], ApiError>(__TAURI_INVOKE("private_conversations", { serverId })),
+	/**  Pin and mute state of every private conversation that has any. */
+	pmConversationPrefs: () => typedError<PmConversationPrefs[], ApiError>(__TAURI_INVOKE("pm_conversation_prefs")),
+	/**  Pins a private conversation to the top of the overview, or unpins it. */
+	pmConversationSetPinned: (serverId: number, certHash: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("pm_conversation_set_pinned", { serverId, certHash, pinned })),
+	/**  Mutes a private conversation for `minutes`, or until turned back on (`null`). */
+	pmConversationMute: (serverId: number, certHash: string, minutes: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("pm_conversation_mute", { serverId, certHash, minutes })),
+	/**  Turns notifications of a muted private conversation back on. */
+	pmConversationUnmute: (serverId: number, certHash: string) => typedError<null, ApiError>(__TAURI_INVOKE("pm_conversation_unmute", { serverId, certHash })),
 	/**
 	 *  Sends Mumble-compatible HTML (the UI converts Markdown and scales images).
 	 *  Waits briefly for the server's refusal (FR-2.47). Fails with `messageTooLarge` above the
@@ -177,11 +248,49 @@ export const commands = {
 	 */
 	openLink: (url: string) => typedError<null, ApiError>(__TAURI_INVOKE("open_link", { url })),
 	/**
+	 *  Live figures for the card of a `mumble://` link. Only the engine contacts the network, the
+	 *  query never connects, and nothing is asked while the link-preview switch is off (issue #175).
+	 */
+	mumbleLinkStats: (url: string, refresh: boolean) => typedError<MumbleLinkStats, ApiError>(__TAURI_INVOKE("mumble_link_stats", { url, refresh })),
+	/**
+	 *  A card's Join: the same handling as a `mumble://` link that came from outside (FR-2.13), so the
+	 *  server bar shows the server, a running connection joins the channel and an unknown server is
+	 *  offered for saving. Only a click on the card gets here.
+	 */
+	mumbleLinkJoin: (url: string) => typedError<LinkOutcome, ApiError>(__TAURI_INVOKE("mumble_link_join", { url })),
+	/**
+	 *  Downloads the public server list. The UI calls this only when the user opens the browser or
+	 *  presses Refresh (FR-3.92); nothing is fetched in the background.
+	 */
+	publicServersList: () => typedError<PublicServer[], ApiError>(__TAURI_INVOKE("public_servers_list")),
+	/**
+	 *  Pings one listed server; `null` when it did not answer. The engine paces all pings (one every
+	 *  50 ms, a few in flight), whatever the UI asks for.
+	 */
+	publicServerPing: (host: string, port: number) => typedError<PublicServerPing | null, ApiError>(__TAURI_INVOKE("public_server_ping", { host, port })),
+	/**
 	 *  An external image (`<img src>` in a message) or direct image link, ready to show inline;
 	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the
 	 *  image cannot be shown (blocked address, too large, unsupported format).
 	 */
 	inlineImage: (url: string) => typedError<InlineImage | null, ApiError>(__TAURI_INVOKE("inline_image", { url })),
+	/**
+	 *  Format and size of a direct audio link (issue #260), read from the start of the file;
+	 *  `null` when previews are switched off in the settings (then nothing is fetched) or the link
+	 *  is not a playable audio file (blocked address, too large, unsupported format).
+	 */
+	audioInfo: (url: string) => typedError<AudioInfo | null, ApiError>(__TAURI_INVOKE("audio_info", { url })),
+	/**
+	 *  The audio file of a direct audio link as a `data:` URL of its sniffed type, fetched by the
+	 *  engine after the user clicked play (issue #260); `null` when previews are switched off or
+	 *  the file cannot be played.
+	 */
+	audioFile: (url: string) => typedError<string | null, ApiError>(__TAURI_INVOKE("audio_file", { url })),
+	/**
+	 *  Saves the audio file of a direct audio link to `path`, which the user picked in a save
+	 *  dialog (issue #260). The engine fetches it again with the same checks as for playing.
+	 */
+	audioSave: (url: string, path: string) => typedError<null, ApiError>(__TAURI_INVOKE("audio_save", { url, path })),
 	/**
 	 *  Hides the preview card of `url` under a message for good (QA.42). Messages that were not
 	 *  stored (history saving off) keep nothing; the UI hides the card for the session.
@@ -233,6 +342,11 @@ export const commands = {
 	 */
 	historyLoad: (serverId: number, conversation: Conversation, before: string | null, limit: number) => typedError<ChatMessage[], ApiError>(__TAURI_INVOKE("history_load", { serverId, conversation, before, limit })),
 	historyClear: (scope: HistoryScope) => typedError<null, ApiError>(__TAURI_INVOKE("history_clear", { scope })),
+	/**
+	 *  When the user last cleared the history of a channel (RFC 3339), for channel info (issue
+	 *  #170); `null` if never.
+	 */
+	historyClearedAt: (serverId: number, channelId: number) => typedError<string | null, ApiError>(__TAURI_INVOKE("history_cleared_at", { serverId, channelId })),
 	/**  "Save history" switch per server (default on). */
 	historySetSaving: (serverId: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("history_set_saving", { serverId, enabled })),
 	/**
@@ -262,17 +376,39 @@ export const commands = {
 	windowOverlayNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("window_overlay_notice_pending")),
 	/**  Marks the notice as shown so it never comes back. */
 	windowOverlayNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("window_overlay_notice_dismiss")),
+	/**
+	 *  Whether the user still has to be told that their saved audio device was reset to the system
+	 *  default because it could not be matched to the new device list (issue #183).
+	 */
+	audioDeviceNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("audio_device_notice_pending")),
+	/**  Marks the audio device notice as shown so it never comes back. */
+	audioDeviceNoticeDismiss: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_device_notice_dismiss")),
 	audioDevices: () => typedError<AudioDevices, ApiError>(__TAURI_INVOKE("audio_devices")),
 	/**
 	 *  Highest bitrate in kbit/s the bitrate slider can reach (FR-2.64); `null` without a voice
 	 *  server. Follow `BitrateMaxChanged` afterwards.
 	 */
 	bitrateMax: () => typedError<number | null, ApiError>(__TAURI_INVOKE("bitrate_max")),
+	/**  The channels of a connected server that have an audio profile. */
+	channelAudioProfiles: (serverId: number) => typedError<ChannelAudioEntry[], ApiError>(__TAURI_INVOKE("channel_audio_profiles", { serverId })),
+	/**
+	 *  Saves the audio profile of a channel, or removes it with `null` ("Remove profile"). Applies
+	 *  at once when the user is in that channel.
+	 */
+	channelAudioProfileSet: (serverId: number, channelId: number, profile: ChannelAudioProfile | null) => typedError<null, ApiError>(__TAURI_INVOKE("channel_audio_profile_set", { serverId, channelId, profile })),
+	/**
+	 *  The channel profile in effect now; `null` runs on the global settings. Follow
+	 *  `ActiveAudioProfileChanged` afterwards.
+	 */
+	activeAudioProfile: () => typedError<ActiveAudioProfile | null, ApiError>(__TAURI_INVOKE("active_audio_profile")),
 	/**
 	 *  Records up to 5 s of processed own voice with level metering, then plays it back.
-	 *  Voice of a connected session pauses meanwhile.
+	 *  Voice of a connected session pauses meanwhile. `devices` tests devices that are not saved
+	 *  yet, e.g. a microphone picked in the wizard rerun (#149).
 	 */
-	micTestStart: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start")),
+	micTestStart: (devices: MicTestDevices | null) => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start", { devices })),
+	/**  Plays a short sound on the output device ("Test sound" in the output popover). */
+	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
 	/**  Ends the test wherever it is (recording or playback). */
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
@@ -333,10 +469,15 @@ export const commands = {
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
 	/**
-	 *  Starts or stops capturing packets. The UI turns it on while the developer tools are
-	 *  unlocked; turning it off drops everything captured.
+	 *  The developer tools were unlocked (`true`) or hidden again (`false`). Hiding them stops any
+	 *  capture and closes the inspector window; capture itself starts with the window.
 	 */
 	packetCaptureSet: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_set", { enabled })),
+	/**
+	 *  Keeps capturing while the inspector window is closed (`true`), or stops doing so; turning
+	 *  it off with the window closed drops what was captured.
+	 */
+	packetCaptureBackground: (enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("packet_capture_background", { enabled })),
 	/**
 	 *  Packets captured after the packet with id `after` (all kept packets with `null`), plus the
 	 *  counters.
@@ -370,8 +511,15 @@ export const commands = {
 	whatsNewMarkSeen: () => typedError<null, ApiError>(__TAURI_INVOKE("whats_new_mark_seen")),
 	/**  Decides by window focus and the notification setting; shows the system notification itself. */
 	notifyMessage: (notice: MessageNotice) => typedError<NotifyOutcome, ApiError>(__TAURI_INVOKE("notify_message", { notice })),
+	dndState: () => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_state")),
+	/**  Turns the Mumcord switch on or off; it is saved and applies to all servers at once. */
+	dndSet: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set", { on })),
+	/**  "Follow system Do Not Disturb". */
+	dndSetFollowSystem: (on: boolean) => typedError<DndState, ApiError>(__TAURI_INVOKE("dnd_set_follow_system", { on })),
 	/**  The user opened this chat: its system notification is outdated. */
 	notificationDismiss: (serverId: number, conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { serverId, conversation })),
+	/**  Replaces the tray's unread summary and recent chats. */
+	trayAttentionSet: (attention: TrayAttention) => typedError<null, ApiError>(__TAURI_INVOKE("tray_attention_set", { attention })),
 	/**  Platform support and the own shared track (for the settings). */
 	nowPlayingStatus: () => typedError<NowPlayingStatus, ApiError>(__TAURI_INVOKE("now_playing_status")),
 	/**
@@ -492,9 +640,14 @@ export const commands = {
 
 /** Events */
 export const events = {
+	acceptedConversationsChanged: makeEvent<AcceptedConversationsChanged, AcceptedConversationsChanged>("accepted-conversations-changed"),
+	activeAudioProfileChanged: makeEvent<ActiveAudioProfileChanged, ActiveAudioProfileChanged>("active-audio-profile-changed"),
+	audioDeviceFallback: makeEvent<AudioDeviceFallback, AudioDeviceFallback>("audio-device-fallback"),
 	audioDevicesChanged: makeEvent<AudioDevicesChanged, AudioDevicesChanged>("audio-devices-changed"),
 	bitrateMaxChanged: makeEvent<BitrateMaxChanged, BitrateMaxChanged>("bitrate-max-changed"),
+	blockedUsersChanged: makeEvent<BlockedUsersChanged, BlockedUsersChanged>("blocked-users-changed"),
 	certTrustRequired: makeEvent<CertTrustRequired, CertTrustRequired>("cert-trust-required"),
+	channelAudioProfilesChanged: makeEvent<ChannelAudioProfilesChanged, ChannelAudioProfilesChanged>("channel-audio-profiles-changed"),
 	channelPasswordPrompt: makeEvent<ChannelPasswordPrompt, ChannelPasswordPrompt>("channel-password-prompt"),
 	channelRemoved: makeEvent<ChannelRemoved, ChannelRemoved>("channel-removed"),
 	channelUpserted: makeEvent<ChannelUpserted, ChannelUpserted>("channel-upserted"),
@@ -504,6 +657,7 @@ export const events = {
 	deepLinkOpened: makeEvent<DeepLinkOpened, DeepLinkOpened>("deep-link-opened"),
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	directConsentRequired: makeEvent<DirectConsentRequired, DirectConsentRequired>("direct-consent-required"),
+	dndChanged: makeEvent<DndChanged, DndChanged>("dnd-changed"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
@@ -517,14 +671,18 @@ export const events = {
 	notificationActivated: makeEvent<NotificationActivated, NotificationActivated>("notification-activated"),
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
+	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
+	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
+	serverIdentityMissing: makeEvent<ServerIdentityMissing, ServerIdentityMissing>("server-identity-missing"),
 	serverSynced: makeEvent<ServerSynced, ServerSynced>("server-synced"),
 	syncProgress: makeEvent<SyncProgress, SyncProgress>("sync-progress"),
 	talkStateChanged: makeEvent<TalkStateChanged, TalkStateChanged>("talk-state-changed"),
 	transportChanged: makeEvent<TransportChanged, TransportChanged>("transport-changed"),
+	traySettingsRequested: makeEvent<TraySettingsRequested, TraySettingsRequested>("tray-settings-requested"),
 	unreadChanged: makeEvent<UnreadChanged, UnreadChanged>("unread-changed"),
 	updateAvailable: makeEvent<UpdateAvailable, UpdateAvailable>("update-available"),
 	userRemoved: makeEvent<UserRemoved, UserRemoved>("user-removed"),
@@ -536,6 +694,35 @@ export const events = {
 };
 
 /* Types */
+/**  A person who may keep sending private messages to one own identity. */
+export type AcceptedConversation = {
+	/**  Certificate hash of the own identity. */
+	ownCertHash: string,
+	certHash: string,
+	name: string,
+	/**  RFC 3339. */
+	acceptedAt: string,
+};
+
+export type AcceptedConversationsChanged = {
+	conversations: AcceptedConversation[],
+};
+
+/**  The profile in effect: the own channel's on the server that carries voice. */
+export type ActiveAudioProfile = {
+	serverId: number,
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**
+ *  The channel profile in effect changed: the user joined or left a channel with a profile, or
+ *  its profile was edited. `null` runs on the global settings.
+ */
+export type ActiveAudioProfileChanged = {
+	active: ActiveAudioProfile | null,
+};
+
 /**  Error returned by every failing command. */
 export type ApiError = {
 	code: ErrorCode,
@@ -569,6 +756,12 @@ export type AudioDevice = {
 	isDefault: boolean,
 };
 
+/**  The chosen device is gone and the system default plays in its place. */
+export type AudioDeviceFallback = {
+	/**  `true` for the microphone, `false` for the speakers. */
+	input: boolean,
+};
+
 export type AudioDevices = {
 	inputs: AudioDevice[],
 	outputs: AudioDevice[],
@@ -578,6 +771,8 @@ export type AudioDevices = {
 export type AudioDevicesChanged = {
 	devices: AudioDevices,
 };
+
+export type AudioFormat = "mp3" | "ogg" | "aac" | "mp4" | "wav" | "flac" | "webm";
 
 /**
  *  Glitch counters of the local audio path since voice started on this connection (issue #123),
@@ -615,6 +810,16 @@ export type AudioHealth = {
 	processingMaxHistoryUs: number[],
 };
 
+/**  A direct audio link before the click (issue #260). */
+export type AudioInfo = {
+	/**  The link as posted, without fragment. */
+	url: string,
+	/**  Sniffed from the file's first bytes. */
+	format: AudioFormat,
+	/**  File size in bytes, when the server said (capped at 4 GB; larger files are refused). */
+	size: number | null,
+};
+
 /**  The most likely cause of a Fair or Poor rating. */
 export type AudioIssue = 
 /**  Voice from others was concealed: packets lost or late on the way. */
@@ -640,6 +845,34 @@ export type AudioRatingLabel = {
  */
 export type BitrateMaxChanged = {
 	kbps: number | null,
+};
+
+/**  Channel messages of blocked users (issue #140). */
+export type BlockedMessages = "collapse" | "hide";
+
+/**  A person one own identity blocked. */
+export type BlockedUser = {
+	/**  Id for `unblock`. */
+	id: number,
+	/**  Certificate hash of the own identity that set the block. */
+	ownCertHash: string,
+	/**
+	 *  `null` for a name block: then only `name` on `serverId` is blocked. With a certificate
+	 *  the block covers every server.
+	 */
+	certHash: string | null,
+	/**  The name when blocked. Untrusted: render as plain text. */
+	name: string,
+	/**  The server the block was set on; `null` once that server was removed. */
+	serverId: number | null,
+	/**  Label of that server when the block was set. */
+	serverLabel: string,
+	/**  RFC 3339. */
+	blockedAt: string,
+};
+
+export type BlockedUsersChanged = {
+	users: BlockedUser[],
 };
 
 /**  A game on the bundled blocklist (QA.56), shown read-only in the settings. */
@@ -682,6 +915,29 @@ export type CertTrustRequired = {
 	previousFingerprint: string | null,
 };
 
+/**  How a tested server certificate relates to the saved trust decision. */
+export type CertificateState = "trusted" | "unknown" | "changed";
+
+/**  A channel of the server that has a profile. */
+export type ChannelAudioEntry = {
+	channelId: number,
+	profile: ChannelAudioProfile,
+};
+
+/**  The overrides of a channel audio profile; `null` keeps the global setting ("default"). */
+export type ChannelAudioProfile = {
+	musicQuality: boolean | null,
+	lowLatency: boolean | null,
+	/**  Own bitrate cap in kbit/s, 16 to 510; the server's limit still wins. */
+	bitrateKbps: number | null,
+};
+
+/**  The audio profiles of a server's channels changed. */
+export type ChannelAudioProfilesChanged = {
+	serverId: number,
+	profiles: ChannelAudioEntry[],
+};
+
 export type ChannelInfo = {
 	id: number,
 	/**  `null` for the root channel. */
@@ -697,6 +953,13 @@ export type ChannelInfo = {
 	 *  `channel_description_request` fetches the text (FR-1.48b).
 	 */
 	hasDescription: boolean,
+	/**  User limit; `null` when the channel has none (the server's limit still applies). */
+	maxUsers: number | null,
+	temporary: boolean,
+	/**  Channels linked to this one, sorted by id. */
+	links: number[],
+	/**  Entering needs a password (access token) or group membership. */
+	enterRestricted: boolean,
 };
 
 export type ChannelPasswordPrompt = {
@@ -721,6 +984,15 @@ export type ChannelPermissions = {
 	listen: boolean,
 	/**  Only meaningful on the root channel: "Register self" (FR-1.34). */
 	registerSelf: boolean,
+	speak: boolean,
+	whisper: boolean,
+	/**  Edit the channel's ACL; only true once the server confirmed it. */
+	write: boolean,
+	/**
+	 *  Move other people out of this channel (drag a person, "Move users here…"); only true
+	 *  once the server confirmed it.
+	 */
+	moveUsers: boolean,
 };
 
 export type ChannelRemoved = {
@@ -810,6 +1082,8 @@ export type ConnectionStats = {
 	packetsReceived: number,
 	/**  Health of the local audio path; `null` on a server without voice. */
 	audio: AudioHealth | null,
+	/**  Estimated mouth-to-ear latency; `null` on a server without voice. */
+	latency: LatencyEstimate | null,
 };
 
 /**  Answer to a question asked once (direct connections, update check, AppImage menu entry). */
@@ -847,6 +1121,20 @@ export type DefaultAvatarSkipped = {
  */
 export type DirectConsentRequired = {
 	serverId: number,
+};
+
+/**  The switch, the follow setting or the system state changed (also from the tray). */
+export type DndChanged = {
+	state: DndState,
+};
+
+/**  Everything the UI shows about Do Not Disturb. */
+export type DndState = {
+	/**  The Mumcord switch (quick settings, settings, tray). */
+	manual: boolean,
+	/**  "Follow system Do Not Disturb". */
+	followSystem: boolean,
+	system: SystemDnd,
 };
 
 /**  A dropped image file, ready to go into the attachment tray. */
@@ -1049,12 +1337,20 @@ export type HistorySynced = {
 	messages: ChatMessage[],
 };
 
-/**  Public view of the identity; the certificate itself never leaves the engine. */
+/**  Public view of an identity; the certificate and its key never leave the engine. */
 export type Identity = {
-	/**  Default username. */
+	id: number,
+	/**  Local label the user chose; the certificate is not changed by it. */
+	label: string,
+	/**  Default username, from the certificate's common name. */
 	name: string,
 	/**  SHA-1 hash of the certificate, as Mumble servers identify it. */
 	certHash: string,
+	/**  When the identity was added to Mumcord, RFC 3339 (like message times). */
+	addedAt: string,
+	isDefault: boolean,
+	/**  Servers that use this identity directly (not through the default). */
+	serverIds: number[],
 };
 
 /**  The in-game overlay settings changed. */
@@ -1151,6 +1447,32 @@ export type KnownGame = {
 export type Language = "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr" | "ga" | "hr" | "hu" | "it" | "lt" | "lv" | "mt" | "nl" | "pl" | "pt" | "ro" | "sk" | "sl" | "sv";
 
 /**
+ *  Estimated mouth-to-ear latency and its parts (issue #156), in microseconds (integers, as
+ *  specta exports floats as nullable). Assumes the other side runs in the same mode.
+ */
+export type LatencyEstimate = {
+	lowLatency: boolean,
+	/**  Audio per packet: 10 ms in low-latency mode, 20 ms otherwise. */
+	packetMs: number,
+	/**  Microphone device buffer. */
+	inputBufferUs: number,
+	/**  One packet plus the encoder look-ahead. */
+	encodeUs: number,
+	/**  Half the ping to the server; `null` until measured (not connected, TCP tunnel). */
+	networkUs: number | null,
+	/**  Jitter-buffer target for a clean stream. */
+	jitterUs: number,
+	/**  Measured processing: DSP and encoding out, decoding and mixing in. */
+	processingUs: number,
+	/**  Output queue and speaker device buffer. */
+	outputBufferUs: number,
+	/**  Sum of the parts (without the network while it is unknown). */
+	totalUs: number,
+	/**  The same estimate for the other mode. */
+	otherModeTotalUs: number,
+};
+
+/**
  *  What Mumcord did with a `mumble://` link (FR-2.13). The UI brings the named server into
  *  view and, for `unknownServer`, offers to save it (FR-1.11).
  */
@@ -1175,10 +1497,14 @@ export type LinkPreview = {
 	description: string | null,
 	/**  Preview image as a `data:` URL (fetched and re-encoded by the engine). */
 	image: string | null,
-	/**  Set for YouTube, Twitch and Spotify links: show a player card. */
+	/**  Set for YouTube and Twitch links: show a player card. */
 	video: VideoEmbed | null,
+	/**  Set for music service links and music pages: show a music card (issue #262). */
+	music: MusicEmbed | null,
 	/**  The link serves an image: show it inline (`inline_image`) instead of a card. */
 	isImage: boolean,
+	/**  The link serves an audio file: show the audio player (`audio_info`) instead of a card. */
+	isAudio: boolean,
 };
 
 /**  `ID` and `ID_LIKE` from os-release, e.g. `linuxmint` like `ubuntu debian`. */
@@ -1210,10 +1536,36 @@ export type MessageReceived = {
 	message: ChatMessage,
 };
 
+/**  A held chat request (from a Mumcord user) or held messages (from a standard client). */
+export type MessageRequest = {
+	/**  Id for accept and decline; unique per server while the client runs. */
+	id: number,
+	session: number,
+	/**  Untrusted: render as plain text. */
+	name: string,
+	certHash: string | null,
+	chatRequest: boolean,
+	/**  Plain text note of a chat request (at most 200 characters). Untrusted: plain text only. */
+	note: string | null,
+	/**  Held messages, oldest first. */
+	messages: ChatMessage[],
+	/**  RFC 3339. */
+	receivedAt: string,
+};
+
 /**  Processed input level, about 20 times per second while the mic test runs or while connected. */
 export type MicLevel = {
 	/**  0.0 (silence) to 1.0 (full scale). */
 	level: number | null,
+};
+
+/**
+ *  Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+ *  They are not saved.
+ */
+export type MicTestDevices = {
+	inputDevice: string | null,
+	outputDevice: string | null,
 };
 
 /**
@@ -1225,6 +1577,66 @@ export type MicTestPhase = "recording" | "playing" | "done" | "failed";
 /**  The mic test changed phase. */
 export type MicTestPhaseChanged = {
 	phase: MicTestPhase,
+};
+
+export type MumbleCertificate = {
+	/**  Common name; empty while locked by a password. */
+	name: string,
+	/**  End of validity, RFC 3339. */
+	validUntil: string | null,
+	needsPassword: boolean,
+	alreadyImported: boolean,
+};
+
+export type MumbleDevice = {
+	id: string,
+	name: string,
+};
+
+export type MumbleFavourite = {
+	label: string,
+	host: string,
+	port: number,
+	username: string,
+	hasPassword: boolean,
+	/**  Already in Mumcord; skipped by the import. */
+	duplicate: boolean,
+};
+
+export type MumbleImportDone = {
+	added: SavedServer[],
+	/**  Labels of chosen servers that were already in Mumcord. */
+	skipped: string[],
+	passwordsSaved: number,
+	identity: Identity | null,
+	identitySkipped: boolean,
+	/**  End of validity of the imported certificate, RFC 3339. */
+	identityValidUntil: string | null,
+};
+
+/**  What an installed official client offers for import. */
+export type MumbleImportFound = {
+	format: MumbleSettingsFormat,
+	favourites: MumbleFavourite[],
+	favouritesFailed: boolean,
+	certificate: MumbleCertificate | null,
+	inputDevice: MumbleDevice | null,
+	outputDevice: MumbleDevice | null,
+	devicesMissing: boolean,
+	/**  In the `pttKey` settings format. */
+	pttKey: string | null,
+	pttIssue: MumblePttIssue | null,
+	talkMode: TalkMode | null,
+	outputVolumePercent: number | null,
+};
+
+/**  No `Debug`: it carries the certificate password. */
+export type MumbleImportRequest = {
+	favourites: MumbleServerKey[],
+	passwords: boolean,
+	certificate: boolean,
+	/**  Only for a certificate that needs one. */
+	certificatePassword: string | null,
 };
 
 /**  Parsed `mumble://[user[:password]@]host[:port]/[channel/path]` link. */
@@ -1242,6 +1654,49 @@ export type NoiseBackend = "nnnoiseless" | "rnnoise" | "sonora";
 
 /**  Aggressiveness of the `sonora-ns` backend; the neural backends have no settings. */
 export type NoiseSuppressionLevel = "low" | "moderate" | "high" | "veryHigh";
+
+/**
+ *  What the public server query answered for a `mumble://` link (issue #175). `privacyOff` means
+ *  nothing was asked because the link-preview switch is off; `unreachable` means the server did not
+ *  answer within the query timeout. The figures are untrusted server data, shown as plain text.
+ */
+export type MumbleLinkStats = { kind: "privacyOff" } | { kind: "unreachable" } | { kind: "answered"; pingMs: number; users: number; maxUsers: number; version: string };
+
+/**  Why Mumble's push-to-talk shortcut cannot be used in Mumcord. */
+export type MumblePttIssue = "modifierOnly" | "tooManyKeys" | "unknown";
+
+/**  A favourite chosen in the preview, by host and port. */
+export type MumbleServerKey = {
+	host: string,
+	port: number,
+};
+
+/**  Which settings format of the official client was found. */
+export type MumbleSettingsFormat = 
+/**  `mumble_settings.json`, Mumble 1.5 and later. */
+"json" | 
+/**  Mumble 1.4 and earlier (INI file, property list or registry). */
+"legacy" | 
+/**  Only the favourites database was found. */
+"databaseOnly";
+
+export type MusicEmbed = {
+	service: MusicService,
+	kind: MusicKind,
+	/**
+	 *  The service's official embed; load it only after the user clicks play. `null`: the
+	 *  service has no usable embed, the card only links to it.
+	 */
+	playerUrl: string | null,
+	/**  Artist or uploader, when the service names one. */
+	artist: string | null,
+};
+
+export type MusicKind = "track" | "album" | "playlist" | "artist" | "episode" | "show";
+
+export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMusic" | "tidal" | "deezer" | "bandcamp" | 
+/**  Another page that says it is music. */
+"other";
 
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
@@ -1370,6 +1825,8 @@ export type Packet = {
 
 export type PacketCapture = {
 	capturing: boolean,
+	/**  Capture keeps running while the inspector window is closed. */
+	background: boolean,
 	/**  Packets newer than the requested id, oldest first. */
 	packets: Packet[],
 	/**  Packets per server, kind and direction since capture started or was cleared. */
@@ -1409,6 +1866,39 @@ export type PlaylistEntry = {
 	/**  Their name when the entry arrived, for when they have left the server since. */
 	addedByName: string | null,
 };
+
+/**  Pin and mute state of a private conversation, by server and the person's certificate hash. */
+export type PmConversationPrefs = {
+	serverId: number,
+	certHash: string,
+	pinned: boolean,
+	/**
+	 *  RFC 3339 end of a timed mute; `null` when not muted or muted until turned back on.
+	 *  A time in the past means the mute is over.
+	 */
+	mutedUntil: string | null,
+	/**  Muted until turned back on. */
+	mutedForever: boolean,
+};
+
+/**  Pinned or muted private conversations changed: the full list. */
+export type PmConversationPrefsChanged = {
+	prefs: PmConversationPrefs[],
+};
+
+export type PmRequests = {
+	incoming: MessageRequest[],
+	sent: SentChatRequest[],
+};
+
+/**  The requests of one server changed. Memory only: gone after disconnect or quit. */
+export type PmRequestsChanged = {
+	serverId: number,
+	requests: PmRequests,
+};
+
+/**  "Private messages from" (issue #141). */
+export type PmRule = "everyone" | "friendsOnly" | "nobody";
 
 /**
  *  A person (or the user, with the own session) started or stopped sending positions: show or
@@ -1453,6 +1943,33 @@ export type PositionalStatus = {
  */
 export type PositionalStatusChanged = {
 	status: PositionalStatus,
+};
+
+/**
+ *  A stored private conversation: its newest message (with the conversation) and the name the
+ *  other person last wrote under, `null` when only own messages are stored.
+ */
+export type PrivateConversation = {
+	last: ChatMessage,
+	/**  Untrusted: render as plain text. */
+	peerName: string | null,
+};
+
+/**  Private message rule, per-server overrides and exceptions (issue #141). */
+export type PrivateMessageSettings = {
+	/**  Default everyone. */
+	rule: PmRule,
+	/**  Servers that do not use `rule`. */
+	serverRules: ServerPmRule[],
+	/**  "People in my current channel" (default on). */
+	allowCurrentChannel: boolean,
+	/**  "Conversations I already accepted" (default on). */
+	allowAccepted: boolean,
+	/**
+	 *  Keep filtered messages from standard clients as message requests (default on); off
+	 *  drops them.
+	 */
+	keepRequests: boolean,
 };
 
 export type PttAvailability = { status: "available" } | { status: "unavailable"; reason: PttUnavailableReason };
@@ -1502,6 +2019,24 @@ export type PttUnavailableReason =
 /**  macOS: Mumcord lacks the Accessibility permission for the mouse event tap. */
 "mouseNeedsAccessibility";
 
+/**  One listed server. Untrusted list data, already cleaned by the engine; shown as plain text. */
+export type PublicServer = {
+	name: string,
+	host: string,
+	port: number,
+	/**  Country name from the list; may be empty. */
+	country: string,
+	/**  Upper-case ISO 3166 alpha-2 code, or empty. */
+	countryCode: string,
+};
+
+/**  What a listed server answered to the ping. Untrusted server data. */
+export type PublicServerPing = {
+	pingMs: number,
+	users: number,
+	maxUsers: number,
+};
+
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
 export type SavedChannelPassword = {
 	/**  The user's own name; `null` shows the channels, or "Password N" without any. */
@@ -1537,8 +2072,12 @@ export type SavedServer = {
 	wasVoiceServerAtQuit: boolean,
 	/**  No toasts or desktop notifications from this server; badges stay (FR-2.10). */
 	notificationsMuted: boolean,
+	/**  `@all` and `@channel` do not count as mentions on this server (issue #70). */
+	groupMentionsMuted: boolean,
 	/**  Theme shown with this server; `null` uses the app theme (FR-2.17). */
 	themeId: string | null,
+	/**  Identity this server connects with; `null` uses the default identity (issue #148). */
+	identityId: number | null,
 };
 
 /**  One person sharing their screen in the voice channel. */
@@ -1561,6 +2100,14 @@ export type ScreenSharesChanged = {
 	shares: ScreenShare[],
 };
 
+/**  A chat request the user sent; a decline is never told, so it stays pending. */
+export type SentChatRequest = {
+	session: number,
+	name: string,
+	certHash: string | null,
+	accepted: boolean,
+};
+
 /**  One server's connection state, as listed by `connections_list`. */
 export type ServerConnection = {
 	serverId: number,
@@ -1574,10 +2121,17 @@ export type ServerDenied = {
 	channelId: number | null,
 };
 
+/**  An identity whose key material could not be read, so a server fell back to the default. */
+export type ServerIdentityMissing = {
+	serverId: number,
+};
+
 /**  Server facts and limits learned during the handshake. */
 export type ServerInfo = {
 	/**  E.g. "1.5.735". */
 	version: string,
+	release: string | null,
+	os: string | null,
 	/**  False on servers older than 1.4: following is hidden with a hint (FR-1.12). */
 	followSupported: boolean,
 	/**  Sanitized HTML. */
@@ -1592,6 +2146,23 @@ export type ServerInfo = {
 	/**  Maximum length of messages containing images in characters (0 = unlimited). */
 	maxImageMessageLength: number,
 	allowHtml: boolean,
+	maxBandwidth: number | null,
+	maxUsers: number | null,
+	recordingAllowed: boolean,
+	serverLabel: string | null,
+	serverAddress: string | null,
+	serverPort: number | null,
+	tlsFingerprint: string | null,
+	usersOnline: number,
+	sessionId: number | null,
+	registered: boolean,
+	currentChannelPermissions: number | null,
+	mumcordUsers: number,
+	tlsTrusted: boolean,
+	tlsIssuer: string | null,
+	tlsValidFrom: string | null,
+	tlsValidUntil: string | null,
+	tlsCertificatePem: string | null,
 };
 
 /**  Fields for adding or editing a saved server. */
@@ -1602,6 +2173,12 @@ export type ServerInput = {
 	port: number,
 	username: string,
 	password: PasswordUpdate,
+};
+
+/**  A server with its own "Private messages from" rule. */
+export type ServerPmRule = {
+	serverId: number,
+	rule: PmRule,
 };
 
 /**  Complete view of the connected server. */
@@ -1625,6 +2202,19 @@ export type ServerSnapshot = {
 /**  Sent once the server finished syncing (ServerSync) and after a reconnect. */
 export type ServerSynced = {
 	snapshot: ServerSnapshot,
+};
+
+/**  Values of the add/edit dialog for a test connection (issue #151). */
+export type ServerTestInput = {
+	address: string,
+	port: number,
+	username: string,
+	/**  `keep` uses the saved password of `serverId`; `set` uses the typed one. */
+	password: PasswordUpdate,
+	/**  Saved server the test belongs to (saved password and certificate decision). */
+	serverId: number | null,
+	/**  Identity to try; `null` uses the default identity. */
+	identityId: number | null,
 };
 
 export type Settings = {
@@ -1659,11 +2249,21 @@ export type Settings = {
 	noiseSuppressionRnnoiseConsent: Consent,
 	echoCancellation: boolean,
 	autoGain: boolean,
+	/**  Manual microphone gain in percent, 0–200 (default 100). */
+	inputGainPercent: number,
+	/**  Master volume of everything played, 0–100 (default 100). */
+	outputVolumePercent: number,
 	/**
 	 *  "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
 	 *  510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
 	 */
 	musicQuality: boolean,
+	/**
+	 *  "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+	 *  jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+	 *  volume bypassed, for playing music together. Applies live.
+	 */
+	lowLatency: boolean,
 	/**
 	 *  Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
 	 *  `bitrate_max`.
@@ -1763,6 +2363,10 @@ export type Settings = {
 	 *  that knew about it.
 	 */
 	whatsNewSeen: string | null,
+	/**  "Private messages from" (issue #141). */
+	privateMessages: PrivateMessageSettings,
+	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
+	blockedMessages: BlockedMessages,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -1786,12 +2390,24 @@ export type SoundSettings = {
 	shareStopped: boolean,
 	viewerStarted: boolean,
 	viewerStopped: boolean,
+	/**  The server kicks you (#205). */
+	kicked: boolean,
+	/**  The server bans you (#205). */
+	banned: boolean,
 };
 
 /**  Channels received so far while a server is still syncing (FR-2.24). */
 export type SyncProgress = {
 	serverId: number,
 	channels: number,
+};
+
+/**  The desktop's own Do Not Disturb or Focus mode as far as Mumcord can read it. */
+export type SystemDnd = {
+	/**  The desktop whose state is read, e.g. "KDE Plasma"; `null` when none can be read. */
+	desktop: string | null,
+	/**  Whether the system's Do Not Disturb is on; `null` when it can't be read. */
+	on: boolean | null,
 };
 
 export type TalkMode = "voiceActivation" | "pushToTalk";
@@ -1801,6 +2417,17 @@ export type TalkStateChanged = {
 	serverId: number,
 	session: number,
 	talking: boolean,
+};
+
+/**  Result of a test connection. */
+export type TestConnection = {
+	/**  Round trip of a Mumble ping over the control connection. */
+	pingMs: number,
+	/**  Version string the server reported, e.g. "1.5.0". */
+	version: string,
+	/**  SHA-256 fingerprint of the server certificate, as shown to users. */
+	fingerprint: string,
+	certificate: CertificateState,
 };
 
 export type Theme = "system" | "dark" | "light";
@@ -1834,6 +2461,29 @@ export type TransportChanged = {
 	serverId: number,
 	transport: Transport,
 };
+
+/**
+ *  Unread messages, mentions and recent private chats across all servers, for the tray icon's
+ *  badge and menu.
+ */
+export type TrayAttention = {
+	unread: number,
+	mentions: number,
+	/**  Most recent first. */
+	chats: TrayChat[],
+};
+
+/**  A recent private chat for the tray's "Recent chats" menu. */
+export type TrayChat = {
+	serverId: number,
+	conversation: Conversation,
+	/**  Display name of the person (plain text). */
+	name: string,
+	unread: number,
+};
+
+/**  "Settings…" was chosen in the tray menu; the window is already in front. */
+export type TraySettingsRequested = Record<string, never>;
 
 export type UnreadChanged = {
 	serverId: number,
@@ -1939,14 +2589,11 @@ export type VideoEmbed = {
 	 *  `&parent=<host of the page>` appended.
 	 */
 	playerUrl: string,
-	/**
-	 *  Channel or uploader name; for Spotify the kind of item (`track`, `album`, `playlist`,
-	 *  `artist`, `episode`, `show`).
-	 */
+	/**  Channel or uploader name. */
 	channel: string | null,
 };
 
-export type VideoSite = "youtube" | "twitch" | "spotify";
+export type VideoSite = "youtube" | "twitch";
 
 export type VoiceActivation = "automatic" | "manual";
 

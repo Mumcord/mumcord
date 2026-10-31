@@ -1,0 +1,102 @@
+{
+  "title": "Paņem līdzi savus Mumble iestatījumus",
+  "intro": "Šajā datorā atradām oficiālo Mumble klientu. Izvēlies, ko kopēt. Mumble nekas netiek mainīts, un nekas nepamet tavu datoru.",
+  "optional": "{{progress}} · pēc izvēles",
+  "listLabel": "Ko kopēt no Mumble",
+  "favourites": {
+    "title": "Izlases serveri",
+    "found_zero": "Atrasts: {{count}}",
+    "found_one": "Atrasts: {{count}}",
+    "found_other": "Atrasti: {{count}}",
+    "duplicates_zero": "{{count}} jau ir Mumcord (izlaisti)",
+    "duplicates_one": "{{count}} jau ir Mumcord (izlaists)",
+    "duplicates_other": "{{count}} jau ir Mumcord (izlaisti)",
+    "failed": "Neizdevās nolasīt Mumble serveru sarakstu.",
+    "review": "Pārskatīt sarakstu",
+    "hide": "Paslēpt sarakstu",
+    "listLabel": "Kopējamie serveri",
+    "duplicate": "Jau ir Mumcord"
+  },
+  "passwords": {
+    "title": "Saglabātās paroles",
+    "count_zero": "{{count}} izlases serveriem ir saglabāta parole",
+    "count_one": "{{count}} izlases serverim ir saglabāta parole",
+    "count_other": "{{count}} izlases serveriem ir saglabāta parole",
+    "keychain": "Saglabāta sistēmas atslēgu saišķī"
+  },
+  "identity": {
+    "title": "Identitāte (klienta sertifikāts)",
+    "keeps": "Saglabā tavu reģistrēto vārdu un atļaujas",
+    "locked": "aizsargāts ar paroli Mumble",
+    "named": "Sertifikāts lietotājam “{{name}}”",
+    "validUntil": "derīgs līdz {{date}}",
+    "passwordNeeded": "Nepieciešama parole",
+    "already": "Jau ir Mumcord",
+    "password": "Sertifikāta parole no Mumble",
+    "passwordRequired": "Ievadi sertifikāta paroli.",
+    "wrongPassword": "Ar šo paroli sertifikātu nevar atvērt. Mēģini vēlreiz."
+  },
+  "devices": {
+    "title": "Audio ierīces",
+    "input": "Mikrofons: {{name}}",
+    "output": "Izvade: {{name}}",
+    "missing": "Mumble ierīces nav pievienotas šim datoram."
+  },
+  "ptt": {
+    "title": "Push-to-talk taustiņš",
+    "modifierOnly": "Mumble taustiņš ir tikai modificētājtaustiņš, ko Mumcord nevar izmantot. Taustiņu vari izvēlēties vēlāk.",
+    "tooManyKeys": "Mumble īsinājumtaustiņam ir vairāk nekā viens taustiņš, ko Mumcord nevar izmantot. Taustiņu vari izvēlēties vēlāk.",
+    "unknown": "Mumble īsinājumtaustiņš izmanto taustiņu vai ierīci, ko Mumcord neatpazīst. Taustiņu vari izvēlēties vēlāk."
+  },
+  "volume": {
+    "title": "Skaļums un balss iestatījumi",
+    "hint": "Mumble un Mumcord izmanto dažādas skalas, tāpēc vērtības nesakristu",
+    "notRecommended": "Nav ieteicams"
+  },
+  "selected_zero": "Atlasīti {{count}} vienumi",
+  "selected_one": "Atlasīts {{count}} vienums",
+  "selected_other": "Atlasīti {{count}} vienumi",
+  "import": "Importēt",
+  "importing": "Notiek importēšana…",
+  "skip": "Pagaidām izlaist",
+  "cancel": "Atcelt",
+  "failed": "Importēšanu neizdevās pabeigt. Mēģini vēlreiz.",
+  "secureStorage": "Mumcord nevar piekļūt tavas sistēmas drošajai glabātuvei. Atbloķē atslēgu saišķi vai paroļu pārvaldnieku un mēģini vēlreiz.",
+  "settingsFailed": "Serveri tika nokopēti, taču iestatījumus neizdevās saglabāt.",
+  "summary": {
+    "title": "Importēšana pabeigta",
+    "intro": "Tavi Mumble dati ir nokopēti. Apskati, kas notika.",
+    "added_zero": "{{count}} serveru pievienoti izlasei",
+    "added_one": "{{count}} serveris pievienots izlasei",
+    "added_other": "{{count}} serveri pievienoti izlasei",
+    "skipped_zero": "{{count}} serveru izlaisti",
+    "skipped_one": "{{count}} serveris izlaists",
+    "skipped_other": "{{count}} serveri izlaisti",
+    "skippedDetail_zero": "{{names}} jau ir tavā sarakstā",
+    "skippedDetail_one": "{{names}} jau ir tavā sarakstā",
+    "skippedDetail_other": "{{names}} jau ir tavā sarakstā",
+    "duplicate": "Dublikāts",
+    "passwords_zero": "{{count}} paroļu saglabātas",
+    "passwords_one": "{{count}} parole saglabāta",
+    "passwords_other": "{{count}} paroles saglabātas",
+    "passwordsDetail": "Saglabāta sistēmas atslēgu saišķī, nevis failā",
+    "identity": "Identitāte importēta",
+    "identityDefault": "Mumcord to tagad izmanto",
+    "identityServers": "Izmanto nokopētajiem serveriem",
+    "identitySkipped": "Identitāte jau ir Mumcord",
+    "identitySkippedDetail": "Šis sertifikāts jau ir viena no tavām identitātēm",
+    "devicesAndPtt": "Audio ierīces un push-to-talk taustiņš",
+    "done": "Gatavs",
+    "undo": "Atsaukt importēšanu",
+    "undone": "Importēšana tika atsaukta.",
+    "undoFailed": "Importēšanu neizdevās pilnībā atsaukt. Pārbaudi savus serverus un identitātes."
+  },
+  "settings": {
+    "title": "Importēt no Mumble",
+    "hint": "Nokopē izlases serverus, saglabātās paroles, savu sertifikātu un audio iestatījumus no oficiālā Mumble klienta.",
+    "button": "Importēt no Mumble…",
+    "searching": "Meklē Mumble…",
+    "notFound": "Oficiālais Mumble klients šajā datorā netika atrasts.",
+    "breadcrumb": "Iestatījumi · Serveri · Importēt no Mumble"
+  }
+}

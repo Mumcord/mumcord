@@ -25,7 +25,7 @@ async fn microphone_is_opened_once() {
     }
     assert_eq!(input_opens(), 0, "listing devices opened the microphone");
 
-    let (first, second) = tokio::join!(engine.mic_test_start(), engine.mic_test_start());
+    let (first, second) = tokio::join!(engine.mic_test_start(None), engine.mic_test_start(None));
     first.expect("first start");
     second.expect("second start");
     engine

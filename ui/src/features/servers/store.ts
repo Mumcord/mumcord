@@ -13,6 +13,7 @@ import {
   type CertTrustRequired,
   type ConnectionState,
   type DeepLinkOpened,
+  type Identity,
   type MumbleLink,
   type MumcordApi,
   type SavedServer,
@@ -28,7 +29,8 @@ export type DialogRequest =
   | { kind: "add"; link: MumbleLink | null }
   | { kind: "edit"; serverId: number }
   | { kind: "remove"; serverId: number }
-  | { kind: "theme"; serverId: number };
+  | { kind: "theme"; serverId: number }
+  | { kind: "identity"; serverId: number };
 
 /** Why the last connection ended without the user asking for it. */
 export interface ConnectionEnd {
@@ -39,7 +41,13 @@ export interface ConnectionEnd {
 }
 
 export type ActionContext =
-  "reorder" | "remove" | "disconnect" | "alwaysConnect" | "notifications" | "savePassword";
+  | "reorder"
+  | "remove"
+  | "disconnect"
+  | "alwaysConnect"
+  | "notifications"
+  | "savePassword"
+  | "identity";
 
 /** A server whose connect was refused for a wrong password; the retry dialog is open (FR-2.59). */
 export interface PasswordPrompt {
@@ -53,7 +61,12 @@ export interface PasswordPrompt {
 export interface ServersState {
   ready: boolean;
   servers: SavedServer[];
+  /** Every identity, default first (issue #148); the server dialogs and badges read it. */
+  identities: Identity[];
+  /** Certificate name of the default identity, for the user panel before a connect. */
   identityName: string;
+  /** A server that connected with the default because its own identity is gone (issue #148). */
+  identityNotice: number | null;
   /** Connection of the shown server, or of the server that changed last while none is shown. */
   connection: ConnectionState;
   /** Every server that is not disconnected (FR-2.1). */
@@ -74,7 +87,9 @@ const DISCONNECTED: ConnectionState = { state: "disconnected", error: null };
 const INITIAL: ServersState = {
   ready: false,
   servers: [],
+  identities: [],
   identityName: "",
+  identityNotice: null,
   connection: { state: "disconnected", error: null },
   connections: new Map(),
   transport: null,
@@ -258,6 +273,9 @@ function start(api: MumcordApi): Store {
     api.on("deepLinkOpened", (opened) => {
       openLink(opened);
     }),
+    api.on("serverIdentityMissing", ({ serverId }) => {
+      setState({ identityNotice: serverId });
+    }),
     subscribeServerChanges((change) => {
       if (change.kind !== "shown" || store !== created) return;
       const shown = getShownServerId();
@@ -275,8 +293,8 @@ function start(api: MumcordApi): Store {
       console.error("Reading the start link failed", error);
     },
   );
-  void Promise.all([api.serversList(), api.connectionsList(), api.identityGet()]).then(
-    ([servers, connections, identity]) => {
+  void Promise.all([api.serversList(), api.connectionsList(), api.identityList()]).then(
+    ([servers, connections, identities]) => {
       if (store !== created) return;
       const shown = getShownServerId();
       const map = new Map(connections.map((c) => [c.serverId, c.state]));
@@ -285,7 +303,8 @@ function start(api: MumcordApi): Store {
       setState({
         ready: true,
         servers,
-        identityName: identity?.name ?? "",
+        identities,
+        identityName: identities.find((i) => i.isDefault)?.name ?? "",
         ...(created.connectionSeen ? {} : { connection, connections: map }),
       });
       takePendingLink(created);
@@ -340,6 +359,16 @@ export function useServers(): ServersState {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
+/** The current state outside React, e.g. for checks in event handlers. */
+export function getServersState(): ServersState {
+  return getSnapshot();
+}
+
+/** The user turned `@all` and `@channel` off for this server (issue #70). */
+export function groupMentionsMuted(serverId: number): boolean {
+  return getSnapshot().servers.find((s) => s.id === serverId)?.groupMentionsMuted ?? false;
+}
+
 /** The limit read with the last `serverLimitReached` refusal, `null` if unknown. */
 export function getServerLimit(): number | null {
   return getSnapshot().serverLimit;
@@ -374,6 +403,57 @@ export async function updateServer(id: number, input: ServerInput): Promise<Save
   return server;
 }
 
+/**
+ * Reads the identity list again after it changed in the settings (issue #148), together with the
+ * servers: deleting an identity puts its servers back on the default, which shows in the list.
+ */
+export async function refreshIdentities(): Promise<void> {
+  const { api } = ensure();
+  try {
+    const [identities, servers] = await Promise.all([api.identityList(), api.serversList()]);
+    setState({
+      identities,
+      servers,
+      identityName: identities.find((i) => i.isDefault)?.name ?? "",
+    });
+  } catch (error) {
+    console.error("Reading the identities failed", toApiError(error).code);
+  }
+}
+
+/**
+ * Stores a server's identity choice (issue #148); with `reconnect` the server is disconnected
+ * and connected again right away, so the change takes effect. Other servers are not touched.
+ */
+export async function setServerIdentity(
+  serverId: number,
+  identityId: number | null,
+  reconnect: boolean,
+): Promise<boolean> {
+  const { api } = ensure();
+  try {
+    const server = await api.serverSetIdentity(serverId, identityId);
+    setState({
+      servers: getSnapshot().servers.map((s) => (s.id === serverId ? server : s)),
+      actionError: null,
+    });
+    await refreshIdentities();
+    if (reconnect) {
+      if (getSnapshot().connections.has(serverId)) await api.disconnect(serverId);
+      requestConnect(serverId);
+    }
+    return true;
+  } catch (error) {
+    setState({ actionError: { context: "identity", error: toApiError(error) } });
+    return false;
+  }
+}
+
+/** Closes the "identity missing" notice of the server bar. */
+export function dismissIdentityNotice(): void {
+  setState({ identityNotice: null });
+}
+
 export async function removeServer(id: number): Promise<void> {
   const { api } = ensure();
   const { connections, servers } = getSnapshot();
@@ -386,6 +466,8 @@ export async function removeServer(id: number): Promise<void> {
       ...(ended?.serverId === id ? { ended: null } : {}),
     });
     announce(t("announce.removed", { server: serverName({ ...INITIAL, servers }, id) }));
+    // The identity's "used by" list no longer counts this server.
+    void refreshIdentities();
   } catch (error) {
     setState({ actionError: { context: "remove", error: toApiError(error) } });
   }
@@ -519,6 +601,17 @@ export async function toggleNotificationsMuted(serverId: number, muted: boolean)
   setState({ actionError: null });
   try {
     replaceServer(await api.serverSetNotificationsMuted(serverId, muted));
+  } catch (error) {
+    setState({ actionError: { context: "notifications", error: toApiError(error) } });
+  }
+}
+
+/** The menu's "Mute @all and @channel" switch (issue #70, Q1.6). */
+export async function toggleGroupMentionsMuted(serverId: number, muted: boolean): Promise<void> {
+  const { api } = ensure();
+  setState({ actionError: null });
+  try {
+    replaceServer(await api.serverSetGroupMentionsMuted(serverId, muted));
   } catch (error) {
     setState({ actionError: { context: "notifications", error: toApiError(error) } });
   }

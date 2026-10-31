@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Pregled poslužitelja",
   "tree": {
     "label": "Kanali",
-    "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje",
+    "hint": "Enter: prikaži chat · Shift+Enter ili dvoklik: pridruži se · Strelice: pomicanje, proširivanje, sažimanje · Tipka izbornika: mogućnosti kanala",
     "join": "Pridruži se",
-    "menuLabel": "Opcije za {{channel}}",
-    "showDescription": "Prikaži opis kanala",
     "you": "(ti)",
-    "voiceHere": "ovdje si (glas)",
+    "youAreHere": "ovdje si",
     "people_one": "{{count}} osoba",
     "people_few": "{{count}} osobe",
     "people_other": "{{count}} osoba",
@@ -21,7 +18,14 @@
     "showAll": "Prikaži sve ({{total}})",
     "showFewer": "Prikaži manje",
     "jump": "Skoči na moj kanal",
-    "locked": "zaključano"
+    "locked": "zaključano",
+    "temporary": "privremeni",
+    "linked": "povezan",
+    "full": "Kanal je pun",
+    "fullPlaces": "Kanal je pun, {{places}}",
+    "places_one": "zauzeto {{taken}} od {{count}} mjesta",
+    "places_few": "zauzeto {{taken}} od {{count}} mjesta",
+    "places_other": "zauzeto {{taken}} od {{count}} mjesta"
   },
   "status": {
     "listening": "samo sluša",
@@ -58,7 +62,8 @@
   "errors": {
     "joinDenied": "Nemaš dopuštenje ući u ovaj kanal.",
     "joinFailed": "Pridruživanje kanalu nije uspjelo. Pokušaj ponovno.",
-    "notConnected": "Nisi povezan s poslužiteljem."
+    "notConnected": "Nisi povezan s poslužiteljem.",
+    "moveFailed": "Ovu osobu nije moguće premjestiti."
   },
   "empty": {
     "disconnected": "Nisi povezan. Odaberi poslužitelj da vidiš njegove kanale.",
@@ -75,6 +80,17 @@
     "channels_other": "{{count}} kanala",
     "people_one": "{{count}} osoba",
     "people_few": "{{count}} osobe",
-    "people_other": "{{count}} osoba"
+    "people_other": "{{count}} osoba",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Povezano",
+      "connecting": "Povezivanje",
+      "reconnecting": "Ponovno povezivanje…",
+      "disconnected": "Nije povezano"
+    },
+    "online": "{{count}} na mreži",
+    "onlinePing": "{{count}} na mreži · {{ping}} ms"
   }
 }

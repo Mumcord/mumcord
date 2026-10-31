@@ -1,6 +1,7 @@
-//! YouTube, Twitch and Spotify links that get a player card (FR-1.50). The player URL points to the
+//! YouTube and Twitch links that get a player card (FR-1.50). The player URL points to the
 //! privacy-friendly embed origins (`youtube-nocookie.com`, `player.twitch.tv`,
-//! `clips.twitch.tv`, `open.spotify.com/embed`); the UI loads it only after the user clicks play.
+//! `clips.twitch.tv`); the UI loads it only after the user clicks play. Music services, Spotify
+//! and YouTube Music among them, are recognised in [`super::music`].
 
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -9,7 +10,6 @@ use serde::{Deserialize, Serialize};
 pub enum VideoProvider {
     Youtube,
     Twitch,
-    Spotify,
 }
 
 /// A recognised video link.
@@ -18,8 +18,7 @@ pub struct VideoLink {
     pub provider: VideoProvider,
     /// Embedded player; Twitch players additionally need `parent=<embedding host>`.
     pub player_url: String,
-    /// Twitch channel name, or for Spotify the kind of item (`track`, `album`, `playlist`,
-    /// `artist`, `episode`, `show`), taken from the link.
+    /// Twitch channel name, taken from the link.
     pub channel: Option<String>,
 }
 
@@ -54,7 +53,7 @@ pub fn recognise(url: &Url) -> Option<VideoLink> {
         .map(|s| s.filter(|p| !p.is_empty()).collect())
         .unwrap_or_default();
     match host {
-        "youtube.com" | "m.youtube.com" | "music.youtube.com" => {
+        "youtube.com" | "m.youtube.com" => {
             let id = match segments.as_slice() {
                 ["watch"] => url
                     .query_pairs()
@@ -81,24 +80,6 @@ pub fn recognise(url: &Url) -> Option<VideoLink> {
             }
             _ => None,
         },
-        "open.spotify.com" => {
-            // Links may carry an `intl-xx` locale prefix.
-            let rest = match segments.as_slice() {
-                [first, rest @ ..] if first.starts_with("intl-") => rest,
-                all => all,
-            };
-            match rest {
-                [
-                    kind @ ("track" | "album" | "playlist" | "artist" | "episode" | "show"),
-                    id,
-                ] if is_spotify_id(id) => Some(VideoLink {
-                    provider: VideoProvider::Spotify,
-                    player_url: format!("https://open.spotify.com/embed/{kind}/{id}"),
-                    channel: Some((*kind).to_owned()),
-                }),
-                _ => None,
-            }
-        }
         "clips.twitch.tv" => match segments.as_slice() {
             [slug] if is_slug(slug) && *slug != "embed" => Some(clip(slug, None)),
             _ => None,
@@ -133,10 +114,6 @@ fn clip(slug: &str, channel: Option<&str>) -> VideoLink {
         player_url: format!("https://clips.twitch.tv/embed?clip={slug}&autoplay=true"),
         channel: channel.map(|c| c.to_ascii_lowercase()),
     }
-}
-
-fn is_spotify_id(s: &str) -> bool {
-    (10..=30).contains(&s.len()) && s.bytes().all(|b| b.is_ascii_alphanumeric())
 }
 
 fn is_digits(s: &str) -> bool {
@@ -208,38 +185,5 @@ mod tests {
         assert_eq!(player("https://www.twitch.tv/directory"), None);
         assert_eq!(player("https://www.twitch.tv/videos/abc"), None);
         assert_eq!(player("https://www.twitch.tv/a/b/c/d"), None);
-    }
-
-    #[test]
-    fn recognises_spotify() {
-        let track =
-            rec("https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=abc123").expect("track");
-        assert_eq!(track.provider, VideoProvider::Spotify);
-        assert_eq!(
-            track.player_url,
-            "https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC"
-        );
-        assert_eq!(track.channel.as_deref(), Some("track"));
-        for kind in ["album", "playlist", "artist", "episode", "show"] {
-            let link = rec(&format!(
-                "https://open.spotify.com/{kind}/37i9dQZF1DXcBWIGoYBM5M"
-            ));
-            assert_eq!(link.expect(kind).channel.as_deref(), Some(kind));
-        }
-        assert_eq!(
-            player("https://open.spotify.com/intl-de/track/4uLU6hMCjMI75M1A2tKUQC"),
-            Some("https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC".into())
-        );
-        assert_eq!(player("https://open.spotify.com/track/short"), None);
-        assert_eq!(
-            player("https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQ%22"),
-            None
-        );
-        assert_eq!(player("https://open.spotify.com/user/someone"), None);
-        assert_eq!(player("https://open.spotify.com/"), None);
-        assert_eq!(
-            player("https://spotify.com.evil.example/track/4uLU6hMCjMI75M1A2tKUQC"),
-            None
-        );
     }
 }

@@ -1,11 +1,23 @@
 {
-  "show": "Prikaži Mumcord",
+  "show": "Otvori Mumcord",
+  "settings": "Postavke…",
   "mute": "Isključi mikrofon",
   "deafen": "Isključi zvuk",
+  "dnd": "Ne ometaj",
+  "dndSystem": "Ne ometaj (sustav)",
   "quit": "Izađi",
   "disconnected": "Nije povezano",
   "connecting": "Povezivanje…",
+  "reconnecting": "Ponovno povezivanje…",
   "connected": "Povezano",
+  "connectedIn": "Povezano · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Povezano – govori",
-  "muted": "Povezano – mikrofon isključen"
+  "muted": "Povezano – mikrofon isključen",
+  "voiceMenu": "Glasovni poslužitelj i kanal",
+  "voiceServer": "Glasovni poslužitelj",
+  "channelsOf": "Kanali · {server}",
+  "moreChannels": "Više kanala u Mumcordu…",
+  "recentChats": "Nedavni razgovori",
+  "chatUnread": "{name} – {count} nepročitano"
 }

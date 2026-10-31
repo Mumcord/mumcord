@@ -55,10 +55,14 @@
   "menu": {
     "label": "Handlinger for {{name}}",
     "viewProfile": "Se profil",
+    "sendMessage": "Send besked",
     "join": "Gå til {{channel}}",
-    "joinDenied": "Du har ikke adgang til denne kanal.",
+    "joinFull": "Denne kanal er fuld.",
+    "joinLocked": "Du må ikke gå ind i denne kanal, eller den kræver en adgangskode.",
     "mute": "Slå lyden fra for mig",
-    "connectionInfo": "Forbindelsesinfo…"
+    "connectionInfo": "Forbindelsesinfo…",
+    "chatRequestPending": "Chatanmodning afventer",
+    "revokeConsent": "Tilbagekald chatsamtykke …"
   },
   "nowPlaying": {
     "label": "Spiller nu",
@@ -83,5 +87,53 @@
   "preview": {
     "privateMessage": "Privat besked",
     "fullProfile": "Hele profilen"
+  },
+  "chatRequest": {
+    "title": "Chatanmodning til {{name}}",
+    "note": "Note (valgfri)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} af {{max}} tegn brugt",
+    "send": "Send",
+    "failed": "Chatanmodningen kunne ikke sendes. Prøv igen."
+  },
+  "toggle": {
+    "show": "Vis medlemmer",
+    "hide": "Skjul medlemmer",
+    "showCount_one": "Vis medlemmer ({{count}})",
+    "showCount_other": "Vis medlemmer ({{count}})",
+    "talkingOne": "{{name}} taler",
+    "talkingTwo": "{{first}} og {{second}} taler",
+    "talkingMore_one": "{{name}} og {{count}} anden taler",
+    "talkingMore_other": "{{name}} og {{count}} andre taler",
+    "shortcut": "Ctrl+Skift+M"
+  },
+  "revokeConsent": {
+    "title": "Tilbagekald chatsamtykke for {{name}}?",
+    "message": "{{name}} skal sende en ny beskedanmodning, før beskederne når frem til dig igen. Din chathistorik bevares.",
+    "confirm": "Tilbagekald",
+    "failed": "Tilbagekaldelsen af chatsamtykket mislykkedes. Prøv igen."
+  },
+  "block": {
+    "menu": "Bloker…",
+    "unblock": "Fjern blokering",
+    "title": "Vil du blokere {{name}}?",
+    "onServer": "på {{server}}",
+    "whatHappens": "Hvad sker der",
+    "private": "Private beskeder fra {{name}} vises ikke og giver dig ingen notifikationer.",
+    "channelCollapsed": "{{name}}s kanalbeskeder er foldet sammen. Du kan stadig åbne dem.",
+    "channelHidden": "{{name}}s kanalbeskeder er skjult.",
+    "voice": "{{name}} er slået fra for dig i tale, også hviskninger.",
+    "data": "Ingen historiksynkronisering, invitationer eller andre Mumcord-data fra {{name}}.",
+    "followsCert": "Blokeringen følger {{name}}s certifikat, så et nyt navn omgår den ikke.",
+    "nameOnly": "{{name}} har intet certifikat, så blokeringen gælder kun dette navn på {{server}}.",
+    "warning": "{{name}} kan stadig se dig og læse dine beskeder. Mumble har ingen måde at stoppe det på kun fra din side. {{name}} får ikke besked om blokeringen.",
+    "cancel": "Annuller",
+    "confirm": "Bloker {{name}}",
+    "done": "{{name}} er blokeret.",
+    "failed": "Det lykkedes ikke at blokere {{name}}. Prøv igen.",
+    "badge": "Blokeret",
+    "collapsed": "Besked fra en blokeret bruger",
+    "show": "Vis",
+    "showLabel": "Vis besked fra en blokeret bruger"
   }
 }

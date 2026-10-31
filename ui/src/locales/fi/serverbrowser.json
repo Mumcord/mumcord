@@ -1,0 +1,48 @@
+{
+  "title": "Julkiset palvelimet",
+  "loading": "Ladataan luetteloa…",
+  "subtitle": "Ladattu, koska avasit tämän sivun · {{shown}}/{{total}} näkyvissä",
+  "search": "Hae nimellä, osoitteella tai maalla",
+  "refresh": "Päivitä",
+  "retry": "Yritä uudelleen",
+  "loadFailed": "Julkisten palvelinten luetteloa ei voitu ladata. Tarkista internetyhteys ja yritä uudelleen.",
+  "noMatch": "Mikään palvelin ei vastaa hakua ja suodattimia.",
+  "saveFailed": "Palvelinta ei voitu lisätä. Yritä uudelleen.",
+  "filters": {
+    "label": "Suodattimet",
+    "country": "Maa",
+    "anyCountry": "Mikä tahansa maa",
+    "ping": "Viive",
+    "anyPing": "Mikä tahansa viive",
+    "pingBelow": "Alle {{ms}} ms",
+    "hideEmpty": "Piilota tyhjät",
+    "hideFull": "Piilota täydet"
+  },
+  "sortedBy": "Järjestys: {{column}}",
+  "columns": {
+    "name": "Nimi",
+    "country": "Maa",
+    "ping": "Viive",
+    "users": "Käyttäjät",
+    "actions": "Toiminnot"
+  },
+  "badge": {
+    "empty": "Tyhjä",
+    "full": "Täynnä"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Ei vielä tiedossa",
+  "measuring": "Mitataan",
+  "noAnswer": "Ei vastausta",
+  "ms": "{{ms}} ms",
+  "connect": "Yhdistä",
+  "connectTo": "Yhdistä palvelimeen {{server}}",
+  "favourite": "Suosikki",
+  "favouriteServer": "Lisää {{server}} palvelimiisi",
+  "saved": "Tallennettu",
+  "savedAs": "{{server}} on palvelimissasi",
+  "announce": {
+    "saved": "{{server}} lisättiin palvelimiisi"
+  },
+  "note": "Vain näkyvät rivit pingataan, muutama kerrallaan. Palvelimelle ei lähetetä mitään muuta ennen kuin yhdistät."
+}

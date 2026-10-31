@@ -39,14 +39,25 @@ export function ViewProvider({ children }: { children: ReactNode }) {
       finishWizard: () => {
         dispatch({ type: "finishWizard" });
       },
-      openSettings: () => {
-        dispatch({ type: "openSettings" });
+      openSettings: (section) => {
+        dispatch(
+          section === undefined ? { type: "openSettings" } : { type: "openSettings", section },
+        );
       },
       openOverlaySettings: () => {
         dispatch({ type: "openSettings", section: "overlay" });
       },
+      openAudioSettings: () => {
+        dispatch({ type: "openSettings", section: "audio" });
+      },
       openPrivacySettings: () => {
         dispatch({ type: "openSettings", section: "privacy" });
+      },
+      openRerunWizard: () => {
+        dispatch({ type: "openRerunWizard" });
+      },
+      closeRerunWizard: () => {
+        dispatch({ type: "closeRerunWizard" });
       },
       closeOverlay: () => {
         dispatch({ type: "closeOverlay" });

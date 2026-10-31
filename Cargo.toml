@@ -42,8 +42,9 @@ rustls = { version = "0.23", default-features = false, features = ["ring", "std"
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
 bytes = "1"
 # Link previews (FR-1.49): HTTP/1.1 client on the same rustls/ring stack as the Mumble
-# connection, with the OS certificate store for web sites.
-reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider"] }
+# connection, with the OS certificate store for web sites. gzip because the public server list
+# (#68) refuses requests that do not accept it; responses are decompressed before the size cap.
+reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider", "gzip"] }
 rustls-platform-verifier = "0.7"
 
 # Direct Mumcord-to-Mumcord connections (FR-2.35): QUIC on the same rustls/ring stack, router
@@ -63,6 +64,14 @@ protoc-bin-vendored = "3.3"
 
 # Crypto & certificates
 aes = "0.9"
+# X.509 parsing for the TLS certificate details in the server info panel (FR-1.10).
+x509-parser = "0.18"
+# PEM for the "Show certificate" action in the server info panel.
+base64 = "0.23"
+# Import from the official Mumble client (issue #66): its 1.4 settings on macOS (property list)
+# and Windows (registry).
+plist = "1.10"
+windows-registry = "0.6"
 rand = "0.10"
 sha1 = "0.10"
 # Content hash of full-size images shared between Mumcord clients (FR-1.60c).
@@ -75,7 +84,10 @@ rsa = { version = "0.9", default-features = false, features = ["std", "getrandom
 # Audio
 # realtime-dbus: cpal asks for real-time scheduling of its device threads (rtkit over D-Bus on
 # Linux, MMCSS on Windows), so a loaded CPU does not starve them (issue #123).
-cpal = { version = "0.18", features = ["realtime-dbus"] }
+# pipewire (Linux): streams open on the PipeWire node the user picked, so every sink and source
+# of a multi-endpoint interface is its own device (issue #183). Uses the libpipewire that screen
+# sharing already links; no effect on Windows and macOS.
+cpal = { version = "0.18", features = ["realtime-dbus", "pipewire"] }
 # The same request for Mumcord's own capture and playback threads.
 audio_thread_priority = { version = "0.35", default-features = false, features = ["with_dbus"] }
 # opusic-sys builds libopus statically from bundled sources.
@@ -88,6 +100,10 @@ rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "74b46b10656
 sonora = "0.2"
 rtrb = "0.4"
 rubato = "5.0"
+# Lists the sound server's sinks and sources with their default flags (issue #183). Pure Rust
+# PulseAudio protocol client; PipeWire answers it through pipewire-pulse.
+pulseaudio = "0.3"
+futures = { version = "0.3", default-features = false, features = ["executor"] }
 hound = "3.5"
 
 # Screen sharing (FR-2.42): VP9 software codec on the system or a CI-built static libvpx, found
@@ -151,6 +167,8 @@ core-foundation = "0.10"
 
 # Errors, logging, serialization, CLI
 thiserror = "2"
+# The public server list (#68) is XML.
+quick-xml = "0.42"
 anyhow = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

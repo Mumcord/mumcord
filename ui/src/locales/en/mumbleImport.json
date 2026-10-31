@@ -1,0 +1,94 @@
+{
+  "title": "Bring your Mumble setup along",
+  "intro": "We found the official Mumble client on this computer. Pick what to copy. Nothing is changed in Mumble, and nothing leaves your computer.",
+  "optional": "{{progress}} · optional",
+  "listLabel": "What to copy from Mumble",
+  "favourites": {
+    "title": "Server favourites",
+    "found_one": "{{count}} found",
+    "found_other": "{{count}} found",
+    "duplicates_one": "{{count}} already in Mumcord (skipped)",
+    "duplicates_other": "{{count}} already in Mumcord (skipped)",
+    "failed": "Mumble's server list could not be read.",
+    "review": "Review list",
+    "hide": "Hide list",
+    "listLabel": "Servers to copy",
+    "duplicate": "Already in Mumcord"
+  },
+  "passwords": {
+    "title": "Saved passwords",
+    "count_one": "{{count}} of the favourites has a stored password",
+    "count_other": "{{count}} of the favourites have a stored password",
+    "keychain": "Stored in the system keychain"
+  },
+  "identity": {
+    "title": "Identity (client certificate)",
+    "keeps": "Keeps your registered name and permissions",
+    "locked": "protected by a password in Mumble",
+    "named": "Certificate for “{{name}}”",
+    "validUntil": "valid until {{date}}",
+    "passwordNeeded": "Password needed",
+    "already": "Already in Mumcord",
+    "password": "Certificate password from Mumble",
+    "passwordRequired": "Please enter the certificate password.",
+    "wrongPassword": "This password does not open the certificate. Please try again."
+  },
+  "devices": {
+    "title": "Audio devices",
+    "input": "Microphone: {{name}}",
+    "output": "Output: {{name}}",
+    "missing": "Mumble's devices are not connected to this computer."
+  },
+  "ptt": {
+    "title": "Push-to-talk key",
+    "modifierOnly": "Mumble's key is a modifier key on its own, which Mumcord can't use. You can pick a key later.",
+    "tooManyKeys": "Mumble's shortcut has more than one key, which Mumcord can't use. You can pick a key later.",
+    "unknown": "Mumble's shortcut uses a key or device Mumcord doesn't know. You can pick a key later."
+  },
+  "volume": {
+    "title": "Volume and voice settings",
+    "hint": "Mumble and Mumcord use different scales, so they would not match",
+    "notRecommended": "Not recommended"
+  },
+  "selected_one": "{{count}} item selected",
+  "selected_other": "{{count}} items selected",
+  "import": "Import",
+  "importing": "Importing…",
+  "skip": "Skip for now",
+  "cancel": "Cancel",
+  "failed": "The import could not be finished. Please try again.",
+  "secureStorage": "Mumcord can't reach your system's secure storage. Unlock your keyring or password manager and try again.",
+  "settingsFailed": "Your servers were copied, but the settings could not be saved.",
+  "summary": {
+    "title": "Import finished",
+    "intro": "Your Mumble data was copied. Review what happened.",
+    "added_one": "{{count}} server added to favourites",
+    "added_other": "{{count}} servers added to favourites",
+    "skipped_one": "{{count}} server skipped",
+    "skipped_other": "{{count}} servers skipped",
+    "skippedDetail_one": "{{names}} is already in your list",
+    "skippedDetail_other": "{{names}} are already in your list",
+    "duplicate": "Duplicate",
+    "passwords_one": "{{count}} password saved",
+    "passwords_other": "{{count}} passwords saved",
+    "passwordsDetail": "Stored in the system keychain, not in a file",
+    "identity": "Identity imported",
+    "identityDefault": "Mumcord now uses it",
+    "identityServers": "Used for the copied servers",
+    "identitySkipped": "Identity already in Mumcord",
+    "identitySkippedDetail": "This certificate is already one of your identities",
+    "devicesAndPtt": "Audio devices and push-to-talk key",
+    "done": "Done",
+    "undo": "Undo import",
+    "undone": "The import was undone.",
+    "undoFailed": "The import could not be undone completely. Please check your servers and identities."
+  },
+  "settings": {
+    "title": "Import from Mumble",
+    "hint": "Copy server favourites, saved passwords, your certificate and audio settings from the official Mumble client.",
+    "button": "Import from Mumble…",
+    "searching": "Looking for Mumble…",
+    "notFound": "The official Mumble client was not found on this computer.",
+    "breadcrumb": "Settings · Servers · Import from Mumble"
+  }
+}

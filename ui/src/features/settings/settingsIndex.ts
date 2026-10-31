@@ -19,14 +19,18 @@ export interface SettingEntry {
 
 /** Static index of the settings screen; keep it in step with the section components. */
 export const SETTINGS_INDEX: readonly SettingEntry[] = [
-  { section: "identity", group: "identity.current", terms: ["identity.explanation"] },
   {
     section: "identity",
-    group: "identity.backup",
-    control: "identity.export",
-    terms: ["identity.exportHint"],
+    group: "identity.listTitle",
+    terms: ["identity.intro", "identity.backupWarning"],
   },
-  { section: "identity", group: "identity.backup", control: "identity.import" },
+  { section: "identity", group: "identity.listTitle", control: "identity.new" },
+  {
+    section: "identity",
+    group: "identity.listTitle",
+    control: "identity.import",
+    terms: ["identity.importTitle"],
+  },
   {
     section: "identity",
     group: "profile.title",
@@ -63,6 +67,19 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     group: "audio.quality",
     control: "audio.musicQuality",
     terms: ["audio.musicQualityHint"],
+  },
+  {
+    section: "audio",
+    group: "audio.quality",
+    control: "audio.lowLatency",
+    terms: [
+      "audio.lowLatencyHint",
+      "audio.lowLatencyWarningTitle",
+      "audio.lowLatencyBandwidth",
+      "audio.lowLatencyWifi",
+      "audio.lowLatencyHeadphones",
+      "audio.lowLatencyPtt",
+    ],
   },
   {
     section: "audio",
@@ -268,6 +285,18 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["language.system"],
     literals: Object.values(ENDONYMS),
   },
+  {
+    section: "sounds",
+    group: "dnd.title",
+    control: "dnd.label",
+    terms: ["dnd.description"],
+  },
+  {
+    section: "sounds",
+    group: "dnd.title",
+    control: "dnd.follow",
+    terms: ["dnd.followDescription"],
+  },
   { section: "sounds", control: "sounds.joinLeave" },
   { section: "sounds", control: "sounds.voiceJoin" },
   { section: "sounds", control: "sounds.selfMute" },
@@ -283,6 +312,8 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "sounds", control: "sounds.shareStopped" },
   { section: "sounds", control: "sounds.viewerStarted" },
   { section: "sounds", control: "sounds.viewerStopped" },
+  { section: "sounds", control: "sounds.kicked" },
+  { section: "sounds", control: "sounds.banned" },
   {
     section: "sounds",
     group: "notifications.title",
@@ -299,6 +330,30 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     group: "gamePlugins.title",
     terms: ["gamePlugins.explanation", "gamePlugins.antiCheat"],
   },
+  { section: "privacy", group: "blocked.title", terms: ["blocked.hint"] },
+  {
+    section: "privacy",
+    group: "blocked.messagesTitle",
+    terms: ["blocked.collapse", "blocked.hide"],
+  },
+  {
+    section: "privacy",
+    group: "privateMessages.title",
+    control: "privateMessages.legend",
+    terms: [
+      "privateMessages.everyone",
+      "privateMessages.friendsOnly",
+      "privateMessages.nobody",
+      "privateMessages.keepRequests",
+    ],
+  },
+  { section: "privacy", group: "privateMessages.overrideTitle" },
+  {
+    section: "privacy",
+    group: "privateMessages.alwaysTitle",
+    terms: ["privateMessages.currentChannel", "privateMessages.accepted"],
+  },
+  { section: "privacy", group: "acceptedConversations.title" },
   {
     section: "privacy",
     group: "privacyDirect.title",

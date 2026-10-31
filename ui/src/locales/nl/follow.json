@@ -12,9 +12,7 @@
     "generic": "Dit kanaal volgen is mislukt. Probeer het opnieuw."
   },
   "dm": {
-    "title": "Privéberichten",
-    "unknown": "Onbekende persoon",
-    "withServer": "{{name}}, op {{server}}"
+    "unknown": "Onbekende persoon"
   },
   "notify": {
     "channel": "{{name}} in {{channel}}: {{text}}",
@@ -54,5 +52,9 @@
     "dismiss": "Sluiten",
     "unfollowFailed": "Alle kanalen ontvolgen is mislukt. Probeer het opnieuw."
   },
-  "mention": "bevat een vermelding van jou"
+  "mention": "bevat een vermelding van jou",
+  "header": {
+    "follow": "Kanaal volgen",
+    "unfollow": "Volgend, klik om te ontvolgen"
+  }
 }

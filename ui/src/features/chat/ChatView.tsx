@@ -14,6 +14,7 @@ import { PreferencesContext } from "../../app/preferences";
 import { useSelectedConversation, useServerState } from "../channels";
 import { PrivatePresence, useFriend } from "../friends";
 import { useAvatars } from "../members/useAvatars";
+import { IdentityBadge } from "../servers/IdentityBadge";
 import { ActivityBanners } from "./ActivityBanners";
 import {
   conversationKey,
@@ -28,6 +29,7 @@ import { conversationInfo } from "./conversationInfo";
 import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
+import { useBlockedView } from "./blockedView";
 import { PinnedInfoBox, type PinnedBlock } from "./PinnedInfo";
 import { pinnedInfo } from "./pinnedInfoModel";
 import { descriptionKey, hideInfo, useHiddenHash, welcomeKey } from "./hiddenInfo";
@@ -41,9 +43,11 @@ const ANNOUNCE_CHARS = 200;
 export interface ChatViewProps {
   /** Extra header controls for the conversation, e.g. the Follow toggle (B22). */
   renderHeaderActions?: (conversation: Conversation) => ReactNode;
+  /** Replaces the plain title of a channel chat, e.g. with the channel-name menu (#170). */
+  renderChannelTitle?: (channelId: number) => ReactNode;
 }
 
-export function ChatView({ renderHeaderActions }: ChatViewProps) {
+export function ChatView({ renderHeaderActions, renderChannelTitle }: ChatViewProps) {
   const { t } = useTranslation("chat");
   const { conversation } = useSelectedConversation();
   if (conversation === null) {
@@ -58,6 +62,7 @@ export function ChatView({ renderHeaderActions }: ChatViewProps) {
       key={conversationKey(conversation)}
       conversation={conversation}
       renderHeaderActions={renderHeaderActions}
+      renderChannelTitle={renderChannelTitle}
     />
   );
 }
@@ -65,16 +70,23 @@ export function ChatView({ renderHeaderActions }: ChatViewProps) {
 interface ConversationChatProps {
   conversation: Conversation;
   renderHeaderActions: ChatViewProps["renderHeaderActions"];
+  renderChannelTitle: ChatViewProps["renderChannelTitle"];
 }
 
-function ConversationChat({ conversation, renderHeaderActions }: ConversationChatProps) {
+function ConversationChat({
+  conversation,
+  renderHeaderActions,
+  renderChannelTitle,
+}: ConversationChatProps) {
   const { t } = useTranslation("chat");
   const server = useServerState();
-  const log = useConversationLog(conversation);
-  const info = conversationInfo(server, conversation, log.messages);
+  const fullLog = useConversationLog(conversation);
+  const serverId = shownServerId();
+  const blocked = useBlockedView(fullLog, serverId, conversation);
+  const log = blocked.log;
+  const info = conversationInfo(server, conversation, fullLog.messages);
   const limits = useMemo(() => messageLimits(server.info), [server.info]);
   const pinnedChannelId = conversation.kind === "channel" ? conversation.channelId : null;
-  const serverId = shownServerId();
   const channelKey = descriptionKey(serverId, pinnedChannelId ?? -1);
   const hiddenWelcome = useHiddenHash(welcomeKey(serverId));
   const hiddenDescription = useHiddenHash(channelKey);
@@ -204,17 +216,22 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
   return (
     <div className="chat">
       <header className="chat-header">
-        <h2 className="chat-header__title">
-          {info.isChannel ? (
-            <span className="chat-header__hash" aria-hidden="true">
-              #
+        {conversation.kind === "channel" && renderChannelTitle ? (
+          renderChannelTitle(conversation.channelId)
+        ) : (
+          <h2 className="chat-header__title">
+            {info.isChannel ? (
+              <span className="chat-header__hash" aria-hidden="true">
+                #
+              </span>
+            ) : null}
+            <span className="visually-hidden">
+              {info.isChannel ? t("header.channelPrefix") : t("header.privatePrefix")}
             </span>
-          ) : null}
-          <span className="visually-hidden">
-            {info.isChannel ? t("header.channelPrefix") : t("header.privatePrefix")}
-          </span>
-          {name}
-        </h2>
+            {name}
+          </h2>
+        )}
+        <IdentityBadge className="chat-header__identity" />
         {!info.isChannel && (
           <PrivatePresence
             className="chat-header__presence"
@@ -247,6 +264,7 @@ function ConversationChat({ conversation, renderHeaderActions }: ConversationCha
         linkPreviews={linkPreviews}
         onReply={blockedReason === null ? setReplyTo : undefined}
         listKey={`${String(serverId)}:${JSON.stringify(conversation)}`}
+        collapsedIds={blocked.collapsedIds}
       />
       <Composer
         target={info.target}

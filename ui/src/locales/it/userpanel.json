@@ -8,7 +8,10 @@
     "muted": "Microfono disattivato",
     "unmuted": "Microfono attivato",
     "deafened": "Audio disattivato. Non senti gli altri e il tuo microfono è disattivato",
-    "undeafened": "Audio attivato"
+    "undeafened": "Audio attivato",
+    "leftVoice": "Voce lasciata su {{server}}",
+    "disconnected": "Disconnesso da {{server}}",
+    "disconnectedAll": "Disconnesso da tutti i server"
   },
   "readOnly": {
     "text": "Stai solo leggendo – entra in un canale per parlare.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Inserisci una password per proteggere il file di backup.",
     "exported": "Backup dell'identità salvato.",
     "confirm": "Registrati",
-    "done": "Registrato su questo server"
+    "done": "Registrato su questo server",
+    "identity": "Il nome registrato appartiene all'identità {{identity}}."
   },
   "errors": {
     "tooLarge": "È troppo grande per il server. Scegli un'immagine più piccola o scrivi un testo più breve.",
@@ -89,11 +93,54 @@
     "offerImages": "Offri immagini a dimensione intera",
     "offerImagesHint": "Permetti agli altri di caricare le tue immagini originali",
     "loadImages": "Carica immagini a dimensione intera",
-    "loadImagesHint": "Scarica le immagini originali degli altri"
+    "loadImagesHint": "Scarica le immagini originali degli altri",
+    "dnd": "Non disturbare",
+    "dndHint": "Silenzia suoni e banner delle notifiche",
+    "dndSystemHint": "Attivo tramite il Non disturbare del desktop",
+    "privateMessages": "Messaggi privati da",
+    "pm_everyone": "Tutti",
+    "pm_friendsOnly": "Amici",
+    "pm_nobody": "Nessuno"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",
     "server": "Voce: {{server}}",
     "show": "{{location}} – mostra questo server"
+  },
+  "disconnectMenu": {
+    "label": "Opzioni di disconnessione",
+    "open": "Altre opzioni di disconnessione",
+    "leaveVoice": "Lascia la voce",
+    "leaveVoiceHint": "Smetti di parlare e ascoltare, resta connesso per la chat",
+    "disconnectHint": "Chiudi la connessione a questo server",
+    "switchTo": "Sposta la voce su {{server}}",
+    "all": "Disconnetti da tutti i server…",
+    "allHint": "Chiudi tutte le connessioni ai server"
+  },
+  "disconnectAll": {
+    "title": "Disconnettere da tutti i server?",
+    "message": "Disconnettere da tutti i {{total}} server?",
+    "confirm": "Disconnetti"
+  },
+  "audio": {
+    "inputOptions": "Opzioni del microfono",
+    "outputOptions": "Opzioni degli altoparlanti",
+    "inputDevices": "Dispositivo di ingresso",
+    "outputDevices": "Dispositivo di uscita",
+    "systemDefault": "Predefinito di sistema",
+    "noDevices": "Nessun dispositivo trovato",
+    "noiseSuppression": "Riduzione del rumore",
+    "testSound": "Prova suono",
+    "voiceSettings": "Impostazioni vocali…",
+    "fallbackInput": "Microfono scollegato. Viene usato il predefinito di sistema.",
+    "fallbackOutput": "Dispositivo di uscita scollegato. Viene usato il predefinito di sistema.",
+    "volume": "Volume",
+    "level": "Livello"
+  },
+  "dnd": {
+    "label": "Non disturbare",
+    "manual": "manuale",
+    "system": "Non disturbare (sistema)",
+    "systemHint": "Disattivalo nelle impostazioni delle notifiche del desktop."
   }
 }

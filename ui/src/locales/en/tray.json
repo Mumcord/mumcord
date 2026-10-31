@@ -1,11 +1,23 @@
 {
-  "show": "Show Mumcord",
+  "show": "Open Mumcord",
+  "settings": "Settings…",
   "mute": "Mute",
   "deafen": "Deafen",
+  "dnd": "Do Not Disturb",
+  "dndSystem": "Do Not Disturb (system)",
   "quit": "Quit",
   "disconnected": "Not connected",
   "connecting": "Connecting…",
+  "reconnecting": "Reconnecting…",
   "connected": "Connected",
+  "connectedIn": "Connected · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Connected – talking",
-  "muted": "Connected – muted"
+  "muted": "Connected – muted",
+  "voiceMenu": "Voice server and channel",
+  "voiceServer": "Voice server",
+  "channelsOf": "Channels · {server}",
+  "moreChannels": "More channels in Mumcord…",
+  "recentChats": "Recent chats",
+  "chatUnread": "{name} – {count} unread"
 }

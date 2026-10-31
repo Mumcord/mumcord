@@ -11,5 +11,56 @@
   "open": "Open chat",
   "close": "Dismiss notification",
   "mentionLine": "{{sender}} mentioned you: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notifications",
+    "bellUnread_one": "Notifications, {{count}} unread",
+    "bellUnread_other": "Notifications, {{count}} unread",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Mark all as read",
+    "filterLabel": "Show notifications",
+    "filter": {
+      "all": "All",
+      "mentions": "Mentions",
+      "requests": "Requests",
+      "invites": "Invites"
+    },
+    "empty": "You're all caught up.",
+    "unread": "Unread",
+    "dndOn": "Do Not Disturb is on",
+    "dndOff": "Do Not Disturb is off",
+    "settings": "Notification settings",
+    "someone": "Someone",
+    "quoted": "“{{text}}”",
+    "mention": "{{name}} mentioned you",
+    "mentionGroup": "{{name}} mentioned everyone",
+    "reply": "{{name}} replied to your message",
+    "chatRequest": "{{name}} wants to chat with you",
+    "messageRequest": "Message request from {{name}}",
+    "messageRequestBody_one": "{{count}} message from a standard Mumble client",
+    "messageRequestBody_other": "{{count}} messages from a standard Mumble client",
+    "invite": {
+      "watchParty": "{{name}} invited you to a watch party",
+      "screenShare": "{{name}} is sharing their screen",
+      "card": "{{name}} sent you a card",
+      "theme": "{{name}} shared a theme with you"
+    },
+    "connection": "{{server}} unreachable",
+    "type": {
+      "chatRequest": "Chat request",
+      "messageRequest": "Message request",
+      "invite": "Invite",
+      "private": "Private message",
+      "connection": "Connection"
+    },
+    "accept": "Accept",
+    "decline": "Decline",
+    "join": "Join",
+    "watch": "Watch",
+    "open": "Open",
+    "dismiss": "Dismiss",
+    "dismissItem": "Dismiss: {{title}}",
+    "failed": "That did not work. Please try again.",
+    "block": "Block"
+  }
 }

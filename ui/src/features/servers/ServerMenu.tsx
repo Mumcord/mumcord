@@ -1,4 +1,4 @@
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useRef, type KeyboardEvent, type ReactNode } from "react";
 
 export interface MenuItem {
   id: string;
@@ -8,6 +8,12 @@ export interface MenuItem {
   checked?: boolean;
   /** Shown but not usable yet; stays focusable so screen readers can find it. */
   disabled?: boolean;
+  /** Decorative icon before the label. */
+  icon?: ReactNode;
+  /** Short state at the end of the row, e.g. "Following". */
+  hint?: string;
+  /** Draws a divider above the item. */
+  separatorBefore?: boolean;
   onSelect: () => void;
 }
 
@@ -77,25 +83,33 @@ export function ServerMenu({ label, items, position, onClose }: ServerMenuProps)
       onKeyDown={onKeyDown}
     >
       {items.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          role={item.checked === undefined ? "menuitem" : "menuitemcheckbox"}
-          aria-checked={item.checked}
-          aria-disabled={item.disabled}
-          tabIndex={-1}
-          className={
-            item.danger ? "server-menu__item server-menu__item--danger" : "server-menu__item"
-          }
-          onClick={item.disabled ? undefined : item.onSelect}
-        >
-          {item.checked === undefined ? null : (
-            <span className="server-menu__check" aria-hidden="true">
-              {item.checked ? "✓" : ""}
-            </span>
-          )}
-          {item.label}
-        </button>
+        <Fragment key={item.id}>
+          {item.separatorBefore && <div role="separator" className="server-menu__separator" />}
+          <button
+            type="button"
+            role={item.checked === undefined ? "menuitem" : "menuitemcheckbox"}
+            aria-checked={item.checked}
+            aria-disabled={item.disabled}
+            tabIndex={-1}
+            className={
+              item.danger ? "server-menu__item server-menu__item--danger" : "server-menu__item"
+            }
+            onClick={item.disabled ? undefined : item.onSelect}
+          >
+            {item.checked === undefined ? null : (
+              <span className="server-menu__check" aria-hidden="true">
+                {item.checked ? "✓" : ""}
+              </span>
+            )}
+            {item.icon && (
+              <span className="server-menu__icon" aria-hidden="true">
+                {item.icon}
+              </span>
+            )}
+            {item.label}
+            {item.hint && <span className="server-menu__end">{item.hint}</span>}
+          </button>
+        </Fragment>
       ))}
     </div>
   );

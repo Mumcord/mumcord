@@ -9,6 +9,7 @@ mod deeplink;
 #[cfg(target_os = "linux")]
 mod desktop_entry;
 mod display;
+mod dnd;
 #[cfg(target_os = "linux")]
 mod gst_fallback;
 mod ingame_overlay;
@@ -36,8 +37,9 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, channels, chat, diagnostics, dropped, follow, friends, history, identity, links,
-    notifications as notify, people, profile, servers, session, settings,
+    app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow, friends,
+    history, identity, links, mumble_import, notifications as notify, people, pm_overview,
+    pm_rules, profile, servers, session, settings,
 };
 
 /// Path of the generated TypeScript bindings, relative to this crate.
@@ -56,16 +58,26 @@ fn specta_builder() -> Builder<tauri::Wry> {
         .disable_serde_phases()
         .commands(collect_commands![
             identity::identity_get,
+            identity::identity_list,
             identity::identity_create,
             identity::identity_import,
+            identity::identity_rename,
             identity::identity_export,
+            identity::identity_delete,
+            identity::identity_set_default,
+            identity::server_set_identity,
+            mumble_import::mumble_import_scan,
+            mumble_import::mumble_import_apply,
+            mumble_import::mumble_import_undo,
             servers::servers_list,
             servers::server_add,
+            servers::server_test_connection,
             servers::server_update,
             servers::server_remove,
             servers::servers_reorder,
             servers::server_set_always_connect,
             servers::server_set_notifications_muted,
+            servers::server_set_group_mentions_muted,
             servers::server_set_theme,
             servers::parse_mumble_link,
             session::connect,
@@ -75,15 +87,18 @@ fn specta_builder() -> Builder<tauri::Wry> {
             session::voice_server_get,
             session::session_snapshot,
             session::connection_stats,
+            session::latency_estimate,
             session::cert_trust_decide,
             session::set_self_mute,
             session::set_self_deaf,
             channels::channel_join,
+            channels::voice_leave,
             channels::channel_join_with_password,
             channels::channel_passwords,
             channels::channel_password_rename,
             channels::channel_passwords_remove,
             channels::channel_description_request,
+            people::person_move,
             people::person_set_volume,
             people::person_set_local_mute,
             people::person_set_note,
@@ -91,6 +106,21 @@ fn specta_builder() -> Builder<tauri::Wry> {
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,
+            pm_rules::pm_requests,
+            pm_rules::pm_request_accept,
+            pm_rules::pm_request_decline,
+            pm_rules::chat_request_send,
+            pm_rules::accepted_conversations,
+            pm_rules::accepted_conversation_revoke,
+            blocking::blocked_users,
+            blocking::block_user,
+            blocking::block_cert,
+            blocking::unblock,
+            pm_overview::private_conversations,
+            pm_overview::pm_conversation_prefs,
+            pm_overview::pm_conversation_set_pinned,
+            pm_overview::pm_conversation_mute,
+            pm_overview::pm_conversation_unmute,
             chat::send_channel_message,
             chat::send_private_message,
             chat::save_image,
@@ -105,7 +135,14 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::full_image::full_image_cancel,
             links::link_preview,
             links::open_link,
+            links::mumble_link_stats,
+            links::mumble_link_join,
+            commands::public_servers::public_servers_list,
+            commands::public_servers::public_server_ping,
             links::inline_image,
+            links::audio_info,
+            links::audio_file,
+            links::audio_save,
             links::preview_dismiss,
             links::embed_player_open,
             links::embed_player_close,
@@ -123,6 +160,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::conversation_mark_read,
             history::history_load,
             history::history_clear,
+            history::history_cleared_at,
             history::history_set_saving,
             history::history_sync_request,
             profile::set_own_avatar,
@@ -134,9 +172,15 @@ fn specta_builder() -> Builder<tauri::Wry> {
             settings::settings_update,
             settings::window_overlay_notice_pending,
             settings::window_overlay_notice_dismiss,
+            settings::audio_device_notice_pending,
+            settings::audio_device_notice_dismiss,
             audio::audio_devices,
             audio::bitrate_max,
+            channel_audio::channel_audio_profiles,
+            channel_audio::channel_audio_profile_set,
+            channel_audio::active_audio_profile,
             audio::mic_test_start,
+            audio::audio_test_sound,
             audio::mic_test_stop,
             commands::ptt::ptt_availability,
             commands::ptt::ptt_capture_key,
@@ -155,6 +199,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             diagnostics::diagnostics_save,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,
+            commands::inspector::packet_capture_background,
             commands::inspector::packet_capture_poll,
             commands::inspector::packet_capture_clear,
             commands::inspector::packet_capture_export,
@@ -170,7 +215,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::changelog::changelog_close,
             commands::changelog::whats_new_mark_seen,
             notify::notify_message,
+            commands::dnd::dnd_state,
+            commands::dnd::dnd_set,
+            commands::dnd::dnd_set_follow_system,
             notify::notification_dismiss,
+            commands::tray::tray_attention_set,
             commands::now_playing::now_playing_status,
             commands::now_playing::now_playing_cover,
             commands::now_gaming::now_gaming_status,
@@ -224,6 +273,10 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::UserRemoved,
             people::TalkStateChanged,
             friends::FriendsChanged,
+            pm_rules::PmRequestsChanged,
+            pm_rules::AcceptedConversationsChanged,
+            blocking::BlockedUsersChanged,
+            pm_overview::PmConversationPrefsChanged,
             chat::MessageReceived,
             history::HistorySynced,
             history::HistorySyncStatus,
@@ -231,12 +284,17 @@ fn specta_builder() -> Builder<tauri::Wry> {
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
+            audio::AudioDeviceFallback,
             audio::BitrateMaxChanged,
+            channel_audio::ChannelAudioProfilesChanged,
+            channel_audio::ActiveAudioProfileChanged,
             audio::MicLevel,
             audio::MicTestPhaseChanged,
             app::CloseRequested,
             profile::DefaultAvatarSkipped,
+            identity::ServerIdentityMissing,
             notify::NotificationActivated,
+            commands::dnd::DndChanged,
             commands::now_playing::NowPlayingChanged,
             commands::now_gaming::NowGamingChanged,
             commands::positional::PositionalStatusChanged,
@@ -250,6 +308,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::updates::UpdateAvailable,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
+            commands::tray::TraySettingsRequested,
         ])
 }
 
@@ -319,12 +378,14 @@ pub fn run() {
         .manage(dropped::DroppedFiles::default())
         .manage(aux_window::OpenLock::default())
         .manage(commands::inspector::SharedView::default())
+        .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())
         .manage(watch_player::PlayerServer::default())
         .on_window_event(|window, event| {
             dropped::on_window_event(window, event);
             window::on_window_event(window, event);
             aux_window::on_window_event(window, event);
+            commands::inspector::on_window_event(window, event);
         })
         .setup(move |app| {
             builder.mount_events(app);
@@ -334,6 +395,7 @@ pub fn run() {
             start_engine(app.handle())?;
             start_window_and_autostart(app.handle());
             tray::init(app.handle());
+            dnd::init(app.handle());
             ingame_overlay_init(app.handle());
             deeplink::init(app.handle());
             #[cfg(target_os = "linux")]
@@ -489,7 +551,7 @@ fn emit_engine_event(
     server_id: commands::types::ServerId,
     event: EngineEvent,
 ) -> tauri::Result<()> {
-    tray::on_engine_event(app, &event);
+    tray::on_engine_event(app, server_id, &event);
     notifications::on_engine_event(app, server_id, &event);
     if let (Some(runtime), Some(engine)) = (
         app.try_state::<ingame_overlay::Runtime>(),
@@ -579,10 +641,26 @@ fn emit_engine_event(
             devices: devices.into(),
         }
         .emit(app),
+        EngineEvent::AudioDeviceFallback { input } => {
+            audio::AudioDeviceFallback { input }.emit(app)
+        }
         EngineEvent::BitrateMaxChanged(max_bps) => audio::BitrateMaxChanged {
             kbps: max_bps.map(|b| b / 1000),
         }
         .emit(app),
+        EngineEvent::ChannelAudioProfilesChanged(profiles) => {
+            channel_audio::ChannelAudioProfilesChanged {
+                server_id,
+                profiles: profiles.into_iter().map(Into::into).collect(),
+            }
+            .emit(app)
+        }
+        EngineEvent::ActiveAudioProfileChanged(active) => {
+            channel_audio::ActiveAudioProfileChanged {
+                active: active.map(Into::into),
+            }
+            .emit(app)
+        }
         EngineEvent::MicLevel(level) => audio::MicLevel { level }.emit(app),
         EngineEvent::MicTestPhaseChanged(phase) => audio::MicTestPhaseChanged {
             phase: phase.into(),
@@ -600,6 +678,10 @@ fn emit_engine_event(
         }
         .emit(app),
         EngineEvent::DefaultAvatarSkipped { server_id } => profile::DefaultAvatarSkipped {
+            server_id: commands::types::to_api_server_id(server_id),
+        }
+        .emit(app),
+        EngineEvent::ServerIdentityMissing { server_id } => identity::ServerIdentityMissing {
             server_id: commands::types::to_api_server_id(server_id),
         }
         .emit(app),
@@ -639,6 +721,23 @@ fn emit_engine_event(
         .emit(app),
         EngineEvent::FriendsChanged(list) => friends::FriendsChanged {
             friends: friends::to_api_friends(list),
+        }
+        .emit(app),
+        EngineEvent::PmRequestsChanged(requests) => pm_rules::PmRequestsChanged {
+            server_id,
+            requests: requests.into(),
+        }
+        .emit(app),
+        EngineEvent::AcceptedConversationsChanged(list) => pm_rules::AcceptedConversationsChanged {
+            conversations: pm_rules::to_api_accepted(list),
+        }
+        .emit(app),
+        EngineEvent::BlockedUsersChanged(list) => blocking::BlockedUsersChanged {
+            users: blocking::to_api_blocked(list),
+        }
+        .emit(app),
+        EngineEvent::PmConversationPrefsChanged(list) => pm_overview::PmConversationPrefsChanged {
+            prefs: pm_overview::to_api_prefs(list),
         }
         .emit(app),
         EngineEvent::DirectConsentRequired => {

@@ -1,19 +1,33 @@
 /**
  * Which links of a message get a preview card, which images are shown inline, the shared
- * lookups and the rules for embedding video players (FR-1.49, FR-1.50, FR-1.55).
+ * lookups and the rules for embedding video and music players (FR-1.49, FR-1.50, FR-1.55,
+ * issues #260 and #262).
  */
-import { getApi, type InlineImage, type LinkPreview, type VideoEmbed } from "../../api";
+import {
+  getApi,
+  type AudioInfo,
+  type InlineImage,
+  type LinkPreview,
+  type MumbleLinkStats,
+  type MusicEmbed,
+  type VideoEmbed,
+} from "../../api";
 
 /** More cards than this per message would bury the conversation. */
 export const MAX_PREVIEWS = 3;
 
-/** Origins the embedded players may load from: Spotify in the app window (CSP `frame-src`), the
- * others in the loopback player page. */
+/** Origins the embedded video players may load from, all in the loopback player page. */
 const PLAYER_ORIGINS = new Set([
   "https://www.youtube-nocookie.com",
   "https://player.twitch.tv",
   "https://clips.twitch.tv",
-  "https://open.spotify.com",
+]);
+
+/** Music embeds that run in the app window, by origin, with the only path the CSP `frame-src`
+ * allows there. */
+const DIRECT_MUSIC_PLAYERS = new Map([
+  ["https://open.spotify.com", "/embed/"],
+  ["https://w.soundcloud.com", "/player/"],
 ]);
 
 /** Distinct http(s) link targets of sanitized message HTML, in order, at most {@link MAX_PREVIEWS}. */
@@ -54,6 +68,15 @@ export function externalImages(html: string): string[] {
     if (images.length === MAX_PREVIEWS) break;
   }
   return images;
+}
+
+/** Direct audio links: the path ends in an audio file extension (issue #260). */
+export function isAudioLink(url: string): boolean {
+  try {
+    return /\.(?:mp3|ogg|oga|opus|m4a|aac|wav|flac|weba|webm)$/i.test(new URL(url).pathname);
+  } catch {
+    return false;
+  }
 }
 
 /** File name of the image link for labels, or its host when the path has none. */
@@ -107,6 +130,7 @@ function memoized<T>(
 
 const previews = new Map<string, Promise<LinkPreview | null>>();
 const images = new Map<string, Promise<InlineImage | null>>();
+const audio = new Map<string, Promise<AudioInfo | null>>();
 
 /** Only images the engine produced; anything else would make the webview load from the web. */
 export function safeImage(src: string | null): string | null {
@@ -123,32 +147,79 @@ export function loadInlineImage(url: string): Promise<InlineImage | null> {
   return memoized(images, url, "an inline image", () => getApi().inlineImage(url));
 }
 
-/** Forgets loaded previews and images (tests). */
+/**
+ * Format and size of a direct audio link, asked once per app run; `refresh` asks again (the
+ * card's Try again). The file itself is only fetched on play ({@link loadAudioFile}).
+ */
+export function loadAudioInfo(url: string, refresh = false): Promise<AudioInfo | null> {
+  if (refresh) audio.delete(url);
+  return memoized(audio, url, "audio file details", () => getApi().audioInfo(url));
+}
+
+/** The audio file as a `data:` URL, fetched by the engine; not kept, it can be large. */
+export async function loadAudioFile(url: string): Promise<string | null> {
+  try {
+    const dataUrl = await getApi().audioFile(url);
+    return dataUrl !== null && /^data:audio\/[a-z0-9.+-]+;base64,/.test(dataUrl) ? dataUrl : null;
+  } catch (error: unknown) {
+    console.error("Loading an audio file failed", error);
+    return null;
+  }
+}
+
+const cards = new Map<string, Promise<MumbleLinkStats | null>>();
+
+/** The figures the engine's query answers for one link, asked once per link (issue #175). */
+export function loadMumbleStats(url: string, refresh = false): Promise<MumbleLinkStats | null> {
+  if (refresh) cards.delete(url);
+  return memoized(cards, url, "the figures of a chat link", () =>
+    getApi().mumbleLinkStats(url, refresh),
+  );
+}
+
+/** Forgets loaded previews, images and query answers (tests). */
 export function clearPreviews(): void {
   previews.clear();
   images.clear();
+  audio.clear();
+  cards.clear();
 }
 
 /**
- * How a card's player runs: Spotify's embed directly in the app window (it needs no referrer, so
- * it also runs on Tauri's custom `tauri://` scheme); YouTube and Twitch through the app's
- * loopback player page (FR-2.41a), because YouTube refuses to play without an http(s) referrer
- * and Twitch only accepts an https or `localhost` parent.
+ * How a card's player runs: Spotify's and SoundCloud's embeds directly in the app window (they
+ * need no referrer, so they also run on Tauri's custom `tauri://` scheme); YouTube (also for
+ * YouTube Music) and Twitch through the app's loopback player page (FR-2.41a), because YouTube
+ * refuses to play without an http(s) referrer and Twitch only accepts an https or `localhost`
+ * parent.
  */
 export type CardPlayer = { via: "direct" | "page"; url: string };
 
-/** The player of a video card, or `null` when the URL is not one of the known players. */
-export function cardPlayer(video: VideoEmbed): CardPlayer | null {
-  let url: URL;
+function parseUrl(text: string): URL | null {
   try {
-    url = new URL(video.playerUrl);
+    return new URL(text);
   } catch {
     return null;
   }
-  if (!PLAYER_ORIGINS.has(url.origin)) return null;
-  if (url.origin === "https://open.spotify.com") {
-    // Only the embed path is in the CSP; the rest of open.spotify.com is not a player.
-    return url.pathname.startsWith("/embed/") ? { via: "direct", url: url.toString() } : null;
+}
+
+/** The player of a video card, or `null` when the URL is not one of the known players. */
+export function cardPlayer(video: VideoEmbed): CardPlayer | null {
+  const url = parseUrl(video.playerUrl);
+  return url !== null && PLAYER_ORIGINS.has(url.origin)
+    ? { via: "page", url: url.toString() }
+    : null;
+}
+
+/** The official embed of a music card, or `null` when it has none or the URL is not one of the
+ * known players (issue #262). */
+export function musicPlayer(music: MusicEmbed): CardPlayer | null {
+  const url = music.playerUrl === null ? null : parseUrl(music.playerUrl);
+  if (url === null) return null;
+  const path = DIRECT_MUSIC_PLAYERS.get(url.origin);
+  if (path !== undefined) {
+    return url.pathname.startsWith(path) ? { via: "direct", url: url.toString() } : null;
   }
-  return { via: "page", url: url.toString() };
+  return music.service === "youtubeMusic" && url.origin === "https://www.youtube-nocookie.com"
+    ? { via: "page", url: url.toString() }
+    : null;
 }

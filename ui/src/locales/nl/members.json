@@ -55,10 +55,14 @@
   "menu": {
     "label": "Acties voor {{name}}",
     "viewProfile": "Profiel bekijken",
+    "sendMessage": "Bericht sturen",
     "join": "Naar {{channel}} gaan",
-    "joinDenied": "Je mag dit kanaal niet betreden.",
+    "joinFull": "Dit kanaal is vol.",
+    "joinLocked": "Je mag dit kanaal niet betreden, of het vraagt om een wachtwoord.",
     "mute": "Voor mij dempen",
-    "connectionInfo": "Verbindingsinfo…"
+    "connectionInfo": "Verbindingsinfo…",
+    "chatRequestPending": "Chatverzoek in behandeling",
+    "revokeConsent": "Chattoestemming intrekken…"
   },
   "nowPlaying": {
     "label": "Speelt nu",
@@ -83,5 +87,53 @@
   "preview": {
     "privateMessage": "Privébericht",
     "fullProfile": "Volledig profiel"
+  },
+  "chatRequest": {
+    "title": "Chatverzoek aan {{name}}",
+    "note": "Notitie (optioneel)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} van {{max}} tekens gebruikt",
+    "send": "Verzenden",
+    "failed": "Het chatverzoek kon niet worden verzonden. Probeer het opnieuw."
+  },
+  "toggle": {
+    "show": "Leden tonen",
+    "hide": "Leden verbergen",
+    "showCount_one": "Leden tonen ({{count}})",
+    "showCount_other": "Leden tonen ({{count}})",
+    "talkingOne": "{{name}} praat",
+    "talkingTwo": "{{first}} en {{second}} praten",
+    "talkingMore_one": "{{name}} en {{count}} ander praten",
+    "talkingMore_other": "{{name}} en {{count}} anderen praten",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Chattoestemming voor {{name}} intrekken?",
+    "message": "{{name}} moet opnieuw een berichtverzoek sturen voordat de berichten je weer bereiken. Je chatgeschiedenis blijft bewaard.",
+    "confirm": "Intrekken",
+    "failed": "Het intrekken van de chattoestemming is mislukt. Probeer het opnieuw."
+  },
+  "block": {
+    "menu": "Blokkeren…",
+    "unblock": "Deblokkeren",
+    "title": "{{name}} blokkeren?",
+    "onServer": "op {{server}}",
+    "whatHappens": "Wat er gebeurt",
+    "private": "Privéberichten van {{name}} worden niet getoond en geven geen melding.",
+    "channelCollapsed": "Kanaalberichten van {{name}} zijn ingeklapt. Je kunt ze nog steeds openen.",
+    "channelHidden": "Kanaalberichten van {{name}} worden verborgen.",
+    "voice": "{{name}} is voor jou gedempt in spraak, inclusief gefluister.",
+    "data": "Geen geschiedenissynchronisatie, uitnodigingen of andere Mumcord-gegevens van {{name}}.",
+    "followsCert": "De blokkade volgt het certificaat van {{name}}, dus een nieuwe naam omzeilt hem niet.",
+    "nameOnly": "{{name}} heeft geen certificaat, dus de blokkade geldt alleen voor deze naam op {{server}}.",
+    "warning": "{{name}} kan je nog steeds zien en je berichten lezen. Mumble biedt geen manier om dat alleen aan jouw kant te voorkomen. {{name}} krijgt geen melding van de blokkade.",
+    "cancel": "Annuleren",
+    "confirm": "{{name}} blokkeren",
+    "done": "{{name}} is geblokkeerd.",
+    "failed": "{{name}} blokkeren is mislukt. Probeer het opnieuw.",
+    "badge": "Geblokkeerd",
+    "collapsed": "Bericht van een geblokkeerde gebruiker",
+    "show": "Tonen",
+    "showLabel": "Bericht van een geblokkeerde gebruiker tonen"
   }
 }

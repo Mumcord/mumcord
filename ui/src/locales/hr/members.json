@@ -56,10 +56,14 @@
   "menu": {
     "label": "Radnje za {{name}}",
     "viewProfile": "Pogledaj profil",
+    "sendMessage": "Pošalji poruku",
     "join": "Pridruži se kanalu {{channel}}",
-    "joinDenied": "Nemate dopuštenje za ulazak u ovaj kanal.",
+    "joinFull": "Ovaj kanal je pun.",
+    "joinLocked": "Ne smiješ ući u ovaj kanal ili je potrebna lozinka.",
     "mute": "Utišaj za mene",
-    "connectionInfo": "Informacije o vezi…"
+    "connectionInfo": "Informacije o vezi…",
+    "chatRequestPending": "Zahtjev za razgovor na čekanju",
+    "revokeConsent": "Opozovi pristanak na chat…"
   },
   "nowPlaying": {
     "label": "Trenutno svira",
@@ -85,5 +89,55 @@
   "preview": {
     "privateMessage": "Privatna poruka",
     "fullProfile": "Cijeli profil"
+  },
+  "chatRequest": {
+    "title": "Zahtjev za razgovor korisniku {{name}}",
+    "note": "Bilješka (neobavezno)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Iskorišteno {{count}} od {{max}} znakova",
+    "send": "Pošalji",
+    "failed": "Zahtjev za razgovor nije bilo moguće poslati. Pokušaj ponovno."
+  },
+  "toggle": {
+    "show": "Prikaži članove",
+    "hide": "Sakrij članove",
+    "showCount_one": "Prikaži članove ({{count}})",
+    "showCount_few": "Prikaži članove ({{count}})",
+    "showCount_other": "Prikaži članove ({{count}})",
+    "talkingOne": "{{name}} govori",
+    "talkingTwo": "{{first}} i {{second}} govore",
+    "talkingMore_one": "{{name}} i još {{count}} govore",
+    "talkingMore_few": "{{name}} i još {{count}} govore",
+    "talkingMore_other": "{{name}} i još {{count}} govore",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Opozvati pristanak na chat za {{name}}?",
+    "message": "{{name}} morat će ponovno poslati zahtjev za poruku prije nego što ti poruke opet stignu. Povijest chata ostaje.",
+    "confirm": "Opozovi",
+    "failed": "Opoziv pristanka na chat nije uspio. Pokušaj ponovno."
+  },
+  "block": {
+    "menu": "Blokiraj…",
+    "unblock": "Odblokiraj",
+    "title": "Blokirati korisnika {{name}}?",
+    "onServer": "na poslužitelju {{server}}",
+    "whatHappens": "Što se događa",
+    "private": "Privatne poruke korisnika {{name}} ne prikazuju se i ne šalju ti obavijest.",
+    "channelCollapsed": "Poruke korisnika {{name}} u kanalu su sažete. I dalje ih možeš otvoriti.",
+    "channelHidden": "Poruke korisnika {{name}} u kanalu su skrivene.",
+    "voice": "Korisnik {{name}} je za tebe utišan u glasovnom razgovoru, uključujući šaptanje.",
+    "data": "Nema sinkronizacije povijesti, pozivnica ni drugih Mumcord podataka od korisnika {{name}}.",
+    "followsCert": "Blokada prati certifikat korisnika {{name}}, pa je novo ime ne zaobilazi.",
+    "nameOnly": "Korisnik {{name}} nema certifikat, pa se blokada odnosi samo na ovo ime na poslužitelju {{server}}.",
+    "warning": "Korisnik {{name}} i dalje te vidi i može čitati tvoje poruke. Mumble nema način da to spriječi samo s tvoje strane. Korisnik {{name}} ne dobiva obavijest o blokadi.",
+    "cancel": "Odustani",
+    "confirm": "Blokiraj korisnika {{name}}",
+    "done": "Korisnik {{name}} je blokiran.",
+    "failed": "Blokiranje korisnika {{name}} nije uspjelo. Pokušaj ponovno.",
+    "badge": "Blokiran",
+    "collapsed": "Poruka blokiranog korisnika",
+    "show": "Prikaži",
+    "showLabel": "Prikaži poruku blokiranog korisnika"
   }
 }

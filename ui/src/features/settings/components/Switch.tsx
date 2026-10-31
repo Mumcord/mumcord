@@ -1,4 +1,5 @@
 import { useId, type Ref } from "react";
+import { InfoTip } from "../../../components/InfoTip";
 
 interface SwitchProps {
   label: string;
@@ -6,6 +7,10 @@ interface SwitchProps {
   onChange: (checked: boolean) => void;
   description?: string;
   disabled?: boolean;
+  /** Short tag next to the label, e.g. "Beta". */
+  badge?: string;
+  /** Explains the switch behind a "?" button instead of a line of text. */
+  tip?: { label: string; text: string };
   /** Lets the caller focus the switch, e.g. when another section links to it. */
   inputRef?: Ref<HTMLInputElement>;
 }
@@ -17,6 +22,8 @@ export function Switch({
   onChange,
   description,
   disabled = false,
+  badge,
+  tip,
   inputRef,
 }: SwitchProps) {
   const id = useId();
@@ -25,6 +32,8 @@ export function Switch({
     <div className="settings-switch">
       <div className="settings-switch__text">
         <label htmlFor={id}>{label}</label>
+        {badge !== undefined && <span className="settings-switch__badge">{badge}</span>}
+        {tip !== undefined && <InfoTip label={tip.label} text={tip.text} />}
         {description !== undefined && (
           <p id={descriptionId} className="settings-hint">
             {description}

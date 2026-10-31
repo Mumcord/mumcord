@@ -109,7 +109,7 @@ async fn person_volume_scales_their_voice() {
     )
     .expect("engine");
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let server = engine

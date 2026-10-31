@@ -2,7 +2,14 @@
  * Small context menu (chat images and messages, theme cards): positioned at the pointer, kept
  * inside the window, arrow keys between items, Escape or Tab closes it and returns the focus.
  */
-import { useEffect, useLayoutEffect, useRef, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 
 /** Gap kept between the menu and the window edge. */
@@ -18,6 +25,16 @@ export interface MenuPosition {
 
 export interface MenuItem {
   label: string;
+  /** Second line under the label; read as the item's description, not as part of its name. */
+  hint?: string;
+  /** SVG path (24x24 grid) drawn before the label, so meaning never rests on colour alone. */
+  icon?: string;
+  /** Marks a destructive action. */
+  danger?: boolean;
+  /** Shown but not available; stays reachable with the arrow keys so it can be read. */
+  disabled?: boolean;
+  /** Selecting it opens another menu: shows an arrow and announces the popup. */
+  submenu?: boolean;
   onSelect: () => void;
 }
 
@@ -26,6 +43,8 @@ export interface ContextMenuProps {
   /** Accessible name of the menu. */
   label: string;
   items: readonly MenuItem[];
+  /** Shown above the items, e.g. who the menu is about; not an item itself. */
+  header?: ReactNode;
   onClose: () => void;
 }
 
@@ -45,8 +64,9 @@ function restoreSelection(ranges: readonly Range[]) {
   for (const range of ranges) selection.addRange(range);
 }
 
-export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
+export function ContextMenu({ menu, label, items, header, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const idBase = useId();
   // Focusing a menu button (or the opener again on close) collapses the selection in some
   // webviews, which made selected text look unselected while the menu was open (#135).
   const selection = useRef<Range[]>([]);
@@ -124,22 +144,62 @@ export function ContextMenu({ menu, label, items, onClose }: ContextMenuProps) {
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
-      {items.map((item) => (
-        <button
-          key={item.label}
-          type="button"
-          role="menuitem"
-          tabIndex={-1}
-          className="server-menu__item"
-          onClick={() => {
-            close(true);
-            restoreSelection(selection.current);
-            item.onSelect();
-          }}
-        >
-          {item.label}
-        </button>
-      ))}
+      {header}
+      {items.map((item, index) => {
+        const labelId = `${idBase}-label-${String(index)}`;
+        const hintId = `${idBase}-hint-${String(index)}`;
+        return (
+          <button
+            key={item.label}
+            type="button"
+            role="menuitem"
+            tabIndex={-1}
+            className={`server-menu__item${item.danger ? " server-menu__item--danger" : ""}`}
+            aria-labelledby={item.hint ? labelId : undefined}
+            aria-describedby={item.hint ? hintId : undefined}
+            aria-disabled={item.disabled === true ? true : undefined}
+            aria-haspopup={item.submenu === true ? "menu" : undefined}
+            onClick={() => {
+              if (item.disabled === true) return;
+              close(true);
+              restoreSelection(selection.current);
+              item.onSelect();
+            }}
+          >
+            {item.icon ? (
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                <path
+                  d={item.icon}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ) : null}
+            <span className="server-menu__text">
+              <span id={labelId}>{item.label}</span>
+              {item.hint ? (
+                <span id={hintId} className="server-menu__hint">
+                  {item.hint}
+                </span>
+              ) : null}
+            </span>
+            {item.submenu === true ? (
+              <svg
+                className="server-menu__submenu"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            ) : null}
+          </button>
+        );
+      })}
     </div>,
     document.body,
   );

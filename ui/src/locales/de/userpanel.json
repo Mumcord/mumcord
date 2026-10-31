@@ -8,7 +8,10 @@
     "muted": "Mikrofon stummgeschaltet",
     "unmuted": "Mikrofon wieder aktiv",
     "deafened": "Taubgeschaltet. Du hörst niemanden und dein Mikrofon ist stumm",
-    "undeafened": "Taubschaltung aufgehoben"
+    "undeafened": "Taubschaltung aufgehoben",
+    "leftVoice": "Sprache auf {{server}} verlassen",
+    "disconnected": "Von {{server}} getrennt",
+    "disconnectedAll": "Von allen Servern getrennt"
   },
   "readOnly": {
     "text": "Du liest nur mit – tritt einem Kanal bei, um zu sprechen.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Gib ein Passwort ein, um die Sicherungsdatei zu schützen.",
     "exported": "Identitätssicherung gespeichert.",
     "confirm": "Registrieren",
-    "done": "Auf diesem Server registriert"
+    "done": "Auf diesem Server registriert",
+    "identity": "Der registrierte Name gehört zur Identität {{identity}}."
   },
   "errors": {
     "tooLarge": "Das ist zu groß für den Server. Wähle ein kleineres Bild oder schreibe einen kürzeren Text.",
@@ -89,11 +93,54 @@
     "offerImages": "Originalbilder anbieten",
     "offerImagesHint": "Andere dürfen deine Originalbilder laden",
     "loadImages": "Originalbilder laden",
-    "loadImagesHint": "Originalbilder von anderen abrufen"
+    "loadImagesHint": "Originalbilder von anderen abrufen",
+    "dnd": "Nicht stören",
+    "dndHint": "Stellt Benachrichtigungstöne und -banner stumm",
+    "dndSystemHint": "An über „Nicht stören“ deines Desktops",
+    "privateMessages": "Private Nachrichten von",
+    "pm_everyone": "Alle",
+    "pm_friendsOnly": "Freunde",
+    "pm_nobody": "Niemand"
   },
   "voice": {
     "line": "Sprache: {{channel}} · {{server}}",
     "server": "Sprache: {{server}}",
     "show": "{{location}} – diesen Server anzeigen"
+  },
+  "disconnectMenu": {
+    "label": "Trennen-Optionen",
+    "open": "Weitere Trennen-Optionen",
+    "leaveVoice": "Sprache verlassen",
+    "leaveVoiceHint": "Nicht mehr sprechen und hören, für den Chat verbunden bleiben",
+    "disconnectHint": "Die Verbindung zu diesem Server schließen",
+    "switchTo": "Sprache zu {{server}} wechseln",
+    "all": "Von allen Servern trennen…",
+    "allHint": "Alle Serververbindungen schließen"
+  },
+  "disconnectAll": {
+    "title": "Von allen Servern trennen?",
+    "message": "Von allen {{total}} Servern trennen?",
+    "confirm": "Trennen"
+  },
+  "audio": {
+    "inputOptions": "Mikrofon-Optionen",
+    "outputOptions": "Lautsprecher-Optionen",
+    "inputDevices": "Eingabegerät",
+    "outputDevices": "Ausgabegerät",
+    "systemDefault": "Systemstandard",
+    "noDevices": "Keine Geräte gefunden",
+    "noiseSuppression": "Rauschunterdrückung",
+    "testSound": "Testton",
+    "voiceSettings": "Spracheinstellungen…",
+    "fallbackInput": "Mikrofon getrennt. Der Systemstandard wird verwendet.",
+    "fallbackOutput": "Ausgabegerät getrennt. Der Systemstandard wird verwendet.",
+    "volume": "Lautstärke",
+    "level": "Pegel"
+  },
+  "dnd": {
+    "label": "Nicht stören",
+    "manual": "manuell",
+    "system": "Nicht stören (System)",
+    "systemHint": "Schalte es in den Benachrichtigungseinstellungen deines Desktops aus."
   }
 }

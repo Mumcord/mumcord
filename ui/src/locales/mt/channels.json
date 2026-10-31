@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Ħarsa ġenerali lejn is-server",
   "tree": {
     "label": "Kanali",
-    "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa",
+    "hint": "Enter: uri ċ-chat · Shift+Enter jew double-click: ingħaqad · Vireg: mexxi, wessa', ikkollassa · Buttuna tal-menu: għażliet tal-kanal",
     "join": "Ingħaqad",
-    "menuLabel": "Għażliet għal {{channel}}",
-    "showDescription": "Uri d-deskrizzjoni tal-kanal",
     "you": "(int)",
-    "voiceHere": "int hawn (vuċi)",
+    "youAreHere": "int hawn",
     "people_one": "{{count}} persuna",
     "people_two": "{{count}} persuni",
     "people_few": "{{count}} persuni",
@@ -25,7 +22,16 @@
     "showAll": "Uri kollha ({{total}})",
     "showFewer": "Uri inqas",
     "jump": "Mur għall-kanal tiegħi",
-    "locked": "maqful"
+    "locked": "maqful",
+    "temporary": "temporanju",
+    "linked": "marbut",
+    "full": "Il-kanal mimli",
+    "fullPlaces": "Il-kanal mimli, {{places}}",
+    "places_one": "{{taken}} minn {{count}} post meħud",
+    "places_two": "{{taken}} minn {{count}} postijiet meħuda",
+    "places_few": "{{taken}} minn {{count}} postijiet meħuda",
+    "places_many": "{{taken}} minn {{count}} post meħuda",
+    "places_other": "{{taken}} minn {{count}} post meħuda"
   },
   "status": {
     "listening": "qed jisma' biss",
@@ -62,7 +68,8 @@
   "errors": {
     "joinDenied": "Ma tistax tidħol f'dan il-kanal.",
     "joinFailed": "Ma stajtx tingħaqad mal-kanal. Erġa' pprova.",
-    "notConnected": "Mhux konness ma' server."
+    "notConnected": "Mhux konness ma' server.",
+    "moveFailed": "Ma setgħetx titmexxa din il-persuna."
   },
   "empty": {
     "disconnected": "Mhux konness. Agħżel server biex tara l-kanali tiegħu.",
@@ -83,6 +90,17 @@
     "people_two": "{{count}} persuni",
     "people_few": "{{count}} persuni",
     "people_many": "{{count}} persuna",
-    "people_other": "{{count}} persuna"
+    "people_other": "{{count}} persuna",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Konness",
+      "connecting": "Qed jikkonnettja",
+      "reconnecting": "Qed jerġa' jikkonnettja…",
+      "disconnected": "Skonness"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

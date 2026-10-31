@@ -93,7 +93,7 @@ for (const theme of ["light", "dark"] as const) {
       await treeTo("Raid");
       await browser.keys(["Enter"]);
       const toggle = await tabTo((f) => f.cls.includes("follow-toggle"), "Follow toggle");
-      expect(toggle.text).toContain("Follow");
+      expect(toggle.label).toBe("Follow channel");
       await browser.keys(["Enter"]);
       await bot(["expect", "user", me, "--listening", "Raid"], { name: peer, timeout: 20 });
       await scan(`${theme} chat followed channel`);

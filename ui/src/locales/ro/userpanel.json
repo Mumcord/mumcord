@@ -8,7 +8,10 @@
     "muted": "Microfon oprit",
     "unmuted": "Microfon pornit",
     "deafened": "Sunet oprit. Nu-i auzi pe ceilalți, iar microfonul tău e oprit",
-    "undeafened": "Sunet pornit"
+    "undeafened": "Sunet pornit",
+    "leftVoice": "Ai părăsit vocea pe {{server}}",
+    "disconnected": "Deconectat de la {{server}}",
+    "disconnectedAll": "Deconectat de la toate serverele"
   },
   "readOnly": {
     "text": "Doar citești – intră într-un canal ca să vorbești.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Introdu o parolă ca să protejezi fișierul de rezervă.",
     "exported": "Copia de rezervă a identității a fost salvată.",
     "confirm": "Înregistrează-te",
-    "done": "Înregistrat pe acest server"
+    "done": "Înregistrat pe acest server",
+    "identity": "Numele înregistrat aparține identității {{identity}}."
   },
   "errors": {
     "tooLarge": "E prea mare pentru server. Alege o poză mai mică sau scrie un text mai scurt.",
@@ -89,11 +93,54 @@
     "offerImages": "Oferă imagini la dimensiune completă",
     "offerImagesHint": "Lasă-i pe ceilalți să-ți încarce imaginile originale",
     "loadImages": "Încarcă imagini la dimensiune completă",
-    "loadImagesHint": "Preia imaginile originale de la ceilalți"
+    "loadImagesHint": "Preia imaginile originale de la ceilalți",
+    "dnd": "Nu deranja",
+    "dndHint": "Dezactivează sunetele și bannerele de notificare",
+    "dndSystemHint": "Activat prin modul Nu deranja al desktopului",
+    "privateMessages": "Mesaje private de la",
+    "pm_everyone": "Oricine",
+    "pm_friendsOnly": "Prieteni",
+    "pm_nobody": "Nimeni"
   },
   "voice": {
     "line": "Voce: {{channel}} · {{server}}",
     "server": "Voce: {{server}}",
     "show": "{{location}} – arată acest server"
+  },
+  "disconnectMenu": {
+    "label": "Opțiuni de deconectare",
+    "open": "Mai multe opțiuni de deconectare",
+    "leaveVoice": "Părăsește vocea",
+    "leaveVoiceHint": "Nu mai vorbi și nu mai asculta, rămâi conectat pentru chat",
+    "disconnectHint": "Închide conexiunea la acest server",
+    "switchTo": "Mută vocea pe {{server}}",
+    "all": "Deconectează de la toate serverele…",
+    "allHint": "Închide toate conexiunile la servere"
+  },
+  "disconnectAll": {
+    "title": "Te deconectezi de la toate serverele?",
+    "message": "Te deconectezi de la toate cele {{total}} servere?",
+    "confirm": "Deconectează"
+  },
+  "audio": {
+    "inputOptions": "Opțiuni microfon",
+    "outputOptions": "Opțiuni difuzoare",
+    "inputDevices": "Dispozitiv de intrare",
+    "outputDevices": "Dispozitiv de ieșire",
+    "systemDefault": "Implicit al sistemului",
+    "noDevices": "Niciun dispozitiv găsit",
+    "noiseSuppression": "Suprimarea zgomotului",
+    "testSound": "Testează sunetul",
+    "voiceSettings": "Setări de voce…",
+    "fallbackInput": "Microfonul a fost deconectat. Se folosește dispozitivul implicit al sistemului.",
+    "fallbackOutput": "Dispozitivul de ieșire a fost deconectat. Se folosește dispozitivul implicit al sistemului.",
+    "volume": "Volum",
+    "level": "Nivel"
+  },
+  "dnd": {
+    "label": "Nu deranja",
+    "manual": "manual",
+    "system": "Nu deranja (sistem)",
+    "systemHint": "Dezactivează-l în setările de notificări ale desktopului."
   }
 }

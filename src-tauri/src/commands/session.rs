@@ -40,6 +40,8 @@ pub enum ConnectionState {
 pub struct ServerInfo {
     /// E.g. "1.5.735".
     pub version: String,
+    pub release: Option<String>,
+    pub os: Option<String>,
     /// False on servers older than 1.4: following is hidden with a hint (FR-1.12).
     pub follow_supported: bool,
     /// Sanitized HTML.
@@ -52,6 +54,23 @@ pub struct ServerInfo {
     /// Maximum length of messages containing images in characters (0 = unlimited).
     pub max_image_message_length: u32,
     pub allow_html: bool,
+    pub max_bandwidth: Option<u32>,
+    pub max_users: Option<u32>,
+    pub recording_allowed: bool,
+    pub server_label: Option<String>,
+    pub server_address: Option<String>,
+    pub server_port: Option<u16>,
+    pub tls_fingerprint: Option<String>,
+    pub users_online: u32,
+    pub session_id: Option<u32>,
+    pub registered: bool,
+    pub current_channel_permissions: Option<u32>,
+    pub mumcord_users: u32,
+    pub tls_trusted: bool,
+    pub tls_issuer: Option<String>,
+    pub tls_valid_from: Option<String>,
+    pub tls_valid_until: Option<String>,
+    pub tls_certificate_pem: Option<String>,
 }
 
 /// Unread count of a followed channel or private chat.
@@ -108,6 +127,52 @@ pub struct ConnectionStats {
     pub packets_received: u32,
     /// Health of the local audio path; `null` on a server without voice.
     pub audio: Option<AudioHealth>,
+    /// Estimated mouth-to-ear latency; `null` on a server without voice.
+    pub latency: Option<LatencyEstimate>,
+}
+
+/// Estimated mouth-to-ear latency and its parts (issue #156), in microseconds (integers, as
+/// specta exports floats as nullable). Assumes the other side runs in the same mode.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct LatencyEstimate {
+    pub low_latency: bool,
+    /// Audio per packet: 10 ms in low-latency mode, 20 ms otherwise.
+    pub packet_ms: u32,
+    /// Microphone device buffer.
+    pub input_buffer_us: u32,
+    /// One packet plus the encoder look-ahead.
+    pub encode_us: u32,
+    /// Half the ping to the server; `null` until measured (not connected, TCP tunnel).
+    pub network_us: Option<u32>,
+    /// Jitter-buffer target for a clean stream.
+    pub jitter_us: u32,
+    /// Measured processing: DSP and encoding out, decoding and mixing in.
+    pub processing_us: u32,
+    /// Output queue and speaker device buffer.
+    pub output_buffer_us: u32,
+    /// Sum of the parts (without the network while it is unknown).
+    pub total_us: u32,
+    /// The same estimate for the other mode.
+    pub other_mode_total_us: u32,
+}
+
+impl From<mumcord_engine::LatencyEstimateView> for LatencyEstimate {
+    fn from(v: mumcord_engine::LatencyEstimateView) -> Self {
+        let us = |ms: f32| (ms.max(0.0) * 1000.0).round() as u32;
+        Self {
+            low_latency: v.low_latency,
+            packet_ms: v.packet_ms,
+            input_buffer_us: us(v.input_buffer_ms),
+            encode_us: us(v.encode_ms),
+            network_us: v.network_ms.map(us),
+            jitter_us: us(v.jitter_ms),
+            processing_us: us(v.processing_ms),
+            output_buffer_us: us(v.output_buffer_ms),
+            total_us: us(v.total_ms),
+            other_mode_total_us: us(v.other_mode_total_ms),
+        }
+    }
 }
 
 /// Overall audio rating over the recent window (issue #152).
@@ -322,12 +387,31 @@ impl From<ServerInfoView> for ServerInfo {
     fn from(v: ServerInfoView) -> Self {
         Self {
             version: v.version,
+            release: v.release,
+            os: v.os,
             follow_supported: v.follow_supported,
             welcome_text: v.welcome_text,
             default_channel_id: v.default_channel_id,
             max_message_length: v.max_message_length,
             max_image_message_length: v.max_image_message_length,
             allow_html: v.allow_html,
+            max_bandwidth: v.max_bandwidth,
+            max_users: v.max_users,
+            recording_allowed: v.recording_allowed,
+            server_label: v.server_label,
+            server_address: v.server_address,
+            server_port: v.server_port,
+            tls_fingerprint: v.tls_fingerprint,
+            users_online: v.users_online,
+            session_id: v.session_id,
+            registered: v.registered,
+            current_channel_permissions: v.current_channel_permissions,
+            mumcord_users: v.mumcord_users,
+            tls_trusted: v.tls_trusted,
+            tls_issuer: v.tls_issuer,
+            tls_valid_from: v.tls_valid_from,
+            tls_valid_until: v.tls_valid_until,
+            tls_certificate_pem: v.tls_certificate_pem,
         }
     }
 }
@@ -379,6 +463,7 @@ impl From<ConnectionStatsView> for ConnectionStats {
             packets_sent: count(v.packets_sent),
             packets_received: count(v.packets_received),
             audio: v.audio.map(AudioHealth::from),
+            latency: v.latency.map(LatencyEstimate::from),
         }
     }
 }
@@ -461,6 +546,14 @@ pub fn connection_stats(
     Ok(engine
         .connection_stats(to_engine_server_id(server_id))
         .map(ConnectionStats::from))
+}
+
+/// Estimated mouth-to-ear latency for Settings → Audio (issue #156); `null` while no audio
+/// device runs. Includes the voice server's ping while connected.
+#[tauri::command]
+#[specta::specta]
+pub fn latency_estimate(engine: State<'_, Engine>) -> ApiResult<Option<LatencyEstimate>> {
+    Ok(engine.latency_estimate().map(LatencyEstimate::from))
 }
 
 /// Answers a `CertTrustRequired`; trusting is remembered for the server.

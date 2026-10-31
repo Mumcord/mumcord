@@ -14,9 +14,7 @@
     "generic": "Sledování tohoto kanálu se nepovedlo. Zkus to prosím znovu."
   },
   "dm": {
-    "title": "Přímé zprávy",
-    "unknown": "Neznámá osoba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Neznámá osoba"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",
@@ -62,5 +60,9 @@
     "dismiss": "Zavřít",
     "unfollowFailed": "Zrušení sledování všech kanálů se nepovedlo. Zkus to prosím znovu."
   },
-  "mention": "obsahuje zmínku o tobě"
+  "mention": "obsahuje zmínku o tobě",
+  "header": {
+    "follow": "Sledovat kanál",
+    "unfollow": "Sleduješ, kliknutím zrušíš"
+  }
 }

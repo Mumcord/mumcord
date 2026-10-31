@@ -14,9 +14,7 @@
     "generic": "Nepavyko sekti šio kanalo. Bandyk dar kartą."
   },
   "dm": {
-    "title": "Tiesioginės žinutės",
-    "unknown": "Nežinomas žmogus",
-    "withServer": "{{name}}, serveryje {{server}}"
+    "unknown": "Nežinomas žmogus"
   },
   "notify": {
     "channel": "{{name}} kanale {{channel}}: {{text}}",
@@ -62,5 +60,9 @@
     "dismiss": "Atmesti",
     "unfollowFailed": "Nepavyko nustoti sekti visų kanalų. Bandyk dar kartą."
   },
-  "mention": "yra tavo paminėjimas"
+  "mention": "yra tavo paminėjimas",
+  "header": {
+    "follow": "Sekti kanalą",
+    "unfollow": "Sekama, spustelėkite, kad nebesektumėte"
+  }
 }

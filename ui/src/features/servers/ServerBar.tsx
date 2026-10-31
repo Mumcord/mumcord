@@ -6,6 +6,7 @@ import {
   useState,
   type DragEvent,
   type KeyboardEvent,
+  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
 import type { SavedServer } from "../../api";
@@ -21,10 +22,16 @@ import {
   openDialog,
   requestConnect,
   toggleAlwaysConnect,
+  toggleGroupMentionsMuted,
   toggleNotificationsMuted,
   useServers,
 } from "./store";
 import { serverLabel, statusOf, type ServerBadges, type ServerStatus } from "./serverStatus";
+import {
+  closeServerBrowser,
+  toggleServerBrowser,
+  useServerBrowserOpen,
+} from "../serverbrowser/browserStore";
 
 interface ServerOptionsProps {
   server: SavedServer;
@@ -80,6 +87,19 @@ function ServerOptions({
       label: t("menu.muteNotifications"),
       checked: server.notificationsMuted,
       onSelect: act(() => void toggleNotificationsMuted(server.id, !server.notificationsMuted)),
+    },
+    {
+      id: "muteGroupMentions",
+      label: t("menu.muteGroupMentions"),
+      checked: server.groupMentionsMuted,
+      onSelect: act(() => void toggleGroupMentionsMuted(server.id, !server.groupMentionsMuted)),
+    },
+    {
+      id: "identity",
+      label: t("menu.identity"),
+      onSelect: act(() => {
+        openDialog({ kind: "identity", serverId: server.id });
+      }),
     },
     {
       id: "theme",
@@ -146,13 +166,23 @@ function ServerOptions({
  * voice server, unread, mentions; spec §5.2), "+" to add. The shown server is marked.
  * One Tab stop with arrow-key navigation; Alt+Up/Down or drag and drop reorders.
  */
-export function ServerBar() {
+export interface ServerBarProps {
+  /** Shown above the servers, e.g. the private messages button (issue #173). */
+  top?: ReactNode;
+  /** Something from `top` fills the channel column: no server is marked as shown. */
+  topActive?: boolean;
+  /** A server was clicked (to leave what `top` opened). */
+  onServerClick?: () => void;
+}
+
+export function ServerBar({ top, topActive = false, onServerClick }: ServerBarProps = {}) {
   const { t } = useTranslation("servers");
   const state = useServers();
   const shownId = useShownServerId();
   const voiceId = useVoiceServerId();
   const follow = useFollowStates();
   const mentions = useMentions();
+  const browserOpen = useServerBrowserOpen();
   const { servers } = state;
   const badgesOf = (id: number): ServerBadges => {
     const unread = [...(follow.get(id)?.unread.values() ?? [])].some((count) => count > 0);
@@ -236,6 +266,7 @@ export function ServerBar() {
       <p id={hintId} className="visually-hidden">
         {t("bar.keyboardHint")}
       </p>
+      {top}
       <ul className="server-bar__list" aria-label={t("bar.listLabel")}>
         {servers.map((server, index) => {
           const badges = badgesOf(server.id);
@@ -243,7 +274,12 @@ export function ServerBar() {
           const name = displayName(server);
           const label = serverLabel(t, name, badges);
           const shown =
-            shownId === server.id && status !== null && status !== "error" && status !== "failed";
+            !topActive &&
+            !browserOpen &&
+            shownId === server.id &&
+            status !== null &&
+            status !== "error" &&
+            status !== "failed";
           return (
             <li
               key={server.id}
@@ -284,6 +320,8 @@ export function ServerBar() {
                   setFocusIndex(index);
                 }}
                 onClick={() => {
+                  onServerClick?.();
+                  closeServerBrowser();
                   requestConnect(server.id);
                 }}
                 onContextMenu={(event) => {
@@ -301,6 +339,22 @@ export function ServerBar() {
           );
         })}
       </ul>
+      <div className="server-bar__item" data-shown={browserOpen || undefined}>
+        <button
+          type="button"
+          className="server-bar__server server-bar__browse"
+          aria-label={t("bar.browse")}
+          aria-pressed={browserOpen}
+          data-tooltip={t("bar.browse")}
+          data-tooltip-placement="right"
+          onClick={toggleServerBrowser}
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <circle cx="10.5" cy="10.5" r="6" stroke="currentColor" strokeWidth="2.5" />
+            <path d="m15 15 5 5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
       <div className="server-bar__item">
         <button
           type="button"

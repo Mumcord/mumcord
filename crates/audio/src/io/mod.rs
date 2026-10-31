@@ -38,6 +38,8 @@ mod devices;
 mod frames;
 mod resample;
 mod ring;
+#[cfg(target_os = "linux")]
+mod sound_server;
 #[cfg(any(test, feature = "test-backend"))]
 mod test_backend;
 
@@ -70,6 +72,18 @@ pub struct DeviceInfo {
 }
 
 /// Notifications from the control thread, for UI and diagnostics.
+/// What happens to a saved device id when the device list changed its kind of ids (issue #183:
+/// ALSA PCM names on Linux became PipeWire node names). See [`AudioIo::migrate_device`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DeviceMigration {
+    /// The id is still valid (or the backend did not change).
+    Keep,
+    /// The device it meant, under its new id.
+    Replace(String),
+    /// Use the system default; `notice` when the user should be told their choice was reset.
+    Default { notice: bool },
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DeviceEvent {
     /// Devices were plugged in or removed; re-query [`AudioIo::devices`].
@@ -106,6 +120,19 @@ pub struct IoStats {
     /// Device threads the OS refused real-time scheduling (they run at normal priority).
     pub realtime_denied: u64,
 }
+
+/// How much audio the device streams move per callback (their buffer period), as the host
+/// actually delivers it. `None` until a stream has run, or while no stream is open.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct DevicePeriods {
+    pub input: Option<std::time::Duration>,
+    pub output: Option<std::time::Duration>,
+}
+
+/// Device buffer requested in low-latency mode (issue #156): 128 frames at 48 kHz (about
+/// 2.7 ms), scaled to the device rate and clamped to the range the device reports. A device
+/// that refuses it runs with the host default instead.
+pub const LOW_LATENCY_BUFFER_FRAMES: u32 = 128;
 
 /// Errors from audio device I/O.
 #[derive(Debug, thiserror::Error)]

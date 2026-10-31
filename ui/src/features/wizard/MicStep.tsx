@@ -9,16 +9,37 @@ import { StepFrame } from "./StepFrame";
 type TestPhase = "idle" | "recording" | "playing";
 
 interface MicStepProps {
+  /** 1-based step number and step count of this wizard pass (#149 rerun: 1 of 4). */
+  step: number;
+  total: number;
   settings: Settings;
   focusOnMount: boolean;
-  /** Saves the changed devices so the test uses them; rejects when saving failed. */
+  /**
+   * Reports the changed devices. First start saves them at once so the test uses them; the
+   * rerun keeps them as a draft until Finish (#149), and the test then uses the draft devices.
+   */
   onDevicesChange: (devices: Pick<Settings, "inputDevice" | "outputDevice">) => Promise<void>;
-  onBack: () => void;
+  /** The shown devices are not saved yet: the test uses them without writing settings. */
+  stagedDevices?: boolean;
+  /** Rerun step 1 is the first step: no Back there. */
+  onBack?: (() => void) | undefined;
   onNext: () => void;
+  /** Rerun only: closes the wizard (#149). */
+  onCancel?: (() => void) | undefined;
 }
 
-/** Step 2: input/output device, level meter and record-then-play test (FR-1.4). */
-export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNext }: MicStepProps) {
+/** Step 2 on first start, step 1 in the rerun: devices, level meter and record-then-play test (FR-1.4). */
+export function MicStep({
+  step,
+  total,
+  settings,
+  focusOnMount,
+  onDevicesChange,
+  stagedDevices = false,
+  onBack,
+  onNext,
+  onCancel,
+}: MicStepProps) {
   const { t } = useTranslation("wizard");
   const [devices, setDevices] = useState<AudioDevices | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +115,12 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
   async function startTest() {
     setError(null);
     try {
-      await getApi().micTestStart();
+      // Unsaved devices are tested on their own; the engine switches back afterwards (#149).
+      await getApi().micTestStart(
+        stagedDevices
+          ? { inputDevice: settings.inputDevice, outputDevice: settings.outputDevice }
+          : null,
+      );
     } catch (cause: unknown) {
       console.error("starting the mic test failed", cause);
       setError(t("mic.testFailed"));
@@ -148,13 +174,15 @@ export function MicStep({ settings, focusOnMount, onDevicesChange, onBack, onNex
 
   return (
     <StepFrame
-      step={2}
+      step={step}
+      total={total}
       title={t("mic.title")}
       focusOnMount={focusOnMount}
       busy={false}
       submitLabel={t("common:next")}
       onSubmit={onNext}
       onBack={onBack}
+      onCancel={onCancel}
     >
       <p className="wizard-muted">{t("mic.intro")}</p>
       {deviceSelect(inputId, "inputDevice", devices?.inputs ?? [], t("mic.input"))}

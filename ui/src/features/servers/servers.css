@@ -139,6 +139,14 @@
   background: var(--color-text);
 }
 
+/* Beats the muted colour of icons without a connection state. */
+.server-bar__item .server-bar__browse[aria-pressed="true"] {
+  border-radius: var(--radius-tile);
+  background: var(--gradient-accent) border-box;
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-glow);
+}
+
 .server-bar__add {
   color: var(--color-success);
   font-size: var(--font-size-xl);
@@ -174,9 +182,83 @@
   background: var(--color-bg-hover);
 }
 
+/* Keyboard focus also gets the focus-coloured ring of the #172 mockup. */
+.server-menu__item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.server-menu__item:has(.server-menu__text) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-menu__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.server-menu__hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.server-menu__item--danger {
+  color: var(--color-danger);
+}
+
 .server-menu__item[aria-disabled="true"] {
   color: var(--color-text-muted);
   cursor: default;
+}
+
+.server-menu__item:has(.server-menu__icon) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.server-menu__icon {
+  display: inline-flex;
+  flex: none;
+  color: inherit;
+}
+
+.server-menu__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Menus with icons (channel menus, #170/#172) follow the mockups: roomier panel, body-size text. */
+.server-menu:has(.server-menu__icon) {
+  min-width: 18rem;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+}
+
+.server-menu:has(.server-menu__icon) .server-menu__item {
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+}
+
+.server-menu__item--danger .server-menu__icon {
+  color: inherit;
+}
+
+.server-menu__end {
+  margin-inline-start: auto;
+  padding-inline-start: var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.server-menu__separator {
+  height: 1px;
+  margin: var(--space-1) var(--space-2);
+  background: var(--color-border);
 }
 
 .server-menu__check {
@@ -387,4 +469,85 @@
   display: flex;
   flex-shrink: 0;
   gap: 4px;
+}
+
+/* Tabs of the add/edit server dialog (issue #151). */
+.servers-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.servers-dialog:has(.servers-tabs) {
+  width: min(34rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.servers-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-2);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.servers-tabs__tab[aria-selected="true"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.servers-tabs__tab:hover {
+  color: var(--color-text);
+}
+
+.servers-tabs__dot {
+  display: inline-grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: var(--color-bg-elevated);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.servers-form__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.servers-form__link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
+.servers-form__success {
+  margin: var(--space-1) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+}
+
+.servers-form__test {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* The test button keeps its own width; the result line goes underneath. */
+.servers-form__field > .button {
+  align-self: flex-start;
 }

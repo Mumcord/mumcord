@@ -14,7 +14,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { getApi, type Theme } from "../../api";
+import { getApi, type PmRule, type Theme } from "../../api";
+import { dndSource, useDnd } from "../dnd/useDnd";
 import { useSettings } from "../settings/useSettings";
 import "./quicksettings.css";
 
@@ -44,6 +45,8 @@ const ITEM =
   '[role="menuitemcheckbox"]:not([aria-disabled]), [role="menuitemradio"], [role="menuitem"]:not([aria-disabled])';
 
 const THEMES: readonly Theme[] = ["system", "dark", "light"];
+
+const PM_RULES: readonly PmRule[] = ["everyone", "friendsOnly", "nobody"];
 
 const ICON = {
   link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
@@ -114,13 +117,14 @@ export function QuickSettings({
 }) {
   const { t } = useTranslation("userpanel");
   const { settings, update } = useSettings();
+  const dnd = useDnd();
   const [supported, setSupported] = useState(true);
   const [gamingSupported, setGamingSupported] = useState(true);
   const [betaOpen, setBetaOpen] = useState(readBetaOpen);
   const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const betaId = useId();
-  const ready = settings !== null;
+  const ready = settings !== null && dnd.state !== null;
 
   const close = (returnFocus: boolean) => {
     onClose();
@@ -206,10 +210,14 @@ export function QuickSettings({
         break;
       case "ArrowRight":
       case "ArrowLeft": {
-        // Inside the theme control the horizontal arrows step through the options.
+        // Inside a segmented control the horizontal arrows step through its own options.
         const current = items[index];
         if (current?.getAttribute("role") !== "menuitemradio") return;
-        const radios = items.filter((item) => item.getAttribute("role") === "menuitemradio");
+        const radios = items.filter(
+          (item) =>
+            item.getAttribute("role") === "menuitemradio" &&
+            item.parentElement === current.parentElement,
+        );
         const at = radios.indexOf(current);
         const step = event.key === "ArrowRight" ? 1 : -1;
         radios[(at + step + radios.length) % radios.length]?.focus();
@@ -297,8 +305,19 @@ export function QuickSettings({
       <div id={titleId} className="quick-settings__title">
         {t("quickSettings.label")}
       </div>
-      {settings ? (
+      {settings && dnd.state ? (
         <>
+          {row(
+            ICON.dark,
+            t("quickSettings.dnd"),
+            dndSource(dnd.state) === "system"
+              ? t("quickSettings.dndSystemHint")
+              : t("quickSettings.dndHint"),
+            dnd.state.manual,
+            () => {
+              dnd.setManual(!dnd.state?.manual);
+            },
+          )}
           {row(
             ICON.link,
             t("quickSettings.linkPreviews"),
@@ -400,6 +419,31 @@ export function QuickSettings({
                 >
                   <Glyph d={ICON[theme]} />
                   {t(`quickSettings.theme_${theme}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="quick-settings__theme">
+            <span className="quick-settings__label">{t("quickSettings.privateMessages")}</span>
+            <div
+              role="group"
+              aria-label={t("quickSettings.privateMessages")}
+              className="quick-settings__segments"
+            >
+              {PM_RULES.map((rule) => (
+                <button
+                  key={rule}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={settings.privateMessages.rule === rule}
+                  tabIndex={-1}
+                  className="quick-settings__segment"
+                  data-testid={`quick-pm-${rule}`}
+                  onClick={() => {
+                    update({ privateMessages: { ...settings.privateMessages, rule } });
+                  }}
+                >
+                  {t(`quickSettings.pm_${rule}`)}
                 </button>
               ))}
             </div>

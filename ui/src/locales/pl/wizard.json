@@ -1,5 +1,24 @@
 {
   "progress": "Krok {{current}} z {{total}}",
+  "rerun": {
+    "title": "Kreator konfiguracji",
+    "note": "Uruchamiasz konfigurację ponownie. Twoja tożsamość się nie zmienia.",
+    "manageIdentities": "Zarządzaj tożsamościami",
+    "stepsLabel": "Kroki konfiguracji",
+    "stepsSkipped": "(pominięty, tożsamość nie jest jego częścią)",
+    "steps": {
+      "identity": "Tożsamość",
+      "mic": "Mikrofon",
+      "privacy": "Prywatność",
+      "updates": "Aktualizacje",
+      "talk": "Tryb mówienia"
+    },
+    "footer": "Anulowanie zostawia wszystko bez zmian. Na końcu zapisywane są tylko zmienione kroki.",
+    "discardTitle": "Odrzucić zmiany?",
+    "discardBody": "Nic nie jest zapisywane przed zakończeniem. Jeśli teraz anulujesz, wszystko zostanie bez zmian.",
+    "discardKeep": "Kontynuuj edycję",
+    "discardConfirm": "Odrzuć zmiany"
+  },
   "loadFailed": "Nie udało się wczytać kreatora.",
   "finish": "Zakończ",
   "errors": {

@@ -12,9 +12,7 @@
     "generic": "Kanavan seuraaminen ei onnistunut. Yritä uudelleen."
   },
   "dm": {
-    "title": "Yksityisviestit",
-    "unknown": "Tuntematon henkilö",
-    "withServer": "{{name}}, palvelimella {{server}}"
+    "unknown": "Tuntematon henkilö"
   },
   "notify": {
     "channel": "{{name}} kanavalla {{channel}}: {{text}}",
@@ -54,5 +52,9 @@
     "dismiss": "Ohita",
     "unfollowFailed": "Kaikkien kanavien seuraamisen lopettaminen ei onnistunut. Yritä uudelleen."
   },
-  "mention": "sisältää maininnan sinusta"
+  "mention": "sisältää maininnan sinusta",
+  "header": {
+    "follow": "Seuraa kanavaa",
+    "unfollow": "Seurataan, lopeta napsauttamalla"
+  }
 }

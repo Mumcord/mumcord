@@ -85,71 +85,6 @@
   display: none;
 }
 
-/* Keeps the first member heading clear of the hide button above it. */
-.shell__members-content > .members-panel > .collapsible-section:first-child h2 {
-  padding-inline-end: 2.5rem;
-}
-
-/* "Show members" in the chat and "Hide members" at the top of the member column (issue #165). */
-.shell__members-toggle,
-.shell__members-hide {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-full);
-  background: var(--color-bg-elevated);
-  cursor: pointer;
-}
-
-/* Floats over the chat header, so showing and hiding never moves the chat (issue #165). */
-.shell__members-toggle {
-  position: absolute;
-  top: var(--space-1);
-  right: var(--space-4);
-  z-index: 2;
-  padding: var(--space-1) var(--space-3);
-}
-
-/* Room for the reveal button next to the chat header's own actions. */
-.shell[data-members-reveal="true"] .chat-header__actions {
-  margin-inline-end: calc(var(--members-reveal-width) + var(--space-2));
-}
-
-.shell__members-hide {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  z-index: 1;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-}
-
-.shell__members-toggle:hover,
-.shell__members-hide:hover {
-  border-color: var(--color-text-secondary);
-  background: var(--color-bg-hover);
-}
-
-/* Points left towards the chat when shown, right towards the hidden column when hidden. */
-.shell__members-chevron {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-style: solid;
-  border-width: 0 1.5px 1.5px 0;
-  border-color: currentcolor;
-}
-
-.shell__members-toggle .shell__members-chevron {
-  rotate: 135deg;
-}
-
-.shell__members-hide .shell__members-chevron {
-  rotate: -45deg;
-}
-
 .shell > .resize-handle[data-column="channels"] {
   left: calc(var(--width-server-bar) + var(--channels-width));
 }
@@ -162,7 +97,9 @@
   outline: none;
 }
 
-/* Narrow windows: the member list becomes an overlay panel opened from the chat column. */
+/* Narrow windows: the member list is hidden and slides in over the chat as an overlay below the
+   chat header, opened and closed by the members button in that header (issue #165). The scrim dims
+   everything else except the header, which stays above it. */
 @media (max-width: 60rem) {
   .shell {
     grid-template-columns: var(--width-server-bar) var(--channels-width) minmax(0, 1fr);
@@ -173,18 +110,46 @@
   }
 
   .shell__members {
-    display: none;
+    position: absolute;
+    top: var(--members-overlay-top);
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    width: min(var(--members-width), 80vw);
+    border-left-color: var(--color-border);
+    background: var(--color-bg-elevated);
+    box-shadow: var(--shadow-raised);
+    translate: 100% 0;
+    visibility: hidden;
+    transition:
+      translate var(--duration-normal) var(--ease-out),
+      visibility 0s linear var(--duration-normal);
   }
 
   .shell[data-members-open="true"] .shell__members {
-    display: block;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(var(--members-width), 80vw);
-    z-index: 10;
-    box-shadow: var(--shadow-raised);
+    translate: 0 0;
+    visibility: visible;
+    transition: translate var(--duration-normal) var(--ease-out);
+  }
+
+  .shell[data-members-open="true"] .chat-header {
+    position: relative;
+    z-index: 11;
+    background: var(--color-bg-chat);
+  }
+
+  .shell__members-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    background: rgb(0 0 0 / 50%);
+  }
+}
+
+@media (max-width: 60rem) and (prefers-reduced-motion: reduce) {
+  .shell__members,
+  .shell[data-members-open="true"] .shell__members {
+    transition: none;
   }
 }
 
@@ -309,4 +274,19 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+}
+
+/* A page in place of the columns right of the server bar (public server browser, #68). The
+   columns stay mounted, so the chat keeps its state; hidden, they leave the focus order, the a11y
+   tree and the grid's auto-placement. */
+.shell__page {
+  z-index: 5;
+  grid-row: 1;
+  grid-column: 2 / -1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.shell[data-page-open] > :not(.shell__servers, .shell__page) {
+  display: none;
 }

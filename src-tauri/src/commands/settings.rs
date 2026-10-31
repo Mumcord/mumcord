@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, State};
 
-use super::types::{ApiError, ApiResult, ErrorCode};
+use super::types::{
+    ApiError, ApiResult, ErrorCode, ServerId, to_api_server_id, to_engine_server_id,
+};
 
 /// Answer to a question asked once (direct connections, update check, AppImage menu entry).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -258,6 +260,10 @@ pub struct SoundSettings {
     pub share_stopped: bool,
     pub viewer_started: bool,
     pub viewer_stopped: bool,
+    /// The server kicks you (#205).
+    pub kicked: bool,
+    /// The server bans you (#205).
+    pub banned: bool,
 }
 
 /// Positional audio (FR-1.41): voices of people in the same game placed in 3D.
@@ -271,6 +277,121 @@ pub struct PositionalSettings {
     /// Metres (default 15): voices are silent beyond this distance. Kept above `minDistance`
     /// on save.
     pub max_distance: f32,
+}
+
+/// Channel messages of blocked users (issue #140).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum BlockedMessages {
+    Collapse,
+    Hide,
+}
+
+impl From<store::BlockedMessages> for BlockedMessages {
+    fn from(b: store::BlockedMessages) -> Self {
+        match b {
+            store::BlockedMessages::Collapse => Self::Collapse,
+            store::BlockedMessages::Hide => Self::Hide,
+        }
+    }
+}
+
+impl From<BlockedMessages> for store::BlockedMessages {
+    fn from(b: BlockedMessages) -> Self {
+        match b {
+            BlockedMessages::Collapse => Self::Collapse,
+            BlockedMessages::Hide => Self::Hide,
+        }
+    }
+}
+
+/// "Private messages from" (issue #141).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PmRule {
+    Everyone,
+    FriendsOnly,
+    Nobody,
+}
+
+impl From<store::PmRule> for PmRule {
+    fn from(rule: store::PmRule) -> Self {
+        match rule {
+            store::PmRule::Everyone => Self::Everyone,
+            store::PmRule::FriendsOnly => Self::FriendsOnly,
+            store::PmRule::Nobody => Self::Nobody,
+        }
+    }
+}
+
+impl From<PmRule> for store::PmRule {
+    fn from(rule: PmRule) -> Self {
+        match rule {
+            PmRule::Everyone => Self::Everyone,
+            PmRule::FriendsOnly => Self::FriendsOnly,
+            PmRule::Nobody => Self::Nobody,
+        }
+    }
+}
+
+/// A server with its own "Private messages from" rule.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerPmRule {
+    pub server_id: ServerId,
+    pub rule: PmRule,
+}
+
+/// Private message rule, per-server overrides and exceptions (issue #141).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PrivateMessageSettings {
+    /// Default everyone.
+    pub rule: PmRule,
+    /// Servers that do not use `rule`.
+    pub server_rules: Vec<ServerPmRule>,
+    /// "People in my current channel" (default on).
+    pub allow_current_channel: bool,
+    /// "Conversations I already accepted" (default on).
+    pub allow_accepted: bool,
+    /// Keep filtered messages from standard clients as message requests (default on); off
+    /// drops them.
+    pub keep_requests: bool,
+}
+
+impl From<&store::PrivateMessageSettings> for PrivateMessageSettings {
+    fn from(p: &store::PrivateMessageSettings) -> Self {
+        Self {
+            rule: p.rule.into(),
+            server_rules: p
+                .server_rules
+                .iter()
+                .map(|(id, rule)| ServerPmRule {
+                    server_id: to_api_server_id(*id),
+                    rule: (*rule).into(),
+                })
+                .collect(),
+            allow_current_channel: p.allow_current_channel,
+            allow_accepted: p.allow_accepted,
+            keep_requests: p.keep_requests,
+        }
+    }
+}
+
+impl From<&PrivateMessageSettings> for store::PrivateMessageSettings {
+    fn from(p: &PrivateMessageSettings) -> Self {
+        Self {
+            rule: p.rule.into(),
+            server_rules: p
+                .server_rules
+                .iter()
+                .map(|r| (to_engine_server_id(r.server_id), r.rule.into()))
+                .collect(),
+            allow_current_channel: p.allow_current_channel,
+            allow_accepted: p.allow_accepted,
+            keep_requests: p.keep_requests,
+        }
+    }
 }
 
 /// Largest accepted distance in metres.
@@ -308,9 +429,17 @@ pub struct Settings {
     pub noise_suppression_rnnoise_consent: Consent,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
+    /// Manual microphone gain in percent, 0–200 (default 100).
+    pub input_gain_percent: u16,
+    /// Master volume of everything played, 0–100 (default 100).
+    pub output_volume_percent: u16,
     /// "Music quality" (default off; FR-1.24, QA.37): bitrate cap up to the server limit (max
     /// 510 kbit/s), music-tuned encoder, noise suppression and automatic volume bypassed.
     pub music_quality: bool,
+    /// "Low-latency mode" (default off; issue #156): 10 ms low-delay Opus packets, a minimal
+    /// jitter buffer, small device buffers and echo cancellation, noise suppression and automatic
+    /// volume bypassed, for playing music together. Applies live.
+    pub low_latency: bool,
     /// Own bitrate cap in kbit/s (FR-2.64); `null` is "Max". Range 16 to the maximum from
     /// `bitrate_max`.
     pub bitrate_kbps: Option<u32>,
@@ -390,6 +519,10 @@ pub struct Settings {
     /// The version whose "What's new" was shown or skipped last; `null` before the first start
     /// that knew about it.
     pub whats_new_seen: Option<String>,
+    /// "Private messages from" (issue #141).
+    pub private_messages: PrivateMessageSettings,
+    /// Channel messages of blocked users: collapsed (default) or hidden (issue #140).
+    pub blocked_messages: BlockedMessages,
 }
 
 impl Settings {
@@ -432,7 +565,10 @@ impl Settings {
             noise_suppression_rnnoise_consent: s.noise_suppression_rnnoise_consent.into(),
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
+            input_gain_percent: s.input_gain_percent,
+            output_volume_percent: s.output_volume_percent,
             music_quality: s.music_quality,
+            low_latency: s.low_latency,
             bitrate_kbps: s.bitrate_kbps,
             video_ducking: s.video_ducking,
             video_ducking_percent: s.video_ducking_percent,
@@ -452,6 +588,8 @@ impl Settings {
                 share_stopped: s.sounds.share_stopped,
                 viewer_started: s.sounds.viewer_started,
                 viewer_stopped: s.sounds.viewer_stopped,
+                kicked: s.sounds.kicked,
+                banned: s.sounds.banned,
             },
             notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
@@ -514,6 +652,8 @@ impl Settings {
             window_overlay_notice_shown: s.window_overlay_notice_shown,
             whats_new_auto: s.whats_new_auto,
             whats_new_seen: s.whats_new_seen.clone(),
+            private_messages: (&s.private_messages).into(),
+            blocked_messages: s.blocked_messages.into(),
         }
     }
 
@@ -556,7 +696,10 @@ impl Settings {
         s.noise_suppression_rnnoise_consent = self.noise_suppression_rnnoise_consent.into();
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
+        s.input_gain_percent = self.input_gain_percent.min(200);
+        s.output_volume_percent = self.output_volume_percent.min(100);
         s.music_quality = self.music_quality;
+        s.low_latency = self.low_latency;
         s.bitrate_kbps = self.bitrate_kbps;
         s.video_ducking = self.video_ducking;
         s.video_ducking_percent = self.video_ducking_percent.clamp(
@@ -579,6 +722,8 @@ impl Settings {
         s.sounds.share_stopped = self.sounds.share_stopped;
         s.sounds.viewer_started = self.sounds.viewer_started;
         s.sounds.viewer_stopped = self.sounds.viewer_stopped;
+        s.sounds.kicked = self.sounds.kicked;
+        s.sounds.banned = self.sounds.banned;
         s.notifications = self.notifications.into();
         s.close_behaviour = match self.close_behaviour {
             CloseBehaviour::Ask => store::CloseBehaviour::Ask,
@@ -632,6 +777,8 @@ impl Settings {
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s.whats_new_auto = self.whats_new_auto;
         s.whats_new_seen.clone_from(&self.whats_new_seen);
+        s.private_messages = (&self.private_messages).into();
+        s.blocked_messages = self.blocked_messages.into();
         s
     }
 }
@@ -748,6 +895,24 @@ pub async fn window_overlay_notice_dismiss(engine: State<'_, Engine>) -> ApiResu
     Ok(())
 }
 
+/// Whether the user still has to be told that their saved audio device was reset to the system
+/// default because it could not be matched to the new device list (issue #183).
+#[tauri::command]
+#[specta::specta]
+pub fn audio_device_notice_pending(engine: State<'_, Engine>) -> ApiResult<bool> {
+    Ok(engine.settings()?.audio_device_notice)
+}
+
+/// Marks the audio device notice as shown so it never comes back.
+#[tauri::command]
+#[specta::specta]
+pub async fn audio_device_notice_dismiss(engine: State<'_, Engine>) -> ApiResult<()> {
+    let mut settings = engine.settings()?;
+    settings.audio_device_notice = false;
+    engine.update_settings(settings).await?;
+    Ok(())
+}
+
 /// Replaces the whole record and applies changes immediately; returns the stored record.
 #[tauri::command]
 #[specta::specta]
@@ -827,6 +992,7 @@ mod tests {
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
         ui.sounds.share_stopped = false;
+        ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
         ui.input_device = Some(String::new());
         ui.send_default_avatar = false;
@@ -875,6 +1041,7 @@ mod tests {
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
         assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
+        assert!(!stored.sounds.banned && stored.sounds.kicked);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
         assert_eq!(
             stored.input_device, None,

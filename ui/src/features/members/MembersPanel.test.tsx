@@ -376,6 +376,44 @@ describe("MembersPanel", () => {
     expect(profile).toHaveBeenCalledTimes(2);
   });
 
+  it("loads an avatar once when the person loses it right after the answer", async () => {
+    await renderPanel();
+    const profile = vi.spyOn(api, "personProfile");
+    const ben = getServerState().users.get(3);
+    if (!ben) throw new Error("Ben missing");
+
+    profile.mockResolvedValueOnce({
+      comment: null,
+      avatar: "data:image/png;base64,QkVO",
+      note: "",
+    });
+    act(() => {
+      api.mock.emit("userUpserted", { serverId: 1, user: { ...ben, hasAvatar: true } });
+    });
+
+    // The server takes the avatar away in the same tick in which the image is drawn, before React
+    // has run the effects of that render: the cache is already empty, so the effect of the old
+    // render must not load the same person a second time.
+    const row = member(/^Ben/);
+    const applied = new Promise<void>((resolve) => {
+      const observer = new MutationObserver(() => {
+        const img = row.querySelector(".avatar img");
+        if (img?.getAttribute("src") !== "data:image/png;base64,QkVO") return;
+        observer.disconnect();
+        act(() => {
+          api.mock.emit("userUpserted", { serverId: 1, user: { ...ben, hasAvatar: false } });
+        });
+        resolve();
+      });
+      observer.observe(row, { childList: true, subtree: true, attributes: true });
+    });
+    await applied;
+    await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+
+    expect(avatarImage(/^Ben/)).toBeNull();
+    expect(profile).toHaveBeenCalledExactlyOnceWith(1, 3);
+  });
+
   it("refetches an avatar when only avatarHash changes", async () => {
     await renderPanel();
     const profile = vi.spyOn(api, "personProfile");

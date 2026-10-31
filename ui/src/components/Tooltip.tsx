@@ -5,7 +5,10 @@ import { parsePlacement, placeTooltip } from "./tooltipPlacement";
 
 /**
  * Themed tooltips (FR-2.79). Any element with `data-tooltip="…"` gets one, optionally with
- * `data-tooltip-placement="top|bottom|left|right"` (default top). One layer listens on the
+ * `data-tooltip-placement="top|bottom|left|right"` (default top), a keyboard shortcut chip
+ * (`data-tooltip-shortcut`) and a highlighted second line (`data-tooltip-detail`).
+ * `data-tooltip-overflow` shows it only while the trigger's text is cut off (e.g. a truncated
+ * name whose tooltip would otherwise repeat the visible text). One layer listens on the
  * document instead of a component per trigger, so long member lists pay nothing per row and
  * any element can opt in without a wrapper. Mount `<TooltipLayer />` once at the app root.
  *
@@ -16,9 +19,14 @@ export const TOOLTIP_DELAY_MS = 400;
 
 const TRIGGER = "[data-tooltip]";
 
-interface Shown {
-  trigger: HTMLElement;
+interface Content {
   label: string;
+  shortcut: string;
+  detail: string;
+}
+
+interface Shown extends Content {
+  trigger: HTMLElement;
 }
 
 function triggerOf(target: EventTarget | null): HTMLElement | null {
@@ -27,6 +35,18 @@ function triggerOf(target: EventTarget | null): HTMLElement | null {
 
 function labelOf(trigger: HTMLElement): string {
   return trigger.dataset.tooltip?.trim() ?? "";
+}
+
+function contentOf(trigger: HTMLElement): Content {
+  return {
+    label: labelOf(trigger),
+    shortcut: trigger.dataset.tooltipShortcut?.trim() ?? "",
+    detail: trigger.dataset.tooltipDetail?.trim() ?? "",
+  };
+}
+
+function sameContent(a: Content, b: Content): boolean {
+  return a.label === b.label && a.shortcut === b.shortcut && a.detail === b.detail;
 }
 
 /** Native modal dialogs and the full-screen element sit in the top layer: the tooltip must be
@@ -81,21 +101,27 @@ export function TooltipLayer() {
       setShown(null);
     };
     const show = (trigger: HTMLElement) => {
-      const label = labelOf(trigger);
-      if (!trigger.isConnected || label === "") return;
+      const content = contentOf(trigger);
+      if (!trigger.isConnected || content.label === "") return;
+      if (
+        trigger.hasAttribute("data-tooltip-overflow") &&
+        trigger.scrollWidth <= trigger.clientWidth
+      ) {
+        return;
+      }
       current = trigger;
-      setShown({ trigger, label });
+      setShown({ trigger, ...content });
       // The trigger can lose its tooltip, change it or leave the page while it is shown.
       observer = new MutationObserver(() => {
-        const next = labelOf(trigger);
-        if (!trigger.isConnected || next === "") hide();
-        else setShown((prev) => (prev?.label === next ? prev : { trigger, label: next }));
+        const next = contentOf(trigger);
+        if (!trigger.isConnected || next.label === "") hide();
+        else setShown((prev) => (prev && sameContent(prev, next) ? prev : { trigger, ...next }));
       });
       observer.observe(document.body, {
         subtree: true,
         childList: true,
         attributes: true,
-        attributeFilter: ["data-tooltip"],
+        attributeFilter: ["data-tooltip", "data-tooltip-shortcut", "data-tooltip-detail"],
       });
     };
     const schedule = (trigger: HTMLElement) => {
@@ -173,7 +199,7 @@ export function TooltipLayer() {
   useLayoutEffect(() => {
     const tip = tipRef.current;
     if (shown === null || tip === null) return;
-    const { trigger, label } = shown;
+    const { trigger, label, shortcut, detail } = shown;
     // Measured at 0/0 first: a transformed or filtered ancestor (glass, a dialog) moves the
     // origin of position: fixed, and this offset corrects for it.
     tip.style.left = "0px";
@@ -193,7 +219,7 @@ export function TooltipLayer() {
     tip.style.top = `${String(place.top - origin.top)}px`;
     tip.dataset.placement = place.placement;
 
-    if (alreadySpoken(trigger, label)) return;
+    if (shortcut === "" && detail === "" && alreadySpoken(trigger, label)) return;
     trigger.setAttribute(
       "aria-describedby",
       [withoutToken(trigger.getAttribute("aria-describedby"), id), id].filter(Boolean).join(" "),
@@ -215,7 +241,15 @@ export function TooltipLayer() {
       className="tooltip"
       data-in-modal={inModal || undefined}
     >
-      {shown.label}
+      {shown.shortcut === "" ? (
+        shown.label
+      ) : (
+        <span className="tooltip__row">
+          {shown.label}
+          <kbd className="tooltip__shortcut">{shown.shortcut}</kbd>
+        </span>
+      )}
+      {shown.detail !== "" && <span className="tooltip__detail">{shown.detail}</span>}
     </div>,
     containerOf(shown.trigger),
   );

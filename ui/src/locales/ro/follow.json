@@ -13,9 +13,7 @@
     "generic": "Urmărirea acestui canal nu a mers. Încearcă din nou."
   },
   "dm": {
-    "title": "Mesaje directe",
-    "unknown": "Persoană necunoscută",
-    "withServer": "{{name}}, pe {{server}}"
+    "unknown": "Persoană necunoscută"
   },
   "notify": {
     "channel": "{{name}} în {{channel}}: {{text}}",
@@ -58,5 +56,9 @@
     "dismiss": "Închide",
     "unfollowFailed": "Renunțarea la toate canalele nu a mers. Încearcă din nou."
   },
-  "mention": "conține o mențiune a ta"
+  "mention": "conține o mențiune a ta",
+  "header": {
+    "follow": "Urmărește canalul",
+    "unfollow": "Urmărești, fă clic pentru a opri"
+  }
 }

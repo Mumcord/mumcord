@@ -56,10 +56,14 @@
   "menu": {
     "label": "Acciones para {{name}}",
     "viewProfile": "Ver perfil",
+    "sendMessage": "Enviar mensaje",
     "join": "Unirse a {{channel}}",
-    "joinDenied": "No tienes permiso para entrar en este canal.",
+    "joinFull": "Este canal está lleno.",
+    "joinLocked": "No puedes entrar en este canal o necesita una contraseña.",
     "mute": "Silenciar para mí",
-    "connectionInfo": "Info de conexión…"
+    "connectionInfo": "Info de conexión…",
+    "chatRequestPending": "Solicitud de chat pendiente",
+    "revokeConsent": "Retirar el consentimiento de chat…"
   },
   "nowPlaying": {
     "label": "Reproduciendo",
@@ -85,5 +89,55 @@
   "preview": {
     "privateMessage": "Mensaje privado",
     "fullProfile": "Perfil completo"
+  },
+  "chatRequest": {
+    "title": "Solicitud de chat para {{name}}",
+    "note": "Nota (opcional)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} de {{max}} caracteres usados",
+    "send": "Enviar",
+    "failed": "No se pudo enviar la solicitud de chat. Inténtalo de nuevo."
+  },
+  "toggle": {
+    "show": "Mostrar miembros",
+    "hide": "Ocultar miembros",
+    "showCount_one": "Mostrar miembros ({{count}})",
+    "showCount_many": "Mostrar miembros ({{count}})",
+    "showCount_other": "Mostrar miembros ({{count}})",
+    "talkingOne": "{{name}} está hablando",
+    "talkingTwo": "{{first}} y {{second}} están hablando",
+    "talkingMore_one": "{{name}} y {{count}} persona más están hablando",
+    "talkingMore_many": "{{name}} y {{count}} más están hablando",
+    "talkingMore_other": "{{name}} y {{count}} más están hablando",
+    "shortcut": "Ctrl+Mayús+M"
+  },
+  "revokeConsent": {
+    "title": "¿Retirar el consentimiento de chat de {{name}}?",
+    "message": "{{name}} tendrá que enviar una nueva solicitud de mensaje antes de que sus mensajes te lleguen de nuevo. Tu historial de chat se conserva.",
+    "confirm": "Retirar",
+    "failed": "No se pudo retirar el consentimiento de chat. Inténtalo de nuevo."
+  },
+  "block": {
+    "menu": "Bloquear…",
+    "unblock": "Desbloquear",
+    "title": "¿Bloquear a {{name}}?",
+    "onServer": "en {{server}}",
+    "whatHappens": "Qué ocurre",
+    "private": "Los mensajes privados de {{name}} no se muestran y no te notifican.",
+    "channelCollapsed": "Los mensajes de canal de {{name}} están contraídos. Aún puedes abrirlos.",
+    "channelHidden": "Los mensajes de canal de {{name}} están ocultos.",
+    "voice": "{{name}} está silenciado para ti en la voz, incluidos los susurros.",
+    "data": "Sin sincronización del historial, invitaciones ni otros datos de Mumcord de {{name}}.",
+    "followsCert": "El bloqueo sigue el certificado de {{name}}, así que un nombre nuevo no lo evita.",
+    "nameOnly": "{{name}} no tiene certificado, así que el bloqueo solo se aplica a este nombre en {{server}}.",
+    "warning": "{{name}} aún puede verte y leer tus mensajes. Mumble no ofrece ninguna forma de impedirlo solo por tu parte. {{name}} no recibe aviso del bloqueo.",
+    "cancel": "Cancelar",
+    "confirm": "Bloquear a {{name}}",
+    "done": "{{name}} está bloqueado.",
+    "failed": "No se pudo bloquear a {{name}}. Inténtalo de nuevo.",
+    "badge": "Bloqueado",
+    "collapsed": "Mensaje de un usuario bloqueado",
+    "show": "Mostrar",
+    "showLabel": "Mostrar mensaje de un usuario bloqueado"
   }
 }

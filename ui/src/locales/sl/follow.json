@@ -14,9 +14,7 @@
     "generic": "Sledenje temu kanalu ni uspelo. Poskusi znova."
   },
   "dm": {
-    "title": "Neposredna sporočila",
-    "unknown": "Neznana oseba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Neznana oseba"
   },
   "notify": {
     "channel": "{{name}} v {{channel}}: {{text}}",
@@ -62,5 +60,9 @@
     "dismiss": "Opusti",
     "unfollowFailed": "Prenehanje sledenja vsem kanalom ni uspelo. Poskusi znova."
   },
-  "mention": "vsebuje omembo tebe"
+  "mention": "vsebuje omembo tebe",
+  "header": {
+    "follow": "Sledi kanalu",
+    "unfollow": "Slediš, klikni za prekinitev"
+  }
 }

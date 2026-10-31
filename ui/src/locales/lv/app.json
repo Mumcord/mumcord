@@ -11,10 +11,6 @@
     "chat": "Pāriet uz čatu",
     "channels": "Pāriet uz kanāliem"
   },
-  "members": {
-    "show": "Rādīt dalībniekus",
-    "hide": "Slēpt dalībniekus"
-  },
   "resize": {
     "channels": "Mainīt kanālu saraksta izmēru",
     "members": "Mainīt dalībnieku saraksta izmēru"

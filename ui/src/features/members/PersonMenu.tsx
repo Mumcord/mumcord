@@ -1,6 +1,7 @@
 /**
- * Context menu on a person (FR-1.18, QA.32): View profile, local mute, friend (FR-1.64), volume
- * slider and private message. Reuses the profile card's volume slider and local-mute action, so both
+ * Context menu on a person (FR-1.18, QA.32): send message (#141 chat request when needed), join
+ * their channel, add or remove friend (FR-1.64), view profile, revoke chat consent, local mute and
+ * volume slider. Reuses the profile card's volume slider and local-mute action, so both
  * places store the same per-certificate settings. Yourself only gets "View profile".
  */
 import {
@@ -16,7 +17,13 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, toEngineError } from "../../api";
 import { shownServerId, useServerState } from "../channels/serverStore";
+import { hasMumcordFeature } from "../channels/mumcord";
 import { setFriend, useFriend } from "../friends";
+import { openChatRequestDialog } from "../requests/chatRequestDialogStore";
+import { openRevokeConsentDialog } from "../requests/revokeConsentStore";
+import { useAcceptedConsent, usePmRequests } from "../requests/requestsStore";
+import { blockTargetFor, openBlockDialog, unblock, useBlock } from "../blocking";
+import { BLOCK_PATH } from "../blocking/BlockIcon";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { joinTarget } from "./joinTarget";
@@ -90,6 +97,9 @@ function PersonMenu({
   const state = useServerState();
   const user = findPerson(state.users, open.session, open.name);
   const friend = useFriend(user?.certHash ?? null);
+  const { sent } = usePmRequests(state.serverId);
+  const consent = useAcceptedConsent(state.serverId, user?.certHash ?? null);
+  const block = useBlock(state.serverId, user?.certHash ?? null, user?.name ?? "");
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -150,6 +160,19 @@ function PersonMenu({
 
   const join = user && !isSelf ? joinTarget(state, user) : null;
 
+  // Chat requests (issue #141) reach Mumcord users who announced them, and only make sense for
+  // people who may not write yet: not friends, no accepted conversation, no accepted request.
+  const sentRequest = user ? sent.find((r) => r.session === user.session) : undefined;
+  const alreadyAccepted = sentRequest?.accepted === true || consent !== undefined;
+  const chatRequest =
+    user && !isSelf && friend === undefined && !alreadyAccepted
+      ? hasMumcordFeature(user, "chat-request")
+        ? sentRequest
+          ? "pending"
+          : "offer"
+        : null
+      : null;
+
   const report = (cause: unknown) => {
     console.error("Changing a person's local settings failed", toEngineError(cause).code);
   };
@@ -202,6 +225,32 @@ function PersonMenu({
     </button>
   );
 
+  // Shown but not selectable; the visible reason is its accessible description, not its name.
+  const disabledItem = (id: string, icon: ReactNode, label: string, reason: string | null) => (
+    <button
+      key={id}
+      type="button"
+      role="menuitem"
+      aria-disabled="true"
+      aria-labelledby={`person-menu-${id}-label`}
+      aria-describedby={reason === null ? undefined : `person-menu-${id}-reason`}
+      tabIndex={-1}
+      className="server-menu__item person-menu__item"
+    >
+      <MenuIcon>{icon}</MenuIcon>
+      <span className="quick-settings__text">
+        <span id={`person-menu-${id}-label`} className="quick-settings__label">
+          {label}
+        </span>
+        {reason !== null && (
+          <span id={`person-menu-${id}-reason`} className="quick-settings__hint">
+            {reason}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+
   return (
     <div
       ref={ref}
@@ -217,89 +266,102 @@ function PersonMenu({
           <MenuConnectionLine session={user.session} />
         </div>
       )}
-      {user ? (
-        item("profile", <IdentityCardIcon />, t("menu.viewProfile"), () => {
-          closePersonMenu();
-          onViewProfile(user.session, open.opener);
-        })
-      ) : (
-        // Not on the server: there is no profile to open and nothing to mute.
-        <button
-          type="button"
-          role="menuitem"
-          aria-disabled="true"
-          tabIndex={-1}
-          className="server-menu__item person-menu__item"
-        >
-          <MenuIcon>
-            <IdentityCardIcon />
-          </MenuIcon>
-          {t("menu.viewProfile")}
-        </button>
+      {user && !isSelf && (
+        <>
+          {chatRequest === "pending"
+            ? disabledItem(
+                "message",
+                <ChatBubbleIcon />,
+                t("menu.sendMessage"),
+                t("menu.chatRequestPending"),
+              )
+            : item("message", <ChatBubbleIcon />, t("menu.sendMessage"), () => {
+                closePersonMenu();
+                // Without an accepted conversation a Mumcord user first gets a chat request (#141).
+                if (chatRequest === "offer") {
+                  openChatRequestDialog({
+                    serverId: shownServerId(),
+                    session: user.session,
+                    name: user.name,
+                    opener: open.opener,
+                  });
+                } else {
+                  openPrivateConversation(user);
+                }
+              })}
+          {join &&
+            (join.blocked === null
+              ? item(
+                  "join",
+                  <EnterChannelIcon />,
+                  t("menu.join", { channel: join.channel.name }),
+                  () => {
+                    setJoinError(null);
+                    joinChannel(join.channel.id).then(
+                      () => {
+                        closePersonMenu();
+                      },
+                      (cause: unknown) => {
+                        const { code } = toEngineError(cause);
+                        if (code !== "permissionDenied" && code !== "notConnected") {
+                          console.error("Joining a person's channel failed", code);
+                        }
+                        setJoinError(
+                          code === "permissionDenied"
+                            ? tChannels("errors.joinDenied")
+                            : code === "notConnected"
+                              ? tChannels("errors.notConnected")
+                              : tChannels("errors.joinFailed"),
+                        );
+                      },
+                    );
+                  },
+                )
+              : disabledItem(
+                  "join",
+                  <EnterChannelIcon />,
+                  t("menu.join", { channel: join.channel.name }),
+                  join.blocked === "full" ? t("menu.joinFull") : t("menu.joinLocked"),
+                ))}
+          {joinError && (
+            <p role="alert" className="channels-error">
+              {joinError}
+            </p>
+          )}
+          {/* People without a certificate can't be recognised again, so they can't be friends. */}
+          {user.certHash === null
+            ? disabledItem("friend", <HeartIcon />, tFriends("add"), tFriends("noCertificate"))
+            : item(
+                "friend",
+                <HeartIcon />,
+                friend === undefined ? tFriends("add") : tFriends("remove"),
+                () => {
+                  setFriend(user, friend === undefined).catch(report);
+                },
+              )}
+        </>
       )}
+      {user
+        ? item("profile", <IdentityCardIcon />, t("menu.viewProfile"), () => {
+            closePersonMenu();
+            onViewProfile(user.session, open.opener);
+          })
+        : // Not on the server: there is no profile to open and nothing to mute.
+          disabledItem("profile", <IdentityCardIcon />, t("menu.viewProfile"), null)}
       {user &&
         item("connection", <SignalIcon />, t("menu.connectionInfo"), () => {
           closePersonMenu();
           requestConnectionExpanded();
           onViewProfile(user.session, open.opener, true);
         })}
+      {consent &&
+        !isSelf &&
+        item("revokeConsent", <RevokeIcon />, t("menu.revokeConsent"), () => {
+          closePersonMenu();
+          openRevokeConsentDialog({ conversation: consent, opener: open.opener });
+        })}
       {user && !isSelf && (
         <>
-          {item("message", <ChatBubbleIcon />, t("card.sendPrivateMessage"), () => {
-            closePersonMenu();
-            openPrivateConversation(user);
-          })}
-          {join &&
-            (join.allowed ? (
-              item(
-                "join",
-                <EnterChannelIcon />,
-                t("menu.join", { channel: join.channel.name }),
-                () => {
-                  setJoinError(null);
-                  joinChannel(join.channel.id).then(
-                    () => {
-                      closePersonMenu();
-                    },
-                    (cause: unknown) => {
-                      const { code } = toEngineError(cause);
-                      if (code !== "permissionDenied" && code !== "notConnected") {
-                        console.error("Joining a person's channel failed", code);
-                      }
-                      setJoinError(
-                        code === "permissionDenied"
-                          ? tChannels("errors.joinDenied")
-                          : code === "notConnected"
-                            ? tChannels("errors.notConnected")
-                            : tChannels("errors.joinFailed"),
-                      );
-                    },
-                  );
-                },
-              )
-            ) : (
-              <button
-                type="button"
-                role="menuitem"
-                aria-disabled="true"
-                aria-describedby="person-menu-join-reason"
-                tabIndex={-1}
-                className="server-menu__item person-menu__item"
-              >
-                <MenuIcon>
-                  <EnterChannelIcon />
-                </MenuIcon>
-                {t("menu.join", { channel: join.channel.name })}
-                <span id="person-menu-join-reason" className="visually-hidden">
-                  {t("menu.joinDenied")}
-                </span>
-              </button>
-            ))}
-          {joinError && (
-            <p role="alert" className="channels-error">
-              {joinError}
-            </p>
-          )}
           <div role="separator" className="person-menu__separator" />
           {/* Same switch row as the quick settings; the menu stays open while it toggles. */}
           <button
@@ -322,36 +384,47 @@ function PersonMenu({
             </span>
             <span className="quick-settings__switch" aria-hidden="true" />
           </button>
-          {/* People without a certificate can't be recognised again, so they can't be friends. */}
-          <button
-            type="button"
-            role="menuitemcheckbox"
-            aria-checked={friend !== undefined}
-            aria-disabled={user.certHash === null}
-            tabIndex={-1}
-            className="quick-settings__row"
-            onClick={() => {
-              if (user.certHash === null) return;
-              setFriend(user, friend === undefined).catch(report);
-            }}
-          >
-            <MenuIcon>
-              <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" />
-            </MenuIcon>
-            <span className="quick-settings__text">
-              <span className="quick-settings__label">{tFriends("friend")}</span>
-              {user.certHash === null && (
-                <span className="quick-settings__hint">{tFriends("noCertificate")}</span>
-              )}
-            </span>
-            <span className="quick-settings__switch" aria-hidden="true" />
-          </button>
           <div className="person-menu__volume">
             <MenuIcon>
               <path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" />
             </MenuIcon>
             <VolumeSlider user={user} onError={report} />
           </div>
+          <div role="separator" className="person-menu__separator" />
+          {/* Last, apart from the rest: the label and icon say it is drastic, not only the colour. */}
+          <button
+            type="button"
+            role="menuitem"
+            tabIndex={-1}
+            className="server-menu__item server-menu__item--danger person-menu__item"
+            data-testid={block ? "person-unblock" : "person-block"}
+            onClick={() => {
+              closePersonMenu();
+              if (block) {
+                unblock(block.id).catch((cause: unknown) => {
+                  console.error("Unblocking failed", toEngineError(cause).code);
+                });
+                open.opener?.focus();
+                return;
+              }
+              const target =
+                state.serverId === null
+                  ? null
+                  : blockTargetFor(
+                      state.serverId,
+                      user.name,
+                      user.certHash,
+                      user.session,
+                      open.opener,
+                    );
+              if (target) openBlockDialog(target);
+            }}
+          >
+            <MenuIcon>
+              <path d={BLOCK_PATH} />
+            </MenuIcon>
+            {block ? t("block.unblock") : t("block.menu")}
+          </button>
         </>
       )}
     </div>
@@ -400,6 +473,18 @@ function IdentityCardIcon() {
 
 function ChatBubbleIcon() {
   return <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />;
+}
+
+function RevokeIcon() {
+  return (
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM9 7l6 6M15 7l-6 6" />
+  );
+}
+
+function HeartIcon() {
+  return (
+    <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" />
+  );
 }
 
 function EnterChannelIcon() {

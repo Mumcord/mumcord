@@ -1,5 +1,24 @@
 {
   "progress": "{{current}}. lépés / {{total}}",
+  "rerun": {
+    "title": "Beállítási varázsló",
+    "note": "Újra végigfutsz a beállításon. Az identitásod nem változik.",
+    "manageIdentities": "Identitások kezelése",
+    "stepsLabel": "A beállítás lépései",
+    "stepsSkipped": "(kihagyva, az identitás nem része ennek)",
+    "steps": {
+      "identity": "Identitás",
+      "mic": "Mikrofon",
+      "privacy": "Adatvédelem",
+      "updates": "Frissítések",
+      "talk": "Beszédmód"
+    },
+    "footer": "A Mégse mindent úgy hagy, ahogy van. A végén csak a módosított lépések mentődnek.",
+    "discardTitle": "Elveti a módosításokat?",
+    "discardBody": "A befejezés előtt semmi nem mentődik. Ha most megszakítod, minden úgy marad, ahogy van.",
+    "discardKeep": "Szerkesztés folytatása",
+    "discardConfirm": "Módosítások elvetése"
+  },
   "loadFailed": "A beállítást nem sikerült betölteni.",
   "finish": "Befejezés",
   "errors": {

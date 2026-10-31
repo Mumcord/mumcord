@@ -11,10 +11,6 @@
     "chat": "Salt la chat",
     "channels": "Salt la canale"
   },
-  "members": {
-    "show": "Arată membrii",
-    "hide": "Ascunde membrii"
-  },
   "resize": {
     "channels": "Redimensionează lista de canale",
     "members": "Redimensionează lista de membri"

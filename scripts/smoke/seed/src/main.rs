@@ -11,10 +11,10 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use mumcord_protocol::{ConnectConfig, ConnectError, ServerCert};
-use mumcord_store::{Identity, NewServer, SecretStore, Store};
+use mumcord_store::{Identity, NewIdentity, NewServer, SecretStore, Store};
 
 const HOST: &str = "127.0.0.1";
 
@@ -39,10 +39,18 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     let cert = server_cert(port).await?;
 
-    SecretStore::os().save_identity(&Identity::generate(username)?)?;
-
     std::fs::create_dir_all(&data_dir)?;
     let store = Store::open(&data_dir)?;
+    // The first identity becomes the default one, which servers without their own identity use.
+    let identity = Identity::generate(username)?;
+    let record = store.add_identity(&NewIdentity::new(
+        username,
+        identity.name(),
+        &identity.cert_hash(),
+        now_ms()?,
+    ))?;
+    SecretStore::os().save_identity(record.id, &identity)?;
+
     let mut settings = store.settings()?;
     settings.wizard_completed = true;
     store.save_settings(&settings)?;
@@ -53,6 +61,12 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("seeded server_id={}", saved.id);
     Ok(())
+}
+
+fn now_ms() -> Result<i64, Box<dyn std::error::Error>> {
+    Ok(i64::try_from(
+        SystemTime::now().duration_since(UNIX_EPOCH)?.as_millis(),
+    )?)
 }
 
 /// Reads the server certificate by rejecting it in the TLS handshake.
@@ -68,7 +82,7 @@ async fn server_cert(port: u16) -> Result<ServerCert, Box<dyn std::error::Error>
         login_timeout: Duration::from_secs(10),
     };
     match mumcord_protocol::connect(config).await {
-        Err(ConnectError::CertificateRejected(cert)) => Ok(cert),
+        Err(ConnectError::CertificateRejected(cert)) => Ok(*cert),
         Err(e) => Err(format!("reading the server certificate failed: {e}").into()),
         Ok(_) => Err("server accepted a connection that rejected its certificate".into()),
     }

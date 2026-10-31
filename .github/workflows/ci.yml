@@ -220,6 +220,13 @@ jobs:
       - name: Rust lint
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
+      # The smoke-test seeder is its own Cargo project outside the workspace, so the steps above
+      # never compile it. Checking it here catches store/protocol API changes that would
+      # otherwise only break the Smoke jobs of the test builds.
+      - name: Smoke seeder builds
+        if: runner.os == 'Linux'
+        run: cargo clippy --manifest-path scripts/smoke/seed/Cargo.toml --locked -- -D warnings
+
       - name: Rust tests
         run: cargo test --workspace --locked
 

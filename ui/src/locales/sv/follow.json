@@ -12,9 +12,7 @@
     "generic": "Det gick inte att följa kanalen. Försök igen."
   },
   "dm": {
-    "title": "Direktmeddelanden",
-    "unknown": "Okänd person",
-    "withServer": "{{name}}, på {{server}}"
+    "unknown": "Okänd person"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
@@ -54,5 +52,9 @@
     "dismiss": "Avfärda",
     "unfollowFailed": "Det gick inte att sluta följa alla kanaler. Försök igen."
   },
-  "mention": "innehåller en omnämning av dig"
+  "mention": "innehåller en omnämning av dig",
+  "header": {
+    "follow": "Följ kanal",
+    "unfollow": "Följer, klicka för att sluta följa"
+  }
 }

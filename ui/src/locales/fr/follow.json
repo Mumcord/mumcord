@@ -13,9 +13,7 @@
     "generic": "Le suivi de ce canal n’a pas fonctionné. Veuillez réessayer."
   },
   "dm": {
-    "title": "Messages privés",
-    "unknown": "Personne inconnue",
-    "withServer": "{{name}}, sur {{server}}"
+    "unknown": "Personne inconnue"
   },
   "notify": {
     "channel": "{{name}} dans {{channel}} : {{text}}",
@@ -58,5 +56,9 @@
     "dismiss": "Ignorer",
     "unfollowFailed": "L’arrêt du suivi de tous les canaux n’a pas fonctionné. Veuillez réessayer."
   },
-  "mention": "contient une mention de vous"
+  "mention": "contient une mention de vous",
+  "header": {
+    "follow": "Suivre le canal",
+    "unfollow": "Suivi, cliquer pour ne plus suivre"
+  }
 }

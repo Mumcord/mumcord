@@ -1,5 +1,24 @@
 {
   "progress": "Korak {{current}} od {{total}}",
+  "rerun": {
+    "title": "Čarobnjak za postavljanje",
+    "note": "Ponovno prolaziš kroz postavljanje. Tvoj identitet se ne mijenja.",
+    "manageIdentities": "Upravljaj identitetima",
+    "stepsLabel": "Koraci postavljanja",
+    "stepsSkipped": "(preskočeno, identitet nije dio ovoga)",
+    "steps": {
+      "identity": "Identitet",
+      "mic": "Mikrofon",
+      "privacy": "Privatnost",
+      "updates": "Ažuriranja",
+      "talk": "Način govora"
+    },
+    "footer": "Odustajanje ostavlja sve kako jest. Na kraju se spremaju samo promijenjeni koraci.",
+    "discardTitle": "Odbaciti promjene?",
+    "discardBody": "Ništa se ne sprema prije završetka. Ako sada odustaneš, sve ostaje kako jest.",
+    "discardKeep": "Nastavi uređivati",
+    "discardConfirm": "Odbaci promjene"
+  },
   "loadFailed": "Postavljanje nije bilo moguće učitati.",
   "finish": "Završi",
   "errors": {

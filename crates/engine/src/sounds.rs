@@ -19,8 +19,13 @@
 //! once the server confirms the move, so a refused join (e.g. a missing channel password) stays
 //! silent. Automatic arrivals (read-only landing, reconnect
 //! restore) and quitting never call them.
+//!
+//! Being kicked or banned (#205) has its own sounds: the session code calls
+//! [`SoundHub::removed`] when the server removes the own session, before voice is torn down.
+//! A plain disconnect or a server shutdown removes nobody and stays silent.
 
 use std::collections::{BTreeSet, HashMap};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
@@ -58,6 +63,10 @@ pub enum Sound {
     /// Someone starts watching your screen share (FR-2.77).
     ViewerStarted,
     ViewerStopped,
+    /// The server kicks you (#205).
+    Kicked,
+    /// The server bans you (#205).
+    Banned,
 }
 
 /// At most one joining or leaving activity sound per this span (FR-2.77).
@@ -89,6 +98,8 @@ impl Sound {
             Self::PartyLeft | Self::ViewerStopped => {
                 include_bytes!("../../../assets/sounds/user_left.wav")
             }
+            Self::Kicked => include_bytes!("../../../assets/sounds/kicked.wav"),
+            Self::Banned => include_bytes!("../../../assets/sounds/banned.wav"),
         }
     }
 
@@ -110,6 +121,18 @@ impl Sound {
             Self::ShareStopped => s.share_stopped,
             Self::ViewerStarted => s.viewer_started,
             Self::ViewerStopped => s.viewer_stopped,
+            Self::Kicked => s.kicked,
+            Self::Banned => s.banned,
+        }
+    }
+
+    /// The sound for the server removing the own session: a ban, or a kick by someone.
+    /// A removal without an actor and without a ban is no kick and stays silent.
+    pub fn for_removal(actor: Option<u32>, ban: bool) -> Option<Self> {
+        if ban {
+            Some(Self::Banned)
+        } else {
+            actor.map(|_| Self::Kicked)
         }
     }
 
@@ -129,6 +152,24 @@ impl Sound {
     /// Samples with the mix-in gain applied.
     fn mixed(self) -> Vec<f32> {
         self.samples().into_iter().map(|s| s * SOUND_GAIN).collect()
+    }
+
+    /// A notification about messages or activity, which Do Not Disturb silences (FR-3.111).
+    /// Voice presence (people joining or leaving) and feedback for the user's own actions
+    /// keep playing: voice keeps working during Do Not Disturb.
+    fn notification(self) -> bool {
+        matches!(
+            self,
+            Self::Message
+                | Self::Mention
+                | Self::PartyStarted
+                | Self::PartyJoined
+                | Self::PartyLeft
+                | Self::ShareStarted
+                | Self::ShareStopped
+                | Self::ViewerStarted
+                | Self::ViewerStopped
+        )
     }
 
     /// Feedback for the user's own action, so it plays even while deafened.
@@ -392,6 +433,8 @@ struct State {
 pub struct SoundHub {
     settings: Box<dyn Fn() -> SoundSettings + Send + Sync>,
     state: Mutex<State>,
+    /// Do Not Disturb is in effect (manual switch or the followed system state).
+    do_not_disturb: AtomicBool,
 }
 
 impl SoundHub {
@@ -406,6 +449,7 @@ impl SoundHub {
                 awaiting_move: None,
                 last_burst: None,
             }),
+            do_not_disturb: AtomicBool::new(false),
         })
     }
 
@@ -426,6 +470,15 @@ impl SoundHub {
 
     fn state(&self) -> std::sync::MutexGuard<'_, State> {
         self.state.lock().unwrap_or_else(PoisonError::into_inner)
+    }
+
+    /// Do Not Disturb turned on or off: notification sounds stay silent while it is on.
+    pub fn set_do_not_disturb(&self, on: bool) {
+        self.do_not_disturb.store(on, Ordering::Relaxed);
+    }
+
+    fn silenced(&self, sound: Sound) -> bool {
+        sound.notification() && self.do_not_disturb.load(Ordering::Relaxed)
     }
 
     /// Audio is open: sounds go to `out` from now on.
@@ -476,6 +529,17 @@ impl SoundHub {
         self.play_locked(&mut state, sound, deaf);
     }
 
+    /// Plays `sound` now whatever the toggles and the deaf state say: the "Test sound" button
+    /// of the output popover must be audible so the user can judge the chosen device and volume.
+    pub fn play_test(&self, sound: Sound) {
+        let mut state = self.state();
+        if let Some(out) = state.out.as_mut()
+            && !out(&sound.mixed())
+        {
+            tracing::debug!("test sound skipped: mixer input is full");
+        }
+    }
+
     /// The user joins a channel for voice themselves (QA.23); `mute`/`deaf` is the own state
     /// the join turns on. Plays the join sound in place of the mute/deafen cues the server's
     /// echo of that change would cause. With a `target` channel to move to, the sound waits
@@ -509,10 +573,24 @@ impl SoundHub {
             .then(|| Sound::HangUp.mixed())
     }
 
+    /// The server removed the own session (#205). Returns the kick or ban samples (gain
+    /// applied) if voice is on, the user is not deafened and the toggle allows it. Like
+    /// [`hang_up`](Self::hang_up), the caller plays them on a path that outlives the voice
+    /// pipeline.
+    pub fn removed(&self, actor: Option<u32>, ban: bool) -> Option<Vec<f32>> {
+        let mut state = self.state();
+        state.pending_join = false;
+        state.awaiting_move = None;
+        state.tracker.joining = None;
+        let sound = Sound::for_removal(actor, ban)?;
+        (state.out.is_some() && !state.tracker.own_deaf() && sound.enabled(&(self.settings)()))
+            .then(|| sound.mixed())
+    }
+
     /// Whether a rate-limited `sound` is not too close to the last one. A sound that would
     /// stay silent anyway does not use up the gap.
     fn burst_allowed(&self, state: &mut State, sound: Sound) -> bool {
-        if !sound.enabled(&(self.settings)()) || state.tracker.own_deaf() {
+        if !sound.enabled(&(self.settings)()) || state.tracker.own_deaf() || self.silenced(sound) {
             return true;
         }
         let now = Instant::now();
@@ -530,7 +608,7 @@ impl SoundHub {
         if was_deaf && !sound.own_action() {
             return;
         }
-        if !sound.enabled(&(self.settings)()) {
+        if !sound.enabled(&(self.settings)()) || self.silenced(sound) {
             return;
         }
         if let Some(out) = state.out.as_mut()
@@ -549,7 +627,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 17] = [
+    const ALL: [Sound; 19] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -567,6 +645,8 @@ mod tests {
         Sound::ShareStopped,
         Sound::ViewerStarted,
         Sound::ViewerStopped,
+        Sound::Kicked,
+        Sound::Banned,
     ];
 
     fn user(session: u32, channel_id: u32, mute: bool, deaf: bool) -> UserView {
@@ -597,12 +677,31 @@ mod tests {
             self_session: 1,
             info: crate::session::ServerInfoView {
                 version: String::new(),
+                release: None,
+                os: None,
                 follow_supported: true,
                 welcome_text: None,
                 default_channel_id: None,
                 max_message_length: 5000,
                 max_image_message_length: 0,
                 allow_html: false,
+                max_bandwidth: None,
+                max_users: None,
+                recording_allowed: false,
+                server_label: None,
+                server_address: None,
+                server_port: None,
+                tls_fingerprint: None,
+                users_online: 0,
+                session_id: None,
+                registered: false,
+                current_channel_permissions: None,
+                mumcord_users: 0,
+                tls_trusted: true,
+                tls_issuer: None,
+                tls_valid_from: None,
+                tls_valid_until: None,
+                tls_certificate_pem: None,
             },
             channels: Vec::new(),
             users,
@@ -688,6 +787,8 @@ mod tests {
             share_stopped: false,
             viewer_started: false,
             viewer_stopped: false,
+            kicked: false,
+            banned: false,
         };
         for s in ALL {
             assert!(s.enabled(&SoundSettings::default()), "{s:?}");
@@ -713,6 +814,19 @@ mod tests {
     }
 
     #[test]
+    fn test_sound_plays_even_when_deafened_and_toggles_are_off() {
+        let (hub, log) = hub_with_log(SoundSettings {
+            new_message: false,
+            ..SoundSettings::default()
+        });
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        hub.play(Sound::Message);
+        assert!(log.lock().unwrap().is_empty());
+        hub.play_test(Sound::Message);
+        assert_eq!(log.lock().unwrap().len(), 1);
+    }
+
+    #[test]
     fn deafened_suppresses_all_but_undeafen() {
         let (hub, log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![
@@ -729,6 +843,24 @@ mod tests {
         assert_eq!(log.lock().unwrap().len(), 2, "undeafen plays");
         hub.play(Sound::Message);
         assert_eq!(log.lock().unwrap().len(), 3);
+    }
+
+    #[test]
+    fn do_not_disturb_silences_notifications_but_not_voice_or_own_actions() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.set_do_not_disturb(true);
+        for sound in ALL {
+            log.lock().unwrap().clear();
+            hub.play(sound);
+            let played = !log.lock().unwrap().is_empty();
+            assert_eq!(played, !sound.notification(), "{sound:?}");
+        }
+        assert!(!Sound::UserJoined.notification() && !Sound::Mute.notification());
+        assert!(Sound::Mention.notification() && Sound::ShareStarted.notification());
+        log.lock().unwrap().clear();
+        hub.set_do_not_disturb(false);
+        hub.play(Sound::Mention);
+        assert_eq!(log.lock().unwrap().len(), 1, "plays again once it is off");
     }
 
     #[test]
@@ -764,9 +896,12 @@ mod tests {
             assert_eq!(u16::from_le_bytes([wav[34], wav[35]]), 16);
             let samples = s.samples();
             assert!(samples.len() > 48_00, "{s:?} too short");
+            // The ban sound is a two-part slapstick effect (impact, then a squeak) and keeps
+            // its full second; every other cue stays short.
+            let max_ms = if s == Sound::Banned { 1000 } else { 400 };
             assert!(
-                samples.len() <= 48_000 * 400 / 1000,
-                "{s:?} longer than 400 ms"
+                samples.len() <= 48_000 * max_ms / 1000,
+                "{s:?} longer than {max_ms} ms"
             );
             assert!(peak_dbfs(&samples) <= -12.0, "{s:?} too loud");
             assert!(peak_dbfs(&samples) > -40.0, "{s:?} inaudible");
@@ -958,6 +1093,47 @@ mod tests {
 
         hub.detach();
         assert!(hub.hang_up().is_none(), "no voice, nothing to hang up");
+    }
+
+    #[test]
+    fn removal_maps_to_kick_or_ban() {
+        assert_eq!(Sound::for_removal(Some(2), false), Some(Sound::Kicked));
+        assert_eq!(Sound::for_removal(Some(2), true), Some(Sound::Banned));
+        assert_eq!(
+            Sound::for_removal(None, true),
+            Some(Sound::Banned),
+            "a ban sounds even without an actor"
+        );
+        assert_eq!(
+            Sound::for_removal(None, false),
+            None,
+            "a removal by nobody is no kick"
+        );
+    }
+
+    #[test]
+    fn removed_needs_voice_toggle_and_hearing() {
+        let (hub, _log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        let kicked = hub.removed(Some(2), false).expect("kicked");
+        assert_eq!(kicked.len(), Sound::Kicked.samples().len());
+        let banned = hub.removed(Some(2), true).expect("banned");
+        assert_eq!(banned.len(), Sound::Banned.samples().len());
+        assert!(hub.removed(None, false).is_none(), "no kick, no sound");
+
+        let (off, _log) = hub_with_log(SoundSettings {
+            kicked: false,
+            ..SoundSettings::default()
+        });
+        assert!(off.removed(Some(2), false).is_none(), "kick toggle off");
+        assert!(off.removed(Some(2), true).is_some(), "ban toggle stays on");
+
+        let (deaf, _log) = hub_with_log(SoundSettings::default());
+        deaf.observe(&synced(vec![user(1, 10, true, true)]));
+        assert!(deaf.removed(Some(2), true).is_none(), "deafened");
+
+        hub.detach();
+        assert!(hub.removed(Some(2), true).is_none(), "no voice");
     }
 
     #[test]

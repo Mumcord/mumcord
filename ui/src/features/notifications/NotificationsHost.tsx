@@ -8,8 +8,11 @@ import {
   useShownServerId,
 } from "../channels";
 import { conversationKey, subscribeIncoming } from "../chat";
+import { isConversationMuted } from "../messages/conversationsStore";
 import { useServers } from "../servers";
+import { markConversationRead } from "./centreStore";
 import { handleIncoming } from "./incoming";
+import { NotificationCentre } from "./NotificationCentre";
 import { clearServerNotifications, markSeen, noticeKey } from "./notificationStore";
 import { Toasts } from "./Toasts";
 import "./notifications.css";
@@ -27,6 +30,12 @@ function dismissSystemNotification(serverId: number, conversation: Conversation)
     .catch((error: unknown) => {
       console.error("Dismissing a desktop notification failed", error);
     });
+}
+
+/** The chat is on screen: its toast, count and notification centre entries are done. */
+function seen(serverId: number, conversation: Conversation): void {
+  markSeen(noticeKey(serverId, conversationKey(conversation)));
+  markConversationRead(serverId, conversation);
 }
 
 /** Moves keyboard focus to the chat once it has rendered: the composer, else the chat region. */
@@ -56,7 +65,9 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     [servers],
   );
   const muted = useCallback(
-    (id: number) => servers.find((s) => s.id === id)?.notificationsMuted ?? false,
+    (id: number, conversation: Conversation) =>
+      (servers.find((s) => s.id === id)?.notificationsMuted ?? false) ||
+      isConversationMuted(id, conversation),
     [servers],
   );
   const live = useRef({ t, overlayOpen, onOpenChat, selected, shown, serverName, muted });
@@ -69,7 +80,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     live.current.onOpenChat();
     showServer(serverId);
     selectConversation(conversation);
-    markSeen(noticeKey(serverId, conversationKey(conversation)));
+    seen(serverId, conversation);
     dismissSystemNotification(serverId, conversation);
     focusChat();
   }, []);
@@ -78,7 +89,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
     function seeSelected(): void {
       const { selected: current, overlayOpen: covered, shown: server } = live.current;
       if (current === null || covered || server === null) return;
-      markSeen(noticeKey(server, conversationKey(current)));
+      seen(server, current);
       dismissSystemNotification(server, current);
     }
     const unsubscribers = [
@@ -87,7 +98,7 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
           t: live.current.t,
           overlayOpen: live.current.overlayOpen,
           serverName: (id) => live.current.serverName(id),
-          muted: (id) => live.current.muted(id),
+          muted: (id, conversation) => live.current.muted(id, conversation),
         });
       }),
       getApi().on("notificationActivated", ({ serverId, conversation }) => {
@@ -110,9 +121,14 @@ export function NotificationsHost({ overlayOpen, onOpenChat }: NotificationsHost
 
   useEffect(() => {
     if (selected === null || overlayOpen || shown === null) return;
-    markSeen(noticeKey(shown, conversationKey(selected)));
+    seen(shown, selected);
     dismissSystemNotification(shown, selected);
   }, [selected, overlayOpen, shown]);
 
-  return <Toasts onOpen={open} />;
+  return (
+    <>
+      <Toasts onOpen={open} />
+      <NotificationCentre overlayOpen={overlayOpen} />
+    </>
+  );
 }

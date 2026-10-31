@@ -8,7 +8,10 @@
     "muted": "Micrófono silenciado",
     "unmuted": "Micrófono activado",
     "deafened": "Ensordecido. No oyes a nadie y tu micrófono está silenciado",
-    "undeafened": "Ensordecimiento desactivado"
+    "undeafened": "Ensordecimiento desactivado",
+    "leftVoice": "Has salido de la voz en {{server}}",
+    "disconnected": "Desconectado de {{server}}",
+    "disconnectedAll": "Desconectado de todos los servidores"
   },
   "readOnly": {
     "text": "Estás leyendo sin participar: únete a un canal para hablar.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Escribe una contraseña para proteger el archivo de copia.",
     "exported": "Copia de la identidad guardada.",
     "confirm": "Registrarse",
-    "done": "Registrado en este servidor"
+    "done": "Registrado en este servidor",
+    "identity": "El nombre registrado pertenece a la identidad {{identity}}."
   },
   "errors": {
     "tooLarge": "Es demasiado grande para el servidor. Elige una imagen más pequeña o escribe un texto más corto.",
@@ -89,11 +93,54 @@
     "offerImages": "Ofrecer imágenes originales",
     "offerImagesHint": "Otros pueden cargar tus imágenes originales",
     "loadImages": "Cargar imágenes originales",
-    "loadImagesHint": "Obtener las imágenes originales de otros"
+    "loadImagesHint": "Obtener las imágenes originales de otros",
+    "dnd": "No molestar",
+    "dndHint": "Silencia los sonidos y avisos de notificación",
+    "dndSystemHint": "Activado por el modo No molestar de tu escritorio",
+    "privateMessages": "Mensajes privados de",
+    "pm_everyone": "Todos",
+    "pm_friendsOnly": "Amigos",
+    "pm_nobody": "Nadie"
   },
   "voice": {
     "line": "Voz: {{channel}} · {{server}}",
     "server": "Voz: {{server}}",
     "show": "{{location}} – mostrar este servidor"
+  },
+  "disconnectMenu": {
+    "label": "Opciones de desconexión",
+    "open": "Más opciones de desconexión",
+    "leaveVoice": "Salir de la voz",
+    "leaveVoiceHint": "Dejar de hablar y escuchar, seguir conectado para el chat",
+    "disconnectHint": "Cerrar la conexión con este servidor",
+    "switchTo": "Cambiar la voz a {{server}}",
+    "all": "Desconectar de todos los servidores…",
+    "allHint": "Cerrar todas las conexiones a servidores"
+  },
+  "disconnectAll": {
+    "title": "¿Desconectar de todos los servidores?",
+    "message": "¿Desconectar de los {{total}} servidores?",
+    "confirm": "Desconectar"
+  },
+  "audio": {
+    "inputOptions": "Opciones del micrófono",
+    "outputOptions": "Opciones de los altavoces",
+    "inputDevices": "Dispositivo de entrada",
+    "outputDevices": "Dispositivo de salida",
+    "systemDefault": "Predeterminado del sistema",
+    "noDevices": "No se encontraron dispositivos",
+    "noiseSuppression": "Supresión de ruido",
+    "testSound": "Probar sonido",
+    "voiceSettings": "Ajustes de voz…",
+    "fallbackInput": "Micrófono desconectado. Se usa el predeterminado del sistema.",
+    "fallbackOutput": "Dispositivo de salida desconectado. Se usa el predeterminado del sistema.",
+    "volume": "Volumen",
+    "level": "Nivel"
+  },
+  "dnd": {
+    "label": "No molestar",
+    "manual": "manual",
+    "system": "No molestar (sistema)",
+    "systemHint": "Desactívalo en los ajustes de notificaciones de tu escritorio."
   }
 }

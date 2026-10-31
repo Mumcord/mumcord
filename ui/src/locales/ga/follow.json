@@ -15,9 +15,7 @@
     "generic": "Níor oibrigh sé an cainéal seo a leanúint. Bain triail eile as."
   },
   "dm": {
-    "title": "Teachtaireachtaí díreacha",
-    "unknown": "Duine anaithnid",
-    "withServer": "{{name}}, ar {{server}}"
+    "unknown": "Duine anaithnid"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
@@ -66,5 +64,9 @@
     "dismiss": "Dún",
     "unfollowFailed": "Níor oibrigh sé scor de gach cainéal a leanúint. Bain triail eile as."
   },
-  "mention": "luann sé thú"
+  "mention": "luann sé thú",
+  "header": {
+    "follow": "Lean an cainéal",
+    "unfollow": "Ag leanúint, cliceáil chun éirí as"
+  }
 }

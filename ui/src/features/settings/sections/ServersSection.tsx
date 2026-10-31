@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { SettingsImport } from "../../mumbleImport/SettingsImport";
 import { Group, Section } from "../components/Section";
 import type { SettingsSectionProps } from "./types";
 
@@ -11,7 +12,10 @@ function parseLimit(text: string): number | null {
   return value >= MAX_SERVERS_RANGE.min && value <= MAX_SERVERS_RANGE.max ? value : null;
 }
 
-/** Servers: how many servers may be connected at the same time (FR-2.1). */
+/**
+ * Servers: how many servers may be connected at the same time (FR-2.1) and the import from the
+ * official Mumble client (FR-3.94).
+ */
 export function ServersSection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const id = useId();
@@ -49,6 +53,7 @@ export function ServersSection({ settings, update }: SettingsSectionProps) {
           {valid ? t("servers.limitHint") : t("servers.limitInvalid")}
         </p>
       </Group>
+      <SettingsImport settings={settings} update={update} />
     </Section>
   );
 }

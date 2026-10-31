@@ -95,7 +95,7 @@ async fn voice_moves_between_connected_servers_within_the_limit() {
     )
     .expect("engine");
     engine
-        .identity_create("Multi Tester".into())
+        .identity_create("Multi Tester".into(), None)
         .await
         .expect("identity");
     let name = format!("ms-{:06x}", std::process::id() & 0xff_ffff);
@@ -178,6 +178,24 @@ async fn voice_moves_between_connected_servers_within_the_limit() {
     assert!(engine.snapshot_of(a).expect("A").read_only);
     assert!(!engine.snapshot_of(b).expect("B").read_only);
     assert_eq!(engine.snapshot().expect("voice snapshot").server_id, b);
+
+    // Leaving voice keeps B connected but read-only and deafened; nobody has voice (#154).
+    engine.leave_voice();
+    wait_voice_server(&mut rx, None).await;
+    assert!(engine.snapshot_of(b).expect("B").read_only);
+    bot_b
+        .wait_user(&name, &check(true))
+        .await
+        .expect("B shows the user deafened");
+    assert!(matches!(
+        engine.connection_state_of(b),
+        ConnState::Connected { .. }
+    ));
+    // Joining a channel gives voice back.
+    engine
+        .join_channel(b, channel_id(&snap_b, "Raid"))
+        .expect("rejoin Raid on B");
+    wait_voice_server(&mut rx, Some(b)).await;
 
     // Disconnecting A leaves B and its voice alone; C fits again (FR-2.9).
     engine.disconnect(a);

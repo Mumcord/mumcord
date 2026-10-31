@@ -55,10 +55,14 @@
   "menu": {
     "label": "Toiminnot: {{name}}",
     "viewProfile": "Näytä profiili",
+    "sendMessage": "Lähetä viesti",
     "join": "Liity kanavalle {{channel}}",
-    "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
+    "joinFull": "Tämä kanava on täynnä.",
+    "joinLocked": "Et voi liittyä tälle kanavalle, tai se vaatii salasanan.",
     "mute": "Mykistä minulta",
-    "connectionInfo": "Yhteyden tiedot…"
+    "connectionInfo": "Yhteyden tiedot…",
+    "chatRequestPending": "Keskustelupyyntö odottaa",
+    "revokeConsent": "Peru keskustelusuostumus…"
   },
   "nowPlaying": {
     "label": "Nyt soi",
@@ -83,5 +87,53 @@
   "preview": {
     "privateMessage": "Yksityisviesti",
     "fullProfile": "Koko profiili"
+  },
+  "chatRequest": {
+    "title": "Keskustelupyyntö käyttäjälle {{name}}",
+    "note": "Viesti (valinnainen)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} / {{max}} merkkiä käytetty",
+    "send": "Lähetä",
+    "failed": "Keskustelupyyntöä ei voitu lähettää. Yritä uudelleen."
+  },
+  "toggle": {
+    "show": "Näytä jäsenet",
+    "hide": "Piilota jäsenet",
+    "showCount_one": "Näytä jäsenet ({{count}})",
+    "showCount_other": "Näytä jäsenet ({{count}})",
+    "talkingOne": "{{name}} puhuu",
+    "talkingTwo": "{{first}} ja {{second}} puhuvat",
+    "talkingMore_one": "{{name}} ja {{count}} muu puhuvat",
+    "talkingMore_other": "{{name}} ja {{count}} muuta puhuvat",
+    "shortcut": "Ctrl+Vaihto+M"
+  },
+  "revokeConsent": {
+    "title": "Perutaanko keskustelusuostumus käyttäjältä {{name}}?",
+    "message": "Käyttäjän {{name}} täytyy lähettää uusi viestipyyntö, ennen kuin hänen viestinsä tulevat taas perille. Keskusteluhistoria säilyy.",
+    "confirm": "Peru",
+    "failed": "Keskustelusuostumuksen peruminen epäonnistui. Yritä uudelleen."
+  },
+  "block": {
+    "menu": "Estä…",
+    "unblock": "Poista esto",
+    "title": "Estetäänkö {{name}}?",
+    "onServer": "palvelimella {{server}}",
+    "whatHappens": "Mitä tapahtuu",
+    "private": "Käyttäjän {{name}} yksityisviestejä ei näytetä, eivätkä ne ilmoita sinulle.",
+    "channelCollapsed": "Käyttäjän {{name}} kanavaviestit on tiivistetty. Voit silti avata ne.",
+    "channelHidden": "Käyttäjän {{name}} kanavaviestit on piilotettu.",
+    "voice": "{{name}} on mykistetty sinulta puheessa, myös kuiskaukset.",
+    "data": "Ei historian synkronointia, kutsuja tai muuta Mumcord-dataa käyttäjältä {{name}}.",
+    "followsCert": "Esto seuraa käyttäjän {{name}} varmennetta, joten uusi nimi ei kierrä sitä.",
+    "nameOnly": "Käyttäjällä {{name}} ei ole varmennetta, joten esto koskee vain tätä nimeä palvelimella {{server}}.",
+    "warning": "{{name}} voi yhä nähdä sinut ja lukea viestisi. Mumble ei voi estää sitä pelkästään sinun puolellasi. {{name}} ei saa tietoa estosta.",
+    "cancel": "Peruuta",
+    "confirm": "Estä {{name}}",
+    "done": "{{name}} on estetty.",
+    "failed": "Käyttäjän {{name}} estäminen epäonnistui. Yritä uudelleen.",
+    "badge": "Estetty",
+    "collapsed": "Viesti estetyltä käyttäjältä",
+    "show": "Näytä",
+    "showLabel": "Näytä viesti estetyltä käyttäjältä"
   }
 }

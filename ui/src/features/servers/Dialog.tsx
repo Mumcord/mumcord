@@ -9,6 +9,8 @@ interface DialogProps {
   /** Element focused when the dialog opens; defaults to the first form control. */
   initialFocus?: RefObject<HTMLElement | null> | undefined;
   describedBy?: string | undefined;
+  /** Extra class on the `<dialog>`, for a dialog that needs its own size or layout. */
+  className?: string | undefined;
 }
 
 const FOCUSABLE = "input, select, textarea, button";
@@ -24,6 +26,7 @@ export function Dialog({
   role = "dialog",
   initialFocus,
   describedBy,
+  className,
 }: DialogProps) {
   const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
@@ -54,7 +57,7 @@ export function Dialog({
   return (
     <dialog
       ref={ref}
-      className="servers-dialog"
+      className={className ? `servers-dialog ${className}` : "servers-dialog"}
       role={role === "alertdialog" ? "alertdialog" : undefined}
       aria-modal="true"
       aria-labelledby={titleId}

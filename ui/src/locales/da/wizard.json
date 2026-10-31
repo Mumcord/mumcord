@@ -1,5 +1,24 @@
 {
   "progress": "Trin {{current}} af {{total}}",
+  "rerun": {
+    "title": "Opsætningsguide",
+    "note": "Du gennemgår opsætningen igen. Din identitet ændres ikke.",
+    "manageIdentities": "Administrér identiteter",
+    "stepsLabel": "Trin i opsætningen",
+    "stepsSkipped": "(sprunget over, identiteten er ikke en del af det)",
+    "steps": {
+      "identity": "Identitet",
+      "mic": "Mikrofon",
+      "privacy": "Privatliv",
+      "updates": "Opdateringer",
+      "talk": "Taletilstand"
+    },
+    "footer": "Annullér lader alt være, som det er. Kun de trin, du ændrede, gemmes til sidst.",
+    "discardTitle": "Kassér dine ændringer?",
+    "discardBody": "Intet gemmes, før du er færdig. Annullerer du nu, forbliver alt som det er.",
+    "discardKeep": "Fortsæt med at redigere",
+    "discardConfirm": "Kassér ændringer"
+  },
   "loadFailed": "Opsætningen kunne ikke indlæses.",
   "finish": "Afslut",
   "errors": {

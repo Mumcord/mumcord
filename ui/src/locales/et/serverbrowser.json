@@ -1,0 +1,48 @@
+{
+  "title": "Avalikud serverid",
+  "loading": "Laadin loendit…",
+  "subtitle": "Laaditud, sest avasid selle lehe · kuvatud {{shown}}/{{total}}",
+  "search": "Otsi nime, aadressi või riigi järgi",
+  "refresh": "Värskenda",
+  "retry": "Proovi uuesti",
+  "loadFailed": "Avalike serverite loendit ei õnnestunud laadida. Kontrolli internetiühendust ja proovi uuesti.",
+  "noMatch": "Ükski server ei vasta otsingule ja filtritele.",
+  "saveFailed": "Serverit ei õnnestunud lisada. Proovi uuesti.",
+  "filters": {
+    "label": "Filtrid",
+    "country": "Riik",
+    "anyCountry": "Iga riik",
+    "ping": "Ping",
+    "anyPing": "Iga ping",
+    "pingBelow": "Alla {{ms}} ms",
+    "hideEmpty": "Peida tühjad",
+    "hideFull": "Peida täis"
+  },
+  "sortedBy": "Järjestus: {{column}}",
+  "columns": {
+    "name": "Nimi",
+    "country": "Riik",
+    "ping": "Ping",
+    "users": "Kasutajad",
+    "actions": "Toimingud"
+  },
+  "badge": {
+    "empty": "Tühi",
+    "full": "Täis"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Veel teadmata",
+  "measuring": "Mõõdan",
+  "noAnswer": "Vastust pole",
+  "ms": "{{ms}} ms",
+  "connect": "Ühenda",
+  "connectTo": "Ühenda serveriga {{server}}",
+  "favourite": "Lemmik",
+  "favouriteServer": "Lisa {{server}} oma serverite hulka",
+  "saved": "Salvestatud",
+  "savedAs": "{{server}} on sinu serverite hulgas",
+  "announce": {
+    "saved": "{{server}} lisati sinu serverite hulka"
+  },
+  "note": "Pingitakse ainult nähtavaid ridu, mõnda korraga. Muud midagi serverile ei saadeta enne, kui ühendad."
+}

@@ -8,7 +8,10 @@
     "muted": "Mikrofoni mykistetty",
     "unmuted": "Mikrofonin mykistys poistettu",
     "deafened": "Kuulokkeet mykistetty. Et kuule muita, ja mikrofonisi on mykistetty",
-    "undeafened": "Kuulokkeiden mykistys poistettu"
+    "undeafened": "Kuulokkeiden mykistys poistettu",
+    "leftVoice": "Poistuttu äänestä palvelimella {{server}}",
+    "disconnected": "Yhteys palvelimeen {{server}} katkaistu",
+    "disconnectedAll": "Yhteys kaikkiin palvelimiin katkaistu"
   },
   "readOnly": {
     "text": "Seuraat keskustelua – liity kanavalle puhuaksesi.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Anna salasana varmuuskopiotiedoston suojaamiseksi.",
     "exported": "Identiteetin varmuuskopio tallennettu.",
     "confirm": "Rekisteröidy",
-    "done": "Rekisteröitynyt tälle palvelimelle"
+    "done": "Rekisteröitynyt tälle palvelimelle",
+    "identity": "Rekisteröity nimi kuuluu identiteetille {{identity}}."
   },
   "errors": {
     "tooLarge": "Tämä on liian suuri palvelimelle. Valitse pienempi kuva tai kirjoita lyhyempi teksti.",
@@ -89,11 +93,54 @@
     "offerImages": "Tarjoa täysikokoiset kuvat",
     "offerImagesHint": "Anna muiden ladata alkuperäiset kuvasi",
     "loadImages": "Lataa täysikokoiset kuvat",
-    "loadImagesHint": "Hae alkuperäiset kuvat muilta"
+    "loadImagesHint": "Hae alkuperäiset kuvat muilta",
+    "dnd": "Älä häiritse",
+    "dndHint": "Mykistää ilmoitusäänet ja -bannerit",
+    "dndSystemHint": "Päällä työpöydän Älä häiritse -tilan kautta",
+    "privateMessages": "Yksityisviestit keneltä",
+    "pm_everyone": "Kaikilta",
+    "pm_friendsOnly": "Kaverit",
+    "pm_nobody": "Ei keneltäkään"
   },
   "voice": {
     "line": "Puhe: {{channel}} · {{server}}",
     "server": "Puhe: {{server}}",
     "show": "{{location}} – näytä tämä palvelin"
+  },
+  "disconnectMenu": {
+    "label": "Katkaisuvaihtoehdot",
+    "open": "Lisää katkaisuvaihtoehtoja",
+    "leaveVoice": "Poistu äänestä",
+    "leaveVoiceHint": "Lopeta puhuminen ja kuuntelu, pysy yhteydessä chattia varten",
+    "disconnectHint": "Sulje yhteys tähän palvelimeen",
+    "switchTo": "Siirrä ääni palvelimelle {{server}}",
+    "all": "Katkaise yhteys kaikkiin palvelimiin…",
+    "allHint": "Sulje kaikki palvelinyhteydet"
+  },
+  "disconnectAll": {
+    "title": "Katkaistaanko yhteys kaikkiin palvelimiin?",
+    "message": "Katkaistaanko yhteys kaikkiin {{total}} palvelimeen?",
+    "confirm": "Katkaise"
+  },
+  "audio": {
+    "inputOptions": "Mikrofonin asetukset",
+    "outputOptions": "Kaiuttimien asetukset",
+    "inputDevices": "Tulolaite",
+    "outputDevices": "Lähtölaite",
+    "systemDefault": "Järjestelmän oletus",
+    "noDevices": "Laitteita ei löytynyt",
+    "noiseSuppression": "Kohinanvaimennus",
+    "testSound": "Testiääni",
+    "voiceSettings": "Ääniasetukset…",
+    "fallbackInput": "Mikrofoni irrotettiin. Käytössä on järjestelmän oletus.",
+    "fallbackOutput": "Lähtölaite irrotettiin. Käytössä on järjestelmän oletus.",
+    "volume": "Äänenvoimakkuus",
+    "level": "Taso"
+  },
+  "dnd": {
+    "label": "Älä häiritse",
+    "manual": "käsin",
+    "system": "Älä häiritse (järjestelmä)",
+    "systemHint": "Poista se käytöstä työpöydän ilmoitusasetuksista."
   }
 }

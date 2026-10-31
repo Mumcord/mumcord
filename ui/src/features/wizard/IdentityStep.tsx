@@ -8,6 +8,9 @@ import { StepFrame } from "./StepFrame";
 type Mode = "create" | "import";
 
 interface IdentityStepProps {
+  /** 1-based step number and step count; the identity step exists only on first start. */
+  step: number;
+  total: number;
   /** Identity that already exists (wizard was left halfway); the step then only confirms it. */
   identity: Identity | null;
   focusOnMount: boolean;
@@ -15,7 +18,7 @@ interface IdentityStepProps {
 }
 
 /** Step 1: create a new identity or import a PKCS#12 file (FR-1.2). */
-export function IdentityStep({ identity, focusOnMount, onDone }: IdentityStepProps) {
+export function IdentityStep({ step, total, identity, focusOnMount, onDone }: IdentityStepProps) {
   const { t } = useTranslation("wizard");
   const [mode, setMode] = useState<Mode>("create");
   const [name, setName] = useState("");
@@ -65,8 +68,8 @@ export function IdentityStep({ identity, focusOnMount, onDone }: IdentityStepPro
     try {
       const created =
         mode === "create"
-          ? await getApi().identityCreate(name.trim())
-          : await getApi().identityImport(path ?? "", password === "" ? null : password);
+          ? await getApi().identityCreate(name.trim(), null)
+          : await getApi().identityImport(path ?? "", password === "" ? null : password, null);
       onDone(created);
     } catch (cause: unknown) {
       setBusy(false);
@@ -96,7 +99,8 @@ export function IdentityStep({ identity, focusOnMount, onDone }: IdentityStepPro
 
   return (
     <StepFrame
-      step={1}
+      step={step}
+      total={total}
       title={t("identity.title")}
       focusOnMount={focusOnMount}
       busy={busy}

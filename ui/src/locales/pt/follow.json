@@ -13,9 +13,7 @@
     "generic": "Não foi possível seguir este canal. Tenta novamente."
   },
   "dm": {
-    "title": "Mensagens diretas",
-    "unknown": "Pessoa desconhecida",
-    "withServer": "{{name}}, em {{server}}"
+    "unknown": "Pessoa desconhecida"
   },
   "notify": {
     "channel": "{{name}} em {{channel}}: {{text}}",
@@ -58,5 +56,9 @@
     "dismiss": "Dispensar",
     "unfollowFailed": "Não foi possível deixar de seguir todos os canais. Tenta novamente."
   },
-  "mention": "inclui uma menção a ti"
+  "mention": "inclui uma menção a ti",
+  "header": {
+    "follow": "Seguir canal",
+    "unfollow": "A seguir, clique para deixar de seguir"
+  }
 }

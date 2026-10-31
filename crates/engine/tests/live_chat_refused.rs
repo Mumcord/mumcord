@@ -71,7 +71,7 @@ async fn refused_message_is_reported_and_can_be_retried() {
     .expect("engine");
     let name = format!("mc-refused-{}", std::process::id());
     engine
-        .identity_create(name.clone())
+        .identity_create(name.clone(), None)
         .await
         .expect("identity");
     let (server, snapshot) = connect(&engine, &mut rx, &name).await;

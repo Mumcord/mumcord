@@ -1,0 +1,102 @@
+{
+  "title": "Adu-ți configurarea din Mumble",
+  "intro": "Am găsit clientul oficial Mumble pe acest computer. Alege ce să copiem. Nu se modifică nimic în Mumble și nimic nu părăsește computerul tău.",
+  "optional": "{{progress}} · opțional",
+  "listLabel": "Ce să copiem din Mumble",
+  "favourites": {
+    "title": "Servere favorite",
+    "found_one": "{{count}} găsit",
+    "found_few": "{{count}} găsite",
+    "found_other": "{{count}} de găsite",
+    "duplicates_one": "{{count}} deja în Mumcord (omis)",
+    "duplicates_few": "{{count}} deja în Mumcord (omise)",
+    "duplicates_other": "{{count}} deja în Mumcord (omise)",
+    "failed": "Lista de servere din Mumble nu a putut fi citită.",
+    "review": "Verifică lista",
+    "hide": "Ascunde lista",
+    "listLabel": "Servere de copiat",
+    "duplicate": "Deja în Mumcord"
+  },
+  "passwords": {
+    "title": "Parole salvate",
+    "count_one": "{{count}} dintre favorite are o parolă salvată",
+    "count_few": "{{count}} dintre favorite au o parolă salvată",
+    "count_other": "{{count}} dintre favorite au o parolă salvată",
+    "keychain": "Stocată în depozitul de chei al sistemului"
+  },
+  "identity": {
+    "title": "Identitate (certificat de client)",
+    "keeps": "Îți păstrează numele înregistrat și permisiunile",
+    "locked": "protejat cu parolă în Mumble",
+    "named": "Certificat pentru „{{name}}”",
+    "validUntil": "valabil până la {{date}}",
+    "passwordNeeded": "Este necesară parola",
+    "already": "Deja în Mumcord",
+    "password": "Parola certificatului din Mumble",
+    "passwordRequired": "Introdu parola certificatului.",
+    "wrongPassword": "Această parolă nu deschide certificatul. Încearcă din nou."
+  },
+  "devices": {
+    "title": "Dispozitive audio",
+    "input": "Microfon: {{name}}",
+    "output": "Ieșire: {{name}}",
+    "missing": "Dispozitivele din Mumble nu sunt conectate la acest computer."
+  },
+  "ptt": {
+    "title": "Tasta push-to-talk",
+    "modifierOnly": "Tasta din Mumble este doar o tastă modificatoare, pe care Mumcord nu o poate folosi. Poți alege o tastă mai târziu.",
+    "tooManyKeys": "Comanda rapidă din Mumble are mai mult de o tastă, lucru pe care Mumcord nu îl poate folosi. Poți alege o tastă mai târziu.",
+    "unknown": "Comanda rapidă din Mumble folosește o tastă sau un dispozitiv pe care Mumcord nu le cunoaște. Poți alege o tastă mai târziu."
+  },
+  "volume": {
+    "title": "Volum și setări de voce",
+    "hint": "Mumble și Mumcord folosesc scale diferite, așa că valorile nu s-ar potrivi",
+    "notRecommended": "Nerecomandat"
+  },
+  "selected_one": "{{count}} element selectat",
+  "selected_few": "{{count}} elemente selectate",
+  "selected_other": "{{count}} de elemente selectate",
+  "import": "Importă",
+  "importing": "Se importă…",
+  "skip": "Omite deocamdată",
+  "cancel": "Anulează",
+  "failed": "Importul nu a putut fi finalizat. Încearcă din nou.",
+  "secureStorage": "Mumcord nu poate accesa stocarea securizată a sistemului. Deblochează depozitul de chei sau managerul de parole și încearcă din nou.",
+  "settingsFailed": "Serverele tale au fost copiate, dar setările nu au putut fi salvate.",
+  "summary": {
+    "title": "Import finalizat",
+    "intro": "Datele tale din Mumble au fost copiate. Vezi ce s-a întâmplat.",
+    "added_one": "{{count}} server adăugat la favorite",
+    "added_few": "{{count}} servere adăugate la favorite",
+    "added_other": "{{count}} de servere adăugate la favorite",
+    "skipped_one": "{{count}} server omis",
+    "skipped_few": "{{count}} servere omise",
+    "skipped_other": "{{count}} de servere omise",
+    "skippedDetail_one": "{{names}} este deja în lista ta",
+    "skippedDetail_few": "{{names}} sunt deja în lista ta",
+    "skippedDetail_other": "{{names}} sunt deja în lista ta",
+    "duplicate": "Duplicat",
+    "passwords_one": "{{count}} parolă salvată",
+    "passwords_few": "{{count}} parole salvate",
+    "passwords_other": "{{count}} de parole salvate",
+    "passwordsDetail": "Stocată în breloc (keychain) sistemului, nu într-un fișier",
+    "identity": "Identitate importată",
+    "identityDefault": "Mumcord o folosește acum",
+    "identityServers": "Folosită pentru serverele copiate",
+    "identitySkipped": "Identitate deja în Mumcord",
+    "identitySkippedDetail": "Acest certificat este deja una dintre identitățile tale",
+    "devicesAndPtt": "Dispozitive audio și tasta push-to-talk",
+    "done": "Gata",
+    "undo": "Anulează importul",
+    "undone": "Importul a fost anulat.",
+    "undoFailed": "Importul nu a putut fi anulat complet. Verifică serverele și identitățile tale."
+  },
+  "settings": {
+    "title": "Importă din Mumble",
+    "hint": "Copiază serverele favorite, parolele salvate, certificatul și setările audio din clientul oficial Mumble.",
+    "button": "Importă din Mumble…",
+    "searching": "Se caută Mumble…",
+    "notFound": "Clientul oficial Mumble nu a fost găsit pe acest computer.",
+    "breadcrumb": "Setări · Servere · Importă din Mumble"
+  }
+}

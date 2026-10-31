@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Server overview",
   "tree": {
     "label": "Channels",
-    "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse",
+    "hint": "Enter: show chat · Shift+Enter or double-click: join · Arrow keys: move, expand, collapse · Menu key: channel options",
     "join": "Join",
-    "menuLabel": "Options for {{channel}}",
-    "showDescription": "Show channel description",
     "you": "(you)",
-    "voiceHere": "you are here (voice)",
+    "youAreHere": "you are here",
     "people_one": "{{count}} person",
     "people_other": "{{count}} people",
     "stack": {
@@ -19,7 +16,13 @@
     "showAll": "Show all ({{total}})",
     "showFewer": "Show fewer",
     "jump": "Jump to my channel",
-    "locked": "locked"
+    "locked": "locked",
+    "temporary": "temporary",
+    "linked": "linked",
+    "full": "Channel full",
+    "fullPlaces": "Channel full, {{places}}",
+    "places_one": "{{taken}} of {{count}} place taken",
+    "places_other": "{{taken}} of {{count}} places taken"
   },
   "status": {
     "listening": "listening only",
@@ -56,7 +59,8 @@
   "errors": {
     "joinDenied": "You are not allowed to enter this channel.",
     "joinFailed": "Could not join the channel. Please try again.",
-    "notConnected": "Not connected to a server."
+    "notConnected": "Not connected to a server.",
+    "moveFailed": "Could not move this person."
   },
   "empty": {
     "disconnected": "Not connected. Pick a server to see its channels.",
@@ -71,6 +75,17 @@
     "channels_one": "{{count}} channel",
     "channels_other": "{{count}} channels",
     "people_one": "{{count}} person",
-    "people_other": "{{count}} people"
+    "people_other": "{{count}} people",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Connected",
+      "connecting": "Connecting",
+      "reconnecting": "Reconnecting…",
+      "disconnected": "Disconnected"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

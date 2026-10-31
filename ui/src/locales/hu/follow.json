@@ -12,9 +12,7 @@
     "generic": "A csatorna követése nem sikerült. Próbáld újra."
   },
   "dm": {
-    "title": "Közvetlen üzenetek",
-    "unknown": "Ismeretlen személy",
-    "withServer": "{{name}}, itt: {{server}}"
+    "unknown": "Ismeretlen személy"
   },
   "notify": {
     "channel": "{{name}} itt: {{channel}}: {{text}}",
@@ -54,5 +52,9 @@
     "dismiss": "Elvetés",
     "unfollowFailed": "Az összes csatorna követésének megszüntetése nem sikerült. Próbáld újra."
   },
-  "mention": "megemlít téged"
+  "mention": "megemlít téged",
+  "header": {
+    "follow": "Csatorna követése",
+    "unfollow": "Követed, kattints a leállításhoz"
+  }
 }

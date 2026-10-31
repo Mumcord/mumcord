@@ -1,0 +1,164 @@
+/* "Audio for this channel" dialog (issue #171), in the card style of channel info. */
+
+.servers-dialog.channel-audio {
+  width: min(34rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.channel-audio .servers-dialog__title {
+  margin-bottom: var(--space-1);
+}
+
+.channel-audio__subtitle {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.channel-audio__subtitle span {
+  margin-right: var(--space-1);
+}
+
+.channel-audio__presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-3);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.channel-audio__preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  text-align: center;
+  cursor: pointer;
+}
+
+.channel-audio__preset:hover {
+  background: var(--color-bg-hover);
+}
+
+.channel-audio__preset--on {
+  border: 2px solid var(--color-accent);
+  background: var(--color-bg-selected);
+}
+
+.channel-audio__preset:has(input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.channel-audio__preset-name {
+  font-weight: var(--font-weight-bold);
+}
+
+.channel-audio__preset-hint {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.channel-audio__row {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.channel-audio__default {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.channel-audio__link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-warning);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.channel-audio__link:hover {
+  text-decoration: underline;
+}
+
+.channel-audio__bitrate-line {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.channel-audio__bitrate-line label {
+  font-weight: var(--font-weight-bold);
+}
+
+.channel-audio__track {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.channel-audio__track input {
+  flex: 1;
+  accent-color: var(--color-accent);
+}
+
+/* Server limit mark on the track; the thumb's width is kept out of the position. */
+.channel-audio__limit {
+  position: absolute;
+  top: 50%;
+  left: calc(0.5rem + var(--limit-at) * (100% - 1rem));
+  width: 2px;
+  height: 1.25rem;
+  background: var(--color-text-secondary);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.channel-audio__bitrate-value {
+  min-width: 5.5rem;
+  font-weight: var(--font-weight-bold);
+  text-align: right;
+}
+
+.channel-audio__scale {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.channel-audio__note {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.channel-audio__error {
+  margin: var(--space-2) 0 0;
+  color: var(--color-danger);
+}
+
+.channel-audio__footer {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}
+
+.channel-audio__remove {
+  margin-right: auto;
+}

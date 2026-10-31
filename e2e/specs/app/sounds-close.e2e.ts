@@ -222,7 +222,8 @@ describe("AC-1.25 close while connected", () => {
     await browser.pause(3000);
     const connected = await browser.execute(() => document.querySelector('.server-bar__item[data-status="connected"], .server-bar__item[data-status="connecting"]') !== null);
     if (!connected) {
-      await tabTo((f) => f.cls.includes("server-bar__server"), "server button");
+      // The Messages button (#173) comes before the servers in the bar.
+      await tabTo((f) => f.cls.includes("server-bar__server") && !f.cls.includes("pm-button__button"), "server button");
       await browser.keys(["Enter"]);
     }
     await waitFor('.server-bar__item[data-status="connected"]', 30_000);

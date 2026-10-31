@@ -1,0 +1,48 @@
+{
+  "title": "Verejné servery",
+  "loading": "Načítava sa zoznam…",
+  "subtitle": "Načítané, pretože ste otvorili túto stránku · zobrazené {{shown}} z {{total}}",
+  "search": "Hľadať podľa názvu, adresy alebo krajiny",
+  "refresh": "Obnoviť",
+  "retry": "Skúsiť znova",
+  "loadFailed": "Zoznam verejných serverov sa nepodarilo načítať. Skontrolujte pripojenie na internet a skúste to znova.",
+  "noMatch": "Hľadaniu a filtrom nezodpovedá žiadny server.",
+  "saveFailed": "Server sa nepodarilo pridať. Skúste to znova.",
+  "filters": {
+    "label": "Filtre",
+    "country": "Krajina",
+    "anyCountry": "Akákoľvek krajina",
+    "ping": "Ping",
+    "anyPing": "Akýkoľvek ping",
+    "pingBelow": "Pod {{ms}} ms",
+    "hideEmpty": "Skryť prázdne",
+    "hideFull": "Skryť plné"
+  },
+  "sortedBy": "Zoradenie: {{column}}",
+  "columns": {
+    "name": "Názov",
+    "country": "Krajina",
+    "ping": "Ping",
+    "users": "Používatelia",
+    "actions": "Akcie"
+  },
+  "badge": {
+    "empty": "Prázdny",
+    "full": "Plný"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Zatiaľ neznáme",
+  "measuring": "Meria sa",
+  "noAnswer": "Bez odpovede",
+  "ms": "{{ms}} ms",
+  "connect": "Pripojiť",
+  "connectTo": "Pripojiť k {{server}}",
+  "favourite": "Obľúbený",
+  "favouriteServer": "Pridať {{server}} medzi vaše servery",
+  "saved": "Uložené",
+  "savedAs": "{{server}} je medzi vašimi servermi",
+  "announce": {
+    "saved": "{{server}} pridaný medzi vaše servery"
+  },
+  "note": "Pingujú sa iba viditeľné riadky, niekoľko naraz. Nič iné sa na server neodosiela, kým sa nepripojíte."
+}

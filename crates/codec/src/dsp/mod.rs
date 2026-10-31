@@ -160,7 +160,10 @@ impl DspChain {
         if let Some(backend) = controls.take_backend() {
             self.backend = backend;
         }
-        let aec_on = controls.echo_cancellation();
+        // Low-latency mode keeps the signal untouched: these stages change the sound and the
+        // echo canceller would need the far end it can no longer track at minimal buffering.
+        let bypass = controls.low_latency();
+        let aec_on = controls.echo_cancellation() && !bypass;
 
         // Always drain the reference so it never goes stale while echo
         // cancellation is off.
@@ -188,11 +191,18 @@ impl DspChain {
             }
         }
 
+        let gain = controls.input_gain();
+        if gain != 1.0 {
+            for sample in out.iter_mut() {
+                *sample = (*sample * gain).clamp(-1.0, 1.0);
+            }
+        }
+
         // The selected backend is the only one that changes the audio. `out` already holds the
         // frame the backend gets, so a rejected frame passes through without an extra copy.
         let music = controls.music_quality();
         let mut probability = None;
-        if self.force_noise_suppression || (controls.noise_suppression() && !music) {
+        if self.force_noise_suppression || (controls.noise_suppression() && !music && !bypass) {
             let outcome = self.backend.process(out, &mut self.processed);
             if outcome.failed {
                 controls.count_error();
@@ -207,7 +217,8 @@ impl DspChain {
             probability = self.detector.process(out, &mut self.processed).probability;
         }
 
-        let level_music = controls.auto_gain() && music;
+        let auto_gain = controls.auto_gain() && !bypass;
+        let level_music = auto_gain && music;
         if level_music {
             if !self.leveling {
                 self.leveler = Leveler::default();
@@ -215,7 +226,7 @@ impl DspChain {
             self.leveler.process(out);
         }
         self.leveling = level_music;
-        if controls.auto_gain() && !music {
+        if auto_gain && !music {
             self.scratch = *out;
             if self
                 .agc

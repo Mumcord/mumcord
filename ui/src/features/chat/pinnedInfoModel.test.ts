@@ -3,7 +3,16 @@ import type { ChannelInfo, ServerInfo } from "../../api";
 import { getServerState, resetServerStore, type ServerState } from "../channels/serverStore";
 import { pinnedInfo } from "./pinnedInfoModel";
 
-const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
+const allow = {
+  enter: true,
+  textMessage: true,
+  listen: true,
+  registerSelf: false,
+  speak: true,
+  whisper: true,
+  write: false,
+  moveUsers: false,
+};
 
 function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {
   return {
@@ -14,6 +23,10 @@ function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {
     permissions: allow,
     description: null,
     hasDescription: false,
+    maxUsers: null,
+    temporary: false,
+    links: [],
+    enterRestricted: false,
     ...patch,
   };
 }
@@ -30,6 +43,25 @@ function state(channels: ChannelInfo[], info: Partial<ServerInfo> = {}): ServerS
       maxMessageLength: 0,
       maxImageMessageLength: 0,
       allowHtml: true,
+      release: null,
+      os: null,
+      maxBandwidth: null,
+      maxUsers: null,
+      recordingAllowed: false,
+      serverLabel: null,
+      serverAddress: null,
+      serverPort: null,
+      tlsFingerprint: null,
+      usersOnline: 0,
+      sessionId: null,
+      registered: false,
+      currentChannelPermissions: null,
+      mumcordUsers: 0,
+      tlsTrusted: true,
+      tlsIssuer: null,
+      tlsValidFrom: null,
+      tlsValidUntil: null,
+      tlsCertificatePem: null,
       ...info,
     },
     channels: new Map(channels.map((c) => [c.id, c])),

@@ -979,3 +979,48 @@ fn strength_setting_changes_what_the_chain_sends() {
         "very high ({very_high:.1}) is not stronger than moderate ({moderate:.1})"
     );
 }
+
+/// Issue #156: low-latency mode sends the microphone signal untouched, even with echo
+/// cancellation, noise suppression and automatic gain switched on.
+#[test]
+fn low_latency_bypasses_echo_cancellation_noise_suppression_and_gain() {
+    let input = music_like(48_000 * 2, 0.05);
+    let (mut chain, _echo) = chain_with(true, true, true);
+    chain.controls().set_low_latency(true);
+    let out = run(&mut chain, &input);
+    assert_eq!(out.len(), input.len());
+    assert!(
+        out.iter().zip(&input).all(|(o, i)| o == i),
+        "low-latency output differs from the input"
+    );
+
+    chain.controls().set_low_latency(false);
+    let out = run(&mut chain, &input);
+    assert!(
+        out.iter().zip(&input).any(|(o, i)| (o - i).abs() > 1e-3),
+        "the stages are back once the mode is off"
+    );
+}
+
+#[test]
+fn input_gain_scales_the_signal_and_clips_at_full_scale() {
+    let tone: Vec<f32> = (0..SAMPLE_RATE as usize)
+        .map(|i| 0.2 * (2.0 * PI * 440.0 * i as f32 / SAMPLE_RATE as f32).sin())
+        .collect();
+    let level = |percent: u16| {
+        let (mut chain, _reference) = chain_with(false, false, false);
+        chain.controls().set_input_gain_percent(percent);
+        let out = run(&mut chain, &tone);
+        (energy(last_seconds(&out, 0.5)), out)
+    };
+    let (unity, _) = level(100);
+    let (doubled, loud) = level(200);
+    let (silent, _) = level(0);
+    assert!(
+        (db(doubled / unity) - 6.0).abs() < 0.5,
+        "200 % is +6 dB, got {:.2}",
+        db(doubled / unity)
+    );
+    assert_eq!(silent, 0.0);
+    assert!(loud.iter().all(|s| s.abs() <= 1.0));
+}

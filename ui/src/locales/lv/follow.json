@@ -13,9 +13,7 @@
     "generic": "Sekošana šim kanālam neizdevās. Lūdzu, mēģini vēlreiz."
   },
   "dm": {
-    "title": "Tiešās ziņas",
-    "unknown": "Nezināms cilvēks",
-    "withServer": "{{name}}, serverī {{server}}"
+    "unknown": "Nezināms cilvēks"
   },
   "notify": {
     "channel": "{{name}} kanālā {{channel}}: {{text}}",
@@ -58,5 +56,9 @@
     "dismiss": "Aizvērt",
     "unfollowFailed": "Sekošanas pārtraukšana visiem kanāliem neizdevās. Lūdzu, mēģini vēlreiz."
   },
-  "mention": "ietver tavu pieminējumu"
+  "mention": "ietver tavu pieminējumu",
+  "header": {
+    "follow": "Sekot kanālam",
+    "unfollow": "Seko, noklikšķini, lai pārtrauktu"
+  }
 }

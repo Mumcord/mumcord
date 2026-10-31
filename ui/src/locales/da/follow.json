@@ -12,9 +12,7 @@
     "generic": "Det lykkedes ikke at følge denne kanal. Prøv igen."
   },
   "dm": {
-    "title": "Direkte beskeder",
-    "unknown": "Ukendt person",
-    "withServer": "{{name}}, på {{server}}"
+    "unknown": "Ukendt person"
   },
   "notify": {
     "channel": "{{name}} i {{channel}}: {{text}}",
@@ -54,5 +52,9 @@
     "dismiss": "Afvis",
     "unfollowFailed": "Det lykkedes ikke at stoppe med at følge alle kanaler. Prøv igen."
   },
-  "mention": "indeholder en omtale af dig"
+  "mention": "indeholder en omtale af dig",
+  "header": {
+    "follow": "Følg kanal",
+    "unfollow": "Følger, klik for at stoppe"
+  }
 }

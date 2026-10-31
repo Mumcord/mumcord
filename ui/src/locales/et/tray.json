@@ -1,11 +1,23 @@
 {
-  "show": "Näita Mumcordi",
+  "show": "Ava Mumcord",
+  "settings": "Seaded…",
   "mute": "Vaigista mikrofon",
   "deafen": "Kurdista",
+  "dnd": "Ära sega",
+  "dndSystem": "Ära sega (süsteem)",
   "quit": "Välju",
   "disconnected": "Ühendus puudub",
   "connecting": "Ühendamine…",
+  "reconnecting": "Ühendan uuesti…",
   "connected": "Ühendatud",
+  "connectedIn": "Ühendatud · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Ühendatud – räägib",
-  "muted": "Ühendatud – vaigistatud"
+  "muted": "Ühendatud – vaigistatud",
+  "voiceMenu": "Häälserver ja kanal",
+  "voiceServer": "Häälserver",
+  "channelsOf": "Kanalid · {server}",
+  "moreChannels": "Rohkem kanaleid Mumcordis…",
+  "recentChats": "Viimased vestlused",
+  "chatUnread": "{name} – {count} lugemata"
 }

@@ -50,6 +50,10 @@ export interface TreeActions {
   join: (channelId: number) => void;
   joinOnce: (channelId: number, now: number) => void;
   openPerson: (session: number, opener: HTMLElement | null) => void;
+  /** Opens a channel's right-click menu at `position` (issue #172). */
+  openMenu: (channelId: number, position: { x: number; y: number }) => void;
+  /** Moves a dragged person into a channel (issue #172). */
+  movePerson: (session: number, channelId: number) => void;
   /** Pure factories of self-updating content (e.g. the unread badge); see `ChannelTreeProps`. */
   channelBadge?: ((channelId: number) => ReactNode) | undefined;
   channelAction?:

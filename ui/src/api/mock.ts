@@ -3,26 +3,50 @@
  * It follows the contract in docs/engine-api.md closely enough for UI flows, not the
  * Mumble protocol: no network, no audio.
  */
-import type { InspectorView, MessageNotice, NotifyOutcome, WindowLook } from "../bindings/commands";
+import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
+  DndState,
+  InspectorView,
+  LinkOutcome,
+  MessageNotice,
+  MumbleImportDone,
+  MumbleImportFound,
+  MumbleLinkStats,
+  NotifyOutcome,
+  SystemDnd,
+  WindowLook,
+} from "../bindings/commands";
+import { parseMumbleLink } from "../features/chat/mumbleLink";
+import type {
+  AcceptedConversation,
+  BlockedUser,
+  ActiveAudioProfile,
+  PmConversationPrefs,
+  PrivateConversation,
   ApiError,
   AudioDevices,
+  ChannelAudioProfile,
   ChannelInfo,
   ChatMessage,
   ConnectionState,
   ConnectionStats,
+  LatencyEstimate,
   Conversation,
   ErrorCode,
   Friend,
   HistoryScope,
   Identity,
+  AudioInfo,
   InlineImage,
   LinkPreview,
+  MusicEmbed,
+  MessageRequest,
   MumbleLink,
   GameKey,
   GameOverlayEntry,
   GamePlugin,
   InGameOverlayState,
+  PmRequests,
   PttAvailability,
   PttMouseStatus,
   SavedServer,
@@ -61,6 +85,11 @@ export interface MockOptions {
   maxListeners?: number;
   /** Delay before connection events fire; 0 emits them synchronously (handy in tests). */
   connectDelayMs?: number;
+  /**
+   * What the import from the official Mumble client finds (issue #66); `null` = not installed.
+   * Defaults to fictional data in the demo seeds and to `null` otherwise.
+   */
+  mumble?: MumbleImportFound | null;
 }
 
 /** Test and dev controls on top of the normal API. */
@@ -100,6 +129,8 @@ export interface MockControls {
   offerRejoin(serverId: number, channelPath: string[]): void;
   /** Whether the main window counts as focused for message notifications (default true). */
   setWindowFocused(focused: boolean): void;
+  /** Simulates the desktop's own Do Not Disturb (FR-3.112). */
+  setSystemDnd(system: SystemDnd): void;
   /** System notifications `notifyMessage` "showed", oldest first. */
   desktopNotices(): readonly MessageNotice[];
   /** Sounds `notifyMessage` played for incoming messages, oldest first (QA.41). */
@@ -110,10 +141,22 @@ export interface MockControls {
   upsertUser(user: User): void;
   /** Takes away the Enter permission of a channel; `MOCK_CHANNEL_PASSWORD` opens it (FR-2.78). */
   lockChannel(channelId: number): void;
+  /** Changes a channel as a server update would, e.g. its user limit or permissions. */
+  updateChannel(channelId: number, patch: Partial<Omit<ChannelInfo, "id">>): void;
   /** Renames a channel, like an admin on the server would. */
   renameChannel(channelId: number, name: string): void;
+  /** Sets a channel's user limit, like an admin on the server would. */
+  limitChannel(channelId: number, maxUsers: number): void;
   /** Stores a channel password without any details, like one saved before issue #146. */
   addBareChannelPassword(serverId: number, password: string): void;
+  /**
+   * Holds a chat request (with `note`) or a message request (with `messages`) from `senderSession`
+   * on the focused server, like the engine does under "Friends only" (issue #141).
+   */
+  receivePmRequest(
+    senderSession: number,
+    request: Pick<MessageRequest, "chatRequest" | "note"> & { messages?: string[] },
+  ): MessageRequest;
   /**
    * Which connected server the controls above act on (e.g. `receiveMessage`); by default the
    * server that connected last.
@@ -136,7 +179,9 @@ const NEW_SERVER_FLAGS = {
   alwaysConnectAtStart: false,
   wasVoiceServerAtQuit: false,
   notificationsMuted: false,
+  groupMentionsMuted: false,
   themeId: null,
+  identityId: null,
 } satisfies Partial<SavedServer>;
 /** The one channel password the mock accepts (FR-2.78). */
 export const MOCK_CHANNEL_PASSWORD = "secret";
@@ -180,7 +225,10 @@ const DEFAULT_SETTINGS: Settings = {
   noiseSuppressionRnnoiseConsent: "unset",
   echoCancellation: true,
   autoGain: true,
+  inputGainPercent: 100,
+  outputVolumePercent: 100,
   musicQuality: false,
+  lowLatency: false,
   videoDucking: true,
   videoDuckingPercent: 30,
   bitrateKbps: 96,
@@ -200,6 +248,8 @@ const DEFAULT_SETTINGS: Settings = {
     shareStopped: true,
     viewerStarted: true,
     viewerStopped: true,
+    kicked: true,
+    banned: true,
   },
   closeBehaviour: "ask",
   chatDisplay: "cozy",
@@ -234,6 +284,14 @@ const DEFAULT_SETTINGS: Settings = {
   windowOverlayNoticeShown: false,
   whatsNewAuto: true,
   whatsNewSeen: null,
+  privateMessages: {
+    rule: "everyone",
+    serverRules: [],
+    allowCurrentChannel: true,
+    allowAccepted: true,
+    keepRequests: true,
+  },
+  blockedMessages: "collapse",
 };
 
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
@@ -248,6 +306,20 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
   const youtube = /^(?:www\.)?youtu(?:\.be|be\.com)$/.test(parsed.hostname)
     ? (parsed.searchParams.get("v") ?? parsed.pathname.split("/").pop() ?? "")
     : "";
+  const music = mockMusic(parsed);
+  if (music !== null) {
+    return {
+      url,
+      siteName: null,
+      title: MOCK_MUSIC_TITLES[music.kind] ?? "Midnight Signals",
+      description: music.artist === null ? "Lumen Park · Single · 2025" : null,
+      image: demoCover(music.service === "appleMusic" ? 20 : 330),
+      video: null,
+      music,
+      isImage: false,
+      isAudio: false,
+    };
+  }
   if (/^[\w-]{11}$/.test(youtube)) {
     return {
       url,
@@ -260,7 +332,9 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
         playerUrl: `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1`,
         channel: "Demo channel",
       },
+      music: null,
       isImage: false,
+      isAudio: false,
     };
   }
   if (demo) {
@@ -271,7 +345,9 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
       description: "Fictional notes from last week's session.",
       image: demoPicture(),
       video: null,
+      music: null,
       isImage: false,
+      isAudio: false,
     };
   }
   return {
@@ -281,8 +357,120 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
     description: "Link previews come from the engine; this is mock data.",
     image: null,
     video: null,
+    music: null,
     isImage: false,
+    isAudio: false,
   };
+}
+
+const MOCK_MUSIC_TITLES: Partial<Record<MusicEmbed["kind"], string>> = {
+  album: "Glass Harbour",
+  playlist: "Night Drive Mix",
+};
+
+/** Offline stand-in for the engine's music link recognition (issue #262), by host only. */
+function mockMusic(url: URL): MusicEmbed | null {
+  const kind = /\/(album|playlist)\//.test(url.pathname)
+    ? url.pathname.includes("/album/")
+      ? "album"
+      : "playlist"
+    : "track";
+  const id = url.pathname.split("/").pop() ?? "";
+  switch (url.hostname) {
+    case "open.spotify.com":
+      return {
+        service: "spotify",
+        kind,
+        playerUrl: `https://open.spotify.com/embed/${kind}/${id}`,
+        artist: null,
+      };
+    case "soundcloud.com":
+      return {
+        service: "soundcloud",
+        kind,
+        playerUrl: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url.href)}`,
+        artist: "Lumen Park",
+      };
+    case "music.apple.com":
+      return { service: "appleMusic", kind, playerUrl: null, artist: "Nora Vale" };
+    case "tidal.com":
+      return { service: "tidal", kind, playerUrl: null, artist: "Lumen Park" };
+    case "tunes.example":
+      return { service: "other", kind, playerUrl: null, artist: null };
+    default:
+      return null;
+  }
+}
+
+/** A gradient cover with a ring, drawn in the browser; `null` without a canvas (tests). */
+function demoCover(hue: number): string | null {
+  const canvas = document.createElement("canvas");
+  canvas.width = 96;
+  canvas.height = 96;
+  const context = canvas.getContext("2d");
+  if (context === null) return null;
+  const gradient = context.createLinearGradient(0, 0, 96, 96);
+  gradient.addColorStop(0, `hsl(${String(hue)} 90% 70%)`);
+  gradient.addColorStop(1, `hsl(${String(hue + 60)} 80% 55%)`);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 96, 96);
+  context.strokeStyle = "rgb(255 255 255 / 75%)";
+  context.lineWidth = 4;
+  context.beginPath();
+  context.arc(48, 48, 22, 0, 2 * Math.PI);
+  context.stroke();
+  return canvas.toDataURL("image/png");
+}
+
+/** Offline stand-in for the engine's audio probe (issue #260); links with "broken" fail. */
+function mockAudioInfo(url: string): AudioInfo | null {
+  const ext = /\.([a-z0-9]+)$/i.exec(new URL(url).pathname)?.[1]?.toLowerCase();
+  if (ext === undefined || url.includes("broken")) return null;
+  const formats: Record<string, AudioInfo["format"]> = {
+    mp3: "mp3",
+    ogg: "ogg",
+    opus: "ogg",
+    m4a: "mp4",
+    aac: "aac",
+    wav: "wav",
+    flac: "flac",
+    webm: "webm",
+  };
+  const format = formats[ext];
+  return format === undefined ? null : { url, format, size: 4_200_000 };
+}
+
+/** A few seconds of a soft chord as a WAV `data:` URL, standing in for any audio file. */
+function mockAudioFile(): string {
+  const rate = 8000;
+  const samples = rate * 6;
+  const bytes = new Uint8Array(44 + samples * 2);
+  const view = new DataView(bytes.buffer);
+  const text = (offset: number, value: string) => {
+    for (let i = 0; i < value.length; i++) bytes[offset + i] = value.charCodeAt(i);
+  };
+  text(0, "RIFF");
+  view.setUint32(4, 36 + samples * 2, true);
+  text(8, "WAVEfmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true);
+  view.setUint32(28, rate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  text(36, "data");
+  view.setUint32(40, samples * 2, true);
+  for (let i = 0; i < samples; i++) {
+    const t = i / rate;
+    const envelope = 0.5 + 0.5 * Math.sin(2 * Math.PI * 0.7 * t);
+    const value =
+      envelope * (Math.sin(2 * Math.PI * 220 * t) + 0.5 * Math.sin(2 * Math.PI * 330 * t));
+    view.setInt16(44 + i * 2, Math.round(value * 6000), true);
+  }
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return `data:audio/wav;base64,${btoa(binary)}`;
 }
 
 /** Offline stand-in for the engine's inline images: the same small picture for every http(s) URL. */
@@ -306,6 +494,35 @@ const DEVICES: AudioDevices = {
     { id: "out-usb", name: "USB Headset", isDefault: false },
   ],
 };
+
+/** The figures measured on a PipeWire machine with an 18 ms ping (issue #156), for both modes. */
+function mockLatencyEstimate(lowLatency: boolean): LatencyEstimate {
+  return lowLatency
+    ? {
+        lowLatency,
+        packetMs: 10,
+        inputBufferUs: 2667,
+        encodeUs: 12500,
+        networkUs: 9000,
+        jitterUs: 10000,
+        processingUs: 100,
+        outputBufferUs: 13667,
+        totalUs: 47934,
+        otherModeTotalUs: 107134,
+      }
+    : {
+        lowLatency,
+        packetMs: 20,
+        inputBufferUs: 10667,
+        encodeUs: 26500,
+        networkUs: 9000,
+        jitterUs: 20000,
+        processingUs: 300,
+        outputBufferUs: 40667,
+        totalUs: 107134,
+        otherModeTotalUs: 47934,
+      };
+}
 
 const DEFAULT_CONNECTION_STATS: ConnectionStats = {
   transport: "udp",
@@ -339,9 +556,19 @@ const DEFAULT_CONNECTION_STATS: ConnectionStats = {
       2900, 3100, 2800, 3300, 3000, 3600, 4800, 3900, 3500, 3200, 3700, 3400,
     ],
   },
+  latency: mockLatencyEstimate(false),
 };
 
-const allow = { enter: true, textMessage: true, listen: true, registerSelf: false };
+const allow = {
+  enter: true,
+  textMessage: true,
+  listen: true,
+  registerSelf: false,
+  speak: true,
+  whisper: true,
+  write: false,
+  moveUsers: false,
+};
 
 function seedChannels(): ChannelInfo[] {
   return [
@@ -352,6 +579,10 @@ function seedChannels(): ChannelInfo[] {
       position: 0,
       permissions: { ...allow, registerSelf: true },
       ...noDescription,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     {
       id: 1,
@@ -361,6 +592,10 @@ function seedChannels(): ChannelInfo[] {
       permissions: { ...allow },
       description: MOCK_LOBBY_DESCRIPTION,
       hasDescription: true,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     // Like a long description on a real server: only announced, fetched on request.
     {
@@ -371,6 +606,10 @@ function seedChannels(): ChannelInfo[] {
       permissions: { ...allow },
       description: null,
       hasDescription: true,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
     {
       id: 3,
@@ -379,9 +618,50 @@ function seedChannels(): ChannelInfo[] {
       position: 2,
       permissions: { ...allow, textMessage: false },
       ...noDescription,
+      maxUsers: null,
+      temporary: false,
+      links: [],
+      enterRestricted: false,
     },
   ];
 }
+
+/** A fictional official Mumble client for screenshots (issue #66); "Book Club" is a duplicate. */
+export const DEMO_MUMBLE: MumbleImportFound = {
+  format: "json",
+  favourites: [
+    ["Nordic Gamers", "nordic.example.org", true],
+    ["Retro LAN", "retro.example.net", true],
+    ["Coffee Club", "coffee.example.com", false],
+    ["Pixel Harbor", "pixel.example.org", true],
+    ["Silent Orbit", "orbit.example.net", false],
+    ["Book Club", "books.example.com", false],
+  ].map(([label, host, hasPassword]) => ({
+    label: label as string,
+    host: host as string,
+    port: 64738,
+    username: "Zoe",
+    hasPassword: hasPassword as boolean,
+    duplicate: false,
+  })),
+  favouritesFailed: false,
+  certificate: {
+    name: "",
+    validUntil: null,
+    needsPassword: true,
+    alreadyImported: false,
+  },
+  inputDevice: { id: "pipewire:usb-headset", name: "USB Headset" },
+  outputDevice: { id: "pipewire:speakers", name: "Speakers" },
+  devicesMissing: false,
+  pttKey: "Ctrl+Space",
+  pttIssue: null,
+  talkMode: "pushToTalk",
+  outputVolumePercent: 80,
+};
+
+/** Password of the locked certificate in {@link DEMO_MUMBLE}. */
+export const DEMO_MUMBLE_CERT_PASSWORD = "mumble";
 
 /** Fictional demo data for screenshots (seed "demo"); example.org addresses only. */
 const DEMO_SERVERS: [string, string][] = [
@@ -397,17 +677,24 @@ function demoChannels(serverName: string): ChannelInfo[] {
     parentId,
     name,
     position,
-    permissions: { ...allow },
+    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172).
+    permissions: { ...allow, moveUsers: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
+    maxUsers: null,
+    temporary: false,
+    links: [],
+    enterRestricted: false,
   });
   return [
     { ...channel(0, 0, serverName, 0), parentId: null },
     channel(1, 0, "Lobby", 0),
     channel(2, 0, "Gaming", 1),
-    channel(4, 2, "Squad A", 0),
-    channel(5, 2, "Squad B", 1),
-    channel(6, 0, "Music Room", 2),
+    // A user limit and a link between the squads, for the channel info screenshots (#170).
+    { ...channel(4, 2, "Squad A", 0), maxUsers: 5, links: [5] },
+    { ...channel(5, 2, "Squad B", 1), links: [4] },
+    // Full: six people in, for the user-limit screenshots (#172).
+    { ...channel(6, 0, "Music Room", 2), maxUsers: 6 },
     channel(7, 0, "Study Hall", 3),
     { ...channel(3, 0, "AFK", 4), permissions: { ...allow, textMessage: false } },
   ];
@@ -529,26 +816,9 @@ function conversationKey(c: Conversation): string {
   }
 }
 
+/** The same rules as `parse_mumble_link` in the engine, through the UI's single parsing module. */
 function parseLink(url: string): MumbleLink {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return fail("invalidInput", "not a valid link");
-  }
-  if (parsed.protocol !== "mumble:" || parsed.hostname === "") {
-    return fail("invalidInput", "not a mumble:// link");
-  }
-  return {
-    address: parsed.hostname,
-    port: parsed.port === "" ? 64738 : Number(parsed.port),
-    username: parsed.username === "" ? null : decodeURIComponent(parsed.username),
-    password: parsed.password === "" ? null : decodeURIComponent(parsed.password),
-    channelPath: parsed.pathname
-      .split("/")
-      .filter((part) => part !== "")
-      .map(decodeURIComponent),
-  };
+  return parseMumbleLink(url) ?? fail("invalidInput", "not a mumble:// link");
 }
 
 /** Length of each mic-test phase (recording, playback) in the mock. */
@@ -559,6 +829,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const fresh = seed === "fresh" || seed === "demoFresh";
   const stress = seed === "stress";
   const demo = seed === "demo" || seed === "demoFresh" || stress;
+  /** What the mock answered for each `mumble://` link in this run (issue #175). */
+  const queryAnswers = new Map<string, MumbleLinkStats>();
   const serverVersion = options.serverVersion ?? "1.5.735";
   const maxListeners = options.maxListeners ?? 2;
   const connectDelayMs = options.connectDelayMs ?? 0;
@@ -569,13 +841,54 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   /** Friends by certificate hash (FR-1.64); online state is derived from the snapshot. */
   const friends = new Map<string, { name: string; addedAt: string; lastSeenAt: string | null }>();
   let shownFriends = "[]";
+  /** Held and sent requests per server (issue #141); memory only, dropped on disconnect. */
+  const pmRequestsByServer = new Map<number, PmRequests>();
+  let nextPmRequestId = 1;
+  let acceptedConversations: AcceptedConversation[] = [];
+  /** Blocked users of every own identity (issue #140). */
+  let blockedUsers: BlockedUser[] = [];
+  let nextBlockId = 1;
+  let pmPrefs: PmConversationPrefs[] = [];
+
+  function setPmPrefs(
+    serverId: number,
+    certHash: string,
+    change: Partial<Omit<PmConversationPrefs, "serverId" | "certHash">>,
+  ): void {
+    const same = (p: PmConversationPrefs) => p.serverId === serverId && p.certHash === certHash;
+    const old = pmPrefs.find(same) ?? {
+      serverId,
+      certHash,
+      pinned: false,
+      mutedUntil: null,
+      mutedForever: false,
+    };
+    const next = { ...old, ...change };
+    const kept = next.pinned || next.mutedUntil !== null || next.mutedForever;
+    pmPrefs = [...pmPrefs.filter((p) => !same(p)), ...(kept ? [next] : [])];
+    emit("pmConversationPrefsChanged", { prefs: pmPrefs });
+  }
   const failures = new Map<CommandName, ApiError>();
   const inspector = createMockInspector();
   let inspectorView: InspectorView | null = null;
   let windowLook: WindowLook | null = null;
   const certPrompts = new Map<number, string | null>();
 
-  let identity: Identity | null = fresh ? null : { name: "Zoe", certHash: "selfhash" };
+  // Identities are added one by one; the first one is the default (issue #148).
+  let identities: Identity[] = fresh
+    ? []
+    : [
+        {
+          id: 1,
+          label: "Default",
+          name: "Zoe",
+          certHash: mockCertHash("zoe"),
+          addedAt: "2026-03-12T09:00:00.000Z",
+          isDefault: true,
+          serverIds: [],
+        },
+      ];
+  let nextIdentityId = identities.length + 1;
   let settings: Settings = { ...DEFAULT_SETTINGS, wizardCompleted: !fresh };
   // One official game plugin as found in a Mumble installation; no game runs in the mock.
   let gamePlugins: GamePlugin[] = [
@@ -630,12 +943,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const requiredPasswords = new Map<number, string>();
   const savedPasswords = new Map<number, string>();
   const channelTokens = new Map<number, MockChannelToken[]>();
+  // Channel audio profiles (issue #171) by server, then channel id; and the one in effect.
+  const channelAudio = new Map<number, Map<number, ChannelAudioProfile>>();
+  let activeAudio: ActiveAudioProfile | null = null;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
   // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
   // own mute/deafen choice while joined for voice, which a join restores.
   let ownVoice = { mute: false, deaf: false };
   let windowFocused = true;
+  let dnd: DndState = {
+    manual: false,
+    followSystem: true,
+    system: { desktop: "KDE Plasma", on: false },
+  };
+  const dndActive = () => dnd.manual || (dnd.followSystem && dnd.system.on === true);
+  const setDnd = (next: DndState) => {
+    dnd = next;
+    emit("dndChanged", { state: dnd });
+    return Promise.resolve(dnd);
+  };
   let ingameOverlay: InGameOverlayState = {
     supported: true,
     explanationKey: null,
@@ -671,6 +998,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       ? [[1, new Map([[conversationKey({ kind: "channel", channelId: 1 }), demoHistory()]])]]
       : [],
   );
+  // When "Clear history" last ran (issue #119): per server and channel, per server, or for all.
+  const clearedAt = new Map<string, string>();
+  const clearedKey = (serverId: number | null, channelId: number | null) =>
+    `${String(serverId)}:${String(channelId)}`;
 
   function dispatch<K extends EventName>(event: K, payload: EventPayloads[K]): void {
     const set = listeners.get(event);
@@ -773,12 +1104,83 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   function setState(next: ConnectionState): void {
     if (next.state === "disconnected") {
       sessions.delete(currentServerId);
+      pmRequestsByServer.delete(currentServerId);
       if (pendingConnect?.serverId === currentServerId) pendingConnect = null;
       if (voiceServerId === currentServerId) setVoiceServer(null);
     } else {
       sessions.set(currentServerId, { snapshot: session()?.snapshot ?? null, state: next });
     }
     emitServer("connectionStateChanged", { state: next });
+    syncActiveAudio();
+  }
+
+  function pmRequestsOf(serverId: number): PmRequests {
+    return pmRequestsByServer.get(serverId) ?? { incoming: [], sent: [] };
+  }
+
+  function setPmRequests(serverId: number, requests: PmRequests): void {
+    pmRequestsByServer.set(serverId, requests);
+    emit("pmRequestsChanged", { serverId, requests });
+  }
+
+  /** The mock connects every server with the default identity. */
+  function ownCertHash(): string {
+    return identities.find((identity) => identity.isDefault)?.certHash ?? "";
+  }
+
+  function acceptConversation(name: string, certHash: string | null): void {
+    const own = ownCertHash();
+    if (certHash === null) return;
+    if (acceptedConversations.some((c) => c.ownCertHash === own && c.certHash === certHash)) return;
+    acceptedConversations = [
+      ...acceptedConversations,
+      { ownCertHash: own, certHash, name, acceptedAt: new Date().toISOString() },
+    ];
+    emit("acceptedConversationsChanged", { conversations: acceptedConversations });
+  }
+
+  /** Whether a block of the mock's identity covers `user` on `serverId`, like the engine. */
+  function isBlocked(serverId: number, user: Pick<User, "name" | "certHash">): boolean {
+    const own = ownCertHash();
+    return blockedUsers.some(
+      (b) =>
+        b.ownCertHash === own &&
+        (b.certHash === null
+          ? b.serverId === serverId && b.name.toLowerCase() === user.name.toLowerCase()
+          : b.certHash === user.certHash),
+    );
+  }
+
+  function addBlock(serverId: number, name: string, certHash: string | null): void {
+    const own = ownCertHash();
+    const same = (b: BlockedUser) =>
+      b.ownCertHash === own &&
+      (certHash === null
+        ? b.certHash === null &&
+          b.serverId === serverId &&
+          b.name.toLowerCase() === name.toLowerCase()
+        : b.certHash === certHash);
+    if (!blockedUsers.some(same)) {
+      const serverLabel = servers.find((s) => s.id === serverId)?.label ?? "";
+      blockedUsers = [
+        ...blockedUsers,
+        {
+          id: nextBlockId++,
+          ownCertHash: own,
+          certHash,
+          name,
+          serverId,
+          serverLabel,
+          blockedAt: new Date().toISOString(),
+        },
+      ].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    for (const [id, requests] of pmRequestsByServer) {
+      const incoming = requests.incoming.filter((r) => !isBlocked(id, r));
+      if (incoming.length !== requests.incoming.length)
+        setPmRequests(id, { ...requests, incoming });
+    }
+    emit("blockedUsersChanged", { users: blockedUsers });
   }
 
   function setSnapshot(snapshot: ServerSnapshot): void {
@@ -790,6 +1192,35 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (voiceServerId === serverId) return;
     voiceServerId = serverId;
     emit("voiceServerChanged", { serverId });
+    syncActiveAudio();
+  }
+
+  /**
+   * Like the engine: the profile of the own channel is in effect on the server with the voice
+   * pipeline, the voice server or else the earliest connected one.
+   */
+  function syncActiveAudio(): void {
+    const serverId =
+      voiceServerId ??
+      [...sessions].find(([, s]) => s.state.state === "connected" && s.snapshot)?.[0] ??
+      null;
+    const snap = serverId === null ? null : sessions.get(serverId)?.snapshot;
+    const self = snap?.users.find((u) => u.session === snap.selfSession);
+    const profile =
+      serverId !== null && self ? channelAudio.get(serverId)?.get(self.channelId) : undefined;
+    const next =
+      serverId !== null && self && profile
+        ? { serverId, channelId: self.channelId, profile }
+        : null;
+    if (JSON.stringify(next) === JSON.stringify(activeAudio)) return;
+    activeAudio = next;
+    emit("activeAudioProfileChanged", { active: next });
+  }
+
+  function channelAudioEntries(serverId: number) {
+    return [...(channelAudio.get(serverId) ?? new Map<number, ChannelAudioProfile>())]
+      .sort(([a], [b]) => a - b)
+      .map(([channelId, profile]) => ({ channelId, profile }));
   }
 
   /**
@@ -828,8 +1259,81 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return session()?.snapshot ?? fail("notConnected", "not connected");
   }
 
-  function requireIdentity(): Identity {
-    return identity ?? fail("notFound", "no identity yet");
+  /** Deterministic 40-character certificate hash, like the engine's SHA-1. */
+  function mockCertHash(seed: string): string {
+    let hash = "";
+    for (let index = 0; hash.length < 40; index += 1) {
+      hash += (seed + String(index))
+        .split("")
+        .reduce((sum, char) => sum + char.charCodeAt(0), 0)
+        .toString(16)
+        .padStart(2, "0");
+    }
+    return hash.slice(0, 40);
+  }
+
+  function orderedIdentities(): Identity[] {
+    return [...identities].sort(
+      (a, b) =>
+        Number(b.isDefault) - Number(a.isDefault) ||
+        a.addedAt.localeCompare(b.addedAt) ||
+        a.id - b.id,
+    );
+  }
+
+  function defaultIdentity(): Identity | null {
+    return identities.find((i) => i.isDefault) ?? null;
+  }
+
+  function requireIdentity(id?: number): Identity {
+    if (id === undefined) return defaultIdentity() ?? fail("notFound", "no identity yet");
+    return identities.find((i) => i.id === id) ?? fail("notFound", `no identity ${String(id)}`);
+  }
+
+  function addIdentity(label: string, name: string, certHash: string): Identity {
+    if (certHash !== "" && identities.some((i) => i.certHash === certHash))
+      fail("invalidInput", "this identity is already in the list");
+    const identity: Identity = {
+      id: nextIdentityId++,
+      label,
+      name,
+      certHash,
+      addedAt: new Date().toISOString(),
+      isDefault: identities.length === 0,
+      serverIds: [],
+    };
+    identities = [...identities, identity];
+    return identity;
+  }
+
+  /** Removes an identity from the mock; the default passes to the oldest remaining one. */
+  function removeIdentity(id: number): void {
+    const removed = requireIdentity(id);
+    if (identities.length <= 1) fail("invalidInput", "Mumcord needs at least one identity");
+    identities = identities.filter((i) => i.id !== id);
+    if (removed.isDefault) {
+      const next = orderedIdentities()[0];
+      if (next) identities = identities.map((i) => ({ ...i, isDefault: i.id === next.id }));
+    }
+    for (const server of servers) {
+      if (server.identityId === id) setIdentityOfServer(server.id, null);
+    }
+  }
+
+  /** Stores a server's identity and keeps the identities' `serverIds` in sync. */
+  function setIdentityOfServer(serverId: number, identityId: number | null): SavedServer {
+    const server = requireServer(serverId);
+    if (identityId !== null) requireIdentity(identityId);
+    const updated: SavedServer = { ...server, identityId };
+    servers = servers.map((s) => (s.id === serverId ? updated : s));
+    identities = identities.map((i) => ({
+      ...i,
+      serverIds:
+        i.id === identityId
+          ? [...new Set([...i.serverIds, serverId])]
+          : i.serverIds.filter((s) => s !== serverId),
+    }));
+    return updated;
   }
 
   function requireChannel(id: number): ChannelInfo {
@@ -871,6 +1375,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const updated = { ...requireUser(session), ...patch };
     snap.users = snap.users.map((u) => (u.session === session ? updated : u));
     emitServer("userUpserted", { user: updated });
+    if (session === SELF_SESSION) syncActiveAudio();
     return updated;
   }
 
@@ -979,7 +1484,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     rejoinOffers.delete(serverId);
     const offer = readOnly && offerPath ? findChannelByPath(channels, offerPath) : undefined;
     const self = {
-      ...person(SELF_SESSION, requireServer(serverId).username, target?.id ?? 0, "selfhash"),
+      ...person(
+        SELF_SESSION,
+        requireServer(serverId).username,
+        target?.id ?? 0,
+        mockCertHash("zoe"),
+      ),
       ...(readOnly ? { selfMute: true, selfDeaf: true } : joinedVoice()),
     };
     if (readOnly) muteBeforeDeaf = false;
@@ -990,27 +1500,50 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       avatarHash: "a1",
     };
     const carla = { ...person(4, "Carla", 2, "carlahash"), listeningChannelIds: [1] };
+    const users = stress
+      ? stressUsers(self, channels)
+      : demo
+        ? demoUsers(self)
+        : [self, anna, person(3, "Ben", 1, null), carla];
+    const saved = requireServer(serverId);
     const info: ServerInfo = {
       version: serverVersion,
       followSupported: !serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2"),
       welcomeText: demo
-        ? `Welcome to <b>${requireServer(serverId).label}</b>. Be kind and have fun!`
+        ? `Welcome to <b>${saved.label}</b>. Be kind and have fun!`
         : "Welcome to the <b>mock</b> server.",
       defaultChannelId: target?.id ?? null,
       maxMessageLength: 5000,
       maxImageMessageLength: 131072,
       allowHtml: true,
+      release: null,
+      os: "Linux",
+      maxBandwidth: 128_000,
+      maxUsers: 100,
+      recordingAllowed: false,
+      serverLabel: saved.label,
+      serverAddress: saved.address,
+      serverPort: saved.port,
+      tlsFingerprint:
+        "9F:2C:41:7A:B3:0E:D8:65:1C:AA:4B:F0:92:3D:77:E1:5A:08:C6:2F:B9:14:6E:D3:80:47:A5:1B:F2:69:CE:30",
+      usersOnline: users.length,
+      sessionId: SELF_SESSION,
+      registered: true,
+      currentChannelPermissions: 0x1 | 0x8 | 0x100,
+      mumcordUsers: users.filter((user) => user.isMumcord).length,
+      tlsTrusted: true,
+      tlsIssuer: "CN=Example Root CA, O=Example Org",
+      tlsValidFrom: "2026-03-01",
+      tlsValidUntil: "2027-03-01",
+      tlsCertificatePem:
+        "-----BEGIN CERTIFICATE-----\nMIIBszCCAVmgAwIBAgIUExampleCertificateForTheMockServer\n-----END CERTIFICATE-----\n",
     };
     return {
       serverId,
       selfSession: SELF_SESSION,
       info,
       channels,
-      users: stress
-        ? stressUsers(self, channels)
-        : demo
-          ? demoUsers(self)
-          : [self, anna, person(3, "Ben", 1, null), carla],
+      users,
       followedChannelIds: [],
       unread: [],
       readOnly,
@@ -1026,8 +1559,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     });
     return [
       withAvatar(self),
-      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true }),
-      withAvatar(person(5, "Jonas", 1, "jonashash")),
+      withAvatar({ ...person(2, "Maya", 1, "mayahash"), hasComment: true, isMumcord: true }),
+      withAvatar({ ...person(5, "Jonas", 1, "jonashash"), isMumcord: true }),
       withAvatar(person(7, "Priya", 1, "priyahash")),
       { ...person(3, "Ben", 1, null), selfMute: true },
       { ...person(4, "Carla", 7, "carlahash"), listeningChannelIds: [1] },
@@ -1129,22 +1662,129 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     return message;
   }
 
+  // Import from the official Mumble client (issue #66).
+  const mumble = options.mumble !== undefined ? options.mumble : demo ? DEMO_MUMBLE : null;
+  let lastMumbleImport: { servers: number[]; identity: number | null } | null = null;
+
+  function mumbleScan(): MumbleImportFound | null {
+    if (mumble === null) return null;
+    const known = new Set(servers.map((s) => `${s.address.toLowerCase()}:${String(s.port)}`));
+    return {
+      ...mumble,
+      favourites: mumble.favourites.map((f) => ({
+        ...f,
+        duplicate: known.has(`${f.host.toLowerCase()}:${String(f.port)}`),
+      })),
+    };
+  }
+
+  function mumbleApply(
+    request: Parameters<EngineCommands["mumbleImportApply"]>[0],
+  ): MumbleImportDone {
+    const found = mumbleScan();
+    if (found === null) fail("notFound", "Mumble data not found");
+    const cert = found.certificate;
+    if (request.certificate && cert?.needsPassword === true) {
+      if (request.certificatePassword !== DEMO_MUMBLE_CERT_PASSWORD)
+        fail("wrongPassword", "the certificate could not be opened");
+    }
+    const done: MumbleImportDone = {
+      added: [],
+      skipped: [],
+      passwordsSaved: 0,
+      identity: null,
+      identitySkipped: false,
+      identityValidUntil: null,
+    };
+    if (request.certificate && cert) {
+      if (cert.alreadyImported) done.identitySkipped = true;
+      else {
+        done.identity = addIdentity("Zoe", "Zoe", mockCertHash("mumble-import"));
+        done.identityValidUntil = "2029-03-14T00:00:00Z";
+      }
+    }
+    for (const f of found.favourites) {
+      if (!request.favourites.some((k) => k.host === f.host && k.port === f.port)) continue;
+      if (f.duplicate) {
+        done.skipped.push(f.label);
+        continue;
+      }
+      const hasPassword = request.passwords && f.hasPassword;
+      const server: SavedServer = {
+        id: nextServerId++,
+        label: f.label,
+        address: f.host,
+        port: f.port,
+        username: f.username,
+        hasPassword,
+        saveHistory: true,
+        ...NEW_SERVER_FLAGS,
+      };
+      if (hasPassword) done.passwordsSaved += 1;
+      servers = [...servers, server];
+      done.added.push({ ...server });
+    }
+    lastMumbleImport = {
+      servers: done.added.map((s) => s.id),
+      identity: done.identity?.id ?? null,
+    };
+    return done;
+  }
+
+  function mumbleUndo(): void {
+    const last = lastMumbleImport;
+    if (last === null) fail("notFound", "nothing to undo");
+    lastMumbleImport = null;
+    servers = servers.filter((s) => !last.servers.includes(s.id));
+    if (last.identity !== null) identities = identities.filter((i) => i.id !== last.identity);
+  }
+
   const commands: EngineCommands = {
     // identity
-    identityGet: () => Promise.resolve(identity),
-    identityCreate: (name) => {
+    identityGet: () => Promise.resolve(defaultIdentity()),
+    identityList: () => Promise.resolve(orderedIdentities().map((i) => ({ ...i }))),
+    identityCreate: (name, label) => {
       if (name.trim() === "") fail("invalidInput", "name is required");
-      identity = { name: name.trim(), certHash: "selfhash" };
-      return Promise.resolve(identity);
+      const id = nextIdentityId;
+      return Promise.resolve(
+        addIdentity(label ?? name.trim(), name.trim(), mockCertHash(`created-${String(id)}`)),
+      );
     },
-    identityImport: (path) => {
+    identityImport: (path, _password, label) => {
       const file = path.split(/[\\/]/).pop() ?? "Imported";
-      identity = { name: file.replace(/\.p12$|\.pfx$/i, ""), certHash: "importedhash" };
-      return Promise.resolve(identity);
+      const name = file.replace(/\.p12$|\.pfx$/i, "");
+      const id = nextIdentityId;
+      return Promise.resolve(
+        addIdentity(label ?? name, name, mockCertHash(`imported-${String(id)}`)),
+      );
     },
-    identityExport: (_path, password) => {
-      requireIdentity();
+    identityRename: (id, label) => {
+      requireIdentity(id);
+      if (label.trim() === "") fail("invalidInput", "label is required");
+      let renamed = requireIdentity(id);
+      renamed = { ...renamed, label: label.trim() };
+      identities = identities.map((i) => (i.id === id ? renamed : i));
+      return Promise.resolve(renamed);
+    },
+    identityExport: (id, _path, password) => {
+      requireIdentity(id);
       if (password === "") fail("invalidInput", "a password is required");
+      return Promise.resolve(null);
+    },
+    identityDelete: (id) => {
+      removeIdentity(id);
+      return Promise.resolve(null);
+    },
+    identitySetDefault: (id) => {
+      requireIdentity(id);
+      identities = identities.map((i) => ({ ...i, isDefault: i.id === id }));
+      return Promise.resolve(orderedIdentities().map((i) => ({ ...i })));
+    },
+
+    mumbleImportScan: () => Promise.resolve(mumbleScan()),
+    mumbleImportApply: (request) => Promise.resolve(mumbleApply(request)),
+    mumbleImportUndo: () => {
+      mumbleUndo();
       return Promise.resolve(null);
     },
 
@@ -1175,6 +1815,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     serverRemove: (id) => {
       requireServer(id);
       servers = servers.filter((s) => s.id !== id);
+      identities = identities.map((i) => ({
+        ...i,
+        serverIds: i.serverIds.filter((s) => s !== id),
+      }));
       history.delete(id);
       return Promise.resolve(null);
     },
@@ -1188,6 +1832,33 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     parseMumbleLink: (url) => Promise.resolve(parseLink(url)),
+    // The mock never contacts a server. It answers with figures of its own, and says that nothing
+    // was asked while the privacy switch is off — which is what the real command does (issue #175).
+    mumbleLinkStats: (url: string, refresh: boolean): Promise<MumbleLinkStats> => {
+      parseLink(url);
+      if (!settings.linkPreviews) return Promise.resolve({ kind: "privacyOff" });
+      // Like the engine, the mock keeps the answer for the session unless the card asks again.
+      const stored = queryAnswers.get(url);
+      const answer: MumbleLinkStats =
+        refresh || stored === undefined
+          ? { kind: "answered", pingMs: 12, users: 8, maxUsers: 24, version: serverVersion }
+          : stored;
+      queryAnswers.set(url, answer);
+      return Promise.resolve(answer);
+    },
+    // The public server browser (issue #68): fictional servers, nothing is contacted.
+    publicServersList: () => Promise.resolve(mockPublicServers()),
+    publicServerPing: (host: string, port: number) =>
+      Promise.resolve(mockPublicServerPing(host, port)),
+    mumbleLinkJoin: (url: string) => {
+      const link = parseLink(url);
+      const saved = servers.find((s) => s.address === link.address && s.port === link.port);
+      const outcome: LinkOutcome = saved
+        ? { kind: "connecting", serverId: saved.id }
+        : { kind: "unknownServer" };
+      emit("deepLinkOpened", { link, outcome });
+      return Promise.resolve(outcome);
+    },
 
     // session
     connect: (serverId, channelPath, password) => {
@@ -1221,7 +1892,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     sessionSnapshot: (serverId) => Promise.resolve(sessions.get(serverId)?.snapshot ?? null),
     connectionStats: (serverId) =>
       Promise.resolve(
-        sessions.get(serverId)?.state.state === "connected" ? { ...connectionStats } : null,
+        sessions.get(serverId)?.state.state === "connected"
+          ? {
+              ...connectionStats,
+              // Follows the setting like the engine, unless a test set its own figure.
+              latency:
+                connectionStats.latency === DEFAULT_CONNECTION_STATS.latency
+                  ? mockLatencyEstimate(activeAudio?.profile.lowLatency ?? settings.lowLatency)
+                  : connectionStats.latency,
+            }
+          : null,
       ),
     certTrustDecide: (serverId, _fingerprint, trust) => {
       const pending = pendingConnect;
@@ -1260,6 +1940,19 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
 
     // channels
+    voiceLeave: () => {
+      const previous = voiceServerId;
+      if (previous === null) return Promise.resolve(null);
+      // Like the engine: the server stays connected, read-only (muted + deafened).
+      if (sessions.get(previous)?.snapshot) {
+        currentServerId = previous;
+        setSnapshot({ ...requireSnapshot(), readOnly: true, rejoinChannelId: null });
+        updateUser(SELF_SESSION, { selfMute: true, selfDeaf: true });
+      }
+      setVoiceServer(null);
+      return Promise.resolve(null);
+    },
+
     channelJoin: (serverId, channelId) => {
       requireSession(serverId);
       // Like a real server, a refused join is answered asynchronously, here with the
@@ -1355,6 +2048,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       updateUser(session, { volume });
       return Promise.resolve(null);
     },
+    personMove: (serverId, session, channelId) => {
+      requireSession(serverId);
+      requireUser(session);
+      // Like a real server, a refused move only answers with a denial; nobody moves.
+      if (!requireChannel(channelId).permissions.moveUsers) return Promise.resolve(null);
+      updateUser(session, { channelId });
+      return Promise.resolve(null);
+    },
     personSetLocalMute: (serverId, session, muted) => {
       requireSession(serverId);
       updateUser(session, { localMute: muted });
@@ -1382,6 +2083,114 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         lastSeenAt: known?.lastSeenAt ?? null,
       });
       refreshFriends();
+      return Promise.resolve(null);
+    },
+    pmRequests: (serverId) => Promise.resolve(pmRequestsOf(serverId)),
+    pmRequestAccept: (serverId, id) => {
+      requireSession(serverId);
+      const requests = pmRequestsOf(serverId);
+      const request = requests.incoming.find((r) => r.id === id);
+      if (!request) fail("notFound", "no such request");
+      acceptConversation(request.name, request.certHash);
+      setPmRequests(serverId, {
+        ...requests,
+        incoming: requests.incoming.filter((r) => r.id !== id),
+      });
+      for (const message of request.messages) {
+        store(message);
+        emitServer("messageReceived", { message });
+      }
+      return Promise.resolve(null);
+    },
+    pmRequestDecline: (serverId, id) => {
+      requireSession(serverId);
+      const requests = pmRequestsOf(serverId);
+      if (!requests.incoming.some((r) => r.id === id)) fail("notFound", "no such request");
+      setPmRequests(serverId, {
+        ...requests,
+        incoming: requests.incoming.filter((r) => r.id !== id),
+      });
+      return Promise.resolve(null);
+    },
+    chatRequestSend: (serverId, session, note) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      if (!user.isMumcord || !user.mumcordFeatures.includes("chat-request")) {
+        fail("invalidInput", "this person cannot receive chat requests");
+      }
+      const requests = pmRequestsOf(serverId);
+      if (requests.sent.some((r) => r.session === session && !r.accepted)) {
+        fail("invalidInput", "a chat request is already pending");
+      }
+      if (note !== null && Array.from(note).length > 200) fail("invalidInput", "note is too long");
+      acceptConversation(user.name, user.certHash);
+      setPmRequests(serverId, {
+        ...requests,
+        sent: [
+          ...requests.sent.filter((r) => r.session !== session),
+          { session, name: user.name, certHash: user.certHash, accepted: false },
+        ],
+      });
+      return Promise.resolve(null);
+    },
+    privateConversations: (serverId) => {
+      requireSession(serverId);
+      const list: PrivateConversation[] = [];
+      for (const messages of serverHistory(serverId).values()) {
+        const last = messages.at(-1);
+        if (last?.conversation.kind !== "private") continue;
+        const { certHash } = last.conversation;
+        const peer = [...messages].reverse().find((m) => m.senderCertHash === certHash);
+        list.push({ last, peerName: peer?.senderName ?? null });
+      }
+      list.sort((a, b) => Date.parse(b.last.sentAt) - Date.parse(a.last.sentAt));
+      return Promise.resolve(list);
+    },
+    pmConversationPrefs: () => Promise.resolve(pmPrefs),
+    pmConversationSetPinned: (serverId, certHash, pinned) => {
+      setPmPrefs(serverId, certHash, { pinned });
+      return Promise.resolve(null);
+    },
+    pmConversationMute: (serverId, certHash, minutes) => {
+      setPmPrefs(
+        serverId,
+        certHash,
+        minutes === null
+          ? { mutedUntil: null, mutedForever: true }
+          : {
+              mutedUntil: new Date(Date.now() + minutes * 60_000).toISOString(),
+              mutedForever: false,
+            },
+      );
+      return Promise.resolve(null);
+    },
+    pmConversationUnmute: (serverId, certHash) => {
+      setPmPrefs(serverId, certHash, { mutedUntil: null, mutedForever: false });
+      return Promise.resolve(null);
+    },
+    blockedUsers: () => Promise.resolve(blockedUsers),
+    blockUser: (serverId, session) => {
+      requireSession(serverId);
+      const user = requireUser(session);
+      addBlock(serverId, user.name, user.certHash);
+      return Promise.resolve(null);
+    },
+    blockCert: (serverId, certHash, name) => {
+      if (certHash === "") return fail("invalidInput", "a certificate hash is needed");
+      addBlock(serverId, name, certHash);
+      return Promise.resolve(null);
+    },
+    unblock: (id) => {
+      blockedUsers = blockedUsers.filter((b) => b.id !== id);
+      emit("blockedUsersChanged", { users: blockedUsers });
+      return Promise.resolve(null);
+    },
+    acceptedConversations: () => Promise.resolve(acceptedConversations),
+    acceptedConversationRevoke: (ownCertHash, certHash) => {
+      acceptedConversations = acceptedConversations.filter(
+        (c) => c.ownCertHash !== ownCertHash || c.certHash !== certHash,
+      );
+      emit("acceptedConversationsChanged", { conversations: acceptedConversations });
       return Promise.resolve(null);
     },
     friendRemove: (certHash) => {
@@ -1494,10 +2303,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(all.slice(Math.max(0, stop - limit), stop));
     },
     historyClear: (scope: HistoryScope) => {
-      if (scope.kind === "all") history.clear();
-      else if (scope.kind === "server") history.delete(scope.serverId);
-      else serverHistory(scope.serverId).delete(conversationKey(scope.conversation));
+      const now = new Date().toISOString();
+      if (scope.kind === "all") {
+        history.clear();
+        clearedAt.set(clearedKey(null, null), now);
+      } else if (scope.kind === "server") {
+        history.delete(scope.serverId);
+        clearedAt.set(clearedKey(scope.serverId, null), now);
+      } else {
+        serverHistory(scope.serverId).delete(conversationKey(scope.conversation));
+        if (scope.conversation.kind === "channel") {
+          clearedAt.set(clearedKey(scope.serverId, scope.conversation.channelId), now);
+        }
+      }
       return Promise.resolve(null);
+    },
+    historyClearedAt: (serverId, channelId) => {
+      requireSession(serverId);
+      const marks = [
+        clearedAt.get(clearedKey(serverId, channelId)),
+        clearedAt.get(clearedKey(serverId, null)),
+        clearedAt.get(clearedKey(null, null)),
+      ].filter((at) => at !== undefined);
+      return Promise.resolve(marks.sort().at(-1) ?? null);
     },
     historySetSaving: (serverId, enabled) => {
       requireServer(serverId);
@@ -1543,6 +2371,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       Promise.resolve(settings.linkPreviews ? mockLinkPreview(url, demo) : null),
     inlineImage: (url) =>
       Promise.resolve(settings.linkPreviews ? mockInlineImage(url, demo) : null),
+    audioInfo: (url) => Promise.resolve(settings.linkPreviews ? mockAudioInfo(url) : null),
+    audioFile: (url) =>
+      Promise.resolve(
+        settings.linkPreviews && mockAudioInfo(url) !== null ? mockAudioFile() : null,
+      ),
+    audioSave: () => Promise.resolve(null),
     previewDismiss: (messageId, url) => {
       for (const conversations of history.values()) {
         for (const messages of conversations.values()) {
@@ -1714,6 +2548,28 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // audio
     audioDevices: () => Promise.resolve(DEVICES),
     bitrateMax: () => Promise.resolve<number | null>(null),
+    latencyEstimate: () =>
+      Promise.resolve(mockLatencyEstimate(activeAudio?.profile.lowLatency ?? settings.lowLatency)),
+    channelAudioProfiles: (serverId) => {
+      requireSession(serverId);
+      return Promise.resolve(channelAudioEntries(serverId));
+    },
+    channelAudioProfileSet: (serverId, channelId, profile) => {
+      requireSession(serverId);
+      requireChannel(channelId);
+      const kbps = profile?.bitrateKbps;
+      if (kbps != null && (kbps < 16 || kbps > 510)) {
+        fail("invalidInput", "bitrate must be 16–510 kbit/s");
+      }
+      const saved = channelAudio.get(serverId) ?? new Map<number, ChannelAudioProfile>();
+      if (profile) saved.set(channelId, { ...profile });
+      else saved.delete(channelId);
+      channelAudio.set(serverId, saved);
+      emitServer("channelAudioProfilesChanged", { profiles: channelAudioEntries(serverId) });
+      syncActiveAudio();
+      return Promise.resolve(null);
+    },
+    activeAudioProfile: () => Promise.resolve(activeAudio),
     micTestStart: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);
@@ -1731,6 +2587,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }, MIC_TEST_PHASE_MS);
       return Promise.resolve(null);
     },
+    audioTestSound: () => Promise.resolve(null),
     micTestStop: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);
@@ -1769,6 +2626,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // packet inspector
     packetCaptureSet: (enabled) => {
       inspector.set(enabled);
+      return Promise.resolve(null);
+    },
+    packetCaptureBackground: (enabled) => {
+      inspector.setBackground(enabled);
       return Promise.resolve(null);
     },
     packetCapturePoll: (after) => Promise.resolve(inspector.poll(after)),
@@ -1826,6 +2687,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // message notifications: same decision as the engine (src-tauri/src/notifications.rs)
     notifyMessage: (notice) => {
+      if (dndActive()) return Promise.resolve("none");
       const mode = settings.notifications;
       // Same choice as the engine: the ping replaces the message sound (gating by chat omitted).
       if (notice.mention && settings.sounds.mention) messageSounds.push("mention");
@@ -1840,6 +2702,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(outcome);
     },
     notificationDismiss: () => Promise.resolve(null),
+    trayAttentionSet: () => Promise.resolve(null),
+    dndState: () => Promise.resolve(dnd),
+    dndSet: (on) => setDnd({ ...dnd, manual: on }),
+    dndSetFollowSystem: (on) => setDnd({ ...dnd, followSystem: on }),
 
     // Epic 2 contract, not built in the engine yet.
     serverSetAlwaysConnect: (serverId, enabled) => {
@@ -1860,6 +2726,32 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       requireServer(serverId);
       servers = servers.map((s) => (s.id === serverId ? { ...s, notificationsMuted: muted } : s));
       return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetGroupMentionsMuted: (serverId, muted) => {
+      requireServer(serverId);
+      servers = servers.map((s) => (s.id === serverId ? { ...s, groupMentionsMuted: muted } : s));
+      return Promise.resolve({ ...requireServer(serverId) });
+    },
+    serverSetIdentity: (serverId, identityId) =>
+      Promise.resolve({ ...setIdentityOfServer(serverId, identityId) }),
+    serverTestConnection: (input) => {
+      if (input.address.trim() === "") fail("invalidInput", "address is required");
+      if (input.port === 0) fail("invalidInput", "port is required");
+      if (input.username.trim() === "") fail("invalidInput", "username is required");
+      const server = input.serverId === null ? null : requireServer(input.serverId);
+      // The mock knows one reachable server; anything else is unreachable.
+      if (!["localhost", "127.0.0.1"].includes(input.address.trim()))
+        fail("serverUnreachable", "unreachable in the mock");
+      if (input.password.kind === "set" && input.password.value === "wrong")
+        fail("wrongPassword", "wrong password");
+      const certificate =
+        server === null ? "unknown" : certPrompts.has(server.id) ? "changed" : "trusted";
+      return Promise.resolve({
+        pingMs: 12,
+        version: "1.5.0",
+        fingerprint: MOCK_FINGERPRINT,
+        certificate,
+      });
     },
     serverSetTheme: (serverId, themeId) => {
       requireServer(serverId);
@@ -2022,6 +2914,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Nobody has the removed window overlay switched on in the browser mock.
     windowOverlayNoticePending: () => Promise.resolve(false),
     windowOverlayNoticeDismiss: () => Promise.resolve(null),
+    audioDeviceNoticePending: () => Promise.resolve(false),
+    audioDeviceNoticeDismiss: () => Promise.resolve(null),
   };
 
   // Turns synchronous throws into rejections and applies injected failures.
@@ -2054,9 +2948,43 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     offerHistory: (channelId, holderName, lines) => {
       offeredHistory.set(channelId, { holderName, lines });
     },
+    receivePmRequest: (senderSession, { chatRequest, note, messages = [] }) => {
+      focused();
+      const sender = requireUser(senderSession);
+      const request: MessageRequest = {
+        id: nextPmRequestId++,
+        session: senderSession,
+        name: sender.name,
+        certHash: sender.certHash,
+        chatRequest,
+        note,
+        messages: messages.map((body): ChatMessage => ({
+          id: String(nextMessageId++),
+          conversation:
+            sender.certHash === null
+              ? { kind: "privateSession", session: senderSession }
+              : { kind: "private", certHash: sender.certHash },
+          senderName: sender.name,
+          senderCertHash: sender.certHash,
+          senderSession,
+          own: false,
+          sentAt: new Date().toISOString(),
+          body,
+          dismissedPreviews: [],
+          syncedFrom: null,
+        })),
+        receivedAt: new Date().toISOString(),
+      };
+      const requests = pmRequestsOf(currentServerId);
+      setPmRequests(currentServerId, { ...requests, incoming: [...requests.incoming, request] });
+      return request;
+    },
     receiveMessage: (conversation, body, senderSession) => {
       focused();
       const sender = requireUser(senderSession);
+      // Like the engine (issue #140): private messages of blocked people are dropped, their
+      // channel messages arrive without unread count.
+      const blocked = isBlocked(currentServerId, sender);
       const message: ChatMessage = {
         id: String(nextMessageId++),
         conversation,
@@ -2069,8 +2997,10 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         dismissedPreviews: [],
         syncedFrom: null,
       };
+      if (blocked && conversation.kind !== "channel") return message;
       store(message);
       emitServer("messageReceived", { message });
+      if (blocked) return message;
       const snap = requireSnapshot();
       const followed =
         conversation.kind === "channel" && snap.followedChannelIds.includes(conversation.channelId);
@@ -2114,6 +3044,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     setWindowFocused: (focused) => {
       windowFocused = focused;
     },
+    setSystemDnd: (system) => {
+      void setDnd({ ...dnd, system });
+    },
     desktopNotices: () => desktopNotices,
     messageSounds: () => messageSounds,
     removeUser: (session) => {
@@ -2132,9 +3065,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       focused();
       const snap = requireSnapshot();
       const channel = requireChannel(channelId);
-      const locked = { ...channel, permissions: { ...channel.permissions, enter: false } };
+      const locked = {
+        ...channel,
+        enterRestricted: true,
+        permissions: { ...channel.permissions, enter: false },
+      };
       snap.channels = snap.channels.map((c) => (c.id === channelId ? locked : c));
       emitServer("channelUpserted", { channel: locked });
+    },
+    updateChannel: (channelId, patch) => {
+      focused();
+      const snap = requireSnapshot();
+      const updated = { ...requireChannel(channelId), ...patch };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? updated : c));
+      emitServer("channelUpserted", { channel: updated });
     },
     renameChannel: (channelId, name) => {
       focused();
@@ -2142,6 +3086,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const renamed = { ...requireChannel(channelId), name };
       snap.channels = snap.channels.map((c) => (c.id === channelId ? renamed : c));
       emitServer("channelUpserted", { channel: renamed });
+    },
+    limitChannel: (channelId, maxUsers) => {
+      focused();
+      const snap = requireSnapshot();
+      const limited = { ...requireChannel(channelId), maxUsers };
+      snap.channels = snap.channels.map((c) => (c.id === channelId ? limited : c));
+      emitServer("channelUpserted", { channel: limited });
     },
     addBareChannelPassword: (serverId, password) => {
       const token = { token: password, label: null, channels: [], lastUsedAt: null };
@@ -2158,7 +3109,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 }
 
 /** Pinned channel info (FR-1.48b): demo descriptions and the text behind a hash-only one. */
-const noDescription = { description: null, hasDescription: false };
+const noDescription = { description: null, hasDescription: false, maxUsers: null };
 
 const MOCK_LOBBY_DESCRIPTION = "<p><b>Welcome to the Lobby!</b> Say hi and pick a channel.</p>";
 
@@ -2179,4 +3130,5 @@ const DEMO_DESCRIPTIONS = new Map<number, string>([
     "<p><b>Gaming</b>: find your squad below.</p><p>Push-to-talk in Squad channels, " +
       "and keep it friendly. Event nights are on Fridays at 20:00.</p>",
   ],
+  [4, "<p>Ranked queue for <b>Squad A</b>. Strategy notes are pinned in #Gaming.</p>"],
 ]);

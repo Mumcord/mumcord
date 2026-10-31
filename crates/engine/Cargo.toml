@@ -14,10 +14,16 @@ mumcord-positional.workspace = true
 mumcord-p2p.workspace = true
 mumcord-screenshare.workspace = true
 tokio.workspace = true
+# Import from the official Mumble client (issue #66): its database and 1.4/1.5 settings.
+rusqlite.workspace = true
+base64.workspace = true
+plist.workspace = true
+x509-parser.workspace = true
 bytes.workspace = true
 ammonia.workspace = true
 html5ever.workspace = true
 reqwest.workspace = true
+quick-xml.workspace = true
 rustls.workspace = true
 rustls-platform-verifier.workspace = true
 sha1.workspace = true
@@ -57,6 +63,8 @@ objc2-core-graphics = { workspace = true, features = ["CGDirectDisplay", "CGWind
 objc2-core-audio-types = { workspace = true, features = ["CoreAudioBaseTypes"] }
 
 [target.'cfg(windows)'.dependencies]
+# Mumble 1.4 keeps its settings in the registry (issue #66).
+windows-registry.workspace = true
 # Screen capture: the system picker and frames of Windows.Graphics.Capture (Direct3D 11), and the
 # shared app's sound via WASAPI process loopback. Same version as Tauri's own `windows`;
 # `windows-core` for the activation callback (`#[implement]`).
@@ -97,6 +105,8 @@ mumcord-store = { workspace = true, features = ["test-util"] }
 mumcord-audio = { workspace = true, features = ["test-backend"] }
 netsim = { path = "../../tools/netsim" }
 rcgen.workspace = true
+# The link card test builds a query answer in the protobuf format, like the protocol crate does.
+prost.workspace = true
 
 [lints]
 workspace = true

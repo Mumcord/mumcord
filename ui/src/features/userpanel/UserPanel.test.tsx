@@ -10,7 +10,9 @@ import "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { getShownServerId, resetServerStore, showServer } from "../channels/serverStore";
 import { resetNowGamingStore } from "../nowgaming";
+import { refreshIdentities, setServerIdentity } from "../servers";
 import { resetNowPlayingStore } from "../nowplaying";
+import { addServer } from "../servers/store";
 import { UserPanel } from "./UserPanel";
 import { LEVEL_FRAME_MS } from "./useMicLevelFill";
 
@@ -64,6 +66,15 @@ async function setup(connect = true, registered = false, talk?: Partial<Settings
 }
 
 beforeEach(() => {
+  // jsdom has no modal dialogs.
+  Object.assign(HTMLDialogElement.prototype, {
+    showModal(this: HTMLDialogElement) {
+      this.setAttribute("open", "");
+    },
+    close(this: HTMLDialogElement) {
+      this.removeAttribute("open");
+    },
+  });
   announcements = [];
   stopAnnouncements = subscribeAnnouncements((a) => announcements.push(a.message));
   files.pickImagePath.mockReset();
@@ -309,9 +320,22 @@ describe("UserPanel", () => {
     expect(deafen()).toBeDisabled();
   });
 
+  it("shows the certificate name of the identity the shown server uses", async () => {
+    await setup(false);
+    await api.identityCreate("Zoe (Acme)", "Work");
+    await refreshIdentities();
+    const [server] = await api.serversList();
+    const id = (server ?? { id: 0 }).id;
+    showServer(id);
+    await setServerIdentity(id, 2, false);
+    await waitFor(() => {
+      expect(screen.getByText("Zoe (Acme)")).toBeInTheDocument();
+    });
+  });
+
   it("registers after explaining and exporting the identity, then hides the menu item", async () => {
     await setup();
-    await api.identityCreate("Self");
+    await api.identityCreate("Self", null);
     const exportSpy = vi.spyOn(api, "identityExport");
     files.pickSavePath.mockResolvedValue("/tmp/id.p12");
     await openMenuItem("Register on this server");
@@ -324,7 +348,7 @@ describe("UserPanel", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Export identity" }));
     await waitFor(() => {
-      expect(exportSpy).toHaveBeenCalledWith("/tmp/id.p12", "pw");
+      expect(exportSpy).toHaveBeenCalledWith(1, "/tmp/id.p12", "pw");
     });
     fireEvent.click(screen.getByRole("button", { name: "Register" }));
     await waitFor(() => {
@@ -482,9 +506,13 @@ describe("UserPanel", () => {
     const labels = [...row.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"));
     expect(labels).toEqual([
       "Mute microphone",
+      "Microphone options",
       "Deafen",
+      "Speaker options",
       expect.stringMatching(/^Disconnect from /),
+      "More disconnect options",
       "Connection info",
+      "Voice quality",
       "Quick settings",
     ]);
     await joinVoice();
@@ -886,5 +914,132 @@ describe("quick settings (FR-1.66)", () => {
     fireEvent.contextMenu(gear());
     await screen.findByRole("menuitemcheckbox", { name: /^Link previews/u });
     expect(screen.queryByRole("menuitemcheckbox", { name: /^Overlay/u })).toBeNull();
+  });
+
+  describe("disconnect menu (#154)", () => {
+    const phone = () => screen.getByRole("button", { name: /^Disconnect from / });
+
+    /** Connects a second saved server so the multi-server items appear. */
+    async function connectSecond() {
+      const added = await addServer({
+        label: "Retro LAN",
+        address: "retro.example",
+        port: 64738,
+        username: "tester",
+        password: { kind: "keep" },
+      });
+      await act(() => api.connect(added.id, null, null));
+      showServer(1);
+      await waitFor(() => {
+        expect(phone()).toBeInTheDocument();
+      });
+      return added.id;
+    }
+
+    it("opens on right-click, the menu key and the arrow, and Escape returns the focus", async () => {
+      await setup();
+      await screen.findByRole("button", { name: /^Disconnect from / });
+      fireEvent.contextMenu(phone());
+      expect(await screen.findByRole("menu", { name: "Disconnect options" })).toBeInTheDocument();
+      fireEvent.keyDown(document.activeElement ?? phone(), { key: "Escape" });
+      await waitFor(() => {
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
+      expect(phone()).toHaveFocus();
+
+      fireEvent.keyDown(phone(), { key: "ContextMenu" });
+      expect(await screen.findByRole("menu")).toBeInTheDocument();
+      fireEvent.keyDown(document.activeElement ?? phone(), { key: "Escape" });
+      await waitFor(() => {
+        expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: "More disconnect options" }));
+      expect(await screen.findByRole("menu")).toBeInTheDocument();
+    });
+
+    it("keeps the left-click disconnect and shows no menu", async () => {
+      await setup();
+      const spy = vi.spyOn(api, "disconnect");
+      fireEvent.click(await screen.findByRole("button", { name: /^Disconnect from / }));
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalled();
+      });
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+
+    it("offers only the disconnect while no server has voice", async () => {
+      await setup();
+      fireEvent.contextMenu(await screen.findByRole("button", { name: /^Disconnect from / }));
+      await screen.findByRole("menu");
+      expect(screen.queryByRole("menuitem", { name: "Leave voice" })).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("menuitem", { name: /^Disconnect from / }),
+      ).toHaveAccessibleDescription("Close the connection to this server");
+      expect(screen.queryByRole("menuitem", { name: /all servers/u })).not.toBeInTheDocument();
+      expect(screen.queryByRole("menuitem", { name: /^Switch voice to/u })).not.toBeInTheDocument();
+    });
+
+    it("leaves voice and stays connected, read-only, announcing it", async () => {
+      await setup();
+      await joinVoice();
+      const spy = vi.spyOn(api, "voiceLeave");
+      fireEvent.contextMenu(phone());
+      fireEvent.click(await screen.findByRole("menuitem", { name: "Leave voice" }));
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalled();
+      });
+      expect(await screen.findByText(READ_ONLY)).toBeInTheDocument();
+      expect(phone()).toBeInTheDocument();
+      expect(announcements.some((m) => m.startsWith("Left voice on"))).toBe(true);
+      // Joining a channel gives voice back.
+      await joinVoice();
+    });
+
+    it("moves voice to another connected server", async () => {
+      await setup();
+      const second = await connectSecond();
+      await joinVoice();
+      const spy = vi.spyOn(api, "channelJoin");
+      fireEvent.contextMenu(phone());
+      fireEvent.click(await screen.findByRole("menuitem", { name: "Switch voice to Retro LAN" }));
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalledWith(second, expect.any(Number));
+      });
+      await waitFor(async () => {
+        expect(await api.voiceServerGet()).toBe(second);
+      });
+    });
+
+    it("asks before disconnecting from all servers; Cancel changes nothing", async () => {
+      await setup();
+      await connectSecond();
+      const spy = vi.spyOn(api, "disconnect");
+      fireEvent.contextMenu(phone());
+      fireEvent.click(
+        await screen.findByRole("menuitem", { name: "Disconnect from all servers…" }),
+      );
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog).toHaveTextContent("Disconnect from all 2 servers?");
+      const cancel = within(dialog).getByRole("button", { name: "Cancel" });
+      expect(cancel).toHaveFocus();
+      fireEvent.click(cancel);
+      await waitFor(() => {
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      });
+      expect(spy).not.toHaveBeenCalled();
+
+      fireEvent.contextMenu(phone());
+      fireEvent.click(
+        await screen.findByRole("menuitem", { name: "Disconnect from all servers…" }),
+      );
+      fireEvent.click(
+        within(await screen.findByRole("dialog")).getByRole("button", { name: "Disconnect" }),
+      );
+      await waitFor(() => {
+        expect(spy).toHaveBeenCalledTimes(2);
+      });
+      expect(await api.connectionsList()).toHaveLength(0);
+    });
   });
 });

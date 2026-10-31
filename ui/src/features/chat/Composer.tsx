@@ -15,7 +15,6 @@ import {
   type KeyboardEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
-import type { User } from "../../api";
 import { isFileDrag } from "../../app/nativeDrag";
 import { selfUser, useServerSelector } from "../channels";
 import { useAvatars } from "../members/useAvatars";
@@ -31,11 +30,14 @@ import {
   findMentionQuery,
   insertMention,
   optionId,
+  rankGroupMentions,
   rankMentionCandidates,
   type MentionQuery,
 } from "./mentions";
-import { MentionPicker } from "./MentionPicker";
+import { MentionPicker, type MentionOption } from "./MentionPicker";
 import type { ReplyQuote } from "./reply";
+import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
+import { MumbleLinkCard } from "./MumbleLinkCard";
 import { useComposer } from "./useComposer";
 
 export interface ComposerProps {
@@ -125,6 +127,9 @@ export function Composer({
 }: ComposerProps) {
   const { t } = useTranslation("chat");
   const composer = useComposer(target, limits, reply, onCancelReply);
+  // A `mumble://` link the user typed is shown as its card before sending (issue #175).
+  const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
+  const credentialLinks = useMemo(() => countCredentials(previewLinks), [previewLinks]);
   const fileInput = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
@@ -149,6 +154,24 @@ export function Composer({
     [composer.text, caret, disabled],
   );
   const hereChannel = target?.kind === "channel" ? target.channelId : ownChannel;
+  // `@channel` and `@all` only make sense in a channel (issue #70).
+  const inChannel = target?.kind === "channel";
+  const hereName = useServerSelector((state) =>
+    hereChannel === null ? "" : (state.channels.get(hereChannel)?.name ?? ""),
+  );
+  // Who `@channel` and `@all` reach: the people in the channel, and those plus its listeners.
+  const reach = useMemo(() => {
+    let members = 0;
+    let readers = 0;
+    for (const user of users.values()) {
+      const member = user.channelId === hereChannel;
+      if (member) members += 1;
+      if (member || (hereChannel !== null && user.listeningChannelIds.includes(hereChannel))) {
+        readers += 1;
+      }
+    }
+    return { members, readers };
+  }, [users, hereChannel]);
   const candidates = useMemo(
     () =>
       mention === null
@@ -156,13 +179,23 @@ export function Composer({
         : rankMentionCandidates(users.values(), mention.query, hereChannel, selfSession),
     [mention, users, hereChannel, selfSession],
   );
+  const options = useMemo<MentionOption[]>(
+    () => [
+      ...(mention === null || !inChannel ? [] : rankGroupMentions(mention.query)).map((group) => ({
+        kind: "group" as const,
+        group,
+      })),
+      ...candidates.map((user) => ({ kind: "user" as const, user })),
+    ],
+    [mention, inChannel, candidates],
+  );
   const isDismissed =
     mention !== null &&
     dismissed !== null &&
     mention.start === dismissed.start &&
     mention.query.startsWith(dismissed.query);
-  const pickerOpen = mention !== null && !isDismissed && candidates.length > 0;
-  const activeIndex = Math.min(active, Math.max(candidates.length - 1, 0));
+  const pickerOpen = mention !== null && !isDismissed && options.length > 0;
+  const activeIndex = Math.min(active, Math.max(options.length - 1, 0));
   const avatarOf = useAvatars(pickerOpen ? candidates : []);
 
   // Counts nested dragenter/dragleave pairs so the highlight does not flicker over child elements.
@@ -222,16 +255,17 @@ export function Composer({
     composer.setText(edit.text);
   }
 
-  function pick(user: User) {
+  function pick(option: MentionOption) {
     const element = input.current;
     if (mention === null || element === null) return;
-    const edit = insertMention(element.value, mention.start, element.selectionStart, user.name);
+    const name = option.kind === "group" ? option.group : option.user.name;
+    const edit = insertMention(element.value, mention.start, element.selectionStart, name);
     pendingSelection.current = {
       text: edit.text,
       selectionStart: edit.caret,
       selectionEnd: edit.caret,
     };
-    setDismissed({ start: mention.start, query: `${user.name} ` });
+    setDismissed({ start: mention.start, query: `${name} ` });
     setCaret(edit.caret);
     composer.setText(edit.text);
   }
@@ -239,7 +273,7 @@ export function Composer({
   /** Handles the keys of the open mention list; true when the key was used. */
   function onPickerKey(event: KeyboardEvent<HTMLTextAreaElement>): boolean {
     if (!pickerOpen || event.nativeEvent.isComposing) return false;
-    const count = candidates.length;
+    const count = options.length;
     switch (event.key) {
       case "ArrowDown":
         setActive((activeIndex + 1) % count);
@@ -249,9 +283,9 @@ export function Composer({
         break;
       case "Enter":
       case "Tab": {
-        const user = candidates[activeIndex];
-        if (user === undefined || event.shiftKey || event.ctrlKey || event.altKey) return false;
-        pick(user);
+        const option = options[activeIndex];
+        if (option === undefined || event.shiftKey || event.ctrlKey || event.altKey) return false;
+        pick(option);
         break;
       }
       case "Escape":
@@ -399,18 +433,32 @@ export function Composer({
             ) : null}
           </div>
         ) : null}
+        {previewLinks.length > 0 ? (
+          <div className="chat-composer__links">
+            {previewLinks.map((url) => (
+              <MumbleLinkCard
+                key={url}
+                url={url}
+                credentialLinks={credentialLinks}
+                preview
+                tabIndex={0}
+              />
+            ))}
+          </div>
+        ) : null}
         <AttachmentTray items={composer.attachments} onRemove={composer.removeAttachment} />
         {pickerOpen ? (
           <MentionPicker
             id={pickerId}
-            candidates={candidates}
+            options={options}
             active={activeIndex}
             avatarOf={avatarOf}
+            channel={{ name: hereName, members: reach.members, readers: reach.readers }}
             onPick={pick}
           />
         ) : null}
         <p className="visually-hidden" role="status">
-          {pickerOpen ? t("mention.found", { count: candidates.length }) : ""}
+          {pickerOpen ? t("mention.found", { count: options.length }) : ""}
         </p>
         <FormatToolbar onFormat={format} disabled={disabled} />
         <div className="chat-composer__row">

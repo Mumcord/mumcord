@@ -1,11 +1,23 @@
 {
-  "show": "Näytä Mumcord",
+  "show": "Avaa Mumcord",
+  "settings": "Asetukset…",
   "mute": "Mykistä mikrofoni",
   "deafen": "Mykistä kuulokkeet",
+  "dnd": "Älä häiritse",
+  "dndSystem": "Älä häiritse (järjestelmä)",
   "quit": "Lopeta",
   "disconnected": "Ei yhteyttä",
   "connecting": "Yhdistetään…",
+  "reconnecting": "Yhdistetään uudelleen…",
   "connected": "Yhdistetty",
+  "connectedIn": "Yhdistetty · {channel}",
+  "serverState": "{server} – {state}",
   "talking": "Yhdistetty – puhuu",
-  "muted": "Yhdistetty – mykistetty"
+  "muted": "Yhdistetty – mykistetty",
+  "voiceMenu": "Puhepalvelin ja kanava",
+  "voiceServer": "Puhepalvelin",
+  "channelsOf": "Kanavat · {server}",
+  "moreChannels": "Lisää kanavia Mumcordissa…",
+  "recentChats": "Viimeisimmät keskustelut",
+  "chatUnread": "{name} – {count} lukematonta"
 }

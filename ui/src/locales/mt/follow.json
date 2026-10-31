@@ -15,9 +15,7 @@
     "generic": "Is-segwiment ta' dan il-kanal ma ħadimx. Erġa' pprova."
   },
   "dm": {
-    "title": "Messaġġi diretti",
-    "unknown": "Persuna mhux magħrufa",
-    "withServer": "{{name}}, fuq {{server}}"
+    "unknown": "Persuna mhux magħrufa"
   },
   "notify": {
     "channel": "{{name}} f'{{channel}}: {{text}}",
@@ -66,5 +64,9 @@
     "dismiss": "Ormi",
     "unfollowFailed": "It-twaqqif tas-segwiment tal-kanali kollha ma ħadimx. Erġa' pprova."
   },
-  "mention": "jinkludi semmija tiegħek"
+  "mention": "jinkludi semmija tiegħek",
+  "header": {
+    "follow": "Segwi l-kanal",
+    "unfollow": "Qed issegwi, ikklikkja biex twaqqaf"
+  }
 }

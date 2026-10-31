@@ -177,6 +177,87 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, position)
     );
     ",
+    // v14: several identities (issue #148). Certificates and keys stay in the OS secure
+    // storage; this table holds the local label, the certificate's common name and hash, when
+    // it was added and which one is the default. `saved_server.identity_id` NULL means "use
+    // the default identity", so existing servers keep their identity after the upgrade.
+    r"
+    CREATE TABLE identity (
+        id         INTEGER PRIMARY KEY,
+        label      TEXT    NOT NULL,
+        cert_name  TEXT    NOT NULL,
+        cert_hash  TEXT    NOT NULL UNIQUE,
+        created_at INTEGER NOT NULL,
+        is_default INTEGER NOT NULL DEFAULT 0 CHECK (is_default IN (0, 1))
+    );
+    CREATE UNIQUE INDEX identity_one_default ON identity (is_default) WHERE is_default = 1;
+
+    ALTER TABLE saved_server ADD COLUMN identity_id INTEGER REFERENCES identity (id)
+        ON DELETE SET NULL;
+    ",
+    // v15: turning off `@all` / `@channel` mentions per server (issue #70, Q1.6).
+    r"
+    ALTER TABLE saved_server ADD COLUMN group_mentions_muted INTEGER NOT NULL DEFAULT 0;
+    ",
+    // v16: accepted private conversations (issue #141). Kept per own identity, keyed by the
+    // own certificate hash, so the same person can message one identity but not another.
+    r"
+    CREATE TABLE accepted_conversation (
+        own_cert_hash TEXT    NOT NULL,
+        cert_hash     TEXT    NOT NULL,
+        name          TEXT    NOT NULL,
+        accepted_at   INTEGER NOT NULL,
+        PRIMARY KEY (own_cert_hash, cert_hash)
+    );
+    ",
+    // v17: pinned and muted private conversations in the private messages overview (issue
+    // #173), by server and the other person's certificate hash. `muted_until` is Unix millis,
+    // i64::MAX for "until turned back on", NULL when not muted.
+    r"
+    CREATE TABLE pm_conversation (
+        server_id   INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        cert_hash   TEXT    NOT NULL,
+        pinned      INTEGER NOT NULL DEFAULT 0 CHECK (pinned IN (0, 1)),
+        muted_until INTEGER,
+        PRIMARY KEY (server_id, cert_hash)
+    );
+    ",
+    // v18: audio profiles per channel (issue #171): overrides of Music quality, low-latency mode
+    // and the bitrate cap; NULL keeps the global setting. Keyed by channel id, with the channel
+    // path kept so a renamed or recreated channel still matches.
+    r"
+    CREATE TABLE channel_audio_profile (
+        server_id     INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        channel_id    INTEGER NOT NULL,
+        channel_path  TEXT    NOT NULL,
+        music_quality INTEGER CHECK (music_quality IN (0, 1)),
+        low_latency   INTEGER CHECK (low_latency IN (0, 1)),
+        bitrate_kbps  INTEGER CHECK (bitrate_kbps > 0),
+        PRIMARY KEY (server_id, channel_id)
+    );
+    ",
+    // v19: blocked users (issue #140), kept per own identity (FR-3.79). Lands after #218,
+    // whose `channel_audio_profile` (v18, above) keeps its version number so the version
+    // numbers match. A certificate block (`cert_hash` set) covers every server of
+    // that identity (Q1.4); a name block (`cert_hash` NULL) is for people without a
+    // certificate and only applies on `server_id`. `server_label` keeps where the block was
+    // set readable after the server is removed.
+    r"
+    CREATE TABLE blocked_user (
+        id            INTEGER PRIMARY KEY,
+        own_cert_hash TEXT    NOT NULL,
+        cert_hash     TEXT,
+        name          TEXT    NOT NULL,
+        server_id     INTEGER REFERENCES saved_server (id) ON DELETE SET NULL,
+        server_label  TEXT    NOT NULL,
+        blocked_at    INTEGER NOT NULL
+    );
+    CREATE UNIQUE INDEX blocked_user_cert ON blocked_user (own_cert_hash, cert_hash)
+        WHERE cert_hash IS NOT NULL;
+    CREATE UNIQUE INDEX blocked_user_name
+        ON blocked_user (own_cert_hash, server_id, name COLLATE NOCASE)
+        WHERE cert_hash IS NULL;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -232,6 +313,16 @@ pub(crate) mod tests {
         let dir = tempfile::tempdir().expect("tempdir");
         let store = Store::open(dir.path()).expect("open store");
         (dir, store)
+    }
+
+    /// Testers' local databases already have #218's `channel_audio_profile` as v18, so
+    /// `blocked_user` must stay v19.
+    #[test]
+    fn blocked_user_is_v19_after_channel_audio_profile() {
+        assert_eq!(MIGRATIONS.len(), 19);
+        assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
+        assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
+        assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
     }
 
     #[test]
@@ -444,6 +535,7 @@ pub(crate) mod tests {
         let server = &store.servers().expect("servers")[0];
         assert_eq!(server.label, "Old");
         assert!(!server.always_connect_at_start && !server.notifications_muted);
+        assert!(!server.group_mentions_muted);
         assert!(!server.was_voice_server_at_quit);
         assert_eq!(
             (server.connected_at_quit, server.theme_id.as_deref()),

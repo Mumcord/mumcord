@@ -57,10 +57,14 @@
   "menu": {
     "label": "Akcje dla {{name}}",
     "viewProfile": "Zobacz profil",
+    "sendMessage": "Wyślij wiadomość",
     "join": "Dołącz do {{channel}}",
-    "joinDenied": "Nie masz uprawnień do wejścia na ten kanał.",
+    "joinFull": "Ten kanał jest pełny.",
+    "joinLocked": "Nie możesz wejść na ten kanał albo wymaga on hasła.",
     "mute": "Wycisz dla mnie",
-    "connectionInfo": "Informacje o połączeniu…"
+    "connectionInfo": "Informacje o połączeniu…",
+    "chatRequestPending": "Prośba o czat oczekuje",
+    "revokeConsent": "Cofnij zgodę na czat…"
   },
   "nowPlaying": {
     "label": "Teraz gra",
@@ -87,5 +91,57 @@
   "preview": {
     "privateMessage": "Wiadomość prywatna",
     "fullProfile": "Pełny profil"
+  },
+  "chatRequest": {
+    "title": "Prośba o czat do {{name}}",
+    "note": "Notatka (opcjonalnie)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Wykorzystano {{count}} z {{max}} znaków",
+    "send": "Wyślij",
+    "failed": "Nie udało się wysłać prośby o czat. Spróbuj ponownie."
+  },
+  "toggle": {
+    "show": "Pokaż członków",
+    "hide": "Ukryj członków",
+    "showCount_one": "Pokaż członków ({{count}})",
+    "showCount_few": "Pokaż członków ({{count}})",
+    "showCount_many": "Pokaż członków ({{count}})",
+    "showCount_other": "Pokaż członków ({{count}})",
+    "talkingOne": "{{name}} mówi",
+    "talkingTwo": "{{first}} i {{second}} mówią",
+    "talkingMore_one": "{{name}} i {{count}} inna osoba mówią",
+    "talkingMore_few": "{{name}} i {{count}} inne osoby mówią",
+    "talkingMore_many": "{{name}} i {{count}} innych osób mówi",
+    "talkingMore_other": "{{name}} i {{count}} innych osób mówi",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Cofnąć zgodę na czat dla {{name}}?",
+    "message": "{{name}} będzie musiał(a) ponownie wysłać prośbę o wiadomość, zanim jego/jej wiadomości znów do ciebie dotrą. Historia czatu zostaje.",
+    "confirm": "Cofnij",
+    "failed": "Nie udało się cofnąć zgody na czat. Spróbuj ponownie."
+  },
+  "block": {
+    "menu": "Zablokuj…",
+    "unblock": "Odblokuj",
+    "title": "Zablokować użytkownika {{name}}?",
+    "onServer": "na serwerze {{server}}",
+    "whatHappens": "Co się dzieje",
+    "private": "Wiadomości prywatne od użytkownika {{name}} nie są wyświetlane i nie wysyłają powiadomień.",
+    "channelCollapsed": "Wiadomości kanałowe użytkownika {{name}} są zwinięte. Nadal możesz je otworzyć.",
+    "channelHidden": "Wiadomości kanałowe użytkownika {{name}} są ukryte.",
+    "voice": "Użytkownik {{name}} jest dla ciebie wyciszony w rozmowie głosowej, także szepty.",
+    "data": "Brak synchronizacji historii, zaproszeń i innych danych Mumcord od użytkownika {{name}}.",
+    "followsCert": "Blokada podąża za certyfikatem użytkownika {{name}}, więc nowa nazwa jej nie omija.",
+    "nameOnly": "Użytkownik {{name}} nie ma certyfikatu, więc blokada dotyczy tylko tej nazwy na serwerze {{server}}.",
+    "warning": "Użytkownik {{name}} nadal może cię widzieć i czytać twoje wiadomości. Mumble nie pozwala temu zapobiec wyłącznie po twojej stronie. Użytkownik {{name}} nie dostaje informacji o blokadzie.",
+    "cancel": "Anuluj",
+    "confirm": "Zablokuj użytkownika {{name}}",
+    "done": "Użytkownik {{name}} został zablokowany.",
+    "failed": "Nie udało się zablokować użytkownika {{name}}. Spróbuj ponownie.",
+    "badge": "Zablokowany",
+    "collapsed": "Wiadomość od zablokowanego użytkownika",
+    "show": "Pokaż",
+    "showLabel": "Pokaż wiadomość od zablokowanego użytkownika"
   }
 }

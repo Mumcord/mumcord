@@ -37,12 +37,13 @@
 
 .tree-channel__row,
 .tree-person__row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-height: 2rem;
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   user-select: none;
 }
@@ -52,17 +53,19 @@
   background: var(--color-bg-hover);
 }
 
-/* Violet inset bar instead of a border, so the selected row keeps its size. */
+/* Selected channel (its chat is open), as in the #172 mockup: a 2px focus-coloured ring and a
+   faint tint. Inset shadows instead of borders, so the row keeps its size. */
 .tree-channel__row[data-selected="true"] {
-  background: var(--color-bg-selected);
-  box-shadow: inset 3px 0 0 var(--color-accent);
+  background: color-mix(in srgb, var(--color-focus) 8%, transparent);
+  box-shadow: inset 0 0 0 2px var(--color-focus);
   color: var(--color-text);
   font-weight: var(--font-weight-bold);
 }
 
-/* Voice channel: green bar and speaker icon, distinct from the violet selected bar. Both bars
-   stack (voice on the outer edge) as box-shadows, so nothing shifts. */
+/* Own voice channel: green bar on the left, green tint and speaker icon. With the chat open as
+   well, the bar and the ring stack. */
 .tree-channel__row[data-voice="true"] {
+  background: color-mix(in srgb, var(--color-talking) 12%, transparent);
   box-shadow: inset 3px 0 0 var(--color-talking);
   font-weight: var(--font-weight-bold);
 }
@@ -70,26 +73,38 @@
 .tree-channel__row[data-voice="true"][data-selected="true"] {
   box-shadow:
     inset 3px 0 0 var(--color-talking),
-    inset 6px 0 0 var(--color-accent);
+    inset 0 0 0 2px var(--color-focus);
 }
 
-.tree-channel__row[data-voice="true"] .tree-channel__name::before {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-right: var(--space-1);
-  background: var(--color-talking);
-  content: "";
-  vertical-align: -0.125em;
-  /* Speaker icon (stroke path, same style as the person icons). */
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E")
-    center / contain no-repeat;
+.tree-channel__glyph {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+.tree-channel__glyph[data-kind="voice"] {
+  color: var(--color-talking);
 }
 
 .tree-channel__toggle {
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
   width: 1rem;
   color: var(--color-text-secondary);
-  text-align: center;
+}
+
+.tree-channel__chevron {
+  transition: transform 120ms ease;
+}
+
+.tree-channel__chevron[data-expanded="true"] {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-channel__chevron {
+    transition: none;
+  }
 }
 
 .tree-channel__toggle[data-expandable="false"] {
@@ -112,23 +127,20 @@
 }
 
 /* Pill after the name (icon + number); the name truncates first, pills never shrink. */
-.tree-channel__lock {
+.tree-channel__lock,
+.tree-channel__status {
   display: inline-flex;
   flex: none;
   align-items: center;
   color: var(--color-text-secondary);
 }
 
+/* Plain muted number after the name, as in the mockup. */
 .tree-channel__count {
-  display: inline-flex;
   flex: none;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-full);
-  background: var(--color-bg-hover);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
 }
 
 /* Generated, so the digit is not treeitem text: visible text must be part of the name (WCAG 2.5.3). */
@@ -144,9 +156,14 @@
   width: 1rem;
 }
 
-/* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). */
+/* Shown on hover and while the row has keyboard focus (Shift+Enter is the keyboard route). It
+   floats over the row's end, left of the action slot, so showing it never truncates the name. */
 .tree-channel__join {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--space-2) + 1rem + var(--space-2));
   display: none;
+  transform: translateY(-50%);
   padding: 0 var(--space-2);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-full);
@@ -206,28 +223,101 @@
   font-size: var(--font-size-sm);
 }
 
-/* Heading above the channel tree, styled like the "Direct messages" heading (follow.css). */
-.server-overview {
-  padding: var(--space-2) var(--space-2) 0;
-}
-
-.server-overview h2 {
-  margin: 0 0 var(--space-1);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-}
-
-/* Row above the tree: the server name with its menu (if any), then "Jump to my channel". */
-.channels-header {
-  display: flex;
+/* Heading above the channel tree, in the style of the sidebar section headings. */
+/* Section header of the shown server (issue #172): chevron, connection dot, name in capitals,
+   "N online · XX ms", the ⋯ menu and "Jump to my channel". */
+/* Name, menu and jump on the first line; "N online · XX ms" under the name, so a narrow column
+   never squeezes the name. */
+.server-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  column-gap: var(--space-1);
   align-items: center;
   min-height: 2rem;
+  margin-top: var(--space-2);
+  padding: 0 var(--space-1);
 }
 
-.channels-header > :not(.jump-to-channel) {
-  flex: 1;
+.server-section__title {
+  grid-row: 1;
+  grid-column: 1;
   min-width: 0;
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.server-section__toggle {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  max-width: 100%;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.server-section__toggle:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.server-section__chevron {
+  flex: none;
+  transition: transform 120ms ease;
+}
+
+.server-section__chevron[data-expanded="true"] {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .server-section__chevron {
+    transition: none;
+  }
+}
+
+.server-section__dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+}
+
+.server-section__dot[data-state="connected"] {
+  background: var(--color-success);
+}
+
+.server-section__dot[data-state="connecting"],
+.server-section__dot[data-state="reconnecting"] {
+  background: var(--color-warning);
+}
+
+.server-section__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.server-section__meta {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  min-width: 0;
+  /* Under the name: past the chevron, the dot and their gaps. */
+  padding-left: calc(var(--space-1) + 14px + var(--space-2) + 0.5rem + var(--space-2));
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .jump-to-channel {
@@ -296,9 +386,9 @@
 .channel-search__input {
   width: 100%;
   min-width: 0;
-  padding: var(--space-1) 1.75rem var(--space-1) var(--space-2);
+  padding: var(--space-2) 3.25rem var(--space-2) calc(var(--space-2) + 16px + var(--space-2));
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-bg-servers);
   color: var(--color-text);
   font-size: var(--font-size-sm);
@@ -311,6 +401,26 @@
 .channel-search__input:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: -1px;
+}
+
+.channel-search__icon {
+  position: absolute;
+  left: var(--space-2);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* "Ctrl K" chip at the field's end while it is empty, as in the #172 mockup. */
+.channel-search__key {
+  position: absolute;
+  right: var(--space-2);
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  pointer-events: none;
 }
 
 /* Own clear button instead of the engine's, which looks different per platform. */
@@ -353,4 +463,71 @@
   margin: var(--space-2) 0 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+/* User limit after the name (FR-3.85), generated for the same reason as the count. */
+.tree-channel__limit {
+  flex: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.tree-channel__limit::before {
+  content: attr(data-limit);
+}
+
+.tree-channel__limit[data-full="true"] {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-bold);
+}
+
+/* A full channel is dimmed; its count keeps the warning colour at full strength. */
+.tree-channel[data-full] .tree-channel__name,
+.tree-channel[data-full] .tree-channel__status,
+.tree-channel[data-full] .tree-channel__lock {
+  opacity: 0.6;
+}
+
+/* "you are here" on the own voice channel, at the row's end like the mockup. It gives way
+   first: the name keeps its room, and in a narrow column only screen readers get the text (the
+   green bar and speaker icon still mark the channel). */
+.channel-tree {
+  container-type: inline-size;
+}
+
+.tree-channel__here {
+  flex: 0 1000 auto;
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-channel__here::before {
+  content: attr(data-label);
+}
+
+@container (max-width: 12rem) {
+  .tree-channel__here {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    clip: rect(0 0 0 0);
+  }
+}
+
+/* A channel a dragged person can be dropped on (issue #172). */
+.tree-channel__row[data-drop="true"] {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: -2px;
+}
+
+.tree-person[draggable="true"] {
+  cursor: grab;
 }

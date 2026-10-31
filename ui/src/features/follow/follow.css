@@ -1,4 +1,4 @@
-.follow-toggle[aria-pressed="true"] {
+.follow-toggle.follow-toggle--eye[aria-pressed="true"] {
   color: var(--color-accent-text);
 }
 
@@ -39,52 +39,6 @@
   content: attr(data-count);
 }
 
-.direct-messages {
-  padding: var(--space-2);
-}
-
-.direct-messages h2 {
-  margin: 0 0 var(--space-1);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-}
-
-.direct-messages ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.direct-messages__item {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  min-height: 2rem;
-  padding: var(--space-1) var(--space-2);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.direct-messages__item:hover {
-  background: var(--color-bg-hover);
-}
-
-.direct-messages__presence {
-  display: inline-flex;
-  margin-right: var(--space-2);
-}
-
-/* Same violet selection bar as the channel tree; an inset shadow keeps the row size. */
-.direct-messages__item[aria-current="true"] {
-  background: var(--color-bg-selected);
-  box-shadow: inset 3px 0 0 var(--color-accent);
-}
-
 /* Follow eye in a channel row (QA.13): the 16px icon sits on the person status icon column; the
    24px click target (WCAG 2.5.8) grows into the row via negative margins, so nothing shifts. */
 .follow-star {
@@ -113,14 +67,33 @@
 }
 
 .follow-star[data-followed="true"] .follow-eye__pupil,
-.follow-toggle[aria-pressed="true"] .follow-eye__pupil {
+.follow-toggle.follow-toggle--eye[aria-pressed="true"] .follow-eye__pupil {
   fill: currentColor;
 }
 
-.follow-toggle {
+.follow-toggle.follow-toggle--eye {
   display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: var(--space-1);
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.follow-toggle.follow-toggle--eye:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-accent-text);
+}
+
+.follow-toggle.follow-toggle--eye .follow-eye {
+  width: 18px;
+  height: 18px;
 }
 
 /* Only opacity changes, so showing the eye never moves anything in the row. */
@@ -139,22 +112,8 @@
 }
 
 .follow-server {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 2rem;
-  padding: 0 var(--space-2);
-}
-
-.follow-server__name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: inline-flex;
+  flex: none;
 }
 
 .follow-server__menu {
@@ -185,24 +144,4 @@
   font-size: inherit;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.direct-messages__name {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.direct-messages__server {
-  flex: 0 1 40%;
-  min-width: 0;
-  margin-inline: var(--space-2);
-  text-align: right;
-  overflow: hidden;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

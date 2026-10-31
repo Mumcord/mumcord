@@ -69,6 +69,15 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             listen: has(permissions::LISTEN),
             register_self: channel.id == ROOT_CHANNEL
                 && bits.is_some_and(|b| b & permissions::SELF_REGISTER != 0),
+            speak: has(permissions::SPEAK),
+            whisper: has(permissions::WHISPER),
+            write: bits.is_some_and(|b| b & permissions::WRITE != 0),
+            // Servers answer permission queries only for channels the client asked about; the
+            // root channel's answer (sent at sync) stands in for the rest, as ACLs inherit
+            // downwards. The server still checks every move.
+            move_users: bits
+                .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
+                .is_some_and(|b| b & permissions::MOVE != 0),
         },
         description: channel
             .description
@@ -76,6 +85,10 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             .filter(|t| !t.trim().is_empty())
             .map(sanitize_html),
         has_description: super::description::has_description(channel),
+        max_users: channel.max_users.filter(|&n| n > 0),
+        temporary: channel.temporary,
+        links: channel.links.iter().copied().collect(),
+        enter_restricted: channel.is_enter_restricted,
     }
 }
 
@@ -119,6 +132,8 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
             .map(|v| v.to_string())
             .or_else(|| info.release.clone())
             .unwrap_or_default(),
+        release: info.release.clone(),
+        os: info.os.clone(),
         follow_supported: info.supports_listening(),
         welcome_text: info
             .welcome_text
@@ -129,6 +144,25 @@ pub fn server_info_view(state: &ServerState) -> ServerInfoView {
         max_message_length: info.message_length.unwrap_or(0),
         max_image_message_length: info.image_message_length.unwrap_or(0),
         allow_html: info.allow_html.unwrap_or(true),
+        max_bandwidth: info.max_bandwidth,
+        max_users: info.max_users,
+        recording_allowed: info.recording_allowed.unwrap_or(false),
+        server_label: None,
+        server_address: None,
+        server_port: None,
+        tls_fingerprint: None,
+        users_online: u32::try_from(state.users.len()).unwrap_or(u32::MAX),
+        session_id: state.session,
+        registered: state.own_user().is_some_and(|u| u.user_id.is_some()),
+        current_channel_permissions: state
+            .own_user()
+            .and_then(|u| state.permissions.get(&u.channel_id).copied()),
+        mumcord_users: 0, // Filled in by the snapshot function, which knows the Mumcord peers.
+        tls_trusted: true,
+        tls_issuer: None,
+        tls_valid_from: None,
+        tls_valid_until: None,
+        tls_certificate_pem: None,
     }
 }
 
@@ -305,14 +339,63 @@ mod tests {
         let view = channel_view(&state, &raid);
         assert!(view.permissions.enter && view.permissions.text_message);
         assert!(!view.permissions.register_self);
+        assert!(view.permissions.speak && !view.permissions.write);
 
         state.permissions.insert(2, permissions::TRAVERSE);
         let view = channel_view(&state, &raid);
         assert!(!view.permissions.enter && !view.permissions.text_message);
+        assert!(!view.permissions.speak);
+
+        state
+            .permissions
+            .insert(2, permissions::WRITE | permissions::SPEAK);
+        let view = channel_view(&state, &raid);
+        assert!(view.permissions.write && view.permissions.speak);
 
         state.permissions.insert(0, permissions::SELF_REGISTER);
         let root = state.channels[&0].clone();
         assert!(channel_view(&state, &root).permissions.register_self);
+    }
+
+    #[test]
+    fn move_permission_falls_back_to_the_root_answer() {
+        let mut state = tree();
+        let raid = state.channels[&2].clone();
+        assert!(!channel_view(&state, &raid).permissions.move_users);
+
+        state.permissions.insert(0, permissions::MOVE);
+        assert!(channel_view(&state, &raid).permissions.move_users);
+
+        state.permissions.insert(2, permissions::ENTER);
+        assert!(!channel_view(&state, &raid).permissions.move_users);
+    }
+
+    #[test]
+    fn channel_details_for_channel_info() {
+        let mut state = tree();
+        let raid = state.channels.get_mut(&2).expect("raid");
+        raid.max_users = Some(10);
+        raid.temporary = true;
+        raid.links.extend([4, 3]);
+        raid.is_enter_restricted = true;
+        let view = channel_view(&state, &state.channels[&2]);
+        assert_eq!(view.max_users, Some(10));
+        assert!(view.temporary && view.enter_restricted);
+        assert_eq!(view.links, [3, 4]);
+
+        // Mumble sends 0 for "no limit".
+        state.channels.get_mut(&2).expect("raid").max_users = Some(0);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+    }
+
+    #[test]
+    fn user_limit_zero_means_none() {
+        let mut state = tree();
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+        state.channels.get_mut(&2).expect("raid").max_users = Some(0);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, None);
+        state.channels.get_mut(&2).expect("raid").max_users = Some(5);
+        assert_eq!(channel_view(&state, &state.channels[&2]).max_users, Some(5));
     }
 
     #[test]

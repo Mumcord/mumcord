@@ -74,7 +74,25 @@ export interface ChannelTreeProps {
    * opened up to the matches. The remembered expand state stays as it was for when it is cleared.
    */
   filter?: string | undefined;
+  /**
+   * A channel's right-click menu (issue #172), rendered while it or a dialog it opened is shown.
+   * Without it, right-click shows the browser's own menu.
+   */
+  channelMenu?: ((menu: ChannelMenuRequest) => ReactNode) | undefined;
+  /** Moves a person dragged onto a channel (issue #172). */
+  onMovePerson?: ((session: number, channelId: number) => void) | undefined;
   ref?: Ref<ChannelTreeHandle> | undefined;
+}
+
+export interface ChannelMenuRequest {
+  channelId: number;
+  position: { x: number; y: number };
+  /** Joins the channel; left out for the user's own voice channel. */
+  join?: (() => void) | undefined;
+  /** Puts focus back on the channel's row. */
+  restoreFocus: () => void;
+  /** The menu and its dialogs are closed. */
+  onDone: () => void;
 }
 
 export interface ChannelTreeHandle {
@@ -138,6 +156,8 @@ export function ChannelTree({
   channelBadge,
   channelAction,
   filter = "",
+  channelMenu,
+  onMovePerson,
   ref,
 }: ChannelTreeProps) {
   const { t } = useTranslation("channels");
@@ -173,6 +193,7 @@ export function ChannelTree({
       initialCollapsed(roots, state.channels.size, ownChannelId),
   );
   const [jump, setJump] = useState<{ rowId: string } | null>(null);
+  const [menu, setMenu] = useState<{ channelId: number; x: number; y: number } | null>(null);
 
   // "Hide empty channels" and "Show talking people first" (FR-2.23). Talking only reorders the
   // tree while that switch is on. Search below always covers every channel.
@@ -340,6 +361,10 @@ export function ChannelTree({
     };
   }, [jump]);
 
+  const openMenu = (channelId: number, position: { x: number; y: number }) => {
+    if (channelMenu) setMenu({ channelId, ...position });
+  };
+
   const toggleShowAll = (channelId: number) => {
     setShowAll((current) => {
       const next = new Set(current);
@@ -359,6 +384,17 @@ export function ChannelTree({
     const row = rows[index];
     if (!row) return;
     let handled = true;
+    // The menu key and Shift+F10 open a channel's menu (issue #172); a person row keeps the
+    // browser's contextmenu event, which opens the person menu.
+    const menuKey = event.key === "ContextMenu" || (event.key === "F10" && event.shiftKey);
+    if (menuKey && row.kind === "channel" && channelMenu) {
+      const element = treeRef.current?.querySelector<HTMLElement>(`[data-row="${row.id}"]`);
+      const rect = element?.getBoundingClientRect();
+      openMenu(row.channelId, { x: rect?.left ?? 0, y: rect?.bottom ?? 0 });
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     switch (event.key) {
       case "ArrowDown":
         focusRow(rows[index + 1]?.id);
@@ -413,6 +449,8 @@ export function ChannelTree({
       onJoin(channelId);
     },
     openPerson: onOpenPerson,
+    openMenu,
+    movePerson: (session, channelId) => onMovePerson?.(session, channelId),
     channelBadge,
     channelAction,
   };
@@ -471,6 +509,26 @@ export function ChannelTree({
           ))}
         </TreeContext.Provider>
       </div>
+      {menu !== null &&
+        channelMenu?.({
+          channelId: menu.channelId,
+          position: { x: menu.x, y: menu.y },
+          join:
+            menu.channelId === selfChannelId
+              ? undefined
+              : () => {
+                  onJoin(menu.channelId);
+                },
+          restoreFocus: () => {
+            // Looked up when called: the row may have been redrawn while the menu was open.
+            const rowId = channelRowId(menu.channelId);
+            setFocusedId(rowId);
+            document.querySelector<HTMLElement>(`[data-row="${rowId}"]`)?.focus();
+          },
+          onDone: () => {
+            setMenu(null);
+          },
+        })}
       {result !== null && result.roots.length === 0 && (
         <p className="channel-tree__empty">{t("search.empty", { query: filter.trim() })}</p>
       )}

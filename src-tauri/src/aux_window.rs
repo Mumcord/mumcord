@@ -34,6 +34,7 @@ pub const INSPECTOR: Spec = Spec {
     allowed_commands: &[
         "app_info",
         "packet_capture_poll",
+        "packet_capture_background",
         "packet_capture_clear",
         "packet_capture_export",
         "packet_inspector_view",
@@ -241,6 +242,7 @@ mod tests {
         let label = INSPECTOR.label;
         assert!(command_allowed(label, "packet_capture_poll"));
         assert!(command_allowed(label, "packet_inspector_close"));
+        assert!(command_allowed(label, "packet_capture_background"));
         assert!(!command_allowed(label, "packet_capture_set"));
         assert!(!command_allowed(label, "packet_inspector_open"));
         assert!(!command_allowed(label, "deep_link_take_pending"));

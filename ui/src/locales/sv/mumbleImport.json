@@ -1,0 +1,94 @@
+{
+  "title": "Ta med din Mumble-inställning",
+  "intro": "Vi hittade den officiella Mumble-klienten på den här datorn. Välj vad som ska kopieras. Inget ändras i Mumble och inget lämnar din dator.",
+  "optional": "{{progress}} · valfritt",
+  "listLabel": "Vad som ska kopieras från Mumble",
+  "favourites": {
+    "title": "Serverfavoriter",
+    "found_one": "{{count}} hittad",
+    "found_other": "{{count}} hittade",
+    "duplicates_one": "{{count}} finns redan i Mumcord (hoppades över)",
+    "duplicates_other": "{{count}} finns redan i Mumcord (hoppades över)",
+    "failed": "Mumbles serverlista kunde inte läsas.",
+    "review": "Granska listan",
+    "hide": "Dölj listan",
+    "listLabel": "Servrar att kopiera",
+    "duplicate": "Finns redan i Mumcord"
+  },
+  "passwords": {
+    "title": "Sparade lösenord",
+    "count_one": "{{count}} av favoriterna har ett sparat lösenord",
+    "count_other": "{{count}} av favoriterna har ett sparat lösenord",
+    "keychain": "Sparat i systemets nyckelring"
+  },
+  "identity": {
+    "title": "Identitet (klientcertifikat)",
+    "keeps": "Behåller ditt registrerade namn och dina behörigheter",
+    "locked": "skyddat med lösenord i Mumble",
+    "named": "Certifikat för ”{{name}}”",
+    "validUntil": "giltigt till {{date}}",
+    "passwordNeeded": "Lösenord krävs",
+    "already": "Finns redan i Mumcord",
+    "password": "Certifikatlösenord från Mumble",
+    "passwordRequired": "Ange certifikatets lösenord.",
+    "wrongPassword": "Lösenordet öppnar inte certifikatet. Försök igen."
+  },
+  "devices": {
+    "title": "Ljudenheter",
+    "input": "Mikrofon: {{name}}",
+    "output": "Utgång: {{name}}",
+    "missing": "Mumbles enheter är inte anslutna till den här datorn."
+  },
+  "ptt": {
+    "title": "Push-to-talk-tangent",
+    "modifierOnly": "Tangenten i Mumble är bara en modifierartangent, som Mumcord inte kan använda. Du kan välja en tangent senare.",
+    "tooManyKeys": "Genvägen i Mumble har fler än en tangent, vilket Mumcord inte kan använda. Du kan välja en tangent senare.",
+    "unknown": "Genvägen i Mumble använder en tangent eller enhet som Mumcord inte känner till. Du kan välja en tangent senare."
+  },
+  "volume": {
+    "title": "Volym och röstinställningar",
+    "hint": "Mumble och Mumcord använder olika skalor, så värdena skulle inte stämma överens",
+    "notRecommended": "Rekommenderas inte"
+  },
+  "selected_one": "{{count}} objekt valt",
+  "selected_other": "{{count}} objekt valda",
+  "import": "Importera",
+  "importing": "Importerar…",
+  "skip": "Hoppa över just nu",
+  "cancel": "Avbryt",
+  "failed": "Importen kunde inte slutföras. Försök igen.",
+  "secureStorage": "Mumcord når inte systemets säkra lagring. Lås upp din nyckelring eller lösenordshanterare och försök igen.",
+  "settingsFailed": "Dina servrar kopierades, men inställningarna kunde inte sparas.",
+  "summary": {
+    "title": "Importen är klar",
+    "intro": "Dina Mumble-data har kopierats. Se vad som hände.",
+    "added_one": "{{count}} server tillagd i favoriter",
+    "added_other": "{{count}} servrar tillagda i favoriter",
+    "skipped_one": "{{count}} server hoppades över",
+    "skipped_other": "{{count}} servrar hoppades över",
+    "skippedDetail_one": "{{names}} finns redan i din lista",
+    "skippedDetail_other": "{{names}} finns redan i din lista",
+    "duplicate": "Dubblett",
+    "passwords_one": "{{count}} lösenord sparat",
+    "passwords_other": "{{count}} lösenord sparade",
+    "passwordsDetail": "Sparat i systemets nyckelring, inte i en fil",
+    "identity": "Identitet importerad",
+    "identityDefault": "Mumcord använder den nu",
+    "identityServers": "Används för de kopierade servrarna",
+    "identitySkipped": "Identiteten finns redan i Mumcord",
+    "identitySkippedDetail": "Certifikatet är redan en av dina identiteter",
+    "devicesAndPtt": "Ljudenheter och push-to-talk-tangent",
+    "done": "Klart",
+    "undo": "Ångra importen",
+    "undone": "Importen ångrades.",
+    "undoFailed": "Importen kunde inte ångras helt. Kontrollera dina servrar och identiteter."
+  },
+  "settings": {
+    "title": "Importera från Mumble",
+    "hint": "Kopiera serverfavoriter, sparade lösenord, ditt certifikat och ljudinställningar från den officiella Mumble-klienten.",
+    "button": "Importera från Mumble…",
+    "searching": "Letar efter Mumble…",
+    "notFound": "Den officiella Mumble-klienten hittades inte på den här datorn.",
+    "breadcrumb": "Inställningar · Servrar · Importera från Mumble"
+  }
+}

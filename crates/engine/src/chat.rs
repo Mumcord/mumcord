@@ -277,20 +277,26 @@ pub(crate) fn transient_id() -> String {
     )
 }
 
-/// Incoming text message: route, sanitize, store, emit, count unread (hook from the session).
-pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
+/// Incoming text message: route, sanitize, apply blocks (issue #140) and the private message
+/// rule (issue #141), then store, emit and count unread (hook from the session).
+pub(crate) fn on_text(
+    ctx: &SessionCtx,
+    msg: &TextMessage,
+    peers: &crate::mumcord::ServerPeers,
+    requests: &crate::pm_rules::ServerRequests,
+    block_list: &crate::blocking::BlockList,
+) {
     let routed = ctx.handle.with_state(|s| {
         let route = route(s, msg)?;
         let sender = msg.actor.and_then(|a| s.users.get(&a));
-        let unread = counts_unread(s, route);
         Some((
             route,
             sender.map(|u| u.name.clone()).unwrap_or_default(),
             sender.and_then(|u| u.cert_hash.clone()),
-            unread,
+            is_own_sender(s, msg.actor),
         ))
     });
-    let Some((route, sender_name, sender_cert_hash, counts_unread)) = routed else {
+    let Some((route, sender_name, sender_cert_hash, own)) = routed else {
         return;
     };
     let conversation = match route {
@@ -302,20 +308,63 @@ pub(crate) fn on_text(ctx: &SessionCtx, msg: &TextMessage) {
             None => ConversationRef::PrivateSession { session },
         },
     };
-    let Ok(key) = unread_key(ctx, &conversation) else {
-        return;
-    };
-    let mut message = ChatMessageView {
+    let message = ChatMessageView {
         id: String::new(),
-        conversation: conversation.clone(),
+        conversation,
         sender_name,
         sender_cert_hash,
         sender_session: msg.actor,
-        own: false,
+        own,
         sent_at: now_millis(),
         body: sanitize_message_html(&msg.message),
         dismissed_previews: Vec::new(),
         synced_from: None,
+    };
+    let blocked = msg
+        .actor
+        .is_some_and(|a| crate::blocking::is_blocked(ctx, block_list, a));
+    let private = matches!(route, Route::Private { .. });
+    let verdict = crate::blocking::text_verdict(private, blocked);
+    if verdict == crate::blocking::TextVerdict::Drop {
+        return;
+    }
+    if let Route::Private { session } = route {
+        match crate::pm_rules::screen(ctx, peers, requests, session) {
+            crate::pm_rules::Verdict::Show => {}
+            crate::pm_rules::Verdict::Hold => {
+                crate::pm_rules::hold(ctx, requests, session, message);
+                return;
+            }
+            crate::pm_rules::Verdict::Drop => return,
+        }
+    }
+    // Own messages never count as unread, even when a server or another session of the user
+    // sends them back.
+    let counts_unread = !own
+        && verdict == crate::blocking::TextVerdict::Normal
+        && ctx.handle.with_state(|s| counts_unread(s, route));
+    deliver(ctx, message, counts_unread);
+}
+
+/// Whether `actor` is the user's own session or another session with the user's certificate:
+/// those messages are the user's own and never notify (issue #215).
+fn is_own_sender(state: &ServerState, actor: Option<u32>) -> bool {
+    let Some(actor) = actor else {
+        return false;
+    };
+    if state.session == Some(actor) {
+        return true;
+    }
+    let own_hash = state.own_user().and_then(|u| u.cert_hash.as_deref());
+    own_hash.is_some() && state.users.get(&actor).and_then(|u| u.cert_hash.as_deref()) == own_hash
+}
+
+/// Stores, emits and counts an incoming message; also used for held message requests once
+/// they are accepted (issue #141).
+pub(crate) fn deliver(ctx: &SessionCtx, mut message: ChatMessageView, counts_unread: bool) {
+    let conversation = message.conversation.clone();
+    let Ok(key) = unread_key(ctx, &conversation) else {
+        return;
     };
     let stored = match &key {
         UnreadKey::Stored(c) => Some(c.clone()),
@@ -412,7 +461,7 @@ pub(crate) fn forget_unread(server: ServerId, channel_path: &str) -> bool {
         .is_some_and(|n| n > 0)
 }
 
-fn history_view(
+pub(crate) fn history_view(
     m: ChatMessage,
     conversation: &ConversationRef,
     own_hash: Option<&str>,
@@ -515,6 +564,7 @@ impl Engine {
             .send_text(&TextTarget::user(session), html)
             .map_err(command_error)?;
         await_refusal(&ctx, denials, None).await?;
+        crate::pm_rules::on_own_private_message(&ctx, self.pm_requests_state(), session);
         let conversation = match recipient {
             Some(cert_hash) => ConversationRef::Private { cert_hash },
             None => ConversationRef::PrivateSession { session },
@@ -638,6 +688,22 @@ impl Engine {
     pub fn gif_favorite_use(&self, url: &str) -> EngineResult<()> {
         lock(&self.store_handle())
             .use_gif_favorite(url, now_millis())
+            .map_err(store_error)
+    }
+
+    /// When the user last cleared the history of a channel (issue #119), for channel info
+    /// (issue #170); `None` if never, and for private chats.
+    pub fn history_cleared_at(
+        &self,
+        server_id: ServerId,
+        conversation: &ConversationRef,
+    ) -> EngineResult<Option<UnixMillis>> {
+        let key = unread_key(&self.session_ctx_for(server_id)?, conversation)?;
+        let UnreadKey::Stored(Conversation::Channel(path)) = key else {
+            return Ok(None);
+        };
+        lock(&self.store_handle())
+            .history_cleared_at(server_id, &path)
             .map_err(store_error)
     }
 
@@ -848,6 +914,43 @@ mod tests {
             route(&s, &text(Some(5), other_tree)),
             Some(Route::Channel(3))
         );
+    }
+
+    #[test]
+    fn messages_from_own_sessions_are_own() {
+        let mut s = state();
+        s.session = Some(10);
+        s.users.insert(
+            10,
+            User {
+                session: 10,
+                cert_hash: Some("me".into()),
+                ..Default::default()
+            },
+        );
+        s.users.insert(
+            11,
+            User {
+                session: 11,
+                cert_hash: Some("me".into()),
+                ..Default::default()
+            },
+        );
+        s.users.insert(
+            5,
+            User {
+                session: 5,
+                cert_hash: Some("other".into()),
+                ..Default::default()
+            },
+        );
+        assert!(is_own_sender(&s, Some(10)), "own session");
+        assert!(
+            is_own_sender(&s, Some(11)),
+            "second session, same certificate"
+        );
+        assert!(!is_own_sender(&s, Some(5)));
+        assert!(!is_own_sender(&s, None));
     }
 
     #[test]

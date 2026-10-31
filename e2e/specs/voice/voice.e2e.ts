@@ -207,7 +207,10 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
   it("AC-1.8 single click shows Raid's chat without moving; double click joins", async () => {
     await channelName("Raid").click();
     await browser.waitUntil(
-      async () => (await $("h2.chat-header__title").getText()).includes("Raid"),
+      // The name sits in a truncating span of the channel-name button (#170); WebKitWebDriver's
+      // visible text skips it, so read the DOM text.
+      async () =>
+        String(await $("h2.chat-header__title").getProperty("textContent")).includes("Raid"),
       { timeoutMsg: "Raid chat not shown" },
     );
     await sleep(1500);
@@ -257,7 +260,12 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     const hereC = (await readTree()).find((c) => c.people.includes("Tester"));
     const here = !hereC || hereC.level === 1 ? botRoot : hereC.name;
     await main.do(`join "${here}"`);
-    await expect(personRow("Bot")).toBeExisting();
+    // The row moves when the bot changes channel, so read the plain tree data instead of holding
+    // an element handle (a stale handle made this test flaky on CI).
+    await browser.waitUntil(
+      async () => (await readTree()).some((c) => c.people.includes("Bot")),
+      { timeout: 15_000, timeoutMsg: "Bot not shown in the tree" },
+    );
     await watchTalking();
     const lat: number[] = [];
     for (let i = 0; i < 5; i++) {

@@ -11,5 +11,56 @@
   "open": "Chat öffnen",
   "close": "Benachrichtigung schließen",
   "mentionLine": "{{sender}} hat dich erwähnt: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Benachrichtigungen",
+    "bellUnread_one": "Benachrichtigungen, {{count}} ungelesen",
+    "bellUnread_other": "Benachrichtigungen, {{count}} ungelesen",
+    "shortcut": "Strg+Umschalt+N",
+    "markAllRead": "Alle als gelesen markieren",
+    "filterLabel": "Benachrichtigungen anzeigen",
+    "filter": {
+      "all": "Alle",
+      "mentions": "Erwähnungen",
+      "requests": "Anfragen",
+      "invites": "Einladungen"
+    },
+    "empty": "Du bist auf dem neuesten Stand.",
+    "unread": "Ungelesen",
+    "dndOn": "Nicht stören ist an",
+    "dndOff": "Nicht stören ist aus",
+    "settings": "Benachrichtigungseinstellungen",
+    "someone": "Jemand",
+    "quoted": "„{{text}}“",
+    "mention": "{{name}} hat dich erwähnt",
+    "mentionGroup": "{{name}} hat alle erwähnt",
+    "reply": "{{name}} hat auf deine Nachricht geantwortet",
+    "chatRequest": "{{name}} möchte mit dir chatten",
+    "messageRequest": "Nachrichtenanfrage von {{name}}",
+    "messageRequestBody_one": "{{count}} Nachricht von einem Standard-Mumble-Client",
+    "messageRequestBody_other": "{{count}} Nachrichten von einem Standard-Mumble-Client",
+    "invite": {
+      "watchParty": "{{name}} hat dich zu einer Watch-Party eingeladen",
+      "screenShare": "{{name}} teilt den Bildschirm",
+      "card": "{{name}} hat dir eine Karte gesendet",
+      "theme": "{{name}} hat ein Design mit dir geteilt"
+    },
+    "connection": "{{server}} nicht erreichbar",
+    "type": {
+      "chatRequest": "Chatanfrage",
+      "messageRequest": "Nachrichtenanfrage",
+      "invite": "Einladung",
+      "private": "Private Nachricht",
+      "connection": "Verbindung"
+    },
+    "accept": "Annehmen",
+    "decline": "Ablehnen",
+    "join": "Beitreten",
+    "watch": "Ansehen",
+    "open": "Öffnen",
+    "dismiss": "Verwerfen",
+    "dismissItem": "Verwerfen: {{title}}",
+    "failed": "Das hat nicht geklappt. Bitte versuche es erneut.",
+    "block": "Blockieren"
+  }
 }

@@ -8,7 +8,10 @@
     "muted": "Mikrofón stlmený",
     "unmuted": "Mikrofón zapnutý",
     "deafened": "Zvuk stlmený. Nepočuješ ostatných a tvoj mikrofón je stlmený",
-    "undeafened": "Zvuk zapnutý"
+    "undeafened": "Zvuk zapnutý",
+    "leftVoice": "Hlas na serveri {{server}} opustený",
+    "disconnected": "Odpojené od servera {{server}}",
+    "disconnectedAll": "Odpojené od všetkých serverov"
   },
   "readOnly": {
     "text": "Len čítaš – ak chceš hovoriť, pripoj sa do kanála.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Zadaj heslo na ochranu súboru so zálohou.",
     "exported": "Záloha identity uložená.",
     "confirm": "Registrovať",
-    "done": "Registrovaný na tomto serveri"
+    "done": "Registrovaný na tomto serveri",
+    "identity": "Registrovaný názov patrí identite {{identity}}."
   },
   "errors": {
     "tooLarge": "Toto je pre server príliš veľké. Vyber menší obrázok alebo napíš kratší text.",
@@ -89,11 +93,54 @@
     "offerImages": "Ponúkať obrázky v plnej veľkosti",
     "offerImagesHint": "Ostatní si môžu načítať tvoje originálne obrázky",
     "loadImages": "Načítavať obrázky v plnej veľkosti",
-    "loadImagesHint": "Sťahovať originálne obrázky od ostatných"
+    "loadImagesHint": "Sťahovať originálne obrázky od ostatných",
+    "dnd": "Nerušiť",
+    "dndHint": "Stlmí zvuky a bannery upozornení",
+    "dndSystemHint": "Zapnuté cez režim Nerušiť vášho prostredia",
+    "privateMessages": "Súkromné správy od",
+    "pm_everyone": "Všetci",
+    "pm_friendsOnly": "Priatelia",
+    "pm_nobody": "Nikto"
   },
   "voice": {
     "line": "Hlas: {{channel}} · {{server}}",
     "server": "Hlas: {{server}}",
     "show": "{{location}} – zobraziť tento server"
+  },
+  "disconnectMenu": {
+    "label": "Možnosti odpojenia",
+    "open": "Ďalšie možnosti odpojenia",
+    "leaveVoice": "Opustiť hlas",
+    "leaveVoiceHint": "Prestať hovoriť a počúvať, zostať pripojený kvôli chatu",
+    "disconnectHint": "Zavrieť pripojenie k tomuto serveru",
+    "switchTo": "Prepnúť hlas na {{server}}",
+    "all": "Odpojiť od všetkých serverov…",
+    "allHint": "Zavrieť všetky pripojenia k serverom"
+  },
+  "disconnectAll": {
+    "title": "Odpojiť od všetkých serverov?",
+    "message": "Odpojiť od všetkých {{total}} serverov?",
+    "confirm": "Odpojiť"
+  },
+  "audio": {
+    "inputOptions": "Možnosti mikrofónu",
+    "outputOptions": "Možnosti reproduktorov",
+    "inputDevices": "Vstupné zariadenie",
+    "outputDevices": "Výstupné zariadenie",
+    "systemDefault": "Predvolené v systéme",
+    "noDevices": "Nenašli sa žiadne zariadenia",
+    "noiseSuppression": "Potlačenie šumu",
+    "testSound": "Testovací zvuk",
+    "voiceSettings": "Nastavenia hlasu…",
+    "fallbackInput": "Mikrofón bol odpojený. Používa sa predvolené zariadenie systému.",
+    "fallbackOutput": "Výstupné zariadenie bolo odpojené. Používa sa predvolené zariadenie systému.",
+    "volume": "Hlasitosť",
+    "level": "Úroveň"
+  },
+  "dnd": {
+    "label": "Nerušiť",
+    "manual": "ručne",
+    "system": "Nerušiť (systém)",
+    "systemHint": "Vypnite ho v nastaveniach upozornení vášho prostredia."
   }
 }

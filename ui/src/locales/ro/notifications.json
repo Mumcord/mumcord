@@ -13,5 +13,58 @@
   "open": "Deschide chatul",
   "close": "Închide notificarea",
   "mentionLine": "{{sender}} te-a menționat: {{preview}}",
-  "withServer": "{{server}} · {{what}}"
+  "withServer": "{{server}} · {{what}}",
+  "centre": {
+    "title": "Notificări",
+    "bellUnread_one": "Notificări, {{count}} necitită",
+    "bellUnread_few": "Notificări, {{count}} necitite",
+    "bellUnread_other": "Notificări, {{count}} necitite",
+    "shortcut": "Ctrl+Shift+N",
+    "markAllRead": "Marchează tot ca citit",
+    "filterLabel": "Afișează notificările",
+    "filter": {
+      "all": "Toate",
+      "mentions": "Mențiuni",
+      "requests": "Cereri",
+      "invites": "Invitații"
+    },
+    "empty": "Ești la zi.",
+    "unread": "Necitite",
+    "dndOn": "Nu deranja este activat",
+    "dndOff": "Nu deranja este dezactivat",
+    "settings": "Setări notificări",
+    "someone": "Cineva",
+    "quoted": "„{{text}}”",
+    "mention": "{{name}} te-a menționat",
+    "mentionGroup": "{{name}} i-a menționat pe toți",
+    "reply": "{{name}} a răspuns la mesajul tău",
+    "chatRequest": "{{name}} vrea să discute cu tine",
+    "messageRequest": "Cerere de mesaj de la {{name}}",
+    "messageRequestBody_one": "{{count}} mesaj de la un client Mumble standard",
+    "messageRequestBody_few": "{{count}} mesaje de la un client Mumble standard",
+    "messageRequestBody_other": "{{count}} de mesaje de la un client Mumble standard",
+    "invite": {
+      "watchParty": "{{name}} te-a invitat la o vizionare comună",
+      "screenShare": "{{name}} își partajează ecranul",
+      "card": "{{name}} ți-a trimis un card",
+      "theme": "{{name}} a partajat o temă cu tine"
+    },
+    "connection": "{{server}} nu poate fi contactat",
+    "type": {
+      "chatRequest": "Cerere de chat",
+      "messageRequest": "Cerere de mesaj",
+      "invite": "Invitație",
+      "private": "Mesaj privat",
+      "connection": "Conexiune"
+    },
+    "accept": "Acceptă",
+    "decline": "Refuză",
+    "join": "Alătură-te",
+    "watch": "Urmărește",
+    "open": "Deschide",
+    "dismiss": "Închide",
+    "dismissItem": "Închide: {{title}}",
+    "failed": "Nu a funcționat. Încearcă din nou.",
+    "block": "Blochează"
+  }
 }

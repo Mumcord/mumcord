@@ -13,9 +13,7 @@
     "generic": "Praćenje ovog kanala nije uspjelo. Pokušaj ponovno."
   },
   "dm": {
-    "title": "Izravne poruke",
-    "unknown": "Nepoznata osoba",
-    "withServer": "{{name}}, na {{server}}"
+    "unknown": "Nepoznata osoba"
   },
   "notify": {
     "channel": "{{name}} u {{channel}}: {{text}}",
@@ -58,5 +56,9 @@
     "dismiss": "Odbaci",
     "unfollowFailed": "Prestanak praćenja svih kanala nije uspio. Pokušaj ponovno."
   },
-  "mention": "sadrži spominjanje tebe"
+  "mention": "sadrži spominjanje tebe",
+  "header": {
+    "follow": "Prati kanal",
+    "unfollow": "Pratiš, klikni za prestanak"
+  }
 }

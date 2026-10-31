@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Szerver áttekintése",
   "tree": {
     "label": "Csatornák",
-    "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás",
+    "hint": "Enter: chat megjelenítése · Shift+Enter vagy dupla kattintás: belépés · Nyílbillentyűk: mozgás, kibontás, összecsukás · Menübillentyű: csatorna beállításai",
     "join": "Belépés",
-    "menuLabel": "{{channel}} beállításai",
-    "showDescription": "Csatornaleírás megjelenítése",
     "you": "(te)",
-    "voiceHere": "itt vagy (hang)",
+    "youAreHere": "itt vagy",
     "people_one": "{{count}} személy",
     "people_other": "{{count}} személy",
     "stack": {
@@ -19,7 +16,13 @@
     "showAll": "Összes megjelenítése ({{total}})",
     "showFewer": "Kevesebb megjelenítése",
     "jump": "Ugrás a csatornámhoz",
-    "locked": "zárolt"
+    "locked": "zárolt",
+    "temporary": "ideiglenes",
+    "linked": "összekapcsolt",
+    "full": "A csatorna megtelt",
+    "fullPlaces": "A csatorna megtelt, {{places}}",
+    "places_one": "{{count}} helyből {{taken}} foglalt",
+    "places_other": "{{count}} helyből {{taken}} foglalt"
   },
   "status": {
     "listening": "csak hallgat",
@@ -56,7 +59,8 @@
   "errors": {
     "joinDenied": "Nem léphetsz be ebbe a csatornába.",
     "joinFailed": "Nem sikerült belépni a csatornába. Próbáld újra.",
-    "notConnected": "Nincs kapcsolat szerverrel."
+    "notConnected": "Nincs kapcsolat szerverrel.",
+    "moveFailed": "Ezt a személyt nem sikerült áthelyezni."
   },
   "empty": {
     "disconnected": "Nincs kapcsolat. Válassz egy szervert a csatornái megtekintéséhez.",
@@ -71,6 +75,17 @@
     "channels_one": "{{count}} csatorna",
     "channels_other": "{{count}} csatorna",
     "people_one": "{{count}} személy",
-    "people_other": "{{count}} személy"
+    "people_other": "{{count}} személy",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Csatlakozva",
+      "connecting": "Csatlakozás",
+      "reconnecting": "Újracsatlakozás…",
+      "disconnected": "Nincs kapcsolat"
+    },
+    "online": "{{count}} online",
+    "onlinePing": "{{count}} online · {{ping}} ms"
   }
 }

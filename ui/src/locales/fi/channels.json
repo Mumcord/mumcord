@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Palvelimen yleiskatsaus",
   "tree": {
     "label": "Kanavat",
-    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista",
+    "hint": "Enter: näytä chat · Shift+Enter tai kaksoisnapsautus: liity · Nuolinäppäimet: liiku, laajenna, supista · Valikkonäppäin: kanavan asetukset",
     "join": "Liity",
-    "menuLabel": "Kanavan {{channel}} valinnat",
-    "showDescription": "Näytä kanavan kuvaus",
     "you": "(sinä)",
-    "voiceHere": "olet täällä (puhe)",
+    "youAreHere": "olet täällä",
     "people_one": "{{count}} henkilö",
     "people_other": "{{count}} henkilöä",
     "stack": {
@@ -19,7 +16,13 @@
     "showAll": "Näytä kaikki ({{total}})",
     "showFewer": "Näytä vähemmän",
     "jump": "Siirry omalle kanavalleni",
-    "locked": "lukittu"
+    "locked": "lukittu",
+    "temporary": "väliaikainen",
+    "linked": "linkitetty",
+    "full": "Kanava on täynnä",
+    "fullPlaces": "Kanava on täynnä, {{places}}",
+    "places_one": "{{taken}}/{{count}} paikka varattu",
+    "places_other": "{{taken}}/{{count}} paikkaa varattu"
   },
   "status": {
     "listening": "vain kuuntelee",
@@ -56,7 +59,8 @@
   "errors": {
     "joinDenied": "Sinulla ei ole lupaa liittyä tälle kanavalle.",
     "joinFailed": "Kanavalle liittyminen epäonnistui. Yritä uudelleen.",
-    "notConnected": "Ei yhteyttä palvelimeen."
+    "notConnected": "Ei yhteyttä palvelimeen.",
+    "moveFailed": "Henkilön siirtäminen epäonnistui."
   },
   "empty": {
     "disconnected": "Ei yhteyttä. Valitse palvelin nähdäksesi sen kanavat.",
@@ -71,6 +75,17 @@
     "channels_one": "{{count}} kanava",
     "channels_other": "{{count}} kanavaa",
     "people_one": "{{count}} henkilö",
-    "people_other": "{{count}} henkilöä"
+    "people_other": "{{count}} henkilöä",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Yhdistetty",
+      "connecting": "Yhdistetään",
+      "reconnecting": "Yhdistetään uudelleen…",
+      "disconnected": "Ei yhteyttä"
+    },
+    "online": "{{count}} paikalla",
+    "onlinePing": "{{count}} paikalla · {{ping}} ms"
   }
 }

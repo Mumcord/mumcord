@@ -1,0 +1,48 @@
+{
+  "title": "Javni strežniki",
+  "loading": "Nalaganje seznama …",
+  "subtitle": "Naloženo, ker ste odprli to stran · prikazano {{shown}} od {{total}}",
+  "search": "Iskanje po imenu, naslovu ali državi",
+  "refresh": "Osveži",
+  "retry": "Poskusi znova",
+  "loadFailed": "Seznama javnih strežnikov ni bilo mogoče naložiti. Preverite internetno povezavo in poskusite znova.",
+  "noMatch": "Iskanju in filtrom ne ustreza noben strežnik.",
+  "saveFailed": "Strežnika ni bilo mogoče dodati. Poskusite znova.",
+  "filters": {
+    "label": "Filtri",
+    "country": "Država",
+    "anyCountry": "Katera koli država",
+    "ping": "Ping",
+    "anyPing": "Kateri koli ping",
+    "pingBelow": "Pod {{ms}} ms",
+    "hideEmpty": "Skrij prazne",
+    "hideFull": "Skrij polne"
+  },
+  "sortedBy": "Razvrščanje: {{column}}",
+  "columns": {
+    "name": "Ime",
+    "country": "Država",
+    "ping": "Ping",
+    "users": "Uporabniki",
+    "actions": "Dejanja"
+  },
+  "badge": {
+    "empty": "Prazen",
+    "full": "Poln"
+  },
+  "users": "{{users}} / {{max}}",
+  "unknown": "Še neznano",
+  "measuring": "Merjenje",
+  "noAnswer": "Ni odgovora",
+  "ms": "{{ms}} ms",
+  "connect": "Poveži",
+  "connectTo": "Poveži s strežnikom {{server}}",
+  "favourite": "Priljubljen",
+  "favouriteServer": "Dodaj {{server}} med svoje strežnike",
+  "saved": "Shranjeno",
+  "savedAs": "{{server}} je med vašimi strežniki",
+  "announce": {
+    "saved": "{{server}} je dodan med vaše strežnike"
+  },
+  "note": "Pingajo se le vidne vrstice, nekaj naenkrat. Nič drugega se strežniku ne pošlje, dokler se ne povežete."
+}

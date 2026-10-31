@@ -11,12 +11,14 @@
 //! Lock order: `core` before `store`. Neither lock is held across an `.await`.
 
 pub(crate) mod batch;
+mod channel_audio;
 mod channel_password;
 pub mod convert;
 mod description;
 pub mod extension;
 mod local;
 mod machine;
+mod mumble_import;
 mod types;
 
 use std::cmp::Reverse;
@@ -30,19 +32,25 @@ use mumcord_audio::bitrate::{
     BitrateController, LinkStats as BitrateStats, Transport as BitrateTransport,
 };
 use mumcord_audio::dsp::{DspControls, MicTest, MicTestPhase as DspPhase};
+use mumcord_audio::io::{AudioIo, DeviceMigration, Direction};
 use mumcord_audio::mixer::PacketSender;
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{
     ClientIdentity, ConnectConfig, ConnectError, Connection, DisconnectReason, Event, Handle,
-    ServerState, Transport, VoiceEvent, VoiceTransport,
+    ServerCert, ServerState, Transport, VoiceEvent, VoiceTransport,
 };
-use mumcord_store::{Identity, OwnVoice, SavedServer, SecretStore, ServerId, Store};
+use mumcord_store::{Identity, IdentityId, OwnVoice, SavedServer, SecretStore, ServerId, Store};
 use tokio::runtime::Handle as Runtime;
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
+pub use channel_audio::{ActiveAudioProfile, ChannelAudioView};
 pub use channel_password::{ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView};
 pub use machine::MAX_RECONNECT_ATTEMPTS;
+pub use mumble_import::{
+    ImportDevice, ImportFavouriteView, ImportIdentityView, MumbleImportChoice, MumbleImportPreview,
+    MumbleImportResult,
+};
 pub use types::*;
 
 use crate::audio_rating::AudioRatingView;
@@ -205,8 +213,8 @@ struct Inner {
     /// Held while the audio devices start, so concurrent first uses open the microphone once
     /// (every open can show the OS microphone prompt).
     audio_start: tokio::sync::Mutex<()>,
-    /// `None` until loaded from secure storage; then `Some(None)` before the wizard ran.
-    identity: Mutex<Option<Option<Identity>>>,
+    /// Saved device choices were checked against the current device list (issue #183).
+    audio_devices_migrated: std::sync::Once,
     events: Events,
     controls: Arc<DspControls>,
     meter: Arc<Meter>,
@@ -224,6 +232,10 @@ struct Inner {
     /// Link previews and video cards for chat links (FR-1.49, FR-1.50); also the image cache
     /// of full-size chat images.
     previews: Arc<crate::web::LinkPreviews>,
+    /// Answers of the public server query behind the `mumble://` link card (issue #175).
+    queries: Arc<crate::server_query::ServerQueries>,
+    /// The public server browser's list source and ping pacing (issue #68).
+    public_servers: crate::public_servers::PublicServers,
     /// Full-size image transfers with other Mumcord clients (FR-1.60c).
     full_images: crate::full_image::ServerTransfers,
     /// Direct connections to other Mumcord users (FR-2.35).
@@ -235,8 +247,14 @@ struct Inner {
     user_stats: Mutex<crate::stats::UserStatsHub>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
+    /// Chat and message requests per server (issue #141).
+    pm_requests: crate::pm_rules::ServerRequests,
+    /// Blocked users of every own identity (issue #140).
+    blocked: crate::blocking::BlockList,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
+    /// What the last import from the official Mumble client added, for its undo (issue #66).
+    mumble_import: Mutex<Option<mumble_import::LastImport>>,
     /// Positional audio (FR-1.41).
     positional: crate::positional::Positional,
     /// Watch parties in the user's channels (FR-2.39).
@@ -262,6 +280,19 @@ struct Core {
     audio: Option<Audio>,
     pipeline: Option<VoicePipeline>,
     mic_test: Option<MicTest>,
+    /// The channel audio profile in effect (issue #171); `None` runs on the global settings.
+    channel_audio: Option<ActiveAudioProfile>,
+    /// Devices to switch back to once the running mic test ends, when it ran on devices the
+    /// caller did not save (wizard rerun, #149).
+    mic_test_restore: Option<(Option<String>, Option<String>)>,
+}
+
+/// Devices a microphone test runs on instead of the stored ones (wizard rerun, #149).
+/// They are never saved; the test switches to them and back to the stored ones.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MicTestDevices {
+    pub input: Option<String>,
+    pub output: Option<String>,
 }
 
 /// One server's connection.
@@ -304,6 +335,39 @@ impl Core {
         };
         view.rating = pipeline.health().rate(Instant::now(), view.totals());
         Some(view)
+    }
+
+    /// The latency estimate from the running devices and voice pipeline.
+    fn latency(
+        &self,
+        voice: &VoiceShared,
+        controls: &DspControls,
+        rtt_ms: Option<f32>,
+    ) -> Option<crate::latency::LatencyEstimateView> {
+        let audio = self.audio.as_ref()?;
+        let mix_time_avg_us = self
+            .pipeline
+            .as_ref()
+            .map_or(0, |p| p.playback_stats().mix_time_avg_us);
+        Some(crate::latency::estimate(&crate::latency::LatencyInputs {
+            low_latency: controls.low_latency(),
+            periods: audio.io().device_periods(),
+            rtt_ms,
+            capture_time_avg_us: voice.capture_time.avg_us(),
+            mix_time_avg_us,
+        }))
+    }
+
+    /// Keeps the output queue of the playback thread at the target for the current mode and
+    /// device period; called about once a second, as the period is only known once the device
+    /// stream runs.
+    fn sync_queue_target(&mut self, low_latency: bool) {
+        let Some(output) = self.audio.as_ref().map(|a| a.io().device_periods().output) else {
+            return;
+        };
+        if let Some(pipeline) = self.pipeline.as_mut() {
+            pipeline.set_queue_target_ms(crate::latency::queue_target_ms(low_latency, output));
+        }
     }
 
     /// Adds the current counters to the rating's history; called about once a second.
@@ -360,6 +424,8 @@ struct Session {
     /// Where the server put the user on connect, before any rejoin (FR-1.48b).
     default_channel_id: Option<u32>,
     description_requests: description::DescriptionRequests,
+    /// TLS certificate details of this connection for the server info panel (FR-1.10).
+    tls: Option<ServerCert>,
 }
 
 /// Commands to the session task.
@@ -427,7 +493,10 @@ pub(crate) fn store_error(err: mumcord_store::Error) -> EngineError {
         }
         E::Pkcs12(_) | E::Pkcs12NoIdentity | E::EmptyIdentityName => ErrorKind::InvalidInput,
         E::InvalidVolume(_) | E::InvalidPort => ErrorKind::InvalidInput,
-        E::UnknownServer(_) => ErrorKind::NotFound,
+        E::InvalidIdentityLabel { .. } | E::DuplicateIdentity | E::LastIdentity => {
+            ErrorKind::InvalidInput
+        }
+        E::UnknownServer(_) | E::UnknownIdentity(_) => ErrorKind::NotFound,
         _ => ErrorKind::Internal,
     };
     EngineError::new(kind, err.to_string())
@@ -448,6 +517,7 @@ impl Engine {
             )
         })?;
         let store = Store::open(data_dir).map_err(store_error)?;
+        local::bootstrap_identities(&store, &secrets);
         crate::profile::backfill_server_avatars(&store, data_dir);
         let settings = store.settings().map_err(store_error)?;
         let rejoin_offers = store
@@ -475,13 +545,15 @@ impl Engine {
         let meter = Arc::new(Meter::default());
         voice::spawn_meter(&rt, controls.clone(), meter.clone(), events.clone());
         let voice = Arc::new(VoiceShared::default());
+        let blocked = crate::blocking::load(&lock(&store));
+        let queries = Arc::new(crate::server_query::ServerQueries::default());
         let inner = Arc::new(Inner {
             rt,
             data_dir: data_dir.to_path_buf(),
             store,
             secrets: Arc::new(secrets),
             audio_start: tokio::sync::Mutex::new(()),
-            identity: Mutex::new(None),
+            audio_devices_migrated: std::sync::Once::new(),
             events,
             controls,
             meter,
@@ -495,6 +567,8 @@ impl Engine {
                 crate::web::LinkPreviews::app_policy(),
                 crate::web::fetch::Timeouts::default(),
             )),
+            queries: queries.clone(),
+            public_servers: crate::public_servers::PublicServers::new(queries),
             full_images: crate::full_image::ServerTransfers::default(),
             direct: crate::p2p::Direct::default(),
             core: Mutex::new(Core::default()),
@@ -502,7 +576,10 @@ impl Engine {
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
             user_stats: Mutex::default(),
             mumcord: Mutex::default(),
+            pm_requests: Mutex::default(),
+            blocked: Mutex::new(blocked),
             history_sync: Arc::default(),
+            mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
             inspector: Arc::default(),
@@ -563,6 +640,48 @@ impl Engine {
         }
     }
 
+    /// The figures the public server query answers for the `mumble://` link card (issue #175).
+    /// Nothing is asked while the link-preview privacy switch is off, or while the user blocks
+    /// the person whose message carried the link (issue #140). `refresh` asks a server that
+    /// answered before, which is what the card's Retry button does.
+    pub async fn server_query(
+        &self,
+        address: &str,
+        port: u16,
+        refresh: bool,
+    ) -> crate::server_query::QueryOutcome {
+        match self.settings() {
+            Ok(settings) if settings.link_previews => {
+                self.inner.queries.query(address, port, refresh).await
+            }
+            Ok(_) => crate::server_query::QueryOutcome::NotAllowed,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for a server query failed");
+                crate::server_query::QueryOutcome::NotAllowed
+            }
+        }
+    }
+
+    /// The public server list (issue #68). Fetched only on this call, which the UI makes when the
+    /// user opens the server browser; `agent` names this client honestly.
+    pub async fn public_servers(
+        &self,
+        agent: &str,
+    ) -> Result<Vec<crate::public_servers::PublicServer>, crate::public_servers::PublicListError>
+    {
+        self.inner.public_servers.list(agent).await
+    }
+
+    /// Ping, users and user limit of one listed server, paced with all other browser pings;
+    /// `None` when it did not answer.
+    pub async fn public_server_ping(
+        &self,
+        host: &str,
+        port: u16,
+    ) -> Option<crate::server_query::ServerQuery> {
+        self.inner.public_servers.ping(host, port).await
+    }
+
     /// An external image or image link from a message, ready to show inline (FR-1.55); `None`
     /// when previews are switched off in the settings (then nothing is fetched) or the image
     /// cannot be shown.
@@ -573,6 +692,36 @@ impl Engine {
             Err(e) => {
                 tracing::warn!(error = %e, "reading the settings for an inline image failed");
                 None
+            }
+        }
+    }
+
+    /// Format and size of a direct audio link for its player card (issue #260); `None` when
+    /// previews are switched off in the settings (then nothing is fetched) or the link is not a
+    /// playable audio file.
+    pub async fn audio_info(&self, url: &str) -> Option<crate::web::AudioInfo> {
+        if !self.previews_allowed("audio info") {
+            return None;
+        }
+        self.inner.previews.audio_info(url).await
+    }
+
+    /// The audio file of a direct audio link, fetched after the user clicked play (issue
+    /// #260); `None` when previews are switched off or the file cannot be played.
+    pub async fn audio_file(&self, url: &str) -> Option<crate::web::AudioFile> {
+        if !self.previews_allowed("an audio file") {
+            return None;
+        }
+        self.inner.previews.audio_file(url).await
+    }
+
+    /// Whether the link-preview privacy switch allows fetching `what`.
+    fn previews_allowed(&self, what: &str) -> bool {
+        match self.settings() {
+            Ok(settings) => settings.link_previews,
+            Err(e) => {
+                tracing::warn!(error = %e, "reading the settings for {what} failed");
+                false
             }
         }
     }
@@ -608,13 +757,65 @@ impl Engine {
         &self.inner.direct
     }
 
-    /// The identity from secure storage; `None` before the wizard created one.
+    /// The default identity from secure storage; `None` before the wizard created one.
+    /// Direct (peer-to-peer) connections always use it, whatever the servers use.
     pub(crate) async fn stored_identity(&self) -> EngineResult<Option<Identity>> {
-        self.inner.identity().await
+        let Some(id) = self.inner.default_identity_id().await? else {
+            return Ok(None);
+        };
+        self.inner.identity_by_id(id).await
     }
 
     pub(crate) fn mumcord_state(&self) -> &crate::mumcord::ServerPeers {
         &self.inner.mumcord
+    }
+
+    pub(crate) fn pm_requests_state(&self) -> &crate::pm_rules::ServerRequests {
+        &self.inner.pm_requests
+    }
+
+    pub(crate) fn blocked_state(&self) -> &crate::blocking::BlockList {
+        &self.inner.blocked
+    }
+
+    /// Mutes or unmutes the voice of people whose block changed (issue #140); their own
+    /// "Mute for me" stays as it is.
+    pub(crate) fn apply_block_mutes(
+        &self,
+        before: &[mumcord_store::BlockedUser],
+        after: &[mumcord_store::BlockedUser],
+    ) {
+        let mut core = lock(&self.inner.core);
+        let Some(server_id) = core.audio_server else {
+            return;
+        };
+        let Some((changed, users)) = core.session(server_id).ok().map(|s| {
+            s.handle.with_state(|st| {
+                let changed = crate::blocking::changed_sessions(before, after, st, server_id);
+                let users: Vec<_> = changed
+                    .iter()
+                    .filter_map(|(session, _)| st.users.get(session).cloned())
+                    .collect();
+                (changed, users)
+            })
+        }) else {
+            return;
+        };
+        let store = lock(&self.inner.store);
+        let Core {
+            slots, pipeline, ..
+        } = &mut *core;
+        let (Some(slot), Some(pipeline)) = (slots.get(&server_id), pipeline.as_mut()) else {
+            return;
+        };
+        for ((session, blocked), user) in changed.into_iter().zip(&users) {
+            let setting = slot.people.setting(&store, server_id, user);
+            pipeline.apply_person(
+                session,
+                setting.volume,
+                crate::blocking::voice_muted(setting.local_mute, blocked),
+            );
+        }
     }
 
     pub(crate) fn watch_party_state(&self) -> &crate::watch_party::ServerParties {
@@ -768,7 +969,7 @@ impl Engine {
     /// before the others, then the saved order), up to the limit. Every connect is read-only.
     /// Nothing happens before the first-run wizard created an identity.
     pub async fn connect_at_start(&self) -> EngineResult<()> {
-        if self.inner.identity().await?.is_none() {
+        if self.inner.default_identity_id().await?.is_none() {
             return Ok(());
         }
         let (servers, max) = {
@@ -798,6 +999,13 @@ impl Engine {
             self.inner.hang_up(&mut core);
         }
         self.inner.end_slot(&mut core, server_id, None);
+    }
+
+    /// Stops voice on the voice server while keeping every connection (chat and read-along stay
+    /// live). Does nothing while no server has voice.
+    pub fn leave_voice(&self) {
+        let mut core = lock(&self.inner.core);
+        self.inner.leave_voice(&mut core);
     }
 
     /// Disconnects every server for quitting or restarting the app (FR-2.9). Unlike
@@ -956,6 +1164,32 @@ impl Engine {
         Ok(())
     }
 
+    /// Moves a person to another channel (drag in the tree, "Move users here…"). The server
+    /// enforces the move permission; the result arrives as the person's `UserUpserted`.
+    pub fn person_move(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        channel_id: u32,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let (channel_known, user_known) = ctx.handle.with_state(|s| {
+            (
+                s.channels.contains_key(&channel_id),
+                s.users.contains_key(&session),
+            )
+        });
+        if !channel_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown channel"));
+        }
+        if !user_known {
+            return Err(EngineError::new(ErrorKind::NotFound, "unknown person"));
+        }
+        ctx.handle
+            .move_user(session, channel_id)
+            .map_err(convert::command_error)
+    }
+
     pub fn person_set_volume(
         &self,
         server_id: ServerId,
@@ -1112,20 +1346,42 @@ impl Engine {
     }
 
     /// Microphone test: record up to 5 s, then play back (FR-1.4). Voice pauses meanwhile.
-    pub async fn mic_test_start(&self) -> EngineResult<()> {
+    /// `devices` lets the test run on devices the caller has not saved yet (wizard rerun, #149).
+    pub async fn mic_test_start(&self, devices: Option<MicTestDevices>) -> EngineResult<()> {
         self.inner.ensure_audio().await?;
+        if lock(&self.inner.core).mic_test.is_some() {
+            return Ok(());
+        }
+        // Unsaved devices are switched on the open streams for the test and switched back when it
+        // ends, so a cancelled wizard leaves the engine on the stored devices.
+        let restore = match devices {
+            Some(devices) => {
+                let saved = lock(&self.inner.store).settings().map_err(store_error)?;
+                let restore = (saved.input_device, saved.output_device);
+                self.inner
+                    .switch_audio_devices(devices.input, devices.output)
+                    .await?;
+                Some(restore)
+            }
+            None => None,
+        };
         let mut core = lock(&self.inner.core);
         if core.mic_test.is_some() {
+            // A concurrent start won the race; its test ends on the stored devices again.
+            drop(core);
+            self.inner.restore_audio_devices(restore);
             return Ok(());
         }
         self.inner.stop_pipeline(&mut core);
-        let audio = core
-            .audio
-            .as_mut()
-            .ok_or_else(|| EngineError::internal("audio not running"))?;
-        let test = match voice::start_mic_test(audio, self.inner.controls.clone()) {
+        let started = match core.audio.as_mut() {
+            Some(audio) => voice::start_mic_test(audio, self.inner.controls.clone()),
+            None => Err(EngineError::internal("audio not running")),
+        };
+        let test = match started {
             Ok(test) => test,
             Err(error) => {
+                drop(core);
+                self.inner.restore_audio_devices(restore);
                 self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
                     types::MicTestPhase::Failed,
                 ));
@@ -1133,6 +1389,7 @@ impl Engine {
             }
         };
         core.mic_test = Some(test);
+        core.mic_test_restore = restore;
         self.inner.events.emit(EngineEvent::MicTestPhaseChanged(
             types::MicTestPhase::Recording,
         ));
@@ -1149,6 +1406,15 @@ impl Engine {
         if let Some(test) = &lock(&self.inner.core).mic_test {
             test.stop_recording();
         }
+    }
+
+    /// Plays a short sound on the output device, for the "Test sound" button. Only audible
+    /// while voice audio runs (the popover is only reachable then).
+    pub fn audio_test_sound(&self) {
+        self.inner
+            .events
+            .sounds()
+            .play_test(crate::sounds::Sound::Message);
     }
 
     /// Ends the mic test wherever it is; voice of a connected session resumes.
@@ -1248,13 +1514,35 @@ impl Engine {
             packets_sent: count(&voice.packets_sent),
             packets_received: count(&voice.packets_received),
             audio: on_voice.then(|| core.audio_health(voice)).flatten(),
+            latency: on_voice
+                .then(|| {
+                    core.latency(
+                        voice,
+                        &self.inner.controls,
+                        link.and_then(|l| l.rtt).map(|d| d.as_secs_f32() * 1000.0),
+                    )
+                })
+                .flatten(),
         })
+    }
+
+    /// Estimated mouth-to-ear latency for Settings → Audio (issue #156): with the ping of the
+    /// voice server while connected, without the network part otherwise. `None` while no audio
+    /// device runs (nothing is measured yet).
+    pub fn latency_estimate(&self) -> Option<crate::latency::LatencyEstimateView> {
+        let core = lock(&self.inner.core);
+        let rtt_ms = core
+            .audio_server
+            .and_then(|id| core.session(id).ok())
+            .and_then(|s| s.transport.as_ref())
+            .and_then(|t| t.stats().rtt)
+            .map(|d| d.as_secs_f32() * 1000.0);
+        core.latency(&self.inner.voice, &self.inner.controls, rtt_ms)
     }
 
     /// Devices and connection counters for the diagnostic file (no names or addresses
     /// beyond device names, which the diagnostics module documents).
     pub fn diagnostic_info(&self, app_version: &str) -> crate::diag::DiagnosticInfo {
-        use mumcord_audio::io::{AudioIo, Direction};
         let mut info = crate::diag::DiagnosticInfo::new(app_version);
         for (direction, is_input) in [(Direction::Input, true), (Direction::Output, false)] {
             // Without a connection or mic test no audio runs; the list is still wanted then.
@@ -1366,6 +1654,24 @@ impl Inner {
         }
     }
 
+    /// Stops the voice pipeline of a connection that ended. A kick or ban plays its sound
+    /// (#205) on its own short-lived player, like the hang-up sound, so the teardown cannot
+    /// cut it off.
+    fn stop_pipeline_after_removal(&self, core: &mut Core, reason: &DisconnectReason) {
+        let samples = match reason {
+            DisconnectReason::Kicked { actor, ban, .. } => {
+                self.events.sounds().removed(*actor, *ban)
+            }
+            _ => None,
+        };
+        self.stop_pipeline(core);
+        if let Some(samples) = samples
+            && let Some(audio) = core.audio.as_ref()
+        {
+            audio.play_tail(&self.rt, &samples);
+        }
+    }
+
     /// Devices are open only while a server is in a slot or the mic test runs.
     fn release_audio_if_idle(&self, core: &mut Core) {
         if core.slots.is_empty() && core.mic_test.is_none() && core.pipeline.is_none() {
@@ -1454,6 +1760,7 @@ impl Inner {
             crate::now_playing::on_disconnect(&self.now_playing, server_id, &session.handle);
             crate::now_gaming::on_disconnect(&self.now_gaming, server_id, &session.handle);
             crate::mumcord::on_disconnect(&self.mumcord, server_id);
+            crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
             self.forget_password_attempt(server_id);
             self.full_images.reset(server_id);
@@ -1524,6 +1831,35 @@ impl Inner {
             }
         }
         self.start_pipeline(core);
+        self.sync_channel_audio(core);
+    }
+
+    /// Self-deafens and mutes a still connected server; the user stays in their channel.
+    fn make_read_only(core: &mut Core, server_id: ServerId) {
+        let Some(slot) = core.slots.get_mut(&server_id) else {
+            return;
+        };
+        slot.self_voice = SelfVoice::read_only();
+        // Deafening on the server mutes too.
+        if let Some(session) = &slot.session
+            && let Err(e) = session.handle.set_self_deaf(true)
+        {
+            tracing::warn!(error = %e, "making the server read-only failed");
+        }
+    }
+
+    /// Stops voice on the voice server without leaving it ("Leave voice"): the server becomes
+    /// read-only like any other connected one and no server has voice until the next explicit
+    /// join. Uses only the self-deafen flag, so it works on every standard Mumble server.
+    fn leave_voice(self: &Arc<Self>, core: &mut Core) {
+        let Some(server_id) = core.voice_server.take() else {
+            return;
+        };
+        Self::make_read_only(core, server_id);
+        // Nothing to offer for rejoining after a restart, as after a disconnect.
+        self.forget_voice_channel();
+        self.events.emit(EngineEvent::VoiceServerChanged(None));
+        self.rebind_audio(core);
     }
 
     /// Makes `server_id` the voice server (FR-2.2). The previous voice server becomes
@@ -1532,16 +1868,8 @@ impl Inner {
         if core.voice_server == Some(server_id) {
             return;
         }
-        if let Some(previous) = core.voice_server.take()
-            && let Some(slot) = core.slots.get_mut(&previous)
-        {
-            slot.self_voice = SelfVoice::read_only();
-            // Deafening on the server mutes too.
-            if let Some(session) = &slot.session
-                && let Err(e) = session.handle.set_self_deaf(true)
-            {
-                tracing::warn!(error = %e, "making the previous voice server read-only failed");
-            }
+        if let Some(previous) = core.voice_server.take() {
+            Self::make_read_only(core, previous);
         }
         core.voice_server = Some(server_id);
         // Only the voice server's channel is offered for rejoining after a restart (FR-2.3).
@@ -1728,11 +2056,33 @@ impl Inner {
             .map_err(store_error)
             .map_err(fatal)?;
         let password = overridden.or(saved);
-        let identity = self
-            .identity()
-            .await
-            .map_err(fatal)?
-            .ok_or_else(|| fatal(EngineError::new(ErrorKind::NotFound, "no identity yet")))?;
+        // The server's own identity, or the default when it uses none or its identity is gone
+        // (issue #148).
+        let identity = match server.identity_id {
+            Some(id) => match self.identity_by_id(id).await.map_err(fatal)? {
+                Some(identity) => identity,
+                None => {
+                    tracing::warn!(
+                        server_id,
+                        "the identity chosen for this server is missing; using the default"
+                    );
+                    self.events
+                        .for_server(server_id)
+                        .emit(EngineEvent::ServerIdentityMissing { server_id });
+                    self.default_identity()
+                        .await
+                        .map_err(fatal)?
+                        .ok_or_else(|| {
+                            fatal(EngineError::new(ErrorKind::NotFound, "no identity yet"))
+                        })?
+                }
+            },
+            None => self
+                .default_identity()
+                .await
+                .map_err(fatal)?
+                .ok_or_else(|| fatal(EngineError::new(ErrorKind::NotFound, "no identity yet")))?,
+        };
 
         let expected = trusted.clone();
         let config = ConnectConfig {
@@ -1799,7 +2149,11 @@ impl Inner {
         port: u16,
         arrival: Arrival,
     ) -> Ended {
-        let Connection { handle, mut events } = connection;
+        let Connection {
+            handle,
+            mut events,
+            server_cert,
+        } = connection;
         let (transport, mut voice_rx) = match start_voice(&handle, host, port).await {
             Some((transport, rx)) => (Some(Arc::new(transport)), Some(rx)),
             None => (None, None),
@@ -1823,6 +2177,7 @@ impl Inner {
                     rejoin_offer,
                     default_channel_id,
                     description_requests: description::DescriptionRequests::default(),
+                    tls: server_cert,
                 });
                 slot.machine.synced();
             }
@@ -1862,6 +2217,7 @@ impl Inner {
             ctx.events
                 .emit(EngineEvent::ServerSynced(Box::new(snapshot)));
         }
+        self.sync_channel_audio(&mut lock(&self.core));
         // A link naming a channel is an explicit join (QA.23); after `ServerSynced`, which
         // resets the sound hub's view of the own state.
         if link_join
@@ -1968,7 +2324,10 @@ impl Inner {
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
-                        lock(&self.core).sample_audio_health(&self.voice);
+                        let mut core = lock(&self.core);
+                        core.sample_audio_health(&self.voice);
+                        core.sync_queue_target(self.controls.low_latency());
+                        drop(core);
                         for session in self.positional.expire(Instant::now()) {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,
@@ -1977,6 +2336,8 @@ impl Inner {
                         }
                     }
                                 bitrate.set_user_cap(self.user_cap_bps());
+                    // Low-latency mode sends 10 ms packets: twice the header overhead.
+                    bitrate.set_frames_per_packet(if self.controls.low_latency() { 1 } else { 2 });
                     if audio {
                         self.publish_bitrate_max(Some(bitrate.max_possible()));
                     }
@@ -2023,7 +2384,7 @@ impl Inner {
             return Ended::Stale;
         }
         if core.audio_server == Some(server_id) {
-            self.stop_pipeline(&mut core);
+            self.stop_pipeline_after_removal(&mut core, &reason);
         }
         if let Some(slot) = core.slots.get_mut(&server_id) {
             slot.session = None;
@@ -2161,6 +2522,7 @@ impl Inner {
             }
             Event::UserUpdated(change) => {
                 let user = &change.user;
+                let blocked = change.joined && self.user_blocked(ctx, user);
                 let mut core = lock(&self.core);
                 let audio = core.audio_server == Some(server_id);
                 let setting = core
@@ -2169,10 +2531,14 @@ impl Inner {
                     .map(|slot| slot.people.setting(&lock(&self.store), server_id, user));
                 if change.joined
                     && audio
-                    && let Some(setting) = setting.filter(|s| !people::is_default(*s))
+                    && let Some(setting) = setting.filter(|s| blocked || !people::is_default(*s))
                     && let Some(pipeline) = core.pipeline.as_mut()
                 {
-                    pipeline.apply_person(user.session, setting.volume, setting.local_mute);
+                    pipeline.apply_person(
+                        user.session,
+                        setting.volume,
+                        crate::blocking::voice_muted(setting.local_mute, blocked),
+                    );
                 }
                 drop(core);
                 let own = ctx.handle.with_state(|s| s.session) == Some(user.session);
@@ -2199,6 +2565,7 @@ impl Inner {
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                     self.on_own_channel(ctx, user.channel_id);
+                    self.sync_channel_audio(&mut lock(&self.core));
                 }
                 if let Some(setting) = setting {
                     ctx.events.emit(EngineEvent::UserUpserted(
@@ -2221,6 +2588,7 @@ impl Inner {
                 crate::now_playing::on_user_removed(&self.now_playing, server_id, user.session);
                 crate::now_gaming::on_user_removed(&self.now_gaming, server_id, user.session);
                 crate::mumcord::on_user_removed(&self.mumcord, server_id, user.session);
+                crate::pm_rules::on_user_removed(ctx, &self.pm_requests, user.session);
                 crate::history_sync::on_user_removed(&self.history_sync, server_id, user.session);
                 crate::watch_party::on_user_removed(&self.watch_parties, ctx, user.session);
                 crate::screen_share::on_user_removed(
@@ -2256,6 +2624,9 @@ impl Inner {
                     t.on_tunnel(packet.clone());
                 }
             }
+            // Nothing a blocked person sends reaches any feature (issue #140).
+            Event::PluginData(data)
+                if crate::blocking::sent_by_blocked(ctx, &self.blocked, data) => {}
             Event::PluginData(data) => {
                 crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
                 crate::now_gaming::on_plugin_data(&self.now_gaming, ctx, data);
@@ -2277,13 +2648,32 @@ impl Inner {
                 crate::watch_party::on_plugin_data(&self.watch_parties, ctx, data);
                 crate::screen_share::on_plugin_data(&self.screen_shares, &self.mumcord, ctx, data);
                 crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
+                crate::pm_rules::on_plugin_data(ctx, &self.pm_requests, data);
                 crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
                 self.direct.on_plugin_data(ctx, data);
             }
             Event::UserStats(stats) => crate::stats::on_stats(&self.user_stats, ctx, stats),
-            Event::TextMessage(_) | Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
+            // Here rather than in the extension hooks: the private message rule needs to know
+            // who runs Mumcord (issue #141).
+            Event::TextMessage(message) => {
+                crate::chat::on_text(
+                    ctx,
+                    message,
+                    &self.mumcord,
+                    &self.pm_requests,
+                    &self.blocked,
+                );
+            }
+            Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }
         extension::on_event(ctx, &event);
+    }
+
+    /// Whether `user` on the server of `ctx` is blocked (issue #140).
+    fn user_blocked(&self, ctx: &SessionCtx, user: &mumcord_protocol::User) -> bool {
+        let blocks = lock(&self.blocked);
+        ctx.handle
+            .with_state(|s| crate::blocking::user_blocked(&blocks, s, ctx.server_id, user))
     }
 
     /// The person as the UI shows them, with the Mumcord features they announced there.
@@ -2400,32 +2790,52 @@ impl Inner {
         let slot = core.slots.get(&server_id)?;
         let session = slot.session.as_ref()?;
         let store = lock(&self.store);
+        let saved_server = store.server(server_id).ok().flatten();
+        let tls_fingerprint = store.trusted_cert(server_id).ok().flatten();
         session.handle.with_state(|s: &ServerState| {
+            let users: Vec<UserView> = s
+                .users
+                .values()
+                .map(|u| {
+                    let mut view =
+                        self.user_view_of(server_id, u, slot.people.setting(&store, server_id, u));
+                    // The server's echo of the mute/deafen just sent may still be on its way.
+                    if Some(u.session) == s.session {
+                        view.self_mute = slot.self_voice.mute;
+                        view.self_deaf = slot.self_voice.deaf;
+                    }
+                    view
+                })
+                .collect();
+            let mumcord_users = u32::try_from(
+                users
+                    .iter()
+                    .filter(|u| u.mumcord_features.is_some())
+                    .count(),
+            )
+            .unwrap_or(u32::MAX);
             Some(Snapshot {
                 server_id,
                 self_session: s.session?,
                 info: ServerInfoView {
                     default_channel_id: session.default_channel_id,
+                    server_label: saved_server.as_ref().map(|s| s.label.clone()),
+                    server_address: saved_server.as_ref().map(|s| s.address.clone()),
+                    server_port: saved_server.as_ref().map(|s| s.port),
+                    tls_fingerprint: session
+                        .tls
+                        .as_ref()
+                        .map(|c| format_fingerprint(&c.sha256_hex))
+                        .or(tls_fingerprint),
+                    mumcord_users,
+                    tls_issuer: session.tls.as_ref().and_then(|c| c.issuer.clone()),
+                    tls_valid_from: session.tls.as_ref().and_then(|c| c.valid_from.clone()),
+                    tls_valid_until: session.tls.as_ref().and_then(|c| c.valid_until.clone()),
+                    tls_certificate_pem: session.tls.as_ref().map(|c| c.pem.clone()),
                     ..convert::server_info_view(s)
                 },
                 channels: s.channels.values().map(|c| channel_view(s, c)).collect(),
-                users: s
-                    .users
-                    .values()
-                    .map(|u| {
-                        let mut view = self.user_view_of(
-                            server_id,
-                            u,
-                            slot.people.setting(&store, server_id, u),
-                        );
-                        // The server's echo of the mute/deafen just sent may still be on its way.
-                        if Some(u.session) == s.session {
-                            view.self_mute = slot.self_voice.mute;
-                            view.self_deaf = slot.self_voice.deaf;
-                        }
-                        view
-                    })
-                    .collect(),
+                users,
                 followed_channel_ids: followed_ids(&store, server_id, s),
                 unread: Vec::new(),
                 read_only: slot.self_voice.own().is_none(),
@@ -2548,6 +2958,9 @@ impl Inner {
     ) -> EngineResult<()> {
         let mut core = lock(&self.core);
         let user = Self::person_in_session(&core, server_id, session)?;
+        let blocked = core
+            .session(server_id)
+            .is_ok_and(|s| self.user_blocked(&self.ctx(s), &user));
         let setting = {
             let store = lock(&self.store);
             let slot = core
@@ -2562,7 +2975,11 @@ impl Inner {
         if core.audio_server == Some(server_id)
             && let Some(pipeline) = core.pipeline.as_mut()
         {
-            pipeline.apply_person(session, setting.volume, setting.local_mute);
+            pipeline.apply_person(
+                session,
+                setting.volume,
+                crate::blocking::voice_muted(setting.local_mute, blocked),
+            );
         }
         drop(core);
         self.events
@@ -2585,27 +3002,115 @@ impl Inner {
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))
     }
 
+    /// Device choices saved from the ALSA device list before issue #183 are mapped onto the
+    /// sound server's devices. Runs once per process, before the settings reach the UI or open
+    /// the devices; a choice that cannot be mapped is reset to the system default, and the
+    /// notice tells the user.
+    pub(crate) fn migrate_audio_devices(&self) {
+        self.audio_devices_migrated.call_once(|| {
+            let store = lock(&self.store);
+            let mut settings = match store.settings() {
+                Ok(settings) => settings,
+                Err(e) => {
+                    tracing::warn!(error = %e, "reading settings for the device migration failed");
+                    return;
+                }
+            };
+            let mut changed = false;
+            for (direction, saved) in [
+                (Direction::Input, &mut settings.input_device),
+                (Direction::Output, &mut settings.output_device),
+            ] {
+                let Some(id) = saved.as_deref() else { continue };
+                match AudioIo::migrate_device(direction, id) {
+                    Ok(DeviceMigration::Keep) => continue,
+                    Ok(DeviceMigration::Replace(new)) => *saved = Some(new),
+                    Ok(DeviceMigration::Default { notice }) => {
+                        *saved = None;
+                        settings.audio_device_notice |= notice;
+                    }
+                    // The id stays; a later start tries again.
+                    Err(e) => {
+                        tracing::warn!(?direction, error = %e, "migrating the saved audio device failed");
+                        continue;
+                    }
+                }
+                tracing::info!(?direction, "saved audio device migrated to the new device list");
+                changed = true;
+            }
+            if changed && let Err(e) = store.save_settings(&settings) {
+                tracing::warn!(error = %e, "saving the migrated audio devices failed");
+            }
+        });
+    }
+
     /// Starts the audio devices on first use.
     async fn ensure_audio(self: &Arc<Self>) -> EngineResult<()> {
         let _starting = self.audio_start.lock().await;
         if lock(&self.core).audio.is_some() {
             return Ok(());
         }
+        self.migrate_audio_devices();
         let settings = lock(&self.store).settings().map_err(store_error)?;
         let events = self.events.clone();
         let audio = self
             .rt
             .spawn_blocking(move || {
-                Audio::start(settings.input_device, settings.output_device, events)
+                let audio = Audio::start(settings.input_device, settings.output_device, events)?;
+                audio.set_output_volume_percent(settings.output_volume_percent);
+                Ok::<_, EngineError>(audio)
             })
             .await
             .map_err(|e| EngineError::internal(e.to_string()))??;
         let mut core = lock(&self.core);
         if core.audio.is_none() {
+            // Under the core lock, so a settings change cannot slip in between.
+            if self.controls.low_latency() {
+                audio.set_low_latency(true);
+            }
             core.audio = Some(audio);
         }
         self.start_pipeline(&mut core);
         Ok(())
+    }
+
+    /// Switches the open device streams without saving anything (a mic test on devices the user
+    /// has not committed to yet, #149). Does nothing while no stream is open: the next start
+    /// opens the stored devices.
+    async fn switch_audio_devices(
+        self: &Arc<Self>,
+        input: Option<String>,
+        output: Option<String>,
+    ) -> EngineResult<()> {
+        let inner = self.clone();
+        self.rt
+            .spawn_blocking(move || {
+                let core = lock(&inner.core);
+                match &core.audio {
+                    Some(audio) => audio.set_devices(input, output),
+                    None => Ok(()),
+                }
+            })
+            .await
+            .map_err(|e| EngineError::internal(e.to_string()))??;
+        Ok(())
+    }
+
+    /// Switches back to `devices` in the background; the caller holds no lock, so a running
+    /// stream reopen never stalls it.
+    fn restore_audio_devices(self: &Arc<Self>, devices: Option<(Option<String>, Option<String>)>) {
+        let Some((input, output)) = devices else {
+            return;
+        };
+        let inner = self.clone();
+        self.rt.spawn_blocking(move || {
+            let core = lock(&inner.core);
+            if let Some(audio) = &core.audio
+                && let Err(e) = audio.set_devices(input, output)
+            {
+                tracing::warn!(error = %e, "switching the audio devices back failed");
+            }
+        });
     }
 
     /// Starts voice for the pipeline's server if devices are free; otherwise it starts once
@@ -2654,12 +3159,21 @@ impl Inner {
                 let users = session
                     .handle
                     .with_state(|s| s.users.values().cloned().collect::<Vec<_>>());
+                let blocks = lock(&self.blocked);
                 for user in users {
                     let setting = slot.people.setting(&store, server_id, &user);
-                    if !people::is_default(setting) {
-                        pipeline.apply_person(user.session, setting.volume, setting.local_mute);
+                    let blocked = session.handle.with_state(|s| {
+                        crate::blocking::user_blocked(&blocks, s, server_id, &user)
+                    });
+                    if blocked || !people::is_default(setting) {
+                        pipeline.apply_person(
+                            user.session,
+                            setting.volume,
+                            crate::blocking::voice_muted(setting.local_mute, blocked),
+                        );
                     }
                 }
+                drop(blocks);
                 drop(store);
                 core.pipeline = Some(pipeline);
                 self.meter.voice.store(true, Ordering::Relaxed);
@@ -2703,7 +3217,9 @@ impl Inner {
     }
 
     fn finish_mic_test(self: &Arc<Self>, core: &mut Core) {
+        let restore = core.mic_test_restore.take();
         let Some(test) = core.mic_test.take() else {
+            self.restore_audio_devices(restore);
             return;
         };
         self.events
@@ -2715,22 +3231,34 @@ impl Inner {
         }
         self.start_pipeline(core);
         self.release_audio_if_idle(core);
+        self.restore_audio_devices(restore);
     }
 
-    /// The identity from secure storage, cached after the first read.
-    async fn identity(&self) -> EngineResult<Option<Identity>> {
-        if let Some(cached) = lock(&self.identity).clone() {
-            return Ok(cached);
-        }
+    /// Identity `id` from secure storage; the secret store caches it for the session, so
+    /// several connects and reconnects cost one read (and at most one OS prompt).
+    async fn identity_by_id(&self, id: IdentityId) -> EngineResult<Option<Identity>> {
         let secrets = self.secrets.clone();
-        let loaded = self
-            .rt
-            .spawn_blocking(move || secrets.load_identity())
+        self.rt
+            .spawn_blocking(move || secrets.load_identity(id))
             .await
             .map_err(|e| EngineError::internal(e.to_string()))?
-            .map_err(store_error)?;
-        *lock(&self.identity) = Some(loaded.clone());
-        Ok(loaded)
+            .map_err(store_error)
+    }
+
+    /// Id of the default identity, or `None` before the wizard created one.
+    async fn default_identity_id(&self) -> EngineResult<Option<IdentityId>> {
+        Ok(lock(&self.store)
+            .default_identity()
+            .map_err(store_error)?
+            .map(|record| record.id))
+    }
+
+    /// The default identity itself.
+    async fn default_identity(&self) -> EngineResult<Option<Identity>> {
+        match self.default_identity_id().await? {
+            Some(id) => self.identity_by_id(id).await,
+            None => Ok(None),
+        }
     }
 }
 
@@ -2833,7 +3361,9 @@ mod declined_kind_tests {
             connected_at_quit: quit_at,
             was_voice_server_at_quit: voice,
             notifications_muted: false,
+            group_mentions_muted: false,
             theme_id: None,
+            identity_id: None,
         }
     }
 
@@ -2906,7 +3436,7 @@ mod password_override_tests {
         )
         .expect("engine");
         engine
-            .identity_create("Tester".into())
+            .identity_create("Tester".into(), None)
             .await
             .expect("identity");
         let server = engine

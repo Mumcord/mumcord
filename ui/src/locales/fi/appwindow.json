@@ -14,6 +14,12 @@
     "dismiss": "Selvä",
     "openSettings": "Avaa peittokuvan asetukset"
   },
+  "audioDevice": {
+    "title": "Valitse äänilaitteesi uudelleen",
+    "description": "Mumcord näyttää nyt äänilaitteidesi jokaisen tulon ja lähdön erikseen. Tallennettua laitettasi ei voitu yhdistää mihinkään niistä, joten toistaiseksi käytetään järjestelmän oletusta. Voit valita laitteen ääniasetuksista.",
+    "dismiss": "Selvä",
+    "openSettings": "Avaa ääniasetukset"
+  },
   "appImageMenu": {
     "title": "Lisätäänkö Mumcord sovellusvalikkoon?",
     "description": "Näin Mumcord näkyy sovellusvalikossasi. Kuvake ja puhu painamalla toimivat oikein Waylandissa, ja mumble://-linkit avaavat Mumcordin. Voit muuttaa tätä myöhemmin asetuksista.",

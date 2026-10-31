@@ -68,7 +68,10 @@ async fn engine(dir: &Path, name: &str) -> (Engine, EventReceiver, ServerView) {
         tokio::runtime::Handle::current(),
     )
     .expect("engine");
-    engine.identity_create(name.into()).await.expect("identity");
+    engine
+        .identity_create(name.into(), None)
+        .await
+        .expect("identity");
     // Plugin data only: the direct path is covered by live_p2p, and an unanswered consent
     // question would hold the fetch for a minute before it falls back.
     let mut settings = engine.settings().expect("settings");

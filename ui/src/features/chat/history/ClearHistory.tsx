@@ -5,31 +5,12 @@ import { useServerState } from "../../channels";
 import { clearConversation } from "../chatStore";
 import "./history.css";
 
-/** "Clear history" of the open conversation, with a confirmation dialog. */
+/** "Clear history" button of the open conversation, with a confirmation dialog. */
 export function ClearHistory({ conversation }: { conversation: Conversation }) {
   const { t } = useTranslation("follow");
   const { serverId } = useServerState();
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const opener = useRef<HTMLButtonElement>(null);
-
-  function close() {
-    setOpen(false);
-    opener.current?.focus();
-  }
-
-  async function confirm() {
-    if (serverId === null) return;
-    try {
-      await getApi().historyClear({ kind: "conversation", serverId, conversation });
-      clearConversation(conversation);
-      setError(null);
-      close();
-    } catch (e) {
-      console.error("Clearing history failed", e);
-      setError(t("history.failed"));
-    }
-  }
 
   return (
     <>
@@ -39,15 +20,53 @@ export function ClearHistory({ conversation }: { conversation: Conversation }) {
         className="follow-toggle"
         disabled={serverId === null}
         onClick={() => {
-          setError(null);
           setOpen(true);
         }}
       >
         {t("history.clear")}
       </button>
-      {open && <ConfirmDialog error={error} onConfirm={() => void confirm()} onCancel={close} />}
+      {open && (
+        <ClearHistoryDialog
+          conversation={conversation}
+          onClose={() => {
+            setOpen(false);
+            opener.current?.focus();
+          }}
+        />
+      )}
     </>
   );
+}
+
+/**
+ * Confirms and clears the history of a conversation; also opened from the channel-name menu
+ * (issue #170). The engine records the clear, so history sync does not bring it back (#119).
+ */
+export function ClearHistoryDialog({
+  conversation,
+  onClose,
+}: {
+  conversation: Conversation;
+  /** Called after clearing or cancelling; the caller puts focus back where it belongs. */
+  onClose: () => void;
+}) {
+  const { t } = useTranslation("follow");
+  const { serverId } = useServerState();
+  const [error, setError] = useState<string | null>(null);
+
+  async function confirm() {
+    if (serverId === null) return;
+    try {
+      await getApi().historyClear({ kind: "conversation", serverId, conversation });
+      clearConversation(conversation);
+      onClose();
+    } catch (e) {
+      console.error("Clearing history failed", e);
+      setError(t("history.failed"));
+    }
+  }
+
+  return <ConfirmDialog error={error} onConfirm={() => void confirm()} onCancel={onClose} />;
 }
 
 function ConfirmDialog(props: {

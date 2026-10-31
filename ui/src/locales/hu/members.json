@@ -55,10 +55,14 @@
   "menu": {
     "label": "Műveletek: {{name}}",
     "viewProfile": "Profil megtekintése",
+    "sendMessage": "Üzenet küldése",
     "join": "Csatlakozás: {{channel}}",
-    "joinDenied": "Nincs jogosultságod belépni ebbe a csatornába.",
+    "joinFull": "Ez a csatorna megtelt.",
+    "joinLocked": "Nem léphetsz be ebbe a csatornába, vagy jelszó kell hozzá.",
     "mute": "Némítás nálam",
-    "connectionInfo": "Kapcsolati adatok…"
+    "connectionInfo": "Kapcsolati adatok…",
+    "chatRequestPending": "Csevegési kérés függőben",
+    "revokeConsent": "Csevegési hozzájárulás visszavonása…"
   },
   "nowPlaying": {
     "label": "Most szól",
@@ -83,5 +87,53 @@
   "preview": {
     "privateMessage": "Privát üzenet",
     "fullProfile": "Teljes profil"
+  },
+  "chatRequest": {
+    "title": "Csevegési kérés neki: {{name}}",
+    "note": "Megjegyzés (nem kötelező)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "{{count}} / {{max}} karakter felhasználva",
+    "send": "Küldés",
+    "failed": "A csevegési kérést nem sikerült elküldeni. Próbáld újra."
+  },
+  "toggle": {
+    "show": "Tagok megjelenítése",
+    "hide": "Tagok elrejtése",
+    "showCount_one": "Tagok megjelenítése ({{count}})",
+    "showCount_other": "Tagok megjelenítése ({{count}})",
+    "talkingOne": "{{name}} beszél",
+    "talkingTwo": "{{first}} és {{second}} beszél",
+    "talkingMore_one": "{{name}} és még {{count}} fő beszél",
+    "talkingMore_other": "{{name}} és még {{count}} fő beszél",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Visszavonod a csevegési hozzájárulást {{name}} számára?",
+    "message": "{{name}} új üzenetkérelmet kell küldjön, mielőtt az üzenetei újra eljutnak hozzád. A csevegési előzmények megmaradnak.",
+    "confirm": "Visszavonás",
+    "failed": "A csevegési hozzájárulás visszavonása nem sikerült. Próbáld újra."
+  },
+  "block": {
+    "menu": "Letiltás…",
+    "unblock": "Letiltás feloldása",
+    "title": "Letiltod {{name}} felhasználót?",
+    "onServer": "a(z) {{server}} szerveren",
+    "whatHappens": "Mi történik",
+    "private": "{{name}} privát üzenetei nem jelennek meg, és nem értesítenek.",
+    "channelCollapsed": "{{name}} csatornaüzenetei összecsukva jelennek meg. Továbbra is megnyithatod őket.",
+    "channelHidden": "{{name}} csatornaüzenetei el vannak rejtve.",
+    "voice": "{{name}} némítva van nálad a hangban, a súgásokat is beleértve.",
+    "data": "Nincs előzményszinkronizálás, meghívó vagy más Mumcord-adat {{name}} felhasználótól.",
+    "followsCert": "A letiltás {{name}} tanúsítványát követi, így egy új név nem kerüli meg.",
+    "nameOnly": "{{name}} felhasználónak nincs tanúsítványa, ezért a letiltás csak erre a névre vonatkozik a(z) {{server}} szerveren.",
+    "warning": "{{name}} továbbra is lát téged és olvashatja az üzeneteidet. A Mumble nem tudja ezt csak a te oldaladon megakadályozni. {{name}} nem kap értesítést a letiltásról.",
+    "cancel": "Mégse",
+    "confirm": "{{name}} letiltása",
+    "done": "{{name}} le van tiltva.",
+    "failed": "{{name}} letiltása nem sikerült. Próbáld újra.",
+    "badge": "Letiltva",
+    "collapsed": "Üzenet egy letiltott felhasználótól",
+    "show": "Megjelenítés",
+    "showLabel": "Letiltott felhasználó üzenetének megjelenítése"
   }
 }

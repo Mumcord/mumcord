@@ -1,12 +1,14 @@
 /**
  * Turns `@Name` in sanitized message HTML into focusable chips for people who are on the server
- * (FR-1.51). Works on text nodes only and builds elements with the DOM API, so no message text is
+ * (FR-1.51), and `@all` / `@channel` into plain highlighted chips (issue #70). Works on text nodes only and builds elements with the DOM API, so no message text is
  * ever parsed as markup; code blocks and links are left alone.
  */
 import type { User } from "../../api";
-import { foldName, isWholeMention } from "./mentions";
+import { foldName, GROUP_MENTIONS, isWholeMention } from "./mentions";
 
 export const MENTION_CLASS = "chat-mention";
+/** `@all` / `@channel`: highlighted like a person's chip, but nothing to open. */
+export const GROUP_MENTION_CLASS = "chat-mention-group";
 const SKIP = "a, pre, code, script, style";
 
 export interface MentionPerson {
@@ -72,6 +74,20 @@ function chip(doc: Document, text: string, person: MentionPerson, label: string)
   return element;
 }
 
+function groupChip(doc: Document, text: string): HTMLElement {
+  const element = doc.createElement("span");
+  element.className = GROUP_MENTION_CLASS;
+  element.textContent = text;
+  return element;
+}
+
+/** The group keyword of a whole-word `@all` / `@channel` at `at` in folded `text`. */
+function groupAt(text: string, at: number): string | undefined {
+  return GROUP_MENTIONS.find(
+    (group) => text.startsWith(group, at + 1) && isWholeMention(text, at, at + 1 + group.length),
+  );
+}
+
 function splitText(
   doc: Document,
   node: Text,
@@ -88,12 +104,15 @@ function splitText(
       const end = at + 1 + p.folded.length;
       return text.startsWith(p.folded, at + 1) && isWholeMention(text, at, end);
     });
-    if (!person) continue;
+    // A person who is really called "all" keeps their own chip.
+    const keyword = person === undefined ? groupAt(text, at) : person.folded;
+    if (keyword === undefined) continue;
     const start = origin[at] ?? 0;
-    const end = origin[at + 1 + person.folded.length] ?? source.length;
+    const end = origin[at + 1 + keyword.length] ?? source.length;
     if (start < copied) continue;
     if (start > copied) parts.push(source.slice(copied, start));
-    parts.push(chip(doc, source.slice(start, end), person, label(person.name)));
+    const shown = source.slice(start, end);
+    parts.push(person ? chip(doc, shown, person, label(person.name)) : groupChip(doc, shown));
     copied = end;
   }
   if (parts.length === 0) return;
@@ -101,13 +120,16 @@ function splitText(
   node.replaceWith(...parts);
 }
 
-/** `html` with a chip around every mention of one of `people`; unchanged when there is none. */
+/**
+ * `html` with a chip around every mention of one of `people` and every `@all` / `@channel`;
+ * unchanged when there is none.
+ */
 export function linkMentions(
   html: string,
   people: readonly MentionPerson[],
   label: (name: string) => string,
 ): string {
-  if (!html.includes("@") || people.length === 0) return html;
+  if (!html.includes("@")) return html;
   const withFolded = people.map((p) => ({ ...p, folded: foldName(p.name.trim()) }));
   const doc = new DOMParser().parseFromString(html, "text/html");
   const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);

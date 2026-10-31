@@ -579,3 +579,165 @@
   font-size: var(--font-size-sm);
   color: var(--color-danger);
 }
+
+/* Identity manager (issue #148): one card per identity with its actions on the right. */
+.identity-manager__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.identity-manager__head .settings-group__title {
+  margin: 0;
+}
+
+.identity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.identity-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "avatar body actions"
+    "meta meta meta";
+  align-items: start;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-tile);
+  background: var(--color-bg-elevated);
+}
+
+.identity-card__avatar {
+  grid-area: avatar;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  color: var(--color-on-accent);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Fixed palette so an identity keeps its colour; colours come from the theme tokens. */
+.identity-card__avatar--tone0 {
+  background: var(--color-accent);
+}
+.identity-card__avatar--tone1 {
+  background: var(--color-success);
+}
+.identity-card__avatar--tone2 {
+  background: var(--color-warning);
+}
+.identity-card__avatar--tone3 {
+  background: var(--color-danger);
+}
+.identity-card__avatar--tone4 {
+  background: var(--color-talking);
+}
+.identity-card__avatar--tone5 {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.identity-card__body {
+  grid-area: body;
+  min-width: 0;
+}
+
+.identity-card__fingerprint {
+  grid-area: meta;
+}
+
+.identity-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.identity-card__badge {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.identity-card__meta {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.identity-card__actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+/* Compact actions: five buttons have to fit beside the label without wrapping. */
+.identity-card__actions .settings-button {
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.identity-warning {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-tile);
+  font-size: var(--font-size-sm);
+}
+
+.identity-warning__icon {
+  flex: 0 0 auto;
+  margin-top: 0.1em;
+  color: var(--color-danger);
+}
+
+.settings-details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.settings-details dt {
+  color: var(--color-text-secondary);
+}
+
+.settings-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-details__fingerprint {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+/* A link inside running text; a button for keyboard and screen-reader semantics. */
+.settings-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

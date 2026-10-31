@@ -8,7 +8,10 @@
     "muted": "Micro coupé",
     "unmuted": "Micro réactivé",
     "deafened": "Son coupé. Vous n’entendez pas les autres et votre micro est coupé",
-    "undeafened": "Son réactivé"
+    "undeafened": "Son réactivé",
+    "leftVoice": "Vocal quitté sur {{server}}",
+    "disconnected": "Déconnecté de {{server}}",
+    "disconnectedAll": "Déconnecté de tous les serveurs"
   },
   "readOnly": {
     "text": "Vous suivez en lecture seule – rejoignez un canal pour parler.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Saisissez un mot de passe pour protéger le fichier de sauvegarde.",
     "exported": "Sauvegarde de l’identité enregistrée.",
     "confirm": "S’enregistrer",
-    "done": "Enregistré sur ce serveur"
+    "done": "Enregistré sur ce serveur",
+    "identity": "Le nom enregistré appartient à l'identité {{identity}}."
   },
   "errors": {
     "tooLarge": "C’est trop volumineux pour le serveur. Choisissez une image plus petite ou écrivez un texte plus court.",
@@ -89,11 +93,54 @@
     "offerImages": "Proposer les images en taille réelle",
     "offerImagesHint": "Permet aux autres de charger vos images originales",
     "loadImages": "Charger les images en taille réelle",
-    "loadImagesHint": "Récupère les images originales des autres"
+    "loadImagesHint": "Récupère les images originales des autres",
+    "dnd": "Ne pas déranger",
+    "dndHint": "Coupe les sons et bannières de notification",
+    "dndSystemHint": "Activé par le mode Ne pas déranger de votre bureau",
+    "privateMessages": "Messages privés de",
+    "pm_everyone": "Tout le monde",
+    "pm_friendsOnly": "Amis",
+    "pm_nobody": "Personne"
   },
   "voice": {
     "line": "Vocal : {{channel}} · {{server}}",
     "server": "Vocal : {{server}}",
     "show": "{{location}} – afficher ce serveur"
+  },
+  "disconnectMenu": {
+    "label": "Options de déconnexion",
+    "open": "Plus d'options de déconnexion",
+    "leaveVoice": "Quitter le vocal",
+    "leaveVoiceHint": "Ne plus parler ni écouter, rester connecté pour le chat",
+    "disconnectHint": "Fermer la connexion à ce serveur",
+    "switchTo": "Passer le vocal sur {{server}}",
+    "all": "Se déconnecter de tous les serveurs…",
+    "allHint": "Fermer toutes les connexions aux serveurs"
+  },
+  "disconnectAll": {
+    "title": "Se déconnecter de tous les serveurs ?",
+    "message": "Se déconnecter des {{total}} serveurs ?",
+    "confirm": "Se déconnecter"
+  },
+  "audio": {
+    "inputOptions": "Options du microphone",
+    "outputOptions": "Options des haut-parleurs",
+    "inputDevices": "Périphérique d’entrée",
+    "outputDevices": "Périphérique de sortie",
+    "systemDefault": "Par défaut du système",
+    "noDevices": "Aucun périphérique trouvé",
+    "noiseSuppression": "Suppression du bruit",
+    "testSound": "Tester le son",
+    "voiceSettings": "Paramètres vocaux…",
+    "fallbackInput": "Microphone débranché. Le périphérique par défaut du système est utilisé.",
+    "fallbackOutput": "Périphérique de sortie débranché. Le périphérique par défaut du système est utilisé.",
+    "volume": "Volume",
+    "level": "Niveau"
+  },
+  "dnd": {
+    "label": "Ne pas déranger",
+    "manual": "manuel",
+    "system": "Ne pas déranger (système)",
+    "systemHint": "Désactivez-le dans les réglages de notification de votre bureau."
   }
 }

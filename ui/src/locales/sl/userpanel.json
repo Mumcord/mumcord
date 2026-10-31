@@ -8,7 +8,10 @@
     "muted": "Mikrofon utišan",
     "unmuted": "Mikrofon vklopljen",
     "deafened": "Zvok izklopljen. Drugih ne slišiš in tvoj mikrofon je utišan",
-    "undeafened": "Zvok vklopljen"
+    "undeafened": "Zvok vklopljen",
+    "leftVoice": "Glas na strežniku {{server}} zapuščen",
+    "disconnected": "Prekinjena povezava s strežnikom {{server}}",
+    "disconnectedAll": "Prekinjena povezava z vsemi strežniki"
   },
   "readOnly": {
     "text": "Samo bereš – pridruži se kanalu, da lahko govoriš.",
@@ -52,7 +55,8 @@
     "passwordRequired": "Vpiši geslo za zaščito datoteke varnostne kopije.",
     "exported": "Varnostna kopija identitete shranjena.",
     "confirm": "Registriraj se",
-    "done": "Registriran na tem strežniku"
+    "done": "Registriran na tem strežniku",
+    "identity": "Registrirano ime pripada identiteti {{identity}}."
   },
   "errors": {
     "tooLarge": "To je preveliko za strežnik. Izberi manjšo sliko ali napiši krajše besedilo.",
@@ -89,11 +93,54 @@
     "offerImages": "Ponujaj slike v polni velikosti",
     "offerImagesHint": "Drugi lahko naložijo tvoje izvirne slike",
     "loadImages": "Nalagaj slike v polni velikosti",
-    "loadImagesHint": "Pridobi izvirne slike od drugih"
+    "loadImagesHint": "Pridobi izvirne slike od drugih",
+    "dnd": "Ne moti",
+    "dndHint": "Utiša zvoke in pasice obvestil",
+    "dndSystemHint": "Vklopljeno prek načina Ne moti vašega namizja",
+    "privateMessages": "Zasebna sporočila od",
+    "pm_everyone": "Vsi",
+    "pm_friendsOnly": "Prijatelji",
+    "pm_nobody": "Nihče"
   },
   "voice": {
     "line": "Glas: {{channel}} · {{server}}",
     "server": "Glas: {{server}}",
     "show": "{{location}} – pokaži ta strežnik"
+  },
+  "disconnectMenu": {
+    "label": "Možnosti prekinitve",
+    "open": "Več možnosti prekinitve",
+    "leaveVoice": "Zapusti glas",
+    "leaveVoiceHint": "Nehaj govoriti in poslušati, ostani povezan za klepet",
+    "disconnectHint": "Zapri povezavo s tem strežnikom",
+    "switchTo": "Premakni glas na {{server}}",
+    "all": "Prekini povezavo z vsemi strežniki …",
+    "allHint": "Zapri vse povezave s strežniki"
+  },
+  "disconnectAll": {
+    "title": "Prekiniti povezavo z vsemi strežniki?",
+    "message": "Prekiniti povezavo z vsemi {{total}} strežniki?",
+    "confirm": "Prekini"
+  },
+  "audio": {
+    "inputOptions": "Možnosti mikrofona",
+    "outputOptions": "Možnosti zvočnikov",
+    "inputDevices": "Vhodna naprava",
+    "outputDevices": "Izhodna naprava",
+    "systemDefault": "Sistemska privzeta",
+    "noDevices": "Najdena ni nobena naprava",
+    "noiseSuppression": "Zmanjševanje šuma",
+    "testSound": "Preizkusni zvok",
+    "voiceSettings": "Nastavitve glasu…",
+    "fallbackInput": "Mikrofon je bil odklopljen. Uporablja se sistemska privzeta naprava.",
+    "fallbackOutput": "Izhodna naprava je bila odklopljena. Uporablja se sistemska privzeta naprava.",
+    "volume": "Glasnost",
+    "level": "Raven"
+  },
+  "dnd": {
+    "label": "Ne moti",
+    "manual": "ročno",
+    "system": "Ne moti (sistem)",
+    "systemHint": "Izklopite ga v nastavitvah obvestil vašega namizja."
   }
 }

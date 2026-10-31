@@ -12,6 +12,8 @@ import {
   sameConversation,
 } from "../channels";
 import { conversationKey, isMention } from "../chat";
+import { isBlocked } from "../blocking/blockedStore";
+import { recordIncoming } from "./centreSources";
 import { bumpCount, markMention, markSeen, noticeKey, showToast } from "./notificationStore";
 import { hasImage, plainPreview } from "./preview";
 
@@ -21,8 +23,8 @@ export interface IncomingContext {
   overlayOpen: boolean;
   /** Saved name of a server (FR-2.10), `undefined` if unknown. */
   serverName: (serverId: number) => string | undefined;
-  /** Notifications of this server are muted (FR-2.10). */
-  muted: (serverId: number) => boolean;
+  /** Notifications of this server (FR-2.10) or of this private conversation (#173) are muted. */
+  muted: (serverId: number, conversation: Conversation) => boolean;
 }
 
 export interface NoticeTexts {
@@ -80,10 +82,17 @@ export async function handleIncoming(
   serverId: number,
   context: IncomingContext,
 ): Promise<void> {
-  if (message.own || context.muted(serverId)) return;
+  if (message.own) return;
+  // Blocked users (issue #140): no sound, toast, mention or centre entry. The engine already
+  // drops their private messages; channel messages still arrive for the chat to collapse.
+  if (isBlocked(serverId, message.senderCertHash, message.senderName)) return;
   const { conversation } = message;
-  const key = noticeKey(serverId, conversationKey(conversation));
   const onScreen = isOnScreen(serverId, conversation, context.overlayOpen);
+  if (context.muted(serverId, conversation)) return;
+  // Before the engine decides about sound and toast: the centre also collects during Do Not
+  // Disturb (Q1.5).
+  recordIncoming(message, serverId, onScreen);
+  const key = noticeKey(serverId, conversationKey(conversation));
   const count = bumpCount(key);
   // A mention notifies like a private message: the setting decides how, the chat does not matter.
   // The ping (engine, in `notifyMessage`) follows the mention itself; only the highlighting of

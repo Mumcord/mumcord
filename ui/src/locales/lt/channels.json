@@ -1,13 +1,10 @@
 {
-  "serverOverview": "Serverio apžvalga",
   "tree": {
     "label": "Kanalai",
-    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti",
+    "hint": "Enter: rodyti pokalbį · Shift+Enter arba dukart spustelėti: prisijungti · Rodyklių klavišai: judėti, išskleisti, suskleisti · Meniu klavišas: kanalo parinktys",
     "join": "Prisijungti",
-    "menuLabel": "{{channel}} parinktys",
-    "showDescription": "Rodyti kanalo aprašymą",
     "you": "(tu)",
-    "voiceHere": "tu čia (balsas)",
+    "youAreHere": "tu čia",
     "people_one": "{{count}} žmogus",
     "people_few": "{{count}} žmonės",
     "people_many": "{{count}} žmogaus",
@@ -23,7 +20,15 @@
     "showAll": "Rodyti visus ({{total}})",
     "showFewer": "Rodyti mažiau",
     "jump": "Pereiti į mano kanalą",
-    "locked": "užrakinta"
+    "locked": "užrakinta",
+    "temporary": "laikinas",
+    "linked": "susietas",
+    "full": "Kanalas pilnas",
+    "fullPlaces": "Kanalas pilnas, {{places}}",
+    "places_one": "užimta {{taken}} iš {{count}} vietos",
+    "places_few": "užimta {{taken}} iš {{count}} vietų",
+    "places_many": "užimta {{taken}} iš {{count}} vietos",
+    "places_other": "užimta {{taken}} iš {{count}} vietų"
   },
   "status": {
     "listening": "tik klauso",
@@ -60,7 +65,8 @@
   "errors": {
     "joinDenied": "Tau neleidžiama įeiti į šį kanalą.",
     "joinFailed": "Nepavyko prisijungti prie kanalo. Bandyk dar kartą.",
-    "notConnected": "Neprisijungta prie serverio."
+    "notConnected": "Neprisijungta prie serverio.",
+    "moveFailed": "Nepavyko perkelti šio žmogaus."
   },
   "empty": {
     "disconnected": "Neprisijungta. Pasirink serverį, kad pamatytum jo kanalus.",
@@ -79,6 +85,17 @@
     "people_one": "{{count}} žmogus",
     "people_few": "{{count}} žmonės",
     "people_many": "{{count}} žmogaus",
-    "people_other": "{{count}} žmonių"
+    "people_other": "{{count}} žmonių",
+    "shortcut": "Ctrl K"
+  },
+  "section": {
+    "state": {
+      "connected": "Prisijungta",
+      "connecting": "Jungiamasi",
+      "reconnecting": "Jungiamasi iš naujo…",
+      "disconnected": "Atsijungta"
+    },
+    "online": "{{count}} prisijungę",
+    "onlinePing": "{{count}} prisijungę · {{ping}} ms"
   }
 }

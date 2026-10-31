@@ -28,6 +28,8 @@ function renderStep(
   renderInWizard(
     harness,
     <TalkModeStep
+      step={5}
+      total={5}
       settings={settings}
       availability={availability}
       mouseStatus={mouseStatus}

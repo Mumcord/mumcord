@@ -57,10 +57,14 @@
   "menu": {
     "label": "Akcie pre {{name}}",
     "viewProfile": "Zobraziť profil",
+    "sendMessage": "Poslať správu",
     "join": "Pripojiť sa k {{channel}}",
-    "joinDenied": "Do tohto kanála nemáte povolený vstup.",
+    "joinFull": "Tento kanál je plný.",
+    "joinLocked": "Do tohto kanála nesmieš vstúpiť alebo vyžaduje heslo.",
     "mute": "Stlmiť pre mňa",
-    "connectionInfo": "Informácie o pripojení…"
+    "connectionInfo": "Informácie o pripojení…",
+    "chatRequestPending": "Žiadosť o chat čaká na vybavenie",
+    "revokeConsent": "Odvolať súhlas s četom…"
   },
   "nowPlaying": {
     "label": "Práve hrá",
@@ -87,5 +91,57 @@
   "preview": {
     "privateMessage": "Súkromná správa",
     "fullProfile": "Celý profil"
+  },
+  "chatRequest": {
+    "title": "Žiadosť o chat pre {{name}}",
+    "note": "Poznámka (voliteľné)",
+    "counter": "{{count}} / {{max}}",
+    "counterLabel": "Využité {{count}} z {{max}} znakov",
+    "send": "Odoslať",
+    "failed": "Žiadosť o chat sa nepodarilo odoslať. Skús to znova."
+  },
+  "toggle": {
+    "show": "Zobraziť členov",
+    "hide": "Skryť členov",
+    "showCount_one": "Zobraziť členov ({{count}})",
+    "showCount_few": "Zobraziť členov ({{count}})",
+    "showCount_many": "Zobraziť členov ({{count}})",
+    "showCount_other": "Zobraziť členov ({{count}})",
+    "talkingOne": "{{name}} hovorí",
+    "talkingTwo": "{{first}} a {{second}} hovoria",
+    "talkingMore_one": "{{name}} a {{count}} ďalší hovoria",
+    "talkingMore_few": "{{name}} a {{count}} ďalší hovoria",
+    "talkingMore_many": "{{name}} a {{count}} ďalších hovorí",
+    "talkingMore_other": "{{name}} a {{count}} ďalších hovorí",
+    "shortcut": "Ctrl+Shift+M"
+  },
+  "revokeConsent": {
+    "title": "Odvolať súhlas s četom pre {{name}}?",
+    "message": "{{name}} bude musieť znova poslať žiadosť o správu, kým sa k tebe jeho správy dostanú. História četu zostane.",
+    "confirm": "Odvolať",
+    "failed": "Odvolanie súhlasu s četom sa nepodarilo. Skús to znova."
+  },
+  "block": {
+    "menu": "Blokovať…",
+    "unblock": "Odblokovať",
+    "title": "Blokovať používateľa {{name}}?",
+    "onServer": "na serveri {{server}}",
+    "whatHappens": "Čo sa stane",
+    "private": "Súkromné správy od používateľa {{name}} sa nezobrazujú a neupozorňujú ťa.",
+    "channelCollapsed": "Správy používateľa {{name}} v kanáli sú zbalené. Stále ich môžeš otvoriť.",
+    "channelHidden": "Správy používateľa {{name}} v kanáli sú skryté.",
+    "voice": "Používateľ {{name}} je pre teba v hlasovom chate stlmený, vrátane šepkania.",
+    "data": "Žiadna synchronizácia histórie, pozvánky ani iné dáta z Mumcordu od používateľa {{name}}.",
+    "followsCert": "Blokovanie sa riadi certifikátom používateľa {{name}}, takže zmena mena ho neobíde.",
+    "nameOnly": "Používateľ {{name}} nemá certifikát, takže sa blokovanie vzťahuje iba na toto meno na serveri {{server}}.",
+    "warning": "Používateľ {{name}} ťa stále vidí a môže čítať tvoje správy. Mumble to nedokáže zastaviť iba na tvojej strane. Používateľ {{name}} sa o blokovaní nedozvie.",
+    "cancel": "Zrušiť",
+    "confirm": "Blokovať používateľa {{name}}",
+    "done": "Používateľ {{name}} je zablokovaný.",
+    "failed": "Blokovanie používateľa {{name}} zlyhalo. Skús to znova.",
+    "badge": "Zablokovaný",
+    "collapsed": "Správa od zablokovaného používateľa",
+    "show": "Zobraziť",
+    "showLabel": "Zobraziť správu od zablokovaného používateľa"
   }
 }

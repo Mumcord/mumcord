@@ -4,27 +4,45 @@
  */
 import { useTranslation } from "react-i18next";
 import { getApi } from "../api";
+import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
+import { useMembersColumn } from "./membersCollapse";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { Wizard } from "../features/wizard";
+import { NotificationBell } from "../features/notifications";
 import { SharingBar } from "../features/screenshare";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
 import {
   ChannelUnreadBadge,
-  DirectMessages,
   FollowAllMenu,
   FollowHeaderActions,
   FollowNoticeLine,
   FollowStar,
+  MessageNotifications,
 } from "../features/follow";
+import { ChannelAudioHost } from "../features/channelaudio";
+import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
-import { MembersPanel, openPrivateConversation } from "../features/members";
+import {
+  MembersPanel,
+  MembersToggle,
+  openPrivateConversation,
+  useChannelPresence,
+} from "../features/members";
 import { ScreenShareWidget } from "../features/screenshare";
 import { VideoDucking, WatchPartyWidget } from "../features/watchparty";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
+import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
+import { RequestsEntry, RequestsView, useRequestsView } from "../features/requests";
+import {
+  closeMessages,
+  MessagesButton,
+  MessagesOverview,
+  useMessagesOpen,
+} from "../features/messages";
 import {
   AppImageMenuPrompt,
   DirectConsentPrompt,
@@ -33,25 +51,47 @@ import {
   CloseDialog,
   WindowOverlayNotice,
   type WindowOverlayNoticeApi,
+  AudioDeviceNotice,
+  type AudioDeviceNoticeApi,
 } from "../features/app";
 
 /** Server bar (B19). */
 export function ServersMount() {
-  return <ServersRoot />;
+  const messages = useMessagesOpen();
+  const browserOpen = useServerBrowserOpen();
+  return (
+    <ServersRoot
+      top={<MessagesButton covered={browserOpen} onOpen={closeServerBrowser} />}
+      topActive={messages}
+      onServerClick={closeMessages}
+    />
+  );
 }
 
-/** Channel tree (B20). */
+/** Channel tree (B20), or the private messages overview while it is open (#173). */
 export function ChannelsMount() {
+  const messages = useMessagesOpen();
+  if (messages) {
+    return (
+      <>
+        <MessagesOverview />
+        <UserStatsWatcher />
+        <MessageNotifications />
+      </>
+    );
+  }
   return (
     <>
       <ChannelsPanel
         header={<FollowAllMenu />}
+        aboveTree={<RequestsEntry />}
         channelBadge={(channelId) => <ChannelUnreadBadge channelId={channelId} />}
         channelAction={(channel) => <FollowStar {...channel} />}
+        channelMenu={(menu) => <ChannelTreeMenu key={menu.channelId} {...menu} />}
       />
       <FollowNoticeLine />
       <UserStatsWatcher />
-      <DirectMessages />
+      <MessageNotifications />
     </>
   );
 }
@@ -73,18 +113,27 @@ const windowOverlayNoticeApi: WindowOverlayNoticeApi = {
   },
 };
 
+const audioDeviceNoticeApi: AudioDeviceNoticeApi = {
+  pending: () => getApi().audioDeviceNoticePending(),
+  dismiss: async () => {
+    await getApi().audioDeviceNoticeDismiss();
+  },
+};
+
 /**
  * Thin status bar above the chat, e.g. "Reconnecting…" (B19), the rejoin offer (QA.9) and the
  * close question (B25). All render nothing when idle.
  */
 export function ChatStatusMount() {
-  const { openOverlaySettings } = useView();
+  const { openOverlaySettings, openAudioSettings } = useView();
   return (
     <>
       <ConnectionStatus />
       <RejoinPrompt />
       <CloseDialog />
+      <ChannelAudioHost />
       <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
+      <AudioDeviceNotice api={audioDeviceNoticeApi} onOpenSettings={openAudioSettings} />
       <UpdateHint />
       <UpdateCheckPrompt />
       <AppImageMenuPrompt />
@@ -93,9 +142,42 @@ export function ChatStatusMount() {
   );
 }
 
-/** Chat header, message list and input (B21). */
+/** Chat header, message list and input (B21), or the message requests while they are open (#141). */
 export function ChatMount() {
-  return <ChatView renderHeaderActions={(conv) => <FollowHeaderActions conversation={conv} />} />;
+  const requests = useRequestsView();
+  if (requests)
+    return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
+  return (
+    <ChatView
+      renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
+      renderHeaderActions={(conv) => (
+        <>
+          <FollowHeaderActions conversation={conv} />
+          <MembersToggleMount />
+          <NotificationBell />
+        </>
+      )}
+    />
+  );
+}
+
+/** The members button in the chat header, wired to the shell's member column (issue #165). */
+function MembersToggleMount() {
+  const { t } = useTranslation("members");
+  const column = useMembersColumn();
+  const presence = useChannelPresence();
+  const macos = useIsMacos();
+  if (column === null) return null;
+  return (
+    <MembersToggle
+      expanded={column.shown}
+      controls={column.controls}
+      presence={presence}
+      shortcut={macos ? "⌘⇧M" : t("toggle.shortcut")}
+      onToggle={column.toggle}
+      buttonRef={column.buttonRef}
+    />
+  );
 }
 
 /**
@@ -135,6 +217,14 @@ export function WizardMount() {
 
 /** Settings content inside the settings overlay (B24). */
 export function SettingsMount() {
-  const { settingsSection } = useView();
-  return <SettingsScreen {...(settingsSection ? { initialSection: settingsSection } : {})} />;
+  const { settingsSection, settingsRevision } = useView();
+  // A section requested while the settings are already open (e.g. "Manage identities" in the
+  // About page or the wizard rerun, #149) remounts the screen there.
+  return (
+    <SettingsScreen
+      key={settingsSection ?? "default"}
+      settingsRevision={settingsRevision}
+      {...(settingsSection ? { initialSection: settingsSection } : {})}
+    />
+  );
 }
