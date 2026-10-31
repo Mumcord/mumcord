@@ -141,6 +141,8 @@
     "label": "Forstyr ikke",
     "manual": "manuelt",
     "system": "Forstyr ikke (system)",
-    "systemHint": "Slå det fra i skrivebordets indstillinger for notifikationer."
-  }
+    "systemHint": "Slå det fra i skrivebordets indstillinger for notifikationer.",
+    "short": "Forstyr ikke"
+  },
+  "dismissError": "Afvis"
 }

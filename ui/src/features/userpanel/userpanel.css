@@ -1,7 +1,11 @@
-/* Set off from the channel list by its background alone (QA.26), no separator line. */
+/* Set off from the channel list by its background alone (QA.26), no separator line. Three fixed
+   rows (identity, status strip, controls, #246): every row has a set height and nothing inside
+   wraps, so the panel keeps the same height in every state and the channel list never jumps. All
+   sizes are in rem, so the panel scales with the text size. */
 .userpanel {
   position: relative;
   display: flex;
+  flex: none;
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-3) var(--space-2);
@@ -10,18 +14,10 @@
 
 .userpanel__identity {
   display: flex;
-  min-width: 0;
-}
-
-/* With the split arrows (#153, #154, #155) the controls are wider than the default sidebar; they
-   wrap onto a second line instead of overflowing it, which cut off the settings button and let
-   keyboard focus scroll the whole column sideways. */
-.userpanel__row {
-  display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-1);
+  height: 2.5rem;
+  min-width: 0;
 }
 
 .userpanel__profile {
@@ -29,19 +25,14 @@
   flex: 1 1 auto;
   align-items: center;
   gap: var(--space-2);
-  width: 100%;
   min-width: 0;
-  padding: var(--space-1);
+  padding-inline-start: var(--space-1);
   color: var(--color-text);
   text-align: left;
 }
 
 .userpanel__profile--offline {
   color: var(--color-text-muted);
-}
-
-.userpanel__toggle:hover:not(:disabled) {
-  background: var(--color-bg-hover);
 }
 
 .userpanel__text {
@@ -51,16 +42,13 @@
   min-width: 0;
 }
 
-/* The full name wraps onto a second line; only a name longer than that gets an ellipsis. */
+/* One line each: the row has a fixed height, so a long name ends in an ellipsis (tooltip). */
 .userpanel__name {
-  display: -webkit-box;
   overflow: hidden;
   font-weight: var(--font-weight-bold);
   line-height: 1.25;
-  overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .userpanel__status {
@@ -77,6 +65,39 @@
   height: 1em;
   margin-inline-end: 0.25em;
   vertical-align: -0.125em;
+}
+
+/* Holds the avatar with its talking ring and the muted badge; the avatar itself clips its image. */
+.userpanel__avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+/* Outline, not border: the ring sits outside the box, so nothing shifts while talking. */
+.userpanel__avatar[data-talking] .userpanel-avatar {
+  outline: 2px solid var(--color-talking);
+  outline-offset: 1px;
+}
+
+.userpanel__badge {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--color-bg-servers);
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: var(--color-bg-servers);
+}
+
+.userpanel__badge svg {
+  width: 0.625rem;
+  height: 0.625rem;
 }
 
 .userpanel-avatar {
@@ -112,6 +133,219 @@
   height: 4rem;
 }
 
+/* Status strip: one message on the left, chips for persistent states on the right. */
+.userpanel-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 1.5rem;
+  min-width: 0;
+  padding-inline: var(--space-2) 0;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.userpanel-strip[data-message="error"] {
+  background: color-mix(in srgb, var(--color-danger) 18%, var(--color-bg-sidebar));
+}
+
+.userpanel-strip[data-message="reconnecting"],
+.userpanel-strip[data-message="connecting"] {
+  background: color-mix(in srgb, var(--color-warning) 18%, var(--color-bg-sidebar));
+}
+
+.userpanel-strip[data-message="voiceElsewhere"] {
+  background: color-mix(in srgb, var(--color-accent) 22%, var(--color-bg-sidebar));
+}
+
+.userpanel-strip[data-message="disconnected"],
+.userpanel-strip[data-message="readOnly"] {
+  color: var(--color-text-secondary);
+}
+
+.userpanel-strip__message {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  height: 100%;
+}
+
+.userpanel-strip__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userpanel-strip__icon {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.userpanel-strip[data-message="error"] .userpanel-strip__icon {
+  color: var(--color-danger);
+}
+
+.userpanel-strip[data-message="reconnecting"] .userpanel-strip__icon,
+.userpanel-strip[data-message="connecting"] .userpanel-strip__icon {
+  color: var(--color-warning);
+}
+
+.userpanel-strip__spinner {
+  animation: userpanel-spin 1s linear infinite;
+}
+
+@keyframes userpanel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .userpanel-strip__spinner {
+    animation: none;
+  }
+}
+
+/* The live dot of the own voice channel. */
+.userpanel-strip__dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+}
+
+.userpanel-strip__dismiss,
+.userpanel-strip__action,
+.userpanel-voice {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.userpanel-strip__dismiss {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-inline-start: auto;
+  border-radius: var(--radius-md);
+}
+
+.userpanel-strip__dismiss:hover {
+  background: var(--color-bg-hover);
+}
+
+/* "Join ‹channel›" of the read-only state: a quiet text button that ellipsizes last. */
+.userpanel-strip__action {
+  flex: 0 1 auto;
+  min-width: 2.5rem;
+  overflow: hidden;
+  color: var(--color-accent-text);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userpanel-strip__action:hover,
+.userpanel-voice:hover .userpanel-strip__text {
+  text-decoration: underline;
+}
+
+/* Voice on another server (FR-2.5): the whole message shows that server. */
+.userpanel-voice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  height: 100%;
+  text-align: left;
+}
+
+.userpanel-strip__chips,
+.userpanel-strip__persistent {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Compact chips (24 px tall touch targets): icon only, or icon and a short word. */
+.userpanel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  box-sizing: border-box;
+  height: 1.5rem;
+  max-width: 5.5rem;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.userpanel-chip--icon {
+  justify-content: center;
+  width: 1.5rem;
+  padding: 0;
+}
+
+.userpanel-chip--icon:hover {
+  background: var(--color-bg-hover);
+}
+
+.userpanel-chip--latency {
+  color: var(--color-accent);
+}
+
+.userpanel-chip__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Control row: three pills (toggle and its popover arrow) that never wrap. */
+.userpanel__row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  height: 2rem;
+}
+
+.userpanel__split {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-sidebar);
+}
+
+/* Not connected: the hang-up pill keeps its place as an empty slot. */
+.userpanel__split--empty {
+  box-sizing: border-box;
+  width: 3.5rem;
+  height: 2rem;
+  border: 1px dashed var(--color-border-strong);
+  background: transparent;
+}
+
 .userpanel__toggle {
   position: relative;
   display: inline-flex;
@@ -124,11 +358,14 @@
   overflow: hidden;
   padding: 0;
   border: 0;
-  /* Round like the website's icon buttons; the size stays 2rem. */
   border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
+}
+
+.userpanel__toggle:hover:not(:disabled) {
+  background: var(--color-bg-hover);
 }
 
 .userpanel__toggle:disabled {
@@ -146,9 +383,18 @@
   color: var(--color-text-muted);
 }
 
+.userpanel__toggle--hangup {
+  color: var(--color-danger);
+}
+
 .userpanel__icon {
   position: relative;
   display: inline-flex;
+}
+
+.userpanel__icon svg + svg {
+  position: absolute;
+  inset: 0;
 }
 
 /* Live input level: a fill rising from the bottom, height driven by --mic-level. Green like the
@@ -178,29 +424,28 @@
   }
 }
 
-.userpanel__icon svg + svg {
-  position: absolute;
-  inset: 0;
-}
-
-.userpanel-error {
-  margin: var(--space-1) 0 0;
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-}
-
-.userpanel-readonly {
-  display: flex;
-  flex-wrap: wrap;
+.userpanel__arrow {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-1) var(--space-2);
-  margin-top: var(--space-1);
+  justify-content: center;
+  box-sizing: border-box;
+  width: 1.5rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  cursor: pointer;
 }
 
-.userpanel-readonly__text {
-  margin: 0;
+.userpanel__arrow:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+
+.userpanel__arrow:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
 }
 
 .userpanel-hint {
@@ -260,39 +505,6 @@
   margin-top: var(--space-3);
 }
 
-/* The ▾ sits against the phone button as one split control. */
-.userpanel__toggle--more {
-  margin-inline-start: calc(-1 * var(--space-1));
-  padding-inline: 0;
-  min-width: 1.25rem;
-}
-
-.userpanel__toggle--hangup:hover:not(:disabled) {
-  color: var(--color-danger);
-}
-
-/* The voice location (FR-2.5): a quiet text button that shows the voice server. */
-.userpanel-voice {
-  display: block;
-  max-width: 100%;
-  margin-top: var(--space-1);
-  padding: 0;
-  overflow: hidden;
-  border: none;
-  background: none;
-  color: var(--color-success);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.userpanel-voice:hover {
-  text-decoration: underline;
-}
-
 /* Rich-text comment editor (FR-2.51). */
 .rich-editor__toolbar,
 .rich-editor__link {
@@ -324,37 +536,6 @@
 .rich-editor__field ol {
   margin: 0;
   padding-left: 1.5em;
-}
-
-/* A toggle with its small options arrow beside it. */
-.userpanel__split {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-}
-
-.userpanel__arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 1.5rem;
-  height: 2rem;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-}
-
-.userpanel__arrow:hover:not(:disabled) {
-  background: var(--color-bg-hover);
-}
-
-.userpanel__arrow:disabled {
-  color: var(--color-text-muted);
-  cursor: default;
 }
 
 .userpanel-notice {

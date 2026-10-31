@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { useView } from "../../app/view";
 import { getApi } from "../../api";
-import { ConnectionInfo } from "../connection";
-import { showServer, useServers as useServerStates } from "../channels";
+import { showServer, useServers as useServerStates, useShownServerId } from "../channels";
 import { ConfirmDialog, disconnect, useServers } from "../servers";
 import type { MenuPosition } from "../../components/ContextMenu";
 import { useAvatars } from "../members/useAvatars";
@@ -13,11 +12,12 @@ import { trackLabel, useNowPlaying } from "../nowplaying";
 import { DisconnectMenu } from "./DisconnectMenu";
 import { describeError } from "./errors";
 import { ProfileDialog } from "./ProfileDialog";
-import { DndIndicator } from "../dnd/DndIndicator";
-import { joinChannel, useNoVoice } from "./readOnly";
+import { joinChannel } from "./readOnly";
 import { QuickSettings, type QuickSettingsState } from "./QuickSettings";
 import { RegisterDialog } from "./RegisterDialog";
-import { AudioArrow } from "./AudioArrow";
+import { ArrowIcon, AudioArrow } from "./AudioArrow";
+import { StatusStrip } from "./StatusStrip";
+import { stripMessage } from "./stripMessage";
 import { useAudioPopover } from "./useAudioPopover";
 import { useMicLevelFill } from "./useMicLevelFill";
 import { usePushToTalk } from "./usePushToTalk";
@@ -41,13 +41,12 @@ const GEAR =
   "M10.47 5.37L10.9 3.07L13.1 3.07L13.53 5.37L14.6 5.72L15.6 6.23L17.54 4.91L19.09 6.46L17.77 8.4L18.28 9.4L18.63 10.47L20.93 10.9L20.93 13.1L18.63 13.53L18.28 14.6L17.77 15.6L19.09 17.54L17.54 19.09L15.6 17.77L14.6 18.28L13.53 18.63L13.1 20.93L10.9 20.93L10.47 18.63L9.4 18.28L8.4 17.77L6.46 19.09L4.91 17.54L6.23 15.6L5.72 14.6L5.37 13.53L3.07 13.1L3.07 10.9L5.37 10.47L5.72 9.4L6.23 8.4L4.91 6.46L6.46 4.91L8.4 6.23L9.4 5.72ZM9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0";
 const HANG_UP = "M3 14c5-5 13-5 18 0l-2.5 2.5-3-1.5v-2.5a9 9 0 0 0-5 0V15l-3 1.5z";
 const SLASH = "M4 4l16 16";
-const CHEVRON = "M7 10l5 5 5-5";
 
 export function UserPanel() {
   const { t } = useTranslation("userpanel");
   const { openSettings, openAudioSettings } = useView();
   const state = useUserPanel();
-  const readOnly = useNoVoice();
+  const shownServerId = useShownServerId();
   const { self, shownSelf, voice } = state;
   const avatarOf = useAvatars(self ? [self] : []);
   const avatarSrc = self ? avatarOf(self) : null;
@@ -157,26 +156,29 @@ export function UserPanel() {
   const switchTargets = (connectedIds.length > 1 ? connectedIds : [])
     .filter((id) => id !== voice?.serverId && serverStates.get(id) !== undefined)
     .map((id) => ({ serverId: id, label: nameOf(id) }));
-  const connection = servers.connection.state;
-  const status =
-    connection === "reconnecting"
-      ? t("status.reconnecting")
-      : connection === "connecting"
-        ? t("status.connecting")
-        : !connected
-          ? t("status.disconnected")
-          : readOnly
-            ? t("status.readOnly")
-            : null;
-  // In the normal connected state the status line shows the own game or playing track. The game
-  // wins the short line (it says more about being busy); the tooltip names both.
-  const track = status === null && ownTrack?.track.playing ? trackLabel(ownTrack.track) : null;
-  const game = status === null && ownGame ? ownGame.game.name : null;
-  const statusText = status ?? game ?? track ?? (serverLabel || t("status.connected"));
-  const statusTitle =
+  const message = stripMessage({
+    error,
+    connection: servers.connection.state,
+    connected,
+    voiceServerId: voice?.serverId ?? null,
+    shownServerId,
+  });
+  // The subtitle under the name: the own game or playing track while connected (the game wins
+  // the short line, it says more about being busy; the tooltip names both), else the server.
+  const track = connected && ownTrack?.track.playing ? trackLabel(ownTrack.track) : null;
+  const game = connected && ownGame ? ownGame.game.name : null;
+  const subtitle =
+    game ??
+    track ??
+    (connected || link !== null ? serverLabel || t("status.connected") : t("status.disconnected"));
+  const subtitleTitle =
     game !== null && track !== null
       ? `${t("status.playing", { game })} · ${t("status.listening", { track })}`
-      : statusText;
+      : subtitle;
+
+  const openQuick = (x: number, y: number, opener: HTMLElement) => {
+    setQuick({ x, y, opener });
+  };
 
   return (
     <div className="userpanel">
@@ -187,19 +189,30 @@ export function UserPanel() {
             connected ? "userpanel__profile" : "userpanel__profile userpanel__profile--offline"
           }
         >
-          {/* The initial is drawn by CSS from data-initial, not as DOM text. */}
+          {/* Muted or deafened also shows as a badge, talking as a ring: more than colour. */}
           <span
-            className="userpanel-avatar"
-            data-initial={avatarSrc ? undefined : name.slice(0, 1).toUpperCase()}
+            className="userpanel__avatar"
+            data-talking={transmitting ? "" : undefined}
             aria-hidden="true"
           >
-            {avatarSrc ? <img className="userpanel-avatar__img" src={avatarSrc} alt="" /> : null}
+            {/* The initial is drawn by CSS from data-initial, not as DOM text. */}
+            <span
+              className="userpanel-avatar"
+              data-initial={avatarSrc ? undefined : name.slice(0, 1).toUpperCase()}
+            >
+              {avatarSrc ? <img className="userpanel-avatar__img" src={avatarSrc} alt="" /> : null}
+            </span>
+            {connected && (mute || deaf) ? (
+              <span className="userpanel__badge">
+                <Icon d={SLASH} />
+              </span>
+            ) : null}
           </span>
           <span className="userpanel__text">
-            <span className="userpanel__name" data-tooltip={name}>
+            <span className="userpanel__name" data-tooltip={name} data-tooltip-overflow>
               {name}
             </span>{" "}
-            <span className="userpanel__status" data-tooltip={statusTitle}>
+            <span className="userpanel__status" data-tooltip={subtitleTitle}>
               {(game ?? track) !== null && (
                 <svg
                   className="userpanel__status-icon"
@@ -217,12 +230,58 @@ export function UserPanel() {
                   />
                 </svg>
               )}
-              {statusText}
+              {subtitle}
             </span>
           </span>
         </div>
+        <button
+          ref={settingsButton}
+          type="button"
+          className="userpanel__toggle userpanel__toggle--settings"
+          aria-label={t("settings")}
+          data-tooltip={t("settings")}
+          aria-haspopup="menu"
+          onClick={(event) => {
+            const box = event.currentTarget.getBoundingClientRect();
+            openQuick(box.left, box.bottom, event.currentTarget);
+          }}
+          onContextMenu={(event) => {
+            event.preventDefault();
+            openQuick(event.clientX, event.clientY, event.currentTarget);
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
+            event.preventDefault();
+            const box = event.currentTarget.getBoundingClientRect();
+            openQuick(box.left, box.bottom, event.currentTarget);
+          }}
+        >
+          <Icon d={GEAR} />
+        </button>
       </div>
-      <DndIndicator />
+      <StatusStrip
+        message={message}
+        error={error}
+        serverLabel={serverLabel}
+        voiceChannel={voice?.channelName ?? null}
+        voiceServerLabel={nameOf(voice?.serverId ?? null)}
+        joinChannel={shownSelf ? state.channelName : null}
+        reconnect={
+          servers.connection.state === "reconnecting"
+            ? { attempt: servers.connection.attempt, max: servers.connection.maxAttempts }
+            : null
+        }
+        connected={connected}
+        onDismissError={() => {
+          setError(null);
+        }}
+        onJoin={() => {
+          if (shownSelf) run(joinChannel(shownSelf.channelId));
+        }}
+        onShowVoiceServer={() => {
+          if (voice) showServer(voice.serverId);
+        }}
+      />
       <div className="userpanel__row">
         <span className="userpanel__split">
           <button
@@ -267,7 +326,7 @@ export function UserPanel() {
           <AudioArrow kind="output" audio={audio} disabled={!connected} />
         </span>
         {link !== null ? (
-          <>
+          <span className="userpanel__split">
             <button
               type="button"
               className="userpanel__toggle userpanel__toggle--hangup"
@@ -289,7 +348,7 @@ export function UserPanel() {
             </button>
             <button
               type="button"
-              className="userpanel__toggle userpanel__toggle--more"
+              className="userpanel__arrow userpanel__toggle--more"
               aria-label={t("disconnectMenu.open")}
               data-tooltip={t("disconnectMenu.open")}
               aria-haspopup="menu"
@@ -297,35 +356,13 @@ export function UserPanel() {
                 openDisconnectMenuBelow(event.currentTarget);
               }}
             >
-              <Icon d={CHEVRON} />
+              <ArrowIcon />
             </button>
-          </>
-        ) : null}
-        {connected ? <ConnectionInfo className="userpanel__toggle" /> : null}
-        <button
-          ref={settingsButton}
-          type="button"
-          className="userpanel__toggle"
-          aria-label={t("settings")}
-          data-tooltip={t("settings")}
-          aria-haspopup="menu"
-          onClick={(event) => {
-            const box = event.currentTarget.getBoundingClientRect();
-            setQuick({ x: box.left, y: box.bottom, opener: event.currentTarget });
-          }}
-          onContextMenu={(event) => {
-            event.preventDefault();
-            setQuick({ x: event.clientX, y: event.clientY, opener: event.currentTarget });
-          }}
-          onKeyDown={(event) => {
-            if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
-            event.preventDefault();
-            const box = event.currentTarget.getBoundingClientRect();
-            setQuick({ x: box.left, y: box.bottom, opener: event.currentTarget });
-          }}
-        >
-          <Icon d={GEAR} />
-        </button>
+          </span>
+        ) : (
+          // Keeps the hang-up pill's place, so the other controls never shift.
+          <span className="userpanel__split userpanel__split--empty" aria-hidden="true" />
+        )}
       </div>
       {audio.node}
       {quick ? (
@@ -380,35 +417,6 @@ export function UserPanel() {
           }}
         />
       ) : null}
-      {voice ? (
-        <VoiceLine
-          channelName={voice.channelName}
-          serverName={nameOf(voice.serverId)}
-          onShow={() => {
-            showServer(voice.serverId);
-          }}
-        />
-      ) : connected && readOnly && shownSelf ? (
-        <div className="userpanel-readonly" role="status">
-          <p className="userpanel-readonly__text">{t("readOnly.text")}</p>
-          {state.channelName !== null ? (
-            <button
-              type="button"
-              className="button userpanel-readonly__join"
-              onClick={() => {
-                run(joinChannel(shownSelf.channelId));
-              }}
-            >
-              {t("readOnly.join", { channel: state.channelName })}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
-      {error ? (
-        <p className="userpanel-error" role="alert">
-          {error}
-        </p>
-      ) : null}
       {dialog === "profile" && shownSelf ? (
         <ProfileDialog
           session={shownSelf.session}
@@ -419,31 +427,5 @@ export function UserPanel() {
       ) : null}
       {dialog === "register" ? <RegisterDialog onClose={closeDialog} /> : null}
     </div>
-  );
-}
-
-interface VoiceLineProps {
-  channelName: string | null;
-  serverName: string;
-  onShow: () => void;
-}
-
-/** "Voice: ‹channel› · ‹server›" (FR-2.5); clicking it shows the voice server. */
-function VoiceLine({ channelName, serverName, onShow }: VoiceLineProps) {
-  const { t } = useTranslation("userpanel");
-  const text =
-    channelName === null
-      ? t("voice.server", { server: serverName })
-      : t("voice.line", { channel: channelName, server: serverName });
-  return (
-    <button
-      type="button"
-      className="userpanel-voice"
-      aria-label={t("voice.show", { location: text })}
-      data-tooltip={t("voice.show", { location: text })}
-      onClick={onShow}
-    >
-      {text}
-    </button>
   );
 }

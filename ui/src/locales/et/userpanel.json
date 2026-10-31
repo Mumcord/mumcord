@@ -141,6 +141,8 @@
     "label": "Ära sega",
     "manual": "käsitsi",
     "system": "Ära sega (süsteem)",
-    "systemHint": "Lülita see välja töölaua teavituste seadetes."
-  }
+    "systemHint": "Lülita see välja töölaua teavituste seadetes.",
+    "short": "Ära sega"
+  },
+  "dismissError": "Sulge"
 }

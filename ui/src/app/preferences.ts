@@ -20,6 +20,8 @@ export interface Preferences {
   talkingFirst: boolean;
   /** Signal icon next to people with a weak connection (FR-2.26). */
   showWeakConnectionIcon: boolean;
+  /** Low-latency mode as set globally (#156); a channel audio profile can override it. */
+  lowLatency: boolean;
   /**
    * Applies theme, language, chat layout and link previews and accessibility switches from a settings record immediately. The engine sends no event
    * when settings change, so whoever calls `settingsUpdate` passes the result here.
@@ -34,6 +36,7 @@ export interface Preferences {
       | "hideEmptyChannels"
       | "talkingFirst"
       | "showWeakConnectionIcon"
+      | "lowLatency"
       | "visualEffects"
       | "appThemeId"
       | "customThemes"
@@ -74,4 +77,9 @@ export function useEmbedsAllowed(): boolean {
 export function useShowWeakConnectionIcon(): boolean {
   return (useContext(PreferencesContext) ?? { showWeakConnectionIcon: true })
     .showWeakConnectionIcon;
+}
+
+/** The global low-latency switch (#156); off without a provider, like its default setting. */
+export function useLowLatencySetting(): boolean {
+  return (useContext(PreferencesContext) ?? { lowLatency: false }).lowLatency;
 }

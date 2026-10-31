@@ -141,6 +141,8 @@
     "label": "Nicht stören",
     "manual": "manuell",
     "system": "Nicht stören (System)",
-    "systemHint": "Schalte es in den Benachrichtigungseinstellungen deines Desktops aus."
-  }
+    "systemHint": "Schalte es in den Benachrichtigungseinstellungen deines Desktops aus.",
+    "short": "Nicht stören"
+  },
+  "dismissError": "Schließen"
 }

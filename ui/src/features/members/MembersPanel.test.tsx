@@ -62,6 +62,7 @@ describe("MembersPanel", () => {
       hideEmptyChannels: false,
       talkingFirst: true,
       showWeakConnectionIcon: true,
+      lowLatency: false,
       applySettings: () => undefined,
     };
     render(

@@ -141,6 +141,8 @@
     "label": "Ne zavarjanak",
     "manual": "kézi",
     "system": "Ne zavarjanak (rendszer)",
-    "systemHint": "Kapcsold ki az asztali környezet értesítési beállításaiban."
-  }
+    "systemHint": "Kapcsold ki az asztali környezet értesítési beállításaiban.",
+    "short": "Ne zavarj"
+  },
+  "dismissError": "Bezárás"
 }

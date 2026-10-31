@@ -141,6 +141,8 @@
     "label": "Niet storen",
     "manual": "handmatig",
     "system": "Niet storen (systeem)",
-    "systemHint": "Zet het uit in de meldingsinstellingen van je bureaublad."
-  }
+    "systemHint": "Zet het uit in de meldingsinstellingen van je bureaublad.",
+    "short": "Niet storen"
+  },
+  "dismissError": "Sluiten"
 }

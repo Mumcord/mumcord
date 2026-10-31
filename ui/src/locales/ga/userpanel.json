@@ -141,6 +141,8 @@
     "label": "Ná Cuir Isteach",
     "manual": "de láimh",
     "system": "Ná Cuir Isteach (córas)",
-    "systemHint": "Múch é i socruithe fógraí do dheisce."
-  }
+    "systemHint": "Múch é i socruithe fógraí do dheisce.",
+    "short": "Ná cuir isteach"
+  },
+  "dismissError": "Dún"
 }

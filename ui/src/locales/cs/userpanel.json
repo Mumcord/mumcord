@@ -141,6 +141,8 @@
     "label": "Nerušit",
     "manual": "ručně",
     "system": "Nerušit (systém)",
-    "systemHint": "Vypněte ho v nastavení oznámení vašeho prostředí."
-  }
+    "systemHint": "Vypněte ho v nastavení oznámení vašeho prostředí.",
+    "short": "Nerušit"
+  },
+  "dismissError": "Zavřít"
 }

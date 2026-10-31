@@ -141,6 +141,8 @@
     "label": "Netraucēt",
     "manual": "manuāli",
     "system": "Netraucēt (sistēma)",
-    "systemHint": "Izslēdziet to darbvirsmas paziņojumu iestatījumos."
-  }
+    "systemHint": "Izslēdziet to darbvirsmas paziņojumu iestatījumos.",
+    "short": "Netraucēt"
+  },
+  "dismissError": "Aizvērt"
 }

@@ -136,8 +136,16 @@ function Panel({ open }: { open: boolean }) {
 /**
  * Button with a non-modal popover showing the live link figures (AC-1.23): transport,
  * latency, loss and the current send bitrate. Refreshes about once per second while open.
+ * `compact` (the user panel's status strip, #246) leaves out the separate arrow: the voice
+ * quality panel then opens from the same button with right-click, the menu key or Shift+F10.
  */
-export function ConnectionInfo({ className }: { className?: string }) {
+export function ConnectionInfo({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   const { t } = useTranslation("connection");
   // "stats" is the statistics popover, "quick" the voice quality panel (right-click or menu key).
   const [mode, setMode] = useState<"stats" | "quick" | null>(null);
@@ -193,6 +201,7 @@ export function ConnectionInfo({ className }: { className?: string }) {
         type="button"
         className={className}
         aria-label={t("open")}
+        data-tooltip={compact ? t("open") : undefined}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={open ? panelId : undefined}
@@ -222,21 +231,23 @@ export function ConnectionInfo({ className }: { className?: string }) {
           />
         </svg>
       </button>
-      <button
-        type="button"
-        className={`${className ?? ""} connection-info__more`}
-        aria-label={t("quick.open")}
-        aria-haspopup="dialog"
-        aria-expanded={mode === "quick"}
-        onClick={() => {
-          if (mode === "quick") setMode(null);
-          else openQuick();
-        }}
-      >
-        <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
-          <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="3" />
-        </svg>
-      </button>
+      {compact ? null : (
+        <button
+          type="button"
+          className={`${className ?? ""} connection-info__more`}
+          aria-label={t("quick.open")}
+          aria-haspopup="dialog"
+          aria-expanded={mode === "quick"}
+          onClick={() => {
+            if (mode === "quick") setMode(null);
+            else openQuick();
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="10" height="10" aria-hidden="true" focusable="false">
+            <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="3" />
+          </svg>
+        </button>
+      )}
       {open ? (
         <div
           ref={panel}

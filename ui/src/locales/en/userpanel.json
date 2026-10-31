@@ -141,6 +141,8 @@
     "label": "Do Not Disturb",
     "manual": "manual",
     "system": "Do Not Disturb (system)",
-    "systemHint": "Turn it off in your desktop's notification settings."
-  }
+    "systemHint": "Turn it off in your desktop's notification settings.",
+    "short": "DND"
+  },
+  "dismissError": "Dismiss"
 }

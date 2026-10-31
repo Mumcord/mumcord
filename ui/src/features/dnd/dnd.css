@@ -1,42 +1,25 @@
+/* The chip's frame comes from the user panel (.userpanel-chip); here only its colours. */
 .dnd-indicator {
-  margin-top: var(--space-2);
-  font-size: var(--font-size-sm);
-}
-
-.dnd-indicator__badge {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-md);
-  color: var(--color-text);
   background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  color: var(--color-text);
 }
 
-.dnd-indicator[data-source="system"] .dnd-indicator__badge {
+.dnd-indicator[data-source="system"] {
   background: color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 .dnd-indicator__icon {
   flex: none;
-  width: 1rem;
-  height: 1rem;
+  width: 0.875rem;
+  height: 0.875rem;
   color: var(--color-accent-text);
 }
 
-/* The label wraps rather than pushing the "?" out of the narrow user panel. */
-.dnd-indicator__badge > strong {
+.dnd-indicator__text {
   min-width: 0;
-}
-
-.dnd-indicator__badge > .info-tip {
-  flex: none;
-  margin-inline-start: auto;
-}
-
-.dnd-indicator__source {
-  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dnd-status {
