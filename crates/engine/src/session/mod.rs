@@ -2264,6 +2264,7 @@ impl Inner {
         let mut tick = tokio::time::interval(BITRATE_INTERVAL);
         let mut packets: Option<PacketSender> = None;
         let mut permissions = batch::PermissionBatch::default();
+        let mut whispers = crate::whisper::IncomingWhispers::default();
         loop {
             let permissions_due = permissions.deadline();
             let voice_event = async {
@@ -2313,6 +2314,17 @@ impl Inner {
                                 sending,
                             });
                         }
+                        if let Some(kind) = whispers.on_packet(
+                            packet.session,
+                            packet.whisper,
+                            packet.is_last,
+                            Instant::now(),
+                        ) {
+                            ctx.events.emit(EngineEvent::IncomingWhisperChanged {
+                                session: packet.session,
+                                kind,
+                            });
+                        }
                         if !self.voice.deaf.load(Ordering::Relaxed)
                             && let (Some(tx), Some(p)) = (packets.as_mut(), voice::playback_packet(&packet))
                         {
@@ -2346,6 +2358,12 @@ impl Inner {
                             ctx.events.emit(EngineEvent::PositionalSendingChanged {
                                 session,
                                 sending: false,
+                            });
+                        }
+                        for session in whispers.expire(Instant::now()) {
+                            ctx.events.emit(EngineEvent::IncomingWhisperChanged {
+                                session,
+                                kind: None,
                             });
                         }
                     }
