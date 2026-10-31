@@ -564,7 +564,8 @@
   "privacyDirect": {
     "title": "Connexions directes",
     "allow": "Autoriser les connexions directes avec d’autres utilisateurs de Mumcord",
-    "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée."
+    "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée.",
+    "notUsed": "Non utilisé dans le mode pair à pair choisi : Mumcord ne se connecte jamais directement aux autres personnes."
   },
   "updates": {
     "title": "Mises à jour",

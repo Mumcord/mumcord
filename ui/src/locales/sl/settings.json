@@ -566,7 +566,8 @@
   "privacyDirect": {
     "title": "Neposredne povezave",
     "allow": "Dovoli neposredne povezave z drugimi uporabniki Mumcorda",
-    "hint": "Neposredne povezave so hitrejše, vendar druga oseba vidi tvoj naslov IP. Dokler se ne odločiš, Mumcord vpraša, ko bi bila prvič uporabljena."
+    "hint": "Neposredne povezave so hitrejše, vendar druga oseba vidi tvoj naslov IP. Dokler se ne odločiš, Mumcord vpraša, ko bi bila prvič uporabljena.",
+    "notUsed": "V izbranem načinu peer-to-peer se ne uporablja: Mumcord se nikoli ne poveže neposredno z drugimi."
   },
   "updates": {
     "title": "Posodobitve",

@@ -228,3 +228,31 @@ pub fn screen_share_list(
         .map(Into::into)
         .collect())
 }
+
+/// Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShareStartBlock {
+    pub blocked: WatchBlock,
+    /// Why the relay cannot be used, when `blocked` is `relayUnavailable`.
+    pub relay_reason: Option<RelayUnavailable>,
+}
+
+/// What blocks starting a share on the server right now; `null` when sharing is possible. The
+/// settings and the relay change without an event, so the UI asks again before starting.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_block(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ShareStartBlock>> {
+    Ok(engine
+        .screen_share_block(to_engine_server_id(server_id))
+        .map(|block| ShareStartBlock {
+            blocked: block.into(),
+            relay_reason: match block {
+                EngineWatchBlock::Relay(reason) => Some(reason.into()),
+                _ => None,
+            },
+        }))
+}

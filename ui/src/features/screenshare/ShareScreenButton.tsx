@@ -6,11 +6,13 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { BetaBadge } from "../../components/BetaBadge";
+import { shareBlockText } from "./availability";
 import type { OwnShareState } from "./useOwnShare";
 import { useShareActions } from "./useShareActions";
 
 export function ShareScreenButton({ share }: { share: OwnShareState }) {
   const { t } = useTranslation("screenshare");
+  const { t: tP2p } = useTranslation("p2p");
   const { own, block, recheck } = share;
   const { starting, failed, disabled, start, stop } = useShareActions(share);
   const reasonId = useId();
@@ -36,7 +38,7 @@ export function ShareScreenButton({ share }: { share: OwnShareState }) {
     );
   }
 
-  const reason = block === null ? null : t(`blocked.${block}`);
+  const reason = block === null ? null : shareBlockText(t, tP2p, block);
   const describedBy = [reason && reasonId, failed && errorId].filter(Boolean).join(" ");
   return (
     <>

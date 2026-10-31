@@ -544,10 +544,20 @@ fn blocked(block: WatchBlock) -> EngineError {
 }
 
 impl Engine {
+    /// Why nobody could watch a share of the user on `server_id`, so starting one makes no
+    /// sense: the mode is off, or neither direct (consent) nor the relay may be used (FR-4.3 –
+    /// FR-4.5, AC-4.9). `None` when a share may start; a consent not asked yet is no block.
+    pub fn screen_share_block(&self, server_id: ServerId) -> Option<WatchBlock> {
+        self.p2p_unavailable(server_id)
+            .as_ref()
+            .and_then(WatchBlock::of)
+    }
+
     /// Starts sharing in the user's channel on `server_id` and tells the Mumcord users there
     /// (FR-2.42). Captures the whole screen on X11 and lets the user pick on Wayland; closing
     /// that picker gives [`StartOutcome::Cancelled`]. The share stops by itself when the capture
-    /// ends (the desktop's stop button).
+    /// ends (the desktop's stop button). Errors with [`ErrorKind::DirectUnavailable`] and a
+    /// [`WatchBlock::code`] when [`Engine::screen_share_block`] blocks it.
     pub async fn screen_share_start(
         &self,
         server_id: ServerId,
@@ -555,6 +565,9 @@ impl Engine {
     ) -> EngineResult<StartOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
         let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
+        if let Some(block) = self.screen_share_block(server_id) {
+            return Err(blocked(block));
+        }
         if lock(self.screen_share_state())
             .servers
             .get(&server_id)

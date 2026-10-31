@@ -566,7 +566,8 @@
   "privacyDirect": {
     "title": "Tiesioginiai ryšiai",
     "allow": "Leisti tiesioginius ryšius su kitais Mumcord naudotojais",
-    "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas."
+    "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas.",
+    "notUsed": "Pasirinktame peer-to-peer režime nenaudojama: Mumcord niekada nesijungia tiesiogiai prie kitų."
   },
   "updates": {
     "title": "Atnaujinimai",

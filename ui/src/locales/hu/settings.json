@@ -562,7 +562,8 @@
   "privacyDirect": {
     "title": "Közvetlen kapcsolatok",
     "allow": "Közvetlen kapcsolatok engedélyezése más Mumcord-felhasználókkal",
-    "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet."
+    "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet.",
+    "notUsed": "A választott peer-to-peer módban nincs használatban: a Mumcord sosem kapcsolódik közvetlenül másokhoz."
   },
   "updates": {
     "title": "Frissítések",

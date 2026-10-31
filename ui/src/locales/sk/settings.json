@@ -566,7 +566,8 @@
   "privacyDirect": {
     "title": "Priame pripojenia",
     "allow": "Povoliť priame pripojenia k ostatným používateľom Mumcordu",
-    "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo."
+    "hint": "Priame pripojenia sú rýchlejšie, ale druhá osoba uvidí tvoju IP adresu. Kým sa nerozhodneš, Mumcord sa opýta, keď by sa nejaké prvýkrát použilo.",
+    "notUsed": "Vo zvolenom režime peer-to-peer sa nepoužíva: Mumcord sa nikdy nepripája priamo k ostatným."
   },
   "updates": {
     "title": "Aktualizácie",

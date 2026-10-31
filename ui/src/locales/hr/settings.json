@@ -564,7 +564,8 @@
   "privacyDirect": {
     "title": "Izravne veze",
     "allow": "Dopusti izravne veze s drugim korisnicima Mumcorda",
-    "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila."
+    "hint": "Izravne veze su brže, ali druga osoba može vidjeti tvoju IP adresu. Dok ne odlučiš, Mumcord pita kad bi se veza prvi put koristila.",
+    "notUsed": "Ne koristi se u odabranom peer-to-peer načinu: Mumcord se nikad ne povezuje izravno s drugima."
   },
   "updates": {
     "title": "Ažuriranja",

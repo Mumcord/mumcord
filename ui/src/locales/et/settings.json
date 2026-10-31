@@ -562,7 +562,8 @@
   "privacyDirect": {
     "title": "Otseühendused",
     "allow": "Luba otseühendused teiste Mumcordi kasutajatega",
-    "hint": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Kuni sa pole otsustanud, küsib Mumcord esimesel korral, kui mõnda kasutataks."
+    "hint": "Otseühendused on kiiremad, kuid teine inimene näeb sinu IP-aadressi. Kuni sa pole otsustanud, küsib Mumcord esimesel korral, kui mõnda kasutataks.",
+    "notUsed": "Valitud peer-to-peer-režiimis ei kasutata: Mumcord ei loo kunagi otseühendust teistega."
   },
   "updates": {
     "title": "Uuendused",

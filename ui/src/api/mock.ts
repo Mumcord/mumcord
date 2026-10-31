@@ -47,10 +47,12 @@ import type {
   PttAvailability,
   PttMouseStatus,
   RelayInfo,
+  RelayUnavailable,
   SavedServer,
   ServerInfo,
   ServerInput,
   ScreenShare,
+  ShareStartBlock,
   ServerSnapshot,
   Settings,
   User,
@@ -946,6 +948,34 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   function relayOf(serverId: number): RelayInfo {
     return relays.get(serverId) ?? NO_RELAY;
+  }
+
+  /** Why the relay can't be used on the server, `null` when it can (as the engine decides). */
+  function relayUnavailable(serverId: number): RelayUnavailable | null {
+    const status = relayOf(serverId).status;
+    switch (status.kind) {
+      case "available":
+        return null;
+      case "none":
+        return { kind: "noRelay" };
+      case "unavailable":
+        return status.reason;
+      default:
+        return { kind: status.kind };
+    }
+  }
+
+  /** What blocks P2P features on the server, like the engine's plan (spec 04, FR-4.3 – FR-4.5). */
+  function shareStartBlock(serverId: number): ShareStartBlock | null {
+    const mode = requireServer(serverId).p2pModeOverride ?? settings.p2pMode;
+    const relayReason = relayUnavailable(serverId);
+    const direct = mode !== "relayOnly" && settings.allowDirectConnections !== "no";
+    const relay = mode !== "directOnly" && relayReason === null;
+    if (mode === "off") return { blocked: "p2pOff", relayReason: null };
+    if (mode === "relayOnly" && relayReason !== null) {
+      return { blocked: "relayUnavailable", relayReason };
+    }
+    return direct || relay ? null : { blocked: "consentOff", relayReason: null };
   }
 
   function setRelay(serverId: number, info: RelayInfo): void {
@@ -2766,6 +2796,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const own = ownShares.get(serverId);
       return Promise.resolve(own ? [own] : []);
     },
+    screenShareBlock: (serverId) => Promise.resolve(shareStartBlock(serverId)),
     screenShareWatch: () => notImplemented("screenShareWatch"),
     screenShareUnwatch: () => notImplemented("screenShareUnwatch"),
     screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),

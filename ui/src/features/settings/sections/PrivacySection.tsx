@@ -13,6 +13,8 @@ import type { SettingsSectionProps } from "./types";
  */
 export function PrivacySection({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
+  // These modes never connect directly, so the consent has no effect (spec 04, FR-4.3).
+  const directUnused = settings.p2pMode === "relayOnly" || settings.p2pMode === "off";
   return (
     <Section title={t("sections.privacy")}>
       <PrivateMessagesGroup settings={settings} update={update} />
@@ -29,8 +31,9 @@ export function PrivacySection({ settings, update }: SettingsSectionProps) {
       <Group title={t("privacyDirect.title")}>
         <Switch
           label={t("privacyDirect.allow")}
-          description={t("privacyDirect.hint")}
+          description={directUnused ? t("privacyDirect.notUsed") : t("privacyDirect.hint")}
           checked={settings.allowDirectConnections === "yes"}
+          disabled={directUnused}
           onChange={(allowed) => {
             update({ allowDirectConnections: allowed ? "yes" : "no" });
           }}

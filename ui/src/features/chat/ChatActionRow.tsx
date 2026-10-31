@@ -9,7 +9,7 @@ import { useSelectedConversation, useServerState, useShownServerId } from "../ch
 import { useEmbedsAllowed } from "../../app/preferences";
 import { useOpenPrivacySettings } from "../../app/view";
 import { getApi } from "../../api";
-import { Viewers, useOwnShare, useShareActions } from "../screenshare";
+import { Viewers, shareBlockText, useOwnShare, useShareActions } from "../screenshare";
 import { WatchLinkDialog, useWatchParty } from "../watchparty";
 import "./chatActionRow.css";
 
@@ -18,6 +18,7 @@ const APPS_ICON = "M5 5h5v5H5zM14 5h5v5h-5zM5 14h5v5H5zM14 14h5v5h-5z";
 export function ChatActionRow() {
   const { t } = useTranslation("chat");
   const { t: tShare } = useTranslation("screenshare");
+  const { t: tP2p } = useTranslation("p2p");
   const { t: tParty } = useTranslation("watchparty");
   const serverId = useShownServerId();
   const { conversation } = useSelectedConversation();
@@ -99,7 +100,7 @@ export function ChatActionRow() {
   };
 
   const sharing = share.own;
-  const shareReason = share.block === null ? null : tShare(`blocked.${share.block}`);
+  const shareReason = share.block === null ? null : shareBlockText(tShare, tP2p, share.block);
   const watchLabel = partyRunning ? t("actions.addToPlaylist") : tParty("watchTogether");
 
   const item = (

@@ -568,7 +568,8 @@
   "privacyDirect": {
     "title": "Ceangail dhíreacha",
     "allow": "Ceadaigh ceangail dhíreacha le húsáideoirí eile Mumcord",
-    "hint": "Bíonn ceangail dhíreacha níos tapúla, ach is féidir leis an duine eile do sheoladh IP a fheiceáil. Go dtí go gcinneann tú, fiafraíonn Mumcord an chéad uair a d’úsáidfí ceann."
+    "hint": "Bíonn ceangail dhíreacha níos tapúla, ach is féidir leis an duine eile do sheoladh IP a fheiceáil. Go dtí go gcinneann tú, fiafraíonn Mumcord an chéad uair a d’úsáidfí ceann.",
+    "notUsed": "Ní úsáidtear é sa mhód piarbhrearthóireachta roghnaithe: ní cheanglaíonn Mumcord go díreach le daoine eile riamh."
   },
   "updates": {
     "title": "Nuashonruithe",

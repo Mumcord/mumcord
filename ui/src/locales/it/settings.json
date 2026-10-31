@@ -564,7 +564,8 @@
   "privacyDirect": {
     "title": "Connessioni dirette",
     "allow": "Consenti connessioni dirette con altri utenti Mumcord",
-    "hint": "Le connessioni dirette sono più veloci, ma l'altra persona può vedere il tuo indirizzo IP. Finché non decidi, Mumcord chiede la prima volta che ne servirebbe una."
+    "hint": "Le connessioni dirette sono più veloci, ma l'altra persona può vedere il tuo indirizzo IP. Finché non decidi, Mumcord chiede la prima volta che ne servirebbe una.",
+    "notUsed": "Non usato nella modalità peer-to-peer scelta: Mumcord non si collega mai direttamente ad altre persone."
   },
   "updates": {
     "title": "Aggiornamenti",

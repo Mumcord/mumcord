@@ -84,4 +84,20 @@ describe("Epic 2 settings rows", () => {
     fireEvent.click(check);
     expect(check).toBeChecked();
   });
+
+  it("disables the direct-connection consent in modes that never connect directly", async () => {
+    const current = await settings();
+    render(<Stateful initial={current} Section={PrivacySection} />);
+    const direct = screen.getByRole("switch", {
+      name: "Allow direct connections to other Mumcord users",
+    });
+    expect(direct).toBeEnabled();
+    for (const mode of [/^Relay only/, /^Off/]) {
+      fireEvent.click(screen.getByRole("radio", { name: mode }));
+      expect(direct).toBeDisabled();
+      expect(direct).toHaveAccessibleDescription(/never connects directly/);
+    }
+    fireEvent.click(screen.getByRole("radio", { name: /^Direct only/ }));
+    expect(direct).toBeEnabled();
+  });
 });

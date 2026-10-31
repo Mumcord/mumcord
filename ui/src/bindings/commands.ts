@@ -614,6 +614,11 @@ export const commands = {
 	/**  The shares in the user's channel (for a view opened after the last event). */
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
 	/**
+	 *  What blocks starting a share on the server right now; `null` when sharing is possible. The
+	 *  settings and the relay change without an event, so the UI asks again before starting.
+	 */
+	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
+	/**
 	 *  Asks GitHub for the latest release now (only when `updateCheck` is `yes`); `null` when
 	 *  this version is current, the user did not consent or the check failed (logged only).
 	 */
@@ -2377,6 +2382,13 @@ export type Settings = {
 	whatsNewSeen: string | null,
 	/**  "Private messages from" (issue #141). */
 	privateMessages: PrivateMessageSettings,
+};
+
+/**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
+export type ShareStartBlock = {
+	blocked: WatchBlock,
+	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
+	relayReason: RelayUnavailable | null,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */

@@ -562,7 +562,8 @@
   "privacyDirect": {
     "title": "Direktanslutningar",
     "allow": "Tillåt direktanslutningar till andra Mumcord-användare",
-    "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas."
+    "hint": "Direktanslutningar är snabbare, men den andra personen kan se din IP-adress. Tills du bestämmer dig frågar Mumcord första gången en skulle användas.",
+    "notUsed": "Används inte i det valda peer-to-peer-läget: Mumcord ansluter aldrig direkt till andra."
   },
   "updates": {
     "title": "Uppdateringar",

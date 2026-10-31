@@ -562,7 +562,8 @@
   "privacyDirect": {
     "title": "Directe verbindingen",
     "allow": "Directe verbindingen met andere Mumcord-gebruikers toestaan",
-    "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden."
+    "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden.",
+    "notUsed": "Niet gebruikt in de gekozen peer-to-peer-modus: Mumcord maakt nooit rechtstreeks verbinding met anderen."
   },
   "updates": {
     "title": "Updates",

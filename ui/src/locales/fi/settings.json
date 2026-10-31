@@ -562,7 +562,8 @@
   "privacyDirect": {
     "title": "Suorat yhteydet",
     "allow": "Salli suorat yhteydet muihin Mumcord-käyttäjiin",
-    "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran."
+    "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran.",
+    "notUsed": "Ei käytössä valitussa peer-to-peer-tilassa: Mumcord ei koskaan yhdistä suoraan muihin."
   },
   "updates": {
     "title": "Päivitykset",

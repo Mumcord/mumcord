@@ -253,6 +253,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_decode_fallback,
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
+            commands::screen_share::screen_share_block,
             commands::updates::update_check_now,
             commands::updates::appimage_menu_entry_add,
         ])

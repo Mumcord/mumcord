@@ -55,13 +55,19 @@ describe("share availability", () => {
   const linux = platformOf("linux x86_64");
 
   it("names the first reason that blocks sharing", () => {
-    expect(shareBlock({ inChannel: true, consent: "yes", platform: linux })).toBeNull();
-    expect(shareBlock({ inChannel: true, consent: "unset", platform: null })).toBeNull();
-    expect(shareBlock({ inChannel: false, consent: "no", platform: linux })).toBe("notInChannel");
-    expect(shareBlock({ inChannel: true, consent: "no", platform: linux })).toBe("consentOff");
+    const off = { blocked: "p2pOff", relayReason: null } as const;
+    expect(shareBlock({ inChannel: true, p2p: null, platform: linux })).toBeNull();
+    expect(shareBlock({ inChannel: true, p2p: null, platform: null })).toBeNull();
+    expect(shareBlock({ inChannel: false, p2p: off, platform: linux })).toEqual({
+      kind: "notInChannel",
+    });
+    expect(shareBlock({ inChannel: true, p2p: off, platform: linux })).toEqual({
+      kind: "p2p",
+      block: off,
+    });
     expect(
-      shareBlock({ inChannel: true, consent: "yes", platform: platformOf("freebsd x86_64") }),
-    ).toBe("unsupportedPlatform");
+      shareBlock({ inChannel: true, p2p: null, platform: platformOf("freebsd x86_64") }),
+    ).toEqual({ kind: "unsupportedPlatform" });
   });
 
   it("supports Linux without sound, macOS and Windows with sound", () => {
@@ -139,8 +145,19 @@ describe("share button", () => {
     expect(start).not.toHaveBeenCalled();
   });
 
-  it("is disabled when direct connections are turned off", async () => {
+  it("stays available with direct connections turned off while the relay can be used", async () => {
     const api = await linuxMock();
+    await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
+    render(<SharePanel />);
+    const button = await shareButton();
+    await waitFor(() => {
+      expect(button).not.toHaveAttribute("aria-disabled");
+    });
+  });
+
+  it("is disabled when direct connections are turned off and there is no relay", async () => {
+    const api = await linuxMock();
+    await api.relayForget(1);
     await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
     render(<SharePanel />);
     const button = await shareButton();
@@ -150,7 +167,32 @@ describe("share button", () => {
     expect(button).toHaveAttribute("aria-disabled", "true");
   });
 
-  it("notices consent turned off since the last read when clicked", async () => {
+  it("is disabled when peer-to-peer is off", async () => {
+    const api = await linuxMock();
+    await api.settingsUpdate({ ...(await api.settingsGet()), p2pMode: "off" });
+    const start = vi.spyOn(api, "screenShareStart");
+    render(<SharePanel />);
+    const button = await shareButton();
+    await waitFor(() => {
+      expect(button).toHaveAccessibleDescription("Peer-to-peer is off.");
+    });
+    fireEvent.click(button);
+    expect(start).not.toHaveBeenCalled();
+  });
+
+  it("names the relay reason in relay-only mode without a relay", async () => {
+    const api = await linuxMock();
+    await api.relayForget(1);
+    await api.serverSetP2pModeOverride(1, "relayOnly");
+    render(<SharePanel />);
+    const button = await shareButton();
+    await waitFor(() => {
+      expect(button).toHaveAccessibleDescription(/no relay/i);
+    });
+    expect(button).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("notices peer-to-peer turned off since the last read when clicked", async () => {
     const api = await linuxMock();
     const start = vi.spyOn(api, "screenShareStart");
     render(<SharePanel />);
@@ -158,7 +200,7 @@ describe("share button", () => {
     await waitFor(() => {
       expect(button).not.toHaveAttribute("aria-disabled");
     });
-    await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
+    await api.settingsUpdate({ ...(await api.settingsGet()), p2pMode: "off" });
     fireEvent.click(button);
     await waitFor(() => {
       expect(button).toHaveAttribute("aria-disabled", "true");

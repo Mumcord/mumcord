@@ -239,6 +239,10 @@ fn relay_error(e: P2pError) -> DirectError {
     match e {
         P2pError::RelayUnreachable => DirectError::Relay(RelayUnavailable::Unreachable),
         P2pError::RelayRefused(refusal) => DirectError::Relay(RelayUnavailable::Refused(refusal)),
+        // A relay that shows another certificate than the pinned one is not used (FR-4.9).
+        P2pError::RelayCertMismatch => DirectError::Relay(RelayUnavailable::Untrusted),
+        // The outer link or the pairing broke: from the user's view the relay is not usable.
+        P2pError::RelayFailed => DirectError::Relay(RelayUnavailable::Unreachable),
         other => other.into(),
     }
 }
@@ -902,6 +906,27 @@ mod tests {
             Err(DirectError::Relay(r)) => format!("relay:{r:?}"),
             Err(e) => format!("{e:?}"),
         }
+    }
+
+    #[test]
+    fn relay_errors_map_to_relay_reasons() {
+        let reason = |e| match relay_error(e) {
+            DirectError::Relay(r) => Some(r),
+            _ => None,
+        };
+        assert_eq!(
+            reason(P2pError::RelayUnreachable),
+            Some(RelayUnavailable::Unreachable)
+        );
+        assert_eq!(
+            reason(P2pError::RelayCertMismatch),
+            Some(RelayUnavailable::Untrusted)
+        );
+        assert_eq!(
+            reason(P2pError::RelayFailed),
+            Some(RelayUnavailable::Unreachable)
+        );
+        assert_eq!(reason(P2pError::BadPeerHash), None);
     }
 
     #[test]

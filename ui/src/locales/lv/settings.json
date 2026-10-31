@@ -564,7 +564,8 @@
   "privacyDirect": {
     "title": "Tiešie savienojumi",
     "allow": "Atļaut tiešos savienojumus ar citiem Mumcord lietotājiem",
-    "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots."
+    "hint": "Tiešie savienojumi ir ātrāki, bet otra persona var redzēt tavu IP adresi. Kamēr neesi izlēmis, Mumcord jautā pirmajā reizē, kad tāds tiktu izmantots.",
+    "notUsed": "Izvēlētajā peer-to-peer režīmā netiek izmantots: Mumcord nekad neveido tiešu savienojumu ar citiem."
   },
   "updates": {
     "title": "Atjauninājumi",

@@ -568,7 +568,8 @@
   "privacyDirect": {
     "title": "Konnessjonijiet diretti",
     "allow": "Ippermetti konnessjonijiet diretti ma' utenti oħra ta' Mumcord",
-    "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda."
+    "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda.",
+    "notUsed": "Mhux użat fil-modalità peer-to-peer magħżula: Mumcord qatt ma jikkonnettja direttament ma' nies oħra."
   },
   "updates": {
     "title": "Aġġornamenti",
