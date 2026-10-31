@@ -118,4 +118,21 @@ describe("chat: private message rules and message requests (#141)", () => {
     await pmRow(BOT).waitForDisplayed();
     await closeMessagesOverview();
   });
+
+  it("Revoke chat consent in the person menu turns the next private message into a request again", async () => {
+    const person = $(`//div[contains(@class,'tree-person') and contains(.,'${BOT}')]`);
+    await person.waitForDisplayed({ timeout: 10_000 });
+    await person.click({ button: "right" });
+    const revoke = $("//*[@role='menuitem'][normalize-space()='Revoke chat consent…']");
+    await revoke.waitForClickable();
+    await revoke.click();
+    const dialog = $(`//dialog[.//*[contains(.,'Revoke chat consent for ${BOT}?')]]`);
+    await dialog.waitForDisplayed();
+    await dialog.$("//button[normalize-space()='Revoke']").click();
+    await dialog.waitForDisplayed({ reverse: true });
+
+    await stranger.run(`pm ${USER} "after revoke"`);
+    await requestsEntry().waitForDisplayed({ timeout: 15_000 });
+    await expect(requestsEntry().$(".requests-entry__count")).toHaveText("1");
+  });
 });
