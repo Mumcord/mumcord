@@ -32,7 +32,9 @@ export function ShareMiniBar({ serverId }: { serverId: number }): ReactNode {
       status={live?.paused ? t("paused", { name }) : t("live")}
       openLabel={tc("media.open")}
       closeLabel={t("stop")}
-      onOpen={() => openMedia("share")}
+      onOpen={() => {
+        openMedia("share");
+      }}
       onClose={() => {
         // The sharer never watches their own picture, so here "Stop" only leaves the mini bar.
         if (!watchingYourOwn) stopWatching();

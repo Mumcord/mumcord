@@ -11,7 +11,7 @@ import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
 import { MediaPanel } from "../media/MediaPanel";
-import { bitrate } from "../media/format";
+import { bitrate, dimension } from "../media/format";
 import { setTab, useMediaView } from "../media/mediaView";
 import { useScreenShares } from "./sharesStore";
 import { useWatchedShare } from "./watching";
@@ -87,7 +87,7 @@ export function ViewerPanel(): ReactNode {
         <span className="viewer-panel__quality">
           {quality === null
             ? t("unknown")
-            : `${String(quality.width)}×${String(quality.height)}, ${bitrate(quality.kbps)}`}
+            : `${dimension(quality.width, quality.height)}, ${bitrate(quality.kbps)}`}
         </span>
       </p>
       <h3 className="viewer-panel__heading">

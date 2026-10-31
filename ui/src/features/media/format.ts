@@ -13,6 +13,11 @@ export function clockTime(seconds: number): string {
   return h > 0 ? `${String(h)}:${String(m).padStart(2, "0")}:${ss}` : `${String(m)}:${ss}`;
 }
 
+/** Picture size as the chip shows it: 1920, 1080 → "1920×1080". */
+export function dimension(width: number, height: number): string {
+  return `${String(width)}×${String(height)}`;
+}
+
 /** Kilobit per second as the chip shows it: 42300 → "42.3 Mbit/s", 900 → "900 kbit/s". */
 export function bitrate(kbps: number): string {
   if (kbps >= 1000) return `${(kbps / 1000).toFixed(1)} Mbit/s`;

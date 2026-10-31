@@ -12,7 +12,7 @@ import { getApi, type WatchStats } from "../../api";
 import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
-import { bitrate } from "../media/format";
+import { bitrate, dimension } from "../media/format";
 import { MediaFrame } from "../media/MediaFrame";
 import { VolumeControl } from "../media/VolumeControl";
 import { mediaView, setFit, setFocus, useMediaView, type FitMode } from "../media/mediaView";
@@ -217,7 +217,7 @@ function Chips({
     <span className="media-frame__chips">
       <span
         data-tooltip={t("resolution")}
-      >{`$${String(shown.width)}×$${String(shown.height)}`}</span>
+      >{dimension(shown.width, shown.height)}</span>
       <span data-tooltip={t("frameRate")}>{`${String(shown.fps)} fps`}</span>
       <span data-tooltip={t("bitrate")}>{bitrate(shown.kbps)}</span>
       <span data-tooltip={t("path")}>{t(path === null ? "pathUnknown" : "pathDirect")}</span>
@@ -261,7 +261,7 @@ function StreamDetails({
     <div className="stream-details" role="group" aria-label={t("streamDetails")}>
       <p>
         <span>{t("resolution")}</span>
-        <span>{`$${String(shown.width)}×$${String(shown.height)}`}</span>
+        <span>{dimension(shown.width, shown.height)}</span>
       </p>
       <p>
         <span>{t("frameRate")}</span>

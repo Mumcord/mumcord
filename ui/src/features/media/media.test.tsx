@@ -1,6 +1,6 @@
 /** The media view store, the time and bitrate figures and the sync state of a player (issue #163). */
 import { describe, expect, it } from "vitest";
-import { behindSeconds, bitrate, clockTime } from "./format";
+import { behindSeconds, bitrate, clockTime, dimension } from "./format";
 import { closeMedia, leaveCinema, mediaView, openMedia, resetMediaView, setTab } from "./mediaView";
 import { syncState, outOfSync } from "../watchparty/syncState";
 
@@ -9,6 +9,11 @@ describe("figures", () => {
     expect(clockTime(432)).toBe("7:12");
     expect(clockTime(3723)).toBe("1:02:03");
     expect(clockTime(-1)).toBe("0:00");
+  });
+
+  it("shows a picture size as width × height", () => {
+    expect(dimension(1920, 1080)).toBe("1920×1080");
+    expect(dimension(0, 0)).toBe("0×0");
   });
 
   it("shows a bitrate in megabits when it is over a megabit", () => {
