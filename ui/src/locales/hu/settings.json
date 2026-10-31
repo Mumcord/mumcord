@@ -158,6 +158,20 @@
     "processing": "Hangfeldolgozás",
     "noiseSuppression": "Zajszűrés",
     "noiseSuppressionHint": "Kiszűri a háttérzajt, például a billentyűzetet és a ventilátorokat.",
+    "noiseChoice": {
+      "light": "Gyenge",
+      "standard": "Normál",
+      "advanced": "Speciális (MI)",
+      "off": "Ki"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasszikus szűrő egyenletes zajhoz, például ventilátorhoz vagy zúgáshoz. A legkisebb processzorterhelés.",
+      "standard": "MI-szűrő hétköznapi zajhoz, például billentyűzethez és ventilátorhoz. Kis processzorterhelés.",
+      "advanced": "Újabb MI-modell, amely a változó zajt is eltávolítja. Körülbelül háromszor annyi processzor, mint a Normál, és 10 ms-mal több késleltetés."
+    },
+    "noiseChoiceBeta": "Béta",
+    "noiseChoiceTipLabel": "Erről: {{choice}}",
+    "detectorHint": "A beszédaktiválás a RNNoise modellel ismeri fel a beszédet; nem módosítja a hangot.",
     "echoCancellation": "Visszhangszűrés",
     "echoCancellationHint": "Megakadályozza, hogy mások visszahallják magukat, ha hangszórót használsz.",
     "autoGain": "Automatikus hangerő",

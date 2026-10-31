@@ -158,6 +158,20 @@
     "processing": "Stemverwerking",
     "noiseSuppression": "Ruisonderdrukking",
     "noiseSuppressionHint": "Filtert achtergrondgeluid zoals toetsenborden en ventilatoren.",
+    "noiseChoice": {
+      "light": "Licht",
+      "standard": "Standaard",
+      "advanced": "Geavanceerd (AI)",
+      "off": "Uit"
+    },
+    "noiseChoiceHint": {
+      "light": "Klassiek filter voor constant geluid zoals ventilatoren of brom. Laagste CPU-gebruik.",
+      "standard": "AI-filter voor alledaags geluid zoals toetsenborden en ventilatoren. Laag CPU-gebruik.",
+      "advanced": "Nieuwer AI-model dat ook wisselend geluid verwijdert. Ongeveer drie keer de CPU van Standaard en 10 ms meer vertraging."
+    },
+    "noiseChoiceBeta": "Bèta",
+    "noiseChoiceTipLabel": "Over {{choice}}",
+    "detectorHint": "Spraakactivering herkent spraak met het RNNoise-model; het verandert je audio niet.",
     "echoCancellation": "Echo-onderdrukking",
     "echoCancellationHint": "Voorkomt dat anderen zichzelf horen als je luidsprekers gebruikt.",
     "autoGain": "Automatisch volume",

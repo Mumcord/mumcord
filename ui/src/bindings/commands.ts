@@ -1827,6 +1827,15 @@ export type MusicService = "spotify" | "soundcloud" | "youtubeMusic" | "appleMus
 /**  Another page that says it is music. */
 "other";
 
+/**  Which noise suppression runs while it is on (Settings → Voice, FR-3.65). */
+export type NoiseBackend = 
+/**  "Light". */
+"light" | 
+/**  "Standard", the default. */
+"standard" | 
+/**  "Advanced (AI)", Beta. */
+"advanced";
+
 /**
  *  The user clicked a system notification; the window is already in front. Show the server
  *  and open this chat.
@@ -2470,6 +2479,8 @@ export type Settings = {
 	inputDevice: string | null,
 	outputDevice: string | null,
 	noiseSuppression: boolean,
+	/**  Selected noise suppression (default Standard). */
+	noiseSuppressionBackend: NoiseBackend,
 	echoCancellation: boolean,
 	autoGain: boolean,
 	/**  Manual microphone gain in percent, 0–200 (default 100). */

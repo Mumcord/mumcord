@@ -196,6 +196,18 @@ pub enum VoiceActivation {
     Manual,
 }
 
+/// Which noise suppression runs while it is on (Settings → Voice, FR-3.65).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum NoiseBackend {
+    /// "Light".
+    Light,
+    /// "Standard", the default.
+    Standard,
+    /// "Advanced (AI)", Beta.
+    Advanced,
+}
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum CloseBehaviour {
@@ -445,6 +457,8 @@ pub struct Settings {
     pub input_device: Option<String>,
     pub output_device: Option<String>,
     pub noise_suppression: bool,
+    /// Selected noise suppression (default Standard).
+    pub noise_suppression_backend: NoiseBackend,
     pub echo_cancellation: bool,
     pub auto_gain: bool,
     /// Manual microphone gain in percent, 0–200 (default 100).
@@ -574,6 +588,11 @@ impl Settings {
             input_device: s.input_device.clone(),
             output_device: s.output_device.clone(),
             noise_suppression: s.noise_suppression,
+            noise_suppression_backend: match s.noise_suppression_backend {
+                store::NoiseBackend::Light => NoiseBackend::Light,
+                store::NoiseBackend::Standard => NoiseBackend::Standard,
+                store::NoiseBackend::Advanced => NoiseBackend::Advanced,
+            },
             echo_cancellation: s.echo_cancellation,
             auto_gain: s.auto_gain,
             input_gain_percent: s.input_gain_percent,
@@ -696,6 +715,11 @@ impl Settings {
         s.input_device = self.input_device.clone().filter(|d| !d.is_empty());
         s.output_device = self.output_device.clone().filter(|d| !d.is_empty());
         s.noise_suppression = self.noise_suppression;
+        s.noise_suppression_backend = match self.noise_suppression_backend {
+            NoiseBackend::Light => store::NoiseBackend::Light,
+            NoiseBackend::Standard => store::NoiseBackend::Standard,
+            NoiseBackend::Advanced => store::NoiseBackend::Advanced,
+        };
         s.echo_cancellation = self.echo_cancellation;
         s.auto_gain = self.auto_gain;
         s.input_gain_percent = self.input_gain_percent.min(200);

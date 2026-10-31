@@ -6,12 +6,15 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use mumcord_audio::dsp::{DspControls, TalkMode as DspTalkMode};
+use mumcord_audio::dsp::{
+    Backend as DspBackend, DspControls, SuppressionLevel as DspSuppressionLevel,
+    TalkMode as DspTalkMode,
+};
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 use mumcord_protocol::{ClientIdentity, ConnectConfig, ConnectError};
 use mumcord_store::{
-    Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, P2pMode, SavedServer,
-    SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
+    Identity, IdentityId, IdentityRecord, NewIdentity, NewServer, NoiseBackend, P2pMode,
+    SavedServer, SecretStore, ServerId, Settings, TalkMode, UnixMillis, VoiceActivation,
 };
 
 use super::channel_audio::effective_settings;
@@ -29,6 +32,17 @@ const TEST_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(15);
 pub(crate) fn apply_dsp(controls: &DspControls, settings: &Settings) {
     controls.set_echo_cancellation(settings.echo_cancellation);
     controls.set_noise_suppression(settings.noise_suppression);
+    // The backend is built here, on the settings thread, never in the audio path. Every choice is
+    // a plain level without its own options, so `sonora-ns` (Light) runs at one fixed strength:
+    // Moderate, about 12 dB, which removes steady noise without thinning the voice.
+    controls.set_noise_backend(
+        match settings.noise_suppression_backend {
+            NoiseBackend::Light => DspBackend::Sonora,
+            NoiseBackend::Standard => DspBackend::Nnnoiseless,
+            NoiseBackend::Advanced => DspBackend::Rnnoise,
+        },
+        DspSuppressionLevel::Moderate,
+    );
     controls.set_auto_gain(settings.auto_gain);
     controls.set_input_gain_percent(settings.input_gain_percent);
     controls.set_music_quality(settings.music_quality);
@@ -869,6 +883,28 @@ mod tests {
         let mut zero = fields("x", "host", "me");
         zero.port = 0;
         assert!(validated(&zero).is_err());
+    }
+
+    /// The Settings choices (FR-3.65) select their libraries; Light runs at its fixed strength.
+    #[test]
+    fn each_noise_choice_selects_its_backend() {
+        let controls = DspControls::default();
+        apply_dsp(&controls, &Settings::default());
+        assert_eq!(controls.noise_backend(), DspBackend::Nnnoiseless);
+
+        for (choice, backend) in [
+            (NoiseBackend::Light, DspBackend::Sonora),
+            (NoiseBackend::Advanced, DspBackend::Rnnoise),
+            (NoiseBackend::Standard, DspBackend::Nnnoiseless),
+        ] {
+            let settings = Settings {
+                noise_suppression_backend: choice,
+                ..Settings::default()
+            };
+            apply_dsp(&controls, &settings);
+            assert_eq!(controls.noise_backend(), backend);
+        }
+        assert_eq!(controls.suppression_level(), DspSuppressionLevel::Moderate);
     }
 
     async fn engine() -> (tempfile::TempDir, Engine) {
