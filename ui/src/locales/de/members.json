@@ -55,11 +55,12 @@
   "menu": {
     "label": "Aktionen für {{name}}",
     "viewProfile": "Profil ansehen",
+    "sendMessage": "Nachricht senden",
     "join": "{{channel}} beitreten",
-    "joinDenied": "Du darfst diesen Kanal nicht betreten.",
+    "joinFull": "Dieser Kanal ist voll.",
+    "joinLocked": "Du darfst diesen Kanal nicht betreten, oder er braucht ein Passwort.",
     "mute": "Für mich stummschalten",
     "connectionInfo": "Verbindungsinfo …",
-    "chatRequest": "Chatanfrage senden …",
     "chatRequestPending": "Chatanfrage ausstehend"
   },
   "nowPlaying": {

@@ -58,11 +58,12 @@
   "menu": {
     "label": "Gníomhartha do {{name}}",
     "viewProfile": "Féach ar an bpróifíl",
+    "sendMessage": "Seol teachtaireacht",
     "join": "Téigh isteach i {{channel}}",
-    "joinDenied": "Níl cead agat dul isteach sa chainéal seo.",
+    "joinFull": "Tá an cainéal seo lán.",
+    "joinLocked": "Níl cead agat dul isteach sa chainéal seo, nó teastaíonn pasfhocal uaidh.",
     "mute": "Balbhaigh dom",
     "connectionInfo": "Faisnéis cheangail…",
-    "chatRequest": "Seol iarratas comhrá…",
     "chatRequestPending": "Iarratas comhrá ar feitheamh"
   },
   "nowPlaying": {

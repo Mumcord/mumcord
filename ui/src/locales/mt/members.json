@@ -58,11 +58,12 @@
   "menu": {
     "label": "Azzjonijiet għal {{name}}",
     "viewProfile": "Ara l-profil",
+    "sendMessage": "Ibgħat messaġġ",
     "join": "Ingħaqad ma' {{channel}}",
-    "joinDenied": "M'intix permess tidħol f'dan il-kanal.",
+    "joinFull": "Dan il-kanal huwa mimli.",
+    "joinLocked": "M’għandekx permess tidħol f’dan il-kanal, jew jeħtieġ password.",
     "mute": "Mutja għalija",
     "connectionInfo": "Informazzjoni dwar il-konnessjoni…",
-    "chatRequest": "Ibgħat talba għal chat…",
     "chatRequestPending": "Talba għal chat pendenti"
   },
   "nowPlaying": {

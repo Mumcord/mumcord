@@ -182,7 +182,7 @@ describe("chat request from the person menu", () => {
     act(() => {
       openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
     });
-    fireEvent.click(screen.getByRole("menuitem", { name: "Send chat request…" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Send message" }));
     const dialog = screen.getByRole("dialog", { name: "Chat request to Anna" });
     fireEvent.change(within(dialog).getByLabelText("Note (optional)"), {
       target: { value: "  Hello there " },
@@ -196,7 +196,10 @@ describe("chat request from the person menu", () => {
     act(() => {
       openPersonMenu({ session: 2, x: 10, y: 10, opener: null });
     });
-    expect(screen.getByRole("menuitem", { name: "Chat request pending" })).toHaveAttribute(
+    expect(screen.getByRole("menuitem", { name: "Send message" })).toHaveAccessibleDescription(
+      "Chat request pending",
+    );
+    expect(screen.getByRole("menuitem", { name: "Send message" })).toHaveAttribute(
       "aria-disabled",
       "true",
     );

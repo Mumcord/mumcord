@@ -57,11 +57,12 @@
   "menu": {
     "label": "Akce pro {{name}}",
     "viewProfile": "Zobrazit profil",
+    "sendMessage": "Poslat zprávu",
     "join": "Připojit se k {{channel}}",
-    "joinDenied": "Do tohoto kanálu nemáte přístup.",
+    "joinFull": "Tento kanál je plný.",
+    "joinLocked": "Do tohoto kanálu nesmíš vstoupit, nebo vyžaduje heslo.",
     "mute": "Ztlumit pro mě",
     "connectionInfo": "Informace o připojení…",
-    "chatRequest": "Poslat žádost o chat…",
     "chatRequestPending": "Žádost o chat čeká na vyřízení"
   },
   "nowPlaying": {

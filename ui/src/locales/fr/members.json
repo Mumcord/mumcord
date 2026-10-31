@@ -56,11 +56,12 @@
   "menu": {
     "label": "Actions pour {{name}}",
     "viewProfile": "Voir le profil",
+    "sendMessage": "Envoyer un message",
     "join": "Rejoindre {{channel}}",
-    "joinDenied": "Vous n'êtes pas autorisé à entrer dans ce canal.",
+    "joinFull": "Ce canal est plein.",
+    "joinLocked": "Vous n'êtes pas autorisé à entrer dans ce canal, ou il demande un mot de passe.",
     "mute": "Mettre en sourdine pour moi",
     "connectionInfo": "Infos de connexion…",
-    "chatRequest": "Envoyer une demande de chat…",
     "chatRequestPending": "Demande de chat en attente"
   },
   "nowPlaying": {

@@ -55,11 +55,12 @@
   "menu": {
     "label": "Actions for {{name}}",
     "viewProfile": "View profile",
+    "sendMessage": "Send message",
     "join": "Join {{channel}}",
-    "joinDenied": "You are not allowed to enter this channel.",
+    "joinFull": "This channel is full.",
+    "joinLocked": "You may not enter this channel, or it needs a password.",
     "mute": "Mute for me",
     "connectionInfo": "Connection info…",
-    "chatRequest": "Send chat request…",
     "chatRequestPending": "Chat request pending"
   },
   "nowPlaying": {

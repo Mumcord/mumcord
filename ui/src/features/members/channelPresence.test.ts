@@ -11,6 +11,7 @@ const lobby: ChannelInfo = {
   permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
   description: null,
   hasDescription: false,
+  maxUsers: null,
 };
 
 function user(session: number, name: string, change: Partial<User> = {}): User {

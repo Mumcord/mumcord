@@ -55,11 +55,12 @@
   "menu": {
     "label": "Toimingud: {{name}}",
     "viewProfile": "Vaata profiili",
+    "sendMessage": "Saada sõnum",
     "join": "Liitu kanaliga {{channel}}",
-    "joinDenied": "Sul pole luba sellesse kanalisse siseneda.",
+    "joinFull": "See kanal on täis.",
+    "joinLocked": "Sa ei tohi sellesse kanalisse siseneda või see vajab parooli.",
     "mute": "Vaigista minu jaoks",
     "connectionInfo": "Ühenduse teave…",
-    "chatRequest": "Saada vestlustaotlus…",
     "chatRequestPending": "Vestlustaotlus ootel"
   },
   "nowPlaying": {

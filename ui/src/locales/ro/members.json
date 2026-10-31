@@ -56,11 +56,12 @@
   "menu": {
     "label": "Acțiuni pentru {{name}}",
     "viewProfile": "Vezi profilul",
+    "sendMessage": "Trimite mesaj",
     "join": "Intră în {{channel}}",
-    "joinDenied": "Nu ai voie să intri pe acest canal.",
+    "joinFull": "Acest canal este plin.",
+    "joinLocked": "Nu ai voie să intri pe acest canal sau acesta necesită o parolă.",
     "mute": "Fără sunet pentru mine",
     "connectionInfo": "Informații conexiune…",
-    "chatRequest": "Trimite cerere de chat…",
     "chatRequestPending": "Cerere de chat în așteptare"
   },
   "nowPlaying": {

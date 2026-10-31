@@ -27,6 +27,7 @@ const channel = (id: number): ChannelInfo => ({
   permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
   description: null,
   hasDescription: false,
+  maxUsers: null,
 });
 
 describe("server store", () => {
@@ -57,6 +58,7 @@ describe("server store", () => {
           permissions: { enter: true, textMessage: true, listen: true, registerSelf: false },
           description: null,
           hasDescription: false,
+          maxUsers: null,
         },
       });
       api.mock.emit("userRemoved", { serverId: 1, session: 2 });

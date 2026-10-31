@@ -35,6 +35,8 @@ pub struct ChannelInfo {
     /// True when the channel has a description, even if only its hash is known yet; then
     /// `channel_description_request` fetches the text (FR-1.48b).
     pub has_description: bool,
+    /// The channel's user limit; `null` when it has none.
+    pub max_users: Option<u32>,
 }
 
 /// A channel was added or changed.
@@ -146,6 +148,7 @@ impl From<ChannelView> for ChannelInfo {
             },
             description: v.description,
             has_description: v.has_description,
+            max_users: v.max_users,
         }
     }
 }

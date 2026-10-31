@@ -55,11 +55,12 @@
   "menu": {
     "label": "Acties voor {{name}}",
     "viewProfile": "Profiel bekijken",
+    "sendMessage": "Bericht sturen",
     "join": "Naar {{channel}} gaan",
-    "joinDenied": "Je mag dit kanaal niet betreden.",
+    "joinFull": "Dit kanaal is vol.",
+    "joinLocked": "Je mag dit kanaal niet betreden, of het vraagt om een wachtwoord.",
     "mute": "Voor mij dempen",
     "connectionInfo": "Verbindingsinfo…",
-    "chatRequest": "Chatverzoek sturen…",
     "chatRequestPending": "Chatverzoek in behandeling"
   },
   "nowPlaying": {

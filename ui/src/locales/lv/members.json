@@ -56,11 +56,12 @@
   "menu": {
     "label": "Darbības: {{name}}",
     "viewProfile": "Skatīt profilu",
+    "sendMessage": "Sūtīt ziņu",
     "join": "Pievienoties kanālam {{channel}}",
-    "joinDenied": "Jums nav atļaujas ieiet šajā kanālā.",
+    "joinFull": "Šis kanāls ir pilns.",
+    "joinLocked": "Tev nav atļauts ieiet šajā kanālā, vai tam vajag paroli.",
     "mute": "Izslēgt man",
     "connectionInfo": "Savienojuma informācija…",
-    "chatRequest": "Sūtīt tērzēšanas pieprasījumu…",
     "chatRequestPending": "Tērzēšanas pieprasījums gaida"
   },
   "nowPlaying": {

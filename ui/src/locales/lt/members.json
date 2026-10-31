@@ -57,11 +57,12 @@
   "menu": {
     "label": "{{name}} veiksmai",
     "viewProfile": "Peržiūrėti profilį",
+    "sendMessage": "Siųsti žinutę",
     "join": "Prisijungti prie {{channel}}",
-    "joinDenied": "Neturite teisės įeiti į šį kanalą.",
+    "joinFull": "Šis kanalas pilnas.",
+    "joinLocked": "Tau negalima įeiti į šį kanalą arba jam reikia slaptažodžio.",
     "mute": "Nutildyti man",
     "connectionInfo": "Ryšio informacija…",
-    "chatRequest": "Siųsti pokalbio prašymą…",
     "chatRequestPending": "Pokalbio prašymas laukia"
   },
   "nowPlaying": {

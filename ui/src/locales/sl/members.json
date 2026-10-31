@@ -57,11 +57,12 @@
   "menu": {
     "label": "Dejanja za {{name}}",
     "viewProfile": "Ogled profila",
+    "sendMessage": "Pošlji sporočilo",
     "join": "Pridruži se kanalu {{channel}}",
-    "joinDenied": "Nimate dovoljenja za vstop v ta kanal.",
+    "joinFull": "Ta kanal je poln.",
+    "joinLocked": "V ta kanal ne smeš vstopiti ali pa zahteva geslo.",
     "mute": "Utišaj zame",
     "connectionInfo": "Podatki o povezavi…",
-    "chatRequest": "Pošlji prošnjo za klepet…",
     "chatRequestPending": "Prošnja za klepet čaka"
   },
   "nowPlaying": {

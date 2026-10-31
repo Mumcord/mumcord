@@ -55,11 +55,12 @@
   "menu": {
     "label": "Åtgärder för {{name}}",
     "viewProfile": "Visa profil",
+    "sendMessage": "Skicka meddelande",
     "join": "Gå med i {{channel}}",
-    "joinDenied": "Du har inte behörighet att gå in i den här kanalen.",
+    "joinFull": "Den här kanalen är full.",
+    "joinLocked": "Du får inte gå in i den här kanalen, eller så kräver den ett lösenord.",
     "mute": "Stäng av för mig",
     "connectionInfo": "Anslutningsinfo…",
-    "chatRequest": "Skicka chattförfrågan…",
     "chatRequestPending": "Chattförfrågan väntar"
   },
   "nowPlaying": {

@@ -55,11 +55,12 @@
   "menu": {
     "label": "Handlinger for {{name}}",
     "viewProfile": "Se profil",
+    "sendMessage": "Send besked",
     "join": "Gå til {{channel}}",
-    "joinDenied": "Du har ikke adgang til denne kanal.",
+    "joinFull": "Denne kanal er fuld.",
+    "joinLocked": "Du må ikke gå ind i denne kanal, eller den kræver en adgangskode.",
     "mute": "Slå lyden fra for mig",
     "connectionInfo": "Forbindelsesinfo…",
-    "chatRequest": "Send chatanmodning…",
     "chatRequestPending": "Chatanmodning afventer"
   },
   "nowPlaying": {

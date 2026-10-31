@@ -56,11 +56,12 @@
   "menu": {
     "label": "Radnje za {{name}}",
     "viewProfile": "Pogledaj profil",
+    "sendMessage": "Pošalji poruku",
     "join": "Pridruži se kanalu {{channel}}",
-    "joinDenied": "Nemate dopuštenje za ulazak u ovaj kanal.",
+    "joinFull": "Ovaj kanal je pun.",
+    "joinLocked": "Ne smiješ ući u ovaj kanal ili je potrebna lozinka.",
     "mute": "Utišaj za mene",
     "connectionInfo": "Informacije o vezi…",
-    "chatRequest": "Pošalji zahtjev za razgovor…",
     "chatRequestPending": "Zahtjev za razgovor na čekanju"
   },
   "nowPlaying": {

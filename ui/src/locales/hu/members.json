@@ -55,11 +55,12 @@
   "menu": {
     "label": "Műveletek: {{name}}",
     "viewProfile": "Profil megtekintése",
+    "sendMessage": "Üzenet küldése",
     "join": "Csatlakozás: {{channel}}",
-    "joinDenied": "Nincs jogosultságod belépni ebbe a csatornába.",
+    "joinFull": "Ez a csatorna megtelt.",
+    "joinLocked": "Nem léphetsz be ebbe a csatornába, vagy jelszó kell hozzá.",
     "mute": "Némítás nálam",
     "connectionInfo": "Kapcsolati adatok…",
-    "chatRequest": "Csevegési kérés küldése…",
     "chatRequestPending": "Csevegési kérés függőben"
   },
   "nowPlaying": {

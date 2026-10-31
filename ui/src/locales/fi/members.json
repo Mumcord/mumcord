@@ -55,11 +55,12 @@
   "menu": {
     "label": "Toiminnot: {{name}}",
     "viewProfile": "Näytä profiili",
+    "sendMessage": "Lähetä viesti",
     "join": "Liity kanavalle {{channel}}",
-    "joinDenied": "Sinulla ei ole oikeutta liittyä tälle kanavalle.",
+    "joinFull": "Tämä kanava on täynnä.",
+    "joinLocked": "Et voi liittyä tälle kanavalle, tai se vaatii salasanan.",
     "mute": "Mykistä minulta",
     "connectionInfo": "Yhteyden tiedot…",
-    "chatRequest": "Lähetä keskustelupyyntö…",
     "chatRequestPending": "Keskustelupyyntö odottaa"
   },
   "nowPlaying": {

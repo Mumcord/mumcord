@@ -57,11 +57,12 @@
   "menu": {
     "label": "Akcje dla {{name}}",
     "viewProfile": "Zobacz profil",
+    "sendMessage": "Wyślij wiadomość",
     "join": "Dołącz do {{channel}}",
-    "joinDenied": "Nie masz uprawnień do wejścia na ten kanał.",
+    "joinFull": "Ten kanał jest pełny.",
+    "joinLocked": "Nie możesz wejść na ten kanał albo wymaga on hasła.",
     "mute": "Wycisz dla mnie",
     "connectionInfo": "Informacje o połączeniu…",
-    "chatRequest": "Wyślij prośbę o czat…",
     "chatRequestPending": "Prośba o czat oczekuje"
   },
   "nowPlaying": {
