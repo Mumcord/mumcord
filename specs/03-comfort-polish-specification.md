@@ -76,8 +76,8 @@ Everything in this epic is local to the client. The server enforces only what it
 - **FR-3.63** It applies when the user joins that channel and the previous values return when they leave. Precedence: channel profile > global setting; the server's bandwidth limit and the per-packet limit (QA.82) always win. (The issue mentions a "server profile"; none exists, see Q1.10.)
 - **FR-3.64** Set from the channel-name menu ("Audio for this channel…", #170), the channel's right-click menu in the tree (#172) and channel info. A ♪ or ⚡ badge marks channels with a profile (with a text label for screen readers). The active source is shown in the connection info and quick panel ("Music quality (channel profile)"). "Remove profile" returns to the defaults.
 
-**High-quality noise suppression (#176, Beta)**
-- **FR-3.65** Settings → Voice offers noise suppression "Standard (light)" (nnnoiseless, default), "High quality (Beta, more CPU)" (Mumcord/rnnoise-rs, RNNoise 2024 model) and Off, with a CPU note.
+**Noise suppression levels and Advanced (AI) (#176, PR #126, Beta)**
+- **FR-3.65** The setup wizard and Settings → Voice offer noise suppression as four levels, weakest first: **Light** (sonora-ns, one fixed strength, for steady noise, lowest CPU), **Standard** (nnnoiseless, default), **Advanced (AI)** with a Beta badge (Mumcord/rnnoise-rs, RNNoise 2024 model, about three times the CPU of Standard) and **Off**. A "?" InfoTip next to each level says what it is good for and its CPU cost. No level has options of its own (sonora-ns's strength setting from PR #126 was dropped), and there is no consent gate for rnnoise-rs, since it comes from Mumcord's own fork. Settings rows that stored a library name load as the matching level.
 - **FR-3.66** The fork is a git dependency pinned to a tag, used only in crates Mumcord does not publish (or behind a feature the published crates don't enable). It builds on the backend selection of PR #126.
 - **FR-3.67** Weights ship in the app only if the size is acceptable; otherwise they are downloaded on first use after the user turns the option on, with a verified checksum.
 - **FR-3.68** If processing overloads (audio health rating, #152), Mumcord falls back to the light backend with a notice. Low-latency mode turns it off unless the user forces it.
@@ -310,7 +310,7 @@ Built features also have screenshots in `docs/images/screenshots/` (e.g. `connec
 
 - **Low-latency mode (FR-3.56):** 10 ms frames are the smallest size Mumble's 10 ms sequence numbering supports; restricted low-delay Opus has no in-band FEC, so loss is concealed only. Both encoders exist from the start because creating one allocates, which the real-time thread must not do. Target ≈ 35–45 ms mouth to ear on a good wired link with ≈ 20 ms ping vs ≈ 90 ms normally. UDP header overhead roughly doubles (≈ 29 instead of ≈ 15 kbit/s).
 - **Per-channel profiles (FR-3.62):** applied on the own channel join; never sent to the server.
-- **High-quality noise suppression (FR-3.65):** runs in the capture path under the real-time protection of #150; must not cause real-time demotions on a typical x86 desktop; int8 model where fast, else float.
+- **Advanced (AI) noise suppression (FR-3.65):** runs in the capture path under the real-time protection of #150; must not cause real-time demotions on a typical x86 desktop; int8 model where fast, else float.
 - **Whisper and shout (FR-3.70):** standard `VoiceTarget` messages and voice packet target ids; nothing new on the wire.
 - **Link cards (FR-3.96):** the standard public UDP ping (protobuf form for 1.5+ servers, legacy form for older ones); no TLS connection.
 - **Server info (FR-3.81):** `Version`, `ServerConfig`, `ServerSync`, `PermissionQuery` and the server's TLS leaf certificate.
@@ -357,7 +357,7 @@ stateDiagram-v2
 No new stack; spec 01 and spec 02 decisions stay. New pieces, each with a reason:
 
 - **Tauri updater plugin + minisign key** (#168): official, handles download, signature check, install and relaunch on Windows, macOS and AppImage. The AppImage uses the same plugin path; stable channel only in 0.5.0, the portable zip only gets "Notify only", and the private key is a CI secret with rotation in `docs/release-signing.md` (Q1.12).
-- **Mumcord/rnnoise-rs** (#176): pure Rust, BSD-3-Clause fork with SIMD, int8 and real-time safety work; pinned git tag, never in published crates.
+- **Mumcord/rnnoise-rs** (#176): pure Rust, BSD-3-Clause fork with SIMD, int8 and real-time safety work; pinned to a commit (rev), only in the unpublished engine crate, never in published crates.
 - **x509-parser** (#147, PR #192): reads the server certificate details in the protocol layer.
 - **PipeWire enumeration and node targeting** on Linux (#183, PR #194), ALSA as fallback.
 - **Global-shortcuts portal** on Wayland (#64), reusing the push-to-talk approach of spec 01.
@@ -380,7 +380,7 @@ No new stack; spec 01 and spec 02 decisions stay. New pieces, each with a reason
 - **Portable Windows zip** (#181, done): built next to the NSIS installer, included in `SHA256SUMS`, the SBOM and the release manifest, smoke-tested in CI.
 - **Windows signing** (#180): Azure Artifact Signing variables in the GitHub environment `release`, federated credential for `repo:Mumcord/mumcord:environment:release`; `signtool verify` in CI; a test release on a clean Windows VM.
 - **Updater bundles** (#168): a new minisign key pair; the private key only as a CI secret, the public key in the app; signed update bundles for Windows, macOS and AppImage; an integration test against a local update server (`MUMCORD_UPDATE_URL`).
-- **rnnoise-rs** (#176): pinned git tag; model weights in the app or a checksummed download.
+- **rnnoise-rs** (#176): pinned to a commit (rev); model weights in the app or a checksummed download.
 - **Rust style** (#108): one reformat commit and per-area lint PRs.
 
 ## 11. Acceptance criteria (verifiable in the running client)
@@ -394,7 +394,7 @@ Voice & audio:
 - **AC-3.53** Turn on low-latency mode → warnings shown; outgoing packets are 10 ms with one frame each; an official Mumble client in the same channel plays the audio correctly; the estimate shows every part and a clearly lower total than normal mode.
 - **AC-3.54** Low-latency mode with 5 % simulated loss → stays usable, concealment counters rise, no crash or stall.
 - **AC-3.55** Set "Music quality + high bitrate" for channel Music → join Music → both active and shown as "(channel profile)" with a ♪ badge; leave → previous values return; remove the profile → defaults.
-- **AC-3.56** Select "High quality (Beta)" noise suppression → voice still reaches the second client; under the live load test no real-time demotion; forced overload → fallback to Standard with a notice.
+- **AC-3.56** Select "Advanced (AI)" noise suppression → voice still reaches the second client; under the live load test no real-time demotion; forced overload → fallback to Standard with a notice.
 - **AC-3.57** Linux with PipeWire and a multi-endpoint interface → every endpoint is listed with its friendly name; choice survives replug and restart.
 - **AC-3.58** Set a whisper target to the second client and hold its key → only that client hears the user, the voice bar shows the target, the receiver sees the whisper mark; an official client as receiver also hears it.
 - **AC-3.59** Assign a global hotkey to mute; with Mumcord in the background press it → muted; assigning the same key twice shows a conflict.
@@ -484,7 +484,7 @@ Desktop, relay, updates, developer:
 | #171 | No "server profile": channel profile > global setting | Q1.10 |
 | #163, #164 | Everyone controls playback; picture-in-picture = pop-out with always on top | Q1.11 |
 | #168, #181 | Stable channel only; AppImage via plugin; portable zip notify only; key as CI secret | Q1.12 |
-| #159, #176 | Noise suppression: Standard / High quality (Beta) / Off | Q1.13 |
+| #159, #176 | Noise suppression: Light / Standard / Advanced (AI, Beta) / Off; sonora-ns kept as Light at a fixed strength (decision on PR #126) | Q1.13 |
 | #159, #62 | One peer-to-peer / relay setting key (#159 model) | Q1.14 |
 | #141 | One global PM rule plus per-server override; accepted conversations and blocks per own identity | Q1.15 |
 | #148, #151 | PR #197 merged as is; Passwords tab fixed in a follow-up | Q1.16 |
@@ -559,7 +559,7 @@ As of 2026-10-30. Milestone 0.5.0 holds 41 issues (plus overview #63): 5 done, 9
 | #172 | Server and channel tree redesign | not started | – |
 | #173 | Private messages overview redesign | not started | – |
 | #175 | `mumble://` link cards | PR open #199 | #199 |
-| #176 | High-quality noise suppression (Beta) | not started (prerequisite PR #126 open) | – |
+| #176 | Advanced (AI) noise suppression (Beta) | not started (prerequisite PR #126 open) | – |
 | #180 | Sign the Windows builds | not started (pipeline ready, verification pending) | – |
 | #181 | Portable Windows build | done | #182 |
 | #183 | Every PipeWire device listed | done | #194 |

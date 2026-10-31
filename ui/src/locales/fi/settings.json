@@ -158,6 +158,20 @@
     "processing": "Puheen käsittely",
     "noiseSuppression": "Kohinanvaimennus",
     "noiseSuppressionHint": "Suodattaa taustamelun, kuten näppäimistön ja tuulettimien äänet.",
+    "noiseChoice": {
+      "light": "Kevyt",
+      "standard": "Tavallinen",
+      "advanced": "Edistynyt (tekoäly)",
+      "off": "Pois"
+    },
+    "noiseChoiceHint": {
+      "light": "Perinteinen suodatin tasaiselle melulle, kuten tuulettimille tai huminalle. Pienin suoritinkuorma.",
+      "standard": "Tekoälysuodatin arkiselle melulle, kuten näppäimistöille ja tuulettimille. Pieni suoritinkuorma.",
+      "advanced": "Uudempi tekoälymalli, joka poistaa myös vaihtelevaa melua. Noin kolminkertainen suoritinkuorma Tavalliseen verrattuna ja 10 ms enemmän viivettä."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Tietoja: {{choice}}",
+    "detectorHint": "Puheaktivointi tunnistaa puheen RNNoise-mallilla; se ei muuta ääntäsi.",
     "echoCancellation": "Kaiunpoisto",
     "echoCancellationHint": "Estää muita kuulemasta itseään, kun käytät kaiuttimia.",
     "autoGain": "Automaattinen äänenvoimakkuus",

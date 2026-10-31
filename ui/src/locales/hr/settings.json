@@ -159,6 +159,20 @@
     "processing": "Obrada glasa",
     "noiseSuppression": "Suzbijanje šuma",
     "noiseSuppressionHint": "Filtrira pozadinsku buku poput tipkovnice i ventilatora.",
+    "noiseChoice": {
+      "light": "Slabo",
+      "standard": "Standardno",
+      "advanced": "Napredno (AI)",
+      "off": "Isključeno"
+    },
+    "noiseChoiceHint": {
+      "light": "Klasični filtar za stalnu buku poput ventilatora ili zujanja. Najmanje opterećenje procesora.",
+      "standard": "AI filtar za svakodnevnu buku poput tipkovnica i ventilatora. Malo opterećenje procesora.",
+      "advanced": "Noviji AI model koji uklanja i promjenjivu buku. Oko tri puta više procesora od Standardnog i 10 ms više kašnjenja."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "O opciji {{choice}}",
+    "detectorHint": "Aktivacija glasa prepoznaje govor modelom RNNoise; on ne mijenja tvoj zvuk.",
     "echoCancellation": "Poništavanje jeke",
     "echoCancellationHint": "Sprječava da drugi čuju sami sebe kad koristiš zvučnike.",
     "autoGain": "Automatska glasnoća",

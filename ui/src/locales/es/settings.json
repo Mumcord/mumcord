@@ -159,6 +159,20 @@
     "processing": "Procesamiento de voz",
     "noiseSuppression": "Supresión de ruido",
     "noiseSuppressionHint": "Filtra ruidos de fondo como teclados y ventiladores.",
+    "noiseChoice": {
+      "light": "Ligera",
+      "standard": "Estándar",
+      "advanced": "Avanzada (IA)",
+      "off": "Desactivada"
+    },
+    "noiseChoiceHint": {
+      "light": "Filtro clásico para ruido constante, como ventiladores o zumbidos. El menor uso de CPU.",
+      "standard": "Filtro con IA para el ruido cotidiano, como teclados y ventiladores. Poco uso de CPU.",
+      "advanced": "Modelo de IA más reciente que también elimina ruido variable. Unas tres veces la CPU de Estándar y 10 ms más de retardo."
+    },
+    "noiseChoiceBeta": "Beta",
+    "noiseChoiceTipLabel": "Acerca de {{choice}}",
+    "detectorHint": "La activación por voz detecta el habla con el modelo RNNoise; no cambia tu audio.",
     "echoCancellation": "Cancelación de eco",
     "echoCancellationHint": "Evita que los demás se oigan a sí mismos cuando usas altavoces.",
     "autoGain": "Volumen automático",

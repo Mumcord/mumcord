@@ -147,7 +147,18 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     section: "voice",
     group: "voice.processing",
     control: "voice.noiseSuppression",
-    terms: ["voice.noiseSuppressionHint"],
+    terms: [
+      "voice.noiseSuppressionHint",
+      "voice.noiseChoice.light",
+      "voice.noiseChoice.standard",
+      "voice.noiseChoice.advanced",
+      "voice.noiseChoiceHint.light",
+      "voice.noiseChoiceHint.standard",
+      "voice.noiseChoiceHint.advanced",
+      "voice.detectorHint",
+    ],
+    // Library names are the same in every language.
+    literals: ["nnnoiseless", "rnnoise", "RNNoise", "sonora"],
   },
   {
     section: "voice",

@@ -159,6 +159,20 @@
     "processing": "Traitement de la voix",
     "noiseSuppression": "Suppression de bruit",
     "noiseSuppressionHint": "Filtre les bruits de fond comme les claviers et les ventilateurs.",
+    "noiseChoice": {
+      "light": "Légère",
+      "standard": "Standard",
+      "advanced": "Avancée (IA)",
+      "off": "Désactivée"
+    },
+    "noiseChoiceHint": {
+      "light": "Filtre classique pour le bruit constant, comme les ventilateurs ou le ronflement. Le plus faible usage du processeur.",
+      "standard": "Filtre IA pour le bruit du quotidien, comme les claviers et les ventilateurs. Faible usage du processeur.",
+      "advanced": "Modèle d'IA plus récent qui supprime aussi le bruit variable. Environ trois fois le processeur de Standard et 10 ms de délai en plus."
+    },
+    "noiseChoiceBeta": "Bêta",
+    "noiseChoiceTipLabel": "À propos de {{choice}}",
+    "detectorHint": "L'activation vocale détecte la parole avec le modèle RNNoise ; il ne modifie pas votre audio.",
     "echoCancellation": "Annulation d’écho",
     "echoCancellationHint": "Évite que les autres s’entendent eux-mêmes quand vous utilisez des haut-parleurs.",
     "autoGain": "Volume automatique",
