@@ -11,10 +11,6 @@
     "chat": "Spring til chat",
     "channels": "Spring til kanaler"
   },
-  "members": {
-    "show": "Vis medlemmer",
-    "hide": "Skjul medlemmer"
-  },
   "resize": {
     "channels": "Tilpas størrelsen på kanallisten",
     "members": "Tilpas størrelsen på medlemslisten"

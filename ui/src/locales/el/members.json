@@ -93,5 +93,16 @@
     "counterLabel": "Χρησιμοποιήθηκαν {{count}} από {{max}} χαρακτήρες",
     "send": "Αποστολή",
     "failed": "Το αίτημα συνομιλίας δεν μπόρεσε να σταλεί. Δοκίμασε ξανά."
+  },
+  "toggle": {
+    "show": "Εμφάνιση μελών",
+    "hide": "Απόκρυψη μελών",
+    "showCount_one": "Εμφάνιση μελών ({{count}})",
+    "showCount_other": "Εμφάνιση μελών ({{count}})",
+    "talkingOne": "{{name}} μιλάει",
+    "talkingTwo": "{{first}} και {{second}} μιλάνε",
+    "talkingMore_one": "{{name}} και {{count}} ακόμη μιλάνε",
+    "talkingMore_other": "{{name}} και {{count}} ακόμη μιλάνε",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

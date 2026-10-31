@@ -93,5 +93,16 @@
     "counterLabel": "{{count}} / {{max}} merkkiä käytetty",
     "send": "Lähetä",
     "failed": "Keskustelupyyntöä ei voitu lähettää. Yritä uudelleen."
+  },
+  "toggle": {
+    "show": "Näytä jäsenet",
+    "hide": "Piilota jäsenet",
+    "showCount_one": "Näytä jäsenet ({{count}})",
+    "showCount_other": "Näytä jäsenet ({{count}})",
+    "talkingOne": "{{name}} puhuu",
+    "talkingTwo": "{{first}} ja {{second}} puhuvat",
+    "talkingMore_one": "{{name}} ja {{count}} muu puhuvat",
+    "talkingMore_other": "{{name}} ja {{count}} muuta puhuvat",
+    "shortcut": "Ctrl+Vaihto+M"
   }
 }

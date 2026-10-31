@@ -11,10 +11,6 @@
     "chat": "Pereiti į pokalbį",
     "channels": "Pereiti į kanalus"
   },
-  "members": {
-    "show": "Rodyti narius",
-    "hide": "Slėpti narius"
-  },
   "resize": {
     "channels": "Keisti kanalų sąrašo dydį",
     "members": "Keisti narių sąrašo dydį"

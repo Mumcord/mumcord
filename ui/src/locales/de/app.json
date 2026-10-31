@@ -11,10 +11,6 @@
     "chat": "Zum Chat springen",
     "channels": "Zu den Kanälen springen"
   },
-  "members": {
-    "show": "Mitglieder anzeigen",
-    "hide": "Mitglieder ausblenden"
-  },
   "resize": {
     "channels": "Breite der Kanalliste ändern",
     "members": "Breite der Mitgliederliste ändern"

@@ -93,5 +93,16 @@
     "counterLabel": "{{count}} van {{max}} tekens gebruikt",
     "send": "Verzenden",
     "failed": "Het chatverzoek kon niet worden verzonden. Probeer het opnieuw."
+  },
+  "toggle": {
+    "show": "Leden tonen",
+    "hide": "Leden verbergen",
+    "showCount_one": "Leden tonen ({{count}})",
+    "showCount_other": "Leden tonen ({{count}})",
+    "talkingOne": "{{name}} praat",
+    "talkingTwo": "{{first}} en {{second}} praten",
+    "talkingMore_one": "{{name}} en {{count}} ander praten",
+    "talkingMore_other": "{{name}} en {{count}} anderen praten",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

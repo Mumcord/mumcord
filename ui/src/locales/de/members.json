@@ -93,5 +93,16 @@
     "counterLabel": "{{count}} von {{max}} Zeichen verwendet",
     "send": "Senden",
     "failed": "Die Chatanfrage konnte nicht gesendet werden. Bitte versuche es erneut."
+  },
+  "toggle": {
+    "show": "Mitglieder anzeigen",
+    "hide": "Mitglieder ausblenden",
+    "showCount_one": "Mitglieder anzeigen ({{count}})",
+    "showCount_other": "Mitglieder anzeigen ({{count}})",
+    "talkingOne": "{{name}} spricht",
+    "talkingTwo": "{{first}} und {{second}} sprechen",
+    "talkingMore_one": "{{name}} und {{count}} weitere sprechen",
+    "talkingMore_other": "{{name}} und {{count}} weitere sprechen",
+    "shortcut": "Strg+Umschalt+M"
   }
 }

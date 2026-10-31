@@ -95,5 +95,18 @@
     "counterLabel": "{{count}} din {{max}} caractere folosite",
     "send": "Trimite",
     "failed": "Cererea de chat nu a putut fi trimisă. Încearcă din nou."
+  },
+  "toggle": {
+    "show": "Arată membrii",
+    "hide": "Ascunde membrii",
+    "showCount_one": "Arată membrii ({{count}})",
+    "showCount_few": "Arată membrii ({{count}})",
+    "showCount_other": "Arată membrii ({{count}})",
+    "talkingOne": "{{name}} vorbește",
+    "talkingTwo": "{{first}} și {{second}} vorbesc",
+    "talkingMore_one": "{{name}} și încă {{count}} persoană vorbesc",
+    "talkingMore_few": "{{name}} și încă {{count}} persoane vorbesc",
+    "talkingMore_other": "{{name}} și încă {{count}} de persoane vorbesc",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

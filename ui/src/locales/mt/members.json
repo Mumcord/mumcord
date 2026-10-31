@@ -99,5 +99,22 @@
     "counterLabel": "{{count}} minn {{max}} karattri użati",
     "send": "Ibgħat",
     "failed": "It-talba għal chat ma setgħetx tintbagħat. Erġa' pprova."
+  },
+  "toggle": {
+    "show": "Uri l-membri",
+    "hide": "Aħbi l-membri",
+    "showCount_one": "Uri l-membri ({{count}})",
+    "showCount_two": "Uri l-membri ({{count}})",
+    "showCount_few": "Uri l-membri ({{count}})",
+    "showCount_many": "Uri l-membri ({{count}})",
+    "showCount_other": "Uri l-membri ({{count}})",
+    "talkingOne": "{{name}} qed jitkellem",
+    "talkingTwo": "{{first}} u {{second}} qed jitkellmu",
+    "talkingMore_one": "{{name}} u {{count}} oħrajn qed jitkellmu",
+    "talkingMore_two": "{{name}} u {{count}} oħrajn qed jitkellmu",
+    "talkingMore_few": "{{name}} u {{count}} oħrajn qed jitkellmu",
+    "talkingMore_many": "{{name}} u {{count}} oħrajn qed jitkellmu",
+    "talkingMore_other": "{{name}} u {{count}} oħrajn qed jitkellmu",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

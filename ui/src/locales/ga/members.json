@@ -99,5 +99,22 @@
     "counterLabel": "{{count}} as {{max}} carachtar in úsáid",
     "send": "Seol",
     "failed": "Níorbh fhéidir an t-iarratas comhrá a sheoladh. Bain triail eile as."
+  },
+  "toggle": {
+    "show": "Taispeáin baill",
+    "hide": "Folaigh baill",
+    "showCount_one": "Taispeáin baill ({{count}})",
+    "showCount_two": "Taispeáin baill ({{count}})",
+    "showCount_few": "Taispeáin baill ({{count}})",
+    "showCount_many": "Taispeáin baill ({{count}})",
+    "showCount_other": "Taispeáin baill ({{count}})",
+    "talkingOne": "Tá {{name}} ag caint",
+    "talkingTwo": "Tá {{first}} agus {{second}} ag caint",
+    "talkingMore_one": "Tá {{name}} agus {{count}} eile ag caint",
+    "talkingMore_two": "Tá {{name}} agus {{count}} eile ag caint",
+    "talkingMore_few": "Tá {{name}} agus {{count}} eile ag caint",
+    "talkingMore_many": "Tá {{name}} agus {{count}} eile ag caint",
+    "talkingMore_other": "Tá {{name}} agus {{count}} eile ag caint",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

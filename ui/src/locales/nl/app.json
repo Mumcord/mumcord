@@ -11,10 +11,6 @@
     "chat": "Naar de chat",
     "channels": "Naar de kanalen"
   },
-  "members": {
-    "show": "Leden tonen",
-    "hide": "Leden verbergen"
-  },
   "resize": {
     "channels": "Grootte van kanaallijst aanpassen",
     "members": "Grootte van ledenlijst aanpassen"

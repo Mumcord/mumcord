@@ -97,5 +97,20 @@
     "counterLabel": "Využito {{count}} z {{max}} znaků",
     "send": "Odeslat",
     "failed": "Žádost o chat se nepodařilo odeslat. Zkus to prosím znovu."
+  },
+  "toggle": {
+    "show": "Zobrazit členy",
+    "hide": "Skrýt členy",
+    "showCount_one": "Zobrazit členy ({{count}})",
+    "showCount_few": "Zobrazit členy ({{count}})",
+    "showCount_many": "Zobrazit členy ({{count}})",
+    "showCount_other": "Zobrazit členy ({{count}})",
+    "talkingOne": "{{name}} mluví",
+    "talkingTwo": "{{first}} a {{second}} mluví",
+    "talkingMore_one": "{{name}} a {{count}} další mluví",
+    "talkingMore_few": "{{name}} a {{count}} další mluví",
+    "talkingMore_many": "{{name}} a {{count}} dalších mluví",
+    "talkingMore_other": "{{name}} a {{count}} dalších mluví",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

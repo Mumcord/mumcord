@@ -93,5 +93,16 @@
     "counterLabel": "Използвани {{count}} от {{max}} знака",
     "send": "Изпрати",
     "failed": "Заявката за чат не можа да бъде изпратена. Опитай отново."
+  },
+  "toggle": {
+    "show": "Покажи участниците",
+    "hide": "Скрий участниците",
+    "showCount_one": "Покажи участниците ({{count}})",
+    "showCount_other": "Покажи участниците ({{count}})",
+    "talkingOne": "{{name}} говори",
+    "talkingTwo": "{{first}} и {{second}} говорят",
+    "talkingMore_one": "{{name}} и още {{count}} говорят",
+    "talkingMore_other": "{{name}} и още {{count}} говорят",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

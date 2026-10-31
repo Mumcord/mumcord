@@ -93,5 +93,16 @@
     "counterLabel": "{{count}} / {{max}} karakter felhasználva",
     "send": "Küldés",
     "failed": "A csevegési kérést nem sikerült elküldeni. Próbáld újra."
+  },
+  "toggle": {
+    "show": "Tagok megjelenítése",
+    "hide": "Tagok elrejtése",
+    "showCount_one": "Tagok megjelenítése ({{count}})",
+    "showCount_other": "Tagok megjelenítése ({{count}})",
+    "talkingOne": "{{name}} beszél",
+    "talkingTwo": "{{first}} és {{second}} beszél",
+    "talkingMore_one": "{{name}} és még {{count}} fő beszél",
+    "talkingMore_other": "{{name}} és még {{count}} fő beszél",
+    "shortcut": "Ctrl+Shift+M"
   }
 }

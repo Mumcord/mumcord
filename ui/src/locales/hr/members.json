@@ -95,5 +95,18 @@
     "counterLabel": "Iskorišteno {{count}} od {{max}} znakova",
     "send": "Pošalji",
     "failed": "Zahtjev za razgovor nije bilo moguće poslati. Pokušaj ponovno."
+  },
+  "toggle": {
+    "show": "Prikaži članove",
+    "hide": "Sakrij članove",
+    "showCount_one": "Prikaži članove ({{count}})",
+    "showCount_few": "Prikaži članove ({{count}})",
+    "showCount_other": "Prikaži članove ({{count}})",
+    "talkingOne": "{{name}} govori",
+    "talkingTwo": "{{first}} i {{second}} govore",
+    "talkingMore_one": "{{name}} i još {{count}} govore",
+    "talkingMore_few": "{{name}} i još {{count}} govore",
+    "talkingMore_other": "{{name}} i još {{count}} govore",
+    "shortcut": "Ctrl+Shift+M"
   }
 }
