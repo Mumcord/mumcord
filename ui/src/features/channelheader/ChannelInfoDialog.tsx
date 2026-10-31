@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import { useServerState } from "../channels";
+import { profileSummary as audioSummary, useChannelAudioProfile } from "../channelaudio";
 import { openLink } from "../chat/openLink";
 import { sanitizeHtml } from "../chat/sanitize";
 import { Dialog } from "../servers/Dialog";
@@ -15,6 +16,8 @@ interface ChannelInfoDialogProps {
   link: string | null;
   /** `null` on servers without follow support. */
   following: boolean | null;
+  /** Opens "Audio for this channel" in place of this dialog (issue #171). */
+  onOpenAudio: () => void;
   onClose: () => void;
 }
 
@@ -32,7 +35,13 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
  * follow state and the last history clear. Every value comes from what the server sends to every
  * client or from local data; nothing is asked of the server beyond the description text.
  */
-export function ChannelInfoDialog({ channelId, link, following, onClose }: ChannelInfoDialogProps) {
+export function ChannelInfoDialog({
+  channelId,
+  link,
+  following,
+  onOpenAudio,
+  onClose,
+}: ChannelInfoDialogProps) {
   const { t, i18n } = useTranslation("channelheader");
   const server = useServerState();
   const { servers } = useServers();
@@ -41,6 +50,7 @@ export function ChannelInfoDialog({ channelId, link, following, onClose }: Chann
   const [clearedAt, setClearedAt] = useState<string | null>(null);
   const [copied, setCopied] = useState<"done" | "failed" | null>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
+  const audioProfile = useChannelAudioProfile(serverId, channelId);
 
   const channel = server.channels.get(channelId);
   const needsDescription = channel !== undefined && channel.hasDescription && !channel.description;
@@ -195,6 +205,14 @@ export function ChannelInfoDialog({ channelId, link, following, onClose }: Chann
         {following !== null && (
           <Row label={t("info.following")}>{following ? t("info.yes") : t("info.no")}</Row>
         )}
+        <Row label={t("info.audioProfile")}>
+          <span className="channel-info__audio">
+            {t(`info.audio.${audioSummary(audioProfile)}`)}
+            <button type="button" className="channel-audio__link" onClick={onOpenAudio}>
+              {audioProfile ? t("info.audioEdit") : t("info.audioSet")}
+            </button>
+          </span>
+        </Row>
         <Row label={t("info.cleared")}>
           {clearedAt === null ? t("info.never") : formatDate(clearedAt)}
         </Row>

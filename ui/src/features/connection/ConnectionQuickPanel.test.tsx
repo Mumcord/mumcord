@@ -191,4 +191,42 @@ describe("ConnectionQuickPanel", () => {
     await openQuick();
     expect(await axeViolations(container)).toEqual([]);
   });
+
+  it("shows and edits the values of the channel audio profile in effect (#171)", async () => {
+    await setup();
+    const [server] = await api.serversList();
+    const serverId = server?.id ?? 0;
+    const snapshot = await waitFor(async () => {
+      const synced = await api.sessionSnapshot(serverId);
+      expect(synced).not.toBeNull();
+      return synced;
+    });
+    const self = snapshot?.users.find((u) => u.session === snapshot.selfSession);
+    await api.channelAudioProfileSet(serverId, self?.channelId ?? 0, {
+      musicQuality: true,
+      lowLatency: null,
+      bitrateKbps: 100,
+    });
+    const panel = await openQuick();
+    const music = await within(panel).findByRole("switch", {
+      name: "Music quality (channel profile)",
+    });
+    expect(music).toBeChecked();
+    expect(within(panel).getByRole("switch", { name: "Low-latency mode" })).not.toBeChecked();
+    expect(within(panel).getByRole("slider", { name: "Bitrate (channel profile)" })).toHaveValue(
+      "100",
+    );
+    fireEvent.click(music);
+    await waitFor(async () => {
+      expect((await api.activeAudioProfile())?.profile.musicQuality).toBe(false);
+    });
+    expect((await api.settingsGet()).musicQuality).toBe(false);
+    expect((await api.settingsGet()).bitrateKbps).toBe(96);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    fireEvent.click(screen.getByRole("button", { name: "Connection info" }));
+    expect(
+      await screen.findByText("Music quality off, 100 kbit/s (channel profile)"),
+    ).toBeVisible();
+  });
 });

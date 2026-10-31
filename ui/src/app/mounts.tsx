@@ -20,6 +20,7 @@ import {
   FollowNoticeLine,
   FollowStar,
 } from "../features/follow";
+import { ChannelAudioHost } from "../features/channelaudio";
 import { ChannelHeader } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { UserStatsWatcher } from "../features/connection";
@@ -103,6 +104,7 @@ export function ChatStatusMount() {
       <ConnectionStatus />
       <RejoinPrompt />
       <CloseDialog />
+      <ChannelAudioHost />
       <WindowOverlayNotice api={windowOverlayNoticeApi} onOpenSettings={openOverlaySettings} />
       <AudioDeviceNotice api={audioDeviceNoticeApi} onOpenSettings={openAudioSettings} />
       <UpdateHint />

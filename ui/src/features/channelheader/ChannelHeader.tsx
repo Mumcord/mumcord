@@ -2,13 +2,14 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "re
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../api";
 import { useServerState } from "../channels";
+import { ChannelAudioDialog, profileKind, useChannelAudioProfile } from "../channelaudio";
 import { ClearHistoryDialog } from "../chat/history/ClearHistory";
 import { FollowToggle, useFollowControl } from "../follow";
 import { EyeIcon } from "../follow/EyeIcon";
 import { ServerMenu, type MenuItem } from "../servers/ServerMenu";
 import { ChannelInfoDialog } from "./ChannelInfoDialog";
 import { channelLink, channelPath, shortDescription } from "./channelModel";
-import { ChevronIcon, InfoIcon, KeyIcon, LinkIcon, TrashIcon } from "./icons";
+import { ChevronIcon, InfoIcon, KeyIcon, LinkIcon, MusicIcon, TrashIcon } from "./icons";
 import "./channel-header.css";
 
 /** How long "Link copied" stays in the header. */
@@ -16,8 +17,9 @@ const STATUS_MS = 3000;
 
 /**
  * Left part of a channel's chat header (issue #170): the follow eye, the channel name as a menu
- * button (Follow, Copy channel link, Channel password, Channel info, Clear chat history) and a
- * line with the channel path and description.
+ * button (Follow, Audio for this channel, Copy channel link, Channel password, Channel info, Clear
+ * chat history), a line with the channel path and description and the ♪ / ⚡ badge of a channel
+ * audio profile (issue #171).
  */
 export function ChannelHeader({ channelId }: { channelId: number }) {
   const { t } = useTranslation("channelheader");
@@ -26,7 +28,8 @@ export function ChannelHeader({ channelId }: { channelId: number }) {
   const follow = useFollowControl(channelId);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [menuAt, setMenuAt] = useState<{ x: number; y: number } | null>(null);
-  const [dialog, setDialog] = useState<"info" | "clear" | null>(null);
+  const [dialog, setDialog] = useState<"info" | "audio" | "clear" | null>(null);
+  const audioKind = profileKind(useChannelAudioProfile(server.serverId, channelId));
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
@@ -91,6 +94,16 @@ export function ChannelHeader({ channelId }: { channelId: number }) {
       follow.toggle();
     },
   };
+  const audioItem: MenuItem = {
+    id: "audio",
+    label: t("menu.audio"),
+    icon: <MusicIcon />,
+    ...(audioKind ? { hint: t(`menu.audioHint.${audioKind}`) } : {}),
+    onSelect: () => {
+      setMenuAt(null);
+      setDialog("audio");
+    },
+  };
   const copyItem: MenuItem = {
     id: "copy-link",
     label: t("menu.copyLink"),
@@ -113,6 +126,7 @@ export function ChannelHeader({ channelId }: { channelId: number }) {
   // Items the user cannot use here are left out (FR-3.88).
   const items: MenuItem[] = [
     ...(follow.supported ? [followItem] : []),
+    ...(server.serverId !== null ? [audioItem] : []),
     ...(link !== null ? [copyItem] : []),
     ...(channel?.enterRestricted && !channel.permissions.enter ? [passwordItem] : []),
     {
@@ -182,6 +196,12 @@ export function ChannelHeader({ channelId }: { channelId: number }) {
           {description}
         </p>
       )}
+      {audioKind && (
+        <span className={`channel-header__badge channel-header__badge--${audioKind}`}>
+          <span aria-hidden="true">{audioKind === "jam" ? "⚡" : "♪"} </span>
+          {t(`badge.${audioKind}`)}
+        </span>
+      )}
       <span className="channel-header__status" role="status">
         {status}
       </span>
@@ -198,9 +218,13 @@ export function ChannelHeader({ channelId }: { channelId: number }) {
           channelId={channelId}
           link={link}
           following={follow.supported ? follow.following : null}
+          onOpenAudio={() => {
+            setDialog("audio");
+          }}
           onClose={closeDialog}
         />
       )}
+      {dialog === "audio" && <ChannelAudioDialog channelId={channelId} onClose={closeDialog} />}
       {dialog === "clear" && (
         <ClearHistoryDialog conversation={{ kind: "channel", channelId }} onClose={closeDialog} />
       )}

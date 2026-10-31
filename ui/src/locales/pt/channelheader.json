@@ -9,7 +9,12 @@
     "copyLink": "Copiar link do canal",
     "password": "Palavra-passe do canal…",
     "info": "Informações do canal",
-    "clear": "Limpar histórico do chat…"
+    "clear": "Limpar histórico do chat…",
+    "audio": "Áudio deste canal…",
+    "audioHint": {
+      "music": "♪ Música",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Informações do canal: {{channel}}",
@@ -46,10 +51,57 @@
     "following": "A seguir",
     "yes": "Sim",
     "no": "Não",
+    "audioProfile": "O meu perfil de áudio",
+    "audio": {
+      "none": "Nenhum",
+      "voice": "Voz (predefinições)",
+      "music": "♪ Música",
+      "jam": "⚡ Jam (baixa latência)",
+      "custom": "Personalizado"
+    },
+    "audioEdit": "Editar…",
+    "audioSet": "Configurar…",
     "cleared": "Histórico limpo pela última vez",
     "never": "Nunca",
     "copyLink": "Copiar link",
     "copied": "Copiado",
     "close": "Fechar"
+  },
+  "badge": {
+    "music": "Perfil de música",
+    "jam": "Perfil Jam"
+  },
+  "audio": {
+    "title": "Áudio deste canal",
+    "presets": "Predefinições",
+    "preset": {
+      "voice": "Voz",
+      "voiceHint": "Predefinições",
+      "music": "Música",
+      "musicHint": "Qualidade + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Baixa latência"
+    },
+    "musicQuality": "Qualidade para música",
+    "musicQualityHint": "Codificador otimizado para música; supressão de ruído desativada.",
+    "musicIncluded": "Incluído enquanto o modo de baixa latência estiver ativado.",
+    "lowLatency": "Modo de baixa latência",
+    "lowLatencyHint": "Pacotes mais pequenos. Mais largura de banda, menos robusto.",
+    "beta": "Beta",
+    "on": "ativado",
+    "off": "desativado",
+    "followsDefault": "Predefinição ({{value}})",
+    "useDefault": "usar predefinição",
+    "bitrate": "Taxa de bits",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Máx.",
+    "bitrateDefault": "Predefinição, {{value}}",
+    "serverLimit": "Limite do servidor {{kbps}} kbit/s",
+    "noServerLimit": "Sem limite do servidor",
+    "note": "Aplica-se ao entrar neste canal, apenas neste dispositivo. As outras pessoas não são afetadas. As informações de ligação assinalam estes valores com «(perfil do canal)».",
+    "saveFailed": "Não foi possível guardar o perfil de áudio.",
+    "remove": "Remover perfil",
+    "cancel": "Cancelar",
+    "save": "Guardar"
   }
 }

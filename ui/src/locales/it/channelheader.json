@@ -9,7 +9,12 @@
     "copyLink": "Copia link del canale",
     "password": "Password del canale…",
     "info": "Info sul canale",
-    "clear": "Cancella cronologia della chat…"
+    "clear": "Cancella cronologia della chat…",
+    "audio": "Audio per questo canale…",
+    "audioHint": {
+      "music": "♪ Musica",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Info sul canale: {{channel}}",
@@ -46,10 +51,57 @@
     "following": "Seguito",
     "yes": "Sì",
     "no": "No",
+    "audioProfile": "Il mio profilo audio",
+    "audio": {
+      "none": "Nessuno",
+      "voice": "Voce (predefiniti)",
+      "music": "♪ Musica",
+      "jam": "⚡ Jam (bassa latenza)",
+      "custom": "Personalizzato"
+    },
+    "audioEdit": "Modifica…",
+    "audioSet": "Configura…",
     "cleared": "Ultima cancellazione della cronologia",
     "never": "Mai",
     "copyLink": "Copia link",
     "copied": "Copiato",
     "close": "Chiudi"
+  },
+  "badge": {
+    "music": "Profilo musica",
+    "jam": "Profilo Jam"
+  },
+  "audio": {
+    "title": "Audio per questo canale",
+    "presets": "Preset",
+    "preset": {
+      "voice": "Voce",
+      "voiceHint": "Predefiniti",
+      "music": "Musica",
+      "musicHint": "Qualità + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Bassa latenza"
+    },
+    "musicQuality": "Qualità musica",
+    "musicQualityHint": "Encoder ottimizzato per la musica; soppressione del rumore disattivata.",
+    "musicIncluded": "Incluso finché la modalità bassa latenza è attiva.",
+    "lowLatency": "Modalità bassa latenza",
+    "lowLatencyHint": "Pacchetti più piccoli. Più banda, meno robusto.",
+    "beta": "Beta",
+    "on": "attivo",
+    "off": "disattivo",
+    "followsDefault": "Predefinito ({{value}})",
+    "useDefault": "usa il predefinito",
+    "bitrate": "Bitrate",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max",
+    "bitrateDefault": "Predefinito, {{value}}",
+    "serverLimit": "Limite del server {{kbps}} kbit/s",
+    "noServerLimit": "Nessun limite del server",
+    "note": "Si applica quando entri in questo canale, solo su questo dispositivo. Gli altri non sono interessati. Le info sulla connessione contrassegnano questi valori con «(profilo del canale)».",
+    "saveFailed": "Impossibile salvare il profilo audio.",
+    "remove": "Rimuovi profilo",
+    "cancel": "Annulla",
+    "save": "Salva"
   }
 }

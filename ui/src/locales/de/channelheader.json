@@ -9,7 +9,12 @@
     "copyLink": "Kanallink kopieren",
     "password": "Kanalpasswort…",
     "info": "Kanalinfo",
-    "clear": "Chatverlauf löschen…"
+    "clear": "Chatverlauf löschen…",
+    "audio": "Audio für diesen Kanal…",
+    "audioHint": {
+      "music": "♪ Musik",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Folge ich",
     "yes": "Ja",
     "no": "Nein",
+    "audioProfile": "Mein Audioprofil",
+    "audio": {
+      "none": "Keines",
+      "voice": "Sprache (Standard)",
+      "music": "♪ Musik",
+      "jam": "⚡ Jam (niedrige Latenz)",
+      "custom": "Benutzerdefiniert"
+    },
+    "audioEdit": "Bearbeiten…",
+    "audioSet": "Einrichten…",
     "cleared": "Verlauf zuletzt gelöscht",
     "never": "Nie",
     "copyLink": "Link kopieren",
     "copied": "Kopiert",
     "close": "Schließen"
+  },
+  "badge": {
+    "music": "Musikprofil",
+    "jam": "Jam-Profil"
+  },
+  "audio": {
+    "title": "Audio für diesen Kanal",
+    "presets": "Voreinstellungen",
+    "preset": {
+      "voice": "Sprache",
+      "voiceHint": "Standard",
+      "music": "Musik",
+      "musicHint": "Qualität + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Niedrige Latenz"
+    },
+    "musicQuality": "Musikqualität",
+    "musicQualityHint": "Auf Musik abgestimmter Encoder; Rauschunterdrückung aus.",
+    "musicIncluded": "Enthalten, solange der Modus für niedrige Latenz an ist.",
+    "lowLatency": "Modus für niedrige Latenz",
+    "lowLatencyHint": "Kleinste Pakete. Mehr Bandbreite, weniger robust.",
+    "beta": "Beta",
+    "on": "an",
+    "off": "aus",
+    "followsDefault": "Standard ({{value}})",
+    "useDefault": "Standard verwenden",
+    "bitrate": "Bitrate",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max.",
+    "bitrateDefault": "Standard, {{value}}",
+    "serverLimit": "Serverlimit {{kbps}} kbit/s",
+    "noServerLimit": "Kein Serverlimit",
+    "note": "Gilt, wenn du diesen Kanal betrittst, nur auf diesem Gerät. Andere sind nicht betroffen. Die Verbindungsinfo kennzeichnet diese Werte mit „(Kanalprofil)“.",
+    "saveFailed": "Das Audioprofil konnte nicht gespeichert werden.",
+    "remove": "Profil entfernen",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
   }
 }

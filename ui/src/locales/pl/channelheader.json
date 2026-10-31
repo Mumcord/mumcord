@@ -9,7 +9,12 @@
     "copyLink": "Kopiuj link do kanału",
     "password": "Hasło kanału…",
     "info": "Informacje o kanale",
-    "clear": "Wyczyść historię czatu…"
+    "clear": "Wyczyść historię czatu…",
+    "audio": "Dźwięk dla tego kanału…",
+    "audioHint": {
+      "music": "♪ Muzyka",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Informacje o kanale: {{channel}}",
@@ -48,10 +53,57 @@
     "following": "Obserwujesz",
     "yes": "Tak",
     "no": "Nie",
+    "audioProfile": "Mój profil dźwięku",
+    "audio": {
+      "none": "Brak",
+      "voice": "Głos (domyślne)",
+      "music": "♪ Muzyka",
+      "jam": "⚡ Jam (niskie opóźnienie)",
+      "custom": "Własny"
+    },
+    "audioEdit": "Edytuj…",
+    "audioSet": "Skonfiguruj…",
     "cleared": "Historia ostatnio wyczyszczona",
     "never": "Nigdy",
     "copyLink": "Kopiuj link",
     "copied": "Skopiowano",
     "close": "Zamknij"
+  },
+  "badge": {
+    "music": "Profil muzyki",
+    "jam": "Profil Jam"
+  },
+  "audio": {
+    "title": "Dźwięk dla tego kanału",
+    "presets": "Ustawienia wstępne",
+    "preset": {
+      "voice": "Głos",
+      "voiceHint": "Domyślne",
+      "music": "Muzyka",
+      "musicHint": "Jakość + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Niskie opóźnienie"
+    },
+    "musicQuality": "Jakość muzyki",
+    "musicQualityHint": "Koder dostrojony do muzyki; redukcja szumów wyłączona.",
+    "musicIncluded": "Uwzględnione, gdy tryb niskich opóźnień jest włączony.",
+    "lowLatency": "Tryb niskich opóźnień",
+    "lowLatencyHint": "Najmniejsze pakiety. Większe zużycie pasma, mniejsza odporność.",
+    "beta": "Beta",
+    "on": "wł.",
+    "off": "wył.",
+    "followsDefault": "Domyślnie ({{value}})",
+    "useDefault": "użyj domyślnych",
+    "bitrate": "Przepływność",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Domyślnie, {{value}}",
+    "serverLimit": "Limit serwera {{kbps}} kbit/s",
+    "noServerLimit": "Brak limitu serwera",
+    "note": "Obowiązuje po wejściu na ten kanał, tylko na tym urządzeniu. Inne osoby nie są dotknięte. Informacje o połączeniu oznaczają te wartości tekstem „(profil kanału)”.",
+    "saveFailed": "Nie udało się zapisać profilu dźwięku.",
+    "remove": "Usuń profil",
+    "cancel": "Anuluj",
+    "save": "Zapisz"
   }
 }

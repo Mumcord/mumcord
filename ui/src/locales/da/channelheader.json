@@ -9,7 +9,12 @@
     "copyLink": "Kopiér kanallink",
     "password": "Kanaladgangskode…",
     "info": "Kanalinfo",
-    "clear": "Ryd chathistorik…"
+    "clear": "Ryd chathistorik…",
+    "audio": "Lyd til denne kanal…",
+    "audioHint": {
+      "music": "♪ Musik",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Følger",
     "yes": "Ja",
     "no": "Nej",
+    "audioProfile": "Min lydprofil",
+    "audio": {
+      "none": "Ingen",
+      "voice": "Tale (standard)",
+      "music": "♪ Musik",
+      "jam": "⚡ Jam (lav latenstid)",
+      "custom": "Brugerdefineret"
+    },
+    "audioEdit": "Rediger…",
+    "audioSet": "Konfigurer…",
     "cleared": "Historik sidst ryddet",
     "never": "Aldrig",
     "copyLink": "Kopiér link",
     "copied": "Kopieret",
     "close": "Luk"
+  },
+  "badge": {
+    "music": "Musikprofil",
+    "jam": "Jam-profil"
+  },
+  "audio": {
+    "title": "Lyd til denne kanal",
+    "presets": "Forudindstillinger",
+    "preset": {
+      "voice": "Tale",
+      "voiceHint": "Standard",
+      "music": "Musik",
+      "musicHint": "Kvalitet + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Lav latenstid"
+    },
+    "musicQuality": "Musikkvalitet",
+    "musicQualityHint": "Encoder tunet til musik; støjdæmpning slået fra.",
+    "musicIncluded": "Inkluderet, mens tilstanden med lav latenstid er slået til.",
+    "lowLatency": "Tilstand med lav latenstid",
+    "lowLatencyHint": "Mindste pakker. Mere båndbredde, mindre robust.",
+    "beta": "Beta",
+    "on": "til",
+    "off": "fra",
+    "followsDefault": "Standard ({{value}})",
+    "useDefault": "brug standard",
+    "bitrate": "Bitrate",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Standard, {{value}}",
+    "serverLimit": "Servergrænse {{kbps}} kbit/s",
+    "noServerLimit": "Ingen servergrænse",
+    "note": "Gælder, når du går ind i denne kanal, kun på denne enhed. Andre påvirkes ikke. Forbindelsesinfo markerer disse værdier med „(kanalprofil)“.",
+    "saveFailed": "Lydprofilen kunne ikke gemmes.",
+    "remove": "Fjern profil",
+    "cancel": "Annuller",
+    "save": "Gem"
   }
 }

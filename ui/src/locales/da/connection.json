@@ -91,5 +91,14 @@
   "endToEndValue": "≈ {{value}} ms (skøn)",
   "lowLatencyMode": "Tilstand med lav latenstid",
   "identity": "Identitet",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (kanalprofil)",
+  "profile": {
+    "row": "Lydprofil",
+    "musicOn": "Musikkvalitet",
+    "musicOff": "Musikkvalitet fra",
+    "lowLatencyOn": "Tilstand med lav latenstid",
+    "lowLatencyOff": "Tilstand med lav latenstid fra",
+    "defaults": "Standard"
+  }
 }

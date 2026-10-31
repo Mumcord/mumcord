@@ -14,8 +14,10 @@ import type {
 import { parseMumbleLink } from "../features/chat/mumbleLink";
 import type {
   AcceptedConversation,
+  ActiveAudioProfile,
   ApiError,
   AudioDevices,
+  ChannelAudioProfile,
   ChannelInfo,
   ChatMessage,
   ConnectionState,
@@ -723,6 +725,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   const requiredPasswords = new Map<number, string>();
   const savedPasswords = new Map<number, string>();
   const channelTokens = new Map<number, MockChannelToken[]>();
+  // Channel audio profiles (issue #171) by server, then channel id; and the one in effect.
+  const channelAudio = new Map<number, Map<number, ChannelAudioProfile>>();
+  let activeAudio: ActiveAudioProfile | null = null;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
   // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
@@ -877,6 +882,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       sessions.set(currentServerId, { snapshot: session()?.snapshot ?? null, state: next });
     }
     emitServer("connectionStateChanged", { state: next });
+    syncActiveAudio();
   }
 
   function pmRequestsOf(serverId: number): PmRequests {
@@ -913,6 +919,35 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (voiceServerId === serverId) return;
     voiceServerId = serverId;
     emit("voiceServerChanged", { serverId });
+    syncActiveAudio();
+  }
+
+  /**
+   * Like the engine: the profile of the own channel is in effect on the server with the voice
+   * pipeline, the voice server or else the earliest connected one.
+   */
+  function syncActiveAudio(): void {
+    const serverId =
+      voiceServerId ??
+      [...sessions].find(([, s]) => s.state.state === "connected" && s.snapshot)?.[0] ??
+      null;
+    const snap = serverId === null ? null : sessions.get(serverId)?.snapshot;
+    const self = snap?.users.find((u) => u.session === snap.selfSession);
+    const profile =
+      serverId !== null && self ? channelAudio.get(serverId)?.get(self.channelId) : undefined;
+    const next =
+      serverId !== null && self && profile
+        ? { serverId, channelId: self.channelId, profile }
+        : null;
+    if (JSON.stringify(next) === JSON.stringify(activeAudio)) return;
+    activeAudio = next;
+    emit("activeAudioProfileChanged", { active: next });
+  }
+
+  function channelAudioEntries(serverId: number) {
+    return [...(channelAudio.get(serverId) ?? new Map<number, ChannelAudioProfile>())]
+      .sort(([a], [b]) => a - b)
+      .map(([channelId, profile]) => ({ channelId, profile }));
   }
 
   /**
@@ -1067,6 +1102,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const updated = { ...requireUser(session), ...patch };
     snap.users = snap.users.map((u) => (u.session === session ? updated : u));
     emitServer("userUpserted", { user: updated });
+    if (session === SELF_SESSION) syncActiveAudio();
     return updated;
   }
 
@@ -1501,7 +1537,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
               // Follows the setting like the engine, unless a test set its own figure.
               latency:
                 connectionStats.latency === DEFAULT_CONNECTION_STATS.latency
-                  ? mockLatencyEstimate(settings.lowLatency)
+                  ? mockLatencyEstimate(activeAudio?.profile.lowLatency ?? settings.lowLatency)
                   : connectionStats.latency,
             }
           : null,
@@ -2085,7 +2121,28 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // audio
     audioDevices: () => Promise.resolve(DEVICES),
     bitrateMax: () => Promise.resolve<number | null>(null),
-    latencyEstimate: () => Promise.resolve(mockLatencyEstimate(settings.lowLatency)),
+    latencyEstimate: () =>
+      Promise.resolve(mockLatencyEstimate(activeAudio?.profile.lowLatency ?? settings.lowLatency)),
+    channelAudioProfiles: (serverId) => {
+      requireSession(serverId);
+      return Promise.resolve(channelAudioEntries(serverId));
+    },
+    channelAudioProfileSet: (serverId, channelId, profile) => {
+      requireSession(serverId);
+      requireChannel(channelId);
+      const kbps = profile?.bitrateKbps;
+      if (kbps != null && (kbps < 16 || kbps > 510)) {
+        fail("invalidInput", "bitrate must be 16–510 kbit/s");
+      }
+      const saved = channelAudio.get(serverId) ?? new Map<number, ChannelAudioProfile>();
+      if (profile) saved.set(channelId, { ...profile });
+      else saved.delete(channelId);
+      channelAudio.set(serverId, saved);
+      emitServer("channelAudioProfilesChanged", { profiles: channelAudioEntries(serverId) });
+      syncActiveAudio();
+      return Promise.resolve(null);
+    },
+    activeAudioProfile: () => Promise.resolve(activeAudio),
     micTestStart: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);

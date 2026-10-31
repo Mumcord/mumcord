@@ -9,7 +9,12 @@
     "copyLink": "Kopiera kanallänk",
     "password": "Kanallösenord…",
     "info": "Kanalinfo",
-    "clear": "Rensa chatthistorik…"
+    "clear": "Rensa chatthistorik…",
+    "audio": "Ljud för den här kanalen…",
+    "audioHint": {
+      "music": "♪ Musik",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanalinfo: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Följer",
     "yes": "Ja",
     "no": "Nej",
+    "audioProfile": "Min ljudprofil",
+    "audio": {
+      "none": "Ingen",
+      "voice": "Röst (standard)",
+      "music": "♪ Musik",
+      "jam": "⚡ Jam (låg latens)",
+      "custom": "Anpassad"
+    },
+    "audioEdit": "Redigera…",
+    "audioSet": "Konfigurera…",
     "cleared": "Historiken senast rensad",
     "never": "Aldrig",
     "copyLink": "Kopiera länk",
     "copied": "Kopierad",
     "close": "Stäng"
+  },
+  "badge": {
+    "music": "Musikprofil",
+    "jam": "Jam-profil"
+  },
+  "audio": {
+    "title": "Ljud för den här kanalen",
+    "presets": "Förinställningar",
+    "preset": {
+      "voice": "Röst",
+      "voiceHint": "Standard",
+      "music": "Musik",
+      "musicHint": "Kvalitet + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Låg latens"
+    },
+    "musicQuality": "Musikkvalitet",
+    "musicQualityHint": "Kodare optimerad för musik; brusreducering av.",
+    "musicIncluded": "Ingår medan läget för låg latens är på.",
+    "lowLatency": "Läge för låg latens",
+    "lowLatencyHint": "Minsta paket. Mer bandbredd, mindre robust.",
+    "beta": "Beta",
+    "on": "på",
+    "off": "av",
+    "followsDefault": "Standard ({{value}})",
+    "useDefault": "använd standard",
+    "bitrate": "Bithastighet",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max",
+    "bitrateDefault": "Standard, {{value}}",
+    "serverLimit": "Servergräns {{kbps}} kbit/s",
+    "noServerLimit": "Ingen servergräns",
+    "note": "Gäller när du går med i den här kanalen, bara på den här enheten. Andra påverkas inte. Anslutningsinfo markerar dessa värden med ”(kanalprofil)”.",
+    "saveFailed": "Det gick inte att spara ljudprofilen.",
+    "remove": "Ta bort profil",
+    "cancel": "Avbryt",
+    "save": "Spara"
   }
 }

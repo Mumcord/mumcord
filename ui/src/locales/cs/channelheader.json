@@ -9,7 +9,12 @@
     "copyLink": "Kopírovat odkaz na kanál",
     "password": "Heslo kanálu…",
     "info": "Informace o kanálu",
-    "clear": "Vymazat historii chatu…"
+    "clear": "Vymazat historii chatu…",
+    "audio": "Zvuk pro tento kanál…",
+    "audioHint": {
+      "music": "♪ Hudba",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Informace o kanálu: {{channel}}",
@@ -48,10 +53,57 @@
     "following": "Sleduješ",
     "yes": "Ano",
     "no": "Ne",
+    "audioProfile": "Můj zvukový profil",
+    "audio": {
+      "none": "Žádný",
+      "voice": "Hlas (výchozí)",
+      "music": "♪ Hudba",
+      "jam": "⚡ Jam (nízká latence)",
+      "custom": "Vlastní"
+    },
+    "audioEdit": "Upravit…",
+    "audioSet": "Nastavit…",
     "cleared": "Historie naposledy vymazána",
     "never": "Nikdy",
     "copyLink": "Kopírovat odkaz",
     "copied": "Zkopírováno",
     "close": "Zavřít"
+  },
+  "badge": {
+    "music": "Profil Hudba",
+    "jam": "Profil Jam"
+  },
+  "audio": {
+    "title": "Zvuk pro tento kanál",
+    "presets": "Předvolby",
+    "preset": {
+      "voice": "Hlas",
+      "voiceHint": "Výchozí",
+      "music": "Hudba",
+      "musicHint": "Kvalita + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Nízká latence"
+    },
+    "musicQuality": "Kvalita pro hudbu",
+    "musicQualityHint": "Kodér vyladěný pro hudbu; potlačení šumu vypnuto.",
+    "musicIncluded": "Zahrnuto, dokud je zapnutý režim nízké latence.",
+    "lowLatency": "Režim nízké latence",
+    "lowLatencyHint": "Nejmenší pakety. Větší spotřeba datového toku, menší odolnost.",
+    "beta": "Beta",
+    "on": "zap.",
+    "off": "vyp.",
+    "followsDefault": "Výchozí ({{value}})",
+    "useDefault": "použít výchozí",
+    "bitrate": "Datový tok",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max.",
+    "bitrateDefault": "Výchozí, {{value}}",
+    "serverLimit": "Limit serveru {{kbps}} kbit/s",
+    "noServerLimit": "Bez limitu serveru",
+    "note": "Platí po vstupu do tohoto kanálu, pouze na tomto zařízení. Ostatních se to netýká. Informace o připojení označují tyto hodnoty textem „(profil kanálu)“.",
+    "saveFailed": "Zvukový profil se nepodařilo uložit.",
+    "remove": "Odebrat profil",
+    "cancel": "Zrušit",
+    "save": "Uložit"
   }
 }

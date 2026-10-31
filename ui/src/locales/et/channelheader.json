@@ -9,7 +9,12 @@
     "copyLink": "Kopeeri kanali link",
     "password": "Kanali parool…",
     "info": "Kanali info",
-    "clear": "Tühjenda vestluse ajalugu…"
+    "clear": "Tühjenda vestluse ajalugu…",
+    "audio": "Selle kanali heli…",
+    "audioHint": {
+      "music": "♪ Muusika",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanali info: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Jälgin",
     "yes": "Jah",
     "no": "Ei",
+    "audioProfile": "Minu heliprofiil",
+    "audio": {
+      "none": "Puudub",
+      "voice": "Hääl (vaikeseaded)",
+      "music": "♪ Muusika",
+      "jam": "⚡ Jam (väike viivitus)",
+      "custom": "Kohandatud"
+    },
+    "audioEdit": "Muuda…",
+    "audioSet": "Seadista…",
     "cleared": "Ajalugu tühjendati viimati",
     "never": "Mitte kunagi",
     "copyLink": "Kopeeri link",
     "copied": "Kopeeritud",
     "close": "Sulge"
+  },
+  "badge": {
+    "music": "Muusikaprofiil",
+    "jam": "Jam-profiil"
+  },
+  "audio": {
+    "title": "Selle kanali heli",
+    "presets": "Eelseaded",
+    "preset": {
+      "voice": "Hääl",
+      "voiceHint": "Vaikeseaded",
+      "music": "Muusika",
+      "musicHint": "Kvaliteet + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Väike viivitus"
+    },
+    "musicQuality": "Muusikakvaliteet",
+    "musicQualityHint": "Muusikale häälestatud kodeerija; mürasummutus välja lülitatud.",
+    "musicIncluded": "Kaasas, kui väikese viivitusega režiim on sees.",
+    "lowLatency": "Väikese viivitusega režiim",
+    "lowLatencyHint": "Kõige väiksemad paketid. Rohkem ribalaiust, vähem töökindel.",
+    "beta": "Beta",
+    "on": "sees",
+    "off": "väljas",
+    "followsDefault": "Vaikimisi ({{value}})",
+    "useDefault": "kasuta vaikeseadet",
+    "bitrate": "Bitikiirus",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Vaikimisi, {{value}}",
+    "serverLimit": "Serveri piirang {{kbps}} kbit/s",
+    "noServerLimit": "Serveri piirangut pole",
+    "note": "Rakendub, kui liitud selle kanaliga, ainult sellel seadmel. Teisi see ei mõjuta. Ühenduse teave märgib need väärtused tekstiga „(kanali profiil)“.",
+    "saveFailed": "Heliprofiili ei õnnestunud salvestada.",
+    "remove": "Eemalda profiil",
+    "cancel": "Tühista",
+    "save": "Salvesta"
   }
 }

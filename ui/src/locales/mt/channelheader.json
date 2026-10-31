@@ -9,7 +9,12 @@
     "copyLink": "Ikkopja r-rabta tal-kanal",
     "password": "Il-password tal-kanal…",
     "info": "Informazzjoni dwar il-kanal",
-    "clear": "Neħħi l-istorja taċ-chat…"
+    "clear": "Neħħi l-istorja taċ-chat…",
+    "audio": "Awdjo għal dan il-kanal…",
+    "audioHint": {
+      "music": "♪ Mużika",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Informazzjoni dwar il-kanal: {{channel}}",
@@ -50,10 +55,57 @@
     "following": "Qed issegwi",
     "yes": "Iva",
     "no": "Le",
+    "audioProfile": "Il-profil tal-awdjo tiegħi",
+    "audio": {
+      "none": "L-ebda wieħed",
+      "voice": "Vuċi (default)",
+      "music": "♪ Mużika",
+      "jam": "⚡ Jam (latenza baxxa)",
+      "custom": "Personalizzat"
+    },
+    "audioEdit": "Editja…",
+    "audioSet": "Issettja…",
     "cleared": "L-istorja tneħħiet l-aħħar darba",
     "never": "Qatt",
     "copyLink": "Ikkopja r-rabta",
     "copied": "Ikkupjat",
     "close": "Agħlaq"
+  },
+  "badge": {
+    "music": "Profil tal-mużika",
+    "jam": "Profil Jam"
+  },
+  "audio": {
+    "title": "Awdjo għal dan il-kanal",
+    "presets": "Preset",
+    "preset": {
+      "voice": "Vuċi",
+      "voiceHint": "Default",
+      "music": "Mużika",
+      "musicHint": "Kwalità + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Latenza baxxa"
+    },
+    "musicQuality": "Kwalità tal-mużika",
+    "musicQualityHint": "Encoder irranġat għall-mużika; it-tnaqqis tal-ħoss mitfi.",
+    "musicIncluded": "Inkluż sakemm il-modalità ta' latenza baxxa tkun mixgħula.",
+    "lowLatency": "Modalità ta' latenza baxxa",
+    "lowLatencyHint": "L-iżgħar pakketti. Aktar bandwidth, inqas robust.",
+    "beta": "Beta",
+    "on": "mixgħul",
+    "off": "mitfi",
+    "followsDefault": "Default ({{value}})",
+    "useDefault": "uża d-default",
+    "bitrate": "Bitrate",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Mass.",
+    "bitrateDefault": "Default, {{value}}",
+    "serverLimit": "Limitu tas-server {{kbps}} kbit/s",
+    "noServerLimit": "L-ebda limitu tas-server",
+    "note": "Japplika meta tingħaqad ma' dan il-kanal, fuq dan l-apparat biss. Persuni oħra ma jiġux affettwati. L-informazzjoni dwar il-konnessjoni timmarka dawn il-valuri b'“(profil tal-kanal)”.",
+    "saveFailed": "Ma setax jiġi ssejvjat il-profil tal-awdjo.",
+    "remove": "Neħħi l-profil",
+    "cancel": "Ikkanċella",
+    "save": "Issejvja"
   }
 }

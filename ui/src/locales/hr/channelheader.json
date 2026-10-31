@@ -9,7 +9,12 @@
     "copyLink": "Kopiraj poveznicu kanala",
     "password": "Lozinka kanala…",
     "info": "Informacije o kanalu",
-    "clear": "Očisti povijest chata…"
+    "clear": "Očisti povijest chata…",
+    "audio": "Zvuk za ovaj kanal…",
+    "audioHint": {
+      "music": "♪ Glazba",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Informacije o kanalu: {{channel}}",
@@ -46,10 +51,57 @@
     "following": "Pratiš",
     "yes": "Da",
     "no": "Ne",
+    "audioProfile": "Moj audioprofil",
+    "audio": {
+      "none": "Nema",
+      "voice": "Govor (zadano)",
+      "music": "♪ Glazba",
+      "jam": "⚡ Jam (niska latencija)",
+      "custom": "Prilagođeno"
+    },
+    "audioEdit": "Uredi…",
+    "audioSet": "Postavi…",
     "cleared": "Povijest zadnji put očišćena",
     "never": "Nikad",
     "copyLink": "Kopiraj poveznicu",
     "copied": "Kopirano",
     "close": "Zatvori"
+  },
+  "badge": {
+    "music": "Profil glazbe",
+    "jam": "Jam profil"
+  },
+  "audio": {
+    "title": "Zvuk za ovaj kanal",
+    "presets": "Predlošci",
+    "preset": {
+      "voice": "Govor",
+      "voiceHint": "Zadano",
+      "music": "Glazba",
+      "musicHint": "Kvaliteta + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Niska latencija"
+    },
+    "musicQuality": "Kvaliteta za glazbu",
+    "musicQualityHint": "Enkoder prilagođen glazbi; potiskivanje šuma isključeno.",
+    "musicIncluded": "Uključeno dok je način niske latencije uključen.",
+    "lowLatency": "Način niske latencije",
+    "lowLatencyHint": "Najmanji paketi. Više propusnosti, manja otpornost.",
+    "beta": "Beta",
+    "on": "uključeno",
+    "off": "isključeno",
+    "followsDefault": "Zadano ({{value}})",
+    "useDefault": "koristi zadano",
+    "bitrate": "Brzina prijenosa",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Zadano, {{value}}",
+    "serverLimit": "Ograničenje poslužitelja {{kbps}} kbit/s",
+    "noServerLimit": "Bez ograničenja poslužitelja",
+    "note": "Primjenjuje se kad uđete u ovaj kanal, samo na ovom uređaju. Ostali nisu pogođeni. Informacije o vezi označavaju ove vrijednosti s „(profil kanala)”.",
+    "saveFailed": "Audioprofil nije moguće spremiti.",
+    "remove": "Ukloni profil",
+    "cancel": "Odustani",
+    "save": "Spremi"
   }
 }

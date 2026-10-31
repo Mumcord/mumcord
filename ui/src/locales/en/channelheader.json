@@ -9,7 +9,12 @@
     "copyLink": "Copy channel link",
     "password": "Channel password…",
     "info": "Channel info",
-    "clear": "Clear chat history…"
+    "clear": "Clear chat history…",
+    "audio": "Audio for this channel…",
+    "audioHint": {
+      "music": "♪ Music",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Channel info: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Following",
     "yes": "Yes",
     "no": "No",
+    "audioProfile": "My audio profile",
+    "audio": {
+      "none": "None",
+      "voice": "Voice (defaults)",
+      "music": "♪ Music",
+      "jam": "⚡ Jam (low latency)",
+      "custom": "Custom"
+    },
+    "audioEdit": "Edit…",
+    "audioSet": "Set up…",
     "cleared": "History last cleared",
     "never": "Never",
     "copyLink": "Copy link",
     "copied": "Copied",
     "close": "Close"
+  },
+  "badge": {
+    "music": "Music profile",
+    "jam": "Jam profile"
+  },
+  "audio": {
+    "title": "Audio for this channel",
+    "presets": "Presets",
+    "preset": {
+      "voice": "Voice",
+      "voiceHint": "Defaults",
+      "music": "Music",
+      "musicHint": "Quality + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Low latency"
+    },
+    "musicQuality": "Music quality",
+    "musicQualityHint": "Music-tuned encoder; noise suppression off.",
+    "musicIncluded": "Included while low-latency mode is on.",
+    "lowLatency": "Low-latency mode",
+    "lowLatencyHint": "Smallest packets. More bandwidth, less robust.",
+    "beta": "Beta",
+    "on": "on",
+    "off": "off",
+    "followsDefault": "Default ({{value}})",
+    "useDefault": "use default",
+    "bitrate": "Bitrate",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max",
+    "bitrateDefault": "Default, {{value}}",
+    "serverLimit": "Server limit {{kbps}} kbit/s",
+    "noServerLimit": "No server limit",
+    "note": "Applies when you join this channel, only on this device. Other people are not affected. Connection info marks these values with “(channel profile)”.",
+    "saveFailed": "Couldn't save the audio profile.",
+    "remove": "Remove profile",
+    "cancel": "Cancel",
+    "save": "Save"
   }
 }

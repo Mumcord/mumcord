@@ -9,7 +9,12 @@
     "copyLink": "Kopioi kanavan linkki",
     "password": "Kanavan salasana…",
     "info": "Kanavan tiedot",
-    "clear": "Tyhjennä keskusteluhistoria…"
+    "clear": "Tyhjennä keskusteluhistoria…",
+    "audio": "Tämän kanavan ääni…",
+    "audioHint": {
+      "music": "♪ Musiikki",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanavan tiedot: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Seurataan",
     "yes": "Kyllä",
     "no": "Ei",
+    "audioProfile": "Oma ääniprofiilini",
+    "audio": {
+      "none": "Ei mitään",
+      "voice": "Puhe (oletukset)",
+      "music": "♪ Musiikki",
+      "jam": "⚡ Jam (pieni viive)",
+      "custom": "Mukautettu"
+    },
+    "audioEdit": "Muokkaa…",
+    "audioSet": "Määritä…",
     "cleared": "Historia tyhjennetty viimeksi",
     "never": "Ei koskaan",
     "copyLink": "Kopioi linkki",
     "copied": "Kopioitu",
     "close": "Sulje"
+  },
+  "badge": {
+    "music": "Musiikkiprofiili",
+    "jam": "Jam-profiili"
+  },
+  "audio": {
+    "title": "Tämän kanavan ääni",
+    "presets": "Esiasetukset",
+    "preset": {
+      "voice": "Puhe",
+      "voiceHint": "Oletukset",
+      "music": "Musiikki",
+      "musicHint": "Laatu + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Pieni viive"
+    },
+    "musicQuality": "Musiikkilaatu",
+    "musicQualityHint": "Musiikkiin viritetty enkooderi; kohinanvaimennus pois päältä.",
+    "musicIncluded": "Sisältyy, kun pienen viiveen tila on päällä.",
+    "lowLatency": "Pienen viiveen tila",
+    "lowLatencyHint": "Pienimmät paketit. Enemmän kaistanleveyttä, vähemmän kestävä.",
+    "beta": "Beta",
+    "on": "päällä",
+    "off": "pois",
+    "followsDefault": "Oletus ({{value}})",
+    "useDefault": "käytä oletusta",
+    "bitrate": "Bittinopeus",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Oletus, {{value}}",
+    "serverLimit": "Palvelimen raja {{kbps}} kbit/s",
+    "noServerLimit": "Ei palvelimen rajaa",
+    "note": "Otetaan käyttöön, kun liityt tälle kanavalle, vain tällä laitteella. Muihin tämä ei vaikuta. Yhteystiedoissa nämä arvot merkitään tekstillä ”(kanavaprofiili)”.",
+    "saveFailed": "Ääniprofiilia ei voitu tallentaa.",
+    "remove": "Poista profiili",
+    "cancel": "Peruuta",
+    "save": "Tallenna"
   }
 }

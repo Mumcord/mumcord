@@ -93,5 +93,14 @@
   "endToEndValue": "≈ {{value}} ms (szacunek)",
   "lowLatencyMode": "Tryb niskich opóźnień",
   "identity": "Tożsamość",
-  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}"
+  "identityValue": "{{label}} ({{name}}) · {{fingerprint}}",
+  "profileSource": "{{label}} (profil kanału)",
+  "profile": {
+    "row": "Profil dźwięku",
+    "musicOn": "Jakość muzyki",
+    "musicOff": "Jakość muzyki wył.",
+    "lowLatencyOn": "Tryb niskich opóźnień",
+    "lowLatencyOff": "Tryb niskich opóźnień wył.",
+    "defaults": "Domyślne"
+  }
 }

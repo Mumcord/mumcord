@@ -9,7 +9,12 @@
     "copyLink": "Kopiraj povezavo do kanala",
     "password": "Geslo kanala…",
     "info": "Podatki o kanalu",
-    "clear": "Počisti zgodovino klepeta…"
+    "clear": "Počisti zgodovino klepeta…",
+    "audio": "Zvok za ta kanal…",
+    "audioHint": {
+      "music": "♪ Glasba",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Podatki o kanalu: {{channel}}",
@@ -48,10 +53,57 @@
     "following": "Slediš",
     "yes": "Da",
     "no": "Ne",
+    "audioProfile": "Moj zvočni profil",
+    "audio": {
+      "none": "Brez",
+      "voice": "Glas (privzeto)",
+      "music": "♪ Glasba",
+      "jam": "⚡ Jam (nizka zakasnitev)",
+      "custom": "Po meri"
+    },
+    "audioEdit": "Uredi…",
+    "audioSet": "Nastavi…",
     "cleared": "Zgodovina nazadnje počiščena",
     "never": "Nikoli",
     "copyLink": "Kopiraj povezavo",
     "copied": "Kopirano",
     "close": "Zapri"
+  },
+  "badge": {
+    "music": "Profil glasbe",
+    "jam": "Profil Jam"
+  },
+  "audio": {
+    "title": "Zvok za ta kanal",
+    "presets": "Prednastavitve",
+    "preset": {
+      "voice": "Glas",
+      "voiceHint": "Privzeto",
+      "music": "Glasba",
+      "musicHint": "Kakovost + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Nizka zakasnitev"
+    },
+    "musicQuality": "Kakovost za glasbo",
+    "musicQualityHint": "Kodirnik, prilagojen glasbi; dušenje šuma izklopljeno.",
+    "musicIncluded": "Vključeno, dokler je vklopljen način nizke zakasnitve.",
+    "lowLatency": "Način nizke zakasnitve",
+    "lowLatencyHint": "Najmanjši paketi. Več pasovne širine, manj robustno.",
+    "beta": "Beta",
+    "on": "vklopljeno",
+    "off": "izklopljeno",
+    "followsDefault": "Privzeto ({{value}})",
+    "useDefault": "uporabi privzeto",
+    "bitrate": "Bitna hitrost",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Najv.",
+    "bitrateDefault": "Privzeto, {{value}}",
+    "serverLimit": "Omejitev strežnika {{kbps}} kbit/s",
+    "noServerLimit": "Brez omejitve strežnika",
+    "note": "Velja ob pridružitvi temu kanalu, samo na tej napravi. Drugih ne prizadene. Podatki o povezavi te vrednosti označijo z „(profil kanala)“.",
+    "saveFailed": "Zvočnega profila ni bilo mogoče shraniti.",
+    "remove": "Odstrani profil",
+    "cancel": "Prekliči",
+    "save": "Shrani"
   }
 }

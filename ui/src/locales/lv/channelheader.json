@@ -9,7 +9,12 @@
     "copyLink": "Kopēt kanāla saiti",
     "password": "Kanāla parole…",
     "info": "Kanāla informācija",
-    "clear": "Notīrīt tērzēšanas vēsturi…"
+    "clear": "Notīrīt tērzēšanas vēsturi…",
+    "audio": "Šī kanāla audio…",
+    "audioHint": {
+      "music": "♪ Mūzika",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanāla informācija: {{channel}}",
@@ -46,10 +51,57 @@
     "following": "Seko",
     "yes": "Jā",
     "no": "Nē",
+    "audioProfile": "Mans audio profils",
+    "audio": {
+      "none": "Nav",
+      "voice": "Balss (noklusējums)",
+      "music": "♪ Mūzika",
+      "jam": "⚡ Jam (zema aizkave)",
+      "custom": "Pielāgots"
+    },
+    "audioEdit": "Rediģēt…",
+    "audioSet": "Iestatīt…",
     "cleared": "Vēsture pēdējoreiz notīrīta",
     "never": "Nekad",
     "copyLink": "Kopēt saiti",
     "copied": "Nokopēts",
     "close": "Aizvērt"
+  },
+  "badge": {
+    "music": "Mūzikas profils",
+    "jam": "Jam profils"
+  },
+  "audio": {
+    "title": "Šī kanāla audio",
+    "presets": "Sagataves",
+    "preset": {
+      "voice": "Balss",
+      "voiceHint": "Noklusējums",
+      "music": "Mūzika",
+      "musicHint": "Kvalitāte + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Zema aizkave"
+    },
+    "musicQuality": "Mūzikas kvalitāte",
+    "musicQualityHint": "Mūzikai pielāgots kodētājs; trokšņu slāpēšana izslēgta.",
+    "musicIncluded": "Iekļauts, kamēr ir ieslēgts zemas aizkaves režīms.",
+    "lowLatency": "Zemas aizkaves režīms",
+    "lowLatencyHint": "Vismazākās paketes. Vairāk joslas platuma, mazāk noturīgs.",
+    "beta": "Beta",
+    "on": "ieslēgts",
+    "off": "izslēgts",
+    "followsDefault": "Noklusējums ({{value}})",
+    "useDefault": "izmantot noklusējumu",
+    "bitrate": "Bitu pārraides ātrums",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Noklusējums, {{value}}",
+    "serverLimit": "Servera ierobežojums {{kbps}} kbit/s",
+    "noServerLimit": "Nav servera ierobežojuma",
+    "note": "Tiek lietots, kad pievienojaties šim kanālam, tikai šajā ierīcē. Citus tas neietekmē. Savienojuma informācijā šīs vērtības ir atzīmētas ar „(kanāla profils)“.",
+    "saveFailed": "Neizdevās saglabāt audio profilu.",
+    "remove": "Noņemt profilu",
+    "cancel": "Atcelt",
+    "save": "Saglabāt"
   }
 }

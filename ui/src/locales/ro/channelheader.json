@@ -9,7 +9,12 @@
     "copyLink": "Copiază linkul canalului",
     "password": "Parola canalului…",
     "info": "Informații despre canal",
-    "clear": "Șterge istoricul conversației…"
+    "clear": "Șterge istoricul conversației…",
+    "audio": "Audio pentru acest canal…",
+    "audioHint": {
+      "music": "♪ Muzică",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Informații despre canal: {{channel}}",
@@ -46,10 +51,57 @@
     "following": "Urmărești",
     "yes": "Da",
     "no": "Nu",
+    "audioProfile": "Profilul meu audio",
+    "audio": {
+      "none": "Niciunul",
+      "voice": "Voce (implicit)",
+      "music": "♪ Muzică",
+      "jam": "⚡ Jam (latență redusă)",
+      "custom": "Personalizat"
+    },
+    "audioEdit": "Editează…",
+    "audioSet": "Configurează…",
     "cleared": "Istoric șters ultima dată",
     "never": "Niciodată",
     "copyLink": "Copiază linkul",
     "copied": "Copiat",
     "close": "Închide"
+  },
+  "badge": {
+    "music": "Profil muzică",
+    "jam": "Profil Jam"
+  },
+  "audio": {
+    "title": "Audio pentru acest canal",
+    "presets": "Presetări",
+    "preset": {
+      "voice": "Voce",
+      "voiceHint": "Implicit",
+      "music": "Muzică",
+      "musicHint": "Calitate + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Latență redusă"
+    },
+    "musicQuality": "Calitate pentru muzică",
+    "musicQualityHint": "Encoder optimizat pentru muzică; suprimarea zgomotului dezactivată.",
+    "musicIncluded": "Inclus cât timp modul cu latență redusă este activat.",
+    "lowLatency": "Mod cu latență redusă",
+    "lowLatencyHint": "Cele mai mici pachete. Mai multă lățime de bandă, mai puțin robust.",
+    "beta": "Beta",
+    "on": "activat",
+    "off": "dezactivat",
+    "followsDefault": "Implicit ({{value}})",
+    "useDefault": "folosește implicitul",
+    "bitrate": "Rată de biți",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max.",
+    "bitrateDefault": "Implicit, {{value}}",
+    "serverLimit": "Limita serverului {{kbps}} kbit/s",
+    "noServerLimit": "Fără limită a serverului",
+    "note": "Se aplică la intrarea pe acest canal, doar pe acest dispozitiv. Ceilalți nu sunt afectați. Informațiile despre conexiune marchează aceste valori cu „(profil de canal)”.",
+    "saveFailed": "Profilul audio nu a putut fi salvat.",
+    "remove": "Elimină profilul",
+    "cancel": "Anulează",
+    "save": "Salvează"
   }
 }

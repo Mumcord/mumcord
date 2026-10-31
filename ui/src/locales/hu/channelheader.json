@@ -9,7 +9,12 @@
     "copyLink": "Csatornahivatkozás másolása",
     "password": "Csatorna jelszava…",
     "info": "Csatorna adatai",
-    "clear": "Csevegési előzmények törlése…"
+    "clear": "Csevegési előzmények törlése…",
+    "audio": "Hang ehhez a csatornához…",
+    "audioHint": {
+      "music": "♪ Zene",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Csatorna adatai: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Követed",
     "yes": "Igen",
     "no": "Nem",
+    "audioProfile": "Saját hangprofilom",
+    "audio": {
+      "none": "Nincs",
+      "voice": "Beszéd (alapértelmezett)",
+      "music": "♪ Zene",
+      "jam": "⚡ Jam (alacsony késleltetés)",
+      "custom": "Egyéni"
+    },
+    "audioEdit": "Szerkesztés…",
+    "audioSet": "Beállítás…",
     "cleared": "Az előzmények utolsó törlése",
     "never": "Soha",
     "copyLink": "Hivatkozás másolása",
     "copied": "Másolva",
     "close": "Bezárás"
+  },
+  "badge": {
+    "music": "Zeneprofil",
+    "jam": "Jam profil"
+  },
+  "audio": {
+    "title": "Hang ehhez a csatornához",
+    "presets": "Előbeállítások",
+    "preset": {
+      "voice": "Beszéd",
+      "voiceHint": "Alapértelmezett",
+      "music": "Zene",
+      "musicHint": "Minőség + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Alacsony késleltetés"
+    },
+    "musicQuality": "Zenei minőség",
+    "musicQualityHint": "Zenére hangolt kódoló; zajszűrés kikapcsolva.",
+    "musicIncluded": "Benne van, amíg az alacsony késleltetésű mód be van kapcsolva.",
+    "lowLatency": "Alacsony késleltetésű mód",
+    "lowLatencyHint": "Legkisebb csomagok. Több sávszélesség, kevésbé robusztus.",
+    "beta": "Beta",
+    "on": "be",
+    "off": "ki",
+    "followsDefault": "Alapértelmezett ({{value}})",
+    "useDefault": "alapértelmezett használata",
+    "bitrate": "Bitráta",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max.",
+    "bitrateDefault": "Alapértelmezett, {{value}}",
+    "serverLimit": "Szerverkorlát: {{kbps}} kbit/s",
+    "noServerLimit": "Nincs szerverkorlát",
+    "note": "Akkor lép életbe, amikor csatlakozol ehhez a csatornához, csak ezen az eszközön. Másokat nem érint. A kapcsolat adatai ezeket az értékeket a „(csatornaprofil)” jelöléssel látják el.",
+    "saveFailed": "Nem sikerült menteni a hangprofilt.",
+    "remove": "Profil eltávolítása",
+    "cancel": "Mégse",
+    "save": "Mentés"
   }
 }

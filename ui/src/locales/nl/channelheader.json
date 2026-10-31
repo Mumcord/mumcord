@@ -9,7 +9,12 @@
     "copyLink": "Kanaallink kopiëren",
     "password": "Kanaalwachtwoord…",
     "info": "Kanaalinfo",
-    "clear": "Chatgeschiedenis wissen…"
+    "clear": "Chatgeschiedenis wissen…",
+    "audio": "Audio voor dit kanaal…",
+    "audioHint": {
+      "music": "♪ Muziek",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanaalinfo: {{channel}}",
@@ -44,10 +49,57 @@
     "following": "Volgend",
     "yes": "Ja",
     "no": "Nee",
+    "audioProfile": "Mijn audioprofiel",
+    "audio": {
+      "none": "Geen",
+      "voice": "Spraak (standaard)",
+      "music": "♪ Muziek",
+      "jam": "⚡ Jam (lage latentie)",
+      "custom": "Aangepast"
+    },
+    "audioEdit": "Bewerken…",
+    "audioSet": "Instellen…",
     "cleared": "Geschiedenis laatst gewist",
     "never": "Nooit",
     "copyLink": "Link kopiëren",
     "copied": "Gekopieerd",
     "close": "Sluiten"
+  },
+  "badge": {
+    "music": "Muziekprofiel",
+    "jam": "Jamprofiel"
+  },
+  "audio": {
+    "title": "Audio voor dit kanaal",
+    "presets": "Voorinstellingen",
+    "preset": {
+      "voice": "Spraak",
+      "voiceHint": "Standaard",
+      "music": "Muziek",
+      "musicHint": "Kwaliteit + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Lage latentie"
+    },
+    "musicQuality": "Muziekkwaliteit",
+    "musicQualityHint": "Op muziek afgestemde encoder; ruisonderdrukking uit.",
+    "musicIncluded": "Inbegrepen zolang de modus voor lage latentie aan staat.",
+    "lowLatency": "Modus voor lage latentie",
+    "lowLatencyHint": "Kleinste pakketten. Meer bandbreedte, minder robuust.",
+    "beta": "Beta",
+    "on": "aan",
+    "off": "uit",
+    "followsDefault": "Standaard ({{value}})",
+    "useDefault": "standaard gebruiken",
+    "bitrate": "Bitrate",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Max",
+    "bitrateDefault": "Standaard, {{value}}",
+    "serverLimit": "Serverlimiet {{kbps}} kbit/s",
+    "noServerLimit": "Geen serverlimiet",
+    "note": "Geldt wanneer je dit kanaal betreedt, alleen op dit apparaat. Anderen worden niet beïnvloed. Verbindingsinfo markeert deze waarden met “(kanaalprofiel)”.",
+    "saveFailed": "Het audioprofiel kon niet worden opgeslagen.",
+    "remove": "Profiel verwijderen",
+    "cancel": "Annuleren",
+    "save": "Opslaan"
   }
 }

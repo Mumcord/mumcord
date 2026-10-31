@@ -9,7 +9,12 @@
     "copyLink": "Cóipeáil nasc an chainéil",
     "password": "Pasfhocal an chainéil…",
     "info": "Eolas faoin gcainéal",
-    "clear": "Glan stair an chomhrá…"
+    "clear": "Glan stair an chomhrá…",
+    "audio": "Fuaim don chainéal seo…",
+    "audioHint": {
+      "music": "♪ Ceol",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Eolas faoin gcainéal: {{channel}}",
@@ -50,10 +55,57 @@
     "following": "Ag leanúint",
     "yes": "Tá",
     "no": "Níl",
+    "audioProfile": "Mo phróifíl fuaime",
+    "audio": {
+      "none": "Faic",
+      "voice": "Guth (réamhshocruithe)",
+      "music": "♪ Ceol",
+      "jam": "⚡ Jam (moill íseal)",
+      "custom": "Saincheaptha"
+    },
+    "audioEdit": "Cuir in eagar…",
+    "audioSet": "Socraigh…",
     "cleared": "Glanadh an stair go deireanach",
     "never": "Riamh",
     "copyLink": "Cóipeáil an nasc",
     "copied": "Cóipeáilte",
     "close": "Dún"
+  },
+  "badge": {
+    "music": "Próifíl cheoil",
+    "jam": "Próifíl Jam"
+  },
+  "audio": {
+    "title": "Fuaim don chainéal seo",
+    "presets": "Réamhshocruithe",
+    "preset": {
+      "voice": "Guth",
+      "voiceHint": "Réamhshocruithe",
+      "music": "Ceol",
+      "musicHint": "Cáilíocht + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Moill íseal"
+    },
+    "musicQuality": "Cáilíocht cheoil",
+    "musicQualityHint": "Ionchódóir atá tiúnta don cheol; cuimsiú torainn múchta.",
+    "musicIncluded": "San áireamh fad is atá an mód moill íseal air.",
+    "lowLatency": "Mód moill íseal",
+    "lowLatencyHint": "Na pacáistí is lú. Níos mó leathanbhanda, níos lú láidreachta.",
+    "beta": "Beta",
+    "on": "air",
+    "off": "as",
+    "followsDefault": "Réamhshocrú ({{value}})",
+    "useDefault": "úsáid an réamhshocrú",
+    "bitrate": "Ráta giotán",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Uas.",
+    "bitrateDefault": "Réamhshocrú, {{value}}",
+    "serverLimit": "Teorainn an fhreastalaí {{kbps}} kbit/s",
+    "noServerLimit": "Gan teorainn freastalaí",
+    "note": "Feidhmíonn sé nuair a théann tú isteach sa chainéal seo, ar an ngléas seo amháin. Ní dhéanann sé difear do dhaoine eile. Cuireann an t-eolas faoin nasc “(próifíl chainéil)” leis na luachanna seo.",
+    "saveFailed": "Níorbh fhéidir an phróifíl fuaime a shábháil.",
+    "remove": "Bain an phróifíl",
+    "cancel": "Cealaigh",
+    "save": "Sábháil"
   }
 }

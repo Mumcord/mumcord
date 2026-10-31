@@ -9,7 +9,12 @@
     "copyLink": "Kopijuoti kanalo nuorodą",
     "password": "Kanalo slaptažodis…",
     "info": "Kanalo informacija",
-    "clear": "Išvalyti pokalbių istoriją…"
+    "clear": "Išvalyti pokalbių istoriją…",
+    "audio": "Šio kanalo garsas…",
+    "audioHint": {
+      "music": "♪ Muzika",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Kanalo informacija: {{channel}}",
@@ -48,10 +53,57 @@
     "following": "Sekama",
     "yes": "Taip",
     "no": "Ne",
+    "audioProfile": "Mano garso profilis",
+    "audio": {
+      "none": "Nėra",
+      "voice": "Balsas (numatytieji)",
+      "music": "♪ Muzika",
+      "jam": "⚡ Jam (maža delsa)",
+      "custom": "Pasirinktinis"
+    },
+    "audioEdit": "Redaguoti…",
+    "audioSet": "Nustatyti…",
     "cleared": "Istorija paskutinį kartą išvalyta",
     "never": "Niekada",
     "copyLink": "Kopijuoti nuorodą",
     "copied": "Nukopijuota",
     "close": "Uždaryti"
+  },
+  "badge": {
+    "music": "Muzikos profilis",
+    "jam": "Jam profilis"
+  },
+  "audio": {
+    "title": "Šio kanalo garsas",
+    "presets": "Šablonai",
+    "preset": {
+      "voice": "Balsas",
+      "voiceHint": "Numatytieji",
+      "music": "Muzika",
+      "musicHint": "Kokybė + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Maža delsa"
+    },
+    "musicQuality": "Muzikos kokybė",
+    "musicQualityHint": "Muzikai pritaikytas kodavimo įrankis; triukšmo slopinimas išjungtas.",
+    "musicIncluded": "Įtraukta, kol įjungtas mažos delsos režimas.",
+    "lowLatency": "Mažos delsos režimas",
+    "lowLatencyHint": "Mažiausi paketai. Daugiau pralaidumo, mažesnis atsparumas.",
+    "beta": "Beta",
+    "on": "įjungta",
+    "off": "išjungta",
+    "followsDefault": "Numatytoji ({{value}})",
+    "useDefault": "naudoti numatytąją",
+    "bitrate": "Bitų sparta",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Maks.",
+    "bitrateDefault": "Numatytoji, {{value}}",
+    "serverLimit": "Serverio riba {{kbps}} kbit/s",
+    "noServerLimit": "Be serverio ribos",
+    "note": "Taikoma prisijungus prie šio kanalo, tik šiame įrenginyje. Kitų tai neveikia. Ryšio informacijoje šios reikšmės pažymimos „(kanalo profilis)“.",
+    "saveFailed": "Nepavyko išsaugoti garso profilio.",
+    "remove": "Pašalinti profilį",
+    "cancel": "Atšaukti",
+    "save": "Išsaugoti"
   }
 }

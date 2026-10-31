@@ -9,7 +9,12 @@
     "copyLink": "Copiar enlace del canal",
     "password": "Contraseña del canal…",
     "info": "Información del canal",
-    "clear": "Borrar historial del chat…"
+    "clear": "Borrar historial del chat…",
+    "audio": "Audio de este canal…",
+    "audioHint": {
+      "music": "♪ Música",
+      "jam": "⚡ Jam"
+    }
   },
   "info": {
     "title": "Información del canal: {{channel}}",
@@ -46,10 +51,57 @@
     "following": "Siguiendo",
     "yes": "Sí",
     "no": "No",
+    "audioProfile": "Mi perfil de audio",
+    "audio": {
+      "none": "Ninguno",
+      "voice": "Voz (valores predeterminados)",
+      "music": "♪ Música",
+      "jam": "⚡ Jam (baja latencia)",
+      "custom": "Personalizado"
+    },
+    "audioEdit": "Editar…",
+    "audioSet": "Configurar…",
     "cleared": "Historial borrado por última vez",
     "never": "Nunca",
     "copyLink": "Copiar enlace",
     "copied": "Copiado",
     "close": "Cerrar"
+  },
+  "badge": {
+    "music": "Perfil de música",
+    "jam": "Perfil Jam"
+  },
+  "audio": {
+    "title": "Audio de este canal",
+    "presets": "Preajustes",
+    "preset": {
+      "voice": "Voz",
+      "voiceHint": "Predeterminado",
+      "music": "Música",
+      "musicHint": "Calidad + {{kbps}} kbit/s",
+      "jam": "Jam",
+      "jamHint": "Baja latencia"
+    },
+    "musicQuality": "Calidad de música",
+    "musicQualityHint": "Codificador optimizado para música; supresión de ruido desactivada.",
+    "musicIncluded": "Incluido mientras el modo de baja latencia está activado.",
+    "lowLatency": "Modo de baja latencia",
+    "lowLatencyHint": "Paquetes más pequeños. Más ancho de banda, menos robusto.",
+    "beta": "Beta",
+    "on": "activado",
+    "off": "desactivado",
+    "followsDefault": "Predeterminado ({{value}})",
+    "useDefault": "usar el predeterminado",
+    "bitrate": "Tasa de bits",
+    "bitrateValue": "{{kbps}} kbit/s",
+    "bitrateMax": "Máx.",
+    "bitrateDefault": "Predeterminado, {{value}}",
+    "serverLimit": "Límite del servidor {{kbps}} kbit/s",
+    "noServerLimit": "Sin límite del servidor",
+    "note": "Se aplica al unirte a este canal, solo en este dispositivo. No afecta a los demás. La información de conexión marca estos valores con «(perfil del canal)».",
+    "saveFailed": "No se pudo guardar el perfil de audio.",
+    "remove": "Quitar perfil",
+    "cancel": "Cancelar",
+    "save": "Guardar"
   }
 }
