@@ -78,6 +78,8 @@ The client only displays relay state; every access decision is made by the bot (
   - "The relay bot did not answer." (token request timed out, FR-4.14)
   - "The relay refused the connection: {reason}" (handshake error code, section 6.5)
   - "The relay could not be reached over UDP or TCP 443."
+  - `token-err` reasons without their own line above: `denied` → "The relay bot refused the request."; `peer-gone` → "The other person left the server."; `rate-limited` → "Too many relay requests. Try again in a minute."; `relay-full` → "The relay refused the connection: relay full"; `relay-down` → the "not reachable right now" line above; `peer-not-mumcord` → the FR-4.14 line "The other person can't use the relay …".
+  - Pinned relay changed and not trusted (FR-4.9): "The relay of this server changed and is not trusted."
 - **FR-4.12** Without any announcement Mumcord behaves exactly as before this epic, except that `relay_only` reports "This server has no relay".
 
 ### 4.3 Client: connecting
