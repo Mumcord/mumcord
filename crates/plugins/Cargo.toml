@@ -3,12 +3,14 @@ name = "mumcord-plugins"
 description = "Plugin host for Mumcord: sandboxed WebAssembly runtime, manifest and package handling"
 version.workspace = true
 edition.workspace = true
-rust-version.workspace = true
+# wasmtime 50 needs Rust 1.97; the rest of the workspace builds with older toolchains.
+rust-version = "1.97"
 license.workspace = true
 # Part of the app, not a library for others: the plugin API is the WIT package, not this crate.
 publish = false
 
 [dependencies]
+wasmtime.workspace = true
 zip.workspace = true
 semver.workspace = true
 sha2.workspace = true
@@ -17,6 +19,11 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 tempfile.workspace = true
+
+[dev-dependencies]
+wat.workspace = true
+wit-component.workspace = true
+wit-parser.workspace = true
 
 [lints]
 workspace = true
