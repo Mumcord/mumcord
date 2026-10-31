@@ -92,7 +92,9 @@ describe("chat: channel tree right-click menu (AC-3.65)", () => {
     await rightClick("Raid");
     await $("//button[@role='menuitem'][contains(., 'Join channel')]").click();
     await browser.waitUntil(
-      async () => (await treeItem("Raid").getText()).includes("you are here"),
+      // "you are here" may be visually hidden in a narrow tree; the text is still there.
+      async () =>
+        String(await treeItem("Raid").getProperty("textContent")).includes("you are here"),
       { timeoutMsg: "did not join Raid from the menu" },
     );
   });
