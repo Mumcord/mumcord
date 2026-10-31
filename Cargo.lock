@@ -3597,6 +3597,7 @@ dependencies = [
  "ammonia",
  "anyhow",
  "ashpd",
+ "base64 0.23.1",
  "block2",
  "bytes",
  "dispatch2",
@@ -3619,10 +3620,12 @@ dependencies = [
  "objc2-foundation",
  "objc2-screen-capture-kit",
  "pipewire",
+ "plist",
  "prost",
  "quick-xml 0.42.0",
  "rcgen",
  "reqwest",
+ "rusqlite",
  "rustls",
  "rustls-platform-verifier",
  "serde",
@@ -3639,7 +3642,9 @@ dependencies = [
  "windows",
  "windows-core",
  "windows-future",
+ "windows-registry",
  "x11rb 0.14.0",
+ "x509-parser",
 ]
 
 [[package]]

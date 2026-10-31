@@ -68,6 +68,10 @@ aes = "0.9"
 x509-parser = "0.18"
 # PEM for the "Show certificate" action in the server info panel.
 base64 = "0.23"
+# Import from the official Mumble client (issue #66): its 1.4 settings on macOS (property list)
+# and Windows (registry).
+plist = "1.10"
+windows-registry = "0.6"
 rand = "0.10"
 sha1 = "0.10"
 # Content hash of full-size images shared between Mumcord clients (FR-1.60c).
