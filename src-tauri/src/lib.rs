@@ -229,6 +229,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::p2p_consent_decide,
             commands::watch_party::watch_party_start,
             commands::watch_party::watch_party_command,
+            commands::watch_party::watch_party_report,
             commands::watch_party::watch_party_join,
             commands::watch_party::watch_party_get,
             commands::watch_party::watch_party_leave,
@@ -247,6 +248,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_decode_fallback,
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
+            commands::screen_share::screen_share_quality,
+            commands::screen_share::screen_share_watch_stats,
             commands::updates::update_check_now,
             commands::updates::appimage_menu_entry_add,
         ])

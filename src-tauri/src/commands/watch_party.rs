@@ -42,6 +42,19 @@ pub struct PlaylistEntry {
     pub added_by_name: Option<String>,
 }
 
+/// Where one participant's player last said it is (issue #163).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ParticipantPosition {
+    pub session: SessionId,
+    pub position_ms: u32,
+    /// How old the report was when the view was made, in milliseconds.
+    pub age_ms: u32,
+    /// The state that player reported for itself, not the party's.
+    pub playing: bool,
+    pub buffering: bool,
+}
+
 /// The running party in the voice channel.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -60,6 +73,10 @@ pub struct WatchParty {
     pub playlist: Vec<PlaylistEntry>,
     /// Who skipped to the current video ("Anna skipped"), until the next playback command.
     pub skipped_by: Option<SessionId>,
+    /// Where each participant last reported being (issue #163).
+    pub positions: Vec<ParticipantPosition>,
+    /// Who started the party (the crown in the watching list, issue #163).
+    pub host: SessionId,
 }
 
 /// The party on the server started, changed or ended (`party` is `null`).
@@ -116,6 +133,18 @@ impl From<mumcord_engine::WatchPartyView> for WatchParty {
                 })
                 .collect(),
             skipped_by: v.skipped_by,
+            positions: v
+                .positions
+                .into_iter()
+                .map(|p| ParticipantPosition {
+                    session: p.session,
+                    position_ms: p.position_ms,
+                    age_ms: p.age_ms,
+                    playing: p.playing,
+                    buffering: p.buffering,
+                })
+                .collect(),
+            host: v.host,
         }
     }
 }
@@ -151,6 +180,24 @@ pub fn watch_party_command(
     command: WatchCommand,
 ) -> ApiResult<()> {
     Ok(engine.watch_party_command(to_engine_server_id(server_id), command.into())?)
+}
+
+/// Where the user's player is, for the sync list (issue #163): remembered and told to the others.
+#[tauri::command]
+#[specta::specta]
+pub fn watch_party_report(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    position_ms: u32,
+    playing: bool,
+    buffering: bool,
+) -> ApiResult<()> {
+    Ok(engine.watch_party_report(
+        to_engine_server_id(server_id),
+        position_ms,
+        playing,
+        buffering,
+    )?)
 }
 
 /// Leaves the party (also happens when leaving the channel).

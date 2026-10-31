@@ -408,6 +408,10 @@ describe("screen share viewer", () => {
               soundAvailable: false,
               viewers: [],
               blocked: null,
+
+              kind: null,
+
+              elapsedMs: 0,
             },
           ],
         });
@@ -455,6 +459,10 @@ describe("screen share viewer", () => {
             soundAvailable: false,
             viewers: [1],
             blocked: null,
+
+            kind: null,
+
+            elapsedMs: 0,
           },
         ],
       });

@@ -21,6 +21,10 @@ function share(patch: Partial<ScreenShare> = {}): ScreenShare {
     soundAvailable: false,
     viewers: [],
     blocked: null,
+
+    kind: null,
+
+    elapsedMs: 0,
     ...patch,
   };
 }
