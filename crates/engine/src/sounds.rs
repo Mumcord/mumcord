@@ -178,8 +178,8 @@ impl Sound {
     }
 }
 
-/// Decodes the embedded 16-bit mono WAV files (canonical RIFF layout written by
-/// `assets/sounds/generate.py`); anything unexpected yields silence-free empty output.
+/// Decodes the embedded 16-bit mono WAV files (RIFF chunks as written by ffmpeg); anything
+/// unexpected yields silence-free empty output.
 fn decode_wav(bytes: &[u8]) -> Vec<f32> {
     let mut pos = 12;
     while pos + 8 <= bytes.len() {
@@ -897,12 +897,18 @@ mod tests {
             let samples = s.samples();
             assert!(samples.len() > 48_00, "{s:?} too short");
             // The kick and ban sounds are 1 s long; the connect sound (also used for the party and share starts)
-            // is a 1.2 s chime and the new-message sound a 1 s one, the mention 0.7 s and the hang up (also the share stop) 0.9 s; every other cue stays short.
+            // is a 1.2 s chime and the new-message sound a 1 s one, the mention 0.7 s, the people joining and leaving 0.8 s and the hang up (also the share stop) 0.9 s; every other cue stays short.
             let max_ms = match s {
                 Sound::Banned | Sound::Kicked => 1000,
                 Sound::VoiceJoin | Sound::PartyStarted | Sound::ShareStarted => 1200,
                 Sound::Message => 1000,
                 Sound::Mention => 700,
+                Sound::UserJoined
+                | Sound::UserLeft
+                | Sound::PartyJoined
+                | Sound::PartyLeft
+                | Sound::ViewerStarted
+                | Sound::ViewerStopped => 800,
                 Sound::HangUp | Sound::ShareStopped => 900,
                 _ => 400,
             };

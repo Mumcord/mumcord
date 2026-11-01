@@ -15,6 +15,7 @@
 - New kicked and banned sounds
 - New mention sound
 - New leaving-voice sound
+- New someone-joining and someone-leaving sounds
 
 ### Fixed
 
