@@ -134,7 +134,11 @@ describe("InstallPrompt", () => {
     act(() => {
       api.mock.emit("pluginsInstallProgress", { id: "poll", progress: { stage: "verifying" } });
     });
-    expect(await screen.findByText("Checking…")).toBeTruthy();
+    expect(
+      (await screen.findByRole("progressbar", { name: "Installing Poll" })).getAttribute(
+        "aria-valuetext",
+      ),
+    ).toBe("100% · Checking signature…");
     expect(screen.getByRole("button", { name: "Cancel" })).toHaveProperty("disabled", true);
     await act(async () => {
       fail(new EngineError("invalidInput", "Signature check failed"));
@@ -152,6 +156,27 @@ describe("InstallPrompt", () => {
       "Download didn't match the official list",
     );
     expect(screen.queryByRole("button", { name: "Install" })).toBeNull();
+  });
+
+  it("shows the download progress while preparing and retries after a failure", async () => {
+    const prepare = vi
+      .spyOn(api, "pluginInstallPrepare")
+      .mockRejectedValueOnce(new EngineError("invalidInput", "The plugin list is unreachable"))
+      .mockReturnValueOnce(new Promise(() => {}));
+    render(<InstallPrompt plugin={poll} repositoryWarning={false} onClose={vi.fn()} />);
+    expect((await screen.findByRole("alert")).textContent).toBe("The plugin list is unreachable");
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(prepare).toHaveBeenCalledTimes(2);
+    act(() => {
+      api.mock.emit("pluginsInstallProgress", {
+        id: "poll",
+        progress: { stage: "downloading", received: 11_500_000, total: 23_000_000 },
+      });
+    });
+    const bar = await screen.findByRole("progressbar", { name: "Installing Poll" });
+    expect(bar.getAttribute("aria-valuenow")).toBe("50");
+    expect(screen.getByText("Downloading 11.5 MB of 23 MB")).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("asks to confirm the first install from a third-party repository", async () => {

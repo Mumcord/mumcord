@@ -41,14 +41,6 @@
     "cancel": "Cancelar",
     "close": "Fechar",
     "install": "Instalar",
-    "stage": {
-      "downloading": "A transferir…",
-      "verifying": "A verificar…",
-      "unpacking": "A descompactar…",
-      "starting": "A iniciar…",
-      "done": "Instalado",
-      "failed": "A instalação falhou"
-    },
     "failed": "Não foi possível instalar {{name}}.",
     "intro": "{{name}} pede estas permissões. As opcionais podem ser desativadas agora ou mais tarde.",
     "visibilityTitle": "Quem pode saber que usa {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Sugerido por {{server}}",
     "suggestedText": "O servidor apenas sugere. Tu decides e ele não sabe o que instalas.",
     "neverTitle": "Nunca recebe",
-    "thisServer": "este servidor"
+    "thisServer": "este servidor",
+    "retry": "Tentar novamente"
   },
   "toast": {
     "installed": "{{name}} instalado",
@@ -96,5 +89,13 @@
     "updated": "Atualizado",
     "offline": "Offline: a mostrar a lista guardada",
     "checkFailed": "Falha ao procurar atualizações"
+  },
+  "progress": {
+    "label": "A instalar {{name}}",
+    "downloading": "Transferido {{received}} de {{total}}",
+    "verifying": "A verificar a assinatura…",
+    "unpacking": "A descompactar…",
+    "starting": "A iniciar…",
+    "announce": "{{name}}: {{percent}} % transferido"
   }
 }

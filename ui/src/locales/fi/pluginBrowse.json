@@ -41,14 +41,6 @@
     "cancel": "Peruuta",
     "close": "Sulje",
     "install": "Asenna",
-    "stage": {
-      "downloading": "Ladataan…",
-      "verifying": "Tarkistetaan…",
-      "unpacking": "Puretaan…",
-      "starting": "Käynnistetään…",
-      "done": "Asennettu",
-      "failed": "Asennus epäonnistui"
-    },
     "failed": "Lisäosaa {{name}} ei voitu asentaa.",
     "intro": "{{name}} pyytää näitä oikeuksia. Valinnaiset voi poistaa käytöstä nyt tai myöhemmin.",
     "visibilityTitle": "Kuka näkee, että käytät lisäosaa {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Palvelimen {{server}} ehdottama",
     "suggestedText": "Palvelin vain ehdottaa. Sinä päätät, eikä se saa tietää, mitä asennat.",
     "neverTitle": "Se ei koskaan saa",
-    "thisServer": "tämä palvelin"
+    "thisServer": "tämä palvelin",
+    "retry": "Yritä uudelleen"
   },
   "toast": {
     "installed": "{{name}} asennettu",
@@ -96,5 +89,13 @@
     "updated": "Päivitetty",
     "offline": "Ei yhteyttä: näytetään tallennettu luettelo",
     "checkFailed": "Päivitysten tarkistus epäonnistui"
+  },
+  "progress": {
+    "label": "Asennetaan {{name}}",
+    "downloading": "Ladattu {{received}} / {{total}}",
+    "verifying": "Tarkistetaan allekirjoitusta…",
+    "unpacking": "Puretaan…",
+    "starting": "Käynnistetään…",
+    "announce": "{{name}}: {{percent}} % ladattu"
   }
 }

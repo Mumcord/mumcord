@@ -26,7 +26,11 @@ pub struct InstallRequest {
 /// One step of an install, for the progress shown in the store.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InstallStage {
-    Downloading,
+    /// `received` of `total` package bytes (the size from the signed index).
+    Downloading {
+        received: u64,
+        total: u64,
+    },
     Verifying,
     Unpacking,
     Starting,
@@ -39,7 +43,8 @@ pub enum InstallStage {
 }
 
 /// Downloads a package and its author signature. Runs outside the service lock, as it can take
-/// a while; reports `Downloading`, and `Failed` if the download fails.
+/// a while; reports `Downloading` as the bytes arrive (at most once per whole percent, so the UI
+/// is not flooded), and `Failed` if the download fails.
 pub async fn fetch(
     client: &Client,
     events: &UnboundedSender<ServiceEvent>,
@@ -53,13 +58,52 @@ pub async fn fetch(
             stage,
         });
     };
-    progress(InstallStage::Downloading);
-    client.download(url, size).await.map_err(|error| {
-        progress(InstallStage::Failed {
-            reason: error.to_string(),
-        });
-        error.into()
-    })
+    progress(InstallStage::Downloading {
+        received: 0,
+        total: size,
+    });
+    let mut throttle = DownloadThrottle::new(size);
+    let mut on_bytes = |received| {
+        if throttle.should_report(received) {
+            progress(InstallStage::Downloading {
+                received,
+                total: size,
+            });
+        }
+    };
+    client
+        .download_with_progress(url, size, &mut on_bytes)
+        .await
+        .map_err(|error| {
+            progress(InstallStage::Failed {
+                reason: error.to_string(),
+            });
+            error.into()
+        })
+}
+
+/// Lets a download report only when its whole percent changes.
+struct DownloadThrottle {
+    total: u64,
+    last_percent: u64,
+}
+
+impl DownloadThrottle {
+    fn new(total: u64) -> Self {
+        Self {
+            total,
+            last_percent: 0,
+        }
+    }
+
+    fn should_report(&mut self, received: u64) -> bool {
+        let percent = received.saturating_mul(100) / self.total.max(1);
+        if percent <= self.last_percent {
+            return false;
+        }
+        self.last_percent = percent;
+        true
+    }
 }
 
 impl PluginService {
@@ -200,5 +244,33 @@ impl PluginService {
             id: id.to_owned(),
             stage,
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::DownloadThrottle;
+
+    #[test]
+    fn download_progress_is_reported_once_per_percent() {
+        let mut throttle = DownloadThrottle::new(23_000_000);
+        let reported = (1..=23_000_u64)
+            .map(|chunk| chunk * 1_000)
+            .filter(|&received| throttle.should_report(received))
+            .count();
+        assert_eq!(reported, 100);
+    }
+
+    #[test]
+    fn a_tiny_download_reports_its_end() {
+        let mut throttle = DownloadThrottle::new(10);
+        assert!(throttle.should_report(10));
+        assert!(!throttle.should_report(10));
+    }
+
+    #[test]
+    fn an_empty_size_does_not_divide_by_zero() {
+        let mut throttle = DownloadThrottle::new(0);
+        assert!(!throttle.should_report(0));
     }
 }

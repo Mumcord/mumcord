@@ -112,6 +112,17 @@ impl Client {
         max: usize,
         etag: Option<&str>,
     ) -> Result<Response, RegistryError> {
+        self.get_with_progress(url, max, etag, &mut |_| {}).await
+    }
+
+    /// [`Self::get`], calling `on_bytes` with the bytes received so far after every chunk.
+    async fn get_with_progress(
+        &self,
+        url: &Url,
+        max: usize,
+        etag: Option<&str>,
+        on_bytes: &mut (dyn FnMut(u64) + Send),
+    ) -> Result<Response, RegistryError> {
         self.policy.check(url)?;
         let mut request = self
             .http
@@ -158,6 +169,7 @@ impl Client {
                 return Err(RegistryError::TooLarge(max));
             }
             bytes.extend_from_slice(&chunk);
+            on_bytes(bytes.len() as u64);
         }
         Ok(Response::Body { bytes, etag })
     }
@@ -181,11 +193,23 @@ impl Client {
     /// Downloads a package of the size the index promised, plus its author signature (B14's
     /// `<id>-<ver>.mcplugin.minisig` next to the package). A larger body is a mismatch.
     pub async fn download(&self, url: &str, size: u64) -> Result<Download, RegistryError> {
+        self.download_with_progress(url, size, &mut |_| {}).await
+    }
+
+    /// [`Self::download`], calling `on_bytes` with the package bytes received so far.
+    pub async fn download_with_progress(
+        &self,
+        url: &str,
+        size: u64,
+        on_bytes: &mut (dyn FnMut(u64) + Send),
+    ) -> Result<Download, RegistryError> {
         let url = Url::parse(url).map_err(|_| RegistryError::InvalidUrl)?;
         let max = usize::try_from(size).map_err(|_| VerifyFailure::Mismatch)?;
-        let bytes = match self.get_body(&url, max).await {
+        let bytes = match self.get_with_progress(&url, max, None, on_bytes).await {
+            Ok(Response::Body { bytes, .. }) => bytes,
+            Ok(Response::NotModified) => return Err(RegistryError::Status(304)),
             Err(RegistryError::TooLarge(_)) => return Err(VerifyFailure::Mismatch.into()),
-            other => other?,
+            Err(error) => return Err(error),
         };
         let signature = self.get_signature(&url).await?;
         Ok(Download { bytes, signature })

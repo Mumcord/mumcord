@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { InstallProgress } from "../prompt/InstallProgress";
 import type { IndexedPlugin } from "../../../api";
 import { isPermissionId, PERMISSION_RISK, permissionTextKey } from "../permissions/catalogue";
 import { formatSize } from "../updates/formatSize";
@@ -62,6 +63,7 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
           </div>
           <p className="pd-meta">{meta.join(" · ")}</p>
           <p className="pd-summary">{plugin.summary}</p>
+          <InstallProgress id={plugin.id} name={plugin.name} />
         </div>
         <div className="pd-action">
           {installed ? (

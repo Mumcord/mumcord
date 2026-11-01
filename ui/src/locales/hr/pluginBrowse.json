@@ -41,14 +41,6 @@
     "cancel": "Odustani",
     "close": "Zatvori",
     "install": "Instaliraj",
-    "stage": {
-      "downloading": "Preuzimanje…",
-      "verifying": "Provjera…",
-      "unpacking": "Raspakiravanje…",
-      "starting": "Pokretanje…",
-      "done": "Instalirano",
-      "failed": "Instalacija nije uspjela"
-    },
     "failed": "Dodatak {{name}} nije moguće instalirati.",
     "intro": "{{name}} traži ove dozvole. Neobavezne možete isključiti sada ili poslije.",
     "visibilityTitle": "Tko može vidjeti da koristite {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Predlaže poslužitelj {{server}}",
     "suggestedText": "Poslužitelj samo predlaže. Vi odlučujete, a on ne saznaje što instalirate.",
     "neverTitle": "Nikada ne dobiva",
-    "thisServer": "ovaj poslužitelj"
+    "thisServer": "ovaj poslužitelj",
+    "retry": "Pokušaj ponovno"
   },
   "toast": {
     "installed": "{{name}} je instaliran",
@@ -96,5 +89,13 @@
     "updated": "Ažurirano",
     "offline": "Izvan mreže: prikazuje se spremljeni popis",
     "checkFailed": "Provjera ažuriranja nije uspjela"
+  },
+  "progress": {
+    "label": "Instaliranje {{name}}",
+    "downloading": "Preuzeto {{received}} od {{total}}",
+    "verifying": "Provjera potpisa…",
+    "unpacking": "Raspakiravanje…",
+    "starting": "Pokretanje…",
+    "announce": "{{name}}: preuzeto {{percent}} %"
   }
 }

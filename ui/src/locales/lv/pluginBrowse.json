@@ -41,14 +41,6 @@
     "cancel": "Atcelt",
     "close": "Aizvērt",
     "install": "Instalēt",
-    "stage": {
-      "downloading": "Notiek lejupielāde…",
-      "verifying": "Notiek pārbaude…",
-      "unpacking": "Notiek izpakošana…",
-      "starting": "Notiek palaišana…",
-      "done": "Instalēts",
-      "failed": "Instalēšana neizdevās"
-    },
     "failed": "Spraudni {{name}} neizdevās instalēt.",
     "intro": "{{name}} lūdz šīs atļaujas. Neobligātās var izslēgt tagad vai vēlāk.",
     "visibilityTitle": "Kas var redzēt, ka lieto {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Ieteicis {{server}}",
     "suggestedText": "Serveris tikai iesaka. Jūs izlemjat, un tas neuzzina, ko instalējat.",
     "neverTitle": "Tas nekad nesaņem",
-    "thisServer": "šis serveris"
+    "thisServer": "šis serveris",
+    "retry": "Mēģināt vēlreiz"
   },
   "toast": {
     "installed": "{{name}} instalēts",
@@ -96,5 +89,13 @@
     "updated": "Atjaunināts",
     "offline": "Bezsaistē: tiek rādīts saglabātais saraksts",
     "checkFailed": "Atjauninājumu pārbaude neizdevās"
+  },
+  "progress": {
+    "label": "Instalē {{name}}",
+    "downloading": "Lejupielādēti {{received}} no {{total}}",
+    "verifying": "Pārbauda parakstu…",
+    "unpacking": "Atarhivē…",
+    "starting": "Palaiž…",
+    "announce": "{{name}}: lejupielādēti {{percent}}%"
   }
 }

@@ -41,14 +41,6 @@
     "cancel": "Annullér",
     "close": "Luk",
     "install": "Installér",
-    "stage": {
-      "downloading": "Henter…",
-      "verifying": "Tjekker…",
-      "unpacking": "Pakker ud…",
-      "starting": "Starter…",
-      "done": "Installeret",
-      "failed": "Installationen mislykkedes"
-    },
     "failed": "{{name}} kunne ikke installeres.",
     "intro": "{{name}} beder om disse tilladelser. Valgfrie kan slås fra nu eller senere.",
     "visibilityTitle": "Hvem kan se, at du bruger {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Foreslået af {{server}}",
     "suggestedText": "Serveren foreslår kun. Du bestemmer, og den får ikke at vide, hvad du installerer.",
     "neverTitle": "Det får aldrig",
-    "thisServer": "denne server"
+    "thisServer": "denne server",
+    "retry": "Prøv igen"
   },
   "toast": {
     "installed": "{{name}} er installeret",
@@ -96,5 +89,13 @@
     "updated": "Opdateret",
     "offline": "Offline: viser den gemte liste",
     "checkFailed": "Kontrol af opdateringer mislykkedes"
+  },
+  "progress": {
+    "label": "Installerer {{name}}",
+    "downloading": "Downloadet {{received}} af {{total}}",
+    "verifying": "Kontrollerer signatur…",
+    "unpacking": "Udpakker…",
+    "starting": "Starter…",
+    "announce": "{{name}}: {{percent}} % downloadet"
   }
 }

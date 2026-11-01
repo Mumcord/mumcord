@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type InstalledPlugin, type PluginUpdate } from "../../../api";
 import { isPermissionId, permissionTextKey } from "../permissions/catalogue";
+import { InstallProgress } from "../prompt/InstallProgress";
 import { usePluginIconUrl } from "../render/assets";
 import { formatSize } from "./formatSize";
 
@@ -89,6 +90,7 @@ export function UpdateRow({
             ))}
           </ul>
         )}
+        <InstallProgress id={update.id} name={update.name} />
         {failed && (
           <p role="alert" className="settings-error">
             {t("installFailed", { name: update.name })}

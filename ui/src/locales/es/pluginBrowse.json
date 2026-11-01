@@ -41,14 +41,6 @@
     "cancel": "Cancelar",
     "close": "Cerrar",
     "install": "Instalar",
-    "stage": {
-      "downloading": "Descargando…",
-      "verifying": "Comprobando…",
-      "unpacking": "Descomprimiendo…",
-      "starting": "Iniciando…",
-      "done": "Instalado",
-      "failed": "Error al instalar"
-    },
     "failed": "No se pudo instalar {{name}}.",
     "intro": "{{name}} pide estos permisos. Los opcionales se pueden desactivar ahora o más tarde.",
     "visibilityTitle": "Quién puede saber que usas {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Sugerido por {{server}}",
     "suggestedText": "El servidor solo sugiere. Tú decides y no se le dice qué instalas.",
     "neverTitle": "Nunca recibe",
-    "thisServer": "este servidor"
+    "thisServer": "este servidor",
+    "retry": "Reintentar"
   },
   "toast": {
     "installed": "{{name}} instalado",
@@ -96,5 +89,13 @@
     "updated": "Actualizado",
     "offline": "Sin conexión: se muestra la lista guardada",
     "checkFailed": "Error al buscar actualizaciones"
+  },
+  "progress": {
+    "label": "Instalando {{name}}",
+    "downloading": "Descargado {{received}} de {{total}}",
+    "verifying": "Comprobando la firma…",
+    "unpacking": "Descomprimiendo…",
+    "starting": "Iniciando…",
+    "announce": "{{name}}: {{percent}} % descargado"
   }
 }

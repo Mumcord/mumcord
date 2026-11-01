@@ -2533,7 +2533,9 @@ export type PluginInstallProgress = {
 };
 
 /**  One step of an install. */
-export type PluginInstallStage = { stage: "downloading" } | { stage: "verifying" } | { stage: "unpacking" } | { stage: "starting" } | 
+export type PluginInstallStage = 
+/**  `received` of `total` package bytes (packages are at most 64 MiB, so u32 fits). */
+{ stage: "downloading"; received: number; total: number } | { stage: "verifying" } | { stage: "unpacking" } | { stage: "starting" } | 
 /**  Installed: the UI shows "<name> installed". */
 { stage: "done" } | 
 /**  Stopped; `reason` is a user-facing text. */

@@ -41,14 +41,6 @@
     "cancel": "Zrušiť",
     "close": "Zavrieť",
     "install": "Nainštalovať",
-    "stage": {
-      "downloading": "Sťahuje sa…",
-      "verifying": "Kontroluje sa…",
-      "unpacking": "Rozbaľuje sa…",
-      "starting": "Spúšťa sa…",
-      "done": "Nainštalované",
-      "failed": "Inštalácia zlyhala"
-    },
     "failed": "Doplnok {{name}} sa nepodarilo nainštalovať.",
     "intro": "{{name}} žiada o tieto oprávnenia. Voliteľné môžete vypnúť teraz alebo neskôr.",
     "visibilityTitle": "Kto uvidí, že používate {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Navrhol server {{server}}",
     "suggestedText": "Server iba navrhuje. Rozhodujete vy a nedozvie sa, čo inštalujete.",
     "neverTitle": "Nikdy nedostane",
-    "thisServer": "tento server"
+    "thisServer": "tento server",
+    "retry": "Skúsiť znova"
   },
   "toast": {
     "installed": "Doplnok {{name}} bol nainštalovaný",
@@ -96,5 +89,13 @@
     "updated": "Aktualizované",
     "offline": "Offline: zobrazuje sa uložený zoznam",
     "checkFailed": "Kontrola aktualizácií zlyhala"
+  },
+  "progress": {
+    "label": "Inštalácia {{name}}",
+    "downloading": "Stiahnuté {{received}} z {{total}}",
+    "verifying": "Kontrola podpisu…",
+    "unpacking": "Rozbaľovanie…",
+    "starting": "Spúšťanie…",
+    "announce": "{{name}}: stiahnuté {{percent}} %"
   }
 }

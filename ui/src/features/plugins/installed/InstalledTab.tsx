@@ -17,6 +17,7 @@ import { usePlugins } from "../pluginStore";
 import { usePluginTree } from "../render/pluginUiStore";
 import { useUpdates } from "../updates/useUpdates";
 import "./installed.css";
+import { InstallProgress } from "../prompt/InstallProgress";
 import { usePluginIconUrl } from "../render/assets";
 import {
   BADGE_PERMISSION,
@@ -248,6 +249,7 @@ function PluginRow({
           {plugin.description !== "" && (
             <span className="plugins-installed-description">{plugin.description}</span>
           )}
+          <InstallProgress id={plugin.id} name={name} variant="slim" />
           {(chips.length > 0 || requests(plugin, MESSAGES_PERMISSION)) && (
             <ul className="plugins-installed-chips" aria-label={t("chips.label")}>
               {chips.map((key) => (

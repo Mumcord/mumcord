@@ -41,14 +41,6 @@
     "cancel": "Cealaigh",
     "close": "Dún",
     "install": "Suiteáil",
-    "stage": {
-      "downloading": "Ag íoslódáil…",
-      "verifying": "Ag seiceáil…",
-      "unpacking": "Ag díphacáil…",
-      "starting": "Ag tosú…",
-      "done": "Suiteáilte",
-      "failed": "Theip ar an suiteáil"
-    },
     "failed": "Níorbh fhéidir {{name}} a shuiteáil.",
     "intro": "Iarrann {{name}} na ceadanna seo. Is féidir iad siúd atá roghnach a mhúchadh anois nó níos déanaí.",
     "visibilityTitle": "Cé atá in ann a fheiceáil go n-úsáideann tú {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Molta ag {{server}}",
     "suggestedText": "Ní dhéanann an freastalaí ach moladh. Cinneann tusa, agus ní insítear dó cad a shuiteálann tú.",
     "neverTitle": "Ní fhaigheann sé riamh",
-    "thisServer": "an freastalaí seo"
+    "thisServer": "an freastalaí seo",
+    "retry": "Bain triail eile as"
   },
   "toast": {
     "installed": "{{name}} suiteáilte",
@@ -96,5 +89,13 @@
     "updated": "Nuashonraithe",
     "offline": "As líne: á thaispeáint an liosta sábháilte",
     "checkFailed": "Theip ar sheiceáil nuashonruithe"
+  },
+  "progress": {
+    "label": "{{name}} á shuiteáil",
+    "downloading": "{{received}} as {{total}} íoslódáilte",
+    "verifying": "An síniú á sheiceáil…",
+    "unpacking": "Á dhíphacáil…",
+    "starting": "Á thosú…",
+    "announce": "{{name}}: {{percent}}% íoslódáilte"
   }
 }

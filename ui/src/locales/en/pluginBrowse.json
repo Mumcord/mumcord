@@ -41,14 +41,6 @@
     "cancel": "Cancel",
     "close": "Close",
     "install": "Install",
-    "stage": {
-      "downloading": "Downloading…",
-      "verifying": "Checking…",
-      "unpacking": "Unpacking…",
-      "starting": "Starting…",
-      "done": "Installed",
-      "failed": "Install failed"
-    },
     "failed": "{{name}} could not be installed.",
     "intro": "{{name}} asks for these. Optional ones can be turned off now or later.",
     "visibilityTitle": "Who can tell you use {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Suggested by {{server}}",
     "suggestedText": "The server only suggests. You decide, and it isn't told what you install.",
     "neverTitle": "It never gets",
-    "thisServer": "this server"
+    "thisServer": "this server",
+    "retry": "Try again"
   },
   "toast": {
     "installed": "{{name}} installed",
@@ -96,5 +89,13 @@
     "updated": "Updated",
     "offline": "Offline: showing the saved list",
     "checkFailed": "Checking for updates failed"
+  },
+  "progress": {
+    "label": "Installing {{name}}",
+    "downloading": "Downloading {{received}} of {{total}}",
+    "verifying": "Checking signature…",
+    "unpacking": "Unpacking…",
+    "starting": "Starting…",
+    "announce": "{{name}}: {{percent}}% downloaded"
   }
 }

@@ -41,14 +41,6 @@
     "cancel": "Anuluj",
     "close": "Zamknij",
     "install": "Zainstaluj",
-    "stage": {
-      "downloading": "Pobieranie…",
-      "verifying": "Sprawdzanie…",
-      "unpacking": "Rozpakowywanie…",
-      "starting": "Uruchamianie…",
-      "done": "Zainstalowano",
-      "failed": "Instalacja nie powiodła się"
-    },
     "failed": "Nie udało się zainstalować: {{name}}.",
     "intro": "{{name}} prosi o te uprawnienia. Opcjonalne można wyłączyć teraz lub później.",
     "visibilityTitle": "Kto widzi, że używasz {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Zaproponowane przez {{server}}",
     "suggestedText": "Serwer tylko proponuje. Ty decydujesz, a on nie dowiaduje się, co instalujesz.",
     "neverTitle": "Nigdy nie dostaje",
-    "thisServer": "ten serwer"
+    "thisServer": "ten serwer",
+    "retry": "Spróbuj ponownie"
   },
   "toast": {
     "installed": "Zainstalowano: {{name}}",
@@ -96,5 +89,13 @@
     "updated": "Zaktualizowano",
     "offline": "Offline: wyświetlana jest zapisana lista",
     "checkFailed": "Sprawdzanie aktualizacji nie powiodło się"
+  },
+  "progress": {
+    "label": "Instalowanie {{name}}",
+    "downloading": "Pobrano {{received}} z {{total}}",
+    "verifying": "Sprawdzanie podpisu…",
+    "unpacking": "Rozpakowywanie…",
+    "starting": "Uruchamianie…",
+    "announce": "{{name}}: pobrano {{percent}}%"
   }
 }

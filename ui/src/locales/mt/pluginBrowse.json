@@ -41,14 +41,6 @@
     "cancel": "Ikkanċella",
     "close": "Agħlaq",
     "install": "Installa",
-    "stage": {
-      "downloading": "Qed jinżel…",
-      "verifying": "Qed jiġi ċċekkjat…",
-      "unpacking": "Qed jinfetaħ…",
-      "starting": "Qed jibda…",
-      "done": "Installat",
-      "failed": "L-installazzjoni falliet"
-    },
     "failed": "{{name}} ma setax jiġi installat.",
     "intro": "{{name}} jitlob dawn il-permessi. Dawk fakultattivi tistgħu tdawwluhom issa jew aktar tard.",
     "visibilityTitle": "Min jista' jara li qed tuża {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Issuġġerit minn {{server}}",
     "suggestedText": "Is-server jissuġġerixxi biss. Int tiddeċiedi u ma jgħarrafx x'tinstalla.",
     "neverTitle": "Qatt ma jiksbu",
-    "thisServer": "dan is-server"
+    "thisServer": "dan is-server",
+    "retry": "Erġa' pprova"
   },
   "toast": {
     "installed": "{{name}} installat",
@@ -96,5 +89,13 @@
     "updated": "Aġġornat",
     "offline": "Offline: qed tintwera l-lista maħżuna",
     "checkFailed": "Ma rnexxiex il-verifika tal-aġġornamenti"
+  },
+  "progress": {
+    "label": "Qed jiġi installat {{name}}",
+    "downloading": "Imniżżel {{received}} minn {{total}}",
+    "verifying": "Qed tiġi ċċekkjata l-firma…",
+    "unpacking": "Qed jinfetaħ…",
+    "starting": "Qed jibda…",
+    "announce": "{{name}}: {{percent}}% imniżżel"
   }
 }

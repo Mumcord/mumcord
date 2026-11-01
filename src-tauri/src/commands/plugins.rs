@@ -14,8 +14,8 @@ use mumcord_plugins::registry::{
     UrlPolicy, fetch_official, official_base,
 };
 use mumcord_plugins::service::{
-    Approval, CommandOutcome, InstallRequest, PeerInfo, PluginInfo, PluginService, ServiceError,
-    Status, StoredLine, UiInput, fetch, load_repository,
+    Approval, CommandOutcome, InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService,
+    ServiceError, ServiceEvent, Status, StoredLine, UiInput, fetch, load_repository,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
@@ -679,6 +679,10 @@ pub async fn plugin_install_prepare(
     let download = fetch(&client, &events, &id, &url, size)
         .await
         .map_err(plugins::service_error)?;
+    let _ = events.send(ServiceEvent::InstallProgress {
+        id: id.clone(),
+        stage: InstallStage::Verifying,
+    });
     let (download, offer) = tauri::async_runtime::spawn_blocking(move || {
         let verified = verify_package(&download.bytes, &entry, &download.signature, source)
             .map_err(|e| plugins::service_error(e.into()))?;

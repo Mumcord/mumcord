@@ -41,14 +41,6 @@
     "cancel": "Anulează",
     "close": "Închide",
     "install": "Instalează",
-    "stage": {
-      "downloading": "Se descarcă…",
-      "verifying": "Se verifică…",
-      "unpacking": "Se dezarhivează…",
-      "starting": "Se pornește…",
-      "done": "Instalat",
-      "failed": "Instalarea a eșuat"
-    },
     "failed": "{{name}} nu a putut fi instalat.",
     "intro": "{{name}} cere aceste permisiuni. Cele opționale pot fi dezactivate acum sau mai târziu.",
     "visibilityTitle": "Cine poate vedea că folosești {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Sugerat de {{server}}",
     "suggestedText": "Serverul doar sugerează. Tu decizi, iar el nu află ce instalezi.",
     "neverTitle": "Nu primește niciodată",
-    "thisServer": "acest server"
+    "thisServer": "acest server",
+    "retry": "Încearcă din nou"
   },
   "toast": {
     "installed": "{{name}} a fost instalat",
@@ -96,5 +89,13 @@
     "updated": "Actualizat",
     "offline": "Offline: se afișează lista salvată",
     "checkFailed": "Verificarea actualizărilor a eșuat"
+  },
+  "progress": {
+    "label": "Se instalează {{name}}",
+    "downloading": "Descărcat {{received}} din {{total}}",
+    "verifying": "Se verifică semnătura…",
+    "unpacking": "Se dezarhivează…",
+    "starting": "Se pornește…",
+    "announce": "{{name}}: {{percent}}% descărcat"
   }
 }

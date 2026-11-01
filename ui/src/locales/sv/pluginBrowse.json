@@ -41,14 +41,6 @@
     "cancel": "Avbryt",
     "close": "Stäng",
     "install": "Installera",
-    "stage": {
-      "downloading": "Laddar ner…",
-      "verifying": "Kontrollerar…",
-      "unpacking": "Packar upp…",
-      "starting": "Startar…",
-      "done": "Installerat",
-      "failed": "Installationen misslyckades"
-    },
     "failed": "{{name}} kunde inte installeras.",
     "intro": "{{name}} ber om dessa behörigheter. Valfria kan stängas av nu eller senare.",
     "visibilityTitle": "Vem kan se att du använder {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Föreslås av {{server}}",
     "suggestedText": "Servern föreslår bara. Du bestämmer och den får inte veta vad du installerar.",
     "neverTitle": "Det får aldrig",
-    "thisServer": "den här servern"
+    "thisServer": "den här servern",
+    "retry": "Försök igen"
   },
   "toast": {
     "installed": "{{name}} installerat",
@@ -96,5 +89,13 @@
     "updated": "Uppdaterad",
     "offline": "Offline: visar den sparade listan",
     "checkFailed": "Sökningen efter uppdateringar misslyckades"
+  },
+  "progress": {
+    "label": "Installerar {{name}}",
+    "downloading": "Hämtat {{received}} av {{total}}",
+    "verifying": "Kontrollerar signaturen…",
+    "unpacking": "Packar upp…",
+    "starting": "Startar…",
+    "announce": "{{name}}: {{percent}} % hämtat"
   }
 }

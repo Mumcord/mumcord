@@ -41,14 +41,6 @@
     "cancel": "Abbrechen",
     "close": "Schließen",
     "install": "Installieren",
-    "stage": {
-      "downloading": "Wird heruntergeladen…",
-      "verifying": "Wird geprüft…",
-      "unpacking": "Wird entpackt…",
-      "starting": "Wird gestartet…",
-      "done": "Installiert",
-      "failed": "Installation fehlgeschlagen"
-    },
     "failed": "{{name}} konnte nicht installiert werden.",
     "intro": "{{name}} bittet um diese Berechtigungen. Optionale kannst du jetzt oder später ausschalten.",
     "visibilityTitle": "Wer sehen kann, dass du {{name}} nutzt",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Vorgeschlagen von {{server}}",
     "suggestedText": "Der Server schlägt nur vor. Du entscheidest, und er erfährt nicht, was du installierst.",
     "neverTitle": "Es bekommt nie",
-    "thisServer": "dieser Server"
+    "thisServer": "dieser Server",
+    "retry": "Erneut versuchen"
   },
   "toast": {
     "installed": "{{name}} installiert",
@@ -96,5 +89,13 @@
     "updated": "Aktualisiert",
     "offline": "Offline: Die gespeicherte Liste wird angezeigt",
     "checkFailed": "Die Suche nach Updates ist fehlgeschlagen"
+  },
+  "progress": {
+    "label": "{{name}} wird installiert",
+    "downloading": "{{received}} von {{total}} heruntergeladen",
+    "verifying": "Signatur wird geprüft…",
+    "unpacking": "Wird entpackt…",
+    "starting": "Wird gestartet…",
+    "announce": "{{name}}: {{percent}} % heruntergeladen"
   }
 }

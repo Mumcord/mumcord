@@ -92,7 +92,12 @@ pub struct PluginsSharedState {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "stage", rename_all = "camelCase")]
 pub enum PluginInstallStage {
-    Downloading,
+    /// `received` of `total` package bytes (packages are at most 64 MiB, so u32 fits).
+    #[serde(rename_all = "camelCase")]
+    Downloading {
+        received: u32,
+        total: u32,
+    },
     Verifying,
     Unpacking,
     Starting,
@@ -107,7 +112,10 @@ pub enum PluginInstallStage {
 impl From<InstallStage> for PluginInstallStage {
     fn from(stage: InstallStage) -> Self {
         match stage {
-            InstallStage::Downloading => Self::Downloading,
+            InstallStage::Downloading { received, total } => Self::Downloading {
+                received: u32::try_from(received).unwrap_or(u32::MAX),
+                total: u32::try_from(total).unwrap_or(u32::MAX),
+            },
             InstallStage::Verifying => Self::Verifying,
             InstallStage::Unpacking => Self::Unpacking,
             InstallStage::Starting => Self::Starting,

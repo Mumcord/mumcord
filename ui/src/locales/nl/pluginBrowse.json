@@ -41,14 +41,6 @@
     "cancel": "Annuleren",
     "close": "Sluiten",
     "install": "Installeren",
-    "stage": {
-      "downloading": "Downloaden…",
-      "verifying": "Controleren…",
-      "unpacking": "Uitpakken…",
-      "starting": "Starten…",
-      "done": "Geïnstalleerd",
-      "failed": "Installatie mislukt"
-    },
     "failed": "{{name}} kon niet worden geïnstalleerd.",
     "intro": "{{name}} vraagt hierom. Optionele rechten kun je nu of later uitzetten.",
     "visibilityTitle": "Wie kan zien dat je {{name}} gebruikt",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Voorgesteld door {{server}}",
     "suggestedText": "De server stelt alleen voor. Jij beslist en hij hoort niet wat je installeert.",
     "neverTitle": "Het krijgt nooit",
-    "thisServer": "deze server"
+    "thisServer": "deze server",
+    "retry": "Opnieuw proberen"
   },
   "toast": {
     "installed": "{{name}} geïnstalleerd",
@@ -96,5 +89,13 @@
     "updated": "Bijgewerkt",
     "offline": "Offline: de opgeslagen lijst wordt getoond",
     "checkFailed": "Controleren op updates is mislukt"
+  },
+  "progress": {
+    "label": "{{name}} installeren",
+    "downloading": "{{received}} van {{total}} gedownload",
+    "verifying": "Handtekening controleren…",
+    "unpacking": "Uitpakken…",
+    "starting": "Starten…",
+    "announce": "{{name}}: {{percent}}% gedownload"
   }
 }

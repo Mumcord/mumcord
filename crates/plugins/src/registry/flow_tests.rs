@@ -329,6 +329,23 @@ async fn download_returns_package_and_author_signature() {
     ));
 }
 
+#[tokio::test]
+async fn download_reports_received_bytes_up_to_the_package_size() {
+    let author = keypair();
+    let server = TestServer::start();
+    let body = vec![7_u8; 300_000];
+    publish(&server, "big-1.0.0.mcplugin", &author, &body);
+    let url = format!("{}big-1.0.0.mcplugin", server.base);
+    let mut seen = Vec::new();
+    let download = client()
+        .download_with_progress(&url, 300_000, &mut |received| seen.push(received))
+        .await
+        .expect("test step");
+    assert_eq!(download.bytes.len(), 300_000);
+    assert!(seen.windows(2).all(|w| w[0] < w[1]), "received only grows");
+    assert_eq!(seen.last(), Some(&300_000));
+}
+
 /// The served signature verifies with the author key.
 fn sign_check(author: &KeyPair, download: &Download) -> String {
     RegistryKeys::pinned(&public(author))

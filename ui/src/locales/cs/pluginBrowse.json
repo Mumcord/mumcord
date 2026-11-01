@@ -41,14 +41,6 @@
     "cancel": "Zrušit",
     "close": "Zavřít",
     "install": "Nainstalovat",
-    "stage": {
-      "downloading": "Stahování…",
-      "verifying": "Kontrola…",
-      "unpacking": "Rozbalování…",
-      "starting": "Spouštění…",
-      "done": "Nainstalováno",
-      "failed": "Instalace se nezdařila"
-    },
     "failed": "Doplněk {{name}} se nepodařilo nainstalovat.",
     "intro": "{{name}} žádá o tato oprávnění. Volitelná můžete vypnout nyní nebo později.",
     "visibilityTitle": "Kdo uvidí, že používáte {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Navrhl server {{server}}",
     "suggestedText": "Server pouze navrhuje. Rozhodujete vy a nedozví se, co instalujete.",
     "neverTitle": "Nikdy nezíská",
-    "thisServer": "tento server"
+    "thisServer": "tento server",
+    "retry": "Zkusit znovu"
   },
   "toast": {
     "installed": "Doplněk {{name}} byl nainstalován",
@@ -96,5 +89,13 @@
     "updated": "Aktualizováno",
     "offline": "Offline: zobrazuje se uložený seznam",
     "checkFailed": "Kontrola aktualizací selhala"
+  },
+  "progress": {
+    "label": "Instalace {{name}}",
+    "downloading": "Staženo {{received}} z {{total}}",
+    "verifying": "Kontrola podpisu…",
+    "unpacking": "Rozbalování…",
+    "starting": "Spouštění…",
+    "announce": "{{name}}: staženo {{percent}} %"
   }
 }

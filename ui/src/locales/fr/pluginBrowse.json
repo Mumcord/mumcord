@@ -41,14 +41,6 @@
     "cancel": "Annuler",
     "close": "Fermer",
     "install": "Installer",
-    "stage": {
-      "downloading": "Téléchargement…",
-      "verifying": "Vérification…",
-      "unpacking": "Décompression…",
-      "starting": "Démarrage…",
-      "done": "Installé",
-      "failed": "Échec de l’installation"
-    },
     "failed": "{{name}} n’a pas pu être installé.",
     "intro": "{{name}} demande ces autorisations. Les optionnelles peuvent être désactivées maintenant ou plus tard.",
     "visibilityTitle": "Qui peut savoir que vous utilisez {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Suggéré par {{server}}",
     "suggestedText": "Le serveur ne fait que suggérer. Vous décidez, et il ne sait pas ce que vous installez.",
     "neverTitle": "Il n'obtient jamais",
-    "thisServer": "ce serveur"
+    "thisServer": "ce serveur",
+    "retry": "Réessayer"
   },
   "toast": {
     "installed": "{{name}} installé",
@@ -96,5 +89,13 @@
     "updated": "À jour",
     "offline": "Hors ligne : la liste enregistrée est affichée",
     "checkFailed": "La recherche de mises à jour a échoué"
+  },
+  "progress": {
+    "label": "Installation de {{name}}",
+    "downloading": "{{received}} sur {{total}} téléchargés",
+    "verifying": "Vérification de la signature…",
+    "unpacking": "Décompression…",
+    "starting": "Démarrage…",
+    "announce": "{{name}} : {{percent}} % téléchargés"
   }
 }

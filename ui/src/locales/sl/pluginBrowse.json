@@ -41,14 +41,6 @@
     "cancel": "Prekliči",
     "close": "Zapri",
     "install": "Namesti",
-    "stage": {
-      "downloading": "Prenašanje…",
-      "verifying": "Preverjanje…",
-      "unpacking": "Razpakiranje…",
-      "starting": "Zaganjanje…",
-      "done": "Nameščen",
-      "failed": "Namestitev ni uspela"
-    },
     "failed": "Vtičnika {{name}} ni bilo mogoče namestiti.",
     "intro": "{{name}} zahteva ta dovoljenja. Neobvezna lahko izklopite zdaj ali pozneje.",
     "visibilityTitle": "Kdo lahko vidi, da uporabljate {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Predlaga strežnik {{server}}",
     "suggestedText": "Strežnik le predlaga. Vi odločate in ne izve, kaj nameščate.",
     "neverTitle": "Nikoli ne dobi",
-    "thisServer": "ta strežnik"
+    "thisServer": "ta strežnik",
+    "retry": "Poskusi znova"
   },
   "toast": {
     "installed": "{{name}} je nameščen",
@@ -96,5 +89,13 @@
     "updated": "Posodobljeno",
     "offline": "Brez povezave: prikazan je shranjeni seznam",
     "checkFailed": "Preverjanje posodobitev ni uspelo"
+  },
+  "progress": {
+    "label": "Nameščanje {{name}}",
+    "downloading": "Preneseno {{received}} od {{total}}",
+    "verifying": "Preverjanje podpisa…",
+    "unpacking": "Razpakiranje…",
+    "starting": "Zagon…",
+    "announce": "{{name}}: preneseno {{percent}} %"
   }
 }

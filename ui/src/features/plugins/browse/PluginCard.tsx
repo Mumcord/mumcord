@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { IndexedPlugin } from "../../../api";
+import { InstallProgress } from "../prompt/InstallProgress";
 import { CATEGORIES } from "./filter";
 import { PluginIcon } from "./PluginIcon";
 import { sourceLabel } from "./source";
@@ -44,6 +45,7 @@ export function PluginCard({ plugin, installed, onDetails, onInstall }: PluginCa
         </div>
         <p className="plugin-card-meta">{meta.join(" · ")}</p>
         <p className="plugin-card-summary">{plugin.summary}</p>
+        <InstallProgress id={plugin.id} name={name} variant="slim" />
       </div>
       {installed ? (
         <span className="plugin-card-installed">✓ {t("installed")}</span>

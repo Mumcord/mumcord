@@ -41,14 +41,6 @@
     "cancel": "Tühista",
     "close": "Sulge",
     "install": "Paigalda",
-    "stage": {
-      "downloading": "Allalaadimine…",
-      "verifying": "Kontrollimine…",
-      "unpacking": "Lahtipakkimine…",
-      "starting": "Käivitamine…",
-      "done": "Paigaldatud",
-      "failed": "Paigaldamine ebaõnnestus"
-    },
     "failed": "Pluginat {{name}} ei õnnestunud paigaldada.",
     "intro": "{{name}} küsib neid õigusi. Valikulisi saab välja lülitada nüüd või hiljem.",
     "visibilityTitle": "Kes näeb, et kasutad {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Soovitab {{server}}",
     "suggestedText": "Server ainult soovitab. Sina otsustad ja see ei saa teada, mida paigaldad.",
     "neverTitle": "See ei saa kunagi",
-    "thisServer": "see server"
+    "thisServer": "see server",
+    "retry": "Proovi uuesti"
   },
   "toast": {
     "installed": "{{name}} paigaldatud",
@@ -96,5 +89,13 @@
     "updated": "Värskendatud",
     "offline": "Võrguühenduseta: kuvatakse salvestatud loendit",
     "checkFailed": "Uuenduste kontroll ebaõnnestus"
+  },
+  "progress": {
+    "label": "{{name}} paigaldamine",
+    "downloading": "Alla laaditud {{received}} / {{total}}",
+    "verifying": "Allkirja kontrollimine…",
+    "unpacking": "Lahtipakkimine…",
+    "starting": "Käivitamine…",
+    "announce": "{{name}}: {{percent}}% alla laaditud"
   }
 }

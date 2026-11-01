@@ -41,14 +41,6 @@
     "cancel": "Mégse",
     "close": "Bezárás",
     "install": "Telepítés",
-    "stage": {
-      "downloading": "Letöltés…",
-      "verifying": "Ellenőrzés…",
-      "unpacking": "Kicsomagolás…",
-      "starting": "Indítás…",
-      "done": "Telepítve",
-      "failed": "A telepítés sikertelen"
-    },
     "failed": "A(z) {{name}} bővítményt nem sikerült telepíteni.",
     "intro": "A(z) {{name}} ezeket kéri. A választhatóak most vagy később kikapcsolhatók.",
     "visibilityTitle": "Ki láthatja, hogy a(z) {{name}} bővítményt használod",
@@ -59,7 +51,8 @@
     "suggestedTitle": "{{server}} javasolta",
     "suggestedText": "A szerver csak javasol. Te döntesz, és nem tudja meg, mit telepítesz.",
     "neverTitle": "Soha nem kap",
-    "thisServer": "ez a szerver"
+    "thisServer": "ez a szerver",
+    "retry": "Újra"
   },
   "toast": {
     "installed": "{{name}} telepítve",
@@ -96,5 +89,13 @@
     "updated": "Frissítve",
     "offline": "Offline: a mentett lista látható",
     "checkFailed": "A frissítések keresése nem sikerült"
+  },
+  "progress": {
+    "label": "{{name}} telepítése",
+    "downloading": "{{received}} / {{total}} letöltve",
+    "verifying": "Aláírás ellenőrzése…",
+    "unpacking": "Kicsomagolás…",
+    "starting": "Indítás…",
+    "announce": "{{name}}: {{percent}}% letöltve"
   }
 }

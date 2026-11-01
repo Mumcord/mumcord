@@ -4,7 +4,6 @@ import {
   getApi,
   type IndexedPlugin,
   type PluginInstallOffer,
-  type PluginInstallStage,
   type PluginVisibilityChoice,
 } from "../../../api";
 import { useServers } from "../../servers";
@@ -14,13 +13,15 @@ import { PermissionList } from "../permissions/PermissionList";
 import { PluginIcon } from "../browse/PluginIcon";
 import { sourceLabel } from "../browse/source";
 import { pluginErrorText } from "./errorText";
+import { InstallProgress } from "./InstallProgress";
+import { clearInstallProgress } from "./installProgressStore";
 import { showPluginToast } from "./installToast";
 import "./prompt.css";
 
 type Phase =
   | { kind: "preparing" }
   | { kind: "ready"; offer: PluginInstallOffer }
-  | { kind: "installing"; offer: PluginInstallOffer; stage: PluginInstallStage["stage"] | null }
+  | { kind: "installing"; offer: PluginInstallOffer }
   | { kind: "failed"; message: string };
 
 const VISIBILITIES: readonly PluginVisibilityChoice[] = ["everyone", "friends", "nobody"];
@@ -58,6 +59,8 @@ export function InstallPrompt({
   const [enabled, setEnabled] = useState<ReadonlySet<string>>(new Set());
   const [visibility, setVisibility] = useState<PluginVisibilityChoice>("everyone");
   const [understood, setUnderstood] = useState(false);
+  // Bumped by "Try again": downloads and checks the package once more.
+  const [attempt, setAttempt] = useState(0);
   const visibilityName = useId();
   const name = plugin.name;
 
@@ -66,6 +69,7 @@ export function InstallPrompt({
     getApi()
       .pluginInstallPrepare(plugin.id)
       .then((offer) => {
+        clearInstallProgress(plugin.id);
         if (cancelled) return;
         setEnabled(defaultOptionalSelection(requestedOf(offer)));
         setVisibility(offer.defaultVisibility);
@@ -73,6 +77,7 @@ export function InstallPrompt({
       })
       .catch((error: unknown) => {
         console.error("Preparing the plugin install failed", error);
+        clearInstallProgress(plugin.id);
         if (!cancelled) {
           setPhase({
             kind: "failed",
@@ -83,21 +88,12 @@ export function InstallPrompt({
     return () => {
       cancelled = true;
     };
-  }, [plugin.id, name, t]);
+  }, [plugin.id, name, t, attempt]);
 
   const installing = phase.kind === "installing";
-  useEffect(() => {
-    if (!installing) return;
-    return getApi().on("pluginsInstallProgress", ({ id, progress }) => {
-      if (id !== plugin.id) return;
-      setPhase((current) =>
-        current.kind === "installing" ? { ...current, stage: progress.stage } : current,
-      );
-    });
-  }, [installing, plugin.id]);
 
   const install = (offer: PluginInstallOffer) => {
-    setPhase({ kind: "installing", offer, stage: null });
+    setPhase({ kind: "installing", offer });
     getApi()
       .pluginInstall(plugin.id, offer.version, [...enabled], visibility)
       .then(() => {
@@ -136,6 +132,7 @@ export function InstallPrompt({
           {t("prompt.preparing", { name })}
         </p>
       )}
+      {(phase.kind === "preparing" || installing) && <InstallProgress id={plugin.id} name={name} />}
       {phase.kind === "failed" && (
         <p role="alert" className="settings-error">
           {phase.message}
@@ -227,13 +224,6 @@ export function InstallPrompt({
               </label>
             </div>
           )}
-          {installing && (
-            <p role="status" className="plugin-prompt-status">
-              {phase.stage === null
-                ? t("prompt.stage.downloading")
-                : t(`prompt.stage.${phase.stage}`)}
-            </p>
-          )}
         </>
       )}
       <div className="settings-dialog__actions plugin-prompt-actions">
@@ -241,6 +231,18 @@ export function InstallPrompt({
         <button type="button" className="settings-button" disabled={installing} onClick={close}>
           {phase.kind === "failed" ? t("prompt.close") : t("prompt.cancel")}
         </button>
+        {phase.kind === "failed" && (
+          <button
+            type="button"
+            className="settings-button settings-button--primary"
+            onClick={() => {
+              setPhase({ kind: "preparing" });
+              setAttempt((n) => n + 1);
+            }}
+          >
+            {t("prompt.retry")}
+          </button>
+        )}
         {(phase.kind === "ready" || phase.kind === "installing") && (
           <button
             type="button"

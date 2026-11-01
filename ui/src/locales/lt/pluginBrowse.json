@@ -41,14 +41,6 @@
     "cancel": "Atšaukti",
     "close": "Uždaryti",
     "install": "Įdiegti",
-    "stage": {
-      "downloading": "Atsisiunčiama…",
-      "verifying": "Tikrinama…",
-      "unpacking": "Išpakuojama…",
-      "starting": "Paleidžiama…",
-      "done": "Įdiegtas",
-      "failed": "Įdiegti nepavyko"
-    },
     "failed": "Nepavyko įdiegti {{name}}.",
     "intro": "{{name}} prašo šių leidimų. Neprivalomus galite išjungti dabar arba vėliau.",
     "visibilityTitle": "Kas gali matyti, kad naudojate {{name}}",
@@ -59,7 +51,8 @@
     "suggestedTitle": "Siūlo {{server}}",
     "suggestedText": "Serveris tik siūlo. Jūs nusprendžiate, o jis nesužino, ką diegiate.",
     "neverTitle": "Niekada negauna",
-    "thisServer": "šis serveris"
+    "thisServer": "šis serveris",
+    "retry": "Bandyti dar kartą"
   },
   "toast": {
     "installed": "{{name}} įdiegtas",
@@ -96,5 +89,13 @@
     "updated": "Atnaujinta",
     "offline": "Neprisijungus: rodomas išsaugotas sąrašas",
     "checkFailed": "Nepavyko patikrinti naujinimų"
+  },
+  "progress": {
+    "label": "Diegiama {{name}}",
+    "downloading": "Atsisiųsta {{received}} iš {{total}}",
+    "verifying": "Tikrinamas parašas…",
+    "unpacking": "Išpakuojama…",
+    "starting": "Paleidžiama…",
+    "announce": "{{name}}: atsisiųsta {{percent}} %"
   }
 }
