@@ -4,6 +4,7 @@
 //! everything in a temporary folder: storage is a fresh database per scenario and nothing
 //! reaches the network or the user's keychain.
 
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::{Duration, Instant};
@@ -20,8 +21,8 @@ use mumcord_plugins::wit::events::{
 };
 use mumcord_plugins::wit::peers::Target;
 use mumcord_plugins::wit::theme::Mode;
-use mumcord_plugins::wit::types::{Error, Peer};
-use mumcord_plugins::wit::ui::{Component, Node, Slot};
+use mumcord_plugins::wit::types::{BotInfo, Error, Peer};
+use mumcord_plugins::wit::ui::{Component, Node, Slot, UserMenuFilter};
 use mumcord_plugins::{HostContext, HostEvent, Manifest, PluginHost, PluginIo};
 use mumcord_store::{NewIdentity, PluginRecord, PluginVisibility, Store};
 use serde::Deserialize;
@@ -161,6 +162,7 @@ fn default_me() -> PeerSpec {
         session: 1,
         name: "Me".into(),
         anonymous: false,
+        bot: None,
     }
 }
 
@@ -176,6 +178,17 @@ pub struct PeerSpec {
     /// A user without a certificate: the plugin sees no key.
     #[serde(default)]
     pub anonymous: bool,
+    /// What the user's hello says when they are a bot (`peers.bot`, user-menu filters).
+    #[serde(default)]
+    pub bot: Option<BotSpec>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BotSpec {
+    pub name: String,
+    #[serde(default)]
+    pub modules: Vec<String>,
 }
 
 #[derive(Debug, Default, Clone, Copy, Deserialize)]
@@ -342,6 +355,9 @@ pub enum Expect {
     MenuEntry {
         #[serde(default)]
         label: Option<String>,
+        /// The users a filtered entry shows on; checked only when given.
+        #[serde(default)]
+        sessions: Option<Vec<u32>>,
     },
     Log {
         contains: String,
@@ -372,7 +388,8 @@ pub enum Output {
     Cleared(SlotSpec),
     Dialog(String),
     DialogClosed,
-    MenuEntry(Option<String>),
+    /// Label (`None`: removed) and, for a filtered entry, the matching sessions.
+    MenuEntry(Option<String>, Option<Vec<u32>>),
     Message {
         to: Target,
         kind: u8,
@@ -397,6 +414,8 @@ struct MockIo {
     name: String,
     max_payload: usize,
     channel: Vec<Peer>,
+    /// Bot info by session, for the users in `channel`.
+    bots: HashMap<u32, BotInfo>,
     outputs: Arc<Mutex<Vec<Output>>>,
     gestures: Mutex<GestureGate>,
 }
@@ -428,7 +447,33 @@ impl PluginIo for MockIo {
     }
 
     fn set_user_menu_entry(&self, _plugin: &str, label: Option<String>) -> Result<(), Error> {
-        self.push(Output::MenuEntry(label));
+        self.push(Output::MenuEntry(label, None));
+        Ok(())
+    }
+
+    /// Resolves the filter once against the scenario's channel, as the client does.
+    fn set_user_menu_entry_for(
+        &self,
+        _plugin: &str,
+        label: String,
+        filter: UserMenuFilter,
+    ) -> Result<(), Error> {
+        let wants_bot = filter.bot_name.is_some() || filter.bot_module.is_some();
+        let sessions = self.channel[1..]
+            .iter()
+            .map(|peer| peer.session)
+            .filter(|session| {
+                let bot_matches = self.bots.get(session).is_some_and(|bot| {
+                    filter.bot_name.as_ref().is_none_or(|n| *n == bot.name)
+                        && filter
+                            .bot_module
+                            .as_ref()
+                            .is_none_or(|m| bot.modules.contains(m))
+                });
+                (wants_bot && bot_matches) || filter.sessions.contains(session)
+            })
+            .collect();
+        self.push(Output::MenuEntry(Some(label), Some(sessions)));
         Ok(())
     }
 
@@ -460,6 +505,10 @@ impl PluginIo for MockIo {
 
     fn presence(&self, _plugin: &str) -> Result<Vec<Peer>, Error> {
         Ok(self.channel.clone())
+    }
+
+    fn bot(&self, _plugin: &str, session: u32) -> Result<Option<BotInfo>, Error> {
+        Ok(self.bots.get(&session).cloned())
     }
 
     fn chat_send(&self, plugin: &str, text: String) -> Result<(), Error> {
@@ -520,12 +569,27 @@ impl Session {
         let me = peer(&scenario.me);
         let mut channel = vec![me.clone()];
         channel.extend(scenario.peers.iter().map(peer));
+        let bots = scenario
+            .peers
+            .iter()
+            .filter_map(|spec| {
+                let bot = spec.bot.as_ref()?;
+                Some((
+                    spec.session,
+                    BotInfo {
+                        name: bot.name.clone(),
+                        modules: bot.modules.clone(),
+                    },
+                ))
+            })
+            .collect();
 
         let outputs = Arc::new(Mutex::new(Vec::new()));
         let io = Arc::new(MockIo {
             name: manifest.name.clone(),
             max_payload: (manifest.messaging.max_payload as usize).min(MAX_PAYLOAD),
             channel,
+            bots,
             outputs: Arc::clone(&outputs),
             gestures: Mutex::default(),
         });
@@ -929,7 +993,9 @@ fn matches(expect: &Expect, output: &Output) -> bool {
             contains(t, title.as_ref()) && contains(b, body.as_ref())
         }
         (Expect::Dialog { title }, Output::Dialog(t)) => contains(t, title.as_ref()),
-        (Expect::MenuEntry { label }, Output::MenuEntry(l)) => label == l,
+        (Expect::MenuEntry { label, sessions }, Output::MenuEntry(l, s)) => {
+            label == l && (sessions.is_none() || sessions == s)
+        }
         (Expect::Stopped { error }, Output::Stopped(e)) => contains(e, error.as_ref()),
         _ => false,
     }
@@ -969,7 +1035,10 @@ fn summary(output: &Output) -> String {
         Output::Cleared(slot) => format!("cleared {slot:?}"),
         Output::Dialog(title) => format!("dialog {title:?}"),
         Output::DialogClosed => "dialog closed".into(),
-        Output::MenuEntry(label) => format!("menu entry {label:?}"),
+        Output::MenuEntry(label, None) => format!("menu entry {label:?}"),
+        Output::MenuEntry(label, Some(sessions)) => {
+            format!("menu entry {label:?} for {sessions:?}")
+        }
         Output::Message { to, kind, payload } => format!(
             "message to {to:?}, kind {kind}, payload {}",
             encode_hex(payload)
@@ -1068,6 +1137,48 @@ steps:
             &output
         ));
         assert!(!matches(&expect(None, Some(4), None, None), &output));
+    }
+
+    #[test]
+    fn filtered_menu_entries_resolve_against_the_scenario_bots() {
+        let peer = |session| Peer {
+            session,
+            name: format!("u{session}"),
+            key: None,
+        };
+        let io = MockIo {
+            name: "Music".into(),
+            max_payload: MAX_PAYLOAD,
+            channel: vec![peer(1), peer(2), peer(3), peer(4)],
+            bots: HashMap::from([(
+                2,
+                BotInfo {
+                    name: "mumbot".into(),
+                    modules: vec!["music".into()],
+                },
+            )]),
+            outputs: Arc::default(),
+            gestures: Mutex::default(),
+        };
+        let filter = UserMenuFilter {
+            bot_name: None,
+            bot_module: Some("music".into()),
+            sessions: vec![4],
+        };
+        io.set_user_menu_entry_for("music", "Configure bot".into(), filter)
+            .expect("accepted");
+        assert_eq!(
+            io.bot("music", 2).expect("ok").map(|b| b.name),
+            Some("mumbot".into())
+        );
+        let output = lock(&io.outputs).pop().expect("an entry");
+        let expect = |sessions: Option<Vec<u32>>| Expect::MenuEntry {
+            label: Some("Configure bot".into()),
+            sessions,
+        };
+        assert!(matches(&expect(Some(vec![2, 4])), &output));
+        assert!(matches(&expect(None), &output));
+        assert!(!matches(&expect(Some(vec![2])), &output));
     }
 
     #[test]

@@ -267,8 +267,12 @@ pub enum PluginUiChange {
     OpenDialog { title: String },
     /// Closes the dialog without telling the plugin.
     CloseDialog,
-    /// The plugin's entry in the user context menu; `None` removes it.
-    UserMenuEntry { label: Option<String> },
+    /// The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
+    /// users it shows on (`None`: every other user in the user's channel).
+    UserMenuEntry {
+        label: Option<String>,
+        sessions: Option<Vec<u32>>,
+    },
     /// The plugin's sealed web view opens (or switches page) at `url`, a `mumcord-web` URL the
     /// app serves from the plugin's `web/` folder (FR-6.46).
     WebviewShow {
@@ -508,7 +512,7 @@ impl From<UiUpdate> for PluginUiChange {
             UiUpdate::Clear { slot } => Self::Clear { slot: slot.into() },
             UiUpdate::OpenDialog { title } => Self::OpenDialog { title },
             UiUpdate::CloseDialog => Self::CloseDialog,
-            UiUpdate::UserMenuEntry { label } => Self::UserMenuEntry { label },
+            UiUpdate::UserMenuEntry { label, sessions } => Self::UserMenuEntry { label, sessions },
             UiUpdate::WebviewShow { place, entry } => Self::WebviewShow {
                 place: place.into(),
                 url: entry,
@@ -538,7 +542,8 @@ pub enum ActionKind {
 pub struct Trees {
     trees: HashMap<String, HashMap<PluginSlot, Vec<PluginNode>>>,
     dialogs: HashMap<String, String>,
-    menu_entries: HashMap<String, String>,
+    /// Label and the sessions it shows on (`None`: everyone).
+    menu_entries: HashMap<String, (String, Option<Vec<u32>>)>,
     webviews: HashMap<String, (PluginWebviewPlace, String)>,
 }
 
@@ -572,9 +577,10 @@ impl Trees {
                     slots.remove(&PluginSlot::Dialog);
                 }
             }
-            PluginUiChange::UserMenuEntry { label } => match label {
+            PluginUiChange::UserMenuEntry { label, sessions } => match label {
                 Some(label) => {
-                    self.menu_entries.insert(plugin.to_owned(), label.clone());
+                    self.menu_entries
+                        .insert(plugin.to_owned(), (label.clone(), sessions.clone()));
                 }
                 None => {
                     self.menu_entries.remove(plugin);
@@ -621,11 +627,12 @@ impl Trees {
                 },
             });
         }
-        for (plugin, label) in &self.menu_entries {
+        for (plugin, (label, sessions)) in &self.menu_entries {
             out.push(PluginUi {
                 plugin: plugin.clone(),
                 change: PluginUiChange::UserMenuEntry {
                     label: Some(label.clone()),
+                    sessions: sessions.clone(),
                 },
             });
         }

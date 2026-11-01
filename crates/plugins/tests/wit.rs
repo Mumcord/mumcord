@@ -172,3 +172,37 @@ fn ui_has_every_slot_of_fr_6_40_and_component_of_fr_6_41() {
         ["bob", "hop", "wave", "nap", "sparkle", "shake", "fade"]
     );
 }
+
+fn field_names(resolve: &Resolve, id: TypeId) -> Vec<String> {
+    match &resolve.types[id].kind {
+        TypeDefKind::Record(r) => r.fields.iter().map(|f| f.name.clone()).collect(),
+        other => panic!("not a record: {other:?}"),
+    }
+}
+
+fn has_function(resolve: &Resolve, interface: &str, name: &str) -> bool {
+    resolve
+        .interfaces
+        .iter()
+        .find(|(_, i)| i.name.as_deref() == Some(interface))
+        .is_some_and(|(_, i)| i.functions.contains_key(name))
+}
+
+/// Bot info and the filtered user-menu entry were added to 1.0.0 additively: `peer` keeps its
+/// fields, so plugins built before them still link.
+#[test]
+fn bot_info_and_filtered_user_menu_are_additive() {
+    let (resolve, _) = package();
+    let peer = type_in(&resolve, "types", "peer");
+    assert_eq!(field_names(&resolve, peer), ["session", "name", "key"]);
+    let bot = type_in(&resolve, "types", "bot-info");
+    assert_eq!(field_names(&resolve, bot), ["name", "modules"]);
+    let filter = type_in(&resolve, "ui", "user-menu-filter");
+    assert_eq!(
+        field_names(&resolve, filter),
+        ["bot-name", "bot-module", "sessions"]
+    );
+    assert!(has_function(&resolve, "peers", "bot"));
+    assert!(has_function(&resolve, "ui", "set-user-menu-entry"));
+    assert!(has_function(&resolve, "ui", "set-user-menu-entry-for"));
+}

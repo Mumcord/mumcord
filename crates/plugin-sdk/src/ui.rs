@@ -22,6 +22,23 @@
 //! Strings such as `action` are the plugin's own identifiers; they come back in the `ui-action`
 //! event. The host validates every tree (only stacks and lists may have children, labels are
 //! required, colours must be theme tokens) and refuses invalid ones with `invalid`.
+//!
+//! A user-menu entry can be limited to bots that say so in their Mumcord hello, plus users the
+//! plugin lists itself (e.g. saved bots found by `peer.key`); [`crate::peers::bot`] tells a
+//! user's bot info:
+//!
+//! ```no_run
+//! use mumcord_plugin_sdk::ui::{self, UserMenuFilter};
+//!
+//! # fn demo(saved: Vec<u32>) -> Result<(), mumcord_plugin_sdk::types::Error> {
+//! let filter = UserMenuFilter {
+//!     bot_name: Some("mumbot".into()),
+//!     bot_module: Some("music".into()),
+//!     sessions: saved,
+//! };
+//! ui::set_user_menu_entry_for("Configure bot", &filter)
+//! # }
+//! ```
 
 pub use crate::bindings::mumcord::plugin::ui::*;
 

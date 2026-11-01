@@ -10,12 +10,19 @@ use std::time::{Duration, Instant};
 use wasmtime::component::{HasSelf, Linker};
 
 use crate::api::theme::TOKENS;
-use crate::runtime::bindings::mumcord::plugin::ui::{Component, Host, Node, Slot, add_to_linker};
+use crate::runtime::bindings::mumcord::plugin::ui::{
+    Component, Host, Node, Slot, UserMenuFilter, add_to_linker,
+};
 use crate::runtime::wit::types::Error;
 use crate::runtime::{HostApi, Level, PluginState};
 
 pub const DIALOG_PERMISSION: &str = "ui.dialog";
 pub const USER_MENU_PERMISSION: &str = "ui.user-menu";
+
+/// Characters of a user-menu label.
+pub const MAX_MENU_LABEL_CHARS: usize = 40;
+/// Sessions in a user-menu filter.
+pub const MAX_MENU_SESSIONS: usize = 256;
 
 /// Nodes per tree (FR-6.42).
 pub const MAX_NODES: usize = 500;
@@ -62,6 +69,17 @@ pub fn slot_permission(slot: &Slot) -> Option<&'static str> {
 }
 
 /// A short, content-free name of a slot for the rate limiter and Diagnostics lines.
+/// A user-menu label: not blank, at most [`MAX_MENU_LABEL_CHARS`].
+fn check_menu_label(label: &str) -> Result<(), Error> {
+    if label.trim().is_empty() {
+        Err(Error::Invalid)
+    } else if label.chars().count() > MAX_MENU_LABEL_CHARS {
+        Err(Error::TooLarge)
+    } else {
+        Ok(())
+    }
+}
+
 fn slot_key(slot: &Slot) -> String {
     match slot {
         Slot::Panel => "panel".to_owned(),
@@ -459,7 +477,23 @@ impl Host for PluginState {
 
     fn set_user_menu_entry(&mut self, label: Option<String>) -> Result<(), Error> {
         self.ctx.grants.check(&self.id, USER_MENU_PERMISSION)?;
+        if let Some(label) = &label {
+            check_menu_label(label)?;
+        }
         self.io()?.set_user_menu_entry(&self.id, label)
+    }
+
+    fn set_user_menu_entry_for(
+        &mut self,
+        label: String,
+        filter: UserMenuFilter,
+    ) -> Result<(), Error> {
+        self.ctx.grants.check(&self.id, USER_MENU_PERMISSION)?;
+        check_menu_label(&label)?;
+        if filter.sessions.len() > MAX_MENU_SESSIONS {
+            return Err(Error::TooLarge);
+        }
+        self.io()?.set_user_menu_entry_for(&self.id, label, filter)
     }
 }
 
@@ -590,6 +624,10 @@ mod tests {
     #[test]
     fn refuses_bad_structure() {
         assert_eq!(error(&[]), Error::Invalid);
+        assert_eq!(check_menu_label("Configure bot"), Ok(()));
+        assert_eq!(check_menu_label(&"x".repeat(MAX_MENU_LABEL_CHARS)), Ok(()));
+        assert_eq!(check_menu_label(&"x".repeat(41)), Err(Error::TooLarge));
+        assert_eq!(check_menu_label(" "), Err(Error::Invalid));
         assert_eq!(error(&[stack(vec![5]), text("a")]), Error::Invalid);
         assert_eq!(error(&[stack(vec![0])]), Error::Invalid);
         assert_eq!(error(&[stack(vec![1, 1]), text("a")]), Error::Invalid);

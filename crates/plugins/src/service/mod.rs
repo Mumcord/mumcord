@@ -44,7 +44,7 @@ use crate::wit::theme::Mode;
 pub use commands::{CommandOutcome, PluginCommand};
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
-pub use plugin_io::{PeerInfo, SelfInfo, UiUpdate};
+pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, UiUpdate};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
 pub use ui::UiInput;
 pub use updates::{Approval, Due, Schedule, UpdateInfo, load_repository, run_check};

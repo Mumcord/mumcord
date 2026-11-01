@@ -6,8 +6,8 @@
 use std::fmt::Debug;
 
 use crate::runtime::wit::peers::Target;
-use crate::runtime::wit::types::{Error, Peer};
-use crate::runtime::wit::ui::{Node, Slot};
+use crate::runtime::wit::types::{BotInfo, Error, Peer};
+use crate::runtime::wit::ui::{Node, Slot, UserMenuFilter};
 use crate::runtime::wit::webview::Place;
 
 /// Carries out what a plugin asks of the UI, other users and the chat. `plugin` is the id of
@@ -26,12 +26,22 @@ pub trait PluginIo: Send + Sync + Debug {
     fn close_dialog(&self, plugin: &str);
     /// `ui.set-user-menu-entry`.
     fn set_user_menu_entry(&self, plugin: &str, label: Option<String>) -> Result<(), Error>;
+    /// `ui.set-user-menu-entry-for`: the entry only for users matching `filter` (label and
+    /// session count already checked).
+    fn set_user_menu_entry_for(
+        &self,
+        plugin: &str,
+        label: String,
+        filter: UserMenuFilter,
+    ) -> Result<(), Error>;
     /// `peers.send`.
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error>;
     /// `peers.start-game-burst`.
     fn start_game_burst(&self, plugin: &str) -> Result<(), Error>;
     /// `peers.presence`: the user's channel, the user first.
     fn presence(&self, plugin: &str) -> Result<Vec<Peer>, Error>;
+    /// `peers.bot`: the bot info of a user in the user's channel.
+    fn bot(&self, plugin: &str, session: u32) -> Result<Option<BotInfo>, Error>;
     /// `chat.send`: posts "[Name] text" if a user gesture allows it.
     fn chat_send(&self, plugin: &str, text: String) -> Result<(), Error>;
     /// `chat.line-hash`: the hash of the line `chat_send` would post (it includes the plugin's

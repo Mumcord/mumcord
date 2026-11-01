@@ -2631,8 +2631,11 @@ export type PluginUiChange =
 { type: "openDialog"; title: string } | 
 /**  Closes the dialog without telling the plugin. */
 { type: "closeDialog" } | 
-/**  The plugin's entry in the user context menu; `None` removes it. */
-{ type: "userMenuEntry"; label: string | null } | 
+/**
+ *  The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
+ *  users it shows on (`None`: every other user in the user's channel).
+ */
+{ type: "userMenuEntry"; label: string | null; sessions: number[] | null } | 
 /**
  *  The plugin's sealed web view opens (or switches page) at `url`, a `mumcord-web` URL the
  *  app serves from the plugin's `web/` folder (FR-6.46).

@@ -5,7 +5,7 @@
 use wasmtime::component::{HasSelf, Linker};
 
 use crate::runtime::bindings::mumcord::plugin::peers::{Host, Target, add_to_linker};
-use crate::runtime::wit::types::{Error, Peer};
+use crate::runtime::wit::types::{BotInfo, Error, Peer};
 use crate::runtime::{HostApi, PluginState};
 
 pub const PERMISSION: &str = "peers.messages";
@@ -34,5 +34,10 @@ impl Host for PluginState {
     fn presence(&mut self) -> Result<Vec<Peer>, Error> {
         self.ctx.grants.check(&self.id, PRESENCE_PERMISSION)?;
         self.io()?.presence(&self.id)
+    }
+
+    fn bot(&mut self, user: u32) -> Result<Option<BotInfo>, Error> {
+        self.ctx.grants.check(&self.id, PRESENCE_PERMISSION)?;
+        self.io()?.bot(&self.id, user)
     }
 }

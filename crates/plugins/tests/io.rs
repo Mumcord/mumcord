@@ -6,8 +6,8 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use mumcord_plugins::wit::peers::Target;
-use mumcord_plugins::wit::types::{Error, Peer};
-use mumcord_plugins::wit::ui::{Node, Slot};
+use mumcord_plugins::wit::types::{BotInfo, Error, Peer};
+use mumcord_plugins::wit::ui::{Node, Slot, UserMenuFilter};
 use mumcord_plugins::{CallError, HostContext, HostEvent, PluginHost, PluginIo};
 use semver::Version;
 use tokio::sync::mpsc::{UnboundedReceiver, unbounded_channel};
@@ -76,6 +76,14 @@ impl PluginIo for Recorder {
     fn set_user_menu_entry(&self, _plugin: &str, _label: Option<String>) -> Result<(), Error> {
         Ok(())
     }
+    fn set_user_menu_entry_for(
+        &self,
+        _plugin: &str,
+        _label: String,
+        _filter: UserMenuFilter,
+    ) -> Result<(), Error> {
+        Ok(())
+    }
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error> {
         let payload = String::from_utf8_lossy(&payload);
         self.record(format!("{plugin} send {to:?} {kind} {payload}"));
@@ -86,6 +94,9 @@ impl PluginIo for Recorder {
     }
     fn presence(&self, _plugin: &str) -> Result<Vec<Peer>, Error> {
         Ok(Vec::new())
+    }
+    fn bot(&self, _plugin: &str, _session: u32) -> Result<Option<BotInfo>, Error> {
+        Ok(None)
     }
     fn chat_send(&self, _plugin: &str, _text: String) -> Result<(), Error> {
         Ok(())

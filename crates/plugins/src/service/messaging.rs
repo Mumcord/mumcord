@@ -11,7 +11,7 @@ use std::time::Instant;
 use mumcord_store::{PluginVisibility, ServerId};
 
 use super::plugin_io::{
-    API_MAJOR, Connection, MessagingMeta, PeerInfo, PluginMeta, SelfInfo, wit_peer,
+    API_MAJOR, BotInfo, Connection, MessagingMeta, PeerInfo, PluginMeta, SelfInfo, wit_peer,
 };
 use super::{Origin, PluginService};
 use crate::manifest::Visibility;
@@ -33,7 +33,11 @@ pub struct Announce {
 impl PluginService {
     /// The server the user looks at changed (`None`: none). Plugins get `self-changed`.
     pub fn set_focused_server(&mut self, server: Option<ServerId>) {
-        self.io.peers().focused = server;
+        let changed = std::mem::replace(&mut self.io.peers().focused, server) != server;
+        if changed {
+            self.io.menu_forget_sessions(None);
+            self.io.refresh_menus();
+        }
         self.broadcast_self();
     }
 
@@ -55,6 +59,8 @@ impl PluginService {
             state.focused == Some(server)
         };
         if focused {
+            self.io.menu_forget_sessions(None);
+            self.io.refresh_menus();
             self.broadcast_self();
         }
     }
@@ -78,6 +84,7 @@ impl PluginService {
         connection(&mut self.io.peers().connections, server)
             .members
             .insert(peer.session, peer.clone());
+        self.io.refresh_menus();
         self.dispatch(server, |keys, id| Event::Joined(wit_peer(keys, id, &peer)));
     }
 
@@ -88,8 +95,26 @@ impl PluginService {
             let connection = connection(&mut state.connections, server);
             connection.members.remove(&peer.session);
             connection.messenger.forget_session(peer.session);
+            if state.focused == Some(server) {
+                drop(state);
+                self.io.menu_forget_sessions(Some(peer.session));
+            }
         }
+        self.io.refresh_menus();
         self.dispatch(server, |keys, id| Event::Left(wit_peer(keys, id, peer)));
+    }
+
+    /// A person's hello says they are a bot (`None`: no longer, or they left the server).
+    pub fn peer_bot(&mut self, server: ServerId, session: u32, bot: Option<BotInfo>) {
+        {
+            let mut state = self.io.peers();
+            let bots = &mut connection(&mut state.connections, server).bots;
+            match bot {
+                Some(bot) => bots.insert(session, bot),
+                None => bots.remove(&session),
+            };
+        }
+        self.io.refresh_menus();
     }
 
     pub fn peer_talking(&mut self, server: ServerId, peer: &PeerInfo, talking: bool) {

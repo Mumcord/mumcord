@@ -5,6 +5,8 @@
 //! `peers` works on the messaging state per connection ([`PeersState`], one
 //! [`Messenger`] each), which the service feeds from engine events (see `messaging.rs`).
 
+mod user_menu;
+
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::Instant;
@@ -23,9 +25,11 @@ use crate::messaging::{
 };
 use crate::peer_key::PeerKeys;
 use crate::wit::peers;
-use crate::wit::types::{Error, Peer};
-use crate::wit::ui::{Node, Slot};
+use crate::wit::types::{BotInfo as WitBotInfo, Error, Peer};
+use crate::wit::ui::{Node, Slot, UserMenuFilter};
 use crate::wit::webview::Place;
+
+pub use user_menu::BotInfo;
 
 /// The plugin API major this host speaks; written into every envelope and announce entry.
 pub(super) const API_MAJOR: u8 = 1;
@@ -67,8 +71,10 @@ pub enum UiUpdate {
         title: String,
     },
     CloseDialog,
+    /// `None` removes the entry. `sessions` lists the users it shows on (`None`: everyone).
     UserMenuEntry {
         label: Option<String>,
+        sessions: Option<Vec<u32>>,
     },
     /// The plugin's web view opens (or switches) to `entry` below `web/`, query included.
     WebviewShow {
@@ -106,6 +112,8 @@ pub(super) struct PeersState {
     /// Loaded, switched-on plugins by id.
     pub plugins: HashMap<String, PluginMeta>,
     pub connections: HashMap<ServerId, Connection>,
+    /// User-menu entries by plugin.
+    menus: HashMap<String, user_menu::MenuEntry>,
 }
 
 #[derive(Debug)]
@@ -121,6 +129,8 @@ pub(super) struct Connection {
     /// Users whose hello lists `plugins`: they receive our announce.
     pub capable: BTreeSet<u32>,
     pub throttle: AnnounceThrottle,
+    /// Bot info from hellos by session (people in other channels too).
+    pub bots: HashMap<u32, BotInfo>,
 }
 
 impl Connection {
@@ -133,6 +143,7 @@ impl Connection {
             announced: HashMap::new(),
             capable: BTreeSet::new(),
             throttle: AnnounceThrottle::default(),
+            bots: HashMap::new(),
         }
     }
 }
@@ -201,6 +212,7 @@ impl ServiceIo {
     pub fn forget(&self, plugin: &str) {
         self.chat().gate.forget(plugin);
         self.webviews.forget(plugin);
+        self.menu_forget_plugin(plugin);
     }
 
     fn emit(&self, event: ServiceEvent) {
@@ -248,8 +260,22 @@ impl PluginIo for ServiceIo {
     }
 
     fn set_user_menu_entry(&self, plugin: &str, label: Option<String>) -> Result<(), Error> {
-        self.ui(plugin, UiUpdate::UserMenuEntry { label });
+        self.menu_set(plugin, label);
         Ok(())
+    }
+
+    fn set_user_menu_entry_for(
+        &self,
+        plugin: &str,
+        label: String,
+        filter: UserMenuFilter,
+    ) -> Result<(), Error> {
+        self.menu_set_filtered(plugin, label, filter);
+        Ok(())
+    }
+
+    fn bot(&self, _plugin: &str, session: u32) -> Result<Option<WitBotInfo>, Error> {
+        self.bot_of(session)
     }
 
     fn peer_send(
@@ -264,6 +290,7 @@ impl PluginIo for ServiceIo {
             focused,
             plugins,
             connections,
+            ..
         } = &mut *state;
         let meta = plugins
             .get(plugin)

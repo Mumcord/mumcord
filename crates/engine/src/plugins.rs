@@ -61,6 +61,14 @@ pub struct PluginPeer {
     pub cert_hash: Option<String>,
 }
 
+/// What a bot says about itself in its `mumcord.hello` (untrusted, sanitised): its name and the
+/// modules it runs, e.g. `mumbot` with `music`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginBot {
+    pub name: String,
+    pub modules: Vec<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PluginChannel {
     pub id: u32,
@@ -93,6 +101,13 @@ pub enum PluginEngineEvent {
         server_id: ServerId,
         session: u32,
         plugins: bool,
+    },
+    /// A person's hello says they are a bot (or no longer is, e.g. after leaving the server).
+    /// It can arrive before or after they join the user's channel.
+    PeerBot {
+        server_id: ServerId,
+        session: u32,
+        bot: Option<PluginBot>,
     },
     /// Someone joined the user's channel, or is there when the user arrives (FR-6.16).
     Joined {
@@ -188,6 +203,8 @@ struct ServerView {
     users: BTreeMap<u32, Seen>,
     sharers: BTreeSet<u32>,
     capable: BTreeSet<u32>,
+    /// Bot info last reported per session.
+    bots: BTreeMap<u32, PluginBot>,
     /// Server-plugin sender pinned for this connection when there is no identity to store it.
     sender_pin: Option<String>,
 }
@@ -312,6 +329,7 @@ impl PluginEngineEvent {
             Self::SharedState { server_id, .. }
             | Self::Disconnected { server_id }
             | Self::PeerCapable { server_id, .. }
+            | Self::PeerBot { server_id, .. }
             | Self::Joined { server_id, .. }
             | Self::Left { server_id, .. }
             | Self::Talking { server_id, .. }
@@ -515,26 +533,46 @@ pub(crate) fn on_peer_known(
     server_id: ServerId,
     session: u32,
 ) {
-    let plugins = lock(peers)
-        .get(&server_id)
-        .and_then(|p| p.features(session))
-        .is_some_and(|f| f.iter().any(|x| x == FEATURE));
-    let changed = {
+    let (plugins, bot) = {
+        let servers = lock(peers);
+        let known = servers.get(&server_id);
+        (
+            known
+                .and_then(|p| p.features(session))
+                .is_some_and(|f| f.iter().any(|x| x == FEATURE)),
+            known.and_then(|p| p.bot(session)).cloned(),
+        )
+    };
+    let (changed, bot_changed) = {
         let mut servers = lock(&hub.servers);
         let Some(view) = servers.get_mut(&server_id) else {
             return;
         };
-        if plugins && view.visible(session).is_some() {
+        let visible = view.visible(session).is_some();
+        let changed = if plugins && visible {
             view.capable.insert(session)
         } else {
             view.capable.remove(&session)
-        }
+        };
+        let bot = bot.filter(|_| visible);
+        let bot_changed = match &bot {
+            Some(bot) => view.bots.insert(session, bot.clone()).as_ref() != Some(bot),
+            None => view.bots.remove(&session).is_some(),
+        };
+        (changed, bot_changed.then_some(bot))
     };
     if changed {
         hub.emit(PluginEngineEvent::PeerCapable {
             server_id,
             session,
             plugins,
+        });
+    }
+    if let Some(bot) = bot_changed {
+        hub.emit(PluginEngineEvent::PeerBot {
+            server_id,
+            session,
+            bot,
         });
     }
 }

@@ -2637,7 +2637,15 @@ impl Inner {
                 drop(core);
                 crate::now_playing::on_user_removed(&self.now_playing, server_id, user.session);
                 crate::now_gaming::on_user_removed(&self.now_gaming, server_id, user.session);
-                crate::mumcord::on_user_removed(&self.mumcord, server_id, user.session);
+                if crate::mumcord::on_user_removed(&self.mumcord, server_id, user.session) {
+                    // Plugins drop the person's bot info, so a reused session is not a bot.
+                    crate::plugins::on_peer_known(
+                        ctx.events.plugins(),
+                        &self.mumcord,
+                        server_id,
+                        user.session,
+                    );
+                }
                 crate::pm_rules::on_user_removed(ctx, &self.pm_requests, user.session);
                 crate::history_sync::on_user_removed(&self.history_sync, server_id, user.session);
                 crate::watch_party::on_user_removed(&self.watch_parties, ctx, user.session);

@@ -9,7 +9,7 @@ use mumcord_engine::plugins::{PluginEngineEvent, PluginPeer};
 use mumcord_engine::{ChatMessageView, ConversationRef, Engine, ServerId};
 use mumcord_plugins::messaging::Outgoing;
 use mumcord_plugins::messaging::announce::ANNOUNCE_DATA_ID;
-use mumcord_plugins::service::{PeerInfo, PluginService, SelfInfo};
+use mumcord_plugins::service::{BotInfo, PeerInfo, PluginService, SelfInfo};
 use mumcord_protocol::LowOutcome;
 
 use tauri::AppHandle;
@@ -225,6 +225,18 @@ fn feed(service: &mut PluginService, event: PluginEngineEvent, friends: &HashSet
             session,
             plugins,
         } => service.peer_capable(server_id, session, plugins),
+        PluginEngineEvent::PeerBot {
+            server_id,
+            session,
+            bot,
+        } => service.peer_bot(
+            server_id,
+            session,
+            bot.map(|bot| BotInfo {
+                name: bot.name,
+                modules: bot.modules,
+            }),
+        ),
         PluginEngineEvent::Joined { server_id, peer: p } => {
             service.peer_joined(server_id, peer(p, friends));
         }

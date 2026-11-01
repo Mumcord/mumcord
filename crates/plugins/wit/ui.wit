@@ -280,4 +280,21 @@ interface ui {
   /// user's own channel; none removes it. Choosing it sends `user-menu-requested`.
   /// Errors: `not-permitted`, `too-large`.
   set-user-menu-entry: func(label: option<string>) -> result<_, error>;
+
+  /// Who sees a filtered user-menu entry. A user matches when the bot part matches (at least one
+  /// of `bot-name` and `bot-module` is set, and their bot info has that name and that module),
+  /// or when their session is in `sessions`, e.g. bots the plugin already saved, found by
+  /// `peer.key`.
+  record user-menu-filter {
+    bot-name: option<string>,
+    bot-module: option<string>,
+    /// At most 256 sessions.
+    sessions: list<session>,
+  }
+
+  /// Like `set-user-menu-entry`, but the entry only shows on users that match `filter`. The
+  /// host keeps it current as users join, leave or say they are a bot; a session in the list
+  /// that leaves is dropped from it. Call it again to change the label or the filter;
+  /// `set-user-menu-entry(none)` removes it. Errors: `not-permitted`, `too-large`.
+  set-user-menu-entry-for: func(label: string, filter: user-menu-filter) -> result<_, error>;
 }

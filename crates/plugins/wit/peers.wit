@@ -5,7 +5,7 @@
 /// server. The receiver learns the sender from the Mumble session that sent the message, never
 /// from the payload. Incoming messages arrive as the `peer-message` event.
 interface peers {
-  use types.{error, peer, session};
+  use types.{bot-info, error, peer, session};
 
   /// Who a message goes to.
   variant target {
@@ -36,4 +36,9 @@ interface peers {
   /// Snapshot of the users in the user's current channel, including the user themselves (first
   /// entry). Empty while disconnected. Needs `events.presence`. Errors: `not-permitted`.
   presence: func() -> result<list<peer>, error>;
+
+  /// The bot info of a user in the user's current channel, from their Mumcord hello. None for
+  /// people, for bots that did not say so, and for sessions outside the channel. Needs
+  /// `events.presence`. Errors: `not-permitted`.
+  bot: func(user: session) -> result<option<bot-info>, error>;
 }
