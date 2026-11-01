@@ -165,6 +165,7 @@ The Mumble server only relays plugin data and text messages under its normal ACL
 
 - **FR-6.46** An official plugin with `ui.webview` may ship HTML, CSS, JS and images in `web/` and show them in the large panel popover or in a dialog.
 - **FR-6.47** The web view is a sandboxed frame with an opaque origin: no network (CSP `default-src 'none'` plus inline/package-local script, style and image only), no Tauri IPC, no storage, no navigation, no popups, no access to the Mumcord window. It talks only to its own plugin through a message bridge (≤ 16 KiB per message, ≤ 60 per second); the plugin decides what to share via the normal API.
+  - *Addendum 2026-11-01 (EV3):* successful responses for a plugin's `web/` files carry `Access-Control-Allow-Origin: *` (never `Allow-Credentials`), because the frame's opaque origin makes CSS masks, `fetch` and fonts CORS requests. Not-found answers get no such header. The per-frame CSP stays the guard: a frame may only reach its own plugin's folder.
 - **FR-6.48** `web/` counts toward the package limits of FR-6.10; it is loaded only if `ui.webview` is granted; keyboard focus enters and leaves the frame with Tab/Escape.
 
 ### 4.9 Signing & trust (#276)

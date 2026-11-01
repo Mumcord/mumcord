@@ -112,6 +112,12 @@ fn response(
     if let Some(mime) = mime {
         builder = builder.header(header::CONTENT_TYPE, mime);
     }
+    if plugin.is_some() && status.is_success() {
+        // The frame's origin is opaque ("null"), so its CORS requests to its own files (CSS
+        // masks, fetch, fonts) need this. The files are the package's public content, and each
+        // frame's CSP still limits it to its own plugin's folder.
+        builder = builder.header(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+    }
     builder.body(body).unwrap_or_else(|error| {
         tracing::warn!(%error, "a web view response could not be built");
         Response::new(Vec::new())
@@ -141,6 +147,30 @@ mod tests {
                 .unwrap();
             assert!(csp.starts_with("default-src 'none'"), "{csp}");
             assert!(csp.contains("sandbox"));
+            assert!(
+                !answer
+                    .headers()
+                    .contains_key(header::ACCESS_CONTROL_ALLOW_ORIGIN)
+            );
         }
+    }
+
+    #[test]
+    fn plugin_files_allow_cors_from_the_opaque_frame() {
+        let answer = response(
+            StatusCode::OK,
+            Some("snacks"),
+            Some("image/webp"),
+            Vec::new(),
+        );
+        assert_eq!(answer.headers()[header::ACCESS_CONTROL_ALLOW_ORIGIN], "*");
+        let csp = answer.headers()[header::CONTENT_SECURITY_POLICY]
+            .to_str()
+            .unwrap();
+        // CORS is open, but the frame may still only reach its own plugin's folder.
+        assert!(
+            csp.contains(&format!("connect-src {}/snacks/;", origin())),
+            "{csp}"
+        );
     }
 }
