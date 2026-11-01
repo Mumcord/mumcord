@@ -15,6 +15,8 @@ mod install;
 mod lifecycle;
 mod messaging;
 mod plugin_io;
+mod revocation;
+mod updates;
 
 use std::collections::BTreeMap;
 use std::io;
@@ -40,6 +42,8 @@ use crate::wit::theme::Mode;
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
 pub use plugin_io::{PeerInfo, SelfInfo, UiUpdate};
+pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
+pub use updates::{Approval, Due, Schedule, UpdateInfo, run_check};
 
 /// The permission that lets a plugin show a badge next to user names (FR-6.63).
 const BADGE_PERMISSION: &str = "ui.member-badge";
@@ -89,6 +93,13 @@ pub enum ServiceEvent {
         plugin: String,
         card: String,
         message: u64,
+    },
+    /// A new plugin version is waiting in the Updates tab: a notification-centre entry, no OS
+    /// notification (FR-6.69). Sent once per version.
+    UpdateAvailable {
+        id: String,
+        name: String,
+        version: String,
     },
 }
 
@@ -141,6 +152,8 @@ pub struct PluginInfo {
     pub installed_at: UnixMillis,
     /// This plugin's badge is the one shown next to names (FR-6.63).
     pub badge: bool,
+    /// A `revoked.json` entry matching the installed version (FR-6.70).
+    pub revocation: Option<RevocationNotice>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -181,6 +194,14 @@ pub enum ServiceError {
     DeveloperModeOff,
     #[error("{0:?} is not a developer plugin")]
     NotDeveloper(String),
+    #[error("No update is available for {0:?}")]
+    NoUpdate(String),
+    /// The update needs new permissions or comes from a new author key; it waits in the
+    /// Updates tab (FR-6.67).
+    #[error("This update needs your approval")]
+    NeedsApproval,
+    #[error("Mumcord turned this plugin off: {0}")]
+    Revoked(String),
 }
 
 /// Where an installed plugin came from, as stored in `plugin.source`.
@@ -249,6 +270,10 @@ pub struct PluginService {
     /// Why an installed plugin could not be loaded in this run.
     load_errors: BTreeMap<String, String>,
     events: UnboundedSender<ServiceEvent>,
+    /// Available updates and rollback reasons (FR-6.66–6.69).
+    updates: updates::Updates,
+    /// The latest revocation list applied (bundled, cached or fetched).
+    revoked: crate::registry::RevocationList,
 }
 
 impl PluginService {
@@ -303,6 +328,8 @@ impl PluginService {
             quiet: false,
             load_errors: BTreeMap::new(),
             events,
+            updates: updates::Updates::default(),
+            revoked: crate::registry::RevocationList::bundled(),
         };
         Ok((service, host_rx, events_rx))
     }
@@ -444,6 +471,7 @@ impl PluginService {
                 Some(RunState::Disabled) | None => Status::Off,
             }
         };
+        let revocation = self.revocation_notice(&record);
         PluginInfo {
             name: manifest.map(|m| m.name.clone()).unwrap_or_default(),
             required: manifest
@@ -467,6 +495,7 @@ impl PluginService {
             visibility: record.visibility,
             pinned: record.pinned,
             notifications: record.notifications,
+            revocation,
             installed_at: record.installed_at,
         }
     }

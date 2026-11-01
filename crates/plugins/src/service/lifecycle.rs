@@ -59,6 +59,9 @@ impl PluginService {
             if self.host.all_off() {
                 return Err(ServiceError::AllOff);
             }
+            if let Some(reason) = self.disabling_revocation(&record) {
+                return Err(ServiceError::Revoked(reason));
+            }
             let manifest = self.loaded_manifest(id)?;
             if revokes_required(&manifest.permissions.required, &record.granted) {
                 return Err(ServiceError::RequiredMissing);
