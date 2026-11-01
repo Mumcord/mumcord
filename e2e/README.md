@@ -83,29 +83,78 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
   warns).
 
 - **Failures:** screenshot + page source of the app go to `e2e/artifacts/` (git-ignored); CI uploads
-  them. axe reports land there too.
+  them (instance B: same name with `-B`). axe reports land there too.
 
 ## Writing specs
 
 Put specs in `e2e/specs/<area>/<name>.e2e.ts` (mocha `describe`/`it`, WebdriverIO `browser`/`$`/`expect`
 from `@wdio/globals`). Import helpers from `e2e/helpers/index.ts`:
 
-| Helper                                                                                    | What it does                                                                                                     |
-| ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `testenv.up(svc, {cert})`, `testenv.reset(svc, {cert})`                                   | start / reset a server (`v15`, `v15b`, `v14`, `v13`, `limit`; cert `A`/`B`). `reset` drops clients.              |
-| `testenv.stop/start/restart(svc)`, `testenv.ports`                                        | container control for reconnect tests; port map                                                                  |
-| `bot([...cmd], {name, port, cert, superuser, timeout, hold})`                             | runs one `mumbot` subcommand; throws unless exit 0                                                               |
-| `botInBackground([...cmd], opts)`                                                         | long-running bot (`--hold`, `script` via `.send(line)`); `.done`, `.stop()`                                      |
-| `botOn(svc, cmd, opts)`, `botOnAll(svcs, cmd, opts)`, `botInBackgroundOn(svc, cmd, opts)` | bots by service name (`v15`, `v15b` …); `botOnAll` connects to several servers at once                           |
-| `netsim.start(svc)`, `netsim.ctl(...args)`, `netsim.stop()`                               | proxy `127.0.0.1:64800` → server; e.g. `ctl("loss","both","10")`, `ctl("block-udp","on")`                        |
-| `netsim.startProxy(svc, {listen, control})`                                               | extra proxy (own `ctl`, `stop`, `listenPort`), e.g. a bot behind its own proxy: `bot(cmd, {port: p.listenPort})` |
-| `testenv.address(svc)`, `testenv.project`                                                 | `localhost:<port>` for the add-server form; compose project (`MUMCORD_PROJECT`)                                  |
-| `app.restart({freshProfile, audio, env})`                                                 | quit and restart the app (keeps the profile unless `freshProfile`; `env`: extra app env for this spec file)      |
-| `app.profile()`                                                                           | current profile root (check files in `data/app.mumcord.client/` etc.)                                            |
-| `app.invoke(command, args)`                                                               | calls a Tauri command of the app and returns its result (state the UI does not show)                             |
-| `axe.scan(label, options)`, `axe.summarize(violations)`                                   | axe-core WCAG 2.2 AA scan of the current screen; returns violations                                              |
-| `bin`, `repoRoot`, `artifactsDir`                                                         | paths to binaries (incl. the test game plugin and `headless_check`) and folders                                  |
+| Helper                                                                                     | What it does                                                                                                     |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `testenv.up(svc, {cert})`, `testenv.reset(svc, {cert})`                                    | start / reset a server (`v15`, `v15b`, `v14`, `v13`, `limit`; cert `A`/`B`). `reset` drops clients.              |
+| `testenv.stop/start/restart(svc)`, `testenv.ports`                                         | container control for reconnect tests; port map                                                                  |
+| `bot([...cmd], {name, port, cert, superuser, timeout, hold})`                              | runs one `mumbot` subcommand; throws unless exit 0                                                               |
+| `botInBackground([...cmd], opts)`                                                          | long-running bot (`--hold`, `script` via `.send(line)`); `.done`, `.stop()`                                      |
+| `botOn(svc, cmd, opts)`, `botOnAll(svcs, cmd, opts)`, `botInBackgroundOn(svc, cmd, opts)`  | bots by service name (`v15`, `v15b` …); `botOnAll` connects to several servers at once                           |
+| `netsim.start(svc)`, `netsim.ctl(...args)`, `netsim.stop()`                                | proxy `127.0.0.1:64800` → server; e.g. `ctl("loss","both","10")`, `ctl("block-udp","on")`                        |
+| `netsim.startProxy(svc, {listen, control})`                                                | extra proxy (own `ctl`, `stop`, `listenPort`), e.g. a bot behind its own proxy: `bot(cmd, {port: p.listenPort})` |
+| `testenv.address(svc)`, `testenv.project`                                                  | `localhost:<port>` for the add-server form; compose project (`MUMCORD_PROJECT`)                                  |
+| `app.restart({freshProfile, audio, env, args})`                                            | quit and restart app A (keeps the profile unless `freshProfile`; `env`/`args`: extra app env / CLI arguments)    |
+| `app.profile(id)`                                                                          | profile root of instance `"a"` (default) or `"b"` (check files in `data/app.mumcord.client/` etc.)               |
+| `apps.startB(opts)`, `apps.restartB(opts)`, `apps.stopB()`                                 | second client B (see "Two clients"); `startB` uses a fresh profile unless `freshProfile: false`                  |
+| `apps.onB(async () => …)`, `apps.browserB()`                                               | run helpers against B (globals `browser`/`$`/`$$` point at B inside); B's raw WebDriver session                  |
+| `apps.pluginEnv({registryKey, registryUrl, fakeAppVersion, forceDailyCheck, fastBackoff})` | plugin test env for the `env` option (see "Plugin test environment")                                             |
+| `app.invoke(command, args)`                                                                | calls a Tauri command of the app and returns its result (state the UI does not show)                             |
+| `axe.scan(label, options)`, `axe.summarize(violations)`                                    | axe-core WCAG 2.2 AA scan of the current screen; returns violations                                              |
+| `bin`, `repoRoot`, `artifactsDir`                                                          | paths to binaries (incl. the test game plugin and `headless_check`) and folders                                  |
 
 The test servers are not started automatically: call `testenv.up("v15")` (or `reset`) in a
 `before` hook of specs that need them. Use `bot(["expect", "user", "Tester"])`-style checks to
 verify what other users see.
+
+## Two clients
+
+Some criteria need two Mumcord users (plugin messaging, blocking). Every spec has instance **A**
+(the normal wdio session, `browser`/`$`). `apps.startB()` starts instance **B** next to it:
+
+```ts
+await completeWizard("Alice");
+await addAndConnect();
+await apps.startB();
+await apps.onB(async () => {
+  await completeWizard("Bob");
+  await addAndConnect();
+});
+await personRow("Bob").waitForDisplayed();
+```
+
+- **Isolation:** B has its own profile dir, its own tauri-driver/WebKitWebDriver ports
+  (`4544+2n`/`4545+2n` for run id n), its own overlay socket name, and its own session D-Bus with
+  its own unlocked gnome-keyring (keyring file inside B's profile). The private bus is what lets a
+  second app start at all: the app's single-instance lock is a D-Bus name, and on a shared bus B
+  would hand over to A and exit (and share A's identity).
+- **Processes:** everything an instance starts carries `MUMCORD_E2E_INSTANCE=a|b` in its
+  environment, so `app.restart()` never kills B and `apps.restartB()` never kills A. B is stopped
+  after each spec file and at the start of the next one.
+- **`onB`:** points the `@wdio/globals` exports at B for the duration of the callback, so every
+  existing UI helper works for B. Keep A and B steps sequential: never mix an `onB` call and A
+  commands in one `Promise.all`. Elements fetched inside `onB` stay bound to B.
+- **Cost:** two WebKit apps need about twice the memory and CPU; start B only in specs that need it.
+
+## Plugin test environment
+
+Pass `env: apps.pluginEnv({...})` to `app.restart`, `apps.startB` or `apps.restartB`, and
+`args: ["--no-plugins"]` to start without plugins. The variables are read by debug builds only;
+release builds ignore them.
+
+| Variable                                | `pluginEnv` field | Purpose                                                            |
+| --------------------------------------- | ----------------- | ------------------------------------------------------------------ |
+| `MUMCORD_PLUGIN_REGISTRY_KEY`           | `registryKey`     | public minisign key of the run's fixture registry (FR-6.53)        |
+| `MUMCORD_PLUGIN_REGISTRY_URL`           | `registryUrl`     | base URL of the fixture registry (`mumcord-plugin serve-registry`) |
+| `MUMCORD_PLUGIN_TEST_APP_VERSION`       | `fakeAppVersion`  | fake app version, triggers the per-version re-hash (AC-6.21)       |
+| `MUMCORD_PLUGIN_TEST_FORCE_DAILY_CHECK` | `forceDailyCheck` | `1`: run the daily revocation/update check at start (AC-6.20)      |
+| `MUMCORD_PLUGIN_TEST_FAST_BACKOFF`      | `fastBackoff`     | `1`: shorten the crash back-off timers (AC-6.8)                    |
+
+The signing key pair is generated per run with `mumcord-plugin keygen` into the run's cache dir and
+is never committed.
