@@ -141,17 +141,21 @@
   color: var(--color-danger);
 }
 
-.pr-icon-button {
+.button.pr-icon-button {
   display: inline-grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  min-width: 0;
   padding: 0;
+  line-height: 1;
 }
 
 .pr-icon-mask {
-  width: 18px;
-  height: 18px;
+  display: block;
+  width: 20px;
+  height: 20px;
   background-color: currentcolor;
   mask-size: contain;
   mask-repeat: no-repeat;
