@@ -1254,7 +1254,7 @@ describe("Identity section", () => {
   // keeps one entry.
   it("refuses an identity whose certificate is already in the list", async () => {
     openPath.mockResolvedValue("/home/me/Old.p12");
-    await openSection("Identity");
+    await openSection("Account & Identity");
     for (let attempt = 0; attempt < 2; attempt += 1) {
       fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
       const dialog = await screen.findByRole("dialog", { name: "Import identity" });
