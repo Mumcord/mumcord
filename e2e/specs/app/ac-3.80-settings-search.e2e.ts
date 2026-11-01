@@ -1,4 +1,4 @@
-import { $, $$, browser, expect } from "@wdio/globals";
+import { $, browser, expect } from "@wdio/globals";
 import { runFirstStartWizard } from "../../helpers/wizard-util.ts";
 import { openAllSettings, searchSettings, settingsTab } from "../../helpers/settings-ui.ts";
 
@@ -32,8 +32,10 @@ describe("AC-3.80 settings search", () => {
     const count = await privacy.$(".settings-search__count").getText();
     expect(count).toBe(`${String(results.length)} results`);
     expect(results.some((text) => text.startsWith(SYNONYM_HIT))).toBe(true);
-    // Matches in visible text are marked.
-    expect(await $$(".settings-search__results mark.settings-search__match").length).toBeGreaterThan(0);
+    // Matches in visible text are marked. Both "relay" hits match only through synonyms, so a
+    // word from the visible label shows the marks.
+    await searchSettings("direct");
+    await expect($(".settings-search__results mark.settings-search__match")).toBeExisting();
   });
 
   it("navigates with the arrow keys and clears with Escape", async () => {
