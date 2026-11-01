@@ -8,6 +8,7 @@ mod health;
 mod host;
 pub mod i18n;
 pub mod manifest;
+pub mod messaging;
 pub mod package;
 pub mod permissions;
 mod runtime;
