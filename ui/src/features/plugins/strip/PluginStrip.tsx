@@ -132,7 +132,7 @@ export function PluginStrip() {
     <section
       className="pstrip"
       aria-label={t("heading")}
-      title={sharedSupported ? undefined : t("unsupported")}
+      data-tooltip={sharedSupported ? undefined : t("unsupported")}
     >
       <div className="pstrip-bar">
         <button
@@ -140,7 +140,7 @@ export function PluginStrip() {
           className="pstrip-toggle"
           aria-expanded={!collapsed}
           aria-controls={panelId}
-          title={collapsed ? t("show") : t("hide")}
+          data-tooltip={collapsed ? t("show") : t("hide")}
           onClick={toggleCollapsed}
         >
           <span aria-hidden="true">{collapsed ? "▸" : "▾"}</span> {t("heading")}
@@ -158,7 +158,7 @@ export function PluginStrip() {
                 className="pstrip-icon"
                 aria-label={p.name}
                 aria-pressed={p.id === active.id}
-                title={p.name}
+                data-tooltip={p.name}
                 tabIndex={p.id === active.id ? 0 : -1}
                 onClick={() => {
                   setChosen(p.id);
@@ -183,7 +183,7 @@ export function PluginStrip() {
                 ref={expandRef}
                 className="pstrip-expand"
                 aria-label={t("expand", { name: active.name })}
-                title={t("expand", { name: active.name })}
+                data-tooltip={t("expand", { name: active.name })}
                 aria-haspopup="dialog"
                 aria-expanded={expanded}
                 onClick={() => {
@@ -214,7 +214,7 @@ export function PluginStrip() {
               className="pstrip-expand"
               ref={closeRef}
               aria-label={t("close")}
-              title={t("close")}
+              data-tooltip={t("close")}
               onClick={() => {
                 setExpanded(false);
                 expandRef.current?.focus();
