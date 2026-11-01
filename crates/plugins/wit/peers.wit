@@ -17,7 +17,7 @@ interface peers {
 
   /// Sends one message. Needs `peers.messages`.
   ///
-  /// `kind` is the plugin's own message type (byte 2 of the wire envelope). `payload` is at most
+  /// `kind` is the plugin's own message type (byte 2 of the wire envelope; the `direct` event flag is bit 7 of byte 1). `payload` is at most
   /// 997 bytes and at most the manifest's `messaging.max_payload`.
   /// Rate limits: per plugin 1 message per 2 s sustained (burst 3), or 4 per second during a game
   /// burst; all plugins together 1 per second (burst 5). Mumcord's own features go first; a

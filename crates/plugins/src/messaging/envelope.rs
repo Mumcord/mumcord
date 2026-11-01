@@ -2,6 +2,9 @@
 //!
 //! Plugin data id `mumcord.p.<plugin-id>`; payload byte 0 is the envelope version, byte 1 the
 //! plugin API major, byte 2 the plugin's own message kind, and the rest the plugin payload.
+//! Bit 7 of byte 1 ([`DIRECT_FLAG`]) is set when the sender addressed only the receiving user
+//! (`peers.send` with a direct target); the low 7 bits are the API major. Both are part of
+//! envelope version 1, which is unreleased, so no version bump is needed.
 //! The sender is the Mumble session that sent the frame; nothing in the envelope claims identity.
 
 use super::SendError;
@@ -10,6 +13,10 @@ use super::SendError;
 pub const DATA_ID_PREFIX: &str = "mumcord.p.";
 /// The only envelope version this build reads and writes.
 pub const ENVELOPE_VERSION: u8 = 1;
+/// Bit 7 of the API major byte: the message was sent to one user, not the whole channel.
+pub const DIRECT_FLAG: u8 = 0x80;
+/// The bits of byte 1 that hold the plugin API major.
+const API_MAJOR_MASK: u8 = !DIRECT_FLAG;
 /// Bytes in front of the plugin payload.
 pub const HEADER_LEN: usize = 3;
 /// Hard ceiling for a plugin payload, independent of the manifest's `messaging.max_payload`.
@@ -19,6 +26,7 @@ pub const MAX_PAYLOAD: usize = 997;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Envelope {
     pub api_major: u8,
+    pub direct: bool,
     pub kind: u8,
     pub payload: Vec<u8>,
 }
@@ -47,9 +55,11 @@ pub fn plugin_id_of(data_id: &str) -> Option<&str> {
 }
 
 /// Encodes a message. `max_payload` is the manifest's `messaging.max_payload`; the effective
-/// limit is the smaller of it and [`MAX_PAYLOAD`].
+/// limit is the smaller of it and [`MAX_PAYLOAD`]. `api_major` uses 7 bits; higher bits are
+/// dropped so they can never be mistaken for the direct flag.
 pub fn encode(
     api_major: u8,
+    direct: bool,
     kind: u8,
     payload: &[u8],
     max_payload: u32,
@@ -58,8 +68,9 @@ pub fn encode(
     if payload.len() > limit {
         return Err(SendError::TooLarge);
     }
+    let flagged_major = (api_major & API_MAJOR_MASK) | if direct { DIRECT_FLAG } else { 0 };
     let mut bytes = Vec::with_capacity(HEADER_LEN + payload.len());
-    bytes.extend_from_slice(&[ENVELOPE_VERSION, api_major, kind]);
+    bytes.extend_from_slice(&[ENVELOPE_VERSION, flagged_major, kind]);
     bytes.extend_from_slice(payload);
     Ok(bytes)
 }
@@ -76,7 +87,8 @@ pub fn decode(bytes: &[u8]) -> Result<Envelope, DecodeError> {
         return Err(DecodeError::TooLarge);
     }
     Ok(Envelope {
-        api_major: *api_major,
+        api_major: *api_major & API_MAJOR_MASK,
+        direct: *api_major & DIRECT_FLAG != 0,
         kind: *kind,
         payload: payload.to_vec(),
     })
@@ -89,13 +101,14 @@ mod tests {
 
     #[test]
     fn round_trip() {
-        let bytes = encode(1, 7, b"hello", 997).unwrap();
+        let bytes = encode(1, false, 7, b"hello", 997).unwrap();
         assert_eq!(&bytes[..3], &[1, 1, 7]);
         let env = decode(&bytes).unwrap();
         assert_eq!(
             env,
             Envelope {
                 api_major: 1,
+                direct: false,
                 kind: 7,
                 payload: b"hello".to_vec()
             }
@@ -103,17 +116,41 @@ mod tests {
     }
 
     #[test]
+    fn direct_flag_round_trips_in_bit_7_of_byte_1() {
+        let bytes = encode(1, true, 7, b"x", 997).unwrap();
+        assert_eq!(&bytes[..3], &[1, 0x81, 7]);
+        let env = decode(&bytes).unwrap();
+        assert!(env.direct);
+        assert_eq!(env.api_major, 1);
+        assert!(
+            !decode(&encode(1, false, 7, b"x", 997).unwrap())
+                .unwrap()
+                .direct
+        );
+    }
+
+    #[test]
+    fn api_major_cannot_spoof_the_direct_flag() {
+        let bytes = encode(0x81, false, 0, &[], 997).unwrap();
+        assert_eq!(bytes[1], 1);
+        assert!(!decode(&bytes).unwrap().direct);
+    }
+
+    #[test]
     fn empty_payload_is_valid() {
-        let env = decode(&encode(1, 0, &[], 997).unwrap()).unwrap();
+        let env = decode(&encode(1, false, 0, &[], 997).unwrap()).unwrap();
         assert!(env.payload.is_empty());
     }
 
     #[test]
     fn payload_limit_is_the_smaller_of_manifest_and_hard_cap() {
-        assert_eq!(encode(1, 0, &[0; 998], 4096), Err(SendError::TooLarge));
-        assert!(encode(1, 0, &[0; 997], 4096).is_ok());
-        assert_eq!(encode(1, 0, &[0; 11], 10), Err(SendError::TooLarge));
-        assert!(encode(1, 0, &[0; 10], 10).is_ok());
+        assert_eq!(
+            encode(1, false, 0, &[0; 998], 4096),
+            Err(SendError::TooLarge)
+        );
+        assert!(encode(1, false, 0, &[0; 997], 4096).is_ok());
+        assert_eq!(encode(1, false, 0, &[0; 11], 10), Err(SendError::TooLarge));
+        assert!(encode(1, false, 0, &[0; 10], 10).is_ok());
     }
 
     #[test]

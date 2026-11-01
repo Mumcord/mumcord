@@ -189,8 +189,7 @@ impl PluginService {
                     sender: peer,
                     kind: delivery.kind,
                     payload: delivery.payload,
-                    // The envelope does not say whether the sender addressed only this user.
-                    direct: false,
+                    direct: delivery.direct,
                 }),
             );
         }

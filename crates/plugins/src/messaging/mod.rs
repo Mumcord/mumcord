@@ -81,6 +81,8 @@ pub struct Outgoing {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Delivery {
     pub sender: u32,
+    /// The sender addressed only this user (envelope direct flag).
+    pub direct: bool,
     pub kind: u8,
     pub payload: Vec<u8>,
 }
@@ -116,7 +118,13 @@ impl Messenger {
         if req.plugin.visibility == Visibility::Nobody {
             return Err(SendError::Hidden);
         }
-        let bytes = envelope::encode(req.api_major, req.kind, req.payload, req.max_payload)?;
+        let bytes = envelope::encode(
+            req.api_major,
+            matches!(req.target, Target::Direct(_)),
+            req.kind,
+            req.payload,
+            req.max_payload,
+        )?;
         let receivers = recipients::select(&req.plugin, req.target, members)?;
         let counters = self.counters.entry(req.plugin.id.to_owned()).or_default();
         if let Err(e) = self.rate.try_send(req.plugin.id, now) {
@@ -172,6 +180,7 @@ impl Messenger {
         counters.received += 1;
         Some(Delivery {
             sender: sender_session,
+            direct: envelope.direct,
             kind: envelope.kind,
             payload: envelope.payload,
         })
@@ -358,10 +367,12 @@ mod tests {
             m.receive(&everyone, 5, Some(&member), &[1, 1, 9, 42], t0),
             Some(Delivery {
                 sender: 5,
+                direct: false,
                 kind: 9,
                 payload: vec![42]
             })
         );
+
         assert_eq!(m.receive(&everyone, 5, Some(&member), &[9, 1, 9], t0), None);
         assert_eq!(m.receive(&everyone, 6, None, &[1, 1, 9], t0), None);
         assert_eq!(
@@ -392,5 +403,25 @@ mod tests {
         assert_eq!(c.incoming_invalid, 1);
         assert_eq!(c.incoming_refused, 2);
         assert_eq!(c.incoming_rate_dropped, 7);
+    }
+
+    #[test]
+    fn receive_reports_the_direct_flag() {
+        let t0 = Instant::now();
+        let entries = peers();
+        let member = Member {
+            session: 5,
+            is_friend: false,
+            plugins: &entries,
+        };
+        let mut m = Messenger::new(t0);
+        let got = m.receive(
+            &plugin(Visibility::Everyone),
+            5,
+            Some(&member),
+            &[1, 0x81, 9, 42],
+            t0,
+        );
+        assert_eq!(got.map(|d| d.direct), Some(true));
     }
 }
