@@ -99,7 +99,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | V-B | Mockup conformance: Installed tab card rows (see scratchpad v1/deviations.md) | in progress | v-b |
 | V-C | Mockup conformance: Browse two-column grid (see scratchpad v1/deviations.md) | in progress | v-c |
 | V-D | Mockup conformance: Plugin detail page (see scratchpad v1/deviations.md) | done (138f2d3d) | v-d |
-| V-E | Mockup conformance: Install prompt redesign (see scratchpad v1/deviations.md) | in progress | v-e |
+| V-E | Mockup conformance: Install prompt redesign (see scratchpad v1/deviations.md) | done (ed55dd0e; per-permission explanations, E4/E5 → V-D2) | v-e |
 | V-F | Mockup conformance: Updates tab redesign (see scratchpad v1/deviations.md) | done (5b360924; later: skip version, release notes, last-checked time) | v-f |
 | V-G | Mockup conformance: Add repository dialog (see scratchpad v1/deviations.md) | in progress | v-g |
 | V-H | Mockup conformance: Notification centre plugin entries (see scratchpad v1/deviations.md) | done (62459fde; "via <bot>" needs the bot name in the suggestion event — later) | v-h |
@@ -108,7 +108,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | V-M | Mockup conformance: Mumbot Music dialog layout (see scratchpad v1/deviations.md) | partly done (setup form; host gaps → R1, rest → V-M2) | v-m |
 | R1 | Renderer upgrade for mockup fidelity (WIT additive @1.0.0 + SDK + renderer + CLI preview): dialog header with plugin icon, title + subtitle; text-input with stacked label, full width, error/help text + error state; button variants (primary, secondary/outline, danger) and stack alignment (start/end/space-between); status chip tones | in progress | r1-render |
 | V-M2 | Mumbot Music: finish the #310 mockups using R1 (dialog header, inputs with error state, right-aligned primary Save, saved-bots rows with avatar + status pill, two-column player, "Not in your channel" copy) | open | |
-| V-D2 | Plugin details: index/DTO fields for source URL, licence, min Mumcord, signing key fingerprint, reviewed/added dates (registry format + site-data + IndexedPlugin) and per-permission explanation lines (second text per permission in the catalogue + 24 locales) | open | |
+| V-D2 | Plugin details: index/DTO fields for source URL, licence, min Mumcord, signing key fingerprint, reviewed/added dates (registry format + site-data + IndexedPlugin) and per-permission explanation lines (second text per permission in the catalogue + 24 locales); plus install prompt E4 "Suggested by <server>" box (when installed from a server suggestion), E5 "It never gets …" box, prompt width so the visibility control fits beside its text | in progress | v-d2 |
 | E4 | Echolings: closed-eye sleeping art for every species/stage/colour as in the #264 mockups (after F27), used when asleep instead of the plain zzz-only look | done (feat/echolings 303a883; 305 files) | e4-sleepart |
 | V1 | Mockup conformance review: collect all mockups from the 0.6.0 issues (#264, #267–#285, #310), screenshot the current implementation of each screen (mock dev server + `mumcord-plugin preview`), side-by-side sheets + a prioritised deviation list → fix tasks | in progress | v1-mockups |
 | S5 | Plugins strip collapsed state: keep showing the installed plugin icons in the header row even when collapsed; clicking an icon while collapsed opens that plugin's large popover directly (expanded inline panel stays as now) | done (fccc73e5) | s5-strip |
