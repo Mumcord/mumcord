@@ -1,6 +1,7 @@
 //! Plugin commands (spec 06, §8): thin wrappers around the plugin service. The UI never talks
 //! to plugins or the network itself.
 
+use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -9,12 +10,12 @@ use mumcord_engine::Engine;
 use mumcord_engine::store::PluginVisibility;
 use mumcord_plugins::manifest::Visibility as ManifestVisibility;
 use mumcord_plugins::registry::{
-    Client, Freshness, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, OFFLINE_TEXT, UrlPolicy,
-    fetch_official, official_base,
+    Client, Freshness, Index, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, OFFLINE_TEXT,
+    UrlPolicy, fetch_official, official_base,
 };
 use mumcord_plugins::service::{
     Approval, CommandOutcome, InstallRequest, PluginInfo, PluginService, ServiceError, Status,
-    UiInput, fetch,
+    UiInput, fetch, load_repository,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
@@ -26,7 +27,7 @@ use tauri::{AppHandle, State};
 
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
 use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi};
-use crate::plugins::{self, Plugins, PreparedInstall};
+use crate::plugins::{self, Plugins, PreparedInstall, RepoIndex};
 
 /// Who sees that the user has a plugin (FR-6.35).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -236,8 +237,7 @@ pub struct IndexScreenshot {
     pub alt: String,
 }
 
-/// Which list a store plugin comes from. Third-party repositories are listed once B33b loads
-/// them; until then every entry is official.
+/// Which list a store plugin comes from.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(
     tag = "kind",
@@ -253,7 +253,7 @@ pub enum IndexSource {
     },
 }
 
-/// One plugin of the official index, texts in the asked language (English fallback).
+/// One plugin of the store (official or a repository), texts in the asked language (English fallback).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct IndexedPlugin {
@@ -277,7 +277,7 @@ pub struct IndexedPlugin {
 }
 
 impl IndexedPlugin {
-    fn new(p: &IndexPlugin, language: &str) -> Self {
+    fn new(p: &IndexPlugin, source: IndexSource, language: &str) -> Self {
         let latest = p.latest();
         let alt = |texts: &std::collections::BTreeMap<String, String>| {
             texts
@@ -288,7 +288,7 @@ impl IndexedPlugin {
         };
         Self {
             id: p.id.clone(),
-            source: IndexSource::Official,
+            source,
             name: p.name(language).to_owned(),
             summary: p.summary(language).to_owned(),
             description_md_url: p.description_md_url.clone(),
@@ -430,7 +430,9 @@ pub async fn plugins_list(app: AppHandle) -> ApiResult<PluginsOverview> {
     plugins_of(&app)?.call(overview).await
 }
 
-/// Loads the official plugin list (cached copy when offline, FR-6.55).
+/// Loads the official plugin list (cached copy when offline, FR-6.55) followed by the plugins of
+/// every switched-on repository (FR-6.61, FR-6.74). A repository that cannot be loaded is left
+/// out; one whose key changed is paused and its plugins turned off (FR-6.75).
 #[tauri::command]
 #[specta::specta]
 pub async fn plugins_index(
@@ -464,18 +466,103 @@ pub async fn plugins_index(
             engine.update_settings(stored).await?;
         }
     }
-    let index = PluginIndex {
+    let repositories = {
+        let store = engine.store_handle();
+        let store = store
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        store
+            .plugin_repositories()
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
+    };
+    let official_ids: BTreeSet<String> =
+        loaded.index.plugins.iter().map(|p| p.id.clone()).collect();
+    let is_official_id = |id: &str| official_ids.contains(id);
+    let mut repo_indexes = Vec::new();
+    for repository in repositories
+        .iter()
+        .filter(|r| r.enabled && r.paused_reason.is_none())
+    {
+        let index = load_repository(
+            &client,
+            plugins.service(),
+            plugins.registry_cache(),
+            repository,
+            &is_official_id,
+        )
+        .await
+        .map_err(plugins::service_error)?;
+        if let Some(index) = index {
+            repo_indexes.push(RepoIndex {
+                repository_id: repository.id,
+                name: repository.name.clone(),
+                index,
+            });
+        }
+    }
+    let mut listed: Vec<IndexedPlugin> = loaded
+        .index
+        .plugins
+        .iter()
+        .map(|p| IndexedPlugin::new(p, IndexSource::Official, &language))
+        .collect();
+    listed.extend(
+        repo_plugins(Some(&loaded.index), &repo_indexes)
+            .into_iter()
+            .map(|(repo, p)| {
+                let source = IndexSource::Repo {
+                    repository_id: u32::try_from(repo.repository_id).unwrap_or(u32::MAX),
+                    name: repo.name.clone(),
+                };
+                IndexedPlugin::new(p, source, &language)
+            }),
+    );
+    *plugins.index() = Some(loaded.index);
+    *plugins.repo_indexes() = repo_indexes;
+    Ok(PluginIndex {
         freshness,
         notice,
-        plugins: loaded
-            .index
-            .plugins
-            .iter()
-            .map(|p| IndexedPlugin::new(p, &language))
-            .collect(),
-    };
-    *plugins.index() = Some(loaded.index);
-    Ok(index)
+        plugins: listed,
+    })
+}
+
+/// The repository plugins Browse lists: an id the official list has, or an older repository
+/// already lists, is skipped, so official plugins are never shadowed (FR-6.76).
+fn repo_plugins<'a>(
+    official: Option<&Index>,
+    repositories: &'a [RepoIndex],
+) -> Vec<(&'a RepoIndex, &'a IndexPlugin)> {
+    let mut seen: BTreeSet<&str> = official
+        .map(|i| i.plugins.iter().map(|p| p.id.as_str()).collect())
+        .unwrap_or_default();
+    let mut listed = Vec::new();
+    for repository in repositories {
+        for plugin in &repository.index.plugins {
+            if seen.insert(plugin.id.as_str()) {
+                listed.push((repository, plugin));
+            }
+        }
+    }
+    listed
+}
+
+/// A plugin of the loaded store lists with the source it installs from.
+fn find_indexed(plugins: &Plugins, id: &str) -> ApiResult<(Source, IndexPlugin)> {
+    let index = plugins.index();
+    if let Some(plugin) = index.as_ref().and_then(|i| i.plugin(id)) {
+        return Ok((Source::Official, plugin.clone()));
+    }
+    let repositories = plugins.repo_indexes();
+    repo_plugins(index.as_ref(), &repositories)
+        .into_iter()
+        .find(|(_, p)| p.id == id)
+        .map(|(repo, p)| {
+            let source = Source::Repo {
+                repository_id: repo.repository_id,
+            };
+            (source, p.clone())
+        })
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))
 }
 
 /// What the install prompt shows, read from the verified package's manifest (the index only
@@ -500,18 +587,20 @@ pub enum PluginIndexImage {
     Screenshot { index: u32 },
 }
 
-/// The latest version's index entry, download URL and size of a plugin in the loaded list.
+/// The source, latest version's index entry, download URL and size of a plugin in the loaded
+/// lists.
 fn indexed_latest(
     plugins: &Plugins,
     id: &str,
-) -> ApiResult<(mumcord_plugins::verify::IndexEntry, String, u64)> {
-    let index = plugins.index();
-    let plugin = index
-        .as_ref()
-        .and_then(|i| i.plugin(id))
-        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
+) -> ApiResult<(Source, mumcord_plugins::verify::IndexEntry, String, u64)> {
+    let (source, plugin) = find_indexed(plugins, id)?;
     let latest = plugin.latest();
-    Ok((plugin.entry(latest), latest.url.clone(), latest.size))
+    Ok((
+        source,
+        plugin.entry(latest),
+        latest.url.clone(),
+        latest.size,
+    ))
 }
 
 fn install_offer(id: &str, manifest: &Manifest) -> PluginInstallOffer {
@@ -537,7 +626,8 @@ fn install_offer(id: &str, manifest: &Manifest) -> PluginInstallOffer {
     }
 }
 
-/// Downloads and verifies the latest version of an official plugin before the install prompt
+/// Downloads and verifies the latest version of a store plugin (official or from a repository)
+/// before the install prompt
 /// opens, so the prompt can show the manifest's required and optional permissions. Nothing is
 /// unpacked or run; `plugin_install` installs this package once the user agrees.
 #[tauri::command]
@@ -548,20 +638,15 @@ pub async fn plugin_install_prepare(
     id: String,
 ) -> ApiResult<PluginInstallOffer> {
     let plugins = plugins_of(&app)?;
-    let (entry, url, size) = indexed_latest(&plugins, &id)?;
+    let (source, entry, url, size) = indexed_latest(&plugins, &id)?;
     let client = registry_client(engine.settings()?.developer_mode)?;
     let events = plugins.call(|service| Ok(service.events())).await?;
     let download = fetch(&client, &events, &id, &url, size)
         .await
         .map_err(plugins::service_error)?;
     let (download, offer) = tauri::async_runtime::spawn_blocking(move || {
-        let verified = verify_package(
-            &download.bytes,
-            &entry,
-            &download.signature,
-            Source::Official,
-        )
-        .map_err(|e| plugins::service_error(e.into()))?;
+        let verified = verify_package(&download.bytes, &entry, &download.signature, source)
+            .map_err(|e| plugins::service_error(e.into()))?;
         let offer = install_offer(&entry.id, &verified.package.manifest);
         Ok::<_, ApiError>((download, offer))
     })
@@ -586,15 +671,9 @@ pub async fn plugin_index_image(
     image: PluginIndexImage,
 ) -> ApiResult<String> {
     let plugins = plugins_of(&app)?;
-    let (url, max) = {
-        let index = plugins.index();
-        let plugin = index
-            .as_ref()
-            .and_then(|i| i.plugin(&id))
-            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
-        image_url(plugin, image)
-            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "the plugin has no such image"))?
-    };
+    let (_, plugin) = find_indexed(&plugins, &id)?;
+    let (url, max) = image_url(&plugin, image)
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "the plugin has no such image"))?;
     if let Some(cached) = plugins.cached_image(&url) {
         return Ok(cached);
     }
@@ -623,7 +702,7 @@ fn image_url(plugin: &IndexPlugin, image: PluginIndexImage) -> Option<(String, u
     }
 }
 
-/// Installs a plugin from the official list loaded by `plugins_index` (latest version unless
+/// Installs a plugin from the lists loaded by `plugins_index` (official or a repository) (latest version unless
 /// `version` is given), with the optional permissions the user left on.
 #[tauri::command]
 #[specta::specta]
@@ -636,19 +715,20 @@ pub async fn plugin_install(
     visibility: PluginVisibilityChoice,
 ) -> ApiResult<()> {
     let plugins = plugins_of(&app)?;
-    let (entry, url, size) = {
-        let index = plugins.index();
-        let plugin = index
-            .as_ref()
-            .and_then(|i| i.plugin(&id))
-            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
+    let (source, entry, url, size) = {
+        let (source, plugin) = find_indexed(&plugins, &id)?;
         let chosen = match &version {
             Some(v) => plugin
                 .version(v)
                 .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "version not in the list"))?,
             None => plugin.latest(),
         };
-        (plugin.entry(chosen), chosen.url.clone(), chosen.size)
+        (
+            source,
+            plugin.entry(chosen),
+            chosen.url.clone(),
+            chosen.size,
+        )
     };
     // The package the install prompt already verified, unless it was for another version.
     let prepared = plugins
@@ -666,7 +746,7 @@ pub async fn plugin_install(
         }
     };
     let request = InstallRequest {
-        source: Source::Official,
+        source,
         entry,
         optional,
         visibility: visibility.into(),
@@ -1361,5 +1441,47 @@ mod tests {
             ]
         );
         assert_eq!(offer.default_visibility, PluginVisibilityChoice::Friends);
+    }
+
+    fn store_index(ids: &[&str]) -> Index {
+        let plugins: Vec<serde_json::Value> = ids
+            .iter()
+            .map(|id| {
+                serde_json::json!({
+                    "id": id,
+                    "name": {"en": id},
+                    "summary": {"en": "A plugin"},
+                    "author_keys": ["RWStYW7iMZi0HAbHe+TL+GQ4NH70MYE6hJMKZDGGvpbqucV6UpbYwVXz"],
+                    "updated": "2026-10-01",
+                    "versions": [{"version": "1.0.0", "api": 1,
+                        "url": format!("https://example.org/{id}.mcplugin"),
+                        "size": 10, "sha256": "ab".repeat(32), "permissions": []}]
+                })
+            })
+            .collect();
+        let bytes = serde_json::to_vec(
+            &serde_json::json!({"format": 1, "sequence": 1, "plugins": plugins}),
+        )
+        .expect("index json");
+        Index::parse(&bytes, &mumcord_plugins::registry::IndexKind::Official).expect("index")
+    }
+
+    fn repo(repository_id: i64, ids: &[&str]) -> RepoIndex {
+        RepoIndex {
+            repository_id,
+            name: format!("Repo {repository_id}"),
+            index: store_index(ids),
+        }
+    }
+
+    #[test]
+    fn repositories_never_shadow_official_plugins_and_the_oldest_repository_wins() {
+        let official = store_index(&["dice"]);
+        let repositories = [repo(1, &["dice", "radio"]), repo(2, &["radio", "quiz"])];
+        let listed: Vec<(i64, &str)> = repo_plugins(Some(&official), &repositories)
+            .into_iter()
+            .map(|(r, p)| (r.repository_id, p.id.as_str()))
+            .collect();
+        assert_eq!(listed, vec![(1, "radio"), (2, "quiz")]);
     }
 }

@@ -41,6 +41,8 @@ pub struct Plugins {
     trees: Mutex<Trees>,
     /// The last official index, for installs from the store.
     index: Mutex<Option<Index>>,
+    /// The last indexes of the switched-on third-party repositories, oldest repository first.
+    repo_indexes: Mutex<Vec<RepoIndex>>,
     /// Registry caches, one folder per source (`official`, `repo-<id>`).
     registry_cache: PathBuf,
     /// The package verified for the open install prompt, installed on "Install".
@@ -50,6 +52,13 @@ pub struct Plugins {
     /// Open web views, shared with the service: the `mumcord-web` protocol reads it without
     /// waiting for the service lock.
     webviews: Arc<Webviews>,
+}
+
+/// One third-party repository's signed index, as Browse last loaded it.
+pub struct RepoIndex {
+    pub repository_id: i64,
+    pub name: String,
+    pub index: Index,
 }
 
 /// A downloaded and verified package waiting for the user's answer in the install prompt.
@@ -144,6 +153,15 @@ impl Plugins {
         lock(&self.index)
     }
 
+    pub fn repo_indexes(&self) -> MutexGuard<'_, Vec<RepoIndex>> {
+        lock(&self.repo_indexes)
+    }
+
+    /// The service itself, for registry steps that lock it between network calls.
+    pub fn service(&self) -> &Arc<Mutex<PluginService>> {
+        &self.service
+    }
+
     pub fn registry_cache(&self) -> &std::path::Path {
         &self.registry_cache
     }
@@ -221,6 +239,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
         service: Arc::new(Mutex::new(service)),
         trees: Mutex::default(),
         index: Mutex::default(),
+        repo_indexes: Mutex::default(),
         registry_cache: cache_dir.join("plugin-registry"),
         prepared: Mutex::default(),
         images: Mutex::default(),
