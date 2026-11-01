@@ -481,10 +481,12 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
     const keyButton = $("button=Set key");
     await keyButton.click();
     await browser.keys("F9");
-    await browser.waitUntil(async () => (await $("kbd.settings-kbd").getText()) !== "none", {
+    // The push-to-talk key's own row; the hotkeys on the same page show their keys as well.
+    const pttKey = $(".settings-field-row kbd.settings-kbd");
+    await browser.waitUntil(async () => (await pttKey.getText()) !== "none", {
       timeoutMsg: "push-to-talk key not captured",
     });
-    log(`ptt key: ${await $("kbd.settings-kbd").getText()}`);
+    log(`ptt key: ${await pttKey.getText()}`);
     const panel = await $("[role='tabpanel']").getText();
     log(`voice settings notes: ${panel.split("\n").filter((l) => /not available|cannot|could not/i.test(l)).join(" | ") || "none"}`);
     await browser.keys("Escape");
