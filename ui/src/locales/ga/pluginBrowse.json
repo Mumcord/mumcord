@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Gach duine: feiceann gach úsáideoir den bhreiseán seo é.",
     "visibilityHintFriends": "Cairde: ní fheiceann ach do chairde é.",
     "visibilityHintNobody": "Aon duine: ní sheoltar aon rud, ní fheiceann daoine eile é.",
-    "footnote": "Athraigh níos déanaí in Socruithe → Breiseáin."
+    "footnote": "Athraigh níos déanaí in Socruithe → Breiseáin.",
+    "suggestedTitle": "Molta ag {{server}}",
+    "suggestedText": "Ní dhéanann an freastalaí ach moladh. Cinneann tusa, agus ní insítear dó cad a shuiteálann tú.",
+    "neverTitle": "Ní fhaigheann sé riamh",
+    "thisServer": "an freastalaí seo"
   },
   "toast": {
     "installed": "{{name}} suiteáilte",
@@ -80,5 +84,11 @@
   "checksTitle": "Baineann seiceálacha oifigiúla fós",
   "checksText": "Is féidir le liosta cúlghairme Mumcord é a dhíchumasú. Tá ainmneacha breiseán oifigiúil in áirithe.",
   "metaPermissions": "Ceadanna: {{count}}",
-  "footer": "Stór oifigiúil · liosta sínithe seiceáilte · ní sheoltar aon ní fút"
+  "footer": "Stór oifigiúil · liosta sínithe seiceáilte · ní sheoltar aon ní fút",
+  "factSource": "Foinse: {{url}}",
+  "factLicence": "Ceadúnas: {{license}}",
+  "factMinVersion": "Teastaíonn Mumcord {{version}} nó níos nuaí",
+  "factSigned": "Sínithe leis an eochair {{key}}",
+  "factReviewed": "Athbhreithnithe ag na cothaitheoirí ar {{date}}",
+  "factAdded": "Curtha leis ar {{date}}"
 }

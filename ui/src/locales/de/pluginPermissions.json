@@ -28,7 +28,27 @@
     "secrets": "Ein Geheimnis (z. B. einen API-Schlüssel) im Schlüsselbund deines Systems speichern",
     "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen (ohne Internet)"
   },
-  "requiredReason": "Nötig, damit das Plugin funktioniert",
-  "optionalReason": "Optional: jederzeit abschaltbar",
+  "explanations": {
+    "uiPanel": "Ein kleines Panel dieses Plugins erscheint in der Plugin-Leiste.",
+    "uiMemberBadge": "Ein kleines Symbol kann neben den Namen in der Mitgliederliste erscheinen.",
+    "uiProfileCard": "Es kann einen Abschnitt zu den Profilkarten hinzufügen.",
+    "uiChatCard": "Es kann eigene Karten im Chat zeigen, zum Beispiel eine Umfrage oder ein Würfelergebnis.",
+    "uiUserMenu": "Es kann einen Eintrag zum Rechtsklick-Menü einer Person hinzufügen.",
+    "uiDialog": "Es kann ein eigenes Fenster öffnen, zum Beispiel zum Einrichten.",
+    "eventsSelf": "Es sieht, ob du stummgeschaltet oder taub bist und in welchem Kanal du bist.",
+    "eventsVoice": "Es sieht, wann Leute anfangen und aufhören zu sprechen, aber nie, was gesagt wird.",
+    "eventsPresence": "Es sieht, wer deinen Kanal betritt oder verlässt.",
+    "eventsChatActivity": "Es sieht, dass jemand schreibt, aber nie, was geschrieben wird.",
+    "peersMessages": "Es kann kleine Datenmengen an dieses Plugin auf den Computern anderer Personen in deinem Kanal senden.",
+    "notify": "Es kann Benachrichtigungen zeigen. Bei „Nicht stören“ bleibt es still.",
+    "randomBytes": "Es kann sichere Zufallszahlen anfordern, zum Beispiel für Würfel.",
+    "commands": "Es kann Chat-Befehle hinzufügen, die du eintippst, etwa /roll.",
+    "chatSend": "Es kann eine Chatnachricht in deinem Namen senden, aber nur nach deinem Klick oder Befehl.",
+    "chatSupersedes": "Wer seine Karte sieht, sieht nicht zusätzlich die einfache Textzeile.",
+    "chatTriggers": "Es liest Chatnachrichten, die mit seinen Auslösewörtern beginnen, etwa !poll, und keine anderen.",
+    "netHttp": "Es kann mit einem Server sprechen, den du wählst, und nur mit diesem.",
+    "secrets": "Es kann ein Geheimnis, etwa einen API-Schlüssel, in deinem System-Schlüsselbund aufbewahren.",
+    "uiWebview": "Es kann eigene Webinhalte in einem abgeschotteten Rahmen ohne Internetzugang zeigen."
+  },
   "listLabel": "Berechtigungen"
 }

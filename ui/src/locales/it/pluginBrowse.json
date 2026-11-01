@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Tutti: tutti gli utenti di questo plugin lo vedono.",
     "visibilityHintFriends": "Amici: solo i tuoi amici lo vedono.",
     "visibilityHintNobody": "Nessuno: non viene inviato nulla, gli altri non lo vedono.",
-    "footnote": "Modificabile in seguito in Impostazioni → Plugin."
+    "footnote": "Modificabile in seguito in Impostazioni → Plugin.",
+    "suggestedTitle": "Suggerito da {{server}}",
+    "suggestedText": "Il server si limita a suggerire. Decidi tu e non gli viene detto cosa installi.",
+    "neverTitle": "Non ottiene mai",
+    "thisServer": "questo server"
   },
   "toast": {
     "installed": "{{name}} installato",
@@ -80,5 +84,11 @@
   "checksTitle": "I controlli ufficiali restano validi",
   "checksText": "L'elenco di revoca di Mumcord può disattivarlo. I nomi dei plugin ufficiali sono riservati.",
   "metaPermissions": "Autorizzazioni: {{count}}",
-  "footer": "Repository ufficiale · elenco firmato verificato · non viene inviato nulla su di te"
+  "footer": "Repository ufficiale · elenco firmato verificato · non viene inviato nulla su di te",
+  "factSource": "Origine: {{url}}",
+  "factLicence": "Licenza: {{license}}",
+  "factMinVersion": "Richiede Mumcord {{version}} o successivo",
+  "factSigned": "Firmato con la chiave {{key}}",
+  "factReviewed": "Esaminato dai maintainer il {{date}}",
+  "factAdded": "Aggiunto il {{date}}"
 }

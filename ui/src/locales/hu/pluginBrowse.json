@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Mindenki: a bővítmény minden felhasználója látja.",
     "visibilityHintFriends": "Barátok: csak a barátaid látják.",
     "visibilityHintNobody": "Senki: semmi sem kerül elküldésre, mások nem látják.",
-    "footnote": "Később módosítható itt: Beállítások → Bővítmények."
+    "footnote": "Később módosítható itt: Beállítások → Bővítmények.",
+    "suggestedTitle": "{{server}} javasolta",
+    "suggestedText": "A szerver csak javasol. Te döntesz, és nem tudja meg, mit telepítesz.",
+    "neverTitle": "Soha nem kap",
+    "thisServer": "ez a szerver"
   },
   "toast": {
     "installed": "{{name}} telepítve",
@@ -80,5 +84,11 @@
   "checksTitle": "A hivatalos ellenőrzések továbbra is érvényesek",
   "checksText": "A Mumcord visszavonási listája kikapcsolhatja. A hivatalos bővítmények nevei foglaltak.",
   "metaPermissions": "Engedélyek: {{count}}",
-  "footer": "Hivatalos tároló · aláírt lista ellenőrizve · rólad semmi nem kerül elküldésre"
+  "footer": "Hivatalos tároló · aláírt lista ellenőrizve · rólad semmi nem kerül elküldésre",
+  "factSource": "Forrás: {{url}}",
+  "factLicence": "Licenc: {{license}}",
+  "factMinVersion": "Mumcord {{version}} vagy újabb szükséges",
+  "factSigned": "Aláírva a következő kulccsal: {{key}}",
+  "factReviewed": "A karbantartók ellenőrizték: {{date}}",
+  "factAdded": "Hozzáadva: {{date}}"
 }

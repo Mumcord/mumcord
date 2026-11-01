@@ -28,7 +28,27 @@
     "secrets": "Pohrani tajnu (npr. API ključ) u sistemski privjesak ključeva",
     "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru (bez interneta)"
   },
-  "requiredReason": "Potrebno da dodatak radi",
-  "optionalReason": "Neobavezno: može se isključiti u bilo kojem trenutku",
+  "explanations": {
+    "uiPanel": "Mali panel ovog dodatka pojavljuje se u traci dodataka.",
+    "uiMemberBadge": "Mala ikona može se pojaviti pokraj imena na popisu članova.",
+    "uiProfileCard": "Može dodati odjeljak profilnim karticama.",
+    "uiChatCard": "Može prikazivati vlastite kartice u chatu, na primjer anketu ili bacanje kocke.",
+    "uiUserMenu": "Može dodati stavku u izbornik desnog klika korisnika.",
+    "uiDialog": "Može otvoriti vlastiti prozor, na primjer za postavljanje.",
+    "eventsSelf": "Vidi jeste li utišani ili oglušeni i u kojem ste kanalu.",
+    "eventsVoice": "Vidi kada ljudi počnu i prestanu govoriti, nikada što govore.",
+    "eventsPresence": "Vidi tko ulazi u vaš kanal ili ga napušta.",
+    "eventsChatActivity": "Vidi da netko piše, nikada što piše.",
+    "peersMessages": "Može slati male količine podataka ovom dodatku na računalima drugih osoba u vašem kanalu.",
+    "notify": "Može prikazivati obavijesti. Pri načinu Ne uznemiravaj šuti.",
+    "randomBytes": "Može tražiti sigurne slučajne brojeve, na primjer za kocke.",
+    "commands": "Može dodati chat naredbe koje sami upisujete, poput /roll.",
+    "chatSend": "Može objaviti chat poruku u vaše ime, samo nakon vašeg klika ili naredbe.",
+    "chatSupersedes": "Tko vidi njegovu karticu, ne vidi dodatno njegov obični tekstualni redak.",
+    "chatTriggers": "Čita chat poruke koje počinju njegovim okidačkim riječima, poput !poll, i nijedne druge.",
+    "netHttp": "Može razgovarati s jednim poslužiteljem koji odaberete, i samo s njim.",
+    "secrets": "Može čuvati tajnu, poput API ključa, u privjesku ključeva sustava.",
+    "uiWebview": "Može prikazati vlastiti web sadržaj u zatvorenom okviru bez pristupa internetu."
+  },
   "listLabel": "Dozvole"
 }

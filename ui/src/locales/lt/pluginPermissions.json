@@ -28,7 +28,27 @@
     "secrets": "Saugoti paslaptį (pvz., API raktą) jūsų sistemos raktų pakabuke",
     "uiWebview": "Rodyti savo žiniatinklio turinį izoliuotame rėmelyje (be interneto)"
   },
-  "requiredReason": "Reikalinga, kad papildinys veiktų",
-  "optionalReason": "Neprivaloma: galima bet kada išjungti",
+  "explanations": {
+    "uiPanel": "Nedidelė šio įskiepio plokštė rodoma įskiepių juostoje.",
+    "uiMemberBadge": "Nedidelė piktograma gali atsirasti šalia vardų narių sąraše.",
+    "uiProfileCard": "Gali pridėti skyrių profilio kortelėms.",
+    "uiChatCard": "Gali pokalbyje rodyti savo korteles, pavyzdžiui, apklausą ar kauliuko metimą.",
+    "uiUserMenu": "Gali pridėti punktą naudotojo dešiniojo pelės mygtuko meniu.",
+    "uiDialog": "Gali atidaryti savo langą, pavyzdžiui, nustatymams.",
+    "eventsSelf": "Mato, ar esate nutildyti ar apkurtinti ir kuriame kanale esate.",
+    "eventsVoice": "Mato, kada žmonės pradeda ir nustoja kalbėti, bet niekada ko nors pasakyto.",
+    "eventsPresence": "Mato, kas įeina į jūsų kanalą ar jį palieka.",
+    "eventsChatActivity": "Mato, kad kažkas rašo, bet niekada ką rašo.",
+    "peersMessages": "Gali siųsti nedidelius duomenų kiekius šiam įskiepiui kitų jūsų kanalo žmonių kompiuteriuose.",
+    "notify": "Gali rodyti pranešimus. Esant režimui Netrukdyti jis tylus.",
+    "randomBytes": "Gali prašyti saugių atsitiktinių skaičių, pavyzdžiui, kauliukams.",
+    "commands": "Gali pridėti pokalbio komandų, kurias renkate patys, pavyzdžiui, /roll.",
+    "chatSend": "Gali paskelbti pokalbio žinutę jūsų vardu, tik jums spustelėjus ar įvedus komandą.",
+    "chatSupersedes": "Kas mato jo kortelę, papildomai nemato jo paprastos teksto eilutės.",
+    "chatTriggers": "Skaito pokalbio žinutes, prasidedančias jo paleidimo žodžiais, pavyzdžiui, !poll, ir jokių kitų.",
+    "netHttp": "Gali bendrauti su vienu jūsų pasirinktu serveriu ir tik su juo.",
+    "secrets": "Gali saugoti paslaptį, pavyzdžiui, API raktą, sistemos raktų saugykloje.",
+    "uiWebview": "Gali rodyti savo žiniatinklio turinį uždarame rėmelyje be prieigos prie interneto."
+  },
   "listLabel": "Leidimai"
 }

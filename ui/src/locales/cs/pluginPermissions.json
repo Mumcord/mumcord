@@ -28,7 +28,27 @@
     "secrets": "Uložit tajemství (např. klíč API) do úložiště klíčů systému",
     "uiWebview": "Zobrazit vlastní webový obsah v izolovaném rámu (bez internetu)"
   },
-  "requiredReason": "Nutné, aby plugin fungoval",
-  "optionalReason": "Volitelné: lze kdykoli vypnout",
+  "explanations": {
+    "uiPanel": "Malý panel tohoto pluginu se objeví v liště pluginů.",
+    "uiMemberBadge": "Malá ikona se může objevit vedle jmen v seznamu členů.",
+    "uiProfileCard": "Může přidat sekci do profilových karet.",
+    "uiChatCard": "Může v chatu zobrazovat vlastní karty, například anketu nebo výsledek hodu kostkou.",
+    "uiUserMenu": "Může přidat položku do nabídky pravého tlačítka u uživatele.",
+    "uiDialog": "Může otevřít vlastní okno, například pro nastavení.",
+    "eventsSelf": "Vidí, zda jste ztlumeni nebo ohluchnuti a ve kterém kanálu jste.",
+    "eventsVoice": "Vidí, kdy lidé začnou a přestanou mluvit, nikdy co říkají.",
+    "eventsPresence": "Vidí, kdo vstoupí do vašeho kanálu nebo ho opustí.",
+    "eventsChatActivity": "Vidí, že někdo píše, nikdy co píše.",
+    "peersMessages": "Může posílat malé objemy dat tomuto pluginu na počítačích dalších lidí ve vašem kanálu.",
+    "notify": "Může zobrazovat oznámení. V režimu Nerušit mlčí.",
+    "randomBytes": "Může žádat bezpečná náhodná čísla, například pro kostky.",
+    "commands": "Může přidat chatové příkazy, které sami píšete, například /roll.",
+    "chatSend": "Může odeslat zprávu do chatu vaším jménem, jen po vašem kliknutí nebo příkazu.",
+    "chatSupersedes": "Kdo vidí jeho kartu, nevidí navíc jeho prostý textový řádek.",
+    "chatTriggers": "Čte zprávy v chatu, které začínají jeho spouštěcími slovy, například !poll, a žádné jiné.",
+    "netHttp": "Může komunikovat s jedním serverem, který zvolíte, a jen s ním.",
+    "secrets": "Může uložit tajemství, například klíč API, do klíčenky systému.",
+    "uiWebview": "Může zobrazit vlastní webový obsah v uzavřeném rámu bez přístupu k internetu."
+  },
   "listLabel": "Oprávnění"
 }

@@ -28,7 +28,27 @@
     "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
     "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)"
   },
-  "requiredReason": "Potrebné, aby plugin fungoval",
-  "optionalReason": "Voliteľné: možno kedykoľvek vypnúť",
+  "explanations": {
+    "uiPanel": "Malý panel tohto pluginu sa zobrazí v lište pluginov.",
+    "uiMemberBadge": "Malá ikona sa môže zobraziť vedľa mien v zozname členov.",
+    "uiProfileCard": "Môže pridať sekciu do profilových kariet.",
+    "uiChatCard": "Môže v chate zobrazovať vlastné karty, napríklad anketu alebo výsledok hodu kockou.",
+    "uiUserMenu": "Môže pridať položku do ponuky pravého tlačidla u používateľa.",
+    "uiDialog": "Môže otvoriť vlastné okno, napríklad na nastavenie.",
+    "eventsSelf": "Vidí, či ste stlmení alebo ohluchnutí a v ktorom kanáli ste.",
+    "eventsVoice": "Vidí, kedy ľudia začnú a prestanú hovoriť, nikdy čo hovoria.",
+    "eventsPresence": "Vidí, kto vstúpi do vášho kanála alebo ho opustí.",
+    "eventsChatActivity": "Vidí, že niekto píše, nikdy čo píše.",
+    "peersMessages": "Môže posielať malé objemy údajov tomuto pluginu na počítačoch ďalších ľudí vo vašom kanáli.",
+    "notify": "Môže zobrazovať oznámenia. V režime Nerušiť mlčí.",
+    "randomBytes": "Môže žiadať bezpečné náhodné čísla, napríklad pre kocky.",
+    "commands": "Môže pridať chatové príkazy, ktoré sami píšete, napríklad /roll.",
+    "chatSend": "Môže odoslať správu do chatu vaším menom, len po vašom kliknutí alebo príkaze.",
+    "chatSupersedes": "Kto vidí jeho kartu, nevidí navyše jeho obyčajný textový riadok.",
+    "chatTriggers": "Číta správy v chate, ktoré začínajú jeho spúšťacími slovami, napríklad !poll, a žiadne iné.",
+    "netHttp": "Môže komunikovať s jedným serverom, ktorý zvolíte, a len s ním.",
+    "secrets": "Môže uložiť tajomstvo, napríklad kľúč API, do kľúčenky systému.",
+    "uiWebview": "Môže zobraziť vlastný webový obsah v uzavretom ráme bez prístupu na internet."
+  },
   "listLabel": "Oprávnenia"
 }

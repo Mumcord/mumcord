@@ -84,6 +84,21 @@ pub struct IndexPlugin {
     pub author_keys: Vec<String>,
     #[serde(default)]
     pub reviewed: bool,
+    /// Where the plugin's source code lives (an `http(s)` URL); shown on its details page.
+    #[serde(default)]
+    pub source_url: Option<String>,
+    /// SPDX licence expression, e.g. `MIT`.
+    #[serde(default)]
+    pub license: Option<String>,
+    /// Lowest Mumcord version the plugin needs, e.g. `0.7`.
+    #[serde(default)]
+    pub min_mumcord: Option<String>,
+    /// Day the maintainers reviewed the plugin, `YYYY-MM-DD` (official index only).
+    #[serde(default)]
+    pub reviewed_on: Option<String>,
+    /// Day the plugin was added to the index, `YYYY-MM-DD`.
+    #[serde(default)]
+    pub added_on: Option<String>,
     /// Date of the latest version, `YYYY-MM-DD`.
     pub updated: String,
     pub versions: Vec<IndexVersion>,
@@ -256,6 +271,7 @@ fn check_plugin(
     if plugin.author_keys.is_empty() {
         return Err(invalid("no author key"));
     }
+    check_details(&plugin).map_err(IgnoredReason::Invalid)?;
     if plugin.versions.is_empty() {
         return Err(invalid("no versions"));
     }
@@ -275,6 +291,36 @@ fn check_plugin(
         }
     }
     Ok(plugin)
+}
+
+/// The optional details fields come from the repository, so they are length-limited and checked
+/// before the UI shows them.
+fn check_details(plugin: &IndexPlugin) -> Result<(), String> {
+    const MAX_TEXT: usize = 100;
+    const MAX_URL: usize = 300;
+    let text = |name: &str, value: &Option<String>| match value {
+        Some(v) if v.trim().is_empty() || v.chars().count() > MAX_TEXT => {
+            Err(format!("bad {name}"))
+        }
+        _ => Ok(()),
+    };
+    let date = |name: &str, value: &Option<String>| match value {
+        Some(v) if chrono::NaiveDate::parse_from_str(v, "%Y-%m-%d").is_err() => {
+            Err(format!("bad {name}"))
+        }
+        _ => Ok(()),
+    };
+    if let Some(url) = &plugin.source_url {
+        let ok = url.len() <= MAX_URL
+            && reqwest::Url::parse(url).is_ok_and(|u| matches!(u.scheme(), "http" | "https"));
+        if !ok {
+            return Err("bad source url".to_owned());
+        }
+    }
+    text("license", &plugin.license)?;
+    text("minimum Mumcord version", &plugin.min_mumcord)?;
+    date("review date", &plugin.reviewed_on)?;
+    date("added date", &plugin.added_on)
 }
 
 fn parse_sha256(hex: &str) -> Option<[u8; 32]> {
@@ -399,6 +445,37 @@ pub(super) mod tests {
         assert_eq!(reasons[0], IgnoredReason::Duplicate);
         assert!(matches!(reasons[1], IgnoredReason::Invalid(_)));
         assert_eq!(index.ignored.len(), 4);
+    }
+
+    #[test]
+    fn optional_details_are_read_and_checked() {
+        let mut good = plugin("dice");
+        good["source_url"] = json!("https://github.com/Mumcord/dice");
+        good["license"] = json!("MIT");
+        good["min_mumcord"] = json!("0.7");
+        good["reviewed_on"] = json!("2026-10-20");
+        good["added_on"] = json!("2026-09-01");
+        let mut bad_url = plugin("a-url");
+        bad_url["source_url"] = json!("javascript:alert(1)");
+        let mut bad_date = plugin("a-date");
+        bad_date["reviewed_on"] = json!("20 Oct");
+        let index = Index::parse(
+            &official(vec![good, bad_url, bad_date, plugin("plain")]),
+            &IndexKind::Official,
+        )
+        .expect("test step");
+        let dice = index.plugin("dice").expect("test step");
+        assert_eq!(dice.license.as_deref(), Some("MIT"));
+        assert_eq!(dice.reviewed_on.as_deref(), Some("2026-10-20"));
+        assert!(
+            index
+                .plugin("plain")
+                .expect("test step")
+                .source_url
+                .is_none()
+        );
+        assert_eq!(index.plugins.len(), 2);
+        assert_eq!(index.ignored.len(), 2);
     }
 
     #[test]

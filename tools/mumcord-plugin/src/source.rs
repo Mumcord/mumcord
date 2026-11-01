@@ -34,6 +34,21 @@ pub struct PluginFile {
     /// Set by a maintainer after review.
     #[serde(default)]
     pub reviewed: bool,
+    /// Where the source code lives (`http(s)` URL).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_url: Option<String>,
+    /// SPDX licence expression, e.g. `MIT`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub license: Option<String>,
+    /// Lowest Mumcord version the plugin needs, e.g. `0.7`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_mumcord: Option<String>,
+    /// Day a maintainer reviewed the plugin, `YYYY-MM-DD`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reviewed_on: Option<String>,
+    /// Day the plugin was added to the index, `YYYY-MM-DD`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub added_on: Option<String>,
     /// Markdown file next to plugin.toml, published as the long description.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -186,6 +201,11 @@ pub mod tests {
             authors: vec!["Mumcord".into()],
             author_keys: vec!["RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3".into()],
             reviewed: true,
+            source_url: Some("https://github.com/Mumcord/plugins".into()),
+            license: Some("MIT".into()),
+            min_mumcord: Some("0.7".into()),
+            reviewed_on: Some("2026-10-20".into()),
+            added_on: Some("2026-09-01".into()),
             description: Some("README.md".into()),
             icon: Some("icon-128.png".into()),
             screenshots: vec![ScreenshotFile {

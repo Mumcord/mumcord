@@ -28,7 +28,27 @@
     "secrets": "Gemme en hemmelighed (f.eks. en API-nøgle) i dit systems nøglering",
     "uiWebview": "Vise eget webindhold i en lukket ramme (uden internet)"
   },
-  "requiredReason": "Kræves for at pluginet virker",
-  "optionalReason": "Valgfri: kan slås fra når som helst",
+  "explanations": {
+    "uiPanel": "Et lille panel fra dette plugin vises i plugin-linjen.",
+    "uiMemberBadge": "Et lille ikon kan vises ved siden af navne på medlemslisten.",
+    "uiProfileCard": "Det kan tilføje et afsnit til profilkort.",
+    "uiChatCard": "Det kan vise egne kort i chatten, for eksempel en afstemning eller et terningekast.",
+    "uiUserMenu": "Det kan tilføje et punkt i en brugers højreklikmenu.",
+    "uiDialog": "Det kan åbne sit eget vindue, for eksempel til opsætning.",
+    "eventsSelf": "Det kan se, om du er gjort tavs eller døv, og hvilken kanal du er i.",
+    "eventsVoice": "Det kan se, hvornår folk begynder og holder op med at tale, aldrig hvad der siges.",
+    "eventsPresence": "Det kan se, hvem der kommer ind i eller forlader din kanal.",
+    "eventsChatActivity": "Det kan se, at nogen skriver, aldrig hvad der skrives.",
+    "peersMessages": "Det kan sende små mængder data til dette plugin hos andre i din kanal.",
+    "notify": "Det kan vise notifikationer. Det er stille ved Forstyr ikke.",
+    "randomBytes": "Det kan bede om sikre tilfældige tal, for eksempel til terninger.",
+    "commands": "Det kan tilføje chatkommandoer, som du selv skriver, som /roll.",
+    "chatSend": "Det kan sende en chatbesked i dit navn, kun efter dit klik eller din kommando.",
+    "chatSupersedes": "Dem, der ser dets kort, ser ikke også dets almindelige tekstlinje.",
+    "chatTriggers": "Det læser chatbeskeder, der starter med dets udløserord, som !poll, og ingen andre.",
+    "netHttp": "Det kan tale med én server, du vælger, og kun den.",
+    "secrets": "Det kan gemme en hemmelighed, som en API-nøgle, i systemets nøglering.",
+    "uiWebview": "Det kan vise eget webindhold i en lukket ramme uden internetadgang."
+  },
   "listLabel": "Tilladelser"
 }

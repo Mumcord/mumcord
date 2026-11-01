@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Kõik: kõik selle plugina kasutajad näevad seda.",
     "visibilityHintFriends": "Sõbrad: seda näevad ainult sinu sõbrad.",
     "visibilityHintNobody": "Keegi: midagi ei saadeta, teised ei näe.",
-    "footnote": "Hiljem muudetav: Seaded → Pluginad."
+    "footnote": "Hiljem muudetav: Seaded → Pluginad.",
+    "suggestedTitle": "Soovitab {{server}}",
+    "suggestedText": "Server ainult soovitab. Sina otsustad ja see ei saa teada, mida paigaldad.",
+    "neverTitle": "See ei saa kunagi",
+    "thisServer": "see server"
   },
   "toast": {
     "installed": "{{name}} paigaldatud",
@@ -80,5 +84,11 @@
   "checksTitle": "Ametlikud kontrollid kehtivad endiselt",
   "checksText": "Mumcordi tühistusnimekiri võib selle välja lülitada. Ametlike pistikprogrammide nimed on reserveeritud.",
   "metaPermissions": "Õigused: {{count}}",
-  "footer": "Ametlik repositoorium · allkirjastatud loend kontrollitud · sinu kohta ei saadeta midagi"
+  "footer": "Ametlik repositoorium · allkirjastatud loend kontrollitud · sinu kohta ei saadeta midagi",
+  "factSource": "Allikas: {{url}}",
+  "factLicence": "Litsents: {{license}}",
+  "factMinVersion": "Vajab Mumcordi {{version}} või uuemat",
+  "factSigned": "Allkirjastatud võtmega {{key}}",
+  "factReviewed": "Hooldajad vaatasid üle {{date}}",
+  "factAdded": "Lisatud {{date}}"
 }

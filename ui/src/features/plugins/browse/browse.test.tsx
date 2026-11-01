@@ -155,6 +155,27 @@ describe("BrowseTab", () => {
     expect(screen.getByText("High risk")).toBeTruthy();
   });
 
+  it("shows the details card from the index and the explanation of each permission", async () => {
+    withIndex([
+      indexed("fetcher", {
+        permissions: ["ui.panel"],
+        sourceUrl: "https://github.com/Mumcord/fetcher",
+        license: "MIT",
+        minMumcord: "0.7",
+        signingKey: "1CB49831E26E61AD",
+        reviewedOn: "2026-10-20",
+      }),
+    ]);
+    render(<BrowseTab />, { wrapper: Wrapper });
+    fireEvent.click(await screen.findByRole("button", { name: "Details of Fetcher" }));
+    expect(screen.getByText("Source: github.com/Mumcord/fetcher")).toBeTruthy();
+    expect(screen.getByText("Licence: MIT")).toBeTruthy();
+    expect(screen.getByText("Needs Mumcord 0.7 or newer")).toBeTruthy();
+    expect(screen.getByText("Signed with key 1CB4…61AD")).toBeTruthy();
+    expect(screen.getByText(/^Reviewed by maintainers on /)).toBeTruthy();
+    expect(screen.getByText(/small panel for this plugin appears/)).toBeTruthy();
+  });
+
   it("loads the icon through the engine and falls back to the initial", async () => {
     withIndex([dice, indexed("poll", { icon: "https://example.org/p.png" })]);
     const image = vi

@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Kaikki: kaikki tämän lisäosan käyttäjät näkevät sen.",
     "visibilityHintFriends": "Kaverit: vain kaverisi näkevät sen.",
     "visibilityHintNobody": "Ei kukaan: mitään ei lähetetä, muut eivät näe sitä.",
-    "footnote": "Muutettavissa myöhemmin kohdassa Asetukset → Lisäosat."
+    "footnote": "Muutettavissa myöhemmin kohdassa Asetukset → Lisäosat.",
+    "suggestedTitle": "Palvelimen {{server}} ehdottama",
+    "suggestedText": "Palvelin vain ehdottaa. Sinä päätät, eikä se saa tietää, mitä asennat.",
+    "neverTitle": "Se ei koskaan saa",
+    "thisServer": "tämä palvelin"
   },
   "toast": {
     "installed": "{{name}} asennettu",
@@ -80,5 +84,11 @@
   "checksTitle": "Viralliset tarkistukset ovat edelleen voimassa",
   "checksText": "Mumcordin estolista voi poistaa sen käytöstä. Virallisten lisäosien nimet on varattu.",
   "metaPermissions": "Oikeudet: {{count}}",
-  "footer": "Virallinen lähde · allekirjoitettu luettelo tarkistettu · sinusta ei lähetetä mitään"
+  "footer": "Virallinen lähde · allekirjoitettu luettelo tarkistettu · sinusta ei lähetetä mitään",
+  "factSource": "Lähde: {{url}}",
+  "factLicence": "Lisenssi: {{license}}",
+  "factMinVersion": "Vaatii Mumcordin {{version}} tai uudemman",
+  "factSigned": "Allekirjoitettu avaimella {{key}}",
+  "factReviewed": "Ylläpitäjien tarkastama {{date}}",
+  "factAdded": "Lisätty {{date}}"
 }

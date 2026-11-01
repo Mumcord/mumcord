@@ -28,7 +28,27 @@
     "secrets": "Spara en hemlighet (t.ex. en API-nyckel) i systemets nyckelring",
     "uiWebview": "Visa eget webbinnehåll i en isolerad ram (utan internet)"
   },
-  "requiredReason": "Krävs för att tillägget ska fungera",
-  "optionalReason": "Valfri: kan stängas av när som helst",
+  "explanations": {
+    "uiPanel": "En liten panel för detta plugin visas i plugin-listen.",
+    "uiMemberBadge": "En liten ikon kan visas bredvid namn i medlemslistan.",
+    "uiProfileCard": "Det kan lägga till ett avsnitt på profilkort.",
+    "uiChatCard": "Det kan visa egna kort i chatten, till exempel en omröstning eller ett tärningskast.",
+    "uiUserMenu": "Det kan lägga till ett alternativ i någons högerklicksmeny.",
+    "uiDialog": "Det kan öppna ett eget fönster, till exempel för inställningar.",
+    "eventsSelf": "Det ser om du är tystad eller döv och vilken kanal du är i.",
+    "eventsVoice": "Det ser när folk börjar och slutar prata, aldrig vad som sägs.",
+    "eventsPresence": "Det ser vem som går med i eller lämnar din kanal.",
+    "eventsChatActivity": "Det ser att någon skriver, aldrig vad som skrivs.",
+    "peersMessages": "Det kan skicka små mängder data till detta plugin hos andra i din kanal.",
+    "notify": "Det kan visa aviseringar. Det är tyst vid Stör ej.",
+    "randomBytes": "Det kan be om säkra slumptal, till exempel för tärningar.",
+    "commands": "Det kan lägga till chattkommandon som du skriver, som /roll.",
+    "chatSend": "Det kan skicka ett chattmeddelande i ditt namn, bara efter att du klickat eller skrivit ett kommando.",
+    "chatSupersedes": "De som ser dess kort ser inte även dess vanliga textrad.",
+    "chatTriggers": "Det läser chattmeddelanden som börjar med dess utlösarord, som !poll, och inga andra.",
+    "netHttp": "Det kan prata med en server som du väljer, och bara med den.",
+    "secrets": "Det kan spara en hemlighet, som en API-nyckel, i systemets nyckelring.",
+    "uiWebview": "Det kan visa eget webbinnehåll i en sluten ram utan internetåtkomst."
+  },
   "listLabel": "Behörigheter"
 }

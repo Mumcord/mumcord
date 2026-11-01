@@ -28,7 +28,27 @@
     "secrets": "Conservare un segreto (ad es. una chiave API) nel portachiavi del sistema",
     "uiWebview": "Mostrare contenuti web propri in un riquadro isolato (senza internet)"
   },
-  "requiredReason": "Necessario per il funzionamento del plugin",
-  "optionalReason": "Facoltativo: disattivabile in qualsiasi momento",
+  "explanations": {
+    "uiPanel": "Un piccolo pannello di questo plugin appare nella barra dei plugin.",
+    "uiMemberBadge": "Una piccola icona può comparire accanto ai nomi nell'elenco dei membri.",
+    "uiProfileCard": "Può aggiungere una sezione alle schede profilo.",
+    "uiChatCard": "Può mostrare proprie schede nella chat, ad esempio un sondaggio o un lancio di dadi.",
+    "uiUserMenu": "Può aggiungere una voce al menu col tasto destro di una persona.",
+    "uiDialog": "Può aprire una propria finestra, ad esempio per configurarsi.",
+    "eventsSelf": "Vede se sei silenziato o assordato e in quale canale ti trovi.",
+    "eventsVoice": "Vede quando le persone iniziano e smettono di parlare, mai cosa dicono.",
+    "eventsPresence": "Vede chi entra o esce dal tuo canale.",
+    "eventsChatActivity": "Vede che qualcuno sta scrivendo, mai cosa scrive.",
+    "peersMessages": "Può inviare piccole quantità di dati a questo plugin sui computer delle altre persone nel tuo canale.",
+    "notify": "Può mostrare notifiche. Resta in silenzio con Non disturbare.",
+    "randomBytes": "Può chiedere numeri casuali sicuri, ad esempio per i dadi.",
+    "commands": "Può aggiungere comandi di chat che scrivi tu, come /roll.",
+    "chatSend": "Può pubblicare un messaggio di chat a tuo nome, solo dopo un tuo clic o comando.",
+    "chatSupersedes": "Chi vede la sua scheda non vede anche la sua riga di testo semplice.",
+    "chatTriggers": "Legge i messaggi di chat che iniziano con le sue parole chiave, come !poll, e nessun altro.",
+    "netHttp": "Può parlare con un server che scegli tu, e solo con quello.",
+    "secrets": "Può conservare un segreto, come una chiave API, nel portachiavi del sistema.",
+    "uiWebview": "Può mostrare contenuti web propri in un riquadro isolato, senza accesso a internet."
+  },
   "listLabel": "Permessi"
 }

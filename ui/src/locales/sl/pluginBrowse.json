@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Vsi: vidijo vsi uporabniki tega vtičnika.",
     "visibilityHintFriends": "Prijatelji: vidijo samo vaši prijatelji.",
     "visibilityHintNobody": "Nihče: nič se ne pošlje, drugi ne vidijo.",
-    "footnote": "Pozneje spremenite v: Nastavitve → Vtičniki."
+    "footnote": "Pozneje spremenite v: Nastavitve → Vtičniki.",
+    "suggestedTitle": "Predlaga strežnik {{server}}",
+    "suggestedText": "Strežnik le predlaga. Vi odločate in ne izve, kaj nameščate.",
+    "neverTitle": "Nikoli ne dobi",
+    "thisServer": "ta strežnik"
   },
   "toast": {
     "installed": "{{name}} je nameščen",
@@ -80,5 +84,11 @@
   "checksTitle": "Uradni pregledi še vedno veljajo",
   "checksText": "Mumcordov seznam preklicev ga lahko izklopi. Imena uradnih vtičnikov so rezervirana.",
   "metaPermissions": "Dovoljenja: {{count}}",
-  "footer": "Uradni repozitorij · podpisani seznam preverjen · nič o vas se ne pošilja"
+  "footer": "Uradni repozitorij · podpisani seznam preverjen · nič o vas se ne pošilja",
+  "factSource": "Vir: {{url}}",
+  "factLicence": "Licenca: {{license}}",
+  "factMinVersion": "Zahteva Mumcord {{version}} ali novejši",
+  "factSigned": "Podpisano s ključem {{key}}",
+  "factReviewed": "Pregledali vzdrževalci dne {{date}}",
+  "factAdded": "Dodano dne {{date}}"
 }

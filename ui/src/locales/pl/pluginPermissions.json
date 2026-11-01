@@ -28,7 +28,27 @@
     "secrets": "Przechowywać sekret (np. klucz API) w systemowym pęku kluczy",
     "uiWebview": "Pokazywać własną treść internetową w izolowanej ramce (bez internetu)"
   },
-  "requiredReason": "Wymagane, aby wtyczka działała",
-  "optionalReason": "Opcjonalne: można wyłączyć w dowolnej chwili",
+  "explanations": {
+    "uiPanel": "Mały panel tej wtyczki pojawia się na pasku wtyczek.",
+    "uiMemberBadge": "Mała ikona może pojawić się obok nazw na liście członków.",
+    "uiProfileCard": "Może dodać sekcję do kart profilu.",
+    "uiChatCard": "Może pokazywać własne karty na czacie, na przykład ankietę lub wynik rzutu kośćmi.",
+    "uiUserMenu": "Może dodać pozycję do menu prawego przycisku myszy użytkownika.",
+    "uiDialog": "Może otworzyć własne okno, na przykład do konfiguracji.",
+    "eventsSelf": "Widzi, czy jesteś wyciszony lub ogłuszony i na którym kanale jesteś.",
+    "eventsVoice": "Widzi, kiedy ludzie zaczynają i przestają mówić, nigdy co mówią.",
+    "eventsPresence": "Widzi, kto dołącza do Twojego kanału lub go opuszcza.",
+    "eventsChatActivity": "Widzi, że ktoś pisze, nigdy co pisze.",
+    "peersMessages": "Może wysyłać niewielkie ilości danych do tej wtyczki na komputerach innych osób na Twoim kanale.",
+    "notify": "Może pokazywać powiadomienia. W trybie Nie przeszkadzać milczy.",
+    "randomBytes": "Może prosić o bezpieczne liczby losowe, na przykład do kości.",
+    "commands": "Może dodawać polecenia czatu, które wpisujesz sam, jak /roll.",
+    "chatSend": "Może wysłać wiadomość na czacie w Twoim imieniu, tylko po Twoim kliknięciu lub poleceniu.",
+    "chatSupersedes": "Osoby widzące jej kartę nie widzą dodatkowo zwykłej linii tekstu.",
+    "chatTriggers": "Czyta wiadomości czatu zaczynające się od jej słów wyzwalających, jak !poll, i żadnych innych.",
+    "netHttp": "Może rozmawiać z jednym wybranym przez Ciebie serwerem i tylko z nim.",
+    "secrets": "Może przechowywać sekret, na przykład klucz API, w systemowym schowku kluczy.",
+    "uiWebview": "Może pokazywać własną treść internetową w izolowanej ramce bez dostępu do internetu."
+  },
   "listLabel": "Uprawnienia"
 }

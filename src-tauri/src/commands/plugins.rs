@@ -273,6 +273,18 @@ pub struct IndexedPlugin {
     pub categories: Vec<String>,
     pub authors: Vec<String>,
     pub reviewed: bool,
+    /// Where the source code lives.
+    pub source_url: Option<String>,
+    /// SPDX licence expression.
+    pub license: Option<String>,
+    /// Lowest Mumcord version the plugin needs.
+    pub min_mumcord: Option<String>,
+    /// Day the maintainers reviewed it (`YYYY-MM-DD`).
+    pub reviewed_on: Option<String>,
+    /// Day it was added to the index (`YYYY-MM-DD`).
+    pub added_on: Option<String>,
+    /// Fingerprint (minisign key id) of the key the plugin's packages are signed with.
+    pub signing_key: Option<String>,
     pub updated: String,
     /// The latest version.
     pub version: String,
@@ -310,6 +322,15 @@ impl IndexedPlugin {
             categories: p.categories.clone(),
             authors: p.authors.clone(),
             reviewed: p.reviewed,
+            source_url: p.source_url.clone(),
+            license: p.license.clone(),
+            min_mumcord: p.min_mumcord.clone(),
+            reviewed_on: p.reviewed_on.clone(),
+            added_on: p.added_on.clone(),
+            signing_key: p
+                .author_keys
+                .first()
+                .and_then(|key| mumcord_plugins::registry::key_fingerprint(key)),
             updated: p.updated.clone(),
             version: latest.version.clone(),
             size: latest.size as f64,

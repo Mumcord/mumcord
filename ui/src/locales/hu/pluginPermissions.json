@@ -28,7 +28,27 @@
     "secrets": "Titok (pl. API-kulcs) tárolása a rendszer kulcstartójában",
     "uiWebview": "Saját webes tartalom megjelenítése elszigetelt keretben (internet nélkül)"
   },
-  "requiredReason": "A bővítmény működéséhez szükséges",
-  "optionalReason": "Választható: bármikor kikapcsolható",
+  "explanations": {
+    "uiPanel": "A bővítmény egy kis panelt jelenít meg a bővítménysávban.",
+    "uiMemberBadge": "Egy kis ikon jelenhet meg a nevek mellett a tagok listájában.",
+    "uiProfileCard": "Hozzáadhat egy szakaszt a profilkártyákhoz.",
+    "uiChatCard": "Saját kártyákat mutathat a csevegésben, például szavazást vagy dobás eredményét.",
+    "uiUserMenu": "Hozzáadhat egy elemet a felhasználó jobb gombos menüjéhez.",
+    "uiDialog": "Megnyithatja a saját ablakát, például a beállításhoz.",
+    "eventsSelf": "Látja, hogy némítva vagy süketítve vagy-e, és melyik csatornán vagy.",
+    "eventsVoice": "Látja, mikor kezdenek és hagynak abba beszélni az emberek, de sosem azt, amit mondanak.",
+    "eventsPresence": "Látja, ki lép be a csatornádba vagy ki hagyja el.",
+    "eventsChatActivity": "Látja, hogy valaki ír, de sosem azt, amit ír.",
+    "peersMessages": "Kis mennyiségű adatot küldhet ennek a bővítménynek a csatornád többi tagjának gépén.",
+    "notify": "Megjeleníthet értesítéseket. Ne zavarjanak módban csendben marad.",
+    "randomBytes": "Biztonságos véletlen számokat kérhet, például kockákhoz.",
+    "commands": "Hozzáadhat csevegőparancsokat, amelyeket te gépelsz be, például /roll.",
+    "chatSend": "A nevedben küldhet csevegőüzenetet, de csak a te kattintásod vagy parancsod után.",
+    "chatSupersedes": "Aki látja a kártyáját, az nem látja emellett az egyszerű szöveges sorát.",
+    "chatTriggers": "Olyan csevegőüzeneteket olvas, amelyek az indítószavaival kezdődnek, például !poll, másokat nem.",
+    "netHttp": "Egyetlen, általad választott szerverrel kommunikálhat, mással nem.",
+    "secrets": "Titkot, például API-kulcsot tárolhat a rendszer kulcstartójában.",
+    "uiWebview": "Saját webes tartalmat jeleníthet meg zárt keretben, internet-hozzáférés nélkül."
+  },
   "listLabel": "Engedélyek"
 }

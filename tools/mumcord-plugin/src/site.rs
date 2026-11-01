@@ -115,6 +115,11 @@ fn index_plugin(
         authors: plugin.authors.clone(),
         author_keys: plugin.author_keys.clone(),
         reviewed: plugin.reviewed,
+        source_url: plugin.source_url.clone(),
+        license: plugin.license.clone(),
+        min_mumcord: plugin.min_mumcord.clone(),
+        reviewed_on: plugin.reviewed_on.clone(),
+        added_on: plugin.added_on.clone(),
         updated: latest.published.clone(),
         versions: versions
             .iter()
@@ -162,6 +167,8 @@ mod tests {
         let dice = index.plugin("dice").expect("listed");
         assert_eq!(dice.latest().version, "1.2.0");
         assert_eq!(dice.updated, "2026-10-02");
+        assert_eq!(dice.license.as_deref(), Some("MIT"));
+        assert_eq!(dice.reviewed_on.as_deref(), Some("2026-10-20"));
         assert_eq!(dice.name["de"], "Würfel");
         assert_eq!(
             dice.icon.as_deref(),

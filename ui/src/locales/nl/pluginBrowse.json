@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Iedereen: alle gebruikers van deze plugin zien het.",
     "visibilityHintFriends": "Vrienden: alleen je vrienden zien het.",
     "visibilityHintNobody": "Niemand: er wordt niets verstuurd, anderen zien het niet.",
-    "footnote": "Later te wijzigen onder Instellingen → Plugins."
+    "footnote": "Later te wijzigen onder Instellingen → Plugins.",
+    "suggestedTitle": "Voorgesteld door {{server}}",
+    "suggestedText": "De server stelt alleen voor. Jij beslist en hij hoort niet wat je installeert.",
+    "neverTitle": "Het krijgt nooit",
+    "thisServer": "deze server"
   },
   "toast": {
     "installed": "{{name}} geïnstalleerd",
@@ -80,5 +84,11 @@
   "checksTitle": "Officiële controles blijven gelden",
   "checksText": "De intrekkingslijst van Mumcord kan de plugin uitschakelen. Namen van officiële plugins zijn gereserveerd.",
   "metaPermissions": "Rechten: {{count}}",
-  "footer": "Officiële repository · ondertekende lijst gecontroleerd · er wordt niets over jou verzonden"
+  "footer": "Officiële repository · ondertekende lijst gecontroleerd · er wordt niets over jou verzonden",
+  "factSource": "Bron: {{url}}",
+  "factLicence": "Licentie: {{license}}",
+  "factMinVersion": "Heeft Mumcord {{version}} of nieuwer nodig",
+  "factSigned": "Ondertekend met sleutel {{key}}",
+  "factReviewed": "Beoordeeld door de beheerders op {{date}}",
+  "factAdded": "Toegevoegd op {{date}}"
 }

@@ -28,7 +28,27 @@
     "secrets": "Säilyttää salaisuus (esim. API-avain) järjestelmäsi avainnipussa",
     "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä (ei internetiä)"
   },
-  "requiredReason": "Tarvitaan, jotta lisäosa toimii",
-  "optionalReason": "Valinnainen: voi poistaa käytöstä milloin tahansa",
+  "explanations": {
+    "uiPanel": "Tämän lisäosan pieni paneeli näkyy lisäosapalkissa.",
+    "uiMemberBadge": "Pieni kuvake voi näkyä nimien vieressä jäsenluettelossa.",
+    "uiProfileCard": "Se voi lisätä osion profiilikortteihin.",
+    "uiChatCard": "Se voi näyttää omia korttejaan keskustelussa, esimerkiksi kyselyn tai nopanheiton tuloksen.",
+    "uiUserMenu": "Se voi lisätä kohdan käyttäjän hiiren kakkospainikkeen valikkoon.",
+    "uiDialog": "Se voi avata oman ikkunansa, esimerkiksi asetuksia varten.",
+    "eventsSelf": "Se näkee, oletko mykistetty tai kuuro ja millä kanavalla olet.",
+    "eventsVoice": "Se näkee, milloin ihmiset alkavat ja lopettavat puhumisen, ei koskaan mitä sanotaan.",
+    "eventsPresence": "Se näkee, kuka liittyy kanavallesi tai poistuu siltä.",
+    "eventsChatActivity": "Se näkee, että joku kirjoittaa, ei koskaan mitä.",
+    "peersMessages": "Se voi lähettää pieniä tietomääriä tälle lisäosalle kanavasi muiden ihmisten tietokoneilla.",
+    "notify": "Se voi näyttää ilmoituksia. Älä häiritse -tilassa se pysyy hiljaa.",
+    "randomBytes": "Se voi pyytää turvallisia satunnaislukuja, esimerkiksi nopille.",
+    "commands": "Se voi lisätä keskustelukomentoja, jotka kirjoitat itse, kuten /roll.",
+    "chatSend": "Se voi lähettää keskusteluviestin nimissäsi vasta napsautuksesi tai komentosi jälkeen.",
+    "chatSupersedes": "Ne, jotka näkevät sen kortin, eivät näe lisäksi sen tavallista tekstirivia.",
+    "chatTriggers": "Se lukee keskusteluviestit, jotka alkavat sen liipaisusanoilla, kuten !poll, eikä muita.",
+    "netHttp": "Se voi puhua yhden valitsemasi palvelimen kanssa, ei muiden.",
+    "secrets": "Se voi säilyttää salaisuuden, kuten API-avaimen, järjestelmän avainnipussa.",
+    "uiWebview": "Se voi näyttää omaa verkkosisältöä suljetussa kehyksessä ilman internetyhteyttä."
+  },
   "listLabel": "Oikeudet"
 }

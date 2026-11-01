@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Visi: tai mato visi šio papildinio naudotojai.",
     "visibilityHintFriends": "Draugai: tai mato tik jūsų draugai.",
     "visibilityHintNobody": "Niekas: niekas nesiunčiama, kiti nemato.",
-    "footnote": "Vėliau pakeisti galite: Nustatymai → Papildiniai."
+    "footnote": "Vėliau pakeisti galite: Nustatymai → Papildiniai.",
+    "suggestedTitle": "Siūlo {{server}}",
+    "suggestedText": "Serveris tik siūlo. Jūs nusprendžiate, o jis nesužino, ką diegiate.",
+    "neverTitle": "Niekada negauna",
+    "thisServer": "šis serveris"
   },
   "toast": {
     "installed": "{{name}} įdiegtas",
@@ -80,5 +84,11 @@
   "checksTitle": "Oficialūs patikrinimai vis dar galioja",
   "checksText": "„Mumcord“ atšaukimo sąrašas gali jį išjungti. Oficialių papildinių pavadinimai rezervuoti.",
   "metaPermissions": "Leidimai: {{count}}",
-  "footer": "Oficiali saugykla · pasirašytas sąrašas patikrintas · nieko apie jus nesiunčiama"
+  "footer": "Oficiali saugykla · pasirašytas sąrašas patikrintas · nieko apie jus nesiunčiama",
+  "factSource": "Šaltinis: {{url}}",
+  "factLicence": "Licencija: {{license}}",
+  "factMinVersion": "Reikia Mumcord {{version}} ar naujesnės",
+  "factSigned": "Pasirašyta raktu {{key}}",
+  "factReviewed": "Prižiūrėtojų peržiūrėta {{date}}",
+  "factAdded": "Pridėta {{date}}"
 }

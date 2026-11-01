@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Alla: alla som använder detta tillägg kan se det.",
     "visibilityHintFriends": "Vänner: bara dina vänner kan se det.",
     "visibilityHintNobody": "Ingen: inget skickas, andra kan inte se det.",
-    "footnote": "Kan ändras senare under Inställningar → Tillägg."
+    "footnote": "Kan ändras senare under Inställningar → Tillägg.",
+    "suggestedTitle": "Föreslås av {{server}}",
+    "suggestedText": "Servern föreslår bara. Du bestämmer och den får inte veta vad du installerar.",
+    "neverTitle": "Det får aldrig",
+    "thisServer": "den här servern"
   },
   "toast": {
     "installed": "{{name}} installerat",
@@ -80,5 +84,11 @@
   "checksTitle": "Officiella kontroller gäller fortfarande",
   "checksText": "Mumcords spärrlista kan stänga av det. Namn som används av officiella plugins är reserverade.",
   "metaPermissions": "Behörigheter: {{count}}",
-  "footer": "Officiellt förråd · signerad lista kontrollerad · inget om dig skickas"
+  "footer": "Officiellt förråd · signerad lista kontrollerad · inget om dig skickas",
+  "factSource": "Källa: {{url}}",
+  "factLicence": "Licens: {{license}}",
+  "factMinVersion": "Kräver Mumcord {{version}} eller nyare",
+  "factSigned": "Signerat med nyckel {{key}}",
+  "factReviewed": "Granskat av underhållarna den {{date}}",
+  "factAdded": "Tillagt den {{date}}"
 }

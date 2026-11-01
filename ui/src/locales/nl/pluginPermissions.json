@@ -28,7 +28,27 @@
     "secrets": "Een geheim (bijv. een API-sleutel) bewaren in de sleutelhanger van je systeem",
     "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)"
   },
-  "requiredReason": "Nodig om de plugin te laten werken",
-  "optionalReason": "Optioneel: altijd uit te zetten",
+  "explanations": {
+    "uiPanel": "Een klein paneel van deze plugin verschijnt in de pluginbalk.",
+    "uiMemberBadge": "Een klein icoon kan naast namen in de ledenlijst verschijnen.",
+    "uiProfileCard": "Het kan een sectie aan profielkaarten toevoegen.",
+    "uiChatCard": "Het kan eigen kaarten in de chat tonen, bijvoorbeeld een peiling of een dobbelsteenworp.",
+    "uiUserMenu": "Het kan een item toevoegen aan het rechtermuisknopmenu van iemand.",
+    "uiDialog": "Het kan een eigen venster openen, bijvoorbeeld om iets in te stellen.",
+    "eventsSelf": "Het ziet of je gedempt of doof bent en in welk kanaal je zit.",
+    "eventsVoice": "Het ziet wanneer mensen beginnen en stoppen met praten, nooit wat er gezegd wordt.",
+    "eventsPresence": "Het ziet wie je kanaal binnenkomt of verlaat.",
+    "eventsChatActivity": "Het ziet dat iemand typt, nooit wat er getypt wordt.",
+    "peersMessages": "Het kan kleine hoeveelheden gegevens sturen naar deze plugin op de computers van anderen in je kanaal.",
+    "notify": "Het kan meldingen tonen. Bij Niet storen blijft het stil.",
+    "randomBytes": "Het kan veilige willekeurige getallen opvragen, bijvoorbeeld voor dobbelstenen.",
+    "commands": "Het kan chatcommando's toevoegen die je zelf typt, zoals /roll.",
+    "chatSend": "Het kan een chatbericht namens jou plaatsen, alleen na jouw klik of commando.",
+    "chatSupersedes": "Wie de kaart ziet, ziet niet ook de gewone tekstregel.",
+    "chatTriggers": "Het leest chatberichten die beginnen met zijn triggerwoorden, zoals !poll, en geen andere.",
+    "netHttp": "Het kan praten met één server die jij kiest, en alleen met die.",
+    "secrets": "Het kan een geheim, zoals een API-sleutel, bewaren in de sleutelhanger van je systeem.",
+    "uiWebview": "Het kan eigen webinhoud tonen in een afgesloten kader zonder internettoegang."
+  },
   "listLabel": "Rechten"
 }

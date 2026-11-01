@@ -262,6 +262,11 @@ impl Registry {
             authors: manifest.authors.clone(),
             author_keys: vec![self.author.public_line()],
             reviewed: self.repository.is_none(),
+            source_url: Some(format!("{}plugins/{id}", self.base)),
+            license: Some("MIT".to_owned()),
+            min_mumcord: Some("0.7".to_owned()),
+            reviewed_on: self.repository.is_none().then(date::today),
+            added_on: Some(date::today()),
             updated: date::today(),
             versions,
         })

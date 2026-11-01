@@ -175,6 +175,18 @@
   font-weight: 600;
 }
 
+.pd-perm-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pd-perm-body span {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
 .pd-perm-icon {
   display: grid;
   flex: none;

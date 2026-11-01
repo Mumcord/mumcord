@@ -28,7 +28,27 @@
     "secrets": "Conserver un secret (p. ex. une clé d'API) dans le trousseau de votre système",
     "uiWebview": "Afficher son propre contenu web dans un cadre isolé (sans internet)"
   },
-  "requiredReason": "Nécessaire au fonctionnement du plugin",
-  "optionalReason": "Optionnel : désactivable à tout moment",
+  "explanations": {
+    "uiPanel": "Un petit panneau de ce plugin apparaît dans la barre des plugins.",
+    "uiMemberBadge": "Une petite icône peut apparaître à côté des noms dans la liste des membres.",
+    "uiProfileCard": "Il peut ajouter une section aux cartes de profil.",
+    "uiChatCard": "Il peut afficher ses propres cartes dans le chat, par exemple un sondage ou un résultat de dé.",
+    "uiUserMenu": "Il peut ajouter une entrée au menu du clic droit d'une personne.",
+    "uiDialog": "Il peut ouvrir sa propre fenêtre, par exemple pour se configurer.",
+    "eventsSelf": "Il voit si vous êtes en sourdine ou rendu sourd et dans quel salon vous êtes.",
+    "eventsVoice": "Il voit quand des personnes commencent ou arrêtent de parler, jamais ce qui est dit.",
+    "eventsPresence": "Il voit qui rejoint ou quitte votre salon.",
+    "eventsChatActivity": "Il voit que quelqu'un écrit, jamais ce qu'il écrit.",
+    "peersMessages": "Il peut envoyer de petites quantités de données à ce plugin sur les ordinateurs des autres personnes de votre salon.",
+    "notify": "Il peut afficher des notifications. Il reste silencieux en mode Ne pas déranger.",
+    "randomBytes": "Il peut demander des nombres aléatoires sûrs, par exemple pour des dés.",
+    "commands": "Il peut ajouter des commandes de chat que vous tapez, comme /roll.",
+    "chatSend": "Il peut publier un message de chat en votre nom, seulement après un clic ou une commande de votre part.",
+    "chatSupersedes": "Les personnes qui voient sa carte ne voient pas en plus sa ligne de texte simple.",
+    "chatTriggers": "Il lit les messages de chat qui commencent par ses mots déclencheurs, comme !poll, et aucun autre.",
+    "netHttp": "Il peut parler à un serveur que vous choisissez, et uniquement à celui-là.",
+    "secrets": "Il peut garder un secret, comme une clé d'API, dans le trousseau de votre système.",
+    "uiWebview": "Il peut afficher son propre contenu web dans un cadre isolé, sans accès à Internet."
+  },
   "listLabel": "Autorisations"
 }

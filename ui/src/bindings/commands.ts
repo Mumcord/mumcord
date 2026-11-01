@@ -1750,6 +1750,18 @@ export type IndexedPlugin = {
 	categories: string[],
 	authors: string[],
 	reviewed: boolean,
+	/**  Where the source code lives. */
+	sourceUrl: string | null,
+	/**  SPDX licence expression. */
+	license: string | null,
+	/**  Lowest Mumcord version the plugin needs. */
+	minMumcord: string | null,
+	/**  Day the maintainers reviewed it (`YYYY-MM-DD`). */
+	reviewedOn: string | null,
+	/**  Day it was added to the index (`YYYY-MM-DD`). */
+	addedOn: string | null,
+	/**  Fingerprint (minisign key id) of the key the plugin's packages are signed with. */
+	signingKey: string | null,
 	updated: string,
 	/**  The latest version. */
 	version: string,

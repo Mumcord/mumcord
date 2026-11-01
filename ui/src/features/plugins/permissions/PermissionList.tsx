@@ -61,9 +61,7 @@ function Row({
       </span>
       <span className="perm-body">
         <span className="perm-text">{text}</span>
-        <span className="perm-reason">
-          {toggle === undefined ? t("requiredReason") : t("optionalReason")}
-        </span>
+        {known && <span className="perm-reason">{t(`explanations.${permissionTextKey(id)}`)}</span>}
       </span>
       {risk === "red" ? (
         <span className="perm-risk-badge">{riskLabel}</span>

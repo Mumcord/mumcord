@@ -28,7 +28,27 @@
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
     "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)"
   },
-  "requiredReason": "Riachtanach chun an breiseán a oibriú",
-  "optionalReason": "Roghnach: is féidir é a mhúchadh am ar bith",
+  "explanations": {
+    "uiPanel": "Taispeántar painéal beag den bhreiseán seo i stiall na mbreiseán.",
+    "uiMemberBadge": "Is féidir deilbhín beag a bheith le feiceáil taobh le hainmneacha sa liosta comhaltaí.",
+    "uiProfileCard": "Is féidir leis rannán a chur le cártaí próifíle.",
+    "uiChatCard": "Is féidir leis a chártaí féin a thaispeáint sa chomhrá, mar shampla pobal nó toradh dísle.",
+    "uiUserMenu": "Is féidir leis iontráil a chur le roghchlár deaschliceála úsáideora.",
+    "uiDialog": "Is féidir leis a fhuinneog féin a oscailt, mar shampla chun rudaí a shocrú.",
+    "eventsSelf": "Feiceann sé an bhfuil tú balbhaithe nó bodhraithe agus cén cainéal ina bhfuil tú.",
+    "eventsVoice": "Feiceann sé cathain a thosaíonn agus a stopann daoine ag labhairt, ach riamh cad a deirtear.",
+    "eventsPresence": "Feiceann sé cé a thagann isteach i do chainéal nó a fhágann é.",
+    "eventsChatActivity": "Feiceann sé go bhfuil duine ag scríobh, ach riamh cad atá á scríobh.",
+    "peersMessages": "Is féidir leis méideanna beaga sonraí a sheoladh chuig an mbreiseán seo ar ríomhairí daoine eile i do chainéal.",
+    "notify": "Is féidir leis fógraí a thaispeáint. Bíonn sé ciúin le Ná Cuir Isteach Orm.",
+    "randomBytes": "Is féidir leis uimhreacha randamacha slána a iarraidh, mar shampla le haghaidh dísle.",
+    "commands": "Is féidir leis orduithe comhrá a chur leis a chlóscríobhann tú féin, mar /roll.",
+    "chatSend": "Is féidir leis teachtaireacht chomhrá a phostáil ar do shon, ach amháin tar éis duit cliceáil nó ordú a chlóscríobh.",
+    "chatSupersedes": "Ní fheiceann an té a fheiceann a chárta a líne téacs shimplí freisin.",
+    "chatTriggers": "Léann sé teachtaireachtaí comhrá a thosaíonn lena fhocail truicir, mar !poll, agus aon cheann eile.",
+    "netHttp": "Is féidir leis labhairt le freastalaí amháin a roghnaíonn tú, agus leis sin amháin.",
+    "secrets": "Is féidir leis rún, mar eochair API, a choinneáil i eochairshlabhra do chórais.",
+    "uiWebview": "Is féidir leis a ábhar gréasáin féin a thaispeáint i bhfráma séalaithe gan rochtain idirlín."
+  },
   "listLabel": "Ceadanna"
 }

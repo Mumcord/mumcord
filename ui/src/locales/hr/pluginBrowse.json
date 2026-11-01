@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Svi: vide svi korisnici ovog dodatka.",
     "visibilityHintFriends": "Prijatelji: vide samo vaši prijatelji.",
     "visibilityHintNobody": "Nitko: ništa se ne šalje, drugi ne vide.",
-    "footnote": "Kasnije se može promijeniti u: Postavke → Dodaci."
+    "footnote": "Kasnije se može promijeniti u: Postavke → Dodaci.",
+    "suggestedTitle": "Predlaže poslužitelj {{server}}",
+    "suggestedText": "Poslužitelj samo predlaže. Vi odlučujete, a on ne saznaje što instalirate.",
+    "neverTitle": "Nikada ne dobiva",
+    "thisServer": "ovaj poslužitelj"
   },
   "toast": {
     "installed": "{{name}} je instaliran",
@@ -80,5 +84,11 @@
   "checksTitle": "Službene provjere i dalje vrijede",
   "checksText": "Mumcordov popis opoziva može ga isključiti. Nazivi službenih dodataka rezervirani su.",
   "metaPermissions": "Dopuštenja: {{count}}",
-  "footer": "Službeni repozitorij · potpisani popis provjeren · ništa o vama se ne šalje"
+  "footer": "Službeni repozitorij · potpisani popis provjeren · ništa o vama se ne šalje",
+  "factSource": "Izvor: {{url}}",
+  "factLicence": "Licenca: {{license}}",
+  "factMinVersion": "Zahtijeva Mumcord {{version}} ili noviji",
+  "factSigned": "Potpisano ključem {{key}}",
+  "factReviewed": "Pregledali su održavatelji dana {{date}}",
+  "factAdded": "Dodano dana {{date}}"
 }

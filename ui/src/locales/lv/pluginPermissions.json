@@ -28,7 +28,27 @@
     "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
     "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)"
   },
-  "requiredReason": "Nepieciešams, lai spraudnis darbotos",
-  "optionalReason": "Neobligāti: var izslēgt jebkurā laikā",
+  "explanations": {
+    "uiPanel": "Neliels šī spraudņa panelis parādās spraudņu joslā.",
+    "uiMemberBadge": "Neliela ikona var parādīties blakus vārdiem dalībnieku sarakstā.",
+    "uiProfileCard": "Tas var pievienot sadaļu profila kartītēm.",
+    "uiChatCard": "Tas var rādīt savas kartītes tērzēšanā, piemēram, aptauju vai metiena rezultātu.",
+    "uiUserMenu": "Tas var pievienot ierakstu lietotāja labā klikšķa izvēlnei.",
+    "uiDialog": "Tas var atvērt savu logu, piemēram, iestatīšanai.",
+    "eventsSelf": "Tas redz, vai esat izslēgts skaņā vai apklusināts un kurā kanālā esat.",
+    "eventsVoice": "Tas redz, kad cilvēki sāk un beidz runāt, bet nekad ko viņi saka.",
+    "eventsPresence": "Tas redz, kas ienāk jūsu kanālā vai to atstāj.",
+    "eventsChatActivity": "Tas redz, ka kāds raksta, bet nekad ko raksta.",
+    "peersMessages": "Tas var sūtīt nelielu datu apjomu šim spraudnim citu cilvēku datoros jūsu kanālā.",
+    "notify": "Tas var rādīt paziņojumus. Režīmā Netraucēt tas klusē.",
+    "randomBytes": "Tas var pieprasīt drošus nejaušus skaitļus, piemēram, kauliņiem.",
+    "commands": "Tas var pievienot tērzēšanas komandas, ko ierakstāt paši, piemēram, /roll.",
+    "chatSend": "Tas var publicēt tērzēšanas ziņu jūsu vārdā, tikai pēc jūsu klikšķa vai komandas.",
+    "chatSupersedes": "Kas redz tā kartīti, papildus neredz tā vienkāršo teksta rindu.",
+    "chatTriggers": "Tas lasa tērzēšanas ziņas, kas sākas ar tā aktivizēšanas vārdiem, piemēram, !poll, un nevienas citas.",
+    "netHttp": "Tas var sazināties ar vienu jūsu izvēlētu serveri un tikai ar to.",
+    "secrets": "Tas var glabāt noslēpumu, piemēram, API atslēgu, sistēmas atslēgu saišķī.",
+    "uiWebview": "Tas var rādīt savu tīmekļa saturu slēgtā rāmī bez piekļuves internetam."
+  },
   "listLabel": "Atļaujas"
 }

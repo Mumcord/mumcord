@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Alle: alle brugere af dette plugin kan se det.",
     "visibilityHintFriends": "Venner: kun dine venner kan se det.",
     "visibilityHintNobody": "Ingen: intet sendes, andre kan ikke se det.",
-    "footnote": "Kan ændres senere under Indstillinger → Plugins."
+    "footnote": "Kan ændres senere under Indstillinger → Plugins.",
+    "suggestedTitle": "Foreslået af {{server}}",
+    "suggestedText": "Serveren foreslår kun. Du bestemmer, og den får ikke at vide, hvad du installerer.",
+    "neverTitle": "Det får aldrig",
+    "thisServer": "denne server"
   },
   "toast": {
     "installed": "{{name}} er installeret",
@@ -80,5 +84,11 @@
   "checksTitle": "Officielle kontroller gælder stadig",
   "checksText": "Mumcords spærreliste kan slå det fra. Navne brugt af officielle plugins er reserverede.",
   "metaPermissions": "Tilladelser: {{count}}",
-  "footer": "Officielt lager · signeret liste kontrolleret · intet om dig sendes"
+  "footer": "Officielt lager · signeret liste kontrolleret · intet om dig sendes",
+  "factSource": "Kilde: {{url}}",
+  "factLicence": "Licens: {{license}}",
+  "factMinVersion": "Kræver Mumcord {{version}} eller nyere",
+  "factSigned": "Signeret med nøgle {{key}}",
+  "factReviewed": "Gennemgået af vedligeholderne den {{date}}",
+  "factAdded": "Tilføjet den {{date}}"
 }

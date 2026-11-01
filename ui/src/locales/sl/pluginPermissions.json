@@ -28,7 +28,27 @@
     "secrets": "Shrani skrivnost (npr. ključ API) v sistemsko zbirko ključev",
     "uiWebview": "Prikaži lastno spletno vsebino v izoliranem okvirju (brez interneta)"
   },
-  "requiredReason": "Potrebno, da vtičnik deluje",
-  "optionalReason": "Neobvezno: lahko ga kadar koli izklopite",
+  "explanations": {
+    "uiPanel": "Majhna plošča tega vtičnika se prikaže v vrstici vtičnikov.",
+    "uiMemberBadge": "Majhna ikona se lahko prikaže ob imenih na seznamu članov.",
+    "uiProfileCard": "Lahko doda razdelek profilnim karticam.",
+    "uiChatCard": "Lahko v klepetu prikaže lastne kartice, na primer anketo ali met kocke.",
+    "uiUserMenu": "Lahko doda vnos v meni z desnim klikom pri uporabniku.",
+    "uiDialog": "Lahko odpre lastno okno, na primer za nastavitev.",
+    "eventsSelf": "Vidi, ali ste utišani ali ogluševani in v katerem kanalu ste.",
+    "eventsVoice": "Vidi, kdaj ljudje začnejo in nehajo govoriti, nikoli kaj govorijo.",
+    "eventsPresence": "Vidi, kdo vstopi v vaš kanal ali ga zapusti.",
+    "eventsChatActivity": "Vidi, da nekdo piše, nikoli kaj piše.",
+    "peersMessages": "Lahko pošilja majhne količine podatkov temu vtičniku na računalnikih drugih ljudi v vašem kanalu.",
+    "notify": "Lahko prikazuje obvestila. Pri načinu Ne moti molči.",
+    "randomBytes": "Lahko zahteva varna naključna števila, na primer za kocke.",
+    "commands": "Lahko doda klepetalne ukaze, ki jih vnesete sami, kot je /roll.",
+    "chatSend": "Lahko objavi klepetalno sporočilo v vašem imenu, le po vašem kliku ali ukazu.",
+    "chatSupersedes": "Kdor vidi njegovo kartico, ne vidi dodatno njegove navadne besedilne vrstice.",
+    "chatTriggers": "Bere klepetalna sporočila, ki se začnejo z njegovimi sprožilnimi besedami, kot je !poll, in nobenih drugih.",
+    "netHttp": "Lahko komunicira z enim strežnikom, ki ga izberete, in samo z njim.",
+    "secrets": "Lahko shrani skrivnost, na primer ključ API, v sistemsko zbirko ključev.",
+    "uiWebview": "Lahko prikaže lastno spletno vsebino v zaprtem okvirju brez dostopa do interneta."
+  },
   "listLabel": "Dovoljenja"
 }

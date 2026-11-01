@@ -4,7 +4,7 @@ import type { IndexedPlugin } from "../../../api";
 import { consumePluginRequest, usePendingPluginRequest } from "../pluginRequestStore";
 import { usePlugins } from "../pluginStore";
 import { pluginMessageText } from "../prompt/errorText";
-import { InstallPrompt } from "../prompt/InstallPrompt";
+import { InstallPrompt, type SuggestedBy } from "../prompt/InstallPrompt";
 import "./browse.css";
 import { loadPluginIndex, usePluginIndex } from "./indexStore";
 import { PluginCard } from "./PluginCard";
@@ -28,6 +28,7 @@ export function BrowseTab() {
   const [category, setCategory] = useState<Category>("all");
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [promptId, setPromptId] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<SuggestedBy | null>(null);
   const searchId = useId();
   const plugins = useMemo(() => (state.status === "loaded" ? state.index.plugins : []), [state]);
   const find = (id: string | null) => plugins.find((plugin) => plugin.id === id) ?? null;
@@ -49,7 +50,10 @@ export function BrowseTab() {
     setHandled([installRequest]);
     if (official(installRequest.plugin)) {
       setDetailsId(installRequest.plugin);
-      if (!isInstalled(installRequest.plugin)) setPromptId(installRequest.plugin);
+      if (!isInstalled(installRequest.plugin)) {
+        setPromptId(installRequest.plugin);
+        setSuggestion(installRequest.suggestion ?? null);
+      }
     }
   }
   useEffect(() => {
@@ -63,8 +67,10 @@ export function BrowseTab() {
     <InstallPrompt
       plugin={prompted}
       repositoryWarning={needsRepositoryWarning(prompted.source, installed)}
+      suggestedBy={suggestion}
       onClose={() => {
         setPromptId(null);
+        setSuggestion(null);
       }}
     />
   );

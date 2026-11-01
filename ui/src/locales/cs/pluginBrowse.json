@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Všichni: uvidí to všichni uživatelé tohoto pluginu.",
     "visibilityHintFriends": "Přátelé: uvidí to jen vaši přátelé.",
     "visibilityHintNobody": "Nikdo: nic se neodesílá, ostatní to neuvidí.",
-    "footnote": "Později změníte v části Nastavení → Pluginy."
+    "footnote": "Později změníte v části Nastavení → Pluginy.",
+    "suggestedTitle": "Navrhl server {{server}}",
+    "suggestedText": "Server pouze navrhuje. Rozhodujete vy a nedozví se, co instalujete.",
+    "neverTitle": "Nikdy nezíská",
+    "thisServer": "tento server"
   },
   "toast": {
     "installed": "Doplněk {{name}} byl nainstalován",
@@ -80,5 +84,11 @@
   "checksTitle": "Oficiální kontroly stále platí",
   "checksText": "Seznam zrušených pluginů Mumcordu ho může vypnout. Názvy oficiálních pluginů jsou vyhrazeny.",
   "metaPermissions": "Oprávnění: {{count}}",
-  "footer": "Oficiální repozitář · podepsaný seznam ověřen · nic o vás se neodesílá"
+  "footer": "Oficiální repozitář · podepsaný seznam ověřen · nic o vás se neodesílá",
+  "factSource": "Zdroj: {{url}}",
+  "factLicence": "Licence: {{license}}",
+  "factMinVersion": "Vyžaduje Mumcord {{version}} nebo novější",
+  "factSigned": "Podepsáno klíčem {{key}}",
+  "factReviewed": "Zkontrolováno správci dne {{date}}",
+  "factAdded": "Přidáno dne {{date}}"
 }

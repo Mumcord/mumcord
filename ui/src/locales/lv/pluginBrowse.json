@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Visi: to redz visi šī spraudņa lietotāji.",
     "visibilityHintFriends": "Draugi: to redz tikai tavi draugi.",
     "visibilityHintNobody": "Neviens: nekas netiek sūtīts, citi to neredz.",
-    "footnote": "Vēlāk mainīt var sadaļā Iestatījumi → Spraudņi."
+    "footnote": "Vēlāk mainīt var sadaļā Iestatījumi → Spraudņi.",
+    "suggestedTitle": "Ieteicis {{server}}",
+    "suggestedText": "Serveris tikai iesaka. Jūs izlemjat, un tas neuzzina, ko instalējat.",
+    "neverTitle": "Tas nekad nesaņem",
+    "thisServer": "šis serveris"
   },
   "toast": {
     "installed": "{{name}} instalēts",
@@ -80,5 +84,11 @@
   "checksTitle": "Oficiālās pārbaudes joprojām ir spēkā",
   "checksText": "Mumcord atsaukšanas saraksts to var izslēgt. Oficiālo spraudņu nosaukumi ir rezervēti.",
   "metaPermissions": "Atļaujas: {{count}}",
-  "footer": "Oficiālā krātuve · parakstītais saraksts pārbaudīts · nekas par jums netiek sūtīts"
+  "footer": "Oficiālā krātuve · parakstītais saraksts pārbaudīts · nekas par jums netiek sūtīts",
+  "factSource": "Avots: {{url}}",
+  "factLicence": "Licence: {{license}}",
+  "factMinVersion": "Nepieciešams Mumcord {{version}} vai jaunāks",
+  "factSigned": "Parakstīts ar atslēgu {{key}}",
+  "factReviewed": "Uzturētāji pārbaudīja {{date}}",
+  "factAdded": "Pievienots {{date}}"
 }

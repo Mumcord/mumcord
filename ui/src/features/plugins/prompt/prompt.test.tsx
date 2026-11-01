@@ -41,6 +41,32 @@ afterEach(() => {
   setApi(undefined);
 });
 
+describe("InstallPrompt boxes", () => {
+  it("says who suggested the install and what an official plugin never gets", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(offer);
+    render(
+      <InstallPrompt
+        plugin={poll}
+        repositoryWarning={false}
+        suggestedBy={{ serverId: 99, reason: "We use it for raids" }}
+        onClose={vi.fn()}
+      />,
+    );
+    expect(await screen.findByText("Suggested by this server")).toBeTruthy();
+    expect(screen.getByText("We use it for raids")).toBeTruthy();
+    expect(screen.getByText("It never gets")).toBeTruthy();
+  });
+
+  it("shows neither box for a plain repository install", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(offer);
+    const repo = indexed("poll", { source: { kind: "repo", repositoryId: 1, name: "Fans" } });
+    render(<InstallPrompt plugin={repo} repositoryWarning={false} onClose={vi.fn()} />);
+    await screen.findAllByText("Required");
+    expect(screen.queryByText("It never gets")).toBeNull();
+    expect(screen.queryByText(/^Suggested by/)).toBeNull();
+  });
+});
+
 describe("InstallPrompt", () => {
   it("shows required and optional permissions and the visibility choice, then installs", async () => {
     vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(offer);

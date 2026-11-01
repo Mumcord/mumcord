@@ -28,7 +28,27 @@
     "secrets": "Żomm sigriet (eż. ċavetta API) fil-keychain tas-sistema tiegħek",
     "uiWebview": "Uri l-kontenut tal-web tiegħu stess f'qafas issiġillat (mingħajr internet)"
   },
-  "requiredReason": "Meħtieġ biex il-plugin jaħdem",
-  "optionalReason": "Fakultattiv: jista' jintefa fi kwalunkwe ħin",
+  "explanations": {
+    "uiPanel": "Pannell żgħir ta' dan il-plugin jidher fil-linja tal-plugins.",
+    "uiMemberBadge": "Ikona żgħira tista' tidher ħdejn l-ismijiet fil-lista tal-membri.",
+    "uiProfileCard": "Jista' jżid sezzjoni mal-karti tal-profil.",
+    "uiChatCard": "Jista' juri l-karti tiegħu stess fiċ-chat, pereżempju stħarriġ jew riżultat ta' dadi.",
+    "uiUserMenu": "Jista' jżid daħla mal-menu tal-click tal-lemin ta' utent.",
+    "uiDialog": "Jista' jiftaħ it-tieqa tiegħu stess, pereżempju biex jiġi stabbilit.",
+    "eventsSelf": "Jara jekk intix mutat jew torox u f'liema kanal int.",
+    "eventsVoice": "Jara meta nies jibdew u jieqfu jitkellmu, qatt dak li jingħad.",
+    "eventsPresence": "Jara min jidħol fil-kanal tiegħek jew iħallih.",
+    "eventsChatActivity": "Jara li xi ħadd qed jikteb, qatt dak li jikteb.",
+    "peersMessages": "Jista' jibgħat ammonti żgħar ta' dejta lil dan il-plugin fuq il-kompjuters ta' persuni oħra fil-kanal tiegħek.",
+    "notify": "Jista' juri notifiki. Jibqa' siekta b'Tiddisturbax.",
+    "randomBytes": "Jista' jitlob numri każwali siguri, pereżempju għad-dadi.",
+    "commands": "Jista' jżid kmandi taċ-chat li tikteb int, bħal /roll.",
+    "chatSend": "Jista' jippubblika messaġġ taċ-chat f'ismek, biss wara li tikklikkja jew tikteb kmand.",
+    "chatSupersedes": "Min jara l-karta tiegħu ma jarax ukoll is-sular tat-test sempliċi tiegħu.",
+    "chatTriggers": "Jaqra messaġġi taċ-chat li jibdew bil-kliem tiegħu li jattiva, bħal !poll, u l-ebda oħra.",
+    "netHttp": "Jista' jkellem server wieħed li tagħżel int, u dak biss.",
+    "secrets": "Jista' jżomm sigriet, bħal ċavetta API, fil-keychain tas-sistema tiegħek.",
+    "uiWebview": "Jista' juri kontenut tal-web tiegħu stess f'qafas issiġillat mingħajr aċċess għall-internet."
+  },
   "listLabel": "Permessi"
 }

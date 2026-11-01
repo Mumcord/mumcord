@@ -84,6 +84,11 @@ in peer announces with its first 8 hex digits.
       "authors": ["Mumcord"],
       "author_keys": ["RW…"],
       "reviewed": true,
+      "source_url": "https://github.com/Mumcord/plugins/tree/main/dice",
+      "license": "MIT",
+      "min_mumcord": "0.7",
+      "reviewed_on": "2026-10-01",
+      "added_on": "2026-09-01",
       "updated": "2026-10-01",
       "versions": [
         {
@@ -123,6 +128,11 @@ Plugin entry:
 | `categories`, `authors` | array of strings      | no       |                                                                         |
 | `author_keys`           | array of keys         | yes      | At least one. A package must be signed by one of them.                  |
 | `reviewed`              | bool                  | no       | Default `false`. The official registry sets it after maintainer review. |
+| `source_url`            | URL                   | no       | `http(s)` link to the source code; shown on the details page.           |
+| `license`               | string                | no       | SPDX licence expression such as `MIT` (at most 100 characters).         |
+| `min_mumcord`           | string                | no       | Lowest Mumcord version the plugin needs, e.g. `0.7` (≤ 100 characters). |
+| `reviewed_on`           | `YYYY-MM-DD`          | no       | Day the maintainers reviewed the plugin (official index).               |
+| `added_on`              | `YYYY-MM-DD`          | no       | Day the plugin was added to the index.                                  |
 | `updated`               | `YYYY-MM-DD`          | yes      | Date of the latest version.                                             |
 | `versions`              | array                 | yes      | At least one; no duplicate versions. The highest semver is the latest.  |
 
@@ -253,6 +263,11 @@ categories = ["games"]
 authors = ["Mumcord"]
 author_keys = ["RW…"]
 reviewed = true
+source_url = "https://github.com/Mumcord/plugins/tree/main/dice"
+license = "MIT"
+min_mumcord = "0.7"
+reviewed_on = "2026-10-01"
+added_on = "2026-09-01"
 description = "README.md"
 icon = "icon-128.png"
 
@@ -261,15 +276,16 @@ file = "shot-1.png"
 alt = { en = "A roll of two dice" }
 ```
 
-| Field                   | Required | Meaning                                                                                         |
-| ----------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-| `name`, `summary`       | yes      | Language tag → text; `en` required. Become `name` / `summary` in the index.                     |
-| `categories`, `authors` | no       | Copied into the index.                                                                          |
-| `author_keys`           | yes      | Minisign public keys (base64 line) allowed to sign packages. A new key needs maintainer review. |
-| `reviewed`              | no       | Set by a maintainer after review; default `false`.                                              |
-| `description`           | no       | Markdown file in the plugin folder, published as `v1/media/<id>/<file>` (`description_md_url`). |
-| `icon`                  | no       | Image in the plugin folder, published under `v1/media/<id>/`.                                   |
-| `screenshots`           | no       | `{file, alt}`; `alt` maps language tags to text. Published under `v1/media/<id>/`.              |
+| Field                                                             | Required | Meaning                                                                                                                                                                                             |
+| ----------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`, `summary`                                                 | yes      | Language tag → text; `en` required. Become `name` / `summary` in the index.                                                                                                                         |
+| `categories`, `authors`                                           | no       | Copied into the index.                                                                                                                                                                              |
+| `author_keys`                                                     | yes      | Minisign public keys (base64 line) allowed to sign packages. A new key needs maintainer review.                                                                                                     |
+| `reviewed`                                                        | no       | Set by a maintainer after review; default `false`.                                                                                                                                                  |
+| `source_url`, `license`, `min_mumcord`, `reviewed_on`, `added_on` | no       | Copied into the index; all optional. A bad value (non-http URL, malformed date, over-long text) drops the entry with a note. The details page shows the signing-key fingerprint from `author_keys`. |
+| `description`                                                     | no       | Markdown file in the plugin folder, published as `v1/media/<id>/<file>` (`description_md_url`).                                                                                                     |
+| `icon`                                                            | no       | Image in the plugin folder, published under `v1/media/<id>/`.                                                                                                                                       |
+| `screenshots`                                                     | no       | `{file, alt}`; `alt` maps language tags to text. Published under `v1/media/<id>/`.                                                                                                                  |
 
 File paths are relative to the plugin folder and may not contain `..`.
 

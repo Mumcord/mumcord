@@ -120,7 +120,27 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
             </h4>
             <ul className="pd-facts">
               {repository !== null && <li>{t("repositoryName", { repository })}</li>}
-              {official && plugin.reviewed && <li>{t("reviewed")}</li>}
+              {plugin.sourceUrl !== null && (
+                <li>{t("factSource", { url: plugin.sourceUrl.replace(/^https?:\/\//, "") })}</li>
+              )}
+              {plugin.license !== null && <li>{t("factLicence", { license: plugin.license })}</li>}
+              {plugin.minMumcord !== null && (
+                <li>{t("factMinVersion", { version: plugin.minMumcord })}</li>
+              )}
+              {plugin.signingKey !== null && (
+                <li title={plugin.signingKey}>
+                  {t("factSigned", { key: shortKey(plugin.signingKey) })}
+                </li>
+              )}
+              {official && plugin.reviewed && plugin.reviewedOn === null && (
+                <li>{t("reviewed")}</li>
+              )}
+              {plugin.reviewedOn !== null && (
+                <li>{t("factReviewed", { date: formatDate(plugin.reviewedOn, i18n.language) })}</li>
+              )}
+              {plugin.addedOn !== null && (
+                <li>{t("factAdded", { date: formatDate(plugin.addedOn, i18n.language) })}</li>
+              )}
               {repository !== null && <li>{t("updatesFrom")}</li>}
             </ul>
           </section>
@@ -141,6 +161,11 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
 function Screenshot({ id, index, alt }: { id: string; index: number; alt: string }) {
   const url = useIndexImage(id, { kind: "screenshot", index });
   return url === null ? null : <img className="pd-shot" src={url} alt={alt} />;
+}
+
+/** `1CB49831E26E61AD` → `1CB4…61AD`, as in the mockup; the full id is the tooltip. */
+function shortKey(key: string): string {
+  return key.length > 8 ? `${key.slice(0, 4)}…${key.slice(-4)}` : key;
 }
 
 function formatDate(value: string, language: string): string {
@@ -166,7 +191,10 @@ function PermissionPreview({ ids }: { ids: readonly string[] }) {
             <span className={`pd-perm-icon perm-risk perm-risk-${risk}`} aria-hidden="true">
               {risk === "red" ? "▲" : "●"}
             </span>
-            <strong>{known ? t(`texts.${permissionTextKey(id)}`) : id}</strong>
+            <span className="pd-perm-body">
+              <strong>{known ? t(`texts.${permissionTextKey(id)}`) : id}</strong>
+              {known && <span>{t(`explanations.${permissionTextKey(id)}`)}</span>}
+            </span>
             {risk === "red" && <span className="perm-risk-badge">{t("risk.red")}</span>}
           </li>
         );

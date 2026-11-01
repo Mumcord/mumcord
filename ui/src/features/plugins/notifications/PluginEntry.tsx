@@ -34,7 +34,11 @@ function SuggestionActions({ item, notice }: { item: PluginItem; notice: Suggest
             onClick={() => {
               markRead(item.id);
               setCentreOpen(false);
-              requestPluginScreen({ kind: "install", plugin });
+              requestPluginScreen({
+                kind: "install",
+                plugin,
+                suggestion: { serverId, reason: notice.reason },
+              });
             }}
           >
             {t("suggestion.install")}

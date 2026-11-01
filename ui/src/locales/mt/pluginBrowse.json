@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Kulħadd: jarawh l-utenti kollha ta' dan il-plugin.",
     "visibilityHintFriends": "Ħbieb: jarawh biss il-ħbieb tiegħek.",
     "visibilityHintNobody": "Ħadd: ma jintbagħat xejn, l-oħrajn ma jarawhx.",
-    "footnote": "Biddel aktar tard f’Settings → Plugins."
+    "footnote": "Biddel aktar tard f’Settings → Plugins.",
+    "suggestedTitle": "Issuġġerit minn {{server}}",
+    "suggestedText": "Is-server jissuġġerixxi biss. Int tiddeċiedi u ma jgħarrafx x'tinstalla.",
+    "neverTitle": "Qatt ma jiksbu",
+    "thisServer": "dan is-server"
   },
   "toast": {
     "installed": "{{name}} installat",
@@ -80,5 +84,11 @@
   "checksTitle": "It-tiftixiet uffiċjali xorta japplikaw",
   "checksText": "Il-lista ta' revoka ta' Mumcord tista' titfih. L-ismijiet tal-plugins uffiċjali huma riżervati.",
   "metaPermissions": "Permessi: {{count}}",
-  "footer": "Repożitorju uffiċjali · lista ffirmata ċċekkjata · xejn dwarek ma jintbagħat"
+  "footer": "Repożitorju uffiċjali · lista ffirmata ċċekkjata · xejn dwarek ma jintbagħat",
+  "factSource": "Sors: {{url}}",
+  "factLicence": "Liċenzja: {{license}}",
+  "factMinVersion": "Jeħtieġ Mumcord {{version}} jew aktar ġdid",
+  "factSigned": "Iffirmat biċ-ċavetta {{key}}",
+  "factReviewed": "Eżaminat mill-maintainers fi {{date}}",
+  "factAdded": "Miżjud fi {{date}}"
 }

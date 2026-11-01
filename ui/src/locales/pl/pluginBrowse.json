@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Wszyscy: widzą to wszyscy użytkownicy tej wtyczki.",
     "visibilityHintFriends": "Znajomi: widzą to tylko Twoi znajomi.",
     "visibilityHintNobody": "Nikt: nic nie jest wysyłane, inni tego nie widzą.",
-    "footnote": "Zmienisz to później w: Ustawienia → Wtyczki."
+    "footnote": "Zmienisz to później w: Ustawienia → Wtyczki.",
+    "suggestedTitle": "Zaproponowane przez {{server}}",
+    "suggestedText": "Serwer tylko proponuje. Ty decydujesz, a on nie dowiaduje się, co instalujesz.",
+    "neverTitle": "Nigdy nie dostaje",
+    "thisServer": "ten serwer"
   },
   "toast": {
     "installed": "Zainstalowano: {{name}}",
@@ -80,5 +84,11 @@
   "checksTitle": "Oficjalne kontrole nadal obowiązują",
   "checksText": "Lista unieważnień Mumcord może ją wyłączyć. Nazwy oficjalnych wtyczek są zarezerwowane.",
   "metaPermissions": "Uprawnienia: {{count}}",
-  "footer": "Oficjalne repozytorium · podpisana lista sprawdzona · nic o tobie nie jest wysyłane"
+  "footer": "Oficjalne repozytorium · podpisana lista sprawdzona · nic o tobie nie jest wysyłane",
+  "factSource": "Źródło: {{url}}",
+  "factLicence": "Licencja: {{license}}",
+  "factMinVersion": "Wymaga Mumcord {{version}} lub nowszego",
+  "factSigned": "Podpisano kluczem {{key}}",
+  "factReviewed": "Sprawdzone przez opiekunów dnia {{date}}",
+  "factAdded": "Dodano dnia {{date}}"
 }

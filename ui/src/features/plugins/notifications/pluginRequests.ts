@@ -8,8 +8,11 @@
 export type PluginRequest =
   /** Official plugin: open its details page in the store. */
   | { kind: "details"; plugin: string }
-  /** Official plugin: open the install prompt (the user sees every permission first). */
-  | { kind: "install"; plugin: string }
+  /**
+   * Official plugin: open the install prompt (the user sees every permission first). `suggestion`
+   * is set when a server suggested it, so the prompt can say who asked.
+   */
+  | { kind: "install"; plugin: string; suggestion?: { serverId: number; reason: string } }
   /** Third-party plugin: open the Add repository dialog with the announced key as Expected key. */
   | { kind: "addRepository"; url: string; key: string | null }
   /** Open the Updates tab. */

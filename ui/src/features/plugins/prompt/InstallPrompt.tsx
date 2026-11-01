@@ -7,6 +7,7 @@ import {
   type PluginInstallStage,
   type PluginVisibilityChoice,
 } from "../../../api";
+import { useServers } from "../../servers";
 import { ModalDialog } from "../../settings/components/ModalDialog";
 import { defaultOptionalSelection, type RequestedPermission } from "../permissions/catalogue";
 import { PermissionList } from "../permissions/PermissionList";
@@ -25,10 +26,18 @@ type Phase =
 const VISIBILITIES: readonly PluginVisibilityChoice[] = ["everyone", "friends", "nobody"];
 const MESSAGES = "peers.messages";
 
+/** The server suggestion an install came from (the notification centre), if any. */
+export interface SuggestedBy {
+  serverId: number;
+  /** Why the server suggests it; written by the server, so untrusted text. */
+  reason: string;
+}
+
 export interface InstallPromptProps {
   plugin: IndexedPlugin;
   /** First install from this third-party repository: the user must confirm the warning. */
   repositoryWarning: boolean;
+  suggestedBy?: SuggestedBy | null;
   onClose: () => void;
 }
 
@@ -36,8 +45,15 @@ export interface InstallPromptProps {
  * The install prompt (spec §5.3, FR-6.60). The engine first downloads and verifies the package
  * so the prompt can list its required and optional permissions; nothing runs until Install.
  */
-export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPromptProps) {
+export function InstallPrompt({
+  plugin,
+  repositoryWarning,
+  suggestedBy = null,
+  onClose,
+}: InstallPromptProps) {
   const { t } = useTranslation("pluginBrowse");
+  const { servers } = useServers();
+  const serverName = servers.find((s) => s.id === suggestedBy?.serverId)?.label ?? null;
   const [phase, setPhase] = useState<Phase>({ kind: "preparing" });
   const [enabled, setEnabled] = useState<ReadonlySet<string>>(new Set());
   const [visibility, setVisibility] = useState<PluginVisibilityChoice>("everyone");
@@ -127,6 +143,15 @@ export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPro
       )}
       {(phase.kind === "ready" || phase.kind === "installing") && (
         <>
+          {suggestedBy !== null && (
+            <div className="plugin-prompt-box" role="note">
+              <strong>
+                {t("prompt.suggestedTitle", { server: serverName ?? t("prompt.thisServer") })}
+              </strong>
+              {suggestedBy.reason !== "" && <p>{suggestedBy.reason}</p>}
+              <p>{t("prompt.suggestedText")}</p>
+            </div>
+          )}
           <p className="plugin-prompt-subtitle">{t("prompt.intro", { name })}</p>
           <PermissionList
             requested={requestedOf(phase.offer)}
@@ -172,6 +197,12 @@ export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPro
                   </label>
                 ))}
               </div>
+            </div>
+          )}
+          {plugin.source.kind === "official" && (
+            <div className="plugin-prompt-box" role="note">
+              <strong>{t("prompt.neverTitle")}</strong>
+              <p>{t("neverText")}</p>
             </div>
           )}
           {repositoryWarning && plugin.source.kind === "repo" && (

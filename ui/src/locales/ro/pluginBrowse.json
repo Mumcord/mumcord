@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Toți: toți utilizatorii acestui plugin văd.",
     "visibilityHintFriends": "Prieteni: doar prietenii tăi văd.",
     "visibilityHintNobody": "Nimeni: nu se trimite nimic, ceilalți nu văd.",
-    "footnote": "Se poate schimba mai târziu în Setări → Pluginuri."
+    "footnote": "Se poate schimba mai târziu în Setări → Pluginuri.",
+    "suggestedTitle": "Sugerat de {{server}}",
+    "suggestedText": "Serverul doar sugerează. Tu decizi, iar el nu află ce instalezi.",
+    "neverTitle": "Nu primește niciodată",
+    "thisServer": "acest server"
   },
   "toast": {
     "installed": "{{name}} a fost instalat",
@@ -80,5 +84,11 @@
   "checksTitle": "Verificările oficiale se aplică în continuare",
   "checksText": "Lista de revocare Mumcord îl poate dezactiva. Numele pluginurilor oficiale sunt rezervate.",
   "metaPermissions": "Permisiuni: {{count}}",
-  "footer": "Depozit oficial · lista semnată verificată · nu se trimite nimic despre tine"
+  "footer": "Depozit oficial · lista semnată verificată · nu se trimite nimic despre tine",
+  "factSource": "Sursă: {{url}}",
+  "factLicence": "Licență: {{license}}",
+  "factMinVersion": "Necesită Mumcord {{version}} sau mai nou",
+  "factSigned": "Semnat cu cheia {{key}}",
+  "factReviewed": "Verificat de mentenanți la {{date}}",
+  "factAdded": "Adăugat la {{date}}"
 }

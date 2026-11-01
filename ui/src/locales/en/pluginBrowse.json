@@ -55,7 +55,11 @@
     "visibilityHintEveryone": "Everyone: all users of this plugin can tell.",
     "visibilityHintFriends": "Friends: only your friends can tell.",
     "visibilityHintNobody": "Nobody: nothing is sent, others can't tell.",
-    "footnote": "Change later in Settings → Plugins."
+    "footnote": "Change later in Settings → Plugins.",
+    "suggestedTitle": "Suggested by {{server}}",
+    "suggestedText": "The server only suggests. You decide, and it isn't told what you install.",
+    "neverTitle": "It never gets",
+    "thisServer": "this server"
   },
   "toast": {
     "installed": "{{name}} installed",
@@ -80,5 +84,11 @@
   "checksTitle": "Official checks still apply",
   "checksText": "Mumcord's revocation list can turn it off. Names used by official plugins are reserved.",
   "metaPermissions": "Permissions: {{count}}",
-  "footer": "Official repository · signed index checked · nothing about you is sent"
+  "footer": "Official repository · signed index checked · nothing about you is sent",
+  "factSource": "Source: {{url}}",
+  "factLicence": "Licence: {{license}}",
+  "factMinVersion": "Needs Mumcord {{version}} or newer",
+  "factSigned": "Signed with key {{key}}",
+  "factReviewed": "Reviewed by maintainers on {{date}}",
+  "factAdded": "Added on {{date}}"
 }

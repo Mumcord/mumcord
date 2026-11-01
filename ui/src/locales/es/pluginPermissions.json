@@ -28,7 +28,27 @@
     "secrets": "Guardar un secreto (p. ej., una clave de API) en el llavero de tu sistema",
     "uiWebview": "Mostrar su propio contenido web en un marco aislado (sin internet)"
   },
-  "requiredReason": "Necesario para que el plugin funcione",
-  "optionalReason": "Opcional: se puede desactivar en cualquier momento",
+  "explanations": {
+    "uiPanel": "Un pequeño panel de este plugin aparece en la barra de plugins.",
+    "uiMemberBadge": "Un pequeño icono puede aparecer junto a los nombres en la lista de miembros.",
+    "uiProfileCard": "Puede añadir una sección a las tarjetas de perfil.",
+    "uiChatCard": "Puede mostrar sus propias tarjetas en el chat, por ejemplo una encuesta o un resultado de dados.",
+    "uiUserMenu": "Puede añadir una entrada al menú contextual de una persona.",
+    "uiDialog": "Puede abrir su propia ventana, por ejemplo para configurarse.",
+    "eventsSelf": "Ve si estás silenciado o ensordecido y en qué canal estás.",
+    "eventsVoice": "Ve cuándo la gente empieza y deja de hablar, nunca lo que se dice.",
+    "eventsPresence": "Ve quién entra o sale de tu canal.",
+    "eventsChatActivity": "Ve que alguien está escribiendo, nunca lo que escribe.",
+    "peersMessages": "Puede enviar pequeñas cantidades de datos a este plugin en los equipos de otras personas de tu canal.",
+    "notify": "Puede mostrar notificaciones. Se mantiene en silencio con No molestar.",
+    "randomBytes": "Puede pedir números aleatorios seguros, por ejemplo para dados.",
+    "commands": "Puede añadir comandos de chat que escribes tú, como /roll.",
+    "chatSend": "Puede publicar un mensaje de chat en tu nombre, solo tras un clic o un comando tuyo.",
+    "chatSupersedes": "Quien vea su tarjeta no ve además su línea de texto simple.",
+    "chatTriggers": "Lee los mensajes de chat que empiezan con sus palabras clave, como !poll, y ningún otro.",
+    "netHttp": "Puede hablar con un servidor que tú elijas, y solo con ese.",
+    "secrets": "Puede guardar un secreto, como una clave de API, en el llavero de tu sistema.",
+    "uiWebview": "Puede mostrar su propio contenido web en un marco aislado, sin acceso a internet."
+  },
   "listLabel": "Permisos"
 }

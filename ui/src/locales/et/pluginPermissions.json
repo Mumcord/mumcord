@@ -28,7 +28,27 @@
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
     "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)"
   },
-  "requiredReason": "Vajalik, et plugin töötaks",
-  "optionalReason": "Valikuline: saab igal ajal välja lülitada",
+  "explanations": {
+    "uiPanel": "Selle plugina väike paneel ilmub pluginate ribale.",
+    "uiMemberBadge": "Väike ikoon võib ilmuda nimede kõrvale liikmete loendis.",
+    "uiProfileCard": "See võib lisada jaotise profiilikaartidele.",
+    "uiChatCard": "See võib vestluses näidata oma kaarte, näiteks küsitlust või täringuvisket.",
+    "uiUserMenu": "See võib lisada kirje kasutaja paremklõpsu menüüsse.",
+    "uiDialog": "See võib avada oma akna, näiteks seadistamiseks.",
+    "eventsSelf": "See näeb, kas oled vaigistatud või kurdistatud ja mis kanalis oled.",
+    "eventsVoice": "See näeb, millal inimesed hakkavad rääkima ja lõpetavad, mitte kunagi mida nad ütlevad.",
+    "eventsPresence": "See näeb, kes sinu kanalisse tuleb või sealt lahkub.",
+    "eventsChatActivity": "See näeb, et keegi kirjutab, mitte kunagi mida.",
+    "peersMessages": "See võib saata väikeses koguses andmeid sellele pluginale teiste inimeste arvutites sinu kanalis.",
+    "notify": "See võib näidata teavitusi. Režiimis Ära sega on see vaikne.",
+    "randomBytes": "See võib küsida turvalisi juhuslikke numbreid, näiteks täringute jaoks.",
+    "commands": "See võib lisada vestluskäske, mida sa ise trükid, näiteks /roll.",
+    "chatSend": "See võib postitada vestlussõnumi sinu nimel, ainult pärast sinu klõpsu või käsku.",
+    "chatSupersedes": "Kes näeb selle kaarti, ei näe lisaks tavalist tekstirida.",
+    "chatTriggers": "See loeb vestlussõnumeid, mis algavad selle käivitussõnadega, näiteks !poll, ja ühtegi teist.",
+    "netHttp": "See võib suhelda ühe sinu valitud serveriga ja ainult sellega.",
+    "secrets": "See võib hoida saladust, näiteks API võtit, süsteemi võtmehoidjas.",
+    "uiWebview": "See võib näidata oma veebisisu suletud raamis ilma internetiühenduseta."
+  },
   "listLabel": "Õigused"
 }

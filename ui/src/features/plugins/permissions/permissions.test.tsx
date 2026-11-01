@@ -36,6 +36,15 @@ describe("permission catalogue", () => {
     const ids = Object.keys(PERMISSION_RISK) as PermissionId[];
     expect(Object.keys(en.texts).sort()).toEqual(ids.map(permissionTextKey).sort());
   });
+
+  it("has an English explanation for every id, equal to the Rust source text", () => {
+    const rustExplanations = [
+      ...rust.matchAll(
+        /\b(?:all|official)\(\s*"([^"]+)",\s*Risk::\w+,\s*"(?:[^"\\]|\\.)*",\s*"((?:[^"\\]|\\.)*)",?\s*\)/g,
+      ),
+    ].map((m) => [permissionTextKey(m[1] as PermissionId), m[2]]);
+    expect(Object.fromEntries(rustExplanations)).toEqual(en.explanations);
+  });
 });
 
 describe("PermissionList", () => {
