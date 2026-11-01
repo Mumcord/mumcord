@@ -18,6 +18,8 @@ import { VolumeControl } from "../media/VolumeControl";
 import { mediaView, setFit, setFocus, useMediaView, type FitMode } from "../media/mediaView";
 import { useMediaKeys } from "../media/useMediaKeys";
 import { useFullscreen } from "../media/useFullscreen";
+import { P2pLinkText } from "../p2p/P2pLinkText";
+import { useP2pLink } from "../p2p/useP2pLink";
 import { useFirstUse, ShortcutHint } from "../media/ShortcutHint";
 import { ScreenStage } from "./ScreenStage";
 import { useScreenShareOf } from "./sharesStore";
@@ -43,6 +45,7 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   const meter = useMemo(() => new StreamMeter(), []);
   const { fullscreen, toggle, exit } = useFullscreen(frameRef);
   const first = useFirstUse("screenShare");
+  const link = useP2pLink(serverId, session);
   const [stats, setStats] = useState<WatchStats | null>(null);
   const [details, setDetails] = useState(false);
   const [level, setLevel] = useState(100);
@@ -116,6 +119,11 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
               {what(t, share?.kind ?? null, share?.elapsedMs ?? 0, share?.sound ?? false)}
             </span>
           </span>
+          {link !== null && (
+            <span className="media-frame__sub">
+              <P2pLinkText link={link} />
+            </span>
+          )}
           <span className="media-frame__live">{t("live")}</span>
           <Chips t={t} shown={shown} path={stats?.path ?? null} sound={share?.sound ?? false} />
         </>
