@@ -1,0 +1,30 @@
+{
+  "required": "Krävs",
+  "optional": "Valfritt",
+  "risk": {
+    "green": "Låg risk",
+    "yellow": "Medelhög risk",
+    "red": "Hög risk"
+  },
+  "texts": {
+    "uiPanel": "Visa en panel i pluginraden",
+    "uiMemberBadge": "Visa en liten bricka bredvid användarnamn",
+    "uiProfileCard": "Lägga till ett avsnitt på profilkort",
+    "uiChatCard": "Visa kort i chatten",
+    "uiUserMenu": "Lägga till ett alternativ i en användares högerklicksmeny",
+    "uiDialog": "Öppna ett eget fönster",
+    "eventsSelf": "Känna till din egen status (avstängd, döv, kanal)",
+    "eventsVoice": "Veta vem som pratar",
+    "eventsPresence": "Veta vem som går in i och lämnar din kanal",
+    "eventsChatActivity": "Veta när någon skriver (inte vad)",
+    "peersMessages": "Utbyta data med detta plugin för andra i din kanal",
+    "notify": "Visa aviseringar",
+    "randomBytes": "Hämta säkra slumptal",
+    "commands": "Lägga till chattkommandon som /roll",
+    "chatSend": "Skicka ett chattmeddelande åt dig efter ett klick eller ett kommando",
+    "chatSupersedes": "Dölja sin egen textrad för dem som ser dess kort",
+    "netHttp": "Prata med en server som du väljer",
+    "secrets": "Spara en hemlighet (t.ex. en API-nyckel) i systemets nyckelring",
+    "uiWebview": "Visa eget webbinnehåll i en isolerad ram (utan internet)"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "required": "Påkrævet",
+  "optional": "Valgfri",
+  "risk": {
+    "green": "Lav risiko",
+    "yellow": "Middel risiko",
+    "red": "Høj risiko"
+  },
+  "texts": {
+    "uiPanel": "Vis et panel i plugin-bjælken",
+    "uiMemberBadge": "Vis et lille mærke ved brugernavne",
+    "uiProfileCard": "Tilføj en sektion til profilkort",
+    "uiChatCard": "Vis kort i chatten",
+    "uiUserMenu": "Tilføj et punkt til en brugers højreklikmenu",
+    "uiDialog": "Åbn sit eget vindue",
+    "eventsSelf": "Kende din egen status (slået fra, døv, kanal)",
+    "eventsVoice": "Vide, hvem der taler",
+    "eventsPresence": "Vide, hvem der kommer ind i og forlader din kanal",
+    "eventsChatActivity": "Vide, hvornår nogen skriver (ikke hvad)",
+    "peersMessages": "Udveksle data med dette plugin for andre i din kanal",
+    "notify": "Vis notifikationer",
+    "randomBytes": "Hente sikre tilfældige tal",
+    "commands": "Tilføje chatkommandoer som /roll",
+    "chatSend": "Sende en chatbesked for dig efter et klik eller en kommando",
+    "chatSupersedes": "Skjule sin egen tekstlinje for dem, der ser dets kort",
+    "netHttp": "Tale med en server, du vælger",
+    "secrets": "Gemme en hemmelighed (f.eks. en API-nøgle) i dit systems nøglering",
+    "uiWebview": "Vise eget webindhold i en lukket ramme (uden internet)"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "required": "Kohustuslik",
+  "optional": "Valikuline",
+  "risk": {
+    "green": "Madal risk",
+    "yellow": "Keskmine risk",
+    "red": "Kõrge risk"
+  },
+  "texts": {
+    "uiPanel": "Kuvada paneeli pluginate ribal",
+    "uiMemberBadge": "Kuvada väike märk kasutajanimede kõrval",
+    "uiProfileCard": "Lisada profiilikaartidele jaotis",
+    "uiChatCard": "Kuvada kaarte vestluses",
+    "uiUserMenu": "Lisada kasutaja paremklõpsumenüüsse kirje",
+    "uiDialog": "Avada oma aken",
+    "eventsSelf": "Teada sinu enda olekut (vaigistatud, kurdistatud, kanal)",
+    "eventsVoice": "Teada, kes räägib",
+    "eventsPresence": "Teada, kes sinu kanalisse tuleb ja sealt lahkub",
+    "eventsChatActivity": "Teada, millal keegi kirjutab (mitte mida)",
+    "peersMessages": "Vahetada selle pluginaga andmeid sinu kanali teiste inimeste jaoks",
+    "notify": "Kuvada teavitusi",
+    "randomBytes": "Saada turvalisi juhuslikke arve",
+    "commands": "Lisada vestluskäske nagu /roll",
+    "chatSend": "Postitada sinu eest vestlussõnum pärast klõpsu või käsku",
+    "chatSupersedes": "Peita oma tekstirida neile, kes näevad selle kaarti",
+    "netHttp": "Suhelda sinu valitud serveriga",
+    "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
+    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)"
+  }
+}

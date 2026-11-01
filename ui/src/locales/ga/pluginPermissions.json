@@ -1,0 +1,30 @@
+{
+  "required": "Riachtanach",
+  "optional": "Roghnach",
+  "risk": {
+    "green": "Priacal íseal",
+    "yellow": "Priacal measartha",
+    "red": "Priacal ard"
+  },
+  "texts": {
+    "uiPanel": "Painéal a thaispeáint i stiall na bhfreastalaithe breise",
+    "uiMemberBadge": "Suaitheantas beag a thaispeáint cois ainmneacha úsáideoirí",
+    "uiProfileCard": "Rannóg a chur le cártaí próifíle",
+    "uiChatCard": "Cártaí a thaispeáint sa chomhrá",
+    "uiUserMenu": "Iontráil a chur le roghchlár deaschliceáil úsáideora",
+    "uiDialog": "A fhuinneog féin a oscailt",
+    "eventsSelf": "Do stádas féin a bheith ar eolas (balbhaithe, bodhraithe, cainéal)",
+    "eventsVoice": "A bheith ar an eolas cé atá ag labhairt",
+    "eventsPresence": "A bheith ar an eolas cé a thagann isteach i do chainéal agus cé a fhágann é",
+    "eventsChatActivity": "A bheith ar an eolas nuair a scríobhann duine éigin (ní cad)",
+    "peersMessages": "Sonraí a mhalartú leis an breiseán seo do dhaoine eile i do chainéal",
+    "notify": "Fógraí a thaispeáint",
+    "randomBytes": "Uimhreacha randamacha slána a fháil",
+    "commands": "Orduithe comhrá ar nós /roll a chur leis",
+    "chatSend": "Teachtaireacht chomhrá a phostáil ar do shon tar éis cliceála nó ordaithe",
+    "chatSupersedes": "A líne téacs féin a cheilt orthu siúd a fheiceann a chárta",
+    "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
+    "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
+    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)"
+  }
+}

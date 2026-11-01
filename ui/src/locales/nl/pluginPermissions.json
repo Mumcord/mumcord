@@ -1,0 +1,30 @@
+{
+  "required": "Vereist",
+  "optional": "Optioneel",
+  "risk": {
+    "green": "Laag risico",
+    "yellow": "Gemiddeld risico",
+    "red": "Hoog risico"
+  },
+  "texts": {
+    "uiPanel": "Een paneel tonen in de pluginbalk",
+    "uiMemberBadge": "Een klein badge naast gebruikersnamen tonen",
+    "uiProfileCard": "Een sectie toevoegen aan profielkaarten",
+    "uiChatCard": "Kaarten in de chat tonen",
+    "uiUserMenu": "Een item toevoegen aan het rechtsklikmenu van een gebruiker",
+    "uiDialog": "Een eigen venster openen",
+    "eventsSelf": "Je eigen status kennen (gedempt, doof, kanaal)",
+    "eventsVoice": "Weten wie er praat",
+    "eventsPresence": "Weten wie je kanaal binnenkomt en verlaat",
+    "eventsChatActivity": "Weten wanneer iemand typt (niet wat)",
+    "peersMessages": "Gegevens uitwisselen met deze plugin voor andere mensen in je kanaal",
+    "notify": "Meldingen tonen",
+    "randomBytes": "Veilige willekeurige getallen ophalen",
+    "commands": "Chatopdrachten toevoegen zoals /roll",
+    "chatSend": "Een chatbericht voor je plaatsen na een klik of opdracht",
+    "chatSupersedes": "Zijn eigen tekstregel verbergen voor mensen die de kaart zien",
+    "netHttp": "Praten met een server die je kiest",
+    "secrets": "Een geheim (bijv. een API-sleutel) bewaren in de sleutelhanger van je systeem",
+    "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)"
+  }
+}

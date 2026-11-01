@@ -1,0 +1,30 @@
+{
+  "required": "Obligāti",
+  "optional": "Neobligāti",
+  "risk": {
+    "green": "Zems risks",
+    "yellow": "Vidējs risks",
+    "red": "Augsts risks"
+  },
+  "texts": {
+    "uiPanel": "Rādīt paneli spraudņu joslā",
+    "uiMemberBadge": "Rādīt nelielu nozīmīti blakus lietotājvārdiem",
+    "uiProfileCard": "Pievienot sadaļu profila kartītēm",
+    "uiChatCard": "Rādīt kartītes tērzēšanā",
+    "uiUserMenu": "Pievienot ierakstu lietotāja labā klikšķa izvēlnei",
+    "uiDialog": "Atvērt savu logu",
+    "eventsSelf": "Zināt jūsu pašu statusu (izslēgts mikrofons, izslēgta skaņa, kanāls)",
+    "eventsVoice": "Zināt, kas runā",
+    "eventsPresence": "Zināt, kas pievienojas jūsu kanālam un atstāj to",
+    "eventsChatActivity": "Zināt, kad kāds raksta (nevis ko)",
+    "peersMessages": "Apmainīties ar datiem ar šo spraudni citiem cilvēkiem jūsu kanālā",
+    "notify": "Rādīt paziņojumus",
+    "randomBytes": "Iegūt drošus nejaušus skaitļus",
+    "commands": "Pievienot tērzēšanas komandas, piemēram, /roll",
+    "chatSend": "Nosūtīt tērzēšanas ziņojumu jūsu vārdā pēc klikšķa vai komandas",
+    "chatSupersedes": "Paslēpt savu teksta rindu cilvēkiem, kas redz tā kartīti",
+    "netHttp": "Sazināties ar jūsu izvēlētu serveri",
+    "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
+    "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)"
+  }
+}

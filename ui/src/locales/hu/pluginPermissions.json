@@ -1,0 +1,30 @@
+{
+  "required": "Kötelező",
+  "optional": "Nem kötelező",
+  "risk": {
+    "green": "Alacsony kockázat",
+    "yellow": "Közepes kockázat",
+    "red": "Magas kockázat"
+  },
+  "texts": {
+    "uiPanel": "Panel megjelenítése a bővítménysávban",
+    "uiMemberBadge": "Kis jelvény megjelenítése a felhasználónevek mellett",
+    "uiProfileCard": "Szakasz hozzáadása a profilkártyákhoz",
+    "uiChatCard": "Kártyák megjelenítése a csevegésben",
+    "uiUserMenu": "Bejegyzés hozzáadása a felhasználó jobbkattintásos menüjéhez",
+    "uiDialog": "Saját ablak megnyitása",
+    "eventsSelf": "A saját állapotod ismerete (némítva, süketítve, csatorna)",
+    "eventsVoice": "Annak ismerete, ki beszél",
+    "eventsPresence": "Annak ismerete, ki lép be a csatornádra és ki lép ki onnan",
+    "eventsChatActivity": "Annak ismerete, mikor ír valaki (nem az, hogy mit)",
+    "peersMessages": "Adatok cseréje ezzel a bővítménnyel a csatornád többi tagjával",
+    "notify": "Értesítések megjelenítése",
+    "randomBytes": "Biztonságos véletlen számok lekérése",
+    "commands": "Csevegőparancsok hozzáadása, például /roll",
+    "chatSend": "Csevegőüzenet küldése a nevedben kattintás vagy parancs után",
+    "chatSupersedes": "Saját szövegsorának elrejtése azok elől, akik látják a kártyáját",
+    "netHttp": "Kommunikáció egy általad választott kiszolgálóval",
+    "secrets": "Titok (pl. API-kulcs) tárolása a rendszer kulcstartójában",
+    "uiWebview": "Saját webes tartalom megjelenítése elszigetelt keretben (internet nélkül)"
+  }
+}

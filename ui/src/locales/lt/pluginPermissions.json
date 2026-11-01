@@ -1,0 +1,30 @@
+{
+  "required": "Privaloma",
+  "optional": "Neprivaloma",
+  "risk": {
+    "green": "Maža rizika",
+    "yellow": "Vidutinė rizika",
+    "red": "Didelė rizika"
+  },
+  "texts": {
+    "uiPanel": "Rodyti skydelį įskiepių juostoje",
+    "uiMemberBadge": "Rodyti mažą ženkliuką šalia naudotojų vardų",
+    "uiProfileCard": "Pridėti skyrių prie profilio kortelių",
+    "uiChatCard": "Rodyti korteles pokalbyje",
+    "uiUserMenu": "Pridėti įrašą prie naudotojo dešiniojo pelės mygtuko meniu",
+    "uiDialog": "Atverti savo langą",
+    "eventsSelf": "Žinoti jūsų pačių būseną (nutildytas, apkurtintas, kanalas)",
+    "eventsVoice": "Žinoti, kas kalba",
+    "eventsPresence": "Žinoti, kas prisijungia prie jūsų kanalo ir jį palieka",
+    "eventsChatActivity": "Žinoti, kada kažkas rašo (bet ne ką)",
+    "peersMessages": "Keistis duomenimis su šiuo įskiepiu kitiems jūsų kanalo žmonėms",
+    "notify": "Rodyti pranešimus",
+    "randomBytes": "Gauti saugius atsitiktinius skaičius",
+    "commands": "Pridėti pokalbio komandas, pvz., /roll",
+    "chatSend": "Paskelbti pokalbio žinutę jūsų vardu po paspaudimo ar komandos",
+    "chatSupersedes": "Slėpti savo teksto eilutę tiems, kas mato jo kortelę",
+    "netHttp": "Bendrauti su jūsų pasirinktu serveriu",
+    "secrets": "Saugoti paslaptį (pvz., API raktą) jūsų sistemos raktų pakabuke",
+    "uiWebview": "Rodyti savo žiniatinklio turinį izoliuotame rėmelyje (be interneto)"
+  }
+}

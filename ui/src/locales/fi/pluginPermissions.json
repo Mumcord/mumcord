@@ -1,0 +1,30 @@
+{
+  "required": "Pakollinen",
+  "optional": "Valinnainen",
+  "risk": {
+    "green": "Pieni riski",
+    "yellow": "Kohtalainen riski",
+    "red": "Suuri riski"
+  },
+  "texts": {
+    "uiPanel": "Näyttää paneelin lisäosapalkissa",
+    "uiMemberBadge": "Näyttää pienen merkin käyttäjänimien vieressä",
+    "uiProfileCard": "Lisätä osion profiilikortteihin",
+    "uiChatCard": "Näyttää kortteja keskustelussa",
+    "uiUserMenu": "Lisätä kohdan käyttäjän oikean painikkeen valikkoon",
+    "uiDialog": "Avata oman ikkunan",
+    "eventsSelf": "Tietää oma tilasi (mykistys, kuurous, kanava)",
+    "eventsVoice": "Tietää, kuka puhuu",
+    "eventsPresence": "Tietää, kuka liittyy kanavallesi ja poistuu sieltä",
+    "eventsChatActivity": "Tietää, milloin joku kirjoittaa (ei mitä)",
+    "peersMessages": "Vaihtaa tietoja tämän lisäosan kanssa kanavasi muille ihmisille",
+    "notify": "Näyttää ilmoituksia",
+    "randomBytes": "Hakea turvallisia satunnaislukuja",
+    "commands": "Lisätä keskustelukomentoja kuten /roll",
+    "chatSend": "Lähettää keskusteluviestin puolestasi napsautuksen tai komennon jälkeen",
+    "chatSupersedes": "Piilottaa oma tekstirivinsä niiltä, jotka näkevät sen kortin",
+    "netHttp": "Keskustella valitsemasi palvelimen kanssa",
+    "secrets": "Säilyttää salaisuus (esim. API-avain) järjestelmäsi avainnipussa",
+    "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä (ei internetiä)"
+  }
+}

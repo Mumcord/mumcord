@@ -1,0 +1,30 @@
+{
+  "required": "Povinné",
+  "optional": "Voliteľné",
+  "risk": {
+    "green": "Nízke riziko",
+    "yellow": "Stredné riziko",
+    "red": "Vysoké riziko"
+  },
+  "texts": {
+    "uiPanel": "Zobraziť panel v lište pluginov",
+    "uiMemberBadge": "Zobraziť malý odznak vedľa mien používateľov",
+    "uiProfileCard": "Pridať sekciu do kariet profilu",
+    "uiChatCard": "Zobrazovať karty v chate",
+    "uiUserMenu": "Pridať položku do kontextovej ponuky používateľa",
+    "uiDialog": "Otvoriť vlastné okno",
+    "eventsSelf": "Poznať váš vlastný stav (stlmenie, ohluchnutie, kanál)",
+    "eventsVoice": "Vedieť, kto hovorí",
+    "eventsPresence": "Vedieť, kto vstupuje do vášho kanála a opúšťa ho",
+    "eventsChatActivity": "Vedieť, kedy niekto píše (nie čo)",
+    "peersMessages": "Vymieňať údaje s týmto pluginom pre ďalších ľudí vo vašom kanáli",
+    "notify": "Zobrazovať oznámenia",
+    "randomBytes": "Získavať bezpečné náhodné čísla",
+    "commands": "Pridať chatové príkazy ako /roll",
+    "chatSend": "Odoslať za vás správu v chate po kliknutí alebo príkaze",
+    "chatSupersedes": "Skryť vlastný textový riadok ľuďom, ktorí vidia jeho kartu",
+    "netHttp": "Komunikovať so serverom, ktorý si vyberiete",
+    "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
+    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)"
+  }
+}

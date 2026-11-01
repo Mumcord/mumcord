@@ -1,0 +1,30 @@
+{
+  "required": "Meħtieġ",
+  "optional": "Fakultattiv",
+  "risk": {
+    "green": "Riskju baxx",
+    "yellow": "Riskju medju",
+    "red": "Riskju għoli"
+  },
+  "texts": {
+    "uiPanel": "Uri pannell fil-linja tal-plugins",
+    "uiMemberBadge": "Uri badge żgħir ħdejn l-ismijiet tal-utenti",
+    "uiProfileCard": "Żid taqsima mal-karti tal-profil",
+    "uiChatCard": "Uri karti fiċ-chat",
+    "uiUserMenu": "Żid element fil-menu tal-klikk il-lemin ta' utent",
+    "uiDialog": "Iftaħ it-tieqa tiegħu stess",
+    "eventsSelf": "Kun taf l-istatus tiegħek stess (mutu, torox, kanal)",
+    "eventsVoice": "Kun taf min qed jitkellem",
+    "eventsPresence": "Kun taf min jidħol u joħroġ mill-kanal tiegħek",
+    "eventsChatActivity": "Kun taf meta xi ħadd jiktbu (mhux x'jiktbu)",
+    "peersMessages": "Skambja dejta ma' dan il-plugin għal persuni oħra fil-kanal tiegħek",
+    "notify": "Uri notifiki",
+    "randomBytes": "Ikseb numri każwali siguri",
+    "commands": "Żid kmandi taċ-chat bħal /roll",
+    "chatSend": "Ippubblika messaġġ taċ-chat f'ismek wara klikk jew kmand",
+    "chatSupersedes": "Aħbi r-riga tat-test tiegħu stess għal dawk li jaraw il-karta tiegħu",
+    "netHttp": "Kellem server li tagħżel int",
+    "secrets": "Żomm sigriet (eż. ċavetta API) fil-keychain tas-sistema tiegħek",
+    "uiWebview": "Uri l-kontenut tal-web tiegħu stess f'qafas issiġillat (mingħajr internet)"
+  }
+}

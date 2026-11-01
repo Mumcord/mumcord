@@ -1,0 +1,61 @@
+/* Permission list (FR-6.60). Risk colours come from theme tokens so every theme stays readable;
+   the symbol and the "High risk" text carry the meaning without colour. */
+.perm-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.perm-heading {
+  margin: 0 0 var(--space-1);
+  font-size: 0.875rem;
+}
+
+.perm-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.perm-row,
+.perm-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.perm-label {
+  cursor: pointer;
+}
+
+.perm-risk-green {
+  color: var(--color-success);
+}
+
+.perm-risk-yellow {
+  color: var(--color-warning);
+}
+
+.perm-risk-red {
+  color: var(--color-danger);
+}
+
+.perm-risk-badge {
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  padding: 0 var(--space-1);
+}
+
+.perm-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

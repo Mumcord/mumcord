@@ -1,0 +1,30 @@
+{
+  "required": "Obligatoriu",
+  "optional": "Opțional",
+  "risk": {
+    "green": "Risc scăzut",
+    "yellow": "Risc mediu",
+    "red": "Risc ridicat"
+  },
+  "texts": {
+    "uiPanel": "Afișează un panou în bara de pluginuri",
+    "uiMemberBadge": "Afișează o insignă mică lângă numele utilizatorilor",
+    "uiProfileCard": "Adaugă o secțiune la cardurile de profil",
+    "uiChatCard": "Afișează carduri în chat",
+    "uiUserMenu": "Adaugă o intrare în meniul clic-dreapta al unui utilizator",
+    "uiDialog": "Deschide propria fereastră",
+    "eventsSelf": "Cunoaște propria stare (mut, surd, canal)",
+    "eventsVoice": "Știe cine vorbește",
+    "eventsPresence": "Știe cine intră pe canalul tău și cine îl părăsește",
+    "eventsChatActivity": "Știe când scrie cineva (nu ce)",
+    "peersMessages": "Schimbă date cu acest plugin pentru alte persoane de pe canalul tău",
+    "notify": "Afișează notificări",
+    "randomBytes": "Obține numere aleatoare sigure",
+    "commands": "Adaugă comenzi de chat precum /roll",
+    "chatSend": "Postează un mesaj de chat în numele tău după un clic sau o comandă",
+    "chatSupersedes": "Ascunde propria linie de text pentru persoanele care îi văd cardul",
+    "netHttp": "Comunică cu un server ales de tine",
+    "secrets": "Păstrează un secret (de ex. o cheie API) în breasla de chei a sistemului",
+    "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)"
+  }
+}

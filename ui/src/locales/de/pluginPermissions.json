@@ -1,0 +1,30 @@
+{
+  "required": "Erforderlich",
+  "optional": "Optional",
+  "risk": {
+    "green": "Geringes Risiko",
+    "yellow": "Mittleres Risiko",
+    "red": "Hohes Risiko"
+  },
+  "texts": {
+    "uiPanel": "Ein Panel in der Plugin-Leiste anzeigen",
+    "uiMemberBadge": "Ein kleines Abzeichen neben Benutzernamen anzeigen",
+    "uiProfileCard": "Profilkarten um einen Abschnitt erweitern",
+    "uiChatCard": "Karten im Chat anzeigen",
+    "uiUserMenu": "Einen Eintrag im Rechtsklick-Menü eines Benutzers hinzufügen",
+    "uiDialog": "Ein eigenes Fenster öffnen",
+    "eventsSelf": "Deinen eigenen Status kennen (Stumm, Taub, Kanal)",
+    "eventsVoice": "Wissen, wer gerade spricht",
+    "eventsPresence": "Wissen, wer deinem Kanal beitritt oder ihn verlässt",
+    "eventsChatActivity": "Wissen, wann jemand schreibt (nicht was)",
+    "peersMessages": "Daten mit diesem Plugin bei anderen Personen in deinem Kanal austauschen",
+    "notify": "Benachrichtigungen anzeigen",
+    "randomBytes": "Sichere Zufallszahlen erzeugen",
+    "commands": "Chat-Befehle wie /roll hinzufügen",
+    "chatSend": "Nach deinem Klick oder Befehl eine Chatnachricht für dich senden",
+    "chatSupersedes": "Die eigene Textzeile für Personen ausblenden, die ihre Karte sehen",
+    "netHttp": "Mit einem Server deiner Wahl kommunizieren",
+    "secrets": "Ein Geheimnis (z. B. einen API-Schlüssel) im Schlüsselbund deines Systems speichern",
+    "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen (ohne Internet)"
+  }
+}

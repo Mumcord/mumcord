@@ -1,0 +1,30 @@
+{
+  "required": "Obavezno",
+  "optional": "Neobavezno",
+  "risk": {
+    "green": "Nizak rizik",
+    "yellow": "Srednji rizik",
+    "red": "Visok rizik"
+  },
+  "texts": {
+    "uiPanel": "Prikaži ploču u traci dodataka",
+    "uiMemberBadge": "Prikaži malu značku pored korisničkih imena",
+    "uiProfileCard": "Dodaj odjeljak u profilne kartice",
+    "uiChatCard": "Prikaži kartice u chatu",
+    "uiUserMenu": "Dodaj stavku u kontekstni izbornik korisnika",
+    "uiDialog": "Otvori vlastiti prozor",
+    "eventsSelf": "Znati vaš vlastiti status (utišan, gluh, kanal)",
+    "eventsVoice": "Znati tko govori",
+    "eventsPresence": "Znati tko ulazi u vaš kanal i izlazi iz njega",
+    "eventsChatActivity": "Znati kada netko piše (ne što)",
+    "peersMessages": "Razmjenjuj podatke s ovim dodatkom za druge osobe u vašem kanalu",
+    "notify": "Prikaži obavijesti",
+    "randomBytes": "Dohvati sigurne slučajne brojeve",
+    "commands": "Dodaj chat naredbe poput /roll",
+    "chatSend": "Objavi chat poruku umjesto vas nakon klika ili naredbe",
+    "chatSupersedes": "Sakrij vlastiti redak teksta osobama koje vide njegovu karticu",
+    "netHttp": "Komuniciraj s poslužiteljem koji odaberete",
+    "secrets": "Pohrani tajnu (npr. API ključ) u sistemski privjesak ključeva",
+    "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru (bez interneta)"
+  }
+}

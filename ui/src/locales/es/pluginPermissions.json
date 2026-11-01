@@ -1,0 +1,30 @@
+{
+  "required": "Obligatorio",
+  "optional": "Opcional",
+  "risk": {
+    "green": "Riesgo bajo",
+    "yellow": "Riesgo medio",
+    "red": "Riesgo alto"
+  },
+  "texts": {
+    "uiPanel": "Mostrar un panel en la barra de plugins",
+    "uiMemberBadge": "Mostrar una pequeña insignia junto a los nombres de usuario",
+    "uiProfileCard": "Añadir una sección a las tarjetas de perfil",
+    "uiChatCard": "Mostrar tarjetas en el chat",
+    "uiUserMenu": "Añadir una entrada al menú contextual de un usuario",
+    "uiDialog": "Abrir su propia ventana",
+    "eventsSelf": "Conocer tu propio estado (silenciado, ensordecido, canal)",
+    "eventsVoice": "Saber quién está hablando",
+    "eventsPresence": "Saber quién entra y sale de tu canal",
+    "eventsChatActivity": "Saber cuándo alguien escribe (no qué)",
+    "peersMessages": "Intercambiar datos con este plugin para otras personas de tu canal",
+    "notify": "Mostrar notificaciones",
+    "randomBytes": "Obtener números aleatorios seguros",
+    "commands": "Añadir comandos de chat como /roll",
+    "chatSend": "Publicar un mensaje de chat por ti tras un clic o un comando",
+    "chatSupersedes": "Ocultar su propia línea de texto a quienes ven su tarjeta",
+    "netHttp": "Comunicarse con un servidor que elijas",
+    "secrets": "Guardar un secreto (p. ej., una clave de API) en el llavero de tu sistema",
+    "uiWebview": "Mostrar su propio contenido web en un marco aislado (sin internet)"
+  }
+}
