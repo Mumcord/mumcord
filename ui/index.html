@@ -47,10 +47,6 @@
         --start-glow: rgb(106 64 224 / 18%);
         --start-bar: linear-gradient(90deg, #e8784a, #e0457f, #6a40e0);
       }
-      /* The helper windows (inspector, licences, pop-outs) load this page too but have no start. */
-      html[data-start-screen="off"] #start-screen {
-        display: none;
-      }
       #start-screen[data-leaving] {
         opacity: 0;
         pointer-events: none;
@@ -243,9 +239,16 @@
     <script>
       // The main window starts hidden (tauri.conf.json); show it once the start screen has
       // painted, so it never appears empty. The app shows it after a timeout anyway.
+      // Helper windows drop the start screen here: hiding it by the root attribute alone is not
+      // enough, because they later copy the main window's root attributes (applyRootLook) and
+      // that removes the attribute, which put the start screen over the whole window.
       (function () {
+        if (document.documentElement.dataset.startScreen === "off") {
+          document.getElementById("start-screen").remove();
+          return;
+        }
         var tauri = window.__TAURI_INTERNALS__;
-        if (!tauri || document.documentElement.dataset.startScreen === "off") return;
+        if (!tauri) return;
         requestAnimationFrame(function () {
           setTimeout(function () {
             tauri.invoke("app_start_painted").catch(function (error) {
