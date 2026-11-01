@@ -224,6 +224,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugins_set_all_off,
             commands::plugins::plugin_set_badge,
             commands::plugins::plugin_diagnostics,
+            commands::plugins::plugin_asset,
             commands::plugins::plugins_ui_trees,
             commands::plugins::plugins_set_appearance,
             commands::plugins::plugin_ui_action,

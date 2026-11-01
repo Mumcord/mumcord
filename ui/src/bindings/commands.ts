@@ -534,6 +534,7 @@ export const commands = {
 	/**  Which plugin's member badge is shown (`None`: no badge). */
 	pluginSetBadge: (id: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_badge", { id })),
 	pluginDiagnostics: (id: string) => typedError<PluginDiagnostics, ApiError>(__TAURI_INVOKE("plugin_diagnostics", { id })),
+	pluginAsset: (id: string, path: string) => typedError<PluginAsset, ApiError>(__TAURI_INVOKE("plugin_asset", { id, path })),
 	/**
 	 *  Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
 	 *  after the plugins started. Reload it after `plugins://changed` (stopped plugins lose
@@ -2302,6 +2303,16 @@ export type PluginActionValue = { type: "none" } | { type: "boolean"; value: boo
 export type PluginAlign = "start" | "center" | "end" | "stretch";
 
 export type PluginAnimation = "bob" | "hop" | "wave" | "nap" | "sparkle" | "shake" | "fade";
+
+/**
+ *  An image from a plugin's `assets/` folder for the UI renderer (SVG already sanitised at
+ *  install). The UI turns it into a blob URL; it never reads plugin files itself.
+ */
+export type PluginAsset = {
+	mimeType: string,
+	/**  The file's bytes, base64-encoded. */
+	base64: string,
+};
 
 export type PluginButtonKind = "primary" | "secondary" | "danger";
 

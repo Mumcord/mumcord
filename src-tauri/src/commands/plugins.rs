@@ -620,6 +620,56 @@ pub fn plugins_ui_trees(app: AppHandle) -> ApiResult<Vec<PluginUi>> {
     Ok(plugins_of(&app)?.trees().snapshot())
 }
 
+/// An image from a plugin's `assets/` folder for the UI renderer (SVG already sanitised at
+/// install). The UI turns it into a blob URL; it never reads plugin files itself.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginAsset {
+    pub mime_type: String,
+    /// The file's bytes, base64-encoded.
+    pub base64: String,
+}
+
+/// The media type of an asset the package format allows (FR-6.42).
+fn asset_mime(path: &str) -> Option<&'static str> {
+    let (_, ext) = path.rsplit_once('.')?;
+    match ext.to_ascii_lowercase().as_str() {
+        "svg" => Some("image/svg+xml"),
+        "png" => Some("image/png"),
+        "webp" => Some("image/webp"),
+        _ => None,
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_asset(app: AppHandle, id: String, path: String) -> ApiResult<PluginAsset> {
+    use base64::Engine as _;
+    let mime = asset_mime(&path)
+        .filter(|_| mumcord_plugins::api::ui::is_asset_path(&path))
+        .ok_or_else(|| invalid("not an image inside assets/"))?;
+    let dir = plugins_of(&app)?
+        .call(move |service| Ok(service.dir(&id).map(PathBuf::from)))
+        .await?
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin is not running"))?;
+    let not_found = |_| ApiError::new(ErrorCode::NotFound, "no such asset");
+    let assets = tokio::fs::canonicalize(dir.join("assets"))
+        .await
+        .map_err(not_found)?;
+    let file = tokio::fs::canonicalize(dir.join(&path))
+        .await
+        .map_err(not_found)?;
+    // A link must not lead out of the package's assets.
+    if !file.starts_with(&assets) {
+        return Err(invalid("not an image inside assets/"));
+    }
+    let bytes = tokio::fs::read(&file).await.map_err(not_found)?;
+    Ok(PluginAsset {
+        mime_type: mime.to_owned(),
+        base64: base64::engine::general_purpose::STANDARD.encode(bytes),
+    })
+}
+
 /// The resolved app language and theme for plugins (the UI knows the system values).
 #[tauri::command]
 #[specta::specta]
@@ -773,6 +823,15 @@ fn registry_error(error: mumcord_plugins::registry::RegistryError) -> ApiError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn assets_are_only_images() {
+        assert_eq!(asset_mime("assets/egg.SVG"), Some("image/svg+xml"));
+        assert_eq!(asset_mime("assets/pet.png"), Some("image/png"));
+        assert_eq!(asset_mime("assets/pet.webp"), Some("image/webp"));
+        assert_eq!(asset_mime("assets/notes.txt"), None);
+        assert_eq!(asset_mime("assets/noext"), None);
+    }
 
     #[test]
     fn action_values_map_to_wit() {
