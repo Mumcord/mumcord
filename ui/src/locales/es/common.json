@@ -59,6 +59,15 @@
     "host": "Anfitrión",
     "fullscreen": "Pantalla completa",
     "exitFullscreen": "Salir de pantalla completa",
-    "none": "Nadie"
+    "none": "Nadie",
+    "popOut": "Abrir en ventana aparte",
+    "popIn": "Volver a la ventana principal",
+    "onTop": "Siempre visible",
+    "poppedOut": "Reproduciendo en una ventana aparte",
+    "bringBack": "Traer de vuelta",
+    "popOutFailed": "No se pudo abrir la ventana aparte",
+    "popInFailed": "No se pudo traer de vuelta la vista",
+    "onTopFailed": "No se pudo cambiar «Siempre visible»",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

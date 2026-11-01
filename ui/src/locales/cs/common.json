@@ -59,6 +59,15 @@
     "host": "Hostitel",
     "fullscreen": "Celá obrazovka",
     "exitFullscreen": "Opustit celou obrazovku",
-    "none": "Nikdo"
+    "none": "Nikdo",
+    "popOut": "Otevřít v samostatném okně",
+    "popIn": "Vrátit do hlavního okna",
+    "onTop": "Vždy navrchu",
+    "poppedOut": "Přehrává se v samostatném okně",
+    "bringBack": "Vrátit zpět",
+    "popOutFailed": "Samostatné okno se nepodařilo otevřít",
+    "popInFailed": "Zobrazení se nepodařilo vrátit",
+    "onTopFailed": "Nastavení „Vždy navrchu“ se nepodařilo změnit",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

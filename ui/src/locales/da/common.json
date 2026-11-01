@@ -59,6 +59,15 @@
     "host": "Vært",
     "fullscreen": "Fuld skærm",
     "exitFullscreen": "Forlad fuld skærm",
-    "none": "Ingen"
+    "none": "Ingen",
+    "popOut": "Åbn i separat vindue",
+    "popIn": "Flyt tilbage til hovedvinduet",
+    "onTop": "Altid øverst",
+    "poppedOut": "Afspilles i separat vindue",
+    "bringBack": "Hent tilbage",
+    "popOutFailed": "Det separate vindue kunne ikke åbnes",
+    "popInFailed": "Visningen kunne ikke hentes tilbage",
+    "onTopFailed": "Altid øverst kunne ikke ændres",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

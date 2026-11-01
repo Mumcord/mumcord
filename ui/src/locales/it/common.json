@@ -59,6 +59,15 @@
     "host": "Host",
     "fullscreen": "Schermo intero",
     "exitFullscreen": "Esci dallo schermo intero",
-    "none": "Nessuno"
+    "none": "Nessuno",
+    "popOut": "Apri in una finestra separata",
+    "popIn": "Riporta nella finestra principale",
+    "onTop": "Sempre in primo piano",
+    "poppedOut": "In riproduzione in una finestra separata",
+    "bringBack": "Riporta qui",
+    "popOutFailed": "Impossibile aprire la finestra separata",
+    "popInFailed": "Impossibile riportare la vista",
+    "onTopFailed": "Impossibile modificare «Sempre in primo piano»",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

@@ -59,6 +59,15 @@
     "host": "Gazdă",
     "fullscreen": "Ecran complet",
     "exitFullscreen": "Ieși din ecran complet",
-    "none": "Nimeni"
+    "none": "Nimeni",
+    "popOut": "Deschide într-o fereastră separată",
+    "popIn": "Readu în fereastra principală",
+    "onTop": "Mereu deasupra",
+    "poppedOut": "Se redă într-o fereastră separată",
+    "bringBack": "Readu înapoi",
+    "popOutFailed": "Fereastra separată nu a putut fi deschisă",
+    "popInFailed": "Vizualizarea nu a putut fi readusă",
+    "onTopFailed": "Opțiunea „Mereu deasupra” nu a putut fi schimbată",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

@@ -59,6 +59,15 @@
     "host": "Domaćin",
     "fullscreen": "Cijeli ekran",
     "exitFullscreen": "Napusti cijeli ekran",
-    "none": "Nitko"
+    "none": "Nitko",
+    "popOut": "Otvori u zasebnom prozoru",
+    "popIn": "Vrati u glavni prozor",
+    "onTop": "Uvijek na vrhu",
+    "poppedOut": "Reproducira se u zasebnom prozoru",
+    "bringBack": "Vrati",
+    "popOutFailed": "Zasebni prozor nije se mogao otvoriti",
+    "popInFailed": "Prikaz se nije mogao vratiti",
+    "onTopFailed": "Postavka „Uvijek na vrhu” nije se mogla promijeniti",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

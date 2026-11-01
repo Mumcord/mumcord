@@ -59,6 +59,15 @@
     "host": "Värd",
     "fullscreen": "Helskärm",
     "exitFullscreen": "Lämna helskärm",
-    "none": "Ingen"
+    "none": "Ingen",
+    "popOut": "Öppna i separat fönster",
+    "popIn": "Flytta tillbaka till huvudfönstret",
+    "onTop": "Alltid överst",
+    "poppedOut": "Spelas i ett separat fönster",
+    "bringBack": "Hämta tillbaka",
+    "popOutFailed": "Det separata fönstret kunde inte öppnas",
+    "popInFailed": "Vyn kunde inte hämtas tillbaka",
+    "onTopFailed": "Alltid överst kunde inte ändras",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

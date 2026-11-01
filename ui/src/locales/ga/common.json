@@ -59,6 +59,15 @@
     "host": "Óstach",
     "fullscreen": "Full screen",
     "exitFullscreen": "Fág an scéalán iomlán",
-    "none": "Aon duine"
+    "none": "Aon duine",
+    "popOut": "Oscail i bhfuinneog ar leith",
+    "popIn": "Ar ais sa phríomhfhuinneog",
+    "onTop": "I gcónaí ar barr",
+    "poppedOut": "Á sheinm i bhfuinneog ar leith",
+    "bringBack": "Tabhair ar ais",
+    "popOutFailed": "Níorbh fhéidir an fhuinneog ar leith a oscailt",
+    "popInFailed": "Níorbh fhéidir an t-amharc a thabhairt ar ais",
+    "onTopFailed": "Níorbh fhéidir “I gcónaí ar barr” a athrú",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

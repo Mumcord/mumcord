@@ -19,6 +19,8 @@ const PATHS = {
   mini: "M2 3.5h12v9H2zM8.5 8h4v3h-4z",
   open: "M9.5 2.5h4v4M13.5 2.5L8 8M7 3.5H3.5v9h9V9",
   leave: "M6.5 2.5h-3v11h3M10 5l3 3-3 3M13 8H6.5",
+  popIn: "M13.5 2.5L8 8M8 4.5V8h3.5M7 3.5H3.5v9h9V9",
+  pin: "M6 2.5h4M7 2.5v4L4.5 9h7L9 6.5v-4M8 9v4.5",
 } as const;
 
 export type MediaIconName = keyof typeof PATHS;

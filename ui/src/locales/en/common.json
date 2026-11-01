@@ -59,6 +59,15 @@
     "host": "Host",
     "fullscreen": "Full screen",
     "exitFullscreen": "Leave full screen",
-    "none": "Nobody"
+    "none": "Nobody",
+    "popOut": "Pop out",
+    "popIn": "Pop back in",
+    "onTop": "Always on top",
+    "poppedOut": "Playing in separate window",
+    "bringBack": "Bring back",
+    "popOutFailed": "Couldn't open the separate window",
+    "popInFailed": "Couldn't bring the view back",
+    "onTopFailed": "Couldn't change always on top",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

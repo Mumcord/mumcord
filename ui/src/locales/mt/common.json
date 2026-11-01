@@ -59,6 +59,15 @@
     "host": "Ospitant",
     "fullscreen": "Scherm sħiħ",
     "exitFullscreen": "ħarog mill-iskjer sħiħ",
-    "none": "Ħadd"
+    "none": "Ħadd",
+    "popOut": "Iftaħ f’tieqa separata",
+    "popIn": "Ġib lura fit-tieqa ewlenija",
+    "onTop": "Dejjem fuq",
+    "poppedOut": "Qed jindaqq f’tieqa separata",
+    "bringBack": "Ġib lura",
+    "popOutFailed": "Ma setgħetx tinfetaħ it-tieqa separata",
+    "popInFailed": "Ma setax jinġieb lura l-wiri",
+    "onTopFailed": "Ma setax jinbidel “Dejjem fuq”",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

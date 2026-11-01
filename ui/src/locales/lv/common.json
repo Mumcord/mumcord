@@ -59,6 +59,15 @@
     "host": "Saimnieks",
     "fullscreen": "Pilns ekrāns",
     "exitFullscreen": "Iziet no pilna ekrāna",
-    "none": "Neviens"
+    "none": "Neviens",
+    "popOut": "Atvērt atsevišķā logā",
+    "popIn": "Atgriezt galvenajā logā",
+    "onTop": "Vienmēr virspusē",
+    "poppedOut": "Atskaņo atsevišķā logā",
+    "bringBack": "Atgriezt",
+    "popOutFailed": "Neizdevās atvērt atsevišķo logu",
+    "popInFailed": "Neizdevās atgriezt skatu",
+    "onTopFailed": "Neizdevās mainīt iestatījumu “Vienmēr virspusē”",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

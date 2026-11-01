@@ -59,6 +59,15 @@
     "host": "Host",
     "fullscreen": "Täisekraan",
     "exitFullscreen": "Välju täisekraanilt",
-    "none": "Keegi"
+    "none": "Keegi",
+    "popOut": "Ava eraldi aknas",
+    "popIn": "Too tagasi põhiaknasse",
+    "onTop": "Alati peal",
+    "poppedOut": "Esitatakse eraldi aknas",
+    "bringBack": "Too tagasi",
+    "popOutFailed": "Eraldi akent ei õnnestunud avada",
+    "popInFailed": "Vaadet ei õnnestunud tagasi tuua",
+    "onTopFailed": "Valikut „Alati peal“ ei õnnestunud muuta",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }
