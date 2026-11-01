@@ -21,6 +21,7 @@ import {
   cardsAfter,
   channelOfListKey,
   leadingCards,
+  reanchorChannelCards,
   replayChannel,
   usePluginChat,
   viaPlugin,
@@ -240,7 +241,15 @@ export function Original({ label, children }: { label?: ReactNode; children: Rea
  * channel's history is loaded, and again whenever the plugins change, the plugins see its stored
  * messages again so old messages get their cards too.
  */
-export function LeadingPluginCards({ listKey, loaded }: { listKey: string; loaded: boolean }) {
+export function LeadingPluginCards({
+  listKey,
+  loaded,
+  messages = [],
+}: {
+  listKey: string;
+  loaded: boolean;
+  messages?: readonly ChatMessage[];
+}) {
   const chat = usePluginChat();
   const channel = channelOfListKey(listKey);
   const serverId = channel?.serverId;
@@ -250,6 +259,11 @@ export function LeadingPluginCards({ listKey, loaded }: { listKey: string; loade
       replayChannel(serverId, channelId);
     }
   }, [loaded, serverId, channelId, chat.names]);
+  useEffect(() => {
+    if (serverId !== undefined && channelId !== undefined && messages.length > 0) {
+      reanchorChannelCards(serverId, channelId, messages);
+    }
+  }, [serverId, channelId, messages]);
   if (channel === null) return null;
   const cards = leadingCards(chat, channel.serverId, channel.channelId);
   if (cards.length === 0) return null;

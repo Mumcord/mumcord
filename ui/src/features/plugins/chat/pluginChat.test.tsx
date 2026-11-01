@@ -13,6 +13,7 @@ import {
   applyUi,
   cardKey,
   cardsAfter,
+  leadingCards,
   channelOfListKey,
   commandOf,
   matchCommands,
@@ -20,6 +21,7 @@ import {
   viaPlugin,
   type PlacedCard,
   type PluginChatState,
+  reanchorLeadingCards,
 } from "./pluginChatStore";
 import { reportMention } from "./pluginMentions";
 
@@ -85,9 +87,27 @@ const placed = (plugin: string, card: string, after: string | null): PlacedCard 
   serverId: 1,
   channelId: 1,
   after,
+  at: Date.parse("2026-11-01T10:00:00Z"),
 });
 
 describe("plugin chat store", () => {
+  it("moves a card that appeared before the history loaded behind the message it followed", () => {
+    const at = (iso: string, id: string): ChatMessage => ({ ...message(id, "x"), sentAt: iso });
+    const state = {
+      ...EMPTY,
+      placed: new Map([[cardKey("dice", "c1"), placed("dice", "c1", null)]]),
+    };
+    const history = [
+      at("2026-10-31T09:00:00Z", "old"),
+      at("2026-11-01T09:59:59Z", "mine"),
+      at("2026-11-01T10:30:00Z", "later"),
+    ];
+    const next = reanchorLeadingCards(state, 1, 1, history);
+    expect(leadingCards(next, 1, 1)).toEqual([]);
+    expect(cardsAfter(next, history[1] as ChatMessage)).toHaveLength(1);
+    expect(reanchorLeadingCards(state, 1, 1, [history[2] as ChatMessage])).toBe(state);
+  });
+
   it("places a new chat card once, where the user is when it appears", () => {
     const place = vi.fn((plugin: string, card: string) => placed(plugin, card, "m1"));
     let state = applyUi(EMPTY, cardUi("poll", "p1", "Lunch?"), place);

@@ -909,7 +909,7 @@ export function MessageList({
               {t("list.loadFailed")}
             </p>
           ) : null}
-          <LeadingPluginCards listKey={listKey} loaded={log.loaded} />
+          <LeadingPluginCards listKey={listKey} loaded={log.loaded} messages={messages} />
           {messages.length === 0 ? (
             log.loaded ? (
               <p className="chat-list__empty">{t("empty")}</p>

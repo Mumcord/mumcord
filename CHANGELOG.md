@@ -34,6 +34,7 @@
 
 ### Fixed
 
+- A plugin card for your own fresh message (for example the dice card after /roll) now shows at the bottom next to that message instead of above the older messages
 - Screen readers now read a chat line a plugin replaced as its card (e.g. "Card from Poll: Lunch at noon?") and no longer read lines a plugin hid.
 - Plugin cards in the chat no longer get their own scrollbar: a taller card is cut off with a soft fade and **Show more** expands it.
 - Pasting with Ctrl+V works again on some Linux desktops
