@@ -102,9 +102,19 @@ export function PluginStrip() {
 
   const popover = activeId !== undefined && expanded;
   const closeRef = useRef<HTMLButtonElement>(null);
+  const restoreFocusRef = useRef(false);
   useEffect(() => {
-    if (popover) closeRef.current?.focus();
-  }, [popover]);
+    if (popover) {
+      closeRef.current?.focus();
+      return;
+    }
+    if (!restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    // The inline panel is not rendered while the sheet is open, so its expand button is new
+    // after closing; the collapsed strip has no inline panel and goes back to the icon.
+    const target = collapsed ? iconRefs.current.get(activeId ?? "") : expandRef.current;
+    target?.focus();
+  }, [popover, collapsed, activeId]);
 
   if (withPanel.length === 0 || active === undefined) return null;
 
@@ -116,10 +126,8 @@ export function PluginStrip() {
   }
 
   function closePopover() {
+    restoreFocusRef.current = true;
     setExpanded(false);
-    // The inline panel (and its expand button) is hidden while collapsed; go back to the icon.
-    const target = collapsed ? iconRefs.current.get(activeId ?? "") : expandRef.current;
-    target?.focus();
   }
 
   function onIconKeys(event: KeyboardEvent, index: number) {
@@ -209,7 +217,7 @@ export function PluginStrip() {
         </div>
       </div>
       <div id={panelId} hidden={collapsed}>
-        {inline && (
+        {inline && !expanded && (
           <div className="pstrip-panel" data-shared={sharedSupported ? "on" : "off"}>
             <div className="pstrip-panel-tools">
               <button
@@ -219,7 +227,7 @@ export function PluginStrip() {
                 aria-label={t("expand", { name: active.name })}
                 data-tooltip={t("expand", { name: active.name })}
                 aria-haspopup="dialog"
-                aria-expanded={expanded}
+                aria-expanded={false}
                 onClick={() => {
                   setExpanded(true);
                 }}
@@ -228,7 +236,7 @@ export function PluginStrip() {
               </button>
             </div>
             {!sharedSupported && <p className="pstrip-hint">{t("unsupported")}</p>}
-            {!expanded && <div className="pstrip-body">{body}</div>}
+            <div className="pstrip-body">{body}</div>
           </div>
         )}
       </div>

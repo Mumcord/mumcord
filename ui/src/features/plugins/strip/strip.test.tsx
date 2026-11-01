@@ -116,7 +116,17 @@ describe("PluginStrip", () => {
     expect(dialog).toBeInTheDocument();
     fireEvent.keyDown(dialog, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(expand).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Expand Pets" })).toHaveFocus();
+  });
+
+  it("hides the inline area completely while the sheet is open and restores it after", async () => {
+    setup([plugin("pets", "Pets")], ["pets"]);
+    const { container } = render(<PluginStrip />);
+    fireEvent.click(await screen.findByRole("button", { name: "Expand Pets" }));
+    expect(container.querySelector(".pstrip-panel")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Expand Pets" })).toBeNull();
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Pets" }), { key: "Escape" });
+    expect(container.querySelector(".pstrip-panel")).not.toBeNull();
   });
 
   it("opens and closes the popover when the plugin asks", async () => {
