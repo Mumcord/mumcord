@@ -143,7 +143,7 @@ Version entry:
 | `version`     | semver       | yes      | Must equal the manifest version.                                                                                |
 | `api`         | int          | yes      | Plugin API major version (`1`).                                                                                 |
 | `url`         | URL          | yes      | Package download; author signature at `url` + `.minisig`.                                                       |
-| `size`        | int          | yes      | Exact package size in bytes, 1 … 5 MiB (official index: 64 MiB).                                                                   |
+| `size`        | int          | yes      | Exact package size in bytes, 1 … 5 MiB (official index: 64 MiB).                                                |
 | `sha256`      | hex          | yes      | Lower-case hex SHA-256 of the package (64 digits).                                                              |
 | `permissions` | array of ids | yes      | Every permission, required or optional, the reviewed version may request. A package asking for more is refused. |
 
