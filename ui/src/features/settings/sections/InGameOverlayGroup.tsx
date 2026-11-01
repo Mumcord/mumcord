@@ -136,16 +136,19 @@ function OpenGlLaunchOption({ option }: { option: string }) {
         <strong>{t("overlay.inGame.opengl.title")}</strong>
       </p>
       <p className="settings-hint">{t("overlay.inGame.opengl.explanation")}</p>
-      <input
-        className="settings-input"
-        type="text"
-        readOnly
-        aria-label={t("overlay.inGame.opengl.label")}
-        value={option}
-        onFocus={(e) => {
-          e.currentTarget.select();
-        }}
-      />
+      <div className="settings-control-row">
+        <label htmlFor={`${id}-option`}>{t("overlay.inGame.opengl.label")}</label>
+        <input
+          id={`${id}-option`}
+          className="settings-input"
+          type="text"
+          readOnly
+          value={option}
+          onFocus={(e) => {
+            e.currentTarget.select();
+          }}
+        />
+      </div>
       <div className="settings-actions">
         <button type="button" className="settings-button" onClick={copyOption}>
           {t("overlay.inGame.opengl.copy")}
