@@ -56,6 +56,34 @@ export const ENDONYMS: Record<Language, string> = {
   sv: "Svenska",
 };
 
+/** Each language's English name, so the picker also finds "German" for Deutsch. */
+export const ENGLISH_NAMES: Record<Language, string> = {
+  bg: "Bulgarian",
+  cs: "Czech",
+  da: "Danish",
+  de: "German",
+  el: "Greek",
+  en: "English",
+  es: "Spanish",
+  et: "Estonian",
+  fi: "Finnish",
+  fr: "French",
+  ga: "Irish",
+  hr: "Croatian",
+  hu: "Hungarian",
+  it: "Italian",
+  lt: "Lithuanian",
+  lv: "Latvian",
+  mt: "Maltese",
+  nl: "Dutch",
+  pl: "Polish",
+  pt: "Portuguese",
+  ro: "Romanian",
+  sk: "Slovak",
+  sl: "Slovenian",
+  sv: "Swedish",
+};
+
 export type TranslationTree = { [key: string]: string | TranslationTree };
 export type Bundles = Record<string, TranslationTree>;
 

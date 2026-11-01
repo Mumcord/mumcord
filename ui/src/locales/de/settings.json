@@ -401,7 +401,9 @@
   "language": {
     "title": "Sprache",
     "legend": "Sprache der Oberfläche",
-    "system": "Wie das System"
+    "system": "Wie das System",
+    "search": "Sprache suchen",
+    "noMatch": "Keine passende Sprache"
   },
   "sounds": {
     "title": "Töne",

@@ -407,7 +407,9 @@
   "language": {
     "title": "Kalba",
     "legend": "Rodymo kalba",
-    "system": "Pagal sistemą"
+    "system": "Pagal sistemą",
+    "search": "Ieškoti kalbos",
+    "noMatch": "Atitinkančios kalbos nėra"
   },
   "sounds": {
     "title": "Garsai",

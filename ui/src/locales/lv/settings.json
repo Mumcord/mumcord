@@ -404,7 +404,9 @@
   "language": {
     "title": "Valoda",
     "legend": "Attēlošanas valoda",
-    "system": "Sekot sistēmai"
+    "system": "Sekot sistēmai",
+    "search": "Meklēt valodu",
+    "noMatch": "Nav atbilstošas valodas"
   },
   "sounds": {
     "title": "Skaņas",

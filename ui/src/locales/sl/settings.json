@@ -407,7 +407,9 @@
   "language": {
     "title": "Jezik",
     "legend": "Jezik prikaza",
-    "system": "Sledi sistemu"
+    "system": "Sledi sistemu",
+    "search": "Iskanje jezika",
+    "noMatch": "Noben jezik se ne ujema"
   },
   "sounds": {
     "title": "Zvoki",

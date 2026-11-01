@@ -407,7 +407,9 @@
   "language": {
     "title": "Język",
     "legend": "Język interfejsu",
-    "system": "Zgodnie z systemem"
+    "system": "Zgodnie z systemem",
+    "search": "Szukaj języka",
+    "noMatch": "Brak pasującego języka"
   },
   "sounds": {
     "title": "Dźwięki",

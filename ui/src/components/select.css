@@ -74,3 +74,55 @@
 .select__option--active[aria-selected="true"] {
   background: var(--color-bg-hover);
 }
+
+/* Searchable variant: the field looks like the dropdown button but holds a text input. */
+.select__field {
+  padding: 0;
+  cursor: text;
+}
+
+.select__field:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.select__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.select__input:focus {
+  outline: none;
+}
+
+.select__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.select__toggle {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.select__status:not(:empty) {
+  position: absolute;
+  z-index: 20;
+  inset-inline: 0;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+}

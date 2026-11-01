@@ -404,7 +404,9 @@
   "language": {
     "title": "Limbă",
     "legend": "Limba de afișare",
-    "system": "Urmează sistemul"
+    "system": "Urmează sistemul",
+    "search": "Caută o limbă",
+    "noMatch": "Nicio limbă nu corespunde"
   },
   "sounds": {
     "title": "Sunete",

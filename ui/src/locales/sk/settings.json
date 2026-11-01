@@ -407,7 +407,9 @@
   "language": {
     "title": "Jazyk",
     "legend": "Jazyk zobrazenia",
-    "system": "Podľa systému"
+    "system": "Podľa systému",
+    "search": "Hľadať jazyk",
+    "noMatch": "Žiadny jazyk nezodpovedá"
   },
   "sounds": {
     "title": "Zvuky",

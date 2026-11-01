@@ -410,7 +410,9 @@
   "language": {
     "title": "Teanga",
     "legend": "Teanga taispeána",
-    "system": "Lean an córas"
+    "system": "Lean an córas",
+    "search": "Cuardaigh teanga",
+    "noMatch": "Níl aon teanga ag teacht leis"
   },
   "sounds": {
     "title": "Fuaimeanna",

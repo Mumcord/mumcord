@@ -401,7 +401,9 @@
   "language": {
     "title": "Sprog",
     "legend": "Visningssprog",
-    "system": "Følg systemet"
+    "system": "Følg systemet",
+    "search": "Søg efter sprog",
+    "noMatch": "Intet sprog matcher"
   },
   "sounds": {
     "title": "Lyde",

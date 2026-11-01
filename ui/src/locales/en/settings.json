@@ -401,7 +401,9 @@
   "language": {
     "title": "Language",
     "legend": "Display language",
-    "system": "Follow system"
+    "system": "Follow system",
+    "search": "Search languages",
+    "noMatch": "No matching language"
   },
   "sounds": {
     "title": "Sounds",

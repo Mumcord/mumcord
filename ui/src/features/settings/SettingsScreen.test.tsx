@@ -254,14 +254,14 @@ describe("SettingsScreen", () => {
   it("rolls a failed save back and explains it", async () => {
     await openSection("General");
     api.mock.failNext("settingsUpdate", "io");
-    fireEvent.click(screen.getByRole("radio", { name: "Deutsch" }));
+    chooseOption(screen.getByRole("combobox", { name: "Display language" }), "Deutsch");
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The last change could not be saved",
     );
-    expect(screen.getByRole("radio", { name: "Follow system" })).toBeChecked();
+    expect(screen.getByRole("combobox", { name: "Display language" })).toHaveValue("Follow system");
     expect(applySettings).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole("radio", { name: "Español" }));
+    chooseOption(screen.getByRole("combobox", { name: "Display language" }), "Español");
     await waitFor(() => {
       expect(applySettings).toHaveBeenCalledWith(expect.objectContaining({ language: "es" }));
     });
@@ -272,7 +272,7 @@ describe("SettingsScreen", () => {
     await api.settingsUpdate({ ...(await api.settingsGet()), language: "de" });
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("General");
-    fireEvent.click(screen.getByRole("radio", { name: "Follow system" }));
+    chooseOption(screen.getByRole("combobox", { name: "Display language" }), "Follow system");
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith(expect.objectContaining({ language: null }));
     });

@@ -404,7 +404,9 @@
   "language": {
     "title": "Langue",
     "legend": "Langue d’affichage",
-    "system": "Suivre le système"
+    "system": "Suivre le système",
+    "search": "Rechercher une langue",
+    "noMatch": "Aucune langue correspondante"
   },
   "sounds": {
     "title": "Sons",

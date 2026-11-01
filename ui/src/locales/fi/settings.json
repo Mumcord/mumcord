@@ -401,7 +401,9 @@
   "language": {
     "title": "Kieli",
     "legend": "Näyttökieli",
-    "system": "Seuraa järjestelmää"
+    "system": "Seuraa järjestelmää",
+    "search": "Hae kieltä",
+    "noMatch": "Sopivaa kieltä ei löytynyt"
   },
   "sounds": {
     "title": "Äänet",

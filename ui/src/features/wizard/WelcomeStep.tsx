@@ -1,25 +1,10 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import type { Language } from "../../api";
-import { Select } from "../../components/Select";
-import { ENDONYMS, SUPPORTED_LANGUAGES } from "../../i18n/resources";
+import { LanguagePicker } from "../../components/LanguagePicker";
 import type { SettingsSectionProps } from "../settings/sections/types";
 import { StepFrame } from "./StepFrame";
 
-const SYSTEM = "system";
-
-// Sorted by the names people see, with a fixed collation so the order never jumps when the UI
-// language changes (as in Settings → Language).
-const collator = new Intl.Collator("en");
-const LANGUAGES = [...SUPPORTED_LANGUAGES].sort((a, b) =>
-  collator.compare(ENDONYMS[a], ENDONYMS[b]),
-);
-
 const POINTS = ["voice", "servers", "private"] as const;
-
-function isLanguage(value: string): value is Language {
-  return SUPPORTED_LANGUAGES.some((language) => language === value);
-}
 
 /** Welcome: what Mumcord is, and the UI language (applied at once, saved at Finish). */
 export function WelcomeStep({
@@ -61,15 +46,11 @@ export function WelcomeStep({
       </ul>
       <div className="wizard-row">
         <label htmlFor={languageId}>{ts("language.legend")}</label>
-        <Select
+        <LanguagePicker
           id={languageId}
-          value={settings.language ?? SYSTEM}
-          options={[
-            { value: SYSTEM, label: ts("language.system") },
-            ...LANGUAGES.map((value) => ({ value, label: ENDONYMS[value] })),
-          ]}
-          onChange={(choice) => {
-            update({ language: isLanguage(choice) ? choice : null });
+          value={settings.language}
+          onChange={(language) => {
+            update({ language });
           }}
         />
       </div>

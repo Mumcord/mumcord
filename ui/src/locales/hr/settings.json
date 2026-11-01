@@ -404,7 +404,9 @@
   "language": {
     "title": "Jezik",
     "legend": "Jezik prikaza",
-    "system": "Prati sustav"
+    "system": "Prati sustav",
+    "search": "Pretraži jezike",
+    "noMatch": "Nema odgovarajućeg jezika"
   },
   "sounds": {
     "title": "Zvukovi",
