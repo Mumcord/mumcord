@@ -43,9 +43,9 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B34 | Server-suggested plugins logic | done | b34-suggest |
 | B23 | Installed tab and plugin details | open | |
 | B24 | Browse tab, install prompt, deep-link target | in progress | b24-browse |
-| B33a | Updates tab | open | |
-| B33b | Repositories tab | open | |
-| B33c | Developer tab | open | |
+| B33a | Updates tab | in progress | b33a-updates |
+| B33b | Repositories tab | in progress | b33b-repos |
+| B33c | Developer tab | in progress | b33c-dev |
 | B37 | ⚠ OUTWARD: registry CI and publish workflows | done (Mumcord/plugins PR #7, not merged) | b37-ci |
 | B38 | Template and author docs | done (Mumcord/plugins PR #4, not merged) | b38-template |
 | B39 | Poll plugin | done (Mumcord/plugins PR #2, not merged) | b39-poll |
