@@ -19,6 +19,7 @@ pub mod peer_key;
 pub mod permissions;
 pub mod registry;
 mod runtime;
+pub mod service;
 pub mod verify;
 pub mod version;
 
