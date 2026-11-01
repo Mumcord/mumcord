@@ -6,6 +6,7 @@
 
 pub mod api;
 pub mod cache;
+pub mod chat;
 mod diag;
 pub mod grants;
 mod health;
