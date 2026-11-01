@@ -72,6 +72,7 @@ describe("sharer control bar", () => {
       soundAvailable: false,
       viewers: [ANNA, BEN],
       blocked: null,
+      relayReason: null,
       kind: "window",
       elapsedMs: 60000,
     });

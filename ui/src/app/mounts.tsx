@@ -60,11 +60,8 @@ import {
   AudioDeviceNotice,
   type AudioDeviceNoticeApi,
 } from "../features/app";
-<<<<<<< HEAD
 import { WhisperBanner } from "../features/whisper/WhisperBanner";
 
-=======
->>>>>>> a512cd7 (feat(screenshare): the sharer control bar at the top of the chat)
 /** Server bar (B19). */
 export function ServersMount() {
   const messages = useMessagesOpen();
