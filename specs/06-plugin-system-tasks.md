@@ -77,7 +77,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F16 | Wire `PluginWebView` / `usePluginWebView(id, "panelPopover")` into the strip's expanded popover (B27) + extend fx-webview-probe to also probe `typeof __TAURI_INTERNALS__` and raw IPC handlers (webkit.messageHandlers.ipc, chrome.webview) | done (ada55433, 36b0265a) | f16-wvwire |
 | F17 | Check vitest: installed/browse/chat tests reportedly show i18n keys instead of English (cache or real?) — fix cause | done (68b034bc: stale cache only; fixed native title attrs in PluginStrip; SettingsScreen/Wizard flaky under load) | f17-i18n |
 | Q0 | Health check of epic/plugins head: full workspace cargo fmt/clippy (incl. windows/macos cross-lint)/test + full UI typecheck/lint/prettier/vitest; fix anything red | in progress | q0-health |
-| B6v | Run e2e two-clients.e2e.ts + smoke/app.e2e.ts under the e2e lock; verify tauri:options.args (e.g. --no-plugins) reaches the app; fix harness issues | in progress | b6v-e2erun |
+| B6v | Run e2e two-clients.e2e.ts + smoke/app.e2e.ts under the e2e lock; verify tauri:options.args (e.g. --no-plugins) reaches the app; fix harness issues | done (two-clients 2/2, app 3/3, args reach the app) | b6v-e2erun |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
