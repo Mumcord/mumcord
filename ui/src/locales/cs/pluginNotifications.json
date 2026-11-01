@@ -1,0 +1,27 @@
+{
+  "type": "Doplněk",
+  "autoOff": {
+    "title": "Doplněk {{name}} byl vypnut",
+    "body": "Vypnuto po opakovaných pádech",
+    "open": "Zobrazit v Doplňcích"
+  },
+  "update": {
+    "title": "Aktualizace pro {{name}}",
+    "body": "Verze {{version}} čeká na kartě Aktualizace",
+    "open": "Zobrazit aktualizace"
+  },
+  "suggestion": {
+    "title": "Tento server doporučuje {{name}}",
+    "noReason": "Doporučeno serverem",
+    "install": "Nainstalovat",
+    "installLabel": "Nainstalovat {{name}}",
+    "addRepository": "Přidat repozitář",
+    "addRepositoryLabel": "Přidat repozitář pro {{name}}",
+    "details": "Podrobnosti",
+    "detailsLabel": "Podrobnosti o {{name}}",
+    "notNow": "Teď ne",
+    "notNowLabel": "Prozatím skrýt {{name}}",
+    "dontAsk": "Pro tento server se už neptat"
+  },
+  "failed": "Nepodařilo se. Zkuste to prosím znovu."
+}

@@ -32,7 +32,8 @@
       "all": "Gach ceann",
       "mentions": "Luanna",
       "requests": "Iarratais",
-      "invites": "Cuirí"
+      "invites": "Cuirí",
+      "plugins": "Breiseáin"
     },
     "empty": "Tá tú ar an eolas.",
     "unread": "Gan léamh",

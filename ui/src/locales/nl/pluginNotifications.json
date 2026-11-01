@@ -1,0 +1,27 @@
+{
+  "type": "Plug-in",
+  "autoOff": {
+    "title": "{{name}} is uitgeschakeld",
+    "body": "Uitgeschakeld na herhaalde crashes",
+    "open": "Tonen in Plug-ins"
+  },
+  "update": {
+    "title": "Update voor {{name}}",
+    "body": "Versie {{version}} wacht op het tabblad Updates",
+    "open": "Updates tonen"
+  },
+  "suggestion": {
+    "title": "Deze server stelt {{name}} voor",
+    "noReason": "Voorgesteld door de server",
+    "install": "Installeren",
+    "installLabel": "{{name}} installeren",
+    "addRepository": "Repository toevoegen",
+    "addRepositoryLabel": "Repository voor {{name}} toevoegen",
+    "details": "Details",
+    "detailsLabel": "Details van {{name}}",
+    "notNow": "Nu niet",
+    "notNowLabel": "{{name}} voorlopig verbergen",
+    "dontAsk": "Niet meer vragen voor deze server"
+  },
+  "failed": "Dat is niet gelukt. Probeer het opnieuw."
+}

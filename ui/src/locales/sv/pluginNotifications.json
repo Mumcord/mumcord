@@ -1,0 +1,27 @@
+{
+  "type": "Tillägg",
+  "autoOff": {
+    "title": "{{name}} stängdes av",
+    "body": "Avstängt efter upprepade krascher",
+    "open": "Visa i Tillägg"
+  },
+  "update": {
+    "title": "Uppdatering för {{name}}",
+    "body": "Version {{version}} väntar på fliken Uppdateringar",
+    "open": "Visa uppdateringar"
+  },
+  "suggestion": {
+    "title": "Den här servern föreslår {{name}}",
+    "noReason": "Föreslaget av servern",
+    "install": "Installera",
+    "installLabel": "Installera {{name}}",
+    "addRepository": "Lägg till databas",
+    "addRepositoryLabel": "Lägg till databas för {{name}}",
+    "details": "Detaljer",
+    "detailsLabel": "Detaljer om {{name}}",
+    "notNow": "Inte nu",
+    "notNowLabel": "Dölj {{name}} tills vidare",
+    "dontAsk": "Fråga inte igen för den här servern"
+  },
+  "failed": "Det fungerade inte. Försök igen."
+}

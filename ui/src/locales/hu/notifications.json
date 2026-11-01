@@ -23,7 +23,8 @@
       "all": "Mind",
       "mentions": "Említések",
       "requests": "Kérések",
-      "invites": "Meghívások"
+      "invites": "Meghívások",
+      "plugins": "Bővítmények"
     },
     "empty": "Mindent elolvastál.",
     "unread": "Olvasatlan",

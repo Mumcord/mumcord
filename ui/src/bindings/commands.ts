@@ -557,6 +557,10 @@ export const commands = {
 	 *  never the text).
 	 */
 	pluginsMentioned: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_mentioned", { serverId, session })),
+	/**  "Not now": the suggestion stays hidden until the server's list changes or 30 days pass. */
+	pluginSuggestionNotNow: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_not_now", { serverId, plugin })),
+	/**  "Don't ask again for this server". */
+	pluginSuggestionsDismissServer: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestions_dismiss_server", { serverId })),
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
@@ -846,6 +850,7 @@ export const events = {
 	pluginsChanged: makeEvent<PluginsChanged, PluginsChanged>("plugins://changed"),
 	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
+	pluginsSuggestion: makeEvent<PluginSuggestion, PluginSuggestion>("plugins://suggestion"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
@@ -2451,6 +2456,26 @@ export type PluginStatus = { kind: "running" } |
 { kind: "noPlugins" } | 
 /**  The installed files could not be loaded. */
 { kind: "notLoaded"; error: string };
+
+/**  `plugins://suggestion`: the server suggests a plugin. Every text is untrusted plain text. */
+export type PluginSuggestion = {
+	serverId: number,
+	plugin: string,
+	/**  The plugin's name from the official list; the id for third-party plugins. */
+	name: string,
+	/**  Why the server suggests it, written by the server. */
+	reason: string,
+	/**  The announcement number as text (a new one makes "Not now" lapse). */
+	seq: string,
+	source: PluginSuggestionSource,
+};
+
+/**  Where a suggested plugin comes from. */
+export type PluginSuggestionSource = 
+/**  The official list: Install or Details. */
+{ kind: "official"; version: string } | 
+/**  A third-party repository: opens the Add repository dialog with `key` as Expected key. */
+{ kind: "repository"; url: string; key: string | null };
 
 /**
  *  `plugin://supersede`: hide chat message `messageId` and show the plugin's chat card `card`

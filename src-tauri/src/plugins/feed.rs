@@ -12,7 +12,9 @@ use mumcord_plugins::messaging::announce::ANNOUNCE_DATA_ID;
 use mumcord_plugins::service::{PeerInfo, PluginService, SelfInfo};
 use mumcord_protocol::LowOutcome;
 
-use super::Plugins;
+use tauri::AppHandle;
+
+use super::{Plugins, suggestions};
 
 /// Engine events handled per service call; a burst (e.g. joining a full channel) takes the
 /// service lock once.
@@ -21,11 +23,12 @@ const BATCH: usize = 256;
 const ANNOUNCE_POLL: Duration = Duration::from_secs(1);
 
 /// Feeds the engine's plugin events into the service.
-pub fn pump_engine_events(plugins: &Arc<Plugins>, engine: &Engine) {
+pub fn pump_engine_events(app: &AppHandle, plugins: &Arc<Plugins>, engine: &Engine) {
     let Some(mut events) = engine.plugin_events() else {
         tracing::error!("the plugin event stream is already taken");
         return;
     };
+    let app = app.clone();
     let plugins = Arc::clone(plugins);
     let engine = engine.clone();
     tauri::async_runtime::spawn(async move {
@@ -35,6 +38,20 @@ pub fn pump_engine_events(plugins: &Arc<Plugins>, engine: &Engine) {
                 && let Ok(event) = events.try_recv()
             {
                 batch.push(event);
+            }
+            // Server suggestions go to the notification centre, not to the plugins.
+            let (announced, batch): (Vec<_>, Vec<_>) = batch
+                .into_iter()
+                .partition(|e| matches!(e, PluginEngineEvent::ServerPlugins { .. }));
+            for event in announced {
+                if let PluginEngineEvent::ServerPlugins {
+                    server_id,
+                    sender,
+                    data,
+                } = event
+                {
+                    suggestions::handle(&app, &plugins, &engine, server_id, sender, data).await;
+                }
             }
             let friends = friend_hashes(&engine, &batch);
             let result = plugins
@@ -231,7 +248,7 @@ fn feed(service: &mut PluginService, event: PluginEngineEvent, friends: &HashSet
             data_id,
             data,
         } => service.peer_data(server_id, &peer(sender, friends), &data_id, &data),
-        // Server-suggested plugins are handled by their own task (B34).
+        // Split off before feeding: suggestions are for the notification centre.
         PluginEngineEvent::ServerPlugins { .. } => {}
     }
 }

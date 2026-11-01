@@ -11,6 +11,7 @@ import { extractCards } from "../chat/cards";
 import { isGroupMention, isMention, isReplyMention } from "../chat/ownMention";
 import { messageText } from "../chat/reply";
 import { subscribeEndedHidden } from "../servers/endedEvents";
+import { bindPluginNotices } from "../plugins/notifications";
 import { findThemeCode } from "../../theme/shareCodec";
 import {
   messageItemId,
@@ -197,6 +198,7 @@ export function bindCentreSources(api: MumcordApi): Unsubscribe {
       shares.delete(serverId);
       removeItems((item) => isLive(item, serverId));
     }),
+    bindPluginNotices(api),
     subscribeEndedHidden(({ end, text }) => {
       addItem({
         kind: "connection",

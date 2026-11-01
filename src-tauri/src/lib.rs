@@ -230,6 +230,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_ui_action,
             commands::plugins::plugin_ui_event,
             commands::plugins::plugins_mentioned,
+            plugins::suggestions::plugin_suggestion_not_now,
+            plugins::suggestions::plugin_suggestions_dismiss_server,
             diagnostics::diagnostics_save,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,
@@ -375,6 +377,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             plugins::ui::PluginUi,
             plugins::PluginNotification,
             plugins::PluginSupersede,
+            plugins::suggestions::PluginSuggestion,
         ])
 }
 

@@ -1,0 +1,27 @@
+{
+  "type": "Bővítmény",
+  "autoOff": {
+    "title": "A(z) {{name}} ki lett kapcsolva",
+    "body": "Ismételt összeomlások után kikapcsolva",
+    "open": "Megjelenítés a Bővítményekben"
+  },
+  "update": {
+    "title": "Frissítés ehhez: {{name}}",
+    "body": "A(z) {{version}} verzió a Frissítések lapon vár",
+    "open": "Frissítések megjelenítése"
+  },
+  "suggestion": {
+    "title": "Ez a szerver a(z) {{name}} bővítményt javasolja",
+    "noReason": "A szerver javasolta",
+    "install": "Telepítés",
+    "installLabel": "{{name}} telepítése",
+    "addRepository": "Tároló hozzáadása",
+    "addRepositoryLabel": "Tároló hozzáadása ehhez: {{name}}",
+    "details": "Részletek",
+    "detailsLabel": "{{name}} részletei",
+    "notNow": "Most nem",
+    "notNowLabel": "{{name}} elrejtése egyelőre",
+    "dontAsk": "Ne kérdezze újra ennél a szervernél"
+  },
+  "failed": "Ez nem sikerült. Próbálja újra."
+}

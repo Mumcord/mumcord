@@ -1,0 +1,27 @@
+{
+  "type": "Breiseán",
+  "autoOff": {
+    "title": "Cuireadh {{name}} as feidhm",
+    "body": "Curtha as feidhm tar éis tuairteanna arís agus arís eile",
+    "open": "Taispeáin sna Breiseáin"
+  },
+  "update": {
+    "title": "Nuashonrú do {{name}}",
+    "body": "Tá leagan {{version}} ag fanacht sa chluaisín Nuashonruithe",
+    "open": "Taispeáin nuashonruithe"
+  },
+  "suggestion": {
+    "title": "Molann an freastalaí seo {{name}}",
+    "noReason": "Molta ag an bhfreastalaí",
+    "install": "Suiteáil",
+    "installLabel": "Suiteáil {{name}}",
+    "addRepository": "Cuir stór leis",
+    "addRepositoryLabel": "Cuir stór leis do {{name}}",
+    "details": "Sonraí",
+    "detailsLabel": "Sonraí {{name}}",
+    "notNow": "Ní anois",
+    "notNowLabel": "Folaigh {{name}} don am i láthair",
+    "dontAsk": "Ná fiafraigh arís don fhreastalaí seo"
+  },
+  "failed": "Níor oibrigh sé sin. Bain triail eile as."
+}

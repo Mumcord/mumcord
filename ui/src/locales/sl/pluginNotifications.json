@@ -1,0 +1,27 @@
+{
+  "type": "Vtičnik",
+  "autoOff": {
+    "title": "Vtičnik {{name}} je izklopljen",
+    "body": "Izklopljen po ponavljajočih se zrušitvah",
+    "open": "Pokaži v Vtičnikih"
+  },
+  "update": {
+    "title": "Posodobitev za {{name}}",
+    "body": "Različica {{version}} čaka v zavihku Posodobitve",
+    "open": "Pokaži posodobitve"
+  },
+  "suggestion": {
+    "title": "Ta strežnik predlaga {{name}}",
+    "noReason": "Predlagal strežnik",
+    "install": "Namesti",
+    "installLabel": "Namesti {{name}}",
+    "addRepository": "Dodaj repozitorij",
+    "addRepositoryLabel": "Dodaj repozitorij za {{name}}",
+    "details": "Podrobnosti",
+    "detailsLabel": "Podrobnosti o {{name}}",
+    "notNow": "Ne zdaj",
+    "notNowLabel": "Za zdaj skrij {{name}}",
+    "dontAsk": "Za ta strežnik ne vprašaj več"
+  },
+  "failed": "To ni uspelo. Poskusite znova."
+}

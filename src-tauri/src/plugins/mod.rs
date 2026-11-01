@@ -5,6 +5,7 @@
 //! service events are pumped by background tasks; commands are thin wrappers.
 
 mod feed;
+pub mod suggestions;
 pub mod ui;
 
 use std::path::PathBuf;
@@ -191,7 +192,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
     });
     pump_host_events(&plugins, host_events);
     pump_service_events(app, &plugins, engine, events);
-    feed::pump_engine_events(&plugins, engine);
+    feed::pump_engine_events(app, &plugins, engine);
     feed::pump_announces(&plugins, engine);
     pump_registry_checks(&plugins, engine);
     focus(app, &plugins, engine.voice_server());
@@ -441,7 +442,7 @@ fn focus(app: &AppHandle, plugins: &Arc<Plugins>, server: Option<mumcord_engine:
 }
 
 /// The identity used on `server`, else the default one.
-async fn identity_of(
+pub(crate) async fn identity_of(
     app: &AppHandle,
     server: Option<mumcord_engine::ServerId>,
 ) -> Option<mumcord_engine::IdentityId> {

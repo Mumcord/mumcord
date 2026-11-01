@@ -1,0 +1,27 @@
+{
+  "type": "Plugin",
+  "autoOff": {
+    "title": "{{name}} a fost dezactivat",
+    "body": "Dezactivat după blocări repetate",
+    "open": "Afișează în Pluginuri"
+  },
+  "update": {
+    "title": "Actualizare pentru {{name}}",
+    "body": "Versiunea {{version}} așteaptă în fila Actualizări",
+    "open": "Afișează actualizările"
+  },
+  "suggestion": {
+    "title": "Acest server sugerează {{name}}",
+    "noReason": "Sugerat de server",
+    "install": "Instalează",
+    "installLabel": "Instalează {{name}}",
+    "addRepository": "Adaugă depozit",
+    "addRepositoryLabel": "Adaugă depozit pentru {{name}}",
+    "details": "Detalii",
+    "detailsLabel": "Detalii despre {{name}}",
+    "notNow": "Nu acum",
+    "notNowLabel": "Ascunde {{name}} deocamdată",
+    "dontAsk": "Nu mai întreba pentru acest server"
+  },
+  "failed": "Nu a funcționat. Încearcă din nou."
+}

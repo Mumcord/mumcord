@@ -1,0 +1,27 @@
+{
+  "type": "Papildinys",
+  "autoOff": {
+    "title": "Papildinys {{name}} buvo išjungtas",
+    "body": "Išjungta po pasikartojančių strigčių",
+    "open": "Rodyti skiltyje Papildiniai"
+  },
+  "update": {
+    "title": "{{name}} naujinys",
+    "body": "Versija {{version}} laukia skirtuke Naujiniai",
+    "open": "Rodyti naujinius"
+  },
+  "suggestion": {
+    "title": "Šis serveris siūlo {{name}}",
+    "noReason": "Serverio pasiūlyta",
+    "install": "Įdiegti",
+    "installLabel": "Įdiegti {{name}}",
+    "addRepository": "Pridėti saugyklą",
+    "addRepositoryLabel": "Pridėti saugyklą: {{name}}",
+    "details": "Išsami informacija",
+    "detailsLabel": "Išsami informacija apie {{name}}",
+    "notNow": "Ne dabar",
+    "notNowLabel": "Kol kas slėpti {{name}}",
+    "dontAsk": "Daugiau neklausti dėl šio serverio"
+  },
+  "failed": "Nepavyko. Bandykite dar kartą."
+}

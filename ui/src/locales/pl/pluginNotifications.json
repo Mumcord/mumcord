@@ -1,0 +1,27 @@
+{
+  "type": "Wtyczka",
+  "autoOff": {
+    "title": "Wyłączono wtyczkę {{name}}",
+    "body": "Wyłączona po wielokrotnych awariach",
+    "open": "Pokaż w Wtyczkach"
+  },
+  "update": {
+    "title": "Aktualizacja dla {{name}}",
+    "body": "Wersja {{version}} czeka na karcie Aktualizacje",
+    "open": "Pokaż aktualizacje"
+  },
+  "suggestion": {
+    "title": "Ten serwer proponuje {{name}}",
+    "noReason": "Zaproponowane przez serwer",
+    "install": "Zainstaluj",
+    "installLabel": "Zainstaluj {{name}}",
+    "addRepository": "Dodaj repozytorium",
+    "addRepositoryLabel": "Dodaj repozytorium dla {{name}}",
+    "details": "Szczegóły",
+    "detailsLabel": "Szczegóły: {{name}}",
+    "notNow": "Nie teraz",
+    "notNowLabel": "Ukryj {{name}} na razie",
+    "dontAsk": "Nie pytaj więcej dla tego serwera"
+  },
+  "failed": "To nie zadziałało. Spróbuj ponownie."
+}

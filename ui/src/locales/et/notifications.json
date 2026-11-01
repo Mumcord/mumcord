@@ -23,7 +23,8 @@
       "all": "Kõik",
       "mentions": "Mainimised",
       "requests": "Taotlused",
-      "invites": "Kutsed"
+      "invites": "Kutsed",
+      "plugins": "Pluginad"
     },
     "empty": "Kõik on loetud.",
     "unread": "Lugemata",

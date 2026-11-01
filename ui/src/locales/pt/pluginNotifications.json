@@ -1,0 +1,27 @@
+{
+  "type": "Plugin",
+  "autoOff": {
+    "title": "{{name}} foi desativado",
+    "body": "Desativado após falhas repetidas",
+    "open": "Mostrar em Plugins"
+  },
+  "update": {
+    "title": "Atualização de {{name}}",
+    "body": "A versão {{version}} aguarda no separador Atualizações",
+    "open": "Mostrar atualizações"
+  },
+  "suggestion": {
+    "title": "Este servidor sugere {{name}}",
+    "noReason": "Sugerido pelo servidor",
+    "install": "Instalar",
+    "installLabel": "Instalar {{name}}",
+    "addRepository": "Adicionar repositório",
+    "addRepositoryLabel": "Adicionar repositório para {{name}}",
+    "details": "Detalhes",
+    "detailsLabel": "Detalhes de {{name}}",
+    "notNow": "Agora não",
+    "notNowLabel": "Ocultar {{name}} por agora",
+    "dontAsk": "Não perguntar novamente neste servidor"
+  },
+  "failed": "Isso não funcionou. Tente novamente."
+}

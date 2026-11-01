@@ -1,0 +1,27 @@
+{
+  "type": "Plugin",
+  "autoOff": {
+    "title": "{{name}} wurde ausgeschaltet",
+    "body": "Nach wiederholten Abstürzen ausgeschaltet",
+    "open": "In Plugins anzeigen"
+  },
+  "update": {
+    "title": "Update für {{name}}",
+    "body": "Version {{version}} wartet im Tab „Updates“",
+    "open": "Updates anzeigen"
+  },
+  "suggestion": {
+    "title": "Dieser Server schlägt {{name}} vor",
+    "noReason": "Vom Server vorgeschlagen",
+    "install": "Installieren",
+    "installLabel": "{{name}} installieren",
+    "addRepository": "Repository hinzufügen",
+    "addRepositoryLabel": "Repository für {{name}} hinzufügen",
+    "details": "Details",
+    "detailsLabel": "Details zu {{name}}",
+    "notNow": "Jetzt nicht",
+    "notNowLabel": "{{name}} vorerst ausblenden",
+    "dontAsk": "Für diesen Server nicht mehr fragen"
+  },
+  "failed": "Das hat nicht geklappt. Bitte versuche es erneut."
+}

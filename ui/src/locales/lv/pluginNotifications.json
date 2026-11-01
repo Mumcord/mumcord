@@ -1,0 +1,27 @@
+{
+  "type": "Spraudnis",
+  "autoOff": {
+    "title": "Spraudnis {{name}} tika izslēgts",
+    "body": "Izslēgts pēc atkārtotām avārijām",
+    "open": "Rādīt sadaļā Spraudņi"
+  },
+  "update": {
+    "title": "Atjauninājums: {{name}}",
+    "body": "Versija {{version}} gaida cilnē Atjauninājumi",
+    "open": "Rādīt atjauninājumus"
+  },
+  "suggestion": {
+    "title": "Šis serveris iesaka {{name}}",
+    "noReason": "Servera ieteikums",
+    "install": "Instalēt",
+    "installLabel": "Instalēt {{name}}",
+    "addRepository": "Pievienot krātuvi",
+    "addRepositoryLabel": "Pievienot krātuvi: {{name}}",
+    "details": "Detaļas",
+    "detailsLabel": "Detaļas: {{name}}",
+    "notNow": "Ne tagad",
+    "notNowLabel": "Pagaidām paslēpt {{name}}",
+    "dontAsk": "Vairs nejautāt par šo serveri"
+  },
+  "failed": "Neizdevās. Lūdzu, mēģiniet vēlreiz."
+}

@@ -8,13 +8,20 @@
  * of them were read or dismissed.
  */
 import type { Conversation, MessageRequest, PmRequests } from "../../api";
+import type { PluginNotice } from "../plugins/notifications/types";
 
 /** Mentions and replies point at stored messages and are kept this long (FR-3.107). */
 export const MESSAGE_ITEM_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-export type CentreFilter = "all" | "mentions" | "requests" | "invites";
+export type CentreFilter = "all" | "mentions" | "requests" | "invites" | "plugins";
 
-export const FILTERS: readonly CentreFilter[] = ["all", "mentions", "requests", "invites"];
+export const FILTERS: readonly CentreFilter[] = [
+  "all",
+  "mentions",
+  "requests",
+  "invites",
+  "plugins",
+];
 
 interface Base {
   /** Unique across the centre; see the `*Id` helpers. */
@@ -100,8 +107,15 @@ export type UpdateItem = Base & {
   url: string;
 };
 
+/**
+ * An entry of the category Plugins (spec 06): a plugin's notification, a crash shut-off, an
+ * available update or a server's suggestion. Only suggestions belong to a server.
+ */
+export type PluginItem = Base & { kind: "plugin"; notice: PluginNotice };
+
 /** Everything the centre stores itself. */
-export type StoredItem = MentionItem | ReplyItem | InviteItem | ConnectionItem | UpdateItem;
+export type StoredItem =
+  MentionItem | ReplyItem | InviteItem | ConnectionItem | UpdateItem | PluginItem;
 
 /** A held chat or message request (#141), built from the requests store on every render. */
 export type RequestItem = Base & OnServer & { kind: "request"; request: MessageRequest };
@@ -130,6 +144,9 @@ export const UPDATE_ITEM_ID = "update";
 
 /** The server an entry belongs to; `null` for app-wide entries such as an update. */
 export function serverOf(item: CentreItem): number | null {
+  if (item.kind === "plugin") {
+    return item.notice.kind === "suggestion" ? item.notice.serverId : null;
+  }
   return item.kind === "update" ? null : item.serverId;
 }
 
@@ -151,6 +168,8 @@ export function filterOf(item: CentreItem): Exclude<CentreFilter, "all"> | null 
       return "requests";
     case "invite":
       return "invites";
+    case "plugin":
+      return "plugins";
     case "connection":
     case "update":
       return null;
@@ -180,6 +199,7 @@ export function buildItems(
     (item) =>
       item.kind === "connection" ||
       item.kind === "update" ||
+      item.kind === "plugin" ||
       !isBlocked(item.serverId, item.senderCertHash ?? null, item.sender),
   );
   for (const [serverId, { incoming }] of requests) {
@@ -216,6 +236,7 @@ export function filterCounts(items: readonly CentreItem[]): Record<CentreFilter,
     mentions: 0,
     requests: 0,
     invites: 0,
+    plugins: 0,
   };
   for (const item of items) {
     const filter = filterOf(item);

@@ -32,7 +32,8 @@
       "all": "Kollha",
       "mentions": "Referenzi",
       "requests": "Talbiet",
-      "invites": "Stediniet"
+      "invites": "Stediniet",
+      "plugins": "Plagins"
     },
     "empty": "Qrajt kollox.",
     "unread": "Mhux moqrija",
