@@ -121,6 +121,7 @@
 
 ### Fixed
 
+- The chat stays scrolled to the newest message when a plugin card appears or grows after its message (for example while its images load); if you scrolled up to read, it stays where you are
 - A plugin dialog that shows a web page (for example the EVE fit plugin's fitting wheel) is now large (up to 960 × 720 pixels, shrinking with the window) instead of the narrow dialog size, and the page can show its own icons and images
 - Linux: Mumcord no longer gets killed (SIGXCPU) when a voice thread at real-time priority runs past its time budget, for example with noise suppression in a development build. An overrunning thread now drops back to normal priority and audio keeps running; the budget leaves room for bursts (half of rtkit's hard limit instead of one 10 ms frame), the capture thread rests briefly while catching up on a backlog, development builds no longer use real-time scheduling, and they build the voice processing crates optimised (#139)
 - The Copy buttons on code blocks, the packet inspector, the theme share action and the OpenGL launch option now copy through the app's own clipboard access, so they work on Linux where the web engine's clipboard fails (issue #134)

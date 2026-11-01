@@ -595,6 +595,34 @@ export function MessageList({
     if (element && atBottom.current) element.scrollTop = element.scrollHeight;
   }
 
+  // Plugin cards render and grow after their message (async render, icons, web content), and the
+  // list itself shrinks when the composer grows. A reader at the bottom stays there; one who
+  // scrolled up is left where they are.
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const follow = () => {
+      if (atBottom.current) element.scrollTop = element.scrollHeight;
+    };
+    const resizes = new ResizeObserver(follow);
+    const observeChildren = () => {
+      resizes.disconnect();
+      resizes.observe(element);
+      for (const child of element.children) resizes.observe(child);
+    };
+    // The list's direct children come and go (empty notice, message list, leading cards).
+    const children = new MutationObserver(() => {
+      observeChildren();
+      follow();
+    });
+    observeChildren();
+    children.observe(element, { childList: true });
+    return () => {
+      children.disconnect();
+      resizes.disconnect();
+    };
+  }, []);
+
   function messageImage(target: EventTarget): HTMLImageElement | null {
     const image = target instanceof Element ? target.closest("img") : null;
     return image?.closest(".chat-message__body") ? image : null;
