@@ -6,7 +6,10 @@ import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
 import { isMumcord } from "./mumcord";
 
-/** The two-people "M" of the logo, reduced to two brand-coloured shapes. */
+/**
+ * The app icon in miniature: the two-people "M" with the cap and the beanie on its violet tile,
+ * which keeps the same contrast on light and dark themes.
+ */
 export function MumcordBadge({
   user,
   size = 13,
@@ -24,16 +27,27 @@ export function MumcordBadge({
       {" "}
       <span className="mumcord-badge" data-tooltip={label} role="img" aria-label={label}>
         <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
-          <circle cx="7" cy="4.8" r="3" fill="var(--color-mumcord-a, #9b7cff)" />
-          <circle cx="17" cy="4.8" r="3" fill="var(--color-mumcord-b, #ff8a9b)" />
+          <rect width="24" height="24" rx="6" fill="#2f027f" />
           <path
-            d="M2 21.500V12.500C2 9.800 3.800 8.500 6 8.500C8.500 8.500 10.200 10.200 12 12V21.500Z"
-            fill="var(--color-mumcord-a, #9b7cff)"
+            d="M5.5 19.5 7.2 13.2 12 17 16.8 13.2 18.5 19.5"
+            fill="none"
+            stroke="#e1d0fd"
+            strokeWidth="3.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
+          <circle cx="7.6" cy="9.3" r="2.4" fill="#e1d0fd" />
+          <circle cx="16.4" cy="9.3" r="2.4" fill="#e1d0fd" />
           <path
-            d="M22 21.500V12.500C22 9.800 20.200 8.500 18 8.500C15.500 8.500 13.800 10.200 12 12V21.500Z"
-            fill="var(--color-mumcord-b, #ff8a9b)"
+            d="M5 8.2C5 5.2 10.2 5.2 10.2 8.2ZM5.4 8.2 2.6 9.4"
+            fill="#9a62fe"
+            stroke="#9a62fe"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
+          <path d="M13.8 8.2C13.8 5 19 5 19 8.2Z" fill="#fdb558" />
+          <circle cx="16.4" cy="5.4" r="1.2" fill="#fb777c" />
         </svg>
       </span>
     </>
