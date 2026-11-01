@@ -66,6 +66,7 @@ pub use bindings::mumcord::plugin::{
     chat, clock, events, http, notify, random, secrets, theme, timers, types, webview,
 };
 
+pub mod i18n;
 pub mod log;
 pub mod peers;
 pub mod storage;
