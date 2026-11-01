@@ -66,9 +66,11 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F6 | `prettier --check .` fails on docs/plugin-registry-format.md (pre-existing since B15/B25b) — format it; check the whole repo passes prettier | done (dce1eb42) | f6-prettier |
 | F7 | Pin `rust-toolchain.toml` (same stable version) in Mumcord/plugins template (feat/template-docs), `mumcord-plugin new` template (tools/mumcord-plugin) and each official plugin branch (feat/poll, feat/dice, feat/echolings, feat/mumbot-music), so reproducible-build hashes match CI | done (Rust 1.99.1; 159ad432 + plugins branches) | f7-toolchain |
 | F8 | docs/engine-api.md: list all new plugin commands/events (B13 engine methods, B18 commands+events, B20b plugins_take_pending_link, renamed game_plugins_*) | open | |
+| F9 | Echolings: singular/plural for "days together" ("1 day") on feat/echolings | open | |
+| F10 | CLI `mumcord-plugin test`: support a self-changed event step (DND, mute) so DND → sleeping can be scenario-tested; add the Echolings DND scenario after | open | |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
-| S3 | Echolings scenario tests on feat/echolings | in progress | s3-pets |
+| S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
 | S4 | Mumbot Music scenario tests on feat/mumbot-music | in progress | s4-music |
 | M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins) | open | |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | done (folded into B25c) | b25c-test |
