@@ -12,7 +12,9 @@ members = [
     "crates/p2p",
     "crates/screenshare",
     "crates/plugins",
+    "crates/plugin-sdk",
     "tools/netsim",
+    "tools/mumcord-plugin",
     "src-tauri",
 ]
 
@@ -36,6 +38,7 @@ mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
 mumcord-screenshare = { path = "crates/screenshare" }
 mumcord-plugins = { path = "crates/plugins" }
+mumcord-plugin-sdk = { path = "crates/plugin-sdk" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -139,6 +142,17 @@ semver = "1"
 wat = "1"
 wit-component = "0.263"
 wit-parser = "0.263"
+# Plugin SDK (FR-6.72): guest bindings for the WIT package, built into each plugin.
+wit-bindgen = "0.63"
+# Repository and package signatures (FR-6.53): verify only in the client, sign in the CLI.
+minisign-verify = "0.3"
+minisign = "0.10"
+# Peer keys for plugin messages; the HMAC version matches sha2 0.11.
+hmac = "0.13"
+# Repository sources and registry metadata (FR-6.54).
+toml = "1"
+# Scenario files for `mumcord-plugin test` (FR-6.71); pure Rust, no libyaml.
+serde-saphyr = "2"
 
 # Storage & secrets
 rusqlite = { version = "0.41", features = ["bundled"] }

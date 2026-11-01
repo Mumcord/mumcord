@@ -1,0 +1,18 @@
+[package]
+name = "mumcord-plugin-sdk"
+description = "SDK for writing Mumcord plugins as WebAssembly components"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+# The SDK is compiled into third-party plugins, so it uses a permissive licence (spec §8).
+license = "Apache-2.0"
+repository.workspace = true
+publish = false
+
+[dependencies]
+wit-bindgen.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

@@ -10,6 +10,7 @@ license.workspace = true
 publish = false
 
 [dependencies]
+mumcord-store.workspace = true
 wasmtime.workspace = true
 zip.workspace = true
 semver.workspace = true
@@ -19,8 +20,16 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 tempfile.workspace = true
+minisign-verify.workspace = true
+hmac.workspace = true
+toml.workspace = true
+rand.workspace = true
+ammonia.workspace = true
+reqwest.workspace = true
+tokio.workspace = true
 
 [dev-dependencies]
+mumcord-store = { workspace = true, features = ["test-util"] }
 wat.workspace = true
 wit-component.workspace = true
 wit-parser.workspace = true
