@@ -36,6 +36,7 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     icon: null,
     description: "",
     authors: [],
+    chatPatterns: [],
     offered: [],
     ...overrides,
   };
@@ -171,6 +172,20 @@ describe("InstalledTab", () => {
     await waitFor(() => {
       expect(setNotifications).toHaveBeenCalledWith("foo", false);
     });
+  });
+
+  it("lists what its chat patterns recognise under that permission", async () => {
+    withPlugins([
+      {
+        ...foo,
+        required: ["chat.patterns"],
+        granted: ["chat.patterns"],
+        chatPatterns: ["Recognise EVE Online fits pasted in chat"],
+      },
+    ]);
+    render(<InstalledTab />);
+    fireEvent.click(await screen.findByRole("button", { name: "Permissions", description: "foo" }));
+    expect(screen.getByText("Recognise EVE Online fits pasted in chat")).toBeInTheDocument();
   });
 
   it("says which plugin took one of its commands", async () => {

@@ -99,6 +99,7 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
             enabled={granted}
             onToggle={togglePermission}
             readOnly={busy}
+            chatPatterns={plugin.chatPatterns}
           />
         </section>
       )}

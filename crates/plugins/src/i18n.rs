@@ -24,6 +24,8 @@ const MAX_DESCRIPTION_CHARS: usize = 140;
 pub struct DisplayText {
     pub name: String,
     pub description: String,
+    /// What the manifest's chat patterns recognise, in manifest order.
+    pub chat_patterns: Vec<String>,
 }
 
 /// Looks up the display text for `language` (e.g. `de-AT`) in a plugin directory.
@@ -41,6 +43,7 @@ pub fn display_text(manifest: &Manifest, plugin_dir: &Path, language: &str) -> D
         name: lookup(NAME_KEY, MAX_NAME_CHARS).unwrap_or_else(|| manifest.name.clone()),
         description: lookup(DESCRIPTION_KEY, MAX_DESCRIPTION_CHARS)
             .unwrap_or_else(|| manifest.description.clone()),
+        chat_patterns: pattern_descriptions(manifest, &tables),
     }
 }
 
@@ -55,8 +58,12 @@ pub fn chat_pattern_descriptions(package: &Package, language: &str) -> Vec<Strin
         }
         parse_table(bytes, tag)
     });
-    package
-        .manifest
+    pattern_descriptions(&package.manifest, &tables)
+}
+
+/// Each chat pattern's translated description, falling back to the manifest's own.
+fn pattern_descriptions(manifest: &Manifest, tables: &[BTreeMap<String, String>]) -> Vec<String> {
+    manifest
         .chat_patterns
         .iter()
         .enumerate()
@@ -155,7 +162,8 @@ mod tests {
             de,
             DisplayText {
                 name: "Haustiere".into(),
-                description: "Deutsch".into()
+                description: "Deutsch".into(),
+                chat_patterns: Vec::new(),
             }
         );
 
@@ -164,7 +172,8 @@ mod tests {
             fr,
             DisplayText {
                 name: "Pets EN".into(),
-                description: "English text".into()
+                description: "English text".into(),
+                chat_patterns: Vec::new(),
             }
         );
     }

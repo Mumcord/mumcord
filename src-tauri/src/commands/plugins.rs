@@ -160,6 +160,9 @@ pub struct InstalledPlugin {
     pub description: String,
     /// The manifest's authors.
     pub authors: Vec<String>,
+    /// What the plugin's chat patterns recognise, in the app language (shown with
+    /// `chat.patterns`). Plugin text: plain, untrusted.
+    pub chat_patterns: Vec<String>,
     /// Optional permissions an update added and the user has not answered yet; they are off.
     /// Answering means `plugin_set_permissions` (which clears this).
     pub offered: Vec<String>,
@@ -213,6 +216,7 @@ impl InstalledPlugin {
             revocation: p.revocation.map(|r| r.reason),
             icon: p.icon,
             description: p.description,
+            chat_patterns: p.chat_patterns,
             authors: p.authors,
             offered: p.offered,
         }
@@ -1437,6 +1441,7 @@ mod tests {
             icon: None,
             description: String::new(),
             authors: Vec::new(),
+            chat_patterns: Vec::new(),
             offered: Vec::new(),
         }
     }

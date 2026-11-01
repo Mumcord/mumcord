@@ -1878,6 +1878,11 @@ export type InstalledPlugin = {
 	/**  The manifest's authors. */
 	authors: string[],
 	/**
+	 *  What the plugin's chat patterns recognise, in the app language (shown with
+	 *  `chat.patterns`). Plugin text: plain, untrusted.
+	 */
+	chatPatterns: string[],
+	/**
 	 *  Optional permissions an update added and the user has not answered yet; they are off.
 	 *  Answering means `plugin_set_permissions` (which clears this).
 	 */

@@ -20,6 +20,7 @@
 - **Developer mode** (Settings > Advanced) adds a Developer tab to load, reload and unload a plugin from a folder, with its log. Such plugins are marked "Developer plugin" and are unloaded when Developer mode is turned off. A plugin SDK, the `mumcord-plugin` command-line tool for authors and a project template are available (Apache-2.0).
 - Plugin layouts can now have a row where one entry fills the width next to a fixed button (for example a saved fit next to **Copy fitting**), and plugin buttons can show a small second line such as who saved an entry and when.
 - The **Plugins** entry in the Settings sidebar shows how many plugin updates (and new optional permissions) are waiting.
+- An installed plugin's permissions list what its chat patterns recognise under "Recognise certain chat messages", as the install prompt does.
 - `mumcord://plugins/<id>` links open the details of an official plugin in Browse; they never install anything by themselves.
 - Four official plugins, each available in all 24 Mumcord languages:
   - **Poll**: ask a question with 2 to 10 options, see live results in the chat card and the panel, and end the poll when done. Votes are counted once per person.

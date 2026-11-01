@@ -173,6 +173,9 @@ pub struct PluginInfo {
     pub description: String,
     /// The manifest's authors; empty when the plugin could not be loaded.
     pub authors: Vec<String>,
+    /// What its chat patterns recognise, in the app language (shown with `chat.patterns`).
+    /// Plugin text: plain, untrusted.
+    pub chat_patterns: Vec<String>,
     /// Optional permissions an update added that the user has not answered yet (never
     /// granted by the update; Plugins → Updates offers them).
     pub offered: Vec<String>,
@@ -597,7 +600,11 @@ impl PluginService {
                 _ => None,
             },
             name: text.as_ref().map(|t| t.name.clone()).unwrap_or_default(),
-            description: text.map(|t| t.description).unwrap_or_default(),
+            description: text
+                .as_ref()
+                .map(|t| t.description.clone())
+                .unwrap_or_default(),
+            chat_patterns: text.map(|t| t.chat_patterns).unwrap_or_default(),
             status,
             badge: badge == Some(record.id.as_str()),
             id: record.id,

@@ -33,6 +33,7 @@ const plugin: InstalledPlugin = {
   icon: null,
   description: "",
   authors: [],
+  chatPatterns: [],
   offered: [],
 };
 

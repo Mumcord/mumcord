@@ -28,6 +28,7 @@ function plugin(id: string, name: string, enabled = true): InstalledPlugin {
     icon: null,
     description: "",
     authors: [],
+    chatPatterns: [],
     offered: [],
   };
 }
