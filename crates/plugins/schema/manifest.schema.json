@@ -76,15 +76,7 @@
       "maxItems": 3,
       "uniqueItems": true,
       "items": {
-        "enum": [
-          "fun",
-          "games",
-          "chat",
-          "voice",
-          "accessibility",
-          "looks",
-          "tools"
-        ]
+        "enum": ["fun", "games", "chat", "voice", "accessibility", "looks", "tools"]
       }
     },
     "icon": {
@@ -112,9 +104,7 @@
               },
               {
                 "type": "object",
-                "required": [
-                  "id"
-                ],
+                "required": ["id"],
                 "properties": {
                   "id": {
                     "$ref": "#/$defs/permission"
@@ -165,11 +155,7 @@
           "description": "Largest message payload in bytes."
         },
         "default_visibility": {
-          "enum": [
-            "everyone",
-            "friends",
-            "nobody"
-          ],
+          "enum": ["everyone", "friends", "nobody"],
           "description": "Preselected visibility in the install prompt."
         }
       }
@@ -178,10 +164,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "name",
-          "description"
-        ],
+        "required": ["name", "description"],
         "properties": {
           "name": {
             "type": "string",
@@ -207,9 +190,7 @@
     },
     "net": {
       "type": "object",
-      "required": [
-        "hosts"
-      ],
+      "required": ["hosts"],
       "properties": {
         "hosts": {
           "const": "user-configured",
