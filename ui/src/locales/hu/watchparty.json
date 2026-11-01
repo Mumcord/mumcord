@@ -30,6 +30,8 @@
     "title": "Következik",
     "empty": "Nincs következő. Adj hozzá YouTube-linkeket a „Hozzáadás a lejátszási listához” gombbal.",
     "skip": "Kihagyás",
+    "previous": "Előző",
+    "previousFailed": "Nem sikerült visszalépni az előző videóhoz.",
     "moveHint": "Az Alt+Fel és az Alt+Le mozgatja a videót; húzhatod is.",
     "moved": "Áthelyezve a(z) {{position}}. helyre",
     "videoTitle": "YouTube-videó",
@@ -42,7 +44,9 @@
     "nextFailed": "A következő videót nem sikerült elindítani.",
     "move": "{{title}} áthelyezése",
     "upNext": "Következik: {{title}}",
-    "upNextNone": "Nincs következő"
+    "upNextNone": "Nincs következő",
+    "paste": "Illessz be egy YouTube linket",
+    "notALink": "Ez nem YouTube link"
   },
   "widget": {
     "play": "Lejátszás",

@@ -44,75 +44,132 @@
   font-size: 0.8125rem;
 }
 
-.sharer-controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
-}
-
-.sharer-controls p {
-  margin: 0;
-}
-
-.sharer-controls__status {
-  font-weight: 600;
-}
-
-.sharer-controls__status .live-badge {
-  margin-left: 0;
-}
-
-.sharer-controls__viewers,
-.sharer-controls__hint {
-  font-size: 0.8125rem;
-}
-
-.sharer-controls__viewers[data-full] {
-  font-weight: 600;
-}
-
-.sharer-controls__buttons {
+/* The sharer's control bar at the top of the chat (issue #163, FR-3.127). */
+.sharer-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
-}
-
-/* Bar above the user panel while sharing (FR-2.71). */
-.sharing-bar {
-  display: flex;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: var(--color-danger);
-  color: var(--color-on-accent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   font-size: 0.8125rem;
+}
+
+.sharer-bar p {
+  margin: 0;
+}
+
+.sharer-bar__thumb {
+  flex: none;
+}
+
+.sharer-bar__thumb img {
+  display: block;
+  width: 4rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background: #000;
+  object-fit: cover;
+}
+
+.sharer-bar__time,
+.sharer-bar__paused {
   font-weight: 600;
 }
 
-.sharing-bar__text {
+.sharer-bar__source,
+.sharer-bar__hint {
+  color: var(--color-text-secondary);
+}
+
+.sharer-bar__popover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sharer-bar__viewer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sharer-bar__name {
   flex: 1;
   min-width: 0;
 }
 
-.sharing-bar__viewers {
-  flex: none;
-  font-weight: 400;
+.sharer-bar__quality {
+  color: var(--color-text-muted);
 }
 
-.sharing-bar__end {
-  flex: none;
-  padding: 0 var(--space-2);
-  border: 1px solid currentcolor;
+/* The viewers panel of a watched share (issue #163, FR-3.126). */
+.viewer-panel__heading {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.viewer-panel__person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-1);
+}
+
+.viewer-panel__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-panel__quality,
+.viewer-panel__empty,
+.viewer-panel__hint {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+/* The picture of a watched share and what stands in front of it (issue #163). */
+.screen-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.screen-stage__message {
+  margin: 0;
+}
+
+.screen-stage__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+/* Stream details: the figures behind the picture (issue #163, FR-3.126). */
+.stream-details {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2);
   border-radius: var(--radius-sm);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
+  background: var(--color-bg-elevated);
+  font-size: var(--font-size-sm);
 }
 
-.sharing-bar__end:hover {
-  background: color-mix(in srgb, currentcolor 20%, transparent);
+.stream-details p {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.stream-details p span:first-child {
+  color: var(--color-text-muted);
 }

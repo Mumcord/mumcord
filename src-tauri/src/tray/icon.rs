@@ -1,4 +1,4 @@
-//! Tray icon pictures (FR-3.132): the app icon greyed out while disconnected, dimmed with a red
+//! Tray icon pictures (FR-3.132): the tray mark greyed out while disconnected, dimmed with a red
 //! slash while muted or deafened, with a green ring while someone in the user's channel talks,
 //! plus a pink unread badge (with the mention count) and a moon for Do Not Disturb.
 
@@ -12,34 +12,6 @@ const RED: [u8; 3] = [239, 68, 68];
 const PINK: [u8; 3] = [236, 72, 153];
 const MOON: [u8; 3] = [221, 214, 254];
 const OUTLINE: [u8; 3] = [20, 20, 24];
-
-/// Box-filters the app icon down to `size` × `size` RGBA.
-pub fn scale(icon: &Image<'_>, size: u32) -> Image<'static> {
-    let (w, h) = (icon.width().max(1), icon.height().max(1));
-    let src = icon.rgba();
-    let mut out = vec![0u8; (size * size * 4) as usize];
-    for y in 0..size {
-        for x in 0..size {
-            let (x0, x1) = (x * w / size, ((x + 1) * w / size).max(x * w / size + 1));
-            let (y0, y1) = (y * h / size, ((y + 1) * h / size).max(y * h / size + 1));
-            let mut sum = [0u32; 4];
-            for sy in y0..y1.min(h) {
-                for sx in x0..x1.min(w) {
-                    let i = ((sy * w + sx) * 4) as usize;
-                    for (c, s) in sum.iter_mut().enumerate() {
-                        *s += u32::from(src.get(i + c).copied().unwrap_or(0));
-                    }
-                }
-            }
-            let n = ((x1.min(w) - x0) * (y1.min(h) - y0)).max(1);
-            let o = ((y * size + x) * 4) as usize;
-            for c in 0..4 {
-                out[o + c] = u8::try_from(sum[c] / n).unwrap_or(u8::MAX);
-            }
-        }
-    }
-    Image::new_owned(out, size, size)
-}
 
 /// RGBA pixels with drawing helpers; coordinates are pixel centres.
 struct Canvas {
@@ -325,13 +297,5 @@ mod tests {
         let img = dot([1, 2, 3], 16);
         assert_eq!(at(&img, 8, 8), [1, 2, 3, 255]);
         assert_eq!(at(&img, 0, 0), [0, 0, 0, 0]);
-    }
-
-    #[test]
-    fn scaling_averages_pixels() {
-        let base = Image::new_owned(vec![200; 128 * 128 * 4], 128, 128);
-        let img = scale(&base, 64);
-        assert_eq!((img.width(), img.height()), (64, 64));
-        assert!(img.rgba().iter().all(|&b| b == 200));
     }
 }

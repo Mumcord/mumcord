@@ -36,5 +36,29 @@
     "output": "Buffer tal-ispiker",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Kontrolli tal-playback",
+    "nowPlaying": "Issa qiegħed ilaʿib",
+    "watching": "Qegħdin jaraw",
+    "open": "Iftaħ",
+    "next": "Li jmiss",
+    "seek": "Fittex",
+    "volume": "Volum",
+    "syncedPlay": "Sincronizzat",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} għandha l-kontroll",
+    "inSync": "Sincronizzat",
+    "inSyncAll": "Kollha sincronizzati",
+    "inSyncExcept": "Kollha sincronizzati sakwen {{count}}",
+    "buffering": "Qed tibblocca",
+    "behind": "{{seconds}} s lura",
+    "ahead": "{{seconds}} s quddiem",
+    "noReport": "Għalkex rapot",
+    "you": "int",
+    "host": "Ospitant",
+    "fullscreen": "Scherm sħiħ",
+    "exitFullscreen": "ħarog mill-iskjer sħiħ",
+    "none": "Ħadd"
   }
 }

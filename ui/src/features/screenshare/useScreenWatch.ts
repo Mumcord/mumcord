@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { getApi, toEngineError } from "../../api";
 import { screenFrameChannel, webCodecsVp9Supported } from "../../api/screenFrames";
 import { createFrameRenderer } from "./frameRenderer";
+import type { StreamMeter } from "./streamStats";
 import { CONNECT_TIMEOUT_MS, watchFailure, type WatchFailure } from "./watchFailure";
 
 export type WatchStatus =
@@ -29,6 +30,7 @@ export function useScreenWatch(
   session: number,
   canvasRef: RefObject<HTMLCanvasElement | null>,
   paused: boolean,
+  meter?: StreamMeter,
 ): ScreenWatch {
   const [status, setStatus] = useState<WatchStatus>({ state: "starting" });
   const [attempt, setAttempt] = useState(0);
@@ -75,6 +77,19 @@ export function useScreenWatch(
       if (isStopped()) return;
       const renderer = createFrameRenderer(canvas, {
         mode: decodeHere ? "vp9" : "rgba",
+        onFrame: (frame, atMs) => {
+          if (meter === undefined || frame.kind !== "vp9") return;
+          meter.frame({
+            atMs,
+            timestampUs: frame.timestampUs,
+            bytes: frame.data.byteLength,
+            width: frame.width,
+            height: frame.height,
+          });
+        },
+        onDrop: (atMs) => {
+          meter?.drop(atMs);
+        },
         requestKeyframe: () => {
           api.screenShareRequestKeyframe(serverId, session).catch((error: unknown) => {
             console.warn("screen share keyframe request failed", error);

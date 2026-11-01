@@ -36,5 +36,8 @@
   "stopped": "Ukončil jsi sdílení obrazovky.",
   "pauseSharing": "Pozastavit sdílení",
   "resumeSharing": "Pokračovat ve sdílení",
-  "viewersLabel": "Kdo sleduje"
+  "viewersLabel": "Kdo sleduje",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Změnit okno",
+  "viewersTitle": "Sledující"
 }

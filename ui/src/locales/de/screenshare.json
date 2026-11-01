@@ -34,5 +34,8 @@
   "stopped": "Du hast die Bildschirmfreigabe beendet.",
   "pauseSharing": "Teilen pausieren",
   "resumeSharing": "Teilen fortsetzen",
-  "viewersLabel": "Wer zuschaut"
+  "viewersLabel": "Wer zuschaut",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Fenster wechseln",
+  "viewersTitle": "Zuschauer"
 }

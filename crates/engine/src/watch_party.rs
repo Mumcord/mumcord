@@ -25,6 +25,8 @@
 //! end at once advance the party just once.
 //!
 //! Version 2 added the playlist: new messages (`pl`, `next`) and optional fields in `state`.
+//! Version 3 adds the position report (`pos`, issue #163): every player says where it is and
+//! whether it is buffering, so the party can show each person as in sync, buffering or behind.
 //! Version 1 clients drop messages they cannot read and ignore unknown fields.
 
 mod playlist;
@@ -48,7 +50,7 @@ pub const DATA_ID: &str = "mumcord.watch";
 /// Hello feature of clients that take part in watch parties.
 pub const FEATURE: &str = "watch-party";
 /// The message version this client sends; higher versions are still read.
-const VERSION: u32 = 2;
+const VERSION: u32 = 3;
 /// More people than this in one party are not tracked; it bounds the state message too.
 const MAX_PARTICIPANTS: usize = 32;
 /// When a newcomer gets the state a second time. The server silently drops plugin data over its
@@ -74,12 +76,35 @@ impl WatchCommand {
     }
 }
 
+/// Where one participant's player was when it last reported (issue #163).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ParticipantPosition {
+    pub session: u32,
+    pub position_ms: u32,
+    /// How old the report was when the view was made, in milliseconds.
+    pub age_ms: u32,
+    /// The player's own state, not the party's.
+    pub playing: bool,
+    pub buffering: bool,
+}
+
 /// Who did what last, for the "Anna paused" line.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WatchAction {
     pub session: u32,
     pub command: WatchCommand,
 }
+
+/// One video that already played, for the previous button (issue #163). `id` is 0 for the video
+/// the party started with.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HistoryItem {
+    pub id: u32,
+    pub v: String,
+}
+
+/// How much of the past one party keeps.
+pub const HISTORY_MAX: usize = 10;
 
 /// The party in the user's channel as the UI shows it. `position_ms` is the position when the
 /// view was made; while `playing`, the player runs on from there.
@@ -100,6 +125,12 @@ pub struct WatchPartyView {
     pub playlist: Vec<PlaylistEntry>,
     /// Who skipped to the current video, until the next playback command.
     pub skipped_by: Option<u32>,
+    /// Where each participant last reported being, sorted by session.
+    pub positions: Vec<ParticipantPosition>,
+    /// Who started the party (the crown in the watching list, issue #163).
+    pub host: u32,
+    /// What played before the current video, oldest first, at most [`HISTORY_MAX`] (issue #163).
+    pub history: Vec<HistoryItem>,
 }
 
 /// What travels over plugin data.
@@ -137,6 +168,14 @@ enum Msg {
         /// Who skipped to it (version 2).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         skip: Option<u32>,
+        /// What played before `cur`, oldest first (version 3, issue #163).
+        #[serde(default)]
+        hist: Vec<HistoryItem>,
+    },
+    /// The sender went back to the already played entry `id` (version 3, issue #163).
+    Prev {
+        id: u32,
+        v: String,
     },
     /// Playlist edits, bundled (version 2).
     Pl {
@@ -149,6 +188,12 @@ enum Msg {
         video: String,
         #[serde(default)]
         skip: bool,
+    },
+    /// Where the sender's player is (version 3, issue #163).
+    Pos {
+        pos: u32,
+        play: bool,
+        buf: bool,
     },
 }
 
@@ -206,6 +251,19 @@ pub(crate) struct Party {
     /// Newcomers this client already sent the state to, with when to send it once more;
     /// cleared when they leave the channel.
     announced: BTreeMap<u32, Option<Instant>>,
+    /// What each participant last said about its own player (issue #163).
+    reports: BTreeMap<u32, Report>,
+    /// What played before the current video, oldest first (issue #163).
+    history: Vec<HistoryItem>,
+}
+
+/// What one player last said about itself.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct Report {
+    position_ms: u32,
+    at: Instant,
+    playing: bool,
+    buffering: bool,
 }
 
 impl Party {
@@ -225,6 +283,8 @@ impl Party {
             skipped_by: None,
             ended: false,
             announced: BTreeMap::new(),
+            reports: BTreeMap::new(),
+            history: Vec::new(),
         }
     }
 
@@ -247,6 +307,36 @@ impl Party {
         self.last_action = Some(WatchAction { session, command });
         self.skipped_by = None;
         self.ended = false;
+        // The command itself says where that player is.
+        self.record(session, command.position_ms(), self.playing, false);
+    }
+
+    /// Remembers where `session` said its player is.
+    fn record(&mut self, session: u32, position_ms: u32, playing: bool, buffering: bool) {
+        if self.reports.len() >= MAX_PARTICIPANTS && !self.reports.contains_key(&session) {
+            return;
+        }
+        self.reports.insert(
+            session,
+            Report {
+                position_ms,
+                at: Instant::now(),
+                playing,
+                buffering,
+            },
+        );
+    }
+
+    /// Remembers that `id` played, so the previous button can go back to it. A repeated message
+    /// cannot put the same video in the past twice.
+    fn remember(&mut self, id: u32, video: &str) {
+        if self.history.len() >= HISTORY_MAX || self.history.iter().any(|h| h.id == id) {
+            return;
+        }
+        self.history.push(HistoryItem {
+            id,
+            v: video.to_string(),
+        });
     }
 
     /// Goes on to entry `id`, playing from the start; `skipped_by` names who skipped.
@@ -261,11 +351,24 @@ impl Party {
         self.ended = false;
     }
 
+    /// Goes back to the last video of the past; that entry leaves the past, so the next press
+    /// gives the video before it. `None` when nothing played yet.
+    fn previous(&mut self) -> Option<Msg> {
+        let item = self.history.pop()?;
+        self.advance(item.id, item.v.clone(), None);
+        Some(Msg::Prev {
+            id: item.id,
+            v: item.v.clone(),
+        })
+    }
+
     /// Goes on to the first playlist entry; the message tells the others. `None` when the
     /// playlist is empty.
     fn go_on(&mut self, skipped_by: Option<u32>) -> Option<Msg> {
         let from = self.current;
         let (id, video) = self.playlist.pop_front()?;
+        let left = self.video_id.clone();
+        self.remember(from, &left);
         self.advance(id, video.clone(), skipped_by);
         Some(Msg::Next {
             from,
@@ -347,7 +450,26 @@ impl Party {
             current_entry: self.current,
             playlist: self.playlist.view(),
             skipped_by: self.skipped_by,
+            positions: self.positions(),
+            host: self.starter,
+            history: self.history.clone(),
         }
+    }
+
+    /// Each participant's last report, sorted by session, with its age when the view is made.
+    fn positions(&self) -> Vec<ParticipantPosition> {
+        let now = Instant::now();
+        self.reports
+            .iter()
+            .map(|(session, report)| ParticipantPosition {
+                session: *session,
+                position_ms: report.position_ms,
+                age_ms: u32::try_from(now.saturating_duration_since(report.at).as_millis())
+                    .unwrap_or(u32::MAX),
+                playing: report.playing,
+                buffering: report.buffering,
+            })
+            .collect()
     }
 
     fn state_msg(&self) -> Msg {
@@ -363,6 +485,7 @@ impl Party {
             }),
             cur: self.current,
             skip: self.skipped_by,
+            hist: self.history.clone(),
         }
     }
 }
@@ -492,6 +615,7 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
             last,
             cur,
             skip,
+            hist,
         } => {
             // A state only fills in a party this client does not know yet; a second one is the
             // answerer repeating its announcement.
@@ -516,6 +640,11 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
                 });
             party.current = cur;
             party.skipped_by = skip.filter(|s| *s == here.own || here.others.contains(s));
+            party.history = hist
+                .into_iter()
+                .take(HISTORY_MAX)
+                .filter(|h| valid_video_id(&h.v))
+                .collect();
             servers.insert(ctx.server_id, party);
             true
         }
@@ -530,6 +659,13 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
         Msg::Cmd { cmd } => match servers.get_mut(&ctx.server_id) {
             Some(party) if party.participants.contains(&sender) => {
                 party.apply(sender, cmd);
+                true
+            }
+            _ => false,
+        },
+        Msg::Pos { pos, play, buf } => match servers.get_mut(&ctx.server_id) {
+            Some(party) if party.participants.contains(&sender) => {
+                party.record(sender, pos, play, buf);
                 true
             }
             _ => false,
@@ -556,8 +692,24 @@ pub(crate) fn on_plugin_data(state: &ServerParties, ctx: &SessionCtx, data: &Plu
                     && id != from
                     && valid_video_id(&video) =>
             {
+                let left = party.video_id.clone();
+                party.remember(from, &left);
                 party.playlist.consumed(id);
                 party.advance(id, video, skip.then_some(sender));
+                true
+            }
+            _ => false,
+        },
+        Msg::Prev { id, v } => match servers.get_mut(&ctx.server_id) {
+            // Going back only works for a video this client already has in its past, so a forged
+            // or out-of-order message changes nothing.
+            Some(party)
+                if party.participants.contains(&sender)
+                    && valid_video_id(&v)
+                    && party.history.iter().any(|h| h.id == id) =>
+            {
+                party.history.retain(|h| h.id != id);
+                party.advance(id, v, None);
                 true
             }
             _ => false,
@@ -580,6 +732,7 @@ fn remove_participant(
     if !party.participants.remove(&session) {
         return false;
     }
+    party.reports.remove(&session);
     if party.participants.is_empty() {
         servers.remove(&server_id);
     }
@@ -791,6 +944,41 @@ impl Engine {
         Ok(())
     }
 
+    /// Where this client's player is (issue #163): remembered for the sync list and told to the
+    /// other participants. The UI sends it when its player begins buffering and otherwise at most
+    /// every ten seconds, so the party stays under the server's plugin data rate limit.
+    pub fn watch_party_report(
+        &self,
+        server_id: ServerId,
+        position_ms: u32,
+        playing: bool,
+        buffering: bool,
+    ) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
+        let view = {
+            let mut servers = lock(self.watch_party_state());
+            let party = servers
+                .get_mut(&server_id)
+                .filter(|p| p.joined)
+                .ok_or_else(no_party)?;
+            party.record(here.own, position_ms, playing, buffering);
+            party.view()
+        };
+        let receivers = capable(self.mumcord_state(), server_id, &here.others);
+        send(
+            &ctx.handle,
+            &receivers,
+            Msg::Pos {
+                pos: position_ms,
+                play: playing,
+                buf: buffering,
+            },
+        );
+        ctx.events.emit(EngineEvent::WatchPartyChanged(Some(view)));
+        Ok(())
+    }
+
     /// Leaves the party. It stays an invitation while others are still in it.
     pub fn watch_party_leave(&self, server_id: ServerId) -> EngineResult<()> {
         let ctx = self.session_ctx_for(server_id)?;
@@ -888,6 +1076,31 @@ impl Engine {
                 party.finish();
             }
             (msg, party.view())
+        };
+        if let Some(msg) = msg {
+            let receivers = capable(self.mumcord_state(), server_id, &here.others);
+            send(&ctx.handle, &receivers, msg);
+        }
+        ctx.events.emit(EngineEvent::WatchPartyChanged(Some(view)));
+        Ok(())
+    }
+
+    /// Goes back to the video that played before the current one (issue #163) and tells the
+    /// others. The party plays it from the start; the entry leaves the past, so pressing previous
+    /// again gives the video before it.
+    pub fn watch_party_previous(&self, server_id: ServerId) -> EngineResult<()> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
+        let (msg, view) = {
+            let mut servers = lock(self.watch_party_state());
+            let party = servers
+                .get_mut(&server_id)
+                .filter(|p| p.joined)
+                .ok_or_else(no_party)?;
+            let msg = party
+                .previous()
+                .ok_or_else(|| EngineError::invalid("nothing has played yet in this party"))?;
+            (Some(msg), party.view())
         };
         if let Some(msg) = msg {
             let receivers = capable(self.mumcord_state(), server_id, &here.others);
@@ -1018,12 +1231,18 @@ mod tests {
                 }),
                 cur: u32::MAX,
                 skip: Some(u32::MAX),
+                hist: Vec::new(),
             },
             Msg::Next {
                 from: u32::MAX,
                 id: u32::MAX,
                 video: "dQw4w9WgXcQ".into(),
                 skip: true,
+            },
+            Msg::Pos {
+                pos: u32::MAX,
+                play: true,
+                buf: true,
             },
             Msg::Pl {
                 ops: vec![
@@ -1050,7 +1269,7 @@ mod tests {
         });
         assert_eq!(
             std::str::from_utf8(&data).expect("utf-8"),
-            r#"{"v":2,"t":"cmd","cmd":{"kind":"pause","position_ms":1500}}"#
+            r#"{"v":3,"t":"cmd","cmd":{"kind":"pause","position_ms":1500}}"#
         );
         let data = encode(Msg::Pl {
             ops: vec![Op::Add {
@@ -1063,7 +1282,75 @@ mod tests {
         });
         assert_eq!(
             std::str::from_utf8(&data).expect("utf-8"),
-            r#"{"v":2,"t":"pl","ops":[{"o":"add","id":7,"v":"dQw4w9WgXcQ","k":1.5,"c":3}]}"#
+            r#"{"v":3,"t":"pl","ops":[{"o":"add","id":7,"v":"dQw4w9WgXcQ","k":1.5,"c":3}]}"#
+        );
+    }
+
+    #[test]
+    fn the_past_keeps_what_played_and_previous_goes_back_to_it() {
+        let mut party = Party::new(1, "dQw4w9WgXcQ".into(), 5);
+        let first = party.playlist.add(5, None, "aaaaaaaaaaa").expect("added");
+        party.go_on(Some(5)).expect("went on");
+        assert_eq!(party.view().current_entry, first);
+        assert_eq!(
+            party.view().history,
+            [HistoryItem {
+                id: 0,
+                v: "dQw4w9WgXcQ".into(),
+            }],
+            "the video the party started with is in the past"
+        );
+        assert_eq!(
+            party.previous(),
+            Some(Msg::Prev {
+                id: 0,
+                v: "dQw4w9WgXcQ".into(),
+            })
+        );
+        assert_eq!(party.view().current_entry, 0);
+        assert!(
+            party.view().history.is_empty(),
+            "the past loses what plays again"
+        );
+        // With nothing played yet there is nothing to go back to.
+        assert_eq!(party.previous(), None);
+    }
+
+    #[test]
+    fn reports_keep_the_sync_state_of_every_player() {
+        let mut party = Party::new(1, "dQw4w9WgXcQ".into(), 5);
+        party.record(5, 4000, true, false);
+        party.record(7, 1200, true, true);
+        let view = party.view();
+        assert_eq!(
+            view.positions,
+            [
+                ParticipantPosition {
+                    session: 5,
+                    position_ms: 4000,
+                    age_ms: 0,
+                    playing: true,
+                    buffering: false,
+                },
+                ParticipantPosition {
+                    session: 7,
+                    position_ms: 1200,
+                    age_ms: 0,
+                    playing: true,
+                    buffering: true,
+                },
+            ],
+            "sorted by session, so every client lists them the same way"
+        );
+        // A command is a report too, and a player that left is gone from the list.
+        party.apply(7, WatchCommand::Pause { position_ms: 1300 });
+        assert_eq!(party.view().positions.len(), 2);
+        assert!(!party.view().positions[1].buffering);
+        party.add(9);
+        assert_eq!(
+            party.view().positions.len(),
+            2,
+            "only players that reported show up"
         );
     }
 

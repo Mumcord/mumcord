@@ -3,7 +3,9 @@
 use std::sync::Arc;
 
 use mumcord_engine::Engine;
-use mumcord_engine::screen_share::{ScreenShareView, WatchBlock as EngineWatchBlock};
+use mumcord_engine::screen_share::{
+    ScreenShareView, ShareKind as EngineShareKind, WatchBlock as EngineWatchBlock,
+};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::State;
@@ -46,6 +48,70 @@ pub struct ScreenShare {
     pub blocked: Option<WatchBlock>,
     /// Why the relay cannot be used, when `blocked` is `relayUnavailable`.
     pub relay_reason: Option<RelayUnavailable>,
+    /// What the sharer picked in the system picker (issue #163); `null` where the platform cannot
+    /// tell a window from the whole screen.
+    pub kind: Option<ShareKind>,
+    /// How long the share has been running (issue #163).
+    pub elapsed_ms: u32,
+}
+
+/// What the sharer picked in the system picker (issue #163).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ShareKind {
+    Window,
+    Screen,
+}
+
+/// The live picture of the own share for the sharer's bar (issue #163, FR-3.127).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShareThumbnail {
+    pub width: u32,
+    pub height: u32,
+    /// The last keyframe, scaled down, as a `data:` URL the UI shows as it is.
+    pub data_url: String,
+}
+
+/// How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShareQuality {
+    pub width: u32,
+    pub height: u32,
+    pub fps: u32,
+    pub kbps: u32,
+    pub viewers: Vec<ViewerQuality>,
+}
+
+/// What one viewer gets (issue #163).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewerQuality {
+    pub session: SessionId,
+    pub fps: u32,
+    /// It lost every layer it can and still does not keep up, so the quality step is lowered for
+    /// everyone because of this viewer.
+    pub struggling: bool,
+}
+
+/// What the user's own watch of a share looks like (issue #163); the picture figures come from
+/// the frames themselves and are counted in the UI.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct WatchStats {
+    /// Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
+    /// second path.
+    pub path: SharePath,
+    /// Sound level of the shared sound at the viewer, 0.0–1.0.
+    pub rms: f32,
+}
+
+/// How the frames of a watched share reach the viewer.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SharePath {
+    Direct,
 }
 
 /// The screen shares on the server changed; carries the full list.
@@ -81,6 +147,11 @@ impl From<ScreenShareView> for ScreenShare {
                 Some(EngineWatchBlock::Relay(reason)) => Some(reason.into()),
                 _ => None,
             },
+            kind: v.kind.map(|k| match k {
+                EngineShareKind::Window => ShareKind::Window,
+                EngineShareKind::Screen => ShareKind::Screen,
+            }),
+            elapsed_ms: v.elapsed_ms,
         }
     }
 }
@@ -254,5 +325,64 @@ pub fn screen_share_block(
                 EngineWatchBlock::Relay(reason) => Some(reason.into()),
                 _ => None,
             },
+        }))
+}
+
+/// The picture the sharer's bar shows: the last keyframe the encoder took (issue #163).
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_thumbnail(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ShareThumbnail>> {
+    Ok(engine
+        .screen_share_thumbnail(to_engine_server_id(server_id))
+        .map(|t| ShareThumbnail {
+            width: t.width,
+            height: t.height,
+            data_url: t.data_url,
+        }))
+}
+
+/// How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163).
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_quality(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+) -> ApiResult<Option<ShareQuality>> {
+    Ok(engine
+        .screen_share_media_stats(to_engine_server_id(server_id))
+        .map(|s| ShareQuality {
+            width: s.width,
+            height: s.height,
+            fps: s.fps,
+            kbps: s.kbps,
+            viewers: s
+                .viewers
+                .into_iter()
+                .map(|v| ViewerQuality {
+                    session: v.session,
+                    fps: v.fps,
+                    struggling: v.struggling,
+                })
+                .collect(),
+        }))
+}
+
+/// What the user's own watch of `session`'s share looks like (issue #163); the picture figures are
+/// counted in the UI from the frames. `None` while not watching.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_watch_stats(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<Option<WatchStats>> {
+    Ok(engine
+        .screen_share_sound_stats(to_engine_server_id(server_id), session)
+        .map(|stats| WatchStats {
+            path: SharePath::Direct,
+            rms: stats.rms,
         }))
 }

@@ -363,3 +363,62 @@ async fn screen_shares_between_mumcord_clients() {
         .expect("stop");
     wait_shares(&mut viewers[0].rx, "no shares left", <[_]>::is_empty).await;
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn the_sharer_says_what_was_picked_and_how_long_it_runs() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_share_source");
+    let sharer = start(&dir, "s163a").await;
+    let mut viewer = start(&dir, "s163b").await;
+    let server = sharer.server();
+    let own_server = viewer.server();
+    sharer
+        .engine
+        .screen_share_start(server, false)
+        .await
+        .expect("start");
+    let seen = wait_shares(&mut viewer.rx, "the share", |shares| {
+        share_of(shares, sharer.session()).is_some()
+    })
+    .await;
+    let remote = share_of(&seen, sharer.session()).expect("share");
+    // What the sharer picked travels as it is; a capture that cannot tell says nothing.
+    let own = sharer
+        .engine
+        .screen_shares(server)
+        .into_iter()
+        .find(|s| s.session == sharer.session())
+        .expect("own");
+    assert_eq!(remote.kind, own.kind, "the source reaches the viewer");
+    assert!(
+        remote.elapsed_ms < 2000,
+        "the viewer counts from arrival, not from another machine's clock: {remote:?}"
+    );
+
+    tokio::time::sleep(Duration::from_secs(3)).await;
+    let grown = sharer
+        .engine
+        .screen_shares(server)
+        .into_iter()
+        .find(|s| s.session == sharer.session())
+        .expect("own");
+    assert!(
+        grown.elapsed_ms >= 3000,
+        "the share keeps running: {grown:?}"
+    );
+    let seen_again = viewer
+        .engine
+        .screen_shares(own_server)
+        .into_iter()
+        .find(|s| s.session == sharer.session())
+        .expect("viewer");
+    assert!(
+        seen_again.elapsed_ms >= 3000,
+        "and the viewer sees it: {seen_again:?}"
+    );
+}

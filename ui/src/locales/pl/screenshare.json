@@ -36,5 +36,8 @@
   "stopped": "Zakończono udostępnianie twojego ekranu.",
   "pauseSharing": "Wstrzymaj udostępnianie",
   "resumeSharing": "Wznów udostępnianie",
-  "viewersLabel": "Kto ogląda"
+  "viewersLabel": "Kto ogląda",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Zmień okno",
+  "viewersTitle": "Oglądający"
 }

@@ -36,5 +36,29 @@
     "output": "Buffer difuzor",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Comenzi player",
+    "nowPlaying": "Redă acum",
+    "watching": "Vizionează",
+    "open": "Deschide",
+    "next": "Următor",
+    "seek": "Caută",
+    "volume": "Volum",
+    "syncedPlay": "Sincronizat",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} are controlul",
+    "inSync": "Sincronizat",
+    "inSyncAll": "Toți sincronizați",
+    "inSyncExcept": "Toți sincronizați, cu excepția {{count}}",
+    "buffering": "Încărcare",
+    "behind": "{{seconds}} s în urmă",
+    "ahead": "{{seconds}} s înainte",
+    "noReport": "Fără raport",
+    "you": "tu",
+    "host": "Gazdă",
+    "fullscreen": "Ecran complet",
+    "exitFullscreen": "Ieși din ecran complet",
+    "none": "Nimeni"
   }
 }

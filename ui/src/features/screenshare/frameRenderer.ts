@@ -21,11 +21,15 @@ export interface RendererOptions {
   requestKeyframe: () => void;
   /** The first picture is on the canvas. */
   onFirstPicture?: () => void;
+  /** A frame arrived, for the frame rate, the bitrate and the delay (issue #163). */
+  onFrame?: (frame: ScreenFrame, atMs: number) => void;
+  /** A frame was dropped. */
+  onDrop?: (atMs: number) => void;
 }
 
 export function createFrameRenderer(
   canvas: HTMLCanvasElement,
-  { mode, requestKeyframe, onFirstPicture }: RendererOptions,
+  { mode, requestKeyframe, onFirstPicture, onFrame, onDrop }: RendererOptions,
 ): FrameRenderer {
   const context = canvas.getContext("2d");
   let closed = false;
@@ -49,6 +53,7 @@ export function createFrameRenderer(
     return {
       push(frame) {
         if (frame.kind !== "rgba") return;
+        onFrame?.(frame, Date.now());
         draw(new ImageData(frame.data, frame.width, frame.height), frame.width, frame.height);
       },
       close() {
@@ -64,6 +69,7 @@ export function createFrameRenderer(
   function waitForKeyframe(): void {
     if (waitingForKeyframe || closed) return;
     waitingForKeyframe = true;
+    onDrop?.(Date.now());
     requestKeyframe();
   }
 
@@ -96,6 +102,7 @@ export function createFrameRenderer(
   return {
     push(frame) {
       if (closed || frame.kind !== "vp9") return;
+      onFrame?.(frame, Date.now());
       const frameSize = `${String(frame.width)}x${String(frame.height)}`;
       if (frame.keyframe) {
         // A new size (the quality step changed the resolution) needs a newly configured decoder.

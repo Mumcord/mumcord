@@ -25,10 +25,11 @@
       "use strict";
       // Bridge between the Mumcord window and an embedded player (FR-2.41a), served as
       // `player.html` and `embed.html`. player.html (watch party): the app sends typed
-      // load/play/pause/seek/setVolume messages; the page drives YouTube's postMessage control protocol and
-      // answers with typed ready/state/time/ended/error messages. embed.html (chat card): the app
-      // sends one typed embed message with a YouTube or Twitch player URL and the page frames it;
-      // a YouTube player also reports its errors, so the app can show the missing-codec hint.
+      // load/play/pause/seek/setVolume/setUserVolume messages; the page drives YouTube's
+      // postMessage control protocol and answers with typed ready/state/time/meta/ended/error
+      // messages. embed.html (chat card): the app sends one typed embed message with a YouTube or
+      // Twitch player URL and the page frames it; a YouTube player also reports its errors, so the
+      // app can show the missing-codec hint.
       // Messages are only taken from the parent frame at an app origin and from the YouTube
       // frame, and only sent back to the app origin that talked first.
       (() => {
@@ -57,6 +58,8 @@
         let listen = 0;
         // setVolume is relative to the viewer's own player volume, known from its first report.
         let userVolume = null;
+        // The viewer's own volume as a fraction of that (issue #163); ducking multiplies it.
+        let ownLevel = 1;
         let level = 1;
         let applied = null;
         let appliedAt = 0;
@@ -74,7 +77,7 @@
 
         const applyVolume = () => {
           if (userVolume === null) return;
-          const volume = Math.round(userVolume * level);
+          const volume = Math.round(userVolume * ownLevel * level);
           if (volume === applied) return;
           applied = volume;
           appliedAt = performance.now();
@@ -103,7 +106,7 @@
             performance.now() - appliedAt > OWN_CHANGE_MS &&
             level > 0
           ) {
-            userVolume = Math.min(100, Math.round(volume / level));
+            userVolume = Math.min(100, Math.round(volume / (ownLevel * level)));
             applied = volume;
           }
         };
@@ -195,6 +198,14 @@
             data.level <= 1
           ) {
             fadeTo(data.level);
+          } else if (
+            data.type === "setUserVolume" &&
+            typeof data.level === "number" &&
+            data.level >= 0 &&
+            data.level <= 1
+          ) {
+            ownLevel = data.level;
+            applyVolume();
           }
         };
 
@@ -227,6 +238,19 @@
             if (typeof info.playerState === "number") reportState(info.playerState);
             if (typeof info.currentTime === "number" && Number.isFinite(info.currentTime)) {
               toApp({ type: "time", seconds: info.currentTime });
+            }
+            // The seek bar needs the length; the buffered part only when the player reports it.
+            const length = info.videoData?.lengthSeconds;
+            if (typeof length === "number" && Number.isFinite(length) && length > 0) {
+              const loaded = info.progress?.loaded;
+              toApp({
+                type: "meta",
+                seconds: length,
+                bufferedSeconds:
+                  typeof loaded === "number" && Number.isFinite(loaded) && loaded > 0 && loaded <= 1
+                    ? Math.round(loaded * length)
+                    : null,
+              });
             }
             if (typeof info.volume === "number" && info.volume >= 0 && info.volume <= 100) {
               onVolume(info.volume);

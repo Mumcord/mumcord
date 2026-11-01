@@ -36,5 +36,8 @@
   "stopped": "Ustavil si deljenje zaslona.",
   "pauseSharing": "Začasno ustavi deljenje",
   "resumeSharing": "Nadaljuj deljenje",
-  "viewersLabel": "Kdo gleda"
+  "viewersLabel": "Kdo gleda",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Zmeni okno",
+  "viewersTitle": "Gledalci"
 }

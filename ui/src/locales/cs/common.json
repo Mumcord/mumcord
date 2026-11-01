@@ -36,5 +36,29 @@
     "output": "Vyrovnávací paměť reproduktorů",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Ovládání přehrávače",
+    "nowPlaying": "Právě hraje",
+    "watching": "Sledují",
+    "open": "Otevřít",
+    "next": "Další",
+    "seek": "Hledat",
+    "volume": "Hlasitost",
+    "syncedPlay": "Synchronizováno",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} má kontrolu",
+    "inSync": "V synchronizaci",
+    "inSyncAll": "Všichni v synchronizaci",
+    "inSyncExcept": "Všichni v synchronizaci kromě {{count}}",
+    "buffering": "Načítá",
+    "behind": "{{seconds}} s pozadu",
+    "ahead": "{{seconds}} s napřed",
+    "noReport": "Bez hlášení",
+    "you": "vy",
+    "host": "Hostitel",
+    "fullscreen": "Celá obrazovka",
+    "exitFullscreen": "Opustit celou obrazovku",
+    "none": "Nikdo"
   }
 }
