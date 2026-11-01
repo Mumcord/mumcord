@@ -183,7 +183,9 @@ describe("PluginStrip", () => {
     resetServerStore();
     setup([plugin("pets", "Pets")], ["pets"]);
     await connect();
-    await waitFor(() => { expect(getServerState().serverId).not.toBeNull(); });
+    await waitFor(() => {
+      expect(getServerState().serverId).not.toBeNull();
+    });
     const serverId = getServerState().serverId;
     render(<PluginStrip />);
     await screen.findByText("pets panel");
