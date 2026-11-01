@@ -94,6 +94,17 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | E3 | Echolings: use the new -small SVGs for the 16/24 px badges (src/social/view.rs badge(), lib.rs own badge) + sleeping "z z" state art (DND/nap) as in the #264 mockups | done (feat/echolings a8d226a; sleep = zzz icon, no closed-eye art because of the 200-file package limit) | e3-pets |
 | F27 | Package limits: official plugins may have up to 400 files (third-party and dev stay at 200) — crates/plugins package.rs + spec FR-6.10 addendum + docs + plugins CI (B37) limit | done (60e3f6a8 + plugins PR #9) | f27-limit |
 | F28 | (a) Host `button` gets an optional `expanded: option<bool>` (WIT additive) rendered as aria-expanded, so disclosure buttons (Dice help) announce their state; (b) CLI `preview`: dark mode must actually apply, and the popover slot must render at 420×560 (and dialog/chat-card at their sizes) | open | |
+| V-A | Mockup conformance: Plugins settings header, sandbox subtitle, tab counts (see scratchpad v1/deviations.md) | in progress | v-a |
+| V-B | Mockup conformance: Installed tab card rows (see scratchpad v1/deviations.md) | in progress | v-b |
+| V-C | Mockup conformance: Browse two-column grid (see scratchpad v1/deviations.md) | in progress | v-c |
+| V-D | Mockup conformance: Plugin detail page (see scratchpad v1/deviations.md) | in progress | v-d |
+| V-E | Mockup conformance: Install prompt redesign (see scratchpad v1/deviations.md) | in progress | v-e |
+| V-F | Mockup conformance: Updates tab redesign (see scratchpad v1/deviations.md) | in progress | v-f |
+| V-G | Mockup conformance: Add repository dialog (see scratchpad v1/deviations.md) | in progress | v-g |
+| V-H | Mockup conformance: Notification centre plugin entries (see scratchpad v1/deviations.md) | in progress | v-h |
+| V-I | Mockup conformance: Plugin strip N running + side sheet (see scratchpad v1/deviations.md) | in progress | v-i |
+| V-L | Mockup conformance: Dice card redesign + roll history (see scratchpad v1/deviations.md) | in progress | v-l |
+| V-M | Mockup conformance: Mumbot Music dialog layout (see scratchpad v1/deviations.md) | in progress | v-m |
 | E4 | Echolings: closed-eye sleeping art for every species/stage/colour as in the #264 mockups (after F27), used when asleep instead of the plain zzz-only look | done (feat/echolings 303a883; 305 files) | e4-sleepart |
 | V1 | Mockup conformance review: collect all mockups from the 0.6.0 issues (#264, #267–#285, #310), screenshot the current implementation of each screen (mock dev server + `mumcord-plugin preview`), side-by-side sheets + a prioritised deviation list → fix tasks | in progress | v1-mockups |
 | S5 | Plugins strip collapsed state: keep showing the installed plugin icons in the header row even when collapsed; clicking an icon while collapsed opens that plugin's large popover directly (expanded inline panel stays as now) | done (fccc73e5) | s5-strip |
