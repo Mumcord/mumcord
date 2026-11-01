@@ -71,6 +71,8 @@
     "bandwidthLabel": "Estimated bandwidth",
     "bandwidthValue": "≈ {{value}} of {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} of {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "The bar turns amber from 80 % of the server limit and red above it.",
     "bandwidthHintWithin": "With low-latency mode: ≈ {{value}} kbit/s (10 ms packets), still within the limit.",
     "bandwidthHintOver": "With low-latency mode: ≈ {{value}} kbit/s (10 ms packets), above the limit.",
     "bandwidthHintNoLimit": "With low-latency mode: ≈ {{value}} kbit/s (10 ms packets).",

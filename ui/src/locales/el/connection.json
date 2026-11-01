@@ -71,6 +71,8 @@
     "bandwidthLabel": "Εκτιμώμενο εύρος ζώνης με κεφαλίδες",
     "bandwidthValue": "≈ {{value}} από {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} από {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Η μπάρα γίνεται κεχριμπαρί από το 80 % του ορίου του διακομιστή και κόκκινη πάνω από αυτό.",
     "bandwidthHintWithin": "Με λειτουργία χαμηλής καθυστέρησης: ≈ {{value}} kbit/s (πακέτα 10 ms), ακόμα εντός ορίου.",
     "bandwidthHintOver": "Με λειτουργία χαμηλής καθυστέρησης: ≈ {{value}} kbit/s (πακέτα 10 ms), πάνω από το όριο.",
     "bandwidthHintNoLimit": "Με λειτουργία χαμηλής καθυστέρησης: ≈ {{value}} kbit/s (πακέτα 10 ms).",

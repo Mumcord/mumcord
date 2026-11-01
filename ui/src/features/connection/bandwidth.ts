@@ -19,7 +19,7 @@ export interface BandwidthEstimate {
   kbps: number;
   /** Extra header cost of 10 ms packets compared with 20 ms ones. */
   lowLatencyExtraKbps: number;
-  /** Share of the server limit, 0 to 1; `null` without a limit. */
+  /** Share of the server limit (above 1 when over it); `null` without a limit. */
   share: number | null;
 }
 
@@ -37,6 +37,17 @@ export function estimateBandwidth(stats: ConnectionStats, lowLatency = false): B
   return {
     kbps,
     lowLatencyExtraKbps,
-    share: limit !== null && limit > 0 ? Math.min(kbps / limit, 1) : null,
+    share: limit !== null && limit > 0 ? kbps / limit : null,
   };
+}
+
+/** From this share of the server limit the meter warns. */
+export const BANDWIDTH_WARNING_SHARE = 0.8;
+
+export type BandwidthLevel = "normal" | "warning" | "danger";
+
+/** Meter colour: neutral below 80 % of the server limit, warning from 80 % up to it, danger above it. */
+export function bandwidthLevel(share: number): BandwidthLevel {
+  if (share > 1) return "danger";
+  return share >= BANDWIDTH_WARNING_SHARE ? "warning" : "normal";
 }

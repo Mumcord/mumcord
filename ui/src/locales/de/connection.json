@@ -71,6 +71,8 @@
     "bandwidthLabel": "Geschätzte Bandbreite inkl. Header",
     "bandwidthValue": "≈ {{value}} von {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} von {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Der Balken wird ab 80 % des Server-Limits gelb und darüber rot.",
     "bandwidthHintWithin": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), noch innerhalb des Limits.",
     "bandwidthHintOver": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete), über dem Limit.",
     "bandwidthHintNoLimit": "Mit Modus für niedrige Latenz: ≈ {{value}} kbit/s (10-ms-Pakete).",

@@ -74,6 +74,8 @@
     "bandwidthLabel": "Bandwidth stmat bl-intestaturi",
     "bandwidthValue": "≈ {{value}} minn {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} minn {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Il-bar issir ambra minn 80 % tal-limitu tas-server u aħmar fuqu.",
     "bandwidthHintWithin": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms), għadu fil-limitu.",
     "bandwidthHintOver": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms),'il fuq mil-limitu.",
     "bandwidthHintNoLimit": "Bil-modalità b'latenza baxxa: ≈ {{value}} kbit/s (pakketti ta' 10 ms).",

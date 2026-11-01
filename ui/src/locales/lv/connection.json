@@ -72,6 +72,8 @@
     "bandwidthLabel": "Paredzamais joslas platums ar galvenēm",
     "bandwidthValue": "≈ {{value}} no {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} no {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Josla kļūst dzintara krāsā no 80 % servera limita un sarkana virs tā.",
     "bandwidthHintWithin": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes), joprojām robežās.",
     "bandwidthHintOver": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes), pāri robežai.",
     "bandwidthHintNoLimit": "Ar zemas aizkaves režīmu: ≈ {{value}} kbit/s (10 ms pakotnes).",

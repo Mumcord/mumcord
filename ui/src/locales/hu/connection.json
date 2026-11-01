@@ -71,6 +71,8 @@
     "bandwidthLabel": "Becsült sávszélesség fejlécekkel",
     "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} / {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "A sáv a szerverkorlát 80 %-ától borostyánsárga, felette piros.",
     "bandwidthHintWithin": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok), még a korláton belül.",
     "bandwidthHintOver": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok), a korlát felett.",
     "bandwidthHintNoLimit": "Alacsony késleltetésű móddal: ≈ {{value}} kbit/s (10 ms-os csomagok).",

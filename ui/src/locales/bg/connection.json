@@ -71,6 +71,8 @@
     "bandwidthLabel": "Прогнозна честотна лента с хедъри",
     "bandwidthValue": "≈ {{value}} от {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} от {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Лентата става кехлибарена от 80 % от ограничението на сървъра и червена над него.",
     "bandwidthHintWithin": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms), все още в лимита.",
     "bandwidthHintOver": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms), над лимита.",
     "bandwidthHintNoLimit": "С режим с ниско закъснение: ≈ {{value}} kbit/s (пакети от 10 ms).",

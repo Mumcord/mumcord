@@ -53,6 +53,8 @@
 
 ### Fixed
 
+- The "Estimated bandwidth incl. headers" row in the voice quality panel no longer lets the label run into the value or pushes the "?" onto its own line in long languages such as German, Finnish and Hungarian: the label wraps on its own, the "?" stays beside it and the value stays right-aligned. The flat strip became a rounded meter that is neutral up to 79 % of the server limit, amber from 80 % and red above 100 %, which the "?" explains; screen readers hear e.g. "398 of 558 kbit/s (71 %)" (#299)
+
 - Your own messages never play the mention sound or show a notification, even when the server or another session of yours sends them back; they also no longer count as unread (#215)
 - When the desktop has Do Not Disturb on, the user panel no longer shows the long "Turn it off in your desktop's notification settings." line under "Do Not Disturb (system)": a small "?" next to it shows the hint on hover and keyboard focus, like the other explanations in the panels (#217)
 - The server info dialog is now translated in all 24 languages: its labels, permission names, trust status and limits were English everywhere because the English text had been copied into every language file (#207)

@@ -71,6 +71,8 @@
     "bandwidthLabel": "Geschatte bandbreedte incl. headers",
     "bandwidthValue": "≈ {{value}} van {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} van {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "De balk wordt oranje vanaf 80 % van de serverlimiet en rood erboven.",
     "bandwidthHintWithin": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms), nog binnen de limiet.",
     "bandwidthHintOver": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms), boven de limiet.",
     "bandwidthHintNoLimit": "Met modus voor lage latentie: ≈ {{value}} kbit/s (pakketten van 10 ms).",

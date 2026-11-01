@@ -72,6 +72,8 @@
     "bandwidthLabel": "Bande passante estimée avec en-têtes",
     "bandwidthValue": "≈ {{value}} sur {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} sur {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "La barre devient orange à partir de 80 % de la limite du serveur et rouge au-delà.",
     "bandwidthHintWithin": "Avec le mode faible latence : ≈ {{value}} kbit/s (paquets de 10 ms), toujours dans la limite.",
     "bandwidthHintOver": "Avec le mode faible latence : ≈ {{value}} kbit/s (paquets de 10 ms), au-dessus de la limite.",
     "bandwidthHintNoLimit": "Avec le mode faible latence : ≈ {{value}} kbit/s (paquets de 10 ms).",

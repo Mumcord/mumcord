@@ -72,6 +72,8 @@
     "bandwidthLabel": "Lățime de bandă estimată cu antete",
     "bandwidthValue": "≈ {{value}} din {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} din {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Bara devine chihlimbar de la 80 % din limita serverului și roșie peste aceasta.",
     "bandwidthHintWithin": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms), încă în limită.",
     "bandwidthHintOver": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms), peste limită.",
     "bandwidthHintNoLimit": "Cu modul cu latență redusă: ≈ {{value}} kbit/s (pachete de 10 ms).",

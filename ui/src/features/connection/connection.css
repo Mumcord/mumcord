@@ -83,8 +83,59 @@
   gap: var(--space-1);
 }
 
-.connection-quick__bandwidth meter {
-  width: 100%;
+/* Label (wrapping, with its "?" kept beside the text) and value (never wraps, right-aligned). */
+.connection-quick__bandwidth-row {
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  align-items: baseline;
+}
+
+.connection-quick__bandwidth-label {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.connection-quick__bandwidth-tail {
+  white-space: nowrap;
+}
+
+.connection-quick__bandwidth-tail .info-tip {
+  margin-inline-start: var(--space-1);
+}
+
+.connection-quick__bandwidth-row strong {
+  flex: none;
+  margin-inline-start: auto;
+  text-align: end;
+}
+
+.connection-quick__meter {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-border);
+}
+
+.connection-quick__meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+  transition: width 0.2s ease;
+}
+
+.connection-quick__meter[data-level="warning"] .connection-quick__meter-fill {
+  background: var(--color-warning);
+}
+
+.connection-quick__meter[data-level="danger"] .connection-quick__meter-fill {
+  background: var(--color-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connection-quick__meter-fill {
+    transition: none;
+  }
 }
 
 .connection-quick__link {
