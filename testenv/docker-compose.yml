@@ -70,7 +70,7 @@ services:
   # mumbot/up.sh (profile "mumbot"); a plain ./up.sh never starts it.
   mumbot:
     profiles: ["mumbot"]
-    image: ghcr.io/mumcord/mumbot:0.3.0
+    image: ghcr.io/mumcord/mumbot:0.4.1
     command: ["run"]
     restart: "no"
     user: "${PUID:-1000}:${PGID:-1000}"

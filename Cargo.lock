@@ -204,7 +204,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -215,7 +215,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -263,7 +263,7 @@ dependencies = [
  "objc2-foundation",
  "parking_lot",
  "percent-encoding",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
  "wl-clipboard-rs",
  "x11rb 0.13.2",
 ]
@@ -1808,7 +1808,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2059,7 +2059,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3870,7 +3870,7 @@ dependencies = [
  "png",
  "serde",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3887,15 +3887,16 @@ checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
 
 [[package]]
 name = "mumbot"
-version = "0.3.0"
-source = "git+https://github.com/Mumcord/mumbot?tag=v0.3.0#d85763751d2c62e6720c643898cff572f40a9e40"
+version = "0.4.1"
+source = "git+https://github.com/Mumcord/mumbot?tag=v0.4.1#06569261b9f998fdf1526972f2e03dfd9bcd3656"
 dependencies = [
  "anyhow",
  "bytes",
  "clap",
  "hound",
- "mumcord-codec 0.4.4",
- "mumcord-protocol 0.4.4",
+ "mumcord-codec",
+ "mumcord-p2p 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "mumcord-protocol",
  "rcgen",
  "ring",
  "rtrb",
@@ -3931,7 +3932,7 @@ dependencies = [
  "mumcord-engine",
  "mumcord-overlay-ipc",
  "mumcord-plugins",
- "mumcord-protocol 0.5.0",
+ "mumcord-protocol",
  "notify-rust",
  "open",
  "rand 0.10.3",
@@ -3969,24 +3970,10 @@ dependencies = [
  "futures",
  "hound",
  "libc",
- "mumcord-codec 0.5.0",
+ "mumcord-codec",
  "pulseaudio",
  "rtrb",
  "rubato",
- "thiserror 2.0.21",
- "tracing",
-]
-
-[[package]]
-name = "mumcord-codec"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c0b645e53f55160cdb62c0b8f85699deaec7fdb183561a0fdfb986fac613da7"
-dependencies = [
- "nnnoiseless",
- "opus",
- "rtrb",
- "sonora",
  "thiserror 2.0.21",
  "tracing",
 ]
@@ -4020,9 +4007,9 @@ dependencies = [
  "image",
  "mumbot",
  "mumcord-audio",
- "mumcord-p2p",
+ "mumcord-p2p 0.5.0",
  "mumcord-positional",
- "mumcord-protocol 0.5.0",
+ "mumcord-protocol",
  "mumcord-screenshare",
  "mumcord-store",
  "netsim",
@@ -4086,12 +4073,36 @@ dependencies = [
  "bytes",
  "crab_nat",
  "igd-next",
- "mumcord-protocol 0.5.0",
+ "mumcord-protocol",
  "mumcord-store",
  "netdev",
  "quinn",
  "rand 0.10.3",
  "rcgen",
+ "rustls",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "socket2",
+ "thiserror 2.0.21",
+ "tokio",
+ "tokio-rustls",
+ "tracing",
+]
+
+[[package]]
+name = "mumcord-p2p"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3da262b16b19b1d6be0c5e9a40949bf02109c991a53aef0b48e74518701c23d1"
+dependencies = [
+ "bytes",
+ "crab_nat",
+ "igd-next",
+ "mumcord-protocol",
+ "netdev",
+ "quinn",
+ "rand 0.10.3",
  "rustls",
  "serde",
  "serde_json",
@@ -4177,26 +4188,6 @@ dependencies = [
  "thiserror 2.0.21",
  "tracing",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "mumcord-protocol"
-version = "0.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff2b31a2e22ae6338f3b31efc9c504ac471f400793e767b8dff91d3bc1d891a1"
-dependencies = [
- "aes",
- "bytes",
- "prost",
- "prost-build",
- "protoc-bin-vendored",
- "rand 0.10.3",
- "rustls",
- "sha1 0.10.7",
- "thiserror 2.0.21",
- "tokio",
- "tokio-rustls",
- "tracing",
 ]
 
 [[package]]
@@ -4411,7 +4402,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5546,8 +5537,8 @@ version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
 dependencies = [
- "heck 0.5.0",
- "itertools 0.14.0",
+ "heck 0.4.1",
+ "itertools 0.13.0",
  "log",
  "multimap",
  "petgraph",
@@ -5566,7 +5557,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -5767,7 +5758,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6202,7 +6193,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6260,7 +6251,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6785,7 +6776,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -7752,10 +7743,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -8196,7 +8187,7 @@ dependencies = [
  "png",
  "serde",
  "thiserror 2.0.21",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8254,7 +8245,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -9079,7 +9070,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -9100,7 +9091,7 @@ dependencies = [
  "objc2-foundation",
  "objc2-quartz-core",
  "raw-window-handle",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
  "windows-version",
 ]
 
@@ -9512,7 +9503,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d6f32a0ff4a9f6f01231eb2059cc85479330739333e0e58cadf03b6af2cca10"
 dependencies = [
  "cfg-if",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
