@@ -14,13 +14,15 @@ import { useServerStateOf } from "../channels";
 import { EmbedsOffNotice } from "./EmbedsOffNotice";
 import { PlayPause } from "./PlayPause";
 import { MediaPanel } from "../media/MediaPanel";
-import { closeMedia, setTab, useMediaView } from "../media/mediaView";
+import { setTab, useMediaView } from "../media/mediaView";
 import { useTick } from "../media/useTick";
 import { WatchingList } from "./WatchingList";
+import { PanelPlaylist } from "./PanelPlaylist";
 import { Playlist } from "./Playlist";
 import { playNext } from "./playlistActions";
 import { WatchPartyPlayer } from "./WatchPartyPlayer";
-import { setWatchParty, useWatchParty } from "./watchPartyStore";
+import { joinWatchParty } from "./startParty";
+import { useWatchParty } from "./watchPartyStore";
 import "./watchParty.css";
 
 function reportError(message: string, error: unknown): void {
@@ -38,17 +40,6 @@ export function WatchPartyPanel({ serverId, channelId }: { serverId: number; cha
   const party = live?.party ?? null;
   const view = useMediaView();
   const nowMs = useTick(1000);
-  const leave = () => {
-    getApi()
-      .watchPartyLeave(serverId)
-      .then(() => {
-        closeMedia("watch");
-      })
-      .catch((error: unknown) => {
-        console.error(t("leaveFailed"), error);
-        announce(t("leaveFailed"), "assertive");
-      });
-  };
 
   const onCommand = useCallback(
     (command: WatchCommand) => {
@@ -72,14 +63,7 @@ export function WatchPartyPanel({ serverId, channelId }: { serverId: number; cha
   }
 
   const join = () => {
-    getApi()
-      .watchPartyJoin(serverId)
-      .then((joined) => {
-        setWatchParty(serverId, joined);
-      })
-      .catch((error: unknown) => {
-        reportError(t("joinFailed"), error);
-      });
+    joinWatchParty(serverId, t("joinFailed"));
   };
 
   if (!embeds) {
@@ -96,35 +80,42 @@ export function WatchPartyPanel({ serverId, channelId }: { serverId: number; cha
       const user = users.get(session);
       return user ? [user] : [];
     });
+    const watching = (
+      <WatchingList
+        serverId={serverId}
+        live={live}
+        users={users}
+        selfSession={selfSession}
+        nowMs={nowMs}
+      />
+    );
     return (
-      <section className="watch-party" aria-label={t("title")}>
-        <MediaPanel
-          label={t("title")}
-          tabs={[
-            { id: "playlist", label: tc("media.nowPlaying"), count: party.playlist.length },
-            { id: "watching", label: tc("media.watching"), count: people.length },
-          ]}
-          active={view.tab}
-          onSelect={(id) => {
-            if (id === "playlist" || id === "watching") setTab(id);
-          }}
-        >
-          <button type="button" className="button" onClick={leave}>
-            {t("leave")}
-          </button>
-          {view.tab === "watching" ? (
-            <WatchingList
+      <MediaPanel
+        label={t("title")}
+        tabs={[
+          { id: "playlist", label: t("tabs.playlist"), count: party.playlist.length },
+          { id: "watching", label: tc("media.watching"), count: people.length },
+        ]}
+        active={view.tab}
+        onSelect={(id) => {
+          if (id === "playlist" || id === "watching") setTab(id);
+        }}
+      >
+        {view.tab === "watching" ? (
+          watching
+        ) : (
+          <>
+            <PanelPlaylist
               serverId={serverId}
               live={live}
               users={users}
               selfSession={selfSession}
-              nowMs={nowMs}
             />
-          ) : (
-            <Playlist serverId={serverId} party={party} users={users} paste />
-          )}
-        </MediaPanel>
-      </section>
+            <h3 className="media-panel__heading">{t("whoIsWatching")}</h3>
+            {watching}
+          </>
+        )}
+      </MediaPanel>
     );
   }
 
