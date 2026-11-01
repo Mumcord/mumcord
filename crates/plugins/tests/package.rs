@@ -146,7 +146,24 @@ fn rejects_symlinks() {
 #[test]
 fn rejects_too_many_files_and_oversize_packages() {
     let result = with(|f| f.extend((0..200).map(|i| (format!("i18n/x{i}.json"), Vec::new()))));
-    assert!(matches!(result, Err(PackageError::TooManyFiles)));
+    assert!(matches!(result, Err(PackageError::TooManyFiles(200))));
+
+    let official = |extra: usize| {
+        let mut files = good_files();
+        files.push(("README.md".into(), b"# Dice".to_vec()));
+        files.push(("LICENSE".into(), b"MIT".to_vec()));
+        let have = files.len();
+        files.extend((0..400 - have + extra).map(|i| {
+            let (a, b) = (b'k' + (i / 26) as u8, b'a' + (i % 26) as u8);
+            (
+                format!("i18n/{}{}.json", a as char, b as char),
+                b"{}".to_vec(),
+            )
+        }));
+        Package::read(&zip(&files), Source::Official)
+    };
+    assert!(official(0).is_ok());
+    assert!(matches!(official(1), Err(PackageError::TooManyFiles(400))));
 
     let big = vec![0u8; MAX_PACKAGE_BYTES as usize + 1];
     assert!(matches!(

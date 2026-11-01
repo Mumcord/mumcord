@@ -29,6 +29,8 @@ pub const OFFICIAL_FILES: &[&str] = &["README.md", "LICENSE"];
 pub const MAX_PACKAGE_BYTES: u64 = 5 * 1024 * 1024;
 pub const MAX_UNPACKED_BYTES: u64 = 8 * 1024 * 1024;
 pub const MAX_FILES: usize = 200;
+/// Official plugins may ship more files, e.g. a large icon set (FR-6.10).
+pub const MAX_OFFICIAL_FILES: usize = 400;
 pub const MAX_ASSET_BYTES: u64 = 512 * 1024;
 
 const ASSET_EXTENSIONS: &[&str] = &[".png", ".webp", ".svg"];
@@ -96,8 +98,8 @@ pub enum PackageError {
     TooLarge,
     #[error("The package is not a valid zip file: {0}")]
     Zip(String),
-    #[error("The package has more than {MAX_FILES} files")]
-    TooManyFiles,
+    #[error("The package has more than {0} files")]
+    TooManyFiles(usize),
     #[error("The package unpacks to more than {} MiB", MAX_UNPACKED_BYTES / 1024 / 1024)]
     UnpackedTooLarge,
     #[error("\"{0}\" is not allowed in a package (only plain files with safe relative paths)")]
@@ -147,8 +149,13 @@ impl Package {
         let digest = Digest::of(bytes);
         let mut archive = zip::ZipArchive::new(Cursor::new(bytes))
             .map_err(|e| PackageError::Zip(e.to_string()))?;
-        if archive.len() > MAX_FILES {
-            return Err(PackageError::TooManyFiles);
+        let max_files = if source == Source::Official {
+            MAX_OFFICIAL_FILES
+        } else {
+            MAX_FILES
+        };
+        if archive.len() > max_files {
+            return Err(PackageError::TooManyFiles(max_files));
         }
 
         let mut files = BTreeMap::new();
