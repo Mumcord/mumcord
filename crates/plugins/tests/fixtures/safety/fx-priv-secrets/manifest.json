@@ -1,1 +1,5 @@
-{"id":"fx-priv-secrets","name":"Fixture Third-Party Secrets","permissions":{"required":["secrets"]}}
+{
+  "id": "fx-priv-secrets",
+  "name": "Fixture Third-Party Secrets",
+  "permissions": { "required": ["secrets"] }
+}
