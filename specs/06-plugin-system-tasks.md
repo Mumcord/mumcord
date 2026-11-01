@@ -262,7 +262,7 @@ Plugin update setting auto/notify/off, check at start + every 6 h, auto-install 
 - Owns: `crates/plugins/src/service/{updates,revocation}.rs`.
 
 **B17c – Chat integration logic** · simple · deps B11b
-Command registry (name rules, built-ins win, first installed wins, "Command taken by <plugin>"), typed command → `ui-action`, `chat.send` gesture window (2 s, one message per gesture, ≤ 500 chars, prefix "[Name] "), supersedes matching (4-byte hash, same session, 10 s).
+Command registry (name rules, built-ins win, first installed wins, "Command taken by <plugin>"), typed command → `ui-action`, `chat.send` gesture window (8 s, one message per gesture, ≤ 500 chars, prefix "[Name] "), supersedes matching (4-byte hash, same session, 10 s).
 - Covers: FR-6.43–6.45; AC-6.7 (logic).
 - Owns: `crates/plugins/src/chat.rs`.
 

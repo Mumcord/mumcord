@@ -12,10 +12,9 @@ use sha2::{Digest, Sha256};
 
 use crate::manifest::Command;
 
-/// How long after a user gesture `chat.send` is allowed (FR-6.44).
-pub const GESTURE_WINDOW: Duration = Duration::from_secs(2);
-/// Longer window for a typed slash command, whose plugin may need a moment to answer.
-pub const COMMAND_GESTURE_WINDOW: Duration = Duration::from_secs(8);
+/// How long after a user gesture (button click or typed command) `chat.send` is allowed (FR-6.44).
+/// Long enough for a plugin to answer after a click, e.g. a verified dice roll.
+pub const GESTURE_WINDOW: Duration = Duration::from_secs(8);
 /// Longest text a plugin may post, in characters, without the prefix (FR-6.44).
 pub const MAX_SEND_CHARS: usize = 500;
 /// How long a text line and a card may be apart and still match (FR-6.45).
@@ -231,11 +230,10 @@ impl GestureGate {
             .insert(plugin.to_owned(), (now, GESTURE_WINDOW));
     }
 
-    /// A typed slash command for this plugin: allows one `chat.send` for
-    /// `COMMAND_GESTURE_WINDOW`.
+    /// A typed slash command for this plugin: same window as a click.
     pub fn command_gesture(&mut self, plugin: &str, now: Instant) {
         self.gestures
-            .insert(plugin.to_owned(), (now, COMMAND_GESTURE_WINDOW));
+            .insert(plugin.to_owned(), (now, GESTURE_WINDOW));
     }
 
     /// Checks a `chat.send` and returns the line to post, with the `[Name] ` prefix. A refused
@@ -487,7 +485,7 @@ mod tests {
     }
 
     #[test]
-    fn gesture_expires_after_two_seconds_and_is_per_plugin() {
+    fn gesture_expires_after_eight_seconds_and_is_per_plugin() {
         let t0 = Instant::now();
         let mut gate = GestureGate::default();
         gate.gesture("dice", t0);
@@ -496,7 +494,22 @@ mod tests {
             Err(SendError::NotPermitted)
         );
         assert_eq!(
-            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(2001)),
+            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(8001)),
+            Err(SendError::NotPermitted)
+        );
+    }
+
+    #[test]
+    fn click_gesture_lasts_eight_seconds_for_one_message() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        gate.gesture("dice", t0);
+        assert!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(7999))
+                .is_ok()
+        );
+        assert_eq!(
+            gate.send("dice", "Dice", "y", t0 + Duration::from_secs(1)),
             Err(SendError::NotPermitted)
         );
     }
@@ -522,14 +535,14 @@ mod tests {
     }
 
     #[test]
-    fn a_later_click_replaces_a_command_gesture_window() {
+    fn a_later_gesture_restarts_the_window() {
         let t0 = Instant::now();
         let mut gate = GestureGate::default();
-        gate.command_gesture("dice", t0);
         gate.gesture("dice", t0);
-        assert_eq!(
-            gate.send("dice", "Dice", "x", t0 + Duration::from_secs(3)),
-            Err(SendError::NotPermitted)
+        gate.gesture("dice", t0 + Duration::from_secs(5));
+        assert!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_secs(12))
+                .is_ok()
         );
     }
 
