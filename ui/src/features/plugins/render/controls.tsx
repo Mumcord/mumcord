@@ -181,7 +181,9 @@ export function PluginSlider(props: Of<"slider">) {
   const { send } = useRender();
   const id = useId();
   const [local, setLocal] = useState<{ from: number; value: number }>({ from: value, value });
-  // A new value from the plugin replaces what the user left behind.
+  // A new value from the plugin replaces what the user left behind, for good: it must not come
+  // back when the plugin returns to the old value.
+  if (local.from !== value) setLocal({ from: value, value });
   const current = local.from === value ? local.value : value;
   const commit = () => {
     if (current === value) return;

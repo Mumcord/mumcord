@@ -59,8 +59,13 @@ function renderNode(
   if (node === undefined || seen.has(index)) return null;
   seen.add(index);
   const children = () =>
-    node.children.map((child) => (
-      <Fragment key={child}>{renderNode(nodes, child, seen, reducedMotion)}</Fragment>
+    // Keyed by place among the siblings and kind, not by flat node index: a part of the tree
+    // that grows or shrinks shifts every later index, which would remount later fields and
+    // drop what the user is typing (and the focus).
+    node.children.map((child, place) => (
+      <Fragment key={`${String(place)}:${nodes[child]?.component.type ?? ""}`}>
+        {renderNode(nodes, child, seen, reducedMotion)}
+      </Fragment>
     ));
   const c = node.component;
   let content: ReactNode;

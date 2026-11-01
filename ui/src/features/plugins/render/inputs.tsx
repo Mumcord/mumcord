@@ -39,6 +39,9 @@ export function PluginTextInput(props: Of<"textInput">) {
   const { note, noteId, invalid } = useFieldNote(id, props);
   const max = Math.min(maxBytes, MAX_INPUT_BYTES);
   const [draft, setDraft] = useState<{ from: string; text: string }>({ from: value, text: value });
+  // A new value from the plugin replaces the draft for good; otherwise the draft would come back
+  // when the plugin returns to the old value (e.g. empties the field after using the text).
+  if (draft.from !== value) setDraft({ from: value, text: value });
   const text = draft.from === value ? draft.text : value;
   const count = charCount(text, max);
   const commit = () => {

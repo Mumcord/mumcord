@@ -713,3 +713,74 @@ describe("countdown", () => {
     expect(screen.getByRole("timer")).toHaveTextContent("Time's up");
   });
 });
+
+describe("tree updates while typing", () => {
+  const addInput: PluginComponent = {
+    type: "textInput",
+    label: "Add a file name or URL",
+    value: "",
+    placeholder: "",
+    maxBytes: 64,
+    purpose: "plain",
+    action: "add-text",
+    disabled: false,
+    help: null,
+    helpTone: null,
+    error: null,
+  };
+  const text = (value: string) => leaf({ type: "text", text: value, style: "body", color: null });
+
+  it("shows the plugin's value once it changes, not an older draft", () => {
+    // The user types, the plugin takes the text ("abc") and then empties the field after
+    // using it; the field must not bring the typed draft back.
+    const tree = (value: string) => [leaf({ ...addInput, value })];
+    const view = show(tree(""));
+    const field = screen.getByRole("textbox", { name: "Add a file name or URL" });
+    fireEvent.change(field, { target: { value: "abc" } });
+    view.rerender(<PluginTree plugin="poll" slot={PANEL} nodes={tree("abc")} />);
+    view.rerender(<PluginTree plugin="poll" slot={PANEL} nodes={tree("")} />);
+    expect(screen.getByRole("textbox", { name: "Add a file name or URL" })).toHaveValue("");
+  });
+
+  it("shows the plugin's slider value once it changes, not an older position", () => {
+    const slider = (value: number) => [
+      leaf({
+        type: "slider",
+        label: "Volume",
+        min: 0,
+        max: 100,
+        step: 5,
+        value,
+        action: "volume",
+        disabled: false,
+      }),
+    ];
+    const view = show(slider(60));
+    const range = screen.getByRole("slider", { name: "Volume" });
+    fireEvent.change(range, { target: { value: "30" } });
+    view.rerender(<PluginTree plugin="poll" slot={PANEL} nodes={slider(30)} />);
+    view.rerender(<PluginTree plugin="poll" slot={PANEL} nodes={slider(60)} />);
+    expect(screen.getByRole("slider", { name: "Volume" })).toHaveValue("60");
+  });
+
+  it("keeps the draft and the focus when an earlier part of the tree grows", () => {
+    // Root: [now playing, input]. The now-playing part grows from one node to three, which
+    // moves the input from flat index 2 to 4.
+    const before = [stack([1, 2]), text("Nothing is playing"), leaf(addInput)];
+    const after = [
+      stack([1, 4]),
+      stack([2, 3]),
+      text("Now playing"),
+      text("tone-a"),
+      leaf(addInput),
+    ];
+    const view = show(before);
+    const field = screen.getByRole("textbox", { name: "Add a file name or URL" });
+    field.focus();
+    fireEvent.change(field, { target: { value: "http://host/track.mp3" } });
+    view.rerender(<PluginTree plugin="poll" slot={PANEL} nodes={after} />);
+    const now = screen.getByRole("textbox", { name: "Add a file name or URL" });
+    expect(now).toHaveValue("http://host/track.mp3");
+    expect(now).toHaveFocus();
+  });
+});

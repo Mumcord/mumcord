@@ -51,6 +51,7 @@
 - A plugin card for your own fresh message (for example the dice card after /roll) now shows at the bottom next to that message instead of above the older messages
 - Screen readers now read a chat line a plugin replaced as its card (e.g. "Card from Poll: Lunch at noon?") and no longer read lines a plugin hid.
 - A plugin that uses the system keychain (such as Mumbot Music) is no longer stopped as "took too long" when the keychain answers slowly.
+- Text you are typing into a plugin's field (for example a track URL in Mumbot Music) no longer disappears when another part of the plugin's window changes, such as a new song starting, and a field or slider the plugin resets (for example the track field after **Add track**) no longer shows your old entry again.
 - Plugin cards in the chat no longer get their own scrollbar: a taller card is cut off with a soft fade and **Show more** expands it.
 - Pasting with Ctrl+V works again on some Linux desktops
 - A plugin that could not be loaded now keeps its name (in your language) and icon in **Settings > Plugins > Installed** instead of showing its internal id
