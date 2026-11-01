@@ -22,6 +22,17 @@ Requires: Docker (with compose), `openssl`, `sqlite3` on the host.
 
 Superuser name is `SuperUser`, password is `SUPERUSER_PASSWORD` from `.env`. `SERVER_PASSWORD` (optional) is the connect password; leave it empty for an open server.
 
+### One password for the shared servers
+
+The SuperUser password is applied on every container start (`up.sh` recreates the container). The default servers (project `testenv`, ports 64738-64742) are shared by all git worktrees, so every worktree needs the same `testenv/.env` as the main checkout. `up.sh` refuses to run when it differs, and `e2e/run.sh` copies the main checkout's `.env` into a new worktree. Live tests read the password from their own checkout's `.env`, so a mismatch shows up as a failed SuperUser login.
+
+If SuperUser logins fail against a running shared server, apply the main checkout's password again:
+
+    cp <main-checkout>/testenv/.env testenv/.env
+    testenv/up.sh v15        # recreates the container with that password; data is kept
+
+For a private server with its own password use a parallel instance (below).
+
 ## Parallel instances
 
 Two optional env vars (read by `up.sh`, `down.sh`, `reset.sh` and the E2E helpers) let several people or agents run their own servers side by side:
