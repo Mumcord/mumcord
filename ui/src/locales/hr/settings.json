@@ -115,7 +115,6 @@
     "duckingLevel": "Smanjena glasnoća",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Način niske latencije",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Za zajedničko sviranje glazbe u stvarnom vremenu",
     "lowLatencyWarningTitle": "Mijenja otpornost za brzinu",
     "lowLatencyBandwidth": "Troši više propusnosti (paketi od 10 ms).",
@@ -590,7 +589,6 @@
   "p2p": {
     "title": "Peer-to-peer (dijeljenje zaslona, slike u punoj veličini)",
     "modeLabel": "Peer-to-peer način",
-    "recommended": "Preporučeno",
     "explanation": "Izravno drugoj osobi pokazuje tvoju IP adresu. Relej je skriva od nje; operater releja (zajednica ovog poslužitelja) može je vidjeti. Oboje je end-to-end šifrirano.",
     "useGlobal": "Koristi globalnu postavku",
     "overrideHint": "Samo za ovaj poslužitelj. „Koristi globalnu postavku“ prati Postavke → Privatnost.",

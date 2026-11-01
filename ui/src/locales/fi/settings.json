@@ -114,7 +114,6 @@
     "duckingLevel": "Hiljennetty äänenvoimakkuus",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Pienen viiveen tila",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Musiikin soittamiseen yhdessä reaaliajassa",
     "lowLatencyWarningTitle": "Vaihtaa luotettavuutta nopeuteen",
     "lowLatencyBandwidth": "Käyttää enemmän kaistaa (10 ms:n paketit).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-peer (näytön jakaminen, täysikokoiset kuvat)",
     "modeLabel": "Peer-to-peer-tila",
-    "recommended": "Suositus",
     "explanation": "Suora yhteys näyttää IP-osoitteesi toiselle henkilölle. Rele piilottaa sen häneltä; releen ylläpitäjä (tämän palvelimen yhteisö) voi nähdä sen. Molemmat ovat päästä päähän salattuja.",
     "useGlobal": "Käytä yleisasetusta",
     "overrideHint": "Vain tälle palvelimelle. ”Käytä yleisasetusta” noudattaa kohtaa Asetukset → Yksityisyys.",

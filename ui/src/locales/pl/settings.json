@@ -116,7 +116,6 @@
     "duckingLevel": "Obniżona głośność",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Tryb niskich opóźnień",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Do wspólnego grania muzyki w czasie rzeczywistym",
     "lowLatencyWarningTitle": "Wymienia niezawodność na szybkość",
     "lowLatencyBandwidth": "Zużywa więcej przepustowości (pakiety po 10 ms).",
@@ -593,7 +592,6 @@
   "p2p": {
     "title": "Peer-to-peer (udostępnianie ekranu, obrazy w pełnym rozmiarze)",
     "modeLabel": "Tryb peer-to-peer",
-    "recommended": "Zalecane",
     "explanation": "Połączenie bezpośrednie pokazuje twój adres IP drugiej osobie. Przekaźnik ukrywa go przed nią; operator przekaźnika (społeczność tego serwera) może go zobaczyć. Oba warianty są szyfrowane od końca do końca.",
     "useGlobal": "Użyj ustawienia globalnego",
     "overrideHint": "Tylko dla tego serwera. „Użyj ustawienia globalnego” podąża za Ustawienia → Prywatność.",

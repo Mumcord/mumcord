@@ -114,7 +114,6 @@
     "duckingLevel": "Sänkt volym",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Läge för låg latens",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "För att spela musik tillsammans i realtid",
     "lowLatencyWarningTitle": "Byter stabilitet mot snabbhet",
     "lowLatencyBandwidth": "Använder mer bandbredd (10 ms-paket).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-peer (skärmdelning, bilder i full storlek)",
     "modeLabel": "Peer-to-peer-läge",
-    "recommended": "Rekommenderas",
     "explanation": "Direkt visar din IP-adress för den andra personen. Reläet döljer den för dem; reläets operatör (den här serverns community) kan se den. Båda är end-to-end-krypterade.",
     "useGlobal": "Använd global inställning",
     "overrideHint": "Endast för den här servern. ”Använd global inställning” följer Inställningar → Integritet.",

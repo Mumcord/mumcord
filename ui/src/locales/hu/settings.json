@@ -114,7 +114,6 @@
     "duckingLevel": "Csökkentett hangerő",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Alacsony késleltetésű mód",
-    "lowLatencyBeta": "Béta",
     "lowLatencyHint": "Valós idejű közös zenélésre",
     "lowLatencyWarningTitle": "A stabilitást cseréli sebességre",
     "lowLatencyBandwidth": "Több sávszélességet használ (10 ms-os csomagok).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-peer (képernyőmegosztás, teljes méretű képek)",
     "modeLabel": "Peer-to-peer mód",
-    "recommended": "Ajánlott",
     "explanation": "A közvetlen kapcsolat megmutatja az IP-címedet a másik félnek. Az átjátszó elrejti előle; az átjátszó üzemeltetője (a szerver közössége) láthatja. Mindkettő végpontok közötti titkosítású.",
     "useGlobal": "Globális beállítás használata",
     "overrideHint": "Csak ennél a szervernél. A „Globális beállítás használata” a Beállítások → Adatvédelem értékét követi.",

@@ -116,7 +116,6 @@
     "duckingLevel": "Pritildytas garsumas",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Mažos delsos režimas",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Muzikai groti kartu realiuoju laiku",
     "lowLatencyWarningTitle": "Stabilumą iškeičia į greitį",
     "lowLatencyBandwidth": "Naudoja daugiau pralaidumo (10 ms paketai).",
@@ -593,7 +592,6 @@
   "p2p": {
     "title": "Peer-to-peer (ekrano bendrinimas, viso dydžio vaizdai)",
     "modeLabel": "Peer-to-peer režimas",
-    "recommended": "Rekomenduojama",
     "explanation": "Tiesioginis ryšys parodo tavo IP adresą kitam asmeniui. Perdavimo mazgas jį nuo jo paslepia; mazgo operatorius (šio serverio bendruomenė) jį mato. Abu variantai šifruojami nuo galo iki galo.",
     "useGlobal": "Naudoti bendrą nustatymą",
     "overrideHint": "Tik šiam serveriui. „Naudoti bendrą nustatymą“ seka Nustatymai → Privatumas.",

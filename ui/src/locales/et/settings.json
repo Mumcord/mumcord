@@ -114,7 +114,6 @@
     "duckingLevel": "Vähendatud helitugevus",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Väikese viivitusega režiim",
-    "lowLatencyBeta": "Beeta",
     "lowLatencyHint": "Koos muusika mängimiseks reaalajas",
     "lowLatencyWarningTitle": "Vahetab töökindluse kiiruse vastu",
     "lowLatencyBandwidth": "Kasutab rohkem ribalaiust (10 ms paketid).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-peer (ekraani jagamine, täissuuruses pildid)",
     "modeLabel": "Peer-to-peer-režiim",
-    "recommended": "Soovitatav",
     "explanation": "Otseühendus näitab sinu IP-aadressi teisele inimesele. Releeserver peidab selle tema eest; releeserveri haldaja (selle serveri kogukond) näeb seda. Mõlemad on otspunktkrüpteeritud.",
     "useGlobal": "Kasuta üldseadet",
     "overrideHint": "Ainult selle serveri jaoks. „Kasuta üldseadet“ järgib jaotist Seaded → Privaatsus.",

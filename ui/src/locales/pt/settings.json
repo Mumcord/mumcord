@@ -115,7 +115,6 @@
     "duckingLevel": "Volume reduzido",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modo de baixa latência",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Para tocar música em conjunto em tempo real",
     "lowLatencyWarningTitle": "Troca robustez por velocidade",
     "lowLatencyBandwidth": "Usa mais largura de banda (pacotes de 10 ms).",
@@ -590,7 +589,6 @@
   "p2p": {
     "title": "Peer-to-peer (partilha de ecrã, imagens em tamanho original)",
     "modeLabel": "Modo peer-to-peer",
-    "recommended": "Recomendado",
     "explanation": "O modo direto mostra o teu endereço IP à outra pessoa. O retransmissor oculta-o dela; o operador do retransmissor (a comunidade deste servidor) pode vê-lo. Ambos são cifrados de ponta a ponta.",
     "useGlobal": "Usar definição global",
     "overrideHint": "Apenas para este servidor. «Usar definição global» segue Definições → Privacidade.",

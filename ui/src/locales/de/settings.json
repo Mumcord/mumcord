@@ -114,7 +114,6 @@
     "duckingLevel": "Gesenkte Lautstärke",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modus für niedrige Latenz",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Zum gemeinsamen Musizieren in Echtzeit",
     "lowLatencyWarningTitle": "Tauscht Stabilität gegen Tempo",
     "lowLatencyBandwidth": "Braucht mehr Bandbreite (10-ms-Pakete).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-Peer (Bildschirmfreigabe, Bilder in voller Größe)",
     "modeLabel": "Peer-to-Peer-Modus",
-    "recommended": "Empfohlen",
     "explanation": "Bei „Direkt“ sieht die andere Person deine IP-Adresse. Das Relay verbirgt sie vor ihr; der Betreiber des Relays (die Community dieses Servers) kann sie sehen. Beides ist Ende-zu-Ende-verschlüsselt.",
     "useGlobal": "Globale Einstellung verwenden",
     "overrideHint": "Nur für diesen Server. „Globale Einstellung verwenden“ folgt Einstellungen → Datenschutz.",

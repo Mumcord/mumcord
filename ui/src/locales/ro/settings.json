@@ -115,7 +115,6 @@
     "duckingLevel": "Volum redus",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Mod cu latență redusă",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Pentru a cânta împreună în timp real",
     "lowLatencyWarningTitle": "Sacrifică robustețea pentru viteză",
     "lowLatencyBandwidth": "Folosește mai multă lățime de bandă (pachete de 10 ms).",
@@ -590,7 +589,6 @@
   "p2p": {
     "title": "Peer-to-peer (partajarea ecranului, imagini la dimensiune completă)",
     "modeLabel": "Mod peer-to-peer",
-    "recommended": "Recomandat",
     "explanation": "Direct îi arată celeilalte persoane adresa ta IP. Releul o ascunde de ea; operatorul releului (comunitatea acestui server) o poate vedea. Ambele sunt criptate end-to-end.",
     "useGlobal": "Folosește setarea globală",
     "overrideHint": "Doar pentru acest server. „Folosește setarea globală” urmează Setări → Confidențialitate.",

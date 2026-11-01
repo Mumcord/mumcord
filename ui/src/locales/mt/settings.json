@@ -117,7 +117,6 @@
     "duckingLevel": "Volum imbaxxi",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modalità ta' latenza baxxa",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Biex tkun tista' ddoqq il-mużika flimkien f'ħin reali",
     "lowLatencyWarningTitle": "Tbiddel is-saħħa bil-veloċità",
     "lowLatencyBandwidth": "Juża aktar bandwidth (pakketti ta' 10 ms).",
@@ -596,7 +595,6 @@
   "p2p": {
     "title": "Peer-to-peer (qsim tal-iskrin, immaġini bid-daqs sħiħ)",
     "modeLabel": "Modalità peer-to-peer",
-    "recommended": "Rakkomandat",
     "explanation": "Dirett juri l-indirizz IP tiegħek lill-persuna l-oħra. Ir-relay jaħbiħulha; l-operatur tar-relay (il-komunità ta' dan is-server) jista' jarah. It-tnejn huma kriptati minn tarf sa tarf.",
     "useGlobal": "Uża s-setting globali",
     "overrideHint": "Għal dan is-server biss. \"Uża s-setting globali\" isegwi Settings → Privatezza.",

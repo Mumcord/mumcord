@@ -114,7 +114,6 @@
     "duckingLevel": "Sænket lydstyrke",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Tilstand med lav latenstid",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Til at spille musik sammen i realtid",
     "lowLatencyWarningTitle": "Bytter robusthed for hastighed",
     "lowLatencyBandwidth": "Bruger mere båndbredde (10 ms-pakker).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-peer (skærmdeling, billeder i fuld størrelse)",
     "modeLabel": "Peer-to-peer-tilstand",
-    "recommended": "Anbefalet",
     "explanation": "Direkte viser din IP-adresse for den anden person. Relæet skjuler den for dem; relæets operatør (denne servers fællesskab) kan se den. Begge er end-to-end-krypteret.",
     "useGlobal": "Brug global indstilling",
     "overrideHint": "Kun for denne server. \"Brug global indstilling\" følger Indstillinger → Privatliv.",

@@ -114,7 +114,6 @@
     "duckingLevel": "Verlaagd volume",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modus voor lage latentie",
-    "lowLatencyBeta": "Bèta",
     "lowLatencyHint": "Om samen muziek te maken in realtime",
     "lowLatencyWarningTitle": "Ruilt robuustheid in voor snelheid",
     "lowLatencyBandwidth": "Gebruikt meer bandbreedte (pakketten van 10 ms).",
@@ -587,7 +586,6 @@
   "p2p": {
     "title": "Peer-to-peer (schermdelen, afbeeldingen op volledige grootte)",
     "modeLabel": "Peer-to-peer-modus",
-    "recommended": "Aanbevolen",
     "explanation": "Bij direct ziet de ander je IP-adres. De relay verbergt het voor hem of haar; de beheerder van de relay (de community van deze server) kan het zien. Beide zijn end-to-end versleuteld.",
     "useGlobal": "Globale instelling gebruiken",
     "overrideHint": "Alleen voor deze server. \"Globale instelling gebruiken\" volgt Instellingen → Privacy.",

@@ -115,7 +115,6 @@
     "duckingLevel": "Volume réduit",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Mode faible latence",
-    "lowLatencyBeta": "Bêta",
     "lowLatencyHint": "Pour jouer de la musique ensemble en temps réel",
     "lowLatencyWarningTitle": "Sacrifie la robustesse pour la vitesse",
     "lowLatencyBandwidth": "Utilise plus de bande passante (paquets de 10 ms).",
@@ -590,7 +589,6 @@
   "p2p": {
     "title": "Pair à pair (partage d’écran, images en taille réelle)",
     "modeLabel": "Mode pair à pair",
-    "recommended": "Recommandé",
     "explanation": "Le mode direct montre votre adresse IP à l’autre personne. Le relais la lui cache ; l’opérateur du relais (la communauté de ce serveur) peut la voir. Les deux sont chiffrés de bout en bout.",
     "useGlobal": "Utiliser le réglage global",
     "overrideHint": "Uniquement pour ce serveur. « Utiliser le réglage global » suit Paramètres → Confidentialité.",

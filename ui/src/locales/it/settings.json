@@ -115,7 +115,6 @@
     "duckingLevel": "Volume ridotto",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modalità a bassa latenza",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Per suonare insieme in tempo reale",
     "lowLatencyWarningTitle": "Scambia robustezza con velocità",
     "lowLatencyBandwidth": "Usa più banda (pacchetti da 10 ms).",
@@ -590,7 +589,6 @@
   "p2p": {
     "title": "Peer-to-peer (condivisione dello schermo, immagini a dimensione intera)",
     "modeLabel": "Modalità peer-to-peer",
-    "recommended": "Consigliata",
     "explanation": "Con la connessione diretta l'altra persona vede il tuo indirizzo IP. Il relay lo nasconde; l'operatore del relay (la community di questo server) può vederlo. Entrambe sono crittografate end-to-end.",
     "useGlobal": "Usa l'impostazione globale",
     "overrideHint": "Solo per questo server. «Usa l'impostazione globale» segue Impostazioni → Privacy.",

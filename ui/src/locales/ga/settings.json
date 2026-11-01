@@ -117,7 +117,6 @@
     "duckingLevel": "Airde íslithe",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Mód lag-latency",
-    "lowLatencyBeta": "Béite",
     "lowLatencyHint": "Chun ceol a sheinm le chéile i bhfíoram",
     "lowLatencyWarningTitle": "Malartaíonn sé stóinseacht ar luas",
     "lowLatencyBandwidth": "Úsáideann sé níos mó bandaleithead (paicéid 10 ms).",
@@ -596,7 +595,6 @@
   "p2p": {
     "title": "Piarbhrearthóireacht (comhroinnt scáileáin, íomhánna lán-mhéide)",
     "modeLabel": "Mód piarbhrearthóireachta",
-    "recommended": "Molta",
     "explanation": "Taispeánann Díreach do sheoladh IP don duine eile. Folaíonn an t-athsheachadán uaidh é; is féidir le hoibreoir an athsheachadáin (pobal an fhreastalaí seo) é a fheiceáil. Tá an dá rogha criptithe ó cheann ceann.",
     "useGlobal": "Úsáid an socrú domhanda",
     "overrideHint": "Don fhreastalaí seo amháin. Leanann “Úsáid an socrú domhanda” Socruithe → Príobháideacht.",

@@ -116,7 +116,6 @@
     "duckingLevel": "Znížená hlasitosť",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Režim nízkej latencie",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Na spoločné hranie hudby v reálnom čase",
     "lowLatencyWarningTitle": "Obetuje odolnosť v prospech rýchlosti",
     "lowLatencyBandwidth": "Využíva viac šírky pásma (pakety po 10 ms).",
@@ -593,7 +592,6 @@
   "p2p": {
     "title": "Peer-to-peer (zdieľanie obrazovky, obrázky v plnej veľkosti)",
     "modeLabel": "Režim peer-to-peer",
-    "recommended": "Odporúčané",
     "explanation": "Priame spojenie ukáže druhej osobe tvoju IP adresu. Relay ju pred ňou skryje; prevádzkovateľ relay (komunita tohto servera) ju vidí. Oboje je koncovo šifrované.",
     "useGlobal": "Použiť globálne nastavenie",
     "overrideHint": "Iba pre tento server. „Použiť globálne nastavenie“ sa riadi voľbou Nastavenia → Súkromie.",

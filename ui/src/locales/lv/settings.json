@@ -115,7 +115,6 @@
     "duckingLevel": "Samazināts skaļums",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Zemas aizkaves režīms",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Lai kopā spēlētu mūziku reāllaikā",
     "lowLatencyWarningTitle": "Aizstāj izturību ar ātrumu",
     "lowLatencyBandwidth": "Izmanto vairāk joslas platuma (10 ms paketes).",
@@ -590,7 +589,6 @@
   "p2p": {
     "title": "Peer-to-peer (ekrāna kopīgošana, pilna izmēra attēli)",
     "modeLabel": "Peer-to-peer režīms",
-    "recommended": "Ieteicams",
     "explanation": "Tiešais savienojums parāda tavu IP adresi otrai personai. Relejs to no viņas slēpj; releja operators (šī servera kopiena) to redz. Abi veidi ir šifrēti no gala līdz galam.",
     "useGlobal": "Izmantot globālo iestatījumu",
     "overrideHint": "Tikai šim serverim. „Izmantot globālo iestatījumu“ seko sadaļai Iestatījumi → Privātums.",
