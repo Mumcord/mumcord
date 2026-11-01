@@ -40,6 +40,7 @@
 - A plugin window that shows a web page (for example the EVE fit fitting wheel) now opens right after installing or updating the plugin, instead of only after restarting Mumcord
 - A plugin button that leads to its permissions (for example Poll's **Turn on !poll voting**) now opens that plugin's permissions in **Settings > Plugins > Installed** instead of only the list
 
+- The Poll chat card shows its top three options in full again instead of fading the third one behind **Show more**
 ### Internal
 
 - Plugin runtime (Epic 3.1, #268): the new `crates/plugins` runs plugins as WebAssembly components in wasmtime without WASI, so a plugin can only call what Mumcord offers (for now only its own log). Each plugin gets its own store with a 32 MiB memory limit and a CPU deadline per call (500 ms for start, 50 ms otherwise); a plugin that loops, runs out of memory or crashes is stopped while everything else keeps running, restarts with back-off and stays off after 3 failures in 10 minutes. The first version of the plugin API (`mumcord:plugin@1.0.0`) lives in `crates/plugins/wit/`. Not linked into the app yet.
