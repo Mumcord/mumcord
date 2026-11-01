@@ -158,3 +158,9 @@ release builds ignore them.
 
 The signing key pair is generated per run with `mumcord-plugin keygen` into the run's cache dir and
 is never committed.
+
+`registry.start()` runs `scripts/e2e-plugin-registry.sh`, which builds the CLI, the safety fixtures
+and the official plugins. The image has no wasm32 target, so CI builds them on the runner with
+`scripts/e2e-plugin-registry.sh --build-only <dir>` and sets `MUMCORD_E2E_PLUGIN_PACKAGES=<dir>`:
+`e2e/run.sh` mounts the folder into the container and the script takes the CLI and packages from
+it. The same works locally.

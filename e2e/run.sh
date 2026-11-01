@@ -56,6 +56,11 @@ fi
 tty=(); [ -t 1 ] && tty=(-t)
 # Extra `docker run` flags, e.g. MUMCORD_E2E_DOCKER_ARGS="--cpus=2" to mimic a 2-core CI runner.
 read -r -a extra <<< "${MUMCORD_E2E_DOCKER_ARGS:-}"
+# Plugin CLI and packages built on the host (scripts/e2e-plugin-registry.sh --build-only): the
+# image has no wasm32 target, so the plugin specs take them from there instead of building.
+if [ -n "${MUMCORD_E2E_PLUGIN_PACKAGES:-}" ]; then
+  extra+=(-v "$MUMCORD_E2E_PLUGIN_PACKAGES:$MUMCORD_E2E_PLUGIN_PACKAGES:ro" -e MUMCORD_E2E_PLUGIN_PACKAGES)
+fi
 # Host network: the app, bots and netsim reach the testenv servers on localhost:64738-64741 and
 # netsim on 64800/64801. The repo is mounted at its host path so docker compose (via the host
 # socket) resolves testenv's relative volume paths to real host paths.
