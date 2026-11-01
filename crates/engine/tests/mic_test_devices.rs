@@ -35,6 +35,10 @@ async fn a_mic_test_on_unsaved_devices_saves_nothing() {
     let saved = engine.settings().expect("settings");
     assert_eq!(saved.input_device, None);
 
+    // The baseline is taken before the start: the start opens the microphone once for the audio
+    // engine and once more for the switch, and a fast machine finishes the switch before
+    // `mic_test_start` returns, so a baseline read afterwards could already include it.
+    let opens = input_opens();
     engine
         .mic_test_start(Some(MicTestDevices {
             input: Some("unsaved-microphone".into()),
@@ -43,8 +47,7 @@ async fn a_mic_test_on_unsaved_devices_saves_nothing() {
         .await
         .expect("test start");
 
-    let opens = input_opens();
-    let switched = wait_until(|| input_opens() > opens).await;
+    let switched = wait_until(|| input_opens() >= opens + 2).await;
     assert!(switched, "the test must open the microphone again");
 
     let during = engine.settings().expect("settings");
