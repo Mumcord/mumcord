@@ -650,3 +650,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - C11 ✅ AC-6.25 (e2e specs/plugins/mumbot-music.e2e.ts against the local testenv mumbot, 6/7 green locally: red rows, public http refused, wrong/right key, skip/stop/volume/add by name, upload, key not in export, bot leaves; add by URL blocked locally by ufw (bot container cannot reach the host), runs in CI; fixes 56dd7b43 keychain wait counted as waiting, 89c9aef7 plugin fields keep typed text/focus across tree updates and drop stale drafts)
 - Decision 2026-11-01 (user): FR-6.59 "highlighted" = Echolings listed first in Browse; no separate highlight card (mockup conformance V-C 1881b87a)
 - C14 ✅ AC-6.29 (f0f5f5ba a11y.e2e.ts 7/7 ×2; fix cbb6e504 modal focus); 🖐 manual screen reader check (steps in D1); at 150 % font Poll card needs "Show more"
+- C5 ✅ AC-6.8, AC-6.9, AC-6.10 (eef7969d, f4f9deb8 safe-mode.e2e.ts 4/4)
