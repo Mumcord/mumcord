@@ -11,14 +11,14 @@ without a format change. A change that old clients would misread needs a new `fo
 
 ## Files and locations
 
-| File | Official registry | Third-party repository |
-|---|---|---|
-| Index | `https://mumcord.github.io/plugins/v1/index.json` | Any URL the user adds (the address *is* the index URL) |
-| Index signature | `…/v1/index.json.minisig` | Index URL + `.minisig` |
-| Revocation list | `…/v1/revoked.json` + `.minisig` | – (only the official list exists) |
-| Permission texts | `…/v1/permissions.json` | – |
-| Package | GitHub release asset `<id>-v<ver>/<id>-<ver>.mcplugin` | Any URL listed in the index |
-| Author signature | Package URL + `.minisig` | Package URL + `.minisig` |
+| File             | Official registry                                      | Third-party repository                                 |
+| ---------------- | ------------------------------------------------------ | ------------------------------------------------------ |
+| Index            | `https://mumcord.github.io/plugins/v1/index.json`      | Any URL the user adds (the address _is_ the index URL) |
+| Index signature  | `…/v1/index.json.minisig`                              | Index URL + `.minisig`                                 |
+| Revocation list  | `…/v1/revoked.json` + `.minisig`                       | – (only the official list exists)                      |
+| Permission texts | `…/v1/permissions.json`                                | –                                                      |
+| Package          | GitHub release asset `<id>-v<ver>/<id>-<ver>.mcplugin` | Any URL listed in the index                            |
+| Author signature | Package URL + `.minisig`                               | Package URL + `.minisig`                               |
 
 The official base (`https://mumcord.github.io/plugins/v1/`) can be replaced by a mirror in
 Settings → Plugins → Repositories → Advanced. A mirror serves the same signed files; Mumcord still
@@ -100,42 +100,42 @@ in peer announces with its first 8 hex digits.
 }
 ```
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `format` | int | yes | Always `1` for this format. Other values are rejected. |
-| `sequence` | int ≥ 0 | yes | Increases with every publish. Mumcord refuses an index with a lower `sequence` than the last one it accepted from the same source (rollback protection) and keeps its cached copy. |
-| `repository` | object | third-party only | Shown in the add dialog. The official index has none. |
-| `repository.name` | string | yes | Shown as "Unofficial · <name>". Not empty. |
-| `repository.homepage`, `.contact` | string | no | Shown in the add dialog. |
-| `repository.public_key` | key | yes | The key this file is signed with. Pinned on first use. |
-| `key_rotation` | object | no | See [Key rotation](#key-rotation). |
-| `plugins` | array | yes | Third-party: at most 500 entries, otherwise the whole index is rejected. |
+| Field                             | Type    | Required         | Meaning                                                                                                                                                                            |
+| --------------------------------- | ------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `format`                          | int     | yes              | Always `1` for this format. Other values are rejected.                                                                                                                             |
+| `sequence`                        | int ≥ 0 | yes              | Increases with every publish. Mumcord refuses an index with a lower `sequence` than the last one it accepted from the same source (rollback protection) and keeps its cached copy. |
+| `repository`                      | object  | third-party only | Shown in the add dialog. The official index has none.                                                                                                                              |
+| `repository.name`                 | string  | yes              | Shown as "Unofficial · <name>". Not empty.                                                                                                                                         |
+| `repository.homepage`, `.contact` | string  | no               | Shown in the add dialog.                                                                                                                                                           |
+| `repository.public_key`           | key     | yes              | The key this file is signed with. Pinned on first use.                                                                                                                             |
+| `key_rotation`                    | object  | no               | See [Key rotation](#key-rotation).                                                                                                                                                 |
+| `plugins`                         | array   | yes              | Third-party: at most 500 entries, otherwise the whole index is rejected.                                                                                                           |
 
 Plugin entry:
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `id` | string | yes | Plugin id, `^[a-z][a-z0-9-]{2,31}$`; must equal the manifest id. |
-| `name`, `summary` | map lang → text | yes | `en` is required; other language tags optional. |
-| `description_md_url` | URL | no | Long description in Markdown (FR-6.80). |
-| `icon` | URL | no | |
-| `screenshots` | array of `{url, alt}` | no | `alt` is a map lang → text. |
-| `categories`, `authors` | array of strings | no | |
-| `author_keys` | array of keys | yes | At least one. A package must be signed by one of them. |
-| `reviewed` | bool | no | Default `false`. The official registry sets it after maintainer review. |
-| `updated` | `YYYY-MM-DD` | yes | Date of the latest version. |
-| `versions` | array | yes | At least one; no duplicate versions. The highest semver is the latest. |
+| Field                   | Type                  | Required | Meaning                                                                 |
+| ----------------------- | --------------------- | -------- | ----------------------------------------------------------------------- |
+| `id`                    | string                | yes      | Plugin id, `^[a-z][a-z0-9-]{2,31}$`; must equal the manifest id.        |
+| `name`, `summary`       | map lang → text       | yes      | `en` is required; other language tags optional.                         |
+| `description_md_url`    | URL                   | no       | Long description in Markdown (FR-6.80).                                 |
+| `icon`                  | URL                   | no       |                                                                         |
+| `screenshots`           | array of `{url, alt}` | no       | `alt` is a map lang → text.                                             |
+| `categories`, `authors` | array of strings      | no       |                                                                         |
+| `author_keys`           | array of keys         | yes      | At least one. A package must be signed by one of them.                  |
+| `reviewed`              | bool                  | no       | Default `false`. The official registry sets it after maintainer review. |
+| `updated`               | `YYYY-MM-DD`          | yes      | Date of the latest version.                                             |
+| `versions`              | array                 | yes      | At least one; no duplicate versions. The highest semver is the latest.  |
 
 Version entry:
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `version` | semver | yes | Must equal the manifest version. |
-| `api` | int | yes | Plugin API major version (`1`). |
-| `url` | URL | yes | Package download; author signature at `url` + `.minisig`. |
-| `size` | int | yes | Exact package size in bytes, 1 … 5 MiB. |
-| `sha256` | hex | yes | Lower-case hex SHA-256 of the package (64 digits). |
-| `permissions` | array of ids | yes | Every permission, required or optional, the reviewed version may request. A package asking for more is refused. |
+| Field         | Type         | Required | Meaning                                                                                                         |
+| ------------- | ------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `version`     | semver       | yes      | Must equal the manifest version.                                                                                |
+| `api`         | int          | yes      | Plugin API major version (`1`).                                                                                 |
+| `url`         | URL          | yes      | Package download; author signature at `url` + `.minisig`.                                                       |
+| `size`        | int          | yes      | Exact package size in bytes, 1 … 5 MiB.                                                                         |
+| `sha256`      | hex          | yes      | Lower-case hex SHA-256 of the package (64 digits).                                                              |
+| `permissions` | array of ids | yes      | Every permission, required or optional, the reviewed version may request. A package asking for more is refused. |
 
 ### Invalid and forbidden entries
 
@@ -177,7 +177,11 @@ sign the index with the new key. Keep `key_rotation` in the index until all user
       "id": "echolings",
       "versions": ["1.0.0"],
       "severity": "disable",
-      "reason": { "en": "Crashes voice", "de": "Bringt Sprache zum Absturz", "es": "Bloquea la voz" },
+      "reason": {
+        "en": "Crashes voice",
+        "de": "Bringt Sprache zum Absturz",
+        "es": "Bloquea la voz"
+      },
       "since": "2026-10-20"
     },
     {
@@ -192,17 +196,17 @@ sign the index with the new key. Keep `key_rotation` in the index until all user
 }
 ```
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `format` | int | yes | `1`. |
-| `sequence` | int ≥ 0 | yes | Increases with every publish; a lower one than the cached copy is refused. |
-| `revoked[].id` | string | yes | Plugin id. Applies to every source (official, third-party, developer). |
-| `revoked[].versions` | array of semver | no | Revoked versions. |
-| `revoked[].sha256` | array of hex | no | Revoked packages by hash. Without `versions` and `sha256`, every version is revoked. |
-| `revoked[].author_key` | key | no | If set, only packages signed by this author key match. |
-| `revoked[].severity` | `disable` / `warn` | yes | `disable` stops and turns the plugin off ("Turned off by Mumcord: <reason>"); `warn` shows the reason on the plugin row. Data is never removed. |
-| `revoked[].reason` | map lang → text | yes | `en` required; `de` and `es` expected. |
-| `revoked[].since` | `YYYY-MM-DD` | yes | Publication date. |
+| Field                  | Type               | Required | Meaning                                                                                                                                         |
+| ---------------------- | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `format`               | int                | yes      | `1`.                                                                                                                                            |
+| `sequence`             | int ≥ 0            | yes      | Increases with every publish; a lower one than the cached copy is refused.                                                                      |
+| `revoked[].id`         | string             | yes      | Plugin id. Applies to every source (official, third-party, developer).                                                                          |
+| `revoked[].versions`   | array of semver    | no       | Revoked versions.                                                                                                                               |
+| `revoked[].sha256`     | array of hex       | no       | Revoked packages by hash. Without `versions` and `sha256`, every version is revoked.                                                            |
+| `revoked[].author_key` | key                | no       | If set, only packages signed by this author key match.                                                                                          |
+| `revoked[].severity`   | `disable` / `warn` | yes      | `disable` stops and turns the plugin off ("Turned off by Mumcord: <reason>"); `warn` shows the reason on the plugin row. Data is never removed. |
+| `revoked[].reason`     | map lang → text    | yes      | `en` required; `de` and `es` expected.                                                                                                          |
+| `revoked[].since`      | `YYYY-MM-DD`       | yes      | Publication date.                                                                                                                               |
 
 Mumcord fetches `revoked.json` once a day, even with plugin updates off, and always applies the
 copy bundled with the release (`crates/plugins/assets/revoked.json`) in addition to the fetched
@@ -257,15 +261,15 @@ file = "shot-1.png"
 alt = { en = "A roll of two dice" }
 ```
 
-| Field | Required | Meaning |
-|---|---|---|
-| `name`, `summary` | yes | Language tag → text; `en` required. Become `name` / `summary` in the index. |
-| `categories`, `authors` | no | Copied into the index. |
-| `author_keys` | yes | Minisign public keys (base64 line) allowed to sign packages. A new key needs maintainer review. |
-| `reviewed` | no | Set by a maintainer after review; default `false`. |
-| `description` | no | Markdown file in the plugin folder, published as `v1/media/<id>/<file>` (`description_md_url`). |
-| `icon` | no | Image in the plugin folder, published under `v1/media/<id>/`. |
-| `screenshots` | no | `{file, alt}`; `alt` maps language tags to text. Published under `v1/media/<id>/`. |
+| Field                   | Required | Meaning                                                                                         |
+| ----------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `name`, `summary`       | yes      | Language tag → text; `en` required. Become `name` / `summary` in the index.                     |
+| `categories`, `authors` | no       | Copied into the index.                                                                          |
+| `author_keys`           | yes      | Minisign public keys (base64 line) allowed to sign packages. A new key needs maintainer review. |
+| `reviewed`              | no       | Set by a maintainer after review; default `false`.                                              |
+| `description`           | no       | Markdown file in the plugin folder, published as `v1/media/<id>/<file>` (`description_md_url`). |
+| `icon`                  | no       | Image in the plugin folder, published under `v1/media/<id>/`.                                   |
+| `screenshots`           | no       | `{file, alt}`; `alt` maps language tags to text. Published under `v1/media/<id>/`.              |
 
 File paths are relative to the plugin folder and may not contain `..`.
 
@@ -291,12 +295,12 @@ commit = "4f1c…"
 path = "dice"
 ```
 
-| Field | Meaning |
-|---|---|
-| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for. |
-| `published` | `YYYY-MM-DD`; the newest version's date becomes `updated`. |
-| `signature` | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`. |
-| `source` | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash. |
+| Field                                             | Meaning                                                                                                                         |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for.                                 |
+| `published`                                       | `YYYY-MM-DD`; the newest version's date becomes `updated`.                                                                      |
+| `signature`                                       | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`.        |
+| `source`                                          | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash. |
 
 The package itself is not in the repository: the publish workflow rebuilds it from `source` and
 attaches it to the release `<id>-v<ver>`, so the index URL is
@@ -328,14 +332,14 @@ a third-party repository instead; its address is `http://127.0.0.1:<port>/v1/ind
 Scenario switches (`--scenario`, repeatable, or `POST /_ctl/scenario?set=a,b` while running; an
 empty `set=` clears them) produce what the client must refuse:
 
-| Scenario | Effect |
-|---|---|
-| `tampered-hash:<id>` | The index lists a wrong SHA-256 for the plugin → "Download didn't match the official list". |
-| `lower-sequence` | The index sequence is one below the current one → rollback refused. |
-| `wrong-key` | The index is signed with an unknown key → "Signature check failed". |
-| `extra-permission:<id>` | The index allows one permission less than the manifest asks for → install refused. |
-| `revoke:<id>[@<ver>][:warn]` | Adds a `revoked.json` entry (severity `disable`, or `warn`). |
-| `key-change[:rotate]` | The index is signed with a second key; `rotate` adds a valid `key_rotation`. |
+| Scenario                     | Effect                                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------------- |
+| `tampered-hash:<id>`         | The index lists a wrong SHA-256 for the plugin → "Download didn't match the official list". |
+| `lower-sequence`             | The index sequence is one below the current one → rollback refused.                         |
+| `wrong-key`                  | The index is signed with an unknown key → "Signature check failed".                         |
+| `extra-permission:<id>`      | The index allows one permission less than the manifest asks for → install refused.          |
+| `revoke:<id>[@<ver>][:warn]` | Adds a `revoked.json` entry (severity `disable`, or `warn`).                                |
+| `key-change[:rotate]`        | The index is signed with a second key; `rotate` adds a valid `key_rotation`.                |
 
 `POST /_ctl/reload` rescans the package folder and raises the sequence, which publishes new
 versions. The sequence starts at the current Unix time unless `--sequence` is given.
