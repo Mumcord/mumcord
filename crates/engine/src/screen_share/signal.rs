@@ -20,7 +20,15 @@ pub const DATA_ID: &str = "mumcord.screen";
 /// Hello feature of clients that can share and watch screens.
 pub const FEATURE: &str = "screen-share";
 /// The signal version this client sends; higher versions are still read.
-pub const VERSION: u32 = 1;
+pub const VERSION: u32 = 2;
+
+/// What the sharer picked, when the platform can tell (issue #163).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ShareKind {
+    Window,
+    Screen,
+}
 /// Viewers per sharer (FR-2.43); the ninth gets [`Signal::Full`].
 pub const MAX_VIEWERS: usize = 8;
 
@@ -32,6 +40,12 @@ pub enum Signal {
         live: bool,
         paused: bool,
         sound: bool,
+        /// What the sharer picked; `None` where the platform cannot tell (issue #163).
+        #[serde(default)]
+        kind: Option<ShareKind>,
+        /// How long the share had been running when this signal was sent (issue #163).
+        #[serde(default)]
+        elapsed_ms: u32,
     },
     /// The sender wants to watch the receiver's share.
     Watch,
@@ -94,6 +108,8 @@ mod tests {
                 live: true,
                 paused: false,
                 sound: true,
+                kind: Some(ShareKind::Window),
+                elapsed_ms: 4200,
             },
             Signal::Watch,
             Signal::Accept,
@@ -106,6 +122,18 @@ mod tests {
         for signal in signals {
             assert_eq!(decode(&encode(&signal)), Some(signal));
         }
+    }
+
+    #[test]
+    fn version_1_shares_still_read() {
+        let signal = decode(br#"{"v":1,"t":"share","live":true,"paused":false,"sound":false}"#);
+        let Some(Signal::Share {
+            kind, elapsed_ms, ..
+        }) = signal
+        else {
+            panic!("not a share: {signal:?}");
+        };
+        assert_eq!((kind, elapsed_ms), (None, 0));
     }
 
     #[test]

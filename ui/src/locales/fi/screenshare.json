@@ -34,5 +34,8 @@
   "stopped": "Lopetit näytön jakamisen.",
   "pauseSharing": "Keskeytä jakaminen",
   "resumeSharing": "Jatka jakamista",
-  "viewersLabel": "Ketkä katsovat"
+  "viewersLabel": "Ketkä katsovat",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Vaihda ikkuna",
+  "viewersTitle": "Katsojat"
 }

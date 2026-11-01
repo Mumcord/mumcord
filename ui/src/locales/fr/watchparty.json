@@ -30,6 +30,8 @@
     "title": "À suivre",
     "empty": "Rien à suivre. Ajoutez des liens YouTube avec « Ajouter à la playlist ».",
     "skip": "Passer",
+    "previous": "Précédent",
+    "previousFailed": "Impossible de revenir à la vidéo précédente.",
     "moveHint": "Alt+Haut et Alt+Bas déplacent la vidéo ; vous pouvez aussi la faire glisser.",
     "moved": "Déplacé en position {{position}}",
     "videoTitle": "Vidéo YouTube",
@@ -42,7 +44,9 @@
     "nextFailed": "La vidéo suivante n’a pas pu être lancée.",
     "move": "Déplacer {{title}}",
     "upNext": "À suivre : {{title}}",
-    "upNextNone": "Rien à suivre"
+    "upNextNone": "Rien à suivre",
+    "paste": "Collez un lien YouTube",
+    "notALink": "Ce n'est pas un lien YouTube"
   },
   "widget": {
     "play": "Lecture",

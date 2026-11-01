@@ -53,3 +53,15 @@ export function playNext(serverId: number, from: number, skip: boolean, failedTe
       report(failedText, error);
     });
 }
+
+/**
+ * Goes back to the video that played before the current one for everyone (issue #163). The engine
+ * takes the last entry of the past it keeps; with nothing played yet it answers with an error.
+ */
+export function playPrevious(serverId: number, failedText: string): void {
+  getApi()
+    .watchPartyPrevious(serverId)
+    .catch((error: unknown) => {
+      report(failedText, error);
+    });
+}

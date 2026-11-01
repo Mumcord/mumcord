@@ -34,5 +34,8 @@
   "stopped": "Спря споделянето на екрана си.",
   "pauseSharing": "Пауза на споделянето",
   "resumeSharing": "Продължи споделянето",
-  "viewersLabel": "Кой гледа"
+  "viewersLabel": "Кой гледа",
+  "elapsed": "{{minutes}} мин",
+  "changeWindow": "Смени прозорец",
+  "viewersTitle": "Зрители"
 }

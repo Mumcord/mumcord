@@ -36,5 +36,29 @@
     "output": "Speaker buffer",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Player controls",
+    "nowPlaying": "Now playing",
+    "watching": "Watching",
+    "open": "Open",
+    "next": "Next",
+    "seek": "Seek",
+    "volume": "Volume",
+    "syncedPlay": "Synced play",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} is in control",
+    "inSync": "In sync",
+    "inSyncAll": "Everyone in sync",
+    "inSyncExcept": "Everyone in sync except {{count}}",
+    "buffering": "Buffering",
+    "behind": "{{seconds}} s behind",
+    "ahead": "{{seconds}} s ahead",
+    "noReport": "No report yet",
+    "you": "you",
+    "host": "Host",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Leave full screen",
+    "none": "Nobody"
   }
 }

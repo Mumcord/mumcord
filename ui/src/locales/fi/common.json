@@ -36,5 +36,29 @@
     "output": "Kaiuttimen puskuri",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Soittimen valitsimet",
+    "nowPlaying": "Nyt toistetaan",
+    "watching": "Katsovat",
+    "open": "Avaa",
+    "next": "Seuraava",
+    "seek": "Siirry",
+    "volume": "Äänenvoimakkuus",
+    "syncedPlay": "Synkassa",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} hallitsee",
+    "inSync": "Synkassa",
+    "inSyncAll": "Kaikki synkassa",
+    "inSyncExcept": "Kaikki synkassa paitsi {{count}}",
+    "buffering": "Puskuroi",
+    "behind": "{{seconds}} s jäljessä",
+    "ahead": "{{seconds}} s edellä",
+    "noReport": "Ei raporttia",
+    "you": "sinä",
+    "host": "Isäntä",
+    "fullscreen": "Koko näyttö",
+    "exitFullscreen": "Poistu koko näytöstä",
+    "none": "Kukaan"
   }
 }

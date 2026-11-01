@@ -1,0 +1,434 @@
+/*
+ * The media frame, the mini bar and the right column panel that both media views share
+ * (issue #163). Theme tokens only, so light and dark and every custom theme work.
+ */
+.media-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.media-frame__picture {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: #000;
+}
+
+.media-frame__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* The overlays fade in on hover, keyboard focus or pause; reduced motion keeps them visible. */
+.media-frame__top,
+.media-frame__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.media-frame:hover .media-frame__top,
+.media-frame:hover .media-frame__bottom,
+.media-frame:focus-within .media-frame__top,
+.media-frame:focus-within .media-frame__bottom,
+.media-frame[data-paused] .media-frame__top,
+.media-frame[data-paused] .media-frame__bottom {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-frame__top,
+  .media-frame__bottom {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+.media-frame__mark {
+  flex: none;
+}
+
+.media-frame__titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.media-frame__title {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-frame__sub,
+.media-frame__time,
+.media-frame__action {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.media-frame__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* The seek bar: the played part, the buffered part, and a marker where each other viewer is. */
+.seek-bar {
+  position: relative;
+  flex: 1;
+  min-width: 8rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--played),
+    color-mix(in srgb, var(--color-accent) 35%, transparent) var(--played),
+    var(--color-bg-hover) 100%
+  );
+}
+
+.seek-bar__buffer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+.seek-bar__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  background: none;
+  cursor: pointer;
+}
+
+.seek-bar__input::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-bg);
+}
+
+.seek-bar__marker {
+  position: absolute;
+  top: -0.25rem;
+  width: 0.25rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-text);
+}
+
+.volume {
+  position: relative;
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-width: 6rem;
+}
+
+.volume__input {
+  flex: 1;
+  height: 0.5rem;
+  appearance: none;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--played),
+    var(--color-bg-hover) var(--played)
+  );
+}
+
+.volume__meter {
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+}
+
+/* The mini bar at the top of the chat. */
+.mini-bar {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.mini-bar__thumb {
+  flex: none;
+  width: 3rem;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+}
+
+.mini-bar__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-bar__text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.mini-bar__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-bar__progress {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.sync-dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+}
+
+.sync-dot--synced {
+  background: var(--color-success);
+}
+
+.sync-dot--buffering {
+  background: var(--color-warning);
+}
+
+/* The right column panel. */
+.media-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.media-panel__tabs {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.media-panel__tab {
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.media-panel__tab[aria-selected="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-bg-selected);
+  color: var(--color-text);
+}
+
+.media-panel__count {
+  margin-left: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+/* The watching list with the sync state of each person. */
+.watch-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.watch-list__person {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) 0;
+}
+
+.watch-list__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.watch-list__host {
+  color: var(--color-accent-text);
+}
+
+.watch-list__state {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.watch-list__state--synced {
+  color: var(--color-success);
+}
+
+.watch-list__state--buffering {
+  color: var(--color-warning);
+}
+
+/* The share mini bar has no picture of its own: a small screen shape stands for it. */
+.mini-bar__screen {
+  display: inline-block;
+  width: 26px;
+  height: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg-elevated);
+}
+
+/* The picture and the three ways of showing it (issue #163, FR-3.126). */
+.media-frame__screen {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.media-frame__screen img,
+.media-frame__screen canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.media-frame__screen--fill img,
+.media-frame__screen--fill canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 1:1 shows the picture at its own size instead of fitting it into the frame. */
+.media-frame__screen--oneToOne {
+  overflow: auto;
+}
+
+.media-frame__screen--oneToOne img,
+.media-frame__screen--oneToOne canvas {
+  max-width: none;
+  max-height: none;
+}
+
+/* What the share looks like, counted from the frames (issue #163). */
+.media-frame__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.media-frame__live {
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.media-frame__fit {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.media-frame__keys {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.media-frame__unavailable {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.media-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+/* The sync pill: the dot carries the meaning without colour alone (issue #163). */
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+}
+
+.sync-pill[data-out] {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.sync-pill__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-success);
+}
+
+.sync-pill[data-out] .sync-pill__dot {
+  background: var(--color-warning);
+}
+
+.volume__icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-secondary);
+}
+
+.mini-bar__status {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.mini-bar__empty {
+  width: 26px;
+  height: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg-elevated);
+}
+
+/* The mock's placeholder picture (issue #163): the mock has no peer, so it shows its own demo image. */
+.media-frame__mockpicture {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: var(--radius-md);
+}

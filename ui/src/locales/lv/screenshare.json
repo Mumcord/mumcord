@@ -35,5 +35,8 @@
   "stopped": "Tu pārtrauci ekrāna kopīgošanu.",
   "pauseSharing": "Pauzēt kopīgošanu",
   "resumeSharing": "Turpināt kopīgošanu",
-  "viewersLabel": "Kas skatās"
+  "viewersLabel": "Kas skatās",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Mainīt logu",
+  "viewersTitle": "Skatītāji"
 }

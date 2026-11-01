@@ -36,5 +36,29 @@
     "output": "Højttalerbuffer",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Afspillerkontroler",
+    "nowPlaying": "Spiller nu",
+    "watching": "Ser",
+    "open": "Åbn",
+    "next": "Næste",
+    "seek": "Søg",
+    "volume": "Lydstyrke",
+    "syncedPlay": "Synkroniseret",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} har kontrol",
+    "inSync": "Synkroniseret",
+    "inSyncAll": "Alle er synkroniseret",
+    "inSyncExcept": "Alle synkroniseret undtagen {{count}}",
+    "buffering": "Loader",
+    "behind": "{{seconds}} s bagefter",
+    "ahead": "{{seconds}} s foran",
+    "noReport": "Ingen melding",
+    "you": "dig",
+    "host": "Vært",
+    "fullscreen": "Fuld skærm",
+    "exitFullscreen": "Forlad fuld skærm",
+    "none": "Ingen"
   }
 }

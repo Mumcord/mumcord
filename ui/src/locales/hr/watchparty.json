@@ -30,6 +30,8 @@
     "title": "Sljedeće",
     "empty": "Ništa nije sljedeće. Dodaj YouTube poveznice s „Dodaj na popis”.",
     "skip": "Preskoči",
+    "previous": "Prethodni",
+    "previousFailed": "Nije bilo moguće vratiti se na prethodni video.",
     "moveHint": "Alt+Gore i Alt+Dolje pomiču video; možeš ga i povući.",
     "moved": "Premješteno na mjesto {{position}}",
     "videoTitle": "YouTube video",
@@ -42,7 +44,9 @@
     "nextFailed": "Sljedeći video nije se mogao pokrenuti.",
     "move": "Premjesti {{title}}",
     "upNext": "Sljedeće: {{title}}",
-    "upNextNone": "Ništa nije sljedeće"
+    "upNextNone": "Ništa nije sljedeće",
+    "paste": "Zlijepi YouTube link",
+    "notALink": "To nije YouTube link"
   },
   "widget": {
     "play": "Reproduciraj",

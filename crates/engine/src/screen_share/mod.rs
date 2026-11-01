@@ -32,6 +32,7 @@ pub mod sound_macos;
 mod sound_windows;
 mod start;
 mod state;
+mod thumbnail;
 mod watch;
 mod windows_rules;
 pub mod wire;
@@ -53,13 +54,15 @@ use crate::session::{
     Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, WeakEngine, lock,
 };
 use signal::{DATA_ID, FEATURE, Signal, decode, encode};
-use state::{Admit, Answer, OwnShare, Shares, Watching};
+use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use media::{ScreenMediaStats, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
+pub use signal::ShareKind;
 pub use start::StartOutcome;
+pub use thumbnail::ShareThumbnail;
 pub use watch::ScreenFrameSink;
 
 /// How long a watch request waits for the sharer's answer.
@@ -114,6 +117,11 @@ pub struct ScreenShareView {
     pub viewers: Vec<u32>,
     /// Why "Watch" is not possible; always `None` for the own share.
     pub blocked: Option<WatchBlock>,
+    /// What the sharer picked, when the platform can tell (issue #163).
+    pub kind: Option<ShareKind>,
+    /// How long the share has been running (issue #163): the own one from its start, another's
+    /// from the time their signal arrived, so no clock of another machine is trusted.
+    pub elapsed_ms: u32,
 }
 
 /// Shares per connected server, and where watched frames go.
@@ -202,11 +210,15 @@ fn announce(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, receive
             live: true,
             paused: own.paused,
             sound: own.sound,
+            kind: own.kind,
+            elapsed_ms: own.elapsed_ms(),
         },
         None => Signal::Share {
             live: false,
             paused: false,
             sound: false,
+            kind: None,
+            elapsed_ms: 0,
         },
     };
     let receivers = capable(peers, ctx.server_id, receivers, FEATURE);
@@ -315,7 +327,18 @@ pub(crate) fn on_plugin_data(
                 live: true,
                 paused,
                 sound,
-            } => shares.share_live(sender, paused, sound),
+                kind,
+                elapsed_ms,
+            } => shares.share_live(
+                sender,
+                &Announced {
+                    paused,
+                    sound,
+                    kind,
+                    elapsed_ms,
+                },
+                Instant::now(),
+            ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
             Signal::Watch => {
                 match shares.own.as_mut().map(|own| own.admit(sender)) {
@@ -331,6 +354,8 @@ pub(crate) fn on_plugin_data(
                             live: false,
                             paused: false,
                             sound: false,
+                            kind: None,
+                            elapsed_ms: 0,
                         });
                     }
                 }
@@ -587,6 +612,7 @@ impl Engine {
                 return Err(EngineError::invalid("already sharing on this server"));
             }
             let mut own = OwnShare::new(sound, app_sound.is_some());
+            own.kind = source.kind();
             let media = media::Media::start(source);
             if let Some(app_sound) = app_sound {
                 media.start_sound(app_sound);
@@ -924,6 +950,16 @@ impl Engine {
             .and_then(|s| s.own.as_ref())
             .and_then(|own| own.media.as_ref())
             .map(media::Media::stats)
+    }
+
+    /// The picture the sharer's control bar shows for the own share (issue #163, FR-3.127).
+    pub fn screen_share_thumbnail(&self, server_id: ServerId) -> Option<ShareThumbnail> {
+        lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .and_then(|own| own.media.as_ref())
+            .and_then(media::Media::thumbnail)
     }
 
     /// Throttles the own share's upload in-process, to `viewer` or (with `None`) to all viewers

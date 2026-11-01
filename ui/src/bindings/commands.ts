@@ -616,6 +616,8 @@ export const commands = {
 	watchPartyStart: (serverId: number, videoId: string) => typedError<WatchParty, ApiError>(__TAURI_INVOKE("watch_party_start", { serverId, videoId })),
 	/**  Sends a playback command to everyone in the party. */
 	watchPartyCommand: (serverId: number, command: WatchCommand) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_command", { serverId, command })),
+	/**  Where the user's player is, for the sync list (issue #163): remembered and told to the others. */
+	watchPartyReport: (serverId: number, positionMs: number, playing: boolean, buffering: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_report", { serverId, positionMs, playing, buffering })),
 	/**  Joins the party the user was invited to; its position is the current one. */
 	watchPartyJoin: (serverId: number) => typedError<WatchParty, ApiError>(__TAURI_INVOKE("watch_party_join", { serverId })),
 	/**  The party in the user's channel, if any (for a view opened after the last event). */
@@ -628,6 +630,8 @@ export const commands = {
 	watchPartyRemove: (serverId: number, entry: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_remove", { serverId, entry })),
 	/**  Moves an entry of the party's playlist to `index` (0 plays next). */
 	watchPartyMove: (serverId: number, entry: number, index: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_move", { serverId, entry, index })),
+	/**  Goes back to the video that played before the current one for everyone (issue #163). */
+	watchPartyPrevious: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_previous", { serverId })),
 	/**
 	 *  Goes on from entry `from` to the next playlist entry for everyone: at the end of a video,
 	 *  or at once with `skip`.
@@ -673,6 +677,15 @@ export const commands = {
 	 *  settings and the relay change without an event, so the UI asks again before starting.
 	 */
 	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
+	/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
+	screenShareQuality: (serverId: number) => typedError<ShareQuality | null, ApiError>(__TAURI_INVOKE("screen_share_quality", { serverId })),
+	/**  The picture the sharer's bar shows: the last keyframe the encoder took (issue #163). */
+	screenShareThumbnail: (serverId: number) => typedError<ShareThumbnail | null, ApiError>(__TAURI_INVOKE("screen_share_thumbnail", { serverId })),
+	/**
+	 *  What the user's own watch of `session`'s share looks like (issue #163); the picture figures are
+	 *  counted in the UI from the frames. `None` while not watching.
+	 */
+	screenShareWatchStats: (serverId: number, session: number) => typedError<WatchStats | null, ApiError>(__TAURI_INVOKE("screen_share_watch_stats", { serverId, session })),
 	/**  The updater's current state. */
 	updateStatus: () => __TAURI_INVOKE<UpdateStatus>("update_status"),
 	/**
@@ -1384,6 +1397,12 @@ export type GamePluginProblem =
 /**  The plugin failed and is not used until it is enabled again. */
 "failed";
 
+/**  One video that already played, for the previous button (issue #163). */
+export type HistoryItem = {
+	id: number,
+	videoId: string,
+};
+
 export type HistoryScope = { kind: "conversation"; serverId: number; conversation: Conversation } | { kind: "server"; serverId: number } | { kind: "all" };
 
 /**  A channel's history sync started (`running: true`) or ended with `added` new messages. */
@@ -2050,6 +2069,17 @@ export type PacketCounter = {
 
 export type PacketDirection = "sent" | "received";
 
+/**  Where one participant's player last said it is (issue #163). */
+export type ParticipantPosition = {
+	session: number,
+	positionMs: number,
+	/**  How old the report was when the view was made, in milliseconds. */
+	ageMs: number,
+	/**  The state that player reported for itself, not the party's. */
+	playing: boolean,
+	buffering: boolean,
+};
+
 /**  How a server edit treats the stored password. */
 export type PasswordUpdate = 
 /**  Leave the stored password as it is (on add: no password). */
@@ -2365,6 +2395,13 @@ export type ScreenShare = {
 	blocked: WatchBlock | null,
 	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
 	relayReason: RelayUnavailable | null,
+	/**
+	 *  What the sharer picked in the system picker (issue #163); `null` where the platform cannot
+	 *  tell a window from the whole screen.
+	 */
+	kind: ShareKind | null,
+	/**  How long the share has been running (issue #163). */
+	elapsedMs: number,
 };
 
 /**  The screen shares on the server changed; carries the full list. */
@@ -2656,11 +2693,34 @@ export type Settings = {
 	blockedMessages: BlockedMessages,
 };
 
+/**  What the sharer picked in the system picker (issue #163). */
+export type ShareKind = "window" | "screen";
+
+/**  How the frames of a watched share reach the viewer. */
+export type SharePath = "direct";
+
+/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
+export type ShareQuality = {
+	width: number,
+	height: number,
+	fps: number,
+	kbps: number,
+	viewers: ViewerQuality[],
+};
+
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
 export type ShareStartBlock = {
 	blocked: WatchBlock,
 	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
 	relayReason: RelayUnavailable | null,
+};
+
+/**  The live picture of the own share for the sharer's bar (issue #163, FR-3.127). */
+export type ShareThumbnail = {
+	width: number,
+	height: number,
+	/**  The last keyframe, scaled down, as a `data:` URL the UI shows as it is. */
+	dataUrl: string,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -2941,6 +3001,17 @@ export type VideoEmbed = {
 
 export type VideoSite = "youtube" | "twitch";
 
+/**  What one viewer gets (issue #163). */
+export type ViewerQuality = {
+	session: number,
+	fps: number,
+	/**
+	 *  It lost every layer it can and still does not keep up, so the quality step is lowered for
+	 *  everyone because of this viewer.
+	 */
+	struggling: boolean,
+};
+
 export type VoiceActivation = "automatic" | "manual";
 
 /**  Voice packets of a connected server since its voice link started. */
@@ -2995,12 +3066,32 @@ export type WatchParty = {
 	playlist: PlaylistEntry[],
 	/**  Who skipped to the current video ("Anna skipped"), until the next playback command. */
 	skippedBy: number | null,
+	/**  Where each participant last reported being (issue #163). */
+	positions: ParticipantPosition[],
+	/**  Who started the party (the crown in the watching list, issue #163). */
+	host: number,
+	/**  What played before the current video, oldest first (issue #163). */
+	history: HistoryItem[],
 };
 
 /**  The party on the server started, changed or ended (`party` is `null`). */
 export type WatchPartyChanged = {
 	serverId: number,
 	party: WatchParty | null,
+};
+
+/**
+ *  What the user's own watch of a share looks like (issue #163); the picture figures come from
+ *  the frames themselves and are counted in the UI.
+ */
+export type WatchStats = {
+	/**
+	 *  Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
+	 *  second path.
+	 */
+	path: SharePath,
+	/**  Sound level of the shared sound at the viewer, 0.0–1.0. */
+	rms: number | null,
 };
 
 export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";

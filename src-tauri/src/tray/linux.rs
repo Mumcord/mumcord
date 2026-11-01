@@ -34,7 +34,7 @@ pub async fn spawn(app: &AppHandle) -> Result<ksni::Handle<KsniTray>, ksni::Erro
 impl KsniTray {
     /// Takes a new view; the menu stays when the view carries none.
     pub fn show(&mut self, view: View) {
-        self.icon = view.icon;
+        self.icon = Some(view.icon);
         self.tooltip = view.tooltip;
         if let Some(menu) = view.menu {
             self.menu = menu;

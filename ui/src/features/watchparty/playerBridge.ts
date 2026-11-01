@@ -17,12 +17,16 @@ export type BridgeCommand =
    * Video volume as a fraction of the viewer's own player volume, 0–1 (auto-ducking, FR-2.76);
    * the page fades to it.
    */
-  | { type: "setVolume"; level: number };
+  | { type: "setVolume"; level: number }
+  /** The viewer's own volume as a fraction, 0–1 (issue #163); ducking multiplies it. */
+  | { type: "setUserVolume"; level: number };
 
 export type BridgeReport =
   | { type: "ready" }
   | { type: "state"; state: number }
   | { type: "time"; seconds: number }
+  /** How far the video is and how much of it the player has (issue #163). */
+  | { type: "meta"; seconds: number; bufferedSeconds: number | null }
   | { type: "ended" }
   | { type: "error"; code: number };
 
@@ -63,6 +67,11 @@ export function parseBridgeReport(data: unknown): BridgeReport | null {
       return isNumber(data.seconds) ? { type: "time", seconds: data.seconds } : null;
     case "error":
       return { type: "error", code: isNumber(data.code) ? data.code : 0 };
+    case "meta":
+      return isNumber(data.seconds) &&
+        (data.bufferedSeconds === null || isNumber(data.bufferedSeconds))
+        ? { type: "meta", seconds: data.seconds, bufferedSeconds: data.bufferedSeconds ?? null }
+        : null;
     default:
       return null;
   }
@@ -76,4 +85,9 @@ export function loadCommand(videoId: string): BridgeCommand | null {
 /** The setVolume command for a ducking level, clamped to 0–1; `null` for a non-number. */
 export function volumeCommand(level: number): BridgeCommand | null {
   return isNumber(level) ? { type: "setVolume", level: Math.min(1, Math.max(0, level)) } : null;
+}
+
+/** The viewer's own volume as a fraction, 0–1 (issue #163); `null` for a non-number. */
+export function userVolumeCommand(level: number): BridgeCommand | null {
+  return isNumber(level) ? { type: "setUserVolume", level: Math.min(1, Math.max(0, level)) } : null;
 }

@@ -47,6 +47,12 @@ export class PartySync {
     if (this.ready) this.apply();
   }
 
+  /** The user acted here: send it for everyone and ignore the player's own echo (issue #163). */
+  act(command: WatchCommand): void {
+    this.deps.send(command);
+    this.quietUntil = this.deps.now() + QUIET_MS;
+  }
+
   /** The player answers the control protocol. */
   onReady(): void {
     if (this.ready) return;

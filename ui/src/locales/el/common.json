@@ -36,5 +36,29 @@
     "output": "Ενταμιευτής ηχείων",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Χειριστήρας αναπαραγωγής",
+    "nowPlaying": "Τώρα παίζει",
+    "watching": "Βλέπουν",
+    "open": "Άνοιγμα",
+    "next": "Επόμενο",
+    "seek": "Μετάβαση",
+    "volume": "Ένταση",
+    "syncedPlay": "Συσγχρονισμένο",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "Ο/Η {{name}} έχει τον έλεγχο",
+    "inSync": "Συσγχρονισμένα",
+    "inSyncAll": "Όλοι συγχρονισμένοι",
+    "inSyncExcept": "Όλοι συγχρονισμένοι εκτός από {{count}}",
+    "buffering": "Φόρτωση",
+    "behind": "{{seconds}} δευτ. πίσω",
+    "ahead": "{{seconds}} δευτ. μπροστά",
+    "noReport": "Καμία αναφορά",
+    "you": "εσύ",
+    "host": "Οικοδεσπότης",
+    "fullscreen": "Πλήρης οθόνη",
+    "exitFullscreen": "Έξοδος από πλήρη οθόνη",
+    "none": "Κανείς"
   }
 }

@@ -30,6 +30,8 @@
     "title": "Urmează",
     "empty": "Nu urmează nimic. Adaugă linkuri YouTube cu „Adaugă în playlist”.",
     "skip": "Sari peste",
+    "previous": "Anterior",
+    "previousFailed": "Nu s-a putut reveni la videoul anterior.",
     "moveHint": "Alt+Sus și Alt+Jos mută videoclipul; îl poți și trage.",
     "moved": "Mutat pe poziția {{position}}",
     "videoTitle": "Videoclip YouTube",
@@ -42,7 +44,9 @@
     "nextFailed": "Videoclipul următor nu a putut porni.",
     "move": "Mută {{title}}",
     "upNext": "Urmează: {{title}}",
-    "upNextNone": "Nu urmează nimic"
+    "upNextNone": "Nu urmează nimic",
+    "paste": "Lipește un link YouTube",
+    "notALink": "Acela nu este un link YouTube"
   },
   "widget": {
     "play": "Redă",

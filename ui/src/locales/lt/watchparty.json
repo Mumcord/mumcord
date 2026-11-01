@@ -30,6 +30,8 @@
     "title": "Toliau",
     "empty": "Toliau nieko nėra. Pridėk YouTube nuorodų per „Pridėti į grojaraštį“.",
     "skip": "Praleisti",
+    "previous": "Ankstesnis",
+    "previousFailed": "Nepavyko grįžti prie ankstesnio vaizdo įrašo.",
     "moveHint": "Alt+Aukštyn ir Alt+Žemyn perkelia vaizdo įrašą; jį taip pat gali vilkti.",
     "moved": "Perkelta į {{position}} vietą",
     "videoTitle": "YouTube vaizdo įrašas",
@@ -42,7 +44,9 @@
     "nextFailed": "Nepavyko paleisti kito vaizdo įrašo.",
     "move": "Perkelti {{title}}",
     "upNext": "Toliau: {{title}}",
-    "upNextNone": "Toliau nieko nėra"
+    "upNextNone": "Toliau nieko nėra",
+    "paste": "Įklijuokite YouTube nuorodą",
+    "notALink": "Tai nėra YouTube nuoroda"
   },
   "widget": {
     "play": "Leisti",

@@ -30,6 +30,8 @@
     "title": "A seguire",
     "empty": "Niente a seguire. Aggiungi link YouTube con «Aggiungi alla playlist».",
     "skip": "Salta",
+    "previous": "Precedente",
+    "previousFailed": "Impossibile tornare al video precedente.",
     "moveHint": "Alt+Su e Alt+Giù spostano il video; puoi anche trascinarlo.",
     "moved": "Spostato in posizione {{position}}",
     "videoTitle": "Video YouTube",
@@ -42,7 +44,9 @@
     "nextFailed": "Impossibile avviare il video successivo.",
     "move": "Sposta {{title}}",
     "upNext": "A seguire: {{title}}",
-    "upNextNone": "Niente a seguire"
+    "upNextNone": "Niente a seguire",
+    "paste": "Incolla un link YouTube",
+    "notALink": "Non è un link YouTube"
   },
   "widget": {
     "play": "Riproduci",

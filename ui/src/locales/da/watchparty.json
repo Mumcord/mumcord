@@ -30,6 +30,8 @@
     "title": "Næste",
     "empty": "Intet i køen. Tilføj YouTube-links med “Føj til playliste”.",
     "skip": "Spring over",
+    "previous": "Forrige",
+    "previousFailed": "Kunne ikke gå tilbage til den forrige video.",
     "moveHint": "Alt+Op og Alt+Ned flytter videoen; du kan også trække den.",
     "moved": "Flyttet til position {{position}}",
     "videoTitle": "YouTube-video",
@@ -42,7 +44,9 @@
     "nextFailed": "Næste video kunne ikke startes.",
     "move": "Flyt {{title}}",
     "upNext": "Næste: {{title}}",
-    "upNextNone": "Intet i køen"
+    "upNextNone": "Intet i køen",
+    "paste": "Indsæt et YouTube-link",
+    "notALink": "Det er ikke et YouTube-link"
   },
   "widget": {
     "play": "Afspil",
