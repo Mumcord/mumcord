@@ -40,6 +40,8 @@ describe("mock engine", () => {
     expect(await api.watchPartyGet(1)).toBe(api.mediaDemo.party);
     expect(await api.screenShareQuality(1)).toBe(api.mediaDemo.quality);
     expect(await api.screenShareWatchStats(1, 7)).toEqual({ path: "direct", rms: 0.42 });
+    // The share view names the connection too, so the demo share has one (issue #163, FR-4.19).
+    expect(await api.p2pLink(1, 7)).toEqual({ path: "direct", ipHidden: false });
     expect(await api.screenShareWatch(1, 7, undefined as never)).toBeNull();
     expect(api.mediaDemo.picture).toMatch(/^data:image\/webp;base64,/);
     const plain = createMockApi();

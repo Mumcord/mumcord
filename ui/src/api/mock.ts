@@ -3059,14 +3059,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     // Demo only, for screenshots: Maya (session 2) is reached through the relay, Jonas
-    // (session 5) directly.
+    // (session 5) directly. Priya (session 7), whose share the media views show, is reached
+    // directly as well, so the path the share view names matches its own chip: media goes over a
+    // direct connection today (FR-2.46).
     p2pLink: (_serverId, session) =>
       Promise.resolve(
         !demo
           ? null
           : session === 2
             ? { path: "relayTcp", ipHidden: true }
-            : session === 5
+            : session === 5 || session === mediaDemo.share?.session
               ? { path: "direct", ipHidden: false }
               : null,
       ),
