@@ -34,7 +34,7 @@ export function UpdatesSection({ settings, update }: SettingsSectionProps) {
         </p>
       )}
       <Group title={t("updates.checking")}>
-        <ModeRow
+        <UpdateModeRow
           mode={mode}
           canInstall={canInstall}
           onChange={(next) => {
@@ -76,7 +76,7 @@ export function UpdatesSection({ settings, update }: SettingsSectionProps) {
   );
 }
 
-function ModeRow(props: {
+export function UpdateModeRow(props: {
   mode: UpdateMode;
   canInstall: boolean;
   onChange: (mode: UpdateMode) => void;
