@@ -236,7 +236,10 @@ describe("noise suppression backends", () => {
     }
     await app.restart({ freshProfile: true });
     await wizard("NoiseTester");
-    await app.useClassicSounds();
+    // Every measurement restarts the app while it is in voice. The quit sound (#325) makes that
+    // quit wait for it, which on a slow runner outlasted the harness's grace period: the app was
+    // killed 5 s late and the recorded copy landed outside the window its connect time allows.
+    await app.updateSettings({ quit: false });
     await openVoiceSettings();
     const muteSwitch = await switchByText("Connect muted");
     if (await muteSwitch.isSelected()) await muteSwitch.click();
