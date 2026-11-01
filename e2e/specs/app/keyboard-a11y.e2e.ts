@@ -25,6 +25,42 @@ import {
   wizard,
 } from "./flows.ts";
 
+/**
+ * The searchable language picker on the welcome step: opens with ArrowDown, filters while typing
+ * (English name), gets scanned while open, and Escape closes it without choosing anything.
+ */
+async function languagePickerByKeyboard(theme: string): Promise<void> {
+  await tabTo((f) => f.role === "combobox" && f.cls.includes("select__input"), "language picker");
+  const state = () =>
+    browser.execute(() => {
+      const field = document.activeElement as HTMLInputElement;
+      const list = document.getElementById(field.getAttribute("aria-controls") ?? "");
+      return {
+        expanded: field.getAttribute("aria-expanded"),
+        value: field.value,
+        options: Array.from(list?.querySelectorAll("[role=option]") ?? [], (o) => o.textContent.trim()),
+        active: field.getAttribute("aria-activedescendant") ?? "",
+        firstId: list?.querySelector("[role=option]")?.id ?? "",
+      };
+    });
+  const before = await state();
+  await browser.keys(["ArrowDown"]);
+  expect((await state()).options).toHaveLength(25);
+  await typeText("germ");
+  await browser.waitUntil(async () => (await state()).options.join() === "Deutsch", {
+    timeoutMsg: "typing 'germ' did not filter the language list to Deutsch",
+  });
+  const open = await state();
+  expect(open.expanded).toBe("true");
+  expect(open.active).toBe(open.firstId);
+  await scan(`${theme} wizard language picker open`);
+  await browser.keys(["Escape"]);
+  const closed = await state();
+  expect(closed.expanded).toBe("false");
+  expect(closed.value).toBe(before.value);
+  await waitFor("form.wizard-step");
+}
+
 /** Top-level settings groups (#161). */
 const SETTINGS_TABS = 10;
 
@@ -55,6 +91,7 @@ for (const theme of ["light", "dark"] as const) {
         style: "custom",
         onStep: async (step) => {
           await scan(`${theme} wizard step ${step}`);
+          if (step === "welcome") await languagePickerByKeyboard(theme);
         },
       });
       await scan(`${theme} main empty state`);

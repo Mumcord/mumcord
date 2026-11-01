@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
 import { app, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
-  chooseRadio,
+  chooseLanguage,
   connectFromEmptyState,
   focus,
   htmlTheme,
@@ -221,15 +221,15 @@ describe("AC-1.26 language switch without restart", () => {
     english = await collect();
   });
 
-  for (const [lang, settingsTitle] of [
-    ["es", "Ajustes"],
-    ["de", "Einstellungen"],
+  for (const [lang, search, settingsTitle] of [
+    ["es", "Spanish", "Ajustes"],
+    ["de", "German", "Einstellungen"],
   ] as const) {
     it(`switches to ${lang} live and translates every UI text`, async () => {
       const pid = await browser.execute(() => performance.timeOrigin);
       await openSettings();
       await settingsTabNamed("general");
-      await chooseRadio(lang);
+      await chooseLanguage(lang, search);
       await browser.waitUntil(async () => (await browser.execute(() => document.documentElement.lang)) === lang, {
         timeoutMsg: `html lang never became ${lang}`,
       });
@@ -250,18 +250,24 @@ describe("AC-1.26 language switch without restart", () => {
     const pid = await browser.execute(() => performance.timeOrigin);
     await openSettings();
     await settingsTabNamed("general");
-    // Only the language picker: the General page holds other radio groups too (#161).
-    const names = await browser.execute(() => {
-      const group = document.querySelector<HTMLInputElement>(".overlay__dialog input[type=radio][value=fr]")?.name ?? "";
-      return Array.from(document.querySelectorAll(`.overlay__dialog input[type=radio][name="${group}"]`), (r) => r.closest("label")?.textContent.trim() ?? "");
-    });
+    // The searchable picker lists every language in its own name when nothing is typed.
+    const field = await $(".overlay__dialog .language-picker [role=combobox]");
+    await field.click();
+    await $(".language-picker [role=listbox]").waitForDisplayed();
+    const names = await browser.execute(() =>
+      Array.from(document.querySelectorAll(".language-picker [role=option]"), (o) => o.textContent.trim()),
+    );
+    await browser.keys(["Escape"]);
     expect(names).toEqual(expect.arrayContaining(["Français", "Ελληνικά", "Gaeilge", "Malti", "Български"]));
     expect(names).toHaveLength(25);
-    for (const lang of ["fr", "el"]) {
+    for (const [lang, search] of [
+      ["fr", "French"],
+      ["el", "Greek"],
+    ] as const) {
       const strings = JSON.parse(readFileSync(join(repoRoot, `ui/src/locales/${lang}/app.json`), "utf8")) as {
         settings: { title: string };
       };
-      await chooseRadio(lang);
+      await chooseLanguage(lang, search);
       await browser.waitUntil(
         async () =>
           (await browser.execute(() => document.querySelector(".overlay__dialog h1")?.textContent ?? "")) ===

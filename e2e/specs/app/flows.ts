@@ -310,25 +310,28 @@ export async function settingsTab(index: number): Promise<string> {
   return (await focus()).text;
 }
 
-/** In the open settings panel, Tabs to the radio group containing `value` and arrows to it. */
-export async function chooseRadio(value: string): Promise<void> {
-  await tabTo((f) => f.tag === "input" && f.type === "radio" && groupHas(value), `radio group with ${value}`);
-  for (const key of ["ArrowDown", "ArrowUp"]) {
-    // The language picker has 25 options; arrow keys wrap around, so this reaches every one.
-    for (let i = 0; i < 25; i++) {
-      if ((await focus()).value === value) return;
-      await browser.keys([key]);
-    }
-  }
-  if ((await focus()).value !== value) throw new Error(`radio ${value} not reachable with arrow keys`);
-}
-
-async function groupHas(value: string): Promise<boolean> {
-  return browser.execute((v: string) => {
-    const e = document.activeElement as HTMLInputElement;
-    if (e.type !== "radio") return false;
-    return Array.from(document.querySelectorAll<HTMLInputElement>(`input[type=radio][name="${e.name}"]`)).some((r) => r.value === v);
-  }, value);
+/**
+ * Picks the UI language with the keyboard only: tabs to the searchable language picker, types
+ * `search` (an English name such as "German", so no non-ASCII keys are needed) and presses Enter
+ * on the first match.
+ */
+export async function chooseLanguage(code: string, search: string): Promise<void> {
+  await tabTo((f) => f.role === "combobox" && f.cls.includes("select__input"), "language picker");
+  // Focus selects the shown name so typing replaces it; after an earlier pick the field keeps focus.
+  await browser.execute(() => {
+    (document.activeElement as HTMLInputElement).select();
+  });
+  await typeText(search);
+  await browser.waitUntil(
+    () =>
+      browser.execute((c: string) => {
+        const field = document.activeElement;
+        const first = document.querySelector(`#${CSS.escape(field?.getAttribute("aria-controls") ?? "")} [role=option]`);
+        return field?.getAttribute("aria-activedescendant") === first?.id && first?.getAttribute("lang") === c;
+      }, code),
+    { timeoutMsg: `"${search}" did not list ${code} first in the language picker` },
+  );
+  await browser.keys(["Enter"]);
 }
 
 // ---------------------------------------------------------------- X11 / D-Bus helpers

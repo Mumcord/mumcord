@@ -17,7 +17,7 @@ import { channelName, doubleClickRow, ownChannel } from "../../helpers/voice-ui.
 import { dialogTab, dialogTitle, fill, serverButton, waitServerStatus } from "../../helpers/servers-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { button, waitForText } from "../../helpers/wizard-util.ts";
-import { chooseRadio, focus, pressUntil, tabTo, wizard } from "../app/flows.ts";
+import { chooseLanguage, focus, pressUntil, tabTo, wizard } from "../app/flows.ts";
 
 const USER = "P2pTester";
 const ALPHA = "Alpha";
@@ -317,7 +317,7 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
       p2p: { modeLabel: string; explanation: string; mode: Record<Mode, string> };
     };
     await $("//button[@role='tab'][normalize-space()='General']").click();
-    await chooseRadio("de");
+    await chooseLanguage("de", "German");
     await $('[role="tab"][id$="-tab-privacy"]').click();
     await $("fieldset.p2p-modes").waitForDisplayed();
     await browser.waitUntil(async () => (await p2pGroupA11y()).name === de.p2p.modeLabel, {
