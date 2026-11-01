@@ -6,6 +6,7 @@
 import { useSyncExternalStore } from "react";
 import { closeMedia, openMedia } from "../media/mediaView";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
+import { StreamMeter } from "./streamStats";
 
 export interface WatchedShare {
   serverId: number;
@@ -14,6 +15,8 @@ export interface WatchedShare {
 }
 
 let watched: WatchedShare | null = null;
+// One meter per watch, so the viewer's chips and the panel's own row show the same figures.
+let meter = new StreamMeter();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
@@ -21,6 +24,7 @@ const listeners = new Set<() => void>();
 function set(next: WatchedShare | null): void {
   if (next === watched) return;
   watched = next;
+  meter = new StreamMeter();
   for (const listener of listeners) listener();
 }
 
@@ -85,10 +89,16 @@ export function useWatchedShare(): WatchedShare | null {
   return useSyncExternalStore(subscribe, snapshot);
 }
 
+/** Counts the frames of the share open now (issue #163). */
+export function watchMeter(): StreamMeter {
+  return meter;
+}
+
 /** Test helper: forgets the binding and the open share. */
 export function resetWatchingStore(): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = [];
   boundApi = undefined;
   watched = null;
+  meter = new StreamMeter();
 }

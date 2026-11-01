@@ -135,7 +135,7 @@ export function useScreenWatch(
       stopped = true;
       stopWatching?.();
     };
-  }, [serverId, session, canvasRef, attempt]);
+  }, [serverId, session, canvasRef, attempt, meter]);
 
   const retry = useCallback(() => {
     setAttempt((n) => n + 1);
