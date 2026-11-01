@@ -38,8 +38,26 @@ pub const LOG_LINES: usize = 200;
 pub const LOG_LINE_CHARS: usize = 200;
 
 /// Interfaces a plugin may import, without the `@version` suffix. The linker then checks that
-/// the requested version is compatible (same major, not newer than the host).
-const ALLOWED_IMPORTS: &[&str] = &["mumcord:plugin/types", "mumcord:plugin/log"];
+/// the requested version is compatible (same major, not newer than the host). A component
+/// imports every interface whose types it uses (e.g. `events` for `on-event`), so all of them
+/// are listed; an import of a function the host does not provide yet fails in the linker.
+const ALLOWED_IMPORTS: &[&str] = &[
+    "mumcord:plugin/types",
+    "mumcord:plugin/log",
+    "mumcord:plugin/storage",
+    "mumcord:plugin/timers",
+    "mumcord:plugin/clock",
+    "mumcord:plugin/notify",
+    "mumcord:plugin/theme",
+    "mumcord:plugin/random",
+    "mumcord:plugin/peers",
+    "mumcord:plugin/ui",
+    "mumcord:plugin/chat",
+    "mumcord:plugin/secrets",
+    "mumcord:plugin/http",
+    "mumcord:plugin/webview",
+    "mumcord:plugin/events",
+];
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.
 pub struct Runtime {

@@ -23,6 +23,10 @@
   (func (export "start") (param $api_ptr i32) (param $api_len i32) (param $has_prev i32) (param $prev_ptr i32) (param $prev_len i32) (result i32)
     {{START}})
 
+  ;; on-event(event): the event variant has more than 16 flat values, so the host passes a
+  ;; pointer to it. The test plugin ignores every event.
+  (func (export "on-event") (param i32))
+
   (func (export "stop")
     {{STOP}})
 )

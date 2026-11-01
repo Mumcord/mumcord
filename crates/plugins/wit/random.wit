@@ -1,0 +1,8 @@
+/// Secure randomness (FR-6.24). Needs the `random.bytes` permission.
+interface random {
+  use types.{error};
+
+  /// `len` cryptographically secure random bytes from the OS generator, at most 256 per call.
+  /// Errors: `not-permitted`, `too-large`.
+  bytes: func(len: u32) -> result<list<u8>, error>;
+}

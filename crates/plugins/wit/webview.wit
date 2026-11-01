@@ -1,0 +1,31 @@
+/// Sandboxed web view (FR-6.46 … FR-6.48). Needs the `ui.webview` permission (official plugins
+/// only).
+///
+/// Shows an HTML file from the package's `web/` folder in a frame with an opaque origin: no
+/// network, no storage, no navigation, no popups, no Tauri IPC and no access to the Mumcord
+/// window. The page talks only to its own plugin through a message bridge; the plugin decides
+/// what to share through the normal API. Limits: each message at most 16 KiB, at most 60
+/// messages per second in each direction (extra messages are dropped). Messages from the page
+/// arrive as the `webview-message` event.
+interface webview {
+  use types.{error};
+
+  /// Where the web view is shown. Only one web view per plugin is open at a time.
+  enum place {
+    /// The large panel popover (420×560) in the Plugins strip.
+    panel-popover,
+    /// The plugin's dialog (see `ui.open-dialog`), replacing its `dialog` tree.
+    dialog,
+  }
+
+  /// Shows `entry`, a path inside `web/` such as 'snack-race/index.html', replacing any web view
+  /// this plugin already shows. Errors: `not-permitted`, `invalid` (no such file).
+  show: func(place: place, entry: string) -> result<_, error>;
+
+  /// Closes the web view; the slot falls back to its tree.
+  hide: func();
+
+  /// Sends a message to the page (delivered as a `message` event in the page's JavaScript).
+  /// Errors: `not-permitted`, `too-large`, `rate-limited`, `invalid` (no web view open).
+  post: func(message: string) -> result<_, error>;
+}

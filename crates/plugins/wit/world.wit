@@ -1,20 +1,38 @@
 /// The Mumcord plugin API.
 ///
 /// A plugin is a WebAssembly component that targets this world. It gets no WASI: no files,
-/// sockets, clocks or randomness exist unless an interface below provides them.
+/// sockets, clocks or randomness exist unless an interface below provides them (FR-6.1). Every
+/// host call is checked against the plugin's granted permissions; a missing permission returns
+/// `not-permitted`.
 ///
-/// Later waves of Epic 3.1 add the imports `ui`, `peers`, `storage`, `timers`, `clock`, `notify`
-/// and `theme`, and the export `on-event`.
+/// Call limits (FR-6.3): `start` may run for 500 ms, every other call into the plugin for 50 ms;
+/// linear memory is 32 MiB unless the manifest lowers it. Exceeding a limit stops the plugin.
 package mumcord:plugin@1.0.0;
 
 world plugin {
   use types.{start-info};
+  use events.{event};
 
   import log;
+  import storage;
+  import timers;
+  import clock;
+  import notify;
+  import theme;
+  import random;
+  import peers;
+  import ui;
+  import chat;
+  import secrets;
+  import http;
+  import webview;
 
   /// Called once after the plugin is enabled. An error keeps the plugin off and is shown to the
   /// user.
   export start: func(info: start-info) -> result<_, string>;
+
+  /// Called for every event, one at a time, in order.
+  export on-event: func(event: event);
 
   /// Called before the plugin is disabled or unloaded.
   export stop: func();

@@ -1,0 +1,142 @@
+/// Everything the host tells a running plugin, delivered one at a time through the exported
+/// `on-event` (FR-6.16).
+///
+/// Each event is delivered only with its permission. Events wait in a queue of 256 per plugin;
+/// when it is full, the oldest non-UI events are dropped and counted in Diagnostics. Talking
+/// events are coalesced to at most 10 per second. Nothing from or about a blocked user is ever
+/// delivered. While disconnected, server events are simply absent.
+interface events {
+  use types.{peer};
+  use theme.{theme-info};
+  use timers.{timer-id};
+  use ui.{slot};
+  use http.{request-id, http-response, http-error, file-handle};
+
+  /// A channel on the current server. The name is untrusted text.
+  record channel {
+    id: u32,
+    name: string,
+  }
+
+  /// The local user's state.
+  record self-state {
+    /// The user's own peer while connected (with the same key other users' plugins see for
+    /// them in this plugin), otherwise none.
+    me: option<peer>,
+    /// An opaque key of the current server for this plugin (stable per server, different per
+    /// plugin, no address inside), for prefixing storage keys. None while disconnected.
+    server: option<string>,
+    channel: option<channel>,
+    muted: bool,
+    deafened: bool,
+    /// Do Not Disturb or quiet time is active.
+    do-not-disturb: bool,
+  }
+
+  /// Who receives this plugin's messages and whose messages it gets (FR-6.33).
+  enum visibility {
+    everyone,
+    friends,
+    nobody,
+  }
+
+  /// This plugin's own settings, chosen by the user.
+  record plugin-settings {
+    /// Permission ids currently granted, e.g. 'ui.panel'. A revoked permission takes effect
+    /// immediately (calls return `not-permitted`, related events stop).
+    granted: list<string>,
+    visibility: visibility,
+  }
+
+  /// Where the panel is shown (FR-6.40).
+  enum panel-visibility {
+    hidden,
+    inline,
+    expanded,
+  }
+
+  /// The value that came with a `ui-action`.
+  variant action-value {
+    none,
+    boolean(bool),
+    number(f32),
+    text(string),
+    /// A list row was dragged from index `from` to index `to`.
+    reorder(tuple<u32, u32>),
+    file(file-handle),
+  }
+
+  /// Where a `ui-action` came from.
+  variant action-source {
+    slot(slot),
+    /// A slash command the user typed (FR-6.43); the action is the command name and the value
+    /// is the rest of the line as `text`. The typed text is never sent as chat.
+    command,
+  }
+
+  record ui-action {
+    source: action-source,
+    action: string,
+    value: action-value,
+  }
+
+  record peer-message {
+    sender: peer,
+    /// The sender's message type (see `peers.send`).
+    kind: u8,
+    /// At most 997 bytes. Untrusted: validate before use.
+    payload: list<u8>,
+    /// True if it was sent directly to this user, false if to the whole channel.
+    direct: bool,
+  }
+
+  record http-result {
+    id: request-id,
+    outcome: result<http-response, http-error>,
+  }
+
+  variant event {
+    /// `events.voice`: a user started (true) or stopped (false) talking.
+    talking(tuple<peer, bool>),
+    /// `events.presence`: a user joined the user's current channel (also sent for everyone
+    /// already there when the user moves into a channel).
+    joined(peer),
+    /// `events.presence`: a user left the user's current channel or the server.
+    left(peer),
+    /// `events.presence`: a user in the current channel started sharing their screen.
+    screen-share-started(peer),
+    /// `events.chat-activity`: someone wrote in a channel; never the text.
+    chat-activity(tuple<peer, channel>),
+    /// `events.chat-activity`: someone mentioned the user; never the text.
+    mentioned(peer),
+    /// `events.self`: the user's own state changed.
+    self-changed(self-state),
+    /// No permission: theme, mode or reduced motion changed.
+    theme-changed(theme-info),
+    /// No permission: the UI language changed (BCP 47 tag, e.g. 'de').
+    language-changed(string),
+    /// No permission: this plugin's granted permissions or visibility changed.
+    settings-changed(plugin-settings),
+    /// The user clicked, changed or typed something in this plugin's UI, or typed one of its
+    /// slash commands.
+    ui-action(ui-action),
+    /// A timer from `timers.start` fired.
+    timer(timer-id),
+    /// `peers.messages`: a message from the same plugin of another user.
+    peer-message(peer-message),
+    /// `ui.profile-card`: the user opened someone's profile card; answer with `set-tree` on the
+    /// `profile-card` slot within 500 ms.
+    profile-card-opened(peer),
+    /// `ui.panel`: the panel was hidden, shown inline or expanded.
+    panel-visibility-changed(panel-visibility),
+    /// `ui.user-menu`: the user chose this plugin's entry in someone's right-click menu.
+    user-menu-requested(peer),
+    /// `ui.dialog`: the user closed the plugin's dialog.
+    dialog-closed,
+    /// `net.http`: a request from `http.request` finished.
+    http-response(http-result),
+    /// `ui.webview`: a message from this plugin's web view page (at most 16 KiB). Untrusted:
+    /// validate before use.
+    webview-message(string),
+  }
+}

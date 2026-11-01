@@ -1,0 +1,18 @@
+/// The current theme (FR-6.23). Needs no permission. Plugins only ever see token names and the
+/// mode, never raw CSS or colour values. Changes arrive as the `theme-changed` event.
+interface theme {
+  enum mode {
+    light,
+    dark,
+  }
+
+  record theme-info {
+    mode: mode,
+    /// The colour token names a UI tree may use, e.g. 'accent', 'text-muted', 'danger'.
+    tokens: list<string>,
+    /// The user asked for reduced motion: animation presets and sprites are shown still.
+    reduced-motion: bool,
+  }
+
+  current: func() -> theme-info;
+}

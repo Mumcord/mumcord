@@ -1,0 +1,24 @@
+/// Chat integration (FR-6.44, FR-6.45). Plugins never read chat text.
+interface chat {
+  use types.{error, session};
+
+  /// Posts one plain-text Mumble message into the user's current channel. Needs `chat.send`.
+  ///
+  /// Allowed only within 2 s after a user gesture for this plugin (a button click or a slash
+  /// command), one message per gesture, at most 500 characters. The host prefixes the plugin
+  /// name ('[Poll] …') so official Mumble clients see where it came from.
+  /// Errors: `not-permitted` (no permission or no fresh gesture), `too-large`, `no-recipients`
+  /// (not connected).
+  send: func(text: string) -> result<_, error>;
+
+  /// The 4-byte hash of a chat line as other Mumcord clients will see it: the host computes it
+  /// over `text` with the '[Plugin name] ' prefix, so all clients agree. Plugins put it into
+  /// their messages so receivers can call `supersede`.
+  line-hash: func(text: string) -> u32;
+
+  /// Hides a text message from `sender` whose line hash matches `hash`, if it arrives within
+  /// 10 s (before or after this call), and shows the chat card `card-id` in its place with
+  /// 'Show text' to reveal the line. Needs `chat.supersedes` and `ui.chat-card`.
+  /// Errors: `not-permitted`, `invalid` (unknown card).
+  supersede: func(card-id: string, sender: session, hash: u32) -> result<_, error>;
+}
