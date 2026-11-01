@@ -20,13 +20,14 @@ afterEach(() => {
 
 async function importStep() {
   renderInWizard(harness, <Wizard />);
+  fireEvent.click(await screen.findByRole("button", { name: "Let's get started" }));
   return screen.findByRole("heading", { name: "Bring your Mumble setup along" });
 }
 
 describe("Wizard import from the official Mumble client (issue #66)", () => {
-  it("comes first when Mumble is installed, with a preview of what it finds", async () => {
+  it("comes after the welcome when Mumble is installed, with a preview of what it finds", async () => {
     await importStep();
-    expect(screen.getByText("Step 1 of 6 · optional")).toBeInTheDocument();
+    expect(screen.getByText("Step 2 of 11 · optional")).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Server favourites" })).toBeChecked();
     expect(screen.getByText("6 found")).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Saved passwords" })).toBeChecked();
@@ -43,8 +44,8 @@ describe("Wizard import from the official Mumble client (issue #66)", () => {
   it("skips to the identity step without importing", async () => {
     await importStep();
     fireEvent.click(screen.getByRole("button", { name: "Skip for now" }));
-    await screen.findByRole("heading", { name: "Your identity" });
-    expect(screen.getByText("Step 2 of 6")).toBeInTheDocument();
+    await screen.findByRole("heading", { name: "Who are you on Mumble?" });
+    expect(screen.getByText("Step 3 of 11 · Identity")).toBeInTheDocument();
     expect(await harness.api.serversList()).toEqual([]);
   });
 
@@ -96,8 +97,8 @@ describe("Wizard import from the official Mumble client (issue #66)", () => {
     await screen.findByRole("heading", { name: "Import finished" });
     expect(screen.queryByText("Identity imported")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Done" }));
-    await screen.findByRole("heading", { name: "Your identity" });
-    expect(screen.getByText("Step 2 of 6")).toBeInTheDocument();
+    await screen.findByRole("heading", { name: "Who are you on Mumble?" });
+    expect(screen.getByText("Step 3 of 11 · Identity")).toBeInTheDocument();
   });
 
   it("uses the imported certificate as the identity", async () => {
@@ -108,7 +109,7 @@ describe("Wizard import from the official Mumble client (issue #66)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Import" }));
     await screen.findByRole("heading", { name: "Import finished" });
     fireEvent.click(screen.getByRole("button", { name: "Done" }));
-    await screen.findByRole("heading", { name: "Your identity" });
+    await screen.findByRole("heading", { name: "Who are you on Mumble?" });
     expect(screen.getByText("Using identity Zoe.")).toBeInTheDocument();
   });
 });

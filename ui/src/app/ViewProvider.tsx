@@ -45,10 +45,10 @@ export function ViewProvider({ children }: { children: ReactNode }) {
         );
       },
       openOverlaySettings: () => {
-        dispatch({ type: "openSettings", section: "overlay" });
+        dispatch({ type: "openSettings", section: "gaming" });
       },
       openAudioSettings: () => {
-        dispatch({ type: "openSettings", section: "audio" });
+        dispatch({ type: "openSettings", section: "voiceAudio" });
       },
       openPrivacySettings: () => {
         dispatch({ type: "openSettings", section: "privacy" });

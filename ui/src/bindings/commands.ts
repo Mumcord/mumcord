@@ -374,6 +374,11 @@ export const commands = {
 	settingsGet: () => typedError<Settings, ApiError>(__TAURI_INVOKE("settings_get")),
 	/**  Replaces the whole record and applies changes immediately; returns the stored record. */
 	settingsUpdate: (settings: Settings) => typedError<Settings, ApiError>(__TAURI_INVOKE("settings_update", { settings })),
+	/**
+	 *  The values a fresh install starts with. Settings marks what differs from them as changed and
+	 *  "Reset section" goes back to them (#161).
+	 */
+	settingsDefault: () => __TAURI_INVOKE<Settings>("settings_default"),
 	/**  Whether the one-time notice about the removed window overlay still has to be shown. */
 	windowOverlayNoticePending: () => typedError<boolean, ApiError>(__TAURI_INVOKE("window_overlay_notice_pending")),
 	/**  Marks the notice as shown so it never comes back. */
@@ -2687,11 +2692,21 @@ export type Settings = {
 	 *  that knew about it.
 	 */
 	whatsNewSeen: string | null,
+	/**
+	 *  The setup style chosen in the wizard (issue #159); `null` until the wizard stored one.
+	 *  Settings compares it with the current values ("Balanced, customised").
+	 */
+	setupPreset: SetupPreset | null,
 	/**  "Private messages from" (issue #141). */
 	privateMessages: PrivateMessageSettings,
 	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
 	blockedMessages: BlockedMessages,
 };
+
+/**  The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom. */
+export type SetupPreset = "everythingOn" | 
+/**  "Balanced (Recommended)". */
+"balanced" | "maximumPrivacy" | "custom";
 
 /**  What the sharer picked in the system picker (issue #163). */
 export type ShareKind = "window" | "screen";

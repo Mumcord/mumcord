@@ -90,8 +90,7 @@ export function CacheGroup() {
   const total = sizes === null ? null : KINDS.reduce((sum, kind) => sum + sizeOf(sizes, kind), 0);
 
   return (
-    <Group title={t("cache.title")}>
-      <p className="settings-hint">{t("cache.hint")}</p>
+    <Group title={t("cache.title")} icon="storage" info={t("cache.hint")}>
       {KINDS.map((kind) => (
         <Switch
           key={kind}

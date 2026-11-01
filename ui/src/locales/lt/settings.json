@@ -1,25 +1,49 @@
 {
-  "sectionList": "Nustatymų skiltys",
+  "sectionList": "Nustatymų grupės",
   "loading": "Įkeliami nustatymai…",
   "loadFailed": "Nepavyko įkelti tavo nustatymų. Uždaryk nustatymus ir bandyk dar kartą.",
   "saveFailed": "Nepavyko įrašyti paskutinio pakeitimo. Bandyk dar kartą.",
   "sections": {
-    "identity": "Tapatybė",
-    "audio": "Garsas",
-    "voice": "Balsas",
-    "chatHistory": "Pokalbiai ir istorija",
+    "general": "Bendra",
+    "account": "Paskyra ir tapatybė",
+    "voiceAudio": "Balsas ir garsas",
+    "chatNotifications": "Pokalbiai ir pranešimai",
+    "privacy": "Privatumas ir ryšiai",
     "appearance": "Išvaizda",
-    "accessibility": "Pritaikymas neįgaliesiems",
-    "language": "Kalba",
-    "sounds": "Garsai ir pranešimai",
-    "overlay": "Perdanga",
-    "diagnostics": "Diagnostika",
-    "about": "Apie",
     "servers": "Serveriai",
-    "privacy": "Privatumas",
-    "updates": "Atnaujinimai",
+    "gaming": "Žaidimai ir perdanga",
+    "advanced": "Papildoma ir kūrėjams",
+    "about": "Apie",
     "packetInspector": "Paketų tikrintuvas",
     "hotkeys": "Spartieji klavišai"
+  },
+  "sectionDescriptions": {
+    "general": "Paleidimas, kalba, atnaujinimai ir prieinamumas.",
+    "account": "Jūsų tapatybės, profilis ir tai, ką bendrinate.",
+    "voiceAudio": "Mikrofonas, garsiakalbiai, kaip kalbate ir kaip skambate.",
+    "chatNotifications": "Pranešimai, privačios žinutės, užblokuoti žmonės ir žinučių istorija.",
+    "privacy": "Kaip jungiatės prie kitų ir ką „Mumcord“ įkelia iš išorės.",
+    "appearance": "Tema, išdėstymas ir kanalų sąrašas.",
+    "servers": "Ryšiai su keliais serveriais ir kiekvieno serverio nustatymai.",
+    "gaming": "Perdanga žaidime, pozicinis garsas ir žaidimų papildiniai.",
+    "advanced": "Kūrėjų įrankiai, diagnostika, saugykla ir licencijos.",
+    "about": "Versija, pagalba ir sąrankos vedlys."
+  },
+  "breadcrumb": "Nustatymai / {{section}}",
+  "moreInfo": "Daugiau informacijos: {{topic}}",
+  "searchTerms": {
+    "devices": "įvestis išvestis ausinės garsiakalbis garso plokštė",
+    "talkMode": "PTT VAD balso aktyvavimas spartusis klavišas",
+    "noiseSuppression": "foninis triukšmas triukšmo slopinimas",
+    "p2p": "P2P perdavimo mazgas tiesioginiai ryšiai slėpti mano IP adresą",
+    "theme": "tamsus režimas šviesus režimas spalvos",
+    "startup": "automatinis paleidimas paleidimas prisijungimas dėklas",
+    "language": "vertimas kalba lokalė",
+    "updates": "nauja versija naujinimas",
+    "storage": "disko vieta išvalyti talpyklą",
+    "blocked": "ignoruoti blokuoti nutildyti žmones",
+    "notifications": "įspėjimai iššokantys langai",
+    "externalContent": "įterpiniai paveikslėliai peržiūros"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -28,7 +52,12 @@
     "count_one": "Rastas {{count}} nustatymas",
     "count_few": "Rasti {{count}} nustatymai",
     "count_many": "Rasta {{count}} nustatymo",
-    "count_other": "Rasta {{count}} nustatymų"
+    "count_other": "Rasta {{count}} nustatymų",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} rezultatas",
+    "groupCount_few": "{{count}} rezultatai",
+    "groupCount_many": "{{count}} rezultato",
+    "groupCount_other": "{{count}} rezultatų"
   },
   "errors": {
     "secureStorage": "Tavo sistemos saugykla nepasiekiama arba prieiga atmesta.",
@@ -114,7 +143,6 @@
     "testStop": "Stabdyti įrašymą",
     "testRecording": "Įrašoma… kalbėk dabar.",
     "testPlaying": "Atkuriamas tavo balsas…",
-    "quality": "Kokybė",
     "musicQuality": "Muzikos kokybė",
     "musicQualityHint": "Naudoja daugiau pralaidumo ir išjungia triukšmo slopinimą bei automatinį garsumą; skirta muzikai. Geriausiai veikia su „Spausk ir kalbėk“.",
     "bitrate": "Bitų sparta",
@@ -128,7 +156,6 @@
     "duckingLevel": "Pritildytas garsumas",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Mažos delsos režimas",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Muzikai groti kartu realiuoju laiku",
     "lowLatencyWarningTitle": "Stabilumą iškeičia į greitį",
     "lowLatencyBandwidth": "Naudoja daugiau pralaidumo (10 ms paketai).",
@@ -159,7 +186,7 @@
     "keyMissing": "Nustatyk klavišą, kitaip niekas tavęs negirdės.",
     "keyRejected": "Šio klavišo naudoti negalima. Išbandyk kitą, galimai su Ctrl, Alt ar Shift.",
     "keyNotConfirmed": "Darbalaukis nepatvirtino sparčiojo klavišo. Bandyk dar kartą ir priimk sistemos langą arba priskirk klavišą darbalaukio sparčiųjų klavišų nustatymuose.",
-    "processing": "Balso apdorojimas",
+    "processing": "Apdorojimas ir kokybė",
     "noiseSuppression": "Triukšmo slopinimas",
     "noiseSuppressionHint": "Išfiltruoja foninį triukšmą, pavyzdžiui, klaviatūros ar ventiliatorių garsą.",
     "noiseChoice": {
@@ -265,12 +292,12 @@
     }
   },
   "history": {
+    "title": "Žinučių istorija",
     "explanation": "Pokalbių žinutės įrašomos tik šiame kompiuteryje.",
-    "perServer": "Serveriai",
+    "perServer": "Išimtys kiekvienam serveriui",
     "noServers": "Įrašytų serverių dar nėra.",
     "save": "Įrašyti istoriją serveryje {{server}}",
     "clearServer": "Išvalyti {{server}} istoriją…",
-    "all": "Visi serveriai",
     "clearAll": "Išvalyti visą istoriją…",
     "confirmTitle": "Išvalyti istoriją?",
     "confirmServer": "Visos įrašytos žinutės iš {{server}} bus ištrintos iš šio kompiuterio. Kiti žmonės savo kopijas pasilieka. Jų kopijos nebus vėl sinchronizuotos į šį kompiuterį. To atšaukti negalima.",
@@ -282,7 +309,6 @@
     "autoDeleteHint": "Senesnės žinutės iš šio kompiuterio ištrinamos automatiškai, neklausiant. Tai paveikia tik čia įrašytą istoriją, ne serverį."
   },
   "fullImages": {
-    "title": "Pilno dydžio paveikslėliai",
     "offer": "Siūlyti mano pilno dydžio paveikslėlius",
     "offerHint": "Kiti Mumcord naudotojai gali atidaryti mano paveikslėlius pilnu dydžiu. Išjungta: siunčiama tik maža peržiūra, originalas nesaugomas ir niekam neduodamas.",
     "load": "Įkelti pilno dydžio paveikslėlius iš kitų",
@@ -304,14 +330,15 @@
     "system": "Pagal sistemą",
     "dark": "Tamsi",
     "light": "Šviesi",
-    "behaviour": "Elgsena",
+    "behaviour": "Paleidimas ir langas",
     "closeLegend": "Kai uždarai langą būdamas (-a) prisijungęs (-usi)",
     "closeAsk": "Klausti kiekvieną kartą",
     "closeTray": "Suskleisti į dėklą",
     "closeQuit": "Išeiti iš Mumcord",
     "autostart": "Paleisti Mumcord, kai prisijungiu prie sistemos",
     "startMinimized": "Paleisti suskleistą",
-    "startMinimizedHint": "Kai Mumcord pasileidžia prisijungus prie sistemos, jis laukia dėkle, o ne atidaro langą."
+    "startMinimizedHint": "Kai Mumcord pasileidžia prisijungus prie sistemos, jis laukia dėkle, o ne atidaro langą.",
+    "look": "Išvaizda ir išdėstymas"
   },
   "themeEditor": {
     "name": "Temos pavadinimas",
@@ -369,7 +396,7 @@
     "deleteConfirm": "Ištrinti"
   },
   "accessibility": {
-    "hints": "Užuominos",
+    "hints": "Prieinamumas",
     "keyboardHints": "Rodyti klaviatūros užuominas",
     "keyboardHintsHint": "Trumpi patarimai ekrane, pavyzdžiui, „Rodyklių klavišai: judėti“, po kanalų sąrašu ir mėgstamiausiuose GIF. Ekrano skaitytuvai juos vis tiek perskaito, kai tai išjungta.",
     "announcements": "Ekrano skaitytuvo pranešimai",
@@ -378,11 +405,15 @@
     "skipLinksHint": "Nuorodos lango pradžioje, kurios paspaudus Tab iškart nukelia į pokalbį ar kanalų sąrašą."
   },
   "language": {
+    "title": "Kalba",
     "legend": "Rodymo kalba",
-    "system": "Pagal sistemą"
+    "system": "Pagal sistemą",
+    "search": "Ieškoti kalbos",
+    "noMatch": "Atitinkančios kalbos nėra"
   },
   "sounds": {
-    "explanation": "Trumpi garsai šiems įvykiams:",
+    "title": "Garsai",
+    "explanation": "Trumpi garsai, grojami šiems įvykiams.",
     "joinLeave": "Kažkas prisijungia prie tavo kanalo arba jį palieka",
     "voiceJoin": "Tu įeini į kanalą balsui",
     "selfMute": "Tu nutildai arba vėl įjungi savo mikrofoną",
@@ -459,7 +490,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Žurnalas",
+    "title": "Diagnostika",
     "logLevel": "Žurnalo detalumas",
     "levels": {
       "error": "Tik klaidos",
@@ -494,7 +525,8 @@
     "setupWizardHint": "Dar kartą pereikite pradinę sąranką ir peržiūrėkite mikrofoną, privatumo pasirinkimus, atnaujinimų tikrinimą ir kalbėjimo režimą. Dabartiniai pasirinkimai jau įrašyti.",
     "setupWizardRun": "Vėl paleisti sąrankos vediklį",
     "setupWizardIdentityNote": "Jūsų tapatybė tam nepriklauso. Jūsų sertifikatas, o su juo ir registruotas vardas bei teisės serveriuose, lieka tiksliai tokie, kokie yra.",
-    "setupWizardIdentityLink": "Tvarkykite ją skiltyje Tapatybė"
+    "setupWizardIdentityLink": "Tvarkykite ją skiltyje Tapatybė",
+    "versionTitle": "Versija ir licencija"
   },
   "profile": {
     "title": "Profilis",
@@ -510,7 +542,6 @@
     "skipped": "Tavo numatytasis avataras neišsiųstas: jis per didelis šiam serveriui."
   },
   "linkPreviews": {
-    "title": "Nuorodų peržiūros",
     "switch": "Rodyti nuorodų peržiūras ir įterpinius",
     "hint": "Mumcord įkelia nuorodų puslapius, kad parodytų peržiūras ir vaizdo grotuvus; tos svetainės mato tavo IP adresą."
   },
@@ -531,7 +562,7 @@
     "cleared": "Talpykla išvalyta, atlaisvinta {{size}}."
   },
   "cache": {
-    "title": "Talpykla",
+    "title": "Saugykla",
     "hint": "„Mumcord“ šiame kompiuteryje laiko laikinus duomenis, kad viskas įsikeltų greičiau. Juos galima saugiai išvalyti; prireikus jie sukuriami iš naujo.",
     "kind": {
       "previews": "Nuorodų peržiūros ir paveikslėliai",
@@ -573,7 +604,7 @@
     "betaHint": "Rezultatai priklauso nuo žaidimo ir jo įskiepių palaikymo."
   },
   "gamePlugins": {
-    "title": "Pozicinis garsas: šaltiniai",
+    "title": "Žaidimų papildiniai",
     "explanation": "Žaidimai Mumcord praneša, kur esi, per Mumble Link arba oficialius Mumble žaidimų įskiepius. Mumcord randa įskiepius savo įskiepių aplanke ir esamame Mumble diegime. Įjunk tik žaidimų, kuriuos žaidi, įskiepius.",
     "antiCheat": "Žaidimų įskiepiai skaito žaidimo atmintį. Kai kurios apsaugos nuo sukčiavimo sistemos tai gali pažymėti; išjunk įskiepius žaidimams su griežta apsauga nuo sukčiavimo.",
     "loading": "Ieškoma žaidimų įskiepių…",
@@ -596,7 +627,6 @@
     "limitInvalid": "Įvesk sveikąjį skaičių nuo 1 iki 15."
   },
   "appearanceEffects": {
-    "title": "Efektai",
     "visualEffects": "Vaizdo efektai (stiklas, grūdėtumas)",
     "visualEffectsHint": "Matinio stiklo meniu ir subtilus juostos grūdėtumas. Išjungiama automatiškai, kai sistema prašo mažiau skaidrumo ar judesio."
   },
@@ -610,7 +640,6 @@
   "p2p": {
     "title": "Peer-to-peer (ekrano bendrinimas, viso dydžio vaizdai)",
     "modeLabel": "Peer-to-peer režimas",
-    "recommended": "Rekomenduojama",
     "explanation": "Tiesioginis ryšys parodo tavo IP adresą kitam asmeniui. Perdavimo mazgas jį nuo jo paslepia; mazgo operatorius (šio serverio bendruomenė) jį mato. Abu variantai šifruojami nuo galo iki galo.",
     "useGlobal": "Naudoti bendrą nustatymą",
     "overrideHint": "Tik šiam serveriui. „Naudoti bendrą nustatymą“ seka Nustatymai → Privatumas.",
@@ -623,7 +652,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Tiesioginiai ryšiai",
     "allow": "Leisti tiesioginius ryšius su kitais Mumcord naudotojais",
     "hint": "Tiesioginiai ryšiai greitesni, bet kitas asmuo gali matyti tavo IP adresą. Kol nenusprendei, Mumcord paklausia pirmą kartą, kai toks būtų naudojamas.",
     "notUsed": "Pasirinktame peer-to-peer režime nenaudojama: Mumcord niekada nesijungia tiesiogiai prie kitų."
@@ -634,6 +662,7 @@
     "failed": "Nepavyko. Bandyk dar kartą."
   },
   "inspector": {
+    "title": "Kūrėjų įrankiai",
     "intro": "Rodo paketus, kuriuos Mumcord siunčia ir gauna, daugiausia Mumcord papildinių duomenis, derinimui. Saugomi tik paskutiniai 2000 paketų, šio įrenginio atmintyje; niekas nėra registruojama ar niekur siunčiama.",
     "devTools": "Kūrėjo įrankiai",
     "devToolsHint": "Išjunkite, kad vėl paslėptumėte paketų tikrintuvą ir sustabdytumėte fiksavimą.",
@@ -812,7 +841,14 @@
     "hide": "Visiškai paslėpti",
     "hideHint": "Pokalbyje nieko nerodoma."
   },
+  "externalContent": {
+    "title": "Išorinis turinys"
+  },
+  "privacyConnections": {
+    "title": "Ryšiai"
+  },
   "updates": {
+    "title": "Atnaujinimai",
     "installedFrom": "Mumcord {{version}} · įdiegta iš: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -826,7 +862,6 @@
       "aur": "AUR",
       "otherLinux": "Linux paketas"
     },
-    "checking": "Tikrinama",
     "mode": "Kai randamas naujinimas",
     "modeHint": "Naujinimai visada patikrinami ir patvirtinami prieš įdiegiant.",
     "modeAuto": "Atsisiųsti automatiškai",
@@ -844,7 +879,6 @@
     "intervalHours_many": "Kas {{count}} valandos",
     "intervalHours_other": "Kas {{count}} valandų",
     "intervalWeek": "Kartą per savaitę",
-    "status": "Būsena",
     "state": {
       "idle": "Dar netikrinta",
       "off": "Naujinimų tikrinimas išjungtas",
@@ -871,6 +905,101 @@
     "whatsNew": "Kas nauja",
     "whatsNewHint": "Peržiūrėk kiekvienos versijos pakeitimus.",
     "openChangelog": "Atidaryti pakeitimų žurnalą"
+  },
+  "badges": {
+    "changed": "Pakeista",
+    "recommended": "Rekomenduojama",
+    "groupChanged": "Yra pakeistų nustatymų"
+  },
+  "resetSection": {
+    "button": "Atstatyti skiltį",
+    "title": "Atstatyti „{{section}}“?",
+    "intro": "Šie nustatymai grįš į jūsų šabloną arba numatytąją reikšmę:",
+    "nothing": "Kiekvienas „{{section}}“ nustatymas jau turi šablono arba numatytąją reikšmę.",
+    "confirm": "Atstatyti"
+  },
+  "activePreset": {
+    "heading": "Aktyvus šablonas",
+    "none": "Be šablono",
+    "customised": "{{preset}}, pritaikyta",
+    "changed_one": "Nuo sąrankos pakeistas {{count}} nustatymas",
+    "changed_few": "Nuo sąrankos pakeisti {{count}} nustatymai",
+    "changed_many": "Nuo sąrankos pakeisto {{count}} nustatymo",
+    "changed_other": "Nuo sąrankos pakeista {{count}} nustatymų",
+    "unchanged": "Nuo sąrankos pakeitimų nėra",
+    "switch": "Keisti",
+    "switchLabel": "Pakeisti šabloną",
+    "applyFailed": "Nepavyko pakeisti perdangos žaidime ar režimo „Netrukdyti“. Bandykite dar kartą."
+  },
+  "presets": {
+    "dialogTitle": "Pakeisti šabloną",
+    "dialogIntro": "Pasirinkite pradžios tašką. Keičiasi tik šablono apimami nustatymai; visa kita lieka kaip yra.",
+    "legend": "Šablonai",
+    "continue": "Tęsti",
+    "confirmTitle": "Perjungti į „{{preset}}“?",
+    "confirmIntro": "Šie nustatymai pasikeis:",
+    "confirmNothing": "Nė vienas nustatymas nesikeičia. „Mumcord“ įsimena „{{preset}}“ kaip jūsų šabloną.",
+    "confirmCustom": "Nė vienas nustatymas nesikeičia. Nustatymai nebelygina jūsų pasirinkimų su šablonu, o lygina juos su numatytaisiais.",
+    "apply": "Pakeisti šabloną",
+    "everythingOn": {
+      "name": "Viskas įjungta",
+      "tagline": "Visos funkcijos",
+      "point1": "Kiti mato, ką žaidžiate ir ko klausotės",
+      "point2": "Jūsų IP matomas žmonėms, su kuriais jungiatės tiesiogiai",
+      "point3": "Bet kas gali jums rašyti; nuorodos ir paveikslėliai įkeliami iš interneto",
+      "point4": "Perdanga, istorijos sinchronizavimas ir viso dydžio paveikslėliai įjungti"
+    },
+    "balanced": {
+      "name": "Subalansuota",
+      "tagline": "Tarp privatumo ir patogumo",
+      "point1": "Rašyti gali tik draugai ir jūsų kanalo žmonės",
+      "point2": "Tiesioginis ryšys, atsarginis variantas – perdavimo mazgas",
+      "point3": "Nuorodų peržiūros ir viso dydžio paveikslėliai įjungti",
+      "point4": "Tai, ką žaidžiate ir ko klausotės, lieka privatu"
+    },
+    "maximumPrivacy": {
+      "name": "Maksimalus privatumas",
+      "tagline": "Bendrinkite kuo mažiau",
+      "point1": "Rašyti gali tik draugai, be išimčių",
+      "point2": "Jūsų IP paslėptas; viskas eina per perdavimo mazgą",
+      "point3": "Jokio išorinio turinio, jokio istorijos sinchronizavimo, jokio bendrinimo",
+      "point4": "Niekas nebendrinama apie tai, ką darote"
+    },
+    "custom": {
+      "name": "Pasirinktinis",
+      "tagline": "Jūsų pačių pasirinkimai",
+      "point1": "Palieka kiekvieną nustatymą kaip yra",
+      "point2": "Pakeitimai lyginami su numatytaisiais",
+      "point3": "Geriausia, jei žinote, ko norite"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta funkcijos",
+    "hint": "Ankstyvos funkcijos; jos gali keistis. Kiekviena taip pat rodoma savo vietoje su Beta ženkleliu.",
+    "gamePlugins": "Žaidimų papildiniai",
+    "manage": "Tvarkyti papildinius"
+  },
+  "privacySummary": {
+    "title": "Privatumo suvestinė",
+    "ipHidden": "Jūsų IP adresas lieka paslėptas",
+    "ipVisible": "Tiesioginiai ryšiai gali parodyti jūsų IP adresą",
+    "matches": "Atitinka „{{preset}}“",
+    "messages": "Privačios žinutės iš: {{rule}}",
+    "p2pHidden": "Peer-to-peer eina per perdavimo mazgą, todėl kitas asmuo nemato jūsų IP adreso.",
+    "p2pDirect": "Peer-to-peer pirmiausia jungiasi tiesiogiai; kitas asmuo gali matyti jūsų IP adresą.",
+    "p2pDirectOnly": "Peer-to-peer jungiasi tik tiesiogiai; kitas asmuo gali matyti jūsų IP adresą.",
+    "externalOn": "Nuorodų peržiūros įjungtos: „Mumcord“ gauna nurodytus puslapius jiems sukurti.",
+    "externalOff": "Nuorodų peržiūros išjungtos: „Mumcord“ nieko neįkelia iš nurodytų puslapių.",
+    "imagesOn": "Viso dydžio paveikslėliai keičiami tiesiogiai tarp „Mumcord“ naudotojų.",
+    "imagesOff": "Viso dydžio paveikslėliai nekeičiami.",
+    "historyOn": "Istorijos sinchronizavimas įjungtas: dalijatės kanalo istorija su kitais „Mumcord“ naudotojais.",
+    "historyOff": "Istorijos sinchronizavimas išjungtas.",
+    "sharingBoth": "Kiti mato, ką žaidžiate ir ko klausotės.",
+    "sharingPlaying": "Kiti mato, ko klausotės.",
+    "sharingGaming": "Kiti mato žaidimą, kurį žaidžiate.",
+    "sharingNone": "Tai, ką žaidžiate ir ko klausotės, lieka privatu.",
+    "change": "Keisti",
+    "changeLabel": "Keisti: {{topic}}"
   },
   "hotkeys": {
     "global": "Visuotiniai spartieji klavišai",

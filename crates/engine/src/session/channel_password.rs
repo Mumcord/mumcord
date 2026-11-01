@@ -26,22 +26,49 @@ pub enum ChannelPasswordState {
     Ended,
 }
 
-/// The join retried with a new token, per server, until the server answers it.
+/// The join the own user asked for, per server, until the server answers it. Only a refusal
+/// of such a join asks for a password: the server also refuses Enter for things the user never
+/// asked for, such as the statistics of someone in a locked channel.
 #[derive(Default)]
 pub(super) struct Attempts(HashMap<ServerId, Attempt>);
 
 struct Attempt {
     channel_id: u32,
-    token: String,
+    /// The password the join was retried with; `None` for a join without one.
+    token: Option<String>,
 }
 
 impl Attempts {
+    /// The own user asked to join `channel_id`. A password retry for that channel stays.
+    pub(super) fn request(&mut self, server_id: ServerId, channel_id: u32) {
+        if self
+            .0
+            .get(&server_id)
+            .is_none_or(|a| a.channel_id != channel_id)
+        {
+            self.0.insert(
+                server_id,
+                Attempt {
+                    channel_id,
+                    token: None,
+                },
+            );
+        }
+    }
+
     fn start(&mut self, server_id: ServerId, channel_id: u32, token: String) {
-        self.0.insert(server_id, Attempt { channel_id, token });
+        self.0.insert(
+            server_id,
+            Attempt {
+                channel_id,
+                token: Some(token),
+            },
+        );
     }
 
     /// What a denial means for the dialog, plus the token to remove again when it was wrong.
-    /// `None` when the denial is no refused join of the own user.
+    /// `None` when the denial answers no join the own user asked for. The attempt ends with
+    /// the answer, so one join asks at most once.
     fn on_denied(
         &mut self,
         server_id: ServerId,
@@ -60,24 +87,25 @@ impl Attempts {
                     None
                 }
             });
+        let attempt = attempt?;
         if !refused_entry(denied, own_session) {
-            return attempt.map(|_| (channel_id, ChannelPasswordState::Ended, None));
+            return Some((channel_id, ChannelPasswordState::Ended, None));
         }
-        Some(match attempt {
-            Some(attempt) => (channel_id, ChannelPasswordState::Wrong, Some(attempt.token)),
+        Some(match attempt.token {
+            Some(token) => (channel_id, ChannelPasswordState::Wrong, Some(token)),
             None => (channel_id, ChannelPasswordState::Required, None),
         })
     }
 
-    /// The own user arrived in `channel_id`: the token that let them in, if that ends an
-    /// attempt.
+    /// The own user arrived in `channel_id`: ends an attempt on it, handing back the token that
+    /// let them in when it was a password retry.
     fn on_own_moved(&mut self, server_id: ServerId, channel_id: u32) -> Option<String> {
         let done = self
             .0
             .get(&server_id)
             .is_some_and(|a| a.channel_id == channel_id);
         if done {
-            self.0.remove(&server_id).map(|a| a.token)
+            self.0.remove(&server_id).and_then(|a| a.token)
         } else {
             None
         }
@@ -428,10 +456,12 @@ mod tests {
     #[test]
     fn a_refused_join_asks_for_a_password() {
         let mut attempts = Attempts::default();
+        attempts.request(1, 3);
         assert_eq!(
             attempts.on_denied(1, &enter_refused(), Some(OWN)),
             Some((3, ChannelPasswordState::Required, None))
         );
+        attempts.request(1, 3);
         let traverse = denied(DenyKind::Permission, permissions::TRAVERSE, None);
         assert_eq!(
             attempts.on_denied(1, &traverse, Some(OWN)),
@@ -440,13 +470,38 @@ mod tests {
     }
 
     #[test]
-    fn other_denials_do_not_ask() {
+    fn a_refusal_without_an_own_join_never_asks() {
+        // Murmur refuses the statistics of someone in a locked channel with exactly the Enter
+        // denial a refused join gets, again on every refresh.
         let mut attempts = Attempts::default();
+        for _ in 0..3 {
+            assert_eq!(attempts.on_denied(1, &enter_refused(), Some(OWN)), None);
+        }
+    }
+
+    #[test]
+    fn one_join_asks_only_once() {
+        let mut attempts = Attempts::default();
+        attempts.request(1, 3);
+        assert_eq!(
+            attempts.on_denied(1, &enter_refused(), Some(OWN)),
+            Some((3, ChannelPasswordState::Required, None))
+        );
+        assert_eq!(attempts.on_denied(1, &enter_refused(), Some(OWN)), None);
+    }
+
+    #[test]
+    fn other_denials_do_not_ask() {
         let other_person = denied(DenyKind::Permission, permissions::ENTER, Some(OWN + 1));
         let text = denied(DenyKind::Permission, permissions::TEXT_MESSAGE, Some(OWN));
         let full = denied(DenyKind::ChannelFull, 0, Some(OWN));
         for d in [other_person, text, full] {
-            assert_eq!(attempts.on_denied(1, &d, Some(OWN)), None);
+            let mut attempts = Attempts::default();
+            attempts.request(1, 3);
+            assert_eq!(
+                attempts.on_denied(1, &d, Some(OWN)),
+                Some((3, ChannelPasswordState::Ended, None))
+            );
         }
     }
 
@@ -454,11 +509,15 @@ mod tests {
     fn a_refused_retry_is_wrong_and_hands_back_the_token() {
         let mut attempts = Attempts::default();
         attempts.start(1, 3, "wrong".into());
+        // The join that follows the retry keeps its password.
+        attempts.request(1, 3);
         assert_eq!(
             attempts.on_denied(1, &enter_refused(), Some(OWN)),
             Some((3, ChannelPasswordState::Wrong, Some("wrong".into())))
         );
-        // The attempt is over: the next refusal asks afresh.
+        // The attempt is over: only the next join asks afresh.
+        assert_eq!(attempts.on_denied(1, &enter_refused(), Some(OWN)), None);
+        attempts.request(1, 3);
         assert_eq!(
             attempts.on_denied(1, &enter_refused(), Some(OWN)),
             Some((3, ChannelPasswordState::Required, None))
@@ -473,6 +532,10 @@ mod tests {
         assert_eq!(attempts.on_own_moved(1, 4), None, "another channel");
         assert_eq!(attempts.on_own_moved(1, 3).as_deref(), Some("secret"));
         assert_eq!(attempts.on_own_moved(1, 3), None, "only once");
+
+        attempts.request(1, 3);
+        assert_eq!(attempts.on_own_moved(1, 3), None, "no password");
+        assert_eq!(attempts.on_denied(1, &enter_refused(), Some(OWN)), None);
     }
 
     #[test]
@@ -490,10 +553,7 @@ mod tests {
     fn an_attempt_on_another_channel_stays() {
         let mut attempts = Attempts::default();
         attempts.start(1, 4, "secret".into());
-        assert_eq!(
-            attempts.on_denied(1, &enter_refused(), Some(OWN)),
-            Some((3, ChannelPasswordState::Required, None))
-        );
+        assert_eq!(attempts.on_denied(1, &enter_refused(), Some(OWN)), None);
         assert!(attempts.on_own_moved(1, 4).is_some());
     }
 

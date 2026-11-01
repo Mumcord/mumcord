@@ -129,7 +129,7 @@ async function shownFingerprint(label: string): Promise<string> {
   return normalizeFingerprint(match[1]);
 }
 
-/** Creates an identity through Settings → Identity (name + label). */
+/** Creates an identity through Settings → Account & Identity (name + label). */
 async function createIdentity(name: string, label: string): Promise<void> {
   await settingsAction("New identity").click();
   await settingsTitle("New identity").waitForDisplayed();
@@ -216,7 +216,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
 
   it("AC-3.2: creates identities; each card shows its own avatar and fingerprint", async () => {
     await completeWizard(ME);
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     await card(ME).waitForDisplayed();
     expect(await card(ME).getText()).toContain("Default");
 
@@ -255,7 +255,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
       "-inkey", join(dir, "imported-key.pem"), "-out", p12, "-passout", `pass:${IMPORT_PASSWORD}`,
     ]);
 
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     await importIdentity(p12, IMPORT_PASSWORD);
     // AC-3.3: the label defaults to the certificate's common name, so the list shows it.
     await card(IMPORTED).waitForDisplayed({ timeout: 20_000 });
@@ -321,7 +321,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
     // is given to the engine directly: the same code path the Export button runs after the picker.
     // The dialog itself (password twice, empty password refused) is covered by
     // SettingsScreen.test.tsx ("exports the identity with a password entered twice").
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     const dir = join(artifactsDir, "identities");
     const path = join(dir, "work.p12");
     const row = await identityRow(WORK);
@@ -405,7 +405,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
   });
 
   it("AC-3.9: two servers connected at the same time with different identities", async () => {
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     await addServer(testenv.ports.v15, SERVER_A, WORK, WORK_NAME);
     await addServer(testenv.ports.v15b, SERVER_B, STREAM, STREAM_NAME);
 
@@ -523,7 +523,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
   });
 
   it("AC-3.6: deleting an identity a server uses names the server, needs the typed label, and falls back to the default", async () => {
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     const text = await openDeleteDialog(WORK);
     // Both servers follow the default identity (IdentQA, the wizard's): Work is gone.
     expect(text).toContain(`These servers will use the default identity ${ME} afterwards: ${SERVER_A}`);
@@ -563,7 +563,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
   });
 
   it("AC-3.7: deleting the default names the identity that becomes the new default", async () => {
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     const remaining = await app.invoke<IdentityRow[]>("identity_list", {});
     expect(remaining.length).toBe(3); // IdentQA (default), Stream, ImportedQA
     const text = await openDeleteDialog(ME);
@@ -592,7 +592,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
   });
 
   it("AC-3.8: the last remaining identity cannot be deleted, in the UI and in the engine", async () => {
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     const rows = await app.invoke<IdentityRow[]>("identity_list", {});
     for (const row of rows.slice(0, rows.length - 1)) {
       await openDeleteDialog(row.label);
@@ -622,7 +622,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
   it("keeps the identity list after a restart", async () => {
     const before = await app.invoke<IdentityRow[]>("identity_list", {});
     await app.restart();
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     const rows = await app.invoke<IdentityRow[]>("identity_list", {});
     expect(rows.map((row) => row.label)).toEqual(before.map((row) => row.label));
     await card(rows[0]?.label ?? "").waitForDisplayed({ timeout: 30_000 });
@@ -646,7 +646,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
     await tabTo((f) => f.role === "tab", "the settings tab list");
     await browser.keys(["Home"]);
     for (let i = 0; i < 20; i++) {
-      if ((await focus()).id.endsWith("-tab-identity")) break;
+      if ((await focus()).id.endsWith("-tab-account")) break;
       await browser.keys(["ArrowDown"]);
     }
     await browser.keys(["Enter"]);
@@ -695,7 +695,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
 
     // Every control on the identity screen has an accessible name: axe scan in both themes. The
     // dropdown that announces its value is the server dialog's (checked in server-dialog.e2e.ts).
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     for (const theme of ["dark", "light"]) {
       await browser.execute((value: string) => {
         document.documentElement.dataset.theme = value;

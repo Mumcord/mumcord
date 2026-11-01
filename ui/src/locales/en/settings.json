@@ -1,32 +1,59 @@
 {
-  "sectionList": "Settings sections",
+  "sectionList": "Settings groups",
   "loading": "Loading settings…",
   "loadFailed": "Your settings could not be loaded. Close the settings and try again.",
   "saveFailed": "The last change could not be saved. Please try again.",
   "sections": {
-    "identity": "Identity",
-    "audio": "Audio",
-    "voice": "Voice",
-    "chatHistory": "Chat & history",
+    "general": "General",
+    "account": "Account & Identity",
+    "voiceAudio": "Voice & Audio",
+    "chatNotifications": "Chat & Notifications",
+    "privacy": "Privacy & Connections",
     "appearance": "Appearance",
-    "accessibility": "Accessibility",
-    "language": "Language",
-    "sounds": "Sounds & notifications",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostics",
-    "about": "About",
     "servers": "Servers",
-    "privacy": "Privacy",
-    "updates": "Updates",
+    "gaming": "Gaming & Overlay",
+    "advanced": "Advanced & Developer",
+    "about": "About",
     "packetInspector": "Packet inspector",
     "hotkeys": "Hotkeys"
+  },
+  "sectionDescriptions": {
+    "general": "Startup, language, updates and accessibility.",
+    "account": "Your identities, profile and what you share.",
+    "voiceAudio": "Microphone, speakers, how you talk and how you sound.",
+    "chatNotifications": "Notifications, private messages, blocked people and message history.",
+    "privacy": "How you connect to other people and what Mumcord loads from outside.",
+    "appearance": "Theme, layout and the channel list.",
+    "servers": "Connections to several servers and settings per server.",
+    "gaming": "The in-game overlay, positional audio and game plugins.",
+    "advanced": "Developer tools, diagnostics, storage and licences.",
+    "about": "Version, support and the setup wizard."
+  },
+  "breadcrumb": "Settings / {{section}}",
+  "moreInfo": "More information: {{topic}}",
+  "searchTerms": {
+    "devices": "input output headset speaker sound card",
+    "talkMode": "PTT VAD voice activity hotkey",
+    "noiseSuppression": "background noise denoise",
+    "p2p": "P2P relay direct connections hide my IP address",
+    "theme": "dark mode light mode colours colors",
+    "startup": "autostart boot login tray",
+    "language": "translation locale",
+    "updates": "new version upgrade",
+    "storage": "disk space clear cache",
+    "blocked": "ignore block mute people",
+    "notifications": "alerts pop-ups",
+    "externalContent": "embeds images previews"
   },
   "search": {
     "label": "Search settings",
     "results": "Search results",
     "empty": "No settings match “{{query}}”.",
     "count_one": "{{count}} setting found",
-    "count_other": "{{count}} settings found"
+    "count_other": "{{count}} settings found",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} result",
+    "groupCount_other": "{{count}} results"
   },
   "errors": {
     "secureStorage": "Your system's secure storage is not available or access was refused.",
@@ -112,7 +139,6 @@
     "testStop": "Stop recording",
     "testRecording": "Recording… speak now.",
     "testPlaying": "Playing back your voice…",
-    "quality": "Quality",
     "musicQuality": "Music quality",
     "musicQualityHint": "Tunes the encoder for music and turns off noise suppression and automatic volume; for music. Push-to-talk works best.",
     "bitrate": "Bitrate",
@@ -126,7 +152,6 @@
     "duckingLevel": "Lowered volume",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Low-latency mode",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "For playing music together in real time",
     "lowLatencyWarningTitle": "Trades robustness for speed",
     "lowLatencyBandwidth": "Uses more bandwidth (10 ms packets).",
@@ -157,7 +182,7 @@
     "keyMissing": "Set a key, otherwise nobody can hear you.",
     "keyRejected": "That key cannot be used. Try another key, optionally with Ctrl, Alt or Shift.",
     "keyNotConfirmed": "The desktop didn't confirm the shortcut. Try again and accept the system dialog, or assign the key in the desktop's shortcut settings.",
-    "processing": "Voice processing",
+    "processing": "Processing & quality",
     "noiseSuppression": "Noise suppression",
     "noiseSuppressionHint": "Filters out background noise like keyboards and fans.",
     "noiseChoice": {
@@ -261,12 +286,12 @@
     }
   },
   "history": {
+    "title": "Message history",
     "explanation": "Chat messages are saved only on this computer.",
-    "perServer": "Servers",
+    "perServer": "Per-server overrides",
     "noServers": "No saved servers yet.",
     "save": "Save history on {{server}}",
     "clearServer": "Clear history of {{server}}…",
-    "all": "All servers",
     "clearAll": "Clear all history…",
     "confirmTitle": "Clear history?",
     "confirmServer": "All saved messages from {{server}} will be deleted from this computer. Other people keep their copies. Their copies won't be synced back to this computer. This cannot be undone.",
@@ -278,7 +303,6 @@
     "autoDeleteHint": "Older messages are deleted from this computer automatically, without asking. This only affects the history saved here, not the server."
   },
   "fullImages": {
-    "title": "Full-size images",
     "offer": "Offer my full-size images",
     "offerHint": "Other Mumcord users can open my pictures in full size. Off: only the small preview is sent, no original is kept and none is shared.",
     "load": "Load full-size images from others",
@@ -300,14 +324,15 @@
     "system": "Follow system",
     "dark": "Dark",
     "light": "Light",
-    "behaviour": "Behaviour",
+    "behaviour": "Startup & window",
     "closeLegend": "When you close the window while connected",
     "closeAsk": "Ask every time",
     "closeTray": "Minimize to the tray",
     "closeQuit": "Quit Mumcord",
     "autostart": "Start Mumcord when I log in",
     "startMinimized": "Start minimized",
-    "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window."
+    "startMinimizedHint": "When Mumcord starts at login, it waits in the tray instead of opening the window.",
+    "look": "Look & layout"
   },
   "themeEditor": {
     "name": "Theme name",
@@ -365,7 +390,7 @@
     "deleteConfirm": "Delete"
   },
   "accessibility": {
-    "hints": "Hints",
+    "hints": "Accessibility",
     "keyboardHints": "Show keyboard hints",
     "keyboardHintsHint": "Short on-screen tips like “Arrow keys: move” below the channel list and in the GIF favorites. Screen readers still read them when this is off.",
     "announcements": "Screen reader announcements",
@@ -374,11 +399,15 @@
     "skipLinksHint": "Links at the start of the window that jump straight to the chat or the channel list when you press Tab."
   },
   "language": {
+    "title": "Language",
     "legend": "Display language",
-    "system": "Follow system"
+    "system": "Follow system",
+    "search": "Search languages",
+    "noMatch": "No matching language"
   },
   "sounds": {
-    "explanation": "Short sounds for these events:",
+    "title": "Sounds",
+    "explanation": "Short sounds that play for these events.",
     "joinLeave": "Someone joins or leaves your channel",
     "voiceJoin": "You join a channel for voice",
     "selfMute": "You mute or unmute yourself",
@@ -455,7 +484,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Logging",
+    "title": "Diagnostics",
     "logLevel": "Log detail",
     "levels": {
       "error": "Errors only",
@@ -490,7 +519,8 @@
     "setupWizardHint": "Go through the first-start setup again to review your microphone, privacy choices, update check and talk mode. Your current choices are filled in.",
     "setupWizardRun": "Run setup wizard again",
     "setupWizardIdentityNote": "Your identity is not part of this. Your certificate, and with it your registered name and permissions on servers, stays exactly as it is.",
-    "setupWizardIdentityLink": "Manage it in Identity"
+    "setupWizardIdentityLink": "Manage it in Identity",
+    "versionTitle": "Version and licence"
   },
   "profile": {
     "title": "Profile",
@@ -506,7 +536,6 @@
     "skipped": "Your default avatar was not sent: it is too large for this server."
   },
   "linkPreviews": {
-    "title": "Link previews",
     "switch": "Show link previews and embeds",
     "hint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address."
   },
@@ -527,7 +556,7 @@
     "cleared": "Cache cleared, {{size}} freed."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Storage",
     "hint": "Mumcord keeps temporary data on this computer so things load faster. Clearing it is safe; it is rebuilt when needed.",
     "kind": {
       "previews": "Link previews and images",
@@ -567,7 +596,7 @@
     "betaHint": "Results depend on the game and its plugin support."
   },
   "gamePlugins": {
-    "title": "Positional audio: sources",
+    "title": "Game plugins",
     "explanation": "Games tell Mumcord where you are through Mumble Link or through official Mumble game plugins. Mumcord finds the plugins in its own plugin folder and in an existing Mumble installation. Turn on only the plugins for games you play.",
     "antiCheat": "Game plugins read the game's memory. Some anti-cheat systems may flag this; turn plugins off for games with strict anti-cheat.",
     "loading": "Looking for game plugins…",
@@ -590,7 +619,6 @@
     "limitInvalid": "Enter a whole number from 1 to 15."
   },
   "appearanceEffects": {
-    "title": "Effects",
     "visualEffects": "Visual effects (glass, grain)",
     "visualEffectsHint": "Frosted-glass menus and a subtle film grain. Turned off automatically when your system asks for reduced transparency or motion."
   },
@@ -604,7 +632,6 @@
   "p2p": {
     "title": "Peer-to-peer (screen sharing, full-size images)",
     "modeLabel": "Peer-to-peer mode",
-    "recommended": "Recommended",
     "explanation": "Direct shows your IP address to the other person. The relay hides it from them; the relay's operator (this server's community) can see it. Both are end-to-end encrypted.",
     "useGlobal": "Use global setting",
     "overrideHint": "Only for this server. \"Use global setting\" follows Settings → Privacy.",
@@ -617,7 +644,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Direct connections",
     "allow": "Allow direct connections to other Mumcord users",
     "hint": "Direct connections are faster, but the other person can see your IP address. Until you decide, Mumcord asks the first time one would be used.",
     "notUsed": "Not used in the chosen peer-to-peer mode: Mumcord never connects directly to other people."
@@ -628,6 +654,7 @@
     "failed": "That did not work. Please try again."
   },
   "inspector": {
+    "title": "Developer tools",
     "intro": "Shows the packets Mumcord sends and receives, mainly Mumcord plugin data, for debugging. Only the last 2,000 packets are kept, in memory on this device; nothing is logged or sent anywhere.",
     "devTools": "Developer tools",
     "devToolsHint": "Turn off to hide the packet inspector again and stop capturing.",
@@ -804,7 +831,14 @@
     "hide": "Hide them completely",
     "hideHint": "Nothing is shown in the chat."
   },
+  "externalContent": {
+    "title": "External content"
+  },
+  "privacyConnections": {
+    "title": "Connections"
+  },
   "updates": {
+    "title": "Updates",
     "installedFrom": "Mumcord {{version}} · installed from {{source}}",
     "install": {
       "appImage": "the AppImage",
@@ -818,7 +852,6 @@
       "aur": "the AUR",
       "otherLinux": "a Linux package"
     },
-    "checking": "Checking",
     "mode": "When an update is found",
     "modeHint": "Updates are always checked and verified before they are installed.",
     "modeAuto": "Download automatically",
@@ -832,7 +865,6 @@
     "intervalHours_one": "Every hour",
     "intervalHours_other": "Every {{count}} hours",
     "intervalWeek": "Once a week",
-    "status": "Status",
     "state": {
       "idle": "Not checked yet",
       "off": "Update checks are off",
@@ -859,6 +891,99 @@
     "whatsNew": "What's new",
     "whatsNewHint": "See the changes in every version.",
     "openChangelog": "Open changelog"
+  },
+  "badges": {
+    "changed": "Changed",
+    "recommended": "Recommended",
+    "groupChanged": "Has changed settings"
+  },
+  "resetSection": {
+    "button": "Reset section",
+    "title": "Reset {{section}}?",
+    "intro": "These settings go back to your preset or to their default value:",
+    "nothing": "Every setting in {{section}} already has its preset or default value.",
+    "confirm": "Reset"
+  },
+  "activePreset": {
+    "heading": "Active preset",
+    "none": "No preset",
+    "customised": "{{preset}}, customised",
+    "changed_one": "{{count}} setting changed since setup",
+    "changed_other": "{{count}} settings changed since setup",
+    "unchanged": "No changes since setup",
+    "switch": "Switch",
+    "switchLabel": "Switch preset",
+    "applyFailed": "The in-game overlay or Do Not Disturb could not be changed. Please try again."
+  },
+  "presets": {
+    "dialogTitle": "Switch preset",
+    "dialogIntro": "Pick a starting point. Only the settings a preset covers change; everything else stays as it is.",
+    "legend": "Presets",
+    "continue": "Continue",
+    "confirmTitle": "Switch to {{preset}}?",
+    "confirmIntro": "These settings change:",
+    "confirmNothing": "No setting changes. Mumcord remembers {{preset}} as your preset.",
+    "confirmCustom": "No setting changes. Settings stops comparing your choices with a preset and compares them with the defaults instead.",
+    "apply": "Switch preset",
+    "everythingOn": {
+      "name": "Everything on",
+      "tagline": "Full feature set",
+      "point1": "Others see what you play and listen to",
+      "point2": "Your IP is visible to people you connect to directly",
+      "point3": "Anyone can message you; links and images load from the web",
+      "point4": "Overlay, history sync and full-size images are on"
+    },
+    "balanced": {
+      "name": "Balanced",
+      "tagline": "Between privacy and comfort",
+      "point1": "Only friends and people in your channel can message you",
+      "point2": "Direct connection, with a relay as fallback",
+      "point3": "Link previews and full-size images are on",
+      "point4": "What you play and listen to stays private"
+    },
+    "maximumPrivacy": {
+      "name": "Maximum privacy",
+      "tagline": "Share as little as possible",
+      "point1": "Only friends can message you, no exceptions",
+      "point2": "Your IP is hidden; everything goes through the relay",
+      "point3": "No outside content, no history sync, no sharing",
+      "point4": "Nothing is shared about what you do"
+    },
+    "custom": {
+      "name": "Custom",
+      "tagline": "Your own choices",
+      "point1": "Keeps every setting as it is",
+      "point2": "Changes are compared with the defaults",
+      "point3": "Best if you know what you want"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta features",
+    "hint": "Early features; they may change. Each one is also shown where it belongs, with a Beta badge.",
+    "gamePlugins": "Game plugins",
+    "manage": "Manage plugins"
+  },
+  "privacySummary": {
+    "title": "Privacy summary",
+    "ipHidden": "Your IP address stays hidden",
+    "ipVisible": "Direct connections can show your IP address",
+    "matches": "Matches {{preset}}",
+    "messages": "Private messages from: {{rule}}",
+    "p2pHidden": "Peer-to-peer goes through the relay, so the other person does not see your IP address.",
+    "p2pDirect": "Peer-to-peer connects directly first; the other person can see your IP address.",
+    "p2pDirectOnly": "Peer-to-peer only connects directly; the other person can see your IP address.",
+    "externalOn": "Link previews are on: Mumcord fetches linked pages to build them.",
+    "externalOff": "Link previews are off: Mumcord loads nothing from linked pages.",
+    "imagesOn": "Full-size images are exchanged directly between Mumcord users.",
+    "imagesOff": "Full-size images are not exchanged.",
+    "historyOn": "History sync is on: you share your channel history with other Mumcord users.",
+    "historyOff": "History sync is off.",
+    "sharingBoth": "Others see what you play and listen to.",
+    "sharingPlaying": "Others see what you listen to.",
+    "sharingGaming": "Others see the game you play.",
+    "sharingNone": "What you play and listen to stays private.",
+    "change": "Change",
+    "changeLabel": "Change: {{topic}}"
   },
   "hotkeys": {
     "global": "Global shortcuts",

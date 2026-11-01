@@ -33,7 +33,7 @@ export function ImportStep({
   const progress = t("wizard:progress", { current: step, total });
   const headingId = useId();
   return (
-    <section className="wizard-step wizard-step--wide" aria-labelledby={headingId}>
+    <section className="wizard-step wizard-step__body" aria-labelledby={headingId}>
       <MumbleImport
         found={found}
         settings={settings}
@@ -42,7 +42,7 @@ export function ImportStep({
         }}
         header={(stage) => (
           <>
-            <p className="wizard-progress">{t("optional", { progress })}</p>
+            <p className="wizard-eyebrow">{t("optional", { progress })}</p>
             <h2 id={headingId} className="mumble-import__heading" tabIndex={-1} data-stage-heading>
               {stage === "choose" ? t("title") : t("summary.title")}
             </h2>

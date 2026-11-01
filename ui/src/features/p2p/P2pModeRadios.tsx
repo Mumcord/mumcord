@@ -1,6 +1,8 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import type { P2pMode } from "../../api";
+import { useIsChanged } from "../settings/components/changedSettings";
+import { ChangedBadge, RecommendedBadge } from "../settings/components/SettingBadges";
 import "./p2p.css";
 
 /** The five modes in the order of FR-4.1; the first one is the default. */
@@ -43,15 +45,20 @@ export function P2pModeRadios({
     ? [GLOBAL, ...P2P_MODES]
     : [...P2P_MODES];
   const selected = value ?? GLOBAL;
+  const changed = useIsChanged(t("p2p.title"));
   return (
     <fieldset
       className="p2p-modes"
-      aria-label={t("p2p.modeLabel")}
+      aria-label={changed ? `${t("p2p.modeLabel")}, ${t("badges.changed")}` : t("p2p.modeLabel")}
       aria-describedby={explanationId}
     >
       <legend className={hideTitle ? "visually-hidden" : "p2p-modes__legend"}>
         {t("p2p.title")}
       </legend>
+      {/* Only inside Settings: there it marks a mode that differs from the preset (#161). */}
+      <span className="setting-badges" aria-hidden="true">
+        <ChangedBadge label={t("p2p.title")} />
+      </span>
       {options.map((option) => (
         <label key={option} className="p2p-modes__option">
           <input
@@ -65,7 +72,10 @@ export function P2pModeRadios({
           />
           {option === GLOBAL ? t("p2p.useGlobal") : t(`p2p.mode.${option}`)}
           {option === RECOMMENDED && (
-            <span className="p2p-modes__badge">{t("p2p.recommended")}</span>
+            <>
+              {" "}
+              <RecommendedBadge className="p2p-modes__badge" />
+            </>
           )}
         </label>
       ))}

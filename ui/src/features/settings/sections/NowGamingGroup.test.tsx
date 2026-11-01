@@ -20,14 +20,16 @@ afterEach(() => {
 });
 
 describe("NowGamingGroup", () => {
-  it("is off by default and turns sharing on", async () => {
+  it("is off by default and turns sharing on", () => {
     const update = vi.fn();
     render(<NowGamingGroup settings={settings} update={update} />);
     const toggle = screen.getByRole("switch", { name: "Share the game I'm playing" });
     expect(toggle).not.toBeChecked();
     fireEvent.click(toggle);
     expect(update).toHaveBeenCalledWith({ nowGaming: true });
-    expect(await screen.findByText(/"🎮 Game" line/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "More information: Share the game I'm playing" }),
+    ).toHaveAttribute("data-tooltip", expect.stringMatching(/"🎮 Game" line/));
   });
 
   it("shows the detected game while on", async () => {

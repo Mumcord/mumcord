@@ -17,6 +17,7 @@ import {
   USER,
   waitMessage,
 } from "../../helpers/chat-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 /** Certificate of the bot: the same identity across both of its names. */
 const CERT = "BlockQA";
@@ -52,11 +53,7 @@ async function voicePeak(out: OutputWav, bot: ScriptBot): Promise<number> {
 }
 
 async function openPrivacySettings(): Promise<void> {
-  const button = $("button[aria-label='Quick settings']");
-  await button.waitForClickable();
-  await button.click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $("//button[@role='tab' and .='Privacy']").click();
+  await openSettingsGroup("Chat & Notifications");
 }
 
 // AC-3.71 (issue #140): block the second client → their private messages neither show nor

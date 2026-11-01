@@ -425,9 +425,11 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     await closeSettings();
   });
 
-  it("AC-2.16: controls sit right-aligned in every settings section", async () => {
+  it("AC-2.16: controls sit right-aligned in every section card of every settings group", async () => {
     await appearance();
     const names = await $$('[role="tab"]').map((t) => t.getText());
+    // The ten top-level groups of #161.
+    expect(names).toHaveLength(10);
     const off: string[] = [];
     for (const name of names) {
       await $(`[role="tab"]=${name}`).click();
@@ -436,12 +438,15 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
         ...(await browser.execute((section: string) => {
           const panel = document.querySelector("[role='tabpanel']:not([hidden])") ?? document.body;
           const out: string[] = [];
+          // Every page is a grid of section cards (#161); the check runs inside each of them.
+          if (panel.querySelector(".settings-group") === null) out.push(`${section}: no section cards`);
           const sel = ".select, input.settings-input, input[role='switch'], textarea.settings-input";
           for (const el of Array.from(panel.querySelectorAll<HTMLElement>(sel))) {
             const r = el.getBoundingClientRect();
             if (r.width === 0 || r.height === 0) continue;
             const row = el.closest<HTMLElement>(".settings-control-row, .settings-switch");
             const label = (el.getAttribute("aria-label") ?? (el.id || el.className)).slice(0, 40);
+            if (!el.closest(".settings-group")) out.push(`${section}: ${label} outside a section card`);
             if (!row) {
               out.push(`${section}: ${label} not in a right-aligned row (${el.parentElement?.className ?? ""})`);
               continue;

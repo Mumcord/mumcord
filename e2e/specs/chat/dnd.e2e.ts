@@ -11,6 +11,7 @@ import {
   USER,
 } from "../../helpers/chat-ui.ts";
 import { userPanelLayout } from "../../helpers/voice-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 function anyToast() {
   return $("//section[@aria-label='Notifications']//button[contains(@class,'toast__open')]");
@@ -87,9 +88,7 @@ describe("chat: Do Not Disturb (AC-3.76)", () => {
   });
 
   it("says the system state can't be read here", async () => {
-    await $("button[aria-label='Quick settings']").click();
-    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-    await $("//button[@role='tab' and .='Sounds & notifications']").click();
+    await openSettingsGroup("Chat & Notifications");
     await $("//p[contains(@class,'dnd-status')][contains(., 'Unavailable')]").waitForDisplayed();
     await browser.keys("Escape");
   });

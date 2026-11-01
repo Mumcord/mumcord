@@ -15,7 +15,7 @@ export function DndGroup() {
   const { desktop, on } = state.system;
   const readable = desktop !== null && on !== null;
   return (
-    <Group title={t("dnd.title")}>
+    <Group title={t("dnd.title")} icon="moon">
       <Switch
         label={t("dnd.label")}
         description={t("dnd.description")}
@@ -24,6 +24,7 @@ export function DndGroup() {
       />
       <Switch
         label={t("dnd.follow")}
+        recommended
         description={t("dnd.followDescription")}
         checked={state.followSystem}
         onChange={setFollowSystem}

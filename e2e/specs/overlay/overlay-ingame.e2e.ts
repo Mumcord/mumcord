@@ -9,6 +9,7 @@ import { browser, expect, $ } from "@wdio/globals";
 import { app, artifactsDir, bin, botInBackgroundOn, repoRoot, testenv, type BackgroundBot } from "../../helpers/index.ts";
 import { run } from "../../helpers/run.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly, readTree } from "../../helpers/voice-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 const speechPath = join(repoRoot, "testenv", "audio", "speech.wav");
 const GAME = "headless_check";
@@ -37,11 +38,7 @@ async function expectDrawn(drawn: boolean): Promise<void> {
 }
 
 async function openOverlaySettings(): Promise<void> {
-  const button = $("button[aria-label='Quick settings']");
-  await button.waitForClickable();
-  await button.click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $("//button[@role='tab' and .='Overlay']").click();
+  await openSettingsGroup("Gaming & Overlay");
 }
 
 async function closeSettings(): Promise<void> {

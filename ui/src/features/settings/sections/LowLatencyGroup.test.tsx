@@ -24,9 +24,9 @@ describe("LowLatencyGroup", () => {
   it("is off by default, shows no warning and saves the switch", async () => {
     const update = vi.fn();
     render(<LowLatencyGroup settings={settings} update={update} />);
-    const toggle = screen.getByRole("switch", { name: "Low-latency mode" });
+    const toggle = screen.getByRole("switch", { name: "Low-latency mode Beta feature" });
     expect(toggle).not.toBeChecked();
-    expect(screen.getByText("Beta")).toBeInTheDocument();
+    expect(screen.getByText("Beta feature")).toBeInTheDocument();
     expect(screen.queryByRole("note")).toBeNull();
     fireEvent.click(toggle);
     expect(update).toHaveBeenCalledWith({ lowLatency: true });

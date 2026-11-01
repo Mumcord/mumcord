@@ -5,20 +5,14 @@ import { browser, expect, $, $$ } from "@wdio/globals";
 import { botInBackground, type BackgroundBot, type BotOptions } from "./bot.ts";
 import { artifactsDir, repoRoot } from "./paths.ts";
 import { run } from "./run.ts";
-import { nextToLastWizardStep } from "./wizard-util.ts";
+import { runFirstStartWizard, type WizardPreset } from "./wizard-util.ts";
 import { doubleClickRow, showAllPeople } from "./voice-ui.ts";
 
 export const USER = "ChatQA";
 
-/** Runs the first-start wizard: new identity → default devices → voice activation. */
-export async function finishWizard(name = USER): Promise<void> {
-  const nameInput = $("input[autocomplete='nickname']");
-  await nameInput.waitForDisplayed({ timeout: 30_000 });
-  await nameInput.setValue(name);
-  await clickButton("Next");
-  await nextToLastWizardStep();
-  await $("input[value='voiceActivation']").click();
-  await clickButton("Finish");
+/** Runs the first-start wizard: new identity, default devices and voice activation, `preset`. */
+export async function finishWizard(name = USER, preset?: WizardPreset): Promise<void> {
+  await runFirstStartWizard(name, preset);
 }
 
 export async function clickButton(text: string): Promise<void> {

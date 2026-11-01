@@ -1,5 +1,12 @@
 /* Settings → Hotkeys (issue #64, mockup epic3-64-hotkeys-settings). */
 
+.hotkeys-subheading {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
 .hotkeys-note {
   margin: var(--space-2) 0;
   padding: var(--space-3) var(--space-4);

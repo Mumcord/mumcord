@@ -16,6 +16,7 @@ import {
   testenv,
   type BackgroundBot,
 } from "../../helpers/index.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { hasClass } from "../../helpers/selectors.ts";
 import { readWav, rms, silence, splitStereo, wavSamples, writeWav } from "../../helpers/voice-audio.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly, personRow, readTree } from "../../helpers/voice-ui.ts";
@@ -88,9 +89,7 @@ async function openQuickSettings(): Promise<ReturnType<typeof $>> {
 }
 
 async function openAudioSettings(): Promise<void> {
-  await (await openQuickSettings()).waitForDisplayed();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $("//button[@role='tab' and .='Audio']").click();
+  await openSettingsGroup("Gaming & Overlay");
 }
 
 /** The settings switch whose label is `label`. */

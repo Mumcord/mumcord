@@ -17,7 +17,7 @@ export function DuckingGroup({ settings, update }: SettingsSectionProps) {
   const id = useId();
   const shown = t("audio.duckingLevelValue", { percent: settings.videoDuckingPercent });
   return (
-    <Group title={t("audio.videoSound")}>
+    <Group title={t("audio.videoSound")} icon="video">
       <Switch
         label={t("audio.ducking")}
         description={t("audio.duckingHint")}

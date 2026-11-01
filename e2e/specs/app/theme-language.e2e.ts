@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
 import { app, bot, repoRoot, testenv } from "../../helpers/index.ts";
 import {
-  chooseRadio,
+  chooseLanguage,
   connectFromEmptyState,
   focus,
   htmlTheme,
@@ -20,7 +20,8 @@ import {
 } from "./flows.ts";
 
 const me = "C7Lang";
-const TABS = 13;
+/** Top-level settings groups (#161). */
+const TABS = 10;
 
 /**
  * Opens the settings tab of `section` (its id, so it works in every UI language); indexes shift
@@ -117,6 +118,8 @@ const neutral = (t: string) =>
   /^Standard$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
+  // Settings group names that read the same: "General" in Spanish, "Gaming & Overlay" in German.
+  /^(General|Gaming & Overlay)$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
   /^In \S+ \(\d+\)$/.test(t) ||
   // Language names in the picker are shown in their own language (endonyms).
@@ -218,15 +221,15 @@ describe("AC-1.26 language switch without restart", () => {
     english = await collect();
   });
 
-  for (const [lang, settingsTitle] of [
-    ["es", "Ajustes"],
-    ["de", "Einstellungen"],
+  for (const [lang, search, settingsTitle] of [
+    ["es", "Spanish", "Ajustes"],
+    ["de", "German", "Einstellungen"],
   ] as const) {
     it(`switches to ${lang} live and translates every UI text`, async () => {
       const pid = await browser.execute(() => performance.timeOrigin);
       await openSettings();
-      await settingsTabNamed("language");
-      await chooseRadio(lang);
+      await settingsTabNamed("general");
+      await chooseLanguage(lang, search);
       await browser.waitUntil(async () => (await browser.execute(() => document.documentElement.lang)) === lang, {
         timeoutMsg: `html lang never became ${lang}`,
       });
@@ -246,17 +249,25 @@ describe("AC-1.26 language switch without restart", () => {
   it("offers all 24 EU languages by their own names and switches to French and Greek live", async () => {
     const pid = await browser.execute(() => performance.timeOrigin);
     await openSettings();
-    await settingsTabNamed("language");
+    await settingsTabNamed("general");
+    // The searchable picker lists every language in its own name when nothing is typed.
+    const field = await $(".overlay__dialog .language-picker [role=combobox]");
+    await field.click();
+    await $(".language-picker [role=listbox]").waitForDisplayed();
     const names = await browser.execute(() =>
-      Array.from(document.querySelectorAll(".overlay__dialog input[type=radio]"), (r) => r.closest("label")?.textContent.trim() ?? ""),
+      Array.from(document.querySelectorAll(".language-picker [role=option]"), (o) => o.textContent.trim()),
     );
+    await browser.keys(["Escape"]);
     expect(names).toEqual(expect.arrayContaining(["Français", "Ελληνικά", "Gaeilge", "Malti", "Български"]));
     expect(names).toHaveLength(25);
-    for (const lang of ["fr", "el"]) {
+    for (const [lang, search] of [
+      ["fr", "French"],
+      ["el", "Greek"],
+    ] as const) {
       const strings = JSON.parse(readFileSync(join(repoRoot, `ui/src/locales/${lang}/app.json`), "utf8")) as {
         settings: { title: string };
       };
-      await chooseRadio(lang);
+      await chooseLanguage(lang, search);
       await browser.waitUntil(
         async () =>
           (await browser.execute(() => document.querySelector(".overlay__dialog h1")?.textContent ?? "")) ===

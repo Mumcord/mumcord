@@ -9,7 +9,7 @@ import {
 } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { lastChecked } from "./lastChecked";
-import { UpdatesSection } from "./UpdatesSection";
+import { UpdatesCard } from "./UpdatesSection";
 
 let api: MockApi;
 let settings: Settings;
@@ -32,10 +32,10 @@ async function emit(change: Partial<UpdateStatus>) {
   });
 }
 
-describe("UpdatesSection (FR-3.146)", () => {
+describe("UpdatesCard (FR-3.146)", () => {
   it("stores each mode as check and auto-download settings", async () => {
     const update = vi.fn();
-    render(<UpdatesSection settings={settings} update={update} />);
+    render(<UpdatesCard settings={settings} update={update} />);
     await screen.findByText(/installed from the AppImage/);
     expect(screen.getByRole("radio", { name: "Notify only" })).toBeChecked();
     fireEvent.click(screen.getByRole("radio", { name: "Download automatically" }));
@@ -45,9 +45,7 @@ describe("UpdatesSection (FR-3.146)", () => {
   });
 
   it("offers no automatic download where the copy cannot install itself", async () => {
-    render(
-      <UpdatesSection settings={{ ...settings, updateAutoDownload: true }} update={vi.fn()} />,
-    );
+    render(<UpdatesCard settings={{ ...settings, updateAutoDownload: true }} update={vi.fn()} />);
     await screen.findByText(/installed from/);
     await emit({ install: "deb", canInstall: false });
     const auto = screen.getByRole("radio", { name: "Download automatically" });
@@ -58,7 +56,7 @@ describe("UpdatesSection (FR-3.146)", () => {
 
   it("changes the check interval", async () => {
     const update = vi.fn();
-    render(<UpdatesSection settings={settings} update={update} />);
+    render(<UpdatesCard settings={settings} update={update} />);
     expect(screen.getByText("On start and every 12 hours")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("combobox", { name: "Check for updates" }));
     fireEvent.click(await screen.findByRole("option", { name: "Once a week" }));
@@ -67,7 +65,7 @@ describe("UpdatesSection (FR-3.146)", () => {
 
   it("checks now and shows the result", async () => {
     const check = vi.spyOn(api, "updateCheckNow");
-    render(<UpdatesSection settings={settings} update={vi.fn()} />);
+    render(<UpdatesCard settings={settings} update={vi.fn()} />);
     fireEvent.click(await screen.findByRole("button", { name: "Check now" }));
     expect(check).toHaveBeenCalledOnce();
     await emit({ phase: "upToDate", lastCheckMs: Date.now() });
@@ -77,17 +75,17 @@ describe("UpdatesSection (FR-3.146)", () => {
 
   it("does not check while off or in a development build", async () => {
     const { rerender } = render(
-      <UpdatesSection settings={{ ...settings, updateCheck: "no" }} update={vi.fn()} />,
+      <UpdatesCard settings={{ ...settings, updateCheck: "no" }} update={vi.fn()} />,
     );
     expect(await screen.findByRole("button", { name: "Check now" })).toBeDisabled();
-    rerender(<UpdatesSection settings={settings} update={vi.fn()} />);
+    rerender(<UpdatesCard settings={settings} update={vi.fn()} />);
     await emit({ devBuild: true });
     expect(screen.getByText("Development build: updates are off")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Check now" })).toBeDisabled();
   });
 
   it("mentions being offline only quietly", async () => {
-    render(<UpdatesSection settings={settings} update={vi.fn()} />);
+    render(<UpdatesCard settings={settings} update={vi.fn()} />);
     await screen.findByText(/installed from/);
     await emit({ phase: "failed", error: "network" });
     expect(screen.getByText(/GitHub could not be reached/)).toBeInTheDocument();
@@ -96,7 +94,7 @@ describe("UpdatesSection (FR-3.146)", () => {
 
   it("stops skipping a version", async () => {
     const update = vi.fn();
-    render(<UpdatesSection settings={{ ...settings, updateSkipped: "0.4.4" }} update={update} />);
+    render(<UpdatesCard settings={{ ...settings, updateSkipped: "0.4.4" }} update={update} />);
     expect(screen.getByText("0.4.4 is skipped and will not be offered again.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Stop skipping" }));
     expect(update).toHaveBeenLastCalledWith({ updateSkipped: null });

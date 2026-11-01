@@ -5,7 +5,8 @@ import { app, botInBackground, testenv, type BackgroundBot } from "../../helpers
 import { run, runOk } from "../../helpers/run.ts";
 import { waitConnected } from "../../helpers/chat-ui.ts";
 import { typeInto } from "../../helpers/servers-ui.ts";
-import { button, finishWizardWithDefaults, waitForText, wizardStep } from "../../helpers/wizard-util.ts";
+import { openSettingsGroup, settingsCard } from "../../helpers/settings-ui.ts";
+import { button, runFirstStartWizard, waitForText } from "../../helpers/wizard-util.ts";
 
 // Issue #60: the hidden packet inspector. Seven clicks on the version in About unlock it; on
 // connecting, the app greets the bot that is already there with a Mumcord hello (plugin data),
@@ -14,11 +15,8 @@ import { button, finishWizardWithDefaults, waitForText, wizardStep } from "../..
 const MY_NAME = "Inspector-Tester";
 const BOT_NAME = "Inspector-Bot";
 
-async function openSettings(tab: string): Promise<void> {
-  await $("button[aria-label='Quick settings']").click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $(`//button[@role='tab'][normalize-space()='${tab}']`).click();
-}
+/** The Developer tools card (#60), in Advanced & Developer once unlocked (#161). */
+const devToolsCard = () => settingsCard("Developer tools");
 
 let mainWindow = "";
 
@@ -73,15 +71,13 @@ describe("packet inspector (issue #60)", () => {
   });
 
   it("completes the wizard", async () => {
-    await waitForText(wizardStep(1));
-    await $("input[type=text]").setValue(MY_NAME);
-    await button("Next").click();
-    await finishWizardWithDefaults();
+    await runFirstStartWizard(MY_NAME);
   });
 
   it("is hidden until the version in About is clicked seven times", async () => {
-    await openSettings("About");
-    expect(await $("//button[@role='tab'][normalize-space()='Packet inspector']").isExisting()).toBe(false);
+    await openSettingsGroup("Advanced & Developer");
+    expect(await devToolsCard().isExisting()).toBe(false);
+    await openSettingsGroup("About");
     const version = $("//dt[normalize-space()='Version']/following-sibling::dd[1]");
     // Dev builds show dev~<commit> instead of a release version (RELEASING.md).
     await browser.waitUntil(async () => /\d+\.\d+|dev~\S+/.test(await version.getText()), {
@@ -89,13 +85,14 @@ describe("packet inspector (issue #60)", () => {
     });
     for (let i = 0; i < 7; i++) await version.click();
     await waitForText("Developer tools unlocked");
-    await $("//button[@role='tab'][normalize-space()='Packet inspector']").waitForDisplayed();
+    await openSettingsGroup("Advanced & Developer");
+    await devToolsCard().waitForDisplayed();
     await browser.keys(["Escape"]);
   });
 
   it("opens the inspector before connecting, because capture runs only while it is open", async () => {
     mainWindow = await browser.getWindowHandle();
-    await openSettings("Packet inspector");
+    await openSettingsGroup("Advanced & Developer");
     expect(await $("table").isExisting()).toBe(false);
     await button("Open packet inspector").click();
     await switchToInspector();
@@ -116,7 +113,7 @@ describe("packet inspector (issue #60)", () => {
     await button("Trust and connect").click();
     await waitConnected();
 
-    await openSettings("Packet inspector");
+    await openSettingsGroup("Advanced & Developer");
     await switchToInspector();
     const row = $("//tr[contains(@class,'pi-row-sent')][.//code[normalize-space()='mumcord.hello']]");
     await row.waitForDisplayed({ timeout: 15_000, timeoutMsg: "no sent hello row" });

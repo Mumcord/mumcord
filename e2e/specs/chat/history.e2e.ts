@@ -10,6 +10,7 @@ import {
   sleep,
   waitMessage,
 } from "../../helpers/chat-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 async function restartAndOpenLobby(): Promise<void> {
   await app.restart();
@@ -19,11 +20,7 @@ async function restartAndOpenLobby(): Promise<void> {
 }
 
 async function openSettings(): Promise<void> {
-  const button = $("button[aria-label='Quick settings']");
-  await button.waitForClickable();
-  await button.click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $("//button[@role='tab' and .='Chat & history']").click();
+  await openSettingsGroup("Servers");
 }
 
 // AC-1.17: history survives a restart, "Clear history" removes it, "Save history" off keeps nothing.

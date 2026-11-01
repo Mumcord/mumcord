@@ -1,21 +1,13 @@
 // UI steps shared by the voice specs: first-start wizard, connecting, reading the channel tree.
 import { browser, $ } from "@wdio/globals";
 import { ports } from "./testenv.ts";
-import { nextToLastWizardStep } from "./wizard-util.ts";
+import { runFirstStartWizard } from "./wizard-util.ts";
 
 export const SERVER = "localhost";
 
 /** Wizard on a fresh profile: new identity, default devices, voice activation. */
 export async function completeWizard(name: string): Promise<void> {
-  const nameInput = $("input[autocomplete='nickname']");
-  await nameInput.waitForDisplayed({ timeout: 30_000 });
-  await nameInput.setValue(name);
-  await $("button=Next").click();
-  await nextToLastWizardStep();
-  // Keep voice activation; don't touch the system's mumble:// handler from a test.
-  const link = $("//label[contains(., 'Open mumble:// links')]/input");
-  if ((await link.isExisting()) && (await link.isSelected())) await link.click();
-  await $("button=Finish").click();
+  await runFirstStartWizard(name);
 }
 
 /** Adds the server from the empty state and trusts its certificate. */

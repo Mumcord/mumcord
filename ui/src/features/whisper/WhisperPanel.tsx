@@ -63,7 +63,7 @@ export function WhisperButton({
     label: t("panel.manage"),
     icon: GEAR,
     onSelect: () => {
-      openSettingsSection("voice");
+      openSettingsSection("voiceAudio");
     },
   });
 

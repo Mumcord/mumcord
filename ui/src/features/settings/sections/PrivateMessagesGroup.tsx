@@ -5,6 +5,7 @@ import { Select } from "../../../components/Select";
 import { displayName } from "../../servers/format";
 import { useServers } from "../../servers/store";
 import { Group } from "../components/Section";
+import { ChangedBadge, RecommendedBadge } from "../components/SettingBadges";
 import { Switch } from "../components/Switch";
 import type { SettingsSectionProps } from "./types";
 import "./privateMessages.css";
@@ -22,8 +23,8 @@ export function PrivateMessagesGroup({ settings, update }: SettingsSectionProps)
   };
   return (
     <>
-      <Group title={t("privateMessages.title")}>
-        <RuleCards
+      <Group title={t("privateMessages.title")} icon="mail">
+        <PmRuleCards
           value={pm.rule}
           onChange={(rule) => {
             change({ rule });
@@ -44,7 +45,7 @@ export function PrivateMessagesGroup({ settings, update }: SettingsSectionProps)
           change({ serverRules });
         }}
       />
-      <Group title={t("privateMessages.alwaysTitle")}>
+      <Group title={t("privateMessages.alwaysTitle")} icon="user">
         <Switch
           label={t("privateMessages.currentChannel")}
           description={t("privateMessages.currentChannelHint")}
@@ -66,13 +67,30 @@ export function PrivateMessagesGroup({ settings, update }: SettingsSectionProps)
   );
 }
 
-/** Native radios drawn as cards; the title names each radio, the hint describes it. */
-function RuleCards({ value, onChange }: { value: PmRule; onChange: (rule: PmRule) => void }) {
+/** The rule #159 recommends; its card carries the "Recommended" pill. */
+const RECOMMENDED_RULE: PmRule = "friendsOnly";
+
+/**
+ * Native radios drawn as cards; the title names each radio, the hint describes it. The group is
+ * named by the legend and its "Changed" badge, which stays outside the legend.
+ */
+export function PmRuleCards({
+  value,
+  onChange,
+}: {
+  value: PmRule;
+  onChange: (rule: PmRule) => void;
+}) {
   const { t } = useTranslation("settings");
   const id = useId();
   return (
-    <fieldset className="pm-rules">
-      <legend className="pm-rules__legend">{t("privateMessages.legend")}</legend>
+    <fieldset className="pm-rules" aria-labelledby={`${id}-legend ${id}-badges`}>
+      <legend id={`${id}-legend`} className="pm-rules__legend">
+        {t("privateMessages.legend")}
+      </legend>
+      <span id={`${id}-badges`} className="setting-badges">
+        <ChangedBadge label={t("privateMessages.legend")} />
+      </span>
       {PM_RULES.map((rule) => {
         const titleId = `${id}-${rule}-title`;
         const hintId = `${id}-${rule}-hint`;
@@ -93,6 +111,12 @@ function RuleCards({ value, onChange }: { value: PmRule; onChange: (rule: PmRule
             <span className="pm-rules__text">
               <span id={titleId} className="pm-rules__title">
                 {t(`privateMessages.${rule}`)}
+                {rule === RECOMMENDED_RULE && (
+                  <>
+                    {" "}
+                    <RecommendedBadge />
+                  </>
+                )}
               </span>
               <span id={hintId} className="pm-rules__hint">
                 {t(`privateMessages.${rule}Hint`)}
@@ -127,7 +151,7 @@ function ServerOverrides({
     onChange(rule === undefined ? others : [...others, { serverId, rule }]);
   };
   return (
-    <Group title={t("privateMessages.overrideTitle")}>
+    <Group title={t("privateMessages.overrideTitle")} icon="server">
       {servers.length === 0 ? (
         <p className="settings-hint">{t("privateMessages.noServers")}</p>
       ) : (

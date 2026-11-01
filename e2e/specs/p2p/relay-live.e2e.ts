@@ -26,6 +26,7 @@ import { trustIfAsked } from "../../helpers/chat-ui.ts";
 import { dialogTitle, fill, serverButton, waitServerStatus } from "../../helpers/servers-ui.ts";
 import { button, waitForText } from "../../helpers/wizard-util.ts";
 import { wizard } from "../app/flows.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 const enabled = process.env.MUMCORD_E2E_RELAY === "1";
 const PORT = Number(process.env.MUMCORD_E2E_RELAY_PORT ?? 44758);
@@ -40,12 +41,6 @@ interface Row {
 }
 
 let mainWindow = "";
-
-async function openSettings(tab: string): Promise<void> {
-  await $("button[aria-label='Quick settings']").click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $(`//button[@role='tab'][normalize-space()='${tab}']`).click();
-}
 
 async function switchToInspector(): Promise<void> {
   const handle = (await browser.getWindowHandles()).find((h) => h !== mainWindow);
@@ -80,12 +75,12 @@ function infoValue(label: string) {
   it("completes the wizard and opens the packet inspector", async () => {
     await wizard(USER);
     mainWindow = await browser.getWindowHandle();
-    await openSettings("About");
+    await openSettingsGroup("About");
     const version = $("//dt[normalize-space()='Version']/following-sibling::dd[1]");
     await browser.waitUntil(async () => /\d+\.\d+|dev~\S+/.test(await version.getText()), { timeoutMsg: "version not loaded" });
     for (let i = 0; i < 7; i++) await version.click();
     await waitForText("Developer tools unlocked");
-    await $("//button[@role='tab'][normalize-space()='Packet inspector']").click();
+    await openSettingsGroup("Advanced & Developer");
     await button("Open packet inspector").click();
     await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 2, {
       timeout: 15_000,

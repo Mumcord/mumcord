@@ -2,7 +2,7 @@ import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type LogLevel } from "../../../api";
 import { Select } from "../../../components/Select";
-import { Group, Section } from "../components/Section";
+import { Group } from "../components/Section";
 import { errorText } from "../errors";
 import { pickSavePath } from "../fileDialogs";
 import type { SettingsSectionProps } from "./types";
@@ -11,8 +11,8 @@ const LEVELS: LogLevel[] = ["error", "warn", "info", "debug"];
 
 type Status = { kind: "success" | "error"; text: string } | null;
 
-/** Diagnostics: log level and "Save diagnostic file" (FR-1.40). */
-export function DiagnosticsSection({ settings, update }: SettingsSectionProps) {
+/** Log level and "Save diagnostic file" (FR-1.40). */
+export function DiagnosticsCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const id = useId();
   const [status, setStatus] = useState<Status>(null);
@@ -35,35 +35,29 @@ export function DiagnosticsSection({ settings, update }: SettingsSectionProps) {
   };
 
   return (
-    <Section title={t("sections.diagnostics")}>
-      <Group title={t("diagnostics.logging")}>
-        <div className="settings-control-row">
-          <label htmlFor={id}>{t("diagnostics.logLevel")}</label>
-          <Select
-            id={id}
-            value={settings.logLevel}
-            options={LEVELS.map((level) => ({
-              value: level,
-              label: t(`diagnostics.levels.${level}`),
-            }))}
-            onChange={(level) => {
-              update({ logLevel: level as LogLevel });
-            }}
-          />
-        </div>
-      </Group>
-      <Group title={t("diagnostics.file")}>
-        <p className="settings-hint">{t("diagnostics.fileHint")}</p>
+    <Group title={t("diagnostics.title")} icon="file" info={t("diagnostics.fileHint")}>
+      <div className="settings-control-row">
+        <label htmlFor={id}>{t("diagnostics.logLevel")}</label>
+        <Select
+          id={id}
+          value={settings.logLevel}
+          options={LEVELS.map((level) => ({
+            value: level,
+            label: t(`diagnostics.levels.${level}`),
+          }))}
+          onChange={(level) => {
+            update({ logLevel: level as LogLevel });
+          }}
+        />
+      </div>
+      <div className="settings-actions">
         <button type="button" className="settings-button" onClick={() => void save()}>
           {t("diagnostics.save")}
         </button>
-        <p
-          role="status"
-          className={status?.kind === "error" ? "settings-error" : "settings-success"}
-        >
-          {status?.text}
-        </p>
-      </Group>
-    </Section>
+      </div>
+      <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
+        {status?.text}
+      </p>
+    </Group>
   );
 }

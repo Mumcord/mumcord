@@ -1,6 +1,6 @@
-/* Updates section (FR-3.146): a title with its hint on the left, the control on the right. */
+/* Updates card (FR-3.146): a title with its hint on the left, the control on the right. */
 .upd-settings-origin {
-  margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+  margin: 0 0 var(--space-2);
   color: var(--color-text-secondary);
 }
 
@@ -32,7 +32,9 @@
 }
 
 .upd-settings-row__title {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
   font-weight: var(--font-weight-bold);
 }

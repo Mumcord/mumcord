@@ -6,7 +6,7 @@ import { profile } from "./app.ts";
 import { bin, testenvDir } from "./paths.ts";
 import { run, runOk } from "./run.ts";
 import { hasClass } from "./selectors.ts";
-import { finishWizardWithDefaults } from "./wizard-util.ts";
+import { runFirstStartWizard } from "./wizard-util.ts";
 
 // UI helpers for the server specs (AC-1.4 – AC-1.6) and the identity manager (issue #148).
 
@@ -113,9 +113,11 @@ export async function pickOption(label: string, optionText: string): Promise<voi
   await option.click();
 }
 
-/** A button of the settings section itself (never the one inside one of its dialogs). */
+/** A button in a section card's action bar (never the one inside one of its dialogs). */
 export function settingsAction(text: string) {
-  return browser.$(`//div[${hasClass("settings-actions")}]//button[normalize-space()="${text}"]`);
+  return browser.$(
+    `//div[${hasClass("settings-group__actions")}]//button[normalize-space()="${text}"]`,
+  );
 }
 
 export function button(text: string) {
@@ -153,9 +155,7 @@ export async function choosePathInNativeDialog(title: string, path: string): Pro
 
 /** Runs the first-start wizard: new identity → default mic → voice activation. */
 export async function completeWizard(name: string): Promise<void> {
-  await fill("Name", name);
-  await button("Next").click();
-  await finishWizardWithDefaults();
+  await runFirstStartWizard(name);
 }
 
 /** Opens the context menu of one server icon (a script event: a WebDriver right-click leaves the

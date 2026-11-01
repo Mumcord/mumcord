@@ -1,34 +1,63 @@
 {
-  "sectionList": "Sekce nastavení",
+  "sectionList": "Skupiny nastavení",
   "loading": "Načítání nastavení…",
   "loadFailed": "Tvoje nastavení se nepodařilo načíst. Zavři nastavení a zkus to znovu.",
   "saveFailed": "Poslední změnu se nepodařilo uložit. Zkus to prosím znovu.",
   "sections": {
-    "identity": "Identita",
-    "audio": "Zvuk",
-    "voice": "Hlas",
-    "chatHistory": "Chat a historie",
+    "general": "Obecné",
+    "account": "Účet a identita",
+    "voiceAudio": "Hlas a zvuk",
+    "chatNotifications": "Chat a oznámení",
+    "privacy": "Soukromí a připojení",
     "appearance": "Vzhled",
-    "accessibility": "Přístupnost",
-    "language": "Jazyk",
-    "sounds": "Zvuky a oznámení",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostika",
-    "about": "O aplikaci",
     "servers": "Servery",
-    "privacy": "Soukromí",
-    "updates": "Aktualizace",
+    "gaming": "Hry a překryv",
+    "advanced": "Pokročilé a vývojářské",
+    "about": "O aplikaci",
     "packetInspector": "Inspektor paketů",
     "hotkeys": "Klávesové zkratky"
+  },
+  "sectionDescriptions": {
+    "general": "Spuštění, jazyk, aktualizace a přístupnost.",
+    "account": "Vaše identity, profil a co sdílíte.",
+    "voiceAudio": "Mikrofon, reproduktory, jak mluvíte a jak zníte.",
+    "chatNotifications": "Oznámení, soukromé zprávy, blokované osoby a historie zpráv.",
+    "privacy": "Jak se připojujete k ostatním a co Mumcord načítá zvenčí.",
+    "appearance": "Motiv, rozvržení a seznam kanálů.",
+    "servers": "Připojení k více serverům a nastavení pro jednotlivé servery.",
+    "gaming": "Překryv ve hře, poziční zvuk a herní pluginy.",
+    "advanced": "Vývojářské nástroje, diagnostika, úložiště a licence.",
+    "about": "Verze, podpora a průvodce nastavením."
+  },
+  "breadcrumb": "Nastavení / {{section}}",
+  "moreInfo": "Další informace: {{topic}}",
+  "searchTerms": {
+    "devices": "vstup výstup sluchátka reproduktor zvuková karta",
+    "talkMode": "PTT VAD hlasová aktivita klávesová zkratka",
+    "noiseSuppression": "hluk na pozadí potlačení šumu",
+    "p2p": "P2P relay přímá spojení skrýt moji IP adresu",
+    "theme": "tmavý režim světlý režim barvy",
+    "startup": "automatické spuštění start přihlášení oznamovací oblast",
+    "language": "překlad jazyk místní nastavení",
+    "updates": "nová verze upgrade",
+    "storage": "místo na disku vymazat mezipaměť",
+    "blocked": "ignorovat blokovat ztlumit osoby",
+    "notifications": "upozornění vyskakovací okna",
+    "externalContent": "vložený obsah obrázky náhledy"
   },
   "search": {
     "label": "Hledat v nastavení",
     "results": "Výsledky hledání",
     "empty": "Hledání „{{query}}“ neodpovídá žádné nastavení.",
     "count_one": "Nalezeno {{count}} nastavení",
+    "count_other": "Nalezeno {{count}} nastavení",
     "count_few": "Nalezena {{count}} nastavení",
     "count_many": "Nalezeno {{count}} nastavení",
-    "count_other": "Nalezeno {{count}} nastavení"
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} výsledek",
+    "groupCount_other": "{{count}} výsledků",
+    "groupCount_few": "{{count}} výsledky",
+    "groupCount_many": "{{count}} výsledku"
   },
   "errors": {
     "secureStorage": "Zabezpečené úložiště tvého systému není dostupné, nebo byl přístup odmítnut.",
@@ -114,7 +143,6 @@
     "testStop": "Zastavit nahrávání",
     "testRecording": "Nahrávám… teď mluv.",
     "testPlaying": "Přehrávám tvůj hlas…",
-    "quality": "Kvalita",
     "musicQuality": "Kvalita pro hudbu",
     "musicQualityHint": "Využívá víc přenosového pásma a vypíná potlačení šumu a automatickou hlasitost; pro hudbu. Nejlépe funguje s push-to-talk.",
     "bitrate": "Datový tok",
@@ -128,7 +156,6 @@
     "duckingLevel": "Snížená hlasitost",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Režim nízké latence",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Pro společné hraní hudby v reálném čase",
     "lowLatencyWarningTitle": "Obětuje odolnost ve prospěch rychlosti",
     "lowLatencyBandwidth": "Využívá více šířky pásma (pakety po 10 ms).",
@@ -159,7 +186,7 @@
     "keyMissing": "Nastav klávesu, jinak tě nikdo neuslyší.",
     "keyRejected": "Tuto klávesu nelze použít. Zkus jinou, případně s Ctrl, Alt nebo Shift.",
     "keyNotConfirmed": "Desktop zkratku nepotvrdil. Zkus to znovu a potvrď systémový dialog, nebo klávesu přiřaď v nastavení zkratek desktopu.",
-    "processing": "Zpracování hlasu",
+    "processing": "Zpracování a kvalita",
     "noiseSuppression": "Potlačení šumu",
     "noiseSuppressionHint": "Odfiltruje zvuky na pozadí, jako jsou klávesnice a větráky.",
     "noiseChoice": {
@@ -243,9 +270,9 @@
       "noServer": "Připoj se k serveru a vyber lidi nebo kanál.",
       "missingChannel": "{{channel}} (není na tomto serveru)",
       "summaryPeople_one": "{{count}} osoba · šeptání",
+      "summaryPeople_other": "{{count}} osob · šeptání",
       "summaryPeople_few": "{{count}} osoby · šeptání",
       "summaryPeople_many": "{{count}} osoby · šeptání",
-      "summaryPeople_other": "{{count}} osob · šeptání",
       "summaryChannel": "Jen kanál · volání",
       "summaryChannelTree": "Kanál a podkanály · volání",
       "hotkey": "Podrž pro mluvení:",
@@ -265,12 +292,12 @@
     }
   },
   "history": {
+    "title": "Historie zpráv",
     "explanation": "Zprávy z chatu se ukládají jen na tomto počítači.",
-    "perServer": "Servery",
+    "perServer": "Přepsání pro jednotlivé servery",
     "noServers": "Zatím žádné uložené servery.",
     "save": "Ukládat historii na {{server}}",
     "clearServer": "Vymazat historii {{server}}…",
-    "all": "Všechny servery",
     "clearAll": "Vymazat celou historii…",
     "confirmTitle": "Vymazat historii?",
     "confirmServer": "Všechny uložené zprávy z {{server}} budou z tohoto počítače smazány. Ostatní si své kopie ponechají. Jejich kopie se do tohoto počítače znovu nesynchronizují. Nelze to vrátit zpět.",
@@ -282,7 +309,6 @@
     "autoDeleteHint": "Starší zprávy se z tohoto počítače mažou automaticky, bez ptaní. Týká se to jen historie uložené tady, ne serveru."
   },
   "fullImages": {
-    "title": "Obrázky v plné velikosti",
     "offer": "Nabízet mé obrázky v plné velikosti",
     "offerHint": "Ostatní uživatelé Mumcordu můžou otevřít mé obrázky v plné velikosti. Vypnuto: posílá se jen malý náhled, originál se neuchovává ani nesdílí.",
     "load": "Načítat obrázky v plné velikosti od ostatních",
@@ -304,14 +330,15 @@
     "system": "Podle systému",
     "dark": "Tmavý",
     "light": "Světlý",
-    "behaviour": "Chování",
+    "behaviour": "Spuštění a okno",
     "closeLegend": "Když zavřeš okno během připojení",
     "closeAsk": "Pokaždé se zeptat",
     "closeTray": "Minimalizovat do lišty",
     "closeQuit": "Ukončit Mumcord",
     "autostart": "Spustit Mumcord po přihlášení",
     "startMinimized": "Spouštět minimalizovaně",
-    "startMinimizedHint": "Když se Mumcord spustí po přihlášení, počká v liště, místo aby otevřel okno."
+    "startMinimizedHint": "Když se Mumcord spustí po přihlášení, počká v liště, místo aby otevřel okno.",
+    "look": "Vzhled a rozvržení"
   },
   "themeEditor": {
     "name": "Název motivu",
@@ -369,7 +396,7 @@
     "deleteConfirm": "Smazat"
   },
   "accessibility": {
-    "hints": "Nápovědy",
+    "hints": "Přístupnost",
     "keyboardHints": "Zobrazovat nápovědy ke klávesnici",
     "keyboardHintsHint": "Krátké tipy na obrazovce jako „Šipky: pohyb“ pod seznamem kanálů a v oblíbených GIFech. Čtečky obrazovky je čtou, i když je toto vypnuté.",
     "announcements": "Hlášení pro čtečku obrazovky",
@@ -378,11 +405,15 @@
     "skipLinksHint": "Odkazy na začátku okna, které po stisku Tab skočí rovnou na chat nebo seznam kanálů."
   },
   "language": {
+    "title": "Jazyk",
     "legend": "Jazyk zobrazení",
-    "system": "Podle systému"
+    "system": "Podle systému",
+    "search": "Hledat jazyk",
+    "noMatch": "Žádný jazyk neodpovídá"
   },
   "sounds": {
-    "explanation": "Krátké zvuky pro tyto události:",
+    "title": "Zvuky",
+    "explanation": "Krátké zvuky, které se přehrají při těchto událostech.",
     "joinLeave": "Někdo se připojí do tvého kanálu nebo ho opustí",
     "voiceJoin": "Připojíš se do hlasového kanálu",
     "selfMute": "Ztlumíš nebo zapneš svůj mikrofon",
@@ -459,7 +490,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Protokolování",
+    "title": "Diagnostika",
     "logLevel": "Podrobnost protokolu",
     "levels": {
       "error": "Jen chyby",
@@ -494,7 +525,8 @@
     "setupWizardHint": "Projdi znovu počáteční nastavení a zkontroluj mikrofon, volby soukromí, kontrolu aktualizací a režim mluvení. Tvoje současné volby jsou předvyplněné.",
     "setupWizardRun": "Spustit průvodce nastavením znovu",
     "setupWizardIdentityNote": "Tvoje identita do toho nepatří. Tvůj certifikát a s ním registrované jméno a oprávnění na serverech zůstávají přesně tak, jak jsou.",
-    "setupWizardIdentityLink": "Spravuj ji v části Identita"
+    "setupWizardIdentityLink": "Spravuj ji v části Identita",
+    "versionTitle": "Verze a licence"
   },
   "profile": {
     "title": "Profil",
@@ -510,7 +542,6 @@
     "skipped": "Tvůj výchozí avatar nebyl odeslán: je pro tento server příliš velký."
   },
   "linkPreviews": {
-    "title": "Náhledy odkazů",
     "switch": "Zobrazovat náhledy odkazů a vložený obsah",
     "hint": "Mumcord načítá odkazované stránky kvůli náhledům a přehrávačům videa; tyto weby uvidí tvou IP adresu."
   },
@@ -531,7 +562,7 @@
     "cleared": "Mezipaměť vymazána, uvolněno {{size}}."
   },
   "cache": {
-    "title": "Mezipaměť",
+    "title": "Úložiště",
     "hint": "Mumcord ukládá v tomto počítači dočasná data, aby se vše načítalo rychleji. Jejich vymazání je bezpečné; v případě potřeby se vytvoří znovu.",
     "kind": {
       "previews": "Náhledy odkazů a obrázky",
@@ -548,9 +579,9 @@
   },
   "retention": {
     "days_one": "{{count}} den",
+    "days_other": "{{count}} dní",
     "days_few": "{{count}} dny",
-    "days_many": "{{count}} dne",
-    "days_other": "{{count}} dní"
+    "days_many": "{{count}} dne"
   },
   "nowGaming": {
     "title": "Právě hraju",
@@ -573,7 +604,7 @@
     "betaHint": "Výsledky závisí na hře a podpoře jejího pluginu."
   },
   "gamePlugins": {
-    "title": "Poziční zvuk: zdroje",
+    "title": "Herní pluginy",
     "explanation": "Hry sdělují Mumcordu, kde se nacházíš, přes Mumble Link nebo přes oficiální herní pluginy Mumble. Mumcord hledá pluginy ve své vlastní složce pluginů a v existující instalaci Mumble. Zapni jen pluginy pro hry, které hraješ.",
     "antiCheat": "Herní pluginy čtou paměť hry. Některé systémy anti-cheat to můžou označit; u her s přísným anti-cheatem pluginy vypni.",
     "loading": "Hledám herní pluginy…",
@@ -596,7 +627,6 @@
     "limitInvalid": "Zadej celé číslo od 1 do 15."
   },
   "appearanceEffects": {
-    "title": "Efekty",
     "visualEffects": "Vizuální efekty (sklo, zrno)",
     "visualEffectsHint": "Nabídky z matného skla a jemné filmové zrno. Automaticky vypnuto, když systém žádá méně průhlednosti nebo pohybu."
   },
@@ -610,7 +640,6 @@
   "p2p": {
     "title": "Peer-to-peer (sdílení obrazovky, obrázky v plné velikosti)",
     "modeLabel": "Režim peer-to-peer",
-    "recommended": "Doporučeno",
     "explanation": "Přímé spojení ukáže druhé osobě tvou IP adresu. Relay ji před ní skryje; provozovatel relay (komunita tohoto serveru) ji vidí. Obojí je koncově šifrované.",
     "useGlobal": "Použít globální nastavení",
     "overrideHint": "Jen pro tento server. „Použít globální nastavení“ se řídí volbou Nastavení → Soukromí.",
@@ -623,7 +652,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Přímá připojení",
     "allow": "Povolit přímá připojení k ostatním uživatelům Mumcordu",
     "hint": "Přímá připojení jsou rychlejší, ale druhá osoba uvidí tvou IP adresu. Dokud se nerozhodneš, Mumcord se zeptá, když by se nějaké poprvé použilo.",
     "notUsed": "Ve zvoleném režimu peer-to-peer se nepoužívá: Mumcord se nikdy nepřipojuje přímo k ostatním."
@@ -634,6 +662,7 @@
     "failed": "Nepovedlo se. Zkus to znovu."
   },
   "inspector": {
+    "title": "Vývojářské nástroje",
     "intro": "Zobrazuje pakety, které Mumcord odesílá a přijímá, hlavně data pluginů Mumcord, pro ladění. Uchovává se jen posledních 2 000 paketů, v paměti tohoto zařízení; nic se neprotokoluje ani nikam neodesílá.",
     "devTools": "Vývojářské nástroje",
     "devToolsHint": "Vypnutím znovu skryjete inspektor paketů a zastavíte zachytávání.",
@@ -678,9 +707,9 @@
     },
     "details": "Podrobnosti paketu z {{time}}",
     "toUsers_one": "→ {{count}} uživatel",
+    "toUsers_other": "→ {{count}} uživatelů",
     "toUsers_few": "→ {{count}} uživatelé",
     "toUsers_many": "→ {{count}} uživatele",
-    "toUsers_other": "→ {{count}} uživatelů",
     "delayed": "zpožděno o {{ms}} ms",
     "notDelayed": "bez zpoždění",
     "tokensLeft": "zbývající tokeny: {{tokens}}",
@@ -812,7 +841,14 @@
     "hide": "Úplně je skrýt",
     "hideHint": "V chatu se nezobrazí nic."
   },
+  "externalContent": {
+    "title": "Externí obsah"
+  },
+  "privacyConnections": {
+    "title": "Připojení"
+  },
   "updates": {
+    "title": "Aktualizace",
     "installedFrom": "Mumcord {{version}} · nainstalováno z: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -826,7 +862,6 @@
       "aur": "AUR",
       "otherLinux": "balíček pro Linux"
     },
-    "checking": "Kontroluje se",
     "mode": "Když se najde aktualizace",
     "modeHint": "Aktualizace se před instalací vždy kontrolují a ověřují.",
     "modeAuto": "Stahovat automaticky",
@@ -835,16 +870,15 @@
     "autoUnavailable": "Tato kopie se nemůže aktualizovat sama, proto tě Mumcord jen upozorní na nové verze.",
     "interval": "Kontrolovat aktualizace",
     "intervalHint_one": "Při spuštění a každou hodinu",
+    "intervalHint_other": "Při spuštění a každých {{count}} hodin",
     "intervalHint_few": "Při spuštění a každé {{count}} hodiny",
     "intervalHint_many": "Při spuštění a každých {{count}} hodiny",
-    "intervalHint_other": "Při spuštění a každých {{count}} hodin",
     "intervalWeekHint": "Při spuštění a jednou týdně",
     "intervalHours_one": "Každou hodinu",
+    "intervalHours_other": "Každých {{count}} hodin",
     "intervalHours_few": "Každé {{count}} hodiny",
     "intervalHours_many": "Každých {{count}} hodiny",
-    "intervalHours_other": "Každých {{count}} hodin",
     "intervalWeek": "Jednou týdně",
-    "status": "Stav",
     "state": {
       "idle": "Zatím nezkontrolováno",
       "off": "Kontrola aktualizací je vypnutá",
@@ -871,6 +905,101 @@
     "whatsNew": "Co je nového",
     "whatsNewHint": "Podívej se na změny v každé verzi.",
     "openChangelog": "Otevřít seznam změn"
+  },
+  "badges": {
+    "changed": "Změněno",
+    "recommended": "Doporučeno",
+    "groupChanged": "Obsahuje změněná nastavení"
+  },
+  "resetSection": {
+    "button": "Obnovit sekci",
+    "title": "Obnovit „{{section}}“?",
+    "intro": "Tato nastavení se vrátí na vaši předvolbu nebo na výchozí hodnotu:",
+    "nothing": "Každé nastavení v sekci „{{section}}“ už má svou předvolbu nebo výchozí hodnotu.",
+    "confirm": "Obnovit"
+  },
+  "activePreset": {
+    "heading": "Aktivní předvolba",
+    "none": "Žádná předvolba",
+    "customised": "{{preset}}, upraveno",
+    "changed_one": "Od nastavení byla změněna {{count}} položka",
+    "changed_other": "Od nastavení bylo změněno {{count}} položek",
+    "changed_few": "Od nastavení byly změněny {{count}} položky",
+    "changed_many": "Od nastavení bylo změněno {{count}} položky",
+    "unchanged": "Od nastavení žádné změny",
+    "switch": "Přepnout",
+    "switchLabel": "Přepnout předvolbu",
+    "applyFailed": "Překryv ve hře nebo režim Nerušit se nepodařilo změnit. Zkuste to prosím znovu."
+  },
+  "presets": {
+    "dialogTitle": "Přepnout předvolbu",
+    "dialogIntro": "Vyberte výchozí bod. Změní se jen nastavení, která předvolba pokrývá; vše ostatní zůstane, jak je.",
+    "legend": "Předvolby",
+    "continue": "Pokračovat",
+    "confirmTitle": "Přepnout na {{preset}}?",
+    "confirmIntro": "Tato nastavení se změní:",
+    "confirmNothing": "Žádné nastavení se nemění. Mumcord si zapamatuje {{preset}} jako vaši předvolbu.",
+    "confirmCustom": "Žádné nastavení se nemění. Nastavení přestane porovnávat vaše volby s předvolbou a porovnává je s výchozími hodnotami.",
+    "apply": "Přepnout předvolbu",
+    "everythingOn": {
+      "name": "Vše zapnuto",
+      "tagline": "Plná sada funkcí",
+      "point1": "Ostatní vidí, co hrajete a posloucháte",
+      "point2": "Vaše IP adresa je viditelná pro lidi, ke kterým se připojujete přímo",
+      "point3": "Kdokoli vám může psát; odkazy a obrázky se načítají z webu",
+      "point4": "Překryv, synchronizace historie a obrázky v plné velikosti jsou zapnuté"
+    },
+    "balanced": {
+      "name": "Vyvážené",
+      "tagline": "Mezi soukromím a pohodlím",
+      "point1": "Psát vám mohou jen přátelé a lidé ve vašem kanálu",
+      "point2": "Přímé připojení s relay jako záložní možností",
+      "point3": "Náhledy odkazů a obrázky v plné velikosti jsou zapnuté",
+      "point4": "To, co hrajete a posloucháte, zůstává soukromé"
+    },
+    "maximumPrivacy": {
+      "name": "Maximální soukromí",
+      "tagline": "Sdílejte co nejméně",
+      "point1": "Psát vám mohou jen přátelé, bez výjimek",
+      "point2": "Vaše IP adresa je skrytá; vše jde přes relay",
+      "point3": "Žádný externí obsah, žádná synchronizace historie, žádné sdílení",
+      "point4": "O tom, co děláte, se nesdílí nic"
+    },
+    "custom": {
+      "name": "Vlastní",
+      "tagline": "Vaše vlastní volby",
+      "point1": "Ponechá všechna nastavení, jak jsou",
+      "point2": "Změny se porovnávají s výchozími hodnotami",
+      "point3": "Nejlepší, pokud víte, co chcete"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta funkce",
+    "hint": "Rané funkce; mohou se změnit. Každá se zobrazuje i tam, kam patří, s označením Beta.",
+    "gamePlugins": "Herní pluginy",
+    "manage": "Spravovat pluginy"
+  },
+  "privacySummary": {
+    "title": "Přehled soukromí",
+    "ipHidden": "Vaše IP adresa zůstává skrytá",
+    "ipVisible": "Přímá spojení mohou prozradit vaši IP adresu",
+    "matches": "Odpovídá předvolbě {{preset}}",
+    "messages": "Soukromé zprávy od: {{rule}}",
+    "p2pHidden": "Peer-to-peer jde přes relay, takže druhá osoba nevidí vaši IP adresu.",
+    "p2pDirect": "Peer-to-peer se nejdřív připojuje přímo; druhá osoba může vidět vaši IP adresu.",
+    "p2pDirectOnly": "Peer-to-peer se připojuje pouze přímo; druhá osoba může vidět vaši IP adresu.",
+    "externalOn": "Náhledy odkazů jsou zapnuté: Mumcord pro jejich vytvoření stahuje odkazované stránky.",
+    "externalOff": "Náhledy odkazů jsou vypnuté: Mumcord z odkazovaných stránek nic nenačítá.",
+    "imagesOn": "Obrázky v plné velikosti se vyměňují přímo mezi uživateli Mumcordu.",
+    "imagesOff": "Obrázky v plné velikosti se nevyměňují.",
+    "historyOn": "Synchronizace historie je zapnutá: sdílíte historii svého kanálu s dalšími uživateli Mumcordu.",
+    "historyOff": "Synchronizace historie je vypnutá.",
+    "sharingBoth": "Ostatní vidí, co hrajete a posloucháte.",
+    "sharingPlaying": "Ostatní vidí, co posloucháte.",
+    "sharingGaming": "Ostatní vidí hru, kterou hrajete.",
+    "sharingNone": "To, co hrajete a posloucháte, zůstává soukromé.",
+    "change": "Změnit",
+    "changeLabel": "Změnit: {{topic}}"
   },
   "hotkeys": {
     "global": "Globální zkratky",

@@ -60,10 +60,15 @@ export function PositionalGroup({ settings, update }: SettingsSectionProps) {
   };
 
   return (
-    <Group title={t("positional.title")} badge={<BetaBadge />}>
-      <p className="settings-hint">{t("positional.betaHint")}</p>
+    <Group
+      title={t("positional.title")}
+      icon="compass"
+      badge={<BetaBadge />}
+      info={t("positional.betaHint")}
+    >
       <Switch
         label={t("positional.switch")}
+        badge={<BetaBadge />}
         description={t("positional.hint")}
         checked={enabled}
         onChange={(on) => {

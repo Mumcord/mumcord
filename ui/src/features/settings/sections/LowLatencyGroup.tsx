@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
+import { BetaBadge } from "../../../components/BetaBadge";
 import type { LatencyEstimate } from "../../../bindings/commands";
 import { Switch } from "../components/Switch";
 import { LatencyBreakdown, LatencySummary } from "./LatencyEstimate";
@@ -43,7 +44,7 @@ export function LowLatencyGroup({ settings, update }: SettingsSectionProps) {
     <>
       <Switch
         label={t("audio.lowLatency")}
-        badge={t("audio.lowLatencyBeta")}
+        badge={<BetaBadge />}
         description={t("audio.lowLatencyHint")}
         checked={settings.lowLatency}
         onChange={(lowLatency) => {

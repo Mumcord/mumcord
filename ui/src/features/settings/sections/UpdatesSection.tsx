@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type UpdateStatus } from "../../../api";
+import { InfoTip } from "../../../components/InfoTip";
 import { Select } from "../../../components/Select";
 import { openUpdateDialog, useUpdateStatus } from "../../updates";
 import {
@@ -10,7 +11,7 @@ import {
   updateModePatch,
   type UpdateMode,
 } from "../../updates/updateMode";
-import { Group, Section } from "../components/Section";
+import { Group } from "../components/Section";
 import type { SettingsSectionProps } from "./types";
 import { lastChecked } from "./lastChecked";
 import "./updates.css";
@@ -18,13 +19,13 @@ import "./updates.css";
 const MODE_LABELS = { auto: "modeAuto", notify: "modeNotify", off: "modeOff" } as const;
 
 /** Updates (FR-3.144, FR-3.146): when Mumcord looks for new versions and what it does then. */
-export function UpdatesSection({ settings, update }: SettingsSectionProps) {
+export function UpdatesCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const { status } = useUpdateStatus();
   const canInstall = status?.canInstall ?? true;
   const mode = effectiveUpdateMode(settings, canInstall);
   return (
-    <Section title={t("sections.updates")}>
+    <Group title={t("updates.title")} icon="refresh" wide>
       {status !== null && (
         <p className="upd-settings-origin">
           {t("updates.installedFrom", {
@@ -33,66 +34,62 @@ export function UpdatesSection({ settings, update }: SettingsSectionProps) {
           })}
         </p>
       )}
-      <Group title={t("updates.checking")}>
-        <ModeRow
-          mode={mode}
-          canInstall={canInstall}
-          onChange={(next) => {
-            update(updateModePatch(next));
-          }}
-        />
-        <IntervalRow
-          hours={settings.updateIntervalHours}
-          disabled={mode === "off"}
-          onChange={(hours) => {
-            update({ updateIntervalHours: hours });
-          }}
-        />
-      </Group>
-      <Group title={t("updates.status")}>
-        <StatusRow status={status} off={mode === "off"} />
-        {settings.updateSkipped !== null && (
-          <div className="upd-settings-row">
-            <div className="upd-settings-row__text">
-              <p className="upd-settings-row__title">{t("updates.skipped")}</p>
-              <p className="settings-hint">
-                {t("updates.skippedHint", { version: settings.updateSkipped })}
-              </p>
-            </div>
-            <button
-              type="button"
-              className="settings-button"
-              onClick={() => {
-                update({ updateSkipped: null });
-              }}
-            >
-              {t("updates.stopSkipping")}
-            </button>
+      <UpdateModeRow
+        mode={mode}
+        canInstall={canInstall}
+        onChange={(next) => {
+          update(updateModePatch(next));
+        }}
+      />
+      <IntervalRow
+        hours={settings.updateIntervalHours}
+        disabled={mode === "off"}
+        onChange={(hours) => {
+          update({ updateIntervalHours: hours });
+        }}
+      />
+      <StatusRow status={status} off={mode === "off"} />
+      {settings.updateSkipped !== null && (
+        <div className="upd-settings-row">
+          <div className="upd-settings-row__text">
+            <p className="upd-settings-row__title">{t("updates.skipped")}</p>
+            <p className="settings-hint">
+              {t("updates.skippedHint", { version: settings.updateSkipped })}
+            </p>
           </div>
-        )}
-        <ChangelogRow />
-      </Group>
-    </Section>
+          <button
+            type="button"
+            className="settings-button"
+            onClick={() => {
+              update({ updateSkipped: null });
+            }}
+          >
+            {t("updates.stopSkipping")}
+          </button>
+        </div>
+      )}
+      <ChangelogRow />
+    </Group>
   );
 }
 
-function ModeRow(props: {
+export function UpdateModeRow(props: {
   mode: UpdateMode;
   canInstall: boolean;
   onChange: (mode: UpdateMode) => void;
 }) {
   const { t } = useTranslation("settings");
   const titleId = useId();
-  const hintId = useId();
   const reasonId = useId();
   return (
     <div className="upd-settings-row">
       <div className="upd-settings-row__text">
-        <p id={titleId} className="upd-settings-row__title">
-          {t("updates.mode")}
-        </p>
-        <p id={hintId} className="settings-hint">
-          {t("updates.modeHint")}
+        <p className="upd-settings-row__title">
+          <span id={titleId}>{t("updates.mode")}</span>
+          <InfoTip
+            label={t("moreInfo", { topic: t("updates.mode") })}
+            text={t("updates.modeHint")}
+          />
         </p>
         {!props.canInstall && (
           <p id={reasonId} className="settings-hint">
@@ -104,7 +101,7 @@ function ModeRow(props: {
         role="radiogroup"
         className="upd-segmented"
         aria-labelledby={titleId}
-        aria-describedby={props.canInstall ? hintId : `${hintId} ${reasonId}`}
+        aria-describedby={props.canInstall ? undefined : reasonId}
       >
         {UPDATE_MODES.map((mode) => (
           <label
@@ -240,8 +237,13 @@ function ChangelogRow() {
   return (
     <div className="upd-settings-row">
       <div className="upd-settings-row__text">
-        <p className="upd-settings-row__title">{t("updates.whatsNew")}</p>
-        <p className="settings-hint">{t("updates.whatsNewHint")}</p>
+        <p className="upd-settings-row__title">
+          {t("updates.whatsNew")}
+          <InfoTip
+            label={t("moreInfo", { topic: t("updates.whatsNew") })}
+            text={t("updates.whatsNewHint")}
+          />
+        </p>
         {failed && (
           <p role="alert" className="settings-error">
             {t("about.changelogFailed")}

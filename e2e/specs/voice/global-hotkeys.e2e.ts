@@ -7,6 +7,7 @@ import { $, browser, expect } from "@wdio/globals";
 import { app, repoRoot, testenv } from "../../helpers/index.ts";
 import { run } from "../../helpers/run.ts";
 import { addAndConnect, completeWizard, joinIfReadOnly } from "../../helpers/voice-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 const ME = "HotkeyQA";
 
@@ -31,9 +32,7 @@ describe("global hotkeys (AC-3.59, #64)", () => {
   });
 
   it("assigns a key to mute and refuses it a second time as a conflict", async () => {
-    await $("button[aria-label='Quick settings']").click();
-    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-    await $("button[role='tab']=Hotkeys").click();
+    await openSettingsGroup("Voice & Audio");
     expect(await keyField("Mute / unmute microphone").getText()).toBe("Not set");
 
     await keyField("Mute / unmute microphone").click();

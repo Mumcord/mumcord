@@ -15,8 +15,9 @@ import { app, repoRoot, testenv } from "../../helpers/index.ts";
 import { trustIfAsked } from "../../helpers/chat-ui.ts";
 import { channelName, doubleClickRow, ownChannel } from "../../helpers/voice-ui.ts";
 import { dialogTab, dialogTitle, fill, serverButton, waitServerStatus } from "../../helpers/servers-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { button, waitForText } from "../../helpers/wizard-util.ts";
-import { chooseRadio, focus, pressUntil, tabTo, wizard } from "../app/flows.ts";
+import { chooseLanguage, focus, pressUntil, tabTo, wizard } from "../app/flows.ts";
 
 const USER = "P2pTester";
 const ALPHA = "Alpha";
@@ -76,15 +77,9 @@ async function chooseP2pByKeyboard(value: string): Promise<void> {
   expect((await focus()).checked).toBe(true);
 }
 
-async function openSettings(tab: string): Promise<void> {
-  await $("button[aria-label='Quick settings']").click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $(`//button[@role='tab'][normalize-space()='${tab}']`).click();
-}
-
-/** Settings → Privacy, the global mode chosen by keyboard, settings closed again. */
+/** Settings → Privacy & Connections, the global mode chosen by keyboard, settings closed again. */
 async function setGlobalMode(mode: Mode): Promise<void> {
-  await openSettings("Privacy");
+  await openSettingsGroup("Privacy & Connections");
   await $("fieldset.p2p-modes").waitForDisplayed();
   await chooseP2pByKeyboard(mode);
   await browser.keys(["Escape"]);
@@ -185,19 +180,22 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
   });
 
   it("AC-4.23: the wizard shows the five options with explanation, chosen by keyboard", async () => {
-    await wizard(USER, async (step) => {
-      if (step !== 3) return;
+    // The peer-to-peer choice is on the Custom path's Connections step (#159).
+    await wizard(USER, { style: "custom", onStep: async (step) => {
+      if (step !== "connections") return;
       const options = await p2pOptions();
       expect(options.map((o) => o.value)).toEqual([...MODES]);
       expect(options.map((o) => o.label)).toEqual(MODES.map((m) => EN_LABELS[m]));
-      expect(await checkedMode()).toBe("directRelay");
+      // Custom starts from the last preset picked: the arrow keys pass Maximum privacy on the
+      // way from Balanced to Custom, so its relay-only choice is preselected.
+      expect(await checkedMode()).toBe("relayOnly");
       expect(await $("fieldset.p2p-modes .p2p-modes__badge").getText()).toBe("Recommended");
       const a11y = await p2pGroupA11y();
       expect(a11y.name).toBe("Peer-to-peer mode");
       expect(a11y.description).toContain("Direct shows your IP address");
       await chooseP2pByKeyboard("directOnly");
-    });
-    await openSettings("Privacy");
+    } });
+    await openSettingsGroup("Privacy & Connections");
     await $("fieldset.p2p-modes").waitForDisplayed();
     expect(await checkedMode()).toBe("directOnly");
   });
@@ -206,7 +204,8 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
     const options = await p2pOptions();
     expect(options.map((o) => o.label)).toEqual(MODES.map((m) => EN_LABELS[m]));
     const a11y = await p2pGroupA11y();
-    expect(a11y.name).toBe("Peer-to-peer mode");
+    // Direct only differs from the preset the wizard started from, so the group says "Changed".
+    expect(a11y.name).toBe("Peer-to-peer mode, Changed");
     expect(a11y.description).toContain("The relay hides it from them");
     await browser.keys(["Escape"]);
   });
@@ -215,12 +214,12 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
     mainWindow = await browser.getWindowHandle();
     await addServer(ALPHA, "v15");
     await addServer(BRAVO, "v15b");
-    await openSettings("About");
+    await openSettingsGroup("About");
     const version = $("//dt[normalize-space()='Version']/following-sibling::dd[1]");
     await browser.waitUntil(async () => /\d+\.\d+|dev~\S+/.test(await version.getText()), { timeoutMsg: "version not loaded" });
     for (let i = 0; i < 7; i++) await version.click();
     await waitForText("Developer tools unlocked");
-    await $("//button[@role='tab'][normalize-space()='Packet inspector']").click();
+    await openSettingsGroup("Advanced & Developer");
     await button("Open packet inspector").click();
     await browser.waitUntil(async () => (await browser.getWindowHandles()).length === 2, {
       timeout: 15_000,
@@ -308,7 +307,7 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
     await browser.reloadSession();
     mainWindow = await browser.getWindowHandle();
     await serverButton(ALPHA).waitForDisplayed({ timeout: 30_000 });
-    await openSettings("Privacy");
+    await openSettingsGroup("Privacy & Connections");
     await $("fieldset.p2p-modes").waitForDisplayed();
     expect(await checkedMode()).toBe("relayOnly");
   });
@@ -316,12 +315,15 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
   it("AC-4.23: in German the options and their labels are translated", async () => {
     const de = JSON.parse(readFileSync(join(repoRoot, "ui", "src", "locales", "de", "settings.json"), "utf8")) as {
       p2p: { modeLabel: string; explanation: string; mode: Record<Mode, string> };
+      badges: { changed: string };
     };
-    await $("//button[@role='tab'][normalize-space()='Language']").click();
-    await chooseRadio("de");
+    await $("//button[@role='tab'][normalize-space()='General']").click();
+    await chooseLanguage("de", "German");
     await $('[role="tab"][id$="-tab-privacy"]').click();
     await $("fieldset.p2p-modes").waitForDisplayed();
-    await browser.waitUntil(async () => (await p2pGroupA11y()).name === de.p2p.modeLabel, {
+    // The mode still differs from the wizard's preset, so the group keeps its "Changed" note.
+    const name = `${de.p2p.modeLabel}, ${de.badges.changed}`;
+    await browser.waitUntil(async () => (await p2pGroupA11y()).name === name, {
       timeoutMsg: "the radio group was not translated",
     });
     expect((await p2pOptions()).map((o) => o.label)).toEqual(MODES.map((m) => de.p2p.mode[m]));

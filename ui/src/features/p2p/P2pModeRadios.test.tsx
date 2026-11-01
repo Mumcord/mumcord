@@ -10,7 +10,7 @@ describe("P2pModeRadios", () => {
     const group = screen.getByRole("group", { name: "Peer-to-peer mode" });
     const radios = within(group).getAllByRole("radio");
     expect(radios.map((radio) => radio.closest("label")?.textContent)).toEqual([
-      "Direct + relay (direct first)Recommended",
+      "Direct + relay (direct first) Recommended",
       "Direct + relay (always relay, hides my IP)",
       "Direct only",
       "Relay only",

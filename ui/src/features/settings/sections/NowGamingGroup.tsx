@@ -46,7 +46,7 @@ export function NowGamingGroup({ settings, update }: SettingsSectionProps) {
 
   const supported = status?.supported ?? true;
   return (
-    <Group title={t("nowGaming.title")}>
+    <Group title={t("nowGaming.title")} icon="gamepad">
       <Switch
         label={t("nowGaming.switch")}
         description={t("nowGaming.hint")}

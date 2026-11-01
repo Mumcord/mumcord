@@ -34,6 +34,16 @@ async fn wait_for<T>(
     }
 }
 
+/// No password prompt arrives within `quiet`.
+async fn no_prompt_for(rx: &mut EventReceiver, quiet: Duration) {
+    let deadline = tokio::time::Instant::now() + quiet;
+    while let Ok(event) = tokio::time::timeout_at(deadline, rx.recv()).await {
+        if let Some(EngineEvent::ChannelPassword { channel_id, state }) = event {
+            panic!("unexpected password prompt {state:?} for channel {channel_id}");
+        }
+    }
+}
+
 /// Connects (trusting the test server's certificate when asked) and waits for the sync.
 async fn connect(engine: &Engine, rx: &mut EventReceiver, server: ServerId) {
     engine.connect(server, None).expect("connect");
@@ -170,6 +180,33 @@ async fn channel_password_is_asked_stored_and_sent_on_reconnect() {
         _ => None,
     })
     .await;
+
+    // The admin sits in the locked channel. Murmur refuses the statistics of someone there with
+    // an Enter denial for that channel; nobody tried to join, so that never asks for a password.
+    let admin_session = engine
+        .snapshot_of(server)
+        .expect("snapshot")
+        .users
+        .iter()
+        .find(|u| u.channel_id == room_id && u.session != own)
+        .expect("admin in the locked channel")
+        .session;
+    engine
+        .user_stats_watch(server, vec![admin_session])
+        .expect("watch stats");
+    wait_for(&mut rx, "statistics refused", |e| match e {
+        EngineEvent::ServerDenied {
+            channel_id: Some(id),
+            ..
+        } if *id == room_id => Some(()),
+        EngineEvent::ChannelPassword { .. } => panic!("asked for a password without a join"),
+        _ => None,
+    })
+    .await;
+    engine
+        .user_stats_watch(server, Vec::new())
+        .expect("unwatch");
+    no_prompt_for(&mut rx, Duration::from_secs(1)).await;
 
     engine.join_channel(server, room_id).expect("join");
     assert_eq!(

@@ -1,25 +1,77 @@
 {
   "progress": "Step {{current}} of {{total}}",
   "loadFailed": "The setup could not be loaded.",
-  "finish": "Finish",
+  "recommended": "Recommended",
+  "tipLabel": "About {{name}}",
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "secureStorageUnavailable": "Mumcord can't reach your system's secure storage. Unlock your keyring or password manager and try again.",
     "saveFailed": "Your settings could not be saved. Please try again."
   },
+  "nav": {
+    "getStarted": "Let's get started",
+    "finishSetup": "Finish setup",
+    "startMumcord": "Start Mumcord",
+    "finish": "Finish",
+    "skip": "Skip for now",
+    "enterKey": "Enter",
+    "enterHint": "to continue"
+  },
+  "rail": {
+    "label": "Setup steps",
+    "appName": "Mumcord",
+    "setup": "Setup",
+    "custom": "Custom",
+    "done": "(done)",
+    "progress": "Setup progress",
+    "later": "Everything here can be changed later in Settings."
+  },
+  "steps": {
+    "welcome": "Welcome",
+    "import": "Import from Mumble",
+    "identity": "Identity",
+    "voice": "Voice",
+    "setupStyle": "Setup style",
+    "privateMessages": "Private messages",
+    "connections": "Connections",
+    "features": "Features",
+    "appearance": "Appearance",
+    "startup": "Startup and updates",
+    "summary": "All set"
+  },
+  "welcome": {
+    "title": "Voice chat that feels like",
+    "titleAccent": "your own place.",
+    "subtitle": "Mumcord speaks Mumble, so it works with every Mumble server, and adds a modern chat on top. Let's set it up the way you like. It takes about two minutes.",
+    "voice": {
+      "title": "Crystal-clear voice",
+      "text": "Low-latency audio with noise suppression built in."
+    },
+    "servers": {
+      "title": "Works with any Mumble server",
+      "text": "No account, no sign-up. Join the servers you already use."
+    },
+    "private": {
+      "title": "Private by design",
+      "text": "No telemetry. What Mumcord stores stays on your computer."
+    }
+  },
   "identity": {
-    "title": "Your identity",
-    "intro": "Servers recognise you by your identity. Create a new one or bring the one you already use.",
-    "create": "Create new",
-    "import": "Import file",
-    "name": "Name",
-    "nameHint": "Other people see this name. You can change it per server later.",
+    "title": "Who are you on Mumble?",
+    "intro": "Your identity is how servers recognise you. Create a new one, or bring the one you already use.",
+    "legend": "Your identity",
+    "create": "Create a new identity",
+    "createText": "Your identity is a certificate that proves who you are on Mumble servers. It keeps your registered name and permissions, so you are the same person every time you join.",
+    "import": "Import an existing identity",
+    "name": "Default display name",
+    "nameHint": "Used on servers that don't know you yet. You can change it per server.",
     "chooseFile": "Choose file…",
     "noFile": "No file chosen",
     "chosenFile": "Chosen file: {{file}}",
-    "password": "File password (if any)",
+    "password": "File password",
+    "passwordHint": "The password stays on this computer and is never sent anywhere.",
     "existing": "Using identity {{name}}.",
-    "backup": "Your identity is like a key. Back it up later in Settings → Identity.",
+    "backup": "Back it up later in Settings. A backup lets you restore your identity on a new computer.",
     "nameRequired": "Please enter a name.",
     "fileRequired": "Please choose an identity file (.p12 or .pfx).",
     "fileType": "Identity file",
@@ -29,101 +81,142 @@
     "pickFailed": "The file picker could not be opened."
   },
   "mic": {
-    "title": "Microphone",
-    "intro": "Pick your microphone and speakers. The defaults usually work.",
     "input": "Microphone",
     "output": "Speakers or headphones",
     "systemDefault": "System default",
     "defaultVia": "System default ({{backend}})",
     "level": "Microphone level",
-    "test": "Test",
-    "stop": "Stop",
     "idle": "Press Test, say something, and you will hear yourself back.",
     "recording": "Speak now…",
     "playing": "Playing back your voice…",
     "devicesFailed": "Your audio devices could not be listed. You can continue and pick them later in Settings.",
-    "testFailed": "The test could not start. Check that the microphone is connected."
+    "testFailed": "The test could not start. Check that the microphone is connected.",
+    "test": "Hear yourself",
+    "stop": "Stop"
   },
-  "privacy": {
-    "title": "Your privacy",
-    "noTelemetry": "Mumcord sends no telemetry, analytics or crash reports.",
-    "ownServers": "It connects only to the servers you add.",
-    "linkPreviews": "Link previews and images or GIFs from chat links are loaded from the linked sites. You can turn this off in the next step or later in Settings.",
-    "mumcordUsers": "Mumcord-only features exchange data only with other Mumcord users on the same server.",
-    "local": "Everything Mumcord stores stays on your computer.",
-    "statement": "Full privacy statement"
-  },
-  "updates": {
-    "title": "New versions",
-    "choice": "When a new version is out",
-    "auto": "Download automatically",
-    "autoHint": "Mumcord downloads and verifies the update in the background and asks you before restarting.",
-    "notify": "Notify only",
-    "notifyHint": "Mumcord tells you about a new version and shows what changed. Nothing is downloaded until you say so.",
-    "off": "Off",
-    "offHint": "Mumcord never asks GitHub for new versions. You update it yourself.",
-    "privacy": "Checking sends only the request itself and the app name and version to GitHub. You can change this later in Settings."
-  },
-  "talk": {
-    "title": "How do you want to talk?",
-    "mode": "Talk mode",
-    "voiceActivation": "Voice activation",
-    "voiceActivationHint": "Your microphone turns on when you speak.",
-    "pushToTalk": "Push to talk",
-    "pushToTalkHint": "Hold a key while you speak.",
-    "waylandNoPortal": "Push to talk isn't available: your desktop doesn't let apps use global shortcuts. Voice activation works without a key.",
-    "registrationFailed": "Push to talk couldn't be set up on this system. Use voice activation instead.",
-    "key": "Push-to-talk key",
-    "noKey": "No key chosen",
-    "currentKey": "Key: {{key}}",
-    "chooseKey": "Choose key",
-    "changeKey": "Change key",
-    "pressKey": "Press a key… (Escape to cancel)",
-    "confirmDialog": "Confirm the shortcut in the system dialog or assign it in the System Settings window that opens… (Escape to cancel)",
-    "keyInvalid": "That key can't be used. Try another one.",
-    "keyNotConfirmed": "The desktop didn't confirm the shortcut. Try again and accept the system dialog, or assign the key in the desktop's shortcut settings.",
+  "voice": {
+    "title": "Sound good?",
+    "subtitle": "Pick your devices and say something. The bar should move while you talk.",
+    "talkLegend": "How do you want to talk?",
+    "tipLabel": "About {{mode}}",
+    "voiceActivationHint": "Talk freely. Mumcord sends audio when you speak.",
+    "pushToTalkHint": "Hold a key while you speak. Best in noisy places.",
     "keyRequired": "Choose a push-to-talk key or switch to voice activation.",
+    "notSure": "Not sure? Start with voice activation. You can switch any time from the quick settings."
+  },
+  "style": {
+    "title": "How much do you want to share?",
+    "subtitle": "Pick a starting point. You see every choice again on the last screen and can change it there.",
+    "legend": "Setup style",
+    "everythingOn": {
+      "title": "Everything on",
+      "subtitle": "Full feature set",
+      "p1": "Others see what you play and listen to",
+      "p2": "Your IP is visible to people you connect to directly",
+      "p3": "Anyone can message you; links and images load from the web",
+      "p4": "Overlay, history sync and full-size images are on"
+    },
+    "balanced": {
+      "title": "Balanced",
+      "subtitle": "Between privacy and comfort",
+      "p1": "Only friends and people in your channel can message you",
+      "p2": "Direct connection, with a relay as fallback",
+      "p3": "Link previews and full-size images are on",
+      "p4": "What you play and listen to stays private"
+    },
+    "maximumPrivacy": {
+      "title": "Maximum privacy",
+      "subtitle": "Share as little as possible",
+      "p1": "Only friends can message you, no exceptions",
+      "p2": "Your IP is hidden; everything goes through the relay",
+      "p3": "No outside content, no history sync, no sharing",
+      "p4": "Updates only notify you; nothing is shared about what you do"
+    },
+    "custom": {
+      "title": "Custom",
+      "subtitle": "Go through every choice",
+      "p1": "Walk through each step yourself",
+      "p2": "See what every setting does and who sees it",
+      "p3": "Best if you know what you want"
+    },
+    "presetSelected": "{{preset}} selected: you skip the detailed privacy steps. Choose Custom to go through each one.",
+    "customSelected": "Custom selected: the next steps go through every choice."
+  },
+  "pm": {
+    "title": "Who can message you?",
+    "subtitle": "Private messages are one-to-one chats. Channel chat isn't affected by this choice.",
+    "local": "Filtering happens on your computer. Senders aren't told. You can set a different rule per server later."
+  },
+  "connections": {
+    "title": "Connections and content",
+    "subtitle": "Some features connect you straight to other Mumcord users, and some chat content loads from other websites. Choose what's OK for you.",
+    "chatContent": "Chat content",
+    "sharing": "Sharing with Mumcord users"
+  },
+  "features": {
+    "title": "Make it yours",
+    "subtitle": "Turn on the extras you want. Each one says who can see what.",
+    "seenByMumcordUsers": "Visible to Mumcord users on the same server.",
+    "onlyYou": "Only you see it.",
+    "ingameOverlayAlt": "Example of the in-game overlay showing who is talking"
+  },
+  "appearance": {
+    "title": "Pick your look",
+    "subtitle": "The window updates as you choose. There are more themes, and your own, in Settings."
+  },
+  "startup": {
+    "title": "Startup and updates",
+    "subtitle": "How Mumcord starts and what it does about new versions.",
     "linkHandler": "Open mumble:// links with Mumcord",
     "linkHandlerHint": "Clicking a server link on a website then opens it here.",
     "linkHandlerActive": "Mumcord already opens mumble:// links.",
     "linkHandlerFailed": "Mumcord could not be set up to open mumble:// links. You can try again in Settings.",
-    "mouseDisabled": "Push to talk isn't available with this mouse button until \"Allow mouse buttons\" is switched on in Settings → Voice.",
-    "mouseNeedsInputGroup": "Push to talk isn't available: Mumcord may not read your mouse. Settings → Voice explains how to allow it.",
-    "mouseNeedsAccessibility": "Push to talk isn't available: Mumcord needs the Accessibility permission to see mouse buttons.",
-    "pressKeyOrMouse": "Press a key or a mouse button (middle or side)… (Escape to cancel)",
-    "mouse": {
-      "middle": "Middle mouse button",
-      "back": "Mouse button 4 (back)",
-      "forward": "Mouse button 5 (forward)"
+    "autostartFailed": "Mumcord could not be set to start when you log in. You can try again in Settings."
+  },
+  "summary": {
+    "title": "You're all set",
+    "titleNamed": "You're all set, {{name}}",
+    "subtitle": "Here's what you chose. Use Edit on any card to change it before you start.",
+    "on": "on",
+    "off": "off",
+    "unavailable": "not available here",
+    "editShort": "Edit",
+    "edit": "Edit {{card}}",
+    "cards": {
+      "identity": "Identity",
+      "voice": "Voice",
+      "privateMessages": "Private messages",
+      "connections": "Connections",
+      "chatContent": "Chat content",
+      "features": "Features",
+      "appearance": "Appearance",
+      "startup": "Startup",
+      "updates": "Updates"
     },
-    "mouseStillWorks": "You can still use a mouse button.",
-    "mouseOptIn": "Want to use a mouse side button? Switch on \"Allow mouse buttons\" in Settings → Voice after setup.",
-    "autostart": "Start Mumcord when I log in",
-    "autostartHint": "You can change this later in Settings → Appearance.",
-    "autostartFailed": "Mumcord could not be set to start when you log in. You can try again in Settings.",
-    "linkPreviews": "Show link previews and embeds",
-    "linkPreviewsHint": "Mumcord loads linked pages to show previews and video players; those sites see your IP address.",
-    "historySharing": "Share my channel history",
-    "historySharingHint": "Other Mumcord users who join a channel after you can see its earlier messages from your saved history (up to 7 days). Private chats are never shared. You can change this later in Settings → Chat & history.",
-    "ingameOverlay": "Show the overlay inside games",
-    "ingameOverlayHint": "Draws who is talking on top of your game (Linux). You can turn it on or off per game later in Settings.",
-    "ingameOverlayWarning": "Some games with anti-cheat may flag or block in-game overlays. Mumcord keeps known-risky games (such as Valorant or League of Legends) off by default. Enable it only for games you trust.",
-    "ingameOverlayAlt": "Example of the in-game overlay showing who is talking"
+    "identityDetail": "Saved in your system keychain",
+    "voiceDetail": "Noise suppression: {{noise}}",
+    "pmDetail": "My channel {{channel}} · accepted chats {{accepted}} · requests {{requests}}",
+    "contentTitle": "Link previews {{previews}}",
+    "contentDetail": "Full-size images {{images}} · history sync {{sync}}",
+    "featuresTitle": "In-game overlay {{overlay}}",
+    "featuresDetail": "Follow system Do Not Disturb {{dnd}} · now playing {{playing}} · now gaming {{gaming}}",
+    "effectsDetail": "Visual effects {{effects}}",
+    "startupTitle": "Start at login {{login}}",
+    "startupDetail": "Start minimized {{minimized}} · mumble:// links {{links}}",
+    "updates": {
+      "auto": "Download automatically",
+      "notify": "Notify only",
+      "off": "Off"
+    },
+    "updatesDetail": "Updates are always checked and verified before they are installed.",
+    "backup": "Your identity {{name}} is saved in your system keychain. Back it up from Settings → Identity, so you never lose your registered name.",
+    "nextServer": "Next: add your first server",
+    "rerunNote": "Only the values you changed are saved."
   },
   "rerun": {
     "title": "Setup wizard",
     "note": "You are running the setup again. Your identity is not changed.",
     "manageIdentities": "Manage identities",
-    "stepsLabel": "Setup steps",
-    "stepsSkipped": "(skipped, the identity is not part of this)",
-    "steps": {
-      "identity": "Identity",
-      "mic": "Microphone",
-      "privacy": "Privacy",
-      "updates": "Updates",
-      "talk": "Talk mode"
-    },
-    "footer": "Cancel keeps everything as it is. Only the steps you changed are saved at the end.",
     "discardTitle": "Discard your changes?",
     "discardBody": "Nothing you changed is saved before you finish. Cancel now and everything stays as it is.",
     "discardKeep": "Keep editing",
