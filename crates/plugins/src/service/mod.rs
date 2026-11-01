@@ -47,7 +47,7 @@ pub use messaging::Announce;
 pub use plugin_io::{PeerInfo, SelfInfo, UiUpdate};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
 pub use ui::UiInput;
-pub use updates::{Approval, Due, Schedule, UpdateInfo, run_check};
+pub use updates::{Approval, Due, Schedule, UpdateInfo, load_repository, run_check};
 
 /// The permission that lets a plugin show a badge next to user names (FR-6.63).
 const BADGE_PERMISSION: &str = "ui.member-badge";

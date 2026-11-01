@@ -502,3 +502,27 @@ async fn an_offline_check_applies_the_bundled_list_and_retries_later() {
     let due = schedule.due(i64::try_from(now).expect("millis"), &settings);
     assert!(due.revocations && !due.updates);
 }
+
+#[test]
+fn a_paused_repository_turns_off_only_its_own_plugins_and_keeps_their_data() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let poll = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    let dice = Release::new("dice", "1.0.0", OK_START, PERMISSIONS, &key);
+    let (mut service, _events) = installed(&fx, &poll);
+    let mut other = dice.request(&[]);
+    other.source = Source::Repo { repository_id: 2 };
+    service.install(&other, &dice.download).expect("installs");
+
+    service.pause_repository(1).expect("pauses");
+
+    assert!(
+        !info(&service, "poll").enabled,
+        "the paused repository's plugin is off"
+    );
+    assert!(
+        info(&service, "dice").enabled,
+        "other repositories are untouched"
+    );
+    assert_eq!(fx.kv("poll"), Some(b"v".to_vec()), "data is kept");
+}

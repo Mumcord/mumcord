@@ -15,7 +15,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError};
 
-use mumcord_store::{PluginRecord, PluginUpdates, Settings, UnixMillis};
+use mumcord_store::{PluginRecord, PluginRepository, PluginUpdates, Settings, UnixMillis};
 use semver::Version;
 
 use super::{
@@ -213,68 +213,24 @@ pub async fn run_check(
         Err(error) => tracing::warn!(%error, "could not load the official index"),
     }
 
-    let used_repositories = with_service(service, |s| {
-        Ok::<_, ServiceError>(
-            s.store()
-                .plugins()?
-                .into_iter()
-                .filter_map(|r| match Origin::parse(&r.source) {
-                    Some(Origin::Repo(id)) if r.removed_at.is_none() => Some(id),
-                    _ => None,
-                })
-                .collect::<BTreeSet<i64>>(),
-        )
-    })
-    .await??;
     let official_ids: BTreeSet<String> = indexes
         .iter()
         .flat_map(|(_, index)| index.plugins.iter().map(|p| p.id.clone()))
         .collect();
     let is_official_id = |id: &str| official_ids.contains(id);
-    for repository in repositories
-        .iter()
-        .filter(|r| r.enabled && used_repositories.contains(&r.id))
-    {
-        let dir = registry_cache.join(format!("repo-{}", repository.id));
-        let outcome = fetch_repository(client, &dir, repository, &is_official_id).await;
-        let (loaded, new_key) = match outcome {
-            Ok(RepoOutcome::Loaded(loaded)) => (loaded, None),
-            Ok(RepoOutcome::Rotated { new_key, loaded }) => (loaded, Some(new_key)),
-            Ok(RepoOutcome::KeyChanged { .. }) => {
-                let id = repository.id;
-                with_service(service, move |s| {
-                    s.store().pause_plugin_repository(id, KEY_CHANGED)
-                })
-                .await??;
-                tracing::warn!(repository = id, "repository key changed; paused");
-                continue;
-            }
-            Err(error) => {
-                tracing::warn!(repository = repository.id, %error, "could not load a repository");
-                continue;
-            }
-        };
-        if let Freshness::Rejected(error) = &loaded.freshness {
-            tracing::warn!(repository = repository.id, %error, "a repository index was rejected");
+    // Every switched-on repository, also those nothing is installed from yet: a key change
+    // must be noticed before the user installs from it (FR-6.75).
+    for repository in repositories.iter().filter(|r| r.enabled) {
+        if let Some(index) =
+            load_repository(client, service, registry_cache, repository, &is_official_id).await?
+        {
+            indexes.push((
+                Source::Repo {
+                    repository_id: repository.id,
+                },
+                index,
+            ));
         }
-        if matches!(loaded.freshness, Freshness::Fresh | Freshness::NotModified) {
-            let id = repository.id;
-            let sequence = i64::try_from(loaded.index.sequence).unwrap_or(i64::MAX);
-            with_service(service, move |s| {
-                let store = s.store();
-                if let Some(key) = new_key {
-                    store.replace_plugin_repository_key(id, &key, now)?;
-                }
-                store.record_plugin_repository_check(id, sequence, now)
-            })
-            .await??;
-        }
-        indexes.push((
-            Source::Repo {
-                repository_id: repository.id,
-            },
-            loaded.index,
-        ));
     }
 
     let mode = settings.plugins_updates;
@@ -297,6 +253,50 @@ pub async fn run_check(
     Ok(())
 }
 
+/// Loads a third-party repository's signed index (offline copy in `registry_cache/repo-<id>`)
+/// and records the outcome: the sequence, and a rotated key, after a successful fetch; after a
+/// key change the repository is paused and its plugins are turned off (FR-6.75). Returns the
+/// index to use, or `None` when the repository could not be loaded at all (logged).
+pub async fn load_repository(
+    client: &Client,
+    service: &Arc<Mutex<PluginService>>,
+    registry_cache: &Path,
+    repository: &PluginRepository,
+    is_official_id: &(dyn Fn(&str) -> bool + Sync),
+) -> Result<Option<Index>, ServiceError> {
+    let id = repository.id;
+    let dir = registry_cache.join(format!("repo-{id}"));
+    let (loaded, new_key) = match fetch_repository(client, &dir, repository, is_official_id).await {
+        Ok(RepoOutcome::Loaded(loaded)) => (loaded, None),
+        Ok(RepoOutcome::Rotated { new_key, loaded }) => (loaded, Some(new_key)),
+        Ok(RepoOutcome::KeyChanged { .. }) => {
+            with_service(service, move |s| s.pause_repository(id)).await??;
+            tracing::warn!(repository = id, "repository key changed; paused");
+            return Ok(None);
+        }
+        Err(error) => {
+            tracing::warn!(repository = id, %error, "could not load a repository");
+            return Ok(None);
+        }
+    };
+    if let Freshness::Rejected(error) = &loaded.freshness {
+        tracing::warn!(repository = id, %error, "a repository index was rejected");
+    }
+    if matches!(loaded.freshness, Freshness::Fresh | Freshness::NotModified) {
+        let sequence = i64::try_from(loaded.index.sequence).unwrap_or(i64::MAX);
+        let now = now_millis();
+        with_service(service, move |s| {
+            let store = s.store();
+            if let Some(key) = new_key {
+                store.replace_plugin_repository_key(id, &key, now)?;
+            }
+            store.record_plugin_repository_check(id, sequence, now)
+        })
+        .await??;
+    }
+    Ok(Some(loaded.index))
+}
+
 /// Runs `f` with the service locked, on a blocking thread (loading and starting plugins block).
 async fn with_service<T: Send + 'static>(
     service: &Arc<Mutex<PluginService>>,
@@ -312,6 +312,27 @@ async fn with_service<T: Send + 'static>(
 }
 
 impl PluginService {
+    /// Pauses a repository whose key changed and turns off every plugin installed from it,
+    /// keeping their data (FR-6.75). The user re-enables it via the key-change review.
+    pub fn pause_repository(&mut self, repository_id: i64) -> Result<(), ServiceError> {
+        self.store()
+            .pause_plugin_repository(repository_id, KEY_CHANGED)?;
+        let source = Origin::Repo(repository_id).to_db();
+        let ids: Vec<String> = self
+            .store()
+            .plugins()?
+            .into_iter()
+            .filter(|r| r.removed_at.is_none() && r.enabled && r.source == source)
+            .map(|r| r.id)
+            .collect();
+        for id in ids {
+            if let Err(error) = self.set_enabled(&id, false) {
+                tracing::warn!(plugin = id.as_str(), %error, "turning off a paused repository's plugin failed");
+            }
+        }
+        Ok(())
+    }
+
     /// The updates on offer, for the Updates tab.
     pub fn updates(&self) -> Vec<UpdateInfo> {
         self.updates.available.values().cloned().collect()
