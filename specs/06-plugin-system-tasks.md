@@ -101,7 +101,8 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | H2p | Plugins adopt H2: poll (fallback line + !poll vote lines replaced by card), eve-fit (after EV3/EV4) | poll done (feat/poll 5c7680f); eve-fit in progress | h2p-evefit |
 | H3 | Plugins see chat (chat-match, triggers, chat activity, cards) on EVERY connected server, not only the voice server (user decision 2026-11-01); events carry the server so replies/cards go to the right chat | in progress | h3-allservers |
 | H2m | mumcord-plugin CLI mock: issue message tokens for chat-match/chat-trigger + replay steps so scenarios can test replace/hide/is-replay | done (b59e1ea5; scenario syntax: event message:N replay:true, expect replaced/hidden) | h2m-mock |
-| H2s | Poll: YAML scenarios for hide / replay-no-count / own-line replace using the H2m mock (b59e1ea5) | in progress | h2s-pollscen |
+| H2s | Poll: YAML scenarios for hide / replay-no-count / own-line replace using the H2m mock (b59e1ea5) | partly done (feat/poll e1a7382: live hide+count, replay hide no-count); own-line (255) scenarios need H2m2 | h2s-pollscen |
+| H2m2 | CLI mock: scenario syntax for own-line replay (chat-match pattern index 255 / own: true, needs chat.send) + poll scenarios (c) own create line replaced by card, close line hidden, (d) unknown lines untouched | in progress | h2m2-ownline |
 | DBG1 | eve-fit card anchored to previous message when own message still sending | done (5675329e, fe91be1b) | dbg-evefit |
 | Q0 | Fix 2 failing vitest on epic/plugins: PluginDetails.tsx:131 li title, --text-muted in browse.css | done (2e3b7078) | q0-vitest |
 | EV1 | New plugin `eve-fit` (Mumcord/plugins, release-independent): detects EFT fits pasted in chat (H1), renders a chat card (ship, slots/modules summary) + popout/side-sheet view; check eveship.fit licence + CCP content policy before bundling anything | done (Mumcord/plugins PR #10: 8b595a2, 961ab01, 86e523e) | ev1-evefit |
