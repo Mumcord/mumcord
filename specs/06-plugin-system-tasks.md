@@ -4,13 +4,13 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 
 | ID | Title | Status | Owner |
 |---|---|---|---|
-| B1 | Bring in PR #297 and all epic dependencies | open | |
-| B3 | Store: plugin tables and settings keys | open | |
-| B5 | Protocol: low-priority lane for plugin messages | open | |
-| B6 | E2E: two Mumcord clients in one run | open | |
-| B7 | ⚠ OUTWARD: create the `Mumcord/plugins` repository skeleton | open | |
-| B8 | ⚠ OUTWARD (repo `Mumcord/mumbot`): module `plugins` (mumbot#20) | open | |
-| B20 | Deep link `mumcord://plugins/<id>` | open | |
+| B1 | Bring in PR #297 and all epic dependencies | in progress | b1-deps |
+| B3 | Store: plugin tables and settings keys | in progress | b3-store |
+| B5 | Protocol: low-priority lane for plugin messages | done | b5-lane |
+| B6 | E2E: two Mumcord clients in one run | in progress | b6-e2e2 |
+| B7 | ⚠ OUTWARD: create the `Mumcord/plugins` repository skeleton | done | b7-pluginsrepo |
+| B8 | ⚠ OUTWARD (repo `Mumcord/mumbot`): module `plugins` (mumbot#20) | in progress | b8-mumbot |
+| B20 | Deep link `mumcord://plugins/<id>` | in progress | b20-deeplink |
 | B2 | WIT package `mumcord:plugin@1.0.0` | open | |
 | B4 | Manifest, permission catalogue and package rules to spec | open | |
 | B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | open | |
@@ -55,8 +55,8 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B41c | Echolings: Snack Race (web view) | open | |
 | B42 | Mumbot Music plugin | open | |
 | B43 | CI in Mumcord: plugin tests and E2E | open | |
-| B44 | PRIVACY.md plugins section | open | |
-| K1 | Official plugin registry signing key (generated locally, stored as secret, never committed) | open | |
+| B44 | PRIVACY.md plugins section | done | b44-privacy |
+| K1 | Official plugin registry signing key (generated locally, stored as secret, never committed) | done (public keys: ~/.config/mumcord-signing/plugins/{active,backup}.pub; active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5) | k1-signkey |
 
 ---
 
@@ -404,3 +404,11 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - No mention of Claude/AI, no `Co-Authored-By` trailers, no "Generated with" lines.
 - Outward-facing work (B7, B8, B37 and anything in `Mumcord/plugins` or `Mumcord/mumbot`) only after user approval; mumbot changes follow that repo's own rules.
 - Delete own build cache `~/.cache/mumcord-build/<agent>` when done.
+
+---
+
+## Contracts from finished tasks (maintained by the lead)
+
+- **B5 (3315a4cf):** `Handle::send_plugin_data_low(receivers, data_id, data) -> Result<PluginTicket, CommandError>`; `PluginTicket::outcome().await -> LowOutcome::{Sent, Expired, Disconnected}` (dropping the ticket is fine); `Handle::plugin_data_expired() -> u64` (drops per connection). Core `send_plugin_data` unchanged and always goes first; low frames expire after 10 s; flush/disconnect don't wait for them.
+- **K1:** registry public keys in `~/.config/mumcord-signing/plugins/{active,backup}.pub` (active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5). Embed only public keys. Signing secrets `PLUGIN_SIGNING_KEY` / `PLUGIN_SIGNING_KEY_PASSWORD` live in the `publish` environment of Mumcord/plugins.
+- **B7 (+fix 5dc6e28):** Mumcord/plugins has no repo-wide licence; each official plugin folder (`poll/`, `dice/`, `echolings/`, `mumbot-music/`) has AGPL-3.0, `template/` and `docs/` Apache-2.0. Pages at https://mumcord.github.io/plugins/; environment `publish`; branch protection 1 approval + `check`. Version files live at `plugins/<id>/versions/<ver>.toml`.
