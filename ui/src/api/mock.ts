@@ -344,6 +344,14 @@ const DEFAULT_SETTINGS: Settings = {
   blockedMessages: "collapse",
 };
 
+/** Fictional titles and covers for the demo party's videos (issue #163). */
+const DEMO_VIDEOS: Record<string, { title: string; hue: number }> = {
+  dQw4w9WgXcQ: { title: "Northern Lights over a Quiet Lake", hue: 300 },
+  tk1a2b3c4d5: { title: "Tide Pools at Dawn", hue: 190 },
+  pr7c8d9e0f1: { title: "Desert Light, a Timelapse", hue: 20 },
+  pl4a5n6t7e8: { title: "Build a Paper Lantern in 10 Minutes", hue: 250 },
+};
+
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
 function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
   let parsed: URL;
@@ -371,12 +379,13 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
     };
   }
   if (/^[\w-]{11}$/.test(youtube)) {
+    const named = demo ? DEMO_VIDEOS[youtube] : undefined;
     return {
       url,
       siteName: "YouTube",
-      title: "Demo video",
+      title: named?.title ?? "Demo video",
       description: null,
-      image: null,
+      image: named === undefined ? null : demoCover(named.hue),
       video: {
         site: "youtube",
         playerUrl: `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1`,
@@ -936,9 +945,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           skippedBy: null,
           host: 2,
           playlist: [
-            { id: 1, videoId: "dQw4w9WgXcQ", addedBy: 2, addedByName: "Maya" },
-            { id: 2, videoId: "tk1a2b3c4d5", addedBy: 5, addedByName: "Jonas" },
-            { id: 3, videoId: "pr7c8d9e0f1", addedBy: 7, addedByName: "Priya" },
+            { id: 1, videoId: "tk1a2b3c4d5", addedBy: 5, addedByName: "Jonas" },
+            { id: 2, videoId: "pr7c8d9e0f1", addedBy: 7, addedByName: "Priya" },
+            { id: 3, videoId: "pl4a5n6t7e8", addedBy: 9, addedByName: null },
           ],
           positions: [
             { session: 1, positionMs: 431000, ageMs: 900, playing: true, buffering: false },
