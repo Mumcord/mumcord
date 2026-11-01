@@ -46,7 +46,8 @@ impl Storage {
     }
 
     /// The identity scope plugins see: the focused server's identity, else the default
-    /// identity. `None` makes every `identity` scope call fail with `invalid`.
+    /// identity. `None` falls back to the stored default identity; without any identity every
+    /// `identity` scope call fails with `invalid`.
     pub fn set_identity(&self, identity: Option<IdentityId>) {
         *self
             .identity
@@ -63,8 +64,23 @@ impl Storage {
             Scope::Global => Ok(GLOBAL_SCOPE.to_owned()),
             Scope::Identity => self
                 .identity()
+                .or_else(|| self.default_identity())
                 .map(|id| id.to_string())
                 .ok_or(Error::Invalid),
+        }
+    }
+
+    /// Until the host has resolved the focused server's identity (no server focused yet, or
+    /// the app is still starting), plugins use the default identity (spec 06 decision #6).
+    fn default_identity(&self) -> Option<IdentityId> {
+        let store = self.store.as_ref()?;
+        let store = store.lock().unwrap_or_else(PoisonError::into_inner);
+        match store.default_identity() {
+            Ok(record) => record.map(|r| r.id),
+            Err(error) => {
+                tracing::warn!(%error, "reading the default identity for plugin storage failed");
+                None
+            }
         }
     }
 
@@ -297,7 +313,7 @@ impl HostContext {
 
 #[cfg(test)]
 mod tests {
-    use mumcord_store::{MAX_PLUGIN_VALUE_BYTES, PluginRecord, PluginVisibility};
+    use mumcord_store::{MAX_PLUGIN_VALUE_BYTES, NewIdentity, PluginRecord, PluginVisibility};
 
     use super::*;
     use crate::api::secrets::PluginSecrets;
@@ -362,6 +378,41 @@ mod tests {
         s.delete("pet", Scope::Global, "missing")
             .expect("missing is fine");
         assert_eq!(s.get("pet", Scope::Global, "name"), Ok(None));
+    }
+
+    /// F51: a plugin that starts before any server is focused (or before the host resolved
+    /// the focused server's identity) uses the default identity instead of failing.
+    #[test]
+    fn without_a_focused_identity_the_default_identity_is_used() {
+        let (_dir, ctx) = context();
+        let s = &ctx.storage;
+        let default = {
+            let store = s.store.as_ref().expect("store");
+            let store = store.lock().expect("lock");
+            let default = store
+                .add_identity(&NewIdentity::new("Main", "main", "aa", 1))
+                .expect("identity");
+            store
+                .add_identity(&NewIdentity::new("Work", "work", "bb", 2))
+                .expect("identity");
+            default.id
+        };
+        s.set_identity(None);
+        s.set("pet", QUOTA, Scope::Identity, "name", b"Pip")
+            .expect("set");
+
+        s.set_identity(Some(default));
+        assert_eq!(
+            s.get("pet", Scope::Identity, "name"),
+            Ok(Some(b"Pip".to_vec())),
+            "the fallback wrote to the default identity"
+        );
+        s.set_identity(Some(default + 1));
+        assert_eq!(
+            s.get("pet", Scope::Identity, "name"),
+            Ok(None),
+            "focusing a server with another identity switches the scope"
+        );
     }
 
     #[test]
