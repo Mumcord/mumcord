@@ -238,7 +238,7 @@
 }
 
 .plugin-refresh__result {
-  color: var(--text-muted, inherit);
+  color: var(--color-text-muted);
 }
 
 .plugin-refresh__spinner {

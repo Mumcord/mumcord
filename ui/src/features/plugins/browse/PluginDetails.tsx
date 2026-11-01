@@ -128,7 +128,7 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
                 <li>{t("factMinVersion", { version: plugin.minMumcord })}</li>
               )}
               {plugin.signingKey !== null && (
-                <li title={plugin.signingKey}>
+                <li data-tooltip={plugin.signingKey}>
                   {t("factSigned", { key: shortKey(plugin.signingKey) })}
                 </li>
               )}
