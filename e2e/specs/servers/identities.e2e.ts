@@ -646,7 +646,7 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
     await tabTo((f) => f.role === "tab", "the settings tab list");
     await browser.keys(["Home"]);
     for (let i = 0; i < 20; i++) {
-      if ((await focus()).id.endsWith("-tab-identity")) break;
+      if ((await focus()).id.endsWith("-tab-account")) break;
       await browser.keys(["ArrowDown"]);
     }
     await browser.keys(["Enter"]);
