@@ -72,7 +72,9 @@
 }
 
 .plugins-section {
+  grid-column: 1 / -1;
   min-width: 0;
+  width: 100%;
 }
 
 .plugins-tab {
@@ -101,5 +103,6 @@
 .plugins-footer {
   display: flex;
   justify-content: flex-end;
+  gap: var(--space-4);
   margin-top: var(--space-3);
 }
