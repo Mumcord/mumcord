@@ -12,6 +12,9 @@
 - New new-message sound
 - New microphone mute and unmute sounds
 - New deafen and undeafen sounds
+- New kicked and banned sounds
+- New mention sound
+- New leaving-voice sound
 
 ### Fixed
 

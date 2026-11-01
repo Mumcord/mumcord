@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Synthesizes the Mumcord notification sounds (48 kHz mono 16-bit WAV). CC0.
 
-voice_join.wav, message.wav and the mute/unmute/deafen/undeafen sounds are not synthesized here (see README.md).
+Only user_joined.wav and user_left.wav are; all other sounds are not synthesized here (see README.md).
 
 Run: python3 generate.py   (writes the .wav files next to this script)
 """
@@ -41,10 +41,6 @@ def seq(parts):
 SOUNDS = {
     "user_joined": [(659.3, 0.11, 0.0), (880.0, 0.15, 0.08)],
     "user_left": [(880.0, 0.11, 0.0), (659.3, 0.15, 0.08)],
-    # you are mentioned: two quick high notes, clearly different from the single message tone
-    "mention": [(1318.5, 0.09, 0.0), (1760.0, 0.20, 0.09)],
-    # you disconnect: a low falling fifth, like putting down a phone
-    "hang_up": [(523.3, 0.12, 0.0), (349.2, 0.20, 0.10)],
 }
 
 here = os.path.dirname(os.path.abspath(__file__))
