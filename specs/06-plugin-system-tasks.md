@@ -80,6 +80,12 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F18 | UI fixes from screenshots: expanded Plugins strip is clipped by the user panel with a tall channel tree (strip must fit: scroll the tree or cap the strip); focus ring on the details-view title looks like a box (focus only when keyboard-focused, or don't focus the heading) | done (8610f01a) | f18-strip |
 | F19 | Debug builds must read MUMCORD_PLUGIN_REGISTRY_URL (documented by B6 for E2E, used by B16b) as the official registry base, same as the mirror setting; currently only MUMCORD_PLUGIN_REGISTRY_KEY is read | open | |
 | F20 | Expanded plugin popover (strip "expand", 420×560) has no background — transparent over the app; give it the normal surface background, border, shadow in dark+light | in progress | f20-popover |
+| L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | in progress | l0-sdki18n |
+| L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | open | |
+| L2 | Dice: all 24 languages via L0 | open | |
+| L3 | Echolings: all 24 languages via L0 | open | |
+| L4 | Mumbot Music: all 24 languages via L0 | open | |
+| L5 | Mumcord/plugins CI (check.yml): official plugins must ship i18n files for all 24 Mumcord languages with the same key set as en.json; template + docs explain it | open | |
 | B6v | Run e2e two-clients.e2e.ts + smoke/app.e2e.ts under the e2e lock; verify tauri:options.args (e.g. --no-plugins) reaches the app; fix harness issues | done (two-clients 2/2, app 3/3, args reach the app) | b6v-e2erun |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
@@ -502,3 +508,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **F16 (ada55433, 36b0265a):** the strip popover shows the web view instead of the tree. fx-webview-probe also reports `tauri-internals` (typeof), `webkit-ipc-handler`, `webview2-handler`, `webkit-ipc-post`, `webview2-post`: "undefined"/"false"/"blocked: <Error>" are safe; ONLY "reachable" is a leak (C7).
 - **F15 (4ce0db7f, 073286c5):** command `plugins_shared_supported(serverId)` + event `plugins://shared-state` {serverId, supported} (PluginsSharedState), UI hook `useSharedSupported` (unknown counts as supported). Also fixed a Rust test-compile error (`icon: None` in the commands/plugins.rs test helper). Docs: add both to docs/engine-api.md (D1).
 - **Main merged into epic (fe0e08d1):** Cargo.lock kept epic + `cargo update -w`; notices regenerated with scripts/generate-notices.sh. Note: the pkill pattern for the lead test build must be `'^/home/tvorwachs/.cache/mumcord-build/lead-run/debug/mumcord( |$)'` (otherwise it also matches mumcord-plugin).
+- **New requirement (user, 2026-11-01):** official plugins must support ALL Mumcord languages (the 24 locales in ui/src/locales). Spec addendum in D1.
