@@ -20,9 +20,13 @@ toml.workspace = true
 minisign.workspace = true
 sha2.workspace = true
 zip.workspace = true
+semver.workspace = true
+wit-component.workspace = true
+wit-parser.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
+tokio.workspace = true
 
 [lints]
 workspace = true

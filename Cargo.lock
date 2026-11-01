@@ -4095,12 +4095,16 @@ dependencies = [
  "clap",
  "minisign",
  "mumcord-plugins",
+ "semver",
  "serde",
  "serde-saphyr",
  "serde_json",
  "sha2 0.11.1",
  "tempfile",
+ "tokio",
  "toml 1.1.8+spec-1.1.0",
+ "wit-component 0.263.0",
+ "wit-parser 0.263.0",
  "zip",
 ]
 
