@@ -9,6 +9,7 @@
 
 ### Added
 
+- A plugin installed from a server's suggestion is remembered at once, so the suggestion does not come back if you remove the plugin again.
 - **Plugins**: small add-ons that give Mumcord new features. A new **Settings > Plugins** page has five tabs: **Installed** (switch a plugin on or off, change its permissions, settings and who it talks to, see diagnostics, export or reset its data, remove it with or without its data), **Browse** (official plugins by category, with search), **Updates**, **Repositories** and, with Developer mode on, **Developer**. No plugin is installed by default. Plugins also run while you are not connected to a server. **Plugins** is in the command palette too.
 - Installing or updating a plugin now shows a progress bar with the downloaded size, then "Checking signature", "Unpacking" and "Starting"; a failed download can be retried from the install dialog.
 - Installing a plugin first shows an **install prompt** in plain language: what it wants to do, each permission marked green, yellow or red, required ones fixed and optional ones as switches. Permissions can be changed later and take effect at once. Plugins can never read your chat text, files, microphone, certificates or passwords.

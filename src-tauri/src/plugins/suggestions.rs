@@ -237,9 +237,63 @@ pub async fn plugin_suggestions_dismiss_server(
         .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
 }
 
+/// The user installed a plugin from a suggestion: remember it, so the suggestion does not come
+/// back if the plugin is removed before the server's next announcement (AC-6.26).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_suggestion_installed(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    server_id: ApiServerId,
+    plugin: String,
+) -> ApiResult<()> {
+    let (server, identity) = identity_for(&app, server_id).await?;
+    let store = engine.store_handle();
+    let store = store
+        .lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
+    record_installed(&store, server, identity, &plugin)
+}
+
+fn record_installed(
+    store: &mumcord_engine::store::Store,
+    server: ServerId,
+    identity: mumcord_engine::IdentityId,
+    plugin: &str,
+) -> ApiResult<()> {
+    suggestions::mark_installed(store, server, identity, plugin)
+        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_install_from_a_suggestion_is_remembered() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let store = mumcord_engine::store::Store::open(dir.path()).expect("store");
+        let server = store
+            .add_server(&mumcord_engine::store::NewServer::new(
+                "A",
+                "localhost",
+                "Tester",
+            ))
+            .expect("server")
+            .id;
+        let identity = store
+            .add_identity(&mumcord_engine::store::NewIdentity::new(
+                "One", "one", "h1", 1,
+            ))
+            .expect("identity")
+            .id;
+        record_installed(&store, server, identity, "dice").expect("recorded");
+        let rows = store.plugin_suggestions(server, identity).expect("rows");
+        assert!(
+            rows.iter()
+                .any(|r| r.plugin_id == "dice" && r.state == "installed")
+        );
+    }
 
     #[test]
     fn a_repository_suggestion_keeps_its_expected_key() {

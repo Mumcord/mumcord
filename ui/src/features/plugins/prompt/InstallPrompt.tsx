@@ -98,6 +98,13 @@ export function InstallPrompt({
       .pluginInstall(plugin.id, offer.version, [...enabled], visibility)
       .then(() => {
         showPluginToast(t("toast.installed", { name }));
+        if (suggestedBy) {
+          getApi()
+            .pluginSuggestionInstalled(suggestedBy.serverId, plugin.id)
+            .catch((error: unknown) => {
+              console.error("Remembering the installed suggestion failed", error);
+            });
+        }
         onClose();
       })
       .catch((error: unknown) => {
