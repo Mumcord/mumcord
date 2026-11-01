@@ -89,7 +89,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | done (ff7d3e6b) | l0-sdki18n |
 | L0b | SDK i18n: full CLDR plural categories (zero/one/two/few/many/other) for the 24 languages in `tn`, falling back to `_other` | done (cf033cd5; `plural_category(tag, count)`, tn walks the fallback chain) | l0b-plurals |
 | L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | done (feat/poll 1b8a91a) | l1 |
-| L2 | Dice: all 24 languages via L0 | in progress | l2 |
+| L2 | Dice: all 24 languages via L0 | done (feat/dice f9bc164) | l2 |
 | L3 | Echolings: all 24 languages via L0 | done (feat/echolings 2cb4d6d) | l3 |
 | L4 | Mumbot Music: all 24 languages via L0 | done (feat/mumbot-music a5189a8) | l4 |
 | L5 | Mumcord/plugins CI (check.yml): official plugins must ship i18n files for all 24 Mumcord languages with the same key set as en.json; template + docs explain it | done (Mumcord/plugins PR #8, not merged) | l5 |
