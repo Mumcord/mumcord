@@ -1,6 +1,6 @@
 ;; Core module of the test plugin, written against the canonical ABI of `wit/world.wit`.
-;; The tests turn it into a component with wit-component after replacing the START and STOP
-;; placeholders with the function bodies each test needs.
+;; The tests turn it into a component with wit-component after replacing the START, EVENT and
+;; STOP placeholders with the function bodies each test needs.
 (module
   (import "mumcord:plugin/log@1.0.0" "write" (func $log (param i32 i32 i32)))
   (memory (export "memory") 1)
@@ -24,8 +24,9 @@
     {{START}})
 
   ;; on-event(event): the event variant has more than 16 flat values, so the host passes a
-  ;; pointer to it. The test plugin ignores every event.
-  (func (export "on-event") (param i32))
+  ;; pointer to it. The EVENT body decides what to do with it (usually nothing).
+  (func (export "on-event") (param $event i32)
+    {{EVENT}})
 
   (func (export "stop")
     {{STOP}})

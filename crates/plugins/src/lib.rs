@@ -4,6 +4,8 @@
 //! The plugin API is the WIT package in `wit/`; the manifest rules are also published as a JSON
 //! schema in `schema/manifest.schema.json`.
 
+pub mod cache;
+mod diag;
 mod health;
 mod host;
 pub mod i18n;
@@ -15,9 +17,12 @@ mod runtime;
 pub mod verify;
 pub mod version;
 
-pub use health::{Health, Recovery};
-pub use host::{HostError, LoadError, PluginHost, PluginState};
+pub use diag::{DiagSnapshot, Diagnostics};
+pub use health::{BACKOFF, Health, Recovery};
+pub use host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 pub use manifest::{Manifest, ManifestError, Source};
 pub use package::{Digest, ExpectedDigest, Package, PackageError, PackageVerifier, VerifyError};
-pub use runtime::{CallError, CompileError, Level, LogBuffer};
+pub use runtime::{
+    CallError, CompileError, HostContext, Level, LogBuffer, QUEUE_CAPACITY, TALKING_PER_SECOND, wit,
+};
 pub use version::{API_VERSION, Incompatibility};
