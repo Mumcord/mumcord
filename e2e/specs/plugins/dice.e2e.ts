@@ -4,11 +4,16 @@
 // offers the Dice command, and the typed command itself never reaches the chat.
 import { $, browser, expect } from "@wdio/globals";
 import { app, apps, registry, testenv } from "../../helpers/index.ts";
-import { composer, messageTexts, ScriptBot } from "../../helpers/chat-ui.ts";
+import { composer, joinChannel, messageTexts, ScriptBot } from "../../helpers/chat-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { addAndConnect, completeWizard, personRow } from "../../helpers/voice-ui.ts";
 
 const VERIFIED_WITHIN_MS = 5_000;
+/**
+ * Plugin messages travel only on the voice server (FR-6.33, H3 addendum), so A and B join the
+ * channel instead of just reading it.
+ */
+const ROOT = "Mumcord Test Server";
 
 async function openPlugins(tab: "Browse" | "Installed"): Promise<void> {
   await openSettingsGroup("Plugins");
@@ -52,13 +57,19 @@ async function installDice(): Promise<void> {
   await closeSettings();
 }
 
-/** Text of the newest Dice card in the open chat, or "" when there is none. */
+/**
+ * Text of the newest Dice card in the open chat, or "" when there is none. The dice are drawn
+ * as faces, so their values come from the images' alt text, appended after the visible text.
+ */
 async function lastDiceCard(): Promise<string> {
   return browser.execute(() => {
     const cards = document.querySelectorAll<HTMLElement>(
       "section.plugin-chat-card[aria-label='Card from Dice roller']",
     );
-    return cards.length > 0 ? cards[cards.length - 1].innerText : "";
+    if (cards.length === 0) return "";
+    const card = cards[cards.length - 1];
+    const faces = Array.from(card.querySelectorAll<HTMLImageElement>("img[alt]"), (i) => i.alt);
+    return `${card.innerText}\n${faces.join(" ")}`;
   });
 }
 
@@ -125,11 +136,13 @@ describe("plugins: Dice roller between two clients", () => {
     await app.restart({ env: fixtures.env() });
     await completeWizard("Alice");
     await addAndConnect();
+    await joinChannel(ROOT);
     await installDice();
     await apps.startB({ env: fixtures.env() });
     await apps.onB(async () => {
       await completeWizard("Bob");
       await addAndConnect();
+      await joinChannel(ROOT);
       await installDice();
       await personRow("Alice").waitForDisplayed({ timeout: 20_000 });
     });
@@ -147,8 +160,7 @@ describe("plugins: Dice roller between two clients", () => {
     await expect(option).toHaveText(expect.stringContaining("Dice roller"));
   });
 
-  // F47: Dice messages don't reach the peer (A's roll ends "rolled alone" although B runs Dice).
-  it.skip("AC-6.4: A's roll is verified on A and B within 5 s, C gets the fallback line", async () => {
+  it("AC-6.4: A's roll is verified on A and B within 5 s, C gets the fallback line", async () => {
     const fallback = plainUser().run('expect message --from Alice --contains "rolled 2d6+3"', 30_000);
     const box = composer();
     await typeInComposer("/roll 2d6+3");
