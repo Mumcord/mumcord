@@ -16,6 +16,8 @@ use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap};
 
 use crate::api;
+use crate::api::files::Files;
+use crate::api::http::{Http, HttpSet};
 use crate::api::notify::Notify;
 use crate::api::secrets::{PluginSecrets, SecretsApi};
 use crate::api::storage::{Storage, StorageApi};
@@ -104,6 +106,7 @@ const HOST_APIS: &[AddToLinker] = &[
     <api::random::RandomApi as HostApi>::add_to_linker,
     <StorageApi as HostApi>::add_to_linker,
     <SecretsApi as HostApi>::add_to_linker,
+    <api::http::HttpApi as HostApi>::add_to_linker,
 ];
 
 /// Services shared by all plugins that host calls need (store, grants, settings …). Later host
@@ -121,6 +124,10 @@ pub struct HostContext {
     pub theme: Theme,
     /// `None` until the service has loaded the per-install secret; peers then get no key.
     pub peer_keys: Option<PeerKeys>,
+    /// `net.http` (FR-6.37): allowed addresses and the request worker.
+    pub http: Http,
+    /// Files the user picked in plugin file pickers, for `net.http` uploads.
+    pub files: Files,
 }
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.
@@ -198,6 +205,7 @@ pub struct PluginState {
     /// The manifest's storage quota in bytes (FR-6.20).
     pub(crate) storage_quota: u64,
     pub(crate) timers: TimerSet,
+    pub(crate) http: HttpSet,
     limiter: Limiter,
 }
 
@@ -322,6 +330,10 @@ impl Compiled {
             diag: Arc::clone(&params.diag),
             storage_quota: params.storage_quota,
             timers: params.ctx.timers.set(Weak::clone(&params.queue)),
+            http: params
+                .ctx
+                .http
+                .set(Arc::clone(&params.id), Weak::clone(&params.queue)),
             limiter: Limiter {
                 limits,
                 diag: Arc::clone(&params.diag),

@@ -36,6 +36,7 @@ keyring.workspace = true
 [dev-dependencies]
 mumcord-store = { workspace = true, features = ["test-util"] }
 minisign.workspace = true
+rcgen.workspace = true
 wat.workspace = true
 wit-component.workspace = true
 wit-parser.workspace = true

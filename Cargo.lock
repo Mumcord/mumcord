@@ -4130,6 +4130,7 @@ dependencies = [
  "minisign-verify",
  "mumcord-store",
  "rand 0.10.3",
+ "rcgen",
  "reqwest",
  "rustls",
  "rustls-platform-verifier",

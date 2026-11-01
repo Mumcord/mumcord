@@ -1,6 +1,8 @@
 //! The host side of the WIT interfaces: one module per interface (FR-6.16–6.31).
 
 pub mod clock;
+pub mod files;
+pub mod http;
 pub mod log;
 pub mod notify;
 pub mod random;
