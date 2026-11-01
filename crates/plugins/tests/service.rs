@@ -7,14 +7,14 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 use minisign::KeyPair;
-use mumcord_plugins::Digest;
 use mumcord_plugins::Source;
 use mumcord_plugins::registry::Download;
 use mumcord_plugins::service::{
-    InstallRequest, InstallStage, PluginInfo, PluginService, ServiceConfig, ServiceError,
+    InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService, ServiceConfig, ServiceError,
     ServiceEvent, Status,
 };
 use mumcord_plugins::verify::IndexEntry;
+use mumcord_plugins::{Digest, HostEvent};
 use mumcord_store::{PluginVisibility, Store};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -35,6 +35,10 @@ fn component(start: &str) -> Vec<u8> {
         .replace("{{START}}", start)
         .replace("{{EVENT}}", "")
         .replace("{{STOP}}", "");
+    encode(&core)
+}
+
+fn encode(core: &str) -> Vec<u8> {
     let mut module = wat::parse_str(core).expect("fixture is valid WAT");
     let mut resolve = wit_parser::Resolve::default();
     let (package, _) = resolve
@@ -141,16 +145,29 @@ impl Fixture {
         app_version: Version,
         no_plugins: bool,
     ) -> (PluginService, UnboundedReceiver<ServiceEvent>) {
+        let (service, _host_events, events) = self.service_with_host(app_version, no_plugins);
+        (service, events)
+    }
+
+    fn service_with_host(
+        &self,
+        app_version: Version,
+        no_plugins: bool,
+    ) -> (
+        PluginService,
+        UnboundedReceiver<HostEvent>,
+        UnboundedReceiver<ServiceEvent>,
+    ) {
         let config = ServiceConfig {
             plugins_dir: self.plugins_dir(),
             cache_dir: None,
             app_version,
             no_plugins,
         };
-        let (mut service, _host_events, events) =
+        let (mut service, host_events, events) =
             PluginService::new(config, Arc::clone(&self.store), None).expect("service builds");
         service.start().expect("service starts");
-        (service, events)
+        (service, host_events, events)
     }
 
     fn set_developer_mode(&self, on: bool) {
@@ -487,4 +504,149 @@ fn developer_folders_follow_developer_mode() {
     service.developer_mode_changed(false).expect("unloads");
     assert!(service.list().expect("list").iter().all(|p| p.id != id));
     assert!(service.dir(&id).is_none());
+}
+
+/// Core module: `start` sends "hi" (kind 5) to the channel with `peers.send`. On an error it
+/// refuses to start with the error's code as a digit.
+const SENDER: &str = r#"
+(module
+  (import "mumcord:plugin/peers@1.0.0" "send" (func $send (param i32 i32 i32 i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (data (i32.const 40) "hi")
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (global.get $heap))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (call $send (i32.const 0) (i32.const 0) (i32.const 5) (i32.const 40) (i32.const 2)
+      (i32.const 100))
+    (if (i32.load8_u (i32.const 100))
+      (then
+        (i32.store8 (i32.const 48) (i32.add (i32.const 48) (i32.load8_u (i32.const 101))))
+        (i32.store8 (i32.const 64) (i32.const 1))
+        (i32.store (i32.const 68) (i32.const 48))
+        (i32.store (i32.const 72) (i32.const 1))
+        (return (i32.const 64))))
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param i32))
+  (func (export "stop"))
+)"#;
+const MESSAGING: &str = r#","permissions":{"required":["peers.messages"]}"#;
+/// `no-recipients` in the WIT error enum.
+const NO_RECIPIENTS: &str = "3";
+
+fn sender_folder(root: &Path, id: &str) -> PathBuf {
+    let dir = root.join(format!("src-{id}"));
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(dir.join("manifest.json"), manifest(id, "0.1.0", MESSAGING)).expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode(SENDER)).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    dir
+}
+
+fn bob() -> PeerInfo {
+    PeerInfo {
+        session: 7,
+        name: "Bob".into(),
+        cert_hash: Some("ab".repeat(20)),
+        is_friend: false,
+    }
+}
+
+#[test]
+fn messages_go_to_peers_announcing_the_same_plugin() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["sender@1~dev"]}"#,
+    );
+
+    let id = service
+        .load_dev(&sender_folder(fx.root.path(), "sender"))
+        .expect("loads");
+    assert_eq!(info(&service, &id).status, Status::Running);
+    let mut sent = None;
+    while let Ok(event) = host_events.try_recv() {
+        service.handle_host_event(event).expect("handled");
+    }
+    while let Ok(event) = events.try_recv() {
+        if let ServiceEvent::PeerSend {
+            server,
+            plugin,
+            outgoing,
+        } = event
+        {
+            sent = Some((server, plugin, outgoing));
+        }
+    }
+    let (server, plugin, outgoing) = sent.expect("a message for the engine");
+    assert_eq!((server, plugin.as_str()), (1, "sender"));
+    assert_eq!(outgoing.data_id, "mumcord.p.sender");
+    assert_eq!(outgoing.receivers, [7]);
+    assert_eq!(outgoing.bytes, [1, 1, 5, b'h', b'i']);
+    assert_eq!(service.messaging_counters("sender").sent, 1);
+
+    // Nobody runs "lonely": its send at start fails with no-recipients.
+    let lonely = service
+        .load_dev(&sender_folder(fx.root.path(), "lonely"))
+        .expect("loads");
+    assert!(matches!(
+        info(&service, &lonely).status,
+        Status::BackingOff { error } if error.ends_with(NO_RECIPIENTS)
+    ));
+
+    // The announce lists the messaging plugins and goes to capable peers, once per 10 s.
+    let announces = service.poll_announces();
+    assert_eq!(announces.len(), 1);
+    assert_eq!(announces[0].receivers, [7]);
+    let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
+    assert!(
+        text.contains("sender@1~dev") && text.contains("lonely@1~dev"),
+        "{text}"
+    );
+    assert!(service.poll_announces().is_empty());
+    assert!(service.next_announce_at().is_none());
+
+    // Incoming: accepted from the announcing member, refused from someone outside the channel.
+    service.peer_data(1, &bob(), "mumcord.p.sender", &[1, 1, 9, 0]);
+    let stranger = PeerInfo {
+        session: 9,
+        ..bob()
+    };
+    service.peer_data(1, &stranger, "mumcord.p.sender", &[1, 1, 9, 0]);
+    let counters = service.messaging_counters("sender");
+    assert_eq!((counters.received, counters.incoming_refused), (1, 1));
+    service.message_expired(1, "sender");
+    assert_eq!(service.messaging_counters("sender").expired, 1);
+}
+
+#[test]
+fn visibility_nobody_leaves_a_plugin_out_of_the_announce() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _host_events, _events) = fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    let id = service
+        .load_dev(&sender_folder(fx.root.path(), "quiet"))
+        .expect("loads");
+    service
+        .set_visibility(&id, PluginVisibility::Nobody)
+        .expect("visibility");
+    let announces = service.poll_announces();
+    let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
+    assert!(!text.contains("quiet"), "{text}");
 }

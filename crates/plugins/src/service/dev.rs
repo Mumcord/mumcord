@@ -67,6 +67,7 @@ impl PluginService {
         }
         self.ctx.grants.set(&id, &record.granted);
         self.ctx.notify.set_enabled(&id, true);
+        self.sync_peers();
         // A developer wants to see a failing start in the log, so the plugin stays loaded.
         if !self.host.all_off()
             && let Err(error) = self.host.enable(&id)

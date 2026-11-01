@@ -154,6 +154,7 @@ impl PluginService {
     pub fn reset_data(&mut self, id: &str) -> Result<(), ServiceError> {
         self.record(id)?;
         self.ctx.reset_plugin_data(id)?;
+        self.ctx.http.forget(id);
         if self.host.state(id) == Some(crate::RunState::Running) {
             self.stop(id);
             self.host.enable(id)?;
@@ -251,6 +252,8 @@ impl PluginService {
         if !record.enabled || self.host.all_off() || self.host.manifest(&record.id).is_none() {
             return;
         }
+        // Before the start, so a plugin may already message from its `start`.
+        self.sync_peers();
         if let Err(error) = self.host.enable(&record.id) {
             tracing::warn!(plugin = record.id.as_str(), %error, "plugin did not start");
         }
@@ -277,6 +280,8 @@ impl PluginService {
     pub(super) fn forget_runtime(&self, id: &str) {
         self.ctx.grants.forget(id);
         self.ctx.notify.forget(id);
+        self.ctx.http.forget(id);
+        self.io.forget(id);
     }
 
     fn loaded_manifest(&self, id: &str) -> Result<&crate::Manifest, ServiceError> {

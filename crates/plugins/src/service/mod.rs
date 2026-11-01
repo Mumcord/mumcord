@@ -13,6 +13,8 @@
 mod dev;
 mod install;
 mod lifecycle;
+mod messaging;
+mod plugin_io;
 
 use std::collections::BTreeMap;
 use std::io;
@@ -36,6 +38,8 @@ use crate::wit::events::{Event, PluginSettings};
 use crate::wit::theme::Mode;
 
 pub use install::{InstallRequest, InstallStage, fetch};
+pub use messaging::Announce;
+pub use plugin_io::{PeerInfo, SelfInfo, UiUpdate};
 
 /// The permission that lets a plugin show a badge next to user names (FR-6.63).
 const BADGE_PERMISSION: &str = "ui.member-badge";
@@ -53,7 +57,7 @@ pub struct ServiceConfig {
 }
 
 /// What the UI hears from the service.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum ServiceEvent {
     /// The plugin list or a plugin's state changed (`plugins://changed`).
     Changed,
@@ -67,6 +71,24 @@ pub enum ServiceEvent {
         id: String,
         title: String,
         body: String,
+    },
+    /// A plugin message for the engine's low-priority lane (`Engine::plugin_send`). When its
+    /// ticket ends `Expired`, call [`PluginService::message_expired`].
+    PeerSend {
+        server: mumcord_store::ServerId,
+        plugin: String,
+        outgoing: crate::messaging::Outgoing,
+    },
+    /// A plugin changed its UI (`plugin://ui`). Trees are untrusted.
+    Ui { plugin: String, update: UiUpdate },
+    /// `chat.send` passed the gesture gate: post `line` ("[Name] text") as a channel message
+    /// through the normal chat path.
+    ChatPost { plugin: String, line: String },
+    /// Hide text message `message` and show the plugin's card `card` instead (FR-6.45).
+    Supersede {
+        plugin: String,
+        card: String,
+        message: u64,
     },
 }
 
@@ -214,6 +236,7 @@ impl Origin {
 pub struct PluginService {
     host: PluginHost,
     ctx: Arc<HostContext>,
+    io: Arc<plugin_io::ServiceIo>,
     store: Arc<Mutex<Store>>,
     plugins_dir: PathBuf,
     integrity: Integrity,
@@ -221,6 +244,8 @@ pub struct PluginService {
     integrity_version: String,
     no_plugins: bool,
     language: String,
+    /// Do Not Disturb or quiet time.
+    quiet: bool,
     /// Why an installed plugin could not be loaded in this run.
     load_errors: BTreeMap<String, String>,
     events: UnboundedSender<ServiceEvent>,
@@ -245,14 +270,20 @@ impl PluginService {
     > {
         std::fs::create_dir_all(&config.plugins_dir)?;
         let peer_keys = PeerKeys::load_or_create(&config.plugins_dir)?;
+        let (events, events_rx) = unbounded_channel();
+        let io = Arc::new(plugin_io::ServiceIo::new(
+            Some(peer_keys.clone()),
+            events.clone(),
+        ));
         let ctx = Arc::new(HostContext {
             storage: Storage::new(Arc::clone(&store)),
             secrets,
             peer_keys: Some(peer_keys),
+            http: crate::api::http::Http::new(&config.plugins_dir),
+            io: Some(Arc::clone(&io) as Arc<dyn crate::api::io::PluginIo>),
             ..HostContext::default()
         });
         let (host_tx, host_rx) = unbounded_channel();
-        let (events, events_rx) = unbounded_channel();
         let host = PluginHost::new(
             config.app_version.clone(),
             config.cache_dir,
@@ -262,12 +293,14 @@ impl PluginService {
         let service = Self {
             host,
             ctx,
+            io,
             store,
             integrity: Integrity::load(&config.plugins_dir)?,
             plugins_dir: config.plugins_dir,
             integrity_version: crate::verify::app_version(&config.app_version.to_string()),
             no_plugins: config.no_plugins,
             language: "en".into(),
+            quiet: false,
             load_errors: BTreeMap::new(),
             events,
         };
@@ -357,11 +390,6 @@ impl PluginService {
             .broadcast(&Event::ThemeChanged(self.ctx.theme.info()));
     }
 
-    /// Do Not Disturb or quiet time: plugin notifications are held back.
-    pub fn set_quiet(&self, quiet: bool) {
-        self.ctx.notify.set_quiet(quiet);
-    }
-
     /// What a plugin thread reported. Started plugins get their settings, language and theme;
     /// a plugin that stays off after repeated crashes is stored as off with reason `crashes`.
     pub fn handle_host_event(&mut self, event: HostEvent) -> Result<(), ServiceError> {
@@ -374,6 +402,7 @@ impl PluginService {
                     .send(&id, Event::LanguageChanged(self.language.clone()));
                 self.host
                     .send(&id, Event::ThemeChanged(self.ctx.theme.info()));
+                self.host.send(&id, self.self_event(&id));
                 self.changed();
             }
             HostEvent::Failed { id, recovery, .. } => {
@@ -505,6 +534,7 @@ impl PluginService {
     }
 
     fn changed(&self) {
+        self.sync_peers();
         self.emit(ServiceEvent::Changed);
     }
 }
