@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
 import { bot, botInBackground, testenv } from "../../helpers/index.ts";
+import { runFirstStartWizard } from "../../helpers/wizard-util.ts";
 
 // AC-1.19 (register on this server) and AC-1.20 (own/bot avatar + comment), spec 01 §11.
 // A name no other spec uses: this spec registers it on v15, and a registered name rejects every
@@ -24,12 +25,6 @@ async function clickItem(text: string): Promise<void> {
   await el.click();
 }
 
-async function onStep(n: number): Promise<void> {
-  await browser.waitUntil(async () => (await $("#root").getText()).includes(`Step ${String(n)} of`), {
-    timeoutMsg: `wizard step ${String(n)} not shown`,
-  });
-}
-
 // Profile edits and registration live in the quick settings, opened from the gear.
 async function openUserMenu(): Promise<void> {
   const gear = $('button[aria-label="Quick settings"]');
@@ -45,20 +40,8 @@ describe("profile: register, avatar, comment", () => {
     avatarPath = join(mkdtempSync(join(tmpdir(), "mumcord-avatar-")), "me.png");
     writeFileSync(avatarPath, Buffer.from(PNG_1X1, "base64"));
 
-    // Wizard: identity -> mic -> privacy -> talk mode -> updates.
     await $("#root").waitForDisplayed();
-    const name = $('input[type="text"]');
-    await name.waitForDisplayed();
-    await name.setValue(ME);
-    await clickText("button", "Next");
-    await onStep(2);
-    await clickText("button", "Next");
-    await onStep(3);
-    await clickText("button", "Next");
-    await onStep(4);
-    await clickText("button", "Next");
-    await onStep(5);
-    await clickText("button", "Finish");
+    await runFirstStartWizard(ME);
 
     // First server, then trust its certificate.
     const address = $('input[placeholder="mumble.example.org"]');
