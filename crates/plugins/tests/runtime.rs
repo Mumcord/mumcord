@@ -325,6 +325,63 @@ fn endless_loop_in_an_event_is_stopped_within_its_budget_and_restarted() {
     assert_eq!(host.state("spin"), Some(RunState::Running));
 }
 
+/// AC-6.9: running out of memory in an event is a failure like a crash (AC-6.8): back-off,
+/// restart, off after the third time, and other plugins keep running.
+#[test]
+fn running_out_of_memory_in_an_event_backs_off_like_a_crash() {
+    let root = tempfile::tempdir().expect("temp dir");
+    let (mut host, mut events) = host_with_events(None);
+    host.set_backoff(SHORT_BACKOFF);
+    let hog = "(loop $more (drop (memory.grow (i32.const 16))) (br $more))";
+    let wasm = component_with_events(WELL_BEHAVED, hog, "");
+    host.load(&plugin_dir(root.path(), "hog", &wasm, ""), None)
+        .expect("loads");
+    host.load(
+        &plugin_dir(root.path(), "good", &component(WELL_BEHAVED, ""), ""),
+        None,
+    )
+    .expect("loads");
+    host.enable("hog").expect("starts");
+    host.enable("good").expect("starts");
+    for _ in 0..2 {
+        assert!(matches!(next_event(&mut events), HostEvent::Started { .. }));
+    }
+
+    for attempt in 1..=3 {
+        assert!(host.send("hog", Event::Timer(1)), "attempt {attempt}");
+        let failed = next_event(&mut events);
+        let HostEvent::Failed {
+            id,
+            error: CallError::OutOfMemory,
+            recovery,
+        } = failed
+        else {
+            panic!("expected out of memory on attempt {attempt}, got {failed:?}");
+        };
+        assert_eq!(id, "hog");
+        if attempt < 3 {
+            assert!(
+                matches!(recovery, Recovery::RetryAt(_)),
+                "attempt {attempt}"
+            );
+            assert_eq!(
+                next_event(&mut events),
+                HostEvent::Started { id: "hog".into() }
+            );
+        } else {
+            assert_eq!(recovery, Recovery::StayOff);
+        }
+    }
+    assert_eq!(
+        host.state("hog"),
+        Some(RunState::AutoOff {
+            error: CallError::OutOfMemory
+        })
+    );
+    assert!(host.send("good", Event::Timer(1)));
+    assert_eq!(host.state("good"), Some(RunState::Running));
+}
+
 #[test]
 fn turn_off_all_stops_everything_and_refuses_starts() {
     let root = tempfile::tempdir().expect("temp dir");
