@@ -20,6 +20,7 @@ mod kde_x11;
 mod notifications;
 mod now_gaming;
 mod now_playing;
+mod plugins;
 mod portable;
 mod ptt;
 mod screen_frames;
@@ -207,6 +208,27 @@ fn specta_builder() -> Builder<tauri::Wry> {
             app::link_handler_register,
             app::deep_link_take_pending,
             app::plugins_take_pending_link,
+            commands::plugins::plugins_list,
+            commands::plugins::plugins_index,
+            commands::plugins::plugin_install,
+            commands::plugins::plugin_set_enabled,
+            commands::plugins::plugin_set_permissions,
+            commands::plugins::plugin_set_visibility,
+            commands::plugins::plugin_set_notifications,
+            commands::plugins::plugin_remove,
+            commands::plugins::plugin_export_data,
+            commands::plugins::plugin_reset_data,
+            commands::plugins::plugin_dev_load,
+            commands::plugins::plugin_dev_reload,
+            commands::plugins::plugin_dev_unload,
+            commands::plugins::plugins_set_all_off,
+            commands::plugins::plugin_set_badge,
+            commands::plugins::plugin_diagnostics,
+            commands::plugins::plugins_ui_trees,
+            commands::plugins::plugins_set_appearance,
+            commands::plugins::plugin_ui_action,
+            commands::plugins::plugin_ui_event,
+            commands::plugins::plugins_mentioned,
             diagnostics::diagnostics_save,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,
@@ -237,8 +259,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::now_gaming::now_gaming_icon,
             commands::now_gaming::now_gaming_join,
             commands::positional::positional_status,
-            commands::positional::plugins_list,
-            commands::positional::plugin_set_enabled,
+            commands::positional::game_plugins_list,
+            commands::positional::game_plugin_set_enabled,
             commands::ingame_overlay::ingame_overlay_state,
             commands::ingame_overlay::ingame_overlay_set_mode,
             commands::ingame_overlay::ingame_overlay_set_game,
@@ -347,6 +369,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::media_popout::MediaPopoutChanged,
             commands::tray::TraySettingsRequested,
             commands::hotkeys::HotkeyPressed,
+            plugins::PluginsChanged,
+            plugins::PluginInstallProgress,
+            plugins::ui::PluginUi,
+            plugins::PluginNotification,
+            plugins::PluginSupersede,
         ])
 }
 
@@ -514,6 +541,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     now_playing::start(engine.clone());
     now_gaming::start(engine.clone());
     start_plugin_host(app, &engine, &data_dir, &stored.enabled_plugins);
+    plugins::start(app, &engine);
     app.manage(engine.clone());
     let at_start = engine.clone();
     tauri::async_runtime::spawn(async move {
@@ -599,6 +627,7 @@ fn emit_engine_event(
 ) -> tauri::Result<()> {
     tray::on_engine_event(app, server_id, &event);
     notifications::on_engine_event(app, server_id, &event);
+    plugins::on_engine_event(app, &event);
     if let (Some(runtime), Some(engine)) = (
         app.try_state::<ingame_overlay::Runtime>(),
         app.try_state::<Engine>(),

@@ -1,0 +1,805 @@
+//! Plugin commands (spec 06, §8): thin wrappers around the plugin service. The UI never talks
+//! to plugins or the network itself.
+
+use std::path::PathBuf;
+use std::sync::Arc;
+
+use mumcord_engine::Engine;
+use mumcord_engine::store::PluginVisibility;
+use mumcord_plugins::registry::{
+    Client, Freshness, IndexPlugin, OFFLINE_TEXT, UrlPolicy, fetch_official, official_base,
+};
+use mumcord_plugins::service::{
+    InstallRequest, PluginInfo, PluginService, ServiceError, Status, UiInput, fetch,
+};
+use mumcord_plugins::wit::events::{ActionSource, ActionValue};
+use mumcord_plugins::wit::theme::Mode;
+use mumcord_plugins::{Level, Source};
+use serde::{Deserialize, Serialize};
+use specta::Type;
+use tauri::{AppHandle, State};
+
+use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
+use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi};
+use crate::plugins::{self, Plugins};
+
+/// Who sees that the user has a plugin (FR-6.35).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginVisibilityChoice {
+    Everyone,
+    Friends,
+    Nobody,
+}
+
+impl From<PluginVisibility> for PluginVisibilityChoice {
+    fn from(v: PluginVisibility) -> Self {
+        match v {
+            PluginVisibility::Everyone => Self::Everyone,
+            PluginVisibility::Friends => Self::Friends,
+            PluginVisibility::Nobody => Self::Nobody,
+        }
+    }
+}
+
+impl From<PluginVisibilityChoice> for PluginVisibility {
+    fn from(v: PluginVisibilityChoice) -> Self {
+        match v {
+            PluginVisibilityChoice::Everyone => Self::Everyone,
+            PluginVisibilityChoice::Friends => Self::Friends,
+            PluginVisibilityChoice::Nobody => Self::Nobody,
+        }
+    }
+}
+
+/// Where an installed plugin came from.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum PluginSourceInfo {
+    Official,
+    Repo {
+        repository_id: u32,
+    },
+    /// "Developer plugin", loaded from `folder`.
+    Dev {
+        folder: String,
+    },
+}
+
+/// Where a plugin is in its life.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum PluginStatus {
+    Running,
+    /// Off; see `disabledReason`.
+    Off,
+    /// Crashed; starts again by itself.
+    BackingOff {
+        error: String,
+    },
+    /// "Turned off after repeated crashes".
+    AutoOff {
+        error: String,
+    },
+    /// "Turn off all plugins" is on.
+    AllOff,
+    /// Started with `--no-plugins`.
+    NoPlugins,
+    /// The installed files could not be loaded.
+    NotLoaded {
+        error: String,
+    },
+}
+
+impl From<Status> for PluginStatus {
+    fn from(s: Status) -> Self {
+        match s {
+            Status::Running => Self::Running,
+            Status::Off => Self::Off,
+            Status::BackingOff { error } => Self::BackingOff { error },
+            Status::AutoOff { error } => Self::AutoOff { error },
+            Status::AllOff => Self::AllOff,
+            Status::NoPlugins => Self::NoPlugins,
+            Status::NotLoaded { error } => Self::NotLoaded { error },
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginOptionalPermission {
+    pub id: String,
+    /// Preselected in the install prompt.
+    pub suggested: bool,
+}
+
+/// One installed plugin.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct InstalledPlugin {
+    pub id: String,
+    /// Empty when the plugin could not be loaded.
+    pub name: String,
+    pub version: String,
+    pub source: PluginSourceInfo,
+    pub status: PluginStatus,
+    /// Whether the user wants it on.
+    pub enabled: bool,
+    /// `crashes`, `revoked`, `tampered`, `user` or `permission`.
+    pub disabled_reason: Option<String>,
+    pub required: Vec<String>,
+    pub optional: Vec<PluginOptionalPermission>,
+    pub granted: Vec<String>,
+    pub visibility: PluginVisibilityChoice,
+    pub pinned: bool,
+    pub notifications: bool,
+    /// Unix milliseconds.
+    pub installed_at: f64,
+    /// This plugin's badge is the one shown next to names.
+    pub badge: bool,
+}
+
+impl From<PluginInfo> for InstalledPlugin {
+    fn from(p: PluginInfo) -> Self {
+        let source = match (p.source, p.developer_folder) {
+            (Source::Dev, folder) => PluginSourceInfo::Dev {
+                folder: folder.map(|f| f.display().to_string()).unwrap_or_default(),
+            },
+            (Source::Repo { repository_id }, _) => PluginSourceInfo::Repo {
+                repository_id: u32::try_from(repository_id).unwrap_or(u32::MAX),
+            },
+            (Source::Official, _) => PluginSourceInfo::Official,
+        };
+        Self {
+            id: p.id,
+            name: p.name,
+            version: p.version,
+            source,
+            status: p.status.into(),
+            enabled: p.enabled,
+            disabled_reason: p.disabled_reason,
+            required: p.required,
+            optional: p
+                .optional
+                .into_iter()
+                .map(|o| PluginOptionalPermission {
+                    id: o.id,
+                    suggested: o.suggested,
+                })
+                .collect(),
+            granted: p.granted,
+            visibility: p.visibility.into(),
+            pinned: p.pinned,
+            notifications: p.notifications,
+            installed_at: p.installed_at as f64,
+            badge: p.badge,
+        }
+    }
+}
+
+/// Settings → Plugins.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginsOverview {
+    /// Started with `--no-plugins`: show the banner.
+    pub no_plugins: bool,
+    /// "Turn off all plugins" is on.
+    pub all_off: bool,
+    pub plugins: Vec<InstalledPlugin>,
+}
+
+/// How fresh the store's plugin list is.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum IndexFreshness {
+    Fresh,
+    NotModified,
+    /// The last known list (`notice` says so).
+    Offline,
+    /// A new list failed a check; the last known one is shown.
+    Rejected,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexScreenshot {
+    pub url: String,
+    pub alt: String,
+}
+
+/// One plugin of the official index, texts in the asked language (English fallback).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexedPlugin {
+    pub id: String,
+    pub name: String,
+    pub summary: String,
+    pub description_md_url: Option<String>,
+    pub icon: Option<String>,
+    pub screenshots: Vec<IndexScreenshot>,
+    pub categories: Vec<String>,
+    pub authors: Vec<String>,
+    pub reviewed: bool,
+    pub updated: String,
+    /// The latest version.
+    pub version: String,
+    /// Package size in bytes.
+    pub size: f64,
+    /// Every permission (required and optional) the version may ask for.
+    pub permissions: Vec<String>,
+}
+
+impl IndexedPlugin {
+    fn new(p: &IndexPlugin, language: &str) -> Self {
+        let latest = p.latest();
+        let alt = |texts: &std::collections::BTreeMap<String, String>| {
+            texts
+                .get(language)
+                .or_else(|| texts.get("en"))
+                .cloned()
+                .unwrap_or_default()
+        };
+        Self {
+            id: p.id.clone(),
+            name: p.name(language).to_owned(),
+            summary: p.summary(language).to_owned(),
+            description_md_url: p.description_md_url.clone(),
+            icon: p.icon.clone(),
+            screenshots: p
+                .screenshots
+                .iter()
+                .map(|s| IndexScreenshot {
+                    url: s.url.clone(),
+                    alt: alt(&s.alt),
+                })
+                .collect(),
+            categories: p.categories.clone(),
+            authors: p.authors.clone(),
+            reviewed: p.reviewed,
+            updated: p.updated.clone(),
+            version: latest.version.clone(),
+            size: latest.size as f64,
+            permissions: latest.permissions.clone(),
+        }
+    }
+}
+
+/// The store's official plugin list.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginIndex {
+    pub freshness: IndexFreshness,
+    /// A user-facing text when the list is not fresh.
+    pub notice: Option<String>,
+    pub plugins: Vec<IndexedPlugin>,
+}
+
+/// The value of a `ui-action` as the UI sends it.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum PluginActionValue {
+    None,
+    Boolean {
+        value: bool,
+    },
+    Number {
+        value: f32,
+    },
+    /// Also the typed text of a password field (it goes into the secret, never to the plugin).
+    Text {
+        value: String,
+    },
+    /// A list row moved from `from` to `to`.
+    Reorder {
+        from: u32,
+        to: u32,
+    },
+    /// The path the user picked in a file picker.
+    File {
+        path: String,
+    },
+}
+
+/// A user input for a plugin's UI other than an action.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum PluginUiInput {
+    ProfileCardOpened { session: SessionId },
+    PanelVisibility { visibility: PluginPanelVisibility },
+    UserMenuRequested { session: SessionId },
+    DialogClosed,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginLogLevel {
+    Debug,
+    Info,
+    Warn,
+    Error,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginLogLine {
+    pub level: PluginLogLevel,
+    pub text: String,
+}
+
+/// The Diagnostics section of a plugin (counts only, never payloads).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginDiagnostics {
+    pub cpu_time_ms: f64,
+    pub memory_bytes: f64,
+    pub peak_memory_bytes: f64,
+    pub dropped_events: f64,
+    pub dropped_messages: f64,
+    pub restarts: f64,
+    pub messages_sent: f64,
+    pub messages_rate_limited: f64,
+    pub messages_expired: f64,
+    pub messages_received: f64,
+    pub incoming_rate_dropped: f64,
+    pub incoming_invalid: f64,
+    /// The plugin's own log lines (in memory only).
+    pub log: Vec<PluginLogLine>,
+}
+
+fn plugins_of(app: &AppHandle) -> ApiResult<Arc<Plugins>> {
+    plugins::state(app)
+}
+
+fn overview(service: &mut PluginService) -> Result<PluginsOverview, ServiceError> {
+    Ok(PluginsOverview {
+        no_plugins: service.no_plugins(),
+        all_off: service.all_off()?,
+        plugins: service.list()?.into_iter().map(Into::into).collect(),
+    })
+}
+
+/// Every installed plugin, developer plugins included.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugins_list(app: AppHandle) -> ApiResult<PluginsOverview> {
+    plugins_of(&app)?.call(overview).await
+}
+
+/// Loads the official plugin list (cached copy when offline, FR-6.55).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugins_index(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    language: String,
+) -> ApiResult<PluginIndex> {
+    let plugins = plugins_of(&app)?;
+    let settings = engine.settings()?;
+    let client = registry_client(settings.developer_mode)?;
+    let base = official_base(settings.plugins_mirror_url.as_deref()).map_err(registry_error)?;
+    let cache = plugins.registry_cache().join("official");
+    std::fs::create_dir_all(&cache).map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))?;
+    let last_seen = u64::try_from(settings.plugins_last_official_sequence)
+        .ok()
+        .filter(|s| *s > 0);
+    let loaded = fetch_official(&client, &cache, &base, last_seen)
+        .await
+        .map_err(registry_error)?;
+    let (freshness, notice) = match &loaded.freshness {
+        Freshness::Fresh => (IndexFreshness::Fresh, None),
+        Freshness::NotModified => (IndexFreshness::NotModified, None),
+        Freshness::Offline => (IndexFreshness::Offline, Some(OFFLINE_TEXT.to_owned())),
+        Freshness::Rejected(e) => (IndexFreshness::Rejected, Some(e.to_string())),
+    };
+    if matches!(loaded.freshness, Freshness::Fresh) {
+        let sequence = i64::try_from(loaded.index.sequence).unwrap_or(i64::MAX);
+        if sequence > settings.plugins_last_official_sequence {
+            let mut stored = engine.settings()?;
+            stored.plugins_last_official_sequence = sequence;
+            engine.update_settings(stored).await?;
+        }
+    }
+    let index = PluginIndex {
+        freshness,
+        notice,
+        plugins: loaded
+            .index
+            .plugins
+            .iter()
+            .map(|p| IndexedPlugin::new(p, &language))
+            .collect(),
+    };
+    *plugins.index() = Some(loaded.index);
+    Ok(index)
+}
+
+/// Installs a plugin from the official list loaded by `plugins_index` (latest version unless
+/// `version` is given), with the optional permissions the user left on.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_install(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: String,
+    version: Option<String>,
+    optional: Vec<String>,
+    visibility: PluginVisibilityChoice,
+) -> ApiResult<()> {
+    let plugins = plugins_of(&app)?;
+    let (entry, url, size) = {
+        let index = plugins.index();
+        let plugin = index
+            .as_ref()
+            .and_then(|i| i.plugin(&id))
+            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
+        let chosen = match &version {
+            Some(v) => plugin
+                .version(v)
+                .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "version not in the list"))?,
+            None => plugin.latest(),
+        };
+        (plugin.entry(chosen), chosen.url.clone(), chosen.size)
+    };
+    let client = registry_client(engine.settings()?.developer_mode)?;
+    let events = plugins.call(|service| Ok(service.events())).await?;
+    let download = fetch(&client, &events, &id, &url, size)
+        .await
+        .map_err(plugins::service_error)?;
+    let request = InstallRequest {
+        source: Source::Official,
+        entry,
+        optional,
+        visibility: visibility.into(),
+    };
+    plugins
+        .call(move |service| service.install(&request, &download))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_enabled(app: AppHandle, id: String, enabled: bool) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_enabled(&id, enabled))
+        .await
+}
+
+/// The granted optional permissions (required ones are always granted).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_permissions(
+    app: AppHandle,
+    id: String,
+    granted: Vec<String>,
+) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_permissions(&id, &granted))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_visibility(
+    app: AppHandle,
+    id: String,
+    visibility: PluginVisibilityChoice,
+) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_visibility(&id, visibility.into()))
+        .await
+}
+
+/// The plugin's "notifications" switch.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_notifications(app: AppHandle, id: String, on: bool) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_notifications(&id, on))
+        .await
+}
+
+/// Removes a plugin; its data is kept for 30 days unless `deleteData`.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_remove(app: AppHandle, id: String, delete_data: bool) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.remove(&id, delete_data))
+        .await
+}
+
+/// The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_export_data(app: AppHandle, id: String) -> ApiResult<String> {
+    plugins_of(&app)?
+        .call(move |service| service.export_data(&id))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_reset_data(app: AppHandle, id: String) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.reset_data(&id))
+        .await
+}
+
+/// Developer mode: loads an unpacked plugin folder and returns its id.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_dev_load(app: AppHandle, folder: String) -> ApiResult<String> {
+    plugins_of(&app)?
+        .call(move |service| service.load_dev(&PathBuf::from(folder)))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_dev_reload(app: AppHandle, id: String) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.reload_dev(&id))
+        .await
+}
+
+/// Unloads a developer plugin and deletes its data.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_dev_unload(app: AppHandle, id: String) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.unload_dev(&id))
+        .await
+}
+
+/// "Turn off all plugins" (FR-6.6); kept across restarts.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugins_set_all_off(app: AppHandle, all_off: bool) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_all_off(all_off))
+        .await
+}
+
+/// Which plugin's member badge is shown (`None`: no badge).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_badge(app: AppHandle, id: Option<String>) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_badge_plugin(id))
+        .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_diagnostics(app: AppHandle, id: String) -> ApiResult<PluginDiagnostics> {
+    plugins_of(&app)?
+        .call(move |service| {
+            let d = service.diagnostics(&id).unwrap_or_default();
+            let m = service.messaging_counters(&id);
+            let log = service
+                .log_lines(&id)
+                .into_iter()
+                .map(|(level, text)| PluginLogLine {
+                    level: match level {
+                        Level::Debug => PluginLogLevel::Debug,
+                        Level::Info => PluginLogLevel::Info,
+                        Level::Warn => PluginLogLevel::Warn,
+                        Level::Error => PluginLogLevel::Error,
+                    },
+                    text,
+                })
+                .collect();
+            Ok(PluginDiagnostics {
+                cpu_time_ms: d.cpu_time_ms as f64,
+                memory_bytes: d.memory_bytes as f64,
+                peak_memory_bytes: d.peak_memory_bytes as f64,
+                dropped_events: d.dropped_events as f64,
+                dropped_messages: d.dropped_messages as f64,
+                restarts: d.restarts as f64,
+                messages_sent: m.sent as f64,
+                messages_rate_limited: m.rate_limited as f64,
+                messages_expired: m.expired as f64,
+                messages_received: m.received as f64,
+                incoming_rate_dropped: m.incoming_rate_dropped as f64,
+                incoming_invalid: m.incoming_invalid as f64,
+                log,
+            })
+        })
+        .await
+}
+
+/// Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
+/// after the plugins started. Reload it after `plugins://changed` (stopped plugins lose
+/// their UI).
+#[tauri::command]
+#[specta::specta]
+pub fn plugins_ui_trees(app: AppHandle) -> ApiResult<Vec<PluginUi>> {
+    Ok(plugins_of(&app)?.trees().snapshot())
+}
+
+/// The resolved app language and theme for plugins (the UI knows the system values).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugins_set_appearance(
+    app: AppHandle,
+    language: String,
+    dark: bool,
+    reduced_motion: bool,
+) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| {
+            service.set_language(&language);
+            service.set_theme(if dark { Mode::Dark } else { Mode::Light }, reduced_motion);
+            Ok(())
+        })
+        .await
+}
+
+/// The user acted in a plugin's UI (`slot`) or typed one of its slash commands (`slot`
+/// `None`: `action` is the command, `value` the rest of the line as text). Actions must
+/// belong to an enabled component on screen. Server addresses become reachable for the
+/// plugin, password text goes into the secret, a picked file becomes a handle.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_ui_action(
+    app: AppHandle,
+    id: String,
+    slot: Option<PluginSlot>,
+    action: String,
+    value: PluginActionValue,
+) -> ApiResult<()> {
+    let plugins = plugins_of(&app)?;
+    let kind = match &slot {
+        Some(slot) => plugins
+            .trees()
+            .action_kind(&id, slot, &action)
+            .ok_or_else(|| ApiError::new(ErrorCode::InvalidInput, "no such action on screen"))?,
+        None => ActionKind::Plain,
+    };
+    let source = slot.map_or(ActionSource::Command, |s| ActionSource::Slot(s.into()));
+    let delivered = plugins
+        .call_api(move |service| {
+            let ctx = service.context();
+            let value = match (kind, value) {
+                (ActionKind::ServerAddress, PluginActionValue::Text { value }) => {
+                    ctx.http.allow(&id, &value).map_err(invalid)?;
+                    ActionValue::Text(value)
+                }
+                (ActionKind::Password { secret }, PluginActionValue::Text { value }) => {
+                    let secrets = ctx
+                        .grants
+                        .check(&id, "secrets")
+                        .ok()
+                        .and(ctx.secrets.as_ref())
+                        .ok_or_else(|| invalid("secrets are not available"))?;
+                    secrets.set(&id, &secret, &value).map_err(invalid)?;
+                    ActionValue::None
+                }
+                (ActionKind::File, PluginActionValue::File { path }) => {
+                    ctx.grants
+                        .check(&id, "net.http")
+                        .map_err(|_| invalid("not permitted"))?;
+                    let handle = ctx
+                        .files
+                        .register(&id, std::path::Path::new(&path))
+                        .map_err(invalid)?;
+                    ActionValue::File(handle)
+                }
+                (ActionKind::Password { .. } | ActionKind::File, _) => {
+                    return Err(invalid("wrong value for this action"));
+                }
+                (_, value) => action_value(value),
+            };
+            Ok(service.ui_input(
+                &id,
+                UiInput::Action {
+                    source,
+                    action,
+                    value,
+                },
+            ))
+        })
+        .await?;
+    delivered_or_error(delivered)
+}
+
+/// Other user inputs for a plugin's UI.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -> ApiResult<()> {
+    let input = match input {
+        PluginUiInput::ProfileCardOpened { session } => UiInput::ProfileCardOpened(session),
+        PluginUiInput::PanelVisibility { visibility } => {
+            UiInput::PanelVisibility(visibility.into())
+        }
+        PluginUiInput::UserMenuRequested { session } => UiInput::UserMenuRequested(session),
+        PluginUiInput::DialogClosed => UiInput::DialogClosed,
+    };
+    let delivered = plugins_of(&app)?
+        .call(move |service| Ok(service.ui_input(&id, input)))
+        .await?;
+    delivered_or_error(delivered)
+}
+
+/// The UI found a mention of the user in a message from `session` (plugins get `mentioned`,
+/// never the text).
+#[tauri::command]
+#[specta::specta]
+pub fn plugins_mentioned(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+) -> ApiResult<()> {
+    Ok(engine.plugin_mentioned(to_engine_server_id(server_id), session)?)
+}
+
+fn action_value(value: PluginActionValue) -> ActionValue {
+    match value {
+        PluginActionValue::None | PluginActionValue::File { .. } => ActionValue::None,
+        PluginActionValue::Boolean { value } => ActionValue::Boolean(value),
+        PluginActionValue::Number { value } => ActionValue::Number(value),
+        PluginActionValue::Text { value } => ActionValue::Text(value),
+        PluginActionValue::Reorder { from, to } => ActionValue::Reorder((from, to)),
+    }
+}
+
+fn delivered_or_error(delivered: bool) -> ApiResult<()> {
+    if delivered {
+        Ok(())
+    } else {
+        Err(ApiError::new(
+            ErrorCode::InvalidInput,
+            "the plugin is not running or may not get this",
+        ))
+    }
+}
+
+/// A user-facing refusal; never contains the typed text.
+fn invalid(error: impl std::fmt::Display) -> ApiError {
+    ApiError::new(ErrorCode::InvalidInput, error.to_string())
+}
+
+fn registry_client(developer_mode: bool) -> ApiResult<Client> {
+    Client::new(UrlPolicy::new(developer_mode)).map_err(registry_error)
+}
+
+fn registry_error(error: mumcord_plugins::registry::RegistryError) -> ApiError {
+    plugins::service_error(error.into())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn action_values_map_to_wit() {
+        assert!(matches!(
+            action_value(PluginActionValue::Reorder { from: 1, to: 3 }),
+            ActionValue::Reorder((1, 3))
+        ));
+        assert!(matches!(
+            action_value(PluginActionValue::File { path: "/x".into() }),
+            ActionValue::None
+        ));
+        let json = serde_json::json!({"type": "text", "value": "2d6"});
+        let value: PluginActionValue = serde_json::from_value(json).expect("parses");
+        assert!(matches!(action_value(value), ActionValue::Text(t) if t == "2d6"));
+    }
+
+    #[test]
+    fn plugin_slots_round_trip_through_json() {
+        let slot = PluginSlot::MemberBadge { session: 7 };
+        let json = serde_json::to_value(&slot).expect("serialises");
+        assert_eq!(
+            json,
+            serde_json::json!({"kind": "memberBadge", "session": 7})
+        );
+        assert_eq!(
+            serde_json::from_value::<PluginSlot>(json).expect("parses"),
+            slot
+        );
+    }
+}

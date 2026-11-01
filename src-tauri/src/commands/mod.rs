@@ -32,6 +32,7 @@ pub mod now_gaming;
 pub mod now_playing;
 pub mod p2p;
 pub mod people;
+pub mod plugins;
 pub mod pm_overview;
 pub mod pm_rules;
 pub mod positional;

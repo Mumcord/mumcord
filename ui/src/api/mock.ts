@@ -2763,8 +2763,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         senders: [],
       }),
 
-    pluginsList: () => Promise.resolve(gamePlugins.map((p) => ({ ...p }))),
-    pluginSetEnabled: (id, enabled) => {
+    gamePluginsList: () => Promise.resolve(gamePlugins.map((p) => ({ ...p }))),
+    gamePluginSetEnabled: (id, enabled) => {
       if (!gamePlugins.some((p) => p.id === id)) fail("notFound", "no such game plugin");
       gamePlugins = gamePlugins.map((p) => (p.id === id ? { ...p, enabled } : p));
       return Promise.resolve(gamePlugins.map((p) => ({ ...p })));
@@ -2931,6 +2931,29 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Mock links arrive only via `api.mock.emit("deepLinkOpened", …)`.
     deepLinkTakePending: () => Promise.resolve(null),
     pluginsTakePendingLink: () => Promise.resolve(null),
+
+    // plugins (spec 06): no plugin is installed in the mock; UI tasks extend this.
+    pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: [] }),
+    pluginsIndex: () => Promise.resolve({ freshness: "fresh", notice: null, plugins: [] }),
+    pluginInstall: () => notImplemented("pluginInstall"),
+    pluginSetEnabled: () => fail("notFound", "no such plugin"),
+    pluginSetPermissions: () => fail("notFound", "no such plugin"),
+    pluginSetVisibility: () => fail("notFound", "no such plugin"),
+    pluginSetNotifications: () => fail("notFound", "no such plugin"),
+    pluginRemove: () => fail("notFound", "no such plugin"),
+    pluginExportData: () => fail("notFound", "no such plugin"),
+    pluginResetData: () => fail("notFound", "no such plugin"),
+    pluginDevLoad: () => notImplemented("pluginDevLoad"),
+    pluginDevReload: () => fail("notFound", "no such plugin"),
+    pluginDevUnload: () => fail("notFound", "no such plugin"),
+    pluginsSetAllOff: () => Promise.resolve(null),
+    pluginSetBadge: () => Promise.resolve(null),
+    pluginDiagnostics: () => fail("notFound", "no such plugin"),
+    pluginsUiTrees: () => Promise.resolve([]),
+    pluginsSetAppearance: () => Promise.resolve(null),
+    pluginUiAction: () => fail("invalidInput", "no such action on screen"),
+    pluginUiEvent: () => fail("invalidInput", "the plugin is not running"),
+    pluginsMentioned: () => Promise.resolve(null),
 
     // packet inspector
     packetCaptureSet: (enabled) => {

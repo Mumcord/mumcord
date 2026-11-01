@@ -1087,6 +1087,9 @@ pub async fn settings_update(
     if stored.language != previous.language {
         crate::tray::language_changed(&app);
     }
+    if stored.developer_mode != previous.developer_mode {
+        crate::plugins::developer_mode_changed(&app, stored.developer_mode);
+    }
     Ok(Settings::from_store(&stored))
 }
 

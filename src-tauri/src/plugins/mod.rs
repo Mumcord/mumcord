@@ -1,0 +1,493 @@
+//! Glue between the engine, the plugin service (`mumcord_plugins`) and the UI (spec 06, §8).
+//!
+//! The service lives behind one mutex and is only called on blocking threads: loading or
+//! starting a plugin can take a while and must never stall the async runtime. Engine and
+//! service events are pumped by background tasks; commands are thin wrappers.
+
+mod feed;
+pub mod ui;
+
+use std::path::PathBuf;
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
+
+use mumcord_engine::Engine;
+use mumcord_plugins::api::secrets::PluginSecrets;
+use mumcord_plugins::registry::{Client, Index, UrlPolicy};
+use mumcord_plugins::service::{
+    InstallStage, PluginService, Schedule, ServiceConfig, ServiceError, ServiceEvent, Status,
+    run_check,
+};
+use serde::{Deserialize, Serialize};
+use specta::Type;
+use tauri::{AppHandle, Manager};
+use tauri_specta::Event;
+use tokio::sync::mpsc::UnboundedReceiver;
+
+use crate::commands::types::{ApiError, ApiResult, ErrorCode};
+use ui::{PluginUi, Trees};
+
+/// The command-line flag that starts Mumcord without any plugin (FR-6.6).
+const NO_PLUGINS_FLAG: &str = "--no-plugins";
+/// How often updates and revocations are checked for (B17b decides what is due).
+const REGISTRY_CHECK_INTERVAL: std::time::Duration = std::time::Duration::from_secs(15 * 60);
+
+/// The app's plugin state (managed as `Arc<Plugins>`).
+pub struct Plugins {
+    service: Arc<Mutex<PluginService>>,
+    trees: Mutex<Trees>,
+    /// The last official index, for installs from the store.
+    index: Mutex<Option<Index>>,
+    /// Registry caches, one folder per source (`official`, `repo-<id>`).
+    registry_cache: PathBuf,
+}
+
+/// `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://changed")]
+pub struct PluginsChanged {}
+
+/// One step of an install.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "stage", rename_all = "camelCase")]
+pub enum PluginInstallStage {
+    Downloading,
+    Verifying,
+    Unpacking,
+    Starting,
+    /// Installed: the UI shows "<name> installed".
+    Done,
+    /// Stopped; `reason` is a user-facing text.
+    Failed {
+        reason: String,
+    },
+}
+
+impl From<InstallStage> for PluginInstallStage {
+    fn from(stage: InstallStage) -> Self {
+        match stage {
+            InstallStage::Downloading => Self::Downloading,
+            InstallStage::Verifying => Self::Verifying,
+            InstallStage::Unpacking => Self::Unpacking,
+            InstallStage::Starting => Self::Starting,
+            InstallStage::Done => Self::Done,
+            InstallStage::Failed { reason } => Self::Failed { reason },
+        }
+    }
+}
+
+/// `plugins://install-progress`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://install-progress")]
+pub struct PluginInstallProgress {
+    pub id: String,
+    pub progress: PluginInstallStage,
+}
+
+impl Plugins {
+    /// Runs `f` on the service on a blocking thread.
+    pub async fn call<T, F>(self: &Arc<Self>, f: F) -> ApiResult<T>
+    where
+        T: Send + 'static,
+        F: FnOnce(&mut PluginService) -> Result<T, ServiceError> + Send + 'static,
+    {
+        let service = Arc::clone(&self.service);
+        tauri::async_runtime::spawn_blocking(move || f(&mut lock(&service)))
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
+            .map_err(service_error)
+    }
+
+    /// Like [`Self::call`] for steps that fail with app errors.
+    pub async fn call_api<T, F>(self: &Arc<Self>, f: F) -> ApiResult<T>
+    where
+        T: Send + 'static,
+        F: FnOnce(&mut PluginService) -> ApiResult<T> + Send + 'static,
+    {
+        let service = Arc::clone(&self.service);
+        tauri::async_runtime::spawn_blocking(move || f(&mut lock(&service)))
+            .await
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
+    }
+
+    pub fn trees(&self) -> MutexGuard<'_, Trees> {
+        lock(&self.trees)
+    }
+
+    pub fn index(&self) -> MutexGuard<'_, Option<Index>> {
+        lock(&self.index)
+    }
+
+    pub fn registry_cache(&self) -> &std::path::Path {
+        &self.registry_cache
+    }
+}
+
+fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
+    mutex.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+/// The plugin state, or an error when the service could not start.
+pub fn state(app: &AppHandle) -> ApiResult<Arc<Plugins>> {
+    app.try_state::<Arc<Plugins>>()
+        .map(|s| Arc::clone(&s))
+        .ok_or_else(|| ApiError::new(ErrorCode::Internal, "plugins are not available"))
+}
+
+/// Maps service errors; their texts are the user-facing ones of spec §5.7.
+pub fn service_error(error: ServiceError) -> ApiError {
+    let code = match &error {
+        ServiceError::NotInstalled(_) => ErrorCode::NotFound,
+        ServiceError::Io(_) => ErrorCode::Io,
+        ServiceError::Store(_)
+        | ServiceError::Host(_)
+        | ServiceError::Compile(_)
+        | ServiceError::Load(_)
+        | ServiceError::Data(_) => ErrorCode::Internal,
+        ServiceError::Registry(_) => ErrorCode::ServerUnreachable,
+        _ => ErrorCode::InvalidInput,
+    };
+    ApiError::new(code, error.to_string())
+}
+
+/// Builds the plugin service and starts its plugins in the background. Without it the app runs
+/// normally; plugin commands then fail.
+pub fn start(app: &AppHandle, engine: &Engine) {
+    if let Err(e) = try_start(app, engine) {
+        tracing::error!(error = %e, "starting the plugin service failed");
+    }
+}
+
+fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error::Error>> {
+    let data_dir = crate::portable::data_dir(app)?;
+    let cache_dir = crate::portable::cache_dir(app)?;
+    let no_plugins = std::env::args().any(|a| a == NO_PLUGINS_FLAG);
+    let config = ServiceConfig {
+        // FR-6.15. The game plugin host scans the same folder for libraries only.
+        plugins_dir: data_dir.join("plugins"),
+        cache_dir: Some(cache_dir.join("plugin-modules")),
+        app_version: semver::Version::parse(env!("CARGO_PKG_VERSION"))?,
+        no_plugins,
+    };
+    let secrets = Some(Arc::new(PluginSecrets::os()));
+    let (mut service, host_events, events) =
+        PluginService::new(config, engine.store_handle(), secrets)?;
+    test_hooks(&mut service);
+    tracing::info!(no_plugins, "plugin service ready");
+    let plugins = Arc::new(Plugins {
+        service: Arc::new(Mutex::new(service)),
+        trees: Mutex::default(),
+        index: Mutex::default(),
+        registry_cache: cache_dir.join("plugin-registry"),
+    });
+    app.manage(Arc::clone(&plugins));
+
+    let starting = Arc::clone(&plugins);
+    tauri::async_runtime::spawn(async move {
+        if let Err(e) = starting.call(PluginService::start).await {
+            tracing::error!(error = %e, "starting the plugins failed");
+        }
+    });
+    pump_host_events(&plugins, host_events);
+    pump_service_events(app, &plugins, engine, events);
+    feed::pump_engine_events(&plugins, engine);
+    feed::pump_announces(&plugins, engine);
+    pump_registry_checks(&plugins, engine);
+    focus(app, &plugins, engine.voice_server());
+    Ok(())
+}
+
+/// Debug builds only: shorter restart back-off for the crash tests (AC-6.8).
+#[cfg(debug_assertions)]
+fn test_hooks(service: &mut PluginService) {
+    if std::env::var_os("MUMCORD_PLUGIN_TEST_FAST_BACKOFF").is_some() {
+        let step = std::time::Duration::from_millis(500);
+        service.set_backoff([step, step * 2, step * 4]);
+    }
+}
+
+#[cfg(not(debug_assertions))]
+fn test_hooks(_service: &mut PluginService) {}
+
+/// Updates and revocations (B17b): at start and every 15 minutes; the service decides what
+/// is due. Runs on its own thread because the check's future is not `Send`.
+fn pump_registry_checks(plugins: &Arc<Plugins>, engine: &Engine) {
+    let plugins = Arc::clone(plugins);
+    let engine = engine.clone();
+    let runtime = tauri::async_runtime::handle().inner().clone();
+    let spawned = std::thread::Builder::new()
+        .name("plugin-updates".into())
+        .spawn(move || {
+            let mut schedule = Schedule::new();
+            loop {
+                let developer_mode = engine.settings().map(|s| s.developer_mode).unwrap_or(false);
+                match Client::new(UrlPolicy::new(developer_mode)) {
+                    Ok(client) => {
+                        let check = run_check(
+                            &client,
+                            &plugins.service,
+                            &mut schedule,
+                            &plugins.registry_cache,
+                        );
+                        if let Err(e) = runtime.block_on(check) {
+                            tracing::warn!(error = %e, "the plugin update check failed");
+                        }
+                    }
+                    Err(e) => tracing::warn!(error = %e, "no client for the plugin update check"),
+                }
+                std::thread::sleep(REGISTRY_CHECK_INTERVAL);
+            }
+        });
+    if let Err(e) = spawned {
+        tracing::error!(error = %e, "starting the plugin update checks failed");
+    }
+}
+
+/// Plugin starts and crashes go back into the service.
+fn pump_host_events(
+    plugins: &Arc<Plugins>,
+    mut host_events: UnboundedReceiver<mumcord_plugins::HostEvent>,
+) {
+    let plugins = Arc::clone(plugins);
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = host_events.recv().await {
+            if let Err(e) = plugins
+                .call(move |service| service.handle_host_event(event))
+                .await
+            {
+                tracing::warn!(error = %e, "handling a plugin host event failed");
+            }
+        }
+    });
+}
+
+/// Service events to the UI.
+fn pump_service_events(
+    app: &AppHandle,
+    plugins: &Arc<Plugins>,
+    engine: &Engine,
+    mut events: UnboundedReceiver<ServiceEvent>,
+) {
+    let app = app.clone();
+    let plugins = Arc::clone(plugins);
+    let engine = engine.clone();
+    tauri::async_runtime::spawn(async move {
+        while let Some(event) = events.recv().await {
+            if let Err(e) = on_service_event(&app, &plugins, &engine, event).await {
+                tracing::warn!(error = %e, "forwarding a plugin event failed");
+            }
+        }
+    });
+}
+
+async fn on_service_event(
+    app: &AppHandle,
+    plugins: &Arc<Plugins>,
+    engine: &Engine,
+    event: ServiceEvent,
+) -> Result<(), Box<dyn std::error::Error>> {
+    match event {
+        ServiceEvent::Changed => {
+            let running = plugins
+                .call(|service| {
+                    Ok(service
+                        .list()?
+                        .into_iter()
+                        .filter(|p| p.status == Status::Running)
+                        .map(|p| p.id)
+                        .collect::<Vec<_>>())
+                })
+                .await?;
+            plugins.trees().retain(|id| running.iter().any(|r| r == id));
+            PluginsChanged {}.emit(app)?;
+        }
+        ServiceEvent::InstallProgress { id, stage } => PluginInstallProgress {
+            id,
+            progress: stage.into(),
+        }
+        .emit(app)?,
+        ServiceEvent::Ui { plugin, update } => {
+            let change = ui::PluginUiChange::from(update);
+            plugins.trees().apply(&plugin, &change);
+            PluginUi { plugin, change }.emit(app)?;
+        }
+        ServiceEvent::AutoOff { id } => PluginNotification {
+            plugin: id,
+            notice: PluginNotice::AutoOff,
+        }
+        .emit(app)?,
+        ServiceEvent::UpdateAvailable { id, name, version } => PluginNotification {
+            plugin: id,
+            notice: PluginNotice::UpdateAvailable { name, version },
+        }
+        .emit(app)?,
+        ServiceEvent::Notify { id, title, body } => PluginNotification {
+            plugin: id,
+            notice: PluginNotice::Message { title, body },
+        }
+        .emit(app)?,
+        ServiceEvent::PeerSend {
+            server,
+            plugin,
+            outgoing,
+        } => feed::send(plugins, engine, server, plugin, outgoing),
+        ServiceEvent::ChatPost { plugin, line } => {
+            let Some(server) = engine.voice_server() else {
+                tracing::debug!(plugin, "plugin chat line dropped: not connected");
+                return Ok(());
+            };
+            match feed::post_line(engine, server, &line).await {
+                Ok(message) => crate::commands::chat::MessageReceived {
+                    server_id: crate::commands::types::to_api_server_id(server),
+                    message: message.into(),
+                }
+                .emit(app)?,
+                Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
+            }
+        }
+        ServiceEvent::Supersede {
+            plugin,
+            card,
+            message,
+        } => PluginSupersede {
+            plugin,
+            card,
+            message_id: message.to_string(),
+        }
+        .emit(app)?,
+    }
+    Ok(())
+}
+
+/// What a plugin notification says.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum PluginNotice {
+    /// `notify.send`; title and body are untrusted plain text.
+    Message { title: String, body: String },
+    /// "Turned off after repeated crashes".
+    AutoOff,
+    /// A new version waits in the Updates tab (no OS notification).
+    UpdateAvailable { name: String, version: String },
+}
+
+/// `plugins://notification`: an entry for the notification centre (category Plugins).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://notification")]
+pub struct PluginNotification {
+    pub plugin: String,
+    pub notice: PluginNotice,
+}
+
+/// `plugin://supersede`: hide chat message `messageId` and show the plugin's chat card `card`
+/// in its place (FR-6.45).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugin://supersede")]
+pub struct PluginSupersede {
+    pub plugin: String,
+    pub card: String,
+    pub message_id: String,
+}
+
+/// Engine events the plugins care about besides their own stream: the focused server and
+/// incoming chat lines (supersede check).
+pub fn on_engine_event(app: &AppHandle, event: &mumcord_engine::EngineEvent) {
+    let Ok(plugins) = state(app) else {
+        return;
+    };
+    match event {
+        mumcord_engine::EngineEvent::VoiceServerChanged(server) => {
+            focus(app, &plugins, *server);
+        }
+        mumcord_engine::EngineEvent::MessageReceived(message) => {
+            let Some((id, sender, line)) = feed::incoming_line(message) else {
+                return;
+            };
+            let plugins = Arc::clone(&plugins);
+            tauri::async_runtime::spawn(async move {
+                let result = plugins
+                    .call(move |service| Ok(service.chat_text(id, sender, &line)))
+                    .await;
+                // A match arrives as a `Supersede` service event; nothing to do here.
+                if let Err(e) = result {
+                    tracing::warn!(error = %e, "the plugin supersede check failed");
+                }
+            });
+        }
+        _ => {}
+    }
+}
+
+/// Plugins see the server the user is on; identity-scoped storage follows its identity.
+fn focus(app: &AppHandle, plugins: &Arc<Plugins>, server: Option<mumcord_engine::ServerId>) {
+    let app = app.clone();
+    let plugins = Arc::clone(plugins);
+    tauri::async_runtime::spawn(async move {
+        let identity = identity_of(&app, server).await;
+        let result = plugins
+            .call(move |service| {
+                service.set_focused_server(server);
+                service.set_identity(identity);
+                Ok(())
+            })
+            .await;
+        if let Err(e) = result {
+            tracing::warn!(error = %e, "telling plugins about the server failed");
+        }
+    });
+}
+
+/// The identity used on `server`, else the default one.
+async fn identity_of(
+    app: &AppHandle,
+    server: Option<mumcord_engine::ServerId>,
+) -> Option<mumcord_engine::IdentityId> {
+    let engine = app.try_state::<Engine>()?;
+    let identities = match engine.identity_list().await {
+        Ok(identities) => identities,
+        Err(e) => {
+            tracing::warn!(error = %e, "reading the identities for plugins failed");
+            return None;
+        }
+    };
+    server
+        .and_then(|s| identities.iter().find(|i| i.server_ids.contains(&s)))
+        .or_else(|| identities.iter().find(|i| i.is_default))
+        .map(|i| i.id)
+}
+
+/// Do Not Disturb holds back plugin notifications.
+pub fn set_quiet(app: &AppHandle, quiet: bool) {
+    let Ok(plugins) = state(app) else {
+        return;
+    };
+    tauri::async_runtime::spawn(async move {
+        let result = plugins
+            .call(move |service| {
+                service.set_quiet(quiet);
+                Ok(())
+            })
+            .await;
+        if let Err(e) = result {
+            tracing::warn!(error = %e, "passing Do Not Disturb to plugins failed");
+        }
+    });
+}
+
+/// Developer mode turned on or off: developer plugins are unloaded when it goes off.
+pub fn developer_mode_changed(app: &AppHandle, on: bool) {
+    let Ok(plugins) = state(app) else {
+        return;
+    };
+    tauri::async_runtime::spawn(async move {
+        if let Err(e) = plugins
+            .call(move |service| service.developer_mode_changed(on))
+            .await
+        {
+            tracing::warn!(error = %e, "applying Developer mode to plugins failed");
+        }
+    });
+}
