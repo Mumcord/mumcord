@@ -48,6 +48,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
+      # The image, cargo target and docker layers together fill the runner disk; drop
+      # preinstalled toolchains this job never uses.
+      - name: Free runner disk space
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+
       - uses: actions/checkout@v7
 
       # The version the app shows (RELEASING.md); the manifests keep the last release's version.
@@ -110,6 +118,7 @@ jobs:
         # bash enables pipefail, so a failing docker save (e.g. disk full) fails the step.
         shell: bash
         run: |
+          df -h /
           docker save mumcord-e2e | zstd -T0 -3 -q -o e2e-image.tar.zst
           tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumbot netsim examples/libtest_plugin.so \
             examples/headless_check libmumcord_overlay_layer.so \
