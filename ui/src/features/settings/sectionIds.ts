@@ -4,6 +4,7 @@ export const SECTION_IDS = [
   "servers",
   "audio",
   "voice",
+  "hotkeys",
   "chatHistory",
   "appearance",
   "accessibility",

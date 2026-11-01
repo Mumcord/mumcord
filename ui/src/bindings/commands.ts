@@ -433,6 +433,13 @@ export const commands = {
 	whisperStart: (targetId: string) => typedError<WhisperState, ApiError>(__TAURI_INVOKE("whisper_start", { targetId })),
 	/**  Ends the own whisper or shout; talking goes back to the own channel. */
 	whisperStop: () => typedError<null, ApiError>(__TAURI_INVOKE("whisper_stop")),
+	/**
+	 *  Checks a captured key for `slot`: returns it in the stored form and what already uses it.
+	 *  `invalidInput` for keys that cannot be a global shortcut (modifiers only, mouse buttons).
+	 */
+	hotkeyCheck: (key: string, slot: HotkeySlot) => typedError<HotkeyCheck, ApiError>(__TAURI_INVOKE("hotkey_check", { key, slot })),
+	/**  How hotkeys work in this session and which of them could not be registered. */
+	hotkeysStatus: () => typedError<HotkeysStatus, ApiError>(__TAURI_INVOKE("hotkeys_status")),
 	pttAvailability: () => typedError<PttAvailability, ApiError>(__TAURI_INVOKE("ptt_availability")),
 	/**
 	 *  Validates a key the UI captured (`KeyboardEvent.code` plus modifiers, e.g. "Ctrl+KeyA",
@@ -717,6 +724,7 @@ export const events = {
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
 	historySyncStatus: makeEvent<HistorySyncStatus, HistorySyncStatus>("history-sync-status"),
 	historySynced: makeEvent<HistorySynced, HistorySynced>("history-synced"),
+	hotkeyPressed: makeEvent<HotkeyPressed, HotkeyPressed>("hotkey-pressed"),
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	incomingWhisperChanged: makeEvent<IncomingWhisperChanged, IncomingWhisperChanged>("incoming-whisper-changed"),
 	inspectorViewChanged: makeEvent<InspectorViewChanged, InspectorViewChanged>("inspector-view-changed"),
@@ -1395,6 +1403,65 @@ export type HistorySynced = {
 	messages: ChatMessage[],
 };
 
+/**  A global hotkey: the key as returned by `hotkey_check` and its action. */
+export type Hotkey = {
+	key: string,
+	action: HotkeyAction,
+};
+
+/**  What a global hotkey does. */
+export type HotkeyAction = { kind: "toggleMute" } | { kind: "toggleDeafen" } | { kind: "toggleDnd" } | 
+/**  Leaves voice, or joins voice again on the shown server. */
+{ kind: "joinLeaveVoice" } | 
+/**  Moves voice to the next connected server. */
+{ kind: "switchVoiceServer" } | 
+/**  Moves voice to the channel at `path` (names below the root) on `serverId`. */
+{ kind: "switchChannel"; serverId: number; path: string[] } | { kind: "previousChannel" } | { kind: "toggleMemberColumn" } | { kind: "openQuickSettings" } | { kind: "openMumcord" };
+
+export type HotkeyCheck = {
+	/**  The key in the stored form, e.g. `"Ctrl+Shift+D"`. */
+	key: string,
+	conflict: HotkeyConflict | null,
+};
+
+/**  What already uses a key. */
+export type HotkeyConflict = 
+/**  The hotkey at `index` in `hotkeys`. */
+{ kind: "hotkey"; index: number } | { kind: "pushToTalk" } | 
+/**  The hold-to-talk key of a whisper target (#67), named by the user. */
+{ kind: "whisper"; targetId: string; name: string } | 
+/**  One of Mumcord's own shortcuts; cannot be cleared. */
+{ kind: "inApp"; shortcut: InAppShortcut };
+
+/**  A global hotkey was pressed; the UI runs its action. "Open Mumcord" never arrives here. */
+export type HotkeyPressed = {
+	action: HotkeyAction,
+};
+
+/**
+ *  The key being set: push-to-talk, an existing hotkey (index into `hotkeys`), a whisper
+ *  target's key (#67), or a new hotkey.
+ */
+export type HotkeySlot = { kind: "pushToTalk" } | { kind: "hotkey"; index: number } | { kind: "whisper"; targetId: string } | { kind: "new" };
+
+/**  How hotkeys reach Mumcord in this session. */
+export type HotkeysMode = 
+/**  X11, Windows, macOS, Wayland compatibility mode. */
+"global" | 
+/**  Native Wayland: the desktop asks once to allow the shortcuts. */
+"portal" | 
+/**  Native Wayland without the global-shortcuts portal: only while Mumcord has the focus. */
+"unavailable";
+
+export type HotkeysStatus = {
+	mode: HotkeysMode,
+	/**
+	 *  Indices into `hotkeys` whose key could not be registered (taken by another app, or the
+	 *  desktop assigned none).
+	 */
+	failed: number[],
+};
+
 /**  Public view of an identity; the certificate and its key never leave the engine. */
 export type Identity = {
 	id: number,
@@ -1410,6 +1477,17 @@ export type Identity = {
 	/**  Servers that use this identity directly (not through the default). */
 	serverIds: number[],
 };
+
+/**  Mumcord's own window shortcuts, which a global hotkey would swallow. */
+export type InAppShortcut = 
+/**  Ctrl+Shift+M: show or hide the member column. */
+"memberColumn" | 
+/**  Ctrl+Shift+N: the notification centre. */
+"notificationCentre" | 
+/**  Ctrl+K, Ctrl+F: search. */
+"search" | 
+/**  Ctrl+W: close a separate window. */
+"closeWindow";
 
 /**  The in-game overlay settings changed. */
 export type InGameOverlayChanged = {
@@ -2430,6 +2508,13 @@ export type Settings = {
 	 *  push-to-talk path (default off, FR-1.48). Takes effect after `app_restart`.
 	 */
 	pttCompatibilityMode: boolean,
+	/**
+	 *  Global hotkeys also work while Mumcord is in the background (issue #64); off, only
+	 *  while its window has the focus.
+	 */
+	globalHotkeys: boolean,
+	/**  Global hotkeys; none by default (Q1.7). */
+	hotkeys: Hotkey[],
 	/**  Device ids from `audio_devices`; `null` uses the OS default. */
 	inputDevice: string | null,
 	outputDevice: string | null,
@@ -2921,8 +3006,8 @@ export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "n
 /**  Why whisper keys cannot work in this session. */
 export type WhisperKeysUnavailable = 
 /**
- *  Native Wayland: global keys go through the desktop portal, which whisper keys do not use
- *  yet (#64); the X11 compatibility mode offers them.
+ *  Native Wayland without the global-shortcuts portal; the X11 compatibility mode offers
+ *  the keys.
  */
 "waylandPortal";
 

@@ -18,7 +18,8 @@
     "servers": "Servidores",
     "privacy": "Privacidad",
     "updates": "Actualizaciones",
-    "packetInspector": "Inspector de paquetes"
+    "packetInspector": "Inspector de paquetes",
+    "hotkeys": "Atajos"
   },
   "search": {
     "label": "Buscar ajustes",
@@ -252,7 +253,7 @@
       "keyRemove": "Quitar tecla",
       "keyTaken": "No se puede usar esta tecla: no es una sola tecla con modificadores opcionales, o ya es la de pulsar para hablar o la de otro destino.",
       "keyFailed": "Esta tecla la tiene otra aplicación, así que ahora no funciona.",
-      "keysWayland": "Las teclas de susurro no están disponibles en esta sesión de Wayland: el portal de atajos globales del escritorio solo mantiene la tecla de pulsar para hablar. Activa el modo de compatibilidad para usarlas o empieza a susurrar desde el panel de usuario.",
+      "keysWayland": "Las teclas de susurro no están disponibles en esta sesión de Wayland: tu escritorio no ofrece atajos globales. Activa el modo de compatibilidad para usarlas o empieza a susurrar desde el panel de usuario.",
       "save": "Guardar",
       "delete": "Eliminar destino",
       "savedStatus": "Guardado.",
@@ -863,5 +864,57 @@
     "whatsNew": "Novedades",
     "whatsNewHint": "Consulta los cambios de cada versión.",
     "openChangelog": "Abrir el registro de cambios"
+  },
+  "hotkeys": {
+    "global": "Atajos globales",
+    "background": "Funcionar con Mumcord en segundo plano",
+    "backgroundHint": "Los atajos funcionan en todas partes, también en juegos. No hay ninguno por defecto.",
+    "foregroundOnly": "Los atajos solo funcionan mientras la ventana de Mumcord está en primer plano.",
+    "portal": "Tu escritorio (Wayland) te pedirá una vez que apruebes los atajos globales.",
+    "noPortal": "Tu escritorio no ofrece atajos globales, así que solo funcionan mientras la ventana de Mumcord está en primer plano.",
+    "compatLink": "Usar el modo de compatibilidad (X11)",
+    "compatSuffix": "si eso no está disponible.",
+    "actions": "Acciones",
+    "action": {
+      "pushToTalk": "Pulsar para hablar",
+      "toggleMute": "Silenciar / activar micrófono",
+      "toggleDeafen": "Ensordecer / dejar de ensordecer",
+      "toggleDnd": "Alternar No molestar",
+      "joinLeaveVoice": "Unirse a / salir de la voz",
+      "switchVoiceServer": "Cambiar de servidor de voz",
+      "switchChannel": "Cambiar al canal…",
+      "previousChannel": "Volver al canal anterior",
+      "toggleMemberColumn": "Mostrar / ocultar columna de miembros",
+      "openQuickSettings": "Abrir ajustes rápidos",
+      "openMumcord": "Abrir Mumcord"
+    },
+    "pushToTalkHint": "Transmite mientras mantienes las teclas",
+    "pushToTalkOff": "Se usa cuando el modo de habla en Voz es pulsar para hablar",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Canal raíz",
+    "notSet": "Sin asignar",
+    "recording": "Pulsa una combinación de teclas…",
+    "recordingHint": "Pulsa <esc>Esc</esc> para cancelar, <back>Backspace</back> para borrar. La grabación se detiene a los 5 segundos.",
+    "clear": "Borrar",
+    "clearLabel": "Borrar {{action}}",
+    "cancel": "Cancelar",
+    "conflictTitle": "Conflicto.",
+    "conflict": "Esta combinación ya la usa «{{other}}». Elige otra, o asígnala aquí y borra la otra.",
+    "inApp": "Esta combinación es el atajo propio de Mumcord para {{shortcut}}. Elige otra.",
+    "inAppShortcut": {
+      "memberColumn": "mostrar y ocultar la columna de miembros",
+      "notificationCentre": "el centro de notificaciones",
+      "search": "buscar",
+      "closeWindow": "cerrar una ventana"
+    },
+    "assignHere": "Asignar aquí",
+    "rejected": "Esta tecla no puede ser un atajo global. Pulsa una tecla distinta de Ctrl, Alt, Shift o Super, con o sin ellas.",
+    "failed": "No se pudo registrar este atajo. Puede que otra aplicación o tu escritorio ya lo usen.",
+    "add": "Añadir atajo «cambiar al canal»…",
+    "addChannel": "Canal",
+    "addNone": "Conéctate a un servidor para elegir uno de sus canales.",
+    "addConfirm": "Añadir",
+    "reset": "Restablecer todos los atajos",
+    "resetHint": "Quita todos los atajos excepto pulsar para hablar; por defecto no hay ninguno."
   }
 }

@@ -12,6 +12,7 @@ mod display;
 mod dnd;
 #[cfg(target_os = "linux")]
 mod gst_fallback;
+mod hotkeys;
 mod ingame_overlay;
 mod kde;
 #[cfg(target_os = "linux")]
@@ -188,6 +189,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::whisper::whisper_key_check,
             commands::whisper::whisper_start,
             commands::whisper::whisper_stop,
+            commands::hotkeys::hotkey_check,
+            commands::hotkeys::hotkeys_status,
             commands::ptt::ptt_availability,
             commands::ptt::ptt_capture_key,
             commands::ptt::ptt_capture_cancel,
@@ -329,6 +332,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
             commands::tray::TraySettingsRequested,
+            commands::hotkeys::HotkeyPressed,
         ])
 }
 
@@ -486,6 +490,7 @@ fn start_engine(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     settings::configure_ptt(app, settings::active_ptt_key(&stored));
     commands::whisper::install_key_handler(app);
     commands::whisper::configure_keys(app, &stored);
+    commands::hotkeys::configure(app, &stored);
 
     let screen_frames = std::sync::Arc::new(screen_frames::ScreenFrames::default());
     engine.set_screen_frame_sink(screen_frames.clone());

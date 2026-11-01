@@ -18,7 +18,8 @@
     "servers": "Serveri",
     "privacy": "Privātums",
     "updates": "Atjauninājumi",
-    "packetInspector": "Pakešu inspektors"
+    "packetInspector": "Pakešu inspektors",
+    "hotkeys": "Īsinājumtaustiņi"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -252,7 +253,7 @@
       "keyRemove": "Noņemt taustiņu",
       "keyTaken": "Šo taustiņu nevar izmantot: tas nav viens taustiņš ar neobligātiem modifikatoriem vai arī tas jau ir push-to-talk vai cita mērķa taustiņš.",
       "keyFailed": "Šo taustiņu tur cita lietotne, tāpēc tas pašlaik nedarbojas.",
-      "keysWayland": "Čukstu taustiņi šajā Wayland sesijā nav pieejami: darbvirsmas globālo īsinājumtaustiņu portāls tur tikai push-to-talk taustiņu. Ieslēdziet saderības režīmu, lai tos izmantotu, vai sāciet čukstēt no lietotāja paneļa.",
+      "keysWayland": "Čukstu taustiņi šajā Wayland sesijā nav pieejami: tava darbvirsma nepiedāvā globālos īsceļus. Ieslēdziet saderības režīmu, lai tos izmantotu, vai sāciet čukstēt no lietotāja paneļa.",
       "save": "Saglabāt",
       "delete": "Dzēst mērķi",
       "savedStatus": "Saglabāts.",
@@ -863,5 +864,57 @@
     "whatsNew": "Kas jauns",
     "whatsNewHint": "Skati izmaiņas katrā versijā.",
     "openChangelog": "Atvērt izmaiņu žurnālu"
+  },
+  "hotkeys": {
+    "global": "Globālie īsinājumtaustiņi",
+    "background": "Darboties, kamēr Mumcord ir fonā",
+    "backgroundHint": "Īsinājumtaustiņi darbojas visur, arī spēlēs. Pēc noklusējuma nekas nav iestatīts.",
+    "foregroundOnly": "Īsinājumtaustiņi darbojas tikai tad, kad Mumcord logs ir priekšplānā.",
+    "portal": "Tava darbvirsma (Wayland) vienreiz lūgs apstiprināt globālos īsinājumtaustiņus.",
+    "noPortal": "Tava darbvirsma nepiedāvā globālos īsinājumtaustiņus, tāpēc tie darbojas tikai tad, kad Mumcord logs ir priekšplānā.",
+    "compatLink": "Izmantot saderības režīmu (X11),",
+    "compatSuffix": "ja tas nav pieejams.",
+    "actions": "Darbības",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Izslēgt / ieslēgt mikrofonu",
+      "toggleDeafen": "Izslēgt / ieslēgt skaņu",
+      "toggleDnd": "Pārslēgt Netraucēt",
+      "joinLeaveVoice": "Pievienoties balsij / pamest balsi",
+      "switchVoiceServer": "Mainīt balss serveri",
+      "switchChannel": "Pāriet uz kanālu…",
+      "previousChannel": "Atpakaļ uz iepriekšējo kanālu",
+      "toggleMemberColumn": "Rādīt / slēpt dalībnieku kolonnu",
+      "openQuickSettings": "Atvērt ātros iestatījumus",
+      "openMumcord": "Atvērt Mumcord"
+    },
+    "pushToTalkHint": "Sūta, kamēr turi taustiņus",
+    "pushToTalkOff": "Tiek izmantots, kad runas režīms sadaļā Balss ir push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Saknes kanāls",
+    "notSet": "Nav iestatīts",
+    "recording": "Nospied taustiņu kombināciju…",
+    "recordingHint": "Nospied <esc>Esc</esc>, lai atceltu, <back>Backspace</back>, lai notīrītu. Ierakstīšana apstājas pēc 5 sekundēm.",
+    "clear": "Notīrīt",
+    "clearLabel": "Notīrīt: {{action}}",
+    "cancel": "Atcelt",
+    "conflictTitle": "Konflikts.",
+    "conflict": "Šo kombināciju jau izmanto „{{other}}“. Izvēlies citu vai piešķir to šeit un notīri otru.",
+    "inApp": "Šī kombinācija ir paša Mumcord īsinājumtaustiņš: {{shortcut}}. Izvēlies citu.",
+    "inAppShortcut": {
+      "memberColumn": "dalībnieku kolonnas rādīšana un slēpšana",
+      "notificationCentre": "paziņojumu centrs",
+      "search": "meklēšana",
+      "closeWindow": "loga aizvēršana"
+    },
+    "assignHere": "Piešķirt šeit",
+    "rejected": "Šis taustiņš nevar būt globāls īsinājumtaustiņš. Nospied citu taustiņu, nevis Ctrl, Alt, Shift vai Super, ar tiem vai bez tiem.",
+    "failed": "Šo īsinājumtaustiņu neizdevās reģistrēt. Iespējams, to jau izmanto cita lietotne vai tava darbvirsma.",
+    "add": "Pievienot īsinājumtaustiņu „pāriet uz kanālu“…",
+    "addChannel": "Kanāls",
+    "addNone": "Pieslēdzies serverim, lai izvēlētos kādu no tā kanāliem.",
+    "addConfirm": "Pievienot",
+    "reset": "Atiestatīt visus īsinājumtaustiņus",
+    "resetHint": "Noņem visus īsinājumtaustiņus, izņemot push-to-talk; pēc noklusējuma nekas nav iestatīts."
   }
 }

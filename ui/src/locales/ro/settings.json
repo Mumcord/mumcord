@@ -18,7 +18,8 @@
     "servers": "Servere",
     "privacy": "Confidențialitate",
     "updates": "Actualizări",
-    "packetInspector": "Inspector de pachete"
+    "packetInspector": "Inspector de pachete",
+    "hotkeys": "Comenzi rapide"
   },
   "search": {
     "label": "Caută în setări",
@@ -252,7 +253,7 @@
       "keyRemove": "Elimină tasta",
       "keyTaken": "Această tastă nu poate fi folosită: nu este o singură tastă cu modificatori opționali sau este deja push-to-talk ori tasta altei ținte.",
       "keyFailed": "Această tastă este ținută de altă aplicație, deci acum nu funcționează.",
-      "keysWayland": "Tastele pentru șoapte nu sunt disponibile în această sesiune Wayland: portalul de scurtături globale al desktopului ține doar tasta push-to-talk. Activează modul de compatibilitate ca să le folosești sau începe să șoptești din panoul utilizatorului.",
+      "keysWayland": "Tastele pentru șoapte nu sunt disponibile în această sesiune Wayland: desktopul tău nu oferă scurtături globale. Activează modul de compatibilitate ca să le folosești sau începe să șoptești din panoul utilizatorului.",
       "save": "Salvează",
       "delete": "Șterge ținta",
       "savedStatus": "Salvat.",
@@ -863,5 +864,57 @@
     "whatsNew": "Ce e nou",
     "whatsNewHint": "Vezi modificările din fiecare versiune.",
     "openChangelog": "Deschide jurnalul de modificări"
+  },
+  "hotkeys": {
+    "global": "Comenzi rapide globale",
+    "background": "Funcționează cât timp Mumcord e în fundal",
+    "backgroundHint": "Comenzile rapide funcționează peste tot, inclusiv în jocuri. Implicit, nu este setată nicio comandă.",
+    "foregroundOnly": "Comenzile rapide funcționează doar cât timp fereastra Mumcord e în prim-plan.",
+    "portal": "Desktopul tău (Wayland) îți va cere o dată să aprobi comenzile rapide globale.",
+    "noPortal": "Desktopul tău nu oferă comenzi rapide globale, așa că funcționează doar cât timp fereastra Mumcord e în prim-plan.",
+    "compatLink": "Folosește modul de compatibilitate (X11)",
+    "compatSuffix": "dacă aceasta nu e disponibilă.",
+    "actions": "Acțiuni",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Oprește / pornește microfonul",
+      "toggleDeafen": "Oprește / pornește sunetul",
+      "toggleDnd": "Comută Nu deranja",
+      "joinLeaveVoice": "Intră în / ieși din voce",
+      "switchVoiceServer": "Schimbă serverul de voce",
+      "switchChannel": "Treci la canalul…",
+      "previousChannel": "Înapoi la canalul anterior",
+      "toggleMemberColumn": "Arată / ascunde coloana de membri",
+      "openQuickSettings": "Deschide setările rapide",
+      "openMumcord": "Deschide Mumcord"
+    },
+    "pushToTalkHint": "Transmite cât ții tastele apăsate",
+    "pushToTalkOff": "Folosit când modul de vorbire din Voce este push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Canal rădăcină",
+    "notSet": "Nesetat",
+    "recording": "Apasă o combinație de taste…",
+    "recordingHint": "Apasă <esc>Esc</esc> pentru a anula, <back>Backspace</back> pentru a șterge. Înregistrarea se oprește după 5 secunde.",
+    "clear": "Șterge",
+    "clearLabel": "Șterge {{action}}",
+    "cancel": "Anulează",
+    "conflictTitle": "Conflict.",
+    "conflict": "Această combinație este deja folosită de „{{other}}”. Alege alta sau atribuie-o aici și șterge-o pe cealaltă.",
+    "inApp": "Această combinație este comanda rapidă proprie a Mumcord pentru {{shortcut}}. Alege alta.",
+    "inAppShortcut": {
+      "memberColumn": "afișarea și ascunderea coloanei de membri",
+      "notificationCentre": "centrul de notificări",
+      "search": "căutare",
+      "closeWindow": "închiderea unei ferestre"
+    },
+    "assignHere": "Atribuie aici",
+    "rejected": "Această tastă nu poate fi o comandă rapidă globală. Apasă o altă tastă decât Ctrl, Alt, Shift sau Super, cu sau fără acestea.",
+    "failed": "Această comandă rapidă nu a putut fi înregistrată. Poate o folosește deja altă aplicație sau desktopul tău.",
+    "add": "Adaugă comanda rapidă „treci la canal”…",
+    "addChannel": "Canal",
+    "addNone": "Conectează-te la un server pentru a alege unul dintre canalele lui.",
+    "addConfirm": "Adaugă",
+    "reset": "Resetează toate comenzile rapide",
+    "resetHint": "Elimină toate comenzile rapide în afară de push-to-talk; implicit, nu este setată nicio comandă."
   }
 }

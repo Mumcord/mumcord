@@ -27,6 +27,7 @@ import { ServersSection } from "./sections/ServersSection";
 import { SoundsSection } from "./sections/SoundsSection";
 import { UpdatesSection } from "./sections/UpdatesSection";
 import { VoiceSection } from "./sections/VoiceSection";
+import { HotkeysSection } from "./sections/HotkeysSection";
 import { SettingsNavigationContext, type SettingsNavigation } from "./settingsNavigation";
 import { SettingsSearch } from "./SettingsSearch";
 import type { SearchResult } from "./settingsIndex";
@@ -68,6 +69,8 @@ function renderSection(id: SectionId, settings: Settings, update: UpdateSettings
       return <AudioSection {...props} />;
     case "voice":
       return <VoiceSection {...props} />;
+    case "hotkeys":
+      return <HotkeysSection {...props} />;
     case "chatHistory":
       return <ChatHistorySection {...props} />;
     case "appearance":
@@ -137,6 +140,10 @@ export function SettingsScreen({
       compatibilityFocusPending,
       compatibilityFocused: () => {
         setCompatibilityFocusPending(false);
+      },
+      openCompatibilityMode: () => {
+        setActive("voice");
+        setCompatibilityFocusPending(true);
       },
     }),
     [compatibilityFocusPending],

@@ -22,6 +22,7 @@ import { useAudioPopover } from "./useAudioPopover";
 import { useMicLevelFill } from "./useMicLevelFill";
 import { usePushToTalk } from "./usePushToTalk";
 import { useUserPanel } from "./useUserPanel";
+import { onUiHotkey } from "../hotkeys";
 import "./userpanel.css";
 
 type Dialog = "profile" | "register" | null;
@@ -179,6 +180,18 @@ export function UserPanel() {
   const openQuick = (x: number, y: number, opener: HTMLElement) => {
     setQuick({ x, y, opener });
   };
+
+  // "Open quick settings" hotkey (#64): the menu opens at the gear button.
+  useEffect(
+    () =>
+      onUiHotkey("openQuickSettings", () => {
+        const button = settingsButton.current;
+        if (button === null) return;
+        const box = button.getBoundingClientRect();
+        setQuick({ x: box.left, y: box.bottom, opener: button });
+      }),
+    [],
+  );
 
   return (
     <div className="userpanel">

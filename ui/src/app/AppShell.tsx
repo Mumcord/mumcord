@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { SkipLinks } from "../a11y";
+import { onUiHotkey } from "../features/hotkeys";
 import { ResizeHandle } from "./ResizeHandle";
 import {
   isMembersShortcut,
@@ -101,6 +102,9 @@ export function AppShell({ slots, inert = false }: { slots: ShellSlots; inert?: 
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [inert, overlayShown, toggleMembers]);
+
+  // The global hotkey also works while the window is in the background (#64).
+  useEffect(() => onUiHotkey("toggleMemberColumn", toggleMembers), [toggleMembers]);
 
   // Hiding takes the focused element with it: the members button takes the focus instead.
   const wasShown = useRef(membersShown);

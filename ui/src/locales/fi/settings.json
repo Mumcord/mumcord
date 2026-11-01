@@ -18,7 +18,8 @@
     "servers": "Palvelimet",
     "privacy": "Yksityisyys",
     "updates": "Päivitykset",
-    "packetInspector": "Pakettitarkastin"
+    "packetInspector": "Pakettitarkastin",
+    "hotkeys": "Pikanäppäimet"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -250,7 +251,7 @@
       "keyRemove": "Poista näppäin",
       "keyTaken": "Tätä näppäintä ei voi käyttää: se ei ole yksittäinen näppäin valinnaisilla muuntonäppäimillä tai se on jo push-to-talk tai toisen kohteen näppäin.",
       "keyFailed": "Toinen sovellus pitää tätä näppäintä, joten se ei toimi nyt.",
-      "keysWayland": "Kuiskausnäppäimet eivät ole käytettävissä tässä Wayland-istunnossa: työpöydän yleisten pikanäppäinten portaali pitää hallussaan vain push-to-talk-näppäintä. Ota käyttöön yhteensopivuustila käyttääksesi niitä tai aloita kuiskaus käyttäjäpaneelista.",
+      "keysWayland": "Kuiskausnäppäimet eivät ole käytettävissä tässä Wayland-istunnossa: työpöytäsi ei tarjoa yleisiä pikanäppäimiä. Ota käyttöön yhteensopivuustila käyttääksesi niitä tai aloita kuiskaus käyttäjäpaneelista.",
       "save": "Tallenna",
       "delete": "Poista kohde",
       "savedStatus": "Tallennettu.",
@@ -857,5 +858,57 @@
     "whatsNew": "Mikä on uutta",
     "whatsNewHint": "Katso muutokset jokaisessa versiossa.",
     "openChangelog": "Avaa muutosloki"
+  },
+  "hotkeys": {
+    "global": "Yleiset pikanäppäimet",
+    "background": "Toimi, kun Mumcord on taustalla",
+    "backgroundHint": "Pikanäppäimet toimivat kaikkialla, myös peleissä. Oletuksena mitään ei ole asetettu.",
+    "foregroundOnly": "Pikanäppäimet toimivat vain, kun Mumcord-ikkuna on etualalla.",
+    "portal": "Työpöytäsi (Wayland) pyytää hyväksymään yleiset pikanäppäimet kerran.",
+    "noPortal": "Työpöytäsi ei tarjoa yleisiä pikanäppäimiä, joten ne toimivat vain, kun Mumcord-ikkuna on etualalla.",
+    "compatLink": "Käytä yhteensopivuustilaa (X11),",
+    "compatSuffix": "jos se ei ole saatavilla.",
+    "actions": "Toiminnot",
+    "action": {
+      "pushToTalk": "Puhu painamalla",
+      "toggleMute": "Mykistä mikrofoni / poista mykistys",
+      "toggleDeafen": "Hiljennä kuuntelu / palauta kuuntelu",
+      "toggleDnd": "Vaihda Älä häiritse",
+      "joinLeaveVoice": "Liity puheeseen / poistu puheesta",
+      "switchVoiceServer": "Vaihda puhepalvelinta",
+      "switchChannel": "Vaihda kanavaan…",
+      "previousChannel": "Takaisin edelliselle kanavalle",
+      "toggleMemberColumn": "Näytä / piilota jäsensarake",
+      "openQuickSettings": "Avaa pika-asetukset",
+      "openMumcord": "Avaa Mumcord"
+    },
+    "pushToTalkHint": "Lähettää, kun pidät näppäimiä pohjassa",
+    "pushToTalkOff": "Käytössä, kun Puhe-osion puhetila on Puhu painamalla",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Juurikanava",
+    "notSet": "Ei asetettu",
+    "recording": "Paina näppäinyhdistelmää…",
+    "recordingHint": "Paina <esc>Esc</esc> peruuttaaksesi ja <back>Backspace</back> tyhjentääksesi. Tallennus päättyy 5 sekunnin kuluttua.",
+    "clear": "Tyhjennä",
+    "clearLabel": "Tyhjennä {{action}}",
+    "cancel": "Peruuta",
+    "conflictTitle": "Ristiriita.",
+    "conflict": "Tämä yhdistelmä on jo käytössä toiminnolle ”{{other}}”. Valitse toinen tai määritä se tähän ja tyhjennä toinen.",
+    "inApp": "Tämä yhdistelmä on Mumcordin oma pikanäppäin: {{shortcut}}. Valitse toinen.",
+    "inAppShortcut": {
+      "memberColumn": "jäsensarakkeen näyttäminen ja piilottaminen",
+      "notificationCentre": "ilmoituskeskus",
+      "search": "haku",
+      "closeWindow": "ikkunan sulkeminen"
+    },
+    "assignHere": "Määritä tähän",
+    "rejected": "Tämä näppäin ei voi olla yleinen pikanäppäin. Paina muuta näppäintä kuin Ctrl, Alt, Shift tai Super, niiden kanssa tai ilman.",
+    "failed": "Pikanäppäintä ei voitu rekisteröidä. Jokin toinen sovellus tai työpöytäsi saattaa jo käyttää sitä.",
+    "add": "Lisää pikanäppäin ”vaihda kanavaan”…",
+    "addChannel": "Kanava",
+    "addNone": "Yhdistä palvelimeen valitaksesi jonkin sen kanavista.",
+    "addConfirm": "Lisää",
+    "reset": "Nollaa kaikki pikanäppäimet",
+    "resetHint": "Poistaa kaikki pikanäppäimet paitsi Puhu painamalla; oletuksena mitään ei ole asetettu."
   }
 }

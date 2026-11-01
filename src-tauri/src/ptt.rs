@@ -133,7 +133,7 @@ pub fn set_host_app_id(app_id: &str) {
 /// Registers Mumcord with `org.freedesktop.host.portal.Registry`. The portal only accepts this
 /// as the first call on the D-Bus connection, so every portal path awaits it first.
 #[cfg(target_os = "linux")]
-async fn register_host_app() {
+pub(crate) async fn register_host_app() {
     HOST_APP_REGISTERED
         .get_or_init(|| async {
             let Some(app_id) = HOST_APP_ID.get() else {
@@ -286,7 +286,7 @@ pub fn cancel_capture() {
     }
 }
 
-fn current_backend() -> Backend {
+pub(crate) fn current_backend() -> Backend {
     if SessionEnv::current().runs_on_wayland() {
         Backend::Portal
     } else {
@@ -507,7 +507,7 @@ fn canonical_key(key: &str) -> Option<String> {
 /// Converts a canonical key to the XDG "shortcuts" format used as the portal's preferred
 /// trigger, e.g. `"Ctrl+A"` → `"CTRL+a"`. `None` if the key has no known keysym.
 #[cfg_attr(not(any(target_os = "linux", test)), allow(dead_code))]
-fn portal_trigger(canonical: &str) -> Option<String> {
+pub(crate) fn portal_trigger(canonical: &str) -> Option<String> {
     let (key, modifiers) = canonical
         .rsplit_once('+')
         .map_or((canonical, ""), |(m, k)| (k, m));
@@ -590,7 +590,7 @@ fn unregister_global<R: Runtime>(app: &AppHandle<R>) {
 // ---------------------------------------------------------------------------------------------
 
 #[cfg(target_os = "linux")]
-async fn portal_reachable() -> bool {
+pub(crate) async fn portal_reachable() -> bool {
     register_host_app().await;
     match ashpd::desktop::global_shortcuts::GlobalShortcuts::new().await {
         Ok(_) => true,
@@ -608,7 +608,7 @@ async fn activate_portal(key: &str) -> Result<(), PttUnavailableReason> {
         return Ok(());
     }
     let preferred = normalize_key(key).ok().and_then(|k| portal_trigger(&k));
-    match portal::bind(preferred.as_deref()).await {
+    match bind_ptt(preferred.as_deref()).await {
         // Keep the user's stored key: it is what `configure` is called with next time.
         Ok((binding, trigger)) => {
             if trigger.is_none() {
@@ -627,6 +627,31 @@ async fn activate_portal(key: &str) -> Result<(), PttUnavailableReason> {
             Err(PttUnavailableReason::RegistrationFailed)
         }
     }
+}
+
+/// Push-to-talk's id and description in the portal session.
+#[cfg(target_os = "linux")]
+const PTT_SHORTCUT_ID: &str = "push-to-talk";
+#[cfg(target_os = "linux")]
+const PTT_SHORTCUT_DESCRIPTION: &str = "Push to talk";
+
+/// Binds the push-to-talk shortcut in its own portal session; returns its trigger, if any.
+#[cfg(target_os = "linux")]
+async fn bind_ptt(
+    preferred: Option<&str>,
+) -> Result<(portal::Binding, Option<String>), portal::BindError> {
+    let request = portal::Request {
+        id: PTT_SHORTCUT_ID,
+        description: PTT_SHORTCUT_DESCRIPTION,
+        preferred_trigger: preferred,
+    };
+    let sink: portal::Sink = Arc::new(|id, pressed| {
+        if id == PTT_SHORTCUT_ID {
+            emit(pressed);
+        }
+    });
+    let (binding, shortcuts) = portal::bind(&[request], sink).await?;
+    Ok((binding, portal::trigger_of(&shortcuts, PTT_SHORTCUT_ID)))
 }
 
 /// How long the desktop's shortcut settings stay open for the user to assign a key.
@@ -679,7 +704,7 @@ async fn bind_and_assign<R: Runtime>(
     app: &AppHandle<R>,
     preferred: Option<&str>,
 ) -> Result<(portal::Binding, String), portal::BindError> {
-    let (binding, trigger) = portal::bind(preferred).await?;
+    let (binding, trigger) = bind_ptt(preferred).await?;
     if let Some(trigger) = trigger {
         return Ok((binding, trigger));
     }
@@ -694,7 +719,12 @@ async fn bind_and_assign<R: Runtime>(
              settings in the background"
         );
     }
-    match tokio::time::timeout(ASSIGN_TIMEOUT, portal::assign(&binding, token)).await {
+    match tokio::time::timeout(
+        ASSIGN_TIMEOUT,
+        portal::assign(&binding, PTT_SHORTCUT_ID, token),
+    )
+    .await
+    {
         Ok(Ok(trigger)) => Ok((binding, trigger)),
         Ok(Err(err)) => {
             binding.close();
@@ -776,7 +806,7 @@ fn replace_portal_binding(binding: portal::Binding) {
 }
 
 #[cfg(not(target_os = "linux"))]
-async fn portal_reachable() -> bool {
+pub(crate) async fn portal_reachable() -> bool {
     false
 }
 
@@ -790,8 +820,10 @@ async fn capture_portal<R: Runtime>(_app: &AppHandle<R>, normalized: &str) -> Ap
     Ok(normalized.to_owned())
 }
 
+/// The XDG `GlobalShortcuts` portal: one session per set of shortcuts (push-to-talk, the
+/// global hotkeys of [`crate::hotkeys`]).
 #[cfg(target_os = "linux")]
-mod portal {
+pub(crate) mod portal {
     use std::pin::Pin;
     use std::sync::Arc;
 
@@ -803,12 +835,20 @@ mod portal {
     use ashpd::zbus::export::futures_core::Stream;
     use tauri::async_runtime::{self, JoinHandle};
 
-    const SHORTCUT_ID: &str = "push-to-talk";
-    const SHORTCUT_DESCRIPTION: &str = "Push to talk";
+    /// A shortcut to bind: a stable id, the description the desktop shows, and the trigger
+    /// proposed to the user in the XDG "shortcuts" format.
+    pub struct Request<'a> {
+        pub id: &'a str,
+        pub description: &'a str,
+        pub preferred_trigger: Option<&'a str>,
+    }
 
-    /// A live portal session with its push-to-talk shortcut and the task listening to it.
+    /// Receives `(shortcut id, pressed)` for every activation and deactivation.
+    pub type Sink = Arc<dyn Fn(&str, bool) + Send + Sync>;
+
+    /// A live portal session with its shortcuts and the task listening to them.
     pub struct Binding {
-        /// The `pttKey` this binding was made for.
+        /// The key this binding was made for (push-to-talk's `pttKey`).
         pub key: String,
         session: Arc<Session<GlobalShortcuts>>,
         listener: JoinHandle<()>,
@@ -851,16 +891,17 @@ mod portal {
         }
     }
 
-    /// Opens a new session and binds the push-to-talk shortcut. The desktop shows its consent
-    /// dialog unless it remembers an earlier binding. Returns the binding (with an empty
-    /// `key`) and the trigger the user chose, or `None` if the desktop has no key assigned
-    /// (the session stays live, so a key assigned later still works).
+    /// Opens a new session and binds `shortcuts`; `sink` receives their key events. The
+    /// desktop shows its consent dialog unless it remembers an earlier binding. Returns the
+    /// binding (with an empty `key`) and the shortcuts as bound; [`trigger_of`] tells whether
+    /// one has a key (the session stays live, so a key assigned later still works).
     ///
     /// KDE only shows its dialog for shortcuts it has never seen for this app; for a known
     /// one it answers at once with the stored key and ignores `preferred_trigger`.
     pub async fn bind(
-        preferred_trigger: Option<&str>,
-    ) -> Result<(Binding, Option<String>), BindError> {
+        shortcuts: &[Request<'_>],
+        sink: Sink,
+    ) -> Result<(Binding, Vec<Shortcut>), BindError> {
         super::register_host_app().await;
         let portal = GlobalShortcuts::new()
             .await
@@ -878,10 +919,12 @@ mod portal {
             .create_session(CreateSessionOptions::default())
             .await
             .map_err(BindError::Failed)?;
-        let shortcut = NewShortcut::new(SHORTCUT_ID, SHORTCUT_DESCRIPTION)
-            .preferred_trigger(preferred_trigger);
+        let requested: Vec<NewShortcut> = shortcuts
+            .iter()
+            .map(|s| NewShortcut::new(s.id, s.description).preferred_trigger(s.preferred_trigger))
+            .collect();
         let response = portal
-            .bind_shortcuts(&session, &[shortcut], None, BindShortcutsOptions::default())
+            .bind_shortcuts(&session, &requested, None, BindShortcutsOptions::default())
             .await
             .and_then(|request| request.response());
         let bound = match response {
@@ -894,25 +937,26 @@ mod portal {
                 });
             }
         };
-        let trigger = trigger_of(bound.shortcuts());
+        let bound = bound.shortcuts().to_vec();
         let listener = async_runtime::spawn(async move {
             // The proxy must outlive the signal streams.
             let _portal = portal;
-            listen(Box::pin(activated), Box::pin(deactivated)).await;
+            listen(Box::pin(activated), Box::pin(deactivated), sink).await;
         });
         let binding = Binding {
             key: String::new(),
             session: Arc::new(session),
             listener,
         };
-        Ok((binding, trigger))
+        Ok((binding, bound))
     }
 
     /// Opens the desktop's settings for this session's shortcuts (portal version 2) and waits
-    /// until the push-to-talk shortcut has a key; returns its trigger description.
+    /// until shortcut `id` has a key; returns its trigger description.
     /// `activation_token` lets the desktop bring those settings to the front.
     pub async fn assign(
         binding: &Binding,
+        id: &str,
         activation_token: Option<String>,
     ) -> Result<String, BindError> {
         super::register_host_app().await;
@@ -934,18 +978,18 @@ mod portal {
             .await
             .map_err(BindError::Failed)?;
         while let Some(event) = next(&mut changed).await {
-            if let Some(trigger) = trigger_of(event.shortcuts()) {
+            if let Some(trigger) = trigger_of(event.shortcuts(), id) {
                 return Ok(trigger);
             }
         }
         Err(BindError::NoTrigger)
     }
 
-    /// The push-to-talk trigger description in `shortcuts`, if it has a key.
-    fn trigger_of(shortcuts: &[Shortcut]) -> Option<String> {
+    /// The trigger description of shortcut `id` in `shortcuts`, if it has a key.
+    pub fn trigger_of(shortcuts: &[Shortcut], id: &str) -> Option<String> {
         shortcuts
             .iter()
-            .find(|s| s.id() == SHORTCUT_ID)
+            .find(|s| s.id() == id)
             .map(|s| s.trigger_description().trim().to_owned())
             .filter(|t| !t.is_empty())
     }
@@ -961,19 +1005,14 @@ mod portal {
         mut deactivated: Pin<
             Box<impl Stream<Item = ashpd::desktop::global_shortcuts::Deactivated>>,
         >,
+        sink: Sink,
     ) {
+        // The portal sends the signals of all our sessions to every listener; each sink only
+        // reacts to its own shortcut ids.
         loop {
             tokio::select! {
-                Some(event) = next(&mut activated) => {
-                    if event.shortcut_id() == SHORTCUT_ID {
-                        super::emit(true);
-                    }
-                }
-                Some(event) = next(&mut deactivated) => {
-                    if event.shortcut_id() == SHORTCUT_ID {
-                        super::emit(false);
-                    }
-                }
+                Some(event) = next(&mut activated) => sink(event.shortcut_id(), true),
+                Some(event) = next(&mut deactivated) => sink(event.shortcut_id(), false),
                 else => break,
             }
         }

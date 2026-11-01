@@ -5,6 +5,8 @@ export interface SettingsNavigation {
   /** True from the request until the switch has taken the focus. */
   compatibilityFocusPending: boolean;
   compatibilityFocused: () => void;
+  /** Shows Voice and focuses the "Compatibility mode (X11)" switch (Linux Wayland). */
+  openCompatibilityMode: () => void;
 }
 
 export const SettingsNavigationContext = createContext<SettingsNavigation | null>(null);

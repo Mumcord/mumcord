@@ -18,7 +18,8 @@
     "servers": "Serveriai",
     "privacy": "Privatumas",
     "updates": "Atnaujinimai",
-    "packetInspector": "Paketų tikrintuvas"
+    "packetInspector": "Paketų tikrintuvas",
+    "hotkeys": "Spartieji klavišai"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -254,7 +255,7 @@
       "keyRemove": "Pašalinti klavišą",
       "keyTaken": "Šio klavišo naudoti negalima: tai ne vienas klavišas su nebūtinais modifikatoriais arba jis jau yra push-to-talk ar kito tikslo klavišas.",
       "keyFailed": "Šį klavišą laiko kita programa, todėl dabar jis neveikia.",
-      "keysWayland": "Šnabždesio klavišai šioje Wayland sesijoje nepasiekiami: darbalaukio visuotinių spartųjų klavišų portalas laiko tik push-to-talk klavišą. Įjunk suderinamumo režimą, kad juos naudotum, arba pradėk šnibždėti iš naudotojo skydelio.",
+      "keysWayland": "Šnabždesio klavišai šioje Wayland sesijoje nepasiekiami: tavo darbalaukis nesiūlo visuotinių sparčiųjų klavišų. Įjunk suderinamumo režimą, kad juos naudotum, arba pradėk šnibždėti iš naudotojo skydelio.",
       "save": "Išsaugoti",
       "delete": "Ištrinti tikslą",
       "savedStatus": "Išsaugota.",
@@ -869,5 +870,57 @@
     "whatsNew": "Kas nauja",
     "whatsNewHint": "Peržiūrėk kiekvienos versijos pakeitimus.",
     "openChangelog": "Atidaryti pakeitimų žurnalą"
+  },
+  "hotkeys": {
+    "global": "Visuotiniai spartieji klavišai",
+    "background": "Veikti, kai Mumcord yra fone",
+    "backgroundHint": "Spartieji klavišai veikia visur, net žaidimuose. Pagal numatytuosius nustatymus nieko nenustatyta.",
+    "foregroundOnly": "Spartieji klavišai veikia tik tada, kai Mumcord langas yra priekyje.",
+    "portal": "Tavo darbalaukis (Wayland) vieną kartą paprašys patvirtinti visuotinius spartuosius klavišus.",
+    "noPortal": "Tavo darbalaukis nesiūlo visuotinių spartųjų klavišų, todėl jie veikia tik tada, kai Mumcord langas yra priekyje.",
+    "compatLink": "Naudoti suderinamumo režimą (X11),",
+    "compatSuffix": "jei to nėra.",
+    "actions": "Veiksmai",
+    "action": {
+      "pushToTalk": "Spausk ir kalbėk",
+      "toggleMute": "Nutildyti / įjungti mikrofoną",
+      "toggleDeafen": "Išjungti / įjungti garsą",
+      "toggleDnd": "Perjungti Netrukdyti",
+      "joinLeaveVoice": "Prisijungti prie balso / išeiti iš balso",
+      "switchVoiceServer": "Keisti balso serverį",
+      "switchChannel": "Pereiti į kanalą…",
+      "previousChannel": "Atgal į ankstesnį kanalą",
+      "toggleMemberColumn": "Rodyti / slėpti narių stulpelį",
+      "openQuickSettings": "Atidaryti sparčiuosius nustatymus",
+      "openMumcord": "Atidaryti Mumcord"
+    },
+    "pushToTalkHint": "Siunčia, kol laikai klavišus",
+    "pushToTalkOff": "Naudojama, kai kalbėjimo režimas skiltyje Balsas yra spausk ir kalbėk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Šakninis kanalas",
+    "notSet": "Nenustatyta",
+    "recording": "Paspausk klavišų kombinaciją…",
+    "recordingHint": "Paspausk <esc>Esc</esc>, kad atšauktum, <back>Backspace</back>, kad išvalytum. Įrašymas sustos po 5 sekundžių.",
+    "clear": "Išvalyti",
+    "clearLabel": "Išvalyti: {{action}}",
+    "cancel": "Atšaukti",
+    "conflictTitle": "Konfliktas.",
+    "conflict": "Šią kombinaciją jau naudoja „{{other}}“. Pasirink kitą arba priskirk ją čia ir išvalyk kitą.",
+    "inApp": "Ši kombinacija yra paties Mumcord spartusis klavišas: {{shortcut}}. Pasirink kitą.",
+    "inAppShortcut": {
+      "memberColumn": "narių stulpelio rodymas ir slėpimas",
+      "notificationCentre": "pranešimų centras",
+      "search": "paieška",
+      "closeWindow": "lango uždarymas"
+    },
+    "assignHere": "Priskirti čia",
+    "rejected": "Šis klavišas negali būti visuotinis spartusis klavišas. Paspausk kitą klavišą nei Ctrl, Alt, Shift ar Super, su jais arba be jų.",
+    "failed": "Šio spartaus klavišo nepavyko užregistruoti. Gali būti, kad jį jau naudoja kita programa arba tavo darbalaukis.",
+    "add": "Pridėti spartųjį klavišą „pereiti į kanalą“…",
+    "addChannel": "Kanalas",
+    "addNone": "Prisijunk prie serverio, kad pasirinktum vieną jo kanalų.",
+    "addConfirm": "Pridėti",
+    "reset": "Atstatyti visus spartuosius klavišus",
+    "resetHint": "Pašalina visus spartuosius klavišus, išskyrus spausk ir kalbėk; pagal numatytuosius nustatymus nieko nenustatyta."
   }
 }
