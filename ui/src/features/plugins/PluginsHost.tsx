@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { getApi } from "../../api";
 import { usePreferences } from "../../app/preferences";
 import { PluginsPalette } from "./PluginsPalette";
+import { usePluginRequestRouter } from "./pluginRequestStore";
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
@@ -10,11 +11,13 @@ const prefersReducedMotion = () =>
 
 /**
  * Tells the plugins which language and colour scheme the app shows (plugins draw their UI in
- * them, B18) and hosts the command palette. Mount once in the app shell.
+ * them, B18), routes requests to open a plugin screen and hosts the command palette. Mount once
+ * in the app shell.
  */
 export function PluginsHost() {
   const { language, resolvedTheme } = usePreferences();
   const dark = resolvedTheme === "dark";
+  usePluginRequestRouter();
 
   useEffect(() => {
     const send = () => {

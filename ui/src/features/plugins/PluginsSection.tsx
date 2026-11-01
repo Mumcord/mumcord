@@ -1,6 +1,7 @@
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Group } from "../settings/components/Section";
+import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginRequestStore";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
 import "./plugins.css";
 import { DeveloperTab } from "./developer/DeveloperTab";
@@ -29,6 +30,12 @@ export function PluginsSection({ developerMode }: { developerMode: boolean }) {
   const { overview, loadFailed } = usePlugins();
   const baseId = useId();
   const [selected, setSelected] = useState<PluginTab>("installed");
+  const requestedTab = useRequestedPluginTab();
+  // A request (e.g. from the notification centre) switches the tab once, then is consumed.
+  if (requestedTab !== null && requestedTab !== selected) setSelected(requestedTab);
+  useEffect(() => {
+    if (requestedTab !== null) consumeRequestedPluginTab();
+  }, [requestedTab]);
   const tabRefs = useRef(new Map<PluginTab, HTMLButtonElement>());
   const tabs = PLUGIN_TABS.filter((tab) => tab !== "developer" || developerMode);
   // Turning Developer mode off while its tab is open falls back to the first tab.
