@@ -18,6 +18,7 @@ use wasmtime::{Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsB
 use crate::api;
 use crate::api::files::Files;
 use crate::api::http::{Http, HttpSet};
+use crate::api::io::PluginIo;
 use crate::api::notify::Notify;
 use crate::api::secrets::{PluginSecrets, SecretsApi};
 use crate::api::storage::{Storage, StorageApi};
@@ -107,6 +108,10 @@ const HOST_APIS: &[AddToLinker] = &[
     <StorageApi as HostApi>::add_to_linker,
     <SecretsApi as HostApi>::add_to_linker,
     <api::http::HttpApi as HostApi>::add_to_linker,
+    <api::ui::UiApi as HostApi>::add_to_linker,
+    <api::peers::PeersApi as HostApi>::add_to_linker,
+    <api::chat::ChatApi as HostApi>::add_to_linker,
+    <api::webview::WebviewApi as HostApi>::add_to_linker,
 ];
 
 /// Services shared by all plugins that host calls need (store, grants, settings …). Later host
@@ -128,6 +133,8 @@ pub struct HostContext {
     pub http: Http,
     /// Files the user picked in plugin file pickers, for `net.http` uploads.
     pub files: Files,
+    /// Carries out `ui`, `peers` and `chat` calls; `None` refuses them with `not-permitted`.
+    pub io: Option<Arc<dyn PluginIo>>,
 }
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.
@@ -444,6 +451,16 @@ impl ResourceLimiter for Limiter {
 }
 
 impl bindings::mumcord::plugin::types::Host for PluginState {}
+
+impl PluginState {
+    /// The [`PluginIo`] for `ui`, `peers` and `chat`; without one these calls are not permitted.
+    pub(crate) fn io(&self) -> Result<&dyn PluginIo, wit::types::Error> {
+        self.ctx
+            .io
+            .as_deref()
+            .ok_or(wit::types::Error::NotPermitted)
+    }
+}
 
 /// The last [`LOG_LINES`] lines a plugin logged, each cut to [`LOG_LINE_CHARS`] characters.
 /// Kept apart from the app log so plugins cannot write into it.

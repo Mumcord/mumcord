@@ -23,6 +23,7 @@ pub mod service;
 pub mod verify;
 pub mod version;
 
+pub use api::io::PluginIo;
 pub use diag::{DiagSnapshot, Diagnostics};
 pub use health::{BACKOFF, Health, Recovery};
 pub use host::{HostError, HostEvent, LoadError, PluginHost, RunState};
