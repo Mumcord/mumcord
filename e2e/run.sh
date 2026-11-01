@@ -36,6 +36,12 @@ exec {lock_fd}>"$cache/run.lock"
 flock "$lock_mode" "$lock_fd"
 
 # Test servers need a .env; generate throwaway passwords when there is none (CI, fresh clones).
+# A git worktree reuses the main checkout's .env so all checkouts agree on the shared servers' password.
+primary_env="$(dirname "$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)")/testenv/.env"
+if [ ! -f "$repo/testenv/.env" ] && [ -f "$primary_env" ]; then
+  cp "$primary_env" "$repo/testenv/.env"
+  echo "copied testenv/.env from the main checkout"
+fi
 if [ ! -f "$repo/testenv/.env" ]; then
   printf 'SUPERUSER_PASSWORD=%s\nSERVER_PASSWORD=\n' "$(openssl rand -hex 16)" > "$repo/testenv/.env"
   echo "created testenv/.env with a random SuperUser password"
