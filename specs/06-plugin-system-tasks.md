@@ -21,10 +21,10 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B14 | Signing and verification | done | b14-verify |
 | B15 | Registry and repository client | done | b15-registry |
 | B16a | Safety fixture plugins | done | b16a-fixtures |
-| B17a | Plugin service: lifecycle | in progress | b17a-service |
-| B17b | Updates and kill switch | open | |
+| B17a | Plugin service: lifecycle | done | b17a-service |
+| B17b | Updates and kill switch | in progress | b17b-updates |
 | B17c | Chat integration logic | done | b17c-chat |
-| B18 | App glue (src-tauri) | open | |
+| B18 | App glue (src-tauri) | in progress | b18-glue |
 | B19 | `net.http` executor (official only) | done | b19-http |
 | B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
 | B22 | Permission list component and texts | done | b22-permlist |
@@ -40,7 +40,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B30 | User-menu entry and plugin dialog | open | |
 | B31 | Sandboxed web view | open | |
 | B32 | Notification centre: category Plugins | open | |
-| B34 | Server-suggested plugins logic | open | |
+| B34 | Server-suggested plugins logic | in progress | b34-suggest |
 | B23 | Installed tab and plugin details | open | |
 | B24 | Browse tab, install prompt, deep-link target | open | |
 | B33a | Updates tab | open | |
@@ -62,6 +62,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F2 | Fix: safety fixtures pass `prettier --check .` (format them) and builder `common_manifest()` uses only B4 fields (authors/categories) | done | f2-fixtures |
 | F3 | chat.rs GestureGate: a gesture from a typed command (source `command`) allows its one message for up to 8 s (clicks stay 2 s); needed for verified dice rolls (FR-6.44 addendum) | done | f3-gesture |
 | F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | open | |
+| F5 | Messaging envelope: carry a `direct` flag so `peer-message.direct` is correct (wire is unreleased, keep envelope v1 compatible within the epic) | open | |
 | M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins) | open | |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | open | |
 
@@ -453,3 +454,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B40 (Mumcord/plugins PR #5, 117fb71):** Dice in `dice/**`, 32 native tests, `mumcord-plugin check --official` ok. Wire: kind 1 commit {id u32, C 32 B, canonical notation ≤ 32 B}, 2 witness {roller session u32, id u32, W 16 B}, 3 reveal {id, R 16 B, count u8 ≤ 2, W…}. "Not revealed" after 10 s from commit, or 5 s after the 2nd witness. The slash command arrives as `ui-action` with source Command, action "roll", value Text(args): B17a must deliver it that way. Needs F3 (8 s command gesture). MVP cut: large channels may send a few extra witnesses (only 2 count).
 - **B41b (Mumcord/plugins feat/echolings: bb1e6c3, d24908e, 43206b5):** social + Echo Echo, 53 host tests, wasm 303 KB (now also imports peers + notify). Kinds: 1 card ≤ 75 B, 2 pat (direct), 3 Echo Echo invite, 4 score (binary, version byte first; format in README); kinds ≥ 5 are free for B41c. Visits are in identity storage key `visits`. Chat cards are `echo-echo-<id>`; action ids `visit-pat:<n>`, `echo-join`, `echo-pad:<n>`, `echo-close`. Scores show after a fixed 45 s. Without ui.chat-card the game uses the panel.
 - **B42 (Mumcord/plugins PR #6: 1945951, 465ca38):** `mumbot-music/`, 28 native tests, `check --official` ok. Host glue contract: dialog actions arrive as ui-action with source Slot(Dialog), settings actions with Slot(Settings); the server-address inputs `address` (dialog) and `edit-address` (settings) must both trigger `ctx.http.allow`; `self-state.server` must be set; the plugin calls `set-user-menu-entry` once at start. Two key slots a/b per bot; poll 3 s with back-off up to 12 s on 429. Spec addendum (D1): 3 s instead of 2 s, 32-hex key prefixes, English only compiled in, add field 64 B (long URLs don't fit).
+- **B17a (6b2785e2 lifecycle, c6d13cba PluginIo + messaging):** `crates/plugins/src/service/{mod,install,lifecycle,dev,messaging,plugin_io}.rs`. `PluginService::new(ServiceConfig{plugins_dir, cache_dir, app_version, no_plugins}, store, secrets) -> (svc, host_rx, events_rx)`, then `start()`; feed every HostEvent to `handle_host_event`; call it under a mutex on a blocking thread. ServiceEvent: Changed, InstallProgress{id, stage}, AutoOff, Notify, PeerSend{server, plugin, outgoing} (→ engine.plugin_send; on ticket Expired call `message_expired`), Ui{plugin, UiUpdate}, ChatPost{plugin, line}, Supersede. Install: `service::fetch(client, &svc.events(), id, url, size)` outside the lock, then `install(&InstallRequest{source, entry, optional, visibility}, &download)`. Calls: set_enabled, set_permissions, set_visibility, set_notifications, remove(id, delete_data), reset_data, export_data, set_all_off/all_off, badge_plugin/set_badge_plugin (None = no badge; the default is the only member-badge plugin at install), load_dev/reload_dev/unload_dev (dev rows `dev:<path>`; unloading deletes the data; official-only permissions refused outright), developer_mode_changed, list() -> PluginInfo{status, …}, log_lines, diagnostics. Engine feed: set_focused_server, shared_state, disconnected, peer_capable, peer_joined/left/talking, screen_share_started, chat_activity, mentioned, self_changed(SelfInfo), peer_data, with people as PeerInfo{session, name, cert_hash, is_friend} (B18 decides is_friend); poll_announces/next_announce_at (announce timer), set_identity, set_language, set_theme, set_quiet, gesture/command_gesture, chat_text. Open: `peer-message.direct` is always false (F5); UI tree limits belong to B26; the B17c CommandRegistry isn't wired to install/remove yet (B18/B29); B18 reads MUMCORD_PLUGIN_TEST_FAST_BACKOFF and calls svc.set_backoff.
