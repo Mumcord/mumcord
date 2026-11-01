@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 /**
  * The seek bar of the cinema view (issue #163, FR-3.124): the played part, the buffered part where
  * the player knows it, and a marker where each other viewer is. It is a slider, so the keyboard can
@@ -34,15 +33,17 @@ export function SeekBar({
   onSeek,
 }: SeekBarProps) {
   const duration = Math.max(1, durationMs);
-  const played = Math.min(positionMs, duration);
+  // Until the player says how long the video is, nothing can be shown as played.
+  const played = durationMs > 0 ? Math.min(positionMs, duration) : 0;
   const buffered = Math.min(Math.max(bufferedMs ?? positionMs, played), duration);
   const percent = (ms: number) => `${((ms / duration) * 100).toFixed(2)}%`;
-  const time = clockTime(played / 1000);
+  const time = clockTime((durationMs > 0 ? played : positionMs) / 1000);
   const total = durationMs > 0 ? clockTime(durationMs / 1000) : null;
 
   return (
-    <div className="seek-bar" style={{ "--played": percent(played) } as CSSProperties}>
+    <div className="seek-bar">
       <div className="seek-bar__buffer" aria-hidden="true" style={{ width: percent(buffered) }} />
+      <div className="seek-bar__played" aria-hidden="true" style={{ width: percent(played) }} />
       <input
         type="range"
         className="seek-bar__input"
@@ -59,7 +60,8 @@ export function SeekBar({
           onSeek(Number(event.target.value));
         }}
       />
-      {markers.map((marker) => (
+      {/* Without a known length there is nowhere to put the other viewers. */}
+      {(durationMs > 0 ? markers : []).map((marker) => (
         <span
           key={marker.session}
           className="seek-bar__marker"
