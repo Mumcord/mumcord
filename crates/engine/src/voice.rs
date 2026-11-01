@@ -194,19 +194,20 @@ impl Audio {
     /// Plays `samples` independent of any voice pipeline (the hang-up sound, QA.19): a
     /// short-lived mixer feeds the shared sink and, together with the devices, lives until the
     /// sound is through, even if this `Audio` is released right after. Call it once the voice
-    /// pipeline has stopped, so only one mixer writes to the sink. Never blocks.
-    pub fn play_tail(&self, rt: &Runtime, samples: &[f32]) {
+    /// pipeline has stopped, so only one mixer writes to the sink. Never blocks. Returns whether
+    /// playback started; a failure is logged.
+    pub fn play_tail(&self, rt: &Runtime, samples: &[f32]) -> bool {
         let (playback, ports) = match Playback::start(self.sink.clone(), PlaybackConfig::default())
         {
             Ok(started) => started,
             Err(e) => {
-                tracing::warn!(error = %e, "hang-up sound: starting playback failed");
-                return;
+                tracing::warn!(error = %e, "closing sound: starting playback failed");
+                return false;
             }
         };
         let mut mix_in = ports.mix_in;
         if samples.iter().any(|&s| mix_in.push(s).is_err()) {
-            tracing::debug!("hang-up sound cut short: mixer input is full");
+            tracing::debug!("closing sound cut short: mixer input is full");
         }
         let io = self.io.clone();
         let linger =
@@ -215,6 +216,7 @@ impl Audio {
             tokio::time::sleep(linger).await;
             drop((playback, mix_in, io));
         });
+        true
     }
 }
 
