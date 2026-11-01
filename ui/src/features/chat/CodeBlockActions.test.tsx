@@ -14,7 +14,7 @@ import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
 import { CodeBlockActions } from "./CodeBlockActions";
 import { MAX_DOWNLOAD_BYTES } from "./codeBlock";
-import { extensionFor } from "./highlight";
+import { extensionFor, loadHighlighter } from "./highlight";
 import { markdownToHtml } from "./markdown";
 import { MessageList } from "./MessageList";
 
@@ -64,6 +64,7 @@ let writeText: MockInstance<MockApi["copyText"]>;
 
 beforeAll(async () => {
   await applyLanguage("en");
+  await loadHighlighter();
 });
 
 beforeEach(() => {
