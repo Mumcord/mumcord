@@ -7,12 +7,14 @@
 pub mod api;
 pub mod cache;
 mod diag;
+pub mod grants;
 mod health;
 mod host;
 pub mod i18n;
 pub mod manifest;
 pub mod messaging;
 pub mod package;
+pub mod peer_key;
 pub mod permissions;
 pub mod registry;
 mod runtime;

@@ -295,7 +295,7 @@ fn endless_loop_in_an_event_is_stopped_within_its_budget_and_restarted() {
     }
 
     let sent = Instant::now();
-    assert!(host.send("spin", Event::DialogClosed));
+    assert!(host.send("spin", Event::Timer(1)));
     let failed = next_event(&mut events);
     let took = sent.elapsed();
     assert!(
@@ -313,7 +313,7 @@ fn endless_loop_in_an_event_is_stopped_within_its_budget_and_restarted() {
     assert!(took < Duration::from_millis(500), "took {took:?}");
 
     // Other plugins keep running, and the stuck one comes back by itself.
-    assert!(host.send("good", Event::DialogClosed));
+    assert!(host.send("good", Event::Timer(1)));
     assert_eq!(host.state("good"), Some(RunState::Running));
     assert_eq!(
         next_event(&mut events),
@@ -336,7 +336,7 @@ fn turn_off_all_stops_everything_and_refuses_starts() {
     host.set_all_off(true);
     assert!(host.all_off());
     assert_eq!(host.state("good"), Some(RunState::AllOff));
-    assert!(!host.send("good", Event::DialogClosed));
+    assert!(!host.send("good", Event::Timer(1)));
     assert_eq!(host.enable("good"), Err(HostError::AllOff));
 
     host.set_all_off(false);
@@ -472,4 +472,121 @@ fn api_version_decides_whether_a_plugin_loads() {
         host.load(&root.path().join("current"), None),
         Err(LoadError::AlreadyLoaded(_))
     ));
+}
+
+/// Calls `notify.send("nope", "nope")` five times, then returns `ok` (AC-6.15).
+const NOTIFY_FIVE_TIMES: &str = "
+    (call $notify (i32.const 32) (i32.const 4) (i32.const 32) (i32.const 4) (i32.const 128))
+    (call $notify (i32.const 32) (i32.const 4) (i32.const 32) (i32.const 4) (i32.const 128))
+    (call $notify (i32.const 32) (i32.const 4) (i32.const 32) (i32.const 4) (i32.const 128))
+    (call $notify (i32.const 32) (i32.const 4) (i32.const 32) (i32.const 4) (i32.const 128))
+    (call $notify (i32.const 32) (i32.const 4) (i32.const 32) (i32.const 4) (i32.const 128))
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64)";
+
+fn host_with_context(ctx: Arc<HostContext>) -> (PluginHost, UnboundedReceiver<HostEvent>) {
+    let (outbox, events) = unbounded_channel();
+    let host = PluginHost::new(APP_VERSION, None, ctx, outbox).expect("runtime starts");
+    (host, events)
+}
+
+fn notifications(events: &mut UnboundedReceiver<HostEvent>) -> usize {
+    std::iter::from_fn(|| events.try_recv().ok())
+        .filter(|event| matches!(event, HostEvent::Notify { .. }))
+        .count()
+}
+
+#[test]
+fn notify_five_times_gives_one_entry_and_none_in_do_not_disturb() {
+    let root = tempfile::tempdir().expect("temp dir");
+    let ctx = Arc::new(HostContext::default());
+    ctx.grants.set("notifier", ["notify"]);
+    ctx.grants.set("quiet", ["notify"]);
+    let (mut host, mut events) = host_with_context(Arc::clone(&ctx));
+    let wasm = component(NOTIFY_FIVE_TIMES, "");
+
+    host.load(&plugin_dir(root.path(), "notifier", &wasm, ""), None)
+        .expect("loads");
+    host.enable("notifier").expect("starts");
+    assert_eq!(
+        events.try_recv().ok(),
+        Some(HostEvent::Notify {
+            id: "notifier".into(),
+            title: "nope".into(),
+            body: "nope".into(),
+        })
+    );
+    assert_eq!(notifications(&mut events), 0);
+
+    ctx.notify.set_quiet(true);
+    host.load(&plugin_dir(root.path(), "quiet", &wasm, ""), None)
+        .expect("loads");
+    host.enable("quiet").expect("starts");
+    assert_eq!(notifications(&mut events), 0);
+
+    // Without the permission the call fails and nothing reaches the centre.
+    ctx.notify.set_quiet(false);
+    host.load(&plugin_dir(root.path(), "denied", &wasm, ""), None)
+        .expect("loads");
+    host.enable("denied").expect("starts");
+    assert_eq!(notifications(&mut events), 0);
+}
+
+#[test]
+fn timers_fire_as_events_and_stop_with_the_plugin() {
+    let root = tempfile::tempdir().expect("temp dir");
+    let (mut host, _events) = host_with_events(None);
+    let start = "
+        (call $timer (i32.const 1) (i32.const 1) (i32.const 128))
+        (i32.store8 (i32.const 64) (i32.const 0))
+        (i32.const 64)";
+    let on_timer = "(call $log (i32.const 1) (i32.const 32) (i32.const 4))";
+    let wasm = component_with_events(start, on_timer, "");
+    host.load(&plugin_dir(root.path(), "ticker", &wasm, ""), None)
+        .expect("loads");
+    host.enable("ticker").expect("starts");
+
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while host.log_lines("ticker").len() < 2 {
+        assert!(Instant::now() < deadline, "the timer did not repeat");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    host.disable("ticker").expect("stops");
+    let ticks = host.log_lines("ticker").len();
+    std::thread::sleep(Duration::from_millis(600));
+    assert_eq!(host.log_lines("ticker").len(), ticks);
+}
+
+#[test]
+fn events_need_their_permission_at_the_time_they_are_sent() {
+    use mumcord_plugins::wit::types::Peer;
+    let root = tempfile::tempdir().expect("temp dir");
+    let ctx = Arc::new(HostContext::default());
+    let (mut host, _events) = host_with_context(Arc::clone(&ctx));
+    let on_event = "(call $log (i32.const 1) (i32.const 32) (i32.const 4))";
+    let wasm = component_with_events(WELL_BEHAVED, on_event, "");
+    host.load(&plugin_dir(root.path(), "watcher", &wasm, ""), None)
+        .expect("loads");
+    host.enable("watcher").expect("starts");
+    let joined = Event::Joined(Peer {
+        session: 7,
+        name: "a".into(),
+        key: None,
+    });
+
+    assert!(!host.send("watcher", joined.clone()));
+    ctx.grants.set("watcher", ["events.presence"]);
+    assert!(host.send("watcher", joined.clone()));
+    ctx.grants.set("watcher", Vec::<String>::new());
+    host.broadcast(&joined);
+    assert!(host.send("watcher", Event::LanguageChanged("de".into())));
+
+    // The start line, the permitted `joined` and `language-changed`; not the broadcast.
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while host.log_lines("watcher").len() < 3 {
+        assert!(Instant::now() < deadline, "events were not delivered");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    std::thread::sleep(Duration::from_millis(100));
+    assert_eq!(host.log_lines("watcher").len(), 3);
 }

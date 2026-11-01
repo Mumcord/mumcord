@@ -4106,6 +4106,7 @@ version = "0.4.4"
 dependencies = [
  "ammonia",
  "base64 0.23.1",
+ "chrono",
  "hmac 0.13.0",
  "keyring",
  "minisign",

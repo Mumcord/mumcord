@@ -22,6 +22,7 @@ tracing.workspace = true
 tempfile.workspace = true
 minisign-verify.workspace = true
 hmac.workspace = true
+chrono.workspace = true
 toml.workspace = true
 rand.workspace = true
 ammonia.workspace = true

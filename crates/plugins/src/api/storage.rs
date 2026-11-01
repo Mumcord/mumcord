@@ -327,6 +327,7 @@ mod tests {
         let ctx = HostContext {
             storage: Storage::new(Arc::new(Mutex::new(store))),
             secrets: Some(Arc::new(PluginSecrets::in_memory())),
+            ..HostContext::default()
         };
         ctx.storage.set_identity(Some(7));
         (dir, ctx)

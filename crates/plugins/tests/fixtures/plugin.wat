@@ -3,6 +3,10 @@
 ;; STOP placeholders with the function bodies each test needs.
 (module
   (import "mumcord:plugin/log@1.0.0" "write" (func $log (param i32 i32 i32)))
+  ;; send(title, body) -> result<_, error>: two strings, then a pointer for the result.
+  (import "mumcord:plugin/notify@1.0.0" "send" (func $notify (param i32 i32 i32 i32 i32)))
+  ;; start(interval-ms, repeat) -> result<timer-id, error>, then a pointer for the result.
+  (import "mumcord:plugin/timers@1.0.0" "start" (func $timer (param i32 i32 i32)))
   (memory (export "memory") 1)
   (global $heap (mut i32) (i32.const 4096))
   (data (i32.const 32) "nope")

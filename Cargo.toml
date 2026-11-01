@@ -149,6 +149,8 @@ minisign-verify = "0.3"
 minisign = "0.10"
 # Peer keys for plugin messages; the HMAC version matches sha2 0.11.
 hmac = "0.13"
+# Local UTC offset for the plugin clock (FR-6.21); follows DST changes by itself.
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
 # Repository sources and registry metadata (FR-6.54).
 toml = "1"
 # Scenario files for `mumcord-plugin test` (FR-6.71); pure Rust, no libyaml.

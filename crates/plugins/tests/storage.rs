@@ -117,6 +117,7 @@ fn setup(id: &str) -> Setup {
     let ctx = HostContext {
         storage: Storage::new(Arc::clone(&store)),
         secrets: None,
+        ..HostContext::default()
     };
     let (outbox, events) = unbounded_channel();
     let host = PluginHost::new(Version::new(0, 7, 0), None, Arc::new(ctx), outbox)

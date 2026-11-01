@@ -42,6 +42,13 @@ pub enum HostEvent {
         error: CallError,
         recovery: Recovery,
     },
+    /// The plugin's `notify.send` passed the limits: add an entry to the notification centre,
+    /// category Plugins, with the plugin's name and icon. Title and body are untrusted text.
+    Notify {
+        id: String,
+        title: String,
+        body: String,
+    },
 }
 
 /// The runtime part of the plugin lifecycle (spec §7.2).
@@ -214,6 +221,7 @@ impl PluginHost {
             }
         }
 
+        let queue = Arc::new(EventQueue::new(Arc::clone(&slot.diag)));
         let params = StartParams {
             id: Arc::from(id),
             memory_bytes: slot.manifest.memory_mib as usize * 1024 * 1024,
@@ -227,8 +235,8 @@ impl PluginHost {
             outbox,
             log: Arc::clone(&slot.log),
             diag: Arc::clone(&slot.diag),
+            queue: Arc::downgrade(&queue),
         };
-        let queue = Arc::new(EventQueue::new(Arc::clone(&slot.diag)));
         let (reply, started) = sync_channel(1);
         let thread = {
             let compiled = slot.compiled.clone();
@@ -304,21 +312,25 @@ impl PluginHost {
         self.all_off
     }
 
-    /// Queues an event for one plugin. Returns false when it is not running; a plugin that is
-    /// backing off counts the event as dropped.
+    /// Queues an event for one plugin. Returns false when it is not running or lacks the
+    /// event's permission; a plugin that is backing off counts the event as dropped.
     pub fn send(&self, id: &str, event: Event) -> bool {
+        if !self.ctx.grants.allows_event(id, &event) {
+            return false;
+        }
         self.plugins
             .get(id)
             .and_then(|slot| slot.worker.as_ref())
             .is_some_and(|worker| worker.queue.push(event))
     }
 
-    /// Queues an event for every running plugin. Permission filtering happens before this.
+    /// Queues an event for every running plugin that holds the event's permission.
     pub fn broadcast(&self, event: &Event) {
         for worker in self
             .plugins
-            .values()
-            .filter_map(|slot| slot.worker.as_ref())
+            .iter()
+            .filter(|(id, _)| self.ctx.grants.allows_event(id, event))
+            .filter_map(|(_, slot)| slot.worker.as_ref())
         {
             worker.queue.push(event.clone());
         }

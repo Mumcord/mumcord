@@ -6,20 +6,26 @@
 use std::collections::VecDeque;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Condvar, Mutex, MutexGuard, PoisonError};
+use std::sync::{Arc, Condvar, Mutex, MutexGuard, PoisonError, Weak};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
 use semver::Version;
 use tokio::sync::mpsc::UnboundedSender;
-use wasmtime::component::{Component, HasSelf, InstancePre, Linker};
+use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap};
 
+use crate::api;
+use crate::api::notify::Notify;
 use crate::api::secrets::{PluginSecrets, SecretsApi};
 use crate::api::storage::{Storage, StorageApi};
+use crate::api::theme::Theme;
+use crate::api::timers::{TimerSet, Timers};
 use crate::cache;
 use crate::diag::Diagnostics;
+use crate::grants::Grants;
 use crate::host::HostEvent;
+use crate::peer_key::PeerKeys;
 
 pub(crate) mod bindings {
     wasmtime::component::bindgen!({ path: "wit", world: "plugin" });
@@ -90,7 +96,12 @@ type AddToLinker = fn(&mut Linker<PluginState>) -> wasmtime::Result<()>;
 
 /// Every interface the host serves. One line per `api/*` module.
 const HOST_APIS: &[AddToLinker] = &[
-    <LogApi as HostApi>::add_to_linker,
+    <api::log::LogApi as HostApi>::add_to_linker,
+    <api::timers::TimersApi as HostApi>::add_to_linker,
+    <api::clock::ClockApi as HostApi>::add_to_linker,
+    <api::notify::NotifyApi as HostApi>::add_to_linker,
+    <api::theme::ThemeApi as HostApi>::add_to_linker,
+    <api::random::RandomApi as HostApi>::add_to_linker,
     <StorageApi as HostApi>::add_to_linker,
     <SecretsApi as HostApi>::add_to_linker,
 ];
@@ -103,6 +114,13 @@ pub struct HostContext {
     pub storage: Storage,
     /// `secrets` (FR-6.25); `None` turns the interface off (tests, no keychain wanted).
     pub secrets: Option<Arc<PluginSecrets>>,
+    /// The permission gate every host call and event goes through.
+    pub grants: Grants,
+    pub timers: Timers,
+    pub notify: Notify,
+    pub theme: Theme,
+    /// `None` until the service has loaded the per-install secret; peers then get no key.
+    pub peer_keys: Option<PeerKeys>,
 }
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.
@@ -159,6 +177,8 @@ pub(crate) struct StartParams {
     pub outbox: UnboundedSender<HostEvent>,
     pub log: Arc<Mutex<LogBuffer>>,
     pub diag: Arc<Diagnostics>,
+    /// The plugin's event queue, for host calls that answer later (timers).
+    pub queue: Weak<EventQueue>,
 }
 
 /// One running plugin: its store and instance. Lives on the plugin's own thread.
@@ -168,10 +188,6 @@ pub struct Instance {
 }
 
 /// What the host keeps per running plugin, reachable from host functions.
-#[allow(
-    dead_code,
-    reason = "id, ctx and outbox are for the host API modules that come next"
-)]
 pub struct PluginState {
     pub(crate) id: Arc<str>,
     pub(crate) ctx: Arc<HostContext>,
@@ -181,6 +197,7 @@ pub struct PluginState {
     pub(crate) diag: Arc<Diagnostics>,
     /// The manifest's storage quota in bytes (FR-6.20).
     pub(crate) storage_quota: u64,
+    pub(crate) timers: TimerSet,
     limiter: Limiter,
 }
 
@@ -304,6 +321,7 @@ impl Compiled {
             log: Arc::clone(&params.log),
             diag: Arc::clone(&params.diag),
             storage_quota: params.storage_quota,
+            timers: params.ctx.timers.set(Weak::clone(&params.queue)),
             limiter: Limiter {
                 limits,
                 diag: Arc::clone(&params.diag),
@@ -415,27 +433,6 @@ impl ResourceLimiter for Limiter {
 
 impl bindings::mumcord::plugin::types::Host for PluginState {}
 
-/// `log` (FR-6.26): lines go only to the plugin's ring buffer, never to Mumcord's log files.
-struct LogApi;
-
-impl HostApi for LogApi {
-    fn add_to_linker(linker: &mut Linker<PluginState>) -> wasmtime::Result<()> {
-        bindings::mumcord::plugin::log::add_to_linker::<PluginState, HasSelf<PluginState>>(
-            linker,
-            |s| s,
-        )
-    }
-}
-
-impl bindings::mumcord::plugin::log::Host for PluginState {
-    fn write(&mut self, level: Level, message: String) {
-        self.log
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .push(level, &message);
-    }
-}
-
 /// The last [`LOG_LINES`] lines a plugin logged, each cut to [`LOG_LINE_CHARS`] characters.
 /// Kept apart from the app log so plugins cannot write into it.
 #[derive(Debug, Default)]
@@ -444,7 +441,7 @@ pub struct LogBuffer {
 }
 
 impl LogBuffer {
-    fn push(&mut self, level: Level, message: &str) {
+    pub(crate) fn push(&mut self, level: Level, message: &str) {
         if self.lines.len() == LOG_LINES {
             self.lines.pop_front();
         }
