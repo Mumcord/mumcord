@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Ta wtyczka nie wyświetla tu jeszcze niczego.",
+    "actionFailed": "Wtyczka nie mogła tego obsłużyć. Spróbuj ponownie."
+  },
+  "progress": {
+    "working": "W toku"
+  },
+  "countdown": {
+    "done": "Czas minął"
+  },
+  "select": {
+    "refresh": "Odśwież: {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} bajtów"
+  },
+  "password": {
+    "save": "Zapisz",
+    "saved": "Zapisano bezpiecznie"
+  },
+  "file": {
+    "choose": "Wybierz plik…",
+    "none": "Nie wybrano pliku"
+  },
+  "list": {
+    "handle": "Przenieś wiersz {{position}} z {{total}} (strzałka w górę lub w dół)",
+    "moved": "Przeniesiono wiersz {{from}} na pozycję {{to}} z {{total}}"
+  }
+}

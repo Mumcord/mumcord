@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Acest plugin nu afișează încă nimic aici.",
+    "actionFailed": "Pluginul nu a putut gestiona acest lucru. Încearcă din nou."
+  },
+  "progress": {
+    "working": "În desfășurare"
+  },
+  "countdown": {
+    "done": "Timpul a expirat"
+  },
+  "select": {
+    "refresh": "Reîmprospătează {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} octeți"
+  },
+  "password": {
+    "save": "Salvează",
+    "saved": "Salvat în siguranță"
+  },
+  "file": {
+    "choose": "Alege fișierul…",
+    "none": "Niciun fișier ales"
+  },
+  "list": {
+    "handle": "Mută rândul {{position}} din {{total}} (săgeată sus sau jos)",
+    "moved": "Rândul {{from}} a fost mutat pe poziția {{to}} din {{total}}"
+  }
+}

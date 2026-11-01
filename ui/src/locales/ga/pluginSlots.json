@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Níl aon rud á thaispeáint ag an mbreiseán seo anseo fós.",
+    "actionFailed": "Níorbh fhéidir leis an mbreiseán é sin a láimhseáil. Bain triail eile as."
+  },
+  "progress": {
+    "working": "Ar siúl"
+  },
+  "countdown": {
+    "done": "Tá an t-am istigh"
+  },
+  "select": {
+    "refresh": "Athnuaigh {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} beart"
+  },
+  "password": {
+    "save": "Sábháil",
+    "saved": "Sábháilte go slán"
+  },
+  "file": {
+    "choose": "Roghnaigh comhad…",
+    "none": "Níor roghnaíodh comhad"
+  },
+  "list": {
+    "handle": "Bog ró {{position}} as {{total}} (saighead suas nó síos)",
+    "moved": "Bogadh ró {{from}} go dtí suíomh {{to}} as {{total}}"
+  }
+}

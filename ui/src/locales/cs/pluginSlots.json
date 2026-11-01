@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Tento plugin zde zatím nic nezobrazuje.",
+    "actionFailed": "Plugin to nedokázal zpracovat. Zkuste to prosím znovu."
+  },
+  "progress": {
+    "working": "Probíhá"
+  },
+  "countdown": {
+    "done": "Čas vypršel"
+  },
+  "select": {
+    "refresh": "Obnovit {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} bajtů"
+  },
+  "password": {
+    "save": "Uložit",
+    "saved": "Bezpečně uloženo"
+  },
+  "file": {
+    "choose": "Vybrat soubor…",
+    "none": "Není vybrán žádný soubor"
+  },
+  "list": {
+    "handle": "Přesunout řádek {{position}} z {{total}} (šipka nahoru nebo dolů)",
+    "moved": "Řádek {{from}} přesunut na pozici {{to}} z {{total}}"
+  }
+}

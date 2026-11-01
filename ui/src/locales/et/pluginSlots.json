@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "See plugin ei näita siin veel midagi.",
+    "actionFailed": "Plugin ei saanud sellega hakkama. Proovi uuesti."
+  },
+  "progress": {
+    "working": "Käimas"
+  },
+  "countdown": {
+    "done": "Aeg on läbi"
+  },
+  "select": {
+    "refresh": "Värskenda: {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} baiti"
+  },
+  "password": {
+    "save": "Salvesta",
+    "saved": "Turvaliselt salvestatud"
+  },
+  "file": {
+    "choose": "Vali fail…",
+    "none": "Faili pole valitud"
+  },
+  "list": {
+    "handle": "Liiguta rida {{position}}/{{total}} (nool üles või alla)",
+    "moved": "Rida {{from}} liigutati kohale {{to}}/{{total}}"
+  }
+}

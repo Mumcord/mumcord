@@ -2952,6 +2952,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginSetBadge: () => Promise.resolve(null),
     pluginDiagnostics: () => fail("notFound", "no such plugin"),
     pluginsUiTrees: () => Promise.resolve([]),
+    pluginAsset: () => fail("notFound", "no such asset"),
     pluginsSetAppearance: () => Promise.resolve(null),
     pluginUiAction: () => fail("invalidInput", "no such action on screen"),
     pluginUiEvent: () => fail("invalidInput", "the plugin is not running"),

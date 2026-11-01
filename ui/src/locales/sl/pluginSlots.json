@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Ta vtičnik tukaj še ničesar ne prikazuje.",
+    "actionFailed": "Vtičnik tega ni mogel obdelati. Poskusite znova."
+  },
+  "progress": {
+    "working": "V teku"
+  },
+  "countdown": {
+    "done": "Čas je potekel"
+  },
+  "select": {
+    "refresh": "Osveži {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} bajtov"
+  },
+  "password": {
+    "save": "Shrani",
+    "saved": "Varno shranjeno"
+  },
+  "file": {
+    "choose": "Izberi datoteko…",
+    "none": "Ni izbrane datoteke"
+  },
+  "list": {
+    "handle": "Premakni vrstico {{position}} od {{total}} (puščica gor ali dol)",
+    "moved": "Vrstica {{from}} premaknjena na mesto {{to}} od {{total}}"
+  }
+}

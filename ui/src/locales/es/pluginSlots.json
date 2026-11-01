@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Este plugin aún no muestra nada aquí.",
+    "actionFailed": "El plugin no ha podido procesarlo. Inténtalo de nuevo."
+  },
+  "progress": {
+    "working": "En curso"
+  },
+  "countdown": {
+    "done": "Se acabó el tiempo"
+  },
+  "select": {
+    "refresh": "Actualizar {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} bytes"
+  },
+  "password": {
+    "save": "Guardar",
+    "saved": "Guardado de forma segura"
+  },
+  "file": {
+    "choose": "Elegir archivo…",
+    "none": "Ningún archivo elegido"
+  },
+  "list": {
+    "handle": "Mover la fila {{position}} de {{total}} (flecha arriba o abajo)",
+    "moved": "Fila {{from}} movida a la posición {{to}} de {{total}}"
+  }
+}

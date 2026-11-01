@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Dette plugin viser ikke noget her endnu.",
+    "actionFailed": "Pluginnet kunne ikke håndtere det. Prøv igen."
+  },
+  "progress": {
+    "working": "I gang"
+  },
+  "countdown": {
+    "done": "Tiden er gået"
+  },
+  "select": {
+    "refresh": "Opdater {{label}}"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} byte"
+  },
+  "password": {
+    "save": "Gem",
+    "saved": "Gemt sikkert"
+  },
+  "file": {
+    "choose": "Vælg fil…",
+    "none": "Ingen fil valgt"
+  },
+  "list": {
+    "handle": "Flyt række {{position}} af {{total}} (pil op eller ned)",
+    "moved": "Række {{from}} flyttet til position {{to}} af {{total}}"
+  }
+}

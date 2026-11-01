@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Deze plugin toont hier nog niets.",
+    "actionFailed": "De plugin kon dit niet verwerken. Probeer het opnieuw."
+  },
+  "progress": {
+    "working": "Bezig"
+  },
+  "countdown": {
+    "done": "De tijd is om"
+  },
+  "select": {
+    "refresh": "{{label}} vernieuwen"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} bytes"
+  },
+  "password": {
+    "save": "Opslaan",
+    "saved": "Veilig opgeslagen"
+  },
+  "file": {
+    "choose": "Bestand kiezen…",
+    "none": "Geen bestand gekozen"
+  },
+  "list": {
+    "handle": "Rij {{position}} van {{total}} verplaatsen (pijl omhoog of omlaag)",
+    "moved": "Rij {{from}} verplaatst naar positie {{to}} van {{total}}"
+  }
+}

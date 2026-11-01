@@ -1,0 +1,30 @@
+{
+  "tree": {
+    "empty": "Ez a bővítmény itt még nem jelenít meg semmit.",
+    "actionFailed": "A bővítmény ezt nem tudta kezelni. Próbáld újra."
+  },
+  "progress": {
+    "working": "Folyamatban"
+  },
+  "countdown": {
+    "done": "Lejárt az idő"
+  },
+  "select": {
+    "refresh": "{{label}} frissítése"
+  },
+  "input": {
+    "bytes": "{{used}} / {{max}} bájt"
+  },
+  "password": {
+    "save": "Mentés",
+    "saved": "Biztonságosan mentve"
+  },
+  "file": {
+    "choose": "Fájl kiválasztása…",
+    "none": "Nincs kiválasztott fájl"
+  },
+  "list": {
+    "handle": "{{position}}. sor áthelyezése ({{total}} közül; fel vagy le nyíl)",
+    "moved": "A(z) {{from}}. sor áthelyezve a(z) {{to}}. helyre ({{total}} közül)"
+  }
+}
