@@ -248,6 +248,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_commands,
             commands::plugins::plugin_run_command,
             plugins::suggestions::plugin_suggestion_not_now,
+            plugins::suggestions::plugin_suggestion_installed,
             plugins::suggestions::plugin_suggestions_dismiss_server,
             diagnostics::diagnostics_save,
             diagnostics::app_info,

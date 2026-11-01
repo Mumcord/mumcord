@@ -3013,6 +3013,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginInstallPrepare: () => fail("notFound", "plugin not in the list"),
     pluginIndexImage: () => fail("notFound", "plugin not in the list"),
     pluginSuggestionNotNow: () => Promise.resolve(null),
+    pluginSuggestionInstalled: () => Promise.resolve(null),
     pluginSuggestionsDismissServer: () => Promise.resolve(null),
     pluginSetEnabled: () => fail("notFound", "no such plugin"),
     pluginSetPermissions: () => fail("notFound", "no such plugin"),

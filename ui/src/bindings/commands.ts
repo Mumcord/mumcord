@@ -633,6 +633,11 @@ export const commands = {
 	pluginRunCommand: (line: string, serverId: number | null) => typedError<PluginCommandOutcome, ApiError>(__TAURI_INVOKE("plugin_run_command", { line, serverId })),
 	/**  "Not now": the suggestion stays hidden until the server's list changes or 30 days pass. */
 	pluginSuggestionNotNow: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_not_now", { serverId, plugin })),
+	/**
+	 *  The user installed a plugin from a suggestion: remember it, so the suggestion does not come
+	 *  back if the plugin is removed before the server's next announcement (AC-6.26).
+	 */
+	pluginSuggestionInstalled: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_installed", { serverId, plugin })),
 	/**  "Don't ask again for this server". */
 	pluginSuggestionsDismissServer: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestions_dismiss_server", { serverId })),
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
