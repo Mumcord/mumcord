@@ -322,6 +322,9 @@ describe("Echolings between two friends (AC-6.5, AC-6.6)", () => {
       await section().waitForDisplayed({ timeout: 10_000 });
       await waitText(section, PET_A);
       await waitText(section, "Bond");
+      // The open profile card covers the chat cards the next tests click.
+      await browser.keys("Escape");
+      await profile.waitForDisplayed({ reverse: true, timeout: 10_000 });
     });
   });
 
@@ -377,10 +380,7 @@ describe("Echolings between two friends (AC-6.5, AC-6.6)", () => {
     });
   });
 
-  // C4b: Echolings shows its race page with `webview.show(Place::Dialog)` without opening a
-  // dialog first, which the host refuses (`invalid`): the card says "The race window could not
-  // open." Needs a fix in Echolings (feat/echolings).
-  it.skip("AC-6.5: A and B race in Snack Race (web view, page↔plugin bridge)", async () => {
+  it("AC-6.5: A and B race in Snack Race (web view, page↔plugin bridge)", async () => {
     await openEcholings();
     await clickIn(panel, "Snack Race");
     // The host's race window opens with every text from the plugin (bridge page → plugin → page).
@@ -396,9 +396,10 @@ describe("Echolings between two friends (AC-6.5, AC-6.6)", () => {
       await waitText(() => card("Snack Race"), "Alice started Snack Race", 30_000);
       await clickIn(() => card("Snack Race"), "Join");
       await raceFrame().waitForDisplayed({ timeout: 20_000 });
-      await browser.waitUntil(async () => (await racePage()).lanes.length === 2, {
+      // Other pets join the track with their first hop (kind 8), so in the lobby B sees its own.
+      await browser.waitUntil(async () => (await racePage()).lanes.length === 1, {
         timeout: 20_000,
-        timeoutMsg: "B's race page does not list both pets",
+        timeoutMsg: "B's race page never showed B's pet",
       });
       return autoRace();
     });
@@ -421,11 +422,12 @@ describe("Echolings between two friends (AC-6.5, AC-6.6)", () => {
     const bLane = pageA.lanes.find((l) => l.startsWith("Bob"));
     const bOwn = pageB.lanes.find((l) => !l.startsWith("Alice"));
     if (bOwn !== undefined && !bOwn.includes(": 0 of")) expect(bLane).not.toContain(": 0 of");
+    // The page ranks runs as their scores arrive; the cards rank them 20 s after the start.
     await browser.keys("Escape");
-    await waitText(() => card("Snack Race"), "Bob", 10_000);
+    await waitText(() => card("Snack Race"), "Bob", 30_000);
     await apps.onB(async () => {
       await browser.keys("Escape");
-      await waitText(() => card("Snack Race"), "Alice", 10_000);
+      await waitText(() => card("Snack Race"), "Alice", 30_000);
     });
   });
 
