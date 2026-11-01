@@ -31,7 +31,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B25a | SDK crate `mumcord-plugin-sdk` | done | b25a-sdk |
 | B25b | CLI `mumcord-plugin` (author + registry commands) | done | b25b-cli |
 | B25c | CLI `test` and `preview` | done | b25c-test |
-| B16b | Fixture registry setup for E2E | in progress | b16b-fixreg |
+| B16b | Fixture registry setup for E2E | partly done (1d9b62d3 helper + setup script; E2E check not run → B16v) | b16b-fixreg |
 | B9 | Local mumbot instance (music + plugins) | done | b9-mumbot |
 | B26 | UI tree renderer | done | b26-render |
 | B27 | Plugins strip and panel popover | done | b27-strip |
@@ -124,6 +124,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F31 | Real-app bug: icon alignment — (a) icon-button glyphs are off-centre in their round buttons (renderer); (b) Echolings Treat/Play icons render as plain white circles under the F26 monochrome mask (need proper monochrome glyphs); (c) strip header card and the plugin icon row are not vertically aligned | done (e402bd4e + echolings f9587ab) | f31-icons |
 | F32 | Strip: while the right side sheet is open, the inline mini panel collapses to an empty thin bar with only the expand icon — hide the inline area completely for that plugin (or keep its normal inline content); never an empty bar | done (9b49a6b7) | f32-strip |
 | F33 | Strip redesign (user): remove the "Plugins · N aktiv" header card; only the row of plugin icons; clicking an icon toggles that plugin's mini (inline) view below; the expand button in the mini view opens the side sheet; keyboard + screen reader accessible | in progress | f33-strip |
+| B16v | Verify the B16b fixture-registry helper with one E2E spec that installs Poll from the local registry (under the e2e lock); fix what fails | open | |
 | L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | done (ff7d3e6b) | l0-sdki18n |
 | L0b | SDK i18n: full CLDR plural categories (zero/one/two/few/many/other) for the 24 languages in `tn`, falling back to `_other` | done (cf033cd5; `plural_category(tag, count)`, tn walks the fallback chain) | l0b-plurals |
 | L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | done (feat/poll 1b8a91a) | l1 |
