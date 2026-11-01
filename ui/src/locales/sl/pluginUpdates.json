@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Posodobitve vtičnikov",
+    "info": "Ločeno od posodabljanja aplikacije. Mumcord išče posodobitve vtičnikov ob zagonu in nato vsakih 6 ur.",
+    "infoLabel": "Več informacij: posodobitve vtičnikov",
+    "auto": "Namesti samodejno",
+    "notify": "Samo obvesti",
+    "off": "Izklopljeno"
+  },
+  "waiting": "Posodobitve",
+  "empty": "Vsi vtičniki so posodobljeni.",
+  "emptyOff": "Posodobitve vtičnikov so izklopljene. Vklopite jih zgoraj, da se iščejo posodobitve.",
+  "loadFailed": "Posodobitev ni bilo mogoče naložiti.",
+  "versions": "{{from}} na {{to}}",
+  "needsPermissions": "Ta različica potrebuje dodatna dovoljenja. Preglejte jih pred posodobitvijo.",
+  "newAuthorKey": "To različico je podpisal drug avtor. Posodobite le, če novemu avtorju zaupate.",
+  "rolledBack": "Različica {{version}} se ni zagnala, zato je bila obnovljena prejšnja. Razlog:",
+  "review": "Preglej in posodobi",
+  "approve": "Potrdi in posodobi",
+  "update": "Posodobi",
+  "installFailed": "Vtičnika {{name}} ni bilo mogoče posodobiti. Poskusite znova.",
+  "pins": "Pripni različico",
+  "pinsHint": "Pripet vtičnik ostane na trenutni različici in zanj ni ponujenih posodobitev.",
+  "pin": "Obdrži {{name}} na tej različici",
+  "pinVersion": "Različica {{version}}"
+}

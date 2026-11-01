@@ -1,9 +1,11 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { type PluginUpdates } from "../../api";
 import { Group } from "../settings/components/Section";
 import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginRequestStore";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
 import { RepositoriesTab, type MirrorSetting } from "./repos";
+import { UpdatesTab } from "./updates";
 import "./plugins.css";
 import { DeveloperTab } from "./developer/DeveloperTab";
 
@@ -29,10 +31,15 @@ const TAB_CONTENT: Record<PluginTab, ReactNode> = {
 export function PluginsSection({
   developerMode,
   mirror,
+  updateMode = "auto",
+  onUpdateModeChange = () => undefined,
 }: {
   developerMode: boolean;
   /** The optional mirror of the official list, shown under Repositories → Advanced. */
   mirror?: MirrorSetting | undefined;
+  /** The "Plugin updates" setting (FR-6.66). */
+  updateMode?: PluginUpdates;
+  onUpdateModeChange?: (mode: PluginUpdates) => void;
 }) {
   const { t } = useTranslation("pluginSettings");
   const { overview, loadFailed } = usePlugins();
@@ -126,7 +133,13 @@ export function PluginsSection({
         ))}
       </div>
       <div role="tabpanel" id={panelId(active)} aria-labelledby={tabId(active)} tabIndex={-1}>
-        {active === "repositories" ? <RepositoriesTab mirror={mirror} /> : TAB_CONTENT[active]}
+        {active === "updates" ? (
+          <UpdatesTab mode={updateMode} onModeChange={onUpdateModeChange} />
+        ) : active === "repositories" ? (
+          <RepositoriesTab mirror={mirror} />
+        ) : (
+          TAB_CONTENT[active]
+        )}
       </div>
     </Group>
   );

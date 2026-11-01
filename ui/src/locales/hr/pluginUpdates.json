@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Ažuriranja dodataka",
+    "info": "Odvojeno od ažuriranja aplikacije. Mumcord traži ažuriranja dodataka pri pokretanju i zatim svakih 6 sati.",
+    "infoLabel": "Više informacija: ažuriranja dodataka",
+    "auto": "Instaliraj automatski",
+    "notify": "Samo obavijesti",
+    "off": "Isključeno"
+  },
+  "waiting": "Ažuriranja",
+  "empty": "Svi su dodaci ažurni.",
+  "emptyOff": "Ažuriranja dodataka su isključena. Uključite ih iznad za traženje ažuriranja.",
+  "loadFailed": "Ažuriranja nisu mogla biti učitana.",
+  "versions": "{{from}} na {{to}}",
+  "needsPermissions": "Ova verzija treba dodatna dopuštenja. Pregledajte ih prije ažuriranja.",
+  "newAuthorKey": "Ovu je verziju potpisao drugi autor. Ažurirajte samo ako vjerujete novom autoru.",
+  "rolledBack": "Verzija {{version}} nije se pokrenula pa je vraćena prethodna verzija. Razlog:",
+  "review": "Pregledaj i ažuriraj",
+  "approve": "Odobri i ažuriraj",
+  "update": "Ažuriraj",
+  "installFailed": "Dodatak {{name}} nije bilo moguće ažurirati. Pokušajte ponovno.",
+  "pins": "Prikvači verziju",
+  "pinsHint": "Prikvačeni dodatak ostaje na trenutnoj verziji i za njega se ne nude ažuriranja.",
+  "pin": "Zadrži {{name}} na ovoj verziji",
+  "pinVersion": "Verzija {{version}}"
+}

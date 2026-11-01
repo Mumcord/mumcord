@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Aktualizacje wtyczek",
+    "info": "Niezależne od aktualizacji aplikacji. Mumcord szuka aktualizacji wtyczek przy uruchomieniu i co 6 godzin.",
+    "infoLabel": "Więcej informacji: aktualizacje wtyczek",
+    "auto": "Instaluj automatycznie",
+    "notify": "Tylko powiadamiaj",
+    "off": "Wyłączone"
+  },
+  "waiting": "Aktualizacje",
+  "empty": "Wszystkie wtyczki są aktualne.",
+  "emptyOff": "Aktualizacje wtyczek są wyłączone. Włącz je powyżej, aby szukać aktualizacji.",
+  "loadFailed": "Nie udało się wczytać aktualizacji.",
+  "versions": "{{from}} do {{to}}",
+  "needsPermissions": "Ta wersja wymaga dodatkowych uprawnień. Sprawdź je przed aktualizacją.",
+  "newAuthorKey": "Ta wersja jest podpisana przez innego autora. Aktualizuj tylko, jeśli ufasz nowemu autorowi.",
+  "rolledBack": "Wersja {{version}} nie uruchomiła się, więc przywrócono poprzednią wersję. Powód:",
+  "review": "Sprawdź i zaktualizuj",
+  "approve": "Zatwierdź i zaktualizuj",
+  "update": "Zaktualizuj",
+  "installFailed": "Nie udało się zaktualizować wtyczki {{name}}. Spróbuj ponownie.",
+  "pins": "Przypnij wersję",
+  "pinsHint": "Przypięta wtyczka zostaje przy obecnej wersji i nie dostaje propozycji aktualizacji.",
+  "pin": "Zostaw {{name}} w tej wersji",
+  "pinVersion": "Wersja {{version}}"
+}

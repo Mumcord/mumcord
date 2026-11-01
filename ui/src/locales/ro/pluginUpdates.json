@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Actualizări pentru pluginuri",
+    "info": "Separat de actualizarea aplicației. Mumcord caută actualizări pentru pluginuri la pornire și apoi la fiecare 6 ore.",
+    "infoLabel": "Mai multe informații: actualizări pentru pluginuri",
+    "auto": "Instalează automat",
+    "notify": "Doar notifică",
+    "off": "Oprit"
+  },
+  "waiting": "Actualizări",
+  "empty": "Toate pluginurile sunt la zi.",
+  "emptyOff": "Actualizările pentru pluginuri sunt oprite. Pornește-le mai sus pentru a căuta actualizări.",
+  "loadFailed": "Actualizările nu au putut fi încărcate.",
+  "versions": "{{from}} la {{to}}",
+  "needsPermissions": "Această versiune are nevoie de mai multe permisiuni. Verifică-le înainte de actualizare.",
+  "newAuthorKey": "Această versiune este semnată de alt autor. Actualizează doar dacă ai încredere în noul autor.",
+  "rolledBack": "Versiunea {{version}} nu a pornit, așa că a fost restaurată versiunea anterioară. Motiv:",
+  "review": "Verifică și actualizează",
+  "approve": "Aprobă și actualizează",
+  "update": "Actualizează",
+  "installFailed": "{{name}} nu a putut fi actualizat. Încearcă din nou.",
+  "pins": "Fixează versiunea",
+  "pinsHint": "Un plugin fixat rămâne la versiunea actuală și nu i se oferă actualizări.",
+  "pin": "Păstrează {{name}} la această versiune",
+  "pinVersion": "Versiunea {{version}}"
+}

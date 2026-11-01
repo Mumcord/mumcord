@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Plug-inupdates",
+    "info": "Los van de app-updater. Mumcord zoekt bij het starten en daarna elke 6 uur naar plug-inupdates.",
+    "infoLabel": "Meer informatie: plug-inupdates",
+    "auto": "Automatisch installeren",
+    "notify": "Alleen melden",
+    "off": "Uit"
+  },
+  "waiting": "Updates",
+  "empty": "Alle plug-ins zijn up-to-date.",
+  "emptyOff": "Plug-inupdates staan uit. Zet ze hierboven aan om naar updates te zoeken.",
+  "loadFailed": "De updates konden niet worden geladen.",
+  "versions": "{{from}} naar {{to}}",
+  "needsPermissions": "Deze versie heeft meer rechten nodig. Bekijk ze voordat je bijwerkt.",
+  "newAuthorKey": "Deze versie is door een andere auteur ondertekend. Werk alleen bij als je de nieuwe auteur vertrouwt.",
+  "rolledBack": "Versie {{version}} kon niet starten, daarom is de vorige versie hersteld. Reden:",
+  "review": "Bekijken en bijwerken",
+  "approve": "Goedkeuren en bijwerken",
+  "update": "Bijwerken",
+  "installFailed": "{{name}} kon niet worden bijgewerkt. Probeer het opnieuw.",
+  "pins": "Versie vastzetten",
+  "pinsHint": "Een vastgezette plug-in blijft op de huidige versie en krijgt geen updates aangeboden.",
+  "pin": "{{name}} op deze versie houden",
+  "pinVersion": "Versie {{version}}"
+}

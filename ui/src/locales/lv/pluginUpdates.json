@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Spraudņu atjauninājumi",
+    "info": "Atsevišķi no lietotnes atjaunināšanas. Mumcord meklē spraudņu atjauninājumus startējot un pēc tam ik pēc 6 stundām.",
+    "infoLabel": "Plašāka informācija: spraudņu atjauninājumi",
+    "auto": "Instalēt automātiski",
+    "notify": "Tikai paziņot",
+    "off": "Izslēgts"
+  },
+  "waiting": "Atjauninājumi",
+  "empty": "Visi spraudņi ir atjaunināti.",
+  "emptyOff": "Spraudņu atjauninājumi ir izslēgti. Ieslēdziet tos augstāk, lai meklētu atjauninājumus.",
+  "loadFailed": "Atjauninājumus neizdevās ielādēt.",
+  "versions": "{{from}} uz {{to}}",
+  "needsPermissions": "Šai versijai vajag vairāk atļauju. Pārskatiet tās pirms atjaunināšanas.",
+  "newAuthorKey": "Šo versiju ir parakstījis cits autors. Atjauniniet tikai tad, ja uzticaties jaunajam autoram.",
+  "rolledBack": "Versija {{version}} neuzsākās, tāpēc tika atjaunota iepriekšējā versija. Iemesls:",
+  "review": "Pārskatīt un atjaunināt",
+  "approve": "Apstiprināt un atjaunināt",
+  "update": "Atjaunināt",
+  "installFailed": "Spraudni {{name}} neizdevās atjaunināt. Mēģiniet vēlreiz.",
+  "pins": "Piespraust versiju",
+  "pinsHint": "Piesprausts spraudnis paliek pašreizējā versijā, un tam atjauninājumi netiek piedāvāti.",
+  "pin": "Paturēt {{name}} šajā versijā",
+  "pinVersion": "Versija {{version}}"
+}

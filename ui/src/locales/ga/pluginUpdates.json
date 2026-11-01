@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Nuashonruithe breiseán",
+    "info": "Scartha ó nuashonrú an aip. Féachann Mumcord le nuashonruithe breiseán ag tosú agus gach 6 uair an chloig ina dhiaidh sin.",
+    "infoLabel": "Tuilleadh eolais: nuashonruithe breiseán",
+    "auto": "Suiteáil go huathoibríoch",
+    "notify": "Fógra amháin",
+    "off": "As"
+  },
+  "waiting": "Nuashonruithe",
+  "empty": "Tá gach breiseán cothrom le dáta.",
+  "emptyOff": "Tá nuashonruithe breiseán as. Cuir ar siúl thuas iad chun nuashonruithe a lorg.",
+  "loadFailed": "Níorbh fhéidir na nuashonruithe a luchtú.",
+  "versions": "{{from}} go {{to}}",
+  "needsPermissions": "Teastaíonn tuilleadh ceadanna ón leagan seo. Athbhreithnigh iad sula nuashonraíonn tú.",
+  "newAuthorKey": "Tá an leagan seo sínithe ag údar eile. Nuashonraigh ach amháin má tá muinín agat as an údar nua.",
+  "rolledBack": "Níor thosaigh leagan {{version}}, mar sin athchóiríodh an leagan roimhe. Cúis:",
+  "review": "Athbhreithnigh agus nuashonraigh",
+  "approve": "Ceadaigh agus nuashonraigh",
+  "update": "Nuashonraigh",
+  "installFailed": "Níorbh fhéidir {{name}} a nuashonrú. Bain triail eile as.",
+  "pins": "Greamaigh leagan",
+  "pinsHint": "Fanann breiseán greamaithe ar a leagan reatha agus ní thairgtear nuashonruithe dó.",
+  "pin": "Coinnigh {{name}} ar an leagan seo",
+  "pinVersion": "Leagan {{version}}"
+}

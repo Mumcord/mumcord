@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Aggiornamenti dei plugin",
+    "info": "Separato dall'aggiornamento dell'app. Mumcord cerca aggiornamenti dei plugin all'avvio e ogni 6 ore.",
+    "infoLabel": "Maggiori informazioni: aggiornamenti dei plugin",
+    "auto": "Installa automaticamente",
+    "notify": "Solo notifica",
+    "off": "Disattivati"
+  },
+  "waiting": "Aggiornamenti",
+  "empty": "Tutti i plugin sono aggiornati.",
+  "emptyOff": "Gli aggiornamenti dei plugin sono disattivati. Attivali qui sopra per cercare aggiornamenti.",
+  "loadFailed": "Impossibile caricare gli aggiornamenti.",
+  "versions": "da {{from}} a {{to}}",
+  "needsPermissions": "Questa versione richiede più autorizzazioni. Controllale prima di aggiornare.",
+  "newAuthorKey": "Questa versione è firmata da un altro autore. Aggiorna solo se ti fidi del nuovo autore.",
+  "rolledBack": "La versione {{version}} non si è avviata, quindi è stata ripristinata la versione precedente. Motivo:",
+  "review": "Controlla e aggiorna",
+  "approve": "Approva e aggiorna",
+  "update": "Aggiorna",
+  "installFailed": "Impossibile aggiornare {{name}}. Riprova.",
+  "pins": "Blocca versione",
+  "pinsHint": "Un plugin bloccato resta alla versione attuale e non riceve proposte di aggiornamento.",
+  "pin": "Mantieni {{name}} su questa versione",
+  "pinVersion": "Versione {{version}}"
+}

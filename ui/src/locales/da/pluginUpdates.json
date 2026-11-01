@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Plugin-opdateringer",
+    "info": "Adskilt fra appens opdatering. Mumcord søger efter plugin-opdateringer ved start og derefter hver 6. time.",
+    "infoLabel": "Flere oplysninger: plugin-opdateringer",
+    "auto": "Installer automatisk",
+    "notify": "Giv kun besked",
+    "off": "Fra"
+  },
+  "waiting": "Opdateringer",
+  "empty": "Alle plugins er opdaterede.",
+  "emptyOff": "Plugin-opdateringer er slået fra. Slå dem til ovenfor for at søge efter opdateringer.",
+  "loadFailed": "Opdateringerne kunne ikke indlæses.",
+  "versions": "{{from}} til {{to}}",
+  "needsPermissions": "Denne version kræver flere tilladelser. Gennemgå dem, før du opdaterer.",
+  "newAuthorKey": "Denne version er signeret af en anden udgiver. Opdater kun, hvis du stoler på den nye udgiver.",
+  "rolledBack": "Version {{version}} kunne ikke starte, så den forrige version blev gendannet. Årsag:",
+  "review": "Gennemgå og opdater",
+  "approve": "Godkend og opdater",
+  "update": "Opdater",
+  "installFailed": "{{name}} kunne ikke opdateres. Prøv igen.",
+  "pins": "Fastlås version",
+  "pinsHint": "Et fastlåst plugin bliver på sin nuværende version og får ikke tilbudt opdateringer.",
+  "pin": "Behold {{name}} på denne version",
+  "pinVersion": "Version {{version}}"
+}

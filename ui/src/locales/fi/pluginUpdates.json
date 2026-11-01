@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Lisäosien päivitykset",
+    "info": "Erillinen sovelluksen päivittäjästä. Mumcord hakee lisäosien päivityksiä käynnistyessä ja sen jälkeen 6 tunnin välein.",
+    "infoLabel": "Lisätietoja: lisäosien päivitykset",
+    "auto": "Asenna automaattisesti",
+    "notify": "Ilmoita vain",
+    "off": "Pois"
+  },
+  "waiting": "Päivitykset",
+  "empty": "Kaikki lisäosat ovat ajan tasalla.",
+  "emptyOff": "Lisäosien päivitykset ovat pois päältä. Ota ne käyttöön yllä, niin päivityksiä haetaan.",
+  "loadFailed": "Päivityksiä ei voitu ladata.",
+  "versions": "{{from}} → {{to}}",
+  "needsPermissions": "Tämä versio tarvitsee lisää oikeuksia. Tarkista ne ennen päivitystä.",
+  "newAuthorKey": "Tämän version on allekirjoittanut eri tekijä. Päivitä vain, jos luotat uuteen tekijään.",
+  "rolledBack": "Versio {{version}} ei käynnistynyt, joten edellinen versio palautettiin. Syy:",
+  "review": "Tarkista ja päivitä",
+  "approve": "Hyväksy ja päivitä",
+  "update": "Päivitä",
+  "installFailed": "Lisäosaa {{name}} ei voitu päivittää. Yritä uudelleen.",
+  "pins": "Kiinnitä versio",
+  "pinsHint": "Kiinnitetty lisäosa pysyy nykyisessä versiossaan, eikä sille tarjota päivityksiä.",
+  "pin": "Pidä {{name}} tässä versiossa",
+  "pinVersion": "Versio {{version}}"
+}

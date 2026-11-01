@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Tilläggsuppdateringar",
+    "info": "Skilt från appens uppdaterare. Mumcord söker efter tilläggsuppdateringar vid start och sedan var 6:e timme.",
+    "infoLabel": "Mer information: tilläggsuppdateringar",
+    "auto": "Installera automatiskt",
+    "notify": "Bara meddela",
+    "off": "Av"
+  },
+  "waiting": "Uppdateringar",
+  "empty": "Alla tillägg är uppdaterade.",
+  "emptyOff": "Tilläggsuppdateringar är av. Slå på dem ovan för att söka efter uppdateringar.",
+  "loadFailed": "Uppdateringarna kunde inte läsas in.",
+  "versions": "{{from}} till {{to}}",
+  "needsPermissions": "Den här versionen behöver fler behörigheter. Granska dem innan du uppdaterar.",
+  "newAuthorKey": "Den här versionen är signerad av en annan upphovsperson. Uppdatera bara om du litar på den nya.",
+  "rolledBack": "Version {{version}} kunde inte startas, så den tidigare versionen återställdes. Orsak:",
+  "review": "Granska och uppdatera",
+  "approve": "Godkänn och uppdatera",
+  "update": "Uppdatera",
+  "installFailed": "{{name}} kunde inte uppdateras. Försök igen.",
+  "pins": "Fäst version",
+  "pinsHint": "Ett fäst tillägg stannar på sin nuvarande version och erbjuds inga uppdateringar.",
+  "pin": "Behåll {{name}} på den här versionen",
+  "pinVersion": "Version {{version}}"
+}

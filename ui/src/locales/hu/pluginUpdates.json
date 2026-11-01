@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Bővítményfrissítések",
+    "info": "Az alkalmazásfrissítéstől független. A Mumcord induláskor, majd 6 óránként keres bővítményfrissítéseket.",
+    "infoLabel": "További információ: bővítményfrissítések",
+    "auto": "Telepítés automatikusan",
+    "notify": "Csak értesítés",
+    "off": "Ki"
+  },
+  "waiting": "Frissítések",
+  "empty": "Minden bővítmény naprakész.",
+  "emptyOff": "A bővítményfrissítések ki vannak kapcsolva. Kapcsold be fent a frissítések kereséséhez.",
+  "loadFailed": "A frissítéseket nem sikerült betölteni.",
+  "versions": "{{from}} → {{to}}",
+  "needsPermissions": "Ehhez a verzióhoz több engedély kell. Frissítés előtt nézd át őket.",
+  "newAuthorKey": "Ezt a verziót más szerző írta alá. Csak akkor frissíts, ha megbízol az új szerzőben.",
+  "rolledBack": "A(z) {{version}} verzió nem indult el, ezért visszaállt az előző verzió. Ok:",
+  "review": "Átnézés és frissítés",
+  "approve": "Jóváhagyás és frissítés",
+  "update": "Frissítés",
+  "installFailed": "A(z) {{name}} frissítése nem sikerült. Próbáld újra.",
+  "pins": "Verzió rögzítése",
+  "pinsHint": "A rögzített bővítmény a jelenlegi verziónál marad, és nem kap frissítési ajánlatot.",
+  "pin": "{{name}} maradjon ezen a verzión",
+  "pinVersion": "{{version}} verzió"
+}

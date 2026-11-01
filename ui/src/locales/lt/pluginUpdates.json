@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Papildinių naujinimai",
+    "info": "Atskirai nuo programėlės naujinimo. „Mumcord“ ieško papildinių naujinimų paleidžiant ir vėliau kas 6 valandas.",
+    "infoLabel": "Daugiau informacijos: papildinių naujinimai",
+    "auto": "Diegti automatiškai",
+    "notify": "Tik pranešti",
+    "off": "Išjungta"
+  },
+  "waiting": "Naujinimai",
+  "empty": "Visi papildiniai atnaujinti.",
+  "emptyOff": "Papildinių naujinimai išjungti. Įjunkite juos aukščiau, kad būtų ieškoma naujinimų.",
+  "loadFailed": "Nepavyko įkelti naujinimų.",
+  "versions": "{{from}} į {{to}}",
+  "needsPermissions": "Šiai versijai reikia daugiau leidimų. Peržiūrėkite juos prieš naujindami.",
+  "newAuthorKey": "Šią versiją pasirašė kitas autorius. Naujinkite tik jei pasitikite nauju autoriumi.",
+  "rolledBack": "Versija {{version}} nepasileido, todėl atkurta ankstesnė versija. Priežastis:",
+  "review": "Peržiūrėti ir naujinti",
+  "approve": "Patvirtinti ir naujinti",
+  "update": "Naujinti",
+  "installFailed": "Nepavyko atnaujinti papildinio {{name}}. Bandykite dar kartą.",
+  "pins": "Prisegti versiją",
+  "pinsHint": "Prisegtas papildinys lieka dabartinėje versijoje ir jam naujinimai nesiūlomi.",
+  "pin": "Palikti {{name}} šioje versijoje",
+  "pinVersion": "Versija {{version}}"
+}

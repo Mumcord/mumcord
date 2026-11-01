@@ -532,6 +532,12 @@ export const commands = {
 	pluginSetNotifications: (id: string, on: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_notifications", { id, on })),
 	/**  Removes a plugin; its data is kept for 30 days unless `deleteData`. */
 	pluginRemove: (id: string, deleteData: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_remove", { id, deleteData })),
+	/**  The updates waiting for the user. */
+	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
+	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
+	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
+	/**  "Pin version": a pinned plugin is not offered updates (FR-6.67). */
+	pluginSetPinned: (id: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_pinned", { id, pinned })),
 	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
 	pluginExportData: (id: string) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_export_data", { id })),
 	pluginResetData: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_reset_data", { id })),
@@ -2575,6 +2581,29 @@ export type PluginUiChange =
 
 /**  A user input for a plugin's UI other than an action. */
 export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" };
+
+/**  One update on offer in Settings → Plugins → Updates. */
+export type PluginUpdate = {
+	id: string,
+	/**  From the signed list; untrusted text. */
+	name: string,
+	from: string,
+	to: string,
+	source: PluginSourceInfo,
+	/**  Download size in bytes. */
+	size: number,
+	/**  `None`: may install without asking. */
+	approval: PluginUpdateApproval | null,
+	/**  This version was installed, failed to start and was rolled back: the reason. */
+	failed: string | null,
+};
+
+/**  Why an update waits for the user (FR-6.67). */
+export type PluginUpdateApproval = 
+/**  The new version asks for these permissions on top of what is granted. */
+{ kind: "newPermissions"; permissions: string[] } | 
+/**  The new version is signed by a different author key. */
+{ kind: "newAuthorKey" };
 
 /**  How plugin updates are handled. */
 export type PluginUpdates = "auto" | "notify" | "off";

@@ -123,6 +123,10 @@ export function SettingsPageCards({
               update({ pluginsMirrorUrl });
             },
           }}
+          updateMode={settings.pluginsUpdates}
+          onUpdateModeChange={(pluginsUpdates) => {
+            update({ pluginsUpdates });
+          }}
         />
       );
     case "appearance":

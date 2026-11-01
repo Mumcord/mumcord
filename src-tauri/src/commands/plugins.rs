@@ -13,7 +13,7 @@ use mumcord_plugins::registry::{
     fetch_official, official_base,
 };
 use mumcord_plugins::service::{
-    InstallRequest, PluginInfo, PluginService, ServiceError, Status, UiInput, fetch,
+    Approval, InstallRequest, PluginInfo, PluginService, ServiceError, Status, UiInput, fetch,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
@@ -658,6 +658,112 @@ pub async fn plugin_set_visibility(
 pub async fn plugin_set_notifications(app: AppHandle, id: String, on: bool) -> ApiResult<()> {
     plugins_of(&app)?
         .call(move |service| service.set_notifications(&id, on))
+        .await
+}
+
+/// Why an update waits for the user (FR-6.67).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum PluginUpdateApproval {
+    /// The new version asks for these permissions on top of what is granted.
+    NewPermissions { permissions: Vec<String> },
+    /// The new version is signed by a different author key.
+    NewAuthorKey,
+}
+
+/// One update on offer in Settings → Plugins → Updates.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginUpdate {
+    pub id: String,
+    /// From the signed list; untrusted text.
+    pub name: String,
+    pub from: String,
+    pub to: String,
+    pub source: PluginSourceInfo,
+    /// Download size in bytes.
+    pub size: u32,
+    /// `None`: may install without asking.
+    pub approval: Option<PluginUpdateApproval>,
+    /// This version was installed, failed to start and was rolled back: the reason.
+    pub failed: Option<String>,
+}
+
+/// The updates waiting for the user.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_updates(app: AppHandle) -> ApiResult<Vec<PluginUpdate>> {
+    plugins_of(&app)?
+        .call(|service| {
+            Ok(service
+                .updates()
+                .into_iter()
+                .map(|u| PluginUpdate {
+                    id: u.id,
+                    name: u.name,
+                    from: u.from,
+                    to: u.to,
+                    source: match u.source {
+                        Source::Repo { repository_id } => PluginSourceInfo::Repo {
+                            repository_id: u32::try_from(repository_id).unwrap_or(u32::MAX),
+                        },
+                        _ => PluginSourceInfo::Official,
+                    },
+                    size: u32::try_from(u.size).unwrap_or(u32::MAX),
+                    approval: u.approval.map(|a| match a {
+                        Approval::NewPermissions(permissions) => {
+                            PluginUpdateApproval::NewPermissions { permissions }
+                        }
+                        Approval::NewAuthorKey => PluginUpdateApproval::NewAuthorKey,
+                    }),
+                    failed: u.failed,
+                })
+                .collect())
+        })
+        .await
+}
+
+/// Installs the waiting update of `id`; `optional` are the optional permissions to keep on.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_apply_update(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: String,
+    optional: Vec<String>,
+) -> ApiResult<()> {
+    let plugins = plugins_of(&app)?;
+    let target = id.clone();
+    let (url, size) = plugins
+        .call(move |service| {
+            service
+                .updates()
+                .into_iter()
+                .find(|u| u.id == target)
+                .map(|u| (u.url, u.size))
+                .ok_or(ServiceError::NoUpdate(target))
+        })
+        .await?;
+    let client = registry_client(engine.settings()?.developer_mode)?;
+    let events = plugins.call(|service| Ok(service.events())).await?;
+    let download = fetch(&client, &events, &id, &url, size)
+        .await
+        .map_err(plugins::service_error)?;
+    plugins
+        .call(move |service| service.apply_update(&id, &download, Some(&optional)))
+        .await
+}
+
+/// "Pin version": a pinned plugin is not offered updates (FR-6.67).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_pinned(app: AppHandle, id: String, pinned: bool) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.set_pinned(&id, pinned))
         .await
 }
 

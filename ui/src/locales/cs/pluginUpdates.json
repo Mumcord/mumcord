@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Aktualizace pluginů",
+    "info": "Odděleno od aktualizací aplikace. Mumcord hledá aktualizace pluginů při spuštění a poté každých 6 hodin.",
+    "infoLabel": "Další informace: aktualizace pluginů",
+    "auto": "Instalovat automaticky",
+    "notify": "Jen upozornit",
+    "off": "Vypnuto"
+  },
+  "waiting": "Aktualizace",
+  "empty": "Všechny pluginy jsou aktuální.",
+  "emptyOff": "Aktualizace pluginů jsou vypnuté. Zapněte je výše, aby se aktualizace hledaly.",
+  "loadFailed": "Aktualizace se nepodařilo načíst.",
+  "versions": "{{from}} na {{to}}",
+  "needsPermissions": "Tato verze potřebuje další oprávnění. Před aktualizací je zkontrolujte.",
+  "newAuthorKey": "Tato verze je podepsána jiným autorem. Aktualizujte jen tehdy, když novému autorovi důvěřujete.",
+  "rolledBack": "Verze {{version}} se nespustila, proto byla obnovena předchozí verze. Důvod:",
+  "review": "Zkontrolovat a aktualizovat",
+  "approve": "Schválit a aktualizovat",
+  "update": "Aktualizovat",
+  "installFailed": "Plugin {{name}} se nepodařilo aktualizovat. Zkuste to znovu.",
+  "pins": "Připnout verzi",
+  "pinsHint": "Připnutý plugin zůstane na současné verzi a nenabízejí se mu aktualizace.",
+  "pin": "Ponechat {{name}} na této verzi",
+  "pinVersion": "Verze {{version}}"
+}

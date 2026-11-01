@@ -1,0 +1,26 @@
+{
+  "mode": {
+    "legend": "Mises à jour des plugins",
+    "info": "Indépendant du programme de mise à jour de l'application. Mumcord cherche des mises à jour au démarrage, puis toutes les 6 heures.",
+    "infoLabel": "Plus d'informations : mises à jour des plugins",
+    "auto": "Installer automatiquement",
+    "notify": "Notifier seulement",
+    "off": "Désactivées"
+  },
+  "waiting": "Mises à jour",
+  "empty": "Tous les plugins sont à jour.",
+  "emptyOff": "Les mises à jour des plugins sont désactivées. Activez-les ci-dessus pour en rechercher.",
+  "loadFailed": "Impossible de charger les mises à jour.",
+  "versions": "{{from}} vers {{to}}",
+  "needsPermissions": "Cette version demande plus d'autorisations. Vérifiez-les avant de mettre à jour.",
+  "newAuthorKey": "Cette version est signée par un autre auteur. Ne mettez à jour que si vous faites confiance à ce nouvel auteur.",
+  "rolledBack": "La version {{version}} n'a pas pu démarrer, la version précédente a donc été rétablie. Raison :",
+  "review": "Vérifier et mettre à jour",
+  "approve": "Approuver et mettre à jour",
+  "update": "Mettre à jour",
+  "installFailed": "Impossible de mettre à jour {{name}}. Veuillez réessayer.",
+  "pins": "Figer la version",
+  "pinsHint": "Un plugin figé reste sur sa version actuelle et ne se voit proposer aucune mise à jour.",
+  "pin": "Garder {{name}} sur cette version",
+  "pinVersion": "Version {{version}}"
+}
