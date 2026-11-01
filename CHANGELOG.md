@@ -10,7 +10,8 @@
 
 - New connect sound
 - New new-message sound
-- New microphone mute sound
+- New microphone mute and unmute sounds
+- New deafen and undeafen sounds
 
 ### Fixed
 
