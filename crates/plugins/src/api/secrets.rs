@@ -271,10 +271,6 @@ impl PluginState {
     fn permit_secrets(&self) -> Result<(), Error> {
         self.ctx.grants.check(&self.id, PERMISSION)
     }
-
-    fn plugin_secrets(&self) -> Result<&PluginSecrets, Error> {
-        self.ctx.secrets.as_deref().ok_or(Error::NotPermitted)
-    }
 }
 
 impl secrets::Host for PluginState {
@@ -283,8 +279,11 @@ impl secrets::Host for PluginState {
         if name.len() > MAX_NAME_BYTES {
             return Err(Error::TooLarge);
         }
-        self.plugin_secrets()?
-            .exists(&self.id, &name)
+        let secrets = self.ctx.secrets.as_deref().ok_or(Error::NotPermitted)?;
+        let id = &self.id;
+        // The keychain is the OS's (D-Bus, a wallet prompt): waiting, not the plugin's own work.
+        self.clock
+            .waiting(|| secrets.exists(id, &name))
             .map_err(|e| plugin_error(&self.id, e))
     }
 
@@ -293,8 +292,11 @@ impl secrets::Host for PluginState {
         if name.len() > MAX_NAME_BYTES {
             return Err(Error::TooLarge);
         }
-        self.plugin_secrets()?
-            .delete(&self.id, &name)
+        let secrets = self.ctx.secrets.as_deref().ok_or(Error::NotPermitted)?;
+        let id = &self.id;
+        // The keychain is the OS's (D-Bus, a wallet prompt): waiting, not the plugin's own work.
+        self.clock
+            .waiting(|| secrets.delete(id, &name))
             .map_err(|e| plugin_error(&self.id, e))
     }
 }
@@ -312,6 +314,8 @@ mod memory {
         pub items: Mutex<HashMap<String, Vec<u8>>>,
         pub reads: AtomicUsize,
         pub broken: AtomicBool,
+        /// How long each read takes, like a keychain behind D-Bus.
+        pub read_delay: Mutex<std::time::Duration>,
     }
 
     pub(super) struct MemoryBackend(pub Arc<State>);
@@ -339,6 +343,7 @@ mod memory {
 
         fn get(&self, account: &str) -> Result<Option<Vec<u8>>, SecretsError> {
             self.fail()?;
+            std::thread::sleep(*self.0.read_delay.lock().expect("lock"));
             self.0.reads.fetch_add(1, Ordering::Relaxed);
             Ok(self.0.items.lock().expect("lock").get(account).cloned())
         }
@@ -455,5 +460,106 @@ mod tests {
             plugin_error("pet", SecretsError::InvalidName),
             Error::Invalid
         );
+    }
+
+    /// A plugin that asks for secret "k" on every event.
+    const ASKING_PLUGIN: &str = r#"
+(module
+  (import "mumcord:plugin/secrets@1.0.0" "exists" (func $exists (param i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (data (i32.const 32) "k")
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (i32.and (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param i32)
+    (call $exists (i32.const 32) (i32.const 1) (i32.const 100))
+    ;; A function entry checks the epoch deadline once the host call has returned.
+    (call $own_work))
+  (func $own_work)
+  (func (export "stop"))
+)"#;
+
+    fn asking_plugin(root: &std::path::Path) -> std::path::PathBuf {
+        let mut module = wat::parse_str(ASKING_PLUGIN).expect("valid WAT");
+        let mut resolve = wit_parser::Resolve::default();
+        let (package, _) = resolve
+            .push_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("wit"))
+            .expect("WIT parses");
+        let world = resolve
+            .select_world(&[package], Some("plugin"))
+            .expect("world exists");
+        wit_component::embed_component_metadata(
+            &mut module,
+            &resolve,
+            world,
+            wit_component::StringEncoding::UTF8,
+            false,
+        )
+        .expect("metadata embeds");
+        let wasm = wit_component::ComponentEncoder::default()
+            .validate(true)
+            .module(&module)
+            .expect("module is accepted")
+            .encode()
+            .expect("component encodes");
+        let dir = root.join("asker");
+        std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+        std::fs::write(
+            dir.join("manifest.json"),
+            r#"{"manifest":1,"id":"asker","name":"Test","version":"1.0.0","api":"^1.0",
+                "authors":["Tests"],"description":"A test plugin","categories":["tools"],
+                "license":"MIT","permissions":{"required":["secrets"]}}"#,
+        )
+        .expect("write manifest");
+        std::fs::write(dir.join("plugin.wasm"), wasm).expect("write wasm");
+        std::fs::write(dir.join("i18n/en.json"), "{}").expect("write i18n");
+        dir
+    }
+
+    /// Like waiting for the database (FR-6.3 addendum), waiting for a slow keychain (D-Bus, a
+    /// wallet prompt) does not use up the plugin's 50 ms call budget.
+    #[test]
+    fn waiting_for_the_keychain_does_not_use_up_the_call_budget() {
+        use crate::runtime::wit::events::Event;
+        use crate::{HostContext, HostEvent, PluginHost};
+
+        let (state, secrets) = secrets();
+        *state.read_delay.lock().expect("lock") = std::time::Duration::from_millis(200);
+        let ctx = HostContext {
+            secrets: Some(Arc::new(secrets)),
+            ..HostContext::default()
+        };
+        ctx.grants.set("asker", ["secrets"]);
+        let root = tempfile::tempdir().expect("temp dir");
+        let (outbox, mut events) = tokio::sync::mpsc::unbounded_channel();
+        let mut host = PluginHost::new(semver::Version::new(0, 7, 0), None, Arc::new(ctx), outbox)
+            .expect("runtime starts");
+        host.load(&asking_plugin(root.path()), None).expect("loads");
+        host.enable("asker").expect("starts");
+        assert!(host.send("asker", Event::Timer(1)));
+
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        while state.reads.load(Ordering::Relaxed) == 0 {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "the plugin never asked"
+            );
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+        // The read is done; give a stop for overtime the chance to show up.
+        std::thread::sleep(std::time::Duration::from_millis(300));
+        while let Ok(event) = events.try_recv() {
+            assert!(
+                !matches!(event, HostEvent::Failed { .. }),
+                "the plugin was stopped: {event:?}"
+            );
+        }
     }
 }

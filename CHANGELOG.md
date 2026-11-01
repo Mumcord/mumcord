@@ -50,6 +50,7 @@
 - A plugin dialog that shows a web page (for example the EVE fit plugin's fitting wheel) is now large (up to 960 × 720 pixels, shrinking with the window) instead of the narrow dialog size, and the page can show its own icons and images
 - A plugin card for your own fresh message (for example the dice card after /roll) now shows at the bottom next to that message instead of above the older messages
 - Screen readers now read a chat line a plugin replaced as its card (e.g. "Card from Poll: Lunch at noon?") and no longer read lines a plugin hid.
+- A plugin that uses the system keychain (such as Mumbot Music) is no longer stopped as "took too long" when the keychain answers slowly.
 - Plugin cards in the chat no longer get their own scrollbar: a taller card is cut off with a soft fade and **Show more** expands it.
 - Pasting with Ctrl+V works again on some Linux desktops
 - A plugin that could not be loaded now keeps its name (in your language) and icon in **Settings > Plugins > Installed** instead of showing its internal id
