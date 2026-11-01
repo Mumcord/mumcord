@@ -58,7 +58,8 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B44 | PRIVACY.md plugins section | done | b44-privacy |
 | K1 | Official plugin registry signing key (generated locally, stored as secret, never committed) | done (public keys: ~/.config/mumcord-signing/plugins/{active,backup}.pub; active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5) | k1-signkey |
 | B20b | Deep link: buffer a cold-start `plugins://open-details` until the UI takes it (pending-take command) + Windows runtime registration of `mumcord` in commands/app.rs | done | b20b-deeplink |
-| F1 | Fix: ui tsc error in ui/src/api/mock.ts (missing plugin settings fields from B3) + prettier on crates/plugins/schema/manifest.schema.json | in progress | f1-uifix |
+| F1 | Fix: ui tsc error in ui/src/api/mock.ts (missing plugin settings fields from B3) + prettier on crates/plugins/schema/manifest.schema.json | done | f1-uifix |
+| F2 | Fix: safety fixtures pass `prettier --check .` (format them) and builder `common_manifest()` uses only B4 fields (authors/categories) | in progress | f2-fixtures |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | open | |
 
 ---
