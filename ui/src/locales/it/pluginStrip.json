@@ -5,5 +5,8 @@
   "show": "Mostra i pannelli dei plugin",
   "expand": "Espandi {{name}}",
   "close": "Chiudi",
-  "unsupported": "Questo server non supporta le funzioni condivise dei plugin"
+  "unsupported": "Questo server non supporta le funzioni condivise dei plugin",
+  "running_one": "{{count}} in esecuzione",
+  "running_many": "{{count}} in esecuzione",
+  "running_other": "{{count}} in esecuzione"
 }

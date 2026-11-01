@@ -16,7 +16,7 @@ function initials(name: string): string {
   return Array.from(name.trim()).slice(0, 2).join("").toUpperCase();
 }
 
-/** The expanded popover shows the plugin's web view when it opened one there, else its panel. */
+/** The side sheet shows the plugin's web view when it opened one there, else its panel. */
 function PopoverBody({ id, name, children }: { id: string; name: string; children: ReactNode }) {
   const webview = usePluginWebView(id, "panelPopover");
   return (
@@ -37,7 +37,7 @@ function PluginIcon({ id, name }: { id: string; name: string }) {
 
 /**
  * Plugins strip under the channel tree (FR-6.64): one icon per enabled plugin that has a panel,
- * the active plugin's panel below, and an "Expand" button that opens the large popover.
+ * the active plugin's panel below, and an "Expand" button that opens the side sheet on the right.
  */
 export function PluginStrip() {
   const t = useT("pluginStrip");
@@ -55,6 +55,9 @@ export function PluginStrip() {
   const withPanel = (overview?.plugins ?? [])
     .filter((p) => p.enabled && p.status.kind === "running" && trees.get(p.id)?.has("panel"))
     .map((p) => ({ id: p.id, name: p.name }));
+  const runningCount = (overview?.plugins ?? []).filter(
+    (p) => p.enabled && p.status.kind === "running",
+  ).length;
   const active = withPanel.find((p) => p.id === chosen) ?? withPanel[0];
   const activeId = active?.id;
   const inline = !collapsed && activeId !== undefined;
@@ -164,7 +167,16 @@ export function PluginStrip() {
           data-tooltip={collapsed ? t("show") : t("hide")}
           onClick={toggleCollapsed}
         >
-          <span aria-hidden="true">{collapsed ? "▸" : "▾"}</span> {t("heading")}
+          <span className="pstrip-puzzle" aria-hidden="true">
+            🧩
+          </span>
+          <span className="pstrip-titles">
+            <span className="pstrip-title">{t("heading")}</span>
+            <span className="pstrip-sub">{t("running", { count: runningCount })}</span>
+          </span>
+          <span className="pstrip-caret" aria-hidden="true">
+            {collapsed ? "▸" : "▾"}
+          </span>
         </button>
         <div className="pstrip-icons" role="toolbar" aria-label={t("list")}>
           {withPanel.map((p, index) => (
@@ -199,8 +211,7 @@ export function PluginStrip() {
       <div id={panelId} hidden={collapsed}>
         {inline && (
           <div className="pstrip-panel" data-shared={sharedSupported ? "on" : "off"}>
-            <div className="pstrip-panel-head">
-              <span className="pstrip-panel-name">{active.name}</span>
+            <div className="pstrip-panel-tools">
               <button
                 type="button"
                 ref={expandRef}
@@ -225,13 +236,16 @@ export function PluginStrip() {
         // Escape closes the dialog wherever focus is inside it.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <div
-          className="pstrip-popover"
+          className="pstrip-sheet"
           role="dialog"
           aria-label={active.name}
           onKeyDown={onPopoverKeys}
         >
           <div className="pstrip-panel-head">
-            <span className="pstrip-panel-name">{active.name}</span>
+            <span className="pstrip-panel-name">
+              <PluginIcon id={active.id} name={active.name} />
+              {active.name}
+            </span>
             <button
               type="button"
               className="pstrip-expand"

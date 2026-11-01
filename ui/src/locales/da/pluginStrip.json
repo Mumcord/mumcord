@@ -5,5 +5,7 @@
   "show": "Vis plugin-paneler",
   "expand": "Udvid {{name}}",
   "close": "Luk",
-  "unsupported": "Denne server understøtter ikke delte plugin-funktioner"
+  "unsupported": "Denne server understøtter ikke delte plugin-funktioner",
+  "running_one": "{{count}} kører",
+  "running_other": "{{count}} kører"
 }

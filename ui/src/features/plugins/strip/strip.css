@@ -1,4 +1,4 @@
-/* Plugins strip and panel popover (FR-6.64). */
+/* Plugins strip and panel side sheet (FR-6.64). */
 
 .pstrip {
   border-top: 1px solid var(--color-border);
@@ -24,8 +24,33 @@
 }
 
 .pstrip-toggle {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-1) var(--space-2);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border);
+  text-align: left;
+}
+
+.pstrip-titles {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.pstrip-title {
   font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.pstrip-sub,
+.pstrip-caret {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .pstrip-icons {
@@ -54,7 +79,7 @@
 }
 
 .pstrip-panel,
-.pstrip-popover {
+.pstrip-sheet {
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -63,7 +88,14 @@
 }
 
 .pstrip-panel {
-  max-width: 260px;
+  position: relative;
+}
+
+.pstrip-panel-tools {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  z-index: 1;
 }
 
 .pstrip-panel[data-shared="off"] .pstrip-body {
@@ -71,6 +103,7 @@
 }
 
 .pstrip-body {
+  padding-right: calc(var(--space-4) + var(--space-2));
   max-height: 160px;
   overflow: auto;
 }
@@ -90,12 +123,13 @@
   margin: var(--space-1) 0;
 }
 
-.pstrip-popover {
+.pstrip-sheet {
   position: fixed;
-  left: var(--space-4);
+  right: var(--space-4);
+  top: var(--space-4);
   bottom: var(--space-4);
+  margin-top: 0;
   width: min(420px, calc(100vw - 2 * var(--space-4)));
-  height: min(560px, calc(100vh - 2 * var(--space-4)));
   display: flex;
   flex-direction: column;
   z-index: 50;
@@ -108,4 +142,10 @@
   flex: 1;
   overflow: auto;
   margin-top: var(--space-2);
+}
+
+.pstrip-panel-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }

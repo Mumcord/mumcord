@@ -5,5 +5,7 @@
   "show": "Visa tilläggspaneler",
   "expand": "Utöka {{name}}",
   "close": "Stäng",
-  "unsupported": "Den här servern stöder inte delade tilläggsfunktioner"
+  "unsupported": "Den här servern stöder inte delade tilläggsfunktioner",
+  "running_one": "{{count}} körs",
+  "running_other": "{{count}} körs"
 }

@@ -5,5 +5,9 @@
   "show": "Pokaži plošče vtičnikov",
   "expand": "Razširi {{name}}",
   "close": "Zapri",
-  "unsupported": "Ta strežnik ne podpira skupnih funkcij vtičnikov"
+  "unsupported": "Ta strežnik ne podpira skupnih funkcij vtičnikov",
+  "running_one": "{{count}} teče",
+  "running_two": "{{count}} tečeta",
+  "running_few": "{{count}} tečejo",
+  "running_other": "{{count}} teče"
 }

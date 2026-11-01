@@ -5,5 +5,9 @@
   "show": "Pokaż panele wtyczek",
   "expand": "Powiększ {{name}}",
   "close": "Zamknij",
-  "unsupported": "Ten serwer nie obsługuje wspólnych funkcji wtyczek"
+  "unsupported": "Ten serwer nie obsługuje wspólnych funkcji wtyczek",
+  "running_one": "{{count}} uruchomiona",
+  "running_few": "{{count}} uruchomione",
+  "running_many": "{{count}} uruchomionych",
+  "running_other": "{{count}} uruchomionej"
 }

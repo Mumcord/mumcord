@@ -5,5 +5,7 @@
   "show": "Näytä lisäosien paneelit",
   "expand": "Laajenna {{name}}",
   "close": "Sulje",
-  "unsupported": "Tämä palvelin ei tue lisäosien yhteisiä toimintoja"
+  "unsupported": "Tämä palvelin ei tue lisäosien yhteisiä toimintoja",
+  "running_one": "{{count}} käynnissä",
+  "running_other": "{{count}} käynnissä"
 }

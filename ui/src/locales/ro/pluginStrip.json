@@ -5,5 +5,8 @@
   "show": "Arată panourile de pluginuri",
   "expand": "Extinde {{name}}",
   "close": "Închide",
-  "unsupported": "Acest server nu acceptă funcțiile comune ale pluginurilor"
+  "unsupported": "Acest server nu acceptă funcțiile comune ale pluginurilor",
+  "running_one": "{{count}} în execuție",
+  "running_few": "{{count}} în execuție",
+  "running_other": "{{count}} în execuție"
 }

@@ -5,5 +5,7 @@
   "show": "Show plugin panels",
   "expand": "Expand {{name}}",
   "close": "Close",
-  "unsupported": "This server doesn't support shared plugin features"
+  "unsupported": "This server doesn't support shared plugin features",
+  "running_one": "{{count}} running",
+  "running_other": "{{count}} running"
 }

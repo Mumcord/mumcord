@@ -5,5 +5,8 @@
   "show": "Afficher les panneaux des plugins",
   "expand": "Agrandir {{name}}",
   "close": "Fermer",
-  "unsupported": "Ce serveur ne prend pas en charge les fonctions partagées des plugins"
+  "unsupported": "Ce serveur ne prend pas en charge les fonctions partagées des plugins",
+  "running_one": "{{count}} en cours",
+  "running_many": "{{count}} en cours",
+  "running_other": "{{count}} en cours"
 }

@@ -5,5 +5,10 @@
   "show": "Uri l-pannelli tal-plugins",
   "expand": "Kabbar {{name}}",
   "close": "Agħlaq",
-  "unsupported": "Dan is-server ma jappoġġax il-funzjonijiet kondiviżi tal-plugins"
+  "unsupported": "Dan is-server ma jappoġġax il-funzjonijiet kondiviżi tal-plugins",
+  "running_one": "{{count}} qed jaħdem",
+  "running_two": "{{count}} qed jaħdem",
+  "running_few": "{{count}} qed jaħdem",
+  "running_many": "{{count}} qed jaħdem",
+  "running_other": "{{count}} qed jaħdem"
 }

@@ -5,5 +5,7 @@
   "show": "Plugin-Panels anzeigen",
   "expand": "{{name}} vergrößern",
   "close": "Schließen",
-  "unsupported": "Dieser Server unterstützt keine gemeinsamen Plugin-Funktionen"
+  "unsupported": "Dieser Server unterstützt keine gemeinsamen Plugin-Funktionen",
+  "running_one": "{{count}} aktiv",
+  "running_other": "{{count}} aktiv"
 }

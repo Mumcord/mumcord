@@ -5,5 +5,7 @@
   "show": "Näita pluginapaneele",
   "expand": "Suurenda {{name}}",
   "close": "Sulge",
-  "unsupported": "See server ei toeta jagatud pluginafunktsioone"
+  "unsupported": "See server ei toeta jagatud pluginafunktsioone",
+  "running_one": "{{count}} töötab",
+  "running_other": "{{count}} töötab"
 }
