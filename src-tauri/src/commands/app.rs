@@ -51,7 +51,7 @@ pub async fn close_choice(
     Ok(())
 }
 
-/// The main window's page painted its start screen; the window can be shown without an empty
+/// The main window's page holds its start screen; the window can be shown without an empty
 /// frame. Called by the inline script in `ui/index.html`, before the app bundle has loaded.
 #[tauri::command]
 #[specta::specta]

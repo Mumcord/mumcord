@@ -109,9 +109,10 @@ pub fn show(app: &AppHandle) {
 /// slow or broken page can never keep the window hidden.
 const PAINT_FALLBACK: Duration = Duration::from_secs(1);
 
-/// Coordinates the first reveal of the main window: it waits until the page has painted its
-/// start screen (no empty white window) and the start decided the window should be shown (not a
-/// start at login into the tray). Either can happen first; the window is shown once.
+/// Coordinates the first reveal of the main window: it waits until the page holds its start
+/// screen (so the first frame shown is that screen, not an empty white window) and the start
+/// decided the window should be shown (not a start at login into the tray). Either can happen
+/// first; the window is shown once.
 #[derive(Default)]
 pub struct StartReveal(Mutex<RevealState>);
 
@@ -162,8 +163,8 @@ impl StartReveal {
     }
 }
 
-/// The page painted its start screen (see `ui/index.html`); shows the window if the start wants
-/// it visible.
+/// The page holds its start screen, ready for the first frame (see `ui/index.html`); shows the
+/// window if the start wants it visible.
 pub fn on_start_painted(app: &AppHandle) {
     if app.state::<StartReveal>().painted() {
         show(app);
