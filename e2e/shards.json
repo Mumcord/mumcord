@@ -52,6 +52,7 @@
     ],
     [
       "specs/chat/pm-rules.e2e.ts",
+      "specs/plugins/dice.e2e.ts",
       "specs/plugins/poll.e2e.ts",
       "specs/plugins/registry-install.e2e.ts",
       "specs/smoke/two-clients.e2e.ts",
