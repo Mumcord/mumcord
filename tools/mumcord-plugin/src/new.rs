@@ -104,11 +104,17 @@ A Mumcord plugin.
 
 ```sh
 rustup target add wasm32-unknown-unknown
+cargo generate-lockfile         # once; commit Cargo.lock
 mumcord-plugin build            # writes dist/{id}-0.1.0.mcplugin
 mumcord-plugin check dist/{id}-0.1.0.mcplugin
 ```
 
-Load the folder in Mumcord under Settings → Developer (Developer mode) to try it.
+Commit `Cargo.lock`: `mumcord-plugin build --reproducible` and `mumcord-plugin test` need it.
+
+## Try it in Mumcord
+
+Switch on Developer mode, then use Developer → load on the plugins page. It needs an unpacked
+folder (`manifest.json`, `plugin.wasm` and `i18n/en.json`), not a `.mcplugin` package.
 
 ## Licence
 
