@@ -35,7 +35,13 @@
   "pauseSharing": "Teilen pausieren",
   "resumeSharing": "Teilen fortsetzen",
   "viewersLabel": "Wer zuschaut",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Fenster wechseln",
-  "viewersTitle": "Zuschauer"
+  "viewersTitle": "Zuschauer",
+  "thumbnail": "Vorschau dessen, was du teilst",
+  "youAreSharing": "Du teilst",
+  "ofMax": "{{count}} von {{max}}",
+  "fullShort": "Alle Plätze sind belegt.",
+  "stopShort": "Beenden",
+  "viewerCount_one": "{{count}} Zuschauer",
+  "viewerCount_other": "{{count}} Zuschauer"
 }

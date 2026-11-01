@@ -36,7 +36,14 @@
   "pauseSharing": "Pausar compartición",
   "resumeSharing": "Reanudar compartición",
   "viewersLabel": "Quién está mirando",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Cambiar ventana",
-  "viewersTitle": "Viendo"
+  "viewersTitle": "Viendo",
+  "thumbnail": "Vista previa de lo que compartes",
+  "youAreSharing": "Estás compartiendo",
+  "ofMax": "{{count}} de {{max}}",
+  "fullShort": "Todas las plazas están ocupadas.",
+  "stopShort": "Detener",
+  "viewerCount_one": "{{count}} espectador",
+  "viewerCount_many": "{{count}} espectadores",
+  "viewerCount_other": "{{count}} espectadores"
 }

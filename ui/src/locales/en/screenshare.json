@@ -35,7 +35,13 @@
   "pauseSharing": "Pause sharing",
   "resumeSharing": "Resume sharing",
   "viewersLabel": "Who is watching",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Change window",
-  "viewersTitle": "Viewers"
+  "viewersTitle": "Viewers",
+  "thumbnail": "Preview of what you share",
+  "youAreSharing": "You are sharing",
+  "viewerCount_one": "{{count}} viewer",
+  "viewerCount_other": "{{count}} viewers",
+  "ofMax": "{{count}} of {{max}}",
+  "fullShort": "All places are taken.",
+  "stopShort": "Stop"
 }

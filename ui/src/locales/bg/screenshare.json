@@ -35,7 +35,13 @@
   "pauseSharing": "Пауза на споделянето",
   "resumeSharing": "Продължи споделянето",
   "viewersLabel": "Кой гледа",
-  "elapsed": "{{minutes}} мин",
   "changeWindow": "Смени прозорец",
-  "viewersTitle": "Зрители"
+  "viewersTitle": "Зрители",
+  "thumbnail": "Преглед на споделяното",
+  "youAreSharing": "Споделяте",
+  "ofMax": "{{count}} от {{max}}",
+  "fullShort": "Всички места са заети.",
+  "stopShort": "Спри",
+  "viewerCount_one": "{{count}} зрител",
+  "viewerCount_other": "{{count}} зрители"
 }

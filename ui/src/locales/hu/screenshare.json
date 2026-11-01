@@ -35,7 +35,13 @@
   "pauseSharing": "Megosztás szüneteltetése",
   "resumeSharing": "Megosztás folytatása",
   "viewersLabel": "Kik nézik",
-  "elapsed": "{{minutes}} perc",
   "changeWindow": "Ablak váltása",
-  "viewersTitle": "Nézők"
+  "viewersTitle": "Nézők",
+  "thumbnail": "A megosztott tartalom előnézete",
+  "youAreSharing": "Megosztod",
+  "ofMax": "{{count}} / {{max}}",
+  "fullShort": "Minden hely foglalt.",
+  "stopShort": "Leállítás",
+  "viewerCount_one": "{{count}} néző",
+  "viewerCount_other": "{{count}} néző"
 }

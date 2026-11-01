@@ -35,7 +35,13 @@
   "pauseSharing": "Delen pauzeren",
   "resumeSharing": "Delen hervatten",
   "viewersLabel": "Wie kijkt er",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Venster wisselen",
-  "viewersTitle": "Kijkers"
+  "viewersTitle": "Kijkers",
+  "thumbnail": "Voorbeeld van wat je deelt",
+  "youAreSharing": "Je deelt",
+  "ofMax": "{{count}} van {{max}}",
+  "fullShort": "Alle plaatsen zijn bezet.",
+  "stopShort": "Stoppen",
+  "viewerCount_one": "{{count}} kijker",
+  "viewerCount_other": "{{count}} kijkers"
 }

@@ -38,7 +38,16 @@
   "pauseSharing": "Ippawża l-qsim",
   "resumeSharing": "Kompli l-qsim",
   "viewersLabel": "Min qed jara",
-  "elapsed": "{{minutes}} minuta",
   "changeWindow": "Ibdel twieqa",
-  "viewersTitle": "Spettaturi"
+  "viewersTitle": "Spettaturi",
+  "thumbnail": "Previżjoni ta' dak li qed taqsam",
+  "youAreSharing": "Qed taqsam",
+  "ofMax": "{{count}} minn {{max}}",
+  "fullShort": "Il-postijiet kollha huma okkupati.",
+  "stopShort": "Waqqaf",
+  "viewerCount_one": "{{count}} telespettatur",
+  "viewerCount_two": "{{count}} telespettaturi",
+  "viewerCount_few": "{{count}} telespettaturi",
+  "viewerCount_many": "{{count}}-il telespettatur",
+  "viewerCount_other": "{{count}} telespettatur"
 }

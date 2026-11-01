@@ -35,7 +35,13 @@
   "pauseSharing": "Keskeytä jakaminen",
   "resumeSharing": "Jatka jakamista",
   "viewersLabel": "Ketkä katsovat",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Vaihda ikkuna",
-  "viewersTitle": "Katsojat"
+  "viewersTitle": "Katsojat",
+  "thumbnail": "Esikatselu jakamastasi",
+  "youAreSharing": "Jaat näyttöä",
+  "ofMax": "{{count}}/{{max}}",
+  "fullShort": "Kaikki paikat ovat täynnä.",
+  "stopShort": "Lopeta",
+  "viewerCount_one": "{{count}} katsoja",
+  "viewerCount_other": "{{count}} katsojaa"
 }

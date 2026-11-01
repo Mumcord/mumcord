@@ -37,7 +37,15 @@
   "pauseSharing": "Pozastavit sdílení",
   "resumeSharing": "Pokračovat ve sdílení",
   "viewersLabel": "Kdo sleduje",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Změnit okno",
-  "viewersTitle": "Sledující"
+  "viewersTitle": "Sledující",
+  "thumbnail": "Náhled sdíleného obsahu",
+  "youAreSharing": "Sdílíte",
+  "ofMax": "{{count}} z {{max}}",
+  "fullShort": "Všechna místa jsou obsazena.",
+  "stopShort": "Ukončit",
+  "viewerCount_one": "{{count}} divák",
+  "viewerCount_few": "{{count}} diváci",
+  "viewerCount_many": "{{count}} diváka",
+  "viewerCount_other": "{{count}} diváků"
 }

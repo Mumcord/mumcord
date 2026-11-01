@@ -95,13 +95,14 @@ describe("sound of the own share", () => {
         shares: [share({ soundAvailable, sound: soundAvailable })],
       });
     });
-    await screen.findByRole("status", { name: BAR_NAME });
+    await screen.findByRole("group", { name: BAR_NAME });
   }
 
-  it("hints and hides the sound switch when the share has no source", async () => {
+  it("disables the sound switch with its reason when the share has no source", async () => {
     await sharing(false);
-    expect(screen.getByText(/Linux shares no sound/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Share sound" })).toBeNull();
+    const sound = screen.getByRole("button", { name: "Sound" });
+    expect(sound).toHaveAttribute("aria-disabled", "true");
+    expect(sound).toHaveAccessibleDescription(/Linux shares no sound/);
   });
 
   it("names the whole screen on systems that can send sound", async () => {
@@ -112,14 +113,16 @@ describe("sound of the own share", () => {
     act(() => {
       api.mock.emit("screenSharesChanged", { serverId: 1, shares: [share()] });
     });
-    expect(await screen.findByText(/This share has no sound/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Share sound" })).toBeNull();
+    expect(await screen.findByRole("button", { name: "Sound" })).toHaveAccessibleDescription(
+      /This share has no sound/,
+    );
   });
 
   it("shows the sound switch and no hint when the share has a source", async () => {
     await sharing(true);
-    expect(screen.getByRole("button", { name: "Share sound" })).toBeInTheDocument();
-    expect(screen.queryByText(/no sound/)).toBeNull();
+    const sound = screen.getByRole("button", { name: "Sound" });
+    expect(sound).toHaveAttribute("aria-pressed", "true");
+    expect(sound).not.toHaveAttribute("aria-disabled");
   });
 });
 
@@ -133,11 +136,10 @@ describe("share button", () => {
       expect(button).not.toHaveAttribute("aria-disabled");
     });
     fireEvent.click(button);
-    await screen.findByRole("status", { name: BAR_NAME });
+    await screen.findByRole("group", { name: BAR_NAME });
     expect(start).toHaveBeenCalledWith(1, false);
-    expect(screen.getByText("Nobody is watching yet")).toBeInTheDocument();
-    expect(screen.getByText(/Linux shares no sound/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Share sound" })).toBeNull();
+    expect(screen.getByRole("button", { name: /0 viewers/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sound" })).toHaveAttribute("aria-disabled", "true");
   });
 
   it("is disabled with its reason when not in a voice channel", async () => {
@@ -307,14 +309,19 @@ describe("sharer controls", () => {
         shares: [share({ viewers: [ANNA, BEN] })],
       });
     });
-    expect(await screen.findByText("2 watching: Anna, Ben")).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: /2 viewers/ }));
+    const popover = screen.getByRole("group", { name: "Viewers" });
+    expect(popover).toHaveTextContent("Anna");
+    expect(popover).toHaveTextContent("Ben");
+    expect(popover).toHaveTextContent("2 of 8");
     act(() => {
       api.mock.emit("screenSharesChanged", {
         serverId: 1,
         shares: [share({ viewers: [ANNA, BEN, 10, 11, 12, 13, 14, 15] })],
       });
     });
-    expect(await screen.findByText(/^Share full: 8 of 8 watching: Anna, Ben/)).toBeInTheDocument();
+    expect(popover).toHaveTextContent("8 of 8");
+    expect(popover).toHaveTextContent("All places are taken.");
   });
 });
 
@@ -378,22 +385,22 @@ describe("sharer control bar", () => {
   it("is the entry point while nothing is shared", () => {
     render(<SharerBar />);
     expect(screen.getByRole("button", { name: /^Share screen/ })).toBeInTheDocument();
-    expect(screen.getByRole("status", { name: BAR_NAME })).not.toHaveTextContent("Live");
+    expect(screen.getByRole("group", { name: BAR_NAME })).not.toHaveTextContent("Live");
   });
 
   it("shows the source, the running time and that it is live", async () => {
     render(<SharerBar />);
     await api.screenShareStart(1, false);
-    const bar = screen.getByRole("status", { name: BAR_NAME });
+    const bar = screen.getByRole("group", { name: BAR_NAME });
     await vi.waitFor(() => {
       expect(bar).toHaveTextContent("Live");
-      expect(bar).toHaveTextContent("1 min");
+      expect(bar).toHaveTextContent("You are sharing0:00");
       expect(bar).toHaveTextContent("Shared picture");
-      expect(bar).toHaveTextContent("Linux shares no sound");
+      expect(bar).toHaveTextContent("no sound");
     });
   });
 
-  it("counts the viewers, and the ⋯ button names them with their quality", async () => {
+  it("counts the viewers, and the viewers button names them with their quality", async () => {
     vi.spyOn(api, "screenShareQuality").mockResolvedValue({
       width: 1920,
       height: 1080,
@@ -406,23 +413,28 @@ describe("sharer control bar", () => {
     });
     render(<SharerBar />);
     await api.screenShareStart(1, false);
-    const bar = screen.getByRole("status", { name: BAR_NAME });
-    await vi.waitFor(() => expect(bar).toHaveTextContent("Nobody is watching yet"));
-    watchedBy(share({ viewers: [ANNA, BEN], kind: "window", elapsedMs: 60000 }));
-    await vi.waitFor(() => expect(bar).toHaveTextContent("2 watching: Anna, Ben"));
-    fireEvent.click(screen.getByRole("button", { name: "Viewers" }));
+    const bar = screen.getByRole("group", { name: BAR_NAME });
+    await vi.waitFor(() => expect(bar).toHaveTextContent("1080p · 60 fps"));
+    act(() => {
+      watchedBy(share({ viewers: [ANNA, BEN], kind: "window", elapsedMs: 60000 }));
+    });
+    expect(bar).toHaveTextContent("1:00");
+    fireEvent.click(screen.getByRole("button", { name: /2 viewers/ }));
     const popover = screen.getByRole("group", { name: "Viewers" });
     await vi.waitFor(() => {
-      expect(popover).toHaveTextContent("60 fps, Direct");
+      expect(popover).toHaveTextContent("1080p · 60 fps");
+      expect(popover).toHaveTextContent("1080p · 20 fps");
       expect(popover).toHaveTextContent("Quality adapts to the slowest viewer");
     });
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("group", { name: "Viewers" })).toBeNull();
   });
 
   it("shows the live picture of what the user shares", async () => {
     render(<SharerBar />);
     await api.screenShareStart(1, false);
     await vi.waitFor(() => {
-      const picture = screen.getByRole("img", { name: "You are sharing your screen" });
+      const picture = screen.getByRole("img", { name: "Preview of what you share" });
       expect(picture).toHaveAttribute("src", expect.stringMatching(/^data:image\/webp;base64,/));
     });
   });
@@ -434,7 +446,7 @@ describe("sharer control bar", () => {
     fireEvent.click(screen.getByRole("button", { name: "Pause" }));
     expect(call).toHaveBeenCalledWith(1, true);
     await vi.waitFor(() =>
-      expect(screen.getByRole("status", { name: BAR_NAME })).toHaveTextContent("Paused"),
+      expect(screen.getByRole("group", { name: BAR_NAME })).toHaveTextContent("Paused"),
     );
   });
 

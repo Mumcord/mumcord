@@ -35,7 +35,13 @@
   "pauseSharing": "Pausa delning",
   "resumeSharing": "Återuppta delning",
   "viewersLabel": "Vem som tittar",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Byt fönster",
-  "viewersTitle": "Tittare"
+  "viewersTitle": "Tittare",
+  "thumbnail": "Förhandsvisning av det du delar",
+  "youAreSharing": "Du delar",
+  "ofMax": "{{count}} av {{max}}",
+  "fullShort": "Alla platser är upptagna.",
+  "stopShort": "Stoppa",
+  "viewerCount_one": "{{count}} tittare",
+  "viewerCount_other": "{{count}} tittare"
 }

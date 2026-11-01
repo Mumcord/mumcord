@@ -37,7 +37,15 @@
   "pauseSharing": "Pristabdyti bendrinimą",
   "resumeSharing": "Tęsti bendrinimą",
   "viewersLabel": "Kas žiūri",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Keisti langą",
-  "viewersTitle": "Žiūrovai"
+  "viewersTitle": "Žiūrovai",
+  "thumbnail": "Bendrinamo turinio peržiūra",
+  "youAreSharing": "Bendrinate",
+  "ofMax": "{{count}} iš {{max}}",
+  "fullShort": "Visos vietos užimtos.",
+  "stopShort": "Stabdyti",
+  "viewerCount_one": "{{count}} žiūrovas",
+  "viewerCount_few": "{{count}} žiūrovai",
+  "viewerCount_many": "{{count}} žiūrovo",
+  "viewerCount_other": "{{count}} žiūrovų"
 }

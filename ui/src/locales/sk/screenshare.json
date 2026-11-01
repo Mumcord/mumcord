@@ -37,7 +37,15 @@
   "pauseSharing": "Pozastaviť zdieľanie",
   "resumeSharing": "Pokračovať v zdieľaní",
   "viewersLabel": "Kto sleduje",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Zmeniť okno",
-  "viewersTitle": "Diváci"
+  "viewersTitle": "Diváci",
+  "thumbnail": "Náhľad zdieľaného obsahu",
+  "youAreSharing": "Zdieľate",
+  "ofMax": "{{count}} z {{max}}",
+  "fullShort": "Všetky miesta sú obsadené.",
+  "stopShort": "Ukončiť",
+  "viewerCount_one": "{{count}} divák",
+  "viewerCount_few": "{{count}} diváci",
+  "viewerCount_many": "{{count}} diváka",
+  "viewerCount_other": "{{count}} divákov"
 }

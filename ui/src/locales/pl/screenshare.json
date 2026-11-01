@@ -37,7 +37,15 @@
   "pauseSharing": "Wstrzymaj udostępnianie",
   "resumeSharing": "Wznów udostępnianie",
   "viewersLabel": "Kto ogląda",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Zmień okno",
-  "viewersTitle": "Oglądający"
+  "viewersTitle": "Oglądający",
+  "thumbnail": "Podgląd udostępnianej treści",
+  "youAreSharing": "Udostępniasz",
+  "ofMax": "{{count}} z {{max}}",
+  "fullShort": "Wszystkie miejsca są zajęte.",
+  "stopShort": "Zakończ",
+  "viewerCount_one": "{{count}} widz",
+  "viewerCount_few": "{{count}} widzowie",
+  "viewerCount_many": "{{count}} widzów",
+  "viewerCount_other": "{{count}} widza"
 }

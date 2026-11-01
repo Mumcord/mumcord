@@ -36,7 +36,14 @@
   "pauseSharing": "Pauzēt kopīgošanu",
   "resumeSharing": "Turpināt kopīgošanu",
   "viewersLabel": "Kas skatās",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Mainīt logu",
-  "viewersTitle": "Skatītāji"
+  "viewersTitle": "Skatītāji",
+  "thumbnail": "Kopīgotā satura priekšskatījums",
+  "youAreSharing": "Jūs kopīgojat",
+  "ofMax": "{{count}} no {{max}}",
+  "fullShort": "Visas vietas ir aizņemtas.",
+  "stopShort": "Apturēt",
+  "viewerCount_zero": "{{count}} skatītāju",
+  "viewerCount_one": "{{count}} skatītājs",
+  "viewerCount_other": "{{count}} skatītāji"
 }
