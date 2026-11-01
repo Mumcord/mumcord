@@ -465,6 +465,42 @@ impl Store {
         Ok(())
     }
 
+    /// Certificate hash of the server-plugin announcer pinned on first use for a server entry
+    /// and own identity (FR-6.77), lowercase hex.
+    pub fn plugin_sender_pin(
+        &self,
+        server: ServerId,
+        identity: IdentityId,
+    ) -> Result<Option<String>> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT cert_hash FROM plugin_sender_pin WHERE server_id = ?1 AND identity_id = ?2",
+                params![server, identity],
+                |row| row.get(0),
+            )
+            .optional()?)
+    }
+
+    /// Pins the server-plugin announcer of a server entry and identity; an existing pin is
+    /// replaced.
+    pub fn set_plugin_sender_pin(
+        &self,
+        server: ServerId,
+        identity: IdentityId,
+        cert_hash: &str,
+        first_seen: UnixMillis,
+    ) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO plugin_sender_pin (server_id, identity_id, cert_hash, first_seen)
+             VALUES (?1, ?2, ?3, ?4)
+             ON CONFLICT (server_id, identity_id) DO UPDATE SET
+                 cert_hash = excluded.cert_hash, first_seen = excluded.first_seen",
+            params![server, identity, cert_hash.to_ascii_lowercase(), first_seen],
+        )?;
+        Ok(())
+    }
+
     pub fn plugin_suggestions(
         &self,
         server: ServerId,
@@ -754,5 +790,34 @@ mod tests {
                 .expect("list")
                 .is_empty()
         );
+    }
+
+    #[test]
+    fn sender_pin_is_per_server_and_identity() {
+        let (_dir, store) = temp_store();
+        let server = store
+            .add_server(&NewServer::new("A", "localhost", "Tester"))
+            .expect("server")
+            .id;
+        let one = store
+            .add_identity(&NewIdentity::new("One", "one", "h1", 1))
+            .expect("identity")
+            .id;
+        let two = store
+            .add_identity(&NewIdentity::new("Two", "two", "h2", 2))
+            .expect("identity")
+            .id;
+        assert_eq!(store.plugin_sender_pin(server, one).expect("read"), None);
+        store
+            .set_plugin_sender_pin(server, one, "ABCDEF", 5)
+            .expect("pin");
+        store
+            .set_plugin_sender_pin(server, one, "abc123", 6)
+            .expect("replace");
+        assert_eq!(
+            store.plugin_sender_pin(server, one).expect("read"),
+            Some("abc123".to_owned())
+        );
+        assert_eq!(store.plugin_sender_pin(server, two).expect("read"), None);
     }
 }

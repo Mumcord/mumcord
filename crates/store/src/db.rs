@@ -333,6 +333,14 @@ const MIGRATIONS: &[&str] = &[
         sender_pin  TEXT    NOT NULL,
         PRIMARY KEY (server_id, identity_id, plugin_id)
     );
+
+    CREATE TABLE plugin_sender_pin (
+        server_id   INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        identity_id INTEGER NOT NULL REFERENCES identity (id) ON DELETE CASCADE,
+        cert_hash   TEXT    NOT NULL,
+        first_seen  INTEGER NOT NULL,
+        PRIMARY KEY (server_id, identity_id)
+    );
     ",
 ];
 
