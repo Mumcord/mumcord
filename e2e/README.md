@@ -65,11 +65,22 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
 - **CI shards:** `.github/workflows/e2e.yml` builds the image and the binaries once
   (`MUMCORD_E2E_STEP=build`), shares them as an artifact, and runs the shards of `e2e/shards.json`
   in parallel jobs (`MUMCORD_E2E_STEP=test MUMCORD_E2E_SHARD=<n>`, each runner with its own test
-  servers). The "Linux E2E" job fails if the build or any shard failed. The shards are balanced by
-  measured spec durations; the longest spec (network resilience, ~5 min in CI) sits alone in shard 1
-  and sets the floor. A new spec file must be added to a shard (the shortest one); a run with
-  `MUMCORD_E2E_SHARD` set fails while `shards.json` and the spec files disagree. When changing
-  the number of shards, also change the job matrix.
+  servers). The "Linux E2E" job fails if the build or any shard failed.
+- **Shard balance:** ten shards, balanced by the measured CI duration of each spec file
+  (`e2e/spec-durations.json`). The longest spec (network resilience, ~5 min in CI) is pinned alone
+  to shard 1 and sets the floor; the others are spread longest-first onto the emptiest shard.
+  `scripts/e2e-shards.js` rewrites `shards.json`:
+
+      node scripts/e2e-shards.js                                 # rebalance (e.g. after adding a spec)
+      node scripts/e2e-shards.js --measure <run-id> [<run-id>…]  # re-measure from passed CI runs first
+      node scripts/e2e-shards.js --shards 12                     # change the number of shards
+
+  `--measure` reads the shard logs with the `gh` CLI (take ~10 recent passed E2E runs from
+  `gh run list --workflow e2e.yml --status success`). A spec without a measured duration counts with
+  the median. A run with `MUMCORD_E2E_SHARD` set fails while `shards.json` and the spec files
+  disagree. When changing the number of shards, also change the job matrix in `e2e.yml` (the script
+  warns).
+
 - **Failures:** screenshot + page source of the app go to `e2e/artifacts/` (git-ignored); CI uploads
   them. axe reports land there too.
 

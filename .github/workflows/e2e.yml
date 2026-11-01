@@ -2,7 +2,7 @@ name: E2E
 
 # UI end-to-end tests in the e2e/ Docker image (WebKitWebDriver + tauri-driver, Xvfb) against
 # the local testenv Mumble servers. Slow, so separate from CI: on pull requests to main and manual
-# runs. One job builds the image and the debug binaries once, five shard jobs run the spec files
+# runs. One job builds the image and the debug binaries once, ten shard jobs run the spec files
 # of e2e/shards.json in parallel (each runner has its own test servers), and "Linux E2E" (the
 # check main's branch protection requires) passes only when all of them passed.
 on:
@@ -125,8 +125,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Must match the number of shards in e2e/shards.json.
-        shard: [1, 2, 3, 4, 5]
+        # Must match the number of shards in e2e/shards.json (scripts/e2e-shards.js).
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
       - uses: actions/checkout@v7
 
