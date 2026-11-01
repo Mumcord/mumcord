@@ -33,15 +33,15 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B25c | CLI `test` and `preview` | done | b25c-test |
 | B16b | Fixture registry setup for E2E | open | |
 | B9 | Local mumbot instance (music + plugins) | done | b9-mumbot |
-| B26 | UI tree renderer | in progress | b26-render |
-| B27 | Plugins strip and panel popover | open | |
-| B28 | Member badges, profile-card sections, chat decorations | open | |
-| B29 | Chat UI: cards, slash commands, via label, superseded lines | open | |
-| B30 | User-menu entry and plugin dialog | open | |
+| B26 | UI tree renderer | done | b26-render |
+| B27 | Plugins strip and panel popover | in progress | b27-strip |
+| B28 | Member badges, profile-card sections, chat decorations | in progress | b28-badges |
+| B29 | Chat UI: cards, slash commands, via label, superseded lines | in progress | b29-chat |
+| B30 | User-menu entry and plugin dialog | in progress | b30-dialog |
 | B31 | Sandboxed web view | open | |
 | B32 | Notification centre: category Plugins | done | b32-notify |
 | B34 | Server-suggested plugins logic | done | b34-suggest |
-| B23 | Installed tab and plugin details | open | |
+| B23 | Installed tab and plugin details | in progress | b23-installed |
 | B24 | Browse tab, install prompt, deep-link target | in progress | b24-browse |
 | B33a | Updates tab | in progress | b33a-updates |
 | B33b | Repositories tab | in progress | b33b-repos |
@@ -68,6 +68,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F8 | docs/engine-api.md: list all new plugin commands/events (B13 engine methods, B18 commands+events, B20b plugins_take_pending_link, renamed game_plugins_*) | open | |
 | F9 | Echolings: singular/plural for "days together" ("1 day") on feat/echolings | done (204cc09) | f9-plural |
 | F10 | CLI `mumcord-plugin test`: support a self-changed event step (DND, mute) so DND → sleeping can be scenario-tested; add the Echolings DND scenario after | done (115d7b69 + echolings 8852b91; stale comment in echolings/scenarios/hatch-and-care.yaml line 3 to remove in a later echolings commit) | f10-selfevent |
+| F11 | Re-check all official plugins + template against the new B26 UI tree rules (run all scenario tests with the current CLI; fix refused trees on their branches) | in progress | f11-treerules |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
@@ -472,3 +473,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B32 (fd512082):** `src-tauri/src/plugins/suggestions.rs`; ServerPlugins events are split off in feed.rs → suggestions::parse/process (pin = sender cert hash). Event `plugins://suggestion` {plugin id, name, reason, seq (string), source}; commands `plugin_suggestion_not_now(serverId, plugin)` and `plugin_suggestions_dismiss_server(serverId)`. UI `ui/src/features/plugins/notifications/**`: centre entry kind `plugin` + "Plugins" filter, silent (no toast/OS notification), untrusted texts as plain text. REQUEST BUS: `subscribePluginRequests` emits `details`, `install`, `addRepository {url, key}`, `updates` and `installed {plugin}` (held until a subscriber exists). The shell (B21) / B23 / B24 / B27 / B33 must subscribe, otherwise Install / Details / Update buttons do nothing. Open: initials avatar instead of the plugin icon (B24 icon loading); the "Turned off after repeated crashes" texts must match B21/B23.
 - **B21 (ca71bb4a):** Settings section "Plugins" after Privacy with tabs Installed / Browse / Updates / Repositories (+ Developer when Developer mode is on), header "Turn off all plugins" / "Turn plugins on again", a `--no-plugins` banner and an all-off notice. Developer mode switch `DeveloperModeCard` in Advanced. Store `ui/src/features/plugins/pluginStore.ts`: `usePlugins()` → {overview, loadFailed}, `refreshPlugins()`, `setAllPluginsOff(b)`, reloads on plugins://changed. Tab tasks (B23, B24, B33a–c) replace their entry in `TAB_CONTENT` in `PluginsSection.tsx`; labels `pluginSettings.tabs.*`. `PluginsHost` (mounted in app/mounts.tsx) calls plugins_set_appearance and hosts a small command palette (Ctrl+Shift+P: "Plugins", "Turn off all plugins"); it was built after all, which satisfies FR-6.6/6.58. Open: changes.ts does not track developerMode; the B32 request bus (`subscribePluginRequests`) is NOT yet subscribed: B23/B24/B33 subscribe for their requests.
 - **B33c (4d112f18):** `ui/src/features/plugins/developer/` (DeveloperTab, `pickFolderPath` in developer/pickFolder.ts via the Tauri dialog with directory:true), namespace `pluginDeveloper` (24 locales); lists dev plugins with a permanent "Developer plugin" badge; Load/Reload/Unload; log polled from pluginDiagnostics every 2 s.
+- **B26 (3d4c61c3 limits, ecef8f75 plugin_asset, 483501b0 renderer):** host limits in api/ui.rs (pub consts MAX_NODES etc., `api::ui::is_asset_path`); a refused tree logs slot + rule + node index. Rules: labels required, colours = tokens, only stack/list have children, every node reachable, sprite fps 1–12, slider min<max, a select value must be an option. `plugin_asset(id, path) -> {mimeType, base64}` (svg/png/webp under assets/). UI: `<PluginTree plugin slot nodes />`; store `render/pluginUiStore.ts` with `usePluginTree(plugin, slot)` / `usePluginUi()` → trees, dialogs (plugin→title), menuEntries (plugin→label); `slotKey()`; re-fetches on plugins://changed. Dialog focus trap = B30.
