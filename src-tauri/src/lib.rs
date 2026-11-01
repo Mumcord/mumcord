@@ -275,6 +275,12 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_quality,
             commands::screen_share::screen_share_thumbnail,
             commands::screen_share::screen_share_watch_stats,
+            commands::screen_share::screen_share_frames_attach,
+            commands::media_popout::media_popout_open,
+            commands::media_popout::media_popout_close,
+            commands::media_popout::media_popout_set_on_top,
+            commands::media_popout::media_popout_set_title,
+            commands::media_popout::media_popout_state,
             commands::updates::update_status,
             commands::updates::update_check_now,
             commands::updates::update_download,
@@ -337,6 +343,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::updates::UpdateStatusChanged,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
+            commands::media_popout::MediaPopoutChanged,
             commands::tray::TraySettingsRequested,
             commands::hotkeys::HotkeyPressed,
         ])
@@ -417,9 +424,11 @@ pub fn run() {
             window::on_window_event(window, event);
             aux_window::on_window_event(window, event);
             commands::inspector::on_window_event(window, event);
+            commands::media_popout::on_window_event(window, event);
         })
         .setup(move |app| {
             builder.mount_events(app);
+            app.manage(commands::media_popout::MediaPopouts::load(app.handle()));
             // Before the engine: its event hook uses the notifier.
             notifications::init(app.handle());
             create_main_window(app.handle())?;

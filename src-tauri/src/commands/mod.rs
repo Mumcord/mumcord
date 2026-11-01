@@ -25,6 +25,7 @@ pub mod ingame_overlay;
 pub mod inspector;
 pub mod licences;
 pub mod links;
+pub mod media_popout;
 pub mod mumble_import;
 pub mod notifications;
 pub mod now_gaming;
