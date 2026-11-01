@@ -26,10 +26,8 @@
   "installNamed": "Installa {{name}}",
   "details": "Dettalji",
   "detailsNamed": "Dettalji ta' {{name}}",
-  "back": "Lura għall-plagins kollha",
   "version": "Verżjoni {{version}}",
   "by": "minn {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Screenshots",
   "mayAskFor": "Dan il-plagin jista' jitlob",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "It-tniżżil ma jaqbilx mal-elenku uffiċjali",
     "signature": "Il-verifika tal-firma falliet",
     "permissions": "Dan il-plagin jitlob permessi li mhumiex elenkati fir-repożitorju"
-  }
+  },
+  "officialReviewed": "Uffiċjali · rivedut",
+  "updatedOn": "aġġornat fil-{{date}}",
+  "whatItCanDo": "X'jista' jagħmel",
+  "neverTitle": "Qatt mhu possibbli għall-plugins",
+  "neverText": "Il-mikrofonu jew l-awdjo tiegħek · fajls fuq il-kompjuter tiegħek · iċ-ċertifikat jew il-passwords tiegħek · data ta' plugins oħra",
+  "repositoryName": "Repożitorju: {{repository}}",
+  "updatesFrom": "L-aġġornamenti jiġu minn dan ir-repożitorju",
+  "unofficialTitle": "Minn repożitorju mhux uffiċjali",
+  "unofficialText": "{{repository}} ma jiġix rivedut minn Mumcord. Xorta jaħdem fis-sandbox u jieħu biss il-permessi li inti tippermetti.",
+  "checksTitle": "It-tiftixiet uffiċjali xorta japplikaw",
+  "checksText": "Il-lista ta' revoka ta' Mumcord tista' titfih. L-ismijiet tal-plugins uffiċjali huma riżervati."
 }

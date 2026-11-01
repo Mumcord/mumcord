@@ -26,10 +26,8 @@
   "installNamed": "Įdiegti {{name}}",
   "details": "Išsami informacija",
   "detailsNamed": "Išsami informacija apie {{name}}",
-  "back": "Atgal į visus papildinius",
   "version": "Versija {{version}}",
   "by": "autorius: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Ekrano nuotraukos",
   "mayAskFor": "Šis papildinys gali prašyti",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Atsisiuntimas neatitiko oficialaus sąrašo",
     "signature": "Parašo patikra nepavyko",
     "permissions": "Šis papildinys prašo leidimų, kurių nėra saugykloje"
-  }
+  },
+  "officialReviewed": "Oficialus · peržiūrėtas",
+  "updatedOn": "atnaujinta {{date}}",
+  "whatItCanDo": "Ką gali",
+  "neverTitle": "Papildiniams niekada neįmanoma",
+  "neverText": "Jūsų mikrofonas ar garsas · failai jūsų kompiuteryje · jūsų sertifikatas ar slaptažodžiai · kitų papildinių duomenys",
+  "repositoryName": "Saugykla: {{repository}}",
+  "updatesFrom": "Naujiniai ateina iš šios saugyklos",
+  "unofficialTitle": "Iš neoficialios saugyklos",
+  "unofficialText": "„Mumcord“ neperžiūri saugyklos {{repository}}. Papildinys vis tiek veikia smėlio dėžėje ir gauna tik jūsų leidžiamus leidimus.",
+  "checksTitle": "Oficialūs patikrinimai vis dar galioja",
+  "checksText": "„Mumcord“ atšaukimo sąrašas gali jį išjungti. Oficialių papildinių pavadinimai rezervuoti."
 }

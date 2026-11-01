@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { IndexedPlugin } from "../../../api";
 import { isPermissionId, PERMISSION_RISK, permissionTextKey } from "../permissions/catalogue";
+import { formatSize } from "../updates/formatSize";
 import { PluginIcon } from "./PluginIcon";
 import { sourceLabel } from "./source";
 import { useIndexImage } from "./useIndexImage";
 import "../permissions/permissions.css";
+import "./details.css";
 
 export interface PluginDetailsProps {
   plugin: IndexedPlugin;
@@ -16,78 +18,121 @@ export interface PluginDetailsProps {
 
 /** A plugin's store page: what it is, who made it and which permissions it may ask for. */
 export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDetailsProps) {
-  const { t } = useTranslation("pluginBrowse");
+  const { t, i18n } = useTranslation("pluginBrowse");
+  const { t: tTabs } = useTranslation("pluginSettings");
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     heading.current?.focus();
   }, [plugin.id]);
   const name = plugin.name;
 
+  const official = plugin.source.kind === "official";
+  const repository = plugin.source.kind === "repo" ? plugin.source.name : null;
+  const meta = [
+    plugin.authors.length > 0 ? t("by", { authors: plugin.authors.join(", ") }) : null,
+    plugin.version,
+    plugin.size !== null ? formatSize(plugin.size, i18n.language) : null,
+    t("updatedOn", { date: formatDate(plugin.updated, i18n.language) }),
+    plugin.categories.length > 0
+      ? plugin.categories.map((c) => t(`category.${c}`, { defaultValue: c })).join(", ")
+      : null,
+  ].filter((part) => part !== null);
+
   return (
-    <article className="plugin-details" aria-labelledby={`plugin-details-${plugin.id}`}>
-      <div>
-        <button type="button" className="settings-button" onClick={onBack}>
-          {t("back")}
-        </button>
-      </div>
-      <header className="plugin-details-header">
+    <article className="pd" aria-labelledby={`plugin-details-${plugin.id}`}>
+      <button type="button" className="pd-back" onClick={onBack}>
+        <span aria-hidden="true">← </span>
+        {tTabs("tabs.browse")}
+      </button>
+      <header className="pd-header">
         <PluginIcon id={plugin.id} name={name} hasIcon={plugin.icon !== null} />
-        <div>
-          <h3 id={`plugin-details-${plugin.id}`} ref={heading} tabIndex={-1}>
-            {name}
-          </h3>
-          <p className="plugin-details-meta">
-            {t("version", { version: plugin.version })}
-            {plugin.authors.length > 0 && <> · {t("by", { authors: plugin.authors.join(", ") })}</>}
-            {plugin.size !== null && (
-              <> · {t("size", { size: Math.max(1, Math.round(plugin.size / 1024)) })}</>
-            )}
-          </p>
-          <div className="plugin-card-labels">
-            <span
-              className={
-                plugin.source.kind === "official"
-                  ? "plugin-label"
-                  : "plugin-label plugin-label-unofficial"
-              }
-            >
-              {sourceLabel(t, plugin.source)}
+        <div className="pd-headline">
+          <div className="pd-title-row">
+            <h3 id={`plugin-details-${plugin.id}`} ref={heading} tabIndex={-1}>
+              {name}
+            </h3>
+            <span className={official ? "pd-pill" : "pd-pill pd-pill-unofficial"}>
+              <span aria-hidden="true">{official ? "✓ " : "⚠ "}</span>
+              {official
+                ? plugin.reviewed
+                  ? t("officialReviewed")
+                  : t("official")
+                : sourceLabel(t, plugin.source)}
             </span>
-            {plugin.reviewed && <span className="plugin-label">{t("reviewed")}</span>}
-            {plugin.categories.map((category) => (
-              <span key={category} className="plugin-label">
-                {t(`category.${category}`, { defaultValue: category })}
-              </span>
-            ))}
           </div>
+          <p className="pd-meta">{meta.join(" · ")}</p>
+          <p className="pd-summary">{plugin.summary}</p>
+        </div>
+        <div className="pd-action">
+          {installed ? (
+            <span className="plugin-label">{t("installed")}</span>
+          ) : (
+            <button
+              type="button"
+              className={official ? "settings-button settings-button--primary" : "settings-button"}
+              aria-label={t("installNamed", { name })}
+              onClick={onInstall}
+            >
+              {official ? t("install") : `${t("install")}…`}
+            </button>
+          )}
         </div>
       </header>
-      <p>{plugin.summary}</p>
       {plugin.screenshots.length > 0 && (
-        <section aria-label={t("screenshots")} className="plugin-details-shots">
+        <section aria-label={t("screenshots")} className="pd-shots">
           {plugin.screenshots.map((shot, index) => (
             <Screenshot key={index} id={plugin.id} index={index} alt={shot.alt} />
           ))}
         </section>
       )}
-      {plugin.permissions.length > 0 && (
-        <section>
-          <h4>{t("mayAskFor")}</h4>
-          <PermissionPreview ids={plugin.permissions} />
-        </section>
+      {repository !== null && (
+        <div className="pd-banner" role="note">
+          <span className="pd-banner-icon" aria-hidden="true">
+            ⚠
+          </span>
+          <div>
+            <strong>{t("unofficialTitle")}</strong>
+            <p>{t("unofficialText", { repository })}</p>
+          </div>
+        </div>
       )}
-      <div>
-        {installed ? (
-          <span className="plugin-label">{t("installed")}</span>
-        ) : (
-          <button
-            type="button"
-            className="settings-button settings-button--primary"
-            onClick={onInstall}
-          >
-            {t("installNamed", { name })}
-          </button>
+      <div className="pd-columns">
+        {plugin.permissions.length > 0 && (
+          <section className="pd-card" aria-labelledby="pd-can-do">
+            <h4 id="pd-can-do" className="pd-card-title">
+              {t("whatItCanDo")}
+            </h4>
+            <PermissionPreview ids={plugin.permissions} />
+          </section>
         )}
+        <div className="pd-side">
+          {official && (
+            <section className="pd-card" aria-labelledby="pd-never">
+              <h4 id="pd-never" className="pd-card-title">
+                {t("neverTitle")}
+              </h4>
+              <p>{t("neverText")}</p>
+            </section>
+          )}
+          <section className="pd-card" aria-labelledby="pd-details">
+            <h4 id="pd-details" className="pd-card-title">
+              {t("details")}
+            </h4>
+            <ul className="pd-facts">
+              {repository !== null && <li>{t("repositoryName", { repository })}</li>}
+              {official && plugin.reviewed && <li>{t("reviewed")}</li>}
+              {repository !== null && <li>{t("updatesFrom")}</li>}
+            </ul>
+          </section>
+          {repository !== null && (
+            <section className="pd-card" aria-labelledby="pd-checks">
+              <h4 id="pd-checks" className="pd-card-title">
+                {t("checksTitle")}
+              </h4>
+              <p>{t("checksText")}</p>
+            </section>
+          )}
+        </div>
       </div>
     </article>
   );
@@ -95,7 +140,14 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
 
 function Screenshot({ id, index, alt }: { id: string; index: number; alt: string }) {
   const url = useIndexImage(id, { kind: "screenshot", index });
-  return url === null ? null : <img className="plugin-details-shot" src={url} alt={alt} />;
+  return url === null ? null : <img className="pd-shot" src={url} alt={alt} />;
+}
+
+function formatDate(value: string, language: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat(language, { dateStyle: "medium" }).format(date);
 }
 
 /**
@@ -105,16 +157,16 @@ function Screenshot({ id, index, alt }: { id: string; index: number; alt: string
 function PermissionPreview({ ids }: { ids: readonly string[] }) {
   const { t } = useTranslation("pluginPermissions");
   return (
-    <ul className="plugin-details-permissions">
+    <ul className="pd-perms">
       {ids.map((id) => {
         const known = isPermissionId(id);
         const risk = known ? PERMISSION_RISK[id] : "red";
         return (
-          <li key={id}>
-            <span className={`perm-risk perm-risk-${risk}`} aria-hidden="true">
+          <li key={id} className="pd-perm">
+            <span className={`pd-perm-icon perm-risk perm-risk-${risk}`} aria-hidden="true">
               {risk === "red" ? "▲" : "●"}
-            </span>{" "}
-            {known ? t(`texts.${permissionTextKey(id)}`) : id}
+            </span>
+            <strong>{known ? t(`texts.${permissionTextKey(id)}`) : id}</strong>
             {risk === "red" && <span className="perm-risk-badge">{t("risk.red")}</span>}
           </li>
         );

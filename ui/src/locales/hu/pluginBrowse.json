@@ -26,10 +26,8 @@
   "installNamed": "{{name}} telepítése",
   "details": "Részletek",
   "detailsNamed": "{{name}} részletei",
-  "back": "Vissza az összes bővítményhez",
   "version": "{{version}} verzió",
   "by": "készítette: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Képernyőképek",
   "mayAskFor": "Ez a bővítmény kérheti",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "A letöltés nem egyezik a hivatalos listával",
     "signature": "Az aláírás ellenőrzése sikertelen",
     "permissions": "Ez a bővítmény olyan engedélyeket kér, amelyek nincsenek a tárolóban felsorolva"
-  }
+  },
+  "officialReviewed": "Hivatalos · ellenőrzött",
+  "updatedOn": "frissítve: {{date}}",
+  "whatItCanDo": "Mire képes",
+  "neverTitle": "Bővítményeknek soha nem lehetséges",
+  "neverText": "A mikrofonod vagy hangod · a számítógéped fájljai · a tanúsítványod vagy jelszavaid · más bővítmények adatai",
+  "repositoryName": "Tár: {{repository}}",
+  "updatesFrom": "A frissítések ebből a tárból érkeznek",
+  "unofficialTitle": "Nem hivatalos tárból",
+  "unofficialText": "A(z) {{repository}} tárat a Mumcord nem ellenőrzi. A bővítmény így is a homokozóban fut, és csak az általad engedélyezett jogosultságokat kapja.",
+  "checksTitle": "A hivatalos ellenőrzések továbbra is érvényesek",
+  "checksText": "A Mumcord visszavonási listája kikapcsolhatja. A hivatalos bővítmények nevei foglaltak."
 }

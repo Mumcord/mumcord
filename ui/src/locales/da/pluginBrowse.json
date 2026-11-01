@@ -26,10 +26,8 @@
   "installNamed": "Installér {{name}}",
   "details": "Detaljer",
   "detailsNamed": "Detaljer om {{name}}",
-  "back": "Tilbage til alle plugins",
   "version": "Version {{version}}",
   "by": "af {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Skærmbilleder",
   "mayAskFor": "Dette plugin kan bede om",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Downloaden matchede ikke den officielle liste",
     "signature": "Signaturtjekket mislykkedes",
     "permissions": "Dette plugin beder om tilladelser, der ikke står i lageret"
-  }
+  },
+  "officialReviewed": "Officiel · gennemgået",
+  "updatedOn": "opdateret {{date}}",
+  "whatItCanDo": "Hvad det kan",
+  "neverTitle": "Aldrig muligt for plugins",
+  "neverText": "Din mikrofon eller lyd · filer på din computer · dit certifikat eller dine adgangskoder · andre plugins' data",
+  "repositoryName": "Arkiv: {{repository}}",
+  "updatesFrom": "Opdateringer kommer fra dette arkiv",
+  "unofficialTitle": "Fra et uofficielt arkiv",
+  "unofficialText": "{{repository}} er ikke gennemgået af Mumcord. Pluginnet kører stadig i sandkassen og får kun de tilladelser, du giver.",
+  "checksTitle": "Officielle kontroller gælder stadig",
+  "checksText": "Mumcords spærreliste kan slå det fra. Navne brugt af officielle plugins er reserverede."
 }

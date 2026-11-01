@@ -26,10 +26,8 @@
   "installNamed": "Instalează {{name}}",
   "details": "Detalii",
   "detailsNamed": "Detalii despre {{name}}",
-  "back": "Înapoi la toate pluginurile",
   "version": "Versiunea {{version}}",
   "by": "de {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Capturi de ecran",
   "mayAskFor": "Acest plugin poate cere",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Descărcarea nu se potrivește cu lista oficială",
     "signature": "Verificarea semnăturii a eșuat",
     "permissions": "Acest plugin cere permisiuni care nu sunt listate în depozit"
-  }
+  },
+  "officialReviewed": "Oficial · verificat",
+  "updatedOn": "actualizat la {{date}}",
+  "whatItCanDo": "Ce poate face",
+  "neverTitle": "Niciodată posibil pentru pluginuri",
+  "neverText": "Microfonul sau sunetul tău · fișierele de pe computer · certificatul sau parolele tale · datele altor pluginuri",
+  "repositoryName": "Depozit: {{repository}}",
+  "updatesFrom": "Actualizările vin din acest depozit",
+  "unofficialTitle": "Dintr-un depozit neoficial",
+  "unofficialText": "{{repository}} nu este verificat de Mumcord. Rulează totuși în sandbox și primește doar permisiunile pe care le permiți.",
+  "checksTitle": "Verificările oficiale se aplică în continuare",
+  "checksText": "Lista de revocare Mumcord îl poate dezactiva. Numele pluginurilor oficiale sunt rezervate."
 }

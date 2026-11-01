@@ -26,10 +26,8 @@
   "installNamed": "Install {{name}}",
   "details": "Details",
   "detailsNamed": "Details of {{name}}",
-  "back": "Back to all plugins",
   "version": "Version {{version}}",
   "by": "by {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Screenshots",
   "mayAskFor": "This plugin may ask for",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Download didn't match the official list",
     "signature": "Signature check failed",
     "permissions": "This plugin asks for permissions not listed in the repository"
-  }
+  },
+  "officialReviewed": "Official · reviewed",
+  "updatedOn": "updated {{date}}",
+  "whatItCanDo": "What it can do",
+  "neverTitle": "Never possible for plugins",
+  "neverText": "Your microphone or audio · files on your computer · your certificate or passwords · other plugins' data",
+  "repositoryName": "Repository: {{repository}}",
+  "updatesFrom": "Updates come from this repository",
+  "unofficialTitle": "From an unofficial repository",
+  "unofficialText": "{{repository}} is not reviewed by Mumcord. It still runs in the sandbox and gets only the permissions you allow.",
+  "checksTitle": "Official checks still apply",
+  "checksText": "Mumcord's revocation list can turn it off. Names used by official plugins are reserved."
 }

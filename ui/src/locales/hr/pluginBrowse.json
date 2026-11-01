@@ -26,10 +26,8 @@
   "installNamed": "Instaliraj {{name}}",
   "details": "Detalji",
   "detailsNamed": "Detalji dodatka {{name}}",
-  "back": "Natrag na sve dodatke",
   "version": "Verzija {{version}}",
   "by": "autor: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Snimke zaslona",
   "mayAskFor": "Ovaj dodatak može zatražiti",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Preuzeta datoteka ne odgovara službenom popisu",
     "signature": "Provjera potpisa nije uspjela",
     "permissions": "Ovaj dodatak traži dopuštenja koja nisu navedena u repozitoriju"
-  }
+  },
+  "officialReviewed": "Službeno · provjereno",
+  "updatedOn": "ažurirano {{date}}",
+  "whatItCanDo": "Što može",
+  "neverTitle": "Nikad moguće za dodatke",
+  "neverText": "Vaš mikrofon ili zvuk · datoteke na vašem računalu · vaš certifikat ili lozinke · podaci drugih dodataka",
+  "repositoryName": "Repozitorij: {{repository}}",
+  "updatesFrom": "Ažuriranja dolaze iz ovog repozitorija",
+  "unofficialTitle": "Iz neslužbenog repozitorija",
+  "unofficialText": "Mumcord ne provjerava {{repository}}. Dodatak se i dalje izvodi u izoliranom okruženju i dobiva samo dopuštenja koja odobrite.",
+  "checksTitle": "Službene provjere i dalje vrijede",
+  "checksText": "Mumcordov popis opoziva može ga isključiti. Nazivi službenih dodataka rezervirani su."
 }

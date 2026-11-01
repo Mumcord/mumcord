@@ -26,10 +26,8 @@
   "installNamed": "Paigalda {{name}}",
   "details": "Üksikasjad",
   "detailsNamed": "{{name}} üksikasjad",
-  "back": "Tagasi kõigi pluginate juurde",
   "version": "Versioon {{version}}",
   "by": "autor: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Ekraanipildid",
   "mayAskFor": "See plugin võib küsida",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Allalaadimine ei vastanud ametlikule loendile",
     "signature": "Allkirja kontroll ebaõnnestus",
     "permissions": "See plugin küsib õigusi, mida repositooriumis ei ole loetletud"
-  }
+  },
+  "officialReviewed": "Ametlik · üle vaadatud",
+  "updatedOn": "uuendatud {{date}}",
+  "whatItCanDo": "Mida see oskab",
+  "neverTitle": "Pistikprogrammidele kunagi võimatu",
+  "neverText": "Sinu mikrofon või heli · failid sinu arvutis · sinu sertifikaat või paroolid · teiste pistikprogrammide andmed",
+  "repositoryName": "Hoidla: {{repository}}",
+  "updatesFrom": "Uuendused tulevad sellest hoidlast",
+  "unofficialTitle": "Mitteametlikust hoidlast",
+  "unofficialText": "Mumcord ei vaata hoidlat {{repository}} üle. Pistikprogramm töötab siiski liivakastis ja saab ainult load, mida sa lubad.",
+  "checksTitle": "Ametlikud kontrollid kehtivad endiselt",
+  "checksText": "Mumcordi tühistusnimekiri võib selle välja lülitada. Ametlike pistikprogrammide nimed on reserveeritud."
 }

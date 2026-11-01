@@ -26,10 +26,8 @@
   "installNamed": "Asenna {{name}}",
   "details": "Tiedot",
   "detailsNamed": "Lisäosan {{name}} tiedot",
-  "back": "Takaisin kaikkiin lisäosiin",
   "version": "Versio {{version}}",
   "by": "tekijä: {{authors}}",
-  "size": "{{size}} kt",
   "screenshots": "Kuvakaappaukset",
   "mayAskFor": "Tämä lisäosa voi pyytää",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Lataus ei vastannut virallista luetteloa",
     "signature": "Allekirjoituksen tarkistus epäonnistui",
     "permissions": "Tämä lisäosa pyytää oikeuksia, joita ei ole mainittu lähteessä"
-  }
+  },
+  "officialReviewed": "Virallinen · tarkastettu",
+  "updatedOn": "päivitetty {{date}}",
+  "whatItCanDo": "Mitä se voi tehdä",
+  "neverTitle": "Lisäosille aina mahdotonta",
+  "neverText": "Mikrofonisi tai äänesi · tietokoneesi tiedostot · varmenteesi tai salasanasi · muiden lisäosien tiedot",
+  "repositoryName": "Tietovarasto: {{repository}}",
+  "updatesFrom": "Päivitykset tulevat tästä tietovarastosta",
+  "unofficialTitle": "Epävirallisesta tietovarastosta",
+  "unofficialText": "Mumcord ei ole tarkastanut tietovarastoa {{repository}}. Lisäosa toimii silti hiekkalaatikossa ja saa vain sallimasi oikeudet.",
+  "checksTitle": "Viralliset tarkistukset ovat edelleen voimassa",
+  "checksText": "Mumcordin estolista voi poistaa sen käytöstä. Virallisten lisäosien nimet on varattu."
 }

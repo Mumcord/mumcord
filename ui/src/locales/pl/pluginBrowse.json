@@ -26,10 +26,8 @@
   "installNamed": "Zainstaluj {{name}}",
   "details": "Szczegóły",
   "detailsNamed": "Szczegóły: {{name}}",
-  "back": "Wróć do wszystkich wtyczek",
   "version": "Wersja {{version}}",
   "by": "autor: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Zrzuty ekranu",
   "mayAskFor": "Ta wtyczka może prosić o",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Pobrany plik nie pasuje do oficjalnej listy",
     "signature": "Weryfikacja podpisu nie powiodła się",
     "permissions": "Ta wtyczka prosi o uprawnienia, których nie ma w repozytorium"
-  }
+  },
+  "officialReviewed": "Oficjalna · sprawdzona",
+  "updatedOn": "zaktualizowano {{date}}",
+  "whatItCanDo": "Co potrafi",
+  "neverTitle": "Nigdy niedostępne dla wtyczek",
+  "neverText": "Twój mikrofon lub dźwięk · pliki na twoim komputerze · twój certyfikat lub hasła · dane innych wtyczek",
+  "repositoryName": "Repozytorium: {{repository}}",
+  "updatesFrom": "Aktualizacje pochodzą z tego repozytorium",
+  "unofficialTitle": "Z nieoficjalnego repozytorium",
+  "unofficialText": "{{repository}} nie jest sprawdzane przez Mumcord. Wtyczka nadal działa w piaskownicy i dostaje tylko uprawnienia, na które pozwolisz.",
+  "checksTitle": "Oficjalne kontrole nadal obowiązują",
+  "checksText": "Lista unieważnień Mumcord może ją wyłączyć. Nazwy oficjalnych wtyczek są zarezerwowane."
 }

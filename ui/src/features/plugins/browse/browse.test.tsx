@@ -134,8 +134,8 @@ describe("BrowseTab", () => {
 
     routePluginRequest({ kind: "details", plugin: "dice" });
     expect(await screen.findByRole("heading", { name: "Dice" })).toBeTruthy();
-    expect(screen.getByText(/Version 1\.0\.0/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Back to all plugins" }));
+    expect(screen.getByText(/1\.0\.0/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Browse" }));
     expect(await screen.findByRole("list", { name: "Available plugins" })).toBeTruthy();
   });
 

@@ -26,10 +26,8 @@
   "installNamed": "Namesti {{name}}",
   "details": "Podrobnosti",
   "detailsNamed": "Podrobnosti o {{name}}",
-  "back": "Nazaj na vse vtičnike",
   "version": "Različica {{version}}",
   "by": "avtor: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Posnetki zaslona",
   "mayAskFor": "Ta vtičnik lahko zahteva",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Prenos se ne ujema z uradnim seznamom",
     "signature": "Preverjanje podpisa ni uspelo",
     "permissions": "Ta vtičnik zahteva dovoljenja, ki niso navedena v repozitoriju"
-  }
+  },
+  "officialReviewed": "Uradno · pregledano",
+  "updatedOn": "posodobljeno {{date}}",
+  "whatItCanDo": "Kaj zmore",
+  "neverTitle": "Za vtičnike nikoli mogoče",
+  "neverText": "Vaš mikrofon ali zvok · datoteke v vašem računalniku · vaše potrdilo ali gesla · podatki drugih vtičnikov",
+  "repositoryName": "Repozitorij: {{repository}}",
+  "updatesFrom": "Posodobitve prihajajo iz tega repozitorija",
+  "unofficialTitle": "Iz neuradnega repozitorija",
+  "unofficialText": "Mumcord ne pregleduje repozitorija {{repository}}. Vtičnik se še vedno izvaja v peskovniku in dobi le dovoljenja, ki jih dovolite.",
+  "checksTitle": "Uradni pregledi še vedno veljajo",
+  "checksText": "Mumcordov seznam preklicev ga lahko izklopi. Imena uradnih vtičnikov so rezervirana."
 }

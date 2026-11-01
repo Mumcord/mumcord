@@ -26,10 +26,8 @@
   "installNamed": "Installa {{name}}",
   "details": "Dettagli",
   "detailsNamed": "Dettagli di {{name}}",
-  "back": "Torna a tutti i plugin",
   "version": "Versione {{version}}",
   "by": "di {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Schermate",
   "mayAskFor": "Questo plugin può richiedere",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Il download non corrisponde all’elenco ufficiale",
     "signature": "Verifica della firma non riuscita",
     "permissions": "Questo plugin richiede autorizzazioni non elencate nel repository"
-  }
+  },
+  "officialReviewed": "Ufficiale · verificato",
+  "updatedOn": "aggiornato il {{date}}",
+  "whatItCanDo": "Cosa può fare",
+  "neverTitle": "Mai possibile per i plugin",
+  "neverText": "Il tuo microfono o l'audio · i file sul tuo computer · il tuo certificato o le password · i dati di altri plugin",
+  "repositoryName": "Repository: {{repository}}",
+  "updatesFrom": "Gli aggiornamenti arrivano da questo repository",
+  "unofficialTitle": "Da un repository non ufficiale",
+  "unofficialText": "{{repository}} non è verificato da Mumcord. Viene comunque eseguito nella sandbox e ottiene solo i permessi che consenti.",
+  "checksTitle": "I controlli ufficiali restano validi",
+  "checksText": "L'elenco di revoca di Mumcord può disattivarlo. I nomi dei plugin ufficiali sono riservati."
 }

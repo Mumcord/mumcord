@@ -26,10 +26,8 @@
   "installNamed": "Instalēt {{name}}",
   "details": "Informācija",
   "detailsNamed": "Informācija par {{name}}",
-  "back": "Atpakaļ uz visiem spraudņiem",
   "version": "Versija {{version}}",
   "by": "autors: {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Ekrānuzņēmumi",
   "mayAskFor": "Šis spraudnis var pieprasīt",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Lejupielāde neatbilda oficiālajam sarakstam",
     "signature": "Paraksta pārbaude neizdevās",
     "permissions": "Šis spraudnis pieprasa atļaujas, kas nav norādītas krātuvē"
-  }
+  },
+  "officialReviewed": "Oficiāls · pārbaudīts",
+  "updatedOn": "atjaunināts {{date}}",
+  "whatItCanDo": "Ko tas var",
+  "neverTitle": "Spraudņiem nekad nav iespējams",
+  "neverText": "Jūsu mikrofons vai skaņa · faili jūsu datorā · jūsu sertifikāts vai paroles · citu spraudņu dati",
+  "repositoryName": "Krātuve: {{repository}}",
+  "updatesFrom": "Atjauninājumi nāk no šīs krātuves",
+  "unofficialTitle": "No neoficiālas krātuves",
+  "unofficialText": "Mumcord nepārbauda krātuvi {{repository}}. Spraudnis tomēr darbojas smilškastē un saņem tikai atļaujas, ko jūs atļaujat.",
+  "checksTitle": "Oficiālās pārbaudes joprojām ir spēkā",
+  "checksText": "Mumcord atsaukšanas saraksts to var izslēgt. Oficiālo spraudņu nosaukumi ir rezervēti."
 }

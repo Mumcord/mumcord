@@ -26,10 +26,8 @@
   "installNamed": "Nainstalovat {{name}}",
   "details": "Podrobnosti",
   "detailsNamed": "Podrobnosti o doplňku {{name}}",
-  "back": "Zpět na všechny doplňky",
   "version": "Verze {{version}}",
   "by": "od {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Snímky obrazovky",
   "mayAskFor": "Tento doplněk může požádat o",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Stažený soubor neodpovídá oficiálnímu seznamu",
     "signature": "Ověření podpisu selhalo",
     "permissions": "Tento doplněk žádá o oprávnění, která nejsou uvedena v repozitáři"
-  }
+  },
+  "officialReviewed": "Oficiální · zkontrolováno",
+  "updatedOn": "aktualizováno {{date}}",
+  "whatItCanDo": "Co umí",
+  "neverTitle": "Pro pluginy nikdy možné",
+  "neverText": "Váš mikrofon nebo zvuk · soubory ve vašem počítači · váš certifikát nebo hesla · data jiných pluginů",
+  "repositoryName": "Repozitář: {{repository}}",
+  "updatesFrom": "Aktualizace přicházejí z tohoto repozitáře",
+  "unofficialTitle": "Z neoficiálního repozitáře",
+  "unofficialText": "{{repository}} Mumcord nekontroluje. Plugin přesto běží v izolovaném prostředí a dostane jen oprávnění, která povolíte.",
+  "checksTitle": "Oficiální kontroly stále platí",
+  "checksText": "Seznam zrušených pluginů Mumcordu ho může vypnout. Názvy oficiálních pluginů jsou vyhrazeny."
 }

@@ -26,10 +26,8 @@
   "installNamed": "Installera {{name}}",
   "details": "Detaljer",
   "detailsNamed": "Detaljer om {{name}}",
-  "back": "Tillbaka till alla tillägg",
   "version": "Version {{version}}",
   "by": "av {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Skärmbilder",
   "mayAskFor": "Det här tillägget kan be om",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Nedladdningen matchade inte den officiella listan",
     "signature": "Signaturkontrollen misslyckades",
     "permissions": "Det här tillägget ber om behörigheter som inte finns i förvaret"
-  }
+  },
+  "officialReviewed": "Officiell · granskad",
+  "updatedOn": "uppdaterad {{date}}",
+  "whatItCanDo": "Vad den kan göra",
+  "neverTitle": "Aldrig möjligt för plugin",
+  "neverText": "Din mikrofon eller ljud · filer på din dator · ditt certifikat eller dina lösenord · andra plugins data",
+  "repositoryName": "Förråd: {{repository}}",
+  "updatesFrom": "Uppdateringar kommer från det här förrådet",
+  "unofficialTitle": "Från ett inofficiellt förråd",
+  "unofficialText": "{{repository}} granskas inte av Mumcord. Pluginet körs ändå i sandlådan och får bara de behörigheter du tillåter.",
+  "checksTitle": "Officiella kontroller gäller fortfarande",
+  "checksText": "Mumcords spärrlista kan stänga av det. Namn som används av officiella plugins är reserverade."
 }

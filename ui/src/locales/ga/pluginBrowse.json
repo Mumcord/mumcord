@@ -26,10 +26,8 @@
   "installNamed": "Suiteáil {{name}}",
   "details": "Sonraí",
   "detailsNamed": "Sonraí {{name}}",
-  "back": "Ar ais chuig na breiseáin go léir",
   "version": "Leagan {{version}}",
   "by": "le {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Pictiúir scáileáin",
   "mayAskFor": "Is féidir leis an mbreiseán seo iarraidh",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Níor mheaitseáil an íoslódáil leis an liosta oifigiúil",
     "signature": "Theip ar sheiceáil an tsínithe",
     "permissions": "Iarrann an breiseán seo ceadanna nach bhfuil liostaithe sa stóras"
-  }
+  },
+  "officialReviewed": "Oifigiúil · athbhreithnithe",
+  "updatedOn": "nuashonraithe {{date}}",
+  "whatItCanDo": "Cad is féidir leis a dhéanamh",
+  "neverTitle": "Ní féidir riamh do bhreiseáin",
+  "neverText": "Do mhicreafón nó d'fhuaim · comhaid ar do ríomhaire · do theastas nó do phasfhocail · sonraí breiseán eile",
+  "repositoryName": "Stór: {{repository}}",
+  "updatesFrom": "Tagann nuashonruithe ón stór seo",
+  "unofficialTitle": "Ó stór neamhoifigiúil",
+  "unofficialText": "Ní athbhreithníonn Mumcord {{repository}}. Ritheann sé sa bhosca gainimh fós agus faigheann sé na ceadanna a cheadaíonn tú amháin.",
+  "checksTitle": "Baineann seiceálacha oifigiúla fós",
+  "checksText": "Is féidir le liosta cúlghairme Mumcord é a dhíchumasú. Tá ainmneacha breiseán oifigiúil in áirithe."
 }

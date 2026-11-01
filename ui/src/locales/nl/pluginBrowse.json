@@ -26,10 +26,8 @@
   "installNamed": "{{name}} installeren",
   "details": "Details",
   "detailsNamed": "Details van {{name}}",
-  "back": "Terug naar alle plug-ins",
   "version": "Versie {{version}}",
   "by": "door {{authors}}",
-  "size": "{{size}} KB",
   "screenshots": "Schermafbeeldingen",
   "mayAskFor": "Deze plug-in kan vragen om",
   "prompt": {
@@ -66,5 +64,16 @@
     "mismatch": "Download komt niet overeen met de officiële lijst",
     "signature": "Handtekeningcontrole mislukt",
     "permissions": "Deze plug-in vraagt om rechten die niet in de repository staan"
-  }
+  },
+  "officialReviewed": "Officieel · beoordeeld",
+  "updatedOn": "bijgewerkt op {{date}}",
+  "whatItCanDo": "Wat het kan",
+  "neverTitle": "Nooit mogelijk voor plugins",
+  "neverText": "Je microfoon of audio · bestanden op je computer · je certificaat of wachtwoorden · gegevens van andere plugins",
+  "repositoryName": "Repository: {{repository}}",
+  "updatesFrom": "Updates komen uit deze repository",
+  "unofficialTitle": "Uit een onofficiële repository",
+  "unofficialText": "{{repository}} wordt niet beoordeeld door Mumcord. De plugin draait nog steeds in de sandbox en krijgt alleen de rechten die jij toestaat.",
+  "checksTitle": "Officiële controles blijven gelden",
+  "checksText": "De intrekkingslijst van Mumcord kan de plugin uitschakelen. Namen van officiële plugins zijn gereserveerd."
 }
