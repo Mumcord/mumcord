@@ -61,8 +61,9 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F1 | Fix: ui tsc error in ui/src/api/mock.ts (missing plugin settings fields from B3) + prettier on crates/plugins/schema/manifest.schema.json | done | f1-uifix |
 | F2 | Fix: safety fixtures pass `prettier --check .` (format them) and builder `common_manifest()` uses only B4 fields (authors/categories) | done | f2-fixtures |
 | F3 | chat.rs GestureGate: a gesture from a typed command (source `command`) allows its one message for up to 8 s (clicks stay 2 s); needed for verified dice rolls (FR-6.44 addendum) | done | f3-gesture |
-| F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | in progress | f4-docs |
+| F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | done (ab8cd0fb + plugins 4b29be5) | f4-docs |
 | F5 | Messaging envelope: carry a `direct` flag so `peer-message.direct` is correct (wire is unreleased, keep envelope v1 compatible within the epic) | open | |
+| F6 | `prettier --check .` fails on docs/plugin-registry-format.md (pre-existing since B15/B25b) — format it; check the whole repo passes prettier | open | |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | in progress | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | in progress | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | open | |
