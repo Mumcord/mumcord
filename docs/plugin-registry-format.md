@@ -207,3 +207,135 @@ sign the index with the new key. Keep `key_rotation` in the index until all user
 Mumcord fetches `revoked.json` once a day, even with plugin updates off, and always applies the
 copy bundled with the release (`crates/plugins/assets/revoked.json`) in addition to the fetched
 one. If several entries match, `disable` wins over `warn`.
+
+## `permissions.json`
+
+The official registry also publishes `v1/permissions.json` with the shared permission texts for
+the website (FR-6.80). It is generated from the client's permission catalogue and not signed.
+
+```json
+{
+  "format": 1,
+  "permissions": {
+    "chat.send": { "risk": "yellow", "official_only": false, "text": { "en": "…" } }
+  }
+}
+```
+
+`risk` is `green`, `yellow` or `red`; `text` maps language tags to the text shown in the install
+prompt (English only for now).
+
+## Registry source
+
+The official registry is generated from files in `Mumcord/plugins` (FR-6.54) by
+`mumcord-plugin site-data`; the publish workflow then signs `index.json` and `revoked.json` with
+`mumcord-plugin sign`. Authors add a version with `mumcord-plugin publish-pr`, which writes the
+files below and opens the pull request. All files are TOML; unknown fields are an error, so typos
+are caught in review.
+
+```
+plugins/<id>/plugin.toml          one per plugin; the folder name is the id
+plugins/<id>/versions/<ver>.toml  one per published version; the file name is the version
+plugins/<id>/<media files>        README, icon, screenshots referenced from plugin.toml
+revoked.toml                      kill switch entries
+```
+
+### `plugins/<id>/plugin.toml`
+
+```toml
+name = { en = "Dice", de = "Würfel" }
+summary = { en = "Roll dice in the channel" }
+categories = ["games"]
+authors = ["Mumcord"]
+author_keys = ["RW…"]
+reviewed = true
+description = "README.md"
+icon = "icon-128.png"
+
+[[screenshots]]
+file = "shot-1.png"
+alt = { en = "A roll of two dice" }
+```
+
+| Field | Required | Meaning |
+|---|---|---|
+| `name`, `summary` | yes | Language tag → text; `en` required. Become `name` / `summary` in the index. |
+| `categories`, `authors` | no | Copied into the index. |
+| `author_keys` | yes | Minisign public keys (base64 line) allowed to sign packages. A new key needs maintainer review. |
+| `reviewed` | no | Set by a maintainer after review; default `false`. |
+| `description` | no | Markdown file in the plugin folder, published as `v1/media/<id>/<file>` (`description_md_url`). |
+| `icon` | no | Image in the plugin folder, published under `v1/media/<id>/`. |
+| `screenshots` | no | `{file, alt}`; `alt` maps language tags to text. Published under `v1/media/<id>/`. |
+
+File paths are relative to the plugin folder and may not contain `..`.
+
+### `plugins/<id>/versions/<ver>.toml`
+
+```toml
+version = "1.2.0"
+api = 1
+size = 48213
+sha256 = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+permissions = ["chat.commands", "chat.send"]
+published = "2026-10-01"
+signature = """
+untrusted comment: signature from minisign secret key
+RW…
+trusted comment: …
+…
+"""
+
+[source]
+repository = "https://github.com/Mumcord/plugins"
+commit = "4f1c…"
+path = "dice"
+```
+
+| Field | Meaning |
+|---|---|
+| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for. |
+| `published` | `YYYY-MM-DD`; the newest version's date becomes `updated`. |
+| `signature` | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`. |
+| `source` | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash. |
+
+The package itself is not in the repository: the publish workflow rebuilds it from `source` and
+attaches it to the release `<id>-v<ver>`, so the index URL is
+`https://github.com/Mumcord/plugins/releases/download/<id>-v<ver>/<id>-<ver>.mcplugin`.
+
+### `revoked.toml`
+
+Same fields as the entries of [`revoked.json`](#revokedjson); `sequence` and `format` are added on
+publish.
+
+```toml
+[[revoked]]
+id = "echolings"
+versions = ["1.0.0"]
+severity = "disable"
+reason = { en = "Crashes voice", de = "Bringt Sprache zum Absturz", es = "Bloquea la voz" }
+since = "2026-10-20"
+```
+
+## Local test registry
+
+`mumcord-plugin serve-registry --packages <dir> --key <test.key>` serves the packages in `<dir>`
+as an official registry on `http://127.0.0.1:<port>/v1/`, signed with a test key (create one
+with `mumcord-plugin keygen --unencrypted`). Point a development build at it with the mirror
+setting and `MUMCORD_PLUGIN_REGISTRY_KEY=<public key line>`. With `--repository <name>` it serves
+a third-party repository instead; its address is `http://127.0.0.1:<port>/v1/index.json`
+(Developer mode allows plain `http` for localhost).
+
+Scenario switches (`--scenario`, repeatable, or `POST /_ctl/scenario?set=a,b` while running; an
+empty `set=` clears them) produce what the client must refuse:
+
+| Scenario | Effect |
+|---|---|
+| `tampered-hash:<id>` | The index lists a wrong SHA-256 for the plugin → "Download didn't match the official list". |
+| `lower-sequence` | The index sequence is one below the current one → rollback refused. |
+| `wrong-key` | The index is signed with an unknown key → "Signature check failed". |
+| `extra-permission:<id>` | The index allows one permission less than the manifest asks for → install refused. |
+| `revoke:<id>[@<ver>][:warn]` | Adds a `revoked.json` entry (severity `disable`, or `warn`). |
+| `key-change[:rotate]` | The index is signed with a second key; `rotate` adds a valid `key_rotation`. |
+
+`POST /_ctl/reload` rescans the package folder and raises the sequence, which publishes new
+versions. The sequence starts at the current Unix time unless `--sequence` is given.
