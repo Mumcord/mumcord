@@ -29,7 +29,6 @@
   "bitrate": "Débit",
   "path": "Voie",
   "pathDirect": "Direct",
-  "pathUnknown": "Inconnue",
   "sound": "Son",
   "soundOn": "Son activé",
   "soundOff": "Son coupé",

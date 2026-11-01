@@ -1,6 +1,5 @@
 {
   "follow": "Seuraa",
-  "following": "Seurataan",
   "unsupported": "Kanavien seuraaminen vaatii palvelimen, jonka versio on 1.4 tai uudempi.",
   "unread_one": "{{count}} lukematon viesti",
   "unread_other": "{{count}} lukematonta viestiä",

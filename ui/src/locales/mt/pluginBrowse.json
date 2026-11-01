@@ -28,7 +28,6 @@
   "version": "Verżjoni {{version}}",
   "by": "minn {{authors}}",
   "screenshots": "Screenshots",
-  "mayAskFor": "Dan il-plagin jista' jitlob",
   "prompt": {
     "title": "Tinstalla {{name}}?",
     "preparing": "Qed jiġi ċċekkjat {{name}}…",

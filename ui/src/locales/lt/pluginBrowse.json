@@ -28,7 +28,6 @@
   "version": "Versija {{version}}",
   "by": "autorius: {{authors}}",
   "screenshots": "Ekrano nuotraukos",
-  "mayAskFor": "Šis papildinys gali prašyti",
   "prompt": {
     "title": "Įdiegti {{name}}?",
     "preparing": "Tikrinamas {{name}}…",

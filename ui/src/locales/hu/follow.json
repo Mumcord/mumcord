@@ -1,6 +1,5 @@
 {
   "follow": "Követés",
-  "following": "Követed",
   "unsupported": "A csatornák követéséhez 1.4-es vagy újabb verziójú szerver kell.",
   "unread_one": "{{count}} olvasatlan üzenet",
   "unread_other": "{{count}} olvasatlan üzenet",

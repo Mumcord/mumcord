@@ -39,7 +39,6 @@
     "sessionOnly": "Ova osoba nema certifikat pa ove postavke vrijede samo za ovu sesiju.",
     "sendPrivateMessage": "Pošalji privatnu poruku",
     "privateMessage": "Privatna poruka",
-    "localSettings": "Tvoje postavke",
     "localSettingsHint": "Ovo vidiš samo ti. Promjene se odmah spremaju.",
     "settingsFor": "Postavke za {{name}}",
     "hintMuted": "Utišano",

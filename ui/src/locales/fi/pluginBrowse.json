@@ -28,7 +28,6 @@
   "version": "Versio {{version}}",
   "by": "tekijä: {{authors}}",
   "screenshots": "Kuvakaappaukset",
-  "mayAskFor": "Tämä lisäosa voi pyytää",
   "prompt": {
     "title": "Asennetaanko {{name}}?",
     "preparing": "Tarkistetaan {{name}}…",

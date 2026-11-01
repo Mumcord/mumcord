@@ -40,7 +40,6 @@
     "sessionOnly": "Ta osoba nie ma certyfikatu, więc te ustawienia obowiązują tylko w tej sesji.",
     "sendPrivateMessage": "Wyślij wiadomość prywatną",
     "privateMessage": "Wiadomość prywatna",
-    "localSettings": "Twoje ustawienia",
     "localSettingsHint": "Widzisz je tylko Ty. Zmiany zapisują się od razu.",
     "settingsFor": "Ustawienia dla {{name}}",
     "hintMuted": "Wyciszono",

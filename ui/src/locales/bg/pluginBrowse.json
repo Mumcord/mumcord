@@ -28,7 +28,6 @@
   "version": "Версия {{version}}",
   "by": "от {{authors}}",
   "screenshots": "Екранни снимки",
-  "mayAskFor": "Тази добавка може да поиска",
   "prompt": {
     "title": "Да се инсталира ли {{name}}?",
     "preparing": "{{name}} се проверява…",

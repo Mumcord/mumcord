@@ -28,7 +28,6 @@
   "version": "{{version}} verzió",
   "by": "készítette: {{authors}}",
   "screenshots": "Képernyőképek",
-  "mayAskFor": "Ez a bővítmény kérheti",
   "prompt": {
     "title": "Telepíted a(z) {{name}} bővítményt?",
     "preparing": "{{name}} ellenőrzése…",

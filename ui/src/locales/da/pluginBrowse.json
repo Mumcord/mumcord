@@ -28,7 +28,6 @@
   "version": "Version {{version}}",
   "by": "af {{authors}}",
   "screenshots": "Skærmbilleder",
-  "mayAskFor": "Dette plugin kan bede om",
   "prompt": {
     "title": "Installér {{name}}?",
     "preparing": "Tjekker {{name}}…",

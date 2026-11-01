@@ -28,7 +28,6 @@
   "version": "Leagan {{version}}",
   "by": "le {{authors}}",
   "screenshots": "Pictiúir scáileáin",
-  "mayAskFor": "Is féidir leis an mbreiseán seo iarraidh",
   "prompt": {
     "title": "An suiteáil {{name}}?",
     "preparing": "Ag seiceáil {{name}}…",

@@ -28,7 +28,6 @@
   "version": "Versie {{version}}",
   "by": "door {{authors}}",
   "screenshots": "Schermafbeeldingen",
-  "mayAskFor": "Deze plug-in kan vragen om",
   "prompt": {
     "title": "{{name}} installeren?",
     "preparing": "{{name}} controleren…",

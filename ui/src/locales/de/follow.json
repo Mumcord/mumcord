@@ -1,6 +1,5 @@
 {
   "follow": "Folgen",
-  "following": "Folge ich",
   "unsupported": "Kanälen folgen funktioniert erst mit einem Server ab Version 1.4.",
   "unread_one": "{{count}} ungelesene Nachricht",
   "unread_other": "{{count}} ungelesene Nachrichten",

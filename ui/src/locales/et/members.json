@@ -38,7 +38,6 @@
     "sessionOnly": "Sellel inimesel pole sertifikaati, seega kehtivad need seaded ainult selle seansi jooksul.",
     "sendPrivateMessage": "Saada privaatsõnum",
     "privateMessage": "Privaatsõnum",
-    "localSettings": "Sinu seaded",
     "localSettingsHint": "Neid näed ainult sina. Muudatused salvestatakse kohe.",
     "settingsFor": "Seaded: {{name}}",
     "hintMuted": "Vaigistatud",

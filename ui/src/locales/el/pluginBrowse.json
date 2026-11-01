@@ -28,7 +28,6 @@
   "version": "Έκδοση {{version}}",
   "by": "από {{authors}}",
   "screenshots": "Στιγμιότυπα οθόνης",
-  "mayAskFor": "Αυτό το πρόσθετο μπορεί να ζητήσει",
   "prompt": {
     "title": "Εγκατάσταση του {{name}};",
     "preparing": "Έλεγχος του {{name}}…",

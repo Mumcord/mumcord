@@ -28,7 +28,6 @@
   "version": "Različica {{version}}",
   "by": "avtor: {{authors}}",
   "screenshots": "Posnetki zaslona",
-  "mayAskFor": "Ta vtičnik lahko zahteva",
   "prompt": {
     "title": "Namestim {{name}}?",
     "preparing": "Preverjanje {{name}}…",

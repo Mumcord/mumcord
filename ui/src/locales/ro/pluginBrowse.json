@@ -28,7 +28,6 @@
   "version": "Versiunea {{version}}",
   "by": "de {{authors}}",
   "screenshots": "Capturi de ecran",
-  "mayAskFor": "Acest plugin poate cere",
   "prompt": {
     "title": "Instalezi {{name}}?",
     "preparing": "Se verifică {{name}}…",

@@ -28,7 +28,6 @@
   "version": "Versija {{version}}",
   "by": "autors: {{authors}}",
   "screenshots": "Ekrānuzņēmumi",
-  "mayAskFor": "Šis spraudnis var pieprasīt",
   "prompt": {
     "title": "Vai instalēt {{name}}?",
     "preparing": "Notiek {{name}} pārbaude…",

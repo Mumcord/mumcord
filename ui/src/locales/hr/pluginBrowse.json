@@ -28,7 +28,6 @@
   "version": "Verzija {{version}}",
   "by": "autor: {{authors}}",
   "screenshots": "Snimke zaslona",
-  "mayAskFor": "Ovaj dodatak može zatražiti",
   "prompt": {
     "title": "Instalirati {{name}}?",
     "preparing": "Provjera dodatka {{name}}…",

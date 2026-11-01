@@ -28,7 +28,6 @@
   "version": "Version {{version}}",
   "by": "von {{authors}}",
   "screenshots": "Screenshots",
-  "mayAskFor": "Dieses Plugin kann anfragen",
   "prompt": {
     "title": "{{name}} installieren?",
     "preparing": "{{name}} wird geprüft…",

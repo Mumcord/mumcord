@@ -28,7 +28,6 @@
   "version": "Version {{version}}",
   "by": "av {{authors}}",
   "screenshots": "Skärmbilder",
-  "mayAskFor": "Det här tillägget kan be om",
   "prompt": {
     "title": "Installera {{name}}?",
     "preparing": "Kontrollerar {{name}}…",

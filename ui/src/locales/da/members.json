@@ -38,7 +38,6 @@
     "sessionOnly": "Denne person har intet certifikat, så disse indstillinger gælder kun for denne session.",
     "sendPrivateMessage": "Send privat besked",
     "privateMessage": "Privat besked",
-    "localSettings": "Dine indstillinger",
     "localSettingsHint": "Kun du kan se disse. Ændringer gemmes med det samme.",
     "settingsFor": "Indstillinger for {{name}}",
     "hintMuted": "Lydløs",

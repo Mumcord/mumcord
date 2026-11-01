@@ -1,6 +1,5 @@
 {
   "follow": "Seguir",
-  "following": "A seguir",
   "unsupported": "Seguir canais requer um servidor com a versão 1.4 ou mais recente.",
   "unread_one": "{{count}} mensagem por ler",
   "unread_many": "{{count}} mensagens por ler",

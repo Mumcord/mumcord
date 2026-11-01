@@ -40,7 +40,6 @@
     "sessionOnly": "Šis žmogus neturi sertifikato, todėl šie nustatymai galioja tik per šią sesiją.",
     "sendPrivateMessage": "Siųsti privačią žinutę",
     "privateMessage": "Privati žinutė",
-    "localSettings": "Tavo nustatymai",
     "localSettingsHint": "Tai mato tik tu. Pakeitimai įrašomi iškart.",
     "settingsFor": "{{name}} nustatymai",
     "hintMuted": "Nutildyta",

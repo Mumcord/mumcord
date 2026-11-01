@@ -28,7 +28,6 @@
   "version": "Verzia {{version}}",
   "by": "od {{authors}}",
   "screenshots": "Snímky obrazovky",
-  "mayAskFor": "Tento doplnok môže požiadať o",
   "prompt": {
     "title": "Nainštalovať {{name}}?",
     "preparing": "Kontroluje sa {{name}}…",

@@ -28,7 +28,6 @@
   "version": "Versioon {{version}}",
   "by": "autor: {{authors}}",
   "screenshots": "Ekraanipildid",
-  "mayAskFor": "See plugin võib küsida",
   "prompt": {
     "title": "Kas paigaldada {{name}}?",
     "preparing": "{{name}} kontrollimine…",

@@ -28,7 +28,6 @@
   "version": "Versão {{version}}",
   "by": "de {{authors}}",
   "screenshots": "Capturas de ecrã",
-  "mayAskFor": "Este plugin pode pedir",
   "prompt": {
     "title": "Instalar {{name}}?",
     "preparing": "A verificar {{name}}…",

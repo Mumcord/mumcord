@@ -40,7 +40,6 @@
     "sessionOnly": "Ta oseba nima certifikata, zato te nastavitve veljajo samo za to sejo.",
     "sendPrivateMessage": "Pošlji zasebno sporočilo",
     "privateMessage": "Zasebno sporočilo",
-    "localSettings": "Tvoje nastavitve",
     "localSettingsHint": "Vidiš jih samo ti. Spremembe se shranijo takoj.",
     "settingsFor": "Nastavitve za {{name}}",
     "hintMuted": "Utišano",

@@ -38,7 +38,6 @@
     "sessionOnly": "Deze persoon heeft geen certificaat, dus deze instellingen gelden alleen voor deze sessie.",
     "sendPrivateMessage": "Privébericht sturen",
     "privateMessage": "Privébericht",
-    "localSettings": "Jouw instellingen",
     "localSettingsHint": "Alleen jij ziet deze. Wijzigingen worden direct opgeslagen.",
     "settingsFor": "Instellingen voor {{name}}",
     "hintMuted": "Gedempt",

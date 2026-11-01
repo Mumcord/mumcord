@@ -28,7 +28,6 @@
   "version": "Wersja {{version}}",
   "by": "autor: {{authors}}",
   "screenshots": "Zrzuty ekranu",
-  "mayAskFor": "Ta wtyczka może prosić o",
   "prompt": {
     "title": "Zainstalować {{name}}?",
     "preparing": "Sprawdzanie: {{name}}…",
