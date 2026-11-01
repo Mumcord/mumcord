@@ -140,8 +140,19 @@
 
         const load = (videoId) => {
           const src = new URL(`/embed/${videoId}`, YOUTUBE);
-          src.searchParams.set("playsinline", "1");
-          src.searchParams.set("rel", "0");
+          // Only the app's controls drive the party, through the control protocol: YouTube's
+          // own controls, keys and overlays are off.
+          for (const [name, value] of [
+            ["playsinline", "1"],
+            ["rel", "0"],
+            ["controls", "0"],
+            ["disablekb", "1"],
+            ["fs", "0"],
+            ["modestbranding", "1"],
+            ["iv_load_policy", "3"],
+          ]) {
+            src.searchParams.set(name, value);
+          }
           frameYouTube(src);
         };
 

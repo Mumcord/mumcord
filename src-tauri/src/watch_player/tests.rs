@@ -191,3 +191,17 @@ fn app_csp_allows_the_page_origin() {
     assert!(page.contains("const APP_ORIGINS = [\"tauri://localhost\",\"http://tauri.localhost\""));
     assert!(!page.contains("frame-ancestors"), "{page}");
 }
+
+#[test]
+fn party_player_hides_youtubes_own_controls() {
+    // Only the app's controls drive the party (issue #163); YouTube's would bypass the sync.
+    for param in [
+        r#"["controls", "0"]"#,
+        r#"["disablekb", "1"]"#,
+        r#"["fs", "0"]"#,
+        r#"["modestbranding", "1"]"#,
+        r#"["iv_load_policy", "3"]"#,
+    ] {
+        assert!(PAGE.contains(param), "player page lacks {param}");
+    }
+}
