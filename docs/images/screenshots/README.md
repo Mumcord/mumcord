@@ -194,4 +194,6 @@ or a shared screen. The three #163 media shots are 1280×800.
 
 The media views of issue #163 run against the mock, which has no peer: they show the mock's own
 placeholder picture, its fictional viewers and its fictional stream figures. The picture areas cannot
-show a real frame in a browser mock, so the shots show the layout, not a live stream.
+show a real frame in a browser mock, so the shots show the layout, not a live stream. The share view
+also names how the picture arrives, and in the demo seeds the mock gives its fictional share a direct
+connection, so the shot reads "Direct · IP visible".
