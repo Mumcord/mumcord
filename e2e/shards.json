@@ -57,6 +57,7 @@
       "specs/plugins/dice.e2e.ts",
       "specs/plugins/notify-webview-old-server.e2e.ts",
       "specs/plugins/poll.e2e.ts",
+      "specs/plugins/echolings.e2e.ts",
       "specs/plugins/registry-install.e2e.ts",
       "specs/plugins/server-suggestions.e2e.ts",
       "specs/smoke/two-clients.e2e.ts",
