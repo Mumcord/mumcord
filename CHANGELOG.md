@@ -2,6 +2,27 @@
 
 ## [Unreleased]
 
+### Added
+
+- **Plugins**: small add-ons that give Mumcord new features. A new **Settings > Plugins** page has five tabs: **Installed** (switch a plugin on or off, change its permissions, settings and who it talks to, see diagnostics, export or reset its data, remove it with or without its data), **Browse** (official plugins by category, with search), **Updates**, **Repositories** and, with Developer mode on, **Developer**. No plugin is installed by default. Plugins also run while you are not connected to a server. **Plugins** is in the command palette too.
+- Installing a plugin first shows an **install prompt** in plain language: what it wants to do, each permission marked green, yellow or red, required ones fixed and optional ones as switches. Permissions can be changed later and take effect at once. Plugins can never read your chat text, files, microphone, certificates or passwords.
+- Plugins show up where you use Mumcord: a **Plugins strip** under the channel list (one icon per plugin, a small panel for the active one and an expand button; it can be collapsed), cards in the chat, **slash commands** such as `/roll`, a small badge next to names (one at a time; choose which in Settings), a section in profile cards, entries in a person's right-click menu, and plugin windows. Messages sent by a plugin are marked "via" the plugin, and a plugin's own plain-text fallback line is hidden for people who see its card.
+- Plugins can send you **notifications**; they appear in the notification centre under a new **Plugins** category, can be switched off per plugin and stay silent in Do Not Disturb.
+- Plugins can exchange data with the same plugin on other people's Mumcord in your channel (for example a shared poll). It travels over the normal voice server, so standard Mumble servers need nothing, other clients ignore it, and you choose who may see it.
+- **Plugin updates** have their own setting: install automatically (default), notify only, or off. An update that asks for more permissions or comes from a different author always waits for your approval, a plugin that fails to start after an update is rolled back, and a plugin can be pinned to its current version.
+- **Servers can suggest plugins**: a server's Mumbot can recommend plugins, which appear in the notification centre with Install, Details, Not now and Don't ask again for this server. Nothing is installed without your approval.
+- **Third-party repositories**: add up to 10 repositories of your own in Settings > Plugins > Repositories (shown with the repository name and key fingerprint first). Their plugins are labelled "Unofficial" everywhere, the first install from each repository shows a warning, and a repository whose signing key changes is paused until you confirm.
+- **Developer mode** (Settings > Advanced) adds a Developer tab to load, reload and unload a plugin from a folder, with its log. Such plugins are marked "Developer plugin" and are unloaded when Developer mode is turned off. A plugin SDK, the `mumcord-plugin` command-line tool for authors and a project template are available (Apache-2.0).
+- `mumcord://plugins/<id>` links open the details of an official plugin in Browse; they never install anything by themselves.
+- Four official plugins, each available in all 24 Mumcord languages:
+  - **Poll**: ask a question with 2 to 10 options, see live results in the chat card and the panel, and end the poll when done. Votes are counted once per person.
+  - **Dice roller**: `/roll` with notation like `d20`, `2d6+3`, advantage and disadvantage, and drop lowest or highest, plus quick-roll buttons and a built-in help. Rolls are made together with others in the channel so nobody can cheat, and each result says Verified, Unverified (rolled alone) or Not revealed.
+  - **Echolings**: a small pet that lives in your Plugins strip, with 5 species, 4 growth stages and 3 colours. Pat, feed, play with it or let it nap; it never dies, sleeps when you are on Do Not Disturb and has no paid items or sounds. Friends see your pet as a badge and in your profile card, can react to it and visit it, and there are two mini-games, Echo Echo and Snack Race.
+  - **Mumbot Music**: control a Mumbot music bot from Mumcord (now playing, skip, stop, volume, queue, add tracks). Right-click the bot and choose **Configure bot**, enter its address and API key and test the connection. The key is kept in your system keychain.
+- Mumbot now introduces itself to Mumcord, so Mumcord knows which users are bots and what they can do; "Configure bot" appears only on bots that offer music.
+- Safety: plugins run in a sealed sandbox with no access to your network, files or audio other than what Mumcord offers them, and with limits on memory and time. A plugin that keeps crashing is turned off, and nothing affects your voice. **Turn off all plugins** (Settings > Plugins and the command palette) stops them all at once, and starting Mumcord with `--no-plugins` loads none. Official plugins are signed and checked on install and after every Mumcord update; a **kill switch** can disable a plugin that turns out to be harmful, with the reason shown, and is checked once a day even when plugin updates are off.
+- Privacy: checking for plugins sends no identifiers and no list of what you have installed. Plugin data stays on your computer, removing a plugin keeps its data for 30 days unless you delete it, and see PRIVACY.md for the details.
+
 ## [0.5.0] - 2026-11-01
 
 ### Added
