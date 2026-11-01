@@ -10,6 +10,7 @@ import { getApi, toEngineError } from "../../../api";
 import { Modal } from "../../userpanel/Modal";
 import { PluginTree } from "../render/PluginTree";
 import { usePluginTree, usePluginUi } from "../render/pluginUiStore";
+import { PluginWebView, usePluginWebView } from "../webview";
 import { takeDialogOpener } from "./pluginDialogStore";
 
 /** Renders the open plugin dialog, if any; mount once. */
@@ -23,6 +24,8 @@ export function PluginDialogHost() {
 function PluginDialog({ plugin, title }: { plugin: string; title: string }) {
   const { t } = useTranslation("pluginDialog");
   const nodes = usePluginTree(plugin, { kind: "dialog" });
+  // An open web view replaces the dialog tree (FR-6.46).
+  const webview = usePluginWebView(plugin, "dialog");
 
   const close = useCallback(() => {
     getApi()
@@ -44,7 +47,11 @@ function PluginDialog({ plugin, title }: { plugin: string; title: string }) {
 
   return (
     <Modal title={title} onClose={close}>
-      {nodes && <PluginTree plugin={plugin} slot={{ kind: "dialog" }} nodes={nodes} />}
+      {webview ? (
+        <PluginWebView plugin={plugin} webview={webview} title={title} />
+      ) : (
+        nodes && <PluginTree plugin={plugin} slot={{ kind: "dialog" }} nodes={nodes} />
+      )}
       <div className="userpanel-form__actions">
         <button type="button" className="button" onClick={close}>
           {t("close")}
