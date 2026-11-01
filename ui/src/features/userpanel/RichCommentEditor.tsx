@@ -84,10 +84,13 @@ export function RichCommentEditor({
   };
 
   const paste = (event: ClipboardEvent) => {
-    event.preventDefault();
     const html = event.clipboardData.getData("text/html");
+    const text = event.clipboardData.getData("text/plain");
+    // WebKitGTK may hide text offered only as `text/plain;charset=utf-8`; the webview inserts it.
+    if (!html && !text) return;
+    event.preventDefault();
     if (html) run("insertHTML", cleanCommentHtml(html));
-    else run("insertText", event.clipboardData.getData("text/plain"));
+    else run("insertText", text);
     changed();
   };
 
