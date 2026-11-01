@@ -36,6 +36,8 @@ import {
 import { ShareMiniBar, ScreenShareView, SharerBar, ViewerPanel } from "../features/screenshare";
 import {
   VideoDucking,
+  WatchHeaderActions,
+  WatchHeaderTitle,
   WatchMiniBar,
   WatchPartyPanel,
   WatchTogetherView,
@@ -169,9 +171,18 @@ export function ChatMount() {
     );
   return (
     <ChatView
-      renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
+      renderChannelTitle={(channelId) =>
+        serverId === null ? (
+          <ChannelHeader channelId={channelId} />
+        ) : (
+          <WatchHeaderTitle serverId={serverId}>
+            <ChannelHeader channelId={channelId} />
+          </WatchHeaderTitle>
+        )
+      }
       renderHeaderActions={(conv) => (
         <>
+          {serverId !== null && <WatchHeaderActions serverId={serverId} />}
           <FollowHeaderActions conversation={conv} />
           <MembersToggleMount />
           <NotificationBell />
