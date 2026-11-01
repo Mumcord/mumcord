@@ -256,6 +256,29 @@ pub fn screen_share_unwatch(
     Ok(engine.screen_share_unwatch(server_id, session)?)
 }
 
+/// Sends the frames of a running watch to `frames` from now on, in place of the channel the watch
+/// started with: the screen share pop-out (issue #164) takes the frames over, and the main window
+/// takes them back when the pop-out closes, all without leaving the share (the viewers list does
+/// not change). Asks the sharer for a keyframe so the new decoder can start; while the watch is
+/// still connecting the first frame is a keyframe anyway. Only one window gets the frames at a
+/// time.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_frames_attach(
+    engine: State<'_, Engine>,
+    screen_frames: State<'_, Arc<ScreenFrames>>,
+    server_id: ServerId,
+    session: SessionId,
+    frames: FrameChannel,
+) -> ApiResult<()> {
+    let server_id = to_engine_server_id(server_id);
+    screen_frames.attach(server_id, session, frames);
+    if let Err(e) = engine.screen_share_request_keyframe(server_id, session) {
+        tracing::debug!(error = %e, "no keyframe asked for the re-attached frames");
+    }
+    Ok(())
+}
+
 /// Decodes a watched share in Rust and sends RGBA pictures instead of VP9 frames, for a webview
 /// without WebCodecs VP9 (FR-2.44).
 #[tauri::command]

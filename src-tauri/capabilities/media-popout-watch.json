@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "media-popout-watch",
+  "description": "Permissions for the watch party pop-out window: engine events only",
+  "windows": ["media-popout-watch"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

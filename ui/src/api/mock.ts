@@ -79,6 +79,7 @@ import {
 } from "./client";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 import { createMockInspector } from "./mockInspector";
+import { createMockPopouts } from "./mockPopout";
 import { createMockUpdater } from "./mockUpdater";
 
 export interface MockOptions {
@@ -1011,6 +1012,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // for trying and photographing the updater.
   const mockUpdate = demo && new URLSearchParams(window.location.search).has("mockUpdate");
   const inspector = createMockInspector();
+  const popouts = createMockPopouts((state) => {
+    emit("mediaPopoutChanged", { state });
+  });
   const updater = createMockUpdater({
     demo,
     startupCheck: mockUpdate,
@@ -2950,6 +2954,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     licencesClose: () => Promise.resolve(null),
     changelogOpen: () => Promise.resolve(null),
     changelogClose: () => Promise.resolve(null),
+    // The mock has no second window; the pop-out page opens with `?window=media-popout&kind=…`.
+    mediaPopoutOpen: (kind, target, _title, onTop) => {
+      popouts.open(kind, target, onTop);
+      return Promise.resolve(null);
+    },
+    mediaPopoutClose: (kind) => {
+      popouts.close(kind);
+      return Promise.resolve(null);
+    },
+    mediaPopoutSetOnTop: (kind, on) => {
+      popouts.setOnTop(kind, on);
+      return Promise.resolve(null);
+    },
+    mediaPopoutSetTitle: () => Promise.resolve(null),
+    mediaPopoutState: () => Promise.resolve(popouts.state()),
     whatsNewMarkSeen: () => {
       settings = { ...settings, whatsNewSeen: "0.0.0-mock" };
       return Promise.resolve(null);
@@ -3293,6 +3312,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     screenShareBlock: (serverId) => Promise.resolve(shareStartBlock(serverId)),
     screenShareUnwatch: () => notImplemented("screenShareUnwatch"),
+    screenShareFramesAttach: (_serverId, session) => {
+      if (mediaDemo.share === null || mediaDemo.share.session !== session) {
+        return notImplemented("screenShareFramesAttach");
+      }
+      return Promise.resolve(null);
+    },
     screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
     updateStatus: () => Promise.resolve(updater.status()),

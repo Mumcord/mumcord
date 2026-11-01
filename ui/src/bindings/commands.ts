@@ -691,6 +691,35 @@ export const commands = {
 	 *  counted in the UI from the frames. `None` while not watching.
 	 */
 	screenShareWatchStats: (serverId: number, session: number) => typedError<WatchStats | null, ApiError>(__TAURI_INVOKE("screen_share_watch_stats", { serverId, session })),
+	/**
+	 *  Sends the frames of a running watch to `frames` from now on, in place of the channel the watch
+	 *  started with: the screen share pop-out (issue #164) takes the frames over, and the main window
+	 *  takes them back when the pop-out closes, all without leaving the share (the viewers list does
+	 *  not change). Asks the sharer for a keyframe so the new decoder can start; while the watch is
+	 *  still connecting the first frame is a keyframe anyway. Only one window gets the frames at a
+	 *  time.
+	 */
+	screenShareFramesAttach: (serverId: number, session: number, frames: Channel<ArrayBuffer>) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_frames_attach", { serverId, session, frames })),
+	/**
+	 *  Pops the view of `kind` out into its own window showing `target`, or brings the open one to
+	 *  the front (and switches it to `target`). `title` is the localised window title; `onTop`
+	 *  replaces the remembered always-on-top flag when given (picture-in-picture opens with `true`).
+	 */
+	mediaPopoutOpen: (kind: MediaPopoutKind, target: MediaPopoutTarget, title: string, onTop: boolean | null) => typedError<null, ApiError>(__TAURI_INVOKE("media_popout_open", { kind, target, title, onTop })),
+	/**
+	 *  Closes the pop-out of `kind` ("Pop back in", Ctrl+W); the view docks once the window is gone
+	 *  and `mediaPopoutChanged` follows. Nothing happens when it is not open.
+	 */
+	mediaPopoutClose: (kind: MediaPopoutKind) => typedError<null, ApiError>(__TAURI_INVOKE("media_popout_close", { kind })),
+	/**
+	 *  Turns always on top of the pop-out of `kind` on or off, applied at once when it is open and
+	 *  remembered for the next time.
+	 */
+	mediaPopoutSetOnTop: (kind: MediaPopoutKind, on: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("media_popout_set_on_top", { kind, on })),
+	/**  Renames the open pop-out of `kind`, e.g. when the video or the channel changes. */
+	mediaPopoutSetTitle: (kind: MediaPopoutKind, title: string) => typedError<null, ApiError>(__TAURI_INVOKE("media_popout_set_title", { kind, title })),
+	/**  Which views are popped out right now, for a window that opens later. */
+	mediaPopoutState: () => typedError<MediaPopoutState, ApiError>(__TAURI_INVOKE("media_popout_state")),
 	/**  The updater's current state. */
 	updateStatus: () => __TAURI_INVOKE<UpdateStatus>("update_status"),
 	/**
@@ -746,6 +775,7 @@ export const events = {
 	inGameOverlayChanged: makeEvent<InGameOverlayChanged, InGameOverlayChanged>("in-game-overlay-changed"),
 	incomingWhisperChanged: makeEvent<IncomingWhisperChanged, IncomingWhisperChanged>("incoming-whisper-changed"),
 	inspectorViewChanged: makeEvent<InspectorViewChanged, InspectorViewChanged>("inspector-view-changed"),
+	mediaPopoutChanged: makeEvent<MediaPopoutChanged, MediaPopoutChanged>("media-popout-changed"),
 	messageReceived: makeEvent<MessageReceived, MessageReceived>("message-received"),
 	micLevel: makeEvent<MicLevel, MicLevel>("mic-level"),
 	micTestPhaseChanged: makeEvent<MicTestPhaseChanged, MicTestPhaseChanged>("mic-test-phase-changed"),
@@ -1706,6 +1736,39 @@ export type LinuxDistro = {
 };
 
 export type LogLevel = "error" | "warn" | "info" | "debug";
+
+/**  Which views are popped out changed; sent to every window. */
+export type MediaPopoutChanged = {
+	state: MediaPopoutState,
+};
+
+/**  The view a pop-out shows. */
+export type MediaPopoutKind = 
+/**  The watch party player. */
+"watch" | 
+/**  A watched screen share. */
+"share";
+
+/**  One kind of pop-out. */
+export type MediaPopoutSlot = {
+	/**  What the open pop-out shows; `null` while the view is docked in the main window. */
+	target: MediaPopoutTarget | null,
+	/**  Whether the pop-out stays above other windows; remembered while docked. */
+	onTop: boolean,
+};
+
+/**  Both pop-outs. */
+export type MediaPopoutState = {
+	watch: MediaPopoutSlot,
+	share: MediaPopoutSlot,
+};
+
+/**  What a pop-out shows: the party of `serverId`, or the share of `session` on `serverId`. */
+export type MediaPopoutTarget = {
+	serverId: number,
+	/**  The sharer; `null` for the watch party. */
+	session: number | null,
+};
 
 /**  One new message as the UI would announce it. Texts are translated and plain (no HTML). */
 export type MessageNotice = {
