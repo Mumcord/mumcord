@@ -1,23 +1,59 @@
 {
-  "sectionList": "Seadete jaotised",
+  "sectionList": "Seadete rühmad",
   "loading": "Laadin seadeid…",
   "loadFailed": "Sinu seadeid ei õnnestunud laadida. Sulge seaded ja proovi uuesti.",
   "saveFailed": "Viimast muudatust ei õnnestunud salvestada. Proovi palun uuesti.",
   "sections": {
+    "general": "Üldine",
+    "account": "Konto ja identiteet",
+    "voiceAudio": "Hääl ja heli",
+    "chatNotifications": "Vestlus ja teavitused",
+    "privacy": "Privaatsus ja ühendused",
     "appearance": "Välimus",
-    "about": "Teave",
     "servers": "Serverid",
-    "privacy": "Privaatsus",
-    "updates": "Uuendused",
+    "gaming": "Mängimine ja ülekate",
+    "advanced": "Täpsemad ja arendaja",
+    "about": "Teave",
     "packetInspector": "Pakettide inspektor",
     "hotkeys": "Kiirklahvid"
+  },
+  "sectionDescriptions": {
+    "general": "Käivitamine, keel, uuendused ja juurdepääsetavus.",
+    "account": "Sinu identiteedid, profiil ja see, mida sa jagad.",
+    "voiceAudio": "Mikrofon, kõlarid, kuidas sa räägid ja kuidas sa kõlad.",
+    "chatNotifications": "Teavitused, privaatsõnumid, blokeeritud inimesed ja sõnumite ajalugu.",
+    "privacy": "Kuidas sa teistega ühendud ja mida Mumcord väljastpoolt laeb.",
+    "appearance": "Kujundus, paigutus ja kanalite loend.",
+    "servers": "Ühendused mitme serveriga ja serveripõhised seaded.",
+    "gaming": "Mängusisene ülekate, positsiooniheli ja mängupluginad.",
+    "advanced": "Arendaja tööriistad, diagnostika, salvestusruum ja litsentsid.",
+    "about": "Versioon, tugi ja seadistusviisard."
+  },
+  "breadcrumb": "Seaded / {{section}}",
+  "moreInfo": "Lisateave: {{topic}}",
+  "searchTerms": {
+    "devices": "sisend väljund peakomplekt kõlar helikaart",
+    "talkMode": "PTT VAD hääleaktiivsus kiirklahv",
+    "noiseSuppression": "taustamüra müra vähendamine",
+    "p2p": "P2P relee otseühendused peida minu IP-aadress",
+    "theme": "tume režiim hele režiim värvid",
+    "startup": "automaatkäivitus käivitus sisselogimine salv",
+    "language": "tõlge keel piirkond",
+    "updates": "uus versioon uuendus",
+    "storage": "kettaruum tühjenda vahemälu",
+    "blocked": "ignoreeri blokeeri vaigista inimesed",
+    "notifications": "hoiatused hüpikaknad",
+    "externalContent": "manused pildid eelvaated"
   },
   "search": {
     "label": "Otsi seadeid",
     "results": "Otsingutulemused",
     "empty": "Päringule „{{query}}“ ei vasta ükski seade.",
     "count_one": "Leitud {{count}} seade",
-    "count_other": "Leitud {{count}} seadet"
+    "count_other": "Leitud {{count}} seadet",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} tulemus",
+    "groupCount_other": "{{count}} tulemust"
   },
   "errors": {
     "secureStorage": "Sinu süsteemi turvahoidla pole saadaval või juurdepääs keelati.",
@@ -145,7 +181,7 @@
     "keyMissing": "Määra klahv, muidu ei kuule sind keegi.",
     "keyRejected": "Seda klahvi ei saa kasutada. Proovi mõnda teist, soovi korral koos Ctrl, Alt või Shiftiga.",
     "keyNotConfirmed": "Töölaud ei kinnitanud kiirklahvi. Proovi uuesti ja nõustu süsteemi dialoogiga või määra klahv töölaua kiirklahvide seadetes.",
-    "processing": "Hääle töötlus",
+    "processing": "Töötlus ja kvaliteet",
     "noiseSuppression": "Müravaigistus",
     "noiseSuppressionHint": "Filtreerib välja taustamüra, nagu klaviatuur ja ventilaatorid.",
     "noiseChoice": {
@@ -249,8 +285,9 @@
     }
   },
   "history": {
+    "title": "Sõnumite ajalugu",
     "explanation": "Vestlussõnumid salvestatakse ainult sellesse arvutisse.",
-    "perServer": "Serverid",
+    "perServer": "Serveripõhised ülekirjutused",
     "noServers": "Salvestatud servereid veel pole.",
     "save": "Salvesta ajalugu serveril {{server}}",
     "clearServer": "Tühjenda serveri {{server}} ajalugu…",
@@ -286,14 +323,15 @@
     "system": "Järgi süsteemi",
     "dark": "Tume",
     "light": "Hele",
-    "behaviour": "Käitumine",
+    "behaviour": "Käivitus ja aken",
     "closeLegend": "Kui sulged akna ühendatuna",
     "closeAsk": "Küsi iga kord",
     "closeTray": "Minimeeri salve",
     "closeQuit": "Välju Mumcordist",
     "autostart": "Käivita Mumcord sisselogimisel",
     "startMinimized": "Käivita minimeerituna",
-    "startMinimizedHint": "Kui Mumcord käivitub sisselogimisel, ootab see salves, selle asemel et akent avada."
+    "startMinimizedHint": "Kui Mumcord käivitub sisselogimisel, ootab see salves, selle asemel et akent avada.",
+    "look": "Välimus ja paigutus"
   },
   "themeEditor": {
     "name": "Teema nimi",
@@ -351,7 +389,7 @@
     "deleteConfirm": "Kustuta"
   },
   "accessibility": {
-    "hints": "Vihjed",
+    "hints": "Juurdepääsetavus",
     "keyboardHints": "Näita klaviatuurivihjeid",
     "keyboardHintsHint": "Lühikesed ekraanivihjed, nagu „Nooleklahvid: liigu“, kanalite loendi all ja GIF-i lemmikutes. Ekraanilugejad loevad neid ka siis, kui see on välja lülitatud.",
     "announcements": "Ekraanilugeja teated",
@@ -360,11 +398,13 @@
     "skipLinksHint": "Akna alguses olevad lingid, mis viivad Tab-klahvi vajutades otse vestlusesse või kanalite loendisse."
   },
   "language": {
+    "title": "Keel",
     "legend": "Kuvakeel",
     "system": "Järgi süsteemi"
   },
   "sounds": {
-    "explanation": "Lühikesed helid nende sündmuste jaoks:",
+    "title": "Helid",
+    "explanation": "Lühikesed helid, mis mängivad nende sündmuste puhul.",
     "joinLeave": "Keegi liitub sinu kanaliga või lahkub sellest",
     "voiceJoin": "Liitud kanaliga häälega",
     "selfMute": "Vaigistad end või lõpetad vaigistuse",
@@ -441,6 +481,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnostika",
     "logLevel": "Logi detailsus",
     "levels": {
       "error": "Ainult vead",
@@ -475,7 +516,8 @@
     "setupWizardHint": "Käi esmane seadistus uuesti läbi, et vaadata üle mikrofon, privaatsusvalikud, värskenduste kontroll ja rääkimisrežiim. Sinu praegused valikud on eelnevalt täidetud.",
     "setupWizardRun": "Käivita seadistusviisard uuesti",
     "setupWizardIdentityNote": "Sinu identiteet ei kuulu selle juurde. Sinu sertifikaat ja koos sellega registreeritud nimi ning õigused serverites jäävad täpselt selliseks, nagu need on.",
-    "setupWizardIdentityLink": "Halda seda jaotises Identiteet"
+    "setupWizardIdentityLink": "Halda seda jaotises Identiteet",
+    "versionTitle": "Versioon ja litsents"
   },
   "profile": {
     "title": "Profiil",
@@ -511,7 +553,7 @@
     "cleared": "Vahemälu tühjendatud, vabanes {{size}}."
   },
   "cache": {
-    "title": "Vahemälu",
+    "title": "Salvestusruum",
     "hint": "Mumcord hoiab selles arvutis ajutisi andmeid, et kõik laadiks kiiremini. Nende tühjendamine on ohutu; vajaduse korral luuakse need uuesti.",
     "kind": {
       "previews": "Linkide eelvaated ja pildid",
@@ -551,7 +593,7 @@
     "betaHint": "Tulemused sõltuvad mängust ja selle pluginatoest."
   },
   "gamePlugins": {
-    "title": "Positsiooniheli: allikad",
+    "title": "Mängupluginad",
     "explanation": "Mängud annavad Mumcordile teada, kus sa oled, Mumble Linki või ametlike Mumble'i mängupluginate kaudu. Mumcord leiab pluginad oma pluginakaustast ja olemasolevast Mumble'i paigaldusest. Lülita sisse ainult mängude pluginad, mida mängid.",
     "antiCheat": "Mängupluginad loevad mängu mälu. Mõned petmisvastased süsteemid võivad seda märgistada; lülita pluginad range petmisvastase kaitsega mängudel välja.",
     "loading": "Otsin mängupluginaid…",
@@ -609,6 +651,7 @@
     "failed": "See ei õnnestunud. Proovi uuesti."
   },
   "inspector": {
+    "title": "Arendaja tööriistad",
     "intro": "Näitab pakette, mida Mumcord saadab ja võtab vastu, peamiselt Mumcordi pluginate andmeid, silumiseks. Säilitatakse ainult viimased 2000 paketti, selle seadme mälus; midagi ei logita ega saadeta kuhugi.",
     "devTools": "Arendaja tööriistad",
     "devToolsHint": "Lülita välja, et pakettide inspektor uuesti peita ja jäädvustamine peatada.",
@@ -785,7 +828,14 @@
     "hide": "Peida need täielikult",
     "hideHint": "Vestluses ei näidata midagi."
   },
+  "externalContent": {
+    "title": "Väline sisu"
+  },
+  "privacyConnections": {
+    "title": "Ühendused"
+  },
   "updates": {
+    "title": "Uuendused",
     "installedFrom": "Mumcord {{version}} · paigaldatud allikast: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -799,7 +849,6 @@
       "aur": "AUR",
       "otherLinux": "Linuxi pakett"
     },
-    "checking": "Kontrollin",
     "mode": "Kui uuendus leitakse",
     "modeHint": "Uuendusi kontrollitakse ja verifitseeritakse alati enne paigaldamist.",
     "modeAuto": "Laadi automaatselt alla",
@@ -813,7 +862,6 @@
     "intervalHours_one": "Iga tunni järel",
     "intervalHours_other": "Iga {{count}} tunni järel",
     "intervalWeek": "Kord nädalas",
-    "status": "Olek",
     "state": {
       "idle": "Pole veel kontrollitud",
       "off": "Uuenduste kontroll on välja lülitatud",
@@ -840,6 +888,99 @@
     "whatsNew": "Mis on uut",
     "whatsNewHint": "Vaata iga versiooni muudatusi.",
     "openChangelog": "Ava muudatuste logi"
+  },
+  "badges": {
+    "changed": "Muudetud",
+    "recommended": "Soovitatav",
+    "groupChanged": "Sisaldab muudetud seadeid"
+  },
+  "resetSection": {
+    "button": "Lähtesta jaotis",
+    "title": "Kas lähtestada {{section}}?",
+    "intro": "Need seaded lähevad tagasi sinu eelseadistuse või vaikeväärtuse juurde:",
+    "nothing": "Kõigil jaotise {{section}} seadetel on juba oma eelseadistus või vaikeväärtus.",
+    "confirm": "Lähtesta"
+  },
+  "activePreset": {
+    "heading": "Aktiivne eelseadistus",
+    "none": "Eelseadistust pole",
+    "customised": "{{preset}}, kohandatud",
+    "changed_one": "{{count}} seadet on pärast seadistamist muudetud",
+    "changed_other": "{{count}} seadet on pärast seadistamist muudetud",
+    "unchanged": "Pärast seadistamist pole midagi muudetud",
+    "switch": "Vaheta",
+    "switchLabel": "Vaheta eelseadistust",
+    "applyFailed": "Mängusisest ülekatet või režiimi Ära sega ei õnnestunud muuta. Proovi uuesti."
+  },
+  "presets": {
+    "dialogTitle": "Vaheta eelseadistust",
+    "dialogIntro": "Vali lähtepunkt. Muutuvad ainult need seaded, mida eelseadistus hõlmab; kõik muu jääb samaks.",
+    "legend": "Eelseadistused",
+    "continue": "Jätka",
+    "confirmTitle": "Kas vahetada eelseadistusele {{preset}}?",
+    "confirmIntro": "Need seaded muutuvad:",
+    "confirmNothing": "Ükski seade ei muutu. Mumcord jätab eelseadistuse {{preset}} sinu eelseadistusena meelde.",
+    "confirmCustom": "Ükski seade ei muutu. Seaded lõpetavad sinu valikute võrdlemise eelseadistusega ja võrdlevad neid vaikeväärtustega.",
+    "apply": "Vaheta eelseadistust",
+    "everythingOn": {
+      "name": "Kõik sees",
+      "tagline": "Kõik funktsioonid",
+      "point1": "Teised näevad, mida sa mängid ja kuulad",
+      "point2": "Sinu IP on nähtav inimestele, kellega sa otse ühendud",
+      "point3": "Igaüks saab sulle kirjutada; lingid ja pildid laaditakse veebist",
+      "point4": "Ülekate, ajaloo sünkroonimine ja täissuuruses pildid on sees"
+    },
+    "balanced": {
+      "name": "Tasakaalustatud",
+      "tagline": "Privaatsuse ja mugavuse vahel",
+      "point1": "Sulle saavad kirjutada ainult sõbrad ja sinu kanali liikmed",
+      "point2": "Otseühendus, varuks relee",
+      "point3": "Linkide eelvaated ja täissuuruses pildid on sees",
+      "point4": "See, mida sa mängid ja kuulad, jääb privaatseks"
+    },
+    "maximumPrivacy": {
+      "name": "Maksimaalne privaatsus",
+      "tagline": "Jaga võimalikult vähe",
+      "point1": "Sulle saavad kirjutada ainult sõbrad, erandeid pole",
+      "point2": "Sinu IP on peidetud; kõik käib läbi relee",
+      "point3": "Väliset sisu pole, ajaloo sünkroonimist pole, jagamist pole",
+      "point4": "Sinu tegevuse kohta ei jagata midagi"
+    },
+    "custom": {
+      "name": "Kohandatud",
+      "tagline": "Sinu enda valikud",
+      "point1": "Jätab kõik seaded samaks",
+      "point2": "Muudatusi võrreldakse vaikeväärtustega",
+      "point3": "Parim, kui tead, mida tahad"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beetafunktsioonid",
+    "hint": "Varased funktsioonid; need võivad muutuda. Igaüht näidatakse ka seal, kuhu see kuulub, beeta-märgiga.",
+    "gamePlugins": "Mängupluginad",
+    "manage": "Halda plugineid"
+  },
+  "privacySummary": {
+    "title": "Privaatsuse kokkuvõte",
+    "ipHidden": "Sinu IP-aadress jääb peidetuks",
+    "ipVisible": "Otseühendused võivad sinu IP-aadressi näidata",
+    "matches": "Vastab eelseadistusele {{preset}}",
+    "messages": "Privaatsõnumid kellelt: {{rule}}",
+    "p2pHidden": "Peer-to-peer läheb läbi relee, nii et teine inimene ei näe sinu IP-aadressi.",
+    "p2pDirect": "Peer-to-peer ühendub esmalt otse; teine inimene näeb sinu IP-aadressi.",
+    "p2pDirectOnly": "Peer-to-peer ühendub ainult otse; teine inimene näeb sinu IP-aadressi.",
+    "externalOn": "Linkide eelvaated on sees: Mumcord pärib nende loomiseks lingitud lehed.",
+    "externalOff": "Linkide eelvaated on väljas: Mumcord ei lae lingitud lehtedelt midagi.",
+    "imagesOn": "Täissuuruses pilte vahetatakse otse Mumcordi kasutajate vahel.",
+    "imagesOff": "Täissuuruses pilte ei vahetata.",
+    "historyOn": "Ajaloo sünkroonimine on sees: sa jagad oma kanali ajalugu teiste Mumcordi kasutajatega.",
+    "historyOff": "Ajaloo sünkroonimine on väljas.",
+    "sharingBoth": "Teised näevad, mida sa mängid ja kuulad.",
+    "sharingPlaying": "Teised näevad, mida sa kuulad.",
+    "sharingGaming": "Teised näevad mängu, mida sa mängid.",
+    "sharingNone": "See, mida sa mängid ja kuulad, jääb privaatseks.",
+    "change": "Muuda",
+    "changeLabel": "Muuda: {{topic}}"
   },
   "hotkeys": {
     "global": "Globaalsed kiirklahvid",

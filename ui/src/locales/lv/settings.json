@@ -1,16 +1,49 @@
 {
-  "sectionList": "Iestatījumu sadaļas",
+  "sectionList": "Iestatījumu grupas",
   "loading": "Ielādē iestatījumus…",
   "loadFailed": "Tavus iestatījumus neizdevās ielādēt. Aizver iestatījumus un mēģini vēlreiz.",
   "saveFailed": "Pēdējo izmaiņu neizdevās saglabāt. Lūdzu, mēģini vēlreiz.",
   "sections": {
+    "general": "Vispārīgi",
+    "account": "Konts un identitāte",
+    "voiceAudio": "Balss un skaņa",
+    "chatNotifications": "Tērzēšana un paziņojumi",
+    "privacy": "Privātums un savienojumi",
     "appearance": "Izskats",
-    "about": "Par lietotni",
     "servers": "Serveri",
-    "privacy": "Privātums",
-    "updates": "Atjauninājumi",
+    "gaming": "Spēles un pārklājums",
+    "advanced": "Papildu un izstrādātājiem",
+    "about": "Par lietotni",
     "packetInspector": "Pakešu inspektors",
     "hotkeys": "Īsinājumtaustiņi"
+  },
+  "sectionDescriptions": {
+    "general": "Palaišana, valoda, atjauninājumi un pieejamība.",
+    "account": "Jūsu identitātes, profils un tas, ko kopīgojat.",
+    "voiceAudio": "Mikrofons, skaļruņi, kā jūs runājat un kā skanat.",
+    "chatNotifications": "Paziņojumi, privātās ziņas, bloķētie cilvēki un ziņu vēsture.",
+    "privacy": "Kā jūs savienojaties ar citiem un ko Mumcord ielādē no ārpuses.",
+    "appearance": "Motīvs, izkārtojums un kanālu saraksts.",
+    "servers": "Savienojumi ar vairākiem serveriem un iestatījumi katram serverim.",
+    "gaming": "Pārklājums spēlē, pozicionālā skaņa un spēļu spraudņi.",
+    "advanced": "Izstrādātāju rīki, diagnostika, krātuve un licences.",
+    "about": "Versija, atbalsts un iestatīšanas vednis."
+  },
+  "breadcrumb": "Iestatījumi / {{section}}",
+  "moreInfo": "Papildinformācija: {{topic}}",
+  "searchTerms": {
+    "devices": "ievade izvade austiņas skaļrunis skaņas karte",
+    "talkMode": "PTT VAD balss aktivizēšana īsinājumtaustiņš",
+    "noiseSuppression": "fona troksnis trokšņu slāpēšana",
+    "p2p": "P2P releja serveris tiešie savienojumi paslēpt manu IP adresi",
+    "theme": "tumšais režīms gaišais režīms krāsas",
+    "startup": "automātiskā palaišana sāknēšana pieteikšanās sistēmas josla",
+    "language": "tulkojums valoda lokalizācija",
+    "updates": "jauna versija jauninājums",
+    "storage": "diska vieta notīrīt kešatmiņu",
+    "blocked": "ignorēt bloķēt izslēgt skaņu cilvēki",
+    "notifications": "brīdinājumi uznirstošie logi",
+    "externalContent": "iegulumi attēli priekšskatījumi"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -18,7 +51,11 @@
     "empty": "Neviens iestatījums neatbilst “{{query}}”.",
     "count_zero": "Atrasti {{count}} iestatījumu",
     "count_one": "Atrasts {{count}} iestatījums",
-    "count_other": "Atrasti {{count}} iestatījumi"
+    "count_other": "Atrasti {{count}} iestatījumi",
+    "shortcut": "Ctrl F",
+    "groupCount_zero": "{{count}} rezultātu",
+    "groupCount_one": "{{count}} rezultāts",
+    "groupCount_other": "{{count}} rezultāti"
   },
   "errors": {
     "secureStorage": "Tavas sistēmas drošā krātuve nav pieejama, vai piekļuve tika atteikta.",
@@ -146,7 +183,7 @@
     "keyMissing": "Iestati taustiņu, citādi neviens tevi nedzirdēs.",
     "keyRejected": "Šo taustiņu nevar izmantot. Izmēģini citu taustiņu, pēc izvēles ar Ctrl, Alt vai Shift.",
     "keyNotConfirmed": "Darbvirsma neapstiprināja īsceļu. Mēģini vēlreiz un apstiprini sistēmas dialogu vai piešķir taustiņu darbvirsmas īsceļu iestatījumos.",
-    "processing": "Balss apstrāde",
+    "processing": "Apstrāde un kvalitāte",
     "noiseSuppression": "Trokšņu slāpēšana",
     "noiseSuppressionHint": "Filtrē fona troksni, piemēram, tastatūras un ventilatorus.",
     "noiseChoice": {
@@ -251,8 +288,9 @@
     }
   },
   "history": {
+    "title": "Ziņu vēsture",
     "explanation": "Čata ziņas tiek saglabātas tikai šajā datorā.",
-    "perServer": "Serveri",
+    "perServer": "Izņēmumi katram serverim",
     "noServers": "Saglabātu serveru vēl nav.",
     "save": "Saglabāt vēsturi serverī {{server}}",
     "clearServer": "Dzēst {{server}} vēsturi…",
@@ -288,14 +326,15 @@
     "system": "Sekot sistēmai",
     "dark": "Tumšs",
     "light": "Gaišs",
-    "behaviour": "Uzvedība",
+    "behaviour": "Palaišana un logs",
     "closeLegend": "Kad aizver logu, būdams savienots",
     "closeAsk": "Jautāt katru reizi",
     "closeTray": "Samazināt uz paplāti",
     "closeQuit": "Iziet no Mumcord",
     "autostart": "Startēt Mumcord, kad pieslēdzos sistēmai",
     "startMinimized": "Startēt samazinātu",
-    "startMinimizedHint": "Kad Mumcord startē pieslēgšanās brīdī, tas gaida paplātē, nevis atver logu."
+    "startMinimizedHint": "Kad Mumcord startē pieslēgšanās brīdī, tas gaida paplātē, nevis atver logu.",
+    "look": "Izskats un izkārtojums"
   },
   "themeEditor": {
     "name": "Motīva nosaukums",
@@ -353,7 +392,7 @@
     "deleteConfirm": "Dzēst"
   },
   "accessibility": {
-    "hints": "Padomi",
+    "hints": "Pieejamība",
     "keyboardHints": "Rādīt tastatūras padomus",
     "keyboardHintsHint": "Īsi ekrāna padomi, piemēram, “Bulttaustiņi: pārvietoties”, zem kanālu saraksta un GIF izlasē. Ekrāna lasītāji tos joprojām nolasa arī tad, kad tas ir izslēgts.",
     "announcements": "Ekrāna lasītāja paziņojumi",
@@ -362,11 +401,13 @@
     "skipLinksHint": "Saites loga sākumā, kas pēc Tab nospiešanas pārlec tieši uz čatu vai kanālu sarakstu."
   },
   "language": {
+    "title": "Valoda",
     "legend": "Attēlošanas valoda",
     "system": "Sekot sistēmai"
   },
   "sounds": {
-    "explanation": "Īsas skaņas šiem notikumiem:",
+    "title": "Skaņas",
+    "explanation": "Īsas skaņas, kas tiek atskaņotas šiem notikumiem.",
     "joinLeave": "Kāds pievienojas tavam kanālam vai to pamet",
     "voiceJoin": "Tu pievienojies kanālam balsij",
     "selfMute": "Tu izslēdz vai ieslēdz savu mikrofonu",
@@ -443,6 +484,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnostika",
     "logLevel": "Žurnāla detalizācija",
     "levels": {
       "error": "Tikai kļūdas",
@@ -477,7 +519,8 @@
     "setupWizardHint": "Vēlreiz izej pirmreizējo iestatīšanu, lai pārskatītu mikrofonu, privātuma izvēles, atjauninājumu pārbaudi un runāšanas režīmu. Tavas pašreizējās izvēles jau ir aizpildītas.",
     "setupWizardRun": "Palaist iestatīšanas vedni vēlreiz",
     "setupWizardIdentityNote": "Tava identitāte tam nepieder. Tavs sertifikāts un līdz ar to reģistrētais vārds un atļaujas serveros paliek tieši tādi, kādi tie ir.",
-    "setupWizardIdentityLink": "Pārvaldi to sadaļā Identitāte"
+    "setupWizardIdentityLink": "Pārvaldi to sadaļā Identitāte",
+    "versionTitle": "Versija un licence"
   },
   "profile": {
     "title": "Profils",
@@ -513,7 +556,7 @@
     "cleared": "Kešatmiņa notīrīta, atbrīvots {{size}}."
   },
   "cache": {
-    "title": "Kešatmiņa",
+    "title": "Krātuve",
     "hint": "Mumcord šajā datorā glabā pagaidu datus, lai viss ielādētos ātrāk. Tos droši var notīrīt; vajadzības gadījumā tie tiek izveidoti no jauna.",
     "kind": {
       "previews": "Saišu priekšskatījumi un attēli",
@@ -554,7 +597,7 @@
     "betaHint": "Rezultāti ir atkarīgi no spēles un tās spraudņu atbalsta."
   },
   "gamePlugins": {
-    "title": "Pozicionālā skaņa: avoti",
+    "title": "Spēļu spraudņi",
     "explanation": "Spēles pasaka Mumcord, kur tu atrodies, izmantojot Mumble Link vai oficiālos Mumble spēļu spraudņus. Mumcord atrod spraudņus savā spraudņu mapē un esošā Mumble instalācijā. Ieslēdz tikai to spēļu spraudņus, kuras spēlē.",
     "antiCheat": "Spēļu spraudņi nolasa spēles atmiņu. Dažas pretkrāpšanās sistēmas to var atzīmēt; izslēdz spraudņus spēlēm ar stingru pretkrāpšanās aizsardzību.",
     "loading": "Meklē spēļu spraudņus…",
@@ -612,6 +655,7 @@
     "failed": "Neizdevās. Mēģini vēlreiz."
   },
   "inspector": {
+    "title": "Izstrādātāju rīki",
     "intro": "Rāda paketes, ko Mumcord sūta un saņem, galvenokārt Mumcord spraudņu datus, kļūdu meklēšanai. Tiek glabātas tikai pēdējās 2000 paketes, šīs ierīces atmiņā; nekas netiek reģistrēts vai kaut kur sūtīts.",
     "devTools": "Izstrādātāja rīki",
     "devToolsHint": "Izslēdziet, lai atkal paslēptu pakešu inspektoru un apturētu tveršanu.",
@@ -789,7 +833,14 @@
     "hide": "Paslēpt pilnībā",
     "hideHint": "Tērzēšanā nekas netiek rādīts."
   },
+  "externalContent": {
+    "title": "Ārējs saturs"
+  },
+  "privacyConnections": {
+    "title": "Savienojumi"
+  },
   "updates": {
+    "title": "Atjauninājumi",
     "installedFrom": "Mumcord {{version}} · instalēts no: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -803,7 +854,6 @@
       "aur": "AUR",
       "otherLinux": "Linux pakotne"
     },
-    "checking": "Pārbauda",
     "mode": "Kad atrasts atjauninājums",
     "modeHint": "Atjauninājumi vienmēr tiek pārbaudīti un apstiprināti pirms instalēšanas.",
     "modeAuto": "Lejupielādēt automātiski",
@@ -819,7 +869,6 @@
     "intervalHours_one": "Ik pēc {{count}} stundas",
     "intervalHours_other": "Ik pēc {{count}} stundām",
     "intervalWeek": "Reizi nedēļā",
-    "status": "Statuss",
     "state": {
       "idle": "Vēl nav pārbaudīts",
       "off": "Atjauninājumu pārbaude ir izslēgta",
@@ -846,6 +895,100 @@
     "whatsNew": "Kas jauns",
     "whatsNewHint": "Skati izmaiņas katrā versijā.",
     "openChangelog": "Atvērt izmaiņu žurnālu"
+  },
+  "badges": {
+    "changed": "Mainīts",
+    "recommended": "Ieteicams",
+    "groupChanged": "Satur mainītus iestatījumus"
+  },
+  "resetSection": {
+    "button": "Atiestatīt sadaļu",
+    "title": "Vai atiestatīt sadaļu “{{section}}”?",
+    "intro": "Šie iestatījumi atgriežas pie jūsu sagataves vai noklusējuma vērtības:",
+    "nothing": "Katram sadaļas “{{section}}” iestatījumam jau ir sagataves vai noklusējuma vērtība.",
+    "confirm": "Atiestatīt"
+  },
+  "activePreset": {
+    "heading": "Aktīvā sagatave",
+    "none": "Nav sagataves",
+    "customised": "{{preset}}, pielāgota",
+    "changed_zero": "Kopš iestatīšanas mainīti {{count}} iestatījumu",
+    "changed_one": "Kopš iestatīšanas mainīts {{count}} iestatījums",
+    "changed_other": "Kopš iestatīšanas mainīti {{count}} iestatījumi",
+    "unchanged": "Kopš iestatīšanas izmaiņu nav",
+    "switch": "Mainīt",
+    "switchLabel": "Mainīt sagatavi",
+    "applyFailed": "Neizdevās mainīt pārklājumu spēlē vai režīmu “Netraucēt”. Lūdzu, mēģiniet vēlreiz."
+  },
+  "presets": {
+    "dialogTitle": "Mainīt sagatavi",
+    "dialogIntro": "Izvēlieties sākumpunktu. Mainās tikai tie iestatījumi, ko sagatave aptver; viss pārējais paliek nemainīts.",
+    "legend": "Sagataves",
+    "continue": "Turpināt",
+    "confirmTitle": "Pāriet uz “{{preset}}”?",
+    "confirmIntro": "Šie iestatījumi mainīsies:",
+    "confirmNothing": "Neviens iestatījums nemainās. Mumcord atceras “{{preset}}” kā jūsu sagatavi.",
+    "confirmCustom": "Neviens iestatījums nemainās. Iestatījumi vairs nesalīdzina jūsu izvēles ar sagatavi, bet salīdzina ar noklusējuma vērtībām.",
+    "apply": "Mainīt sagatavi",
+    "everythingOn": {
+      "name": "Viss ieslēgts",
+      "tagline": "Visas funkcijas",
+      "point1": "Citi redz, ko jūs spēlējat un klausāties",
+      "point2": "Jūsu IP ir redzams cilvēkiem, ar kuriem savienojaties tieši",
+      "point3": "Ikviens var jums rakstīt; saites un attēli tiek ielādēti no tīmekļa",
+      "point4": "Pārklājums, vēstures sinhronizācija un pilna izmēra attēli ir ieslēgti"
+    },
+    "balanced": {
+      "name": "Līdzsvarots",
+      "tagline": "Starp privātumu un ērtībām",
+      "point1": "Jums var rakstīt tikai draugi un cilvēki jūsu kanālā",
+      "point2": "Tiešs savienojums, ar releja serveri kā rezerves variantu",
+      "point3": "Saišu priekšskatījumi un pilna izmēra attēli ir ieslēgti",
+      "point4": "Tas, ko spēlējat un klausāties, paliek privāts"
+    },
+    "maximumPrivacy": {
+      "name": "Maksimāls privātums",
+      "tagline": "Kopīgojiet pēc iespējas mazāk",
+      "point1": "Jums var rakstīt tikai draugi, bez izņēmumiem",
+      "point2": "Jūsu IP ir paslēpts; viss iet caur releja serveri",
+      "point3": "Nav ārēja satura, nav vēstures sinhronizācijas, nav kopīgošanas",
+      "point4": "Nekas netiek kopīgots par to, ko jūs darāt"
+    },
+    "custom": {
+      "name": "Pielāgots",
+      "tagline": "Jūsu pašu izvēles",
+      "point1": "Saglabā katru iestatījumu tādu, kāds tas ir",
+      "point2": "Izmaiņas tiek salīdzinātas ar noklusējuma vērtībām",
+      "point3": "Vislabāk, ja zināt, ko vēlaties"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta funkcijas",
+    "hint": "Agrīnas funkcijas; tās var mainīties. Katra ir redzama arī savā vietā ar Beta zīmi.",
+    "gamePlugins": "Spēļu spraudņi",
+    "manage": "Pārvaldīt spraudņus"
+  },
+  "privacySummary": {
+    "title": "Privātuma kopsavilkums",
+    "ipHidden": "Jūsu IP adrese paliek paslēpta",
+    "ipVisible": "Tiešie savienojumi var atklāt jūsu IP adresi",
+    "matches": "Atbilst sagatavei “{{preset}}”",
+    "messages": "Privātās ziņas no: {{rule}}",
+    "p2pHidden": "Peer-to-peer iet caur releja serveri, tāpēc otra persona neredz jūsu IP adresi.",
+    "p2pDirect": "Peer-to-peer vispirms savienojas tieši; otra persona var redzēt jūsu IP adresi.",
+    "p2pDirectOnly": "Peer-to-peer savienojas tikai tieši; otra persona var redzēt jūsu IP adresi.",
+    "externalOn": "Saišu priekšskatījumi ir ieslēgti: Mumcord ielādē saistītās lapas, lai tos izveidotu.",
+    "externalOff": "Saišu priekšskatījumi ir izslēgti: Mumcord neko neielādē no saistītajām lapām.",
+    "imagesOn": "Pilna izmēra attēli tiek apmainīti tieši starp Mumcord lietotājiem.",
+    "imagesOff": "Pilna izmēra attēli netiek apmainīti.",
+    "historyOn": "Vēstures sinhronizācija ir ieslēgta: jūs kopīgojat savu kanālu vēsturi ar citiem Mumcord lietotājiem.",
+    "historyOff": "Vēstures sinhronizācija ir izslēgta.",
+    "sharingBoth": "Citi redz, ko jūs spēlējat un klausāties.",
+    "sharingPlaying": "Citi redz, ko jūs klausāties.",
+    "sharingGaming": "Citi redz spēli, ko jūs spēlējat.",
+    "sharingNone": "Tas, ko spēlējat un klausāties, paliek privāts.",
+    "change": "Mainīt",
+    "changeLabel": "Mainīt: {{topic}}"
   },
   "hotkeys": {
     "global": "Globālie īsinājumtaustiņi",

@@ -1,16 +1,49 @@
 {
-  "sectionList": "Secțiuni de setări",
+  "sectionList": "Grupuri de setări",
   "loading": "Se încarcă setările…",
   "loadFailed": "Setările tale nu au putut fi încărcate. Închide setările și încearcă din nou.",
   "saveFailed": "Ultima modificare nu a putut fi salvată. Încearcă din nou.",
   "sections": {
+    "general": "General",
+    "account": "Cont și identitate",
+    "voiceAudio": "Voce și audio",
+    "chatNotifications": "Chat și notificări",
+    "privacy": "Confidențialitate și conexiuni",
     "appearance": "Aspect",
-    "about": "Despre",
     "servers": "Servere",
-    "privacy": "Confidențialitate",
-    "updates": "Actualizări",
+    "gaming": "Jocuri și suprapunere",
+    "advanced": "Avansat și pentru dezvoltatori",
+    "about": "Despre",
     "packetInspector": "Inspector de pachete",
     "hotkeys": "Comenzi rapide"
+  },
+  "sectionDescriptions": {
+    "general": "Pornire, limbă, actualizări și accesibilitate.",
+    "account": "Identitățile tale, profilul și ce partajezi.",
+    "voiceAudio": "Microfon, difuzoare, cum vorbești și cum suni.",
+    "chatNotifications": "Notificări, mesaje private, persoane blocate și istoricul mesajelor.",
+    "privacy": "Cum te conectezi cu alte persoane și ce încarcă Mumcord din exterior.",
+    "appearance": "Temă, aspect și lista de canale.",
+    "servers": "Conexiuni la mai multe servere și setări pentru fiecare server.",
+    "gaming": "Suprapunerea din joc, audio poziționat și pluginuri pentru jocuri.",
+    "advanced": "Instrumente pentru dezvoltatori, diagnosticare, stocare și licențe.",
+    "about": "Versiune, asistență și asistentul de configurare."
+  },
+  "breadcrumb": "Setări / {{section}}",
+  "moreInfo": "Mai multe informații: {{topic}}",
+  "searchTerms": {
+    "devices": "intrare ieșire căști difuzor placă de sunet",
+    "talkMode": "PTT VAD activitate vocală scurtătură",
+    "noiseSuppression": "zgomot de fundal eliminare zgomot",
+    "p2p": "P2P releu conexiuni directe ascunde adresa mea IP",
+    "theme": "mod întunecat mod luminos culori",
+    "startup": "pornire automată autentificare zona de notificare",
+    "language": "traducere limbă regiune",
+    "updates": "versiune nouă actualizare",
+    "storage": "spațiu pe disc golește memoria cache",
+    "blocked": "ignoră blochează dezactivează sunetul persoane",
+    "notifications": "alerte ferestre pop-up",
+    "externalContent": "conținut încorporat imagini previzualizări"
   },
   "search": {
     "label": "Caută în setări",
@@ -18,7 +51,11 @@
     "empty": "Nicio setare nu se potrivește cu „{{query}}”.",
     "count_one": "{{count}} setare găsită",
     "count_few": "{{count}} setări găsite",
-    "count_other": "{{count}} de setări găsite"
+    "count_other": "{{count}} de setări găsite",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} rezultat",
+    "groupCount_few": "{{count}} rezultate",
+    "groupCount_other": "{{count}} de rezultate"
   },
   "errors": {
     "secureStorage": "Stocarea securizată a sistemului tău nu e disponibilă sau accesul a fost refuzat.",
@@ -146,7 +183,7 @@
     "keyMissing": "Setează o tastă, altfel nu te aude nimeni.",
     "keyRejected": "Tasta nu poate fi folosită. Încearcă alta, eventual cu Ctrl, Alt sau Shift.",
     "keyNotConfirmed": "Desktopul nu a confirmat scurtătura. Încearcă din nou și acceptă dialogul sistemului sau atribuie tasta în setările de scurtături ale desktopului.",
-    "processing": "Procesarea vocii",
+    "processing": "Procesare și calitate",
     "noiseSuppression": "Suprimarea zgomotului",
     "noiseSuppressionHint": "Filtrează zgomotul de fundal, cum ar fi tastaturile și ventilatoarele.",
     "noiseChoice": {
@@ -251,8 +288,9 @@
     }
   },
   "history": {
+    "title": "Istoricul mesajelor",
     "explanation": "Mesajele din chat sunt salvate doar pe acest computer.",
-    "perServer": "Servere",
+    "perServer": "Excepții pentru fiecare server",
     "noServers": "Încă nu ai servere salvate.",
     "save": "Salvează istoricul pe {{server}}",
     "clearServer": "Șterge istoricul pentru {{server}}…",
@@ -288,14 +326,15 @@
     "system": "Urmează sistemul",
     "dark": "Întunecată",
     "light": "Luminoasă",
-    "behaviour": "Comportament",
+    "behaviour": "Pornire și fereastră",
     "closeLegend": "Când închizi fereastra în timp ce ești conectat",
     "closeAsk": "Întreabă de fiecare dată",
     "closeTray": "Minimizează în tray",
     "closeQuit": "Închide Mumcord",
     "autostart": "Pornește Mumcord când mă autentific",
     "startMinimized": "Pornește minimizat",
-    "startMinimizedHint": "Când Mumcord pornește la autentificare, așteaptă în tray în loc să deschidă fereastra."
+    "startMinimizedHint": "Când Mumcord pornește la autentificare, așteaptă în tray în loc să deschidă fereastra.",
+    "look": "Aspect și aranjare"
   },
   "themeEditor": {
     "name": "Numele temei",
@@ -353,7 +392,7 @@
     "deleteConfirm": "Șterge"
   },
   "accessibility": {
-    "hints": "Indicii",
+    "hints": "Accesibilitate",
     "keyboardHints": "Arată indicii de tastatură",
     "keyboardHintsHint": "Sfaturi scurte pe ecran, precum „Săgeți: mută”, sub lista de canale și în GIF-urile favorite. Cititoarele de ecran le citesc chiar și când opțiunea e oprită.",
     "announcements": "Anunțuri pentru cititorul de ecran",
@@ -362,11 +401,13 @@
     "skipLinksHint": "Linkuri la începutul ferestrei care sar direct la chat sau la lista de canale când apeși Tab."
   },
   "language": {
+    "title": "Limbă",
     "legend": "Limba de afișare",
     "system": "Urmează sistemul"
   },
   "sounds": {
-    "explanation": "Sunete scurte pentru aceste evenimente:",
+    "title": "Sunete",
+    "explanation": "Sunete scurte redate la aceste evenimente.",
     "joinLeave": "Cineva intră sau iese din canalul tău",
     "voiceJoin": "Intri într-un canal de voce",
     "selfMute": "Îți oprești sau pornești microfonul",
@@ -443,6 +484,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnosticare",
     "logLevel": "Nivel de detaliu al jurnalului",
     "levels": {
       "error": "Doar erori",
@@ -477,7 +519,8 @@
     "setupWizardHint": "Parcurge din nou configurarea inițială pentru a verifica microfonul, opțiunile de confidențialitate, verificarea actualizărilor și modul de vorbire. Valorile actuale sunt deja completate.",
     "setupWizardRun": "Rulează din nou asistentul de configurare",
     "setupWizardIdentityNote": "Identitatea ta nu face parte din asta. Certificatul tău, împreună cu numele înregistrat și permisiunile pe servere, rămâne exact așa cum este.",
-    "setupWizardIdentityLink": "Gestioneaz-o în Identitate"
+    "setupWizardIdentityLink": "Gestioneaz-o în Identitate",
+    "versionTitle": "Versiune și licență"
   },
   "profile": {
     "title": "Profil",
@@ -513,7 +556,7 @@
     "cleared": "Cache golit, {{size}} eliberați."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Stocare",
     "hint": "Mumcord păstrează pe acest computer date temporare pentru ca totul să se încarce mai repede. Ștergerea lor este sigură; se recreează la nevoie.",
     "kind": {
       "previews": "Previzualizări de linkuri și imagini",
@@ -554,7 +597,7 @@
     "betaHint": "Rezultatele depind de joc și de suportul pentru pluginuri."
   },
   "gamePlugins": {
-    "title": "Audio pozițional: surse",
+    "title": "Pluginuri pentru jocuri",
     "explanation": "Jocurile îi spun lui Mumcord unde te afli prin Mumble Link sau prin pluginurile oficiale de jocuri Mumble. Mumcord găsește pluginurile în propriul folder de pluginuri și într-o instalare Mumble existentă. Activează doar pluginurile pentru jocurile pe care le joci.",
     "antiCheat": "Pluginurile de jocuri citesc memoria jocului. Unele sisteme anti-cheat pot semnala asta; oprește pluginurile pentru jocurile cu anti-cheat strict.",
     "loading": "Se caută pluginuri de jocuri…",
@@ -612,6 +655,7 @@
     "failed": "Nu a funcționat. Încearcă din nou."
   },
   "inspector": {
+    "title": "Instrumente pentru dezvoltatori",
     "intro": "Afișează pachetele trimise și primite de Mumcord, mai ales date ale pluginurilor Mumcord, pentru depanare. Sunt păstrate doar ultimele 2.000 de pachete, în memoria acestui dispozitiv; nimic nu este înregistrat în jurnal sau trimis nicăieri.",
     "devTools": "Instrumente pentru dezvoltatori",
     "devToolsHint": "Dezactivează pentru a ascunde din nou inspectorul de pachete și a opri captura.",
@@ -789,7 +833,14 @@
     "hide": "Ascunde-le complet",
     "hideHint": "În chat nu se afișează nimic."
   },
+  "externalContent": {
+    "title": "Conținut extern"
+  },
+  "privacyConnections": {
+    "title": "Conexiuni"
+  },
   "updates": {
+    "title": "Actualizări",
     "installedFrom": "Mumcord {{version}} · instalat din {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -803,7 +854,6 @@
       "aur": "AUR",
       "otherLinux": "un pachet Linux"
     },
-    "checking": "Se verifică",
     "mode": "Când se găsește o actualizare",
     "modeHint": "Actualizările sunt întotdeauna verificate și validate înainte de a fi instalate.",
     "modeAuto": "Descarcă automat",
@@ -819,7 +869,6 @@
     "intervalHours_few": "La fiecare {{count}} ore",
     "intervalHours_other": "La fiecare {{count}} de ore",
     "intervalWeek": "O dată pe săptămână",
-    "status": "Stare",
     "state": {
       "idle": "Încă nu s-a verificat",
       "off": "Căutarea actualizărilor este dezactivată",
@@ -846,6 +895,100 @@
     "whatsNew": "Ce e nou",
     "whatsNewHint": "Vezi modificările din fiecare versiune.",
     "openChangelog": "Deschide jurnalul de modificări"
+  },
+  "badges": {
+    "changed": "Modificat",
+    "recommended": "Recomandat",
+    "groupChanged": "Are setări modificate"
+  },
+  "resetSection": {
+    "button": "Resetează secțiunea",
+    "title": "Resetezi {{section}}?",
+    "intro": "Aceste setări revin la presetarea ta sau la valoarea implicită:",
+    "nothing": "Fiecare setare din {{section}} are deja presetarea sau valoarea implicită.",
+    "confirm": "Resetează"
+  },
+  "activePreset": {
+    "heading": "Presetare activă",
+    "none": "Fără presetare",
+    "customised": "{{preset}}, personalizată",
+    "changed_one": "{{count}} setare modificată de la configurare",
+    "changed_few": "{{count}} setări modificate de la configurare",
+    "changed_other": "{{count}} de setări modificate de la configurare",
+    "unchanged": "Nicio modificare de la configurare",
+    "switch": "Schimbă",
+    "switchLabel": "Schimbă presetarea",
+    "applyFailed": "Suprapunerea din joc sau modul Nu deranja nu a putut fi modificat. Încearcă din nou."
+  },
+  "presets": {
+    "dialogTitle": "Schimbă presetarea",
+    "dialogIntro": "Alege un punct de plecare. Se schimbă doar setările acoperite de o presetare; restul rămâne neschimbat.",
+    "legend": "Presetări",
+    "continue": "Continuă",
+    "confirmTitle": "Treci la {{preset}}?",
+    "confirmIntro": "Aceste setări se schimbă:",
+    "confirmNothing": "Nicio setare nu se schimbă. Mumcord reține {{preset}} ca presetare a ta.",
+    "confirmCustom": "Nicio setare nu se schimbă. Setările nu mai compară alegerile tale cu o presetare, ci cu valorile implicite.",
+    "apply": "Schimbă presetarea",
+    "everythingOn": {
+      "name": "Totul activat",
+      "tagline": "Set complet de funcții",
+      "point1": "Ceilalți văd ce joci și ce asculți",
+      "point2": "IP-ul tău este vizibil pentru persoanele cu care te conectezi direct",
+      "point3": "Oricine îți poate scrie; linkurile și imaginile se încarcă de pe web",
+      "point4": "Suprapunerea, sincronizarea istoricului și imaginile la dimensiune completă sunt activate"
+    },
+    "balanced": {
+      "name": "Echilibrat",
+      "tagline": "Între confidențialitate și confort",
+      "point1": "Doar prietenii și persoanele din canalul tău îți pot scrie",
+      "point2": "Conexiune directă, cu un releu ca alternativă",
+      "point3": "Previzualizările linkurilor și imaginile la dimensiune completă sunt activate",
+      "point4": "Ce joci și ce asculți rămâne privat"
+    },
+    "maximumPrivacy": {
+      "name": "Confidențialitate maximă",
+      "tagline": "Partajează cât mai puțin",
+      "point1": "Doar prietenii îți pot scrie, fără excepții",
+      "point2": "IP-ul tău este ascuns; totul trece prin releu",
+      "point3": "Fără conținut extern, fără sincronizarea istoricului, fără partajare",
+      "point4": "Nu se partajează nimic despre ce faci"
+    },
+    "custom": {
+      "name": "Personalizat",
+      "tagline": "Alegerile tale",
+      "point1": "Păstrează fiecare setare așa cum este",
+      "point2": "Modificările sunt comparate cu valorile implicite",
+      "point3": "Cel mai bine dacă știi ce vrei"
+    }
+  },
+  "betaFeatures": {
+    "title": "Funcții beta",
+    "hint": "Funcții în stadiu incipient; se pot schimba. Fiecare apare și la locul ei, cu o insignă Beta.",
+    "gamePlugins": "Pluginuri pentru jocuri",
+    "manage": "Gestionează pluginurile"
+  },
+  "privacySummary": {
+    "title": "Rezumatul confidențialității",
+    "ipHidden": "Adresa ta IP rămâne ascunsă",
+    "ipVisible": "Conexiunile directe pot arăta adresa ta IP",
+    "matches": "Corespunde cu {{preset}}",
+    "messages": "Mesaje private de la: {{rule}}",
+    "p2pHidden": "Peer-to-peer trece prin releu, deci cealaltă persoană nu îți vede adresa IP.",
+    "p2pDirect": "Peer-to-peer se conectează mai întâi direct; cealaltă persoană îți poate vedea adresa IP.",
+    "p2pDirectOnly": "Peer-to-peer se conectează doar direct; cealaltă persoană îți poate vedea adresa IP.",
+    "externalOn": "Previzualizările linkurilor sunt activate: Mumcord preia paginile din linkuri ca să le creeze.",
+    "externalOff": "Previzualizările linkurilor sunt dezactivate: Mumcord nu încarcă nimic din paginile din linkuri.",
+    "imagesOn": "Imaginile la dimensiune completă sunt schimbate direct între utilizatorii Mumcord.",
+    "imagesOff": "Imaginile la dimensiune completă nu sunt schimbate.",
+    "historyOn": "Sincronizarea istoricului este activată: partajezi istoricul canalului cu alți utilizatori Mumcord.",
+    "historyOff": "Sincronizarea istoricului este dezactivată.",
+    "sharingBoth": "Ceilalți văd ce joci și ce asculți.",
+    "sharingPlaying": "Ceilalți văd ce asculți.",
+    "sharingGaming": "Ceilalți văd jocul pe care îl joci.",
+    "sharingNone": "Ce joci și ce asculți rămâne privat.",
+    "change": "Schimbă",
+    "changeLabel": "Schimbă: {{topic}}"
   },
   "hotkeys": {
     "global": "Comenzi rapide globale",

@@ -1,23 +1,59 @@
 {
-  "sectionList": "Inställningsavsnitt",
+  "sectionList": "Inställningsgrupper",
   "loading": "Läser in inställningar…",
   "loadFailed": "Dina inställningar kunde inte läsas in. Stäng inställningarna och försök igen.",
   "saveFailed": "Den senaste ändringen kunde inte sparas. Försök igen.",
   "sections": {
+    "general": "Allmänt",
+    "account": "Konto och identitet",
+    "voiceAudio": "Röst och ljud",
+    "chatNotifications": "Chatt och aviseringar",
+    "privacy": "Integritet och anslutningar",
     "appearance": "Utseende",
-    "about": "Om",
     "servers": "Servrar",
-    "privacy": "Integritet",
-    "updates": "Uppdateringar",
+    "gaming": "Spel och överlägg",
+    "advanced": "Avancerat och utveckling",
+    "about": "Om",
     "packetInspector": "Paketinspektör",
     "hotkeys": "Kortkommandon"
+  },
+  "sectionDescriptions": {
+    "general": "Start, språk, uppdateringar och tillgänglighet.",
+    "account": "Dina identiteter, din profil och vad du delar.",
+    "voiceAudio": "Mikrofon, högtalare, hur du pratar och hur du låter.",
+    "chatNotifications": "Aviseringar, privata meddelanden, blockerade personer och meddelandehistorik.",
+    "privacy": "Hur du ansluter till andra och vad Mumcord läser in utifrån.",
+    "appearance": "Tema, layout och kanallistan.",
+    "servers": "Anslutningar till flera servrar och inställningar per server.",
+    "gaming": "Överlägget i spel, positionsljud och spelinsticksmoduler.",
+    "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
+    "about": "Version, support och installationsguiden."
+  },
+  "breadcrumb": "Inställningar / {{section}}",
+  "moreInfo": "Mer information: {{topic}}",
+  "searchTerms": {
+    "devices": "ingång utgång headset högtalare ljudkort",
+    "talkMode": "PTT VAD röstaktivitet kortkommando",
+    "noiseSuppression": "bakgrundsljud brus brusreducering",
+    "p2p": "P2P relä direktanslutningar dölj min IP-adress",
+    "theme": "mörkt läge ljust läge färger",
+    "startup": "autostart start inloggning systemfältet",
+    "language": "översättning språk region",
+    "updates": "ny version uppgradering",
+    "storage": "diskutrymme rensa cache",
+    "blocked": "ignorera blockera tysta personer",
+    "notifications": "aviseringar popup-fönster",
+    "externalContent": "inbäddat innehåll bilder förhandsvisningar"
   },
   "search": {
     "label": "Sök i inställningar",
     "results": "Sökresultat",
     "empty": "Inga inställningar matchar ”{{query}}”.",
     "count_one": "{{count}} inställning hittades",
-    "count_other": "{{count}} inställningar hittades"
+    "count_other": "{{count}} inställningar hittades",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} resultat",
+    "groupCount_other": "{{count}} resultat"
   },
   "errors": {
     "secureStorage": "Systemets säkra lagring är inte tillgänglig eller åtkomsten nekades.",
@@ -145,7 +181,7 @@
     "keyMissing": "Välj en tangent, annars kan ingen höra dig.",
     "keyRejected": "Den tangenten kan inte användas. Prova en annan tangent, gärna med Ctrl, Alt eller Skift.",
     "keyNotConfirmed": "Skrivbordet bekräftade inte kortkommandot. Försök igen och godkänn systemdialogen, eller tilldela tangenten i skrivbordets kortkommandoinställningar.",
-    "processing": "Röstbehandling",
+    "processing": "Bearbetning och kvalitet",
     "noiseSuppression": "Brusreducering",
     "noiseSuppressionHint": "Filtrerar bort bakgrundsljud som tangentbord och fläktar.",
     "noiseChoice": {
@@ -249,8 +285,9 @@
     }
   },
   "history": {
+    "title": "Meddelandehistorik",
     "explanation": "Chattmeddelanden sparas bara på den här datorn.",
-    "perServer": "Servrar",
+    "perServer": "Undantag per server",
     "noServers": "Inga sparade servrar än.",
     "save": "Spara historik på {{server}}",
     "clearServer": "Rensa historiken för {{server}}…",
@@ -286,14 +323,15 @@
     "system": "Följ systemet",
     "dark": "Mörkt",
     "light": "Ljust",
-    "behaviour": "Beteende",
+    "behaviour": "Start och fönster",
     "closeLegend": "När du stänger fönstret medan du är ansluten",
     "closeAsk": "Fråga varje gång",
     "closeTray": "Minimera till systemfältet",
     "closeQuit": "Avsluta Mumcord",
     "autostart": "Starta Mumcord när jag loggar in",
     "startMinimized": "Starta minimerat",
-    "startMinimizedHint": "När Mumcord startar vid inloggning väntar det i systemfältet i stället för att öppna fönstret."
+    "startMinimizedHint": "När Mumcord startar vid inloggning väntar det i systemfältet i stället för att öppna fönstret.",
+    "look": "Utseende och layout"
   },
   "themeEditor": {
     "name": "Temanamn",
@@ -351,7 +389,7 @@
     "deleteConfirm": "Ta bort"
   },
   "accessibility": {
-    "hints": "Tips",
+    "hints": "Tillgänglighet",
     "keyboardHints": "Visa tangentbordstips",
     "keyboardHintsHint": "Korta tips på skärmen som ”Piltangenter: flytta” under kanallistan och i GIF-favoriterna. Skärmläsare läser dem fortfarande upp när det här är av.",
     "announcements": "Skärmläsarmeddelanden",
@@ -360,11 +398,13 @@
     "skipLinksHint": "Länkar i början av fönstret som hoppar direkt till chatten eller kanallistan när du trycker på Tab."
   },
   "language": {
+    "title": "Språk",
     "legend": "Visningsspråk",
     "system": "Följ systemet"
   },
   "sounds": {
-    "explanation": "Korta ljud för de här händelserna:",
+    "title": "Ljud",
+    "explanation": "Korta ljud som spelas vid dessa händelser.",
     "joinLeave": "Någon går med i eller lämnar din kanal",
     "voiceJoin": "Du går med i en kanal för röst",
     "selfMute": "Du stänger av eller slår på din mikrofon",
@@ -441,6 +481,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnostik",
     "logLevel": "Loggdetaljer",
     "levels": {
       "error": "Bara fel",
@@ -475,7 +516,8 @@
     "setupWizardHint": "Gå igenom den första installationen igen för att se över mikrofon, integritetsval, uppdateringskontroll och talläge. Dina nuvarande val är förifyllda.",
     "setupWizardRun": "Kör installationsguiden igen",
     "setupWizardIdentityNote": "Din identitet är inte en del av detta. Ditt certifikat, och med det ditt registrerade namn och dina behörigheter på servrar, förblir precis som det är.",
-    "setupWizardIdentityLink": "Hantera den under Identitet"
+    "setupWizardIdentityLink": "Hantera den under Identitet",
+    "versionTitle": "Version och licens"
   },
   "profile": {
     "title": "Profil",
@@ -511,7 +553,7 @@
     "cleared": "Cachen rensades, {{size}} frigjordes."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Lagring",
     "hint": "Mumcord sparar tillfälliga data på den här datorn så att allt laddas snabbare. Det är säkert att rensa dem; de skapas på nytt vid behov.",
     "kind": {
       "previews": "Länkförhandsvisningar och bilder",
@@ -551,7 +593,7 @@
     "betaHint": "Resultatet beror på spelet och dess pluginstöd."
   },
   "gamePlugins": {
-    "title": "Positionsljud: källor",
+    "title": "Spelinsticksmoduler",
     "explanation": "Spel talar om för Mumcord var du befinner dig via Mumble Link eller via officiella Mumble-spelplugin. Mumcord hittar pluginen i sin egen pluginmapp och i en befintlig Mumble-installation. Slå bara på pluginen för spel du spelar.",
     "antiCheat": "Spelplugin läser spelets minne. Vissa anti-cheat-system kan flagga detta. Stäng av pluginen för spel med strikt anti-cheat.",
     "loading": "Letar efter spelplugin…",
@@ -609,6 +651,7 @@
     "failed": "Det fungerade inte. Försök igen."
   },
   "inspector": {
+    "title": "Utvecklarverktyg",
     "intro": "Visar de paket som Mumcord skickar och tar emot, främst Mumcord-plugindata, för felsökning. Bara de senaste 2 000 paketen sparas, i minnet på den här enheten; inget loggas eller skickas någonstans.",
     "devTools": "Utvecklarverktyg",
     "devToolsHint": "Stäng av för att dölja paketinspektören igen och sluta fånga paket.",
@@ -785,7 +828,14 @@
     "hide": "Dölj dem helt",
     "hideHint": "Inget visas i chatten."
   },
+  "externalContent": {
+    "title": "Externt innehåll"
+  },
+  "privacyConnections": {
+    "title": "Anslutningar"
+  },
   "updates": {
+    "title": "Uppdateringar",
     "installedFrom": "Mumcord {{version}} · installerad från {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -799,7 +849,6 @@
       "aur": "AUR",
       "otherLinux": "ett Linux-paket"
     },
-    "checking": "Kontrollerar",
     "mode": "När en uppdatering hittas",
     "modeHint": "Uppdateringar kontrolleras och verifieras alltid innan de installeras.",
     "modeAuto": "Ladda ned automatiskt",
@@ -813,7 +862,6 @@
     "intervalHours_one": "Varje timme",
     "intervalHours_other": "Var {{count}}:e timme",
     "intervalWeek": "En gång i veckan",
-    "status": "Status",
     "state": {
       "idle": "Inte kontrollerat än",
       "off": "Uppdateringskontroll är av",
@@ -840,6 +888,99 @@
     "whatsNew": "Nyheter",
     "whatsNewHint": "Se ändringarna i varje version.",
     "openChangelog": "Öppna ändringsloggen"
+  },
+  "badges": {
+    "changed": "Ändrad",
+    "recommended": "Rekommenderad",
+    "groupChanged": "Har ändrade inställningar"
+  },
+  "resetSection": {
+    "button": "Återställ avsnitt",
+    "title": "Återställa {{section}}?",
+    "intro": "Dessa inställningar går tillbaka till din förinställning eller till standardvärdet:",
+    "nothing": "Alla inställningar i {{section}} har redan sin förinställning eller sitt standardvärde.",
+    "confirm": "Återställ"
+  },
+  "activePreset": {
+    "heading": "Aktiv förinställning",
+    "none": "Ingen förinställning",
+    "customised": "{{preset}}, anpassad",
+    "changed_one": "{{count}} inställning ändrad sedan installationen",
+    "changed_other": "{{count}} inställningar ändrade sedan installationen",
+    "unchanged": "Inga ändringar sedan installationen",
+    "switch": "Byt",
+    "switchLabel": "Byt förinställning",
+    "applyFailed": "Överlägget i spel eller Stör ej kunde inte ändras. Försök igen."
+  },
+  "presets": {
+    "dialogTitle": "Byt förinställning",
+    "dialogIntro": "Välj en utgångspunkt. Bara de inställningar som en förinställning omfattar ändras; allt annat förblir som det är.",
+    "legend": "Förinställningar",
+    "continue": "Fortsätt",
+    "confirmTitle": "Byta till {{preset}}?",
+    "confirmIntro": "Dessa inställningar ändras:",
+    "confirmNothing": "Ingen inställning ändras. Mumcord kommer ihåg {{preset}} som din förinställning.",
+    "confirmCustom": "Ingen inställning ändras. Inställningar slutar jämföra dina val med en förinställning och jämför dem med standardvärdena i stället.",
+    "apply": "Byt förinställning",
+    "everythingOn": {
+      "name": "Allt på",
+      "tagline": "Alla funktioner",
+      "point1": "Andra ser vad du spelar och lyssnar på",
+      "point2": "Din IP-adress syns för personer du ansluter direkt till",
+      "point3": "Vem som helst kan skicka meddelanden till dig; länkar och bilder läses in från webben",
+      "point4": "Överlägg, historiksynkronisering och bilder i full storlek är på"
+    },
+    "balanced": {
+      "name": "Balanserad",
+      "tagline": "Mellan integritet och bekvämlighet",
+      "point1": "Bara vänner och personer i din kanal kan skicka meddelanden till dig",
+      "point2": "Direktanslutning, med ett relä som reserv",
+      "point3": "Länkförhandsvisningar och bilder i full storlek är på",
+      "point4": "Det du spelar och lyssnar på förblir privat"
+    },
+    "maximumPrivacy": {
+      "name": "Maximal integritet",
+      "tagline": "Dela så lite som möjligt",
+      "point1": "Bara vänner kan skicka meddelanden till dig, inga undantag",
+      "point2": "Din IP-adress är dold; allt går via reläet",
+      "point3": "Inget externt innehåll, ingen historiksynkronisering, ingen delning",
+      "point4": "Ingenting delas om vad du gör"
+    },
+    "custom": {
+      "name": "Anpassad",
+      "tagline": "Dina egna val",
+      "point1": "Behåller varje inställning som den är",
+      "point2": "Ändringar jämförs med standardvärdena",
+      "point3": "Bäst om du vet vad du vill ha"
+    }
+  },
+  "betaFeatures": {
+    "title": "Betafunktioner",
+    "hint": "Tidiga funktioner som kan ändras. Varje funktion visas också där den hör hemma, med en Beta-märkning.",
+    "gamePlugins": "Spelinsticksmoduler",
+    "manage": "Hantera insticksmoduler"
+  },
+  "privacySummary": {
+    "title": "Integritetssammanfattning",
+    "ipHidden": "Din IP-adress förblir dold",
+    "ipVisible": "Direktanslutningar kan visa din IP-adress",
+    "matches": "Motsvarar {{preset}}",
+    "messages": "Privata meddelanden från: {{rule}}",
+    "p2pHidden": "Peer-to-peer går via reläet, så den andra personen ser inte din IP-adress.",
+    "p2pDirect": "Peer-to-peer ansluter direkt först; den andra personen kan se din IP-adress.",
+    "p2pDirectOnly": "Peer-to-peer ansluter bara direkt; den andra personen kan se din IP-adress.",
+    "externalOn": "Länkförhandsvisningar är på: Mumcord hämtar de länkade sidorna för att skapa dem.",
+    "externalOff": "Länkförhandsvisningar är av: Mumcord läser inte in något från länkade sidor.",
+    "imagesOn": "Bilder i full storlek utbyts direkt mellan Mumcord-användare.",
+    "imagesOff": "Bilder i full storlek utbyts inte.",
+    "historyOn": "Historiksynkronisering är på: du delar din kanalhistorik med andra Mumcord-användare.",
+    "historyOff": "Historiksynkronisering är av.",
+    "sharingBoth": "Andra ser vad du spelar och lyssnar på.",
+    "sharingPlaying": "Andra ser vad du lyssnar på.",
+    "sharingGaming": "Andra ser vilket spel du spelar.",
+    "sharingNone": "Det du spelar och lyssnar på förblir privat.",
+    "change": "Ändra",
+    "changeLabel": "Ändra: {{topic}}"
   },
   "hotkeys": {
     "global": "Globala kortkommandon",

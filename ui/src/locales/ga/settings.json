@@ -1,16 +1,49 @@
 {
-  "sectionList": "Rannáin shocruithe",
+  "sectionList": "Grúpaí socruithe",
   "loading": "Ag luchtú socruithe…",
   "loadFailed": "Níorbh fhéidir do shocruithe a luchtú. Dún na socruithe agus bain triail eile as.",
   "saveFailed": "Níorbh fhéidir an t-athrú deireanach a shábháil. Bain triail eile as.",
   "sections": {
+    "general": "Ginearálta",
+    "account": "Cuntas agus féiniúlacht",
+    "voiceAudio": "Guth agus fuaim",
+    "chatNotifications": "Comhrá agus fógraí",
+    "privacy": "Príobháideachas agus naisc",
     "appearance": "Cuma",
-    "about": "Maidir le",
     "servers": "Freastalaithe",
-    "privacy": "Príobháideachas",
-    "updates": "Nuashonruithe",
+    "gaming": "Cluichí agus forleagan",
+    "advanced": "Casta agus forbróir",
+    "about": "Maidir le",
     "packetInspector": "Cigire paicéad",
     "hotkeys": "Aicearraí"
+  },
+  "sectionDescriptions": {
+    "general": "Tosú, teanga, nuashonruithe agus inrochtaineacht.",
+    "account": "Do chuid féiniúlachtaí, do phróifíl agus an méid a chomhroinneann tú.",
+    "voiceAudio": "Micreafón, callairí, an chaoi a labhraíonn tú agus an chaoi a gcloistear thú.",
+    "chatNotifications": "Fógraí, teachtaireachtaí príobháideacha, daoine blocáilte agus stair na dteachtaireachtaí.",
+    "privacy": "An chaoi a nascann tú le daoine eile agus an méid a luchtaíonn Mumcord ón taobh amuigh.",
+    "appearance": "Téama, leagan amach agus liosta na gcainéal.",
+    "servers": "Naisc le roinnt freastalaithe agus socruithe do gach freastalaí.",
+    "gaming": "An forleagan sa chluiche, fuaim shuímh agus breiseáin chluiche.",
+    "advanced": "Uirlisí forbróra, diagnóisic, stóras agus ceadúnais.",
+    "about": "Leagan, tacaíocht agus an draoi socraithe."
+  },
+  "breadcrumb": "Socruithe / {{section}}",
+  "moreInfo": "Tuilleadh eolais: {{topic}}",
+  "searchTerms": {
+    "devices": "ionchur aschur cluaisíní callaire cárta fuaime",
+    "talkMode": "PTT VAD gníomhaíocht ghutha eochair aicearra",
+    "noiseSuppression": "torann cúlra laghdú torainn",
+    "p2p": "P2P athsheachadán naisc dhíreacha folaigh mo sheoladh IP",
+    "theme": "mód dorcha mód geal dathanna",
+    "startup": "uaththosú tosaithe logáil isteach tráidire",
+    "language": "aistriúchán teanga logchaighdeán",
+    "updates": "leagan nua uasghrádú",
+    "storage": "spás diosca glan taisce",
+    "blocked": "déan neamhaird blocáil balbhaigh daoine",
+    "notifications": "foláirimh preabfhuinneoga",
+    "externalContent": "leabaithe íomhánna réamhamharcanna"
   },
   "search": {
     "label": "Cuardaigh socruithe",
@@ -20,7 +53,13 @@
     "count_two": "Aimsíodh {{count}} shocrú",
     "count_few": "Aimsíodh {{count}} shocrú",
     "count_many": "Aimsíodh {{count}} socrú",
-    "count_other": "Aimsíodh {{count}} socrú"
+    "count_other": "Aimsíodh {{count}} socrú",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} toradh",
+    "groupCount_two": "{{count}} thoradh",
+    "groupCount_few": "{{count}} thoradh",
+    "groupCount_many": "{{count}} toradh",
+    "groupCount_other": "{{count}} toradh"
   },
   "errors": {
     "secureStorage": "Níl stóras slán do chórais ar fáil nó diúltaíodh an rochtain.",
@@ -148,7 +187,7 @@
     "keyMissing": "Socraigh eochair, nó ní chloisfidh aon duine thú.",
     "keyRejected": "Ní féidir an eochair sin a úsáid. Bain triail as eochair eile, le Ctrl, Alt nó Shift más mian leat.",
     "keyNotConfirmed": "Níor dheimhnigh an deasc an t-aicearra. Bain triail eile as agus glac leis an dialóg chórais, nó sann an eochair i socruithe aicearraí na deisce.",
-    "processing": "Próiseáil gutha",
+    "processing": "Próiseáil agus cáilíocht",
     "noiseSuppression": "Cosc torainn",
     "noiseSuppressionHint": "Scagann sé torann cúlra amach, ar nós méarchláir agus fan.",
     "noiseChoice": {
@@ -255,8 +294,9 @@
     }
   },
   "history": {
+    "title": "Stair na dteachtaireachtaí",
     "explanation": "Ní shábháiltear teachtaireachtaí comhrá ach ar an ríomhaire seo.",
-    "perServer": "Freastalaithe",
+    "perServer": "Sáruithe do gach freastalaí",
     "noServers": "Gan freastalaithe sábháilte fós.",
     "save": "Sábháil an stair ar {{server}}",
     "clearServer": "Glan stair {{server}}…",
@@ -292,14 +332,15 @@
     "system": "Lean an córas",
     "dark": "Dorcha",
     "light": "Solas",
-    "behaviour": "Iompar",
+    "behaviour": "Tosú agus fuinneog",
     "closeLegend": "Nuair a dhúnann tú an fhuinneog agus tú ceangailte",
     "closeAsk": "Fiafraigh gach uair",
     "closeTray": "Íoslaghdaigh go dtí an tráidire",
     "closeQuit": "Scoir Mumcord",
     "autostart": "Tosaigh Mumcord nuair a logálaim isteach",
     "startMinimized": "Tosaigh íoslaghdaithe",
-    "startMinimizedHint": "Nuair a thosaíonn Mumcord ag logáil isteach, fanann sé sa tráidire in ionad an fhuinneog a oscailt."
+    "startMinimizedHint": "Nuair a thosaíonn Mumcord ag logáil isteach, fanann sé sa tráidire in ionad an fhuinneog a oscailt.",
+    "look": "Cuma agus leagan amach"
   },
   "themeEditor": {
     "name": "Ainm an téama",
@@ -357,7 +398,7 @@
     "deleteConfirm": "Scrios"
   },
   "accessibility": {
-    "hints": "Leideanna",
+    "hints": "Inrochtaineacht",
     "keyboardHints": "Taispeáin leideanna méarchláir",
     "keyboardHintsHint": "Leideanna gearra ar an scáileán ar nós “Eochracha saigheada: bog” faoi liosta na gcainéal agus i GIFanna ceanán. Léann léitheoirí scáileáin amach iad fós nuair atá sé seo as.",
     "announcements": "Fógraí léitheora scáileáin",
@@ -366,11 +407,13 @@
     "skipLinksHint": "Naisc ag tús na fuinneoige a léimeann díreach go dtí an comhrá nó liosta na gcainéal nuair a bhrúnn tú Tab."
   },
   "language": {
+    "title": "Teanga",
     "legend": "Teanga taispeána",
     "system": "Lean an córas"
   },
   "sounds": {
-    "explanation": "Fuaimeanna gearra do na himeachtaí seo:",
+    "title": "Fuaimeanna",
+    "explanation": "Fuaimeanna gearra a sheinntear don imeachtaí seo.",
     "joinLeave": "Téann duine isteach i do chainéal nó imíonn sé",
     "voiceJoin": "Téann tú isteach i gcainéal le haghaidh gutha",
     "selfMute": "Balbhaíonn tú nó díbhalbhaíonn tú thú féin",
@@ -447,6 +490,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnóisic",
     "logLevel": "Mionsonraí logála",
     "levels": {
       "error": "Earráidí amháin",
@@ -481,7 +525,8 @@
     "setupWizardHint": "Téigh tríd an gcéad socrú arís chun do mhicreafón, do roghanna príobháideachais, an tseiceáil nuashonraithe agus an mód labhartha a athbhreithniú. Tá do roghanna reatha réamhlíonta.",
     "setupWizardRun": "Rith an treoraí socraithe arís",
     "setupWizardIdentityNote": "Níl do chéannacht mar chuid de seo. Fanann do theastas, agus leis an ainm cláraithe agus na ceadanna atá agat ar fhreastalaithe, go díreach mar atá siad.",
-    "setupWizardIdentityLink": "Bainistigh í i gCéannacht"
+    "setupWizardIdentityLink": "Bainistigh í i gCéannacht",
+    "versionTitle": "Leagan agus ceadúnas"
   },
   "profile": {
     "title": "Próifíl",
@@ -517,7 +562,7 @@
     "cleared": "Glanadh an taisce, {{size}} saor."
   },
   "cache": {
-    "title": "Taisce",
+    "title": "Stóras",
     "hint": "Coinníonn Mumcord sonraí sealadacha ar an ríomhaire seo ionas go luchtaíonn gach rud níos tapúla. Tá sé sábháilte iad a ghlanadh; athchruthaítear iad nuair is gá.",
     "kind": {
       "previews": "Réamhamhairc nasc agus íomhánna",
@@ -560,7 +605,7 @@
     "betaHint": "Braitheann na torthaí ar an gcluiche agus ar a thacaíocht do bhreiseáin."
   },
   "gamePlugins": {
-    "title": "Fuaim shuímh: foinsí",
+    "title": "Breiseáin chluiche",
     "explanation": "Insíonn cluichí do Mumcord cá bhfuil tú trí Mumble Link nó trí bhreiseáin chluichí oifigiúla Mumble. Aimsíonn Mumcord na breiseáin ina fhillteán breiseán féin agus i suiteáil Mumble atá ann cheana. Ná cuir ar siúl ach na breiseáin do chluichí a imríonn tú.",
     "antiCheat": "Léann breiseáin chluichí cuimhne an chluiche. D'fhéadfadh córais áirithe frithcheilge é seo a thuairisciú; cuir breiseáin as do chluichí a bhfuil frithcheilg dhian acu.",
     "loading": "Ag lorg breiseán cluichí…",
@@ -618,6 +663,7 @@
     "failed": "Níor oibrigh sé sin. Bain triail eile as."
   },
   "inspector": {
+    "title": "Uirlisí forbróra",
     "intro": "Taispeánann sé na paicéid a sheolann agus a fhaigheann Mumcord, go príomha sonraí breiseán Mumcord, chun fabhtanna a aimsiú. Ní choinnítear ach na 2,000 paicéad is déanaí, i gcuimhne an ghléis seo; ní logáiltear ná ní sheoltar aon rud áit ar bith.",
     "devTools": "Uirlisí forbróra",
     "devToolsHint": "Cuir as chun an cigire paicéad a cheilt arís agus an gabháil a stopadh.",
@@ -797,7 +843,14 @@
     "hide": "Folaigh go hiomlán iad",
     "hideHint": "Ní thaispeántar aon rud sa chomhrá."
   },
+  "externalContent": {
+    "title": "Ábhar seachtrach"
+  },
+  "privacyConnections": {
+    "title": "Naisc"
+  },
   "updates": {
+    "title": "Nuashonruithe",
     "installedFrom": "Mumcord {{version}} · suiteáilte ó {{source}}",
     "install": {
       "appImage": "an AppImage",
@@ -811,7 +864,6 @@
       "aur": "an AUR",
       "otherLinux": "pacáiste Linux"
     },
-    "checking": "Ag seiceáil",
     "mode": "Nuair a aimsítear nuashonrú",
     "modeHint": "Seiceáiltear agus fíoraítear nuashonruithe i gcónaí sula suiteáiltear iad.",
     "modeAuto": "Íoslódáil go huathoibríoch",
@@ -831,7 +883,6 @@
     "intervalHours_many": "Gach {{count}} uair an chloig",
     "intervalHours_other": "Gach {{count}} uair an chloig",
     "intervalWeek": "Uair sa tseachtain",
-    "status": "Stádas",
     "state": {
       "idle": "Gan seiceáil fós",
       "off": "Tá seiceáil nuashonruithe múchta",
@@ -858,6 +909,102 @@
     "whatsNew": "Cad atá nua",
     "whatsNewHint": "Féach ar na hathruithe i ngach leagan.",
     "openChangelog": "Oscail an loga athruithe"
+  },
+  "badges": {
+    "changed": "Athraithe",
+    "recommended": "Molta",
+    "groupChanged": "Tá socruithe athraithe ann"
+  },
+  "resetSection": {
+    "button": "Athshocraigh an chuid",
+    "title": "Athshocraigh {{section}}?",
+    "intro": "Filleann na socruithe seo ar do réamhshocrú nó ar a luach réamhshocraithe:",
+    "nothing": "Tá a réamhshocrú nó a luach réamhshocraithe ag gach socrú i {{section}} cheana féin.",
+    "confirm": "Athshocraigh"
+  },
+  "activePreset": {
+    "heading": "An réamhshocrú gníomhach",
+    "none": "Gan réamhshocrú",
+    "customised": "{{preset}}, saincheaptha",
+    "changed_one": "Athraíodh {{count}} socrú ó rinneadh an socrú",
+    "changed_two": "Athraíodh {{count}} shocrú ó rinneadh an socrú",
+    "changed_few": "Athraíodh {{count}} shocrú ó rinneadh an socrú",
+    "changed_many": "Athraíodh {{count}} socrú ó rinneadh an socrú",
+    "changed_other": "Athraíodh {{count}} socrú ó rinneadh an socrú",
+    "unchanged": "Gan athruithe ó rinneadh an socrú",
+    "switch": "Athraigh",
+    "switchLabel": "Athraigh réamhshocrú",
+    "applyFailed": "Níorbh fhéidir an forleagan sa chluiche ná Ná Cuir Isteach orm a athrú. Bain triail eile as."
+  },
+  "presets": {
+    "dialogTitle": "Athraigh réamhshocrú",
+    "dialogIntro": "Roghnaigh pointe tosaigh. Ní athraíonn ach na socruithe a chlúdaíonn réamhshocrú; fanann gach rud eile mar atá.",
+    "legend": "Réamhshocruithe",
+    "continue": "Lean ar aghaidh",
+    "confirmTitle": "Athraigh go {{preset}}?",
+    "confirmIntro": "Athraíonn na socruithe seo:",
+    "confirmNothing": "Ní athraíonn aon socrú. Cuimhníonn Mumcord ar {{preset}} mar do réamhshocrú.",
+    "confirmCustom": "Ní athraíonn aon socrú. Stopann Socruithe de do roghanna a chur i gcomparáid le réamhshocrú agus cuireann siad i gcomparáid leis na réamhshocruithe iad.",
+    "apply": "Athraigh réamhshocrú",
+    "everythingOn": {
+      "name": "Gach rud ar siúl",
+      "tagline": "An tacar iomlán gnéithe",
+      "point1": "Feiceann daoine eile an méid a imrítear agus a éisteann tú leis",
+      "point2": "Tá do sheoladh IP le feiceáil ag daoine a nascann tú leo go díreach",
+      "point3": "Féadfaidh duine ar bith teachtaireacht a chur chugat; luchtaítear naisc agus íomhánna ón ngréasán",
+      "point4": "Tá an forleagan, sioncronú staire agus íomhánna lán-mhéide ar siúl"
+    },
+    "balanced": {
+      "name": "Cothromaithe",
+      "tagline": "Idir phríobháideachas agus compord",
+      "point1": "Ní féidir ach le cairde agus daoine i do chainéal teachtaireacht a chur chugat",
+      "point2": "Nasc díreach, le hathsheachadán mar chúltaca",
+      "point3": "Tá réamhamharcanna naisc agus íomhánna lán-mhéide ar siúl",
+      "point4": "Fanann an méid a imríonn tú agus a éisteann tú leis príobháideach"
+    },
+    "maximumPrivacy": {
+      "name": "Uasphríobháideachas",
+      "tagline": "Comhroinn chomh beag agus is féidir",
+      "point1": "Ní féidir ach le cairde teachtaireacht a chur chugat, gan eisceacht",
+      "point2": "Tá do sheoladh IP folaithe; téann gach rud tríd an athsheachadán",
+      "point3": "Gan ábhar seachtrach, gan sioncronú staire, gan comhroinnt",
+      "point4": "Ní chomhroinntear aon rud faoin méid a dhéanann tú"
+    },
+    "custom": {
+      "name": "Saincheaptha",
+      "tagline": "Do chuid roghanna féin",
+      "point1": "Coimeádann gach socrú mar atá sé",
+      "point2": "Cuirtear athruithe i gcomparáid leis na réamhshocruithe",
+      "point3": "Is fearr é más eol duit cad atá uait"
+    }
+  },
+  "betaFeatures": {
+    "title": "Gnéithe béite",
+    "hint": "Gnéithe luatha; d'fhéadfadh siad athrú. Taispeántar gach ceann acu freisin san áit ar leis é, le suaitheantas Béite.",
+    "gamePlugins": "Breiseáin chluiche",
+    "manage": "Bainistigh breiseáin"
+  },
+  "privacySummary": {
+    "title": "Achoimre phríobháideachais",
+    "ipHidden": "Fanann do sheoladh IP folaithe",
+    "ipVisible": "D'fhéadfadh naisc dhíreacha do sheoladh IP a thaispeáint",
+    "matches": "Comhoiriúnaíonn le {{preset}}",
+    "messages": "Teachtaireachtaí príobháideacha ó: {{rule}}",
+    "p2pHidden": "Téann piarbhrearthóireacht tríd an athsheachadán, mar sin ní fheiceann an duine eile do sheoladh IP.",
+    "p2pDirect": "Nascann piarbhrearthóireacht go díreach ar dtús; féadfaidh an duine eile do sheoladh IP a fheiceáil.",
+    "p2pDirectOnly": "Ní nascann piarbhrearthóireacht ach go díreach; féadfaidh an duine eile do sheoladh IP a fheiceáil.",
+    "externalOn": "Tá réamhamharcanna naisc ar siúl: faigheann Mumcord na leathanaigh nasctha chun iad a thógáil.",
+    "externalOff": "Tá réamhamharcanna naisc as: ní luchtaíonn Mumcord aon rud ó leathanaigh nasctha.",
+    "imagesOn": "Malartaítear íomhánna lán-mhéide go díreach idir úsáideoirí Mumcord.",
+    "imagesOff": "Ní mhalartaítear íomhánna lán-mhéide.",
+    "historyOn": "Tá sioncronú staire ar siúl: comhroinneann tú stair do chainéil le húsáideoirí Mumcord eile.",
+    "historyOff": "Tá sioncronú staire as.",
+    "sharingBoth": "Feiceann daoine eile an méid a imríonn agus a éisteann tú leis.",
+    "sharingPlaying": "Feiceann daoine eile an méid a éisteann tú leis.",
+    "sharingGaming": "Feiceann daoine eile an cluiche a imríonn tú.",
+    "sharingNone": "Fanann an méid a imríonn agus a éisteann tú leis príobháideach.",
+    "change": "Athraigh",
+    "changeLabel": "Athraigh: {{topic}}"
   },
   "hotkeys": {
     "global": "Aicearraí domhanda",

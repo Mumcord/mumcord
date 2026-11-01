@@ -1,16 +1,49 @@
 {
-  "sectionList": "Secções das definições",
+  "sectionList": "Grupos de definições",
   "loading": "A carregar definições…",
   "loadFailed": "Não foi possível carregar as tuas definições. Fecha as definições e tenta novamente.",
   "saveFailed": "Não foi possível guardar a última alteração. Tenta novamente.",
   "sections": {
+    "general": "Geral",
+    "account": "Conta e identidade",
+    "voiceAudio": "Voz e áudio",
+    "chatNotifications": "Chat e notificações",
+    "privacy": "Privacidade e ligações",
     "appearance": "Aspeto",
-    "about": "Acerca de",
     "servers": "Servidores",
-    "privacy": "Privacidade",
-    "updates": "Atualizações",
+    "gaming": "Jogos e sobreposição",
+    "advanced": "Avançado e programador",
+    "about": "Acerca de",
     "packetInspector": "Inspetor de pacotes",
     "hotkeys": "Atalhos"
+  },
+  "sectionDescriptions": {
+    "general": "Arranque, idioma, atualizações e acessibilidade.",
+    "account": "As tuas identidades, o teu perfil e o que partilhas.",
+    "voiceAudio": "Microfone, altifalantes, como falas e como soas.",
+    "chatNotifications": "Notificações, mensagens privadas, pessoas bloqueadas e histórico de mensagens.",
+    "privacy": "Como te ligas a outras pessoas e o que o Mumcord carrega do exterior.",
+    "appearance": "Tema, disposição e lista de canais.",
+    "servers": "Ligações a vários servidores e definições por servidor.",
+    "gaming": "A sobreposição no jogo, áudio posicional e plugins de jogos.",
+    "advanced": "Ferramentas de programador, diagnóstico, armazenamento e licenças.",
+    "about": "Versão, suporte e o assistente de configuração."
+  },
+  "breadcrumb": "Definições / {{section}}",
+  "moreInfo": "Mais informações: {{topic}}",
+  "searchTerms": {
+    "devices": "entrada saída auricular altifalante placa de som",
+    "talkMode": "PTT VAD atividade de voz atalho",
+    "noiseSuppression": "ruído de fundo remover ruído",
+    "p2p": "P2P relay ligações diretas ocultar o meu endereço IP",
+    "theme": "modo escuro modo claro cores",
+    "startup": "arranque automático iniciar sessão área de notificação",
+    "language": "tradução idioma região",
+    "updates": "nova versão atualização",
+    "storage": "espaço em disco limpar cache",
+    "blocked": "ignorar bloquear silenciar pessoas",
+    "notifications": "alertas pop-ups",
+    "externalContent": "conteúdo incorporado imagens pré-visualizações"
   },
   "search": {
     "label": "Pesquisar definições",
@@ -18,7 +51,11 @@
     "empty": "Nenhuma definição corresponde a “{{query}}”.",
     "count_one": "{{count}} definição encontrada",
     "count_many": "{{count}} definições encontradas",
-    "count_other": "{{count}} definições encontradas"
+    "count_other": "{{count}} definições encontradas",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} resultado",
+    "groupCount_many": "{{count}} de resultados",
+    "groupCount_other": "{{count}} resultados"
   },
   "errors": {
     "secureStorage": "O armazenamento seguro do sistema não está disponível ou o acesso foi recusado.",
@@ -146,7 +183,7 @@
     "keyMissing": "Define uma tecla, caso contrário ninguém te ouve.",
     "keyRejected": "Não é possível usar essa tecla. Tenta outra, opcionalmente com Ctrl, Alt ou Shift.",
     "keyNotConfirmed": "O ambiente de trabalho não confirmou o atalho. Tenta novamente e aceita a caixa de diálogo do sistema, ou atribui a tecla nas definições de atalhos do ambiente de trabalho.",
-    "processing": "Processamento de voz",
+    "processing": "Processamento e qualidade",
     "noiseSuppression": "Supressão de ruído",
     "noiseSuppressionHint": "Filtra o ruído de fundo, como teclados e ventoinhas.",
     "noiseChoice": {
@@ -251,8 +288,9 @@
     }
   },
   "history": {
+    "title": "Histórico de mensagens",
     "explanation": "As mensagens de chat são guardadas apenas neste computador.",
-    "perServer": "Servidores",
+    "perServer": "Exceções por servidor",
     "noServers": "Ainda sem servidores guardados.",
     "save": "Guardar histórico em {{server}}",
     "clearServer": "Limpar histórico de {{server}}…",
@@ -288,14 +326,15 @@
     "system": "Seguir o sistema",
     "dark": "Escuro",
     "light": "Claro",
-    "behaviour": "Comportamento",
+    "behaviour": "Arranque e janela",
     "closeLegend": "Ao fechar a janela durante uma ligação",
     "closeAsk": "Perguntar sempre",
     "closeTray": "Minimizar para a bandeja",
     "closeQuit": "Sair do Mumcord",
     "autostart": "Iniciar o Mumcord quando inicio sessão",
     "startMinimized": "Iniciar minimizado",
-    "startMinimizedHint": "Quando o Mumcord inicia com a sessão, fica à espera na bandeja em vez de abrir a janela."
+    "startMinimizedHint": "Quando o Mumcord inicia com a sessão, fica à espera na bandeja em vez de abrir a janela.",
+    "look": "Aspeto e disposição"
   },
   "themeEditor": {
     "name": "Nome do tema",
@@ -353,7 +392,7 @@
     "deleteConfirm": "Eliminar"
   },
   "accessibility": {
-    "hints": "Dicas",
+    "hints": "Acessibilidade",
     "keyboardHints": "Mostrar dicas de teclado",
     "keyboardHintsHint": "Pequenas dicas no ecrã como “Setas: mover” por baixo da lista de canais e nos GIFs favoritos. Os leitores de ecrã continuam a lê-las quando está desativado.",
     "announcements": "Anúncios para leitores de ecrã",
@@ -362,11 +401,13 @@
     "skipLinksHint": "Ligações no início da janela que saltam diretamente para o chat ou para a lista de canais quando premes Tab."
   },
   "language": {
+    "title": "Idioma",
     "legend": "Idioma de apresentação",
     "system": "Seguir o sistema"
   },
   "sounds": {
-    "explanation": "Sons curtos para estes eventos:",
+    "title": "Sons",
+    "explanation": "Sons curtos que tocam nestes eventos.",
     "joinLeave": "Alguém entra ou sai do teu canal",
     "voiceJoin": "Entras num canal para voz",
     "selfMute": "Silencias ou reativas o teu microfone",
@@ -443,6 +484,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnóstico",
     "logLevel": "Detalhe do registo",
     "levels": {
       "error": "Apenas erros",
@@ -477,7 +519,8 @@
     "setupWizardHint": "Percorra outra vez a configuração inicial para rever o microfone, as opções de privacidade, a verificação de atualizações e o modo de fala. Os seus valores atuais estão preenchidos.",
     "setupWizardRun": "Repetir o assistente de configuração",
     "setupWizardIdentityNote": "A sua identidade não faz parte disto. O seu certificado, e com ele o nome registado e as permissões nos servidores, fica exatamente como está.",
-    "setupWizardIdentityLink": "Gerir em Identidade"
+    "setupWizardIdentityLink": "Gerir em Identidade",
+    "versionTitle": "Versão e licença"
   },
   "profile": {
     "title": "Perfil",
@@ -513,7 +556,7 @@
     "cleared": "Cache limpa, {{size}} libertados."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Armazenamento",
     "hint": "O Mumcord guarda dados temporários neste computador para tudo carregar mais depressa. Limpá-los é seguro; são recriados quando necessário.",
     "kind": {
       "previews": "Pré-visualizações de links e imagens",
@@ -554,7 +597,7 @@
     "betaHint": "Os resultados dependem do jogo e do suporte de plugins."
   },
   "gamePlugins": {
-    "title": "Áudio posicional: fontes",
+    "title": "Plugins de jogos",
     "explanation": "Os jogos indicam ao Mumcord onde estás através do Mumble Link ou dos plugins de jogos oficiais do Mumble. O Mumcord encontra os plugins na sua própria pasta de plugins e numa instalação existente do Mumble. Ativa apenas os plugins dos jogos que jogas.",
     "antiCheat": "Os plugins de jogos leem a memória do jogo. Alguns sistemas anti-cheat podem sinalizar isto; desativa os plugins em jogos com anti-cheat rigoroso.",
     "loading": "A procurar plugins de jogos…",
@@ -612,6 +655,7 @@
     "failed": "Não funcionou. Tenta novamente."
   },
   "inspector": {
+    "title": "Ferramentas de programador",
     "intro": "Mostra os pacotes que o Mumcord envia e recebe, sobretudo dados de plugins do Mumcord, para depuração. Só os últimos 2000 pacotes são mantidos, na memória deste dispositivo; nada é registado nem enviado para lado nenhum.",
     "devTools": "Ferramentas de programador",
     "devToolsHint": "Desative para voltar a ocultar o inspetor de pacotes e parar a captura.",
@@ -789,7 +833,14 @@
     "hide": "Ocultá-las por completo",
     "hideHint": "Nada é mostrado no chat."
   },
+  "externalContent": {
+    "title": "Conteúdo externo"
+  },
+  "privacyConnections": {
+    "title": "Ligações"
+  },
   "updates": {
+    "title": "Atualizações",
     "installedFrom": "Mumcord {{version}} · instalado a partir de {{source}}",
     "install": {
       "appImage": "o AppImage",
@@ -803,7 +854,6 @@
       "aur": "o AUR",
       "otherLinux": "um pacote Linux"
     },
-    "checking": "A verificar",
     "mode": "Quando for encontrada uma atualização",
     "modeHint": "As atualizações são sempre verificadas e validadas antes de serem instaladas.",
     "modeAuto": "Transferir automaticamente",
@@ -819,7 +869,6 @@
     "intervalHours_many": "A cada {{count}} horas",
     "intervalHours_other": "A cada {{count}} de horas",
     "intervalWeek": "Uma vez por semana",
-    "status": "Estado",
     "state": {
       "idle": "Ainda não verificado",
       "off": "A procura de atualizações está desativada",
@@ -846,6 +895,100 @@
     "whatsNew": "Novidades",
     "whatsNewHint": "Vê as alterações de cada versão.",
     "openChangelog": "Abrir o registo de alterações"
+  },
+  "badges": {
+    "changed": "Alterado",
+    "recommended": "Recomendado",
+    "groupChanged": "Tem definições alteradas"
+  },
+  "resetSection": {
+    "button": "Repor secção",
+    "title": "Repor {{section}}?",
+    "intro": "Estas definições voltam à tua predefinição ou ao valor por omissão:",
+    "nothing": "Todas as definições em {{section}} já têm a sua predefinição ou o valor por omissão.",
+    "confirm": "Repor"
+  },
+  "activePreset": {
+    "heading": "Predefinição ativa",
+    "none": "Sem predefinição",
+    "customised": "{{preset}}, personalizada",
+    "changed_one": "{{count}} definição alterada desde a configuração",
+    "changed_many": "{{count}} de definições alteradas desde a configuração",
+    "changed_other": "{{count}} definições alteradas desde a configuração",
+    "unchanged": "Sem alterações desde a configuração",
+    "switch": "Mudar",
+    "switchLabel": "Mudar de predefinição",
+    "applyFailed": "Não foi possível alterar a sobreposição no jogo nem o modo Não incomodar. Tenta novamente."
+  },
+  "presets": {
+    "dialogTitle": "Mudar de predefinição",
+    "dialogIntro": "Escolhe um ponto de partida. Só mudam as definições que uma predefinição abrange; tudo o resto fica como está.",
+    "legend": "Predefinições",
+    "continue": "Continuar",
+    "confirmTitle": "Mudar para {{preset}}?",
+    "confirmIntro": "Estas definições mudam:",
+    "confirmNothing": "Nenhuma definição muda. O Mumcord lembra-se de {{preset}} como a tua predefinição.",
+    "confirmCustom": "Nenhuma definição muda. As Definições deixam de comparar as tuas escolhas com uma predefinição e passam a compará-las com os valores por omissão.",
+    "apply": "Mudar de predefinição",
+    "everythingOn": {
+      "name": "Tudo ativado",
+      "tagline": "Conjunto completo de funcionalidades",
+      "point1": "Os outros veem o que jogas e o que ouves",
+      "point2": "O teu IP é visível para as pessoas a quem te ligas diretamente",
+      "point3": "Qualquer pessoa pode enviar-te mensagens; ligações e imagens são carregadas da web",
+      "point4": "Sobreposição, sincronização do histórico e imagens em tamanho real estão ativadas"
+    },
+    "balanced": {
+      "name": "Equilibrado",
+      "tagline": "Entre privacidade e conforto",
+      "point1": "Só amigos e pessoas do teu canal podem enviar-te mensagens",
+      "point2": "Ligação direta, com um relay como alternativa",
+      "point3": "Pré-visualizações de ligações e imagens em tamanho real estão ativadas",
+      "point4": "O que jogas e o que ouves permanece privado"
+    },
+    "maximumPrivacy": {
+      "name": "Privacidade máxima",
+      "tagline": "Partilhar o mínimo possível",
+      "point1": "Só amigos podem enviar-te mensagens, sem exceções",
+      "point2": "O teu IP está oculto; tudo passa pelo relay",
+      "point3": "Sem conteúdo externo, sem sincronização do histórico, sem partilha",
+      "point4": "Nada é partilhado sobre o que fazes"
+    },
+    "custom": {
+      "name": "Personalizado",
+      "tagline": "As tuas próprias escolhas",
+      "point1": "Mantém todas as definições como estão",
+      "point2": "As alterações são comparadas com os valores por omissão",
+      "point3": "O melhor se souberes o que queres"
+    }
+  },
+  "betaFeatures": {
+    "title": "Funcionalidades beta",
+    "hint": "Funcionalidades iniciais que podem mudar. Cada uma também aparece no seu lugar, com um selo Beta.",
+    "gamePlugins": "Plugins de jogos",
+    "manage": "Gerir plugins"
+  },
+  "privacySummary": {
+    "title": "Resumo de privacidade",
+    "ipHidden": "O teu endereço IP permanece oculto",
+    "ipVisible": "As ligações diretas podem mostrar o teu endereço IP",
+    "matches": "Corresponde a {{preset}}",
+    "messages": "Mensagens privadas de: {{rule}}",
+    "p2pHidden": "O peer-to-peer passa pelo relay, por isso a outra pessoa não vê o teu endereço IP.",
+    "p2pDirect": "O peer-to-peer liga-se primeiro diretamente; a outra pessoa pode ver o teu endereço IP.",
+    "p2pDirectOnly": "O peer-to-peer só se liga diretamente; a outra pessoa pode ver o teu endereço IP.",
+    "externalOn": "As pré-visualizações de ligações estão ativadas: o Mumcord obtém as páginas ligadas para as criar.",
+    "externalOff": "As pré-visualizações de ligações estão desativadas: o Mumcord não carrega nada das páginas ligadas.",
+    "imagesOn": "As imagens em tamanho real são trocadas diretamente entre utilizadores do Mumcord.",
+    "imagesOff": "As imagens em tamanho real não são trocadas.",
+    "historyOn": "A sincronização do histórico está ativada: partilhas o histórico do canal com outros utilizadores do Mumcord.",
+    "historyOff": "A sincronização do histórico está desativada.",
+    "sharingBoth": "Os outros veem o que jogas e o que ouves.",
+    "sharingPlaying": "Os outros veem o que ouves.",
+    "sharingGaming": "Os outros veem o jogo que jogas.",
+    "sharingNone": "O que jogas e o que ouves permanece privado.",
+    "change": "Alterar",
+    "changeLabel": "Alterar: {{topic}}"
   },
   "hotkeys": {
     "global": "Atalhos globais",

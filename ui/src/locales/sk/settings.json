@@ -1,16 +1,49 @@
 {
-  "sectionList": "Sekcie nastavení",
+  "sectionList": "Skupiny nastavení",
   "loading": "Načítavam nastavenia…",
   "loadFailed": "Tvoje nastavenia sa nepodarilo načítať. Zavri nastavenia a skús to znova.",
   "saveFailed": "Poslednú zmenu sa nepodarilo uložiť. Skús to znova.",
   "sections": {
+    "general": "Všeobecné",
+    "account": "Účet a identita",
+    "voiceAudio": "Hlas a zvuk",
+    "chatNotifications": "Chat a oznámenia",
+    "privacy": "Súkromie a pripojenia",
     "appearance": "Vzhľad",
-    "about": "O aplikácii",
     "servers": "Servery",
-    "privacy": "Súkromie",
-    "updates": "Aktualizácie",
+    "gaming": "Hry a prekrytie",
+    "advanced": "Rozšírené a pre vývojárov",
+    "about": "O aplikácii",
     "packetInspector": "Inšpektor paketov",
     "hotkeys": "Klávesové skratky"
+  },
+  "sectionDescriptions": {
+    "general": "Spúšťanie, jazyk, aktualizácie a prístupnosť.",
+    "account": "Tvoje identity, profil a to, čo zdieľaš.",
+    "voiceAudio": "Mikrofón, reproduktory, ako hovoríš a ako znieš.",
+    "chatNotifications": "Oznámenia, súkromné správy, zablokovaní ľudia a história správ.",
+    "privacy": "Ako sa pripájaš k iným a čo Mumcord načítava zvonka.",
+    "appearance": "Téma, rozloženie a zoznam kanálov.",
+    "servers": "Pripojenia k viacerým serverom a nastavenia pre jednotlivé servery.",
+    "gaming": "Prekrytie v hre, polohový zvuk a doplnky pre hry.",
+    "advanced": "Nástroje pre vývojárov, diagnostika, úložisko a licencie.",
+    "about": "Verzia, podpora a sprievodca nastavením."
+  },
+  "breadcrumb": "Nastavenia / {{section}}",
+  "moreInfo": "Viac informácií: {{topic}}",
+  "searchTerms": {
+    "devices": "vstup výstup slúchadlá reproduktor zvuková karta",
+    "talkMode": "PTT VAD hlasová aktivita klávesová skratka",
+    "noiseSuppression": "hluk na pozadí potlačenie hluku",
+    "p2p": "P2P relay priame pripojenia skryť moju adresu IP",
+    "theme": "tmavý režim svetlý režim farby",
+    "startup": "automatické spustenie prihlásenie oznamovacia oblasť",
+    "language": "preklad jazyk región",
+    "updates": "nová verzia aktualizácia",
+    "storage": "miesto na disku vymazať vyrovnávaciu pamäť",
+    "blocked": "ignorovať blokovať stlmiť ľudí",
+    "notifications": "upozornenia vyskakovacie okná",
+    "externalContent": "vložený obsah obrázky náhľady"
   },
   "search": {
     "label": "Hľadať v nastaveniach",
@@ -19,7 +52,12 @@
     "count_one": "Nájdené {{count}} nastavenie",
     "count_few": "Nájdené {{count}} nastavenia",
     "count_many": "Nájdeného {{count}} nastavenia",
-    "count_other": "Nájdených {{count}} nastavení"
+    "count_other": "Nájdených {{count}} nastavení",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} výsledok",
+    "groupCount_few": "{{count}} výsledky",
+    "groupCount_many": "{{count}} výsledku",
+    "groupCount_other": "{{count}} výsledkov"
   },
   "errors": {
     "secureStorage": "Zabezpečené úložisko tvojho systému nie je dostupné alebo bol prístup odmietnutý.",
@@ -147,7 +185,7 @@
     "keyMissing": "Nastav kláves, inak ťa nikto nebude počuť.",
     "keyRejected": "Tento kláves sa nedá použiť. Skús iný, prípadne s Ctrl, Alt alebo Shift.",
     "keyNotConfirmed": "Desktop skratku nepotvrdil. Skús to znova a prijmi systémový dialóg, alebo priraď kláves v nastaveniach skratiek desktopu.",
-    "processing": "Spracovanie hlasu",
+    "processing": "Spracovanie a kvalita",
     "noiseSuppression": "Potlačenie šumu",
     "noiseSuppressionHint": "Odfiltruje hluk v pozadí, napríklad klávesnicu či ventilátory.",
     "noiseChoice": {
@@ -253,8 +291,9 @@
     }
   },
   "history": {
+    "title": "História správ",
     "explanation": "Správy z chatu sa ukladajú len v tomto počítači.",
-    "perServer": "Servery",
+    "perServer": "Výnimky pre jednotlivé servery",
     "noServers": "Zatiaľ žiadne uložené servery.",
     "save": "Ukladať históriu na {{server}}",
     "clearServer": "Vymazať históriu {{server}}…",
@@ -290,14 +329,15 @@
     "system": "Podľa systému",
     "dark": "Tmavý",
     "light": "Svetlý",
-    "behaviour": "Správanie",
+    "behaviour": "Spúšťanie a okno",
     "closeLegend": "Keď zatvoríš okno počas pripojenia",
     "closeAsk": "Vždy sa opýtať",
     "closeTray": "Minimalizovať do lišty",
     "closeQuit": "Ukončiť Mumcord",
     "autostart": "Spustiť Mumcord po prihlásení",
     "startMinimized": "Spustiť minimalizovaný",
-    "startMinimizedHint": "Keď sa Mumcord spustí po prihlásení, čaká v lište namiesto otvorenia okna."
+    "startMinimizedHint": "Keď sa Mumcord spustí po prihlásení, čaká v lište namiesto otvorenia okna.",
+    "look": "Vzhľad a rozloženie"
   },
   "themeEditor": {
     "name": "Názov motívu",
@@ -355,7 +395,7 @@
     "deleteConfirm": "Odstrániť"
   },
   "accessibility": {
-    "hints": "Tipy",
+    "hints": "Prístupnosť",
     "keyboardHints": "Zobrazovať tipy pre klávesnicu",
     "keyboardHintsHint": "Krátke tipy na obrazovke, napríklad „Šípky: presun“, pod zoznamom kanálov a v obľúbených GIFoch. Čítačky obrazovky ich prečítajú aj vtedy, keď je toto vypnuté.",
     "announcements": "Oznámenia pre čítačku obrazovky",
@@ -364,11 +404,13 @@
     "skipLinksHint": "Odkazy na začiatku okna, ktoré po stlačení Tab skočia priamo na chat alebo zoznam kanálov."
   },
   "language": {
+    "title": "Jazyk",
     "legend": "Jazyk zobrazenia",
     "system": "Podľa systému"
   },
   "sounds": {
-    "explanation": "Krátke zvuky pri týchto udalostiach:",
+    "title": "Zvuky",
+    "explanation": "Krátke zvuky, ktoré sa prehrajú pri týchto udalostiach.",
     "joinLeave": "Niekto sa pripojí do tvojho kanála alebo ho opustí",
     "voiceJoin": "Pripojíš sa do kanála na hlasový chat",
     "selfMute": "Stlmíš alebo zapneš svoj mikrofón",
@@ -445,6 +487,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnostika",
     "logLevel": "Podrobnosť záznamov",
     "levels": {
       "error": "Len chyby",
@@ -479,7 +522,8 @@
     "setupWizardHint": "Prejdi znova úvodné nastavenie a skontroluj mikrofón, voľby súkromia, kontrolu aktualizácií a režim rozprávania. Tvoje aktuálne voľby sú predvyplnené.",
     "setupWizardRun": "Spustiť sprievodcu nastavením znova",
     "setupWizardIdentityNote": "Tvoja identita do toho nepatrí. Tvoj certifikát a s ním registrované meno a oprávnenia na serveroch zostávajú presne také, aké sú.",
-    "setupWizardIdentityLink": "Spravuj ju v časti Identita"
+    "setupWizardIdentityLink": "Spravuj ju v časti Identita",
+    "versionTitle": "Verzia a licencia"
   },
   "profile": {
     "title": "Profil",
@@ -515,7 +559,7 @@
     "cleared": "Vyrovnávacia pamäť vymazaná, uvoľnené {{size}}."
   },
   "cache": {
-    "title": "Vyrovnávacia pamäť",
+    "title": "Úložisko",
     "hint": "Mumcord ukladá v tomto počítači dočasné údaje, aby sa všetko načítalo rýchlejšie. Ich vymazanie je bezpečné; v prípade potreby sa vytvoria znova.",
     "kind": {
       "previews": "Náhľady odkazov a obrázky",
@@ -557,7 +601,7 @@
     "betaHint": "Výsledky závisia od hry a podpory jej pluginu."
   },
   "gamePlugins": {
-    "title": "Priestorový zvuk: zdroje",
+    "title": "Doplnky pre hry",
     "explanation": "Hry oznamujú Mumcordu, kde sa nachádzaš, cez Mumble Link alebo cez oficiálne herné pluginy Mumble. Mumcord hľadá pluginy vo vlastnom priečinku pluginov a v existujúcej inštalácii Mumble. Zapni len pluginy pre hry, ktoré hráš.",
     "antiCheat": "Herné pluginy čítajú pamäť hry. Niektoré systémy anti-cheat to môžu označiť; pre hry s prísnym anti-cheatom pluginy vypni.",
     "loading": "Hľadám herné pluginy…",
@@ -615,6 +659,7 @@
     "failed": "Nepodarilo sa. Skús to znova."
   },
   "inspector": {
+    "title": "Nástroje pre vývojárov",
     "intro": "Zobrazuje pakety, ktoré Mumcord odosiela a prijíma, hlavne dáta pluginov Mumcord, na ladenie. Uchováva sa iba posledných 2 000 paketov, v pamäti tohto zariadenia; nič sa nezaznamenáva ani nikam neodosiela.",
     "devTools": "Vývojárske nástroje",
     "devToolsHint": "Vypnutím znova skryjete inšpektor paketov a zastavíte zachytávanie.",
@@ -793,7 +838,14 @@
     "hide": "Úplne ich skryť",
     "hideHint": "V chate sa nezobrazí nič."
   },
+  "externalContent": {
+    "title": "Externý obsah"
+  },
+  "privacyConnections": {
+    "title": "Pripojenia"
+  },
   "updates": {
+    "title": "Aktualizácie",
     "installedFrom": "Mumcord {{version}} · nainštalované z: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -807,7 +859,6 @@
       "aur": "AUR",
       "otherLinux": "balík pre Linux"
     },
-    "checking": "Kontroluje sa",
     "mode": "Keď sa nájde aktualizácia",
     "modeHint": "Aktualizácie sa pred inštaláciou vždy kontrolujú a overujú.",
     "modeAuto": "Sťahovať automaticky",
@@ -825,7 +876,6 @@
     "intervalHours_many": "Každých {{count}} hodiny",
     "intervalHours_other": "Každých {{count}} hodín",
     "intervalWeek": "Raz týždenne",
-    "status": "Stav",
     "state": {
       "idle": "Zatiaľ nekontrolované",
       "off": "Kontrola aktualizácií je vypnutá",
@@ -852,6 +902,101 @@
     "whatsNew": "Čo je nové",
     "whatsNewHint": "Pozri si zmeny v každej verzii.",
     "openChangelog": "Otvoriť zoznam zmien"
+  },
+  "badges": {
+    "changed": "Zmenené",
+    "recommended": "Odporúčané",
+    "groupChanged": "Obsahuje zmenené nastavenia"
+  },
+  "resetSection": {
+    "button": "Obnoviť sekciu",
+    "title": "Obnoviť {{section}}?",
+    "intro": "Tieto nastavenia sa vrátia na tvoju predvoľbu alebo na predvolenú hodnotu:",
+    "nothing": "Všetky nastavenia v sekcii {{section}} už majú svoju predvoľbu alebo predvolenú hodnotu.",
+    "confirm": "Obnoviť"
+  },
+  "activePreset": {
+    "heading": "Aktívna predvoľba",
+    "none": "Žiadna predvoľba",
+    "customised": "{{preset}}, upravená",
+    "changed_one": "{{count}} nastavenie zmenené od inštalácie",
+    "changed_few": "{{count}} nastavenia zmenené od inštalácie",
+    "changed_many": "{{count}} nastavenia zmeneného od inštalácie",
+    "changed_other": "{{count}} nastavení zmenených od inštalácie",
+    "unchanged": "Žiadne zmeny od inštalácie",
+    "switch": "Prepnúť",
+    "switchLabel": "Prepnúť predvoľbu",
+    "applyFailed": "Prekrytie v hre alebo režim Nerušiť sa nepodarilo zmeniť. Skús to znova."
+  },
+  "presets": {
+    "dialogTitle": "Prepnúť predvoľbu",
+    "dialogIntro": "Vyber východiskový bod. Zmenia sa iba nastavenia, ktoré predvoľba pokrýva; všetko ostatné zostane tak, ako je.",
+    "legend": "Predvoľby",
+    "continue": "Pokračovať",
+    "confirmTitle": "Prepnúť na {{preset}}?",
+    "confirmIntro": "Tieto nastavenia sa zmenia:",
+    "confirmNothing": "Žiadne nastavenie sa nezmení. Mumcord si zapamätá {{preset}} ako tvoju predvoľbu.",
+    "confirmCustom": "Žiadne nastavenie sa nezmení. Nastavenia prestanú porovnávať tvoje voľby s predvoľbou a budú ich porovnávať s predvolenými hodnotami.",
+    "apply": "Prepnúť predvoľbu",
+    "everythingOn": {
+      "name": "Všetko zapnuté",
+      "tagline": "Plná sada funkcií",
+      "point1": "Ostatní vidia, čo hráš a čo počúvaš",
+      "point2": "Tvoja IP adresa je viditeľná pre ľudí, s ktorými sa pripájaš priamo",
+      "point3": "Ktokoľvek ti môže písať; odkazy a obrázky sa načítavajú z webu",
+      "point4": "Prekrytie, synchronizácia histórie a obrázky v plnej veľkosti sú zapnuté"
+    },
+    "balanced": {
+      "name": "Vyvážené",
+      "tagline": "Medzi súkromím a pohodlím",
+      "point1": "Písať ti môžu len priatelia a ľudia z tvojho kanála",
+      "point2": "Priame pripojenie, s relay ako záložným riešením",
+      "point3": "Náhľady odkazov a obrázky v plnej veľkosti sú zapnuté",
+      "point4": "To, čo hráš a čo počúvaš, zostáva súkromné"
+    },
+    "maximumPrivacy": {
+      "name": "Maximálne súkromie",
+      "tagline": "Zdieľaj čo najmenej",
+      "point1": "Písať ti môžu len priatelia, bez výnimiek",
+      "point2": "Tvoja IP adresa je skrytá; všetko ide cez relay",
+      "point3": "Žiadny externý obsah, žiadna synchronizácia histórie, žiadne zdieľanie",
+      "point4": "Nezdieľa sa nič o tom, čo robíš"
+    },
+    "custom": {
+      "name": "Vlastné",
+      "tagline": "Tvoje vlastné voľby",
+      "point1": "Ponechá každé nastavenie tak, ako je",
+      "point2": "Zmeny sa porovnávajú s predvolenými hodnotami",
+      "point3": "Najlepšie, ak vieš, čo chceš"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta funkcie",
+    "hint": "Skoré funkcie, ktoré sa môžu zmeniť. Každá je zobrazená aj na svojom mieste so značkou Beta.",
+    "gamePlugins": "Doplnky pre hry",
+    "manage": "Spravovať doplnky"
+  },
+  "privacySummary": {
+    "title": "Prehľad súkromia",
+    "ipHidden": "Tvoja IP adresa zostáva skrytá",
+    "ipVisible": "Priame pripojenia môžu zobraziť tvoju IP adresu",
+    "matches": "Zodpovedá predvoľbe {{preset}}",
+    "messages": "Súkromné správy od: {{rule}}",
+    "p2pHidden": "Peer-to-peer ide cez relay, takže druhá osoba nevidí tvoju IP adresu.",
+    "p2pDirect": "Peer-to-peer sa najprv pripája priamo; druhá osoba môže vidieť tvoju IP adresu.",
+    "p2pDirectOnly": "Peer-to-peer sa pripája iba priamo; druhá osoba môže vidieť tvoju IP adresu.",
+    "externalOn": "Náhľady odkazov sú zapnuté: Mumcord na ich vytvorenie sťahuje odkazované stránky.",
+    "externalOff": "Náhľady odkazov sú vypnuté: Mumcord nenačítava nič z odkazovaných stránok.",
+    "imagesOn": "Obrázky v plnej veľkosti sa vymieňajú priamo medzi používateľmi Mumcordu.",
+    "imagesOff": "Obrázky v plnej veľkosti sa nevymieňajú.",
+    "historyOn": "Synchronizácia histórie je zapnutá: históriu kanála zdieľaš s ostatnými používateľmi Mumcordu.",
+    "historyOff": "Synchronizácia histórie je vypnutá.",
+    "sharingBoth": "Ostatní vidia, čo hráš a čo počúvaš.",
+    "sharingPlaying": "Ostatní vidia, čo počúvaš.",
+    "sharingGaming": "Ostatní vidia hru, ktorú hráš.",
+    "sharingNone": "To, čo hráš a čo počúvaš, zostáva súkromné.",
+    "change": "Zmeniť",
+    "changeLabel": "Zmeniť: {{topic}}"
   },
   "hotkeys": {
     "global": "Globálne skratky",

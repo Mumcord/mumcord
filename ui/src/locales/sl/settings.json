@@ -1,16 +1,49 @@
 {
-  "sectionList": "Razdelki nastavitev",
+  "sectionList": "Skupine nastavitev",
   "loading": "Nalaganje nastavitev …",
   "loadFailed": "Tvojih nastavitev ni bilo mogoče naložiti. Zapri nastavitve in poskusi znova.",
   "saveFailed": "Zadnje spremembe ni bilo mogoče shraniti. Poskusi znova.",
   "sections": {
+    "general": "Splošno",
+    "account": "Račun in identiteta",
+    "voiceAudio": "Glas in zvok",
+    "chatNotifications": "Klepet in obvestila",
+    "privacy": "Zasebnost in povezave",
     "appearance": "Videz",
-    "about": "O aplikaciji",
     "servers": "Strežniki",
-    "privacy": "Zasebnost",
-    "updates": "Posodobitve",
+    "gaming": "Igre in prekrivanje",
+    "advanced": "Napredno in za razvijalce",
+    "about": "O aplikaciji",
     "packetInspector": "Pregledovalnik paketov",
     "hotkeys": "Bližnjice"
+  },
+  "sectionDescriptions": {
+    "general": "Zagon, jezik, posodobitve in dostopnost.",
+    "account": "Tvoje identitete, profil in to, kar deliš.",
+    "voiceAudio": "Mikrofon, zvočniki, kako govoriš in kako zvenijo.",
+    "chatNotifications": "Obvestila, zasebna sporočila, blokirani ljudje in zgodovina sporočil.",
+    "privacy": "Kako se povezuješ z drugimi in kaj Mumcord nalaga od zunaj.",
+    "appearance": "Tema, postavitev in seznam kanalov.",
+    "servers": "Povezave z več strežniki in nastavitve za posamezen strežnik.",
+    "gaming": "Prekrivanje v igri, pozicijski zvok in vtičniki za igre.",
+    "advanced": "Razvijalska orodja, diagnostika, shramba in licence.",
+    "about": "Različica, podpora in čarovnik za nastavitev."
+  },
+  "breadcrumb": "Nastavitve / {{section}}",
+  "moreInfo": "Več informacij: {{topic}}",
+  "searchTerms": {
+    "devices": "vhod izhod slušalke zvočnik zvočna kartica",
+    "talkMode": "PTT VAD glasovna aktivnost bližnjica",
+    "noiseSuppression": "hrup v ozadju odstranjevanje hrupa",
+    "p2p": "P2P posrednik neposredne povezave skrij moj naslov IP",
+    "theme": "temni način svetli način barve",
+    "startup": "samodejni zagon prijava sistemska vrstica",
+    "language": "prevod jezik regija",
+    "updates": "nova različica nadgradnja",
+    "storage": "prostor na disku počisti predpomnilnik",
+    "blocked": "prezri blokiraj utišaj ljudi",
+    "notifications": "opozorila pojavna okna",
+    "externalContent": "vdelana vsebina slike predogledi"
   },
   "search": {
     "label": "Išči nastavitve",
@@ -19,7 +52,12 @@
     "count_one": "Najdena {{count}} nastavitev",
     "count_two": "Najdeni {{count}} nastavitvi",
     "count_few": "Najdene {{count}} nastavitve",
-    "count_other": "Najdenih {{count}} nastavitev"
+    "count_other": "Najdenih {{count}} nastavitev",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} rezultat",
+    "groupCount_two": "{{count}} rezultata",
+    "groupCount_few": "{{count}} rezultati",
+    "groupCount_other": "{{count}} rezultatov"
   },
   "errors": {
     "secureStorage": "Varna shramba tvojega sistema ni na voljo ali pa je bil dostop zavrnjen.",
@@ -147,7 +185,7 @@
     "keyMissing": "Nastavi tipko, sicer te nihče ne bo slišal.",
     "keyRejected": "Te tipke ni mogoče uporabiti. Poskusi drugo tipko, po želji s Ctrl, Alt ali Shift.",
     "keyNotConfirmed": "Namizje ni potrdilo bližnjice. Poskusi znova in sprejmi sistemsko pogovorno okno ali tipko dodeli v nastavitvah bližnjic namizja.",
-    "processing": "Obdelava glasu",
+    "processing": "Obdelava in kakovost",
     "noiseSuppression": "Dušenje šuma",
     "noiseSuppressionHint": "Odstrani hrup iz ozadja, kot so tipkovnice in ventilatorji.",
     "noiseChoice": {
@@ -253,8 +291,9 @@
     }
   },
   "history": {
+    "title": "Zgodovina sporočil",
     "explanation": "Sporočila klepeta se shranjujejo samo na tem računalniku.",
-    "perServer": "Strežniki",
+    "perServer": "Izjeme za posamezen strežnik",
     "noServers": "Še ni shranjenih strežnikov.",
     "save": "Shranjuj zgodovino za {{server}}",
     "clearServer": "Počisti zgodovino za {{server}} …",
@@ -290,14 +329,15 @@
     "system": "Sledi sistemu",
     "dark": "Temna",
     "light": "Svetla",
-    "behaviour": "Vedenje",
+    "behaviour": "Zagon in okno",
     "closeLegend": "Ko zapreš okno med povezavo",
     "closeAsk": "Vprašaj vsakič",
     "closeTray": "Pomanjšaj v sistemsko vrstico",
     "closeQuit": "Zapri Mumcord",
     "autostart": "Zaženi Mumcord ob prijavi",
     "startMinimized": "Zaženi pomanjšano",
-    "startMinimizedHint": "Ko se Mumcord zažene ob prijavi, počaka v sistemski vrstici, namesto da odpre okno."
+    "startMinimizedHint": "Ko se Mumcord zažene ob prijavi, počaka v sistemski vrstici, namesto da odpre okno.",
+    "look": "Videz in postavitev"
   },
   "themeEditor": {
     "name": "Ime teme",
@@ -355,7 +395,7 @@
     "deleteConfirm": "Izbriši"
   },
   "accessibility": {
-    "hints": "Namigi",
+    "hints": "Dostopnost",
     "keyboardHints": "Pokaži namige za tipkovnico",
     "keyboardHintsHint": "Kratki namigi na zaslonu, kot je »Puščice: premikanje«, pod seznamom kanalov in v priljubljenih GIF-ih. Bralniki zaslona jih preberejo tudi, ko je to izklopljeno.",
     "announcements": "Obvestila bralnika zaslona",
@@ -364,11 +404,13 @@
     "skipLinksHint": "Povezave na začetku okna, ki ob pritisku tipke Tab skočijo naravnost na klepet ali seznam kanalov."
   },
   "language": {
+    "title": "Jezik",
     "legend": "Jezik prikaza",
     "system": "Sledi sistemu"
   },
   "sounds": {
-    "explanation": "Kratki zvoki za te dogodke:",
+    "title": "Zvoki",
+    "explanation": "Kratki zvoki, ki se predvajajo ob teh dogodkih.",
     "joinLeave": "Nekdo se pridruži tvojemu kanalu ali ga zapusti",
     "voiceJoin": "Pridružiš se kanalu za glas",
     "selfMute": "Utišaš ali vklopiš svoj mikrofon",
@@ -445,6 +487,7 @@
     }
   },
   "diagnostics": {
+    "title": "Diagnostika",
     "logLevel": "Podrobnost dnevnika",
     "levels": {
       "error": "Samo napake",
@@ -479,7 +522,8 @@
     "setupWizardHint": "Znova pojdi skozi prvo nastavitev in preglej mikrofon, izbire zasebnosti, preverjanje posodobitev in način govora. Tvoje trenutne izbire so že izpolnjene.",
     "setupWizardRun": "Znova zaženi čarovnika za nastavitev",
     "setupWizardIdentityNote": "Tvoja identiteta ni del tega. Tvoje potrdilo in z njim registrirano ime ter dovoljenja na strežnikih ostanejo natanko takšni, kot so.",
-    "setupWizardIdentityLink": "Upravljaj jo v Identiteti"
+    "setupWizardIdentityLink": "Upravljaj jo v Identiteti",
+    "versionTitle": "Različica in licenca"
   },
   "profile": {
     "title": "Profil",
@@ -515,7 +559,7 @@
     "cleared": "Predpomnilnik počiščen, sproščeno {{size}}."
   },
   "cache": {
-    "title": "Predpomnilnik",
+    "title": "Shramba",
     "hint": "Mumcord na tem računalniku hrani začasne podatke, da se vse hitreje naloži. Brisanje je varno; po potrebi se znova ustvarijo.",
     "kind": {
       "previews": "Predogledi povezav in slike",
@@ -557,7 +601,7 @@
     "betaHint": "Rezultati so odvisni od igre in podpore za njen vtičnik."
   },
   "gamePlugins": {
-    "title": "Prostorski zvok: viri",
+    "title": "Vtičniki za igre",
     "explanation": "Igre Mumcordu sporočajo, kje si, prek Mumble Link ali prek uradnih vtičnikov iger za Mumble. Mumcord najde vtičnike v svoji mapi z vtičniki in v obstoječi namestitvi Mumble. Vklopi samo vtičnike za igre, ki jih igraš.",
     "antiCheat": "Vtičniki iger berejo pomnilnik igre. Nekateri protigoljufijski sistemi to lahko označijo; za igre s strogo protigoljufijsko zaščito vtičnike izklopi.",
     "loading": "Iskanje vtičnikov iger …",
@@ -615,6 +659,7 @@
     "failed": "Ni uspelo. Poskusi znova."
   },
   "inspector": {
+    "title": "Razvijalska orodja",
     "intro": "Prikazuje pakete, ki jih Mumcord pošilja in prejema, predvsem podatke vtičnikov Mumcord, za odpravljanje napak. Hrani se le zadnjih 2000 paketov, v pomnilniku te naprave; nič se ne beleži ali pošilja drugam.",
     "devTools": "Razvijalska orodja",
     "devToolsHint": "Izklopite, da znova skrijete pregledovalnik paketov in ustavite zajemanje.",
@@ -793,7 +838,14 @@
     "hide": "Povsem jih skrij",
     "hideHint": "V klepetu se ne prikaže nič."
   },
+  "externalContent": {
+    "title": "Zunanja vsebina"
+  },
+  "privacyConnections": {
+    "title": "Povezave"
+  },
   "updates": {
+    "title": "Posodobitve",
     "installedFrom": "Mumcord {{version}} · nameščeno iz: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -807,7 +859,6 @@
       "aur": "AUR",
       "otherLinux": "paket za Linux"
     },
-    "checking": "Preverjanje",
     "mode": "Ko je najdena posodobitev",
     "modeHint": "Posodobitve se pred namestitvijo vedno preverijo in potrdijo.",
     "modeAuto": "Samodejno prenesi",
@@ -825,7 +876,6 @@
     "intervalHours_few": "Vsake {{count}} ure",
     "intervalHours_other": "Vsakih {{count}} ur",
     "intervalWeek": "Enkrat na teden",
-    "status": "Stanje",
     "state": {
       "idle": "Še ni preverjeno",
       "off": "Preverjanje posodobitev je izključeno",
@@ -852,6 +902,101 @@
     "whatsNew": "Kaj je novega",
     "whatsNewHint": "Oglej si spremembe v vsaki različici.",
     "openChangelog": "Odpri dnevnik sprememb"
+  },
+  "badges": {
+    "changed": "Spremenjeno",
+    "recommended": "Priporočeno",
+    "groupChanged": "Ima spremenjene nastavitve"
+  },
+  "resetSection": {
+    "button": "Ponastavi razdelek",
+    "title": "Ponastavim {{section}}?",
+    "intro": "Te nastavitve se vrnejo na tvojo prednastavitev ali privzeto vrednost:",
+    "nothing": "Vse nastavitve v razdelku {{section}} že imajo svojo prednastavitev ali privzeto vrednost.",
+    "confirm": "Ponastavi"
+  },
+  "activePreset": {
+    "heading": "Aktivna prednastavitev",
+    "none": "Brez prednastavitve",
+    "customised": "{{preset}}, prilagojena",
+    "changed_one": "{{count}} nastavitev spremenjena od namestitve",
+    "changed_two": "{{count}} nastavitvi spremenjeni od namestitve",
+    "changed_few": "{{count}} nastavitve spremenjene od namestitve",
+    "changed_other": "{{count}} nastavitev spremenjenih od namestitve",
+    "unchanged": "Brez sprememb od namestitve",
+    "switch": "Zamenjaj",
+    "switchLabel": "Zamenjaj prednastavitev",
+    "applyFailed": "Prekrivanja v igri ali načina Ne moti ni bilo mogoče spremeniti. Poskusi znova."
+  },
+  "presets": {
+    "dialogTitle": "Zamenjaj prednastavitev",
+    "dialogIntro": "Izberi izhodišče. Spremenijo se le nastavitve, ki jih prednastavitev zajema; vse drugo ostane, kot je.",
+    "legend": "Prednastavitve",
+    "continue": "Naprej",
+    "confirmTitle": "Preklopim na {{preset}}?",
+    "confirmIntro": "Te nastavitve se spremenijo:",
+    "confirmNothing": "Nobena nastavitev se ne spremeni. Mumcord si zapomni {{preset}} kot tvojo prednastavitev.",
+    "confirmCustom": "Nobena nastavitev se ne spremeni. Nastavitve nehajo primerjati tvoje izbire s prednastavitvijo in jih primerjajo s privzetimi vrednostmi.",
+    "apply": "Zamenjaj prednastavitev",
+    "everythingOn": {
+      "name": "Vse vklopljeno",
+      "tagline": "Poln nabor funkcij",
+      "point1": "Drugi vidijo, kaj igraš in kaj poslušaš",
+      "point2": "Tvoj naslov IP je viden ljudem, s katerimi se povezuješ neposredno",
+      "point3": "Vsak ti lahko piše; povezave in slike se naložijo s spleta",
+      "point4": "Prekrivanje, sinhronizacija zgodovine in slike v polni velikosti so vklopljeni"
+    },
+    "balanced": {
+      "name": "Uravnoteženo",
+      "tagline": "Med zasebnostjo in udobjem",
+      "point1": "Pišejo ti lahko le prijatelji in ljudje v tvojem kanalu",
+      "point2": "Neposredna povezava, s posrednikom kot rezervo",
+      "point3": "Predogledi povezav in slike v polni velikosti so vklopljeni",
+      "point4": "To, kaj igraš in kaj poslušaš, ostane zasebno"
+    },
+    "maximumPrivacy": {
+      "name": "Največja zasebnost",
+      "tagline": "Deli čim manj",
+      "point1": "Pišejo ti lahko le prijatelji, brez izjem",
+      "point2": "Tvoj naslov IP je skrit; vse gre prek posrednika",
+      "point3": "Brez zunanje vsebine, brez sinhronizacije zgodovine, brez deljenja",
+      "point4": "Nič se ne deli o tem, kaj počneš"
+    },
+    "custom": {
+      "name": "Po meri",
+      "tagline": "Tvoje lastne izbire",
+      "point1": "Ohrani vsako nastavitev, kot je",
+      "point2": "Spremembe se primerjajo s privzetimi vrednostmi",
+      "point3": "Najboljše, če veš, kaj želiš"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta funkcije",
+    "hint": "Zgodnje funkcije, ki se lahko spremenijo. Vsaka je prikazana tudi na svojem mestu z oznako Beta.",
+    "gamePlugins": "Vtičniki za igre",
+    "manage": "Upravljaj vtičnike"
+  },
+  "privacySummary": {
+    "title": "Povzetek zasebnosti",
+    "ipHidden": "Tvoj naslov IP ostane skrit",
+    "ipVisible": "Neposredne povezave lahko pokažejo tvoj naslov IP",
+    "matches": "Ustreza prednastavitvi {{preset}}",
+    "messages": "Zasebna sporočila od: {{rule}}",
+    "p2pHidden": "Peer-to-peer gre prek posrednika, zato druga oseba ne vidi tvojega naslova IP.",
+    "p2pDirect": "Peer-to-peer se najprej poveže neposredno; druga oseba lahko vidi tvoj naslov IP.",
+    "p2pDirectOnly": "Peer-to-peer se poveže samo neposredno; druga oseba lahko vidi tvoj naslov IP.",
+    "externalOn": "Predogledi povezav so vklopljeni: Mumcord za njihovo izdelavo prenese povezane strani.",
+    "externalOff": "Predogledi povezav so izklopljeni: Mumcord ne naloži ničesar iz povezanih strani.",
+    "imagesOn": "Slike v polni velikosti si neposredno izmenjujejo uporabniki Mumcorda.",
+    "imagesOff": "Slike v polni velikosti se ne izmenjujejo.",
+    "historyOn": "Sinhronizacija zgodovine je vklopljena: zgodovino kanala deliš z drugimi uporabniki Mumcorda.",
+    "historyOff": "Sinhronizacija zgodovine je izklopljena.",
+    "sharingBoth": "Drugi vidijo, kaj igraš in kaj poslušaš.",
+    "sharingPlaying": "Drugi vidijo, kaj poslušaš.",
+    "sharingGaming": "Drugi vidijo igro, ki jo igraš.",
+    "sharingNone": "To, kaj igraš in kaj poslušaš, ostane zasebno.",
+    "change": "Spremeni",
+    "changeLabel": "Spremeni: {{topic}}"
   },
   "hotkeys": {
     "global": "Globalne bližnjice",
