@@ -287,11 +287,11 @@
   min-height: 0;
 }
 
-/* Focus mode (issue #163): only the picture. The other columns and the chat are hidden, and Esc
-   or Z brings them back. */
+/* Focus mode (issue #163): only the picture. The other columns are hidden, and Esc or Z brings
+   them back. The picture lives in the chat column, so that column stays; the chat view drops its
+   messages and composer itself (`mediaOnly`). */
 .shell[data-focus] .shell__channel-column,
 .shell[data-focus] .shell__members,
-.shell[data-focus] .shell__chat-body,
 .shell[data-focus] > .resize-handle,
 .shell[data-page-open] > :not(.shell__servers, .shell__page) {
   display: none;
