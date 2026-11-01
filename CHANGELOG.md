@@ -43,6 +43,7 @@
 
 ### Fixed
 
+- Plugins: old compiled copies of plugins no longer pile up on disk; Mumcord removes the ones that are no longer needed each time it starts
 - Closing a full profile card with Escape right after using a button in it (for example a plugin button that then greys out) no longer stops that profile card from opening again.
 - Plugins that keep data per identity (such as Echolings) no longer fail to start with "invalid" when no server is open yet, for example right after installing them or after restarting Mumcord; they use your default identity until you open a server
 - Keyboard: when a dialog changes its content (for example a plugin dialog switching from its setup form to its player), the focus now stays in the dialog, so Escape and Tab keep working.

@@ -312,6 +312,8 @@ pub struct PluginService {
     io: Arc<plugin_io::ServiceIo>,
     store: Arc<Mutex<Store>>,
     plugins_dir: PathBuf,
+    /// Compiled-plugin cache, pruned once per start (FR-6.7).
+    cache_dir: Option<PathBuf>,
     integrity: Integrity,
     /// The version the per-app-version re-hash runs for (B14; debug builds can fake it).
     integrity_version: String,
@@ -369,7 +371,7 @@ impl PluginService {
         let (host_tx, host_rx) = unbounded_channel();
         let host = PluginHost::new(
             config.app_version.clone(),
-            config.cache_dir,
+            config.cache_dir.clone(),
             Arc::clone(&ctx),
             host_tx,
         )?;
@@ -380,6 +382,7 @@ impl PluginService {
             store,
             integrity: Integrity::load(&config.plugins_dir)?,
             plugins_dir: config.plugins_dir,
+            cache_dir: config.cache_dir,
             integrity_version: crate::verify::app_version(&config.app_version.to_string()),
             no_plugins: config.no_plugins,
             language: "en".into(),

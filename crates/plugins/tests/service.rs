@@ -251,6 +251,55 @@ fn installs_starts_and_reports_progress() {
 }
 
 #[test]
+fn starting_the_service_removes_stale_compiled_modules() {
+    let fx = Fixture::new();
+    let cache_dir = fx.root.path().join("cache");
+    let version = Version::new(0, 7, 0);
+    let config = || ServiceConfig {
+        plugins_dir: fx.plugins_dir(),
+        cache_dir: Some(cache_dir.clone()),
+        app_version: version.clone(),
+        no_plugins: false,
+    };
+    let (mut service, _host_events, _events) =
+        PluginService::new(config(), Arc::clone(&fx.store), None).expect("service builds");
+    service.start().expect("service starts");
+    let poll = signed("poll", OK_START, PERMISSIONS, &[]);
+    service
+        .install(&poll.request, &poll.download)
+        .expect("installs");
+    let wasm = std::fs::read(fx.plugins_dir().join("poll/1.0.0/plugin.wasm")).expect("wasm");
+    let current =
+        mumcord_plugins::cache::path(&cache_dir, &mumcord_plugins::cache::key(&wasm, &version));
+    let stale = mumcord_plugins::cache::path(&cache_dir, "stale");
+    let old_app = mumcord_plugins::cache::path(
+        &cache_dir,
+        &mumcord_plugins::cache::key(&wasm, &Version::new(0, 6, 0)),
+    );
+    assert!(current.is_file(), "the install compiled into the cache");
+    std::fs::write(&stale, b"x").expect("stale file");
+    std::fs::write(&old_app, b"x").expect("old app version");
+    drop(service);
+
+    let (mut restarted, _host_events, _events) =
+        PluginService::new(config(), Arc::clone(&fx.store), None).expect("service builds");
+    restarted.start().expect("service starts");
+    // The cleanup runs on its own thread.
+    for _ in 0..200 {
+        if !stale.exists() && !old_app.exists() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+    assert!(!stale.exists(), "an unknown entry is removed");
+    assert!(
+        !old_app.exists(),
+        "an entry of another app version is removed"
+    );
+    assert!(current.is_file(), "the installed plugin keeps its entry");
+}
+
+#[test]
 fn a_tampered_download_or_failing_start_leaves_nothing_behind() {
     let fx = Fixture::new();
     let (mut service, mut events) = fx.service();

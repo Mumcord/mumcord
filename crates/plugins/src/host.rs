@@ -150,6 +150,10 @@ impl PluginHost {
 
     /// Replaces the restart back-off (5 s, 30 s, 5 min); for tests. Applies from the next
     /// `enable`.
+    pub fn app_version(&self) -> &Version {
+        &self.app_version
+    }
+
     pub fn set_backoff(&mut self, steps: [Duration; 3]) {
         self.backoff = steps;
     }

@@ -46,8 +46,38 @@ impl PluginService {
             self.load_record(record);
         }
         self.clean_folders(&records);
+        self.prune_compiled_cache(&records);
         self.changed();
         Ok(())
+    }
+
+    /// Drops compiled modules of other app versions and of plugin versions that are no longer
+    /// installed (FR-6.7). Runs on its own thread because it hashes every installed component;
+    /// a failure only costs disk space, so it is logged and never fails the start.
+    fn prune_compiled_cache(&self, records: &[PluginRecord]) {
+        let Some(cache_dir) = self.cache_dir.clone() else {
+            return;
+        };
+        let dirs: Vec<PathBuf> = records
+            .iter()
+            .filter_map(|record| self.files_dir_of(record))
+            .collect();
+        let app_version = self.host.app_version().clone();
+        let spawned = std::thread::Builder::new()
+            .name("plugin-cache-prune".into())
+            .spawn(move || {
+                let keep: Vec<String> = dirs
+                    .iter()
+                    .filter_map(|dir| std::fs::read(dir.join(crate::package::WASM_FILE)).ok())
+                    .map(|wasm| crate::cache::key(&wasm, &app_version))
+                    .collect();
+                if let Err(error) = crate::cache::prune(&cache_dir, &keep) {
+                    tracing::warn!(%error, "could not prune the compiled plugin cache");
+                }
+            });
+        if let Err(error) = spawned {
+            tracing::warn!(%error, "could not start the compiled plugin cache cleanup");
+        }
     }
 
     /// Turns a plugin on or off (spec §7.2: "user enables" / "user disables"). Turning on also
