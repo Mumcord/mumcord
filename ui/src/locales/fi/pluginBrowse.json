@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Hae lisäosia",
+  "searchPlaceholder": "Hae lisäosia",
+  "categoriesLabel": "Luokat",
+  "category": {
+    "all": "Kaikki",
+    "fun": "Hauskat",
+    "games": "Pelit",
+    "chat": "Chat",
+    "voice": "Ääni",
+    "accessibility": "Saavutettavuus",
+    "looks": "Ulkoasu",
+    "tools": "Työkalut"
+  },
+  "listLabel": "Saatavilla olevat lisäosat",
+  "loading": "Ladataan lisäosaluetteloa…",
+  "retry": "Yritä uudelleen",
+  "empty": "Lisäosia ei ole vielä saatavilla.",
+  "noMatch": "Mikään lisäosa ei vastaa hakua.",
+  "highlight": "Suositellut",
+  "official": "Virallinen",
+  "unofficial": "Epävirallinen · {{repository}}",
+  "reviewed": "Mumcordin tarkastama",
+  "installed": "Asennettu",
+  "install": "Asenna",
+  "installNamed": "Asenna {{name}}",
+  "details": "Tiedot",
+  "detailsNamed": "Lisäosan {{name}} tiedot",
+  "back": "Takaisin kaikkiin lisäosiin",
+  "version": "Versio {{version}}",
+  "by": "tekijä: {{authors}}",
+  "size": "{{size}} kt",
+  "screenshots": "Kuvakaappaukset",
+  "mayAskFor": "Tämä lisäosa voi pyytää",
+  "prompt": {
+    "title": "Asennetaanko {{name}}?",
+    "subtitle": "{{name}} {{version}} · tekijä: {{authors}}",
+    "preparing": "Tarkistetaan {{name}}…",
+    "visibility": "Ketkä näkevät, että käytät sitä",
+    "visibilityEveryone": "Kaikki",
+    "visibilityFriends": "Kaverit",
+    "visibilityNobody": "Ei kukaan",
+    "warningTitle": "Tämä lisäosa ei ole Mumcordilta",
+    "warningText": "Mumcord ei tarkasta lähteen {{repository}} lisäosia. Asenna ne vain, jos luotat tähän lähteeseen.",
+    "understand": "Ymmärrän",
+    "cancel": "Peruuta",
+    "close": "Sulje",
+    "install": "Asenna",
+    "stage": {
+      "downloading": "Ladataan…",
+      "verifying": "Tarkistetaan…",
+      "unpacking": "Puretaan…",
+      "starting": "Käynnistetään…",
+      "done": "Asennettu",
+      "failed": "Asennus epäonnistui"
+    },
+    "failed": "Lisäosaa {{name}} ei voitu asentaa."
+  },
+  "toast": {
+    "installed": "{{name}} asennettu",
+    "dismiss": "Ohita"
+  },
+  "errors": {
+    "unreachable": "Lisäosaluetteloa ei voi ladata. Tarkista yhteytesi.",
+    "offline": "Näytetään viimeksi tunnettu lisäosaluettelo (offline)",
+    "mismatch": "Lataus ei vastannut virallista luetteloa",
+    "signature": "Allekirjoituksen tarkistus epäonnistui",
+    "permissions": "Tämä lisäosa pyytää oikeuksia, joita ei ole mainittu lähteessä"
+  }
+}

@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { getApi } from "../../api";
 import { usePreferences } from "../../app/preferences";
 import { PluginDialogHost } from "./dialog";
+import { usePluginDeepLinks } from "./browse/deepLink";
 import { PluginsPalette } from "./PluginsPalette";
+import { PluginToasts } from "./prompt/PluginToasts";
 import { usePluginRequestRouter } from "./pluginRequestStore";
 import { usePluginMentions } from "./chat";
 
@@ -21,6 +23,7 @@ export function PluginsHost() {
   const dark = resolvedTheme === "dark";
   usePluginRequestRouter();
   usePluginMentions();
+  usePluginDeepLinks();
 
   useEffect(() => {
     const send = () => {
@@ -43,6 +46,7 @@ export function PluginsHost() {
     <>
       <PluginsPalette />
       <PluginDialogHost />
+      <PluginToasts />
     </>
   );
 }

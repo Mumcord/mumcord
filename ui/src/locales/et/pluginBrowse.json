@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Otsi pluginaid",
+  "searchPlaceholder": "Otsi pluginaid",
+  "categoriesLabel": "Kategooriad",
+  "category": {
+    "all": "Kõik",
+    "fun": "Lõbu",
+    "games": "Mängud",
+    "chat": "Vestlus",
+    "voice": "Hääl",
+    "accessibility": "Juurdepääsetavus",
+    "looks": "Välimus",
+    "tools": "Tööriistad"
+  },
+  "listLabel": "Saadaolevad pluginad",
+  "loading": "Pluginate loendi laadimine…",
+  "retry": "Proovi uuesti",
+  "empty": "Pluginaid pole veel saadaval.",
+  "noMatch": "Ükski plugin ei vasta otsingule.",
+  "highlight": "Esiletõstetud",
+  "official": "Ametlik",
+  "unofficial": "Mitteametlik · {{repository}}",
+  "reviewed": "Mumcordi poolt üle vaadatud",
+  "installed": "Paigaldatud",
+  "install": "Paigalda",
+  "installNamed": "Paigalda {{name}}",
+  "details": "Üksikasjad",
+  "detailsNamed": "{{name}} üksikasjad",
+  "back": "Tagasi kõigi pluginate juurde",
+  "version": "Versioon {{version}}",
+  "by": "autor: {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Ekraanipildid",
+  "mayAskFor": "See plugin võib küsida",
+  "prompt": {
+    "title": "Kas paigaldada {{name}}?",
+    "subtitle": "{{name}} {{version}} · autor: {{authors}}",
+    "preparing": "{{name}} kontrollimine…",
+    "visibility": "Kes näeb, et sa seda kasutad",
+    "visibilityEveryone": "Kõik",
+    "visibilityFriends": "Sõbrad",
+    "visibilityNobody": "Mitte keegi",
+    "warningTitle": "See plugin ei ole Mumcordilt",
+    "warningText": "Mumcord ei vaata repositooriumi {{repository}} pluginaid üle. Paigalda need ainult siis, kui usaldad seda repositooriumi.",
+    "understand": "Saan aru",
+    "cancel": "Tühista",
+    "close": "Sulge",
+    "install": "Paigalda",
+    "stage": {
+      "downloading": "Allalaadimine…",
+      "verifying": "Kontrollimine…",
+      "unpacking": "Lahtipakkimine…",
+      "starting": "Käivitamine…",
+      "done": "Paigaldatud",
+      "failed": "Paigaldamine ebaõnnestus"
+    },
+    "failed": "Pluginat {{name}} ei õnnestunud paigaldada."
+  },
+  "toast": {
+    "installed": "{{name}} paigaldatud",
+    "dismiss": "Loobu"
+  },
+  "errors": {
+    "unreachable": "Pluginate loendit ei saa laadida. Kontrolli ühendust.",
+    "offline": "Kuvatakse viimati teadaolevat pluginate loendit (võrguühenduseta)",
+    "mismatch": "Allalaadimine ei vastanud ametlikule loendile",
+    "signature": "Allkirja kontroll ebaõnnestus",
+    "permissions": "See plugin küsib õigusi, mida repositooriumis ei ole loetletud"
+  }
+}

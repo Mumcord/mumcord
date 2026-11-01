@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Pretraži dodatke",
+  "searchPlaceholder": "Pretraži dodatke",
+  "categoriesLabel": "Kategorije",
+  "category": {
+    "all": "Sve",
+    "fun": "Zabava",
+    "games": "Igre",
+    "chat": "Chat",
+    "voice": "Glas",
+    "accessibility": "Pristupačnost",
+    "looks": "Izgled",
+    "tools": "Alati"
+  },
+  "listLabel": "Dostupni dodaci",
+  "loading": "Učitavanje popisa dodataka…",
+  "retry": "Pokušaj ponovno",
+  "empty": "Još nema dostupnih dodataka.",
+  "noMatch": "Nijedan dodatak ne odgovara pretraživanju.",
+  "highlight": "Istaknuto",
+  "official": "Službeni",
+  "unofficial": "Neslužbeni · {{repository}}",
+  "reviewed": "Pregledao Mumcord",
+  "installed": "Instalirano",
+  "install": "Instaliraj",
+  "installNamed": "Instaliraj {{name}}",
+  "details": "Detalji",
+  "detailsNamed": "Detalji dodatka {{name}}",
+  "back": "Natrag na sve dodatke",
+  "version": "Verzija {{version}}",
+  "by": "autor: {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Snimke zaslona",
+  "mayAskFor": "Ovaj dodatak može zatražiti",
+  "prompt": {
+    "title": "Instalirati {{name}}?",
+    "subtitle": "{{name}} {{version}} · autor: {{authors}}",
+    "preparing": "Provjera dodatka {{name}}…",
+    "visibility": "Tko može vidjeti da ga koristiš",
+    "visibilityEveryone": "Svi",
+    "visibilityFriends": "Prijatelji",
+    "visibilityNobody": "Nitko",
+    "warningTitle": "Ovaj dodatak nije od Mumcorda",
+    "warningText": "Mumcord ne pregledava dodatke iz {{repository}}. Instaliraj ih samo ako vjeruješ ovom repozitoriju.",
+    "understand": "Razumijem",
+    "cancel": "Odustani",
+    "close": "Zatvori",
+    "install": "Instaliraj",
+    "stage": {
+      "downloading": "Preuzimanje…",
+      "verifying": "Provjera…",
+      "unpacking": "Raspakiravanje…",
+      "starting": "Pokretanje…",
+      "done": "Instalirano",
+      "failed": "Instalacija nije uspjela"
+    },
+    "failed": "Dodatak {{name}} nije moguće instalirati."
+  },
+  "toast": {
+    "installed": "{{name}} je instaliran",
+    "dismiss": "Odbaci"
+  },
+  "errors": {
+    "unreachable": "Nije moguće učitati popis dodataka. Provjeri vezu.",
+    "offline": "Prikazuje se posljednji poznati popis dodataka (izvan mreže)",
+    "mismatch": "Preuzeta datoteka ne odgovara službenom popisu",
+    "signature": "Provjera potpisa nije uspjela",
+    "permissions": "Ovaj dodatak traži dopuštenja koja nisu navedena u repozitoriju"
+  }
+}

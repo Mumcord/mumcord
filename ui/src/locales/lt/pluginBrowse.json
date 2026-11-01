@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Ieškoti papildinių",
+  "searchPlaceholder": "Ieškoti papildinių",
+  "categoriesLabel": "Kategorijos",
+  "category": {
+    "all": "Visi",
+    "fun": "Pramogos",
+    "games": "Žaidimai",
+    "chat": "Pokalbiai",
+    "voice": "Balsas",
+    "accessibility": "Prieinamumas",
+    "looks": "Išvaizda",
+    "tools": "Įrankiai"
+  },
+  "listLabel": "Galimi papildiniai",
+  "loading": "Įkeliamas papildinių sąrašas…",
+  "retry": "Bandyti dar kartą",
+  "empty": "Papildinių dar nėra.",
+  "noMatch": "Nė vienas papildinys neatitinka paieškos.",
+  "highlight": "Rekomenduojami",
+  "official": "Oficialus",
+  "unofficial": "Neoficialus · {{repository}}",
+  "reviewed": "Peržiūrėjo „Mumcord“",
+  "installed": "Įdiegtas",
+  "install": "Įdiegti",
+  "installNamed": "Įdiegti {{name}}",
+  "details": "Išsami informacija",
+  "detailsNamed": "Išsami informacija apie {{name}}",
+  "back": "Atgal į visus papildinius",
+  "version": "Versija {{version}}",
+  "by": "autorius: {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Ekrano nuotraukos",
+  "mayAskFor": "Šis papildinys gali prašyti",
+  "prompt": {
+    "title": "Įdiegti {{name}}?",
+    "subtitle": "{{name}} {{version}} · autorius: {{authors}}",
+    "preparing": "Tikrinamas {{name}}…",
+    "visibility": "Kas gali matyti, kad jį naudojate",
+    "visibilityEveryone": "Visi",
+    "visibilityFriends": "Draugai",
+    "visibilityNobody": "Niekas",
+    "warningTitle": "Šis papildinys nėra iš „Mumcord“",
+    "warningText": "„Mumcord“ neperžiūri papildinių iš {{repository}}. Diekite juos tik jei pasitikite šia saugykla.",
+    "understand": "Suprantu",
+    "cancel": "Atšaukti",
+    "close": "Uždaryti",
+    "install": "Įdiegti",
+    "stage": {
+      "downloading": "Atsisiunčiama…",
+      "verifying": "Tikrinama…",
+      "unpacking": "Išpakuojama…",
+      "starting": "Paleidžiama…",
+      "done": "Įdiegtas",
+      "failed": "Įdiegti nepavyko"
+    },
+    "failed": "Nepavyko įdiegti {{name}}."
+  },
+  "toast": {
+    "installed": "{{name}} įdiegtas",
+    "dismiss": "Atmesti"
+  },
+  "errors": {
+    "unreachable": "Nepavyksta įkelti papildinių sąrašo. Patikrinkite ryšį.",
+    "offline": "Rodomas paskutinis žinomas papildinių sąrašas (neprisijungus)",
+    "mismatch": "Atsisiuntimas neatitiko oficialaus sąrašo",
+    "signature": "Parašo patikra nepavyko",
+    "permissions": "Šis papildinys prašo leidimų, kurių nėra saugykloje"
+  }
+}

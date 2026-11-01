@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Cerca plugin",
+  "searchPlaceholder": "Cerca plugin",
+  "categoriesLabel": "Categorie",
+  "category": {
+    "all": "Tutti",
+    "fun": "Divertimento",
+    "games": "Giochi",
+    "chat": "Chat",
+    "voice": "Voce",
+    "accessibility": "Accessibilità",
+    "looks": "Aspetto",
+    "tools": "Strumenti"
+  },
+  "listLabel": "Plugin disponibili",
+  "loading": "Caricamento dell’elenco dei plugin…",
+  "retry": "Riprova",
+  "empty": "Non ci sono ancora plugin disponibili.",
+  "noMatch": "Nessun plugin corrisponde alla ricerca.",
+  "highlight": "In evidenza",
+  "official": "Ufficiale",
+  "unofficial": "Non ufficiale · {{repository}}",
+  "reviewed": "Verificato da Mumcord",
+  "installed": "Installato",
+  "install": "Installa",
+  "installNamed": "Installa {{name}}",
+  "details": "Dettagli",
+  "detailsNamed": "Dettagli di {{name}}",
+  "back": "Torna a tutti i plugin",
+  "version": "Versione {{version}}",
+  "by": "di {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Schermate",
+  "mayAskFor": "Questo plugin può richiedere",
+  "prompt": {
+    "title": "Installare {{name}}?",
+    "subtitle": "{{name}} {{version}} · di {{authors}}",
+    "preparing": "Controllo di {{name}}…",
+    "visibility": "Chi può vedere che lo usi",
+    "visibilityEveryone": "Tutti",
+    "visibilityFriends": "Amici",
+    "visibilityNobody": "Nessuno",
+    "warningTitle": "Questo plugin non proviene da Mumcord",
+    "warningText": "I plugin di {{repository}} non sono verificati da Mumcord. Installali solo se ti fidi di questo repository.",
+    "understand": "Ho capito",
+    "cancel": "Annulla",
+    "close": "Chiudi",
+    "install": "Installa",
+    "stage": {
+      "downloading": "Download in corso…",
+      "verifying": "Controllo in corso…",
+      "unpacking": "Estrazione in corso…",
+      "starting": "Avvio in corso…",
+      "done": "Installato",
+      "failed": "Installazione non riuscita"
+    },
+    "failed": "Impossibile installare {{name}}."
+  },
+  "toast": {
+    "installed": "{{name}} installato",
+    "dismiss": "Ignora"
+  },
+  "errors": {
+    "unreachable": "Impossibile caricare l’elenco dei plugin. Controlla la connessione.",
+    "offline": "Viene mostrato l’ultimo elenco di plugin noto (offline)",
+    "mismatch": "Il download non corrisponde all’elenco ufficiale",
+    "signature": "Verifica della firma non riuscita",
+    "permissions": "Questo plugin richiede autorizzazioni non elencate nel repository"
+  }
+}

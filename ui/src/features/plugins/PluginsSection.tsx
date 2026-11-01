@@ -7,6 +7,7 @@ import { setAllPluginsOff, usePlugins } from "./pluginStore";
 import { RepositoriesTab, type MirrorSetting } from "./repos";
 import { UpdatesTab } from "./updates";
 import "./plugins.css";
+import { BrowseTab } from "./browse/BrowseTab";
 import { DeveloperTab } from "./developer/DeveloperTab";
 import { InstalledTab } from "./installed/InstalledTab";
 
@@ -19,7 +20,7 @@ type PluginTab = (typeof PLUGIN_TABS)[number];
  */
 const TAB_CONTENT: Record<PluginTab, ReactNode> = {
   installed: <InstalledTab />,
-  browse: null,
+  browse: <BrowseTab />,
   updates: null,
   repositories: <RepositoriesTab />,
   developer: <DeveloperTab />,

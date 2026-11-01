@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Hledat doplňky",
+  "searchPlaceholder": "Hledat doplňky",
+  "categoriesLabel": "Kategorie",
+  "category": {
+    "all": "Vše",
+    "fun": "Zábava",
+    "games": "Hry",
+    "chat": "Chat",
+    "voice": "Hlas",
+    "accessibility": "Přístupnost",
+    "looks": "Vzhled",
+    "tools": "Nástroje"
+  },
+  "listLabel": "Dostupné doplňky",
+  "loading": "Načítání seznamu doplňků…",
+  "retry": "Zkusit znovu",
+  "empty": "Zatím nejsou k dispozici žádné doplňky.",
+  "noMatch": "Hledání neodpovídá žádný doplněk.",
+  "highlight": "Doporučené",
+  "official": "Oficiální",
+  "unofficial": "Neoficiální · {{repository}}",
+  "reviewed": "Zkontrolováno Mumcordem",
+  "installed": "Nainstalováno",
+  "install": "Nainstalovat",
+  "installNamed": "Nainstalovat {{name}}",
+  "details": "Podrobnosti",
+  "detailsNamed": "Podrobnosti o doplňku {{name}}",
+  "back": "Zpět na všechny doplňky",
+  "version": "Verze {{version}}",
+  "by": "od {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Snímky obrazovky",
+  "mayAskFor": "Tento doplněk může požádat o",
+  "prompt": {
+    "title": "Nainstalovat {{name}}?",
+    "subtitle": "{{name}} {{version}} · od {{authors}}",
+    "preparing": "Kontrola doplňku {{name}}…",
+    "visibility": "Kdo uvidí, že ho používáte",
+    "visibilityEveryone": "Všichni",
+    "visibilityFriends": "Přátelé",
+    "visibilityNobody": "Nikdo",
+    "warningTitle": "Tento doplněk není od Mumcordu",
+    "warningText": "Doplňky z {{repository}} Mumcord nekontroluje. Instalujte je jen tehdy, pokud tomuto repozitáři důvěřujete.",
+    "understand": "Rozumím",
+    "cancel": "Zrušit",
+    "close": "Zavřít",
+    "install": "Nainstalovat",
+    "stage": {
+      "downloading": "Stahování…",
+      "verifying": "Kontrola…",
+      "unpacking": "Rozbalování…",
+      "starting": "Spouštění…",
+      "done": "Nainstalováno",
+      "failed": "Instalace se nezdařila"
+    },
+    "failed": "Doplněk {{name}} se nepodařilo nainstalovat."
+  },
+  "toast": {
+    "installed": "Doplněk {{name}} byl nainstalován",
+    "dismiss": "Zavřít"
+  },
+  "errors": {
+    "unreachable": "Seznam doplňků se nepodařilo načíst. Zkontrolujte připojení.",
+    "offline": "Zobrazuje se poslední známý seznam doplňků (offline)",
+    "mismatch": "Stažený soubor neodpovídá oficiálnímu seznamu",
+    "signature": "Ověření podpisu selhalo",
+    "permissions": "Tento doplněk žádá o oprávnění, která nejsou uvedena v repozitáři"
+  }
+}

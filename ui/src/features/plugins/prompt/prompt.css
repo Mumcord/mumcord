@@ -1,0 +1,57 @@
+/* Install prompt and plugin toasts. Colours come from theme tokens only. */
+.plugin-prompt {
+  max-width: 36rem;
+}
+
+.plugin-prompt-source,
+.plugin-prompt-subtitle {
+  margin: 0 0 var(--space-2);
+}
+
+.plugin-prompt-visibility {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.plugin-prompt-warning {
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.plugin-prompt-status {
+  margin: var(--space-2) 0;
+}
+
+.plugin-toasts {
+  position: fixed;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.plugin-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+}
+
+.plugin-toast-dismiss {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}

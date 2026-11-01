@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Cuardaigh breiseáin",
+  "searchPlaceholder": "Cuardaigh breiseáin",
+  "categoriesLabel": "Catagóirí",
+  "category": {
+    "all": "Gach",
+    "fun": "Spraoi",
+    "games": "Cluichí",
+    "chat": "Comhrá",
+    "voice": "Guth",
+    "accessibility": "Inrochtaineacht",
+    "looks": "Cuma",
+    "tools": "Uirlisí"
+  },
+  "listLabel": "Breiseáin atá ar fáil",
+  "loading": "Ag lódáil liosta na mbreiseán…",
+  "retry": "Bain triail eile as",
+  "empty": "Níl aon bhreiseán ar fáil go fóill.",
+  "noMatch": "Ní réitíonn aon bhreiseán le do chuardach.",
+  "highlight": "Aibhsithe",
+  "official": "Oifigiúil",
+  "unofficial": "Neamhoifigiúil · {{repository}}",
+  "reviewed": "Athbhreithnithe ag Mumcord",
+  "installed": "Suiteáilte",
+  "install": "Suiteáil",
+  "installNamed": "Suiteáil {{name}}",
+  "details": "Sonraí",
+  "detailsNamed": "Sonraí {{name}}",
+  "back": "Ar ais chuig na breiseáin go léir",
+  "version": "Leagan {{version}}",
+  "by": "le {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Pictiúir scáileáin",
+  "mayAskFor": "Is féidir leis an mbreiseán seo iarraidh",
+  "prompt": {
+    "title": "An suiteáil {{name}}?",
+    "subtitle": "{{name}} {{version}} · le {{authors}}",
+    "preparing": "Ag seiceáil {{name}}…",
+    "visibility": "Cé a fheiceann go n-úsáideann tú é",
+    "visibilityEveryone": "Gach duine",
+    "visibilityFriends": "Cairde",
+    "visibilityNobody": "Duine ar bith",
+    "warningTitle": "Ní ó Mumcord an breiseán seo",
+    "warningText": "Ní athbhreithníonn Mumcord breiseáin ó {{repository}}. Ná suiteáil iad ach amháin má tá muinín agat as an stóras seo.",
+    "understand": "Tuigim",
+    "cancel": "Cealaigh",
+    "close": "Dún",
+    "install": "Suiteáil",
+    "stage": {
+      "downloading": "Ag íoslódáil…",
+      "verifying": "Ag seiceáil…",
+      "unpacking": "Ag díphacáil…",
+      "starting": "Ag tosú…",
+      "done": "Suiteáilte",
+      "failed": "Theip ar an suiteáil"
+    },
+    "failed": "Níorbh fhéidir {{name}} a shuiteáil."
+  },
+  "toast": {
+    "installed": "{{name}} suiteáilte",
+    "dismiss": "Diúltaigh"
+  },
+  "errors": {
+    "unreachable": "Ní féidir liosta na mbreiseán a lódáil. Seiceáil do cheangal.",
+    "offline": "Ag taispeáint an liosta breiseán is déanaí atá ar eolas (as líne)",
+    "mismatch": "Níor mheaitseáil an íoslódáil leis an liosta oifigiúil",
+    "signature": "Theip ar sheiceáil an tsínithe",
+    "permissions": "Iarrann an breiseán seo ceadanna nach bhfuil liostaithe sa stóras"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Iskanje vtičnikov",
+  "searchPlaceholder": "Iskanje vtičnikov",
+  "categoriesLabel": "Kategorije",
+  "category": {
+    "all": "Vsi",
+    "fun": "Zabava",
+    "games": "Igre",
+    "chat": "Klepet",
+    "voice": "Glas",
+    "accessibility": "Dostopnost",
+    "looks": "Videz",
+    "tools": "Orodja"
+  },
+  "listLabel": "Razpoložljivi vtičniki",
+  "loading": "Nalaganje seznama vtičnikov…",
+  "retry": "Poskusi znova",
+  "empty": "Vtičniki še niso na voljo.",
+  "noMatch": "Noben vtičnik ne ustreza iskanju.",
+  "highlight": "Izpostavljeno",
+  "official": "Uradni",
+  "unofficial": "Neuradni · {{repository}}",
+  "reviewed": "Pregledal Mumcord",
+  "installed": "Nameščen",
+  "install": "Namesti",
+  "installNamed": "Namesti {{name}}",
+  "details": "Podrobnosti",
+  "detailsNamed": "Podrobnosti o {{name}}",
+  "back": "Nazaj na vse vtičnike",
+  "version": "Različica {{version}}",
+  "by": "avtor: {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Posnetki zaslona",
+  "mayAskFor": "Ta vtičnik lahko zahteva",
+  "prompt": {
+    "title": "Namestim {{name}}?",
+    "subtitle": "{{name}} {{version}} · avtor: {{authors}}",
+    "preparing": "Preverjanje {{name}}…",
+    "visibility": "Kdo lahko vidi, da ga uporabljate",
+    "visibilityEveryone": "Vsi",
+    "visibilityFriends": "Prijatelji",
+    "visibilityNobody": "Nihče",
+    "warningTitle": "Ta vtičnik ni iz Mumcorda",
+    "warningText": "Mumcord ne pregleduje vtičnikov iz {{repository}}. Namestite jih le, če zaupate temu repozitoriju.",
+    "understand": "Razumem",
+    "cancel": "Prekliči",
+    "close": "Zapri",
+    "install": "Namesti",
+    "stage": {
+      "downloading": "Prenašanje…",
+      "verifying": "Preverjanje…",
+      "unpacking": "Razpakiranje…",
+      "starting": "Zaganjanje…",
+      "done": "Nameščen",
+      "failed": "Namestitev ni uspela"
+    },
+    "failed": "Vtičnika {{name}} ni bilo mogoče namestiti."
+  },
+  "toast": {
+    "installed": "{{name}} je nameščen",
+    "dismiss": "Opusti"
+  },
+  "errors": {
+    "unreachable": "Seznama vtičnikov ni mogoče naložiti. Preverite povezavo.",
+    "offline": "Prikazan je zadnji znani seznam vtičnikov (brez povezave)",
+    "mismatch": "Prenos se ne ujema z uradnim seznamom",
+    "signature": "Preverjanje podpisa ni uspelo",
+    "permissions": "Ta vtičnik zahteva dovoljenja, ki niso navedena v repozitoriju"
+  }
+}

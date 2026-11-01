@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Rechercher des plugins",
+  "searchPlaceholder": "Rechercher des plugins",
+  "categoriesLabel": "Catégories",
+  "category": {
+    "all": "Tous",
+    "fun": "Divertissement",
+    "games": "Jeux",
+    "chat": "Chat",
+    "voice": "Voix",
+    "accessibility": "Accessibilité",
+    "looks": "Apparence",
+    "tools": "Outils"
+  },
+  "listLabel": "Plugins disponibles",
+  "loading": "Chargement de la liste des plugins…",
+  "retry": "Réessayer",
+  "empty": "Aucun plugin n’est encore disponible.",
+  "noMatch": "Aucun plugin ne correspond à votre recherche.",
+  "highlight": "À la une",
+  "official": "Officiel",
+  "unofficial": "Non officiel · {{repository}}",
+  "reviewed": "Vérifié par Mumcord",
+  "installed": "Installé",
+  "install": "Installer",
+  "installNamed": "Installer {{name}}",
+  "details": "Détails",
+  "detailsNamed": "Détails de {{name}}",
+  "back": "Retour à tous les plugins",
+  "version": "Version {{version}}",
+  "by": "par {{authors}}",
+  "size": "{{size}} Ko",
+  "screenshots": "Captures d’écran",
+  "mayAskFor": "Ce plugin peut demander",
+  "prompt": {
+    "title": "Installer {{name}} ?",
+    "subtitle": "{{name}} {{version}} · par {{authors}}",
+    "preparing": "Vérification de {{name}}…",
+    "visibility": "Qui peut voir que vous l’utilisez",
+    "visibilityEveryone": "Tout le monde",
+    "visibilityFriends": "Amis",
+    "visibilityNobody": "Personne",
+    "warningTitle": "Ce plugin ne vient pas de Mumcord",
+    "warningText": "Les plugins de {{repository}} ne sont pas vérifiés par Mumcord. Ne les installez que si vous faites confiance à ce dépôt.",
+    "understand": "J’ai compris",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "install": "Installer",
+    "stage": {
+      "downloading": "Téléchargement…",
+      "verifying": "Vérification…",
+      "unpacking": "Décompression…",
+      "starting": "Démarrage…",
+      "done": "Installé",
+      "failed": "Échec de l’installation"
+    },
+    "failed": "{{name}} n’a pas pu être installé."
+  },
+  "toast": {
+    "installed": "{{name}} installé",
+    "dismiss": "Ignorer"
+  },
+  "errors": {
+    "unreachable": "Impossible de charger la liste des plugins. Vérifiez votre connexion.",
+    "offline": "Dernière liste de plugins connue affichée (hors ligne)",
+    "mismatch": "Le téléchargement ne correspond pas à la liste officielle",
+    "signature": "Échec de la vérification de la signature",
+    "permissions": "Ce plugin demande des autorisations qui ne figurent pas dans le dépôt"
+  }
+}

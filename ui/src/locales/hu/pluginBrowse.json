@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Bővítmények keresése",
+  "searchPlaceholder": "Bővítmények keresése",
+  "categoriesLabel": "Kategóriák",
+  "category": {
+    "all": "Mind",
+    "fun": "Szórakozás",
+    "games": "Játékok",
+    "chat": "Csevegés",
+    "voice": "Hang",
+    "accessibility": "Akadálymentesség",
+    "looks": "Megjelenés",
+    "tools": "Eszközök"
+  },
+  "listLabel": "Elérhető bővítmények",
+  "loading": "A bővítmények listájának betöltése…",
+  "retry": "Próbáld újra",
+  "empty": "Még nincsenek elérhető bővítmények.",
+  "noMatch": "Nincs a keresésnek megfelelő bővítmény.",
+  "highlight": "Kiemelt",
+  "official": "Hivatalos",
+  "unofficial": "Nem hivatalos · {{repository}}",
+  "reviewed": "A Mumcord átvizsgálta",
+  "installed": "Telepítve",
+  "install": "Telepítés",
+  "installNamed": "{{name}} telepítése",
+  "details": "Részletek",
+  "detailsNamed": "{{name}} részletei",
+  "back": "Vissza az összes bővítményhez",
+  "version": "{{version}} verzió",
+  "by": "készítette: {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Képernyőképek",
+  "mayAskFor": "Ez a bővítmény kérheti",
+  "prompt": {
+    "title": "Telepíted a(z) {{name}} bővítményt?",
+    "subtitle": "{{name}} {{version}} · készítette: {{authors}}",
+    "preparing": "{{name}} ellenőrzése…",
+    "visibility": "Ki láthatja, hogy használod",
+    "visibilityEveryone": "Mindenki",
+    "visibilityFriends": "Barátok",
+    "visibilityNobody": "Senki",
+    "warningTitle": "Ez a bővítmény nem a Mumcordtól származik",
+    "warningText": "A(z) {{repository}} bővítményeit a Mumcord nem vizsgálja át. Csak akkor telepítsd őket, ha megbízol ebben a tárolóban.",
+    "understand": "Megértettem",
+    "cancel": "Mégse",
+    "close": "Bezárás",
+    "install": "Telepítés",
+    "stage": {
+      "downloading": "Letöltés…",
+      "verifying": "Ellenőrzés…",
+      "unpacking": "Kicsomagolás…",
+      "starting": "Indítás…",
+      "done": "Telepítve",
+      "failed": "A telepítés sikertelen"
+    },
+    "failed": "A(z) {{name}} bővítményt nem sikerült telepíteni."
+  },
+  "toast": {
+    "installed": "{{name}} telepítve",
+    "dismiss": "Elvetés"
+  },
+  "errors": {
+    "unreachable": "A bővítmények listája nem tölthető be. Ellenőrizd a kapcsolatot.",
+    "offline": "Az utolsó ismert bővítménylista látható (offline)",
+    "mismatch": "A letöltés nem egyezik a hivatalos listával",
+    "signature": "Az aláírás ellenőrzése sikertelen",
+    "permissions": "Ez a bővítmény olyan engedélyeket kér, amelyek nincsenek a tárolóban felsorolva"
+  }
+}

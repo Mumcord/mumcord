@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Hľadať doplnky",
+  "searchPlaceholder": "Hľadať doplnky",
+  "categoriesLabel": "Kategórie",
+  "category": {
+    "all": "Všetky",
+    "fun": "Zábava",
+    "games": "Hry",
+    "chat": "Chat",
+    "voice": "Hlas",
+    "accessibility": "Prístupnosť",
+    "looks": "Vzhľad",
+    "tools": "Nástroje"
+  },
+  "listLabel": "Dostupné doplnky",
+  "loading": "Načítava sa zoznam doplnkov…",
+  "retry": "Skúsiť znova",
+  "empty": "Zatiaľ nie sú dostupné žiadne doplnky.",
+  "noMatch": "Vášmu hľadaniu nezodpovedá žiadny doplnok.",
+  "highlight": "Odporúčané",
+  "official": "Oficiálny",
+  "unofficial": "Neoficiálny · {{repository}}",
+  "reviewed": "Skontrolované Mumcordom",
+  "installed": "Nainštalované",
+  "install": "Nainštalovať",
+  "installNamed": "Nainštalovať {{name}}",
+  "details": "Podrobnosti",
+  "detailsNamed": "Podrobnosti o doplnku {{name}}",
+  "back": "Späť na všetky doplnky",
+  "version": "Verzia {{version}}",
+  "by": "od {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Snímky obrazovky",
+  "mayAskFor": "Tento doplnok môže požiadať o",
+  "prompt": {
+    "title": "Nainštalovať {{name}}?",
+    "subtitle": "{{name}} {{version}} · od {{authors}}",
+    "preparing": "Kontroluje sa {{name}}…",
+    "visibility": "Kto uvidí, že ho používate",
+    "visibilityEveryone": "Všetci",
+    "visibilityFriends": "Priatelia",
+    "visibilityNobody": "Nikto",
+    "warningTitle": "Tento doplnok nie je od Mumcordu",
+    "warningText": "Doplnky z {{repository}} Mumcord nekontroluje. Inštalujte ich, len ak tomuto repozitáru dôverujete.",
+    "understand": "Rozumiem",
+    "cancel": "Zrušiť",
+    "close": "Zavrieť",
+    "install": "Nainštalovať",
+    "stage": {
+      "downloading": "Sťahuje sa…",
+      "verifying": "Kontroluje sa…",
+      "unpacking": "Rozbaľuje sa…",
+      "starting": "Spúšťa sa…",
+      "done": "Nainštalované",
+      "failed": "Inštalácia zlyhala"
+    },
+    "failed": "Doplnok {{name}} sa nepodarilo nainštalovať."
+  },
+  "toast": {
+    "installed": "Doplnok {{name}} bol nainštalovaný",
+    "dismiss": "Zavrieť"
+  },
+  "errors": {
+    "unreachable": "Zoznam doplnkov sa nepodarilo načítať. Skontrolujte pripojenie.",
+    "offline": "Zobrazuje sa posledný známy zoznam doplnkov (offline)",
+    "mismatch": "Stiahnutý súbor nezodpovedá oficiálnemu zoznamu",
+    "signature": "Overenie podpisu zlyhalo",
+    "permissions": "Tento doplnok žiada oprávnenia, ktoré nie sú uvedené v repozitári"
+  }
+}

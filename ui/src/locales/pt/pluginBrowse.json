@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Pesquisar plugins",
+  "searchPlaceholder": "Pesquisar plugins",
+  "categoriesLabel": "Categorias",
+  "category": {
+    "all": "Todos",
+    "fun": "Diversão",
+    "games": "Jogos",
+    "chat": "Chat",
+    "voice": "Voz",
+    "accessibility": "Acessibilidade",
+    "looks": "Aspeto",
+    "tools": "Ferramentas"
+  },
+  "listLabel": "Plugins disponíveis",
+  "loading": "A carregar a lista de plugins…",
+  "retry": "Tentar novamente",
+  "empty": "Ainda não há plugins disponíveis.",
+  "noMatch": "Nenhum plugin corresponde à pesquisa.",
+  "highlight": "Em destaque",
+  "official": "Oficial",
+  "unofficial": "Não oficial · {{repository}}",
+  "reviewed": "Revisto pelo Mumcord",
+  "installed": "Instalado",
+  "install": "Instalar",
+  "installNamed": "Instalar {{name}}",
+  "details": "Detalhes",
+  "detailsNamed": "Detalhes de {{name}}",
+  "back": "Voltar a todos os plugins",
+  "version": "Versão {{version}}",
+  "by": "de {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Capturas de ecrã",
+  "mayAskFor": "Este plugin pode pedir",
+  "prompt": {
+    "title": "Instalar {{name}}?",
+    "subtitle": "{{name}} {{version}} · de {{authors}}",
+    "preparing": "A verificar {{name}}…",
+    "visibility": "Quem pode ver que o usa",
+    "visibilityEveryone": "Todos",
+    "visibilityFriends": "Amigos",
+    "visibilityNobody": "Ninguém",
+    "warningTitle": "Este plugin não é do Mumcord",
+    "warningText": "Os plugins de {{repository}} não são revistos pelo Mumcord. Instale-os apenas se confiar neste repositório.",
+    "understand": "Compreendo",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "install": "Instalar",
+    "stage": {
+      "downloading": "A transferir…",
+      "verifying": "A verificar…",
+      "unpacking": "A descompactar…",
+      "starting": "A iniciar…",
+      "done": "Instalado",
+      "failed": "A instalação falhou"
+    },
+    "failed": "Não foi possível instalar {{name}}."
+  },
+  "toast": {
+    "installed": "{{name}} instalado",
+    "dismiss": "Dispensar"
+  },
+  "errors": {
+    "unreachable": "Não é possível carregar a lista de plugins. Verifique a ligação.",
+    "offline": "A mostrar a última lista de plugins conhecida (offline)",
+    "mismatch": "A transferência não corresponde à lista oficial",
+    "signature": "A verificação da assinatura falhou",
+    "permissions": "Este plugin pede permissões que não constam do repositório"
+  }
+}

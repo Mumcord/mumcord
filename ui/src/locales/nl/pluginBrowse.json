@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Plug-ins zoeken",
+  "searchPlaceholder": "Plug-ins zoeken",
+  "categoriesLabel": "Categorieën",
+  "category": {
+    "all": "Alle",
+    "fun": "Leuk",
+    "games": "Spellen",
+    "chat": "Chat",
+    "voice": "Spraak",
+    "accessibility": "Toegankelijkheid",
+    "looks": "Uiterlijk",
+    "tools": "Hulpmiddelen"
+  },
+  "listLabel": "Beschikbare plug-ins",
+  "loading": "Plug-inlijst laden…",
+  "retry": "Opnieuw proberen",
+  "empty": "Er zijn nog geen plug-ins beschikbaar.",
+  "noMatch": "Geen plug-ins gevonden voor je zoekopdracht.",
+  "highlight": "Uitgelicht",
+  "official": "Officieel",
+  "unofficial": "Niet-officieel · {{repository}}",
+  "reviewed": "Gecontroleerd door Mumcord",
+  "installed": "Geïnstalleerd",
+  "install": "Installeren",
+  "installNamed": "{{name}} installeren",
+  "details": "Details",
+  "detailsNamed": "Details van {{name}}",
+  "back": "Terug naar alle plug-ins",
+  "version": "Versie {{version}}",
+  "by": "door {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Schermafbeeldingen",
+  "mayAskFor": "Deze plug-in kan vragen om",
+  "prompt": {
+    "title": "{{name}} installeren?",
+    "subtitle": "{{name}} {{version}} · door {{authors}}",
+    "preparing": "{{name}} controleren…",
+    "visibility": "Wie kan zien dat je hem gebruikt",
+    "visibilityEveryone": "Iedereen",
+    "visibilityFriends": "Vrienden",
+    "visibilityNobody": "Niemand",
+    "warningTitle": "Deze plug-in komt niet van Mumcord",
+    "warningText": "Plug-ins van {{repository}} worden niet door Mumcord gecontroleerd. Installeer ze alleen als je deze repository vertrouwt.",
+    "understand": "Ik begrijp het",
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "install": "Installeren",
+    "stage": {
+      "downloading": "Downloaden…",
+      "verifying": "Controleren…",
+      "unpacking": "Uitpakken…",
+      "starting": "Starten…",
+      "done": "Geïnstalleerd",
+      "failed": "Installatie mislukt"
+    },
+    "failed": "{{name}} kon niet worden geïnstalleerd."
+  },
+  "toast": {
+    "installed": "{{name}} geïnstalleerd",
+    "dismiss": "Negeren"
+  },
+  "errors": {
+    "unreachable": "De plug-inlijst kan niet worden geladen. Controleer je verbinding.",
+    "offline": "Laatst bekende plug-inlijst wordt getoond (offline)",
+    "mismatch": "Download komt niet overeen met de officiële lijst",
+    "signature": "Handtekeningcontrole mislukt",
+    "permissions": "Deze plug-in vraagt om rechten die niet in de repository staan"
+  }
+}

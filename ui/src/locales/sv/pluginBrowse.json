@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Sök efter tillägg",
+  "searchPlaceholder": "Sök efter tillägg",
+  "categoriesLabel": "Kategorier",
+  "category": {
+    "all": "Alla",
+    "fun": "Skoj",
+    "games": "Spel",
+    "chat": "Chatt",
+    "voice": "Röst",
+    "accessibility": "Tillgänglighet",
+    "looks": "Utseende",
+    "tools": "Verktyg"
+  },
+  "listLabel": "Tillgängliga tillägg",
+  "loading": "Läser in tilläggslistan…",
+  "retry": "Försök igen",
+  "empty": "Det finns inga tillägg ännu.",
+  "noMatch": "Inga tillägg matchar din sökning.",
+  "highlight": "Utvalda",
+  "official": "Officiellt",
+  "unofficial": "Inofficiellt · {{repository}}",
+  "reviewed": "Granskat av Mumcord",
+  "installed": "Installerat",
+  "install": "Installera",
+  "installNamed": "Installera {{name}}",
+  "details": "Detaljer",
+  "detailsNamed": "Detaljer om {{name}}",
+  "back": "Tillbaka till alla tillägg",
+  "version": "Version {{version}}",
+  "by": "av {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Skärmbilder",
+  "mayAskFor": "Det här tillägget kan be om",
+  "prompt": {
+    "title": "Installera {{name}}?",
+    "subtitle": "{{name}} {{version}} · av {{authors}}",
+    "preparing": "Kontrollerar {{name}}…",
+    "visibility": "Vem som kan se att du använder det",
+    "visibilityEveryone": "Alla",
+    "visibilityFriends": "Vänner",
+    "visibilityNobody": "Ingen",
+    "warningTitle": "Det här tillägget kommer inte från Mumcord",
+    "warningText": "Tillägg från {{repository}} granskas inte av Mumcord. Installera dem bara om du litar på det här förvaret.",
+    "understand": "Jag förstår",
+    "cancel": "Avbryt",
+    "close": "Stäng",
+    "install": "Installera",
+    "stage": {
+      "downloading": "Laddar ner…",
+      "verifying": "Kontrollerar…",
+      "unpacking": "Packar upp…",
+      "starting": "Startar…",
+      "done": "Installerat",
+      "failed": "Installationen misslyckades"
+    },
+    "failed": "{{name}} kunde inte installeras."
+  },
+  "toast": {
+    "installed": "{{name}} installerat",
+    "dismiss": "Avfärda"
+  },
+  "errors": {
+    "unreachable": "Det går inte att läsa in tilläggslistan. Kontrollera anslutningen.",
+    "offline": "Visar den senast kända tilläggslistan (offline)",
+    "mismatch": "Nedladdningen matchade inte den officiella listan",
+    "signature": "Signaturkontrollen misslyckades",
+    "permissions": "Det här tillägget ber om behörigheter som inte finns i förvaret"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Søg efter plugins",
+  "searchPlaceholder": "Søg efter plugins",
+  "categoriesLabel": "Kategorier",
+  "category": {
+    "all": "Alle",
+    "fun": "Sjov",
+    "games": "Spil",
+    "chat": "Chat",
+    "voice": "Stemme",
+    "accessibility": "Tilgængelighed",
+    "looks": "Udseende",
+    "tools": "Værktøjer"
+  },
+  "listLabel": "Tilgængelige plugins",
+  "loading": "Indlæser plugin-listen…",
+  "retry": "Prøv igen",
+  "empty": "Der er endnu ingen plugins tilgængelige.",
+  "noMatch": "Ingen plugins matcher din søgning.",
+  "highlight": "Fremhævet",
+  "official": "Officiel",
+  "unofficial": "Uofficiel · {{repository}}",
+  "reviewed": "Gennemgået af Mumcord",
+  "installed": "Installeret",
+  "install": "Installér",
+  "installNamed": "Installér {{name}}",
+  "details": "Detaljer",
+  "detailsNamed": "Detaljer om {{name}}",
+  "back": "Tilbage til alle plugins",
+  "version": "Version {{version}}",
+  "by": "af {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Skærmbilleder",
+  "mayAskFor": "Dette plugin kan bede om",
+  "prompt": {
+    "title": "Installér {{name}}?",
+    "subtitle": "{{name}} {{version}} · af {{authors}}",
+    "preparing": "Tjekker {{name}}…",
+    "visibility": "Hvem kan se, at du bruger det",
+    "visibilityEveryone": "Alle",
+    "visibilityFriends": "Venner",
+    "visibilityNobody": "Ingen",
+    "warningTitle": "Dette plugin er ikke fra Mumcord",
+    "warningText": "Plugins fra {{repository}} er ikke gennemgået af Mumcord. Installér dem kun, hvis du har tillid til dette lager.",
+    "understand": "Jeg forstår",
+    "cancel": "Annullér",
+    "close": "Luk",
+    "install": "Installér",
+    "stage": {
+      "downloading": "Henter…",
+      "verifying": "Tjekker…",
+      "unpacking": "Pakker ud…",
+      "starting": "Starter…",
+      "done": "Installeret",
+      "failed": "Installationen mislykkedes"
+    },
+    "failed": "{{name}} kunne ikke installeres."
+  },
+  "toast": {
+    "installed": "{{name}} er installeret",
+    "dismiss": "Afvis"
+  },
+  "errors": {
+    "unreachable": "Plugin-listen kan ikke indlæses. Tjek din forbindelse.",
+    "offline": "Viser den senest kendte plugin-liste (offline)",
+    "mismatch": "Downloaden matchede ikke den officielle liste",
+    "signature": "Signaturtjekket mislykkedes",
+    "permissions": "Dette plugin beder om tilladelser, der ikke står i lageret"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Caută pluginuri",
+  "searchPlaceholder": "Caută pluginuri",
+  "categoriesLabel": "Categorii",
+  "category": {
+    "all": "Toate",
+    "fun": "Distracție",
+    "games": "Jocuri",
+    "chat": "Chat",
+    "voice": "Voce",
+    "accessibility": "Accesibilitate",
+    "looks": "Aspect",
+    "tools": "Instrumente"
+  },
+  "listLabel": "Pluginuri disponibile",
+  "loading": "Se încarcă lista de pluginuri…",
+  "retry": "Încearcă din nou",
+  "empty": "Nu există încă pluginuri disponibile.",
+  "noMatch": "Niciun plugin nu se potrivește căutării.",
+  "highlight": "Recomandat",
+  "official": "Oficial",
+  "unofficial": "Neoficial · {{repository}}",
+  "reviewed": "Verificat de Mumcord",
+  "installed": "Instalat",
+  "install": "Instalează",
+  "installNamed": "Instalează {{name}}",
+  "details": "Detalii",
+  "detailsNamed": "Detalii despre {{name}}",
+  "back": "Înapoi la toate pluginurile",
+  "version": "Versiunea {{version}}",
+  "by": "de {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Capturi de ecran",
+  "mayAskFor": "Acest plugin poate cere",
+  "prompt": {
+    "title": "Instalezi {{name}}?",
+    "subtitle": "{{name}} {{version}} · de {{authors}}",
+    "preparing": "Se verifică {{name}}…",
+    "visibility": "Cine poate vedea că îl folosești",
+    "visibilityEveryone": "Toată lumea",
+    "visibilityFriends": "Prieteni",
+    "visibilityNobody": "Nimeni",
+    "warningTitle": "Acest plugin nu provine de la Mumcord",
+    "warningText": "Pluginurile din {{repository}} nu sunt verificate de Mumcord. Instalează-le doar dacă ai încredere în acest depozit.",
+    "understand": "Am înțeles",
+    "cancel": "Anulează",
+    "close": "Închide",
+    "install": "Instalează",
+    "stage": {
+      "downloading": "Se descarcă…",
+      "verifying": "Se verifică…",
+      "unpacking": "Se dezarhivează…",
+      "starting": "Se pornește…",
+      "done": "Instalat",
+      "failed": "Instalarea a eșuat"
+    },
+    "failed": "{{name}} nu a putut fi instalat."
+  },
+  "toast": {
+    "installed": "{{name}} a fost instalat",
+    "dismiss": "Închide"
+  },
+  "errors": {
+    "unreachable": "Lista de pluginuri nu poate fi încărcată. Verifică conexiunea.",
+    "offline": "Se afișează ultima listă de pluginuri cunoscută (offline)",
+    "mismatch": "Descărcarea nu se potrivește cu lista oficială",
+    "signature": "Verificarea semnăturii a eșuat",
+    "permissions": "Acest plugin cere permisiuni care nu sunt listate în depozit"
+  }
+}

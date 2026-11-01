@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Buscar plugins",
+  "searchPlaceholder": "Buscar plugins",
+  "categoriesLabel": "Categorías",
+  "category": {
+    "all": "Todos",
+    "fun": "Diversión",
+    "games": "Juegos",
+    "chat": "Chat",
+    "voice": "Voz",
+    "accessibility": "Accesibilidad",
+    "looks": "Aspecto",
+    "tools": "Herramientas"
+  },
+  "listLabel": "Plugins disponibles",
+  "loading": "Cargando la lista de plugins…",
+  "retry": "Reintentar",
+  "empty": "Aún no hay plugins disponibles.",
+  "noMatch": "Ningún plugin coincide con tu búsqueda.",
+  "highlight": "Destacado",
+  "official": "Oficial",
+  "unofficial": "No oficial · {{repository}}",
+  "reviewed": "Revisado por Mumcord",
+  "installed": "Instalado",
+  "install": "Instalar",
+  "installNamed": "Instalar {{name}}",
+  "details": "Detalles",
+  "detailsNamed": "Detalles de {{name}}",
+  "back": "Volver a todos los plugins",
+  "version": "Versión {{version}}",
+  "by": "de {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Capturas de pantalla",
+  "mayAskFor": "Este plugin puede solicitar",
+  "prompt": {
+    "title": "¿Instalar {{name}}?",
+    "subtitle": "{{name}} {{version}} · de {{authors}}",
+    "preparing": "Comprobando {{name}}…",
+    "visibility": "Quién puede ver que lo usas",
+    "visibilityEveryone": "Todos",
+    "visibilityFriends": "Amigos",
+    "visibilityNobody": "Nadie",
+    "warningTitle": "Este plugin no es de Mumcord",
+    "warningText": "Mumcord no revisa los plugins de {{repository}}. Instálalos solo si confías en este repositorio.",
+    "understand": "Entendido",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "install": "Instalar",
+    "stage": {
+      "downloading": "Descargando…",
+      "verifying": "Comprobando…",
+      "unpacking": "Descomprimiendo…",
+      "starting": "Iniciando…",
+      "done": "Instalado",
+      "failed": "Error al instalar"
+    },
+    "failed": "No se pudo instalar {{name}}."
+  },
+  "toast": {
+    "installed": "{{name}} instalado",
+    "dismiss": "Descartar"
+  },
+  "errors": {
+    "unreachable": "No se puede cargar la lista de plugins. Comprueba tu conexión.",
+    "offline": "Mostrando la última lista de plugins conocida (sin conexión)",
+    "mismatch": "La descarga no coincide con la lista oficial",
+    "signature": "Error en la comprobación de la firma",
+    "permissions": "Este plugin solicita permisos que no figuran en el repositorio"
+  }
+}

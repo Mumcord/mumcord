@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Fittex plagins",
+  "searchPlaceholder": "Fittex plagins",
+  "categoriesLabel": "Kategoriji",
+  "category": {
+    "all": "Kollha",
+    "fun": "Divertiment",
+    "games": "Logħob",
+    "chat": "Chat",
+    "voice": "Vuċi",
+    "accessibility": "Aċċessibilità",
+    "looks": "Dehra",
+    "tools": "Għodod"
+  },
+  "listLabel": "Plagins disponibbli",
+  "loading": "Qed jitgħabba l-elenku tal-plagins…",
+  "retry": "Erġa' pprova",
+  "empty": "Għad m'hemm l-ebda plagin disponibbli.",
+  "noMatch": "L-ebda plagin ma jaqbel mat-tiftix tiegħek.",
+  "highlight": "Ippreżentat",
+  "official": "Uffiċjali",
+  "unofficial": "Mhux uffiċjali · {{repository}}",
+  "reviewed": "Rivedut minn Mumcord",
+  "installed": "Installat",
+  "install": "Installa",
+  "installNamed": "Installa {{name}}",
+  "details": "Dettalji",
+  "detailsNamed": "Dettalji ta' {{name}}",
+  "back": "Lura għall-plagins kollha",
+  "version": "Verżjoni {{version}}",
+  "by": "minn {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Screenshots",
+  "mayAskFor": "Dan il-plagin jista' jitlob",
+  "prompt": {
+    "title": "Tinstalla {{name}}?",
+    "subtitle": "{{name}} {{version}} · minn {{authors}}",
+    "preparing": "Qed jiġi ċċekkjat {{name}}…",
+    "visibility": "Min jista' jara li qed tużah",
+    "visibilityEveryone": "Kulħadd",
+    "visibilityFriends": "Ħbieb",
+    "visibilityNobody": "Ħadd",
+    "warningTitle": "Dan il-plagin mhuwiex minn Mumcord",
+    "warningText": "Il-plagins minn {{repository}} mhumiex riveduti minn Mumcord. Installahom biss jekk temmen f'dan ir-repożitorju.",
+    "understand": "Nifhem",
+    "cancel": "Ikkanċella",
+    "close": "Agħlaq",
+    "install": "Installa",
+    "stage": {
+      "downloading": "Qed jinżel…",
+      "verifying": "Qed jiġi ċċekkjat…",
+      "unpacking": "Qed jinfetaħ…",
+      "starting": "Qed jibda…",
+      "done": "Installat",
+      "failed": "L-installazzjoni falliet"
+    },
+    "failed": "{{name}} ma setax jiġi installat."
+  },
+  "toast": {
+    "installed": "{{name}} installat",
+    "dismiss": "Ċaħad"
+  },
+  "errors": {
+    "unreachable": "Ma jistax jitgħabba l-elenku tal-plagins. Iċċekkja l-konnessjoni tiegħek.",
+    "offline": "Qed jintwera l-aħħar elenku magħruf tal-plagins (offline)",
+    "mismatch": "It-tniżżil ma jaqbilx mal-elenku uffiċjali",
+    "signature": "Il-verifika tal-firma falliet",
+    "permissions": "Dan il-plagin jitlob permessi li mhumiex elenkati fir-repożitorju"
+  }
+}

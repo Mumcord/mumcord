@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Търсене на добавки",
+  "searchPlaceholder": "Търсене на добавки",
+  "categoriesLabel": "Категории",
+  "category": {
+    "all": "Всички",
+    "fun": "Забавни",
+    "games": "Игри",
+    "chat": "Чат",
+    "voice": "Глас",
+    "accessibility": "Достъпност",
+    "looks": "Външен вид",
+    "tools": "Инструменти"
+  },
+  "listLabel": "Налични добавки",
+  "loading": "Списъкът с добавки се зарежда…",
+  "retry": "Опитай отново",
+  "empty": "Все още няма налични добавки.",
+  "noMatch": "Няма добавки, които отговарят на търсенето.",
+  "highlight": "Препоръчани",
+  "official": "Официална",
+  "unofficial": "Неофициална · {{repository}}",
+  "reviewed": "Прегледана от Mumcord",
+  "installed": "Инсталирана",
+  "install": "Инсталиране",
+  "installNamed": "Инсталиране на {{name}}",
+  "details": "Подробности",
+  "detailsNamed": "Подробности за {{name}}",
+  "back": "Назад към всички добавки",
+  "version": "Версия {{version}}",
+  "by": "от {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Екранни снимки",
+  "mayAskFor": "Тази добавка може да поиска",
+  "prompt": {
+    "title": "Да се инсталира ли {{name}}?",
+    "subtitle": "{{name}} {{version}} · от {{authors}}",
+    "preparing": "{{name}} се проверява…",
+    "visibility": "Кой може да вижда, че я използвате",
+    "visibilityEveryone": "Всички",
+    "visibilityFriends": "Приятели",
+    "visibilityNobody": "Никой",
+    "warningTitle": "Тази добавка не е от Mumcord",
+    "warningText": "Добавките от {{repository}} не се преглеждат от Mumcord. Инсталирайте ги само ако имате доверие на това хранилище.",
+    "understand": "Разбирам",
+    "cancel": "Отказ",
+    "close": "Затваряне",
+    "install": "Инсталиране",
+    "stage": {
+      "downloading": "Изтегляне…",
+      "verifying": "Проверка…",
+      "unpacking": "Разархивиране…",
+      "starting": "Стартиране…",
+      "done": "Инсталирана",
+      "failed": "Инсталирането не успя"
+    },
+    "failed": "{{name}} не можа да бъде инсталирана."
+  },
+  "toast": {
+    "installed": "{{name}} е инсталирана",
+    "dismiss": "Скриване"
+  },
+  "errors": {
+    "unreachable": "Списъкът с добавки не може да се зареди. Проверете връзката си.",
+    "offline": "Показва се последният известен списък с добавки (офлайн)",
+    "mismatch": "Изтегленият файл не съвпада с официалния списък",
+    "signature": "Проверката на подписа не успя",
+    "permissions": "Тази добавка иска разрешения, които не са посочени в хранилището"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Meklēt spraudņus",
+  "searchPlaceholder": "Meklēt spraudņus",
+  "categoriesLabel": "Kategorijas",
+  "category": {
+    "all": "Visi",
+    "fun": "Izklaide",
+    "games": "Spēles",
+    "chat": "Tērzēšana",
+    "voice": "Balss",
+    "accessibility": "Pieejamība",
+    "looks": "Izskats",
+    "tools": "Rīki"
+  },
+  "listLabel": "Pieejamie spraudņi",
+  "loading": "Notiek spraudņu saraksta ielāde…",
+  "retry": "Mēģināt vēlreiz",
+  "empty": "Spraudņu vēl nav.",
+  "noMatch": "Neviens spraudnis neatbilst meklēšanai.",
+  "highlight": "Ieteiktie",
+  "official": "Oficiāls",
+  "unofficial": "Neoficiāls · {{repository}}",
+  "reviewed": "Pārbaudījis Mumcord",
+  "installed": "Instalēts",
+  "install": "Instalēt",
+  "installNamed": "Instalēt {{name}}",
+  "details": "Informācija",
+  "detailsNamed": "Informācija par {{name}}",
+  "back": "Atpakaļ uz visiem spraudņiem",
+  "version": "Versija {{version}}",
+  "by": "autors: {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Ekrānuzņēmumi",
+  "mayAskFor": "Šis spraudnis var pieprasīt",
+  "prompt": {
+    "title": "Vai instalēt {{name}}?",
+    "subtitle": "{{name}} {{version}} · autors: {{authors}}",
+    "preparing": "Notiek {{name}} pārbaude…",
+    "visibility": "Kas var redzēt, ka to izmantojat",
+    "visibilityEveryone": "Visi",
+    "visibilityFriends": "Draugi",
+    "visibilityNobody": "Neviens",
+    "warningTitle": "Šis spraudnis nav no Mumcord",
+    "warningText": "Mumcord nepārbauda spraudņus no {{repository}}. Instalējiet tos tikai tad, ja uzticaties šai krātuvei.",
+    "understand": "Saprotu",
+    "cancel": "Atcelt",
+    "close": "Aizvērt",
+    "install": "Instalēt",
+    "stage": {
+      "downloading": "Notiek lejupielāde…",
+      "verifying": "Notiek pārbaude…",
+      "unpacking": "Notiek izpakošana…",
+      "starting": "Notiek palaišana…",
+      "done": "Instalēts",
+      "failed": "Instalēšana neizdevās"
+    },
+    "failed": "Spraudni {{name}} neizdevās instalēt."
+  },
+  "toast": {
+    "installed": "{{name}} instalēts",
+    "dismiss": "Aizvērt"
+  },
+  "errors": {
+    "unreachable": "Nevar ielādēt spraudņu sarakstu. Pārbaudiet savienojumu.",
+    "offline": "Tiek rādīts pēdējais zināmais spraudņu saraksts (bezsaistē)",
+    "mismatch": "Lejupielāde neatbilda oficiālajam sarakstam",
+    "signature": "Paraksta pārbaude neizdevās",
+    "permissions": "Šis spraudnis pieprasa atļaujas, kas nav norādītas krātuvē"
+  }
+}

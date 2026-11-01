@@ -1,0 +1,70 @@
+{
+  "searchLabel": "Search plugins",
+  "searchPlaceholder": "Search plugins",
+  "categoriesLabel": "Categories",
+  "category": {
+    "all": "All",
+    "fun": "Fun",
+    "games": "Games",
+    "chat": "Chat",
+    "voice": "Voice",
+    "accessibility": "Accessibility",
+    "looks": "Looks",
+    "tools": "Tools"
+  },
+  "listLabel": "Available plugins",
+  "loading": "Loading the plugin list…",
+  "retry": "Try again",
+  "empty": "No plugins are available yet.",
+  "noMatch": "No plugins match your search.",
+  "highlight": "Featured",
+  "official": "Official",
+  "unofficial": "Unofficial · {{repository}}",
+  "reviewed": "Reviewed by Mumcord",
+  "installed": "Installed",
+  "install": "Install",
+  "installNamed": "Install {{name}}",
+  "details": "Details",
+  "detailsNamed": "Details of {{name}}",
+  "back": "Back to all plugins",
+  "version": "Version {{version}}",
+  "by": "by {{authors}}",
+  "size": "{{size}} KB",
+  "screenshots": "Screenshots",
+  "mayAskFor": "This plugin may ask for",
+  "prompt": {
+    "title": "Install {{name}}?",
+    "subtitle": "{{name}} {{version}} · by {{authors}}",
+    "preparing": "Checking {{name}}…",
+    "visibility": "Who can see that you use it",
+    "visibilityEveryone": "Everyone",
+    "visibilityFriends": "Friends",
+    "visibilityNobody": "Nobody",
+    "warningTitle": "This plugin is not from Mumcord",
+    "warningText": "Plugins from {{repository}} are not reviewed by Mumcord. Only install them if you trust this repository.",
+    "understand": "I understand",
+    "cancel": "Cancel",
+    "close": "Close",
+    "install": "Install",
+    "stage": {
+      "downloading": "Downloading…",
+      "verifying": "Checking…",
+      "unpacking": "Unpacking…",
+      "starting": "Starting…",
+      "done": "Installed",
+      "failed": "Install failed"
+    },
+    "failed": "{{name}} could not be installed."
+  },
+  "toast": {
+    "installed": "{{name}} installed",
+    "dismiss": "Dismiss"
+  },
+  "errors": {
+    "unreachable": "Can't load the plugin list. Check your connection.",
+    "offline": "Showing the last known plugin list (offline)",
+    "mismatch": "Download didn't match the official list",
+    "signature": "Signature check failed",
+    "permissions": "This plugin asks for permissions not listed in the repository"
+  }
+}
