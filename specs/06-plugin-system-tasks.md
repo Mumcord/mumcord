@@ -24,22 +24,22 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B17a | Plugin service: lifecycle | done | b17a-service |
 | B17b | Updates and kill switch | done | b17b-updates |
 | B17c | Chat integration logic | done | b17c-chat |
-| B18 | App glue (src-tauri) | in progress | b18-glue |
+| B18 | App glue (src-tauri) | done | b18-glue |
 | B19 | `net.http` executor (official only) | done | b19-http |
-| B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
+| B21 | UI shell: Settings → Plugins, Developer mode, palette, store | in progress | b21-shell |
 | B22 | Permission list component and texts | done | b22-permlist |
 | B25a | SDK crate `mumcord-plugin-sdk` | done | b25a-sdk |
 | B25b | CLI `mumcord-plugin` (author + registry commands) | done | b25b-cli |
 | B25c | CLI `test` and `preview` | done | b25c-test |
 | B16b | Fixture registry setup for E2E | open | |
 | B9 | Local mumbot instance (music + plugins) | done | b9-mumbot |
-| B26 | UI tree renderer | open | |
+| B26 | UI tree renderer | in progress | b26-render |
 | B27 | Plugins strip and panel popover | open | |
 | B28 | Member badges, profile-card sections, chat decorations | open | |
 | B29 | Chat UI: cards, slash commands, via label, superseded lines | open | |
 | B30 | User-menu entry and plugin dialog | open | |
 | B31 | Sandboxed web view | open | |
-| B32 | Notification centre: category Plugins | open | |
+| B32 | Notification centre: category Plugins | in progress | b32-notify |
 | B34 | Server-suggested plugins logic | done | b34-suggest |
 | B23 | Installed tab and plugin details | open | |
 | B24 | Browse tab, install prompt, deep-link target | open | |
@@ -65,6 +65,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F5 | Messaging envelope: carry a `direct` flag so `peer-message.direct` is correct (wire is unreleased, keep envelope v1 compatible within the epic) | open | |
 | F6 | `prettier --check .` fails on docs/plugin-registry-format.md (pre-existing since B15/B25b) — format it; check the whole repo passes prettier | done (dce1eb42) | f6-prettier |
 | F7 | Pin `rust-toolchain.toml` (same stable version) in Mumcord/plugins template (feat/template-docs), `mumcord-plugin new` template (tools/mumcord-plugin) and each official plugin branch (feat/poll, feat/dice, feat/echolings, feat/mumbot-music), so reproducible-build hashes match CI | in progress | f7-toolchain |
+| F8 | docs/engine-api.md: list all new plugin commands/events (B13 engine methods, B18 commands+events, B20b plugins_take_pending_link, renamed game_plugins_*) | open | |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | in progress | s3-pets |
@@ -465,3 +466,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B25c (4e73d1de seam, 0fcdb0f2 test/preview; includes B25c2):** api/{io,ui,peers,chat,webview}.rs serve ui/peers/chat through `HostContext.io`. `mumcord-plugin test <pkg|folder> <scenario.yaml...>` runs the real PluginHost against a mock host (temp Store + identity, peer keys, real GestureGate, client start events). YAML keys: `grant`, `me`, `peers`, `language`, `theme`, `steps` (event / wait / expect); unknown fields are refused. Example: `tools/mumcord-plugin/scenarios/hello.yaml`. `mumcord-plugin preview <pkg|folder> [--scenario f] [--out preview.html]` writes static HTML. The ignored test author_flow builds the template for wasm32 and runs test + preview. Mock gaps: no rate-limit/visibility simulation, timers in real time, webview not-permitted.
 - **B17b (5ef82210):** `service/{updates,revocation}.rs`. B18: one `Schedule::new()` per run; `service::run_check(&client, &Arc<Mutex<PluginService>>, &mut schedule, registry_cache_dir)` at start + every 15 min (updates every 6 h, never when Off; revocations daily even when Off; MUMCORD_PLUGIN_TEST_FORCE_DAILY_CHECK=1 forces it in debug builds). Cache subdirs `official`, `repo-<id>` (B24/B33b use the same). B33a/B32: `svc.updates() -> Vec<UpdateInfo{id, name, from, to, source, entry, url, size, approval: None|NewPermissions(ids)|NewAuthorKey, failed: Option<reason>}>`; install via `fetch(...)`, then `apply_update(id, &download, Some(&optional_grants))`; `set_pinned(id, bool)`. `ServiceEvent::UpdateAvailable{id, name, version}` fires once per waiting version. `PluginInfo.revocation: Option<RevocationNotice>` (`.text()` = "Turned off by Mumcord: <reason>"). Errors NoUpdate, NeedsApproval, Revoked (set_enabled refuses revoked plugins). A failed start restores the old version, the reason goes to UpdateInfo.failed, and there is no automatic retry.
 - **B37 (Mumcord/plugins PR #7: d772f72, 304e488, 21bf96d, c5517af):** check.yml (job `check`), composite action setup-cli (branch defaults to epic/plugins → main at M1), `.github/scripts/registry.py`, deny.toml, schemas/{plugin,version,revoked}.schema.json, pr-comment.yml (workflow_run), publish.yml (build → release → sign in env publish → Pages → notify, skipped without SITE_DISPATCH_REPO/SITE_DISPATCH_TOKEN), `.github/registry-key.pub` (active public key only), REVIEW.md. Publish triggers only on plugins/** or revoked.toml. Reproducible builds need a pinned rust-toolchain.toml (F7). The `github-pages` environment is created by the first deploy.
+- **B18 (837b810f engine, d5a867c2 service, 5a27b55f app):** positional commands were renamed to `game_plugins_list` / `game_plugin_set_enabled`. Own channel messages emit ChatActivity; `Engine::store_handle` is public; `service::UiInput` + `PluginService::ui_input(id, input) -> bool`. COMMANDS: plugins_list → PluginsOverview{noPlugins, allOff, plugins: InstalledPlugin[]}; plugins_index(language) → PluginIndex{freshness, notice, plugins: IndexedPlugin[]}; plugin_install(id, version?, optional, visibility); plugin_set_enabled / _permissions / _visibility / _notifications; plugin_remove(id, deleteData); plugin_export_data → JSON string; plugin_reset_data; plugin_dev_load / reload / unload; plugins_set_all_off; plugin_set_badge(id|null); plugin_diagnostics → PluginDiagnostics; plugins_ui_trees → PluginUi[]; plugins_set_appearance(language, dark, reducedMotion); plugin_ui_action(id, slot: PluginSlot|null (null = slash command), action, value: PluginActionValue); plugin_ui_event(id, PluginUiInput); plugins_mentioned(serverId, session). EVENTS: plugins://changed PluginsChanged{}, plugins://install-progress PluginInstallProgress{id, progress}, plugin://ui PluginUi{plugin, change: PluginUiChange}, plugins://notification PluginNotification{plugin, notice: message|autoOff|updateAvailable}, plugin://supersede PluginSupersede{plugin, card, messageId}. TREE DTO (B26) in src-tauri/src/plugins/ui.rs: PluginSlot{kind}, PluginNode{component, animation, children}, PluginComponent{type, camelCase fields}, PluginUiChange setTree|clear|openDialog|closeDialog|userMenuEntry. UI RULES: a ui-action is accepted only if an enabled component with that action is in the slot's current tree; server-address → http.allow, password → secret (no value to the plugin), file pick → handle; after plugins://changed re-fetch plugins_ui_trees; B21 calls plugins_set_appearance; a UI task calls plugins_mentioned on detected mentions; plugin chat lines go to the user's channel on the voice server and are emitted as MessageReceived. run_check runs at start + every 15 min on its own thread; registry cache is <cache>/plugin-registry/{official,…}. OPEN: ServerPlugins events are ignored in feed.rs (wire to B34 suggestions → B32); slash-command registry not wired (B29); plugin_pin / repo / update commands (B27/B33); index icon/screenshot URLs are raw (B24 must load them through Rust, the UI never touches the network); docs gap (F8).
