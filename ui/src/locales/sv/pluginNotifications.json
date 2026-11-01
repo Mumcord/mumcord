@@ -11,17 +11,20 @@
     "open": "Visa uppdateringar"
   },
   "suggestion": {
-    "title": "Den här servern föreslår {{name}}",
+    "title": "Den här servern använder {{name}}",
     "noReason": "Föreslaget av servern",
-    "install": "Installera",
+    "install": "Installera…",
     "installLabel": "Installera {{name}}",
-    "addRepository": "Lägg till databas",
     "addRepositoryLabel": "Lägg till databas för {{name}}",
-    "details": "Detaljer",
+    "details": "Visa detaljer",
     "detailsLabel": "Detaljer om {{name}}",
     "notNow": "Inte nu",
     "notNowLabel": "Dölj {{name}} tills vidare",
-    "dontAsk": "Fråga inte igen för den här servern"
+    "dontAsk": "Fråga inte igen för den här servern",
+    "recommended": "Rekommenderad",
+    "official": "Officiell",
+    "unofficial": "Inofficiell · {{host}}",
+    "footer": "Förslag installerar aldrig något av sig själva. Servern får inte veta vad du installerar."
   },
   "failed": "Det fungerade inte. Försök igen."
 }

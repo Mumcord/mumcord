@@ -11,17 +11,20 @@
     "open": "Frissítések megjelenítése"
   },
   "suggestion": {
-    "title": "Ez a szerver a(z) {{name}} bővítményt javasolja",
+    "title": "Ez a szerver ezt használja: {{name}}",
     "noReason": "A szerver javasolta",
-    "install": "Telepítés",
+    "install": "Telepítés…",
     "installLabel": "{{name}} telepítése",
-    "addRepository": "Tároló hozzáadása",
     "addRepositoryLabel": "Tároló hozzáadása ehhez: {{name}}",
-    "details": "Részletek",
+    "details": "Részletek megtekintése",
     "detailsLabel": "{{name}} részletei",
     "notNow": "Most nem",
     "notNowLabel": "{{name}} elrejtése egyelőre",
-    "dontAsk": "Ne kérdezze újra ennél a szervernél"
+    "dontAsk": "Ne kérdezze újra ennél a szervernél",
+    "recommended": "Ajánlott",
+    "official": "Hivatalos",
+    "unofficial": "Nem hivatalos · {{host}}",
+    "footer": "A javaslatok soha nem telepítenek semmit maguktól. A szerver nem tudja meg, mit telepítesz."
   },
   "failed": "Ez nem sikerült. Próbálja újra."
 }

@@ -11,17 +11,20 @@
     "open": "Show updates"
   },
   "suggestion": {
-    "title": "This server suggests {{name}}",
+    "title": "This server uses {{name}}",
     "noReason": "Suggested by the server",
-    "install": "Install",
+    "install": "Install…",
     "installLabel": "Install {{name}}",
-    "addRepository": "Add repository",
     "addRepositoryLabel": "Add repository for {{name}}",
-    "details": "Details",
+    "details": "View details",
     "detailsLabel": "Details of {{name}}",
     "notNow": "Not now",
     "notNowLabel": "Hide {{name}} for now",
-    "dontAsk": "Don't ask again for this server"
+    "dontAsk": "Don't ask again for this server",
+    "recommended": "Recommended",
+    "official": "Official",
+    "unofficial": "Unofficial · {{host}}",
+    "footer": "Suggestions never install anything by themselves. The server isn't told what you install."
   },
   "failed": "That did not work. Please try again."
 }

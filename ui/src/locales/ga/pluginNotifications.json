@@ -11,17 +11,20 @@
     "open": "Taispeáin nuashonruithe"
   },
   "suggestion": {
-    "title": "Molann an freastalaí seo {{name}}",
+    "title": "Úsáideann an freastalaí seo {{name}}",
     "noReason": "Molta ag an bhfreastalaí",
-    "install": "Suiteáil",
+    "install": "Suiteáil…",
     "installLabel": "Suiteáil {{name}}",
-    "addRepository": "Cuir stór leis",
     "addRepositoryLabel": "Cuir stór leis do {{name}}",
-    "details": "Sonraí",
+    "details": "Féach ar na sonraí",
     "detailsLabel": "Sonraí {{name}}",
     "notNow": "Ní anois",
     "notNowLabel": "Folaigh {{name}} don am i láthair",
-    "dontAsk": "Ná fiafraigh arís don fhreastalaí seo"
+    "dontAsk": "Ná fiafraigh arís don fhreastalaí seo",
+    "recommended": "Molta",
+    "official": "Oifigiúil",
+    "unofficial": "Neamhoifigiúil · {{host}}",
+    "footer": "Ní shuiteálann moltaí aon rud astu féin. Ní insítear don fhreastalaí cad a shuiteálann tú."
   },
   "failed": "Níor oibrigh sé sin. Bain triail eile as."
 }

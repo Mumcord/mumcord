@@ -11,17 +11,20 @@
     "open": "Zobraziť aktualizácie"
   },
   "suggestion": {
-    "title": "Tento server odporúča {{name}}",
+    "title": "Tento server používa {{name}}",
     "noReason": "Odporúčané serverom",
-    "install": "Nainštalovať",
+    "install": "Nainštalovať…",
     "installLabel": "Nainštalovať {{name}}",
-    "addRepository": "Pridať repozitár",
     "addRepositoryLabel": "Pridať repozitár pre {{name}}",
-    "details": "Podrobnosti",
+    "details": "Zobraziť podrobnosti",
     "detailsLabel": "Podrobnosti o {{name}}",
     "notNow": "Teraz nie",
     "notNowLabel": "Zatiaľ skryť {{name}}",
-    "dontAsk": "Pre tento server sa už nepýtať"
+    "dontAsk": "Pre tento server sa už nepýtať",
+    "recommended": "Odporúčané",
+    "official": "Oficiálne",
+    "unofficial": "Neoficiálne · {{host}}",
+    "footer": "Návrhy nikdy nič samy neinštalujú. Server sa nedozvie, čo inštalujete."
   },
   "failed": "Nepodarilo sa. Skúste to znova."
 }

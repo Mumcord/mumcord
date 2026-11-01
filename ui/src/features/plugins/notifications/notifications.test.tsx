@@ -174,4 +174,15 @@ describe("plugin entries of the notification centre", () => {
     ]);
     stop();
   });
+
+  it("shows the source pills and the footer note on a suggestion", async () => {
+    await setup();
+    act(() => {
+      api.mock.emit("pluginsSuggestion", SUGGESTION);
+    });
+    const centre = openPanel();
+    expect(await within(centre).findByText("Recommended")).toBeInTheDocument();
+    expect(within(centre).getByText("✓ Official")).toBeInTheDocument();
+    expect(within(centre).getByText(/never install anything by themselves/)).toBeInTheDocument();
+  });
 });

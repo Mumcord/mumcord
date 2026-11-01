@@ -11,17 +11,20 @@
     "open": "Rodyti naujinius"
   },
   "suggestion": {
-    "title": "Šis serveris siūlo {{name}}",
+    "title": "Šis serveris naudoja „{{name}}“",
     "noReason": "Serverio pasiūlyta",
-    "install": "Įdiegti",
+    "install": "Įdiegti…",
     "installLabel": "Įdiegti {{name}}",
-    "addRepository": "Pridėti saugyklą",
     "addRepositoryLabel": "Pridėti saugyklą: {{name}}",
-    "details": "Išsami informacija",
+    "details": "Peržiūrėti informaciją",
     "detailsLabel": "Išsami informacija apie {{name}}",
     "notNow": "Ne dabar",
     "notNowLabel": "Kol kas slėpti {{name}}",
-    "dontAsk": "Daugiau neklausti dėl šio serverio"
+    "dontAsk": "Daugiau neklausti dėl šio serverio",
+    "recommended": "Rekomenduojama",
+    "official": "Oficialus",
+    "unofficial": "Neoficialus · {{host}}",
+    "footer": "Pasiūlymai niekada patys nieko neįdiegia. Serveris nesužino, ką įdiegiate."
   },
   "failed": "Nepavyko. Bandykite dar kartą."
 }

@@ -6,8 +6,23 @@ import { requestPluginScreen } from "./pluginRequests";
 export interface PluginEntryText {
   title: string;
   body: string;
-  /** The second chip: what kind of entry it is. */
-  where: string;
+  /** The chips after the server chip: what kind of entry it is, or where a suggestion comes from. */
+  chips: PluginChip[];
+}
+
+export interface PluginChip {
+  label: string;
+  /** `accent` marks a recommendation, `ok` an official source, `warn` an unofficial one. */
+  tone?: "accent" | "ok" | "warn";
+}
+
+/** The host of a repository address, which is all that is safe and short enough to show. */
+function hostOf(url: string): string {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
 }
 
 /**
@@ -16,29 +31,37 @@ export interface PluginEntryText {
  */
 export function usePluginEntryText(item: PluginItem | null): PluginEntryText {
   const { t } = useTranslation("pluginNotifications");
-  if (item === null) return { title: "", body: "", where: "" };
+  if (item === null) return { title: "", body: "", chips: [] };
   const { notice } = item;
-  const where = t("type");
+  const chips: PluginChip[] = [{ label: t("type") }];
   switch (notice.kind) {
     case "message":
-      return { title: notice.title || notice.name, body: notice.title ? notice.body : "", where };
+      return { title: notice.title || notice.name, body: notice.title ? notice.body : "", chips };
     case "autoOff":
       return {
         title: t("autoOff.title", { name: notice.name }),
         body: t("autoOff.body"),
-        where,
+        chips,
       };
     case "update":
       return {
         title: t("update.title", { name: notice.name }),
         body: t("update.body", { version: notice.version }),
-        where,
+        chips,
       };
     case "suggestion":
       return {
         title: t("suggestion.title", { name: notice.name }),
         body: notice.reason || t("suggestion.noReason"),
-        where,
+        chips: [
+          { label: t("suggestion.recommended"), tone: "accent" },
+          notice.source.kind === "official"
+            ? { label: `✓ ${t("suggestion.official")}`, tone: "ok" }
+            : {
+                label: `⚠ ${t("suggestion.unofficial", { host: hostOf(notice.source.url) })}`,
+                tone: "warn",
+              },
+        ],
       };
   }
 }

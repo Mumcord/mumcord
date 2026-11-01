@@ -310,9 +310,15 @@ export function CentreEntry({
           {body && <span className="centre-entry__body">{body}</span>}
           <span className="centre-entry__chips">
             {serverName && <span className="centre-chip">{serverName}</span>}
-            <span className="centre-chip">
-              {item.kind === "plugin" ? plugin.where : whereOf(item, t)}
-            </span>
+            {item.kind === "plugin" ? (
+              plugin.chips.map((chip) => (
+                <span key={chip.label} className="centre-chip" data-tone={chip.tone}>
+                  {chip.label}
+                </span>
+              ))
+            ) : (
+              <span className="centre-chip">{whereOf(item, t)}</span>
+            )}
           </span>
         </button>
         {item.kind === "request" && (

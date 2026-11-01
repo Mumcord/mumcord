@@ -11,17 +11,20 @@
     "open": "Näytä päivitykset"
   },
   "suggestion": {
-    "title": "Tämä palvelin ehdottaa laajennusta {{name}}",
+    "title": "Tämä palvelin käyttää: {{name}}",
     "noReason": "Palvelimen ehdottama",
-    "install": "Asenna",
+    "install": "Asenna…",
     "installLabel": "Asenna {{name}}",
-    "addRepository": "Lisää arkisto",
     "addRepositoryLabel": "Lisää arkisto: {{name}}",
-    "details": "Tiedot",
+    "details": "Näytä tiedot",
     "detailsLabel": "Tiedot: {{name}}",
     "notNow": "Ei nyt",
     "notNowLabel": "Piilota {{name}} toistaiseksi",
-    "dontAsk": "Älä kysy enää tästä palvelimesta"
+    "dontAsk": "Älä kysy enää tästä palvelimesta",
+    "recommended": "Suositeltu",
+    "official": "Virallinen",
+    "unofficial": "Epävirallinen · {{host}}",
+    "footer": "Ehdotukset eivät asenna mitään itsestään. Palvelin ei saa tietää, mitä asennat."
   },
   "failed": "Se ei onnistunut. Yritä uudelleen."
 }

@@ -54,6 +54,8 @@ function SuggestionActions({ item, notice }: { item: PluginItem; notice: Suggest
           </button>
         </>
       ) : (
+        // A third-party plugin cannot be installed before its repository is known (FR-6.78), so
+        // "Install…" leads to the Add repository dialog.
         <button
           type="button"
           className="button button--primary centre-entry__action"
@@ -65,7 +67,7 @@ function SuggestionActions({ item, notice }: { item: PluginItem; notice: Suggest
             requestPluginScreen({ kind: "addRepository", url: source.url, key: source.key });
           }}
         >
-          {t("suggestion.addRepository")}
+          {t("suggestion.install")}
         </button>
       )}
       <button
@@ -86,7 +88,7 @@ function SuggestionActions({ item, notice }: { item: PluginItem; notice: Suggest
       </button>
       <button
         type="button"
-        className="button centre-entry__action"
+        className="centre-entry__link"
         data-testid="centre-plugin-dont-ask"
         onClick={() => {
           answer(
@@ -157,4 +159,10 @@ export function PluginActions({ item }: { item: PluginItem }) {
     case "message":
       return null;
   }
+}
+
+/** Under the list when it holds suggestions: they never act on their own (FR-6.79). */
+export function PluginSuggestionsNote() {
+  const { t } = useTranslation("pluginNotifications");
+  return <p className="centre__note">{t("suggestion.footer")}</p>;
 }

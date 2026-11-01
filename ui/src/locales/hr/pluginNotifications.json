@@ -11,17 +11,20 @@
     "open": "Prikaži ažuriranja"
   },
   "suggestion": {
-    "title": "Ovaj poslužitelj predlaže {{name}}",
+    "title": "Ovaj poslužitelj koristi {{name}}",
     "noReason": "Predložio poslužitelj",
-    "install": "Instaliraj",
+    "install": "Instaliraj…",
     "installLabel": "Instaliraj {{name}}",
-    "addRepository": "Dodaj repozitorij",
     "addRepositoryLabel": "Dodaj repozitorij za {{name}}",
-    "details": "Pojedinosti",
+    "details": "Prikaži pojedinosti",
     "detailsLabel": "Pojedinosti o {{name}}",
     "notNow": "Ne sada",
     "notNowLabel": "Za sada sakrij {{name}}",
-    "dontAsk": "Više ne pitaj za ovaj poslužitelj"
+    "dontAsk": "Više ne pitaj za ovaj poslužitelj",
+    "recommended": "Preporučeno",
+    "official": "Službeno",
+    "unofficial": "Neslužbeno · {{host}}",
+    "footer": "Prijedlozi nikad ništa ne instaliraju sami. Poslužitelj ne zna što instalirate."
   },
   "failed": "Nije uspjelo. Pokušajte ponovno."
 }

@@ -11,17 +11,20 @@
     "open": "Vis opdateringer"
   },
   "suggestion": {
-    "title": "Denne server foreslår {{name}}",
+    "title": "Denne server bruger {{name}}",
     "noReason": "Foreslået af serveren",
-    "install": "Installer",
+    "install": "Installer…",
     "installLabel": "Installer {{name}}",
-    "addRepository": "Tilføj repository",
     "addRepositoryLabel": "Tilføj repository til {{name}}",
-    "details": "Detaljer",
+    "details": "Se detaljer",
     "detailsLabel": "Detaljer om {{name}}",
     "notNow": "Ikke nu",
     "notNowLabel": "Skjul {{name}} for nu",
-    "dontAsk": "Spørg ikke igen for denne server"
+    "dontAsk": "Spørg ikke igen for denne server",
+    "recommended": "Anbefalet",
+    "official": "Officiel",
+    "unofficial": "Uofficiel · {{host}}",
+    "footer": "Forslag installerer aldrig noget af sig selv. Serveren får ikke at vide, hvad du installerer."
   },
   "failed": "Det virkede ikke. Prøv igen."
 }

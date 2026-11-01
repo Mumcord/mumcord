@@ -11,17 +11,20 @@
     "open": "Näita uuendusi"
   },
   "suggestion": {
-    "title": "See server soovitab: {{name}}",
+    "title": "See server kasutab {{name}}",
     "noReason": "Serveri soovitatud",
-    "install": "Installi",
+    "install": "Installi…",
     "installLabel": "Installi {{name}}",
-    "addRepository": "Lisa hoidla",
     "addRepositoryLabel": "Lisa hoidla: {{name}}",
-    "details": "Üksikasjad",
+    "details": "Vaata üksikasju",
     "detailsLabel": "Üksikasjad: {{name}}",
     "notNow": "Mitte praegu",
     "notNowLabel": "Peida {{name}} praegu",
-    "dontAsk": "Ära enam selle serveri kohta küsi"
+    "dontAsk": "Ära enam selle serveri kohta küsi",
+    "recommended": "Soovitatud",
+    "official": "Ametlik",
+    "unofficial": "Mitteametlik · {{host}}",
+    "footer": "Soovitused ei installi iial midagi ise. Server ei saa teada, mida sa installid."
   },
   "failed": "See ei õnnestunud. Proovi uuesti."
 }

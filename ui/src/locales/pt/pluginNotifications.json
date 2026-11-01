@@ -11,17 +11,20 @@
     "open": "Mostrar atualizações"
   },
   "suggestion": {
-    "title": "Este servidor sugere {{name}}",
+    "title": "Este servidor usa {{name}}",
     "noReason": "Sugerido pelo servidor",
-    "install": "Instalar",
+    "install": "Instalar…",
     "installLabel": "Instalar {{name}}",
-    "addRepository": "Adicionar repositório",
     "addRepositoryLabel": "Adicionar repositório para {{name}}",
-    "details": "Detalhes",
+    "details": "Ver detalhes",
     "detailsLabel": "Detalhes de {{name}}",
     "notNow": "Agora não",
     "notNowLabel": "Ocultar {{name}} por agora",
-    "dontAsk": "Não perguntar novamente neste servidor"
+    "dontAsk": "Não perguntar novamente neste servidor",
+    "recommended": "Recomendado",
+    "official": "Oficial",
+    "unofficial": "Não oficial · {{host}}",
+    "footer": "As sugestões nunca instalam nada sozinhas. O servidor não sabe o que você instala."
   },
   "failed": "Isso não funcionou. Tente novamente."
 }

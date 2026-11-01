@@ -11,17 +11,20 @@
     "open": "Afișează actualizările"
   },
   "suggestion": {
-    "title": "Acest server sugerează {{name}}",
+    "title": "Acest server folosește {{name}}",
     "noReason": "Sugerat de server",
-    "install": "Instalează",
+    "install": "Instalează…",
     "installLabel": "Instalează {{name}}",
-    "addRepository": "Adaugă depozit",
     "addRepositoryLabel": "Adaugă depozit pentru {{name}}",
-    "details": "Detalii",
+    "details": "Vezi detaliile",
     "detailsLabel": "Detalii despre {{name}}",
     "notNow": "Nu acum",
     "notNowLabel": "Ascunde {{name}} deocamdată",
-    "dontAsk": "Nu mai întreba pentru acest server"
+    "dontAsk": "Nu mai întreba pentru acest server",
+    "recommended": "Recomandat",
+    "official": "Oficial",
+    "unofficial": "Neoficial · {{host}}",
+    "footer": "Sugestiile nu instalează niciodată nimic de la sine. Serverul nu află ce instalezi."
   },
   "failed": "Nu a funcționat. Încearcă din nou."
 }

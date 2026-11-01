@@ -11,17 +11,20 @@
     "open": "Zobrazit aktualizace"
   },
   "suggestion": {
-    "title": "Tento server doporučuje {{name}}",
+    "title": "Tento server používá {{name}}",
     "noReason": "Doporučeno serverem",
-    "install": "Nainstalovat",
+    "install": "Nainstalovat…",
     "installLabel": "Nainstalovat {{name}}",
-    "addRepository": "Přidat repozitář",
     "addRepositoryLabel": "Přidat repozitář pro {{name}}",
-    "details": "Podrobnosti",
+    "details": "Zobrazit podrobnosti",
     "detailsLabel": "Podrobnosti o {{name}}",
     "notNow": "Teď ne",
     "notNowLabel": "Prozatím skrýt {{name}}",
-    "dontAsk": "Pro tento server se už neptat"
+    "dontAsk": "Pro tento server se už neptat",
+    "recommended": "Doporučeno",
+    "official": "Oficiální",
+    "unofficial": "Neoficiální · {{host}}",
+    "footer": "Návrhy nikdy nic samy neinstalují. Server se nedozví, co instalujete."
   },
   "failed": "Nepodařilo se. Zkuste to prosím znovu."
 }

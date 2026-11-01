@@ -11,17 +11,20 @@
     "open": "Rādīt atjauninājumus"
   },
   "suggestion": {
-    "title": "Šis serveris iesaka {{name}}",
+    "title": "Šis serveris izmanto {{name}}",
     "noReason": "Servera ieteikums",
-    "install": "Instalēt",
+    "install": "Instalēt…",
     "installLabel": "Instalēt {{name}}",
-    "addRepository": "Pievienot krātuvi",
     "addRepositoryLabel": "Pievienot krātuvi: {{name}}",
-    "details": "Detaļas",
+    "details": "Skatīt detaļas",
     "detailsLabel": "Detaļas: {{name}}",
     "notNow": "Ne tagad",
     "notNowLabel": "Pagaidām paslēpt {{name}}",
-    "dontAsk": "Vairs nejautāt par šo serveri"
+    "dontAsk": "Vairs nejautāt par šo serveri",
+    "recommended": "Ieteicams",
+    "official": "Oficiāls",
+    "unofficial": "Neoficiāls · {{host}}",
+    "footer": "Ieteikumi nekad paši neko neinstalē. Serveris neuzzina, ko jūs instalējat."
   },
   "failed": "Neizdevās. Lūdzu, mēģiniet vēlreiz."
 }

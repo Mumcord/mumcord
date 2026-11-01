@@ -11,17 +11,20 @@
     "open": "Updates tonen"
   },
   "suggestion": {
-    "title": "Deze server stelt {{name}} voor",
+    "title": "Deze server gebruikt {{name}}",
     "noReason": "Voorgesteld door de server",
-    "install": "Installeren",
+    "install": "Installeren…",
     "installLabel": "{{name}} installeren",
-    "addRepository": "Repository toevoegen",
     "addRepositoryLabel": "Repository voor {{name}} toevoegen",
-    "details": "Details",
+    "details": "Details bekijken",
     "detailsLabel": "Details van {{name}}",
     "notNow": "Nu niet",
     "notNowLabel": "{{name}} voorlopig verbergen",
-    "dontAsk": "Niet meer vragen voor deze server"
+    "dontAsk": "Niet meer vragen voor deze server",
+    "recommended": "Aanbevolen",
+    "official": "Officieel",
+    "unofficial": "Onofficieel · {{host}}",
+    "footer": "Suggesties installeren nooit zelf iets. De server weet niet wat je installeert."
   },
   "failed": "Dat is niet gelukt. Probeer het opnieuw."
 }
