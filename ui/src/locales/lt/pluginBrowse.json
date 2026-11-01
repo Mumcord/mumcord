@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorijos",
   "category": {
     "all": "Visi",
-    "fun": "Pramogos",
+    "fun": "Pramogos ir augintiniai",
     "games": "Žaidimai",
-    "chat": "Pokalbiai",
-    "voice": "Balsas",
+    "chat": "Pokalbių įrankiai",
+    "voice": "Balso įrankiai",
     "accessibility": "Prieinamumas",
     "looks": "Išvaizda",
     "tools": "Įrankiai"
@@ -17,14 +17,13 @@
   "retry": "Bandyti dar kartą",
   "empty": "Papildinių dar nėra.",
   "noMatch": "Nė vienas papildinys neatitinka paieškos.",
-  "highlight": "Rekomenduojami",
+  "details": "Išsami informacija",
   "official": "Oficialus",
   "unofficial": "Neoficialus · {{repository}}",
   "reviewed": "Peržiūrėjo „Mumcord“",
   "installed": "Įdiegtas",
   "install": "Įdiegti",
   "installNamed": "Įdiegti {{name}}",
-  "details": "Išsami informacija",
   "detailsNamed": "Išsami informacija apie {{name}}",
   "version": "Versija {{version}}",
   "by": "autorius: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Iš neoficialios saugyklos",
   "unofficialText": "„Mumcord“ neperžiūri saugyklos {{repository}}. Papildinys vis tiek veikia smėlio dėžėje ir gauna tik jūsų leidžiamus leidimus.",
   "checksTitle": "Oficialūs patikrinimai vis dar galioja",
-  "checksText": "„Mumcord“ atšaukimo sąrašas gali jį išjungti. Oficialių papildinių pavadinimai rezervuoti."
+  "checksText": "„Mumcord“ atšaukimo sąrašas gali jį išjungti. Oficialių papildinių pavadinimai rezervuoti.",
+  "metaPermissions": "Leidimai: {{count}}",
+  "footer": "Oficiali saugykla · pasirašytas sąrašas patikrintas · nieko apie jus nesiunčiama"
 }

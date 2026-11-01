@@ -4,10 +4,10 @@
   "categoriesLabel": "Categorieën",
   "category": {
     "all": "Alle",
-    "fun": "Leuk",
+    "fun": "Leuk en huisdieren",
     "games": "Spellen",
-    "chat": "Chat",
-    "voice": "Spraak",
+    "chat": "Chat-hulpmiddelen",
+    "voice": "Spraak-hulpmiddelen",
     "accessibility": "Toegankelijkheid",
     "looks": "Uiterlijk",
     "tools": "Hulpmiddelen"
@@ -17,14 +17,13 @@
   "retry": "Opnieuw proberen",
   "empty": "Er zijn nog geen plug-ins beschikbaar.",
   "noMatch": "Geen plug-ins gevonden voor je zoekopdracht.",
-  "highlight": "Uitgelicht",
+  "details": "Details",
   "official": "Officieel",
   "unofficial": "Niet-officieel · {{repository}}",
   "reviewed": "Gecontroleerd door Mumcord",
   "installed": "Geïnstalleerd",
   "install": "Installeren",
   "installNamed": "{{name}} installeren",
-  "details": "Details",
   "detailsNamed": "Details van {{name}}",
   "version": "Versie {{version}}",
   "by": "door {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Uit een onofficiële repository",
   "unofficialText": "{{repository}} wordt niet beoordeeld door Mumcord. De plugin draait nog steeds in de sandbox en krijgt alleen de rechten die jij toestaat.",
   "checksTitle": "Officiële controles blijven gelden",
-  "checksText": "De intrekkingslijst van Mumcord kan de plugin uitschakelen. Namen van officiële plugins zijn gereserveerd."
+  "checksText": "De intrekkingslijst van Mumcord kan de plugin uitschakelen. Namen van officiële plugins zijn gereserveerd.",
+  "metaPermissions": "Rechten: {{count}}",
+  "footer": "Officiële repository · ondertekende lijst gecontroleerd · er wordt niets over jou verzonden"
 }

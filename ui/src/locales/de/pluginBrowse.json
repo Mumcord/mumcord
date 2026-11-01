@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorien",
   "category": {
     "all": "Alle",
-    "fun": "Spaß",
+    "fun": "Spaß & Haustiere",
     "games": "Spiele",
-    "chat": "Chat",
-    "voice": "Sprache",
+    "chat": "Chat-Werkzeuge",
+    "voice": "Sprach-Werkzeuge",
     "accessibility": "Barrierefreiheit",
     "looks": "Optik",
     "tools": "Werkzeuge"
@@ -17,14 +17,13 @@
   "retry": "Erneut versuchen",
   "empty": "Noch keine Plugins verfügbar.",
   "noMatch": "Keine Plugins passen zu deiner Suche.",
-  "highlight": "Empfohlen",
+  "details": "Details",
   "official": "Offiziell",
   "unofficial": "Inoffiziell · {{repository}}",
   "reviewed": "Von Mumcord geprüft",
   "installed": "Installiert",
   "install": "Installieren",
   "installNamed": "{{name}} installieren",
-  "details": "Details",
   "detailsNamed": "Details zu {{name}}",
   "version": "Version {{version}}",
   "by": "von {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Aus einem inoffiziellen Repository",
   "unofficialText": "{{repository}} wird nicht von Mumcord geprüft. Es läuft trotzdem in der Sandbox und erhält nur die Berechtigungen, die du erlaubst.",
   "checksTitle": "Offizielle Prüfungen gelten weiterhin",
-  "checksText": "Die Sperrliste von Mumcord kann es abschalten. Namen offizieller Plugins sind reserviert."
+  "checksText": "Die Sperrliste von Mumcord kann es abschalten. Namen offizieller Plugins sind reserviert.",
+  "metaPermissions": "Berechtigungen: {{count}}",
+  "footer": "Offizielles Repository · signierte Liste geprüft · nichts über dich wird gesendet"
 }

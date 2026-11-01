@@ -4,10 +4,10 @@
   "categoriesLabel": "Categories",
   "category": {
     "all": "All",
-    "fun": "Fun",
+    "fun": "Fun & pets",
     "games": "Games",
-    "chat": "Chat",
-    "voice": "Voice",
+    "chat": "Chat tools",
+    "voice": "Voice tools",
     "accessibility": "Accessibility",
     "looks": "Looks",
     "tools": "Tools"
@@ -17,14 +17,13 @@
   "retry": "Try again",
   "empty": "No plugins are available yet.",
   "noMatch": "No plugins match your search.",
-  "highlight": "Featured",
+  "details": "Details",
   "official": "Official",
   "unofficial": "Unofficial · {{repository}}",
   "reviewed": "Reviewed by Mumcord",
   "installed": "Installed",
   "install": "Install",
   "installNamed": "Install {{name}}",
-  "details": "Details",
   "detailsNamed": "Details of {{name}}",
   "version": "Version {{version}}",
   "by": "by {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "From an unofficial repository",
   "unofficialText": "{{repository}} is not reviewed by Mumcord. It still runs in the sandbox and gets only the permissions you allow.",
   "checksTitle": "Official checks still apply",
-  "checksText": "Mumcord's revocation list can turn it off. Names used by official plugins are reserved."
+  "checksText": "Mumcord's revocation list can turn it off. Names used by official plugins are reserved.",
+  "metaPermissions": "Permissions: {{count}}",
+  "footer": "Official repository · signed index checked · nothing about you is sent"
 }

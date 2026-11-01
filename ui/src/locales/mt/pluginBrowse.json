@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategoriji",
   "category": {
     "all": "Kollha",
-    "fun": "Divertiment",
+    "fun": "Divertiment u annimali domestiċi",
     "games": "Logħob",
-    "chat": "Chat",
-    "voice": "Vuċi",
+    "chat": "Għodod tal-chat",
+    "voice": "Għodod tal-vuċi",
     "accessibility": "Aċċessibilità",
     "looks": "Dehra",
     "tools": "Għodod"
@@ -17,14 +17,13 @@
   "retry": "Erġa' pprova",
   "empty": "Għad m'hemm l-ebda plagin disponibbli.",
   "noMatch": "L-ebda plagin ma jaqbel mat-tiftix tiegħek.",
-  "highlight": "Ippreżentat",
+  "details": "Dettalji",
   "official": "Uffiċjali",
   "unofficial": "Mhux uffiċjali · {{repository}}",
   "reviewed": "Rivedut minn Mumcord",
   "installed": "Installat",
   "install": "Installa",
   "installNamed": "Installa {{name}}",
-  "details": "Dettalji",
   "detailsNamed": "Dettalji ta' {{name}}",
   "version": "Verżjoni {{version}}",
   "by": "minn {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Minn repożitorju mhux uffiċjali",
   "unofficialText": "{{repository}} ma jiġix rivedut minn Mumcord. Xorta jaħdem fis-sandbox u jieħu biss il-permessi li inti tippermetti.",
   "checksTitle": "It-tiftixiet uffiċjali xorta japplikaw",
-  "checksText": "Il-lista ta' revoka ta' Mumcord tista' titfih. L-ismijiet tal-plugins uffiċjali huma riżervati."
+  "checksText": "Il-lista ta' revoka ta' Mumcord tista' titfih. L-ismijiet tal-plugins uffiċjali huma riżervati.",
+  "metaPermissions": "Permessi: {{count}}",
+  "footer": "Repożitorju uffiċjali · lista ffirmata ċċekkjata · xejn dwarek ma jintbagħat"
 }

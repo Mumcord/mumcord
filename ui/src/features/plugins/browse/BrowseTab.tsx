@@ -9,7 +9,7 @@ import "./browse.css";
 import { loadPluginIndex, usePluginIndex } from "./indexStore";
 import { PluginCard } from "./PluginCard";
 import { PluginDetails } from "./PluginDetails";
-import { CATEGORIES, isHighlighted, visiblePlugins, type Category } from "./filter";
+import { CATEGORIES, visiblePlugins, type Category } from "./filter";
 import { needsRepositoryWarning } from "./source";
 
 /**
@@ -130,7 +130,7 @@ export function BrowseTab() {
             <input
               id={searchId}
               type="search"
-              className="settings-input"
+              className="settings-input plugin-browse-search"
               placeholder={t("searchPlaceholder")}
               value={search}
               onChange={(event) => {
@@ -164,6 +164,7 @@ export function BrowseTab() {
             onDetails={setDetailsId}
             onInstall={setPromptId}
           />
+          <p className="plugin-browse-footer">{t("footer")}</p>
         </>
       )}
       {prompt}
@@ -194,7 +195,6 @@ function BrowseList({
           key={`${plugin.source.kind === "repo" ? String(plugin.source.repositoryId) : "official"}:${plugin.id}`}
           plugin={plugin}
           installed={isInstalled(plugin.id)}
-          highlighted={isHighlighted(plugin)}
           onDetails={() => {
             onDetails(plugin.id);
           }}

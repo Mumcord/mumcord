@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorier",
   "category": {
     "all": "Alla",
-    "fun": "Skoj",
+    "fun": "Skoj och husdjur",
     "games": "Spel",
-    "chat": "Chatt",
-    "voice": "Röst",
+    "chat": "Chattverktyg",
+    "voice": "Röstverktyg",
     "accessibility": "Tillgänglighet",
     "looks": "Utseende",
     "tools": "Verktyg"
@@ -17,14 +17,13 @@
   "retry": "Försök igen",
   "empty": "Det finns inga tillägg ännu.",
   "noMatch": "Inga tillägg matchar din sökning.",
-  "highlight": "Utvalda",
+  "details": "Detaljer",
   "official": "Officiellt",
   "unofficial": "Inofficiellt · {{repository}}",
   "reviewed": "Granskat av Mumcord",
   "installed": "Installerat",
   "install": "Installera",
   "installNamed": "Installera {{name}}",
-  "details": "Detaljer",
   "detailsNamed": "Detaljer om {{name}}",
   "version": "Version {{version}}",
   "by": "av {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Från ett inofficiellt förråd",
   "unofficialText": "{{repository}} granskas inte av Mumcord. Pluginet körs ändå i sandlådan och får bara de behörigheter du tillåter.",
   "checksTitle": "Officiella kontroller gäller fortfarande",
-  "checksText": "Mumcords spärrlista kan stänga av det. Namn som används av officiella plugins är reserverade."
+  "checksText": "Mumcords spärrlista kan stänga av det. Namn som används av officiella plugins är reserverade.",
+  "metaPermissions": "Behörigheter: {{count}}",
+  "footer": "Officiellt förråd · signerad lista kontrollerad · inget om dig skickas"
 }

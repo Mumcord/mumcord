@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategooriad",
   "category": {
     "all": "Kõik",
-    "fun": "Lõbu",
+    "fun": "Lõbu ja lemmikloomad",
     "games": "Mängud",
-    "chat": "Vestlus",
-    "voice": "Hääl",
+    "chat": "Vestlustööriistad",
+    "voice": "Häälutööriistad",
     "accessibility": "Juurdepääsetavus",
     "looks": "Välimus",
     "tools": "Tööriistad"
@@ -17,14 +17,13 @@
   "retry": "Proovi uuesti",
   "empty": "Pluginaid pole veel saadaval.",
   "noMatch": "Ükski plugin ei vasta otsingule.",
-  "highlight": "Esiletõstetud",
+  "details": "Üksikasjad",
   "official": "Ametlik",
   "unofficial": "Mitteametlik · {{repository}}",
   "reviewed": "Mumcordi poolt üle vaadatud",
   "installed": "Paigaldatud",
   "install": "Paigalda",
   "installNamed": "Paigalda {{name}}",
-  "details": "Üksikasjad",
   "detailsNamed": "{{name}} üksikasjad",
   "version": "Versioon {{version}}",
   "by": "autor: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Mitteametlikust hoidlast",
   "unofficialText": "Mumcord ei vaata hoidlat {{repository}} üle. Pistikprogramm töötab siiski liivakastis ja saab ainult load, mida sa lubad.",
   "checksTitle": "Ametlikud kontrollid kehtivad endiselt",
-  "checksText": "Mumcordi tühistusnimekiri võib selle välja lülitada. Ametlike pistikprogrammide nimed on reserveeritud."
+  "checksText": "Mumcordi tühistusnimekiri võib selle välja lülitada. Ametlike pistikprogrammide nimed on reserveeritud.",
+  "metaPermissions": "Õigused: {{count}}",
+  "footer": "Ametlik repositoorium · allkirjastatud loend kontrollitud · sinu kohta ei saadeta midagi"
 }

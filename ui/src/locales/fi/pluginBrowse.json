@@ -4,10 +4,10 @@
   "categoriesLabel": "Luokat",
   "category": {
     "all": "Kaikki",
-    "fun": "Hauskat",
+    "fun": "Hauskat ja lemmikit",
     "games": "Pelit",
-    "chat": "Chat",
-    "voice": "Ääni",
+    "chat": "Chat-työkalut",
+    "voice": "Äänityökalut",
     "accessibility": "Saavutettavuus",
     "looks": "Ulkoasu",
     "tools": "Työkalut"
@@ -17,14 +17,13 @@
   "retry": "Yritä uudelleen",
   "empty": "Lisäosia ei ole vielä saatavilla.",
   "noMatch": "Mikään lisäosa ei vastaa hakua.",
-  "highlight": "Suositellut",
+  "details": "Tiedot",
   "official": "Virallinen",
   "unofficial": "Epävirallinen · {{repository}}",
   "reviewed": "Mumcordin tarkastama",
   "installed": "Asennettu",
   "install": "Asenna",
   "installNamed": "Asenna {{name}}",
-  "details": "Tiedot",
   "detailsNamed": "Lisäosan {{name}} tiedot",
   "version": "Versio {{version}}",
   "by": "tekijä: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Epävirallisesta tietovarastosta",
   "unofficialText": "Mumcord ei ole tarkastanut tietovarastoa {{repository}}. Lisäosa toimii silti hiekkalaatikossa ja saa vain sallimasi oikeudet.",
   "checksTitle": "Viralliset tarkistukset ovat edelleen voimassa",
-  "checksText": "Mumcordin estolista voi poistaa sen käytöstä. Virallisten lisäosien nimet on varattu."
+  "checksText": "Mumcordin estolista voi poistaa sen käytöstä. Virallisten lisäosien nimet on varattu.",
+  "metaPermissions": "Oikeudet: {{count}}",
+  "footer": "Virallinen lähde · allekirjoitettu luettelo tarkistettu · sinusta ei lähetetä mitään"
 }

@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorije",
   "category": {
     "all": "Vsi",
-    "fun": "Zabava",
+    "fun": "Zabava in ljubljenčki",
     "games": "Igre",
-    "chat": "Klepet",
-    "voice": "Glas",
+    "chat": "Orodja za klepet",
+    "voice": "Glasovna orodja",
     "accessibility": "Dostopnost",
     "looks": "Videz",
     "tools": "Orodja"
@@ -17,14 +17,13 @@
   "retry": "Poskusi znova",
   "empty": "Vtičniki še niso na voljo.",
   "noMatch": "Noben vtičnik ne ustreza iskanju.",
-  "highlight": "Izpostavljeno",
+  "details": "Podrobnosti",
   "official": "Uradni",
   "unofficial": "Neuradni · {{repository}}",
   "reviewed": "Pregledal Mumcord",
   "installed": "Nameščen",
   "install": "Namesti",
   "installNamed": "Namesti {{name}}",
-  "details": "Podrobnosti",
   "detailsNamed": "Podrobnosti o {{name}}",
   "version": "Različica {{version}}",
   "by": "avtor: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Iz neuradnega repozitorija",
   "unofficialText": "Mumcord ne pregleduje repozitorija {{repository}}. Vtičnik se še vedno izvaja v peskovniku in dobi le dovoljenja, ki jih dovolite.",
   "checksTitle": "Uradni pregledi še vedno veljajo",
-  "checksText": "Mumcordov seznam preklicev ga lahko izklopi. Imena uradnih vtičnikov so rezervirana."
+  "checksText": "Mumcordov seznam preklicev ga lahko izklopi. Imena uradnih vtičnikov so rezervirana.",
+  "metaPermissions": "Dovoljenja: {{count}}",
+  "footer": "Uradni repozitorij · podpisani seznam preverjen · nič o vas se ne pošilja"
 }

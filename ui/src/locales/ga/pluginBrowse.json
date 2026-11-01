@@ -4,10 +4,10 @@
   "categoriesLabel": "Catagóirí",
   "category": {
     "all": "Gach",
-    "fun": "Spraoi",
+    "fun": "Spraoi agus peataí",
     "games": "Cluichí",
-    "chat": "Comhrá",
-    "voice": "Guth",
+    "chat": "Uirlisí comhrá",
+    "voice": "Uirlisí gutha",
     "accessibility": "Inrochtaineacht",
     "looks": "Cuma",
     "tools": "Uirlisí"
@@ -17,14 +17,13 @@
   "retry": "Bain triail eile as",
   "empty": "Níl aon bhreiseán ar fáil go fóill.",
   "noMatch": "Ní réitíonn aon bhreiseán le do chuardach.",
-  "highlight": "Aibhsithe",
+  "details": "Sonraí",
   "official": "Oifigiúil",
   "unofficial": "Neamhoifigiúil · {{repository}}",
   "reviewed": "Athbhreithnithe ag Mumcord",
   "installed": "Suiteáilte",
   "install": "Suiteáil",
   "installNamed": "Suiteáil {{name}}",
-  "details": "Sonraí",
   "detailsNamed": "Sonraí {{name}}",
   "version": "Leagan {{version}}",
   "by": "le {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Ó stór neamhoifigiúil",
   "unofficialText": "Ní athbhreithníonn Mumcord {{repository}}. Ritheann sé sa bhosca gainimh fós agus faigheann sé na ceadanna a cheadaíonn tú amháin.",
   "checksTitle": "Baineann seiceálacha oifigiúla fós",
-  "checksText": "Is féidir le liosta cúlghairme Mumcord é a dhíchumasú. Tá ainmneacha breiseán oifigiúil in áirithe."
+  "checksText": "Is féidir le liosta cúlghairme Mumcord é a dhíchumasú. Tá ainmneacha breiseán oifigiúil in áirithe.",
+  "metaPermissions": "Ceadanna: {{count}}",
+  "footer": "Stór oifigiúil · liosta sínithe seiceáilte · ní sheoltar aon ní fút"
 }

@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorier",
   "category": {
     "all": "Alle",
-    "fun": "Sjov",
+    "fun": "Sjov og kæledyr",
     "games": "Spil",
-    "chat": "Chat",
-    "voice": "Stemme",
+    "chat": "Chatværktøjer",
+    "voice": "Stemmeværktøjer",
     "accessibility": "Tilgængelighed",
     "looks": "Udseende",
     "tools": "Værktøjer"
@@ -17,14 +17,13 @@
   "retry": "Prøv igen",
   "empty": "Der er endnu ingen plugins tilgængelige.",
   "noMatch": "Ingen plugins matcher din søgning.",
-  "highlight": "Fremhævet",
+  "details": "Detaljer",
   "official": "Officiel",
   "unofficial": "Uofficiel · {{repository}}",
   "reviewed": "Gennemgået af Mumcord",
   "installed": "Installeret",
   "install": "Installér",
   "installNamed": "Installér {{name}}",
-  "details": "Detaljer",
   "detailsNamed": "Detaljer om {{name}}",
   "version": "Version {{version}}",
   "by": "af {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Fra et uofficielt arkiv",
   "unofficialText": "{{repository}} er ikke gennemgået af Mumcord. Pluginnet kører stadig i sandkassen og får kun de tilladelser, du giver.",
   "checksTitle": "Officielle kontroller gælder stadig",
-  "checksText": "Mumcords spærreliste kan slå det fra. Navne brugt af officielle plugins er reserverede."
+  "checksText": "Mumcords spærreliste kan slå det fra. Navne brugt af officielle plugins er reserverede.",
+  "metaPermissions": "Tilladelser: {{count}}",
+  "footer": "Officielt lager · signeret liste kontrolleret · intet om dig sendes"
 }

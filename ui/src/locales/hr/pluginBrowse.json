@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorije",
   "category": {
     "all": "Sve",
-    "fun": "Zabava",
+    "fun": "Zabava i ljubimci",
     "games": "Igre",
-    "chat": "Chat",
-    "voice": "Glas",
+    "chat": "Alati za chat",
+    "voice": "Glasovni alati",
     "accessibility": "Pristupačnost",
     "looks": "Izgled",
     "tools": "Alati"
@@ -17,14 +17,13 @@
   "retry": "Pokušaj ponovno",
   "empty": "Još nema dostupnih dodataka.",
   "noMatch": "Nijedan dodatak ne odgovara pretraživanju.",
-  "highlight": "Istaknuto",
+  "details": "Detalji",
   "official": "Službeni",
   "unofficial": "Neslužbeni · {{repository}}",
   "reviewed": "Pregledao Mumcord",
   "installed": "Instalirano",
   "install": "Instaliraj",
   "installNamed": "Instaliraj {{name}}",
-  "details": "Detalji",
   "detailsNamed": "Detalji dodatka {{name}}",
   "version": "Verzija {{version}}",
   "by": "autor: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Iz neslužbenog repozitorija",
   "unofficialText": "Mumcord ne provjerava {{repository}}. Dodatak se i dalje izvodi u izoliranom okruženju i dobiva samo dopuštenja koja odobrite.",
   "checksTitle": "Službene provjere i dalje vrijede",
-  "checksText": "Mumcordov popis opoziva može ga isključiti. Nazivi službenih dodataka rezervirani su."
+  "checksText": "Mumcordov popis opoziva može ga isključiti. Nazivi službenih dodataka rezervirani su.",
+  "metaPermissions": "Dopuštenja: {{count}}",
+  "footer": "Službeni repozitorij · potpisani popis provjeren · ništa o vama se ne šalje"
 }

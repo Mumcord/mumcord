@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorie",
   "category": {
     "all": "Vše",
-    "fun": "Zábava",
+    "fun": "Zábava a mazlíčci",
     "games": "Hry",
-    "chat": "Chat",
-    "voice": "Hlas",
+    "chat": "Nástroje pro chat",
+    "voice": "Nástroje pro hlas",
     "accessibility": "Přístupnost",
     "looks": "Vzhled",
     "tools": "Nástroje"
@@ -17,14 +17,13 @@
   "retry": "Zkusit znovu",
   "empty": "Zatím nejsou k dispozici žádné doplňky.",
   "noMatch": "Hledání neodpovídá žádný doplněk.",
-  "highlight": "Doporučené",
+  "details": "Podrobnosti",
   "official": "Oficiální",
   "unofficial": "Neoficiální · {{repository}}",
   "reviewed": "Zkontrolováno Mumcordem",
   "installed": "Nainstalováno",
   "install": "Nainstalovat",
   "installNamed": "Nainstalovat {{name}}",
-  "details": "Podrobnosti",
   "detailsNamed": "Podrobnosti o doplňku {{name}}",
   "version": "Verze {{version}}",
   "by": "od {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Z neoficiálního repozitáře",
   "unofficialText": "{{repository}} Mumcord nekontroluje. Plugin přesto běží v izolovaném prostředí a dostane jen oprávnění, která povolíte.",
   "checksTitle": "Oficiální kontroly stále platí",
-  "checksText": "Seznam zrušených pluginů Mumcordu ho může vypnout. Názvy oficiálních pluginů jsou vyhrazeny."
+  "checksText": "Seznam zrušených pluginů Mumcordu ho může vypnout. Názvy oficiálních pluginů jsou vyhrazeny.",
+  "metaPermissions": "Oprávnění: {{count}}",
+  "footer": "Oficiální repozitář · podepsaný seznam ověřen · nic o vás se neodesílá"
 }

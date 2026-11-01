@@ -69,9 +69,9 @@ describe("BrowseTab", () => {
     const list = await screen.findByRole("list", { name: "Available plugins" });
     const first = within(list).getAllByRole("listitem").at(0);
     expect(first?.querySelector("h3")?.textContent).toBe("Echolings");
-    expect(first?.textContent).toContain("Featured");
+    expect(first?.textContent).toContain("✓ Official");
     expect(screen.getAllByRole("button", { name: /^Install / })).toHaveLength(3);
-    expect(screen.getAllByText("Official")).toHaveLength(3);
+    expect(screen.getAllByText("✓ Official")).toHaveLength(3);
     expect(await axeViolations(container)).toEqual([]);
   });
 
@@ -122,7 +122,7 @@ describe("BrowseTab", () => {
       plugins: [{ id: "dice", source: { kind: "official" } }],
     } as never);
     render(<BrowseTab />, { wrapper: Wrapper });
-    expect(await screen.findByText("Installed")).toBeTruthy();
+    expect(await screen.findByText("✓ Installed")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Install Dice" })).toBeNull();
   });
 

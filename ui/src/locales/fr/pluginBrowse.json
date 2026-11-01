@@ -4,10 +4,10 @@
   "categoriesLabel": "Catégories",
   "category": {
     "all": "Tous",
-    "fun": "Divertissement",
+    "fun": "Fun et animaux",
     "games": "Jeux",
-    "chat": "Chat",
-    "voice": "Voix",
+    "chat": "Outils de chat",
+    "voice": "Outils vocaux",
     "accessibility": "Accessibilité",
     "looks": "Apparence",
     "tools": "Outils"
@@ -17,14 +17,13 @@
   "retry": "Réessayer",
   "empty": "Aucun plugin n’est encore disponible.",
   "noMatch": "Aucun plugin ne correspond à votre recherche.",
-  "highlight": "À la une",
+  "details": "Détails",
   "official": "Officiel",
   "unofficial": "Non officiel · {{repository}}",
   "reviewed": "Vérifié par Mumcord",
   "installed": "Installé",
   "install": "Installer",
   "installNamed": "Installer {{name}}",
-  "details": "Détails",
   "detailsNamed": "Détails de {{name}}",
   "version": "Version {{version}}",
   "by": "par {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Depuis un dépôt non officiel",
   "unofficialText": "{{repository}} n'est pas vérifié par Mumcord. Le plugin s'exécute quand même dans le bac à sable et n'obtient que les autorisations que vous accordez.",
   "checksTitle": "Les contrôles officiels s'appliquent toujours",
-  "checksText": "La liste de révocation de Mumcord peut le désactiver. Les noms des plugins officiels sont réservés."
+  "checksText": "La liste de révocation de Mumcord peut le désactiver. Les noms des plugins officiels sont réservés.",
+  "metaPermissions": "Autorisations : {{count}}",
+  "footer": "Dépôt officiel · liste signée vérifiée · rien sur vous n'est envoyé"
 }

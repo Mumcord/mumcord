@@ -4,10 +4,10 @@
   "categoriesLabel": "Categorias",
   "category": {
     "all": "Todos",
-    "fun": "Diversão",
+    "fun": "Diversão e mascotes",
     "games": "Jogos",
-    "chat": "Chat",
-    "voice": "Voz",
+    "chat": "Ferramentas de chat",
+    "voice": "Ferramentas de voz",
     "accessibility": "Acessibilidade",
     "looks": "Aspeto",
     "tools": "Ferramentas"
@@ -17,14 +17,13 @@
   "retry": "Tentar novamente",
   "empty": "Ainda não há plugins disponíveis.",
   "noMatch": "Nenhum plugin corresponde à pesquisa.",
-  "highlight": "Em destaque",
+  "details": "Detalhes",
   "official": "Oficial",
   "unofficial": "Não oficial · {{repository}}",
   "reviewed": "Revisto pelo Mumcord",
   "installed": "Instalado",
   "install": "Instalar",
   "installNamed": "Instalar {{name}}",
-  "details": "Detalhes",
   "detailsNamed": "Detalhes de {{name}}",
   "version": "Versão {{version}}",
   "by": "de {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "De um repositório não oficial",
   "unofficialText": "{{repository}} não é revisto pelo Mumcord. Continua a correr na área isolada e recebe apenas as permissões que permitires.",
   "checksTitle": "As verificações oficiais continuam a aplicar-se",
-  "checksText": "A lista de revogação do Mumcord pode desativá-lo. Os nomes de plugins oficiais estão reservados."
+  "checksText": "A lista de revogação do Mumcord pode desativá-lo. Os nomes de plugins oficiais estão reservados.",
+  "metaPermissions": "Permissões: {{count}}",
+  "footer": "Repositório oficial · lista assinada verificada · nada sobre ti é enviado"
 }

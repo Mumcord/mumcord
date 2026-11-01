@@ -4,10 +4,10 @@
   "categoriesLabel": "Categorii",
   "category": {
     "all": "Toate",
-    "fun": "Distracție",
+    "fun": "Distracție și animale",
     "games": "Jocuri",
-    "chat": "Chat",
-    "voice": "Voce",
+    "chat": "Instrumente de chat",
+    "voice": "Instrumente vocale",
     "accessibility": "Accesibilitate",
     "looks": "Aspect",
     "tools": "Instrumente"
@@ -17,14 +17,13 @@
   "retry": "Încearcă din nou",
   "empty": "Nu există încă pluginuri disponibile.",
   "noMatch": "Niciun plugin nu se potrivește căutării.",
-  "highlight": "Recomandat",
+  "details": "Detalii",
   "official": "Oficial",
   "unofficial": "Neoficial · {{repository}}",
   "reviewed": "Verificat de Mumcord",
   "installed": "Instalat",
   "install": "Instalează",
   "installNamed": "Instalează {{name}}",
-  "details": "Detalii",
   "detailsNamed": "Detalii despre {{name}}",
   "version": "Versiunea {{version}}",
   "by": "de {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Dintr-un depozit neoficial",
   "unofficialText": "{{repository}} nu este verificat de Mumcord. Rulează totuși în sandbox și primește doar permisiunile pe care le permiți.",
   "checksTitle": "Verificările oficiale se aplică în continuare",
-  "checksText": "Lista de revocare Mumcord îl poate dezactiva. Numele pluginurilor oficiale sunt rezervate."
+  "checksText": "Lista de revocare Mumcord îl poate dezactiva. Numele pluginurilor oficiale sunt rezervate.",
+  "metaPermissions": "Permisiuni: {{count}}",
+  "footer": "Depozit oficial · lista semnată verificată · nu se trimite nimic despre tine"
 }

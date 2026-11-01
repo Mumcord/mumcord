@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorijas",
   "category": {
     "all": "Visi",
-    "fun": "Izklaide",
+    "fun": "Izklaide un mājdzīvnieki",
     "games": "Spēles",
-    "chat": "Tērzēšana",
-    "voice": "Balss",
+    "chat": "Tērzēšanas rīki",
+    "voice": "Balss rīki",
     "accessibility": "Pieejamība",
     "looks": "Izskats",
     "tools": "Rīki"
@@ -17,14 +17,13 @@
   "retry": "Mēģināt vēlreiz",
   "empty": "Spraudņu vēl nav.",
   "noMatch": "Neviens spraudnis neatbilst meklēšanai.",
-  "highlight": "Ieteiktie",
+  "details": "Informācija",
   "official": "Oficiāls",
   "unofficial": "Neoficiāls · {{repository}}",
   "reviewed": "Pārbaudījis Mumcord",
   "installed": "Instalēts",
   "install": "Instalēt",
   "installNamed": "Instalēt {{name}}",
-  "details": "Informācija",
   "detailsNamed": "Informācija par {{name}}",
   "version": "Versija {{version}}",
   "by": "autors: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "No neoficiālas krātuves",
   "unofficialText": "Mumcord nepārbauda krātuvi {{repository}}. Spraudnis tomēr darbojas smilškastē un saņem tikai atļaujas, ko jūs atļaujat.",
   "checksTitle": "Oficiālās pārbaudes joprojām ir spēkā",
-  "checksText": "Mumcord atsaukšanas saraksts to var izslēgt. Oficiālo spraudņu nosaukumi ir rezervēti."
+  "checksText": "Mumcord atsaukšanas saraksts to var izslēgt. Oficiālo spraudņu nosaukumi ir rezervēti.",
+  "metaPermissions": "Atļaujas: {{count}}",
+  "footer": "Oficiālā krātuve · parakstītais saraksts pārbaudīts · nekas par jums netiek sūtīts"
 }

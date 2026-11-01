@@ -4,10 +4,10 @@
   "categoriesLabel": "Categorie",
   "category": {
     "all": "Tutti",
-    "fun": "Divertimento",
+    "fun": "Divertimento e animali",
     "games": "Giochi",
-    "chat": "Chat",
-    "voice": "Voce",
+    "chat": "Strumenti di chat",
+    "voice": "Strumenti vocali",
     "accessibility": "Accessibilità",
     "looks": "Aspetto",
     "tools": "Strumenti"
@@ -17,14 +17,13 @@
   "retry": "Riprova",
   "empty": "Non ci sono ancora plugin disponibili.",
   "noMatch": "Nessun plugin corrisponde alla ricerca.",
-  "highlight": "In evidenza",
+  "details": "Dettagli",
   "official": "Ufficiale",
   "unofficial": "Non ufficiale · {{repository}}",
   "reviewed": "Verificato da Mumcord",
   "installed": "Installato",
   "install": "Installa",
   "installNamed": "Installa {{name}}",
-  "details": "Dettagli",
   "detailsNamed": "Dettagli di {{name}}",
   "version": "Versione {{version}}",
   "by": "di {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Da un repository non ufficiale",
   "unofficialText": "{{repository}} non è verificato da Mumcord. Viene comunque eseguito nella sandbox e ottiene solo i permessi che consenti.",
   "checksTitle": "I controlli ufficiali restano validi",
-  "checksText": "L'elenco di revoca di Mumcord può disattivarlo. I nomi dei plugin ufficiali sono riservati."
+  "checksText": "L'elenco di revoca di Mumcord può disattivarlo. I nomi dei plugin ufficiali sono riservati.",
+  "metaPermissions": "Autorizzazioni: {{count}}",
+  "footer": "Repository ufficiale · elenco firmato verificato · non viene inviato nulla su di te"
 }

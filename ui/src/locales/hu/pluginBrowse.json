@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategóriák",
   "category": {
     "all": "Mind",
-    "fun": "Szórakozás",
+    "fun": "Szórakozás és kedvencek",
     "games": "Játékok",
-    "chat": "Csevegés",
-    "voice": "Hang",
+    "chat": "Csevegőeszközök",
+    "voice": "Hangeszközök",
     "accessibility": "Akadálymentesség",
     "looks": "Megjelenés",
     "tools": "Eszközök"
@@ -17,14 +17,13 @@
   "retry": "Próbáld újra",
   "empty": "Még nincsenek elérhető bővítmények.",
   "noMatch": "Nincs a keresésnek megfelelő bővítmény.",
-  "highlight": "Kiemelt",
+  "details": "Részletek",
   "official": "Hivatalos",
   "unofficial": "Nem hivatalos · {{repository}}",
   "reviewed": "A Mumcord átvizsgálta",
   "installed": "Telepítve",
   "install": "Telepítés",
   "installNamed": "{{name}} telepítése",
-  "details": "Részletek",
   "detailsNamed": "{{name}} részletei",
   "version": "{{version}} verzió",
   "by": "készítette: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Nem hivatalos tárból",
   "unofficialText": "A(z) {{repository}} tárat a Mumcord nem ellenőrzi. A bővítmény így is a homokozóban fut, és csak az általad engedélyezett jogosultságokat kapja.",
   "checksTitle": "A hivatalos ellenőrzések továbbra is érvényesek",
-  "checksText": "A Mumcord visszavonási listája kikapcsolhatja. A hivatalos bővítmények nevei foglaltak."
+  "checksText": "A Mumcord visszavonási listája kikapcsolhatja. A hivatalos bővítmények nevei foglaltak.",
+  "metaPermissions": "Engedélyek: {{count}}",
+  "footer": "Hivatalos tároló · aláírt lista ellenőrizve · rólad semmi nem kerül elküldésre"
 }

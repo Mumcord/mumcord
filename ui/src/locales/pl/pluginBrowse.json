@@ -4,10 +4,10 @@
   "categoriesLabel": "Kategorie",
   "category": {
     "all": "Wszystkie",
-    "fun": "Zabawa",
+    "fun": "Zabawa i zwierzaki",
     "games": "Gry",
-    "chat": "Czat",
-    "voice": "Głos",
+    "chat": "Narzędzia czatu",
+    "voice": "Narzędzia głosowe",
     "accessibility": "Dostępność",
     "looks": "Wygląd",
     "tools": "Narzędzia"
@@ -17,14 +17,13 @@
   "retry": "Spróbuj ponownie",
   "empty": "Nie ma jeszcze dostępnych wtyczek.",
   "noMatch": "Żadna wtyczka nie pasuje do wyszukiwania.",
-  "highlight": "Polecane",
+  "details": "Szczegóły",
   "official": "Oficjalna",
   "unofficial": "Nieoficjalna · {{repository}}",
   "reviewed": "Sprawdzona przez Mumcord",
   "installed": "Zainstalowana",
   "install": "Zainstaluj",
   "installNamed": "Zainstaluj {{name}}",
-  "details": "Szczegóły",
   "detailsNamed": "Szczegóły: {{name}}",
   "version": "Wersja {{version}}",
   "by": "autor: {{authors}}",
@@ -79,5 +78,7 @@
   "unofficialTitle": "Z nieoficjalnego repozytorium",
   "unofficialText": "{{repository}} nie jest sprawdzane przez Mumcord. Wtyczka nadal działa w piaskownicy i dostaje tylko uprawnienia, na które pozwolisz.",
   "checksTitle": "Oficjalne kontrole nadal obowiązują",
-  "checksText": "Lista unieważnień Mumcord może ją wyłączyć. Nazwy oficjalnych wtyczek są zarezerwowane."
+  "checksText": "Lista unieważnień Mumcord może ją wyłączyć. Nazwy oficjalnych wtyczek są zarezerwowane.",
+  "metaPermissions": "Uprawnienia: {{count}}",
+  "footer": "Oficjalne repozytorium · podpisana lista sprawdzona · nic o tobie nie jest wysyłane"
 }
