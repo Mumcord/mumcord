@@ -75,6 +75,11 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       );
   const bandwidthTip =
     limit === null ? bandwidthHint : `${bandwidthHint} ${t("quick.bandwidthThresholds")}`;
+  // The last word and the "?" stay together so the tip never wraps onto a line of its own.
+  const bandwidthLabel = t("quick.bandwidthLabel");
+  const split = bandwidthLabel.lastIndexOf(" ") + 1;
+  const labelHead = bandwidthLabel.slice(0, split);
+  const labelTail = bandwidthLabel.slice(split);
   const warning = [
     bandwidth
       ? t("quick.warningBandwidth", {
@@ -180,8 +185,11 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
         <section className="connection-quick__section connection-quick__bandwidth">
           <p className="connection-quick__effective connection-quick__bandwidth-row">
             <span className="connection-quick__bandwidth-label" id={meterId}>
-              <span className="connection-quick__bandwidth-text">{t("quick.bandwidthLabel")}</span>
-              <InfoTip label={more(t("quick.bandwidthLabel"))} text={bandwidthTip} />
+              {labelHead}
+              <span className="connection-quick__bandwidth-tail">
+                {labelTail}
+                <InfoTip label={more(t("quick.bandwidthLabel"))} text={bandwidthTip} />
+              </span>
             </span>
             <strong>
               {limit === null
