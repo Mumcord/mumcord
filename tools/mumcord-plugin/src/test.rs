@@ -270,6 +270,19 @@ pub enum EventSpec {
     PanelVisibility(PanelSpec),
     DialogClosed,
     Language(String),
+    /// The user's own state changed (mute, deafen, do not disturb, channel).
+    /// Unset fields keep their defaults: not muted, not deafened, DND off, test channel.
+    SelfChanged {
+        #[serde(default)]
+        muted: bool,
+        #[serde(default)]
+        deafened: bool,
+        #[serde(default)]
+        dnd: bool,
+        /// Name of the channel the user is in.
+        #[serde(default)]
+        channel: Option<String>,
+    },
 }
 
 #[derive(Debug, Deserialize)]
@@ -478,6 +491,7 @@ pub struct Session {
     host: PluginHost,
     events: UnboundedReceiver<HostEvent>,
     io: Arc<MockIo>,
+    me: Peer,
     outputs: Arc<Mutex<Vec<Output>>>,
     /// Outputs before this index were matched or skipped by an earlier `expect`.
     cursor: usize,
@@ -548,6 +562,7 @@ impl Session {
             host,
             events,
             io,
+            me: me.clone(),
             outputs,
             cursor: 0,
         };
@@ -677,6 +692,25 @@ impl Session {
             }),
             EventSpec::DialogClosed => Event::DialogClosed,
             EventSpec::Language(l) => Event::LanguageChanged(l.clone()),
+            EventSpec::SelfChanged {
+                muted,
+                deafened,
+                dnd,
+                channel,
+            } => {
+                let mut channel_state = test_channel();
+                if let Some(name) = channel {
+                    channel_state.name = name.clone();
+                }
+                Event::SelfChanged(SelfState {
+                    me: Some(self.me.clone()),
+                    server: Some("Test server".into()),
+                    channel: Some(channel_state),
+                    muted: *muted,
+                    deafened: *deafened,
+                    do_not_disturb: *dnd,
+                })
+            }
         })
     }
 
@@ -976,6 +1010,7 @@ steps:
   - event: {peer-message: {from: 2, kind: 1, hex: "00ff"}}
   - event: {joined: 2}
   - event: dialog-closed
+  - event: {self-changed: {dnd: true, muted: true, channel: Lobby}}
   - wait: 50
   - expect: {tree: {slot: panel, text: "Waves: 1"}}
   - expect: {message: {to: channel, kind: 1}}
@@ -983,7 +1018,7 @@ steps:
   - expect: nothing
 "#;
         let scenario: Scenario = serde_saphyr::from_str(yaml).expect("parses");
-        assert_eq!(scenario.steps.len(), 10);
+        assert_eq!(scenario.steps.len(), 11);
         assert_eq!(scenario.me.session, 1);
         assert!(matches!(
             &scenario.steps[1],
@@ -991,7 +1026,12 @@ steps:
                 if c == "c1" && v == "a"
         ));
         assert!(matches!(
-            &scenario.steps[8],
+            &scenario.steps[5],
+            Step::Event(EventSpec::SelfChanged { dnd: true, muted: true, deafened: false, channel: Some(c) })
+                if c == "Lobby"
+        ));
+        assert!(matches!(
+            &scenario.steps[9],
             Step::Expect(Expect::Message {
                 to: Some(ToSpec::Session(2)),
                 ..
