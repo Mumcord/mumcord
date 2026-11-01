@@ -25,7 +25,8 @@ import {
   wizard,
 } from "./flows.ts";
 
-const SETTINGS_TABS = 11;
+/** Top-level settings groups (#161). */
+const SETTINGS_TABS = 10;
 
 for (const theme of ["light", "dark"] as const) {
   describe(`AC-1.27 keyboard-only flows + axe (${theme} OS theme)`, () => {
@@ -49,8 +50,12 @@ for (const theme of ["light", "dark"] as const) {
     });
 
     it("wizard with keyboard only", async () => {
-      await wizard(me, async (step) => {
-        await scan(`${theme} wizard step ${String(step)}`);
+      // Custom walks every step of the wizard (#159), so each one gets scanned.
+      await wizard(me, {
+        style: "custom",
+        onStep: async (step) => {
+          await scan(`${theme} wizard step ${step}`);
+        },
       });
       await scan(`${theme} main empty state`);
     });

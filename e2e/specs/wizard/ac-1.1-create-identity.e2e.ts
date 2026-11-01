@@ -1,21 +1,23 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { $, browser, expect } from "@wdio/globals";
+import { browser, expect } from "@wdio/globals";
 import { app } from "../../helpers/index.ts";
 import {
   button,
+  createIdentity,
   keyringDump,
-  labelled,
   mainWindowMarker,
-  nextToLastWizardStep,
-  waitForText,
-  wizardStep,
+  passWelcome,
+  switchLabelled,
+  voiceToSetupStyle,
+  walkCustomSteps,
 } from "../../helpers/wizard-util.ts";
 
 // AC-1.1: First start → wizard → create identity "Tester", keep defaults, finish → main window
 // within 60 s of starting; the certificate is in the OS secure storage and not a plain file.
-// FR-1.48d: ticking "Start Mumcord when I log in" on the last step writes the XDG autostart entry.
+// FR-1.48d: ticking "Start Mumcord when I log in" on the Custom path's "Startup and updates" step
+// (#159) writes the XDG autostart entry.
 function walk(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = join(dir, e.name);
@@ -28,13 +30,13 @@ describe("AC-1.1 wizard creates identity", () => {
     // Measure from a cold start of a fresh install (driver + app launch included).
     const t0 = Date.now();
     await app.restart({ freshProfile: true });
-    await waitForText("Your identity", 30_000);
-    await waitForText(wizardStep(1));
-    await (await labelled("Name")).setValue("Tester");
-    await button("Next").click();
-    await nextToLastWizardStep();
-    await $('//label[normalize-space(.)="Start Mumcord when I log in"]//input').click();
-    await button("Finish").click();
+    await passWelcome();
+    await createIdentity("Tester");
+    await voiceToSetupStyle();
+    await walkCustomSteps(async (step) => {
+      if (step === "startup") await switchLabelled("Start Mumcord when I log in").click();
+    });
+    await button("Start Mumcord").click();
     await mainWindowMarker().waitForExist({ timeout: 30_000 });
     await expect(mainWindowMarker()).toBeDisplayed();
     const elapsed = (Date.now() - t0) / 1000;

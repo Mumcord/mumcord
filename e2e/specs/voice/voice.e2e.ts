@@ -33,6 +33,7 @@ import {
   watchTalking,
   userPanelLayout,
 } from "../../helpers/voice-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 const dir = join(repoRoot, "e2e", "artifacts", "voice");
 const speechPath = join(repoRoot, "testenv", "audio", "speech.wav");
@@ -475,9 +476,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
   });
 
   it("AC-1.9 push-to-talk (X11): sent only while the key is held, other window focused", async () => {
-    await $("button[aria-label='Quick settings']").click();
-    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-    await $("button[role='tab']=Voice").click();
+    await openSettingsGroup("Voice & Audio");
     await $("//label[contains(., 'Push-to-talk')]").click();
     const keyButton = $("button=Set key");
     await keyButton.click();

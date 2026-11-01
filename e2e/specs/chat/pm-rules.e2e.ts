@@ -12,6 +12,7 @@ import {
   USER,
   waitMessage,
 } from "../../helpers/chat-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 const BOT = "StrangerBot";
 
@@ -32,11 +33,7 @@ function requestsEntry() {
 }
 
 async function openPrivacySettings(): Promise<void> {
-  const button = $("button[aria-label='Quick settings']");
-  await button.waitForClickable();
-  await button.click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $("//button[@role='tab' and .='Privacy']").click();
+  await openSettingsGroup("Chat & Notifications");
 }
 
 // Issue #141: "Private messages from: Friends only" holds private messages from a standard client

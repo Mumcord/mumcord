@@ -5,7 +5,7 @@ import { browser } from "@wdio/globals";
 import { profile } from "./app.ts";
 import { bin, testenvDir } from "./paths.ts";
 import { run, runOk } from "./run.ts";
-import { finishWizardWithDefaults } from "./wizard-util.ts";
+import { runFirstStartWizard } from "./wizard-util.ts";
 
 // UI helpers for the server specs (AC-1.4 – AC-1.6).
 
@@ -52,9 +52,7 @@ export function button(text: string) {
 
 /** Runs the first-start wizard: new identity → default mic → voice activation. */
 export async function completeWizard(name: string): Promise<void> {
-  await fill("Name", name);
-  await button("Next").click();
-  await finishWizardWithDefaults();
+  await runFirstStartWizard(name);
 }
 
 /** Server bar button whose accessible name starts with `name` (status suffix allowed). */

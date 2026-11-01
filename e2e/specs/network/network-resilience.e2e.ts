@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { $, browser, expect } from "@wdio/globals";
 import { app, bot, botInBackground, netsim, testenv, type BackgroundBot } from "../../helpers/index.ts";
-import { finishWizardWithDefaults, readWavPcm, writeWavPcm } from "../../helpers/wizard-util.ts";
+import { readWavPcm, runFirstStartWizard, writeWavPcm } from "../../helpers/wizard-util.ts";
 
 // AC-1.21 (reconnect), AC-1.22 (UDP blocked -> TCP), AC-1.23 (10 % loss -> bitrate adapts).
 // The app talks to a counting relay (64802 by default) that forwards to netsim (64800) -> test
@@ -255,9 +255,7 @@ describe("network resilience (AC-1.21, AC-1.22, AC-1.23)", () => {
 
   it("setup: wizard, connect through relay, join Raid, follow Lobby", async () => {
     await $("#root").waitForDisplayed();
-    await $("input[type=text]").setValue(ME);
-    await $("button=Next").click();
-    await finishWizardWithDefaults();
+    await runFirstStartWizard(ME);
     const address = $("input[placeholder='mumble.example.org']");
     await address.waitForDisplayed();
     await address.setValue(LINK);

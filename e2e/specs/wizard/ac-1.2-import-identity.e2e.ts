@@ -8,12 +8,15 @@ import {
   chooseFileInNativeDialog,
   dumpAppLogs,
   ensureArtifacts,
-  finishWizardWithDefaults,
+  finishWithPreset,
   labelled,
   pageText,
+  passWelcome,
+  voiceToSetupStyle,
   waitForText,
+  waitForWizardStep,
   wizardArtifacts,
-  wizardStep,
+  wizardPrimary,
 } from "../../helpers/wizard-util.ts";
 
 // AC-1.2: Wizard with an exported PKCS#12 file → import → connecting to the test server shows the
@@ -73,15 +76,17 @@ describe("AC-1.2 wizard imports a PKCS#12 identity", () => {
   });
 
   it("imports the file in the wizard", async () => {
-    await waitForText(wizardStep(1), 30_000);
+    await passWelcome();
+    await waitForWizardStep("identity");
     await $('input[name="identity-mode"][value="import"]').click();
     await button("Choose file…").click();
     await chooseFileInNativeDialog(p12);
     await waitForText("Chosen file: c1orig.p12", 10_000);
     const pw = $('input[type="password"]');
     await pw.setValue(P12_PASSWORD);
-    await button("Next").click();
-    await finishWizardWithDefaults();
+    await wizardPrimary().click();
+    await voiceToSetupStyle();
+    await finishWithPreset("everythingOn");
   });
 
   it("connecting to v15 shows the original registered name and cert hash", async () => {

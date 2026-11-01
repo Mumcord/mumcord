@@ -16,10 +16,12 @@
       "specs/voice/whisper.e2e.ts",
       "specs/wizard/ac-1.3-mic-test.e2e.ts",
       "specs/voice/noise-suppression-backends.e2e.ts",
-      "specs/wizard/ac-149-rerun.e2e.ts"
+      "specs/wizard/ac-149-rerun.e2e.ts",
+      "specs/wizard/ac-3.78-setup-presets.e2e.ts"
     ],
     [
       "specs/app/theme-language.e2e.ts",
+      "specs/app/ac-3.80-settings-search.e2e.ts",
       "specs/chat/channel-tree-menu.e2e.ts",
       "specs/chat/link-previews.e2e.ts",
       "specs/chat/mentions.e2e.ts",

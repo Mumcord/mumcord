@@ -8,10 +8,14 @@ import {
   button,
   dumpAppLogs,
   ensureArtifacts,
-  mainWindowMarker,
+  finishWithPreset,
   pageText,
+  passWelcome,
+  voiceToSetupStyle,
   waitForText,
+  waitForWizardStep,
   wizardArtifacts,
+  wizardPrimary,
 } from "../../helpers/wizard-util.ts";
 
 // Issue #66 (FR-3.93, FR-3.94): a fake official Mumble 1.5 client in the fresh profile (its
@@ -22,6 +26,7 @@ import {
 const NAME = "MumImport";
 const SERVER = "Local Mumble test";
 const PASSWORD = "e2e-mumble-saved-pw";
+/** Welcome, Import, Identity, Voice, Setup style, All set (#159). */
 const STEPS = 6;
 
 /** A `QVariant(uint)` as Mumble 1.5 stores one shortcut button (QDataStream, base64). */
@@ -32,8 +37,9 @@ function qvariantUInt(value: number): string {
   return bytes.toString("base64");
 }
 
+/** The step header, upper-cased as the wizard shows it. */
 function step(n: number): string {
-  return `Step ${String(n)} of ${String(STEPS)}`;
+  return `Step ${String(n)} of ${String(STEPS)}`.toUpperCase();
 }
 
 async function writeMumbleFixture(): Promise<string> {
@@ -100,8 +106,9 @@ describe("Issue #66: import from the official Mumble client in the wizard", () =
   });
 
   it("offers the import first and copies the chosen parts", async () => {
+    await passWelcome();
     await waitForText("Bring your Mumble setup along", 30_000);
-    expect(await pageText()).toContain(`${step(1)} · optional`);
+    expect(await pageText()).toContain(`${step(2)} · OPTIONAL`);
     expect(await pageText()).toContain("2 found");
     expect(await pageText()).toContain("Ctrl + Space");
     await button("Import").click();
@@ -112,15 +119,12 @@ describe("Issue #66: import from the official Mumble client in the wizard", () =
     expect(summary).toContain("Identity imported");
     await button("Done").click();
 
-    await waitForText(step(2), 15_000);
+    await waitForWizardStep("identity");
+    expect(await pageText()).toContain(step(3));
     expect(await pageText()).toContain(`Using identity ${NAME}.`);
-    for (let n = 2; n < STEPS; n++) {
-      await waitForText(step(n), 15_000);
-      await button("Next").click();
-    }
-    await waitForText(step(STEPS), 15_000);
-    await button("Finish").click();
-    await mainWindowMarker().waitForExist({ timeout: 30_000 });
+    await wizardPrimary().click();
+    await voiceToSetupStyle();
+    await finishWithPreset("everythingOn");
   });
 
   it("keeps the password and the certificate out of plain files", async () => {

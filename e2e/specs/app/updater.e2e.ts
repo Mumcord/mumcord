@@ -121,7 +121,7 @@ async function openUpdatesSettings(): Promise<void> {
     await $("//*[contains(@class,'quick-settings')]//button[contains(normalize-space(.),'All settings')]").click();
     await waitFor(".overlay__dialog");
   }
-  await $('[role="tab"]=Updates').click();
+  await $('[role="tab"]=General').click();
   await expect(checkNow()).toBeDisplayed();
 }
 

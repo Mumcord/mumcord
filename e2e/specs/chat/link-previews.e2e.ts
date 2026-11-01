@@ -14,6 +14,7 @@ import {
   sleep,
   waitMessage,
 } from "../../helpers/chat-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 /** 1×1 red PNG as the page's preview image. */
 const PNG = Buffer.from(
@@ -84,11 +85,7 @@ async function say(html: string): Promise<void> {
 }
 
 async function openChatSettings(): Promise<void> {
-  const button = $("button[aria-label='Quick settings']");
-  await button.waitForClickable();
-  await button.click();
-  await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-  await $("//button[@role='tab' and .='Chat & history']").click();
+  await openSettingsGroup("Privacy & Connections");
 }
 
 // AC-1.39 (link preview card, switch off → plain link and no request), AC-1.40 (YouTube and
@@ -318,7 +315,7 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     await expect(hint("plain")).toHaveText(`Link preview ${tail}`);
     await expect(hint("no pictures")).toHaveText(`2 previews ${tail}`);
     await hint("no pictures").$("button=Settings > Privacy").click();
-    await expect($("//button[@role='tab' and .='Privacy']")).toHaveAttribute(
+    await expect($("//button[@role='tab' and .='Privacy & Connections']")).toHaveAttribute(
       "aria-selected",
       "true",
     );
@@ -339,7 +336,7 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     );
     const link = $("//button[@role='menuitem' and .='Open Privacy settings']");
     await link.click();
-    await expect($("//button[@role='tab' and .='Privacy']")).toHaveAttribute(
+    await expect($("//button[@role='tab' and .='Privacy & Connections']")).toHaveAttribute(
       "aria-selected",
       "true",
     );

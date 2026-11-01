@@ -20,7 +20,8 @@ import {
 } from "./flows.ts";
 
 const me = "C7Lang";
-const TABS = 13;
+/** Top-level settings groups (#161). */
+const TABS = 10;
 
 /**
  * Opens the settings tab of `section` (its id, so it works in every UI language); indexes shift
@@ -225,7 +226,7 @@ describe("AC-1.26 language switch without restart", () => {
     it(`switches to ${lang} live and translates every UI text`, async () => {
       const pid = await browser.execute(() => performance.timeOrigin);
       await openSettings();
-      await settingsTabNamed("language");
+      await settingsTabNamed("general");
       await chooseRadio(lang);
       await browser.waitUntil(async () => (await browser.execute(() => document.documentElement.lang)) === lang, {
         timeoutMsg: `html lang never became ${lang}`,
@@ -246,10 +247,12 @@ describe("AC-1.26 language switch without restart", () => {
   it("offers all 24 EU languages by their own names and switches to French and Greek live", async () => {
     const pid = await browser.execute(() => performance.timeOrigin);
     await openSettings();
-    await settingsTabNamed("language");
-    const names = await browser.execute(() =>
-      Array.from(document.querySelectorAll(".overlay__dialog input[type=radio]"), (r) => r.closest("label")?.textContent.trim() ?? ""),
-    );
+    await settingsTabNamed("general");
+    // Only the language picker: the General page holds other radio groups too (#161).
+    const names = await browser.execute(() => {
+      const group = document.querySelector<HTMLInputElement>(".overlay__dialog input[type=radio][value=fr]")?.name ?? "";
+      return Array.from(document.querySelectorAll(`.overlay__dialog input[type=radio][name="${group}"]`), (r) => r.closest("label")?.textContent.trim() ?? "");
+    });
     expect(names).toEqual(expect.arrayContaining(["Français", "Ελληνικά", "Gaeilge", "Malti", "Български"]));
     expect(names).toHaveLength(25);
     for (const lang of ["fr", "el"]) {

@@ -76,7 +76,7 @@ async function openVoiceSettings(): Promise<void> {
   if (!(await overlay.isDisplayed())) await openSettings();
   // The noise suppression choice lives in the voice section. Clicking the tab keeps the run
   // independent of where the keyboard focus currently is.
-  const tab = await $("button[id$='-tab-voice']");
+  const tab = await $("button[id$='-tab-voiceAudio']");
   await tab.waitForDisplayed({ timeout: 30_000 });
   await tab.click();
   await (await $(NOISE_GROUP)).waitForDisplayed({ timeout: 30_000 });
