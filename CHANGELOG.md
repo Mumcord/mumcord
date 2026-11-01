@@ -5,6 +5,7 @@
 ### Changed
 
 - Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
+- Mumcord now opens with a **start screen** (the logo on the theme background with a slim loading bar) instead of an empty white window and a bare "Loading…" text. The window only appears once the start screen is drawn, the start screen follows your system theme (or the fixed theme you picked) and fades into the app when it is ready; with reduced motion it switches without movement (#323)
 
 ### Fixed
 

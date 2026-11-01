@@ -33,6 +33,7 @@ import { LazyBoundary } from "../components/LazyBoundary";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
+import { hideStartScreen } from "./startScreen";
 
 // Opened on demand, so they load as chunks of their own (issue #323).
 const WizardRerunOverlay = lazy(() =>
@@ -125,6 +126,13 @@ function StartupError() {
 function Screens() {
   const { t } = useTranslation("common");
   const { screen } = useView();
+
+  // The start screen in index.html covers the loading phase and makes way for the first real
+  // screen: the main screen, the first-run wizard or the start error.
+  useEffect(() => {
+    if (screen !== "loading") hideStartScreen();
+  }, [screen]);
+
   switch (screen) {
     case "loading":
       return (
