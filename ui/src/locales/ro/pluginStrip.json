@@ -1,12 +1,7 @@
 {
   "heading": "Pluginuri",
   "list": "Panouri de pluginuri",
-  "hide": "Ascunde panourile de pluginuri",
-  "show": "Arată panourile de pluginuri",
   "expand": "Extinde {{name}}",
   "close": "Închide",
-  "unsupported": "Acest server nu acceptă funcțiile comune ale pluginurilor",
-  "running_one": "{{count}} în execuție",
-  "running_few": "{{count}} în execuție",
-  "running_other": "{{count}} în execuție"
+  "unsupported": "Acest server nu acceptă funcțiile comune ale pluginurilor"
 }

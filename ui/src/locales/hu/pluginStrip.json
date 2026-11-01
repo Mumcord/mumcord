@@ -1,11 +1,7 @@
 {
   "heading": "Bővítmények",
   "list": "Bővítménypanelek",
-  "hide": "Bővítménypanelek elrejtése",
-  "show": "Bővítménypanelek megjelenítése",
   "expand": "{{name}} nagyítása",
   "close": "Bezárás",
-  "unsupported": "Ez a szerver nem támogatja a közös bővítményfunkciókat",
-  "running_one": "{{count}} fut",
-  "running_other": "{{count}} fut"
+  "unsupported": "Ez a szerver nem támogatja a közös bővítményfunkciókat"
 }

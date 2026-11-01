@@ -7,7 +7,7 @@ import { usePluginIcon } from "../render/usePluginIcon";
 import { useSharedSupported } from "./useSharedSupported";
 import { usePlugins } from "../pluginStore";
 import { PluginWebView, usePluginWebView } from "../webview";
-import { loadCollapsed, saveCollapsed } from "./stripMemory";
+import { loadOpen, saveOpen } from "./stripMemory";
 import "./strip.css";
 
 const PANEL: PluginSlot = { kind: "panel" };
@@ -36,16 +36,17 @@ function PluginIcon({ id, name }: { id: string; name: string }) {
 }
 
 /**
- * Plugins strip under the channel tree (FR-6.64): one icon per enabled plugin that has a panel,
- * the active plugin's panel below, and an "Expand" button that opens the side sheet on the right.
+ * Plugins strip under the channel tree (FR-6.64): one icon per enabled plugin that has a panel.
+ * An icon toggles that plugin's inline (mini) view below the row; its "Expand" button opens the
+ * side sheet on the right.
  */
 export function PluginStrip() {
   const t = useT("pluginStrip");
   const { overview } = usePlugins();
   const { trees, popoverRequest } = usePluginUi();
   const sharedSupported = useSharedSupported();
-  const [collapsed, setCollapsed] = useState(loadCollapsed);
-  const [chosen, setChosen] = useState<string | null>(null);
+  const [openId, setOpenId] = useState(loadOpen);
+  const [focusId, setFocusId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
   const iconRefs = useRef(new Map<string, HTMLButtonElement>());
   const expandRef = useRef<HTMLButtonElement>(null);
@@ -55,12 +56,9 @@ export function PluginStrip() {
   const withPanel = (overview?.plugins ?? [])
     .filter((p) => p.enabled && p.status.kind === "running" && trees.get(p.id)?.has("panel"))
     .map((p) => ({ id: p.id, name: p.name }));
-  const runningCount = (overview?.plugins ?? []).filter(
-    (p) => p.enabled && p.status.kind === "running",
-  ).length;
-  const active = withPanel.find((p) => p.id === chosen) ?? withPanel[0];
+  const active = withPanel.find((p) => p.id === openId);
   const activeId = active?.id;
-  const inline = !collapsed && activeId !== undefined;
+  const inline = activeId !== undefined;
 
   // Tell each plugin whether its panel is visible (B18 contract); only changes are sent.
   const wanted = new Map<string, PluginPanelVisibility>();
@@ -92,7 +90,8 @@ export function PluginStrip() {
     setHandledPopover(popoverRequest.seq);
     if (popoverRequest.open) {
       if (withPanel.some((p) => p.id === popoverRequest.plugin)) {
-        setChosen(popoverRequest.plugin);
+        setOpenId(popoverRequest.plugin);
+        saveOpen(popoverRequest.plugin);
         setExpanded(true);
       }
     } else if (popoverRequest.plugin === activeId) {
@@ -111,17 +110,16 @@ export function PluginStrip() {
     if (!restoreFocusRef.current) return;
     restoreFocusRef.current = false;
     // The inline panel is not rendered while the sheet is open, so its expand button is new
-    // after closing; the collapsed strip has no inline panel and goes back to the icon.
-    const target = collapsed ? iconRefs.current.get(activeId ?? "") : expandRef.current;
-    target?.focus();
-  }, [popover, collapsed, activeId]);
+    // after closing.
+    expandRef.current?.focus();
+  }, [popover]);
 
-  if (withPanel.length === 0 || active === undefined) return null;
+  if (withPanel.length === 0) return null;
 
-  function toggleCollapsed() {
-    const next = !collapsed;
-    setCollapsed(next);
-    saveCollapsed(next);
+  function toggleIcon(id: string) {
+    const next = id === openId ? null : id;
+    setOpenId(next);
+    saveOpen(next);
     setExpanded(false);
   }
 
@@ -146,7 +144,7 @@ export function PluginStrip() {
     event.preventDefault();
     const next = withPanel[target];
     if (next === undefined) return;
-    setChosen(next.id);
+    setFocusId(next.id);
     iconRefs.current.get(next.id)?.focus();
   }
 
@@ -157,8 +155,8 @@ export function PluginStrip() {
   }
 
   const panelId = `${baseId}-panel`;
-  const tree = trees.get(active.id)?.get("panel");
-  const body = tree && <PluginTree plugin={active.id} slot={PANEL} nodes={tree} />;
+  const tree = active && trees.get(active.id)?.get("panel");
+  const body = active && tree && <PluginTree plugin={active.id} slot={PANEL} nodes={tree} />;
 
   return (
     <section
@@ -166,58 +164,37 @@ export function PluginStrip() {
       aria-label={t("heading")}
       data-tooltip={sharedSupported ? undefined : t("unsupported")}
     >
-      <div className="pstrip-bar">
-        <button
-          type="button"
-          className="pstrip-toggle"
-          aria-expanded={!collapsed}
-          aria-controls={panelId}
-          data-tooltip={collapsed ? t("show") : t("hide")}
-          onClick={toggleCollapsed}
-        >
-          <span className="pstrip-puzzle" aria-hidden="true">
-            🧩
-          </span>
-          <span className="pstrip-titles">
-            <span className="pstrip-title">{t("heading")}</span>
-            <span className="pstrip-sub">{t("running", { count: runningCount })}</span>
-          </span>
-          <span className="pstrip-caret" aria-hidden="true">
-            {collapsed ? "▸" : "▾"}
-          </span>
-        </button>
-        <div className="pstrip-icons" role="toolbar" aria-label={t("list")}>
-          {withPanel.map((p, index) => (
-            <button
-              key={p.id}
-              type="button"
-              ref={(el) => {
-                if (el) iconRefs.current.set(p.id, el);
-                else iconRefs.current.delete(p.id);
-              }}
-              className="pstrip-icon"
-              aria-label={p.name}
-              aria-pressed={collapsed ? undefined : p.id === active.id}
-              aria-haspopup={collapsed ? "dialog" : undefined}
-              aria-expanded={collapsed ? expanded && p.id === active.id : undefined}
-              data-tooltip={p.name}
-              tabIndex={p.id === active.id ? 0 : -1}
-              onClick={() => {
-                setChosen(p.id);
-                // Collapsed, an icon has no inline panel to show, so it opens the large popover.
-                if (collapsed) setExpanded(true);
-              }}
-              onKeyDown={(e) => {
-                onIconKeys(e, index);
-              }}
-            >
-              <PluginIcon id={p.id} name={p.name} />
-            </button>
-          ))}
-        </div>
+      <div className="pstrip-icons" role="toolbar" aria-label={t("list")}>
+        {withPanel.map((p, index) => (
+          <button
+            key={p.id}
+            type="button"
+            ref={(el) => {
+              if (el) iconRefs.current.set(p.id, el);
+              else iconRefs.current.delete(p.id);
+            }}
+            className="pstrip-icon"
+            aria-label={p.name}
+            aria-pressed={p.id === activeId}
+            aria-controls={panelId}
+            data-tooltip={p.name}
+            tabIndex={p.id === (focusId ?? activeId ?? withPanel[0]?.id) ? 0 : -1}
+            onFocus={() => {
+              setFocusId(p.id);
+            }}
+            onClick={() => {
+              toggleIcon(p.id);
+            }}
+            onKeyDown={(e) => {
+              onIconKeys(e, index);
+            }}
+          >
+            <PluginIcon id={p.id} name={p.name} />
+          </button>
+        ))}
       </div>
-      <div id={panelId} hidden={collapsed}>
-        {inline && !expanded && (
+      <div id={panelId} hidden={!inline || expanded}>
+        {active && inline && !expanded && (
           <div className="pstrip-panel" data-shared={sharedSupported ? "on" : "off"}>
             <div className="pstrip-panel-tools">
               <button
@@ -240,7 +217,7 @@ export function PluginStrip() {
           </div>
         )}
       </div>
-      {popover && (
+      {popover && active && (
         // Escape closes the dialog wherever focus is inside it.
         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <div

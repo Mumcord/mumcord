@@ -78,6 +78,10 @@ afterEach(() => {
   setApi(undefined);
 });
 
+const open = (id: string) => {
+  window.localStorage.setItem("mumcord.pluginStrip.open", id);
+};
+
 describe("PluginStrip", () => {
   it("is hidden without a plugin that has a panel", async () => {
     setup([plugin("dice", "Dice", true)], []);
@@ -86,28 +90,50 @@ describe("PluginStrip", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows one icon per panel plugin and switches the panel", async () => {
+  it("shows only icons, no header card, and toggles the mini view per icon", async () => {
     setup(
       [plugin("pets", "Pets"), plugin("poll", "Poll"), plugin("dice", "Dice", false)],
       ["pets", "poll", "dice"],
     );
     render(<PluginStrip />);
-    expect(await screen.findByText("pets panel")).toBeInTheDocument();
+    const pets = await screen.findByRole("button", { name: "Pets" });
     expect(screen.getAllByRole("button", { name: /^(Pets|Poll|Dice)$/ })).toHaveLength(2);
+    expect(screen.queryByText(/running|aktiv/)).toBeNull();
+    expect(screen.queryByText("pets panel")).toBeNull();
+    expect(pets).toHaveAttribute("aria-pressed", "false");
+    expect(pets).toHaveAttribute("data-tooltip", "Pets");
+    expect(pets).not.toHaveAttribute("title");
+    fireEvent.click(pets);
+    expect(await screen.findByText("pets panel")).toBeInTheDocument();
+    expect(pets).toHaveAttribute("aria-pressed", "true");
+    expect(pets.getAttribute("aria-controls")).toBe(
+      screen.getByText("pets panel").closest("[id]")?.id,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Poll" }));
     expect(await screen.findByText("poll panel")).toBeInTheDocument();
+    expect(screen.queryByText("pets panel")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Poll" }));
+    expect(screen.queryByText("poll panel")).toBeNull();
   });
 
   it("moves between icons with the arrow keys", async () => {
     setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
     render(<PluginStrip />);
     const first = await screen.findByRole("button", { name: "Pets" });
+    expect(screen.getByRole("toolbar")).toBeInTheDocument();
     first.focus();
     fireEvent.keyDown(first, { key: "ArrowRight" });
-    expect(screen.getByRole("button", { name: "Poll" })).toHaveFocus();
+    const poll = screen.getByRole("button", { name: "Poll" });
+    expect(poll).toHaveFocus();
+    expect(poll).toHaveAttribute("aria-pressed", "false");
+    fireEvent.keyDown(poll, { key: "Home" });
+    expect(first).toHaveFocus();
+    fireEvent.keyDown(first, { key: "End" });
+    expect(poll).toHaveFocus();
   });
 
   it("opens the popover with Expand and closes it with Escape", async () => {
+    open("pets");
     setup([plugin("pets", "Pets")], ["pets"]);
     render(<PluginStrip />);
     const expand = await screen.findByRole("button", { name: "Expand Pets" });
@@ -120,6 +146,7 @@ describe("PluginStrip", () => {
   });
 
   it("hides the inline area completely while the sheet is open and restores it after", async () => {
+    open("pets");
     setup([plugin("pets", "Pets")], ["pets"]);
     const { container } = render(<PluginStrip />);
     fireEvent.click(await screen.findByRole("button", { name: "Expand Pets" }));
@@ -132,7 +159,7 @@ describe("PluginStrip", () => {
   it("opens and closes the popover when the plugin asks", async () => {
     setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
     render(<PluginStrip />);
-    await screen.findByRole("button", { name: "Expand Pets" });
+    await screen.findByRole("button", { name: "Poll" });
     act(() => {
       api.mock.emit("pluginUi", { plugin: "poll", change: { type: "panelPopover", open: true } });
     });
@@ -144,6 +171,7 @@ describe("PluginStrip", () => {
   });
 
   it("shows the plugin's web view in the popover instead of the tree", async () => {
+    open("pets");
     setup([plugin("pets", "Pets")], ["pets"]);
     render(<PluginStrip />);
     fireEvent.click(await screen.findByRole("button", { name: "Expand Pets" }));
@@ -160,42 +188,41 @@ describe("PluginStrip", () => {
     }
   });
 
-  it("stays collapsed once the user collapsed it and tells the plugin", async () => {
+  it("remembers the open plugin, tells it about visibility and closes on a second click", async () => {
     setup([plugin("pets", "Pets")], ["pets"]);
     const events = vi.spyOn(api, "pluginUiEvent").mockResolvedValue(null);
     const first = render(<PluginStrip />);
-    await screen.findByText("pets panel");
+    fireEvent.click(await screen.findByRole("button", { name: "Pets" }));
     await waitFor(() => {
       expect(events).toHaveBeenCalledWith("pets", {
         type: "panelVisibility",
         visibility: "inline",
       });
     });
-    fireEvent.click(screen.getByRole("button", { name: /Plugins/ }));
+    first.unmount();
+    const second = render(<PluginStrip />);
+    expect(await screen.findByText("pets panel")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Pets" }));
     await waitFor(() => {
       expect(events).toHaveBeenLastCalledWith("pets", {
         type: "panelVisibility",
         visibility: "hidden",
       });
     });
-    first.unmount();
+    second.unmount();
     render(<PluginStrip />);
-    const toggle = await screen.findByRole("button", { name: /Plugins/ });
-    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await screen.findByRole("button", { name: "Pets" });
     expect(screen.queryByText("pets panel")).toBeNull();
   });
 
-  it("keeps the icons when collapsed and opens the popover from an icon", async () => {
-    window.localStorage.setItem("mumcord.pluginStrip.collapsed", "1");
+  it("reports expanded when a plugin opens its sheet and hidden after it closes", async () => {
     setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
     const events = vi.spyOn(api, "pluginUiEvent").mockResolvedValue(null);
     render(<PluginStrip />);
-    const poll = await screen.findByRole("button", { name: "Poll" });
-    expect(screen.queryByText("pets panel")).toBeNull();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Pets" }), { key: "ArrowRight" });
-    expect(poll).toHaveFocus();
-    fireEvent.click(poll);
-    expect(screen.getByRole("dialog", { name: "Poll" })).toBeInTheDocument();
+    await screen.findByRole("button", { name: "Poll" });
+    act(() => {
+      api.mock.emit("pluginUi", { plugin: "poll", change: { type: "panelPopover", open: true } });
+    });
     await waitFor(() => {
       expect(events).toHaveBeenCalledWith("poll", {
         type: "panelVisibility",
@@ -203,14 +230,7 @@ describe("PluginStrip", () => {
       });
     });
     fireEvent.keyDown(screen.getByRole("dialog", { name: "Poll" }), { key: "Escape" });
-    expect(screen.queryByRole("dialog")).toBeNull();
-    expect(poll).toHaveFocus();
-    await waitFor(() => {
-      expect(events).toHaveBeenLastCalledWith("poll", {
-        type: "panelVisibility",
-        visibility: "hidden",
-      });
-    });
+    expect(screen.getByRole("button", { name: "Expand Poll" })).toHaveFocus();
   });
 
   async function connect() {
@@ -219,6 +239,7 @@ describe("PluginStrip", () => {
   }
 
   it("explains greyed shared parts on servers without plugin data", async () => {
+    open("pets");
     api = createMockApi({ seed: "ready", serverVersion: "1.3.0" });
     setApi(api);
     resetServerStore();
@@ -232,6 +253,7 @@ describe("PluginStrip", () => {
   });
 
   it("shows no hint on a server with plugin data and follows the engine's decision", async () => {
+    open("pets");
     api = createMockApi({ seed: "ready" });
     setApi(api);
     resetServerStore();

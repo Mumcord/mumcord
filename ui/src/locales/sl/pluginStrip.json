@@ -1,13 +1,7 @@
 {
   "heading": "Vtičniki",
   "list": "Plošče vtičnikov",
-  "hide": "Skrij plošče vtičnikov",
-  "show": "Pokaži plošče vtičnikov",
   "expand": "Razširi {{name}}",
   "close": "Zapri",
-  "unsupported": "Ta strežnik ne podpira skupnih funkcij vtičnikov",
-  "running_one": "{{count}} teče",
-  "running_two": "{{count}} tečeta",
-  "running_few": "{{count}} tečejo",
-  "running_other": "{{count}} teče"
+  "unsupported": "Ta strežnik ne podpira skupnih funkcij vtičnikov"
 }

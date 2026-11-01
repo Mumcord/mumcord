@@ -1,11 +1,7 @@
 {
   "heading": "Lisäosat",
   "list": "Lisäosien paneelit",
-  "hide": "Piilota lisäosien paneelit",
-  "show": "Näytä lisäosien paneelit",
   "expand": "Laajenna {{name}}",
   "close": "Sulje",
-  "unsupported": "Tämä palvelin ei tue lisäosien yhteisiä toimintoja",
-  "running_one": "{{count}} käynnissä",
-  "running_other": "{{count}} käynnissä"
+  "unsupported": "Tämä palvelin ei tue lisäosien yhteisiä toimintoja"
 }

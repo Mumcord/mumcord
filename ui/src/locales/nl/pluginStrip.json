@@ -1,11 +1,7 @@
 {
   "heading": "Plug-ins",
   "list": "Plug-inpanelen",
-  "hide": "Plug-inpanelen verbergen",
-  "show": "Plug-inpanelen tonen",
   "expand": "{{name}} vergroten",
   "close": "Sluiten",
-  "unsupported": "Deze server ondersteunt geen gedeelde plug-infuncties",
-  "running_one": "{{count}} actief",
-  "running_other": "{{count}} actief"
+  "unsupported": "Deze server ondersteunt geen gedeelde plug-infuncties"
 }

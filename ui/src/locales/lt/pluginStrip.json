@@ -1,13 +1,7 @@
 {
   "heading": "Papildiniai",
   "list": "Papildinių skydeliai",
-  "hide": "Slėpti papildinių skydelius",
-  "show": "Rodyti papildinių skydelius",
   "expand": "Išplėsti {{name}}",
   "close": "Uždaryti",
-  "unsupported": "Šis serveris nepalaiko bendrų papildinių funkcijų",
-  "running_one": "{{count}} veikia",
-  "running_few": "{{count}} veikia",
-  "running_many": "{{count}} veikia",
-  "running_other": "{{count}} veikia"
+  "unsupported": "Šis serveris nepalaiko bendrų papildinių funkcijų"
 }

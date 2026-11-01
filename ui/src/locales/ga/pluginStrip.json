@@ -1,14 +1,7 @@
 {
   "heading": "Breiseáin",
   "list": "Painéil bhreiseán",
-  "hide": "Folaigh painéil na mbreiseán",
-  "show": "Taispeáin painéil na mbreiseán",
   "expand": "Leathnaigh {{name}}",
   "close": "Dún",
-  "unsupported": "Ní thacaíonn an freastalaí seo le gnéithe comhroinnte breiseán",
-  "running_one": "{{count}} ag rith",
-  "running_two": "{{count}} ag rith",
-  "running_few": "{{count}} ag rith",
-  "running_many": "{{count}} ag rith",
-  "running_other": "{{count}} ag rith"
+  "unsupported": "Ní thacaíonn an freastalaí seo le gnéithe comhroinnte breiseán"
 }

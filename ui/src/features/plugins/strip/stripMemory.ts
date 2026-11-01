@@ -1,17 +1,17 @@
-const KEY = "mumcord.pluginStrip.collapsed";
+const KEY = "mumcord.pluginStrip.open";
 
-/** Whether the user collapsed the strip; it stays collapsed across restarts (FR-6.64). */
-export function loadCollapsed(): boolean {
+/** The plugin whose inline view was open last, so it stays open across restarts (FR-6.64). */
+export function loadOpen(): string | null {
   try {
-    return window.localStorage.getItem(KEY) === "1";
+    return window.localStorage.getItem(KEY) || null;
   } catch {
-    return false;
+    return null;
   }
 }
 
-export function saveCollapsed(collapsed: boolean): void {
+export function saveOpen(id: string | null): void {
   try {
-    window.localStorage.setItem(KEY, collapsed ? "1" : "0");
+    window.localStorage.setItem(KEY, id ?? "");
   } catch (error: unknown) {
     console.error("Remembering the plugin strip state failed", error);
   }

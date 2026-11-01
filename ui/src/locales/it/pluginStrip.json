@@ -1,12 +1,7 @@
 {
   "heading": "Plugin",
   "list": "Pannelli dei plugin",
-  "hide": "Nascondi i pannelli dei plugin",
-  "show": "Mostra i pannelli dei plugin",
   "expand": "Espandi {{name}}",
   "close": "Chiudi",
-  "unsupported": "Questo server non supporta le funzioni condivise dei plugin",
-  "running_one": "{{count}} in esecuzione",
-  "running_many": "{{count}} in esecuzione",
-  "running_other": "{{count}} in esecuzione"
+  "unsupported": "Questo server non supporta le funzioni condivise dei plugin"
 }

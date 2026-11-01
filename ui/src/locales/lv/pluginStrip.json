@@ -1,12 +1,7 @@
 {
   "heading": "Spraudņi",
   "list": "Spraudņu paneļi",
-  "hide": "Paslēpt spraudņu paneļus",
-  "show": "Rādīt spraudņu paneļus",
   "expand": "Izvērst {{name}}",
   "close": "Aizvērt",
-  "unsupported": "Šis serveris neatbalsta kopīgās spraudņu funkcijas",
-  "running_zero": "{{count}} darbojas",
-  "running_one": "{{count}} darbojas",
-  "running_other": "{{count}} darbojas"
+  "unsupported": "Šis serveris neatbalsta kopīgās spraudņu funkcijas"
 }
