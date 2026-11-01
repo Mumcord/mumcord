@@ -4,10 +4,9 @@
  * or pause, the shared keys, and the "Watching" strip of who is in the party under the picture.
  * Leaving the view keeps the party as the mini bar at the top of the chat.
  */
-import { useCallback, useEffect, useRef, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { announce } from "../../a11y";
-import { getApi, type User, type WatchCommand } from "../../api";
+import type { User, WatchCommand } from "../../api";
 import { openInBrowser } from "../chat/openLink";
 import { useServerStateOf } from "../channels";
 import { Avatar } from "../members/Avatar";
@@ -25,17 +24,15 @@ import { useMediaKeys } from "../media/useMediaKeys";
 import { useFullscreen } from "../media/useFullscreen";
 import { useTick } from "../media/useTick";
 import { CodecHint } from "./CodecHint";
-import { setKnownDuration } from "./knownDuration";
 import { PlayPause } from "./PlayPause";
 import { SyncPill } from "./SyncPill";
-import { loadCommand, playerOrigin } from "./playerBridge";
+import { PartyPlayerFrame } from "./PartyPlayer";
+import { usePartyPlayer } from "./usePartyPlayer";
 import { playNext, playPrevious } from "./playlistActions";
-import { reportPosition } from "./reportPosition";
 import { syncState, type SyncState } from "./syncState";
 import { useVideoPreview } from "./useVideoPreview";
-import { useWatchPlayer } from "./useWatchPlayer";
 import { positionAt, useWatchParty, type LiveParty } from "./watchPartyStore";
-import { PLAYING, watchUrl } from "./youtube";
+import { watchUrl } from "./youtube";
 import "./watchParty.css";
 
 /** How often the view recomputes the time and the sync states. */
@@ -95,44 +92,18 @@ export function Cinema({
   const party = live.party;
   const { users, selfSession } = useServerStateOf(serverId);
   const frameRef = useRef<HTMLElement | null>(null);
-  const embedRef = useRef<HTMLIFrameElement | null>(null);
   const { fullscreen, toggle, exit } = useFullscreen(frameRef);
   const preview = useVideoPreview(party.videoId);
   const title = preview?.title ?? t("playlist.videoTitle");
   const nowMs = useTick(TICK_MS);
   const first = useFirstUse("watchTogether");
 
-  const onCommand = useCallback(
-    (command: WatchCommand) => {
-      getApi()
-        .watchPartyCommand(serverId, command)
-        .catch((error: unknown) => {
-          console.error(t("commandFailed"), error);
-          announce(t("commandFailed"), "assertive");
-        });
-    },
-    [serverId, t],
-  );
-  const onEnded = useCallback(
-    (entry: number) => {
-      playNext(serverId, entry, false, t("playlist.nextFailed"));
-    },
-    [serverId, t],
-  );
-  const onReport = useCallback(
-    (positionMs: number, playing: boolean, buffering: boolean) => {
-      reportPosition(serverId, positionMs, playing, buffering);
-    },
-    [serverId],
-  );
-  const player = useWatchPlayer(live, { onCommand, onEnded, onReport }, embedRef);
-  useEffect(() => {
-    setKnownDuration(party.videoId, player.durationMs);
-  }, [party.videoId, player.durationMs]);
+  const { player, frameRef: embedRef } = usePartyPlayer(serverId, live);
 
   useMediaKeys({
+    // The party says whether it plays, as on the Play/Pause button, so Space never starts it twice.
     playPause: () => {
-      if (player.state === PLAYING) player.pause();
+      if (party.playing) player.pause();
       else player.play();
     },
     seek: (seconds) => {
@@ -172,7 +143,6 @@ export function Cinema({
   const adder = live.currentAdder;
   const adderName =
     adder === null ? null : (users.get(adder.session)?.name ?? adder.name ?? t("someone"));
-  const origin = playerOrigin(player.pageUrl ?? "");
   const action = party.lastAction;
   const time =
     player.durationMs > 0
@@ -207,21 +177,12 @@ export function Cinema({
         picture={
           <div className="media-frame__screen">
             {mockPlaceholder() !== null && <MockPicture label={title} />}
-            {origin !== null && mockPlaceholder() === null && !player.failed && (
-              <iframe
-                key={party.videoId}
-                ref={embedRef}
+            {mockPlaceholder() === null && (
+              <PartyPlayerFrame
+                live={live}
+                player={player}
+                frameRef={embedRef}
                 className="media-frame__frame"
-                src={player.pageUrl ?? ""}
-                title={t("player")}
-                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-                allowFullScreen
-                referrerPolicy="no-referrer"
-                sandbox="allow-scripts allow-same-origin allow-presentation"
-                data-ready={player.ready}
-                onLoad={() => {
-                  embedRef.current?.contentWindow?.postMessage(loadCommand(party.videoId), origin);
-                }}
               />
             )}
             {player.failed && mockPlaceholder() === null && (
