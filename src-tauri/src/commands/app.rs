@@ -81,6 +81,14 @@ pub fn deep_link_take_pending(app: AppHandle) -> ApiResult<Option<DeepLinkOpened
     Ok(deeplink::take_pending(&app))
 }
 
+/// Returns the plugin id of a `mumcord://plugins/<id>` link that arrived before the UI listened
+/// (e.g. the one that launched the app), once. Later links arrive as `plugins://open-details`.
+#[tauri::command]
+#[specta::specta]
+pub fn plugins_take_pending_link(app: AppHandle) -> ApiResult<Option<String>> {
+    Ok(deeplink::take_pending_plugin_link(&app))
+}
+
 #[cfg(not(target_os = "macos"))]
 fn link_error(e: &dyn std::fmt::Display) -> ApiError {
     tracing::warn!(error = %e, "mumble:// handler registration failed");
@@ -101,17 +109,27 @@ fn handler_register(_app: &AppHandle) -> ApiResult<()> {
 #[cfg(target_os = "windows")]
 fn handler_status(app: &AppHandle) -> ApiResult<bool> {
     use tauri_plugin_deep_link::DeepLinkExt;
-    app.deep_link()
-        .is_registered(deeplink::SCHEME)
-        .map_err(|e| link_error(&e))
+    for scheme in deeplink::SCHEMES {
+        if !app
+            .deep_link()
+            .is_registered(scheme)
+            .map_err(|e| link_error(&e))?
+        {
+            return Ok(false);
+        }
+    }
+    Ok(true)
 }
 
 #[cfg(target_os = "windows")]
 fn handler_register(app: &AppHandle) -> ApiResult<()> {
     use tauri_plugin_deep_link::DeepLinkExt;
-    app.deep_link()
-        .register(deeplink::SCHEME)
-        .map_err(|e| link_error(&e))
+    for scheme in deeplink::SCHEMES {
+        app.deep_link()
+            .register(scheme)
+            .map_err(|e| link_error(&e))?;
+    }
+    Ok(())
 }
 
 // Linux uses the app-ID desktop entry, so the handler and the taskbar share one entry.

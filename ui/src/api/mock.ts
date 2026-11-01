@@ -2925,6 +2925,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     // Mock links arrive only via `api.mock.emit("deepLinkOpened", …)`.
     deepLinkTakePending: () => Promise.resolve(null),
+    pluginsTakePendingLink: () => Promise.resolve(null),
 
     // packet inspector
     packetCaptureSet: (enabled) => {

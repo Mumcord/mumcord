@@ -499,6 +499,11 @@ export const commands = {
 	 *  the app), once. Later links arrive only as `deepLinkOpened`.
 	 */
 	deepLinkTakePending: () => typedError<DeepLinkOpened | null, ApiError>(__TAURI_INVOKE("deep_link_take_pending")),
+	/**
+	 *  Returns the plugin id of a `mumcord://plugins/<id>` link that arrived before the UI listened
+	 *  (e.g. the one that launched the app), once. Later links arrive as `plugins://open-details`.
+	 */
+	pluginsTakePendingLink: () => typedError<string | null, ApiError>(__TAURI_INVOKE("plugins_take_pending_link")),
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),

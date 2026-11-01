@@ -206,6 +206,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             app::link_handler_status,
             app::link_handler_register,
             app::deep_link_take_pending,
+            app::plugins_take_pending_link,
             diagnostics::diagnostics_save,
             diagnostics::app_info,
             commands::inspector::packet_capture_set,

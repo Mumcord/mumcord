@@ -14,11 +14,11 @@ use crate::commands::servers::{DeepLinkOpened, LinkOutcome, MumbleLink, parse_li
 use crate::commands::types::{ApiError, to_api_server_id};
 use crate::window;
 
-/// URL scheme Mumcord handles (also declared in tauri.conf.json). macOS registers it through
+/// URL schemes Mumcord handles (also declared in tauri.conf.json). macOS registers them through
 /// Info.plist and Linux through the app's desktop entry (`desktop_entry`), so only Windows
-/// uses it at runtime.
+/// uses them at runtime.
 #[cfg(target_os = "windows")]
-pub const SCHEME: &str = "mumble";
+pub const SCHEMES: [&str; 2] = ["mumble", "mumcord"];
 
 /// Holds links until the UI is ready for them. A link that launches the app arrives before the
 /// web UI listens, so until the UI's first `deep_link_take_pending` links are only kept (the
@@ -51,9 +51,28 @@ impl LinkBuffer {
 #[derive(Default)]
 struct PendingLinks(Mutex<LinkBuffer>);
 
+/// The newest `mumcord://plugins/<id>` id the UI has not taken yet. A link that launches the app
+/// arrives before the web UI listens, so the live event alone would be lost.
+#[derive(Debug, Default)]
+struct PendingPluginLink(Option<String>);
+
+impl PendingPluginLink {
+    fn keep(&mut self, id: String) {
+        self.0 = Some(id);
+    }
+
+    fn take(&mut self) -> Option<String> {
+        self.0.take()
+    }
+}
+
+#[derive(Default)]
+struct PendingPluginLinks(Mutex<PendingPluginLink>);
+
 /// Starts listening for links and picks up the one the app was launched with.
 pub fn init(app: &AppHandle) {
     app.manage(PendingLinks::default());
+    app.manage(PendingPluginLinks::default());
     let deep_link = app.deep_link();
     match deep_link.get_current() {
         Ok(Some(urls)) => open_urls(app, &urls),
@@ -93,6 +112,11 @@ fn parse_plugin_link(url: &Url) -> Option<String> {
 
 fn open_plugin_details(app: &AppHandle, id: String) {
     window::show(app);
+    app.state::<PendingPluginLinks>()
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .keep(id.clone());
     // Never installs: the UI only shows the details.
     if let Err(e) = app.emit(OPEN_PLUGIN_DETAILS_EVENT, OpenPluginDetails { id }) {
         tracing::warn!(error = %e, "forwarding a mumcord:// link to the UI failed");
@@ -217,9 +241,28 @@ pub fn take_pending(app: &AppHandle) -> Option<DeepLinkOpened> {
     link
 }
 
+/// Returns the plugin id of a `mumcord://plugins/<id>` link not yet taken by the UI, once.
+pub fn take_pending_plugin_link(app: &AppHandle) -> Option<String> {
+    app.try_state::<PendingPluginLinks>()?
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pending_plugin_link_keeps_the_newest_and_clears_on_take() {
+        let mut pending = PendingPluginLink::default();
+        assert_eq!(pending.take(), None);
+        pending.keep("dice".to_owned());
+        pending.keep("tarot".to_owned());
+        assert_eq!(pending.take().as_deref(), Some("tarot"));
+        assert_eq!(pending.take(), None);
+    }
 
     fn opened(path: &str) -> DeepLinkOpened {
         DeepLinkOpened {
