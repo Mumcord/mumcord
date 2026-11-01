@@ -71,6 +71,8 @@
     "bandwidthLabel": "Uppskattad bandbredd inkl. rubriker",
     "bandwidthValue": "≈ {{value}} av {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} av {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Stapeln blir gul från 80 % av serverns gräns och röd över den.",
     "bandwidthHintWithin": "Med läget för låg fördröjning: ≈ {{value}} kbit/s (paket på 10 ms), fortfarande inom gränsen.",
     "bandwidthHintOver": "Med läget för låg fördröjning: ≈ {{value}} kbit/s (paket på 10 ms), över gränsen.",
     "bandwidthHintNoLimit": "Med läget för låg fördröjning: ≈ {{value}} kbit/s (paket på 10 ms).",

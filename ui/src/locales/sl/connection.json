@@ -73,6 +73,8 @@
     "bandwidthLabel": "Ocenjena pasovna širina z glavami",
     "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} od {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Vrstica postane jantarna od 80 % omejitve strežnika in rdeča nad njo.",
     "bandwidthHintWithin": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), še znotraj omejitve.",
     "bandwidthHintOver": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms), nad omejitvijo.",
     "bandwidthHintNoLimit": "Z načinom nizke zakasnitve: ≈ {{value}} kbit/s (paketi po 10 ms).",

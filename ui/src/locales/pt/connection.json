@@ -72,6 +72,8 @@
     "bandwidthLabel": "Largura de banda estimada com cabeçalhos",
     "bandwidthValue": "≈ {{value}} de {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} de {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "A barra fica âmbar a partir de 80 % do limite do servidor e vermelha acima dele.",
     "bandwidthHintWithin": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms), ainda dentro do limite.",
     "bandwidthHintOver": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms), acima do limite.",
     "bandwidthHintNoLimit": "Com o modo de baixa latência: ≈ {{value}} kbit/s (pacotes de 10 ms).",

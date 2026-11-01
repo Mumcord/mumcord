@@ -74,6 +74,8 @@
     "bandwidthLabel": "Leithead banda measta le ceanntásca",
     "bandwidthValue": "≈ {{value}} as {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} as {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Éiríonn an barra ómra ó 80 % de theorainn an fhreastalaí agus dearg os a chionn.",
     "bandwidthHintWithin": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms), laistigh den teorainn fós.",
     "bandwidthHintOver": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms), os cionn na teorann.",
     "bandwidthHintNoLimit": "Leis an mód moill íseal: ≈ {{value}} kbit/s (paicéid 10 ms).",

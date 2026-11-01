@@ -73,6 +73,8 @@
     "bandwidthLabel": "Numatomas pralaidumas su antraštėmis",
     "bandwidthValue": "≈ {{value}} iš {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} iš {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Juosta tampa gintarine nuo 80 % serverio ribos ir raudona viršijus ją.",
     "bandwidthHintWithin": "Su mažos delsos režimu: ≈ {{value}} kbit/s (10 ms paketai), vis dar neviršija ribos.",
     "bandwidthHintOver": "Su mažos delsos režimu: ≈ {{value}} kbit/s (10 ms paketai), viršija ribą.",
     "bandwidthHintNoLimit": "Su mažos delsos režimu: ≈ {{value}} kbit/s (10 ms paketai).",

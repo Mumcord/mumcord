@@ -73,6 +73,8 @@
     "bandwidthLabel": "Szacowana przepustowość z nagłówkami",
     "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} z {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Pasek robi się bursztynowy od 80 % limitu serwera i czerwony powyżej niego.",
     "bandwidthHintWithin": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), nadal w limicie.",
     "bandwidthHintOver": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms), ponad limitem.",
     "bandwidthHintNoLimit": "Z trybem niskich opóźnień: ≈ {{value}} kbit/s (pakiety po 10 ms).",

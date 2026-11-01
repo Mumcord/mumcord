@@ -72,6 +72,8 @@
     "bandwidthLabel": "Banda stimata con intestazioni",
     "bandwidthValue": "≈ {{value}} di {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} di {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "La barra diventa ambra dall'80 % del limite del server e rossa oltre.",
     "bandwidthHintWithin": "Con la modalità bassa latenza: ≈ {{value}} kbit/s (pacchetti da 10 ms), ancora entro il limite.",
     "bandwidthHintOver": "Con la modalità bassa latenza: ≈ {{value}} kbit/s (pacchetti da 10 ms), oltre il limite.",
     "bandwidthHintNoLimit": "Con la modalità bassa latenza: ≈ {{value}} kbit/s (pacchetti da 10 ms).",

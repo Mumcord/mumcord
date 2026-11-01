@@ -72,6 +72,8 @@
     "bandwidthLabel": "Procijenjena propusnost sa zaglavljima",
     "bandwidthValue": "≈ {{value}} od {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} od {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Traka postaje jantarna od 80 % ograničenja poslužitelja, a crvena iznad njega.",
     "bandwidthHintWithin": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms), još unutar ograničenja.",
     "bandwidthHintOver": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms), iznad ograničenja.",
     "bandwidthHintNoLimit": "S načinom niske latencije: ≈ {{value}} kbit/s (paketi od 10 ms).",
