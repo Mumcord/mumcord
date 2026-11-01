@@ -11,16 +11,16 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B7 | ⚠ OUTWARD: create the `Mumcord/plugins` repository skeleton | done | b7-pluginsrepo |
 | B8 | ⚠ OUTWARD (repo `Mumcord/mumbot`): module `plugins` (mumbot#20) | done (mumbot PR #33, not merged) | b8-mumbot |
 | B20 | Deep link `mumcord://plugins/<id>` | done | b20-deeplink |
-| B2 | WIT package `mumcord:plugin@1.0.0` | in progress | b2-wit |
+| B2 | WIT package `mumcord:plugin@1.0.0` | done | b2-wit |
 | B4 | Manifest, permission catalogue and package rules to spec | in progress | b4-manifest |
 | B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | open | |
 | B11a | Host API: storage and secrets | open | |
 | B11b | Host API: timers, clock, notify, theme, random, log, permission gate, peer key | open | |
-| B12 | Messaging logic (pure) | open | |
-| B13 | Engine bridge for plugins | open | |
+| B12 | Messaging logic (pure) | in progress | b12-msg |
+| B13 | Engine bridge for plugins | in progress | b13-bridge |
 | B14 | Signing and verification | open | |
 | B15 | Registry and repository client | open | |
-| B16a | Safety fixture plugins | open | |
+| B16a | Safety fixture plugins | in progress | b16a-fixtures |
 | B17a | Plugin service: lifecycle | open | |
 | B17b | Updates and kill switch | open | |
 | B17c | Chat integration logic | open | |
@@ -28,7 +28,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B19 | `net.http` executor (official only) | open | |
 | B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
 | B22 | Permission list component and texts | open | |
-| B25a | SDK crate `mumcord-plugin-sdk` | open | |
+| B25a | SDK crate `mumcord-plugin-sdk` | in progress | b25a-sdk |
 | B25b | CLI `mumcord-plugin` (author + registry commands) | open | |
 | B25c | CLI `test` and `preview` | open | |
 | B16b | Fixture registry setup for E2E | open | |
@@ -418,3 +418,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **Lead decisions after B1:** B25a uses wit-bindgen's `export!` instead of a new `#[plugin]` proc-macro crate (no new workspace member). B25b `serve-registry` uses a minimal std::net HTTP server (no new dependency). Docs (B25/B43) note that the CLI source is Apache-2.0 but the built binary links AGPL code.
 - **B8 (Mumcord/mumbot PR #33, not merged/released):** data id `mumcord.srvplugins`, sent only to sessions whose `mumcord.hello` lists feature `server-plugins`. JSON `{"v":1,"seq":N,"plugins":[{"id","min","src","key"?,"for"}]}`; `src` = `"official"` or an https index URL; `key` = minisign public key, only for third-party; `for` required (1–40 chars); no `level`; ≤ 8 entries, ≤ 1000 B. ≤ 1 per minute per session. Bot refuses to start the module unless registered and server cert pinned. `seq` persisted, +1 when the list changes between restarts. B9/E2E needs a mumbot release (user's yes) and the fetch-mumbot.sh version + sha line.
 - **B20b (b50f149b):** command `plugins_take_pending_link` (returns the newest pending id or null, clears it); live event `plugins://open-details` unchanged. B24 calls the command once on mount, after subscribing to the event. Windows runtime registration covers `mumble` + `mumcord` (`deeplink::SCHEMES`). Touched `src-tauri/src/lib.rs` (registration) and `ui/src/api/mock.ts` (stub). UI typecheck/lint/vitest NOT run for this change: the next UI task runs them first. Docs gap: `docs/engine-api.md` must list `plugins_take_pending_link` (for the docs task).
+- **B2 (71067a1f):** WIT `mumcord:plugin@1.0.0` in `crates/plugins/wit/`: types, log, storage, timers, clock, notify, theme, random, peers, ui, chat, secrets, http, webview, events. The world imports all of them and exports start / on-event / stop. start-info is unchanged; right after start the host sends settings-changed, language-changed and theme-changed (plus self-changed if permitted). The UI tree is a flat list of nodes (node 0 = root, children by index). Slow calls answer through events (`http.request` → id → `http-response`; timers → `timer`). There's a shared error `invalid`, and http has its own error variant. 19 events (FR-6.16's 17 + http-response + webview-message). webview: `show(place = panel-popover | dialog, entry under web/)`, `hide()`, `post(text)`; incoming messages arrive as `webview-message`, ≤ 16 KiB each, ≤ 60/s. runtime.rs ALLOWED_IMPORTS lists all 15 interfaces; a call the host can't serve yet fails at load. GOTCHA: no double quotes inside `///` WIT doc comments (breaks bindgen). Shape is pinned by `crates/plugins/tests/wit.rs`; changes must be additive and go through the lead.
