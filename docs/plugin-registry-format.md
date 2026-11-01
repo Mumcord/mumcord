@@ -92,7 +92,7 @@ in peer announces with its first 8 hex digits.
           "url": "https://github.com/Mumcord/plugins/releases/download/dice-v1.2.0/dice-1.2.0.mcplugin",
           "size": 48213,
           "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-          "permissions": ["chat.commands", "chat.send"]
+          "permissions": ["commands", "chat.send"]
         }
       ]
     }
@@ -276,7 +276,7 @@ version = "1.2.0"
 api = 1
 size = 48213
 sha256 = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-permissions = ["chat.commands", "chat.send"]
+permissions = ["commands", "chat.send"]
 published = "2026-10-01"
 signature = """
 untrusted comment: signature from minisign secret key
