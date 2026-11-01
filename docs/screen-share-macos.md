@@ -16,8 +16,8 @@ test. Run it against a local test server, never a public one.
   always without Mumcord's own output (`excludesCurrentProcessAudio`), so viewers never hear the
   voice chat back. A window or an app shares that app's sound; a whole screen shares the sound
   of every app except Mumcord. Needs macOS 13 or newer.
-- **Size:** the system scales the picture into 1280×720 (the encoder's largest step) before
-  Mumcord sees it, so a Retina or 5K screen costs no more than a 720p one.
+- **Size:** the system scales the picture into 1920×1080 (the encoder's largest step) before
+  Mumcord sees it, so a Retina or 5K screen costs no more than a Full HD one.
 - **Permission:** screen recording needs the user's consent. On macOS 14+ choosing in the
   system picker is that consent. On 12.3 and 13 Mumcord asks for the "Screen & System Audio
   Recording" permission; without it the share fails and the sharer sees "Allow it in System
@@ -41,7 +41,7 @@ test. Run it against a local test server, never a public one.
    and screens.
 2. **Cancel:** close the picker without choosing. No share starts, no error message.
 3. **Window share:** pick the browser window playing a video. The viewer sees the window at up
-   to 720p30 and the menu bar shows the sharing indicator.
+   to 1080p30 and the menu bar shows the sharing indicator.
 4. **Only that app's sound:** the viewer hears the browser's sound, not the second app's sound
    and not the voice chat (talk on the second machine: the sharer hears it, the viewer does not
    hear it twice).

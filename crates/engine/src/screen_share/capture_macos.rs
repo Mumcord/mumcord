@@ -16,9 +16,9 @@
 
 use super::convert::fit;
 
-/// The encoder's largest picture (720p30); the system scales into it, so a 5K screen costs no
-/// more than a 720p one.
-const CAPTURE_BOX: (u32, u32) = (1280, 720);
+/// The encoder's largest picture (the 1080p30 quality step); the system scales into it, so a 5K
+/// screen costs no more than a Full HD one.
+const CAPTURE_BOX: (u32, u32) = (1920, 1080);
 
 /// Why the screen cannot be captured.
 #[derive(Debug, thiserror::Error)]
@@ -663,8 +663,8 @@ mod tests {
 
     #[test]
     fn the_stream_fits_the_encoder_box() {
-        assert_eq!(stream_size(5120.0, 2880.0), (1280, 720));
-        assert_eq!(stream_size(3440.0, 1440.0), (1280, 534));
+        assert_eq!(stream_size(5120.0, 2880.0), (1920, 1080));
+        assert_eq!(stream_size(3440.0, 1440.0), (1920, 802));
         assert_eq!(stream_size(800.0, 601.0), (800, 600));
         assert_eq!(stream_size(0.0, 600.0), CAPTURE_BOX);
         assert_eq!(stream_size(f64::NAN, 600.0), CAPTURE_BOX);
