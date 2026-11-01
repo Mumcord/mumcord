@@ -10,6 +10,7 @@ import {
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
 import { resetPluginStore } from "../pluginStore";
+import { UpdatesBadge } from "./UpdatesBadge";
 import { UpdatesTab } from "./UpdatesTab";
 
 const plugin: InstalledPlugin = {
@@ -211,5 +212,23 @@ describe("UpdatesTab", () => {
         "The permissions of Poll could not be changed.",
       );
     });
+  });
+});
+
+describe("UpdatesBadge", () => {
+  it("counts waiting updates and new optional permissions", async () => {
+    setup([update], { ...plugin, id: "dice", offered: ["chat.send"] });
+    render(<UpdatesBadge />);
+    expect(await screen.findByText("2")).toBeTruthy();
+    expect(screen.getByText("Updates")).toBeTruthy();
+  });
+
+  it("shows nothing when there is nothing to update", async () => {
+    setup([]);
+    const { container } = render(<UpdatesBadge />);
+    await waitFor(() => {
+      expect(getApi().pluginUpdates).toHaveBeenCalled();
+    });
+    expect(container.textContent).toBe("");
   });
 });

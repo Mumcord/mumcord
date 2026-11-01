@@ -1019,6 +1019,11 @@
   margin-inline-start: auto;
 }
 
+.settings__tab-badge {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
 /* Privacy summary (#161): a headline and one plain line per topic, each with a jump link. */
 .privacy-summary__headline {
   margin: 0 0 var(--space-2);

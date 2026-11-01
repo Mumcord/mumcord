@@ -6,7 +6,7 @@ import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginReques
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
 import { RepositoriesTab, type MirrorSetting } from "./repos";
 import { UpdatesTab } from "./updates";
-import { useUpdates } from "./updates/useUpdates";
+import { useUpdatesCount } from "./updates/useUpdatesCount";
 import "./plugins.css";
 import { BrowseTab } from "./browse/BrowseTab";
 import { DeveloperTab } from "./developer/DeveloperTab";
@@ -47,7 +47,6 @@ export function PluginsSection({
 }) {
   const { t } = useTranslation("pluginSettings");
   const { overview, loadFailed } = usePlugins();
-  const { updates } = useUpdates();
   const baseId = useId();
   const [selected, setSelected] = useState<PluginTab>("installed");
   const requestedTab = useRequestedPluginTab();
@@ -62,9 +61,7 @@ export function PluginsSection({
   const active = tabs.includes(selected) ? selected : "installed";
   const allOff = overview?.allOff ?? false;
   const installedCount = overview?.plugins.length;
-  // Waiting updates plus plugins with new optional permissions to answer (F39).
-  const updatesCount =
-    (updates?.length ?? 0) + (overview?.plugins.filter((p) => p.offered.length > 0).length ?? 0);
+  const updatesCount = useUpdatesCount();
   const tabId = (tab: PluginTab) => `${baseId}-tab-${tab}`;
   const panelId = (tab: PluginTab) => `${baseId}-panel-${tab}`;
 

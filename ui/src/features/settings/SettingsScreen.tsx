@@ -23,6 +23,7 @@ import { SettingsPageCards } from "./SettingsPages";
 import { SECTION_ICONS, SECTION_IDS, SET_APART_SECTIONS, type SectionId } from "./sectionIds";
 import { useIsMacos } from "../../api/useIsMacos";
 import { useDevToolsUnlocked } from "../inspector/devTools";
+import { UpdatesBadge } from "../plugins/updates/UpdatesBadge";
 import { ResetSectionButton } from "./ResetSectionButton";
 import { useSettings } from "./useSettings";
 import { useSettingsChanges } from "./useSettingsChanges";
@@ -259,6 +260,7 @@ export function SettingsScreen({
                 >
                   <SettingsIcon name={SECTION_ICONS[id]} />
                   {t(`sections.${id}`)}
+                  {id === "plugins" && <UpdatesBadge />}
                   {dotSections.has(id) && <span className="settings__tab-dot" aria-hidden="true" />}
                 </button>
               ))}
