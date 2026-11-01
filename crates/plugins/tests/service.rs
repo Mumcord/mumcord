@@ -1399,3 +1399,82 @@ fn chat_matches_come_from_every_connected_server() {
     got.sort();
     assert_eq!(got, [b"!a".to_vec(), b"!b".to_vec()]);
 }
+
+/// What the safety fixture builder puts in place of `{{PRELUDE}}` (memory, allocator, `stop`,
+/// `$start_ok`, `$log_info`), so the real fixture core runs here without the builder.
+const FIXTURE_PRELUDE: &str = r#"
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (func (export "cabi_realloc") (param $old i32) (param $old_size i32) (param $align i32) (param $size i32) (result i32)
+    (local $p i32)
+    (local.set $p
+      (i32.and
+        (i32.add (global.get $heap) (i32.sub (local.get $align) (i32.const 1)))
+        (i32.xor (i32.sub (local.get $align) (i32.const 1)) (i32.const -1))))
+    (global.set $heap (i32.add (local.get $p) (local.get $size)))
+    (local.get $p))
+  (func (export "stop"))
+  (func $start_ok (result i32)
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func $log_info (param $ptr i32) (param $len i32)
+    (call $log (i32.const 1) (local.get $ptr) (local.get $len)))
+"#;
+
+/// AC-6.7: the Dice-like safety fixture declares everything Dice declares (incl. `chat.send`) and
+/// posts to chat at start, which is no user gesture: it gets `not-permitted` and nothing is
+/// posted, although it is connected and focused.
+#[test]
+fn a_dice_like_plugin_cannot_post_to_chat_without_a_gesture() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+
+    let declared: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/safety/fx-dice-like/manifest.json"))
+            .expect("fixture manifest");
+    let extra: String = ["permissions", "messaging", "commands"]
+        .iter()
+        .map(|key| format!(r#","{key}":{}"#, declared[key]))
+        .collect();
+    let core =
+        include_str!("fixtures/safety/cores/chat-send.wat").replace("{{PRELUDE}}", FIXTURE_PRELUDE);
+    let dir = fx.root.path().join("src-fx-dice-like");
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(
+        dir.join("manifest.json"),
+        manifest("fx-dice-like", "0.1.0", &extra),
+    )
+    .expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode(&core)).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    let id = service.load_dev(&dir).expect("loads");
+    assert_eq!(info(&service, &id).status, Status::Running);
+
+    let until = std::time::Instant::now() + std::time::Duration::from_secs(2);
+    let mut posted = Vec::new();
+    let outcome = loop {
+        while let Ok(event) = host_events.try_recv() {
+            service.handle_host_event(event).expect("handled");
+        }
+        while let Ok(event) = events.try_recv() {
+            if let ServiceEvent::ChatPost { line, .. } = event {
+                posted.push(line);
+            }
+        }
+        let lines = service.log_lines(&id);
+        if let Some((_, line)) = lines.iter().find(|(_, l)| l.starts_with("chat-send")) {
+            break line.clone();
+        }
+        assert!(
+            std::time::Instant::now() < until,
+            "no chat-send outcome: {lines:?}"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    };
+    assert_eq!(outcome, "chat-send-not-permitted");
+    assert!(posted.is_empty(), "{posted:?}");
+}
