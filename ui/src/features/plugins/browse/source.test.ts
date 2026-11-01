@@ -23,6 +23,7 @@ function installed(source: InstalledPlugin["source"]): InstalledPlugin {
     icon: null,
     description: "",
     authors: [],
+    chatPatterns: [],
     offered: [],
   };
 }
