@@ -239,7 +239,7 @@ interface ui {
     label: string,
     value: string,
     placeholder: string,
-    /// At most 64 bytes; the field shows a byte counter.
+    /// At most 64 bytes (UTF-8); the field counts characters for the user.
     max-bytes: u8,
     purpose: input-purpose,
     /// Sends `ui-action` with a `text` value when the user confirms (Enter or leaving the field).
