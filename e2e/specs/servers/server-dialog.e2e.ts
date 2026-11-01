@@ -1,3 +1,4 @@
+import { connect } from "node:net";
 import { browser, expect, $ } from "@wdio/globals";
 import { app, axe, bot, testenv } from "../../helpers/index.ts";
 import { dumpAppLogs } from "../../helpers/wizard-util.ts";
@@ -108,6 +109,30 @@ async function waitReachable(svc: "v15" | "v15b"): Promise<void> {
         .then(() => true, () => false);
     },
     { timeout: 60_000, interval: 1_000, timeoutMsg: `${svc} did not come back` },
+  );
+}
+
+/**
+ * Waits until the server's TCP port accepts connections. `testenv.reset` returns while the seeded
+ * server is still restarting, and the password server cannot be probed with the bot (it has no
+ * password), so a plain connect is the readiness check. Without it the first test connection can
+ * hit the restart and report "Couldn't reach the server" instead of the refused password.
+ */
+async function waitListening(svc: "v15" | "v15b"): Promise<void> {
+  await browser.waitUntil(
+    () =>
+      new Promise<boolean>((resolve) => {
+        const socket = connect({ host: "127.0.0.1", port: testenv.ports[svc] });
+        socket.once("connect", () => {
+          socket.destroy();
+          resolve(true);
+        });
+        socket.once("error", () => {
+          socket.destroy();
+          resolve(false);
+        });
+      }),
+    { timeout: 60_000, interval: 1_000, timeoutMsg: `${svc} did not start listening` },
   );
 }
 
@@ -302,6 +327,7 @@ describe("add and edit server dialog (issue #151, AC-3.20 – AC-3.29)", functio
     // A second server that needs a password, so v15 stays clean for the other checks.
     process.env.SERVER_PASSWORD = PASSWORD;
     await testenv.reset("v15b");
+    await waitListening("v15b");
 
     await openAddDialog();
     await fill("Address", "localhost");
