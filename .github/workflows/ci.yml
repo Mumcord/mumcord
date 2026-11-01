@@ -94,14 +94,18 @@ jobs:
     name: Dependency checks
     uses: ./.github/workflows/dependency-audit.yml
 
+  # Two jobs per OS that run side by side, each about half the old single job: "check" (format,
+  # clippy, the app build on Windows/macOS and the CI script tests) and "test" (cargo test). They
+  # build different artifacts (check metadata vs. test binaries), so each keeps its own cache.
   build-test:
-    name: Build and test (${{ matrix.os }})
+    name: ${{ matrix.task == 'check' && 'Lint and app build' || 'Rust tests' }} (${{ matrix.os }})
     needs: changes
     if: needs.changes.outputs.code == 'true'
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-latest, macos-latest]
+        task: [check, test]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -208,58 +212,65 @@ jobs:
       # cache and evicted main's caches, so later runs started cold.
       - uses: Swatinem/rust-cache@v2
         with:
+          key: ${{ matrix.task }}
           save-if: ${{ github.event_name != 'pull_request' }}
 
       - uses: ./.github/actions/npm-ci
 
       - name: Rust format
+        if: matrix.task == 'check'
         run: cargo fmt --all --check
 
       - name: Rust lint
+        if: matrix.task == 'check'
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
       # The smoke-test seeder is its own Cargo project outside the workspace, so the steps above
       # never compile it. Checking it here catches store/protocol API changes that would
       # otherwise only break the Smoke jobs of the test builds.
       - name: Smoke seeder builds
-        if: runner.os == 'Linux'
+        if: matrix.task == 'check' && runner.os == 'Linux'
         run: cargo clippy --manifest-path scripts/smoke/seed/Cargo.toml --locked -- -D warnings
 
       - name: Rust tests
+        if: matrix.task == 'test'
         run: cargo test --workspace --locked
 
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
       # tested and free of the device crates (cpal/ALSA) and the resampler.
-      - name: Codec crate without device I/O
-        if: runner.os == 'Linux'
+      - name: Codec crate lint
+        if: matrix.task == 'check' && runner.os == 'Linux'
         run: |
           cargo clippy -p mumcord-codec --all-targets --locked -- -D warnings
-          cargo test -p mumcord-codec --locked
           if cargo tree -p mumcord-codec -e normal --locked | grep -iE 'cpal|alsa|rubato'; then
             echo "mumcord-codec must not depend on cpal, alsa or rubato" >&2
             exit 1
           fi
 
+      - name: Codec crate tests
+        if: matrix.task == 'test' && runner.os == 'Linux'
+        run: cargo test -p mumcord-codec --locked
+
       # release.yml and publish-crates.yml set the tag's version with this script before building.
       - name: Version script
-        if: runner.os == 'Linux'
+        if: matrix.task == 'check' && runner.os == 'Linux'
         run: scripts/ci/test-set-version.sh
 
       - name: Changelog script
-        if: runner.os == 'Linux'
+        if: matrix.task == 'check' && runner.os == 'Linux'
         run: scripts/ci/test-finalise-changelog.sh
 
       - name: Notices script
-        if: runner.os == 'Linux'
+        if: matrix.task == 'check' && runner.os == 'Linux'
         run: scripts/ci/test-notices.sh
 
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
-        if: runner.os != 'Linux'
+        if: matrix.task == 'check' && runner.os != 'Linux'
         run: npm run tauri build -- --debug --no-bundle
 
   # The UI checks are platform-independent (vitest runs in jsdom), so they run once, on Linux, in
-  # parallel with the Rust builds. The ubuntu-24.04 result check below requires this job.
+  # parallel with the Rust jobs. The ubuntu-24.04 result check below requires this job.
   ui:
     name: UI checks
     needs: changes
