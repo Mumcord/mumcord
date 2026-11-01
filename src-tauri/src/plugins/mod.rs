@@ -448,11 +448,24 @@ async fn on_service_event(
             server,
             line,
         } => match feed::post_line(engine, server, &line).await {
-            Ok(message) => crate::commands::chat::MessageReceived {
-                server_id: crate::commands::types::to_api_server_id(server),
-                message: message.into(),
+            Ok(message) => {
+                // The server never echoes our own line, so its card (shown by now or later)
+                // pairs with this copy here; a match arrives as a `Supersede` service event.
+                let own = feed::incoming_line(&message);
+                crate::commands::chat::MessageReceived {
+                    server_id: crate::commands::types::to_api_server_id(server),
+                    message: message.into(),
+                }
+                .emit(app)?;
+                if let Some((id, sender, text)) = own {
+                    plugins
+                        .call(move |service| {
+                            service.chat_text(server, id, sender, &text);
+                            Ok(())
+                        })
+                        .await?;
+                }
             }
-            .emit(app)?,
             Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
         },
         ServiceEvent::Supersede {

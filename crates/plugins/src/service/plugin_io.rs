@@ -206,12 +206,31 @@ impl ServiceIo {
         self.chat().gate.command_gesture(plugin, Instant::now());
     }
 
-    /// An incoming channel text line (plain text, as other clients see it); pairs it with a
-    /// pending card. Only its hash is kept.
+    /// A channel text line on `server` (plain text, as other clients see it), incoming or the
+    /// user's own copy; pairs it with a pending card and hides it live (FR-6.45). Only its hash
+    /// is kept.
     pub fn chat_text(&self, server: ServerId, message: u64, sender: u32, line: &str) -> Supersede {
-        self.chat()
+        let result = self
+            .chat()
             .supersede
-            .text(server, message, sender, line, Instant::now())
+            .text(server, message, sender, line, Instant::now());
+        self.emit_supersede(&result);
+        result
+    }
+
+    fn emit_supersede(&self, result: &Supersede) {
+        if let Supersede::Replace {
+            plugin,
+            card,
+            message,
+        } = result
+        {
+            self.emit(ServiceEvent::Supersede {
+                plugin: plugin.clone(),
+                card: Some(card.clone()),
+                message: *message,
+            });
+        }
     }
 
     /// The server a chat call goes to: the one of the event being handled, else the voice
@@ -481,13 +500,7 @@ impl PluginIo for ServiceIo {
             hash,
             Instant::now(),
         );
-        if let Supersede::Replace { card, message } = result {
-            self.emit(ServiceEvent::Supersede {
-                plugin: plugin.to_owned(),
-                card: Some(card),
-                message,
-            });
-        }
+        self.emit_supersede(&result);
         Ok(())
     }
 
@@ -695,6 +708,31 @@ mod tests {
     }
 
     #[test]
+    fn a_line_arriving_after_its_card_is_replaced_live() {
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        io.peers().plugins.insert(
+            "poll".into(),
+            PluginMeta {
+                name: "Poll".into(),
+                messaging: None,
+            },
+        );
+        let hash = chat::line_hash("Poll", "Lunch?");
+        io.supersede("poll", "c1".into(), 3, hash, Some(2))
+            .expect("ok");
+        assert!(rx.try_recv().is_err(), "the line is not there yet");
+        io.chat_text(1, 11, 3, "[Poll] Lunch?");
+        assert!(rx.try_recv().is_err(), "another server's line stays");
+        io.chat_text(2, 12, 3, "[Poll] Lunch?");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Supersede { plugin, card, message: 12 })
+                if plugin == "poll" && card.as_deref() == Some("c1")
+        ));
+    }
+
+    #[test]
     fn replies_and_cards_stay_in_the_chat_their_event_came_from() {
         let (events, mut rx) = unbounded_channel();
         let io = ServiceIo::new(None, events);
@@ -747,10 +785,15 @@ mod tests {
         assert_eq!(
             io.chat_text(2, 11, 3, "[Poll] Lunch?"),
             Supersede::Replace {
+                plugin: "poll".into(),
                 card: "c1".into(),
                 message: 11
             }
         );
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Supersede { message: 11, .. })
+        ));
 
         // Outside a chat event (a timer, an old plugin): the voice server, as before.
         io.gesture("poll");

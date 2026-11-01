@@ -306,8 +306,12 @@ pub fn poster(line: &str) -> Option<&str> {
 pub enum Supersede {
     /// Show the text line normally / the card has nothing to replace yet.
     None,
-    /// Hide message `message` and show card `card` with "Show text".
-    Replace { card: String, message: u64 },
+    /// Hide message `message` and show plugin `plugin`'s card `card` with "Show text".
+    Replace {
+        plugin: String,
+        card: String,
+        message: u64,
+    },
 }
 
 #[derive(Debug)]
@@ -371,6 +375,7 @@ impl SupersedeTracker {
         }) {
             let line = self.lines.remove(index);
             return Supersede::Replace {
+                plugin: plugin.to_owned(),
                 card: card.to_owned(),
                 message: line.message,
             };
@@ -408,6 +413,7 @@ impl SupersedeTracker {
         }) {
             let card = self.cards.remove(index);
             return Supersede::Replace {
+                plugin: card.plugin,
                 card: card.card,
                 message,
             };
@@ -720,6 +726,7 @@ mod tests {
                 t0 + Duration::from_secs(5)
             ),
             Supersede::Replace {
+                plugin: "poll".into(),
                 card: "c1".into(),
                 message: 7
             }
@@ -738,6 +745,7 @@ mod tests {
         assert_eq!(
             s.text(1, 9, 3, line, t0 + Duration::from_secs(3)),
             Supersede::Replace {
+                plugin: "poll".into(),
                 card: "c1".into(),
                 message: 9
             }
@@ -812,6 +820,7 @@ mod tests {
         assert_eq!(
             s.text(1, 8, 3, line, t0),
             Supersede::Replace {
+                plugin: "poll".into(),
                 card: "c1".into(),
                 message: 8
             }
