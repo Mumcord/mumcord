@@ -8,6 +8,9 @@
   --media-scrim: rgb(8 6 20 / 78%);
   --media-on-scrim: #fff;
   --media-on-scrim-muted: rgb(255 255 255 / 72%);
+  --media-on-scrim-faint: rgb(255 255 255 / 30%);
+  --media-hover: rgb(255 255 255 / 14%);
+  --media-ink: rgb(8 6 20);
   --media-glass: rgb(16 12 36 / 62%);
   --media-glass-border: rgb(255 255 255 / 16%);
 
@@ -162,6 +165,12 @@
   white-space: nowrap;
 }
 
+/* Ordinary buttons on the picture (retry, codec hint) keep their theme surface, so they need the
+   theme's text colour back instead of the light text the overlay passes down. */
+.media-frame .button {
+  color: var(--color-text);
+}
+
 /* Icon buttons on the picture: no frame until hovered, the usual focus ring for the keyboard.
    Doubled class: it has to win over the app-wide `.button`. */
 .button.media-frame__icon {
@@ -179,7 +188,7 @@
 }
 
 .button.media-frame__icon:hover:not(:disabled) {
-  background: rgb(255 255 255 / 14%);
+  background: var(--media-hover);
 }
 
 .button.media-frame__icon:disabled {

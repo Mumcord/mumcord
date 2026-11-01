@@ -196,7 +196,7 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
           <FitButtons t={t} fit={view.fit} />
           <button
             type="button"
-            className="button share-icon-button"
+            className="button media-frame__icon share-icon-button"
             aria-label={t("focus")}
             aria-pressed={view.focus}
             aria-keyshortcuts="Z"
