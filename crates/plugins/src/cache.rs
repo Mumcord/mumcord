@@ -42,10 +42,20 @@ pub(crate) fn load(engine: &Engine, path: &Path) -> Option<Component> {
     if !path.is_file() {
         return None;
     }
+    // Read into memory instead of `deserialize_file`, which memory-maps the file for as long as
+    // the component lives: Windows refuses to delete a mapped file, so a running plugin would
+    // block `prune` and replacing its cache entry.
+    let bytes = match std::fs::read(path) {
+        Ok(bytes) => bytes,
+        Err(error) => {
+            tracing::warn!(%error, "could not read a compiled plugin from the cache");
+            return None;
+        }
+    };
     // SAFETY: the file was written by `store` from `Component::serialize` of the same key; see the
     // module comment for why the cache directory is trusted. wasmtime still checks that it was
     // built for this engine configuration.
-    match unsafe { Component::deserialize_file(engine, path) } {
+    match unsafe { Component::deserialize(engine, &bytes) } {
         Ok(component) => Some(component),
         Err(error) => {
             tracing::warn!(%error, "dropping an unusable compiled plugin from the cache");
@@ -70,7 +80,9 @@ pub(crate) fn store(path: &Path, component: &Component) -> Result<(), String> {
 }
 
 /// Removes every cached file whose key is not in `keep` (uninstalled plugins, old versions, an
-/// older Mumcord).
+/// older Mumcord) and returns how many were removed. A file that cannot be removed (on Windows,
+/// e.g. one still open elsewhere) is skipped and logged, and a later prune tries again: a stale
+/// cache entry only costs disk space, so it must never fail the caller.
 pub fn prune(cache_dir: &Path, keep: &[String]) -> std::io::Result<usize> {
     let dir = cache_dir.join(DIR);
     let entries = match std::fs::read_dir(&dir) {
@@ -87,8 +99,12 @@ pub fn prune(cache_dir: &Path, keep: &[String]) -> std::io::Result<usize> {
             .and_then(|s| s.to_str())
             .is_some_and(|stem| keep.iter().any(|k| k == stem));
         if is_cache_file && !kept {
-            std::fs::remove_file(&path)?;
-            removed += 1;
+            match std::fs::remove_file(&path) {
+                Ok(()) => removed += 1,
+                Err(error) => {
+                    tracing::warn!(%error, "kept a stale compiled plugin that could not be removed");
+                }
+            }
         }
     }
     Ok(removed)
@@ -121,6 +137,19 @@ mod tests {
         assert!(dir.join("aa.cwasm").exists());
         assert!(!dir.join("bb.cwasm").exists());
         assert!(dir.join("notes.txt").exists());
+    }
+
+    #[test]
+    fn prune_skips_files_it_cannot_remove() {
+        let root = tempfile::tempdir().expect("temp dir");
+        let dir = root.path().join(DIR);
+        // A folder with a cache name makes `remove_file` fail on every OS, standing in for a
+        // file that Windows keeps locked.
+        std::fs::create_dir_all(dir.join("locked.cwasm")).expect("mkdir");
+        std::fs::write(dir.join("stale.cwasm"), b"x").expect("write");
+        assert_eq!(prune(root.path(), &[]).expect("prunes"), 1);
+        assert!(dir.join("locked.cwasm").exists());
+        assert!(!dir.join("stale.cwasm").exists());
     }
 
     #[test]

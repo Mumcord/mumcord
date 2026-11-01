@@ -445,7 +445,13 @@ fn compiled_plugins_are_cached_per_component_and_app_version() {
         cache::prune(&cache_dir, &[cache::key(&wasm, &APP_VERSION)]).expect("prunes"),
         0
     );
+    // The running plugin does not hold its cache file, so it can be pruned on every OS
+    // (Windows refuses to delete a file that is still open or mapped).
     assert_eq!(cache::prune(&cache_dir, &[]).expect("prunes"), 1);
+    assert!(!cached.exists());
+    second
+        .disable("good")
+        .expect("still runs after its cache file is gone");
 }
 
 #[test]
