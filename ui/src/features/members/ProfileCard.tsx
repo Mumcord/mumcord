@@ -118,6 +118,13 @@ export function ProfileCard({
       aria-labelledby={titleId}
       aria-modal="true"
       onKeyDown={onKeyDown}
+      onCancel={(event) => {
+        // Escape with focus outside the card's content (e.g. on a button that was just
+        // disabled) only fires the native cancel: close through onClose too, or the card's
+        // state stays open and opening the same person again shows nothing.
+        event.preventDefault();
+        onClose();
+      }}
     >
       <ProfileBody
         key={session}

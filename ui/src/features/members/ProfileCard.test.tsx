@@ -51,6 +51,17 @@ describe("ProfileCard (full profile)", () => {
     expect(dialog.querySelector(".profile-card__header .avatar")).not.toBeNull();
   });
 
+  it("closes through onClose when Escape reaches the dialog from outside its content", async () => {
+    // With focus on the page (e.g. a button inside the card was just disabled), Escape only
+    // fires the dialog's native cancel. Closing natively would leave the card's state open, so
+    // opening the same person again would show nothing.
+    const { dialog, onClose } = await renderCard();
+    const cancel = new Event("cancel", { cancelable: true });
+    fireEvent(dialog, cancel);
+    expect(cancel.defaultPrevented).toBe(true);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   it("puts Private message in the header and has no save button", async () => {
     const { dialog, onSendPrivateMessage, onClose } = await renderCard();
     const pm = within(dialog).getByRole("button", { name: "Private message" });
