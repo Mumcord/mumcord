@@ -6,6 +6,10 @@
 
 - Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
 
+### Added
+
+- New connect sound
+
 ### Fixed
 
 - The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)
