@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="196 253 860 860" role="img" aria-label="Mumcord">
+  <title>Mumcord</title>
+  <defs>
+    <linearGradient id="g-violet" gradientUnits="userSpaceOnUse" x1="320" y1="600" x2="560" y2="860">
+      <stop offset="0" stop-color="#c088fd"/><stop offset=".3" stop-color="#a866fd"/>
+      <stop offset=".6" stop-color="#9044fd"/><stop offset="1" stop-color="#8040fc"/>
+    </linearGradient>
+    <linearGradient id="g-coral" gradientUnits="userSpaceOnUse" x1="950" y1="600" x2="760" y2="800">
+      <stop offset="0" stop-color="#ffa052"/><stop offset=".45" stop-color="#fd7a60"/><stop offset="1" stop-color="#fc5a7e"/>
+    </linearGradient>
+    <linearGradient id="g-arm" gradientUnits="userSpaceOnUse" x1="790" y1="625" x2="515" y2="765">
+      <stop offset="0" stop-color="#fc747c" stop-opacity="0"/><stop offset=".3" stop-color="#f85aad"/>
+      <stop offset=".68" stop-color="#d24aed"/><stop offset="1" stop-color="#c34cfd"/>
+    </linearGradient>
+    <linearGradient id="g-vshade" gradientUnits="userSpaceOnUse" x1="0" y1="715" x2="0" y2="880">
+      <stop offset="0" stop-color="#4a12d2" stop-opacity=".92"/><stop offset=".45" stop-color="#5a20ec" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#6a30f8" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="g-cshade" gradientUnits="userSpaceOnUse" x1="0" y1="715" x2="0" y2="920">
+      <stop offset="0" stop-color="#c41e76"/><stop offset=".4" stop-color="#e63886" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#fd5288" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="g-vhead" gradientUnits="userSpaceOnUse" x1="350" y1="420" x2="465" y2="535">
+      <stop offset="0" stop-color="#c280fc"/><stop offset="1" stop-color="#7f3ffd"/>
+    </linearGradient>
+    <linearGradient id="g-chead" gradientUnits="userSpaceOnUse" x1="900" y1="420" x2="790" y2="535">
+      <stop offset="0" stop-color="#ffa452"/><stop offset="1" stop-color="#fb5a84"/>
+    </linearGradient>
+    <linearGradient id="g-vbubble" gradientUnits="userSpaceOnUse" x1="490" y1="295" x2="600" y2="465">
+      <stop offset="0" stop-color="#b98afc"/><stop offset="1" stop-color="#965afd"/>
+    </linearGradient>
+    <linearGradient id="g-wbubble" gradientUnits="userSpaceOnUse" x1="580" y1="330" x2="770" y2="500">
+      <stop offset="0" stop-color="#fbf6fb"/><stop offset="1" stop-color="#efe0fb"/>
+    </linearGradient>
+    <clipPath id="c-violet"><path d="M456.5,879.2 A85.8,85.8 0 0 1 285,879.2 L285,695 A130,130 0 0 1 484.9,585.4 L626,675.3 L626,770 L541.5,767.5 L456.5,713.3 Z"/></clipPath>
+    <clipPath id="c-coral"><path d="M795.5,879.2 A85.8,85.8 0 0 0 967,879.2 L967,695 A130,130 0 0 0 767.1,585.4 L511.5,748.4 L587.3,796.7 A72,72 0 0 0 664.7,796.7 L795.5,713.3 Z"/></clipPath>
+    <mask id="m-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="1254" height="1254">
+      <rect width="1254" height="1254" fill="#fff"/><path d="M632,315 H712 A78,78 0 0 1 712,477 H632 A78,78 0 0 1 632,315 Z" fill="#000"/>
+    </mask>
+  </defs>
+  <rect x="196" y="253" width="860" height="860" rx="194" fill="#11012f"/>
+  <circle cx="408" cy="478" r="77" fill="url(#g-vhead)"/>
+  <circle cx="844" cy="478" r="77" fill="url(#g-chead)"/>
+  <path d="M456.5,879.2 A85.8,85.8 0 0 1 285,879.2 L285,695 A130,130 0 0 1 484.9,585.4 L626,675.3 L626,770 L541.5,767.5 L456.5,713.3 Z" fill="url(#g-violet)"/>
+  <path clip-path="url(#c-violet)" fill="url(#g-vshade)" d="M456.5,740 C456.5,722 448,709 432,709 C418,709 410,722 400,735 C370,770 330,820 280,862 V970 H456.5 Z"/>
+  <path d="M795.5,879.2 A85.8,85.8 0 0 0 967,879.2 L967,695 A130,130 0 0 0 767.1,585.4 L511.5,748.4 L587.3,796.7 A72,72 0 0 0 664.7,796.7 L795.5,713.3 Z" fill="url(#g-coral)"/>
+  <path clip-path="url(#c-coral)" fill="url(#g-cshade)" d="M795.5,740 C795.5,722 805,709 822,709 C840,709 850,720 860,730 C890,760 935,815 972,862 V970 H795.5 Z"/>
+  <path clip-path="url(#c-coral)" fill="url(#g-arm)" d="M807.1,545.4 L795.5,713.3 L626,840 L481.5,748.4 Z"/>
+</svg>
