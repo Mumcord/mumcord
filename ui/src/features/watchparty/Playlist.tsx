@@ -22,8 +22,7 @@ import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
 import { WatchLinkDialog } from "./WatchLinkDialog";
 import { moveInPlaylist, playNext, removeFromPlaylist } from "./playlistActions";
-import { videoIdOfLink, watchUrl } from "./youtube";
-import { addToPlaylist } from "./playlistActions";
+import { watchUrl } from "./youtube";
 
 interface PlaylistProps {
   serverId: number;
@@ -33,8 +32,6 @@ interface PlaylistProps {
   leading?: ReactNode;
   /** Shows only "Up next" with the list in a popover; otherwise the list is always shown. */
   compact?: boolean;
-  /** The "Paste a YouTube link" field above the list (issue #163). */
-  paste?: boolean;
 }
 
 const POPOVER_MIN_WIDTH = 288;
@@ -42,14 +39,7 @@ const POPOVER_MIN_WIDTH = 288;
 const POPOVER_ROOM = 200;
 const POPOVER_CLOSE_MS = 150;
 
-export function Playlist({
-  serverId,
-  party,
-  users,
-  leading,
-  compact = false,
-  paste = false,
-}: PlaylistProps) {
+export function Playlist({ serverId, party, users, leading, compact = false }: PlaylistProps) {
   const { t } = useTranslation("watchparty");
   const entries = party.playlist;
   const hintId = useId();
@@ -62,23 +52,12 @@ export function Playlist({
   const [popover, setPopover] = useState<CSSProperties | null>(null);
   // While the add dialog is open the popover stays, so the dialog is not unmounted under the user.
   const [adding, setAdding] = useState(false);
-  const [link, setLink] = useState("");
   const addingRef = useRef(false);
   const closeTimer = useRef<number | undefined>(undefined);
   useEffect(() => {
     addingRef.current = adding;
   }, [adding]);
   const next = usePreview(entries[0]?.videoId ?? null);
-
-  const add = (text: string) => {
-    const videoId = videoIdOfLink(text);
-    if (videoId === null) {
-      announce(t("playlist.notALink"), "assertive");
-      return;
-    }
-    addToPlaylist(serverId, videoId, t("playlist.addFailed"));
-    setLink("");
-  };
 
   useEffect(() => {
     if (focusEntry === null) return;
@@ -190,31 +169,6 @@ export function Playlist({
       : t("playlist.upNext", { title: next?.title ?? t("playlist.videoTitle") });
   return (
     <section className="watch-playlist" aria-label={t("playlist.title")}>
-      {paste && (
-        <p className="watch-playlist__paste">
-          <input
-            type="text"
-            aria-label={t("playlist.paste")}
-            placeholder={t("playlist.paste")}
-            value={link}
-            onPaste={(event) => {
-              const text = event.clipboardData.getData("text");
-              if (videoIdOfLink(text) === null) return;
-              event.preventDefault();
-              add(text);
-            }}
-            onChange={(event) => {
-              setLink(event.target.value);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && link !== "") {
-                event.preventDefault();
-                add(link);
-              }
-            }}
-          />
-        </p>
-      )}
       <div className="watch-playlist__header">
         {leading}
         <button

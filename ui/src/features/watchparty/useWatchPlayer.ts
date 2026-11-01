@@ -86,8 +86,10 @@ export function useWatchPlayer(
   useEffect(() => {
     optionsRef.current = options;
   }, [options]);
+  // Every party change (Play or Pause from any button, a remote seek) reaches the player here.
   useEffect(() => {
     liveRef.current = live;
+    syncRef.current?.update(live);
   }, [live]);
 
   useEffect(() => {

@@ -9,12 +9,16 @@ import { getApi, type MumcordApi, type ScreenShare, type Unsubscribe } from "../
 const NONE: readonly ScreenShare[] = [];
 
 let shares = new Map<number, readonly ScreenShare[]>();
+// When each share object arrived: its `elapsedMs` is counted up to that moment.
+let arrived = new WeakMap<ScreenShare, number>();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 
 function set(serverId: number, list: readonly ScreenShare[]): void {
   shares = new Map(shares);
+  const now = Date.now();
+  for (const share of list) if (!arrived.has(share)) arrived.set(share, now);
   if (list.length === 0) shares.delete(serverId);
   else shares.set(serverId, list);
   for (const listener of listeners) listener();
@@ -64,6 +68,15 @@ function sharesOf(serverId: number | null): readonly ScreenShare[] {
   return (serverId === null ? undefined : shares.get(serverId)) ?? NONE;
 }
 
+/**
+ * Takes the shares the engine listed for a window that opened later (the screen share pop-out,
+ * issue #164); a `screenSharesChanged` that arrived first wins.
+ */
+export function seedScreenShares(serverId: number, list: readonly ScreenShare[]): void {
+  ensureBound();
+  if (!shares.has(serverId)) set(serverId, list);
+}
+
 /** Every share in the user's voice channel on `serverId`, including the own one. */
 export function useScreenShares(serverId: number | null): readonly ScreenShare[] {
   return useSyncExternalStore(subscribe, () => sharesOf(serverId));
@@ -87,10 +100,16 @@ export function useIsLive(serverId: number | null, session: number): boolean {
   );
 }
 
+/** When `share` started, as `Date.now()` milliseconds (issue #163: "since 21:04", the elapsed clock). */
+export function shareStartedAt(share: ScreenShare): number {
+  return (arrived.get(share) ?? Date.now()) - share.elapsedMs;
+}
+
 /** Test helper: forgets the binding and all shares. */
 export function resetScreenShareStore(): void {
   for (const unsubscribe of unsubscribers) unsubscribe();
   unsubscribers = [];
   boundApi = undefined;
   shares = new Map();
+  arrived = new WeakMap();
 }

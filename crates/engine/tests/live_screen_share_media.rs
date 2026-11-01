@@ -1,8 +1,8 @@
 //! Screen share media (FR-2.44, AC-2.29) against the local test server: Alice shares the test
 //! pattern with three viewers over loopback direct connections. Every viewer starts at a
-//! keyframe and gets 720p30; a throttled viewer loses temporal layers while the others keep the
+//! keyframe and gets 1080p30; a throttled viewer loses temporal layers while the others keep the
 //! full frame rate; throttling Alice's whole upload drops quality to 480p15 and lifting it brings
-//! 720p30 back; the Rust decoder fallback hands out pictures. Prints fps, bitrate and CPU.
+//! 1080p30 back; the Rust decoder fallback hands out pictures. Prints fps, bitrate and CPU.
 //! `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_screen_share_media -- --ignored --test-threads=1 --nocapture`
 #![cfg(feature = "test-backend")]
@@ -295,7 +295,7 @@ async fn screen_share_media_reaches_every_viewer() {
         result.expect("watch");
     }
 
-    // Every viewer starts at a keyframe and gets 720p30.
+    // Every viewer starts at a keyframe and gets 1080p30.
     tokio::time::sleep(Duration::from_secs(4)).await;
     let cpu_before = cpu_seconds();
     tokio::time::sleep(WINDOW).await;
@@ -310,7 +310,7 @@ async fn screen_share_media_reaches_every_viewer() {
             .map(|(_, h)| h.keyframe);
         assert_eq!(first, Some(true), "viewer {i} starts at a keyframe");
         let (fps, size) = sink.recent(WINDOW);
-        assert_eq!(size, (1280, 720), "viewer {i} size");
+        assert_eq!(size, (1920, 1080), "viewer {i} size");
         assert!(fps >= 25.0, "viewer {i} gets {fps} fps");
     }
     let stats = alice
@@ -318,7 +318,7 @@ async fn screen_share_media_reaches_every_viewer() {
         .screen_share_media_stats(server)
         .expect("stats");
     println!(
-        "720p30: sender {} fps, {} kbps, encode {:.1} ms/frame, {} keyframes; process CPU {:.0}% of one core",
+        "1080p30: sender {} fps, {} kbps, encode {:.1} ms/frame, {} keyframes; process CPU {:.0}% of one core",
         stats.fps,
         stats.kbps,
         stats.encode_ms,
@@ -337,7 +337,7 @@ async fn screen_share_media_reaches_every_viewer() {
     tokio::time::sleep(Duration::from_secs(3)).await;
     let (fps, size) = sinks[2].decoded_recent(WINDOW);
     println!("decode fallback: {fps:.1} fps at {size:?}");
-    assert_eq!(size, (1280, 720));
+    assert_eq!(size, (1920, 1080));
     assert!(fps >= 25.0, "decoded {fps} fps");
     v2.engine
         .screen_share_set_decode_fallback(v2.server(), a, false)
@@ -386,7 +386,7 @@ async fn screen_share_media_reaches_every_viewer() {
         alice
             .engine
             .screen_share_media_stats(server)
-            .is_some_and(|s| s.step == 2)
+            .is_some_and(|s| s.step == 3)
     })
     .await;
     let down = began.elapsed();
@@ -413,7 +413,7 @@ async fn screen_share_media_reaches_every_viewer() {
         .screen_share_set_upload_limit(server, None, None)
         .expect("unthrottle all");
     let began = Instant::now();
-    wait_until("720p30 again", Duration::from_secs(60), || {
+    wait_until("1080p30 again", Duration::from_secs(60), || {
         alice
             .engine
             .screen_share_media_stats(server)
@@ -424,10 +424,10 @@ async fn screen_share_media_reaches_every_viewer() {
     tokio::time::sleep(Duration::from_secs(4)).await;
     for (i, sink) in sinks.iter().enumerate() {
         let (fps, size) = sink.recent(WINDOW);
-        assert_eq!(size, (1280, 720), "viewer {i} back at 720p");
+        assert_eq!(size, (1920, 1080), "viewer {i} back at 1080p");
         assert!(fps >= 20.0, "viewer {i} back at {fps} fps");
     }
-    println!("recovered to 720p30 after {:.1} s", up.as_secs_f64());
+    println!("recovered to 1080p30 after {:.1} s", up.as_secs_f64());
 
     alice.engine.screen_share_stop(server).expect("stop");
 }

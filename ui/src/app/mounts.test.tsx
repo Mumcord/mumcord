@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../api";
 import { selectConversation } from "../features/channels";
 import { connectedMock, resetAll } from "../features/channels/testUtils";
-import { resetMediaView, setFocus } from "../features/media/mediaView";
+import { leaveCinema, resetMediaView } from "../features/media/mediaView";
 import { resetScreenShareStore } from "../features/screenshare/sharesStore";
 import { resetWatchingStore, startWatching } from "../features/screenshare/watching";
 import { ChatMount } from "./mounts";
@@ -52,13 +52,15 @@ describe("chat mount", () => {
     expect(frame.compareDocumentPosition(list)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it("shows the picture alone in focus mode", () => {
+  it("keeps the channel header above the mini bar after leaving the view", async () => {
     startWatching(1, ANNA);
-    setFocus(true);
+    leaveCinema();
     const { container } = render(<ChatMount />);
+    const header = await screen.findByRole("heading", { level: 2 });
+    const bar = container.querySelector(".mini-bar");
 
-    expect(container.querySelector(".media-frame")).not.toBeNull();
-    expect(container.querySelector(".chat-header")).toBeNull();
-    expect(container.querySelector(".chat-list")).toBeNull();
+    expect(bar).not.toBeNull();
+    if (bar === null) return;
+    expect(header.compareDocumentPosition(bar)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 });

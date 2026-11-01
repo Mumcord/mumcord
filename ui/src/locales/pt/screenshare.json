@@ -1,6 +1,5 @@
 {
   "share": "Partilhar ecrã",
-  "shareHint": "Partilhar um ecrã ou uma janela com o teu canal de voz",
   "choosing": "A escolher o que partilhar…",
   "stop": "Parar de partilhar",
   "startFailed": "Não foi possível iniciar a partilha de ecrã.",
@@ -36,7 +35,14 @@
   "pauseSharing": "Pausar partilha",
   "resumeSharing": "Retomar partilha",
   "viewersLabel": "Quem está a ver",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Mudar janela",
-  "viewersTitle": "Espetadores"
+  "viewersTitle": "Espetadores",
+  "thumbnail": "Pré-visualização do que partilha",
+  "youAreSharing": "Está a partilhar",
+  "ofMax": "{{count}} de {{max}}",
+  "fullShort": "Todos os lugares estão ocupados.",
+  "stopShort": "Parar",
+  "viewerCount_one": "{{count}} espetador",
+  "viewerCount_many": "{{count}} espetadores",
+  "viewerCount_other": "{{count}} espetadores"
 }

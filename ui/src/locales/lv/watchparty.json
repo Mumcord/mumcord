@@ -46,7 +46,11 @@
     "upNext": "Nākamais: {{title}}",
     "upNextNone": "Nekā nākamā",
     "paste": "Ielīmējiet YouTube saiti",
-    "notALink": "Tas nav YouTube saite"
+    "notALink": "Tas nav YouTube saite",
+    "more": "Vairāk: {{title}}",
+    "playNext": "Atskaņot nākamo",
+    "removeShort": "Noņemt no saraksta",
+    "emptyPaste": "Nekā nav nākamajā. Ielīmējiet YouTube saiti augstāk."
   },
   "widget": {
     "play": "Atskaņot",
@@ -56,5 +60,15 @@
     "install": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav:",
     "generic": "Šim video vajadzīgs H.264 atbalsts. Instalē gst-libav (GStreamer libav spraudni) ar savas sistēmas pakotņu pārvaldnieku.",
     "rpmFusion": "Fedora sistēmā gst-libav nāk no RPM Fusion repozitorija; vispirms iespējo RPM Fusion."
-  }
+  },
+  "keys": "Atstarpe atskaņot/pauze · ← → pārlēkt 5 s · M izslēgt skaņu · F pilnekrāns",
+  "headerPill": "Skatieties kopā · {{count}}",
+  "miniPlayer": "Mini atskaņotājs",
+  "tabs": {
+    "playlist": "Atskaņošanas saraksts"
+  },
+  "upNextHeading": "Nākamais · velciet, lai mainītu secību",
+  "whoIsWatching": "Kas skatās",
+  "pasteKey": "Ctrl V",
+  "you": "Jūs"
 }

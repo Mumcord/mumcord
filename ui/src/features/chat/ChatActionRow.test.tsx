@@ -151,6 +151,106 @@ describe("share toggle", () => {
   });
 });
 
+describe("share entry", () => {
+  const shareItem = () => {
+    openMenu();
+    return screen.getByRole("menuitem", { name: /^Share screen/ });
+  };
+  const ready = async () => {
+    const item = shareItem();
+    await waitFor(() => {
+      expect(item).not.toHaveAttribute("aria-disabled");
+    });
+    return item;
+  };
+  const blockedWith = async (reason: string | RegExp) => {
+    const item = shareItem();
+    await waitFor(() => {
+      expect(item).toHaveTextContent(reason);
+    });
+    expect(item).toHaveAttribute("aria-disabled", "true");
+  };
+
+  it("stays available with direct connections turned off while the relay can be used", async () => {
+    asLinux();
+    await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
+    render(<ChatActionRow />);
+    await ready();
+  });
+
+  it("names the reason when direct connections are off and there is no relay", async () => {
+    asLinux();
+    await api.relayForget(1);
+    await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
+    render(<ChatActionRow />);
+    await blockedWith(/needs direct connections/);
+  });
+
+  it("names the reason when peer-to-peer is off", async () => {
+    asLinux();
+    await api.settingsUpdate({ ...(await api.settingsGet()), p2pMode: "off" });
+    render(<ChatActionRow />);
+    await blockedWith("Peer-to-peer is off.");
+  });
+
+  it("names the relay reason in relay-only mode without a relay", async () => {
+    asLinux();
+    await api.relayForget(1);
+    await api.serverSetP2pModeOverride(1, "relayOnly");
+    render(<ChatActionRow />);
+    await blockedWith(/no relay/i);
+  });
+
+  it("notices peer-to-peer turned off since the last read when clicked", async () => {
+    asLinux();
+    const start = vi.spyOn(api, "screenShareStart");
+    render(<ChatActionRow />);
+    const item = await ready();
+    await api.settingsUpdate({ ...(await api.settingsGet()), p2pMode: "off" });
+    fireEvent.click(item);
+    await blockedWith("Peer-to-peer is off.");
+    expect(start).not.toHaveBeenCalled();
+  });
+
+  it("treats a closed picker as no error", async () => {
+    asLinux();
+    let finish: (value: null) => void = () => undefined;
+    vi.spyOn(api, "screenShareStart").mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    const error = vi.spyOn(console, "error");
+    render(<ChatActionRow />);
+    fireEvent.click(await ready());
+    await act(async () => {
+      finish(null);
+      await Promise.resolve();
+    });
+    await ready();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("reports a failed start", async () => {
+    asLinux();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    api.mock.failNext("screenShareStart", "internal", "capture failed");
+    render(<ChatActionRow />);
+    fireEvent.click(await ready());
+    expect(await screen.findByRole("alert")).toHaveTextContent("Screen sharing could not start.");
+  });
+
+  it("points to System Settings when macOS does not allow screen recording", async () => {
+    asLinux();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    api.mock.failNext("screenShareStart", "permissionDenied", "screenRecording");
+    render(<ChatActionRow />);
+    fireEvent.click(await ready());
+    expect(await screen.findByRole("alert")).toHaveTextContent("Allow it in System Settings");
+  });
+});
+
 describe("watch together", () => {
   const open = () => {
     openMenu();

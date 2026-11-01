@@ -46,7 +46,7 @@
     "seek": "Springen",
     "volume": "Lautstärke",
     "syncedPlay": "Synchron",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} steuert",
     "inSync": "Im Takt",
     "inSyncAll": "Alle im Takt",
@@ -59,6 +59,15 @@
     "host": "Host",
     "fullscreen": "Vollbild",
     "exitFullscreen": "Vollbild verlassen",
-    "none": "Niemand"
+    "none": "Niemand",
+    "popOut": "In eigenem Fenster öffnen",
+    "popIn": "Zurückholen ins Hauptfenster",
+    "onTop": "Immer im Vordergrund",
+    "poppedOut": "Läuft in separatem Fenster",
+    "bringBack": "Zurückholen",
+    "popOutFailed": "Das separate Fenster konnte nicht geöffnet werden",
+    "popInFailed": "Die Ansicht konnte nicht zurückgeholt werden",
+    "onTopFailed": "„Immer im Vordergrund“ konnte nicht geändert werden",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

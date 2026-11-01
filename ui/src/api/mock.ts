@@ -79,6 +79,7 @@ import {
 } from "./client";
 import { STRESS_SELF_CHANNEL_PATH, stressChannels, stressUsers } from "./mockStress";
 import { createMockInspector } from "./mockInspector";
+import { createMockPopouts } from "./mockPopout";
 import { createMockUpdater } from "./mockUpdater";
 
 export interface MockOptions {
@@ -344,6 +345,14 @@ const DEFAULT_SETTINGS: Settings = {
   blockedMessages: "collapse",
 };
 
+/** Fictional titles and covers for the demo party's videos (issue #163). */
+const DEMO_VIDEOS: Record<string, { title: string; hue: number }> = {
+  dQw4w9WgXcQ: { title: "Northern Lights over a Quiet Lake", hue: 300 },
+  tk1a2b3c4d5: { title: "Tide Pools at Dawn", hue: 190 },
+  pr7c8d9e0f1: { title: "Desert Light, a Timelapse", hue: 20 },
+  pl4a5n6t7e8: { title: "Build a Paper Lantern in 10 Minutes", hue: 250 },
+};
+
 /** Offline stand-in for the engine's link previews: a YouTube player card or a page card. */
 function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
   let parsed: URL;
@@ -371,12 +380,13 @@ function mockLinkPreview(url: string, demo: boolean): LinkPreview | null {
     };
   }
   if (/^[\w-]{11}$/.test(youtube)) {
+    const named = demo ? DEMO_VIDEOS[youtube] : undefined;
     return {
       url,
       siteName: "YouTube",
-      title: "Demo video",
+      title: named?.title ?? "Demo video",
       description: null,
-      image: null,
+      image: named === undefined ? null : demoCover(named.hue),
       video: {
         site: "youtube",
         playerUrl: `https://www.youtube-nocookie.com/embed/${youtube}?autoplay=1`,
@@ -936,9 +946,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           skippedBy: null,
           host: 2,
           playlist: [
-            { id: 1, videoId: "dQw4w9WgXcQ", addedBy: 2, addedByName: "Maya" },
-            { id: 2, videoId: "tk1a2b3c4d5", addedBy: 5, addedByName: "Jonas" },
-            { id: 3, videoId: "pr7c8d9e0f1", addedBy: 7, addedByName: "Priya" },
+            { id: 1, videoId: "tk1a2b3c4d5", addedBy: 5, addedByName: "Jonas" },
+            { id: 2, videoId: "pr7c8d9e0f1", addedBy: 7, addedByName: "Priya" },
+            { id: 3, videoId: "pl4a5n6t7e8", addedBy: 9, addedByName: null },
           ],
           positions: [
             { session: 1, positionMs: 431000, ageMs: 900, playing: true, buffering: false },
@@ -1002,6 +1012,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // for trying and photographing the updater.
   const mockUpdate = demo && new URLSearchParams(window.location.search).has("mockUpdate");
   const inspector = createMockInspector();
+  const popouts = createMockPopouts((state) => {
+    emit("mediaPopoutChanged", { state });
+  });
   const updater = createMockUpdater({
     demo,
     startupCheck: mockUpdate,
@@ -2941,6 +2954,21 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     licencesClose: () => Promise.resolve(null),
     changelogOpen: () => Promise.resolve(null),
     changelogClose: () => Promise.resolve(null),
+    // The mock has no second window; the pop-out page opens with `?window=media-popout&kind=…`.
+    mediaPopoutOpen: (kind, target, _title, onTop) => {
+      popouts.open(kind, target, onTop);
+      return Promise.resolve(null);
+    },
+    mediaPopoutClose: (kind) => {
+      popouts.close(kind);
+      return Promise.resolve(null);
+    },
+    mediaPopoutSetOnTop: (kind, on) => {
+      popouts.setOnTop(kind, on);
+      return Promise.resolve(null);
+    },
+    mediaPopoutSetTitle: () => Promise.resolve(null),
+    mediaPopoutState: () => Promise.resolve(popouts.state()),
     whatsNewMarkSeen: () => {
       settings = { ...settings, whatsNewSeen: "0.0.0-mock" };
       return Promise.resolve(null);
@@ -3284,6 +3312,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     screenShareBlock: (serverId) => Promise.resolve(shareStartBlock(serverId)),
     screenShareUnwatch: () => notImplemented("screenShareUnwatch"),
+    screenShareFramesAttach: (_serverId, session) => {
+      if (mediaDemo.share === null || mediaDemo.share.session !== session) {
+        return notImplemented("screenShareFramesAttach");
+      }
+      return Promise.resolve(null);
+    },
     screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
     updateStatus: () => Promise.resolve(updater.status()),

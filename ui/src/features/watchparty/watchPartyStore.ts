@@ -6,10 +6,21 @@
 import { useSyncExternalStore } from "react";
 import { getApi, type MumcordApi, type Unsubscribe, type WatchParty } from "../../api";
 
+/** Who added a video: their session, and the name the engine kept in case they left. */
+export interface Adder {
+  session: number;
+  name: string | null;
+}
+
 export interface LiveParty {
   party: WatchParty;
   /** `Date.now()` when `party.positionMs` was current. */
   atMs: number;
+  /**
+   * Who added the playing video, where known (issue #163). The engine only lists what plays next,
+   * so the adder is remembered from the playlist as the entry moves up; the first video is the host's.
+   */
+  currentAdder: Adder | null;
 }
 
 let parties = new Map<number, LiveParty>();
@@ -17,10 +28,20 @@ let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 
+function adderOf(party: WatchParty, previous: LiveParty | undefined): Adder | null {
+  if (party.currentEntry === 0) return { session: party.host, name: null };
+  const listed = [...party.playlist, ...(previous?.party.playlist ?? [])].find(
+    (entry) => entry.id === party.currentEntry,
+  );
+  if (listed !== undefined) return { session: listed.addedBy, name: listed.addedByName };
+  return previous?.party.currentEntry === party.currentEntry ? previous.currentAdder : null;
+}
+
 function set(serverId: number, party: WatchParty | null): void {
+  const previous = parties.get(serverId);
   parties = new Map(parties);
   if (party === null) parties.delete(serverId);
-  else parties.set(serverId, { party, atMs: Date.now() });
+  else parties.set(serverId, { party, atMs: Date.now(), currentAdder: adderOf(party, previous) });
   for (const listener of listeners) listener();
 }
 
@@ -60,12 +81,15 @@ export function setWatchParty(serverId: number, party: WatchParty | null): void 
   set(serverId, party);
 }
 
+/** The party in the user's channel on `serverId`, or `null`, for code outside React. */
+export function watchPartyOf(serverId: number | null): LiveParty | null {
+  ensureBound();
+  return (serverId === null ? undefined : parties.get(serverId)) ?? null;
+}
+
 /** The party in the user's channel on `serverId`, or `null`. */
 export function useWatchParty(serverId: number | null): LiveParty | null {
-  return useSyncExternalStore(subscribe, () => {
-    ensureBound();
-    return (serverId === null ? undefined : parties.get(serverId)) ?? null;
-  });
+  return useSyncExternalStore(subscribe, () => watchPartyOf(serverId));
 }
 
 /** Where a party is at `nowMs`, in milliseconds into the video. */

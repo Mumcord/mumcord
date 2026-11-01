@@ -1,6 +1,7 @@
 //! Windows of their own next to the main window: the packet inspector (issue #60), the
-//! third-party licences (issue #138) and "What's new" (issue #145). Each is opened from Settings, at most one at a time, may
-//! call only the few commands it needs, and remembers its size and position on this device.
+//! third-party licences (issue #138), "What's new" (issue #145) and the watch party and screen
+//! share pop-outs (issue #164). Each is open at most once at a time, may call only the few
+//! commands it needs, and remembers its size and position on this device.
 
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -69,10 +70,79 @@ pub const CHANGELOG: Spec = Spec {
     ],
 };
 
-const ALL: [&Spec; 3] = [&INSPECTOR, &LICENCES, &CHANGELOG];
+/// What both media pop-outs need: their own window state, the main window's look, and the
+/// server state (connections, snapshot, profiles) for the names, avatars and channel the overlay
+/// shows. All of it is read-only.
+macro_rules! popout_commands {
+    ($($extra:literal),* $(,)?) => {
+        &[
+            "window_look",
+            "media_popout_state",
+            "media_popout_close",
+            "media_popout_set_on_top",
+            "media_popout_set_title",
+            "connections_list",
+            "voice_server_get",
+            "session_snapshot",
+            "person_profile",
+            $($extra),*
+        ]
+    };
+}
+
+/// The watch party player in its own window (issue #164). It drives the party exactly like the
+/// docked player: play, pause, seek and skip, its position reports, `link_preview` for the video
+/// title and `app_info` for the codec hint.
+pub const WATCH_POPOUT: Spec = Spec {
+    label: "media-popout-watch",
+    url: "index.html?window=media-popout&kind=watch",
+    title: "Watch together — Mumcord",
+    default_size: (960.0, 600.0),
+    min_size: (320.0, 200.0),
+    geometry_file: "media-popout-watch-window.json",
+    allowed_commands: popout_commands![
+        "link_preview",
+        "app_info",
+        "watch_party_get",
+        "watch_party_player_url",
+        "watch_party_command",
+        "watch_party_report",
+        "watch_party_next",
+        "watch_party_previous",
+    ],
+};
+
+/// A watched screen share in its own window (issue #164). It takes over the frames of the
+/// running watch (`screen_share_frames_attach`) but can neither start nor stop watching;
+/// `p2p_link` names the path in the stream details.
+pub const SHARE_POPOUT: Spec = Spec {
+    label: "media-popout-share",
+    url: "index.html?window=media-popout&kind=share",
+    title: "Screen share — Mumcord",
+    default_size: (960.0, 600.0),
+    min_size: (320.0, 200.0),
+    geometry_file: "media-popout-share-window.json",
+    allowed_commands: popout_commands![
+        "p2p_link",
+        "screen_share_list",
+        "screen_share_frames_attach",
+        "screen_share_request_keyframe",
+        "screen_share_set_decode_fallback",
+        "screen_share_watch_stats",
+        "person_set_volume",
+    ],
+};
+
+const ALL: [&Spec; 5] = [
+    &INSPECTOR,
+    &LICENCES,
+    &CHANGELOG,
+    &WATCH_POPOUT,
+    &SHARE_POPOUT,
+];
 
 /// The windows that follow the main window's theme and language.
-pub const FOLLOW_LOOK: [&Spec; 2] = [&LICENCES, &CHANGELOG];
+pub const FOLLOW_LOOK: [&Spec; 4] = [&LICENCES, &CHANGELOG, &WATCH_POPOUT, &SHARE_POPOUT];
 
 /// Whether the webview `label` may call `command`; only the windows above are limited.
 pub fn command_allowed(label: &str, command: &str) -> bool {
@@ -96,19 +166,34 @@ struct Geometry {
 
 /// Brings the window up, creating it if it is not open yet.
 pub fn open(app: &AppHandle, spec: &Spec) -> tauri::Result<()> {
+    open_with(app, spec, None, false)
+}
+
+/// Like [`open`], with a title in place of the spec's and the always-on-top flag applied to the
+/// new or already open window. Wayland compositors may ignore always on top.
+pub fn open_with(
+    app: &AppHandle,
+    spec: &Spec,
+    title: Option<&str>,
+    on_top: bool,
+) -> tauri::Result<()> {
+    let title = title.unwrap_or(spec.title);
     let lock = app.state::<OpenLock>();
     let _guard = lock
         .0
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner);
     if let Some(window) = app.get_webview_window(spec.label) {
+        window.set_title(title)?;
+        window.set_always_on_top(on_top)?;
         window.unminimize()?;
         window.show()?;
         return window.set_focus();
     }
     // Starts hidden so the stored size and position apply before it shows up.
     let mut builder = WebviewWindowBuilder::new(app, spec.label, WebviewUrl::App(spec.url.into()))
-        .title(spec.title)
+        .title(title)
+        .always_on_top(on_top)
         .inner_size(spec.default_size.0, spec.default_size.1)
         .min_inner_size(spec.min_size.0, spec.min_size.1)
         .resizable(true)
@@ -279,11 +364,90 @@ mod tests {
     }
 
     #[test]
+    fn the_watch_popout_gets_only_the_player_commands() {
+        let label = WATCH_POPOUT.label;
+        for command in [
+            "window_look",
+            "media_popout_state",
+            "media_popout_close",
+            "media_popout_set_on_top",
+            "media_popout_set_title",
+            "connections_list",
+            "voice_server_get",
+            "session_snapshot",
+            "person_profile",
+            "link_preview",
+            "app_info",
+            "watch_party_get",
+            "watch_party_player_url",
+            "watch_party_command",
+            "watch_party_report",
+            "watch_party_next",
+            "watch_party_previous",
+        ] {
+            assert!(command_allowed(label, command), "{command}");
+        }
+        for command in [
+            "media_popout_open",
+            "watch_party_start",
+            "watch_party_leave",
+            "watch_party_add",
+            "watch_party_remove",
+            "screen_share_frames_attach",
+            "send_channel_message",
+            "settings_get",
+            "settings_update",
+            "connect",
+        ] {
+            assert!(!command_allowed(label, command), "{command}");
+        }
+    }
+
+    #[test]
+    fn the_share_popout_gets_only_the_viewer_commands() {
+        let label = SHARE_POPOUT.label;
+        for command in [
+            "window_look",
+            "media_popout_state",
+            "media_popout_close",
+            "media_popout_set_on_top",
+            "media_popout_set_title",
+            "connections_list",
+            "voice_server_get",
+            "session_snapshot",
+            "person_profile",
+            "p2p_link",
+            "screen_share_list",
+            "screen_share_frames_attach",
+            "screen_share_request_keyframe",
+            "screen_share_set_decode_fallback",
+            "screen_share_watch_stats",
+            "person_set_volume",
+        ] {
+            assert!(command_allowed(label, command), "{command}");
+        }
+        for command in [
+            "media_popout_open",
+            "screen_share_watch",
+            "screen_share_unwatch",
+            "screen_share_start",
+            "screen_share_stop",
+            "watch_party_command",
+            "person_set_local_mute",
+            "settings_get",
+            "settings_update",
+        ] {
+            assert!(!command_allowed(label, command), "{command}");
+        }
+    }
+
+    #[test]
     fn every_window_has_its_own_label_and_size_file() {
         for (i, a) in ALL.iter().enumerate() {
-            assert!(a.url.ends_with(a.label));
+            assert!(a.url.starts_with("index.html?window="));
             for b in &ALL[i + 1..] {
                 assert_ne!(a.label, b.label);
+                assert_ne!(a.url, b.url);
                 assert_ne!(a.geometry_file, b.geometry_file);
             }
         }
@@ -295,6 +459,8 @@ mod tests {
         assert!(command_allowed("main", "packet_inspector_share"));
         assert!(command_allowed("main", "licences_open"));
         assert!(command_allowed("main", "changelog_open"));
+        assert!(command_allowed("main", "media_popout_open"));
+        assert!(command_allowed("main", "screen_share_watch"));
     }
 
     #[test]

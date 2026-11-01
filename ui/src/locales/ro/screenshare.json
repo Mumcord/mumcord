@@ -1,6 +1,5 @@
 {
   "share": "Partajează ecranul",
-  "shareHint": "Partajează un ecran sau o fereastră cu canalul tău vocal",
   "choosing": "Se alege ce se partajează…",
   "stop": "Oprește partajarea",
   "startFailed": "Partajarea ecranului nu a putut porni.",
@@ -36,7 +35,14 @@
   "pauseSharing": "Pune partajarea pe pauză",
   "resumeSharing": "Reia partajarea",
   "viewersLabel": "Cine urmărește",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Schimbă fereastra",
-  "viewersTitle": "Spectatori"
+  "viewersTitle": "Spectatori",
+  "thumbnail": "Previzualizarea a ceea ce partajezi",
+  "youAreSharing": "Partajezi",
+  "ofMax": "{{count}} din {{max}}",
+  "fullShort": "Toate locurile sunt ocupate.",
+  "stopShort": "Oprește",
+  "viewerCount_one": "{{count}} spectator",
+  "viewerCount_few": "{{count}} spectatori",
+  "viewerCount_other": "{{count}} de spectatori"
 }

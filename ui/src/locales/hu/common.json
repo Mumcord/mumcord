@@ -46,7 +46,7 @@
     "seek": "Ugrás",
     "volume": "Hangerő",
     "syncedPlay": "Szinkronban",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} irányít",
     "inSync": "Szinkronban",
     "inSyncAll": "Mindenki szinkronban",
@@ -59,6 +59,15 @@
     "host": "Házigazda",
     "fullscreen": "Teljes képernyő",
     "exitFullscreen": "Kilépés a teljes képernyőről",
-    "none": "Senki"
+    "none": "Senki",
+    "popOut": "Megnyitás külön ablakban",
+    "popIn": "Vissza a főablakba",
+    "onTop": "Mindig felül",
+    "poppedOut": "Külön ablakban fut",
+    "bringBack": "Visszahozás",
+    "popOutFailed": "Nem sikerült megnyitni a külön ablakot",
+    "popInFailed": "Nem sikerült visszahozni a nézetet",
+    "onTopFailed": "Nem sikerült módosítani a „Mindig felül” beállítást",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

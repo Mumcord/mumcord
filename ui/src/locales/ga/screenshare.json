@@ -1,6 +1,5 @@
 {
   "share": "Comhroinn an scáileán",
-  "shareHint": "Comhroinn scáileán nó fuinneog le do chainéal gutha",
   "choosing": "Ag roghnú cad le comhroinnt…",
   "stop": "Stop ag comhroinnt",
   "startFailed": "Níorbh fhéidir comhroinnt scáileáin a thosú.",
@@ -38,7 +37,16 @@
   "pauseSharing": "Cuir an chomhroinnt ar sos",
   "resumeSharing": "Lean leis an gcomhroinnt",
   "viewersLabel": "Cé atá ag féachaint",
-  "elapsed": "{{minutes}} nóiméad",
   "changeWindow": "Athraigh fuinneog",
-  "viewersTitle": "Breathnóirí"
+  "viewersTitle": "Breathnóirí",
+  "thumbnail": "Réamhamharc ar a bhfuil á roinnt agat",
+  "youAreSharing": "Tá tú ag roinnt",
+  "ofMax": "{{count}} as {{max}}",
+  "fullShort": "Tá gach áit tógtha.",
+  "stopShort": "Stop",
+  "viewerCount_one": "{{count}} lucht féachana",
+  "viewerCount_two": "{{count}} lucht féachana",
+  "viewerCount_few": "{{count}} lucht féachana",
+  "viewerCount_many": "{{count}} lucht féachana",
+  "viewerCount_other": "{{count}} lucht féachana"
 }

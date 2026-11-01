@@ -45,8 +45,12 @@
     "move": "Bog {{title}}",
     "upNext": "Ar aghaidh: {{title}}",
     "upNextNone": "Níl aon rud le teacht",
-    "paste": "Cpasteáil nasc YouTube",
-    "notALink": "Ní nasc YouTube é sin"
+    "paste": "Greamaigh nasc YouTube",
+    "notALink": "Ní nasc YouTube é sin",
+    "more": "Tuilleadh do {{title}}",
+    "playNext": "Seinn ina dhiaidh seo",
+    "removeShort": "Bain den seinmliosta",
+    "emptyPaste": "Níl aon rud ar aghaidh. Greamaigh nasc YouTube thuas."
   },
   "widget": {
     "play": "Seinn",
@@ -56,5 +60,15 @@
     "install": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav:",
     "generic": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav (breiseán libav GStreamer) le bainisteoir pacáistí do chórais.",
     "rpmFusion": "Ar Fedora, tagann gst-libav ó stór RPM Fusion; cumasaigh RPM Fusion ar dtús."
-  }
+  },
+  "keys": "Spás seinn/sos · ← → léim 5 s · M balbhaigh · F lánscáileán",
+  "headerPill": "Féach le chéile · {{count}}",
+  "miniPlayer": "Mionseinnteoir",
+  "tabs": {
+    "playlist": "Seinmliosta"
+  },
+  "upNextHeading": "Ar aghaidh · tarraing chun an t-ord a athrú",
+  "whoIsWatching": "Cé atá ag féachaint",
+  "pasteKey": "Ctrl V",
+  "you": "Tusa"
 }

@@ -43,4 +43,25 @@ describe("stream meter", () => {
   it("says nothing about the delay without a frame", () => {
     expect(new StreamMeter().snapshot().delayMs).toBeNull();
   });
+
+  it("counts decoded pictures for the size and the frame rate, but not for the bitrate", () => {
+    const meter = new StreamMeter();
+    meter.frame({ atMs: BASE, timestampUs: null, bytes: null, width: 1280, height: 720 });
+    meter.frame({ atMs: BASE + 100, timestampUs: null, bytes: null, width: 1280, height: 720 });
+    const stats = meter.snapshot();
+    expect(stats.fps).toBe(2);
+    expect(stats.height).toBe(720);
+    expect(stats.kbps).toBeNull();
+    expect(stats.delayMs).toBeNull();
+  });
+
+  it("gives the dropped frames as a share of all frames of the watch", () => {
+    const meter = new StreamMeter();
+    expect(meter.snapshot().droppedShare).toBeNull();
+    for (let i = 0; i < 9; i += 1) {
+      meter.frame({ atMs: BASE + i, timestampUs: i * 1000, bytes: 10, width: 640, height: 360 });
+    }
+    meter.drop(BASE + 10);
+    expect(meter.snapshot().droppedShare).toBeCloseTo(0.1);
+  });
 });

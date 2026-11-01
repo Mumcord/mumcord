@@ -46,7 +46,7 @@
     "seek": "Procurar",
     "volume": "Volume",
     "syncedPlay": "Sincronizado",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} tem o controlo",
     "inSync": "Sincronizado",
     "inSyncAll": "Todos sincronizados",
@@ -59,6 +59,15 @@
     "host": "Anfitrião",
     "fullscreen": "Ecrã inteiro",
     "exitFullscreen": "Sair do ecrã inteiro",
-    "none": "Ninguém"
+    "none": "Ninguém",
+    "popOut": "Abrir numa janela separada",
+    "popIn": "Voltar à janela principal",
+    "onTop": "Sempre visível",
+    "poppedOut": "A reproduzir numa janela separada",
+    "bringBack": "Trazer de volta",
+    "popOutFailed": "Não foi possível abrir a janela separada",
+    "popInFailed": "Não foi possível trazer a vista de volta",
+    "onTopFailed": "Não foi possível alterar «Sempre visível»",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

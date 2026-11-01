@@ -1,6 +1,5 @@
 {
   "share": "Jaa näyttö",
-  "shareHint": "Jaa näyttö tai ikkuna puhekanavallesi",
   "choosing": "Valitaan jaettavaa…",
   "stop": "Lopeta jakaminen",
   "startFailed": "Näytön jakoa ei voitu aloittaa.",
@@ -35,7 +34,13 @@
   "pauseSharing": "Keskeytä jakaminen",
   "resumeSharing": "Jatka jakamista",
   "viewersLabel": "Ketkä katsovat",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Vaihda ikkuna",
-  "viewersTitle": "Katsojat"
+  "viewersTitle": "Katsojat",
+  "thumbnail": "Esikatselu jakamastasi",
+  "youAreSharing": "Jaat näyttöä",
+  "ofMax": "{{count}}/{{max}}",
+  "fullShort": "Kaikki paikat ovat täynnä.",
+  "stopShort": "Lopeta",
+  "viewerCount_one": "{{count}} katsoja",
+  "viewerCount_other": "{{count}} katsojaa"
 }

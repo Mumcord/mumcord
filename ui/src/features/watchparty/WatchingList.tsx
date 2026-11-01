@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import type { User } from "../../api";
 import { Avatar } from "../members/Avatar";
+import { MediaIcon } from "../media/icons";
 import { useAvatars } from "../members/useAvatars";
 import { syncState, type SyncState } from "./syncState";
 import { positionAt, type LiveParty } from "./watchPartyStore";
@@ -44,18 +45,21 @@ export function WatchingList({
             : syncState(report, positionMs, live.atMs, nowMs);
         return (
           <li key={person.session} className="watch-list__person">
-            <Avatar name={person.name} src={avatarOf(person)} size="sm" />
+            <span className="watch-list__avatar">
+              <Avatar name={person.name} src={avatarOf(person)} size="sm" />
+              <span className={`sync-dot sync-dot--${state.kind}`} aria-hidden="true" />
+            </span>
             <span className="watch-list__name">
-              {person.name}
-              {person.session === selfSession && ` (${t("media.you")})`}
+              {person.session === selfSession ? `${person.name} (${t("media.you")})` : person.name}
             </span>
             {person.session === party.host && (
-              <span className="watch-list__host" data-tooltip={t("media.host")}>
-                <span aria-hidden="true">♔</span>
-                <span className="visually-hidden">{t("media.host")}</span>
+              <span className="watch-list__host">
+                <MediaIcon name="crown" size={12} />
+                <span className="watch-list__host-text">{t("media.host")}</span>
               </span>
             )}
             <span className={`watch-list__state watch-list__state--${state.kind}`}>
+              <span className={`sync-dot sync-dot--${state.kind}`} aria-hidden="true" />
               {stateLabel(t, state)}
             </span>
           </li>

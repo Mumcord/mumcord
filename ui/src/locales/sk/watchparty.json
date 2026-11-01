@@ -46,7 +46,11 @@
     "upNext": "Nasleduje: {{title}}",
     "upNextNone": "Nič ďalšie nenasleduje",
     "paste": "Vložte odkaz na YouTube",
-    "notALink": "Toto nie je odkaz na YouTube"
+    "notALink": "Toto nie je odkaz na YouTube",
+    "more": "Ďalšie možnosti pre {{title}}",
+    "playNext": "Prehrať ako ďalšie",
+    "removeShort": "Odstrániť zo zoznamu",
+    "emptyPaste": "Nič ďalšie nie je na rade. Vložte vyššie odkaz na YouTube."
   },
   "widget": {
     "play": "Prehrať",
@@ -56,5 +60,15 @@
     "install": "Toto video potrebuje podporu H.264. Nainštaluj gst-libav:",
     "generic": "Toto video potrebuje podporu H.264. Nainštaluj gst-libav (plugin libav pre GStreamer) správcom balíkov svojho systému.",
     "rpmFusion": "Na Fedore pochádza gst-libav z repozitára RPM Fusion; najprv povoľ RPM Fusion."
-  }
+  },
+  "keys": "Medzerník prehrať/pozastaviť · ← → posun o 5 s · M stlmiť · F celá obrazovka",
+  "headerPill": "Pozerať spoločne · {{count}}",
+  "miniPlayer": "Miniprehrávač",
+  "tabs": {
+    "playlist": "Zoznam"
+  },
+  "upNextHeading": "Ďalej na rade · presunutím zmeníte poradie",
+  "whoIsWatching": "Kto pozerá",
+  "pasteKey": "Ctrl V",
+  "you": "Vy"
 }

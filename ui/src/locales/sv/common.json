@@ -46,7 +46,7 @@
     "seek": "Sök",
     "volume": "Volym",
     "syncedPlay": "Synkat",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} har kontrollen",
     "inSync": "Synkat",
     "inSyncAll": "Alla är synkade",
@@ -59,6 +59,15 @@
     "host": "Värd",
     "fullscreen": "Helskärm",
     "exitFullscreen": "Lämna helskärm",
-    "none": "Ingen"
+    "none": "Ingen",
+    "popOut": "Öppna i separat fönster",
+    "popIn": "Flytta tillbaka till huvudfönstret",
+    "onTop": "Alltid överst",
+    "poppedOut": "Spelas i ett separat fönster",
+    "bringBack": "Hämta tillbaka",
+    "popOutFailed": "Det separata fönstret kunde inte öppnas",
+    "popInFailed": "Vyn kunde inte hämtas tillbaka",
+    "onTopFailed": "Alltid överst kunde inte ändras",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
  * can report one (the shared sound of a screen share). M mutes, and the meter keeps showing that the
  * sound is there.
  */
+import { MediaIcon } from "./icons";
 
 export interface VolumeControlProps {
   label: string;
@@ -19,16 +20,7 @@ export function VolumeControl({ label, level, onSet, meter = null }: VolumeContr
   return (
     <div className="volume" style={{ "--played": `${String(percent)}%` } as CSSProperties}>
       <span className="volume__icon" aria-hidden="true">
-        <svg viewBox="0 0 16 16" width="14" height="14" focusable="false">
-          <path
-            d="M3 6h3l4-3v10L6 10H3zM11 6l2 2-2 2"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <MediaIcon name={percent === 0 ? "muted" : "volume"} />
       </span>
       <input
         type="range"

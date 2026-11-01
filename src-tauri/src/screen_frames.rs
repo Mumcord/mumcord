@@ -100,7 +100,8 @@ impl ScreenFrames {
         };
         if let Err(e) = channel.send(FrameMessage(message)) {
             tracing::debug!(error = %e, "screen share frame not handed to the webview");
-            self.detach(server_id, sharer);
+            // By channel: a closed pop-out must not take the main window's newer channel.
+            self.detach_channel(server_id, sharer, channel.id());
         }
     }
 }
@@ -237,6 +238,34 @@ mod tests {
         assert!(got_first.lock().unwrap().is_empty());
         assert_eq!(got_second.lock().unwrap().len(), 1);
         assert_eq!(got_other.lock().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn a_closed_webview_loses_its_channel() {
+        let frames = ScreenFrames::default();
+        let calls = Arc::new(Mutex::new(0));
+        let counter = calls.clone();
+        let closed: FrameChannel = Channel::new(move |_| {
+            *counter.lock().unwrap() += 1;
+            Err(tauri::Error::WebviewNotFound)
+        });
+        frames.attach(1, 7, closed);
+        frames.on_encoded(1, 7, &vp9(true));
+        frames.on_encoded(1, 7, &vp9(false));
+        assert_eq!(*calls.lock().unwrap(), 1);
+    }
+
+    #[test]
+    fn a_re_attached_channel_takes_over_the_frames() {
+        let frames = ScreenFrames::default();
+        let (docked, got_docked) = recording();
+        let (popout, got_popout) = recording();
+        frames.attach(1, 7, docked);
+        frames.on_encoded(1, 7, &vp9(true));
+        frames.attach(1, 7, popout);
+        frames.on_encoded(1, 7, &vp9(true));
+        assert_eq!(got_docked.lock().unwrap().len(), 1);
+        assert_eq!(got_popout.lock().unwrap().len(), 1);
     }
 
     #[test]

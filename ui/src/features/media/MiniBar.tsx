@@ -4,6 +4,7 @@
  * pause, "Open" back to the full view and close. Everything keeps working from here.
  */
 import type { ReactNode } from "react";
+import { MediaIcon } from "./icons";
 import "./media.css";
 
 export interface MiniBarProps {
@@ -14,6 +15,8 @@ export interface MiniBarProps {
   thumbnail: ReactNode;
   /** How far the party is, as "7:12 / 17:30". */
   progress?: ReactNode;
+  /** How far it is as 0–1, drawn as a thin line next to the progress where it is known. */
+  fraction?: number;
   /** State dot: sync for the party, live for a share. */
   status: ReactNode;
   actions?: ReactNode;
@@ -28,6 +31,7 @@ export function MiniBar({
   title,
   thumbnail,
   progress,
+  fraction,
   status,
   actions,
   openLabel,
@@ -47,29 +51,34 @@ export function MiniBar({
         >
           {title}
         </span>
-        {progress !== undefined && <span className="mini-bar__progress">{progress}</span>}
+        {progress !== undefined && (
+          <span className="mini-bar__progress">
+            {fraction !== undefined && (
+              <span className="mini-bar__track" aria-hidden="true">
+                <span
+                  className="mini-bar__fill"
+                  style={{ width: `${(Math.min(1, Math.max(0, fraction)) * 100).toFixed(1)}%` }}
+                />
+              </span>
+            )}
+            {progress}
+          </span>
+        )}
       </span>
       <span className="mini-bar__status">{status}</span>
       {actions}
-      <button type="button" className="button" data-tooltip={openLabel} onClick={onOpen}>
+      <button type="button" className="button mini-bar__button" onClick={onOpen}>
+        <MediaIcon name="open" size={14} />
         {openLabel}
       </button>
       <button
         type="button"
-        className="button"
+        className="button mini-bar__icon"
         aria-label={closeLabel}
         data-tooltip={closeLabel}
         onClick={onClose}
       >
-        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
-          <path
-            d="M4 4l8 8M12 4l-8 8"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-        </svg>
+        <MediaIcon name="close" size={14} />
       </button>
     </div>
   );

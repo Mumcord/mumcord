@@ -1,15 +1,34 @@
 /*
  * The media frame, the mini bar and the right column panel that both media views share
- * (issue #163). Theme tokens only, so light and dark and every custom theme work.
+ * (issue #163). Theme tokens only, so light and dark and every custom theme work. The one exception
+ * is the overlay on the picture: the picture looks the same in every theme, so its scrim and the
+ * text on it stay dark and light in every theme too (as the image viewer in `chat.css` does).
  */
 .media-frame {
+  --media-scrim: rgb(8 6 20 / 78%);
+  --media-on-scrim: #fff;
+  --media-on-scrim-muted: rgb(255 255 255 / 72%);
+  --media-on-scrim-faint: rgb(255 255 255 / 30%);
+  --media-hover: rgb(255 255 255 / 14%);
+  --media-ink: rgb(8 6 20);
+  --media-glass: rgb(16 12 36 / 62%);
+  --media-glass-border: rgb(255 255 255 / 16%);
+
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-elevated);
+  width: 100%;
+  /* The picture keeps 16:9 and leaves room for the chat under it on short windows. */
+  max-width: calc(58vh * 16 / 9);
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: #000;
+  box-shadow: var(--shadow-raised);
+  color: var(--media-on-scrim);
+}
+
+.media-frame[data-fullscreen] {
+  max-width: none;
+  border-radius: 0;
 }
 
 .media-frame__picture {
@@ -19,8 +38,11 @@
   justify-content: center;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: var(--radius-sm);
-  background: #000;
+}
+
+.media-frame[data-fullscreen] .media-frame__picture {
+  height: 100%;
+  aspect-ratio: auto;
 }
 
 .media-frame__frame {
@@ -28,17 +50,34 @@
   width: 100%;
   height: 100%;
   border: 0;
+  /* Only the app's controls drive the party, and hovering the picture must show them. */
+  pointer-events: none;
 }
 
-/* The overlays fade in on hover, keyboard focus or pause; reduced motion keeps them visible. */
+/* The overlays sit on the picture and fade in on hover, keyboard focus or pause. */
 .media-frame__top,
 .media-frame__bottom {
+  position: absolute;
+  inset-inline: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-items: center;
-  opacity: 0.6;
+  opacity: 0;
   transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.media-frame__top {
+  top: 0;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  background: linear-gradient(to bottom, var(--media-scrim), transparent);
+}
+
+.media-frame__bottom {
+  bottom: 0;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4) var(--space-3);
+  background: linear-gradient(to top, var(--media-scrim), transparent);
 }
 
 .media-frame:hover .media-frame__top,
@@ -58,35 +97,134 @@
   }
 }
 
+.media-frame__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.media-frame__seek {
+  display: flex;
+  align-items: center;
+  padding-inline: var(--space-1);
+}
+
 .media-frame__mark {
+  display: inline-flex;
   flex: none;
 }
 
 .media-frame__titles {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
 }
 
 .media-frame__title {
-  font-family: var(--font-family-display);
-  font-weight: var(--font-weight-bold);
   overflow: hidden;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.media-frame__sub,
-.media-frame__time,
-.media-frame__action {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+.media-frame__sub {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  overflow: hidden;
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
 }
 
-.media-frame__hint {
-  margin: 0;
-  color: var(--color-text-muted);
+.media-frame__time {
+  margin-inline: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Who did the last thing, e.g. "▶ Maya pressed play"; it pushes the rest to the right edge. */
+.media-frame__action {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-width: 0;
+  margin-left: auto;
+  padding: var(--space-1) var(--space-3);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-success) 55%, transparent);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
   font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ordinary buttons on the picture (retry, codec hint) keep their theme surface, so they need the
+   theme's text colour back instead of the light text the overlay passes down. */
+.media-frame .button {
+  color: var(--color-text);
+}
+
+/* Icon buttons on the picture: no frame until hovered, the usual focus ring for the keyboard.
+   Doubled class: it has to win over the app-wide `.button`. */
+.button.media-frame__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--media-on-scrim);
+}
+
+.button.media-frame__icon:hover:not(:disabled) {
+  background: var(--media-hover);
+}
+
+.button.media-frame__icon:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* The play button stands out from the others. */
+.button.media-frame__icon--main {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--media-glass-border);
+  background: rgb(255 255 255 / 12%);
+}
+
+/* The key hint: a small chip on the picture on first use, gone after a while. */
+.media-frame__hint {
+  position: absolute;
+  bottom: 6.5rem;
+  left: var(--space-4);
+  margin: 0;
+  pointer-events: none;
+}
+
+.media-frame__keys {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-md);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  backdrop-filter: blur(0.5rem);
 }
 
 /* The seek bar: the played part, the buffered part, and a marker where each other viewer is. */
@@ -94,28 +232,31 @@
   position: relative;
   flex: 1;
   min-width: 8rem;
-  height: 0.5rem;
+  height: 0.3125rem;
   border-radius: var(--radius-full);
-  background: linear-gradient(
-    to right,
-    var(--color-accent) var(--played),
-    color-mix(in srgb, var(--color-accent) 35%, transparent) var(--played),
-    var(--color-bg-hover) 100%
-  );
+  background: rgb(255 255 255 / 22%);
 }
 
-.seek-bar__buffer {
+.seek-bar__buffer,
+.seek-bar__played {
   position: absolute;
   inset: 0 auto 0 0;
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+.seek-bar__buffer {
+  background: rgb(255 255 255 / 30%);
+}
+
+.seek-bar__played {
+  background: var(--gradient-accent);
 }
 
 .seek-bar__input {
   position: absolute;
-  inset: 0;
+  inset: -0.5rem 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% + 1rem);
   margin: 0;
   appearance: none;
   background: none;
@@ -123,44 +264,84 @@
 }
 
 .seek-bar__input::-webkit-slider-thumb {
+  width: 1rem;
+  height: 1rem;
   appearance: none;
-  width: 0.75rem;
-  height: 0.75rem;
   border-radius: var(--radius-full);
-  background: var(--color-primary-bg);
+  background: var(--media-on-scrim);
+  box-shadow: 0 0 0 0.25rem rgb(255 255 255 / 20%);
 }
 
+.seek-bar__input::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--media-on-scrim);
+}
+
+/* Other viewers: a small tick on the track, named in the tooltip and for the screen reader. */
 .seek-bar__marker {
   position: absolute;
-  top: -0.25rem;
+  top: 50%;
   width: 0.25rem;
-  height: 1rem;
+  height: 0.875rem;
   border-radius: var(--radius-full);
-  background: var(--color-accent-text);
+  background: var(--color-primary-bg);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+  transform: translate(-50%, -50%);
 }
 
 .volume {
   position: relative;
   display: flex;
-  gap: var(--space-1);
+  gap: var(--space-2);
   align-items: center;
-  min-width: 6rem;
+  width: 8rem;
 }
 
 .volume__input {
   flex: 1;
-  height: 0.5rem;
+  min-width: 0;
+  height: 0.25rem;
   appearance: none;
   border-radius: var(--radius-full);
   background: linear-gradient(
     to right,
-    var(--color-accent) var(--played),
-    var(--color-bg-hover) var(--played)
+    var(--media-on-scrim, var(--color-accent)) var(--played),
+    color-mix(in srgb, currentcolor 25%, transparent) var(--played)
   );
+  cursor: pointer;
+}
+
+.volume__input::-webkit-slider-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  appearance: none;
+  border-radius: var(--radius-full);
+  background: var(--media-on-scrim, var(--color-accent));
+}
+
+.volume__input::-moz-range-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--media-on-scrim, var(--color-accent));
+}
+
+.volume__input:focus-visible {
+  outline-offset: 0.375rem;
+}
+
+.volume__icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--media-on-scrim, var(--color-text-secondary));
 }
 
 .volume__meter {
-  height: 0.5rem;
+  height: 0.25rem;
   border-radius: var(--radius-full);
   background: var(--color-success);
 }
@@ -168,20 +349,41 @@
 /* The mini bar at the top of the chat. */
 .mini-bar {
   display: flex;
-  gap: var(--space-2);
+  flex: none;
+  gap: var(--space-3);
   align-items: center;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
+  margin: var(--space-2) var(--space-4) 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   background: var(--color-bg-elevated);
 }
 
 .mini-bar__thumb {
+  position: relative;
+  display: inline-flex;
   flex: none;
-  width: 3rem;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-bg-hover);
+}
+
+/* The party's video plays on here while its view is closed (issue #163). */
+.mini-bar__thumb:has(.mini-bar__frame) {
+  width: 8rem;
+}
+
+.mini-bar__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
 }
 
 .mini-bar__thumb img {
@@ -193,19 +395,70 @@
 .mini-bar__text {
   display: flex;
   flex: 1;
-  min-width: 0;
   flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
 }
 
 .mini-bar__title {
   overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .mini-bar__progress {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A thin line under the title: how far the video is. */
+.mini-bar__track {
+  flex: 1;
+  max-width: 14rem;
+  height: 0.1875rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+}
+
+.mini-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+}
+
+.mini-bar__status {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.button.mini-bar__button {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* Square icon buttons in the bar (play/pause, close). */
+.button.mini-bar__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
 }
 
 .sync-dot {
@@ -226,39 +479,80 @@
 
 /* The right column panel. */
 .media-panel {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  min-height: 0;
+  padding: var(--space-3);
 }
 
+/* Segmented tabs: the chosen one is a filled pill. */
 .media-panel__tabs {
   display: flex;
   gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-bg-hover) 60%, transparent);
 }
 
 .media-panel__tab {
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--color-border);
+  display: inline-flex;
+  flex: 1;
+  gap: var(--space-1);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
   border-radius: var(--radius-sm);
   background: none;
   color: var(--color-text-secondary);
   font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    color var(--duration-fast);
 }
 
-.media-panel__tab[aria-selected="true"] {
-  border-color: var(--color-accent);
-  background: var(--color-bg-selected);
+.media-panel__tab:hover {
   color: var(--color-text);
 }
 
+.media-panel__tab[aria-selected="true"] {
+  background: var(--color-bg-selected);
+  color: var(--color-text);
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
 .media-panel__count {
-  margin-left: var(--space-1);
+  color: var(--color-accent-text);
+  font-weight: var(--font-weight-normal);
+}
+
+.media-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+/* A small capitals heading inside the panel, e.g. "Now playing". */
+.media-panel__heading {
+  margin: var(--space-2) 0 0;
   color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* The watching list with the sync state of each person. */
 .watch-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -266,26 +560,71 @@
 
 .watch-list__person {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
   align-items: center;
   padding: var(--space-1) 0;
 }
 
+.watch-list__avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+/* The sync state as a dot on the avatar; the state is also written out at the end of the row. */
+.watch-list__avatar .sync-dot {
+  position: absolute;
+  right: -0.125rem;
+  bottom: -0.125rem;
+  box-shadow: 0 0 0 2px var(--color-bg-sidebar);
+}
+
 .watch-list__name {
-  flex: 1;
-  min-width: 0;
+  min-width: 2.5rem;
   overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .watch-list__host {
-  color: var(--color-accent-text);
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 .watch-list__state {
-  font-size: var(--font-size-sm);
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  margin-left: auto;
   color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+/* In a narrow column the host badge keeps only its crown; the word stays for screen readers. */
+@container (max-width: 18rem) {
+  .watch-list__host-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .watch-list__host {
+    padding: 0 var(--space-1);
+  }
 }
 
 .watch-list__state--synced {
@@ -346,7 +685,7 @@
   flex-wrap: wrap;
   gap: var(--space-2);
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: var(--media-on-scrim-muted);
 }
 
 .media-frame__live {
@@ -359,11 +698,6 @@
   gap: var(--space-1);
 }
 
-.media-frame__keys {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
 .media-frame__unavailable {
   display: flex;
   flex-direction: column;
@@ -373,27 +707,19 @@
   text-align: center;
 }
 
-.media-panel__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-2);
-}
-
 /* The sync pill: the dot carries the meaning without colour alone (issue #163). */
 .sync-pill {
   display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
   align-items: center;
-  gap: var(--space-1);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  font-size: var(--font-size-sm);
-}
-
-.sync-pill[data-out] {
-  border-color: var(--color-warning);
-  color: var(--color-warning);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--media-glass-border, var(--color-border));
+  border-radius: var(--radius-full);
+  background: var(--media-glass, transparent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
 }
 
 .sync-pill__dot {
@@ -407,17 +733,6 @@
   background: var(--color-warning);
 }
 
-.volume__icon {
-  display: inline-flex;
-  align-items: center;
-  color: var(--color-text-secondary);
-}
-
-.mini-bar__status {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
 .mini-bar__empty {
   width: 26px;
   height: 16px;
@@ -428,7 +743,61 @@
 
 /* The mock's placeholder picture (issue #163): the mock has no peer, so it shows its own demo image. */
 .media-frame__mockpicture {
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: var(--radius-md);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The main window's stand-in while the view plays in its own window (issue #164). */
+.media-popped-out {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: center;
+  margin: var(--space-4) var(--space-4) var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.media-popped-out__status {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.media-popped-out__title {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* In the pop-out the picture fills the window, keeping its aspect ratio inside it. */
+.media-popout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #000;
+}
+
+/*
+ * The watch party's cinema wrapper is a flex item of the centring box above, so without this it
+ * shrinks to the player's 300 px default width. It takes the whole width instead; its padding and
+ * border only separate it from the chat in the main window.
+ */
+.media-popout > .watch-cinema {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.media-popout .media-frame {
+  max-width: calc(100vh * 16 / 9);
+  border-radius: 0;
+  box-shadow: none;
 }

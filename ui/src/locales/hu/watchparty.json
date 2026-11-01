@@ -46,7 +46,11 @@
     "upNext": "Következik: {{title}}",
     "upNextNone": "Nincs következő",
     "paste": "Illessz be egy YouTube linket",
-    "notALink": "Ez nem YouTube link"
+    "notALink": "Ez nem YouTube link",
+    "more": "Továbbiak: {{title}}",
+    "playNext": "Lejátszás következőként",
+    "removeShort": "Eltávolítás a listáról",
+    "emptyPaste": "Nincs következő videó. Illessz be fent egy YouTube-linket."
   },
   "widget": {
     "play": "Lejátszás",
@@ -56,5 +60,15 @@
     "install": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot:",
     "generic": "Ehhez a videóhoz H.264-támogatás kell. Telepítsd a gst-libav csomagot (a GStreamer libav bővítményét) a rendszered csomagkezelőjével.",
     "rpmFusion": "Fedorán a gst-libav az RPM Fusion tárolóból érhető el; előbb engedélyezd az RPM Fusiont."
-  }
+  },
+  "keys": "Szóköz lejátszás/szünet · ← → ugrás 5 mp · M némítás · F teljes képernyő",
+  "headerPill": "Nézzük együtt · {{count}}",
+  "miniPlayer": "Minilejátszó",
+  "tabs": {
+    "playlist": "Lejátszási lista"
+  },
+  "upNextHeading": "Következik · húzással rendezhető",
+  "whoIsWatching": "Kik nézik",
+  "pasteKey": "Ctrl V",
+  "you": "Te"
 }

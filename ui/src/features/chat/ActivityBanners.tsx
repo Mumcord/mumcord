@@ -6,12 +6,11 @@ import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useEmbedsAllowed } from "../../app/preferences";
 import { useOpenPrivacySettings } from "../../app/view";
-import { getApi, type ScreenShare } from "../../api";
-import { announce } from "../../a11y";
+import type { ScreenShare } from "../../api";
 import { useServerState, useShownServerId } from "../channels";
 import { startWatching, useScreenShares, useWatchedShare } from "../screenshare";
 import { useWatchParty } from "../watchparty";
-import { setWatchParty } from "../watchparty/watchPartyStore";
+import { joinWatchParty } from "../watchparty/startParty";
 import { watchUrl } from "../watchparty/youtube";
 import { p2pBlockText } from "../p2p/relayReason";
 import { loadPreview } from "./links";
@@ -57,15 +56,7 @@ export function ActivityBanners({ channelId }: { channelId: number }) {
   if (serverId === null || !inChannel) return null;
 
   const joinParty = () => {
-    getApi()
-      .watchPartyJoin(serverId)
-      .then((joined) => {
-        setWatchParty(serverId, joined);
-      })
-      .catch((error: unknown) => {
-        console.error("Joining the watch party failed", error);
-        announce(t("activity.joinFailed"), "assertive");
-      });
+    joinWatchParty(serverId, t("activity.joinFailed"));
   };
 
   // The engine lists shares oldest first, so reversing puts the newest on top.

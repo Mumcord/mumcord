@@ -46,7 +46,7 @@
     "seek": "Siirry",
     "volume": "Äänenvoimakkuus",
     "syncedPlay": "Synkassa",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} hallitsee",
     "inSync": "Synkassa",
     "inSyncAll": "Kaikki synkassa",
@@ -59,6 +59,15 @@
     "host": "Isäntä",
     "fullscreen": "Koko näyttö",
     "exitFullscreen": "Poistu koko näytöstä",
-    "none": "Kukaan"
+    "none": "Kukaan",
+    "popOut": "Avaa erillisessä ikkunassa",
+    "popIn": "Palauta pääikkunaan",
+    "onTop": "Aina päällimmäisenä",
+    "poppedOut": "Toistetaan erillisessä ikkunassa",
+    "bringBack": "Palauta",
+    "popOutFailed": "Erillistä ikkunaa ei voitu avata",
+    "popInFailed": "Näkymää ei voitu palauttaa",
+    "onTopFailed": "Asetusta Aina päällimmäisenä ei voitu muuttaa",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

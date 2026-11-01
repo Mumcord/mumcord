@@ -4,8 +4,7 @@
  * the frame keeps the feature as the mini bar at the top of the chat, where it still works.
  *
  * Only one feature can fill the main column at a time; the one that was opened last wins, the
- * other stays as its mini bar. Focus (`Z`) hides the other columns and the chat and shows only the
- * picture.
+ * other stays as its mini bar.
  */
 import { useSyncExternalStore } from "react";
 
@@ -20,8 +19,6 @@ export interface MediaView {
   cinema: MediaKind | null;
   /** Which features show as the mini bar at the top of the chat. */
   mini: Record<MediaKind, boolean>;
-  /** Focus mode: only the picture. */
-  focus: boolean;
   fit: FitMode;
   tab: MediaTab;
 }
@@ -29,7 +26,6 @@ export interface MediaView {
 const initial: MediaView = {
   cinema: null,
   mini: { watch: false, share: false },
-  focus: false,
   fit: "fit",
   tab: "playlist",
 };
@@ -59,7 +55,7 @@ export function openMedia(kind: MediaKind): void {
 export function leaveCinema(): void {
   if (view.cinema === null) return;
   const kind = view.cinema;
-  change({ ...view, cinema: null, mini: { ...view.mini, [kind]: true }, focus: false });
+  change({ ...view, cinema: null, mini: { ...view.mini, [kind]: true } });
 }
 
 /** The feature is over (left the party, stopped watching); its bar goes with it. */
@@ -69,13 +65,7 @@ export function closeMedia(kind: MediaKind): void {
     ...view,
     cinema: view.cinema === kind ? null : view.cinema,
     mini: { ...view.mini, [kind]: false },
-    focus: view.cinema === kind ? false : view.focus,
   });
-}
-
-export function setFocus(on: boolean): void {
-  if (view.focus === on) return;
-  change({ ...view, focus: on });
 }
 
 export function setFit(fit: FitMode): void {

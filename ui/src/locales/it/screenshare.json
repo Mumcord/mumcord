@@ -1,6 +1,5 @@
 {
   "share": "Condividi schermo",
-  "shareHint": "Condividi uno schermo o una finestra con il tuo canale vocale",
   "choosing": "Scelta di cosa condividere…",
   "stop": "Interrompi condivisione",
   "startFailed": "Impossibile avviare la condivisione dello schermo.",
@@ -36,7 +35,14 @@
   "pauseSharing": "Metti in pausa la condivisione",
   "resumeSharing": "Riprendi la condivisione",
   "viewersLabel": "Chi sta guardando",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Cambia finestra",
-  "viewersTitle": "Spettatori"
+  "viewersTitle": "Spettatori",
+  "thumbnail": "Anteprima di ciò che condividi",
+  "youAreSharing": "Stai condividendo",
+  "ofMax": "{{count}} di {{max}}",
+  "fullShort": "Tutti i posti sono occupati.",
+  "stopShort": "Interrompi",
+  "viewerCount_one": "{{count}} spettatore",
+  "viewerCount_many": "{{count}} spettatori",
+  "viewerCount_other": "{{count}} spettatori"
 }

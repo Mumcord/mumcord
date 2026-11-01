@@ -46,7 +46,7 @@
     "seek": "Recherche",
     "volume": "Volume",
     "syncedPlay": "Synchro",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} a la main",
     "inSync": "Synchro",
     "inSyncAll": "Tout le monde est synchronisé",
@@ -59,6 +59,15 @@
     "host": "Hôte",
     "fullscreen": "Plein écran",
     "exitFullscreen": "Quitter le plein écran",
-    "none": "Personne"
+    "none": "Personne",
+    "popOut": "Ouvrir dans une fenêtre séparée",
+    "popIn": "Revenir dans la fenêtre principale",
+    "onTop": "Toujours au premier plan",
+    "poppedOut": "Lecture dans une fenêtre séparée",
+    "bringBack": "Ramener",
+    "popOutFailed": "Impossible d’ouvrir la fenêtre séparée",
+    "popInFailed": "Impossible de ramener la vue",
+    "onTopFailed": "Impossible de modifier « Toujours au premier plan »",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

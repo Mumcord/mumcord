@@ -1,6 +1,5 @@
 {
   "share": "Jaga ekraani",
-  "shareHint": "Jaga ekraani või akent oma häälkanaliga",
   "choosing": "Jagatava valimine…",
   "stop": "Lõpeta jagamine",
   "startFailed": "Ekraani jagamist ei õnnestunud alustada.",
@@ -35,7 +34,13 @@
   "pauseSharing": "Peata jagamine",
   "resumeSharing": "Jätka jagamist",
   "viewersLabel": "Kes vaatavad",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Vaheta akent",
-  "viewersTitle": "Vaatajad"
+  "viewersTitle": "Vaatajad",
+  "thumbnail": "Jagatava eelvaade",
+  "youAreSharing": "Sa jagad",
+  "ofMax": "{{count}} / {{max}}",
+  "fullShort": "Kõik kohad on täis.",
+  "stopShort": "Lõpeta",
+  "viewerCount_one": "{{count}} vaataja",
+  "viewerCount_other": "{{count}} vaatajat"
 }

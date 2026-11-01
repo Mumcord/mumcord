@@ -1,6 +1,5 @@
 {
   "share": "Bildschirm teilen",
-  "shareHint": "Einen Bildschirm oder ein Fenster mit deinem Sprachkanal teilen",
   "choosing": "Auswahl, was geteilt wird …",
   "stop": "Teilen beenden",
   "startFailed": "Die Bildschirmfreigabe konnte nicht starten.",
@@ -35,7 +34,13 @@
   "pauseSharing": "Teilen pausieren",
   "resumeSharing": "Teilen fortsetzen",
   "viewersLabel": "Wer zuschaut",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Fenster wechseln",
-  "viewersTitle": "Zuschauer"
+  "viewersTitle": "Zuschauer",
+  "thumbnail": "Vorschau dessen, was du teilst",
+  "youAreSharing": "Du teilst",
+  "ofMax": "{{count}} von {{max}}",
+  "fullShort": "Alle Plätze sind belegt.",
+  "stopShort": "Beenden",
+  "viewerCount_one": "{{count}} Zuschauer",
+  "viewerCount_other": "{{count}} Zuschauer"
 }
