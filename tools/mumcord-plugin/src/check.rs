@@ -55,8 +55,10 @@ pub fn component_imports(component: &[u8]) -> Result<Vec<String>> {
     let mut names = Vec::new();
     for (key, item) in &resolve.worlds[world].imports {
         let name = match item {
+            // Types the exports use (e.g. start-info) show up as world-level type imports.
+            WorldItem::Type { .. } => continue,
             WorldItem::Interface { id, .. } => resolve.id_of(*id),
-            _ => None,
+            WorldItem::Function(_) => None,
         }
         .unwrap_or_else(|| resolve.name_world_key(key));
         if !import_allowed(&name) {

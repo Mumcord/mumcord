@@ -5,7 +5,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 use mumcord_plugins::manifest;
 use serde_json::json;
 
@@ -111,7 +111,14 @@ pub fn run(id: &str, dir: Option<PathBuf>, sdk_path: Option<&Path>) -> Result<()
     if dir.exists() && fs::read_dir(&dir)?.next().is_some() {
         bail!("{} already exists and is not empty", dir.display());
     }
-    for (path, body) in files(id, sdk_path)? {
+    // Cargo resolves a relative path from the new project, not from where `new` was run.
+    let sdk_path = sdk_path
+        .map(|p| {
+            p.canonicalize()
+                .with_context(|| format!("{} does not exist", p.display()))
+        })
+        .transpose()?;
+    for (path, body) in files(id, sdk_path.as_deref())? {
         let path = dir.join(path);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
