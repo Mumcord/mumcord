@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
+
 ### Fixed
 
 - The "simultaneously connected servers" number field in Settings > Server is no longer stretched across the whole card; it is now as narrow as the number it holds (#320)
