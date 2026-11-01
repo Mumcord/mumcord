@@ -84,6 +84,9 @@ mod tests {
 
     #[test]
     fn an_empty_frame_gives_nothing() {
-        assert_eq!(thumbnail(&I420Frame::new(1, 1, vec![0, 0, 0]).expect("frame")), None);
+        assert_eq!(
+            thumbnail(&I420Frame::new(1, 1, vec![0, 0, 0]).expect("frame")),
+            None
+        );
     }
 }

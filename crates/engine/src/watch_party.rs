@@ -1097,9 +1097,9 @@ impl Engine {
                 .get_mut(&server_id)
                 .filter(|p| p.joined)
                 .ok_or_else(no_party)?;
-            let msg = party.previous().ok_or_else(|| {
-                EngineError::invalid("nothing has played yet in this party")
-            })?;
+            let msg = party
+                .previous()
+                .ok_or_else(|| EngineError::invalid("nothing has played yet in this party"))?;
             (Some(msg), party.view())
         };
         if let Some(msg) = msg {
@@ -1308,7 +1308,10 @@ mod tests {
             })
         );
         assert_eq!(party.view().current_entry, 0);
-        assert!(party.view().history.is_empty(), "the past loses what plays again");
+        assert!(
+            party.view().history.is_empty(),
+            "the past loses what plays again"
+        );
         // With nothing played yet there is nothing to go back to.
         assert_eq!(party.previous(), None);
     }

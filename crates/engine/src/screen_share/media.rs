@@ -353,7 +353,9 @@ impl Media {
 
     /// The last keyframe as the small picture the sharer's bar shows (issue #163).
     pub fn thumbnail(&self) -> Option<ShareThumbnail> {
-        lock(&self.hub.thumbnail).as_ref().and_then(super::thumbnail::thumbnail)
+        lock(&self.hub.thumbnail)
+            .as_ref()
+            .and_then(super::thumbnail::thumbnail)
     }
 
     pub fn stats(&self) -> ScreenMediaStats {

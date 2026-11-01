@@ -31,8 +31,8 @@ pub mod sound_macos;
 #[cfg(windows)]
 mod sound_windows;
 mod start;
-mod thumbnail;
 mod state;
+mod thumbnail;
 mod watch;
 mod windows_rules;
 pub mod wire;

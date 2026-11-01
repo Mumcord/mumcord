@@ -67,7 +67,10 @@ pub use session::{
 };
 pub use session::{MumbleImportChoice, MumbleImportPreview, MumbleImportResult};
 pub use stats::UserStatsView;
-pub use watch_party::{HISTORY_MAX, HistoryItem, PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand, WatchPartyView};
+pub use watch_party::{
+    HISTORY_MAX, HistoryItem, PLAYLIST_MAX, PlaylistEntry, WatchAction, WatchCommand,
+    WatchPartyView,
+};
 pub use web::{
     AudioFile, AudioFormat, AudioInfo, InlineImage, LinkPreview, MusicEmbed, MusicKind,
     MusicService, VideoEmbed, VideoProvider,
