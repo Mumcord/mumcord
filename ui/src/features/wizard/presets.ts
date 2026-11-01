@@ -7,8 +7,9 @@ import type { P2pMode, PmRule, Settings, SetupPreset } from "../../api";
  * Disturb" (`dndSetFollowSystem`), so the wizard works on a `PresetDraft` that carries both.
  *
  * Not covered on purpose: "external images: click to load" and "embeds" from the issue table have
- * no setting of their own (`linkPreviews` covers previews and embeds), and Maximum privacy's
- * "Updates: notify only" waits for that setting (#295), so updates are left untouched.
+ * no setting of their own (`linkPreviews` covers previews and embeds). Maximum privacy's
+ * "Updates: notify only" is applied by the wizard (`applyStyle`), since it is no preset value
+ * the other presets fix.
  */
 
 /** The three presets; Custom walks the detailed steps instead of applying values. */
