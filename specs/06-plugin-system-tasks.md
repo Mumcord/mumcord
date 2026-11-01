@@ -645,4 +645,5 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - C13 ✅ AC-6.27, AC-6.28 (developer_folders_follow_developer_mode, developer/plugins vitest; real CLI new/build×2 identical/check/serve; registry-install.e2e; fix daf15187)
 - C3 ✅ AC-6.4, AC-6.7 (bc0fc956, a850063f, 9fa530c0 dice.e2e.ts 4/4 after F47)
 - C12 ✅ AC-6.26 (bf4d6801 server-suggestions.e2e.ts with real mumbot 0.4.1; live_plugins blocked test)
+- C11 ✅ AC-6.25 (e2e specs/plugins/mumbot-music.e2e.ts against the local testenv mumbot, 6/7 green locally: red rows, public http refused, wrong/right key, skip/stop/volume/add by name, upload, key not in export, bot leaves; add by URL blocked locally by ufw (bot container cannot reach the host), runs in CI; fixes 56dd7b43 keychain wait counted as waiting, 89c9aef7 plugin fields keep typed text/focus across tree updates and drop stale drafts)
 - Decision 2026-11-01 (user): FR-6.59 "highlighted" = Echolings listed first in Browse; no separate highlight card (mockup conformance V-C 1881b87a)
