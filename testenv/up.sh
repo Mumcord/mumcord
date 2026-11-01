@@ -9,6 +9,18 @@ CERT_SET=A
 if [ "${1:-}" = "--cert" ]; then CERT_SET="${2:-}"; fi
 case "$CERT_SET" in A|B) ;; *) echo "cert set must be A or B" >&2; exit 2;; esac
 [ -f .env ] || { echo "missing testenv/.env - run: cp testenv/.env.example testenv/.env" >&2; exit 1; }
+# The shared default servers (project "testenv") are recreated by whichever checkout runs up.sh, and
+# the SuperUser password is applied on every start. A git worktree with its own, different .env would
+# silently change the password the other checkouts' live tests expect, so refuse that.
+if [ "$MUMCORD_PROJECT" = testenv ]; then
+  primary="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)")/testenv/.env"
+  if [ -f "$primary" ] && ! cmp -s .env "$primary"; then
+    echo "testenv/.env differs from the main checkout's ($primary)." >&2
+    echo "The shared servers must use one password: cp '$primary' testenv/.env" >&2
+    echo "(or use a private instance: MUMCORD_PROJECT=<name> MUMCORD_PORT_BASE=<port>)" >&2
+    exit 1
+  fi
+fi
 command -v sqlite3 >/dev/null || { echo "sqlite3 is required on the host to seed channels" >&2; exit 1; }
 PUID=$(id -u)
 PGID=$(id -g)
