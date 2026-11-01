@@ -58,6 +58,7 @@ function setup(plugins: InstalledPlugin[], withPanel: string[]) {
         plugin: id,
         change: {
           type: "setTree" as const,
+          serverId: null,
           slot: { kind: "panel" as const },
           nodes: textTree(`${id} panel`),
         },

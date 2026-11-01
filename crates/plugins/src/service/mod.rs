@@ -94,8 +94,12 @@ pub enum ServiceEvent {
     /// A plugin changed its UI (`plugin://ui`). Trees are untrusted.
     Ui { plugin: String, update: UiUpdate },
     /// `chat.send` passed the gesture gate: post `line` ("[Name] text") as a channel message
-    /// through the normal chat path.
-    ChatPost { plugin: String, line: String },
+    /// through the normal chat path, into the user's current channel on `server`.
+    ChatPost {
+        plugin: String,
+        server: mumcord_store::ServerId,
+        line: String,
+    },
     /// Hide text message `message` and show the plugin's card `card` instead, or only a
     /// "Hidden by <Plugin>" line when `card` is `None` (FR-6.45).
     Supersede {

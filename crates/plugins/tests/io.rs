@@ -62,7 +62,13 @@ impl Recorder {
 }
 
 impl PluginIo for Recorder {
-    fn set_tree(&self, plugin: &str, _slot: Slot, nodes: Vec<Node>) -> Result<(), Error> {
+    fn set_tree(
+        &self,
+        plugin: &str,
+        _slot: Slot,
+        nodes: Vec<Node>,
+        _server: Option<i64>,
+    ) -> Result<(), Error> {
         self.record(format!("{plugin} set_tree {}", nodes.len()));
         Ok(())
     }
@@ -110,7 +116,7 @@ impl PluginIo for Recorder {
     fn bot(&self, _plugin: &str, _session: u32) -> Result<Option<BotInfo>, Error> {
         Ok(None)
     }
-    fn chat_send(&self, _plugin: &str, _text: String) -> Result<(), Error> {
+    fn chat_send(&self, _plugin: &str, _text: String, _server: Option<i64>) -> Result<(), Error> {
         Ok(())
     }
     fn line_hash(&self, _plugin: &str, _text: &str) -> u32 {
@@ -122,6 +128,7 @@ impl PluginIo for Recorder {
         _card: String,
         _sender: u32,
         _hash: u32,
+        _server: Option<i64>,
     ) -> Result<(), Error> {
         Ok(())
     }

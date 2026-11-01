@@ -102,7 +102,11 @@ impl PluginService {
     /// A line the user typed: a plugin command goes to its plugin as a `ui-action` with source
     /// `command` (action = command name, value = the rest of the line) and opens the command
     /// gesture window.
-    pub fn run_command(&self, line: &str) -> Result<CommandOutcome, ServiceError> {
+    pub fn run_command(
+        &self,
+        line: &str,
+        server: Option<mumcord_store::ServerId>,
+    ) -> Result<CommandOutcome, ServiceError> {
         match self.command_registry()?.0.resolve(line) {
             Resolution::Plugin { plugin, action } => {
                 self.ui_input(
@@ -111,6 +115,7 @@ impl PluginService {
                         source: ActionSource::Command,
                         action: action.action,
                         value: ActionValue::Text(action.text),
+                        server,
                     },
                 );
                 Ok(CommandOutcome::Plugin)

@@ -1145,7 +1145,8 @@ pub async fn plugins_set_appearance(
 /// The user acted in a plugin's UI (`slot`) or typed one of its slash commands (`slot`
 /// `None`: `action` is the command, `value` the rest of the line as text). Actions must
 /// belong to an enabled component on screen. Server addresses become reachable for the
-/// plugin, password text goes into the secret, a picked file becomes a handle.
+/// plugin, password text goes into the secret, a picked file becomes a handle. `server_id`:
+/// the server whose chat the action came from (a chat card), where a reply goes.
 #[tauri::command]
 #[specta::specta]
 pub async fn plugin_ui_action(
@@ -1154,6 +1155,7 @@ pub async fn plugin_ui_action(
     slot: Option<PluginSlot>,
     action: String,
     value: PluginActionValue,
+    server_id: Option<ServerId>,
 ) -> ApiResult<()> {
     let plugins = plugins_of(&app)?;
     let kind = match &slot {
@@ -1203,6 +1205,7 @@ pub async fn plugin_ui_action(
                     source,
                     action,
                     value,
+                    server: server_id.map(to_engine_server_id),
                 },
             ))
         })
@@ -1346,12 +1349,18 @@ pub async fn plugin_commands(app: AppHandle) -> ApiResult<Vec<PluginCommand>> {
 }
 
 /// Hands a typed line starting with `/` to the plugin that owns the command, as a `ui-action`
-/// with source `command` (action = command name, value = the rest of the line).
+/// with source `command` (action = command name, value = the rest of the line). `server_id`: the
+/// server whose chat the line was typed in, where a reply goes.
 #[tauri::command]
 #[specta::specta]
-pub async fn plugin_run_command(app: AppHandle, line: String) -> ApiResult<PluginCommandOutcome> {
+pub async fn plugin_run_command(
+    app: AppHandle,
+    line: String,
+    server_id: Option<ServerId>,
+) -> ApiResult<PluginCommandOutcome> {
+    let server = server_id.map(to_engine_server_id);
     let outcome = plugins_of(&app)?
-        .call(move |service| service.run_command(&line))
+        .call(move |service| service.run_command(&line, server))
         .await?;
     Ok(match outcome {
         CommandOutcome::Plugin => PluginCommandOutcome::Plugin,

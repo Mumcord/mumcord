@@ -576,9 +576,10 @@ export const commands = {
 	 *  The user acted in a plugin's UI (`slot`) or typed one of its slash commands (`slot`
 	 *  `None`: `action` is the command, `value` the rest of the line as text). Actions must
 	 *  belong to an enabled component on screen. Server addresses become reachable for the
-	 *  plugin, password text goes into the secret, a picked file becomes a handle.
+	 *  plugin, password text goes into the secret, a picked file becomes a handle. `server_id`:
+	 *  the server whose chat the action came from (a chat card), where a reply goes.
 	 */
-	pluginUiAction: (id: string, slot: PluginSlot | null, action: string, value: PluginActionValue) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_ui_action", { id, slot, action, value })),
+	pluginUiAction: (id: string, slot: PluginSlot | null, action: string, value: PluginActionValue, serverId: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_ui_action", { id, slot, action, value, serverId })),
 	/**  Other user inputs for a plugin's UI. */
 	pluginUiEvent: (id: string, input: PluginUiInput) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_ui_event", { id, input })),
 	/**
@@ -626,9 +627,10 @@ export const commands = {
 	pluginCommands: () => typedError<PluginCommand[], ApiError>(__TAURI_INVOKE("plugin_commands")),
 	/**
 	 *  Hands a typed line starting with `/` to the plugin that owns the command, as a `ui-action`
-	 *  with source `command` (action = command name, value = the rest of the line).
+	 *  with source `command` (action = command name, value = the rest of the line). `server_id`: the
+	 *  server whose chat the line was typed in, where a reply goes.
 	 */
-	pluginRunCommand: (line: string) => typedError<PluginCommandOutcome, ApiError>(__TAURI_INVOKE("plugin_run_command", { line })),
+	pluginRunCommand: (line: string, serverId: number | null) => typedError<PluginCommandOutcome, ApiError>(__TAURI_INVOKE("plugin_run_command", { line, serverId })),
 	/**  "Not now": the suggestion stays hidden until the server's list changes or 30 days pass. */
 	pluginSuggestionNotNow: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_not_now", { serverId, plugin })),
 	/**  "Don't ask again for this server". */
@@ -2671,7 +2673,12 @@ export type PluginUi = {
 /**  What changed in a plugin's UI. */
 export type PluginUiChange = 
 /**  Replaces the slot's tree (a new chat card id appends the card). */
-{ type: "setTree"; slot: PluginSlot; nodes: PluginNode[] } | 
+{ type: "setTree"; slot: PluginSlot; nodes: PluginNode[]; 
+/**
+ *  For a chat card: the server whose chat a new card goes into (`None`: the voice
+ *  server, and for every other slot).
+ */
+serverId: number | null } | 
 /**  Removes the slot's tree. */
 { type: "clear"; slot: PluginSlot } | 
 /**  Opens the plugin's dialog, or only changes its title and subtitle when it is open. */

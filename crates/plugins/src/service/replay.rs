@@ -72,17 +72,16 @@ struct Planned {
 }
 
 impl PluginService {
-    /// Whether `channel` on `server` is the user's current channel on the focused server: the
+    /// Whether `channel` is the user's current channel on `server`, any connected server: the
     /// only chat plugins ever see.
     pub(super) fn in_my_channel(&self, server: ServerId, channel: u32) -> bool {
-        let state = self.io.peers();
-        state.focused == Some(server)
-            && state
-                .connections
-                .get(&server)
-                .and_then(|c| c.me.as_ref())
-                .and_then(|me| me.channel.as_ref())
-                .is_some_and(|(id, _)| *id == channel)
+        self.io
+            .peers()
+            .connections
+            .get(&server)
+            .and_then(|c| c.me.as_ref())
+            .and_then(|me| me.channel.as_ref())
+            .is_some_and(|(id, _)| *id == channel)
     }
 
     /// The chat reference for a live event: a token when the message was stored. The message
@@ -100,6 +99,7 @@ impl PluginService {
         ChatRef {
             token,
             replay: false,
+            server: Some(server),
         }
     }
 
@@ -124,6 +124,7 @@ impl PluginService {
                 ChatRef {
                     token: Some(token),
                     replay: true,
+                    server: Some(server),
                 },
             ) {
                 self.replayed.insert(&plugin, server, message);

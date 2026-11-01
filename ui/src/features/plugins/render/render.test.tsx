@@ -85,10 +85,13 @@ describe("plugin UI store", () => {
 
   it("sets, clears and closes with the dialog", () => {
     const nodes = [stack([])];
-    let s = applyChange(empty, { plugin: "p", change: { type: "setTree", slot: PANEL, nodes } });
+    let s = applyChange(empty, {
+      plugin: "p",
+      change: { type: "setTree", slot: PANEL, nodes, serverId: null },
+    });
     s = applyChange(s, {
       plugin: "p",
-      change: { type: "setTree", slot: { kind: "dialog" }, nodes },
+      change: { type: "setTree", slot: { kind: "dialog" }, nodes, serverId: null },
     });
     s = applyChange(s, {
       plugin: "p",
@@ -134,7 +137,7 @@ describe("plugin UI store", () => {
     act(() => {
       api.mock.emit("pluginUi", {
         plugin: "poll",
-        change: { type: "setTree", slot: PANEL, nodes: [stack([])] },
+        change: { type: "setTree", slot: PANEL, nodes: [stack([])], serverId: null },
       });
     });
     await screen.findByText("1");
@@ -221,8 +224,14 @@ describe("PluginTree", () => {
     ]);
     fireEvent.click(screen.getByRole("button", { name: "Vote" }));
     fireEvent.click(screen.getByRole("switch", { name: "Notify" }));
-    expect(action).toHaveBeenCalledWith("poll", PANEL, "vote", { type: "none" });
-    expect(action).toHaveBeenCalledWith("poll", PANEL, "notify", { type: "boolean", value: true });
+    expect(action).toHaveBeenCalledWith("poll", PANEL, "vote", { type: "none" }, null);
+    expect(action).toHaveBeenCalledWith(
+      "poll",
+      PANEL,
+      "notify",
+      { type: "boolean", value: true },
+      null,
+    );
   });
 
   it("tells the user when an action fails", async () => {
@@ -338,7 +347,13 @@ describe("list", () => {
     fireEvent.keyDown(screen.getByRole("button", { name: /Move row 1 of 3/ }), {
       key: "ArrowDown",
     });
-    expect(action).toHaveBeenCalledWith("poll", PANEL, "move", { type: "reorder", from: 0, to: 1 });
+    expect(action).toHaveBeenCalledWith(
+      "poll",
+      PANEL,
+      "move",
+      { type: "reorder", from: 0, to: 1 },
+      null,
+    );
     expect(screen.getByRole("status")).toHaveTextContent("Moved row 1 to position 2 of 3");
     fireEvent.keyDown(screen.getByRole("button", { name: /Move row 1 of 3/ }), { key: "ArrowUp" });
     expect(action).toHaveBeenCalledTimes(1);
@@ -394,7 +409,7 @@ describe("inputs", () => {
     expect(input).toHaveValue("ää");
     expect(screen.getByText("2 / 2 characters")).toBeInTheDocument();
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(action).toHaveBeenCalledWith("poll", PANEL, "name", { type: "text", value: "ää" });
+    expect(action).toHaveBeenCalledWith("poll", PANEL, "name", { type: "text", value: "ää" }, null);
   });
 
   it("sends the password once and clears the field", () => {
@@ -414,7 +429,13 @@ describe("inputs", () => {
     const input = screen.getByLabelText("Token");
     fireEvent.change(input, { target: { value: "s3cret" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
-    expect(action).toHaveBeenCalledWith("poll", PANEL, "saved", { type: "text", value: "s3cret" });
+    expect(action).toHaveBeenCalledWith(
+      "poll",
+      PANEL,
+      "saved",
+      { type: "text", value: "s3cret" },
+      null,
+    );
     expect(input).toHaveValue("");
     expect(screen.getByRole("status")).toHaveTextContent("Saved securely");
   });
@@ -433,10 +454,16 @@ describe("inputs", () => {
     ]);
     fireEvent.click(screen.getByRole("button", { name: "Song: Choose file…" }));
     expect(await screen.findByText("song.mp3")).toBeInTheDocument();
-    expect(action).toHaveBeenCalledWith("poll", PANEL, "file", {
-      type: "file",
-      path: "/music/song.mp3",
-    });
+    expect(action).toHaveBeenCalledWith(
+      "poll",
+      PANEL,
+      "file",
+      {
+        type: "file",
+        path: "/music/song.mp3",
+      },
+      null,
+    );
   });
 });
 

@@ -2,8 +2,10 @@
 //!
 //! The app turns each engine plugin event into one call here. The service keeps the messaging
 //! state per connection in [`crate::api::peers::Peers`] (shared with the `peers` host calls),
-//! forwards events of the focused server to the plugins with each plugin's own peer keys, and
-//! filters incoming plugin messages. Plugins see only the server the user looks at.
+//! forwards events to the plugins with each plugin's own peer keys, and filters incoming plugin
+//! messages. Voice-side events (channel members, talking, screen shares, self, plugin messages)
+//! come only from the voice server; chat-side events (chat activity, mentions) from every
+//! connected server, so plugin cards work in every server's chat (H3).
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -131,7 +133,7 @@ impl PluginService {
 
     /// Someone wrote in a channel; never the text.
     pub fn chat_activity(&mut self, server: ServerId, sender: &PeerInfo, channel: (u32, String)) {
-        self.dispatch(server, |keys, id| {
+        self.dispatch_chat(server, |keys, id| {
             Event::ChatActivity((
                 wit_peer(keys, id, sender),
                 Channel {
@@ -144,7 +146,7 @@ impl PluginService {
 
     /// Someone mentioned the user; never the text.
     pub fn mentioned(&mut self, server: ServerId, sender: &PeerInfo) {
-        self.dispatch(server, |keys, id| {
+        self.dispatch_chat(server, |keys, id| {
             Event::Mentioned(wit_peer(keys, id, sender))
         });
     }
@@ -427,6 +429,23 @@ impl PluginService {
         }
     }
 
+    /// Sends a chat-side event of `server` (any connected server) to every plugin; replies and
+    /// cards from its handler go to that server's chat.
+    fn dispatch_chat(
+        &self,
+        server: ServerId,
+        event: impl Fn(Option<&crate::peer_key::PeerKeys>, &str) -> Event,
+    ) {
+        let keys = self.ctx.peer_keys.as_ref();
+        let chat = crate::chat::ChatRef {
+            server: Some(server),
+            ..Default::default()
+        };
+        for id in self.loaded_ids() {
+            self.host.send_chat(&id, event(keys, &id), chat);
+        }
+    }
+
     /// The user clicked in `plugin`'s UI (a `ui-action`): it may post one chat line within 2 s.
     pub fn gesture(&self, plugin: &str) {
         self.io.gesture(plugin);
@@ -437,10 +456,16 @@ impl PluginService {
         self.io.command_gesture(plugin);
     }
 
-    /// An incoming channel text message (its plain text as other clients see it). Returns
-    /// `Replace` when a plugin card supersedes it (FR-6.45); only a hash is kept.
-    pub fn chat_text(&self, message: u64, sender: u32, line: &str) -> crate::chat::Supersede {
-        self.io.chat_text(message, sender, line)
+    /// An incoming channel text message on `server` (its plain text as other clients see it).
+    /// Returns `Replace` when a plugin card supersedes it (FR-6.45); only a hash is kept.
+    pub fn chat_text(
+        &self,
+        server: ServerId,
+        message: u64,
+        sender: u32,
+        line: &str,
+    ) -> crate::chat::Supersede {
+        self.io.chat_text(server, message, sender, line)
     }
 
     fn loaded_ids(&self) -> Vec<String> {

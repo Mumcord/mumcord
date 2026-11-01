@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatMessage, InstalledPlugin, PluginCommand, PluginUi } from "../../../api";
 import type { MockApi } from "../../../api/mock";
 import { axeViolations } from "../../../test/axe";
+import { getShownServerId } from "../../channels/serverStore";
 import { connectedMock, resetAll } from "../../channels/testUtils";
 import { Composer } from "../../chat/Composer";
 import { usePluginUi } from "../render/pluginUiStore";
@@ -55,11 +56,17 @@ function message(id: string, body: string, own = false): ChatMessage {
   };
 }
 
-function cardUi(plugin: string, card: string, text: string): PluginUi {
+function cardUi(
+  plugin: string,
+  card: string,
+  text: string,
+  serverId: number | null = null,
+): PluginUi {
   return {
     plugin,
     change: {
       type: "setTree",
+      serverId,
       slot: { kind: "chatCard", id: card },
       nodes: [
         {
@@ -89,6 +96,14 @@ describe("plugin chat store", () => {
     expect(state.placed.get(cardKey("poll", "p1"))?.after).toBe("m1");
     const panel = { plugin: "poll", change: { type: "clear", slot: { kind: "panel" } } };
     expect(applyUi(state, panel as PluginUi, place)).toBe(state);
+  });
+
+  it("places a card in the chat of the server its plugin event came from", () => {
+    const place = vi.fn((plugin: string, card: string) => placed(plugin, card, "m1"));
+    applyUi(EMPTY, cardUi("fit", "f1", "Rifter", 2), place);
+    expect(place).toHaveBeenCalledWith("fit", "f1", 2);
+    applyUi(EMPTY, cardUi("poll", "p1", "Lunch?"), place);
+    expect(place).toHaveBeenLastCalledWith("poll", "p1", null);
   });
 
   it("shows a card that replaces a line there, not as its own item", () => {
@@ -188,7 +203,7 @@ describe("plugin chat UI", () => {
     await screen.findByRole("listbox", { name: "Plugin commands" });
     fireEvent.change(input, { target: { value: "/roll 2d6" } });
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(run).toHaveBeenCalledWith("/roll 2d6");
+    expect(run).toHaveBeenCalledWith("/roll 2d6", getShownServerId());
     expect(input.value).toBe("");
     await act(() => Promise.resolve());
     expect(send).not.toHaveBeenCalled();

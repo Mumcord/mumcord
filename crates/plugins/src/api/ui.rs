@@ -500,7 +500,7 @@ impl Host for PluginState {
             self.reject_tree(&slot, &e.reason);
             return Err(e.error);
         }
-        self.io()?.set_tree(&self.id, slot, nodes)
+        self.io()?.set_tree(&self.id, slot, nodes, self.chat.server)
     }
 
     fn clear(&mut self, slot: Slot) {

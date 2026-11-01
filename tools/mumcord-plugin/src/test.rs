@@ -511,7 +511,13 @@ impl MockIo {
 }
 
 impl PluginIo for MockIo {
-    fn set_tree(&self, _plugin: &str, slot: Slot, nodes: Vec<Node>) -> Result<(), Error> {
+    fn set_tree(
+        &self,
+        _plugin: &str,
+        slot: Slot,
+        nodes: Vec<Node>,
+        _server: Option<i64>,
+    ) -> Result<(), Error> {
         let slot = SlotSpec::from_wit(&slot);
         self.push(Output::Tree { slot, nodes });
         Ok(())
@@ -612,7 +618,7 @@ impl PluginIo for MockIo {
         Ok(self.bots.get(&session).cloned())
     }
 
-    fn chat_send(&self, plugin: &str, text: String) -> Result<(), Error> {
+    fn chat_send(&self, plugin: &str, text: String, _server: Option<i64>) -> Result<(), Error> {
         let line = lock(&self.gestures)
             .send(plugin, &self.name, &text, Instant::now())
             .map_err(|e| match e {
@@ -628,7 +634,14 @@ impl PluginIo for MockIo {
         line_hash(&self.name, text)
     }
 
-    fn supersede(&self, _plugin: &str, card: String, sender: u32, _hash: u32) -> Result<(), Error> {
+    fn supersede(
+        &self,
+        _plugin: &str,
+        card: String,
+        sender: u32,
+        _hash: u32,
+        _server: Option<i64>,
+    ) -> Result<(), Error> {
         self.push(Output::Supersede { card, sender });
         Ok(())
     }
@@ -843,6 +856,7 @@ impl Session {
         let chat = ChatRef {
             token: Some(token),
             replay,
+            server: Some(MOCK_SERVER),
         };
         self.host.send_chat(&self.id, event, chat);
     }

@@ -654,7 +654,7 @@ fn emit_engine_event(
 ) -> tauri::Result<()> {
     tray::on_engine_event(app, server_id, &event);
     notifications::on_engine_event(app, server_id, &event);
-    plugins::on_engine_event(app, &event);
+    plugins::on_engine_event(app, server_id, &event);
     if let (Some(runtime), Some(engine)) = (
         app.try_state::<ingame_overlay::Runtime>(),
         app.try_state::<Engine>(),

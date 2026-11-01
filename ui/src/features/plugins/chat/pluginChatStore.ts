@@ -71,12 +71,12 @@ function capped<K, V>(map: Map<K, V>): Map<K, V> {
 }
 
 /**
- * Where a card that just appeared belongs: the user's channel on the voice server, after its last
- * message. That includes an own message still being sent: the engine hands the user's own message
+ * Where a card that just appeared belongs: the user's channel on `serverId` (the server of the
+ * chat event the plugin answered; `null`: the voice server), after its last message. That includes an own message still being sent: the engine hands the user's own message
  * to plugins before the send returns, so a card for it (e.g. a pasted EVE fit) may come first.
  */
-function placeCard(plugin: string, card: string): PlacedCard | null {
-  const serverId = getVoiceServerId();
+function placeCard(plugin: string, card: string, server: number | null): PlacedCard | null {
+  const serverId = server ?? getVoiceServerId();
   if (serverId === null) return null;
   const channelId = selfUser(getServerStateOf(serverId))?.channelId;
   if (channelId === undefined) return null;
@@ -87,16 +87,16 @@ function placeCard(plugin: string, card: string): PlacedCard | null {
   return { plugin, card, serverId, channelId, after: last?.id ?? null };
 }
 
-/** Applies a plugin UI change: a new chat card is placed where the user is now. */
+/** Applies a plugin UI change: a new chat card is placed where the user is now on its server. */
 export function applyUi(
   state: PluginChatState,
   { plugin, change }: PluginUi,
-  place: (plugin: string, card: string) => PlacedCard | null = placeCard,
+  place: (plugin: string, card: string, serverId: number | null) => PlacedCard | null = placeCard,
 ): PluginChatState {
   if (change.type !== "setTree" || change.slot.kind !== "chatCard") return state;
   const key = cardKey(plugin, change.slot.id);
   if (state.placed.has(key)) return state;
-  const placed = place(plugin, change.slot.id);
+  const placed = place(plugin, change.slot.id, change.serverId);
   if (placed === null) return state;
   return { ...state, placed: capped(new Map(state.placed).set(key, placed)) };
 }

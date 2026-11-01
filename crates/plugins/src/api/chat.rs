@@ -26,7 +26,7 @@ impl HostApi for ChatApi {
 impl Host for PluginState {
     fn send(&mut self, text: String) -> Result<(), Error> {
         self.ctx.grants.check(&self.id, SEND_PERMISSION)?;
-        self.io()?.chat_send(&self.id, text)
+        self.io()?.chat_send(&self.id, text, self.chat.server)
     }
 
     fn line_hash(&mut self, text: String) -> u32 {
@@ -39,7 +39,8 @@ impl Host for PluginState {
 
     fn supersede(&mut self, card_id: String, sender: u32, hash: u32) -> Result<(), Error> {
         self.ctx.grants.check(&self.id, SUPERSEDE_PERMISSION)?;
-        self.io()?.supersede(&self.id, card_id, sender, hash)
+        self.io()?
+            .supersede(&self.id, card_id, sender, hash, self.chat.server)
     }
 
     fn current_message(&mut self) -> Option<u64> {

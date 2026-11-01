@@ -1,6 +1,6 @@
 //! Chat patterns (`chat.patterns`): a matching message from the engine goes to every active
 //! plugin whose pattern matches, and only when it was written in the user's current channel on
-//! the focused server. See [`crate::patterns`].
+//! that server (any connected server). See [`crate::patterns`].
 
 use std::time::Instant;
 

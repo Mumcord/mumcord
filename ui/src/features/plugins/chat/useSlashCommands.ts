@@ -6,6 +6,7 @@ import { useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type PluginCommand } from "../../../api";
 import { commandOf, matchCommands, usePluginChat } from "./pluginChatStore";
+import { getShownServerId } from "../../channels/serverStore";
 
 export function commandQuery(text: string): string | null {
   const match = /^\/([a-z0-9-]*)$/.exec(text);
@@ -94,7 +95,8 @@ export function useSlashCommands(
     setText("");
     setError(null);
     getApi()
-      .pluginRunCommand(line)
+      // The chat box belongs to the chat on screen: a reply goes to that server.
+      .pluginRunCommand(line, getShownServerId())
       .then(
         (outcome) => {
           // The plugin stopped in the meantime: give the line back rather than lose it.

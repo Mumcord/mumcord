@@ -15,6 +15,9 @@ pub enum UiInput {
         source: ActionSource,
         action: String,
         value: ActionValue,
+        /// The server whose chat the action came from (a chat card, a typed slash command):
+        /// a reply or new card from the handler goes there. `None`: the voice server.
+        server: Option<mumcord_store::ServerId>,
     },
     /// The user opened the profile card of `session`.
     ProfileCardOpened(u32),
@@ -41,12 +44,15 @@ impl PluginService {
     pub fn ui_input(&self, id: &str, input: UiInput) -> bool {
         let keys = self.ctx.peer_keys.as_ref();
         let peer = |session| find_peer(&self.io.peers(), session).map(|p| wit_peer(keys, id, &p));
+        let mut chat = crate::chat::ChatRef::default();
         let event = match input {
             UiInput::Action {
                 source,
                 action,
                 value,
+                server,
             } => {
+                chat.server = server;
                 if matches!(source, ActionSource::Command) {
                     self.command_gesture(id);
                 } else {
@@ -79,7 +85,7 @@ impl PluginService {
                 Event::WebviewMessage(text)
             }
         };
-        self.host.send(id, event)
+        self.host.send_chat(id, event, chat)
     }
 }
 

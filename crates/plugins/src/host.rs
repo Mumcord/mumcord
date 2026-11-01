@@ -325,7 +325,7 @@ impl PluginHost {
             .is_some_and(|worker| worker.queue.push(event))
     }
 
-    /// Queues a chat event (`chat-match`, `chat-trigger`) with the message it is about. A replay
+    /// Queues an event with its chat reference (the message and server it is about). A replay
     /// goes only to plugins that can tell it from a live event; otherwise like [`Self::send`].
     pub fn send_chat(&self, id: &str, event: Event, chat: ChatRef) -> bool {
         if !self.ctx.grants.allows_event(id, &event) {

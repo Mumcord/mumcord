@@ -1096,3 +1096,61 @@ fn sent(
         std::thread::sleep(std::time::Duration::from_millis(20));
     }
 }
+
+fn me_in(channel: u32) -> SelfInfo {
+    SelfInfo {
+        me: PeerInfo {
+            session: 1,
+            name: "Me".into(),
+            cert_hash: None,
+            is_friend: false,
+        },
+        channel: Some((channel, "Lobby".into())),
+        muted: false,
+        deafened: false,
+    }
+}
+
+#[test]
+fn chat_matches_come_from_every_connected_server() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    // Voice on server 1 (the echo goes out there), also connected to server 2.
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["cmds@1~dev"]}"#,
+    );
+    service.self_changed(1, me_in(3));
+    service.self_changed(2, me_in(5));
+    let cmds = service
+        .load_dev(&match_folder(
+            fx.root.path(),
+            "cmds",
+            r#","permissions":{"required":["peers.messages","chat.patterns"]},"chat_patterns":[{"pattern":"^!","description":"Commands"}]"#,
+        ))
+        .expect("loads");
+    assert_eq!(info(&service, &cmds).status, Status::Running);
+
+    // Server 2: only the user's channel there (5), not the voice server's channel number.
+    service.chat_match(2, &bob(), 3, "!wrong", None);
+    service.chat_match(2, &bob(), 5, "!a", None);
+    service.chat_match(1, &bob(), 3, "!b", None);
+    // Not connected to server 3: nothing.
+    service.chat_match(3, &bob(), 5, "!none", None);
+
+    let wait = std::time::Duration::from_millis(500);
+    let mut got: Vec<Vec<u8>> = sent(&mut service, &mut host_events, &mut events, wait)
+        .into_iter()
+        .map(|(_, _, text)| text)
+        .collect();
+    got.sort();
+    assert_eq!(got, [b"!a".to_vec(), b"!b".to_vec()]);
+}

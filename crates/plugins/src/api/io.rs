@@ -5,6 +5,8 @@
 
 use std::fmt::Debug;
 
+use mumcord_store::ServerId;
+
 use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{BotInfo, Error, Peer};
 use crate::runtime::wit::ui::{Node, Slot, UserMenuFilter};
@@ -13,11 +15,20 @@ use crate::runtime::wit::webview::Place;
 /// Carries out what a plugin asks of the UI, other users and the chat. `plugin` is the id of
 /// the calling plugin; its permission for the call has already been checked.
 ///
+/// `server` on chat-facing calls is the server of the event the plugin is handling (see
+/// [`crate::chat::ChatRef`]); `None` outside a chat event, where the voice server is meant.
+///
 /// Every method runs on the plugin's own thread inside its call budget (50 ms, 500 ms during
 /// `start`), so it must return quickly: queue work, don't wait for the network or the UI.
 pub trait PluginIo: Send + Sync + Debug {
-    /// `ui.set-tree`: replaces the tree of a slot.
-    fn set_tree(&self, plugin: &str, slot: Slot, nodes: Vec<Node>) -> Result<(), Error>;
+    /// `ui.set-tree`: replaces the tree of a slot. A new chat card goes into `server`'s chat.
+    fn set_tree(
+        &self,
+        plugin: &str,
+        slot: Slot,
+        nodes: Vec<Node>,
+        server: Option<ServerId>,
+    ) -> Result<(), Error>;
     /// `ui.clear`.
     fn clear(&self, plugin: &str, slot: Slot);
     /// `ui.open-dialog` and `ui.open-dialog-with`.
@@ -52,14 +63,20 @@ pub trait PluginIo: Send + Sync + Debug {
     fn presence(&self, plugin: &str) -> Result<Vec<Peer>, Error>;
     /// `peers.bot`: the bot info of a user in the user's channel.
     fn bot(&self, plugin: &str, session: u32) -> Result<Option<BotInfo>, Error>;
-    /// `chat.send`: posts "[Name] text" if a user gesture allows it.
-    fn chat_send(&self, plugin: &str, text: String) -> Result<(), Error>;
+    /// `chat.send`: posts "[Name] text" into `server`'s chat if a user gesture allows it.
+    fn chat_send(&self, plugin: &str, text: String, server: Option<ServerId>) -> Result<(), Error>;
     /// `chat.line-hash`: the hash of the line `chat_send` would post (it includes the plugin's
     /// name, which only the implementation knows).
     fn line_hash(&self, plugin: &str, text: &str) -> u32;
-    /// `chat.supersede`.
-    fn supersede(&self, plugin: &str, card_id: String, sender: u32, hash: u32)
-    -> Result<(), Error>;
+    /// `chat.supersede`: `sender` is a session on `server`.
+    fn supersede(
+        &self,
+        plugin: &str,
+        card_id: String,
+        sender: u32,
+        hash: u32,
+        server: Option<ServerId>,
+    ) -> Result<(), Error>;
     /// `chat.replace` (`card` set) and `chat.hide` (`None`): `token` must be one the host issued
     /// to `plugin` with a chat event. Hosts without a chat refuse it.
     fn replace_message(

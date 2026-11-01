@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri_specta::Event;
 
+use crate::commands::types::{ServerId, to_api_server_id};
+
 /// Where a plugin tree is shown.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
@@ -298,6 +300,9 @@ pub enum PluginUiChange {
     SetTree {
         slot: PluginSlot,
         nodes: Vec<PluginNode>,
+        /// For a chat card: the server whose chat a new card goes into (`None`: the voice
+        /// server, and for every other slot).
+        server_id: Option<ServerId>,
     },
     /// Removes the slot's tree.
     Clear { slot: PluginSlot },
@@ -580,9 +585,14 @@ impl PluginUiChange {
 impl From<UiUpdate> for PluginUiChange {
     fn from(update: UiUpdate) -> Self {
         match update {
-            UiUpdate::SetTree { slot, nodes } => Self::SetTree {
+            UiUpdate::SetTree {
+                slot,
+                nodes,
+                server,
+            } => Self::SetTree {
                 slot: slot.into(),
                 nodes: nodes.into_iter().map(Into::into).collect(),
+                server_id: server.map(to_api_server_id),
             },
             UiUpdate::Clear { slot } => Self::Clear { slot: slot.into() },
             UiUpdate::OpenDialog { title, subtitle } => Self::OpenDialog { title, subtitle },
@@ -627,7 +637,7 @@ pub struct Trees {
 impl Trees {
     pub fn apply(&mut self, plugin: &str, change: &PluginUiChange) {
         match change {
-            PluginUiChange::SetTree { slot, nodes } => {
+            PluginUiChange::SetTree { slot, nodes, .. } => {
                 self.trees
                     .entry(plugin.to_owned())
                     .or_default()
@@ -695,6 +705,7 @@ impl Trees {
                     change: PluginUiChange::SetTree {
                         slot: slot.clone(),
                         nodes: nodes.clone(),
+                        server_id: None,
                     },
                 });
             }
@@ -813,7 +824,14 @@ mod tests {
     }
 
     fn set(trees: &mut Trees, slot: PluginSlot, nodes: Vec<PluginNode>) {
-        trees.apply("poll", &PluginUiChange::SetTree { slot, nodes });
+        trees.apply(
+            "poll",
+            &PluginUiChange::SetTree {
+                slot,
+                nodes,
+                server_id: None,
+            },
+        );
     }
 
     #[test]
@@ -832,6 +850,7 @@ mod tests {
         let change: PluginUiChange = UiUpdate::SetTree {
             slot: wit::Slot::ChatCard("poll-1".into()),
             nodes: vec![wit_node],
+            server: Some(2),
         }
         .into();
         assert_eq!(
@@ -851,10 +870,12 @@ mod tests {
                     animation: Some(PluginAnimation::Hop),
                     children: vec![],
                 }],
+                server_id: Some(2),
             }
         );
         let json = serde_json::to_value(&change).expect("serialises");
         assert_eq!(json["type"], "setTree");
+        assert_eq!(json["serverId"], 2);
         assert_eq!(json["slot"]["kind"], "chatCard");
         assert_eq!(json["nodes"][0]["component"]["type"], "button");
     }

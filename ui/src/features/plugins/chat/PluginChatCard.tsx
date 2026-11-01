@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import type { ChatMessage, PluginSlot } from "../../../api";
 import { PluginTree } from "../render/PluginTree";
 import { usePluginTree } from "../render/pluginUiStore";
+import { useShownServerId } from "../../channels/serverStore";
 import { usePluginIcon } from "../render/usePluginIcon";
 import {
   cardsAfter,
@@ -41,6 +42,8 @@ export function PluginChatCard({
   const { names } = usePluginChat();
   const slot = useMemo<PluginSlot>(() => ({ kind: "chatCard", id: card }), [card]);
   const nodes = usePluginTree(plugin, slot);
+  // Cards show only in the chat on screen: replies to their buttons go to that server.
+  const serverId = useShownServerId();
   if (nodes === undefined) return null;
   const name = names.get(plugin) ?? plugin;
   return (
@@ -52,7 +55,7 @@ export function PluginChatCard({
         </header>
       ) : null}
       <CardBody>
-        <PluginTree plugin={plugin} slot={slot} nodes={nodes} />
+        <PluginTree plugin={plugin} slot={slot} nodes={nodes} serverId={serverId} />
       </CardBody>
     </section>
   );

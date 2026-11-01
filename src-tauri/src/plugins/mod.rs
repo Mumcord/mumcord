@@ -443,20 +443,18 @@ async fn on_service_event(
             plugin,
             outgoing,
         } => feed::send(plugins, engine, server, plugin, outgoing),
-        ServiceEvent::ChatPost { plugin, line } => {
-            let Some(server) = engine.voice_server() else {
-                tracing::debug!(plugin, "plugin chat line dropped: not connected");
-                return Ok(());
-            };
-            match feed::post_line(engine, server, &line).await {
-                Ok(message) => crate::commands::chat::MessageReceived {
-                    server_id: crate::commands::types::to_api_server_id(server),
-                    message: message.into(),
-                }
-                .emit(app)?,
-                Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
+        ServiceEvent::ChatPost {
+            plugin,
+            server,
+            line,
+        } => match feed::post_line(engine, server, &line).await {
+            Ok(message) => crate::commands::chat::MessageReceived {
+                server_id: crate::commands::types::to_api_server_id(server),
+                message: message.into(),
             }
-        }
+            .emit(app)?,
+            Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
+        },
         ServiceEvent::Supersede {
             plugin,
             card,
@@ -506,7 +504,12 @@ pub struct PluginSupersede {
 
 /// Engine events the plugins care about besides their own stream: the focused server and
 /// incoming chat lines (supersede check).
-pub fn on_engine_event(app: &AppHandle, event: &mumcord_engine::EngineEvent) {
+pub fn on_engine_event(
+    app: &AppHandle,
+    server_id: crate::commands::types::ServerId,
+    event: &mumcord_engine::EngineEvent,
+) {
+    let server_id = crate::commands::types::to_engine_server_id(server_id);
     let Ok(plugins) = state(app) else {
         return;
     };
@@ -521,7 +524,7 @@ pub fn on_engine_event(app: &AppHandle, event: &mumcord_engine::EngineEvent) {
             let plugins = Arc::clone(&plugins);
             tauri::async_runtime::spawn(async move {
                 let result = plugins
-                    .call(move |service| Ok(service.chat_text(id, sender, &line)))
+                    .call(move |service| Ok(service.chat_text(server_id, id, sender, &line)))
                     .await;
                 // A match arrives as a `Supersede` service event; nothing to do here.
                 if let Err(e) = result {

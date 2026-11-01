@@ -34,6 +34,8 @@ export interface PluginTreeProps {
   plugin: string;
   slot: PluginSlot;
   nodes: readonly PluginNode[];
+  /** The server whose chat shows this tree (chat cards): a reply to an action goes there. */
+  serverId?: number | null;
 }
 
 const JUSTIFY = { start: "flex-start", end: "flex-end", spaceBetween: "space-between" } as const;
@@ -130,7 +132,7 @@ function renderNode(
   return <div className={`pr-anim pr-anim--${node.animation}`}>{content}</div>;
 }
 
-export function PluginTree({ plugin, slot, nodes }: PluginTreeProps) {
+export function PluginTree({ plugin, slot, nodes, serverId = null }: PluginTreeProps) {
   const { t } = useTranslation("pluginSlots");
   const reducedMotion = useReducedMotion();
   const [failed, setFailed] = useState(false);
@@ -139,13 +141,13 @@ export function PluginTree({ plugin, slot, nodes }: PluginTreeProps) {
     (action: string, value: PluginActionValue) => {
       setFailed(false);
       getApi()
-        .pluginUiAction(plugin, slot, action, value)
+        .pluginUiAction(plugin, slot, action, value, serverId)
         .catch((error: unknown) => {
           console.error("A plugin action failed", error);
           setFailed(true);
         });
     },
-    [plugin, slot],
+    [plugin, slot, serverId],
   );
 
   const ctx = useMemo<RenderContext>(

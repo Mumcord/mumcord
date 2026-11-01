@@ -1,6 +1,6 @@
 //! Chat triggers (`chat.triggers`): a trigger line from the engine goes to the one plugin that
-//! owns the word, and only when it was written in the user's current channel on the focused
-//! server. See [`crate::triggers`].
+//! owns the word, and only when it was written in the user's current channel on that server
+//! (any connected server). See [`crate::triggers`].
 
 use std::time::Instant;
 

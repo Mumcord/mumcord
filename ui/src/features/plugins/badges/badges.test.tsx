@@ -42,7 +42,7 @@ function setTree(pluginId: string, kind: "memberBadge" | "profileCard", label: s
   act(() => {
     api.mock.emit("pluginUi", {
       plugin: pluginId,
-      change: { type: "setTree", slot: { kind, session: 7 }, nodes: text(label) },
+      change: { type: "setTree", slot: { kind, session: 7 }, nodes: text(label), serverId: null },
     });
   });
 }

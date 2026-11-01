@@ -312,6 +312,8 @@ pub enum Supersede {
 
 #[derive(Debug)]
 struct PendingCard {
+    /// Sessions are per server: a card only pairs with a line of its own server.
+    server: ServerId,
     plugin: String,
     /// Only lines with this plugin's "[Name] " prefix can be hidden.
     plugin_name: String,
@@ -323,6 +325,7 @@ struct PendingCard {
 
 #[derive(Debug)]
 struct SeenLine {
+    server: ServerId,
     message: u64,
     /// The plugin name of the line's "[Name] " prefix, if it has one.
     poster: Option<String>,
@@ -345,11 +348,13 @@ impl SupersedeTracker {
         self.lines.retain(|l| fresh(l.at));
     }
 
-    /// `chat.supersede`: a card for a line from `sender` with `hash`. If the line was already
-    /// shown, returns the replacement now; otherwise waits for it. Only a line the plugin posted
-    /// itself (its "[Name] " prefix) can be hidden, so no plugin can hide what others write.
+    /// `chat.supersede`: a card for a line from `sender` with `hash` on `server`. If the line was
+    /// already shown, returns the replacement now; otherwise waits for it. Only a line the plugin
+    /// posted itself (its "[Name] " prefix) can be hidden, so no plugin can hide what others write.
+    #[allow(clippy::too_many_arguments)]
     pub fn card(
         &mut self,
+        server: ServerId,
         plugin: &str,
         plugin_name: &str,
         card: &str,
@@ -359,7 +364,10 @@ impl SupersedeTracker {
     ) -> Supersede {
         self.prune(now);
         if let Some(index) = self.lines.iter().position(|l| {
-            l.sender == sender && l.hash == hash && l.poster.as_deref() == Some(plugin_name)
+            l.server == server
+                && l.sender == sender
+                && l.hash == hash
+                && l.poster.as_deref() == Some(plugin_name)
         }) {
             let line = self.lines.remove(index);
             return Supersede::Replace {
@@ -368,6 +376,7 @@ impl SupersedeTracker {
             };
         }
         self.cards.push(PendingCard {
+            server,
             plugin: plugin.to_owned(),
             plugin_name: plugin_name.to_owned(),
             card: card.to_owned(),
@@ -378,13 +387,24 @@ impl SupersedeTracker {
         Supersede::None
     }
 
-    /// An incoming text message with the line's plain text. Only the hash is remembered.
-    pub fn text(&mut self, message: u64, sender: u32, line: &str, now: Instant) -> Supersede {
+    /// An incoming text message on `server` with the line's plain text. Only the hash is
+    /// remembered.
+    pub fn text(
+        &mut self,
+        server: ServerId,
+        message: u64,
+        sender: u32,
+        line: &str,
+        now: Instant,
+    ) -> Supersede {
         self.prune(now);
         let hash = hash_line(line);
         let poster = poster(line);
         if let Some(index) = self.cards.iter().position(|c| {
-            c.sender == sender && c.hash == hash && poster == Some(c.plugin_name.as_str())
+            c.server == server
+                && c.sender == sender
+                && c.hash == hash
+                && poster == Some(c.plugin_name.as_str())
         }) {
             let card = self.cards.remove(index);
             return Supersede::Replace {
@@ -393,6 +413,7 @@ impl SupersedeTracker {
             };
         }
         self.lines.push(SeenLine {
+            server,
             message,
             poster: poster.map(str::to_owned),
             sender,
@@ -407,10 +428,12 @@ impl SupersedeTracker {
         self.cards.retain(|c| c.plugin != plugin);
     }
 
-    /// The sender left the server.
-    pub fn forget_session(&mut self, sender: u32) {
-        self.cards.retain(|c| c.sender != sender);
-        self.lines.retain(|l| l.sender != sender);
+    /// The sender left `server`.
+    pub fn forget_session(&mut self, server: ServerId, sender: u32) {
+        self.cards
+            .retain(|c| c.server != server || c.sender != sender);
+        self.lines
+            .retain(|l| l.server != server || l.sender != sender);
     }
 }
 
@@ -430,6 +453,9 @@ pub struct ChatRef {
     pub token: Option<u64>,
     /// The message came from stored history, not live: render only, no side effects.
     pub replay: bool,
+    /// The server the event came from: replies (`chat.send`), new chat cards and supersedes go
+    /// to this server's chat. `None` for events of no chat (timers, panels): the voice server.
+    pub server: Option<ServerId>,
 }
 
 /// A message a plugin was handed in a `chat-match` or `chat-trigger` event and may therefore
@@ -682,9 +708,10 @@ mod tests {
         let t0 = Instant::now();
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
-        assert_eq!(s.text(7, 3, line, t0), Supersede::None);
+        assert_eq!(s.text(1, 7, 3, line, t0), Supersede::None);
         assert_eq!(
             s.card(
+                1,
                 "poll",
                 "Poll",
                 "c1",
@@ -705,11 +732,11 @@ mod tests {
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
         assert_eq!(
-            s.card("poll", "Poll", "c1", 3, hash_line(line), t0),
+            s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0),
             Supersede::None
         );
         assert_eq!(
-            s.text(9, 3, line, t0 + Duration::from_secs(3)),
+            s.text(1, 9, 3, line, t0 + Duration::from_secs(3)),
             Supersede::Replace {
                 card: "c1".into(),
                 message: 9
@@ -722,10 +749,10 @@ mod tests {
         let t0 = Instant::now();
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
-        s.card("poll", "Poll", "c1", 3, hash_line(line), t0);
-        assert_eq!(s.text(1, 4, line, t0), Supersede::None);
+        s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0);
+        assert_eq!(s.text(1, 1, 4, line, t0), Supersede::None);
         assert_eq!(
-            s.text(2, 3, line, t0 + Duration::from_millis(10_001)),
+            s.text(1, 2, 3, line, t0 + Duration::from_millis(10_001)),
             Supersede::None
         );
     }
@@ -735,9 +762,9 @@ mod tests {
         let t0 = Instant::now();
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
-        s.card("poll", "Poll", "c1", 3, hash_line(line), t0);
+        s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0);
         s.forget_plugin("poll");
-        assert_eq!(s.text(1, 3, line, t0), Supersede::None);
+        assert_eq!(s.text(1, 1, 3, line, t0), Supersede::None);
     }
 
     #[test]
@@ -746,23 +773,48 @@ mod tests {
         let mut s = SupersedeTracker::default();
         let foreign = "Lunch?";
         let other = "[Dice] Lunch?";
-        s.text(1, 3, foreign, t0);
-        s.text(2, 3, other, t0);
+        s.text(1, 1, 3, foreign, t0);
+        s.text(1, 2, 3, other, t0);
         assert_eq!(
-            s.card("poll", "Poll", "c1", 3, hash_line(foreign), t0),
+            s.card(1, "poll", "Poll", "c1", 3, hash_line(foreign), t0),
             Supersede::None,
             "a line without a prefix"
         );
         assert_eq!(
-            s.card("poll", "Poll", "c2", 3, hash_line(other), t0),
+            s.card(1, "poll", "Poll", "c2", 3, hash_line(other), t0),
             Supersede::None,
             "another plugin's line"
         );
-        s.card("poll", "Poll", "c3", 4, hash_line("x"), t0);
+        s.card(1, "poll", "Poll", "c3", 4, hash_line("x"), t0);
         assert_eq!(
-            s.text(5, 4, "x", t0),
+            s.text(1, 5, 4, "x", t0),
             Supersede::None,
             "card first, no prefix"
+        );
+    }
+
+    #[test]
+    fn a_card_only_hides_a_line_of_its_own_server() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let line = "[Poll] Lunch?";
+        s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0);
+        assert_eq!(
+            s.text(2, 7, 3, line, t0),
+            Supersede::None,
+            "same session number, other server"
+        );
+        assert_eq!(
+            s.card(1, "poll", "Poll", "c2", 3, hash_line(line), t0),
+            Supersede::None,
+            "the other server's line stays visible"
+        );
+        assert_eq!(
+            s.text(1, 8, 3, line, t0),
+            Supersede::Replace {
+                card: "c1".into(),
+                message: 8
+            }
         );
     }
 

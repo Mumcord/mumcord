@@ -63,6 +63,9 @@ pub enum UiUpdate {
     SetTree {
         slot: Slot,
         nodes: Vec<Node>,
+        /// For a chat card: the server whose chat a new card goes into (the server of the event
+        /// the plugin was handling, else the voice server). `None` for other slots.
+        server: Option<ServerId>,
     },
     Clear {
         slot: Slot,
@@ -205,10 +208,16 @@ impl ServiceIo {
 
     /// An incoming channel text line (plain text, as other clients see it); pairs it with a
     /// pending card. Only its hash is kept.
-    pub fn chat_text(&self, message: u64, sender: u32, line: &str) -> Supersede {
+    pub fn chat_text(&self, server: ServerId, message: u64, sender: u32, line: &str) -> Supersede {
         self.chat()
             .supersede
-            .text(message, sender, line, Instant::now())
+            .text(server, message, sender, line, Instant::now())
+    }
+
+    /// The server a chat call goes to: the one of the event being handled, else the voice
+    /// server. Never another one, so a reply or card stays in the chat its event came from.
+    fn chat_server(&self, event_server: Option<ServerId>) -> Option<ServerId> {
+        event_server.or(self.peers().focused)
     }
 
     /// The opaque token plugin `plugin` gets for a message it is handed in a chat event.
@@ -252,8 +261,24 @@ impl ServiceIo {
 }
 
 impl PluginIo for ServiceIo {
-    fn set_tree(&self, plugin: &str, slot: Slot, nodes: Vec<Node>) -> Result<(), Error> {
-        self.ui(plugin, UiUpdate::SetTree { slot, nodes });
+    fn set_tree(
+        &self,
+        plugin: &str,
+        slot: Slot,
+        nodes: Vec<Node>,
+        server: Option<ServerId>,
+    ) -> Result<(), Error> {
+        let server = matches!(slot, Slot::ChatCard(_))
+            .then(|| self.chat_server(server))
+            .flatten();
+        self.ui(
+            plugin,
+            UiUpdate::SetTree {
+                slot,
+                nodes,
+                server,
+            },
+        );
         Ok(())
     }
 
@@ -408,7 +433,7 @@ impl PluginIo for ServiceIo {
             .collect())
     }
 
-    fn chat_send(&self, plugin: &str, text: String) -> Result<(), Error> {
+    fn chat_send(&self, plugin: &str, text: String, server: Option<ServerId>) -> Result<(), Error> {
         let name = self.name(plugin);
         let line = self
             .chat()
@@ -419,8 +444,13 @@ impl PluginIo for ServiceIo {
                 chat::SendError::TooLarge => Error::TooLarge,
                 chat::SendError::Invalid => Error::Invalid,
             })?;
+        let Some(server) = self.chat_server(server) else {
+            tracing::debug!(plugin, "plugin chat line dropped: not connected");
+            return Ok(());
+        };
         self.emit(ServiceEvent::ChatPost {
             plugin: plugin.to_owned(),
+            server,
             line,
         });
         Ok(())
@@ -436,12 +466,21 @@ impl PluginIo for ServiceIo {
         card_id: String,
         sender: u32,
         hash: u32,
+        server: Option<ServerId>,
     ) -> Result<(), Error> {
+        let Some(server) = self.chat_server(server) else {
+            return Ok(());
+        };
         let name = self.name(plugin);
-        let result =
-            self.chat()
-                .supersede
-                .card(plugin, &name, &card_id, sender, hash, Instant::now());
+        let result = self.chat().supersede.card(
+            server,
+            plugin,
+            &name,
+            &card_id,
+            sender,
+            hash,
+            Instant::now(),
+        );
         if let Supersede::Replace { card, message } = result {
             self.emit(ServiceEvent::Supersede {
                 plugin: plugin.to_owned(),
@@ -616,18 +655,19 @@ mod tests {
                 messaging: None,
             },
         );
+        io.peers().focused = Some(1);
         assert_eq!(
-            io.chat_send("dice", "rolled 4".into()),
+            io.chat_send("dice", "rolled 4".into(), None),
             Err(Error::NotPermitted)
         );
         io.gesture("dice");
-        assert_eq!(io.chat_send("dice", "rolled 4".into()), Ok(()));
+        assert_eq!(io.chat_send("dice", "rolled 4".into(), None), Ok(()));
         assert!(matches!(
             rx.try_recv(),
-            Ok(ServiceEvent::ChatPost { line, .. }) if line == "[Dice] rolled 4"
+            Ok(ServiceEvent::ChatPost { line, server: 1, .. }) if line == "[Dice] rolled 4"
         ));
         assert_eq!(
-            io.chat_send("dice", "again".into()),
+            io.chat_send("dice", "again".into(), None),
             Err(Error::NotPermitted)
         );
         assert_eq!(io.line_hash("dice", "x"), chat::line_hash("Dice", "x"));
@@ -645,11 +685,90 @@ mod tests {
             },
         );
         let hash = chat::line_hash("Poll", "Lunch?");
-        assert_eq!(io.chat_text(11, 3, "[Poll] Lunch?"), Supersede::None);
-        io.supersede("poll", "c1".into(), 3, hash).expect("ok");
+        assert_eq!(io.chat_text(2, 11, 3, "[Poll] Lunch?"), Supersede::None);
+        io.supersede("poll", "c1".into(), 3, hash, Some(2))
+            .expect("ok");
         assert!(matches!(
             rx.try_recv(),
             Ok(ServiceEvent::Supersede { card, message: 11, .. }) if card.as_deref() == Some("c1")
+        ));
+    }
+
+    #[test]
+    fn replies_and_cards_stay_in_the_chat_their_event_came_from() {
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        io.peers().plugins.insert(
+            "poll".into(),
+            PluginMeta {
+                name: "Poll".into(),
+                messaging: None,
+            },
+        );
+        // The user talks on server 1 and reads the chat of server 2.
+        io.peers().focused = Some(1);
+
+        io.gesture("poll");
+        io.chat_send("poll", "Lunch?".into(), Some(2))
+            .expect("sent");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::ChatPost { server: 2, .. })
+        ));
+        let card = Slot::ChatCard("c1".into());
+        io.set_tree("poll", card.clone(), vec![], Some(2))
+            .expect("shown");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::SetTree {
+                    server: Some(2),
+                    ..
+                },
+                ..
+            })
+        ));
+        io.set_tree("poll", Slot::Panel, vec![], Some(2))
+            .expect("shown");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::SetTree { server: None, .. },
+                ..
+            })
+        ));
+
+        // Same session number on both servers: only server 2's line is the card's.
+        let hash = chat::line_hash("Poll", "Lunch?");
+        io.chat_text(1, 10, 3, "[Poll] Lunch?");
+        io.supersede("poll", "c1".into(), 3, hash, Some(2))
+            .expect("ok");
+        assert!(rx.try_recv().is_err(), "server 1's line stays");
+        assert_eq!(
+            io.chat_text(2, 11, 3, "[Poll] Lunch?"),
+            Supersede::Replace {
+                card: "c1".into(),
+                message: 11
+            }
+        );
+
+        // Outside a chat event (a timer, an old plugin): the voice server, as before.
+        io.gesture("poll");
+        io.chat_send("poll", "Results".into(), None).expect("sent");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::ChatPost { server: 1, .. })
+        ));
+        io.set_tree("poll", card, vec![], None).expect("shown");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::SetTree {
+                    server: Some(1),
+                    ..
+                },
+                ..
+            })
         ));
     }
 
