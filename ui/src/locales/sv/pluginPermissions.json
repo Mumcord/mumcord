@@ -27,5 +27,8 @@
     "netHttp": "Prata med en server som du väljer",
     "secrets": "Spara en hemlighet (t.ex. en API-nyckel) i systemets nyckelring",
     "uiWebview": "Visa eget webbinnehåll i en isolerad ram (utan internet)"
-  }
+  },
+  "requiredReason": "Krävs för att tillägget ska fungera",
+  "optionalReason": "Valfri: kan stängas av när som helst",
+  "listLabel": "Behörigheter"
 }

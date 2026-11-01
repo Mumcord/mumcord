@@ -32,9 +32,7 @@
   "mayAskFor": "Tento doplnok môže požiadať o",
   "prompt": {
     "title": "Nainštalovať {{name}}?",
-    "subtitle": "{{name}} {{version}} · od {{authors}}",
     "preparing": "Kontroluje sa {{name}}…",
-    "visibility": "Kto uvidí, že ho používate",
     "visibilityEveryone": "Všetci",
     "visibilityFriends": "Priatelia",
     "visibilityNobody": "Nikto",
@@ -52,7 +50,13 @@
       "done": "Nainštalované",
       "failed": "Inštalácia zlyhala"
     },
-    "failed": "Doplnok {{name}} sa nepodarilo nainštalovať."
+    "failed": "Doplnok {{name}} sa nepodarilo nainštalovať.",
+    "intro": "{{name}} žiada o tieto oprávnenia. Voliteľné môžete vypnúť teraz alebo neskôr.",
+    "visibilityTitle": "Kto uvidí, že používate {{name}}",
+    "visibilityHintEveryone": "Všetci: uvidia to všetci používatelia tohto pluginu.",
+    "visibilityHintFriends": "Priatelia: uvidia to len vaši priatelia.",
+    "visibilityHintNobody": "Nikto: nič sa neodosiela, ostatní to neuvidia.",
+    "footnote": "Neskôr zmeníte v časti Nastavenia → Pluginy."
   },
   "toast": {
     "installed": "Doplnok {{name}} bol nainštalovaný",

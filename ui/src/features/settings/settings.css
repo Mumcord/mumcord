@@ -636,6 +636,17 @@
   font-size: var(--font-size-lg);
 }
 
+.settings-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.settings-dialog__title--tight {
+  margin: 0;
+}
+
 @media (max-width: 40rem) {
   .settings {
     flex-direction: column;

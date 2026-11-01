@@ -27,5 +27,8 @@
     "netHttp": "Suhelda sinu valitud serveriga",
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
     "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)"
-  }
+  },
+  "requiredReason": "Vajalik, et plugin töötaks",
+  "optionalReason": "Valikuline: saab igal ajal välja lülitada",
+  "listLabel": "Õigused"
 }

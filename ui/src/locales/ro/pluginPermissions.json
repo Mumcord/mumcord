@@ -27,5 +27,8 @@
     "netHttp": "Comunică cu un server ales de tine",
     "secrets": "Păstrează un secret (de ex. o cheie API) în breasla de chei a sistemului",
     "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)"
-  }
+  },
+  "requiredReason": "Necesar pentru ca pluginul să funcționeze",
+  "optionalReason": "Opțional: poate fi dezactivat oricând",
+  "listLabel": "Permisiuni"
 }

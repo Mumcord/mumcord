@@ -1,34 +1,108 @@
 /* Permission list (FR-6.60). Risk colours come from theme tokens so every theme stays readable;
-   the symbol and the "High risk" text carry the meaning without colour. */
-.perm-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.perm-heading {
-  margin: 0 0 var(--space-1);
-  font-size: 0.875rem;
-}
-
+   the text ("High risk" badge or hidden label) carries the meaning without colour. */
 .perm-rows {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
 }
 
-.perm-row,
+.perm-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.perm-row:last-child {
+  border-bottom: none;
+}
+
 .perm-label {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  flex: 1;
+  cursor: pointer;
 }
 
-.perm-label {
+.perm-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+}
+
+.perm-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.perm-text {
+  font-weight: 600;
+}
+
+.perm-reason {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.perm-chip {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.perm-switch {
+  flex: none;
+  appearance: none;
+  position: relative;
+  width: 2.25rem;
+  height: 1.25rem;
+  margin: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
   cursor: pointer;
+}
+
+.perm-switch::after {
+  content: "";
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: var(--radius-full);
+  background: var(--color-text-secondary);
+  transition: transform 0.15s;
+}
+
+.perm-switch:checked {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.perm-switch:checked::after {
+  background: var(--color-on-accent);
+  transform: translateX(1rem);
+}
+
+.perm-switch:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.perm-switch:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .perm-risk-green {

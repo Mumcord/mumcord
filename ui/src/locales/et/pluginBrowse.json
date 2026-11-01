@@ -32,9 +32,7 @@
   "mayAskFor": "See plugin võib küsida",
   "prompt": {
     "title": "Kas paigaldada {{name}}?",
-    "subtitle": "{{name}} {{version}} · autor: {{authors}}",
     "preparing": "{{name}} kontrollimine…",
-    "visibility": "Kes näeb, et sa seda kasutad",
     "visibilityEveryone": "Kõik",
     "visibilityFriends": "Sõbrad",
     "visibilityNobody": "Mitte keegi",
@@ -52,7 +50,13 @@
       "done": "Paigaldatud",
       "failed": "Paigaldamine ebaõnnestus"
     },
-    "failed": "Pluginat {{name}} ei õnnestunud paigaldada."
+    "failed": "Pluginat {{name}} ei õnnestunud paigaldada.",
+    "intro": "{{name}} küsib neid õigusi. Valikulisi saab välja lülitada nüüd või hiljem.",
+    "visibilityTitle": "Kes näeb, et kasutad {{name}}",
+    "visibilityHintEveryone": "Kõik: kõik selle plugina kasutajad näevad seda.",
+    "visibilityHintFriends": "Sõbrad: seda näevad ainult sinu sõbrad.",
+    "visibilityHintNobody": "Keegi: midagi ei saadeta, teised ei näe.",
+    "footnote": "Hiljem muudetav: Seaded → Pluginad."
   },
   "toast": {
     "installed": "{{name}} paigaldatud",

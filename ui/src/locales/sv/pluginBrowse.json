@@ -32,9 +32,7 @@
   "mayAskFor": "Det här tillägget kan be om",
   "prompt": {
     "title": "Installera {{name}}?",
-    "subtitle": "{{name}} {{version}} · av {{authors}}",
     "preparing": "Kontrollerar {{name}}…",
-    "visibility": "Vem som kan se att du använder det",
     "visibilityEveryone": "Alla",
     "visibilityFriends": "Vänner",
     "visibilityNobody": "Ingen",
@@ -52,7 +50,13 @@
       "done": "Installerat",
       "failed": "Installationen misslyckades"
     },
-    "failed": "{{name}} kunde inte installeras."
+    "failed": "{{name}} kunde inte installeras.",
+    "intro": "{{name}} ber om dessa behörigheter. Valfria kan stängas av nu eller senare.",
+    "visibilityTitle": "Vem kan se att du använder {{name}}",
+    "visibilityHintEveryone": "Alla: alla som använder detta tillägg kan se det.",
+    "visibilityHintFriends": "Vänner: bara dina vänner kan se det.",
+    "visibilityHintNobody": "Ingen: inget skickas, andra kan inte se det.",
+    "footnote": "Kan ändras senare under Inställningar → Tillägg."
   },
   "toast": {
     "installed": "{{name}} installerat",

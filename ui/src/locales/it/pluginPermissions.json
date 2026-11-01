@@ -27,5 +27,8 @@
     "netHttp": "Comunicare con un server a tua scelta",
     "secrets": "Conservare un segreto (ad es. una chiave API) nel portachiavi del sistema",
     "uiWebview": "Mostrare contenuti web propri in un riquadro isolato (senza internet)"
-  }
+  },
+  "requiredReason": "Necessario per il funzionamento del plugin",
+  "optionalReason": "Facoltativo: disattivabile in qualsiasi momento",
+  "listLabel": "Permessi"
 }

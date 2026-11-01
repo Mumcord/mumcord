@@ -32,9 +32,7 @@
   "mayAskFor": "Dieses Plugin kann anfragen",
   "prompt": {
     "title": "{{name}} installieren?",
-    "subtitle": "{{name}} {{version}} · von {{authors}}",
     "preparing": "{{name}} wird geprüft…",
-    "visibility": "Wer sehen kann, dass du es nutzt",
     "visibilityEveryone": "Alle",
     "visibilityFriends": "Freunde",
     "visibilityNobody": "Niemand",
@@ -52,7 +50,13 @@
       "done": "Installiert",
       "failed": "Installation fehlgeschlagen"
     },
-    "failed": "{{name}} konnte nicht installiert werden."
+    "failed": "{{name}} konnte nicht installiert werden.",
+    "intro": "{{name}} bittet um diese Berechtigungen. Optionale kannst du jetzt oder später ausschalten.",
+    "visibilityTitle": "Wer sehen kann, dass du {{name}} nutzt",
+    "visibilityHintEveryone": "Alle: alle Nutzer dieses Plugins sehen es.",
+    "visibilityHintFriends": "Freunde: nur deine Freunde sehen es.",
+    "visibilityHintNobody": "Niemand: nichts wird gesendet, andere sehen es nicht.",
+    "footnote": "Später änderbar unter Einstellungen → Plugins."
   },
   "toast": {
     "installed": "{{name}} installiert",

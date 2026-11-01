@@ -27,5 +27,8 @@
     "netHttp": "Łączyć się z wybranym przez Ciebie serwerem",
     "secrets": "Przechowywać sekret (np. klucz API) w systemowym pęku kluczy",
     "uiWebview": "Pokazywać własną treść internetową w izolowanej ramce (bez internetu)"
-  }
+  },
+  "requiredReason": "Wymagane, aby wtyczka działała",
+  "optionalReason": "Opcjonalne: można wyłączyć w dowolnej chwili",
+  "listLabel": "Uprawnienia"
 }

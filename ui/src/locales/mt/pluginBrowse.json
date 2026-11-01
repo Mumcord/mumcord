@@ -32,9 +32,7 @@
   "mayAskFor": "Dan il-plagin jista' jitlob",
   "prompt": {
     "title": "Tinstalla {{name}}?",
-    "subtitle": "{{name}} {{version}} · minn {{authors}}",
     "preparing": "Qed jiġi ċċekkjat {{name}}…",
-    "visibility": "Min jista' jara li qed tużah",
     "visibilityEveryone": "Kulħadd",
     "visibilityFriends": "Ħbieb",
     "visibilityNobody": "Ħadd",
@@ -52,7 +50,13 @@
       "done": "Installat",
       "failed": "L-installazzjoni falliet"
     },
-    "failed": "{{name}} ma setax jiġi installat."
+    "failed": "{{name}} ma setax jiġi installat.",
+    "intro": "{{name}} jitlob dawn il-permessi. Dawk fakultattivi tistgħu tdawwluhom issa jew aktar tard.",
+    "visibilityTitle": "Min jista' jara li qed tuża {{name}}",
+    "visibilityHintEveryone": "Kulħadd: jarawh l-utenti kollha ta' dan il-plugin.",
+    "visibilityHintFriends": "Ħbieb: jarawh biss il-ħbieb tiegħek.",
+    "visibilityHintNobody": "Ħadd: ma jintbagħat xejn, l-oħrajn ma jarawhx.",
+    "footnote": "Biddel aktar tard f’Settings → Plugins."
   },
   "toast": {
     "installed": "{{name}} installat",

@@ -32,9 +32,7 @@
   "mayAskFor": "Šis spraudnis var pieprasīt",
   "prompt": {
     "title": "Vai instalēt {{name}}?",
-    "subtitle": "{{name}} {{version}} · autors: {{authors}}",
     "preparing": "Notiek {{name}} pārbaude…",
-    "visibility": "Kas var redzēt, ka to izmantojat",
     "visibilityEveryone": "Visi",
     "visibilityFriends": "Draugi",
     "visibilityNobody": "Neviens",
@@ -52,7 +50,13 @@
       "done": "Instalēts",
       "failed": "Instalēšana neizdevās"
     },
-    "failed": "Spraudni {{name}} neizdevās instalēt."
+    "failed": "Spraudni {{name}} neizdevās instalēt.",
+    "intro": "{{name}} lūdz šīs atļaujas. Neobligātās var izslēgt tagad vai vēlāk.",
+    "visibilityTitle": "Kas var redzēt, ka lieto {{name}}",
+    "visibilityHintEveryone": "Visi: to redz visi šī spraudņa lietotāji.",
+    "visibilityHintFriends": "Draugi: to redz tikai tavi draugi.",
+    "visibilityHintNobody": "Neviens: nekas netiek sūtīts, citi to neredz.",
+    "footnote": "Vēlāk mainīt var sadaļā Iestatījumi → Spraudņi."
   },
   "toast": {
     "installed": "{{name}} instalēts",

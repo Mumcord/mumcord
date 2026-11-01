@@ -27,5 +27,8 @@
     "netHttp": "Praten met een server die je kiest",
     "secrets": "Een geheim (bijv. een API-sleutel) bewaren in de sleutelhanger van je systeem",
     "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)"
-  }
+  },
+  "requiredReason": "Nodig om de plugin te laten werken",
+  "optionalReason": "Optioneel: altijd uit te zetten",
+  "listLabel": "Rechten"
 }

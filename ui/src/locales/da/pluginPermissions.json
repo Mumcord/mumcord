@@ -27,5 +27,8 @@
     "netHttp": "Tale med en server, du vælger",
     "secrets": "Gemme en hemmelighed (f.eks. en API-nøgle) i dit systems nøglering",
     "uiWebview": "Vise eget webindhold i en lukket ramme (uden internet)"
-  }
+  },
+  "requiredReason": "Kræves for at pluginet virker",
+  "optionalReason": "Valgfri: kan slås fra når som helst",
+  "listLabel": "Tilladelser"
 }

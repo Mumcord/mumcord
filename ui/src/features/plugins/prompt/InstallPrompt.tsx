@@ -10,6 +10,7 @@ import {
 import { ModalDialog } from "../../settings/components/ModalDialog";
 import { defaultOptionalSelection, type RequestedPermission } from "../permissions/catalogue";
 import { PermissionList } from "../permissions/PermissionList";
+import { PluginIcon } from "../browse/PluginIcon";
 import { sourceLabel } from "../browse/source";
 import { pluginErrorText } from "./errorText";
 import { showPluginToast } from "./installToast";
@@ -102,8 +103,18 @@ export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPro
   };
 
   return (
-    <ModalDialog title={t("prompt.title", { name })} onClose={close} className="plugin-prompt">
-      <p className="plugin-prompt-source">{sourceLabel(t, plugin.source)}</p>
+    <ModalDialog
+      title={t("prompt.title", { name })}
+      onClose={close}
+      className="plugin-prompt"
+      icon={<PluginIcon id={plugin.id} name={name} hasIcon={plugin.icon !== null} />}
+      subtitle={
+        <p className="plugin-prompt-source">
+          {sourceLabel(t, plugin.source)}
+          {phase.kind === "ready" || phase.kind === "installing" ? ` · ${phase.offer.version}` : ""}
+        </p>
+      }
+    >
       {phase.kind === "preparing" && (
         <p role="status" className="plugin-prompt-status">
           {t("prompt.preparing", { name })}
@@ -116,13 +127,7 @@ export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPro
       )}
       {(phase.kind === "ready" || phase.kind === "installing") && (
         <>
-          <p className="plugin-prompt-subtitle">
-            {t("prompt.subtitle", {
-              name,
-              version: phase.offer.version,
-              authors: phase.offer.authors.join(", "),
-            })}
-          </p>
+          <p className="plugin-prompt-subtitle">{t("prompt.intro", { name })}</p>
           <PermissionList
             requested={requestedOf(phase.offer)}
             enabled={enabled}
@@ -137,23 +142,37 @@ export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPro
             }}
           />
           {asksFor(phase.offer, MESSAGES) && (
-            <fieldset className="plugin-prompt-visibility" disabled={installing}>
-              <legend>{t("prompt.visibility")}</legend>
-              {VISIBILITIES.map((choice) => (
-                <label key={choice}>
-                  <input
-                    type="radio"
-                    name={visibilityName}
-                    value={choice}
-                    checked={visibility === choice}
-                    onChange={() => {
-                      setVisibility(choice);
-                    }}
-                  />{" "}
-                  {t(`prompt.visibility${capitalize(choice)}`)}
-                </label>
-              ))}
-            </fieldset>
+            <div className="plugin-prompt-visibility">
+              <div className="plugin-prompt-visibility-text">
+                <span id={`${visibilityName}-label`} className="plugin-prompt-visibility-title">
+                  {t("prompt.visibilityTitle", { name })}
+                </span>
+                <span className="plugin-prompt-visibility-hint">
+                  {t(`prompt.visibilityHint${capitalize(visibility)}`)}
+                </span>
+              </div>
+              <div
+                className="plugin-prompt-segments"
+                role="radiogroup"
+                aria-labelledby={`${visibilityName}-label`}
+              >
+                {VISIBILITIES.map((choice) => (
+                  <label key={choice} className="plugin-prompt-segment">
+                    <input
+                      type="radio"
+                      name={visibilityName}
+                      value={choice}
+                      checked={visibility === choice}
+                      disabled={installing}
+                      onChange={() => {
+                        setVisibility(choice);
+                      }}
+                    />
+                    <span>{t(`prompt.visibility${capitalize(choice)}`)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
           )}
           {repositoryWarning && plugin.source.kind === "repo" && (
             <div
@@ -185,7 +204,8 @@ export function InstallPrompt({ plugin, repositoryWarning, onClose }: InstallPro
           )}
         </>
       )}
-      <div className="settings-dialog__actions">
+      <div className="settings-dialog__actions plugin-prompt-actions">
+        <span className="plugin-prompt-footnote">{t("prompt.footnote")}</span>
         <button type="button" className="settings-button" disabled={installing} onClick={close}>
           {phase.kind === "failed" ? t("prompt.close") : t("prompt.cancel")}
         </button>

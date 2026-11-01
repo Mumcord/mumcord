@@ -27,5 +27,8 @@
     "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
     "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)"
-  }
+  },
+  "requiredReason": "Riachtanach chun an breiseán a oibriú",
+  "optionalReason": "Roghnach: is féidir é a mhúchadh am ar bith",
+  "listLabel": "Ceadanna"
 }

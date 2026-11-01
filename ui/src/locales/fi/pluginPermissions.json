@@ -27,5 +27,8 @@
     "netHttp": "Keskustella valitsemasi palvelimen kanssa",
     "secrets": "Säilyttää salaisuus (esim. API-avain) järjestelmäsi avainnipussa",
     "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä (ei internetiä)"
-  }
+  },
+  "requiredReason": "Tarvitaan, jotta lisäosa toimii",
+  "optionalReason": "Valinnainen: voi poistaa käytöstä milloin tahansa",
+  "listLabel": "Oikeudet"
 }

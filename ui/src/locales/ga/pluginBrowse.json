@@ -32,9 +32,7 @@
   "mayAskFor": "Is féidir leis an mbreiseán seo iarraidh",
   "prompt": {
     "title": "An suiteáil {{name}}?",
-    "subtitle": "{{name}} {{version}} · le {{authors}}",
     "preparing": "Ag seiceáil {{name}}…",
-    "visibility": "Cé a fheiceann go n-úsáideann tú é",
     "visibilityEveryone": "Gach duine",
     "visibilityFriends": "Cairde",
     "visibilityNobody": "Duine ar bith",
@@ -52,7 +50,13 @@
       "done": "Suiteáilte",
       "failed": "Theip ar an suiteáil"
     },
-    "failed": "Níorbh fhéidir {{name}} a shuiteáil."
+    "failed": "Níorbh fhéidir {{name}} a shuiteáil.",
+    "intro": "Iarrann {{name}} na ceadanna seo. Is féidir iad siúd atá roghnach a mhúchadh anois nó níos déanaí.",
+    "visibilityTitle": "Cé atá in ann a fheiceáil go n-úsáideann tú {{name}}",
+    "visibilityHintEveryone": "Gach duine: feiceann gach úsáideoir den bhreiseán seo é.",
+    "visibilityHintFriends": "Cairde: ní fheiceann ach do chairde é.",
+    "visibilityHintNobody": "Aon duine: ní sheoltar aon rud, ní fheiceann daoine eile é.",
+    "footnote": "Athraigh níos déanaí in Socruithe → Breiseáin."
   },
   "toast": {
     "installed": "{{name}} suiteáilte",

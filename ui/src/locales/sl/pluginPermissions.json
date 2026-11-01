@@ -27,5 +27,8 @@
     "netHttp": "Komuniciraj s strežnikom, ki ga izberete",
     "secrets": "Shrani skrivnost (npr. ključ API) v sistemsko zbirko ključev",
     "uiWebview": "Prikaži lastno spletno vsebino v izoliranem okvirju (brez interneta)"
-  }
+  },
+  "requiredReason": "Potrebno, da vtičnik deluje",
+  "optionalReason": "Neobvezno: lahko ga kadar koli izklopite",
+  "listLabel": "Dovoljenja"
 }

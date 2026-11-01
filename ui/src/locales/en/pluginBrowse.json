@@ -32,9 +32,7 @@
   "mayAskFor": "This plugin may ask for",
   "prompt": {
     "title": "Install {{name}}?",
-    "subtitle": "{{name}} {{version}} · by {{authors}}",
     "preparing": "Checking {{name}}…",
-    "visibility": "Who can see that you use it",
     "visibilityEveryone": "Everyone",
     "visibilityFriends": "Friends",
     "visibilityNobody": "Nobody",
@@ -52,7 +50,13 @@
       "done": "Installed",
       "failed": "Install failed"
     },
-    "failed": "{{name}} could not be installed."
+    "failed": "{{name}} could not be installed.",
+    "intro": "{{name}} asks for these. Optional ones can be turned off now or later.",
+    "visibilityTitle": "Who can tell you use {{name}}",
+    "visibilityHintEveryone": "Everyone: all users of this plugin can tell.",
+    "visibilityHintFriends": "Friends: only your friends can tell.",
+    "visibilityHintNobody": "Nobody: nothing is sent, others can't tell.",
+    "footnote": "Change later in Settings → Plugins."
   },
   "toast": {
     "installed": "{{name}} installed",

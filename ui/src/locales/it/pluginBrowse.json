@@ -32,9 +32,7 @@
   "mayAskFor": "Questo plugin può richiedere",
   "prompt": {
     "title": "Installare {{name}}?",
-    "subtitle": "{{name}} {{version}} · di {{authors}}",
     "preparing": "Controllo di {{name}}…",
-    "visibility": "Chi può vedere che lo usi",
     "visibilityEveryone": "Tutti",
     "visibilityFriends": "Amici",
     "visibilityNobody": "Nessuno",
@@ -52,7 +50,13 @@
       "done": "Installato",
       "failed": "Installazione non riuscita"
     },
-    "failed": "Impossibile installare {{name}}."
+    "failed": "Impossibile installare {{name}}.",
+    "intro": "{{name}} richiede questi permessi. Quelli facoltativi si possono disattivare ora o più tardi.",
+    "visibilityTitle": "Chi può vedere che usi {{name}}",
+    "visibilityHintEveryone": "Tutti: tutti gli utenti di questo plugin lo vedono.",
+    "visibilityHintFriends": "Amici: solo i tuoi amici lo vedono.",
+    "visibilityHintNobody": "Nessuno: non viene inviato nulla, gli altri non lo vedono.",
+    "footnote": "Modificabile in seguito in Impostazioni → Plugin."
   },
   "toast": {
     "installed": "{{name}} installato",

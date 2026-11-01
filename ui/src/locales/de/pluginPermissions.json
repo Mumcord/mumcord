@@ -27,5 +27,8 @@
     "netHttp": "Mit einem Server deiner Wahl kommunizieren",
     "secrets": "Ein Geheimnis (z. B. einen API-Schlüssel) im Schlüsselbund deines Systems speichern",
     "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen (ohne Internet)"
-  }
+  },
+  "requiredReason": "Nötig, damit das Plugin funktioniert",
+  "optionalReason": "Optional: jederzeit abschaltbar",
+  "listLabel": "Berechtigungen"
 }

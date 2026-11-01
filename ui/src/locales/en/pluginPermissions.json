@@ -27,5 +27,8 @@
     "netHttp": "Talk to a server you choose",
     "secrets": "Keep a secret (e.g. an API key) in your system keychain",
     "uiWebview": "Show its own web content in a sealed frame (no internet)"
-  }
+  },
+  "requiredReason": "Required for the plugin to work",
+  "optionalReason": "Optional: can be turned off any time",
+  "listLabel": "Permissions"
 }

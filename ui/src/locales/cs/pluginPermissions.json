@@ -27,5 +27,8 @@
     "netHttp": "Komunikovat se serverem, který si vyberete",
     "secrets": "Uložit tajemství (např. klíč API) do úložiště klíčů systému",
     "uiWebview": "Zobrazit vlastní webový obsah v izolovaném rámu (bez internetu)"
-  }
+  },
+  "requiredReason": "Nutné, aby plugin fungoval",
+  "optionalReason": "Volitelné: lze kdykoli vypnout",
+  "listLabel": "Oprávnění"
 }

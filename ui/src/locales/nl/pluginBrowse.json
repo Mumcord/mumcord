@@ -32,9 +32,7 @@
   "mayAskFor": "Deze plug-in kan vragen om",
   "prompt": {
     "title": "{{name}} installeren?",
-    "subtitle": "{{name}} {{version}} · door {{authors}}",
     "preparing": "{{name}} controleren…",
-    "visibility": "Wie kan zien dat je hem gebruikt",
     "visibilityEveryone": "Iedereen",
     "visibilityFriends": "Vrienden",
     "visibilityNobody": "Niemand",
@@ -52,7 +50,13 @@
       "done": "Geïnstalleerd",
       "failed": "Installatie mislukt"
     },
-    "failed": "{{name}} kon niet worden geïnstalleerd."
+    "failed": "{{name}} kon niet worden geïnstalleerd.",
+    "intro": "{{name}} vraagt hierom. Optionele rechten kun je nu of later uitzetten.",
+    "visibilityTitle": "Wie kan zien dat je {{name}} gebruikt",
+    "visibilityHintEveryone": "Iedereen: alle gebruikers van deze plugin zien het.",
+    "visibilityHintFriends": "Vrienden: alleen je vrienden zien het.",
+    "visibilityHintNobody": "Niemand: er wordt niets verstuurd, anderen zien het niet.",
+    "footnote": "Later te wijzigen onder Instellingen → Plugins."
   },
   "toast": {
     "installed": "{{name}} geïnstalleerd",

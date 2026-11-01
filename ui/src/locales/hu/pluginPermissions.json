@@ -27,5 +27,8 @@
     "netHttp": "Kommunikáció egy általad választott kiszolgálóval",
     "secrets": "Titok (pl. API-kulcs) tárolása a rendszer kulcstartójában",
     "uiWebview": "Saját webes tartalom megjelenítése elszigetelt keretben (internet nélkül)"
-  }
+  },
+  "requiredReason": "A bővítmény működéséhez szükséges",
+  "optionalReason": "Választható: bármikor kikapcsolható",
+  "listLabel": "Engedélyek"
 }

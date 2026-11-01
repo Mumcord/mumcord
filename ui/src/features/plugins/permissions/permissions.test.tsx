@@ -56,7 +56,7 @@ describe("PermissionList", () => {
     );
     expect(screen.getByText("Show cards in the chat")).toBeTruthy();
     expect(screen.getByText("High risk")).toBeTruthy();
-    const boxes = screen.getAllByRole("checkbox");
+    const boxes = screen.getAllByRole("switch");
     expect(boxes).toHaveLength(2);
     expect((boxes[0] as HTMLInputElement).checked).toBe(true);
     expect((boxes[1] as HTMLInputElement).checked).toBe(false);
@@ -65,7 +65,7 @@ describe("PermissionList", () => {
   it("reports toggles", () => {
     const onToggle = vi.fn();
     render(<PermissionList requested={requested} enabled={new Set()} onToggle={onToggle} />);
-    fireEvent.click(screen.getByRole("checkbox", { name: /Show notifications/ }));
+    fireEvent.click(screen.getByRole("switch", { name: /Show notifications/ }));
     expect(onToggle).toHaveBeenCalledWith("notify", true);
   });
 
@@ -73,7 +73,7 @@ describe("PermissionList", () => {
     render(
       <PermissionList requested={requested} enabled={new Set()} onToggle={vi.fn()} readOnly />,
     );
-    for (const box of screen.getAllByRole("checkbox")) {
+    for (const box of screen.getAllByRole("switch")) {
       expect((box as HTMLInputElement).disabled).toBe(true);
     }
   });

@@ -32,9 +32,7 @@
   "mayAskFor": "Ez a bővítmény kérheti",
   "prompt": {
     "title": "Telepíted a(z) {{name}} bővítményt?",
-    "subtitle": "{{name}} {{version}} · készítette: {{authors}}",
     "preparing": "{{name}} ellenőrzése…",
-    "visibility": "Ki láthatja, hogy használod",
     "visibilityEveryone": "Mindenki",
     "visibilityFriends": "Barátok",
     "visibilityNobody": "Senki",
@@ -52,7 +50,13 @@
       "done": "Telepítve",
       "failed": "A telepítés sikertelen"
     },
-    "failed": "A(z) {{name}} bővítményt nem sikerült telepíteni."
+    "failed": "A(z) {{name}} bővítményt nem sikerült telepíteni.",
+    "intro": "A(z) {{name}} ezeket kéri. A választhatóak most vagy később kikapcsolhatók.",
+    "visibilityTitle": "Ki láthatja, hogy a(z) {{name}} bővítményt használod",
+    "visibilityHintEveryone": "Mindenki: a bővítmény minden felhasználója látja.",
+    "visibilityHintFriends": "Barátok: csak a barátaid látják.",
+    "visibilityHintNobody": "Senki: semmi sem kerül elküldésre, mások nem látják.",
+    "footnote": "Később módosítható itt: Beállítások → Bővítmények."
   },
   "toast": {
     "installed": "{{name}} telepítve",

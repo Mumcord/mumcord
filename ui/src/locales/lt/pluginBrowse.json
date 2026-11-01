@@ -32,9 +32,7 @@
   "mayAskFor": "Šis papildinys gali prašyti",
   "prompt": {
     "title": "Įdiegti {{name}}?",
-    "subtitle": "{{name}} {{version}} · autorius: {{authors}}",
     "preparing": "Tikrinamas {{name}}…",
-    "visibility": "Kas gali matyti, kad jį naudojate",
     "visibilityEveryone": "Visi",
     "visibilityFriends": "Draugai",
     "visibilityNobody": "Niekas",
@@ -52,7 +50,13 @@
       "done": "Įdiegtas",
       "failed": "Įdiegti nepavyko"
     },
-    "failed": "Nepavyko įdiegti {{name}}."
+    "failed": "Nepavyko įdiegti {{name}}.",
+    "intro": "{{name}} prašo šių leidimų. Neprivalomus galite išjungti dabar arba vėliau.",
+    "visibilityTitle": "Kas gali matyti, kad naudojate {{name}}",
+    "visibilityHintEveryone": "Visi: tai mato visi šio papildinio naudotojai.",
+    "visibilityHintFriends": "Draugai: tai mato tik jūsų draugai.",
+    "visibilityHintNobody": "Niekas: niekas nesiunčiama, kiti nemato.",
+    "footnote": "Vėliau pakeisti galite: Nustatymai → Papildiniai."
   },
   "toast": {
     "installed": "{{name}} įdiegtas",

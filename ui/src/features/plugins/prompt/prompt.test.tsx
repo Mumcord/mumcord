@@ -53,10 +53,9 @@ describe("InstallPrompt", () => {
       </>,
     );
     const dialog = await screen.findByRole("dialog", { name: "Install Poll?" });
-    expect(await screen.findByText("Poll 1.1.0 · by Mumcord")).toBeTruthy();
-    expect(screen.getByText("Official")).toBeTruthy();
-    expect(screen.getByText("Required")).toBeTruthy();
-    expect(screen.getByText("Optional")).toBeTruthy();
+    expect(await screen.findByText("Official · 1.1.0")).toBeTruthy();
+    expect(screen.getAllByText("Required")).toHaveLength(2);
+    expect(screen.getByText("Change later in Settings → Plugins.")).toBeTruthy();
     expect(screen.getByRole("radio", { name: "Friends" })).toHaveProperty("checked", true);
     expect(await axeViolations(dialog)).toEqual([]);
 
@@ -76,7 +75,7 @@ describe("InstallPrompt", () => {
       optional: [],
     });
     render(<InstallPrompt plugin={poll} repositoryWarning={false} onClose={vi.fn()} />);
-    await screen.findByText("Poll 1.1.0 · by Mumcord");
+    await screen.findByText("Official · 1.1.0");
     expect(screen.queryByRole("radio")).toBeNull();
   });
 

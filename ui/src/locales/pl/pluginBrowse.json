@@ -32,9 +32,7 @@
   "mayAskFor": "Ta wtyczka może prosić o",
   "prompt": {
     "title": "Zainstalować {{name}}?",
-    "subtitle": "{{name}} {{version}} · autor: {{authors}}",
     "preparing": "Sprawdzanie: {{name}}…",
-    "visibility": "Kto widzi, że z niej korzystasz",
     "visibilityEveryone": "Wszyscy",
     "visibilityFriends": "Znajomi",
     "visibilityNobody": "Nikt",
@@ -52,7 +50,13 @@
       "done": "Zainstalowano",
       "failed": "Instalacja nie powiodła się"
     },
-    "failed": "Nie udało się zainstalować: {{name}}."
+    "failed": "Nie udało się zainstalować: {{name}}.",
+    "intro": "{{name}} prosi o te uprawnienia. Opcjonalne można wyłączyć teraz lub później.",
+    "visibilityTitle": "Kto widzi, że używasz {{name}}",
+    "visibilityHintEveryone": "Wszyscy: widzą to wszyscy użytkownicy tej wtyczki.",
+    "visibilityHintFriends": "Znajomi: widzą to tylko Twoi znajomi.",
+    "visibilityHintNobody": "Nikt: nic nie jest wysyłane, inni tego nie widzą.",
+    "footnote": "Zmienisz to później w: Ustawienia → Wtyczki."
   },
   "toast": {
     "installed": "Zainstalowano: {{name}}",

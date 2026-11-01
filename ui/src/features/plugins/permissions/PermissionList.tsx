@@ -17,7 +17,29 @@ export interface PermissionListProps {
   readOnly?: boolean;
 }
 
-const RISK_ICON: Record<PermissionRisk, string> = { green: "●", yellow: "●", red: "▲" };
+/** A decorative glyph per permission (the risk is carried by the text and colour, never the glyph). */
+const ICONS: Record<string, string> = {
+  "ui.panel": "▣",
+  "ui.member-badge": "◉",
+  "ui.profile-card": "☰",
+  "ui.chat-card": "▤",
+  "ui.user-menu": "⋮",
+  "ui.dialog": "❏",
+  "ui.webview": "◫",
+  "events.self": "◎",
+  "events.voice": "♫",
+  "events.presence": "●",
+  "events.chat-activity": "✎",
+  "peers.messages": "⇄",
+  notify: "🔔",
+  "random.bytes": "⚄",
+  commands: "/",
+  "chat.send": "➤",
+  "chat.supersedes": "↻",
+  "chat.triggers": "⚑",
+  "net.http": "🌐",
+  secrets: "🔑",
+};
 
 function Row({
   id,
@@ -34,10 +56,15 @@ function Row({
   const riskLabel = t(`risk.${risk}`);
   const content = (
     <>
-      <span className={`perm-risk perm-risk-${risk}`} aria-hidden="true">
-        {RISK_ICON[risk]}
+      <span className={`perm-icon perm-risk-${risk}`} aria-hidden="true">
+        {ICONS[id] ?? "▲"}
       </span>
-      <span className="perm-text">{text}</span>
+      <span className="perm-body">
+        <span className="perm-text">{text}</span>
+        <span className="perm-reason">
+          {toggle === undefined ? t("requiredReason") : t("optionalReason")}
+        </span>
+      </span>
       {risk === "red" ? (
         <span className="perm-risk-badge">{riskLabel}</span>
       ) : (
@@ -46,20 +73,27 @@ function Row({
     </>
   );
   if (toggle === undefined) {
-    return <li className="perm-row">{content}</li>;
+    return (
+      <li className="perm-row">
+        {content}
+        <span className="perm-chip">{t("required")}</span>
+      </li>
+    );
   }
   return (
     <li className="perm-row">
       <label className="perm-label">
+        {content}
         <input
           type="checkbox"
+          role="switch"
+          className="perm-switch"
           checked={toggle.checked}
           disabled={toggle.disabled}
           onChange={(e) => {
             toggle.onChange(e.target.checked);
           }}
         />
-        {content}
       </label>
     </li>
   );
@@ -76,40 +110,27 @@ export function PermissionList({
   readOnly = false,
 }: PermissionListProps) {
   const { t } = useTranslation("pluginPermissions");
-  const required = requested.filter((p) => p.required);
-  const optional = requested.filter((p) => !p.required);
+  // Required rows first, then optional ones, as one list (spec mockup).
+  const rows = [...requested.filter((p) => p.required), ...requested.filter((p) => !p.required)];
   return (
-    <div className="perm-list">
-      {required.length > 0 ? (
-        <section>
-          <h3 className="perm-heading">{t("required")}</h3>
-          <ul className="perm-rows">
-            {required.map((p) => (
-              <Row key={p.id} id={p.id} />
-            ))}
-          </ul>
-        </section>
-      ) : null}
-      {optional.length > 0 ? (
-        <section>
-          <h3 className="perm-heading">{t("optional")}</h3>
-          <ul className="perm-rows">
-            {optional.map((p) => (
-              <Row
-                key={p.id}
-                id={p.id}
-                toggle={{
-                  checked: enabled.has(p.id),
-                  disabled: readOnly,
-                  onChange: (on) => {
-                    onToggle(p.id, on);
-                  },
-                }}
-              />
-            ))}
-          </ul>
-        </section>
-      ) : null}
-    </div>
+    <ul className="perm-rows" aria-label={t("listLabel")}>
+      {rows.map((p) =>
+        p.required ? (
+          <Row key={p.id} id={p.id} />
+        ) : (
+          <Row
+            key={p.id}
+            id={p.id}
+            toggle={{
+              checked: enabled.has(p.id),
+              disabled: readOnly,
+              onChange: (on) => {
+                onToggle(p.id, on);
+              },
+            }}
+          />
+        ),
+      )}
+    </ul>
   );
 }

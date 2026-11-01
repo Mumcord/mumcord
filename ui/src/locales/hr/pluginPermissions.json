@@ -27,5 +27,8 @@
     "netHttp": "Komuniciraj s poslužiteljem koji odaberete",
     "secrets": "Pohrani tajnu (npr. API ključ) u sistemski privjesak ključeva",
     "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru (bez interneta)"
-  }
+  },
+  "requiredReason": "Potrebno da dodatak radi",
+  "optionalReason": "Neobavezno: može se isključiti u bilo kojem trenutku",
+  "listLabel": "Dozvole"
 }

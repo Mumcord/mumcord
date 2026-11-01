@@ -27,5 +27,8 @@
     "netHttp": "Bendrauti su jūsų pasirinktu serveriu",
     "secrets": "Saugoti paslaptį (pvz., API raktą) jūsų sistemos raktų pakabuke",
     "uiWebview": "Rodyti savo žiniatinklio turinį izoliuotame rėmelyje (be interneto)"
-  }
+  },
+  "requiredReason": "Reikalinga, kad papildinys veiktų",
+  "optionalReason": "Neprivaloma: galima bet kada išjungti",
+  "listLabel": "Leidimai"
 }

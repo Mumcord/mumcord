@@ -32,9 +32,7 @@
   "mayAskFor": "Tämä lisäosa voi pyytää",
   "prompt": {
     "title": "Asennetaanko {{name}}?",
-    "subtitle": "{{name}} {{version}} · tekijä: {{authors}}",
     "preparing": "Tarkistetaan {{name}}…",
-    "visibility": "Ketkä näkevät, että käytät sitä",
     "visibilityEveryone": "Kaikki",
     "visibilityFriends": "Kaverit",
     "visibilityNobody": "Ei kukaan",
@@ -52,7 +50,13 @@
       "done": "Asennettu",
       "failed": "Asennus epäonnistui"
     },
-    "failed": "Lisäosaa {{name}} ei voitu asentaa."
+    "failed": "Lisäosaa {{name}} ei voitu asentaa.",
+    "intro": "{{name}} pyytää näitä oikeuksia. Valinnaiset voi poistaa käytöstä nyt tai myöhemmin.",
+    "visibilityTitle": "Kuka näkee, että käytät lisäosaa {{name}}",
+    "visibilityHintEveryone": "Kaikki: kaikki tämän lisäosan käyttäjät näkevät sen.",
+    "visibilityHintFriends": "Kaverit: vain kaverisi näkevät sen.",
+    "visibilityHintNobody": "Ei kukaan: mitään ei lähetetä, muut eivät näe sitä.",
+    "footnote": "Muutettavissa myöhemmin kohdassa Asetukset → Lisäosat."
   },
   "toast": {
     "installed": "{{name}} asennettu",

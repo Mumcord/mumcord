@@ -32,9 +32,7 @@
   "mayAskFor": "Acest plugin poate cere",
   "prompt": {
     "title": "Instalezi {{name}}?",
-    "subtitle": "{{name}} {{version}} · de {{authors}}",
     "preparing": "Se verifică {{name}}…",
-    "visibility": "Cine poate vedea că îl folosești",
     "visibilityEveryone": "Toată lumea",
     "visibilityFriends": "Prieteni",
     "visibilityNobody": "Nimeni",
@@ -52,7 +50,13 @@
       "done": "Instalat",
       "failed": "Instalarea a eșuat"
     },
-    "failed": "{{name}} nu a putut fi instalat."
+    "failed": "{{name}} nu a putut fi instalat.",
+    "intro": "{{name}} cere aceste permisiuni. Cele opționale pot fi dezactivate acum sau mai târziu.",
+    "visibilityTitle": "Cine poate vedea că folosești {{name}}",
+    "visibilityHintEveryone": "Toți: toți utilizatorii acestui plugin văd.",
+    "visibilityHintFriends": "Prieteni: doar prietenii tăi văd.",
+    "visibilityHintNobody": "Nimeni: nu se trimite nimic, ceilalți nu văd.",
+    "footnote": "Se poate schimba mai târziu în Setări → Pluginuri."
   },
   "toast": {
     "installed": "{{name}} a fost instalat",

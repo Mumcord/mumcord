@@ -32,9 +32,7 @@
   "mayAskFor": "Ta vtičnik lahko zahteva",
   "prompt": {
     "title": "Namestim {{name}}?",
-    "subtitle": "{{name}} {{version}} · avtor: {{authors}}",
     "preparing": "Preverjanje {{name}}…",
-    "visibility": "Kdo lahko vidi, da ga uporabljate",
     "visibilityEveryone": "Vsi",
     "visibilityFriends": "Prijatelji",
     "visibilityNobody": "Nihče",
@@ -52,7 +50,13 @@
       "done": "Nameščen",
       "failed": "Namestitev ni uspela"
     },
-    "failed": "Vtičnika {{name}} ni bilo mogoče namestiti."
+    "failed": "Vtičnika {{name}} ni bilo mogoče namestiti.",
+    "intro": "{{name}} zahteva ta dovoljenja. Neobvezna lahko izklopite zdaj ali pozneje.",
+    "visibilityTitle": "Kdo lahko vidi, da uporabljate {{name}}",
+    "visibilityHintEveryone": "Vsi: vidijo vsi uporabniki tega vtičnika.",
+    "visibilityHintFriends": "Prijatelji: vidijo samo vaši prijatelji.",
+    "visibilityHintNobody": "Nihče: nič se ne pošlje, drugi ne vidijo.",
+    "footnote": "Pozneje spremenite v: Nastavitve → Vtičniki."
   },
   "toast": {
     "installed": "{{name}} je nameščen",

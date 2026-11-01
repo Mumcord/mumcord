@@ -32,9 +32,7 @@
   "mayAskFor": "Dette plugin kan bede om",
   "prompt": {
     "title": "Installér {{name}}?",
-    "subtitle": "{{name}} {{version}} · af {{authors}}",
     "preparing": "Tjekker {{name}}…",
-    "visibility": "Hvem kan se, at du bruger det",
     "visibilityEveryone": "Alle",
     "visibilityFriends": "Venner",
     "visibilityNobody": "Ingen",
@@ -52,7 +50,13 @@
       "done": "Installeret",
       "failed": "Installationen mislykkedes"
     },
-    "failed": "{{name}} kunne ikke installeres."
+    "failed": "{{name}} kunne ikke installeres.",
+    "intro": "{{name}} beder om disse tilladelser. Valgfrie kan slås fra nu eller senere.",
+    "visibilityTitle": "Hvem kan se, at du bruger {{name}}",
+    "visibilityHintEveryone": "Alle: alle brugere af dette plugin kan se det.",
+    "visibilityHintFriends": "Venner: kun dine venner kan se det.",
+    "visibilityHintNobody": "Ingen: intet sendes, andre kan ikke se det.",
+    "footnote": "Kan ændres senere under Indstillinger → Plugins."
   },
   "toast": {
     "installed": "{{name}} er installeret",

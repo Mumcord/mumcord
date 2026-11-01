@@ -32,9 +32,7 @@
   "mayAskFor": "Ovaj dodatak može zatražiti",
   "prompt": {
     "title": "Instalirati {{name}}?",
-    "subtitle": "{{name}} {{version}} · autor: {{authors}}",
     "preparing": "Provjera dodatka {{name}}…",
-    "visibility": "Tko može vidjeti da ga koristiš",
     "visibilityEveryone": "Svi",
     "visibilityFriends": "Prijatelji",
     "visibilityNobody": "Nitko",
@@ -52,7 +50,13 @@
       "done": "Instalirano",
       "failed": "Instalacija nije uspjela"
     },
-    "failed": "Dodatak {{name}} nije moguće instalirati."
+    "failed": "Dodatak {{name}} nije moguće instalirati.",
+    "intro": "{{name}} traži ove dozvole. Neobavezne možete isključiti sada ili poslije.",
+    "visibilityTitle": "Tko može vidjeti da koristite {{name}}",
+    "visibilityHintEveryone": "Svi: vide svi korisnici ovog dodatka.",
+    "visibilityHintFriends": "Prijatelji: vide samo vaši prijatelji.",
+    "visibilityHintNobody": "Nitko: ništa se ne šalje, drugi ne vide.",
+    "footnote": "Kasnije se može promijeniti u: Postavke → Dodaci."
   },
   "toast": {
     "installed": "{{name}} je instaliran",

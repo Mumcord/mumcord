@@ -27,5 +27,8 @@
     "netHttp": "Sazināties ar jūsu izvēlētu serveri",
     "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
     "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)"
-  }
+  },
+  "requiredReason": "Nepieciešams, lai spraudnis darbotos",
+  "optionalReason": "Neobligāti: var izslēgt jebkurā laikā",
+  "listLabel": "Atļaujas"
 }
