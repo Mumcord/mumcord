@@ -24,6 +24,10 @@
 - Safety: plugins run in a sealed sandbox with no access to your network, files or audio other than what Mumcord offers them, and with limits on memory and time. A plugin that keeps crashing is turned off, and nothing affects your voice. **Turn off all plugins** (Settings > Plugins and the command palette) stops them all at once, and starting Mumcord with `--no-plugins` loads none. Official plugins are signed and checked on install and after every Mumcord update; a **kill switch** can disable a plugin that turns out to be harmful, with the reason shown, and is checked once a day even when plugin updates are off.
 - Privacy: checking for plugins sends no identifiers and no list of what you have installed. Plugin data stays on your computer, removing a plugin keeps its data for 30 days unless you delete it, and see PRIVACY.md for the details.
 
+### Fixed
+
+- Pasting with Ctrl+V works again on some Linux desktops
+
 ## [0.5.0] - 2026-11-01
 
 ### Added

@@ -348,9 +348,20 @@ export function Composer({
       const imageListed = clipboardItems(data).some(
         (item) => item.kind === "file" && item.type.startsWith("image/"),
       );
-      if (imageListed || hasHiddenFiles(data) || !hasText(data)) {
+      if (imageListed || hasHiddenFiles(data)) {
         event.preventDefault();
         void composer.addFromClipboard(imageListed);
+        return;
+      }
+      if (!hasText(data)) {
+        // WebKitGTK lists no types at all for text offered only as `text/plain;charset=utf-8`, so
+        // the webview must insert it. Only when it inserted nothing may it have been image data
+        // the webview did not hand over (issue #110).
+        const input = event.currentTarget;
+        const before = input.value;
+        window.setTimeout(() => {
+          if (input.value === before) void composer.addFromClipboard(false);
+        }, 0);
       }
       return;
     }

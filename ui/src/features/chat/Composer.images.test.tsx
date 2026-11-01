@@ -158,6 +158,37 @@ describe("Composer image attachments", () => {
     expect(screen.queryByRole("alert")).toBeNull();
   });
 
+  it("leaves a paste with an empty type list to the webview so its text is inserted", () => {
+    const { input } = setup();
+    const notPrevented = fireEvent.paste(input, {
+      clipboardData: { files: [], items: [], types: [] },
+    });
+    expect(notPrevented).toBe(true);
+  });
+
+  it("still looks for image data when an empty-typed paste inserted nothing", async () => {
+    const spy = vi.spyOn(api, "clipboardFiles");
+    const { input } = setup();
+    fireEvent.paste(input, { clipboardData: { files: [], items: [], types: [] } });
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  it("does not look for image data when an empty-typed paste inserted text", async () => {
+    const spy = vi.spyOn(api, "clipboardFiles");
+    const { input } = setup();
+    // The webview inserts the text after the page's paste handlers have run.
+    input.addEventListener("paste", () => {
+      setTimeout(() => {
+        fireEvent.change(input, { target: { value: "pasted" } });
+      }, 0);
+    });
+    fireEvent.paste(input, { clipboardData: { files: [], items: [], types: [] } });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(spy).not.toHaveBeenCalled();
+  });
+
   it("refuses non-image files and images that are too large", async () => {
     const { form } = setup();
     drop(form, [png("doc.pdf", "application/pdf")]);
