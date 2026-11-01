@@ -51,6 +51,10 @@
 //! breaks (untrusted, at most 4 KiB) and `pattern-index` the first pattern that matched. Every
 //! plugin whose pattern matches gets it; each sender is limited to 3 matches per 10 seconds.
 //!
+//! Replacing messages: a card for a matched or triggered message can take that message's place,
+//! and a counted vote line can be hidden; old messages get their cards on a render-only history
+//! replay. See [`chat_card`].
+//!
 //! Every host call is checked against the permissions the user granted; a missing permission
 //! returns [`types::Error::NotPermitted`]. The meaning and limits of each call are documented on
 //! the generated functions and in the WIT files.
@@ -80,6 +84,7 @@ pub use bindings::mumcord::plugin::{
     chat, clock, events, http, notify, random, secrets, theme, timers, types, webview,
 };
 
+pub mod chat_card;
 pub mod i18n;
 pub mod log;
 pub mod peers;

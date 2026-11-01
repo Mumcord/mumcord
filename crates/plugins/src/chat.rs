@@ -1,13 +1,15 @@
 //! Chat integration rules (FR-6.43 … FR-6.45), free of I/O.
 //!
 //! The command registry decides who owns a slash command, the gesture gate decides whether a
-//! plugin may post a chat line right now, and the supersede tracker pairs a plugin card with the
-//! plain-text fallback line. Time is passed in as `now` so every rule is testable. Nothing here
+//! plugin may post a chat line right now, the supersede tracker pairs a plugin card with the
+//! plain-text fallback line, and the message claims decide which chat messages a plugin may
+//! replace with a card or hide. Time is passed in as `now` so every rule is testable. Nothing here
 //! logs or keeps chat text beyond a 4-byte hash.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::time::{Duration, Instant};
 
+use mumcord_store::ServerId;
 use sha2::{Digest, Sha256};
 
 use crate::manifest::Command;
@@ -292,6 +294,13 @@ pub fn line_hash(plugin_name: &str, text: &str) -> u32 {
     hash_line(&prefixed(plugin_name, text))
 }
 
+/// The plugin name of a line's "[Name] " prefix (see [`prefixed`]), if it has one.
+pub fn poster(line: &str) -> Option<&str> {
+    let rest = line.strip_prefix('[')?;
+    let (name, _) = rest.split_once("] ")?;
+    (!name.is_empty() && !name.contains(']')).then_some(name)
+}
+
 /// What to do with an incoming text message or a new card.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Supersede {
@@ -304,6 +313,8 @@ pub enum Supersede {
 #[derive(Debug)]
 struct PendingCard {
     plugin: String,
+    /// Only lines with this plugin's "[Name] " prefix can be hidden.
+    plugin_name: String,
     card: String,
     sender: u32,
     hash: u32,
@@ -313,6 +324,8 @@ struct PendingCard {
 #[derive(Debug)]
 struct SeenLine {
     message: u64,
+    /// The plugin name of the line's "[Name] " prefix, if it has one.
+    poster: Option<String>,
     sender: u32,
     hash: u32,
     at: Instant,
@@ -333,21 +346,21 @@ impl SupersedeTracker {
     }
 
     /// `chat.supersede`: a card for a line from `sender` with `hash`. If the line was already
-    /// shown, returns the replacement now; otherwise waits for it.
+    /// shown, returns the replacement now; otherwise waits for it. Only a line the plugin posted
+    /// itself (its "[Name] " prefix) can be hidden, so no plugin can hide what others write.
     pub fn card(
         &mut self,
         plugin: &str,
+        plugin_name: &str,
         card: &str,
         sender: u32,
         hash: u32,
         now: Instant,
     ) -> Supersede {
         self.prune(now);
-        if let Some(index) = self
-            .lines
-            .iter()
-            .position(|l| l.sender == sender && l.hash == hash)
-        {
+        if let Some(index) = self.lines.iter().position(|l| {
+            l.sender == sender && l.hash == hash && l.poster.as_deref() == Some(plugin_name)
+        }) {
             let line = self.lines.remove(index);
             return Supersede::Replace {
                 card: card.to_owned(),
@@ -356,6 +369,7 @@ impl SupersedeTracker {
         }
         self.cards.push(PendingCard {
             plugin: plugin.to_owned(),
+            plugin_name: plugin_name.to_owned(),
             card: card.to_owned(),
             sender,
             hash,
@@ -368,11 +382,10 @@ impl SupersedeTracker {
     pub fn text(&mut self, message: u64, sender: u32, line: &str, now: Instant) -> Supersede {
         self.prune(now);
         let hash = hash_line(line);
-        if let Some(index) = self
-            .cards
-            .iter()
-            .position(|c| c.sender == sender && c.hash == hash)
-        {
+        let poster = poster(line);
+        if let Some(index) = self.cards.iter().position(|c| {
+            c.sender == sender && c.hash == hash && poster == Some(c.plugin_name.as_str())
+        }) {
             let card = self.cards.remove(index);
             return Supersede::Replace {
                 card: card.card,
@@ -381,6 +394,7 @@ impl SupersedeTracker {
         }
         self.lines.push(SeenLine {
             message,
+            poster: poster.map(str::to_owned),
             sender,
             hash,
             at: now,
@@ -397,6 +411,96 @@ impl SupersedeTracker {
     pub fn forget_session(&mut self, sender: u32) {
         self.cards.retain(|c| c.sender != sender);
         self.lines.retain(|l| l.sender != sender);
+    }
+}
+
+/// `pattern-index` of a replayed `chat-match` that is a line the plugin posted itself
+/// ("[Name] …", via `chat.send`) rather than a match of one of its patterns.
+pub const OWN_LINE: u8 = u8::MAX;
+
+/// How many messages a plugin can hold a claim on at once; the oldest goes first.
+pub const MAX_CLAIMS: usize = 200;
+
+/// The chat message behind the event a plugin is handling (`chat.current-message`,
+/// `chat.is-replay`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct ChatRef {
+    /// The opaque token for `chat.replace` / `chat.hide`; `None` when the message cannot be
+    /// replaced (it was not stored).
+    pub token: Option<u64>,
+    /// The message came from stored history, not live: render only, no side effects.
+    pub replay: bool,
+}
+
+/// A message a plugin was handed in a `chat-match` or `chat-trigger` event and may therefore
+/// replace with a card or hide (FR-6.45).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Claim {
+    pub server: ServerId,
+    pub message: u64,
+}
+
+#[derive(Debug)]
+struct Issued {
+    token: u64,
+    plugin: String,
+    claim: Claim,
+}
+
+/// The opaque message tokens handed to plugins. A token is valid only for the plugin it was
+/// issued to, so a plugin can never touch a message it was not shown.
+#[derive(Debug)]
+pub struct MessageClaims {
+    next: u64,
+    issued: VecDeque<Issued>,
+}
+
+impl Default for MessageClaims {
+    fn default() -> Self {
+        // A random start keeps tokens from looking like (or being guessed as) message ids.
+        Self {
+            next: rand::random::<u64>() >> 1,
+            issued: VecDeque::new(),
+        }
+    }
+}
+
+impl MessageClaims {
+    /// A token for `plugin` to name `message` on `server`. The same message gets the same token.
+    pub fn issue(&mut self, plugin: &str, server: ServerId, message: u64) -> u64 {
+        let claim = Claim { server, message };
+        if let Some(known) = self
+            .issued
+            .iter()
+            .find(|i| i.plugin == plugin && i.claim == claim)
+        {
+            return known.token;
+        }
+        if self.issued.iter().filter(|i| i.plugin == plugin).count() >= MAX_CLAIMS
+            && let Some(oldest) = self.issued.iter().position(|i| i.plugin == plugin)
+        {
+            self.issued.remove(oldest);
+        }
+        self.next = self.next.wrapping_add(1);
+        self.issued.push_back(Issued {
+            token: self.next,
+            plugin: plugin.to_owned(),
+            claim,
+        });
+        self.next
+    }
+
+    /// The message behind `token`, if it was issued to `plugin`.
+    pub fn claim(&self, plugin: &str, token: u64) -> Option<Claim> {
+        self.issued
+            .iter()
+            .find(|i| i.token == token && i.plugin == plugin)
+            .map(|i| i.claim.clone())
+    }
+
+    /// The plugin was disabled or removed.
+    pub fn forget_plugin(&mut self, plugin: &str) {
+        self.issued.retain(|i| i.plugin != plugin);
     }
 }
 
@@ -582,6 +686,7 @@ mod tests {
         assert_eq!(
             s.card(
                 "poll",
+                "Poll",
                 "c1",
                 3,
                 hash_line(line),
@@ -600,7 +705,7 @@ mod tests {
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
         assert_eq!(
-            s.card("poll", "c1", 3, hash_line(line), t0),
+            s.card("poll", "Poll", "c1", 3, hash_line(line), t0),
             Supersede::None
         );
         assert_eq!(
@@ -617,7 +722,7 @@ mod tests {
         let t0 = Instant::now();
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
-        s.card("poll", "c1", 3, hash_line(line), t0);
+        s.card("poll", "Poll", "c1", 3, hash_line(line), t0);
         assert_eq!(s.text(1, 4, line, t0), Supersede::None);
         assert_eq!(
             s.text(2, 3, line, t0 + Duration::from_millis(10_001)),
@@ -630,8 +735,85 @@ mod tests {
         let t0 = Instant::now();
         let mut s = SupersedeTracker::default();
         let line = "[Poll] Lunch?";
-        s.card("poll", "c1", 3, hash_line(line), t0);
+        s.card("poll", "Poll", "c1", 3, hash_line(line), t0);
         s.forget_plugin("poll");
         assert_eq!(s.text(1, 3, line, t0), Supersede::None);
+    }
+
+    #[test]
+    fn only_lines_with_the_plugins_own_prefix_are_hidden() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let foreign = "Lunch?";
+        let other = "[Dice] Lunch?";
+        s.text(1, 3, foreign, t0);
+        s.text(2, 3, other, t0);
+        assert_eq!(
+            s.card("poll", "Poll", "c1", 3, hash_line(foreign), t0),
+            Supersede::None,
+            "a line without a prefix"
+        );
+        assert_eq!(
+            s.card("poll", "Poll", "c2", 3, hash_line(other), t0),
+            Supersede::None,
+            "another plugin's line"
+        );
+        s.card("poll", "Poll", "c3", 4, hash_line("x"), t0);
+        assert_eq!(
+            s.text(5, 4, "x", t0),
+            Supersede::None,
+            "card first, no prefix"
+        );
+    }
+
+    #[test]
+    fn poster_reads_the_prefix() {
+        assert_eq!(poster("[Poll] Lunch?"), Some("Poll"));
+        assert_eq!(poster("[Poll]Lunch?"), None);
+        assert_eq!(poster("[] x"), None);
+        assert_eq!(poster("Poll] x"), None);
+    }
+
+    #[test]
+    fn a_claim_belongs_to_the_plugin_it_was_issued_to() {
+        let mut claims = MessageClaims::default();
+        let token = claims.issue("fit", 1, 42);
+        assert_eq!(
+            claims.issue("fit", 1, 42),
+            token,
+            "same message, same token"
+        );
+        assert_eq!(
+            claims.claim("fit", token),
+            Some(Claim {
+                server: 1,
+                message: 42
+            })
+        );
+        assert_eq!(claims.claim("poll", token), None, "another plugin");
+        assert_eq!(
+            claims.claim("fit", token.wrapping_add(1)),
+            None,
+            "never issued"
+        );
+        let other_server = claims.issue("fit", 2, 42);
+        assert_ne!(other_server, token, "tokens are per server");
+        claims.forget_plugin("fit");
+        assert_eq!(claims.claim("fit", token), None);
+    }
+
+    #[test]
+    fn claims_are_capped_per_plugin() {
+        let mut claims = MessageClaims::default();
+        let first = claims.issue("fit", 1, 0);
+        let poll = claims.issue("poll", 1, 0);
+        for message in 1..=MAX_CLAIMS as u64 {
+            claims.issue("fit", 1, message);
+        }
+        assert_eq!(claims.claim("fit", first), None, "the oldest went first");
+        assert!(
+            claims.claim("poll", poll).is_some(),
+            "other plugins keep theirs"
+        );
     }
 }

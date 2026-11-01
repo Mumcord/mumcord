@@ -14,8 +14,8 @@ use mumcord_plugins::registry::{
     UrlPolicy, fetch_official, official_base,
 };
 use mumcord_plugins::service::{
-    Approval, CommandOutcome, InstallRequest, PluginInfo, PluginService, ServiceError, Status,
-    UiInput, fetch, load_repository,
+    Approval, CommandOutcome, InstallRequest, PeerInfo, PluginInfo, PluginService, ServiceError,
+    Status, StoredLine, UiInput, fetch, load_repository,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
@@ -23,9 +23,11 @@ use mumcord_plugins::wit::theme::Mode;
 use mumcord_plugins::{Level, Manifest, Source};
 use serde::{Deserialize, Serialize};
 use specta::Type;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Manager, State};
 
-use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
+use super::types::{
+    ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
+};
 use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange};
 use crate::plugins::{self, Plugins, PreparedInstall, RepoIndex};
 
@@ -1240,6 +1242,52 @@ pub fn plugins_mentioned(
     session: SessionId,
 ) -> ApiResult<()> {
     Ok(engine.plugin_mentioned(to_engine_server_id(server_id), session)?)
+}
+
+/// How many stored messages of a channel a replay looks at; plugins get at most
+/// `REPLAY_PER_PLUGIN` of them each.
+const REPLAY_LINES: u32 = 100;
+
+/// The UI showed the history of a channel, or the plugins changed while it is open: plugins see
+/// its stored messages again, render only, so old messages get their cards too (FR-6.45). Only
+/// the user's current channel on the focused server is replayed; each message at most once per
+/// plugin, so calling this often is cheap.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugins_replay_chat(
+    app: AppHandle,
+    server_id: ServerId,
+    channel_id: ChannelId,
+) -> ApiResult<()> {
+    let plugins = plugins_of(&app)?;
+    let server = to_engine_server_id(server_id);
+    let engine = app.state::<Engine>().inner().clone();
+    let stored = tauri::async_runtime::spawn_blocking(move || {
+        engine.plugin_stored_lines(server, channel_id, REPLAY_LINES)
+    })
+    .await
+    .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))??;
+    let lines: Vec<StoredLine> = stored
+        .into_iter()
+        .map(|line| StoredLine {
+            message: line.message_id,
+            sender: PeerInfo {
+                session: line.sender.session,
+                name: line.sender.name,
+                cert_hash: line.sender.cert_hash,
+                is_friend: false,
+            },
+            text: line.text,
+            trigger: line.trigger,
+        })
+        .collect();
+    plugins
+        .call(move |service| {
+            service.replay_chat(server, channel_id, &lines);
+            Ok(())
+        })
+        .await?;
+    Ok(())
 }
 
 /// Whether the server passes plugin data (FR-6.38); the answer so far, kept current by the

@@ -1,4 +1,5 @@
-/// Chat integration (FR-6.44, FR-6.45). Plugins never read chat text.
+/// Chat integration (FR-6.44, FR-6.45). Plugins never read chat text beyond their own
+/// triggers and patterns.
 interface chat {
   use types.{error, session};
 
@@ -21,4 +22,30 @@ interface chat {
   /// 'Show text' to reveal the line. Needs `chat.supersedes` and `ui.chat-card`.
   /// Errors: `not-permitted`, `invalid` (unknown card).
   supersede: func(card-id: string, sender: session, hash: u32) -> result<_, error>;
+
+  /// The chat message behind the `chat-match` or `chat-trigger` event being handled right now,
+  /// as an opaque token for `replace` and `hide`. None outside such an event, or when the message
+  /// cannot be replaced (e.g. it was not stored). The token is only valid for this plugin.
+  current-message: func() -> option<u64>;
+
+  /// True while handling a `chat-match` or `chat-trigger` event replayed from stored chat
+  /// history (e.g. when the user opens a channel). Such an event is render-only: show or replace
+  /// cards, but do not count votes, post replies or send peer messages again. Replays also
+  /// deliver this plugin's own earlier lines ('[Name] …') as `chat-match` with
+  /// `pattern-index` 255 (needs `chat.send`), so their cards can be shown again. Only plugins
+  /// that import this function get replayed events.
+  is-replay: func() -> bool;
+
+  /// Shows chat card `card-id` in place of `message` (a token from `current-message`); the
+  /// original text stays one click away and the host shows the plugin's icon. Allowed only for
+  /// messages this plugin was handed. Needs `ui.chat-card`.
+  /// Errors: `not-permitted` (no permission, or not this plugin's message), `invalid` (bad card
+  /// id).
+  replace: func(message: u64, card-id: string) -> result<_, error>;
+
+  /// Hides `message` (a token from `current-message`), e.g. a `!poll 2` vote the plugin counted.
+  /// The host leaves a small 'Hidden by <Plugin>' line with the original text one click away.
+  /// Allowed only for messages this plugin was handed.
+  /// Errors: `not-permitted`.
+  hide: func(message: u64) -> result<_, error>;
 }

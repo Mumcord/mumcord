@@ -145,6 +145,9 @@ pub enum PluginEngineEvent {
         channel: PluginChannel,
         trigger: String,
         args: String,
+        /// The stored id of the message, so a plugin can replace it with a card; `None` when it
+        /// was not stored.
+        message_id: Option<u64>,
     },
     /// A channel message in the user's current channel whose plain text
     /// ([`crate::plain_text::plain_lines`]) matches a pattern set with
@@ -156,6 +159,8 @@ pub enum PluginEngineEvent {
         sender: PluginPeer,
         channel: PluginChannel,
         text: String,
+        /// As for [`PluginEngineEvent::ChatTrigger`].
+        message_id: Option<u64>,
     },
     /// Someone mentioned the user (the UI decides what a mention is); no text.
     Mentioned {
@@ -763,8 +768,16 @@ fn text_channel(state: &ServerState, msg: &TextMessage) -> Option<u32> {
     })
 }
 
-/// Chat activity (FR-6.16): who wrote in which channel, never the text.
-pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg: &TextMessage) {
+/// Chat activity (FR-6.16): who wrote in which channel, never the text. `message_id` is the id
+/// the chat gave the shown message.
+pub(crate) fn on_text(
+    hub: &PluginHub,
+    ctx: &SessionCtx,
+    blocks: &BlockList,
+    msg: &TextMessage,
+    message_id: Option<&str>,
+) {
+    let message_id = message_id.and_then(|id| id.parse().ok());
     let Some(actor) = msg.actor else {
         return;
     };
@@ -789,7 +802,7 @@ pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg
     if blocked {
         return;
     }
-    emit_trigger(hub, ctx, &sender, &channel, &msg.message);
+    emit_trigger(hub, ctx, &sender, &channel, &msg.message, message_id);
     emit_match(
         hub,
         ctx.server_id,
@@ -797,6 +810,7 @@ pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg
         &channel,
         own_channel,
         &msg.message,
+        message_id,
     );
     hub.emit(PluginEngineEvent::ChatActivity {
         server_id: ctx.server_id,
@@ -812,6 +826,7 @@ fn emit_trigger(
     sender: &PluginPeer,
     channel: &PluginChannel,
     html: &str,
+    message_id: Option<u64>,
 ) {
     if let Some((trigger, args)) = crate::plain_text::chat_trigger(html) {
         hub.emit(PluginEngineEvent::ChatTrigger {
@@ -820,6 +835,7 @@ fn emit_trigger(
             channel: channel.clone(),
             trigger,
             args,
+            message_id,
         });
     }
 }
@@ -833,6 +849,7 @@ fn emit_match(
     channel: &PluginChannel,
     own_channel: Option<u32>,
     html: &str,
+    message_id: Option<u64>,
 ) {
     if own_channel != Some(channel.id) {
         return;
@@ -847,13 +864,21 @@ fn emit_match(
             sender: sender.clone(),
             channel: channel.clone(),
             text,
+            message_id,
         });
     }
 }
 
 /// Chat activity for the user's own channel message: the server does not echo it back, and
 /// plugins (e.g. pets reacting to the user's chatting) count it as activity too.
-pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, html: &str) {
+pub(crate) fn on_own_text(
+    hub: &PluginHub,
+    ctx: &SessionCtx,
+    channel_id: u32,
+    html: &str,
+    message_id: &str,
+) {
+    let message_id = message_id.parse().ok();
     let found = ctx.handle.with_state(|s| {
         let me = s.own_user()?;
         s.channels
@@ -861,7 +886,7 @@ pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, ht
             .then(|| (peer_of(me), channel_of(s, channel_id), me.channel_id))
     });
     if let Some((sender, channel, own_channel)) = found {
-        emit_trigger(hub, ctx, &sender, &channel, html);
+        emit_trigger(hub, ctx, &sender, &channel, html, message_id);
         emit_match(
             hub,
             ctx.server_id,
@@ -869,6 +894,7 @@ pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, ht
             &channel,
             Some(own_channel),
             html,
+            message_id,
         );
         hub.emit(PluginEngineEvent::ChatActivity {
             server_id: ctx.server_id,
@@ -878,7 +904,87 @@ pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, ht
     }
 }
 
+/// A stored channel message for a plugin history replay (render only). Like live chat, only
+/// lines that match an active chat pattern, have the trigger shape or carry a "[Name] " plugin
+/// prefix leave the engine; blocked senders never do.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginStoredLine {
+    pub message_id: u64,
+    /// Session 0: the sender may have left long ago.
+    pub sender: PluginPeer,
+    /// [`crate::plain_text::plain_lines`] of the message.
+    pub text: String,
+    /// [`crate::plain_text::chat_trigger`] of the message.
+    pub trigger: Option<(String, String)>,
+}
+
+/// Whether a plain line starts with a "[Name] " prefix as plugins post it.
+fn has_plugin_prefix(text: &str) -> bool {
+    text.strip_prefix('[')
+        .and_then(|rest| rest.split_once("] "))
+        .is_some_and(|(name, _)| !name.is_empty() && !name.contains(']'))
+}
+
 impl Engine {
+    /// The newest `limit` stored messages of the user's current channel on `server_id` that
+    /// plugins may see again (see [`PluginStoredLine`]), oldest first. Empty for any other
+    /// channel: plugins only ever see the channel the user is in.
+    pub fn plugin_stored_lines(
+        &self,
+        server_id: ServerId,
+        channel_id: u32,
+        limit: u32,
+    ) -> crate::EngineResult<Vec<PluginStoredLine>> {
+        let ctx = self.session_ctx_for(server_id)?;
+        let own = ctx
+            .handle
+            .with_state(|s| s.own_user().map(|me| (me.channel_id, me.cert_hash.clone())));
+        let Some((own_channel, own_hash)) = own else {
+            return Ok(Vec::new());
+        };
+        if own_channel != channel_id {
+            return Ok(Vec::new());
+        }
+        let messages = self.history_load(
+            server_id,
+            crate::session::ConversationRef::Channel { channel_id },
+            None,
+            limit,
+        )?;
+        let blocks = crate::blocking::load(&ctx.store());
+        let patterns = lock(&self.events().plugins().chat_patterns).clone();
+        Ok(messages
+            .into_iter()
+            .filter(|m| {
+                m.own
+                    || !crate::blocking::blocks(
+                        &blocks,
+                        own_hash.as_deref(),
+                        server_id,
+                        m.sender_cert_hash.as_deref(),
+                        &m.sender_name,
+                    )
+            })
+            .filter_map(|m| {
+                let message_id = m.id.parse().ok()?;
+                let text = crate::plain_text::plain_lines(&m.body);
+                let trigger = crate::plain_text::chat_trigger(&m.body);
+                let matches = patterns.as_ref().is_some_and(|p| p.is_match(&text));
+                let wanted = matches || trigger.is_some() || has_plugin_prefix(&text);
+                wanted.then_some(PluginStoredLine {
+                    message_id,
+                    sender: PluginPeer {
+                        session: 0,
+                        name: m.sender_name,
+                        cert_hash: m.sender_cert_hash,
+                    },
+                    text,
+                    trigger,
+                })
+            })
+            .collect())
+    }
+
     /// The chat patterns of every active plugin with `chat.patterns` (`None`: none). Only
     /// channel messages in the user's channel that match one become
     /// [`PluginEngineEvent::ChatMatch`].
@@ -1083,7 +1189,7 @@ mod tests {
         };
         let fit = "[Rifter, PvP]<br>Damage Control II";
         let send = |own: Option<u32>, written_in: u32, html: &str| {
-            emit_match(&hub, 1, &peer(2), &channel(written_in), own, html);
+            emit_match(&hub, 1, &peer(2), &channel(written_in), own, html, Some(7));
         };
 
         // No active patterns: nothing leaves the engine.
@@ -1112,12 +1218,22 @@ mod tests {
                 sender,
                 channel,
                 text,
+                message_id,
             } => {
                 assert_eq!((server_id, sender.session, channel.id), (1, 2, 5));
+                assert_eq!(message_id, Some(7), "the message id travels with the match");
                 assert_eq!(text, "[Rifter, PvP]\nDamage Control II");
             }
             other => panic!("{other:?}"),
         }
+    }
+
+    #[test]
+    fn plugin_prefixes_need_a_name_and_a_space() {
+        assert!(has_plugin_prefix("[Poll] Lunch?"));
+        assert!(!has_plugin_prefix("[Poll]Lunch?"));
+        assert!(!has_plugin_prefix("[] x"));
+        assert!(!has_plugin_prefix("hello [Poll] x"));
     }
 
     #[test]

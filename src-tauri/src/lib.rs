@@ -237,6 +237,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_ui_action,
             commands::plugins::plugin_ui_event,
             commands::plugins::plugins_mentioned,
+            commands::plugins::plugins_replay_chat,
             commands::plugin_repos::plugin_repos_list,
             commands::plugin_repos::plugin_repo_preview,
             commands::plugin_repos::plugin_repo_add,

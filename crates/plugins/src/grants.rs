@@ -76,6 +76,8 @@ pub fn event_permission(event: &Event) -> Option<&'static str> {
         Event::HttpResponse(_) => "net.http",
         Event::WebviewMessage(_) => "ui.webview",
         Event::ChatTrigger(_) => "chat.triggers",
+        // A replayed line the plugin posted itself: it may see its own text again.
+        Event::ChatMatch(m) if m.pattern_index == crate::chat::OWN_LINE => "chat.send",
         Event::ChatMatch(_) => "chat.patterns",
         Event::ThemeChanged(_)
         | Event::LanguageChanged(_)

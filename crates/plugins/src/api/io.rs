@@ -60,6 +60,16 @@ pub trait PluginIo: Send + Sync + Debug {
     /// `chat.supersede`.
     fn supersede(&self, plugin: &str, card_id: String, sender: u32, hash: u32)
     -> Result<(), Error>;
+    /// `chat.replace` (`card` set) and `chat.hide` (`None`): `token` must be one the host issued
+    /// to `plugin` with a chat event. Hosts without a chat refuse it.
+    fn replace_message(
+        &self,
+        _plugin: &str,
+        _token: u64,
+        _card: Option<String>,
+    ) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
     /// `webview.show` (FR-6.46). Hosts without web views refuse it.
     fn webview_show(&self, _plugin: &str, _place: Place, _entry: String) -> Result<(), Error> {
         Err(Error::NotPermitted)

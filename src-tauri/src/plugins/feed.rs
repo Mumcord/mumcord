@@ -266,19 +266,28 @@ fn feed(service: &mut PluginService, event: PluginEngineEvent, friends: &HashSet
             channel,
             trigger,
             args,
+            message_id,
         } => service.chat_trigger(
             server_id,
             &peer(sender, friends),
             channel.id,
             &trigger,
             &args,
+            message_id,
         ),
         PluginEngineEvent::ChatMatch {
             server_id,
             sender,
             channel,
             text,
-        } => service.chat_match(server_id, &peer(sender, friends), channel.id, &text),
+            message_id,
+        } => service.chat_match(
+            server_id,
+            &peer(sender, friends),
+            channel.id,
+            &text,
+            message_id,
+        ),
         PluginEngineEvent::Mentioned { server_id, sender } => {
             service.mentioned(server_id, &peer(sender, friends));
         }
@@ -302,10 +311,11 @@ fn feed(service: &mut PluginService, event: PluginEngineEvent, friends: &HashSet
     }
 }
 
-/// An incoming channel message for the supersede check (FR-6.45): its plain text as official
-/// clients show it. Own messages and private messages never supersede.
+/// A channel message for the supersede check (FR-6.45): its plain text as official clients show
+/// it. Private messages never supersede. Own messages can: a plugin's own "[Name] " line (the
+/// only kind a card may hide) is the user's own message on the sender's client.
 pub fn incoming_line(message: &ChatMessageView) -> Option<(u64, u32, String)> {
-    if message.own || !matches!(message.conversation, ConversationRef::Channel { .. }) {
+    if !matches!(message.conversation, ConversationRef::Channel { .. }) {
         return None;
     }
     let id = message.id.parse().ok()?;

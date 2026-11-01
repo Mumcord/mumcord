@@ -25,30 +25,10 @@ impl PluginService {
         channel: u32,
         trigger: &str,
         args: &str,
+        message: Option<u64>,
     ) {
-        self.chat_trigger_at(server, sender, channel, trigger, args, Instant::now());
-    }
-
-    fn chat_trigger_at(
-        &mut self,
-        server: ServerId,
-        sender: &PeerInfo,
-        channel: u32,
-        trigger: &str,
-        args: &str,
-        now: Instant,
-    ) {
-        let in_my_channel = {
-            let state = self.io.peers();
-            state.focused == Some(server)
-                && state
-                    .connections
-                    .get(&server)
-                    .and_then(|c| c.me.as_ref())
-                    .and_then(|me| me.channel.as_ref())
-                    .is_some_and(|(id, _)| *id == channel)
-        };
-        if !in_my_channel || !is_trigger(trigger) {
+        let now = Instant::now();
+        if !self.in_my_channel(server, channel) || !is_trigger(trigger) {
             return;
         }
         let Some(plugin) = self.trigger_owner(trigger) else {
@@ -57,18 +37,20 @@ impl PluginService {
         if !self.trigger_limit.allow((server, sender.session), now) {
             return;
         }
-        let keys = self.ctx.peer_keys.as_ref();
+        let ctx = std::sync::Arc::clone(&self.ctx);
+        let keys = ctx.peer_keys.as_ref();
         let event = Event::ChatTrigger(ChatTrigger {
             sender: wit_peer(keys, &plugin, sender),
             trigger: trigger.to_owned(),
             args: clip_args(args),
         });
-        self.host.send(&plugin, event);
+        let chat = self.live_chat_ref(&plugin, server, message);
+        self.host.send_chat(&plugin, event, chat);
     }
 
     /// The running, enabled plugin with `chat.triggers` that owns `trigger` (first installed
     /// wins). Rebuilt per line like the slash command registry, so it never goes stale.
-    fn trigger_owner(&self, trigger: &str) -> Option<String> {
+    pub(super) fn trigger_owner(&self, trigger: &str) -> Option<String> {
         let records = match self.store().plugins() {
             Ok(records) => records,
             Err(e) => {

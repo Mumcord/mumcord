@@ -485,13 +485,14 @@ pub struct PluginNotification {
 }
 
 /// `plugin://supersede`: hide chat message `messageId` and show the plugin's chat card `card`
-/// in its place (FR-6.45).
+/// in its place, or only a "Hidden by <plugin>" line when `card` is `null` (FR-6.45). The UI
+/// keeps the original text one click away and shows the plugin's icon.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
 #[serde(rename_all = "camelCase")]
 #[tauri_specta(event_name = "plugin://supersede")]
 pub struct PluginSupersede {
     pub plugin: String,
-    pub card: String,
+    pub card: Option<String>,
     pub message_id: String,
 }
 

@@ -17,7 +17,7 @@ use tokio::sync::mpsc::UnboundedSender;
 use super::ServiceEvent;
 use crate::api::io::PluginIo;
 use crate::api::webview::{WebviewPlace, Webviews};
-use crate::chat::{self, GestureGate, Supersede, SupersedeTracker};
+use crate::chat::{self, GestureGate, MessageClaims, Supersede, SupersedeTracker};
 use crate::manifest::Visibility;
 use crate::messaging::{
     AnnounceEntry, AnnounceThrottle, Member, Messenger, PluginRef, SendError, SendRequest,
@@ -157,6 +157,7 @@ impl Connection {
 struct ChatState {
     gate: GestureGate,
     supersede: SupersedeTracker,
+    claims: MessageClaims,
 }
 
 /// See the module docs.
@@ -210,12 +211,21 @@ impl ServiceIo {
             .text(message, sender, line, Instant::now())
     }
 
+    /// The opaque token plugin `plugin` gets for a message it is handed in a chat event.
+    pub fn issue_token(&self, plugin: &str, server: ServerId, message: u64) -> u64 {
+        self.chat().claims.issue(plugin, server, message)
+    }
+
     pub fn webviews(&self) -> &Arc<Webviews> {
         &self.webviews
     }
 
     pub fn forget(&self, plugin: &str) {
-        self.chat().gate.forget(plugin);
+        {
+            let mut chat = self.chat();
+            chat.gate.forget(plugin);
+            chat.claims.forget_plugin(plugin);
+        }
         self.webviews.forget(plugin);
         self.menu_forget_plugin(plugin);
     }
@@ -427,17 +437,32 @@ impl PluginIo for ServiceIo {
         sender: u32,
         hash: u32,
     ) -> Result<(), Error> {
-        let result = self
-            .chat()
-            .supersede
-            .card(plugin, &card_id, sender, hash, Instant::now());
+        let name = self.name(plugin);
+        let result =
+            self.chat()
+                .supersede
+                .card(plugin, &name, &card_id, sender, hash, Instant::now());
         if let Supersede::Replace { card, message } = result {
             self.emit(ServiceEvent::Supersede {
                 plugin: plugin.to_owned(),
-                card,
+                card: Some(card),
                 message,
             });
         }
+        Ok(())
+    }
+
+    fn replace_message(&self, plugin: &str, token: u64, card: Option<String>) -> Result<(), Error> {
+        let claim = self
+            .chat()
+            .claims
+            .claim(plugin, token)
+            .ok_or(Error::NotPermitted)?;
+        self.emit(ServiceEvent::Supersede {
+            plugin: plugin.to_owned(),
+            card,
+            message: claim.message,
+        });
         Ok(())
     }
 
@@ -562,7 +587,7 @@ mod tests {
         io.gesture("poll");
         assert_eq!(io.open_panel_popover("poll"), Ok(()));
         // A chat.send afterwards still works: opening does not use the gesture up.
-        assert_eq!(io.chat().gate.is_fresh("poll", Instant::now()), true);
+        assert!(io.chat().gate.is_fresh("poll", Instant::now()));
         assert!(matches!(
             rx.try_recv(),
             Ok(ServiceEvent::Ui {
@@ -612,13 +637,48 @@ mod tests {
     fn a_card_replaces_its_line_in_either_order() {
         let (events, mut rx) = unbounded_channel();
         let io = ServiceIo::new(None, events);
+        io.peers().plugins.insert(
+            "poll".into(),
+            PluginMeta {
+                name: "Poll".into(),
+                messaging: None,
+            },
+        );
         let hash = chat::line_hash("Poll", "Lunch?");
         assert_eq!(io.chat_text(11, 3, "[Poll] Lunch?"), Supersede::None);
         io.supersede("poll", "c1".into(), 3, hash).expect("ok");
         assert!(matches!(
             rx.try_recv(),
-            Ok(ServiceEvent::Supersede { card, message: 11, .. }) if card == "c1"
+            Ok(ServiceEvent::Supersede { card, message: 11, .. }) if card.as_deref() == Some("c1")
         ));
+    }
+
+    #[test]
+    fn only_the_plugin_handed_a_message_may_replace_or_hide_it() {
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        let token = io.issue_token("fit", 1, 42);
+        assert_eq!(
+            io.replace_message("dice", token, Some("c1".into())),
+            Err(Error::NotPermitted)
+        );
+        assert_eq!(
+            io.replace_message("fit", token ^ 1, None),
+            Err(Error::NotPermitted)
+        );
+        assert!(rx.try_recv().is_err(), "nothing was hidden");
+        io.replace_message("fit", token, Some("c1".into()))
+            .expect("its own message");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Supersede { card, message: 42, .. }) if card.as_deref() == Some("c1")
+        ));
+        io.forget("fit");
+        assert_eq!(
+            io.replace_message("fit", token, None),
+            Err(Error::NotPermitted),
+            "claims end with the plugin"
+        );
     }
 
     #[test]

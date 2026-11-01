@@ -11,7 +11,7 @@ use mumcord_plugins::Source;
 use mumcord_plugins::registry::Download;
 use mumcord_plugins::service::{
     InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService, SelfInfo, ServiceConfig,
-    ServiceError, ServiceEvent, Status,
+    ServiceError, ServiceEvent, Status, StoredLine,
 };
 use mumcord_plugins::verify::IndexEntry;
 use mumcord_plugins::{Digest, HostEvent};
@@ -769,13 +769,13 @@ fn chat_triggers_reach_only_the_owner_and_only_from_my_channel() {
     }
 
     // Another channel, another server or an unknown word: nothing.
-    service.chat_trigger(1, &bob(), 4, "!poll", "1");
-    service.chat_trigger(2, &bob(), 3, "!poll", "1");
-    service.chat_trigger(1, &bob(), 3, "!dice", "1");
+    service.chat_trigger(1, &bob(), 4, "!poll", "1", None);
+    service.chat_trigger(2, &bob(), 3, "!poll", "1", None);
+    service.chat_trigger(1, &bob(), 3, "!dice", "1", None);
     // In my channel: the owner gets it; a third line within a second is dropped.
-    service.chat_trigger(1, &bob(), 3, "!poll", "2");
-    service.chat_trigger(1, &bob(), 3, "!poll", "3");
-    service.chat_trigger(1, &bob(), 3, "!poll", "4");
+    service.chat_trigger(1, &bob(), 3, "!poll", "2", None);
+    service.chat_trigger(1, &bob(), 3, "!poll", "3", None);
+    service.chat_trigger(1, &bob(), 3, "!poll", "4", None);
 
     let wait = std::time::Duration::from_millis(500);
     assert_eq!(
@@ -893,15 +893,15 @@ fn chat_matches_reach_every_matching_plugin_and_only_from_my_channel() {
     assert!(set.is_match("[Rifter, PvP]\nx") && set.is_match("!x") && !set.is_match("hi"));
 
     // Another channel, another server or no pattern matches: nothing.
-    service.chat_match(1, &bob(), 4, "[Rifter, a]");
-    service.chat_match(2, &bob(), 3, "[Rifter, a]");
-    service.chat_match(1, &bob(), 3, "hello");
+    service.chat_match(1, &bob(), 4, "[Rifter, a]", None);
+    service.chat_match(2, &bob(), 3, "[Rifter, a]", None);
+    service.chat_match(1, &bob(), 3, "hello", None);
     // In my channel: every matching plugin, with its first matching pattern.
-    service.chat_match(1, &bob(), 3, "[Rifter, a]");
-    service.chat_match(1, &bob(), 3, "!fit b");
-    service.chat_match(1, &bob(), 3, "!x c");
+    service.chat_match(1, &bob(), 3, "[Rifter, a]", None);
+    service.chat_match(1, &bob(), 3, "!fit b", None);
+    service.chat_match(1, &bob(), 3, "!x c", None);
     // A fourth match within 10 seconds is dropped.
-    service.chat_match(1, &bob(), 3, "!fit d");
+    service.chat_match(1, &bob(), 3, "!fit d", None);
 
     let wait = std::time::Duration::from_millis(500);
     let mut got: Vec<(String, u8, Vec<u8>)> =
@@ -916,6 +916,157 @@ fn chat_matches_reach_every_matching_plugin_and_only_from_my_channel() {
             (fits, 6, b"[Rifter, a]".to_vec()),
         ]
     );
+}
+
+/// Like [`MATCH_ECHO`], but imports `chat.is-replay` (so it takes replays): on a `chat-match`
+/// it hides the message behind it (`chat.current-message` + `chat.hide`) and sends the text as
+/// kind 5 (live) or 6 (replay).
+const REPLAY_ECHO: &str = r#"
+(module
+  (import "mumcord:plugin/peers@1.0.0" "send" (func $send (param i32 i32 i32 i32 i32 i32)))
+  (import "mumcord:plugin/chat@1.0.0" "current-message" (func $current (param i32)))
+  (import "mumcord:plugin/chat@1.0.0" "is-replay" (func $replay (result i32)))
+  (import "mumcord:plugin/chat@1.0.0" "hide" (func $hide (param i64 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param $event i32)
+    (if (i32.eq (i32.load8_u (local.get $event)) (i32.const 20))
+      (then
+        (call $current (i32.const 256))
+        (if (i32.eq (i32.load8_u (i32.const 256)) (i32.const 1))
+          (then (call $hide (i64.load (i32.const 264)) (i32.const 288))))
+        (call $send (i32.const 0) (i32.const 0)
+          (i32.add (i32.const 5) (call $replay))
+          (i32.load (i32.add (local.get $event) (i32.const 36)))
+          (i32.load (i32.add (local.get $event) (i32.const 40)))
+          (i32.const 100)))))
+  (func (export "stop"))
+)"#;
+
+/// Plugin messages (plugin, kind, payload) and hidden messages (plugin, message) within `wait`.
+type Seen = (Vec<(String, u8, Vec<u8>)>, Vec<(String, u64)>);
+
+fn sent_and_hidden(
+    service: &mut PluginService,
+    host_events: &mut UnboundedReceiver<HostEvent>,
+    events: &mut UnboundedReceiver<ServiceEvent>,
+    wait: std::time::Duration,
+) -> Seen {
+    let until = std::time::Instant::now() + wait;
+    let (mut sent, mut hidden) = (Vec::new(), Vec::new());
+    loop {
+        while let Ok(event) = host_events.try_recv() {
+            service.handle_host_event(event).expect("handled");
+        }
+        while let Ok(event) = events.try_recv() {
+            match event {
+                ServiceEvent::PeerSend {
+                    plugin, outgoing, ..
+                } => sent.push((plugin, outgoing.bytes[2], outgoing.bytes[3..].to_vec())),
+                ServiceEvent::Supersede {
+                    plugin,
+                    card: None,
+                    message,
+                } => hidden.push((plugin, message)),
+                _ => {}
+            }
+        }
+        if std::time::Instant::now() >= until {
+            sent.sort();
+            hidden.sort();
+            return (sent, hidden);
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}
+
+#[test]
+fn plugins_hide_only_their_messages_and_replays_reach_only_replay_aware_plugins() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["fits@1~dev","old@1~dev"]}"#,
+    );
+    service.self_changed(
+        1,
+        SelfInfo {
+            me: PeerInfo {
+                session: 1,
+                name: "Me".into(),
+                cert_hash: None,
+                is_friend: false,
+            },
+            channel: Some((3, "Lobby".into())),
+            muted: false,
+            deafened: false,
+        },
+    );
+    let extra = r#","permissions":{"required":["peers.messages","chat.patterns"]},"chat_patterns":[{"pattern":"^\\[","description":"Fits"}]"#;
+    let fits_dir = match_folder(fx.root.path(), "fits", extra);
+    std::fs::write(fits_dir.join("plugin.wasm"), encode(REPLAY_ECHO)).expect("wasm");
+    let fits = service.load_dev(&fits_dir).expect("loads");
+    // Built before replays: never gets one.
+    let old = service
+        .load_dev(&match_folder(fx.root.path(), "old", extra))
+        .expect("loads");
+    let wait = std::time::Duration::from_millis(500);
+
+    // Live: both get it; the replay-aware plugin hides the message it was handed.
+    service.chat_match(1, &bob(), 3, "[Rifter, a]", Some(41));
+    let (sent, hidden) = sent_and_hidden(&mut service, &mut host_events, &mut events, wait);
+    assert_eq!(
+        sent,
+        [
+            (fits.clone(), 5, b"[Rifter, a]".to_vec()),
+            (old.clone(), 5, b"[Rifter, a]".to_vec()),
+        ]
+    );
+    assert_eq!(hidden, [(fits.clone(), 41)]);
+
+    // Replay: only the replay-aware plugin, flagged as replay, and never message 41 again.
+    let line = |message, text: &str| StoredLine {
+        message,
+        sender: PeerInfo {
+            session: 0,
+            ..bob()
+        },
+        text: text.into(),
+        trigger: None,
+    };
+    let lines = [
+        line(41, "[Rifter, a]"),
+        line(42, "[Rifter, b]"),
+        line(43, "hi"),
+    ];
+    service.replay_chat(1, 4, &lines);
+    service.replay_chat(1, 3, &lines);
+    let (sent, hidden) = sent_and_hidden(&mut service, &mut host_events, &mut events, wait);
+    assert_eq!(sent, [(fits.clone(), 6, b"[Rifter, b]".to_vec())]);
+    assert_eq!(hidden, [(fits.clone(), 42)]);
+
+    // A second replay of the same history sends nothing.
+    service.replay_chat(1, 3, &lines);
+    let (sent, hidden) = sent_and_hidden(&mut service, &mut host_events, &mut events, wait);
+    assert!(sent.is_empty() && hidden.is_empty(), "{sent:?} {hidden:?}");
 }
 
 /// Plugin, message kind and payload of every plugin message sent within `wait`.

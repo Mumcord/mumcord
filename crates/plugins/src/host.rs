@@ -14,6 +14,7 @@ use std::time::{Duration, Instant};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedSender;
 
+use crate::chat::ChatRef;
 use crate::diag::Diagnostics;
 use crate::health::{Health, Recovery, backoff_steps};
 use crate::manifest::{Manifest, ManifestError};
@@ -324,6 +325,26 @@ impl PluginHost {
             .is_some_and(|worker| worker.queue.push(event))
     }
 
+    /// Queues a chat event (`chat-match`, `chat-trigger`) with the message it is about. A replay
+    /// goes only to plugins that can tell it from a live event; otherwise like [`Self::send`].
+    pub fn send_chat(&self, id: &str, event: Event, chat: ChatRef) -> bool {
+        if !self.ctx.grants.allows_event(id, &event) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .filter(|slot| !chat.replay || slot.compiled.knows_replay())
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| worker.queue.push_chat(event, chat))
+    }
+
+    /// Whether replayed chat events can go to plugin `id` at all.
+    pub fn takes_replays(&self, id: &str) -> bool {
+        self.plugins
+            .get(id)
+            .is_some_and(|slot| slot.compiled.knows_replay() && slot.worker.is_some())
+    }
+
     /// Queues an event for every running plugin that holds the event's permission.
     pub fn broadcast(&self, event: &Event) {
         for worker in self
@@ -467,8 +488,8 @@ fn serve(instance: &mut Instance, queue: &EventQueue) -> Option<CallError> {
     loop {
         match queue.pop() {
             Next::Stop => return None,
-            Next::Event(event) => {
-                if let Err(error) = instance.on_event(&event) {
+            Next::Event(event, chat) => {
+                if let Err(error) = instance.on_event(&event, chat) {
                     return Some(error);
                 }
             }

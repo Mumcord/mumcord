@@ -822,7 +822,7 @@ mod tests {
         fn send(&mut self, req: HttpRequest) -> Result<HttpResponse, HttpError> {
             let id = self.set.request(&self.ctx, req).expect("accepted");
             match self.queue.pop() {
-                Next::Event(event) => match *event {
+                Next::Event(event, _) => match *event {
                     Event::HttpResponse(result) => {
                         assert_eq!(result.id, id);
                         result.outcome

@@ -2727,14 +2727,20 @@ impl Inner {
             // Here rather than in the extension hooks: the private message rule needs to know
             // who runs Mumcord (issue #141).
             Event::TextMessage(message) => {
-                crate::chat::on_text(
+                let shown = crate::chat::on_text(
                     ctx,
                     message,
                     &self.mumcord,
                     &self.pm_requests,
                     &self.blocked,
                 );
-                crate::plugins::on_text(ctx.events.plugins(), ctx, &self.blocked, message);
+                crate::plugins::on_text(
+                    ctx.events.plugins(),
+                    ctx,
+                    &self.blocked,
+                    message,
+                    shown.as_deref(),
+                );
             }
             Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }

@@ -196,7 +196,7 @@ mod tests {
 
     fn next_timer(queue: &EventQueue) -> TimerId {
         match queue.pop() {
-            Next::Event(event) => match *event {
+            Next::Event(event, _) => match *event {
                 Event::Timer(id) => id,
                 _ => panic!("expected a timer event"),
             },

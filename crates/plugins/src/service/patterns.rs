@@ -18,9 +18,17 @@ const PATTERNS_PERMISSION: &str = "chat.patterns";
 impl PluginService {
     /// A channel message from `sender` in `channel` whose plain text matched an active pattern
     /// in the engine. Blocked senders never get here (the engine drops them); the user's own
-    /// messages do.
-    pub fn chat_match(&mut self, server: ServerId, sender: &PeerInfo, channel: u32, text: &str) {
-        self.chat_match_at(server, sender, channel, text, Instant::now());
+    /// messages do. `message` is the stored message id, if it was stored: the plugin may then
+    /// replace it with a card (`chat.replace`).
+    pub fn chat_match(
+        &mut self,
+        server: ServerId,
+        sender: &PeerInfo,
+        channel: u32,
+        text: &str,
+        message: Option<u64>,
+    ) {
+        self.chat_match_at(server, sender, channel, text, message, Instant::now());
     }
 
     fn chat_match_at(
@@ -29,19 +37,10 @@ impl PluginService {
         sender: &PeerInfo,
         channel: u32,
         text: &str,
+        message: Option<u64>,
         now: Instant,
     ) {
-        let in_my_channel = {
-            let state = self.io.peers();
-            state.focused == Some(server)
-                && state
-                    .connections
-                    .get(&server)
-                    .and_then(|c| c.me.as_ref())
-                    .and_then(|me| me.channel.as_ref())
-                    .is_some_and(|(id, _)| *id == channel)
-        };
-        if !in_my_channel {
+        if !self.in_my_channel(server, channel) {
             return;
         }
         let matches: Vec<(String, u8)> = self
@@ -53,14 +52,16 @@ impl PluginService {
             return;
         }
         let text = clip_text(text);
-        let keys = self.ctx.peer_keys.as_ref();
+        let ctx = std::sync::Arc::clone(&self.ctx);
+        let keys = ctx.peer_keys.as_ref();
         for (plugin, pattern_index) in matches {
             let event = Event::ChatMatch(ChatMatch {
                 sender: wit_peer(keys, &plugin, sender),
                 pattern_index,
                 text: text.clone(),
             });
-            self.host.send(&plugin, event);
+            let chat = self.live_chat_ref(&plugin, server, message);
+            self.host.send_chat(&plugin, event, chat);
         }
     }
 
@@ -77,7 +78,7 @@ impl PluginService {
 
     /// The running, enabled plugins with `chat.patterns` and their pattern sources. Rebuilt per
     /// message like the trigger owners, so it never goes stale.
-    fn active_patterns(&self) -> Vec<(String, Vec<String>)> {
+    pub(super) fn active_patterns(&self) -> Vec<(String, Vec<String>)> {
         let records = match self.store().plugins() {
             Ok(records) => records,
             Err(e) => {

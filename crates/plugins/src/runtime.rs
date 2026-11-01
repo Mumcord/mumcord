@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 
 use semver::Version;
 use tokio::sync::mpsc::UnboundedSender;
+use wasmtime::component::types::ComponentItem;
 use wasmtime::component::{Component, InstancePre, Linker};
 use wasmtime::{
     Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap, UpdateDeadline,
@@ -27,6 +28,7 @@ use crate::api::storage::{Storage, StorageApi};
 use crate::api::theme::Theme;
 use crate::api::timers::{TimerSet, Timers};
 use crate::cache;
+use crate::chat::ChatRef;
 use crate::diag::Diagnostics;
 use crate::grants::Grants;
 use crate::host::HostEvent;
@@ -184,6 +186,8 @@ pub enum CallError {
 pub struct Compiled {
     engine: Engine,
     pre: PluginPre<PluginState>,
+    /// The plugin imports `chat.is-replay`, so it can tell replayed chat events from live ones.
+    knows_replay: bool,
 }
 
 /// Everything a plugin's store is built from.
@@ -221,6 +225,8 @@ pub struct PluginState {
     /// The FR-6.42 update rate per UI slot.
     pub(crate) ui: api::ui::UiLimiter,
     pub(crate) clock: CallClock,
+    /// The chat message behind the event being handled (`chat.current-message`).
+    pub(crate) chat: ChatRef,
     limiter: Limiter,
 }
 
@@ -327,9 +333,17 @@ impl Runtime {
             None => Component::new(&self.engine, wasm)
                 .map_err(|e| CompileError::Invalid(format!("{e:#}")))?,
         };
-        for (name, _) in component.component_type().imports(&self.engine) {
+        let mut knows_replay = false;
+        for (name, item) in component.component_type().imports(&self.engine) {
             if !import_allowed(name) {
                 return Err(CompileError::UnknownImport(name.to_owned()));
+            }
+            if name.starts_with("mumcord:plugin/chat@")
+                && let ComponentItem::ComponentInstance(instance) = item.ty
+            {
+                knows_replay = instance
+                    .exports(&self.engine)
+                    .any(|(export, _)| export == "is-replay");
             }
         }
         let pre: InstancePre<PluginState> = self
@@ -346,6 +360,7 @@ impl Runtime {
         Ok(Compiled {
             engine: self.engine.clone(),
             pre,
+            knows_replay,
         })
     }
 }
@@ -369,6 +384,12 @@ fn import_allowed(name: &str) -> bool {
 }
 
 impl Compiled {
+    /// Whether replayed chat events may go to this plugin (see `chat.is-replay`): a plugin built
+    /// before replays existed could not tell them from live ones and would act on them twice.
+    pub(crate) fn knows_replay(&self) -> bool {
+        self.knows_replay
+    }
+
     /// Instantiates the plugin in a fresh store and calls its `start`.
     pub(crate) fn start(&self, params: &StartParams) -> Result<Instance, CallError> {
         let limits = StoreLimitsBuilder::new()
@@ -394,6 +415,7 @@ impl Compiled {
                 .set(Arc::clone(&params.id), Weak::clone(&params.queue)),
             ui: api::ui::UiLimiter::default(),
             clock: CallClock::default(),
+            chat: ChatRef::default(),
             limiter: Limiter {
                 limits,
                 diag: Arc::clone(&params.diag),
@@ -424,11 +446,13 @@ impl Compiled {
 }
 
 impl Instance {
-    pub(crate) fn on_event(&mut self, event: &Event) -> Result<(), CallError> {
+    pub(crate) fn on_event(&mut self, event: &Event, chat: ChatRef) -> Result<(), CallError> {
         self.store.set_epoch_deadline(CALL_TICKS);
         self.store.data_mut().clock = CallClock::default();
+        self.store.data_mut().chat = chat;
         let started = Instant::now();
         let result = self.plugin.call_on_event(&mut self.store, event);
+        self.store.data_mut().chat = ChatRef::default();
         self.store.data().diag.add_cpu(started.elapsed());
         result.map_err(classify)
     }
@@ -547,7 +571,7 @@ impl LogBuffer {
 
 /// What a plugin thread does next.
 pub(crate) enum Next {
-    Event(Box<Event>),
+    Event(Box<Event>, ChatRef),
     Stop,
 }
 
@@ -562,7 +586,7 @@ pub(crate) struct EventQueue {
 }
 
 struct QueueState {
-    events: VecDeque<(u64, Event)>,
+    events: VecDeque<(u64, Event, ChatRef)>,
     /// Pending talking state per user, in order of the first change since the last delivery.
     talking: VecDeque<(u64, Peer, bool)>,
     /// When the talking events of the last second were delivered.
@@ -595,12 +619,17 @@ impl EventQueue {
     /// Queues an event. Returns false when the plugin is not taking events (backing off); the
     /// event is then dropped and counted.
     pub(crate) fn push(&self, event: Event) -> bool {
+        self.push_chat(event, ChatRef::default())
+    }
+
+    /// Queues a chat event together with the message it is about (`chat.current-message`).
+    pub(crate) fn push_chat(&self, event: Event, chat: ChatRef) -> bool {
         let mut state = self.lock();
         if !state.accepting {
             self.diag.events_dropped(1);
             return false;
         }
-        let dropped = state.push(event);
+        let dropped = state.push(event, chat);
         drop(state);
         self.diag.events_dropped(dropped);
         self.changed.notify_one();
@@ -615,8 +644,8 @@ impl EventQueue {
                 return Next::Stop;
             }
             let now = Instant::now();
-            if let Some(event) = state.pop(now) {
-                return Next::Event(Box::new(event));
+            if let Some((event, chat)) = state.pop(now) {
+                return Next::Event(Box::new(event), chat);
             }
             state = match state.talking_wake_at() {
                 Some(at) => {
@@ -673,7 +702,7 @@ impl EventQueue {
 
 impl QueueState {
     /// Adds an event; returns how many had to be dropped for it.
-    fn push(&mut self, event: Event) -> usize {
+    fn push(&mut self, event: Event, chat: ChatRef) -> usize {
         let seq = self.next_seq;
         self.next_seq += 1;
         if let Event::Talking((peer, talking)) = &event
@@ -693,14 +722,14 @@ impl QueueState {
         }
         match event {
             Event::Talking((peer, talking)) => self.talking.push_back((seq, peer, talking)),
-            event => self.events.push_back((seq, event)),
+            event => self.events.push_back((seq, event, chat)),
         }
         dropped
     }
 
     /// Drops the oldest non-UI entry (talking states count as non-UI), else the oldest one.
     fn drop_one(&mut self) {
-        let non_ui = self.events.iter().position(|(_, e)| !is_ui(e));
+        let non_ui = self.events.iter().position(|(_, e, _)| !is_ui(e));
         let event_seq = non_ui.map(|i| self.events[i].0);
         let talking_seq = self.talking.front().map(|(seq, _, _)| *seq);
         match (non_ui, event_seq, talking_seq) {
@@ -721,7 +750,7 @@ impl QueueState {
 
     /// The next event in arrival order, unless it is a talking event over the rate limit; then
     /// other events go first.
-    fn pop(&mut self, now: Instant) -> Option<Event> {
+    fn pop(&mut self, now: Instant) -> Option<(Event, ChatRef)> {
         while self
             .talking_sent
             .front()
@@ -735,19 +764,22 @@ impl QueueState {
             .front()
             .filter(|_| talking_allowed)
             .map(|(seq, _, _)| *seq);
-        let event_seq = self.events.front().map(|(seq, _)| *seq);
+        let event_seq = self.events.front().map(|(seq, _, _)| *seq);
         match (event_seq, talking_seq) {
             (Some(e), Some(t)) if t < e => self.pop_talking(now),
-            (Some(_), _) => self.events.pop_front().map(|(_, event)| event),
+            (Some(_), _) => self
+                .events
+                .pop_front()
+                .map(|(_, event, chat)| (event, chat)),
             (None, Some(_)) => self.pop_talking(now),
             (None, None) => None,
         }
     }
 
-    fn pop_talking(&mut self, now: Instant) -> Option<Event> {
+    fn pop_talking(&mut self, now: Instant) -> Option<(Event, ChatRef)> {
         let (_, peer, talking) = self.talking.pop_front()?;
         self.talking_sent.push_back(now);
-        Some(Event::Talking((peer, talking)))
+        Some((Event::Talking((peer, talking)), ChatRef::default()))
     }
 
     /// When a held-back talking event may go out.
@@ -813,7 +845,7 @@ mod tests {
     }
 
     fn drain(state: &mut QueueState, now: Instant) -> Vec<Event> {
-        std::iter::from_fn(|| state.pop(now)).collect()
+        std::iter::from_fn(|| state.pop(now).map(|(event, _)| event)).collect()
     }
 
     #[test]
@@ -881,7 +913,7 @@ mod tests {
         assert_eq!(diag.snapshot().dropped_events, 3);
         queue.set_accepting(true);
         assert!(queue.push(Event::Timer(3)));
-        assert!(matches!(queue.pop(), Next::Event(e) if matches!(*e, Event::Timer(3))));
+        assert!(matches!(queue.pop(), Next::Event(e, _) if matches!(*e, Event::Timer(3))));
     }
 
     #[test]

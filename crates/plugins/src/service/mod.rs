@@ -17,6 +17,7 @@ mod lifecycle;
 mod messaging;
 mod patterns;
 mod plugin_io;
+mod replay;
 mod revocation;
 mod triggers;
 mod ui;
@@ -47,6 +48,7 @@ pub use commands::{CommandOutcome, PluginCommand};
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
 pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, UiUpdate};
+pub use replay::{REPLAY_PER_PLUGIN, StoredLine};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
 pub use ui::UiInput;
 pub use updates::{Approval, Due, Schedule, UpdateInfo, load_repository, run_check};
@@ -94,10 +96,11 @@ pub enum ServiceEvent {
     /// `chat.send` passed the gesture gate: post `line` ("[Name] text") as a channel message
     /// through the normal chat path.
     ChatPost { plugin: String, line: String },
-    /// Hide text message `message` and show the plugin's card `card` instead (FR-6.45).
+    /// Hide text message `message` and show the plugin's card `card` instead, or only a
+    /// "Hidden by <Plugin>" line when `card` is `None` (FR-6.45).
     Supersede {
         plugin: String,
-        card: String,
+        card: Option<String>,
         message: u64,
     },
     /// A new plugin version is waiting in the Updates tab: a notification-centre entry, no OS
@@ -290,6 +293,8 @@ pub struct PluginService {
     trigger_limit: crate::triggers::RateLimit,
     /// Per-sender limit for chat pattern matches.
     match_limit: crate::triggers::RateLimit,
+    /// Chat messages each plugin already got, so a history replay never repeats one.
+    replayed: replay::Seen,
 }
 
 impl PluginService {
@@ -351,6 +356,7 @@ impl PluginService {
                 crate::patterns::RATE_LIMIT,
                 crate::patterns::RATE_WINDOW,
             ),
+            replayed: replay::Seen::default(),
         };
         Ok((service, host_rx, events_rx))
     }
