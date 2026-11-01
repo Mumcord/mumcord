@@ -135,6 +135,8 @@ impl Layout {
     }
 }
 
+const FIXTURE_LICENSE: &str = "MIT License\n\nCopyright (c) Mumcord test fixtures\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND.\n";
+
 /// Fields every fixture shares. A manifest-format change only touches this function.
 fn common_manifest(name: &str) -> Map<String, Value> {
     let Value::Object(map) = json!({
@@ -268,6 +270,12 @@ fn build_fixture(
             &json!({ "manifest.name": name, "manifest.description": description }),
         )?,
     )?;
+    // Official packages must ship a README and a LICENSE, so every fixture carries both.
+    fs::write(
+        folder.join("README.md"),
+        format!("# {name}\n\n{description}\n\nA test fixture, never shipped to users.\n"),
+    )?;
+    fs::write(folder.join("LICENSE"), FIXTURE_LICENSE)?;
     if dir.join("web").is_dir() {
         copy_dir(&dir.join("web"), &folder.join("web"))?;
     }

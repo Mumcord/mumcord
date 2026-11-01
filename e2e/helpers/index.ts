@@ -3,6 +3,7 @@ export * as app from "./app.ts";
 export * as apps from "./apps.ts";
 export * as axe from "./axe.ts";
 export * as netsim from "./netsim.ts";
+export * as registry from "./registry.ts";
 export * as testenv from "./testenv.ts";
 export {
   bot,
