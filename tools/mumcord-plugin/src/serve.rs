@@ -169,6 +169,9 @@ impl Registry {
         let mut plugins = Vec::new();
         for (id, infos) in by_id {
             let mut plugin = self.index_plugin(&id, &infos)?;
+            if let Some(png) = latest_package(&infos).and_then(|i| i.icon_png.clone()) {
+                files.insert(format!("v1/media/{id}/icon.png"), png);
+            }
             if self.has(&Scenario::TamperedHash(id.clone())) {
                 for version in &mut plugin.versions {
                     version.sha256 = tamper(&version.sha256);
@@ -242,11 +245,12 @@ impl Registry {
     }
 
     fn index_plugin(&self, id: &str, infos: &[PackageInfo]) -> Result<IndexPlugin> {
-        let latest = infos
-            .iter()
-            .max_by(|a, b| a.manifest.version.cmp(&b.manifest.version))
-            .context("no package")?;
+        let latest = latest_package(infos).context("no package")?;
         let manifest = &latest.manifest;
+        let manifest_icon_url = latest
+            .icon_png
+            .is_some()
+            .then(|| format!("{}v1/media/{id}/icon.png", self.base));
         let versions = infos
             .iter()
             .map(|info| info.index_version(format!("{}packages/{}", self.base, info.file_name())))
@@ -256,7 +260,7 @@ impl Registry {
             name: BTreeMap::from([("en".to_owned(), manifest.name.clone())]),
             summary: BTreeMap::from([("en".to_owned(), manifest.description.clone())]),
             description_md_url: None,
-            icon: None,
+            icon: manifest_icon_url,
             screenshots: Vec::new(),
             categories: manifest.categories.clone(),
             authors: manifest.authors.clone(),
@@ -315,6 +319,12 @@ impl Registry {
 }
 
 /// Flips the first hex digit, so the hash stays well-formed but never matches.
+fn latest_package(infos: &[PackageInfo]) -> Option<&PackageInfo> {
+    infos
+        .iter()
+        .max_by(|a, b| a.manifest.version.cmp(&b.manifest.version))
+}
+
 fn tamper(sha256: &str) -> String {
     let mut chars: Vec<char> = sha256.chars().collect();
     if let Some(first) = chars.first_mut() {
@@ -499,6 +509,8 @@ impl Response {
 fn content_type(path: &str) -> &'static str {
     if path.ends_with(".json") {
         "application/json"
+    } else if path.ends_with(".png") {
+        "image/png"
     } else if path.ends_with(".mcplugin") {
         "application/zip"
     } else {
@@ -509,6 +521,11 @@ fn content_type(path: &str) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn serves_png_as_an_image() {
+        assert_eq!(content_type("v1/media/dice/icon.png"), "image/png");
+    }
 
     #[test]
     fn parses_scenarios() {
@@ -683,6 +700,13 @@ mod tests {
 
             let index = official_index(&base, &keys).expect("signed by the test key");
             assert_eq!(index.sequence, 10);
+            let icon = index.plugin("dice").expect("listed").icon.clone();
+            let icon = icon.expect("the index lists the package icon");
+            assert_eq!(icon, format!("{base}v1/media/dice/icon.png"));
+            assert_eq!(
+                get(&base, "v1/media/dice/icon.png"),
+                registry::tests::TEST_PNG
+            );
             assert_eq!(
                 index.plugin("dice").expect("listed").latest().version,
                 "1.1.0"

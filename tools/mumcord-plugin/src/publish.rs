@@ -17,6 +17,9 @@ use crate::registry::{PackageInfo, api_major};
 use crate::sign;
 use crate::source::{self, PLUGIN_FILE, PluginFile, SourceRef, VersionFile};
 
+/// The store icon kept in the plugin folder; `site-data` publishes it under `v1/media/<id>/`.
+const ICON_FILE: &str = "icon.png";
+
 #[derive(clap::Args)]
 pub struct Args {
     /// The built package; its signature `<package>.minisig` must sit next to it.
@@ -66,15 +69,35 @@ pub fn run(args: Args) -> Result<()> {
     let mut changed = vec![version_path.clone()];
     if plugin_path.exists() {
         let mut plugin: PluginFile = source::read_toml(&plugin_path)?;
+        let mut edited = false;
         if !plugin.author_keys.contains(&author_key) {
             plugin.author_keys.push(author_key.clone());
-            fs::write(&plugin_path, toml::to_string(&plugin)?)?;
-            changed.push(plugin_path.clone());
+            edited = true;
             println!("note: a new author key needs maintainer review");
         }
+        // A plugin listed before it had a PNG icon gets one with its next version.
+        if plugin.icon.is_none()
+            && let Some(png) = &info.icon_png
+        {
+            let icon_path = source::plugin_dir(&args.plugins_repo, &id).join(ICON_FILE);
+            fs::write(&icon_path, png)?;
+            changed.push(icon_path);
+            plugin.icon = Some(ICON_FILE.to_owned());
+            edited = true;
+        }
+        if edited {
+            fs::write(&plugin_path, toml::to_string(&plugin)?)?;
+            changed.push(plugin_path.clone());
+        }
     } else {
-        let plugin = new_plugin_file(&package, author_key);
+        let mut plugin = new_plugin_file(&package, author_key);
         fs::create_dir_all(source::plugin_dir(&args.plugins_repo, &id))?;
+        if let Some(png) = &info.icon_png {
+            let icon_path = source::plugin_dir(&args.plugins_repo, &id).join(ICON_FILE);
+            fs::write(&icon_path, png)?;
+            changed.push(icon_path);
+            plugin.icon = Some(ICON_FILE.to_owned());
+        }
         fs::write(&plugin_path, toml::to_string(&plugin)?)?;
         changed.push(plugin_path.clone());
     }
@@ -284,5 +307,10 @@ mod tests {
         assert_eq!(version.source.commit.len(), 40);
         assert_eq!(plugins[0].plugin.author_keys, [signer.public_line()]);
         assert!(!plugins[0].plugin.reviewed);
+        assert_eq!(plugins[0].plugin.icon.as_deref(), Some("icon.png"));
+        assert_eq!(
+            fs::read(repo.join("plugins/dice/icon.png")).expect("icon written"),
+            crate::registry::tests::TEST_PNG
+        );
     }
 }

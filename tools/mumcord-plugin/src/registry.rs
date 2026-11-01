@@ -8,7 +8,8 @@ use mumcord_plugins::manifest::Manifest;
 use mumcord_plugins::package::{Digest, MANIFEST_FILE};
 use mumcord_plugins::permissions::{CATALOGUE, Risk};
 use mumcord_plugins::registry::{
-    FORMAT_VERSION, IndexPlugin, IndexVersion, KeyRotation, RepositoryInfo, Revocation,
+    FORMAT_VERSION, IndexPlugin, IndexVersion, KeyRotation, MAX_ICON_BYTES, RepositoryInfo,
+    Revocation,
 };
 use semver::VersionReq;
 use serde::Serialize;
@@ -19,6 +20,8 @@ pub struct PackageInfo {
     pub bytes: Vec<u8>,
     pub manifest: Manifest,
     pub sha256: String,
+    /// The store icon: a PNG from the package (the client refuses SVG store images).
+    pub icon_png: Option<Vec<u8>>,
 }
 
 impl PackageInfo {
@@ -34,10 +37,12 @@ impl PackageInfo {
             .read_to_end(&mut manifest)?;
         let manifest = Manifest::parse(&manifest).context("manifest.json is invalid")?;
         let sha256 = Digest::of(&bytes).sha256_hex();
+        let icon_png = icon_png(&mut archive, &manifest);
         Ok(Self {
             bytes,
             manifest,
             sha256,
+            icon_png,
         })
     }
 
@@ -59,6 +64,35 @@ impl PackageInfo {
             permissions: self.permissions(),
         })
     }
+}
+
+/// The manifest icon as PNG: the icon itself, or for an SVG (or WebP) the PNG next to it
+/// (`icon.svg` → `icon-128.png`, `icon.png`, `icon-512.png`). No rasteriser: without a PNG the
+/// plugin simply has no store icon. Files over the client's size cap are skipped.
+fn icon_png(
+    archive: &mut zip::ZipArchive<Cursor<&Vec<u8>>>,
+    manifest: &Manifest,
+) -> Option<Vec<u8>> {
+    let icon = manifest.icon.as_deref()?;
+    let stem = icon.rsplit_once('.').map_or(icon, |(stem, _)| stem);
+    let candidates = [
+        icon.to_owned(),
+        format!("{stem}-128.png"),
+        format!("{stem}.png"),
+        format!("{stem}-512.png"),
+    ];
+    candidates
+        .iter()
+        .filter(|name| name.ends_with(".png"))
+        .find_map(|name| {
+            let mut file = archive.by_name(name).ok()?;
+            let mut body = Vec::new();
+            file.by_ref()
+                .take(MAX_ICON_BYTES as u64 + 1)
+                .read_to_end(&mut body)
+                .ok()?;
+            (body.len() <= MAX_ICON_BYTES && body.starts_with(b"\x89PNG")).then_some(body)
+        })
 }
 
 pub fn package_file_name(id: &str, version: &str) -> String {
@@ -137,6 +171,9 @@ pub mod tests {
 
     use super::*;
 
+    /// The PNG signature plus filler: enough for the registry, which never decodes images.
+    pub const TEST_PNG: &[u8] = b"\x89PNG\r\n\x1a\n-test-icon";
+
     pub fn manifest(id: &str, version: &str, permissions: &[&str]) -> String {
         json!({
             "manifest": 1,
@@ -147,6 +184,7 @@ pub mod tests {
             "api": "^1.0",
             "authors": ["Tester"],
             "categories": ["fun"],
+            "icon": "assets/icon.svg",
             "license": "Apache-2.0",
             "permissions": { "required": permissions },
         })
@@ -158,12 +196,17 @@ pub mod tests {
         let mut zip = zip::ZipWriter::new(Cursor::new(Vec::new()));
         let options = zip::write::SimpleFileOptions::default();
         let manifest = manifest(id, version, permissions);
-        let files: [(&str, &[u8]); 5] = [
+        let files: [(&str, &[u8]); 7] = [
             (MANIFEST_FILE, manifest.as_bytes()),
             ("plugin.wasm", b"\0asm"),
             ("i18n/en.json", b"{}"),
             ("README.md", b"# Test"),
             ("LICENSE", b"Apache-2.0"),
+            (
+                "assets/icon.svg",
+                b"<svg xmlns=\"http://www.w3.org/2000/svg\"/>",
+            ),
+            ("assets/icon-128.png", TEST_PNG),
         ];
         for (name, body) in files {
             zip.start_file(name, options).expect("test step");
@@ -182,6 +225,7 @@ pub mod tests {
         assert_eq!(version.api, 1);
         assert_eq!(version.permissions, ["chat.send"]);
         assert_eq!(version.sha256.len(), 64);
+        assert_eq!(info.icon_png.as_deref(), Some(TEST_PNG));
     }
 
     #[test]
