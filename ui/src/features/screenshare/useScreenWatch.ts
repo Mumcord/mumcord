@@ -78,11 +78,12 @@ export function useScreenWatch(
       const renderer = createFrameRenderer(canvas, {
         mode: decodeHere ? "vp9" : "rgba",
         onFrame: (frame, atMs) => {
-          if (meter === undefined || frame.kind !== "vp9") return;
-          meter.frame({
+          // Decoded pictures still tell the size and the frame rate, so the chips work there too.
+          const encoded = frame.kind === "vp9";
+          meter?.frame({
             atMs,
-            timestampUs: frame.timestampUs,
-            bytes: frame.data.byteLength,
+            timestampUs: encoded ? frame.timestampUs : null,
+            bytes: encoded ? frame.data.byteLength : null,
             width: frame.width,
             height: frame.height,
           });
