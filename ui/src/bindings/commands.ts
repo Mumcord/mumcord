@@ -495,6 +495,11 @@ export const commands = {
 	closeChoice: (choice: CloseChoice, remember: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("close_choice", { choice, remember })),
 	/**  Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48). */
 	appRestart: () => typedError<null, ApiError>(__TAURI_INVOKE("app_restart")),
+	/**
+	 *  The main window's page painted its start screen; the window can be shown without an empty
+	 *  frame. Called by the inline script in `ui/index.html`, before the app bundle has loaded.
+	 */
+	appStartPainted: () => __TAURI_INVOKE<void>("app_start_painted"),
 	/**  Whether Mumcord is the registered handler for `mumble://` links. */
 	linkHandlerStatus: () => typedError<boolean, ApiError>(__TAURI_INVOKE("link_handler_status")),
 	/**  Makes Mumcord the handler for `mumble://` links (FR-1.6). */

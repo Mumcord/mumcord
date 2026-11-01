@@ -2918,6 +2918,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // app
     appRestart: () => Promise.resolve(null),
+    // Only the inline script in index.html calls this, to show the native window.
+    appStartPainted: () => Promise.resolve(),
     closeChoice: (choice, remember) => {
       if (remember) settings = { ...settings, closeBehaviour: choice };
       return Promise.resolve(null);

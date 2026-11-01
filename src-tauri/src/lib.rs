@@ -204,6 +204,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::ptt::ptt_kde_x11_undo,
             app::close_choice,
             app::app_restart,
+            app::app_start_painted,
             app::link_handler_status,
             app::link_handler_register,
             app::deep_link_take_pending,
@@ -414,6 +415,7 @@ pub fn run() {
             }
             invoke(call)
         })
+        .manage(window::StartReveal::default())
         .manage(dropped::DroppedFiles::default())
         .manage(aux_window::OpenLock::default())
         .manage(commands::inspector::SharedView::default())
