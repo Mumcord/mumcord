@@ -4,9 +4,14 @@
 # (testenv/up.sh v15) and MUMBOT_API_KEY in testenv/.env. Music API: http://127.0.0.1:${MUMBOT_PORT:-8081}.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# shellcheck source=testenv/env.sh
 . ./env.sh
 [ -f .env ] || { echo "missing testenv/.env - run: cp testenv/.env.example testenv/.env" >&2; exit 1; }
-set -a; . ./.env; set +a
+set -a
+# The local, git-ignored .env is not there to follow.
+# shellcheck source=/dev/null
+. ./.env
+set +a
 [ -n "${MUMBOT_API_KEY:-}" ] || { echo "set MUMBOT_API_KEY in testenv/.env (any random string, e.g. openssl rand -hex 16)" >&2; exit 1; }
 [ -f certs/A/cert.pem ] || ./gen-certs.sh
 cert_set=${CERT_SET:-A}
@@ -33,6 +38,8 @@ if [ ! -f "$dir/.registered" ]; then
   touch "$dir/.registered"
 fi
 
-export PUID=$(id -u) PGID=$(id -g) SUPERUSER_PASSWORD="${SUPERUSER_PASSWORD:-x}"
+PUID=$(id -u)
+PGID=$(id -g)
+export PUID PGID SUPERUSER_PASSWORD="${SUPERUSER_PASSWORD:-x}"
 docker compose --profile mumbot up -d --force-recreate mumbot
 echo "mumbot up: music API http://127.0.0.1:${MUMBOT_PORT:-8081} (key MUMBOT_API_KEY from testenv/.env)"
