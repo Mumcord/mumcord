@@ -43,11 +43,24 @@ function currentEnvironment(): ApiEnvironment {
   };
 }
 
+/**
+ * Whether this build may contain the mock. Vite replaces these with constants, so in a release
+ * build (no dev server, no test, no `VITE_MUMCORD_MOCK=1`) this is `false` and the bundler drops
+ * the mock and its seed data from the app entirely (issue #323).
+ */
+const MOCK_BUILD =
+  import.meta.env.DEV ||
+  import.meta.env.MODE === "test" ||
+  import.meta.env.VITE_MUMCORD_MOCK === "1";
+
 let instance: MumcordApi | undefined;
 
 /** The active engine client, created on first use. */
 export function getApi(): MumcordApi {
-  instance ??= selectApiKind(currentEnvironment()) === "mock" ? createMockApi() : createTauriApi();
+  if (instance === undefined) {
+    const kind = selectApiKind(currentEnvironment());
+    instance = MOCK_BUILD && kind === "mock" ? createMockApi() : createTauriApi();
+  }
   return instance;
 }
 
