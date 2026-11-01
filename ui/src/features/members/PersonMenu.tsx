@@ -42,6 +42,7 @@ import { joinChannel } from "../userpanel/readOnly";
 import { requestConnectionExpanded } from "../connection/connectionExpanded";
 import { connectionLevel, useUserStats } from "../connection/userStatsStore";
 import { useProfileCard } from "./useProfileCard";
+import { requestPluginMenu, usePluginMenuEntries } from "../plugins/dialog";
 
 /** Gap kept between the menu and the window edge. */
 const EDGE = 8;
@@ -103,6 +104,7 @@ function PersonMenu({
   const { sent } = usePmRequests(state.serverId);
   const consent = useAcceptedConsent(state.serverId, user?.certHash ?? null);
   const block = useBlock(state.serverId, user?.certHash ?? null, user?.name ?? "");
+  const pluginEntries = usePluginMenuEntries();
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -162,6 +164,10 @@ function PersonMenu({
   const isSelf = user?.session === state.selfSession;
 
   const join = user && !isSelf ? joinTarget(state, user) : null;
+  // Plugin entries (FR-6.40) only for people in the user's own channel.
+  const ownChannel =
+    state.selfSession === null ? undefined : state.users.get(state.selfSession)?.channelId;
+  const inOwnChannel = user && !isSelf && ownChannel !== undefined && user.channelId === ownChannel;
 
   // Chat requests (issue #141) reach Mumcord users who announced them, and only make sense for
   // people who may not write yet: not friends, no accepted conversation, no accepted request.
@@ -378,6 +384,13 @@ function PersonMenu({
                 });
               },
             ))}
+      {inOwnChannel &&
+        pluginEntries.map(({ plugin, label }) =>
+          item(`plugin-${plugin}`, <PluginIcon />, label, () => {
+            closePersonMenu();
+            requestPluginMenu(plugin, user.session, open.opener ?? undefined);
+          }),
+        )}
       {consent &&
         !isSelf &&
         item("revokeConsent", <RevokeIcon />, t("menu.revokeConsent"), () => {
@@ -477,6 +490,12 @@ function MenuConnectionLine({ session }: { session: number }) {
       </svg>
       <span className="person-menu__connection-text">{text}</span>
     </span>
+  );
+}
+
+function PluginIcon() {
+  return (
+    <path d="M10 3H6a2 2 0 0 0-2 2v4h2a2 2 0 1 1 0 4H4v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4h-2a2 2 0 1 1 0-4h2V5a2 2 0 0 0-2-2h-4a2 2 0 1 0-4 0z" />
   );
 }
 

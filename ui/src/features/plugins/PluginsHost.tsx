@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { getApi } from "../../api";
 import { usePreferences } from "../../app/preferences";
+import { PluginDialogHost } from "./dialog";
 import { PluginsPalette } from "./PluginsPalette";
 import { usePluginRequestRouter } from "./pluginRequestStore";
 
@@ -36,5 +37,10 @@ export function PluginsHost() {
     };
   }, [language, dark]);
 
-  return <PluginsPalette />;
+  return (
+    <>
+      <PluginsPalette />
+      <PluginDialogHost />
+    </>
+  );
 }
