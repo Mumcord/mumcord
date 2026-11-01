@@ -6,6 +6,7 @@
      host bridge ends up different. The probe URL can be set with ?probe=<url> and defaults to
      the port the end-to-end proxy listens on; the proxy log must stay empty (AC-6.16). -->
 <pre id="out">probing</pre>
+<pre id="echo">no echo</pre>
 <script>
   (async () => {
     const probe =
@@ -31,6 +32,10 @@
     await attempt("webkit-ipc-post", () => window.webkit.messageHandlers.ipc.postMessage("probe"));
     await attempt("webview2-post", () => window.chrome.webview.postMessage("probe"));
     const report = JSON.stringify(results);
+    // The plugin echoes every page message back, so the echo proves both bridge directions.
+    window.addEventListener("message", (event) => {
+      if (event.data === report) document.getElementById("echo").textContent = "echo received";
+    });
     document.getElementById("out").textContent = report;
     window.parent.postMessage(report, "*");
   })();
