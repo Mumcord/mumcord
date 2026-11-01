@@ -44,3 +44,47 @@
   font-size: var(--font-size-xs, 0.75rem);
   color: var(--color-text-muted);
 }
+
+.plugin-chat-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.plugin-chat-mark {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-sm, 4px);
+  object-fit: cover;
+}
+
+.plugin-chat-mark--initial {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.plugin-chat-original-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plugin-chat-hidden {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-muted);
+}

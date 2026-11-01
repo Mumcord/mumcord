@@ -4,8 +4,9 @@
   },
   "via": "permezz ta' {{plugin}}",
   "supersede": {
-    "showText": "Uri t-test",
-    "hideText": "Aħbi t-test"
+    "showText": "Uri t-test oriġinali",
+    "hideText": "Aħbi t-test oriġinali",
+    "hiddenBy": "Moħbi minn {{plugin}}"
   },
   "command": {
     "list": "Kmandi tal-plugins",

@@ -4,8 +4,9 @@
   },
   "via": "ezen keresztül: {{plugin}}",
   "supersede": {
-    "showText": "Szöveg megjelenítése",
-    "hideText": "Szöveg elrejtése"
+    "showText": "Eredeti szöveg megjelenítése",
+    "hideText": "Eredeti szöveg elrejtése",
+    "hiddenBy": "Elrejtette: {{plugin}}"
   },
   "command": {
     "list": "Bővítményparancsok",

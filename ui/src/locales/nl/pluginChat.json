@@ -4,8 +4,9 @@
   },
   "via": "via {{plugin}}",
   "supersede": {
-    "showText": "Tekst tonen",
-    "hideText": "Tekst verbergen"
+    "showText": "Originele tekst tonen",
+    "hideText": "Originele tekst verbergen",
+    "hiddenBy": "Verborgen door {{plugin}}"
   },
   "command": {
     "list": "Plug-inopdrachten",

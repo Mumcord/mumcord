@@ -4,8 +4,9 @@
   },
   "via": "caur {{plugin}}",
   "supersede": {
-    "showText": "Rādīt tekstu",
-    "hideText": "Paslēpt tekstu"
+    "showText": "Rādīt oriģinālo tekstu",
+    "hideText": "Paslēpt oriģinālo tekstu",
+    "hiddenBy": "Paslēpa {{plugin}}"
   },
   "command": {
     "list": "Spraudņu komandas",

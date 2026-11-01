@@ -4,8 +4,9 @@
   },
   "via": "prin {{plugin}}",
   "supersede": {
-    "showText": "Arată textul",
-    "hideText": "Ascunde textul"
+    "showText": "Afișează textul original",
+    "hideText": "Ascunde textul original",
+    "hiddenBy": "Ascuns de {{plugin}}"
   },
   "command": {
     "list": "Comenzile pluginurilor",

@@ -586,6 +586,13 @@ export const commands = {
 	 *  never the text).
 	 */
 	pluginsMentioned: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_mentioned", { serverId, session })),
+	/**
+	 *  The UI showed the history of a channel, or the plugins changed while it is open: plugins see
+	 *  its stored messages again, render only, so old messages get their cards too (FR-6.45). Only
+	 *  the user's current channel on the focused server is replayed; each message at most once per
+	 *  plugin, so calling this often is cheap.
+	 */
+	pluginsReplayChat: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_replay_chat", { serverId, channelId })),
 	/**  Every added repository, oldest first. */
 	pluginReposList: () => typedError<RepositoryView[], ApiError>(__TAURI_INVOKE("plugin_repos_list")),
 	/**
@@ -2639,11 +2646,12 @@ export type PluginSuggestionSource =
 
 /**
  *  `plugin://supersede`: hide chat message `messageId` and show the plugin's chat card `card`
- *  in its place (FR-6.45).
+ *  in its place, or only a "Hidden by <plugin>" line when `card` is `null` (FR-6.45). The UI
+ *  keeps the original text one click away and shows the plugin's icon.
  */
 export type PluginSupersede = {
 	plugin: string,
-	card: string,
+	card: string | null,
 	messageId: string,
 };
 

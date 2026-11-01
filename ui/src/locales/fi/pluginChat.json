@@ -4,8 +4,9 @@
   },
   "via": "{{plugin}} kautta",
   "supersede": {
-    "showText": "Näytä teksti",
-    "hideText": "Piilota teksti"
+    "showText": "Näytä alkuperäinen teksti",
+    "hideText": "Piilota alkuperäinen teksti",
+    "hiddenBy": "Piilottanut {{plugin}}"
   },
   "command": {
     "list": "Laajennusten komennot",

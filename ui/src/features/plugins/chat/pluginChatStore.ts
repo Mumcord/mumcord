@@ -28,16 +28,16 @@ export interface PlacedCard {
   after: string | null;
 }
 
-/** The card shown instead of a text line (FR-6.45). */
+/** What a plugin shows instead of a text line (FR-6.45): its card, or nothing (`card` null). */
 export interface CardRef {
   plugin: string;
-  card: string;
+  card: string | null;
 }
 
 export interface PluginChatState {
   /** By {@link cardKey}, oldest first. */
   readonly placed: ReadonlyMap<string, PlacedCard>;
-  /** Message id → the card that replaces it. */
+  /** Message id → the card that replaces it, or the plugin that hid it. */
   readonly superseded: ReadonlyMap<string, CardRef>;
   /** Cards that replace a message, by {@link cardKey}; they show there, not as local items. */
   readonly replacing: ReadonlySet<string>;
@@ -101,18 +101,32 @@ export function applyUi(
   return { ...state, placed: capped(new Map(state.placed).set(key, placed)) };
 }
 
-/** A card replaces a text line (`plugin://supersede`). */
+/** A card replaces a text line, or a plugin hides it (`card` null; `plugin://supersede`). */
 export function applySupersede(
   state: PluginChatState,
   plugin: string,
-  card: string,
+  card: string | null,
   messageId: string,
 ): PluginChatState {
   return {
     ...state,
     superseded: capped(new Map(state.superseded).set(messageId, { plugin, card })),
-    replacing: new Set(state.replacing).add(cardKey(plugin, card)),
+    replacing:
+      card === null ? state.replacing : new Set(state.replacing).add(cardKey(plugin, card)),
   };
+}
+
+/**
+ * Lets the plugins see the stored messages of a channel again, render only, so old messages get
+ * their cards too (also ones posted before a plugin was installed). Cheap to repeat: the host
+ * sends each message to a plugin at most once.
+ */
+export function replayChannel(serverId: number, channelId: number): void {
+  getApi()
+    .pluginsReplayChat(serverId, channelId)
+    .catch((error: unknown) => {
+      console.error("Replaying the chat for plugins failed", error);
+    });
 }
 
 let state: PluginChatState = EMPTY;

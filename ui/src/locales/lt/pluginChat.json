@@ -4,8 +4,9 @@
   },
   "via": "per {{plugin}}",
   "supersede": {
-    "showText": "Rodyti tekstą",
-    "hideText": "Slėpti tekstą"
+    "showText": "Rodyti originalų tekstą",
+    "hideText": "Slėpti originalų tekstą",
+    "hiddenBy": "Paslėpė {{plugin}}"
   },
   "command": {
     "list": "Papildinių komandos",

@@ -4,8 +4,9 @@
   },
   "via": "via {{plugin}}",
   "supersede": {
-    "showText": "Visa text",
-    "hideText": "Dölj text"
+    "showText": "Visa originaltext",
+    "hideText": "Dölj originaltext",
+    "hiddenBy": "Dold av {{plugin}}"
   },
   "command": {
     "list": "Pluginkommandon",

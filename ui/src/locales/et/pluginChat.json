@@ -4,8 +4,9 @@
   },
   "via": "läbi {{plugin}}",
   "supersede": {
-    "showText": "Näita teksti",
-    "hideText": "Peida tekst"
+    "showText": "Näita algteksti",
+    "hideText": "Peida algtekst",
+    "hiddenBy": "Peitis {{plugin}}"
   },
   "command": {
     "list": "Pistikprogrammide käsud",

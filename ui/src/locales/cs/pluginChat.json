@@ -4,8 +4,9 @@
   },
   "via": "přes {{plugin}}",
   "supersede": {
-    "showText": "Zobrazit text",
-    "hideText": "Skrýt text"
+    "showText": "Zobrazit původní text",
+    "hideText": "Skrýt původní text",
+    "hiddenBy": "Skryto pluginem {{plugin}}"
   },
   "command": {
     "list": "Příkazy pluginů",

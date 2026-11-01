@@ -4,8 +4,9 @@
   },
   "via": "über {{plugin}}",
   "supersede": {
-    "showText": "Text anzeigen",
-    "hideText": "Text ausblenden"
+    "showText": "Originaltext anzeigen",
+    "hideText": "Originaltext ausblenden",
+    "hiddenBy": "Ausgeblendet von {{plugin}}"
   },
   "command": {
     "list": "Plugin-Befehle",

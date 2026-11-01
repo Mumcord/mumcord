@@ -4,8 +4,9 @@
   },
   "via": "prek {{plugin}}",
   "supersede": {
-    "showText": "Pokaži besedilo",
-    "hideText": "Skrij besedilo"
+    "showText": "Pokaži izvirno besedilo",
+    "hideText": "Skrij izvirno besedilo",
+    "hiddenBy": "Skril {{plugin}}"
   },
   "command": {
     "list": "Ukazi vtičnikov",

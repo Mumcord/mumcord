@@ -4,8 +4,9 @@
   },
   "via": "чрез {{plugin}}",
   "supersede": {
-    "showText": "Покажи текста",
-    "hideText": "Скрий текста"
+    "showText": "Покажи оригиналния текст",
+    "hideText": "Скрий оригиналния текст",
+    "hiddenBy": "Скрито от {{plugin}}"
   },
   "command": {
     "list": "Команди на плъгини",

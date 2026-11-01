@@ -4,8 +4,9 @@
   },
   "via": "trí {{plugin}}",
   "supersede": {
-    "showText": "Taispeáin an téacs",
-    "hideText": "Folaigh an téacs"
+    "showText": "Taispeáin an buntéacs",
+    "hideText": "Folaigh an buntéacs",
+    "hiddenBy": "Folaithe ag {{plugin}}"
   },
   "command": {
     "list": "Orduithe breiseán",

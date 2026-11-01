@@ -4,8 +4,9 @@
   },
   "via": "via {{plugin}}",
   "supersede": {
-    "showText": "Afficher le texte",
-    "hideText": "Masquer le texte"
+    "showText": "Afficher le texte d’origine",
+    "hideText": "Masquer le texte d’origine",
+    "hiddenBy": "Masqué par {{plugin}}"
   },
   "command": {
     "list": "Commandes des plugins",

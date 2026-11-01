@@ -4,8 +4,9 @@
   },
   "via": "cez {{plugin}}",
   "supersede": {
-    "showText": "Zobraziť text",
-    "hideText": "Skryť text"
+    "showText": "Zobraziť pôvodný text",
+    "hideText": "Skryť pôvodný text",
+    "hiddenBy": "Skryl {{plugin}}"
   },
   "command": {
     "list": "Príkazy doplnkov",

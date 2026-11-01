@@ -6,7 +6,7 @@ import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll } from "../../channels/testUtils";
 import { Composer } from "../../chat/Composer";
 import { usePluginUi } from "../render/pluginUiStore";
-import { PluginLine } from "./PluginChatCard";
+import { LeadingPluginCards, PluginLine } from "./PluginChatCard";
 import {
   applySupersede,
   applyUi,
@@ -98,6 +98,9 @@ describe("plugin chat store", () => {
     state = applySupersede(state, "poll", "p1", "m2");
     expect(cardsAfter(state, message("m1", "hi"))).toHaveLength(0);
     expect(state.superseded.get("m2")).toEqual({ plugin: "poll", card: "p1" });
+    const hidden = applySupersede(state, "poll", null, "m3");
+    expect(hidden.superseded.get("m3")).toEqual({ plugin: "poll", card: null });
+    expect(hidden.replacing).toBe(state.replacing);
   });
 
   it("offers only owned commands and finds the command a line starts with", () => {
@@ -268,9 +271,50 @@ describe("plugin chat UI", () => {
     expect(await screen.findByRole("region", { name: "Card from Poll" })).toBeTruthy();
     expect(screen.queryByText("fallback line")).toBeNull();
     expect(screen.queryByText("via Poll")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Show text" }));
+    expect(screen.getByText("Poll", { selector: ".plugin-chat-card__header span" })).toBeTruthy();
+    const toggle = screen.getByRole("button", { name: "Show original text" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle);
     expect(screen.getByText("fallback line")).toBeTruthy();
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(toggle.textContent).toBe("Hide original text");
     expect(await axeViolations(document.body)).toEqual([]);
+  });
+
+  it("shows a hidden line as 'Hidden by' with the plugin's mark and the text one click away", async () => {
+    render(
+      <main>
+        <PluginLine message={message("43", "!poll 2")}>
+          <p>vote line</p>
+        </PluginLine>
+      </main>,
+    );
+    expect(screen.getByText("vote line")).toBeTruthy();
+    act(() => {
+      api.mock.emit("pluginSupersede", { plugin: "poll", card: null, messageId: "43" });
+    });
+    expect(await screen.findByText("Hidden by Poll")).toBeTruthy();
+    expect(screen.queryByText("vote line")).toBeNull();
+    expect(document.querySelector(".plugin-chat-mark--initial")?.textContent).toBe("P");
+    const toggle = screen.getByRole("button", { name: "Show original text" });
+    toggle.focus();
+    fireEvent.click(toggle);
+    expect(screen.getByText("vote line")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Hide original text" }));
+    expect(screen.queryByText("vote line")).toBeNull();
+    expect(await axeViolations(document.body)).toEqual([]);
+  });
+
+  it("asks the plugins to replay a channel once its history is loaded", async () => {
+    const replay = vi.spyOn(api, "pluginsReplayChat");
+    const { rerender } = render(
+      <LeadingPluginCards listKey={'1:{"kind":"channel","channelId":3}'} loaded={false} />,
+    );
+    expect(replay).not.toHaveBeenCalled();
+    rerender(<LeadingPluginCards listKey={'1:{"kind":"channel","channelId":3}'} loaded />);
+    await waitFor(() => {
+      expect(replay).toHaveBeenCalledWith(1, 3);
+    });
   });
 
   it("reports mentions from others only", () => {

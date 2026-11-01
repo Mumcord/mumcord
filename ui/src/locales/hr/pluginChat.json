@@ -4,8 +4,9 @@
   },
   "via": "putem {{plugin}}",
   "supersede": {
-    "showText": "Prikaži tekst",
-    "hideText": "Sakrij tekst"
+    "showText": "Prikaži izvorni tekst",
+    "hideText": "Sakrij izvorni tekst",
+    "hiddenBy": "Sakrio {{plugin}}"
   },
   "command": {
     "list": "Naredbe dodataka",
