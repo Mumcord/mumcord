@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)
+
 ## [0.5.0] - 2026-11-01
 
 ### Added
