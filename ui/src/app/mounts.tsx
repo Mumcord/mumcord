@@ -151,6 +151,16 @@ export function ChatMount() {
   const view = useMediaView();
   if (requests)
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
+  const media =
+    serverId === null ? null : view.cinema === "watch" ? (
+      <WatchTogetherView serverId={serverId} />
+    ) : view.cinema === "share" ? (
+      <ScreenShareView />
+    ) : null;
+  // The cinema view (issue #163) sits under the conversation header, so the channel name and its
+  // actions stay at the top and the chat stays usable below it. Focus shows the picture alone; the
+  // mini bar is what remains when the view is left.
+  if (media !== null && view.focus) return media;
   const chat = (
     <ChatView
       renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
@@ -161,27 +171,10 @@ export function ChatMount() {
           <NotificationBell />
         </>
       )}
+      belowHeader={media ?? undefined}
     />
   );
-  if (serverId === null) return chat;
-  // The cinema view (issue #163): the player above the chat, which stays usable below it; the mini
-  // bar is what remains when the view is left. Focus shows the picture alone.
-  if (view.cinema === "watch") {
-    return (
-      <>
-        <WatchTogetherView serverId={serverId} />
-        {!view.focus && chat}
-      </>
-    );
-  }
-  if (view.cinema === "share") {
-    return (
-      <>
-        <ScreenShareView />
-        {!view.focus && chat}
-      </>
-    );
-  }
+  if (serverId === null || view.cinema !== null) return chat;
   return (
     <>
       <SharerBar />

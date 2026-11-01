@@ -45,9 +45,11 @@ export interface ChatViewProps {
   renderHeaderActions?: (conversation: Conversation) => ReactNode;
   /** Replaces the plain title of a channel chat, e.g. with the channel-name menu (#170). */
   renderChannelTitle?: (channelId: number) => ReactNode;
+  /** A media view between the header and the messages (the cinema views of issue #163). */
+  belowHeader?: ReactNode;
 }
 
-export function ChatView({ renderHeaderActions, renderChannelTitle }: ChatViewProps) {
+export function ChatView({ renderHeaderActions, renderChannelTitle, belowHeader }: ChatViewProps) {
   const { t } = useTranslation("chat");
   const { conversation } = useSelectedConversation();
   if (conversation === null) {
@@ -63,6 +65,7 @@ export function ChatView({ renderHeaderActions, renderChannelTitle }: ChatViewPr
       conversation={conversation}
       renderHeaderActions={renderHeaderActions}
       renderChannelTitle={renderChannelTitle}
+      belowHeader={belowHeader}
     />
   );
 }
@@ -71,12 +74,14 @@ interface ConversationChatProps {
   conversation: Conversation;
   renderHeaderActions: ChatViewProps["renderHeaderActions"];
   renderChannelTitle: ChatViewProps["renderChannelTitle"];
+  belowHeader: ChatViewProps["belowHeader"];
 }
 
 function ConversationChat({
   conversation,
   renderHeaderActions,
   renderChannelTitle,
+  belowHeader,
 }: ConversationChatProps) {
   const { t } = useTranslation("chat");
   const server = useServerState();
@@ -243,6 +248,7 @@ function ConversationChat({
           <div className="chat-header__actions">{renderHeaderActions(conversation)}</div>
         ) : null}
       </header>
+      {belowHeader}
       {pinnedChannelId !== null && <ActivityBanners channelId={pinnedChannelId} />}
       <PinnedInfoBox blocks={pinnedBlocks} />
       <MessageList
