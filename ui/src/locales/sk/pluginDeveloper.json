@@ -1,0 +1,35 @@
+{
+  "hint": "Načítajte rozbalený priečinok doplnku a vyskúšajte ho. Vývojárske doplnky nie sú podpísané, nikdy nie sú oficiálne a nemôžu získať net.http, secrets ani ui.webview. Po vypnutí vývojárskeho režimu sa uvoľnia.",
+  "load": "Načítať priečinok doplnku…",
+  "pickFolder": "Vyberte priečinok doplnku",
+  "empty": "Nie je načítaný žiadny vývojársky doplnok.",
+  "listLabel": "Vývojárske doplnky",
+  "label": "Vývojársky doplnok",
+  "status": {
+    "running": "Beží",
+    "off": "Vypnutý",
+    "backingOff": "Reštartuje sa po páde",
+    "autoOff": "Vypnutý po opakovaných pádoch",
+    "allOff": "Všetky doplnky sú vypnuté",
+    "noPlugins": "Doplnky sú pre túto reláciu vypnuté",
+    "notLoaded": "Nepodarilo sa načítať"
+  },
+  "showLog": "Zobraziť záznam doplnku {{name}}",
+  "reload": "Znova načítať {{name}}",
+  "unload": "Uvoľniť {{name}}",
+  "logLabel": "Záznam doplnku {{name}}",
+  "logTitle": "Záznam doplnku {{name}}",
+  "logEmpty": "Zatiaľ žiadne riadky záznamu.",
+  "level": {
+    "debug": "Ladenie",
+    "info": "Info",
+    "warn": "Upozornenie",
+    "error": "Chyba"
+  },
+  "errors": {
+    "load": "Priečinok doplnku sa nepodarilo načítať.",
+    "reload": "Doplnok sa nepodarilo znova načítať.",
+    "unload": "Doplnok sa nepodarilo uvoľniť.",
+    "log": "Záznam sa nepodarilo prečítať."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "hint": "Tella' folder ta' plugin mhux ippakkjat biex tittestjah. Il-plugins tal-iżviluppatur mhumiex iffirmati, qatt mhuma uffiċjali u ma jistgħux jirċievu net.http, secrets jew ui.webview. Jitneħħew meta l-modalità tal-iżviluppatur titwaqqaf.",
+  "load": "Tella' folder tal-plugin…",
+  "pickFolder": "Agħżel il-folder tal-plugin",
+  "empty": "Ebda plugin tal-iżviluppatur mhu mtella'.",
+  "listLabel": "Plugins tal-iżviluppatur",
+  "label": "Plugin tal-iżviluppatur",
+  "status": {
+    "running": "Qed jaħdem",
+    "off": "Mitfi",
+    "backingOff": "Qed jerġa' jibda wara kraxx",
+    "autoOff": "Mitfi wara krazzjiet ripetuti",
+    "allOff": "Il-plugins kollha huma mitfija",
+    "noPlugins": "Il-plugins huma mitfija għal din is-sessjoni",
+    "notLoaded": "Ma setax jitella'"
+  },
+  "showLog": "Uri r-reġistru ta' {{name}}",
+  "reload": "Erġa' tella' {{name}}",
+  "unload": "Neħħi {{name}}",
+  "logLabel": "Reġistru ta' {{name}}",
+  "logTitle": "Reġistru ta' {{name}}",
+  "logEmpty": "Għad m'hemm l-ebda linji fir-reġistru.",
+  "level": {
+    "debug": "Debug",
+    "info": "Info",
+    "warn": "Twissija",
+    "error": "Żball"
+  },
+  "errors": {
+    "load": "Il-folder tal-plugin ma setax jitella'.",
+    "reload": "Il-plugin ma setax jerġa' jitella'.",
+    "unload": "Il-plugin ma setax jitneħħa.",
+    "log": "Ir-reġistru ma setax jinqara."
+  }
+}

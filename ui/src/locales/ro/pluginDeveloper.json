@@ -1,0 +1,35 @@
+{
+  "hint": "Încarcă un dosar de plugin despachetat pentru a-l testa. Pluginurile de dezvoltator nu sunt semnate, nu sunt niciodată oficiale și nu pot primi net.http, secrets sau ui.webview. Sunt descărcate când modul dezvoltator este oprit.",
+  "load": "Încarcă dosarul pluginului…",
+  "pickFolder": "Alege dosarul pluginului",
+  "empty": "Niciun plugin de dezvoltator nu este încărcat.",
+  "listLabel": "Pluginuri de dezvoltator",
+  "label": "Plugin de dezvoltator",
+  "status": {
+    "running": "Rulează",
+    "off": "Oprit",
+    "backingOff": "Repornește după o blocare",
+    "autoOff": "Oprit după blocări repetate",
+    "allOff": "Toate pluginurile sunt oprite",
+    "noPlugins": "Pluginurile sunt oprite pentru această sesiune",
+    "notLoaded": "Nu a putut fi încărcat"
+  },
+  "showLog": "Arată jurnalul pentru {{name}}",
+  "reload": "Reîncarcă {{name}}",
+  "unload": "Descarcă {{name}}",
+  "logLabel": "Jurnalul pentru {{name}}",
+  "logTitle": "Jurnalul pentru {{name}}",
+  "logEmpty": "Încă nu există linii în jurnal.",
+  "level": {
+    "debug": "Depanare",
+    "info": "Info",
+    "warn": "Avertisment",
+    "error": "Eroare"
+  },
+  "errors": {
+    "load": "Dosarul pluginului nu a putut fi încărcat.",
+    "reload": "Pluginul nu a putut fi reîncărcat.",
+    "unload": "Pluginul nu a putut fi descărcat.",
+    "log": "Jurnalul nu a putut fi citit."
+  }
+}

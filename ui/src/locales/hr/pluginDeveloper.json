@@ -1,0 +1,35 @@
+{
+  "hint": "Učitajte raspakiranu mapu dodatka kako biste ga isprobali. Razvojni dodaci nisu potpisani, nikad nisu službeni i ne mogu dobiti net.http, secrets ni ui.webview. Uklanjaju se kad se isključi razvojni način.",
+  "load": "Učitaj mapu dodatka…",
+  "pickFolder": "Odaberite mapu dodatka",
+  "empty": "Nijedan razvojni dodatak nije učitan.",
+  "listLabel": "Razvojni dodaci",
+  "label": "Razvojni dodatak",
+  "status": {
+    "running": "Radi",
+    "off": "Isključen",
+    "backingOff": "Ponovno se pokreće nakon rušenja",
+    "autoOff": "Isključen nakon ponovljenih rušenja",
+    "allOff": "Svi dodaci su isključeni",
+    "noPlugins": "Dodaci su isključeni za ovu sesiju",
+    "notLoaded": "Nije se mogao učitati"
+  },
+  "showLog": "Prikaži zapisnik dodatka {{name}}",
+  "reload": "Ponovno učitaj {{name}}",
+  "unload": "Ukloni {{name}}",
+  "logLabel": "Zapisnik dodatka {{name}}",
+  "logTitle": "Zapisnik dodatka {{name}}",
+  "logEmpty": "Još nema redaka zapisnika.",
+  "level": {
+    "debug": "Ispravljanje",
+    "info": "Info",
+    "warn": "Upozorenje",
+    "error": "Pogreška"
+  },
+  "errors": {
+    "load": "Mapu dodatka nije bilo moguće učitati.",
+    "reload": "Dodatak nije bilo moguće ponovno učitati.",
+    "unload": "Dodatak nije bilo moguće ukloniti.",
+    "log": "Zapisnik nije bilo moguće pročitati."
+  }
+}

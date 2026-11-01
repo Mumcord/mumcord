@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Group } from "../settings/components/Section";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
 import "./plugins.css";
+import { DeveloperTab } from "./developer/DeveloperTab";
 
 const PLUGIN_TABS = ["installed", "browse", "updates", "repositories", "developer"] as const;
 type PluginTab = (typeof PLUGIN_TABS)[number];
@@ -16,7 +17,7 @@ const TAB_CONTENT: Record<PluginTab, ReactNode> = {
   browse: null,
   updates: null,
   repositories: null,
-  developer: null,
+  developer: <DeveloperTab />,
 };
 
 /**

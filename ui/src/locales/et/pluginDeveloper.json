@@ -1,0 +1,35 @@
+{
+  "hint": "Laadige testimiseks lahtipakitud pistikprogrammi kaust. Arendaja pistikprogrammid pole allkirjastatud, ei ole kunagi ametlikud ega saa õigusi net.http, secrets ega ui.webview. Need eemaldatakse, kui arendajarežiim välja lülitatakse.",
+  "load": "Laadi pistikprogrammi kaust…",
+  "pickFolder": "Valige pistikprogrammi kaust",
+  "empty": "Ühtegi arendaja pistikprogrammi pole laaditud.",
+  "listLabel": "Arendaja pistikprogrammid",
+  "label": "Arendaja pistikprogramm",
+  "status": {
+    "running": "Töötab",
+    "off": "Väljas",
+    "backingOff": "Taaskäivitub kokkujooksmise järel",
+    "autoOff": "Välja lülitatud korduvate kokkujooksmiste järel",
+    "allOff": "Kõik pistikprogrammid on välja lülitatud",
+    "noPlugins": "Pistikprogrammid on selleks seansiks välja lülitatud",
+    "notLoaded": "Laadimine ebaõnnestus"
+  },
+  "showLog": "Näita {{name}} logi",
+  "reload": "Laadi {{name}} uuesti",
+  "unload": "Eemalda {{name}}",
+  "logLabel": "{{name}} logi",
+  "logTitle": "{{name}} logi",
+  "logEmpty": "Logiridu veel pole.",
+  "level": {
+    "debug": "Silumine",
+    "info": "Teave",
+    "warn": "Hoiatus",
+    "error": "Viga"
+  },
+  "errors": {
+    "load": "Pistikprogrammi kausta laadimine ebaõnnestus.",
+    "reload": "Pistikprogrammi uuesti laadimine ebaõnnestus.",
+    "unload": "Pistikprogrammi eemaldamine ebaõnnestus.",
+    "log": "Logi lugemine ebaõnnestus."
+  }
+}

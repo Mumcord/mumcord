@@ -1,0 +1,35 @@
+{
+  "hint": "Načtěte rozbalenou složku zásuvného modulu a vyzkoušejte ji. Vývojářské moduly nejsou podepsané, nikdy nejsou oficiální a nemohou získat net.http, secrets ani ui.webview. Po vypnutí vývojářského režimu se uvolní.",
+  "load": "Načíst složku modulu…",
+  "pickFolder": "Vyberte složku modulu",
+  "empty": "Není načten žádný vývojářský modul.",
+  "listLabel": "Vývojářské moduly",
+  "label": "Vývojářský modul",
+  "status": {
+    "running": "Běží",
+    "off": "Vypnutý",
+    "backingOff": "Restartuje se po pádu",
+    "autoOff": "Vypnutý po opakovaných pádech",
+    "allOff": "Všechny moduly jsou vypnuté",
+    "noPlugins": "Moduly jsou pro tuto relaci vypnuté",
+    "notLoaded": "Nepodařilo se načíst"
+  },
+  "showLog": "Zobrazit protokol modulu {{name}}",
+  "reload": "Znovu načíst {{name}}",
+  "unload": "Uvolnit {{name}}",
+  "logLabel": "Protokol modulu {{name}}",
+  "logTitle": "Protokol modulu {{name}}",
+  "logEmpty": "Zatím žádné řádky protokolu.",
+  "level": {
+    "debug": "Ladění",
+    "info": "Info",
+    "warn": "Varování",
+    "error": "Chyba"
+  },
+  "errors": {
+    "load": "Složku modulu se nepodařilo načíst.",
+    "reload": "Modul se nepodařilo znovu načíst.",
+    "unload": "Modul se nepodařilo uvolnit.",
+    "log": "Protokol se nepodařilo přečíst."
+  }
+}
