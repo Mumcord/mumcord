@@ -2824,6 +2824,8 @@ export type SoundSettings = {
 	hangUp: boolean,
 	/**  You quit Mumcord while in a voice channel (#325). */
 	quit: boolean,
+	/**  You switch to another channel while in voice (#325). */
+	channelSwitch: boolean,
 	partyStarted: boolean,
 	partyJoined: boolean,
 	partyLeft: boolean,

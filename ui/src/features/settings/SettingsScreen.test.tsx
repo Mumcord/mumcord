@@ -296,6 +296,7 @@ describe("SettingsScreen", () => {
             voiceJoin: true,
             hangUp: true,
             quit: true,
+            channelSwitch: true,
             partyStarted: true,
             partyJoined: true,
             partyLeft: true,
@@ -325,6 +326,19 @@ describe("SettingsScreen", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Preview" }));
     expect(preview).toHaveBeenLastCalledWith("classic");
+  });
+
+  it("has a channel switch sound switch, on by default", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Voice & Audio");
+    const toggle = screen.getByRole("switch", {
+      name: "You switch to another channel while in voice",
+    });
+    expect(toggle).toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(update.mock.calls.at(-1)?.[0].sounds.channelSwitch).toBe(false);
+    });
   });
 
   it("has separate mention sound and notification switches, both on by default", async () => {

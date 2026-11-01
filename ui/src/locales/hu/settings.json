@@ -419,6 +419,7 @@
     "selfDeaf": "Süketíted magad vagy feloldod a süketítést",
     "hangUp": "Lecsatlakozol egy szerverről",
     "quit": "Kilépsz a Mumcordból, miközben hangcsatornában vagy",
+    "channelSwitch": "Másik csatornára váltasz, miközben hangcsatornában vagy",
     "kicked": "Kirúgnak egy szerverről",
     "banned": "Kitiltanak egy szerverről",
     "messages": "Új üzenet egy követett csatornában vagy privát chatben",

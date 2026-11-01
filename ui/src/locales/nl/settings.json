@@ -419,6 +419,7 @@
     "selfDeaf": "Je zet jezelf doof of heft het doof zetten op",
     "hangUp": "Je verbreekt de verbinding met een server",
     "quit": "Je sluit Mumcord af terwijl je in een spraakkanaal zit",
+    "channelSwitch": "Je wisselt naar een ander kanaal terwijl je in spraak zit",
     "kicked": "Je wordt van een server gekickt",
     "banned": "Je wordt van een server verbannen",
     "messages": "Nieuw bericht in een gevolgd kanaal of privéchat",

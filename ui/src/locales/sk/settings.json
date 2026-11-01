@@ -425,6 +425,7 @@
     "selfDeaf": "Stlmíš alebo zapneš svoj zvuk",
     "hangUp": "Odpojíš sa od servera",
     "quit": "Ukončíš Mumcord, keď si v hlasovom kanáli",
+    "channelSwitch": "Prepneš do iného kanála, keď si v hlasovom kanáli",
     "kicked": "Si vyhodený zo servera",
     "banned": "Si zablokovaný na serveri",
     "messages": "Nová správa v sledovanom kanáli alebo súkromnom chate",

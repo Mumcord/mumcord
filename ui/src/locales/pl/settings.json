@@ -425,6 +425,7 @@
     "selfDeaf": "Ogłuszasz się lub wyłączasz ogłuszenie",
     "hangUp": "Rozłączasz się z serwerem",
     "quit": "Zamykasz Mumcord, będąc na kanale głosowym",
+    "channelSwitch": "Przechodzisz na inny kanał, będąc na kanale głosowym",
     "kicked": "Zostajesz wyrzucony z serwera",
     "banned": "Zostajesz zbanowany na serwerze",
     "messages": "Nowa wiadomość na obserwowanym kanale lub czacie prywatnym",

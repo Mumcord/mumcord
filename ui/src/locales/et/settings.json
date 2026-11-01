@@ -419,6 +419,7 @@
     "selfDeaf": "Kurdistad end või lõpetad kurdistuse",
     "hangUp": "Katkestad ühenduse serveriga",
     "quit": "Sulged Mumcordi, kui oled häälkanalis",
+    "channelSwitch": "Vahetad häälekanalis olles teisele kanalile",
     "kicked": "Sind visatakse serverist välja",
     "banned": "Sulle pannakse serveris keeld",
     "messages": "Uus sõnum jälgitavas kanalis või privaatvestluses",

@@ -1165,16 +1165,18 @@ impl Engine {
                 .map(|s| s.self_voice)
                 .ok_or_else(EngineError::not_connected)?;
             let joins = joins_voice(!here, voice);
+            let switches = !here && voice.own().is_some();
             voice.join(own);
-            joins.then_some(voice)
+            joins.then_some((voice, switches))
         };
         // Before the voice change is sent, so the hub knows its echo when it arrives.
-        if let Some(voice) = joined {
-            self.inner.events.sounds().voice_join(
-                (!here).then_some(channel_id),
-                voice.mute,
-                voice.deaf,
-            );
+        if let Some((voice, switches)) = joined {
+            let sounds = self.inner.events.sounds();
+            if switches {
+                sounds.channel_switch(channel_id, voice.mute, voice.deaf);
+            } else {
+                sounds.voice_join((!here).then_some(channel_id), voice.mute, voice.deaf);
+            }
         }
         self.inner.change_self_voice(server_id, |v| v.join(own))?;
         // The server's echo of the move may come too late, e.g. when the app quits right away.

@@ -352,6 +352,7 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
   { section: "voiceAudio", group: "sounds.title", control: "sounds.selfDeaf" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.hangUp" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.quit" },
+  { section: "voiceAudio", group: "sounds.title", control: "sounds.channelSwitch" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.messages" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.mention" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.mentionNotify" },
