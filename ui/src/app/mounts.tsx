@@ -42,6 +42,7 @@ import {
   WatchPartyPanel,
   WatchTogetherView,
 } from "../features/watchparty";
+import { MediaPopoutHost } from "../features/media/MediaPopoutHost";
 import { useMediaView } from "../features/media/mediaView";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
 import { closeServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
@@ -227,6 +228,7 @@ export function MediaWidgetsMount() {
   return (
     <>
       <VideoDucking />
+      <MediaPopoutHost />
     </>
   );
 }
