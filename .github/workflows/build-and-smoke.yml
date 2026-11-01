@@ -63,10 +63,11 @@ jobs:
             # The installer and the portable zip (packaged below from the same Mumcord.exe).
             bundle: target/release/bundle/nsis/*-setup.exe target/release/bundle/nsis/*-portable.zip
           # One DMG for Apple Silicon and Intel Macs. The smoke test on the arm64 runner
-          # exercises the arm64 half.
+          # exercises the arm64 half. "app" keeps Mumcord.app after the DMG is built (Tauri
+          # deletes it otherwise); releases pack it into the updater archive.
           - name: macos
             os: macos-latest
-            args: --bundles dmg --target universal-apple-darwin
+            args: --bundles app,dmg --target universal-apple-darwin
             bundle: target/universal-apple-darwin/release/bundle/dmg/*.dmg
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
