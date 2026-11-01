@@ -86,7 +86,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | M2b | mumbot (Mumcord/mumbot): send `mumcord.hello` with an additive `bot` object {name, version, modules (enabled only)} to Mumcord sessions; new release needs user yes | open | |
 | M2c | Mumbot Music plugin: use M2a so "Configure bot" only shows on users announcing mumbot-music or already saved bots (by peer key) | open | |
 | L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | done (ff7d3e6b) | l0-sdki18n |
-| L0b | SDK i18n: full CLDR plural categories (zero/one/two/few/many/other) for the 24 languages in `tn`, falling back to `_other` | in progress | l0b-plurals |
+| L0b | SDK i18n: full CLDR plural categories (zero/one/two/few/many/other) for the 24 languages in `tn`, falling back to `_other` | done (cf033cd5; `plural_category(tag, count)`, tn walks the fallback chain) | l0b-plurals |
 | L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | in progress | l1 |
 | L2 | Dice: all 24 languages via L0 | in progress | l2 |
 | L3 | Echolings: all 24 languages via L0 | in progress | l3 |
