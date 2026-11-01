@@ -103,7 +103,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | V-F | Mockup conformance: Updates tab redesign (see scratchpad v1/deviations.md) | in progress | v-f |
 | V-G | Mockup conformance: Add repository dialog (see scratchpad v1/deviations.md) | in progress | v-g |
 | V-H | Mockup conformance: Notification centre plugin entries (see scratchpad v1/deviations.md) | in progress | v-h |
-| V-I | Mockup conformance: Plugin strip N running + side sheet (see scratchpad v1/deviations.md) | in progress | v-i |
+| V-I | Mockup conformance: Plugin strip N running + side sheet (see scratchpad v1/deviations.md) | done (6003fe67; not visually checked — verify in the real build) | v-i |
 | V-L | Mockup conformance: Dice card redesign + roll history (see scratchpad v1/deviations.md) | in progress | v-l |
 | V-M | Mockup conformance: Mumbot Music dialog layout (see scratchpad v1/deviations.md) | in progress | v-m |
 | E4 | Echolings: closed-eye sleeping art for every species/stage/colour as in the #264 mockups (after F27), used when asleep instead of the plain zzz-only look | done (feat/echolings 303a883; 305 files) | e4-sleepart |
