@@ -213,6 +213,8 @@ pub struct PluginState {
     pub(crate) storage_quota: u64,
     pub(crate) timers: TimerSet,
     pub(crate) http: HttpSet,
+    /// The FR-6.42 update rate per UI slot.
+    pub(crate) ui: api::ui::UiLimiter,
     limiter: Limiter,
 }
 
@@ -341,6 +343,7 @@ impl Compiled {
                 .ctx
                 .http
                 .set(Arc::clone(&params.id), Weak::clone(&params.queue)),
+            ui: api::ui::UiLimiter::default(),
             limiter: Limiter {
                 limits,
                 diag: Arc::clone(&params.diag),
