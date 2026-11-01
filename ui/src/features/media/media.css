@@ -784,6 +784,18 @@
   background: #000;
 }
 
+/*
+ * The watch party's cinema wrapper is a flex item of the centring box above, so without this it
+ * shrinks to the player's 300 px default width. It takes the whole width instead; its padding and
+ * border only separate it from the chat in the main window.
+ */
+.media-popout > .watch-cinema {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border-bottom: 0;
+}
+
 .media-popout .media-frame {
   max-width: calc(100vh * 16 / 9);
   border-radius: 0;

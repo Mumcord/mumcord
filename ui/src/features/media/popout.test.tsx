@@ -1,4 +1,5 @@
 /** Popping the media views out into their own window and back (issue #164). */
+import { readFileSync } from "node:fs";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, WatchParty } from "../../api";
@@ -225,5 +226,30 @@ describe("media pop-out", () => {
       expect(close).toHaveBeenCalledWith("watch");
     });
     expect(mediaView().cinema).toBeNull();
+  });
+});
+
+describe("media pop-out layout", () => {
+  afterEach(() => {
+    document.head.replaceChildren();
+    document.body.replaceChildren();
+  });
+
+  // jsdom has no layout, so this checks the cascade: in the pop-out's centring flex box the cinema
+  // wrapper must grow to the window's width, or the player shrinks to its 300 px default.
+  it("lets the watch party fill the pop-out window", () => {
+    for (const file of ["media/media.css", "watchparty/watchParty.css"]) {
+      const style = document.createElement("style");
+      style.textContent = readFileSync(`ui/src/features/${file}`, "utf8");
+      document.head.append(style);
+    }
+    document.body.innerHTML =
+      '<main class="media-popout"><div class="watch-cinema"><section class="media-frame"></section></div></main>';
+
+    const cinema = getComputedStyle(document.querySelector(".watch-cinema") as Element);
+    expect(cinema.flexGrow).toBe("1");
+    expect(cinema.minWidth).toBe("0px");
+    expect(cinema.paddingTop).toBe("0px");
+    expect(cinema.borderBottomWidth).toBe("0px");
   });
 });
