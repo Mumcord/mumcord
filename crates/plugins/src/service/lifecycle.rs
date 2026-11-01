@@ -300,7 +300,13 @@ impl PluginService {
 
     /// Lets an official plugin with `ui.webview` serve its `web/` folder (FR-6.48); without the
     /// grant any open web view closes.
-    fn set_webview_root(&self, id: &str, source: Source, dir: &Path, granted: &[String]) {
+    pub(super) fn set_webview_root(
+        &self,
+        id: &str,
+        source: Source,
+        dir: &Path,
+        granted: &[String],
+    ) {
         let allowed =
             source == Source::Official && granted.iter().any(|g| g == webview::PERMISSION);
         if !allowed {

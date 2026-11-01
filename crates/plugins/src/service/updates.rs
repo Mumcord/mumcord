@@ -598,9 +598,14 @@ impl PluginService {
         dir: &Path,
         previous: &str,
     ) -> Result<(), ServiceError> {
+        let source = Origin::parse(&record.source)
+            .ok_or_else(|| ServiceError::NotInstalled(record.id.clone()))?
+            .source();
         self.host.load(dir, Version::parse(previous).ok())?;
         self.store().save_plugin(record)?;
         self.ctx.grants.set(&record.id, &record.granted);
+        // Unloading the old version forgot its web folder; the new one may bring its own.
+        self.set_webview_root(&record.id, source, dir, &record.granted);
         self.ctx
             .notify
             .set_enabled(&record.id, record.notifications);

@@ -4,8 +4,10 @@
 use std::io::Write;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 
 use minisign::KeyPair;
+use mumcord_plugins::api::webview::WebviewPlace;
 use mumcord_plugins::registry::{Download, Index, IndexKind, RevocationList, Severity};
 use mumcord_plugins::service::{
     Approval, InstallRequest, PluginInfo, PluginService, ServiceConfig, ServiceError, ServiceEvent,
@@ -72,14 +74,15 @@ fn manifest(id: &str, version: &str, permissions: &[&str]) -> String {
     )
 }
 
-fn package(manifest: &str, wasm: &[u8]) -> Vec<u8> {
+fn package(manifest: &str, wasm: &[u8], extra: &[(&str, &[u8])]) -> Vec<u8> {
     let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
     let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
-    for (name, data) in [
+    let files = [
         ("manifest.json", manifest.as_bytes()),
         ("plugin.wasm", wasm),
         ("i18n/en.json", b"{}".as_slice()),
-    ] {
+    ];
+    for &(name, data) in files.iter().chain(extra) {
         writer.start_file(name, options).expect("start file");
         writer.write_all(data).expect("write");
     }
@@ -97,7 +100,22 @@ struct Release {
 
 impl Release {
     fn new(id: &str, version: &str, start: &str, permissions: &[&str], key: &KeyPair) -> Self {
-        let bytes = package(&manifest(id, version, permissions), &component(start));
+        Self::with_files(id, version, start, permissions, key, &[])
+    }
+
+    fn with_files(
+        id: &str,
+        version: &str,
+        start: &str,
+        permissions: &[&str],
+        key: &KeyPair,
+        extra: &[(&str, &[u8])],
+    ) -> Self {
+        let bytes = package(
+            &manifest(id, version, permissions),
+            &component(start),
+            extra,
+        );
         let signature = minisign::sign(Some(&key.pk), &key.sk, &bytes[..], None, None)
             .expect("sign")
             .into_string();
@@ -381,6 +399,53 @@ fn a_version_that_fails_to_start_is_rolled_back_with_its_reason() {
         .expect("plan");
     assert!(automatic.is_empty());
     assert!(service.updates()[0].failed.is_some());
+}
+
+/// Whether the plugin's dialog web view can show `index.html` from its installed `web/` folder.
+fn shows_its_page(service: &PluginService, id: &str) -> bool {
+    let webviews = service.webviews();
+    webviews.dialog_opened(id);
+    let shown = webviews
+        .show(id, WebviewPlace::Dialog, "index.html", Instant::now())
+        .is_ok();
+    webviews.hide(id);
+    webviews.dialog_closed(id);
+    shown
+}
+
+#[test]
+fn installed_and_updated_official_plugins_serve_their_web_pages() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    // Official packages also carry a README and a LICENSE.
+    let page: &[(&str, &[u8])] = &[
+        ("README.md", b"# Fit"),
+        ("LICENSE", b"MIT"),
+        ("web/index.html", b"<!doctype html><p>fit</p>"),
+    ];
+    let permissions = &["ui.panel", "ui.webview"];
+    let v1 = Release::with_files("fit", "1.0.0", OK_START, permissions, &key, page);
+    let v11 = Release::with_files("fit", "1.1.0", OK_START, permissions, &key, page);
+    let (mut service, _events) = fx.service();
+    let request = InstallRequest {
+        source: Source::Official,
+        ..v1.request(&["ui.webview"])
+    };
+    service.install(&request, &v1.download).expect("installs");
+    assert!(shows_its_page(&service, "fit"), "after the install");
+
+    let official: Vec<_> = index(&[&v1, &v11])
+        .into_iter()
+        .map(|(_, index)| (Source::Official, index))
+        .collect();
+    service
+        .plan_updates(&official, PluginUpdates::Auto)
+        .expect("plan");
+    service
+        .apply_update("fit", &v11.download, None)
+        .expect("updates");
+    assert_eq!(info(&service, "fit").version, "1.1.0");
+    assert!(shows_its_page(&service, "fit"), "after the update");
 }
 
 fn revocations(entries: serde_json::Value) -> RevocationList {

@@ -164,6 +164,7 @@ impl PluginService {
             return Err(error.into());
         }
         self.ctx.grants.set(id, &record.granted);
+        self.set_webview_root(id, request.source, &dir, &record.granted);
         self.ctx.notify.set_enabled(id, true);
         // Before the start, so a plugin may already message from its `start`.
         self.sync_peers();
