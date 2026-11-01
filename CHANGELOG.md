@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-01
+
 ### Added
 
 - The screen share viewer moved from the floating widget to the **main column**: header with the sharer, LIVE, what they picked (window or screen) and since when, chips for resolution, frame rate, bitrate, path and sound, a **Stream details** popover (codec, delay against the fastest frame, dropped frames), and the bottom overlay with the volume of the shared sound and its live level, Fit / Fill / 1:1 and Stop watching. The right column lists **Watching (n / 8)** with the frame rate each viewer gets and the hint when quality is lowered for the slowest one. The sharer now gets a **control bar at the top of the chat** — LIVE, elapsed time, source and quality, Pause, Sound, Change window, Viewers and Stop — instead of the red bar in the sidebar. Keys for both views are shared, the overlays fade in on hover, focus or pause and stay visible with reduced motion, and everything is reachable with the keyboard (#163)
@@ -354,6 +356,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.5.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.5.0
 [0.4.4]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.4
 [0.4.3]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.3
 [0.4.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.2

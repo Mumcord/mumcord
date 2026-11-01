@@ -16,7 +16,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.4.4"
+version = "0.5.0"
 edition = "2024"
 rust-version = "1.90"
 license = "AGPL-3.0-only"
@@ -24,11 +24,11 @@ repository = "https://github.com/Mumcord/mumcord"
 
 [workspace.dependencies]
 # Internal crates
-mumcord-protocol = { path = "crates/protocol", version = "0.4" }
+mumcord-protocol = { path = "crates/protocol", version = "0.5" }
 # The version is the minor series: crates.io needs it for the publish of mumcord-audio and mumcord-p2p, and it only changes with a minor/major bump.
-mumcord-codec = { path = "crates/codec", version = "0.4" }
+mumcord-codec = { path = "crates/codec", version = "0.5" }
 mumcord-audio = { path = "crates/audio" }
-mumcord-store = { path = "crates/store", version = "0.4" }
+mumcord-store = { path = "crates/store", version = "0.5" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
