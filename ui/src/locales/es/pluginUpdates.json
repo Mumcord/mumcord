@@ -11,16 +11,31 @@
   "empty": "Todos los plugins están al día.",
   "emptyOff": "Las actualizaciones de plugins están desactivadas. Actívalas arriba para buscar actualizaciones.",
   "loadFailed": "No se pudieron cargar las actualizaciones.",
-  "versions": "{{from}} a {{to}}",
-  "needsPermissions": "Esta versión necesita más permisos. Revísalos antes de actualizar.",
   "newAuthorKey": "Esta versión está firmada por otro autor. Actualiza solo si confías en el nuevo autor.",
   "rolledBack": "La versión {{version}} no pudo iniciarse, así que se restauró la versión anterior. Motivo:",
   "review": "Revisar y actualizar",
-  "approve": "Aprobar y actualizar",
   "update": "Actualizar",
   "installFailed": "No se pudo actualizar {{name}}. Inténtalo de nuevo.",
   "pins": "Fijar versión",
   "pinsHint": "Un plugin fijado se queda en su versión actual y no recibe ofertas de actualización.",
   "pin": "Mantener {{name}} en esta versión",
-  "pinVersion": "Versión {{version}}"
+  "pinVersion": "Versión {{version}}",
+  "versionsTo": "a",
+  "pill": {
+    "none": "Sin permisos nuevos",
+    "permission": "Necesita un permiso nuevo",
+    "author": "Autor nuevo"
+  },
+  "newPermissions": "Permisos nuevos",
+  "revoked": {
+    "title": "{{name}} se ha desactivado",
+    "text": "La versión {{version}} está en la lista de revocación: {{reason}}. Los datos del plugin se conservan.",
+    "details": "Detalles",
+    "remove": "Quitar"
+  },
+  "checkNow": "Comprobar ahora",
+  "lastChecked": "Última comprobación a las {{time}}",
+  "checkFailed": "La comprobación ha fallado. Inténtalo de nuevo.",
+  "modeNote": "Actualizaciones de plugins: {{mode}}. Puedes cambiarlo abajo.",
+  "settings": "Ajustes de actualización"
 }

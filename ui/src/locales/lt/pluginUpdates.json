@@ -11,16 +11,31 @@
   "empty": "Visi papildiniai atnaujinti.",
   "emptyOff": "Papildinių naujinimai išjungti. Įjunkite juos aukščiau, kad būtų ieškoma naujinimų.",
   "loadFailed": "Nepavyko įkelti naujinimų.",
-  "versions": "{{from}} į {{to}}",
-  "needsPermissions": "Šiai versijai reikia daugiau leidimų. Peržiūrėkite juos prieš naujindami.",
   "newAuthorKey": "Šią versiją pasirašė kitas autorius. Naujinkite tik jei pasitikite nauju autoriumi.",
   "rolledBack": "Versija {{version}} nepasileido, todėl atkurta ankstesnė versija. Priežastis:",
   "review": "Peržiūrėti ir naujinti",
-  "approve": "Patvirtinti ir naujinti",
   "update": "Naujinti",
   "installFailed": "Nepavyko atnaujinti papildinio {{name}}. Bandykite dar kartą.",
   "pins": "Prisegti versiją",
   "pinsHint": "Prisegtas papildinys lieka dabartinėje versijoje ir jam naujinimai nesiūlomi.",
   "pin": "Palikti {{name}} šioje versijoje",
-  "pinVersion": "Versija {{version}}"
+  "pinVersion": "Versija {{version}}",
+  "versionsTo": "į",
+  "pill": {
+    "none": "Nėra naujų leidimų",
+    "permission": "Reikia naujo leidimo",
+    "author": "Naujas autorius"
+  },
+  "newPermissions": "Nauji leidimai",
+  "revoked": {
+    "title": "„{{name}}“ buvo išjungtas",
+    "text": "Versija {{version}} yra atšauktųjų sąraše: {{reason}}. Papildinio duomenys išsaugomi.",
+    "details": "Išsamiau",
+    "remove": "Pašalinti"
+  },
+  "checkNow": "Tikrinti dabar",
+  "lastChecked": "Paskutinį kartą tikrinta {{time}}",
+  "checkFailed": "Patikrinti nepavyko. Bandykite dar kartą.",
+  "modeNote": "Papildinių naujinimai: {{mode}}. Tai galite pakeisti žemiau.",
+  "settings": "Naujinimo nustatymai"
 }

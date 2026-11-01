@@ -3021,6 +3021,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginSetPinned: () => fail("notFound", "no such plugin"),
     pluginRemove: () => fail("notFound", "no such plugin"),
     pluginUpdates: () => Promise.resolve([]),
+    pluginCheckNow: () => Promise.resolve(null),
     pluginApplyUpdate: () => fail("notFound", "no update for this plugin"),
     pluginExportData: () => fail("notFound", "no such plugin"),
     pluginResetData: () => fail("notFound", "no such plugin"),

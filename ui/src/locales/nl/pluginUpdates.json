@@ -11,16 +11,31 @@
   "empty": "Alle plug-ins zijn up-to-date.",
   "emptyOff": "Plug-inupdates staan uit. Zet ze hierboven aan om naar updates te zoeken.",
   "loadFailed": "De updates konden niet worden geladen.",
-  "versions": "{{from}} naar {{to}}",
-  "needsPermissions": "Deze versie heeft meer rechten nodig. Bekijk ze voordat je bijwerkt.",
   "newAuthorKey": "Deze versie is door een andere auteur ondertekend. Werk alleen bij als je de nieuwe auteur vertrouwt.",
   "rolledBack": "Versie {{version}} kon niet starten, daarom is de vorige versie hersteld. Reden:",
   "review": "Bekijken en bijwerken",
-  "approve": "Goedkeuren en bijwerken",
   "update": "Bijwerken",
   "installFailed": "{{name}} kon niet worden bijgewerkt. Probeer het opnieuw.",
   "pins": "Versie vastzetten",
   "pinsHint": "Een vastgezette plug-in blijft op de huidige versie en krijgt geen updates aangeboden.",
   "pin": "{{name}} op deze versie houden",
-  "pinVersion": "Versie {{version}}"
+  "pinVersion": "Versie {{version}}",
+  "versionsTo": "naar",
+  "pill": {
+    "none": "Geen nieuwe rechten",
+    "permission": "Heeft een nieuw recht nodig",
+    "author": "Nieuwe auteur"
+  },
+  "newPermissions": "Nieuwe rechten",
+  "revoked": {
+    "title": "{{name}} is uitgezet",
+    "text": "Versie {{version}} staat op de intrekkingslijst: {{reason}}. De plugingegevens blijven bewaard.",
+    "details": "Details",
+    "remove": "Verwijderen"
+  },
+  "checkNow": "Nu controleren",
+  "lastChecked": "Laatst gecontroleerd om {{time}}",
+  "checkFailed": "De controle is mislukt. Probeer het opnieuw.",
+  "modeNote": "Plugin-updates: {{mode}}. Je kunt dit hieronder wijzigen.",
+  "settings": "Update-instellingen"
 }

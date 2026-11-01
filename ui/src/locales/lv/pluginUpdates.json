@@ -11,16 +11,31 @@
   "empty": "Visi spraudņi ir atjaunināti.",
   "emptyOff": "Spraudņu atjauninājumi ir izslēgti. Ieslēdziet tos augstāk, lai meklētu atjauninājumus.",
   "loadFailed": "Atjauninājumus neizdevās ielādēt.",
-  "versions": "{{from}} uz {{to}}",
-  "needsPermissions": "Šai versijai vajag vairāk atļauju. Pārskatiet tās pirms atjaunināšanas.",
   "newAuthorKey": "Šo versiju ir parakstījis cits autors. Atjauniniet tikai tad, ja uzticaties jaunajam autoram.",
   "rolledBack": "Versija {{version}} neuzsākās, tāpēc tika atjaunota iepriekšējā versija. Iemesls:",
   "review": "Pārskatīt un atjaunināt",
-  "approve": "Apstiprināt un atjaunināt",
   "update": "Atjaunināt",
   "installFailed": "Spraudni {{name}} neizdevās atjaunināt. Mēģiniet vēlreiz.",
   "pins": "Piespraust versiju",
   "pinsHint": "Piesprausts spraudnis paliek pašreizējā versijā, un tam atjauninājumi netiek piedāvāti.",
   "pin": "Paturēt {{name}} šajā versijā",
-  "pinVersion": "Versija {{version}}"
+  "pinVersion": "Versija {{version}}",
+  "versionsTo": "uz",
+  "pill": {
+    "none": "Nav jaunu atļauju",
+    "permission": "Nepieciešama jauna atļauja",
+    "author": "Jauns autors"
+  },
+  "newPermissions": "Jaunas atļaujas",
+  "revoked": {
+    "title": "{{name}} tika izslēgts",
+    "text": "Versija {{version}} ir atsaukto sarakstā: {{reason}}. Spraudņa dati tiek saglabāti.",
+    "details": "Detaļas",
+    "remove": "Noņemt"
+  },
+  "checkNow": "Pārbaudīt tagad",
+  "lastChecked": "Pēdējā pārbaude plkst. {{time}}",
+  "checkFailed": "Pārbaude neizdevās. Mēģiniet vēlreiz.",
+  "modeNote": "Spraudņu atjauninājumi: {{mode}}. To var mainīt zemāk.",
+  "settings": "Atjauninājumu iestatījumi"
 }

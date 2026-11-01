@@ -11,16 +11,31 @@
   "empty": "Alla tillägg är uppdaterade.",
   "emptyOff": "Tilläggsuppdateringar är av. Slå på dem ovan för att söka efter uppdateringar.",
   "loadFailed": "Uppdateringarna kunde inte läsas in.",
-  "versions": "{{from}} till {{to}}",
-  "needsPermissions": "Den här versionen behöver fler behörigheter. Granska dem innan du uppdaterar.",
   "newAuthorKey": "Den här versionen är signerad av en annan upphovsperson. Uppdatera bara om du litar på den nya.",
   "rolledBack": "Version {{version}} kunde inte startas, så den tidigare versionen återställdes. Orsak:",
   "review": "Granska och uppdatera",
-  "approve": "Godkänn och uppdatera",
   "update": "Uppdatera",
   "installFailed": "{{name}} kunde inte uppdateras. Försök igen.",
   "pins": "Fäst version",
   "pinsHint": "Ett fäst tillägg stannar på sin nuvarande version och erbjuds inga uppdateringar.",
   "pin": "Behåll {{name}} på den här versionen",
-  "pinVersion": "Version {{version}}"
+  "pinVersion": "Version {{version}}",
+  "versionsTo": "till",
+  "pill": {
+    "none": "Inga nya behörigheter",
+    "permission": "Behöver en ny behörighet",
+    "author": "Ny upphovsperson"
+  },
+  "newPermissions": "Nya behörigheter",
+  "revoked": {
+    "title": "{{name}} stängdes av",
+    "text": "Version {{version}} finns på återkallelselistan: {{reason}}. Tilläggets data sparas.",
+    "details": "Detaljer",
+    "remove": "Ta bort"
+  },
+  "checkNow": "Kontrollera nu",
+  "lastChecked": "Senast kontrollerad kl. {{time}}",
+  "checkFailed": "Kontrollen misslyckades. Försök igen.",
+  "modeNote": "Tilläggsuppdateringar: {{mode}}. Du kan ändra det nedan.",
+  "settings": "Uppdateringsinställningar"
 }

@@ -1,12 +1,15 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type InstalledPlugin, type PluginUpdate } from "../../../api";
-import { PermissionList } from "../permissions/PermissionList";
+import { isPermissionId, permissionTextKey } from "../permissions/catalogue";
+import { usePluginIconUrl } from "../render/assets";
 import { formatSize } from "./formatSize";
 
-const NO_OPTIONAL: ReadonlySet<string> = new Set();
-
-/** One waiting update: what changes, why it needs approval, and the button that installs it. */
+/**
+ * One waiting update: icon, versions, a pill saying whether it asks for more permissions, the new
+ * permissions themselves and the button that installs it. The permissions are on show before the
+ * button is pressed, so "Review and update" is the review.
+ */
 export function UpdateRow({
   update,
   installed,
@@ -17,8 +20,8 @@ export function UpdateRow({
   onDone: () => Promise<void>;
 }) {
   const { t, i18n } = useTranslation("pluginUpdates");
-  const detailsId = useId();
-  const [review, setReview] = useState(false);
+  const { t: tPerm } = useTranslation("pluginPermissions");
+  const iconUrl = usePluginIconUrl(update.id, installed?.icon ?? null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const approval = update.approval;
@@ -38,65 +41,69 @@ export function UpdateRow({
     }
   };
 
+  const newPermissions = approval?.kind === "newPermissions" ? approval.permissions : [];
+  const pill =
+    approval === null ? "none" : approval.kind === "newPermissions" ? "permission" : "author";
+
   return (
     <li className="plugin-update">
-      <div className="plugin-update__head">
-        <span className="plugin-update__name">{update.name}</span>
-        <span className="plugin-update__meta">
-          {t("versions", { from: update.from, to: update.to })} ·{" "}
-          {formatSize(update.size, i18n.language)}
-        </span>
-      </div>
-      {approval?.kind === "newPermissions" && (
-        <p className="plugin-update__note">{t("needsPermissions")}</p>
-      )}
-      {approval?.kind === "newAuthorKey" && (
-        <p role="alert" className="plugin-update__note plugin-update__note--warn">
-          {t("newAuthorKey")}
-        </p>
-      )}
-      {update.failed !== null && (
-        <p role="status" className="plugin-update__note plugin-update__note--warn">
-          {t("rolledBack", { version: update.to })} {update.failed}
-        </p>
-      )}
-      {review && approval?.kind === "newPermissions" && (
-        <div id={detailsId} className="plugin-update__review">
-          <PermissionList
-            requested={approval.permissions.map((id) => ({ id, required: true }))}
-            enabled={NO_OPTIONAL}
-            onToggle={() => undefined}
-            readOnly
-          />
-        </div>
-      )}
-      {failed && (
-        <p role="alert" className="settings-error">
-          {t("installFailed", { name: update.name })}
-        </p>
-      )}
-      <div className="plugin-update__actions">
-        {approval !== null && !review ? (
-          <button
-            type="button"
-            className="settings-button"
-            aria-expanded={false}
-            onClick={() => {
-              setReview(true);
-            }}
-          >
-            {t("review")}
-          </button>
+      <span className="plugin-update__icon" aria-hidden="true">
+        {iconUrl === null ? (
+          update.name.slice(0, 1).toUpperCase()
         ) : (
-          <button
-            type="button"
-            className="settings-button"
-            disabled={busy}
-            onClick={() => void install()}
-          >
-            {approval !== null ? t("approve") : t("update")}
-          </button>
+          <img className="plugin-update__icon-image" src={iconUrl} alt="" />
         )}
+      </span>
+      <div className="plugin-update__body">
+        <div className="plugin-update__head">
+          <span className="plugin-update__name">{update.name}</span>
+          <span className="plugin-update__meta">
+            {update.from} <span aria-hidden="true">→</span>
+            <span className="plugin-update__sr-only">{t("versionsTo")}</span>{" "}
+            <strong className="plugin-update__to">{update.to}</strong> ·{" "}
+            {formatSize(update.size, i18n.language)}
+          </span>
+          <span className={`plugin-update__pill plugin-update__pill--${pill}`}>
+            {t(`pill.${pill}`)}
+          </span>
+        </div>
+        {approval?.kind === "newAuthorKey" && (
+          <p role="alert" className="plugin-update__note plugin-update__note--warn">
+            {t("newAuthorKey")}
+          </p>
+        )}
+        {update.failed !== null && (
+          <p role="status" className="plugin-update__note plugin-update__note--warn">
+            {t("rolledBack", { version: update.to })} {update.failed}
+          </p>
+        )}
+        {newPermissions.length > 0 && (
+          <ul className="plugin-update__permissions" aria-label={t("newPermissions")}>
+            {newPermissions.map((id) => (
+              <li key={id}>
+                <span className="plugin-update__permission-mark" aria-hidden="true">
+                  +
+                </span>{" "}
+                {isPermissionId(id) ? tPerm(`texts.${permissionTextKey(id)}`) : id}
+              </li>
+            ))}
+          </ul>
+        )}
+        {failed && (
+          <p role="alert" className="settings-error">
+            {t("installFailed", { name: update.name })}
+          </p>
+        )}
+      </div>
+      <div className="plugin-update__actions">
+        <button
+          type="button"
+          className="settings-button settings-button--primary"
+          disabled={busy}
+          onClick={() => void install()}
+        >
+          {approval !== null ? t("review") : t("update")}
+        </button>
       </div>
     </li>
   );

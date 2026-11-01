@@ -11,16 +11,31 @@
   "empty": "Tá gach breiseán cothrom le dáta.",
   "emptyOff": "Tá nuashonruithe breiseán as. Cuir ar siúl thuas iad chun nuashonruithe a lorg.",
   "loadFailed": "Níorbh fhéidir na nuashonruithe a luchtú.",
-  "versions": "{{from}} go {{to}}",
-  "needsPermissions": "Teastaíonn tuilleadh ceadanna ón leagan seo. Athbhreithnigh iad sula nuashonraíonn tú.",
   "newAuthorKey": "Tá an leagan seo sínithe ag údar eile. Nuashonraigh ach amháin má tá muinín agat as an údar nua.",
   "rolledBack": "Níor thosaigh leagan {{version}}, mar sin athchóiríodh an leagan roimhe. Cúis:",
   "review": "Athbhreithnigh agus nuashonraigh",
-  "approve": "Ceadaigh agus nuashonraigh",
   "update": "Nuashonraigh",
   "installFailed": "Níorbh fhéidir {{name}} a nuashonrú. Bain triail eile as.",
   "pins": "Greamaigh leagan",
   "pinsHint": "Fanann breiseán greamaithe ar a leagan reatha agus ní thairgtear nuashonruithe dó.",
   "pin": "Coinnigh {{name}} ar an leagan seo",
-  "pinVersion": "Leagan {{version}}"
+  "pinVersion": "Leagan {{version}}",
+  "versionsTo": "go",
+  "pill": {
+    "none": "Gan cead nua",
+    "permission": "Teastaíonn cead nua",
+    "author": "Údar nua"
+  },
+  "newPermissions": "Ceadanna nua",
+  "revoked": {
+    "title": "Cuireadh {{name}} as",
+    "text": "Tá leagan {{version}} ar an liosta cúlghairme: {{reason}}. Coinnítear sonraí an bhreiseáin.",
+    "details": "Sonraí",
+    "remove": "Bain"
+  },
+  "checkNow": "Seiceáil anois",
+  "lastChecked": "Seiceáilte go déanach ag {{time}}",
+  "checkFailed": "Theip ar an seiceáil. Bain triail eile as.",
+  "modeNote": "Nuashonruithe breiseán: {{mode}}. Is féidir leat é seo a athrú thíos.",
+  "settings": "Socruithe nuashonraithe"
 }

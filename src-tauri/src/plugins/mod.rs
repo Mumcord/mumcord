@@ -152,6 +152,28 @@ impl Plugins {
             .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
     }
 
+    /// "Check now": looks for updates right away, ignoring the 6-hour wait. The check's future is
+    /// not `Send`, so it runs on a blocking thread.
+    pub async fn check_now(self: &Arc<Self>, developer_mode: bool) -> ApiResult<()> {
+        let this = Arc::clone(self);
+        let runtime = tauri::async_runtime::handle().inner().clone();
+        tauri::async_runtime::spawn_blocking(move || {
+            let client = Client::new(UrlPolicy::new(developer_mode))
+                .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?;
+            let mut schedule = Schedule::new();
+            runtime
+                .block_on(run_check(
+                    &client,
+                    &this.service,
+                    &mut schedule,
+                    &this.registry_cache,
+                ))
+                .map_err(service_error)
+        })
+        .await
+        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
+    }
+
     pub fn webviews(&self) -> &Webviews {
         &self.webviews
     }

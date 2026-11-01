@@ -11,16 +11,31 @@
   "empty": "Vsi vtičniki so posodobljeni.",
   "emptyOff": "Posodobitve vtičnikov so izklopljene. Vklopite jih zgoraj, da se iščejo posodobitve.",
   "loadFailed": "Posodobitev ni bilo mogoče naložiti.",
-  "versions": "{{from}} na {{to}}",
-  "needsPermissions": "Ta različica potrebuje dodatna dovoljenja. Preglejte jih pred posodobitvijo.",
   "newAuthorKey": "To različico je podpisal drug avtor. Posodobite le, če novemu avtorju zaupate.",
   "rolledBack": "Različica {{version}} se ni zagnala, zato je bila obnovljena prejšnja. Razlog:",
   "review": "Preglej in posodobi",
-  "approve": "Potrdi in posodobi",
   "update": "Posodobi",
   "installFailed": "Vtičnika {{name}} ni bilo mogoče posodobiti. Poskusite znova.",
   "pins": "Pripni različico",
   "pinsHint": "Pripet vtičnik ostane na trenutni različici in zanj ni ponujenih posodobitev.",
   "pin": "Obdrži {{name}} na tej različici",
-  "pinVersion": "Različica {{version}}"
+  "pinVersion": "Različica {{version}}",
+  "versionsTo": "na",
+  "pill": {
+    "none": "Brez novih dovoljenj",
+    "permission": "Potrebuje novo dovoljenje",
+    "author": "Nov avtor"
+  },
+  "newPermissions": "Nova dovoljenja",
+  "revoked": {
+    "title": "Vtičnik {{name}} je izklopljen",
+    "text": "Različica {{version}} je na seznamu preklicanih: {{reason}}. Podatki vtičnika so ohranjeni.",
+    "details": "Podrobnosti",
+    "remove": "Odstrani"
+  },
+  "checkNow": "Preveri zdaj",
+  "lastChecked": "Zadnje preverjanje ob {{time}}",
+  "checkFailed": "Preverjanje ni uspelo. Poskusite znova.",
+  "modeNote": "Posodobitve vtičnikov: {{mode}}. To lahko spremenite spodaj.",
+  "settings": "Nastavitve posodobitev"
 }

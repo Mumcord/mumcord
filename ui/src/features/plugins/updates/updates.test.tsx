@@ -68,16 +68,52 @@ describe("UpdatesTab", () => {
     expect(await screen.findByText("All plugins are up to date.")).toBeInTheDocument();
   });
 
-  it("asks before installing an update with new permissions", async () => {
+  it("shows the new permission before installing an update that needs it", async () => {
     const { apply } = setup([update]);
     const { container } = render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Review and update" }));
+    expect(await screen.findByText("Needs a new permission")).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "New permissions" })).toHaveTextContent("+");
     expect(apply).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Approve and update" }));
+    fireEvent.click(screen.getByRole("button", { name: "Review and update" }));
     await waitFor(() => {
       expect(apply).toHaveBeenCalledWith("poll", ["ui.panel"]);
     });
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("says when an update needs no new permission", async () => {
+    setup([{ ...update, approval: null }]);
+    render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+    expect(await screen.findByText("No new permissions")).toBeInTheDocument();
+  });
+
+  it("shows a banner for a revoked plugin and removes it keeping its data", async () => {
+    const api = createMockApi();
+    vi.spyOn(api, "pluginsList").mockResolvedValue({
+      noPlugins: false,
+      allOff: false,
+      plugins: [{ ...plugin, enabled: false, disabledReason: "revoked", revocation: "Leaks" }],
+    });
+    vi.spyOn(api, "pluginUpdates").mockResolvedValue([]);
+    const remove = vi.spyOn(api, "pluginRemove").mockResolvedValue(null);
+    setApi(api);
+    render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+    expect(await screen.findByText("Poll was turned off")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Remove/ }));
+    expect(remove).toHaveBeenCalledWith("poll", false);
+  });
+
+  it("checks for updates on demand", async () => {
+    const api = createMockApi();
+    vi.spyOn(api, "pluginUpdates").mockResolvedValue([]);
+    const check = vi.spyOn(api, "pluginCheckNow").mockResolvedValue(null);
+    setApi(api);
+    render(<UpdatesTab mode="notify" onModeChange={() => undefined} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Check now" }));
+    await waitFor(() => {
+      expect(check).toHaveBeenCalled();
+    });
+    expect(await screen.findByText(/Last checked/)).toBeInTheDocument();
   });
 
   it("installs an update without new permissions in one click", async () => {

@@ -540,6 +540,8 @@ export const commands = {
 	pluginSetVisibility: (id: string, visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_visibility", { id, visibility })),
 	/**  The plugin's "notifications" switch. */
 	pluginSetNotifications: (id: string, on: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_notifications", { id, on })),
+	/**  "Check now": looks for plugin updates and revocations right away. */
+	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
 	/**  "Pin version": a pinned plugin is not offered updates (FR-6.67). */
 	pluginSetPinned: (id: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_pinned", { id, pinned })),
 	/**  Removes a plugin; its data is kept for 30 days unless `deleteData`. */

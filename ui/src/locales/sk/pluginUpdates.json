@@ -11,16 +11,31 @@
   "empty": "Všetky pluginy sú aktuálne.",
   "emptyOff": "Aktualizácie pluginov sú vypnuté. Zapnite ich vyššie, aby sa aktualizácie hľadali.",
   "loadFailed": "Aktualizácie sa nepodarilo načítať.",
-  "versions": "{{from}} na {{to}}",
-  "needsPermissions": "Táto verzia potrebuje ďalšie oprávnenia. Pred aktualizáciou si ich pozrite.",
   "newAuthorKey": "Táto verzia je podpísaná iným autorom. Aktualizujte len vtedy, ak novému autorovi dôverujete.",
   "rolledBack": "Verzia {{version}} sa nespustila, preto sa obnovila predchádzajúca verzia. Dôvod:",
   "review": "Skontrolovať a aktualizovať",
-  "approve": "Schváliť a aktualizovať",
   "update": "Aktualizovať",
   "installFailed": "Plugin {{name}} sa nepodarilo aktualizovať. Skúste to znova.",
   "pins": "Pripnúť verziu",
   "pinsHint": "Pripnutý plugin zostane na súčasnej verzii a neponúkajú sa mu aktualizácie.",
   "pin": "Ponechať {{name}} na tejto verzii",
-  "pinVersion": "Verzia {{version}}"
+  "pinVersion": "Verzia {{version}}",
+  "versionsTo": "na",
+  "pill": {
+    "none": "Žiadne nové oprávnenia",
+    "permission": "Potrebuje nové oprávnenie",
+    "author": "Nový autor"
+  },
+  "newPermissions": "Nové oprávnenia",
+  "revoked": {
+    "title": "Plugin {{name}} bol vypnutý",
+    "text": "Verzia {{version}} je na zozname zrušených: {{reason}}. Údaje pluginu zostávajú zachované.",
+    "details": "Podrobnosti",
+    "remove": "Odstrániť"
+  },
+  "checkNow": "Skontrolovať teraz",
+  "lastChecked": "Naposledy skontrolované o {{time}}",
+  "checkFailed": "Kontrola zlyhala. Skúste to znova.",
+  "modeNote": "Aktualizácie pluginov: {{mode}}. Môžete to zmeniť nižšie.",
+  "settings": "Nastavenia aktualizácií"
 }

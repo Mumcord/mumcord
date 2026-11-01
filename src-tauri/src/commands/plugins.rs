@@ -897,6 +897,15 @@ pub async fn plugin_apply_update(
         .await
 }
 
+/// "Check now": looks for plugin updates and revocations right away.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_check_now(app: AppHandle, engine: State<'_, Engine>) -> ApiResult<()> {
+    plugins_of(&app)?
+        .check_now(engine.settings()?.developer_mode)
+        .await
+}
+
 /// "Pin version": a pinned plugin is not offered updates (FR-6.67).
 #[tauri::command]
 #[specta::specta]

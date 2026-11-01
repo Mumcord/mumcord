@@ -11,16 +11,31 @@
   "empty": "Kaikki lisäosat ovat ajan tasalla.",
   "emptyOff": "Lisäosien päivitykset ovat pois päältä. Ota ne käyttöön yllä, niin päivityksiä haetaan.",
   "loadFailed": "Päivityksiä ei voitu ladata.",
-  "versions": "{{from}} → {{to}}",
-  "needsPermissions": "Tämä versio tarvitsee lisää oikeuksia. Tarkista ne ennen päivitystä.",
   "newAuthorKey": "Tämän version on allekirjoittanut eri tekijä. Päivitä vain, jos luotat uuteen tekijään.",
   "rolledBack": "Versio {{version}} ei käynnistynyt, joten edellinen versio palautettiin. Syy:",
   "review": "Tarkista ja päivitä",
-  "approve": "Hyväksy ja päivitä",
   "update": "Päivitä",
   "installFailed": "Lisäosaa {{name}} ei voitu päivittää. Yritä uudelleen.",
   "pins": "Kiinnitä versio",
   "pinsHint": "Kiinnitetty lisäosa pysyy nykyisessä versiossaan, eikä sille tarjota päivityksiä.",
   "pin": "Pidä {{name}} tässä versiossa",
-  "pinVersion": "Versio {{version}}"
+  "pinVersion": "Versio {{version}}",
+  "versionsTo": "versioon",
+  "pill": {
+    "none": "Ei uusia oikeuksia",
+    "permission": "Tarvitsee uuden oikeuden",
+    "author": "Uusi tekijä"
+  },
+  "newPermissions": "Uudet oikeudet",
+  "revoked": {
+    "title": "{{name}} otettiin pois käytöstä",
+    "text": "Versio {{version}} on mitätöintilistalla: {{reason}}. Lisäosan tiedot säilyvät.",
+    "details": "Tiedot",
+    "remove": "Poista"
+  },
+  "checkNow": "Tarkista nyt",
+  "lastChecked": "Viimeksi tarkistettu klo {{time}}",
+  "checkFailed": "Tarkistus epäonnistui. Yritä uudelleen.",
+  "modeNote": "Lisäosapäivitykset: {{mode}}. Voit muuttaa tätä alla.",
+  "settings": "Päivitysasetukset"
 }

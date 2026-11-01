@@ -222,6 +222,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_remove,
             commands::plugins::plugin_updates,
             commands::plugins::plugin_apply_update,
+            commands::plugins::plugin_check_now,
             commands::plugins::plugin_export_data,
             commands::plugins::plugin_reset_data,
             commands::plugins::plugin_dev_load,
