@@ -33,6 +33,7 @@
       "specs/chat/dnd.e2e.ts",
       "specs/chat/friends.e2e.ts",
       "specs/chat/notifications.e2e.ts",
+      "specs/plugins/a11y.e2e.ts",
       "specs/positional/positional.e2e.ts",
       "specs/servers/servers.e2e.ts",
       "specs/voice/global-hotkeys.e2e.ts",

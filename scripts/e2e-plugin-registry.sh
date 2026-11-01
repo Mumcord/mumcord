@@ -12,7 +12,7 @@
 # Layout written below <work-dir>:
 #   keys/registry.{key,pub}   test key of the official registry (new each run, never committed)
 #   keys/repo.{key,pub}       test key of the third-party repository (new each run)
-#   packages/official/        the 4 official plugins + fx-webview-probe
+#   packages/official/        the 4 official plugins + fx-webview-probe (eve-fit only staged)
 #   packages/repo/            the other safety fixtures (third-party repository)
 #   staged/                   every fixture package, for publishing later (updates, AC-6.19)
 #   bin/mumcord-plugin        the CLI
@@ -34,7 +34,8 @@ export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$HOME/.cache/mumcord-build/plugin-e
 plugins_url="${MUMCORD_PLUGINS_URL:-https://github.com/Mumcord/plugins}"
 
 # plugin directory in Mumcord/plugins -> branch that carries its source
-official=("poll:feat/poll" "dice:feat/dice" "echolings:feat/echolings" "mumbot-music:feat/mumbot-music")
+# eve-fit is only staged: the accessibility spec publishes it (it is 20+ MB, the others need not wait for it).
+official=("poll:feat/poll" "dice:feat/dice" "echolings:feat/echolings" "mumbot-music:feat/mumbot-music" "eve-fit:feat/eve-fit")
 
 mkdir -p "$work" "$cache"
 rm -rf "$work/keys" "$work/packages" "$work/staged"
@@ -82,10 +83,11 @@ fi
 "$cli" keygen --unencrypted --out "$work/keys" --name repo >/dev/null
 
 # The official plugins and fx-webview-probe (the one fixture signed as official) go to the official
-# registry, the other fixtures to the repository; fx-update-v2 stays staged until a spec publishes it.
+# registry, the other fixtures to the repository; fx-update-v2 and eve-fit stay staged until a spec
+# publishes them.
 for f in "$work"/staged/*.mcplugin; do
   case "$(basename "$f")" in
-    fx-update-v2-fails.mcplugin) ;;
+    fx-update-v2-fails.mcplugin | eve-fit-*.mcplugin) ;;
     fx-webview-probe.mcplugin) cp "$f" "$work/packages/official/" ;;
     fx-*) cp "$f" "$work/packages/repo/" ;;
     *) cp "$f" "$work/packages/official/" ;;
