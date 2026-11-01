@@ -5,6 +5,7 @@
  * no save button, so nothing at the bottom can be mistaken for one (QA.63). The engine stores
  * them per certificate hash; people without a certificate are only adjusted for this session.
  */
+import { PluginProfileSections } from "../plugins/badges";
 import DOMPurify from "dompurify";
 import {
   useCallback,
@@ -240,6 +241,7 @@ function ProfileBody({
       {loadError && <p className="profile-card__note">{t("card.loadFailed")}</p>}
       <NowGamingFor session={user.session} serverId={serverId} joinable={!isSelf} />
       <NowPlayingFor session={user.session} serverId={serverId} />
+      <PluginProfileSections session={user.session} />
       {comment && (
         <div
           className="profile-card__comment"
