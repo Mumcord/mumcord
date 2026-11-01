@@ -211,7 +211,8 @@ export function WizardMount() {
   const { t } = useTranslation("app");
   return (
     <>
-      <h1>{t("wizard.title")}</h1>
+      {/* The rail shows the app name; the heading names the screen for assistive technology. */}
+      <h1 className="visually-hidden">{t("wizard.title")}</h1>
       <Wizard />
     </>
   );

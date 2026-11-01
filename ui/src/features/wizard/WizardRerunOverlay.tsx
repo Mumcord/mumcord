@@ -28,12 +28,12 @@ export function WizardRerunOverlay({ onClose, onManageIdentities }: WizardRerunO
   return (
     <div className="overlay">
       <div
-        className="centered-screen wizard-rerun-overlay"
+        className="wizard-frame wizard-rerun-overlay"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <h1 id={titleId} className="wizard-rerun__title">
+        <h1 id={titleId} className="visually-hidden">
           {t("rerun.title")}
         </h1>
         <Wizard mode="rerun" onClose={onClose} onManageIdentities={onManageIdentities} />
