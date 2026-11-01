@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { getApi, type PluginPanelVisibility, type PluginSlot } from "../../../api";
 import { useT } from "../../../i18n/useT";
 import { useServerSelector } from "../../channels/serverStore";
@@ -6,6 +6,7 @@ import { PluginTree } from "../render/PluginTree";
 import { usePluginUi } from "../render/pluginUiStore";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { usePlugins } from "../pluginStore";
+import { PluginWebView, usePluginWebView } from "../webview";
 import { loadCollapsed, saveCollapsed } from "./stripMemory";
 import "./strip.css";
 
@@ -13,6 +14,16 @@ const PANEL: PluginSlot = { kind: "panel" };
 
 function initials(name: string): string {
   return Array.from(name.trim()).slice(0, 2).join("").toUpperCase();
+}
+
+/** The expanded popover shows the plugin's web view when it opened one there, else its panel. */
+function PopoverBody({ id, name, children }: { id: string; name: string; children: ReactNode }) {
+  const webview = usePluginWebView(id, "panelPopover");
+  return (
+    <div className="pstrip-popover-body">
+      {webview ? <PluginWebView plugin={id} webview={webview} title={name} /> : children}
+    </div>
+  );
 }
 
 function PluginIcon({ id, name }: { id: string; name: string }) {
@@ -212,7 +223,9 @@ export function PluginStrip() {
               <span aria-hidden="true">✕</span>
             </button>
           </div>
-          <div className="pstrip-popover-body">{body}</div>
+          <PopoverBody id={active.id} name={active.name}>
+            {body}
+          </PopoverBody>
         </div>
       )}
     </section>

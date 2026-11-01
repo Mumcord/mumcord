@@ -36,6 +36,15 @@ const textTree = (text: string) => [
   },
 ];
 
+const webviewMock = vi.hoisted(() => ({ open: false }));
+vi.mock("../webview", () => ({
+  usePluginWebView: (_id: string, place: string) =>
+    webviewMock.open && place === "panelPopover"
+      ? { place, url: "mumcord-web://x/index.html", seq: 1 }
+      : undefined,
+  PluginWebView: ({ plugin }: { plugin: string }) => <div data-testid="wv">{plugin}</div>,
+}));
+
 let api: MockApi;
 
 function setup(plugins: InstalledPlugin[], withPanel: string[]) {
@@ -105,6 +114,23 @@ describe("PluginStrip", () => {
     fireEvent.keyDown(dialog, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(expand).toHaveFocus();
+  });
+
+  it("shows the plugin's web view in the popover instead of the tree", async () => {
+    setup([plugin("pets", "Pets")], ["pets"]);
+    render(<PluginStrip />);
+    fireEvent.click(await screen.findByRole("button", { name: "Expand Pets" }));
+    expect(screen.queryByTestId("wv")).toBeNull();
+    expect(screen.getByText("pets panel")).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Pets" }), { key: "Escape" });
+    webviewMock.open = true;
+    try {
+      fireEvent.click(screen.getByRole("button", { name: "Expand Pets" }));
+      expect(screen.getByTestId("wv")).toHaveTextContent("pets");
+      expect(screen.queryByText("pets panel")).toBeNull();
+    } finally {
+      webviewMock.open = false;
+    }
   });
 
   it("stays collapsed once the user collapsed it and tells the plugin", async () => {
