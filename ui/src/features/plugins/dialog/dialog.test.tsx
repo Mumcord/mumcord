@@ -46,6 +46,31 @@ describe("PluginDialogHost", () => {
     expect(sendEvent).toHaveBeenCalledTimes(1);
   });
 
+  it("closes the dialog in the store at once, even if the plugin never answers", () => {
+    const close = vi.spyOn(store, "closePluginDialog");
+    withDialog("Configure bot");
+    render(<PluginDialogHost />);
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(close).toHaveBeenCalledWith("mumbot-music");
+  });
+
+  it("drops the dialog and its web view from the state; a later close is a no-op", () => {
+    const open = { type: "openDialog", title: "T" } as const;
+    let s = store.applyChange(
+      { trees: new Map(), dialogs: new Map(), menuEntries: new Map(), webviews: new Map() },
+      { plugin: "p", change: open },
+    );
+    s = store.applyChange(s, {
+      plugin: "p",
+      change: { type: "webviewShow", place: "dialog", url: "u" },
+    });
+    const once = store.applyChange(s, { plugin: "p", change: { type: "closeDialog" } });
+    expect(once.dialogs.size).toBe(0);
+    expect(once.webviews.size).toBe(0);
+    const twice = store.applyChange(once, { plugin: "p", change: { type: "closeDialog" } });
+    expect(twice.dialogs.size).toBe(0);
+  });
+
   it("hands the opener back once", () => {
     const button = document.createElement("button");
     rememberDialogOpener("a", button);

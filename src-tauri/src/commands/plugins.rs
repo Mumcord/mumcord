@@ -26,7 +26,7 @@ use specta::Type;
 use tauri::{AppHandle, State};
 
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
-use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi};
+use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange};
 use crate::plugins::{self, Plugins, PreparedInstall, RepoIndex};
 
 /// Who sees that the user has a plugin (FR-6.35).
@@ -1164,6 +1164,13 @@ pub async fn plugin_ui_action(
 #[tauri::command]
 #[specta::specta]
 pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -> ApiResult<()> {
+    let plugins = plugins_of(&app)?;
+    // The user is always in control: Esc or Close ends the dialog on the host side at once (state
+    // and web view), whatever the plugin does with the event. A later `close-dialog` is a no-op.
+    if matches!(input, PluginUiInput::DialogClosed) {
+        plugins.trees().apply(&id, &PluginUiChange::CloseDialog);
+        plugins.webviews().dialog_closed(&id);
+    }
     let input = match input {
         PluginUiInput::ProfileCardOpened { session } => UiInput::ProfileCardOpened(session),
         PluginUiInput::PanelVisibility { visibility } => {
@@ -1173,7 +1180,7 @@ pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -
         PluginUiInput::DialogClosed => UiInput::DialogClosed,
         PluginUiInput::WebviewMessage { text } => UiInput::WebviewMessage(text),
     };
-    let delivered = plugins_of(&app)?
+    let delivered = plugins
         .call(move |service| Ok(service.ui_input(&id, input)))
         .await?;
     delivered_or_error(delivered)

@@ -105,6 +105,16 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
 }
 
 let state: PluginUiState = EMPTY;
+
+/**
+ * Ends a plugin's dialog (and a web view shown in it) on the host side. The user's Esc/Close must
+ * not depend on the plugin answering; a later `close-dialog` from the plugin changes nothing.
+ */
+export function closePluginDialog(plugin: string): void {
+  ensureBound();
+  state = applyChange(state, { plugin, change: { type: "closeDialog" } });
+  notify();
+}
 let boundApi: MumcordApi | undefined;
 let unsubscribe: Unsubscribe[] = [];
 let generation = 0;

@@ -1,7 +1,7 @@
 /**
  * The plugin dialog (FR-6.40, `dialog` slot): a modal inside the main window that renders the
- * open plugin's tree. Focus stays inside, Escape or "Close" ends it with `dialog-closed`; the
- * plugin then closes it itself (or keeps it, e.g. to save a draft).
+ * open plugin's tree. Focus stays inside, Escape or "Close" ends it at once on the host side and
+ * then tells the plugin with `dialog-closed`; the user is always in control.
  */
 import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import { announce } from "../../../a11y";
 import { getApi, toEngineError } from "../../../api";
 import { Modal } from "../../userpanel/Modal";
 import { PluginTree } from "../render/PluginTree";
-import { usePluginTree, usePluginUi } from "../render/pluginUiStore";
+import { closePluginDialog, usePluginTree, usePluginUi } from "../render/pluginUiStore";
 import { PluginWebView, usePluginWebView } from "../webview";
 import { takeDialogOpener } from "./pluginDialogStore";
 
@@ -28,6 +28,8 @@ function PluginDialog({ plugin, title }: { plugin: string; title: string }) {
   const webview = usePluginWebView(plugin, "dialog");
 
   const close = useCallback(() => {
+    // Closed here first: the plugin only gets told, it cannot keep the dialog open.
+    closePluginDialog(plugin);
     getApi()
       .pluginUiEvent(plugin, { type: "dialogClosed" })
       .catch((error: unknown) => {
