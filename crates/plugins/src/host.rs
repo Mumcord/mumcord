@@ -101,7 +101,7 @@ impl PluginHost {
         }
         check_compatibility(&manifest, &self.app_version)?;
 
-        let entry = dir.join(&manifest.entry);
+        let entry = dir.join(crate::package::WASM_FILE);
         if std::fs::metadata(&entry)?.len() > MAX_ENTRY_BYTES {
             return Err(LoadError::EntryTooLarge);
         }

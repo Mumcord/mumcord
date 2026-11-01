@@ -1,12 +1,14 @@
-//! `manifest.json`: who a plugin is, which API it needs, what it asks for and how it is shown
-//! (#269). The manifest comes from a stranger, so parsing is strict and every value is capped;
-//! the JSON schema in `schema/manifest.schema.json` describes the same rules for the CLI and the
+//! `manifest.json` (FR-6.11): who a plugin is, which API it needs, what it asks for and how it is
+//! shown. The manifest comes from a stranger, so parsing is strict and every value is capped; the
+//! JSON schema in `schema/manifest.schema.json` describes the same rules for the CLI and the
 //! registry CI.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
 use semver::{Op, Version, VersionReq};
 use serde::Deserialize;
+
+use crate::permissions;
 
 /// The only manifest format version this host reads.
 pub const MANIFEST_FORMAT: u32 = 1;
@@ -14,34 +16,23 @@ pub const MANIFEST_FORMAT: u32 = 1;
 pub const MAX_MANIFEST_BYTES: usize = 16 * 1024;
 /// Plugins may lower their memory limit in the manifest, never raise it above this.
 pub const MAX_MEMORY_MIB: u32 = 32;
-/// Storage quota bounds (#270).
+/// Storage quota bounds (FR-6.20).
 pub const DEFAULT_STORAGE_QUOTA_KIB: u32 = 256;
 pub const MAX_STORAGE_QUOTA_KIB: u32 = 1024;
-/// Plugin bytes per message after Mumcord's 3-byte envelope in a 1000-byte plugin data packet (#271).
+/// Plugin bytes per message after Mumcord's 3-byte envelope in a 1000-byte plugin data packet
+/// (FR-6.34).
 pub const MAX_MESSAGE_PAYLOAD: u32 = 997;
+/// Ids starting with these are kept for plugins published by the Mumcord team.
+pub const RESERVED_ID_PREFIXES: &[&str] = &["mumcord-", "core-"];
+/// Exact user text when a non-official package asks for an official-only permission (FR-6.12).
+pub const OFFICIAL_ONLY_TEXT: &str = "This permission is only available to official plugins";
 
 const MAX_NAME_CHARS: usize = 32;
 const MAX_DESCRIPTION_CHARS: usize = 140;
 const MAX_SHORT_TEXT_CHARS: usize = 64;
-const MAX_URL_CHARS: usize = 256;
 const MAX_PATH_CHARS: usize = 128;
-const MAX_SCREENSHOTS: usize = 8;
-const MAX_LANGUAGES: usize = 64;
-
-/// Permission ids of API 1.0 (#275). An unknown permission makes the load fail, so a plugin never
-/// runs without something it depends on.
-pub const PERMISSIONS: &[&str] = &[
-    "ui.panel",
-    "ui.member-badge",
-    "ui.profile-card",
-    "ui.chat-card",
-    "events.self",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity",
-    "peers.messages",
-    "notify",
-];
+const MAX_AUTHORS: usize = 8;
+const MAX_CATEGORIES: usize = 3;
 
 /// Categories in the browse view.
 pub const CATEGORIES: &[&str] = &[
@@ -54,48 +45,42 @@ pub const CATEGORIES: &[&str] = &[
     "tools",
 ];
 
-/// Icon sizes in pixels a manifest may provide.
-pub const ICON_SIZES: &[u32] = &[16, 32, 48, 64, 128, 256, 512];
+/// Where a package or plugin folder comes from. Decides which permissions and ids it may use.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Source {
+    /// From the official index with valid signatures (FR-6.51).
+    Official,
+    /// From a third-party repository (store `source` = `repo:<repository_id>`).
+    Repo { repository_id: i64 },
+    /// An unpacked folder loaded in Developer mode.
+    Dev,
+}
 
-/// A validated manifest.
+/// A manifest that passed the structural checks of [`Manifest::parse`]. Source-dependent rules
+/// are checked separately by [`Manifest::validate`].
 #[derive(Debug, Clone, PartialEq)]
 pub struct Manifest {
     pub id: String,
     pub name: String,
+    pub description: String,
     pub version: Version,
     /// Range of host API versions (`mumcord:plugin@x.y.z`) the plugin works with.
     pub api: VersionReq,
     /// Optional range of Mumcord app versions, for plugins that depend on a bug fix.
     pub mumcord: Option<VersionReq>,
-    pub author: Author,
-    pub description: Option<String>,
-    pub category: String,
+    pub authors: Vec<String>,
     /// SPDX licence expression.
     pub license: String,
-    pub source: Option<String>,
-    /// Path of the WebAssembly component inside the package.
-    pub entry: String,
-    /// Icon paths by size in pixels.
-    pub icons: BTreeMap<u32, String>,
-    pub screenshots: Vec<String>,
-    pub i18n: I18n,
+    pub categories: Vec<String>,
     pub permissions: Permissions,
-    pub storage: Storage,
-    pub messaging: Option<Messaging>,
     /// Memory limit in MiB, at most [`MAX_MEMORY_MIB`].
     pub memory_mib: u32,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct Author {
-    pub name: String,
-    pub url: Option<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct I18n {
-    pub default: String,
-    pub available: Vec<String>,
+    pub storage_quota_kib: u32,
+    pub messaging: Messaging,
+    pub commands: Vec<Command>,
+    pub net: Option<Net>,
+    /// Path of the icon under `assets/`.
+    pub icon: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -104,26 +89,11 @@ pub struct Permissions {
     pub optional: Vec<OptionalPermission>,
 }
 
-/// An optional permission; `suggested` ones start switched on in the install prompt (#275).
+/// An optional permission; `suggested` ones start switched on in the install prompt (FR-6.29).
 #[derive(Debug, Clone, PartialEq)]
 pub struct OptionalPermission {
     pub id: String,
     pub suggested: bool,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum StorageScope {
-    /// Separate data per identity.
-    Identity,
-    /// One set of data for all identities.
-    Global,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Storage {
-    pub scope: StorageScope,
-    pub quota_kib: u32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
@@ -137,47 +107,74 @@ pub enum Visibility {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Messaging {
     pub max_payload: u32,
+    /// Preselected in the install prompt (FR-6.33).
     pub default_visibility: Option<Visibility>,
+}
+
+/// A slash command (FR-6.43).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct Command {
+    pub name: String,
+    pub description: String,
+    pub usage: Option<String>,
+}
+
+/// `net` (FR-6.37): which hosts `net.http` may reach.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+pub struct Net {
+    pub hosts: NetHosts,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+pub enum NetHosts {
+    /// Only hosts the user typed into a form of the plugin.
+    #[serde(rename = "user-configured")]
+    UserConfigured,
 }
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum ManifestError {
-    #[error("the manifest is larger than {MAX_MANIFEST_BYTES} bytes")]
+    #[error("The manifest is larger than 16 KiB")]
     TooLarge,
-    #[error("the manifest is not valid: {0}")]
+    #[error("The manifest is not valid: {0}")]
     Syntax(String),
-    #[error("manifest format {0} is not supported (this Mumcord reads format {MANIFEST_FORMAT})")]
+    #[error("Manifest format {0} is not supported (this Mumcord reads format {MANIFEST_FORMAT})")]
     UnsupportedFormat(u32),
     #[error(
-        "the plugin id {0:?} is not valid (3 to 32 lowercase letters, digits or dashes, starting with a letter)"
+        "The plugin id \"{0}\" is not valid (3 to 32 lowercase letters, digits or dashes, starting with a letter)"
     )]
     BadId(String),
+    #[error("The plugin id \"{0}\" uses a prefix reserved for Mumcord")]
+    ReservedId(String),
     #[error("{field} is longer than {max} characters")]
     TooLong { field: &'static str, max: usize },
     #[error("{0} is empty or contains control characters")]
     BadText(&'static str),
-    #[error("{field} is not a valid {kind}: {value:?}")]
+    #[error("{field} is not a valid {kind}: \"{value}\"")]
     BadValue {
         field: &'static str,
         kind: &'static str,
         value: String,
     },
-    #[error("the API range {0:?} must have the form ^MAJOR.MINOR, e.g. ^1.0")]
+    #[error("The API range \"{0}\" must have the form ^MAJOR.MINOR, e.g. ^1.0")]
     BadApiRange(String),
-    #[error("the category {0:?} is not one of the known categories")]
+    #[error("The category \"{0}\" is not one of the known categories")]
     UnknownCategory(String),
-    #[error("the permission {0:?} is not known to this Mumcord")]
+    #[error("Unknown permission \"{0}\"")]
     UnknownPermission(String),
-    #[error("the permission {0:?} is listed twice")]
+    #[error("The permission \"{0}\" is listed twice")]
     DuplicatePermission(String),
-    #[error("the path {0:?} is not a safe relative path inside the package")]
+    #[error("{OFFICIAL_ONLY_TEXT}")]
+    OfficialOnly(String),
+    #[error("{field} needs the permission \"{permission}\"")]
+    MissingPermission {
+        field: &'static str,
+        permission: &'static str,
+    },
+    #[error("The command \"{0}\" is declared twice")]
+    DuplicateCommand(String),
+    #[error("The path \"{0}\" is not a safe relative path inside the package")]
     BadPath(String),
-    #[error("the icon size {0:?} is not supported")]
-    BadIconSize(String),
-    #[error("the default language {0:?} is not in the list of available languages")]
-    DefaultLanguageMissing(String),
-    #[error("English (\"en\") must be one of the available languages")]
-    EnglishMissing,
     #[error("{field} must be between {min} and {max}")]
     OutOfRange {
         field: &'static str,
@@ -186,33 +183,32 @@ pub enum ManifestError {
     },
 }
 
-/// The manifest as written; [`Manifest::parse`] turns it into a validated [`Manifest`]. Unknown
-/// fields are ignored so newer manifests still load on older hosts.
+/// The manifest as written; [`Manifest::parse`] turns it into a [`Manifest`]. Unknown fields are
+/// ignored (FR-6.12) so newer manifests still load on older hosts.
 #[derive(Deserialize)]
 struct RawManifest {
     manifest: u32,
     id: String,
     name: String,
+    description: String,
     version: String,
     api: String,
     mumcord: Option<String>,
-    author: Author,
-    description: Option<String>,
-    category: String,
+    authors: Vec<String>,
     license: String,
-    source: Option<String>,
-    entry: String,
-    #[serde(default)]
-    icons: BTreeMap<String, String>,
-    #[serde(default)]
-    screenshots: Vec<String>,
-    i18n: I18n,
+    categories: Vec<String>,
     #[serde(default)]
     permissions: RawPermissions,
-    storage: Option<RawStorage>,
-    messaging: Option<RawMessaging>,
     #[serde(default)]
     limits: RawLimits,
+    #[serde(default)]
+    storage: RawStorage,
+    #[serde(default)]
+    messaging: RawMessaging,
+    #[serde(default)]
+    commands: Vec<Command>,
+    net: Option<Net>,
+    icon: Option<String>,
 }
 
 #[derive(Deserialize, Default)]
@@ -234,32 +230,52 @@ enum RawOptional {
     },
 }
 
-#[derive(Deserialize)]
-struct RawStorage {
-    scope: StorageScope,
-    quota_kib: Option<u32>,
-}
-
-#[derive(Deserialize)]
-struct RawMessaging {
-    max_payload: u32,
-    default_visibility: Option<Visibility>,
-}
-
 #[derive(Deserialize, Default)]
 struct RawLimits {
     memory_mib: Option<u32>,
 }
 
+#[derive(Deserialize, Default)]
+struct RawStorage {
+    quota_kib: Option<u32>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawMessaging {
+    max_payload: Option<u32>,
+    default_visibility: Option<Visibility>,
+}
+
 impl Manifest {
-    /// Parses and validates `manifest.json`.
+    /// Parses `manifest.json` and checks everything that does not depend on where it came from.
     pub fn parse(bytes: &[u8]) -> Result<Self, ManifestError> {
         if bytes.len() > MAX_MANIFEST_BYTES {
             return Err(ManifestError::TooLarge);
         }
         let raw: RawManifest =
             serde_json::from_slice(bytes).map_err(|e| ManifestError::Syntax(e.to_string()))?;
-        raw.validate()
+        raw.check()
+    }
+
+    /// The rules that depend on the source: only official plugins may use official-only
+    /// permissions (FR-6.12, FR-6.73) and the reserved id prefixes (FR-6.11).
+    pub fn validate(&self, source: Source) -> Result<(), ManifestError> {
+        if source == Source::Official {
+            return Ok(());
+        }
+        if RESERVED_ID_PREFIXES
+            .iter()
+            .any(|prefix| self.id.starts_with(prefix))
+        {
+            return Err(ManifestError::ReservedId(self.id.clone()));
+        }
+        match self
+            .all_permissions()
+            .find(|id| permissions::get(id).is_some_and(|p| p.official_only))
+        {
+            Some(id) => Err(ManifestError::OfficialOnly(id.to_owned())),
+            None => Ok(()),
+        }
     }
 
     /// Every permission the manifest names, required first.
@@ -270,10 +286,14 @@ impl Manifest {
             .map(String::as_str)
             .chain(self.permissions.optional.iter().map(|p| p.id.as_str()))
     }
+
+    pub fn has_permission(&self, id: &str) -> bool {
+        self.all_permissions().any(|p| p == id)
+    }
 }
 
 impl RawManifest {
-    fn validate(self) -> Result<Manifest, ManifestError> {
+    fn check(self) -> Result<Manifest, ManifestError> {
         if self.manifest != MANIFEST_FORMAT {
             return Err(ManifestError::UnsupportedFormat(self.manifest));
         }
@@ -281,15 +301,10 @@ impl RawManifest {
             return Err(ManifestError::BadId(self.id));
         }
         text("name", &self.name, MAX_NAME_CHARS)?;
-        if let Some(description) = &self.description {
-            text("description", description, MAX_DESCRIPTION_CHARS)?;
-        }
-        text("author.name", &self.author.name, MAX_SHORT_TEXT_CHARS)?;
-        if let Some(url) = &self.author.url {
-            https_url("author.url", url)?;
-        }
-        if let Some(source) = &self.source {
-            https_url("source", source)?;
+        text("description", &self.description, MAX_DESCRIPTION_CHARS)?;
+        count("authors", self.authors.len(), MAX_AUTHORS)?;
+        for author in &self.authors {
+            text("authors", author, MAX_SHORT_TEXT_CHARS)?;
         }
         text("license", &self.license, MAX_SHORT_TEXT_CHARS)?;
         if !is_spdx_expression(&self.license) {
@@ -309,93 +324,105 @@ impl RawManifest {
             .map(|r| VersionReq::parse(r).map_err(|_| bad_value("mumcord", "version range", r)))
             .transpose()?;
 
-        if !CATEGORIES.contains(&self.category.as_str()) {
-            return Err(ManifestError::UnknownCategory(self.category));
+        count("categories", self.categories.len(), MAX_CATEGORIES)?;
+        let mut seen = BTreeSet::new();
+        for category in &self.categories {
+            if !CATEGORIES.contains(&category.as_str()) || !seen.insert(category) {
+                return Err(ManifestError::UnknownCategory(category.clone()));
+            }
         }
 
-        relative_path(&self.entry)?;
-        if !self.entry.ends_with(".wasm") {
-            return Err(bad_value("entry", "path to a .wasm file", &self.entry));
+        let permissions = check_permissions(self.permissions)?;
+        let has = |id: &str| {
+            permissions.required.iter().any(|p| p == id)
+                || permissions.optional.iter().any(|p| p.id == id)
+        };
+
+        let mut names = BTreeSet::new();
+        for command in &self.commands {
+            if !is_command_name(&command.name) {
+                return Err(bad_value(
+                    "commands.name",
+                    "command name (2 to 16 of a-z, 0-9, -)",
+                    &command.name,
+                ));
+            }
+            if !names.insert(command.name.as_str()) {
+                return Err(ManifestError::DuplicateCommand(command.name.clone()));
+            }
+            text(
+                "commands.description",
+                &command.description,
+                MAX_DESCRIPTION_CHARS,
+            )?;
+            if let Some(usage) = &command.usage {
+                text("commands.usage", usage, MAX_SHORT_TEXT_CHARS)?;
+            }
         }
-        let mut icons = BTreeMap::new();
-        for (size, path) in self.icons {
-            let px = size
-                .parse::<u32>()
-                .ok()
-                .filter(|px| ICON_SIZES.contains(px))
-                .ok_or_else(|| ManifestError::BadIconSize(size.clone()))?;
-            asset_path(&path)?;
-            icons.insert(px, path);
-        }
-        if self.screenshots.len() > MAX_SCREENSHOTS {
-            return Err(ManifestError::OutOfRange {
-                field: "screenshots",
-                min: 0,
-                max: MAX_SCREENSHOTS as u32,
+        if !self.commands.is_empty() && !has("commands") {
+            return Err(ManifestError::MissingPermission {
+                field: "commands",
+                permission: "commands",
             });
         }
-        for path in &self.screenshots {
-            asset_path(path)?;
+        if self.net.is_some() != has("net.http") {
+            return Err(ManifestError::MissingPermission {
+                field: if self.net.is_some() {
+                    "net"
+                } else {
+                    "net.http"
+                },
+                permission: if self.net.is_some() {
+                    "net.http"
+                } else {
+                    "net"
+                },
+            });
         }
 
-        validate_i18n(&self.i18n)?;
-        let permissions = validate_permissions(self.permissions)?;
+        if let Some(icon) = &self.icon {
+            asset_path(icon)?;
+        }
 
-        let storage = match self.storage {
-            Some(s) => Storage {
-                scope: s.scope,
-                quota_kib: in_range(
-                    "storage.quota_kib",
-                    s.quota_kib.unwrap_or(DEFAULT_STORAGE_QUOTA_KIB),
-                    1,
-                    MAX_STORAGE_QUOTA_KIB,
-                )?,
-            },
-            None => Storage {
-                scope: StorageScope::Identity,
-                quota_kib: DEFAULT_STORAGE_QUOTA_KIB,
-            },
-        };
-        let messaging = self
-            .messaging
-            .map(|m| {
-                Ok::<_, ManifestError>(Messaging {
-                    max_payload: in_range(
-                        "messaging.max_payload",
-                        m.max_payload,
-                        1,
-                        MAX_MESSAGE_PAYLOAD,
-                    )?,
-                    default_visibility: m.default_visibility,
-                })
-            })
-            .transpose()?;
         let memory_mib = in_range(
             "limits.memory_mib",
             self.limits.memory_mib.unwrap_or(MAX_MEMORY_MIB),
             1,
             MAX_MEMORY_MIB,
         )?;
+        let storage_quota_kib = in_range(
+            "storage.quota_kib",
+            self.storage.quota_kib.unwrap_or(DEFAULT_STORAGE_QUOTA_KIB),
+            1,
+            MAX_STORAGE_QUOTA_KIB,
+        )?;
+        let messaging = Messaging {
+            max_payload: in_range(
+                "messaging.max_payload",
+                self.messaging.max_payload.unwrap_or(MAX_MESSAGE_PAYLOAD),
+                1,
+                MAX_MESSAGE_PAYLOAD,
+            )?,
+            default_visibility: self.messaging.default_visibility,
+        };
 
         Ok(Manifest {
             id: self.id,
             name: self.name,
+            description: self.description,
             version,
             api,
             mumcord,
-            author: self.author,
-            description: self.description,
-            category: self.category,
+            authors: self.authors,
             license: self.license,
-            source: self.source,
-            entry: self.entry,
-            icons,
-            screenshots: self.screenshots,
-            i18n: self.i18n,
+            categories: self.categories,
             permissions,
-            storage,
-            messaging,
             memory_mib,
+            storage_quota_kib,
+            messaging,
+            commands: self.commands,
+            net: self.net,
+            icon: self.icon,
         })
     }
 }
@@ -408,6 +435,14 @@ pub fn is_valid_id(id: &str) -> bool {
         && bytes
             .iter()
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || *b == b'-')
+}
+
+/// `^[a-z0-9-]{2,16}$` (FR-6.43)
+fn is_command_name(name: &str) -> bool {
+    (2..=16).contains(&name.len())
+        && name
+            .bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
 }
 
 /// A path inside the package: relative, `/`-separated, no `.` or `..` parts, a small safe
@@ -429,7 +464,7 @@ pub fn relative_path(path: &str) -> Result<(), ManifestError> {
     }
 }
 
-/// Icons and screenshots: under `assets/`, a raster or SVG image.
+/// The icon: under `assets/`, a raster or SVG image.
 fn asset_path(path: &str) -> Result<(), ManifestError> {
     relative_path(path)?;
     let image = [".png", ".webp", ".svg"]
@@ -439,7 +474,7 @@ fn asset_path(path: &str) -> Result<(), ManifestError> {
         Ok(())
     } else {
         Err(bad_value(
-            "icons/screenshots",
+            "icon",
             "image under assets/ (.png, .webp, .svg)",
             path,
         ))
@@ -463,28 +498,6 @@ fn parse_api_range(range: &str) -> Result<VersionReq, ManifestError> {
     }
 }
 
-fn validate_i18n(i18n: &I18n) -> Result<(), ManifestError> {
-    if i18n.available.len() > MAX_LANGUAGES {
-        return Err(ManifestError::OutOfRange {
-            field: "i18n.available",
-            min: 1,
-            max: MAX_LANGUAGES as u32,
-        });
-    }
-    for tag in i18n.available.iter().chain(std::iter::once(&i18n.default)) {
-        if !is_language_tag(tag) {
-            return Err(bad_value("i18n", "language tag (e.g. en, de, pt-BR)", tag));
-        }
-    }
-    if !i18n.available.contains(&i18n.default) {
-        return Err(ManifestError::DefaultLanguageMissing(i18n.default.clone()));
-    }
-    if !i18n.available.iter().any(|tag| tag == "en") {
-        return Err(ManifestError::EnglishMissing);
-    }
-    Ok(())
-}
-
 /// `en`, `de`, `pt-BR`: also the file name `i18n/<tag>.json`.
 pub fn is_language_tag(tag: &str) -> bool {
     let mut parts = tag.split('-');
@@ -496,7 +509,7 @@ pub fn is_language_tag(tag: &str) -> bool {
         && parts.next().is_none()
 }
 
-fn validate_permissions(raw: RawPermissions) -> Result<Permissions, ManifestError> {
+fn check_permissions(raw: RawPermissions) -> Result<Permissions, ManifestError> {
     let optional: Vec<OptionalPermission> = raw
         .optional
         .into_iter()
@@ -510,8 +523,10 @@ fn validate_permissions(raw: RawPermissions) -> Result<Permissions, ManifestErro
         .collect();
     let mut seen = BTreeSet::new();
     for id in raw.required.iter().chain(optional.iter().map(|p| &p.id)) {
-        if !PERMISSIONS.contains(&id.as_str()) {
-            return Err(ManifestError::UnknownPermission(id.clone()));
+        if permissions::get(id).is_none() {
+            return Err(ManifestError::UnknownPermission(
+                id.chars().take(MAX_SHORT_TEXT_CHARS).collect(),
+            ));
         }
         if !seen.insert(id.as_str()) {
             return Err(ManifestError::DuplicatePermission(id.clone()));
@@ -549,13 +564,17 @@ fn text(field: &'static str, value: &str, max: usize) -> Result<(), ManifestErro
     Ok(())
 }
 
-fn https_url(field: &'static str, url: &str) -> Result<(), ManifestError> {
-    text(field, url, MAX_URL_CHARS)?;
-    let host = url.strip_prefix("https://").unwrap_or_default();
-    if host.is_empty() || host.starts_with('/') || url.contains(char::is_whitespace) {
-        return Err(bad_value(field, "https URL", url));
+/// Lists that must have at least one and at most `max` entries.
+fn count(field: &'static str, len: usize, max: usize) -> Result<(), ManifestError> {
+    if (1..=max).contains(&len) {
+        Ok(())
+    } else {
+        Err(ManifestError::OutOfRange {
+            field,
+            min: 1,
+            max: max as u32,
+        })
     }
-    Ok(())
 }
 
 fn in_range(field: &'static str, value: u32, min: u32, max: u32) -> Result<u32, ManifestError> {
@@ -570,7 +589,7 @@ fn bad_value(field: &'static str, kind: &'static str, value: &str) -> ManifestEr
     ManifestError::BadValue {
         field,
         kind,
-        value: value.chars().take(MAX_URL_CHARS).collect(),
+        value: value.chars().take(MAX_SHORT_TEXT_CHARS).collect(),
     }
 }
 
@@ -578,30 +597,27 @@ fn bad_value(field: &'static str, kind: &'static str, value: &str) -> ManifestEr
 mod tests {
     use super::*;
 
-    /// The example from #269.
+    /// A manifest using every field.
     pub(crate) const EXAMPLE: &str = r#"{
       "manifest": 1,
       "id": "echolings",
       "name": "Echolings",
+      "description": "Virtual pets that grow while you hang out in voice.",
       "version": "1.2.0",
       "api": "^1.0",
       "mumcord": ">=0.7.0",
-      "author": { "name": "Mumcord team", "url": "https://github.com/Mumcord" },
-      "description": "Virtual pets that grow while you hang out in voice.",
-      "category": "fun",
-      "license": "MIT",
-      "source": "https://github.com/Mumcord/echolings",
-      "entry": "plugin.wasm",
-      "icons": { "64": "assets/icon-64.png", "256": "assets/icon-256.png" },
-      "screenshots": ["assets/shot-1.webp", "assets/shot-2.webp"],
-      "i18n": { "default": "en", "available": ["en", "de", "es"] },
+      "authors": ["Mumcord team"],
+      "license": "AGPL-3.0-only",
+      "categories": ["fun", "games"],
+      "icon": "assets/icon.svg",
       "permissions": {
-        "required": ["ui.panel", "ui.member-badge", "ui.profile-card", "events.voice", "events.presence", "events.self"],
-        "optional": ["peers.messages", "ui.chat-card", "notify", "events.chat-activity"]
+        "required": ["ui.panel", "ui.member-badge", "ui.profile-card", "events.voice", "events.presence", "events.self", "commands"],
+        "optional": ["peers.messages", "ui.chat-card", "notify", { "id": "events.chat-activity", "suggested": true }]
       },
-      "storage": { "scope": "identity", "quota_kib": 512 },
+      "limits": { "memory_mib": 16 },
+      "storage": { "quota_kib": 512 },
       "messaging": { "max_payload": 256, "default_visibility": "friends" },
-      "limits": { "memory_mib": 16 }
+      "commands": [{ "name": "pet", "description": "Pet your Echoling", "usage": "/pet [name]" }]
     }"#;
 
     fn with(change: impl FnOnce(&mut serde_json::Value)) -> Result<Manifest, ManifestError> {
@@ -610,61 +626,60 @@ mod tests {
         Manifest::parse(value.to_string().as_bytes())
     }
 
+    fn remove(v: &mut serde_json::Value, field: &str) {
+        v.as_object_mut().expect("object").remove(field);
+    }
+
     #[test]
     fn accepts_the_example() {
         let m = Manifest::parse(EXAMPLE.as_bytes()).expect("example is valid");
         assert_eq!(m.id, "echolings");
         assert_eq!(m.version, Version::new(1, 2, 0));
         assert_eq!(m.memory_mib, 16);
-        assert_eq!(
-            m.icons.get(&64).map(String::as_str),
-            Some("assets/icon-64.png")
-        );
-        assert_eq!(
-            m.storage,
-            Storage {
-                scope: StorageScope::Identity,
-                quota_kib: 512
-            }
-        );
-        assert_eq!(m.all_permissions().count(), 10);
+        assert_eq!(m.storage_quota_kib, 512);
+        assert_eq!(m.authors, ["Mumcord team"]);
+        assert_eq!(m.categories, ["fun", "games"]);
+        assert_eq!(m.icon.as_deref(), Some("assets/icon.svg"));
+        assert_eq!(m.commands[0].usage.as_deref(), Some("/pet [name]"));
+        assert_eq!(m.messaging.default_visibility, Some(Visibility::Friends));
+        assert_eq!(m.all_permissions().count(), 11);
+        assert!(m.permissions.optional[3].suggested);
+        assert!(!m.permissions.optional[0].suggested);
     }
 
     #[test]
     fn ignores_unknown_fields_and_fills_defaults() {
         let m = with(|v| {
             v["future_field"] = serde_json::json!({ "anything": true });
-            let o = v.as_object_mut().expect("object");
-            o.remove("storage");
-            o.remove("limits");
-            o.remove("messaging");
+            for field in ["storage", "limits", "messaging", "icon", "mumcord"] {
+                remove(v, field);
+            }
         })
         .expect("valid");
         assert_eq!(m.memory_mib, MAX_MEMORY_MIB);
-        assert_eq!(m.storage.quota_kib, DEFAULT_STORAGE_QUOTA_KIB);
-        assert_eq!(m.messaging, None);
+        assert_eq!(m.storage_quota_kib, DEFAULT_STORAGE_QUOTA_KIB);
+        assert_eq!(m.messaging.max_payload, MAX_MESSAGE_PAYLOAD);
+        assert_eq!(m.messaging.default_visibility, None);
     }
 
     #[test]
-    fn reads_suggested_optional_permissions() {
-        let m = with(|v| {
-            v["permissions"]["optional"] =
-                serde_json::json!(["notify", { "id": "peers.messages", "suggested": true }]);
-        })
-        .expect("valid");
-        assert_eq!(
-            m.permissions.optional,
-            vec![
-                OptionalPermission {
-                    id: "notify".into(),
-                    suggested: false
-                },
-                OptionalPermission {
-                    id: "peers.messages".into(),
-                    suggested: true
-                },
-            ]
-        );
+    fn requires_the_spec_fields() {
+        for field in [
+            "manifest",
+            "id",
+            "name",
+            "description",
+            "version",
+            "api",
+            "authors",
+            "license",
+            "categories",
+        ] {
+            assert!(
+                matches!(with(|v| remove(v, field)), Err(ManifestError::Syntax(_))),
+                "{field}"
+            );
+        }
     }
 
     #[test]
@@ -714,11 +729,11 @@ mod tests {
     }
 
     #[test]
-    fn rejects_unknown_and_duplicate_permissions() {
-        assert_eq!(
-            with(|v| v["permissions"]["required"] = serde_json::json!(["network"])),
-            Err(ManifestError::UnknownPermission("network".into()))
-        );
+    fn unknown_permission_names_the_id() {
+        let err = with(|v| v["permissions"]["required"] = serde_json::json!(["network"]))
+            .expect_err("unknown");
+        assert_eq!(err, ManifestError::UnknownPermission("network".into()));
+        assert_eq!(err.to_string(), "Unknown permission \"network\"");
         assert_eq!(
             with(|v| v["permissions"]["optional"] = serde_json::json!(["ui.panel"])),
             Err(ManifestError::DuplicatePermission("ui.panel".into()))
@@ -726,22 +741,96 @@ mod tests {
     }
 
     #[test]
-    fn rejects_missing_or_unsafe_entry() {
+    fn official_only_permissions_need_an_official_source() {
+        let m = with(|v| {
+            v["permissions"]["optional"] = serde_json::json!(["ui.webview", "secrets"]);
+        })
+        .expect("valid");
+        assert!(m.validate(Source::Official).is_ok());
+        for source in [Source::Repo { repository_id: 1 }, Source::Dev] {
+            let err = m.validate(source).expect_err("refused");
+            assert_eq!(err, ManifestError::OfficialOnly("ui.webview".into()));
+            assert_eq!(
+                err.to_string(),
+                "This permission is only available to official plugins"
+            );
+        }
+        let plain = Manifest::parse(EXAMPLE.as_bytes()).expect("valid");
+        assert!(plain.validate(Source::Dev).is_ok());
+    }
+
+    #[test]
+    fn reserved_prefixes_are_official_only() {
+        for id in ["mumcord-pets", "core-tools"] {
+            let m = with(|v| v["id"] = id.into()).expect("valid");
+            assert!(m.validate(Source::Official).is_ok());
+            assert_eq!(
+                m.validate(Source::Repo { repository_id: 3 }),
+                Err(ManifestError::ReservedId(id.into()))
+            );
+            assert!(m.validate(Source::Dev).is_err());
+        }
+    }
+
+    #[test]
+    fn commands_are_checked() {
+        for name in ["x", "a-very-long-command", "Roll", "ro ll", "/roll"] {
+            assert!(
+                with(|v| v["commands"][0]["name"] = name.into()).is_err(),
+                "{name}"
+            );
+        }
         assert!(matches!(
             with(|v| {
-                v.as_object_mut().expect("object").remove("entry");
+                let c = v["commands"][0].clone();
+                v["commands"].as_array_mut().expect("array").push(c);
+            }),
+            Err(ManifestError::DuplicateCommand(_))
+        ));
+        assert!(with(|v| remove(&mut v["commands"][0], "usage")).is_ok());
+        assert!(with(|v| v["commands"][0]["description"] = "".into()).is_err());
+        assert_eq!(
+            with(|v| v["permissions"]["required"] = serde_json::json!(["ui.panel"])),
+            Err(ManifestError::MissingPermission {
+                field: "commands",
+                permission: "commands"
+            })
+        );
+    }
+
+    #[test]
+    fn net_and_net_http_go_together() {
+        let net =
+            |v: &mut serde_json::Value| v["net"] = serde_json::json!({"hosts": "user-configured"});
+        let perm = |v: &mut serde_json::Value| {
+            v["permissions"]["optional"] = serde_json::json!(["net.http"]);
+        };
+        let m = with(|v| {
+            net(v);
+            perm(v);
+        })
+        .expect("valid");
+        assert_eq!(
+            m.net,
+            Some(Net {
+                hosts: NetHosts::UserConfigured
+            })
+        );
+        assert!(matches!(
+            with(net),
+            Err(ManifestError::MissingPermission { .. })
+        ));
+        assert!(matches!(
+            with(perm),
+            Err(ManifestError::MissingPermission { .. })
+        ));
+        assert!(matches!(
+            with(|v| {
+                perm(v);
+                v["net"] = serde_json::json!({"hosts": "any"});
             }),
             Err(ManifestError::Syntax(_))
         ));
-        for entry in [
-            "../plugin.wasm",
-            "/plugin.wasm",
-            "a//b.wasm",
-            "C:\\x.wasm",
-            "plugin.js",
-        ] {
-            assert!(with(|v| v["entry"] = entry.into()).is_err(), "{entry}");
-        }
     }
 
     #[test]
@@ -771,39 +860,34 @@ mod tests {
     #[test]
     fn rejects_other_bad_fields() {
         assert!(matches!(
-            with(|v| v["category"] = "malware".into()),
+            with(|v| v["categories"] = serde_json::json!(["malware"])),
             Err(ManifestError::UnknownCategory(_))
         ));
+        assert!(with(|v| v["categories"] = serde_json::json!([])).is_err());
+        assert!(with(|v| v["categories"] = serde_json::json!(["fun", "fun"])).is_err());
+        assert!(
+            with(|v| v["categories"] = serde_json::json!(["fun", "games", "chat", "voice"]))
+                .is_err()
+        );
+        assert!(with(|v| v["authors"] = serde_json::json!([])).is_err());
+        assert!(with(|v| v["authors"] = serde_json::json!([""])).is_err());
+        assert!(with(|v| v["authors"] = serde_json::json!([{"name": "x"}])).is_err());
         assert!(matches!(
             with(|v| v["manifest"] = 2.into()),
             Err(ManifestError::UnsupportedFormat(2))
         ));
-        assert!(matches!(
-            with(|v| v["icons"] = serde_json::json!({"65": "assets/i.png"})),
-            Err(ManifestError::BadIconSize(_))
-        ));
-        assert!(with(|v| v["icons"] = serde_json::json!({"64": "icon.png"})).is_err());
-        assert!(with(|v| v["source"] = "http://example.com".into()).is_err());
+        for icon in ["icon.png", "assets/icon.gif", "assets/../icon.png"] {
+            assert!(with(|v| v["icon"] = icon.into()).is_err(), "{icon}");
+        }
         assert!(with(|v| v["license"] = "MIT OR".into()).is_err());
         assert!(with(|v| v["license"] = "Apache-2.0 WITH LLVM-exception".into()).is_ok());
-        assert_eq!(
-            with(|v| v["i18n"] = serde_json::json!({"default": "de", "available": ["de"]})),
-            Err(ManifestError::EnglishMissing)
-        );
-        assert!(matches!(
-            with(|v| v["i18n"]["default"] = "fr".into()),
-            Err(ManifestError::DefaultLanguageMissing(_))
-        ));
         assert!(matches!(
             with(|v| v["limits"]["memory_mib"] = 64.into()),
             Err(ManifestError::OutOfRange { .. })
         ));
         assert!(with(|v| v["messaging"]["max_payload"] = 998.into()).is_err());
         assert!(with(|v| v["storage"]["quota_kib"] = 2048.into()).is_err());
-        assert!(matches!(
-            with(|v| v["storage"]["scope"] = "server".into()),
-            Err(ManifestError::Syntax(_))
-        ));
+        assert!(with(|v| v["messaging"]["default_visibility"] = "all".into()).is_err());
     }
 
     /// The published schema must name the same permissions, categories and limits as the parser.
@@ -819,17 +903,14 @@ mod tests {
                 .map(|s| s.as_str().expect("string").to_owned())
                 .collect()
         };
-        assert_eq!(strings(&schema["$defs"]["permission"]["enum"]), PERMISSIONS);
-        assert_eq!(
-            strings(&schema["properties"]["category"]["enum"]),
-            CATEGORIES
-        );
-        let icon_sizes: Vec<String> = ICON_SIZES.iter().map(u32::to_string).collect();
-        assert_eq!(
-            strings(&schema["properties"]["icons"]["propertyNames"]["enum"]),
-            icon_sizes
-        );
+        let ids: Vec<&str> = permissions::CATALOGUE.iter().map(|p| p.id).collect();
+        assert_eq!(strings(&schema["$defs"]["permission"]["enum"]), ids);
         let props = &schema["properties"];
+        assert_eq!(strings(&props["categories"]["items"]["enum"]), CATEGORIES);
+        assert_eq!(props["categories"]["maxItems"], MAX_CATEGORIES);
+        assert_eq!(props["authors"]["maxItems"], MAX_AUTHORS);
+        assert_eq!(props["name"]["maxLength"], MAX_NAME_CHARS);
+        assert_eq!(props["description"]["maxLength"], MAX_DESCRIPTION_CHARS);
         assert_eq!(
             props["limits"]["properties"]["memory_mib"]["maximum"],
             MAX_MEMORY_MIB
@@ -850,6 +931,9 @@ mod tests {
         let example: serde_json::Value = serde_json::from_str(EXAMPLE).expect("example is JSON");
         for field in strings(&schema["required"]) {
             assert!(example.get(&field).is_some(), "{field}");
+        }
+        for field in example.as_object().expect("object").keys() {
+            assert!(props.get(field).is_some(), "{field} missing in schema");
         }
     }
 

@@ -1,6 +1,7 @@
-//! Translated plugin name and description (#269): `i18n/<lang>.json` holds flat string keys;
+//! Translated plugin name and description (FR-6.10): `i18n/<lang>.json` holds flat string keys;
 //! `manifest.name` and `manifest.description` override the manifest's English text. The app
-//! language wins, then its base language, then English, then the manifest itself.
+//! language wins, then its base language, then English, then the manifest itself. The languages a
+//! plugin offers are simply the files present.
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -19,12 +20,12 @@ const MAX_DESCRIPTION_CHARS: usize = 140;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DisplayText {
     pub name: String,
-    pub description: Option<String>,
+    pub description: String,
 }
 
 /// Looks up the display text for `language` (e.g. `de-AT`) in a plugin directory.
 pub fn display_text(manifest: &Manifest, plugin_dir: &Path, language: &str) -> DisplayText {
-    let chain = fallback_chain(manifest, language);
+    let chain = fallback_chain(language);
     let tables: Vec<BTreeMap<String, String>> = chain
         .iter()
         .filter_map(|tag| read_table(&plugin_dir.join("i18n").join(format!("{tag}.json"))))
@@ -38,19 +39,16 @@ pub fn display_text(manifest: &Manifest, plugin_dir: &Path, language: &str) -> D
     DisplayText {
         name: lookup(NAME_KEY, MAX_NAME_CHARS).unwrap_or_else(|| manifest.name.clone()),
         description: lookup(DESCRIPTION_KEY, MAX_DESCRIPTION_CHARS)
-            .or_else(|| manifest.description.clone()),
+            .unwrap_or_else(|| manifest.description.clone()),
     }
 }
 
-/// `de-AT` → `de-AT`, `de`, then English; only languages the manifest declares.
-fn fallback_chain(manifest: &Manifest, language: &str) -> Vec<String> {
+/// `de-AT` → `de-AT`, `de`, then English. Only valid tags, so the file name stays inside `i18n/`.
+fn fallback_chain(language: &str) -> Vec<String> {
     let base = language.split('-').next().unwrap_or_default();
     let mut chain: Vec<String> = Vec::new();
     for tag in [language, base, "en"] {
-        if is_language_tag(tag)
-            && manifest.i18n.available.iter().any(|a| a == tag)
-            && !chain.iter().any(|c| c == tag)
-        {
+        if is_language_tag(tag) && !chain.iter().any(|c| c == tag) {
             chain.push(tag.to_owned());
         }
     }
@@ -90,8 +88,7 @@ mod tests {
 
     fn manifest() -> Manifest {
         let json = r#"{"manifest":1,"id":"pets","name":"Pets","version":"1.0.0","api":"^1.0",
-            "author":{"name":"A"},"description":"English text","category":"fun","license":"MIT",
-            "entry":"plugin.wasm","i18n":{"default":"en","available":["en","de"]}}"#;
+            "authors":["A"],"description":"English text","categories":["fun"],"license":"MIT"}"#;
         Manifest::parse(json.as_bytes()).expect("valid")
     }
 
@@ -116,7 +113,7 @@ mod tests {
             de,
             DisplayText {
                 name: "Haustiere".into(),
-                description: Some("Deutsch".into())
+                description: "Deutsch".into()
             }
         );
 
@@ -125,22 +122,16 @@ mod tests {
             fr,
             DisplayText {
                 name: "Pets EN".into(),
-                description: Some("English text".into())
+                description: "English text".into()
             }
         );
     }
 
     #[test]
-    fn ignores_undeclared_and_unsafe_translations() {
+    fn ignores_missing_and_unsafe_translations() {
         let dir = tempfile::tempdir().expect("temp dir");
         std::fs::create_dir(dir.path().join("i18n")).expect("mkdir");
         std::fs::write(dir.path().join("i18n/en.json"), "{}").expect("write");
-        // Present on disk but not declared in the manifest.
-        std::fs::write(
-            dir.path().join("i18n/es.json"),
-            r#"{"manifest.name":"Mascotas"}"#,
-        )
-        .expect("write");
         std::fs::write(
             dir.path().join("i18n/de.json"),
             "{\"manifest.name\":\"Bad\\u0007\"}",
@@ -148,6 +139,7 @@ mod tests {
         .expect("write");
         let m = manifest();
         assert_eq!(display_text(&m, dir.path(), "es").name, "Pets");
+        assert_eq!(display_text(&m, dir.path(), "../en").name, "Pets");
         assert_eq!(display_text(&m, dir.path(), "de").name, "Pets");
     }
 }

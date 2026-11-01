@@ -3,12 +3,14 @@
 use std::io::Write;
 
 use mumcord_plugins::package::{MAX_PACKAGE_BYTES, check_unofficial_id};
-use mumcord_plugins::{Digest, ExpectedDigest, Package, PackageError};
+use mumcord_plugins::{Digest, ExpectedDigest, ManifestError, Package, PackageError, Source};
 use zip::write::SimpleFileOptions;
 
 const MANIFEST: &str = r#"{"manifest":1,"id":"dice-roller","name":"Dice","version":"1.0.0","api":"^1.0",
-    "author":{"name":"Tests"},"category":"games","license":"MIT","entry":"plugin.wasm",
-    "icons":{"64":"assets/icon-64.png"},"i18n":{"default":"en","available":["en"]}}"#;
+    "authors":["Tests"],"description":"Roll dice","categories":["games"],"license":"MIT",
+    "icon":"assets/icon-64.png"}"#;
+
+const REPO: Source = Source::Repo { repository_id: 1 };
 
 /// The files of a valid package; tests change or add entries.
 fn good_files() -> Vec<(String, Vec<u8>)> {
@@ -35,25 +37,60 @@ fn zip(files: &[(String, Vec<u8>)]) -> Vec<u8> {
 fn with(change: impl FnOnce(&mut Vec<(String, Vec<u8>)>)) -> Result<Package, PackageError> {
     let mut files = good_files();
     change(&mut files);
-    Package::read(&zip(&files))
+    Package::read(&zip(&files), REPO)
+}
+
+fn manifest_with(permissions: &str) -> Vec<u8> {
+    MANIFEST
+        .replace(
+            "\"license\"",
+            &format!("\"permissions\":{permissions},\"license\""),
+        )
+        .into_bytes()
 }
 
 #[test]
 fn accepts_and_installs_a_good_package() {
     let bytes = zip(&good_files());
     let package =
-        Package::read_verified(&bytes, &ExpectedDigest(Digest::of(&bytes))).expect("valid");
+        Package::read_verified(&bytes, REPO, &ExpectedDigest(Digest::of(&bytes))).expect("valid");
     assert_eq!(package.manifest.id, "dice-roller");
 
     let root = tempfile::tempdir().expect("temp dir");
     let dir = package.install(root.path()).expect("installs");
-    assert_eq!(dir, root.path().join("dice-roller"));
+    assert_eq!(dir, root.path().join("dice-roller").join("1.0.0"));
     assert_eq!(
         std::fs::read(dir.join("plugin.wasm")).expect("read"),
         b"\0asm"
     );
     // Installing again replaces the old files and leaves no staging directory behind.
+    std::fs::write(dir.join("stale.txt"), b"old").expect("write");
     package.install(root.path()).expect("reinstalls");
+    assert!(!dir.join("stale.txt").exists());
+    let entries = |path: &std::path::Path| std::fs::read_dir(path).expect("list").count();
+    assert_eq!(entries(root.path()), 1);
+    assert_eq!(entries(&root.path().join("dice-roller")), 1);
+
+    // A new version goes next to the old one, which stays for rollback.
+    let mut files = good_files();
+    files[0].1 = MANIFEST.replace("1.0.0", "1.1.0").into_bytes();
+    let newer = Package::read(&zip(&files), REPO).expect("valid");
+    let newer_dir = newer.install(root.path()).expect("installs");
+    assert_eq!(newer_dir, root.path().join("dice-roller").join("1.1.0"));
+    assert!(dir.join("plugin.wasm").exists());
+    assert_eq!(entries(&root.path().join("dice-roller")), 2);
+}
+
+#[test]
+fn a_failed_install_leaves_nothing_behind() {
+    let package = Package::read(&zip(&good_files()), REPO).expect("valid");
+    let root = tempfile::tempdir().expect("temp dir");
+    // A file where the plugin's directory should be makes the install fail.
+    std::fs::write(root.path().join("dice-roller"), b"in the way").expect("write");
+    assert!(matches!(
+        package.install(root.path()),
+        Err(PackageError::Io(_))
+    ));
     assert_eq!(std::fs::read_dir(root.path()).expect("list").count(), 1);
 }
 
@@ -64,7 +101,7 @@ fn digest_must_match_the_index() {
     assert_eq!(expected.sha256_hex().len(), 64);
     expected.sha256[0] ^= 1;
     assert!(matches!(
-        Package::read_verified(&bytes, &ExpectedDigest(expected)),
+        Package::read_verified(&bytes, REPO, &ExpectedDigest(expected)),
         Err(PackageError::Verification(_))
     ));
 }
@@ -101,7 +138,7 @@ fn rejects_symlinks() {
         .expect("symlink");
     let bytes = writer.finish().expect("finish").into_inner();
     assert!(matches!(
-        Package::read(&bytes),
+        Package::read(&bytes, REPO),
         Err(PackageError::BadEntry(_))
     ));
 }
@@ -112,7 +149,10 @@ fn rejects_too_many_files_and_oversize_packages() {
     assert!(matches!(result, Err(PackageError::TooManyFiles)));
 
     let big = vec![0u8; MAX_PACKAGE_BYTES as usize + 1];
-    assert!(matches!(Package::read(&big), Err(PackageError::TooLarge)));
+    assert!(matches!(
+        Package::read(&big, REPO),
+        Err(PackageError::TooLarge)
+    ));
 
     // A zip bomb in small: 9 MiB of text deflate to a few KiB, the unpacked limit catches it.
     let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
@@ -129,7 +169,7 @@ fn rejects_too_many_files_and_oversize_packages() {
         .expect("write");
     let bytes = writer.finish().expect("finish").into_inner();
     assert!(matches!(
-        Package::read(&bytes),
+        Package::read(&bytes, REPO),
         Err(PackageError::UnpackedTooLarge)
     ));
 }
@@ -162,6 +202,114 @@ fn rejects_missing_files_bad_assets_and_case_clashes() {
     assert!(matches!(
         with(|f| f[0].1 = MANIFEST.replace("\"games\"", "\"crypto\"").into_bytes()),
         Err(PackageError::Manifest(_))
+    ));
+    assert!(matches!(
+        with(|f| f.retain(|(n, _)| n != "assets/icon-64.png")),
+        Err(PackageError::MissingFile(n)) if n == "assets/icon-64.png"
+    ));
+}
+
+#[test]
+fn only_the_known_layout_is_allowed() {
+    for name in [
+        "run.sh",
+        "plugin2.wasm",
+        "docs/notes.md",
+        "i18n/english.json",
+        "i18n/de.txt",
+        "web/app.exe",
+    ] {
+        let result = with(|f| f.push((name.into(), b"x".to_vec())));
+        assert!(
+            matches!(result, Err(PackageError::UnexpectedFile(_))),
+            "{name}: {result:?}"
+        );
+    }
+    let ok = with(|f| {
+        f.push(("i18n/pt-BR.json".into(), b"{}".to_vec()));
+        f.push(("README.md".into(), b"# Dice".to_vec()));
+        f.push(("LICENSE".into(), b"MIT".to_vec()));
+    });
+    assert!(ok.is_ok(), "{ok:?}");
+    assert!(matches!(
+        with(|f| f.push(("i18n/de.json".into(), vec![b' '; 64 * 1024 + 1]))),
+        Err(PackageError::BadTranslation(_))
+    ));
+}
+
+#[test]
+fn web_content_needs_the_webview_permission() {
+    let web = |f: &mut Vec<(String, Vec<u8>)>| f.push(("web/index.html".into(), b"<p>".to_vec()));
+    assert!(matches!(with(web), Err(PackageError::WebWithoutWebview)));
+
+    let mut files = good_files();
+    files[0].1 = manifest_with(r#"{"optional":["ui.webview"]}"#);
+    web(&mut files);
+    files.push(("README.md".into(), b"# Dice".to_vec()));
+    files.push(("LICENSE".into(), b"MIT".to_vec()));
+    assert!(Package::read(&zip(&files), Source::Official).is_ok());
+}
+
+#[test]
+fn official_only_permissions_are_refused_outside_the_official_index() {
+    for permission in ["ui.webview", "net.http", "secrets"] {
+        let mut files = good_files();
+        files[0].1 = if permission == "net.http" {
+            MANIFEST
+                .replace(
+                    "\"license\"",
+                    r#""net":{"hosts":"user-configured"},"permissions":{"required":["net.http"]},"license""#,
+                )
+                .into_bytes()
+        } else {
+            manifest_with(&format!(r#"{{"required":["{permission}"]}}"#))
+        };
+        for source in [REPO, Source::Dev] {
+            let error = Package::read(&zip(&files), source).expect_err("refused");
+            assert!(
+                matches!(
+                    error,
+                    PackageError::Manifest(ManifestError::OfficialOnly(_))
+                ),
+                "{permission}: {error:?}"
+            );
+            assert_eq!(
+                error.to_string(),
+                "This permission is only available to official plugins"
+            );
+        }
+    }
+}
+
+#[test]
+fn official_packages_need_readme_and_licence() {
+    let bytes = zip(&good_files());
+    assert!(matches!(
+        Package::read(&bytes, Source::Official),
+        Err(PackageError::MissingFile(n)) if n == "README.md"
+    ));
+    let mut files = good_files();
+    files.push(("README.md".into(), b"# Dice".to_vec()));
+    assert!(matches!(
+        Package::read(&zip(&files), Source::Official),
+        Err(PackageError::MissingFile(n)) if n == "LICENSE"
+    ));
+    files.push(("LICENSE".into(), b"MIT".to_vec()));
+    assert!(Package::read(&zip(&files), Source::Official).is_ok());
+}
+
+#[test]
+fn svg_assets_are_sanitised_before_install() {
+    let svg = br#"<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(1)</script><circle r="4"/></svg>"#;
+    let package = with(|f| f.push(("assets/logo.svg".into(), svg.to_vec()))).expect("valid");
+    let root = tempfile::tempdir().expect("temp dir");
+    let dir = package.install(root.path()).expect("installs");
+    let installed = std::fs::read_to_string(dir.join("assets/logo.svg")).expect("read");
+    assert!(!installed.contains("alert"), "{installed}");
+    assert!(installed.contains("<circle r=\"4\">"), "{installed}");
+    assert!(matches!(
+        with(|f| f.push(("assets/fake.svg".into(), b"<p>not an image</p>".to_vec()))),
+        Err(PackageError::BadAsset(_))
     ));
 }
 

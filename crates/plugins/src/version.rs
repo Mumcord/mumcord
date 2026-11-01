@@ -16,10 +16,10 @@ pub const API_VERSION: Version = Version::new(1, 0, 0);
 pub enum Incompatibility {
     /// The plugin needs a newer API or app version. Shown as "Needs a newer Mumcord"; such
     /// plugins are not offered in the browse view.
-    #[error("needs a newer Mumcord")]
+    #[error("Needs a newer Mumcord")]
     NeedsNewerMumcord,
     /// The plugin targets an API major this host no longer supports.
-    #[error("made for an older Mumcord and no longer supported")]
+    #[error("Made for an older Mumcord")]
     TooOld,
 }
 

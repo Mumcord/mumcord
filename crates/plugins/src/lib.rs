@@ -9,12 +9,13 @@ mod host;
 pub mod i18n;
 pub mod manifest;
 pub mod package;
+pub mod permissions;
 mod runtime;
 pub mod version;
 
 pub use health::{Health, Recovery};
 pub use host::{HostError, LoadError, PluginHost, PluginState};
-pub use manifest::{Manifest, ManifestError};
+pub use manifest::{Manifest, ManifestError, Source};
 pub use package::{Digest, ExpectedDigest, Package, PackageError, PackageVerifier, VerifyError};
 pub use runtime::{CallError, CompileError, Level, LogBuffer};
 pub use version::{API_VERSION, Incompatibility};

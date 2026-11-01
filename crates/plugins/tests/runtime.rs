@@ -51,9 +51,8 @@ fn component(start: &str, stop: &str) -> Vec<u8> {
 
 fn manifest(id: &str, extra: &str) -> String {
     format!(
-        r#"{{"manifest":1,"id":"{id}","name":"Test","version":"1.0.0","api":"^1.0","author":{{"name":"Tests"}},
-           "category":"tools","license":"MIT","entry":"plugin.wasm",
-           "i18n":{{"default":"en","available":["en"]}}{extra}}}"#
+        r#"{{"manifest":1,"id":"{id}","name":"Test","version":"1.0.0","api":"^1.0","authors":["Tests"],
+           "description":"A test plugin","categories":["tools"],"license":"MIT"{extra}}}"#
     )
 }
 
@@ -292,7 +291,7 @@ fn api_version_decides_whether_a_plugin_loads() {
         error,
         LoadError::Incompatible(Incompatibility::NeedsNewerMumcord)
     ));
-    assert_eq!(error.to_string(), "needs a newer Mumcord");
+    assert_eq!(error.to_string(), "Needs a newer Mumcord");
 
     let app_range = plugin_dir(root.path(), "fixed", &wasm, r#","mumcord":">=0.8.0""#);
     assert!(matches!(
