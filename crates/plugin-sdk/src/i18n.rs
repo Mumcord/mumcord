@@ -3,8 +3,9 @@
 //! through the `language-changed` event.
 //!
 //! Files are flat JSON objects of strings. Placeholders are written `{{name}}`. Plural forms use
-//! the same convention as the Mumcord app: `key_one` (count is 1) and `key_other` (every other
-//! count), with `{{count}}` filled in automatically.
+//! the same convention as the Mumcord app (i18next): one key per CLDR plural category of the
+//! language, `key_zero`, `key_one`, `key_two`, `key_few`, `key_many` and `key_other`, with
+//! `key_other` as the fallback and `{{count}}` filled in automatically. See [`plural_category`].
 //!
 //! Embed the files with [`i18n_embed!`] (an explicit list of tags) or, for official plugins,
 //! [`i18n_all!`] (all 24 languages):
@@ -146,14 +147,26 @@ impl Strings {
         }
     }
 
-    /// Plural text: uses `<key>_one` when `count` is 1 and `<key>_other` otherwise (then the bare
-    /// `key`). `{{count}}` is filled in; `args` adds more placeholders.
+    /// Plural text: for each language of the fallback chain, uses `<key>_<category>` where the
+    /// category is that language's CLDR cardinal plural category of `count` (see
+    /// [`plural_category`]), then `<key>_other`; finally the bare `key`. `{{count}}` is filled in;
+    /// `args` adds more placeholders.
     pub fn tn(&self, key: &str, count: u64, args: &[(&str, &str)]) -> String {
-        let suffix = if count == 1 { "one" } else { "other" };
-        let plural_key = format!("{key}_{suffix}");
-        let text = self.lookup(&plural_key).or_else(|| self.lookup(key));
+        let other_key = format!("{key}_other");
+        let text = self
+            .chain
+            .iter()
+            .find_map(|tag| {
+                let bundle = self.bundles.get(tag)?;
+                let category = plural_category(tag, count);
+                bundle
+                    .get(&format!("{key}_{category}"))
+                    .or_else(|| bundle.get(&other_key))
+            })
+            .map(String::as_str)
+            .or_else(|| self.lookup(key));
         let Some(text) = text else {
-            return self.missing(&plural_key);
+            return self.missing(&other_key);
         };
         let count = count.to_string();
         let mut all = vec![("count", count.as_str())];
@@ -173,6 +186,113 @@ impl Strings {
             warn(&format!("missing translation key {key}"));
         }
         key.to_owned()
+    }
+}
+
+/// The CLDR cardinal plural category (`zero`, `one`, `two`, `few`, `many` or `other`) of an
+/// integer `count` in the language `tag` (a base or region tag such as `pl` or `pt-BR`). These are
+/// the categories `Intl.PluralRules` gives the Mumcord app, so translators reuse the same keys.
+/// A language outside the 24 Mumcord ones gets the English rule.
+pub fn plural_category(tag: &str, count: u64) -> &'static str {
+    let n = count;
+    let (m10, m100) = (n % 10, n % 100);
+    // Romance "many": a non-zero whole number of millions (CLDR 42 and later).
+    let millions = n != 0 && n.is_multiple_of(1_000_000);
+    let base = tag.split(['-', '_']).next().unwrap_or(tag);
+    match base {
+        "fr" | "pt" if n <= 1 => "one",
+        "es" | "it" if n == 1 => "one",
+        "fr" | "pt" | "es" | "it" => {
+            if millions {
+                "many"
+            } else {
+                "other"
+            }
+        }
+        "cs" | "sk" => match n {
+            1 => "one",
+            2..=4 => "few",
+            _ => "other",
+        },
+        "ga" => match n {
+            1 => "one",
+            2 => "two",
+            3..=6 => "few",
+            7..=10 => "many",
+            _ => "other",
+        },
+        "hr" => {
+            if m10 == 1 && m100 != 11 {
+                "one"
+            } else if (2..=4).contains(&m10) && !(12..=14).contains(&m100) {
+                "few"
+            } else {
+                "other"
+            }
+        }
+        "lt" => {
+            if m10 == 1 && !(11..=19).contains(&m100) {
+                "one"
+            } else if (2..=9).contains(&m10) && !(11..=19).contains(&m100) {
+                "few"
+            } else {
+                "other"
+            }
+        }
+        "lv" => {
+            if m10 == 0 || (11..=19).contains(&m100) {
+                "zero"
+            } else if m10 == 1 && m100 != 11 {
+                "one"
+            } else {
+                "other"
+            }
+        }
+        "mt" => {
+            if n == 1 {
+                "one"
+            } else if n == 2 {
+                "two"
+            } else if n == 0 || (2..=10).contains(&m100) {
+                "few"
+            } else if (11..=19).contains(&m100) {
+                "many"
+            } else {
+                "other"
+            }
+        }
+        "pl" => {
+            if n == 1 {
+                "one"
+            } else if (2..=4).contains(&m10) && !(12..=14).contains(&m100) {
+                "few"
+            } else {
+                "many"
+            }
+        }
+        "ro" => {
+            if n == 1 {
+                "one"
+            } else if n == 0 || (1..=19).contains(&m100) {
+                "few"
+            } else {
+                "other"
+            }
+        }
+        "sl" => match m100 {
+            1 => "one",
+            2 => "two",
+            3 | 4 => "few",
+            _ => "other",
+        },
+        // bg da de el en et fi hu nl sv: one for exactly 1.
+        _ => {
+            if n == 1 {
+                "one"
+            } else {
+                "other"
+            }
+        }
     }
 }
 
@@ -262,6 +382,199 @@ mod tests {
         assert_eq!(s.tn("votes", 0, &[]), "0 votes");
         assert_eq!(s.tn("votes", 1, &[]), "1 vote");
         assert_eq!(s.tn("votes", 5, &[]), "5 votes");
+    }
+
+    #[test]
+    fn plural_categories_per_language() {
+        let cases: &[(&str, &[(u64, &str)])] = &[
+            ("bg", &[(0, "other"), (1, "one"), (2, "other")]),
+            ("da", &[(0, "other"), (1, "one"), (5, "other")]),
+            ("de", &[(0, "other"), (1, "one"), (2, "other")]),
+            ("el", &[(0, "other"), (1, "one"), (2, "other")]),
+            (
+                "en",
+                &[(0, "other"), (1, "one"), (2, "other"), (21, "other")],
+            ),
+            ("et", &[(0, "other"), (1, "one"), (2, "other")]),
+            ("fi", &[(0, "other"), (1, "one"), (2, "other")]),
+            ("hu", &[(0, "other"), (1, "one"), (2, "other")]),
+            ("nl", &[(0, "other"), (1, "one"), (2, "other")]),
+            ("sv", &[(0, "other"), (1, "one"), (2, "other")]),
+            (
+                "cs",
+                &[
+                    (0, "other"),
+                    (1, "one"),
+                    (3, "few"),
+                    (5, "other"),
+                    (22, "other"),
+                ],
+            ),
+            (
+                "sk",
+                &[
+                    (0, "other"),
+                    (1, "one"),
+                    (4, "few"),
+                    (5, "other"),
+                    (22, "other"),
+                ],
+            ),
+            (
+                "es",
+                &[
+                    (0, "other"),
+                    (1, "one"),
+                    (2, "other"),
+                    (1_000_000, "many"),
+                    (2_000_000, "many"),
+                ],
+            ),
+            (
+                "it",
+                &[(0, "other"), (1, "one"), (2, "other"), (1_000_000, "many")],
+            ),
+            (
+                "fr",
+                &[
+                    (0, "one"),
+                    (1, "one"),
+                    (2, "other"),
+                    (1_000_000, "many"),
+                    (1_500_000, "other"),
+                ],
+            ),
+            (
+                "pt",
+                &[(0, "one"), (1, "one"), (2, "other"), (1_000_000, "many")],
+            ),
+            ("pt-BR", &[(0, "one"), (2, "other")]),
+            (
+                "ga",
+                &[
+                    (1, "one"),
+                    (2, "two"),
+                    (4, "few"),
+                    (8, "many"),
+                    (11, "other"),
+                    (0, "other"),
+                ],
+            ),
+            (
+                "hr",
+                &[
+                    (1, "one"),
+                    (21, "one"),
+                    (11, "other"),
+                    (3, "few"),
+                    (23, "few"),
+                    (13, "other"),
+                    (5, "other"),
+                    (0, "other"),
+                ],
+            ),
+            (
+                "lt",
+                &[
+                    (1, "one"),
+                    (21, "one"),
+                    (11, "other"),
+                    (2, "few"),
+                    (9, "few"),
+                    (12, "other"),
+                    (10, "other"),
+                    (0, "other"),
+                ],
+            ),
+            (
+                "lv",
+                &[
+                    (0, "zero"),
+                    (10, "zero"),
+                    (11, "zero"),
+                    (19, "zero"),
+                    (1, "one"),
+                    (21, "one"),
+                    (2, "other"),
+                    (22, "other"),
+                ],
+            ),
+            (
+                "mt",
+                &[
+                    (1, "one"),
+                    (2, "two"),
+                    (0, "few"),
+                    (3, "few"),
+                    (10, "few"),
+                    (11, "many"),
+                    (19, "many"),
+                    (20, "other"),
+                    (102, "few"),
+                    (111, "many"),
+                ],
+            ),
+            (
+                "pl",
+                &[
+                    (1, "one"),
+                    (2, "few"),
+                    (4, "few"),
+                    (5, "many"),
+                    (12, "many"),
+                    (22, "few"),
+                    (0, "many"),
+                    (21, "many"),
+                ],
+            ),
+            (
+                "ro",
+                &[
+                    (1, "one"),
+                    (0, "few"),
+                    (2, "few"),
+                    (19, "few"),
+                    (20, "other"),
+                    (101, "few"),
+                    (120, "other"),
+                ],
+            ),
+            (
+                "sl",
+                &[
+                    (1, "one"),
+                    (101, "one"),
+                    (2, "two"),
+                    (102, "two"),
+                    (3, "few"),
+                    (4, "few"),
+                    (5, "other"),
+                    (0, "other"),
+                ],
+            ),
+        ];
+        let languages: Vec<&str> = cases.iter().map(|(tag, _)| *tag).collect();
+        for tag in LANGUAGES.iter() {
+            assert!(languages.contains(tag), "no plural test for {tag}");
+        }
+        for (tag, expected) in cases {
+            for (count, category) in *expected {
+                assert_eq!(plural_category(tag, *count), *category, "{tag} {count}");
+            }
+        }
+    }
+
+    #[test]
+    fn tn_uses_the_category_key_and_falls_back_to_other() {
+        let pl = r#"{"v_one":"{{count}} glos","v_few":"{{count}} glosy","v_many":"{{count}} glosow","v_other":"{{count}} glosa"}"#;
+        let mut s = Strings::new(&[("en", EN), ("pl", pl)]);
+        s.set_language("pl");
+        assert_eq!(s.tn("v", 3, &[]), "3 glosy");
+        assert_eq!(s.tn("v", 5, &[]), "5 glosow");
+        let only_other = r#"{"v_other":"{{count}} x"}"#;
+        let mut s = Strings::new(&[("en", EN), ("pl", only_other)]);
+        s.set_language("pl");
+        assert_eq!(s.tn("v", 3, &[]), "3 x");
     }
 
     #[test]
