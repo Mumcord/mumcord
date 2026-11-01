@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, bot, testenv } from "../../helpers/index.ts";
+import { runOk } from "../../helpers/run.ts";
 import {
   addFirstServer,
   finishWizard,
@@ -294,6 +295,13 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     });
     // A different part, so the check can't pass on what the menu copied before.
     expect(await selectWords("words please")).toBe(true);
+    // Xvfb runs without a window manager, so nothing gives the main window keyboard focus when it
+    // maps; the app's own focus request can lose that race on a slow runner, and the key would
+    // then reach no window. A desktop's window manager focuses the window itself.
+    const mainWindow = (
+      await runOk("xdotool", ["search", "--onlyvisible", "--name", "^Mumcord$"])
+    ).stdout.split("\n")[0];
+    await runOk("xdotool", ["windowfocus", "--sync", mainWindow]);
     await browser.keys(["Control", "c"]);
     await copied("words please");
   });
