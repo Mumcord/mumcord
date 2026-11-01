@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { highlightHex } from "./hexDump";
-import { highlightCode, loadGrammar } from "./highlight";
+import { highlightCode, loadGrammar, loadHighlighter } from "./highlight";
 import { markdownToHtml } from "./markdown";
 import { CODE_LANGUAGE, sanitizeHtml } from "./sanitize";
 
@@ -15,7 +15,20 @@ function parse(html: string): HTMLElement {
 
 const JS = "const answer = 42;\nfunction greet(name) {\n  return `hi ${name}`;\n}";
 
+describe("before highlight.js has loaded (issue #323)", () => {
+  it("wraps and labels the block but keeps the code plain", () => {
+    const html = highlightCode(sanitizeHtml(markdownToHtml("```sql\nSELECT 1;\n```")));
+    const block = parse(html).querySelector<HTMLElement>(".chat-code");
+    expect(block?.dataset["languageLabel"]).toBe("SQL");
+    expect(block?.querySelector("span")).toBeNull();
+  });
+});
+
 describe("highlightCode", () => {
+  beforeAll(async () => {
+    await loadHighlighter();
+  });
+
   it("highlights a fenced block with a language tag", () => {
     const sent = markdownToHtml("```js\n" + JS + "\n```");
     expect(sent).toMatch(/^<pre data-mumcord-lang="js"><code>/);
