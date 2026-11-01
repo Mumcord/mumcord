@@ -1,4 +1,4 @@
-# Scenario for the plugin that `mumcord-plugin new` creates (and the SDK example `hello`).
+# Scenario for the plugin that `mumcord-plugin new` creates.
 # Run it with:  mumcord-plugin test dist/<id>-0.1.0.mcplugin scenarios/hello.yaml
 #
 # A scenario starts the plugin in a mock host, sends the events of `steps` in order and checks
@@ -28,15 +28,15 @@ peers:
   - { session: 2, name: Bob }
 
 steps:
-  - expect: { tree: { slot: panel, text: "Waves: 0" } }
+  - expect: { tree: { slot: panel, text: "0 waves" } }
 
   # A click on the "Wave" button.
   - event: { ui-action: { action: wave } }
   - expect: { message: { to: channel, kind: 1, text: "null" } }
-  - expect: { tree: { slot: panel, text: "Waves: 1" } }
+  - expect: { tree: { slot: panel, text: "1 wave" } }
 
   - event: { ui-action: { action: wave } }
-  - expect: { tree: { slot: panel, text: "Waves: 2" } }
+  - expect: { tree: { slot: panel, text: "2 waves" } }
 
   # Bob waves back.
   - event: { peer-message: { from: 2, kind: 1, text: "null" } }

@@ -85,7 +85,7 @@ fn new_build_reproducibly_check_and_sign() {
     let package = package.to_str().expect("utf-8");
     assert!(cli(work.path(), &["check", package]).contains(&first));
 
-    // The template is the SDK example `hello`, so this also runs that example in the runtime.
+    // The template's own scenario, run in the mock host.
     let scenario = Path::new(env!("CARGO_MANIFEST_DIR")).join("scenarios/hello.yaml");
     let scenario = scenario.to_str().expect("utf-8");
     assert!(cli(work.path(), &["test", package, scenario]).contains("ok   "));
@@ -101,7 +101,7 @@ fn new_build_reproducibly_check_and_sign() {
         ],
     );
     let page = std::fs::read_to_string(work.path().join("preview.html")).expect("test step");
-    assert!(page.contains("Waves: 2"));
+    assert!(page.contains("2 waves"));
 
     cli(
         work.path(),
