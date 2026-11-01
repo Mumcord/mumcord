@@ -34,5 +34,8 @@
   "stopped": "Lõpetasid oma ekraani jagamise.",
   "pauseSharing": "Peata jagamine",
   "resumeSharing": "Jätka jagamist",
-  "viewersLabel": "Kes vaatavad"
+  "viewersLabel": "Kes vaatavad",
+  "elapsed": "{{minutes}} min",
+  "changeWindow": "Vaheta akent",
+  "viewersTitle": "Vaatajad"
 }

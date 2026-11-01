@@ -30,6 +30,8 @@
     "title": "Nākamais",
     "empty": "Nekā nākamā. Pievieno YouTube saites ar “Pievienot atskaņošanas sarakstam”.",
     "skip": "Izlaist",
+    "previous": "Iepriekšējais",
+    "previousFailed": "Neizdevās atgriezties pie iepriekšējā video.",
     "moveHint": "Alt+Augšup un Alt+Lejup pārvieto video; to var arī vilkt.",
     "moved": "Pārvietots uz vietu {{position}}",
     "videoTitle": "YouTube video",
@@ -42,7 +44,9 @@
     "nextFailed": "Nākamo video neizdevās sākt.",
     "move": "Pārvietot {{title}}",
     "upNext": "Nākamais: {{title}}",
-    "upNextNone": "Nekā nākamā"
+    "upNextNone": "Nekā nākamā",
+    "paste": "Ielīmējiet YouTube saiti",
+    "notALink": "Tas nav YouTube saite"
   },
   "widget": {
     "play": "Atskaņot",

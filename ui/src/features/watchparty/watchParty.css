@@ -265,3 +265,12 @@ button.watch-playlist__up-next {
 .watch-party__embeds-off p {
   margin: 0;
 }
+
+/* The paste field that adds a link to the shared playlist (issue #163). */
+.watch-playlist__paste {
+  margin: 0 0 var(--space-2);
+}
+
+.watch-playlist__paste input {
+  width: 100%;
+}

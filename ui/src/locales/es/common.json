@@ -36,5 +36,29 @@
     "output": "Búfer del altavoz",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Controles del reproductor",
+    "nowPlaying": "Reproduciendo ahora",
+    "watching": "Viendo",
+    "open": "Abrir",
+    "next": "Siguiente",
+    "seek": "Buscar",
+    "volume": "Volumen",
+    "syncedPlay": "Sincronizado",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} tiene el control",
+    "inSync": "Sincronizado",
+    "inSyncAll": "Todos sincronizados",
+    "inSyncExcept": "Todos sincronizados excepto {{count}}",
+    "buffering": "Memorizando",
+    "behind": "{{seconds}} s detrás",
+    "ahead": "{{seconds}} s delante",
+    "noReport": "Sin informe",
+    "you": "tú",
+    "host": "Anfitrión",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "none": "Nadie"
   }
 }

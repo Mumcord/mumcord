@@ -37,5 +37,8 @@
   "stopped": "Waqqaft il-qsim tal-iskrin tiegħek.",
   "pauseSharing": "Ippawża l-qsim",
   "resumeSharing": "Kompli l-qsim",
-  "viewersLabel": "Min qed jara"
+  "viewersLabel": "Min qed jara",
+  "elapsed": "{{minutes}} minuta",
+  "changeWindow": "Ibdel twieqa",
+  "viewersTitle": "Spettaturi"
 }

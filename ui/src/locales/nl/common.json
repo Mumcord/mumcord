@@ -36,5 +36,29 @@
     "output": "Luidsprekerbuffer",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Player-bediening",
+    "nowPlaying": "Speelt nu",
+    "watching": "Kijken",
+    "open": "Open",
+    "next": "Volgende",
+    "seek": "Zoeken",
+    "volume": "Volume",
+    "syncedPlay": "Gesynchroniseerd",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} heeft de regie",
+    "inSync": "Gesynchroniseerd",
+    "inSyncAll": "Iedereen gesynchroniseerd",
+    "inSyncExcept": "Iedereen gesynchroniseerd behalve {{count}}",
+    "buffering": "Bezig met bufferen",
+    "behind": "{{seconds}} s achter",
+    "ahead": "{{seconds}} s voor",
+    "noReport": "Nog geen melding",
+    "you": "jij",
+    "host": "Host",
+    "fullscreen": "Beeldschermvullend",
+    "exitFullscreen": "Verlaat fullscreen",
+    "none": "Niemand"
   }
 }

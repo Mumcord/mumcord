@@ -36,5 +36,29 @@
     "output": "Buffer das colunas",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Controlos do leitor",
+    "nowPlaying": "A reproduzir",
+    "watching": "A ver",
+    "open": "Abrir",
+    "next": "Seguinte",
+    "seek": "Procurar",
+    "volume": "Volume",
+    "syncedPlay": "Sincronizado",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} tem o controlo",
+    "inSync": "Sincronizado",
+    "inSyncAll": "Todos sincronizados",
+    "inSyncExcept": "Todos sincronizados exceto {{count}}",
+    "buffering": "Em buffer",
+    "behind": "{{seconds}} s atrás",
+    "ahead": "{{seconds}} s à frente",
+    "noReport": "Sem relatório",
+    "you": "tu",
+    "host": "Anfitrião",
+    "fullscreen": "Ecrã inteiro",
+    "exitFullscreen": "Sair do ecrã inteiro",
+    "none": "Ninguém"
   }
 }

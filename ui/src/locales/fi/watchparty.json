@@ -30,6 +30,8 @@
     "title": "Seuraavaksi",
     "empty": "Ei mitään seuraavaksi. Lisää YouTube-linkkejä valinnalla ”Lisää soittolistaan”.",
     "skip": "Ohita",
+    "previous": "Edellinen",
+    "previousFailed": "Edelliseen videoon ei voitu palata.",
     "moveHint": "Alt+Ylös ja Alt+Alas siirtävät videota; voit myös vetää sitä.",
     "moved": "Siirretty sijaan {{position}}",
     "videoTitle": "YouTube-video",
@@ -42,7 +44,9 @@
     "nextFailed": "Seuraavaa videota ei voitu aloittaa.",
     "move": "Siirrä {{title}}",
     "upNext": "Seuraavaksi: {{title}}",
-    "upNextNone": "Ei mitään seuraavaksi"
+    "upNextNone": "Ei mitään seuraavaksi",
+    "paste": "Liitä YouTube-linkki",
+    "notALink": "Tuo ei ole YouTube-linkki"
   },
   "widget": {
     "play": "Toista",

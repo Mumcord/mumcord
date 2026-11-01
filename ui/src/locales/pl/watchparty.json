@@ -30,6 +30,8 @@
     "title": "Następne",
     "empty": "Nic więcej w kolejce. Dodaj linki do YouTube przez „Dodaj do playlisty”.",
     "skip": "Pomiń",
+    "previous": "Poprzedni",
+    "previousFailed": "Nie można wrócić do poprzedniego filmu.",
     "moveHint": "Alt+Strzałka w górę i Alt+Strzałka w dół przesuwają film; możesz go też przeciągnąć.",
     "moved": "Przeniesiono na pozycję {{position}}",
     "videoTitle": "Film z YouTube",
@@ -42,7 +44,9 @@
     "nextFailed": "Nie udało się uruchomić następnego filmu.",
     "move": "Przenieś {{title}}",
     "upNext": "Następne: {{title}}",
-    "upNextNone": "Nic więcej w kolejce"
+    "upNextNone": "Nic więcej w kolejce",
+    "paste": "Wklej link YouTube",
+    "notALink": "To nie jest link YouTube"
   },
   "widget": {
     "play": "Odtwórz",

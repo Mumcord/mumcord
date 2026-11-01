@@ -1,6 +1,6 @@
 {
   "shards": [
-    ["specs/network/network-resilience.e2e.ts"],
+    ["specs/media/share-bar.e2e.ts", "specs/network/network-resilience.e2e.ts"],
     [
       "specs/chat/dnd.e2e.ts",
       "specs/chat/friends.e2e.ts",

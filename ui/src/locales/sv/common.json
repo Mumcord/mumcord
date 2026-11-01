@@ -36,5 +36,29 @@
     "output": "Högtalarbuffert",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Playerkontroller",
+    "nowPlaying": "Spelar nu",
+    "watching": "Tittar",
+    "open": "Öppna",
+    "next": "Nästa",
+    "seek": "Sök",
+    "volume": "Volym",
+    "syncedPlay": "Synkat",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} har kontrollen",
+    "inSync": "Synkat",
+    "inSyncAll": "Alla är synkade",
+    "inSyncExcept": "Alla synkade utom {{count}}",
+    "buffering": "Buffrar",
+    "behind": "{{seconds}} s efter",
+    "ahead": "{{seconds}} s före",
+    "noReport": "Ingen rapport",
+    "you": "du",
+    "host": "Värd",
+    "fullscreen": "Helskärm",
+    "exitFullscreen": "Lämna helskärm",
+    "none": "Ingen"
   }
 }

@@ -1,5 +1,7 @@
 export { WatchPartyPanel } from "./WatchPartyPanel";
-export { WatchPartyWidget } from "./WatchPartyWidget";
+export { WatchTogetherView } from "./WatchTogetherView";
+export { WatchMiniBar } from "./WatchMiniBar";
+export { WatchingList } from "./WatchingList";
 export { VideoDucking } from "./VideoDucking";
 export { WatchTogetherButton } from "./WatchTogetherButton";
 export { resetWatchPartyStore, useWatchParty } from "./watchPartyStore";

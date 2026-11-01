@@ -30,6 +30,8 @@
     "title": "Naslednje",
     "empty": "Nič ni na vrsti. Dodaj povezave YouTube z »Dodaj na seznam predvajanja«.",
     "skip": "Preskoči",
+    "previous": "Prejšnji",
+    "previousFailed": "Vrnitev na prejšnji video ni uspela.",
     "moveHint": "Alt+Gor in Alt+Dol premakneta video; lahko ga tudi povlečeš.",
     "moved": "Premaknjeno na mesto {{position}}",
     "videoTitle": "Video z YouTuba",
@@ -42,7 +44,9 @@
     "nextFailed": "Naslednjega videa ni bilo mogoče začeti.",
     "move": "Premakni {{title}}",
     "upNext": "Naslednje: {{title}}",
-    "upNextNone": "Nič ni na vrsti"
+    "upNextNone": "Nič ni na vrsti",
+    "paste": "Prilepi povezavo YouTube",
+    "notALink": "To ni povezava YouTube"
   },
   "widget": {
     "play": "Predvajaj",

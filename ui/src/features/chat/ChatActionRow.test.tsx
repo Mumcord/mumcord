@@ -207,6 +207,11 @@ describe("watch together", () => {
       currentEntry: 0,
       playlist: [],
       skippedBy: null,
+
+      positions: [],
+
+      host: 0,
+      history: [],
     };
     const add = vi.spyOn(api, "watchPartyAdd").mockResolvedValue(1);
     const start = vi.spyOn(api, "watchPartyStart");

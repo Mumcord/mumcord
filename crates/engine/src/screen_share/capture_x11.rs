@@ -11,6 +11,7 @@ use x11rb::rust_connection::RustConnection;
 
 use super::capture::CaptureSource;
 use super::convert::bgrx_to_i420;
+use super::signal::ShareKind;
 
 /// Why the screen cannot be captured.
 #[derive(Debug, thiserror::Error)]
@@ -61,6 +62,11 @@ impl X11Capture {
 }
 
 impl CaptureSource for X11Capture {
+    /// X11 has no picker: the whole screen is shared.
+    fn kind(&self) -> Option<ShareKind> {
+        Some(ShareKind::Screen)
+    }
+
     fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {
         let image = self
             .conn

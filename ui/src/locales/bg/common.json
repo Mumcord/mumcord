@@ -36,5 +36,29 @@
     "output": "Буфер на високоговорителя",
     "value": "{{value}} ms",
     "total": "≈ {{value}} ms"
+  },
+  "media": {
+    "controls": "Контроли на плейъра",
+    "nowPlaying": "В момента",
+    "watching": "Гледат",
+    "open": "Отвори",
+    "next": "Следващо",
+    "seek": "Търсене",
+    "volume": "Звук",
+    "syncedPlay": "Синхронно",
+    "keys": "Space · ← → · M · F · Z · Esc",
+    "inControl": "{{name}} е на контрола",
+    "inSync": "В синхрон",
+    "inSyncAll": "Всички в синхрон",
+    "inSyncExcept": "Всички в синхрон, освен {{count}}",
+    "buffering": "Зарежда",
+    "behind": "{{seconds}} с назад",
+    "ahead": "{{seconds}} с напред",
+    "noReport": "Няма данни",
+    "you": "вие",
+    "host": "Домакин",
+    "fullscreen": "Цял екран",
+    "exitFullscreen": "Излез от цял екран",
+    "none": "Никой"
   }
 }

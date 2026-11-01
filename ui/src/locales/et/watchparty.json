@@ -30,6 +30,8 @@
     "title": "Järgmisena",
     "empty": "Järgmisena pole midagi. Lisa YouTube'i linke nupuga „Lisa esitusloendisse“.",
     "skip": "Jäta vahele",
+    "previous": "Eelmine",
+    "previousFailed": "Eelmise video juurde tagasi minemine ei õnnestunud.",
     "moveHint": "Alt+Üles ja Alt+Alla liigutavad videot; saad seda ka lohistada.",
     "moved": "Teisaldatud kohale {{position}}",
     "videoTitle": "YouTube'i video",
@@ -42,7 +44,9 @@
     "nextFailed": "Järgmist videot ei õnnestunud alustada.",
     "move": "Teisalda {{title}}",
     "upNext": "Järgmisena: {{title}}",
-    "upNextNone": "Järgmisena pole midagi"
+    "upNextNone": "Järgmisena pole midagi",
+    "paste": "Aseta YouTube'i link",
+    "notALink": "See ei ole YouTube'i link"
   },
   "widget": {
     "play": "Esita",
