@@ -79,6 +79,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | Q0 | Health check of epic/plugins head: full workspace cargo fmt/clippy (incl. windows/macos cross-lint)/test + full UI typecheck/lint/prettier/vitest; fix anything red | done (all green at 2d1dae00: fmt, clippy incl. win/mac, cargo test, tsc, eslint, prettier, 2436 vitest twice) | q0-health |
 | F18 | UI fixes from screenshots: expanded Plugins strip is clipped by the user panel with a tall channel tree (strip must fit: scroll the tree or cap the strip); focus ring on the details-view title looks like a box (focus only when keyboard-focused, or don't focus the heading) | done (8610f01a) | f18-strip |
 | F19 | Debug builds must read MUMCORD_PLUGIN_REGISTRY_URL (documented by B6 for E2E, used by B16b) as the official registry base, same as the mirror setting; currently only MUMCORD_PLUGIN_REGISTRY_KEY is read | open | |
+| F20 | Expanded plugin popover (strip "expand", 420×560) has no background — transparent over the app; give it the normal surface background, border, shadow in dark+light | in progress | f20-popover |
 | B6v | Run e2e two-clients.e2e.ts + smoke/app.e2e.ts under the e2e lock; verify tauri:options.args (e.g. --no-plugins) reaches the app; fix harness issues | done (two-clients 2/2, app 3/3, args reach the app) | b6v-e2erun |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
