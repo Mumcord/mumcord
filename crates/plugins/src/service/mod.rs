@@ -16,6 +16,7 @@ mod lifecycle;
 mod messaging;
 mod plugin_io;
 mod revocation;
+mod ui;
 mod updates;
 
 use std::collections::BTreeMap;
@@ -43,6 +44,7 @@ pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
 pub use plugin_io::{PeerInfo, SelfInfo, UiUpdate};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
+pub use ui::UiInput;
 pub use updates::{Approval, Due, Schedule, UpdateInfo, run_check};
 
 /// The permission that lets a plugin show a badge next to user names (FR-6.63).
