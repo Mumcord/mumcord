@@ -113,6 +113,8 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F50 | Can a sealed web view frame flood window.webkit.messageHandlers.ipc (e.g. 10k posts)? Measure log growth / UI / IPC stalls; fix only if real (rate-limit or drop log noise) | done (no harm beyond baseline: stderr 74 B/bad post, stall ≤ 0.5 s @10k; risk for D1: web view frame shares the main JS thread → a looping page can freeze the UI; mitigated because ui.webview is official-only + reviewed) | f50-flood |
 | F51 | Echolings fails to start ("could not read pet … invalid") when no server is focused yet (Scope::Identity invalid, src-tauri/src/plugins/mod.rs focus()); per overnight decision #6 use the DEFAULT identity when no server is open | done (cc621f00) | f51-identity |
 | F52 | After an app restart, old Poll lines and "!poll 1" show as plain text in history (no card, not hidden) — H2 replay at startup | done (poll 563dcdc: last 20 polls in identity storage, read-only after restart) | f52-replay |
+| C4b | Snack Race never opens: Echolings calls webview.show(Place::Dialog) without opening a dialog first (host refuses: invalid); fix in feat/echolings (+ ui.dialog permission?) and unskip E2E | in progress | c4b-snack |
+| C4c | Echolings: verify second pat same day is refused; AC-6.6 badge picker switch shows no badge on A's own row — investigate/fix, unskip E2E | in progress | c4c-badge |
 | H2m | mumcord-plugin CLI mock: issue message tokens for chat-match/chat-trigger + replay steps so scenarios can test replace/hide/is-replay | done (b59e1ea5; scenario syntax: event message:N replay:true, expect replaced/hidden) | h2m-mock |
 | H2s | Poll: YAML scenarios for hide / replay-no-count / own-line replace using the H2m mock (b59e1ea5) | done (with H2m2 d33b6da) | h2s-pollscen |
 | H2m2 | CLI mock: scenario syntax for own-line replay (chat-match pattern index 255 / own: true, needs chat.send) + poll scenarios (c) own create line replaced by card, close line hidden, (d) unknown lines untouched | done (5e65f707 own: true; poll d33b6da) | h2m2-ownline |
@@ -651,3 +653,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - Decision 2026-11-01 (user): FR-6.59 "highlighted" = Echolings listed first in Browse; no separate highlight card (mockup conformance V-C 1881b87a)
 - C14 ✅ AC-6.29 (f0f5f5ba a11y.e2e.ts 7/7 ×2; fix cbb6e504 modal focus); 🖐 manual screen reader check (steps in D1); at 150 % font Poll card needs "Show more"
 - C5 ✅ AC-6.8, AC-6.9, AC-6.10 (eef7969d, f4f9deb8 safe-mode.e2e.ts 4/4)
+- C4 ⚠️ AC-6.5 partly ✅ (b50a9c94 friends fix, cc6f58bc echolings.e2e.ts): badge, profile card, Echo Echo ✅; Snack Race ❌ (C4b), second-pat refusal + AC-6.6 badge picker unverified (C4c)
