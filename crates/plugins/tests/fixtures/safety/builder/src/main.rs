@@ -16,7 +16,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, anyhow, bail};
 use serde_json::{Map, Value, json};
-use wit_parser::{Resolve, SizeAlign, TypeDefKind, TypeId};
+use wit_parser::{Resolve, SizeAlign, Type, TypeDefKind, TypeId};
 
 /// Memory management and the shared helpers every core module gets in place of `{{PRELUDE}}`.
 /// Requires the module to import `log.write` as `$log`.
@@ -130,6 +130,11 @@ impl Layout {
         match key {
             "EVENT_PAYLOAD" => Ok(self.payload_offset("events", "event")?.to_string()),
             "COMPONENT_PAYLOAD" => Ok(self.payload_offset("ui", "component")?.to_string()),
+            "PEER_SIZE" => Ok(self
+                .sizes
+                .size(&Type::Id(self.type_in("types", "peer")?))
+                .size_wasm32()
+                .to_string()),
             other => bail!("unknown placeholder {{{{{other}}}}}"),
         }
     }

@@ -325,9 +325,7 @@ describe("Echolings between two friends (AC-6.5, AC-6.6)", () => {
     });
   });
 
-  // C4b: the pat and the disabled button work; reopening the profile card from the pinned
-  // preview does not (test helper), so the stored refusal is not checked yet.
-  it.skip("AC-6.5: B pats A's pet once; a second pat the same day is refused", async () => {
+  it("AC-6.5: B pats A's pet once; a second pat the same day is refused", async () => {
     await apps.onB(async () => {
       const section = () =>
         $("dialog.profile-card section.plugin-profile-section[aria-label='Section from Echolings']");
@@ -431,8 +429,7 @@ describe("Echolings between two friends (AC-6.5, AC-6.6)", () => {
     });
   });
 
-  // C4b: after switching the picker to the badge fixture, A's own row shows no badge at all.
-  it.skip("AC-6.6: with Poll, Dice and a badge plugin only one badge shows; the picker switches it", async () => {
+  it("AC-6.6: with Poll, Dice and a badge plugin only one badge shows; the picker switches it", async () => {
     await openSettingsGroup("Plugins");
     await install("Poll");
     await install("Dice roller");
