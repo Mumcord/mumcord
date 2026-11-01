@@ -7,10 +7,13 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { matchingPreset } from "../wizard/presets";
+import { ActivePresetCard } from "./ActivePresetCard";
+import { changedSections } from "./changes";
 import { DialogHostContext, type DialogHost } from "./components/dialogHost";
+import { ChangedSettingsContext } from "./components/changedSettings";
 import { SettingsIcon } from "./components/SettingsIcon";
 import { SettingsNavigationContext, type SettingsNavigation } from "./settingsNavigation";
 import { SettingsSearch } from "./SettingsSearch";
@@ -20,7 +23,9 @@ import { SettingsPageCards } from "./SettingsPages";
 import { SECTION_ICONS, SECTION_IDS, SET_APART_SECTIONS, type SectionId } from "./sectionIds";
 import { useIsMacos } from "../../api/useIsMacos";
 import { useDevToolsUnlocked } from "../inspector/devTools";
+import { ResetSectionButton } from "./ResetSectionButton";
 import { useSettings } from "./useSettings";
+import { useSettingsChanges } from "./useSettingsChanges";
 import "./settings.css";
 
 /** Card title keys of cards that only show on some systems; the search hides their entries. */
@@ -50,25 +55,31 @@ const isSearchShortcut = (event: globalThis.KeyboardEvent) =>
  * groups on the left (one Tab stop, arrow keys move; Advanced & Developer and About set apart
  * below a divider) and the selected group's page on the right: header plus a grid of section
  * cards. `initialSection` picks the group shown first. Both columns scroll on their own. Every
- * change is saved immediately.
+ * change is saved immediately. Changed settings get a badge and their group a dot; the sidebar
+ * footer shows the active preset and each page header offers "Reset section".
  */
 export function SettingsScreen({
   initialSection,
   settingsRevision,
-  sidebarFooter,
-  pageActions,
 }: {
   initialSection?: SectionId;
   /** Changes when something outside the settings wrote them, e.g. the setup wizard rerun (#149). */
   settingsRevision?: number;
-  /** Pinned to the bottom of the sidebar, e.g. the active preset card. */
-  sidebarFooter?: ReactNode;
-  /** Buttons in the page header of the shown group, e.g. "Reset section". */
-  pageActions?: (section: SectionId) => ReactNode;
 }) {
   const { t } = useTranslation("settings");
   const baseId = useId();
   const { settings, loadFailed, saveFailed, update } = useSettings(settingsRevision);
+  const changes = useSettingsChanges(settings, update);
+  const { current: currentDraft, changed } = changes;
+  const changedLabels = useMemo(
+    () => new Set(changed.map((setting) => t(setting.label))),
+    [changed, t],
+  );
+  const dotSections = useMemo(() => changedSections(changed), [changed]);
+  const presetMatch = useMemo(
+    () => (currentDraft === null ? null : matchingPreset(currentDraft)),
+    [currentDraft],
+  );
   // macOS has no overlay at all (QA.58).
   const macos = useIsMacos();
   // The developer tools stay hidden until they are unlocked (issue #60).
@@ -93,6 +104,11 @@ export function SettingsScreen({
       compatibilityFocusPending,
       compatibilityFocused: () => {
         setCompatibilityFocusPending(false);
+      },
+      jumpTo: (entry) => {
+        setQuery("");
+        setActive(entry.section);
+        setJump({ kind: "setting", entry });
       },
     }),
     [compatibilityFocusPending],
@@ -223,6 +239,7 @@ export function SettingsScreen({
                   role="tab"
                   aria-selected={id === active}
                   aria-controls={panelId(id)}
+                  aria-describedby={dotSections.has(id) ? `${baseId}-changed` : undefined}
                   tabIndex={id === active ? 0 : -1}
                   className={
                     SET_APART_SECTIONS[0] === id
@@ -236,12 +253,17 @@ export function SettingsScreen({
                 >
                   <SettingsIcon name={SECTION_ICONS[id]} />
                   {t(`sections.${id}`)}
+                  {dotSections.has(id) && <span className="settings__tab-dot" aria-hidden="true" />}
                 </button>
               ))}
             </div>
-            {sidebarFooter !== undefined && (
-              <div className="settings__sidebar-footer">{sidebarFooter}</div>
-            )}
+            {/* Describes the tabs with a dot; outside them, so a tab's text stays the group name. */}
+            <span id={`${baseId}-changed`} hidden>
+              {t("badges.groupChanged")}
+            </span>
+            <div className="settings__sidebar-footer">
+              <ActivePresetCard changes={changes} />
+            </div>
           </div>
           <div
             ref={panelRef}
@@ -255,6 +277,11 @@ export function SettingsScreen({
                 {t("saveFailed")}
               </p>
             )}
+            {changes.applyFailed && (
+              <p role="alert" className="settings-error">
+                {t("activePreset.applyFailed")}
+              </p>
+            )}
             <header className="settings-page__header">
               <div className="settings-page__heading">
                 <p className="settings-page__breadcrumb" aria-hidden="true">
@@ -263,9 +290,9 @@ export function SettingsScreen({
                 <h2 className="settings-page__title">{t(`sections.${active}`)}</h2>
                 <p className="settings-page__description">{t(`sectionDescriptions.${active}`)}</p>
               </div>
-              {pageActions !== undefined && (
-                <div className="settings-page__actions">{pageActions(active)}</div>
-              )}
+              <div className="settings-page__actions">
+                <ResetSectionButton section={active} changes={changes} />
+              </div>
             </header>
             {loadFailed ? (
               <p role="alert" className="settings-error">
@@ -274,15 +301,18 @@ export function SettingsScreen({
             ) : settings === null ? (
               <p className="settings-hint">{t("loading")}</p>
             ) : (
-              <div className="settings-page__cards">
-                <SettingsPageCards
-                  id={active}
-                  settings={settings}
-                  update={update}
-                  macos={macos}
-                  devTools={devTools}
-                />
-              </div>
+              <ChangedSettingsContext value={changedLabels}>
+                <div className="settings-page__cards">
+                  <SettingsPageCards
+                    id={active}
+                    settings={settings}
+                    update={update}
+                    macos={macos}
+                    devTools={devTools}
+                    presetMatch={presetMatch}
+                  />
+                </div>
+              </ChangedSettingsContext>
             )}
           </div>
         </div>

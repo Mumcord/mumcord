@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { InfoTip } from "../../../components/InfoTip";
+import { ChangedBadge, RecommendedBadge } from "./SettingBadges";
 
 interface RadioOption<T extends string> {
   value: T;
@@ -9,6 +10,8 @@ interface RadioOption<T extends string> {
   lang?: string;
   /** Small marker after the label, such as "Beta". */
   badge?: string | undefined;
+  /** Shows the green "Recommended" pill after the label (#159). */
+  recommended?: boolean | undefined;
   /** A "?" next to the option that explains it. */
   tip?: { label: string; text: string } | undefined;
 }
@@ -32,19 +35,32 @@ export function RadioGroup<T extends string>({
 }: RadioGroupProps<T>) {
   const name = useId();
   return (
-    // Named by the legend text alone, so the "?" button does not end up in the group's name.
-    <fieldset className="settings-radios" aria-labelledby={`${name}-legend`}>
+    // Named by the legend text and the "Changed" badge, so the "?" button does not end up in the
+    // group's name. The badge sits outside the legend, which keeps the legend's text the label.
+    <fieldset className="settings-radios" aria-labelledby={`${name}-legend ${name}-badges`}>
       <legend className="settings-radios__legend">
         <span id={`${name}-legend`}>{legend}</span>
         {info !== undefined && <InfoTip label={info.label} text={info.text} />}
       </legend>
+      <span id={`${name}-badges`} className="setting-badges settings-radios__badges">
+        <ChangedBadge label={legend} />
+      </span>
       {options.map((option) => (
         <div key={option.value} className="settings-radios__row">
-          <label className="settings-radios__option" lang={option.lang}>
+          <label
+            id={`${name}-${option.value}`}
+            className="settings-radios__option"
+            lang={option.lang}
+          >
             <input
               type="radio"
               name={name}
               value={option.value}
+              aria-labelledby={
+                option.recommended === true
+                  ? `${name}-${option.value} ${name}-${option.value}-recommended`
+                  : undefined
+              }
               checked={option.value === value}
               disabled={option.disabled ?? false}
               onChange={() => {
@@ -60,6 +76,11 @@ export function RadioGroup<T extends string>({
               </>
             )}
           </label>
+          {/* Outside the label, so the label text stays the option's name; the radio's name still
+              includes it through aria-labelledby. */}
+          {option.recommended === true && (
+            <RecommendedBadge id={`${name}-${option.value}-recommended`} />
+          )}
           {/* Outside the label, so the "?" is its own control and does not pick the option; to the
               right, so the tip does not cover the neighbouring options. */}
           {option.tip !== undefined && (

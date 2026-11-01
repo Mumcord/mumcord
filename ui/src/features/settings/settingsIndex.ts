@@ -396,6 +396,22 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["searchTerms.p2p", "privacyDirect.hint"],
   },
   {
+    section: "privacy",
+    group: "privacySummary.title",
+    terms: ["privacySummary.ipHidden", "privacySummary.ipVisible"],
+  },
+  {
+    section: "advanced",
+    group: "betaFeatures.title",
+    terms: ["betaFeatures.hint"],
+  },
+  {
+    section: "advanced",
+    group: "betaFeatures.title",
+    control: "betaFeatures.manage",
+    terms: ["betaFeatures.gamePlugins"],
+  },
+  {
     section: "advanced",
     group: "cache.title",
     control: "cache.clear",

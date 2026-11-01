@@ -631,7 +631,7 @@ describe("Voice section", () => {
         "Advanced (AI) Beta",
         "Off",
       ]);
-      expect(within(group).getByRole("radio", { name: "Standard" })).toBeChecked();
+      expect(within(group).getByRole("radio", { name: "Standard Recommended" })).toBeChecked();
     });
 
     it("explains each level behind a ? and saves the choice", async () => {
@@ -1449,7 +1449,7 @@ describe("Settings search", () => {
     });
     expect(result.querySelector("mark")).toHaveTextContent("Noise");
     fireEvent.click(result);
-    const choice = await screen.findByRole("radio", { name: "Standard" });
+    const choice = await screen.findByRole("radio", { name: "Standard Recommended" });
     await waitFor(() => {
       expect(choice).toHaveFocus();
     });
@@ -1533,7 +1533,8 @@ describe("Accessibility section", () => {
       expect(screen.getByRole("switch", { name })).toBeChecked();
     }
     fireEvent.click(screen.getByRole("switch", { name: "Skip links" }));
-    expect(screen.getByRole("switch", { name: "Skip links" })).not.toBeChecked();
+    // Off differs from the default, so the switch is now also named "Changed" (#161).
+    expect(screen.getByRole("switch", { name: "Skip links Changed" })).not.toBeChecked();
     expect(hintPreferences().skipLinks).toBe(false);
   });
 });

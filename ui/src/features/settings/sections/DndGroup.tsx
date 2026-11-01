@@ -24,6 +24,7 @@ export function DndGroup() {
       />
       <Switch
         label={t("dnd.follow")}
+        recommended
         description={t("dnd.followDescription")}
         checked={state.followSystem}
         onChange={setFollowSystem}

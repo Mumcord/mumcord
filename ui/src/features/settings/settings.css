@@ -915,3 +915,158 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Badges after a setting's label (#161): "Changed" (dot), "Recommended" (green pill). */
+.setting-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.setting-badges:empty {
+  display: none;
+}
+
+.setting-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.setting-badge--changed {
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+}
+
+.setting-badge__dot,
+.settings__tab-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: var(--radius-full);
+  background: var(--color-warning);
+}
+
+.setting-badge--recommended {
+  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  color: var(--color-success);
+}
+
+/* The legend floats so the "Changed" badge can sit on its line while staying outside it. */
+.settings-radios__legend {
+  float: left;
+}
+
+.settings-radios__badges {
+  margin: 0 0 var(--space-2) var(--space-2);
+  min-height: 1.5em;
+  vertical-align: middle;
+}
+
+.settings-radios > :not(legend, .settings-radios__badges) {
+  clear: both;
+}
+
+.settings__tab-dot {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+/* Privacy summary (#161): a headline and one plain line per topic, each with a jump link. */
+.privacy-summary__headline {
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.privacy-summary__lines {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-secondary);
+}
+
+.privacy-summary__lines li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.beta-features__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.settings-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings-change-list {
+  margin: 0 0 var(--space-3);
+  padding-inline-start: var(--space-5);
+}
+
+/* Sidebar footer: the active setup preset (#161). */
+.active-preset {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+
+.active-preset p {
+  margin: 0;
+}
+
+.active-preset__heading {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.active-preset__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.active-preset__name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.active-preset__switch {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.active-preset__switch:hover {
+  text-decoration: underline;
+}
+
+.active-preset__count {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.preset-dialog {
+  width: min(56rem, calc(100vw - 2 * var(--space-5)));
+}

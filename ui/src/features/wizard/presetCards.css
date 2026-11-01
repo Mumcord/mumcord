@@ -1,0 +1,91 @@
+/* Setup style cards (#159), shared by the wizard and Settings → Switch preset (#161). */
+.preset-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+}
+
+.preset-card:hover {
+  background: var(--color-bg-hover);
+}
+
+.preset-card:has(.preset-card__radio:checked) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.preset-card:has(.preset-card__radio:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.preset-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.preset-card__icon {
+  display: inline-flex;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+  color: var(--color-accent-text);
+}
+
+.preset-card:has(.preset-card__radio:checked) .preset-card__icon {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.preset-card__radio {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.preset-card__title {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.preset-card__name {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.preset-card__tagline {
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.preset-card__points {
+  margin: 0;
+  padding-inline-start: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.preset-card__points li + li {
+  margin-top: var(--space-1);
+}

@@ -105,7 +105,7 @@ export function TalkModeCard({ settings, update }: SettingsSectionProps) {
         legend={t("voice.talkModeLegend")}
         value={settings.talkMode}
         options={[
-          { value: "voiceActivation", label: t("voice.voiceActivation") },
+          { value: "voiceActivation", label: t("voice.voiceActivation"), recommended: true },
           // Keep the option usable if it is already selected, so the user can still see it.
           {
             value: "pushToTalk",
@@ -223,6 +223,7 @@ export function ProcessingCard({ settings, update }: SettingsSectionProps) {
           value: choice,
           label: t(`voice.noiseChoice.${choice}`),
           badge: choice === "advanced" ? t("voice.noiseChoiceBeta") : undefined,
+          recommended: choice === "standard",
           tip:
             choice === "off"
               ? undefined

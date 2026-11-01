@@ -6,6 +6,7 @@ import { AcceptedConversationsGroup } from "./sections/AcceptedConversationsGrou
 import { ChannelListCard, LookCard, StartupCard, ThemeCard } from "./sections/AppearanceSection";
 import { DevicesCard, MicTestCard } from "./sections/AudioSection";
 import { BlockedMessagesGroup, BlockedUsersGroup } from "./sections/BlockedUsersGroup";
+import { BetaFeaturesCard } from "./sections/BetaFeaturesCard";
 import { CacheGroup } from "./sections/CacheGroup";
 import {
   ExternalContentCard,
@@ -26,6 +27,7 @@ import { InGameOverlayCard } from "./sections/OverlaySection";
 import { DeveloperToolsCard } from "./sections/PacketInspectorSection";
 import { PositionalGroup } from "./sections/PositionalGroup";
 import { ConnectionsCard } from "./sections/PrivacySection";
+import { PrivacySummaryCard } from "./sections/PrivacySummaryCard";
 import { PrivateMessagesGroup } from "./sections/PrivateMessagesGroup";
 import { ServerConnectionsCard } from "./sections/ServersSection";
 import { NotificationsCard, SoundsCard } from "./sections/SoundsSection";
@@ -33,6 +35,7 @@ import type { SettingsSectionProps } from "./sections/types";
 import { UpdatesCard } from "./sections/UpdatesSection";
 import { ConnectingCard, ProcessingCard, TalkModeCard } from "./sections/VoiceSection";
 import type { SectionId } from "./sectionIds";
+import type { PresetId } from "../wizard/presets";
 
 interface SettingsPageProps extends SettingsSectionProps {
   id: SectionId;
@@ -40,10 +43,19 @@ interface SettingsPageProps extends SettingsSectionProps {
   macos: boolean;
   /** The developer tools card stays hidden until they are unlocked (issue #60). */
   devTools: boolean;
+  /** The preset all preset-covered values match right now, for the privacy summary. */
+  presetMatch: PresetId | null;
 }
 
 /** The section cards of one settings group (#161); keep `settingsIndex` in step. */
-export function SettingsPageCards({ id, settings, update, macos, devTools }: SettingsPageProps) {
+export function SettingsPageCards({
+  id,
+  settings,
+  update,
+  macos,
+  devTools,
+  presetMatch,
+}: SettingsPageProps) {
   const props = { settings, update };
   switch (id) {
     case "general":
@@ -92,6 +104,7 @@ export function SettingsPageCards({ id, settings, update, macos, devTools }: Set
     case "privacy":
       return (
         <>
+          <PrivacySummaryCard settings={settings} presetMatch={presetMatch} />
           <ConnectionsCard {...props} />
           <ExternalContentCard {...props} />
           <HistorySyncCard {...props} />
@@ -124,6 +137,7 @@ export function SettingsPageCards({ id, settings, update, macos, devTools }: Set
     case "advanced":
       return (
         <>
+          <BetaFeaturesCard {...props} />
           {devTools && <DeveloperToolsCard />}
           <DiagnosticsCard {...props} />
           <CacheGroup />

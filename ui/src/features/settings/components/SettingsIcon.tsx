@@ -173,6 +173,8 @@ const SHAPES = {
   star: (
     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
   ),
+  scale: <path d="M12 3v18M8 21h8M4 7h16M4 7l-3 7a3 3 0 0 0 6 0zM20 7l-3 7a3 3 0 0 0 6 0z" />,
+  flask: <path d="M9 2h6M10 2v6L4 19a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3L14 8V2M7 15h10" />,
 } satisfies Record<string, ReactNode>;
 
 export type SettingsIconName = keyof typeof SHAPES;

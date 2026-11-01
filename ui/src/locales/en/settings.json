@@ -150,7 +150,6 @@
     "duckingLevel": "Lowered volume",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Low-latency mode",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "For playing music together in real time",
     "lowLatencyWarningTitle": "Trades robustness for speed",
     "lowLatencyBandwidth": "Uses more bandwidth (10 ms packets).",
@@ -629,7 +628,6 @@
   "p2p": {
     "title": "Peer-to-peer (screen sharing, full-size images)",
     "modeLabel": "Peer-to-peer mode",
-    "recommended": "Recommended",
     "explanation": "Direct shows your IP address to the other person. The relay hides it from them; the relay's operator (this server's community) can see it. Both are end-to-end encrypted.",
     "useGlobal": "Use global setting",
     "overrideHint": "Only for this server. \"Use global setting\" follows Settings → Privacy.",
@@ -889,5 +887,98 @@
     "whatsNew": "What's new",
     "whatsNewHint": "See the changes in every version.",
     "openChangelog": "Open changelog"
+  },
+  "badges": {
+    "changed": "Changed",
+    "recommended": "Recommended",
+    "groupChanged": "Has changed settings"
+  },
+  "resetSection": {
+    "button": "Reset section",
+    "title": "Reset {{section}}?",
+    "intro": "These settings go back to your preset or to their default value:",
+    "nothing": "Every setting in {{section}} already has its preset or default value.",
+    "confirm": "Reset"
+  },
+  "activePreset": {
+    "heading": "Active preset",
+    "none": "No preset",
+    "customised": "{{preset}}, customised",
+    "changed_one": "{{count}} setting changed since setup",
+    "changed_other": "{{count}} settings changed since setup",
+    "unchanged": "No changes since setup",
+    "switch": "Switch",
+    "switchLabel": "Switch preset",
+    "applyFailed": "The in-game overlay or Do Not Disturb could not be changed. Please try again."
+  },
+  "presets": {
+    "dialogTitle": "Switch preset",
+    "dialogIntro": "Pick a starting point. Only the settings a preset covers change; everything else stays as it is.",
+    "legend": "Presets",
+    "continue": "Continue",
+    "confirmTitle": "Switch to {{preset}}?",
+    "confirmIntro": "These settings change:",
+    "confirmNothing": "No setting changes. Mumcord remembers {{preset}} as your preset.",
+    "confirmCustom": "No setting changes. Settings stops comparing your choices with a preset and compares them with the defaults instead.",
+    "apply": "Switch preset",
+    "everythingOn": {
+      "name": "Everything on",
+      "tagline": "Full feature set",
+      "point1": "Others see what you play and listen to",
+      "point2": "Your IP is visible to people you connect to directly",
+      "point3": "Anyone can message you; links and images load from the web",
+      "point4": "Overlay, history sync and full-size images are on"
+    },
+    "balanced": {
+      "name": "Balanced",
+      "tagline": "Between privacy and comfort",
+      "point1": "Only friends and people in your channel can message you",
+      "point2": "Direct connection, with a relay as fallback",
+      "point3": "Link previews and full-size images are on",
+      "point4": "What you play and listen to stays private"
+    },
+    "maximumPrivacy": {
+      "name": "Maximum privacy",
+      "tagline": "Share as little as possible",
+      "point1": "Only friends can message you, no exceptions",
+      "point2": "Your IP is hidden; everything goes through the relay",
+      "point3": "No outside content, no history sync, no sharing",
+      "point4": "Nothing is shared about what you do"
+    },
+    "custom": {
+      "name": "Custom",
+      "tagline": "Your own choices",
+      "point1": "Keeps every setting as it is",
+      "point2": "Changes are compared with the defaults",
+      "point3": "Best if you know what you want"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta features",
+    "hint": "Early features; they may change. Each one is also shown where it belongs, with a Beta badge.",
+    "gamePlugins": "Game plugins",
+    "manage": "Manage plugins"
+  },
+  "privacySummary": {
+    "title": "Privacy summary",
+    "ipHidden": "Your IP address stays hidden",
+    "ipVisible": "Direct connections can show your IP address",
+    "matches": "Matches {{preset}}",
+    "messages": "Private messages from: {{rule}}",
+    "p2pHidden": "Peer-to-peer goes through the relay, so the other person does not see your IP address.",
+    "p2pDirect": "Peer-to-peer connects directly first; the other person can see your IP address.",
+    "p2pDirectOnly": "Peer-to-peer only connects directly; the other person can see your IP address.",
+    "externalOn": "Link previews are on: Mumcord fetches linked pages to build them.",
+    "externalOff": "Link previews are off: Mumcord loads nothing from linked pages.",
+    "imagesOn": "Full-size images are exchanged directly between Mumcord users.",
+    "imagesOff": "Full-size images are not exchanged.",
+    "historyOn": "History sync is on: you share your channel history with other Mumcord users.",
+    "historyOff": "History sync is off.",
+    "sharingBoth": "Others see what you play and listen to.",
+    "sharingPlaying": "Others see what you listen to.",
+    "sharingGaming": "Others see the game you play.",
+    "sharingNone": "What you play and listen to stays private.",
+    "change": "Change",
+    "changeLabel": "Change: {{topic}}"
   }
 }

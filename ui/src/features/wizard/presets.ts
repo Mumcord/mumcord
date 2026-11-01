@@ -17,6 +17,9 @@ export type PresetId = Exclude<SetupPreset, "custom">;
 /** Card order on the setup style step. */
 export const PRESET_IDS: readonly PresetId[] = ["everythingOn", "balanced", "maximumPrivacy"];
 
+/** The four setup styles in card order: the three presets, then Custom. */
+export const SETUP_STYLES: readonly SetupPreset[] = [...PRESET_IDS, "custom"];
+
 /** The preset the wizard selects at first: Balanced, marked "Recommended". */
 export const RECOMMENDED_PRESET: PresetId = "balanced";
 

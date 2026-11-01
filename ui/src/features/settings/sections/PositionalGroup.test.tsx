@@ -36,7 +36,7 @@ function lastSaved(): boolean | undefined {
   return saves.mock.lastCall?.[0].positional.enabled;
 }
 
-const SWITCH = { name: "Positional audio" };
+const SWITCH = { name: "Positional audio Beta feature" };
 
 describe("PositionalGroup", () => {
   it("is off by default and turns positional audio on", () => {

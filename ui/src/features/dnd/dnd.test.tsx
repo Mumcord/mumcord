@@ -70,7 +70,7 @@ describe("DndGroup", () => {
   it("switches Do Not Disturb and following the system, and names the detected desktop", async () => {
     render(<DndGroup />);
     const toggle = await screen.findByRole("switch", { name: "Do Not Disturb" });
-    const follow = screen.getByRole("switch", { name: "Follow system Do Not Disturb" });
+    const follow = screen.getByRole("switch", { name: "Follow system Do Not Disturb Recommended" });
     expect(toggle).not.toBeChecked();
     expect(follow).toBeChecked();
     expect(screen.getByText("Detected")).toBeInTheDocument();

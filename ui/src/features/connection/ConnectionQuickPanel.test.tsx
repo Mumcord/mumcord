@@ -212,7 +212,7 @@ describe("ConnectionQuickPanel", () => {
       name: "Music quality (channel profile)",
     });
     expect(music).toBeChecked();
-    expect(within(panel).getByRole("switch", { name: "Low-latency mode" })).not.toBeChecked();
+    expect(within(panel).getByRole("switch", { name: "Low-latency mode Beta" })).not.toBeChecked();
     expect(within(panel).getByRole("slider", { name: "Bitrate (channel profile)" })).toHaveValue(
       "100",
     );

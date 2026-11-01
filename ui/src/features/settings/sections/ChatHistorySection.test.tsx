@@ -21,8 +21,10 @@ describe("ExternalContentCard: full-size images (FR-1.74)", () => {
   it("are on by default and each switch turns off on its own", () => {
     const update = vi.fn();
     render(<ExternalContentCard settings={settings} update={update} />);
-    const offer = screen.getByRole("switch", { name: "Offer my full-size images" });
-    const load = screen.getByRole("switch", { name: "Load full-size images from others" });
+    const offer = screen.getByRole("switch", { name: "Offer my full-size images Beta feature" });
+    const load = screen.getByRole("switch", {
+      name: "Load full-size images from others Beta feature",
+    });
     expect(offer).toBeChecked();
     expect(load).toBeChecked();
     fireEvent.click(offer);
@@ -33,7 +35,10 @@ describe("ExternalContentCard: full-size images (FR-1.74)", () => {
 
   it("marks both switches as beta", () => {
     render(<ExternalContentCard settings={settings} update={vi.fn()} />);
-    for (const name of ["Offer my full-size images", "Load full-size images from others"]) {
+    for (const name of [
+      "Offer my full-size images Beta feature",
+      "Load full-size images from others Beta feature",
+    ]) {
       const row = screen.getByRole("switch", { name }).closest(".settings-switch");
       expect(row).not.toBeNull();
       expect(within(row as HTMLElement).getByText("Beta feature")).toBeInTheDocument();

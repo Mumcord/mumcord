@@ -68,6 +68,7 @@ export function PositionalGroup({ settings, update }: SettingsSectionProps) {
     >
       <Switch
         label={t("positional.switch")}
+        badge={<BetaBadge />}
         description={t("positional.hint")}
         checked={enabled}
         onChange={(on) => {
