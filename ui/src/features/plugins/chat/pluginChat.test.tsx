@@ -1,10 +1,11 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatMessage, InstalledPlugin, PluginCommand, PluginUi } from "../../../api";
 import type { MockApi } from "../../../api/mock";
 import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll } from "../../channels/testUtils";
 import { Composer } from "../../chat/Composer";
+import { usePluginUi } from "../render/pluginUiStore";
 import { PluginLine } from "./PluginChatCard";
 import {
   applySupersede,
@@ -203,6 +204,48 @@ describe("plugin chat UI", () => {
       expect(send).toHaveBeenCalled();
     });
     expect(run).not.toHaveBeenCalled();
+  });
+
+  it("shows a card for the user's own message after it, even when it appears before the send returns", async () => {
+    api = await connectedMock({ bindStore: true });
+    act(() => {
+      api.mock.emit("voiceServerChanged", { serverId: 1 });
+    });
+    let confirm: ((sent: ChatMessage) => void) | undefined;
+    api.sendChannelMessage = () =>
+      new Promise<ChatMessage>((resolve) => {
+        confirm = resolve;
+      });
+    // The chat list shows the message as sending first, then as confirmed.
+    const line = (id: string) => (
+      <PluginLine message={message(id, "[Rifter, Tackle]<br>Damage Control II", true)}>
+        <p>the fit</p>
+      </PluginLine>
+    );
+    // The app keeps the plugin UI store listening from the start.
+    renderHook(() => usePluginUi());
+    const { rerender } = render(line("tmp-out-1"));
+    const input = renderComposer();
+    const fit = "[Rifter, Tackle]\nDamage Control II";
+    fireEvent.change(input, { target: { value: fit } });
+    fireEvent.keyDown(input, { key: "Enter" });
+    await waitFor(() => {
+      expect(confirm).toBeDefined();
+    });
+    // The engine hands the match to the plugin before the send returns, so its card can arrive
+    // while the message is still being sent.
+    act(() => {
+      api.mock.emit("pluginUi", cardUi("eve-fit", "fit-1", "Tackle"));
+    });
+    await act(async () => {
+      confirm?.({
+        ...message("99", "[Rifter, Tackle]<br>Damage Control II", true),
+        senderSession: 1,
+      });
+      await Promise.resolve();
+    });
+    rerender(line("99"));
+    expect(await screen.findByRole("region", { name: "Card from eve-fit" })).toBeTruthy();
   });
 
   it("replaces a superseded line with the card, in either order, and reveals the text", async () => {

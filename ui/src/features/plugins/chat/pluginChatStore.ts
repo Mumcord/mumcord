@@ -12,7 +12,7 @@ import {
   type PluginUi,
   type Unsubscribe,
 } from "../../../api";
-import { conversationMessages, OUTGOING_PREFIX } from "../../chat/chatStore";
+import { conversationMessages, renderKey, sendingMessages } from "../../chat/chatStore";
 import { getServerStateOf, getVoiceServerId, selfUser } from "../../channels/serverStore";
 
 /** A plugin chat card as a local chat item (not a Mumble message). */
@@ -21,7 +21,10 @@ export interface PlacedCard {
   card: string;
   serverId: number;
   channelId: number;
-  /** The message the card follows; `null` when the channel had none loaded. */
+  /**
+   * The message the card follows; `null` when the channel had none loaded. An own message still
+   * being sent is named by its local id, which stays its render key once it is confirmed.
+   */
   after: string | null;
 }
 
@@ -67,16 +70,21 @@ function capped<K, V>(map: Map<K, V>): Map<K, V> {
   return map;
 }
 
-/** Where a card that just appeared belongs: the user's channel on the voice server. */
+/**
+ * Where a card that just appeared belongs: the user's channel on the voice server, after its last
+ * message. That includes an own message still being sent: the engine hands the user's own message
+ * to plugins before the send returns, so a card for it (e.g. a pasted EVE fit) may come first.
+ */
 function placeCard(plugin: string, card: string): PlacedCard | null {
   const serverId = getVoiceServerId();
   if (serverId === null) return null;
   const channelId = selfUser(getServerStateOf(serverId))?.channelId;
   if (channelId === undefined) return null;
-  const messages = conversationMessages({ kind: "channel", channelId }, serverId);
-  let after: string | null = null;
-  for (const message of messages) if (!message.id.startsWith(OUTGOING_PREFIX)) after = message.id;
-  return { plugin, card, serverId, channelId, after };
+  const conversation = { kind: "channel", channelId } as const;
+  const last =
+    sendingMessages(conversation, serverId).at(-1) ??
+    conversationMessages(conversation, serverId).at(-1);
+  return { plugin, card, serverId, channelId, after: last?.id ?? null };
 }
 
 /** Applies a plugin UI change: a new chat card is placed where the user is now. */
@@ -206,7 +214,9 @@ export function commandOf(
 /** The cards placed right after `message`, in the order they appeared. */
 export function cardsAfter(state: PluginChatState, message: ChatMessage): PlacedCard[] {
   return [...state.placed.values()].filter(
-    (p) => p.after === message.id && !state.replacing.has(cardKey(p.plugin, p.card)),
+    (p) =>
+      (p.after === message.id || p.after === renderKey(message.id)) &&
+      !state.replacing.has(cardKey(p.plugin, p.card)),
   );
 }
 
