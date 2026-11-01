@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Késleltetés",
   "droppedFrames": "Kihagyott képkockák",
-  "focus": "Fókusz",
   "fit": "Illeszkedés",
   "fill": "Kitöltés",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Nézik",
   "keys": "Billentyűparancsok",
   "keyFullscreen": "teljes képernyő",
-  "keyFocus": "fókusz",
   "keyExit": "kilépés"
 }

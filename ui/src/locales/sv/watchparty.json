@@ -61,7 +61,7 @@
     "generic": "Den här videon kräver stöd för H.264. Installera gst-libav (GStreamers libav-plugin) med systemets pakethanterare.",
     "rpmFusion": "På Fedora kommer gst-libav från RPM Fusion-förrådet; aktivera RPM Fusion först."
   },
-  "keys": "Mellanslag spela/pausa · ← → hoppa 5 s · M ljud av · F helskärm · Z fokus",
+  "keys": "Mellanslag spela/pausa · ← → hoppa 5 s · M ljud av · F helskärm",
   "headerPill": "Titta tillsammans · {{count}}",
   "miniPlayer": "Minispelare",
   "tabs": {

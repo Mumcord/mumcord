@@ -37,7 +37,6 @@
   "codec": "Kodek",
   "delay": "Onedkanie",
   "droppedFrames": "Vynechané snímky",
-  "focus": "Fokus",
   "fit": "Prispôsobiť",
   "fill": "Vyplniť",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Sledujú",
   "keys": "Klávesové skratky",
   "keyFullscreen": "celá obrazovka",
-  "keyFocus": "sústredenie",
   "keyExit": "koniec"
 }

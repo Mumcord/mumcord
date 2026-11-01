@@ -70,16 +70,6 @@ export function WindowIcon() {
   );
 }
 
-/** Focus: only the picture. */
-export function FocusIcon() {
-  return (
-    <Icon size={16}>
-      <path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3" />
-      <circle cx="12" cy="12" r="3" />
-    </Icon>
-  );
-}
-
 /** The keys hint. */
 export function KeyboardIcon() {
   return (

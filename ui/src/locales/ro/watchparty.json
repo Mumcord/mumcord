@@ -61,7 +61,7 @@
     "generic": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav (pluginul libav pentru GStreamer) cu managerul de pachete al sistemului tău.",
     "rpmFusion": "Pe Fedora, gst-libav vine din depozitul RPM Fusion; activează mai întâi RPM Fusion."
   },
-  "keys": "Spațiu redare/pauză · ← → salt 5 s · M fără sunet · F ecran complet · Z focalizare",
+  "keys": "Spațiu redare/pauză · ← → salt 5 s · M fără sunet · F ecran complet",
   "headerPill": "Urmăriți împreună · {{count}}",
   "miniPlayer": "Mini player",
   "tabs": {

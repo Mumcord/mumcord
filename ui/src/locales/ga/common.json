@@ -46,7 +46,7 @@
     "seek": "Lorg",
     "volume": "Kreath",
     "syncedPlay": "Sioncronaithe",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "Tá an rialú ag {{name}}",
     "inSync": "Sioncronaithe",
     "inSyncAll": "Tá allt sioncronaithe",

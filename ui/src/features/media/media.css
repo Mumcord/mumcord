@@ -26,11 +26,6 @@
   color: var(--media-on-scrim);
 }
 
-/* Focus mode (issue #163): no chat under the picture, so it may take the window's whole height. */
-.shell[data-focus] .media-frame:not([data-fullscreen]) {
-  max-width: calc((100vh - 8rem) * 16 / 9);
-}
-
 .media-frame[data-fullscreen] {
   max-width: none;
   border-radius: 0;

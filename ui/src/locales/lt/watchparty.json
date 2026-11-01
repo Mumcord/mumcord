@@ -61,7 +61,7 @@
     "generic": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav (GStreamer libav papildinį) savo sistemos paketų tvarkykle.",
     "rpmFusion": "Fedora sistemoje gst-libav gaunamas iš RPM Fusion saugyklos; pirmiausia įjunk RPM Fusion."
   },
-  "keys": "Tarpas groti/pristabdyti · ← → peršokti 5 s · M nutildyti · F visas ekranas · Z fokusas",
+  "keys": "Tarpas groti/pristabdyti · ← → peršokti 5 s · M nutildyti · F visas ekranas",
   "headerPill": "Žiūrėkite kartu · {{count}}",
   "miniPlayer": "Mini grotuvas",
   "tabs": {

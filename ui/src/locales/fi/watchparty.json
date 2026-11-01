@@ -61,7 +61,7 @@
     "generic": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav (GStreamerin libav-liitännäinen) järjestelmäsi paketinhallinnalla.",
     "rpmFusion": "Fedorassa gst-libav tulee RPM Fusion -ohjelmistolähteestä; ota RPM Fusion ensin käyttöön."
   },
-  "keys": "Välilyönti toista/tauko · ← → hyppää 5 s · M mykistä · F koko näyttö · Z keskittyminen",
+  "keys": "Välilyönti toista/tauko · ← → hyppää 5 s · M mykistä · F koko näyttö",
   "headerPill": "Katsokaa yhdessä · {{count}}",
   "miniPlayer": "Minisoitin",
   "tabs": {

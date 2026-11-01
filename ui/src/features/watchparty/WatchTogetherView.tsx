@@ -19,7 +19,6 @@ import { mockPlaceholder } from "../media/mockPlaceholder";
 import { SeekBar, type SeekMarker } from "../media/SeekBar";
 import { ShortcutHint, useFirstUse } from "../media/ShortcutHint";
 import { VolumeControl } from "../media/VolumeControl";
-import { useMediaView, setFocus } from "../media/mediaView";
 import { useMediaKeys } from "../media/useMediaKeys";
 import { useFullscreen } from "../media/useFullscreen";
 import { useTick } from "../media/useTick";
@@ -47,9 +46,8 @@ const ACTION_ICON: Record<WatchCommand["kind"], MediaIconName> = {
 
 export function WatchTogetherView({ serverId }: { serverId: number }): ReactNode {
   const live = useWatchParty(serverId);
-  const view = useMediaView();
   if (live === null || !live.party.joined) return null;
-  return <Cinema serverId={serverId} live={live} focus={view.focus} />;
+  return <Cinema serverId={serverId} live={live} />;
 }
 
 /** An icon button in the control row. */
@@ -78,15 +76,7 @@ function Icon({
   );
 }
 
-export function Cinema({
-  serverId,
-  live,
-  focus,
-}: {
-  serverId: number;
-  live: LiveParty;
-  focus: boolean;
-}): ReactNode {
+export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }): ReactNode {
   const { t: tc } = useTranslation("common");
   const { t } = useTranslation("watchparty");
   const party = live.party;
@@ -113,12 +103,8 @@ export function Cinema({
       player.setVolume(player.volume === 0 ? 1 : 0);
     },
     fullscreen: toggle,
-    focus: () => {
-      setFocus(!focus);
-    },
     escape: () => {
       if (fullscreen) exit();
-      else if (focus) setFocus(false);
     },
   });
 
@@ -268,16 +254,14 @@ export function Cinema({
         fullscreenLabel={tc("media.fullscreen")}
         exitFullscreenLabel={tc("media.exitFullscreen")}
       />
-      {!focus && (
-        <WatchingStrip
-          serverId={serverId}
-          users={users}
-          participants={party.participants}
-          host={party.host}
-          selfSession={selfSession}
-          stateOf={stateOf}
-        />
-      )}
+      <WatchingStrip
+        serverId={serverId}
+        users={users}
+        participants={party.participants}
+        host={party.host}
+        selfSession={selfSession}
+        stateOf={stateOf}
+      />
     </div>
   );
 }

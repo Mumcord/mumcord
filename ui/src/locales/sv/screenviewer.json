@@ -37,7 +37,6 @@
   "codec": "Kodec",
   "delay": "Fördröjning",
   "droppedFrames": "Tappade bilder",
-  "focus": "Fokus",
   "fit": "Anpassa",
   "fill": "Fyll",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Tittar",
   "keys": "Kortkommandon",
   "keyFullscreen": "helskärm",
-  "keyFocus": "fokus",
   "keyExit": "avsluta"
 }

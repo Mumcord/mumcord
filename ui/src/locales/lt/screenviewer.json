@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Delka",
   "droppedFrames": "Praleisti kadrų",
-  "focus": "Fokusas",
   "fit": "Talpinti",
   "fill": "Uždyti",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Žiūri",
   "keys": "Spartieji klavišai",
   "keyFullscreen": "visas ekranas",
-  "keyFocus": "fokusas",
   "keyExit": "išeiti"
 }

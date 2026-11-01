@@ -37,7 +37,6 @@
   "codec": "Kodek",
   "delay": "Zamik",
   "droppedFrames": "Izpuščene sličice",
-  "focus": "Focus",
   "fit": "Prileganje",
   "fill": "Zapolni",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Gledajo",
   "keys": "Bližnjice na tipkovnici",
   "keyFullscreen": "celozaslonski način",
-  "keyFocus": "fokus",
   "keyExit": "izhod"
 }

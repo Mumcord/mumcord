@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Întârziere",
   "droppedFrames": "Cadre pierdute",
-  "focus": "Focus",
   "fit": "Potrivire",
   "fill": "Umplere",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Urmăresc",
   "keys": "Comenzi rapide",
   "keyFullscreen": "ecran complet",
-  "keyFocus": "focalizare",
   "keyExit": "ieșire"
 }

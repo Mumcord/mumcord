@@ -61,7 +61,7 @@
     "generic": "Toto video potřebuje podporu H.264. Nainstaluj gst-libav (plugin libav pro GStreamer) správcem balíčků svého systému.",
     "rpmFusion": "Na Fedoře pochází gst-libav z repozitáře RPM Fusion; nejdřív povol RPM Fusion."
   },
-  "keys": "Mezerník přehrát/pozastavit · ← → posun o 5 s · M ztlumit · F celá obrazovka · Z soustředění",
+  "keys": "Mezerník přehrát/pozastavit · ← → posun o 5 s · M ztlumit · F celá obrazovka",
   "headerPill": "Sledovat společně · {{count}}",
   "miniPlayer": "Minipřehrávač",
   "tabs": {

@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Ritardo",
   "droppedFrames": "Fotogrammi persi",
-  "focus": "Focus",
   "fit": "Adatta",
   "fill": "Riempi",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Stanno guardando",
   "keys": "Scorciatoie da tastiera",
   "keyFullscreen": "schermo intero",
-  "keyFocus": "focus",
   "keyExit": "esci"
 }

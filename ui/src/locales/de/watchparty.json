@@ -61,7 +61,7 @@
     "generic": "Dieses Video braucht H.264-Unterstützung. Installiere gst-libav (das GStreamer-libav-Plugin) mit der Paketverwaltung deines Systems.",
     "rpmFusion": "Unter Fedora kommt gst-libav aus dem RPM-Fusion-Repository; aktiviere zuerst RPM Fusion."
   },
-  "keys": "Leertaste Wiedergabe/Pause · ← → 5 s springen · M stumm · F Vollbild · Z Fokus",
+  "keys": "Leertaste Wiedergabe/Pause · ← → 5 s springen · M stumm · F Vollbild",
   "headerPill": "Gemeinsam ansehen · {{count}}",
   "miniPlayer": "Miniplayer",
   "tabs": {

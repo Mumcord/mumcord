@@ -13,7 +13,7 @@ export function useDismiss(
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      // Escape here closes the popover only, not focus mode or full screen as well.
+      // Escape here closes the popover only, not full screen as well.
       event.stopPropagation();
       event.preventDefault();
       close();

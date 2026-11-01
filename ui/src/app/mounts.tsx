@@ -196,7 +196,6 @@ export function ChatMount() {
           </>
         )
       }
-      mediaOnly={media !== null && view.focus}
     />
   );
 }
