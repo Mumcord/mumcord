@@ -38,7 +38,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B28 | Member badges, profile-card sections, chat decorations | done | b28-badges |
 | B29 | Chat UI: cards, slash commands, via label, superseded lines | in progress | b29-chat |
 | B30 | User-menu entry and plugin dialog | done | b30-dialog |
-| B31 | Sandboxed web view | open | |
+| B31 | Sandboxed web view | in progress | b31-webview |
 | B32 | Notification centre: category Plugins | done | b32-notify |
 | B34 | Server-suggested plugins logic | done | b34-suggest |
 | B23 | Installed tab and plugin details | in progress | b23-installed |
