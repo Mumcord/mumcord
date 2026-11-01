@@ -127,6 +127,60 @@ impl El {
         self
     }
 
+    /// Sets the tone of a chip (a tinted status pill, wins over `color`); no effect on others.
+    #[must_use]
+    pub fn tone(mut self, tone: Tone) -> Self {
+        if let Component::Chip(c) = &mut self.component {
+            c.tone = Some(tone);
+        }
+        self
+    }
+
+    /// Sets how a stack spreads its children along its direction, e.g. `Justify::End` for a
+    /// right-aligned button row; no effect on others.
+    #[must_use]
+    pub fn justify(mut self, justify: Justify) -> Self {
+        if let Component::Stack(c) = &mut self.component {
+            c.justify = Some(justify);
+        }
+        self
+    }
+
+    /// Sets the note under a text input or password field; no effect on others.
+    #[must_use]
+    pub fn help(mut self, text: &str) -> Self {
+        match &mut self.component {
+            Component::TextInput(c) => c.help = Some(text.to_owned()),
+            Component::Password(c) => c.help = Some(text.to_owned()),
+            _ => {}
+        }
+        self
+    }
+
+    /// Colours the note under a text input or password field, e.g. `Tone::Success` for a passed
+    /// check; no effect on others.
+    #[must_use]
+    pub fn help_tone(mut self, tone: Tone) -> Self {
+        match &mut self.component {
+            Component::TextInput(c) => c.help_tone = Some(tone),
+            Component::Password(c) => c.help_tone = Some(tone),
+            _ => {}
+        }
+        self
+    }
+
+    /// Puts a text input or password field into its error state with this message, which
+    /// replaces the help note; no effect on others.
+    #[must_use]
+    pub fn error(mut self, text: &str) -> Self {
+        match &mut self.component {
+            Component::TextInput(c) => c.error = Some(text.to_owned()),
+            Component::Password(c) => c.error = Some(text.to_owned()),
+            _ => {}
+        }
+        self
+    }
+
     /// Flattens the tree into the host's node list: node 0 is the root, then depth-first order.
     pub fn into_nodes(self) -> Vec<Node> {
         let mut nodes = Vec::new();
@@ -158,6 +212,7 @@ pub fn stack(direction: Direction, gap: u8, align: Align) -> El {
         direction,
         gap,
         align,
+        justify: None,
     }))
 }
 
@@ -236,6 +291,7 @@ pub fn chip(text: &str) -> El {
     El::new(Component::Chip(Chip {
         text: text.to_owned(),
         color: None,
+        tone: None,
     }))
 }
 
@@ -306,6 +362,9 @@ pub fn text_input(action: &str, label: &str, value: &str, max_bytes: u8) -> El {
         purpose: InputPurpose::Plain,
         action: action.to_owned(),
         disabled: false,
+        help: None,
+        help_tone: None,
+        error: None,
     }))
 }
 
@@ -316,6 +375,9 @@ pub fn password(action: &str, label: &str, secret: &str) -> El {
         secret: secret.to_owned(),
         action: action.to_owned(),
         disabled: false,
+        help: None,
+        help_tone: None,
+        error: None,
     }))
 }
 
@@ -423,5 +485,35 @@ mod tests {
         assert_eq!(s.options[1].value, "b");
         assert_eq!(s.options[1].label, "Banana");
         assert_eq!(s.selected.as_deref(), Some("b"));
+    }
+
+    #[test]
+    fn field_notes_tones_and_justify_reach_their_components() {
+        let input = text_input("addr", "Bot address", "", 64)
+            .help("Reachable.")
+            .help_tone(Tone::Success)
+            .error("Not reachable.");
+        let Component::TextInput(t) = input.component else {
+            panic!("not a text input")
+        };
+        assert_eq!(t.help.as_deref(), Some("Reachable."));
+        assert_eq!(t.help_tone, Some(Tone::Success));
+        assert_eq!(t.error.as_deref(), Some("Not reachable."));
+
+        let Component::Password(p) = password("key", "API key", "api-key").error("401").component
+        else {
+            panic!("not a password")
+        };
+        assert_eq!(p.error.as_deref(), Some("401"));
+
+        let Component::Chip(c) = chip("Connected").tone(Tone::Success).component else {
+            panic!("not a chip")
+        };
+        assert_eq!(c.tone, Some(Tone::Success));
+
+        let Component::Stack(s) = row().justify(Justify::End).help("x").component else {
+            panic!("not a stack")
+        };
+        assert_eq!(s.justify, Some(Justify::End));
     }
 }

@@ -6,17 +6,26 @@ interface ModalProps {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  /** A line under the title. */
+  subtitle?: string | null;
+  /** Shown before the title, e.g. a plugin's icon; decorative. */
+  icon?: ReactNode;
+  /** If set, the header gets a ✕ button with this accessible name. */
+  closeLabel?: string;
 }
 
 /** Small modal dialog: Escape closes, Tab stays inside, focus starts on the first control. */
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onClose, children, subtitle, icon, closeLabel }: ModalProps) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    const first = dialog.querySelector<HTMLElement>(FOCUSABLE);
+    // Focus starts on the content, not on the header's close button.
+    const first = [...dialog.querySelectorAll<HTMLElement>(FOCUSABLE)].find(
+      (el) => !el.hasAttribute("data-modal-close"),
+    );
     (first ?? dialog).focus();
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -55,7 +64,29 @@ export function Modal({ title, onClose, children }: ModalProps) {
         aria-labelledby={titleId}
         tabIndex={-1}
       >
-        <h2 id={titleId}>{title}</h2>
+        {closeLabel === undefined && icon === undefined && !subtitle ? (
+          <h2 id={titleId}>{title}</h2>
+        ) : (
+          <div className="userpanel-modal__head">
+            {icon}
+            <div className="userpanel-modal__titles">
+              <h2 id={titleId}>{title}</h2>
+              {subtitle ? <p className="userpanel-modal__subtitle">{subtitle}</p> : null}
+            </div>
+            {closeLabel === undefined ? null : (
+              <button
+                type="button"
+                className="userpanel-modal__close"
+                aria-label={closeLabel}
+                data-tooltip={closeLabel}
+                data-modal-close=""
+                onClick={onClose}
+              >
+                <span aria-hidden="true">✕</span>
+              </button>
+            )}
+          </div>
+        )}
         {children}
       </div>
     </div>

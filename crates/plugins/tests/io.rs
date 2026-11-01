@@ -69,7 +69,12 @@ impl PluginIo for Recorder {
     fn clear(&self, plugin: &str, slot: Slot) {
         self.record(format!("{plugin} clear {slot:?}"));
     }
-    fn open_dialog(&self, _plugin: &str, _title: String) -> Result<(), Error> {
+    fn open_dialog(
+        &self,
+        _plugin: &str,
+        _title: String,
+        _subtitle: Option<String>,
+    ) -> Result<(), Error> {
         Ok(())
     }
     fn close_dialog(&self, _plugin: &str) {}

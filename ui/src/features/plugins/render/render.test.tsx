@@ -26,7 +26,7 @@ const leaf = (component: PluginComponent, animation: PluginNode["animation"] = n
 });
 
 const stack = (children: number[]): PluginNode => ({
-  component: { type: "stack", direction: "column", gap: 4, align: "start" },
+  component: { type: "stack", direction: "column", gap: 4, align: "start", justify: null },
   animation: null,
   children,
 });
@@ -90,9 +90,12 @@ describe("plugin UI store", () => {
       plugin: "p",
       change: { type: "setTree", slot: { kind: "dialog" }, nodes },
     });
-    s = applyChange(s, { plugin: "p", change: { type: "openDialog", title: "Hi" } });
+    s = applyChange(s, {
+      plugin: "p",
+      change: { type: "openDialog", title: "Hi", subtitle: "Night Owls" },
+    });
     expect(s.trees.get("p")?.get("panel")).toBe(nodes);
-    expect(s.dialogs.get("p")).toBe("Hi");
+    expect(s.dialogs.get("p")).toEqual({ title: "Hi", subtitle: "Night Owls" });
     s = applyChange(s, { plugin: "p", change: { type: "closeDialog" } });
     expect(s.dialogs.has("p")).toBe(false);
     expect(s.trees.get("p")?.has("dialog")).toBe(false);
@@ -145,7 +148,7 @@ describe("PluginTree", () => {
       leaf({ type: "text", text: "Lunch?", style: "heading", color: "accent" }),
       leaf({ type: "meter", label: "Energy", value: 0.5, color: "success" }),
       leaf({ type: "progress", label: "Upload", value: null }),
-      leaf({ type: "chip", text: "3 votes", color: null }),
+      leaf({ type: "chip", text: "3 votes", color: null, tone: null }),
       leaf({ type: "toggle", label: "Notify", value: true, action: "notify", disabled: false }),
       leaf({
         type: "select",
@@ -245,7 +248,7 @@ describe("PluginTree", () => {
   });
 
   it("animates only without reduced motion", () => {
-    const nodes = [leaf({ type: "chip", text: "hi", color: null }, "bob")];
+    const nodes = [leaf({ type: "chip", text: "hi", color: null, tone: null }, "bob")];
     const { container, unmount } = show(nodes);
     expect(container.querySelector(".pr-anim--bob")).not.toBeNull();
     unmount();
@@ -381,6 +384,9 @@ describe("inputs", () => {
         purpose: "plain",
         action: "name",
         disabled: false,
+        help: null,
+        helpTone: null,
+        error: null,
       }),
     ]);
     const input = screen.getByRole("textbox", { name: "Name" });
@@ -394,7 +400,16 @@ describe("inputs", () => {
   it("sends the password once and clears the field", () => {
     const action = vi.spyOn(api, "pluginUiAction").mockResolvedValue(null);
     show([
-      leaf({ type: "password", label: "Token", secret: "token", action: "saved", disabled: false }),
+      leaf({
+        type: "password",
+        label: "Token",
+        secret: "token",
+        action: "saved",
+        disabled: false,
+        help: null,
+        helpTone: null,
+        error: null,
+      }),
     ]);
     const input = screen.getByLabelText("Token");
     fireEvent.change(input, { target: { value: "s3cret" } });
@@ -422,6 +437,94 @@ describe("inputs", () => {
       type: "file",
       path: "/music/song.mp3",
     });
+  });
+});
+
+describe("field notes", () => {
+  const input = (help: string | null, error: string | null): PluginComponent => ({
+    type: "textInput",
+    label: "Bot address",
+    value: "",
+    placeholder: "",
+    maxBytes: 64,
+    purpose: "serverAddress",
+    action: "address",
+    disabled: false,
+    help,
+    helpTone: "success",
+    error,
+  });
+
+  it("describes the field with its help note in its tone", async () => {
+    const { container } = show([leaf(input("Reachable. Bot is online.", null))]);
+    const field = screen.getByRole("textbox", { name: "Bot address" });
+    expect(field).not.toHaveAttribute("aria-invalid");
+    expect(field).toHaveAccessibleDescription(/Reachable\. Bot is online\./);
+    expect(screen.getByText("Reachable. Bot is online.")).toHaveClass("pr-note--success");
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("shows the error instead of the help and marks the field invalid", async () => {
+    const { container } = show([
+      stack([1, 2]),
+      leaf(input("Reachable.", "Bot not reachable: no answer.")),
+      leaf({
+        type: "password",
+        label: "API key",
+        secret: "api-key",
+        action: "key",
+        disabled: false,
+        help: "Not checked yet.",
+        helpTone: null,
+        error: "Key rejected (401).",
+      }),
+    ]);
+    const field = screen.getByRole("textbox", { name: "Bot address" });
+    expect(field).toHaveAttribute("aria-invalid", "true");
+    expect(field).toHaveAccessibleDescription(/Bot not reachable: no answer\./);
+    expect(screen.queryByText("Reachable.")).not.toBeInTheDocument();
+    expect(screen.getByText("Bot not reachable: no answer.")).toHaveClass("pr-note--danger");
+    const key = screen.getByLabelText("API key");
+    expect(key).toHaveAttribute("aria-invalid", "true");
+    expect(key).toHaveAccessibleDescription("Key rejected (401).");
+    expect(screen.queryByText("Not checked yet.")).not.toBeInTheDocument();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+});
+
+describe("variants", () => {
+  it("draws button kinds, chip tones and stack justification", () => {
+    const button = (label: string, kind: "primary" | "secondary" | "danger"): PluginComponent => ({
+      type: "button",
+      label,
+      action: label,
+      kind,
+      disabled: false,
+      expanded: null,
+    });
+    show([
+      {
+        component: { type: "stack", direction: "row", gap: 8, align: "center", justify: "end" },
+        animation: null,
+        children: [1, 2, 3, 4, 5],
+      },
+      leaf(button("Save", "primary")),
+      leaf(button("Test connection", "secondary")),
+      leaf(button("Remove", "danger")),
+      leaf({ type: "chip", text: "Connected", color: "danger", tone: "success" }),
+      leaf({ type: "chip", text: "3 votes", color: "accent", tone: null }),
+    ]);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveClass("button", "button--primary");
+    expect(screen.getByRole("button", { name: "Test connection" })).toHaveClass(
+      "button",
+      "pr-button--secondary",
+    );
+    expect(screen.getByRole("button", { name: "Remove" })).toHaveClass("pr-button--danger");
+    const tone = screen.getByText("Connected");
+    expect(tone).toHaveClass("pr-chip", "pr-tone--success");
+    expect(tone).not.toHaveAttribute("style");
+    expect(screen.getByText("3 votes")).toHaveStyle({ color: "var(--color-accent)" });
+    expect(document.querySelector(".pr-stack")).toHaveStyle({ justifyContent: "flex-end" });
   });
 });
 

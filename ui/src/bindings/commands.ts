@@ -2447,13 +2447,19 @@ export type PluginCommandOutcome =
 "unknown";
 
 /**  One UI component. `color` values are theme token names (unknown ones make a tree invalid). */
-export type PluginComponent = { type: "stack"; direction: PluginDirection; gap: number; align: PluginAlign } | { type: "text"; text: string; style: PluginTextStyle; color: string | null } | 
+export type PluginComponent = { type: "stack"; direction: PluginDirection; gap: number; align: PluginAlign; 
+/**  `None`: start. */
+justify: PluginJustify | null } | { type: "text"; text: string; style: PluginTextStyle; color: string | null } | 
 /**  `asset` is a path inside the package's `assets/`. */
-{ type: "image"; asset: string; alt: string; width: number; height: number } | { type: "sprite"; asset: string; alt: string; frameWidth: number; frameHeight: number; frames: number; fps: number; stillFrame: number } | { type: "meter"; label: string; value: number | null; color: string | null } | { type: "button"; label: string; action: string; kind: PluginButtonKind; disabled: boolean; expanded: boolean | null } | { type: "iconButton"; icon: string; label: string; action: string; disabled: boolean } | { type: "chip"; text: string; color: string | null } | { type: "divider" } | 
+{ type: "image"; asset: string; alt: string; width: number; height: number } | { type: "sprite"; asset: string; alt: string; frameWidth: number; frameHeight: number; frames: number; fps: number; stillFrame: number } | { type: "meter"; label: string; value: number | null; color: string | null } | { type: "button"; label: string; action: string; kind: PluginButtonKind; disabled: boolean; expanded: boolean | null } | { type: "iconButton"; icon: string; label: string; action: string; disabled: boolean } | { type: "chip"; text: string; color: string | null; 
+/**  Wins over `color`. */
+tone: PluginTone | null } | { type: "divider" } | 
 /**  `value` none: indeterminate. */
-{ type: "progress"; label: string; value: number | null } | { type: "list"; label: string; reorderAction: string | null } | { type: "toggle"; label: string; value: boolean; action: string; disabled: boolean } | { type: "select"; label: string; options: PluginSelectOption[]; selected: string | null; action: string; refreshAction: string | null; disabled: boolean } | { type: "slider"; label: string; min: number | null; max: number | null; step: number | null; value: number | null; action: string; disabled: boolean } | { type: "textInput"; label: string; value: string; placeholder: string; maxBytes: number; purpose: PluginInputPurpose; action: string; disabled: boolean } | 
+{ type: "progress"; label: string; value: number | null } | { type: "list"; label: string; reorderAction: string | null } | { type: "toggle"; label: string; value: boolean; action: string; disabled: boolean } | { type: "select"; label: string; options: PluginSelectOption[]; selected: string | null; action: string; refreshAction: string | null; disabled: boolean } | { type: "slider"; label: string; min: number | null; max: number | null; step: number | null; value: number | null; action: string; disabled: boolean } | { type: "textInput"; label: string; value: string; placeholder: string; maxBytes: number; purpose: PluginInputPurpose; action: string; disabled: boolean; help: string | null; helpTone: PluginTone | null; 
+/**  Set: the field is in its error state and this replaces `help`. */
+error: string | null } | 
 /**  What the user types goes into the named secret; the plugin never sees it. */
-{ type: "password"; label: string; secret: string; action: string; disabled: boolean } | { type: "filePicker"; label: string; accept: string[]; action: string; disabled: boolean } | 
+{ type: "password"; label: string; secret: string; action: string; disabled: boolean; help: string | null; helpTone: PluginTone | null; error: string | null } | { type: "filePicker"; label: string; accept: string[]; action: string; disabled: boolean } | 
 /**  `until` in Unix seconds. */
 { type: "countdown"; label: string; until: number | null };
 
@@ -2518,6 +2524,9 @@ export type PluginInstallStage = { stage: "downloading" } | { stage: "verifying"
 { stage: "done" } | 
 /**  Stopped; `reason` is a user-facing text. */
 { stage: "failed"; reason: string };
+
+/**  Main-axis spread of a stack. */
+export type PluginJustify = "start" | "end" | "spaceBetween";
 
 export type PluginLogLevel = "debug" | "info" | "warn" | "error";
 
@@ -2633,6 +2642,9 @@ export type PluginSupersede = {
 
 export type PluginTextStyle = "body" | "caption" | "heading" | "monospace";
 
+/**  Colour role of a chip or a field note. */
+export type PluginTone = "neutral" | "success" | "warning" | "danger" | "accent";
+
 /**  `plugin://ui`: a plugin changed its UI. */
 export type PluginUi = {
 	plugin: string,
@@ -2645,8 +2657,8 @@ export type PluginUiChange =
 { type: "setTree"; slot: PluginSlot; nodes: PluginNode[] } | 
 /**  Removes the slot's tree. */
 { type: "clear"; slot: PluginSlot } | 
-/**  Opens the plugin's dialog, or only changes its title when it is open. */
-{ type: "openDialog"; title: string } | 
+/**  Opens the plugin's dialog, or only changes its title and subtitle when it is open. */
+{ type: "openDialog"; title: string; subtitle: string | null } | 
 /**  Closes the dialog without telling the plugin. */
 { type: "closeDialog" } | 
 /**  The plugin's panel opens in (`open`) or closes from the strip's large popover. */

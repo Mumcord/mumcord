@@ -10,7 +10,7 @@ use std::time::Duration;
 use anyhow::{Context, Result, bail};
 use mumcord_plugins::api::theme::TOKENS;
 use mumcord_plugins::wit::ui::{
-    Align, Animation, ButtonKind, Component, Direction, Node, TextStyle,
+    Align, Animation, ButtonKind, Component, Direction, Justify, Node, TextStyle, Tone,
 };
 
 use crate::test::{PluginFiles, Scenario, Session, SlotSpec, ThemeSpec};
@@ -40,7 +40,8 @@ pub struct Args {
 /// What the page needs to know besides the trees.
 #[derive(Default)]
 pub struct Options<'a> {
-    pub dialog: Option<&'a str>,
+    /// Title and subtitle of the open dialog.
+    pub dialog: Option<(&'a str, Option<&'a str>)>,
     /// The plugin left its panel popover open, so the panel also shows at popover size.
     pub popover: bool,
     pub theme: Option<ThemeSpec>,
@@ -56,7 +57,7 @@ pub fn run(args: Args) -> Result<()> {
     session.play(&scenario.steps)?;
     std::thread::sleep(SETTLE);
     let trees = session.trees();
-    let dialog = session.dialog_title();
+    let dialog = session.dialog();
     let popover = session.panel_popover_open();
     session.stop();
     if trees.is_empty() {
@@ -66,7 +67,9 @@ pub fn run(args: Args) -> Result<()> {
         &plugin,
         &trees,
         &Options {
-            dialog: dialog.as_deref(),
+            dialog: dialog
+                .as_ref()
+                .map(|(title, subtitle)| (title.as_str(), subtitle.as_deref())),
             popover,
             theme: args.theme,
         },
@@ -87,13 +90,16 @@ pub fn render_page(
     for (slot, nodes) in trees {
         let (label, class) = slot_label(slot, options.dialog);
         let mut content = String::new();
-        Renderer {
+        let mut renderer = Renderer {
             plugin,
             nodes,
             seen: vec![false; nodes.len()],
             out: &mut content,
+        };
+        if let (SlotSpec::Dialog, Some((title, subtitle))) = (slot, options.dialog) {
+            renderer.dialog_header(title, subtitle);
         }
-        .node(0, 0);
+        renderer.node(0, 0);
         let _ = writeln!(
             body,
             "<section><h2>{}</h2><div class=\"slot {class}\">{content}</div></section>",
@@ -120,7 +126,7 @@ pub fn render_page(
     )
 }
 
-fn slot_label(slot: &SlotSpec, dialog: Option<&str>) -> (String, &'static str) {
+fn slot_label(slot: &SlotSpec, dialog: Option<(&str, Option<&str>)>) -> (String, &'static str) {
     match slot {
         SlotSpec::Panel => ("Panel".into(), "panel"),
         SlotSpec::MemberBadge(s) => (format!("Member badge (session {s})"), "badge"),
@@ -130,7 +136,7 @@ fn slot_label(slot: &SlotSpec, dialog: Option<&str>) -> (String, &'static str) {
         SlotSpec::Settings => ("Settings".into(), "form"),
         SlotSpec::Dialog => (
             match dialog {
-                Some(title) => format!("Dialog: {title}"),
+                Some((title, _)) => format!("Dialog: {title}"),
                 None => "Dialog (closed)".into(),
             },
             "form",
@@ -169,9 +175,14 @@ impl Renderer<'_> {
                     Align::End => "flex-end",
                     Align::Stretch => "stretch",
                 };
+                let justify = match s.justify {
+                    None | Some(Justify::Start) => "flex-start",
+                    Some(Justify::End) => "flex-end",
+                    Some(Justify::SpaceBetween) => "space-between",
+                };
                 let _ = write!(
                     self.out,
-                    "<div class=\"stack\"{anim} style=\"flex-direction:{direction};gap:{}px;align-items:{align}\">",
+                    "<div class=\"stack\"{anim} style=\"flex-direction:{direction};gap:{}px;align-items:{align};justify-content:{justify}\">",
                     s.gap.min(32)
                 );
                 self.children(node, depth, false);
@@ -244,14 +255,24 @@ impl Renderer<'_> {
                 self.image(&b.icon, "", "width=\"16\" height=\"16\"", "");
                 self.out.push_str("</button>");
             }
-            Component::Chip(c) => {
-                let _ = write!(
-                    self.out,
-                    "<span class=\"chip\"{anim}{}>{}</span>",
-                    color(c.color.as_deref()),
-                    escape(&c.text)
-                );
-            }
+            Component::Chip(c) => match c.tone {
+                Some(t) => {
+                    let _ = write!(
+                        self.out,
+                        "<span class=\"chip tone-{}\"{anim}>{}</span>",
+                        tone(t),
+                        escape(&c.text)
+                    );
+                }
+                None => {
+                    let _ = write!(
+                        self.out,
+                        "<span class=\"chip\"{anim}{}>{}</span>",
+                        color(c.color.as_deref()),
+                        escape(&c.text)
+                    );
+                }
+            },
             Component::Divider => self.out.push_str("<hr>"),
             Component::Progress(p) => {
                 let value = p
@@ -309,21 +330,27 @@ impl Renderer<'_> {
             Component::TextInput(t) => {
                 let _ = write!(
                     self.out,
-                    "<label{anim}>{} <input type=\"text\" value=\"{}\" placeholder=\"{}\" maxlength=\"{}\"{}></label>",
+                    "<label class=\"field\"{anim}>{} <input type=\"text\" value=\"{}\" placeholder=\"{}\" maxlength=\"{}\"{}{}>",
                     escape(&t.label),
                     escape(&t.value),
                     escape(&t.placeholder),
                     t.max_bytes,
-                    disabled(t.disabled)
+                    disabled(t.disabled),
+                    invalid(t.error.as_deref())
                 );
+                self.field_note(t.help.as_deref(), t.help_tone, t.error.as_deref());
+                self.out.push_str("</label>");
             }
             Component::Password(p) => {
                 let _ = write!(
                     self.out,
-                    "<label{anim}>{} <input type=\"password\"{}></label>",
+                    "<label class=\"field\"{anim}>{} <input type=\"password\"{}{}>",
                     escape(&p.label),
-                    disabled(p.disabled)
+                    disabled(p.disabled),
+                    invalid(p.error.as_deref())
                 );
+                self.field_note(p.help.as_deref(), p.help_tone, p.error.as_deref());
+                self.out.push_str("</label>");
             }
             Component::FilePicker(f) => {
                 let _ = write!(
@@ -358,6 +385,47 @@ impl Renderer<'_> {
     }
 
     /// Inlines a package asset as a data URL; a missing or unknown asset shows its alt text.
+    /// The note under a field: the error if there is one, else the help text in its tone.
+    fn field_note(&mut self, help: Option<&str>, help_tone: Option<Tone>, error: Option<&str>) {
+        let (text, class) = match (error, help) {
+            (Some(error), _) => (error, "tone-danger"),
+            (None, Some(help)) => (help, help_tone.map_or("caption", tone_text)),
+            (None, None) => return,
+        };
+        let _ = write!(
+            self.out,
+            "<span class=\"note {class}\">{}</span>",
+            escape(text)
+        );
+    }
+
+    /// The header the client draws above a dialog: plugin icon, title, subtitle and close button.
+    fn dialog_header(&mut self, title: &str, subtitle: Option<&str>) {
+        self.out.push_str("<div class=\"dialog-head\">");
+        if let Some(icon) = &self.plugin.manifest.icon {
+            self.image(
+                icon,
+                "",
+                "class=\"dialog-icon\" width=\"32\" height=\"32\"",
+                "",
+            );
+        }
+        let _ = write!(
+            self.out,
+            "<div class=\"dialog-titles\"><strong>{}</strong>",
+            escape(title)
+        );
+        if let Some(subtitle) = subtitle {
+            let _ = write!(
+                self.out,
+                "<span class=\"caption\">{}</span>",
+                escape(subtitle)
+            );
+        }
+        self.out
+            .push_str("</div><button class=\"icon\" aria-label=\"Close\">✕</button></div>");
+    }
+
     fn image(&mut self, asset: &str, alt: &str, attrs: &str, anim: &str) {
         let mime = match asset.rsplit_once('.').map(|(_, ext)| ext) {
             Some("svg") => Some("image/svg+xml"),
@@ -405,6 +473,35 @@ fn color(token: Option<&str>) -> String {
     match token {
         Some(token) if TOKENS.contains(&token) => format!(" style=\"color:var(--{token})\""),
         _ => String::new(),
+    }
+}
+
+/// Class of a field note in a tone (plain coloured text, no pill).
+fn tone_text(tone: Tone) -> &'static str {
+    match tone {
+        Tone::Neutral => "caption",
+        Tone::Success => "tone-success",
+        Tone::Warning => "tone-warning",
+        Tone::Danger => "tone-danger",
+        Tone::Accent => "tone-accent",
+    }
+}
+
+fn tone(tone: Tone) -> &'static str {
+    match tone {
+        Tone::Neutral => "neutral",
+        Tone::Success => "success",
+        Tone::Warning => "warning",
+        Tone::Danger => "danger",
+        Tone::Accent => "accent",
+    }
+}
+
+fn invalid(error: Option<&str>) -> &'static str {
+    if error.is_some() {
+        " aria-invalid=\"true\""
+    } else {
+        ""
     }
 }
 
@@ -475,8 +572,23 @@ ul { list-style:none; margin:0; padding:0; } li { padding:2px 0; border-bottom:1
 button { border-radius:6px; border:1px solid var(--border); padding:4px 10px; font:inherit;
   background:var(--surface-raised); color:var(--text); }
 button.primary { background:var(--accent); color:var(--surface); border-color:var(--accent); }
-button.danger { color:var(--danger); border-color:var(--danger); }
+button.secondary { background:transparent; border-color:var(--text-muted); }
+button.danger { background:var(--danger); color:var(--surface); border-color:var(--danger); }
 .chip { display:inline-block; padding:0 8px; border-radius:999px; background:var(--surface-raised); }
+.chip.tone-neutral { color:var(--text-muted); }
+.chip.tone-success { color:var(--success); background:color-mix(in srgb, var(--success) 15%, transparent); }
+.chip.tone-warning { color:var(--warning); background:color-mix(in srgb, var(--warning) 15%, transparent); }
+.chip.tone-danger { color:var(--danger); background:color-mix(in srgb, var(--danger) 15%, transparent); }
+.chip.tone-accent { color:var(--accent); background:color-mix(in srgb, var(--accent) 15%, transparent); }
+.field { display:flex; flex-direction:column; gap:4px; font-weight:600; }
+.field input { width:100%; box-sizing:border-box; font-weight:400; }
+.field input[aria-invalid=true] { border:1px solid var(--danger); }
+.note { font-size:12px; font-weight:400; }
+.note.tone-success { color:var(--success); } .note.tone-warning { color:var(--warning); }
+.note.tone-danger { color:var(--danger); } .note.tone-accent { color:var(--accent); }
+.dialog-head { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.dialog-titles { display:flex; flex-direction:column; flex:1; min-width:0; }
+.dialog-icon { border-radius:8px; }
 .missing { border:1px dashed var(--border); color:var(--text-muted); padding:0 4px; }
 hr { border:0; border-top:1px solid var(--border); width:100%; }
 img, label { max-width:100%; }
@@ -506,6 +618,7 @@ mod tests {
                     direction: Direction::Column,
                     gap: 200,
                     align: Align::Start,
+                    justify: None,
                 }),
                 vec![1, 2, 9],
             ),
@@ -567,6 +680,7 @@ mod tests {
                 direction: Direction::Row,
                 gap: 0,
                 align: Align::Center,
+                justify: None,
             }),
             vec![0, 0],
         )];
@@ -581,5 +695,59 @@ mod tests {
         assert_eq!(base64(b"fo"), "Zm8=");
         assert_eq!(base64(b"foo"), "Zm9v");
         assert_eq!(base64(&[0xff, 0xfe]), "//4=");
+    }
+
+    #[test]
+    fn dialog_header_field_notes_tones_and_justify_render() {
+        use mumcord_plugins::wit::ui::{Chip, InputPurpose, TextInput};
+        let dir = tempfile::tempdir().expect("temp dir");
+        let plugin = crate::test::tests::files(dir.path());
+        let nodes = vec![
+            node(
+                Component::Stack(Stack {
+                    direction: Direction::Row,
+                    gap: 8,
+                    align: Align::Center,
+                    justify: Some(Justify::SpaceBetween),
+                }),
+                vec![1, 2],
+            ),
+            node(
+                Component::Chip(Chip {
+                    text: "Not saved".into(),
+                    color: None,
+                    tone: Some(Tone::Danger),
+                }),
+                vec![],
+            ),
+            node(
+                Component::TextInput(TextInput {
+                    label: "Bot address".into(),
+                    value: String::new(),
+                    placeholder: String::new(),
+                    max_bytes: 64,
+                    purpose: InputPurpose::ServerAddress,
+                    action: "address".into(),
+                    disabled: false,
+                    help: Some("Reachable.".into()),
+                    help_tone: Some(Tone::Success),
+                    error: Some("<b>Bot not reachable</b>".into()),
+                }),
+                vec![],
+            ),
+        ];
+        let options = Options {
+            dialog: Some(("Configure bot", Some("Mumbot · Night Owls"))),
+            ..Options::default()
+        };
+        let page = render_page(&plugin, &[(SlotSpec::Dialog, nodes)], &options);
+        assert!(page.contains("<strong>Configure bot</strong>"));
+        assert!(page.contains("Mumbot · Night Owls"));
+        assert!(page.contains("aria-label=\"Close\""));
+        assert!(page.contains("justify-content:space-between"));
+        assert!(page.contains("class=\"chip tone-danger\""));
+        assert!(page.contains("aria-invalid=\"true\""));
+        assert!(page.contains("&lt;b&gt;Bot not reachable"));
+        assert!(!page.contains("Reachable.</span>"));
     }
 }

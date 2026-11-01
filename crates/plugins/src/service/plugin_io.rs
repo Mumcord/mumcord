@@ -69,6 +69,7 @@ pub enum UiUpdate {
     },
     OpenDialog {
         title: String,
+        subtitle: Option<String>,
     },
     CloseDialog,
     /// The plugin's panel opens in (or closes from) the large popover.
@@ -250,9 +251,14 @@ impl PluginIo for ServiceIo {
         self.ui(plugin, UiUpdate::Clear { slot });
     }
 
-    fn open_dialog(&self, plugin: &str, title: String) -> Result<(), Error> {
+    fn open_dialog(
+        &self,
+        plugin: &str,
+        title: String,
+        subtitle: Option<String>,
+    ) -> Result<(), Error> {
         self.webviews.dialog_opened(plugin);
-        self.ui(plugin, UiUpdate::OpenDialog { title });
+        self.ui(plugin, UiUpdate::OpenDialog { title, subtitle });
         Ok(())
     }
 
@@ -529,7 +535,7 @@ mod tests {
             io.webview_show("snacks", Place::Dialog, "index.html".into()),
             Err(Error::Invalid)
         );
-        io.open_dialog("snacks", "Snacks".into())
+        io.open_dialog("snacks", "Snacks".into(), None)
             .expect("dialog opens");
         assert!(matches!(next(), Some(UiUpdate::OpenDialog { .. })));
         io.webview_show("snacks", Place::Dialog, "index.html?x=1".into())

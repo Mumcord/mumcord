@@ -57,7 +57,8 @@ export function PluginMeter({ label, value: raw, color }: Of<"meter">) {
   );
 }
 
-export function PluginChip({ text, color }: Of<"chip">) {
+export function PluginChip({ text, color, tone }: Of<"chip">) {
+  if (tone !== null) return <span className={`pr-chip pr-tone--${tone}`}>{text}</span>;
   const c = tokenColor(color);
   return (
     <span className="pr-chip" style={c === undefined ? undefined : { color: c, borderColor: c }}>

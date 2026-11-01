@@ -90,6 +90,26 @@ pub enum PluginAlign {
     Stretch,
 }
 
+/// Main-axis spread of a stack.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginJustify {
+    Start,
+    End,
+    SpaceBetween,
+}
+
+/// Colour role of a chip or a field note.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginTone {
+    Neutral,
+    Success,
+    Warning,
+    Danger,
+    Accent,
+}
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum PluginTextStyle {
@@ -134,6 +154,8 @@ pub enum PluginComponent {
         direction: PluginDirection,
         gap: u8,
         align: PluginAlign,
+        /// `None`: start.
+        justify: Option<PluginJustify>,
     },
     Text {
         text: String,
@@ -177,6 +199,8 @@ pub enum PluginComponent {
     Chip {
         text: String,
         color: Option<String>,
+        /// Wins over `color`.
+        tone: Option<PluginTone>,
     },
     Divider,
     /// `value` none: indeterminate.
@@ -219,6 +243,10 @@ pub enum PluginComponent {
         purpose: PluginInputPurpose,
         action: String,
         disabled: bool,
+        help: Option<String>,
+        help_tone: Option<PluginTone>,
+        /// Set: the field is in its error state and this replaces `help`.
+        error: Option<String>,
     },
     /// What the user types goes into the named secret; the plugin never sees it.
     Password {
@@ -226,6 +254,9 @@ pub enum PluginComponent {
         secret: String,
         action: String,
         disabled: bool,
+        help: Option<String>,
+        help_tone: Option<PluginTone>,
+        error: Option<String>,
     },
     FilePicker {
         label: String,
@@ -264,8 +295,11 @@ pub enum PluginUiChange {
     },
     /// Removes the slot's tree.
     Clear { slot: PluginSlot },
-    /// Opens the plugin's dialog, or only changes its title when it is open.
-    OpenDialog { title: String },
+    /// Opens the plugin's dialog, or only changes its title and subtitle when it is open.
+    OpenDialog {
+        title: String,
+        subtitle: Option<String>,
+    },
     /// Closes the dialog without telling the plugin.
     CloseDialog,
     /// The plugin's panel opens in (`open`) or closes from the strip's large popover.
@@ -345,6 +379,16 @@ fn animation(a: wit::Animation) -> PluginAnimation {
     }
 }
 
+fn tone(t: wit::Tone) -> PluginTone {
+    match t {
+        wit::Tone::Neutral => PluginTone::Neutral,
+        wit::Tone::Success => PluginTone::Success,
+        wit::Tone::Warning => PluginTone::Warning,
+        wit::Tone::Danger => PluginTone::Danger,
+        wit::Tone::Accent => PluginTone::Accent,
+    }
+}
+
 fn component(c: wit::Component) -> PluginComponent {
     use PluginComponent as P;
     match c {
@@ -360,6 +404,11 @@ fn component(c: wit::Component) -> PluginComponent {
                 wit::Align::End => PluginAlign::End,
                 wit::Align::Stretch => PluginAlign::Stretch,
             },
+            justify: s.justify.map(|j| match j {
+                wit::Justify::Start => PluginJustify::Start,
+                wit::Justify::End => PluginJustify::End,
+                wit::Justify::SpaceBetween => PluginJustify::SpaceBetween,
+            }),
         },
         wit::Component::Text(t) => P::Text {
             text: t.text,
@@ -411,6 +460,7 @@ fn component(c: wit::Component) -> PluginComponent {
         wit::Component::Chip(c) => P::Chip {
             text: c.text,
             color: c.color,
+            tone: c.tone.map(tone),
         },
         wit::Component::Divider => P::Divider,
         wit::Component::Progress(p) => P::Progress {
@@ -462,12 +512,18 @@ fn component(c: wit::Component) -> PluginComponent {
             },
             action: t.action,
             disabled: t.disabled,
+            help: t.help,
+            help_tone: t.help_tone.map(tone),
+            error: t.error,
         },
         wit::Component::Password(p) => P::Password {
             label: p.label,
             secret: p.secret,
             action: p.action,
             disabled: p.disabled,
+            help: p.help,
+            help_tone: p.help_tone.map(tone),
+            error: p.error,
         },
         wit::Component::FilePicker(f) => P::FilePicker {
             label: f.label,
@@ -514,7 +570,7 @@ impl From<UiUpdate> for PluginUiChange {
                 nodes: nodes.into_iter().map(Into::into).collect(),
             },
             UiUpdate::Clear { slot } => Self::Clear { slot: slot.into() },
-            UiUpdate::OpenDialog { title } => Self::OpenDialog { title },
+            UiUpdate::OpenDialog { title, subtitle } => Self::OpenDialog { title, subtitle },
             UiUpdate::CloseDialog => Self::CloseDialog,
             UiUpdate::PanelPopover { open } => Self::PanelPopover { open },
             UiUpdate::UserMenuEntry { label, sessions } => Self::UserMenuEntry { label, sessions },
@@ -546,7 +602,8 @@ pub enum ActionKind {
 #[derive(Debug, Default)]
 pub struct Trees {
     trees: HashMap<String, HashMap<PluginSlot, Vec<PluginNode>>>,
-    dialogs: HashMap<String, String>,
+    /// Title and subtitle of each open dialog.
+    dialogs: HashMap<String, (String, Option<String>)>,
     /// Label and the sessions it shows on (`None`: everyone).
     menu_entries: HashMap<String, (String, Option<Vec<u32>>)>,
     webviews: HashMap<String, (PluginWebviewPlace, String)>,
@@ -566,8 +623,9 @@ impl Trees {
                     slots.remove(slot);
                 }
             }
-            PluginUiChange::OpenDialog { title } => {
-                self.dialogs.insert(plugin.to_owned(), title.clone());
+            PluginUiChange::OpenDialog { title, subtitle } => {
+                self.dialogs
+                    .insert(plugin.to_owned(), (title.clone(), subtitle.clone()));
             }
             PluginUiChange::CloseDialog => {
                 self.dialogs.remove(plugin);
@@ -626,11 +684,12 @@ impl Trees {
                 });
             }
         }
-        for (plugin, title) in &self.dialogs {
+        for (plugin, (title, subtitle)) in &self.dialogs {
             out.push(PluginUi {
                 plugin: plugin.clone(),
                 change: PluginUiChange::OpenDialog {
                     title: title.clone(),
+                    subtitle: subtitle.clone(),
                 },
             });
         }
@@ -800,12 +859,18 @@ mod tests {
                     purpose: PluginInputPurpose::ServerAddress,
                     action: "address".into(),
                     disabled: false,
+                    help: None,
+                    help_tone: None,
+                    error: None,
                 }),
                 node(PluginComponent::Password {
                     label: "Key".into(),
                     secret: "api-key".into(),
                     action: "save-key".into(),
                     disabled: false,
+                    help: Some("Not checked yet.".into()),
+                    help_tone: Some(PluginTone::Neutral),
+                    error: None,
                 }),
                 node(PluginComponent::Button {
                     label: "Off".into(),
@@ -849,6 +914,7 @@ mod tests {
             "poll",
             &PluginUiChange::OpenDialog {
                 title: "Poll".into(),
+                subtitle: Some("Night Owls".into()),
             },
         );
         assert_eq!(trees.snapshot().len(), 3);
@@ -874,6 +940,7 @@ mod tests {
             "snacks",
             &PluginUiChange::OpenDialog {
                 title: "Snacks".into(),
+                subtitle: None,
             },
         );
         trees.apply("snacks", &show(PluginWebviewPlace::Dialog));

@@ -15,11 +15,16 @@ import {
   type Unsubscribe,
 } from "../../../api";
 
+export interface PluginDialogHeader {
+  readonly title: string;
+  readonly subtitle: string | null;
+}
+
 export interface PluginUiState {
   /** plugin id → slot key ({@link slotKey}) → tree. */
   readonly trees: ReadonlyMap<string, ReadonlyMap<string, readonly PluginNode[]>>;
-  /** plugin id → title of its open dialog. */
-  readonly dialogs: ReadonlyMap<string, string>;
+  /** plugin id → header of its open dialog. */
+  readonly dialogs: ReadonlyMap<string, PluginDialogHeader>;
   /** plugin id → its entry in the user context menu. */
   readonly menuEntries: ReadonlyMap<string, PluginMenuEntryState>;
   /** plugin id → its open web view (FR-6.46). */
@@ -87,7 +92,7 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       return { ...state, trees };
     case "openDialog": {
       const dialogs = new Map(state.dialogs);
-      dialogs.set(plugin, change.title);
+      dialogs.set(plugin, { title: change.title, subtitle: change.subtitle });
       return { ...state, dialogs };
     }
     case "closeDialog": {

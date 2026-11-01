@@ -16,10 +16,14 @@ vi.mock("../../../api", async (orig) => ({
   }),
 }));
 
-function withDialog(title: string | null) {
+vi.mock("../render/usePluginIcon", () => ({
+  usePluginIcon: () => "data:image/svg+xml,icon",
+}));
+
+function withDialog(title: string | null, subtitle: string | null = null) {
   vi.spyOn(store, "usePluginUi").mockReturnValue({
     trees: new Map(),
-    dialogs: title === null ? new Map() : new Map([["mumbot-music", title]]),
+    dialogs: title === null ? new Map() : new Map([["mumbot-music", { title, subtitle }]]),
     menuEntries: new Map(),
     webviews: new Map(),
   });
@@ -34,6 +38,19 @@ describe("PluginDialogHost", () => {
     withDialog(null);
     const { container } = render(<PluginDialogHost />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("draws the header: plugin icon, title, subtitle and a close button", () => {
+    withDialog("Configure bot", "Mumbot · Night Owls Guild");
+    const { container } = render(<PluginDialogHost />);
+    expect(screen.getByRole("dialog", { name: "Configure bot" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Configure bot" })).toBeInTheDocument();
+    expect(screen.getByText("Mumbot · Night Owls Guild")).toBeInTheDocument();
+    expect(container.ownerDocument.querySelector(".userpanel-modal__head img")).toHaveAttribute(
+      "alt",
+      "",
+    );
+    expect(screen.getAllByRole("button")).toHaveLength(1);
   });
 
   it("sends dialog-closed on Escape and on Close", () => {
@@ -56,7 +73,7 @@ describe("PluginDialogHost", () => {
   });
 
   it("drops the dialog and its web view from the state; a later close is a no-op", () => {
-    const open = { type: "openDialog", title: "T" } as const;
+    const open = { type: "openDialog", title: "T", subtitle: null } as const;
     let s = store.applyChange(
       { trees: new Map(), dialogs: new Map(), menuEntries: new Map(), webviews: new Map() },
       { plugin: "p", change: open },

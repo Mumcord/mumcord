@@ -27,6 +27,8 @@ pub const MAX_MENU_SESSIONS: usize = 256;
 
 /// Nodes per tree (FR-6.42).
 pub const MAX_NODES: usize = 500;
+/// Characters in a dialog title or subtitle.
+pub const MAX_DIALOG_TITLE_CHARS: usize = 64;
 /// Encoded tree size per slot (FR-6.42), see [`encoded_size`].
 pub const MAX_TREE_BYTES: usize = 16 * 1024;
 /// `set-tree` calls per slot and second (FR-6.42).
@@ -70,6 +72,16 @@ pub fn slot_permission(slot: &Slot) -> Option<&'static str> {
 }
 
 /// A short, content-free name of a slot for the rate limiter and Diagnostics lines.
+/// Dialog title and subtitle: at most [`MAX_DIALOG_TITLE_CHARS`] each.
+fn check_dialog_text(title: &str, subtitle: Option<&str>) -> Result<(), Error> {
+    let long = |s: &str| s.chars().count() > MAX_DIALOG_TITLE_CHARS;
+    if long(title) || subtitle.is_some_and(long) {
+        Err(Error::TooLarge)
+    } else {
+        Ok(())
+    }
+}
+
 /// A user-menu label: not blank, at most [`MAX_MENU_LABEL_CHARS`].
 fn check_menu_label(label: &str) -> Result<(), Error> {
     if label.trim().is_empty() {
@@ -194,8 +206,18 @@ fn strings(component: &Component) -> Vec<&str> {
             all
         }
         Component::Slider(s) => vec![&s.label, &s.action],
-        Component::TextInput(t) => vec![&t.label, &t.value, &t.placeholder, &t.action],
-        Component::Password(p) => vec![&p.label, &p.secret, &p.action],
+        Component::TextInput(t) => {
+            let mut all: Vec<&str> = vec![&t.label, &t.value, &t.placeholder, &t.action];
+            all.extend(t.help.as_deref());
+            all.extend(t.error.as_deref());
+            all
+        }
+        Component::Password(p) => {
+            let mut all: Vec<&str> = vec![&p.label, &p.secret, &p.action];
+            all.extend(p.help.as_deref());
+            all.extend(p.error.as_deref());
+            all
+        }
         Component::FilePicker(f) => {
             let mut all: Vec<&str> = vec![&f.label, &f.action];
             all.extend(f.accept.iter().map(String::as_str));
@@ -464,8 +486,13 @@ impl Host for PluginState {
     }
 
     fn open_dialog(&mut self, title: String) -> Result<(), Error> {
+        self.open_dialog_with(title, None)
+    }
+
+    fn open_dialog_with(&mut self, title: String, subtitle: Option<String>) -> Result<(), Error> {
         self.ctx.grants.check(&self.id, DIALOG_PERMISSION)?;
-        self.io()?.open_dialog(&self.id, title)
+        check_dialog_text(&title, subtitle.as_deref())?;
+        self.io()?.open_dialog(&self.id, title, subtitle)
     }
 
     fn close_dialog(&mut self) {
@@ -516,7 +543,7 @@ mod tests {
     use super::*;
     use crate::runtime::bindings::mumcord::plugin::ui::{
         Align, Button, ButtonKind, Direction, InputPurpose, ListProps, Sprite, Stack, Text,
-        TextInput, TextStyle,
+        TextInput, TextStyle, Tone,
     };
 
     fn node(component: Component, children: Vec<u32>) -> Node {
@@ -533,6 +560,7 @@ mod tests {
                 direction: Direction::Column,
                 gap: 4,
                 align: Align::Start,
+                justify: None,
             }),
             children,
         )
@@ -695,12 +723,56 @@ mod tests {
                     purpose: InputPurpose::Plain,
                     action: "name".to_owned(),
                     disabled: false,
+                    help: None,
+                    help_tone: None,
+                    error: None,
                 }),
                 vec![],
             )
         };
         assert_eq!(validate(&[input(64)], all), Ok(()));
         assert_eq!(error(&[input(65)]), Error::Invalid);
+    }
+
+    #[test]
+    fn field_notes_count_as_text() {
+        let field = |help: &str, error: Option<&str>| {
+            node(
+                Component::TextInput(TextInput {
+                    label: "Bot address".to_owned(),
+                    value: String::new(),
+                    placeholder: String::new(),
+                    max_bytes: 64,
+                    purpose: InputPurpose::ServerAddress,
+                    action: "address".to_owned(),
+                    disabled: false,
+                    help: Some(help.to_owned()),
+                    help_tone: Some(Tone::Success),
+                    error: error.map(str::to_owned),
+                }),
+                vec![],
+            )
+        };
+        let long = "x".repeat(MAX_TEXT_CHARS + 1);
+        assert_eq!(
+            validate(&[field("Reachable.", Some("Bot not reachable."))], all),
+            Ok(())
+        );
+        assert_eq!(error(&[field(&long, None)]), Error::TooLarge);
+        assert_eq!(error(&[field("Reachable.", Some(&long))]), Error::TooLarge);
+    }
+
+    #[test]
+    fn dialog_title_and_subtitle_are_limited() {
+        let max = "ü".repeat(MAX_DIALOG_TITLE_CHARS);
+        let over = "x".repeat(MAX_DIALOG_TITLE_CHARS + 1);
+        assert_eq!(check_dialog_text(&max, Some(&max)), Ok(()));
+        assert_eq!(check_dialog_text(&max, None), Ok(()));
+        assert_eq!(check_dialog_text(&over, None), Err(Error::TooLarge));
+        assert_eq!(
+            check_dialog_text("Configure bot", Some(&over)),
+            Err(Error::TooLarge)
+        );
     }
 
     #[test]
@@ -722,6 +794,9 @@ mod tests {
                 secret: "token".to_owned(),
                 action: "saved".to_owned(),
                 disabled: false,
+                help: None,
+                help_tone: None,
+                error: Some("Key rejected (401).".to_owned()),
             }),
             vec![],
         );

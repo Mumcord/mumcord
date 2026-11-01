@@ -57,11 +57,22 @@ interface ui {
     stretch,
   }
 
+  /// How a stack spreads its children along its direction.
+  enum justify {
+    start,
+    end,
+    /// First child at the start, last at the end, the rest evenly between.
+    space-between,
+  }
+
   record stack {
     direction: direction,
     /// Spacing between children in px, at most 32.
     gap: u8,
+    /// Cross axis: how children line up across the stack's direction.
     align: align,
+    /// Main axis; none = start.
+    justify: option<justify>,
   }
 
   enum text-style {
@@ -107,9 +118,21 @@ interface ui {
     color: option<string>,
   }
 
+  /// Colour role of a chip or a field note; drawn with the theme's colours.
+  enum tone {
+    neutral,
+    success,
+    warning,
+    danger,
+    accent,
+  }
+
   enum button-kind {
+    /// Filled with the accent colour: the main action, at most one per view.
     primary,
+    /// Outlined.
     secondary,
+    /// Filled red: destructive actions.
     danger,
   }
 
@@ -137,7 +160,10 @@ interface ui {
 
   record chip {
     text: string,
+    /// Theme token for text and border; ignored when `tone` is set.
     color: option<string>,
+    /// A tinted pill in this tone, e.g. a status like 'Connected' (success).
+    tone: option<tone>,
   }
 
   record progress {
@@ -207,6 +233,12 @@ interface ui {
     /// Sends `ui-action` with a `text` value when the user confirms (Enter or leaving the field).
     action: string,
     disabled: bool,
+    /// A note under the field, e.g. what to enter or a check result.
+    help: option<string>,
+    /// Colour of `help`; none = muted text.
+    help-tone: option<tone>,
+    /// If set, the field shows an error state and this text replaces `help`.
+    error: option<string>,
   }
 
   /// Writes what the user types into the named secret (see `secrets`); the plugin never sees
@@ -216,6 +248,12 @@ interface ui {
     secret: string,
     action: string,
     disabled: bool,
+    /// A note under the field (see `text-input`).
+    help: option<string>,
+    /// Colour of `help`; none = muted text.
+    help-tone: option<tone>,
+    /// If set, the field shows an error state and this text replaces `help`.
+    error: option<string>,
   }
 
   /// Lets the user pick one file. Sends `ui-action` with a `file` value: an opaque handle usable
@@ -274,8 +312,14 @@ interface ui {
   /// Opens this plugin's dialog with a title (at most 64 characters); its content is the
   /// `dialog` slot. One dialog per plugin; opening it again only changes the title. Focus is
   /// trapped in the dialog; when the user closes it the plugin gets `dialog-closed`.
+  /// Mumcord draws the header: the plugin's icon, the title and a close button.
   /// Errors: `not-permitted`, `too-large`.
   open-dialog: func(title: string) -> result<_, error>;
+
+  /// Like `open-dialog`, with a subtitle (at most 64 characters) under the title, e.g.
+  /// 'Mumbot · Night Owls Guild'; none = no subtitle. Opening again changes title and subtitle.
+  /// Errors: `not-permitted`, `too-large`.
+  open-dialog-with: func(title: string, subtitle: option<string>) -> result<_, error>;
 
   /// Closes the dialog without a `dialog-closed` event.
   close-dialog: func();

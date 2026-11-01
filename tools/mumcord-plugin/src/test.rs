@@ -398,7 +398,8 @@ pub enum Output {
         nodes: Vec<Node>,
     },
     Cleared(SlotSpec),
-    Dialog(String),
+    /// Title and subtitle.
+    Dialog(String, Option<String>),
     DialogClosed,
     /// The panel popover opened (`true`) or closed (`false`).
     PanelPopover(bool),
@@ -451,8 +452,13 @@ impl PluginIo for MockIo {
         self.push(Output::Cleared(SlotSpec::from_wit(&slot)));
     }
 
-    fn open_dialog(&self, _plugin: &str, title: String) -> Result<(), Error> {
-        self.push(Output::Dialog(title));
+    fn open_dialog(
+        &self,
+        _plugin: &str,
+        title: String,
+        subtitle: Option<String>,
+    ) -> Result<(), Error> {
+        self.push(Output::Dialog(title, subtitle));
         Ok(())
     }
 
@@ -919,12 +925,12 @@ impl Session {
         trees
     }
 
-    /// The dialog title, if the plugin left its dialog open.
-    pub fn dialog_title(&self) -> Option<String> {
+    /// The dialog title and subtitle, if the plugin left its dialog open.
+    pub fn dialog(&self) -> Option<(String, Option<String>)> {
         let mut title = None;
         for output in lock(&self.outputs).iter() {
             match output {
-                Output::Dialog(t) => title = Some(t.clone()),
+                Output::Dialog(t, s) => title = Some((t.clone(), s.clone())),
                 Output::DialogClosed => title = None,
                 _ => {}
             }
@@ -1046,7 +1052,7 @@ fn matches(expect: &Expect, output: &Output) -> bool {
         (Expect::Notification { title, body }, Output::Notification { title: t, body: b }) => {
             contains(t, title.as_ref()) && contains(b, body.as_ref())
         }
-        (Expect::Dialog { title }, Output::Dialog(t)) => contains(t, title.as_ref()),
+        (Expect::Dialog { title }, Output::Dialog(t, _)) => contains(t, title.as_ref()),
         (Expect::PanelPopover { open }, Output::PanelPopover(o)) => open == o,
         (Expect::MenuEntry { label, sessions }, Output::MenuEntry(l, s)) => {
             label == l && (sessions.is_none() || sessions == s)
@@ -1088,7 +1094,8 @@ fn summary(output: &Output) -> String {
             format!("tree {slot:?}, {} nodes, texts {texts:?}", nodes.len())
         }
         Output::Cleared(slot) => format!("cleared {slot:?}"),
-        Output::Dialog(title) => format!("dialog {title:?}"),
+        Output::Dialog(title, None) => format!("dialog {title:?}"),
+        Output::Dialog(title, Some(subtitle)) => format!("dialog {title:?} ({subtitle:?})"),
         Output::DialogClosed => "dialog closed".into(),
         Output::PanelPopover(open) => {
             format!("panel popover {}", if *open { "opened" } else { "closed" })

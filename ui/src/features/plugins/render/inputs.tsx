@@ -11,12 +11,32 @@ type Of<T extends PluginComponent["type"]> = Extract<PluginComponent, { type: T 
 /** Highest byte length of a text input (FR-6.41); the host refuses more. */
 export const MAX_INPUT_BYTES = 64;
 
+type FieldNoteProps = Pick<Of<"textInput">, "help" | "helpTone" | "error">;
+
+/**
+ * The note under a field: the error if there is one (the field is then invalid), else the help
+ * text in its tone. Returns the note's element and the props that tie the input to it.
+ */
+function useFieldNote(id: string, { help, helpTone, error }: FieldNoteProps) {
+  const noteId = `${id}-note`;
+  const text = error ?? help;
+  const tone = error === null ? helpTone : "danger";
+  const note =
+    text === null ? null : (
+      <span id={noteId} className={`pr-note${tone === null ? "" : ` pr-note--${tone}`}`}>
+        {text}
+      </span>
+    );
+  return { note, noteId: text === null ? null : noteId, invalid: error !== null };
+}
+
 /** Sends the text on Enter or when the field is left, if it changed. */
 export function PluginTextInput(props: Of<"textInput">) {
   const { label, value, placeholder, maxBytes, action, disabled } = props;
   const { send } = useRender();
   const { t } = useTranslation("pluginSlots");
   const id = useId();
+  const { note, noteId, invalid } = useFieldNote(id, props);
   const max = Math.min(maxBytes, MAX_INPUT_BYTES);
   const [draft, setDraft] = useState<{ from: string; text: string }>({ from: value, text: value });
   const text = draft.from === value ? draft.text : value;
@@ -34,7 +54,8 @@ export function PluginTextInput(props: Of<"textInput">) {
         value={text}
         placeholder={placeholder}
         disabled={disabled}
-        aria-describedby={`${id}-count`}
+        aria-invalid={invalid || undefined}
+        aria-describedby={noteId === null ? `${id}-count` : `${noteId} ${id}-count`}
         spellCheck={props.purpose === "plain"}
         onChange={(e) => {
           setDraft({ from: value, text: clampBytes(e.currentTarget.value, max) });
@@ -44,9 +65,12 @@ export function PluginTextInput(props: Of<"textInput">) {
         }}
         onBlur={commit}
       />
-      <span id={`${id}-count`} className="pr-counter">
-        {t("input.chars", count)}
-      </span>
+      <div className="pr-field__foot">
+        {note}
+        <span id={`${id}-count`} className="pr-counter">
+          {t("input.chars", count)}
+        </span>
+      </div>
     </div>
   );
 }
@@ -55,10 +79,12 @@ export function PluginTextInput(props: Of<"textInput">) {
  * Writes into the plugin's secret (the host stores it, the plugin never sees the text); the
  * field clears after saving.
  */
-export function PluginPassword({ label, action, disabled }: Of<"password">) {
+export function PluginPassword(props: Of<"password">) {
+  const { label, action, disabled } = props;
   const { send } = useRender();
   const { t } = useTranslation("pluginSlots");
   const id = useId();
+  const { note, noteId, invalid } = useFieldNote(id, props);
   const [text, setText] = useState("");
   const [saved, setSaved] = useState(false);
   const save = () => {
@@ -78,6 +104,8 @@ export function PluginPassword({ label, action, disabled }: Of<"password">) {
           autoComplete="off"
           value={text}
           disabled={disabled}
+          aria-invalid={invalid || undefined}
+          aria-describedby={noteId ?? undefined}
           onChange={(e) => {
             setText(e.currentTarget.value);
             setSaved(false);
@@ -90,9 +118,12 @@ export function PluginPassword({ label, action, disabled }: Of<"password">) {
           {t("password.save")}
         </button>
       </div>
-      <span className="pr-counter" role="status">
-        {saved ? t("password.saved") : ""}
-      </span>
+      <div className="pr-field__foot">
+        {note}
+        <span className="pr-counter" role="status">
+          {saved ? t("password.saved") : ""}
+        </span>
+      </div>
     </div>
   );
 }

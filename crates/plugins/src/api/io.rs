@@ -20,8 +20,13 @@ pub trait PluginIo: Send + Sync + Debug {
     fn set_tree(&self, plugin: &str, slot: Slot, nodes: Vec<Node>) -> Result<(), Error>;
     /// `ui.clear`.
     fn clear(&self, plugin: &str, slot: Slot);
-    /// `ui.open-dialog`.
-    fn open_dialog(&self, plugin: &str, title: String) -> Result<(), Error>;
+    /// `ui.open-dialog` and `ui.open-dialog-with`.
+    fn open_dialog(
+        &self,
+        plugin: &str,
+        title: String,
+        subtitle: Option<String>,
+    ) -> Result<(), Error>;
     /// `ui.close-dialog`.
     fn close_dialog(&self, plugin: &str);
     /// `ui.set-user-menu-entry`.

@@ -85,7 +85,7 @@ describe("web view state", () => {
   const change = (c: PluginUi["change"]): PluginUi => ({ plugin: "snacks", change: c });
 
   it("opens, reloads on a new show and closes with its dialog", () => {
-    let state = applyChange(empty, change({ type: "openDialog", title: "Snacks" }));
+    let state = applyChange(empty, change({ type: "openDialog", title: "Snacks", subtitle: null }));
     state = applyChange(state, change({ type: "webviewShow", place: "dialog", url: URL }));
     const first = state.webviews.get("snacks");
     expect(first?.url).toBe(URL);

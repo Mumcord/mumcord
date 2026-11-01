@@ -12,11 +12,11 @@ const NONE = { type: "none" } as const;
 
 export function PluginButton({ label, action, kind, disabled, expanded }: Of<"button">) {
   const { send } = useRender();
-  const variant = kind === "primary" ? " button--primary" : kind === "danger" ? " pr-danger" : "";
+  const variant = kind === "primary" ? "button--primary" : `pr-button--${kind}`;
   return (
     <button
       type="button"
-      className={`button${variant}`}
+      className={`button ${variant}`}
       disabled={disabled}
       aria-expanded={expanded ?? undefined}
       onClick={() => {

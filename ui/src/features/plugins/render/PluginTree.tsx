@@ -35,6 +35,8 @@ export interface PluginTreeProps {
   nodes: readonly PluginNode[];
 }
 
+const JUSTIFY = { start: "flex-start", end: "flex-end", spaceBetween: "space-between" } as const;
+
 /** Gap of a stack in px; the host refuses more. */
 const MAX_GAP = 32;
 
@@ -61,6 +63,7 @@ function renderNode(
           style={{
             gap: Math.min(c.gap, MAX_GAP),
             alignItems: c.align === "start" || c.align === "end" ? `flex-${c.align}` : c.align,
+            justifyContent: JUSTIFY[c.justify ?? "start"],
           }}
         >
           {children()}
