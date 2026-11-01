@@ -584,7 +584,12 @@ section { margin-bottom:24px; }
 .slot { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px;
   overflow:auto; box-sizing:border-box; }
 .panel { width:260px; height:160px; } .popover { width:420px; height:560px; } .profile-card { width:300px; height:220px; }
-.chat-card { width:440px; max-width:100%; height:160px; } .form { width:420px; max-width:100%; }
+/* Like the host: a tall chat card is cut off with a fade, not scrolled. The scroll timeline of a
+   card that fits is inactive, so only a card that overflows gets the fade. */
+.chat-card { width:440px; max-width:100%; max-height:160px; overflow:hidden;
+  animation:clip-fade linear both; animation-timeline:scroll(self); }
+@keyframes clip-fade { from, to { mask-image:linear-gradient(to bottom, #000 calc(100% - 32px), transparent); } }
+.form { width:420px; max-width:100%; }
 .badge { width:24px; height:24px; padding:0; } .decoration { width:16px; height:16px; padding:0; }
 .stack { display:flex; } .stack.fill-first { flex-wrap:nowrap; }
 .stack.fill-first > :first-child { flex:1 1 0; min-width:0; }
@@ -692,6 +697,7 @@ mod tests {
         assert!(page.contains("class=\"slot panel\""));
         assert!(page.contains("class=\"slot popover\""));
         assert!(page.contains(".popover { width:420px; height:560px; }"));
+        assert!(page.contains("max-height:160px; overflow:hidden;"));
         assert!(page.contains(":root[data-theme=dark]"));
     }
 
