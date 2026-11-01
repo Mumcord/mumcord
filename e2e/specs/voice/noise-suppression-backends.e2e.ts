@@ -82,7 +82,7 @@ async function openVoiceSettings(): Promise<void> {
   await (await $(NOISE_GROUP)).waitForDisplayed({ timeout: 30_000 });
 }
 
-const NOISE_GROUP = "//fieldset[legend[normalize-space(.)='Noise suppression']]";
+const NOISE_GROUP = "//fieldset[legend/span[normalize-space(.)='Noise suppression']]";
 const LIGHT = "Light";
 const STANDARD = "Standard";
 const ADVANCED = "Advanced (AI)";
