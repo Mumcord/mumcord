@@ -46,7 +46,11 @@
     "upNext": "Następne: {{title}}",
     "upNextNone": "Nic więcej w kolejce",
     "paste": "Wklej link YouTube",
-    "notALink": "To nie jest link YouTube"
+    "notALink": "To nie jest link YouTube",
+    "more": "Więcej dla {{title}}",
+    "playNext": "Odtwórz jako następne",
+    "removeShort": "Usuń z playlisty",
+    "emptyPaste": "Nic nie czeka w kolejce. Wklej powyżej link do YouTube."
   },
   "widget": {
     "play": "Odtwórz",
@@ -56,5 +60,15 @@
     "install": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav:",
     "generic": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav (wtyczkę libav dla GStreamera) menedżerem pakietów swojego systemu.",
     "rpmFusion": "W Fedorze gst-libav pochodzi z repozytorium RPM Fusion; najpierw włącz RPM Fusion."
-  }
+  },
+  "keys": "Spacja odtwórz/wstrzymaj · ← → przewiń 5 s · M wycisz · F pełny ekran · Z skupienie",
+  "headerPill": "Oglądajcie razem · {{count}}",
+  "miniPlayer": "Miniodtwarzacz",
+  "tabs": {
+    "playlist": "Playlista"
+  },
+  "upNextHeading": "Następne · przeciągnij, aby zmienić kolejność",
+  "whoIsWatching": "Kto ogląda",
+  "pasteKey": "Ctrl V",
+  "you": "Ty"
 }

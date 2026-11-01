@@ -46,7 +46,11 @@
     "upNext": "Urmează: {{title}}",
     "upNextNone": "Nu urmează nimic",
     "paste": "Lipește un link YouTube",
-    "notALink": "Acela nu este un link YouTube"
+    "notALink": "Acela nu este un link YouTube",
+    "more": "Mai multe pentru {{title}}",
+    "playNext": "Redă în continuare",
+    "removeShort": "Elimină din listă",
+    "emptyPaste": "Nu urmează nimic. Lipiți mai sus un link YouTube."
   },
   "widget": {
     "play": "Redă",
@@ -56,5 +60,15 @@
     "install": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav:",
     "generic": "Acest videoclip are nevoie de suport H.264. Instalează gst-libav (pluginul libav pentru GStreamer) cu managerul de pachete al sistemului tău.",
     "rpmFusion": "Pe Fedora, gst-libav vine din depozitul RPM Fusion; activează mai întâi RPM Fusion."
-  }
+  },
+  "keys": "Spațiu redare/pauză · ← → salt 5 s · M fără sunet · F ecran complet · Z focalizare",
+  "headerPill": "Urmăriți împreună · {{count}}",
+  "miniPlayer": "Mini player",
+  "tabs": {
+    "playlist": "Listă"
+  },
+  "upNextHeading": "Urmează · trageți pentru a reordona",
+  "whoIsWatching": "Cine urmărește",
+  "pasteKey": "Ctrl V",
+  "you": "Tu"
 }

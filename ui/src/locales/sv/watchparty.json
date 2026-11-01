@@ -46,7 +46,11 @@
     "upNext": "Näst på tur: {{title}}",
     "upNextNone": "Inget näst på tur",
     "paste": "Klistra en YouTube-länk",
-    "notALink": "Det är inte en YouTube-länk"
+    "notALink": "Det är inte en YouTube-länk",
+    "more": "Mer för {{title}}",
+    "playNext": "Spela härnäst",
+    "removeShort": "Ta bort från spellistan",
+    "emptyPaste": "Inget står på tur. Klistra in en YouTube-länk ovan."
   },
   "widget": {
     "play": "Spela",
@@ -56,5 +60,15 @@
     "install": "Den här videon kräver stöd för H.264. Installera gst-libav:",
     "generic": "Den här videon kräver stöd för H.264. Installera gst-libav (GStreamers libav-plugin) med systemets pakethanterare.",
     "rpmFusion": "På Fedora kommer gst-libav från RPM Fusion-förrådet; aktivera RPM Fusion först."
-  }
+  },
+  "keys": "Mellanslag spela/pausa · ← → hoppa 5 s · M ljud av · F helskärm · Z fokus",
+  "headerPill": "Titta tillsammans · {{count}}",
+  "miniPlayer": "Minispelare",
+  "tabs": {
+    "playlist": "Spellista"
+  },
+  "upNextHeading": "Nästa · dra för att ändra ordning",
+  "whoIsWatching": "Vem tittar",
+  "pasteKey": "Ctrl V",
+  "you": "Du"
 }

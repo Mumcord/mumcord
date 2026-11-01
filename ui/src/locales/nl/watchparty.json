@@ -46,7 +46,11 @@
     "upNext": "Hierna: {{title}}",
     "upNextNone": "Niets hierna",
     "paste": "Plak een YouTube-link",
-    "notALink": "Dat is geen YouTube-link"
+    "notALink": "Dat is geen YouTube-link",
+    "more": "Meer voor {{title}}",
+    "playNext": "Hierna afspelen",
+    "removeShort": "Uit de afspeellijst verwijderen",
+    "emptyPaste": "Er staat niets klaar. Plak hierboven een YouTube-link."
   },
   "widget": {
     "play": "Afspelen",
@@ -56,5 +60,15 @@
     "install": "Deze video heeft H.264-ondersteuning nodig. Installeer gst-libav:",
     "generic": "Deze video heeft H.264-ondersteuning nodig. Installeer gst-libav (de GStreamer-libav-plug-in) met de pakketbeheerder van je systeem.",
     "rpmFusion": "Op Fedora komt gst-libav uit de RPM Fusion-repository; schakel eerst RPM Fusion in."
-  }
+  },
+  "keys": "Spatie afspelen/pauze · ← → 5 s verspringen · M dempen · F volledig scherm · Z focus",
+  "headerPill": "Samen kijken · {{count}}",
+  "miniPlayer": "Minispeler",
+  "tabs": {
+    "playlist": "Afspeellijst"
+  },
+  "upNextHeading": "Hierna · sleep om de volgorde te wijzigen",
+  "whoIsWatching": "Wie kijkt er mee",
+  "pasteKey": "Ctrl V",
+  "you": "Jij"
 }
