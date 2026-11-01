@@ -1141,9 +1141,12 @@ impl Engine {
             return Err(EngineError::new(ErrorKind::NotFound, "unknown channel"));
         }
         if !here {
+            // Noted before sending so a quick refusal always finds the attempt.
+            lock(&self.inner.password_attempts).request(server_id, channel_id);
             ctx.handle
                 .join_channel(channel_id)
-                .map_err(convert::command_error)?;
+                .map_err(convert::command_error)
+                .inspect_err(|_| self.inner.forget_password_attempt(server_id))?;
         }
         let own = self.inner.own_voice();
         let joined = {

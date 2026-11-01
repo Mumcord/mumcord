@@ -57,6 +57,7 @@
 
 ### Fixed
 
+- The channel password dialog no longer pops up again and again while someone else is in a password-protected channel: the server refuses their connection statistics the same way it refuses a join, and Mumcord took that for a refused join. The dialog now appears only when you try to join a protected channel yourself, once per attempt (#306)
 - The "Estimated bandwidth incl. headers" row in the voice quality panel no longer lets the label run into the value or pushes the "?" onto its own line in long languages such as German, Finnish and Hungarian: the label wraps on its own, the "?" stays beside it and the value stays right-aligned. The flat strip became a rounded meter that is neutral up to 79 % of the server limit, amber from 80 % and red above 100 %, which the "?" explains; screen readers hear e.g. "398 of 558 kbit/s (71 %)" (#299)
 
 - Your own messages never play the mention sound or show a notification, even when the server or another session of yours sends them back; they also no longer count as unread (#215)
