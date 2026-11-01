@@ -205,3 +205,12 @@ fn party_player_hides_youtubes_own_controls() {
         assert!(PAGE.contains(param), "player page lacks {param}");
     }
 }
+
+#[test]
+fn party_player_reads_the_length_youtube_reports() {
+    // YouTube's control protocol names the length `duration` and the loaded part
+    // `videoLoadedFraction`; without them the seek bar stays at the start (issue #163).
+    for field in ["info.duration", "info.videoLoadedFraction", "TIME_MS"] {
+        assert!(PAGE.contains(field), "player page lacks {field}");
+    }
+}

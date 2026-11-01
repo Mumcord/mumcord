@@ -123,4 +123,28 @@ describe("party player", () => {
     expect(post).toHaveBeenLastCalledWith({ type: "play" }, PAGE_ORIGIN);
     expect(screen.getByRole("button", { name: "Pause" })).toBeVisible();
   });
+
+  it("moves the seek bar with the player's reports and seeks the player when dragged", async () => {
+    const command = vi.spyOn(api, "watchPartyCommand").mockResolvedValue(null);
+    openMedia("watch");
+    render(<WatchTogetherView serverId={1} />);
+    show({ playing: true });
+    const { frame, post } = await readyPlayer();
+    const page = (data: unknown) => {
+      act(() => {
+        window.dispatchEvent(
+          new MessageEvent("message", { origin: PAGE_ORIGIN, source: frame.contentWindow, data }),
+        );
+      });
+    };
+    page({ type: "meta", seconds: 200, bufferedSeconds: 50 });
+    page({ type: "state", state: 1 });
+    page({ type: "time", seconds: 42 });
+    const seek = screen.getByRole("slider", { name: "Seek" });
+    expect(seek).toHaveAttribute("max", "200000");
+    expect(seek).toHaveValue("42000");
+    fireEvent.change(seek, { target: { value: "120000" } });
+    expect(post).toHaveBeenLastCalledWith({ type: "seek", seconds: 120 }, PAGE_ORIGIN);
+    expect(command).toHaveBeenCalledWith(1, { kind: "seek", positionMs: 120_000 });
+  });
 });

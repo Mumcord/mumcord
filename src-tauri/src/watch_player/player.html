@@ -43,6 +43,9 @@
         const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
         const PLAYLIST_ID = /^[A-Za-z0-9_-]{10,64}$/;
         const ENDED = 0;
+        const PLAYING = 1;
+        /** How often a playing video tells the app where it is. */
+        const TIME_MS = 500;
         /** The player only starts reporting after it heard "listening"; repeat until it does. */
         const LISTEN_INTERVAL_MS = 250;
         /** Ducking fades (FR-2.76): a full swing takes this long down and back up, in steps. */
@@ -64,6 +67,14 @@
         let applied = null;
         let appliedAt = 0;
         let fade = 0;
+        // The seek bar (issue #163): the video's length, the last time the player reported and
+        // whether it plays. YouTube reports the time only now and then, so while the video plays
+        // the page sends it on from that report every TIME_MS.
+        let duration = 0;
+        let loadedFraction = null;
+        let lastTime = null;
+        let playing = false;
+        let ticker = 0;
 
         const toApp = (message) => {
           if (app !== null) window.parent.postMessage(message, app);
@@ -126,6 +137,11 @@
         /** Frames a YouTube player with its postMessage API on and listens to it. */
         const frameYouTube = (src) => {
           window.clearInterval(listen);
+          window.clearInterval(ticker);
+          duration = 0;
+          loadedFraction = null;
+          lastTime = null;
+          playing = false;
           answered = false;
           userVolume = null;
           applied = null;
@@ -202,6 +218,8 @@
             data.seconds >= 0
           ) {
             command("seekTo", [data.seconds, true]);
+            // The seek bar follows at once instead of running on from before the jump.
+            lastTime = { seconds: data.seconds, at: performance.now() };
           } else if (
             data.type === "setVolume" &&
             typeof data.level === "number" &&
@@ -220,8 +238,34 @@
           }
         };
 
+        const timeNow = () =>
+          lastTime === null
+            ? null
+            : lastTime.seconds + (playing ? (performance.now() - lastTime.at) / 1000 : 0);
+
         const reportState = (state) => {
+          // Freeze the time where the player was, so a pause does not run on.
+          const seconds = timeNow();
+          if (seconds !== null) lastTime = { seconds, at: performance.now() };
+          playing = state === PLAYING;
+          window.clearInterval(ticker);
+          if (playing) {
+            ticker = window.setInterval(() => {
+              const now = timeNow();
+              if (now !== null)
+                toApp({ type: "time", seconds: duration > 0 ? Math.min(now, duration) : now });
+            }, TIME_MS);
+          }
           toApp(state === ENDED ? { type: "ended" } : { type: "state", state });
+        };
+
+        const reportMeta = () => {
+          if (duration <= 0) return;
+          toApp({
+            type: "meta",
+            seconds: duration,
+            bufferedSeconds: loadedFraction === null ? null : Math.round(loadedFraction * duration),
+          });
         };
 
         const fromPlayer = (data) => {
@@ -245,24 +289,38 @@
           }
           if (event === "onStateChange" && typeof info === "number") {
             reportState(info);
-          } else if (event === "infoDelivery" && typeof info === "object" && info !== null) {
-            if (typeof info.playerState === "number") reportState(info.playerState);
+          } else if (
+            (event === "infoDelivery" || event === "initialDelivery") &&
+            typeof info === "object" &&
+            info !== null
+          ) {
             if (typeof info.currentTime === "number" && Number.isFinite(info.currentTime)) {
+              lastTime = { seconds: info.currentTime, at: performance.now() };
               toApp({ type: "time", seconds: info.currentTime });
             }
-            // The seek bar needs the length; the buffered part only when the player reports it.
-            const length = info.videoData?.lengthSeconds;
-            if (typeof length === "number" && Number.isFinite(length) && length > 0) {
-              const loaded = info.progress?.loaded;
-              toApp({
-                type: "meta",
-                seconds: length,
-                bufferedSeconds:
-                  typeof loaded === "number" && Number.isFinite(loaded) && loaded > 0 && loaded <= 1
-                    ? Math.round(loaded * length)
-                    : null,
-              });
+            if (typeof info.playerState === "number") reportState(info.playerState);
+            // The seek bar needs the length (YouTube's `duration`), and how much the player has
+            // where it reports that (`videoLoadedFraction`), each in whichever report brings it.
+            let meta = false;
+            if (
+              typeof info.duration === "number" &&
+              Number.isFinite(info.duration) &&
+              info.duration > 0
+            ) {
+              meta = info.duration !== duration;
+              duration = info.duration;
             }
+            const fraction = info.videoLoadedFraction;
+            if (
+              typeof fraction === "number" &&
+              Number.isFinite(fraction) &&
+              fraction >= 0 &&
+              fraction <= 1
+            ) {
+              meta = meta || fraction !== loadedFraction;
+              loadedFraction = fraction;
+            }
+            if (meta) reportMeta();
             if (typeof info.volume === "number" && info.volume >= 0 && info.volume <= 100) {
               onVolume(info.volume);
             }
