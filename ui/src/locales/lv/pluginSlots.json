@@ -13,7 +13,7 @@
     "refresh": "Atsvaidzināt: {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} baiti"
+    "chars": "{{used}} / {{max}} rakstzīmes"
   },
   "password": {
     "save": "Saglabāt",

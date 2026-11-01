@@ -15,6 +15,15 @@ export function byteLength(text: string): number {
   return encoder.encode(text).length;
 }
 
+/**
+ * The character counter of a byte-limited input: characters typed, and how many fit in total
+ * if the rest is plain ASCII. People think in characters; the byte limit stays the hard rule.
+ */
+export function charCount(text: string, maxBytes: number): { used: number; max: number } {
+  const used = Array.from(text).length;
+  return { used, max: used + Math.max(0, maxBytes - byteLength(text)) };
+}
+
 /** The longest prefix of `text` within `max` UTF-8 bytes, never splitting a character. */
 export function clampBytes(text: string, max: number): string {
   let out = "";

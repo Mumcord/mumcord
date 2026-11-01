@@ -13,7 +13,7 @@
     "refresh": "Obnovit {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} bajtů"
+    "chars": "{{used}} / {{max}} znaků"
   },
   "password": {
     "save": "Uložit",

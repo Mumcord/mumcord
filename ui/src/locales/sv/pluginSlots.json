@@ -13,7 +13,7 @@
     "refresh": "Uppdatera {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} byte"
+    "chars": "{{used}} / {{max}} tecken"
   },
   "password": {
     "save": "Spara",

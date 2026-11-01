@@ -13,7 +13,7 @@
     "refresh": "Atnaujinti: {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} baitų"
+    "chars": "{{used}} / {{max}} simbolių"
   },
   "password": {
     "save": "Išsaugoti",

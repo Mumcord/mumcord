@@ -13,7 +13,7 @@
     "refresh": "Opdater {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} byte"
+    "chars": "{{used}} / {{max}} tegn"
   },
   "password": {
     "save": "Gem",

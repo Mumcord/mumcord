@@ -13,7 +13,7 @@
     "refresh": "Обнови {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} байта"
+    "chars": "{{used}} / {{max}} знака"
   },
   "password": {
     "save": "Запази",

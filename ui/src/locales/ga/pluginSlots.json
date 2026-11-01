@@ -13,7 +13,7 @@
     "refresh": "Athnuaigh {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} beart"
+    "chars": "{{used}} / {{max}} carachtar"
   },
   "password": {
     "save": "Sábháil",

@@ -12,7 +12,7 @@ import {
 } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
-import { byteLength, clampBytes, dropIndex, formatRemaining } from "./helpers";
+import { byteLength, charCount, clampBytes, dropIndex, formatRemaining } from "./helpers";
 import { applyChange, slotKey, usePluginTree, type PluginUiState } from "./pluginUiStore";
 import { PluginTree } from "./PluginTree";
 import { TOKEN_VARS, tokenColor } from "./tokens";
@@ -312,6 +312,13 @@ describe("inputs", () => {
     expect(clampBytes("aää", 4)).toBe("aä");
   });
 
+  it("counts characters and how many still fit", () => {
+    expect(charCount("", 64)).toEqual({ used: 0, max: 64 });
+    expect(charCount("abc", 64)).toEqual({ used: 3, max: 64 });
+    expect(charCount("ää", 4)).toEqual({ used: 2, max: 2 });
+    expect(charCount("ä", 4)).toEqual({ used: 1, max: 3 });
+  });
+
   it("limits the text input to its bytes and sends on Enter", () => {
     const action = vi.spyOn(api, "pluginUiAction").mockResolvedValue(null);
     show([
@@ -329,7 +336,7 @@ describe("inputs", () => {
     const input = screen.getByRole("textbox", { name: "Name" });
     fireEvent.change(input, { target: { value: "äääää" } });
     expect(input).toHaveValue("ää");
-    expect(screen.getByText("4 / 4 bytes")).toBeInTheDocument();
+    expect(screen.getByText("2 / 2 characters")).toBeInTheDocument();
     fireEvent.keyDown(input, { key: "Enter" });
     expect(action).toHaveBeenCalledWith("poll", PANEL, "name", { type: "text", value: "ää" });
   });

@@ -13,7 +13,7 @@
     "refresh": "Reîmprospătează {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} octeți"
+    "chars": "{{used}} / {{max}} caractere"
   },
   "password": {
     "save": "Salvează",

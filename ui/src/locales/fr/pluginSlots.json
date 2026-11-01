@@ -13,7 +13,7 @@
     "refresh": "Actualiser {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} octets"
+    "chars": "{{used}} / {{max}} caractères"
   },
   "password": {
     "save": "Enregistrer",

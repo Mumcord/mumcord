@@ -13,7 +13,7 @@
     "refresh": "{{label}} frissítése"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} bájt"
+    "chars": "{{used}} / {{max}} karakter"
   },
   "password": {
     "save": "Mentés",

@@ -1,10 +1,10 @@
-/** Text-like plugin inputs (FR-6.41): text input with byte counter, password, file picker. */
+/** Text-like plugin inputs (FR-6.41): text input with character counter, password, file picker. */
 import { open } from "@tauri-apps/plugin-dialog";
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type PluginComponent } from "../../../api";
 import { useRender } from "./context";
-import { byteLength, clampBytes } from "./helpers";
+import { charCount, clampBytes } from "./helpers";
 
 type Of<T extends PluginComponent["type"]> = Extract<PluginComponent, { type: T }>;
 
@@ -20,7 +20,7 @@ export function PluginTextInput(props: Of<"textInput">) {
   const max = Math.min(maxBytes, MAX_INPUT_BYTES);
   const [draft, setDraft] = useState<{ from: string; text: string }>({ from: value, text: value });
   const text = draft.from === value ? draft.text : value;
-  const used = byteLength(text);
+  const count = charCount(text, max);
   const commit = () => {
     if (text !== value) send(action, { type: "text", value: text });
   };
@@ -45,7 +45,7 @@ export function PluginTextInput(props: Of<"textInput">) {
         onBlur={commit}
       />
       <span id={`${id}-count`} className="pr-counter">
-        {t("input.bytes", { used, max })}
+        {t("input.chars", count)}
       </span>
     </div>
   );

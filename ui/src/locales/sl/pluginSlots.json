@@ -13,7 +13,7 @@
     "refresh": "Osveži {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} bajtov"
+    "chars": "{{used}} / {{max}} znakov"
   },
   "password": {
     "save": "Shrani",

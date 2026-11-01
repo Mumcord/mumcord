@@ -13,7 +13,7 @@
     "refresh": "Päivitä {{label}}"
   },
   "input": {
-    "bytes": "{{used}} / {{max}} tavua"
+    "chars": "{{used}} / {{max}} merkkiä"
   },
   "password": {
     "save": "Tallenna",
