@@ -359,6 +359,10 @@ impl Store {
     fn from_connection(mut conn: Connection) -> Result<Self> {
         conn.pragma_update(None, "foreign_keys", true)?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
+        // In WAL mode NORMAL only syncs at checkpoints: a commit cannot corrupt the database,
+        // a power cut can lose the last commits, and each write stops waiting for the disk
+        // (plugin storage writes run inside a plugin's 50 ms call budget).
+        conn.pragma_update(None, "synchronous", "NORMAL")?;
         migrate(&mut conn)?;
         Ok(Self { conn })
     }
@@ -397,6 +401,24 @@ pub(crate) mod tests {
         let dir = tempfile::tempdir().expect("tempdir");
         let store = Store::open(dir.path()).expect("open store");
         (dir, store)
+    }
+
+    #[test]
+    fn commits_do_not_wait_for_the_disk() {
+        let (_dir, store) = temp_store();
+        let mode: String = store
+            .conn
+            .query_row("PRAGMA journal_mode", [], |row| row.get(0))
+            .expect("journal mode");
+        let sync: i64 = store
+            .conn
+            .query_row("PRAGMA synchronous", [], |row| row.get(0))
+            .expect("synchronous");
+        assert_eq!(
+            (mode.as_str(), sync),
+            ("wal", 1),
+            "WAL with synchronous=NORMAL"
+        );
     }
 
     /// Testers' local databases already have #218's `channel_audio_profile` as v18, so
