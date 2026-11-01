@@ -211,4 +211,19 @@ mod tests {
         assert_eq!(plain_lines("<script>alert(1)</script>ok"), "ok");
         assert_eq!(plain_lines("cut <b"), "cut");
     }
+
+    /// The fit from the bug report, exactly as Mumcord's composer sent it.
+    #[test]
+    fn a_composed_eve_fit_matches_the_eve_fit_pattern() {
+        const SENT: &str = "<p>[Mamba, *Mamba Class 2/3]<br>Drone Damage Amplifier II<br>Drone Damage Amplifier II</p><p>Pithum C-Type Medium Shield Booster<br>Pithum C-Type EM Shield Amplifier<br>Small Capacitor Booster II<br>Pith X-Type Explosive Shield Hardener</p><p>Rocket Launcher II<br>Rocket Launcher II<br>Rocket Launcher II<br>Rocket Launcher II<br>Rocket Launcher II</p><p>Small EM Shield Reinforcer II<br>Small Explosive Shield Reinforcer II<br>Small Thermal Shield Reinforcer II</p><p>Federation Navy Hobgoblin x2<br>'Augmented' Hobgoblin x2</p><p>Inferno Rage Rocket x5000<br>Navy Cap Booster 400 x16<br>Inferno Javelin Rocket x5000<br>Pith X-Type Explosive Shield Hardener x1<br>Mobile Depot x1</p>";
+        let eft =
+            regex::Regex::new(r"^\[[^,\]\n]{1,64},[^\]\n]{0,100}\][ \t\r]*\n").expect("pattern");
+        let text = plain_lines(SENT);
+        assert!(
+            text.starts_with("[Mamba, *Mamba Class 2/3]\nDrone Damage Amplifier II\n"),
+            "{text}"
+        );
+        assert!(text.contains("\n'Augmented' Hobgoblin x2\n\nInferno Rage Rocket x5000\n"));
+        assert!(eft.is_match(&text));
+    }
 }
