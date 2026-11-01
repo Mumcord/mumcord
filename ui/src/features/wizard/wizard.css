@@ -294,8 +294,7 @@
 }
 
 .wizard-card,
-.wizard-option,
-.wizard-style-card {
+.wizard-option {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -343,8 +342,7 @@
   align-items: center;
 }
 
-.wizard-option[data-selected="true"],
-.wizard-style-card[data-selected="true"] {
+.wizard-option[data-selected="true"] {
   border-color: var(--color-accent);
   box-shadow: var(--shadow-glow);
 }
@@ -376,111 +374,6 @@
 .wizard-badge--recommended {
   background: var(--gradient-accent);
   color: var(--color-on-accent);
-}
-
-.wizard-tile {
-  display: inline-grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-hover);
-  color: var(--color-accent-text);
-}
-
-/* ---- Setup style cards ---- */
-
-.wizard-style-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.wizard-style-card {
-  cursor: pointer;
-}
-
-.wizard-style-card__top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-/* The native radio stays focusable; the round check next to it is what is drawn. */
-.wizard-style-card__radio {
-  position: absolute;
-  opacity: 0;
-}
-
-.wizard-style-card:has(:focus-visible) {
-  outline: var(--focus-ring-width) solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.wizard-style-card__check {
-  display: inline-grid;
-  place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-full);
-}
-
-.wizard-style-card[data-selected="true"] .wizard-style-card__check {
-  border-color: transparent;
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-.wizard-style-card__check .wizard-icon {
-  width: 1rem;
-  height: 1rem;
-}
-
-.wizard-style-card__heading {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.wizard-style-card__title {
-  font-family: var(--font-family-display);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-}
-
-.wizard-style-card__subtitle {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.wizard-style-card__points {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
-}
-
-.wizard-style-card__point {
-  position: relative;
-  padding-inline-start: var(--space-4);
-}
-
-.wizard-style-card__point::before {
-  position: absolute;
-  inset-inline-start: 0;
-  top: 0.55em;
-  width: 0.4em;
-  height: 0.4em;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  content: "";
 }
 
 /* ---- Appearance ---- */
@@ -660,11 +553,4 @@
   .wizard-footer {
     padding-inline: var(--space-4);
   }
-}
-
-.wizard-style-card__name {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-1);
 }

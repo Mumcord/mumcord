@@ -87,7 +87,7 @@ describe("Wizard (first start)", () => {
     await heading("Sound good?");
     click("Next");
     await heading("How much do you want to share?");
-    expect(screen.getByRole("radio", { name: "Recommended Balanced" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Balanced Recommended" })).toBeChecked();
     click("Finish setup");
     await heading("You're all set, Tobias");
     // Nothing is written before the last button.
@@ -247,7 +247,7 @@ describe("Wizard (first start)", () => {
   it("continues with Enter on radio choices (keyboard only)", async () => {
     renderInWizard(harness, <Wizard />);
     await toSetupStyle();
-    const balanced = screen.getByRole("radio", { name: "Recommended Balanced" });
+    const balanced = screen.getByRole("radio", { name: "Balanced Recommended" });
     balanced.focus();
     fireEvent.keyDown(balanced, { key: "Enter", code: "Enter" });
     const summary = await heading("You're all set, Tobias");

@@ -8,6 +8,14 @@ import { ChangeList } from "./components/ChangeListDialog";
 import { ModalDialog } from "./components/ModalDialog";
 import type { SettingsChanges } from "./useSettingsChanges";
 
+/** The plain consequences each preset card lists (3–4). */
+const POINT_KEYS: Record<SetupPreset, readonly string[]> = {
+  everythingOn: ["point1", "point2", "point3", "point4"],
+  balanced: ["point1", "point2", "point3", "point4"],
+  maximumPrivacy: ["point1", "point2", "point3", "point4"],
+  custom: ["point1", "point2", "point3"],
+};
+
 /** The name the card shows: the preset, "Balanced, customised", "Custom" or "No preset". */
 function usePresetName(changes: SettingsChanges): string {
   const { t } = useTranslation("settings");
@@ -107,7 +115,16 @@ function PresetSwitchDialog({
       ) : (
         <>
           <p>{t("presets.dialogIntro")}</p>
-          <PresetCards value={chosen} onChange={setChosen} legend={t("presets.legend")} />
+          <PresetCards
+            value={chosen}
+            onChange={setChosen}
+            legend={t("presets.legend")}
+            text={(preset) => ({
+              name: t(`presets.${preset}.name`),
+              tagline: t(`presets.${preset}.tagline`),
+              points: POINT_KEYS[preset].map((point) => t(`presets.${preset}.${point}`)),
+            })}
+          />
         </>
       )}
       <div className="settings-dialog__actions">
