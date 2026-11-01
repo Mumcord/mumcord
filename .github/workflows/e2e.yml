@@ -118,6 +118,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: e2e-build
+          # A re-run of the same run must replace the first attempt's artifact, otherwise the
+          # shards can download the stale one.
+          overwrite: true
           path: |
             e2e-image.tar.zst
             e2e-bin.tar.zst
@@ -146,6 +149,7 @@ jobs:
           name: e2e-build
 
       - name: Load image and binaries
+        shell: bash
         run: |
           zstd -dc e2e-image.tar.zst | docker load -q
           mkdir -p "$MUMCORD_E2E_CACHE/target/debug"
