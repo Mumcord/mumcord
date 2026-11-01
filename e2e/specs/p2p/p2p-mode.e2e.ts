@@ -204,7 +204,8 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
     const options = await p2pOptions();
     expect(options.map((o) => o.label)).toEqual(MODES.map((m) => EN_LABELS[m]));
     const a11y = await p2pGroupA11y();
-    expect(a11y.name).toBe("Peer-to-peer mode");
+    // Direct only differs from the preset the wizard started from, so the group says "Changed".
+    expect(a11y.name).toBe("Peer-to-peer mode, Changed");
     expect(a11y.description).toContain("The relay hides it from them");
     await browser.keys(["Escape"]);
   });
