@@ -23,6 +23,7 @@
     "commands": "Orduithe comhrá ar nós /roll a chur leis",
     "chatSend": "Teachtaireacht chomhrá a phostáil ar do shon tar éis cliceála nó ordaithe",
     "chatSupersedes": "A líne téacs féin a cheilt orthu siúd a fheiceann a chárta",
+    "chatTriggers": "Teachtaireachtaí comhrá a thosaíonn lena fhocail spreagtha a léamh, mar shampla !poll",
     "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
     "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)"

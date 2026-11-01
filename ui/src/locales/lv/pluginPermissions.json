@@ -23,6 +23,7 @@
     "commands": "Pievienot tērzēšanas komandas, piemēram, /roll",
     "chatSend": "Nosūtīt tērzēšanas ziņojumu jūsu vārdā pēc klikšķa vai komandas",
     "chatSupersedes": "Paslēpt savu teksta rindu cilvēkiem, kas redz tā kartīti",
+    "chatTriggers": "Lasīt tērzēšanas ziņas, kas sākas ar tā atslēgvārdiem, piem., !poll",
     "netHttp": "Sazināties ar jūsu izvēlētu serveri",
     "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
     "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)"

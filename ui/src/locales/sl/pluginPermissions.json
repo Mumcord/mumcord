@@ -23,6 +23,7 @@
     "commands": "Dodaj klepetalne ukaze, kot je /roll",
     "chatSend": "Po vašem kliku ali ukazu objavi klepetalno sporočilo namesto vas",
     "chatSupersedes": "Skrij lastno vrstico besedila osebam, ki vidijo njegovo kartico",
+    "chatTriggers": "Brati sporočila v klepetu, ki se začnejo z njegovimi sprožilnimi besedami, npr. !poll",
     "netHttp": "Komuniciraj s strežnikom, ki ga izberete",
     "secrets": "Shrani skrivnost (npr. ključ API) v sistemsko zbirko ključev",
     "uiWebview": "Prikaži lastno spletno vsebino v izoliranem okvirju (brez interneta)"

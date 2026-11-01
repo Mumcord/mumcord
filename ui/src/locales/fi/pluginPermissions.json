@@ -23,6 +23,7 @@
     "commands": "Lisätä keskustelukomentoja kuten /roll",
     "chatSend": "Lähettää keskusteluviestin puolestasi napsautuksen tai komennon jälkeen",
     "chatSupersedes": "Piilottaa oma tekstirivinsä niiltä, jotka näkevät sen kortin",
+    "chatTriggers": "Lukea chat-viestejä, jotka alkavat sen käynnistyssanoilla, esim. !poll",
     "netHttp": "Keskustella valitsemasi palvelimen kanssa",
     "secrets": "Säilyttää salaisuus (esim. API-avain) järjestelmäsi avainnipussa",
     "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä (ei internetiä)"

@@ -90,6 +90,20 @@ interface events {
     direct: bool,
   }
 
+  /// `chat.triggers`: a channel message in the user's current channel that starts with one of
+  /// this plugin's declared trigger words (manifest `triggers`), e.g. `!poll 2` from someone
+  /// on a plain Mumble client. Nothing else of the chat ever reaches a plugin. Messages from
+  /// blocked users never arrive, the user's own messages do, and each sender is limited to 2
+  /// per second (more are dropped).
+  record chat-trigger {
+    sender: peer,
+    /// The declared trigger word, lowercase, e.g. '!poll'.
+    trigger: string,
+    /// The rest of the first line after the trigger, trimmed; at most 200 characters, possibly
+    /// empty. Untrusted: validate before use.
+    args: string,
+  }
+
   record http-result {
     id: request-id,
     outcome: result<http-response, http-error>,
@@ -138,5 +152,7 @@ interface events {
     /// `ui.webview`: a message from this plugin's web view page (at most 16 KiB). Untrusted:
     /// validate before use.
     webview-message(string),
+    /// `chat.triggers`: someone wrote one of this plugin's trigger words in the user's channel.
+    chat-trigger(chat-trigger),
   }
 }

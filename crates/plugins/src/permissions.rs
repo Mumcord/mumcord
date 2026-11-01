@@ -95,6 +95,11 @@ pub const CATALOGUE: &[Permission] = &[
         Risk::Green,
         "Hide its own text line for people who see its card",
     ),
+    all(
+        "chat.triggers",
+        Risk::Yellow,
+        "Read chat messages that start with its trigger words, such as !poll",
+    ),
     official("net.http", Risk::Red, "Talk to a server you choose"),
     official(
         "secrets",
@@ -119,11 +124,11 @@ mod tests {
 
     #[test]
     fn catalogue_is_closed_and_unique() {
-        assert_eq!(CATALOGUE.len(), 19);
+        assert_eq!(CATALOGUE.len(), 20);
         let mut ids: Vec<_> = CATALOGUE.iter().map(|p| p.id).collect();
         ids.sort_unstable();
         ids.dedup();
-        assert_eq!(ids.len(), 19);
+        assert_eq!(ids.len(), 20);
         assert!(get("files").is_none());
     }
 

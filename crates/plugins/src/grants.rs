@@ -75,6 +75,7 @@ pub fn event_permission(event: &Event) -> Option<&'static str> {
         Event::DialogClosed => "ui.dialog",
         Event::HttpResponse(_) => "net.http",
         Event::WebviewMessage(_) => "ui.webview",
+        Event::ChatTrigger(_) => "chat.triggers",
         Event::ThemeChanged(_)
         | Event::LanguageChanged(_)
         | Event::SettingsChanged(_)
@@ -143,6 +144,11 @@ mod tests {
             Event::UserMenuRequested(peer()),
             Event::DialogClosed,
             Event::WebviewMessage(String::new()),
+            Event::ChatTrigger(crate::wit::events::ChatTrigger {
+                sender: peer(),
+                trigger: "!poll".into(),
+                args: String::new(),
+            }),
         ];
         for event in &events {
             let id = event_permission(event).expect("needs a permission");

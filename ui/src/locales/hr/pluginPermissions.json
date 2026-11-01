@@ -23,6 +23,7 @@
     "commands": "Dodaj chat naredbe poput /roll",
     "chatSend": "Objavi chat poruku umjesto vas nakon klika ili naredbe",
     "chatSupersedes": "Sakrij vlastiti redak teksta osobama koje vide njegovu karticu",
+    "chatTriggers": "Čitati poruke u chatu koje počinju njegovim okidačkim riječima, npr. !poll",
     "netHttp": "Komuniciraj s poslužiteljem koji odaberete",
     "secrets": "Pohrani tajnu (npr. API ključ) u sistemski privjesak ključeva",
     "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru (bez interneta)"

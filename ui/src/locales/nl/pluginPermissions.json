@@ -23,6 +23,7 @@
     "commands": "Chatopdrachten toevoegen zoals /roll",
     "chatSend": "Een chatbericht voor je plaatsen na een klik of opdracht",
     "chatSupersedes": "Zijn eigen tekstregel verbergen voor mensen die de kaart zien",
+    "chatTriggers": "Chatberichten lezen die beginnen met zijn triggerwoorden, zoals !poll",
     "netHttp": "Praten met een server die je kiest",
     "secrets": "Een geheim (bijv. een API-sleutel) bewaren in de sleutelhanger van je systeem",
     "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)"

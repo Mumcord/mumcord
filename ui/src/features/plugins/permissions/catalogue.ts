@@ -21,6 +21,7 @@ export const PERMISSION_RISK = {
   commands: "green",
   "chat.send": "yellow",
   "chat.supersedes": "green",
+  "chat.triggers": "yellow",
   "net.http": "red",
   secrets: "red",
   "ui.webview": "yellow",

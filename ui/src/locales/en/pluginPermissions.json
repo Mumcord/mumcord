@@ -23,6 +23,7 @@
     "commands": "Add chat commands such as /roll",
     "chatSend": "Post a chat message for you after you click or type a command",
     "chatSupersedes": "Hide its own text line for people who see its card",
+    "chatTriggers": "Read chat messages that start with its trigger words, such as !poll",
     "netHttp": "Talk to a server you choose",
     "secrets": "Keep a secret (e.g. an API key) in your system keychain",
     "uiWebview": "Show its own web content in a sealed frame (no internet)"

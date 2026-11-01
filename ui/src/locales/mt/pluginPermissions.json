@@ -23,6 +23,7 @@
     "commands": "Żid kmandi taċ-chat bħal /roll",
     "chatSend": "Ippubblika messaġġ taċ-chat f'ismek wara klikk jew kmand",
     "chatSupersedes": "Aħbi r-riga tat-test tiegħu stess għal dawk li jaraw il-karta tiegħu",
+    "chatTriggers": "Jaqra messaġġi taċ-chat li jibdew bil-kliem ta' attivazzjoni tiegħu, bħal !poll",
     "netHttp": "Kellem server li tagħżel int",
     "secrets": "Żomm sigriet (eż. ċavetta API) fil-keychain tas-sistema tiegħek",
     "uiWebview": "Uri l-kontenut tal-web tiegħu stess f'qafas issiġillat (mingħajr internet)"

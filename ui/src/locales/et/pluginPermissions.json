@@ -23,6 +23,7 @@
     "commands": "Lisada vestluskäske nagu /roll",
     "chatSend": "Postitada sinu eest vestlussõnum pärast klõpsu või käsku",
     "chatSupersedes": "Peita oma tekstirida neile, kes näevad selle kaarti",
+    "chatTriggers": "Lugeda vestlussõnumeid, mis algavad tema käivitussõnadega, nt !poll",
     "netHttp": "Suhelda sinu valitud serveriga",
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
     "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)"

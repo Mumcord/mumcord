@@ -28,7 +28,7 @@ describe("permission catalogue", () => {
   ].map((m) => [m[1], (m[2] ?? "").toLowerCase()]);
 
   it("matches the Rust catalogue (ids and risks)", () => {
-    expect(rustEntries).toHaveLength(19);
+    expect(rustEntries).toHaveLength(20);
     expect(Object.fromEntries(rustEntries)).toEqual(PERMISSION_RISK);
   });
 

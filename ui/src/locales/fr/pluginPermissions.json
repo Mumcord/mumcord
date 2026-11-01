@@ -23,6 +23,7 @@
     "commands": "Ajouter des commandes de chat comme /roll",
     "chatSend": "Publier un message de chat à votre place après un clic ou une commande",
     "chatSupersedes": "Masquer sa propre ligne de texte pour les personnes qui voient sa carte",
+    "chatTriggers": "Lire les messages du chat qui commencent par ses mots déclencheurs, comme !poll",
     "netHttp": "Communiquer avec un serveur de votre choix",
     "secrets": "Conserver un secret (p. ex. une clé d'API) dans le trousseau de votre système",
     "uiWebview": "Afficher son propre contenu web dans un cadre isolé (sans internet)"

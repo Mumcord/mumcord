@@ -122,6 +122,7 @@ fn every_event_of_fr_6_16_exists() {
             // Answers to asynchronous calls, which may not block for longer than 50 ms.
             "http-response",
             "webview-message",
+            "chat-trigger",
         ]
     );
 }

@@ -23,6 +23,7 @@
     "commands": "Tilføje chatkommandoer som /roll",
     "chatSend": "Sende en chatbesked for dig efter et klik eller en kommando",
     "chatSupersedes": "Skjule sin egen tekstlinje for dem, der ser dets kort",
+    "chatTriggers": "Læse chatbeskeder, der starter med dens udløserord, f.eks. !poll",
     "netHttp": "Tale med en server, du vælger",
     "secrets": "Gemme en hemmelighed (f.eks. en API-nøgle) i dit systems nøglering",
     "uiWebview": "Vise eget webindhold i en lukket ramme (uden internet)"

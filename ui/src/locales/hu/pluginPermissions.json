@@ -23,6 +23,7 @@
     "commands": "Csevegőparancsok hozzáadása, például /roll",
     "chatSend": "Csevegőüzenet küldése a nevedben kattintás vagy parancs után",
     "chatSupersedes": "Saját szövegsorának elrejtése azok elől, akik látják a kártyáját",
+    "chatTriggers": "A csevegés azon üzeneteinek olvasása, amelyek a kulcsszavaival kezdődnek, pl. !poll",
     "netHttp": "Kommunikáció egy általad választott kiszolgálóval",
     "secrets": "Titok (pl. API-kulcs) tárolása a rendszer kulcstartójában",
     "uiWebview": "Saját webes tartalom megjelenítése elszigetelt keretben (internet nélkül)"

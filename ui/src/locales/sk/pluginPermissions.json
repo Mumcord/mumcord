@@ -23,6 +23,7 @@
     "commands": "Pridať chatové príkazy ako /roll",
     "chatSend": "Odoslať za vás správu v chate po kliknutí alebo príkaze",
     "chatSupersedes": "Skryť vlastný textový riadok ľuďom, ktorí vidia jeho kartu",
+    "chatTriggers": "Čítať správy v chate, ktoré sa začínajú jeho spúšťacími slovami, napr. !poll",
     "netHttp": "Komunikovať so serverom, ktorý si vyberiete",
     "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
     "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)"

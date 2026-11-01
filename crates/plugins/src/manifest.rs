@@ -33,6 +33,8 @@ const MAX_SHORT_TEXT_CHARS: usize = 64;
 const MAX_PATH_CHARS: usize = 128;
 const MAX_AUTHORS: usize = 8;
 const MAX_CATEGORIES: usize = 3;
+/// At most this many chat trigger words per plugin.
+pub const MAX_TRIGGERS: usize = 4;
 
 /// Categories in the browse view.
 pub const CATEGORIES: &[&str] = &[
@@ -78,6 +80,8 @@ pub struct Manifest {
     pub storage_quota_kib: u32,
     pub messaging: Messaging,
     pub commands: Vec<Command>,
+    /// Chat trigger words such as `!poll` (permission `chat.triggers`); see [`is_trigger`].
+    pub triggers: Vec<String>,
     pub net: Option<Net>,
     /// Path of the icon under `assets/`.
     pub icon: Option<String>,
@@ -173,6 +177,8 @@ pub enum ManifestError {
     },
     #[error("The command \"{0}\" is declared twice")]
     DuplicateCommand(String),
+    #[error("The trigger \"{0}\" is declared twice")]
+    DuplicateTrigger(String),
     #[error("The path \"{0}\" is not a safe relative path inside the package")]
     BadPath(String),
     #[error("{field} must be between {min} and {max}")]
@@ -207,6 +213,8 @@ struct RawManifest {
     messaging: RawMessaging,
     #[serde(default)]
     commands: Vec<Command>,
+    #[serde(default)]
+    triggers: Vec<String>,
     net: Option<Net>,
     icon: Option<String>,
 }
@@ -365,6 +373,32 @@ impl RawManifest {
                 permission: "commands",
             });
         }
+        if self.triggers.len() > MAX_TRIGGERS {
+            return Err(ManifestError::OutOfRange {
+                field: "triggers",
+                min: 0,
+                max: MAX_TRIGGERS as u32,
+            });
+        }
+        let mut triggers = BTreeSet::new();
+        for trigger in &self.triggers {
+            if !is_trigger(trigger) {
+                return Err(bad_value(
+                    "triggers",
+                    "trigger word (! then 2 to 16 of a-z, 0-9, -, starting with a letter)",
+                    trigger,
+                ));
+            }
+            if !triggers.insert(trigger.as_str()) {
+                return Err(ManifestError::DuplicateTrigger(trigger.clone()));
+            }
+        }
+        if !self.triggers.is_empty() && !has("chat.triggers") {
+            return Err(ManifestError::MissingPermission {
+                field: "triggers",
+                permission: "chat.triggers",
+            });
+        }
         if self.net.is_some() != has("net.http") {
             return Err(ManifestError::MissingPermission {
                 field: if self.net.is_some() {
@@ -421,6 +455,7 @@ impl RawManifest {
             storage_quota_kib,
             messaging,
             commands: self.commands,
+            triggers: self.triggers,
             net: self.net,
             icon: self.icon,
         })
@@ -440,6 +475,18 @@ pub fn is_valid_id(id: &str) -> bool {
 /// `^[a-z0-9-]{2,16}$` (FR-6.43)
 fn is_command_name(name: &str) -> bool {
     (2..=16).contains(&name.len())
+        && name
+            .bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
+/// `^![a-z][a-z0-9-]{1,15}$`, e.g. `!poll`.
+pub fn is_trigger(word: &str) -> bool {
+    let Some(name) = word.strip_prefix('!') else {
+        return false;
+    };
+    (2..=16).contains(&name.len())
+        && name.starts_with(|c: char| c.is_ascii_lowercase())
         && name
             .bytes()
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
@@ -794,6 +841,62 @@ mod tests {
             Err(ManifestError::MissingPermission {
                 field: "commands",
                 permission: "commands"
+            })
+        );
+    }
+
+    #[test]
+    fn triggers_are_checked() {
+        let grant = |v: &mut serde_json::Value| {
+            v["permissions"]["optional"] = serde_json::json!(["chat.triggers"]);
+        };
+        let m = with(|v| {
+            grant(v);
+            v["triggers"] = serde_json::json!(["!poll", "!p2-x"]);
+        })
+        .expect("valid");
+        assert_eq!(m.triggers, ["!poll", "!p2-x"]);
+        assert!(with(|_| {}).expect("valid").triggers.is_empty());
+        for word in [
+            "poll",
+            "!p",
+            "!Poll",
+            "!2poll",
+            "!po ll",
+            "!a-very-long-trigger",
+            "!",
+        ] {
+            assert!(
+                with(|v| {
+                    grant(v);
+                    v["triggers"] = serde_json::json!([word]);
+                })
+                .is_err(),
+                "{word}"
+            );
+        }
+        assert_eq!(
+            with(|v| {
+                grant(v);
+                v["triggers"] = serde_json::json!(["!poll", "!poll"]);
+            }),
+            Err(ManifestError::DuplicateTrigger("!poll".into()))
+        );
+        assert!(matches!(
+            with(|v| {
+                grant(v);
+                v["triggers"] = serde_json::json!(["!a1", "!a2", "!a3", "!a4", "!a5"]);
+            }),
+            Err(ManifestError::OutOfRange {
+                field: "triggers",
+                ..
+            })
+        ));
+        assert_eq!(
+            with(|v| v["triggers"] = serde_json::json!(["!poll"])),
+            Err(ManifestError::MissingPermission {
+                field: "triggers",
+                permission: "chat.triggers"
             })
         );
     }

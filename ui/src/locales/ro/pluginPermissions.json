@@ -23,6 +23,7 @@
     "commands": "Adaugă comenzi de chat precum /roll",
     "chatSend": "Postează un mesaj de chat în numele tău după un clic sau o comandă",
     "chatSupersedes": "Ascunde propria linie de text pentru persoanele care îi văd cardul",
+    "chatTriggers": "Citește mesajele din chat care încep cu cuvintele sale declanșatoare, de ex. !poll",
     "netHttp": "Comunică cu un server ales de tine",
     "secrets": "Păstrează un secret (de ex. o cheie API) în breasla de chei a sistemului",
     "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)"

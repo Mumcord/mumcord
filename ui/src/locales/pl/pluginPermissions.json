@@ -23,6 +23,7 @@
     "commands": "Dodawać polecenia czatu, np. /roll",
     "chatSend": "Wysłać wiadomość na czacie w Twoim imieniu po kliknięciu lub poleceniu",
     "chatSupersedes": "Ukrywać własny wiersz tekstu dla osób, które widzą jej kartę",
+    "chatTriggers": "Czytać wiadomości na czacie zaczynające się od jego słów wyzwalających, np. !poll",
     "netHttp": "Łączyć się z wybranym przez Ciebie serwerem",
     "secrets": "Przechowywać sekret (np. klucz API) w systemowym pęku kluczy",
     "uiWebview": "Pokazywać własną treść internetową w izolowanej ramce (bez internetu)"
