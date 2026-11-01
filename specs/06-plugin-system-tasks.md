@@ -622,3 +622,6 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - Replay: command `plugins_replay_chat(serverId, channelId)`, called by UI after channel history load and on plugins://changed; newest 100 stored messages, blocked senders skipped, ≤ 20 events/plugin, once per (plugin, message). Replays pattern matches, trigger lines (to the word owner) and own "[Name] " lines (chat-match with pattern-index 255, needs chat.send). `chat.is-replay()` true during replay; only plugins importing is-replay get replays.
 - SDK: `chat_card::{replace_message(card) -> Ok(bool), hide_message(), is_replay(), OWN_LINE}`. Host draws plugin icon (initial fallback) + "Show original text" toggle on replaced/hidden lines.
 - Plugins: Poll → hide_message() in ChatTrigger, skip counting if is_replay(), supersede old lines via OWN_LINE. Eve-fit → replace_message(card) BEFORE ui::show(ChatCard).
+
+### Acceptance results
+- C8 ✅ AC-6.18–6.21 (abe858b5, tools/mumcord-plugin/tests/registry_checks.rs; c8-registry)
