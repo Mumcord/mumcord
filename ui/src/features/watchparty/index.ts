@@ -1,5 +1,4 @@
-export { WatchPartyPanel } from "./WatchPartyPanel";
-export { WatchTogetherView } from "./WatchTogetherView";
+// The views opened on demand are not re-exported here: they load as chunks of their own (issue #323).
 export { WatchMiniBar } from "./WatchMiniBar";
 export { WatchHeaderActions, WatchHeaderTitle } from "./WatchHeader";
 export { WatchingList } from "./WatchingList";

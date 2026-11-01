@@ -1,5 +1,5 @@
 /** The media views of issue #163 sit under the chat header, not over it. */
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../api";
 import { selectConversation } from "../features/channels";
@@ -42,6 +42,10 @@ describe("chat mount", () => {
     startWatching(1, ANNA);
     const { container } = render(<ChatMount />);
     const header = await screen.findByRole("heading", { level: 2 });
+    // The share view loads as a chunk of its own (issue #323).
+    await waitFor(() => {
+      expect(container.querySelector(".media-frame")).not.toBeNull();
+    });
     const frame = container.querySelector(".media-frame");
     const list = container.querySelector(".chat-list");
 

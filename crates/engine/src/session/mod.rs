@@ -1029,7 +1029,9 @@ impl Engine {
     /// [`Engine::disconnect`] it keeps the voice channel, so the next start offers to rejoin
     /// it (QA.9), and records which servers were connected for the next start (FR-2.7). The
     /// returned future resolves once the connections have sent what was still queued (chat,
-    /// status, plugin data), at most [`SHUTDOWN_DRAIN`] later; await it before exiting.
+    /// status, plugin data), at most [`SHUTDOWN_DRAIN`] later; await it before exiting. While
+    /// in a voice channel it also waits for the quit sound (#325), at most
+    /// [`QUIT_WAIT_MAX`](crate::sounds::QUIT_WAIT_MAX), in parallel with the drain.
     pub fn shutdown(&self) -> impl Future<Output = ()> + Send + use<> {
         let mut core = lock(&self.inner.core);
         let mut slots: Vec<(ServerId, u64)> = core
@@ -1051,6 +1053,7 @@ impl Engine {
             .values()
             .filter_map(|slot| slot.session.as_ref().map(|s| s.handle.closed()))
             .collect();
+        let sound = self.inner.quit_sound(&mut core);
         for server_id in connected {
             self.inner.close_slot(&mut core, server_id, None);
         }
@@ -1060,13 +1063,17 @@ impl Engine {
                 closed.await;
             }
         };
-        async move {
+        let drained = async move {
             if tokio::time::timeout(SHUTDOWN_DRAIN, all_closed)
                 .await
                 .is_err()
             {
                 tracing::warn!("connections did not close in time on shutdown");
             }
+        };
+        // The quit sound plays while the connections drain, not after.
+        async move {
+            tokio::join!(drained, tokio::time::sleep(sound));
         }
     }
 
@@ -1167,16 +1174,18 @@ impl Engine {
                 .map(|s| s.self_voice)
                 .ok_or_else(EngineError::not_connected)?;
             let joins = joins_voice(!here, voice);
+            let switches = !here && voice.own().is_some();
             voice.join(own);
-            joins.then_some(voice)
+            joins.then_some((voice, switches))
         };
         // Before the voice change is sent, so the hub knows its echo when it arrives.
-        if let Some(voice) = joined {
-            self.inner.events.sounds().voice_join(
-                (!here).then_some(channel_id),
-                voice.mute,
-                voice.deaf,
-            );
+        if let Some((voice, switches)) = joined {
+            let sounds = self.inner.events.sounds();
+            if switches {
+                sounds.channel_switch(channel_id, voice.mute, voice.deaf);
+            } else {
+                sounds.voice_join((!here).then_some(channel_id), voice.mute, voice.deaf);
+            }
         }
         self.inner.change_self_voice(server_id, |v| v.join(own))?;
         // The server's echo of the move may come too late, e.g. when the app quits right away.
@@ -1431,10 +1440,17 @@ impl Engine {
     /// Plays a short sound on the output device, for the "Test sound" button. Only audible
     /// while voice audio runs (the popover is only reachable then).
     pub fn audio_test_sound(&self) {
+        let sounds = self.inner.events.sounds();
+        sounds.play_test(crate::sounds::Sound::Message, sounds.theme());
+    }
+
+    /// Plays the connect sound of `theme` for the sound theme preview (#325), whether or not
+    /// that theme is saved yet. Like the test sound, only audible while voice audio runs.
+    pub fn preview_sound_theme(&self, theme: mumcord_store::SoundTheme) {
         self.inner
             .events
             .sounds()
-            .play_test(crate::sounds::Sound::Message);
+            .play_test(crate::sounds::Sound::VoiceJoin, theme);
     }
 
     /// Ends the mic test wherever it is; voice of a connected session resumes.
@@ -1671,6 +1687,22 @@ impl Inner {
         self.stop_pipeline(core);
         if let Some(audio) = core.audio.as_ref() {
             audio.play_tail(&self.rt, &samples);
+        }
+    }
+
+    /// The user quits while in a voice channel (#325): plays the quit sound on its own
+    /// short-lived player, like the hang-up sound, and returns how long the quit should wait
+    /// for it. No sound (not in voice, toggle off, deafened) or a failed playback means no wait.
+    fn quit_sound(&self, core: &mut Core) -> Duration {
+        let Some(samples) = self.events.sounds().quit(core.voice_server.is_some()) else {
+            return Duration::ZERO;
+        };
+        self.stop_pipeline(core);
+        match core.audio.as_ref() {
+            Some(audio) if audio.play_tail(&self.rt, &samples) => {
+                crate::sounds::quit_wait(samples.len())
+            }
+            _ => Duration::ZERO,
         }
     }
 

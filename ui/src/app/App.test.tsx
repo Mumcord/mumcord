@@ -112,7 +112,7 @@ describe("App", () => {
   it("hides Settings during a theme preview and restores it with the draft", async () => {
     await renderWith("ready");
     fireEvent.click(await screen.findByRole("button", { name: "Open settings" }));
-    fireEvent.click(screen.getByRole("tab", { name: "Appearance" }));
+    fireEvent.click(await screen.findByRole("tab", { name: "Appearance" }));
     fireEvent.click(await screen.findByRole("button", { name: "New theme from the current one" }));
     const editor = screen.getByRole("dialog", { name: /^New theme/ });
     const accent = within(editor).getByRole("textbox", { name: "Accent, Dark" });

@@ -1,8 +1,7 @@
+// The views opened on demand are not re-exported here: they load as chunks of their own (issue #323).
 export { LiveBadge } from "./LiveBadge";
 export { useOwnShare, type OwnShareState } from "./useOwnShare";
 export { resetScreenShareStore, useIsLive, useScreenShareOf, useScreenShares } from "./sharesStore";
-export { ScreenShareView } from "./ScreenShareView";
-export { ViewerPanel } from "./ViewerPanel";
 export { resetWatchingStore, startWatching, stopWatching, useWatchedShare } from "./watching";
 export { SharerBar } from "./SharerBar";
 export { ShareMiniBar } from "./ShareMiniBar";

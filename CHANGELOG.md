@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
+- Mumcord now opens with a **start screen** (the logo on the theme background with a slim loading bar) instead of an empty white window and a bare "Loading…" text. The window only appears once the start screen is drawn, the start screen follows your system theme (or the fixed theme you picked) and fades into the app when it is ready; with reduced motion it switches without movement (#323)
+
 ### Added
 
 - **Plugins**: small add-ons that give Mumcord new features. A new **Settings > Plugins** page has five tabs: **Installed** (switch a plugin on or off, change its permissions, settings and who it talks to, see diagnostics, export or reset its data, remove it with or without its data), **Browse** (official plugins by category, with search), **Updates**, **Repositories** and, with Developer mode on, **Developer**. No plugin is installed by default. Plugins also run while you are not connected to a server. **Plugins** is in the command palette too.
@@ -31,6 +36,9 @@
 - Mumbot now introduces itself to Mumcord, so Mumcord knows which users are bots and what they can do; "Configure bot" appears only on bots that offer music.
 - Safety: plugins run in a sealed sandbox with no access to your network, files or audio other than what Mumcord offers them, and with limits on memory and time. A plugin that keeps crashing is turned off, and nothing affects your voice. **Turn off all plugins** (Settings > Plugins and the command palette) stops them all at once, and starting Mumcord with `--no-plugins` loads none. Official plugins are signed and checked on install and after every Mumcord update; a **kill switch** can disable a plugin that turns out to be harmful, with the reason shown, and is checked once a day even when plugin updates are off.
 - Privacy: checking for plugins sends no identifiers and no list of what you have installed. Plugin data stays on your computer, removing a plugin keeps its data for 30 days unless you delete it, and see PRIVACY.md for the details.
+- A second sound theme, **Rich**: new, fuller notification sounds for connecting to voice, new messages, mentions, microphone mute and unmute, deafen and undeafen, someone joining or leaving your channel, leaving voice, being kicked and being banned. Settings > Sounds has a **Sound theme** switch with a preview button to choose between Rich (the default) and **Classic**, the familiar short synthesized tones; the theme applies to every notification sound at once (#325)
+- Quitting Mumcord while you are in a voice channel plays a short, distinctive goodbye sound, so you notice that you just left voice. It plays on every real quit (window close set to Quit, tray Quit, the quit menu or shortcut, and restarting for an update), never when Mumcord only minimises to the tray or when you are not in voice, and it follows the output volume, deafen, the sound theme and its own switch in Settings > Sounds (on by default). Mumcord waits for it at most 1.5 seconds, in parallel with closing the connections; a second quit request exits at once. The sound is local only: others still see the normal leave from the server (#325)
+- Switching to another channel while you are in voice plays its own short channel-switch sound instead of the connect sound, with its own switch in Settings > Sounds (on by default) and a variant in both sound themes (#325)
 
 ### Fixed
 
@@ -40,8 +48,10 @@
 - A plugin that could not be loaded now keeps its name (in your language) and icon in **Settings > Plugins > Installed** instead of showing its internal id
 - A plugin window that shows a web page (for example the EVE fit fitting wheel) now opens right after installing or updating the plugin, instead of only after restarting Mumcord
 - A plugin button that leads to its permissions (for example Poll's **Turn on !poll voting**) now opens that plugin's permissions in **Settings > Plugins > Installed** instead of only the list
-
 - The Poll chat card shows its top three options in full again instead of fading the third one behind **Show more**
+- The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)
+- The "simultaneously connected servers" number field in Settings > Server is no longer stretched across the whole card; it is now as narrow as the number it holds (#320)
+
 ### Internal
 
 - Plugin runtime (Epic 3.1, #268): the new `crates/plugins` runs plugins as WebAssembly components in wasmtime without WASI, so a plugin can only call what Mumcord offers (for now only its own log). Each plugin gets its own store with a 32 MiB memory limit and a CPU deadline per call (500 ms for start, 50 ms otherwise); a plugin that loops, runs out of memory or crashes is stopped while everything else keeps running, restarts with back-off and stays off after 3 failures in 10 minutes. The first version of the plugin API (`mumcord:plugin@1.0.0`) lives in `crates/plugins/wit/`. Not linked into the app yet.

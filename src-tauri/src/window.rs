@@ -1,5 +1,6 @@
 //! Main window behaviour: what closing the window does (FR-1.38) and clean shutdown.
 
+use std::sync::Mutex;
 use std::time::Duration;
 
 use mumcord_engine::{ConnState, Engine, store::CloseBehaviour};
@@ -104,12 +105,89 @@ pub fn show(app: &AppHandle) {
     }
 }
 
+/// Longest wait for the page to paint its start screen before the window is shown anyway, so a
+/// slow or broken page can never keep the window hidden.
+const PAINT_FALLBACK: Duration = Duration::from_secs(1);
+
+/// Coordinates the first reveal of the main window: it waits until the page holds its start
+/// screen (so the first frame shown is that screen, not an empty white window) and the start
+/// decided the window should be shown (not a start at login into the tray). Either can happen
+/// first; the window is shown once.
+#[derive(Default)]
+pub struct StartReveal(Mutex<RevealState>);
+
+#[derive(Default)]
+struct RevealState {
+    painted: bool,
+    wanted: bool,
+    shown: bool,
+}
+
+impl StartReveal {
+    fn lock(&self) -> std::sync::MutexGuard<'_, RevealState> {
+        // The state is three flags; a panic elsewhere can't leave them inconsistent.
+        self.0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
+    /// The page painted its first frame. True when the window should be shown now.
+    pub fn painted(&self) -> bool {
+        let mut state = self.lock();
+        state.painted = true;
+        let ready = state.wanted;
+        Self::reveal_if(&mut state, ready)
+    }
+
+    /// The start wants the window visible. True when the page has already painted.
+    fn wanted(&self) -> bool {
+        let mut state = self.lock();
+        state.wanted = true;
+        let ready = state.painted;
+        Self::reveal_if(&mut state, ready)
+    }
+
+    /// The paint wait timed out. True when the window is still waiting to be shown.
+    fn timed_out(&self) -> bool {
+        let mut state = self.lock();
+        let ready = state.wanted;
+        Self::reveal_if(&mut state, ready)
+    }
+
+    fn reveal_if(state: &mut RevealState, ready: bool) -> bool {
+        if !ready || state.shown {
+            return false;
+        }
+        state.shown = true;
+        true
+    }
+}
+
+/// The page holds its start screen, ready for the first frame (see `ui/index.html`); shows the
+/// window if the start wants it visible.
+pub fn on_start_painted(app: &AppHandle) {
+    if app.state::<StartReveal>().painted() {
+        show(app);
+    }
+}
+
 /// The window starts invisible (tauri.conf.json) so a start at login can stay in the tray
-/// without flashing up first. Without a visible tray it goes to the taskbar instead, so it can
-/// never get lost.
+/// without flashing up first, and so it first appears with the painted start screen. Without a
+/// visible tray it goes to the taskbar instead, so it can never get lost.
 pub fn reveal_at_start(app: &AppHandle, start_hidden: bool) {
     if !start_hidden {
-        show(app);
+        if app.state::<StartReveal>().wanted() {
+            show(app);
+            return;
+        }
+        let app = app.clone();
+        tauri::async_runtime::spawn(async move {
+            tokio::time::sleep(PAINT_FALLBACK).await;
+            if app.state::<StartReveal>().timed_out() {
+                tracing::warn!("the start screen did not paint in time; showing the window");
+                show(&app);
+            }
+        });
         return;
     }
     let app = app.clone();
@@ -170,7 +248,9 @@ pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 
         return;
     }
     // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits (bounded)
-    // until the connections have sent what is still queued and their TLS close.
+    // until the connections have sent what is still queued and their TLS close, and for the
+    // quit sound (#325). A second quit request finds no connection left and exits at once, so
+    // the wait never blocks a forced quit.
     let closed = app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
@@ -182,6 +262,40 @@ pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_window_waits_for_the_first_paint() {
+        let reveal = StartReveal::default();
+        assert!(!reveal.wanted());
+        assert!(reveal.painted());
+        assert!(
+            !reveal.timed_out(),
+            "the fallback must not show it a second time"
+        );
+    }
+
+    #[test]
+    fn a_paint_before_the_start_decision_shows_the_window_on_the_decision() {
+        let reveal = StartReveal::default();
+        assert!(!reveal.painted());
+        assert!(reveal.wanted());
+        assert!(!reveal.painted());
+    }
+
+    #[test]
+    fn the_fallback_shows_the_window_when_the_page_never_paints() {
+        let reveal = StartReveal::default();
+        assert!(!reveal.wanted());
+        assert!(reveal.timed_out());
+        assert!(!reveal.painted(), "a late paint must not show it again");
+    }
+
+    #[test]
+    fn a_start_into_the_tray_ignores_the_paint() {
+        let reveal = StartReveal::default();
+        assert!(!reveal.painted());
+        assert!(!reveal.timed_out());
+    }
 
     #[test]
     fn closing_without_a_connection_always_quits() {

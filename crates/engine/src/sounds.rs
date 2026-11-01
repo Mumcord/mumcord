@@ -2,6 +2,9 @@
 //! your own mute/deafen changes, new messages, your own join of a channel for voice (QA.23) and
 //! hanging up (QA.19). No speech.
 //!
+//! Every sound comes in two themes (#325), chosen in the settings: Classic (short synthesized
+//! tones) and Rich (ElevenLabs sounds). A sound one theme lacks plays from the other.
+//!
 //! The [`SoundHub`] observes the engine's own event flow ([`crate::session::Events::emit`]),
 //! tracks who is in your channel, maps events to a [`Sound`] and, if the per-event toggle in
 //! the settings allows it, writes the embedded 48 kHz mono samples into the mixer's mix-in
@@ -17,8 +20,13 @@
 //! [`SoundHub::voice_join`] for an explicit join and [`SoundHub::hang_up`] before it tears
 //! down voice for a user-initiated disconnect. A join that moves to another channel sounds only
 //! once the server confirms the move, so a refused join (e.g. a missing channel password) stays
-//! silent. Automatic arrivals (read-only landing, reconnect
-//! restore) and quitting never call them.
+//! silent. Switching to another channel while already in voice there plays the channel-switch
+//! sound in place of the join sound ([`SoundHub::channel_switch`], #325). Automatic arrivals
+//! (read-only landing, reconnect restore) and quitting never call them.
+//!
+//! Quitting while in a voice channel has its own sound (#325): the engine's shutdown asks
+//! [`SoundHub::quit`] for it and waits at most [`QUIT_WAIT_MAX`] (see [`quit_wait`]) before the
+//! app exits.
 //!
 //! Being kicked or banned (#205) has its own sounds: the session code calls
 //! [`SoundHub::removed`] when the server removes the own session, before voice is torn down.
@@ -29,7 +37,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
-use mumcord_store::{SoundSettings, Store};
+use mumcord_store::{SoundSettings, SoundTheme, Store};
 
 use crate::session::EngineEvent;
 
@@ -53,6 +61,11 @@ pub enum Sound {
     VoiceJoin,
     /// You disconnect from a server yourself.
     HangUp,
+    /// You quit Mumcord while in a voice channel (#325).
+    Quit,
+    /// You switch to another channel while in voice (#325); plays in place of
+    /// [`Sound::VoiceJoin`].
+    ChannelSwitch,
     /// Someone starts a watch party in your channel (FR-2.77).
     PartyStarted,
     PartyJoined,
@@ -69,38 +82,96 @@ pub enum Sound {
     Banned,
 }
 
+/// Longest the quit waits for its sound (#325), so quitting never feels stuck.
+pub const QUIT_WAIT_MAX: Duration = Duration::from_millis(1500);
+
+/// Extra time after the quit sound's last sample, so the device plays out its buffer.
+const QUIT_WAIT_MARGIN: Duration = Duration::from_millis(150);
+
+/// How long the quit waits for a quit sound of `samples` 48 kHz samples: the sound plus a short
+/// margin for the device buffer, never more than [`QUIT_WAIT_MAX`]. No sound, no wait.
+pub fn quit_wait(samples: usize) -> Duration {
+    if samples == 0 {
+        return Duration::ZERO;
+    }
+    let sound = Duration::from_secs_f64(samples as f64 / 48_000.0);
+    (sound + QUIT_WAIT_MARGIN).min(QUIT_WAIT_MAX)
+}
+
 /// At most one joining or leaving activity sound per this span (FR-2.77).
 const ACTIVITY_GAP: Duration = Duration::from_secs(1);
 
+/// Embeds the named files of one theme's folder in `assets/sounds/`.
+macro_rules! sound_set {
+    ($dir:literal: $($name:literal),+ $(,)?) => {
+        &[$(($name, include_bytes!(concat!("../../../assets/sounds/", $dir, "/", $name, ".wav")))),+]
+    };
+}
+
+type SoundSet = &'static [(&'static str, &'static [u8])];
+
+/// The synthesized tones of `assets/sounds/classic/generate.py` (plus the kick and ban effects).
+const CLASSIC: SoundSet = sound_set!("classic":
+    "user_joined", "user_left", "mute", "unmute", "deafen", "undeafen", "message", "mention",
+    "voice_join", "hang_up", "quit", "channel_switch", "kicked", "banned",
+);
+
+/// The ElevenLabs sounds of `assets/sounds/rich/`.
+const RICH: SoundSet = sound_set!("rich":
+    "user_joined", "user_left", "mute", "unmute", "deafen", "undeafen", "message", "mention",
+    "voice_join", "hang_up", "quit", "channel_switch", "kicked", "banned",
+);
+
+/// The bundled variant of the sound file `name` in `theme`, if that theme has one.
+fn bundled(theme: SoundTheme, name: &str) -> Option<&'static [u8]> {
+    let set = match theme {
+        SoundTheme::Classic => CLASSIC,
+        SoundTheme::Rich => RICH,
+    };
+    set.iter().find(|(n, _)| *n == name).map(|(_, wav)| *wav)
+}
+
+/// The variant of `name` in `theme`; a sound the theme lacks falls back to the other theme, and
+/// one neither has is empty (silent).
+fn resolve(
+    name: &str,
+    theme: SoundTheme,
+    lookup: impl Fn(SoundTheme, &str) -> Option<&'static [u8]>,
+) -> &'static [u8] {
+    let other = match theme {
+        SoundTheme::Classic => SoundTheme::Rich,
+        SoundTheme::Rich => SoundTheme::Classic,
+    };
+    lookup(theme, name)
+        .or_else(|| lookup(other, name))
+        .unwrap_or_default()
+}
+
 impl Sound {
-    fn wav(self) -> &'static [u8] {
+    /// The bundled file this sound plays. Activity sounds reuse others: starts sound like the
+    /// own join, coming and going like people joining and leaving the channel.
+    fn file(self) -> &'static str {
         match self {
-            Self::UserJoined => include_bytes!("../../../assets/sounds/user_joined.wav"),
-            Self::UserLeft => include_bytes!("../../../assets/sounds/user_left.wav"),
-            Self::Mute => include_bytes!("../../../assets/sounds/mute.wav"),
-            Self::Unmute => include_bytes!("../../../assets/sounds/unmute.wav"),
-            Self::Deafen => include_bytes!("../../../assets/sounds/deafen.wav"),
-            Self::Undeafen => include_bytes!("../../../assets/sounds/undeafen.wav"),
-            Self::Message => include_bytes!("../../../assets/sounds/message.wav"),
-            Self::Mention => include_bytes!("../../../assets/sounds/mention.wav"),
-            Self::VoiceJoin => include_bytes!("../../../assets/sounds/voice_join.wav"),
-            Self::HangUp | Self::ShareStopped => {
-                include_bytes!("../../../assets/sounds/hang_up.wav")
-            }
-            // Activity sounds reuse the bundled ones: starts sound like the own join,
-            // coming and going like people joining and leaving the channel.
-            Self::PartyStarted | Self::ShareStarted => {
-                include_bytes!("../../../assets/sounds/voice_join.wav")
-            }
-            Self::PartyJoined | Self::ViewerStarted => {
-                include_bytes!("../../../assets/sounds/user_joined.wav")
-            }
-            Self::PartyLeft | Self::ViewerStopped => {
-                include_bytes!("../../../assets/sounds/user_left.wav")
-            }
-            Self::Kicked => include_bytes!("../../../assets/sounds/kicked.wav"),
-            Self::Banned => include_bytes!("../../../assets/sounds/banned.wav"),
+            Self::UserJoined | Self::PartyJoined | Self::ViewerStarted => "user_joined",
+            Self::UserLeft | Self::PartyLeft | Self::ViewerStopped => "user_left",
+            Self::Mute => "mute",
+            Self::Unmute => "unmute",
+            Self::Deafen => "deafen",
+            Self::Undeafen => "undeafen",
+            Self::Message => "message",
+            Self::Mention => "mention",
+            Self::VoiceJoin | Self::PartyStarted | Self::ShareStarted => "voice_join",
+            Self::HangUp | Self::ShareStopped => "hang_up",
+            Self::Quit => "quit",
+            Self::ChannelSwitch => "channel_switch",
+            Self::Kicked => "kicked",
+            Self::Banned => "banned",
         }
+    }
+
+    /// The WAV bytes of this sound in `theme`, or in the other theme if `theme` has no variant.
+    fn wav(self, theme: SoundTheme) -> &'static [u8] {
+        resolve(self.file(), theme, bundled)
     }
 
     /// Whether the settings enable this sound.
@@ -114,6 +185,8 @@ impl Sound {
             Self::Mention => s.mention,
             Self::VoiceJoin => s.voice_join,
             Self::HangUp => s.hang_up,
+            Self::Quit => s.quit,
+            Self::ChannelSwitch => s.channel_switch,
             Self::PartyStarted => s.party_started,
             Self::PartyJoined => s.party_joined,
             Self::PartyLeft => s.party_left,
@@ -144,14 +217,17 @@ impl Sound {
         )
     }
 
-    /// 48 kHz mono samples of the sound.
-    pub fn samples(self) -> Vec<f32> {
-        decode_wav(self.wav())
+    /// 48 kHz mono samples of the sound in `theme`.
+    pub fn samples(self, theme: SoundTheme) -> Vec<f32> {
+        decode_wav(self.wav(theme))
     }
 
-    /// Samples with the mix-in gain applied.
-    fn mixed(self) -> Vec<f32> {
-        self.samples().into_iter().map(|s| s * SOUND_GAIN).collect()
+    /// Samples in `theme` with the mix-in gain applied.
+    fn mixed(self, theme: SoundTheme) -> Vec<f32> {
+        self.samples(theme)
+            .into_iter()
+            .map(|s| s * SOUND_GAIN)
+            .collect()
     }
 
     /// A notification about messages or activity, which Do Not Disturb silences (FR-3.111).
@@ -174,12 +250,15 @@ impl Sound {
 
     /// Feedback for the user's own action, so it plays even while deafened.
     fn own_action(self) -> bool {
-        matches!(self, Self::Undeafen | Self::VoiceJoin | Self::HangUp)
+        matches!(
+            self,
+            Self::Undeafen | Self::VoiceJoin | Self::ChannelSwitch | Self::HangUp
+        )
     }
 }
 
-/// Decodes the embedded 16-bit mono WAV files (canonical RIFF layout written by
-/// `assets/sounds/generate.py`); anything unexpected yields silence-free empty output.
+/// Decodes the embedded 16-bit mono WAV files (RIFF chunks as written by ffmpeg or
+/// `generate.py`); anything unexpected yields silence-free empty output.
 fn decode_wav(bytes: &[u8]) -> Vec<f32> {
     let mut pos = 12;
     while pos + 8 <= bytes.len() {
@@ -423,8 +502,9 @@ struct State {
     out: Option<SampleSink>,
     /// The own join sound, waiting for audio that is still starting (link join on connect).
     pending_join: bool,
-    /// The channel an explicit join moves to; its sound waits for the server's confirmation.
-    awaiting_move: Option<u32>,
+    /// The channel an explicit join or switch moves to, with the sound that waits for the
+    /// server's confirmation.
+    awaiting_move: Option<(u32, Sound)>,
     /// When the last rate-limited activity sound was due.
     last_burst: Option<Instant>,
 }
@@ -508,9 +588,11 @@ impl SoundHub {
         if let Some((sound, was_deaf)) = state.tracker.observe(event) {
             self.play_locked(&mut state, sound, was_deaf);
         }
-        if state.awaiting_move.is_some() && state.awaiting_move == state.tracker.own_channel() {
+        if let Some((target, sound)) = state.awaiting_move
+            && state.tracker.own_channel() == Some(target)
+        {
             state.awaiting_move = None;
-            self.join_sound(&mut state);
+            self.arrival_sound(&mut state, sound);
         }
         let deaf = state.tracker.own_deaf();
         for sound in activity {
@@ -529,12 +611,18 @@ impl SoundHub {
         self.play_locked(&mut state, sound, deaf);
     }
 
+    /// The sound theme the settings choose.
+    pub fn theme(&self) -> SoundTheme {
+        (self.settings)().theme
+    }
+
     /// Plays `sound` now whatever the toggles and the deaf state say: the "Test sound" button
     /// of the output popover must be audible so the user can judge the chosen device and volume.
-    pub fn play_test(&self, sound: Sound) {
+    /// `theme` is the one to hear, which may not be saved yet (the sound theme preview).
+    pub fn play_test(&self, sound: Sound, theme: SoundTheme) {
         let mut state = self.state();
         if let Some(out) = state.out.as_mut()
-            && !out(&sound.mixed())
+            && !out(&sound.mixed(theme))
         {
             tracing::debug!("test sound skipped: mixer input is full");
         }
@@ -545,18 +633,32 @@ impl SoundHub {
     /// echo of that change would cause. With a `target` channel to move to, the sound waits
     /// until the server put the user there; if audio is still starting, it plays once it is up.
     pub fn voice_join(&self, target: Option<u32>, mute: bool, deaf: bool) {
+        self.arrive(Sound::VoiceJoin, target, mute, deaf);
+    }
+
+    /// The user, already in voice on this server, switches to the channel `target` themselves
+    /// (#325). Like [`voice_join`](Self::voice_join), but the channel-switch sound plays once
+    /// the server confirms the move.
+    pub fn channel_switch(&self, target: u32, mute: bool, deaf: bool) {
+        self.arrive(Sound::ChannelSwitch, Some(target), mute, deaf);
+    }
+
+    fn arrive(&self, sound: Sound, target: Option<u32>, mute: bool, deaf: bool) {
         let mut state = self.state();
         state.tracker.expect_join(mute, deaf);
-        state.awaiting_move = target.filter(|t| state.tracker.own_channel() != Some(*t));
+        state.awaiting_move = target
+            .filter(|t| state.tracker.own_channel() != Some(*t))
+            .map(|t| (t, sound));
         if state.awaiting_move.is_none() {
-            self.join_sound(&mut state);
+            self.arrival_sound(&mut state, sound);
         }
     }
 
-    fn join_sound(&self, state: &mut State) {
+    /// Plays the join or switch sound; a join waits for audio that is still starting.
+    fn arrival_sound(&self, state: &mut State, sound: Sound) {
         if state.out.is_some() {
-            self.play_locked(state, Sound::VoiceJoin, false);
-        } else {
+            self.play_locked(state, sound, false);
+        } else if sound == Sound::VoiceJoin {
             state.pending_join = true;
         }
     }
@@ -569,8 +671,24 @@ impl SoundHub {
         state.pending_join = false;
         state.awaiting_move = None;
         state.tracker.joining = None;
-        (state.out.is_some() && Sound::HangUp.enabled(&(self.settings)()))
-            .then(|| Sound::HangUp.mixed())
+        let settings = (self.settings)();
+        (state.out.is_some() && Sound::HangUp.enabled(&settings))
+            .then(|| Sound::HangUp.mixed(settings.theme))
+    }
+
+    /// The user quits Mumcord (#325). Returns the quit samples (gain applied) if `in_voice` (a
+    /// server carries voice, not just read-only), audio is open, the user is not deafened and
+    /// the toggle allows it. Muting does not matter: it only concerns the microphone. Like
+    /// [`hang_up`](Self::hang_up), the caller plays them on a path that outlives the voice
+    /// pipeline.
+    pub fn quit(&self, in_voice: bool) -> Option<Vec<f32>> {
+        let state = self.state();
+        let settings = (self.settings)();
+        (in_voice
+            && state.out.is_some()
+            && !state.tracker.own_deaf()
+            && Sound::Quit.enabled(&settings))
+        .then(|| Sound::Quit.mixed(settings.theme))
     }
 
     /// The server removed the own session (#205). Returns the kick or ban samples (gain
@@ -583,8 +701,9 @@ impl SoundHub {
         state.awaiting_move = None;
         state.tracker.joining = None;
         let sound = Sound::for_removal(actor, ban)?;
-        (state.out.is_some() && !state.tracker.own_deaf() && sound.enabled(&(self.settings)()))
-            .then(|| sound.mixed())
+        let settings = (self.settings)();
+        (state.out.is_some() && !state.tracker.own_deaf() && sound.enabled(&settings))
+            .then(|| sound.mixed(settings.theme))
     }
 
     /// Whether a rate-limited `sound` is not too close to the last one. A sound that would
@@ -608,11 +727,12 @@ impl SoundHub {
         if was_deaf && !sound.own_action() {
             return;
         }
-        if !sound.enabled(&(self.settings)()) || self.silenced(sound) {
+        let settings = (self.settings)();
+        if !sound.enabled(&settings) || self.silenced(sound) {
             return;
         }
         if let Some(out) = state.out.as_mut()
-            && !out(&sound.mixed())
+            && !out(&sound.mixed(settings.theme))
         {
             tracing::debug!("notification sound skipped: mixer input is full");
         }
@@ -627,7 +747,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 19] = [
+    const ALL: [Sound; 21] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -638,6 +758,8 @@ mod tests {
         Sound::Mention,
         Sound::VoiceJoin,
         Sound::HangUp,
+        Sound::Quit,
+        Sound::ChannelSwitch,
         Sound::PartyStarted,
         Sound::PartyJoined,
         Sound::PartyLeft,
@@ -771,6 +893,7 @@ mod tests {
     #[test]
     fn toggles_gate_each_sound() {
         let off = SoundSettings {
+            theme: SoundTheme::default(),
             user_joined: false,
             user_left: false,
             self_mute: false,
@@ -780,6 +903,8 @@ mod tests {
             mention_notify: false,
             voice_join: false,
             hang_up: false,
+            quit: false,
+            channel_switch: false,
             party_started: false,
             party_joined: false,
             party_left: false,
@@ -822,7 +947,7 @@ mod tests {
         hub.observe(&synced(vec![user(1, 10, true, true)]));
         hub.play(Sound::Message);
         assert!(log.lock().unwrap().is_empty());
-        hub.play_test(Sound::Message);
+        hub.play_test(Sound::Message, SoundTheme::default());
         assert_eq!(log.lock().unwrap().len(), 1);
     }
 
@@ -884,28 +1009,115 @@ mod tests {
 
     #[test]
     fn wavs_decode_short_and_quiet() {
-        for s in ALL {
-            let wav = s.wav();
-            assert_eq!(&wav[..4], b"RIFF");
-            // 1 channel, 48 kHz, 16 bit.
-            assert_eq!(u16::from_le_bytes([wav[22], wav[23]]), 1);
-            assert_eq!(
-                u32::from_le_bytes([wav[24], wav[25], wav[26], wav[27]]),
-                48_000
-            );
-            assert_eq!(u16::from_le_bytes([wav[34], wav[35]]), 16);
-            let samples = s.samples();
-            assert!(samples.len() > 48_00, "{s:?} too short");
-            // The ban sound is a two-part slapstick effect (impact, then a squeak) and keeps
-            // its full second; every other cue stays short.
-            let max_ms = if s == Sound::Banned { 1000 } else { 400 };
-            assert!(
-                samples.len() <= 48_000 * max_ms / 1000,
-                "{s:?} longer than {max_ms} ms"
-            );
-            assert!(peak_dbfs(&samples) <= -12.0, "{s:?} too loud");
-            assert!(peak_dbfs(&samples) > -40.0, "{s:?} inaudible");
+        for theme in [SoundTheme::Classic, SoundTheme::Rich] {
+            for s in ALL {
+                let wav = s.wav(theme);
+                assert_eq!(&wav[..4], b"RIFF");
+                // 1 channel, 48 kHz, 16 bit.
+                assert_eq!(u16::from_le_bytes([wav[22], wav[23]]), 1);
+                assert_eq!(
+                    u32::from_le_bytes([wav[24], wav[25], wav[26], wav[27]]),
+                    48_000
+                );
+                assert_eq!(u16::from_le_bytes([wav[34], wav[35]]), 16);
+                let samples = s.samples(theme);
+                assert!(samples.len() > 48_00, "{theme:?} {s:?} too short");
+                let max_ms = max_ms(theme, s);
+                assert!(
+                    samples.len() <= 48_000 * max_ms / 1000,
+                    "{theme:?} {s:?} longer than {max_ms} ms"
+                );
+                assert!(peak_dbfs(&samples) <= -12.0, "{theme:?} {s:?} too loud");
+                assert!(peak_dbfs(&samples) > -40.0, "{theme:?} {s:?} inaudible");
+            }
         }
+    }
+
+    /// The longest `s` may be in `theme`. Classic cues stay short except the two-part ban
+    /// effect. Rich: the kick, ban, quit and new-message sounds take at most 1 s, the connect
+    /// chime (also the party and share starts) 1.2 s, the mention 0.7 s, people joining and
+    /// leaving 0.8 s and the hang up (also the share stop) 0.9 s; every other cue stays short.
+    fn max_ms(theme: SoundTheme, s: Sound) -> usize {
+        match (theme, s) {
+            (_, Sound::Banned) => 1000,
+            (SoundTheme::Classic, _) => 500,
+            (SoundTheme::Rich, Sound::Kicked | Sound::Quit | Sound::Message) => 1000,
+            (SoundTheme::Rich, Sound::VoiceJoin | Sound::PartyStarted | Sound::ShareStarted) => {
+                1200
+            }
+            (SoundTheme::Rich, Sound::Mention) => 700,
+            (
+                SoundTheme::Rich,
+                Sound::UserJoined
+                | Sound::UserLeft
+                | Sound::PartyJoined
+                | Sound::PartyLeft
+                | Sound::ViewerStarted
+                | Sound::ViewerStopped,
+            ) => 800,
+            (SoundTheme::Rich, Sound::HangUp | Sound::ShareStopped) => 900,
+            (SoundTheme::Rich, _) => 400,
+        }
+    }
+
+    #[test]
+    fn every_sound_has_a_classic_and_a_rich_variant() {
+        for s in ALL {
+            let classic = bundled(SoundTheme::Classic, s.file()).expect("classic variant");
+            let rich = bundled(SoundTheme::Rich, s.file()).expect("rich variant");
+            assert_ne!(classic, rich, "{s:?} sounds the same in both themes");
+            assert_eq!(s.wav(SoundTheme::Classic), classic);
+            assert_eq!(s.wav(SoundTheme::Rich), rich);
+        }
+    }
+
+    #[test]
+    fn a_missing_variant_falls_back_to_the_other_theme() {
+        const CLASSIC_ONLY: &[u8] = b"classic";
+        const RICH_ONLY: &[u8] = b"rich";
+        let lookup = |theme: SoundTheme, name: &str| match (theme, name) {
+            (SoundTheme::Classic, "old") => Some(CLASSIC_ONLY),
+            (SoundTheme::Rich, "new") => Some(RICH_ONLY),
+            _ => None,
+        };
+        assert_eq!(resolve("old", SoundTheme::Rich, lookup), CLASSIC_ONLY);
+        assert_eq!(resolve("old", SoundTheme::Classic, lookup), CLASSIC_ONLY);
+        assert_eq!(resolve("new", SoundTheme::Classic, lookup), RICH_ONLY);
+        assert!(
+            resolve("none", SoundTheme::Rich, lookup).is_empty(),
+            "silent"
+        );
+    }
+
+    #[test]
+    fn the_theme_setting_picks_the_played_variant() {
+        for theme in [SoundTheme::Classic, SoundTheme::Rich] {
+            let (hub, log) = hub_with_log(SoundSettings {
+                theme,
+                ..SoundSettings::default()
+            });
+            hub.observe(&synced(vec![user(1, 10, false, false)]));
+            hub.play(Sound::Message);
+            let quit = hub.quit(true).expect("quit sound");
+            assert_eq!(
+                played(&log),
+                vec![Sound::Message.samples(theme).len()],
+                "{theme:?}"
+            );
+            assert_eq!(quit.len(), Sound::Quit.samples(theme).len(), "{theme:?}");
+            assert_eq!(hub.theme(), theme);
+        }
+        assert_eq!(SoundSettings::default().theme, SoundTheme::Rich);
+    }
+
+    #[test]
+    fn the_test_sound_plays_the_previewed_theme() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.play_test(Sound::VoiceJoin, SoundTheme::Classic);
+        assert_eq!(
+            played(&log),
+            vec![Sound::VoiceJoin.samples(SoundTheme::Classic).len()]
+        );
     }
 
     /// Lengths of the played sounds; compared with [`lens`] of the expected ones. Paired
@@ -915,12 +1127,16 @@ mod tests {
     }
 
     fn lens(sounds: &[Sound]) -> Vec<usize> {
-        sounds.iter().map(|s| s.samples().len()).collect()
+        sounds.iter().map(|s| len(*s)).collect()
+    }
+
+    /// Sample count of `s` in the default theme, which the hubs in these tests play.
+    fn len(s: Sound) -> usize {
+        s.samples(SoundTheme::default()).len()
     }
 
     #[test]
     fn own_and_join_sounds_are_distinct() {
-        let len = |s: Sound| s.samples().len();
         for s in [
             Sound::UserJoined,
             Sound::Mute,
@@ -970,6 +1186,48 @@ mod tests {
 
     /// The join sound follows the server's confirmation of the move: a refused join (e.g. a
     /// channel password is missing, FR-2.78) stays silent, a confirmed one plays it once.
+    /// Switching channels while in voice plays the switch sound, not the join sound, once the
+    /// server confirms the move; a refused switch stays silent (#325).
+    #[test]
+    fn channel_switch_sound_waits_for_the_confirmed_move() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.channel_switch(12, false, false);
+        assert!(played(&log).is_empty(), "not before the server confirms");
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, false, false)));
+        assert!(played(&log).is_empty(), "refused: still outside");
+
+        hub.channel_switch(12, false, false);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::ChannelSwitch]),
+            "once on arrival"
+        );
+        assert_ne!(len(Sound::ChannelSwitch), len(Sound::VoiceJoin));
+    }
+
+    /// The switch is the user's own action: it plays while deafened, but its toggle silences it.
+    #[test]
+    fn channel_switch_follows_its_toggle_not_deafness() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        hub.channel_switch(12, true, true);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, true, true)));
+        assert_eq!(played(&log), lens(&[Sound::ChannelSwitch]), "deafened");
+
+        let (off, log) = hub_with_log(SoundSettings {
+            channel_switch: false,
+            ..SoundSettings::default()
+        });
+        off.observe(&synced(vec![user(1, 10, false, false)]));
+        off.channel_switch(12, false, false);
+        off.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        assert!(played(&log).is_empty(), "toggle off");
+        assert!(Sound::ChannelSwitch.enabled(&SoundSettings::default()));
+    }
+
     #[test]
     fn join_sound_waits_for_the_confirmed_move() {
         let (hub, log) = hub_with_log(SoundSettings::default());
@@ -1026,7 +1284,7 @@ mod tests {
         hub.observe(&synced(vec![user(1, 10, false, false)]));
         hub.observe(&EngineEvent::UserUpserted(user(1, 14, false, false)));
         hub.observe(&EngineEvent::UserUpserted(user(1, 14, true, false)));
-        assert!(!played(&log).contains(&Sound::VoiceJoin.samples().len()));
+        assert!(!played(&log).contains(&Sound::VoiceJoin.samples(SoundTheme::default()).len()));
     }
 
     #[test]
@@ -1083,7 +1341,10 @@ mod tests {
         let (hub, _log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, true, true)]));
         let samples = hub.hang_up().expect("voice on, toggle on, also read-only");
-        assert_eq!(samples.len(), Sound::HangUp.samples().len());
+        assert_eq!(
+            samples.len(),
+            Sound::HangUp.samples(SoundTheme::default()).len()
+        );
 
         let (off, _log) = hub_with_log(SoundSettings {
             hang_up: false,
@@ -1093,6 +1354,54 @@ mod tests {
 
         hub.detach();
         assert!(hub.hang_up().is_none(), "no voice, nothing to hang up");
+    }
+
+    #[test]
+    fn quit_sound_is_distinct() {
+        for s in [Sound::HangUp, Sound::UserLeft, Sound::Kicked, Sound::Banned] {
+            assert_ne!(len(s), len(Sound::Quit), "{s:?}");
+        }
+    }
+
+    /// Muting does not silence the quit sound (it only concerns the microphone); deafening
+    /// does, like the other sounds that are not the user's own deafen action.
+    #[test]
+    fn quit_needs_voice_toggle_and_hearing() {
+        let (hub, _log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, true, false)]));
+        let samples = hub.quit(true).expect("in voice, toggle on, muted");
+        assert_eq!(
+            samples.len(),
+            Sound::Quit.samples(SoundTheme::default()).len()
+        );
+        assert!(hub.quit(false).is_none(), "read-only, not in voice");
+
+        let (off, _log) = hub_with_log(SoundSettings {
+            quit: false,
+            ..SoundSettings::default()
+        });
+        off.observe(&synced(vec![user(1, 10, false, false)]));
+        assert!(off.quit(true).is_none(), "toggle off");
+
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        assert!(hub.quit(true).is_none(), "deafened");
+
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.detach();
+        assert!(hub.quit(true).is_none(), "no audio open");
+    }
+
+    #[test]
+    fn quit_waits_for_the_sound_but_never_long() {
+        assert_eq!(quit_wait(0), Duration::ZERO, "no sound, no wait");
+        let quit = Sound::Quit.samples(SoundTheme::default()).len();
+        let wait = quit_wait(quit);
+        assert!(
+            wait > Duration::from_secs_f64(quit as f64 / 48_000.0),
+            "{wait:?}"
+        );
+        assert!(wait <= QUIT_WAIT_MAX);
+        assert_eq!(quit_wait(48_000 * 10), QUIT_WAIT_MAX, "capped");
     }
 
     #[test]
@@ -1116,9 +1425,15 @@ mod tests {
         let (hub, _log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, false, false)]));
         let kicked = hub.removed(Some(2), false).expect("kicked");
-        assert_eq!(kicked.len(), Sound::Kicked.samples().len());
+        assert_eq!(
+            kicked.len(),
+            Sound::Kicked.samples(SoundTheme::default()).len()
+        );
         let banned = hub.removed(Some(2), true).expect("banned");
-        assert_eq!(banned.len(), Sound::Banned.samples().len());
+        assert_eq!(
+            banned.len(),
+            Sound::Banned.samples(SoundTheme::default()).len()
+        );
         assert!(hub.removed(None, false).is_none(), "no kick, no sound");
 
         let (off, _log) = hub_with_log(SoundSettings {

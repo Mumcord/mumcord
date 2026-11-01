@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { LiveRegions } from "../a11y";
 import { TooltipLayer } from "../components/Tooltip";
@@ -6,7 +6,6 @@ import { PersonMenuHost, ProfilePreviewHost } from "../features/members";
 import { NotificationsHost } from "../features/notifications";
 import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requests";
 import { BlockDialogHost } from "../features/blocking";
-import { WizardRerunOverlay } from "../features/wizard";
 import { TraySync } from "../features/tray";
 import { GlobalHotkeys } from "../features/hotkeys";
 import { AppShell } from "./AppShell";
@@ -29,10 +28,22 @@ import { useDevToolsCapture, useDevToolsUnlocked } from "../features/inspector/d
 import { InspectorViewShare } from "../features/inspector/InspectorViewShare";
 import { WhatsNewOnStart } from "../features/changelog/WhatsNewOnStart";
 import { WindowLookShare } from "../features/licences/WindowLookShare";
-import { ServerBrowser, useServerBrowserOpen } from "../features/serverbrowser";
+import { useServerBrowserOpen } from "../features/serverbrowser";
+import { LazyBoundary } from "../components/LazyBoundary";
 import { useServerTheme } from "./useServerTheme";
 import { useView } from "./view";
 import { ViewProvider } from "./ViewProvider";
+import { hideStartScreen } from "./startScreen";
+
+// Opened on demand, so they load as chunks of their own (issue #323).
+const WizardRerunOverlay = lazy(() =>
+  import("../features/wizard/WizardRerunOverlay").then((m) => ({
+    default: m.WizardRerunOverlay,
+  })),
+);
+const ServerBrowser = lazy(() =>
+  import("../features/serverbrowser/ServerBrowser").then((m) => ({ default: m.ServerBrowser })),
+);
 
 function MainScreen() {
   const { overlay, closeOverlay, openSettings, rerunWizard, closeRerunWizard } = useView();
@@ -61,7 +72,11 @@ function MainScreen() {
           chatStatus: <ChatStatusMount />,
           chat: <ChatMount />,
           members: <MembersMount />,
-          page: browserOpen ? <ServerBrowser /> : null,
+          page: browserOpen ? (
+            <LazyBoundary>
+              <ServerBrowser />
+            </LazyBoundary>
+          ) : null,
         }}
       />
       {/* Kept mounted under the settings overlay so a watched stream does not restart. */}
@@ -70,13 +85,15 @@ function MainScreen() {
       </div>
       {overlay === "settings" && <SettingsOverlay onClose={closeOverlay} blocked={rerunWizard} />}
       {rerunWizard && (
-        <WizardRerunOverlay
-          onClose={closeRerunWizard}
-          onManageIdentities={() => {
-            closeRerunWizard();
-            openSettings("account");
-          }}
-        />
+        <LazyBoundary>
+          <WizardRerunOverlay
+            onClose={closeRerunWizard}
+            onManageIdentities={() => {
+              closeRerunWizard();
+              openSettings("account");
+            }}
+          />
+        </LazyBoundary>
       )}
       {overlay === null && <ProfilePreviewHost />}
       {overlay === null && <PersonMenuHost />}
@@ -109,6 +126,13 @@ function StartupError() {
 function Screens() {
   const { t } = useTranslation("common");
   const { screen } = useView();
+
+  // The start screen in index.html covers the loading phase and makes way for the first real
+  // screen: the main screen, the first-run wizard or the start error.
+  useEffect(() => {
+    if (screen !== "loading") hideStartScreen();
+  }, [screen]);
+
   switch (screen) {
     case "loading":
       return (

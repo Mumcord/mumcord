@@ -413,3 +413,13 @@ export async function invoke<T>(command: string, args: object = {}): Promise<T> 
     args,
   ) as Promise<T>;
 }
+
+/**
+ * Switches the app to the classic sound theme (#325). Specs that measure the speaker output were
+ * tuned to its short tones; the default rich sounds last up to 1.2 s and would spill into their
+ * measurement windows. Stored in the profile, so it survives restarts that keep the profile.
+ */
+export async function useClassicSounds(): Promise<void> {
+  const settings = await invoke<Record<string, unknown>>("settings_get");
+  await invoke("settings_update", { settings: { ...settings, soundTheme: "classic" } });
+}

@@ -8,6 +8,7 @@ import { setAppThemes, useThemeChoice } from "../theme/themeStore";
 import { ducker } from "../features/watchparty/ducking";
 import { setHotkeySettings } from "../features/hotkeys";
 import { PreferencesContext, type Preferences } from "./preferences";
+import { rememberStartTheme } from "./startScreen";
 
 interface StoredPreferences {
   theme: Theme;
@@ -85,6 +86,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       setHotkeySettings(settings);
       setAppThemes(settings.appThemeId, settings.customThemes);
       ducker.setSettings(settings);
+      rememberStartTheme(settings.theme);
       setStored({
         theme: settings.theme,
         language: settings.language,

@@ -129,6 +129,8 @@ const SOUND_KEYS: readonly (keyof SoundSettings)[] = [
   "selfMute",
   "selfDeaf",
   "hangUp",
+  "quit",
+  "channelSwitch",
   "messages",
   "mention",
   "mentionNotify",
@@ -177,6 +179,7 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   top("voiceAudio", "voice.connectMuted", ["connectMuted"]),
   top("voiceAudio", "audio.ducking", ["videoDucking"]),
   top("voiceAudio", "audio.duckingLevel", ["videoDuckingPercent"]),
+  top("voiceAudio", "sounds.theme", ["soundTheme"]),
   ...SOUND_KEYS.map(sound),
   top("chatNotifications", "notifications.legend", ["notifications"]),
   {

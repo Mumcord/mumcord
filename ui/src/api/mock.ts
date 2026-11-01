@@ -289,6 +289,8 @@ const DEFAULT_SETTINGS: Settings = {
     mentionNotify: true,
     voiceJoin: true,
     hangUp: true,
+    quit: true,
+    channelSwitch: true,
     partyStarted: true,
     partyJoined: true,
     partyLeft: true,
@@ -301,6 +303,7 @@ const DEFAULT_SETTINGS: Settings = {
   },
   closeBehaviour: "ask",
   chatDisplay: "cozy",
+  soundTheme: "rich",
   notifications: "both",
   logLevel: "info",
   sendDefaultAvatar: true,
@@ -2869,6 +2872,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     audioTestSound: () => Promise.resolve(null),
+    audioPreviewSoundTheme: () => Promise.resolve(null),
     micTestStop: () => {
       clearInterval(micTimer);
       clearTimeout(micPhaseTimer);
@@ -2942,6 +2946,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // app
     appRestart: () => Promise.resolve(null),
+    // Only the inline script in index.html calls this, to show the native window.
+    appStartPainted: () => Promise.resolve(),
     closeChoice: (choice, remember) => {
       if (remember) settings = { ...settings, closeBehaviour: choice };
       return Promise.resolve(null);

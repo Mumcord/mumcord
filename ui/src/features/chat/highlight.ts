@@ -7,72 +7,12 @@
  * see `sanitize.ts`), because Mumble strips the class attribute. A block with the marker is
  * highlighted as exactly that language, or stays plain text when the language is unknown.
  * Code without it (inline code, other Mumble clients) is detected automatically from a curated
- * set of common languages.
+ * set of common languages. highlight.js itself lives in `highlighter.ts` and loads with the first
+ * message that contains code (issue #323); until then that code is shown plain.
  */
-import DOMPurify from "dompurify";
 import { useMemo, useSyncExternalStore } from "react";
-import hljs from "highlight.js/lib/core";
-import bash from "highlight.js/lib/languages/bash";
-import c from "highlight.js/lib/languages/c";
-import cpp from "highlight.js/lib/languages/cpp";
-import csharp from "highlight.js/lib/languages/csharp";
-import css from "highlight.js/lib/languages/css";
-import diff from "highlight.js/lib/languages/diff";
-import go from "highlight.js/lib/languages/go";
-import ini from "highlight.js/lib/languages/ini";
-import java from "highlight.js/lib/languages/java";
-import javascript from "highlight.js/lib/languages/javascript";
-import json from "highlight.js/lib/languages/json";
-import python from "highlight.js/lib/languages/python";
-import rust from "highlight.js/lib/languages/rust";
-import sql from "highlight.js/lib/languages/sql";
-import typescript from "highlight.js/lib/languages/typescript";
-import xml from "highlight.js/lib/languages/xml";
-import yaml from "highlight.js/lib/languages/yaml";
-import { LANGUAGES, LAZY_GRAMMARS, resolveLanguage } from "./codeLanguages";
-import { highlightHex } from "./hexDump";
+import { LANGUAGES, resolveLanguage } from "./codeLanguages";
 import { CODE_LANGUAGE_ATTRIBUTE } from "./sanitize";
-
-/** The auto-detection set; bundled because detection needs every grammar at once. */
-const DETECTED = {
-  bash,
-  c,
-  cpp,
-  csharp,
-  css,
-  diff,
-  go,
-  ini,
-  java,
-  javascript,
-  json,
-  python,
-  rust,
-  sql,
-  typescript,
-  xml,
-  yaml,
-};
-
-for (const [name, language] of Object.entries(DETECTED)) hljs.registerLanguage(name, language);
-const SUBSET = Object.keys(DETECTED);
-
-/**
- * Below this relevance the guess is noise (a word or two of inline code); the text stays plain.
- * highlight.js scores roughly one point per recognised keyword or construct.
- */
-const MIN_RELEVANCE = 2;
-
-/** highlight.js scope classes, e.g. `hljs-keyword` or the `function_` modifier of a title. */
-const SCOPE_CLASS = /^(?:hljs-[a-z-]+|[a-z]+_+)$/;
-
-const purifier = DOMPurify(window);
-purifier.addHook("uponSanitizeAttribute", (_node, data) => {
-  if (data.attrName !== "class") return;
-  const kept = data.attrValue.split(/\s+/).filter((name) => SCOPE_CLASS.test(name));
-  data.attrValue = kept.join(" ");
-  if (kept.length === 0) data.keepAttr = false;
-});
 
 /** Class of the wrapper around every code block; its buttons and label go in there. */
 export const CODE_BLOCK_CLASS = "chat-code";
@@ -82,63 +22,44 @@ export function extensionFor(language: string | undefined): string {
   return language === undefined ? "txt" : (LANGUAGES[language]?.extension ?? "txt");
 }
 
-// Grammars loaded on demand: messages are highlighted again once one arrives.
+type Highlighter = typeof import("./highlighter");
+
+// Messages are highlighted again whenever highlight.js or one of its grammars arrives.
 let version = 0;
 const listeners = new Set<() => void>();
-const loading = new Map<string, Promise<void>>();
+let highlighter: Highlighter | null = null;
+let loadingHighlighter: Promise<Highlighter | null> | undefined;
+
+function changed(): void {
+  version += 1;
+  for (const listener of listeners) listener();
+}
+
+/** Loads highlight.js; resolves to `null` (code stays plain) when the chunk cannot be loaded. */
+export function loadHighlighter(): Promise<Highlighter | null> {
+  loadingHighlighter ??= import("./highlighter").then(
+    (module) => {
+      module.setOnGrammarLoaded(changed);
+      highlighter = module;
+      changed();
+      return module;
+    },
+    (error: unknown) => {
+      console.error("Loading the code highlighting failed", error);
+      return null;
+    },
+  );
+  return loadingHighlighter;
+}
 
 /** Loads a grammar outside the auto-detection set; resolves once it can be used. */
-export function loadGrammar(grammar: string): Promise<void> {
-  const load = LAZY_GRAMMARS[grammar];
-  if (load === undefined || hljs.getLanguage(grammar) !== undefined) return Promise.resolve();
-  let pending = loading.get(grammar);
-  if (pending === undefined) {
-    pending = load().then(
-      (module) => {
-        hljs.registerLanguage(grammar, module.default);
-        version += 1;
-        for (const listener of listeners) listener();
-      },
-      (error: unknown) => {
-        console.error(`Loading the ${grammar} highlighting failed`, error);
-      },
-    );
-    loading.set(grammar, pending);
-  }
-  return pending;
+export async function loadGrammar(grammar: string): Promise<void> {
+  await (await loadHighlighter())?.loadGrammar(grammar);
 }
 
 function subscribe(listener: () => void): () => void {
   listeners.add(listener);
   return () => listeners.delete(listener);
-}
-
-function clean(html: string): string {
-  return purifier.sanitize(html, { ALLOWED_TAGS: ["span"], ALLOWED_ATTR: ["class"] });
-}
-
-interface Detected {
-  html: string;
-  language: string | undefined;
-}
-
-function detected(text: string): Detected | null {
-  const result = hljs.highlightAuto(text, SUBSET);
-  if (result.relevance < MIN_RELEVANCE) return null;
-  return { html: clean(result.value), language: result.language };
-}
-
-/** Highlighted HTML of `text` in a known language; `null` keeps it plain. */
-function highlightedAs(text: string, language: string): string | null {
-  if (language === "hex") return clean(highlightHex(text));
-  const grammar = LANGUAGES[language]?.grammar ?? null;
-  if (grammar === null) return null;
-  if (hljs.getLanguage(grammar) === undefined) {
-    // Shown plain for now; the version bump re-renders it highlighted.
-    void loadGrammar(grammar);
-    return null;
-  }
-  return clean(hljs.highlight(text, { language: grammar, ignoreIllegals: true }).value);
 }
 
 function colorize(code: Element, html: string | null): void {
@@ -157,6 +78,8 @@ export function highlightCode(sanitizedHtml: string): string {
   if (!sanitizedHtml.includes("<code") && !sanitizedHtml.includes("<pre")) return sanitizedHtml;
   const template = document.createElement("template");
   template.innerHTML = sanitizedHtml;
+  // Without highlight.js yet the blocks get their wrapper and label; colors follow once it loads.
+  if (highlighter === null) void loadHighlighter();
   const named = new Set<Element>();
   for (const pre of template.content.querySelectorAll("pre")) {
     const block = document.createElement("div");
@@ -172,11 +95,14 @@ export function highlightCode(sanitizedHtml: string): string {
       language === null ? name : (LANGUAGES[language]?.label ?? name);
     if (language === null) continue;
     block.dataset["language"] = language;
-    if (code !== null) colorize(code, highlightedAs(code.textContent, language));
+    if (code !== null && highlighter !== null) {
+      colorize(code, highlighter.highlightedAs(code.textContent, language));
+    }
   }
+  if (highlighter === null) return template.innerHTML;
   for (const code of template.content.querySelectorAll("code")) {
     if (named.has(code)) continue;
-    const result = detected(code.textContent);
+    const result = highlighter.detected(code.textContent);
     if (result === null) continue;
     colorize(code, result.html);
     const block = code.parentElement?.parentElement;
@@ -187,7 +113,7 @@ export function highlightCode(sanitizedHtml: string): string {
   return template.innerHTML;
 }
 
-/** {@link highlightCode} for a component; runs again when a grammar it waited for has loaded. */
+/** {@link highlightCode} for a component; runs again when highlight.js or a grammar it waited for has loaded. */
 export function useHighlightedCode(sanitizedHtml: string): string {
   const loaded = useSyncExternalStore(subscribe, () => version);
   // `loaded` is not read: it only tells when the same HTML highlights differently now.

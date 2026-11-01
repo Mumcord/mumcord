@@ -51,6 +51,14 @@ pub async fn close_choice(
     Ok(())
 }
 
+/// The main window's page holds its start screen; the window can be shown without an empty
+/// frame. Called by the inline script in `ui/index.html`, before the app bundle has loaded.
+#[tauri::command]
+#[specta::specta]
+pub fn app_start_painted(app: AppHandle) {
+    window::on_start_painted(&app);
+}
+
 /// Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48).
 #[tauri::command]
 #[specta::specta]
