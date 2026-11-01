@@ -1080,8 +1080,16 @@ pub fn node_texts(node: &Node) -> Vec<&str> {
             .chain(s.options.iter().map(|o| o.label.as_str()))
             .collect(),
         Component::Slider(s) => vec![&s.label],
-        Component::TextInput(t) => vec![&t.label, &t.value],
-        Component::Password(p) => vec![&p.label],
+        Component::TextInput(t) => [t.label.as_str(), t.value.as_str()]
+            .into_iter()
+            .chain(t.help.as_deref())
+            .chain(t.error.as_deref())
+            .collect(),
+        Component::Password(p) => [p.label.as_str()]
+            .into_iter()
+            .chain(p.help.as_deref())
+            .chain(p.error.as_deref())
+            .collect(),
         Component::FilePicker(f) => vec![&f.label],
         Component::Countdown(c) => vec![&c.label],
     }
@@ -1181,6 +1189,48 @@ steps:
                 ..
             })
         ));
+    }
+
+    #[test]
+    fn node_texts_include_field_help_and_error() {
+        use mumcord_plugins::wit::ui::{InputPurpose, Password, TextInput};
+        let input = Node {
+            component: Component::TextInput(TextInput {
+                label: "Address".into(),
+                value: String::new(),
+                placeholder: String::new(),
+                max_bytes: 64,
+                purpose: InputPurpose::ServerAddress,
+                action: "address".into(),
+                disabled: false,
+                help: Some("Reachable.".into()),
+                help_tone: None,
+                error: Some("Not reachable".into()),
+            }),
+            animation: None,
+            children: vec![],
+        };
+        let secret = Node {
+            component: Component::Password(Password {
+                label: "Token".into(),
+                secret: "token".into(),
+                action: "save".into(),
+                disabled: false,
+                help: Some("Stored safely.".into()),
+                help_tone: None,
+                error: Some("Too short".into()),
+            }),
+            animation: None,
+            children: vec![],
+        };
+        assert_eq!(
+            node_texts(&input),
+            ["Address", "", "Reachable.", "Not reachable"]
+        );
+        assert_eq!(
+            node_texts(&secret),
+            ["Token", "Stored safely.", "Too short"]
+        );
     }
 
     #[test]
