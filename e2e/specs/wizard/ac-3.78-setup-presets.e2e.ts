@@ -54,12 +54,12 @@ describe("AC-3.78 setup wizard with presets", () => {
   });
 
   it("starts with Welcome, Identity, Voice and Setup style, Balanced preselected", async () => {
-    expect(await header("welcome")).toContain("step 1 of 5");
+    expect(await header("welcome")).toContain("step 1 of 10");
     await passWelcome();
-    expect(await header("identity")).toContain("step 2 of 5");
+    expect(await header("identity")).toContain("step 2 of 10");
     await createIdentity("PresetTester");
     await voiceToSetupStyle();
-    expect(await header("setupStyle")).toContain("step 4 of 5");
+    expect(await header("setupStyle")).toContain("step 4 of 10");
     await expect(setupStyleRadio("balanced")).toBeSelected();
     const cards = await $$("form.wizard-step label.preset-card").map((card) =>
       card.getAttribute("data-preset"),

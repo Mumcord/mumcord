@@ -26,8 +26,8 @@ import {
 const NAME = "MumImport";
 const SERVER = "Local Mumble test";
 const PASSWORD = "e2e-mumble-saved-pw";
-/** Welcome, Import, Identity, Voice, Setup style, All set (#159). */
-const STEPS = 6;
+/** Welcome, Import, Identity, Voice, Setup style, the five Custom steps, All set (#159). */
+const STEPS = 11;
 
 /** A `QVariant(uint)` as Mumble 1.5 stores one shortcut button (QDataStream, base64). */
 function qvariantUInt(value: number): string {

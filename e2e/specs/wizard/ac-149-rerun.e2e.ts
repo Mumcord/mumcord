@@ -72,16 +72,16 @@ describe("#149 / AC-3.79 run the setup wizard again", () => {
     await button("Run setup wizard again").waitForClickable({ timeout: 15_000 });
   });
 
-  it("opens without the identity step, prefilled and four steps long", async () => {
+  it("opens without the identity step, prefilled and one step shorter", async () => {
     await startRerun();
     await expect(wizard()).toBeDisplayed();
-    expect((await waitForWizardStep("welcome")).toLowerCase()).toContain("step 1 of 4");
+    expect((await waitForWizardStep("welcome")).toLowerCase()).toContain("step 1 of 9");
     await waitForText("Your identity is not changed");
     // No identity step: neither in the rail nor as a step.
     const rail = await wizard().$$(".wizard-rail__label").map((label) => label.getText());
     expect(rail).not.toContain("Identity");
     await wizardPrimary().click();
-    expect((await waitForWizardStep("voice")).toLowerCase()).toContain("step 2 of 4");
+    expect((await waitForWizardStep("voice")).toLowerCase()).toContain("step 2 of 9");
     await expect(wizardControl(".//input[@autocomplete='nickname']")).not.toExist();
     // The voice step shows the saved devices, not empty selects.
     await expect(wizard().$$(".//*[@role='combobox']")).toBeElementsArrayOfSize(2);
