@@ -286,6 +286,38 @@ describe("plugin chat UI", () => {
     expect(await screen.findByRole("region", { name: "Card from eve-fit" })).toBeTruthy();
   });
 
+  it("shows a card without an anchor message at its own time among the messages, not on top", async () => {
+    api = await connectedMock({ bindStore: true });
+    act(() => {
+      api.mock.emit("voiceServerChanged", { serverId: 1 });
+    });
+    renderHook(() => usePluginUi());
+    const shown = [message("m1", "hi")];
+    const { container } = render(
+      <>
+        <LeadingPluginCards
+          listKey={'1:{"kind":"channel","channelId":1}'}
+          loaded
+          messages={shown}
+        />
+        <PluginLine message={shown[0] as ChatMessage}>
+          <p>hi</p>
+        </PluginLine>
+      </>,
+    );
+    // A command like /roll posts no line, so its card has no message to follow when it appears.
+    vi.spyOn(Date, "now").mockReturnValue(Date.parse("2026-11-01T10:05:00Z"));
+    act(() => {
+      api.mock.emit("pluginUi", cardUi("dice", "roll-1", "7"));
+    });
+    const card = await screen.findByRole("region", { name: "Card from dice" });
+    expect(container.querySelector(".plugin-chat-leading")).toBeNull();
+    expect(screen.getByText("hi").compareDocumentPosition(card)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    vi.restoreAllMocks();
+  });
+
   it("replaces a superseded line with the card, in either order, and reveals the text", async () => {
     render(
       <main>

@@ -237,7 +237,8 @@ export function Original({ label, children }: { label?: ReactNode; children: Rea
 }
 
 /**
- * Cards in a channel that had no message yet when they appeared; shown above the list. Once the
+ * Cards in a channel that are older than all its shown messages; shown above the list. Newer cards
+ * without a message to follow are moved behind the last message before them. Once the
  * channel's history is loaded, and again whenever the plugins change, the plugins see its stored
  * messages again so old messages get their cards too.
  */
@@ -259,11 +260,13 @@ export function LeadingPluginCards({
       replayChannel(serverId, channelId);
     }
   }, [loaded, serverId, channelId, chat.names]);
+  // Also when a card arrives: one with no message to follow (a /roll posts no line) belongs at
+  // its own time among the messages that are already shown, not above them.
   useEffect(() => {
     if (serverId !== undefined && channelId !== undefined && messages.length > 0) {
       reanchorChannelCards(serverId, channelId, messages);
     }
-  }, [serverId, channelId, messages]);
+  }, [serverId, channelId, messages, chat.placed]);
   if (channel === null) return null;
   const cards = leadingCards(chat, channel.serverId, channel.channelId);
   if (cards.length === 0) return null;

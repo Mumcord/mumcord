@@ -245,9 +245,9 @@ export function cardsAfter(state: PluginChatState, message: ChatMessage): Placed
 const CLOCK_SLACK_MS = 2000;
 
 /**
- * Moves the cards that appeared before any message of the channel was loaded behind the newest
- * message that was already there. Without this they would stay on top of the history once it
- * loads, above the first date divider, instead of next to the message that triggered them.
+ * Moves the cards that have no message to follow (they appeared before the history loaded, or
+ * like a /roll card answer no chat line) behind the newest message sent before them. Without this
+ * they would stay on top of the history, above the first date divider, instead of at their time.
  */
 export function reanchorLeadingCards(
   state: PluginChatState,
