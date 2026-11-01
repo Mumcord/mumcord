@@ -104,7 +104,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F43 | (main) Flaky multi-server E2E: after a restart, server A sometimes doesn't reconnect (seen locally 1/3 by fix329, not yet in CI) — investigate if it shows in CI | open | – |
 | F44 | Poll compact card: 3rd option hidden behind the 160 px card fade/Show more — top 3 must be fully visible (P4) | in progress | f44-cardheight |
 | F45 | A poll started within 10 s after a peer installs Poll never reaches that peer until rejoin (announce throttle FR-6.35, no resend when a peer's announce adds the plugin) | in progress | f45-resend |
-| F46 | Screen reader still announces the hidden/replaced fallback line (H2) — live region must announce the card instead / skip hidden lines | in progress | f46-a11y |
+| F46 | Screen reader still announces the hidden/replaced fallback line (H2) — live region must announce the card instead / skip hidden lines | done (0fdaa732; 0.5 s announce delay when plugins installed) | f46-a11y |
 | H2m | mumcord-plugin CLI mock: issue message tokens for chat-match/chat-trigger + replay steps so scenarios can test replace/hide/is-replay | done (b59e1ea5; scenario syntax: event message:N replay:true, expect replaced/hidden) | h2m-mock |
 | H2s | Poll: YAML scenarios for hide / replay-no-count / own-line replace using the H2m mock (b59e1ea5) | done (with H2m2 d33b6da) | h2s-pollscen |
 | H2m2 | CLI mock: scenario syntax for own-line replay (chat-match pattern index 255 / own: true, needs chat.send) + poll scenarios (c) own create line replaced by card, close line hidden, (d) unknown lines untouched | done (5e65f707 own: true; poll d33b6da) | h2m2-ownline |
