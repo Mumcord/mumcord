@@ -35,8 +35,7 @@ const ANIMATED_GIF = Buffer.from([
   0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00,
   // Frame 2: colour 1
   0x21, 0xf9, 0x04, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x2c, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01,
-  0x00, 0x00, 0x02, 0x02, 0x4c, 0x01, 0x00,
-  0x3b,
+  0x00, 0x00, 0x02, 0x02, 0x4c, 0x01, 0x00, 0x3b,
 ]);
 
 function page(title: string): string {
@@ -73,7 +72,9 @@ function startSite(): Promise<{ server: Server; port: number; requests: string[]
 }
 
 function card(title: string) {
-  return $(`//article[contains(@class,'link-card')][.//p[@class='link-card__title' and .='${title}']]`);
+  return $(
+    `//article[contains(@class,'link-card')][.//p[@class='link-card__title' and .='${title}']]`,
+  );
 }
 
 function inlineImage(name: string) {
@@ -120,7 +121,10 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     await expect(preview).toHaveText(expect.stringContaining("Mumcord Test Site"));
     await expect(preview).toHaveText(expect.stringContaining("A page served by the E2E test."));
     const image = preview.$("img.link-card__image");
-    await expect(image).toHaveAttribute("src", expect.stringMatching(/^data:image\/(png|jpeg);base64,/));
+    await expect(image).toHaveAttribute(
+      "src",
+      expect.stringMatching(/^data:image\/(png|jpeg);base64,/),
+    );
     expect(site.requests).toEqual(["/page-one", "/cover.png"]);
 
     await preview.$("button.link-card__open").click();
@@ -148,11 +152,19 @@ describe("chat: link previews, player cards and inline images (AC-1.39, AC-1.40,
     await yt.$("button.link-card__play").click();
     await $("iframe[title^='Video player']").waitForExist({ timeout: 15_000 });
     expect(readFileSync(opener.log, "utf8")).not.toContain(youtube);
-    await tw.$("button.link-card__open").click();
-    await browser.waitUntil(() => readFileSync(opener.log, "utf8").includes(twitch), {
-      timeout: 10_000,
-      timeoutMsg: "Open in browser did not hand the Twitch link to the system browser",
-    });
+    // The player iframe appearing above shifts the Twitch card, so a single click can land
+    // on the old position; click again until the opener sees the link.
+    await browser.waitUntil(
+      async () => {
+        await tw.$("button.link-card__open").click();
+        return readFileSync(opener.log, "utf8").includes(twitch);
+      },
+      {
+        interval: 1_000,
+        timeout: 10_000,
+        timeoutMsg: "Open in browser did not hand the Twitch link to the system browser",
+      },
+    );
     await expect($$("iframe")).toBeElementsArrayOfSize(1);
   });
 

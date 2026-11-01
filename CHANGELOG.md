@@ -5,6 +5,7 @@
 ### Fixed
 
 - The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)
+- The "simultaneously connected servers" number field in Settings > Server is no longer stretched across the whole card; it is now as narrow as the number it holds (#320)
 
 ## [0.5.0] - 2026-11-01
 
