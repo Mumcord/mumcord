@@ -26,6 +26,8 @@ export interface PlacedCard {
    * being sent is named by its local id, which stays its render key once it is confirmed.
    */
   after: string | null;
+  /** When the card appeared (ms), to find its place once the channel's messages are loaded. */
+  at: number;
 }
 
 /** What a plugin shows instead of a text line (FR-6.45): its card, or nothing (`card` null). */
@@ -84,7 +86,7 @@ function placeCard(plugin: string, card: string, server: number | null): PlacedC
   const last =
     sendingMessages(conversation, serverId).at(-1) ??
     conversationMessages(conversation, serverId).at(-1);
-  return { plugin, card, serverId, channelId, after: last?.id ?? null };
+  return { plugin, card, serverId, channelId, after: last?.id ?? null, at: Date.now() };
 }
 
 /** Applies a plugin UI change: a new chat card is placed where the user is now on its server. */
@@ -237,6 +239,41 @@ export function cardsAfter(state: PluginChatState, message: ChatMessage): Placed
       (p.after === message.id || p.after === renderKey(message.id)) &&
       !state.replacing.has(cardKey(p.plugin, p.card)),
   );
+}
+
+/** An own message can be listed a moment after the card it triggered; this much counts as before. */
+const CLOCK_SLACK_MS = 2000;
+
+/**
+ * Moves the cards that appeared before any message of the channel was loaded behind the newest
+ * message that was already there. Without this they would stay on top of the history once it
+ * loads, above the first date divider, instead of next to the message that triggered them.
+ */
+export function reanchorLeadingCards(
+  state: PluginChatState,
+  serverId: number,
+  channelId: number,
+  messages: readonly ChatMessage[],
+): PluginChatState {
+  let placed: Map<string, PlacedCard> | undefined;
+  for (const [key, p] of state.placed) {
+    if (p.after !== null || p.serverId !== serverId || p.channelId !== channelId) continue;
+    const anchor = messages.filter((m) => Date.parse(m.sentAt) <= p.at + CLOCK_SLACK_MS).at(-1);
+    if (anchor === undefined) continue;
+    placed ??= new Map(state.placed);
+    placed.set(key, { ...p, after: anchor.id });
+  }
+  return placed === undefined ? state : { ...state, placed };
+}
+
+/** Applies {@link reanchorLeadingCards} to the live state. */
+export function reanchorChannelCards(
+  serverId: number,
+  channelId: number,
+  messages: readonly ChatMessage[],
+): void {
+  ensureBound();
+  publish(reanchorLeadingCards(state, serverId, channelId, messages));
 }
 
 /** Cards in a channel that had no message yet when they appeared. */
