@@ -11,6 +11,7 @@ publish = false
 
 [dependencies]
 mumcord-plugins.workspace = true
+mumcord-store.workspace = true
 clap.workspace = true
 anyhow.workspace = true
 serde.workspace = true
@@ -23,10 +24,11 @@ zip.workspace = true
 semver.workspace = true
 wit-component.workspace = true
 wit-parser.workspace = true
-
-[dev-dependencies]
 tempfile.workspace = true
 tokio.workspace = true
+
+[dev-dependencies]
+wat.workspace = true
 
 [lints]
 workspace = true

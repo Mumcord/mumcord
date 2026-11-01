@@ -5,12 +5,14 @@ mod build;
 mod check;
 mod date;
 mod new;
+mod preview;
 mod publish;
 mod registry;
 mod serve;
 mod sign;
 mod site;
 mod source;
+mod test;
 
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -80,6 +82,10 @@ enum Command {
         #[arg(long)]
         key: PathBuf,
     },
+    /// Run a plugin against YAML scenarios in a mock host (the client's runtime).
+    Test(test::Args),
+    /// Render the UI trees a plugin shows into a static HTML page.
+    Preview(preview::Args),
     /// Serve a local fixture registry signed with a test key (development builds only).
     ServeRegistry(serve::Args),
     /// Add a built package to a checkout of the plugins registry and optionally open a pull request.
@@ -112,6 +118,8 @@ fn main() -> ExitCode {
             unencrypted,
         } => sign::keygen(&out, &name, unencrypted),
         Command::Sign { file, key } => sign::sign_file(&file, &key),
+        Command::Test(args) => test::run(args),
+        Command::Preview(args) => preview::run(args),
         Command::ServeRegistry(args) => serve::run(args),
         Command::PublishPr(args) => publish::run(args),
         Command::SiteData(args) => site::run(args),

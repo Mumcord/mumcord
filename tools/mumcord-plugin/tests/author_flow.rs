@@ -1,5 +1,6 @@
 //! AC-6.28 author flow with the real CLI and the local SDK: `new`, `build --reproducible` twice
-//! from two folders (identical hash), `check`, `keygen`, `sign`, `check --key`. Compiles a plugin
+//! from two folders (identical hash), `check`, `test` and `preview` with the example scenario,
+//! `keygen`, `sign`, `check --key`. Compiles a plugin
 //! for wasm32-unknown-unknown, so it is slow and ignored by default:
 //! `cargo test -p mumcord-plugin --test author_flow -- --ignored`.
 
@@ -83,6 +84,24 @@ fn new_build_reproducibly_check_and_sign() {
     let package = project.join("dist/wave-demo-0.1.0.mcplugin");
     let package = package.to_str().expect("utf-8");
     assert!(cli(work.path(), &["check", package]).contains(&first));
+
+    // The template is the SDK example `hello`, so this also runs that example in the runtime.
+    let scenario = Path::new(env!("CARGO_MANIFEST_DIR")).join("scenarios/hello.yaml");
+    let scenario = scenario.to_str().expect("utf-8");
+    assert!(cli(work.path(), &["test", package, scenario]).contains("ok   "));
+    cli(
+        work.path(),
+        &[
+            "preview",
+            package,
+            "--scenario",
+            scenario,
+            "--out",
+            "preview.html",
+        ],
+    );
+    let page = std::fs::read_to_string(work.path().join("preview.html")).expect("test step");
+    assert!(page.contains("Waves: 2"));
 
     cli(
         work.path(),
