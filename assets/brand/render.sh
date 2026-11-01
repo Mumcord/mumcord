@@ -4,7 +4,7 @@
 # Needs rsvg-convert (librsvg), ImageMagick 7 and Python 3. Run it after changing a master.
 #
 # Masters: mumcord-icon.svg (app icon on its tile), mumcord-logo.svg (no tile, for docs),
-# mumcord-icon-small.svg (32 px and below, where the speech bubbles would turn to noise),
+# mumcord-icon-small.svg (32 px and below: no cap strap or beanie stripes, which would turn to noise),
 # mumcord-tray.svg (one flat colour with an outline, readable on light and dark panels).
 # reference.png is the original artwork the masters were traced from.
 set -euo pipefail
