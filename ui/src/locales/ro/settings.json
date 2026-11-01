@@ -422,6 +422,7 @@
     "selfDeaf": "Îți oprești sau pornești sunetul",
     "hangUp": "Te deconectezi de la un server",
     "quit": "Închizi Mumcord în timp ce ești într-un canal vocal",
+    "channelSwitch": "Treci pe alt canal în timp ce ești pe voce",
     "kicked": "Ești dat afară de pe un server",
     "banned": "Ești interzis pe un server",
     "messages": "Mesaj nou într-un canal urmărit sau într-un chat privat",

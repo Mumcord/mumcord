@@ -288,6 +288,7 @@ const DEFAULT_SETTINGS: Settings = {
     voiceJoin: true,
     hangUp: true,
     quit: true,
+    channelSwitch: true,
     partyStarted: true,
     partyJoined: true,
     partyLeft: true,

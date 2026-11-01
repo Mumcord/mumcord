@@ -20,8 +20,9 @@
 //! [`SoundHub::voice_join`] for an explicit join and [`SoundHub::hang_up`] before it tears
 //! down voice for a user-initiated disconnect. A join that moves to another channel sounds only
 //! once the server confirms the move, so a refused join (e.g. a missing channel password) stays
-//! silent. Automatic arrivals (read-only landing, reconnect
-//! restore) and quitting never call them.
+//! silent. Switching to another channel while already in voice there plays the channel-switch
+//! sound in place of the join sound ([`SoundHub::channel_switch`], #325). Automatic arrivals
+//! (read-only landing, reconnect restore) and quitting never call them.
 //!
 //! Quitting while in a voice channel has its own sound (#325): the engine's shutdown asks
 //! [`SoundHub::quit`] for it and waits at most [`QUIT_WAIT_MAX`] (see [`quit_wait`]) before the
@@ -62,6 +63,9 @@ pub enum Sound {
     HangUp,
     /// You quit Mumcord while in a voice channel (#325).
     Quit,
+    /// You switch to another channel while in voice (#325); plays in place of
+    /// [`Sound::VoiceJoin`].
+    ChannelSwitch,
     /// Someone starts a watch party in your channel (FR-2.77).
     PartyStarted,
     PartyJoined,
@@ -109,13 +113,13 @@ type SoundSet = &'static [(&'static str, &'static [u8])];
 /// The synthesized tones of `assets/sounds/classic/generate.py` (plus the kick and ban effects).
 const CLASSIC: SoundSet = sound_set!("classic":
     "user_joined", "user_left", "mute", "unmute", "deafen", "undeafen", "message", "mention",
-    "voice_join", "hang_up", "quit", "kicked", "banned",
+    "voice_join", "hang_up", "quit", "channel_switch", "kicked", "banned",
 );
 
 /// The ElevenLabs sounds of `assets/sounds/rich/`.
 const RICH: SoundSet = sound_set!("rich":
     "user_joined", "user_left", "mute", "unmute", "deafen", "undeafen", "message", "mention",
-    "voice_join", "hang_up", "quit", "kicked", "banned",
+    "voice_join", "hang_up", "quit", "channel_switch", "kicked", "banned",
 );
 
 /// The bundled variant of the sound file `name` in `theme`, if that theme has one.
@@ -159,6 +163,7 @@ impl Sound {
             Self::VoiceJoin | Self::PartyStarted | Self::ShareStarted => "voice_join",
             Self::HangUp | Self::ShareStopped => "hang_up",
             Self::Quit => "quit",
+            Self::ChannelSwitch => "channel_switch",
             Self::Kicked => "kicked",
             Self::Banned => "banned",
         }
@@ -181,6 +186,7 @@ impl Sound {
             Self::VoiceJoin => s.voice_join,
             Self::HangUp => s.hang_up,
             Self::Quit => s.quit,
+            Self::ChannelSwitch => s.channel_switch,
             Self::PartyStarted => s.party_started,
             Self::PartyJoined => s.party_joined,
             Self::PartyLeft => s.party_left,
@@ -244,7 +250,10 @@ impl Sound {
 
     /// Feedback for the user's own action, so it plays even while deafened.
     fn own_action(self) -> bool {
-        matches!(self, Self::Undeafen | Self::VoiceJoin | Self::HangUp)
+        matches!(
+            self,
+            Self::Undeafen | Self::VoiceJoin | Self::ChannelSwitch | Self::HangUp
+        )
     }
 }
 
@@ -493,8 +502,9 @@ struct State {
     out: Option<SampleSink>,
     /// The own join sound, waiting for audio that is still starting (link join on connect).
     pending_join: bool,
-    /// The channel an explicit join moves to; its sound waits for the server's confirmation.
-    awaiting_move: Option<u32>,
+    /// The channel an explicit join or switch moves to, with the sound that waits for the
+    /// server's confirmation.
+    awaiting_move: Option<(u32, Sound)>,
     /// When the last rate-limited activity sound was due.
     last_burst: Option<Instant>,
 }
@@ -578,9 +588,11 @@ impl SoundHub {
         if let Some((sound, was_deaf)) = state.tracker.observe(event) {
             self.play_locked(&mut state, sound, was_deaf);
         }
-        if state.awaiting_move.is_some() && state.awaiting_move == state.tracker.own_channel() {
+        if let Some((target, sound)) = state.awaiting_move
+            && state.tracker.own_channel() == Some(target)
+        {
             state.awaiting_move = None;
-            self.join_sound(&mut state);
+            self.arrival_sound(&mut state, sound);
         }
         let deaf = state.tracker.own_deaf();
         for sound in activity {
@@ -621,18 +633,32 @@ impl SoundHub {
     /// echo of that change would cause. With a `target` channel to move to, the sound waits
     /// until the server put the user there; if audio is still starting, it plays once it is up.
     pub fn voice_join(&self, target: Option<u32>, mute: bool, deaf: bool) {
+        self.arrive(Sound::VoiceJoin, target, mute, deaf);
+    }
+
+    /// The user, already in voice on this server, switches to the channel `target` themselves
+    /// (#325). Like [`voice_join`](Self::voice_join), but the channel-switch sound plays once
+    /// the server confirms the move.
+    pub fn channel_switch(&self, target: u32, mute: bool, deaf: bool) {
+        self.arrive(Sound::ChannelSwitch, Some(target), mute, deaf);
+    }
+
+    fn arrive(&self, sound: Sound, target: Option<u32>, mute: bool, deaf: bool) {
         let mut state = self.state();
         state.tracker.expect_join(mute, deaf);
-        state.awaiting_move = target.filter(|t| state.tracker.own_channel() != Some(*t));
+        state.awaiting_move = target
+            .filter(|t| state.tracker.own_channel() != Some(*t))
+            .map(|t| (t, sound));
         if state.awaiting_move.is_none() {
-            self.join_sound(&mut state);
+            self.arrival_sound(&mut state, sound);
         }
     }
 
-    fn join_sound(&self, state: &mut State) {
+    /// Plays the join or switch sound; a join waits for audio that is still starting.
+    fn arrival_sound(&self, state: &mut State, sound: Sound) {
         if state.out.is_some() {
-            self.play_locked(state, Sound::VoiceJoin, false);
-        } else {
+            self.play_locked(state, sound, false);
+        } else if sound == Sound::VoiceJoin {
             state.pending_join = true;
         }
     }
@@ -721,7 +747,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 20] = [
+    const ALL: [Sound; 21] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -733,6 +759,7 @@ mod tests {
         Sound::VoiceJoin,
         Sound::HangUp,
         Sound::Quit,
+        Sound::ChannelSwitch,
         Sound::PartyStarted,
         Sound::PartyJoined,
         Sound::PartyLeft,
@@ -877,6 +904,7 @@ mod tests {
             voice_join: false,
             hang_up: false,
             quit: false,
+            channel_switch: false,
             party_started: false,
             party_joined: false,
             party_left: false,
@@ -1158,6 +1186,48 @@ mod tests {
 
     /// The join sound follows the server's confirmation of the move: a refused join (e.g. a
     /// channel password is missing, FR-2.78) stays silent, a confirmed one plays it once.
+    /// Switching channels while in voice plays the switch sound, not the join sound, once the
+    /// server confirms the move; a refused switch stays silent (#325).
+    #[test]
+    fn channel_switch_sound_waits_for_the_confirmed_move() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.channel_switch(12, false, false);
+        assert!(played(&log).is_empty(), "not before the server confirms");
+        hub.observe(&EngineEvent::UserUpserted(user(1, 10, false, false)));
+        assert!(played(&log).is_empty(), "refused: still outside");
+
+        hub.channel_switch(12, false, false);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        assert_eq!(
+            played(&log),
+            lens(&[Sound::ChannelSwitch]),
+            "once on arrival"
+        );
+        assert_ne!(len(Sound::ChannelSwitch), len(Sound::VoiceJoin));
+    }
+
+    /// The switch is the user's own action: it plays while deafened, but its toggle silences it.
+    #[test]
+    fn channel_switch_follows_its_toggle_not_deafness() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        hub.channel_switch(12, true, true);
+        hub.observe(&EngineEvent::UserUpserted(user(1, 12, true, true)));
+        assert_eq!(played(&log), lens(&[Sound::ChannelSwitch]), "deafened");
+
+        let (off, log) = hub_with_log(SoundSettings {
+            channel_switch: false,
+            ..SoundSettings::default()
+        });
+        off.observe(&synced(vec![user(1, 10, false, false)]));
+        off.channel_switch(12, false, false);
+        off.observe(&EngineEvent::UserUpserted(user(1, 12, false, false)));
+        assert!(played(&log).is_empty(), "toggle off");
+        assert!(Sound::ChannelSwitch.enabled(&SoundSettings::default()));
+    }
+
     #[test]
     fn join_sound_waits_for_the_confirmed_move() {
         let (hub, log) = hub_with_log(SoundSettings::default());

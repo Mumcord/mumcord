@@ -422,6 +422,7 @@
     "selfDeaf": "Isključiš ili uključiš svoj zvuk",
     "hangUp": "Odspojiš se s poslužitelja",
     "quit": "Zatvoriš Mumcord dok si u glasovnom kanalu",
+    "channelSwitch": "Prelaziš u drugi kanal dok si u glasovnom kanalu",
     "kicked": "Izbačen si s poslužitelja",
     "banned": "Zabranjen ti je pristup poslužitelju",
     "messages": "Nova poruka u praćenom kanalu ili privatnom chatu",

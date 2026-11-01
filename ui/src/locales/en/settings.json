@@ -419,6 +419,7 @@
     "selfDeaf": "You deafen or undeafen yourself",
     "hangUp": "You disconnect from a server",
     "quit": "You quit Mumcord while in a voice channel",
+    "channelSwitch": "You switch to another channel while in voice",
     "kicked": "You are kicked from a server",
     "banned": "You are banned from a server",
     "messages": "New message in a followed channel or private chat",

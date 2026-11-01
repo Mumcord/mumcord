@@ -1,7 +1,7 @@
 # Notification sounds
 
 Short, soft sounds for FR-1.27 (join/leave, self mute/deafen, new message, own voice join,
-hang up, quit). No speech.
+channel switch, hang up, quit). No speech.
 
 There are two sound themes (#325), chosen in Settings > Sounds:
 
@@ -22,6 +22,7 @@ Format: 48 kHz, mono, 16-bit PCM. Peak about -18 dBFS.
 | message.wav                     | new message in a followed channel or private chat            |
 | mention.wav                     | someone mentions you (`@Name`); replaces message.wav (QA.41) |
 | voice_join.wav                  | you join a channel for voice (QA.23)                         |
+| channel_switch.wav              | you switch to another channel while in voice (#325)          |
 | hang_up.wav                     | you disconnect from a server (QA.19)                         |
 | quit.wav                        | you quit Mumcord while in a voice channel (#325)             |
 | kicked.wav                      | the server kicks you (#205)                                  |
@@ -64,6 +65,8 @@ The classic kicked.wav and banned.wav are not synthesized by `generate.py`:
 - Processing (all of them): converted to 48 kHz mono 16-bit PCM, 3 ms fade-in, normalized to a
   -18 dBFS peak.
   - voice_join.wav: "Elegant device", trimmed from 2 s to 1.2 s (near-silent tail), 150 ms fade-out.
+  - channel_switch.wav: "Elegant channel", first 0.35 s of 1.48 s (the rest was below -60 dBFS),
+    60 ms fade-out.
   - message.wav: "Elegant new message", trimmed from 1.48 s to 1.0 s, 150 ms fade-out.
   - mute.wav: "Microphone mute", trimmed to 0.35 s (the click starts after 0.1 s of silence, the tail
     is near silent), 40 ms fade-out.

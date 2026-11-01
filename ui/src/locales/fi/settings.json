@@ -419,6 +419,7 @@
     "selfDeaf": "Mykistät kuulokkeesi tai poistat niiden mykistyksen",
     "hangUp": "Katkaiset yhteyden palvelimeen",
     "quit": "Suljet Mumcordin ollessasi puhekanavalla",
+    "channelSwitch": "Vaihdat toiselle kanavalle ollessasi puheessa",
     "kicked": "Sinut potkitaan palvelimelta",
     "banned": "Sinulle annetaan porttikielto palvelimelle",
     "messages": "Uusi viesti seuratulla kanavalla tai yksityisessä chatissa",

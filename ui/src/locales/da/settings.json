@@ -419,6 +419,7 @@
     "selfDeaf": "Du slår din lyd fra eller til",
     "hangUp": "Du afbryder fra en server",
     "quit": "Du lukker Mumcord, mens du er i en talekanal",
+    "channelSwitch": "Du skifter til en anden kanal, mens du er i tale",
     "kicked": "Du bliver smidt ud af en server",
     "banned": "Du bliver udelukket fra en server",
     "messages": "Ny besked i en fulgt kanal eller privat chat",

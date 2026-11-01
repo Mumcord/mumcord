@@ -347,6 +347,8 @@ pub struct SoundSettings {
     pub hang_up: bool,
     /// You quit Mumcord while in a voice channel (#325).
     pub quit: bool,
+    /// You switch to another channel while in voice (#325).
+    pub channel_switch: bool,
     pub party_started: bool,
     pub party_joined: bool,
     pub party_left: bool,
@@ -686,6 +688,7 @@ impl Settings {
                 voice_join: s.sounds.voice_join,
                 hang_up: s.sounds.hang_up,
                 quit: s.sounds.quit,
+                channel_switch: s.sounds.channel_switch,
                 party_started: s.sounds.party_started,
                 party_joined: s.sounds.party_joined,
                 party_left: s.sounds.party_left,
@@ -822,6 +825,7 @@ impl Settings {
         s.sounds.voice_join = self.sounds.voice_join;
         s.sounds.hang_up = self.sounds.hang_up;
         s.sounds.quit = self.sounds.quit;
+        s.sounds.channel_switch = self.sounds.channel_switch;
         s.sounds.theme = self.sound_theme.into();
         s.sounds.party_started = self.sounds.party_started;
         s.sounds.party_joined = self.sounds.party_joined;
@@ -1119,6 +1123,7 @@ mod tests {
         assert!(ui.send_default_avatar);
         assert_eq!(ui.notifications, NotificationMode::Both);
         assert_eq!(ui.sound_theme, SoundTheme::Rich);
+        assert!(ui.sounds.channel_switch);
 
         ui.wizard_completed = true;
         ui.talk_mode = TalkMode::PushToTalk;
@@ -1128,6 +1133,7 @@ mod tests {
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
         ui.sounds.quit = false;
+        ui.sounds.channel_switch = false;
         ui.sound_theme = SoundTheme::Classic;
         ui.sounds.share_stopped = false;
         ui.sounds.banned = false;
@@ -1178,7 +1184,7 @@ mod tests {
         assert!(stored.wizard_completed);
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
-        assert!(!stored.sounds.quit);
+        assert!(!stored.sounds.quit && !stored.sounds.channel_switch);
         assert_eq!(stored.sounds.theme, store::SoundTheme::Classic);
         assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
         assert!(!stored.sounds.banned && stored.sounds.kicked);

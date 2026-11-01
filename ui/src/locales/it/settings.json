@@ -422,6 +422,7 @@
     "selfDeaf": "Attivi o disattivi il tuo audio",
     "hangUp": "Ti disconnetti da un server",
     "quit": "Esci da Mumcord mentre sei in un canale vocale",
+    "channelSwitch": "Passi a un altro canale mentre sei in voce",
     "kicked": "Vieni espulso da un server",
     "banned": "Vieni bannato da un server",
     "messages": "Nuovo messaggio in un canale seguito o in una chat privata",
