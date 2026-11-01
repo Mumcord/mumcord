@@ -1720,9 +1720,18 @@ export type IndexScreenshot = {
 	alt: string,
 };
 
+/**
+ *  Which list a store plugin comes from. Third-party repositories are listed once B33b loads
+ *  them; until then every entry is official.
+ */
+export type IndexSource = { kind: "official" } | 
+/**  "Unofficial · <name>" (FR-6.61). */
+{ kind: "repo"; repositoryId: number; name: string };
+
 /**  One plugin of the official index, texts in the asked language (English fallback). */
 export type IndexedPlugin = {
 	id: string,
+	source: IndexSource,
 	name: string,
 	summary: string,
 	descriptionMdUrl: string | null,

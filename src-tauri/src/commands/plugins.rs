@@ -233,11 +233,29 @@ pub struct IndexScreenshot {
     pub alt: String,
 }
 
+/// Which list a store plugin comes from. Third-party repositories are listed once B33b loads
+/// them; until then every entry is official.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
+pub enum IndexSource {
+    Official,
+    /// "Unofficial · <name>" (FR-6.61).
+    Repo {
+        repository_id: u32,
+        name: String,
+    },
+}
+
 /// One plugin of the official index, texts in the asked language (English fallback).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct IndexedPlugin {
     pub id: String,
+    pub source: IndexSource,
     pub name: String,
     pub summary: String,
     pub description_md_url: Option<String>,
@@ -267,6 +285,7 @@ impl IndexedPlugin {
         };
         Self {
             id: p.id.clone(),
+            source: IndexSource::Official,
             name: p.name(language).to_owned(),
             summary: p.summary(language).to_owned(),
             description_md_url: p.description_md_url.clone(),
