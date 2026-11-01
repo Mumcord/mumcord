@@ -47,7 +47,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B33b | Repositories tab | open | |
 | B33c | Developer tab | open | |
 | B37 | ⚠ OUTWARD: registry CI and publish workflows | open | |
-| B38 | Template and author docs | in progress | b38-template |
+| B38 | Template and author docs | done (Mumcord/plugins PR #4, not merged) | b38-template |
 | B39 | Poll plugin | done (Mumcord/plugins PR #2, not merged) | b39-poll |
 | B40 | Dice roller plugin | in progress | b40-dice |
 | B41a | Echolings: pet core | done (Mumcord/plugins PR #3, not merged) | b41a-pets |
@@ -61,6 +61,8 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F1 | Fix: ui tsc error in ui/src/api/mock.ts (missing plugin settings fields from B3) + prettier on crates/plugins/schema/manifest.schema.json | done | f1-uifix |
 | F2 | Fix: safety fixtures pass `prettier --check .` (format them) and builder `common_manifest()` uses only B4 fields (authors/categories) | done | f2-fixtures |
 | F3 | chat.rs GestureGate: a gesture from a typed command (source `command`) allows its one message for up to 8 s (clicks stay 2 s); needed for verified dice rolls (FR-6.44 addendum) | done | f3-gesture |
+| F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | open | |
+| M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins) | open | |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | open | |
 
 ---
@@ -446,3 +448,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **F3 (b2cc0e37):** `GestureGate::command_gesture(plugin, now)` opens an 8 s window for typed commands (`COMMAND_GESTURE_WINDOW`); `gesture(plugin, now)` stays 2 s for clicks; still one message per gesture, and a later gesture replaces the earlier one.
 - **B19 (1f5ae524):** `api/http.rs` + `api/files.rs`. HostContext `http: Http::new(&plugins_dir)` (persists `<plugins_dir>/net-hosts.json`) and `files: Files`; on reset/remove call `ctx.http.forget(id)` + `ctx.files.forget(id)`. UI glue (ui_action owner): when the user confirms a `server-address` text-input, call `ctx.http.allow(id, &text) -> Result<(), AddressError::Invalid>` ('host', 'host:port' or an http(s) URL; without port or scheme 80/443; ≤ 16 per plugin, oldest dropped). After a file-picker pick, call `ctx.files.register(id, &path) -> Result<FileHandle, FileError{NotAFile, TooLarge, Unreadable}>` (≤ 50 MiB, 16 per plugin, memory only) and pass the handle in ui-action `file`. http-error `host-not-allowed` also covers plain http to a public address; B42 shows "Plain http is only allowed for local addresses". TLS reasons are short texts. One upload in flight per plugin. Forbidden headers: Host, Content-Length, Transfer-Encoding, Connection.
 - **B25b (354e9ae9, f9467dc5, a30d9ace):** CLI `mumcord-plugin`: new (embedded template, `--sdk-path`), build [--reproducible] (needs Cargo.lock; prints sha256), check [--official] [--key] (package only, not a folder), keygen [--unencrypted], sign, serve-registry, publish-pr [--open], site-data. Key password from env MUMCORD_PLUGIN_KEY_PASSWORD, else a prompt. serve-registry: `--packages <dir> --key <test.key> [--author-key] [--port] (127.0.0.1 only) [--repository NAME] [--sequence] [--scenario …]`; re-signs packages with the author key (default: the registry key); official base `http://127.0.0.1:PORT/v1/`, packages at `/packages/<id>-<ver>.mcplugin(+.minisig)`; runtime control `POST /_ctl/scenario?set=a,b` (empty clears), `POST /_ctl/reload` (rescan + raise sequence); scenarios tampered-hash:<id>, lower-sequence, wrong-key, extra-permission:<id>, revoke:<id>[@ver][:warn], key-change[:rotate]. Docs: permissions.json, "Registry source" (plugin.toml, versions/<ver>.toml, revoked.toml), "Local test registry" in docs/plugin-registry-format.md. B43 runs `cargo test -p mumcord-plugin -- --ignored`. The template's SDK git dep points at epic/plugins and must switch to main after the epic merge (final task).
+- **B38 (Mumcord/plugins PR #4):** template/ is the real `mumcord-plugin new` output (check passes); docs/ has README, getting-started, manifest, api, permissions, building, testing, publishing, third-party-repositories. Follow-ups F4 and M1.
