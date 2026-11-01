@@ -8,13 +8,14 @@
     "expectedKeyHint": "Jekk is-sid tak ċavetta, waħħalha hawn. Ir-repożitorju mbagħad irid juża eżattament din iċ-ċavetta.",
     "check": "Iċċekkja r-repożitorju",
     "found": "Dan sibna",
-    "name": "Isem",
-    "homepage": "Websajt",
-    "contact": "Kuntatt",
-    "fingerprint": "Marka diġitali taċ-ċavetta",
-    "pluginCount": "Plugins elenkati",
-    "warning": "Mumcord ma jivverifikax il-plugins ta' repożitorju. Mumcord jiftakar din iċ-ċavetta u jerġa' jistaqsik jekk tinbidel.",
-    "confirm": "Żid repożitorju"
+    "confirm": "Żid repożitorju",
+    "subtitle": "Żid biss repożitorji minn nies li tafda fihom.",
+    "signatureValid": "firma valida",
+    "contactLine": "kuntatt: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Ċavetta tal-firma",
+    "warningTitle": "Repożitorju mhux uffiċjali",
+    "warningBody": "Mumcord ma jeżaminax dawn il-plugins. Iċ-ċavetta tinżamm f'moħħha: jekk qatt tinbidel, ir-repożitorju jitwaqqaf sakemm tiċċekkjaha. Meta tfittex, l-indirizz IP tiegħek jidher lill-host. Plugins b'ismijiet uffiċjali qatt ma jittieħdu minn hawn."
   },
   "limit": "Tista' żżid sa {{max}} repożitorji.",
   "limitReached": "Intlaħaq il-limitu ta' {{max}} repożitorji.",
@@ -51,5 +52,9 @@
     "hint": "Biddel dan biss jekk ngħatajt indirizz ta' mirror. Il-mirror irid iservi l-istess fajls iffirmati; Mumcord xorta jivverifika kull firma.",
     "save": "Issejvja",
     "reset": "Uża d-default"
+  },
+  "official": {
+    "name": "Plugins uffiċjali ta' Mumcord",
+    "alwaysOn": "Dejjem mixgħul"
   }
 }

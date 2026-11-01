@@ -8,13 +8,14 @@
     "expectedKeyHint": "Če vam je lastnik dal ključ, ga prilepite sem. Skladišče mora nato uporabljati natanko ta ključ.",
     "check": "Preveri skladišče",
     "found": "To smo našli",
-    "name": "Ime",
-    "homepage": "Spletna stran",
-    "contact": "Stik",
-    "fingerprint": "Prstni odtis ključa",
-    "pluginCount": "Navedeni vtičniki",
-    "warning": "Mumcord vtičnikov iz skladišča ne pregleduje. Mumcord si ta ključ zapomni in vas vpraša znova, če se spremeni.",
-    "confirm": "Dodaj skladišče"
+    "confirm": "Dodaj skladišče",
+    "subtitle": "Dodajte samo repozitorije ljudi, ki jim zaupate.",
+    "signatureValid": "podpis veljaven",
+    "contactLine": "stik: {{contact}}",
+    "pluginsLine": "Vtičniki: {{number}}",
+    "signingKey": "Podpisni ključ",
+    "warningTitle": "Neuradni repozitorij",
+    "warningBody": "Mumcord teh vtičnikov ne pregleduje. Ključ si zapomni: če se kdaj spremeni, je repozitorij zaustavljen, dokler ga ne preverite. Pri brskanju gostitelj vidi vaš naslov IP. Vtičniki z uradnimi imeni se od tod nikoli ne vzamejo."
   },
   "limit": "Dodate lahko do {{max}} skladišč.",
   "limitReached": "Dosežena je omejitev {{max}} skladišč.",
@@ -51,5 +52,9 @@
     "hint": "To spremenite le, če ste dobili naslov zrcala. Zrcalo mora ponujati iste podpisane datoteke; Mumcord še vedno preveri vsak podpis.",
     "save": "Shrani",
     "reset": "Uporabi privzeto"
+  },
+  "official": {
+    "name": "Uradni vtičniki Mumcord",
+    "alwaysOn": "Vedno vklopljeno"
   }
 }

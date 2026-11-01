@@ -8,13 +8,14 @@
     "expectedKeyHint": "Als de eigenaar je een sleutel heeft gegeven, plak die dan hier. De repository moet dan precies deze sleutel gebruiken.",
     "check": "Repository controleren",
     "found": "Dit hebben we gevonden",
-    "name": "Naam",
-    "homepage": "Website",
-    "contact": "Contact",
-    "fingerprint": "Sleutelvingerafdruk",
-    "pluginCount": "Vermelde plugins",
-    "warning": "Plugins uit een repository worden niet door Mumcord gecontroleerd. Mumcord onthoudt deze sleutel en vraagt het opnieuw als die verandert.",
-    "confirm": "Repository toevoegen"
+    "confirm": "Repository toevoegen",
+    "subtitle": "Voeg alleen repositories toe van mensen die je vertrouwt.",
+    "signatureValid": "handtekening geldig",
+    "contactLine": "contact: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Ondertekeningssleutel",
+    "warningTitle": "Onofficiële repository",
+    "warningBody": "Mumcord controleert deze plugins niet. Deze sleutel wordt onthouden: als hij ooit verandert, wordt de repository gepauzeerd tot je hem controleert. Bladeren toont je IP-adres aan de host. Plugins met officiële namen worden hier nooit uit gehaald."
   },
   "limit": "Je kunt maximaal {{max}} repositories toevoegen.",
   "limitReached": "De limiet van {{max}} repositories is bereikt.",
@@ -51,5 +52,9 @@
     "hint": "Wijzig dit alleen als je een mirroradres hebt gekregen. De mirror moet dezelfde ondertekende bestanden leveren; Mumcord controleert nog steeds elke handtekening.",
     "save": "Opslaan",
     "reset": "Standaard gebruiken"
+  },
+  "official": {
+    "name": "Officiële Mumcord-plugins",
+    "alwaysOn": "Altijd aan"
   }
 }

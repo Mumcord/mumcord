@@ -44,7 +44,7 @@ describe("RepositoriesTab", () => {
     expect(await within(dialog).findByText("Example repository")).toBeInTheDocument();
     expect(within(dialog).getByText("1CB49831E26E61AD")).toBeInTheDocument();
     expect(within(dialog).getByText("https://example.org")).toBeInTheDocument();
-    expect(within(dialog).getByText(/not reviewed by Mumcord/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/does not review these plugins/)).toBeInTheDocument();
     expect(add).not.toHaveBeenCalled();
     fireEvent.click(within(dialog).getByRole("button", { name: "Add repository" }));
     const list = await screen.findByRole("list", { name: "Added repositories" });

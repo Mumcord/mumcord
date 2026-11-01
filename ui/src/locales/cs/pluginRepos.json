@@ -8,13 +8,14 @@
     "expectedKeyHint": "Pokud vám vlastník dal klíč, vložte ho sem. Repozitář pak musí používat přesně tento klíč.",
     "check": "Zkontrolovat repozitář",
     "found": "Tohle jsme našli",
-    "name": "Název",
-    "homepage": "Web",
-    "contact": "Kontakt",
-    "fingerprint": "Otisk klíče",
-    "pluginCount": "Uvedené moduly",
-    "warning": "Mumcord moduly z repozitáře nekontroluje. Mumcord si tento klíč zapamatuje a zeptá se znovu, pokud se změní.",
-    "confirm": "Přidat repozitář"
+    "confirm": "Přidat repozitář",
+    "subtitle": "Přidávejte jen repozitáře od lidí, kterým důvěřujete.",
+    "signatureValid": "podpis platný",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Zásuvné moduly: {{number}}",
+    "signingKey": "Podpisový klíč",
+    "warningTitle": "Neoficiální repozitář",
+    "warningBody": "Mumcord tyto moduly nekontroluje. Klíč se pamatuje: pokud se změní, repozitář se pozastaví, dokud ho neověříte. Při procházení uvidí provozovatel vaši IP adresu. Moduly s oficiálními názvy se odsud nikdy nepřebírají."
   },
   "limit": "Můžete přidat nejvýše {{max}} repozitářů.",
   "limitReached": "Byl dosažen limit {{max}} repozitářů.",
@@ -51,5 +52,9 @@
     "hint": "Měňte jen tehdy, pokud jste dostali adresu zrcadla. Zrcadlo musí poskytovat stejné podepsané soubory; Mumcord i tak ověřuje každý podpis.",
     "save": "Uložit",
     "reset": "Použít výchozí"
+  },
+  "official": {
+    "name": "Oficiální moduly Mumcord",
+    "alwaysOn": "Vždy zapnuto"
   }
 }

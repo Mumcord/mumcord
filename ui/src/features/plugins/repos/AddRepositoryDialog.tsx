@@ -1,4 +1,4 @@
-import { useId, useState, type SyntheticEvent } from "react";
+import { useEffect, useId, useRef, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type RepositoryPreview } from "../../../api";
 import { ModalDialog } from "../../settings/components/ModalDialog";
@@ -30,6 +30,12 @@ export function AddRepositoryDialog({
   const [preview, setPreview] = useState<RepositoryPreview | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  // Cancel is the safe default once the repository is shown (FR-6.74), so Enter never adds it.
+  useEffect(() => {
+    if (preview !== null) cancelRef.current?.focus();
+  }, [preview]);
 
   const expected = key.trim() === "" ? null : key.trim();
 
@@ -61,11 +67,14 @@ export function AddRepositoryDialog({
 
   return (
     <ModalDialog title={t("add.title")} onClose={onCancel}>
+      <p className="plugin-repos__subtitle">{t("add.subtitle")}</p>
       <form onSubmit={(event) => void check(event)} className="plugin-repos__form">
-        <label htmlFor={`${id}-url`}>{t("add.address")}</label>
+        <label htmlFor={`${id}-url`} className="plugin-repos__label">
+          {t("add.address")}
+        </label>
         <input
           id={`${id}-url`}
-          className="settings-input"
+          className="settings-input plugin-repos__mono"
           type="url"
           inputMode="url"
           autoComplete="off"
@@ -77,10 +86,12 @@ export function AddRepositoryDialog({
             setPreview(null);
           }}
         />
-        <label htmlFor={`${id}-key`}>{t("add.expectedKey")}</label>
+        <label htmlFor={`${id}-key`} className="plugin-repos__label">
+          {t("add.expectedKey")}
+        </label>
         <input
           id={`${id}-key`}
-          className="settings-input"
+          className="settings-input plugin-repos__mono"
           autoComplete="off"
           spellCheck={false}
           aria-describedby={`${id}-key-hint`}
@@ -95,7 +106,11 @@ export function AddRepositoryDialog({
         </p>
         {preview === null && (
           <div className="settings-dialog__actions">
-            <button type="button" className="settings-button" onClick={onCancel}>
+            <button
+              type="button"
+              className="settings-button settings-button--primary"
+              onClick={onCancel}
+            >
               {t("common:cancel")}
             </button>
             <button
@@ -115,26 +130,30 @@ export function AddRepositoryDialog({
       )}
       {preview !== null && (
         <>
-          <dl className="plugin-repos__facts" aria-label={t("add.found")}>
-            <dt>{t("add.name")}</dt>
-            <dd>{preview.name}</dd>
-            {preview.homepage !== null && (
-              <>
-                <dt>{t("add.homepage")}</dt>
-                <dd>{preview.homepage}</dd>
-              </>
-            )}
-            {preview.contact !== null && (
-              <>
-                <dt>{t("add.contact")}</dt>
-                <dd>{preview.contact}</dd>
-              </>
-            )}
-            <dt>{t("add.fingerprint")}</dt>
-            <dd className="plugin-repos__fingerprint">{preview.fingerprint}</dd>
-            <dt>{t("add.pluginCount")}</dt>
-            <dd>{preview.pluginCount}</dd>
-          </dl>
+          <div className="plugin-repos__card" role="group" aria-label={t("add.found")}>
+            <span className="plugin-repos__card-icon" aria-hidden="true">
+              {preview.name.trim().charAt(0).toUpperCase()}
+            </span>
+            <div className="plugin-repos__card-body">
+              <strong>{preview.name}</strong>
+              <span className="plugin-repos__meta">
+                {[
+                  t("add.pluginsLine", { number: preview.pluginCount }),
+                  t("add.signatureValid"),
+                  ...(preview.contact !== null
+                    ? [t("add.contactLine", { contact: preview.contact })]
+                    : []),
+                ].join(" · ")}
+              </span>
+              {preview.homepage !== null && (
+                <span className="plugin-repos__meta">{preview.homepage}</span>
+              )}
+              <span>
+                {t("add.signingKey")}{" "}
+                <span className="plugin-repos__fingerprint">{preview.fingerprint}</span>
+              </span>
+            </div>
+          </div>
           {preview.notes.length > 0 && (
             <ul className="plugin-repos__notes">
               {preview.notes.map((note) => (
@@ -142,14 +161,25 @@ export function AddRepositoryDialog({
               ))}
             </ul>
           )}
-          <p className="plugin-repos__hint">{t("add.warning")}</p>
+          <div className="plugin-repos__warning" role="note">
+            <strong>
+              <span aria-hidden="true">⚠ </span>
+              {t("add.warningTitle")}
+            </strong>
+            <p>{t("add.warningBody")}</p>
+          </div>
           <div className="settings-dialog__actions">
-            <button type="button" className="settings-button" onClick={onCancel}>
+            <button
+              type="button"
+              className="settings-button settings-button--primary"
+              ref={cancelRef}
+              onClick={onCancel}
+            >
               {t("common:cancel")}
             </button>
             <button
               type="button"
-              className="settings-button settings-button--primary"
+              className="settings-button settings-button--danger"
               disabled={busy}
               onClick={() => void add()}
             >

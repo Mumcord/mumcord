@@ -8,13 +8,14 @@
     "expectedKeyHint": "Jos ylläpitäjä antoi sinulle avaimen, liitä se tähän. Arkiston on silloin käytettävä juuri tätä avainta.",
     "check": "Tarkista arkisto",
     "found": "Tämän löysimme",
-    "name": "Nimi",
-    "homepage": "Verkkosivu",
-    "contact": "Yhteystieto",
-    "fingerprint": "Avaimen sormenjälki",
-    "pluginCount": "Luetellut lisäosat",
-    "warning": "Mumcord ei tarkista arkiston lisäosia. Mumcord muistaa tämän avaimen ja kysyy uudelleen, jos se muuttuu.",
-    "confirm": "Lisää arkisto"
+    "confirm": "Lisää arkisto",
+    "subtitle": "Lisää vain luotettavien ihmisten arkistoja.",
+    "signatureValid": "allekirjoitus kelvollinen",
+    "contactLine": "yhteystieto: {{contact}}",
+    "pluginsLine": "Liitännäisiä: {{number}}",
+    "signingKey": "Allekirjoitusavain",
+    "warningTitle": "Epävirallinen arkisto",
+    "warningBody": "Mumcord ei tarkista näitä liitännäisiä. Avain muistetaan: jos se muuttuu, arkisto keskeytetään, kunnes tarkistat sen. Selaaminen näyttää IP-osoitteesi ylläpitäjälle. Viralliset nimet omaavia liitännäisiä ei koskaan oteta tästä."
   },
   "limit": "Voit lisätä enintään {{max}} arkistoa.",
   "limitReached": "Enimmäismäärä {{max}} arkistoa on saavutettu.",
@@ -51,5 +52,9 @@
     "hint": "Muuta tätä vain, jos sait peilin osoitteen. Peilin on tarjottava samat allekirjoitetut tiedostot; Mumcord tarkistaa silti jokaisen allekirjoituksen.",
     "save": "Tallenna",
     "reset": "Käytä oletusta"
+  },
+  "official": {
+    "name": "Mumcordin viralliset liitännäiset",
+    "alwaysOn": "Aina käytössä"
   }
 }

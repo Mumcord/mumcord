@@ -8,13 +8,14 @@
     "expectedKeyHint": "Ha a tulajdonos megadott egy kulcsot, illeszd be ide. A tárolónak ekkor pontosan ezt a kulcsot kell használnia.",
     "check": "Tároló ellenőrzése",
     "found": "Ezt találtuk",
-    "name": "Név",
-    "homepage": "Weboldal",
-    "contact": "Kapcsolat",
-    "fingerprint": "Kulcs ujjlenyomata",
-    "pluginCount": "Listázott bővítmények",
-    "warning": "A Mumcord nem ellenőrzi a tárolók bővítményeit. A Mumcord megjegyzi ezt a kulcsot, és újra rákérdez, ha megváltozik.",
-    "confirm": "Tároló hozzáadása"
+    "confirm": "Tároló hozzáadása",
+    "subtitle": "Csak olyan emberek tárolóit add hozzá, akikben megbízol.",
+    "signatureValid": "érvényes aláírás",
+    "contactLine": "kapcsolat: {{contact}}",
+    "pluginsLine": "Bővítmények: {{number}}",
+    "signingKey": "Aláírókulcs",
+    "warningTitle": "Nem hivatalos tároló",
+    "warningBody": "A Mumcord nem ellenőrzi ezeket a bővítményeket. A kulcsot megjegyzi: ha megváltozik, a tároló szünetel, amíg meg nem nézed. Böngészéskor a gazdagép látja az IP-címedet. Hivatalos nevű bővítményeket innen soha nem vesz át."
   },
   "limit": "Legfeljebb {{max}} tárolót adhatsz hozzá.",
   "limitReached": "Elérted a {{max}} tárolós korlátot.",
@@ -51,5 +52,9 @@
     "hint": "Csak akkor módosítsd, ha tükörcímet kaptál. A tükörnek ugyanazokat az aláírt fájlokat kell kiszolgálnia; a Mumcord ettől még minden aláírást ellenőriz.",
     "save": "Mentés",
     "reset": "Alapértelmezett használata"
+  },
+  "official": {
+    "name": "Hivatalos Mumcord-bővítmények",
+    "alwaysOn": "Mindig bekapcsolva"
   }
 }

@@ -8,13 +8,14 @@
     "expectedKeyHint": "Ak vám vlastník dal kľúč, vložte ho sem. Repozitár potom musí používať presne tento kľúč.",
     "check": "Skontrolovať repozitár",
     "found": "Toto sme našli",
-    "name": "Názov",
-    "homepage": "Web",
-    "contact": "Kontakt",
-    "fingerprint": "Odtlačok kľúča",
-    "pluginCount": "Uvedené moduly",
-    "warning": "Mumcord moduly z repozitára nekontroluje. Mumcord si tento kľúč zapamätá a opýta sa znova, ak sa zmení.",
-    "confirm": "Pridať repozitár"
+    "confirm": "Pridať repozitár",
+    "subtitle": "Pridávajte iba repozitáre od ľudí, ktorým dôverujete.",
+    "signatureValid": "podpis platný",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Moduly: {{number}}",
+    "signingKey": "Podpisový kľúč",
+    "warningTitle": "Neoficiálny repozitár",
+    "warningBody": "Mumcord tieto moduly nekontroluje. Kľúč sa zapamätá: ak sa zmení, repozitár sa pozastaví, kým ho skontrolujete. Pri prehliadaní uvidí prevádzkovateľ vašu IP adresu. Moduly s oficiálnymi názvami sa odtiaľto nikdy neberú."
   },
   "limit": "Môžete pridať najviac {{max}} repozitárov.",
   "limitReached": "Dosiahol sa limit {{max}} repozitárov.",
@@ -51,5 +52,9 @@
     "hint": "Meňte len vtedy, ak ste dostali adresu zrkadla. Zrkadlo musí poskytovať rovnaké podpísané súbory; Mumcord aj tak overuje každý podpis.",
     "save": "Uložiť",
     "reset": "Použiť predvolené"
+  },
+  "official": {
+    "name": "Oficiálne moduly Mumcord",
+    "alwaysOn": "Vždy zapnuté"
   }
 }

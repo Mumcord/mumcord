@@ -8,13 +8,14 @@
     "expectedKeyHint": "Wenn dir der Betreiber einen Schlüssel genannt hat, füge ihn hier ein. Die Quelle muss dann genau diesen Schlüssel verwenden.",
     "check": "Quelle prüfen",
     "found": "Das haben wir gefunden",
-    "name": "Name",
-    "homepage": "Webseite",
-    "contact": "Kontakt",
-    "fingerprint": "Schlüssel-Fingerabdruck",
-    "pluginCount": "Aufgeführte Plugins",
-    "warning": "Plugins aus einer Quelle werden von Mumcord nicht geprüft. Mumcord merkt sich diesen Schlüssel und fragt dich erneut, wenn er sich ändert.",
-    "confirm": "Quelle hinzufügen"
+    "confirm": "Quelle hinzufügen",
+    "subtitle": "Füge nur Repositories von Menschen hinzu, denen du vertraust.",
+    "signatureValid": "Signatur gültig",
+    "contactLine": "Kontakt: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Signaturschlüssel",
+    "warningTitle": "Inoffizielles Repository",
+    "warningBody": "Mumcord prüft diese Plugins nicht. Dieser Schlüssel wird gemerkt: Ändert er sich, wird das Repository pausiert, bis du es prüfst. Beim Durchsuchen sieht der Betreiber deine IP-Adresse. Plugins mit offiziellen Namen werden nie daraus übernommen."
   },
   "limit": "Du kannst bis zu {{max}} Quellen hinzufügen.",
   "limitReached": "Das Limit von {{max}} Quellen ist erreicht.",
@@ -51,5 +52,9 @@
     "hint": "Ändere das nur, wenn du eine Spiegel-Adresse bekommen hast. Der Spiegel muss dieselben signierten Dateien liefern; Mumcord prüft trotzdem jede Signatur.",
     "save": "Speichern",
     "reset": "Standard verwenden"
+  },
+  "official": {
+    "name": "Offizielle Mumcord-Plugins",
+    "alwaysOn": "Immer aktiv"
   }
 }

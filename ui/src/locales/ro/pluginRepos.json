@@ -8,13 +8,14 @@
     "expectedKeyHint": "Dacă proprietarul ți-a dat o cheie, lipește-o aici. Depozitul trebuie să folosească exact această cheie.",
     "check": "Verifică depozitul",
     "found": "Iată ce am găsit",
-    "name": "Nume",
-    "homepage": "Pagină web",
-    "contact": "Contact",
-    "fingerprint": "Amprenta cheii",
-    "pluginCount": "Pluginuri listate",
-    "warning": "Mumcord nu verifică pluginurile dintr-un depozit. Mumcord reține această cheie și te întreabă din nou dacă se schimbă.",
-    "confirm": "Adaugă depozit"
+    "confirm": "Adaugă depozit",
+    "subtitle": "Adaugă doar depozite de la oameni în care ai încredere.",
+    "signatureValid": "semnătură validă",
+    "contactLine": "contact: {{contact}}",
+    "pluginsLine": "Pluginuri: {{number}}",
+    "signingKey": "Cheie de semnare",
+    "warningTitle": "Depozit neoficial",
+    "warningBody": "Mumcord nu verifică aceste pluginuri. Cheia este reținută: dacă se schimbă vreodată, depozitul este pus pe pauză până o verifici. Navigarea arată adresa ta IP gazdei. Pluginurile cu nume oficiale nu sunt niciodată preluate de aici."
   },
   "limit": "Poți adăuga cel mult {{max}} depozite.",
   "limitReached": "S-a atins limita de {{max}} depozite.",
@@ -51,5 +52,9 @@
     "hint": "Schimbă doar dacă ai primit o adresă de oglindă. Oglinda trebuie să ofere aceleași fișiere semnate; Mumcord verifică oricum fiecare semnătură.",
     "save": "Salvează",
     "reset": "Folosește valoarea implicită"
+  },
+  "official": {
+    "name": "Pluginuri oficiale Mumcord",
+    "alwaysOn": "Mereu activ"
   }
 }

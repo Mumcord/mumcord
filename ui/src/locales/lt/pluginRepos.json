@@ -8,13 +8,14 @@
     "expectedKeyHint": "Jei savininkas davė raktą, įklijuokite jį čia. Tada saugykla turi naudoti būtent šį raktą.",
     "check": "Patikrinti saugyklą",
     "found": "Štai ką radome",
-    "name": "Pavadinimas",
-    "homepage": "Svetainė",
-    "contact": "Kontaktas",
-    "fingerprint": "Rakto kontrolinis kodas",
-    "pluginCount": "Išvardyti įskiepiai",
-    "warning": "„Mumcord“ netikrina saugyklos įskiepių. „Mumcord“ įsimena šį raktą ir paklaus iš naujo, jei jis pasikeis.",
-    "confirm": "Pridėti saugyklą"
+    "confirm": "Pridėti saugyklą",
+    "subtitle": "Pridėkite tik žmonių, kuriais pasitikite, saugyklas.",
+    "signatureValid": "parašas tinkamas",
+    "contactLine": "kontaktas: {{contact}}",
+    "pluginsLine": "Papildinių: {{number}}",
+    "signingKey": "Pasirašymo raktas",
+    "warningTitle": "Neoficiali saugykla",
+    "warningBody": "„Mumcord“ šių papildinių netikrina. Raktas įsimenamas: jei jis pasikeistų, saugykla bus sustabdyta, kol jį patikrinsite. Naršant šeimininkas mato jūsų IP adresą. Papildiniai su oficialiais pavadinimais iš čia niekada neimami."
   },
   "limit": "Galite pridėti iki {{max}} saugyklų.",
   "limitReached": "Pasiektas {{max}} saugyklų limitas.",
@@ -51,5 +52,9 @@
     "hint": "Keiskite tik jei gavote veidrodžio adresą. Veidrodis turi pateikti tuos pačius pasirašytus failus; „Mumcord“ vis tiek tikrina kiekvieną parašą.",
     "save": "Įrašyti",
     "reset": "Naudoti numatytąjį"
+  },
+  "official": {
+    "name": "Oficialūs „Mumcord“ papildiniai",
+    "alwaysOn": "Visada įjungta"
   }
 }

@@ -8,13 +8,14 @@
     "expectedKeyHint": "Má thug an t-úinéir eochair duit, greamaigh anseo í. Caithfidh an stór an eochair seo go díreach a úsáid ansin.",
     "check": "Seiceáil an stór",
     "found": "Seo a fuaireamar",
-    "name": "Ainm",
-    "homepage": "Suíomh gréasáin",
-    "contact": "Teagmháil",
-    "fingerprint": "Méarloim na heochrach",
-    "pluginCount": "Breiseáin liostaithe",
-    "warning": "Ní dhéanann Mumcord athbhreithniú ar bhreiseáin stóir. Cuimhníonn Mumcord ar an eochair seo agus fiafraíonn sé díot arís má athraíonn sí.",
-    "confirm": "Cuir stór leis"
+    "confirm": "Cuir stór leis",
+    "subtitle": "Ná cuir ach stórais daoine a bhfuil muinín agat astu leis.",
+    "signatureValid": "síniú bailí",
+    "contactLine": "teagmháil: {{contact}}",
+    "pluginsLine": "Breiseáin: {{number}}",
+    "signingKey": "Eochair shínithe",
+    "warningTitle": "Stór neamhoifigiúil",
+    "warningBody": "Ní athbhreithníonn Mumcord na breiseáin seo. Cuimhnítear ar an eochair: má athraíonn sí riamh, cuirtear an stór ar sos go dtí go seiceálann tú é. Nuair a bhrabhsálann tú, feiceann an óstach do sheoladh IP. Ní thógtar breiseáin le hainmneacha oifigiúla uaidh go deo."
   },
   "limit": "Is féidir suas le {{max}} stór a chur leis.",
   "limitReached": "Sroichadh an teorainn de {{max}} stór.",
@@ -51,5 +52,9 @@
     "hint": "Ná hathraigh é seo ach má tugadh seoladh scátháin duit. Caithfidh an scáthán na comhaid shínithe chéanna a sholáthar; seiceálann Mumcord gach síniú fós.",
     "save": "Sábháil",
     "reset": "Úsáid an réamhshocrú"
+  },
+  "official": {
+    "name": "Breiseáin oifigiúla Mumcord",
+    "alwaysOn": "Ar siúl i gcónaí"
   }
 }

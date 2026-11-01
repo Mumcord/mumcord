@@ -100,6 +100,10 @@ export function RepositoriesTab({ mirror }: { mirror?: MirrorSetting | undefined
           {problem}
         </p>
       )}
+      <div className="plugin-repos__official">
+        <strong>{t("official.name")}</strong>
+        <span className="plugin-repos__meta">{t("official.alwaysOn")}</span>
+      </div>
       {repositories !== null && repositories.length === 0 && (
         <p className="plugin-repos__hint">{t("empty")}</p>
       )}

@@ -8,13 +8,14 @@
     "expectedKeyHint": "Ja īpašnieks jums iedeva atslēgu, ielīmējiet to šeit. Tad krātuvei jāizmanto tieši šī atslēga.",
     "check": "Pārbaudīt krātuvi",
     "found": "To mēs atradām",
-    "name": "Nosaukums",
-    "homepage": "Tīmekļa vietne",
-    "contact": "Kontakts",
-    "fingerprint": "Atslēgas pirkstu nospiedums",
-    "pluginCount": "Uzskaitītie spraudņi",
-    "warning": "Mumcord nepārbauda krātuves spraudņus. Mumcord iegaumē šo atslēgu un pajautās vēlreiz, ja tā mainīsies.",
-    "confirm": "Pievienot krātuvi"
+    "confirm": "Pievienot krātuvi",
+    "subtitle": "Pievienojiet tikai tādu cilvēku krātuves, kuriem uzticaties.",
+    "signatureValid": "paraksts derīgs",
+    "contactLine": "kontakts: {{contact}}",
+    "pluginsLine": "Spraudņi: {{number}}",
+    "signingKey": "Parakstīšanas atslēga",
+    "warningTitle": "Neoficiāla krātuve",
+    "warningBody": "Mumcord šos spraudņus nepārbauda. Atslēga tiek atcerēta: ja tā mainās, krātuve tiek apturēta, līdz to pārbaudāt. Pārlūkojot saimniekdatoram tiek parādīta jūsu IP adrese. Spraudņi ar oficiāliem nosaukumiem no šejienes nekad netiek ņemti."
   },
   "limit": "Varat pievienot līdz {{max}} krātuvēm.",
   "limitReached": "Sasniegts {{max}} krātuvju ierobežojums.",
@@ -51,5 +52,9 @@
     "hint": "Mainiet tikai tad, ja saņēmāt spoguļa adresi. Spogulim jāpiedāvā tie paši parakstītie faili; Mumcord tāpat pārbauda katru parakstu.",
     "save": "Saglabāt",
     "reset": "Izmantot noklusējumu"
+  },
+  "official": {
+    "name": "Oficiālie Mumcord spraudņi",
+    "alwaysOn": "Vienmēr ieslēgts"
   }
 }

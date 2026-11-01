@@ -8,13 +8,14 @@
     "expectedKeyHint": "If the owner gave you a key, paste it here. The repository must then use exactly this key.",
     "check": "Check repository",
     "found": "What we found",
-    "name": "Name",
-    "homepage": "Homepage",
-    "contact": "Contact",
-    "fingerprint": "Key fingerprint",
-    "pluginCount": "Plugins listed",
-    "warning": "Plugins from a repository are not reviewed by Mumcord. Mumcord remembers this key and asks you again if it ever changes.",
-    "confirm": "Add repository"
+    "confirm": "Add repository",
+    "subtitle": "Only add repositories from people you trust.",
+    "signatureValid": "signature valid",
+    "contactLine": "contact: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Signing key",
+    "warningTitle": "Unofficial repository",
+    "warningBody": "Mumcord does not review these plugins. This key is remembered: if it ever changes, the repository is paused until you check it. Browsing it shows your IP address to its host. Plugins with official names are never taken from it."
   },
   "limit": "You can add up to {{max}} repositories.",
   "limitReached": "The limit of {{max}} repositories is reached.",
@@ -51,5 +52,9 @@
     "hint": "Only change this if you were given a mirror address. The mirror must serve the same signed files; Mumcord still checks every signature.",
     "save": "Save",
     "reset": "Use the default"
+  },
+  "official": {
+    "name": "Official Mumcord plugins",
+    "alwaysOn": "Always on"
   }
 }

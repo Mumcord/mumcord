@@ -8,13 +8,14 @@
     "expectedKeyHint": "Hvis ejeren gav dig en nøgle, så indsæt den her. Arkivet skal så bruge netop denne nøgle.",
     "check": "Tjek arkivet",
     "found": "Det fandt vi",
-    "name": "Navn",
-    "homepage": "Hjemmeside",
-    "contact": "Kontakt",
-    "fingerprint": "Nøglens fingeraftryk",
-    "pluginCount": "Opførte plugins",
-    "warning": "Plugins fra et arkiv gennemgås ikke af Mumcord. Mumcord husker denne nøgle og spørger igen, hvis den ændres.",
-    "confirm": "Tilføj arkiv"
+    "confirm": "Tilføj arkiv",
+    "subtitle": "Tilføj kun arkiver fra folk, du stoler på.",
+    "signatureValid": "signatur gyldig",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Signeringsnøgle",
+    "warningTitle": "Uofficielt arkiv",
+    "warningBody": "Mumcord gennemgår ikke disse plugins. Nøglen huskes: hvis den ændres, sættes arkivet på pause, til du har tjekket den. Når du gennemser det, kan værten se din IP-adresse. Plugins med officielle navne hentes aldrig herfra."
   },
   "limit": "Du kan tilføje op til {{max}} arkiver.",
   "limitReached": "Grænsen på {{max}} arkiver er nået.",
@@ -51,5 +52,9 @@
     "hint": "Ændr kun dette, hvis du har fået en spejladresse. Spejlet skal levere de samme signerede filer; Mumcord tjekker stadig hver signatur.",
     "save": "Gem",
     "reset": "Brug standard"
+  },
+  "official": {
+    "name": "Officielle Mumcord-plugins",
+    "alwaysOn": "Altid til"
   }
 }

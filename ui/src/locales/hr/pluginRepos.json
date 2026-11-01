@@ -8,13 +8,14 @@
     "expectedKeyHint": "Ako vam je vlasnik dao ključ, zalijepite ga ovdje. Repozitorij tada mora koristiti točno taj ključ.",
     "check": "Provjeri repozitorij",
     "found": "Ovo smo pronašli",
-    "name": "Naziv",
-    "homepage": "Web-stranica",
-    "contact": "Kontakt",
-    "fingerprint": "Otisak ključa",
-    "pluginCount": "Navedeni dodaci",
-    "warning": "Mumcord ne pregledava dodatke iz repozitorija. Mumcord pamti ovaj ključ i pitat će vas ponovno ako se promijeni.",
-    "confirm": "Dodaj repozitorij"
+    "confirm": "Dodaj repozitorij",
+    "subtitle": "Dodajte samo repozitorije ljudi kojima vjerujete.",
+    "signatureValid": "potpis valjan",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Dodaci: {{number}}",
+    "signingKey": "Ključ za potpis",
+    "warningTitle": "Neslužbeni repozitorij",
+    "warningBody": "Mumcord ne provjerava ove dodatke. Ključ se pamti: ako se ikad promijeni, repozitorij se pauzira dok ga ne provjerite. Pregledavanje domaćinu prikazuje vašu IP adresu. Dodaci sa službenim nazivima nikad se odavde ne preuzimaju."
   },
   "limit": "Možete dodati do {{max}} repozitorija.",
   "limitReached": "Dosegnuto je ograničenje od {{max}} repozitorija.",
@@ -51,5 +52,9 @@
     "hint": "Promijenite samo ako ste dobili adresu zrcala. Zrcalo mora posluživati iste potpisane datoteke; Mumcord i dalje provjerava svaki potpis.",
     "save": "Spremi",
     "reset": "Koristi zadano"
+  },
+  "official": {
+    "name": "Službeni Mumcord dodaci",
+    "alwaysOn": "Uvijek uključeno"
   }
 }

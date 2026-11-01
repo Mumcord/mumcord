@@ -8,13 +8,14 @@
     "expectedKeyHint": "Om ägaren gav dig en nyckel, klistra in den här. Förrådet måste då använda exakt den nyckeln.",
     "check": "Kontrollera förrådet",
     "found": "Det här hittade vi",
-    "name": "Namn",
-    "homepage": "Webbplats",
-    "contact": "Kontakt",
-    "fingerprint": "Nyckelns fingeravtryck",
-    "pluginCount": "Listade plugin",
-    "warning": "Plugin från ett förråd granskas inte av Mumcord. Mumcord kommer ihåg nyckeln och frågar igen om den ändras.",
-    "confirm": "Lägg till förråd"
+    "confirm": "Lägg till förråd",
+    "subtitle": "Lägg bara till arkiv från personer du litar på.",
+    "signatureValid": "signaturen är giltig",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Tillägg: {{number}}",
+    "signingKey": "Signeringsnyckel",
+    "warningTitle": "Inofficiellt arkiv",
+    "warningBody": "Mumcord granskar inte dessa tillägg. Nyckeln kommer ihåg: om den ändras pausas arkivet tills du har kontrollerat det. När du bläddrar visas din IP-adress för värden. Tillägg med officiella namn hämtas aldrig härifrån."
   },
   "limit": "Du kan lägga till upp till {{max}} förråd.",
   "limitReached": "Gränsen på {{max}} förråd är nådd.",
@@ -51,5 +52,9 @@
     "hint": "Ändra bara detta om du fått en spegeladress. Spegeln måste leverera samma signerade filer; Mumcord kontrollerar ändå varje signatur.",
     "save": "Spara",
     "reset": "Använd standard"
+  },
+  "official": {
+    "name": "Officiella Mumcord-tillägg",
+    "alwaysOn": "Alltid på"
   }
 }

@@ -8,13 +8,14 @@
     "expectedKeyHint": "Si el propietario te dio una clave, pégala aquí. El repositorio deberá usar exactamente esa clave.",
     "check": "Comprobar repositorio",
     "found": "Esto es lo que encontramos",
-    "name": "Nombre",
-    "homepage": "Página web",
-    "contact": "Contacto",
-    "fingerprint": "Huella de la clave",
-    "pluginCount": "Plugins listados",
-    "warning": "Mumcord no revisa los plugins de un repositorio. Mumcord recuerda esta clave y te preguntará de nuevo si alguna vez cambia.",
-    "confirm": "Añadir repositorio"
+    "confirm": "Añadir repositorio",
+    "subtitle": "Añade solo repositorios de personas de confianza.",
+    "signatureValid": "firma válida",
+    "contactLine": "contacto: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Clave de firma",
+    "warningTitle": "Repositorio no oficial",
+    "warningBody": "Mumcord no revisa estos plugins. Esta clave se recuerda: si alguna vez cambia, el repositorio se pausa hasta que lo compruebes. Al explorarlo, su anfitrión ve tu dirección IP. Nunca se toman de él plugins con nombres oficiales."
   },
   "limit": "Puedes añadir hasta {{max}} repositorios.",
   "limitReached": "Se alcanzó el límite de {{max}} repositorios.",
@@ -51,5 +52,9 @@
     "hint": "Cambia esto solo si te dieron la dirección de un espejo. El espejo debe servir los mismos archivos firmados; Mumcord sigue comprobando cada firma.",
     "save": "Guardar",
     "reset": "Usar el valor predeterminado"
+  },
+  "official": {
+    "name": "Plugins oficiales de Mumcord",
+    "alwaysOn": "Siempre activo"
   }
 }

@@ -8,13 +8,14 @@
     "expectedKeyHint": "Si le propriétaire vous a donné une clé, collez-la ici. Le dépôt doit alors utiliser exactement cette clé.",
     "check": "Vérifier le dépôt",
     "found": "Voici ce que nous avons trouvé",
-    "name": "Nom",
-    "homepage": "Site web",
-    "contact": "Contact",
-    "fingerprint": "Empreinte de la clé",
-    "pluginCount": "Plugins listés",
-    "warning": "Mumcord ne vérifie pas les plugins d'un dépôt. Mumcord retient cette clé et vous redemande si elle change un jour.",
-    "confirm": "Ajouter le dépôt"
+    "confirm": "Ajouter le dépôt",
+    "subtitle": "N'ajoutez que des dépôts de personnes en qui vous avez confiance.",
+    "signatureValid": "signature valide",
+    "contactLine": "contact : {{contact}}",
+    "pluginsLine": "Plugins : {{number}}",
+    "signingKey": "Clé de signature",
+    "warningTitle": "Dépôt non officiel",
+    "warningBody": "Mumcord ne vérifie pas ces plugins. Cette clé est mémorisée : si elle change, le dépôt est mis en pause jusqu'à ce que vous la vérifiiez. Le parcourir montre votre adresse IP à son hébergeur. Les plugins portant des noms officiels n'en sont jamais repris."
   },
   "limit": "Vous pouvez ajouter jusqu'à {{max}} dépôts.",
   "limitReached": "La limite de {{max}} dépôts est atteinte.",
@@ -51,5 +52,9 @@
     "hint": "Ne modifiez ceci que si on vous a donné une adresse de miroir. Le miroir doit fournir les mêmes fichiers signés ; Mumcord vérifie quand même chaque signature.",
     "save": "Enregistrer",
     "reset": "Utiliser la valeur par défaut"
+  },
+  "official": {
+    "name": "Plugins officiels de Mumcord",
+    "alwaysOn": "Toujours actif"
   }
 }

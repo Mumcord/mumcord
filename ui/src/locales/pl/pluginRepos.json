@@ -8,13 +8,14 @@
     "expectedKeyHint": "Jeśli właściciel podał Ci klucz, wklej go tutaj. Repozytorium musi wtedy używać dokładnie tego klucza.",
     "check": "Sprawdź repozytorium",
     "found": "Oto co znaleźliśmy",
-    "name": "Nazwa",
-    "homepage": "Strona internetowa",
-    "contact": "Kontakt",
-    "fingerprint": "Odcisk klucza",
-    "pluginCount": "Wymienione wtyczki",
-    "warning": "Mumcord nie sprawdza wtyczek z repozytorium. Mumcord zapamiętuje ten klucz i zapyta ponownie, jeśli się zmieni.",
-    "confirm": "Dodaj repozytorium"
+    "confirm": "Dodaj repozytorium",
+    "subtitle": "Dodawaj tylko repozytoria od osób, którym ufasz.",
+    "signatureValid": "podpis prawidłowy",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Wtyczki: {{number}}",
+    "signingKey": "Klucz podpisu",
+    "warningTitle": "Nieoficjalne repozytorium",
+    "warningBody": "Mumcord nie sprawdza tych wtyczek. Klucz jest zapamiętywany: jeśli się zmieni, repozytorium zostanie wstrzymane, dopóki go nie sprawdzisz. Przeglądanie pokazuje twój adres IP jego hostowi. Wtyczki o oficjalnych nazwach nigdy nie są stąd pobierane."
   },
   "limit": "Możesz dodać do {{max}} repozytoriów.",
   "limitReached": "Osiągnięto limit {{max}} repozytoriów.",
@@ -51,5 +52,9 @@
     "hint": "Zmień to tylko wtedy, gdy dostałeś adres serwera lustrzanego. Serwer musi udostępniać te same podpisane pliki; Mumcord i tak sprawdza każdy podpis.",
     "save": "Zapisz",
     "reset": "Użyj domyślnego"
+  },
+  "official": {
+    "name": "Oficjalne wtyczki Mumcord",
+    "alwaysOn": "Zawsze włączone"
   }
 }

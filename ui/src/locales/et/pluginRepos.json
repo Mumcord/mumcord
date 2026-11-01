@@ -8,13 +8,14 @@
     "expectedKeyHint": "Kui omanik andis sulle võtme, kleebi see siia. Hoidla peab siis kasutama täpselt seda võtit.",
     "check": "Kontrolli hoidlat",
     "found": "Selle leidsime",
-    "name": "Nimi",
-    "homepage": "Koduleht",
-    "contact": "Kontakt",
-    "fingerprint": "Võtme sõrmejälg",
-    "pluginCount": "Loetletud pluginad",
-    "warning": "Mumcord ei kontrolli hoidla pluginaid. Mumcord jätab selle võtme meelde ja küsib uuesti, kui see muutub.",
-    "confirm": "Lisa hoidla"
+    "confirm": "Lisa hoidla",
+    "subtitle": "Lisa ainult usaldusväärsete inimeste hoidlaid.",
+    "signatureValid": "allkiri kehtib",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Pluginaid: {{number}}",
+    "signingKey": "Allkirjastamisvõti",
+    "warningTitle": "Mitteametlik hoidla",
+    "warningBody": "Mumcord neid pluginaid ei kontrolli. Võti jäetakse meelde: kui see muutub, peatatakse hoidla, kuni selle üle vaatad. Sirvimisel näeb hoidla omanik sinu IP-aadressi. Ametliku nimega pluginaid sealt kunagi ei võeta."
   },
   "limit": "Saad lisada kuni {{max}} hoidlat.",
   "limitReached": "{{max}} hoidla piir on täis.",
@@ -51,5 +52,9 @@
     "hint": "Muuda seda ainult siis, kui said peegli aadressi. Peegel peab pakkuma samu allkirjastatud faile; Mumcord kontrollib siiski iga allkirja.",
     "save": "Salvesta",
     "reset": "Kasuta vaikimisi väärtust"
+  },
+  "official": {
+    "name": "Mumcordi ametlikud pluginad",
+    "alwaysOn": "Alati sees"
   }
 }
