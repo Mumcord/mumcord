@@ -11,6 +11,7 @@ import { clockTime } from "../media/format";
 import { MiniBar } from "../media/MiniBar";
 import { useMediaView, openMedia } from "../media/mediaView";
 import { mockPlaceholder } from "../media/mockPlaceholder";
+import { isPoppedOut, usePopouts } from "../media/popoutStore";
 import { useTick } from "../media/useTick";
 import { useKnownDuration } from "./knownDuration";
 import { PartyPlayerFrame } from "./PartyPlayer";
@@ -31,7 +32,7 @@ export function WatchMiniBar({ serverId }: { serverId: number }): ReactNode {
 function Mini({ serverId, live }: { serverId: number; live: LiveParty }): ReactNode {
   const { t: tc } = useTranslation("common");
   const { t: tp } = useTranslation("watchparty");
-  const { player, frameRef } = usePartyPlayer(serverId, live);
+  const poppedOut = isPoppedOut(usePopouts(), "watch", serverId, null);
   const nowMs = useTick(1000);
   const videoId = live.party.videoId;
   const preview = useVideoPreview(videoId);
@@ -56,14 +57,8 @@ function Mini({ serverId, live }: { serverId: number; live: LiveParty }): ReactN
           ) : (
             <span className="mini-bar__empty" aria-hidden="true" />
           )}
-          {mockPlaceholder() === null && (
-            <PartyPlayerFrame
-              live={live}
-              player={player}
-              frameRef={frameRef}
-              className="mini-bar__frame"
-            />
-          )}
+          {/* Issue #164: while the party plays in its own window, the thumbnail stays a picture. */}
+          {!poppedOut && <MiniPlayer serverId={serverId} live={live} />}
         </>
       }
       progress={
@@ -83,5 +78,14 @@ function Mini({ serverId, live }: { serverId: number; live: LiveParty }): ReactN
         leaveWatchParty(serverId, tp("leaveFailed"));
       }}
     />
+  );
+}
+
+/** The party's player in the thumbnail, where the video plays on. */
+function MiniPlayer({ serverId, live }: { serverId: number; live: LiveParty }): ReactNode {
+  const { player, frameRef } = usePartyPlayer(serverId, live);
+  if (mockPlaceholder() !== null) return null;
+  return (
+    <PartyPlayerFrame live={live} player={player} frameRef={frameRef} className="mini-bar__frame" />
   );
 }

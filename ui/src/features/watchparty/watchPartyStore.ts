@@ -81,12 +81,15 @@ export function setWatchParty(serverId: number, party: WatchParty | null): void 
   set(serverId, party);
 }
 
+/** The party in the user's channel on `serverId`, or `null`, for code outside React. */
+export function watchPartyOf(serverId: number | null): LiveParty | null {
+  ensureBound();
+  return (serverId === null ? undefined : parties.get(serverId)) ?? null;
+}
+
 /** The party in the user's channel on `serverId`, or `null`. */
 export function useWatchParty(serverId: number | null): LiveParty | null {
-  return useSyncExternalStore(subscribe, () => {
-    ensureBound();
-    return (serverId === null ? undefined : parties.get(serverId)) ?? null;
-  });
+  return useSyncExternalStore(subscribe, () => watchPartyOf(serverId));
 }
 
 /** Where a party is at `nowMs`, in milliseconds into the video. */

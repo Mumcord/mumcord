@@ -20,6 +20,8 @@ import { SeekBar, type SeekMarker } from "../media/SeekBar";
 import { ShortcutHint, useFirstUse } from "../media/ShortcutHint";
 import { VolumeControl } from "../media/VolumeControl";
 import { useMediaView, setFocus } from "../media/mediaView";
+import { PopoutButtons, PoppedOut } from "../media/PopoutControls";
+import { isPoppedOut, useInPopout, usePopouts, usePopoutTitle } from "../media/popoutStore";
 import { useMediaKeys } from "../media/useMediaKeys";
 import { useFullscreen } from "../media/useFullscreen";
 import { useTick } from "../media/useTick";
@@ -48,8 +50,20 @@ const ACTION_ICON: Record<WatchCommand["kind"], MediaIconName> = {
 export function WatchTogetherView({ serverId }: { serverId: number }): ReactNode {
   const live = useWatchParty(serverId);
   const view = useMediaView();
+  const popouts = usePopouts();
+  const inPopout = useInPopout();
   if (live === null || !live.party.joined) return null;
-  return <Cinema serverId={serverId} live={live} focus={view.focus} />;
+  // Issue #164: the party plays in its own window, so the player here is unloaded.
+  if (!inPopout && isPoppedOut(popouts, "watch", serverId, null))
+    return <WatchPoppedOut videoId={live.party.videoId} />;
+  // The pop-out shows only the picture, as in focus.
+  return <Cinema serverId={serverId} live={live} focus={inPopout || view.focus} />;
+}
+
+function WatchPoppedOut({ videoId }: { videoId: string }): ReactNode {
+  const { t } = useTranslation("watchparty");
+  const preview = useVideoPreview(videoId);
+  return <PoppedOut kind="watch" title={preview?.title ?? t("playlist.videoTitle")} />;
 }
 
 /** An icon button in the control row. */
@@ -97,6 +111,7 @@ export function Cinema({
   const title = preview?.title ?? t("playlist.videoTitle");
   const nowMs = useTick(TICK_MS);
   const first = useFirstUse("watchTogether");
+  const windowTitle = usePopoutTitle(serverId, t("title"));
 
   const { player, frameRef: embedRef } = usePartyPlayer(serverId, live);
 
@@ -261,6 +276,7 @@ export function Cinema({
                 ? tc("media.syncedPlay")
                 : t(`other.${action.command.kind}`, { name: nameOf(action.session) })}
             </span>
+            <PopoutButtons kind="watch" serverId={serverId} session={null} title={windowTitle} />
           </>
         }
         fullscreen={fullscreen}
