@@ -190,8 +190,16 @@ codegen-units = 1
             README.replace("{name}", &name).replace("{id}", id),
         ),
         (".gitignore", "/target\n/dist\n".to_owned()),
+        // Pinned so that reproducible builds give the same hash on every machine.
+        ("rust-toolchain.toml", TOOLCHAIN.to_owned()),
     ])
 }
+
+const TOOLCHAIN: &str = "[toolchain]
+channel = \"1.99.1\"
+targets = [\"wasm32-unknown-unknown\"]
+profile = \"minimal\"
+";
 
 /// `my-plugin` → `My plugin`, cut to the 32-character name limit.
 fn title(id: &str) -> String {
@@ -228,6 +236,11 @@ mod tests {
             .expect("valid Cargo.toml");
         assert_eq!(cargo["package"]["name"].as_str(), Some("wave-demo"));
         assert!(project.join("src/lib.rs").exists());
+        let toolchain: toml::Table = fs::read_to_string(project.join("rust-toolchain.toml"))
+            .expect("test step")
+            .parse()
+            .expect("valid rust-toolchain.toml");
+        assert_eq!(toolchain["toolchain"]["channel"].as_str(), Some("1.99.1"));
 
         assert!(
             run("wave-demo", Some(project), None).is_err(),
