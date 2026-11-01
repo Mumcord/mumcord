@@ -16,8 +16,8 @@ use mumcord_plugins::manifest::Source;
 use mumcord_plugins::package::{MANIFEST_FILE, Package};
 use mumcord_plugins::peer_key::PeerKeys;
 use mumcord_plugins::wit::events::{
-    ActionSource, ActionValue, Channel, Event, PanelVisibility, PeerMessage, PluginSettings,
-    SelfState, UiAction, Visibility,
+    ActionSource, ActionValue, Channel, ChatTrigger, Event, PanelVisibility, PeerMessage,
+    PluginSettings, SelfState, UiAction, Visibility,
 };
 use mumcord_plugins::wit::peers::Target;
 use mumcord_plugins::wit::theme::Mode;
@@ -277,6 +277,13 @@ pub enum EventSpec {
     },
     ScreenShareStarted(u32),
     ChatActivity(u32),
+    /// A chat line starting with one of the plugin's trigger words, e.g. `!poll 2`.
+    ChatTrigger {
+        sender: u32,
+        trigger: String,
+        #[serde(default)]
+        args: String,
+    },
     Mentioned(u32),
     ProfileCardOpened(u32),
     UserMenuRequested(u32),
@@ -563,6 +570,8 @@ pub struct Session {
     outputs: Arc<Mutex<Vec<Output>>>,
     /// Outputs before this index were matched or skipped by an earlier `expect`.
     cursor: usize,
+    /// The manifest's trigger words; a `chat-trigger` step must use one of them.
+    triggers: Vec<String>,
 }
 
 impl Session {
@@ -648,6 +657,7 @@ impl Session {
             me: me.clone(),
             outputs,
             cursor: 0,
+            triggers: manifest.triggers.clone(),
         };
         if let Err(e) = session.host.enable(&session.id) {
             session.drain_host_events();
@@ -765,6 +775,20 @@ impl Session {
             }
             EventSpec::ScreenShareStarted(s) => Event::ScreenShareStarted(self.peer(*s)?),
             EventSpec::ChatActivity(s) => Event::ChatActivity((self.peer(*s)?, test_channel())),
+            EventSpec::ChatTrigger {
+                sender,
+                trigger,
+                args,
+            } => {
+                if !self.triggers.contains(trigger) {
+                    bail!("the manifest does not declare the trigger \"{trigger}\"");
+                }
+                Event::ChatTrigger(ChatTrigger {
+                    sender: self.peer(*sender)?,
+                    trigger: trigger.clone(),
+                    args: mumcord_plugins::triggers::clip_args(args),
+                })
+            }
             EventSpec::Mentioned(s) => Event::Mentioned(self.peer(*s)?),
             EventSpec::ProfileCardOpened(s) => Event::ProfileCardOpened(self.peer(*s)?),
             EventSpec::UserMenuRequested(s) => Event::UserMenuRequested(self.peer(*s)?),
@@ -1107,6 +1131,7 @@ steps:
   - event: {joined: 2}
   - event: dialog-closed
   - event: {self-changed: {dnd: true, muted: true, channel: Lobby}}
+  - event: {chat-trigger: {sender: 2, trigger: "!poll", args: "2"}}
   - wait: 50
   - expect: {tree: {slot: panel, text: "Waves: 1"}}
   - expect: {message: {to: channel, kind: 1}}
@@ -1114,7 +1139,7 @@ steps:
   - expect: nothing
 "#;
         let scenario: Scenario = serde_saphyr::from_str(yaml).expect("parses");
-        assert_eq!(scenario.steps.len(), 11);
+        assert_eq!(scenario.steps.len(), 12);
         assert_eq!(scenario.me.session, 1);
         assert!(matches!(
             &scenario.steps[1],
@@ -1127,7 +1152,12 @@ steps:
                 if c == "Lobby"
         ));
         assert!(matches!(
-            &scenario.steps[9],
+            &scenario.steps[6],
+            Step::Event(EventSpec::ChatTrigger { sender: 2, trigger, args })
+                if trigger == "!poll" && args == "2"
+        ));
+        assert!(matches!(
+            &scenario.steps[10],
             Step::Expect(Expect::Message {
                 to: Some(ToSpec::Session(2)),
                 ..

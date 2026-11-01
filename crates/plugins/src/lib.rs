@@ -21,6 +21,7 @@ pub mod registry;
 mod runtime;
 pub mod service;
 pub mod suggestions;
+pub mod triggers;
 pub mod verify;
 pub mod version;
 

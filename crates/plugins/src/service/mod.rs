@@ -17,6 +17,7 @@ mod lifecycle;
 mod messaging;
 mod plugin_io;
 mod revocation;
+mod triggers;
 mod ui;
 mod updates;
 
@@ -280,6 +281,8 @@ pub struct PluginService {
     updates: updates::Updates,
     /// The latest revocation list applied (bundled, cached or fetched).
     revoked: crate::registry::RevocationList,
+    /// Per-sender limit for chat trigger lines.
+    trigger_limit: crate::triggers::RateLimit,
 }
 
 impl PluginService {
@@ -336,6 +339,7 @@ impl PluginService {
             events,
             updates: updates::Updates::default(),
             revoked: crate::registry::RevocationList::bundled(),
+            trigger_limit: crate::triggers::RateLimit::default(),
         };
         Ok((service, host_rx, events_rx))
     }

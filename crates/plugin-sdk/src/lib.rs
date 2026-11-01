@@ -37,6 +37,12 @@
 //! mumcord_plugin_sdk::export!(Hello);
 //! ```
 //!
+//! Chat triggers: a plugin that declares `"triggers": ["!poll"]` in its manifest and holds
+//! `chat.triggers` gets [`events::Event::ChatTrigger`] when someone in the user's channel (on any
+//! Mumble client) writes a line starting with that word, e.g. `!poll 2`; `args` is the rest of
+//! the line (untrusted, at most 200 characters). No other chat text ever reaches a plugin, and a
+//! word another plugin installed earlier already declares is not delivered.
+//!
 //! Every host call is checked against the permissions the user granted; a missing permission
 //! returns [`types::Error::NotPermitted`]. The meaning and limits of each call are documented on
 //! the generated functions and in the WIT files.

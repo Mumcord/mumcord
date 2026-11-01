@@ -260,6 +260,19 @@ fn feed(service: &mut PluginService, event: PluginEngineEvent, friends: &HashSet
             &peer(sender, friends),
             (channel.id, channel.name),
         ),
+        PluginEngineEvent::ChatTrigger {
+            server_id,
+            sender,
+            channel,
+            trigger,
+            args,
+        } => service.chat_trigger(
+            server_id,
+            &peer(sender, friends),
+            channel.id,
+            &trigger,
+            &args,
+        ),
         PluginEngineEvent::Mentioned { server_id, sender } => {
             service.mentioned(server_id, &peer(sender, friends));
         }
@@ -291,63 +304,11 @@ pub fn incoming_line(message: &ChatMessageView) -> Option<(u64, u32, String)> {
     }
     let id = message.id.parse().ok()?;
     let sender = message.sender_session?;
-    Some((id, sender, plain_text(&message.body)))
-}
-
-/// Mumble HTML to the plain line: tags dropped, entities decoded.
-pub fn plain_text(html: &str) -> String {
-    let mut text = String::with_capacity(html.len());
-    let mut rest = html;
-    while let Some(start) = rest.find('<') {
-        text.push_str(&rest[..start]);
-        rest = match rest[start..].find('>') {
-            Some(end) => &rest[start + end + 1..],
-            None => "",
-        };
-    }
-    text.push_str(rest);
-    decode_entities(&text)
-}
-
-fn decode_entities(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    let mut rest = text;
-    while let Some(start) = rest.find('&') {
-        out.push_str(&rest[..start]);
-        let after = &rest[start + 1..];
-        let decoded = after.find(';').filter(|end| *end <= 10).and_then(|end| {
-            let name = &after[..end];
-            let c = match name {
-                "lt" => Some('<'),
-                "gt" => Some('>'),
-                "amp" => Some('&'),
-                "quot" => Some('"'),
-                "apos" => Some('\''),
-                "nbsp" => Some('\u{a0}'),
-                _ => {
-                    let number = name.strip_prefix('#')?;
-                    let code = match number.strip_prefix(['x', 'X']) {
-                        Some(hex) => u32::from_str_radix(hex, 16).ok()?,
-                        None => number.parse().ok()?,
-                    };
-                    char::from_u32(code)
-                }
-            }?;
-            Some((c, end))
-        });
-        match decoded {
-            Some((c, end)) => {
-                out.push(c);
-                rest = &after[end + 1..];
-            }
-            None => {
-                out.push('&');
-                rest = after;
-            }
-        }
-    }
-    out.push_str(rest);
-    out
+    Some((
+        id,
+        sender,
+        mumcord_engine::plain_text::plain_text(&message.body),
+    ))
 }
 
 /// Plugin text is plain text: it must never become markup in anyone's client.
@@ -375,16 +336,7 @@ mod tests {
         let line = "[Poll] <b>Pizza</b> & \"pasta\" 'tonight'?";
         let html = escape_html(line);
         assert!(!html.contains('<'));
-        assert_eq!(plain_text(&html), line);
-    }
-
-    #[test]
-    fn mumble_html_becomes_its_plain_line() {
-        assert_eq!(
-            plain_text("<p>[Dice] rolled <b>2d6</b>: 7 &#x2764; &#9733;</p>"),
-            "[Dice] rolled 2d6: 7 \u{2764} \u{2605}"
-        );
-        assert_eq!(plain_text("a &unknown; & b"), "a &unknown; & b");
+        assert_eq!(mumcord_engine::plain_text::plain_text(&html), line);
     }
 
     #[test]

@@ -10,8 +10,8 @@ use minisign::KeyPair;
 use mumcord_plugins::Source;
 use mumcord_plugins::registry::Download;
 use mumcord_plugins::service::{
-    InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService, ServiceConfig, ServiceError,
-    ServiceEvent, Status,
+    InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService, SelfInfo, ServiceConfig,
+    ServiceError, ServiceEvent, Status,
 };
 use mumcord_plugins::verify::IndexEntry;
 use mumcord_plugins::{Digest, HostEvent};
@@ -649,4 +649,137 @@ fn visibility_nobody_leaves_a_plugin_out_of_the_announce() {
     let announces = service.poll_announces();
     let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
     assert!(!text.contains("quiet"), "{text}");
+}
+
+/// On a `chat-trigger` event (case 19), sends its `args` to the channel as a kind-5 plugin
+/// message, so the test can see what arrived. The event payload starts at offset 8 (the
+/// variant holds a u64); in `chat-trigger`, `args` is the string at payload offset 32.
+const TRIGGER_ECHO: &str = r#"
+(module
+  (import "mumcord:plugin/peers@1.0.0" "send" (func $send (param i32 i32 i32 i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    ;; Round up to the requested alignment.
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param $event i32)
+    (if (i32.eq (i32.load8_u (local.get $event)) (i32.const 19))
+      (then
+        (call $send (i32.const 0) (i32.const 0) (i32.const 5)
+          (i32.load (i32.add (local.get $event) (i32.const 40)))
+          (i32.load (i32.add (local.get $event) (i32.const 44)))
+          (i32.const 100)))))
+  (func (export "stop"))
+)"#;
+
+fn trigger_folder(root: &Path, id: &str, extra: &str) -> PathBuf {
+    let dir = root.join(format!("src-{id}"));
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(dir.join("manifest.json"), manifest(id, "0.1.0", extra)).expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode(TRIGGER_ECHO)).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    dir
+}
+
+/// Plugin and payload of every plugin message sent within `wait`.
+fn echoed(
+    service: &mut PluginService,
+    host_events: &mut UnboundedReceiver<HostEvent>,
+    events: &mut UnboundedReceiver<ServiceEvent>,
+    wait: std::time::Duration,
+) -> Vec<(String, Vec<u8>)> {
+    let until = std::time::Instant::now() + wait;
+    let mut out = Vec::new();
+    loop {
+        while let Ok(event) = host_events.try_recv() {
+            service.handle_host_event(event).expect("handled");
+        }
+        while let Ok(event) = events.try_recv() {
+            if let ServiceEvent::PeerSend {
+                plugin, outgoing, ..
+            } = event
+            {
+                out.push((plugin, outgoing.bytes[3..].to_vec()));
+            }
+        }
+        if std::time::Instant::now() >= until {
+            return out;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}
+
+#[test]
+fn chat_triggers_reach_only_the_owner_and_only_from_my_channel() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["poll@1~dev","late@1~dev","deaf@1~dev"]}"#,
+    );
+    service.self_changed(
+        1,
+        SelfInfo {
+            me: PeerInfo {
+                session: 1,
+                name: "Me".into(),
+                cert_hash: None,
+                is_friend: false,
+            },
+            channel: Some((3, "Lobby".into())),
+            muted: false,
+            deafened: false,
+        },
+    );
+    let triggers =
+        r#","permissions":{"required":["peers.messages","chat.triggers"]},"triggers":["!poll"]"#;
+    let poll = service
+        .load_dev(&trigger_folder(fx.root.path(), "poll", triggers))
+        .expect("loads");
+    // Declares the same word later: the first plugin keeps it.
+    let _late = service
+        .load_dev(&trigger_folder(fx.root.path(), "late", triggers))
+        .expect("loads");
+    // Without the permission (and so without triggers) nothing reaches it.
+    let _deaf = service
+        .load_dev(&trigger_folder(
+            fx.root.path(),
+            "deaf",
+            r#","permissions":{"required":["peers.messages"]}"#,
+        ))
+        .expect("loads");
+    for id in [&poll, &_late, &_deaf] {
+        assert_eq!(info(&service, id).status, Status::Running, "{id}");
+    }
+
+    // Another channel, another server or an unknown word: nothing.
+    service.chat_trigger(1, &bob(), 4, "!poll", "1");
+    service.chat_trigger(2, &bob(), 3, "!poll", "1");
+    service.chat_trigger(1, &bob(), 3, "!dice", "1");
+    // In my channel: the owner gets it; a third line within a second is dropped.
+    service.chat_trigger(1, &bob(), 3, "!poll", "2");
+    service.chat_trigger(1, &bob(), 3, "!poll", "3");
+    service.chat_trigger(1, &bob(), 3, "!poll", "4");
+
+    let wait = std::time::Duration::from_millis(500);
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll.clone(), b"2".to_vec()), (poll, b"3".to_vec())]
+    );
 }

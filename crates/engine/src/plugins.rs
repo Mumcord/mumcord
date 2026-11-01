@@ -135,6 +135,17 @@ pub enum PluginEngineEvent {
         sender: PluginPeer,
         channel: PluginChannel,
     },
+    /// A channel message whose first line starts with a trigger word such as `!poll`
+    /// ([`crate::plain_text::chat_trigger`]); the user's own lines included, blocked senders
+    /// never. Other chat text never reaches the plugin layer. The plugin service decides
+    /// whether a plugin owns the word.
+    ChatTrigger {
+        server_id: ServerId,
+        sender: PluginPeer,
+        channel: PluginChannel,
+        trigger: String,
+        args: String,
+    },
     /// Someone mentioned the user (the UI decides what a mention is); no text.
     Mentioned {
         server_id: ServerId,
@@ -335,6 +346,7 @@ impl PluginEngineEvent {
             | Self::Talking { server_id, .. }
             | Self::ScreenShareStarted { server_id, .. }
             | Self::ChatActivity { server_id, .. }
+            | Self::ChatTrigger { server_id, .. }
             | Self::Mentioned { server_id, .. }
             | Self::SelfChanged { server_id, .. }
             | Self::PeerData { server_id, .. }
@@ -761,6 +773,7 @@ pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg
     if blocked {
         return;
     }
+    emit_trigger(hub, ctx, &sender, &channel, &msg.message);
     hub.emit(PluginEngineEvent::ChatActivity {
         server_id: ctx.server_id,
         sender,
@@ -768,9 +781,28 @@ pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg
     });
 }
 
+/// A `ChatTrigger` if the message has the trigger shape; nothing otherwise.
+fn emit_trigger(
+    hub: &PluginHub,
+    ctx: &SessionCtx,
+    sender: &PluginPeer,
+    channel: &PluginChannel,
+    html: &str,
+) {
+    if let Some((trigger, args)) = crate::plain_text::chat_trigger(html) {
+        hub.emit(PluginEngineEvent::ChatTrigger {
+            server_id: ctx.server_id,
+            sender: sender.clone(),
+            channel: channel.clone(),
+            trigger,
+            args,
+        });
+    }
+}
+
 /// Chat activity for the user's own channel message: the server does not echo it back, and
 /// plugins (e.g. pets reacting to the user's chatting) count it as activity too.
-pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32) {
+pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, html: &str) {
     let found = ctx.handle.with_state(|s| {
         let me = s.own_user()?;
         s.channels
@@ -778,6 +810,7 @@ pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32) {
             .then(|| (peer_of(me), channel_of(s, channel_id)))
     });
     if let Some((sender, channel)) = found {
+        emit_trigger(hub, ctx, &sender, &channel, html);
         hub.emit(PluginEngineEvent::ChatActivity {
             server_id: ctx.server_id,
             sender,
