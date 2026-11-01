@@ -14,18 +14,18 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B2 | WIT package `mumcord:plugin@1.0.0` | done | b2-wit |
 | B4 | Manifest, permission catalogue and package rules to spec | done | b4-manifest |
 | B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | done | b10-runtime |
-| B11a | Host API: storage and secrets | in progress | b11a-storage |
+| B11a | Host API: storage and secrets | done | b11a-storage |
 | B11b | Host API: timers, clock, notify, theme, random, log, permission gate, peer key | done | b11b-hostapi |
 | B12 | Messaging logic (pure) | done | b12-msg |
 | B13 | Engine bridge for plugins | done | b13-bridge |
 | B14 | Signing and verification | done | b14-verify |
 | B15 | Registry and repository client | done | b15-registry |
 | B16a | Safety fixture plugins | done | b16a-fixtures |
-| B17a | Plugin service: lifecycle | open | |
+| B17a | Plugin service: lifecycle | in progress | b17a-service |
 | B17b | Updates and kill switch | open | |
 | B17c | Chat integration logic | in progress | b17c-chat |
 | B18 | App glue (src-tauri) | open | |
-| B19 | `net.http` executor (official only) | open | |
+| B19 | `net.http` executor (official only) | in progress | b19-http |
 | B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
 | B22 | Permission list component and texts | done | b22-permlist |
 | B25a | SDK crate `mumcord-plugin-sdk` | done | b25a-sdk |
@@ -438,3 +438,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **Plugin repo tasks (B39–B42):** each works in a clone of Mumcord/plugins on its own branch `feat/<plugin>` and opens a PR there (don't merge; the lead merges). Plugins depend on `mumcord-plugin-sdk` via a git dependency on Mumcord/mumcord branch `epic/plugins` (path `crates/plugin-sdk`), build with `cargo build --release --target wasm32-unknown-unknown`, and get AGPL-3.0 (LICENSE already in each folder).
 - **B11b (1bb23d4a):** permission gate `ctx.grants.check(&id, "<perm>") -> Err(Error::NotPermitted)`; the service calls `ctx.grants.set(id, granted)` / `forget(id)`. `PluginHost::send/broadcast` drop events the plugin lacks permission for (`grants::event_permission`). `grants::revokes_required(&manifest.permissions.required, &granted)` → if true, the service disables the plugin. HostContext fields: grants, timers, notify, theme, `peer_keys: Option<PeerKeys>`; build with `..HostContext::default()`. notify: `HostEvent::Notify{id, title, body}`; the service sets `ctx.notify.set_quiet(dnd || quiet_time)`, `set_enabled(id, bool)`, `forget(id)`; limits 1/10 min + 3/24 h, in memory. theme: service calls `ctx.theme.set(mode, reduced_motion)` and broadcasts `ctx.theme.info()`. THEME TOKENS (contract for B26): `api::theme::TOKENS` = text, text-muted, accent, danger, warning, success, surface, surface-raised, border. Peer key: `peer_key::PeerKeys::load_or_create(plugins_dir)` (secret `<plugins_dir>/peer-key.secret`), `.key(plugin_id, Option<cert_hash>) -> Option<String>` (64 hex); B17a loads it into `ctx.peer_keys`. Timers use one shared scheduler thread and are cancelled on stop/restart. log is in `api/log.rs`. `Event::DialogClosed` requires `ui.dialog`. If the OS RNG fails, random.bytes returns not-permitted.
 - **B9 (8d99218d, 2d17f1bb):** mumbot is pinned to 0.3.0 everywhere (scripts/mumbot.env, and the engine's mumbot lib dep with `features = ["tester"]`). Local bot: `testenv/mumbot/up.sh` / `down.sh` (compose profile `mumbot`, image ghcr.io/mumcord/mumbot:0.3.0); music API on `127.0.0.1:${MUMBOT_PORT:-8081}`; registers bot `MumbotLocal` and pins the server cert; renders the git-ignored `bot.toml`; the API key comes from `MUMBOT_API_KEY` in `testenv/.env`; the `plugins` module announces `dice`; test MP3s live in `testenv/mumbot/media/`. Order for E2E: `testenv/up.sh v15`, then `testenv/mumbot/up.sh` (CERT_SET=B after `--cert B`). URL tracks only from host.docker.internal.
+- **B11a (79f5d8f1, 4588fe13, 62922065):** build `HostContext{ storage: Storage::new(Arc<Mutex<Store>>), secrets: Some(Arc::new(PluginSecrets::os())), ..HostContext::default() }`. The service calls `ctx.storage.set_identity(focused server's identity, else the default)` whenever it changes; with none, identity-scope calls fail with `invalid`. HostContext helpers `export_plugin_data(id) -> JSON` ({format:1, plugin, entries:[{scope:"global"|"identity:<n>", key, text|base64}]}, never secrets), `reset_plugin_data`, `delete_plugin_data`, `purge_removed_plugins(now)`, all of which also delete keychain secrets; run them on a blocking thread. `PluginSecrets::available()` false → UNAVAILABLE_TEXT and the permission is unavailable. `set(plugin, name, value)` is ONLY for the settings password field; `pub(crate) get(plugin, name)` is for the net.http executor (B19). Secret names are 1–128 bytes with no control characters. A DB failure reaches the plugin as quota-exceeded (logged without keys/values).
