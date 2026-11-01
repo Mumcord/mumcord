@@ -14,13 +14,11 @@ import { PauseIcon, PlayIcon, StopIcon, VolumeIcon } from "../chat/mediaIcons";
 import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
 import { clockTime } from "../media/format";
-import { useMediaView } from "../media/mediaView";
 import { useTick } from "../media/useTick";
 import { useP2pLink } from "../p2p/useP2pLink";
 import { ChevronDownIcon, InfoCircleIcon, WindowIcon } from "./icons";
 import { PathTag } from "./parts";
 import { qualityText } from "./shareFormat";
-import { SharePanel } from "./SharePanel";
 import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
@@ -36,7 +34,6 @@ export function SharerBar(): ReactNode {
   const { t } = useTranslation("screenshare");
   const { t: tv } = useTranslation("screenviewer");
   const share = useOwnShare();
-  const view = useMediaView();
   const { start, stop } = useShareActions(share);
   const serverId = share.serverId;
   const own = share.own;
@@ -87,17 +84,8 @@ export function SharerBar(): ReactNode {
     };
   }, [serverId, own]);
 
-  // Nothing shared yet: the bar is the entry point, with the reason if sharing is not possible.
-  // A picture in the main column keeps the space above it free (the Apps menu still offers it).
-  if (own === null) {
-    if (view.cinema !== null) return null;
-    return (
-      <div className="sharer-bar sharer-bar--idle" role="group" aria-label={t("controls")}>
-        <SharePanel />
-      </div>
-    );
-  }
-  if (serverId === null) return null;
+  // Starting a share lives in the composer's Apps menu, which also names what blocks it.
+  if (own === null || serverId === null) return null;
   const nameOf = (session: number) => users.get(session)?.name ?? t("someone");
   const srcOf = (session: number) => {
     const user = users.get(session);

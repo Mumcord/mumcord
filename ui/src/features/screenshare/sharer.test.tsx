@@ -1,8 +1,8 @@
 /**
- * The sharer's control bar (issue #163, FR-3.127): before a share it is the entry point, while
- * sharing it names the source and how long the share runs, shows the viewers, and drives pause and
- * stop through the engine. What blocks starting a share (FR-4.3 – FR-4.5) and the sound of the own
- * share (FR-2.42) stay checked here as well, since the bar is where the user sees them.
+ * The sharer's control bar (issue #163, FR-3.127): while sharing it names the source and how long
+ * the share runs, shows the viewers, and drives pause and stop through the engine. What blocks
+ * starting a share (FR-4.3 – FR-4.5) is checked here as pure logic; the Apps menu tests check how
+ * the reasons reach the user. The sound of the own share (FR-2.42) is checked here as well.
  */
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -46,8 +46,6 @@ async function linuxMock(): Promise<MockApi> {
   api.mock.emit("voiceServerChanged", { serverId: 1 });
   return api;
 }
-
-const shareButton = () => screen.findByRole("button", { name: /^Share screen/ });
 
 beforeEach(() => {
   resetScreenShareStore();
@@ -126,160 +124,17 @@ describe("sound of the own share", () => {
   });
 });
 
-describe("share button", () => {
-  it("starts a share in the voice channel and shows the controls", async () => {
+describe("share start", () => {
+  it("shows the controls once a share starts in the voice channel", async () => {
     const api = await linuxMock();
-    const start = vi.spyOn(api, "screenShareStart");
     render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).not.toHaveAttribute("aria-disabled");
+    expect(screen.queryByRole("group", { name: BAR_NAME })).toBeNull();
+    await act(async () => {
+      await api.screenShareStart(1, false);
     });
-    fireEvent.click(button);
     await screen.findByRole("group", { name: BAR_NAME });
-    expect(start).toHaveBeenCalledWith(1, false);
     expect(screen.getByRole("button", { name: /0 viewers/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sound" })).toHaveAttribute("aria-disabled", "true");
-  });
-
-  it("is disabled with its reason when not in a voice channel", async () => {
-    const api = await connectedMock({ bindStore: true });
-    onOs(api, "linux x86_64");
-    const start = vi.spyOn(api, "screenShareStart");
-    render(<SharerBar />);
-    const button = await shareButton();
-    expect(button).toHaveAttribute("aria-disabled", "true");
-    expect(button).toHaveAttribute("data-tooltip", "Join a voice channel to share your screen.");
-    expect(button).toHaveAccessibleDescription("Join a voice channel to share your screen.");
-    fireEvent.click(button);
-    expect(start).not.toHaveBeenCalled();
-  });
-
-  it("stays available with direct connections turned off while the relay can be used", async () => {
-    const api = await linuxMock();
-    await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).not.toHaveAttribute("aria-disabled");
-    });
-  });
-
-  it("is disabled when direct connections are turned off and there is no relay", async () => {
-    const api = await linuxMock();
-    await api.relayForget(1);
-    await api.settingsUpdate({ ...(await api.settingsGet()), allowDirectConnections: "no" });
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).toHaveAccessibleDescription(/needs direct connections/);
-    });
-    expect(button).toHaveAttribute("aria-disabled", "true");
-  });
-
-  it("is disabled when peer-to-peer is off", async () => {
-    const api = await linuxMock();
-    await api.settingsUpdate({ ...(await api.settingsGet()), p2pMode: "off" });
-    const start = vi.spyOn(api, "screenShareStart");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).toHaveAccessibleDescription("Peer-to-peer is off.");
-    });
-    fireEvent.click(button);
-    expect(start).not.toHaveBeenCalled();
-  });
-
-  it("names the relay reason in relay-only mode without a relay", async () => {
-    const api = await linuxMock();
-    await api.relayForget(1);
-    await api.serverSetP2pModeOverride(1, "relayOnly");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).toHaveAccessibleDescription(/no relay/i);
-    });
-    expect(button).toHaveAttribute("aria-disabled", "true");
-  });
-
-  it("notices peer-to-peer turned off since the last read when clicked", async () => {
-    const api = await linuxMock();
-    const start = vi.spyOn(api, "screenShareStart");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).not.toHaveAttribute("aria-disabled");
-    });
-    await api.settingsUpdate({ ...(await api.settingsGet()), p2pMode: "off" });
-    fireEvent.click(button);
-    await waitFor(() => {
-      expect(button).toHaveAttribute("aria-disabled", "true");
-    });
-    expect(start).not.toHaveBeenCalled();
-  });
-
-  it("is disabled on a system without capture", async () => {
-    const api = await linuxMock();
-    vi.mocked(api.appInfo).mockRestore();
-    onOs(api, "freebsd x86_64");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).toHaveAccessibleDescription(
-        "Screen sharing isn't available on this system yet.",
-      );
-    });
-  });
-
-  it("treats a closed picker as no error", async () => {
-    const api = await linuxMock();
-    let finish: (value: null) => void = () => undefined;
-    vi.spyOn(api, "screenShareStart").mockReturnValue(
-      new Promise((resolve) => {
-        finish = resolve;
-      }),
-    );
-    const error = vi.spyOn(console, "error");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).not.toHaveAttribute("aria-disabled");
-    });
-    fireEvent.click(button);
-    await screen.findByRole("button", { name: /Choosing what to share/ });
-    await act(async () => {
-      finish(null);
-      await Promise.resolve();
-    });
-    expect(await shareButton()).not.toHaveAttribute("aria-disabled");
-    expect(screen.queryByRole("alert")).toBeNull();
-    expect(error).not.toHaveBeenCalled();
-  });
-
-  it("reports a failed start", async () => {
-    const api = await linuxMock();
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
-    api.mock.failNext("screenShareStart", "internal", "capture failed");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).not.toHaveAttribute("aria-disabled");
-    });
-    fireEvent.click(button);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Screen sharing could not start.");
-  });
-
-  it("points to System Settings when macOS does not allow screen recording", async () => {
-    const api = await linuxMock();
-    vi.spyOn(console, "error").mockImplementation(() => undefined);
-    api.mock.failNext("screenShareStart", "permissionDenied", "screenRecording");
-    render(<SharerBar />);
-    const button = await shareButton();
-    await waitFor(() => {
-      expect(button).not.toHaveAttribute("aria-disabled");
-    });
-    fireEvent.click(button);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Allow it in System Settings");
   });
 });
 
@@ -287,7 +142,6 @@ describe("sharer controls", () => {
   it("pauses, resumes and stops the own share", async () => {
     const api = await linuxMock();
     render(<SharerBar />);
-    await shareButton();
     await act(async () => {
       await api.screenShareStart(1, false);
     });
@@ -296,13 +150,14 @@ describe("sharer controls", () => {
     fireEvent.click(screen.getByRole("button", { name: "Resume" }));
     await screen.findByRole("button", { name: "Pause" });
     fireEvent.click(screen.getByRole("button", { name: "Stop sharing" }));
-    expect(await shareButton()).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole("group", { name: BAR_NAME })).toBeNull();
+    });
   });
 
   it("lists who is watching and says when the share is full", async () => {
     const api = await linuxMock();
     render(<SharerBar />);
-    await shareButton();
     act(() => {
       api.mock.emit("screenSharesChanged", {
         serverId: 1,
@@ -382,10 +237,9 @@ describe("sharer control bar", () => {
     api.mock.emit("screenSharesChanged", { serverId: 1, shares: [own] });
   }
 
-  it("is the entry point while nothing is shared", () => {
-    render(<SharerBar />);
-    expect(screen.getByRole("button", { name: /^Share screen/ })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: BAR_NAME })).not.toHaveTextContent("Live");
+  it("shows nothing while nothing is shared", () => {
+    const { container } = render(<SharerBar />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it("shows the source, the running time and that it is live", async () => {
@@ -450,12 +304,12 @@ describe("sharer control bar", () => {
     );
   });
 
-  it("stop ends the share and the bar is the entry point again", async () => {
+  it("stop ends the share and the bar goes away", async () => {
     render(<SharerBar />);
     await api.screenShareStart(1, false);
     fireEvent.click(screen.getByRole("button", { name: "Stop sharing" }));
-    await vi.waitFor(() =>
-      expect(screen.getByRole("button", { name: /^Share screen/ })).toBeInTheDocument(),
-    );
+    await vi.waitFor(() => {
+      expect(screen.queryByRole("group", { name: BAR_NAME })).toBeNull();
+    });
   });
 });

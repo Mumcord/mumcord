@@ -1,6 +1,4 @@
 export { LiveBadge } from "./LiveBadge";
-export { SharePanel } from "./SharePanel";
-export { ShareScreenButton } from "./ShareScreenButton";
 export { useOwnShare, type OwnShareState } from "./useOwnShare";
 export { resetScreenShareStore, useIsLive, useScreenShareOf, useScreenShares } from "./sharesStore";
 export { ScreenShareView } from "./ScreenShareView";

@@ -44,30 +44,6 @@
   font-size: var(--font-size-xs);
 }
 
-.share-panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.share-button {
-  display: inline-flex;
-  gap: var(--space-1);
-  align-items: center;
-  justify-content: center;
-}
-
-.share-button[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.share-button__error {
-  margin: 0;
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-}
-
 /* Chips of the viewer's top row: what the picture is and how it arrives (FR-3.126). */
 .share-chips {
   display: flex;
@@ -494,20 +470,6 @@
 }
 
 /* Nothing shared yet: only the "Share screen" button, without the card around it. */
-.sharer-bar--idle {
-  justify-content: flex-end;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.sharer-bar--idle .share-button {
-  padding: var(--space-1) var(--space-3);
-  font-size: var(--font-size-sm);
-}
-
 .sharer-bar__thumb {
   flex: none;
   width: 6rem;
