@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kortelė iš {{plugin}}"
+    "label": "Kortelė iš {{plugin}}",
+    "showMore": "Rodyti daugiau",
+    "showLess": "Rodyti mažiau"
   },
   "via": "per {{plugin}}",
   "supersede": {

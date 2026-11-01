@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Cárta ó {{plugin}}"
+    "label": "Cárta ó {{plugin}}",
+    "showMore": "Taispeáin níos mó",
+    "showLess": "Taispeáin níos lú"
   },
   "via": "trí {{plugin}}",
   "supersede": {

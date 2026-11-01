@@ -2,7 +2,15 @@
  * A plugin chat card (FR-6.40 `chat-card`, 440×160): a local item in the chat, drawn with the
  * plugin's tree. Shows nothing once the plugin clears it or stops.
  */
-import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useTranslation } from "react-i18next";
 import type { ChatMessage, PluginSlot } from "../../../api";
 import { PluginTree } from "../render/PluginTree";
@@ -43,8 +51,64 @@ export function PluginChatCard({
           <span>{name}</span>
         </header>
       ) : null}
-      <PluginTree plugin={plugin} slot={slot} nodes={nodes} />
+      <CardBody>
+        <PluginTree plugin={plugin} slot={slot} nodes={nodes} />
+      </CardBody>
     </section>
+  );
+}
+
+/**
+ * Keeps the card at its 160 px slot height. A scrollbar inside a chat line is easy to miss and
+ * fights the chat's own scrolling, so taller content is clipped with a fade and "Show more"
+ * lets the card grow to its full height instead.
+ */
+function CardBody({ children }: { children: ReactNode }) {
+  const { t } = useTranslation("pluginChat");
+  const clip = useRef<HTMLDivElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const [overflows, setOverflows] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const id = useId();
+  useLayoutEffect(() => {
+    const outer = clip.current;
+    const inner = content.current;
+    if (outer === null || inner === null || expanded) return;
+    const measure = () => {
+      setOverflows(inner.offsetHeight > outer.clientHeight);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(inner);
+    return () => {
+      observer.disconnect();
+    };
+  }, [expanded]);
+  const clipped = overflows && !expanded;
+  return (
+    <>
+      <div
+        id={id}
+        ref={clip}
+        className={`plugin-chat-card__body${expanded ? " plugin-chat-card__body--expanded" : ""}${clipped ? " plugin-chat-card__body--clipped" : ""}`}
+      >
+        <div ref={content}>{children}</div>
+      </div>
+      {overflows ? (
+        <button
+          type="button"
+          className="plugin-chat-show-text plugin-chat-card__more"
+          aria-expanded={expanded}
+          aria-controls={id}
+          onClick={() => {
+            setExpanded(!expanded);
+          }}
+        >
+          {expanded ? t("card.showLess") : t("card.showMore")}
+        </button>
+      ) : null}
+    </>
   );
 }
 

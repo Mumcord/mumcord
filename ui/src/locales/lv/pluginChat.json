@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kartīte no {{plugin}}"
+    "label": "Kartīte no {{plugin}}",
+    "showMore": "Rādīt vairāk",
+    "showLess": "Rādīt mazāk"
   },
   "via": "caur {{plugin}}",
   "supersede": {

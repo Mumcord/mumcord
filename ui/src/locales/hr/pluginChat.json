@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kartica od {{plugin}}"
+    "label": "Kartica od {{plugin}}",
+    "showMore": "Prikaži više",
+    "showLess": "Prikaži manje"
   },
   "via": "putem {{plugin}}",
   "supersede": {

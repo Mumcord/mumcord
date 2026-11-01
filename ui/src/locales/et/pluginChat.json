@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kaart pistikprogrammilt {{plugin}}"
+    "label": "Kaart pistikprogrammilt {{plugin}}",
+    "showMore": "Näita rohkem",
+    "showLess": "Näita vähem"
   },
   "via": "läbi {{plugin}}",
   "supersede": {

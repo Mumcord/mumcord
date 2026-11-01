@@ -281,6 +281,65 @@ describe("plugin chat UI", () => {
     expect(await axeViolations(document.body)).toEqual([]);
   });
 
+  it("never scrolls inside a card: tall content is clipped and 'Show more' expands it", async () => {
+    // jsdom has no layout: report a card body taller than its 144 px clip.
+    const height = vi
+      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.parentElement?.classList.contains("plugin-chat-card__body") === true ? 400 : 0;
+      });
+    const clip = vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(144);
+    try {
+      render(
+        <main>
+          <PluginLine message={message("44", "[Poll] Lunch? 1) Pizza 2) Pasta")}>
+            <p>fallback line</p>
+          </PluginLine>
+        </main>,
+      );
+      expect(await screen.findByText("via Poll")).toBeTruthy();
+      act(() => {
+        api.mock.emit("pluginSupersede", { plugin: "poll", card: "p2", messageId: "44" });
+      });
+      act(() => {
+        api.mock.emit("pluginUi", cardUi("poll", "p2", "Lunch?"));
+      });
+      const card = await screen.findByRole("region", { name: "Card from Poll" });
+      const body = card.querySelector(".plugin-chat-card__body");
+      expect(body?.classList.contains("plugin-chat-card__body--clipped")).toBe(true);
+      const more = screen.getByRole("button", { name: "Show more" });
+      expect(more.getAttribute("aria-expanded")).toBe("false");
+      fireEvent.click(more);
+      expect(body?.classList.contains("plugin-chat-card__body--expanded")).toBe(true);
+      expect(body?.classList.contains("plugin-chat-card__body--clipped")).toBe(false);
+      expect(more.textContent).toBe("Show less");
+      expect(more.getAttribute("aria-expanded")).toBe("true");
+      expect(await axeViolations(document.body)).toEqual([]);
+    } finally {
+      height.mockRestore();
+      clip.mockRestore();
+    }
+  });
+
+  it("shows no 'Show more' when the card fits", async () => {
+    render(
+      <main>
+        <PluginLine message={message("45", "[Poll] Lunch? 1) Pizza 2) Pasta")}>
+          <p>line</p>
+        </PluginLine>
+      </main>,
+    );
+    expect(await screen.findByText("via Poll")).toBeTruthy();
+    act(() => {
+      api.mock.emit("pluginSupersede", { plugin: "poll", card: "p3", messageId: "45" });
+    });
+    act(() => {
+      api.mock.emit("pluginUi", cardUi("poll", "p3", "Lunch?"));
+    });
+    expect(await screen.findByRole("region", { name: "Card from Poll" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Show more" })).toBeNull();
+  });
+
   it("shows a hidden line as 'Hidden by' with the plugin's mark and the text one click away", async () => {
     render(
       <main>

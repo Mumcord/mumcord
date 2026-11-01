@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kaart van {{plugin}}"
+    "label": "Kaart van {{plugin}}",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen"
   },
   "via": "via {{plugin}}",
   "supersede": {

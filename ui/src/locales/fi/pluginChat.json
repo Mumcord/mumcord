@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kortti laajennukselta {{plugin}}"
+    "label": "Kortti laajennukselta {{plugin}}",
+    "showMore": "Näytä lisää",
+    "showLess": "Näytä vähemmän"
   },
   "via": "{{plugin}} kautta",
   "supersede": {

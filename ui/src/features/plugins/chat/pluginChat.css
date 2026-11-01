@@ -3,13 +3,29 @@
 .plugin-chat-card {
   box-sizing: border-box;
   width: min(440px, 100%);
-  max-height: 160px;
   margin: var(--space-1) 0;
   padding: var(--space-2) var(--space-3);
-  overflow: auto;
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
   box-shadow: inset 0 0 0 1px var(--color-border);
+}
+
+/* The slot is 160 px tall (FR-6.40); padding and the "Show more" row sit outside it. */
+.plugin-chat-card__body {
+  max-height: 144px;
+  overflow: hidden;
+}
+
+.plugin-chat-card__body--expanded {
+  max-height: none;
+}
+
+.plugin-chat-card__body--clipped {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+}
+
+.plugin-chat-card__more {
+  margin-top: var(--space-1);
 }
 
 .plugin-chat-via {

@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Card from {{plugin}}"
+    "label": "Card from {{plugin}}",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "via": "via {{plugin}}",
   "supersede": {

@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Scheda di {{plugin}}"
+    "label": "Scheda di {{plugin}}",
+    "showMore": "Mostra di più",
+    "showLess": "Mostra meno"
   },
   "via": "tramite {{plugin}}",
   "supersede": {

@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kort från {{plugin}}"
+    "label": "Kort från {{plugin}}",
+    "showMore": "Visa mer",
+    "showLess": "Visa mindre"
   },
   "via": "via {{plugin}}",
   "supersede": {

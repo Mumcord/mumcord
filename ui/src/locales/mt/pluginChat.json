@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Karta minn {{plugin}}"
+    "label": "Karta minn {{plugin}}",
+    "showMore": "Uri aktar",
+    "showLess": "Uri inqas"
   },
   "via": "permezz ta' {{plugin}}",
   "supersede": {

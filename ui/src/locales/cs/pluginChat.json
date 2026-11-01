@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Karta od {{plugin}}"
+    "label": "Karta od {{plugin}}",
+    "showMore": "Zobrazit více",
+    "showLess": "Zobrazit méně"
   },
   "via": "přes {{plugin}}",
   "supersede": {

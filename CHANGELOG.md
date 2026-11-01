@@ -27,6 +27,7 @@
 
 ### Fixed
 
+- Plugin cards in the chat no longer get their own scrollbar: a taller card is cut off with a soft fade and **Show more** expands it.
 - Pasting with Ctrl+V works again on some Linux desktops
 - A plugin window that shows a web page (for example the EVE fit fitting wheel) now opens right after installing or updating the plugin, instead of only after restarting Mumcord
 

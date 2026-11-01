@@ -1,6 +1,8 @@
 {
   "card": {
-    "label": "Kártya innen: {{plugin}}"
+    "label": "Kártya innen: {{plugin}}",
+    "showMore": "Több megjelenítése",
+    "showLess": "Kevesebb megjelenítése"
   },
   "via": "ezen keresztül: {{plugin}}",
   "supersede": {
