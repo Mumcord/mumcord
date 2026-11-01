@@ -56,7 +56,7 @@
 
 .plugin-repos__url,
 .plugin-repos__fingerprint {
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-family-mono);
   overflow-wrap: anywhere;
 }
 

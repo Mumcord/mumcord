@@ -130,7 +130,7 @@
   list-style: none;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  font-family: var(--font-mono, monospace);
+  font-family: var(--font-family-mono);
   overflow-wrap: anywhere;
 }
 

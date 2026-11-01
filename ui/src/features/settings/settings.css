@@ -931,7 +931,7 @@
 }
 
 .settings-details__fingerprint {
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-family-mono);
 }
 
 /* A link inside running text; a button for keyboard and screen-reader semantics. */

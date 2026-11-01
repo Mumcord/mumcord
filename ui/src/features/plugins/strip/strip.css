@@ -42,7 +42,7 @@
 }
 
 .pstrip-icon[aria-pressed="true"] {
-  background: var(--color-accent-soft, var(--color-border));
+  background: var(--color-bg-selected);
   border-color: var(--color-accent, var(--color-border));
 }
 
