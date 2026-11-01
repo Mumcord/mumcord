@@ -8,12 +8,13 @@ mod feed;
 pub mod suggestions;
 pub mod ui;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use mumcord_engine::Engine;
 use mumcord_plugins::api::secrets::PluginSecrets;
-use mumcord_plugins::registry::{Client, Index, UrlPolicy};
+use mumcord_plugins::registry::{Client, Download, Index, UrlPolicy};
 use mumcord_plugins::service::{
     InstallStage, PluginService, Schedule, ServiceConfig, ServiceError, ServiceEvent, Status,
     run_check,
@@ -40,7 +41,21 @@ pub struct Plugins {
     index: Mutex<Option<Index>>,
     /// Registry caches, one folder per source (`official`, `repo-<id>`).
     registry_cache: PathBuf,
+    /// The package verified for the open install prompt, installed on "Install".
+    prepared: Mutex<Option<PreparedInstall>>,
+    /// Store icons and screenshots as data URLs, by source URL (the UI never fetches).
+    images: Mutex<HashMap<String, String>>,
 }
+
+/// A downloaded and verified package waiting for the user's answer in the install prompt.
+pub struct PreparedInstall {
+    pub id: String,
+    pub version: String,
+    pub download: Download,
+}
+
+/// Images kept for the session; the store shows a few dozen at most.
+const MAX_CACHED_IMAGES: usize = 200;
 
 /// `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -123,6 +138,22 @@ impl Plugins {
     pub fn registry_cache(&self) -> &std::path::Path {
         &self.registry_cache
     }
+
+    pub fn prepared(&self) -> MutexGuard<'_, Option<PreparedInstall>> {
+        lock(&self.prepared)
+    }
+
+    pub fn cached_image(&self, url: &str) -> Option<String> {
+        lock(&self.images).get(url).cloned()
+    }
+
+    pub fn cache_image(&self, url: &str, data_url: &str) {
+        let mut images = lock(&self.images);
+        if images.len() >= MAX_CACHED_IMAGES {
+            images.clear();
+        }
+        images.insert(url.to_owned(), data_url.to_owned());
+    }
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -181,6 +212,8 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
         trees: Mutex::default(),
         index: Mutex::default(),
         registry_cache: cache_dir.join("plugin-registry"),
+        prepared: Mutex::default(),
+        images: Mutex::default(),
     });
     app.manage(Arc::clone(&plugins));
 

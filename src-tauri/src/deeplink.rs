@@ -3,8 +3,9 @@
 
 use std::sync::Mutex;
 
-use serde::Serialize;
-use tauri::{AppHandle, Emitter, Manager, Url};
+use serde::{Deserialize, Serialize};
+use specta::Type;
+use tauri::{AppHandle, Manager, Url};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_specta::Event;
 
@@ -83,12 +84,11 @@ pub fn init(app: &AppHandle) {
     deep_link.on_open_url(move |event| open_urls(&handle, &event.urls()));
 }
 
-/// Event the UI listens to; Browse opens the details of the named plugin.
-const OPEN_PLUGIN_DETAILS_EVENT: &str = "plugins://open-details";
-
-#[derive(Serialize, Clone, Debug, PartialEq, Eq)]
-struct OpenPluginDetails {
-    id: String,
+/// `plugins://open-details`: Browse opens the details of the named plugin.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[tauri_specta(event_name = "plugins://open-details")]
+pub struct PluginsOpenDetails {
+    pub id: String,
 }
 
 /// Plugin ids follow FR-6.11: `^[a-z][a-z0-9-]{2,31}$`.
@@ -118,7 +118,7 @@ fn open_plugin_details(app: &AppHandle, id: String) {
         .unwrap_or_else(|e| e.into_inner())
         .keep(id.clone());
     // Never installs: the UI only shows the details.
-    if let Err(e) = app.emit(OPEN_PLUGIN_DETAILS_EVENT, OpenPluginDetails { id }) {
+    if let Err(e) = (PluginsOpenDetails { id }).emit(app) {
         tracing::warn!(error = %e, "forwarding a mumcord:// link to the UI failed");
     }
 }

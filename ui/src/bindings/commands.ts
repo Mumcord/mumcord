@@ -513,6 +513,17 @@ export const commands = {
 	 *  `version` is given), with the optional permissions the user left on.
 	 */
 	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility })),
+	/**
+	 *  Downloads and verifies the latest version of an official plugin before the install prompt
+	 *  opens, so the prompt can show the manifest's required and optional permissions. Nothing is
+	 *  unpacked or run; `plugin_install` installs this package once the user agrees.
+	 */
+	pluginInstallPrepare: (id: string) => typedError<PluginInstallOffer, ApiError>(__TAURI_INVOKE("plugin_install_prepare", { id })),
+	/**
+	 *  Loads a store image of a plugin in the loaded list as a data URL. It takes an index id, not
+	 *  a URL, so the UI cannot use it to fetch anything else; SVG and oversized files are refused.
+	 */
+	pluginIndexImage: (id: string, image: PluginIndexImage) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_index_image", { id, image })),
 	pluginSetEnabled: (id: string, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_enabled", { id, enabled })),
 	/**  The granted optional permissions (required ones are always granted). */
 	pluginSetPermissions: (id: string, granted: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_permissions", { id, granted })),
@@ -850,6 +861,7 @@ export const events = {
 	pluginsChanged: makeEvent<PluginsChanged, PluginsChanged>("plugins://changed"),
 	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
+	pluginsOpenDetails: makeEvent<PluginsOpenDetails, PluginsOpenDetails>("plugins://open-details"),
 	pluginsSuggestion: makeEvent<PluginSuggestion, PluginSuggestion>("plugins://suggestion"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
@@ -2360,9 +2372,26 @@ export type PluginIndex = {
 	plugins: IndexedPlugin[],
 };
 
+/**  Which store image of an index plugin to load. */
+export type PluginIndexImage = { kind: "icon" } | { kind: "screenshot"; index: number };
+
 export type PluginInputPurpose = "plain" | 
 /**  Hosts typed here become the only ones the plugin may reach with `net.http`. */
 "serverAddress";
+
+/**
+ *  What the install prompt shows, read from the verified package's manifest (the index only
+ *  lists every permission, not which are required).
+ */
+export type PluginInstallOffer = {
+	id: string,
+	version: string,
+	authors: string[],
+	required: string[],
+	optional: PluginOptionalPermission[],
+	/**  Preselected in the visibility choice (shown when `peers.messages` is requested). */
+	defaultVisibility: PluginVisibilityChoice,
+};
 
 /**  `plugins://install-progress`. */
 export type PluginInstallProgress = {
@@ -2519,6 +2548,11 @@ export type PluginVisibilityChoice = "everyone" | "friends" | "nobody";
 
 /**  `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`. */
 export type PluginsChanged = Record<string, never>;
+
+/**  `plugins://open-details`: Browse opens the details of the named plugin. */
+export type PluginsOpenDetails = {
+	id: string,
+};
 
 /**  Settings → Plugins. */
 export type PluginsOverview = {

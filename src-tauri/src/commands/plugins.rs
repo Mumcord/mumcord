@@ -4,24 +4,28 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use base64::Engine as _;
 use mumcord_engine::Engine;
 use mumcord_engine::store::PluginVisibility;
+use mumcord_plugins::manifest::Visibility as ManifestVisibility;
 use mumcord_plugins::registry::{
-    Client, Freshness, IndexPlugin, OFFLINE_TEXT, UrlPolicy, fetch_official, official_base,
+    Client, Freshness, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, OFFLINE_TEXT, UrlPolicy,
+    fetch_official, official_base,
 };
 use mumcord_plugins::service::{
     InstallRequest, PluginInfo, PluginService, ServiceError, Status, UiInput, fetch,
 };
+use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
 use mumcord_plugins::wit::theme::Mode;
-use mumcord_plugins::{Level, Source};
+use mumcord_plugins::{Level, Manifest, Source};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, State};
 
 use super::types::{ApiError, ApiResult, ErrorCode, ServerId, SessionId, to_engine_server_id};
 use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi};
-use crate::plugins::{self, Plugins};
+use crate::plugins::{self, Plugins, PreparedInstall};
 
 /// Who sees that the user has a plugin (FR-6.35).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -417,6 +421,151 @@ pub async fn plugins_index(
     Ok(index)
 }
 
+/// What the install prompt shows, read from the verified package's manifest (the index only
+/// lists every permission, not which are required).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginInstallOffer {
+    pub id: String,
+    pub version: String,
+    pub authors: Vec<String>,
+    pub required: Vec<String>,
+    pub optional: Vec<PluginOptionalPermission>,
+    /// Preselected in the visibility choice (shown when `peers.messages` is requested).
+    pub default_visibility: PluginVisibilityChoice,
+}
+
+/// Which store image of an index plugin to load.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum PluginIndexImage {
+    Icon,
+    Screenshot { index: u32 },
+}
+
+/// The latest version's index entry, download URL and size of a plugin in the loaded list.
+fn indexed_latest(
+    plugins: &Plugins,
+    id: &str,
+) -> ApiResult<(mumcord_plugins::verify::IndexEntry, String, u64)> {
+    let index = plugins.index();
+    let plugin = index
+        .as_ref()
+        .and_then(|i| i.plugin(id))
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
+    let latest = plugin.latest();
+    Ok((plugin.entry(latest), latest.url.clone(), latest.size))
+}
+
+fn install_offer(id: &str, manifest: &Manifest) -> PluginInstallOffer {
+    PluginInstallOffer {
+        id: id.to_owned(),
+        version: manifest.version.to_string(),
+        authors: manifest.authors.clone(),
+        required: manifest.permissions.required.clone(),
+        optional: manifest
+            .permissions
+            .optional
+            .iter()
+            .map(|o| PluginOptionalPermission {
+                id: o.id.clone(),
+                suggested: o.suggested,
+            })
+            .collect(),
+        default_visibility: match manifest.messaging.default_visibility {
+            Some(ManifestVisibility::Friends) => PluginVisibilityChoice::Friends,
+            Some(ManifestVisibility::Nobody) => PluginVisibilityChoice::Nobody,
+            Some(ManifestVisibility::Everyone) | None => PluginVisibilityChoice::Everyone,
+        },
+    }
+}
+
+/// Downloads and verifies the latest version of an official plugin before the install prompt
+/// opens, so the prompt can show the manifest's required and optional permissions. Nothing is
+/// unpacked or run; `plugin_install` installs this package once the user agrees.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_install_prepare(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: String,
+) -> ApiResult<PluginInstallOffer> {
+    let plugins = plugins_of(&app)?;
+    let (entry, url, size) = indexed_latest(&plugins, &id)?;
+    let client = registry_client(engine.settings()?.developer_mode)?;
+    let events = plugins.call(|service| Ok(service.events())).await?;
+    let download = fetch(&client, &events, &id, &url, size)
+        .await
+        .map_err(plugins::service_error)?;
+    let (download, offer) = tauri::async_runtime::spawn_blocking(move || {
+        let verified = verify_package(
+            &download.bytes,
+            &entry,
+            &download.signature,
+            Source::Official,
+        )
+        .map_err(|e| plugins::service_error(e.into()))?;
+        let offer = install_offer(&entry.id, &verified.package.manifest);
+        Ok::<_, ApiError>((download, offer))
+    })
+    .await
+    .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))??;
+    *plugins.prepared() = Some(PreparedInstall {
+        id,
+        version: offer.version.clone(),
+        download,
+    });
+    Ok(offer)
+}
+
+/// Loads a store image of a plugin in the loaded list as a data URL. It takes an index id, not
+/// a URL, so the UI cannot use it to fetch anything else; SVG and oversized files are refused.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_index_image(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: String,
+    image: PluginIndexImage,
+) -> ApiResult<String> {
+    let plugins = plugins_of(&app)?;
+    let (url, max) = {
+        let index = plugins.index();
+        let plugin = index
+            .as_ref()
+            .and_then(|i| i.plugin(&id))
+            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not in the list"))?;
+        image_url(plugin, image)
+            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "the plugin has no such image"))?
+    };
+    if let Some(cached) = plugins.cached_image(&url) {
+        return Ok(cached);
+    }
+    let client = registry_client(engine.settings()?.developer_mode)?;
+    let fetched = client
+        .fetch_image(&url, max)
+        .await
+        .map_err(registry_error)?;
+    let data_url = format!(
+        "data:{};base64,{}",
+        fetched.mime,
+        base64::engine::general_purpose::STANDARD.encode(&fetched.bytes)
+    );
+    plugins.cache_image(&url, &data_url);
+    Ok(data_url)
+}
+
+/// The URL and size cap of one store image.
+fn image_url(plugin: &IndexPlugin, image: PluginIndexImage) -> Option<(String, usize)> {
+    match image {
+        PluginIndexImage::Icon => plugin.icon.clone().map(|url| (url, MAX_ICON_BYTES)),
+        PluginIndexImage::Screenshot { index } => plugin
+            .screenshots
+            .get(usize::try_from(index).ok()?)
+            .map(|s| (s.url.clone(), MAX_SCREENSHOT_BYTES)),
+    }
+}
+
 /// Installs a plugin from the official list loaded by `plugins_index` (latest version unless
 /// `version` is given), with the optional permissions the user left on.
 #[tauri::command]
@@ -444,11 +593,21 @@ pub async fn plugin_install(
         };
         (plugin.entry(chosen), chosen.url.clone(), chosen.size)
     };
-    let client = registry_client(engine.settings()?.developer_mode)?;
-    let events = plugins.call(|service| Ok(service.events())).await?;
-    let download = fetch(&client, &events, &id, &url, size)
-        .await
-        .map_err(plugins::service_error)?;
+    // The package the install prompt already verified, unless it was for another version.
+    let prepared = plugins
+        .prepared()
+        .take()
+        .filter(|p| p.id == id && p.version == entry.version);
+    let download = match prepared {
+        Some(prepared) => prepared.download,
+        None => {
+            let client = registry_client(engine.settings()?.developer_mode)?;
+            let events = plugins.call(|service| Ok(service.events())).await?;
+            fetch(&client, &events, &id, &url, size)
+                .await
+                .map_err(plugins::service_error)?
+        }
+    };
     let request = InstallRequest {
         source: Source::Official,
         entry,
@@ -860,5 +1019,75 @@ mod tests {
             serde_json::from_value::<PluginSlot>(json).expect("parses"),
             slot
         );
+    }
+
+    fn indexed(icon: Option<&str>) -> IndexPlugin {
+        serde_json::from_value(serde_json::json!({
+            "id": "dice",
+            "name": {"en": "Dice"},
+            "summary": {"en": "Roll dice"},
+            "icon": icon,
+            "screenshots": [{"url": "https://example.org/a.png", "alt": {"en": "A roll"}}],
+            "author_keys": [],
+            "reviewed": true,
+            "updated": "2026-10-01",
+            "versions": [{"version": "1.0.0", "api": 1, "url": "https://example.org/d.mcplugin",
+                          "size": 10, "sha256": "ab".repeat(32), "permissions": []}]
+        }))
+        .expect("test step")
+    }
+
+    #[test]
+    fn store_images_come_only_from_the_index_entry() {
+        let plugin = indexed(Some("https://example.org/icon.png"));
+        assert_eq!(
+            image_url(&plugin, PluginIndexImage::Icon),
+            Some(("https://example.org/icon.png".to_owned(), MAX_ICON_BYTES))
+        );
+        assert_eq!(
+            image_url(&plugin, PluginIndexImage::Screenshot { index: 0 }),
+            Some(("https://example.org/a.png".to_owned(), MAX_SCREENSHOT_BYTES))
+        );
+        assert_eq!(
+            image_url(&plugin, PluginIndexImage::Screenshot { index: 1 }),
+            None
+        );
+        assert_eq!(image_url(&indexed(None), PluginIndexImage::Icon), None);
+    }
+
+    #[test]
+    fn install_offer_splits_required_and_optional() {
+        let manifest = Manifest::parse(
+            serde_json::json!({
+                "manifest": 1, "id": "poll", "name": "Poll", "description": "Polls",
+                "version": "1.1.0", "api": "^1.0", "authors": ["Mumcord"],
+                "license": "MIT", "categories": ["chat"],
+                "permissions": {
+                    "required": ["ui.chat-card", "peers.messages"],
+                    "optional": ["notify", {"id": "ui.panel", "suggested": true}]
+                },
+                "messaging": {"max_payload": 256, "default_visibility": "friends"}
+            })
+            .to_string()
+            .as_bytes(),
+        )
+        .expect("test step");
+        let offer = install_offer("poll", &manifest);
+        assert_eq!(offer.version, "1.1.0");
+        assert_eq!(offer.required, ["ui.chat-card", "peers.messages"]);
+        assert_eq!(
+            offer.optional,
+            [
+                PluginOptionalPermission {
+                    id: "notify".into(),
+                    suggested: false
+                },
+                PluginOptionalPermission {
+                    id: "ui.panel".into(),
+                    suggested: true
+                },
+            ]
+        );
+        assert_eq!(offer.default_visibility, PluginVisibilityChoice::Friends);
     }
 }

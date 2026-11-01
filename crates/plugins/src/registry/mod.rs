@@ -10,6 +10,7 @@ mod cache;
 mod fetch;
 mod index;
 mod keys;
+mod media;
 mod repo;
 mod revoked;
 mod sync;
@@ -25,6 +26,7 @@ pub use index::{
     KeyRotation, RepositoryInfo, Screenshot,
 };
 pub use keys::{key_fingerprint, key_fingerprint_prefix, normalize_key};
+pub use media::{Image, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, sniff_image};
 pub use repo::{
     RepoOutcome, RepoPreview, check_repository_url, fetch_repository, preview_repository,
 };
