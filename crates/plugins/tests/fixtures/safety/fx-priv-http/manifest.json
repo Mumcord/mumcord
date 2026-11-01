@@ -1,0 +1,1 @@
+{"id":"fx-priv-http","name":"Fixture Third-Party Http","permissions":{"required":["net.http"]},"net":{"hosts":"user-configured"}}

@@ -1,0 +1,1 @@
+{"id":"fx-webview-probe","name":"Fixture Web View","description":"Official-only: its page probes the network and the parent window","permissions":{"required":["ui.panel","ui.webview"]}}

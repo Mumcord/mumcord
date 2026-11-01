@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Fixture web view</title>
+<!-- Probes what the sealed frame must not be able to do, then reports through the message
+     bridge. The bridge is assumed to be window.parent.postMessage(string): adjust here if the
+     host bridge ends up different. The probe URL can be set with ?probe=<url> and defaults to
+     the port the end-to-end proxy listens on; the proxy log must stay empty (AC-6.16). -->
+<pre id="out">probing</pre>
+<script>
+(async () => {
+  const probe = new URLSearchParams(location.search).get("probe") || "http://127.0.0.1:18999/probe";
+  const results = {};
+  const attempt = async (name, fn) => {
+    try {
+      await fn();
+      results[name] = "reachable";
+    } catch (error) {
+      results[name] = "blocked: " + error.name;
+    }
+  };
+  await attempt("fetch", () => fetch(probe, { mode: "no-cors" }));
+  await attempt("parent-document", () => window.parent.document.title);
+  await attempt("top-location", () => window.top.location.href);
+  await attempt("local-storage", () => localStorage.getItem("x"));
+  const report = JSON.stringify(results);
+  document.getElementById("out").textContent = report;
+  window.parent.postMessage(report, "*");
+})();
+</script>

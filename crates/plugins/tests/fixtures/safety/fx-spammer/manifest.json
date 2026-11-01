@@ -1,0 +1,1 @@
+{"id":"fx-spammer","name":"Fixture Spammer","permissions":{"required":["peers.messages"]},"messaging":{"max_payload":16,"default_visibility":"everyone"}}

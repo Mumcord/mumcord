@@ -1,0 +1,20 @@
+# Standalone tool (not a workspace member): turns the safety fixtures into plugin folders and
+# .mcplugin packages. Run it through scripts/build-plugin-fixtures.sh.
+[package]
+name = "build-safety-fixtures"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.97"
+license = "AGPL-3.0-only"
+publish = false
+
+[dependencies]
+anyhow = "1"
+serde_json = "1"
+wat = "1"
+wit-component = "0.263"
+wit-parser = "0.263"
+zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+
+# Keeps cargo from treating this directory as part of the app workspace.
+[workspace]
