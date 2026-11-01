@@ -9,7 +9,6 @@
     "developer": "Izstrādātājs"
   },
   "turnOffAll": "Izslēgt visus spraudņus",
-  "turnOnAll": "Atkal ieslēgt spraudņus",
   "allOff": "Visi spraudņi ir izslēgti. Tie paliek izslēgti arī pēc pārstartēšanas, līdz tos atkal ieslēgsiet.",
   "noPlugins": "Spraudņi šai sesijai ir izslēgti (palaists ar --no-plugins).",
   "loadFailed": "Spraudņus neizdevās ielādēt.",

@@ -29,7 +29,7 @@
     "gaming": "L'overlay en jeu, l'audio positionnel et les plugins de jeu.",
     "advanced": "Outils de développement, diagnostics, stockage et licences.",
     "about": "Version, assistance et assistant de configuration.",
-    "plugins": "Installer, mettre à jour et gérer les plugins."
+    "plugins": "Les plugins s'exécutent dans un bac à sable et n'obtiennent que ce que vous autorisez. Ils ne voient jamais votre audio, vos fichiers ni votre certificat."
   },
   "breadcrumb": "Paramètres / {{section}}",
   "moreInfo": "Plus d'informations : {{topic}}",

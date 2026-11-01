@@ -9,7 +9,6 @@
     "developer": "Entwickler"
   },
   "turnOffAll": "Alle Plugins ausschalten",
-  "turnOnAll": "Plugins wieder einschalten",
   "allOff": "Alle Plugins sind ausgeschaltet. Sie bleiben aus, auch nach einem Neustart, bis du sie wieder einschaltest.",
   "noPlugins": "Plugins sind für diese Sitzung aus (gestartet mit --no-plugins).",
   "loadFailed": "Die Plugins konnten nicht geladen werden.",

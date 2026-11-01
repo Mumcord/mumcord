@@ -9,7 +9,6 @@
     "developer": "Razvijalec"
   },
   "turnOffAll": "Izklopi vse vtičnike",
-  "turnOnAll": "Ponovno vklopi vtičnike",
   "allOff": "Vsi vtičniki so izklopljeni. Ostanejo izklopljeni, tudi po ponovnem zagonu, dokler jih ne vklopite.",
   "noPlugins": "Vtičniki so za to sejo izklopljeni (zagnano z --no-plugins).",
   "loadFailed": "Vtičnikov ni bilo mogoče naložiti.",

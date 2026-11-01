@@ -9,7 +9,6 @@
     "developer": "Deweloper"
   },
   "turnOffAll": "Wyłącz wszystkie wtyczki",
-  "turnOnAll": "Włącz wtyczki ponownie",
   "allOff": "Wszystkie wtyczki są wyłączone. Pozostaną wyłączone, także po ponownym uruchomieniu, dopóki ich nie włączysz.",
   "noPlugins": "Wtyczki są wyłączone w tej sesji (uruchomiono z --no-plugins).",
   "loadFailed": "Nie udało się wczytać wtyczek.",

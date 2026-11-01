@@ -29,7 +29,7 @@
     "gaming": "A sobreposição no jogo, áudio posicional e plugins de jogos.",
     "advanced": "Ferramentas de programador, diagnóstico, armazenamento e licenças.",
     "about": "Versão, suporte e o assistente de configuração.",
-    "plugins": "Instale, atualize e gira plugins."
+    "plugins": "Os plugins são executados num ambiente isolado e só recebem o que permitir. Nunca veem o seu áudio, ficheiros ou certificado."
   },
   "breadcrumb": "Definições / {{section}}",
   "moreInfo": "Mais informações: {{topic}}",

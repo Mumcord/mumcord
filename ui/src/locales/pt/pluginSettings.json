@@ -9,7 +9,6 @@
     "developer": "Programador"
   },
   "turnOffAll": "Desativar todos os plugins",
-  "turnOnAll": "Reativar os plugins",
   "allOff": "Todos os plugins estão desativados. Continuam assim, mesmo após reiniciar, até os reativar.",
   "noPlugins": "Os plugins estão desativados nesta sessão (iniciada com --no-plugins).",
   "loadFailed": "Não foi possível carregar os plugins.",

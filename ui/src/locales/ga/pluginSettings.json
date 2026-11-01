@@ -9,7 +9,6 @@
     "developer": "Forbróir"
   },
   "turnOffAll": "Cuir gach breiseán as",
-  "turnOnAll": "Cuir na breiseáin air arís",
   "allOff": "Tá gach breiseán as. Fanfaidh siad as, fiú tar éis atosaithe, go dtí go gcuirfidh tú air arís iad.",
   "noPlugins": "Tá na breiseáin as don seisiún seo (tosaithe le --no-plugins).",
   "loadFailed": "Níorbh fhéidir na breiseáin a lódáil.",

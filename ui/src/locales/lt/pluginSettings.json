@@ -9,7 +9,6 @@
     "developer": "Kūrėjas"
   },
   "turnOffAll": "Išjungti visus papildinius",
-  "turnOnAll": "Vėl įjungti papildinius",
   "allOff": "Visi papildiniai išjungti. Jie lieka išjungti, net ir paleidus iš naujo, kol vėl juos įjungsite.",
   "noPlugins": "Papildiniai šiai sesijai išjungti (paleista su --no-plugins).",
   "loadFailed": "Nepavyko įkelti papildinių.",

@@ -29,7 +29,7 @@
     "gaming": "Prekrivanje v igri, pozicijski zvok in vtičniki za igre.",
     "advanced": "Razvijalska orodja, diagnostika, shramba in licence.",
     "about": "Različica, podpora in čarovnik za nastavitev.",
-    "plugins": "Nameščajte, posodabljajte in upravljajte vtičnike."
+    "plugins": "Vtičniki delujejo v peskovniku in dobijo le tisto, kar dovolite. Nikoli ne vidijo vašega zvoka, datotek ali potrdila."
   },
   "breadcrumb": "Nastavitve / {{section}}",
   "moreInfo": "Več informacij: {{topic}}",

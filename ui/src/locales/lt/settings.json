@@ -29,7 +29,7 @@
     "gaming": "Perdanga žaidime, pozicinis garsas ir žaidimų papildiniai.",
     "advanced": "Kūrėjų įrankiai, diagnostika, saugykla ir licencijos.",
     "about": "Versija, pagalba ir sąrankos vedlys.",
-    "plugins": "Diekite, naujinkite ir tvarkykite papildinius."
+    "plugins": "Papildiniai veikia izoliuotoje aplinkoje ir gauna tik tai, ką leidžiate. Jie niekada nemato jūsų garso, failų ar sertifikato."
   },
   "breadcrumb": "Nustatymai / {{section}}",
   "moreInfo": "Daugiau informacijos: {{topic}}",

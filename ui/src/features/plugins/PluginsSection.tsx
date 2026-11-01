@@ -1,11 +1,12 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { type PluginUpdates } from "../../api";
-import { Group } from "../settings/components/Section";
+import { Switch } from "../settings/components/Switch";
 import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginRequestStore";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
 import { RepositoriesTab, type MirrorSetting } from "./repos";
 import { UpdatesTab } from "./updates";
+import { useUpdates } from "./updates/useUpdates";
 import "./plugins.css";
 import { BrowseTab } from "./browse/BrowseTab";
 import { DeveloperTab } from "./developer/DeveloperTab";
@@ -27,8 +28,9 @@ const TAB_CONTENT: Record<PluginTab, ReactNode> = {
 };
 
 /**
- * Settings → Plugins (FR-6.58): header with "Turn off all plugins", the `--no-plugins` banner and
- * the tabs. The Developer tab only exists while Developer mode is on (FR-6.73).
+ * Settings → Plugins (FR-6.58): the tabs with their counts, the `--no-plugins` banner and the
+ * "Turn off all plugins" switch in the footer of the Installed tab. The page title and sandbox
+ * subtitle come from the settings shell. The Developer tab only exists while Developer mode is on (FR-6.73).
  */
 export function PluginsSection({
   developerMode,
@@ -45,6 +47,7 @@ export function PluginsSection({
 }) {
   const { t } = useTranslation("pluginSettings");
   const { overview, loadFailed } = usePlugins();
+  const { updates } = useUpdates();
   const baseId = useId();
   const [selected, setSelected] = useState<PluginTab>("installed");
   const requestedTab = useRequestedPluginTab();
@@ -58,6 +61,8 @@ export function PluginsSection({
   // Turning Developer mode off while its tab is open falls back to the first tab.
   const active = tabs.includes(selected) ? selected : "installed";
   const allOff = overview?.allOff ?? false;
+  const installedCount = overview?.plugins.length;
+  const updatesCount = updates?.length ?? 0;
   const tabId = (tab: PluginTab) => `${baseId}-tab-${tab}`;
   const panelId = (tab: PluginTab) => `${baseId}-panel-${tab}`;
 
@@ -80,21 +85,7 @@ export function PluginsSection({
   };
 
   return (
-    <Group
-      title={t("title")}
-      icon="puzzle"
-      wide
-      actions={
-        <button
-          type="button"
-          className="settings-button"
-          disabled={overview === null}
-          onClick={() => void setAllPluginsOff(!allOff)}
-        >
-          {allOff ? t("turnOnAll") : t("turnOffAll")}
-        </button>
-      }
-    >
+    <div className="plugins-section">
       {overview?.noPlugins === true && (
         <p role="status" className="plugins-banner">
           {t("noPlugins")}
@@ -131,6 +122,12 @@ export function PluginsSection({
             }}
           >
             {t(`tabs.${tab}`)}
+            {tab === "installed" && installedCount !== undefined && (
+              <span className="plugins-tab__count">{installedCount}</span>
+            )}
+            {tab === "updates" && updatesCount > 0 && (
+              <span className="plugins-tab__pill">{updatesCount}</span>
+            )}
           </button>
         ))}
       </div>
@@ -143,6 +140,16 @@ export function PluginsSection({
           TAB_CONTENT[active]
         )}
       </div>
-    </Group>
+      {active === "installed" && (
+        <div className="plugins-footer">
+          <Switch
+            label={t("turnOffAll")}
+            checked={allOff}
+            disabled={overview === null}
+            onChange={(checked) => void setAllPluginsOff(checked)}
+          />
+        </div>
+      )}
+    </div>
   );
 }

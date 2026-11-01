@@ -29,7 +29,7 @@
     "gaming": "Överlägget i spel, positionsljud och spelinsticksmoduler.",
     "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
     "about": "Version, support och installationsguiden.",
-    "plugins": "Installera, uppdatera och hantera tillägg."
+    "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat."
   },
   "breadcrumb": "Inställningar / {{section}}",
   "moreInfo": "Mer information: {{topic}}",

@@ -9,7 +9,6 @@
     "developer": "Programer"
   },
   "turnOffAll": "Isključi sve dodatke",
-  "turnOnAll": "Ponovno uključi dodatke",
   "allOff": "Svi su dodaci isključeni. Ostat će isključeni i nakon ponovnog pokretanja dok ih ne uključite.",
   "noPlugins": "Dodaci su isključeni za ovu sesiju (pokrenuto s --no-plugins).",
   "loadFailed": "Dodatke nije bilo moguće učitati.",

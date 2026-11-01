@@ -29,7 +29,7 @@
     "gaming": "An forleagan sa chluiche, fuaim shuímh agus breiseáin chluiche.",
     "advanced": "Uirlisí forbróra, diagnóisic, stóras agus ceadúnais.",
     "about": "Leagan, tacaíocht agus an draoi socraithe.",
-    "plugins": "Suiteáil, nuashonraigh agus bainistigh breiseáin."
+    "plugins": "Ritheann breiseáin i bhfianán gainimh agus ní fhaigheann siad ach an méid a cheadaíonn tú. Ní fheiceann siad d'fhuaim, do chomhaid ná do theastas riamh."
   },
   "breadcrumb": "Socruithe / {{section}}",
   "moreInfo": "Tuilleadh eolais: {{topic}}",

@@ -29,7 +29,7 @@
     "gaming": "A játékon belüli overlay, a pozicionális hang és a játékbővítmények.",
     "advanced": "Fejlesztői eszközök, diagnosztika, tárhely és licencek.",
     "about": "Verzió, támogatás és a beállítási varázsló.",
-    "plugins": "Bővítmények telepítése, frissítése és kezelése."
+    "plugins": "A bővítmények elszigetelt környezetben futnak, és csak azt kapják meg, amit engedélyezel. Soha nem látják a hangodat, a fájljaidat vagy a tanúsítványodat."
   },
   "breadcrumb": "Beállítások / {{section}}",
   "moreInfo": "További információ: {{topic}}",

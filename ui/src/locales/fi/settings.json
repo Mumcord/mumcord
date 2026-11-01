@@ -29,7 +29,7 @@
     "gaming": "Pelinaikainen peittokuva, paikkaääni ja pelilaajennukset.",
     "advanced": "Kehittäjätyökalut, diagnostiikka, tallennustila ja lisenssit.",
     "about": "Versio, tuki ja käyttöönottoavustaja.",
-    "plugins": "Asenna, päivitä ja hallitse lisäosia."
+    "plugins": "Lisäosat toimivat hiekkalaatikossa ja saavat vain sen, minkä sallit. Ne eivät koskaan näe ääntäsi, tiedostojasi tai varmennettasi."
   },
   "breadcrumb": "Asetukset / {{section}}",
   "moreInfo": "Lisätietoja: {{topic}}",

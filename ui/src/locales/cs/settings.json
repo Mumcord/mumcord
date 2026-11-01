@@ -29,7 +29,7 @@
     "gaming": "Překryv ve hře, poziční zvuk a herní pluginy.",
     "advanced": "Vývojářské nástroje, diagnostika, úložiště a licence.",
     "about": "Verze, podpora a průvodce nastavením.",
-    "plugins": "Instalace, aktualizace a správa doplňků."
+    "plugins": "Pluginy běží v izolovaném prostředí a dostanou jen to, co povolíte. Nikdy nevidí váš zvuk, soubory ani certifikát."
   },
   "breadcrumb": "Nastavení / {{section}}",
   "moreInfo": "Další informace: {{topic}}",

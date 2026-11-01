@@ -9,7 +9,6 @@
     "developer": "Utvecklare"
   },
   "turnOffAll": "Stäng av alla tillägg",
-  "turnOnAll": "Slå på tillägg igen",
   "allOff": "Alla tillägg är avstängda. De förblir avstängda, även efter omstart, tills du slår på dem igen.",
   "noPlugins": "Tillägg är avstängda för den här sessionen (startad med --no-plugins).",
   "loadFailed": "Tilläggen kunde inte läsas in.",

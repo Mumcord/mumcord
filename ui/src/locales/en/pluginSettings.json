@@ -9,7 +9,6 @@
     "developer": "Developer"
   },
   "turnOffAll": "Turn off all plugins",
-  "turnOnAll": "Turn plugins on again",
   "allOff": "All plugins are turned off. They stay off, also after a restart, until you turn them on again.",
   "noPlugins": "Plugins are off for this session (started with --no-plugins).",
   "loadFailed": "Plugins could not be loaded.",

@@ -9,7 +9,6 @@
     "developer": "Arendaja"
   },
   "turnOffAll": "Lülita kõik pluginad välja",
-  "turnOnAll": "Lülita pluginad uuesti sisse",
   "allOff": "Kõik pluginad on välja lülitatud. Nad jäävad välja ka pärast taaskäivitust, kuni lülitad need uuesti sisse.",
   "noPlugins": "Pluginad on selleks seansiks välja lülitatud (käivitatud valikuga --no-plugins).",
   "loadFailed": "Plugin ei õnnestunud laadida.",

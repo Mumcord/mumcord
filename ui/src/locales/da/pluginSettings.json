@@ -9,7 +9,6 @@
     "developer": "Udvikler"
   },
   "turnOffAll": "Sluk alle plugins",
-  "turnOnAll": "Tænd plugins igen",
   "allOff": "Alle plugins er slukket. De forbliver slukket, også efter en genstart, indtil du tænder dem igen.",
   "noPlugins": "Plugins er slået fra i denne session (startet med --no-plugins).",
   "loadFailed": "Pluginsene kunne ikke indlæses.",

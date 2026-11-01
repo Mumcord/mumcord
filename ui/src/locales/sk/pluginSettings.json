@@ -9,7 +9,6 @@
     "developer": "Vývojár"
   },
   "turnOffAll": "Vypnúť všetky doplnky",
-  "turnOnAll": "Znova zapnúť doplnky",
   "allOff": "Všetky doplnky sú vypnuté. Zostanú vypnuté aj po reštarte, kým ich znova nezapnete.",
   "noPlugins": "Doplnky sú pre túto reláciu vypnuté (spustené s --no-plugins).",
   "loadFailed": "Doplnky sa nepodarilo načítať.",

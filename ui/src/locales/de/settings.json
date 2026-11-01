@@ -29,7 +29,7 @@
     "gaming": "Das Ingame-Overlay, Positionsaudio und Spiel-Plugins.",
     "advanced": "Entwicklerwerkzeuge, Diagnose, Speicher und Lizenzen.",
     "about": "Version, Support und der Einrichtungsassistent.",
-    "plugins": "Plugins installieren, aktualisieren und verwalten."
+    "plugins": "Plugins laufen in einer Sandbox und bekommen nur, was du erlaubst. Sie sehen nie dein Audio, deine Dateien oder dein Zertifikat."
   },
   "breadcrumb": "Einstellungen / {{section}}",
   "moreInfo": "Mehr Informationen: {{topic}}",

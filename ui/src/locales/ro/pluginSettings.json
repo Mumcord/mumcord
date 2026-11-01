@@ -9,7 +9,6 @@
     "developer": "Dezvoltator"
   },
   "turnOffAll": "Dezactivează toate pluginurile",
-  "turnOnAll": "Reactivează pluginurile",
   "allOff": "Toate pluginurile sunt dezactivate. Rămân dezactivate, chiar și după repornire, până le reactivezi.",
   "noPlugins": "Pluginurile sunt dezactivate pentru această sesiune (pornit cu --no-plugins).",
   "loadFailed": "Pluginurile nu au putut fi încărcate.",

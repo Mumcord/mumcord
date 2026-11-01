@@ -9,7 +9,6 @@
     "developer": "Żviluppatur"
   },
   "turnOffAll": "Itfi l-plagins kollha",
-  "turnOnAll": "Erġa' ixgħel il-plagins",
   "allOff": "Il-plagins kollha huma mitfija. Jibqgħu mitfija, anki wara li terġa' tibda, sakemm terġa' tixgħelhom.",
   "noPlugins": "Il-plagins huma mitfija għal din is-sessjoni (nbdiet b'--no-plugins).",
   "loadFailed": "Il-plagins ma setgħux jitgħabbew.",

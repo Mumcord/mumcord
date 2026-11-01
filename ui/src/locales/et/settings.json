@@ -29,7 +29,7 @@
     "gaming": "Mängusisene ülekate, positsiooniheli ja mängupluginad.",
     "advanced": "Arendaja tööriistad, diagnostika, salvestusruum ja litsentsid.",
     "about": "Versioon, tugi ja seadistusviisard.",
-    "plugins": "Paigalda, uuenda ja halda plugin."
+    "plugins": "Pluginad töötavad liivakastis ja saavad ainult selle, mida lubad. Nad ei näe kunagi sinu heli, faile ega sertifikaati."
   },
   "breadcrumb": "Seaded / {{section}}",
   "moreInfo": "Lisateave: {{topic}}",

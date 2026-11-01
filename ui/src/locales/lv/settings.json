@@ -29,7 +29,7 @@
     "gaming": "Pārklājums spēlē, pozicionālā skaņa un spēļu spraudņi.",
     "advanced": "Izstrādātāju rīki, diagnostika, krātuve un licences.",
     "about": "Versija, atbalsts un iestatīšanas vednis.",
-    "plugins": "Instalējiet, atjauniniet un pārvaldiet spraudņus."
+    "plugins": "Spraudņi darbojas izolētā vidē un saņem tikai to, ko atļaujat. Tie nekad neredz jūsu audio, failus vai sertifikātu."
   },
   "breadcrumb": "Iestatījumi / {{section}}",
   "moreInfo": "Papildinformācija: {{topic}}",

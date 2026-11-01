@@ -9,7 +9,6 @@
     "developer": "Développeur"
   },
   "turnOffAll": "Désactiver tous les plugins",
-  "turnOnAll": "Réactiver les plugins",
   "allOff": "Tous les plugins sont désactivés. Ils le restent, même après un redémarrage, jusqu'à ce que vous les réactiviez.",
   "noPlugins": "Les plugins sont désactivés pour cette session (démarrage avec --no-plugins).",
   "loadFailed": "Impossible de charger les plugins.",

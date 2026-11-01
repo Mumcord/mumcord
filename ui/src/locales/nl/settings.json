@@ -29,7 +29,7 @@
     "gaming": "De overlay in games, positionele audio en game-plug-ins.",
     "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
     "about": "Versie, ondersteuning en de installatiewizard.",
-    "plugins": "Plug-ins installeren, bijwerken en beheren."
+    "plugins": "Plugins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat."
   },
   "breadcrumb": "Instellingen / {{section}}",
   "moreInfo": "Meer informatie: {{topic}}",

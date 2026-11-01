@@ -29,7 +29,7 @@
     "gaming": "Overlay u igri, pozicijski zvuk i dodaci za igre.",
     "advanced": "Razvojni alati, dijagnostika, pohrana i licence.",
     "about": "Verzija, podrška i čarobnjak za postavljanje.",
-    "plugins": "Instalirajte, ažurirajte i upravljajte dodacima."
+    "plugins": "Dodaci rade u izoliranom okruženju i dobivaju samo ono što dopustite. Nikada ne vide vaš zvuk, datoteke ni certifikat."
   },
   "breadcrumb": "Postavke / {{section}}",
   "moreInfo": "Više informacija: {{topic}}",

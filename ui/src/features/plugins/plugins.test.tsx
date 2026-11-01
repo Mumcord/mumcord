@@ -27,7 +27,7 @@ describe("PluginsSection", () => {
   it("shows the tabs without Developer unless Developer mode is on", async () => {
     const { rerender } = render(<PluginsSection developerMode={false} />);
     await screen.findByRole("tab", { name: "Installed" });
-    expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
+    expect(screen.getAllByRole("tab").map((tab) => tab.textContent.replace(/\d+$/, ""))).toEqual([
       "Installed",
       "Browse",
       "Updates",
@@ -60,14 +60,14 @@ describe("PluginsSection", () => {
       .spyOn(api, "pluginsList")
       .mockResolvedValue({ noPlugins: false, allOff: false, plugins: [] });
     render(<PluginsSection developerMode={false} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Turn off all plugins" }));
+    fireEvent.click(await screen.findByRole("switch", { name: "Turn off all plugins" }));
     expect(setAllOff).toHaveBeenCalledWith(true);
     list.mockResolvedValue({ noPlugins: false, allOff: true, plugins: [] });
     await act(async () => {
       api.mock.emit("pluginsChanged", {});
       await Promise.resolve();
     });
-    expect(await screen.findByRole("button", { name: "Turn plugins on again" })).toBeVisible();
+    expect(await screen.findByRole("switch", { name: "Turn off all plugins" })).toBeChecked();
     expect(screen.getByText(/All plugins are turned off/)).toBeInTheDocument();
   });
 

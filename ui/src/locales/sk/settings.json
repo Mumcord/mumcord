@@ -29,7 +29,7 @@
     "gaming": "Prekrytie v hre, polohový zvuk a doplnky pre hry.",
     "advanced": "Nástroje pre vývojárov, diagnostika, úložisko a licencie.",
     "about": "Verzia, podpora a sprievodca nastavením.",
-    "plugins": "Inštalácia, aktualizácia a správa doplnkov."
+    "plugins": "Pluginy bežia v izolovanom prostredí a dostanú len to, čo povolíte. Nikdy nevidia váš zvuk, súbory ani certifikát."
   },
   "breadcrumb": "Nastavenia / {{section}}",
   "moreInfo": "Viac informácií: {{topic}}",

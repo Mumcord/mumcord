@@ -29,7 +29,7 @@
     "gaming": "Nakładka w grze, dźwięk pozycyjny i wtyczki do gier.",
     "advanced": "Narzędzia deweloperskie, diagnostyka, pamięć i licencje.",
     "about": "Wersja, pomoc i kreator konfiguracji.",
-    "plugins": "Instaluj, aktualizuj i zarządzaj wtyczkami."
+    "plugins": "Wtyczki działają w piaskownicy i dostają tylko to, na co pozwolisz. Nigdy nie widzą twojego dźwięku, plików ani certyfikatu."
   },
   "breadcrumb": "Ustawienia / {{section}}",
   "moreInfo": "Więcej informacji: {{topic}}",
