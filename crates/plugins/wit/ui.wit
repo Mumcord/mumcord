@@ -63,6 +63,10 @@ interface ui {
     end,
     /// First child at the start, last at the end, the rest evenly between.
     space-between,
+    /// Rows only: the first child takes all the free width (its content may shrink and be cut
+    /// off), the others keep their natural width, e.g. an entry button next to a fixed
+    /// 'Copy' button. In a column it behaves like `start`.
+    fill-first,
   }
 
   record stack {
@@ -146,6 +150,9 @@ interface ui {
     /// Disclosure state: `some(true)` while the controlled content is open, `some(false)` while
     /// closed (announced as expanded/collapsed). `none` for ordinary buttons.
     expanded: option<bool>,
+    /// A muted second line under the label, e.g. 'Tobias · 20:09'; none = label only. Screen
+    /// readers announce it as the button's description.
+    detail: option<string>,
   }
 
   record icon-button {

@@ -1,6 +1,6 @@
 //! The plugin API package `mumcord:plugin@1.0.0` is the frozen contract for the runtime, the SDK,
 //! the UI renderer and every plugin. These tests pin its shape to the spec, so an accidental
-//! rename or removal fails here instead of breaking published plugins.
+//! change fails here instead of breaking published plugins.
 
 use std::path::Path;
 
@@ -216,4 +216,60 @@ fn panel_popover_calls_are_additive() {
     let (resolve, _) = package();
     assert!(has_function(&resolve, "ui", "open-panel-popover"));
     assert!(has_function(&resolve, "ui", "close-panel-popover"));
+}
+
+/// Snapshot of every WIT declaration without comments or indentation, one per line.
+const SNAPSHOT: &str = "tests/fixtures/wit-1.0.0.snapshot";
+
+fn declarations() -> String {
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("wit");
+    let mut files: Vec<_> = std::fs::read_dir(&dir)
+        .expect("wit dir")
+        .map(|entry| entry.expect("entry").path())
+        .collect();
+    files.sort();
+    let mut out = String::new();
+    for path in files {
+        let name = path
+            .file_name()
+            .expect("name")
+            .to_string_lossy()
+            .into_owned();
+        out.push_str(&format!("== {name}\n"));
+        for line in std::fs::read_to_string(&path).expect("read wit").lines() {
+            let line = line.trim();
+            if !line.is_empty() && !line.starts_with("//") {
+                out.push_str(line);
+                out.push('\n');
+            }
+        }
+    }
+    out
+}
+
+/// Plugins built against one shape of the package do not load against another: wasmtime checks
+/// the case counts of enums and variants and the fields of records exactly (see
+/// `ui_types_must_match_the_host_exactly` in runtime.rs). So after the 0.6.0 release every
+/// declaration is frozen; doc comments may still change. Before that release the lead may
+/// approve a change, then refresh the snapshot with `UPDATE_WIT_SNAPSHOT=1`.
+#[test]
+fn package_shape_is_frozen() {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(SNAPSHOT);
+    let now = declarations();
+    if std::env::var_os("UPDATE_WIT_SNAPSHOT").is_some() {
+        std::fs::write(&path, &now).expect("write snapshot");
+        return;
+    }
+    // A Windows checkout may turn the line ends into CRLF.
+    let pinned = std::fs::read_to_string(&path)
+        .expect("snapshot exists")
+        .replace("\r\n", "\n");
+    assert!(
+        pinned == now,
+        "WIT mumcord:plugin@1.0.0 changed. It is frozen at the 0.6.0 release: adding enum or \
+         variant cases or record fields breaks every plugin built before (wasmtime checks exact \
+         case counts). Later changes need a new package version (@1.1.0) linked alongside 1.0.0 \
+         with host-side tree conversion (specs/06-plugin-system-specification.md). Compare \
+         {SNAPSHOT} with the WIT files to see what changed."
+    );
 }

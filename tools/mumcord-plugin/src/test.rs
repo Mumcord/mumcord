@@ -1271,7 +1271,9 @@ pub fn node_texts(node: &Node) -> Vec<&str> {
         Component::Image(i) => vec![&i.alt],
         Component::Sprite(s) => vec![&s.alt],
         Component::Meter(m) => vec![&m.label],
-        Component::Button(b) => vec![&b.label],
+        Component::Button(b) => std::iter::once(b.label.as_str())
+            .chain(b.detail.as_deref())
+            .collect(),
         Component::IconButton(b) => vec![&b.label],
         Component::Chip(c) => vec![&c.text],
         Component::Progress(p) => vec![&p.label],

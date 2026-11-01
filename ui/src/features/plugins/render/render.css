@@ -20,6 +20,30 @@
   flex-wrap: wrap;
 }
 
+/* Justify fill-first: the first child takes the free width, the others keep their natural size,
+   so the row never wraps. With an animation the wrapper grows and passes the width on. */
+.pr-stack--fill-first {
+  flex-wrap: nowrap;
+}
+
+.pr-stack--fill-first > * {
+  flex: 0 0 auto;
+}
+
+.pr-stack--fill-first > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.pr-stack--fill-first > .pr-anim:first-child {
+  display: flex;
+}
+
+.pr-stack--fill-first > .pr-anim:first-child > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .pr-stack--column {
   flex-direction: column;
 }
@@ -164,6 +188,28 @@
   margin: 0;
   border: 0;
   border-top: 1px solid var(--color-border);
+}
+
+/* A label with a muted second line under it, e.g. who saved an entry and when. */
+.pr-button--detail {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.pr-button__label,
+.pr-button__detail {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pr-button__detail {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  opacity: 0.8;
 }
 
 /* Secondary: an outline on the surface it sits on. */

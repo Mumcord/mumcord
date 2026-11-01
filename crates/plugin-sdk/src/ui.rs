@@ -118,6 +118,16 @@ impl El {
         self
     }
 
+    /// Adds a muted second line under a button's label, e.g. `"Tobias · 20:09"`; screen readers
+    /// announce it as the description. No effect on others.
+    #[must_use]
+    pub fn detail(mut self, text: &str) -> Self {
+        if let Component::Button(c) = &mut self.component {
+            c.detail = Some(text.to_owned());
+        }
+        self
+    }
+
     /// Sets the kind of a button or copy button; no effect on others.
     #[must_use]
     pub fn kind(mut self, kind: ButtonKind) -> Self {
@@ -139,7 +149,9 @@ impl El {
     }
 
     /// Sets how a stack spreads its children along its direction, e.g. `Justify::End` for a
-    /// right-aligned button row; no effect on others.
+    /// right-aligned button row, or `Justify::FillFirst` for a row whose first child takes the
+    /// free width next to fixed-size ones (with `stack(Direction::Row, 8, Align::Stretch)` they
+    /// also get equal heights); no effect on others.
     #[must_use]
     pub fn justify(mut self, justify: Justify) -> Self {
         if let Component::Stack(c) = &mut self.component {
@@ -277,6 +289,7 @@ pub fn button(action: &str, label: &str) -> El {
         kind: ButtonKind::Primary,
         disabled: false,
         expanded: None,
+        detail: None,
     }))
 }
 
@@ -543,5 +556,25 @@ mod tests {
             panic!("not a stack")
         };
         assert_eq!(s.justify, Some(Justify::End));
+    }
+
+    #[test]
+    fn fill_first_rows_and_button_details() {
+        let Component::Stack(s) = row().justify(Justify::FillFirst).component else {
+            panic!("not a stack")
+        };
+        assert_eq!(s.justify, Some(Justify::FillFirst));
+
+        let Component::Button(b) = button("open:1", "Rifter")
+            .detail("Tobias · 20:09")
+            .component
+        else {
+            panic!("not a button")
+        };
+        assert_eq!(b.detail.as_deref(), Some("Tobias · 20:09"));
+        let Component::Button(b) = button("a", "Plain").component else {
+            panic!("not a button")
+        };
+        assert_eq!(b.detail, None);
     }
 }

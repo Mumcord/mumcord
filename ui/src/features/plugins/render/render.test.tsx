@@ -182,6 +182,7 @@ describe("PluginTree", () => {
         kind: "secondary",
         disabled: false,
         expanded: true,
+        detail: null,
       }),
       leaf({
         type: "button",
@@ -190,6 +191,7 @@ describe("PluginTree", () => {
         kind: "secondary",
         disabled: false,
         expanded: false,
+        detail: null,
       }),
       leaf({
         type: "button",
@@ -198,6 +200,7 @@ describe("PluginTree", () => {
         kind: "secondary",
         disabled: false,
         expanded: null,
+        detail: null,
       }),
     ]);
     expect(screen.getByRole("button", { name: "Open" })).toHaveAttribute("aria-expanded", "true");
@@ -206,6 +209,73 @@ describe("PluginTree", () => {
       "false",
     );
     expect(screen.getByRole("button", { name: "Plain" })).not.toHaveAttribute("aria-expanded");
+  });
+
+  it("lets the first child of a fill-first row take the free width", () => {
+    const row = (justify: "fillFirst" | "start", direction: "row" | "column"): PluginNode => ({
+      component: { type: "stack", direction, gap: 8, align: "stretch", justify },
+      animation: null,
+      children: [1, 2],
+    });
+    const children = [
+      leaf({
+        type: "button",
+        label: "Rifter",
+        action: "open:1",
+        kind: "secondary",
+        disabled: false,
+        expanded: null,
+        detail: "Tobias · 20:09",
+      }),
+      leaf({ type: "copyButton", label: "Copy fitting", text: "[Rifter]", kind: "secondary" }),
+    ];
+    const { container, unmount } = show([row("fillFirst", "row"), ...children]);
+    const stackEl = container.querySelector(".pr-stack");
+    expect(stackEl).toHaveClass("pr-stack--row", "pr-stack--fill-first");
+    expect(stackEl?.firstElementChild).toBe(screen.getByRole("button", { name: "Rifter" }));
+    unmount();
+
+    // Only rows grow a child; a column, or a row with another justify, stays as it was.
+    for (const [justify, direction] of [
+      ["fillFirst", "column"],
+      ["start", "row"],
+    ] as const) {
+      const shown = show([row(justify, direction), ...children]);
+      expect(shown.container.querySelector(".pr-stack")).not.toHaveClass("pr-stack--fill-first");
+      shown.unmount();
+    }
+  });
+
+  it("shows a button's detail line as its description, not its name", async () => {
+    const action = vi.spyOn(api, "pluginUiAction").mockResolvedValue(null);
+    const { container } = show([
+      stack([1, 2]),
+      leaf({
+        type: "button",
+        label: "Rifter",
+        action: "open:1",
+        kind: "secondary",
+        disabled: false,
+        expanded: null,
+        detail: "Tobias · 20:09",
+      }),
+      leaf({
+        type: "button",
+        label: "Plain",
+        action: "plain",
+        kind: "secondary",
+        disabled: false,
+        expanded: null,
+        detail: null,
+      }),
+    ]);
+    const entry = screen.getByRole("button", { name: "Rifter" });
+    expect(entry).toHaveAccessibleDescription("Tobias · 20:09");
+    expect(entry).toHaveTextContent("RifterTobias · 20:09");
+    expect(screen.getByRole("button", { name: "Plain" })).not.toHaveAttribute("aria-describedby");
+    fireEvent.click(entry);
+    expect(action).toHaveBeenCalledWith("poll", PANEL, "open:1", { type: "none" }, null);
+    expect(await axeViolations(container)).toEqual([]);
   });
 
   it("sends button, toggle and refresh actions for its slot", () => {
@@ -219,6 +289,7 @@ describe("PluginTree", () => {
         kind: "primary",
         disabled: false,
         expanded: null,
+        detail: null,
       }),
       leaf({ type: "toggle", label: "Notify", value: false, action: "notify", disabled: false }),
     ]);
@@ -243,6 +314,7 @@ describe("PluginTree", () => {
         kind: "primary",
         disabled: false,
         expanded: null,
+        detail: null,
       }),
     ]);
     fireEvent.click(screen.getByRole("button", { name: "Vote" }));
@@ -528,6 +600,7 @@ describe("variants", () => {
       kind,
       disabled: false,
       expanded: null,
+      detail: null,
     });
     show([
       {

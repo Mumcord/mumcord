@@ -38,7 +38,13 @@ export interface PluginTreeProps {
   serverId?: number | null;
 }
 
-const JUSTIFY = { start: "flex-start", end: "flex-end", spaceBetween: "space-between" } as const;
+const JUSTIFY = {
+  start: "flex-start",
+  end: "flex-end",
+  spaceBetween: "space-between",
+  // The growing first child is done in CSS (`pr-stack--fill-first`).
+  fillFirst: "flex-start",
+} as const;
 
 /** Gap of a stack in px; the host refuses more. */
 const MAX_GAP = 32;
@@ -62,7 +68,9 @@ function renderNode(
     case "stack":
       content = (
         <div
-          className={`pr-stack pr-stack--${c.direction}`}
+          className={`pr-stack pr-stack--${c.direction}${
+            c.justify === "fillFirst" && c.direction === "row" ? " pr-stack--fill-first" : ""
+          }`}
           style={{
             gap: Math.min(c.gap, MAX_GAP),
             alignItems: c.align === "start" || c.align === "end" ? `flex-${c.align}` : c.align,

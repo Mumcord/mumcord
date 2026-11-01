@@ -2460,7 +2460,9 @@ export type PluginComponent = { type: "stack"; direction: PluginDirection; gap: 
 /**  `None`: start. */
 justify: PluginJustify | null } | { type: "text"; text: string; style: PluginTextStyle; color: string | null } | 
 /**  `asset` is a path inside the package's `assets/`. */
-{ type: "image"; asset: string; alt: string; width: number; height: number } | { type: "sprite"; asset: string; alt: string; frameWidth: number; frameHeight: number; frames: number; fps: number; stillFrame: number } | { type: "meter"; label: string; value: number | null; color: string | null } | { type: "button"; label: string; action: string; kind: PluginButtonKind; disabled: boolean; expanded: boolean | null } | { type: "iconButton"; icon: string; label: string; action: string; disabled: boolean } | { type: "chip"; text: string; color: string | null; 
+{ type: "image"; asset: string; alt: string; width: number; height: number } | { type: "sprite"; asset: string; alt: string; frameWidth: number; frameHeight: number; frames: number; fps: number; stillFrame: number } | { type: "meter"; label: string; value: number | null; color: string | null } | { type: "button"; label: string; action: string; kind: PluginButtonKind; disabled: boolean; expanded: boolean | null; 
+/**  Muted second line under the label; announced as the button's description. */
+detail: string | null } | { type: "iconButton"; icon: string; label: string; action: string; disabled: boolean } | { type: "chip"; text: string; color: string | null; 
 /**  Wins over `color`. */
 tone: PluginTone | null } | { type: "divider" } | 
 /**  `value` none: indeterminate. */
@@ -2544,7 +2546,9 @@ export type PluginInstallStage =
 { stage: "failed"; reason: string };
 
 /**  Main-axis spread of a stack. */
-export type PluginJustify = "start" | "end" | "spaceBetween";
+export type PluginJustify = "start" | "end" | "spaceBetween" | 
+/**  Rows: the first child takes the free width, the others keep their natural width. */
+"fillFirst";
 
 export type PluginLogLevel = "debug" | "info" | "warn" | "error";
 

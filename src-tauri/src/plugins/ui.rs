@@ -99,6 +99,8 @@ pub enum PluginJustify {
     Start,
     End,
     SpaceBetween,
+    /// Rows: the first child takes the free width, the others keep their natural width.
+    FillFirst,
 }
 
 /// Colour role of a chip or a field note.
@@ -191,6 +193,8 @@ pub enum PluginComponent {
         kind: PluginButtonKind,
         disabled: bool,
         expanded: Option<bool>,
+        /// Muted second line under the label; announced as the button's description.
+        detail: Option<String>,
     },
     IconButton {
         icon: String,
@@ -419,6 +423,7 @@ fn component(c: wit::Component) -> PluginComponent {
                 wit::Justify::Start => PluginJustify::Start,
                 wit::Justify::End => PluginJustify::End,
                 wit::Justify::SpaceBetween => PluginJustify::SpaceBetween,
+                wit::Justify::FillFirst => PluginJustify::FillFirst,
             }),
         },
         wit::Component::Text(t) => P::Text {
@@ -461,6 +466,7 @@ fn component(c: wit::Component) -> PluginComponent {
             },
             disabled: b.disabled,
             expanded: b.expanded,
+            detail: b.detail,
         },
         wit::Component::IconButton(b) => P::IconButton {
             icon: b.icon,
@@ -843,6 +849,7 @@ mod tests {
                 kind: wit::ButtonKind::Primary,
                 disabled: false,
                 expanded: Some(true),
+                detail: Some("Tobias · 20:09".into()),
             }),
             animation: Some(wit::Animation::Hop),
             children: vec![],
@@ -866,6 +873,7 @@ mod tests {
                         kind: PluginButtonKind::Primary,
                         disabled: false,
                         expanded: Some(true),
+                        detail: Some("Tobias · 20:09".into()),
                     },
                     animation: Some(PluginAnimation::Hop),
                     children: vec![],
@@ -914,6 +922,7 @@ mod tests {
                     kind: PluginButtonKind::Secondary,
                     disabled: true,
                     expanded: None,
+                    detail: None,
                 }),
             ],
         );
@@ -943,6 +952,7 @@ mod tests {
             kind: PluginButtonKind::Primary,
             disabled: false,
             expanded: None,
+            detail: None,
         });
         set(&mut trees, PluginSlot::Dialog, vec![button.clone()]);
         set(&mut trees, PluginSlot::Panel, vec![button]);

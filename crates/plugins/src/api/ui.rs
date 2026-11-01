@@ -186,7 +186,10 @@ fn strings(component: &Component) -> Vec<&str> {
             .into_iter()
             .flatten()
             .collect(),
-        Component::Button(b) => vec![&b.label, &b.action],
+        Component::Button(b) => [Some(b.label.as_str()), Some(&b.action), b.detail.as_deref()]
+            .into_iter()
+            .flatten()
+            .collect(),
         Component::IconButton(b) => vec![&b.icon, &b.label, &b.action],
         Component::Chip(c) => [Some(c.text.as_str()), c.color.as_deref()]
             .into_iter()
@@ -611,6 +614,7 @@ mod tests {
                 kind: ButtonKind::Primary,
                 disabled: false,
                 expanded: None,
+                detail: None,
             }),
             vec![],
         )

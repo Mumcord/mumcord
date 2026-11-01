@@ -17,6 +17,7 @@
 - **Servers can suggest plugins**: a server's Mumbot can recommend plugins, which appear in the notification centre with Install, Details, Not now and Don't ask again for this server. Nothing is installed without your approval.
 - **Third-party repositories**: add up to 10 repositories of your own in Settings > Plugins > Repositories (shown with the repository name and key fingerprint first). Their plugins are labelled "Unofficial" everywhere, the first install from each repository shows a warning, and a repository whose signing key changes is paused until you confirm.
 - **Developer mode** (Settings > Advanced) adds a Developer tab to load, reload and unload a plugin from a folder, with its log. Such plugins are marked "Developer plugin" and are unloaded when Developer mode is turned off. A plugin SDK, the `mumcord-plugin` command-line tool for authors and a project template are available (Apache-2.0).
+- Plugin layouts can now have a row where one entry fills the width next to a fixed button (for example a saved fit next to **Copy fitting**), and plugin buttons can show a small second line such as who saved an entry and when.
 - `mumcord://plugins/<id>` links open the details of an official plugin in Browse; they never install anything by themselves.
 - Four official plugins, each available in all 24 Mumcord languages:
   - **Poll**: ask a question with 2 to 10 options, see live results in the chat card and the panel, and end the poll when done. Votes are counted once per person.

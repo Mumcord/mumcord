@@ -11,20 +11,33 @@ type Of<T extends PluginComponent["type"]> = Extract<PluginComponent, { type: T 
 
 const NONE = { type: "none" } as const;
 
-export function PluginButton({ label, action, kind, disabled, expanded }: Of<"button">) {
+export function PluginButton({ label, action, kind, disabled, expanded, detail }: Of<"button">) {
   const { send } = useRender();
+  const detailId = useId();
   const variant = kind === "primary" ? "button--primary" : `pr-button--${kind}`;
   return (
     <button
       type="button"
-      className={`button ${variant}`}
+      className={`button ${variant}${detail === null ? "" : " pr-button--detail"}`}
       disabled={disabled}
       aria-expanded={expanded ?? undefined}
+      // With a detail line the name stays the label alone; the detail is the description.
+      aria-label={detail === null ? undefined : label}
+      aria-describedby={detail === null ? undefined : detailId}
       onClick={() => {
         send(action, NONE);
       }}
     >
-      {label}
+      {detail === null ? (
+        label
+      ) : (
+        <>
+          <span className="pr-button__label">{label}</span>
+          <span id={detailId} className="pr-button__detail">
+            {detail}
+          </span>
+        </>
+      )}
     </button>
   );
 }

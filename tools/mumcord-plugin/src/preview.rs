@@ -176,13 +176,18 @@ impl Renderer<'_> {
                     Align::Stretch => "stretch",
                 };
                 let justify = match s.justify {
-                    None | Some(Justify::Start) => "flex-start",
+                    None | Some(Justify::Start | Justify::FillFirst) => "flex-start",
                     Some(Justify::End) => "flex-end",
                     Some(Justify::SpaceBetween) => "space-between",
                 };
+                let fill = if s.justify == Some(Justify::FillFirst) {
+                    " fill-first"
+                } else {
+                    ""
+                };
                 let _ = write!(
                     self.out,
-                    "<div class=\"stack\"{anim} style=\"flex-direction:{direction};gap:{}px;align-items:{align};justify-content:{justify}\">",
+                    "<div class=\"stack{fill}\"{anim} style=\"flex-direction:{direction};gap:{}px;align-items:{align};justify-content:{justify}\">",
                     s.gap.min(32)
                 );
                 self.children(node, depth, false);
@@ -235,9 +240,12 @@ impl Renderer<'_> {
                     ButtonKind::Secondary => "secondary",
                     ButtonKind::Danger => "danger",
                 };
+                let detail = b.detail.as_deref().map_or(String::new(), |d| {
+                    format!("<small class=\"detail\">{}</small>", escape(d))
+                });
                 let _ = write!(
                     self.out,
-                    "<button class=\"{kind}\"{anim}{}{}>{}</button>",
+                    "<button class=\"{kind}\"{anim}{}{}>{}{detail}</button>",
                     disabled(b.disabled),
                     b.expanded
                         .map_or(String::new(), |open| format!(" aria-expanded=\"{open}\"")),
@@ -578,7 +586,9 @@ section { margin-bottom:24px; }
 .panel { width:260px; height:160px; } .popover { width:420px; height:560px; } .profile-card { width:300px; height:220px; }
 .chat-card { width:440px; max-width:100%; height:160px; } .form { width:420px; max-width:100%; }
 .badge { width:24px; height:24px; padding:0; } .decoration { width:16px; height:16px; padding:0; }
-.stack { display:flex; } p { margin:0; } .heading { font-weight:700; font-size:16px; }
+.stack { display:flex; } .stack.fill-first { flex-wrap:nowrap; }
+.stack.fill-first > :first-child { flex:1 1 0; min-width:0; }
+button .detail { display:block; font-size:12px; opacity:0.8; } p { margin:0; } .heading { font-weight:700; font-size:16px; }
 .caption { font-size:12px; color:var(--text-muted); } .mono { font-family:ui-monospace, monospace; }
 ul { list-style:none; margin:0; padding:0; } li { padding:2px 0; border-bottom:1px solid var(--border); }
 button { border-radius:6px; border:1px solid var(--border); padding:4px 10px; font:inherit;
@@ -649,6 +659,7 @@ mod tests {
                     kind: ButtonKind::Primary,
                     disabled: false,
                     expanded: Some(false),
+                    detail: Some("Tobias · <b>20:09</b>".into()),
                 }),
                 vec![],
             ),
@@ -658,8 +669,9 @@ mod tests {
         assert!(!page.contains("<script>"));
         assert!(!page.contains("url(x)"));
         assert!(page.contains("gap:32px"));
+        assert!(page.contains("<small class=\"detail\">Tobias · &lt;b&gt;20:09&lt;/b&gt;</small>"));
         let text = page.find("&lt;script").expect("text");
-        let button = page.find(">Wave</button>").expect("button");
+        let button = page.find(">Wave<small").expect("button");
         assert!(text < button);
         assert!(page.contains("aria-expanded=\"false\""));
         assert!(!page.contains("<html lang=\"en\" data-theme"));

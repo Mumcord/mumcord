@@ -1,0 +1,520 @@
+== chat.wit
+interface chat {
+use types.{error, session};
+send: func(text: string) -> result<_, error>;
+line-hash: func(text: string) -> u32;
+supersede: func(card-id: string, sender: session, hash: u32) -> result<_, error>;
+current-message: func() -> option<u64>;
+is-replay: func() -> bool;
+replace: func(message: u64, card-id: string) -> result<_, error>;
+hide: func(message: u64) -> result<_, error>;
+}
+== clock.wit
+interface clock {
+record datetime {
+unix-seconds: u64,
+utc-offset-minutes: s32,
+}
+now: func() -> datetime;
+}
+== events.wit
+interface events {
+use types.{peer};
+use theme.{theme-info};
+use timers.{timer-id};
+use ui.{slot};
+use http.{request-id, http-response, http-error, file-handle};
+record channel {
+id: u32,
+name: string,
+}
+record self-state {
+me: option<peer>,
+server: option<string>,
+channel: option<channel>,
+muted: bool,
+deafened: bool,
+do-not-disturb: bool,
+}
+enum visibility {
+everyone,
+friends,
+nobody,
+}
+record plugin-settings {
+granted: list<string>,
+visibility: visibility,
+}
+enum panel-visibility {
+hidden,
+inline,
+expanded,
+}
+variant action-value {
+none,
+boolean(bool),
+number(f32),
+text(string),
+reorder(tuple<u32, u32>),
+file(file-handle),
+}
+variant action-source {
+slot(slot),
+command,
+}
+record ui-action {
+source: action-source,
+action: string,
+value: action-value,
+}
+record peer-message {
+sender: peer,
+kind: u8,
+payload: list<u8>,
+direct: bool,
+}
+record chat-trigger {
+sender: peer,
+trigger: string,
+args: string,
+}
+record chat-match {
+sender: peer,
+pattern-index: u8,
+text: string,
+}
+record http-result {
+id: request-id,
+outcome: result<http-response, http-error>,
+}
+variant event {
+talking(tuple<peer, bool>),
+joined(peer),
+left(peer),
+screen-share-started(peer),
+chat-activity(tuple<peer, channel>),
+mentioned(peer),
+self-changed(self-state),
+theme-changed(theme-info),
+language-changed(string),
+settings-changed(plugin-settings),
+ui-action(ui-action),
+timer(timer-id),
+peer-message(peer-message),
+profile-card-opened(peer),
+panel-visibility-changed(panel-visibility),
+user-menu-requested(peer),
+dialog-closed,
+http-response(http-result),
+webview-message(string),
+chat-trigger(chat-trigger),
+chat-match(chat-match),
+}
+}
+== http.wit
+interface http {
+use types.{error};
+type request-id = u32;
+enum method {
+get,
+post,
+put,
+patch,
+delete,
+}
+variant header-value {
+text(string),
+secret(string),
+}
+record header {
+name: string,
+value: header-value,
+}
+type file-handle = u64;
+variant form-value {
+text(string),
+file(file-handle),
+}
+record form-field {
+name: string,
+value: form-value,
+}
+variant body {
+empty,
+bytes(list<u8>),
+file(file-handle),
+form(list<form-field>),
+}
+record http-request {
+method: method,
+url: string,
+headers: list<header>,
+body: body,
+}
+record http-response {
+status: u16,
+headers: list<tuple<string, string>>,
+body: list<u8>,
+}
+variant http-error {
+host-not-allowed,
+invalid-request,
+redirect,
+timeout,
+tls(string),
+connect(string),
+response-too-large,
+}
+request: func(req: http-request) -> result<request-id, error>;
+}
+== log.wit
+interface log {
+enum level {
+debug,
+info,
+warn,
+error,
+}
+write: func(level: level, message: string);
+}
+== notify.wit
+interface notify {
+use types.{error};
+send: func(title: string, body: string) -> result<_, error>;
+}
+== peers.wit
+interface peers {
+use types.{bot-info, error, peer, session};
+variant target {
+channel,
+direct(session),
+}
+send: func(to: target, kind: u8, payload: list<u8>) -> result<_, error>;
+start-game-burst: func() -> result<_, error>;
+presence: func() -> result<list<peer>, error>;
+bot: func(user: session) -> result<option<bot-info>, error>;
+}
+== random.wit
+interface random {
+use types.{error};
+bytes: func(len: u32) -> result<list<u8>, error>;
+}
+== secrets.wit
+interface secrets {
+use types.{error};
+exists: func(name: string) -> result<bool, error>;
+delete: func(name: string) -> result<_, error>;
+}
+== storage.wit
+interface storage {
+use types.{error};
+enum scope {
+identity,
+global,
+}
+get: func(scope: scope, key: string) -> result<option<list<u8>>, error>;
+set: func(scope: scope, key: string, value: list<u8>) -> result<_, error>;
+delete: func(scope: scope, key: string) -> result<_, error>;
+list-keys: func(scope: scope, prefix: string) -> result<list<string>, error>;
+}
+== theme.wit
+interface theme {
+enum mode {
+light,
+dark,
+}
+record theme-info {
+mode: mode,
+tokens: list<string>,
+reduced-motion: bool,
+}
+current: func() -> theme-info;
+}
+== timers.wit
+interface timers {
+use types.{error};
+type timer-id = u32;
+start: func(interval-ms: u32, repeat: bool) -> result<timer-id, error>;
+cancel: func(id: timer-id);
+}
+== types.wit
+interface types {
+record start-info {
+api-version: string,
+previous-version: option<string>,
+}
+record bot-info {
+name: string,
+modules: list<string>,
+}
+type session = u32;
+record peer {
+session: session,
+name: string,
+key: option<string>,
+}
+enum error {
+not-permitted,
+too-large,
+rate-limited,
+no-recipients,
+hidden,
+quota-exceeded,
+invalid,
+}
+}
+== ui.wit
+interface ui {
+use types.{error, session};
+variant slot {
+panel,
+member-badge(session),
+profile-card(session),
+chat-card(string),
+chat-decoration(session),
+settings,
+dialog,
+}
+type node-index = u32;
+enum animation {
+bob,
+hop,
+wave,
+nap,
+sparkle,
+shake,
+fade,
+}
+enum direction {
+row,
+column,
+}
+enum align {
+start,
+center,
+end,
+stretch,
+}
+enum justify {
+start,
+end,
+space-between,
+fill-first,
+}
+record stack {
+direction: direction,
+gap: u8,
+align: align,
+justify: option<justify>,
+}
+enum text-style {
+body,
+caption,
+heading,
+monospace,
+}
+record text {
+text: string,
+style: text-style,
+color: option<string>,
+}
+record image {
+asset: string,
+alt: string,
+width: u16,
+height: u16,
+}
+record sprite {
+asset: string,
+alt: string,
+frame-width: u16,
+frame-height: u16,
+frames: u8,
+fps: u8,
+still-frame: u8,
+}
+record meter {
+label: string,
+value: f32,
+color: option<string>,
+}
+enum tone {
+neutral,
+success,
+warning,
+danger,
+accent,
+}
+enum button-kind {
+primary,
+secondary,
+danger,
+}
+record button {
+label: string,
+action: string,
+kind: button-kind,
+disabled: bool,
+expanded: option<bool>,
+detail: option<string>,
+}
+record icon-button {
+icon: string,
+label: string,
+action: string,
+disabled: bool,
+}
+record copy-button {
+label: string,
+text: string,
+kind: button-kind,
+}
+record chip {
+text: string,
+color: option<string>,
+tone: option<tone>,
+}
+record progress {
+label: string,
+value: option<f32>,
+}
+record list-props {
+label: string,
+reorder-action: option<string>,
+}
+record toggle {
+label: string,
+value: bool,
+action: string,
+disabled: bool,
+}
+record select-option {
+value: string,
+label: string,
+}
+record select {
+label: string,
+options: list<select-option>,
+selected: option<string>,
+action: string,
+refresh-action: option<string>,
+disabled: bool,
+}
+record slider {
+label: string,
+min: f32,
+max: f32,
+step: f32,
+value: f32,
+action: string,
+disabled: bool,
+}
+enum input-purpose {
+plain,
+server-address,
+}
+record text-input {
+label: string,
+value: string,
+placeholder: string,
+max-bytes: u8,
+purpose: input-purpose,
+action: string,
+disabled: bool,
+help: option<string>,
+help-tone: option<tone>,
+error: option<string>,
+}
+record password {
+label: string,
+secret: string,
+action: string,
+disabled: bool,
+help: option<string>,
+help-tone: option<tone>,
+error: option<string>,
+}
+record file-picker {
+label: string,
+accept: list<string>,
+action: string,
+disabled: bool,
+}
+record countdown {
+label: string,
+until: u64,
+}
+variant component {
+stack(stack),
+text(text),
+image(image),
+sprite(sprite),
+meter(meter),
+button(button),
+icon-button(icon-button),
+chip(chip),
+divider,
+progress(progress),
+%list(list-props),
+toggle(toggle),
+select(select),
+slider(slider),
+text-input(text-input),
+password(password),
+file-picker(file-picker),
+countdown(countdown),
+copy-button(copy-button),
+}
+record node {
+component: component,
+animation: option<animation>,
+children: list<node-index>,
+}
+set-tree: func(slot: slot, nodes: list<node>) -> result<_, error>;
+clear: func(slot: slot);
+open-dialog: func(title: string) -> result<_, error>;
+open-dialog-with: func(title: string, subtitle: option<string>) -> result<_, error>;
+close-dialog: func();
+set-user-menu-entry: func(label: option<string>) -> result<_, error>;
+record user-menu-filter {
+bot-name: option<string>,
+bot-module: option<string>,
+sessions: list<session>,
+}
+set-user-menu-entry-for: func(label: string, filter: user-menu-filter) -> result<_, error>;
+open-panel-popover: func() -> result<_, error>;
+close-panel-popover: func();
+}
+== webview.wit
+interface webview {
+use types.{error};
+enum place {
+panel-popover,
+dialog,
+}
+show: func(place: place, entry: string) -> result<_, error>;
+hide: func();
+post: func(message: string) -> result<_, error>;
+}
+== world.wit
+package mumcord:plugin@1.0.0;
+world plugin {
+use types.{start-info};
+use events.{event};
+import log;
+import storage;
+import timers;
+import clock;
+import notify;
+import theme;
+import random;
+import peers;
+import ui;
+import chat;
+import secrets;
+import http;
+import webview;
+export start: func(info: start-info) -> result<_, string>;
+export on-event: func(event: event);
+export stop: func();
+}

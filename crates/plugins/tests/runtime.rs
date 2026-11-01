@@ -37,11 +37,14 @@ fn component_with_events(start: &str, event: &str, stop: &str) -> Vec<u8> {
         .replace("{{START}}", start)
         .replace("{{EVENT}}", event)
         .replace("{{STOP}}", stop);
+    component_from(&core, &Path::new(env!("CARGO_MANIFEST_DIR")).join("wit"))
+}
+
+/// Encodes a core module of the fixture as a component against the WIT package in `wit`.
+fn component_from(core: &str, wit: &Path) -> Vec<u8> {
     let mut module = wat::parse_str(core).expect("fixture is valid WAT");
     let mut resolve = wit_parser::Resolve::default();
-    let (package, _) = resolve
-        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("wit"))
-        .expect("WIT parses");
+    let (package, _) = resolve.push_dir(wit).expect("WIT parses");
     let world = resolve
         .select_world(&[package], Some("plugin"))
         .expect("world exists");
@@ -589,4 +592,43 @@ fn events_need_their_permission_at_the_time_they_are_sent() {
     }
     std::thread::sleep(Duration::from_millis(100));
     assert_eq!(host.log_lines("watcher").len(), 3);
+}
+
+/// Why `mumcord:plugin@1.0.0` is frozen after the 0.6.0 release (pinned by `wit.rs`): wasmtime
+/// checks enum and variant case counts exactly, so a plugin built before a case was added no
+/// longer loads. Simulated with the fixture importing `ui.set-tree`, built once against today's
+/// WIT and once against it without the `fill-first` case.
+#[test]
+fn ui_types_must_match_the_host_exactly() {
+    let wit = Path::new(env!("CARGO_MANIFEST_DIR")).join("wit");
+    let older = tempfile::tempdir().expect("temp dir");
+    for entry in std::fs::read_dir(&wit).expect("wit dir") {
+        let path = entry.expect("entry").path();
+        let text = std::fs::read_to_string(&path).expect("read wit");
+        let text = text.replace("    fill-first,\n", "");
+        std::fs::write(older.path().join(path.file_name().expect("name")), text).expect("write");
+    }
+    let core = include_str!("fixtures/plugin.wat")
+        .replace(
+            "(memory (export",
+            r#"(import "mumcord:plugin/ui@1.0.0" "set-tree" (func (param i32 i32 i32 i32 i32 i32)))
+  (memory (export"#,
+        )
+        .replace("{{START}}", WELL_BEHAVED)
+        .replace("{{EVENT}}", "")
+        .replace("{{STOP}}", "");
+    let root = tempfile::tempdir().expect("temp dir");
+    let mut host = host();
+
+    let current = plugin_dir(root.path(), "current", &component_from(&core, &wit), "");
+    host.load(&current, None).expect("loads");
+    host.enable("current").expect("starts");
+    assert_eq!(host.state("current"), Some(RunState::Running));
+
+    let old = plugin_dir(root.path(), "old", &component_from(&core, older.path()), "");
+    let error = host.load(&old, None).expect_err("refused");
+    assert!(
+        matches!(&error, LoadError::Compile(CompileError::Mismatch(m)) if m.contains("found 3 names")),
+        "{error:?}"
+    );
 }
