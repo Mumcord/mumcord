@@ -43,6 +43,7 @@
 
 ### Fixed
 
+- Keyboard: when a dialog changes its content (for example a plugin dialog switching from its setup form to its player), the focus now stays in the dialog, so Escape and Tab keep working.
 - A plugin card that answers no chat message, such as the Dice result after `/roll`, now shows at the bottom of the chat at its own time instead of above the first date divider
 - The example test scenario of `mumcord-plugin` (`scenarios/hello.yaml`) passes again for a plugin created with `mumcord-plugin new`
 - A plugin card now replaces its chat line right away, even when the line arrives after the card (for example a Poll card and its "Vote with !poll" line), on other clients and in your own chat

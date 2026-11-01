@@ -59,8 +59,17 @@ export function Modal({
       }
     };
     dialog.addEventListener("keydown", onKeyDown);
+    // Content that re-renders (e.g. a plugin's setup form turning into its player) can remove the
+    // focused control; the focus would fall to the page and Escape and Tab would stop working.
+    const keepFocus = new MutationObserver(() => {
+      if (document.activeElement === document.body || document.activeElement === null) {
+        dialog.focus();
+      }
+    });
+    keepFocus.observe(dialog, { childList: true, subtree: true });
     return () => {
       dialog.removeEventListener("keydown", onKeyDown);
+      keepFocus.disconnect();
     };
   }, [onClose]);
 
