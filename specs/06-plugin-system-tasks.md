@@ -30,7 +30,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B22 | Permission list component and texts | done | b22-permlist |
 | B25a | SDK crate `mumcord-plugin-sdk` | done | b25a-sdk |
 | B25b | CLI `mumcord-plugin` (author + registry commands) | done | b25b-cli |
-| B25c | CLI `test` and `preview` | in progress | b25c-test |
+| B25c | CLI `test` and `preview` | done | b25c-test |
 | B16b | Fixture registry setup for E2E | open | |
 | B9 | Local mumbot instance (music + plugins) | done | b9-mumbot |
 | B26 | UI tree renderer | open | |
@@ -46,7 +46,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B33a | Updates tab | open | |
 | B33b | Repositories tab | open | |
 | B33c | Developer tab | open | |
-| B37 | ⚠ OUTWARD: registry CI and publish workflows | open | |
+| B37 | ⚠ OUTWARD: registry CI and publish workflows | in progress | b37-ci |
 | B38 | Template and author docs | done (Mumcord/plugins PR #4, not merged) | b38-template |
 | B39 | Poll plugin | done (Mumcord/plugins PR #2, not merged) | b39-poll |
 | B40 | Dice roller plugin | done (Mumcord/plugins PR #5, not merged) | b40-dice |
@@ -61,10 +61,14 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F1 | Fix: ui tsc error in ui/src/api/mock.ts (missing plugin settings fields from B3) + prettier on crates/plugins/schema/manifest.schema.json | done | f1-uifix |
 | F2 | Fix: safety fixtures pass `prettier --check .` (format them) and builder `common_manifest()` uses only B4 fields (authors/categories) | done | f2-fixtures |
 | F3 | chat.rs GestureGate: a gesture from a typed command (source `command`) allows its one message for up to 8 s (clicks stay 2 s); needed for verified dice rolls (FR-6.44 addendum) | done | f3-gesture |
-| F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | open | |
+| F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | in progress | f4-docs |
 | F5 | Messaging envelope: carry a `direct` flag so `peer-message.direct` is correct (wire is unreleased, keep envelope v1 compatible within the epic) | open | |
+| S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | in progress | s1-poll |
+| S2 | Dice scenario tests on Mumcord/plugins feat/dice | in progress | s2-dice |
+| S3 | Echolings scenario tests on feat/echolings | open | |
+| S4 | Mumbot Music scenario tests on feat/mumbot-music | open | |
 | M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins) | open | |
-| B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | open | |
+| B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | done (folded into B25c) | b25c-test |
 
 ---
 
@@ -456,3 +460,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B42 (Mumcord/plugins PR #6: 1945951, 465ca38):** `mumbot-music/`, 28 native tests, `check --official` ok. Host glue contract: dialog actions arrive as ui-action with source Slot(Dialog), settings actions with Slot(Settings); the server-address inputs `address` (dialog) and `edit-address` (settings) must both trigger `ctx.http.allow`; `self-state.server` must be set; the plugin calls `set-user-menu-entry` once at start. Two key slots a/b per bot; poll 3 s with back-off up to 12 s on 429. Spec addendum (D1): 3 s instead of 2 s, 32-hex key prefixes, English only compiled in, add field 64 B (long URLs don't fit).
 - **B17a (6b2785e2 lifecycle, c6d13cba PluginIo + messaging):** `crates/plugins/src/service/{mod,install,lifecycle,dev,messaging,plugin_io}.rs`. `PluginService::new(ServiceConfig{plugins_dir, cache_dir, app_version, no_plugins}, store, secrets) -> (svc, host_rx, events_rx)`, then `start()`; feed every HostEvent to `handle_host_event`; call it under a mutex on a blocking thread. ServiceEvent: Changed, InstallProgress{id, stage}, AutoOff, Notify, PeerSend{server, plugin, outgoing} (→ engine.plugin_send; on ticket Expired call `message_expired`), Ui{plugin, UiUpdate}, ChatPost{plugin, line}, Supersede. Install: `service::fetch(client, &svc.events(), id, url, size)` outside the lock, then `install(&InstallRequest{source, entry, optional, visibility}, &download)`. Calls: set_enabled, set_permissions, set_visibility, set_notifications, remove(id, delete_data), reset_data, export_data, set_all_off/all_off, badge_plugin/set_badge_plugin (None = no badge; the default is the only member-badge plugin at install), load_dev/reload_dev/unload_dev (dev rows `dev:<path>`; unloading deletes the data; official-only permissions refused outright), developer_mode_changed, list() -> PluginInfo{status, …}, log_lines, diagnostics. Engine feed: set_focused_server, shared_state, disconnected, peer_capable, peer_joined/left/talking, screen_share_started, chat_activity, mentioned, self_changed(SelfInfo), peer_data, with people as PeerInfo{session, name, cert_hash, is_friend} (B18 decides is_friend); poll_announces/next_announce_at (announce timer), set_identity, set_language, set_theme, set_quiet, gesture/command_gesture, chat_text. Open: `peer-message.direct` is always false (F5); UI tree limits belong to B26; the B17c CommandRegistry isn't wired to install/remove yet (B18/B29); B18 reads MUMCORD_PLUGIN_TEST_FAST_BACKOFF and calls svc.set_backoff.
 - **B34 (9f39c953):** `crates/plugins/src/suggestions.rs`. `parse(bytes, developer_mode) -> Option<Announcement{seq, entries}>` (ignores `level`, drops bad entries, ≤ 8). `process(&Store, server, identity, sender_pin, &Announcement, &Environment{index: Option<&Index>, revoked, installed: &dyn Fn(&str)->bool}, now) -> Vec<Suggestion{plugin_id, reason, seq, source: Official{version} | Repository{url, key}}>` skips installed, revoked, unknown and below-min entries, and saves state. `not_now` (30 days or a new seq), `dismiss` (per plugin), `dismiss_server` (sentinel row plugin_id "*"), `mark_installed`. Glue (B18/B32): on ServerPlugins use sender.cert_hash as the pin; repository suggestions open the Add dialog with `key` as Expected key; `reason` is untrusted plain text.
+- **B25c (4e73d1de seam, 0fcdb0f2 test/preview; includes B25c2):** api/{io,ui,peers,chat,webview}.rs serve ui/peers/chat through `HostContext.io`. `mumcord-plugin test <pkg|folder> <scenario.yaml...>` runs the real PluginHost against a mock host (temp Store + identity, peer keys, real GestureGate, client start events). YAML keys: `grant`, `me`, `peers`, `language`, `theme`, `steps` (event / wait / expect); unknown fields are refused. Example: `tools/mumcord-plugin/scenarios/hello.yaml`. `mumcord-plugin preview <pkg|folder> [--scenario f] [--out preview.html]` writes static HTML. The ignored test author_flow builds the template for wasm32 and runs test + preview. Mock gaps: no rate-limit/visibility simulation, timers in real time, webview not-permitted.
