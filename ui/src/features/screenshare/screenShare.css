@@ -419,8 +419,11 @@
 }
 
 .viewer-panel__sub {
+  overflow: hidden;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .viewer-panel__empty {

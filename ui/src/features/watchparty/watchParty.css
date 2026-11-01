@@ -600,6 +600,12 @@ button.watch-playlist__up-next {
   font-size: var(--font-size-xs);
 }
 
+.party-entry__by-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .party-entry__by .avatar[data-size="sm"] {
   width: 1.125rem;
   height: 1.125rem;

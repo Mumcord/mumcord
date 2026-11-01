@@ -223,7 +223,9 @@ function AddedBy({
   return (
     <span className="party-entry__by">
       <Avatar name={name} src={adder === null ? null : avatarOf(adder)} size="sm" />
-      <span aria-hidden="true">{name}</span>
+      <span className="party-entry__by-name" aria-hidden="true">
+        {name}
+      </span>
       <span className="visually-hidden">{t("playlist.addedBy", { name })}</span>
     </span>
   );
