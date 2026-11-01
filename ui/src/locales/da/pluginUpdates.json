@@ -37,5 +37,13 @@
   "lastChecked": "Sidst tjekket kl. {{time}}",
   "checkFailed": "Tjekket mislykkedes. Prøv igen.",
   "modeNote": "Plugin-opdateringer: {{mode}}. Du kan ændre det nedenfor.",
-  "settings": "Opdateringsindstillinger"
+  "settings": "Opdateringsindstillinger",
+  "offer": {
+    "heading": "Nye tilladelser",
+    "title": "{{name}} {{version}} kan nu mere. Disse muligheder er slået fra, indtil du slår dem til.",
+    "permission": "Ny valgfri tilladelse: {{permission}}",
+    "save": "Gem",
+    "notNow": "Ikke nu",
+    "failed": "Tilladelserne for {{name}} kunne ikke ændres. Prøv igen."
+  }
 }

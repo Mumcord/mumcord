@@ -173,6 +173,9 @@ pub struct PluginInfo {
     pub description: String,
     /// The manifest's authors; empty when the plugin could not be loaded.
     pub authors: Vec<String>,
+    /// Optional permissions an update added that the user has not answered yet (never
+    /// granted by the update; Plugins → Updates offers them).
+    pub offered: Vec<String>,
 }
 
 /// The manifest in a plugin's installed folder, read for display only (nothing is checked beyond
@@ -411,9 +414,13 @@ impl PluginService {
     pub fn list(&self) -> Result<Vec<PluginInfo>, ServiceError> {
         let records = self.store().plugins()?;
         let badge = self.badge_plugin()?;
+        let mut offered = self.offered_permissions()?;
         Ok(records
             .into_iter()
-            .map(|record| self.info(record, badge.as_deref()))
+            .map(|record| {
+                let offered = offered.remove(&record.id).unwrap_or_default();
+                self.info(record, badge.as_deref(), offered)
+            })
             .collect())
     }
 
@@ -538,7 +545,7 @@ impl PluginService {
         Ok(())
     }
 
-    fn info(&self, record: PluginRecord, badge: Option<&str>) -> PluginInfo {
+    fn info(&self, record: PluginRecord, badge: Option<&str>, offered: Vec<String>) -> PluginInfo {
         let origin = Origin::parse(&record.source);
         let dir = self.files_dir_of(&record);
         // A plugin that could not be loaded still shows the name and icon of its installed files.
@@ -603,6 +610,7 @@ impl PluginService {
             notifications: record.notifications,
             revocation,
             installed_at: record.installed_at,
+            offered,
         }
     }
 
@@ -646,6 +654,31 @@ impl PluginService {
             .collect();
         if holders == [id] {
             settings.plugins_badge_plugin = Some(id.to_owned());
+            store.save_settings(&settings)?;
+        }
+        Ok(())
+    }
+
+    /// Plugin id → optional permissions offered after an update (see [`PluginInfo::offered`]).
+    fn offered_permissions(
+        &self,
+    ) -> Result<std::collections::BTreeMap<String, Vec<String>>, ServiceError> {
+        Ok(self.store().settings()?.plugins_offered_permissions)
+    }
+
+    /// Replaces what is offered to `id`; empty clears it (answered, or the plugin is gone).
+    fn save_offer(&self, id: &str, offered: Vec<String>) -> Result<(), ServiceError> {
+        let store = self.store();
+        let mut settings = store.settings()?;
+        let before = settings.plugins_offered_permissions.get(id).cloned();
+        if offered.is_empty() {
+            settings.plugins_offered_permissions.remove(id);
+        } else {
+            settings
+                .plugins_offered_permissions
+                .insert(id.to_owned(), offered.clone());
+        }
+        if before.unwrap_or_default() != offered {
             store.save_settings(&settings)?;
         }
         Ok(())

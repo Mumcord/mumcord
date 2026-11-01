@@ -37,5 +37,13 @@
   "lastChecked": "Viimati kontrollitud kell {{time}}",
   "checkFailed": "Kontroll ebaõnnestus. Proovi uuesti.",
   "modeNote": "Pluginate uuendused: {{mode}}. Seda saad allpool muuta.",
-  "settings": "Uuenduste seaded"
+  "settings": "Uuenduste seaded",
+  "offer": {
+    "heading": "Uued õigused",
+    "title": "{{name}} {{version}} oskab nüüd rohkem. Need valikud on välja lülitatud, kuni sa need sisse lülitad.",
+    "permission": "Uus valikuline õigus: {{permission}}",
+    "save": "Salvesta",
+    "notNow": "Mitte praegu",
+    "failed": "Lisandmooduli {{name}} õigusi ei õnnestunud muuta. Proovi uuesti."
+  }
 }

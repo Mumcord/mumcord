@@ -37,5 +37,13 @@
   "lastChecked": "Pēdējā pārbaude plkst. {{time}}",
   "checkFailed": "Pārbaude neizdevās. Mēģiniet vēlreiz.",
   "modeNote": "Spraudņu atjauninājumi: {{mode}}. To var mainīt zemāk.",
-  "settings": "Atjauninājumu iestatījumi"
+  "settings": "Atjauninājumu iestatījumi",
+  "offer": {
+    "heading": "Jaunas atļaujas",
+    "title": "{{name}} {{version}} tagad var vairāk. Šīs iespējas paliek izslēgtas, līdz jūs tās ieslēdzat.",
+    "permission": "Jauna neobligāta atļauja: {{permission}}",
+    "save": "Saglabāt",
+    "notNow": "Ne tagad",
+    "failed": "Neizdevās mainīt {{name}} atļaujas. Lūdzu, mēģiniet vēlreiz."
+  }
 }

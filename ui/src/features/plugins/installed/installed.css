@@ -247,3 +247,16 @@
   padding-left: 1.25rem;
   color: var(--color-text-muted);
 }
+
+/* "New permissions" after an update: a pill that opens Plugins → Updates (F39). */
+.plugins-installed-offer {
+  background: none;
+  font: inherit;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.plugins-installed-offer:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

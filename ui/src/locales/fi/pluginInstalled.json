@@ -120,5 +120,6 @@
     "chatPatterns": "Chat-mallit",
     "netHttp": "Internet-yhteys",
     "secrets": "Avainnippu"
-  }
+  },
+  "offerBadge": "Uudet käyttöoikeudet"
 }

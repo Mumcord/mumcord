@@ -120,5 +120,6 @@
     "chatPatterns": "Wzorce czatu",
     "netHttp": "Dostęp do internetu",
     "secrets": "Klucze systemowe"
-  }
+  },
+  "offerBadge": "Nowe uprawnienia"
 }

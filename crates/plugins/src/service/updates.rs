@@ -8,6 +8,12 @@
 //! updated plugin fails to start, the previous version comes back and the reason shows in the
 //! Updates tab. Updates never touch a plugin's data.
 //!
+//! An update never grants anything new by itself: optional permissions a new version adds stay
+//! off and are offered in Plugins → Updates instead, until the user answers (F39). The signed
+//! index lists permissions without saying which are optional, so in automatic mode an update
+//! with new permissions is downloaded and its manifest decides: only new optional ones →
+//! installs and offers them; a new required one → waits for approval as before.
+//!
 //! [`run_check`] does all of this; the app calls it at start and then on a timer (every
 //! 15 minutes is plenty; [`Schedule`] decides what is due).
 
@@ -22,7 +28,7 @@ use super::{
     InstallStage, Origin, PluginService, ServiceError, ServiceEvent, allowed_grants, fetch,
     now_millis, with_required,
 };
-use crate::manifest::Source;
+use crate::manifest::{Manifest, Source};
 use crate::registry::{
     Client, Download, Freshness, Index, IndexPlugin, IndexVersion, RepoOutcome, fetch_official,
     fetch_repository, fetch_revoked, normalize_key, official_base,
@@ -76,6 +82,9 @@ pub(super) struct Updates {
     failed: BTreeMap<String, (String, String)>,
     /// (id, version) pairs already announced in the notification centre.
     notified: BTreeSet<(String, String)>,
+    /// id → (version, approval) found in a downloaded package that may not install by itself;
+    /// it is not downloaded again in this run.
+    held: BTreeMap<String, (String, Approval)>,
 }
 
 /// What a check should do now.
@@ -373,7 +382,17 @@ impl PluginService {
         }
         let automatic: Vec<UpdateInfo> = available
             .values()
-            .filter(|u| mode == PluginUpdates::Auto && u.approval.is_none() && u.failed.is_none())
+            .filter(|u| mode == PluginUpdates::Auto && u.failed.is_none())
+            .filter(|u| match &u.approval {
+                None => true,
+                // Maybe only new optional permissions: the package's manifest decides.
+                Some(Approval::NewPermissions(_)) => self
+                    .updates
+                    .held
+                    .get(&u.id)
+                    .is_none_or(|(held, _)| *held != u.to),
+                Some(Approval::NewAuthorKey) => false,
+            })
             .cloned()
             .collect();
         for update in available.values() {
@@ -431,7 +450,15 @@ impl PluginService {
             .as_deref()
             .and_then(normalize_key)
             .is_some_and(|key| plugin.author_keys.contains(&key));
-        let approval = if !new_permissions.is_empty() {
+        let held = self
+            .updates
+            .held
+            .get(&record.id)
+            .filter(|(held, _)| *held == version.version)
+            .map(|(_, approval)| approval.clone());
+        let approval = if held.is_some() {
+            held
+        } else if !new_permissions.is_empty() {
             Some(Approval::NewPermissions(new_permissions))
         } else if !same_key {
             Some(Approval::NewAuthorKey)
@@ -544,9 +571,7 @@ impl PluginService {
                     None
                 };
                 if let Some(approval) = approval {
-                    if let Some(available) = self.updates.available.get_mut(id) {
-                        available.approval = Some(approval);
-                    }
+                    self.hold(update, approval);
                     return Err(ServiceError::NeedsApproval);
                 }
                 allowed_grants(
@@ -557,6 +582,14 @@ impl PluginService {
             }
         };
         let version = manifest.version.to_string();
+
+        let offered = offered_permissions(
+            self.host.manifest(id),
+            manifest,
+            update.source,
+            &granted,
+            &self.offered_permissions()?.remove(id).unwrap_or_default(),
+        );
 
         self.update_progress(id, InstallStage::Unpacking);
         let dir = verified.package.install(&self.plugins_dir)?;
@@ -588,7 +621,30 @@ impl PluginService {
         }
         self.updates.available.remove(id);
         self.updates.failed.remove(id);
-        Ok(())
+        self.updates.held.remove(id);
+        self.save_offer(id, offered)
+    }
+
+    /// Keeps an automatic update that turned out to need the user waiting: it is announced
+    /// once and not downloaded again in this run.
+    fn hold(&mut self, update: &UpdateInfo, approval: Approval) {
+        if let Some(available) = self.updates.available.get_mut(&update.id) {
+            available.approval = Some(approval.clone());
+        }
+        self.updates
+            .held
+            .insert(update.id.clone(), (update.to.clone(), approval));
+        if self
+            .updates
+            .notified
+            .insert((update.id.clone(), update.to.clone()))
+        {
+            self.emit(ServiceEvent::UpdateAvailable {
+                id: update.id.clone(),
+                name: update.name.clone(),
+                version: update.to.clone(),
+            });
+        }
     }
 
     /// Loads, saves and (if on) starts the new version of an unloaded plugin.
@@ -659,11 +715,94 @@ impl PluginService {
     }
 }
 
+/// The optional permissions to offer after an update: those the new version asks for that the
+/// installed one did not, plus ones still offered from an earlier update, minus what is
+/// granted. Unknown old manifest (it could not be loaded): only the earlier offers carry over.
+fn offered_permissions(
+    old: Option<&Manifest>,
+    new: &Manifest,
+    source: Source,
+    granted: &[String],
+    earlier: &[String],
+) -> Vec<String> {
+    let candidates = new
+        .permissions
+        .optional
+        .iter()
+        .map(|p| p.id.as_str())
+        .filter(|id| {
+            !granted.iter().any(|g| g == id)
+                && (earlier.iter().any(|e| e == id) || old.is_some_and(|m| !m.has_permission(id)))
+        });
+    allowed_grants(new, source, candidates)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     const HOUR: UnixMillis = 60 * 60 * 1000;
+
+    fn manifest(optional: &str) -> Manifest {
+        let json = format!(
+            r#"{{"manifest":1,"id":"poll","name":"Poll","version":"1.0.0","api":"^1.0","authors":["Tests"],
+               "description":"Polls","categories":["tools"],"license":"MIT",
+               "permissions":{{"required":["ui.panel"],"optional":[{optional}]}}}}"#
+        );
+        Manifest::parse(json.as_bytes()).expect("manifest")
+    }
+
+    fn strings(ids: &[&str]) -> Vec<String> {
+        ids.iter().map(|id| (*id).to_owned()).collect()
+    }
+
+    #[test]
+    fn only_optional_permissions_new_to_the_update_are_offered() {
+        let old = manifest(r#""notify""#);
+        let new = manifest(
+            r#""notify", {"id":"chat.triggers","suggested":true}, "events.voice", "secrets""#,
+        );
+        let granted = strings(&["ui.panel", "events.voice"]);
+        // `notify` was there before (left off), `events.voice` is granted, `secrets` is
+        // official-only: only `chat.triggers` is offered to a third-party plugin.
+        let repo = Source::Repo { repository_id: 1 };
+        assert_eq!(
+            offered_permissions(Some(&old), &new, repo, &granted, &[]),
+            ["chat.triggers"]
+        );
+        assert_eq!(
+            offered_permissions(Some(&old), &new, Source::Official, &granted, &[]),
+            ["chat.triggers", "secrets"]
+        );
+        // Unanswered offers carry over; an unknown old manifest offers nothing new.
+        assert_eq!(
+            offered_permissions(
+                Some(&new),
+                &new,
+                repo,
+                &granted,
+                &strings(&["chat.triggers"])
+            ),
+            ["chat.triggers"]
+        );
+        assert!(offered_permissions(None, &new, repo, &granted, &[]).is_empty());
+        // Granted meanwhile, or dropped by the new version: no longer offered.
+        let all = strings(&["ui.panel", "chat.triggers"]);
+        assert!(
+            offered_permissions(Some(&new), &new, repo, &all, &strings(&["chat.triggers"]))
+                .is_empty()
+        );
+        assert!(
+            offered_permissions(
+                Some(&old),
+                &old,
+                repo,
+                &granted,
+                &strings(&["chat.triggers"])
+            )
+            .is_empty()
+        );
+    }
 
     fn schedule() -> Schedule {
         Schedule {

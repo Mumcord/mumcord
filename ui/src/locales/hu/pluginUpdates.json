@@ -37,5 +37,13 @@
   "lastChecked": "Utoljára ellenőrizve: {{time}}",
   "checkFailed": "Az ellenőrzés nem sikerült. Próbáld újra.",
   "modeNote": "Bővítményfrissítések: {{mode}}. Ezt lent módosíthatod.",
-  "settings": "Frissítési beállítások"
+  "settings": "Frissítési beállítások",
+  "offer": {
+    "heading": "Új engedélyek",
+    "title": "A(z) {{name}} {{version}} most már többre képes. Ezek a beállítások kikapcsolva maradnak, amíg be nem kapcsolod őket.",
+    "permission": "Új választható engedély: {{permission}}",
+    "save": "Mentés",
+    "notNow": "Most nem",
+    "failed": "A(z) {{name}} engedélyeit nem sikerült módosítani. Próbáld újra."
+  }
 }

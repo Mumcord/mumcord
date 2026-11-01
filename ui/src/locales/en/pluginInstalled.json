@@ -120,5 +120,6 @@
     "chatPatterns": "Chat patterns",
     "netHttp": "Internet access",
     "secrets": "Keychain"
-  }
+  },
+  "offerBadge": "New permissions"
 }

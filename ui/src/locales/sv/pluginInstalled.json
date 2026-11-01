@@ -120,5 +120,6 @@
     "chatPatterns": "Chattmönster",
     "netHttp": "Internetåtkomst",
     "secrets": "Nyckelring"
-  }
+  },
+  "offerBadge": "Nya behörigheter"
 }

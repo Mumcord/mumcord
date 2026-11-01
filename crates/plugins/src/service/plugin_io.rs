@@ -79,6 +79,8 @@ pub enum UiUpdate {
     PanelPopover {
         open: bool,
     },
+    /// Settings → Plugins → Installed opens on the plugin's details (`ui.open-permissions`).
+    OpenPermissions,
     /// `None` removes the entry. `sessions` lists the users it shows on (`None`: everyone).
     UserMenuEntry {
         label: Option<String>,
@@ -333,6 +335,14 @@ impl PluginIo for ServiceIo {
 
     fn close_panel_popover(&self, plugin: &str) {
         self.ui(plugin, UiUpdate::PanelPopover { open: false });
+    }
+
+    fn open_permissions(&self, plugin: &str) -> Result<(), Error> {
+        if !self.chat().gate.is_fresh(plugin, Instant::now()) {
+            return Err(Error::NotPermitted);
+        }
+        self.ui(plugin, UiUpdate::OpenPermissions);
+        Ok(())
     }
 
     fn set_user_menu_entry(&self, plugin: &str, label: Option<String>) -> Result<(), Error> {
@@ -628,6 +638,23 @@ mod tests {
         assert!(matches!(next(), Some(UiUpdate::WebviewHide)));
         assert!(matches!(next(), Some(UiUpdate::CloseDialog)));
         assert_eq!(io.webview_post("snacks", "hi".into()), Err(Error::Invalid));
+    }
+
+    #[test]
+    fn permissions_open_only_after_a_gesture() {
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        assert_eq!(io.open_permissions("poll"), Err(Error::NotPermitted));
+        assert!(rx.try_recv().is_err());
+        io.gesture("poll");
+        assert_eq!(io.open_permissions("poll"), Ok(()));
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::OpenPermissions,
+                ..
+            })
+        ));
     }
 
     #[test]

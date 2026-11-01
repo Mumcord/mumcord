@@ -12,6 +12,8 @@ import {
 } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
+import { setSettingsOpener } from "../../settings/settingsOpener";
+import { resetPluginRequestStore, usePendingPluginRequest } from "../pluginRequestStore";
 import { byteLength, charCount, clampBytes, dropIndex, formatRemaining } from "./helpers";
 import { applyChange, slotKey, usePluginTree, type PluginUiState } from "./pluginUiStore";
 import { PluginTree } from "./PluginTree";
@@ -141,6 +143,27 @@ describe("plugin UI store", () => {
       });
     });
     await screen.findByText("1");
+  });
+
+  it("opens the plugin's permissions in Installed when it asks to", async () => {
+    setSettingsOpener(vi.fn());
+    function Probe() {
+      const request = usePendingPluginRequest("installed");
+      const tree = usePluginTree("poll", PANEL);
+      return (
+        <span>
+          {tree === undefined ? "ready" : "tree"} {request?.plugin ?? "no request"}
+        </span>
+      );
+    }
+    render(<Probe />);
+    await screen.findByText("ready no request");
+    act(() => {
+      api.mock.emit("pluginUi", { plugin: "poll", change: { type: "openPermissions" } });
+    });
+    await screen.findByText("ready poll");
+    resetPluginRequestStore();
+    setSettingsOpener(null);
   });
 });
 

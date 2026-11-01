@@ -375,4 +375,11 @@ interface ui {
 
   /// Closes the panel popover again, back to the inline panel. Does nothing when it is not open.
   close-panel-popover: func();
+
+  /// Opens Settings → Plugins → Installed on this plugin's details, where the user can turn
+  /// its optional permissions on or off (e.g. a card hint "Turn on !poll voting"). The plugin
+  /// cannot change permissions itself. Only allowed right after a user gesture in this
+  /// plugin's own UI (the same 2 s window `chat.send` uses). Needs no permission. Errors:
+  /// `not-permitted`.
+  open-permissions: func() -> result<_, error>;
 }

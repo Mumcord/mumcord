@@ -37,5 +37,13 @@
   "lastChecked": "Zuletzt geprüft um {{time}}",
   "checkFailed": "Die Prüfung ist fehlgeschlagen. Bitte versuche es erneut.",
   "modeNote": "Plugin-Updates: {{mode}}. Du kannst das unten ändern.",
-  "settings": "Update-Einstellungen"
+  "settings": "Update-Einstellungen",
+  "offer": {
+    "heading": "Neue Berechtigungen",
+    "title": "{{name}} {{version}} kann jetzt mehr. Diese Optionen bleiben aus, bis du sie einschaltest.",
+    "permission": "Neue optionale Berechtigung: {{permission}}",
+    "save": "Speichern",
+    "notNow": "Nicht jetzt",
+    "failed": "Die Berechtigungen von {{name}} konnten nicht geändert werden. Bitte versuche es erneut."
+  }
 }

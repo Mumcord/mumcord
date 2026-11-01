@@ -37,5 +37,13 @@
   "lastChecked": "Viimeksi tarkistettu klo {{time}}",
   "checkFailed": "Tarkistus epäonnistui. Yritä uudelleen.",
   "modeNote": "Lisäosapäivitykset: {{mode}}. Voit muuttaa tätä alla.",
-  "settings": "Päivitysasetukset"
+  "settings": "Päivitysasetukset",
+  "offer": {
+    "heading": "Uudet käyttöoikeudet",
+    "title": "{{name}} {{version}} osaa nyt enemmän. Nämä asetukset ovat pois päältä, kunnes otat ne käyttöön.",
+    "permission": "Uusi valinnainen käyttöoikeus: {{permission}}",
+    "save": "Tallenna",
+    "notNow": "Ei nyt",
+    "failed": "Laajennuksen {{name}} käyttöoikeuksia ei voitu muuttaa. Yritä uudelleen."
+  }
 }

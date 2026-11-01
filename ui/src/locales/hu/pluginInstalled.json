@@ -120,5 +120,6 @@
     "chatPatterns": "Csevegőminták",
     "netHttp": "Internet-hozzáférés",
     "secrets": "Kulcstartó"
-  }
+  },
+  "offerBadge": "Új engedélyek"
 }

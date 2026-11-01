@@ -37,5 +37,13 @@
   "lastChecked": "Paskutinį kartą tikrinta {{time}}",
   "checkFailed": "Patikrinti nepavyko. Bandykite dar kartą.",
   "modeNote": "Papildinių naujinimai: {{mode}}. Tai galite pakeisti žemiau.",
-  "settings": "Naujinimo nustatymai"
+  "settings": "Naujinimo nustatymai",
+  "offer": {
+    "heading": "Nauji leidimai",
+    "title": "{{name}} {{version}} dabar gali daugiau. Šios parinktys lieka išjungtos, kol jų neįjungsite.",
+    "permission": "Naujas neprivalomas leidimas: {{permission}}",
+    "save": "Išsaugoti",
+    "notNow": "Ne dabar",
+    "failed": "Nepavyko pakeisti {{name}} leidimų. Bandykite dar kartą."
+  }
 }

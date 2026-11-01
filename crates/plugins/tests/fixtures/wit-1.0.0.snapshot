@@ -484,6 +484,7 @@ sessions: list<session>,
 set-user-menu-entry-for: func(label: string, filter: user-menu-filter) -> result<_, error>;
 open-panel-popover: func() -> result<_, error>;
 close-panel-popover: func();
+open-permissions: func() -> result<_, error>;
 }
 == webview.wit
 interface webview {

@@ -37,5 +37,13 @@
   "lastChecked": "Naposledy skontrolované o {{time}}",
   "checkFailed": "Kontrola zlyhala. Skúste to znova.",
   "modeNote": "Aktualizácie pluginov: {{mode}}. Môžete to zmeniť nižšie.",
-  "settings": "Nastavenia aktualizácií"
+  "settings": "Nastavenia aktualizácií",
+  "offer": {
+    "heading": "Nové povolenia",
+    "title": "{{name}} {{version}} teraz dokáže viac. Tieto možnosti zostanú vypnuté, kým ich nezapnete.",
+    "permission": "Nové voliteľné povolenie: {{permission}}",
+    "save": "Uložiť",
+    "notNow": "Teraz nie",
+    "failed": "Povolenia pre {{name}} sa nepodarilo zmeniť. Skúste to znova."
+  }
 }

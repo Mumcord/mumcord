@@ -245,6 +245,18 @@ function PluginRow({
                 {t("update.hint", { version: update.to })}
               </span>
             )}
+            {plugin.offered.length > 0 && (
+              <button
+                type="button"
+                className="plugins-installed-pill plugins-installed-pill--warning plugins-installed-offer"
+                aria-describedby={nameId}
+                onClick={() => {
+                  openPluginTab("updates");
+                }}
+              >
+                {t("offerBadge")}
+              </button>
+            )}
           </span>
           {plugin.description !== "" && (
             <span className="plugins-installed-description">{plugin.description}</span>

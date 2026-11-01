@@ -37,5 +37,13 @@
   "lastChecked": "Última comprobación a las {{time}}",
   "checkFailed": "La comprobación ha fallado. Inténtalo de nuevo.",
   "modeNote": "Actualizaciones de plugins: {{mode}}. Puedes cambiarlo abajo.",
-  "settings": "Ajustes de actualización"
+  "settings": "Ajustes de actualización",
+  "offer": {
+    "heading": "Permisos nuevos",
+    "title": "{{name}} {{version}} ahora puede hacer más. Estas opciones están desactivadas hasta que las actives.",
+    "permission": "Nuevo permiso opcional: {{permission}}",
+    "save": "Guardar",
+    "notNow": "Ahora no",
+    "failed": "No se pudieron cambiar los permisos de {{name}}. Inténtalo de nuevo."
+  }
 }

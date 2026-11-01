@@ -1,6 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createMockApi, setApi, type InstalledPlugin, type PluginUpdate } from "../../../api";
+import {
+  createMockApi,
+  getApi,
+  setApi,
+  type InstalledPlugin,
+  type PluginUpdate,
+} from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
 import { resetPluginStore } from "../pluginStore";
@@ -26,6 +32,7 @@ const plugin: InstalledPlugin = {
   icon: null,
   description: "",
   authors: [],
+  offered: [],
 };
 
 const update: PluginUpdate = {
@@ -39,12 +46,12 @@ const update: PluginUpdate = {
   failed: null,
 };
 
-function setup(updates: PluginUpdate[]) {
+function setup(updates: PluginUpdate[], installed: InstalledPlugin = plugin) {
   const api = createMockApi();
   vi.spyOn(api, "pluginsList").mockResolvedValue({
     noPlugins: false,
     allOff: false,
-    plugins: [plugin],
+    plugins: [installed],
   });
   vi.spyOn(api, "pluginUpdates").mockResolvedValue(updates);
   const apply = vi.spyOn(api, "pluginApplyUpdate").mockResolvedValue(null);
@@ -143,5 +150,66 @@ describe("UpdatesTab", () => {
     expect(pin).toHaveBeenCalledWith("poll", true);
     fireEvent.click(screen.getByRole("radio", { name: /Notify only/ }));
     expect(onModeChange).toHaveBeenCalledWith("notify");
+  });
+
+  describe("new optional permissions from an update", () => {
+    const offered: InstalledPlugin = {
+      ...plugin,
+      version: "1.2.0",
+      optional: [
+        { id: "chat.triggers", suggested: true },
+        { id: "notify", suggested: false },
+      ],
+      offered: ["chat.triggers", "notify"],
+    };
+    const triggers = /New optional permission: Read chat messages that start with its trigger/;
+    const notify = /New optional permission: Show notifications/;
+
+    function setupOffer() {
+      const { apply } = setup([], offered);
+      const set = vi.spyOn(getApi(), "pluginSetPermissions").mockResolvedValue(null);
+      return { apply, set };
+    }
+
+    it("offers them with the suggested ones switched on and grants nothing by itself", async () => {
+      const { set } = setupOffer();
+      const { container } = render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+      expect(await screen.findByRole("switch", { name: triggers })).toBeChecked();
+      expect(screen.getByRole("switch", { name: notify })).not.toBeChecked();
+      expect(screen.getByText(/Poll 1.2.0 can do more now/)).toBeInTheDocument();
+      expect(set).not.toHaveBeenCalled();
+      expect(await axeViolations(container)).toEqual([]);
+    });
+
+    it("turns on what the user chose on Save", async () => {
+      const { set } = setupOffer();
+      render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+      fireEvent.click(await screen.findByRole("switch", { name: notify }));
+      fireEvent.click(screen.getByRole("switch", { name: triggers }));
+      fireEvent.click(screen.getByRole("button", { name: /Save/ }));
+      await waitFor(() => {
+        expect(set).toHaveBeenCalledWith("poll", ["ui.panel", "notify"]);
+      });
+    });
+
+    it("keeps them off on Not now", async () => {
+      const { set } = setupOffer();
+      render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+      fireEvent.click(await screen.findByRole("button", { name: /Not now/ }));
+      await waitFor(() => {
+        expect(set).toHaveBeenCalledWith("poll", ["ui.panel"]);
+      });
+    });
+
+    it("says so when the permissions could not be changed", async () => {
+      const { set } = setupOffer();
+      set.mockRejectedValue(new Error("boom"));
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+      fireEvent.click(await screen.findByRole("button", { name: /Save/ }));
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "The permissions of Poll could not be changed.",
+      );
+    });
   });
 });

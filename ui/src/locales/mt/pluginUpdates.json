@@ -37,5 +37,13 @@
   "lastChecked": "L-aħħar kontroll fil-{{time}}",
   "checkFailed": "Il-kontroll falla. Erġa' pprova.",
   "modeNote": "Aġġornamenti tal-plugins: {{mode}}. Tista' tibdel dan hawn taħt.",
-  "settings": "Settings tal-aġġornamenti"
+  "settings": "Settings tal-aġġornamenti",
+  "offer": {
+    "heading": "Permessi ġodda",
+    "title": "{{name}} {{version}} issa jista' jagħmel aktar. Dawn l-għażliet jibqgħu mitfija sakemm tixgħelhom.",
+    "permission": "Permess fakultattiv ġdid: {{permission}}",
+    "save": "Issejvja",
+    "notNow": "Mhux issa",
+    "failed": "Il-permessi ta' {{name}} ma setgħux jinbidlu. Erġa' pprova."
+  }
 }

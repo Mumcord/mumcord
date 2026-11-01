@@ -37,5 +37,13 @@
   "lastChecked": "Zadnja provjera u {{time}}",
   "checkFailed": "Provjera nije uspjela. Pokušajte ponovno.",
   "modeNote": "Ažuriranja dodataka: {{mode}}. To možete promijeniti u nastavku.",
-  "settings": "Postavke ažuriranja"
+  "settings": "Postavke ažuriranja",
+  "offer": {
+    "heading": "Nova dopuštenja",
+    "title": "{{name}} {{version}} sada može više. Ove opcije ostaju isključene dok ih ne uključite.",
+    "permission": "Novo neobavezno dopuštenje: {{permission}}",
+    "save": "Spremi",
+    "notNow": "Ne sada",
+    "failed": "Dopuštenja za {{name}} nije bilo moguće promijeniti. Pokušajte ponovno."
+  }
 }

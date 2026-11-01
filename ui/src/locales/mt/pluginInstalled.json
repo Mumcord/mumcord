@@ -120,5 +120,6 @@
     "chatPatterns": "Mudelli taċ-chat",
     "netHttp": "Aċċess għall-internet",
     "secrets": "Keychain"
-  }
+  },
+  "offerBadge": "Permessi ġodda"
 }

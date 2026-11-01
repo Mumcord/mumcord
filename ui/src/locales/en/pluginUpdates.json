@@ -37,5 +37,13 @@
   "lastChecked": "Last checked {{time}}",
   "checkFailed": "The check failed. Please try again.",
   "modeNote": "Plugin updates: {{mode}}. You can change this below.",
-  "settings": "Update settings"
+  "settings": "Update settings",
+  "offer": {
+    "heading": "New permissions",
+    "title": "{{name}} {{version}} can do more now. These options are off until you turn them on.",
+    "permission": "New optional permission: {{permission}}",
+    "save": "Save",
+    "notNow": "Not now",
+    "failed": "The permissions of {{name}} could not be changed. Please try again."
+  }
 }

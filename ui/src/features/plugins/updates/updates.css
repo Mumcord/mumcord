@@ -187,3 +187,34 @@
   align-self: center;
   gap: var(--space-2);
 }
+
+/* Optional permissions an update added; the user turns them on here (F39). */
+.plugin-offer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.plugin-offer__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.plugin-offer__permissions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plugin-offer__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

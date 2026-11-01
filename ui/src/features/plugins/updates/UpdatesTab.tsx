@@ -5,6 +5,7 @@ import { RadioGroup } from "../../settings/components/RadioGroup";
 import { Switch } from "../../settings/components/Switch";
 import { openPluginTab } from "../pluginRequestStore";
 import { refreshPlugins, usePlugins } from "../pluginStore";
+import { PermissionOffer } from "./PermissionOffer";
 import { UpdateRow } from "./UpdateRow";
 import { useUpdates } from "./useUpdates";
 import "./updates.css";
@@ -30,6 +31,7 @@ export function UpdatesTab({
   const pinnable = plugins.filter((p) => p.source.kind !== "dev");
 
   const revoked = plugins.filter((p) => p.disabledReason === "revoked");
+  const offers = plugins.filter((p) => p.offered.length > 0);
   const [checking, setChecking] = useState(false);
   const [checkFailed, setCheckFailed] = useState(false);
   const [checkedAt, setCheckedAt] = useState<Date | null>(null);
@@ -108,6 +110,22 @@ export function UpdatesTab({
           </div>
         );
       })}
+      {offers.length > 0 && (
+        <section aria-labelledby="plugin-updates-offers">
+          <h3 id="plugin-updates-offers" className="plugin-updates__heading">
+            {t("offer.heading")}
+          </h3>
+          <ul className="plugin-updates__list">
+            {offers.map((plugin) => (
+              <PermissionOffer
+                key={`${plugin.id} ${plugin.offered.join(" ")}`}
+                plugin={plugin}
+                onDone={onDone}
+              />
+            ))}
+          </ul>
+        </section>
+      )}
       <section aria-labelledby="plugin-updates-waiting">
         <h3 id="plugin-updates-waiting" className="plugin-update__sr-only">
           {t("waiting")}

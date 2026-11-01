@@ -37,5 +37,13 @@
   "lastChecked": "Seiceáilte go déanach ag {{time}}",
   "checkFailed": "Theip ar an seiceáil. Bain triail eile as.",
   "modeNote": "Nuashonruithe breiseán: {{mode}}. Is féidir leat é seo a athrú thíos.",
-  "settings": "Socruithe nuashonraithe"
+  "settings": "Socruithe nuashonraithe",
+  "offer": {
+    "heading": "Ceadanna nua",
+    "title": "Is féidir le {{name}} {{version}} níos mó a dhéanamh anois. Fanann na roghanna seo múchta go dtí go gcasann tú air iad.",
+    "permission": "Cead roghnach nua: {{permission}}",
+    "save": "Sábháil",
+    "notNow": "Ní anois",
+    "failed": "Níorbh fhéidir ceadanna {{name}} a athrú. Bain triail eile as."
+  }
 }

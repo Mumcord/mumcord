@@ -1877,6 +1877,11 @@ export type InstalledPlugin = {
 	description: string,
 	/**  The manifest's authors. */
 	authors: string[],
+	/**
+	 *  Optional permissions an update added and the user has not answered yet; they are off.
+	 *  Answering means `plugin_set_permissions` (which clears this).
+	 */
+	offered: string[],
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
@@ -2691,6 +2696,11 @@ serverId: number | null } |
 { type: "closeDialog" } | 
 /**  The plugin's panel opens in (`open`) or closes from the strip's large popover. */
 { type: "panelPopover"; open: boolean } | 
+/**
+ *  Settings → Plugins → Installed opens on the plugin's details, where its permissions are
+ *  (the plugin called `ui.open-permissions` after a user gesture).
+ */
+{ type: "openPermissions" } | 
 /**
  *  The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
  *  users it shows on (`None`: every other user in the user's channel).

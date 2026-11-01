@@ -565,6 +565,10 @@ impl Host for PluginState {
             io.close_panel_popover(&self.id);
         }
     }
+
+    fn open_permissions(&mut self) -> Result<(), Error> {
+        self.io()?.open_permissions(&self.id)
+    }
 }
 
 #[cfg(test)]

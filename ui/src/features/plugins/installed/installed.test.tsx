@@ -36,6 +36,7 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     icon: null,
     description: "",
     authors: [],
+    offered: [],
     ...overrides,
   };
 }
@@ -140,6 +141,24 @@ describe("InstalledTab", () => {
     expect(await screen.findByText("No plugins yet.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Browse plugins" }));
     expect(tab.current).toBe("browse");
+  });
+
+  it("marks a plugin with new permissions to answer and opens Updates", async () => {
+    withPlugins([plugin({ offered: ["chat.triggers"] })]);
+    setSettingsOpener(vi.fn());
+    const tab = { current: null as string | null };
+    function Probe() {
+      tab.current = useRequestedPluginTab();
+      return null;
+    }
+    render(
+      <>
+        <InstalledTab />
+        <Probe />
+      </>,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "New permissions" }));
+    expect(tab.current).toBe("updates");
   });
 
   it("changes permissions, visibility and notifications in the details", async () => {

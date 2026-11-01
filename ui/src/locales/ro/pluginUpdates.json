@@ -37,5 +37,13 @@
   "lastChecked": "Ultima verificare la {{time}}",
   "checkFailed": "Verificarea a eșuat. Încearcă din nou.",
   "modeNote": "Actualizări de plugin-uri: {{mode}}. Poți schimba asta mai jos.",
-  "settings": "Setări de actualizare"
+  "settings": "Setări de actualizare",
+  "offer": {
+    "heading": "Permisiuni noi",
+    "title": "{{name}} {{version}} poate face acum mai mult. Aceste opțiuni rămân dezactivate până le activezi.",
+    "permission": "Permisiune opțională nouă: {{permission}}",
+    "save": "Salvează",
+    "notNow": "Nu acum",
+    "failed": "Permisiunile pentru {{name}} nu au putut fi modificate. Încearcă din nou."
+  }
 }

@@ -319,6 +319,9 @@ pub enum PluginUiChange {
     CloseDialog,
     /// The plugin's panel opens in (`open`) or closes from the strip's large popover.
     PanelPopover { open: bool },
+    /// Settings → Plugins → Installed opens on the plugin's details, where its permissions are
+    /// (the plugin called `ui.open-permissions` after a user gesture).
+    OpenPermissions,
     /// The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
     /// users it shows on (`None`: every other user in the user's channel).
     UserMenuEntry {
@@ -604,6 +607,7 @@ impl From<UiUpdate> for PluginUiChange {
             UiUpdate::OpenDialog { title, subtitle } => Self::OpenDialog { title, subtitle },
             UiUpdate::CloseDialog => Self::CloseDialog,
             UiUpdate::PanelPopover { open } => Self::PanelPopover { open },
+            UiUpdate::OpenPermissions => Self::OpenPermissions,
             UiUpdate::UserMenuEntry { label, sessions } => Self::UserMenuEntry { label, sessions },
             UiUpdate::WebviewShow { place, entry } => Self::WebviewShow {
                 place: place.into(),
@@ -672,7 +676,7 @@ impl Trees {
                 }
             }
             // An event for the strip, nothing to remember.
-            PluginUiChange::PanelPopover { .. } => {}
+            PluginUiChange::PanelPopover { .. } | PluginUiChange::OpenPermissions => {}
             PluginUiChange::UserMenuEntry { label, sessions } => match label {
                 Some(label) => {
                     self.menu_entries

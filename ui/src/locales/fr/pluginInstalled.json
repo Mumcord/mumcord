@@ -120,5 +120,6 @@
     "chatPatterns": "Motifs de chat",
     "netHttp": "Accès à internet",
     "secrets": "Trousseau"
-  }
+  },
+  "offerBadge": "Nouvelles autorisations"
 }

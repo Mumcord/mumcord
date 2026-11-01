@@ -14,6 +14,7 @@ import {
   type PluginWebviewPlace,
   type Unsubscribe,
 } from "../../../api";
+import { routePluginRequest } from "../pluginRequestStore";
 
 export interface PluginDialogHeader {
   readonly title: string;
@@ -125,6 +126,9 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
     // Bridge messages go straight to the open frame (see `webview/`), they are not state.
     case "webviewPost":
       return state;
+    // Opens a settings page (see `bind`); nothing to keep.
+    case "openPermissions":
+      return state;
   }
 }
 
@@ -176,6 +180,10 @@ function bind(api: MumcordApi): void {
   state = EMPTY;
   unsubscribe = [
     api.on("pluginUi", (change) => {
+      // The plugin asked to show its permissions after a click in its own UI.
+      if (change.change.type === "openPermissions") {
+        routePluginRequest({ kind: "installed", plugin: change.plugin });
+      }
       if (pending !== null) pending.push(change);
       state = applyChange(state, change);
       notify();

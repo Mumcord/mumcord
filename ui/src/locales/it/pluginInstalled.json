@@ -120,5 +120,6 @@
     "chatPatterns": "Modelli di chat",
     "netHttp": "Accesso a internet",
     "secrets": "Portachiavi"
-  }
+  },
+  "offerBadge": "Nuove autorizzazioni"
 }

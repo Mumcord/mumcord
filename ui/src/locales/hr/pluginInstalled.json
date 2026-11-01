@@ -120,5 +120,6 @@
     "chatPatterns": "Uzorci u chatu",
     "netHttp": "Pristup internetu",
     "secrets": "Privjesak za ključeve"
-  }
+  },
+  "offerBadge": "Nova dopuštenja"
 }

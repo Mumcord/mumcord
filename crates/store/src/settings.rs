@@ -654,6 +654,10 @@ pub struct Settings {
     pub plugins_last_official_sequence: i64,
     /// When revocations were last checked, in milliseconds since the Unix epoch.
     pub plugins_revoked_checked_at: Option<i64>,
+    /// Plugin id → optional permissions an update added that the user has not answered yet.
+    /// They are never granted by the update itself; Plugins → Updates offers them.
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub plugins_offered_permissions: BTreeMap<String, Vec<String>>,
     /// Id of the theme for the whole app: a built-in preset or one of `custom_themes`.
     pub app_theme_id: String,
     /// Imported and user-made themes; built-in presets are not stored (FR-2.15).
@@ -775,6 +779,7 @@ impl Default for Settings {
             developer_mode: false,
             plugins_last_official_sequence: 0,
             plugins_revoked_checked_at: None,
+            plugins_offered_permissions: BTreeMap::new(),
             app_theme_id: DEFAULT_APP_THEME_ID.to_owned(),
             custom_themes: Vec::new(),
             visual_effects: true,

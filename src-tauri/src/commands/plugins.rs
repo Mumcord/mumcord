@@ -160,6 +160,9 @@ pub struct InstalledPlugin {
     pub description: String,
     /// The manifest's authors.
     pub authors: Vec<String>,
+    /// Optional permissions an update added and the user has not answered yet; they are off.
+    /// Answering means `plugin_set_permissions` (which clears this).
+    pub offered: Vec<String>,
 }
 
 /// The name of a third-party repository; empty when it was removed.
@@ -211,6 +214,7 @@ impl InstalledPlugin {
             icon: p.icon,
             description: p.description,
             authors: p.authors,
+            offered: p.offered,
         }
     }
 }
@@ -1433,6 +1437,7 @@ mod tests {
             icon: None,
             description: String::new(),
             authors: Vec::new(),
+            offered: Vec::new(),
         }
     }
 

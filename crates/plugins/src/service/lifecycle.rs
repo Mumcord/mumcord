@@ -88,7 +88,7 @@ impl PluginService {
     /// Replaces the granted permissions (FR-6.30): a revoked optional permission applies to the
     /// next call and event; a missing required one turns the plugin off with reason
     /// `permission`. Permissions the manifest does not ask for, and official-only ones for
-    /// plugins that are not official, are ignored.
+    /// plugins that are not official, are ignored. This answers what an update offered.
     pub fn set_permissions(&mut self, id: &str, granted: &[String]) -> Result<(), ServiceError> {
         let record = self.record(id)?;
         let source = Origin::parse(&record.source)
@@ -104,6 +104,7 @@ impl PluginService {
                 r.disabled_reason = Some("permission".into());
             }
         })?;
+        self.save_offer(id, Vec::new())?;
         self.ctx.grants.set(id, &record.granted);
         let dir = self.version_dir(id, &record.version);
         self.set_webview_root(id, source, &dir, &record.granted);
@@ -152,6 +153,7 @@ impl PluginService {
             self.store().mark_plugin_removed(id, now_millis())?;
         }
         self.forget_badge(id)?;
+        self.save_offer(id, Vec::new())?;
         self.changed();
         Ok(())
     }

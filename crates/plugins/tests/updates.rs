@@ -307,30 +307,109 @@ fn same_permissions_and_key_update_by_themselves_and_keep_data() {
 }
 
 #[test]
-fn new_permissions_or_a_new_key_wait_for_approval() {
+fn new_optional_permissions_install_but_stay_off_and_are_offered() {
     let fx = Fixture::new();
     let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
     let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
     let v12 = Release::new("poll", "1.2.0", OK_START, MORE_PERMISSIONS, &key);
     let (mut service, mut events) = installed(&fx, &v1);
 
+    // The index cannot tell optional from required: the package is fetched and decides.
     let automatic = service
         .plan_updates(&index(&[&v1, &v12]), PluginUpdates::Auto)
         .expect("plan");
-    assert!(automatic.is_empty());
+    assert_eq!(automatic.len(), 1);
+    assert!(announced(&mut events).is_empty());
+    service
+        .apply_update("poll", &v12.download, None)
+        .expect("only new optional permissions: installs by itself");
+    let plugin = info(&service, "poll");
+    assert_eq!(plugin.version, "1.2.0");
+    assert_eq!(
+        plugin.granted,
+        ["ui.panel", "events.voice"],
+        "nothing new granted"
+    );
+    assert_eq!(plugin.offered, ["chat.send"]);
+    assert_eq!(fx.kv("poll").as_deref(), Some(b"v".as_slice()));
+
+    // The offer survives a restart and is answered by setting the permissions.
+    let (mut service, _events) = fx.service();
+    assert_eq!(info(&service, "poll").offered, ["chat.send"]);
+    service
+        .set_permissions(
+            "poll",
+            &["ui.panel".into(), "events.voice".into(), "chat.send".into()],
+        )
+        .expect("answers");
+    let plugin = info(&service, "poll");
+    assert_eq!(plugin.granted, ["ui.panel", "events.voice", "chat.send"]);
+    assert!(plugin.offered.is_empty());
+}
+
+#[test]
+fn a_permission_turned_off_before_is_not_offered_again() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("poll", "1.0.0", OK_START, MORE_PERMISSIONS, &key);
+    let v11 = Release::new("poll", "1.1.0", OK_START, MORE_PERMISSIONS, &key);
+    // Installed with only `events.voice` on: `chat.send` was asked about and left off.
+    let (mut service, _events) = installed(&fx, &v1);
+    service
+        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .expect("plan");
+    service
+        .apply_update("poll", &v11.download, None)
+        .expect("updates");
+    assert!(info(&service, "poll").offered.is_empty());
+}
+
+#[test]
+fn new_permissions_or_a_new_key_wait_for_approval() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    // `chat.send` becomes required (the first entry is the required one).
+    let required = &["chat.send", "ui.panel", "events.voice"];
+    let v12 = Release::new("poll", "1.2.0", OK_START, required, &key);
+    let (mut service, mut events) = installed(&fx, &v1);
+
+    let automatic = service
+        .plan_updates(&index(&[&v1, &v12]), PluginUpdates::Auto)
+        .expect("plan");
+    assert_eq!(automatic.len(), 1, "fetched to read its manifest");
+    assert!(matches!(
+        service.apply_update("poll", &v12.download, None),
+        Err(ServiceError::NeedsApproval)
+    ));
+    assert_eq!(info(&service, "poll").version, "1.0.0");
     let update = &service.updates()[0];
     assert_eq!(
         update.approval,
         Some(Approval::NewPermissions(vec!["chat.send".into()]))
     );
     assert_eq!(announced(&mut events), [("poll".into(), "1.2.0".into())]);
+    // Not fetched again, not announced again.
+    let automatic = service
+        .plan_updates(&index(&[&v1, &v12]), PluginUpdates::Auto)
+        .expect("plan");
+    assert!(automatic.is_empty());
+    assert!(announced(&mut events).is_empty());
+    assert_eq!(
+        service.updates()[0].approval,
+        Some(Approval::NewPermissions(vec!["chat.send".into()]))
+    );
 
     service
-        .apply_update("poll", &v12.download, Some(&["chat.send".into()]))
+        .apply_update(
+            "poll",
+            &v12.download,
+            Some(&["ui.panel".into(), "events.voice".into()]),
+        )
         .expect("approved update installs");
     let plugin = info(&service, "poll");
     assert_eq!(plugin.version, "1.2.0");
-    assert_eq!(plugin.granted, ["ui.panel", "chat.send"]);
+    assert_eq!(plugin.granted, ["chat.send", "ui.panel", "events.voice"]);
     assert_eq!(fx.kv("poll").as_deref(), Some(b"v".as_slice()));
 
     // A different author key: the index lists both keys, but the installed one did not sign it.

@@ -120,5 +120,6 @@
     "chatPatterns": "Chatmuster",
     "netHttp": "Internetzugriff",
     "secrets": "Schlüsselbund"
-  }
+  },
+  "offerBadge": "Neue Berechtigungen"
 }

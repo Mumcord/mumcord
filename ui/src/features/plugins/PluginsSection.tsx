@@ -62,7 +62,9 @@ export function PluginsSection({
   const active = tabs.includes(selected) ? selected : "installed";
   const allOff = overview?.allOff ?? false;
   const installedCount = overview?.plugins.length;
-  const updatesCount = updates?.length ?? 0;
+  // Waiting updates plus plugins with new optional permissions to answer (F39).
+  const updatesCount =
+    (updates?.length ?? 0) + (overview?.plugins.filter((p) => p.offered.length > 0).length ?? 0);
   const tabId = (tab: PluginTab) => `${baseId}-tab-${tab}`;
   const panelId = (tab: PluginTab) => `${baseId}-panel-${tab}`;
 

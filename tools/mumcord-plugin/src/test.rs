@@ -553,6 +553,14 @@ impl PluginIo for MockIo {
         self.push(Output::PanelPopover(false));
     }
 
+    fn open_permissions(&self, plugin: &str) -> Result<(), Error> {
+        // Only the gesture rule matters here; the settings page is the app's.
+        if !lock(&self.gestures).is_fresh(plugin, Instant::now()) {
+            return Err(Error::NotPermitted);
+        }
+        Ok(())
+    }
+
     fn set_user_menu_entry(&self, _plugin: &str, label: Option<String>) -> Result<(), Error> {
         self.push(Output::MenuEntry(label, None));
         Ok(())

@@ -37,5 +37,13 @@
   "lastChecked": "Dernière vérification à {{time}}",
   "checkFailed": "La vérification a échoué. Veuillez réessayer.",
   "modeNote": "Mises à jour des plugins : {{mode}}. Vous pouvez le modifier ci-dessous.",
-  "settings": "Réglages des mises à jour"
+  "settings": "Réglages des mises à jour",
+  "offer": {
+    "heading": "Nouvelles autorisations",
+    "title": "{{name}} {{version}} peut désormais faire plus. Ces options restent désactivées jusqu'à ce que vous les activiez.",
+    "permission": "Nouvelle autorisation facultative : {{permission}}",
+    "save": "Enregistrer",
+    "notNow": "Pas maintenant",
+    "failed": "Impossible de modifier les autorisations de {{name}}. Veuillez réessayer."
+  }
 }

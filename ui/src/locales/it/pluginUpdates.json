@@ -37,5 +37,13 @@
   "lastChecked": "Ultimo controllo alle {{time}}",
   "checkFailed": "Il controllo non è riuscito. Riprova.",
   "modeNote": "Aggiornamenti dei plugin: {{mode}}. Puoi cambiarlo qui sotto.",
-  "settings": "Impostazioni di aggiornamento"
+  "settings": "Impostazioni di aggiornamento",
+  "offer": {
+    "heading": "Nuove autorizzazioni",
+    "title": "{{name}} {{version}} ora può fare di più. Queste opzioni restano disattivate finché non le attivi.",
+    "permission": "Nuova autorizzazione facoltativa: {{permission}}",
+    "save": "Salva",
+    "notNow": "Non ora",
+    "failed": "Impossibile modificare le autorizzazioni di {{name}}. Riprova."
+  }
 }

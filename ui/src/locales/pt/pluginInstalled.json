@@ -120,5 +120,6 @@
     "chatPatterns": "Padrões de chat",
     "netHttp": "Acesso à internet",
     "secrets": "Porta-chaves"
-  }
+  },
+  "offerBadge": "Novas permissões"
 }

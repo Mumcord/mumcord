@@ -55,6 +55,8 @@ pub trait PluginIo: Send + Sync + Debug {
     fn open_panel_popover(&self, plugin: &str) -> Result<(), Error>;
     /// `ui.close-panel-popover`.
     fn close_panel_popover(&self, plugin: &str);
+    /// `ui.open-permissions`.
+    fn open_permissions(&self, plugin: &str) -> Result<(), Error>;
     /// `peers.send`.
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error>;
     /// `peers.start-game-burst`.

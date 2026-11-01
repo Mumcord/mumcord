@@ -37,5 +37,13 @@
   "lastChecked": "Laatst gecontroleerd om {{time}}",
   "checkFailed": "De controle is mislukt. Probeer het opnieuw.",
   "modeNote": "Plugin-updates: {{mode}}. Je kunt dit hieronder wijzigen.",
-  "settings": "Update-instellingen"
+  "settings": "Update-instellingen",
+  "offer": {
+    "heading": "Nieuwe machtigingen",
+    "title": "{{name}} {{version}} kan nu meer. Deze opties blijven uit totdat je ze aanzet.",
+    "permission": "Nieuwe optionele machtiging: {{permission}}",
+    "save": "Opslaan",
+    "notNow": "Niet nu",
+    "failed": "De machtigingen van {{name}} konden niet worden gewijzigd. Probeer het opnieuw."
+  }
 }

@@ -37,5 +37,13 @@
   "lastChecked": "Ostatnio sprawdzono o {{time}}",
   "checkFailed": "Sprawdzanie się nie powiodło. Spróbuj ponownie.",
   "modeNote": "Aktualizacje wtyczek: {{mode}}. Możesz to zmienić poniżej.",
-  "settings": "Ustawienia aktualizacji"
+  "settings": "Ustawienia aktualizacji",
+  "offer": {
+    "heading": "Nowe uprawnienia",
+    "title": "{{name}} {{version}} potrafi teraz więcej. Te opcje pozostaną wyłączone, dopóki ich nie włączysz.",
+    "permission": "Nowe opcjonalne uprawnienie: {{permission}}",
+    "save": "Zapisz",
+    "notNow": "Nie teraz",
+    "failed": "Nie udało się zmienić uprawnień {{name}}. Spróbuj ponownie."
+  }
 }

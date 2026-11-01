@@ -91,6 +91,10 @@ impl PluginIo for Recorder {
     fn close_panel_popover(&self, plugin: &str) {
         self.record(format!("{plugin} close_panel_popover"));
     }
+    fn open_permissions(&self, plugin: &str) -> Result<(), Error> {
+        self.record(format!("{plugin} open_permissions"));
+        Ok(())
+    }
     fn set_user_menu_entry(&self, _plugin: &str, _label: Option<String>) -> Result<(), Error> {
         Ok(())
     }

@@ -37,5 +37,13 @@
   "lastChecked": "Zadnje preverjanje ob {{time}}",
   "checkFailed": "Preverjanje ni uspelo. Poskusite znova.",
   "modeNote": "Posodobitve vtičnikov: {{mode}}. To lahko spremenite spodaj.",
-  "settings": "Nastavitve posodobitev"
+  "settings": "Nastavitve posodobitev",
+  "offer": {
+    "heading": "Nova dovoljenja",
+    "title": "{{name}} {{version}} zdaj zmore več. Te možnosti ostanejo izklopljene, dokler jih ne vklopite.",
+    "permission": "Novo neobvezno dovoljenje: {{permission}}",
+    "save": "Shrani",
+    "notNow": "Ne zdaj",
+    "failed": "Dovoljenj za {{name}} ni bilo mogoče spremeniti. Poskusite znova."
+  }
 }

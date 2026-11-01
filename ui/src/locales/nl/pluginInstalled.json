@@ -120,5 +120,6 @@
     "chatPatterns": "Chatpatronen",
     "netHttp": "Internettoegang",
     "secrets": "Sleutelhanger"
-  }
+  },
+  "offerBadge": "Nieuwe machtigingen"
 }

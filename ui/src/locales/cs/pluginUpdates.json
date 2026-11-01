@@ -37,5 +37,13 @@
   "lastChecked": "Naposledy zkontrolováno v {{time}}",
   "checkFailed": "Kontrola se nezdařila. Zkuste to znovu.",
   "modeNote": "Aktualizace pluginů: {{mode}}. Můžete to změnit níže.",
-  "settings": "Nastavení aktualizací"
+  "settings": "Nastavení aktualizací",
+  "offer": {
+    "heading": "Nová oprávnění",
+    "title": "{{name}} {{version}} teď umí víc. Tyto možnosti zůstanou vypnuté, dokud je nezapnete.",
+    "permission": "Nové volitelné oprávnění: {{permission}}",
+    "save": "Uložit",
+    "notNow": "Teď ne",
+    "failed": "Oprávnění pluginu {{name}} se nepodařilo změnit. Zkuste to prosím znovu."
+  }
 }
