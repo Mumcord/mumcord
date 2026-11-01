@@ -26,5 +26,9 @@
   "list": {
     "handle": "Bog ró {{position}} as {{total}} (saighead suas nó síos)",
     "moved": "Bogadh ró {{from}} go dtí suíomh {{to}} as {{total}}"
+  },
+  "copyButton": {
+    "copied": "Cóipeáilte",
+    "failed": "Níorbh fhéidir cóipeáil"
   }
 }

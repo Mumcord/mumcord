@@ -26,5 +26,9 @@
   "list": {
     "handle": "Flyt række {{position}} af {{total}} (pil op eller ned)",
     "moved": "Række {{from}} flyttet til position {{to}} af {{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopieret",
+    "failed": "Kunne ikke kopiere"
   }
 }

@@ -118,11 +118,13 @@ impl El {
         self
     }
 
-    /// Sets the kind of a button; no effect on others.
+    /// Sets the kind of a button or copy button; no effect on others.
     #[must_use]
     pub fn kind(mut self, kind: ButtonKind) -> Self {
-        if let Component::Button(c) = &mut self.component {
-            c.kind = kind;
+        match &mut self.component {
+            Component::Button(c) => c.kind = kind,
+            Component::CopyButton(c) => c.kind = kind,
+            _ => {}
         }
         self
     }
@@ -398,6 +400,18 @@ pub fn countdown(label: &str, until: u64) -> El {
     }))
 }
 
+/// A secondary button that copies `text` (at most 8 KiB) to the clipboard when the user clicks
+/// it. The host does the copying and shows a short "Copied" confirmation: the plugin gets no
+/// event, never reads the clipboard and needs no permission. `label` is required; change the look
+/// with `.kind(..)`.
+pub fn copy_button(label: &str, text: &str) -> El {
+    El::new(Component::CopyButton(CopyButton {
+        label: label.to_owned(),
+        text: text.to_owned(),
+        kind: ButtonKind::Secondary,
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -410,6 +424,20 @@ mod tests {
             Component::Divider => "divider",
             _ => "other",
         }
+    }
+
+    #[test]
+    fn copy_button_is_secondary_and_takes_a_kind() {
+        let Component::CopyButton(b) = copy_button("Copy fitting", "x").component else {
+            panic!("not a copy button")
+        };
+        assert_eq!((b.label.as_str(), b.text.as_str()), ("Copy fitting", "x"));
+        assert_eq!(b.kind, ButtonKind::Secondary);
+        let Component::CopyButton(b) = copy_button("c", "x").kind(ButtonKind::Danger).component
+        else {
+            panic!("not a copy button")
+        };
+        assert_eq!(b.kind, ButtonKind::Danger);
     }
 
     #[test]

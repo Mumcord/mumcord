@@ -1,7 +1,8 @@
 /** Simple interactive plugin components (FR-6.41): buttons, toggle, select, slider. */
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { PluginComponent } from "../../../api";
+import { getApi } from "../../../api";
 import { Select } from "../../../components/Select";
 import { usePluginAsset } from "./assets";
 import { useRender } from "./context";
@@ -25,6 +26,51 @@ export function PluginButton({ label, action, kind, disabled, expanded }: Of<"bu
     >
       {label}
     </button>
+  );
+}
+
+const COPY_FEEDBACK_MS = 2000;
+
+/**
+ * A button whose click copies `text` to the clipboard. The host does the copying: the plugin never
+ * touches the clipboard and gets no event, which is why this needs no permission (FR-6.40).
+ */
+export function PluginCopyButton({ label, text, kind }: Of<"copyButton">) {
+  const { t } = useTranslation("pluginSlots");
+  const [result, setResult] = useState<"copied" | "failed" | null>(null);
+  const variant = kind === "primary" ? "button--primary" : `pr-button--${kind}`;
+
+  useEffect(() => {
+    if (result === null) return;
+    const timer = setTimeout(() => {
+      setResult(null);
+    }, COPY_FEEDBACK_MS);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [result]);
+
+  const copy = () => {
+    getApi()
+      .copyText(text)
+      .then(() => {
+        setResult("copied");
+      })
+      .catch(() => {
+        // The copy API logs the real reason; the user only needs to know it did not work.
+        setResult("failed");
+      });
+  };
+
+  return (
+    <span className="pr-copy">
+      <button type="button" className={`button ${variant}`} onClick={copy}>
+        {label}
+      </button>
+      <span className="pr-copy__feedback" role="status" aria-live="polite">
+        {result === null ? "" : t(`copyButton.${result}`)}
+      </span>
+    </span>
   );
 }
 

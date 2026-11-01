@@ -26,5 +26,9 @@
   "list": {
     "handle": "Rij {{position}} van {{total}} verplaatsen (pijl omhoog of omlaag)",
     "moved": "Rij {{from}} verplaatst naar positie {{to}} van {{total}}"
+  },
+  "copyButton": {
+    "copied": "Gekopieerd",
+    "failed": "Kopiëren mislukt"
   }
 }

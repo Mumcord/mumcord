@@ -26,5 +26,9 @@
   "list": {
     "handle": "Premjesti redak {{position}} od {{total}} (strelica gore ili dolje)",
     "moved": "Redak {{from}} premješten na mjesto {{to}} od {{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopirano",
+    "failed": "Kopiranje nije uspjelo"
   }
 }

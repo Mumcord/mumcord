@@ -26,5 +26,9 @@
   "list": {
     "handle": "{{position}}. sor áthelyezése ({{total}} közül; fel vagy le nyíl)",
     "moved": "A(z) {{from}}. sor áthelyezve a(z) {{to}}. helyre ({{total}} közül)"
+  },
+  "copyButton": {
+    "copied": "Másolva",
+    "failed": "A másolás nem sikerült"
   }
 }

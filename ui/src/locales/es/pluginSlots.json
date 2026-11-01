@@ -26,5 +26,9 @@
   "list": {
     "handle": "Mover la fila {{position}} de {{total}} (flecha arriba o abajo)",
     "moved": "Fila {{from}} movida a la posición {{to}} de {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copiado",
+    "failed": "No se pudo copiar"
   }
 }

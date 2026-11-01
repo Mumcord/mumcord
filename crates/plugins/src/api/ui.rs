@@ -41,6 +41,9 @@ pub const MAX_LIST_ROWS: usize = 50;
 pub const MAX_SPRITE_FPS: u8 = 12;
 /// Bytes of a text input (FR-6.41).
 pub const MAX_INPUT_BYTES: u8 = 64;
+/// Bytes of a `copy-button` text (UTF-8). Exempt from the per-string limit, but still counted in
+/// the tree size.
+pub const MAX_COPY_BYTES: usize = 8 * 1024;
 /// Spacing of a stack in px.
 pub const MAX_GAP: u8 = 32;
 
@@ -224,6 +227,16 @@ fn strings(component: &Component) -> Vec<&str> {
             all
         }
         Component::Countdown(c) => vec![&c.label],
+        Component::CopyButton(c) => vec![&c.label],
+    }
+}
+
+/// The text a `copy-button` puts on the clipboard; kept out of [`strings`] because it has its
+/// own, larger limit.
+fn copy_text(component: &Component) -> Option<&str> {
+    match component {
+        Component::CopyButton(c) => Some(&c.text),
+        _ => None,
     }
 }
 
@@ -232,6 +245,7 @@ fn required_label(component: &Component) -> Option<&str> {
     match component {
         Component::Button(b) => Some(&b.label),
         Component::IconButton(b) => Some(&b.label),
+        Component::CopyButton(b) => Some(&b.label),
         Component::Toggle(t) => Some(&t.label),
         Component::Select(s) => Some(&s.label),
         Component::Slider(s) => Some(&s.label),
@@ -359,6 +373,7 @@ pub fn encoded_size(nodes: &[Node]) -> usize {
                     .iter()
                     .map(|s| s.len())
                     .sum::<usize>()
+                + copy_text(&node.component).map_or(0, str::len)
         })
         .sum()
 }
@@ -401,6 +416,17 @@ pub fn validate(nodes: &[Node], allows: impl Fn(&str) -> bool) -> Result<(), Tre
                 error: Error::TooLarge,
                 reason: format!("node {index}: text above {MAX_TEXT_CHARS} characters"),
             });
+        }
+        if let Some(text) = copy_text(component) {
+            if text.len() > MAX_COPY_BYTES {
+                return Err(TreeError {
+                    error: Error::TooLarge,
+                    reason: format!("node {index}: copy text above {MAX_COPY_BYTES} bytes"),
+                });
+            }
+            if text.is_empty() {
+                return Err(invalid(index, "empty copy text"));
+            }
         }
         if required_label(component).is_some_and(|label| label.trim().is_empty()) {
             return Err(invalid(index, "missing accessible label"));
@@ -542,8 +568,8 @@ impl Host for PluginState {
 mod tests {
     use super::*;
     use crate::runtime::bindings::mumcord::plugin::ui::{
-        Align, Button, ButtonKind, Direction, InputPurpose, ListProps, Sprite, Stack, Text,
-        TextInput, TextStyle, Tone,
+        Align, Button, ButtonKind, CopyButton, Direction, InputPurpose, ListProps, Sprite, Stack,
+        Text, TextInput, TextStyle, Tone,
     };
 
     fn node(component: Component, children: Vec<u32>) -> Node {
@@ -760,6 +786,38 @@ mod tests {
         );
         assert_eq!(error(&[field(&long, None)]), Error::TooLarge);
         assert_eq!(error(&[field("Reachable.", Some(&long))]), Error::TooLarge);
+    }
+
+    #[test]
+    fn copy_button_text_has_its_own_limit() {
+        let copy = |label: &str, text: &str| {
+            node(
+                Component::CopyButton(CopyButton {
+                    label: label.to_owned(),
+                    text: text.to_owned(),
+                    kind: ButtonKind::Secondary,
+                }),
+                vec![],
+            )
+        };
+        // Far above the 200 character string limit, exactly at the byte limit.
+        let max = "x".repeat(MAX_COPY_BYTES);
+        assert_eq!(validate(&[copy("Copy fitting", &max)], all), Ok(()));
+        assert_eq!(
+            error(&[copy("Copy fitting", &format!("{max}x"))]),
+            Error::TooLarge
+        );
+        // Bytes, not characters.
+        assert_eq!(
+            error(&[copy("Copy fitting", &"ä".repeat(MAX_COPY_BYTES / 2 + 1))]),
+            Error::TooLarge
+        );
+        assert_eq!(error(&[copy("  ", "x")]), Error::Invalid);
+        assert_eq!(error(&[copy("Copy", "")]), Error::Invalid);
+        assert_eq!(
+            error(&[copy(&"x".repeat(MAX_TEXT_CHARS + 1), "x")]),
+            Error::TooLarge
+        );
     }
 
     #[test]

@@ -26,5 +26,9 @@
   "list": {
     "handle": "Přesunout řádek {{position}} z {{total}} (šipka nahoru nebo dolů)",
     "moved": "Řádek {{from}} přesunut na pozici {{to}} z {{total}}"
+  },
+  "copyButton": {
+    "copied": "Zkopírováno",
+    "failed": "Kopírování se nepodařilo"
   }
 }

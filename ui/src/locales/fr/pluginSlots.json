@@ -26,5 +26,9 @@
   "list": {
     "handle": "Déplacer la ligne {{position}} sur {{total}} (flèche haut ou bas)",
     "moved": "Ligne {{from}} déplacée en position {{to}} sur {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copié",
+    "failed": "Copie impossible"
   }
 }

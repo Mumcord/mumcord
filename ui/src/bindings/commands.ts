@@ -2461,7 +2461,9 @@ error: string | null } |
 /**  What the user types goes into the named secret; the plugin never sees it. */
 { type: "password"; label: string; secret: string; action: string; disabled: boolean; help: string | null; helpTone: PluginTone | null; error: string | null } | { type: "filePicker"; label: string; accept: string[]; action: string; disabled: boolean } | 
 /**  `until` in Unix seconds. */
-{ type: "countdown"; label: string; until: number | null };
+{ type: "countdown"; label: string; until: number | null } | 
+/**  The renderer copies `text` itself on a click; there is no action back to the plugin. */
+{ type: "copyButton"; label: string; text: string; kind: PluginButtonKind };
 
 /**  The Diagnostics section of a plugin (counts only, never payloads). */
 export type PluginDiagnostics = {

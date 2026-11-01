@@ -26,5 +26,9 @@
   "list": {
     "handle": "Zeile {{position}} von {{total}} verschieben (Pfeil nach oben oder unten)",
     "moved": "Zeile {{from}} an Position {{to}} von {{total}} verschoben"
+  },
+  "copyButton": {
+    "copied": "Kopiert",
+    "failed": "Kopieren fehlgeschlagen"
   }
 }

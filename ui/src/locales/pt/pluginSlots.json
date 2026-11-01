@@ -26,5 +26,9 @@
   "list": {
     "handle": "Mover a linha {{position}} de {{total}} (seta para cima ou para baixo)",
     "moved": "Linha {{from}} movida para a posição {{to}} de {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copiado",
+    "failed": "Não foi possível copiar"
   }
 }

@@ -26,5 +26,9 @@
   "list": {
     "handle": "Mută rândul {{position}} din {{total}} (săgeată sus sau jos)",
     "moved": "Rândul {{from}} a fost mutat pe poziția {{to}} din {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copiat",
+    "failed": "Nu s-a putut copia"
   }
 }

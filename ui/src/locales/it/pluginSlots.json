@@ -26,5 +26,9 @@
   "list": {
     "handle": "Sposta la riga {{position}} di {{total}} (freccia su o giù)",
     "moved": "Riga {{from}} spostata alla posizione {{to}} di {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copiato",
+    "failed": "Impossibile copiare"
   }
 }

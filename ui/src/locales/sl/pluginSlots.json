@@ -26,5 +26,9 @@
   "list": {
     "handle": "Premakni vrstico {{position}} od {{total}} (puščica gor ali dol)",
     "moved": "Vrstica {{from}} premaknjena na mesto {{to}} od {{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopirano",
+    "failed": "Kopiranje ni uspelo"
   }
 }

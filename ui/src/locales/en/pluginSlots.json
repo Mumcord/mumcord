@@ -26,5 +26,9 @@
   "list": {
     "handle": "Move row {{position}} of {{total}} (Arrow Up or Down)",
     "moved": "Moved row {{from}} to position {{to}} of {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copied",
+    "failed": "Could not copy"
   }
 }

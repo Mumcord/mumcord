@@ -158,6 +158,18 @@ interface ui {
     disabled: bool,
   }
 
+  /// A button the HOST wires to the clipboard: a click copies `text` to the system clipboard and
+  /// shows a short "Copied" confirmation. The plugin never touches the clipboard, reads nothing
+  /// back and gets no event for the click, so it needs no permission. `text` may be up to 8 KiB
+  /// (UTF-8 bytes); `label` follows the 200 character string limit. A click is not a user
+  /// gesture for `chat.send`.
+  record copy-button {
+    /// Required, like every interactive component.
+    label: string,
+    text: string,
+    kind: button-kind,
+  }
+
   record chip {
     text: string,
     /// Theme token for text and border; ignored when `tone` is set.
@@ -292,6 +304,8 @@ interface ui {
     password(password),
     file-picker(file-picker),
     countdown(countdown),
+    /// Added after 1.0.0 as an additive case (host-side clipboard copy).
+    copy-button(copy-button),
   }
 
   record node {

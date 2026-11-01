@@ -528,6 +528,55 @@ describe("variants", () => {
   });
 });
 
+describe("copy button", () => {
+  const copyNode = leaf({
+    type: "copyButton",
+    label: "Copy fitting",
+    text: "[Drake]",
+    kind: "secondary",
+  });
+
+  it("copies its text on a click and confirms politely", async () => {
+    const copyText = vi.fn(() => Promise.resolve(null));
+    api.copyText = copyText;
+    const action = vi.spyOn(api, "pluginUiAction");
+    show([copyNode]);
+    const button = screen.getByRole("button", { name: "Copy fitting" });
+    expect(button).toHaveClass("pr-button--secondary");
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    expect(copyText).not.toHaveBeenCalled();
+    fireEvent.click(button);
+    expect(copyText).toHaveBeenCalledExactlyOnceWith("[Drake]");
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent("Copied");
+    });
+    expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+    // Nothing goes back to the plugin: the click is not a plugin action.
+    expect(action).not.toHaveBeenCalled();
+  });
+
+  it("says so when the copy fails and forgets the message again", async () => {
+    api.copyText = vi.fn(() => Promise.reject(new Error("no clipboard")));
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    show([copyNode]);
+    fireEvent.click(screen.getByRole("button", { name: "Copy fitting" }));
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent("Could not copy");
+    });
+    act(() => {
+      vi.advanceTimersByTime(2500);
+    });
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+  });
+
+  it("follows the button kinds", () => {
+    show([
+      { ...copyNode, component: { ...copyNode.component, kind: "danger" } as PluginComponent },
+    ]);
+    expect(screen.getByRole("button", { name: "Copy fitting" })).toHaveClass("pr-button--danger");
+  });
+});
+
 describe("countdown", () => {
   it("formats the remaining time", () => {
     expect(formatRemaining(9)).toBe("0:09");

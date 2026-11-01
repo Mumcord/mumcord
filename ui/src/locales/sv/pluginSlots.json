@@ -26,5 +26,9 @@
   "list": {
     "handle": "Flytta rad {{position}} av {{total}} (pil upp eller ner)",
     "moved": "Rad {{from}} flyttad till position {{to}} av {{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopierat",
+    "failed": "Det gick inte att kopiera"
   }
 }

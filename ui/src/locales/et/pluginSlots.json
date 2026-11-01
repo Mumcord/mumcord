@@ -26,5 +26,9 @@
   "list": {
     "handle": "Liiguta rida {{position}}/{{total}} (nool üles või alla)",
     "moved": "Rida {{from}} liigutati kohale {{to}}/{{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopeeritud",
+    "failed": "Kopeerimine ebaõnnestus"
   }
 }

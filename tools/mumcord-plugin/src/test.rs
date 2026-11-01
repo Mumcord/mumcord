@@ -205,7 +205,20 @@ pub enum Step {
     Event(EventSpec),
     /// Milliseconds, e.g. to let a timer fire.
     Wait(u64),
+    /// The user clicks a host-drawn `copy-button` in the slot's current tree; the mock records
+    /// the text the host would put on the clipboard (see `expect: copied`).
+    Copy(CopySpec),
     Expect(Expect),
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CopySpec {
+    /// The button's label.
+    pub label: String,
+    /// Defaults to the panel.
+    #[serde(default)]
+    pub slot: Option<SlotSpec>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -379,6 +392,10 @@ pub enum Expect {
         #[serde(default)]
         error: Option<String>,
     },
+    /// The host copied exactly this text after a `copy` step.
+    Copied {
+        text: String,
+    },
     /// No output at all for a moment.
     Nothing,
 }
@@ -420,6 +437,8 @@ pub enum Output {
         body: String,
     },
     Stopped(String),
+    /// The text a clicked `copy-button` put on the (mock) clipboard.
+    Copied(String),
 }
 
 /// The mock side of [`PluginIo`]: records every call and plays the channel the scenario
@@ -720,8 +739,30 @@ impl Session {
                 std::thread::sleep(Duration::from_millis(*ms));
                 Ok(())
             }
+            Step::Copy(spec) => self.copy(spec),
             Step::Expect(expect) => self.expect(expect),
         }
+    }
+
+    /// Plays the host's side of a copy-button click: finds the button in the slot's latest tree
+    /// and records its text. The plugin itself learns nothing about the click.
+    fn copy(&mut self, spec: &CopySpec) -> Result<()> {
+        let slot = spec.slot.clone().unwrap_or(SlotSpec::Panel);
+        let trees = self.trees();
+        let nodes = trees
+            .iter()
+            .find(|(s, _)| *s == slot)
+            .map(|(_, nodes)| nodes)
+            .with_context(|| format!("the plugin has no tree in {slot:?}"))?;
+        let text = nodes
+            .iter()
+            .find_map(|node| match &node.component {
+                Component::CopyButton(b) if b.label == spec.label => Some(b.text.clone()),
+                _ => None,
+            })
+            .with_context(|| format!("no copy button labelled {:?} in {slot:?}", spec.label))?;
+        self.io.push(Output::Copied(text));
+        Ok(())
     }
 
     fn peer(&self, session: u32) -> Result<Peer> {
@@ -1058,6 +1099,7 @@ fn matches(expect: &Expect, output: &Output) -> bool {
             label == l && (sessions.is_none() || sessions == s)
         }
         (Expect::Stopped { error }, Output::Stopped(e)) => contains(e, error.as_ref()),
+        (Expect::Copied { text }, Output::Copied(t)) => text == t,
         _ => false,
     }
 }
@@ -1092,6 +1134,7 @@ pub fn node_texts(node: &Node) -> Vec<&str> {
             .collect(),
         Component::FilePicker(f) => vec![&f.label],
         Component::Countdown(c) => vec![&c.label],
+        Component::CopyButton(b) => vec![&b.label],
     }
 }
 
@@ -1120,6 +1163,7 @@ fn summary(output: &Output) -> String {
         Output::Supersede { card, sender } => format!("supersede card {card:?} of {sender}"),
         Output::Notification { title, body } => format!("notification {title:?} {body:?}"),
         Output::Stopped(error) => format!("stopped: {error}"),
+        Output::Copied(text) => format!("copied {text:?}"),
     }
 }
 
@@ -1127,6 +1171,7 @@ fn describe(step: &Step) -> String {
     match step {
         Step::Event(e) => format!("event {e:?}"),
         Step::Wait(ms) => format!("wait {ms} ms"),
+        Step::Copy(c) => format!("copy {:?}", c.label),
         Step::Expect(e) => format!("expect {e:?}"),
     }
 }
@@ -1142,6 +1187,28 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
+
+    #[test]
+    fn copy_steps_and_expectations_parse_and_match() {
+        let yaml = r#"
+steps:
+  - copy: {label: Copy fitting}
+  - copy: {label: Copy, slot: dialog}
+  - expect: {copied: {text: "[Drake]"}}
+"#;
+        let scenario: Scenario = serde_saphyr::from_str(yaml).expect("parses");
+        assert!(matches!(&scenario.steps[0], Step::Copy(c) if c.slot.is_none()));
+        assert!(matches!(
+            &scenario.steps[1],
+            Step::Copy(c) if c.slot == Some(SlotSpec::Dialog)
+        ));
+        let Step::Expect(expect) = &scenario.steps[2] else {
+            panic!("not an expectation")
+        };
+        assert!(matches(expect, &Output::Copied("[Drake]".into())));
+        assert!(!matches(expect, &Output::Copied("[Drake] ".into())));
+        assert!(!matches(expect, &Output::Chat("[Drake]".into())));
+    }
 
     #[test]
     fn scenarios_parse_from_yaml() {

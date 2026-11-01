@@ -26,5 +26,9 @@
   "list": {
     "handle": "Ċaqlaq ir-ringiela {{position}} minn {{total}} (vleġġa 'l fuq jew 'l isfel)",
     "moved": "Ir-ringiela {{from}} ġiet imċaqalqa għall-pożizzjoni {{to}} minn {{total}}"
+  },
+  "copyButton": {
+    "copied": "Ikkopjat",
+    "failed": "Ma setax jiġi kkopjat"
   }
 }

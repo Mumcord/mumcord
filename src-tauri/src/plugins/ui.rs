@@ -269,6 +269,12 @@ pub enum PluginComponent {
         label: String,
         until: f64,
     },
+    /// The renderer copies `text` itself on a click; there is no action back to the plugin.
+    CopyButton {
+        label: String,
+        text: String,
+        kind: PluginButtonKind,
+    },
 }
 
 /// One node of a flat tree: node 0 is the root, `children` are indices into the same list.
@@ -535,6 +541,15 @@ fn component(c: wit::Component) -> PluginComponent {
         wit::Component::Countdown(c) => P::Countdown {
             label: c.label,
             until: c.until as f64,
+        },
+        wit::Component::CopyButton(b) => P::CopyButton {
+            label: b.label,
+            text: b.text,
+            kind: match b.kind {
+                wit::ButtonKind::Primary => PluginButtonKind::Primary,
+                wit::ButtonKind::Secondary => PluginButtonKind::Secondary,
+                wit::ButtonKind::Danger => PluginButtonKind::Danger,
+            },
         },
     }
 }

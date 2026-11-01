@@ -164,7 +164,8 @@ fn ui_has_every_slot_of_fr_6_40_and_component_of_fr_6_41() {
             "text-input",
             "password",
             "file-picker",
-            "countdown"
+            "countdown",
+            "copy-button"
         ]
     );
     let animation = type_in(&resolve, "ui", "animation");

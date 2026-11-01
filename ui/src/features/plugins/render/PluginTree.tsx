@@ -9,6 +9,7 @@ import { getApi, type PluginActionValue, type PluginNode, type PluginSlot } from
 import { RenderCtx, type RenderContext } from "./context";
 import {
   PluginButton,
+  PluginCopyButton,
   PluginIconButton,
   PluginSelect,
   PluginSlider,
@@ -87,6 +88,9 @@ function renderNode(
       break;
     case "button":
       content = <PluginButton {...c} />;
+      break;
+    case "copyButton":
+      content = <PluginCopyButton {...c} />;
       break;
     case "iconButton":
       content = <PluginIconButton {...c} />;

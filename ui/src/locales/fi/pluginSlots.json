@@ -26,5 +26,9 @@
   "list": {
     "handle": "Siirrä riviä {{position}}/{{total}} (nuoli ylös tai alas)",
     "moved": "Rivi {{from}} siirretty kohtaan {{to}}/{{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopioitu",
+    "failed": "Kopiointi epäonnistui"
   }
 }

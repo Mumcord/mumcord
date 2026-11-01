@@ -26,5 +26,9 @@
   "list": {
     "handle": "Presunúť riadok {{position}} z {{total}} (šípka hore alebo dole)",
     "moved": "Riadok {{from}} presunutý na pozíciu {{to}} z {{total}}"
+  },
+  "copyButton": {
+    "copied": "Skopírované",
+    "failed": "Kopírovanie zlyhalo"
   }
 }

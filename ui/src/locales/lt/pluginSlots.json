@@ -26,5 +26,9 @@
   "list": {
     "handle": "Perkelti eilutę {{position}} iš {{total}} (rodyklė aukštyn arba žemyn)",
     "moved": "Eilutė {{from}} perkelta į {{to}} vietą iš {{total}}"
+  },
+  "copyButton": {
+    "copied": "Nukopijuota",
+    "failed": "Nepavyko nukopijuoti"
   }
 }

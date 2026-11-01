@@ -369,6 +369,18 @@ impl Renderer<'_> {
                     c.until
                 );
             }
+            Component::CopyButton(b) => {
+                let kind = match b.kind {
+                    ButtonKind::Primary => "primary",
+                    ButtonKind::Secondary => "secondary",
+                    ButtonKind::Danger => "danger",
+                };
+                let _ = write!(
+                    self.out,
+                    "<button class=\"{kind}\"{anim}>{}</button>",
+                    escape(&b.label)
+                );
+            }
         }
     }
 
