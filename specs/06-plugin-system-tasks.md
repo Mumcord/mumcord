@@ -41,7 +41,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B31 | Sandboxed web view | in progress | b31-webview |
 | B32 | Notification centre: category Plugins | done | b32-notify |
 | B34 | Server-suggested plugins logic | done | b34-suggest |
-| B23 | Installed tab and plugin details | in progress | b23-installed |
+| B23 | Installed tab and plugin details | done | b23-installed |
 | B24 | Browse tab, install prompt, deep-link target | in progress | b24-browse |
 | B33a | Updates tab | done | b33a-updates |
 | B33b | Repositories tab | done | b33b-repos |
@@ -72,6 +72,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F12 | Fix: ui typecheck (pluginAsset mock?) + 13 failing vitest in features/plugins (render.test, developer.test, badges.test) on epic/plugins | done (no change needed: fixed by parallel pushes; tsc + 2379 vitest green at 7eeed815; SettingsScreen tests flaky under load) | f12-uitests |
 | B24b | Third-party repo plugins in Browse + install: list enabled, non-paused repos (fetch_repository, cache repo-<id>), label "Unofficial · <repo>", plugin_install / plugin_install_prepare with Source::Repo{repository_id} + pinned key, official ids never shadowed (after B24) | open | |
 | F13 | run_check: a repo paused by the update check is not disabled (only updates stop); repos with no installed plugins are never re-checked (key change unnoticed) — fix per FR-6.75/6.76 | open | |
+| F14 | Plugin icons everywhere: InstalledPlugin gets the manifest icon (via plugin_asset) and Installed tab, plugins strip and notification-centre entries use it instead of initials; plus "Command taken by <plugin>" in the details view (plugin_commands takenBy, after B29) | open | |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
@@ -482,3 +483,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B33b (775d5dcf backend, 83ec3912 UI):** commands in `src-tauri/src/commands/plugin_repos.rs`: plugin_repos_list, plugin_repo_preview, plugin_repo_add (re-fetches and verifies before pinning; max 10, no duplicates), plugin_repo_set_enabled, plugin_repo_remove (repo plugins turned off, data kept, no updates), plugin_repo_review_key, plugin_repo_accept_key. UI `ui/src/features/plugins/repos/` (Add dialog with Expected key, toggles, key-change dialog, mirror setting under Advanced; consumes `addRepository`). Registry `preview_repository` / `fetch_repository` take `&(dyn Fn(&str)->bool + Sync)`; `suggestions::ensure_index` is pub(crate). The repo plugins in Browse / install were NOT done → B24b. run_check gaps → F13.
 - **B30 (b0cf4bd4):** `ui/src/features/plugins/dialog/**` (namespace pluginDialog). The plugin dialog is a modal (existing Modal: focus trap, Esc) rendering the dialog tree; Esc/Close sends `dialog-closed`; the dialog only closes when the plugin sends `close-dialog`. Menu entries in members/PersonMenu.tsx, only for OTHER users in your own channel → `user-menu-requested(session)`. Exports `usePluginMenuEntries()`, `requestPluginMenu()`; `PluginDialogHost` is mounted in PluginsHost.
 - **B33a (53cbf40b, 21057f3a):** Updates tab (update mode auto/notify/off, waiting updates, "Review and update" for new permissions / author key, rolled-back reasons, a pin switch per plugin). Commands `plugin_updates`, `plugin_apply_update(id, optional)`, `plugin_set_pinned(id, pinned)`; namespace pluginUpdates. PluginsSection props `updateMode` / `onUpdateModeChange`. Open: check that the centre entry "Version waiting in the Updates tab" routes via pluginRequestStore.
+- **B23 (8970ecd8 router, eeb4fd70 DTO, 473f8724 UI):** InstalledPlugin.revocation (raw reason) and PluginSourceInfo.repo.name; Installed tab `ui/src/features/plugins/installed/**` (namespace pluginInstalled); `labels.ts` sourceLabel/stateLabel ("Turned off by Mumcord: {{reason}}", "Files of this plugin were changed", "Turned off after repeated crashes"). Dev plugins hide Pin/Remove. Open: initials instead of icons and "Command taken by" → F14.
