@@ -9,6 +9,7 @@ import { ports } from "../../helpers/testenv.ts";
 import { run } from "../../helpers/run.ts";
 import {
   CUSTOM_STEPS,
+  SETUP_STYLES,
   waitForWizardStep,
   type SetupStyle,
   type WizardStepName,
@@ -196,8 +197,14 @@ export async function wizard(name: string, options: WizardOptions = {}): Promise
 
   await waitForWizardStep("setupStyle");
   await onStep?.("setupStyle");
-  await tabTo((f) => f.tag === "input" && f.type === "radio" && f.cls.includes("preset-card__radio"), "setup style cards");
-  await pressUntil("ArrowDown", (f) => f.value === style, `setup style ${style}`, 8);
+  const card = await tabTo(
+    (f) => f.tag === "input" && f.type === "radio" && f.cls.includes("preset-card__radio"),
+    "setup style cards",
+  );
+  // WebKit stops at the ends of a radio group instead of wrapping, so move towards the card.
+  const order: readonly string[] = SETUP_STYLES;
+  const key = order.indexOf(style) < order.indexOf(card.value) ? "ArrowUp" : "ArrowDown";
+  await pressUntil(key, (f) => f.value === style, `setup style ${style}`, order.length);
   // Enter on a radio continues: a preset jumps to the summary, Custom to its first step.
   await browser.keys(["Enter"]);
 

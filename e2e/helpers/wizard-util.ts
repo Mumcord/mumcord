@@ -99,6 +99,13 @@ export const CUSTOM_STEPS: readonly WizardStepName[] = [
 
 /** The four cards of the setup style step (their radio values). */
 export type SetupStyle = "everythingOn" | "balanced" | "maximumPrivacy" | "custom";
+/** The cards in the order they show. */
+export const SETUP_STYLES: readonly SetupStyle[] = [
+  "everythingOn",
+  "balanced",
+  "maximumPrivacy",
+  "custom",
+];
 export type WizardPreset = Exclude<SetupStyle, "custom">;
 
 /** The current step's header line, e.g. "Step 3 of 5 · Voice" (empty when no step shows). */
