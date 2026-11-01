@@ -9,7 +9,7 @@ pub mod suggestions;
 pub mod ui;
 pub mod webview;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
@@ -542,6 +542,21 @@ pub fn on_engine_event(
                 // A match arrives as a `Supersede` service event; nothing to do here.
                 if let Err(e) = result {
                     tracing::warn!(error = %e, "the plugin supersede check failed");
+                }
+            });
+        }
+        mumcord_engine::EngineEvent::FriendsChanged(list) => {
+            let friends: HashSet<String> = list.iter().map(|f| f.cert_hash.clone()).collect();
+            let plugins = Arc::clone(&plugins);
+            tauri::async_runtime::spawn(async move {
+                let result = plugins
+                    .call(move |service| {
+                        service.friends_changed(&friends);
+                        Ok(())
+                    })
+                    .await;
+                if let Err(e) = result {
+                    tracing::warn!(error = %e, "updating the plugins' friends failed");
                 }
             });
         }

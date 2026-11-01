@@ -7,7 +7,7 @@
 //! come only from the voice server; chat-side events (chat activity, mentions) from every
 //! connected server, so plugin cards work in every server's chat (H3).
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 use std::time::Instant;
 
 use mumcord_store::{PluginVisibility, ServerId};
@@ -88,6 +88,20 @@ impl PluginService {
             .insert(peer.session, peer.clone());
         self.io.refresh_menus();
         self.dispatch(server, |keys, id| Event::Joined(wit_peer(keys, id, &peer)));
+    }
+
+    /// The friends list changed (`friends`: cert hashes). People already in the channel take
+    /// their new friend state, so Friends-only plugins reach a new friend without a rejoin.
+    pub fn friends_changed(&mut self, friends: &HashSet<String>) {
+        let mut state = self.io.peers();
+        for connection in state.connections.values_mut() {
+            for peer in connection.members.values_mut() {
+                peer.is_friend = peer
+                    .cert_hash
+                    .as_ref()
+                    .is_some_and(|hash| friends.contains(hash));
+            }
+        }
     }
 
     /// Someone left the user's channel or the server, or the user left their channel.

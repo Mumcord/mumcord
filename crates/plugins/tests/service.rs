@@ -3,6 +3,7 @@
 //! Turn off all, `--no-plugins`, developer folders, badge default and the integrity re-check;
 //! plugin messaging with its rate rules, visibility and the voice-server-only rule.
 
+use std::collections::HashSet;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -672,6 +673,72 @@ fn messages_go_to_peers_announcing_the_same_plugin() {
     assert_eq!((counters.received, counters.incoming_refused), (1, 1));
     service.message_expired(1, "sender");
     assert_eq!(service.messaging_counters("sender").expired, 1);
+}
+
+/// The first message a Friends-only plugin sends at start: its receivers, or `None` when the send
+/// failed (the plugin then backs off with `no-recipients`).
+fn friends_only_send(
+    service: &mut PluginService,
+    host_events: &mut UnboundedReceiver<HostEvent>,
+    events: &mut UnboundedReceiver<ServiceEvent>,
+    root: &Path,
+    id: &str,
+) -> Option<Vec<u32>> {
+    let dir = sender_folder(root, id);
+    let friends_only = format!(r#"{MESSAGING},"messaging":{{"default_visibility":"friends"}}"#);
+    std::fs::write(
+        dir.join("manifest.json"),
+        manifest(id, "0.1.0", &friends_only),
+    )
+    .expect("manifest");
+    let id = service.load_dev(&dir).expect("loads");
+    while let Ok(event) = host_events.try_recv() {
+        service.handle_host_event(event).expect("handled");
+    }
+    let mut receivers = None;
+    while let Ok(event) = events.try_recv() {
+        if let ServiceEvent::PeerSend { outgoing, .. } = event {
+            receivers = Some(outgoing.receivers);
+        }
+    }
+    if receivers.is_none() {
+        assert!(matches!(
+            info(service, &id).status,
+            Status::BackingOff { error } if error.ends_with(NO_RECIPIENTS)
+        ));
+    }
+    receivers
+}
+
+#[test]
+fn befriending_someone_already_in_the_channel_lets_friends_only_messages_reach_them() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    // Bob is in the channel before he becomes a friend.
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["before@1~dev","after@1~dev"]}"#,
+    );
+    let root = fx.root.path();
+    assert_eq!(
+        friends_only_send(&mut service, &mut host_events, &mut events, root, "before"),
+        None
+    );
+
+    let bob_hash = bob().cert_hash.expect("hash");
+    service.friends_changed(&HashSet::from([bob_hash]));
+    assert_eq!(
+        friends_only_send(&mut service, &mut host_events, &mut events, root, "after"),
+        Some(vec![7])
+    );
 }
 
 #[test]

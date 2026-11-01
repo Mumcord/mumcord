@@ -58,6 +58,7 @@
 - The Poll chat card shows its top three options in full again instead of fading the third one behind **Show more**
 - The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)
 - The "simultaneously connected servers" number field in Settings > Server is no longer stretched across the whole card; it is now as narrow as the number it holds (#320)
+- Plugins shared with **Friends** only now reach someone you add as a friend while they are already in your channel, instead of only after one of you rejoins
 
 ### Internal
 
