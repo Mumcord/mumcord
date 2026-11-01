@@ -104,7 +104,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | V-G | Mockup conformance: Add repository dialog (see scratchpad v1/deviations.md) | in progress | v-g |
 | V-H | Mockup conformance: Notification centre plugin entries (see scratchpad v1/deviations.md) | done (62459fde; "via <bot>" needs the bot name in the suggestion event — later) | v-h |
 | V-I | Mockup conformance: Plugin strip N running + side sheet (see scratchpad v1/deviations.md) | done (6003fe67; not visually checked — verify in the real build) | v-i |
-| V-L | Mockup conformance: Dice card redesign + roll history (see scratchpad v1/deviations.md) | in progress | v-l |
+| V-L | Mockup conformance: Dice card redesign + roll history (see scratchpad v1/deviations.md) | done (feat/dice 2224b3d) | v-l |
 | V-M | Mockup conformance: Mumbot Music dialog layout (see scratchpad v1/deviations.md) | partly done (setup form; host gaps → R1, rest → V-M2) | v-m |
 | R1 | Renderer upgrade for mockup fidelity (WIT additive @1.0.0 + SDK + renderer + CLI preview): dialog header with plugin icon, title + subtitle; text-input with stacked label, full width, error/help text + error state; button variants (primary, secondary/outline, danger) and stack alignment (start/end/space-between); status chip tones | in progress | r1-render |
 | V-M2 | Mumbot Music: finish the #310 mockups using R1 (dialog header, inputs with error state, right-aligned primary Save, saved-bots rows with avatar + status pill, two-column player, "Not in your channel" copy) | open | |
