@@ -538,6 +538,7 @@ impl Engine {
             .send_text(&TextTarget::channel(channel_id), html)
             .map_err(command_error)?;
         await_refusal(&ctx, denials, Some(channel_id)).await?;
+        crate::plugins::on_own_text(ctx.events.plugins(), &ctx, channel_id);
         Ok(own_message(
             &ctx,
             ConversationRef::Channel { channel_id },

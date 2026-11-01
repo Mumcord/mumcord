@@ -872,8 +872,8 @@ impl Engine {
         WeakEngine(Arc::downgrade(&self.inner))
     }
 
-    /// The store, also while disconnected (history commands, B14).
-    pub(crate) fn store_handle(&self) -> Arc<Mutex<Store>> {
+    /// The store, also while disconnected (history commands, B14; the plugin service).
+    pub fn store_handle(&self) -> Arc<Mutex<Store>> {
         self.inner.store.clone()
     }
 

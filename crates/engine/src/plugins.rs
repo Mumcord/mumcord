@@ -730,6 +730,24 @@ pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg
     });
 }
 
+/// Chat activity for the user's own channel message: the server does not echo it back, and
+/// plugins (e.g. pets reacting to the user's chatting) count it as activity too.
+pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32) {
+    let found = ctx.handle.with_state(|s| {
+        let me = s.own_user()?;
+        s.channels
+            .contains_key(&channel_id)
+            .then(|| (peer_of(me), channel_of(s, channel_id)))
+    });
+    if let Some((sender, channel)) = found {
+        hub.emit(PluginEngineEvent::ChatActivity {
+            server_id: ctx.server_id,
+            sender,
+            channel,
+        });
+    }
+}
+
 impl Engine {
     /// The plugin event stream. There is one consumer (the plugin service): the first call
     /// takes it, later calls get `None`.

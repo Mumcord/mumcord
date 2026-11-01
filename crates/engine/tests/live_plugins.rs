@@ -250,6 +250,30 @@ async fn plugin_messages_flow_between_engines_until_blocked() {
         "B is in A's channel"
     );
 
+    // The user's own channel message counts as chat activity for plugins; B sees it too.
+    let a_channel = a
+        .engine
+        .snapshot()
+        .expect("synced")
+        .users
+        .iter()
+        .find(|u| u.session == a_session)
+        .expect("A on the server")
+        .channel_id;
+    a.engine
+        .send_channel_message(a_server, a_channel, "hello")
+        .await
+        .expect("message sent");
+    for (rx, what) in [(&mut a.plugins, "A's own"), (&mut b.plugins, "B sees A's")] {
+        wait_plugin(rx, &format!("{what} chat activity"), |e| match e {
+            PluginEngineEvent::ChatActivity {
+                sender, channel, ..
+            } => (sender.session == a_session && channel.id == a_channel).then_some(()),
+            _ => None,
+        })
+        .await;
+    }
+
     // Invalid ids, oversized payloads and unknown people never reach the server.
     assert_eq!(
         a.engine
