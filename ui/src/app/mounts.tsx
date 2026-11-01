@@ -2,14 +2,14 @@
  * Mount points for feature UIs. Each feature task replaces the placeholder in its own mount
  * with its root component; the shell layout itself stays untouched.
  */
+import { lazy } from "react";
 import { useTranslation } from "react-i18next";
+import { LazyBoundary } from "../components/LazyBoundary";
 import { getApi } from "../api";
 import { useIsMacos } from "../api/useIsMacos";
 import { useView } from "./view";
 import { useServerStateOf, useVoiceServerId } from "../features/channels";
 import { useMembersColumn } from "./membersCollapse";
-import { SettingsScreen } from "../features/settings/SettingsScreen";
-import { Wizard } from "../features/wizard";
 import { NotificationBell } from "../features/notifications";
 import { UserPanel } from "../features/userpanel";
 import { ChannelsPanel } from "../features/channels";
@@ -33,14 +33,12 @@ import {
   openPrivateConversation,
   useChannelPresence,
 } from "../features/members";
-import { ShareMiniBar, ScreenShareView, SharerBar, ViewerPanel } from "../features/screenshare";
+import { ShareMiniBar, SharerBar } from "../features/screenshare";
 import {
   VideoDucking,
   WatchHeaderActions,
   WatchHeaderTitle,
   WatchMiniBar,
-  WatchPartyPanel,
-  WatchTogetherView,
 } from "../features/watchparty";
 import { MediaPopoutHost } from "../features/media/MediaPopoutHost";
 import { useMediaView } from "../features/media/mediaView";
@@ -64,6 +62,26 @@ import {
   type AudioDeviceNoticeApi,
 } from "../features/app";
 import { WhisperBanner } from "../features/whisper/WhisperBanner";
+
+// Screens the first frame does not need load as chunks of their own (issue #323).
+const SettingsScreen = lazy(() =>
+  import("../features/settings/SettingsScreen").then((m) => ({ default: m.SettingsScreen })),
+);
+const Wizard = lazy(() => import("../features/wizard/Wizard").then((m) => ({ default: m.Wizard })));
+const WatchTogetherView = lazy(() =>
+  import("../features/watchparty/WatchTogetherView").then((m) => ({
+    default: m.WatchTogetherView,
+  })),
+);
+const WatchPartyPanel = lazy(() =>
+  import("../features/watchparty/WatchPartyPanel").then((m) => ({ default: m.WatchPartyPanel })),
+);
+const ScreenShareView = lazy(() =>
+  import("../features/screenshare/ScreenShareView").then((m) => ({ default: m.ScreenShareView })),
+);
+const ViewerPanel = lazy(() =>
+  import("../features/screenshare/ViewerPanel").then((m) => ({ default: m.ViewerPanel })),
+);
 
 /** Server bar (B19). */
 export function ServersMount() {
@@ -156,9 +174,13 @@ export function ChatMount() {
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
   const media =
     serverId === null ? null : view.cinema === "watch" ? (
-      <WatchTogetherView serverId={serverId} />
+      <LazyBoundary>
+        <WatchTogetherView serverId={serverId} />
+      </LazyBoundary>
     ) : view.cinema === "share" ? (
-      <ScreenShareView />
+      <LazyBoundary>
+        <ScreenShareView />
+      </LazyBoundary>
     ) : null;
   // The channel header always stays at the very top (issue #163): the sharer bar, the mini bars
   // and the cinema view all sit below it, and focus keeps it while hiding the messages.
@@ -239,9 +261,19 @@ export function MembersMount() {
   const { users, selfSession } = useServerStateOf(serverId);
   const own = selfSession === null ? undefined : users.get(selfSession);
   if (view.cinema === "watch" && serverId !== null && own !== undefined) {
-    return <WatchPartyPanel serverId={serverId} channelId={own.channelId} />;
+    return (
+      <LazyBoundary>
+        <WatchPartyPanel serverId={serverId} channelId={own.channelId} />
+      </LazyBoundary>
+    );
   }
-  if (view.cinema === "share") return <ViewerPanel />;
+  if (view.cinema === "share") {
+    return (
+      <LazyBoundary>
+        <ViewerPanel />
+      </LazyBoundary>
+    );
+  }
   return (
     <>
       <MembersPanel onSendPrivateMessage={openPrivateConversation} />
@@ -256,7 +288,9 @@ export function WizardMount() {
     <>
       {/* The rail shows the app name; the heading names the screen for assistive technology. */}
       <h1 className="visually-hidden">{t("wizard.title")}</h1>
-      <Wizard />
+      <LazyBoundary>
+        <Wizard />
+      </LazyBoundary>
     </>
   );
 }
@@ -266,10 +300,12 @@ export function SettingsMount() {
   // A section requested while the settings are already open (e.g. "Manage identities" in the
   // About page or the wizard rerun, #149) remounts the screen there.
   return (
-    <SettingsScreen
-      key={settingsSection ?? "default"}
-      settingsRevision={settingsRevision}
-      {...(settingsSection ? { initialSection: settingsSection } : {})}
-    />
+    <LazyBoundary>
+      <SettingsScreen
+        key={settingsSection ?? "default"}
+        settingsRevision={settingsRevision}
+        {...(settingsSection ? { initialSection: settingsSection } : {})}
+      />
+    </LazyBoundary>
   );
 }
