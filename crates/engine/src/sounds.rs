@@ -20,6 +20,10 @@
 //! silent. Automatic arrivals (read-only landing, reconnect
 //! restore) and quitting never call them.
 //!
+//! Quitting while in a voice channel has its own sound (#325): the engine's shutdown asks
+//! [`SoundHub::quit`] for it and waits at most [`QUIT_WAIT_MAX`] (see [`quit_wait`]) before the
+//! app exits.
+//!
 //! Being kicked or banned (#205) has its own sounds: the session code calls
 //! [`SoundHub::removed`] when the server removes the own session, before voice is torn down.
 //! A plain disconnect or a server shutdown removes nobody and stays silent.
@@ -53,6 +57,8 @@ pub enum Sound {
     VoiceJoin,
     /// You disconnect from a server yourself.
     HangUp,
+    /// You quit Mumcord while in a voice channel (#325).
+    Quit,
     /// Someone starts a watch party in your channel (FR-2.77).
     PartyStarted,
     PartyJoined,
@@ -67,6 +73,22 @@ pub enum Sound {
     Kicked,
     /// The server bans you (#205).
     Banned,
+}
+
+/// Longest the quit waits for its sound (#325), so quitting never feels stuck.
+pub const QUIT_WAIT_MAX: Duration = Duration::from_millis(1500);
+
+/// Extra time after the quit sound's last sample, so the device plays out its buffer.
+const QUIT_WAIT_MARGIN: Duration = Duration::from_millis(150);
+
+/// How long the quit waits for a quit sound of `samples` 48 kHz samples: the sound plus a short
+/// margin for the device buffer, never more than [`QUIT_WAIT_MAX`]. No sound, no wait.
+pub fn quit_wait(samples: usize) -> Duration {
+    if samples == 0 {
+        return Duration::ZERO;
+    }
+    let sound = Duration::from_secs_f64(samples as f64 / 48_000.0);
+    (sound + QUIT_WAIT_MARGIN).min(QUIT_WAIT_MAX)
 }
 
 /// At most one joining or leaving activity sound per this span (FR-2.77).
@@ -98,6 +120,7 @@ impl Sound {
             Self::PartyLeft | Self::ViewerStopped => {
                 include_bytes!("../../../assets/sounds/user_left.wav")
             }
+            Self::Quit => include_bytes!("../../../assets/sounds/quit.wav"),
             Self::Kicked => include_bytes!("../../../assets/sounds/kicked.wav"),
             Self::Banned => include_bytes!("../../../assets/sounds/banned.wav"),
         }
@@ -114,6 +137,7 @@ impl Sound {
             Self::Mention => s.mention,
             Self::VoiceJoin => s.voice_join,
             Self::HangUp => s.hang_up,
+            Self::Quit => s.quit,
             Self::PartyStarted => s.party_started,
             Self::PartyJoined => s.party_joined,
             Self::PartyLeft => s.party_left,
@@ -573,6 +597,20 @@ impl SoundHub {
             .then(|| Sound::HangUp.mixed())
     }
 
+    /// The user quits Mumcord (#325). Returns the quit samples (gain applied) if `in_voice` (a
+    /// server carries voice, not just read-only), audio is open, the user is not deafened and
+    /// the toggle allows it. Muting does not matter: it only concerns the microphone. Like
+    /// [`hang_up`](Self::hang_up), the caller plays them on a path that outlives the voice
+    /// pipeline.
+    pub fn quit(&self, in_voice: bool) -> Option<Vec<f32>> {
+        let state = self.state();
+        (in_voice
+            && state.out.is_some()
+            && !state.tracker.own_deaf()
+            && Sound::Quit.enabled(&(self.settings)()))
+        .then(|| Sound::Quit.mixed())
+    }
+
     /// The server removed the own session (#205). Returns the kick or ban samples (gain
     /// applied) if voice is on, the user is not deafened and the toggle allows it. Like
     /// [`hang_up`](Self::hang_up), the caller plays them on a path that outlives the voice
@@ -627,7 +665,7 @@ mod tests {
     use mumcord_audio::mixer::{Playback, PlaybackConfig, PlaybackSink};
     use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-    const ALL: [Sound; 19] = [
+    const ALL: [Sound; 20] = [
         Sound::UserJoined,
         Sound::UserLeft,
         Sound::Mute,
@@ -638,6 +676,7 @@ mod tests {
         Sound::Mention,
         Sound::VoiceJoin,
         Sound::HangUp,
+        Sound::Quit,
         Sound::PartyStarted,
         Sound::PartyJoined,
         Sound::PartyLeft,
@@ -780,6 +819,7 @@ mod tests {
             mention_notify: false,
             voice_join: false,
             hang_up: false,
+            quit: false,
             party_started: false,
             party_joined: false,
             party_left: false,
@@ -896,10 +936,10 @@ mod tests {
             assert_eq!(u16::from_le_bytes([wav[34], wav[35]]), 16);
             let samples = s.samples();
             assert!(samples.len() > 48_00, "{s:?} too short");
-            // The kick and ban sounds are 1 s long; the connect sound (also used for the party and share starts)
+            // The kick, ban and quit sounds are at most 1 s long; the connect sound (also used for the party and share starts)
             // is a 1.2 s chime and the new-message sound a 1 s one, the mention 0.7 s, the people joining and leaving 0.8 s and the hang up (also the share stop) 0.9 s; every other cue stays short.
             let max_ms = match s {
-                Sound::Banned | Sound::Kicked => 1000,
+                Sound::Banned | Sound::Kicked | Sound::Quit => 1000,
                 Sound::VoiceJoin | Sound::PartyStarted | Sound::ShareStarted => 1200,
                 Sound::Message => 1000,
                 Sound::Mention => 700,
@@ -1106,6 +1146,52 @@ mod tests {
 
         hub.detach();
         assert!(hub.hang_up().is_none(), "no voice, nothing to hang up");
+    }
+
+    #[test]
+    fn quit_sound_is_distinct() {
+        let len = |s: Sound| s.samples().len();
+        for s in [Sound::HangUp, Sound::UserLeft, Sound::Kicked, Sound::Banned] {
+            assert_ne!(len(s), len(Sound::Quit), "{s:?}");
+        }
+    }
+
+    /// Muting does not silence the quit sound (it only concerns the microphone); deafening
+    /// does, like the other sounds that are not the user's own deafen action.
+    #[test]
+    fn quit_needs_voice_toggle_and_hearing() {
+        let (hub, _log) = hub_with_log(SoundSettings::default());
+        hub.observe(&synced(vec![user(1, 10, true, false)]));
+        let samples = hub.quit(true).expect("in voice, toggle on, muted");
+        assert_eq!(samples.len(), Sound::Quit.samples().len());
+        assert!(hub.quit(false).is_none(), "read-only, not in voice");
+
+        let (off, _log) = hub_with_log(SoundSettings {
+            quit: false,
+            ..SoundSettings::default()
+        });
+        off.observe(&synced(vec![user(1, 10, false, false)]));
+        assert!(off.quit(true).is_none(), "toggle off");
+
+        hub.observe(&synced(vec![user(1, 10, true, true)]));
+        assert!(hub.quit(true).is_none(), "deafened");
+
+        hub.observe(&synced(vec![user(1, 10, false, false)]));
+        hub.detach();
+        assert!(hub.quit(true).is_none(), "no audio open");
+    }
+
+    #[test]
+    fn quit_waits_for_the_sound_but_never_long() {
+        assert_eq!(quit_wait(0), Duration::ZERO, "no sound, no wait");
+        let quit = Sound::Quit.samples().len();
+        let wait = quit_wait(quit);
+        assert!(
+            wait > Duration::from_secs_f64(quit as f64 / 48_000.0),
+            "{wait:?}"
+        );
+        assert!(wait <= QUIT_WAIT_MAX);
+        assert_eq!(quit_wait(48_000 * 10), QUIT_WAIT_MAX, "capped");
     }
 
     #[test]

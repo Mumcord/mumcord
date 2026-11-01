@@ -184,6 +184,8 @@ pub struct SoundSettings {
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
     pub hang_up: bool,
+    /// You quit Mumcord while in a voice channel (#325).
+    pub quit: bool,
     /// Someone starts a watch party in your channel (FR-2.77).
     pub party_started: bool,
     /// Someone joins the watch party (FR-2.77).
@@ -216,6 +218,7 @@ impl Default for SoundSettings {
             mention_notify: true,
             voice_join: true,
             hang_up: true,
+            quit: true,
             party_started: true,
             party_joined: true,
             party_left: true,
@@ -1409,7 +1412,7 @@ mod tests {
         assert!(!parsed.sounds.user_joined);
         assert!(parsed.sounds.user_left);
         assert!(
-            parsed.sounds.voice_join && parsed.sounds.hang_up,
+            parsed.sounds.voice_join && parsed.sounds.hang_up && parsed.sounds.quit,
             "new sounds are on for settings saved before they existed"
         );
         assert!(
