@@ -855,9 +855,16 @@
 
 .identity-card__title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
   margin: 0;
+}
+
+/* Long names break instead of being cut off at large text sizes (200 %). */
+.identity-card__title strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .identity-card__badge {
