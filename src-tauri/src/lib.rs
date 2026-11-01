@@ -449,6 +449,10 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .register_asynchronous_uri_scheme_protocol(
+            mumcord_plugins::api::webview::SCHEME,
+            plugins::webview::handle,
+        )
         .invoke_handler(move |call| {
             let label = call.message.webview_ref().label().to_owned();
             if !aux_window::command_allowed(&label, call.message.command()) {

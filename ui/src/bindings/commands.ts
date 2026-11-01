@@ -2626,10 +2626,21 @@ export type PluginUiChange =
 /**  Closes the dialog without telling the plugin. */
 { type: "closeDialog" } | 
 /**  The plugin's entry in the user context menu; `None` removes it. */
-{ type: "userMenuEntry"; label: string | null };
+{ type: "userMenuEntry"; label: string | null } | 
+/**
+ *  The plugin's sealed web view opens (or switches page) at `url`, a `mumcord-web` URL the
+ *  app serves from the plugin's `web/` folder (FR-6.46).
+ */
+{ type: "webviewShow"; place: PluginWebviewPlace; url: string } | 
+/**  The web view closes; its place shows the plugin's tree again. */
+{ type: "webviewHide" } | 
+/**  A bridge message for the page (untrusted text). Not part of the snapshot. */
+{ type: "webviewPost"; message: string };
 
 /**  A user input for a plugin's UI other than an action. */
-export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" };
+export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" } | 
+/**  A bridge message from the plugin's web view page (≤ 16 KiB, ≤ 60/s; dropped otherwise). */
+{ type: "webviewMessage"; text: string };
 
 /**  One update on offer in Settings → Plugins → Updates. */
 export type PluginUpdate = {
@@ -2659,6 +2670,9 @@ export type PluginUpdates = "auto" | "notify" | "off";
 
 /**  Who sees that the user has a plugin (FR-6.35). */
 export type PluginVisibilityChoice = "everyone" | "friends" | "nobody";
+
+/**  Where a plugin's web view is shown. */
+export type PluginWebviewPlace = "panelPopover" | "dialog";
 
 /**  `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`. */
 export type PluginsChanged = Record<string, never>;

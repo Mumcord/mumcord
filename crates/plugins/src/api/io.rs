@@ -8,6 +8,7 @@ use std::fmt::Debug;
 use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{Error, Peer};
 use crate::runtime::wit::ui::{Node, Slot};
+use crate::runtime::wit::webview::Place;
 
 /// Carries out what a plugin asks of the UI, other users and the chat. `plugin` is the id of
 /// the calling plugin; its permission for the call has already been checked.
@@ -39,4 +40,14 @@ pub trait PluginIo: Send + Sync + Debug {
     /// `chat.supersede`.
     fn supersede(&self, plugin: &str, card_id: String, sender: u32, hash: u32)
     -> Result<(), Error>;
+    /// `webview.show` (FR-6.46). Hosts without web views refuse it.
+    fn webview_show(&self, _plugin: &str, _place: Place, _entry: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `webview.hide`.
+    fn webview_hide(&self, _plugin: &str) {}
+    /// `webview.post`: a message to the plugin's page.
+    fn webview_post(&self, _plugin: &str, _message: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
 }

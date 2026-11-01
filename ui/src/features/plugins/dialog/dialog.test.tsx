@@ -20,6 +20,7 @@ function withDialog(title: string | null) {
     trees: new Map(),
     dialogs: title === null ? new Map() : new Map([["mumbot-music", title]]),
     menuEntries: new Map(),
+    webviews: new Map(),
   });
 }
 

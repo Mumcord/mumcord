@@ -76,7 +76,12 @@ describe("theme tokens", () => {
 });
 
 describe("plugin UI store", () => {
-  const empty: PluginUiState = { trees: new Map(), dialogs: new Map(), menuEntries: new Map() };
+  const empty: PluginUiState = {
+    trees: new Map(),
+    dialogs: new Map(),
+    menuEntries: new Map(),
+    webviews: new Map(),
+  };
 
   it("sets, clears and closes with the dialog", () => {
     const nodes = [stack([])];

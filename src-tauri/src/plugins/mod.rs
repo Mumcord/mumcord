@@ -7,6 +7,7 @@
 mod feed;
 pub mod suggestions;
 pub mod ui;
+pub mod webview;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -14,6 +15,7 @@ use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 use mumcord_engine::Engine;
 use mumcord_plugins::api::secrets::PluginSecrets;
+use mumcord_plugins::api::webview::Webviews;
 use mumcord_plugins::registry::{Client, Download, Index, UrlPolicy};
 use mumcord_plugins::service::{
     InstallStage, PluginService, Schedule, ServiceConfig, ServiceError, ServiceEvent, Status,
@@ -45,6 +47,9 @@ pub struct Plugins {
     prepared: Mutex<Option<PreparedInstall>>,
     /// Store icons and screenshots as data URLs, by source URL (the UI never fetches).
     images: Mutex<HashMap<String, String>>,
+    /// Open web views, shared with the service: the `mumcord-web` protocol reads it without
+    /// waiting for the service lock.
+    webviews: Arc<Webviews>,
 }
 
 /// A downloaded and verified package waiting for the user's answer in the install prompt.
@@ -127,6 +132,10 @@ impl Plugins {
             .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
     }
 
+    pub fn webviews(&self) -> &Webviews {
+        &self.webviews
+    }
+
     pub fn trees(&self) -> MutexGuard<'_, Trees> {
         lock(&self.trees)
     }
@@ -207,6 +216,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
         PluginService::new(config, engine.store_handle(), secrets)?;
     test_hooks(&mut service);
     tracing::info!(no_plugins, "plugin service ready");
+    let webviews = service.webviews();
     let plugins = Arc::new(Plugins {
         service: Arc::new(Mutex::new(service)),
         trees: Mutex::default(),
@@ -214,6 +224,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
         registry_cache: cache_dir.join("plugin-registry"),
         prepared: Mutex::default(),
         images: Mutex::default(),
+        webviews,
     });
     app.manage(Arc::clone(&plugins));
 
@@ -334,6 +345,9 @@ async fn on_service_event(
                 })
                 .await?;
             plugins.trees().retain(|id| running.iter().any(|r| r == id));
+            plugins
+                .webviews()
+                .close_unless(|id| running.iter().any(|r| r == id));
             PluginsChanged {}.emit(app)?;
         }
         ServiceEvent::InstallProgress { id, stage } => PluginInstallProgress {
@@ -342,7 +356,7 @@ async fn on_service_event(
         }
         .emit(app)?,
         ServiceEvent::Ui { plugin, update } => {
-            let change = ui::PluginUiChange::from(update);
+            let change = ui::PluginUiChange::new(&plugin, update);
             plugins.trees().apply(&plugin, &change);
             PluginUi { plugin, change }.emit(app)?;
         }

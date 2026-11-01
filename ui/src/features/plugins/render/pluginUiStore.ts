@@ -11,6 +11,7 @@ import {
   type PluginNode,
   type PluginSlot,
   type PluginUi,
+  type PluginWebviewPlace,
   type Unsubscribe,
 } from "../../../api";
 
@@ -21,9 +22,24 @@ export interface PluginUiState {
   readonly dialogs: ReadonlyMap<string, string>;
   /** plugin id → its entry in the user context menu. */
   readonly menuEntries: ReadonlyMap<string, string>;
+  /** plugin id → its open web view (FR-6.46). */
+  readonly webviews: ReadonlyMap<string, PluginWebview>;
 }
 
-const EMPTY: PluginUiState = { trees: new Map(), dialogs: new Map(), menuEntries: new Map() };
+/** An open web view; `seq` changes on every `webviewShow`, so showing a page again reloads it. */
+export interface PluginWebview {
+  readonly place: PluginWebviewPlace;
+  readonly url: string;
+  readonly seq: number;
+}
+
+const EMPTY: PluginUiState = {
+  trees: new Map(),
+  dialogs: new Map(),
+  menuEntries: new Map(),
+  webviews: new Map(),
+};
+let webviewSeq = 0;
 
 /** A stable string for a slot, e.g. `chatCard:poll-1`. */
 export function slotKey(slot: PluginSlot): string {
@@ -62,7 +78,9 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       dialogs.delete(plugin);
       slots.delete(slotKey({ kind: "dialog" }));
       trees.set(plugin, slots);
-      return { ...state, trees, dialogs };
+      const webviews = new Map(state.webviews);
+      if (webviews.get(plugin)?.place === "dialog") webviews.delete(plugin);
+      return { ...state, trees, dialogs, webviews };
     }
     case "userMenuEntry": {
       const menuEntries = new Map(state.menuEntries);
@@ -70,6 +88,19 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       else menuEntries.set(plugin, change.label);
       return { ...state, menuEntries };
     }
+    case "webviewShow": {
+      const webviews = new Map(state.webviews);
+      webviews.set(plugin, { place: change.place, url: change.url, seq: ++webviewSeq });
+      return { ...state, webviews };
+    }
+    case "webviewHide": {
+      const webviews = new Map(state.webviews);
+      webviews.delete(plugin);
+      return { ...state, webviews };
+    }
+    // Bridge messages go straight to the open frame (see `webview/`), they are not state.
+    case "webviewPost":
+      return state;
   }
 }
 

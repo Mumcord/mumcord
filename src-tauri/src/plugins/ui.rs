@@ -6,6 +6,7 @@
 
 use std::collections::HashMap;
 
+use mumcord_plugins::api::webview::WebviewPlace;
 use mumcord_plugins::service::UiUpdate;
 use mumcord_plugins::wit::events::PanelVisibility as WitPanelVisibility;
 use mumcord_plugins::wit::ui as wit;
@@ -268,6 +269,33 @@ pub enum PluginUiChange {
     CloseDialog,
     /// The plugin's entry in the user context menu; `None` removes it.
     UserMenuEntry { label: Option<String> },
+    /// The plugin's sealed web view opens (or switches page) at `url`, a `mumcord-web` URL the
+    /// app serves from the plugin's `web/` folder (FR-6.46).
+    WebviewShow {
+        place: PluginWebviewPlace,
+        url: String,
+    },
+    /// The web view closes; its place shows the plugin's tree again.
+    WebviewHide,
+    /// A bridge message for the page (untrusted text). Not part of the snapshot.
+    WebviewPost { message: String },
+}
+
+/// Where a plugin's web view is shown.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginWebviewPlace {
+    PanelPopover,
+    Dialog,
+}
+
+impl From<WebviewPlace> for PluginWebviewPlace {
+    fn from(place: WebviewPlace) -> Self {
+        match place {
+            WebviewPlace::PanelPopover => Self::PanelPopover,
+            WebviewPlace::Dialog => Self::Dialog,
+        }
+    }
 }
 
 /// `plugin://ui`: a plugin changed its UI.
@@ -457,6 +485,19 @@ impl From<wit::Node> for PluginNode {
     }
 }
 
+impl PluginUiChange {
+    /// The change for `plugin`'s UI update (web view pages get their full URL).
+    pub fn new(plugin: &str, update: UiUpdate) -> Self {
+        match update {
+            UiUpdate::WebviewShow { place, entry } => Self::WebviewShow {
+                place: place.into(),
+                url: super::webview::url(plugin, &entry),
+            },
+            other => other.into(),
+        }
+    }
+}
+
 impl From<UiUpdate> for PluginUiChange {
     fn from(update: UiUpdate) -> Self {
         match update {
@@ -468,6 +509,12 @@ impl From<UiUpdate> for PluginUiChange {
             UiUpdate::OpenDialog { title } => Self::OpenDialog { title },
             UiUpdate::CloseDialog => Self::CloseDialog,
             UiUpdate::UserMenuEntry { label } => Self::UserMenuEntry { label },
+            UiUpdate::WebviewShow { place, entry } => Self::WebviewShow {
+                place: place.into(),
+                url: entry,
+            },
+            UiUpdate::WebviewHide => Self::WebviewHide,
+            UiUpdate::WebviewPost { message } => Self::WebviewPost { message },
         }
     }
 }
@@ -492,6 +539,7 @@ pub struct Trees {
     trees: HashMap<String, HashMap<PluginSlot, Vec<PluginNode>>>,
     dialogs: HashMap<String, String>,
     menu_entries: HashMap<String, String>,
+    webviews: HashMap<String, (PluginWebviewPlace, String)>,
 }
 
 impl Trees {
@@ -513,6 +561,13 @@ impl Trees {
             }
             PluginUiChange::CloseDialog => {
                 self.dialogs.remove(plugin);
+                if self
+                    .webviews
+                    .get(plugin)
+                    .is_some_and(|(place, _)| *place == PluginWebviewPlace::Dialog)
+                {
+                    self.webviews.remove(plugin);
+                }
                 if let Some(slots) = self.trees.get_mut(plugin) {
                     slots.remove(&PluginSlot::Dialog);
                 }
@@ -525,6 +580,14 @@ impl Trees {
                     self.menu_entries.remove(plugin);
                 }
             },
+            PluginUiChange::WebviewShow { place, url } => {
+                self.webviews
+                    .insert(plugin.to_owned(), (*place, url.clone()));
+            }
+            PluginUiChange::WebviewHide => {
+                self.webviews.remove(plugin);
+            }
+            PluginUiChange::WebviewPost { .. } => {}
         }
     }
 
@@ -533,6 +596,7 @@ impl Trees {
         self.trees.retain(|id, _| running(id));
         self.dialogs.retain(|id, _| running(id));
         self.menu_entries.retain(|id, _| running(id));
+        self.webviews.retain(|id, _| running(id));
     }
 
     /// Everything on screen, as the changes that rebuild it.
@@ -562,6 +626,16 @@ impl Trees {
                 plugin: plugin.clone(),
                 change: PluginUiChange::UserMenuEntry {
                     label: Some(label.clone()),
+                },
+            });
+        }
+        // After the dialogs, so a web view in a dialog finds it open.
+        for (plugin, (place, url)) in &self.webviews {
+            out.push(PluginUi {
+                plugin: plugin.clone(),
+                change: PluginUiChange::WebviewShow {
+                    place: *place,
+                    url: url.clone(),
                 },
             });
         }
@@ -768,6 +842,39 @@ mod tests {
                 .is_none()
         );
         trees.retain(|id| id != "poll");
+        assert!(trees.snapshot().is_empty());
+    }
+
+    #[test]
+    fn web_views_are_in_the_snapshot_and_close_with_their_dialog() {
+        let mut trees = Trees::default();
+        let show = |place| PluginUiChange::WebviewShow {
+            place,
+            url: "mumcord-web://localhost/snacks/index.html".into(),
+        };
+        trees.apply(
+            "snacks",
+            &PluginUiChange::OpenDialog {
+                title: "Snacks".into(),
+            },
+        );
+        trees.apply("snacks", &show(PluginWebviewPlace::Dialog));
+        trees.apply(
+            "snacks",
+            &PluginUiChange::WebviewPost {
+                message: "hi".into(),
+            },
+        );
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 2);
+        assert_eq!(snapshot[1].change, show(PluginWebviewPlace::Dialog));
+        trees.apply("snacks", &PluginUiChange::CloseDialog);
+        assert!(trees.snapshot().is_empty());
+        trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
+        trees.apply("snacks", &PluginUiChange::WebviewHide);
+        assert!(trees.snapshot().is_empty());
+        trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
+        trees.retain(|_| false);
         assert!(trees.snapshot().is_empty());
     }
 }

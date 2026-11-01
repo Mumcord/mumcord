@@ -352,10 +352,20 @@ pub enum PluginActionValue {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PluginUiInput {
-    ProfileCardOpened { session: SessionId },
-    PanelVisibility { visibility: PluginPanelVisibility },
-    UserMenuRequested { session: SessionId },
+    ProfileCardOpened {
+        session: SessionId,
+    },
+    PanelVisibility {
+        visibility: PluginPanelVisibility,
+    },
+    UserMenuRequested {
+        session: SessionId,
+    },
     DialogClosed,
+    /// A bridge message from the plugin's web view page (≤ 16 KiB, ≤ 60/s; dropped otherwise).
+    WebviewMessage {
+        text: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -1081,6 +1091,7 @@ pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -
         }
         PluginUiInput::UserMenuRequested { session } => UiInput::UserMenuRequested(session),
         PluginUiInput::DialogClosed => UiInput::DialogClosed,
+        PluginUiInput::WebviewMessage { text } => UiInput::WebviewMessage(text),
     };
     let delivered = plugins_of(&app)?
         .call(move |service| Ok(service.ui_input(&id, input)))

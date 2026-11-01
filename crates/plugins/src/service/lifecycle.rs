@@ -1,15 +1,17 @@
 //! Start-up, enable/disable, permissions, visibility, remove, reset, export and "Turn off all
 //! plugins" (FR-6.6, FR-6.30, FR-6.62, spec §7.2).
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use mumcord_store::{PluginRecord, PluginVisibility};
 use semver::Version;
 
 use super::{Origin, PluginService, ServiceError, allowed_grants, now_millis, settings_event};
+use crate::api::io::PluginIo;
+use crate::api::webview;
 use crate::grants::revokes_required;
 use crate::host::HostError;
-use crate::manifest::is_valid_id;
+use crate::manifest::{Source, is_valid_id};
 
 impl PluginService {
     /// Loads the installed plugins and starts the ones that are on. Also purges data kept for
@@ -103,6 +105,8 @@ impl PluginService {
             }
         })?;
         self.ctx.grants.set(id, &record.granted);
+        let dir = self.version_dir(id, &record.version);
+        self.set_webview_root(id, source, &dir, &record.granted);
         if missing {
             self.stop(id);
         } else {
@@ -242,6 +246,7 @@ impl PluginService {
             origin.source(),
             record.granted.iter().map(String::as_str),
         );
+        self.set_webview_root(&record.id, origin.source(), &dir, &granted);
         self.ctx.grants.set(&record.id, granted);
         self.ctx
             .notify
@@ -291,6 +296,20 @@ impl PluginService {
         self.host
             .manifest(id)
             .ok_or_else(|| ServiceError::NotInstalled(id.to_owned()))
+    }
+
+    /// Lets an official plugin with `ui.webview` serve its `web/` folder (FR-6.48); without the
+    /// grant any open web view closes.
+    fn set_webview_root(&self, id: &str, source: Source, dir: &Path, granted: &[String]) {
+        let allowed =
+            source == Source::Official && granted.iter().any(|g| g == webview::PERMISSION);
+        if !allowed {
+            self.io.webview_hide(id);
+        }
+        let web = dir.join("web");
+        self.io
+            .webviews()
+            .set_root(id, (allowed && web.is_dir()).then_some(web));
     }
 
     pub(super) fn version_dir(&self, id: &str, version: &str) -> PathBuf {

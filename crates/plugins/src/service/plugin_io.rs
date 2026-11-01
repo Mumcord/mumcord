@@ -6,7 +6,7 @@
 //! [`Messenger`] each), which the service feeds from engine events (see `messaging.rs`).
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
-use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 use std::time::Instant;
 
 use mumcord_store::ServerId;
@@ -14,6 +14,7 @@ use tokio::sync::mpsc::UnboundedSender;
 
 use super::ServiceEvent;
 use crate::api::io::PluginIo;
+use crate::api::webview::{WebviewPlace, Webviews};
 use crate::chat::{self, GestureGate, Supersede, SupersedeTracker};
 use crate::manifest::Visibility;
 use crate::messaging::{
@@ -24,6 +25,7 @@ use crate::peer_key::PeerKeys;
 use crate::wit::peers;
 use crate::wit::types::{Error, Peer};
 use crate::wit::ui::{Node, Slot};
+use crate::wit::webview::Place;
 
 /// The plugin API major this host speaks; written into every envelope and announce entry.
 pub(super) const API_MAJOR: u8 = 1;
@@ -54,11 +56,31 @@ pub struct SelfInfo {
 /// A UI change a plugin asked for, for the app's `plugin://ui` pushes. Trees are untrusted.
 #[derive(Debug, Clone)]
 pub enum UiUpdate {
-    SetTree { slot: Slot, nodes: Vec<Node> },
-    Clear { slot: Slot },
-    OpenDialog { title: String },
+    SetTree {
+        slot: Slot,
+        nodes: Vec<Node>,
+    },
+    Clear {
+        slot: Slot,
+    },
+    OpenDialog {
+        title: String,
+    },
     CloseDialog,
-    UserMenuEntry { label: Option<String> },
+    UserMenuEntry {
+        label: Option<String>,
+    },
+    /// The plugin's web view opens (or switches) to `entry` below `web/`, query included.
+    WebviewShow {
+        place: WebviewPlace,
+        entry: String,
+    },
+    /// The web view closes; the place falls back to its tree.
+    WebviewHide,
+    /// A bridge message to the page (untrusted plugin text, never logged).
+    WebviewPost {
+        message: String,
+    },
 }
 
 /// How a switched-on plugin takes part in messaging and chat.
@@ -128,6 +150,7 @@ pub(super) struct ServiceIo {
     chat: Mutex<ChatState>,
     keys: Option<PeerKeys>,
     events: UnboundedSender<ServiceEvent>,
+    webviews: Arc<Webviews>,
 }
 
 impl ServiceIo {
@@ -137,6 +160,7 @@ impl ServiceIo {
             chat: Mutex::default(),
             keys,
             events,
+            webviews: Arc::default(),
         }
     }
 
@@ -170,8 +194,13 @@ impl ServiceIo {
             .text(message, sender, line, Instant::now())
     }
 
+    pub fn webviews(&self) -> &Arc<Webviews> {
+        &self.webviews
+    }
+
     pub fn forget(&self, plugin: &str) {
         self.chat().gate.forget(plugin);
+        self.webviews.forget(plugin);
     }
 
     fn emit(&self, event: ServiceEvent) {
@@ -206,11 +235,15 @@ impl PluginIo for ServiceIo {
     }
 
     fn open_dialog(&self, plugin: &str, title: String) -> Result<(), Error> {
+        self.webviews.dialog_opened(plugin);
         self.ui(plugin, UiUpdate::OpenDialog { title });
         Ok(())
     }
 
     fn close_dialog(&self, plugin: &str) {
+        if self.webviews.dialog_closed(plugin) {
+            self.ui(plugin, UiUpdate::WebviewHide);
+        }
         self.ui(plugin, UiUpdate::CloseDialog);
     }
 
@@ -358,6 +391,32 @@ impl PluginIo for ServiceIo {
         }
         Ok(())
     }
+
+    fn webview_show(&self, plugin: &str, place: Place, entry: String) -> Result<(), Error> {
+        let shown = self
+            .webviews
+            .show(plugin, place.into(), &entry, Instant::now())?;
+        self.ui(
+            plugin,
+            UiUpdate::WebviewShow {
+                place: shown.place,
+                entry: shown.entry,
+            },
+        );
+        Ok(())
+    }
+
+    fn webview_hide(&self, plugin: &str) {
+        if self.webviews.hide(plugin) {
+            self.ui(plugin, UiUpdate::WebviewHide);
+        }
+    }
+
+    fn webview_post(&self, plugin: &str, message: String) -> Result<(), Error> {
+        self.webviews.post(plugin, &message, Instant::now())?;
+        self.ui(plugin, UiUpdate::WebviewPost { message });
+        Ok(())
+    }
 }
 
 /// A user as plugin `plugin` sees them: with that plugin's own key, never the certificate hash.
@@ -409,6 +468,40 @@ mod tests {
         assert!(poll.key.is_some());
         assert_ne!(poll.key, dice.key);
         assert_eq!(wit_peer(None, "poll", &peer).key, None);
+    }
+
+    #[test]
+    fn web_views_follow_the_dialog_and_carry_posts() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        io.webviews()
+            .set_root("snacks", Some(dir.path().to_path_buf()));
+        let mut next = || match rx.try_recv() {
+            Ok(ServiceEvent::Ui { update, .. }) => Some(update),
+            _ => None,
+        };
+        assert_eq!(
+            io.webview_show("snacks", Place::Dialog, "index.html".into()),
+            Err(Error::Invalid)
+        );
+        io.open_dialog("snacks", "Snacks".into())
+            .expect("dialog opens");
+        assert!(matches!(next(), Some(UiUpdate::OpenDialog { .. })));
+        io.webview_show("snacks", Place::Dialog, "index.html?x=1".into())
+            .expect("web view shows");
+        assert!(matches!(
+            next(),
+            Some(UiUpdate::WebviewShow { place: WebviewPlace::Dialog, entry }) if entry == "index.html?x=1"
+        ));
+        io.webview_post("snacks", "hi".into())
+            .expect("web view shows");
+        assert!(matches!(next(), Some(UiUpdate::WebviewPost { message }) if message == "hi"));
+        io.close_dialog("snacks");
+        assert!(matches!(next(), Some(UiUpdate::WebviewHide)));
+        assert!(matches!(next(), Some(UiUpdate::CloseDialog)));
+        assert_eq!(io.webview_post("snacks", "hi".into()), Err(Error::Invalid));
     }
 
     #[test]
