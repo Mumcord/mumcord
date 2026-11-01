@@ -640,3 +640,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - C13 ✅ AC-6.27, AC-6.28 (developer_folders_follow_developer_mode, developer/plugins vitest; real CLI new/build×2 identical/check/serve; registry-install.e2e; fix daf15187)
 - C3 ⚠️ AC-6.4 alone ✅, AC-6.7 ✅ (bc0fc956, a850063f dice.e2e.ts); AC-6.4 verified ❌ → F47 (test skipped), rerun after F47
 - C12 ✅ AC-6.26 (bf4d6801 server-suggestions.e2e.ts with real mumbot 0.4.1; live_plugins blocked test)
+- Decision 2026-11-01 (user): FR-6.59 "highlighted" = Echolings listed first in Browse; no separate highlight card (mockup conformance V-C 1881b87a)
