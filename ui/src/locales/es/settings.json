@@ -411,6 +411,11 @@
   "sounds": {
     "title": "Sonidos",
     "explanation": "Sonidos breves que se reproducen en estos eventos.",
+    "theme": "Tema de sonidos",
+    "themeClassic": "Clásico",
+    "themeRich": "Rico",
+    "preview": "Escuchar",
+    "previewHint": "Rico tiene sonidos más completos; Clásico, tonos cortos y sencillos. La prueba se oye mientras estás en un canal de voz.",
     "joinLeave": "Alguien entra o sale de tu canal",
     "voiceJoin": "Entras en un canal de voz",
     "selfMute": "Te silencias o activas el micrófono",

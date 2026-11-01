@@ -414,6 +414,11 @@
   "sounds": {
     "title": "Zvoki",
     "explanation": "Kratki zvoki, ki se predvajajo ob teh dogodkih.",
+    "theme": "Zvočna tema",
+    "themeClassic": "Klasična",
+    "themeRich": "Bogata",
+    "preview": "Poslušaj",
+    "previewHint": "Bogata ima polnejše zvoke, Klasična kratke, preproste tone. Predogled je slišen, ko si v glasovnem kanalu.",
     "joinLeave": "Nekdo se pridruži tvojemu kanalu ali ga zapusti",
     "voiceJoin": "Pridružiš se kanalu za glas",
     "selfMute": "Utišaš ali vklopiš svoj mikrofon",

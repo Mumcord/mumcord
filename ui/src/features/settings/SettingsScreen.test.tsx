@@ -311,6 +311,22 @@ describe("SettingsScreen", () => {
     });
   });
 
+  it("switches the sound theme and previews the shown one", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    const preview = vi.spyOn(api, "audioPreviewSoundTheme");
+    await openSection("Voice & Audio");
+    const theme = screen.getByRole("radiogroup", { name: "Sound theme" });
+    expect(within(theme).getByRole("radio", { name: "Rich" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+    expect(preview).toHaveBeenLastCalledWith("rich");
+    fireEvent.click(within(theme).getByRole("radio", { name: "Classic" }));
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledWith(expect.objectContaining({ soundTheme: "classic" }));
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+    expect(preview).toHaveBeenLastCalledWith("classic");
+  });
+
   it("has separate mention sound and notification switches, both on by default", async () => {
     const update = vi.spyOn(api, "settingsUpdate");
     await openSection("Voice & Audio");

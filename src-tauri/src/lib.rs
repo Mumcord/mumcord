@@ -184,6 +184,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channel_audio::active_audio_profile,
             audio::mic_test_start,
             audio::audio_test_sound,
+            audio::audio_preview_sound_theme,
             audio::mic_test_stop,
             commands::whisper::whisper_setup,
             commands::whisper::whisper_targets_save,

@@ -411,6 +411,11 @@
   "sounds": {
     "title": "Sons",
     "explanation": "Sons curtos que tocam nestes eventos.",
+    "theme": "Tema de sons",
+    "themeClassic": "Clássico",
+    "themeRich": "Rico",
+    "preview": "Ouvir",
+    "previewHint": "Rico tem sons mais cheios; Clássico, tons curtos e simples. A pré-escuta ouve-se enquanto estás num canal de voz.",
     "joinLeave": "Alguém entra ou sai do teu canal",
     "voiceJoin": "Entras num canal para voz",
     "selfMute": "Silencias ou reativas o teu microfone",

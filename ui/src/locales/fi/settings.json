@@ -408,6 +408,11 @@
   "sounds": {
     "title": "Äänet",
     "explanation": "Lyhyet äänet, jotka soivat näissä tapahtumissa.",
+    "theme": "Ääniteema",
+    "themeClassic": "Klassinen",
+    "themeRich": "Täyteläinen",
+    "preview": "Kuuntele",
+    "previewHint": "Täyteläisessä on runsaammat äänet, Klassisessa lyhyet, yksinkertaiset äänet. Esikuuntelu kuuluu, kun olet puhekanavalla.",
     "joinLeave": "Joku liittyy kanavallesi tai poistuu siltä",
     "voiceJoin": "Liityt kanavalle puhetta varten",
     "selfMute": "Mykistät itsesi tai poistat mykistyksen",

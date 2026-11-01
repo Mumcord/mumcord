@@ -178,6 +178,7 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   top("voiceAudio", "voice.connectMuted", ["connectMuted"]),
   top("voiceAudio", "audio.ducking", ["videoDucking"]),
   top("voiceAudio", "audio.duckingLevel", ["videoDuckingPercent"]),
+  top("voiceAudio", "sounds.theme", ["soundTheme"]),
   ...SOUND_KEYS.map(sound),
   top("chatNotifications", "notifications.legend", ["notifications"]),
   {

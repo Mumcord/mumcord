@@ -414,6 +414,11 @@
   "sounds": {
     "title": "Garsai",
     "explanation": "Trumpi garsai, grojami šiems įvykiams.",
+    "theme": "Garsų tema",
+    "themeClassic": "Klasikinė",
+    "themeRich": "Sodri",
+    "preview": "Paklausyti",
+    "previewHint": "Sodri tema turi pilnesnius garsus, Klasikinė – trumpus, paprastus tonus. Peržiūra girdima, kol esi balso kanale.",
     "joinLeave": "Kažkas prisijungia prie tavo kanalo arba jį palieka",
     "voiceJoin": "Tu įeini į kanalą balsui",
     "selfMute": "Tu nutildai arba vėl įjungi savo mikrofoną",

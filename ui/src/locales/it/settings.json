@@ -411,6 +411,11 @@
   "sounds": {
     "title": "Suoni",
     "explanation": "Brevi suoni riprodotti per questi eventi.",
+    "theme": "Tema sonoro",
+    "themeClassic": "Classico",
+    "themeRich": "Ricco",
+    "preview": "Ascolta",
+    "previewHint": "Ricco ha suoni più pieni, Classico toni brevi e semplici. L'anteprima si sente mentre sei in un canale vocale.",
     "joinLeave": "Qualcuno entra o esce dal tuo canale",
     "voiceJoin": "Entri in un canale vocale",
     "selfMute": "Attivi o disattivi il tuo microfono",

@@ -166,10 +166,24 @@ pub enum NotificationMode {
     Off,
 }
 
-/// Per-event sound toggles (FR-1.27).
+/// Which set of notification sounds plays (#325). A sound missing from the chosen set plays from
+/// the other one.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SoundTheme {
+    /// The short synthesized tones Mumcord started with.
+    Classic,
+    /// Fuller sounds made with ElevenLabs.
+    #[default]
+    Rich,
+}
+
+/// Per-event sound toggles (FR-1.27) and the sound theme.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct SoundSettings {
+    /// Which set of sounds plays (#325).
+    pub theme: SoundTheme,
     pub user_joined: bool,
     pub user_left: bool,
     pub self_mute: bool,
@@ -209,6 +223,7 @@ pub struct SoundSettings {
 impl Default for SoundSettings {
     fn default() -> Self {
         Self {
+            theme: SoundTheme::default(),
             user_joined: true,
             user_left: true,
             self_mute: true,
@@ -1414,6 +1429,11 @@ mod tests {
         assert!(
             parsed.sounds.voice_join && parsed.sounds.hang_up && parsed.sounds.quit,
             "new sounds are on for settings saved before they existed"
+        );
+        assert_eq!(
+            parsed.sounds.theme,
+            SoundTheme::Rich,
+            "settings saved before themes existed get the rich sounds"
         );
         assert!(
             parsed.sounds.party_started && parsed.sounds.viewer_stopped,
