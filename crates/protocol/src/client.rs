@@ -3,7 +3,7 @@
 
 use std::collections::{BTreeMap, VecDeque};
 use std::net::SocketAddr;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 use std::time::{Duration, Instant};
 
@@ -19,7 +19,7 @@ use tokio_rustls::client::TlsStream;
 use crate::error::{CommandError, ConnectError, PermissionDenied, ProtocolError, RejectReason};
 use crate::framing::{self, Frame, MessageType};
 use crate::proto;
-use crate::ratelimit::{self, LeakyBucket, Limit};
+use crate::ratelimit::{self, LOW_PRIORITY_MAX_WAIT, LeakyBucket, Limit};
 use crate::state::{Channel, CryptSetup, ServerInfo, ServerState, User, UserChange};
 use crate::tap::{PacketTap, TapDirection, TapPacing, TappedFrame};
 use crate::tls::{self, CertVerifier, ClientIdentity, ServerCert};
@@ -100,6 +100,29 @@ pub struct PluginData {
     pub data: Bytes,
 }
 
+/// What became of plugin data sent with [`Handle::send_plugin_data_low`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LowOutcome {
+    /// Written to the server.
+    Sent,
+    /// Dropped after waiting 10 s behind higher-priority plugin data.
+    Expired,
+    /// The connection ended before it was sent.
+    Disconnected,
+}
+
+/// Tells the sender of low-priority plugin data whether it went out. Dropping it is fine.
+#[derive(Debug)]
+pub struct PluginTicket(oneshot::Receiver<LowOutcome>);
+
+impl PluginTicket {
+    /// Waits until the data is sent or dropped.
+    pub async fn outcome(self) -> LowOutcome {
+        // The writer drops the sender only when the connection ends.
+        self.0.await.unwrap_or(LowOutcome::Disconnected)
+    }
+}
+
 /// Why the connection ended.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DisconnectReason {
@@ -164,6 +187,9 @@ pub struct Connection {
 
 enum Outgoing {
     Frame(Frame),
+    /// Plugin data that goes only when no other plugin data is waiting; see
+    /// [`Handle::send_plugin_data_low`].
+    LowPluginData(Frame, oneshot::Sender<LowOutcome>),
     /// Answered once everything queued before it is written and the server has answered a ping
     /// sent after it.
     Flush(oneshot::Sender<()>),
@@ -185,6 +211,8 @@ struct Shared {
     connected: AtomicBool,
     ping: Mutex<PingReport>,
     tap: Option<Arc<dyn PacketTap>>,
+    /// Low-priority plugin data dropped because it waited too long.
+    low_expired: AtomicU64,
 }
 
 impl Shared {
@@ -399,6 +427,7 @@ async fn connect_inner(
         pong: watch::Sender::new(0),
         reason: Mutex::new(None),
         connected: AtomicBool::new(true),
+        low_expired: AtomicU64::new(0),
         ping: Mutex::default(),
         tap,
     });
@@ -534,6 +563,10 @@ async fn write_loop<W: AsyncWrite + Unpin>(
                     }
                     None => out.write(&frame, None).await,
                 },
+                Some(Outgoing::LowPluginData(frame, sent)) => {
+                    out.plugin_data.push_low(frame, sent, now);
+                    Ok(())
+                }
                 Some(Outgoing::Flush(done)) => {
                     out.flushes.push(out.flush_marker(done));
                     out.confirm_written().await
@@ -557,10 +590,23 @@ async fn write_loop<W: AsyncWrite + Unpin>(
                 Some((frame, _)) => out.write_paced(&frame, None).await,
                 None => Ok(()),
             },
-            () = sleep_until_some(plugin_data_ready_at) => match out.plugin_data.pop() {
-                Some((frame, pacing)) => out.write_paced(&frame, Some(pacing)).await,
-                None => Ok(()),
-            },
+            () = sleep_until_some(plugin_data_ready_at) => {
+                out.expire_low(tokio::time::Instant::now());
+                match out.plugin_data.pop() {
+                    Some((frame, pacing)) => out.write_paced(&frame, Some(pacing)).await,
+                    None => match out.plugin_data.pop_low() {
+                        Some((frame, pacing, sent)) => {
+                            let written = out.write(&frame, Some(pacing)).await;
+                            if written.is_ok() {
+                                // The sender may have stopped waiting.
+                                let _ = sent.send(LowOutcome::Sent);
+                            }
+                            written
+                        }
+                        None => Ok(()),
+                    },
+                }
+            }
             Ok(()) = pong.changed() => {
                 out.confirm_answered(*pong.borrow_and_update());
                 Ok(())
@@ -684,10 +730,32 @@ impl<W: AsyncWrite + Unpin> Writer<W> {
         }
     }
 
+    /// Drops low-priority plugin data that waited too long and counts it.
+    fn expire_low(&mut self, now: tokio::time::Instant) {
+        let expired = self.plugin_data.expire_low(now);
+        if expired > 0 {
+            self.shared
+                .low_expired
+                .fetch_add(expired, Ordering::Relaxed);
+            tracing::debug!(
+                expired,
+                "low-priority plugin data dropped after waiting too long"
+            );
+        }
+    }
+
     /// Reports what is still queued and will not be sent: message kinds and counts, no content.
     fn log_dropped(&self) {
         let mut dropped: BTreeMap<u16, usize> = BTreeMap::new();
-        for (frame, _) in self.messages.queue.iter().chain(&self.plugin_data.queue) {
+        let low = self.plugin_data.low.iter().map(|l| &l.frame);
+        for frame in self
+            .messages
+            .queue
+            .iter()
+            .chain(&self.plugin_data.queue)
+            .map(|(frame, _)| frame)
+            .chain(low)
+        {
             *dropped.entry(frame.kind).or_default() += 1;
         }
         for (kind, count) in dropped {
@@ -702,6 +770,8 @@ struct Paced {
     bucket: LeakyBucket,
     /// Frames with the time they were queued.
     queue: VecDeque<(Frame, tokio::time::Instant)>,
+    /// Best-effort frames that go only when `queue` is empty. Flushes do not wait for them.
+    low: VecDeque<LowFrame>,
     /// Frames taken and sent so far, for flushes to tell when their frames are out.
     pushed: u64,
     popped: u64,
@@ -712,6 +782,7 @@ impl Paced {
         Self {
             bucket: LeakyBucket::new(limit, now),
             queue: VecDeque::new(),
+            low: VecDeque::new(),
             pushed: 0,
             popped: 0,
         }
@@ -722,23 +793,74 @@ impl Paced {
         self.pushed += 1;
     }
 
-    /// When the next queued frame may go, or `None` with nothing queued.
+    fn push_low(
+        &mut self,
+        frame: Frame,
+        sent: oneshot::Sender<LowOutcome>,
+        now: tokio::time::Instant,
+    ) {
+        self.low.push_back(LowFrame {
+            frame,
+            queued: now,
+            sent,
+        });
+    }
+
+    /// When the next queued frame may go, or `None` with nothing queued. While only core frames
+    /// keep the bucket busy this still wakes per slot, which is also when low frames expire.
     fn ready_at(&self, now: tokio::time::Instant) -> Option<tokio::time::Instant> {
-        (!self.queue.is_empty()).then(|| now + self.bucket.wait_time(now))
+        (!self.queue.is_empty() || !self.low.is_empty()).then(|| now + self.bucket.wait_time(now))
     }
 
     /// The next frame to send; counted as sent, since a failed write ends the connection anyway.
     fn pop(&mut self) -> Option<(Frame, TapPacing)> {
         let (frame, queued) = self.queue.pop_front()?;
+        self.popped += 1;
+        Some((frame, self.take(queued)))
+    }
+
+    /// The next low-priority frame, for when [`Self::pop`] has none.
+    fn pop_low(&mut self) -> Option<(Frame, TapPacing, oneshot::Sender<LowOutcome>)> {
+        let LowFrame {
+            frame,
+            queued,
+            sent,
+        } = self.low.pop_front()?;
+        Some((frame, self.take(queued), sent))
+    }
+
+    fn take(&mut self, queued: tokio::time::Instant) -> TapPacing {
         let now = tokio::time::Instant::now();
         self.bucket.take(now);
-        self.popped += 1;
-        let pacing = TapPacing {
+        TapPacing {
             delay: now.saturating_duration_since(queued),
             tokens_left: self.bucket.tokens_left(now),
-        };
-        Some((frame, pacing))
+        }
     }
+
+    /// Drops low frames queued longer than [`LOW_PRIORITY_MAX_WAIT`]; returns how many.
+    fn expire_low(&mut self, now: tokio::time::Instant) -> u64 {
+        let mut expired = 0;
+        // Queued in order, so the oldest are at the front.
+        while self
+            .low
+            .front()
+            .is_some_and(|l| now.saturating_duration_since(l.queued) > LOW_PRIORITY_MAX_WAIT)
+        {
+            if let Some(l) = self.low.pop_front() {
+                // The sender may have stopped waiting.
+                let _ = l.sent.send(LowOutcome::Expired);
+                expired += 1;
+            }
+        }
+        expired
+    }
+}
+
+struct LowFrame {
+    frame: Frame,
+    queued: tokio::time::Instant,
+    sent: oneshot::Sender<LowOutcome>,
 }
 
 /// Waits for `rx` to be answered, or forever when there is nothing to wait for.
@@ -1184,13 +1306,40 @@ impl Handle {
         data: Vec<u8>,
     ) -> Result<(), CommandError> {
         self.require("plugin data", MumbleVersion::PLUGIN_DATA)?;
+        self.send(self.plugin_data_frame(receivers, data_id, data))
+    }
+
+    /// Like [`Self::send_plugin_data`], but for third-party plugin messages: it shares the same
+    /// server budget yet goes only when no [`Self::send_plugin_data`] frame is waiting, and is
+    /// dropped after waiting 10 s. The ticket reports which happened.
+    pub fn send_plugin_data_low(
+        &self,
+        receivers: &[u32],
+        data_id: &str,
+        data: Vec<u8>,
+    ) -> Result<PluginTicket, CommandError> {
+        self.require("plugin data", MumbleVersion::PLUGIN_DATA)?;
+        let (tx, rx) = oneshot::channel();
+        self.queue(Outgoing::LowPluginData(
+            self.plugin_data_frame(receivers, data_id, data),
+            tx,
+        ))?;
+        Ok(PluginTicket(rx))
+    }
+
+    /// Low-priority plugin data dropped on this connection because it waited too long.
+    pub fn plugin_data_expired(&self) -> u64 {
+        self.shared.low_expired.load(Ordering::Relaxed)
+    }
+
+    fn plugin_data_frame(&self, receivers: &[u32], data_id: &str, data: Vec<u8>) -> Frame {
         let m = proto::PluginDataTransmission {
             sender_session: self.shared.state().session,
             receiver_sessions: receivers.to_vec(),
             data: Some(data),
             data_id: Some(data_id.to_owned()),
         };
-        self.send(Frame::from_message(MessageType::PluginDataTransmission, &m))
+        Frame::from_message(MessageType::PluginDataTransmission, &m)
     }
 
     /// Asks for full avatars/comments/descriptions that were announced only by hash.
@@ -1376,6 +1525,7 @@ mod tests {
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
                 tap: None,
+                low_expired: AtomicU64::new(0),
             }),
         };
         let acl = proto::Acl {
@@ -1409,6 +1559,7 @@ mod tests {
                 connected: AtomicBool::new(true),
                 ping: Mutex::default(),
                 tap: None,
+                low_expired: AtomicU64::new(0),
             }),
         };
         assert!(matches!(
@@ -1448,6 +1599,7 @@ mod drain_tests {
             connected: AtomicBool::new(true),
             ping: Mutex::default(),
             tap: None,
+            low_expired: AtomicU64::new(0),
         })
     }
 
@@ -1459,8 +1611,8 @@ mod drain_tests {
         Frame::from_message(MessageType::TextMessage, &m)
     }
 
-    /// Plays the server: collects the text messages until the client closes, answering pings
-    /// only when `answer` is set.
+    /// Plays the server: collects the text messages and plugin data ids until the client closes,
+    /// answering pings only when `answer` is set.
     fn server(
         mut stream: DuplexStream,
         shared: Arc<Shared>,
@@ -1474,6 +1626,10 @@ mod drain_tests {
                     if frame.kind == MessageType::TextMessage as u16 {
                         let m = proto::TextMessage::decode(frame.payload).expect("text");
                         texts.push(m.message);
+                    } else if frame.kind == MessageType::PluginDataTransmission as u16 {
+                        let m = proto::PluginDataTransmission::decode(frame.payload)
+                            .expect("plugin data");
+                        texts.push(m.data_id.expect("data id"));
                     } else if frame.kind == MessageType::Ping as u16 && answer {
                         let m = proto::Ping::decode(frame.payload).expect("ping");
                         shared.pong.send_replace(m.timestamp.expect("timestamp"));
@@ -1615,6 +1771,98 @@ mod drain_tests {
             .filter(|kind| **kind == MessageType::TextMessage as u16)
             .count();
         assert_eq!(texts, 5);
+    }
+
+    fn start_plugin_data() -> (Handle, JoinHandle<Vec<String>>) {
+        let shared = shared();
+        shared.state().server.version = Some(MumbleVersion::new(1, 4, 0));
+        start_with(true, shared)
+    }
+
+    fn send_core(handle: &Handle, ids: std::ops::Range<u32>) {
+        for i in ids {
+            handle
+                .send_plugin_data(&[2], &format!("core {i}"), vec![0])
+                .expect("queued");
+        }
+    }
+
+    fn send_low(handle: &Handle, i: u32) -> PluginTicket {
+        handle
+            .send_plugin_data_low(&[2], &format!("low {i}"), vec![0])
+            .expect("queued")
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn core_plugin_data_overtakes_low_priority_data() {
+        let (handle, server) = start_plugin_data();
+        // The first 12 use up the burst, so everything after waits in the queues.
+        send_core(&handle, 0..12);
+        let tickets: Vec<_> = (0..3).map(|i| send_low(&handle, i)).collect();
+        send_core(&handle, 12..15);
+        for ticket in tickets {
+            assert_eq!(ticket.outcome().await, LowOutcome::Sent);
+        }
+        handle.disconnect();
+        let mut want: Vec<_> = (0..15).map(|i| format!("core {i}")).collect();
+        want.extend((0..3).map(|i| format!("low {i}")));
+        assert_eq!(server.await.expect("server"), want);
+        assert_eq!(handle.plugin_data_expired(), 0);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn low_priority_data_goes_at_once_when_nothing_else_waits() {
+        let (handle, server) = start_plugin_data();
+        let started = tokio::time::Instant::now();
+        assert_eq!(send_low(&handle, 0).outcome().await, LowOutcome::Sent);
+        assert_eq!(started.elapsed(), Duration::ZERO);
+        handle.disconnect();
+        assert_eq!(server.await.expect("server"), ["low 0"]);
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn low_priority_data_expires_after_ten_seconds_behind_core_data() {
+        let (handle, server) = start_plugin_data();
+        let started = tokio::time::Instant::now();
+        // 12 at once, then one per 300 ms: the queue stays busy for 12 s.
+        send_core(&handle, 0..52);
+        let ticket = send_low(&handle, 0);
+        assert_eq!(ticket.outcome().await, LowOutcome::Expired);
+        let waited = started.elapsed();
+        assert!(waited > LOW_PRIORITY_MAX_WAIT, "{waited:?}");
+        assert!(
+            waited <= LOW_PRIORITY_MAX_WAIT + Duration::from_millis(300),
+            "{waited:?}"
+        );
+        assert_eq!(handle.plugin_data_expired(), 1);
+        handle.close();
+        let sent = server.await.expect("server");
+        assert!(!sent.iter().any(|id| id.starts_with("low")), "{sent:?}");
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn queued_low_priority_data_is_reported_when_the_connection_ends() {
+        let (handle, server) = start_plugin_data();
+        send_core(&handle, 0..12);
+        let ticket = send_low(&handle, 0);
+        handle.close();
+        assert_eq!(ticket.outcome().await, LowOutcome::Disconnected);
+        let sent = server.await.expect("server");
+        assert!(!sent.iter().any(|id| id.starts_with("low")), "{sent:?}");
+        assert_eq!(handle.plugin_data_expired(), 0);
+    }
+
+    #[test]
+    fn low_priority_plugin_data_needs_server_support() {
+        let (tx, _rx) = mpsc::unbounded_channel();
+        let handle = Handle {
+            tx,
+            shared: shared(),
+        };
+        assert!(matches!(
+            handle.send_plugin_data_low(&[3], "id", vec![1]),
+            Err(CommandError::Unsupported { .. })
+        ));
     }
 
     #[tokio::test(start_paused = true)]
