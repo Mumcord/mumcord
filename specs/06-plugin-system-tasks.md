@@ -29,8 +29,8 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
 | B22 | Permission list component and texts | done | b22-permlist |
 | B25a | SDK crate `mumcord-plugin-sdk` | done | b25a-sdk |
-| B25b | CLI `mumcord-plugin` (author + registry commands) | in progress | b25b-cli |
-| B25c | CLI `test` and `preview` | open | |
+| B25b | CLI `mumcord-plugin` (author + registry commands) | done | b25b-cli |
+| B25c | CLI `test` and `preview` | in progress | b25c-test |
 | B16b | Fixture registry setup for E2E | open | |
 | B9 | Local mumbot instance (music + plugins) | done | b9-mumbot |
 | B26 | UI tree renderer | open | |
@@ -47,7 +47,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B33b | Repositories tab | open | |
 | B33c | Developer tab | open | |
 | B37 | ⚠ OUTWARD: registry CI and publish workflows | open | |
-| B38 | Template and author docs | open | |
+| B38 | Template and author docs | in progress | b38-template |
 | B39 | Poll plugin | done (Mumcord/plugins PR #2, not merged) | b39-poll |
 | B40 | Dice roller plugin | in progress | b40-dice |
 | B41a | Echolings: pet core | done (Mumcord/plugins PR #3, not merged) | b41a-pets |
@@ -445,3 +445,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B41a (Mumcord/plugins PR #3, 238abf0 art + 290a036 core):** `echolings/`, with 33 host tests and a 236 KB wasm that imports clock, log, storage, theme, timers, ui. `src/pet::{Pet, Session, Now, Reaction, Refusal}`; balance in `src/pet/balance.rs` + README; storage keys `pet` / `settings` (identity scope, versioned JSON). B41b: others' pets (Talking of others, ScreenShareStarted, PeerMessage, others' ProfileCardOpened are currently ignored in lib.rs) and Echo Echo hooked into `ui::action::PLAY`. API gaps: (1) plugins can't read their own i18n files, so the strings are compiled in (`src/ui/i18n.rs`; en only); (2) there's no host call to open the panel popover. ASSUMPTION for B18: `chat-activity` also fires for the user's OWN channel messages (Echolings Notes rely on it).
 - **F3 (b2cc0e37):** `GestureGate::command_gesture(plugin, now)` opens an 8 s window for typed commands (`COMMAND_GESTURE_WINDOW`); `gesture(plugin, now)` stays 2 s for clicks; still one message per gesture, and a later gesture replaces the earlier one.
 - **B19 (1f5ae524):** `api/http.rs` + `api/files.rs`. HostContext `http: Http::new(&plugins_dir)` (persists `<plugins_dir>/net-hosts.json`) and `files: Files`; on reset/remove call `ctx.http.forget(id)` + `ctx.files.forget(id)`. UI glue (ui_action owner): when the user confirms a `server-address` text-input, call `ctx.http.allow(id, &text) -> Result<(), AddressError::Invalid>` ('host', 'host:port' or an http(s) URL; without port or scheme 80/443; ≤ 16 per plugin, oldest dropped). After a file-picker pick, call `ctx.files.register(id, &path) -> Result<FileHandle, FileError{NotAFile, TooLarge, Unreadable}>` (≤ 50 MiB, 16 per plugin, memory only) and pass the handle in ui-action `file`. http-error `host-not-allowed` also covers plain http to a public address; B42 shows "Plain http is only allowed for local addresses". TLS reasons are short texts. One upload in flight per plugin. Forbidden headers: Host, Content-Length, Transfer-Encoding, Connection.
+- **B25b (354e9ae9, f9467dc5, a30d9ace):** CLI `mumcord-plugin`: new (embedded template, `--sdk-path`), build [--reproducible] (needs Cargo.lock; prints sha256), check [--official] [--key] (package only, not a folder), keygen [--unencrypted], sign, serve-registry, publish-pr [--open], site-data. Key password from env MUMCORD_PLUGIN_KEY_PASSWORD, else a prompt. serve-registry: `--packages <dir> --key <test.key> [--author-key] [--port] (127.0.0.1 only) [--repository NAME] [--sequence] [--scenario …]`; re-signs packages with the author key (default: the registry key); official base `http://127.0.0.1:PORT/v1/`, packages at `/packages/<id>-<ver>.mcplugin(+.minisig)`; runtime control `POST /_ctl/scenario?set=a,b` (empty clears), `POST /_ctl/reload` (rescan + raise sequence); scenarios tampered-hash:<id>, lower-sequence, wrong-key, extra-permission:<id>, revoke:<id>[@ver][:warn], key-change[:rotate]. Docs: permissions.json, "Registry source" (plugin.toml, versions/<ver>.toml, revoked.toml), "Local test registry" in docs/plugin-registry-format.md. B43 runs `cargo test -p mumcord-plugin -- --ignored`. The template's SDK git dep points at epic/plugins and must switch to main after the epic merge (final task).
