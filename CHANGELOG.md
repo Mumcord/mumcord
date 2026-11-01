@@ -7,8 +7,15 @@
 - Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
 - Mumcord now opens with a **start screen** (the logo on the theme background with a slim loading bar) instead of an empty white window and a bare "Loading…" text. The window only appears once the start screen is drawn, the start screen follows your system theme (or the fixed theme you picked) and fades into the app when it is ready; with reduced motion it switches without movement (#323)
 
+### Added
+
+- A second sound theme, **Rich**: new, fuller notification sounds for connecting to voice, new messages, mentions, microphone mute and unmute, deafen and undeafen, someone joining or leaving your channel, leaving voice, being kicked and being banned. Settings > Sounds has a **Sound theme** switch with a preview button to choose between Rich (the default) and **Classic**, the familiar short synthesized tones; the theme applies to every notification sound at once (#325)
+- Quitting Mumcord while you are in a voice channel plays a short, distinctive goodbye sound, so you notice that you just left voice. It plays on every real quit (window close set to Quit, tray Quit, the quit menu or shortcut, and restarting for an update), never when Mumcord only minimises to the tray or when you are not in voice, and it follows the output volume, deafen, the sound theme and its own switch in Settings > Sounds (on by default). Mumcord waits for it at most 1.5 seconds, in parallel with closing the connections; a second quit request exits at once. The sound is local only: others still see the normal leave from the server (#325)
+- Switching to another channel while you are in voice plays its own short channel-switch sound instead of the connect sound, with its own switch in Settings > Sounds (on by default) and a variant in both sound themes (#325)
+
 ### Fixed
 
+- Pasting with Ctrl+V works again on some Linux desktops
 - The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)
 - The "simultaneously connected servers" number field in Settings > Server is no longer stretched across the whole card; it is now as narrow as the number it holds (#320)
 

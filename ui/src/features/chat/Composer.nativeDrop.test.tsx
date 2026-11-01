@@ -281,7 +281,10 @@ describe("Composer paste of image data (issue #110)", () => {
       .spyOn(api, "clipboardImage")
       .mockResolvedValue({ name: "image.png", mime: "image/png", data: btoa("png") });
     setup();
-    expect(paste(screen.getByRole("textbox"), offers)).toBe(false);
+    // Without a listed image the webview's own paste runs first; the native read follows only
+    // because it inserted no text.
+    const listed = offers.some((offer) => offer.kind === "file" || offer.type === "text/uri-list");
+    expect(paste(screen.getByRole("textbox"), offers)).toBe(!listed);
     expect(await screen.findByRole("img", { name: "Image to send: image.png" })).toBeTruthy();
     expect(native).toHaveBeenCalledOnce();
   });

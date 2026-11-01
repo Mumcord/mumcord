@@ -166,10 +166,24 @@ pub enum NotificationMode {
     Off,
 }
 
-/// Per-event sound toggles (FR-1.27).
+/// Which set of notification sounds plays (#325). A sound missing from the chosen set plays from
+/// the other one.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SoundTheme {
+    /// The short synthesized tones Mumcord started with.
+    Classic,
+    /// Fuller sounds made with ElevenLabs.
+    #[default]
+    Rich,
+}
+
+/// Per-event sound toggles (FR-1.27) and the sound theme.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct SoundSettings {
+    /// Which set of sounds plays (#325).
+    pub theme: SoundTheme,
     pub user_joined: bool,
     pub user_left: bool,
     pub self_mute: bool,
@@ -184,6 +198,10 @@ pub struct SoundSettings {
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
     pub hang_up: bool,
+    /// You quit Mumcord while in a voice channel (#325).
+    pub quit: bool,
+    /// You switch to another channel while in voice (#325).
+    pub channel_switch: bool,
     /// Someone starts a watch party in your channel (FR-2.77).
     pub party_started: bool,
     /// Someone joins the watch party (FR-2.77).
@@ -207,6 +225,7 @@ pub struct SoundSettings {
 impl Default for SoundSettings {
     fn default() -> Self {
         Self {
+            theme: SoundTheme::default(),
             user_joined: true,
             user_left: true,
             self_mute: true,
@@ -216,6 +235,8 @@ impl Default for SoundSettings {
             mention_notify: true,
             voice_join: true,
             hang_up: true,
+            quit: true,
+            channel_switch: true,
             party_started: true,
             party_joined: true,
             party_left: true,
@@ -1409,8 +1430,16 @@ mod tests {
         assert!(!parsed.sounds.user_joined);
         assert!(parsed.sounds.user_left);
         assert!(
-            parsed.sounds.voice_join && parsed.sounds.hang_up,
+            parsed.sounds.voice_join
+                && parsed.sounds.hang_up
+                && parsed.sounds.quit
+                && parsed.sounds.channel_switch,
             "new sounds are on for settings saved before they existed"
+        );
+        assert_eq!(
+            parsed.sounds.theme,
+            SoundTheme::Rich,
+            "settings saved before themes existed get the rich sounds"
         );
         assert!(
             parsed.sounds.party_started && parsed.sounds.viewer_stopped,

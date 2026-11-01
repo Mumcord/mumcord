@@ -181,6 +181,7 @@ describe("voice (AC-1.7 – AC-1.12)", () => {
 
   it("AC-1.7 shows the full tree with all bots in the right channels", async () => {
     await completeWizard("Tester");
+    await app.useClassicSounds();
     await addAndConnect();
     await browser.waitUntil(
       async () => {

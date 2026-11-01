@@ -128,6 +128,18 @@ pub fn audio_test_sound(engine: State<'_, Engine>) -> ApiResult<()> {
     Ok(())
 }
 
+/// Plays the connect sound of `theme` ("Preview" next to the sound theme, #325), also before the
+/// theme is saved. Only audible while voice audio runs.
+#[tauri::command]
+#[specta::specta]
+pub fn audio_preview_sound_theme(
+    engine: State<'_, Engine>,
+    theme: super::settings::SoundTheme,
+) -> ApiResult<()> {
+    engine.preview_sound_theme(theme.into());
+    Ok(())
+}
+
 /// Ends the test wherever it is (recording or playback).
 #[tauri::command]
 #[specta::specta]

@@ -50,6 +50,11 @@ SOUNDS = {
     "voice_join": [(523.3, 0.10, 0.0), (659.3, 0.10, 0.07), (784.0, 0.17, 0.14)],
     # you disconnect: a low falling fifth, like putting down a phone
     "hang_up": [(523.3, 0.12, 0.0), (349.2, 0.20, 0.10)],
+    # you quit while in voice: a slow falling arpeggio down to the low C, a longer goodbye than
+    # hang_up
+    "quit": [(784.0, 0.10, 0.0), (659.3, 0.10, 0.09), (523.3, 0.10, 0.18), (392.0, 0.22, 0.27)],
+    # you switch to another channel: a quick up-down-up step, neither arriving nor leaving
+    "channel_switch": [(587.3, 0.08, 0.0), (784.0, 0.08, 0.06), (587.3, 0.08, 0.12), (784.0, 0.14, 0.18)],
 }
 
 here = os.path.dirname(os.path.abspath(__file__))

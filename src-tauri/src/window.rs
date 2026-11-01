@@ -247,7 +247,9 @@ pub fn after_disconnect(app: &AppHandle, then: impl FnOnce(&AppHandle) + Send + 
         return;
     }
     // Keeps the voice channel so the next start can offer to rejoin it (QA.9). Waits (bounded)
-    // until the connections have sent what is still queued and their TLS close.
+    // until the connections have sent what is still queued and their TLS close, and for the
+    // quit sound (#325). A second quit request finds no connection left and exits at once, so
+    // the wait never blocks a forced quit.
     let closed = app.state::<Engine>().shutdown();
     let app = app.clone();
     tauri::async_runtime::spawn(async move {

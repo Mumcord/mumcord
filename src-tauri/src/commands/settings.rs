@@ -301,6 +301,34 @@ impl From<NotificationMode> for store::NotificationMode {
     }
 }
 
+/// Which set of notification sounds plays (#325).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SoundTheme {
+    /// The short synthesized tones.
+    Classic,
+    /// Fuller sounds made with ElevenLabs (default).
+    Rich,
+}
+
+impl From<store::SoundTheme> for SoundTheme {
+    fn from(theme: store::SoundTheme) -> Self {
+        match theme {
+            store::SoundTheme::Classic => Self::Classic,
+            store::SoundTheme::Rich => Self::Rich,
+        }
+    }
+}
+
+impl From<SoundTheme> for store::SoundTheme {
+    fn from(theme: SoundTheme) -> Self {
+        match theme {
+            SoundTheme::Classic => Self::Classic,
+            SoundTheme::Rich => Self::Rich,
+        }
+    }
+}
+
 /// Notification sound toggles per event (FR-1.27).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -317,6 +345,10 @@ pub struct SoundSettings {
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
     pub hang_up: bool,
+    /// You quit Mumcord while in a voice channel (#325).
+    pub quit: bool,
+    /// You switch to another channel while in voice (#325).
+    pub channel_switch: bool,
     pub party_started: bool,
     pub party_joined: bool,
     pub party_left: bool,
@@ -512,6 +544,8 @@ pub struct Settings {
     pub video_ducking: bool,
     /// The lowered level while people talk, 10–80 % (default 30).
     pub video_ducking_percent: u8,
+    /// "Sound theme: Classic / Rich" (default rich, #325).
+    pub sound_theme: SoundTheme,
     pub sounds: SoundSettings,
     /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
     pub notifications: NotificationMode,
@@ -653,6 +687,8 @@ impl Settings {
                 mention_notify: s.sounds.mention_notify,
                 voice_join: s.sounds.voice_join,
                 hang_up: s.sounds.hang_up,
+                quit: s.sounds.quit,
+                channel_switch: s.sounds.channel_switch,
                 party_started: s.sounds.party_started,
                 party_joined: s.sounds.party_joined,
                 party_left: s.sounds.party_left,
@@ -663,6 +699,7 @@ impl Settings {
                 kicked: s.sounds.kicked,
                 banned: s.sounds.banned,
             },
+            sound_theme: s.sounds.theme.into(),
             notifications: s.notifications.into(),
             close_behaviour: match s.close_behaviour {
                 store::CloseBehaviour::Ask => CloseBehaviour::Ask,
@@ -787,6 +824,9 @@ impl Settings {
         s.sounds.mention_notify = self.sounds.mention_notify;
         s.sounds.voice_join = self.sounds.voice_join;
         s.sounds.hang_up = self.sounds.hang_up;
+        s.sounds.quit = self.sounds.quit;
+        s.sounds.channel_switch = self.sounds.channel_switch;
+        s.sounds.theme = self.sound_theme.into();
         s.sounds.party_started = self.sounds.party_started;
         s.sounds.party_joined = self.sounds.party_joined;
         s.sounds.party_left = self.sounds.party_left;
@@ -1082,6 +1122,8 @@ mod tests {
         assert_eq!(ui.log_level, LogLevel::Info);
         assert!(ui.send_default_avatar);
         assert_eq!(ui.notifications, NotificationMode::Both);
+        assert_eq!(ui.sound_theme, SoundTheme::Rich);
+        assert!(ui.sounds.channel_switch);
 
         ui.wizard_completed = true;
         ui.talk_mode = TalkMode::PushToTalk;
@@ -1090,6 +1132,9 @@ mod tests {
         ui.voice_threshold_dbfs = -25;
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
+        ui.sounds.quit = false;
+        ui.sounds.channel_switch = false;
+        ui.sound_theme = SoundTheme::Classic;
         ui.sounds.share_stopped = false;
         ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
@@ -1139,6 +1184,8 @@ mod tests {
         assert!(stored.wizard_completed);
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
+        assert!(!stored.sounds.quit && !stored.sounds.channel_switch);
+        assert_eq!(stored.sounds.theme, store::SoundTheme::Classic);
         assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
         assert!(!stored.sounds.banned && stored.sounds.kicked);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
