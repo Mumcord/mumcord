@@ -568,6 +568,35 @@ export const commands = {
 	 *  never the text).
 	 */
 	pluginsMentioned: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_mentioned", { serverId, session })),
+	/**  Every added repository, oldest first. */
+	pluginReposList: () => typedError<RepositoryView[], ApiError>(__TAURI_INVOKE("plugin_repos_list")),
+	/**
+	 *  Fetches a repository for the Add dialog without adding it. With an "Expected key" the
+	 *  repository must be signed with exactly that key.
+	 */
+	pluginRepoPreview: (url: string, expectedKey: string | null) => typedError<RepositoryPreview, ApiError>(__TAURI_INVOKE("plugin_repo_preview", { url, expectedKey })),
+	/**
+	 *  Adds the repository and pins the key it is signed with (trust on first use). The repository
+	 *  is fetched again, so what is pinned is what was verified just now.
+	 */
+	pluginRepoAdd: (url: string, expectedKey: string | null) => typedError<RepositoryView, ApiError>(__TAURI_INVOKE("plugin_repo_add", { url, expectedKey })),
+	/**
+	 *  Switches a repository on or off. Off turns its plugins off too (FR-6.75). Switching on a
+	 *  repository that was paused for a key change goes through `plugin_repo_accept_key`.
+	 */
+	pluginRepoSetEnabled: (id: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_set_enabled", { id, enabled })),
+	/**
+	 *  Removes a repository. Its plugins are turned off and stay installed, so the user can still
+	 *  export or delete their data; they get no updates any more.
+	 */
+	pluginRepoRemove: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_remove", { id })),
+	/**  Looks at the key a paused repository signs with now (key-change dialog, FR-6.75). */
+	pluginRepoReviewKey: (id: number) => typedError<KeyChangeReview, ApiError>(__TAURI_INVOKE("plugin_repo_review_key", { id })),
+	/**
+	 *  The user trusts the new key: pins it and switches the repository back on. The key is read
+	 *  again from the repository, not taken from the UI.
+	 */
+	pluginRepoAcceptKey: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_accept_key", { id })),
 	/**  "Not now": the suggestion stays hidden until the server's list changes or 30 days pass. */
 	pluginSuggestionNotNow: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_not_now", { serverId, plugin })),
 	/**  "Don't ask again for this server". */
@@ -1792,6 +1821,13 @@ export type KdeX11Access = {
 	undoAvailable: boolean,
 };
 
+/**  The key a paused repository signs with now (FR-6.75). */
+export type KeyChangeReview = {
+	name: string,
+	oldFingerprint: string,
+	newFingerprint: string,
+};
+
 /**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
 export type KnownGame = {
 	key: GameKey,
@@ -2793,6 +2829,34 @@ export type ReleaseNote = {
 	date: string | null,
 	/**  The release's CHANGELOG section (`### Added` …) as Markdown, English only; untrusted. */
 	changes: string,
+};
+
+/**  What the Add dialog shows before the user confirms (FR-6.74). */
+export type RepositoryPreview = {
+	url: string,
+	name: string,
+	homepage: string | null,
+	contact: string | null,
+	fingerprint: string,
+	pluginCount: number,
+	/**  Entries left out of the list, as plain-text notes (FR-6.76). */
+	notes: string[],
+};
+
+/**  One added repository as the Repositories tab shows it. */
+export type RepositoryView = {
+	id: number,
+	url: string,
+	name: string,
+	/**  The pinned key's id, e.g. `1CB49831E26E61AD`. */
+	fingerprint: string,
+	enabled: boolean,
+	/**  Paused after the repository started signing with another key. */
+	keyChanged: boolean,
+	/**  Milliseconds since the epoch of the last successful check. */
+	lastChecked: number | null,
+	/**  Plugins installed from this repository. */
+	installedPlugins: number,
 };
 
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */

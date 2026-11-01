@@ -44,7 +44,7 @@ pub async fn preview_repository(
     client: &Client,
     url: &str,
     expected_key: Option<&str>,
-    is_official_id: &dyn Fn(&str) -> bool,
+    is_official_id: &(dyn Fn(&str) -> bool + Sync),
 ) -> Result<RepoPreview, RegistryError> {
     let url = check_repository_url(url, client.policy().allow_localhost_http)?;
     let bytes = client.get_body(&url, MAX_REPOSITORY_INDEX_BYTES).await?;
@@ -92,7 +92,7 @@ pub async fn fetch_repository(
     client: &Client,
     cache_dir: &Path,
     repository: &PluginRepository,
-    is_official_id: &dyn Fn(&str) -> bool,
+    is_official_id: &(dyn Fn(&str) -> bool + Sync),
 ) -> Result<RepoOutcome, RegistryError> {
     let url = check_repository_url(&repository.url, client.policy().allow_localhost_http)?;
     let pinned = normalize_key(&repository.public_key)
@@ -128,7 +128,7 @@ fn accept_repository(
     signature: &str,
     pinned: &str,
     last_seen: Option<u64>,
-    is_official_id: &dyn Fn(&str) -> bool,
+    is_official_id: &(dyn Fn(&str) -> bool + Sync),
 ) -> Result<(Index, Option<String>), RegistryError> {
     let declared = declared_key(bytes)?;
     // The file must be signed by the key it declares, whichever key that is.

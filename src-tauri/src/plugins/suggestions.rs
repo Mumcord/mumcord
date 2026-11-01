@@ -56,7 +56,7 @@ fn now_millis() -> i64 {
 
 /// Makes sure the official list is known; the UI may not have opened the store yet. A cached
 /// copy is good enough, so an offline start still resolves suggestions.
-async fn ensure_index(plugins: &Arc<Plugins>, engine: &Engine) {
+pub(crate) async fn ensure_index(plugins: &Arc<Plugins>, engine: &Engine) {
     if plugins.index().is_some() {
         return;
     }

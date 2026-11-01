@@ -20,7 +20,7 @@ pub enum IndexKind<'a> {
     Official,
     /// `is_official_id` answers from the official index the caller knows.
     Repository {
-        is_official_id: &'a dyn Fn(&str) -> bool,
+        is_official_id: &'a (dyn Fn(&str) -> bool + Sync),
     },
 }
 

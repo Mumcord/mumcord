@@ -354,7 +354,7 @@ pub struct PluginDiagnostics {
     pub log: Vec<PluginLogLine>,
 }
 
-fn plugins_of(app: &AppHandle) -> ApiResult<Arc<Plugins>> {
+pub(super) fn plugins_of(app: &AppHandle) -> ApiResult<Arc<Plugins>> {
     plugins::state(app)
 }
 
@@ -971,11 +971,11 @@ fn invalid(error: impl std::fmt::Display) -> ApiError {
     ApiError::new(ErrorCode::InvalidInput, error.to_string())
 }
 
-fn registry_client(developer_mode: bool) -> ApiResult<Client> {
+pub(super) fn registry_client(developer_mode: bool) -> ApiResult<Client> {
     Client::new(UrlPolicy::new(developer_mode)).map_err(registry_error)
 }
 
-fn registry_error(error: mumcord_plugins::registry::RegistryError) -> ApiError {
+pub(super) fn registry_error(error: mumcord_plugins::registry::RegistryError) -> ApiError {
     plugins::service_error(error.into())
 }
 
