@@ -315,12 +315,15 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
   it("AC-4.23: in German the options and their labels are translated", async () => {
     const de = JSON.parse(readFileSync(join(repoRoot, "ui", "src", "locales", "de", "settings.json"), "utf8")) as {
       p2p: { modeLabel: string; explanation: string; mode: Record<Mode, string> };
+      badges: { changed: string };
     };
     await $("//button[@role='tab'][normalize-space()='General']").click();
     await chooseLanguage("de", "German");
     await $('[role="tab"][id$="-tab-privacy"]').click();
     await $("fieldset.p2p-modes").waitForDisplayed();
-    await browser.waitUntil(async () => (await p2pGroupA11y()).name === de.p2p.modeLabel, {
+    // The mode still differs from the wizard's preset, so the group keeps its "Changed" note.
+    const name = `${de.p2p.modeLabel}, ${de.badges.changed}`;
+    await browser.waitUntil(async () => (await p2pGroupA11y()).name === name, {
       timeoutMsg: "the radio group was not translated",
     });
     expect((await p2pOptions()).map((o) => o.label)).toEqual(MODES.map((m) => de.p2p.mode[m]));
