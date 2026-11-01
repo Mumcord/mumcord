@@ -43,6 +43,14 @@
 //! the line (untrusted, at most 200 characters). No other chat text ever reaches a plugin, and a
 //! word another plugin installed earlier already declares is not delivered.
 //!
+//! Chat patterns: a plugin that declares up to two `chat_patterns` in its manifest, each a
+//! `pattern` (Rust `regex` syntax, anchored at the message start with `^`) and a user-facing
+//! `description` (translated with the i18n key `chat_patterns.<n>.description`), and holds
+//! `chat.patterns` gets [`events::Event::ChatMatch`] when a channel message in the user's channel
+//! matches one, e.g. a pasted EVE Online fit. `text` is the message as plain text with `\n` line
+//! breaks (untrusted, at most 4 KiB) and `pattern-index` the first pattern that matched. Every
+//! plugin whose pattern matches gets it; each sender is limited to 3 matches per 10 seconds.
+//!
 //! Every host call is checked against the permissions the user granted; a missing permission
 //! returns [`types::Error::NotPermitted`]. The meaning and limits of each call are documented on
 //! the generated functions and in the WIT files.
