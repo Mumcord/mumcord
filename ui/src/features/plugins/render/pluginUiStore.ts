@@ -211,6 +211,11 @@ function getSnapshot(): PluginUiState {
   return state;
 }
 
+/** Everything plugins show right now, outside React (e.g. for screen-reader announcements). */
+export function getPluginUi(): PluginUiState {
+  return getSnapshot();
+}
+
 /** Everything plugins show right now. */
 export function usePluginUi(): PluginUiState {
   return useSyncExternalStore(subscribe, getSnapshot);

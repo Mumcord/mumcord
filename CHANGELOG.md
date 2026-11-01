@@ -33,6 +33,7 @@
 
 ### Fixed
 
+- Screen readers now read a chat line a plugin replaced as its card (e.g. "Card from Poll: Lunch at noon?") and no longer read lines a plugin hid.
 - Plugin cards in the chat no longer get their own scrollbar: a taller card is cut off with a soft fade and **Show more** expands it.
 - Pasting with Ctrl+V works again on some Linux desktops
 - A plugin that could not be loaded now keeps its name (in your language) and icon in **Settings > Plugins > Installed** instead of showing its internal id

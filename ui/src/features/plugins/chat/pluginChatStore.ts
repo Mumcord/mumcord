@@ -190,6 +190,11 @@ function getSnapshot(): PluginChatState {
   return state;
 }
 
+/** The current state outside React (e.g. for screen-reader announcements). */
+export function getPluginChat(): PluginChatState {
+  return getSnapshot();
+}
+
 export function usePluginChat(): PluginChatState {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
