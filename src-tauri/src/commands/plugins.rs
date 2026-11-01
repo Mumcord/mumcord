@@ -67,6 +67,8 @@ pub enum PluginSourceInfo {
     Official,
     Repo {
         repository_id: u32,
+        /// Shown as "Unofficial · <name>"; empty when the repository was removed.
+        name: String,
     },
     /// "Developer plugin", loaded from `folder`.
     Dev {
@@ -145,16 +147,30 @@ pub struct InstalledPlugin {
     pub installed_at: f64,
     /// This plugin's badge is the one shown next to names.
     pub badge: bool,
+    /// The reason from Mumcord's revocation list for the installed version, in the UI language.
+    /// With `disabledReason` `revoked` the plugin was turned off; otherwise it is a warning.
+    pub revocation: Option<String>,
 }
 
-impl From<PluginInfo> for InstalledPlugin {
-    fn from(p: PluginInfo) -> Self {
+/// The name of a third-party repository; empty when it was removed.
+fn repository_name(repositories: &[(i64, String)], id: i64) -> String {
+    repositories
+        .iter()
+        .find(|(repo, _)| *repo == id)
+        .map(|(_, name)| name.clone())
+        .unwrap_or_default()
+}
+
+impl InstalledPlugin {
+    /// `repositories` maps repository ids to names for the "Unofficial · <name>" label.
+    fn new(p: PluginInfo, repositories: &[(i64, String)]) -> Self {
         let source = match (p.source, p.developer_folder) {
             (Source::Dev, folder) => PluginSourceInfo::Dev {
                 folder: folder.map(|f| f.display().to_string()).unwrap_or_default(),
             },
             (Source::Repo { repository_id }, _) => PluginSourceInfo::Repo {
                 repository_id: u32::try_from(repository_id).unwrap_or(u32::MAX),
+                name: repository_name(repositories, repository_id),
             },
             (Source::Official, _) => PluginSourceInfo::Official,
         };
@@ -181,6 +197,7 @@ impl From<PluginInfo> for InstalledPlugin {
             notifications: p.notifications,
             installed_at: p.installed_at as f64,
             badge: p.badge,
+            revocation: p.revocation.map(|r| r.reason),
         }
     }
 }
@@ -362,7 +379,14 @@ fn overview(service: &mut PluginService) -> Result<PluginsOverview, ServiceError
     Ok(PluginsOverview {
         no_plugins: service.no_plugins(),
         all_off: service.all_off()?,
-        plugins: service.list()?.into_iter().map(Into::into).collect(),
+        plugins: {
+            let repositories = service.repository_names()?;
+            service
+                .list()?
+                .into_iter()
+                .map(|p| InstalledPlugin::new(p, &repositories))
+                .collect()
+        },
     })
 }
 
@@ -699,6 +723,7 @@ pub struct PluginUpdate {
 pub async fn plugin_updates(app: AppHandle) -> ApiResult<Vec<PluginUpdate>> {
     plugins_of(&app)?
         .call(|service| {
+            let repositories = service.repository_names()?;
             Ok(service
                 .updates()
                 .into_iter()
@@ -710,6 +735,7 @@ pub async fn plugin_updates(app: AppHandle) -> ApiResult<Vec<PluginUpdate>> {
                     source: match u.source {
                         Source::Repo { repository_id } => PluginSourceInfo::Repo {
                             repository_id: u32::try_from(repository_id).unwrap_or(u32::MAX),
+                            name: repository_name(&repositories, repository_id),
                         },
                         _ => PluginSourceInfo::Official,
                     },
@@ -1088,6 +1114,55 @@ pub(super) fn registry_error(error: mumcord_plugins::registry::RegistryError) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+    use mumcord_plugins::registry::Severity;
+    use mumcord_plugins::service::RevocationNotice;
+
+    fn info(source: Source) -> PluginInfo {
+        PluginInfo {
+            id: "foo".into(),
+            name: "Foo".into(),
+            version: "1.0.0".into(),
+            source,
+            developer_folder: None,
+            status: Status::Off,
+            enabled: false,
+            disabled_reason: Some("revoked".into()),
+            required: Vec::new(),
+            optional: Vec::new(),
+            granted: Vec::new(),
+            visibility: PluginVisibility::Everyone,
+            pinned: false,
+            notifications: true,
+            installed_at: 0,
+            badge: false,
+            revocation: Some(RevocationNotice {
+                severity: Severity::Disable,
+                reason: "Leaks data".into(),
+            }),
+        }
+    }
+
+    #[test]
+    fn installed_plugins_carry_their_repository_name_and_revocation_reason() {
+        let repositories = vec![(3, "Foo Repo".to_string())];
+        let row = InstalledPlugin::new(info(Source::Repo { repository_id: 3 }), &repositories);
+        assert_eq!(
+            row.source,
+            PluginSourceInfo::Repo {
+                repository_id: 3,
+                name: "Foo Repo".into()
+            }
+        );
+        assert_eq!(row.revocation.as_deref(), Some("Leaks data"));
+        let gone = InstalledPlugin::new(info(Source::Repo { repository_id: 9 }), &repositories);
+        assert_eq!(
+            gone.source,
+            PluginSourceInfo::Repo {
+                repository_id: 9,
+                name: String::new()
+            }
+        );
+    }
 
     #[test]
     fn assets_are_only_images() {

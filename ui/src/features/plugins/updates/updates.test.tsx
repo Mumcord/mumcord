@@ -22,6 +22,7 @@ const plugin: InstalledPlugin = {
   notifications: true,
   installedAt: 0,
   badge: false,
+  revocation: null,
 };
 
 const update: PluginUpdate = {

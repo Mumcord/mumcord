@@ -530,14 +530,14 @@ export const commands = {
 	pluginSetVisibility: (id: string, visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_visibility", { id, visibility })),
 	/**  The plugin's "notifications" switch. */
 	pluginSetNotifications: (id: string, on: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_notifications", { id, on })),
+	/**  "Pin version": a pinned plugin is not offered updates (FR-6.67). */
+	pluginSetPinned: (id: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_pinned", { id, pinned })),
 	/**  Removes a plugin; its data is kept for 30 days unless `deleteData`. */
 	pluginRemove: (id: string, deleteData: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_remove", { id, deleteData })),
 	/**  The updates waiting for the user. */
 	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
 	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
 	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
-	/**  "Pin version": a pinned plugin is not offered updates (FR-6.67). */
-	pluginSetPinned: (id: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_pinned", { id, pinned })),
 	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
 	pluginExportData: (id: string) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_export_data", { id })),
 	pluginResetData: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_reset_data", { id })),
@@ -1819,6 +1819,11 @@ export type InstalledPlugin = {
 	installedAt: number | null,
 	/**  This plugin's badge is the one shown next to names. */
 	badge: boolean,
+	/**
+	 *  The reason from Mumcord's revocation list for the installed version, in the UI language.
+	 *  With `disabledReason` `revoked` the plugin was turned off; otherwise it is a warning.
+	 */
+	revocation: string | null,
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
@@ -2509,7 +2514,9 @@ export type PluginSlot =
 { kind: "dialog" };
 
 /**  Where an installed plugin came from. */
-export type PluginSourceInfo = { kind: "official" } | { kind: "repo"; repositoryId: number } | 
+export type PluginSourceInfo = { kind: "official" } | { kind: "repo"; repositoryId: number; 
+/**  Shown as "Unofficial · <name>"; empty when the repository was removed. */
+name: string } | 
 /**  "Developer plugin", loaded from `folder`. */
 { kind: "dev"; folder: string };
 

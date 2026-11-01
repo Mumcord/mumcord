@@ -375,6 +375,16 @@ impl PluginService {
         self.host.dir(id)
     }
 
+    /// Every third-party repository's id and name, for the "Unofficial · <name>" label (FR-6.61).
+    pub fn repository_names(&self) -> Result<Vec<(i64, String)>, ServiceError> {
+        Ok(self
+            .store()
+            .plugin_repositories()?
+            .into_iter()
+            .map(|r| (r.id, r.name))
+            .collect())
+    }
+
     /// The badge shown next to names (FR-6.63): the chosen plugin if it is installed and holds
     /// `ui.member-badge`, else none.
     pub fn badge_plugin(&self) -> Result<Option<String>, ServiceError> {
