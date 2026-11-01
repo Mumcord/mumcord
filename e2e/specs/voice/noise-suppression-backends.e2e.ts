@@ -126,7 +126,8 @@ async function sendContinuously(): Promise<void> {
       break;
     }
   }
-  const slider = await $("//input[@type='range']");
+  // The voice activation threshold; the page has other sliders too.
+  const slider = await $("input.settings-threshold__slider");
   await slider.scrollIntoView();
   await slider.click();
   await browser.keys(["Home"]);
