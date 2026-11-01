@@ -1,6 +1,7 @@
 //! The plugin service end to end with real (tiny) plugins, a real store and packages signed
 //! with keys generated per test run: install, restore after remove, permission revokes,
-//! Turn off all, `--no-plugins`, developer folders, badge default and the integrity re-check.
+//! Turn off all, `--no-plugins`, developer folders, badge default and the integrity re-check;
+//! plugin messaging with its rate rules, visibility and the voice-server-only rule.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -8,14 +9,14 @@ use std::sync::{Arc, Mutex};
 
 use minisign::KeyPair;
 use mumcord_plugins::Source;
-use mumcord_plugins::registry::Download;
+use mumcord_plugins::registry::{Download, key_fingerprint_prefix};
 use mumcord_plugins::service::{
     InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService, SelfInfo, ServiceConfig,
     ServiceError, ServiceEvent, Status, StoredLine,
 };
 use mumcord_plugins::verify::IndexEntry;
 use mumcord_plugins::{Digest, HostEvent};
-use mumcord_store::{PluginVisibility, Store};
+use mumcord_store::{NewPluginRepository, PluginVisibility, Store};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedReceiver;
 use zip::write::SimpleFileOptions;
@@ -91,8 +92,12 @@ struct Signed {
 
 /// A signed package plus the index entry promising it, as the registry would deliver it.
 fn signed(id: &str, start: &str, extra: &str, optional: &[&str]) -> Signed {
+    signed_wasm(id, &component(start), extra, optional)
+}
+
+fn signed_wasm(id: &str, wasm: &[u8], extra: &str, optional: &[&str]) -> Signed {
     let author = KeyPair::generate_unencrypted_keypair().expect("keypair");
-    let bytes = package(&manifest(id, "1.0.0", extra), &component(start));
+    let bytes = package(&manifest(id, "1.0.0", extra), wasm);
     let signature = minisign::sign(Some(&author.pk), &author.sk, &bytes[..], None, None)
         .expect("sign")
         .into_string();
@@ -686,6 +691,209 @@ fn visibility_nobody_leaves_a_plugin_out_of_the_announce() {
     let announces = service.poll_announces();
     let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
     assert!(!text.contains("quiet"), "{text}");
+}
+
+/// Core module: `start` sends "hi" six times, starts a game burst, sends six more and asks for a
+/// second burst. It refuses to start with "1" if the first burst is refused and "2" if the
+/// second is granted.
+const BURSTER: &str = r#"
+(module
+  (import "mumcord:plugin/peers@1.0.0" "send" (func $send (param i32 i32 i32 i32 i32 i32)))
+  (import "mumcord:plugin/peers@1.0.0" "start-game-burst" (func $burst (param i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (data (i32.const 40) "hi")
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (global.get $heap))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func $spam (local $i i32)
+    (loop $again
+      (call $send (i32.const 0) (i32.const 0) (i32.const 5) (i32.const 40) (i32.const 2)
+        (i32.const 100))
+      (local.set $i (i32.add (local.get $i) (i32.const 1)))
+      (br_if $again (i32.lt_u (local.get $i) (i32.const 6)))))
+  (func $fail (param $code i32) (result i32)
+    (i32.store8 (i32.const 48) (local.get $code))
+    (i32.store8 (i32.const 64) (i32.const 1))
+    (i32.store (i32.const 68) (i32.const 48))
+    (i32.store (i32.const 72) (i32.const 1))
+    (i32.const 64))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (call $spam)
+    (call $burst (i32.const 120))
+    (if (i32.load8_u (i32.const 120)) (then (return (call $fail (i32.const 49)))))
+    (call $spam)
+    (call $burst (i32.const 120))
+    (if (i32.eqz (i32.load8_u (i32.const 120))) (then (return (call $fail (i32.const 50)))))
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param i32))
+  (func (export "stop"))
+)"#;
+
+#[test]
+fn a_spamming_plugin_is_held_to_its_rate_and_one_game_burst_a_minute() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _host_events, _events) = fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["burster@1~dev"]}"#,
+    );
+    let dir = fx.root.path().join("src-burster");
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(
+        dir.join("manifest.json"),
+        manifest("burster", "0.1.0", MESSAGING),
+    )
+    .expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode(BURSTER)).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    let id = service.load_dev(&dir).expect("loads");
+    assert_eq!(info(&service, &id).status, Status::Running);
+
+    // Its own bucket lets 3 through; the game burst adds its 4, but all plugins together have
+    // only 5 at once (FR-6.36). Everything else is refused and counted, never queued.
+    let counters = service.messaging_counters("burster");
+    assert_eq!((counters.sent, counters.rate_limited), (5, 7));
+}
+
+/// `not-permitted` in the WIT error enum.
+const NOT_PERMITTED: &str = "0";
+
+#[test]
+fn revoking_optional_peers_messages_stops_sends_and_the_announce_at_once() {
+    let fx = Fixture::new();
+    // Messaging tells sources apart by the repository key, so the repository must exist.
+    let repository_key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let repository = fx
+        .store
+        .lock()
+        .expect("lock")
+        .add_plugin_repository(
+            &NewPluginRepository {
+                url: "https://plugins.example.test".into(),
+                name: "Test".into(),
+                public_key: repository_key.pk.to_base64(),
+            },
+            0,
+        )
+        .expect("repository");
+    assert_eq!(
+        Source::Repo {
+            repository_id: repository
+        },
+        REPO
+    );
+    let tag: String = key_fingerprint_prefix(&repository_key.pk.to_base64())
+        .expect("fingerprint")
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect();
+    let (mut service, _host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    let bob_runs_poll = format!(r#"{{"v":1,"p":["poll@1~{tag}"]}}"#);
+    service.peer_data(1, &bob(), "mumcord.plugins", bob_runs_poll.as_bytes());
+    let mut poll = signed_wasm(
+        "poll",
+        &encode(SENDER),
+        r#","permissions":{"required":["ui.panel"],"optional":["peers.messages"]}"#,
+        &["peers.messages"],
+    );
+    poll.request.entry.permissions = vec!["ui.panel".into(), "peers.messages".into()];
+    poll.request.visibility = PluginVisibility::Everyone;
+    service
+        .install(&poll.request, &poll.download)
+        .expect("installs");
+
+    // Granted: the send at start reaches Bob, and the announce lists Poll.
+    assert_eq!(info(&service, "poll").status, Status::Running);
+    assert_eq!(service.messaging_counters("poll").sent, 1);
+    while events.try_recv().is_ok() {}
+    let announces = service.poll_announces();
+    let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
+    assert!(text.contains("poll@1"), "{text}");
+
+    // Revoked at runtime (AC-6.11): sending is not permitted and Poll is no longer announced.
+    service
+        .set_permissions("poll", &["ui.panel".into()])
+        .expect("optional revoked");
+    service.set_enabled("poll", false).expect("turns off");
+    // Poll's `start` sends and gives up on the error.
+    let error = service
+        .set_enabled("poll", true)
+        .expect_err("start fails")
+        .to_string();
+    assert!(error.ends_with(NOT_PERMITTED), "{error}");
+    // Server 1 announced less than 10 s ago; a server that newly needs an announce shows it.
+    assert!(
+        service.next_announce_at().is_some(),
+        "the change is announced"
+    );
+    service.shared_state(2, true);
+    service.peer_capable(2, 8, true);
+    let announces = service.poll_announces();
+    assert_eq!(announces.len(), 1);
+    let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
+    assert!(!text.contains("poll"), "{text}");
+    while let Ok(event) = events.try_recv() {
+        assert!(
+            !matches!(event, ServiceEvent::PeerSend { .. }),
+            "no mumcord.p.poll goes out"
+        );
+    }
+}
+
+#[test]
+fn peer_messages_come_only_from_the_voice_server_with_a_flood_guard_per_server() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _host_events, _events) = fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    for server in [1, 2] {
+        service.shared_state(server, true);
+        service.peer_capable(server, 7, true);
+        service.peer_joined(server, bob());
+        service.peer_data(
+            server,
+            &bob(),
+            "mumcord.plugins",
+            br#"{"v":1,"p":["sender@1~dev"]}"#,
+        );
+    }
+    service
+        .load_dev(&sender_folder(fx.root.path(), "sender"))
+        .expect("loads");
+
+    // Chat events come from every server (H3), plugin messages only from the voice server.
+    service.peer_data(2, &bob(), "mumcord.p.sender", &[1, 1, 9, 0]);
+    assert_eq!(service.messaging_counters("sender").received, 0);
+    // Bob floods: five per second pass, the rest is dropped and counted.
+    for _ in 0..6 {
+        service.peer_data(1, &bob(), "mumcord.p.sender", &[1, 1, 9, 0]);
+    }
+    let counters = service.messaging_counters("sender");
+    assert_eq!((counters.received, counters.incoming_rate_dropped), (5, 1));
+    // Voice moves to server 2: Bob there has his own window.
+    service.set_focused_server(Some(2));
+    for _ in 0..5 {
+        service.peer_data(2, &bob(), "mumcord.p.sender", &[1, 1, 9, 0]);
+    }
+    service.peer_data(1, &bob(), "mumcord.p.sender", &[1, 1, 9, 0]);
+    let counters = service.messaging_counters("sender");
+    assert_eq!((counters.received, counters.incoming_rate_dropped), (10, 1));
 }
 
 /// On a `chat-trigger` event (case 19), sends its `args` to the channel as a kind-5 plugin

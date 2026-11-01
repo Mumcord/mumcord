@@ -1,8 +1,9 @@
 //! Engine bridge for plugins (spec 06, B13) against the local test server: two engines see each
 //! other's `plugins` feature, exchange a plugin message, a block stops it (AC-6.13), a server
 //! plugin list of an unregistered user is ignored with "sender not registered" while a
-//! registered sender is pinned (AC-6.26), and a 1.3 server has no shared plugin features
-//! (AC-6.17). `testenv/up.sh`, then:
+//! registered sender is pinned (AC-6.26), a whole game burst of plugin messages never holds up a
+//! watch party and shows in the inspector as hex (AC-6.12), and a 1.3 server has no shared plugin
+//! features (AC-6.17). `testenv/up.sh`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_plugins -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
@@ -12,16 +13,22 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use mumbot::{Bot, BotConfig, env};
+use mumcord_engine::inspector::TapDirection;
 use mumcord_engine::plugins::{PluginEngineEvent, PluginSendError};
+use mumcord_engine::watch_party::WatchPartyView;
 use mumcord_engine::{
     ConnState, Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields,
-    ServerId,
+    ServerId, WatchCommand,
 };
 use tokio::sync::mpsc::Receiver;
 
 const WAIT: Duration = Duration::from_secs(20);
 /// How long a message that must not arrive is waited for.
 const QUIET: Duration = Duration::from_secs(3);
+/// A YouTube video id for the watch party; nothing is played.
+const VIDEO: &str = "dQw4w9WgXcQ";
+/// A game burst's worth of plugin messages: 4 per second for 10 s (FR-6.36).
+const BURST: usize = 40;
 const SERVER_PLUGINS: &[u8] =
     br#"{"v":1,"seq":1,"plugins":[{"id":"dice","min":"1.0.0","src":"official","for":"Dice"}]}"#;
 
@@ -78,6 +85,25 @@ async fn wait_plugin<T>(
     }
 }
 
+async fn wait_party(
+    rx: &mut EventReceiver,
+    what: &str,
+    mut pick: impl FnMut(&WatchPartyView) -> bool,
+) {
+    let deadline = tokio::time::Instant::now() + WAIT;
+    loop {
+        let event = tokio::time::timeout_at(deadline, rx.recv())
+            .await
+            .unwrap_or_else(|_| panic!("timed out waiting for {what}"))
+            .expect("event stream open");
+        if let EngineEvent::WatchPartyChanged(Some(party)) = &event
+            && pick(party)
+        {
+            return;
+        }
+    }
+}
+
 /// Whether a plugin message with `data_id` arrives within [`QUIET`].
 async fn receives(rx: &mut Receiver<PluginEngineEvent>, data_id: &str) -> bool {
     let deadline = tokio::time::Instant::now() + QUIET;
@@ -91,8 +117,7 @@ async fn receives(rx: &mut Receiver<PluginEngineEvent>, data_id: &str) -> bool {
 
 struct Client {
     engine: Engine,
-    // Kept so the engine output stays open for the whole test.
-    _events: EventReceiver,
+    events: EventReceiver,
     plugins: Receiver<PluginEngineEvent>,
     name: String,
 }
@@ -156,7 +181,7 @@ impl Client {
         }
         Self {
             engine,
-            _events: rx,
+            events: rx,
             plugins,
             name,
         }
@@ -392,5 +417,129 @@ async fn servers_before_1_4_have_no_shared_plugin_features() {
             .plugin_send(server, &[1], "mumcord.p.dice", vec![1])
             .err(),
         Some(PluginSendError::Unsupported)
+    );
+}
+
+/// AC-6.12 (transport): even the most a plugin may send at once (a whole game burst) waits in the
+/// low-priority lane behind Mumcord's own traffic, so a watch party started at the same time stays
+/// responsive; the plugin messages still arrive or are counted as expired. The inspector shows
+/// them as hex only (FR-6.39).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v14 (MUMCORD_LIVE=1)"]
+async fn a_plugin_burst_never_holds_up_the_watch_party() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("live_plugins_burst");
+    let mut a = Client::start(&dir, "c6a", common::v14()).await;
+    assert!(a.shared_state().await);
+    let mut b = Client::start(&dir, "c6b", common::v14()).await;
+    assert!(b.shared_state().await);
+    let (a_server, b_server) = (a.server(), b.server());
+    let b_session = a.session_of(&b.name);
+    let a_session = b.session_of(&a.name);
+    wait_plugin(&mut a.plugins, "B with plugins", |e| match e {
+        PluginEngineEvent::PeerCapable {
+            session, plugins, ..
+        } => (*session == b_session && *plugins).then_some(()),
+        _ => None,
+    })
+    .await;
+    a.engine.set_packet_capture(true);
+    b.engine.set_packet_capture(true);
+
+    for i in 0..BURST {
+        a.engine
+            .plugin_send(
+                a_server,
+                &[b_session],
+                "mumcord.p.dice",
+                vec![1, 1, 1, u8::try_from(i).expect("small")],
+            )
+            .expect("queued");
+    }
+    let started = std::time::Instant::now();
+    a.engine
+        .watch_party_start(a_server, VIDEO)
+        .expect("party starts");
+    wait_party(&mut b.events, "the invitation", |_| true).await;
+    let invited = started.elapsed();
+    b.engine.watch_party_join(b_server).expect("join");
+    wait_party(&mut a.events, "B in the party", |p| {
+        p.participants.contains(&b_session)
+    })
+    .await;
+    let sent = std::time::Instant::now();
+    a.engine
+        .watch_party_command(a_server, WatchCommand::Pause { position_ms: 5000 })
+        .expect("pause");
+    wait_party(&mut b.events, "the pause", |p| {
+        !p.playing && p.last_action.is_some()
+    })
+    .await;
+    let paused = sent.elapsed();
+    let mut received = 0;
+    while let Ok(event) = b.plugins.try_recv() {
+        if matches!(&event, PluginEngineEvent::PeerData { data_id, .. } if data_id == "mumcord.p.dice")
+        {
+            received += 1;
+        }
+    }
+    assert!(
+        received < BURST,
+        "the burst was still queued while the party went ahead"
+    );
+    assert!(
+        invited < Duration::from_secs(1),
+        "invitation took {invited:?}"
+    );
+    assert!(paused < Duration::from_secs(1), "pause took {paused:?}");
+
+    // The rest of the burst arrives later or is dropped and counted after 10 s.
+    let deadline = tokio::time::Instant::now() + WAIT;
+    while received + usize::try_from(a.engine.plugin_stats(a_server).low_expired).expect("small")
+        < BURST
+    {
+        if let Ok(Some(PluginEngineEvent::PeerData {
+            sender, data_id, ..
+        })) = tokio::time::timeout_at(deadline, b.plugins.recv()).await
+            && data_id == "mumcord.p.dice"
+        {
+            assert_eq!(sender.session, a_session);
+            received += 1;
+        }
+        assert!(
+            tokio::time::Instant::now() < deadline,
+            "{received} of {BURST} arrived, the rest was not counted"
+        );
+    }
+    assert!(received > 0, "plugin messages still get through");
+
+    // Inspector: plugin messages as hex only, with their pacing on the sending side.
+    let on_b = b.engine.poll_packet_capture(None).packets;
+    let first = on_b
+        .iter()
+        .find(|p| p.kind == "mumcord.p.dice" && p.direction == TapDirection::Received)
+        .expect("B's inspector shows the plugin message");
+    assert_eq!(first.sender, Some(a_session));
+    assert_eq!(first.decoded, None);
+    assert_eq!(first.raw_hex, "01010100");
+    let on_a = a.engine.poll_packet_capture(None).packets;
+    let sent_rows: Vec<_> = on_a
+        .iter()
+        .filter(|p| p.kind == "mumcord.p.dice" && p.direction == TapDirection::Sent)
+        .collect();
+    assert_eq!(sent_rows.len(), received);
+    assert!(
+        sent_rows
+            .iter()
+            .all(|p| p.decoded.is_none() && p.delay_ms.is_some())
+    );
+    assert!(
+        on_a.iter()
+            .any(|p| p.kind == "mumcord.watch" && p.direction == TapDirection::Sent),
+        "the party went out on its own lane"
     );
 }
