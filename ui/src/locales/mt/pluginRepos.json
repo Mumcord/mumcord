@@ -1,0 +1,55 @@
+{
+  "intro": "Ir-repożitorji huma listi addizzjonali ta' plugins immexxija minn persuni oħra. Mumcord ma jivverifikax il-plugins tagħhom. Żid biss repożitorji li tafda.",
+  "add": {
+    "button": "Żid repożitorju",
+    "title": "Żid repożitorju",
+    "address": "Indirizz tar-repożitorju",
+    "expectedKey": "Ċavetta mistennija (mhux obbligatorja)",
+    "expectedKeyHint": "Jekk is-sid tak ċavetta, waħħalha hawn. Ir-repożitorju mbagħad irid juża eżattament din iċ-ċavetta.",
+    "check": "Iċċekkja r-repożitorju",
+    "found": "Dan sibna",
+    "name": "Isem",
+    "homepage": "Websajt",
+    "contact": "Kuntatt",
+    "fingerprint": "Marka diġitali taċ-ċavetta",
+    "pluginCount": "Plugins elenkati",
+    "warning": "Mumcord ma jivverifikax il-plugins ta' repożitorju. Mumcord jiftakar din iċ-ċavetta u jerġa' jistaqsik jekk tinbidel.",
+    "confirm": "Żid repożitorju"
+  },
+  "limit": "Tista' żżid sa {{max}} repożitorji.",
+  "limitReached": "Intlaħaq il-limitu ta' {{max}} repożitorji.",
+  "empty": "Għadu ma ġie miżjud ebda repożitorju.",
+  "listLabel": "Repożitorji miżjuda",
+  "loadFailed": "Ir-repożitorji ma setgħux jitgħabbew.",
+  "status": {
+    "keyChanged": "Iċ-ċavetta nbidlet, f'paws"
+  },
+  "fingerprintLine": "Marka diġitali taċ-ċavetta: {{fingerprint}}",
+  "neverChecked": "Għadu ma ġiex iċċekkjat",
+  "lastChecked": "L-aħħar kontroll: {{when}}",
+  "installedCount": "Plugins installati: {{number}}",
+  "toggle": "Uża {{name}}",
+  "remove": {
+    "button": "Neħħi",
+    "label": "Neħħi {{name}}",
+    "title": "Tneħħi {{name}}?",
+    "message": "Ir-repożitorju jitneħħa u l-plugins tiegħu jingħalqu. Jibqgħu installati bid-dejta tagħhom, iżda ma jibqgħux jirċievu aġġornamenti.",
+    "confirm": "Neħħi"
+  },
+  "keyChange": {
+    "title": "{{name}} biddel iċ-ċavetta",
+    "message": "Dan ir-repożitorju issa jiffirma l-lista tal-plugins tiegħu b'ċavetta oħra. Jibqa' f'paws sakemm tiddeċiedi. Afda ċ-ċavetta l-ġdida biss jekk is-sid ħabbar il-bidla.",
+    "oldKey": "Iċ-ċavetta li fdajt s'issa",
+    "newKey": "Ċavetta ġdida",
+    "keepPaused": "Żomm f'paws",
+    "trust": "Afda ċ-ċavetta l-ġdida",
+    "review": "Irrevedi l-bidla taċ-ċavetta"
+  },
+  "mirror": {
+    "title": "Avvanzat",
+    "label": "Mirror tal-lista uffiċjali tal-plugins (mhux obbligatorju)",
+    "hint": "Biddel dan biss jekk ngħatajt indirizz ta' mirror. Il-mirror irid iservi l-istess fajls iffirmati; Mumcord xorta jivverifika kull firma.",
+    "save": "Issejvja",
+    "reset": "Uża d-default"
+  }
+}

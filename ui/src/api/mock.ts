@@ -65,6 +65,8 @@ import type {
   ServerSnapshot,
   Settings,
   User,
+  RepositoryPreview,
+  RepositoryView,
   WatchParty,
 } from "../bindings/commands";
 import {
@@ -1011,6 +1013,27 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     const kept = next.pinned || next.mutedUntil !== null || next.mutedForever;
     pmPrefs = [...pmPrefs.filter((p) => !same(p)), ...(kept ? [next] : [])];
     emit("pmConversationPrefsChanged", { prefs: pmPrefs });
+  }
+  // plugin repositories (spec 06): addresses under example.org work; a "bad" address fails.
+  let repositories: RepositoryView[] = [];
+  let nextRepositoryId = 1;
+  function previewRepository(url: string, expectedKey: string | null): RepositoryPreview {
+    if (!url.startsWith("https://"))
+      fail("invalidInput", "Repository addresses must start with https://");
+    if (url.includes("bad"))
+      fail("serverUnreachable", "The plugin list server could not be reached");
+    if (expectedKey !== null && expectedKey.trim() !== "" && expectedKey.trim() !== "MOCKKEY") {
+      fail("invalidInput", "The repository key doesn't match the expected key");
+    }
+    return {
+      url,
+      name: "Example repository",
+      homepage: "https://example.org",
+      contact: "plugins@example.org",
+      fingerprint: "1CB49831E26E61AD",
+      pluginCount: 3,
+      notes: [],
+    };
   }
   const failures = new Map<CommandName, ApiError>();
   // `?mockUpdate` on a demo seed: someone who chose "Notify only" while a new version is out,
@@ -2935,6 +2958,54 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // plugins (spec 06): no plugin is installed in the mock; UI tasks extend this.
     pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: [] }),
     pluginsIndex: () => Promise.resolve({ freshness: "fresh", notice: null, plugins: [] }),
+    pluginReposList: () => Promise.resolve(repositories.map((r) => ({ ...r }))),
+    pluginRepoPreview: (url, expectedKey) => Promise.resolve(previewRepository(url, expectedKey)),
+    pluginRepoAdd: (url, expectedKey) => {
+      if (repositories.length >= 10) fail("invalidInput", "at most 10 plugin repositories");
+      const preview = previewRepository(url, expectedKey);
+      if (repositories.some((r) => r.url === preview.url)) {
+        fail("invalidInput", "this plugin repository is already in the list");
+      }
+      const added: RepositoryView = {
+        id: nextRepositoryId++,
+        url: preview.url,
+        name: preview.name,
+        fingerprint: preview.fingerprint,
+        enabled: true,
+        keyChanged: false,
+        lastChecked: null,
+        installedPlugins: 0,
+      };
+      repositories = [...repositories, added];
+      emit("pluginsChanged", {});
+      return Promise.resolve({ ...added });
+    },
+    pluginRepoSetEnabled: (id, enabled) => {
+      repositories = repositories.map((r) => (r.id === id ? { ...r, enabled } : r));
+      emit("pluginsChanged", {});
+      return Promise.resolve(null);
+    },
+    pluginRepoRemove: (id) => {
+      repositories = repositories.filter((r) => r.id !== id);
+      emit("pluginsChanged", {});
+      return Promise.resolve(null);
+    },
+    pluginRepoReviewKey: (id) => {
+      const found = repositories.find((r) => r.id === id);
+      if (!found) fail("notFound", "no such repository");
+      return Promise.resolve({
+        name: found.name,
+        oldFingerprint: found.fingerprint,
+        newFingerprint: "0F0F0F0F0F0F0F0F",
+      });
+    },
+    pluginRepoAcceptKey: (id) => {
+      repositories = repositories.map((r) =>
+        r.id === id ? { ...r, enabled: true, keyChanged: false } : r,
+      );
+      emit("pluginsChanged", {});
+      return Promise.resolve(null);
+    },
     pluginInstall: () => notImplemented("pluginInstall"),
     pluginInstallPrepare: () => fail("notFound", "plugin not in the list"),
     pluginIndexImage: () => fail("notFound", "plugin not in the list"),

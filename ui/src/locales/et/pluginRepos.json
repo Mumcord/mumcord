@@ -1,0 +1,55 @@
+{
+  "intro": "Hoidlad on teiste peetavad lisatud pluginate loendid. Mumcord ei kontrolli nende pluginaid. Lisa ainult hoidlaid, mida usaldad.",
+  "add": {
+    "button": "Lisa hoidla",
+    "title": "Lisa hoidla",
+    "address": "Hoidla aadress",
+    "expectedKey": "Oodatud võti (valikuline)",
+    "expectedKeyHint": "Kui omanik andis sulle võtme, kleebi see siia. Hoidla peab siis kasutama täpselt seda võtit.",
+    "check": "Kontrolli hoidlat",
+    "found": "Selle leidsime",
+    "name": "Nimi",
+    "homepage": "Koduleht",
+    "contact": "Kontakt",
+    "fingerprint": "Võtme sõrmejälg",
+    "pluginCount": "Loetletud pluginad",
+    "warning": "Mumcord ei kontrolli hoidla pluginaid. Mumcord jätab selle võtme meelde ja küsib uuesti, kui see muutub.",
+    "confirm": "Lisa hoidla"
+  },
+  "limit": "Saad lisada kuni {{max}} hoidlat.",
+  "limitReached": "{{max}} hoidla piir on täis.",
+  "empty": "Hoidlaid pole veel lisatud.",
+  "listLabel": "Lisatud hoidlad",
+  "loadFailed": "Hoidlaid ei õnnestunud laadida.",
+  "status": {
+    "keyChanged": "Võti muutus, peatatud"
+  },
+  "fingerprintLine": "Võtme sõrmejälg: {{fingerprint}}",
+  "neverChecked": "Pole veel kontrollitud",
+  "lastChecked": "Viimati kontrollitud: {{when}}",
+  "installedCount": "Paigaldatud pluginad: {{number}}",
+  "toggle": "Kasuta hoidlat {{name}}",
+  "remove": {
+    "button": "Eemalda",
+    "label": "Eemalda {{name}}",
+    "title": "Kas eemaldada {{name}}?",
+    "message": "Hoidla eemaldatakse ja selle pluginad lülitatakse välja. Need jäävad andmetega paigaldatuks, kuid ei saa enam uuendusi.",
+    "confirm": "Eemalda"
+  },
+  "keyChange": {
+    "title": "{{name}} vahetas võtit",
+    "message": "See hoidla allkirjastab nüüd oma pluginaloendi teise võtmega. See jääb peatatuks, kuni otsustad. Usalda uut võtit ainult siis, kui omanik muudatusest teatas.",
+    "oldKey": "Seni usaldatud võti",
+    "newKey": "Uus võti",
+    "keepPaused": "Jäta peatatuks",
+    "trust": "Usalda uut võtit",
+    "review": "Vaata võtmevahetus üle"
+  },
+  "mirror": {
+    "title": "Täpsemalt",
+    "label": "Ametliku pluginaloendi peegel (valikuline)",
+    "hint": "Muuda seda ainult siis, kui said peegli aadressi. Peegel peab pakkuma samu allkirjastatud faile; Mumcord kontrollib siiski iga allkirja.",
+    "save": "Salvesta",
+    "reset": "Kasuta vaikimisi väärtust"
+  }
+}

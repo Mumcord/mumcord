@@ -1,0 +1,55 @@
+{
+  "intro": "Quellen sind zusätzliche Plugin-Listen von anderen Leuten. Mumcord prüft deren Plugins nicht. Füge nur Quellen hinzu, denen du vertraust.",
+  "add": {
+    "button": "Quelle hinzufügen",
+    "title": "Quelle hinzufügen",
+    "address": "Adresse der Quelle",
+    "expectedKey": "Erwarteter Schlüssel (optional)",
+    "expectedKeyHint": "Wenn dir der Betreiber einen Schlüssel genannt hat, füge ihn hier ein. Die Quelle muss dann genau diesen Schlüssel verwenden.",
+    "check": "Quelle prüfen",
+    "found": "Das haben wir gefunden",
+    "name": "Name",
+    "homepage": "Webseite",
+    "contact": "Kontakt",
+    "fingerprint": "Schlüssel-Fingerabdruck",
+    "pluginCount": "Aufgeführte Plugins",
+    "warning": "Plugins aus einer Quelle werden von Mumcord nicht geprüft. Mumcord merkt sich diesen Schlüssel und fragt dich erneut, wenn er sich ändert.",
+    "confirm": "Quelle hinzufügen"
+  },
+  "limit": "Du kannst bis zu {{max}} Quellen hinzufügen.",
+  "limitReached": "Das Limit von {{max}} Quellen ist erreicht.",
+  "empty": "Noch keine Quellen hinzugefügt.",
+  "listLabel": "Hinzugefügte Quellen",
+  "loadFailed": "Die Quellen konnten nicht geladen werden.",
+  "status": {
+    "keyChanged": "Schlüssel geändert, pausiert"
+  },
+  "fingerprintLine": "Schlüssel-Fingerabdruck: {{fingerprint}}",
+  "neverChecked": "Noch nicht geprüft",
+  "lastChecked": "Zuletzt geprüft: {{when}}",
+  "installedCount": "Installierte Plugins: {{number}}",
+  "toggle": "{{name}} verwenden",
+  "remove": {
+    "button": "Entfernen",
+    "label": "{{name}} entfernen",
+    "title": "{{name}} entfernen?",
+    "message": "Die Quelle wird entfernt und ihre Plugins werden ausgeschaltet. Sie bleiben mit ihren Daten installiert, bekommen aber keine Updates mehr.",
+    "confirm": "Entfernen"
+  },
+  "keyChange": {
+    "title": "{{name}} hat den Schlüssel geändert",
+    "message": "Diese Quelle signiert ihre Plugin-Liste jetzt mit einem anderen Schlüssel. Sie bleibt pausiert, bis du entscheidest. Vertraue dem neuen Schlüssel nur, wenn der Betreiber die Änderung angekündigt hat.",
+    "oldKey": "Bisher vertrauter Schlüssel",
+    "newKey": "Neuer Schlüssel",
+    "keepPaused": "Pausiert lassen",
+    "trust": "Neuem Schlüssel vertrauen",
+    "review": "Schlüsseländerung prüfen"
+  },
+  "mirror": {
+    "title": "Erweitert",
+    "label": "Spiegelserver für die offizielle Plugin-Liste (optional)",
+    "hint": "Ändere das nur, wenn du eine Spiegel-Adresse bekommen hast. Der Spiegel muss dieselben signierten Dateien liefern; Mumcord prüft trotzdem jede Signatur.",
+    "save": "Speichern",
+    "reset": "Standard verwenden"
+  }
+}

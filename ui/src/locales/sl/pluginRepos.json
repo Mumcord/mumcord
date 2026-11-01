@@ -1,0 +1,55 @@
+{
+  "intro": "Skladišča so dodatni seznami vtičnikov, ki jih vodijo drugi ljudje. Mumcord njihovih vtičnikov ne pregleduje. Dodajte le skladišča, ki jim zaupate.",
+  "add": {
+    "button": "Dodaj skladišče",
+    "title": "Dodaj skladišče",
+    "address": "Naslov skladišča",
+    "expectedKey": "Pričakovani ključ (neobvezno)",
+    "expectedKeyHint": "Če vam je lastnik dal ključ, ga prilepite sem. Skladišče mora nato uporabljati natanko ta ključ.",
+    "check": "Preveri skladišče",
+    "found": "To smo našli",
+    "name": "Ime",
+    "homepage": "Spletna stran",
+    "contact": "Stik",
+    "fingerprint": "Prstni odtis ključa",
+    "pluginCount": "Navedeni vtičniki",
+    "warning": "Mumcord vtičnikov iz skladišča ne pregleduje. Mumcord si ta ključ zapomni in vas vpraša znova, če se spremeni.",
+    "confirm": "Dodaj skladišče"
+  },
+  "limit": "Dodate lahko do {{max}} skladišč.",
+  "limitReached": "Dosežena je omejitev {{max}} skladišč.",
+  "empty": "Skladišč še niste dodali.",
+  "listLabel": "Dodana skladišča",
+  "loadFailed": "Skladišč ni bilo mogoče naložiti.",
+  "status": {
+    "keyChanged": "Ključ spremenjen, začasno ustavljeno"
+  },
+  "fingerprintLine": "Prstni odtis ključa: {{fingerprint}}",
+  "neverChecked": "Še ni preverjeno",
+  "lastChecked": "Nazadnje preverjeno: {{when}}",
+  "installedCount": "Nameščeni vtičniki: {{number}}",
+  "toggle": "Uporabljaj {{name}}",
+  "remove": {
+    "button": "Odstrani",
+    "label": "Odstrani {{name}}",
+    "title": "Odstranim {{name}}?",
+    "message": "Skladišče bo odstranjeno, njegovi vtičniki pa izklopljeni. Ostanejo nameščeni s svojimi podatki, vendar ne prejemajo več posodobitev.",
+    "confirm": "Odstrani"
+  },
+  "keyChange": {
+    "title": "{{name}} je spremenilo ključ",
+    "message": "To skladišče zdaj podpisuje seznam vtičnikov z drugim ključem. Ostane začasno ustavljeno, dokler se ne odločite. Novemu ključu zaupajte le, če je lastnik spremembo napovedal.",
+    "oldKey": "Do zdaj zaupani ključ",
+    "newKey": "Nov ključ",
+    "keepPaused": "Pusti ustavljeno",
+    "trust": "Zaupaj novemu ključu",
+    "review": "Preglej spremembo ključa"
+  },
+  "mirror": {
+    "title": "Napredno",
+    "label": "Zrcalo uradnega seznama vtičnikov (neobvezno)",
+    "hint": "To spremenite le, če ste dobili naslov zrcala. Zrcalo mora ponujati iste podpisane datoteke; Mumcord še vedno preveri vsak podpis.",
+    "save": "Shrani",
+    "reset": "Uporabi privzeto"
+  }
+}

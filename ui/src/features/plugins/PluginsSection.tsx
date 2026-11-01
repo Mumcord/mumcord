@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Group } from "../settings/components/Section";
 import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginRequestStore";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
+import { RepositoriesTab, type MirrorSetting } from "./repos";
 import "./plugins.css";
 import { DeveloperTab } from "./developer/DeveloperTab";
 
@@ -17,7 +18,7 @@ const TAB_CONTENT: Record<PluginTab, ReactNode> = {
   installed: null,
   browse: null,
   updates: null,
-  repositories: null,
+  repositories: <RepositoriesTab />,
   developer: <DeveloperTab />,
 };
 
@@ -25,7 +26,14 @@ const TAB_CONTENT: Record<PluginTab, ReactNode> = {
  * Settings → Plugins (FR-6.58): header with "Turn off all plugins", the `--no-plugins` banner and
  * the tabs. The Developer tab only exists while Developer mode is on (FR-6.73).
  */
-export function PluginsSection({ developerMode }: { developerMode: boolean }) {
+export function PluginsSection({
+  developerMode,
+  mirror,
+}: {
+  developerMode: boolean;
+  /** The optional mirror of the official list, shown under Repositories → Advanced. */
+  mirror?: MirrorSetting | undefined;
+}) {
   const { t } = useTranslation("pluginSettings");
   const { overview, loadFailed } = usePlugins();
   const baseId = useId();
@@ -118,7 +126,7 @@ export function PluginsSection({ developerMode }: { developerMode: boolean }) {
         ))}
       </div>
       <div role="tabpanel" id={panelId(active)} aria-labelledby={tabId(active)} tabIndex={-1}>
-        {TAB_CONTENT[active]}
+        {active === "repositories" ? <RepositoriesTab mirror={mirror} /> : TAB_CONTENT[active]}
       </div>
     </Group>
   );

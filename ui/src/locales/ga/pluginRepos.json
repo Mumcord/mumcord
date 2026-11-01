@@ -1,0 +1,55 @@
+{
+  "intro": "Is liostaí breise breiseán iad stórais atá á reáchtáil ag daoine eile. Ní dhéanann Mumcord athbhreithniú ar a mbreiseáin. Cuir stórais leis nach bhfuil muinín agat astu amháin.",
+  "add": {
+    "button": "Cuir stór leis",
+    "title": "Cuir stór leis",
+    "address": "Seoladh an stóir",
+    "expectedKey": "An eochair a mbeifear ag súil léi (roghnach)",
+    "expectedKeyHint": "Má thug an t-úinéir eochair duit, greamaigh anseo í. Caithfidh an stór an eochair seo go díreach a úsáid ansin.",
+    "check": "Seiceáil an stór",
+    "found": "Seo a fuaireamar",
+    "name": "Ainm",
+    "homepage": "Suíomh gréasáin",
+    "contact": "Teagmháil",
+    "fingerprint": "Méarloim na heochrach",
+    "pluginCount": "Breiseáin liostaithe",
+    "warning": "Ní dhéanann Mumcord athbhreithniú ar bhreiseáin stóir. Cuimhníonn Mumcord ar an eochair seo agus fiafraíonn sé díot arís má athraíonn sí.",
+    "confirm": "Cuir stór leis"
+  },
+  "limit": "Is féidir suas le {{max}} stór a chur leis.",
+  "limitReached": "Sroichadh an teorainn de {{max}} stór.",
+  "empty": "Níor cuireadh aon stór leis go fóill.",
+  "listLabel": "Stórais curtha leis",
+  "loadFailed": "Níorbh fhéidir na stórais a luchtú.",
+  "status": {
+    "keyChanged": "Athraíodh an eochair, curtha ar sos"
+  },
+  "fingerprintLine": "Méarloim na heochrach: {{fingerprint}}",
+  "neverChecked": "Níor seiceáladh go fóill",
+  "lastChecked": "Seiceáilte go deireanach: {{when}}",
+  "installedCount": "Breiseáin suiteáilte: {{number}}",
+  "toggle": "Úsáid {{name}}",
+  "remove": {
+    "button": "Bain",
+    "label": "Bain {{name}}",
+    "title": "Bain {{name}}?",
+    "message": "Baintear an stór agus cuirtear a bhreiseáin as. Fanann siad suiteáilte lena gcuid sonraí, ach ní fhaigheann siad nuashonruithe a thuilleadh.",
+    "confirm": "Bain"
+  },
+  "keyChange": {
+    "title": "D'athraigh {{name}} a eochair",
+    "message": "Síníonn an stór seo a liosta breiseán anois le heochair eile. Fanann sé ar sos go gcinneann tú. Cuir muinín san eochair nua amháin má d'fhógair an t-úinéir an t-athrú.",
+    "oldKey": "An eochair ar chuir tú muinín inti go dtí seo",
+    "newKey": "Eochair nua",
+    "keepPaused": "Fág ar sos",
+    "trust": "Cuir muinín san eochair nua",
+    "review": "Athbhreithnigh athrú na heochrach"
+  },
+  "mirror": {
+    "title": "Casta",
+    "label": "Scáthán den liosta oifigiúil breiseán (roghnach)",
+    "hint": "Ná hathraigh é seo ach má tugadh seoladh scátháin duit. Caithfidh an scáthán na comhaid shínithe chéanna a sholáthar; seiceálann Mumcord gach síniú fós.",
+    "save": "Sábháil",
+    "reset": "Úsáid an réamhshocrú"
+  }
+}

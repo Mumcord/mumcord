@@ -1,0 +1,55 @@
+{
+  "intro": "Los repositorios son listas de plugins adicionales gestionadas por otras personas. Mumcord no revisa sus plugins. Añade solo repositorios en los que confíes.",
+  "add": {
+    "button": "Añadir repositorio",
+    "title": "Añadir repositorio",
+    "address": "Dirección del repositorio",
+    "expectedKey": "Clave esperada (opcional)",
+    "expectedKeyHint": "Si el propietario te dio una clave, pégala aquí. El repositorio deberá usar exactamente esa clave.",
+    "check": "Comprobar repositorio",
+    "found": "Esto es lo que encontramos",
+    "name": "Nombre",
+    "homepage": "Página web",
+    "contact": "Contacto",
+    "fingerprint": "Huella de la clave",
+    "pluginCount": "Plugins listados",
+    "warning": "Mumcord no revisa los plugins de un repositorio. Mumcord recuerda esta clave y te preguntará de nuevo si alguna vez cambia.",
+    "confirm": "Añadir repositorio"
+  },
+  "limit": "Puedes añadir hasta {{max}} repositorios.",
+  "limitReached": "Se alcanzó el límite de {{max}} repositorios.",
+  "empty": "Aún no has añadido repositorios.",
+  "listLabel": "Repositorios añadidos",
+  "loadFailed": "No se pudieron cargar los repositorios.",
+  "status": {
+    "keyChanged": "Clave cambiada, en pausa"
+  },
+  "fingerprintLine": "Huella de la clave: {{fingerprint}}",
+  "neverChecked": "Aún no comprobado",
+  "lastChecked": "Última comprobación: {{when}}",
+  "installedCount": "Plugins instalados: {{number}}",
+  "toggle": "Usar {{name}}",
+  "remove": {
+    "button": "Quitar",
+    "label": "Quitar {{name}}",
+    "title": "¿Quitar {{name}}?",
+    "message": "Se quita el repositorio y se desactivan sus plugins. Siguen instalados con sus datos, pero ya no reciben actualizaciones.",
+    "confirm": "Quitar"
+  },
+  "keyChange": {
+    "title": "{{name}} cambió su clave",
+    "message": "Este repositorio ahora firma su lista de plugins con otra clave. Permanece en pausa hasta que decidas. Confía en la nueva clave solo si el propietario te avisó del cambio.",
+    "oldKey": "Clave de confianza anterior",
+    "newKey": "Clave nueva",
+    "keepPaused": "Mantener en pausa",
+    "trust": "Confiar en la clave nueva",
+    "review": "Revisar el cambio de clave"
+  },
+  "mirror": {
+    "title": "Avanzado",
+    "label": "Espejo de la lista oficial de plugins (opcional)",
+    "hint": "Cambia esto solo si te dieron la dirección de un espejo. El espejo debe servir los mismos archivos firmados; Mumcord sigue comprobando cada firma.",
+    "save": "Guardar",
+    "reset": "Usar el valor predeterminado"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "intro": "Repozitoriji su dodatni popisi dodataka koje vode drugi ljudi. Mumcord ne pregledava njihove dodatke. Dodajte samo repozitorije kojima vjerujete.",
+  "add": {
+    "button": "Dodaj repozitorij",
+    "title": "Dodaj repozitorij",
+    "address": "Adresa repozitorija",
+    "expectedKey": "Očekivani ključ (neobavezno)",
+    "expectedKeyHint": "Ako vam je vlasnik dao ključ, zalijepite ga ovdje. Repozitorij tada mora koristiti točno taj ključ.",
+    "check": "Provjeri repozitorij",
+    "found": "Ovo smo pronašli",
+    "name": "Naziv",
+    "homepage": "Web-stranica",
+    "contact": "Kontakt",
+    "fingerprint": "Otisak ključa",
+    "pluginCount": "Navedeni dodaci",
+    "warning": "Mumcord ne pregledava dodatke iz repozitorija. Mumcord pamti ovaj ključ i pitat će vas ponovno ako se promijeni.",
+    "confirm": "Dodaj repozitorij"
+  },
+  "limit": "Možete dodati do {{max}} repozitorija.",
+  "limitReached": "Dosegnuto je ograničenje od {{max}} repozitorija.",
+  "empty": "Još nema dodanih repozitorija.",
+  "listLabel": "Dodani repozitoriji",
+  "loadFailed": "Repozitoriji se nisu mogli učitati.",
+  "status": {
+    "keyChanged": "Ključ promijenjen, pauzirano"
+  },
+  "fingerprintLine": "Otisak ključa: {{fingerprint}}",
+  "neverChecked": "Još nije provjereno",
+  "lastChecked": "Zadnja provjera: {{when}}",
+  "installedCount": "Instalirani dodaci: {{number}}",
+  "toggle": "Koristi {{name}}",
+  "remove": {
+    "button": "Ukloni",
+    "label": "Ukloni {{name}}",
+    "title": "Ukloniti {{name}}?",
+    "message": "Repozitorij se uklanja, a njegovi dodaci isključuju. Ostaju instalirani sa svojim podacima, ali više ne primaju ažuriranja.",
+    "confirm": "Ukloni"
+  },
+  "keyChange": {
+    "title": "{{name}} je promijenio ključ",
+    "message": "Ovaj repozitorij sada potpisuje popis dodataka drugim ključem. Ostaje pauziran dok ne odlučite. Novom ključu vjerujte samo ako je vlasnik najavio promjenu.",
+    "oldKey": "Dosad pouzdani ključ",
+    "newKey": "Novi ključ",
+    "keepPaused": "Ostavi pauzirano",
+    "trust": "Vjeruj novom ključu",
+    "review": "Pregledaj promjenu ključa"
+  },
+  "mirror": {
+    "title": "Napredno",
+    "label": "Zrcalo službenog popisa dodataka (neobavezno)",
+    "hint": "Promijenite samo ako ste dobili adresu zrcala. Zrcalo mora posluživati iste potpisane datoteke; Mumcord i dalje provjerava svaki potpis.",
+    "save": "Spremi",
+    "reset": "Koristi zadano"
+  }
+}

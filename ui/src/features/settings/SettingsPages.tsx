@@ -114,7 +114,17 @@ export function SettingsPageCards({
         </>
       );
     case "plugins":
-      return <PluginsSection developerMode={settings.developerMode} />;
+      return (
+        <PluginsSection
+          developerMode={settings.developerMode}
+          mirror={{
+            url: settings.pluginsMirrorUrl,
+            onChange: (pluginsMirrorUrl) => {
+              update({ pluginsMirrorUrl });
+            },
+          }}
+        />
+      );
     case "appearance":
       return (
         <>

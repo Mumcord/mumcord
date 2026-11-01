@@ -1,0 +1,55 @@
+{
+  "intro": "I repository sono elenchi di plugin aggiuntivi gestiti da altre persone. Mumcord non controlla i loro plugin. Aggiungi solo repository di cui ti fidi.",
+  "add": {
+    "button": "Aggiungi repository",
+    "title": "Aggiungi repository",
+    "address": "Indirizzo del repository",
+    "expectedKey": "Chiave attesa (facoltativa)",
+    "expectedKeyHint": "Se il titolare ti ha dato una chiave, incollala qui. Il repository dovrà usare esattamente questa chiave.",
+    "check": "Controlla repository",
+    "found": "Ecco cosa abbiamo trovato",
+    "name": "Nome",
+    "homepage": "Sito web",
+    "contact": "Contatto",
+    "fingerprint": "Impronta della chiave",
+    "pluginCount": "Plugin elencati",
+    "warning": "Mumcord non controlla i plugin di un repository. Mumcord ricorda questa chiave e ti chiede di nuovo se cambia.",
+    "confirm": "Aggiungi repository"
+  },
+  "limit": "Puoi aggiungere fino a {{max}} repository.",
+  "limitReached": "Raggiunto il limite di {{max}} repository.",
+  "empty": "Nessun repository aggiunto.",
+  "listLabel": "Repository aggiunti",
+  "loadFailed": "Impossibile caricare i repository.",
+  "status": {
+    "keyChanged": "Chiave cambiata, in pausa"
+  },
+  "fingerprintLine": "Impronta della chiave: {{fingerprint}}",
+  "neverChecked": "Non ancora controllato",
+  "lastChecked": "Ultimo controllo: {{when}}",
+  "installedCount": "Plugin installati: {{number}}",
+  "toggle": "Usa {{name}}",
+  "remove": {
+    "button": "Rimuovi",
+    "label": "Rimuovi {{name}}",
+    "title": "Rimuovere {{name}}?",
+    "message": "Il repository viene rimosso e i suoi plugin vengono disattivati. Restano installati con i loro dati, ma non ricevono più aggiornamenti.",
+    "confirm": "Rimuovi"
+  },
+  "keyChange": {
+    "title": "{{name}} ha cambiato chiave",
+    "message": "Questo repository ora firma il suo elenco di plugin con un'altra chiave. Resta in pausa finché non decidi. Fidati della nuova chiave solo se il titolare ti ha avvisato del cambiamento.",
+    "oldKey": "Chiave di cui ti fidavi finora",
+    "newKey": "Nuova chiave",
+    "keepPaused": "Lascia in pausa",
+    "trust": "Fidati della nuova chiave",
+    "review": "Esamina il cambio di chiave"
+  },
+  "mirror": {
+    "title": "Avanzate",
+    "label": "Mirror dell'elenco ufficiale dei plugin (facoltativo)",
+    "hint": "Cambia questa impostazione solo se ti è stato dato l'indirizzo di un mirror. Il mirror deve fornire gli stessi file firmati; Mumcord controlla comunque ogni firma.",
+    "save": "Salva",
+    "reset": "Usa il valore predefinito"
+  }
+}

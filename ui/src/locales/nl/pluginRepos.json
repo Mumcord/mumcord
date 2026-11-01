@@ -1,0 +1,55 @@
+{
+  "intro": "Repositories zijn extra pluginlijsten die door anderen worden beheerd. Mumcord controleert hun plugins niet. Voeg alleen repositories toe die je vertrouwt.",
+  "add": {
+    "button": "Repository toevoegen",
+    "title": "Repository toevoegen",
+    "address": "Adres van de repository",
+    "expectedKey": "Verwachte sleutel (optioneel)",
+    "expectedKeyHint": "Als de eigenaar je een sleutel heeft gegeven, plak die dan hier. De repository moet dan precies deze sleutel gebruiken.",
+    "check": "Repository controleren",
+    "found": "Dit hebben we gevonden",
+    "name": "Naam",
+    "homepage": "Website",
+    "contact": "Contact",
+    "fingerprint": "Sleutelvingerafdruk",
+    "pluginCount": "Vermelde plugins",
+    "warning": "Plugins uit een repository worden niet door Mumcord gecontroleerd. Mumcord onthoudt deze sleutel en vraagt het opnieuw als die verandert.",
+    "confirm": "Repository toevoegen"
+  },
+  "limit": "Je kunt maximaal {{max}} repositories toevoegen.",
+  "limitReached": "De limiet van {{max}} repositories is bereikt.",
+  "empty": "Nog geen repositories toegevoegd.",
+  "listLabel": "Toegevoegde repositories",
+  "loadFailed": "De repositories konden niet worden geladen.",
+  "status": {
+    "keyChanged": "Sleutel gewijzigd, gepauzeerd"
+  },
+  "fingerprintLine": "Sleutelvingerafdruk: {{fingerprint}}",
+  "neverChecked": "Nog niet gecontroleerd",
+  "lastChecked": "Laatst gecontroleerd: {{when}}",
+  "installedCount": "Geïnstalleerde plugins: {{number}}",
+  "toggle": "{{name}} gebruiken",
+  "remove": {
+    "button": "Verwijderen",
+    "label": "{{name}} verwijderen",
+    "title": "{{name}} verwijderen?",
+    "message": "De repository wordt verwijderd en de bijbehorende plugins worden uitgezet. Ze blijven met hun gegevens geïnstalleerd, maar krijgen geen updates meer.",
+    "confirm": "Verwijderen"
+  },
+  "keyChange": {
+    "title": "{{name}} heeft de sleutel gewijzigd",
+    "message": "Deze repository ondertekent zijn pluginlijst nu met een andere sleutel. Hij blijft gepauzeerd tot jij beslist. Vertrouw de nieuwe sleutel alleen als de eigenaar de wijziging heeft aangekondigd.",
+    "oldKey": "Tot nu toe vertrouwde sleutel",
+    "newKey": "Nieuwe sleutel",
+    "keepPaused": "Gepauzeerd laten",
+    "trust": "Nieuwe sleutel vertrouwen",
+    "review": "Sleutelwijziging bekijken"
+  },
+  "mirror": {
+    "title": "Geavanceerd",
+    "label": "Mirror voor de officiële pluginlijst (optioneel)",
+    "hint": "Wijzig dit alleen als je een mirroradres hebt gekregen. De mirror moet dezelfde ondertekende bestanden leveren; Mumcord controleert nog steeds elke handtekening.",
+    "save": "Opslaan",
+    "reset": "Standaard gebruiken"
+  }
+}

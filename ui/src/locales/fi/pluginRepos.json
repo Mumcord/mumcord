@@ -1,0 +1,55 @@
+{
+  "intro": "Arkistot ovat muiden ylläpitämiä lisäosaluetteloita. Mumcord ei tarkista niiden lisäosia. Lisää vain arkistoja, joihin luotat.",
+  "add": {
+    "button": "Lisää arkisto",
+    "title": "Lisää arkisto",
+    "address": "Arkiston osoite",
+    "expectedKey": "Odotettu avain (valinnainen)",
+    "expectedKeyHint": "Jos ylläpitäjä antoi sinulle avaimen, liitä se tähän. Arkiston on silloin käytettävä juuri tätä avainta.",
+    "check": "Tarkista arkisto",
+    "found": "Tämän löysimme",
+    "name": "Nimi",
+    "homepage": "Verkkosivu",
+    "contact": "Yhteystieto",
+    "fingerprint": "Avaimen sormenjälki",
+    "pluginCount": "Luetellut lisäosat",
+    "warning": "Mumcord ei tarkista arkiston lisäosia. Mumcord muistaa tämän avaimen ja kysyy uudelleen, jos se muuttuu.",
+    "confirm": "Lisää arkisto"
+  },
+  "limit": "Voit lisätä enintään {{max}} arkistoa.",
+  "limitReached": "Enimmäismäärä {{max}} arkistoa on saavutettu.",
+  "empty": "Arkistoja ei ole vielä lisätty.",
+  "listLabel": "Lisätyt arkistot",
+  "loadFailed": "Arkistoja ei voitu ladata.",
+  "status": {
+    "keyChanged": "Avain muuttunut, keskeytetty"
+  },
+  "fingerprintLine": "Avaimen sormenjälki: {{fingerprint}}",
+  "neverChecked": "Ei vielä tarkistettu",
+  "lastChecked": "Viimeksi tarkistettu: {{when}}",
+  "installedCount": "Asennetut lisäosat: {{number}}",
+  "toggle": "Käytä arkistoa {{name}}",
+  "remove": {
+    "button": "Poista",
+    "label": "Poista {{name}}",
+    "title": "Poistetaanko {{name}}?",
+    "message": "Arkisto poistetaan ja sen lisäosat kytketään pois päältä. Ne pysyvät asennettuina tietoineen, mutta eivät saa enää päivityksiä.",
+    "confirm": "Poista"
+  },
+  "keyChange": {
+    "title": "{{name}} vaihtoi avaimensa",
+    "message": "Tämä arkisto allekirjoittaa lisäosaluettelonsa nyt toisella avaimella. Se pysyy keskeytettynä, kunnes päätät. Luota uuteen avaimeen vain, jos ylläpitäjä kertoi muutoksesta.",
+    "oldKey": "Tähän asti luotettu avain",
+    "newKey": "Uusi avain",
+    "keepPaused": "Pidä keskeytettynä",
+    "trust": "Luota uuteen avaimeen",
+    "review": "Tarkista avaimen vaihto"
+  },
+  "mirror": {
+    "title": "Lisäasetukset",
+    "label": "Virallisen lisäosaluettelon peilipalvelin (valinnainen)",
+    "hint": "Muuta tätä vain, jos sait peilin osoitteen. Peilin on tarjottava samat allekirjoitetut tiedostot; Mumcord tarkistaa silti jokaisen allekirjoituksen.",
+    "save": "Tallenna",
+    "reset": "Käytä oletusta"
+  }
+}

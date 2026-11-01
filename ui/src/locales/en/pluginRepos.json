@@ -1,0 +1,55 @@
+{
+  "intro": "Repositories are extra plugin lists run by other people. Mumcord does not review their plugins. Only add a repository you trust.",
+  "add": {
+    "button": "Add repository",
+    "title": "Add repository",
+    "address": "Repository address",
+    "expectedKey": "Expected key (optional)",
+    "expectedKeyHint": "If the owner gave you a key, paste it here. The repository must then use exactly this key.",
+    "check": "Check repository",
+    "found": "What we found",
+    "name": "Name",
+    "homepage": "Homepage",
+    "contact": "Contact",
+    "fingerprint": "Key fingerprint",
+    "pluginCount": "Plugins listed",
+    "warning": "Plugins from a repository are not reviewed by Mumcord. Mumcord remembers this key and asks you again if it ever changes.",
+    "confirm": "Add repository"
+  },
+  "limit": "You can add up to {{max}} repositories.",
+  "limitReached": "The limit of {{max}} repositories is reached.",
+  "empty": "No repositories added yet.",
+  "listLabel": "Added repositories",
+  "loadFailed": "The repositories could not be loaded.",
+  "status": {
+    "keyChanged": "Key changed, paused"
+  },
+  "fingerprintLine": "Key fingerprint: {{fingerprint}}",
+  "neverChecked": "Not checked yet",
+  "lastChecked": "Last checked: {{when}}",
+  "installedCount": "Installed plugins: {{number}}",
+  "toggle": "Use {{name}}",
+  "remove": {
+    "button": "Remove",
+    "label": "Remove {{name}}",
+    "title": "Remove {{name}}?",
+    "message": "The repository is removed and its plugins are turned off. They stay installed with their data, but get no more updates.",
+    "confirm": "Remove"
+  },
+  "keyChange": {
+    "title": "{{name}} changed its key",
+    "message": "This repository now signs its plugin list with a different key. It stays paused until you decide. Only trust the new key if the owner told you about the change.",
+    "oldKey": "Key you trusted before",
+    "newKey": "New key",
+    "keepPaused": "Keep paused",
+    "trust": "Trust new key",
+    "review": "Review key change"
+  },
+  "mirror": {
+    "title": "Advanced",
+    "label": "Mirror for the official plugin list (optional)",
+    "hint": "Only change this if you were given a mirror address. The mirror must serve the same signed files; Mumcord still checks every signature.",
+    "save": "Save",
+    "reset": "Use the default"
+  }
+}

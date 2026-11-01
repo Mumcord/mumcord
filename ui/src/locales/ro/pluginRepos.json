@@ -1,0 +1,55 @@
+{
+  "intro": "Depozitele sunt liste suplimentare de pluginuri administrate de alte persoane. Mumcord nu verifică pluginurile lor. Adaugă doar depozite în care ai încredere.",
+  "add": {
+    "button": "Adaugă depozit",
+    "title": "Adaugă depozit",
+    "address": "Adresa depozitului",
+    "expectedKey": "Cheie așteptată (opțional)",
+    "expectedKeyHint": "Dacă proprietarul ți-a dat o cheie, lipește-o aici. Depozitul trebuie să folosească exact această cheie.",
+    "check": "Verifică depozitul",
+    "found": "Iată ce am găsit",
+    "name": "Nume",
+    "homepage": "Pagină web",
+    "contact": "Contact",
+    "fingerprint": "Amprenta cheii",
+    "pluginCount": "Pluginuri listate",
+    "warning": "Mumcord nu verifică pluginurile dintr-un depozit. Mumcord reține această cheie și te întreabă din nou dacă se schimbă.",
+    "confirm": "Adaugă depozit"
+  },
+  "limit": "Poți adăuga cel mult {{max}} depozite.",
+  "limitReached": "S-a atins limita de {{max}} depozite.",
+  "empty": "Nu ai adăugat încă niciun depozit.",
+  "listLabel": "Depozite adăugate",
+  "loadFailed": "Depozitele nu au putut fi încărcate.",
+  "status": {
+    "keyChanged": "Cheie schimbată, în pauză"
+  },
+  "fingerprintLine": "Amprenta cheii: {{fingerprint}}",
+  "neverChecked": "Încă neverificat",
+  "lastChecked": "Ultima verificare: {{when}}",
+  "installedCount": "Pluginuri instalate: {{number}}",
+  "toggle": "Folosește {{name}}",
+  "remove": {
+    "button": "Elimină",
+    "label": "Elimină {{name}}",
+    "title": "Elimini {{name}}?",
+    "message": "Depozitul este eliminat, iar pluginurile lui sunt oprite. Rămân instalate cu datele lor, dar nu mai primesc actualizări.",
+    "confirm": "Elimină"
+  },
+  "keyChange": {
+    "title": "{{name}} și-a schimbat cheia",
+    "message": "Acest depozit își semnează acum lista de pluginuri cu altă cheie. Rămâne în pauză până decizi. Ai încredere în noua cheie doar dacă proprietarul a anunțat schimbarea.",
+    "oldKey": "Cheia în care ai avut încredere până acum",
+    "newKey": "Cheie nouă",
+    "keepPaused": "Păstrează în pauză",
+    "trust": "Am încredere în cheia nouă",
+    "review": "Examinează schimbarea cheii"
+  },
+  "mirror": {
+    "title": "Avansat",
+    "label": "Oglindă pentru lista oficială de pluginuri (opțional)",
+    "hint": "Schimbă doar dacă ai primit o adresă de oglindă. Oglinda trebuie să ofere aceleași fișiere semnate; Mumcord verifică oricum fiecare semnătură.",
+    "save": "Salvează",
+    "reset": "Folosește valoarea implicită"
+  }
+}
