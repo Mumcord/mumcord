@@ -53,7 +53,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B41a | Echolings: pet core | done (Mumcord/plugins PR #3, not merged) | b41a-pets |
 | B41b | Echolings: social + Echo Echo | in progress | b41b-social |
 | B41c | Echolings: Snack Race (web view) | open | |
-| B42 | Mumbot Music plugin | open | |
+| B42 | Mumbot Music plugin | in progress | b42-music |
 | B43 | CI in Mumcord: plugin tests and E2E | open | |
 | B44 | PRIVACY.md plugins section | done | b44-privacy |
 | K1 | Official plugin registry signing key (generated locally, stored as secret, never committed) | done (public keys: ~/.config/mumcord-signing/plugins/{active,backup}.pub; active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5) | k1-signkey |
