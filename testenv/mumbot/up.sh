@@ -37,6 +37,16 @@ if [ -z "$bot" ]; then
   bot="$fetch_dir/mumbot"
 fi
 if [ ! -f "$dir/.registered" ]; then
+  # testenv/up.sh returns as soon as the container is recreated; until the server listens, the
+  # published port accepts and then resets. Wait for a TLS handshake before the one-shot register.
+  ready=0
+  for _ in $(seq 60); do
+    if timeout 5 openssl s_client -connect "127.0.0.1:$PORT_V15" </dev/null >/dev/null 2>&1; then
+      ready=1; break
+    fi
+    sleep 1
+  done
+  [ "$ready" = 1 ] || { echo "v15 on 127.0.0.1:$PORT_V15 did not accept TLS within 60s" >&2; exit 1; }
   MUMBOT_DATA="$PWD/$dir/data" "$bot" --port "$PORT_V15" --name MumbotLocal --cert mumbotlocal register
   touch "$dir/.registered"
 fi

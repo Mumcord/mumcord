@@ -104,7 +104,8 @@ async function testConnection(expected: string): Promise<void> {
 }
 
 describe("plugins: Mumbot Music with a local mumbot (AC-6.25)", () => {
-  let fixtures: registry.FixtureRegistry;
+  // Unset when the before hook failed early; the after hook then cleans up what did start.
+  let fixtures: registry.FixtureRegistry | undefined;
   let bot: mumbot.LocalMumbot;
   let urlTrack: mumbot.TrackServer | undefined;
 
@@ -138,16 +139,18 @@ describe("plugins: Mumbot Music with a local mumbot (AC-6.25)", () => {
   before(async function () {
     this.timeout(20 * 60_000);
     await testenv.up("v15");
-    fixtures = await registry.start();
+    const started = await registry.start();
+    fixtures = started;
     bot = await mumbot.start();
-    await app.restart({ env: fixtures.env() });
+    await app.restart({ env: started.env() });
     await finishWizard("Alice");
   });
 
   after(async () => {
     await urlTrack?.close();
-    await bot.stop();
-    await fixtures.stop();
+    // Also removes a bot container whose start failed half-way.
+    await mumbot.stop();
+    await fixtures?.stop();
   });
 
   it("marks the network and keychain permissions as high risk and installs", async () => {

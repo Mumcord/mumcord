@@ -18,7 +18,11 @@ export interface LocalMumbot {
   key: string;
   /** Calls the music API with the key; throws on a non-2xx answer. */
   api<T>(method: "GET" | "POST", path: string, body?: object): Promise<T>;
-  stop(): Promise<void>;
+}
+
+/** Removes the bot container; also safe when `start` failed or never ran. */
+export async function stop(): Promise<void> {
+  await runOk(join(testenvDir, "mumbot", "down.sh"), []);
 }
 
 /** Starts the bot (needs v15 up) and waits until it is connected to the server. */
@@ -57,9 +61,6 @@ export async function start(): Promise<LocalMumbot> {
         if (!response.ok) throw new Error(`mumbot ${method} ${path}: ${String(response.status)}`);
         return (await response.json()) as T;
       }
-    },
-    async stop() {
-      await runOk(join(testenvDir, "mumbot", "down.sh"), []);
     },
   };
 }
