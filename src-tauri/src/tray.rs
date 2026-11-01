@@ -32,8 +32,6 @@ mod linux;
 mod menu;
 mod state;
 
-/// Side length of the generated tray images; trays render at 16–32 px.
-const ICON_SIZE: u32 = 64;
 /// Side length of the dots in front of menu rows.
 const DOT_SIZE: u32 = 16;
 
@@ -126,7 +124,7 @@ fn tooltip(status: &str) -> String {
 
 /// Everything a backend draws, taken from the state under one lock.
 struct View {
-    icon: Option<Image<'static>>,
+    icon: Image<'static>,
     tooltip: String,
     /// Only built when the menu may have changed.
     menu: Option<Vec<Entry>>,
@@ -135,7 +133,7 @@ struct View {
 /// The tray's live state, kept in Tauri state.
 pub struct Tray {
     backend: Backend,
-    base: Option<Image<'static>>,
+    base: Image<'static>,
     state: Mutex<TrayState>,
 }
 
@@ -171,8 +169,10 @@ struct Shown {
     actions: Vec<Action>,
 }
 
-fn base_icon(app: &AppHandle) -> Option<Image<'static>> {
-    app.default_window_icon().map(|i| icon::scale(i, ICON_SIZE))
+/// The flat, outlined tray mark (64 px; trays render at 16–32 px): the full-colour app icon's
+/// speech bubbles and gradients turn to noise at tray size.
+fn base_icon() -> Image<'static> {
+    tauri::include_image!("icons/tray.png")
 }
 
 /// Creates the tray. Failing to create it is logged; the app works without one.
@@ -184,7 +184,7 @@ pub fn init(app: &AppHandle) {
             Ok(handle) => {
                 app.manage(Tray {
                     backend: Backend::Ksni(handle),
-                    base: base_icon(&app),
+                    base: base_icon(),
                     state: Mutex::new(initial_state(&app)),
                 });
                 refresh(&app, Change::Menu);
@@ -222,7 +222,7 @@ fn init_tauri(app: &AppHandle) {
 }
 
 fn build(app: &AppHandle) -> tauri::Result<Tray> {
-    let base = base_icon(app);
+    let base = base_icon();
     let mut builder = TrayIconBuilder::with_id("main")
         .menu(&Menu::new(app)?)
         // A menu bar item opens its menu on click (macOS); elsewhere a click shows the window
@@ -243,9 +243,7 @@ fn build(app: &AppHandle) -> tauri::Result<Tray> {
             }
         });
     }
-    if let Some(base) = &base {
-        builder = builder.icon(compose(base, TrayState::default().icon()));
-    }
+    builder = builder.icon(compose(&base, TrayState::default().icon()));
     Ok(Tray {
         backend: Backend::Tauri(Box::new(TauriTray {
             icon: builder.build(app)?,
@@ -431,7 +429,7 @@ fn view(app: &AppHandle, tray: &Tray, change: Change) -> View {
     let labels = current_labels(app);
     let state = lock(&tray.state);
     View {
-        icon: tray.base.as_ref().map(|base| compose(base, state.icon())),
+        icon: compose(&tray.base, state.icon()),
         tooltip: tooltip(labels.status(state.look())),
         menu: (change == Change::Menu).then(|| menu_model(&state, &labels)),
     }
@@ -478,9 +476,7 @@ fn refresh(app: &AppHandle, change: Change) {
 
 fn refresh_tauri(app: &AppHandle, handles: &TauriTray, view: View) {
     let mut result = handles.icon.set_tooltip(Some(view.tooltip));
-    if let Some(icon) = view.icon {
-        result = result.and_then(|()| handles.icon.set_icon(Some(icon)));
-    }
+    result = result.and_then(|()| handles.icon.set_icon(Some(view.icon)));
     if let Some(entries) = view.menu {
         let mut shown = handles.menu.lock().unwrap_or_else(|e| e.into_inner());
         if shown.entries != entries {
