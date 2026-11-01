@@ -46,7 +46,11 @@
     "upNext": "A continuación: {{title}}",
     "upNextNone": "Nada a continuación",
     "paste": "Pega un enlace de YouTube",
-    "notALink": "Eso no es un enlace de YouTube"
+    "notALink": "Eso no es un enlace de YouTube",
+    "more": "Más sobre {{title}}",
+    "playNext": "Reproducir a continuación",
+    "removeShort": "Quitar de la lista",
+    "emptyPaste": "No hay nada a continuación. Pega un enlace de YouTube arriba."
   },
   "widget": {
     "play": "Reproducir",
@@ -56,5 +60,15 @@
     "install": "Este vídeo necesita compatibilidad con H.264. Instala gst-libav:",
     "generic": "Este vídeo necesita compatibilidad con H.264. Instala gst-libav (el plugin libav de GStreamer) con el gestor de paquetes de tu sistema.",
     "rpmFusion": "En Fedora, gst-libav viene del repositorio RPM Fusion; activa primero RPM Fusion."
-  }
+  },
+  "keys": "Espacio reproducir/pausar · ← → saltar 5 s · M silenciar · F pantalla completa",
+  "headerPill": "Ver juntos · {{count}}",
+  "miniPlayer": "Minirreproductor",
+  "tabs": {
+    "playlist": "Lista"
+  },
+  "upNextHeading": "A continuación · arrastra para reordenar",
+  "whoIsWatching": "Quién está viendo",
+  "pasteKey": "Ctrl V",
+  "you": "Tú"
 }

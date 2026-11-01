@@ -46,7 +46,11 @@
     "upNext": "Toliau: {{title}}",
     "upNextNone": "Toliau nieko nėra",
     "paste": "Įklijuokite YouTube nuorodą",
-    "notALink": "Tai nėra YouTube nuoroda"
+    "notALink": "Tai nėra YouTube nuoroda",
+    "more": "Daugiau: {{title}}",
+    "playNext": "Groti kitą",
+    "removeShort": "Pašalinti iš grojaraščio",
+    "emptyPaste": "Toliau nieko nėra. Įklijuokite „YouTube“ nuorodą aukščiau."
   },
   "widget": {
     "play": "Leisti",
@@ -56,5 +60,15 @@
     "install": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav:",
     "generic": "Šiam vaizdo įrašui reikia H.264 palaikymo. Įdiek gst-libav (GStreamer libav papildinį) savo sistemos paketų tvarkykle.",
     "rpmFusion": "Fedora sistemoje gst-libav gaunamas iš RPM Fusion saugyklos; pirmiausia įjunk RPM Fusion."
-  }
+  },
+  "keys": "Tarpas groti/pristabdyti · ← → peršokti 5 s · M nutildyti · F visas ekranas",
+  "headerPill": "Žiūrėkite kartu · {{count}}",
+  "miniPlayer": "Mini grotuvas",
+  "tabs": {
+    "playlist": "Grojaraštis"
+  },
+  "upNextHeading": "Toliau · vilkite, kad pakeistumėte tvarką",
+  "whoIsWatching": "Kas žiūri",
+  "pasteKey": "Ctrl V",
+  "you": "Jūs"
 }

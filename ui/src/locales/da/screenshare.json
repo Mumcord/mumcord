@@ -1,6 +1,5 @@
 {
   "share": "Del skærm",
-  "shareHint": "Del en skærm eller et vindue med din talekanal",
   "choosing": "Vælger, hvad der skal deles…",
   "stop": "Stop deling",
   "startFailed": "Skærmdelingen kunne ikke starte.",
@@ -35,7 +34,13 @@
   "pauseSharing": "Sæt deling på pause",
   "resumeSharing": "Genoptag deling",
   "viewersLabel": "Hvem ser med",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Skift vindue",
-  "viewersTitle": "Seere"
+  "viewersTitle": "Seere",
+  "thumbnail": "Forhåndsvisning af det, du deler",
+  "youAreSharing": "Du deler",
+  "ofMax": "{{count}} af {{max}}",
+  "fullShort": "Alle pladser er optaget.",
+  "stopShort": "Stop",
+  "viewerCount_one": "{{count}} seer",
+  "viewerCount_other": "{{count}} seere"
 }

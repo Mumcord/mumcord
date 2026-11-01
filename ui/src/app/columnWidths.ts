@@ -18,6 +18,11 @@ export const COLUMN_DEFAULT_REM: Record<ResizableColumn, number> = {
 export const COLUMN_STEP_REM = 1;
 /** The chat column keeps at least this much room (360px at the default text size). */
 export const CHAT_MIN_REM = 22.5;
+/**
+ * A watch party or screen share panel in the member column needs this much for its playlist
+ * titles, paste field and stream lines (issue #163); narrower, they wrap after a word or two.
+ */
+export const MEDIA_PANEL_MIN_REM = 20;
 
 export const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
   channels: COLUMN_DEFAULT_REM.channels,
@@ -46,11 +51,15 @@ function sideRoom(room: ShellRoom): number {
 /**
  * The widths actually shown: the chosen ones, shrunk so the chat column keeps its minimum. The
  * member list gives way first. Below the minimum widths nothing shrinks further; the window's
- * own minimum size keeps that case from overflowing.
+ * own minimum size keeps that case from overflowing. While a media panel fills the member column,
+ * that column asks for at least `MEDIA_PANEL_MIN_REM` (a wider chosen width still wins) and
+ * gives it up the same way when the window lacks room.
  */
-export function fitWidths(chosen: ColumnWidths, room: ShellRoom): ColumnWidths {
+export function fitWidths(chosen: ColumnWidths, room: ShellRoom, mediaPanel = false): ColumnWidths {
   let channels = clampWidth(chosen.channels);
-  let members = clampWidth(chosen.members);
+  let members = clampWidth(
+    mediaPanel ? Math.max(chosen.members, MEDIA_PANEL_MIN_REM) : chosen.members,
+  );
   const space = sideRoom(room);
   if (!room.membersShown) return { channels: clampWidth(channels, space), members };
   const overflow = channels + members - space;

@@ -1,6 +1,5 @@
 {
   "share": "Aqsam l-iskrin",
-  "shareHint": "Aqsam skrin jew tieqa mal-kanal tal-vuċi tiegħek",
   "choosing": "Qed tagħżel x'se taqsam…",
   "stop": "Waqqaf il-qsim",
   "startFailed": "Il-qsim tal-iskrin ma setax jibda.",
@@ -38,7 +37,16 @@
   "pauseSharing": "Ippawża l-qsim",
   "resumeSharing": "Kompli l-qsim",
   "viewersLabel": "Min qed jara",
-  "elapsed": "{{minutes}} minuta",
   "changeWindow": "Ibdel twieqa",
-  "viewersTitle": "Spettaturi"
+  "viewersTitle": "Spettaturi",
+  "thumbnail": "Previżjoni ta' dak li qed taqsam",
+  "youAreSharing": "Qed taqsam",
+  "ofMax": "{{count}} minn {{max}}",
+  "fullShort": "Il-postijiet kollha huma okkupati.",
+  "stopShort": "Waqqaf",
+  "viewerCount_one": "{{count}} telespettatur",
+  "viewerCount_two": "{{count}} telespettaturi",
+  "viewerCount_few": "{{count}} telespettaturi",
+  "viewerCount_many": "{{count}}-il telespettatur",
+  "viewerCount_other": "{{count}} telespettatur"
 }

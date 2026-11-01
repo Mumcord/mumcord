@@ -31,7 +31,7 @@ pub const HEADER_LEN: usize = 20;
 pub const KEYFRAME_REQUEST: u8 = 1;
 /// VP9 with three temporal layers (0, 1, 2) uses layers up to 2; one spare for a later mode.
 pub const MAX_TEMPORAL_LAYER: u8 = 3;
-/// Far above a 720p keyframe; anything larger is a broken or hostile sender.
+/// Far above a 1080p keyframe; anything larger is a broken or hostile sender.
 pub const MAX_VIDEO_PAYLOAD: u32 = 4 * 1024 * 1024;
 /// An Opus packet is at most 1275 bytes per frame; this leaves room for multi-frame packets.
 pub const MAX_AUDIO_PAYLOAD: u32 = 4 * 1024;

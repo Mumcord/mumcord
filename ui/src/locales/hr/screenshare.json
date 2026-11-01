@@ -1,6 +1,5 @@
 {
   "share": "Dijeli zaslon",
-  "shareHint": "Dijeli zaslon ili prozor sa svojim glasovnim kanalom",
   "choosing": "Odabir onoga što dijeliš…",
   "stop": "Prestani dijeliti",
   "startFailed": "Dijeljenje zaslona nije se moglo pokrenuti.",
@@ -36,7 +35,14 @@
   "pauseSharing": "Pauziraj dijeljenje",
   "resumeSharing": "Nastavi dijeljenje",
   "viewersLabel": "Tko gleda",
-  "elapsed": "{{minutes}} min",
   "changeWindow": "Promijeni prozor",
-  "viewersTitle": "Gledatelji"
+  "viewersTitle": "Gledatelji",
+  "thumbnail": "Pregled onoga što dijelite",
+  "youAreSharing": "Dijelite",
+  "ofMax": "{{count}} od {{max}}",
+  "fullShort": "Sva su mjesta zauzeta.",
+  "stopShort": "Zaustavi",
+  "viewerCount_one": "{{count}} gledatelj",
+  "viewerCount_few": "{{count}} gledatelja",
+  "viewerCount_other": "{{count}} gledatelja"
 }

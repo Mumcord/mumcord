@@ -46,7 +46,7 @@
     "seek": "Търсене",
     "volume": "Звук",
     "syncedPlay": "Синхронно",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} е на контрола",
     "inSync": "В синхрон",
     "inSyncAll": "Всички в синхрон",
@@ -59,6 +59,15 @@
     "host": "Домакин",
     "fullscreen": "Цял екран",
     "exitFullscreen": "Излез от цял екран",
-    "none": "Никой"
+    "none": "Никой",
+    "popOut": "Отвори в отделен прозорец",
+    "popIn": "Върни в основния прозорец",
+    "onTop": "Винаги отгоре",
+    "poppedOut": "Възпроизвежда се в отделен прозорец",
+    "bringBack": "Върни",
+    "popOutFailed": "Отделният прозорец не можа да се отвори",
+    "popInFailed": "Изгледът не можа да се върне",
+    "onTopFailed": "„Винаги отгоре“ не можа да се промени",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

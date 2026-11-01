@@ -2,7 +2,7 @@
 //! ([`fanout`]) → one writer task per viewer stream.
 //!
 //! Encoding runs on its own thread, never on the audio thread, and shares no lock with audio.
-//! The quality step (720p30 → 720p15 → 480p15) applies to every viewer, since there is one
+//! The quality step (1080p30 → 720p30 → 720p15 → 480p15) applies to every viewer, since there is one
 //! encoder; it goes down when several viewers lag, when one viewer lost every layer and still
 //! does not keep up, or when encoding itself is too slow, and back up once all is well.
 //!
@@ -37,8 +37,15 @@ pub(crate) struct Quality {
     pub bitrate_kbps: u32,
 }
 
-/// Best first; the last is the floor of FR-2.44.
-pub(crate) const STEPS: [Quality; 3] = [
+/// Best first; the last is the floor of FR-2.44. Full HD by default; smaller sources are never
+/// enlarged, and each step keeps the source's aspect ratio (`convert::fit`).
+pub(crate) const STEPS: [Quality; 4] = [
+    Quality {
+        width: 1920,
+        height: 1080,
+        fps: 30,
+        bitrate_kbps: 4000,
+    },
     Quality {
         width: 1280,
         height: 720,
@@ -201,7 +208,7 @@ impl Steps {
 /// How the own share is sent right now (test hook, and the numbers behind AC-2.29).
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct ScreenMediaStats {
-    /// Index into the quality steps: 0 is 720p30, 2 is 480p15.
+    /// Index into the quality steps: 0 is 1080p30, 3 is 480p15.
     pub step: usize,
     pub width: u32,
     pub height: u32,
@@ -703,6 +710,9 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32)) -> Frame {
 mod tests {
     use super::*;
 
+    /// The lowest quality step (480p15).
+    const FLOOR: usize = STEPS.len() - 1;
+
     struct Ending;
     impl CaptureSource for Ending {
         fn frame(&mut self, _: u32, _: u32) -> Option<mumcord_screenshare::I420Frame> {
@@ -750,7 +760,7 @@ mod tests {
             "a moment of pressure is not enough"
         );
         assert!(steps.observe(load(2, 0), at(1)));
-        assert_eq!(steps.quality().fps, 15);
+        assert_eq!(steps.quality(), STEPS[1]);
         assert!(
             !steps.observe(load(2, 0), at(2)),
             "pressure starts counting again"
@@ -759,7 +769,10 @@ mod tests {
             steps.observe(load(0, 1), at(3)),
             "one struggling viewer is enough"
         );
-        assert_eq!(steps.quality(), STEPS[2]);
+        assert_eq!(steps.quality().fps, 15);
+        assert!(!steps.observe(load(0, 1), at(5)));
+        assert!(steps.observe(load(0, 1), at(6)));
+        assert_eq!(steps.quality(), STEPS[FLOOR]);
         assert!(!steps.observe(load(3, 1), at(10)), "the floor holds");
         assert!(!steps.observe(load(3, 1), at(20)));
 
@@ -771,12 +784,14 @@ mod tests {
         assert!(!steps.observe(load(1, 0), at(26)), "lag resets the wait");
         assert!(!steps.observe(load(0, 0), at(27)));
         assert!(steps.observe(load(0, 0), at(32)));
-        assert_eq!(steps.step(), 1);
+        assert_eq!(steps.step(), FLOOR - 1);
         assert!(
             !steps.observe(load(0, 0), at(33)),
             "each step up waits again"
         );
         assert!(steps.observe(load(0, 0), at(38)));
+        assert!(!steps.observe(load(0, 0), at(39)));
+        assert!(steps.observe(load(0, 0), at(44)));
         assert_eq!(steps.quality(), STEPS[0]);
     }
 
@@ -807,9 +822,9 @@ mod tests {
     fn a_step_up_that_keeps_failing_is_tried_less_often() {
         let start = Instant::now();
         let mut steps = Steps::new();
-        // 720p30 never fits, 720p15 does.
-        simulate(&mut steps, start, 0, 20, 1);
-        let (ups, fps) = simulate(&mut steps, start, 20, 60, 1);
+        // Full HD and 720p30 never fit, 720p15 does.
+        simulate(&mut steps, start, 0, 20, 2);
+        let (ups, fps) = simulate(&mut steps, start, 20, 60, 2);
         assert!(ups <= 2, "{ups} tries in 60 s");
         assert!(fps >= 14.0, "{fps} fps");
     }
@@ -862,13 +877,13 @@ mod tests {
 
     /// Encodes the test pattern the way the encode loop does: 10 s at 720p30 (long enough for
     /// rate control to settle), 2 s at 720p15, then `seconds` at the floor; the kbps of each
-    /// second at the floor.
+    /// second at the floor. Full HD before them would only make the test slower.
     fn floor_kbps(seconds: u32) -> Vec<usize> {
         let mut capture = super::super::capture::TestPattern::default();
         let mut encoder: Option<Encoder> = None;
         let mut pts = 0_i64;
         let mut per_second = Vec::new();
-        for (step, seconds) in [(0, 10), (1, 2), (2, seconds)] {
+        for (step, seconds) in [(FLOOR - 2, 10), (FLOOR - 1, 2), (FLOOR, seconds)] {
             let quality = STEPS[step];
             for _ in 0..seconds {
                 let mut bytes = 0;
@@ -898,7 +913,7 @@ mod tests {
                     }
                     pts += 1000 / i64::from(quality.fps);
                 }
-                if step == 2 {
+                if step == FLOOR {
                     per_second.push(bytes * 8 / 1000);
                 }
             }
@@ -911,7 +926,7 @@ mod tests {
     #[test]
     fn the_floor_stays_near_its_bitrate() {
         let per_second = floor_kbps(10);
-        let target = STEPS[2].bitrate_kbps as usize;
+        let target = STEPS[FLOOR].bitrate_kbps as usize;
         assert!(
             per_second.iter().all(|kbps| *kbps <= target * 11 / 10),
             "{per_second:?} kbit/s for a target of {target}"

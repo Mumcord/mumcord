@@ -137,6 +137,8 @@ pub fn minimize_to_tray(app: &AppHandle) {
             return;
         };
         let result = if crate::tray::is_visible(&app).await {
+            // The pop-outs only show what the main window runs; they go with it.
+            crate::commands::media_popout::close_all(&app);
             window.hide()
         } else {
             tracing::warn!("no system tray available; minimizing to the taskbar instead");

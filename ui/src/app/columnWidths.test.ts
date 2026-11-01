@@ -76,6 +76,32 @@ describe("fitWidths", () => {
     });
   });
 
+  it("widens the member column for a media panel when the window has room", () => {
+    expect(fitWidths({ channels: 24, members: 15 }, room(90), true)).toEqual({
+      channels: 24,
+      members: 20,
+    });
+  });
+
+  it("keeps a wider chosen member width for a media panel", () => {
+    expect(fitWidths({ channels: 24, members: 26 }, room(90), true)).toEqual({
+      channels: 24,
+      members: 26,
+    });
+  });
+
+  it("never squeezes the chat to widen a media panel", () => {
+    // 65 - 4.5 - 22.5 = 38rem for both columns: the panel gets what the channels leave.
+    expect(fitWidths({ channels: 20, members: 15 }, room(65), true)).toEqual({
+      channels: 20,
+      members: 18,
+    });
+    expect(fitWidths({ channels: 28, members: 15 }, room(60), true)).toEqual({
+      channels: 18,
+      members: 15,
+    });
+  });
+
   it("ignores the member list when it is an overlay on narrow windows", () => {
     expect(fitWidths({ channels: 28, members: 20 }, room(50, false))).toEqual({
       channels: 23,

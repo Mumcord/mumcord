@@ -1,175 +1,651 @@
-/* Sharer UI: Live marker, share button and controls (FR-2.42–2.45). */
+/*
+ * Screen share UI (FR-2.42–2.45, issue #163): the LIVE marker, the share button, the viewer's
+ * chips, picture modes and stream details, the viewers panel, the sharer's control bar and its
+ * viewers popover. Theme tokens only, so light, dark and every custom theme work.
+ */
+
+/*
+ * LIVE: a filled pill with a dot. The text takes the chat background on the danger colour; danger
+ * is derived to be readable on that background, so the pair is readable the other way round too.
+ */
 .live-badge {
   display: inline-flex;
   flex: none;
+  gap: 0.3em;
+  align-items: center;
   margin-left: var(--space-1);
-  padding: 0 var(--space-1);
-  border: 1px solid currentcolor;
-  border-radius: var(--radius-sm);
-  color: var(--color-danger);
+  padding: 0 0.5em;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  color: var(--color-bg-chat);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.04em;
-  line-height: 1.4;
+  line-height: 1.6;
   text-transform: uppercase;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
-.share-panel {
+.live-badge::before {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.live-badge[data-paused] {
+  background: var(--color-warning);
+}
+
+.live-badge--large {
+  margin-left: 0;
+  font-size: var(--font-size-xs);
+}
+
+/* Chips of the viewer's top row: what the picture is and how it arrives (FR-3.126). */
+.share-chips {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3) 0;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin-left: auto;
 }
 
-.share-button {
+.share-chip {
   display: inline-flex;
   gap: var(--space-1);
+  align-items: center;
+  height: 1.75rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.share-chip--button {
+  justify-content: center;
+  width: 1.75rem;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    color var(--duration-fast);
+}
+
+.share-chip--button:hover,
+.share-chip--button[aria-expanded="true"] {
+  background: var(--media-hover);
+  color: var(--media-on-scrim);
+}
+
+/* Direct is green, the relay amber; the icon carries it too, not the colour alone. */
+.share-path {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.share-path--direct {
+  color: var(--color-success);
+}
+
+.share-path--relay {
+  color: var(--color-warning);
+}
+
+/* On the dark picture the theme's status colours are lightened so they stay readable in light
+   themes, whose success and warning colours are tuned for a light surface. */
+.share-path--direct.share-chip {
+  color: color-mix(in srgb, var(--color-success) 65%, var(--media-on-scrim));
+}
+
+.share-path--relay.share-chip {
+  color: color-mix(in srgb, var(--color-warning) 65%, var(--media-on-scrim));
+}
+
+.share-path.share-chip {
+  border-color: color-mix(in srgb, currentcolor 45%, transparent);
+  background: color-mix(in srgb, currentcolor 10%, var(--media-glass));
+}
+
+/* The picture: Fit keeps it whole, Fill covers the frame, 1:1 shows it at its own size. */
+.share-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.screen-stage,
+.screen-stage__picture {
+  position: absolute;
+  inset: 0;
+}
+
+.screen-stage__picture {
+  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.share-panel > .share-button {
-  width: 100%;
-}
-
-.share-button[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.share-button__error {
-  margin: 0;
-  color: var(--color-danger);
-  font-size: 0.8125rem;
-}
-
-/* The sharer's control bar at the top of the chat (issue #163, FR-3.127). */
-.sharer-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
-  font-size: 0.8125rem;
-}
-
-.sharer-bar p {
-  margin: 0;
-}
-
-.sharer-bar__thumb {
-  flex: none;
-}
-
-.sharer-bar__thumb img {
+.screen-stage__picture canvas,
+.screen-stage__picture img {
   display: block;
-  width: 4rem;
-  height: 2.25rem;
-  border-radius: var(--radius-sm);
-  background: #000;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.share-screen--fill .screen-stage__picture canvas,
+.share-screen--fill .screen-stage__picture img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
   object-fit: cover;
 }
 
-.sharer-bar__time,
-.sharer-bar__paused {
-  font-weight: 600;
+.share-screen--oneToOne .screen-stage__picture {
+  overflow: auto;
 }
 
-.sharer-bar__source,
-.sharer-bar__hint {
-  color: var(--color-text-secondary);
+.share-screen--oneToOne .screen-stage__picture canvas,
+.share-screen--oneToOne .screen-stage__picture img {
+  max-width: none;
+  max-height: none;
+  margin: auto;
 }
 
-.sharer-bar__popover {
+/* Connecting, paused or why watching failed, over the picture. */
+.screen-stage__status {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-}
-
-.sharer-bar__viewer {
-  display: flex;
+  gap: var(--space-3);
   align-items: center;
-  gap: var(--space-1);
-}
-
-.sharer-bar__name {
-  flex: 1;
-  min-width: 0;
-}
-
-.sharer-bar__quality {
-  color: var(--color-text-muted);
-}
-
-/* The viewers panel of a watched share (issue #163, FR-3.126). */
-.viewer-panel__heading {
-  margin: var(--space-2) 0 var(--space-1);
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-}
-
-.viewer-panel__person {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  margin: 0 0 var(--space-1);
-}
-
-.viewer-panel__name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.viewer-panel__quality,
-.viewer-panel__empty,
-.viewer-panel__hint {
-  color: var(--color-text-muted);
-  font-size: 0.8125rem;
-}
-
-/* The picture of a watched share and what stands in front of it (issue #163). */
-.screen-stage {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+  justify-content: center;
+  padding: var(--space-4);
+  pointer-events: none;
   text-align: center;
 }
 
+.screen-stage__status:empty {
+  display: none;
+}
+
 .screen-stage__message {
+  max-width: 32rem;
   margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-sm);
+  backdrop-filter: var(--glass-filter);
 }
 
 .screen-stage__actions {
   display: flex;
+  gap: var(--space-2);
   justify-content: center;
-  gap: var(--space-1);
+  pointer-events: auto;
 }
 
-/* Stream details: the figures behind the picture (issue #163, FR-3.126). */
-.stream-details {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
+/* Stream details: the figures behind the picture, at the top right of it (FR-3.126). */
+.share-details {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+  width: min(20rem, calc(100% - 2 * var(--space-3)));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  /* A theme surface on the picture: the overlay's light text would vanish on it in light themes. */
+  color: var(--color-text);
   font-size: var(--font-size-sm);
 }
 
-.stream-details p {
+.share-details__title {
   display: flex;
-  justify-content: space-between;
   gap: var(--space-2);
+  align-items: center;
+  margin: 0 0 var(--space-2);
+  font-weight: var(--font-weight-bold);
+}
+
+.share-details__list {
   margin: 0;
 }
 
-.stream-details p span:first-child {
+.share-details__row {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  padding: var(--space-1) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.share-details__row dt {
+  color: var(--color-text-secondary);
+}
+
+.share-details__row dd {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* The bottom row: sound level, Fit / Fill / 1:1, Focus and Stop watching. */
+.share-sound {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  height: 2rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.share-sound__bars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 0.875rem;
+}
+
+.share-sound__bar {
+  width: 3px;
+  border-radius: 1px;
+  background: var(--media-on-scrim-faint);
+  transition: background-color var(--duration-fast);
+}
+
+.share-sound__bar:nth-child(1) {
+  height: 35%;
+}
+
+.share-sound__bar:nth-child(2) {
+  height: 65%;
+}
+
+.share-sound__bar:nth-child(3) {
+  height: 50%;
+}
+
+.share-sound__bar:nth-child(4) {
+  height: 100%;
+}
+
+.share-sound__bar:nth-child(5) {
+  height: 75%;
+}
+
+.share-sound__bar[data-lit] {
+  background: var(--color-success);
+}
+
+.share-segments {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+  padding: 2px;
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+}
+
+.share-segments__button {
+  min-width: 2.5rem;
+  height: 1.75rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    color var(--duration-fast);
+}
+
+.share-segments__button:hover {
+  color: var(--media-on-scrim);
+}
+
+/* A light pill on the dark picture in every theme; a theme's primary pill is dark in light themes. */
+.share-segments__button[aria-pressed="true"] {
+  background: var(--media-on-scrim);
+  color: var(--media-ink);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Scoped to the frame so it wins over the frame's rule for ordinary buttons, whatever the
+   stylesheet order. */
+.media-frame .button.share-stop {
+  padding: var(--space-1) var(--space-4);
+  border-color: var(--media-glass-border);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  font-weight: var(--font-weight-bold);
+}
+
+.media-frame .button.share-stop:hover:not(:disabled) {
+  border-color: var(--media-on-scrim-faint);
+  background: var(--media-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share-chip--button,
+  .share-sound__bar,
+  .share-segments__button {
+    transition: none;
+  }
+}
+
+/* The viewers panel of a watched share (issue #163, FR-3.126). */
+.viewer-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.viewer-panel__heading {
+  margin: var(--space-3) 0 var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.viewer-panel__heading:first-child {
+  margin-top: 0;
+}
+
+.viewer-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.viewer-panel__person {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 2.75rem;
+  padding: var(--space-1) 0;
+}
+
+.viewer-panel__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.viewer-panel__name {
+  overflow: hidden;
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-panel__sub {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewer-panel__empty {
+  margin: 0;
   color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* The keys, at the bottom of the panel. */
+.share-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: center;
+  margin: auto 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.viewer-panel__list + .share-keys,
+.viewer-panel__empty + .share-keys {
+  margin-top: auto;
+}
+
+.share-keys kbd {
+  display: inline-block;
+  min-width: 1.4em;
+  padding: 0 0.35em;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+/* The sharer's control bar, floating at the top of the chat (issue #163, FR-3.127). */
+.sharer-bar {
+  position: relative;
+  /* Above the chat below it, so the viewers popover is not covered. */
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  box-shadow: var(--shadow-raised);
+  font-size: var(--font-size-sm);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* Nothing shared yet: only the "Share screen" button, without the card around it. */
+.sharer-bar__thumb {
+  flex: none;
+  width: 6rem;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-servers);
+}
+
+.sharer-bar__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sharer-bar__info {
+  display: flex;
+  flex: 1 1 14rem;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sharer-bar__line {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.sharer-bar__title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.sharer-bar__time {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.sharer-bar__source {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sharer-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--color-border);
+}
+
+.button.sharer-bar__button {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.button.sharer-bar__button[aria-pressed="true"] {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-selected);
+}
+
+.button.sharer-bar__button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.sharer-bar__viewers {
+  position: relative;
+}
+
+.button.sharer-bar__viewers-button {
+  border-color: var(--color-accent);
+}
+
+.sharer-bar__stack {
+  display: inline-flex;
+}
+
+.sharer-bar__stack .avatar + .avatar {
+  margin-left: -0.4rem;
+}
+
+.sharer-bar__stack .avatar {
+  box-shadow: 0 0 0 2px var(--color-bg-elevated);
+}
+
+.button.sharer-bar__stop {
+  border-color: transparent;
+  background: var(--color-danger);
+  color: var(--color-bg-chat);
+  font-weight: var(--font-weight-bold);
+}
+
+.button.sharer-bar__stop:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--color-danger);
+  filter: brightness(1.08);
+}
+
+/* The viewers popover under its button: who watches, in which quality and over which path. */
+.sharer-bar__popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 20rem;
+  max-width: calc(100vw - 2 * var(--space-4));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+.sharer-bar__popover-title {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.sharer-bar__popover-count {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+}
+
+.sharer-bar__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.sharer-bar__note {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+}
+
+.sharer-bar__note svg {
+  flex: none;
+  margin-top: 0.15em;
+}
+
+/* The share mini bar: the sharer's avatar in the middle of the thumbnail slot. */
+.share-mini-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
 }

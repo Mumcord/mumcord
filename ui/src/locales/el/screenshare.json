@@ -1,6 +1,5 @@
 {
   "share": "Κοινή χρήση οθόνης",
-  "shareHint": "Μοιράσου μια οθόνη ή ένα παράθυρο με το φωνητικό σου κανάλι",
   "choosing": "Επιλογή του τι θα μοιραστεί…",
   "stop": "Διακοπή κοινής χρήσης",
   "startFailed": "Η κοινή χρήση οθόνης δεν μπόρεσε να ξεκινήσει.",
@@ -35,7 +34,13 @@
   "pauseSharing": "Παύση κοινής χρήσης",
   "resumeSharing": "Συνέχεια κοινής χρήσης",
   "viewersLabel": "Ποιος βλέπει",
-  "elapsed": "{{minutes}} λεπ",
   "changeWindow": "Αλλαγή παραθύρου",
-  "viewersTitle": "Θεατές"
+  "viewersTitle": "Θεατές",
+  "thumbnail": "Προεπισκόπηση αυτού που μοιράζεστε",
+  "youAreSharing": "Μοιράζεστε",
+  "ofMax": "{{count}} από {{max}}",
+  "fullShort": "Όλες οι θέσεις είναι κατειλημμένες.",
+  "stopShort": "Διακοπή",
+  "viewerCount_one": "{{count}} θεατής",
+  "viewerCount_other": "{{count}} θεατές"
 }

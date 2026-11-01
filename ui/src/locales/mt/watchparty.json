@@ -46,7 +46,11 @@
     "upNext": "Li jmiss: {{title}}",
     "upNextNone": "Xejn ma jmiss",
     "paste": "Imla link ta' YouTube",
-    "notALink": "Dan mhux link ta' YouTube"
+    "notALink": "Dan mhux link ta' YouTube",
+    "more": "Aktar għal {{title}}",
+    "playNext": "Daqq li jmiss",
+    "removeShort": "Neħħi mil-lista",
+    "emptyPaste": "M'hemm xejn li jmiss. Waħħal link ta' YouTube hawn fuq."
   },
   "widget": {
     "play": "Play",
@@ -56,5 +60,15 @@
     "install": "Dan il-video jeħtieġ appoġġ għal H.264. Installa gst-libav:",
     "generic": "Dan il-video jeħtieġ appoġġ għal H.264. Installa gst-libav (il-plugin libav ta' GStreamer) bil-package manager tas-sistema tiegħek.",
     "rpmFusion": "Fuq Fedora, gst-libav jiġi mir-repożitorju RPM Fusion; l-ewwel ixgħel RPM Fusion."
-  }
+  },
+  "keys": "Spazju daqq/pawża · ← → aqbeż 5 s · M siekta · F skrin sħiħ",
+  "headerPill": "Araw flimkien · {{count}}",
+  "miniPlayer": "Mini plejer",
+  "tabs": {
+    "playlist": "Lista"
+  },
+  "upNextHeading": "Li jmiss · kaxkar biex tibdel l-ordni",
+  "whoIsWatching": "Min qed jara",
+  "pasteKey": "Ctrl V",
+  "you": "Int"
 }

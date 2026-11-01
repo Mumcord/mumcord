@@ -31,7 +31,7 @@ real test. Run it against a local test server, never a public one.
 3. **Window share:** pick the browser window. The viewer sees it within a few seconds, the yellow
    capture border appears around the window on the sharer's side.
 4. **Moving picture:** play a video in the shared window; the viewer sees smooth motion at
-   about 30 fps (720p).
+   about 30 fps (up to 1080p).
 5. **Still picture:** pause the video and leave the window untouched. A viewer who starts
    watching now still gets the picture (not a black or empty view).
 6. **Resize:** make the shared window larger and smaller. The viewer's picture follows without

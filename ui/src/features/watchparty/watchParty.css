@@ -69,7 +69,7 @@
 .watch-party__codec-hint code {
   padding: 0 var(--space-1);
   border-radius: var(--radius-sm);
-  background: var(--color-bg-hover);
+  background: var(--media-glass, var(--color-bg-hover));
   overflow-wrap: anywhere;
   user-select: all;
 }
@@ -273,4 +273,341 @@ button.watch-playlist__up-next {
 
 .watch-playlist__paste input {
   width: 100%;
+}
+
+/* The cinema view in the main column (issue #163): the picture card and the watching strip. */
+.watch-cinema {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.watch-strip {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-width: 0;
+}
+
+.watch-strip__label {
+  flex: none;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.watch-strip__people {
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.watch-strip__person {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.watch-strip__person .sync-dot {
+  box-shadow: 0 0 0 2px var(--color-bg-elevated);
+}
+
+.watch-strip__host {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+}
+
+/* The channel header while the cinema is open: the pill sits right after the channel name. */
+.watch-header {
+  display: flex;
+  flex: 1;
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.watch-header > .channel-header {
+  flex: 0 1 auto;
+}
+
+.watch-header__pill {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-1);
+  align-items: center;
+  padding: 0.125rem var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.button.watch-header__action {
+  display: inline-flex;
+  flex: none;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.button.watch-header__action--leave {
+  border-color: var(--color-danger);
+  background: none;
+  color: var(--color-danger);
+}
+
+.button.watch-header__action--leave:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+/* The playlist tab of the party panel (issue #163, FR-3.125). */
+.party-playlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.party-playlist .media-panel__heading {
+  margin-bottom: calc(var(--space-1) * -1);
+}
+
+.party-paste {
+  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  cursor: text;
+}
+
+.party-paste:focus-within {
+  border-style: solid;
+  border-color: var(--color-accent);
+}
+
+.party-paste__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+
+/* The field's ring is the dashed box around it. */
+.party-paste__input:focus-visible {
+  outline: none;
+}
+
+.party-paste__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.party-paste__key {
+  flex: none;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+}
+
+.party-thumb {
+  position: relative;
+  flex: none;
+  /* The panel is as wide as the member column, which the user sets; the thumbnail gives way first. */
+  width: clamp(3.5rem, 28%, 5.25rem);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+}
+
+.party-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.party-thumb__badge {
+  position: absolute;
+  right: var(--space-1);
+  bottom: var(--space-1);
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-sm);
+  background: rgb(0 0 0 / 72%);
+  color: #fff;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.party-now {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-selected);
+}
+
+.party-now__mark {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-text-secondary);
+}
+
+.party-playlist__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.party-playlist__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.party-entry {
+  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  transition: background-color var(--duration-fast);
+}
+
+.party-entry:hover,
+.party-entry:focus-within {
+  background: var(--color-bg-hover);
+}
+
+.party-entry[data-dragged] {
+  border-color: var(--color-accent);
+  opacity: 0.6;
+}
+
+/* The drop line: where the dragged row lands. */
+.party-entry[data-drop]::after {
+  position: absolute;
+  inset-inline: var(--space-1);
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  content: "";
+}
+
+.party-entry[data-drop="before"]::after {
+  top: -2px;
+}
+
+.party-entry[data-drop="after"]::after {
+  bottom: -2px;
+}
+
+.party-entry__handle,
+.party-entry__more {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+}
+
+.party-entry__handle {
+  cursor: grab;
+}
+
+.party-entry__more {
+  align-self: flex-start;
+  cursor: pointer;
+}
+
+.party-entry__handle:hover,
+.party-entry__more:hover {
+  color: var(--color-text);
+}
+
+.party-entry__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.party-entry__title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.party-entry__title--one {
+  -webkit-line-clamp: 1;
+}
+
+.party-entry__by {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.party-entry__by-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.party-entry__by .avatar[data-size="sm"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  font-size: 0.625rem;
 }

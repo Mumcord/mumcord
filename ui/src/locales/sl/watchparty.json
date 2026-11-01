@@ -46,7 +46,11 @@
     "upNext": "Naslednje: {{title}}",
     "upNextNone": "Nič ni na vrsti",
     "paste": "Prilepi povezavo YouTube",
-    "notALink": "To ni povezava YouTube"
+    "notALink": "To ni povezava YouTube",
+    "more": "Več za {{title}}",
+    "playNext": "Predvajaj naslednje",
+    "removeShort": "Odstrani s seznama",
+    "emptyPaste": "Nič ni naslednje. Zgoraj prilepite povezavo do YouTuba."
   },
   "widget": {
     "play": "Predvajaj",
@@ -56,5 +60,15 @@
     "install": "Ta video potrebuje podporo za H.264. Namesti gst-libav:",
     "generic": "Ta video potrebuje podporo za H.264. Namesti gst-libav (vtičnik libav za GStreamer) z upraviteljem paketov svojega sistema.",
     "rpmFusion": "V Fedori gst-libav prihaja iz repozitorija RPM Fusion; najprej omogoči RPM Fusion."
-  }
+  },
+  "keys": "Preslednica predvajaj/premor · ← → preskoči 5 s · M utišaj · F celoten zaslon",
+  "headerPill": "Glejte skupaj · {{count}}",
+  "miniPlayer": "Mini predvajalnik",
+  "tabs": {
+    "playlist": "Seznam"
+  },
+  "upNextHeading": "Naslednje · povlecite za spremembo vrstnega reda",
+  "whoIsWatching": "Kdo gleda",
+  "pasteKey": "Ctrl V",
+  "you": "Vi"
 }

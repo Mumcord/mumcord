@@ -48,11 +48,12 @@ function MainScreen() {
   const devTools = useDevToolsUnlocked();
   const previewing = useThemePreviewing();
   const browserOpen = useServerBrowserOpen();
+  const media = useMediaView();
   return (
     <>
       <AppShell
         inert={overlay !== null && !previewing}
-        focus={useMediaView().focus}
+        mediaPanel={media.cinema !== null}
         slots={{
           servers: <ServersMount />,
           channels: <ChannelsMount />,

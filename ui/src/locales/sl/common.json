@@ -46,7 +46,7 @@
     "seek": "Iskanje",
     "volume": "Glasnost",
     "syncedPlay": "Sinhronizirano",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} ima kontrol",
     "inSync": "Usklajeno",
     "inSyncAll": "Vsi usklajeni",
@@ -59,6 +59,15 @@
     "host": "Gostitelj",
     "fullscreen": "Celozaslonsko",
     "exitFullscreen": "Zapusti celozaslonski način",
-    "none": "Nihče"
+    "none": "Nihče",
+    "popOut": "Odpri v ločenem oknu",
+    "popIn": "Vrni v glavno okno",
+    "onTop": "Vedno na vrhu",
+    "poppedOut": "Predvaja se v ločenem oknu",
+    "bringBack": "Vrni",
+    "popOutFailed": "Ločenega okna ni bilo mogoče odpreti",
+    "popInFailed": "Pogleda ni bilo mogoče vrniti",
+    "onTopFailed": "Možnosti »Vedno na vrhu« ni bilo mogoče spremeniti",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

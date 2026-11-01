@@ -119,6 +119,8 @@ mod tests {
 
     #[test]
     fn fit_keeps_aspect_ratio_even_and_never_enlarges() {
+        assert_eq!(fit(2560, 1440, 1920, 1080), Some((1920, 1080)));
+        assert_eq!(fit(1366, 768, 1920, 1080), Some((1366, 768)));
         assert_eq!(fit(1920, 1080, 1280, 720), Some((1280, 720)));
         assert_eq!(fit(2560, 1080, 1280, 720), Some((1280, 540)));
         assert_eq!(fit(1000, 1000, 1281, 721), Some((720, 720)));

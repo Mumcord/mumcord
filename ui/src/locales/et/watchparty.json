@@ -46,7 +46,11 @@
     "upNext": "Järgmisena: {{title}}",
     "upNextNone": "Järgmisena pole midagi",
     "paste": "Aseta YouTube'i link",
-    "notALink": "See ei ole YouTube'i link"
+    "notALink": "See ei ole YouTube'i link",
+    "more": "Rohkem: {{title}}",
+    "playNext": "Esita järgmisena",
+    "removeShort": "Eemalda esitusloendist",
+    "emptyPaste": "Järjekord on tühi. Kleebi ülal YouTube'i link."
   },
   "widget": {
     "play": "Esita",
@@ -56,5 +60,15 @@
     "install": "See video vajab H.264 tuge. Paigalda gst-libav:",
     "generic": "See video vajab H.264 tuge. Paigalda gst-libav (GStreameri libav-plugin) oma süsteemi paketihalduriga.",
     "rpmFusion": "Fedoras tuleb gst-libav RPM Fusioni hoidlast; luba esmalt RPM Fusion."
-  }
+  },
+  "keys": "Tühik esita/peata · ← → hüppa 5 s · M vaigista · F täisekraan",
+  "headerPill": "Vaata koos · {{count}}",
+  "miniPlayer": "Minimängija",
+  "tabs": {
+    "playlist": "Esitusloend"
+  },
+  "upNextHeading": "Järgmisena · lohista järjestuse muutmiseks",
+  "whoIsWatching": "Kes vaatab",
+  "pasteKey": "Ctrl V",
+  "you": "Sina"
 }

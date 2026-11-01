@@ -46,7 +46,11 @@
     "upNext": "Seuraavaksi: {{title}}",
     "upNextNone": "Ei mitään seuraavaksi",
     "paste": "Liitä YouTube-linkki",
-    "notALink": "Tuo ei ole YouTube-linkki"
+    "notALink": "Tuo ei ole YouTube-linkki",
+    "more": "Lisää: {{title}}",
+    "playNext": "Toista seuraavaksi",
+    "removeShort": "Poista soittolistalta",
+    "emptyPaste": "Jonossa ei ole mitään. Liitä YouTube-linkki yllä."
   },
   "widget": {
     "play": "Toista",
@@ -56,5 +60,15 @@
     "install": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav:",
     "generic": "Tämä video tarvitsee H.264-tuen. Asenna gst-libav (GStreamerin libav-liitännäinen) järjestelmäsi paketinhallinnalla.",
     "rpmFusion": "Fedorassa gst-libav tulee RPM Fusion -ohjelmistolähteestä; ota RPM Fusion ensin käyttöön."
-  }
+  },
+  "keys": "Välilyönti toista/tauko · ← → hyppää 5 s · M mykistä · F koko näyttö",
+  "headerPill": "Katsokaa yhdessä · {{count}}",
+  "miniPlayer": "Minisoitin",
+  "tabs": {
+    "playlist": "Soittolista"
+  },
+  "upNextHeading": "Seuraavaksi · järjestä vetämällä",
+  "whoIsWatching": "Ketkä katsovat",
+  "pasteKey": "Ctrl V",
+  "you": "Sinä"
 }

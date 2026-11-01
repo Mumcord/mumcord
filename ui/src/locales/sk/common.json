@@ -46,7 +46,7 @@
     "seek": "Hľadať",
     "volume": "Hlasitosť",
     "syncedPlay": "Synchronizované",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} má kontrolu",
     "inSync": "Synchronizované",
     "inSyncAll": "Všetci synchronizovaní",
@@ -59,6 +59,15 @@
     "host": "Hostiteľ",
     "fullscreen": "Celá obrazovka",
     "exitFullscreen": "Opustiť celú obrazovku",
-    "none": "Nikto"
+    "none": "Nikto",
+    "popOut": "Otvoriť v samostatnom okne",
+    "popIn": "Vrátiť do hlavného okna",
+    "onTop": "Vždy navrchu",
+    "poppedOut": "Prehráva sa v samostatnom okne",
+    "bringBack": "Vrátiť späť",
+    "popOutFailed": "Samostatné okno sa nepodarilo otvoriť",
+    "popInFailed": "Zobrazenie sa nepodarilo vrátiť",
+    "onTopFailed": "Nastavenie „Vždy navrchu“ sa nepodarilo zmeniť",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

@@ -45,8 +45,12 @@
     "move": "Премести {{title}}",
     "upNext": "Следва: {{title}}",
     "upNextNone": "Нищо не следва",
-    "paste": "Постави YouTube链接",
-    "notALink": "Това не е YouTube链接"
+    "paste": "Постави връзка към YouTube",
+    "notALink": "Това не е YouTube链接",
+    "more": "Още за {{title}}",
+    "playNext": "Пусни следващо",
+    "removeShort": "Премахни от плейлиста",
+    "emptyPaste": "Няма нищо следващо. Поставете връзка от YouTube по-горе."
   },
   "widget": {
     "play": "Пусни",
@@ -56,5 +60,15 @@
     "install": "Това видео изисква поддръжка на H.264. Инсталирай gst-libav:",
     "generic": "Това видео изисква поддръжка на H.264. Инсталирай gst-libav (приставката libav за GStreamer) с мениджъра на пакети на системата си.",
     "rpmFusion": "Във Fedora gst-libav идва от хранилището RPM Fusion; първо включи RPM Fusion."
-  }
+  },
+  "keys": "Интервал пускане/пауза · ← → прескачане 5 с · M без звук · F цял екран",
+  "headerPill": "Гледане заедно · {{count}}",
+  "miniPlayer": "Мини плейър",
+  "tabs": {
+    "playlist": "Плейлист"
+  },
+  "upNextHeading": "Следва · плъзнете за подреждане",
+  "whoIsWatching": "Кой гледа",
+  "pasteKey": "Ctrl V",
+  "you": "Вие"
 }

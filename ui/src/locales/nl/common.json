@@ -46,7 +46,7 @@
     "seek": "Zoeken",
     "volume": "Volume",
     "syncedPlay": "Gesynchroniseerd",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} heeft de regie",
     "inSync": "Gesynchroniseerd",
     "inSyncAll": "Iedereen gesynchroniseerd",
@@ -59,6 +59,15 @@
     "host": "Host",
     "fullscreen": "Beeldschermvullend",
     "exitFullscreen": "Verlaat fullscreen",
-    "none": "Niemand"
+    "none": "Niemand",
+    "popOut": "Openen in apart venster",
+    "popIn": "Terugzetten in hoofdvenster",
+    "onTop": "Altijd bovenop",
+    "poppedOut": "Speelt af in een apart venster",
+    "bringBack": "Terughalen",
+    "popOutFailed": "Het aparte venster kon niet worden geopend",
+    "popInFailed": "De weergave kon niet worden teruggehaald",
+    "onTopFailed": "Altijd bovenop kon niet worden gewijzigd",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

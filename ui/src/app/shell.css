@@ -287,12 +287,6 @@
   min-height: 0;
 }
 
-/* Focus mode (issue #163): only the picture. The other columns and the chat are hidden, and Esc
-   or Z brings them back. */
-.shell[data-focus] .shell__channel-column,
-.shell[data-focus] .shell__members,
-.shell[data-focus] .shell__chat-body,
-.shell[data-focus] > .resize-handle,
 .shell[data-page-open] > :not(.shell__servers, .shell__page) {
   display: none;
 }

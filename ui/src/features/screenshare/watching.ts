@@ -6,6 +6,8 @@
 import { useSyncExternalStore } from "react";
 import { closeMedia, openMedia } from "../media/mediaView";
 import { getApi, type MumcordApi, type Unsubscribe } from "../../api";
+import { releaseKeptWatch } from "./frameHandover";
+import { StreamMeter } from "./streamStats";
 
 export interface WatchedShare {
   serverId: number;
@@ -14,13 +16,18 @@ export interface WatchedShare {
 }
 
 let watched: WatchedShare | null = null;
+// One meter per watch, so the viewer's chips and the panel's own row show the same figures.
+let meter = new StreamMeter();
 let boundApi: MumcordApi | undefined;
 let unsubscribers: Unsubscribe[] = [];
 const listeners = new Set<() => void>();
 
 function set(next: WatchedShare | null): void {
   if (next === watched) return;
+  // A watch kept open for the pop-out ends with the share the user watched (issue #164).
+  releaseKeptWatch(next);
   watched = next;
+  meter = new StreamMeter();
   for (const listener of listeners) listener();
 }
 
@@ -60,7 +67,8 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-function snapshot(): WatchedShare | null {
+/** The share open in the main area, or `null`, for code outside React. */
+export function watchedShare(): WatchedShare | null {
   ensureBound();
   return watched;
 }
@@ -82,7 +90,12 @@ export function stopWatching(): void {
 
 /** The share open in the main area, or `null`. */
 export function useWatchedShare(): WatchedShare | null {
-  return useSyncExternalStore(subscribe, snapshot);
+  return useSyncExternalStore(subscribe, watchedShare);
+}
+
+/** Counts the frames of the share open now (issue #163). */
+export function watchMeter(): StreamMeter {
+  return meter;
 }
 
 /** Test helper: forgets the binding and the open share. */
@@ -91,4 +104,5 @@ export function resetWatchingStore(): void {
   unsubscribers = [];
   boundApi = undefined;
   watched = null;
+  meter = new StreamMeter();
 }

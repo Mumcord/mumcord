@@ -1,5 +1,5 @@
-// Issue #163 (FR-3.125–FR-3.127) with one client only: the sharer's control bar at the top of the
-// chat, and the picture view it belongs to. mumbot cannot be a share viewer (no plugin data), so
+// Issue #163 (FR-3.125–FR-3.127) with one client only: the sharer's control bar below the channel
+// header, and the picture view it belongs to. mumbot cannot be a share viewer (no plugin data), so
 // the second side of these features is covered by the engine live tests
 // (`crates/engine/tests/live_screen_share.rs`), not here. What this spec checks is what one client
 // can show on its own: the bar appears only while sharing, says what was picked and how long the
@@ -14,7 +14,7 @@ import { addFirstServer, finishWizard, joinChannel } from "../../helpers/chat-ui
 
 const ME = "ShareBarQA";
 
-/** The control bar at the top of the chat (issue #163), named like the accessibility tests expect. */
+/** The control bar below the channel header (issue #163), named like the accessibility tests expect. */
 const bar = () => $("//div[contains(@class,'sharer-bar')]");
 
 /** Waits until `el` contains `text`. */
@@ -37,8 +37,15 @@ describe("sharer control bar (#163)", () => {
   });
 
   it("is only the entry point before a share", async () => {
-    await waitText(await bar(), "Share screen");
+    // The bar below the channel header only exists while sharing; the entry point is the Apps menu.
+    expect(await bar().isExisting()).toBe(false);
     expect(await $("//span[contains(@class,'live-badge')]").isExisting()).toBe(false);
+    await $("button.chat-apps__button").click();
+    const entry = await $(
+      "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+    );
+    await entry.waitForExist({ timeout: 20_000, timeoutMsg: "the Apps menu has no Share screen entry" });
+    await browser.keys("Escape");
   });
 
   // A share cannot be started in the container: the picker is the system picker and there is no

@@ -5,6 +5,7 @@ import {
   fitWidths,
   loadColumnWidths,
   maxWidth,
+  MEDIA_PANEL_MIN_REM,
   saveColumnWidths,
   type ColumnWidths,
   type ResizableColumn,
@@ -76,6 +77,8 @@ export interface ColumnWidthsState {
 export function useColumnWidths(
   shellRef: RefObject<HTMLElement | null>,
   serverBarRef: RefObject<HTMLElement | null>,
+  /** A media panel fills the member column and asks for more room. */
+  mediaPanel = false,
 ): ColumnWidthsState {
   const [chosen, setChosen] = useState(loadColumnWidths);
   const chosenRef = useRef(chosen);
@@ -105,8 +108,13 @@ export function useColumnWidths(
   }, [shellRef, serverBarRef]);
 
   const shown = room
-    ? fitWidths(chosen, room)
-    : { channels: clampWidth(chosen.channels), members: clampWidth(chosen.members) };
+    ? fitWidths(chosen, room, mediaPanel)
+    : {
+        channels: clampWidth(chosen.channels),
+        members: clampWidth(
+          mediaPanel ? Math.max(chosen.members, MEDIA_PANEL_MIN_REM) : chosen.members,
+        ),
+      };
   const max = room
     ? { channels: maxWidth("channels", shown, room), members: maxWidth("members", shown, room) }
     : { channels: clampWidth(Infinity), members: clampWidth(Infinity) };

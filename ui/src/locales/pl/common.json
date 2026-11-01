@@ -46,7 +46,7 @@
     "seek": "Szukaj",
     "volume": "Głośność",
     "syncedPlay": "Zsynchronizowane",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} ma kontrolę",
     "inSync": "Zsynchronizowany",
     "inSyncAll": "Wszyscy zsynchronizowani",
@@ -59,6 +59,15 @@
     "host": "Gospodarz",
     "fullscreen": "Pełny ekran",
     "exitFullscreen": "Opuść pełny ekran",
-    "none": "Nikt"
+    "none": "Nikt",
+    "popOut": "Otwórz w osobnym oknie",
+    "popIn": "Przywróć do głównego okna",
+    "onTop": "Zawsze na wierzchu",
+    "poppedOut": "Odtwarzanie w osobnym oknie",
+    "bringBack": "Przywróć",
+    "popOutFailed": "Nie udało się otworzyć osobnego okna",
+    "popInFailed": "Nie udało się przywrócić widoku",
+    "onTopFailed": "Nie udało się zmienić opcji „Zawsze na wierzchu”",
+    "windowTitle": "{{title}} — {{channel}}"
   }
 }

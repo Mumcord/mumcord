@@ -2,9 +2,19 @@
 import { useTranslation } from "react-i18next";
 import { announce } from "../../a11y";
 import { getApi } from "../../api";
+import { MediaIcon } from "../media/icons";
 import { positionAt, type LiveParty } from "./watchPartyStore";
 
-export function PlayPause({ serverId, live }: { serverId: number; live: LiveParty }) {
+export function PlayPause({
+  serverId,
+  live,
+  className = "button watch-party__icon",
+}: {
+  serverId: number;
+  live: LiveParty;
+  /** The look of the place it sits in: the picture's overlay, the mini bar or the playlist row. */
+  className?: string;
+}) {
   const { t } = useTranslation("watchparty");
   const { playing } = live.party;
   const label = playing ? t("widget.pause") : t("widget.play");
@@ -20,12 +30,13 @@ export function PlayPause({ serverId, live }: { serverId: number; live: LivePart
   return (
     <button
       type="button"
-      className="button watch-party__icon"
+      className={className}
       data-tooltip={label}
       aria-label={label}
+      aria-keyshortcuts="Space"
       onClick={onClick}
     >
-      <span aria-hidden="true">{playing ? "⏸" : "▶"}</span>
+      <MediaIcon name={playing ? "pause" : "play"} />
     </button>
   );
 }
