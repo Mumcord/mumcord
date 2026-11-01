@@ -434,7 +434,10 @@ mod tests {
         assert!(csp.contains(
             "script-src mumcord-web://localhost/snacks/ 'unsafe-inline' 'wasm-unsafe-eval';"
         ));
+        // WebAssembly may be compiled, but JavaScript eval stays blocked.
+        assert!(!csp.contains("'unsafe-eval'"));
         assert!(csp.contains("connect-src mumcord-web://localhost/snacks/;"));
+        assert_eq!(csp.matches("connect-src").count(), 1);
         assert!(csp.contains("font-src mumcord-web://localhost/snacks/;"));
         assert!(csp.contains("form-action 'none'"));
         assert!(csp.ends_with("sandbox allow-scripts"));
