@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostik",
     "export": "Exportera data",
     "reset": "Återställ data",
-    "remove": "Ta bort"
+    "remove": "Ta bort",
+    "commandTaken": "/{{command}}: Kommandot används av {{plugin}}"
   },
   "badge": {
     "label": "Märke bredvid namn",

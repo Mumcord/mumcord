@@ -9,6 +9,7 @@ import {
 } from "../pluginRequestStore";
 import { usePlugins } from "../pluginStore";
 import "./installed.css";
+import { usePluginIconUrl } from "../render/assets";
 import { BADGE_PERMISSION, displayName, initials, sourceLabel, stateLabel } from "./labels";
 import type { RowLabel } from "./labels";
 import { PluginDetails } from "./PluginDetails";
@@ -173,6 +174,7 @@ function PluginRow({
   const { t } = useTranslation("pluginInstalled");
   const detailsId = useId();
   const name = displayName(plugin);
+  const iconUrl = usePluginIconUrl(plugin.id, plugin.icon);
   const state = stateLabel(plugin);
   // A revoked plugin cannot be turned on again (the service refuses it).
   const locked = noPlugins || plugin.disabledReason === "revoked";
@@ -180,7 +182,11 @@ function PluginRow({
     <li ref={rowRef} className="plugins-installed-row">
       <div className="plugins-installed-head">
         <span className="plugins-installed-icon" aria-hidden="true">
-          {initials(name)}
+          {iconUrl === null ? (
+            initials(name)
+          ) : (
+            <img className="plugins-installed-icon__image" src={iconUrl} alt="" />
+          )}
         </span>
         <div className="plugins-installed-title">
           <span className="plugins-installed-name">

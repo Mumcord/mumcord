@@ -31,7 +31,8 @@
     "diagnostics": "Dijanjostika",
     "export": "Esporta d-dejta",
     "reset": "Irrisettja d-dejta",
-    "remove": "Neħħi"
+    "remove": "Neħħi",
+    "commandTaken": "/{{command}}: Il-kmand diġà użat minn {{plugin}}"
   },
   "badge": {
     "label": "Badge muri maġenb l-ismijiet",

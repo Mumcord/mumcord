@@ -31,7 +31,8 @@
     "diagnostics": "Diagnosztika",
     "export": "Adatok exportálása",
     "reset": "Adatok visszaállítása",
-    "remove": "Eltávolítás"
+    "remove": "Eltávolítás",
+    "commandTaken": "/{{command}}: A parancsot a(z) {{plugin}} már használja"
   },
   "badge": {
     "label": "A nevek mellett megjelenő jelvény",

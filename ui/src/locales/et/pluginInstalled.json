@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostika",
     "export": "Ekspordi andmed",
     "reset": "Lähtesta andmed",
-    "remove": "Eemalda"
+    "remove": "Eemalda",
+    "commandTaken": "/{{command}}: Käsk on hõivatud pistikprogrammiga {{plugin}}"
   },
   "badge": {
     "label": "Nimede kõrval kuvatav märk",

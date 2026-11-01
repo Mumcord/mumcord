@@ -151,6 +151,8 @@ pub struct InstalledPlugin {
     /// The reason from Mumcord's revocation list for the installed version, in the UI language.
     /// With `disabledReason` `revoked` the plugin was turned off; otherwise it is a warning.
     pub revocation: Option<String>,
+    /// The manifest icon (a path under `assets/`, loaded with `plugin_asset`).
+    pub icon: Option<String>,
 }
 
 /// The name of a third-party repository; empty when it was removed.
@@ -199,6 +201,7 @@ impl InstalledPlugin {
             installed_at: p.installed_at as f64,
             badge: p.badge,
             revocation: p.revocation.map(|r| r.reason),
+            icon: p.icon,
         }
     }
 }

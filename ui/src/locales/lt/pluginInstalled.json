@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostika",
     "export": "Eksportuoti duomenis",
     "reset": "Atstatyti duomenis",
-    "remove": "Pašalinti"
+    "remove": "Pašalinti",
+    "commandTaken": "/{{command}}: Komandą jau naudoja {{plugin}}"
   },
   "badge": {
     "label": "Šalia vardų rodomas ženklelis",

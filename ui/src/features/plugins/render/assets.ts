@@ -53,10 +53,11 @@ function release(key: string): void {
  * The blob URL of a plugin asset: `undefined` while loading, `null` if it cannot be shown
  * (the caller then shows the alt text).
  */
-export function usePluginAsset(plugin: string, path: string): string | null | undefined {
-  const key = `${plugin}\n${path}`;
+export function usePluginAsset(plugin: string, path: string | null): string | null | undefined {
+  const key = `${plugin}\n${path ?? ""}`;
   const [loaded, setLoaded] = useState<{ key: string; url: string | null }>();
   useEffect(() => {
+    if (path === null) return;
     let active = true;
     acquire(key, plugin, path).then(
       (url) => {
@@ -72,5 +73,11 @@ export function usePluginAsset(plugin: string, path: string): string | null | un
       release(key);
     };
   }, [key, plugin, path]);
+  if (path === null) return null;
   return loaded?.key === key ? loaded.url : undefined;
+}
+
+/** The blob URL of an installed plugin's manifest icon, or `null` while loading or without one. */
+export function usePluginIconUrl(plugin: string, icon: string | null | undefined): string | null {
+  return usePluginAsset(plugin, icon ?? null) ?? null;
 }

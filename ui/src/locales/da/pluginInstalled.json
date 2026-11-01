@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostik",
     "export": "Eksportér data",
     "reset": "Nulstil data",
-    "remove": "Fjern"
+    "remove": "Fjern",
+    "commandTaken": "/{{command}}: Kommandoen er optaget af {{plugin}}"
   },
   "badge": {
     "label": "Badge vist ved siden af navne",

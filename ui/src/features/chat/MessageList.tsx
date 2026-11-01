@@ -7,6 +7,7 @@
  * Every message can be replied to (FR-2.60: hover button, context menu or R); a reply shows a
  * compact header with the quote that jumps to the original while it is loaded.
  */
+import { ChatDecoration } from "../plugins/badges";
 import {
   memo,
   useCallback,
@@ -1181,6 +1182,7 @@ const MessageItem = memo(function MessageItem({
       >
         {senderName}
         <MumcordBadge user={senderUser} />
+        <ChatDecoration session={session} />
       </button>,
     )
   ) : (
@@ -1188,6 +1190,7 @@ const MessageItem = memo(function MessageItem({
       <span className="chat-message__sender">
         {senderName}
         <MumcordBadge user={senderUser} />
+        {session !== null && <ChatDecoration session={session} />}
       </span>,
     )
   );

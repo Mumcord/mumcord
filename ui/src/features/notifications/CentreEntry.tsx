@@ -17,6 +17,7 @@ import {
 } from "./centreActions";
 import type { CentreItem, InviteItem, RequestItem, UpdateItem } from "./centreModel";
 import { dismissItem, setCentreOpen } from "./centreStore";
+import { usePluginIcon } from "../plugins/render/usePluginIcon";
 import { PluginActions, usePluginEntryText } from "../plugins/notifications";
 
 type T = TFunction<"notifications">;
@@ -278,13 +279,15 @@ export function CentreEntry({
   const title = item.kind === "plugin" ? plugin.title : titleOf(item, t, serverName);
   const body = item.kind === "plugin" ? plugin.body : bodyOf(item, t);
   const time = relativeTime(new Date(item.at).toISOString(), now, i18n.language);
+  const pluginId = item.kind === "plugin" ? item.notice.plugin : null;
+  const pluginIcon = usePluginIcon(pluginId);
   const avatarName =
     item.kind === "plugin" ? item.notice.name : senderOf(item) || serverName || "Mumcord";
   return (
     <li className="centre-entry" data-unread={!item.read || undefined} data-kind={item.kind}>
       <Avatar
         name={avatarName}
-        src={item.kind === "update" ? `${import.meta.env.BASE_URL}favicon.png` : null}
+        src={item.kind === "update" ? `${import.meta.env.BASE_URL}favicon.png` : pluginIcon}
       />
       <div className="centre-entry__content">
         <button

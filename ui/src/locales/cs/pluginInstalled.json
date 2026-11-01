@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostika",
     "export": "Exportovat data",
     "reset": "Resetovat data",
-    "remove": "Odebrat"
+    "remove": "Odebrat",
+    "commandTaken": "/{{command}}: Příkaz používá {{plugin}}"
   },
   "badge": {
     "label": "Odznak zobrazený u jmen",

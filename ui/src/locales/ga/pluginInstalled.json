@@ -31,7 +31,8 @@
     "diagnostics": "Diagnóisic",
     "export": "Easpórtáil sonraí",
     "reset": "Athshocraigh sonraí",
-    "remove": "Bain"
+    "remove": "Bain",
+    "commandTaken": "/{{command}}: Tá an t-ordú in úsáid ag {{plugin}}"
   },
   "badge": {
     "label": "Suaitheantas le taobh ainmneacha",

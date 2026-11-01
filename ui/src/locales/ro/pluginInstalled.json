@@ -31,7 +31,8 @@
     "diagnostics": "Diagnosticare",
     "export": "Exportă datele",
     "reset": "Resetează datele",
-    "remove": "Elimină"
+    "remove": "Elimină",
+    "commandTaken": "/{{command}}: Comandă deja folosită de {{plugin}}"
   },
   "badge": {
     "label": "Insignă afișată lângă nume",

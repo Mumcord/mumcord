@@ -23,6 +23,7 @@ const plugin: InstalledPlugin = {
   installedAt: 0,
   badge: false,
   revocation: null,
+  icon: null,
 };
 
 const update: PluginUpdate = {

@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostika",
     "export": "Exportovať údaje",
     "reset": "Obnoviť údaje",
-    "remove": "Odstrániť"
+    "remove": "Odstrániť",
+    "commandTaken": "/{{command}}: Príkaz už používa {{plugin}}"
   },
   "badge": {
     "label": "Odznak zobrazený pri menách",

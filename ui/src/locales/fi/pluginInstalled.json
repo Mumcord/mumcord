@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostiikka",
     "export": "Vie tiedot",
     "reset": "Nollaa tiedot",
-    "remove": "Poista"
+    "remove": "Poista",
+    "commandTaken": "/{{command}}: Komennon on ottanut {{plugin}}"
   },
   "badge": {
     "label": "Nimien vieressä näkyvä merkki",

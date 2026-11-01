@@ -31,7 +31,8 @@
     "diagnostics": "Diagnose",
     "export": "Daten exportieren",
     "reset": "Daten zurücksetzen",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "commandTaken": "/{{command}}: Befehl belegt von {{plugin}}"
   },
   "badge": {
     "label": "Abzeichen neben Namen",

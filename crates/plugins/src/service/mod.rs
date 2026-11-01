@@ -158,6 +158,8 @@ pub struct PluginInfo {
     pub badge: bool,
     /// A `revoked.json` entry matching the installed version (FR-6.70).
     pub revocation: Option<RevocationNotice>,
+    /// The manifest icon, a path under `assets/`.
+    pub icon: Option<String>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -488,6 +490,7 @@ impl PluginService {
         let revocation = self.revocation_notice(&record);
         PluginInfo {
             name: manifest.map(|m| m.name.clone()).unwrap_or_default(),
+            icon: manifest.and_then(|m| m.icon.clone()),
             required: manifest
                 .map(|m| m.permissions.required.clone())
                 .unwrap_or_default(),

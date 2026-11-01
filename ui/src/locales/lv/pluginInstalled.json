@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostika",
     "export": "Eksportēt datus",
     "reset": "Atiestatīt datus",
-    "remove": "Noņemt"
+    "remove": "Noņemt",
+    "commandTaken": "/{{command}}: Komandu jau izmanto {{plugin}}"
   },
   "badge": {
     "label": "Nozīmīte blakus vārdiem",

@@ -33,6 +33,7 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     installedAt: null,
     badge: true,
     revocation: null,
+    icon: null,
     ...overrides,
   };
 }
@@ -149,6 +150,23 @@ describe("InstalledTab", () => {
     await waitFor(() => {
       expect(setNotifications).toHaveBeenCalledWith("foo", false);
     });
+  });
+
+  it("says which plugin took one of its commands", async () => {
+    withPlugins([foo]);
+    vi.spyOn(api, "pluginCommands").mockResolvedValue([
+      {
+        pluginId: "foo",
+        pluginName: "Foo",
+        name: "roll",
+        description: "",
+        usage: null,
+        takenBy: "Dice",
+      },
+    ]);
+    render(<InstalledTab />);
+    fireEvent.click(await screen.findByRole("button", { name: "Details of foo" }));
+    expect(await screen.findByText("/roll: Command taken by Dice")).toBeInTheDocument();
   });
 
   it("removes a plugin and keeps its data unless asked", async () => {

@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
@@ -38,6 +38,31 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
   const [notice, setNotice] = useState<string | null>(null);
   const settingsTree = usePluginTree(plugin.id, SETTINGS_SLOT);
   const name = displayName(plugin);
+  const [taken, setTaken] = useState<{ name: string; takenBy: string }[]>([]);
+  useEffect(() => {
+    let active = true;
+    getApi()
+      .pluginCommands()
+      .then(
+        (commands) => {
+          if (active) {
+            setTaken(
+              commands.flatMap((c) =>
+                c.pluginId === plugin.id && c.takenBy !== null
+                  ? [{ name: c.name, takenBy: c.takenBy }]
+                  : [],
+              ),
+            );
+          }
+        },
+        (error: unknown) => {
+          console.error("Loading plugin commands failed", error);
+        },
+      );
+    return () => {
+      active = false;
+    };
+  }, [plugin.id, plugin.enabled, plugin.granted]);
   const dev = plugin.source.kind === "dev";
   const granted = new Set(plugin.granted);
   const requested = [
@@ -129,6 +154,16 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
           />
           {t("details.pin", { version: plugin.version })}
         </label>
+      )}
+
+      {taken.length > 0 && (
+        <ul className="plugins-installed-taken">
+          {taken.map((c) => (
+            <li key={c.name}>
+              {t("details.commandTaken", { command: c.name, plugin: c.takenBy })}
+            </li>
+          ))}
+        </ul>
       )}
 
       {settingsTree !== undefined && settingsTree.length > 0 && (

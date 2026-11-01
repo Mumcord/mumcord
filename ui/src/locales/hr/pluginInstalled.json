@@ -31,7 +31,8 @@
     "diagnostics": "Dijagnostika",
     "export": "Izvezi podatke",
     "reset": "Poništi podatke",
-    "remove": "Ukloni"
+    "remove": "Ukloni",
+    "commandTaken": "/{{command}}: Naredbu je preuzeo {{plugin}}"
   },
   "badge": {
     "label": "Značka uz imena",

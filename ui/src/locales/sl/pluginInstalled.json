@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostika",
     "export": "Izvozi podatke",
     "reset": "Ponastavi podatke",
-    "remove": "Odstrani"
+    "remove": "Odstrani",
+    "commandTaken": "/{{command}}: Ukaz je že zaseden s {{plugin}}"
   },
   "badge": {
     "label": "Značka ob imenih",

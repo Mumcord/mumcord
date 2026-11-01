@@ -31,7 +31,8 @@
     "diagnostics": "Diagnostiek",
     "export": "Gegevens exporteren",
     "reset": "Gegevens resetten",
-    "remove": "Verwijderen"
+    "remove": "Verwijderen",
+    "commandTaken": "/{{command}}: Opdracht al in gebruik door {{plugin}}"
   },
   "badge": {
     "label": "Badge naast namen",
