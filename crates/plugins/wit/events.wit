@@ -171,5 +171,10 @@ interface events {
     /// `chat.patterns`: a message in the user's channel matched one of this plugin's chat
     /// patterns.
     chat-match(chat-match),
+    /// `peers.messages`: a user in the user's current channel can now receive this plugin's
+    /// messages because their Mumcord started announcing it (for example they just installed or
+    /// enabled it). Resend any state a late joiner would get. Not sent for users who already
+    /// announced it when they joined.
+    peer-ready(peer),
   }
 }

@@ -1478,3 +1478,105 @@ fn a_dice_like_plugin_cannot_post_to_chat_without_a_gesture() {
     assert_eq!(outcome, "chat-send-not-permitted");
     assert!(posted.is_empty(), "{posted:?}");
 }
+
+/// On a `peer-ready` event (case 21), sends the peer's name to the channel as a plugin message
+/// of kind 5. In `peer`, `name` is the string at payload offset 4 (the payload starts at
+/// offset 8).
+const READY_ECHO: &str = r#"
+(module
+  (import "mumcord:plugin/peers@1.0.0" "send" (func $send (param i32 i32 i32 i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param $event i32)
+    (if (i32.eq (i32.load8_u (local.get $event)) (i32.const 21))
+      (then
+        (call $send (i32.const 0) (i32.const 0) (i32.const 5)
+          (i32.load (i32.add (local.get $event) (i32.const 12)))
+          (i32.load (i32.add (local.get $event) (i32.const 16)))
+          (i32.const 100)))))
+  (func (export "stop"))
+)"#;
+
+fn ready_folder(root: &Path, id: &str) -> PathBuf {
+    let dir = root.join(format!("src-{id}"));
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(dir.join("manifest.json"), manifest(id, "0.1.0", MESSAGING)).expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode(READY_ECHO)).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    dir
+}
+
+#[test]
+fn a_peer_newly_announcing_a_plugin_makes_it_ready_once() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    let poll = service
+        .load_dev(&ready_folder(fx.root.path(), "poll"))
+        .expect("loads");
+    let _dice = service
+        .load_dev(&ready_folder(fx.root.path(), "dice"))
+        .expect("loads");
+    let wait = std::time::Duration::from_millis(300);
+    assert!(echoed(&mut service, &mut host_events, &mut events, wait).is_empty());
+
+    // Bob installs Poll: only Poll hears that he is ready, and only the first time.
+    let runs_poll = br#"{"v":1,"p":["poll@1~dev"]}"#;
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    service.peer_data(1, &bob(), "mumcord.plugins", runs_poll);
+    // Someone outside the channel announcing Poll is nobody Poll can reach.
+    let eve = PeerInfo {
+        session: 9,
+        name: "Eve".into(),
+        ..bob()
+    };
+    service.peer_data(1, &eve, "mumcord.plugins", runs_poll);
+    assert_eq!(
+        echoed(&mut service, &mut host_events, &mut events, wait),
+        [(poll, b"Bob".to_vec())]
+    );
+}
+
+#[test]
+fn installing_a_plugin_announces_at_once_despite_the_interval() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, _host_events, _events) = fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    let first = service
+        .load_dev(&ready_folder(fx.root.path(), "first"))
+        .expect("loads");
+    assert_eq!(service.poll_announces().len(), 1);
+
+    service
+        .load_dev(&ready_folder(fx.root.path(), "second"))
+        .expect("loads");
+    let announces = service.poll_announces();
+    assert_eq!(announces.len(), 1, "a new plugin skips the 10 s interval");
+    let text = String::from_utf8(announces[0].bytes.clone()).expect("JSON");
+    assert!(text.contains("second@1~dev"), "{text}");
+
+    // Hiding a plugin is no gain: it waits for the interval.
+    service
+        .set_visibility(&first, PluginVisibility::Nobody)
+        .expect("visibility");
+    assert!(service.poll_announces().is_empty());
+    assert!(service.next_announce_at().is_some());
+}

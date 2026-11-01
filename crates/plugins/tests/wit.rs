@@ -124,6 +124,7 @@ fn every_event_of_fr_6_16_exists() {
             "webview-message",
             "chat-trigger",
             "chat-match",
+            "peer-ready",
         ]
     );
 }

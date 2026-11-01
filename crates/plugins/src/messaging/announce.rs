@@ -132,11 +132,14 @@ pub fn parse(bytes: &[u8]) -> Vec<AnnounceEntry> {
 
 /// Keeps announces to at most one per [`MIN_INTERVAL`]. The caller marks a change (plugin set or
 /// visibility changed, a new peer with feature `plugins` appeared) and sends when [`Self::poll`]
-/// says so; a change inside the interval is sent once the interval has passed.
+/// says so; a change inside the interval is sent once the interval has passed. A gained plugin
+/// goes out at once, so peers learn about a fresh install before its first message (F45).
 #[derive(Debug, Default)]
 pub struct AnnounceThrottle {
     last_sent: Option<Instant>,
     pending: bool,
+    /// The pending change adds a plugin: the next announce skips the interval once.
+    gained: bool,
 }
 
 impl AnnounceThrottle {
@@ -144,21 +147,32 @@ impl AnnounceThrottle {
         self.pending = true;
     }
 
+    /// The announced set gained a plugin (installed, enabled, or made visible).
+    pub fn mark_gained(&mut self) {
+        self.pending = true;
+        self.gained = true;
+    }
+
     /// When the next announce is due, if one is pending.
     pub fn due_at(&self, now: Instant) -> Option<Instant> {
         if !self.pending {
             return None;
+        }
+        if self.gained {
+            return Some(now);
         }
         Some(self.last_sent.map_or(now, |t| (t + MIN_INTERVAL).max(now)))
     }
 
     /// Returns true (and records the send) if a pending announce may go out now.
     pub fn poll(&mut self, now: Instant) -> bool {
-        let allowed = self
-            .last_sent
-            .is_none_or(|t| now.duration_since(t) >= MIN_INTERVAL);
+        let allowed = self.gained
+            || self
+                .last_sent
+                .is_none_or(|t| now.duration_since(t) >= MIN_INTERVAL);
         if self.pending && allowed {
             self.pending = false;
+            self.gained = false;
             self.last_sent = Some(now);
             true
         } else {
@@ -268,5 +282,26 @@ mod tests {
         assert_eq!(throttle.due_at(t0), None);
         throttle.reset();
         assert!(throttle.poll(t0 + Duration::from_secs(31)));
+    }
+
+    #[test]
+    fn a_gained_plugin_skips_the_interval_once() {
+        let t0 = Instant::now();
+        let mut throttle = AnnounceThrottle::default();
+        throttle.mark_changed();
+        assert!(throttle.poll(t0));
+        throttle.mark_gained();
+        let t1 = t0 + Duration::from_secs(2);
+        assert_eq!(throttle.due_at(t1), Some(t1));
+        assert!(throttle.poll(t1), "an install goes out at once");
+        throttle.mark_changed();
+        assert!(
+            !throttle.poll(t0 + Duration::from_secs(3)),
+            "a removal waits"
+        );
+        assert_eq!(
+            throttle.due_at(t0 + Duration::from_secs(3)),
+            Some(t1 + MIN_INTERVAL)
+        );
     }
 }

@@ -34,6 +34,11 @@ pub struct PluginRef<'a> {
 }
 
 impl PluginRef<'_> {
+    /// Whether this plugin's messages reach `member`: they run it and visibility allows them.
+    pub fn reaches(&self, member: &Member<'_>) -> bool {
+        self.allows(member) && member.runs(self)
+    }
+
     fn allows(&self, member: &Member<'_>) -> bool {
         match self.visibility {
             Visibility::Everyone => true,

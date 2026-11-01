@@ -109,6 +109,7 @@ http-response(http-result),
 webview-message(string),
 chat-trigger(chat-trigger),
 chat-match(chat-match),
+peer-ready(peer),
 }
 }
 == http.wit

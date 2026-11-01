@@ -68,7 +68,7 @@ pub fn event_permission(event: &Event) -> Option<&'static str> {
         Event::Joined(_) | Event::Left(_) | Event::ScreenShareStarted(_) => "events.presence",
         Event::ChatActivity(_) | Event::Mentioned(_) => "events.chat-activity",
         Event::SelfChanged(_) => "events.self",
-        Event::PeerMessage(_) => "peers.messages",
+        Event::PeerMessage(_) | Event::PeerReady(_) => "peers.messages",
         Event::ProfileCardOpened(_) => "ui.profile-card",
         Event::PanelVisibilityChanged(_) => "ui.panel",
         Event::UserMenuRequested(_) => "ui.user-menu",

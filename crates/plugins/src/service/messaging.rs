@@ -169,9 +169,27 @@ impl PluginService {
     pub fn peer_data(&mut self, server: ServerId, sender: &PeerInfo, data_id: &str, data: &[u8]) {
         let mut state = self.io.peers();
         if data_id == ANNOUNCE_DATA_ID {
-            connection(&mut state.connections, server)
-                .announced
-                .insert(sender.session, announce::parse(data));
+            let peers = &mut *state;
+            let focused = peers.focused == Some(server);
+            let connection = connection(&mut peers.connections, server);
+            let entries = announce::parse(data);
+            let ready = match connection.members.get(&sender.session) {
+                Some(peer) if focused => newly_reachable(
+                    &peers.plugins,
+                    peer,
+                    connection.announced.get(&sender.session).map(Vec::as_slice),
+                    &entries,
+                ),
+                _ => Vec::new(),
+            };
+            connection.announced.insert(sender.session, entries);
+            drop(state);
+            // A poll or game state sent before this announce never reached them (FR-6.35).
+            let keys = self.ctx.peer_keys.as_ref();
+            for id in ready {
+                self.host
+                    .send(&id, Event::PeerReady(wit_peer(keys, &id, sender)));
+            }
             return;
         }
         let Some(plugin) = plugin_id_of(data_id) else {
@@ -357,11 +375,16 @@ impl PluginService {
             })
             .map(|(id, _)| id.clone())
             .collect();
+        let gained = announced(&metas).any(|entry| !announced(&state.plugins).any(|e| e == entry));
         for connection in state.connections.values_mut() {
             for id in &gone {
                 connection.messenger.forget_plugin(id, now);
             }
-            connection.throttle.mark_changed();
+            if gained {
+                connection.throttle.mark_gained();
+            } else {
+                connection.throttle.mark_changed();
+            }
         }
         state.plugins = metas;
     }
@@ -471,6 +494,43 @@ impl PluginService {
     fn loaded_ids(&self) -> Vec<String> {
         self.host.ids().map(str::to_owned).collect()
     }
+}
+
+/// What the announce lists for these plugins: id and source, without visibility Nobody.
+fn announced(
+    plugins: &std::collections::HashMap<String, PluginMeta>,
+) -> impl Iterator<Item = (&str, SourceTag)> {
+    plugins.iter().filter_map(|(id, meta)| {
+        let messaging = meta.messaging.as_ref()?;
+        (messaging.visibility != Visibility::Nobody).then_some((id.as_str(), messaging.source))
+    })
+}
+
+/// Our plugins whose messages reach `peer` with the announce `now` but did not with `before`.
+fn newly_reachable(
+    plugins: &std::collections::HashMap<String, PluginMeta>,
+    peer: &PeerInfo,
+    before: Option<&[AnnounceEntry]>,
+    now: &[AnnounceEntry],
+) -> Vec<String> {
+    let member = |entries| Member {
+        session: peer.session,
+        is_friend: peer.is_friend,
+        plugins: entries,
+    };
+    let (before, now) = (member(before.unwrap_or_default()), member(now));
+    plugins
+        .iter()
+        .filter_map(|(id, meta)| {
+            let messaging = meta.messaging.as_ref()?;
+            let plugin = PluginRef {
+                id,
+                source: messaging.source,
+                visibility: messaging.visibility,
+            };
+            (plugin.reaches(&now) && !plugin.reaches(&before)).then(|| id.clone())
+        })
+        .collect()
 }
 
 fn connection(

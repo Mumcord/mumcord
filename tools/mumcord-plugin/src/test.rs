@@ -288,6 +288,8 @@ pub enum EventSpec {
         direct: bool,
     },
     Joined(u32),
+    /// The user's Mumcord started announcing this plugin (`peer-ready`).
+    PeerReady(u32),
     Left(u32),
     Talking {
         session: u32,
@@ -941,6 +943,7 @@ impl Session {
                 direct: *direct,
             }),
             EventSpec::Joined(s) => Event::Joined(self.peer(*s)?),
+            EventSpec::PeerReady(s) => Event::PeerReady(self.peer(*s)?),
             EventSpec::Left(s) => Event::Left(self.peer(*s)?),
             EventSpec::Talking { session, talking } => {
                 Event::Talking((self.peer(*session)?, *talking))
@@ -1411,9 +1414,14 @@ steps:
   - event: {chat-trigger: {sender: 2, trigger: "!poll", message: 4, replay: true}}
   - expect: {replaced: {message: 4, card: c1}}
   - expect: {hidden: {message: 4}}
+  - event: {peer-ready: 2}
 "#;
         let scenario: Scenario = serde_saphyr::from_str(yaml).expect("parses");
-        assert_eq!(scenario.steps.len(), 16);
+        assert_eq!(scenario.steps.len(), 17);
+        assert!(matches!(
+            &scenario.steps[16],
+            Step::Event(EventSpec::PeerReady(2))
+        ));
         assert!(matches!(
             &scenario.steps[13],
             Step::Event(EventSpec::ChatTrigger {
