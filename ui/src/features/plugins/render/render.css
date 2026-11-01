@@ -149,9 +149,16 @@
   padding: 0;
 }
 
-.pr-icon-button img {
+.pr-icon-mask {
   width: 18px;
   height: 18px;
+  background-color: currentcolor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
 }
 
 .pr-toggle {

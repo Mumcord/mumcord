@@ -123,7 +123,8 @@ interface ui {
   }
 
   record icon-button {
-    /// Asset path of the icon.
+    /// Asset path of the icon. Drawn monochrome in the theme's text colour (only its shape
+    /// counts), so it stays visible on dark and light themes; use `image` or `sprite` for colour.
     icon: string,
     /// Required: the button has no visible text.
     label: string,

@@ -204,6 +204,29 @@ describe("PluginTree", () => {
   });
 });
 
+describe("icon button", () => {
+  it("draws the icon as a mask in the text colour with the label as its name", async () => {
+    vi.spyOn(api, "pluginAsset").mockResolvedValue({ mimeType: "image/svg+xml", base64: "AA==" });
+    vi.stubGlobal("URL", { ...URL, createObjectURL: () => "blob:icon", revokeObjectURL: vi.fn() });
+    const { container } = show([
+      leaf({
+        type: "iconButton",
+        icon: "assets/icons/help.svg",
+        label: "Help",
+        action: "help",
+        disabled: false,
+      }),
+    ]);
+    expect(screen.getByRole("button", { name: "Help" })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(container.querySelector(".pr-icon-mask")).toHaveStyle({
+        maskImage: 'url("blob:icon")',
+      });
+    });
+    expect(container.querySelector("img")).toBeNull();
+  });
+});
+
 describe("sprite", () => {
   const sprite = leaf({
     type: "sprite",

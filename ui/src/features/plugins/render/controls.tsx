@@ -41,7 +41,16 @@ export function PluginIconButton({ icon, label, action, disabled }: Of<"iconButt
         send(action, NONE);
       }}
     >
-      {url ? <img src={url} alt="" draggable={false} /> : <span aria-hidden="true">•</span>}
+      {url ? (
+        // Masked, not an <img>: the icon takes the text colour, so a dark plugin icon stays visible on any theme.
+        <span
+          className="pr-icon-mask"
+          aria-hidden="true"
+          style={{ maskImage: `url("${url}")`, WebkitMaskImage: `url("${url}")` }}
+        />
+      ) : (
+        <span aria-hidden="true">•</span>
+      )}
     </button>
   );
 }
