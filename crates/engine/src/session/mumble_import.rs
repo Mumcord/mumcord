@@ -315,7 +315,7 @@ impl Engine {
                 result.identity_skipped = true;
             } else {
                 let view = self
-                    .identity_import_data(p12, choice.certificate_password.clone(), None)
+                    .identity_import_data(p12, choice.certificate_password.clone(), None, "")
                     .await?;
                 result.identity_valid_until = valid_until(identity.cert_der());
                 record.identity = Some(view.id);

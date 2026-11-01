@@ -440,8 +440,12 @@ export async function setServerIdentity(
     });
     await refreshIdentities();
     if (reconnect) {
-      if (getSnapshot().connections.has(serverId)) await api.disconnect(serverId);
-      requestConnect(serverId);
+      const wasConnected = getSnapshot().connections.has(serverId);
+      if (wasConnected) await api.disconnect(serverId);
+      // The UI state learns about the disconnect only with the engine's event, so requestConnect
+      // would think the server is still connected and only show it (AC-3.10). Connect directly.
+      const connected = await connectNow(serverId, null);
+      if (connected && wasConnected) showServer(serverId);
     }
     return true;
   } catch (error) {

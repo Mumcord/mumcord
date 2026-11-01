@@ -65,6 +65,7 @@
     "secureStorage": "L-ħażna sigura tas-sistema tiegħek mhix disponibbli jew l-aċċess ġie rrifjutat.",
     "io": "Il-fajl ma setax jinqara jew jinkteb. Iċċekkja l-post u erġa' pprova.",
     "invalidInput": "Dan ma ħadimx: il-fajl jew il-password mhumiex validi.",
+    "duplicateIdentity": "Din l-identità diġà fil-lista tiegħek.",
     "notFound": "Il-fajl jew l-element ma nstabx.",
     "generic": "Xi ħaġa marret ħażin. Erġa' pprova."
   },
@@ -103,7 +104,7 @@
     "fingerprintLine": "Marka tas-swaba' {{fingerprint}}",
     "notUsed": "Għadha mhix użata minn ebda server",
     "setDefault": "Agħmel predefinita",
-    "setDefaultFor": "Agħmel lil {{identity}} l-identità predefinita",
+    "setDefaultFor": "Agħmel predefinita – {{identity}}",
     "defaultSet": "{{identity}} issa hija l-identità predefinita.",
     "details": "Dettalji",
     "detailsFor": "Uri d-dettalji ta' {{identity}}",

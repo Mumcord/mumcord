@@ -59,6 +59,7 @@
     "secureStorage": "Dit systems sikre lager er ikke tilgængeligt, eller adgangen blev nægtet.",
     "io": "Filen kunne ikke læses eller skrives. Tjek placeringen, og prøv igen.",
     "invalidInput": "Det virkede ikke: filen eller adgangskoden er ikke gyldig.",
+    "duplicateIdentity": "Denne identitet er allerede i din liste.",
     "notFound": "Filen eller elementet blev ikke fundet.",
     "generic": "Noget gik galt. Prøv igen."
   },
@@ -97,7 +98,7 @@
     "fingerprintLine": "Fingeraftryk {{fingerprint}}",
     "notUsed": "Bruges endnu ikke af nogen server",
     "setDefault": "Sæt som standard",
-    "setDefaultFor": "Sæt {{identity}} som standardidentitet",
+    "setDefaultFor": "Sæt som standard – {{identity}}",
     "defaultSet": "{{identity}} er nu standardidentiteten.",
     "details": "Detaljer",
     "detailsFor": "Vis detaljer for {{identity}}",

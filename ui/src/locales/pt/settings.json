@@ -61,6 +61,7 @@
     "secureStorage": "O armazenamento seguro do sistema não está disponível ou o acesso foi recusado.",
     "io": "Não foi possível ler ou escrever o ficheiro. Verifica a localização e tenta novamente.",
     "invalidInput": "Não funcionou: o ficheiro ou a palavra-passe não é válido.",
+    "duplicateIdentity": "Esta identidade já está na tua lista.",
     "notFound": "Não foi possível encontrar o ficheiro ou o item.",
     "generic": "Algo correu mal. Tenta novamente."
   },
@@ -99,7 +100,7 @@
     "fingerprintLine": "Impressão digital {{fingerprint}}",
     "notUsed": "Ainda não é usada por nenhum servidor",
     "setDefault": "Predefinida",
-    "setDefaultFor": "Definir {{identity}} como identidade predefinida",
+    "setDefaultFor": "Predefinida – {{identity}}",
     "defaultSet": "{{identity}} é agora a identidade predefinida.",
     "details": "Detalhes",
     "detailsFor": "Mostrar detalhes de {{identity}}",

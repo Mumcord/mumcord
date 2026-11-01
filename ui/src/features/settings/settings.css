@@ -790,6 +790,27 @@
   background: var(--color-bg-elevated);
 }
 
+/* The list is the container: at 200 % text (or a narrow settings panel) the five action buttons
+   would starve the card's text column, so they move to their own row instead of cutting the label
+   off (AC-3.14). */
+.identity-list {
+  container-type: inline-size;
+}
+
+@container (max-width: 26rem) {
+  .identity-card {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "avatar body"
+      "actions actions"
+      "meta meta";
+  }
+
+  .identity-card__actions {
+    justify-content: flex-start;
+  }
+}
+
 .identity-card__avatar {
   grid-area: avatar;
   display: grid;
@@ -857,12 +878,13 @@
 .identity-card__actions {
   grid-area: actions;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-1);
 }
 
-/* Compact actions: five buttons have to fit beside the label without wrapping. */
+/* Compact actions: five buttons beside the label; at 200 % text size the row wraps instead of
+   clipping (AC-3.14), and each button keeps its own words on one line. */
 .identity-card__actions .settings-button {
   padding: 0 var(--space-2);
   font-size: var(--font-size-sm);

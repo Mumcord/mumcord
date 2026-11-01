@@ -59,6 +59,7 @@
     "secureStorage": "Systemets säkra lagring är inte tillgänglig eller åtkomsten nekades.",
     "io": "Filen kunde inte läsas eller skrivas. Kontrollera platsen och försök igen.",
     "invalidInput": "Det fungerade inte: filen eller lösenordet är ogiltigt.",
+    "duplicateIdentity": "Den här identiteten finns redan i listan.",
     "notFound": "Filen eller objektet hittades inte.",
     "generic": "Något gick fel. Försök igen."
   },
@@ -97,7 +98,7 @@
     "fingerprintLine": "Fingeravtryck {{fingerprint}}",
     "notUsed": "Används ännu inte av någon server",
     "setDefault": "Ange som standard",
-    "setDefaultFor": "Ange {{identity}} som standardidentitet",
+    "setDefaultFor": "Ange som standard – {{identity}}",
     "defaultSet": "{{identity}} är nu standardidentiteten.",
     "details": "Detaljer",
     "detailsFor": "Visa detaljer för {{identity}}",

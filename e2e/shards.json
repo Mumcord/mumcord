@@ -33,7 +33,9 @@
       "specs/servers/password-modal.e2e.ts",
       "specs/servers/public-server-browser.e2e.ts",
       "specs/servers/servers.e2e.ts",
-      "specs/wizard/ac-66-import-mumble.e2e.ts"
+      "specs/wizard/ac-66-import-mumble.e2e.ts",
+      "specs/servers/identities.e2e.ts",
+      "specs/servers/server-dialog.e2e.ts"
     ],
     [
       "specs/app/member-column.e2e.ts",

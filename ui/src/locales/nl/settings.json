@@ -59,6 +59,7 @@
     "secureStorage": "De beveiligde opslag van je systeem is niet beschikbaar of de toegang is geweigerd.",
     "io": "Het bestand kon niet worden gelezen of geschreven. Controleer de locatie en probeer het opnieuw.",
     "invalidInput": "Dat is mislukt: het bestand of wachtwoord is ongeldig.",
+    "duplicateIdentity": "Deze identiteit staat al in je lijst.",
     "notFound": "Het bestand of item is niet gevonden.",
     "generic": "Er is iets misgegaan. Probeer het opnieuw."
   },
@@ -97,7 +98,7 @@
     "fingerprintLine": "Vingerafdruk {{fingerprint}}",
     "notUsed": "Nog door geen enkele server gebruikt",
     "setDefault": "Als standaard",
-    "setDefaultFor": "{{identity}} als standaardidentiteit instellen",
+    "setDefaultFor": "Als standaard – {{identity}}",
     "defaultSet": "{{identity}} is nu de standaardidentiteit.",
     "details": "Details",
     "detailsFor": "Details van {{identity}} tonen",

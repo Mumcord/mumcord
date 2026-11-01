@@ -59,6 +59,7 @@
     "secureStorage": "A rendszered biztonságos tárolója nem érhető el, vagy a hozzáférést megtagadták.",
     "io": "A fájlt nem sikerült olvasni vagy írni. Ellenőrizd a helyet, és próbáld újra.",
     "invalidInput": "Ez nem sikerült: a fájl vagy a jelszó érvénytelen.",
+    "duplicateIdentity": "Ez az identitás már szerepel a listádban.",
     "notFound": "A fájl vagy elem nem található.",
     "generic": "Valami hiba történt. Próbáld újra."
   },
@@ -97,7 +98,7 @@
     "fingerprintLine": "Ujjlenyomat {{fingerprint}}",
     "notUsed": "Még egyetlen szerver sem használja",
     "setDefault": "Alapértelmezetté",
-    "setDefaultFor": "A(z) {{identity}} beállítása alapértelmezett identitásként",
+    "setDefaultFor": "Alapértelmezetté – {{identity}}",
     "defaultSet": "A(z) {{identity}} mostantól az alapértelmezett identitás.",
     "details": "Részletek",
     "detailsFor": "A(z) {{identity}} részleteinek megjelenítése",

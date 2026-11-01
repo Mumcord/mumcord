@@ -1238,14 +1238,39 @@ describe("Identity section", () => {
     await openSection("Account & Identity");
     fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
     const dialog = await screen.findByRole("dialog", { name: "Import identity" });
+    // AC-3.3: the label field suggests the file name, and an untouched label keeps the
+    // certificate's common name, which is what the list shows.
     expect(within(dialog).getByLabelText("Label")).toHaveValue("Old");
     fireEvent.click(within(dialog).getByRole("button", { name: "Import…" }));
     await waitFor(() => {
-      expect(importIdentity).toHaveBeenCalledWith("/home/me/Old.p12", null, "Old");
+      expect(importIdentity).toHaveBeenCalledWith("/home/me/Old.p12", null, null);
     });
     expect(await screen.findByText('Identity "Old" imported.')).toBeInTheDocument();
     const list = screen.getByRole("list", { name: "Identities" });
     expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  // AC-3.3: the second import of the same certificate is refused with this wording, and the list
+  // keeps one entry.
+  it("refuses an identity whose certificate is already in the list", async () => {
+    openPath.mockResolvedValue("/home/me/Old.p12");
+    await openSection("Identity");
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      fireEvent.click(await screen.findByRole("button", { name: "Import…" }));
+      const dialog = await screen.findByRole("dialog", { name: "Import identity" });
+      fireEvent.click(within(dialog).getByRole("button", { name: "Import…" }));
+      if (attempt === 0) {
+        await waitFor(() =>
+          expect(within(dialog).queryByText(/already in your list/)).not.toBeInTheDocument(),
+        );
+        continue;
+      }
+      expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+        "This identity is already in your list.",
+      );
+      const list = screen.getByRole("list", { name: "Identities" });
+      expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+    }
   });
 
   it("keeps the import dialog open with an explanation when the password is wrong", async () => {
@@ -1306,9 +1331,7 @@ describe("Identity section", () => {
     const setDefault = vi.spyOn(api, "identitySetDefault");
     await api.identityCreate("Zoe (Acme)", "Work");
     await openSection("Account & Identity");
-    fireEvent.click(
-      await screen.findByRole("button", { name: "Set Work as the default identity" }),
-    );
+    fireEvent.click(await screen.findByRole("button", { name: "Set as default – Work" }));
     await waitFor(() => {
       expect(setDefault).toHaveBeenCalledWith(2);
     });

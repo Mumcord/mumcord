@@ -63,6 +63,7 @@
     "secureStorage": "Tavo sistemos saugykla nepasiekiama arba prieiga atmesta.",
     "io": "Nepavyko nuskaityti ar įrašyti failo. Patikrink vietą ir bandyk dar kartą.",
     "invalidInput": "Nepavyko: failas arba slaptažodis netinkamas.",
+    "duplicateIdentity": "Ši tapatybė jau yra tavo sąraše.",
     "notFound": "Failo ar elemento nepavyko rasti.",
     "generic": "Kažkas nepavyko. Bandyk dar kartą."
   },
@@ -101,7 +102,7 @@
     "fingerprintLine": "Pirštų atspaudas {{fingerprint}}",
     "notUsed": "Kol kas nenaudoja nė vienas serveris",
     "setDefault": "Nustatyti numatytąja",
-    "setDefaultFor": "Nustatyti {{identity}} numatytąja tapatybe",
+    "setDefaultFor": "Nustatyti numatytąja – {{identity}}",
     "defaultSet": "{{identity}} dabar yra numatytoji tapatybė.",
     "details": "Išsami informacija",
     "detailsFor": "Rodyti {{identity}} informaciją",
