@@ -124,6 +124,12 @@
   margin: 0;
 }
 
+/* The heading only takes programmatic focus (so screen readers announce the view); it is not
+   interactive, so it gets no focus box. */
+.plugin-details-header h3:focus {
+  outline: none;
+}
+
 .plugin-details-meta {
   margin: var(--space-1) 0;
 }

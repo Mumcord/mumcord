@@ -184,7 +184,7 @@ export function ChannelsPanel({
           />
         }
       />
-      <div id={treeId} hidden={collapsed}>
+      <div id={treeId} className="channels-tree-area" hidden={collapsed}>
         <BigServerGate
           // A fresh tree per server, so its expand/collapse state starts from that server's (QA.27).
           key={state.serverId}
