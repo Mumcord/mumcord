@@ -12,6 +12,10 @@
 #     gets a message token only inside these two events, a foreign token is `not-permitted`.
 #     `replay: true` marks a line from stored history (chat.is-replay); like the real host, it
 #     reaches only plugins that import chat.is-replay.
+#   - event: {chat-match:   {own: true, text: "[Poll] Lunch?", message: 5, replay: true}}
+#     `own: true` is the plugin's own "[Name] " line coming back from history: the host sends it
+#     as chat-match with pattern-index 255 (no manifest pattern needed), only to plugins with
+#     chat.send that import chat.is-replay; without chat.send the mock refuses the step.
 #   - expect: {replaced: {message: 3, card: fit-3}}   # chat.replace (card is optional)
 #   - expect: {hidden: {message: 2}}                  # chat.hide
 name: Waving counts, stores and tells the channel

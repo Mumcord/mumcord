@@ -44,7 +44,8 @@ pub struct Args {
     pub plugin: PathBuf,
     /// Scenario files (YAML); see `tools/mumcord-plugin/scenarios/`. Chat events take
     /// `message: N` and `replay: true`; `expect: {replaced: {message: N, card: ID}}` and
-    /// `expect: {hidden: {message: N}}` check `chat.replace` / `chat.hide`.
+    /// `expect: {hidden: {message: N}}` check `chat.replace` / `chat.hide`. A `chat-match` with
+    /// `own: true` (needs `chat.send`) replays the plugin's own "[Name] " line (pattern index 255).
     #[arg(required = true)]
     pub scenarios: Vec<PathBuf>,
 }
@@ -312,8 +313,15 @@ pub enum EventSpec {
     /// A channel message matching one of the plugin's chat patterns, e.g. a pasted fit. The
     /// pattern index is the first manifest pattern that matches `text`.
     ChatMatch {
+        /// Who wrote the line; not used with `own`.
+        #[serde(default)]
         sender: u32,
         text: String,
+        /// The plugin's own "[Name] " line replayed from history. The real host sends it with
+        /// pattern index 255 (no manifest pattern needed), and only to plugins that have
+        /// `chat.send`; the mock refuses the step without that permission.
+        #[serde(default)]
+        own: bool,
         /// See `chat-trigger`.
         #[serde(default)]
         message: Option<u64>,
@@ -650,6 +658,8 @@ pub struct Session {
     cursor: usize,
     /// The manifest's trigger words; a `chat-trigger` step must use one of them.
     triggers: Vec<String>,
+    /// The permissions the scenario grants.
+    granted: Vec<String>,
     /// The manifest's chat patterns; a `chat-match` step's text must match one of them.
     chat_patterns: Vec<String>,
     /// The highest scenario message number used so far; `chat-*` steps without a `message` get
@@ -742,6 +752,7 @@ impl Session {
             outputs,
             cursor: 0,
             triggers: manifest.triggers.clone(),
+            granted: granted.clone(),
             chat_patterns: manifest
                 .chat_patterns
                 .iter()
@@ -927,6 +938,21 @@ impl Session {
                     sender: self.peer(*sender)?,
                     trigger: trigger.clone(),
                     args: mumcord_plugins::triggers::clip_args(args),
+                })
+            }
+            EventSpec::ChatMatch {
+                text, own: true, ..
+            } => {
+                if !self.granted.iter().any(|p| p == "chat.send") {
+                    bail!(
+                        "`own: true` needs the chat.send permission: the real host replays \
+                         own lines only to plugins that have it"
+                    );
+                }
+                Event::ChatMatch(ChatMatch {
+                    sender: self.me.clone(),
+                    pattern_index: mumcord_plugins::chat::OWN_LINE,
+                    text: mumcord_plugins::patterns::clip_text(text),
                 })
             }
             EventSpec::ChatMatch { sender, text, .. } => {
@@ -1398,7 +1424,7 @@ steps:
         ));
         assert!(matches!(
             &scenario.steps[8],
-            Step::Event(EventSpec::ChatMatch { sender: 2, text, message: None, replay: false })
+            Step::Event(EventSpec::ChatMatch { sender: 2, text, message: None, replay: false, own: false })
                 if text == "[Rifter, PvP]\nDamage Control II"
         ));
         assert!(matches!(

@@ -184,6 +184,53 @@ const CARDS: &str = r#"
   (func (export "stop"))
 )"#;
 
+/// Own-line replay: pattern index 255, only with `chat.send`; without it the step is refused.
+#[test]
+fn own_lines_replay_only_with_chat_send() {
+    let work = tempfile::tempdir().expect("temp dir");
+    let manifest = |permissions: &str| {
+        format!(
+            r#"{{"manifest":1,"id":"cards","name":"Cards","version":"1.0.0","api":"^1.0",
+            "authors":["Tests"],"description":"Cards","categories":["tools"],"license":"MIT",
+            "permissions":{{"required":[{permissions}]}},"triggers":["!poll"]}}"#
+        )
+    };
+    let base = r#""peers.messages","chat.triggers","ui.chat-card""#;
+    let with = build_plugin(
+        work.path(),
+        "with",
+        CARDS,
+        &manifest(&format!(r#"{base},"chat.send""#)),
+    );
+    let without = build_plugin(work.path(), "without", CARDS, &manifest(base));
+    std::fs::write(
+        work.path().join("own.yaml"),
+        "name: own\npeers: [{session: 2, name: Bob}]\nsteps:\n\
+         \x20 - event: {joined: 2}\n\
+         \x20 - expect: nothing\n\
+         \x20 - event: {chat-match: {own: true, text: '[Cards] hi', message: 4, replay: true}}\n\
+         \x20 - expect: {replaced: {message: 4, card: card-1}}\n\
+         \x20 - expect: {message: {kind: 6}}\n",
+    )
+    .expect("write");
+
+    let passed = cli(
+        work.path(),
+        &["test", with.to_str().expect("utf-8"), "own.yaml"],
+    );
+    assert!(passed.status.success(), "{}", stdout(&passed));
+    let refused = cli(
+        work.path(),
+        &["test", without.to_str().expect("utf-8"), "own.yaml"],
+    );
+    assert!(!refused.status.success());
+    assert!(
+        stdout(&refused).contains("chat.send"),
+        "the error names the permission: {}",
+        stdout(&refused)
+    );
+}
+
 #[test]
 fn chat_tokens_replace_and_hide_messages() {
     let work = tempfile::tempdir().expect("temp dir");
