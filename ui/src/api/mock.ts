@@ -3033,6 +3033,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginUiAction: () => fail("invalidInput", "no such action on screen"),
     pluginUiEvent: () => fail("invalidInput", "the plugin is not running"),
     pluginsMentioned: () => Promise.resolve(null),
+    pluginCommands: () => Promise.resolve([]),
+    pluginRunCommand: () => Promise.resolve("unknown"),
 
     // packet inspector
     packetCaptureSet: (enabled) => {

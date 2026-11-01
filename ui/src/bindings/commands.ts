@@ -603,6 +603,13 @@ export const commands = {
 	 *  again from the repository, not taken from the UI.
 	 */
 	pluginRepoAcceptKey: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_accept_key", { id })),
+	/**  The slash commands of all running plugins that hold `commands`, in install order. */
+	pluginCommands: () => typedError<PluginCommand[], ApiError>(__TAURI_INVOKE("plugin_commands")),
+	/**
+	 *  Hands a typed line starting with `/` to the plugin that owns the command, as a `ui-action`
+	 *  with source `command` (action = command name, value = the rest of the line).
+	 */
+	pluginRunCommand: (line: string) => typedError<PluginCommandOutcome, ApiError>(__TAURI_INVOKE("plugin_run_command", { line })),
 	/**  "Not now": the suggestion stays hidden until the server's list changes or 30 days pass. */
 	pluginSuggestionNotNow: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_not_now", { serverId, plugin })),
 	/**  "Don't ask again for this server". */
@@ -2379,6 +2386,28 @@ export type PluginAsset = {
 };
 
 export type PluginButtonKind = "primary" | "secondary" | "danger";
+
+/**  A slash command of an active plugin (FR-6.43). */
+export type PluginCommand = {
+	pluginId: string,
+	pluginName: string,
+	/**  Without the leading `/`. */
+	name: string,
+	description: string,
+	usage: string | null,
+	/**
+	 *  Who owns this name instead: show "Command taken by <takenBy>" in the plugin's settings.
+	 *  `null` when this plugin owns the command (only those are offered in the chat box).
+	 */
+	takenBy: string | null,
+};
+
+/**  What happened to a line typed into the chat box. */
+export type PluginCommandOutcome = 
+/**  A plugin received it; the line is never posted as chat. */
+"plugin" | 
+/**  Not a plugin command: send the line as normal text. */
+"unknown";
 
 /**  One UI component. `color` values are theme token names (unknown ones make a tree invalid). */
 export type PluginComponent = { type: "stack"; direction: PluginDirection; gap: number; align: PluginAlign } | { type: "text"; text: string; style: PluginTextStyle; color: string | null } | 

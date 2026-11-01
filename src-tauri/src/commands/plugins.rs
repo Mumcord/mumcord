@@ -13,7 +13,8 @@ use mumcord_plugins::registry::{
     fetch_official, official_base,
 };
 use mumcord_plugins::service::{
-    Approval, InstallRequest, PluginInfo, PluginService, ServiceError, Status, UiInput, fetch,
+    Approval, CommandOutcome, InstallRequest, PluginInfo, PluginService, ServiceError, Status,
+    UiInput, fetch,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
@@ -1075,6 +1076,63 @@ pub fn plugins_mentioned(
     session: SessionId,
 ) -> ApiResult<()> {
     Ok(engine.plugin_mentioned(to_engine_server_id(server_id), session)?)
+}
+
+/// A slash command of an active plugin (FR-6.43).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginCommand {
+    pub plugin_id: String,
+    pub plugin_name: String,
+    /// Without the leading `/`.
+    pub name: String,
+    pub description: String,
+    pub usage: Option<String>,
+    /// Who owns this name instead: show "Command taken by <takenBy>" in the plugin's settings.
+    /// `null` when this plugin owns the command (only those are offered in the chat box).
+    pub taken_by: Option<String>,
+}
+
+/// What happened to a line typed into the chat box.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginCommandOutcome {
+    /// A plugin received it; the line is never posted as chat.
+    Plugin,
+    /// Not a plugin command: send the line as normal text.
+    Unknown,
+}
+
+/// The slash commands of all running plugins that hold `commands`, in install order.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_commands(app: AppHandle) -> ApiResult<Vec<PluginCommand>> {
+    let commands = plugins_of(&app)?.call(|service| service.commands()).await?;
+    Ok(commands
+        .into_iter()
+        .map(|c| PluginCommand {
+            plugin_id: c.plugin,
+            plugin_name: c.plugin_name,
+            name: c.name,
+            description: c.description,
+            usage: c.usage,
+            taken_by: c.taken_by,
+        })
+        .collect())
+}
+
+/// Hands a typed line starting with `/` to the plugin that owns the command, as a `ui-action`
+/// with source `command` (action = command name, value = the rest of the line).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_run_command(app: AppHandle, line: String) -> ApiResult<PluginCommandOutcome> {
+    let outcome = plugins_of(&app)?
+        .call(move |service| service.run_command(&line))
+        .await?;
+    Ok(match outcome {
+        CommandOutcome::Plugin => PluginCommandOutcome::Plugin,
+        CommandOutcome::Unknown => PluginCommandOutcome::Unknown,
+    })
 }
 
 fn action_value(value: PluginActionValue) -> ActionValue {

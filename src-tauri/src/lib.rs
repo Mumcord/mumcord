@@ -242,6 +242,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugin_repos::plugin_repo_remove,
             commands::plugin_repos::plugin_repo_review_key,
             commands::plugin_repos::plugin_repo_accept_key,
+            commands::plugins::plugin_commands,
+            commands::plugins::plugin_run_command,
             plugins::suggestions::plugin_suggestion_not_now,
             plugins::suggestions::plugin_suggestions_dismiss_server,
             diagnostics::diagnostics_save,

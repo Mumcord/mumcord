@@ -10,6 +10,7 @@
 //! [`ServiceEvent`]s; what plugin threads report arrives as [`HostEvent`]s, which the app hands
 //! back to [`PluginService::handle_host_event`].
 
+mod commands;
 mod dev;
 mod install;
 mod lifecycle;
@@ -40,6 +41,7 @@ use crate::verify::{Integrity, VerifyFailure};
 use crate::wit::events::{Event, PluginSettings};
 use crate::wit::theme::Mode;
 
+pub use commands::{CommandOutcome, PluginCommand};
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
 pub use plugin_io::{PeerInfo, SelfInfo, UiUpdate};
