@@ -64,7 +64,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F4 | Fixes: docs/plugin-registry-format.md example says `chat.commands` (catalogue id is `commands`); after B25c: add the test-harness section to Mumcord/plugins docs/testing.md | done (ab8cd0fb + plugins 4b29be5) | f4-docs |
 | F5 | Messaging envelope: carry a `direct` flag so `peer-message.direct` is correct (wire is unreleased, keep envelope v1 compatible within the epic) | open | |
 | F6 | `prettier --check .` fails on docs/plugin-registry-format.md (pre-existing since B15/B25b) — format it; check the whole repo passes prettier | done (dce1eb42) | f6-prettier |
-| F7 | Pin `rust-toolchain.toml` (same stable version) in Mumcord/plugins template (feat/template-docs), `mumcord-plugin new` template (tools/mumcord-plugin) and each official plugin branch (feat/poll, feat/dice, feat/echolings, feat/mumbot-music), so reproducible-build hashes match CI | in progress | f7-toolchain |
+| F7 | Pin `rust-toolchain.toml` (same stable version) in Mumcord/plugins template (feat/template-docs), `mumcord-plugin new` template (tools/mumcord-plugin) and each official plugin branch (feat/poll, feat/dice, feat/echolings, feat/mumbot-music), so reproducible-build hashes match CI | done (Rust 1.99.1; 159ad432 + plugins branches) | f7-toolchain |
 | F8 | docs/engine-api.md: list all new plugin commands/events (B13 engine methods, B18 commands+events, B20b plugins_take_pending_link, renamed game_plugins_*) | open | |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
