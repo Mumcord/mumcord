@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   getApi,
-  toEngineError,
-  type NoiseBackend,
   type PttAvailability,
   type PttMouseStatus,
   type PttSession,
@@ -16,16 +14,12 @@ import { CompatibilityModeSwitch } from "./CompatibilityModeSwitch";
 import { LowLatencyGroup } from "./LowLatencyGroup";
 import { Switch } from "../components/Switch";
 import { ThresholdMeter } from "../components/ThresholdMeter";
-import { errorText } from "../errors";
-import { keyCombo, mouseKey, mouseLabel } from "../pttKey";
+import { NoiseSuppressionRadios } from "./NoiseSuppressionRadios";
+import { PttKeyCapture } from "./PttKeyCapture";
 import type { SettingsSectionProps } from "./types";
 
 /** The command that adds the user to the `input` group (FR-1.21, AC-1.37). */
 const INPUT_GROUP_COMMAND = "sudo usermod -aG input $USER";
-
-/** The noise suppression choices of FR-3.65 (Q1.13), weakest first: one of the backends, or off. */
-type NoiseChoice = NoiseBackend | "off";
-const NOISE_CHOICES: NoiseChoice[] = ["light", "standard", "advanced", "off"];
 
 /** Whether mouse buttons may be captured: natively, or on Wayland after opting in (QA.4). */
 function mouseAllowed(status: PttMouseStatus | null, settings: Settings): boolean {
@@ -146,7 +140,7 @@ export function TalkModeCard({ settings, update }: SettingsSectionProps) {
         </>
       )}
       {ptt && (
-        <KeyCapture
+        <PttKeyCapture
           current={settings.pttKey}
           mouseAllowed={mouse}
           onCaptured={(pttKey) => {
@@ -207,38 +201,9 @@ export function ConnectingCard({ settings, update }: SettingsSectionProps) {
 /** Voice processing switches plus the quality options: music quality, low latency, bitrate. */
 export function ProcessingCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
-  const noiseChoice: NoiseChoice = settings.noiseSuppression
-    ? settings.noiseSuppressionBackend
-    : "off";
   return (
     <Group title={t("voice.processing")} icon="sliders">
-      <RadioGroup
-        legend={t("voice.noiseSuppression")}
-        info={{
-          label: t("moreInfo", { topic: t("voice.noiseSuppression") }),
-          text: t("voice.noiseSuppressionHint"),
-        }}
-        value={noiseChoice}
-        options={NOISE_CHOICES.map((choice) => ({
-          value: choice,
-          label: t(`voice.noiseChoice.${choice}`),
-          badge: choice === "advanced" ? t("voice.noiseChoiceBeta") : undefined,
-          recommended: choice === "standard",
-          tip:
-            choice === "off"
-              ? undefined
-              : {
-                  label: t("voice.noiseChoiceTipLabel", {
-                    choice: t(`voice.noiseChoice.${choice}`),
-                  }),
-                  text: t(`voice.noiseChoiceHint.${choice}`),
-                },
-        }))}
-        onChange={(choice) => {
-          if (choice === "off") update({ noiseSuppression: false });
-          else update({ noiseSuppression: true, noiseSuppressionBackend: choice });
-        }}
-      />
+      <NoiseSuppressionRadios settings={settings} update={update} />
       {settings.talkMode === "voiceActivation" &&
         (settings.noiseSuppressionBackend === "light" || !settings.noiseSuppression) && (
           <p className="settings-hint">{t("voice.detectorHint")}</p>
@@ -270,157 +235,5 @@ export function ProcessingCard({ settings, update }: SettingsSectionProps) {
       <LowLatencyGroup settings={settings} update={update} />
       <BitrateSlider settings={settings} update={update} />
     </Group>
-  );
-}
-
-type CaptureState = "idle" | "listening" | "waiting";
-
-interface KeyCaptureProps {
-  current: string | null;
-  /** Also accept the middle and side mouse buttons while listening. */
-  mouseAllowed: boolean;
-  onCaptured: (key: string) => void;
-}
-
-/**
- * Push-to-talk key capture: the button listens for the next key (with modifiers) and hands it
- * to the engine, which validates it or, on Wayland, opens the desktop's shortcut dialog.
- */
-function KeyCapture({ current, mouseAllowed, onCaptured }: KeyCaptureProps) {
-  const { t } = useTranslation("settings");
-  const [state, setState] = useState<CaptureState>("idle");
-  const [problem, setProblem] = useState<string | null>(null);
-  const waiting = useRef(false);
-  // Bumped when the user cancels a pending capture, whose failure then shows no error.
-  const attempts = useRef(0);
-
-  // A desktop dialog still open when the section goes away is cancelled.
-  useEffect(
-    () => () => {
-      if (waiting.current) void getApi().pttCaptureCancel().catch(console.error);
-    },
-    [],
-  );
-
-  const capture = async (combo: string) => {
-    setState("waiting");
-    waiting.current = true;
-    const attempt = ++attempts.current;
-    try {
-      onCaptured(await getApi().pttCaptureKey(combo));
-      setProblem(null);
-    } catch (error: unknown) {
-      const engineError = toEngineError(error);
-      if (attempt !== attempts.current) setProblem(null);
-      else if (engineError.code === "invalidInput") setProblem(t("voice.keyRejected"));
-      else if (engineError.code === "shortcutNotConfirmed") {
-        console.error("The desktop did not confirm the push-to-talk shortcut", error);
-        setProblem(t("voice.keyNotConfirmed"));
-      } else {
-        console.error("Capturing the push-to-talk key failed", error);
-        setProblem(errorText(t, error));
-      }
-    } finally {
-      waiting.current = false;
-      setState("idle");
-    }
-  };
-
-  const cancelWaiting = () => {
-    attempts.current++;
-    getApi()
-      .pttCaptureCancel()
-      .catch((error: unknown) => {
-        console.error("Cancelling the push-to-talk capture failed", error);
-      });
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (state === "waiting" && event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      cancelWaiting();
-      return;
-    }
-    if (state !== "listening") return;
-    // While listening every key belongs to the capture, Escape included (it must not close
-    // the settings overlay).
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.key === "Escape") {
-      setState("idle");
-      return;
-    }
-    const combo = keyCombo(event);
-    if (combo !== null) void capture(combo);
-  };
-
-  /** Middle and side buttons while listening; left/right clicks keep working as clicks. */
-  const onMouseDown = (event: MouseEvent<HTMLButtonElement>) => {
-    if (state !== "listening" || !mouseAllowed) return;
-    const key = mouseKey(event.button);
-    if (key === null) return;
-    event.preventDefault();
-    void capture(key);
-  };
-
-  /** Keeps side buttons from navigating and the middle button from pasting while capturing. */
-  const suppressMouse = (event: MouseEvent<HTMLButtonElement>) => {
-    if (state !== "idle" && mouseKey(event.button) !== null) event.preventDefault();
-  };
-
-  const mouseName = current === null ? null : mouseLabel(current);
-  const shown = mouseName === null ? current : t(`voice.mouse.${mouseName}`);
-
-  const label =
-    state === "listening"
-      ? mouseAllowed
-        ? t("voice.keyListeningMouse")
-        : t("voice.keyListening")
-      : state === "waiting"
-        ? t("voice.keyWaiting")
-        : current === null
-          ? t("voice.keySet")
-          : t("voice.keyChange");
-
-  return (
-    <div className="settings-field-row">
-      <p className="settings-value">
-        {t("voice.keyCurrent")} <kbd className="settings-kbd">{shown ?? t("voice.keyNone")}</kbd>
-      </p>
-      <div className="settings-actions">
-        <button
-          type="button"
-          className="settings-button"
-          aria-pressed={state === "listening"}
-          onClick={() => {
-            // Not disabled while waiting: that would drop keyboard focus.
-            if (state === "waiting") return;
-            setProblem(null);
-            setState(state === "listening" ? "idle" : "listening");
-          }}
-          onKeyDown={onKeyDown}
-          onMouseDown={onMouseDown}
-          onMouseUp={suppressMouse}
-          onAuxClick={suppressMouse}
-          onBlur={() => {
-            if (state === "listening") setState("idle");
-          }}
-        >
-          {label}
-        </button>
-        {state === "waiting" && (
-          <button type="button" className="settings-button" onClick={cancelWaiting}>
-            {t("voice.keyCancel")}
-          </button>
-        )}
-      </div>
-      {current === null && state === "idle" && (
-        <p className="settings-warning">{t("voice.keyMissing")}</p>
-      )}
-      <p role="alert" className="settings-error">
-        {problem}
-      </p>
-    </div>
   );
 }

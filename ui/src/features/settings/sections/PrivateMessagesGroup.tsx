@@ -24,7 +24,7 @@ export function PrivateMessagesGroup({ settings, update }: SettingsSectionProps)
   return (
     <>
       <Group title={t("privateMessages.title")} icon="mail">
-        <RuleCards
+        <PmRuleCards
           value={pm.rule}
           onChange={(rule) => {
             change({ rule });
@@ -74,7 +74,13 @@ const RECOMMENDED_RULE: PmRule = "friendsOnly";
  * Native radios drawn as cards; the title names each radio, the hint describes it. The group is
  * named by the legend and its "Changed" badge, which stays outside the legend.
  */
-function RuleCards({ value, onChange }: { value: PmRule; onChange: (rule: PmRule) => void }) {
+export function PmRuleCards({
+  value,
+  onChange,
+}: {
+  value: PmRule;
+  onChange: (rule: PmRule) => void;
+}) {
   const { t } = useTranslation("settings");
   const id = useId();
   return (

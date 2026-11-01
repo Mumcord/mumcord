@@ -1,51 +1,558 @@
-.wizard-step {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  width: min(32rem, 100%);
-  padding: var(--space-5);
-  border-radius: var(--radius-lg);
-  background: var(--color-bg-elevated);
-  box-shadow:
-    0 0 0 1px var(--color-border),
-    var(--shadow-raised);
+/* ---- Setup wizard (issue #159): step rail on the left, one step on the right ---- */
+
+/* The first start fills the window; the rerun (#149) covers the settings window the same way. */
+.centered-screen.wizard-frame,
+.wizard-frame.wizard-rerun-overlay {
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
   text-align: start;
 }
 
-.wizard-step h2 {
+.centered-screen.wizard-frame > :first-child,
+.centered-screen.wizard-frame > :last-child {
   margin: 0;
+}
+
+.wizard-frame.wizard-rerun-overlay {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--color-bg-chat);
+  background-image: var(--glow-backdrop);
+}
+
+.wizard-layout {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(14rem, 18rem) 1fr;
+  min-height: 0;
+  height: 100%;
+}
+
+/* ---- Rail ---- */
+
+.wizard-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-4);
+  border-inline-end: 1px solid var(--color-border);
+  background: var(--color-bg-sidebar);
+}
+
+.wizard-rail__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.wizard-rail__brand img {
+  border-radius: var(--radius-md);
+}
+
+.wizard-rail__name,
+.wizard-rail__setup {
+  display: block;
+}
+
+.wizard-rail__name {
+  font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-rail__setup {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.wizard-rail__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-rail__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+}
+
+.wizard-rail__step[data-state="current"] {
+  border-color: var(--color-accent);
+  background: var(--color-bg-selected);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-rail__step[data-state="done"] {
+  color: var(--color-text);
+}
+
+.wizard-rail__marker {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+}
+
+.wizard-rail__step[data-state="done"] .wizard-rail__marker {
+  border-color: transparent;
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+}
+
+.wizard-rail__marker .wizard-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.wizard-rail__label {
+  flex: 1;
+}
+
+.wizard-rail__tag {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+}
+
+.wizard-rail__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.wizard-rail__footer p {
+  margin: 0;
+}
+
+.wizard-rail__progress {
+  height: 0.375rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+}
+
+.wizard-rail__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gradient-accent);
+  transition: width var(--duration-normal) var(--ease-out);
+}
+
+/* ---- Step ---- */
+
+.wizard-main {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.wizard-main__step {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.wizard-step {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wizard-step__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6);
 }
 
 .wizard-step p {
   margin: 0;
 }
 
-.wizard-progress {
-  align-self: flex-end;
+.wizard-step__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.wizard-eyebrow {
+  color: var(--color-accent-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wizard-step__title {
+  margin: var(--space-1) 0;
+  font-family: var(--font-family-display);
+  font-size: calc(var(--font-size-xl) * 1.5);
+  line-height: 1.15;
+  letter-spacing: var(--letter-spacing-display);
+}
+
+.wizard-step__subtitle {
+  color: var(--color-text-secondary);
+}
+
+.wizard-gradient-text {
+  background: var(--gradient-accent);
+  background-clip: text;
+  color: transparent;
+}
+
+.wizard-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.wizard-step .wizard-footer__hint {
+  margin-inline-end: auto;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
 
-.wizard-choice {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+.wizard-kbd {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-mono);
+}
+
+.wizard-footer__skip,
+.wizard-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.wizard-link {
+  text-decoration: underline;
+}
+
+/* ---- Building blocks ---- */
+
+.wizard-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-4);
+  align-items: start;
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.wizard-radio {
+.wizard-column {
   display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.wizard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wizard-grid--three {
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.wizard-card,
+.wizard-option,
+.wizard-style-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+
+.wizard-card__title,
+.wizard-option__title,
+.wizard-summary-card__value {
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-section-title {
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Rows of switches: the control sits right, separated by a line. */
+.wizard-rows > * + * {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.wizard-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.wizard-option {
+  position: relative;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.wizard-option[data-selected="true"],
+.wizard-style-card[data-selected="true"] {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.wizard-option__label {
+  display: flex;
+  flex: 1;
   align-items: center;
   gap: var(--space-2);
   cursor: pointer;
 }
 
-.wizard-indent {
-  margin-inline-start: var(--space-5);
+.wizard-option__extra,
+.wizard-identity-card > * {
+  flex-basis: 100%;
 }
+
+.wizard-identity-card {
+  align-items: stretch;
+}
+
+.wizard-badge {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-badge--recommended {
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+}
+
+.wizard-tile {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+  color: var(--color-accent-text);
+}
+
+/* ---- Setup style cards ---- */
+
+.wizard-style-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.wizard-style-card {
+  cursor: pointer;
+}
+
+.wizard-style-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* The native radio stays focusable; the round check next to it is what is drawn. */
+.wizard-style-card__radio {
+  position: absolute;
+  opacity: 0;
+}
+
+.wizard-style-card:has(:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.wizard-style-card__check {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.wizard-style-card[data-selected="true"] .wizard-style-card__check {
+  border-color: transparent;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.wizard-style-card__check .wizard-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.wizard-style-card__heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wizard-style-card__title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-style-card__subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.wizard-style-card__points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.wizard-style-card__point {
+  position: relative;
+  padding-inline-start: var(--space-4);
+}
+
+.wizard-style-card__point::before {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.55em;
+  width: 0.4em;
+  height: 0.4em;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  content: "";
+}
+
+/* ---- Appearance ---- */
+
+.wizard-segmented {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.wizard-segmented legend {
+  float: inline-start;
+  margin-inline-end: var(--space-3);
+}
+
+.wizard-segmented__option {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.wizard-segmented__option[data-selected="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-bg-selected);
+  font-weight: var(--font-weight-bold);
+}
+
+.wizard-segmented__option:has(:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ---- Welcome and summary ---- */
+
+.wizard-welcome__logo {
+  flex: none;
+  border-radius: var(--radius-tile);
+  box-shadow: var(--shadow-glow);
+}
+
+.wizard-summary__badge {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-tile);
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+}
+
+.wizard-summary-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.wizard-summary-card__label {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---- Fields and texts ---- */
 
 .wizard-field {
   display: flex;
@@ -53,8 +560,7 @@
   gap: var(--space-1);
 }
 
-.wizard-field input,
-.wizard-field select {
+.wizard-field input {
   padding: var(--space-2);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
@@ -87,6 +593,20 @@
   color: var(--color-danger);
 }
 
+.wizard-failed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin: auto;
+}
+
+.wizard-voice__devices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
 .wizard-meter {
   height: var(--space-2);
   overflow: hidden;
@@ -101,100 +621,50 @@
   transition: width var(--duration-fast) linear;
 }
 
-.wizard-nav {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-/* In-game overlay example screenshot in the wizard (FR-1.46b). */
+/* In-game overlay example screenshot (FR-1.46b). */
 .wizard-overlay-example {
   display: block;
   width: 100%;
   max-width: 360px;
   height: auto;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
-.wizard-list {
+/* Narrow windows: the rail stacks above the step. */
+@media (width < 48rem) {
+  .wizard-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .wizard-rail {
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .wizard-rail__steps {
+    flex-flow: row wrap;
+  }
+
+  .wizard-rail__label,
+  .wizard-rail__tag {
+    display: none;
+  }
+
+  .wizard-rail__step[data-state="current"] .wizard-rail__label {
+    display: inline;
+  }
+
+  .wizard-step__body,
+  .wizard-footer {
+    padding-inline: var(--space-4);
+  }
+}
+
+.wizard-style-card__name {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding-inline-start: var(--space-5);
-}
-
-/* ---- Running the wizard again from Settings (#149) ---- */
-
-/* The rerun covers the settings window completely, like the first start covers the app. */
-.centered-screen.wizard-rerun-overlay {
-  flex: 1;
-  background-color: var(--color-bg-chat);
-  background-image: var(--glow-backdrop);
-}
-
-.wizard-rerun__title {
-  margin: 0;
-  font-size: var(--font-size-xl);
-}
-
-/* The step list: the first-start steps, the identity step marked as skipped. */
-.wizard-steps {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-  width: min(32rem, 100%);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.wizard-steps__item {
-  display: flex;
-  align-items: center;
-}
-
-.wizard-steps__chip {
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.wizard-steps__item[aria-current="step"] .wizard-steps__chip {
-  border-color: var(--color-accent);
-  color: var(--color-text);
-}
-
-/* Not colour alone: the skipped step is struck through as well. */
-.wizard-steps__item--skipped .wizard-steps__chip {
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-
-.wizard-rerun__note,
-.wizard-rerun__footer {
-  width: min(32rem, 100%);
-  text-align: start;
-}
-
-/* Cancel sits on its own side, away from Back and Next. */
-.wizard-nav__cancel {
-  margin-inline-end: auto;
-}
-
-/* A link inside running text; a button for keyboard and screen-reader semantics. */
-.wizard-link {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--color-accent-text);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
+  align-items: flex-start;
+  gap: var(--space-1);
 }

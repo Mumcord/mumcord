@@ -8,17 +8,16 @@ import { StepFrame } from "./StepFrame";
 type Mode = "create" | "import";
 
 interface IdentityStepProps {
-  /** 1-based step number and step count; the identity step exists only on first start. */
-  step: number;
-  total: number;
   /** Identity that already exists (wizard was left halfway); the step then only confirms it. */
   identity: Identity | null;
-  focusOnMount: boolean;
   onDone: (identity: Identity) => void;
 }
 
-/** Step 1: create a new identity or import a PKCS#12 file (FR-1.2). */
-export function IdentityStep({ step, total, identity, focusOnMount, onDone }: IdentityStepProps) {
+/**
+ * "Who are you on Mumble?" (first start only): create a new identity or import a PKCS#12 file
+ * (FR-1.2). The identity is created on Next, since the later steps need it.
+ */
+export function IdentityStep({ identity, onDone }: IdentityStepProps) {
   const { t } = useTranslation("wizard");
   const [mode, setMode] = useState<Mode>("create");
   const [name, setName] = useState("");
@@ -99,22 +98,18 @@ export function IdentityStep({ step, total, identity, focusOnMount, onDone }: Id
 
   return (
     <StepFrame
-      step={step}
-      total={total}
       title={t("identity.title")}
-      focusOnMount={focusOnMount}
+      subtitle={t("identity.intro")}
       busy={busy}
-      submitLabel={t("common:next")}
       onSubmit={() => void submit()}
     >
       {identity ? (
-        <p>{t("identity.existing", { name: identity.name })}</p>
+        <p className="wizard-card">{t("identity.existing", { name: identity.name })}</p>
       ) : (
-        <>
-          <p className="wizard-muted">{t("identity.intro")}</p>
-          <fieldset className="wizard-choice">
-            <legend className="visually-hidden">{t("identity.title")}</legend>
-            <label className="wizard-radio">
+        <fieldset className="wizard-columns">
+          <legend className="visually-hidden">{t("identity.legend")}</legend>
+          <div className="wizard-option wizard-identity-card" data-selected={mode === "create"}>
+            <label className="wizard-option__label">
               <input
                 type="radio"
                 name="identity-mode"
@@ -125,10 +120,11 @@ export function IdentityStep({ step, total, identity, focusOnMount, onDone }: Id
                   setError(null);
                 }}
               />
-              {t("identity.create")}
+              <span className="wizard-option__title">{t("identity.create")}</span>
             </label>
+            <p className="wizard-muted wizard-small">{t("identity.createText")}</p>
             {mode === "create" && (
-              <div className="wizard-field wizard-indent">
+              <div className="wizard-field">
                 <label htmlFor={`${errorId}-name`}>{t("identity.name")}</label>
                 <input
                   id={`${errorId}-name`}
@@ -147,7 +143,10 @@ export function IdentityStep({ step, total, identity, focusOnMount, onDone }: Id
                 </p>
               </div>
             )}
-            <label className="wizard-radio">
+            <p className="wizard-note wizard-small">{t("identity.backup")}</p>
+          </div>
+          <div className="wizard-option wizard-identity-card" data-selected={mode === "import"}>
+            <label className="wizard-option__label">
               <input
                 type="radio"
                 name="identity-mode"
@@ -158,10 +157,10 @@ export function IdentityStep({ step, total, identity, focusOnMount, onDone }: Id
                   setError(null);
                 }}
               />
-              {t("identity.import")}
+              <span className="wizard-option__title">{t("identity.import")}</span>
             </label>
             {mode === "import" && (
-              <div className="wizard-indent">
+              <>
                 <div className="wizard-row">
                   <button
                     type="button"
@@ -189,18 +188,18 @@ export function IdentityStep({ step, total, identity, focusOnMount, onDone }: Id
                       setPassword(event.target.value);
                     }}
                   />
+                  <p className="wizard-muted wizard-small">{t("identity.passwordHint")}</p>
                 </div>
-              </div>
+              </>
             )}
-          </fieldset>
-        </>
+          </div>
+        </fieldset>
       )}
       {error && (
         <p id={errorId} role="alert" className="wizard-error">
           {error}
         </p>
       )}
-      <p className="wizard-note">{t("identity.backup")}</p>
     </StepFrame>
   );
 }

@@ -23,10 +23,7 @@ afterEach(() => {
 });
 
 function renderStep() {
-  renderInWizard(
-    harness,
-    <IdentityStep step={1} total={5} identity={null} focusOnMount={false} onDone={onDone} />,
-  );
+  renderInWizard(harness, <IdentityStep identity={null} onDone={onDone} />);
 }
 
 function next() {
@@ -36,7 +33,7 @@ function next() {
 describe("IdentityStep", () => {
   it("preselects 'Create new' and shows the backup hint", () => {
     renderStep();
-    expect(screen.getByRole("radio", { name: "Create new" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Create a new identity" })).toBeChecked();
     expect(screen.getByText(/Back it up later in Settings/)).toBeInTheDocument();
   });
 
@@ -44,7 +41,7 @@ describe("IdentityStep", () => {
     renderStep();
     next();
     expect(await screen.findByRole("alert")).toHaveTextContent("Please enter a name.");
-    const field = screen.getByLabelText("Name");
+    const field = screen.getByLabelText("Default display name");
     expect(field).toHaveFocus();
     expect(field).toHaveAttribute("aria-invalid", "true");
     expect(field).toHaveAccessibleDescription(/Please enter a name\./);
@@ -53,7 +50,7 @@ describe("IdentityStep", () => {
 
   it("creates the identity when the form is submitted with Enter", async () => {
     renderStep();
-    const field = screen.getByLabelText("Name");
+    const field = screen.getByLabelText("Default display name");
     fireEvent.change(field, { target: { value: "  Tobias " } });
     fireEvent.submit(field.closest("form") as HTMLFormElement);
     await waitFor(() => {
@@ -64,7 +61,9 @@ describe("IdentityStep", () => {
   it("explains a secure storage failure", async () => {
     harness.api.mock.failNext("identityCreate", "secureStorageUnavailable");
     renderStep();
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Tobias" } });
+    fireEvent.change(screen.getByLabelText("Default display name"), {
+      target: { value: "Tobias" },
+    });
     next();
     expect(await screen.findByRole("alert")).toHaveTextContent("secure storage");
     expect(onDone).not.toHaveBeenCalled();
@@ -72,7 +71,7 @@ describe("IdentityStep", () => {
 
   it("requires a file before importing", async () => {
     renderStep();
-    fireEvent.click(screen.getByRole("radio", { name: "Import file" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Import an existing identity" }));
     next();
     expect(await screen.findByRole("alert")).toHaveTextContent("choose an identity file");
     expect(screen.getByRole("button", { name: "Choose file…" })).toHaveFocus();
@@ -82,10 +81,10 @@ describe("IdentityStep", () => {
     pick.mockResolvedValue("/home/me/Tobias.p12");
     const importSpy = vi.spyOn(harness.api, "identityImport");
     renderStep();
-    fireEvent.click(screen.getByRole("radio", { name: "Import file" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Import an existing identity" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose file…" }));
     expect(await screen.findByText("Chosen file: Tobias.p12")).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("File password (if any)"), {
+    fireEvent.change(screen.getByLabelText("File password"), {
       target: { value: "secret" },
     });
     next();
@@ -99,7 +98,7 @@ describe("IdentityStep", () => {
     pick.mockResolvedValue("/home/me/Tobias.p12");
     const importSpy = vi.spyOn(harness.api, "identityImport");
     renderStep();
-    fireEvent.click(screen.getByRole("radio", { name: "Import file" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Import an existing identity" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose file…" }));
     await screen.findByText("Chosen file: Tobias.p12");
     next();
@@ -116,7 +115,7 @@ describe("IdentityStep", () => {
     pick.mockResolvedValue("/home/me/Tobias.p12");
     harness.api.mock.failNext("identityImport", code);
     renderStep();
-    fireEvent.click(screen.getByRole("radio", { name: "Import file" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Import an existing identity" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose file…" }));
     await screen.findByText("Chosen file: Tobias.p12");
     next();
@@ -127,7 +126,7 @@ describe("IdentityStep", () => {
   it("keeps the previous choice when the picker is cancelled", async () => {
     pick.mockResolvedValue(null);
     renderStep();
-    fireEvent.click(screen.getByRole("radio", { name: "Import file" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Import an existing identity" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose file…" }));
     await waitFor(() => {
       expect(pick).toHaveBeenCalled();
@@ -139,7 +138,7 @@ describe("IdentityStep", () => {
     pick.mockRejectedValue(new Error("no dialog"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     renderStep();
-    fireEvent.click(screen.getByRole("radio", { name: "Import file" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Import an existing identity" }));
     fireEvent.click(screen.getByRole("button", { name: "Choose file…" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("file picker");
   });

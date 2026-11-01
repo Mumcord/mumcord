@@ -34,7 +34,7 @@ export function UpdatesCard({ settings, update }: SettingsSectionProps) {
           })}
         </p>
       )}
-      <ModeRow
+      <UpdateModeRow
         mode={mode}
         canInstall={canInstall}
         onChange={(next) => {
@@ -73,7 +73,7 @@ export function UpdatesCard({ settings, update }: SettingsSectionProps) {
   );
 }
 
-function ModeRow(props: {
+export function UpdateModeRow(props: {
   mode: UpdateMode;
   canInstall: boolean;
   onChange: (mode: UpdateMode) => void;
