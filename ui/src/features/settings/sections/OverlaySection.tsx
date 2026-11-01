@@ -1,21 +1,13 @@
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { getApi } from "../../../api";
-import { Section } from "../components/Section";
 import { InGameOverlayGroup } from "./InGameOverlayGroup";
 import { createInGameOverlayApi, type InGameOverlayApi } from "./inGameOverlay";
 
 /**
- * Overlay settings (FR-1.44 – FR-1.46b): the in-game overlay.
- * Positional audio lives in the audio section. `inGameApi` defaults to the
- * engine's in-game overlay commands; tests pass their own.
+ * The in-game overlay card (FR-1.44 – FR-1.46b). `inGameApi` defaults to the engine's in-game
+ * overlay commands; tests pass their own.
  */
-export function OverlaySection({ inGameApi }: { inGameApi?: InGameOverlayApi }) {
-  const { t } = useTranslation("settings");
+export function InGameOverlayCard({ inGameApi }: { inGameApi?: InGameOverlayApi }) {
   const engineInGameApi = useMemo(() => createInGameOverlayApi(getApi()), []);
-  return (
-    <Section title={t("sections.overlay")}>
-      <InGameOverlayGroup api={inGameApi ?? engineInGameApi} />
-    </Section>
-  );
+  return <InGameOverlayGroup api={inGameApi ?? engineInGameApi} />;
 }

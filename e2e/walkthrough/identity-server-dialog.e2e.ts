@@ -64,7 +64,7 @@ describe("manual acceptance walkthrough (issue #195)", function () {
   });
 
   it("identity manager: two cards, the details, dark and light", async () => {
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
     await createIdentity("walkthrough-a", "Walkthrough Alice");
     await createIdentity("walkthrough-b", "Walkthrough Bob");
 
@@ -90,8 +90,8 @@ describe("manual acceptance walkthrough (issue #195)", function () {
     await browser.pause(400);
     await shot("settings-identity-walkthrough-200-dark");
     await chooseMode("Light");
-    await openSettingsSection("identity");
-    await openSettingsSection("identity");
+    await openSettingsSection("account");
+    await openSettingsSection("account");
     await browser.execute(() => {
       document.querySelector(".identity-card")?.scrollIntoView({ block: "end" });
     });

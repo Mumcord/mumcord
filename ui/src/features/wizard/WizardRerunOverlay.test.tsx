@@ -55,7 +55,9 @@ describe("WizardRerunOverlay", () => {
     const run = screen.getByRole("button", { name: "Run setup wizard again" });
     run.focus();
     fireEvent.click(run);
-    const heading = await screen.findByRole("heading", { name: "Microphone" });
+    const heading = await screen.findByRole("heading", {
+      name: "Voice chat that feels like your own place.",
+    });
     await waitFor(() => expect(heading).toHaveFocus());
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     await waitFor(() => expect(run).toHaveFocus());

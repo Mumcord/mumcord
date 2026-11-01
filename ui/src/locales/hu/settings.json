@@ -1,32 +1,59 @@
 {
-  "sectionList": "Beállítási részek",
+  "sectionList": "Beállításcsoportok",
   "loading": "Beállítások betöltése…",
   "loadFailed": "A beállításaidat nem sikerült betölteni. Zárd be a beállításokat, és próbáld újra.",
   "saveFailed": "Az utolsó módosítást nem sikerült menteni. Próbáld újra.",
   "sections": {
-    "identity": "Identitás",
-    "audio": "Audió",
-    "voice": "Hang",
-    "chatHistory": "Chat és előzmények",
+    "general": "Általános",
+    "account": "Fiók és identitás",
+    "voiceAudio": "Hang és audió",
+    "chatNotifications": "Csevegés és értesítések",
+    "privacy": "Adatvédelem és kapcsolatok",
     "appearance": "Megjelenés",
-    "accessibility": "Akadálymentesség",
-    "language": "Nyelv",
-    "sounds": "Hangok és értesítések",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnosztika",
-    "about": "Névjegy",
     "servers": "Szerverek",
-    "privacy": "Adatvédelem",
-    "updates": "Frissítések",
+    "gaming": "Játék és overlay",
+    "advanced": "Speciális és fejlesztői",
+    "about": "Névjegy",
     "packetInspector": "Csomagvizsgáló",
     "hotkeys": "Gyorsbillentyűk"
+  },
+  "sectionDescriptions": {
+    "general": "Indítás, nyelv, frissítések és kisegítő lehetőségek.",
+    "account": "Az identitásaid, a profilod és amit megosztasz.",
+    "voiceAudio": "Mikrofon, hangszórók, hogyan beszélsz és hogyan hangzol.",
+    "chatNotifications": "Értesítések, privát üzenetek, letiltott személyek és az üzenetelőzmények.",
+    "privacy": "Hogyan kapcsolódsz másokhoz, és mit tölt be a Mumcord kívülről.",
+    "appearance": "Téma, elrendezés és a csatornalista.",
+    "servers": "Kapcsolatok több szerverhez és szerverenkénti beállítások.",
+    "gaming": "A játékon belüli overlay, a pozicionális hang és a játékbővítmények.",
+    "advanced": "Fejlesztői eszközök, diagnosztika, tárhely és licencek.",
+    "about": "Verzió, támogatás és a beállítási varázsló."
+  },
+  "breadcrumb": "Beállítások / {{section}}",
+  "moreInfo": "További információ: {{topic}}",
+  "searchTerms": {
+    "devices": "bemenet kimenet fejhallgató hangszóró hangkártya",
+    "talkMode": "PTT VAD hangaktiválás gyorsbillentyű",
+    "noiseSuppression": "háttérzaj zajszűrés",
+    "p2p": "P2P relé közvetlen kapcsolatok IP-címem elrejtése",
+    "theme": "sötét mód világos mód színek",
+    "startup": "automatikus indítás rendszerindítás bejelentkezés tálca",
+    "language": "fordítás nyelv területi beállítás",
+    "updates": "új verzió frissítés",
+    "storage": "lemezterület gyorsítótár törlése",
+    "blocked": "mellőzés tiltás némítás személyek",
+    "notifications": "riasztások felugró ablakok",
+    "externalContent": "beágyazások képek előnézetek"
   },
   "search": {
     "label": "Beállítások keresése",
     "results": "Találatok",
     "empty": "Nincs a(z) „{{query}}” keresésnek megfelelő beállítás.",
     "count_one": "{{count}} beállítás található",
-    "count_other": "{{count}} beállítás található"
+    "count_other": "{{count}} beállítás található",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} találat",
+    "groupCount_other": "{{count}} találat"
   },
   "errors": {
     "secureStorage": "A rendszered biztonságos tárolója nem érhető el, vagy a hozzáférést megtagadták.",
@@ -112,7 +139,6 @@
     "testStop": "Felvétel leállítása",
     "testRecording": "Felvétel… beszélj most.",
     "testPlaying": "A hangod visszajátszása…",
-    "quality": "Minőség",
     "musicQuality": "Zenei minőség",
     "musicQualityHint": "Több sávszélességet használ, és kikapcsolja a zajszűrést és az automatikus hangerőt; zenéhez. Push-to-talkkal működik a legjobban.",
     "bitrate": "Bitráta",
@@ -126,7 +152,6 @@
     "duckingLevel": "Csökkentett hangerő",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Alacsony késleltetésű mód",
-    "lowLatencyBeta": "Béta",
     "lowLatencyHint": "Valós idejű közös zenélésre",
     "lowLatencyWarningTitle": "A stabilitást cseréli sebességre",
     "lowLatencyBandwidth": "Több sávszélességet használ (10 ms-os csomagok).",
@@ -157,7 +182,7 @@
     "keyMissing": "Állíts be egy billentyűt, különben senki sem hall.",
     "keyRejected": "Ez a billentyű nem használható. Próbálj másikat, akár Ctrl, Alt vagy Shift billentyűvel együtt.",
     "keyNotConfirmed": "Az asztali környezet nem erősítette meg a gyorsbillentyűt. Próbáld újra, és fogadd el a rendszer párbeszédablakát, vagy rendeld hozzá a billentyűt az asztali környezet gyorsbillentyű-beállításaiban.",
-    "processing": "Hangfeldolgozás",
+    "processing": "Feldolgozás és minőség",
     "noiseSuppression": "Zajszűrés",
     "noiseSuppressionHint": "Kiszűri a háttérzajt, például a billentyűzetet és a ventilátorokat.",
     "noiseChoice": {
@@ -261,12 +286,12 @@
     }
   },
   "history": {
+    "title": "Üzenetelőzmények",
     "explanation": "A chatüzenetek csak ezen a számítógépen mentődnek.",
-    "perServer": "Szerverek",
+    "perServer": "Szerverenkénti felülbírálások",
     "noServers": "Még nincsenek mentett szerverek.",
     "save": "Előzmények mentése itt: {{server}}",
     "clearServer": "{{server}} előzményeinek törlése…",
-    "all": "Összes szerver",
     "clearAll": "Összes előzmény törlése…",
     "confirmTitle": "Törlöd az előzményeket?",
     "confirmServer": "{{server}} összes mentett üzenete törlődik erről a számítógépről. Másoknál megmaradnak a saját példányaik. Az ő példányaik nem szinkronizálódnak vissza erre a számítógépre. Ez nem vonható vissza.",
@@ -278,7 +303,6 @@
     "autoDeleteHint": "A régebbi üzenetek automatikusan, kérdés nélkül törlődnek erről a számítógépről. Ez csak az itt mentett előzményeket érinti, a szervert nem."
   },
   "fullImages": {
-    "title": "Teljes méretű képek",
     "offer": "Teljes méretű képeim felkínálása",
     "offerHint": "Más Mumcord-felhasználók teljes méretben megnyithatják a képeimet. Kikapcsolva: csak a kis előnézet kerül elküldésre, eredeti nem marad meg, és nem is lesz megosztva.",
     "load": "Teljes méretű képek betöltése másoktól",
@@ -300,14 +324,15 @@
     "system": "Rendszer követése",
     "dark": "Sötét",
     "light": "Világos",
-    "behaviour": "Viselkedés",
+    "behaviour": "Indítás és ablak",
     "closeLegend": "Ha csatlakozva bezárod az ablakot",
     "closeAsk": "Kérdezzen meg minden alkalommal",
     "closeTray": "Kicsinyítés a tálcára",
     "closeQuit": "Kilépés a Mumcordból",
     "autostart": "Mumcord indítása bejelentkezéskor",
     "startMinimized": "Indítás kicsinyítve",
-    "startMinimizedHint": "Ha a Mumcord bejelentkezéskor indul, a tálcán vár az ablak megnyitása helyett."
+    "startMinimizedHint": "Ha a Mumcord bejelentkezéskor indul, a tálcán vár az ablak megnyitása helyett.",
+    "look": "Megjelenés és elrendezés"
   },
   "themeEditor": {
     "name": "Téma neve",
@@ -365,7 +390,7 @@
     "deleteConfirm": "Törlés"
   },
   "accessibility": {
-    "hints": "Tippek",
+    "hints": "Kisegítő lehetőségek",
     "keyboardHints": "Billentyűzettippek megjelenítése",
     "keyboardHintsHint": "Rövid képernyős tippek, például „Nyílbillentyűk: mozgás” a csatornalista alatt és a kedvenc GIF-eknél. A képernyőolvasók kikapcsolva is felolvassák őket.",
     "announcements": "Képernyőolvasó-bejelentések",
@@ -374,11 +399,15 @@
     "skipLinksHint": "Linkek az ablak elején, amelyek Tab lenyomására egyenesen a chathez vagy a csatornalistához ugranak."
   },
   "language": {
+    "title": "Nyelv",
     "legend": "Megjelenítési nyelv",
-    "system": "Rendszer követése"
+    "system": "Rendszer követése",
+    "search": "Nyelv keresése",
+    "noMatch": "Nincs egyező nyelv"
   },
   "sounds": {
-    "explanation": "Rövid hangok ezekhez az eseményekhez:",
+    "title": "Hangok",
+    "explanation": "Rövid hangok, amelyek ezeknél az eseményeknél szólnak.",
     "joinLeave": "Valaki belép a csatornádba vagy elhagyja",
     "voiceJoin": "Belépsz egy hangcsatornába",
     "selfMute": "Némítod magad vagy feloldod a némítást",
@@ -455,7 +484,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Naplózás",
+    "title": "Diagnosztika",
     "logLevel": "Napló részletessége",
     "levels": {
       "error": "Csak hibák",
@@ -490,7 +519,8 @@
     "setupWizardHint": "Fuss végig újra az első beállításon, hogy átnézd a mikrofont, az adatvédelmi döntéseket, a frissítéskeresést és a beszédmódot. A jelenlegi értékek előre ki vannak töltve.",
     "setupWizardRun": "Beállítási varázsló futtatása újra",
     "setupWizardIdentityNote": "Az identitásod nem része ennek. A tanúsítványod, és vele a regisztrált neved és a szerverekre vonatkozó jogosultságaid, pontosan úgy maradnak, ahogy vannak.",
-    "setupWizardIdentityLink": "Kezeld az Identitás alatt"
+    "setupWizardIdentityLink": "Kezeld az Identitás alatt",
+    "versionTitle": "Verzió és licenc"
   },
   "profile": {
     "title": "Profil",
@@ -506,7 +536,6 @@
     "skipped": "Az alapértelmezett avatarod nem lett elküldve: túl nagy ehhez a szerverhez."
   },
   "linkPreviews": {
-    "title": "Linkelőnézetek",
     "switch": "Linkelőnézetek és beágyazások megjelenítése",
     "hint": "A Mumcord betölti a linkelt oldalakat az előnézetekhez és videólejátszókhoz; ezek a webhelyek látják az IP-címedet."
   },
@@ -527,7 +556,7 @@
     "cleared": "Gyorsítótár törölve, {{size}} felszabadítva."
   },
   "cache": {
-    "title": "Gyorsítótár",
+    "title": "Tárhely",
     "hint": "A Mumcord ideiglenes adatokat tárol ezen a számítógépen, hogy minden gyorsabban töltsön be. A törlésük biztonságos; szükség esetén újra létrejönnek.",
     "kind": {
       "previews": "Hivatkozás-előnézetek és képek",
@@ -567,7 +596,7 @@
     "betaHint": "Az eredmény a játéktól és annak plugintámogatásától függ."
   },
   "gamePlugins": {
-    "title": "Térhatású hang: források",
+    "title": "Játékbővítmények",
     "explanation": "A játékok a Mumble Linken vagy hivatalos Mumble játékpluginokon keresztül közlik a Mumcorddal, hol vagy. A Mumcord a saját pluginmappájában és egy meglévő Mumble-telepítésben keresi a pluginokat. Csak azoknak a játékoknak a pluginjait kapcsold be, amelyekkel játszol.",
     "antiCheat": "A játékpluginok olvassák a játék memóriáját. Egyes csalásvédelmi rendszerek ezt megjelölhetik; szigorú csalásvédelemmel rendelkező játékoknál kapcsold ki a pluginokat.",
     "loading": "Játékpluginok keresése…",
@@ -590,7 +619,6 @@
     "limitInvalid": "Adj meg egy egész számot 1 és 15 között."
   },
   "appearanceEffects": {
-    "title": "Effektek",
     "visualEffects": "Vizuális effektek (üveg, szemcsésség)",
     "visualEffectsHint": "Matt üveg menük és finom filmszemcse. Automatikusan kikapcsol, ha a rendszered kevesebb átlátszóságot vagy mozgást kér."
   },
@@ -604,7 +632,6 @@
   "p2p": {
     "title": "Peer-to-peer (képernyőmegosztás, teljes méretű képek)",
     "modeLabel": "Peer-to-peer mód",
-    "recommended": "Ajánlott",
     "explanation": "A közvetlen kapcsolat megmutatja az IP-címedet a másik félnek. Az átjátszó elrejti előle; az átjátszó üzemeltetője (a szerver közössége) láthatja. Mindkettő végpontok közötti titkosítású.",
     "useGlobal": "Globális beállítás használata",
     "overrideHint": "Csak ennél a szervernél. A „Globális beállítás használata” a Beállítások → Adatvédelem értékét követi.",
@@ -617,7 +644,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Közvetlen kapcsolatok",
     "allow": "Közvetlen kapcsolatok engedélyezése más Mumcord-felhasználókkal",
     "hint": "A közvetlen kapcsolatok gyorsabbak, de a másik fél láthatja az IP-címedet. Amíg nem döntesz, a Mumcord rákérdez, amikor először használna egyet.",
     "notUsed": "A választott peer-to-peer módban nincs használatban: a Mumcord sosem kapcsolódik közvetlenül másokhoz."
@@ -628,6 +654,7 @@
     "failed": "Ez nem sikerült. Próbáld újra."
   },
   "inspector": {
+    "title": "Fejlesztői eszközök",
     "intro": "Megmutatja a Mumcord által küldött és fogadott csomagokat, főleg a Mumcord-bővítmények adatait, hibakereséshez. Csak az utolsó 2000 csomag marad meg, ezen az eszközön a memóriában; semmi nem kerül naplózásra vagy elküldésre.",
     "devTools": "Fejlesztői eszközök",
     "devToolsHint": "Kapcsold ki, hogy újra elrejtsd a csomagvizsgálót, és leállítsd a rögzítést.",
@@ -804,7 +831,14 @@
     "hide": "Teljes elrejtés",
     "hideHint": "A csevegésben semmi sem jelenik meg."
   },
+  "externalContent": {
+    "title": "Külső tartalom"
+  },
+  "privacyConnections": {
+    "title": "Kapcsolatok"
+  },
   "updates": {
+    "title": "Frissítések",
     "installedFrom": "Mumcord {{version}} · telepítés forrása: {{source}}",
     "install": {
       "appImage": "az AppImage",
@@ -818,7 +852,6 @@
       "aur": "az AUR",
       "otherLinux": "egy Linux-csomag"
     },
-    "checking": "Ellenőrzés",
     "mode": "Ha frissítés található",
     "modeHint": "A frissítéseket telepítés előtt mindig ellenőrizzük és hitelesítjük.",
     "modeAuto": "Automatikus letöltés",
@@ -832,7 +865,6 @@
     "intervalHours_one": "Óránként",
     "intervalHours_other": "{{count}} óránként",
     "intervalWeek": "Hetente egyszer",
-    "status": "Állapot",
     "state": {
       "idle": "Még nem ellenőrizve",
       "off": "A frissítések keresése ki van kapcsolva",
@@ -859,6 +891,99 @@
     "whatsNew": "Újdonságok",
     "whatsNewHint": "Nézd meg az egyes verziók változásait.",
     "openChangelog": "Változásnapló megnyitása"
+  },
+  "badges": {
+    "changed": "Módosítva",
+    "recommended": "Ajánlott",
+    "groupChanged": "Módosított beállításokat tartalmaz"
+  },
+  "resetSection": {
+    "button": "Szakasz visszaállítása",
+    "title": "Visszaállítod ezt: {{section}}?",
+    "intro": "Ezek a beállítások visszaállnak az előbeállításodra vagy az alapértelmezett értékre:",
+    "nothing": "A(z) {{section}} minden beállítása már az előbeállítás vagy az alapértelmezett értéken van.",
+    "confirm": "Visszaállítás"
+  },
+  "activePreset": {
+    "heading": "Aktív előbeállítás",
+    "none": "Nincs előbeállítás",
+    "customised": "{{preset}}, testreszabva",
+    "changed_one": "{{count}} beállítás módosult a beállítás óta",
+    "changed_other": "{{count}} beállítás módosult a beállítás óta",
+    "unchanged": "Nincs módosítás a beállítás óta",
+    "switch": "Váltás",
+    "switchLabel": "Előbeállítás váltása",
+    "applyFailed": "A játékon belüli overlayt vagy a Ne zavarjanak módot nem sikerült módosítani. Próbáld újra."
+  },
+  "presets": {
+    "dialogTitle": "Előbeállítás váltása",
+    "dialogIntro": "Válassz kiindulópontot. Csak az előbeállítás által érintett beállítások változnak; minden más marad, ahogy van.",
+    "legend": "Előbeállítások",
+    "continue": "Tovább",
+    "confirmTitle": "Váltasz erre: {{preset}}?",
+    "confirmIntro": "Ezek a beállítások változnak:",
+    "confirmNothing": "Egy beállítás sem változik. A Mumcord a(z) {{preset}} előbeállítást jegyzi meg.",
+    "confirmCustom": "Egy beállítás sem változik. A Beállítások a továbbiakban nem előbeállításhoz, hanem az alapértelmezésekhez hasonlítja a választásaidat.",
+    "apply": "Előbeállítás váltása",
+    "everythingOn": {
+      "name": "Minden bekapcsolva",
+      "tagline": "A teljes funkciókészlet",
+      "point1": "Mások látják, mit játszol és mit hallgatsz",
+      "point2": "Az IP-címed látható azoknak, akikkel közvetlenül kapcsolódsz",
+      "point3": "Bárki írhat neked; a hivatkozások és képek a webről töltődnek be",
+      "point4": "Az overlay, az előzményszinkron és a teljes méretű képek be vannak kapcsolva"
+    },
+    "balanced": {
+      "name": "Kiegyensúlyozott",
+      "tagline": "Az adatvédelem és a kényelem között",
+      "point1": "Csak az ismerőseid és a csatornád tagjai írhatnak neked",
+      "point2": "Közvetlen kapcsolat, tartaléknak relével",
+      "point3": "A hivatkozás-előnézetek és a teljes méretű képek be vannak kapcsolva",
+      "point4": "Az, amit játszol és hallgatsz, privát marad"
+    },
+    "maximumPrivacy": {
+      "name": "Maximális adatvédelem",
+      "tagline": "A lehető legkevesebbet oszd meg",
+      "point1": "Csak az ismerőseid írhatnak neked, kivétel nélkül",
+      "point2": "Az IP-címed rejtett; minden a relén keresztül megy",
+      "point3": "Nincs külső tartalom, nincs előzményszinkron, nincs megosztás",
+      "point4": "Semmi sem kerül megosztásra arról, amit csinálsz"
+    },
+    "custom": {
+      "name": "Egyéni",
+      "tagline": "A saját döntéseid",
+      "point1": "Minden beállítást úgy hagy, ahogy van",
+      "point2": "A módosításokat az alapértelmezésekhez hasonlítja",
+      "point3": "Akkor a legjobb, ha tudod, mit szeretnél"
+    }
+  },
+  "betaFeatures": {
+    "title": "Béta funkciók",
+    "hint": "Korai funkciók; változhatnak. Mindegyik a saját helyén is megjelenik, Béta jelvénnyel.",
+    "gamePlugins": "Játékbővítmények",
+    "manage": "Bővítmények kezelése"
+  },
+  "privacySummary": {
+    "title": "Adatvédelmi összegzés",
+    "ipHidden": "Az IP-címed rejtve marad",
+    "ipVisible": "A közvetlen kapcsolatok felfedhetik az IP-címedet",
+    "matches": "Megfelel ennek: {{preset}}",
+    "messages": "Privát üzenetek tőlük: {{rule}}",
+    "p2pHidden": "A peer-to-peer a relén keresztül megy, így a másik személy nem látja az IP-címedet.",
+    "p2pDirect": "A peer-to-peer először közvetlenül kapcsolódik; a másik személy láthatja az IP-címedet.",
+    "p2pDirectOnly": "A peer-to-peer csak közvetlenül kapcsolódik; a másik személy láthatja az IP-címedet.",
+    "externalOn": "A hivatkozás-előnézetek be vannak kapcsolva: a Mumcord letölti a hivatkozott oldalakat az előnézet elkészítéséhez.",
+    "externalOff": "A hivatkozás-előnézetek ki vannak kapcsolva: a Mumcord semmit sem tölt be a hivatkozott oldalakról.",
+    "imagesOn": "A teljes méretű képeket a Mumcord-felhasználók közvetlenül cserélik egymással.",
+    "imagesOff": "A teljes méretű képek cseréje ki van kapcsolva.",
+    "historyOn": "Az előzményszinkron be van kapcsolva: megosztod a csatornaelőzményeidet más Mumcord-felhasználókkal.",
+    "historyOff": "Az előzményszinkron ki van kapcsolva.",
+    "sharingBoth": "Mások látják, mit játszol és mit hallgatsz.",
+    "sharingPlaying": "Mások látják, mit hallgatsz.",
+    "sharingGaming": "Mások látják, melyik játékkal játszol.",
+    "sharingNone": "Az, amit játszol és hallgatsz, privát marad.",
+    "change": "Módosítás",
+    "changeLabel": "Módosítás: {{topic}}"
   },
   "hotkeys": {
     "global": "Globális gyorsbillentyűk",

@@ -45,7 +45,7 @@ async function openHotkeys() {
       </ViewContext.Provider>
     </PreferencesContext.Provider>,
   );
-  fireEvent.click(await screen.findByRole("tab", { name: "Hotkeys" }));
+  fireEvent.click(await screen.findByRole("tab", { name: "Voice & Audio" }));
   await screen.findByRole("heading", { name: "Actions" });
   return view;
 }
@@ -66,7 +66,7 @@ function record(action: string, code: string, modifiers: { ctrlKey?: boolean } =
   press(button, code, modifiers);
 }
 
-describe("Settings → Hotkeys (#64)", () => {
+describe("Settings → Voice & Audio → Hotkeys (#64)", () => {
   it("lists every action without a key and works in the background by default", async () => {
     const { container } = await openHotkeys();
     for (const action of [
@@ -187,13 +187,29 @@ describe("Settings → Hotkeys (#64)", () => {
     ]);
     const save = vi.spyOn(api, "whisperTargetsSave");
     await openHotkeys();
-    const row = await screen.findByRole("button", { name: /^Raid leads/ });
+    // The Whisper & shout card on the same page lists the target too.
+    const card = screen.getByRole("region", { name: "Hotkeys" });
+    const row = await within(card).findByRole("button", { name: /^Raid leads/ });
     expect(row).toHaveAccessibleName("Raid leads F9");
-    expect(screen.getByText("2 people · whisper")).toBeVisible();
+    expect(within(card).getByText("2 people · whisper")).toBeVisible();
     fireEvent.click(row);
     fireEvent.keyDown(row, { code: "F10", key: "F10" });
     await waitFor(() => {
       expect(save).toHaveBeenLastCalledWith([expect.objectContaining({ id: "t1", hotkey: "F10" })]);
+    });
+  });
+
+  it("links to the compatibility mode switch when the desktop offers no global shortcuts", async () => {
+    vi.spyOn(api, "hotkeysStatus").mockResolvedValue({ mode: "unavailable", failed: [] });
+    vi.spyOn(api, "pttSession").mockResolvedValue({
+      waylandDesktop: true,
+      compatibilityActive: false,
+      kde: false,
+    });
+    await openHotkeys();
+    fireEvent.click(await screen.findByRole("button", { name: "Use compatibility mode (X11)" }));
+    await waitFor(() => {
+      expect(screen.getByRole("switch", { name: /Compatibility mode/ })).toHaveFocus();
     });
   });
 

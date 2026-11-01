@@ -7,36 +7,30 @@ import {
   useRef,
   useState,
   type KeyboardEvent,
-  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
-import type { Settings } from "../../api";
+import { matchingPreset } from "../wizard/presets";
+import { ActivePresetCard } from "./ActivePresetCard";
+import { changedSections } from "./changes";
 import { DialogHostContext, type DialogHost } from "./components/dialogHost";
-import { AboutSection } from "./sections/AboutSection";
-import { AccessibilitySection } from "./sections/AccessibilitySection";
-import { AppearanceSection } from "./sections/AppearanceSection";
-import { AudioSection } from "./sections/AudioSection";
-import { ChatHistorySection } from "./sections/ChatHistorySection";
-import { DiagnosticsSection } from "./sections/DiagnosticsSection";
-import { IdentitySection } from "./sections/IdentitySection";
-import { LanguageSection } from "./sections/LanguageSection";
-import { OverlaySection } from "./sections/OverlaySection";
-import { PacketInspectorSection } from "./sections/PacketInspectorSection";
-import { PrivacySection } from "./sections/PrivacySection";
-import { ServersSection } from "./sections/ServersSection";
-import { SoundsSection } from "./sections/SoundsSection";
-import { UpdatesSection } from "./sections/UpdatesSection";
-import { VoiceSection } from "./sections/VoiceSection";
-import { HotkeysSection } from "./sections/HotkeysSection";
+import { ChangedSettingsContext } from "./components/changedSettings";
+import { SettingsIcon } from "./components/SettingsIcon";
 import { SettingsNavigationContext, type SettingsNavigation } from "./settingsNavigation";
 import { SettingsSearch } from "./SettingsSearch";
 import type { SearchResult } from "./settingsIndex";
 import { findGroup, findTarget, headingOf, type JumpTarget } from "./settingsJump";
-import { SECTION_IDS, type SectionId } from "./sectionIds";
+import { SettingsPageCards } from "./SettingsPages";
+import { SECTION_ICONS, SECTION_IDS, SET_APART_SECTIONS, type SectionId } from "./sectionIds";
 import { useIsMacos } from "../../api/useIsMacos";
 import { useDevToolsUnlocked } from "../inspector/devTools";
-import { useSettings, type UpdateSettings } from "./useSettings";
+import { ResetSectionButton } from "./ResetSectionButton";
+import { useSettings } from "./useSettings";
+import { useSettingsChanges } from "./useSettingsChanges";
 import "./settings.css";
+
+/** Card title keys of cards that only show on some systems; the search hides their entries. */
+const IN_GAME_OVERLAY_CARD = "overlay.inGame.title";
+const DEV_TOOLS_CARD = "inspector.title";
 
 /** How long a search jump waits for a control that loads late before landing on its group. */
 const JUMP_WAIT_MS = 1500;
@@ -56,48 +50,13 @@ const isSearchShortcut = (event: globalThis.KeyboardEvent) =>
   !event.shiftKey &&
   event.key.toLowerCase() === "f";
 
-function renderSection(id: SectionId, settings: Settings, update: UpdateSettings): ReactNode {
-  const props = { settings, update };
-  switch (id) {
-    case "identity":
-      return <IdentitySection {...props} />;
-    case "servers":
-      return <ServersSection {...props} />;
-    case "privacy":
-      return <PrivacySection {...props} />;
-    case "audio":
-      return <AudioSection {...props} />;
-    case "voice":
-      return <VoiceSection {...props} />;
-    case "hotkeys":
-      return <HotkeysSection {...props} />;
-    case "chatHistory":
-      return <ChatHistorySection {...props} />;
-    case "appearance":
-      return <AppearanceSection {...props} />;
-    case "accessibility":
-      return <AccessibilitySection {...props} />;
-    case "language":
-      return <LanguageSection {...props} />;
-    case "sounds":
-      return <SoundsSection {...props} />;
-    case "overlay":
-      return <OverlaySection />;
-    case "updates":
-      return <UpdatesSection {...props} />;
-    case "diagnostics":
-      return <DiagnosticsSection {...props} />;
-    case "about":
-      return <AboutSection {...props} />;
-    case "packetInspector":
-      return <PacketInspectorSection />;
-  }
-}
-
 /**
- * Settings content of the settings overlay (FR-1.39): a search field and a vertical list of
- * sections on the left (one Tab stop, arrow keys move) and the selected section on the right.
- * `initialSection` picks the section shown first. Both columns scroll on their own. Every change is saved immediately.
+ * Settings content of the settings overlay (FR-1.39, #161): a search field and a vertical list of
+ * groups on the left (one Tab stop, arrow keys move; Advanced & Developer and About set apart
+ * below a divider) and the selected group's page on the right: header plus a grid of section
+ * cards. `initialSection` picks the group shown first. Both columns scroll on their own. Every
+ * change is saved immediately. Changed settings get a badge and their group a dot; the sidebar
+ * footer shows the active preset and each page header offers "Reset section".
  */
 export function SettingsScreen({
   initialSection,
@@ -110,21 +69,26 @@ export function SettingsScreen({
   const { t } = useTranslation("settings");
   const baseId = useId();
   const { settings, loadFailed, saveFailed, update } = useSettings(settingsRevision);
+  const changes = useSettingsChanges(settings, update);
+  const { current: currentDraft, changed } = changes;
+  const changedLabels = useMemo(
+    () => new Set(changed.map((setting) => t(setting.label))),
+    [changed, t],
+  );
+  const dotSections = useMemo(() => changedSections(changed), [changed]);
+  const presetMatch = useMemo(
+    () => (currentDraft === null ? null : matchingPreset(currentDraft)),
+    [currentDraft],
+  );
   // macOS has no overlay at all (QA.58).
   const macos = useIsMacos();
-  // The packet inspector stays hidden until the developer tools are unlocked (issue #60).
+  // The developer tools stay hidden until they are unlocked (issue #60).
   const devTools = useDevToolsUnlocked();
-  const hidden = useMemo<readonly SectionId[]>(
-    () => [
-      ...(macos ? (["overlay"] as const) : []),
-      ...(devTools ? [] : (["packetInspector"] as const)),
-    ],
+  const hiddenCards = useMemo(
+    () => [...(macos ? [IN_GAME_OVERLAY_CARD] : []), ...(devTools ? [] : [DEV_TOOLS_CARD])],
     [macos, devTools],
   );
-  const sections = useMemo(() => SECTION_IDS.filter((id) => !hidden.includes(id)), [hidden]);
-  const [active, setActive] = useState<SectionId>(initialSection ?? "identity");
-  // Hiding the developer tools from their own section goes back to About.
-  if (active === "packetInspector" && !devTools) setActive("about");
+  const [active, setActive] = useState<SectionId>(initialSection ?? "general");
   const tabs = useRef(new Map<SectionId, HTMLButtonElement>());
   const [hostElement, setHostElement] = useState<HTMLDivElement | null>(null);
   const { dialogContext, blocking } = useDialogHost(hostElement);
@@ -141,8 +105,15 @@ export function SettingsScreen({
       compatibilityFocused: () => {
         setCompatibilityFocusPending(false);
       },
+      jumpTo: (entry) => {
+        setQuery("");
+        setActive(entry.section);
+        setJump({ kind: "setting", entry });
+      },
       openCompatibilityMode: () => {
-        setActive("voice");
+        setQuery("");
+        setJump(null);
+        setActive("voiceAudio");
         setCompatibilityFocusPending(true);
       },
     }),
@@ -186,7 +157,7 @@ export function SettingsScreen({
       return;
     }
     // The index holds translation keys; the screen shows the texts.
-    const group = jump.entry.group === undefined ? undefined : t(jump.entry.group);
+    const group = t(jump.entry.group);
     const control = jump.entry.control === undefined ? undefined : t(jump.entry.control);
     const land = (target: JumpTarget) => {
       target.focus.focus();
@@ -207,7 +178,7 @@ export function SettingsScreen({
     const timer = window.setTimeout(() => {
       observer.disconnect();
       // The control is not offered here (e.g. a Wayland-only switch): land on its group instead.
-      const scope = (group !== undefined ? findGroup(panel, group) : null) ?? panel;
+      const scope = findGroup(panel, group) ?? panel;
       const heading = headingOf(scope);
       land({ focus: heading, highlight: scope === panel ? heading : scope });
     }, JUMP_WAIT_MS);
@@ -218,8 +189,8 @@ export function SettingsScreen({
   }, [jump, t]);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const index = sections.indexOf(active);
-    const last = sections.length - 1;
+    const index = SECTION_IDS.indexOf(active);
+    const last = SECTION_IDS.length - 1;
     const target =
       event.key === "ArrowDown"
         ? index === last
@@ -236,7 +207,7 @@ export function SettingsScreen({
               : null;
     if (target === null) return;
     event.preventDefault();
-    const next = sections[target];
+    const next = SECTION_IDS[target];
     if (next) select(next);
   };
 
@@ -253,7 +224,7 @@ export function SettingsScreen({
               onQueryChange={setQuery}
               onPick={pick}
               inputRef={searchRef}
-              hidden={hidden}
+              hiddenCards={hiddenCards}
             />
             <div
               role="tablist"
@@ -262,7 +233,7 @@ export function SettingsScreen({
               className="settings__nav"
               hidden={query.trim() !== ""}
             >
-              {sections.map((id) => (
+              {SECTION_IDS.map((id) => (
                 <button
                   key={id}
                   ref={(element) => {
@@ -274,16 +245,30 @@ export function SettingsScreen({
                   role="tab"
                   aria-selected={id === active}
                   aria-controls={panelId(id)}
+                  aria-describedby={dotSections.has(id) ? `${baseId}-changed` : undefined}
                   tabIndex={id === active ? 0 : -1}
-                  className="settings__tab"
+                  className={
+                    SET_APART_SECTIONS[0] === id
+                      ? "settings__tab settings__tab--apart"
+                      : "settings__tab"
+                  }
                   onKeyDown={onKeyDown}
                   onClick={() => {
                     select(id);
                   }}
                 >
+                  <SettingsIcon name={SECTION_ICONS[id]} />
                   {t(`sections.${id}`)}
+                  {dotSections.has(id) && <span className="settings__tab-dot" aria-hidden="true" />}
                 </button>
               ))}
+            </div>
+            {/* Describes the tabs with a dot; outside them, so a tab's text stays the group name. */}
+            <span id={`${baseId}-changed`} hidden>
+              {t("badges.groupChanged")}
+            </span>
+            <div className="settings__sidebar-footer">
+              <ActivePresetCard changes={changes} />
             </div>
           </div>
           <div
@@ -298,6 +283,23 @@ export function SettingsScreen({
                 {t("saveFailed")}
               </p>
             )}
+            {changes.applyFailed && (
+              <p role="alert" className="settings-error">
+                {t("activePreset.applyFailed")}
+              </p>
+            )}
+            <header className="settings-page__header">
+              <div className="settings-page__heading">
+                <p className="settings-page__breadcrumb" aria-hidden="true">
+                  {t("breadcrumb", { section: t(`sections.${active}`) })}
+                </p>
+                <h2 className="settings-page__title">{t(`sections.${active}`)}</h2>
+                <p className="settings-page__description">{t(`sectionDescriptions.${active}`)}</p>
+              </div>
+              <div className="settings-page__actions">
+                <ResetSectionButton section={active} changes={changes} />
+              </div>
+            </header>
             {loadFailed ? (
               <p role="alert" className="settings-error">
                 {t("loadFailed")}
@@ -305,7 +307,18 @@ export function SettingsScreen({
             ) : settings === null ? (
               <p className="settings-hint">{t("loading")}</p>
             ) : (
-              renderSection(active, settings, update)
+              <ChangedSettingsContext value={changedLabels}>
+                <div className="settings-page__cards">
+                  <SettingsPageCards
+                    id={active}
+                    settings={settings}
+                    update={update}
+                    macos={macos}
+                    devTools={devTools}
+                    presetMatch={presetMatch}
+                  />
+                </div>
+              </ChangedSettingsContext>
             )}
           </div>
         </div>

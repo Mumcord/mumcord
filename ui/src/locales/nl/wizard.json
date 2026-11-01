@@ -1,25 +1,77 @@
 {
   "progress": "Stap {{current}} van {{total}}",
   "loadFailed": "De installatie kon niet worden geladen.",
-  "finish": "Voltooien",
+  "recommended": "Aanbevolen",
+  "tipLabel": "Over {{name}}",
   "errors": {
     "generic": "Er is iets misgegaan. Probeer het opnieuw.",
     "secureStorageUnavailable": "Mumcord heeft geen toegang tot de beveiligde opslag van je systeem. Ontgrendel je sleutelhanger of wachtwoordmanager en probeer het opnieuw.",
     "saveFailed": "Je instellingen konden niet worden opgeslagen. Probeer het opnieuw."
   },
+  "nav": {
+    "getStarted": "Aan de slag",
+    "finishSetup": "Installatie afronden",
+    "startMumcord": "Mumcord starten",
+    "finish": "Voltooien",
+    "skip": "Nu overslaan",
+    "enterKey": "Enter",
+    "enterHint": "om door te gaan"
+  },
+  "rail": {
+    "label": "Installatiestappen",
+    "appName": "Mumcord",
+    "setup": "Installatie",
+    "custom": "Aangepast",
+    "done": "(klaar)",
+    "progress": "Voortgang van de installatie",
+    "later": "Alles hier kun je later wijzigen in de instellingen."
+  },
+  "steps": {
+    "welcome": "Welkom",
+    "import": "Importeren uit Mumble",
+    "identity": "Identiteit",
+    "voice": "Spraak",
+    "setupStyle": "Installatiestijl",
+    "privateMessages": "Privéberichten",
+    "connections": "Verbindingen",
+    "features": "Functies",
+    "appearance": "Uiterlijk",
+    "startup": "Opstarten en updates",
+    "summary": "Alles klaar"
+  },
+  "welcome": {
+    "title": "Spraakchat die aanvoelt als",
+    "titleAccent": "jouw eigen plek.",
+    "subtitle": "Mumcord spreekt Mumble, dus het werkt met elke Mumble-server, en voegt daar een moderne chat aan toe. Laten we het instellen zoals jij het wilt. Het duurt ongeveer twee minuten.",
+    "voice": {
+      "title": "Kristalheldere spraak",
+      "text": "Audio met lage latentie en ingebouwde ruisonderdrukking."
+    },
+    "servers": {
+      "title": "Werkt met elke Mumble-server",
+      "text": "Geen account, geen aanmelding. Sluit je aan bij de servers die je al gebruikt."
+    },
+    "private": {
+      "title": "Privé door ontwerp",
+      "text": "Geen telemetrie. Wat Mumcord opslaat, blijft op je computer."
+    }
+  },
   "identity": {
-    "title": "Jouw identiteit",
-    "intro": "Servers herkennen je aan je identiteit. Maak een nieuwe aan of neem de identiteit mee die je al gebruikt.",
-    "create": "Nieuwe maken",
-    "import": "Bestand importeren",
-    "name": "Naam",
-    "nameHint": "Anderen zien deze naam. Je kunt hem later per server wijzigen.",
+    "title": "Wie ben jij op Mumble?",
+    "intro": "Je identiteit is hoe servers je herkennen. Maak een nieuwe aan of neem degene mee die je al gebruikt.",
+    "legend": "Je identiteit",
+    "create": "Nieuwe identiteit aanmaken",
+    "createText": "Je identiteit is een certificaat dat bewijst wie je bent op Mumble-servers. Het bewaart je geregistreerde naam en rechten, zodat je elke keer dezelfde persoon bent.",
+    "import": "Bestaande identiteit importeren",
+    "name": "Standaardweergavenaam",
+    "nameHint": "Wordt gebruikt op servers die je nog niet kennen. Je kunt dit per server wijzigen.",
     "chooseFile": "Kies bestand…",
     "noFile": "Geen bestand gekozen",
     "chosenFile": "Gekozen bestand: {{file}}",
-    "password": "Bestandswachtwoord (indien van toepassing)",
+    "password": "Bestandswachtwoord",
+    "passwordHint": "Het wachtwoord blijft op deze computer en wordt nergens naartoe gestuurd.",
     "existing": "Identiteit {{name}} wordt gebruikt.",
-    "backup": "Je identiteit is als een sleutel. Maak er later een back-up van via Instellingen → Identiteit.",
+    "backup": "Maak er later een back-up van in de instellingen. Met een back-up kun je je identiteit op een nieuwe computer herstellen.",
     "nameRequired": "Voer een naam in.",
     "fileRequired": "Kies een identiteitsbestand (.p12 of .pfx).",
     "fileType": "Identiteitsbestand",
@@ -29,101 +81,142 @@
     "pickFailed": "De bestandskiezer kon niet worden geopend."
   },
   "mic": {
-    "title": "Microfoon",
-    "intro": "Kies je microfoon en luidsprekers. De standaardinstellingen werken meestal prima.",
     "input": "Microfoon",
     "output": "Luidsprekers of koptelefoon",
     "systemDefault": "Systeemstandaard",
     "defaultVia": "Systeemstandaard ({{backend}})",
     "level": "Microfoonniveau",
-    "test": "Testen",
-    "stop": "Stoppen",
     "idle": "Druk op Testen, zeg iets en je hoort jezelf terug.",
     "recording": "Praat nu…",
     "playing": "Je stem wordt afgespeeld…",
     "devicesFailed": "Je audioapparaten konden niet worden opgesomd. Je kunt doorgaan en ze later kiezen in de instellingen.",
-    "testFailed": "De test kon niet starten. Controleer of de microfoon is aangesloten."
+    "testFailed": "De test kon niet starten. Controleer of de microfoon is aangesloten.",
+    "test": "Hoor jezelf",
+    "stop": "Stoppen"
   },
-  "privacy": {
-    "title": "Je privacy",
-    "noTelemetry": "Mumcord stuurt geen telemetrie, analyses of crashrapporten.",
-    "ownServers": "Het maakt alleen verbinding met de servers die je toevoegt.",
-    "linkPreviews": "Linkvoorbeelden en afbeeldingen of GIF's uit chatlinks worden geladen van de gelinkte sites. Je kunt dit uitzetten in de volgende stap of later in de Instellingen.",
-    "mumcordUsers": "Functies alleen voor Mumcord wisselen alleen gegevens uit met andere Mumcord-gebruikers op dezelfde server.",
-    "local": "Alles wat Mumcord opslaat, blijft op je computer.",
-    "statement": "Volledige privacyverklaring"
-  },
-  "updates": {
-    "title": "Nieuwe versies",
-    "choice": "Als er een nieuwe versie uit is",
-    "auto": "Automatisch downloaden",
-    "autoHint": "Mumcord downloadt en controleert de update op de achtergrond en vraagt het je voordat het opnieuw opstart.",
-    "notify": "Alleen melden",
-    "notifyHint": "Mumcord meldt een nieuwe versie en laat zien wat er is veranderd. Er wordt pas iets gedownload als jij dat wilt.",
-    "off": "Uit",
-    "offHint": "Mumcord vraagt GitHub nooit naar nieuwe versies. Je werkt zelf bij.",
-    "privacy": "Bij het controleren worden alleen het verzoek zelf en de naam en versie van de app naar GitHub gestuurd. Je kunt dit later wijzigen in de Instellingen."
-  },
-  "talk": {
-    "title": "Hoe wil je praten?",
-    "mode": "Praatmodus",
-    "voiceActivation": "Spraakactivering",
-    "voiceActivationHint": "Je microfoon gaat aan zodra je praat.",
-    "pushToTalk": "Push-to-talk",
-    "pushToTalkHint": "Houd een toets ingedrukt terwijl je praat.",
-    "waylandNoPortal": "Push-to-talk is niet beschikbaar: je desktop staat geen globale sneltoetsen voor apps toe. Spraakactivering werkt zonder toets.",
-    "registrationFailed": "Push-to-talk kon op dit systeem niet worden ingesteld. Gebruik in plaats daarvan spraakactivering.",
-    "key": "Push-to-talk-toets",
-    "noKey": "Geen toets gekozen",
-    "currentKey": "Toets: {{key}}",
-    "chooseKey": "Toets kiezen",
-    "changeKey": "Toets wijzigen",
-    "pressKey": "Druk op een toets… (Escape om te annuleren)",
-    "confirmDialog": "Bevestig de sneltoets in het systeemvenster of wijs hem toe in het venster Systeeminstellingen dat opent… (Escape om te annuleren)",
-    "keyInvalid": "Die toets kan niet worden gebruikt. Probeer een andere.",
-    "keyNotConfirmed": "De desktop heeft de sneltoets niet bevestigd. Probeer het opnieuw en accepteer het systeemvenster, of wijs de toets toe in de sneltoetsinstellingen van je desktop.",
+  "voice": {
+    "title": "Klinkt het goed?",
+    "subtitle": "Kies je apparaten en zeg iets. De balk moet bewegen terwijl je praat.",
+    "talkLegend": "Hoe wil je praten?",
+    "tipLabel": "Over {{mode}}",
+    "voiceActivationHint": "Praat vrijuit. Mumcord verstuurt audio zodra je spreekt.",
+    "pushToTalkHint": "Houd een toets ingedrukt terwijl je spreekt. Het best op rumoerige plekken.",
     "keyRequired": "Kies een push-to-talk-toets of schakel over op spraakactivering.",
+    "notSure": "Niet zeker? Begin met spraakactivering. Je kunt altijd wisselen via de snelle instellingen."
+  },
+  "style": {
+    "title": "Hoeveel wil je delen?",
+    "subtitle": "Kies een beginpunt. Op het laatste scherm zie je alle keuzes opnieuw en kun je ze daar wijzigen.",
+    "legend": "Installatiestijl",
+    "everythingOn": {
+      "title": "Alles aan",
+      "subtitle": "Alle functies",
+      "p1": "Anderen zien wat je speelt en waar je naar luistert",
+      "p2": "Je IP-adres is zichtbaar voor mensen met wie je rechtstreeks verbindt",
+      "p3": "Iedereen kan je berichten sturen; links en afbeeldingen worden van internet geladen",
+      "p4": "Overlay, geschiedenissynchronisatie en afbeeldingen op volle grootte staan aan"
+    },
+    "balanced": {
+      "title": "Gebalanceerd",
+      "subtitle": "Tussen privacy en gemak",
+      "p1": "Alleen vrienden en mensen in je kanaal kunnen je berichten sturen",
+      "p2": "Directe verbinding, met een relay als reserve",
+      "p3": "Linkvoorbeelden en afbeeldingen op volle grootte staan aan",
+      "p4": "Wat je speelt en waar je naar luistert blijft privé"
+    },
+    "maximumPrivacy": {
+      "title": "Maximale privacy",
+      "subtitle": "Zo min mogelijk delen",
+      "p1": "Alleen vrienden kunnen je berichten sturen, zonder uitzonderingen",
+      "p2": "Je IP-adres is verborgen; alles loopt via de relay",
+      "p3": "Geen externe inhoud, geen geschiedenissynchronisatie, niets delen",
+      "p4": "Updates melden alleen iets; er wordt niets gedeeld over wat je doet"
+    },
+    "custom": {
+      "title": "Aangepast",
+      "subtitle": "Elke keuze doorlopen",
+      "p1": "Loop zelf door elke stap",
+      "p2": "Zie wat elke instelling doet en wie het ziet",
+      "p3": "Het best als je precies weet wat je wilt"
+    },
+    "presetSelected": "{{preset}} gekozen: je slaat de gedetailleerde privacystappen over. Kies Aangepast om ze stuk voor stuk door te lopen.",
+    "customSelected": "Aangepast gekozen: de volgende stappen lopen elke keuze door."
+  },
+  "pm": {
+    "title": "Wie kan je berichten sturen?",
+    "subtitle": "Privéberichten zijn één-op-één-gesprekken. Kanaalchat wordt door deze keuze niet beïnvloed.",
+    "local": "Het filteren gebeurt op je computer. Afzenders krijgen hier geen melding van. Later kun je per server een andere regel instellen."
+  },
+  "connections": {
+    "title": "Verbindingen en inhoud",
+    "subtitle": "Sommige functies verbinden je rechtstreeks met andere Mumcord-gebruikers en sommige chatinhoud wordt van andere websites geladen. Kies wat voor jou prima is.",
+    "chatContent": "Chatinhoud",
+    "sharing": "Delen met Mumcord-gebruikers"
+  },
+  "features": {
+    "title": "Maak het van jou",
+    "subtitle": "Zet de extra's aan die je wilt. Bij elk staat wie wat kan zien.",
+    "seenByMumcordUsers": "Zichtbaar voor Mumcord-gebruikers op dezelfde server.",
+    "onlyYou": "Alleen jij ziet dit.",
+    "ingameOverlayAlt": "Voorbeeld van de overlay in games die laat zien wie er praat"
+  },
+  "appearance": {
+    "title": "Kies je stijl",
+    "subtitle": "Het venster past zich aan terwijl je kiest. In de instellingen vind je meer thema's en kun je er zelf een maken."
+  },
+  "startup": {
+    "title": "Opstarten en updates",
+    "subtitle": "Hoe Mumcord start en wat het met nieuwe versies doet.",
     "linkHandler": "mumble://-links openen met Mumcord",
-    "linkHandlerHint": "Als je op een serverlink op een website klikt, wordt die dan hier geopend.",
+    "linkHandlerHint": "Als je op een serverlink op een website klikt, wordt die hier geopend.",
     "linkHandlerActive": "Mumcord opent al mumble://-links.",
     "linkHandlerFailed": "Mumcord kon niet worden ingesteld om mumble://-links te openen. Je kunt het later opnieuw proberen in de instellingen.",
-    "mouseDisabled": "Push-to-talk is niet beschikbaar met deze muisknop totdat “Muisknoppen toestaan” is ingeschakeld in Instellingen → Spraak.",
-    "mouseNeedsInputGroup": "Push-to-talk is niet beschikbaar: Mumcord mag je muis misschien niet lezen. In Instellingen → Spraak staat hoe je dat toestaat.",
-    "mouseNeedsAccessibility": "Push-to-talk is niet beschikbaar: Mumcord heeft de toegankelijkheidsmachtiging nodig om muisknoppen te zien.",
-    "pressKeyOrMouse": "Druk op een toets of muisknop (midden of zij)… (Escape om te annuleren)",
-    "mouse": {
-      "middle": "Middelste muisknop",
-      "back": "Muisknop 4 (terug)",
-      "forward": "Muisknop 5 (vooruit)"
+    "autostartFailed": "Mumcord kon niet worden ingesteld om bij het inloggen te starten. Je kunt het later opnieuw proberen in de instellingen."
+  },
+  "summary": {
+    "title": "Alles klaar",
+    "titleNamed": "Alles klaar, {{name}}",
+    "subtitle": "Dit heb je gekozen. Gebruik Wijzigen op een kaart om iets aan te passen voordat je begint.",
+    "on": "aan",
+    "off": "uit",
+    "unavailable": "hier niet beschikbaar",
+    "editShort": "Wijzigen",
+    "edit": "{{card}} wijzigen",
+    "cards": {
+      "identity": "Identiteit",
+      "voice": "Spraak",
+      "privateMessages": "Privéberichten",
+      "connections": "Verbindingen",
+      "chatContent": "Chatinhoud",
+      "features": "Functies",
+      "appearance": "Uiterlijk",
+      "startup": "Opstarten",
+      "updates": "Updates"
     },
-    "mouseStillWorks": "Je kunt nog steeds een muisknop gebruiken.",
-    "mouseOptIn": "Wil je een zijknop van de muis gebruiken? Schakel na de installatie “Muisknoppen toestaan” in via Instellingen → Spraak.",
-    "autostart": "Mumcord starten wanneer ik inlog",
-    "autostartHint": "Je kunt dit later wijzigen in Instellingen → Weergave.",
-    "autostartFailed": "Mumcord kon niet worden ingesteld om te starten bij het inloggen. Je kunt het later opnieuw proberen in de instellingen.",
-    "linkPreviews": "Linkvoorbeelden en insluitingen tonen",
-    "linkPreviewsHint": "Mumcord laadt gelinkte pagina's om voorbeelden en videospelers te tonen; die sites zien je IP-adres.",
-    "historySharing": "Mijn kanaalgeschiedenis delen",
-    "historySharingHint": "Andere Mumcord-gebruikers die na jou een kanaal betreden, kunnen de eerdere berichten zien uit je opgeslagen geschiedenis (tot 7 dagen). Privéchats worden nooit gedeeld. Je kunt dit later wijzigen in Instellingen → Chat en geschiedenis.",
-    "ingameOverlay": "De overlay in games tonen",
-    "ingameOverlayHint": "Toont wie er praat bovenop je game (Linux). Je kunt dit later per game in- of uitschakelen in de instellingen.",
-    "ingameOverlayWarning": "Sommige games met anticheat kunnen overlays in de game markeren of blokkeren. Mumcord laat bekende risicogames (zoals Valorant of League of Legends) standaard uit. Schakel hem alleen in voor games die je vertrouwt.",
-    "ingameOverlayAlt": "Voorbeeld van de overlay in de game die toont wie er praat"
+    "identityDetail": "Opgeslagen in de sleutelhanger van je systeem",
+    "voiceDetail": "Ruisonderdrukking: {{noise}}",
+    "pmDetail": "Mijn kanaal {{channel}} · geaccepteerde chats {{accepted}} · verzoeken {{requests}}",
+    "contentTitle": "Linkvoorbeelden {{previews}}",
+    "contentDetail": "Afbeeldingen op volle grootte {{images}} · geschiedenissynchronisatie {{sync}}",
+    "featuresTitle": "Overlay in games {{overlay}}",
+    "featuresDetail": "Systeem-Niet-storen volgen {{dnd}} · nu aan het afspelen {{playing}} · nu aan het gamen {{gaming}}",
+    "effectsDetail": "Visuele effecten {{effects}}",
+    "startupTitle": "Starten bij inloggen {{login}}",
+    "startupDetail": "Geminimaliseerd starten {{minimized}} · mumble://-links {{links}}",
+    "updates": {
+      "auto": "Automatisch downloaden",
+      "notify": "Alleen melden",
+      "off": "Uit"
+    },
+    "updatesDetail": "Updates worden altijd gecontroleerd en geverifieerd voordat ze worden geïnstalleerd.",
+    "backup": "Je identiteit {{name}} is opgeslagen in de sleutelhanger van je systeem. Maak er een back-up van via Instellingen → Identiteit, zodat je je geregistreerde naam nooit kwijtraakt.",
+    "nextServer": "Volgende stap: voeg je eerste server toe",
+    "rerunNote": "Alleen de waarden die je hebt gewijzigd, worden opgeslagen."
   },
   "rerun": {
     "title": "Installatiewizard",
     "note": "Je doorloopt de installatie opnieuw. Je identiteit wordt niet gewijzigd.",
     "manageIdentities": "Identiteiten beheren",
-    "stepsLabel": "Stappen van de installatie",
-    "stepsSkipped": "(overgeslagen, de identiteit hoort er niet bij)",
-    "steps": {
-      "identity": "Identiteit",
-      "mic": "Microfoon",
-      "privacy": "Privacy",
-      "updates": "Updates",
-      "talk": "Spraakmodus"
-    },
-    "footer": "Annuleren laat alles zoals het is. Alleen gewijzigde stappen worden aan het eind opgeslagen.",
     "discardTitle": "Wijzigingen weggooien?",
     "discardBody": "Er wordt niets opgeslagen voordat je klaar bent. Als je nu annuleert, blijft alles zoals het is.",
     "discardKeep": "Verder bewerken",

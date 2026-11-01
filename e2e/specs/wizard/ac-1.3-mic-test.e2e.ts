@@ -4,18 +4,19 @@ import { $, browser, expect } from "@wdio/globals";
 import { app } from "../../helpers/index.ts";
 import {
   button,
+  createIdentity,
   dumpAppLogs,
   ensureArtifacts,
-  labelled,
   longSpeechWav,
+  passWelcome,
   readWavPcm,
   waitForText,
+  waitForWizardStep,
   windowDb,
   wizardArtifacts,
-  wizardStep,
 } from "../../helpers/wizard-util.ts";
 
-// AC-1.3: Wizard step 2 → speak → level meter moves; "Test" plays back the own voice.
+// AC-1.3: Wizard voice step (#159) → speak → level meter moves; "Test" plays back the own voice.
 // The file audio backend feeds speech as microphone input and records the speakers to a WAV.
 describe("AC-1.3 wizard microphone step", () => {
   const inWav = join(wizardArtifacts, "ac13-in.wav");
@@ -27,27 +28,26 @@ describe("AC-1.3 wizard microphone step", () => {
 
   before(async () => {
     ensureArtifacts();
-    longSpeechWav(inWav, 20); // 2 minutes of speech, so the mic still talks when we reach step 2
+    longSpeechWav(inWav, 20); // 2 minutes of speech, so the mic still talks when we reach the voice step
     if (existsSync(outWav)) unlinkSync(outWav);
     await app.restart({ audio: `file:${inWav}:${outWav}` });
   });
 
   it("level meter moves with speech and Test plays the recording back", async () => {
-    await waitForText(wizardStep(1), 30_000);
-    await (await labelled("Name")).setValue("Tester");
-    await button("Next").click();
-    await waitForText(wizardStep(2), 120_000);
+    await passWelcome();
+    await createIdentity("Tester");
+    await waitForWizardStep("voice", 120_000);
 
     const meter = $('[role="meter"][aria-label="Microphone level"]');
     await meter.waitForExist();
     expect(Number(await meter.getAttribute("aria-valuenow"))).toBe(0);
 
     // Speaker output written so far (bytes after the 44-byte header); playback must come after.
-    // The audio devices open only when Test is pressed, so the file may not exist yet.
+    // The audio devices open only when "Hear yourself" is pressed, so the file may not exist yet.
     await browser.pause(1500);
     const before = existsSync(outWav) ? Math.max(0, (statSync(outWav).size - 44) / 2) : 0;
 
-    await button("Test").click();
+    await button("Hear yourself").click();
     await waitForText("Speak now…", 5_000);
     const levels: number[] = [];
     const t0 = Date.now();

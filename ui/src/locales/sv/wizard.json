@@ -1,25 +1,77 @@
 {
   "progress": "Steg {{current}} av {{total}}",
   "loadFailed": "Konfigurationen kunde inte läsas in.",
-  "finish": "Slutför",
+  "recommended": "Rekommenderad",
+  "tipLabel": "Om {{name}}",
   "errors": {
     "generic": "Något gick fel. Försök igen.",
     "secureStorageUnavailable": "Mumcord når inte systemets säkra lagring. Lås upp nyckelringen eller lösenordshanteraren och försök igen.",
     "saveFailed": "Dina inställningar kunde inte sparas. Försök igen."
   },
+  "nav": {
+    "getStarted": "Nu kör vi",
+    "finishSetup": "Slutför installationen",
+    "startMumcord": "Starta Mumcord",
+    "finish": "Slutför",
+    "skip": "Hoppa över nu",
+    "enterKey": "Enter",
+    "enterHint": "för att fortsätta"
+  },
+  "rail": {
+    "label": "Installationssteg",
+    "appName": "Mumcord",
+    "setup": "Installation",
+    "custom": "Anpassad",
+    "done": "(klart)",
+    "progress": "Installationens förlopp",
+    "later": "Allt här kan ändras senare i Inställningar."
+  },
+  "steps": {
+    "welcome": "Välkommen",
+    "import": "Importera från Mumble",
+    "identity": "Identitet",
+    "voice": "Röst",
+    "setupStyle": "Installationsstil",
+    "privateMessages": "Privata meddelanden",
+    "connections": "Anslutningar",
+    "features": "Funktioner",
+    "appearance": "Utseende",
+    "startup": "Start och uppdateringar",
+    "summary": "Allt är klart"
+  },
+  "welcome": {
+    "title": "Röstchatt som känns som",
+    "titleAccent": "din egen plats.",
+    "subtitle": "Mumcord talar Mumble, så det fungerar med alla Mumble-servrar, och lägger till en modern chatt ovanpå. Låt oss ställa in det som du vill ha det. Det tar ungefär två minuter.",
+    "voice": {
+      "title": "Kristallklar röst",
+      "text": "Ljud med låg fördröjning och inbyggd brusreducering."
+    },
+    "servers": {
+      "title": "Fungerar med alla Mumble-servrar",
+      "text": "Inget konto, ingen registrering. Gå med i de servrar du redan använder."
+    },
+    "private": {
+      "title": "Privat från grunden",
+      "text": "Ingen telemetri. Det Mumcord lagrar stannar på din dator."
+    }
+  },
   "identity": {
-    "title": "Din identitet",
-    "intro": "Servrar känner igen dig på din identitet. Skapa en ny eller ta med den du redan använder.",
-    "create": "Skapa ny",
-    "import": "Importera fil",
-    "name": "Namn",
-    "nameHint": "Andra ser det här namnet. Du kan ändra det per server senare.",
+    "title": "Vem är du på Mumble?",
+    "intro": "Din identitet är hur servrar känner igen dig. Skapa en ny eller ta med den du redan använder.",
+    "legend": "Din identitet",
+    "create": "Skapa en ny identitet",
+    "createText": "Din identitet är ett certifikat som bevisar vem du är på Mumble-servrar. Det behåller ditt registrerade namn och dina behörigheter, så du är samma person varje gång du går med.",
+    "import": "Importera en befintlig identitet",
+    "name": "Standardvisningsnamn",
+    "nameHint": "Används på servrar som inte känner dig än. Du kan ändra det per server.",
     "chooseFile": "Välj fil…",
     "noFile": "Ingen fil vald",
     "chosenFile": "Vald fil: {{file}}",
-    "password": "Filens lösenord (om det finns)",
+    "password": "Filens lösenord",
+    "passwordHint": "Lösenordet stannar på den här datorn och skickas aldrig någonstans.",
     "existing": "Använder identiteten {{name}}.",
-    "backup": "Din identitet är som en nyckel. Gör en säkerhetskopia senare under Inställningar → Identitet.",
+    "backup": "Säkerhetskopiera senare i Inställningar. Med en säkerhetskopia kan du återställa din identitet på en ny dator.",
     "nameRequired": "Ange ett namn.",
     "fileRequired": "Välj en identitetsfil (.p12 eller .pfx).",
     "fileType": "Identitetsfil",
@@ -29,101 +81,142 @@
     "pickFailed": "Filväljaren kunde inte öppnas."
   },
   "mic": {
-    "title": "Mikrofon",
-    "intro": "Välj mikrofon och högtalare. Standardvalen fungerar oftast.",
     "input": "Mikrofon",
     "output": "Högtalare eller hörlurar",
     "systemDefault": "Systemstandard",
     "defaultVia": "Systemstandard ({{backend}})",
     "level": "Mikrofonnivå",
-    "test": "Testa",
-    "stop": "Stoppa",
     "idle": "Tryck på Testa, säg något, så hör du dig själv.",
     "recording": "Prata nu…",
     "playing": "Spelar upp din röst…",
     "devicesFailed": "Dina ljudenheter kunde inte listas. Du kan fortsätta och välja dem senare under Inställningar.",
-    "testFailed": "Testet kunde inte starta. Kontrollera att mikrofonen är ansluten."
+    "testFailed": "Testet kunde inte starta. Kontrollera att mikrofonen är ansluten.",
+    "test": "Hör dig själv",
+    "stop": "Stoppa"
   },
-  "privacy": {
-    "title": "Din integritet",
-    "noTelemetry": "Mumcord skickar ingen telemetri, analysdata eller kraschrapporter.",
-    "ownServers": "Den ansluter bara till de servrar du lägger till.",
-    "linkPreviews": "Länkförhandsvisningar och bilder eller GIF:ar från länkar i chatten hämtas från de länkade webbplatserna. Du kan stänga av det i nästa steg eller senare i Inställningar.",
-    "mumcordUsers": "Funktioner enbart för Mumcord utbyter bara data med andra Mumcord-användare på samma server.",
-    "local": "Allt som Mumcord sparar stannar på din dator.",
-    "statement": "Fullständigt integritetsmeddelande"
-  },
-  "updates": {
-    "title": "Nya versioner",
-    "choice": "När en ny version finns",
-    "auto": "Ladda ned automatiskt",
-    "autoHint": "Mumcord laddar ned och verifierar uppdateringen i bakgrunden och frågar dig innan det startar om.",
-    "notify": "Endast avisera",
-    "notifyHint": "Mumcord berättar om en ny version och visar vad som har ändrats. Inget laddas ned förrän du säger till.",
-    "off": "Av",
-    "offHint": "Mumcord frågar aldrig GitHub efter nya versioner. Du uppdaterar själv.",
-    "privacy": "Vid kontrollen skickas bara själva förfrågan samt appens namn och version till GitHub. Du kan ändra detta senare i Inställningar."
-  },
-  "talk": {
-    "title": "Hur vill du prata?",
-    "mode": "Pratläge",
-    "voiceActivation": "Röstaktivering",
-    "voiceActivationHint": "Mikrofonen slås på när du pratar.",
-    "pushToTalk": "Push-to-talk",
-    "pushToTalkHint": "Håll ner en tangent medan du pratar.",
-    "waylandNoPortal": "Push-to-talk är inte tillgängligt: ditt skrivbord låter inte appar använda globala kortkommandon. Röstaktivering fungerar utan tangent.",
-    "registrationFailed": "Push-to-talk kunde inte ställas in på det här systemet. Använd röstaktivering i stället.",
-    "key": "Push-to-talk-tangent",
-    "noKey": "Ingen tangent vald",
-    "currentKey": "Tangent: {{key}}",
-    "chooseKey": "Välj tangent",
-    "changeKey": "Byt tangent",
-    "pressKey": "Tryck på en tangent… (Escape för att avbryta)",
-    "confirmDialog": "Bekräfta kortkommandot i systemdialogen eller tilldela det i fönstret Systeminställningar som öppnas… (Escape för att avbryta)",
-    "keyInvalid": "Den tangenten kan inte användas. Prova en annan.",
-    "keyNotConfirmed": "Skrivbordet bekräftade inte kortkommandot. Försök igen och godkänn systemdialogen, eller tilldela tangenten i skrivbordets kortkommandoinställningar.",
+  "voice": {
+    "title": "Låter det bra?",
+    "subtitle": "Välj dina enheter och säg något. Stapeln ska röra sig medan du pratar.",
+    "talkLegend": "Hur vill du prata?",
+    "tipLabel": "Om {{mode}}",
+    "voiceActivationHint": "Prata fritt. Mumcord skickar ljud när du talar.",
+    "pushToTalkHint": "Håll ned en tangent medan du talar. Bäst på bullriga platser.",
     "keyRequired": "Välj en push-to-talk-tangent eller byt till röstaktivering.",
-    "linkHandler": "Öppna mumble://-länkar med Mumcord",
-    "linkHandlerHint": "När du klickar på en serverlänk på en webbplats öppnas den då här.",
-    "linkHandlerActive": "Mumcord öppnar redan mumble://-länkar.",
-    "linkHandlerFailed": "Mumcord kunde inte ställas in för att öppna mumble://-länkar. Du kan försöka igen under Inställningar.",
-    "mouseDisabled": "Push-to-talk är inte tillgängligt med den här musknappen förrän ”Tillåt musknappar” är påslaget under Inställningar → Röst.",
-    "mouseNeedsInputGroup": "Push-to-talk är inte tillgängligt: Mumcord får kanske inte läsa din mus. Inställningar → Röst förklarar hur du tillåter det.",
-    "mouseNeedsAccessibility": "Push-to-talk är inte tillgängligt: Mumcord behöver behörigheten Hjälpmedel för att se musknappar.",
-    "pressKeyOrMouse": "Tryck på en tangent eller en musknapp (mitten eller sida)… (Escape för att avbryta)",
-    "mouse": {
-      "middle": "Mittersta musknappen",
-      "back": "Musknapp 4 (bakåt)",
-      "forward": "Musknapp 5 (framåt)"
+    "notSure": "Osäker? Börja med röstaktivering. Du kan byta när som helst i snabbinställningarna."
+  },
+  "style": {
+    "title": "Hur mycket vill du dela?",
+    "subtitle": "Välj en utgångspunkt. Du ser alla val igen på sista skärmen och kan ändra dem där.",
+    "legend": "Installationsstil",
+    "everythingOn": {
+      "title": "Allt på",
+      "subtitle": "Alla funktioner",
+      "p1": "Andra ser vad du spelar och lyssnar på",
+      "p2": "Din IP-adress syns för personer du ansluter direkt till",
+      "p3": "Vem som helst kan skicka meddelanden till dig; länkar och bilder läses in från webben",
+      "p4": "Överlägg, historiksynkronisering och bilder i full storlek är på"
     },
-    "mouseStillWorks": "Du kan fortfarande använda en musknapp.",
-    "mouseOptIn": "Vill du använda en sidoknapp på musen? Slå på ”Tillåt musknappar” under Inställningar → Röst efter konfigurationen.",
-    "autostart": "Starta Mumcord när jag loggar in",
-    "autostartHint": "Du kan ändra det här senare under Inställningar → Utseende.",
-    "autostartFailed": "Mumcord kunde inte ställas in för att starta när du loggar in. Du kan försöka igen under Inställningar.",
-    "linkPreviews": "Visa länkförhandsvisningar och inbäddningar",
-    "linkPreviewsHint": "Mumcord läser in länkade sidor för att visa förhandsvisningar och videospelare. Dessa webbplatser ser din IP-adress.",
-    "historySharing": "Dela min kanalhistorik",
-    "historySharingHint": "Andra Mumcord-användare som går med i en kanal efter dig kan se dess tidigare meddelanden från din sparade historik (upp till 7 dagar). Privata chattar delas aldrig. Du kan ändra det här senare under Inställningar → Chatt och historik.",
-    "ingameOverlay": "Visa overlayen i spel",
-    "ingameOverlayHint": "Ritar vem som pratar ovanpå ditt spel (Linux). Du kan slå på eller av det per spel senare under Inställningar.",
-    "ingameOverlayWarning": "Vissa spel med anti-cheat kan flagga eller blockera overlayer i spel. Mumcord håller kända riskspel (som Valorant eller League of Legends) avstängda som standard. Slå bara på det för spel du litar på.",
-    "ingameOverlayAlt": "Exempel på overlayen i spel som visar vem som pratar"
+    "balanced": {
+      "title": "Balanserad",
+      "subtitle": "Mellan integritet och bekvämlighet",
+      "p1": "Bara vänner och personer i din kanal kan skicka meddelanden till dig",
+      "p2": "Direktanslutning, med ett relä som reserv",
+      "p3": "Länkförhandsvisningar och bilder i full storlek är på",
+      "p4": "Det du spelar och lyssnar på förblir privat"
+    },
+    "maximumPrivacy": {
+      "title": "Maximal integritet",
+      "subtitle": "Dela så lite som möjligt",
+      "p1": "Bara vänner kan skicka meddelanden till dig, inga undantag",
+      "p2": "Din IP-adress är dold; allt går via reläet",
+      "p3": "Inget externt innehåll, ingen historiksynkronisering, ingen delning",
+      "p4": "Uppdateringar meddelar bara dig; ingenting delas om vad du gör"
+    },
+    "custom": {
+      "title": "Anpassad",
+      "subtitle": "Gå igenom varje val",
+      "p1": "Gå igenom varje steg själv",
+      "p2": "Se vad varje inställning gör och vem som ser den",
+      "p3": "Bäst om du vet vad du vill ha"
+    },
+    "presetSelected": "{{preset}} vald: du hoppar över de detaljerade integritetsstegen. Välj Anpassad för att gå igenom dem ett och ett.",
+    "customSelected": "Anpassad vald: nästa steg går igenom varje val."
+  },
+  "pm": {
+    "title": "Vem kan skicka meddelanden till dig?",
+    "subtitle": "Privata meddelanden är samtal mellan två personer. Kanalchatten påverkas inte av det här valet.",
+    "local": "Filtreringen sker på din dator. Avsändare får inget besked. Du kan ställa in en annan regel per server senare."
+  },
+  "connections": {
+    "title": "Anslutningar och innehåll",
+    "subtitle": "Vissa funktioner ansluter dig direkt till andra Mumcord-användare, och en del chattinnehåll läses in från andra webbplatser. Välj vad som passar dig.",
+    "chatContent": "Chattinnehåll",
+    "sharing": "Delning med Mumcord-användare"
+  },
+  "features": {
+    "title": "Gör det till ditt",
+    "subtitle": "Slå på de extrafunktioner du vill ha. Varje funktion säger vem som ser vad.",
+    "seenByMumcordUsers": "Syns för Mumcord-användare på samma server.",
+    "onlyYou": "Bara du ser det.",
+    "ingameOverlayAlt": "Exempel på överlägget i spel som visar vem som pratar"
+  },
+  "appearance": {
+    "title": "Välj ditt utseende",
+    "subtitle": "Fönstret uppdateras medan du väljer. Fler teman, och dina egna, finns i Inställningar."
+  },
+  "startup": {
+    "title": "Start och uppdateringar",
+    "subtitle": "Hur Mumcord startar och vad det gör med nya versioner.",
+    "linkHandler": "Öppna mumble://-länkar med Mumcord",
+    "linkHandlerHint": "När du klickar på en serverlänk på en webbplats öppnas den sedan här.",
+    "linkHandlerActive": "Mumcord öppnar redan mumble://-länkar.",
+    "linkHandlerFailed": "Mumcord kunde inte ställas in för att öppna mumble://-länkar. Du kan försöka igen i Inställningar.",
+    "autostartFailed": "Mumcord kunde inte ställas in för att starta när du loggar in. Du kan försöka igen i Inställningar."
+  },
+  "summary": {
+    "title": "Allt är klart",
+    "titleNamed": "Allt är klart, {{name}}",
+    "subtitle": "Det här har du valt. Använd Redigera på ett kort för att ändra något innan du börjar.",
+    "on": "på",
+    "off": "av",
+    "unavailable": "inte tillgängligt här",
+    "editShort": "Redigera",
+    "edit": "Redigera {{card}}",
+    "cards": {
+      "identity": "Identitet",
+      "voice": "Röst",
+      "privateMessages": "Privata meddelanden",
+      "connections": "Anslutningar",
+      "chatContent": "Chattinnehåll",
+      "features": "Funktioner",
+      "appearance": "Utseende",
+      "startup": "Start",
+      "updates": "Uppdateringar"
+    },
+    "identityDetail": "Sparad i systemets nyckelring",
+    "voiceDetail": "Brusreducering: {{noise}}",
+    "pmDetail": "Min kanal {{channel}} · accepterade chattar {{accepted}} · förfrågningar {{requests}}",
+    "contentTitle": "Länkförhandsvisningar {{previews}}",
+    "contentDetail": "Bilder i full storlek {{images}} · historiksynkronisering {{sync}}",
+    "featuresTitle": "Överlägg i spel {{overlay}}",
+    "featuresDetail": "Följ systemets Stör ej {{dnd}} · spelas nu {{playing}} · spelar nu {{gaming}}",
+    "effectsDetail": "Visuella effekter {{effects}}",
+    "startupTitle": "Starta vid inloggning {{login}}",
+    "startupDetail": "Starta minimerad {{minimized}} · mumble://-länkar {{links}}",
+    "updates": {
+      "auto": "Ladda ned automatiskt",
+      "notify": "Endast avisera",
+      "off": "Av"
+    },
+    "updatesDetail": "Uppdateringar kontrolleras och verifieras alltid innan de installeras.",
+    "backup": "Din identitet {{name}} är sparad i systemets nyckelring. Säkerhetskopiera den via Inställningar → Identitet, så att du aldrig förlorar ditt registrerade namn.",
+    "nextServer": "Nästa: lägg till din första server",
+    "rerunNote": "Bara de värden du har ändrat sparas."
   },
   "rerun": {
     "title": "Installationsguiden",
     "note": "Du går igenom installationen igen. Din identitet ändras inte.",
     "manageIdentities": "Hantera identiteter",
-    "stepsLabel": "Installationens steg",
-    "stepsSkipped": "(överhoppat, identiteten är inte en del av det)",
-    "steps": {
-      "identity": "Identitet",
-      "mic": "Mikrofon",
-      "privacy": "Integritet",
-      "updates": "Uppdateringar",
-      "talk": "Talläge"
-    },
-    "footer": "Avbryt lämnar allt som det är. Bara de steg du ändrade sparas i slutet.",
     "discardTitle": "Kasta ändringarna?",
     "discardBody": "Inget sparas innan du är klar. Avbryter du nu förblir allt som det är.",
     "discardKeep": "Fortsätt redigera",

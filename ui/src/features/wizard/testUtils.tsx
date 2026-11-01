@@ -6,6 +6,7 @@ import { PreferencesContext, type Preferences } from "../../app/preferences";
 import { ViewContext, type View } from "../../app/view";
 import { applyLanguage } from "../../i18n";
 import { applyThemeToDocument } from "../../theme/theme";
+import { StepNavContext, type StepNav } from "./stepNav";
 
 export interface Harness {
   api: MockApi;
@@ -32,7 +33,17 @@ export async function setupWizardTest(
   };
 }
 
-export function renderInWizard(harness: Harness, ui: ReactNode) {
+/** A step's place in the flow when a step is rendered on its own: step 2 of 5, with Back. */
+export const TEST_NAV: StepNav = {
+  number: 2,
+  total: 5,
+  name: "Test",
+  focusOnMount: false,
+  primary: "next",
+  onBack: () => undefined,
+};
+
+export function renderInWizard(harness: Harness, ui: ReactNode, nav: StepNav = TEST_NAV) {
   const view: View = {
     screen: "wizard",
     overlay: null,
@@ -66,7 +77,7 @@ export function renderInWizard(harness: Harness, ui: ReactNode) {
       <PreferencesContext.Provider value={preferences}>
         <main aria-label="Mumcord">
           <h1>Welcome to Mumcord</h1>
-          {ui}
+          <StepNavContext.Provider value={nav}>{ui}</StepNavContext.Provider>
         </main>
       </PreferencesContext.Provider>
     </ViewContext.Provider>,

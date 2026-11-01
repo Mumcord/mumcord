@@ -333,6 +333,7 @@ const DEFAULT_SETTINGS: Settings = {
   windowOverlayNoticeShown: false,
   whatsNewAuto: true,
   whatsNewSeen: null,
+  setupPreset: null,
   privateMessages: {
     rule: "everyone",
     serverRules: [],
@@ -2772,6 +2773,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // settings
     settingsGet: () => Promise.resolve({ ...settings }),
+    settingsDefault: () => Promise.resolve({ ...DEFAULT_SETTINGS }),
     settingsUpdate: (next) => {
       const positionalSwitched = next.positional.enabled !== settings.positional.enabled;
       settings = { ...next };

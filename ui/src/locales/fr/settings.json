@@ -1,25 +1,49 @@
 {
-  "sectionList": "Sections des paramètres",
+  "sectionList": "Groupes de paramètres",
   "loading": "Chargement des paramètres…",
   "loadFailed": "Vos paramètres n’ont pas pu être chargés. Fermez les paramètres et réessayez.",
   "saveFailed": "La dernière modification n’a pas pu être enregistrée. Veuillez réessayer.",
   "sections": {
-    "identity": "Identité",
-    "audio": "Audio",
-    "voice": "Voix",
-    "chatHistory": "Discussion et historique",
+    "general": "Général",
+    "account": "Compte et identité",
+    "voiceAudio": "Voix et audio",
+    "chatNotifications": "Chat et notifications",
+    "privacy": "Confidentialité et connexions",
     "appearance": "Apparence",
-    "accessibility": "Accessibilité",
-    "language": "Langue",
-    "sounds": "Sons et notifications",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostic",
-    "about": "À propos",
     "servers": "Serveurs",
-    "privacy": "Confidentialité",
-    "updates": "Mises à jour",
+    "gaming": "Jeux et overlay",
+    "advanced": "Avancé et développeur",
+    "about": "À propos",
     "packetInspector": "Inspecteur de paquets",
     "hotkeys": "Raccourcis"
+  },
+  "sectionDescriptions": {
+    "general": "Démarrage, langue, mises à jour et accessibilité.",
+    "account": "Vos identités, votre profil et ce que vous partagez.",
+    "voiceAudio": "Microphone, haut-parleurs, votre façon de parler et votre rendu sonore.",
+    "chatNotifications": "Notifications, messages privés, personnes bloquées et historique des messages.",
+    "privacy": "Comment vous vous connectez aux autres et ce que Mumcord charge depuis l'extérieur.",
+    "appearance": "Thème, disposition et liste des salons.",
+    "servers": "Connexions à plusieurs serveurs et paramètres par serveur.",
+    "gaming": "L'overlay en jeu, l'audio positionnel et les plugins de jeu.",
+    "advanced": "Outils de développement, diagnostics, stockage et licences.",
+    "about": "Version, assistance et assistant de configuration."
+  },
+  "breadcrumb": "Paramètres / {{section}}",
+  "moreInfo": "Plus d'informations : {{topic}}",
+  "searchTerms": {
+    "devices": "entrée sortie casque haut-parleur carte son",
+    "talkMode": "PTT VAD activité vocale raccourci push-to-talk",
+    "noiseSuppression": "bruit de fond réduction de bruit",
+    "p2p": "P2P relais connexions directes masquer mon adresse IP",
+    "theme": "mode sombre mode clair couleurs",
+    "startup": "démarrage automatique session zone de notification",
+    "language": "traduction langue locale",
+    "updates": "nouvelle version mise à niveau",
+    "storage": "espace disque vider le cache",
+    "blocked": "ignorer bloquer muet personnes",
+    "notifications": "alertes fenêtres contextuelles",
+    "externalContent": "intégrations images aperçus"
   },
   "search": {
     "label": "Rechercher dans les paramètres",
@@ -27,7 +51,11 @@
     "empty": "Aucun paramètre ne correspond à « {{query}} ».",
     "count_one": "{{count}} paramètre trouvé",
     "count_many": "{{count}} paramètres trouvés",
-    "count_other": "{{count}} paramètres trouvés"
+    "count_other": "{{count}} paramètres trouvés",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} résultat",
+    "groupCount_many": "{{count}} résultats",
+    "groupCount_other": "{{count}} résultats"
   },
   "errors": {
     "secureStorage": "Le stockage sécurisé de votre système n’est pas disponible ou l’accès a été refusé.",
@@ -113,7 +141,6 @@
     "testStop": "Arrêter l’enregistrement",
     "testRecording": "Enregistrement… parlez maintenant.",
     "testPlaying": "Lecture de votre voix…",
-    "quality": "Qualité",
     "musicQuality": "Qualité musique",
     "musicQualityHint": "Utilise plus de bande passante et désactive la suppression de bruit et le volume automatique ; pour la musique. Le push-to-talk fonctionne le mieux.",
     "bitrate": "Débit",
@@ -127,7 +154,6 @@
     "duckingLevel": "Volume réduit",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Mode faible latence",
-    "lowLatencyBeta": "Bêta",
     "lowLatencyHint": "Pour jouer de la musique ensemble en temps réel",
     "lowLatencyWarningTitle": "Sacrifie la robustesse pour la vitesse",
     "lowLatencyBandwidth": "Utilise plus de bande passante (paquets de 10 ms).",
@@ -158,7 +184,7 @@
     "keyMissing": "Définissez une touche, sinon personne ne vous entendra.",
     "keyRejected": "Cette touche ne peut pas être utilisée. Essayez-en une autre, éventuellement avec Ctrl, Alt ou Maj.",
     "keyNotConfirmed": "Le bureau n’a pas confirmé le raccourci. Réessayez et acceptez la boîte de dialogue système, ou attribuez la touche dans les paramètres de raccourcis du bureau.",
-    "processing": "Traitement de la voix",
+    "processing": "Traitement et qualité",
     "noiseSuppression": "Suppression de bruit",
     "noiseSuppressionHint": "Filtre les bruits de fond comme les claviers et les ventilateurs.",
     "noiseChoice": {
@@ -263,12 +289,12 @@
     }
   },
   "history": {
+    "title": "Historique des messages",
     "explanation": "Les messages des discussions ne sont enregistrés que sur cet ordinateur.",
-    "perServer": "Serveurs",
+    "perServer": "Exceptions par serveur",
     "noServers": "Aucun serveur enregistré pour l’instant.",
     "save": "Enregistrer l’historique sur {{server}}",
     "clearServer": "Effacer l’historique de {{server}}…",
-    "all": "Tous les serveurs",
     "clearAll": "Effacer tout l’historique…",
     "confirmTitle": "Effacer l’historique ?",
     "confirmServer": "Tous les messages enregistrés de {{server}} seront supprimés de cet ordinateur. Les autres personnes conservent leurs copies. Leurs copies ne seront pas resynchronisées sur cet ordinateur. Cette action est irréversible.",
@@ -280,7 +306,6 @@
     "autoDeleteHint": "Les messages plus anciens sont supprimés automatiquement de cet ordinateur, sans confirmation. Cela n’affecte que l’historique enregistré ici, pas le serveur."
   },
   "fullImages": {
-    "title": "Images en taille réelle",
     "offer": "Proposer mes images en taille réelle",
     "offerHint": "Les autres utilisateurs de Mumcord peuvent ouvrir mes images en taille réelle. Désactivé : seul le petit aperçu est envoyé, aucun original n’est conservé ni partagé.",
     "load": "Charger les images en taille réelle des autres",
@@ -302,14 +327,15 @@
     "system": "Suivre le système",
     "dark": "Sombre",
     "light": "Clair",
-    "behaviour": "Comportement",
+    "behaviour": "Démarrage et fenêtre",
     "closeLegend": "Lorsque vous fermez la fenêtre en étant connecté",
     "closeAsk": "Demander à chaque fois",
     "closeTray": "Réduire dans la zone de notification",
     "closeQuit": "Quitter Mumcord",
     "autostart": "Lancer Mumcord à l’ouverture de session",
     "startMinimized": "Démarrer réduit",
-    "startMinimizedHint": "Quand Mumcord démarre à l’ouverture de session, il attend dans la zone de notification au lieu d’ouvrir la fenêtre."
+    "startMinimizedHint": "Quand Mumcord démarre à l’ouverture de session, il attend dans la zone de notification au lieu d’ouvrir la fenêtre.",
+    "look": "Aspect et disposition"
   },
   "themeEditor": {
     "name": "Nom du thème",
@@ -367,7 +393,7 @@
     "deleteConfirm": "Supprimer"
   },
   "accessibility": {
-    "hints": "Astuces",
+    "hints": "Accessibilité",
     "keyboardHints": "Afficher les astuces clavier",
     "keyboardHintsHint": "Courts conseils à l’écran comme « Flèches : se déplacer » sous la liste des canaux et dans les GIF favoris. Les lecteurs d’écran les lisent toujours quand c’est désactivé.",
     "announcements": "Annonces du lecteur d’écran",
@@ -376,11 +402,15 @@
     "skipLinksHint": "Liens au début de la fenêtre qui mènent directement à la discussion ou à la liste des canaux quand vous appuyez sur Tab."
   },
   "language": {
+    "title": "Langue",
     "legend": "Langue d’affichage",
-    "system": "Suivre le système"
+    "system": "Suivre le système",
+    "search": "Rechercher une langue",
+    "noMatch": "Aucune langue correspondante"
   },
   "sounds": {
-    "explanation": "Courts sons pour ces événements :",
+    "title": "Sons",
+    "explanation": "Courts sons joués pour ces événements.",
     "joinLeave": "Quelqu’un rejoint ou quitte votre canal",
     "voiceJoin": "Vous rejoignez un canal vocal",
     "selfMute": "Vous coupez ou réactivez votre micro",
@@ -457,7 +487,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Journalisation",
+    "title": "Diagnostics",
     "logLevel": "Niveau de détail du journal",
     "levels": {
       "error": "Erreurs uniquement",
@@ -492,7 +522,8 @@
     "setupWizardHint": "Refaites la configuration initiale pour revoir votre microphone, vos choix de confidentialité, la recherche de mises à jour et le mode de parole. Vos choix actuels sont préremplis.",
     "setupWizardRun": "Relancer l'assistant de configuration",
     "setupWizardIdentityNote": "Votre identité n'en fait pas partie. Votre certificat, et avec lui votre nom enregistré et vos permissions sur les serveurs, reste exactement tel qu'il est.",
-    "setupWizardIdentityLink": "Gérez-la dans Identité"
+    "setupWizardIdentityLink": "Gérez-la dans Identité",
+    "versionTitle": "Version et licence"
   },
   "profile": {
     "title": "Profil",
@@ -508,7 +539,6 @@
     "skipped": "Votre avatar par défaut n’a pas été envoyé : il est trop volumineux pour ce serveur."
   },
   "linkPreviews": {
-    "title": "Aperçus de liens",
     "switch": "Afficher les aperçus et intégrations de liens",
     "hint": "Mumcord charge les pages liées pour afficher des aperçus et des lecteurs vidéo ; ces sites voient votre adresse IP."
   },
@@ -529,7 +559,7 @@
     "cleared": "Cache vidé, {{size}} libérés."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Stockage",
     "hint": "Mumcord conserve des données temporaires sur cet ordinateur pour que tout se charge plus vite. Les supprimer est sans risque ; elles sont recréées au besoin.",
     "kind": {
       "previews": "Aperçus de liens et images",
@@ -570,7 +600,7 @@
     "betaHint": "Les résultats dépendent du jeu et de la prise en charge des plugins."
   },
   "gamePlugins": {
-    "title": "Audio positionnel : sources",
+    "title": "Plugins de jeu",
     "explanation": "Les jeux indiquent à Mumcord où vous vous trouvez via Mumble Link ou via les plugins de jeu officiels de Mumble. Mumcord trouve les plugins dans son propre dossier de plugins et dans une installation Mumble existante. N’activez que les plugins des jeux auxquels vous jouez.",
     "antiCheat": "Les plugins de jeu lisent la mémoire du jeu. Certains anti-triche peuvent le signaler ; désactivez les plugins pour les jeux dotés d’un anti-triche strict.",
     "loading": "Recherche des plugins de jeu…",
@@ -593,7 +623,6 @@
     "limitInvalid": "Saisissez un nombre entier de 1 à 15."
   },
   "appearanceEffects": {
-    "title": "Effets",
     "visualEffects": "Effets visuels (verre, grain)",
     "visualEffectsHint": "Menus en verre dépoli et léger grain de film. Désactivés automatiquement quand votre système demande moins de transparence ou d’animations."
   },
@@ -607,7 +636,6 @@
   "p2p": {
     "title": "Pair à pair (partage d’écran, images en taille réelle)",
     "modeLabel": "Mode pair à pair",
-    "recommended": "Recommandé",
     "explanation": "Le mode direct montre votre adresse IP à l’autre personne. Le relais la lui cache ; l’opérateur du relais (la communauté de ce serveur) peut la voir. Les deux sont chiffrés de bout en bout.",
     "useGlobal": "Utiliser le réglage global",
     "overrideHint": "Uniquement pour ce serveur. « Utiliser le réglage global » suit Paramètres → Confidentialité.",
@@ -620,7 +648,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Connexions directes",
     "allow": "Autoriser les connexions directes avec d’autres utilisateurs de Mumcord",
     "hint": "Les connexions directes sont plus rapides, mais l’autre personne peut voir votre adresse IP. Tant que vous n’avez pas décidé, Mumcord demande la première fois qu’une connexion directe serait utilisée.",
     "notUsed": "Non utilisé dans le mode pair à pair choisi : Mumcord ne se connecte jamais directement aux autres personnes."
@@ -631,6 +658,7 @@
     "failed": "Cela n’a pas fonctionné. Veuillez réessayer."
   },
   "inspector": {
+    "title": "Outils de développement",
     "intro": "Affiche les paquets envoyés et reçus par Mumcord, surtout les données des plugins Mumcord, pour le débogage. Seuls les 2 000 derniers paquets sont conservés, en mémoire sur cet appareil ; rien n’est journalisé ni envoyé ailleurs.",
     "devTools": "Outils de développement",
     "devToolsHint": "Désactivez pour masquer à nouveau l’inspecteur de paquets et arrêter la capture.",
@@ -808,7 +836,14 @@
     "hide": "Les masquer complètement",
     "hideHint": "Rien n’est affiché dans le chat."
   },
+  "externalContent": {
+    "title": "Contenu externe"
+  },
+  "privacyConnections": {
+    "title": "Connexions"
+  },
   "updates": {
+    "title": "Mises à jour",
     "installedFrom": "Mumcord {{version}} · installé depuis {{source}}",
     "install": {
       "appImage": "l'AppImage",
@@ -822,7 +857,6 @@
       "aur": "l'AUR",
       "otherLinux": "un paquet Linux"
     },
-    "checking": "Vérification",
     "mode": "Quand une mise à jour est trouvée",
     "modeHint": "Les mises à jour sont toujours vérifiées et contrôlées avant d'être installées.",
     "modeAuto": "Télécharger automatiquement",
@@ -838,7 +872,6 @@
     "intervalHours_many": "Toutes les {{count}} heures",
     "intervalHours_other": "Toutes les {{count}} d'heures",
     "intervalWeek": "Une fois par semaine",
-    "status": "État",
     "state": {
       "idle": "Pas encore vérifié",
       "off": "La recherche de mises à jour est désactivée",
@@ -865,6 +898,100 @@
     "whatsNew": "Nouveautés",
     "whatsNewHint": "Consultez les changements de chaque version.",
     "openChangelog": "Ouvrir le journal des modifications"
+  },
+  "badges": {
+    "changed": "Modifié",
+    "recommended": "Recommandé",
+    "groupChanged": "Contient des paramètres modifiés"
+  },
+  "resetSection": {
+    "button": "Réinitialiser la section",
+    "title": "Réinitialiser {{section}} ?",
+    "intro": "Ces paramètres reviennent à votre préréglage ou à leur valeur par défaut :",
+    "nothing": "Chaque paramètre de {{section}} a déjà la valeur de son préréglage ou sa valeur par défaut.",
+    "confirm": "Réinitialiser"
+  },
+  "activePreset": {
+    "heading": "Préréglage actif",
+    "none": "Aucun préréglage",
+    "customised": "{{preset}}, personnalisé",
+    "changed_one": "{{count}} paramètre modifié depuis la configuration",
+    "changed_many": "{{count}} paramètres modifiés depuis la configuration",
+    "changed_other": "{{count}} paramètres modifiés depuis la configuration",
+    "unchanged": "Aucune modification depuis la configuration",
+    "switch": "Changer",
+    "switchLabel": "Changer de préréglage",
+    "applyFailed": "Impossible de modifier l'overlay en jeu ou Ne pas déranger. Veuillez réessayer."
+  },
+  "presets": {
+    "dialogTitle": "Changer de préréglage",
+    "dialogIntro": "Choisissez un point de départ. Seuls les paramètres couverts par un préréglage changent ; tout le reste reste inchangé.",
+    "legend": "Préréglages",
+    "continue": "Continuer",
+    "confirmTitle": "Passer à {{preset}} ?",
+    "confirmIntro": "Ces paramètres changent :",
+    "confirmNothing": "Aucun paramètre ne change. Mumcord retient {{preset}} comme votre préréglage.",
+    "confirmCustom": "Aucun paramètre ne change. Les paramètres ne comparent plus vos choix à un préréglage mais aux valeurs par défaut.",
+    "apply": "Changer de préréglage",
+    "everythingOn": {
+      "name": "Tout activé",
+      "tagline": "Toutes les fonctionnalités",
+      "point1": "Les autres voient ce que vous jouez et écoutez",
+      "point2": "Votre IP est visible des personnes auxquelles vous vous connectez directement",
+      "point3": "Tout le monde peut vous écrire ; les liens et images se chargent depuis le web",
+      "point4": "L'overlay, la synchronisation de l'historique et les images en taille réelle sont activés"
+    },
+    "balanced": {
+      "name": "Équilibré",
+      "tagline": "Entre confidentialité et confort",
+      "point1": "Seuls vos amis et les personnes de votre salon peuvent vous écrire",
+      "point2": "Connexion directe, avec un relais en secours",
+      "point3": "Les aperçus de liens et les images en taille réelle sont activés",
+      "point4": "Ce que vous jouez et écoutez reste privé"
+    },
+    "maximumPrivacy": {
+      "name": "Confidentialité maximale",
+      "tagline": "Partager le moins possible",
+      "point1": "Seuls vos amis peuvent vous écrire, sans exception",
+      "point2": "Votre IP est masquée ; tout passe par le relais",
+      "point3": "Aucun contenu externe, aucune synchronisation d'historique, aucun partage",
+      "point4": "Rien n'est partagé sur ce que vous faites"
+    },
+    "custom": {
+      "name": "Personnalisé",
+      "tagline": "Vos propres choix",
+      "point1": "Conserve chaque paramètre tel quel",
+      "point2": "Les modifications sont comparées aux valeurs par défaut",
+      "point3": "Idéal si vous savez ce que vous voulez"
+    }
+  },
+  "betaFeatures": {
+    "title": "Fonctionnalités bêta",
+    "hint": "Fonctionnalités en avant-première ; elles peuvent changer. Chacune est aussi affichée à sa place, avec un badge Bêta.",
+    "gamePlugins": "Plugins de jeu",
+    "manage": "Gérer les plugins"
+  },
+  "privacySummary": {
+    "title": "Résumé de confidentialité",
+    "ipHidden": "Votre adresse IP reste masquée",
+    "ipVisible": "Les connexions directes peuvent révéler votre adresse IP",
+    "matches": "Correspond à {{preset}}",
+    "messages": "Messages privés de : {{rule}}",
+    "p2pHidden": "Le pair-à-pair passe par le relais, l'autre personne ne voit donc pas votre adresse IP.",
+    "p2pDirect": "Le pair-à-pair se connecte d'abord directement ; l'autre personne peut voir votre adresse IP.",
+    "p2pDirectOnly": "Le pair-à-pair se connecte uniquement en direct ; l'autre personne peut voir votre adresse IP.",
+    "externalOn": "Les aperçus de liens sont activés : Mumcord récupère les pages liées pour les générer.",
+    "externalOff": "Les aperçus de liens sont désactivés : Mumcord ne charge rien depuis les pages liées.",
+    "imagesOn": "Les images en taille réelle sont échangées directement entre utilisateurs de Mumcord.",
+    "imagesOff": "Les images en taille réelle ne sont pas échangées.",
+    "historyOn": "La synchronisation de l'historique est activée : vous partagez l'historique de vos salons avec d'autres utilisateurs de Mumcord.",
+    "historyOff": "La synchronisation de l'historique est désactivée.",
+    "sharingBoth": "Les autres voient ce que vous jouez et écoutez.",
+    "sharingPlaying": "Les autres voient ce que vous écoutez.",
+    "sharingGaming": "Les autres voient le jeu auquel vous jouez.",
+    "sharingNone": "Ce que vous jouez et écoutez reste privé.",
+    "change": "Modifier",
+    "changeLabel": "Modifier : {{topic}}"
   },
   "hotkeys": {
     "global": "Raccourcis globaux",

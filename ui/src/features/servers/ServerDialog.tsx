@@ -532,7 +532,7 @@ export function ServerDialog({ server, link, identityName, onClose }: ServerDial
               className="servers-form__link"
               onClick={() => {
                 onClose();
-                openSettingsSection("identity");
+                openSettingsSection("account");
               }}
             >
               {t("identity.manage")}

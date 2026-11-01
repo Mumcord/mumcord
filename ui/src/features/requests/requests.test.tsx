@@ -240,7 +240,7 @@ describe("private message settings", () => {
   it("chooses the rule with labelled radio cards", async () => {
     await connected();
     const update = renderGroup(DEFAULTS);
-    const friendsOnly = screen.getByRole("radio", { name: "Friends only" });
+    const friendsOnly = screen.getByRole("radio", { name: "Friends only Recommended" });
     expect(friendsOnly).toHaveAccessibleDescription(/chat request instead/);
     fireEvent.click(friendsOnly);
     expect(update).toHaveBeenCalledWith({

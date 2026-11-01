@@ -5,37 +5,66 @@ import {
   getApi,
   type Identity,
   type MumbleImportFound,
-  type P2pMode,
   type PttAvailability,
   type PttMouseStatus,
   type Settings,
+  type SetupPreset,
 } from "../../api";
 import { usePreferences } from "../../app/preferences";
 import { useView } from "../../app/view";
+import { updateModeOf, type UpdateMode } from "../updates/updateMode";
+import { AppearanceStep } from "./AppearanceStep";
+import { ConnectionsStep } from "./ConnectionsStep";
+import { FeaturesStep } from "./FeaturesStep";
 import { IdentityStep } from "./IdentityStep";
 import { ImportStep } from "./ImportStep";
-import { MicStep } from "./MicStep";
-import { PrivacyStep } from "./PrivacyStep";
-import { UpdatesStep } from "./UpdatesStep";
-import { updateModeOf, updateModePatch, type UpdateMode } from "../updates/updateMode";
-import { TalkModeStep, type TalkChoice } from "./TalkModeStep";
-import { WizardSteps } from "./WizardSteps";
+import { matchingPreset, RECOMMENDED_PRESET } from "./presets";
+import { PrivateMessagesStep } from "./PrivateMessagesStep";
+import { SetupStyleStep } from "./SetupStyleStep";
+import { StartupStep } from "./StartupStep";
+import { StepNavContext, type StepNav } from "./stepNav";
+import { SummaryStep } from "./SummaryStep";
+import { VoiceStep } from "./VoiceStep";
+import { WelcomeStep } from "./WelcomeStep";
 import { WizardCancelDialog } from "./WizardCancelDialog";
+import {
+  applyStyle,
+  changedSettings,
+  presetValuesChanged,
+  recordedPreset,
+  type WizardDraft,
+} from "./wizardDraft";
+import {
+  back,
+  canCancel,
+  canGoBack,
+  canSkip,
+  createWizardFlow,
+  CUSTOM_STEPS,
+  editFromSummary,
+  next,
+  primaryButton,
+  progress,
+  railEntries,
+  selectStyle,
+  skip,
+  type WizardFlowState,
+  type WizardStepId,
+} from "./wizardFlow";
+import { WizardRail } from "./WizardRail";
+import "../settings/settings.css";
 import "./wizard.css";
 
-/** First start: [import from Mumble →] identity → microphone → privacy → update hint → talk mode and start options. */
-const FIRST_START_STEPS = 5;
-/** Rerun from Settings (#149): the same steps, without the identity step. */
-const RERUN_STEPS = 4;
-
 interface Loaded {
+  /** What is stored; the reference for "what did the wizard change". */
   settings: Settings;
   identity: Identity | null;
   availability: PttAvailability | null;
   mouseStatus: PttMouseStatus | null;
   linkHandlerActive: boolean | null;
-  ingameOverlaySupported: boolean;
-  ingameOverlayOn: boolean;
+  /** In-game overlay on, or `null` where it is unsupported. */
+  ingameOverlay: boolean | null;
+  dndFollowSystem: boolean;
   portable: boolean;
   /** The official Mumble client's data, when it is installed (first start only, issue #66). */
   mumble: MumbleImportFound | null;
@@ -43,7 +72,18 @@ interface Loaded {
 
 type Load = { state: "loading" } | { state: "failed" } | ({ state: "ready" } & Loaded);
 
-/** Optional lookups must not block the wizard; their absence only hides a hint. */
+/** What the wizard edits, and what it started from. */
+interface Editing {
+  draft: WizardDraft;
+  /** The draft as loaded, before any preset: overlay and DND are saved only when they differ. */
+  initial: WizardDraft;
+  initialUpdateMode: UpdateMode;
+  flow: WizardFlowState;
+  /** The user picked a setup style card (or Custom through a summary Edit). */
+  styleChosen: boolean;
+}
+
+/** Optional lookups must not block the wizard; their absence only hides a choice. */
 function optional<T>(promise: Promise<T>, what: string): Promise<T | null> {
   return promise.catch((cause: unknown) => {
     console.error(`${what} failed`, cause);
@@ -59,7 +99,8 @@ async function loadWizard(rerun: boolean): Promise<Loaded> {
     availability,
     mouseStatus,
     linkHandlerActive,
-    ingameOverlay,
+    overlay,
+    dnd,
     info,
     mumble,
   ] = await Promise.all([
@@ -69,6 +110,7 @@ async function loadWizard(rerun: boolean): Promise<Loaded> {
     optional(api.pttMouseStatus(), "ptt mouse status"),
     optional(api.linkHandlerStatus(), "link handler status"),
     optional(api.ingameOverlayState(), "in-game overlay state"),
+    optional(api.dndState(), "do not disturb state"),
     optional(api.appInfo(), "app info"),
     rerun
       ? Promise.resolve(null)
@@ -80,24 +122,59 @@ async function loadWizard(rerun: boolean): Promise<Loaded> {
     availability,
     mouseStatus,
     linkHandlerActive,
-    ingameOverlaySupported: ingameOverlay?.supported ?? false,
-    ingameOverlayOn: ingameOverlay?.mode === "on",
+    ingameOverlay: overlay?.supported === true ? overlay.mode === "on" : null,
+    dndFollowSystem: dnd?.followSystem ?? false,
     portable: info?.portable ?? false,
     mumble,
   };
 }
 
-/** Whether the rerun's start options differ from the saved ones, so Cancel would drop them. */
-function startOptionsChanged(choice: TalkChoice, saved: Settings, overlayOn: boolean): boolean {
-  return (
-    choice.talkMode !== saved.talkMode ||
-    choice.pttKey !== saved.pttKey ||
-    choice.linkPreviews !== saved.linkPreviews ||
-    choice.historySharing !== saved.historySharing ||
-    choice.autostart !== saved.autostart ||
-    // The link handler is an opt-in action, not a saved value: leaving it ticked is no change.
-    (choice.ingameOverlay !== null && choice.ingameOverlay !== overlayOn)
-  );
+/**
+ * First start: Balanced is preselected and applied. Rerun: the saved values stay as they are,
+ * and the card that matches them is preselected (Custom when none does).
+ */
+function startEditing(loaded: Loaded, rerun: boolean): Editing {
+  const initial: WizardDraft = {
+    settings: loaded.settings,
+    ingameOverlay: loaded.ingameOverlay,
+    dndFollowSystem: loaded.dndFollowSystem,
+    // Portable builds (#181) leave system changes such as the link handler unticked.
+    registerLinkHandler: loaded.linkHandlerActive !== true && !loaded.portable,
+  };
+  const initialUpdateMode = updateModeOf(loaded.settings);
+  const flow = createWizardFlow({
+    mode: rerun ? "rerun" : "firstStart",
+    mumbleFound: loaded.mumble !== null,
+  });
+  if (!rerun) {
+    return {
+      draft: applyStyle(initial, RECOMMENDED_PRESET, initialUpdateMode),
+      initial,
+      initialUpdateMode,
+      flow,
+      styleChosen: false,
+    };
+  }
+  const saved: SetupPreset =
+    loaded.settings.setupPreset === "custom" ? "custom" : (matchingPreset(initial) ?? "custom");
+  return {
+    draft: initial,
+    initial,
+    initialUpdateMode,
+    flow: selectStyle(flow, saved),
+    styleChosen: false,
+  };
+}
+
+/** The settings the window previews while the wizard runs: language and look only. */
+function previewOf(base: Settings, draft: Settings): Settings {
+  return {
+    ...base,
+    language: draft.language,
+    theme: draft.theme,
+    appThemeId: draft.appThemeId,
+    visualEffects: draft.visualEffects,
+  };
 }
 
 interface WizardProps {
@@ -110,9 +187,10 @@ interface WizardProps {
 }
 
 /**
- * Setup wizard: identity → microphone → privacy → update hint → talk mode and start options
- * (FR-1.1–FR-1.6, FR-1.48d). In rerun mode (#149, FR-3.118) the identity step is left out, every
- * value starts at the saved one and nothing is written before Finish.
+ * Setup wizard (issue #159, FR-3.115–FR-3.118): a step rail and one step at a time, driven by
+ * `wizardFlow`. Every choice lives in a draft; nothing is written before Finish, and Finish
+ * writes only what differs from the stored settings. In rerun mode (#149) the identity step is
+ * left out, every value starts at the saved one and Cancel keeps everything.
  */
 export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: WizardProps) {
   const { t } = useTranslation("wizard");
@@ -120,30 +198,26 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
   const { applySettings } = usePreferences();
   const rerun = mode === "rerun";
   const [load, setLoad] = useState<Load>({ state: "loading" });
-  const [step, setStep] = useState(1);
-  // Saved settings plus the rerun's not yet saved devices (#149).
-  const [draft, setDraft] = useState<Settings | null>(null);
-  const [updateMode, setUpdateMode] = useState<UpdateMode>("off");
-  // The privacy step's peer-to-peer mode (spec 04, FR-4.1), saved with the final step.
-  const [p2pMode, setP2pMode] = useState<P2pMode>("directRelay");
-  // The talk mode step's current choices, for the "would Cancel drop something?" question.
-  const [startOptions, setStartOptions] = useState<TalkChoice | null>(null);
-  const [cancelAsked, setCancelAsked] = useState(false);
+  const [editing, setEditing] = useState<Editing | null>(null);
   // Focus follows step changes only, not the initial render; the rerun starts with its heading.
   const [navigated, setNavigated] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cancelAsked, setCancelAsked] = useState(false);
   // The identity before an import from Mumble, restored when the user undoes it (#66).
   const firstIdentity = useRef<Identity | null>(null);
+  // The stored settings, and the preview the window shows (as JSON; `null`: none), for cleanup.
+  const stored = useRef<Settings | null>(null);
+  const shownPreview = useRef<string | null>(null);
+  const finished = useRef(false);
 
   const start = useCallback(() => {
     loadWizard(rerun)
       .then((loaded) => {
         firstIdentity.current = loaded.identity;
+        stored.current = loaded.settings;
         setLoad({ state: "ready", ...loaded });
-        // The optional import from Mumble (#66) comes before the identity step.
-        if (loaded.mumble !== null) setStep(0);
-        setDraft(loaded.settings);
-        setUpdateMode(updateModeOf(loaded.settings));
-        setP2pMode(loaded.settings.p2pMode);
+        setEditing(startEditing(loaded, rerun));
       })
       .catch((cause: unknown) => {
         console.error("loading the wizard failed", cause);
@@ -153,12 +227,37 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
 
   useEffect(start, [start]);
 
-  if (load.state === "loading") {
+  // Language and look apply to the window at once (the live preview) without being saved.
+  const draftSettings = editing?.draft.settings ?? null;
+  useEffect(() => {
+    const base = stored.current;
+    if (draftSettings === null || base === null) return;
+    const preview = previewOf(base, draftSettings);
+    const json = JSON.stringify(preview);
+    const differs = json !== JSON.stringify(base);
+    // Only when the previewed values change, not on every other edit of the draft.
+    if (differs ? json !== shownPreview.current : shownPreview.current !== null) {
+      applySettings(preview);
+    }
+    shownPreview.current = differs ? json : null;
+  }, [applySettings, draftSettings]);
+
+  // Leaving without Finish (rerun Cancel) takes the preview back.
+  useEffect(
+    () => () => {
+      if (shownPreview.current !== null && !finished.current && stored.current !== null) {
+        applySettings(stored.current);
+      }
+    },
+    [applySettings],
+  );
+
+  if (load.state === "loading" || (load.state === "ready" && editing === null)) {
     return <p role="status">{t("common:loading")}</p>;
   }
-  if (load.state === "failed") {
+  if (load.state === "failed" || editing === null) {
     return (
-      <div className="wizard-step">
+      <div className="wizard-failed">
         <p role="alert" className="wizard-error">
           {t("loadFailed")}
         </p>
@@ -176,251 +275,181 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
     );
   }
 
-  const saved = load.settings;
-  // Everything the steps need, so the helpers below do not depend on the union above.
-  const {
-    availability,
-    mouseStatus,
-    linkHandlerActive,
-    ingameOverlaySupported,
-    ingameOverlayOn,
-    portable,
-    identity,
-    mumble,
-  } = load;
-  // Rerun steps show the draft; the first start shows what is saved (the microphone step saves
-  // its devices at once, so the test runs on them).
-  const settings = rerun ? (draft ?? saved) : saved;
-  // The import step (#66) moves every later step's number up by one.
-  const shift = mumble === null ? 0 : 1;
-  const total = (rerun ? RERUN_STEPS : FIRST_START_STEPS) + shift;
-  const focusOnMount = rerun || navigated;
+  const loaded = load;
+  const { draft, initial, flow } = editing;
+  const settings = draft.settings;
 
-  function goTo(next: number) {
+  function go(state: WizardFlowState) {
     setNavigated(true);
-    setStep(next);
+    setError(null);
+    setEditing((current) => (current === null ? current : { ...current, flow: state }));
   }
 
-  async function saveSettings(next: Settings): Promise<Settings> {
-    const stored = await getApi().settingsUpdate(next);
-    setLoad((current) => (current.state === "ready" ? { ...current, settings: stored } : current));
-    return stored;
+  function changeDraft(change: (current: WizardDraft) => WizardDraft) {
+    setEditing((current) =>
+      current === null ? current : { ...current, draft: change(current.draft) },
+    );
   }
 
-  async function finish(choice: TalkChoice) {
-    if (choice.registerLinkHandler) {
-      try {
-        await getApi().linkHandlerRegister();
-      } catch (cause: unknown) {
-        // Not worth blocking the first start; Settings offers it again.
-        console.error("registering the link handler failed", cause);
-        announce(t("talk.linkHandlerFailed"), "polite");
-      }
-    }
-    let saved = await saveSettings({
-      ...settings,
-      talkMode: choice.talkMode,
-      pttKey: choice.pttKey,
-      linkPreviews: choice.linkPreviews,
-      historySharing: choice.historySharing,
-      ...updateModePatch(updateMode),
-      p2pMode,
-      wizardCompleted: true,
+  function update(patch: Partial<Settings>) {
+    changeDraft((current) => ({ ...current, settings: { ...current.settings, ...patch } }));
+  }
+
+  function chooseStyle(style: SetupPreset) {
+    setEditing((current) => {
+      if (current === null) return current;
+      return {
+        ...current,
+        flow: selectStyle(current.flow, style),
+        styleChosen: true,
+        draft:
+          style === "custom"
+            ? current.draft
+            : applyStyle(current.draft, style, current.initialUpdateMode),
+      };
     });
-    if (choice.autostart !== saved.autostart) {
-      // Saved on its own: if the OS refuses the login entry, the wizard still finishes.
-      try {
-        saved = await saveSettings({ ...saved, autostart: choice.autostart });
-      } catch (cause: unknown) {
-        console.error("setting up start at login failed", cause);
-        announce(t("talk.autostartFailed"), "polite");
-      }
-    }
-    if (choice.ingameOverlay) {
-      try {
-        await getApi().ingameOverlaySetMode("on");
-      } catch (cause: unknown) {
-        // Not worth blocking the first start; Settings offers it again.
-        console.error("turning on the in-game overlay failed", cause);
-      }
-    }
-    applySettings(saved);
-    finishWizard();
   }
 
-  /** Rerun (#149): writes only the values the user changed, and only now. */
-  async function finishRerun(choice: TalkChoice) {
-    // Read fresh: anything changed elsewhere while the wizard was open stays as it is.
-    const current = await getApi().settingsGet();
-    const next: Settings = {
-      ...current,
-      inputDevice: settings.inputDevice,
-      outputDevice: settings.outputDevice,
-      ...updateModePatch(updateMode),
-      p2pMode,
-      talkMode: choice.talkMode,
-      pttKey: choice.pttKey,
-      linkPreviews: choice.linkPreviews,
-      historySharing: choice.historySharing,
-      autostart: choice.autostart,
-    };
-    const changed =
-      next.inputDevice !== current.inputDevice ||
-      next.outputDevice !== current.outputDevice ||
-      next.updateCheck !== current.updateCheck ||
-      next.updateAutoDownload !== current.updateAutoDownload ||
-      next.p2pMode !== current.p2pMode ||
-      next.talkMode !== current.talkMode ||
-      next.pttKey !== current.pttKey ||
-      next.linkPreviews !== current.linkPreviews ||
-      next.historySharing !== current.historySharing ||
-      next.autostart !== current.autostart;
-    const stored = changed ? await getApi().settingsUpdate(next) : current;
-    if (choice.registerLinkHandler) {
-      try {
-        await getApi().linkHandlerRegister();
-      } catch (cause: unknown) {
-        console.error("registering the link handler failed", cause);
-        announce(t("talk.linkHandlerFailed"), "polite");
-      }
-    }
-    if (choice.ingameOverlay !== null && choice.ingameOverlay !== ingameOverlayOn) {
-      try {
-        await getApi().ingameOverlaySetMode(choice.ingameOverlay ? "on" : "off");
-      } catch (cause: unknown) {
-        console.error("changing the in-game overlay failed", cause);
-        announce(t("errors.generic"), "polite");
-      }
-    }
-    applySettings(stored);
-    onClose?.();
+  /** Summary → Edit. A Custom-only card while a preset is chosen switches to Custom first. */
+  function edit(step: WizardStepId) {
+    const switching = CUSTOM_STEPS.includes(step) && flow.style !== "custom";
+    if (switching)
+      setEditing((current) => (current === null ? current : { ...current, styleChosen: true }));
+    go(editFromSummary(switching ? selectStyle(flow, "custom") : flow, step));
+  }
+
+  /** The Mumble import (#66) saves at once; its values join the draft and the stored base. */
+  async function saveImport(next: Settings): Promise<Settings> {
+    const before = loaded.settings;
+    const saved = await getApi().settingsUpdate(next);
+    stored.current = saved;
+    setLoad((current) => (current.state === "ready" ? { ...current, settings: saved } : current));
+    update(changedSettings(before, saved));
+    return saved;
+  }
+
+  function hasChanges(): boolean {
+    return (
+      Object.keys(changedSettings(loaded.settings, settings)).length > 0 ||
+      draft.ingameOverlay !== initial.ingameOverlay ||
+      draft.dndFollowSystem !== initial.dndFollowSystem
+    );
   }
 
   function requestCancel() {
-    const pending = rerun
-      ? settings.inputDevice !== saved.inputDevice ||
-        settings.outputDevice !== saved.outputDevice ||
-        updateMode !== updateModeOf(saved) ||
-        p2pMode !== saved.p2pMode ||
-        (startOptions !== null && startOptionsChanged(startOptions, saved, ingameOverlayOn))
-      : false;
-    if (pending) {
-      setCancelAsked(true);
-      return;
+    if (hasChanges()) setCancelAsked(true);
+    else onClose?.();
+  }
+
+  /** Runs an optional system change; a failure is reported but does not stop Finish. */
+  async function attempt(what: string, action: () => Promise<unknown>, failure: string) {
+    try {
+      await action();
+    } catch (cause: unknown) {
+      console.error(`${what} failed`, cause);
+      announce(failure, "polite");
     }
-    onClose?.();
   }
 
-  const cancel = rerun ? requestCancel : undefined;
-
-  function micStep(number: number, back: (() => void) | undefined) {
-    return (
-      <MicStep
-        step={number + shift}
-        total={total}
-        settings={settings}
-        stagedDevices={rerun}
-        focusOnMount={focusOnMount}
-        onDevicesChange={async (devices) => {
-          if (rerun) {
-            setDraft({ ...settings, ...devices });
-            return;
-          }
-          await saveSettings({ ...settings, ...devices });
-        }}
-        onBack={back}
-        onNext={() => {
-          goTo(number + 1);
-        }}
-        onCancel={cancel}
-      />
-    );
+  async function finish() {
+    setBusy(true);
+    setError(null);
+    const api = getApi();
+    try {
+      const record = !rerun || editing?.styleChosen === true || presetValuesChanged(initial, draft);
+      const target: Settings = record
+        ? { ...settings, setupPreset: recordedPreset(flow.style, draft) }
+        : settings;
+      // Only what the wizard changed; anything changed elsewhere meanwhile stays as it is.
+      const { autostart, ...patch } = changedSettings(loaded.settings, target);
+      let saved = await api.settingsGet();
+      if (!rerun || Object.keys(patch).length > 0) {
+        saved = await api.settingsUpdate({
+          ...saved,
+          ...patch,
+          ...(rerun ? {} : { wizardCompleted: true }),
+        });
+      }
+      // Saved on its own: if the OS refuses the login entry, the wizard still finishes.
+      if (autostart !== undefined) {
+        await attempt(
+          "setting up start at login",
+          async () => {
+            saved = await api.settingsUpdate({ ...saved, autostart });
+          },
+          t("startup.autostartFailed"),
+        );
+      }
+      if (draft.registerLinkHandler && loaded.linkHandlerActive !== true) {
+        await attempt(
+          "registering the link handler",
+          () => api.linkHandlerRegister(),
+          t("startup.linkHandlerFailed"),
+        );
+      }
+      if (draft.ingameOverlay !== null && draft.ingameOverlay !== initial.ingameOverlay) {
+        const on = draft.ingameOverlay;
+        await attempt(
+          "changing the in-game overlay",
+          () => api.ingameOverlaySetMode(on ? "on" : "off"),
+          t("errors.generic"),
+        );
+      }
+      if (draft.dndFollowSystem !== initial.dndFollowSystem) {
+        const follow = draft.dndFollowSystem;
+        await attempt(
+          "changing follow system Do Not Disturb",
+          () => api.dndSetFollowSystem(follow),
+          t("errors.generic"),
+        );
+      }
+      finished.current = true;
+      applySettings(saved);
+      if (rerun) onClose?.();
+      else finishWizard();
+    } catch (cause: unknown) {
+      console.error("finishing the setup failed", cause);
+      setBusy(false);
+      setError(t("errors.saveFailed"));
+    }
   }
 
-  function privacyStep(number: number) {
-    return (
-      <PrivacyStep
-        step={number + shift}
-        total={total}
-        p2pMode={p2pMode}
-        onP2pModeChange={setP2pMode}
-        focusOnMount={focusOnMount}
-        onBack={() => {
-          goTo(number - 1);
-        }}
-        onNext={() => {
-          goTo(number + 1);
-        }}
-        onCancel={cancel}
-      />
-    );
-  }
+  const entries = railEntries(flow);
+  const nav: StepNav = {
+    number: entries.findIndex((entry) => entry.state === "current") + 1,
+    total: entries.length,
+    name: t(`steps.${flow.step}`),
+    focusOnMount: rerun || navigated,
+    primary: flow.step === "welcome" ? "getStarted" : primaryButton(flow),
+    onBack: canGoBack(flow)
+      ? () => {
+          go(back(flow));
+        }
+      : undefined,
+    onSkip: canSkip(flow)
+      ? () => {
+          go(skip(flow));
+        }
+      : undefined,
+    onCancel: canCancel(flow) ? requestCancel : undefined,
+  };
 
-  function updatesStep(number: number) {
-    return (
-      <UpdatesStep
-        step={number + shift}
-        total={total}
-        initial={updateMode}
-        focusOnMount={focusOnMount}
-        onBack={() => {
-          goTo(number - 1);
-        }}
-        // Saved with the final step; going Back keeps the choice in the form state.
-        onChange={setUpdateMode}
-        onNext={() => {
-          goTo(number + 1);
-        }}
-        onCancel={cancel}
-      />
-    );
-  }
-
-  function talkStep(number: number) {
-    return (
-      <TalkModeStep
-        step={number + shift}
-        total={total}
-        settings={settings}
-        availability={availability}
-        mouseStatus={mouseStatus}
-        linkHandlerActive={linkHandlerActive}
-        ingameOverlaySupported={ingameOverlaySupported}
-        initialIngameOverlay={rerun && ingameOverlayOn}
-        portable={portable}
-        focusOnMount={focusOnMount}
-        onBack={() => {
-          goTo(number - 1);
-        }}
-        onCancel={cancel}
-        onChange={rerun ? setStartOptions : undefined}
-        onFinish={rerun ? finishRerun : finish}
-      />
-    );
-  }
+  const toNext = () => {
+    go(next(flow));
+  };
 
   function stepBody(): ReactNode {
-    if (rerun) {
-      switch (step) {
-        case 1:
-          return micStep(1, undefined);
-        case 2:
-          return privacyStep(2);
-        case 3:
-          return updatesStep(3);
-        default:
-          return talkStep(4);
-      }
-    }
-    switch (step) {
-      case 0:
-        return mumble === null ? null : (
+    switch (flow.step) {
+      case "welcome":
+        return <WelcomeStep settings={settings} update={update} onNext={toNext} />;
+      case "import":
+        return loaded.mumble === null ? null : (
           <ImportStep
-            step={1}
-            total={total}
-            found={mumble}
-            settings={settings}
-            saveSettings={saveSettings}
+            step={nav.number}
+            total={nav.total}
+            found={loaded.mumble}
+            settings={loaded.settings}
+            saveSettings={saveImport}
             onIdentityChange={(imported) => {
               setLoad((current) =>
                 current.state === "ready"
@@ -428,53 +457,108 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
                   : current,
               );
             }}
-            onNext={() => {
-              goTo(1);
-            }}
+            onNext={toNext}
           />
         );
-      case 1:
+      case "identity":
         return (
           <IdentityStep
-            step={1 + shift}
-            total={total}
-            identity={identity}
-            focusOnMount={navigated}
+            identity={loaded.identity}
             onDone={(done) => {
               setLoad((current) =>
                 current.state === "ready" ? { ...current, identity: done } : current,
               );
-              goTo(2);
+              toNext();
             }}
           />
         );
-      case 2:
-        return micStep(2, () => {
-          goTo(1);
-        });
-      case 3:
-        return privacyStep(3);
-      case 4:
-        return updatesStep(4);
-      default:
-        return talkStep(5);
+      case "voice":
+        return (
+          <VoiceStep
+            settings={settings}
+            update={update}
+            availability={loaded.availability}
+            mouseStatus={loaded.mouseStatus}
+            onNext={toNext}
+          />
+        );
+      case "setupStyle":
+        return <SetupStyleStep style={flow.style} onSelect={chooseStyle} onNext={toNext} />;
+      case "privateMessages":
+        return <PrivateMessagesStep settings={settings} update={update} onNext={toNext} />;
+      case "connections":
+        return <ConnectionsStep settings={settings} update={update} onNext={toNext} />;
+      case "features":
+        return (
+          <FeaturesStep
+            settings={settings}
+            update={update}
+            ingameOverlay={draft.ingameOverlay}
+            dndFollowSystem={draft.dndFollowSystem}
+            onIngameOverlayChange={(on) => {
+              changeDraft((current) => ({ ...current, ingameOverlay: on }));
+            }}
+            onDndFollowSystemChange={(on) => {
+              changeDraft((current) => ({ ...current, dndFollowSystem: on }));
+            }}
+            onNext={toNext}
+          />
+        );
+      case "appearance":
+        return <AppearanceStep settings={settings} update={update} onNext={toNext} />;
+      case "startup":
+        return (
+          <StartupStep
+            settings={settings}
+            update={update}
+            linkHandlerActive={loaded.linkHandlerActive}
+            registerLinkHandler={draft.registerLinkHandler}
+            onRegisterLinkHandlerChange={(on) => {
+              changeDraft((current) => ({ ...current, registerLinkHandler: on }));
+            }}
+            onNext={toNext}
+          />
+        );
+      case "summary":
+        return (
+          <SummaryStep
+            draft={draft}
+            identity={rerun ? null : loaded.identity}
+            name={loaded.identity?.name ?? null}
+            firstStart={!rerun}
+            busy={busy}
+            error={error}
+            onEdit={edit}
+            onFinish={() => void finish()}
+          />
+        );
     }
   }
 
-  const body = stepBody();
-  if (!rerun) return body;
-
   return (
-    <>
-      <WizardSteps current={step} total={RERUN_STEPS} />
-      <p className="wizard-note wizard-rerun__note">
-        {t("rerun.note")}{" "}
-        <button type="button" className="wizard-link" onClick={onManageIdentities}>
-          {t("rerun.manageIdentities")}
-        </button>
-      </p>
-      {body}
-      <p className="wizard-muted wizard-small wizard-rerun__footer">{t("rerun.footer")}</p>
+    <div className="wizard-layout">
+      <WizardRail
+        entries={entries}
+        progress={progress(flow)}
+        note={
+          rerun ? (
+            <p className="wizard-small">
+              {t("rerun.note")}{" "}
+              <button type="button" className="wizard-link" onClick={onManageIdentities}>
+                {t("rerun.manageIdentities")}
+              </button>
+            </p>
+          ) : undefined
+        }
+      />
+      <div className="wizard-main">
+        <StepNavContext.Provider value={nav}>
+          {/* A new key per step remounts it, so its heading takes the focus. */}
+          <div key={flow.step} className="wizard-main__step">
+            {stepBody()}
+          </div>
+        </StepNavContext.Provider>
+      </div>
       {cancelAsked && (
         <WizardCancelDialog
           onKeepEditing={() => {
@@ -486,6 +570,6 @@ export function Wizard({ mode = "firstStart", onClose, onManageIdentities }: Wiz
           }}
         />
       )}
-    </>
+    </div>
   );
 }

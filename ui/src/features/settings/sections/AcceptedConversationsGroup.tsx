@@ -16,7 +16,7 @@ export function AcceptedConversationsGroup() {
   const identityLabel = (certHash: string) =>
     identities.length > 1 ? identities.find((i) => i.certHash === certHash)?.label : undefined;
   return (
-    <Group title={t("acceptedConversations.title")}>
+    <Group title={t("acceptedConversations.title")} icon="check">
       {conversations.length === 0 ? (
         <p className="settings-hint">{t("acceptedConversations.empty")}</p>
       ) : (

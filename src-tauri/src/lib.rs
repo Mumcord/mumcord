@@ -172,6 +172,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             profile::register_self,
             settings::settings_get,
             settings::settings_update,
+            settings::settings_default,
             settings::window_overlay_notice_pending,
             settings::window_overlay_notice_dismiss,
             settings::audio_device_notice_pending,

@@ -5,7 +5,7 @@ import { app, bot, testenv } from "../../helpers/index.ts";
 import { run, runOk } from "../../helpers/run.ts";
 import { waitConnected } from "../../helpers/chat-ui.ts";
 import { typeInto } from "../../helpers/servers-ui.ts";
-import { button, finishWizardWithDefaults, waitForText, wizardStep } from "../../helpers/wizard-util.ts";
+import { button, runFirstStartWizard } from "../../helpers/wizard-util.ts";
 
 // AC-1.28 (diagnostic file contents/privacy) and AC-1.29 (Settings -> About licenses), driven
 // through the real UI. The test server gets a server password; the bot sends a unique chat text.
@@ -58,10 +58,7 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
   });
 
   it("completes the wizard", async () => {
-    await waitForText(wizardStep(1));
-    await $("input[type=text]").setValue(MY_NAME);
-    await button("Next").click();
-    await finishWizardWithDefaults();
+    await runFirstStartWizard(MY_NAME);
   });
 
   it("connects with the server password and receives chat", async () => {
@@ -80,7 +77,7 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
   it("AC-1.28: saved diagnostic file has the facts and no private data", async () => {
     await $("button[aria-label='Quick settings']").click();
     await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-    await $("//button[@role='tab'][normalize-space()='Diagnostics']").click();
+    await $("//button[@role='tab'][normalize-space()='Advanced & Developer']").click();
     // The GTK save dialog appends its ".txt" filter extension even to a typed ".txt" name.
     file = join(app.profile(), "mumcord-diagnostics.txt.txt");
     await dumpDiagnostics(file);
@@ -103,7 +100,7 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     // Also scan: no other file with PEM is expected here; nothing else to check.
   });
 
-  it("AC-1.29: About lists AGPL license and Mumble's BSD notice", async () => {
+  it("AC-1.29: About lists AGPL license, Advanced & Developer Mumble's BSD notice", async () => {
     await browser.pause(500);
     await $("//button[@role='tab'][normalize-space()='About']").click();
     const license = $("pre[aria-label='Mumcord license (AGPL-3.0)']");
@@ -111,7 +108,8 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     expect(await license.getText()).toMatch(/GNU AFFERO GENERAL PUBLIC LICENSE/);
 
     // Issue #138: the third-party licences open in a window of their own, a second WebDriver
-    // window handle.
+    // window handle. Their card sits in Advanced & Developer since the regrouping (#161).
+    await $("//button[@role='tab'][normalize-space()='Advanced & Developer']").click();
     const mainWindow = await browser.getWindowHandle();
     await button("Show third-party licences").click();
     let licences = "";

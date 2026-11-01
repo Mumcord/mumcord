@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getApi, type Identity } from "../../../api";
 import { PasswordDialog } from "../components/PasswordDialog";
 import { WarningIcon } from "../components/WarningIcon";
-import { Section } from "../components/Section";
+import { Group } from "../components/Section";
 import { errorText } from "../errors";
 import { pickOpenPath, pickSavePath } from "../fileDialogs";
 import { refreshIdentities, useServers } from "../../servers/store";
@@ -15,10 +15,6 @@ import {
   RenameIdentityDialog,
 } from "./IdentityDialogs";
 import { identityInitial, identityTone, serversFor, shortFingerprint } from "../identityFormat";
-import { DefaultAvatarGroup } from "./DefaultAvatarGroup";
-import { NowGamingGroup } from "./NowGamingGroup";
-import { NowPlayingGroup } from "./NowPlayingGroup";
-import type { SettingsSectionProps } from "./types";
 
 const IDENTITY_FILTER_EXTENSIONS = ["p12", "pfx"];
 
@@ -34,10 +30,10 @@ type Status = { kind: "success" | "error"; text: string } | null;
 
 /**
  * The identity manager (issue #148): the list of client certificates with create, import,
- * rename, export, details, delete and "set as default", plus the profile's default avatar.
- * Certificates and keys stay in the OS secure storage; this list shows local metadata only.
+ * rename, export, details, delete and "set as default". Certificates and keys stay in the OS
+ * secure storage; this list shows local metadata only.
  */
-export function IdentitySection({ settings, update }: SettingsSectionProps) {
+export function IdentitiesCard() {
   const { t, i18n } = useTranslation("settings");
   const { identities, servers } = useServers();
   const [dialog, setDialog] = useState<Dialog>(null);
@@ -105,124 +101,122 @@ export function IdentitySection({ settings, update }: SettingsSectionProps) {
   const created = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" });
 
   return (
-    <Section title={t("sections.identity")}>
-      <div className="settings-group identity-manager">
-        <div className="identity-manager__head">
-          <h3 className="settings-group__title">{t("identity.listTitle")}</h3>
-          <div className="settings-actions">
-            <button type="button" className="settings-button" onClick={() => void startImport()}>
-              {t("identity.import")}
-            </button>
-            <button
-              type="button"
-              className="settings-button settings-button--primary"
-              onClick={() => {
-                setDialog({ kind: "create" });
-              }}
-            >
-              {t("identity.new")}
-            </button>
-          </div>
-        </div>
-        <p className="settings-hint">{t("identity.intro")}</p>
-        <ul className="identity-list" aria-label={t("identity.listLabel")}>
-          {identities.map((identity) => {
-            const used = serversFor(identity, servers);
-            return (
-              <li key={identity.id} className="identity-card">
-                <span
-                  className={`identity-card__avatar ${identityTone(identity.id)}`}
-                  aria-hidden="true"
-                >
-                  {identityInitial(identity.label)}
-                </span>
-                <div className="identity-card__body">
-                  <p className="identity-card__title">
-                    <strong>{identity.label}</strong>
-                    {identity.isDefault && (
-                      <span className="identity-card__badge">{t("identity.defaultBadge")}</span>
-                    )}
-                  </p>
-                  <p className="identity-card__meta">
-                    {t("identity.createdLine", {
-                      name: identity.name,
-                      date: created.format(new Date(identity.addedAt)),
-                    })}
-                  </p>
-                </div>
-                <div className="identity-card__actions">
-                  {!identity.isDefault && (
-                    <button
-                      type="button"
-                      className="settings-button"
-                      aria-label={t("identity.setDefaultFor", { identity: identity.label })}
-                      onClick={() => void setDefault(identity)}
-                    >
-                      {t("identity.setDefault")}
-                    </button>
+    <Group
+      title={t("identity.listTitle")}
+      icon="key"
+      info={t("identity.intro")}
+      wide
+      actions={
+        <>
+          <button type="button" className="settings-button" onClick={() => void startImport()}>
+            {t("identity.import")}
+          </button>
+          <button
+            type="button"
+            className="settings-button settings-button--primary"
+            onClick={() => {
+              setDialog({ kind: "create" });
+            }}
+          >
+            {t("identity.new")}
+          </button>
+        </>
+      }
+    >
+      <ul className="identity-list" aria-label={t("identity.listLabel")}>
+        {identities.map((identity) => {
+          const used = serversFor(identity, servers);
+          return (
+            <li key={identity.id} className="identity-card">
+              <span
+                className={`identity-card__avatar ${identityTone(identity.id)}`}
+                aria-hidden="true"
+              >
+                {identityInitial(identity.label)}
+              </span>
+              <div className="identity-card__body">
+                <p className="identity-card__title">
+                  <strong>{identity.label}</strong>
+                  {identity.isDefault && (
+                    <span className="identity-card__badge">{t("identity.defaultBadge")}</span>
                   )}
-                  <button
-                    type="button"
-                    className="settings-button"
-                    aria-label={t("identity.detailsFor", { identity: identity.label })}
-                    onClick={() => {
-                      setDialog({ kind: "details", identity });
-                    }}
-                  >
-                    {t("identity.details")}
-                  </button>
-                  <button
-                    type="button"
-                    className="settings-button"
-                    aria-label={t("identity.renameFor", { identity: identity.label })}
-                    onClick={() => {
-                      setDialog({ kind: "rename", identity });
-                    }}
-                  >
-                    {t("identity.rename")}
-                  </button>
-                  <button
-                    type="button"
-                    className="settings-button"
-                    aria-label={t("identity.exportFor", { identity: identity.label })}
-                    onClick={() => void startExport(identity)}
-                  >
-                    {t("identity.export")}
-                  </button>
-                  <button
-                    type="button"
-                    className="settings-button settings-button--danger"
-                    aria-label={t("identity.deleteFor", { identity: identity.label })}
-                    onClick={() => {
-                      setDialog({ kind: "delete", identity });
-                    }}
-                  >
-                    {t("identity.delete")}
-                  </button>
-                </div>
-                <p className="identity-card__meta identity-card__fingerprint">
-                  {t("identity.fingerprintLine", {
-                    fingerprint: shortFingerprint(identity.certHash),
-                  })}
-                  {" · "}
-                  {used.length === 0
-                    ? t("identity.notUsed")
-                    : t("identity.usedBy", {
-                        servers: used.map((server) => server.label || server.address).join(", "),
-                      })}
                 </p>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="identity-warning" role="note">
-          <WarningIcon className="identity-warning__icon" />
-          {t("identity.backupWarning")}
-        </p>
-      </div>
-      <DefaultAvatarGroup settings={settings} update={update} />
-      <NowPlayingGroup settings={settings} update={update} />
-      <NowGamingGroup settings={settings} update={update} />
+                <p className="identity-card__meta">
+                  {t("identity.createdLine", {
+                    name: identity.name,
+                    date: created.format(new Date(identity.addedAt)),
+                  })}
+                </p>
+              </div>
+              <div className="identity-card__actions">
+                {!identity.isDefault && (
+                  <button
+                    type="button"
+                    className="settings-button"
+                    aria-label={t("identity.setDefaultFor", { identity: identity.label })}
+                    onClick={() => void setDefault(identity)}
+                  >
+                    {t("identity.setDefault")}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="settings-button"
+                  aria-label={t("identity.detailsFor", { identity: identity.label })}
+                  onClick={() => {
+                    setDialog({ kind: "details", identity });
+                  }}
+                >
+                  {t("identity.details")}
+                </button>
+                <button
+                  type="button"
+                  className="settings-button"
+                  aria-label={t("identity.renameFor", { identity: identity.label })}
+                  onClick={() => {
+                    setDialog({ kind: "rename", identity });
+                  }}
+                >
+                  {t("identity.rename")}
+                </button>
+                <button
+                  type="button"
+                  className="settings-button"
+                  aria-label={t("identity.exportFor", { identity: identity.label })}
+                  onClick={() => void startExport(identity)}
+                >
+                  {t("identity.export")}
+                </button>
+                <button
+                  type="button"
+                  className="settings-button settings-button--danger"
+                  aria-label={t("identity.deleteFor", { identity: identity.label })}
+                  onClick={() => {
+                    setDialog({ kind: "delete", identity });
+                  }}
+                >
+                  {t("identity.delete")}
+                </button>
+              </div>
+              <p className="identity-card__meta identity-card__fingerprint">
+                {t("identity.fingerprintLine", {
+                  fingerprint: shortFingerprint(identity.certHash),
+                })}
+                {" · "}
+                {used.length === 0
+                  ? t("identity.notUsed")
+                  : t("identity.usedBy", {
+                      servers: used.map((server) => server.label || server.address).join(", "),
+                    })}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="identity-warning" role="note">
+        <WarningIcon className="identity-warning__icon" />
+        {t("identity.backupWarning")}
+      </p>
       <p role="status" className={status?.kind === "error" ? "settings-error" : "settings-success"}>
         {status?.text}
       </p>
@@ -303,6 +297,6 @@ export function IdentitySection({ settings, update }: SettingsSectionProps) {
           }}
         />
       )}
-    </Section>
+    </Group>
   );
 }

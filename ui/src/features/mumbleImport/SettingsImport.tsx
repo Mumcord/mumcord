@@ -41,7 +41,7 @@ export function SettingsImport({ settings, update }: SettingsImportProps) {
   };
 
   return (
-    <Group title={t("settings.title")}>
+    <Group title={t("settings.title")} icon="download">
       <p className="settings-hint">{t("settings.hint")}</p>
       <div className="settings-control-row">
         <button

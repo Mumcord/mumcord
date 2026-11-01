@@ -1,9 +1,8 @@
 import { useTranslation } from "react-i18next";
 import type { NotificationMode, SoundSettings } from "../../../api";
 import { RadioGroup } from "../components/RadioGroup";
-import { Group, Section } from "../components/Section";
+import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
-import { DndGroup } from "./DndGroup";
 import type { SettingsSectionProps } from "./types";
 
 const EVENTS: (keyof SoundSettings)[] = [
@@ -27,16 +26,11 @@ const EVENTS: (keyof SoundSettings)[] = [
 ];
 const NOTIFICATION_MODES: NotificationMode[] = ["both", "inApp", "desktop", "off"];
 
-/**
- * Sounds & notifications: Do Not Disturb (FR-3.111), one switch per notification sound
- * (FR-1.27) and which message notifications are shown (FR-1.48c).
- */
-export function SoundsSection({ settings, update }: SettingsSectionProps) {
+/** One switch per notification sound (FR-1.27). */
+export function SoundsCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   return (
-    <Section title={t("sections.sounds")}>
-      <DndGroup />
-      <p className="settings-hint">{t("sounds.explanation")}</p>
+    <Group title={t("sounds.title")} icon="volume" info={t("sounds.explanation")}>
       {EVENTS.map((event) => (
         <Switch
           key={event}
@@ -47,20 +41,26 @@ export function SoundsSection({ settings, update }: SettingsSectionProps) {
           }}
         />
       ))}
-      <Group title={t("notifications.title")}>
-        <p className="settings-hint">{t("notifications.explanation")}</p>
-        <RadioGroup
-          legend={t("notifications.legend")}
-          value={settings.notifications}
-          options={NOTIFICATION_MODES.map((mode) => ({
-            value: mode,
-            label: t(`notifications.${mode}`),
-          }))}
-          onChange={(notifications) => {
-            update({ notifications });
-          }}
-        />
-      </Group>
-    </Section>
+    </Group>
+  );
+}
+
+/** Which message notifications are shown (FR-1.48c). */
+export function NotificationsCard({ settings, update }: SettingsSectionProps) {
+  const { t } = useTranslation("settings");
+  return (
+    <Group title={t("notifications.title")} icon="bell" info={t("notifications.explanation")}>
+      <RadioGroup
+        legend={t("notifications.legend")}
+        value={settings.notifications}
+        options={NOTIFICATION_MODES.map((mode) => ({
+          value: mode,
+          label: t(`notifications.${mode}`),
+        }))}
+        onChange={(notifications) => {
+          update({ notifications });
+        }}
+      />
+    </Group>
   );
 }

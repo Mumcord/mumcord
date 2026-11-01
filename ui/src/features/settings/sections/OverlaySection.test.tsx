@@ -4,7 +4,7 @@ import { chooseOption } from "../../../components/SelectTestUtils";
 import { createMockApi, setApi, type MockApi } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import type { InGameGame, InGameOverlayApi, InGameState } from "./inGameOverlay";
-import { OverlaySection } from "./OverlaySection";
+import { InGameOverlayCard } from "./OverlaySection";
 
 let api: MockApi;
 
@@ -50,7 +50,7 @@ describe("In-game overlay", () => {
       "LD_PRELOAD=/home/u/.local/share/app.mumcord.client/overlay-layer/current/lib.so %command%";
     const writeText = vi.spyOn(api, "copyText").mockResolvedValue(null);
     render(
-      <OverlaySection
+      <InGameOverlayCard
         inGameApi={fakeInGame({
           supported: true,
           mode: "on",
@@ -68,28 +68,32 @@ describe("In-game overlay", () => {
   });
 
   it("hides the OpenGL launch option without one", async () => {
-    render(<OverlaySection inGameApi={fakeInGame({ supported: true, mode: "on", games: [] })} />);
+    render(
+      <InGameOverlayCard inGameApi={fakeInGame({ supported: true, mode: "on", games: [] })} />,
+    );
     await screen.findByRole("radio", { name: "On" });
     expect(screen.queryByText("OpenGL games")).toBeNull();
   });
 
   it("sets the global mode", async () => {
     const fake = fakeInGame({ supported: true, mode: "off", games: [] });
-    render(<OverlaySection inGameApi={fake} />);
+    render(<InGameOverlayCard inGameApi={fake} />);
     fireEvent.click(await screen.findByRole("radio", { name: "On" }));
     expect(fake.setMode).toHaveBeenCalledWith("on");
     expect(screen.getByRole("radio", { name: "Off" })).toBeChecked();
   });
 
   it("shows the fallback note where it is unsupported", async () => {
-    render(<OverlaySection inGameApi={fakeInGame({ supported: false, mode: "off", games: [] })} />);
+    render(
+      <InGameOverlayCard inGameApi={fakeInGame({ supported: false, mode: "off", games: [] })} />,
+    );
     expect(await screen.findByText(/not available on this system/)).toBeInTheDocument();
     expect(screen.queryByRole("radio", { name: "On" })).not.toBeInTheDocument();
   });
 
   it("names the reason when the overlay library is missing", async () => {
     render(
-      <OverlaySection
+      <InGameOverlayCard
         inGameApi={fakeInGame({
           supported: false,
           explanationKey: "overlay.inGame.limits.libraryMissing",
@@ -103,7 +107,7 @@ describe("In-game overlay", () => {
 
   it("shows a platform hint and no anti-cheat warning without a blocklist", async () => {
     render(
-      <OverlaySection
+      <InGameOverlayCard
         inGameApi={fakeInGame({
           supported: true,
           explanationKey: "overlay.inGame.limits.windowsFullscreen",
@@ -126,7 +130,7 @@ describe("In-game overlay", () => {
       push = onChange;
       return () => undefined;
     });
-    render(<OverlaySection inGameApi={fake} />);
+    render(<InGameOverlayCard inGameApi={fake} />);
     await screen.findByRole("radio", { name: "Off", checked: true });
     act(() => {
       push({
@@ -141,7 +145,7 @@ describe("In-game overlay", () => {
   });
 
   it("uses the engine commands by default", async () => {
-    render(<OverlaySection />);
+    render(<InGameOverlayCard />);
     fireEvent.click(await screen.findByRole("radio", { name: "On" }));
     await waitFor(() => {
       expect(screen.getByRole("radio", { name: "On" })).toBeChecked();
@@ -155,7 +159,7 @@ describe("In-game overlay", () => {
       mode: "on",
       games: [game({ id: "f", name: "Factorio", detected: true })],
     });
-    render(<OverlaySection inGameApi={fake} />);
+    render(<InGameOverlayCard inGameApi={fake} />);
     const toggle = await screen.findByRole("switch", { name: "Factorio" });
     expect(toggle).toBeChecked();
     fireEvent.click(toggle);
@@ -178,7 +182,7 @@ describe("In-game overlay", () => {
       games: [game({ id: "f", name: "Factorio", detected: true })],
     });
     fake.setGameOptions = vi.fn(() => new Promise<InGameState>(() => undefined));
-    render(<OverlaySection inGameApi={fake} />);
+    render(<InGameOverlayCard inGameApi={fake} />);
     fireEvent.click(await screen.findByRole("button", { name: "Options for Factorio" }));
     const group = screen.getByRole("group", { name: "Factorio" });
     chooseOption(within(group).getByRole("combobox", { name: "Position" }), "Bottom right");
@@ -196,7 +200,7 @@ describe("In-game overlay", () => {
       mode: "on",
       games: [game({ id: "v", name: "Valorant", blocked: { reason: "Vanguard" } })],
     });
-    render(<OverlaySection inGameApi={fake} />);
+    render(<InGameOverlayCard inGameApi={fake} />);
     const toggle = await screen.findByRole("switch", { name: "Valorant" });
     expect(toggle).not.toBeChecked();
     expect(screen.getByText("Blocked by anti-cheat.")).toBeInTheDocument();

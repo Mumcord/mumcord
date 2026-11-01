@@ -1,25 +1,49 @@
 {
-  "sectionList": "Taqsimiet tas-settings",
+  "sectionList": "Gruppi ta' settings",
   "loading": "Qed jitgħabbew is-settings…",
   "loadFailed": "Is-settings tiegħek ma setgħux jitgħabbew. Agħlaq is-settings u erġa' pprova.",
   "saveFailed": "L-aħħar bidla ma setgħetx tiġi ssejvjata. Erġa' pprova.",
   "sections": {
-    "identity": "Identità",
-    "audio": "Awdjo",
-    "voice": "Vuċi",
-    "chatHistory": "Chat u storja",
+    "general": "Ġenerali",
+    "account": "Kont u identità",
+    "voiceAudio": "Vuċi u awdjo",
+    "chatNotifications": "Chat u notifiki",
+    "privacy": "Privatezza u konnessjonijiet",
     "appearance": "Dehra",
-    "accessibility": "Aċċessibilità",
-    "language": "Lingwa",
-    "sounds": "Ħsejjes u notifiki",
-    "overlay": "Overlay",
-    "diagnostics": "Dijanjostika",
-    "about": "Dwar",
     "servers": "Servers",
-    "privacy": "Privatezza",
-    "updates": "Aġġornamenti",
+    "gaming": "Logħob u overlay",
+    "advanced": "Avvanzat u żviluppaturi",
+    "about": "Dwar",
     "packetInspector": "Ispettur tal-pakketti",
     "hotkeys": "Shortcuts"
+  },
+  "sectionDescriptions": {
+    "general": "Tnedija, lingwa, aġġornamenti u aċċessibbiltà.",
+    "account": "L-identitajiet tiegħek, il-profil tiegħek u dak li taqsam.",
+    "voiceAudio": "Mikrofonu, speakers, kif titkellem u kif tinstema'.",
+    "chatNotifications": "Notifiki, messaġġi privati, persuni mblukkati u l-istorja tal-messaġġi.",
+    "privacy": "Kif tikkonnettja ma' oħrajn u x'jittella' Mumcord minn barra.",
+    "appearance": "Tema, tqassim u l-lista tal-kanali.",
+    "servers": "Konnessjonijiet ma' diversi servers u settings għal kull server.",
+    "gaming": "L-overlay fil-logħba, awdjo pożizzjonali u plugins tal-logħob.",
+    "advanced": "Għodod għall-iżviluppaturi, dijanjostika, ħażna u liċenzji.",
+    "about": "Verżjoni, appoġġ u l-wizard tas-setup."
+  },
+  "breadcrumb": "Settings / {{section}}",
+  "moreInfo": "Aktar informazzjoni: {{topic}}",
+  "searchTerms": {
+    "devices": "input output headset speaker sound card",
+    "talkMode": "PTT VAD attività tal-vuċi shortcut",
+    "noiseSuppression": "storbju fl-isfond tnaqqis tal-istorbju",
+    "p2p": "P2P relay konnessjonijiet diretti aħbi l-indirizz IP tiegħi",
+    "theme": "mod skur mod ċar kuluri",
+    "startup": "tnedija awtomatika boot login tray",
+    "language": "traduzzjoni lingwa lokal",
+    "updates": "verżjoni ġdida upgrade",
+    "storage": "spazju fid-disk imsaħ il-cache",
+    "blocked": "injora blokka mute persuni",
+    "notifications": "twissijiet pop-ups",
+    "externalContent": "embeds immaġini previews"
   },
   "search": {
     "label": "Fittex fis-settings",
@@ -29,7 +53,13 @@
     "count_two": "Instabu {{count}} settings",
     "count_few": "Instabu {{count}} settings",
     "count_many": "Instabu {{count}} settings",
-    "count_other": "Instabu {{count}} settings"
+    "count_other": "Instabu {{count}} settings",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} riżultat",
+    "groupCount_two": "{{count}} riżultati",
+    "groupCount_few": "{{count}} riżultati",
+    "groupCount_many": "{{count}} riżultat",
+    "groupCount_other": "{{count}} riżultat"
   },
   "errors": {
     "secureStorage": "L-ħażna sigura tas-sistema tiegħek mhix disponibbli jew l-aċċess ġie rrifjutat.",
@@ -115,7 +145,6 @@
     "testStop": "Waqqaf ir-reġistrazzjoni",
     "testRecording": "Qed jirreġistra… tkellem issa.",
     "testPlaying": "Qed jindaqq il-vuċi tiegħek…",
-    "quality": "Kwalità",
     "musicQuality": "Kwalità tal-mużika",
     "musicQualityHint": "Juża aktar bandwidth u jitfi t-tneħħija tal-istorbju u l-volum awtomatiku; għall-mużika. Push-to-talk jaħdem l-aħjar.",
     "bitrate": "Bitrate",
@@ -129,7 +158,6 @@
     "duckingLevel": "Volum imbaxxi",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modalità ta' latenza baxxa",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Biex tkun tista' ddoqq il-mużika flimkien f'ħin reali",
     "lowLatencyWarningTitle": "Tbiddel is-saħħa bil-veloċità",
     "lowLatencyBandwidth": "Juża aktar bandwidth (pakketti ta' 10 ms).",
@@ -160,7 +188,7 @@
     "keyMissing": "Issettja buttuna, inkella ħadd ma jista' jisimgħek.",
     "keyRejected": "Dik il-buttuna ma tistax tintuża. Ipprova buttuna oħra, jekk trid ma' Ctrl, Alt jew Shift.",
     "keyNotConfirmed": "Id-desktop ma kkonfermax ix-shortcut. Erġa' pprova u aċċetta d-dijalogu tas-sistema, jew assenja l-buttuna fis-settings tal-shortcuts tad-desktop.",
-    "processing": "Ipproċessar tal-vuċi",
+    "processing": "Ipproċessar u kwalità",
     "noiseSuppression": "Tneħħija tal-istorbju",
     "noiseSuppressionHint": "Jiffiltra l-istorbju fl-isfond bħal tastieri u fannijiet.",
     "noiseChoice": {
@@ -267,12 +295,12 @@
     }
   },
   "history": {
+    "title": "Storja tal-messaġġi",
     "explanation": "Il-messaġġi taċ-chat jiġu ssejvjati biss fuq dan il-kompjuter.",
-    "perServer": "Servers",
+    "perServer": "Overrides għal kull server",
     "noServers": "Għad m'hemm l-ebda server issejvjat.",
     "save": "Issejvja l-istorja fuq {{server}}",
     "clearServer": "Ħassar l-istorja ta' {{server}}…",
-    "all": "Is-servers kollha",
     "clearAll": "Ħassar l-istorja kollha…",
     "confirmTitle": "Tħassar l-istorja?",
     "confirmServer": "Il-messaġġi ssejvjati kollha minn {{server}} se jitħassru minn dan il-kompjuter. Il-persuni l-oħra jżommu l-kopji tagħhom. Il-kopji tagħhom mhux se jerġgħu jiġu sinkronizzati ma' dan il-kompjuter. Dan ma jistax jiġi mreġġa' lura.",
@@ -284,7 +312,6 @@
     "autoDeleteHint": "Il-messaġġi eqdem jitħassru minn dan il-kompjuter awtomatikament, mingħajr ma jitolbu. Dan jaffettwa biss l-istorja ssejvjata hawn, mhux is-server."
   },
   "fullImages": {
-    "title": "Stampi b'daqs sħiħ",
     "offer": "Offri l-istampi tiegħi b'daqs sħiħ",
     "offerHint": "Utenti oħra ta' Mumcord jistgħu jiftħu l-istampi tiegħi b'daqs sħiħ. Mitfi: jintbagħat biss il-preview żgħir, l-ebda oriġinal ma jinżamm u l-ebda wieħed ma jinqasam.",
     "load": "Tgħabbi stampi b'daqs sħiħ mingħand l-oħrajn",
@@ -306,14 +333,15 @@
     "system": "Segwi s-sistema",
     "dark": "Skur",
     "light": "Ċar",
-    "behaviour": "Mgħiba",
+    "behaviour": "Tnedija u tieqa",
     "closeLegend": "Meta tagħlaq it-tieqa waqt li tkun konness",
     "closeAsk": "Staqsi kull darba",
     "closeTray": "Minimizza fit-tray",
     "closeQuit": "Oħroġ minn Mumcord",
     "autostart": "Ibda Mumcord meta nidħol",
     "startMinimized": "Ibda minimizzat",
-    "startMinimizedHint": "Meta Mumcord jibda mad-dħul, jistenna fit-tray minflok jiftaħ it-tieqa."
+    "startMinimizedHint": "Meta Mumcord jibda mad-dħul, jistenna fit-tray minflok jiftaħ it-tieqa.",
+    "look": "Dehra u tqassim"
   },
   "themeEditor": {
     "name": "Isem it-tema",
@@ -371,7 +399,7 @@
     "deleteConfirm": "Ħassar"
   },
   "accessibility": {
-    "hints": "Suġġerimenti",
+    "hints": "Aċċessibbiltà",
     "keyboardHints": "Uri suġġerimenti tat-tastiera",
     "keyboardHintsHint": "Tips qosra fuq l-iskrin bħal “Vireg: mexxi” taħt il-lista tal-kanali u fil-favoriti tal-GIFs. Il-qarrejja tal-iskrin xorta jaqrawhom meta dan ikun mitfi.",
     "announcements": "Annunċji għall-qarrej tal-iskrin",
@@ -380,11 +408,15 @@
     "skipLinksHint": "Links fil-bidu tat-tieqa li jaqbżu direttament għaċ-chat jew il-lista tal-kanali meta tagħfas Tab."
   },
   "language": {
+    "title": "Lingwa",
     "legend": "Lingwa tal-wiri",
-    "system": "Segwi s-sistema"
+    "system": "Segwi s-sistema",
+    "search": "Fittex lingwa",
+    "noMatch": "Ebda lingwa ma taqbel"
   },
   "sounds": {
-    "explanation": "Ħsejjes qosra għal dawn l-avvenimenti:",
+    "title": "Ħsejjes",
+    "explanation": "Ħsejjes qosra li jindaqqu għal dawn l-avvenimenti.",
     "joinLeave": "Xi ħadd jingħaqad mal-kanal tiegħek jew iħalli",
     "voiceJoin": "Tingħaqad ma' kanal għall-vuċi",
     "selfMute": "Tmutja jew tneħħi l-mute lilek innifsek",
@@ -461,7 +493,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Logging",
+    "title": "Dijanjostika",
     "logLevel": "Dettall tal-log",
     "levels": {
       "error": "Żbalji biss",
@@ -496,7 +528,8 @@
     "setupWizardHint": "Erġa' għaddi mill-ewwel setup biex tirrevedi l-mikrofonu, l-għażliet tal-privatezza, il-kontroll tal-aġġornamenti u l-mod kif titkellem. L-għażliet attwali tiegħek huma mimlija.",
     "setupWizardRun": "Erġa' ħaddem il-wiżard tas-setup",
     "setupWizardIdentityNote": "L-identità tiegħek mhijiex parti minn dan. Iċ-ċertifikat tiegħek, u miegħu l-isem irreġistrat u l-permessi tiegħek fuq is-servers, jibqa' eżatt kif inhu.",
-    "setupWizardIdentityLink": "Immaniġġjaha f'Identità"
+    "setupWizardIdentityLink": "Immaniġġjaha f'Identità",
+    "versionTitle": "Verżjoni u liċenzja"
   },
   "profile": {
     "title": "Profil",
@@ -512,7 +545,6 @@
     "skipped": "L-avatar default tiegħek ma ntbagħatx: huwa kbir wisq għal dan is-server."
   },
   "linkPreviews": {
-    "title": "Previews tal-links",
     "switch": "Uri previews u embeds tal-links",
     "hint": "Mumcord jgħabbi l-paġni marbuta biex juri previews u video players; dawk is-siti jaraw l-indirizz IP tiegħek."
   },
@@ -533,7 +565,7 @@
     "cleared": "Cache imnaddfa, {{size}} meħlusa."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Ħażna",
     "hint": "Mumcord iżomm data temporanja fuq dan il-kompjuter biex kollox jitgħabba aktar malajr. Tista' tindiffa mingħajr periklu; terġa' tinħoloq meta jkun hemm bżonn.",
     "kind": {
       "previews": "Previews tal-links u stampi",
@@ -576,7 +608,7 @@
     "betaHint": "Ir-riżultati jiddependu mil-logħba u mill-appoġġ tal-plugin tagħha."
   },
   "gamePlugins": {
-    "title": "Awdjo posizzjonali: sorsi",
+    "title": "Plugins tal-logħob",
     "explanation": "Il-logħob jgħidu lil Mumcord fejn int permezz ta' Mumble Link jew permezz ta' plugins uffiċjali tal-logħob ta' Mumble. Mumcord isib il-plugins fil-folder tal-plugins tiegħu stess u f'installazzjoni eżistenti ta' Mumble. Ixgħel biss il-plugins tal-logħob li tilgħab.",
     "antiCheat": "Il-plugins tal-logħob jaqraw il-memorja tal-logħba. Xi sistemi anti-cheat jistgħu jimmarkaw dan; itfi l-plugins għal logħob b'anti-cheat strett.",
     "loading": "Qed infittxu plugins tal-logħob…",
@@ -599,7 +631,6 @@
     "limitInvalid": "Daħħal numru sħiħ minn 1 sa 15."
   },
   "appearanceEffects": {
-    "title": "Effetti",
     "visualEffects": "Effetti viżivi (ħġieġ, granulu)",
     "visualEffectsHint": "Menus tal-ħġieġ smerilat u granulu tal-film sottili. Jintfew awtomatikament meta s-sistema titlob inqas trasparenza jew moviment."
   },
@@ -613,7 +644,6 @@
   "p2p": {
     "title": "Peer-to-peer (qsim tal-iskrin, immaġini bid-daqs sħiħ)",
     "modeLabel": "Modalità peer-to-peer",
-    "recommended": "Rakkomandat",
     "explanation": "Dirett juri l-indirizz IP tiegħek lill-persuna l-oħra. Ir-relay jaħbiħulha; l-operatur tar-relay (il-komunità ta' dan is-server) jista' jarah. It-tnejn huma kriptati minn tarf sa tarf.",
     "useGlobal": "Uża s-setting globali",
     "overrideHint": "Għal dan is-server biss. \"Uża s-setting globali\" isegwi Settings → Privatezza.",
@@ -626,7 +656,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Konnessjonijiet diretti",
     "allow": "Ippermetti konnessjonijiet diretti ma' utenti oħra ta' Mumcord",
     "hint": "Il-konnessjonijiet diretti huma aktar mgħaġġla, imma l-persuna l-oħra tista' tara l-indirizz IP tiegħek. Sakemm tiddeċiedi, Mumcord jistaqsi l-ewwel darba li tkun se tintuża waħda.",
     "notUsed": "Mhux użat fil-modalità peer-to-peer magħżula: Mumcord qatt ma jikkonnettja direttament ma' nies oħra."
@@ -637,6 +666,7 @@
     "failed": "Ma ħadimx. Erġa' pprova."
   },
   "inspector": {
+    "title": "Għodod għall-iżviluppaturi",
     "intro": "Juri l-pakketti li Mumcord jibgħat u jirċievi, l-aktar data tal-plugins ta’ Mumcord, għad-debugging. Jinżammu biss l-aħħar 2,000 pakkett, fil-memorja ta’ dan l-apparat; xejn ma jiġi rreġistrat jew mibgħut x’imkien.",
     "devTools": "Għodod tal-iżviluppatur",
     "devToolsHint": "Itfi biex terġa’ taħbi l-ispettur tal-pakketti u twaqqaf il-qbid.",
@@ -816,7 +846,14 @@
     "hide": "Aħbihom għalkollox",
     "hideHint": "Xejn ma jintwera fiċ-chat."
   },
+  "externalContent": {
+    "title": "Kontenut estern"
+  },
+  "privacyConnections": {
+    "title": "Konnessjonijiet"
+  },
   "updates": {
+    "title": "Aġġornamenti",
     "installedFrom": "Mumcord {{version}} · installat minn {{source}}",
     "install": {
       "appImage": "l-AppImage",
@@ -830,7 +867,6 @@
       "aur": "l-AUR",
       "otherLinux": "pakkett tal-Linux"
     },
-    "checking": "Qed jiċċekkja",
     "mode": "Meta jinstab aġġornament",
     "modeHint": "L-aġġornamenti dejjem jiġu ċċekkjati u vverifikati qabel jiġu installati.",
     "modeAuto": "Niżżel awtomatikament",
@@ -850,7 +886,6 @@
     "intervalHours_many": "Kull {{count}} siegħa",
     "intervalHours_other": "Kull {{count}} siegħa",
     "intervalWeek": "Darba fil-ġimgħa",
-    "status": "Status",
     "state": {
       "idle": "Għadu ma ġiex iċċekkjat",
       "off": "Iċ-ċekkjar tal-aġġornamenti huwa mitfi",
@@ -877,6 +912,102 @@
     "whatsNew": "X'hemm ġdid",
     "whatsNewHint": "Ara l-bidliet f'kull verżjoni.",
     "openChangelog": "Iftaħ il-log tal-bidliet"
+  },
+  "badges": {
+    "changed": "Mibdul",
+    "recommended": "Rakkomandat",
+    "groupChanged": "Fih settings mibdula"
+  },
+  "resetSection": {
+    "button": "Irrisettja t-taqsima",
+    "title": "Tirrisettja {{section}}?",
+    "intro": "Dawn is-settings jerġgħu lura għall-preset tiegħek jew għall-valur default tagħhom:",
+    "nothing": "Kull setting f'{{section}} diġà għandu l-valur tal-preset jew il-valur default tiegħu.",
+    "confirm": "Irrisettja"
+  },
+  "activePreset": {
+    "heading": "Preset attiv",
+    "none": "L-ebda preset",
+    "customised": "{{preset}}, personalizzat",
+    "changed_one": "{{count}} setting inbidel mis-setup",
+    "changed_two": "{{count}} settings inbidlu mis-setup",
+    "changed_few": "{{count}} settings inbidlu mis-setup",
+    "changed_many": "{{count}} setting inbidel mis-setup",
+    "changed_other": "{{count}} setting inbidel mis-setup",
+    "unchanged": "L-ebda bidla mis-setup",
+    "switch": "Biddel",
+    "switchLabel": "Biddel il-preset",
+    "applyFailed": "L-overlay fil-logħba jew Do Not Disturb ma setgħux jinbidlu. Jekk jogħġbok erġa' pprova."
+  },
+  "presets": {
+    "dialogTitle": "Biddel il-preset",
+    "dialogIntro": "Agħżel punt tat-tluq. Jinbidlu biss is-settings li preset ikopri; kull ħaġa oħra tibqa' kif inhi.",
+    "legend": "Presets",
+    "continue": "Kompli",
+    "confirmTitle": "Tbiddel għal {{preset}}?",
+    "confirmIntro": "Dawn is-settings jinbidlu:",
+    "confirmNothing": "L-ebda setting ma jinbidel. Mumcord jiftakar {{preset}} bħala l-preset tiegħek.",
+    "confirmCustom": "L-ebda setting ma jinbidel. Is-Settings jieqfu jqabblu l-għażliet tiegħek ma' preset u jqabbluhom mal-valuri default minflok.",
+    "apply": "Biddel il-preset",
+    "everythingOn": {
+      "name": "Kollox mixgħul",
+      "tagline": "Is-sett sħiħ tal-karatteristiċi",
+      "point1": "L-oħrajn jaraw x'tilgħab u x'tisma'",
+      "point2": "L-IP tiegħek jidher għal persuni li tikkonnettja magħhom direttament",
+      "point3": "Kulħadd jista' jibgħatlek messaġġ; links u immaġini jitgħabbew mill-web",
+      "point4": "L-overlay, is-sinkronizzazzjoni tal-istorja u l-immaġini bid-daqs sħiħ huma mixgħula"
+    },
+    "balanced": {
+      "name": "Bilanċjat",
+      "tagline": "Bejn il-privatezza u l-kumdità",
+      "point1": "Biss l-ħbieb u n-nies fil-kanal tiegħek jistgħu jibagħtulek messaġġ",
+      "point2": "Konnessjoni diretta, b'relay bħala riserva",
+      "point3": "Il-previews tal-links u l-immaġini bid-daqs sħiħ huma mixgħula",
+      "point4": "Dak li tilgħab u tisma' jibqa' privat"
+    },
+    "maximumPrivacy": {
+      "name": "Privatezza massima",
+      "tagline": "Aqsam l-inqas possibbli",
+      "point1": "Biss l-ħbieb jistgħu jibagħtulek messaġġ, mingħajr eċċezzjonijiet",
+      "point2": "L-IP tiegħek huwa moħbi; kollox jgħaddi mir-relay",
+      "point3": "L-ebda kontenut minn barra, l-ebda sinkronizzazzjoni tal-istorja, l-ebda qsim",
+      "point4": "Xejn ma jinqasam dwar dak li tagħmel"
+    },
+    "custom": {
+      "name": "Personalizzat",
+      "tagline": "L-għażliet tiegħek stess",
+      "point1": "Iżomm kull setting kif inhu",
+      "point2": "Il-bidliet jitqabblu mal-valuri default",
+      "point3": "L-aħjar jekk taf x'trid"
+    }
+  },
+  "betaFeatures": {
+    "title": "Karatteristiċi beta",
+    "hint": "Karatteristiċi bikrin; jistgħu jinbidlu. Kull waħda tidher ukoll fejn tappartjeni, b'badge Beta.",
+    "gamePlugins": "Plugins tal-logħob",
+    "manage": "Immaniġġja l-plugins"
+  },
+  "privacySummary": {
+    "title": "Sommarju tal-privatezza",
+    "ipHidden": "L-indirizz IP tiegħek jibqa' moħbi",
+    "ipVisible": "Konnessjonijiet diretti jistgħu juru l-indirizz IP tiegħek",
+    "matches": "Jaqbel ma' {{preset}}",
+    "messages": "Messaġġi privati minn: {{rule}}",
+    "p2pHidden": "Peer-to-peer jgħaddi mir-relay, għalhekk il-persuna l-oħra ma tarax l-indirizz IP tiegħek.",
+    "p2pDirect": "Peer-to-peer l-ewwel jikkonnettja direttament; il-persuna l-oħra tista' tara l-indirizz IP tiegħek.",
+    "p2pDirectOnly": "Peer-to-peer jikkonnettja direttament biss; il-persuna l-oħra tista' tara l-indirizz IP tiegħek.",
+    "externalOn": "Il-previews tal-links huma mixgħula: Mumcord jitlob il-paġni marbuta biex jibnihom.",
+    "externalOff": "Il-previews tal-links huma mitfija: Mumcord ma jgħabbi xejn mill-paġni marbuta.",
+    "imagesOn": "L-immaġini bid-daqs sħiħ jinbidlu direttament bejn l-utenti ta' Mumcord.",
+    "imagesOff": "L-immaġini bid-daqs sħiħ ma jinbidlux.",
+    "historyOn": "Is-sinkronizzazzjoni tal-istorja hija mixgħula: taqsam l-istorja tal-kanali tiegħek ma' utenti oħra ta' Mumcord.",
+    "historyOff": "Is-sinkronizzazzjoni tal-istorja hija mitfija.",
+    "sharingBoth": "L-oħrajn jaraw x'tilgħab u x'tisma'.",
+    "sharingPlaying": "L-oħrajn jaraw x'tisma'.",
+    "sharingGaming": "L-oħrajn jaraw il-logħba li tilgħab.",
+    "sharingNone": "Dak li tilgħab u tisma' jibqa' privat.",
+    "change": "Biddel",
+    "changeLabel": "Biddel: {{topic}}"
   },
   "hotkeys": {
     "global": "Shortcuts globali",

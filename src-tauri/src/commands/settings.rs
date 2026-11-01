@@ -59,6 +59,39 @@ impl From<P2pMode> for store::P2pMode {
     }
 }
 
+/// The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SetupPreset {
+    EverythingOn,
+    /// "Balanced (Recommended)".
+    Balanced,
+    MaximumPrivacy,
+    Custom,
+}
+
+impl From<store::SetupPreset> for SetupPreset {
+    fn from(preset: store::SetupPreset) -> Self {
+        match preset {
+            store::SetupPreset::EverythingOn => Self::EverythingOn,
+            store::SetupPreset::Balanced => Self::Balanced,
+            store::SetupPreset::MaximumPrivacy => Self::MaximumPrivacy,
+            store::SetupPreset::Custom => Self::Custom,
+        }
+    }
+}
+
+impl From<SetupPreset> for store::SetupPreset {
+    fn from(preset: SetupPreset) -> Self {
+        match preset {
+            SetupPreset::EverythingOn => Self::EverythingOn,
+            SetupPreset::Balanced => Self::Balanced,
+            SetupPreset::MaximumPrivacy => Self::MaximumPrivacy,
+            SetupPreset::Custom => Self::Custom,
+        }
+    }
+}
+
 /// A custom or imported colour theme (FR-2.14 – FR-2.16) with a dark and a light version. Each
 /// colour map holds the key colours (background, surface, text, accent, talking, warning, error)
 /// as `#rrggbb`; values that are not such a colour are dropped on save. Built-in presets live in
@@ -560,6 +593,9 @@ pub struct Settings {
     /// The version whose "What's new" was shown or skipped last; `null` before the first start
     /// that knew about it.
     pub whats_new_seen: Option<String>,
+    /// The setup style chosen in the wizard (issue #159); `null` until the wizard stored one.
+    /// Settings compares it with the current values ("Balanced, customised").
+    pub setup_preset: Option<SetupPreset>,
     /// "Private messages from" (issue #141).
     pub private_messages: PrivateMessageSettings,
     /// Channel messages of blocked users: collapsed (default) or hidden (issue #140).
@@ -692,6 +728,7 @@ impl Settings {
             window_overlay_notice_shown: s.window_overlay_notice_shown,
             whats_new_auto: s.whats_new_auto,
             whats_new_seen: s.whats_new_seen.clone(),
+            setup_preset: s.setup_preset.map(Into::into),
             private_messages: (&s.private_messages).into(),
             blocked_messages: s.blocked_messages.into(),
         }
@@ -819,6 +856,7 @@ impl Settings {
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s.whats_new_auto = self.whats_new_auto;
         s.whats_new_seen.clone_from(&self.whats_new_seen);
+        s.setup_preset = self.setup_preset.map(Into::into);
         s.private_messages = (&self.private_messages).into();
         s.blocked_messages = self.blocked_messages.into();
         s
@@ -915,6 +953,14 @@ pub fn settings_get(engine: State<'_, Engine>) -> ApiResult<Settings> {
     Ok(Settings::from_store(&engine.settings()?))
 }
 
+/// The values a fresh install starts with. Settings marks what differs from them as changed and
+/// "Reset section" goes back to them (#161).
+#[tauri::command]
+#[specta::specta]
+pub fn settings_default() -> Settings {
+    Settings::from_store(&store::Settings::default())
+}
+
 /// The one-time "window overlay is gone" notice is due for users who had it switched on.
 fn window_overlay_notice_due(settings: &store::Settings) -> bool {
     settings.legacy_window_overlay_enabled && !settings.window_overlay_notice_shown
@@ -997,6 +1043,14 @@ pub async fn settings_update(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn default_settings_match_a_fresh_store() {
+        let defaults = settings_default();
+        assert!(!defaults.wizard_completed);
+        assert_eq!(defaults.setup_preset, None);
+        assert!(defaults.link_previews);
+    }
 
     #[test]
     fn every_language_code_round_trips_through_the_store() {
@@ -1206,8 +1260,10 @@ mod tests {
         ui.window_overlay_notice_shown = true;
         assert!(ui.whats_new_auto);
         assert_eq!(ui.whats_new_seen, None);
+        assert_eq!(ui.setup_preset, None);
         ui.whats_new_auto = false;
         ui.whats_new_seen = Some("0.4.4".into());
+        ui.setup_preset = Some(SetupPreset::Balanced);
         let stored = ui.to_store(&base);
         assert_eq!(stored.max_connected_servers, 15);
         assert_eq!(stored.app_theme_id, "mumcord-dark");
@@ -1222,6 +1278,8 @@ mod tests {
         assert!(back.talking_first && back.window_overlay_notice_shown);
         assert!(!back.whats_new_auto);
         assert_eq!(back.whats_new_seen.as_deref(), Some("0.4.4"));
+        assert_eq!(stored.setup_preset, Some(store::SetupPreset::Balanced));
+        assert_eq!(back.setup_preset, Some(SetupPreset::Balanced));
         assert_eq!(back.allow_direct_connections, Consent::No);
         assert_eq!(stored.p2p_mode, store::P2pMode::RelayFirst);
         assert_eq!(back.p2p_mode, P2pMode::RelayFirst);

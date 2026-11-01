@@ -1,32 +1,59 @@
 {
-  "sectionList": "Asetusosiot",
+  "sectionList": "Asetusryhmät",
   "loading": "Ladataan asetuksia…",
   "loadFailed": "Asetuksiasi ei voitu ladata. Sulje asetukset ja yritä uudelleen.",
   "saveFailed": "Viimeisintä muutosta ei voitu tallentaa. Yritä uudelleen.",
   "sections": {
-    "identity": "Identiteetti",
-    "audio": "Ääni",
-    "voice": "Puhe",
-    "chatHistory": "Chat ja historia",
+    "general": "Yleiset",
+    "account": "Tili ja identiteetti",
+    "voiceAudio": "Puhe ja ääni",
+    "chatNotifications": "Keskustelu ja ilmoitukset",
+    "privacy": "Yksityisyys ja yhteydet",
     "appearance": "Ulkoasu",
-    "accessibility": "Saavutettavuus",
-    "language": "Kieli",
-    "sounds": "Äänet ja ilmoitukset",
-    "overlay": "Peittokuva",
-    "diagnostics": "Diagnostiikka",
-    "about": "Tietoja",
     "servers": "Palvelimet",
-    "privacy": "Yksityisyys",
-    "updates": "Päivitykset",
+    "gaming": "Pelaaminen ja peittokuva",
+    "advanced": "Lisäasetukset ja kehittäjä",
+    "about": "Tietoja",
     "packetInspector": "Pakettitarkastin",
     "hotkeys": "Pikanäppäimet"
+  },
+  "sectionDescriptions": {
+    "general": "Käynnistys, kieli, päivitykset ja saavutettavuus.",
+    "account": "Identiteettisi, profiilisi ja se, mitä jaat.",
+    "voiceAudio": "Mikrofoni, kaiuttimet, miten puhut ja miltä kuulostat.",
+    "chatNotifications": "Ilmoitukset, yksityisviestit, estetyt henkilöt ja viestihistoria.",
+    "privacy": "Miten yhdistät muihin ja mitä Mumcord lataa ulkopuolelta.",
+    "appearance": "Teema, asettelu ja kanavaluettelo.",
+    "servers": "Yhteydet useisiin palvelimiin ja palvelinkohtaiset asetukset.",
+    "gaming": "Pelinaikainen peittokuva, paikkaääni ja pelilaajennukset.",
+    "advanced": "Kehittäjätyökalut, diagnostiikka, tallennustila ja lisenssit.",
+    "about": "Versio, tuki ja käyttöönottoavustaja."
+  },
+  "breadcrumb": "Asetukset / {{section}}",
+  "moreInfo": "Lisätietoja: {{topic}}",
+  "searchTerms": {
+    "devices": "sisääntulo ulostulo kuulokkeet kaiutin äänikortti",
+    "talkMode": "PTT VAD äänentunnistus pikanäppäin",
+    "noiseSuppression": "taustamelu kohinanvaimennus",
+    "p2p": "P2P välitys suorat yhteydet piilota IP-osoitteeni",
+    "theme": "tumma tila vaalea tila värit",
+    "startup": "automaattikäynnistys käynnistys kirjautuminen ilmoitusalue",
+    "language": "käännös kieli alue",
+    "updates": "uusi versio päivitys",
+    "storage": "levytila tyhjennä välimuisti",
+    "blocked": "ohita estä mykistä henkilöt",
+    "notifications": "hälytykset ponnahdusikkunat",
+    "externalContent": "upotukset kuvat esikatselut"
   },
   "search": {
     "label": "Hae asetuksista",
     "results": "Hakutulokset",
     "empty": "Haulla ”{{query}}” ei löytynyt asetuksia.",
     "count_one": "{{count}} asetus löytyi",
-    "count_other": "{{count}} asetusta löytyi"
+    "count_other": "{{count}} asetusta löytyi",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} tulos",
+    "groupCount_other": "{{count}} tulosta"
   },
   "errors": {
     "secureStorage": "Järjestelmäsi suojattu tallennustila ei ole käytettävissä tai pääsy evättiin.",
@@ -112,7 +139,6 @@
     "testStop": "Lopeta tallennus",
     "testRecording": "Tallennetaan… puhu nyt.",
     "testPlaying": "Toistetaan ääntäsi…",
-    "quality": "Laatu",
     "musicQuality": "Musiikkilaatu",
     "musicQualityHint": "Käyttää enemmän kaistaa ja poistaa käytöstä kohinanvaimennuksen ja automaattisen äänenvoimakkuuden; musiikkia varten. Puhu painamalla toimii parhaiten.",
     "bitrate": "Bittinopeus",
@@ -126,7 +152,6 @@
     "duckingLevel": "Hiljennetty äänenvoimakkuus",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Pienen viiveen tila",
-    "lowLatencyBeta": "Beta",
     "lowLatencyHint": "Musiikin soittamiseen yhdessä reaaliajassa",
     "lowLatencyWarningTitle": "Vaihtaa luotettavuutta nopeuteen",
     "lowLatencyBandwidth": "Käyttää enemmän kaistaa (10 ms:n paketit).",
@@ -157,7 +182,7 @@
     "keyMissing": "Aseta näppäin, muuten kukaan ei kuule sinua.",
     "keyRejected": "Tätä näppäintä ei voi käyttää. Kokeile toista näppäintä, halutessasi Ctrl-, Alt- tai Shift-näppäimen kanssa.",
     "keyNotConfirmed": "Työpöytä ei vahvistanut pikanäppäintä. Yritä uudelleen ja hyväksy järjestelmän ikkuna tai määritä näppäin työpöydän pikanäppäinasetuksissa.",
-    "processing": "Puheen käsittely",
+    "processing": "Käsittely ja laatu",
     "noiseSuppression": "Kohinanvaimennus",
     "noiseSuppressionHint": "Suodattaa taustamelun, kuten näppäimistön ja tuulettimien äänet.",
     "noiseChoice": {
@@ -261,12 +286,12 @@
     }
   },
   "history": {
+    "title": "Viestihistoria",
     "explanation": "Chat-viestit tallennetaan vain tälle tietokoneelle.",
-    "perServer": "Palvelimet",
+    "perServer": "Palvelinkohtaiset ohitukset",
     "noServers": "Ei vielä tallennettuja palvelimia.",
     "save": "Tallenna historia palvelimelta {{server}}",
     "clearServer": "Tyhjennä palvelimen {{server}} historia…",
-    "all": "Kaikki palvelimet",
     "clearAll": "Tyhjennä koko historia…",
     "confirmTitle": "Tyhjennetäänkö historia?",
     "confirmServer": "Kaikki palvelimen {{server}} tallennetut viestit poistetaan tältä tietokoneelta. Muiden kopiot säilyvät. Heidän kopioitaan ei synkronoida takaisin tälle tietokoneelle. Tätä ei voi kumota.",
@@ -278,7 +303,6 @@
     "autoDeleteHint": "Vanhemmat viestit poistetaan tältä tietokoneelta automaattisesti kysymättä. Tämä koskee vain tänne tallennettua historiaa, ei palvelinta."
   },
   "fullImages": {
-    "title": "Täysikokoiset kuvat",
     "offer": "Tarjoa täysikokoiset kuvani",
     "offerHint": "Muut Mumcord-käyttäjät voivat avata kuvani täysikokoisina. Pois päältä: vain pieni esikatselu lähetetään, alkuperäistä ei säilytetä eikä jaeta.",
     "load": "Lataa täysikokoiset kuvat muilta",
@@ -300,14 +324,15 @@
     "system": "Seuraa järjestelmää",
     "dark": "Tumma",
     "light": "Vaalea",
-    "behaviour": "Toiminta",
+    "behaviour": "Käynnistys ja ikkuna",
     "closeLegend": "Kun suljet ikkunan yhteyden ollessa auki",
     "closeAsk": "Kysy joka kerta",
     "closeTray": "Pienennä ilmoitusalueelle",
     "closeQuit": "Lopeta Mumcord",
     "autostart": "Käynnistä Mumcord, kun kirjaudun sisään",
     "startMinimized": "Käynnistä pienennettynä",
-    "startMinimizedHint": "Kun Mumcord käynnistyy kirjautuessa, se odottaa ilmoitusalueella ikkunan avaamisen sijaan."
+    "startMinimizedHint": "Kun Mumcord käynnistyy kirjautuessa, se odottaa ilmoitusalueella ikkunan avaamisen sijaan.",
+    "look": "Ulkoasu ja asettelu"
   },
   "themeEditor": {
     "name": "Teeman nimi",
@@ -365,7 +390,7 @@
     "deleteConfirm": "Poista"
   },
   "accessibility": {
-    "hints": "Vihjeet",
+    "hints": "Saavutettavuus",
     "keyboardHints": "Näytä näppäimistövihjeet",
     "keyboardHintsHint": "Lyhyet näytöllä näkyvät vinkit, kuten ”Nuolinäppäimet: liiku”, kanavalistan alla ja GIF-suosikeissa. Ruudunlukijat lukevat ne silti, vaikka tämä olisi pois päältä.",
     "announcements": "Ruudunlukijan ilmoitukset",
@@ -374,11 +399,15 @@
     "skipLinksHint": "Linkit ikkunan alussa, jotka vievät suoraan chattiin tai kanavalistaan, kun painat Tab-näppäintä."
   },
   "language": {
+    "title": "Kieli",
     "legend": "Näyttökieli",
-    "system": "Seuraa järjestelmää"
+    "system": "Seuraa järjestelmää",
+    "search": "Hae kieltä",
+    "noMatch": "Sopivaa kieltä ei löytynyt"
   },
   "sounds": {
-    "explanation": "Lyhyet äänet näille tapahtumille:",
+    "title": "Äänet",
+    "explanation": "Lyhyet äänet, jotka soivat näissä tapahtumissa.",
     "joinLeave": "Joku liittyy kanavallesi tai poistuu siltä",
     "voiceJoin": "Liityt kanavalle puhetta varten",
     "selfMute": "Mykistät itsesi tai poistat mykistyksen",
@@ -455,7 +484,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Lokit",
+    "title": "Diagnostiikka",
     "logLevel": "Lokin tarkkuus",
     "levels": {
       "error": "Vain virheet",
@@ -490,7 +519,8 @@
     "setupWizardHint": "Käy ensiasennus uudelleen läpi ja tarkista mikrofoni, yksityisyysvalinnat, päivitysten tarkistus ja puhumistila. Nykyiset valintasi on täytetty valmiiksi.",
     "setupWizardRun": "Suorita asennusvelho uudelleen",
     "setupWizardIdentityNote": "Identiteettisi ei kuulu tähän. Sertifikaattisi ja sen mukana rekisteröity nimesi ja käyttöoikeutesi palvelimilla pysyvät täsmälleen sellaisina kuin ne ovat.",
-    "setupWizardIdentityLink": "Hallitse sitä kohdassa Identiteetti"
+    "setupWizardIdentityLink": "Hallitse sitä kohdassa Identiteetti",
+    "versionTitle": "Versio ja lisenssi"
   },
   "profile": {
     "title": "Profiili",
@@ -506,7 +536,6 @@
     "skipped": "Oletusprofiilikuvaasi ei lähetetty: se on liian suuri tälle palvelimelle."
   },
   "linkPreviews": {
-    "title": "Linkkien esikatselut",
     "switch": "Näytä linkkien esikatselut ja upotukset",
     "hint": "Mumcord lataa linkitetyt sivut näyttääkseen esikatseluja ja videosoittimia; nämä sivustot näkevät IP-osoitteesi."
   },
@@ -527,7 +556,7 @@
     "cleared": "Välimuisti tyhjennetty, {{size}} vapautettu."
   },
   "cache": {
-    "title": "Välimuisti",
+    "title": "Tallennustila",
     "hint": "Mumcord tallentaa tälle tietokoneelle väliaikaisia tietoja, jotta kaikki latautuu nopeammin. Niiden tyhjentäminen on turvallista; ne luodaan tarvittaessa uudelleen.",
     "kind": {
       "previews": "Linkkien esikatselut ja kuvat",
@@ -567,7 +596,7 @@
     "betaHint": "Tulokset riippuvat pelistä ja sen lisäosatuesta."
   },
   "gamePlugins": {
-    "title": "Sijaintiääni: lähteet",
+    "title": "Pelilaajennukset",
     "explanation": "Pelit kertovat Mumcordille sijaintisi Mumble Linkin tai virallisten Mumble-pelilisäosien kautta. Mumcord etsii lisäosia omasta lisäosakansiostaan ja olemassa olevasta Mumble-asennuksesta. Ota käyttöön vain niiden pelien lisäosat, joita pelaat.",
     "antiCheat": "Pelilisäosat lukevat pelin muistia. Jotkin huijauksenestojärjestelmät voivat merkitä tämän; poista lisäosat käytöstä peleissä, joissa on tiukka huijauksenesto.",
     "loading": "Etsitään pelilisäosia…",
@@ -590,7 +619,6 @@
     "limitInvalid": "Anna kokonaisluku väliltä 1–15."
   },
   "appearanceEffects": {
-    "title": "Tehosteet",
     "visualEffects": "Visuaaliset tehosteet (lasi, rakeisuus)",
     "visualEffectsHint": "Huurrelasivalikot ja hienovarainen filmirae. Pois päältä automaattisesti, kun järjestelmä pyytää vähemmän läpinäkyvyyttä tai liikettä."
   },
@@ -604,7 +632,6 @@
   "p2p": {
     "title": "Peer-to-peer (näytön jakaminen, täysikokoiset kuvat)",
     "modeLabel": "Peer-to-peer-tila",
-    "recommended": "Suositus",
     "explanation": "Suora yhteys näyttää IP-osoitteesi toiselle henkilölle. Rele piilottaa sen häneltä; releen ylläpitäjä (tämän palvelimen yhteisö) voi nähdä sen. Molemmat ovat päästä päähän salattuja.",
     "useGlobal": "Käytä yleisasetusta",
     "overrideHint": "Vain tälle palvelimelle. ”Käytä yleisasetusta” noudattaa kohtaa Asetukset → Yksityisyys.",
@@ -617,7 +644,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Suorat yhteydet",
     "allow": "Salli suorat yhteydet muihin Mumcord-käyttäjiin",
     "hint": "Suorat yhteydet ovat nopeampia, mutta toinen henkilö näkee IP-osoitteesi. Kunnes päätät, Mumcord kysyy, kun sellaista käytettäisiin ensimmäisen kerran.",
     "notUsed": "Ei käytössä valitussa peer-to-peer-tilassa: Mumcord ei koskaan yhdistä suoraan muihin."
@@ -628,6 +654,7 @@
     "failed": "Se ei onnistunut. Yritä uudelleen."
   },
   "inspector": {
+    "title": "Kehittäjätyökalut",
     "intro": "Näyttää Mumcordin lähettämät ja vastaanottamat paketit, lähinnä Mumcord-lisäosien tietoja, virheenjäljitystä varten. Vain viimeiset 2 000 pakettia säilytetään tämän laitteen muistissa; mitään ei kirjata lokiin tai lähetetä minnekään.",
     "devTools": "Kehittäjätyökalut",
     "devToolsHint": "Poista käytöstä piilottaaksesi pakettitarkastimen uudelleen ja lopettaaksesi tallennuksen.",
@@ -804,7 +831,14 @@
     "hide": "Piilota kokonaan",
     "hideHint": "Keskustelussa ei näytetä mitään."
   },
+  "externalContent": {
+    "title": "Ulkoinen sisältö"
+  },
+  "privacyConnections": {
+    "title": "Yhteydet"
+  },
   "updates": {
+    "title": "Päivitykset",
     "installedFrom": "Mumcord {{version}} · asennettu lähteestä: {{source}}",
     "install": {
       "appImage": "AppImage",
@@ -818,7 +852,6 @@
       "aur": "AUR",
       "otherLinux": "Linux-paketti"
     },
-    "checking": "Tarkistetaan",
     "mode": "Kun päivitys löytyy",
     "modeHint": "Päivitykset tarkistetaan ja varmennetaan aina ennen asennusta.",
     "modeAuto": "Lataa automaattisesti",
@@ -832,7 +865,6 @@
     "intervalHours_one": "Joka tunti",
     "intervalHours_other": "{{count}} tunnin välein",
     "intervalWeek": "Kerran viikossa",
-    "status": "Tila",
     "state": {
       "idle": "Ei vielä tarkistettu",
       "off": "Päivitysten tarkistus on pois päältä",
@@ -859,6 +891,99 @@
     "whatsNew": "Mikä on uutta",
     "whatsNewHint": "Katso muutokset jokaisessa versiossa.",
     "openChangelog": "Avaa muutosloki"
+  },
+  "badges": {
+    "changed": "Muutettu",
+    "recommended": "Suositeltu",
+    "groupChanged": "Sisältää muutettuja asetuksia"
+  },
+  "resetSection": {
+    "button": "Palauta osio",
+    "title": "Palautetaanko {{section}}?",
+    "intro": "Nämä asetukset palaavat esiasetukseesi tai oletusarvoonsa:",
+    "nothing": "Kaikilla osion {{section}} asetuksilla on jo esiasetuksensa tai oletusarvonsa.",
+    "confirm": "Palauta"
+  },
+  "activePreset": {
+    "heading": "Aktiivinen esiasetus",
+    "none": "Ei esiasetusta",
+    "customised": "{{preset}}, mukautettu",
+    "changed_one": "{{count}} asetus muutettu käyttöönoton jälkeen",
+    "changed_other": "{{count}} asetusta muutettu käyttöönoton jälkeen",
+    "unchanged": "Ei muutoksia käyttöönoton jälkeen",
+    "switch": "Vaihda",
+    "switchLabel": "Vaihda esiasetus",
+    "applyFailed": "Pelinaikaista peittokuvaa tai Älä häiritse -tilaa ei voitu muuttaa. Yritä uudelleen."
+  },
+  "presets": {
+    "dialogTitle": "Vaihda esiasetus",
+    "dialogIntro": "Valitse lähtökohta. Vain esiasetuksen kattamat asetukset muuttuvat; kaikki muu pysyy ennallaan.",
+    "legend": "Esiasetukset",
+    "continue": "Jatka",
+    "confirmTitle": "Vaihdetaanko esiasetukseen {{preset}}?",
+    "confirmIntro": "Nämä asetukset muuttuvat:",
+    "confirmNothing": "Mikään asetus ei muutu. Mumcord muistaa esiasetuksesi: {{preset}}.",
+    "confirmCustom": "Mikään asetus ei muutu. Asetukset lakkaavat vertaamasta valintojasi esiasetukseen ja vertaavat niitä oletusarvoihin.",
+    "apply": "Vaihda esiasetus",
+    "everythingOn": {
+      "name": "Kaikki päällä",
+      "tagline": "Kaikki ominaisuudet",
+      "point1": "Muut näkevät, mitä pelaat ja kuuntelet",
+      "point2": "IP-osoitteesi näkyy ihmisille, joihin yhdistät suoraan",
+      "point3": "Kuka tahansa voi lähettää sinulle viestin; linkit ja kuvat ladataan verkosta",
+      "point4": "Peittokuva, historian synkronointi ja täysikokoiset kuvat ovat päällä"
+    },
+    "balanced": {
+      "name": "Tasapainoinen",
+      "tagline": "Yksityisyyden ja mukavuuden välillä",
+      "point1": "Vain ystävät ja kanavasi jäsenet voivat lähettää sinulle viestin",
+      "point2": "Suora yhteys, varana välityspalvelin",
+      "point3": "Linkkien esikatselut ja täysikokoiset kuvat ovat päällä",
+      "point4": "Se, mitä pelaat ja kuuntelet, pysyy yksityisenä"
+    },
+    "maximumPrivacy": {
+      "name": "Maksimaalinen yksityisyys",
+      "tagline": "Jaa mahdollisimman vähän",
+      "point1": "Vain ystävät voivat lähettää sinulle viestin, ei poikkeuksia",
+      "point2": "IP-osoitteesi on piilotettu; kaikki kulkee välityspalvelimen kautta",
+      "point3": "Ei ulkoista sisältöä, ei historian synkronointia, ei jakamista",
+      "point4": "Toiminnastasi ei jaeta mitään"
+    },
+    "custom": {
+      "name": "Mukautettu",
+      "tagline": "Omat valintasi",
+      "point1": "Säilyttää kaikki asetukset ennallaan",
+      "point2": "Muutoksia verrataan oletusarvoihin",
+      "point3": "Paras, jos tiedät mitä haluat"
+    }
+  },
+  "betaFeatures": {
+    "title": "Beta-ominaisuudet",
+    "hint": "Varhaisia ominaisuuksia; ne voivat muuttua. Jokainen näkyy myös paikassaan Beta-merkillä.",
+    "gamePlugins": "Pelilaajennukset",
+    "manage": "Hallitse laajennuksia"
+  },
+  "privacySummary": {
+    "title": "Yksityisyyden yhteenveto",
+    "ipHidden": "IP-osoitteesi pysyy piilossa",
+    "ipVisible": "Suorat yhteydet voivat paljastaa IP-osoitteesi",
+    "matches": "Vastaa esiasetusta {{preset}}",
+    "messages": "Yksityisviestit lähettäjiltä: {{rule}}",
+    "p2pHidden": "Vertaisyhteys kulkee välityspalvelimen kautta, joten toinen osapuoli ei näe IP-osoitettasi.",
+    "p2pDirect": "Vertaisyhteys yhdistää ensin suoraan; toinen osapuoli voi nähdä IP-osoitteesi.",
+    "p2pDirectOnly": "Vertaisyhteys yhdistää vain suoraan; toinen osapuoli voi nähdä IP-osoitteesi.",
+    "externalOn": "Linkkien esikatselut ovat päällä: Mumcord hakee linkitetyt sivut niiden luomiseksi.",
+    "externalOff": "Linkkien esikatselut ovat pois päältä: Mumcord ei lataa mitään linkitetyiltä sivuilta.",
+    "imagesOn": "Täysikokoisia kuvia vaihdetaan suoraan Mumcord-käyttäjien kesken.",
+    "imagesOff": "Täysikokoisia kuvia ei vaihdeta.",
+    "historyOn": "Historian synkronointi on päällä: jaat kanavasi historian muiden Mumcord-käyttäjien kanssa.",
+    "historyOff": "Historian synkronointi on pois päältä.",
+    "sharingBoth": "Muut näkevät, mitä pelaat ja kuuntelet.",
+    "sharingPlaying": "Muut näkevät, mitä kuuntelet.",
+    "sharingGaming": "Muut näkevät pelaamasi pelin.",
+    "sharingNone": "Se, mitä pelaat ja kuuntelet, pysyy yksityisenä.",
+    "change": "Muuta",
+    "changeLabel": "Muuta: {{topic}}"
   },
   "hotkeys": {
     "global": "Yleiset pikanäppäimet",

@@ -136,16 +136,19 @@ function OpenGlLaunchOption({ option }: { option: string }) {
         <strong>{t("overlay.inGame.opengl.title")}</strong>
       </p>
       <p className="settings-hint">{t("overlay.inGame.opengl.explanation")}</p>
-      <input
-        className="settings-input"
-        type="text"
-        readOnly
-        aria-label={t("overlay.inGame.opengl.label")}
-        value={option}
-        onFocus={(e) => {
-          e.currentTarget.select();
-        }}
-      />
+      <div className="settings-control-row">
+        <label htmlFor={`${id}-option`}>{t("overlay.inGame.opengl.label")}</label>
+        <input
+          id={`${id}-option`}
+          className="settings-input"
+          type="text"
+          readOnly
+          value={option}
+          onFocus={(e) => {
+            e.currentTarget.select();
+          }}
+        />
+      </div>
       <div className="settings-actions">
         <button type="button" className="settings-button" onClick={copyOption}>
           {t("overlay.inGame.opengl.copy")}
@@ -196,7 +199,7 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
 
   if (state === null) {
     return (
-      <Group title={t("overlay.inGame.title")}>
+      <Group title={t("overlay.inGame.title")} icon="monitor">
         <p className="settings-hint" role={failed ? "alert" : undefined}>
           {failed ? t("overlay.inGame.loadFailed") : t("loading")}
         </p>
@@ -205,7 +208,7 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
   }
   if (!state.supported) {
     return (
-      <Group title={t("overlay.inGame.title")}>
+      <Group title={t("overlay.inGame.title")} icon="monitor">
         <p className="settings-hint" role="note">
           {t(state.explanationKey ?? "overlay.inGame.unsupported")}
         </p>
@@ -218,8 +221,12 @@ export function InGameOverlayGroup({ api }: { api: InGameOverlayApi }) {
   // separate window and never touches the game).
   const hasBlocklist = state.games.some((game) => game.blocked !== null);
   return (
-    <Group title={t("overlay.inGame.title")}>
-      <p className="settings-hint">{t("overlay.inGame.explanation")}</p>
+    <Group
+      title={t("overlay.inGame.title")}
+      icon="monitor"
+      info={t("overlay.inGame.explanation")}
+      wide
+    >
       <div
         role="radiogroup"
         aria-label={t("overlay.inGame.mode")}

@@ -1,25 +1,77 @@
 {
   "progress": "Vaihe {{current}}/{{total}}",
   "loadFailed": "Käyttöönottoa ei voitu ladata.",
-  "finish": "Valmis",
+  "recommended": "Suositeltu",
+  "tipLabel": "Tietoa: {{name}}",
   "errors": {
     "generic": "Jokin meni pieleen. Yritä uudelleen.",
     "secureStorageUnavailable": "Mumcord ei tavoita järjestelmäsi suojattua tallennustilaa. Avaa avainnipun tai salasanojen hallinnan lukitus ja yritä uudelleen.",
     "saveFailed": "Asetuksiasi ei voitu tallentaa. Yritä uudelleen."
   },
+  "nav": {
+    "getStarted": "Aloitetaan",
+    "finishSetup": "Viimeistele käyttöönotto",
+    "startMumcord": "Käynnistä Mumcord",
+    "finish": "Valmis",
+    "skip": "Ohita toistaiseksi",
+    "enterKey": "Enter",
+    "enterHint": "jatkaaksesi"
+  },
+  "rail": {
+    "label": "Käyttöönoton vaiheet",
+    "appName": "Mumcord",
+    "setup": "Käyttöönotto",
+    "custom": "Mukautettu",
+    "done": "(valmis)",
+    "progress": "Käyttöönoton eteneminen",
+    "later": "Kaikkia näitä voi muuttaa myöhemmin Asetuksissa."
+  },
+  "steps": {
+    "welcome": "Tervetuloa",
+    "import": "Tuo Mumblesta",
+    "identity": "Identiteetti",
+    "voice": "Puhe",
+    "setupStyle": "Käyttöönottotapa",
+    "privateMessages": "Yksityisviestit",
+    "connections": "Yhteydet",
+    "features": "Ominaisuudet",
+    "appearance": "Ulkoasu",
+    "startup": "Käynnistys ja päivitykset",
+    "summary": "Valmista"
+  },
+  "welcome": {
+    "title": "Äänichat, joka tuntuu",
+    "titleAccent": "omalta paikaltasi.",
+    "subtitle": "Mumcord puhuu Mumblea, joten se toimii jokaisen Mumble-palvelimen kanssa, ja tuo päälle modernin keskustelun. Säädetään se sinun makusi mukaan. Siihen menee noin kaksi minuuttia.",
+    "voice": {
+      "title": "Kristallinkirkas puhe",
+      "text": "Pienen viiveen ääni ja sisäänrakennettu kohinanvaimennus."
+    },
+    "servers": {
+      "title": "Toimii kaikkien Mumble-palvelimien kanssa",
+      "text": "Ei tiliä, ei rekisteröitymistä. Liity jo käyttämillesi palvelimille."
+    },
+    "private": {
+      "title": "Yksityinen jo suunnittelusta",
+      "text": "Ei telemetriaa. Se, mitä Mumcord tallentaa, pysyy tietokoneellasi."
+    }
+  },
   "identity": {
-    "title": "Identiteettisi",
-    "intro": "Palvelimet tunnistavat sinut identiteettisi perusteella. Luo uusi tai tuo jo käyttämäsi.",
-    "create": "Luo uusi",
-    "import": "Tuo tiedosto",
-    "name": "Nimi",
-    "nameHint": "Muut näkevät tämän nimen. Voit vaihtaa sen myöhemmin palvelinkohtaisesti.",
+    "title": "Kuka olet Mumblessa?",
+    "intro": "Identiteetin avulla palvelimet tunnistavat sinut. Luo uusi tai tuo jo käyttämäsi.",
+    "legend": "Identiteettisi",
+    "create": "Luo uusi identiteetti",
+    "createText": "Identiteettisi on varmenne, joka todistaa kuka olet Mumble-palvelimilla. Se säilyttää rekisteröidyn nimesi ja oikeutesi, joten olet sama henkilö joka kerta, kun liityt.",
+    "import": "Tuo olemassa oleva identiteetti",
+    "name": "Oletusnäyttönimi",
+    "nameHint": "Käytetään palvelimilla, jotka eivät vielä tunne sinua. Voit muuttaa sitä palvelinkohtaisesti.",
     "chooseFile": "Valitse tiedosto…",
     "noFile": "Tiedostoa ei ole valittu",
     "chosenFile": "Valittu tiedosto: {{file}}",
-    "password": "Tiedoston salasana (jos on)",
+    "password": "Tiedoston salasana",
+    "passwordHint": "Salasana pysyy tässä tietokoneessa, eikä sitä lähetetä minnekään.",
     "existing": "Käytetään identiteettiä {{name}}.",
-    "backup": "Identiteettisi on kuin avain. Varmuuskopioi se myöhemmin kohdassa Asetukset → Identiteetti.",
+    "backup": "Varmuuskopioi se myöhemmin Asetuksissa. Varmuuskopion avulla voit palauttaa identiteettisi uudelle tietokoneelle.",
     "nameRequired": "Anna nimi.",
     "fileRequired": "Valitse identiteettitiedosto (.p12 tai .pfx).",
     "fileType": "Identiteettitiedosto",
@@ -29,101 +81,142 @@
     "pickFailed": "Tiedostonvalitsinta ei voitu avata."
   },
   "mic": {
-    "title": "Mikrofoni",
-    "intro": "Valitse mikrofoni ja kaiuttimet. Oletusasetukset toimivat yleensä.",
     "input": "Mikrofoni",
     "output": "Kaiuttimet tai kuulokkeet",
     "systemDefault": "Järjestelmän oletus",
     "defaultVia": "Järjestelmän oletus ({{backend}})",
     "level": "Mikrofonin taso",
-    "test": "Testaa",
-    "stop": "Pysäytä",
     "idle": "Paina Testaa, sano jotain, niin kuulet itsesi.",
     "recording": "Puhu nyt…",
     "playing": "Toistetaan ääntäsi…",
     "devicesFailed": "Äänilaitteitasi ei voitu listata. Voit jatkaa ja valita ne myöhemmin asetuksista.",
-    "testFailed": "Testiä ei voitu aloittaa. Tarkista, että mikrofoni on kytketty."
+    "testFailed": "Testiä ei voitu aloittaa. Tarkista, että mikrofoni on kytketty.",
+    "test": "Kuuntele itseäsi",
+    "stop": "Pysäytä"
   },
-  "privacy": {
-    "title": "Yksityisyytesi",
-    "noTelemetry": "Mumcord ei lähetä telemetriaa, analytiikkaa eikä kaatumisraportteja.",
-    "ownServers": "Se yhdistää vain lisäämiisi palvelimiin.",
-    "linkPreviews": "Linkkien esikatselut sekä chatin linkkien kuvat tai GIF-kuvat ladataan linkitetyiltä sivustoilta. Voit poistaa tämän käytöstä seuraavassa vaiheessa tai myöhemmin asetuksissa.",
-    "mumcordUsers": "Vain Mumcordin ominaisuudet vaihtavat tietoja ainoastaan muiden Mumcord-käyttäjien kanssa samalla palvelimella.",
-    "local": "Kaikki, mitä Mumcord tallentaa, pysyy tietokoneellasi.",
-    "statement": "Täydellinen tietosuojaseloste"
+  "voice": {
+    "title": "Kuulostaako hyvältä?",
+    "subtitle": "Valitse laitteesi ja sano jotain. Palkin pitäisi liikkua puhuessasi.",
+    "talkLegend": "Miten haluat puhua?",
+    "tipLabel": "Tietoa: {{mode}}",
+    "voiceActivationHint": "Puhu vapaasti. Mumcord lähettää ääntä, kun puhut.",
+    "pushToTalkHint": "Pidä näppäintä painettuna puhuessasi. Paras meluisissa paikoissa.",
+    "keyRequired": "Valitse painapuhu-näppäin tai vaihda äänenaktivointiin.",
+    "notSure": "Etkö ole varma? Aloita äänenaktivoinnilla. Voit vaihtaa milloin tahansa pika-asetuksista."
   },
-  "updates": {
-    "title": "Uudet versiot",
-    "choice": "Kun uusi versio on julkaistu",
-    "auto": "Lataa automaattisesti",
-    "autoHint": "Mumcord lataa ja varmentaa päivityksen taustalla ja kysyy sinulta ennen uudelleenkäynnistystä.",
-    "notify": "Vain ilmoita",
-    "notifyHint": "Mumcord kertoo uudesta versiosta ja näyttää, mikä on muuttunut. Mitään ei ladata, ennen kuin niin sanot.",
-    "off": "Pois",
-    "offHint": "Mumcord ei koskaan kysy GitHubilta uusia versioita. Päivität itse.",
-    "privacy": "Tarkistus lähettää GitHubille vain itse pyynnön sekä sovelluksen nimen ja version. Voit muuttaa tätä myöhemmin Asetuksissa."
+  "style": {
+    "title": "Kuinka paljon haluat jakaa?",
+    "subtitle": "Valitse lähtökohta. Näet jokaisen valinnan uudelleen viimeisellä sivulla ja voit muuttaa sen siellä.",
+    "legend": "Käyttöönottotapa",
+    "everythingOn": {
+      "title": "Kaikki päällä",
+      "subtitle": "Kaikki ominaisuudet",
+      "p1": "Muut näkevät, mitä pelaat ja kuuntelet",
+      "p2": "IP-osoitteesi näkyy ihmisille, joihin yhdistät suoraan",
+      "p3": "Kuka tahansa voi lähettää sinulle viestin; linkit ja kuvat ladataan verkosta",
+      "p4": "Peittokuva, historian synkronointi ja täysikokoiset kuvat ovat päällä"
+    },
+    "balanced": {
+      "title": "Tasapainoinen",
+      "subtitle": "Yksityisyyden ja mukavuuden välillä",
+      "p1": "Vain ystävät ja kanavasi jäsenet voivat lähettää sinulle viestin",
+      "p2": "Suora yhteys, varana välityspalvelin",
+      "p3": "Linkkien esikatselut ja täysikokoiset kuvat ovat päällä",
+      "p4": "Se, mitä pelaat ja kuuntelet, pysyy yksityisenä"
+    },
+    "maximumPrivacy": {
+      "title": "Maksimaalinen yksityisyys",
+      "subtitle": "Jaa mahdollisimman vähän",
+      "p1": "Vain ystävät voivat lähettää sinulle viestin, ei poikkeuksia",
+      "p2": "IP-osoitteesi on piilotettu; kaikki kulkee välityspalvelimen kautta",
+      "p3": "Ei ulkoista sisältöä, ei historian synkronointia, ei jakamista",
+      "p4": "Päivitykset vain ilmoittavat sinulle; toiminnastasi ei jaeta mitään"
+    },
+    "custom": {
+      "title": "Mukautettu",
+      "subtitle": "Käy läpi jokainen valinta",
+      "p1": "Käy jokainen vaihe läpi itse",
+      "p2": "Katso, mitä kukin asetus tekee ja kuka sen näkee",
+      "p3": "Paras, jos tiedät mitä haluat"
+    },
+    "presetSelected": "{{preset}} valittu: ohitat yksityiskohtaiset yksityisyysvaiheet. Valitse Mukautettu käydäksesi ne läpi yksitellen.",
+    "customSelected": "Mukautettu valittu: seuraavat vaiheet käyvät läpi jokaisen valinnan."
   },
-  "talk": {
-    "title": "Miten haluat puhua?",
-    "mode": "Puhetila",
-    "voiceActivation": "Puheaktivointi",
-    "voiceActivationHint": "Mikrofonisi aktivoituu, kun puhut.",
-    "pushToTalk": "Puhu painamalla",
-    "pushToTalkHint": "Pidä näppäintä pohjassa, kun puhut.",
-    "waylandNoPortal": "Puhu painamalla ei ole käytettävissä: työpöytäsi ei salli sovellusten käyttää yleisiä pikanäppäimiä. Puheaktivointi toimii ilman näppäintä.",
-    "registrationFailed": "Puhu painamalla -toimintoa ei voitu ottaa käyttöön tässä järjestelmässä. Käytä sen sijaan puheaktivointia.",
-    "key": "Puhu painamalla -näppäin",
-    "noKey": "Näppäintä ei ole valittu",
-    "currentKey": "Näppäin: {{key}}",
-    "chooseKey": "Valitse näppäin",
-    "changeKey": "Vaihda näppäin",
-    "pressKey": "Paina näppäintä… (Escape peruuttaa)",
-    "confirmDialog": "Vahvista pikanäppäin järjestelmän ikkunassa tai määritä se avautuvassa Järjestelmäasetukset-ikkunassa… (Escape peruuttaa)",
-    "keyInvalid": "Tätä näppäintä ei voi käyttää. Kokeile toista.",
-    "keyNotConfirmed": "Työpöytä ei vahvistanut pikanäppäintä. Yritä uudelleen ja hyväksy järjestelmän ikkuna tai määritä näppäin työpöydän pikanäppäinasetuksissa.",
-    "keyRequired": "Valitse puhu painamalla -näppäin tai vaihda puheaktivointiin.",
+  "pm": {
+    "title": "Kuka voi lähettää sinulle viestin?",
+    "subtitle": "Yksityisviestit ovat kahdenkeskisiä keskusteluja. Kanavan keskustelu ei muutu tämän valinnan myötä.",
+    "local": "Suodatus tapahtuu tietokoneellasi. Lähettäjille ei kerrota. Voit asettaa eri säännön palvelinkohtaisesti myöhemmin."
+  },
+  "connections": {
+    "title": "Yhteydet ja sisältö",
+    "subtitle": "Jotkin ominaisuudet yhdistävät sinut suoraan muihin Mumcord-käyttäjiin, ja osa keskustelun sisällöstä ladataan muilta verkkosivuilta. Valitse, mikä sopii sinulle.",
+    "chatContent": "Keskustelun sisältö",
+    "sharing": "Jakaminen Mumcord-käyttäjien kanssa"
+  },
+  "features": {
+    "title": "Tee siitä omasi",
+    "subtitle": "Ota käyttöön haluamasi lisäominaisuudet. Jokaisessa kerrotaan, kuka näkee mitä.",
+    "seenByMumcordUsers": "Näkyy saman palvelimen Mumcord-käyttäjille.",
+    "onlyYou": "Vain sinä näet sen.",
+    "ingameOverlayAlt": "Esimerkki pelinaikaisesta peittokuvasta, joka näyttää kuka puhuu"
+  },
+  "appearance": {
+    "title": "Valitse ulkoasusi",
+    "subtitle": "Ikkuna päivittyy valitessasi. Lisää teemoja ja omia teemoja löytyy Asetuksista."
+  },
+  "startup": {
+    "title": "Käynnistys ja päivitykset",
+    "subtitle": "Miten Mumcord käynnistyy ja mitä se tekee uusille versioille.",
     "linkHandler": "Avaa mumble://-linkit Mumcordilla",
     "linkHandlerHint": "Kun napsautat palvelinlinkkiä verkkosivulla, se avautuu täällä.",
     "linkHandlerActive": "Mumcord avaa jo mumble://-linkit.",
-    "linkHandlerFailed": "Mumcordia ei voitu asettaa avaamaan mumble://-linkkejä. Voit yrittää uudelleen asetuksissa.",
-    "mouseDisabled": "Puhu painamalla ei ole käytettävissä tällä hiiren painikkeella, ennen kuin ”Salli hiiren painikkeet” on otettu käyttöön kohdassa Asetukset → Puhe.",
-    "mouseNeedsInputGroup": "Puhu painamalla ei ole käytettävissä: Mumcord ei ehkä saa lukea hiirtäsi. Kohdassa Asetukset → Puhe kerrotaan, miten sen voi sallia.",
-    "mouseNeedsAccessibility": "Puhu painamalla ei ole käytettävissä: Mumcord tarvitsee Käyttöapu-oikeuden nähdäkseen hiiren painikkeet.",
-    "pressKeyOrMouse": "Paina näppäintä tai hiiren painiketta (keski- tai sivupainike)… (Escape peruuttaa)",
-    "mouse": {
-      "middle": "Hiiren keskipainike",
-      "back": "Hiiren painike 4 (taaksepäin)",
-      "forward": "Hiiren painike 5 (eteenpäin)"
+    "linkHandlerFailed": "Mumcordia ei voitu määrittää avaamaan mumble://-linkkejä. Voit yrittää uudelleen Asetuksissa.",
+    "autostartFailed": "Mumcordia ei voitu asettaa käynnistymään kirjautuessasi. Voit yrittää uudelleen Asetuksissa."
+  },
+  "summary": {
+    "title": "Kaikki valmista",
+    "titleNamed": "Kaikki valmista, {{name}}",
+    "subtitle": "Tässä valintasi. Muuta mitä tahansa Muokkaa-painikkeella ennen aloittamista.",
+    "on": "päällä",
+    "off": "pois päältä",
+    "unavailable": "ei saatavilla täällä",
+    "editShort": "Muokkaa",
+    "edit": "Muokkaa: {{card}}",
+    "cards": {
+      "identity": "Identiteetti",
+      "voice": "Puhe",
+      "privateMessages": "Yksityisviestit",
+      "connections": "Yhteydet",
+      "chatContent": "Keskustelun sisältö",
+      "features": "Ominaisuudet",
+      "appearance": "Ulkoasu",
+      "startup": "Käynnistys",
+      "updates": "Päivitykset"
     },
-    "mouseStillWorks": "Voit silti käyttää hiiren painiketta.",
-    "mouseOptIn": "Haluatko käyttää hiiren sivupainiketta? Ota käyttöön ”Salli hiiren painikkeet” kohdassa Asetukset → Puhe käyttöönoton jälkeen.",
-    "autostart": "Käynnistä Mumcord, kun kirjaudun sisään",
-    "autostartHint": "Voit muuttaa tätä myöhemmin kohdassa Asetukset → Ulkoasu.",
-    "autostartFailed": "Mumcordia ei voitu asettaa käynnistymään kirjautuessasi. Voit yrittää uudelleen asetuksissa.",
-    "linkPreviews": "Näytä linkkien esikatselut ja upotukset",
-    "linkPreviewsHint": "Mumcord lataa linkitetyt sivut näyttääkseen esikatseluja ja videosoittimia; nämä sivustot näkevät IP-osoitteesi.",
-    "historySharing": "Jaa kanavahistoriani",
-    "historySharingHint": "Muut Mumcord-käyttäjät, jotka liittyvät kanavalle sinun jälkeesi, näkevät sen aiemmat viestit tallennetusta historiastasi (enintään 7 päivää). Yksityisiä chatteja ei koskaan jaeta. Voit muuttaa tätä myöhemmin kohdassa Asetukset → Chat ja historia.",
-    "ingameOverlay": "Näytä peittokuva peleissä",
-    "ingameOverlayHint": "Näyttää pelisi päällä, kuka puhuu (Linux). Voit ottaa sen käyttöön tai poistaa sen käytöstä pelikohtaisesti myöhemmin asetuksissa.",
-    "ingameOverlayWarning": "Jotkin huijauksenestoa käyttävät pelit voivat merkitä tai estää pelinsisäiset peittokuvat. Mumcord pitää tunnetusti riskialttiit pelit (kuten Valorant tai League of Legends) oletuksena pois päältä. Ota se käyttöön vain peleissä, joihin luotat.",
-    "ingameOverlayAlt": "Esimerkki pelinsisäisestä peittokuvasta, joka näyttää kuka puhuu"
+    "identityDetail": "Tallennettu järjestelmäsi avainnippuun",
+    "voiceDetail": "Kohinanvaimennus: {{noise}}",
+    "pmDetail": "Oma kanavani {{channel}} · hyväksytyt keskustelut {{accepted}} · pyynnöt {{requests}}",
+    "contentTitle": "Linkkien esikatselut {{previews}}",
+    "contentDetail": "Täysikokoiset kuvat {{images}} · historian synkronointi {{sync}}",
+    "featuresTitle": "Pelinaikainen peittokuva {{overlay}}",
+    "featuresDetail": "Seuraa järjestelmän Älä häiritse -tilaa {{dnd}} · nyt soi {{playing}} · nyt pelataan {{gaming}}",
+    "effectsDetail": "Visuaaliset tehosteet {{effects}}",
+    "startupTitle": "Käynnistä kirjautuessa {{login}}",
+    "startupDetail": "Käynnistä pienennettynä {{minimized}} · mumble://-linkit {{links}}",
+    "updates": {
+      "auto": "Lataa automaattisesti",
+      "notify": "Vain ilmoita",
+      "off": "Pois"
+    },
+    "updatesDetail": "Päivitykset tarkistetaan ja varmennetaan aina ennen asennusta.",
+    "backup": "Identiteettisi {{name}} on tallennettu järjestelmäsi avainnippuun. Varmuuskopioi se kohdasta Asetukset → Identiteetti, ettet koskaan menetä rekisteröityä nimeäsi.",
+    "nextServer": "Seuraavaksi: lisää ensimmäinen palvelimesi",
+    "rerunNote": "Vain muuttamasi arvot tallennetaan."
   },
   "rerun": {
     "title": "Asennusvelho",
     "note": "Käyt asetusta uudelleen läpi. Identiteettisi ei muutu.",
     "manageIdentities": "Hallitse identiteettejä",
-    "stepsLabel": "Asetuksen vaiheet",
-    "stepsSkipped": "(ohitettu, identiteetti ei kuulu tähän)",
-    "steps": {
-      "identity": "Identiteetti",
-      "mic": "Mikrofoni",
-      "privacy": "Yksityisyys",
-      "updates": "Päivitykset",
-      "talk": "Puhumistila"
-    },
-    "footer": "Peruutus jättää kaiken ennalleen. Vain muuttuneet vaiheet tallennetaan lopussa.",
     "discardTitle": "Hylätäänkö muutokset?",
     "discardBody": "Mitään ei tallenneta ennen lopetusta. Jos peruutat nyt, kaikki pysyy ennallaan.",
     "discardKeep": "Jatka muokkaamista",

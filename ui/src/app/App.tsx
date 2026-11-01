@@ -73,7 +73,7 @@ function MainScreen() {
           onClose={closeRerunWizard}
           onManageIdentities={() => {
             closeRerunWizard();
-            openSettings("identity");
+            openSettings("account");
           }}
         />
       )}

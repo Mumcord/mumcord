@@ -1,32 +1,59 @@
 {
-  "sectionList": "Instellingensecties",
+  "sectionList": "Instellingengroepen",
   "loading": "Instellingen laden…",
   "loadFailed": "Je instellingen konden niet worden geladen. Sluit de instellingen en probeer het opnieuw.",
   "saveFailed": "De laatste wijziging kon niet worden opgeslagen. Probeer het opnieuw.",
   "sections": {
-    "identity": "Identiteit",
-    "audio": "Audio",
-    "voice": "Spraak",
-    "chatHistory": "Chat en geschiedenis",
+    "general": "Algemeen",
+    "account": "Account en identiteit",
+    "voiceAudio": "Spraak en audio",
+    "chatNotifications": "Chat en meldingen",
+    "privacy": "Privacy en verbindingen",
     "appearance": "Weergave",
-    "accessibility": "Toegankelijkheid",
-    "language": "Taal",
-    "sounds": "Geluiden en meldingen",
-    "overlay": "Overlay",
-    "diagnostics": "Diagnostiek",
-    "about": "Over",
     "servers": "Servers",
-    "privacy": "Privacy",
-    "updates": "Updates",
+    "gaming": "Gaming en overlay",
+    "advanced": "Geavanceerd en ontwikkelaar",
+    "about": "Over",
     "packetInspector": "Pakketinspecteur",
     "hotkeys": "Sneltoetsen"
+  },
+  "sectionDescriptions": {
+    "general": "Opstarten, taal, updates en toegankelijkheid.",
+    "account": "Je identiteiten, profiel en wat je deelt.",
+    "voiceAudio": "Microfoon, luidsprekers, hoe je praat en hoe je klinkt.",
+    "chatNotifications": "Meldingen, privéberichten, geblokkeerde mensen en berichtgeschiedenis.",
+    "privacy": "Hoe je met anderen verbinding maakt en wat Mumcord van buiten laadt.",
+    "appearance": "Thema, indeling en de kanalenlijst.",
+    "servers": "Verbindingen met meerdere servers en instellingen per server.",
+    "gaming": "De overlay in games, positionele audio en game-plug-ins.",
+    "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
+    "about": "Versie, ondersteuning en de installatiewizard."
+  },
+  "breadcrumb": "Instellingen / {{section}}",
+  "moreInfo": "Meer informatie: {{topic}}",
+  "searchTerms": {
+    "devices": "invoer uitvoer headset luidspreker geluidskaart",
+    "talkMode": "PTT VAD spraakactivering sneltoets",
+    "noiseSuppression": "achtergrondgeluid ruis ruisonderdrukking",
+    "p2p": "P2P relay directe verbindingen mijn IP-adres verbergen",
+    "theme": "donkere modus lichte modus kleuren",
+    "startup": "opstarten automatisch starten inloggen systeemvak",
+    "language": "vertaling taalinstelling",
+    "updates": "nieuwe versie upgrade",
+    "storage": "schijfruimte cache wissen",
+    "blocked": "negeren blokkeren dempen mensen",
+    "notifications": "meldingen pop-ups",
+    "externalContent": "insluitingen afbeeldingen voorbeelden"
   },
   "search": {
     "label": "Instellingen zoeken",
     "results": "Zoekresultaten",
     "empty": "Geen instellingen gevonden voor “{{query}}”.",
     "count_one": "{{count}} instelling gevonden",
-    "count_other": "{{count}} instellingen gevonden"
+    "count_other": "{{count}} instellingen gevonden",
+    "shortcut": "Ctrl F",
+    "groupCount_one": "{{count}} resultaat",
+    "groupCount_other": "{{count}} resultaten"
   },
   "errors": {
     "secureStorage": "De beveiligde opslag van je systeem is niet beschikbaar of de toegang is geweigerd.",
@@ -112,7 +139,6 @@
     "testStop": "Opname stoppen",
     "testRecording": "Opnemen… praat nu.",
     "testPlaying": "Je stem wordt afgespeeld…",
-    "quality": "Kwaliteit",
     "musicQuality": "Muziekkwaliteit",
     "musicQualityHint": "Gebruikt meer bandbreedte en schakelt ruisonderdrukking en automatisch volume uit; bedoeld voor muziek. Push-to-talk werkt het best.",
     "bitrate": "Bitrate",
@@ -126,7 +152,6 @@
     "duckingLevel": "Verlaagd volume",
     "duckingLevelValue": "{{percent}} %",
     "lowLatency": "Modus voor lage latentie",
-    "lowLatencyBeta": "Bèta",
     "lowLatencyHint": "Om samen muziek te maken in realtime",
     "lowLatencyWarningTitle": "Ruilt robuustheid in voor snelheid",
     "lowLatencyBandwidth": "Gebruikt meer bandbreedte (pakketten van 10 ms).",
@@ -157,7 +182,7 @@
     "keyMissing": "Stel een toets in, anders kan niemand je horen.",
     "keyRejected": "Die toets kan niet worden gebruikt. Probeer een andere toets, eventueel met Ctrl, Alt of Shift.",
     "keyNotConfirmed": "De desktop heeft de sneltoets niet bevestigd. Probeer het opnieuw en accepteer het systeemvenster, of wijs de toets toe in de sneltoetsinstellingen van je desktop.",
-    "processing": "Stemverwerking",
+    "processing": "Verwerking en kwaliteit",
     "noiseSuppression": "Ruisonderdrukking",
     "noiseSuppressionHint": "Filtert achtergrondgeluid zoals toetsenborden en ventilatoren.",
     "noiseChoice": {
@@ -261,12 +286,12 @@
     }
   },
   "history": {
+    "title": "Berichtgeschiedenis",
     "explanation": "Chatberichten worden alleen op deze computer opgeslagen.",
-    "perServer": "Servers",
+    "perServer": "Uitzonderingen per server",
     "noServers": "Nog geen opgeslagen servers.",
     "save": "Geschiedenis opslaan op {{server}}",
     "clearServer": "Geschiedenis van {{server}} wissen…",
-    "all": "Alle servers",
     "clearAll": "Alle geschiedenis wissen…",
     "confirmTitle": "Geschiedenis wissen?",
     "confirmServer": "Alle opgeslagen berichten van {{server}} worden van deze computer verwijderd. Anderen houden hun eigen kopieën. Hun kopieën worden niet opnieuw naar deze computer gesynchroniseerd. Dit kan niet ongedaan worden gemaakt.",
@@ -278,7 +303,6 @@
     "autoDeleteHint": "Oudere berichten worden automatisch en zonder te vragen van deze computer verwijderd. Dit geldt alleen voor de geschiedenis die hier is opgeslagen, niet voor de server."
   },
   "fullImages": {
-    "title": "Afbeeldingen op volledige grootte",
     "offer": "Mijn afbeeldingen op volledige grootte aanbieden",
     "offerHint": "Andere Mumcord-gebruikers kunnen mijn afbeeldingen op volledige grootte openen. Uit: alleen het kleine voorbeeld wordt verzonden, er wordt geen origineel bewaard en er wordt er niets van gedeeld.",
     "load": "Afbeeldingen op volledige grootte van anderen laden",
@@ -300,14 +324,15 @@
     "system": "Systeem volgen",
     "dark": "Donker",
     "light": "Licht",
-    "behaviour": "Gedrag",
+    "behaviour": "Opstarten en venster",
     "closeLegend": "Wanneer je het venster sluit terwijl je verbonden bent",
     "closeAsk": "Elke keer vragen",
     "closeTray": "Naar het systeemvak minimaliseren",
     "closeQuit": "Mumcord afsluiten",
     "autostart": "Mumcord starten wanneer ik inlog",
     "startMinimized": "Geminimaliseerd starten",
-    "startMinimizedHint": "Als Mumcord bij het inloggen start, wacht het in het systeemvak in plaats van het venster te openen."
+    "startMinimizedHint": "Als Mumcord bij het inloggen start, wacht het in het systeemvak in plaats van het venster te openen.",
+    "look": "Uiterlijk en indeling"
   },
   "themeEditor": {
     "name": "Themanaam",
@@ -365,7 +390,7 @@
     "deleteConfirm": "Verwijderen"
   },
   "accessibility": {
-    "hints": "Tips",
+    "hints": "Toegankelijkheid",
     "keyboardHints": "Toetsenbordtips tonen",
     "keyboardHintsHint": "Korte tips op het scherm zoals “Pijltjestoetsen: bewegen” onder de kanaallijst en in de GIF-favorieten. Schermlezers lezen ze nog steeds voor als dit uit staat.",
     "announcements": "Meldingen voor schermlezers",
@@ -374,11 +399,15 @@
     "skipLinksHint": "Links aan het begin van het venster die met Tab direct naar de chat of de kanaallijst springen."
   },
   "language": {
+    "title": "Taal",
     "legend": "Weergavetaal",
-    "system": "Systeem volgen"
+    "system": "Systeem volgen",
+    "search": "Taal zoeken",
+    "noMatch": "Geen overeenkomende taal"
   },
   "sounds": {
-    "explanation": "Korte geluiden voor deze gebeurtenissen:",
+    "title": "Geluiden",
+    "explanation": "Korte geluiden die bij deze gebeurtenissen worden afgespeeld.",
     "joinLeave": "Iemand komt binnen in of verlaat je kanaal",
     "voiceJoin": "Je neemt deel aan een kanaal voor voice",
     "selfMute": "Je dempt jezelf of heft de demping op",
@@ -455,7 +484,7 @@
     }
   },
   "diagnostics": {
-    "logging": "Logboek",
+    "title": "Diagnostiek",
     "logLevel": "Logdetail",
     "levels": {
       "error": "Alleen fouten",
@@ -490,7 +519,8 @@
     "setupWizardHint": "Doorloop de eerste installatie opnieuw om je microfoon, privacykeuzes, updatecontrole en spraakmodus te bekijken. Je huidige keuzes zijn al ingevuld.",
     "setupWizardRun": "Installatiewizard opnieuw uitvoeren",
     "setupWizardIdentityNote": "Je identiteit hoort hier niet bij. Je certificaat, en daarmee je geregistreerde naam en rechten op servers, blijft precies zoals het is.",
-    "setupWizardIdentityLink": "Beheer die bij Identiteit"
+    "setupWizardIdentityLink": "Beheer die bij Identiteit",
+    "versionTitle": "Versie en licentie"
   },
   "profile": {
     "title": "Profiel",
@@ -506,7 +536,6 @@
     "skipped": "Je standaardavatar is niet verzonden: hij is te groot voor deze server."
   },
   "linkPreviews": {
-    "title": "Linkvoorbeelden",
     "switch": "Linkvoorbeelden en insluitingen tonen",
     "hint": "Mumcord laadt gelinkte pagina's om voorbeelden en videospelers te tonen; die sites zien je IP-adres."
   },
@@ -527,7 +556,7 @@
     "cleared": "Cache gewist, {{size}} vrijgemaakt."
   },
   "cache": {
-    "title": "Cache",
+    "title": "Opslag",
     "hint": "Mumcord bewaart tijdelijke gegevens op deze computer zodat alles sneller laadt. Wissen is veilig; ze worden zo nodig opnieuw opgebouwd.",
     "kind": {
       "previews": "Linkvoorbeelden en afbeeldingen",
@@ -567,7 +596,7 @@
     "betaHint": "De resultaten hangen af van de game en de ondersteuning voor plug-ins."
   },
   "gamePlugins": {
-    "title": "Positionele audio: bronnen",
+    "title": "Game-plug-ins",
     "explanation": "Games vertellen Mumcord waar je bent via Mumble Link of via officiële Mumble-gameplug-ins. Mumcord vindt de plug-ins in zijn eigen plug-inmap en in een bestaande Mumble-installatie. Schakel alleen de plug-ins in voor games die je speelt.",
     "antiCheat": "Gameplug-ins lezen het geheugen van de game. Sommige anticheatsystemen kunnen dit markeren; schakel plug-ins uit voor games met strenge anticheat.",
     "loading": "Zoeken naar gameplug-ins…",
@@ -590,7 +619,6 @@
     "limitInvalid": "Voer een geheel getal van 1 tot 15 in."
   },
   "appearanceEffects": {
-    "title": "Effecten",
     "visualEffects": "Visuele effecten (glas, korrel)",
     "visualEffectsHint": "Matglazen menu's en een subtiele filmkorrel. Automatisch uit als je systeem om minder transparantie of beweging vraagt."
   },
@@ -604,7 +632,6 @@
   "p2p": {
     "title": "Peer-to-peer (schermdelen, afbeeldingen op volledige grootte)",
     "modeLabel": "Peer-to-peer-modus",
-    "recommended": "Aanbevolen",
     "explanation": "Bij direct ziet de ander je IP-adres. De relay verbergt het voor hem of haar; de beheerder van de relay (de community van deze server) kan het zien. Beide zijn end-to-end versleuteld.",
     "useGlobal": "Globale instelling gebruiken",
     "overrideHint": "Alleen voor deze server. \"Globale instelling gebruiken\" volgt Instellingen → Privacy.",
@@ -617,7 +644,6 @@
     }
   },
   "privacyDirect": {
-    "title": "Directe verbindingen",
     "allow": "Directe verbindingen met andere Mumcord-gebruikers toestaan",
     "hint": "Directe verbindingen zijn sneller, maar de ander kan je IP-adres zien. Totdat je beslist, vraagt Mumcord het de eerste keer dat er een gebruikt zou worden.",
     "notUsed": "Niet gebruikt in de gekozen peer-to-peer-modus: Mumcord maakt nooit rechtstreeks verbinding met anderen."
@@ -628,6 +654,7 @@
     "failed": "Dat is niet gelukt. Probeer het opnieuw."
   },
   "inspector": {
+    "title": "Ontwikkelaarstools",
     "intro": "Toont de pakketten die Mumcord verstuurt en ontvangt, vooral Mumcord-plugingegevens, voor foutopsporing. Alleen de laatste 2.000 pakketten worden bewaard, in het geheugen van dit apparaat; er wordt niets gelogd of ergens heen gestuurd.",
     "devTools": "Ontwikkelaarstools",
     "devToolsHint": "Zet uit om de pakketinspecteur weer te verbergen en het vastleggen te stoppen.",
@@ -804,7 +831,14 @@
     "hide": "Helemaal verbergen",
     "hideHint": "Er wordt niets in de chat getoond."
   },
+  "externalContent": {
+    "title": "Externe inhoud"
+  },
+  "privacyConnections": {
+    "title": "Verbindingen"
+  },
   "updates": {
+    "title": "Updates",
     "installedFrom": "Mumcord {{version}} · geïnstalleerd via {{source}}",
     "install": {
       "appImage": "de AppImage",
@@ -818,7 +852,6 @@
       "aur": "de AUR",
       "otherLinux": "een Linux-pakket"
     },
-    "checking": "Controleren",
     "mode": "Als er een update wordt gevonden",
     "modeHint": "Updates worden altijd gecontroleerd en geverifieerd voordat ze worden geïnstalleerd.",
     "modeAuto": "Automatisch downloaden",
@@ -832,7 +865,6 @@
     "intervalHours_one": "Elk uur",
     "intervalHours_other": "Elke {{count}} uur",
     "intervalWeek": "Eenmaal per week",
-    "status": "Status",
     "state": {
       "idle": "Nog niet gecontroleerd",
       "off": "Updatecontrole staat uit",
@@ -859,6 +891,99 @@
     "whatsNew": "Wat is er nieuw",
     "whatsNewHint": "Bekijk de wijzigingen in elke versie.",
     "openChangelog": "Wijzigingenlogboek openen"
+  },
+  "badges": {
+    "changed": "Gewijzigd",
+    "recommended": "Aanbevolen",
+    "groupChanged": "Bevat gewijzigde instellingen"
+  },
+  "resetSection": {
+    "button": "Sectie resetten",
+    "title": "{{section}} resetten?",
+    "intro": "Deze instellingen gaan terug naar je preset of naar hun standaardwaarde:",
+    "nothing": "Alle instellingen in {{section}} hebben al hun preset of standaardwaarde.",
+    "confirm": "Resetten"
+  },
+  "activePreset": {
+    "heading": "Actieve preset",
+    "none": "Geen preset",
+    "customised": "{{preset}}, aangepast",
+    "changed_one": "{{count}} instelling gewijzigd sinds de installatie",
+    "changed_other": "{{count}} instellingen gewijzigd sinds de installatie",
+    "unchanged": "Geen wijzigingen sinds de installatie",
+    "switch": "Wisselen",
+    "switchLabel": "Preset wisselen",
+    "applyFailed": "De overlay in games of Niet storen kon niet worden gewijzigd. Probeer het opnieuw."
+  },
+  "presets": {
+    "dialogTitle": "Preset wisselen",
+    "dialogIntro": "Kies een beginpunt. Alleen de instellingen die een preset dekt, veranderen; al het andere blijft zoals het is.",
+    "legend": "Presets",
+    "continue": "Doorgaan",
+    "confirmTitle": "Overschakelen naar {{preset}}?",
+    "confirmIntro": "Deze instellingen veranderen:",
+    "confirmNothing": "Er verandert niets. Mumcord onthoudt {{preset}} als je preset.",
+    "confirmCustom": "Er verandert niets. Instellingen vergelijkt je keuzes niet meer met een preset, maar met de standaardwaarden.",
+    "apply": "Preset wisselen",
+    "everythingOn": {
+      "name": "Alles aan",
+      "tagline": "Alle functies",
+      "point1": "Anderen zien wat je speelt en waar je naar luistert",
+      "point2": "Je IP-adres is zichtbaar voor mensen met wie je rechtstreeks verbindt",
+      "point3": "Iedereen kan je berichten sturen; links en afbeeldingen worden van internet geladen",
+      "point4": "Overlay, geschiedenissynchronisatie en afbeeldingen op volle grootte staan aan"
+    },
+    "balanced": {
+      "name": "Gebalanceerd",
+      "tagline": "Tussen privacy en gemak",
+      "point1": "Alleen vrienden en mensen in je kanaal kunnen je berichten sturen",
+      "point2": "Directe verbinding, met een relay als reserve",
+      "point3": "Linkvoorbeelden en afbeeldingen op volle grootte staan aan",
+      "point4": "Wat je speelt en waar je naar luistert blijft privé"
+    },
+    "maximumPrivacy": {
+      "name": "Maximale privacy",
+      "tagline": "Zo min mogelijk delen",
+      "point1": "Alleen vrienden kunnen je berichten sturen, zonder uitzonderingen",
+      "point2": "Je IP-adres is verborgen; alles loopt via de relay",
+      "point3": "Geen externe inhoud, geen geschiedenissynchronisatie, niets delen",
+      "point4": "Er wordt niets gedeeld over wat je doet"
+    },
+    "custom": {
+      "name": "Aangepast",
+      "tagline": "Je eigen keuzes",
+      "point1": "Laat elke instelling zoals ze is",
+      "point2": "Wijzigingen worden met de standaardwaarden vergeleken",
+      "point3": "Het best als je precies weet wat je wilt"
+    }
+  },
+  "betaFeatures": {
+    "title": "Bètafuncties",
+    "hint": "Vroege functies die nog kunnen veranderen. Elke functie staat ook op de plek waar ze hoort, met een bètalabel.",
+    "gamePlugins": "Game-plug-ins",
+    "manage": "Plug-ins beheren"
+  },
+  "privacySummary": {
+    "title": "Privacyoverzicht",
+    "ipHidden": "Je IP-adres blijft verborgen",
+    "ipVisible": "Directe verbindingen kunnen je IP-adres tonen",
+    "matches": "Komt overeen met {{preset}}",
+    "messages": "Privéberichten van: {{rule}}",
+    "p2pHidden": "Peer-to-peer loopt via de relay, dus de ander ziet je IP-adres niet.",
+    "p2pDirect": "Peer-to-peer maakt eerst rechtstreeks verbinding; de ander kan je IP-adres zien.",
+    "p2pDirectOnly": "Peer-to-peer maakt alleen rechtstreeks verbinding; de ander kan je IP-adres zien.",
+    "externalOn": "Linkvoorbeelden staan aan: Mumcord haalt de gelinkte pagina's op om ze te maken.",
+    "externalOff": "Linkvoorbeelden staan uit: Mumcord laadt niets van gelinkte pagina's.",
+    "imagesOn": "Afbeeldingen op volle grootte worden rechtstreeks tussen Mumcord-gebruikers uitgewisseld.",
+    "imagesOff": "Afbeeldingen op volle grootte worden niet uitgewisseld.",
+    "historyOn": "Geschiedenissynchronisatie staat aan: je deelt je kanaalgeschiedenis met andere Mumcord-gebruikers.",
+    "historyOff": "Geschiedenissynchronisatie staat uit.",
+    "sharingBoth": "Anderen zien wat je speelt en waar je naar luistert.",
+    "sharingPlaying": "Anderen zien waar je naar luistert.",
+    "sharingGaming": "Anderen zien welk spel je speelt.",
+    "sharingNone": "Wat je speelt en waar je naar luistert blijft privé.",
+    "change": "Wijzigen",
+    "changeLabel": "Wijzigen: {{topic}}"
   },
   "hotkeys": {
     "global": "Globale sneltoetsen",

@@ -7,6 +7,13 @@ import type { Result } from "axe-core";
 import { axe, repoRoot } from "../../helpers/index.ts";
 import { ports } from "../../helpers/testenv.ts";
 import { run } from "../../helpers/run.ts";
+import {
+  CUSTOM_STEPS,
+  SETUP_STYLES,
+  waitForWizardStep,
+  type SetupStyle,
+  type WizardStepName,
+} from "../../helpers/wizard-util.ts";
 
 export const SERVER = `localhost:${String(ports.v15)}`;
 
@@ -153,38 +160,81 @@ export function findingsReport(): string {
 
 // ---------------------------------------------------------------- flows
 
-/** Wizard: create identity `name`, keep defaults (updates step included), uncheck the mumble:// handler, Finish. */
-export async function wizard(name: string, onStep?: (step: number) => Promise<void>): Promise<void> {
-  await waitFor("form.wizard-step");
-  await onStep?.(1);
+/** Tabs to the shown wizard step's primary button (Next, Finish setup, …) and presses Enter. */
+async function wizardPrimaryByKeyboard(what: string): Promise<void> {
+  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), what);
+  await browser.keys(["Enter"]);
+}
+
+export interface WizardOptions {
+  /** Setup style card to pick (default "everythingOn", see `runFirstStartWizard`). */
+  style?: SetupStyle;
+  /** Runs once each step shows, before the keyboard leaves it. */
+  onStep?: (step: WizardStepName) => Promise<void>;
+}
+
+/**
+ * First-start wizard by keyboard only (#159): Welcome, a new identity `name`, voice defaults,
+ * the setup style card `style` (arrow keys, Enter), the Custom steps with their defaults when
+ * `style` is "custom" (the mumble:// handler unticked on the startup step), summary, Start.
+ */
+export async function wizard(name: string, options: WizardOptions = {}): Promise<void> {
+  const { style = "everythingOn", onStep } = options;
+  await waitForWizardStep("welcome", 30_000);
+  await onStep?.("welcome");
+  await wizardPrimaryByKeyboard("wizard Let's get started");
+
+  await waitForWizardStep("identity");
+  await onStep?.("identity");
   await tabTo((f) => f.tag === "input" && f.type === "text", "identity name field");
   await typeText(name);
   await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "Step 2 of", 30_000);
-  await onStep?.(2);
-  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
+
+  // Leaving the identity step generates the RSA-2048 identity, which takes a while in debug builds.
+  await waitForWizardStep("voice", 120_000);
+  await onStep?.("voice");
+  await wizardPrimaryByKeyboard("wizard Next");
+
+  await waitForWizardStep("setupStyle");
+  await onStep?.("setupStyle");
+  const card = await tabTo(
+    (f) => f.tag === "input" && f.type === "radio" && f.cls.includes("preset-card__radio"),
+    "setup style cards",
+  );
+  // WebKit stops at the ends of a radio group instead of wrapping, so move towards the card.
+  const order: readonly string[] = SETUP_STYLES;
+  const key = order.indexOf(style) < order.indexOf(card.value) ? "ArrowUp" : "ArrowDown";
+  await pressUntil(key, (f) => f.value === style, `setup style ${style}`, order.length);
+  // Enter on a radio continues: a preset jumps to the summary, Custom to its first step.
   await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "Step 3 of");
-  await onStep?.(3);
-  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
-  await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "Step 4 of");
-  await onStep?.(4);
-  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Next");
-  await browser.keys(["Enter"]);
-  await waitText("p.wizard-progress", "Step 5 of");
-  await onStep?.(5);
-  const box = await browser.execute(() => {
-    const c = document.querySelector<HTMLInputElement>("form.wizard-step input[type=checkbox]");
-    return c ? c.checked : null;
-  });
-  if (box === true) {
-    await tabTo((f) => f.tag === "input" && f.type === "checkbox", "mumble:// checkbox");
-    await browser.keys([" "]);
+
+  if (style === "custom") {
+    for (const step of CUSTOM_STEPS) {
+      await waitForWizardStep(step);
+      await onStep?.(step);
+      if (step === "startup") await untickLinkHandler();
+      await wizardPrimaryByKeyboard(`wizard Next on ${step}`);
+    }
   }
-  await tabTo((f) => f.tag === "button" && f.cls.includes("button--primary"), "wizard Finish");
-  await browser.keys(["Enter"]);
+
+  await waitForWizardStep("summary");
+  await onStep?.("summary");
+  await wizardPrimaryByKeyboard("wizard Start Mumcord");
   await waitFor(".shell", 30_000);
+}
+
+/** Startup step: unticks "Open mumble:// links" by keyboard, so a test never claims the handler. */
+async function untickLinkHandler(): Promise<void> {
+  const box = await browser.execute(() => {
+    const label = Array.from(document.querySelectorAll("form.wizard-step label")).find((l) =>
+      l.textContent.includes("mumble://"),
+    );
+    const input = label?.querySelector<HTMLInputElement>("input[type=checkbox]") ?? null;
+    return input === null ? null : { checked: input.checked, id: input.id };
+  });
+  if (box?.checked !== true) return;
+  await tabTo((f) => f.tag === "input" && f.type === "checkbox" && f.id === box.id, "mumble:// checkbox");
+  await browser.keys([" "]);
 }
 
 /** Empty state: type the address, Enter (Add and connect), trust the certificate. */
@@ -260,25 +310,28 @@ export async function settingsTab(index: number): Promise<string> {
   return (await focus()).text;
 }
 
-/** In the open settings panel, Tabs to the radio group containing `value` and arrows to it. */
-export async function chooseRadio(value: string): Promise<void> {
-  await tabTo((f) => f.tag === "input" && f.type === "radio" && groupHas(value), `radio group with ${value}`);
-  for (const key of ["ArrowDown", "ArrowUp"]) {
-    // The language picker has 25 options; arrow keys wrap around, so this reaches every one.
-    for (let i = 0; i < 25; i++) {
-      if ((await focus()).value === value) return;
-      await browser.keys([key]);
-    }
-  }
-  if ((await focus()).value !== value) throw new Error(`radio ${value} not reachable with arrow keys`);
-}
-
-async function groupHas(value: string): Promise<boolean> {
-  return browser.execute((v: string) => {
-    const e = document.activeElement as HTMLInputElement;
-    if (e.type !== "radio") return false;
-    return Array.from(document.querySelectorAll<HTMLInputElement>(`input[type=radio][name="${e.name}"]`)).some((r) => r.value === v);
-  }, value);
+/**
+ * Picks the UI language with the keyboard only: tabs to the searchable language picker, types
+ * `search` (an English name such as "German", so no non-ASCII keys are needed) and presses Enter
+ * on the first match.
+ */
+export async function chooseLanguage(code: string, search: string): Promise<void> {
+  await tabTo((f) => f.role === "combobox" && f.cls.includes("select__input"), "language picker");
+  // Focus selects the shown name so typing replaces it; after an earlier pick the field keeps focus.
+  await browser.execute(() => {
+    (document.activeElement as HTMLInputElement).select();
+  });
+  await typeText(search);
+  await browser.waitUntil(
+    () =>
+      browser.execute((c: string) => {
+        const field = document.activeElement;
+        const first = document.querySelector(`#${CSS.escape(field?.getAttribute("aria-controls") ?? "")} [role=option]`);
+        return field?.getAttribute("aria-activedescendant") === first?.id && first?.getAttribute("lang") === c;
+      }, code),
+    { timeoutMsg: `"${search}" did not list ${code} first in the language picker` },
+  );
+  await browser.keys(["Enter"]);
 }
 
 // ---------------------------------------------------------------- X11 / D-Bus helpers

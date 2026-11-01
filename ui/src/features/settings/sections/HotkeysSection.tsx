@@ -18,7 +18,7 @@ import { channelPath } from "../../hotkeys/runHotkey";
 import { sameAction } from "../../hotkeys/hotkeyKeys";
 import { displayName } from "../../servers/format";
 import { useServers } from "../../servers/store";
-import { Group, Section } from "../components/Section";
+import { Group } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { useSettingsNavigation } from "../settingsNavigation";
 import { HotkeyRow, type PendingConflict } from "./HotkeyRow";
@@ -50,8 +50,8 @@ async function clearWhisperKey(targetId: string): Promise<void> {
   );
 }
 
-/** Settings → Hotkeys (issue #64, FR-3.72, FR-3.73): every action with its global key. */
-export function HotkeysSection({ settings, update }: SettingsSectionProps) {
+/** Settings → Voice & Audio → Hotkeys card (issue #64, FR-3.72, FR-3.73): every action with its global key. */
+export function HotkeysCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const [status, setStatus] = useState<HotkeysStatus | null>(null);
   const [session, setSession] = useState<PttSession | null>(null);
@@ -294,96 +294,94 @@ export function HotkeysSection({ settings, update }: SettingsSectionProps) {
   const compatAvailable = session?.waylandDesktop === true && !session.compatibilityActive;
 
   return (
-    <Section title={t("sections.hotkeys")}>
-      <Group title={t("hotkeys.global")}>
-        <Switch
-          label={t("hotkeys.background")}
-          description={t("hotkeys.backgroundHint")}
-          checked={globalHotkeys}
-          onChange={(next) => {
-            update({ globalHotkeys: next });
-          }}
-        />
-        {!globalHotkeys && <p className="settings-hint">{t("hotkeys.foregroundOnly")}</p>}
-        {globalHotkeys && portalNote !== null && (
-          <p className="hotkeys-note" role="status">
-            {t(portalNote)}
-            {compatAvailable && navigation !== null && (
-              <>
-                {" "}
-                <button
-                  type="button"
-                  className="settings-link"
-                  onClick={navigation.openCompatibilityMode}
-                >
-                  {t("hotkeys.compatLink")}
-                </button>{" "}
-                {t("hotkeys.compatSuffix")}
-              </>
-            )}
-          </p>
-        )}
-      </Group>
-      <Group title={t("hotkeys.actions")}>
+    <Group title={t("sections.hotkeys")} icon="key" wide>
+      <h4 className="hotkeys-subheading">{t("hotkeys.global")}</h4>
+      <Switch
+        label={t("hotkeys.background")}
+        description={t("hotkeys.backgroundHint")}
+        checked={globalHotkeys}
+        onChange={(next) => {
+          update({ globalHotkeys: next });
+        }}
+      />
+      {!globalHotkeys && <p className="settings-hint">{t("hotkeys.foregroundOnly")}</p>}
+      {globalHotkeys && portalNote !== null && (
+        <p className="hotkeys-note" role="status">
+          {t(portalNote)}
+          {compatAvailable && navigation !== null && (
+            <>
+              {" "}
+              <button
+                type="button"
+                className="settings-link"
+                onClick={navigation.openCompatibilityMode}
+              >
+                {t("hotkeys.compatLink")}
+              </button>{" "}
+              {t("hotkeys.compatSuffix")}
+            </>
+          )}
+        </p>
+      )}
+      <h4 className="hotkeys-subheading">{t("hotkeys.actions")}</h4>
+      <HotkeyRow
+        label={t("hotkeys.action.pushToTalk")}
+        description={
+          settings.talkMode === "pushToTalk"
+            ? t("hotkeys.pushToTalkHint")
+            : t("hotkeys.pushToTalkOff")
+        }
+        value={settings.pttKey}
+        onCapture={(combo) => capture(combo, { kind: "pushToTalk" }, assignPtt)}
+        onAssign={(conflict) => {
+          assignPending(assignPtt, conflict);
+        }}
+        onClear={() => {
+          update({ pttKey: null });
+        }}
+      />
+      {BEFORE_CHANNELS.map((kind) => actionRow({ kind }))}
+      {channelRows.map((action) => actionRow(action, channelDescription(action)))}
+      {adding !== null && adding.kind === "switchChannel" && (
         <HotkeyRow
-          label={t("hotkeys.action.pushToTalk")}
-          description={
-            settings.talkMode === "pushToTalk"
-              ? t("hotkeys.pushToTalkHint")
-              : t("hotkeys.pushToTalkOff")
-          }
-          value={settings.pttKey}
-          onCapture={(combo) => capture(combo, { kind: "pushToTalk" }, assignPtt)}
+          label={actionName(adding)}
+          description={channelDescription(adding)}
+          value={null}
+          startRecording
+          onCapture={(combo) => capture(combo, { kind: "new" }, assignAction(adding))}
           onAssign={(conflict) => {
-            assignPending(assignPtt, conflict);
+            assignPending(assignAction(adding), conflict);
           }}
           onClear={() => {
-            update({ pttKey: null });
+            setAdding(null);
+          }}
+          onCancel={() => {
+            setAdding(null);
           }}
         />
-        {BEFORE_CHANNELS.map((kind) => actionRow({ kind }))}
-        {channelRows.map((action) => actionRow(action, channelDescription(action)))}
-        {adding !== null && adding.kind === "switchChannel" && (
-          <HotkeyRow
-            label={actionName(adding)}
-            description={channelDescription(adding)}
-            value={null}
-            startRecording
-            onCapture={(combo) => capture(combo, { kind: "new" }, assignAction(adding))}
-            onAssign={(conflict) => {
-              assignPending(assignAction(adding), conflict);
-            }}
-            onClear={() => {
-              setAdding(null);
-            }}
-            onCancel={() => {
-              setAdding(null);
-            }}
-          />
-        )}
-        {AFTER_CHANNELS.map((kind) => actionRow({ kind }))}
-        {whisper?.targets.map(whisperRow)}
-        <AddChannelHotkey
-          taken={channelRows}
-          onPick={(action) => {
-            setAdding(action);
+      )}
+      {AFTER_CHANNELS.map((kind) => actionRow({ kind }))}
+      {whisper?.targets.map(whisperRow)}
+      <AddChannelHotkey
+        taken={channelRows}
+        onPick={(action) => {
+          setAdding(action);
+        }}
+      />
+      <div className="settings-actions">
+        <button
+          type="button"
+          className="settings-button"
+          disabled={hotkeys.length === 0}
+          onClick={() => {
+            update({ hotkeys: [] });
           }}
-        />
-        <div className="settings-actions">
-          <button
-            type="button"
-            className="settings-button"
-            disabled={hotkeys.length === 0}
-            onClick={() => {
-              update({ hotkeys: [] });
-            }}
-          >
-            {t("hotkeys.reset")}
-          </button>
-        </div>
-        <p className="settings-hint">{t("hotkeys.resetHint")}</p>
-      </Group>
-    </Section>
+        >
+          {t("hotkeys.reset")}
+        </button>
+      </div>
+      <p className="settings-hint">{t("hotkeys.resetHint")}</p>
+    </Group>
   );
 }
 

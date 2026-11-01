@@ -199,7 +199,7 @@ export function CentrePanel() {
           className="centre__settings"
           onClick={() => {
             close(false);
-            openSettingsSection("sounds");
+            openSettingsSection("chatNotifications");
           }}
         >
           {t("centre.settings")}

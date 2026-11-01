@@ -10,6 +10,7 @@ import {
   sleep,
   waitMessage,
 } from "../../helpers/chat-ui.ts";
+import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 
 /** One second of a quiet 440 Hz tone as 16-bit mono PCM WAV. */
 function toneWav(): Buffer {
@@ -153,11 +154,7 @@ describe("chat: audio and music embeds (#260, #262)", () => {
   });
 
   it("with previews switched off shows plain links and fetches nothing", async () => {
-    const quick = $("button[aria-label='Quick settings']");
-    await quick.waitForClickable();
-    await quick.click();
-    await $("//button[@role='menuitem'][contains(., 'All settings')]").click();
-    await $("//button[@role='tab' and .='Chat & history']").click();
+    await openSettingsGroup("Privacy & Connections");
     const toggle = $(
       "//input[@role='switch'][@id=//label[.='Show link previews and embeds']/@for]",
     );

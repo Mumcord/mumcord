@@ -61,19 +61,23 @@ export function GamePluginsGroup() {
   const { t } = useTranslation("settings");
   const { plugins, status, error, setEnabled } = useGamePlugins();
 
-  // Spread into the switch: it takes no `description` at all when there is nothing to say.
-  const description = (p: GamePlugin): { description?: string } => {
+  // Spread into the switch: it takes no `status` at all when there is nothing to say.
+  const pluginStatus = (p: GamePlugin): { status?: string } => {
     const parts: string[] = [];
     if (p.version) parts.push(t("gamePlugins.version", { version: p.version }));
     if (p.problem) parts.push(t(`gamePlugins.problem.${p.problem}`));
     else if (p.enabled && status?.source === p.name) parts.push(t("gamePlugins.active"));
-    return parts.length > 0 ? { description: parts.join(" · ") } : {};
+    return parts.length > 0 ? { status: parts.join(" · ") } : {};
   };
 
   return (
-    <Group title={t("gamePlugins.title")} badge={<BetaBadge />}>
-      <p className="settings-hint">{t("gamePlugins.explanation")}</p>
-      <p className="settings-hint">{t("gamePlugins.antiCheat")}</p>
+    <Group
+      title={t("gamePlugins.title")}
+      icon="box"
+      badge={<BetaBadge />}
+      info={`${t("gamePlugins.explanation")} ${t("gamePlugins.antiCheat")}`}
+      wide
+    >
       {plugins === null && error === null && (
         <p className="settings-hint">{t("gamePlugins.loading")}</p>
       )}
@@ -82,7 +86,7 @@ export function GamePluginsGroup() {
         <Switch
           key={p.id}
           label={p.name}
-          {...description(p)}
+          {...pluginStatus(p)}
           checked={p.enabled}
           disabled={p.problem === "incompatible"}
           onChange={(on) => {

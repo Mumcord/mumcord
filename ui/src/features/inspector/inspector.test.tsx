@@ -4,8 +4,8 @@ import { createMockApi, setApi, type MockApi, type Settings } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { fakeView } from "../../app/testView";
 import { ViewContext } from "../../app/view";
-import { AboutSection } from "../settings/sections/AboutSection";
-import { PacketInspectorSection } from "../settings/sections/PacketInspectorSection";
+import { VersionCard } from "../settings/sections/AboutSection";
+import { DeveloperToolsCard } from "../settings/sections/PacketInspectorSection";
 import { reloadDevToolsUnlocked, setDevToolsUnlocked, UNLOCK_CLICKS } from "./devTools";
 import {
   applyRootLook,
@@ -155,11 +155,11 @@ describe("PacketInspector", () => {
   });
 });
 
-describe("PacketInspectorSection", () => {
+describe("DeveloperToolsCard", () => {
   it("opens the inspector window, once per click", async () => {
     setDevToolsUnlocked(true);
     const open = vi.spyOn(api, "packetInspectorOpen");
-    render(<PacketInspectorSection />);
+    render(<DeveloperToolsCard />);
     const button = screen.getByRole("button", { name: "Open packet inspector" });
     fireEvent.click(button);
     fireEvent.click(button);
@@ -175,7 +175,7 @@ describe("PacketInspectorSection", () => {
     setDevToolsUnlocked(true);
     vi.spyOn(api, "packetInspectorOpen").mockRejectedValue(new Error("no display"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-    render(<PacketInspectorSection />);
+    render(<DeveloperToolsCard />);
     fireEvent.click(screen.getByRole("button", { name: "Open packet inspector" }));
     await waitFor(() => {
       expect(screen.getByRole("status")).not.toBeEmptyDOMElement();
@@ -184,7 +184,7 @@ describe("PacketInspectorSection", () => {
 
   it("hides the tools again with the switch", () => {
     setDevToolsUnlocked(true);
-    render(<PacketInspectorSection />);
+    render(<DeveloperToolsCard />);
     fireEvent.click(screen.getByRole("switch", { name: "Developer tools" }));
     expect(localStorage.getItem("mumcord.devTools")).toBeNull();
   });
@@ -314,7 +314,7 @@ describe("unlocking the developer tools", () => {
   it("takes seven clicks on the version in About", async () => {
     render(
       <ViewContext.Provider value={fakeView()}>
-        <AboutSection settings={settings} update={vi.fn()} />
+        <VersionCard settings={settings} update={vi.fn()} />
       </ViewContext.Provider>,
     );
     const version = await screen.findByText(/^\d+\.\d+\.\d+/u);

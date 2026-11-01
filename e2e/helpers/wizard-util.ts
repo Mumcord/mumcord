@@ -7,9 +7,14 @@ import { run, runOk } from "./run.ts";
 
 export const wizardArtifacts = join(artifactsDir, "wizard");
 
-/** Finds a button by its visible text (exact match after trimming). */
+/**
+ * Finds a button by its visible text (exact match after trimming). The wizard's footer buttons
+ * carry a decorative arrow ("Next →", "← Back"); it is ignored.
+ */
 export function button(text: string) {
-  return $(`//button[normalize-space(.)="${text}"]`);
+  return $(
+    `//button[normalize-space(.)="${text}" or normalize-space(.)="${text} →" or normalize-space(.)="← ${text}"]`,
+  );
 }
 
 /** Finds a form control through its `<label for>` text. */
@@ -61,33 +66,168 @@ export async function chooseFileInNativeDialog(path: string): Promise<void> {
   await runOk("xdotool", ["key", "Return"]);
 }
 
-/** Number of first-start wizard steps; the last one is the talk mode step with Finish. */
-export const WIZARD_STEPS = 5;
+// ---- Setup wizard (#159) ----
+//
+// First start: Welcome → [Import from Mumble] → Identity → Voice → Setup style → [Custom only:
+// Private messages → Connections → Features → Appearance → Startup and updates] → All set.
+// Rerun from Settings → About (#149): the same without import and identity.
 
-/** The wizard's progress line for step `n`. */
-export function wizardStep(n: number): string {
-  return `Step ${String(n)} of ${String(WIZARD_STEPS)}`;
+/** Rail names of the steps, as the step header shows them ("STEP n OF m · <name>"). */
+export const WIZARD_STEP_NAMES = {
+  welcome: "Welcome",
+  import: "Import from Mumble",
+  identity: "Identity",
+  voice: "Voice",
+  setupStyle: "Setup style",
+  privateMessages: "Private messages",
+  connections: "Connections",
+  features: "Features",
+  appearance: "Appearance",
+  startup: "Startup and updates",
+  summary: "All set",
+} as const;
+export type WizardStepName = keyof typeof WIZARD_STEP_NAMES;
+
+/** The Custom-only steps in order. */
+export const CUSTOM_STEPS: readonly WizardStepName[] = [
+  "privateMessages",
+  "connections",
+  "features",
+  "appearance",
+  "startup",
+];
+
+/** The four cards of the setup style step (their radio values). */
+export type SetupStyle = "everythingOn" | "balanced" | "maximumPrivacy" | "custom";
+/** The cards in the order they show. */
+export const SETUP_STYLES: readonly SetupStyle[] = [
+  "everythingOn",
+  "balanced",
+  "maximumPrivacy",
+  "custom",
+];
+export type WizardPreset = Exclude<SetupStyle, "custom">;
+
+/** The current step's header line, e.g. "Step 3 of 5 · Voice" (empty when no step shows). */
+export async function wizardEyebrow(): Promise<string> {
+  const eyebrow = $("form.wizard-step p.wizard-eyebrow");
+  return (await eyebrow.isExisting()) ? (await eyebrow.getText()).trim() : "";
+}
+
+/** Waits until step `step` shows; resolves with its header line ("Step n of m · Name"). */
+export async function waitForWizardStep(step: WizardStepName, timeout = 15_000): Promise<string> {
+  // CSS may upper-case the header, so compare without case.
+  const suffix = `· ${WIZARD_STEP_NAMES[step]}`.toLowerCase();
+  let line = "";
+  await browser.waitUntil(
+    async () => {
+      line = await wizardEyebrow();
+      return line.toLowerCase().endsWith(suffix);
+    },
+    {
+      timeout,
+      timeoutMsg: `wizard step ${step} never showed (last header: ${JSON.stringify(line)})`,
+    },
+  );
+  return line;
+}
+
+/** The primary (submit) button of the shown step. */
+export function wizardPrimary() {
+  return $("form.wizard-step .wizard-footer button[type='submit']");
+}
+
+/** Welcome → "Let's get started". */
+export async function passWelcome(): Promise<void> {
+  await waitForWizardStep("welcome", 30_000);
+  await wizardPrimary().click();
+}
+
+/** On the identity step: a new identity named `name`, then Next. */
+export async function createIdentity(name: string): Promise<void> {
+  await waitForWizardStep("identity", 30_000);
+  const nameInput = $("input[autocomplete='nickname']");
+  await nameInput.waitForDisplayed({ timeout: 10_000 });
+  await nameInput.setValue(name);
+  await wizardPrimary().click();
 }
 
 /**
- * After Next on the identity step: Next through the steps in between with their defaults until
- * the last step shows. Every spec walks the wizard through here, so a new step needs one edit.
+ * After Next on the identity step: waits for the voice step, keeps its defaults (voice
+ * activation) and moves on to the setup style step.
  */
-export async function nextToLastWizardStep(): Promise<void> {
-  for (let step = 2; step < WIZARD_STEPS; step++) {
-    // Leaving step 1 generates the RSA-2048 identity; in the unoptimised debug build the random
-    // prime search takes anywhere from about 1 s to well over 15 s on a 2-core runner.
-    await waitForText(wizardStep(step), step === 2 ? 120_000 : 15_000);
-    await button("Next").click();
-  }
-  await waitForText(wizardStep(WIZARD_STEPS));
+export async function voiceToSetupStyle(): Promise<void> {
+  // Leaving the identity step generates the RSA-2048 identity; in the unoptimised debug build the
+  // random prime search takes anywhere from about 1 s to well over 15 s on a 2-core runner.
+  await waitForWizardStep("voice", 120_000);
+  await wizardPrimary().click();
+  await waitForWizardStep("setupStyle");
 }
 
-/** After Next on the identity step: all remaining steps with defaults, Finish, main window. */
-export async function finishWizardWithDefaults(): Promise<void> {
-  await nextToLastWizardStep();
-  await button("Finish").click();
+/** The radio of setup style card `style`. */
+export function setupStyleRadio(style: SetupStyle) {
+  return $(`form.wizard-step input.preset-card__radio[value='${style}']`);
+}
+
+/** On the setup style step: selects the card `style`. */
+export async function chooseSetupStyle(style: SetupStyle): Promise<void> {
+  const radio = setupStyleRadio(style);
+  await radio.waitForExist({ timeout: 10_000 });
+  // The card's label takes the click, as a user would click the card.
+  await $(`form.wizard-step label.preset-card[data-preset='${style}']`).click();
+  await browser.waitUntil(async () => radio.isSelected(), {
+    timeout: 5_000,
+    timeoutMsg: `setup style ${style} never became selected`,
+  });
+}
+
+/** On the setup style step: `preset` → "Finish setup" → summary → "Start Mumcord" → main window. */
+export async function finishWithPreset(preset: WizardPreset): Promise<void> {
+  await chooseSetupStyle(preset);
+  await button("Finish setup").click();
+  await waitForWizardStep("summary");
+  await button("Start Mumcord").click();
   await mainWindowMarker().waitForExist({ timeout: 30_000 });
+}
+
+/**
+ * On the setup style step: Custom → Next through the five Custom steps (running `onStep` on each
+ * before Next) → summary.
+ */
+export async function walkCustomSteps(
+  onStep?: (step: WizardStepName) => Promise<void>,
+): Promise<void> {
+  await chooseSetupStyle("custom");
+  await wizardPrimary().click();
+  for (const step of CUSTOM_STEPS) {
+    await waitForWizardStep(step);
+    await onStep?.(step);
+    await wizardPrimary().click();
+  }
+  await waitForWizardStep("summary");
+}
+
+/** A switch (`role="switch"` input) by the text of its label. */
+export function switchLabelled(text: string) {
+  return $(`//input[@role='switch'][@id=//label[normalize-space(.)="${text}"]/@for]`);
+}
+
+/**
+ * The whole first-start wizard on a fresh profile: Welcome, a new identity `name`, voice
+ * defaults, `preset`, summary, main window.
+ *
+ * The default is "Everything on" because it keeps the behaviour the specs were written against:
+ * anyone may send private messages (Balanced allows only friends and the own channel), and the
+ * extra sharing it turns on (now playing, now gaming) has nothing to report in the test session.
+ */
+export async function runFirstStartWizard(
+  name: string,
+  preset: WizardPreset = "everythingOn",
+): Promise<void> {
+  await passWelcome();
+  await createIdentity(name);
+  await voiceToSetupStyle();
+  await finishWithPreset(preset);
 }
 
 /** All Mumcord entries in the Secret Service, as printed by `secret-tool search --all`. */
