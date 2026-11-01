@@ -42,12 +42,27 @@ pub struct RevokedLoaded {
     pub freshness: Freshness,
 }
 
+/// Replaces the official base URL in development builds, so E2E runs can use a local fixture
+/// registry. Release builds never read it.
+pub const TEST_URL_ENV: &str = "MUMCORD_PLUGIN_REGISTRY_URL";
+
 /// The official base URL, or the mirror from Settings → Plugins → Repositories → Advanced
-/// (FR-6.57). Mirrored files are still verified with the official keys.
+/// (FR-6.57). Mirrored files are still verified with the official keys. Development builds
+/// also take the base from [`TEST_URL_ENV`]; a mirror setting wins over it.
 pub fn official_base(mirror: Option<&str>) -> Result<Url, RegistryError> {
-    let text = mirror
+    #[cfg(debug_assertions)]
+    let test_url = std::env::var(TEST_URL_ENV).ok();
+    #[cfg(not(debug_assertions))]
+    let test_url: Option<String> = None;
+    official_base_with(mirror, test_url.as_deref())
+}
+
+fn official_base_with(mirror: Option<&str>, test_url: Option<&str>) -> Result<Url, RegistryError> {
+    let text = [mirror, test_url]
+        .into_iter()
+        .flatten()
         .map(str::trim)
-        .filter(|m| !m.is_empty())
+        .find(|m| !m.is_empty())
         .unwrap_or(OFFICIAL_BASE_URL);
     let text = if text.ends_with('/') {
         text.to_owned()
@@ -197,5 +212,38 @@ pub(super) async fn fetch_signed<T>(
             },
         )),
         (Some(Err(error)), None) => Err(error),
+    }
+}
+
+#[cfg(test)]
+mod base_tests {
+    use super::*;
+
+    #[test]
+    fn base_defaults_to_official() {
+        let base = official_base_with(None, None).expect("test step");
+        assert_eq!(base.as_str(), OFFICIAL_BASE_URL);
+    }
+
+    #[test]
+    fn test_url_replaces_official_base() {
+        let base = official_base_with(None, Some("http://127.0.0.1:9/v1")).expect("test step");
+        assert_eq!(base.as_str(), "http://127.0.0.1:9/v1/");
+    }
+
+    #[test]
+    fn mirror_wins_over_test_url() {
+        let base = official_base_with(
+            Some("http://127.0.0.1:1/m/"),
+            Some("http://127.0.0.1:9/v1/"),
+        )
+        .expect("test step");
+        assert_eq!(base.as_str(), "http://127.0.0.1:1/m/");
+    }
+
+    #[test]
+    fn blank_values_are_ignored() {
+        let base = official_base_with(Some(" "), Some("")).expect("test step");
+        assert_eq!(base.as_str(), OFFICIAL_BASE_URL);
     }
 }

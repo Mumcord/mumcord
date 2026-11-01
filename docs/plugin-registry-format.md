@@ -341,7 +341,8 @@ since = "2026-10-20"
 `mumcord-plugin serve-registry --packages <dir> --key <test.key>` serves the packages in `<dir>`
 as an official registry on `http://127.0.0.1:<port>/v1/`, signed with a test key (create one
 with `mumcord-plugin keygen --unencrypted`). Point a development build at it with the mirror
-setting and `MUMCORD_PLUGIN_REGISTRY_KEY=<public key line>`. With `--repository <name>` it serves
+setting or `MUMCORD_PLUGIN_REGISTRY_URL=<base URL>` (the mirror wins), plus
+`MUMCORD_PLUGIN_REGISTRY_KEY=<public key line>`; release builds ignore both variables. With `--repository <name>` it serves
 a third-party repository instead; its address is `http://127.0.0.1:<port>/v1/index.json`
 (Developer mode allows plain `http` for localhost).
 
