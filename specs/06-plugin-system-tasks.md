@@ -101,7 +101,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | V-D | Mockup conformance: Plugin detail page (see scratchpad v1/deviations.md) | done (138f2d3d) | v-d |
 | V-E | Mockup conformance: Install prompt redesign (see scratchpad v1/deviations.md) | done (ed55dd0e; per-permission explanations, E4/E5 → V-D2) | v-e |
 | V-F | Mockup conformance: Updates tab redesign (see scratchpad v1/deviations.md) | done (5b360924; later: skip version, release notes, last-checked time) | v-f |
-| V-G | Mockup conformance: Add repository dialog (see scratchpad v1/deviations.md) | in progress | v-g |
+| V-G | Mockup conformance: Add repository dialog (see scratchpad v1/deviations.md) | done (e46433ea) | v-g |
 | V-H | Mockup conformance: Notification centre plugin entries (see scratchpad v1/deviations.md) | done (62459fde; "via <bot>" needs the bot name in the suggestion event — later) | v-h |
 | V-I | Mockup conformance: Plugin strip N running + side sheet (see scratchpad v1/deviations.md) | done (6003fe67; not visually checked — verify in the real build) | v-i |
 | V-L | Mockup conformance: Dice card redesign + roll history (see scratchpad v1/deviations.md) | done (feat/dice 2224b3d) | v-l |
