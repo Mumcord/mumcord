@@ -73,6 +73,7 @@
       "specs/misc/diagnostics-about.e2e.ts",
       "specs/p2p/p2p-mode.e2e.ts",
       "specs/p2p/relay-live.e2e.ts",
+      "specs/plugins/mumbot-music.e2e.ts",
       "specs/wizard/ac-66-import-mumble.e2e.ts"
     ]
   ]

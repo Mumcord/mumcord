@@ -1,17 +1,20 @@
 #!/bin/bash
 # Usage: testenv/mumbot/up.sh
 # Starts the local mumbot (music + plugins modules) on the v15 test server. Needs v15 running
-# (testenv/up.sh v15) and MUMBOT_API_KEY in testenv/.env. Music API: http://127.0.0.1:${MUMBOT_PORT:-8081}.
+# (testenv/up.sh v15) and MUMBOT_API_KEY in testenv/.env or the environment. Music API: http://127.0.0.1:${MUMBOT_PORT:-8081}.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 # shellcheck source=testenv/env.sh
 . ./env.sh
 [ -f .env ] || { echo "missing testenv/.env - run: cp testenv/.env.example testenv/.env" >&2; exit 1; }
+# A key passed in the environment (the E2E specs use a fresh one per run) wins over .env.
+env_key="${MUMBOT_API_KEY:-}"
 set -a
 # The local, git-ignored .env is not there to follow.
 # shellcheck source=/dev/null
 . ./.env
 set +a
+MUMBOT_API_KEY="${env_key:-${MUMBOT_API_KEY:-}}"
 [ -n "${MUMBOT_API_KEY:-}" ] || { echo "set MUMBOT_API_KEY in testenv/.env (any random string, e.g. openssl rand -hex 16)" >&2; exit 1; }
 [ -f certs/A/cert.pem ] || ./gen-certs.sh
 cert_set=${CERT_SET:-A}
