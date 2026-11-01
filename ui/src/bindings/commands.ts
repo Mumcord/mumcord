@@ -2177,6 +2177,9 @@ export type PlaylistEntry = {
 	addedByName: string | null,
 };
 
+/**  How plugin updates are handled. */
+export type PluginUpdates = "auto" | "notify" | "off";
+
 /**  Pin and mute state of a private conversation, by server and the person's certificate hash. */
 export type PmConversationPrefs = {
 	serverId: number,
@@ -2723,6 +2726,16 @@ export type Settings = {
 	positional: PositionalSettings,
 	/**  How many servers may be connected at once, 1 – 15 (default 5; FR-2.1). */
 	maxConnectedServers: number,
+	/**  Plugin update behaviour (default `auto`). */
+	pluginsUpdates: PluginUpdates,
+	/**  "Turn off all plugins". */
+	pluginsAllOff: boolean,
+	/**  The plugin whose badge is shown next to names; `null` for none. */
+	pluginsBadgePlugin: string | null,
+	/**  Optional mirror of the official plugin repository. */
+	pluginsMirrorUrl: string | null,
+	/**  Developer mode (dev folders, local HTTP repositories). */
+	developerMode: boolean,
 	/**  Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14). */
 	appThemeId: string,
 	customThemes: ThemeRecord[],

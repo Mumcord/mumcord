@@ -517,6 +517,16 @@ pub enum HotkeyAction {
     OpenMumcord,
 }
 
+/// How plugin updates are handled (FR-6.66).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PluginUpdates {
+    #[default]
+    Auto,
+    Notify,
+    Off,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -630,6 +640,20 @@ pub struct Settings {
     pub load_full_images: bool,
     /// Most servers connected at once, 1–15 (FR-2.1). Clamped on load.
     pub max_connected_servers: u8,
+    /// Plugin update behaviour (spec 06 section 7.1).
+    pub plugins_updates: PluginUpdates,
+    /// "Turn off all plugins": no plugin runs until it is turned on again.
+    pub plugins_all_off: bool,
+    /// The plugin whose badge is shown next to names; `None` for none.
+    pub plugins_badge_plugin: Option<String>,
+    /// Optional mirror of the official plugin repository.
+    pub plugins_mirror_url: Option<String>,
+    /// Developer mode: dev folders, local HTTP repositories.
+    pub developer_mode: bool,
+    /// Highest sequence number seen from the official repository (rollback protection).
+    pub plugins_last_official_sequence: i64,
+    /// When revocations were last checked, in milliseconds since the Unix epoch.
+    pub plugins_revoked_checked_at: Option<i64>,
     /// Id of the theme for the whole app: a built-in preset or one of `custom_themes`.
     pub app_theme_id: String,
     /// Imported and user-made themes; built-in presets are not stored (FR-2.15).
@@ -744,6 +768,13 @@ impl Default for Settings {
             offer_full_images: true,
             load_full_images: true,
             max_connected_servers: DEFAULT_MAX_CONNECTED_SERVERS,
+            plugins_updates: PluginUpdates::default(),
+            plugins_all_off: false,
+            plugins_badge_plugin: None,
+            plugins_mirror_url: None,
+            developer_mode: false,
+            plugins_last_official_sequence: 0,
+            plugins_revoked_checked_at: None,
             app_theme_id: DEFAULT_APP_THEME_ID.to_owned(),
             custom_themes: Vec::new(),
             visual_effects: true,
@@ -1189,6 +1220,22 @@ mod tests {
                 expected
             );
         }
+    }
+
+    #[test]
+    fn plugin_settings_default_and_round_trip() {
+        let (_dir, store) = temp_store();
+        let loaded = store.settings().expect("load");
+        assert_eq!(loaded.plugins_updates, PluginUpdates::Auto);
+        assert!(!loaded.plugins_all_off && !loaded.developer_mode);
+        assert_eq!(loaded.plugins_badge_plugin, None);
+        let mut changed = loaded;
+        changed.plugins_updates = PluginUpdates::Notify;
+        changed.plugins_all_off = true;
+        changed.plugins_badge_plugin = Some("echolings".into());
+        changed.plugins_last_official_sequence = 7;
+        store.save_settings(&changed).expect("save");
+        assert_eq!(store.settings().expect("load"), changed);
     }
 
     #[test]
