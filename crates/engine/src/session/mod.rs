@@ -1429,10 +1429,17 @@ impl Engine {
     /// Plays a short sound on the output device, for the "Test sound" button. Only audible
     /// while voice audio runs (the popover is only reachable then).
     pub fn audio_test_sound(&self) {
+        let sounds = self.inner.events.sounds();
+        sounds.play_test(crate::sounds::Sound::Message, sounds.theme());
+    }
+
+    /// Plays the connect sound of `theme` for the sound theme preview (#325), whether or not
+    /// that theme is saved yet. Like the test sound, only audible while voice audio runs.
+    pub fn preview_sound_theme(&self, theme: mumcord_store::SoundTheme) {
         self.inner
             .events
             .sounds()
-            .play_test(crate::sounds::Sound::Message);
+            .play_test(crate::sounds::Sound::VoiceJoin, theme);
     }
 
     /// Ends the mic test wherever it is; voice of a connected session resumes.

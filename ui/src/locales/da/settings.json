@@ -408,6 +408,11 @@
   "sounds": {
     "title": "Lyde",
     "explanation": "Korte lyde, der afspilles ved disse hændelser.",
+    "theme": "Lydtema",
+    "themeClassic": "Klassisk",
+    "themeRich": "Fyldig",
+    "preview": "Lyt",
+    "previewHint": "Fyldig har mere fyldige lyde, Klassisk korte, enkle toner. Prøvelyden kan høres, mens du er i en talekanal.",
     "joinLeave": "Nogen joiner eller forlader din kanal",
     "voiceJoin": "Du joiner en kanal for voice",
     "selfMute": "Du slår din mikrofon fra eller til",

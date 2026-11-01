@@ -8,15 +8,8 @@
 
 ### Added
 
-- New connect sound
-- New new-message sound
-- New microphone mute and unmute sounds
-- New deafen and undeafen sounds
-- New kicked and banned sounds
-- New mention sound
-- New leaving-voice sound
-- New someone-joining and someone-leaving sounds
-- Quitting Mumcord while you are in a voice channel plays a short, distinctive goodbye sound, so you notice that you just left voice. It plays on every real quit (window close set to Quit, tray Quit, the quit menu or shortcut, and restarting for an update), never when Mumcord only minimises to the tray or when you are not in voice, and it follows the output volume, deafen and its own switch in Settings > Sounds (on by default). Mumcord waits for it at most 1.5 seconds, in parallel with closing the connections; a second quit request exits at once. The sound is local only: others still see the normal leave from the server (#325)
+- A second sound theme, **Rich**: new, fuller notification sounds for connecting to voice, new messages, mentions, microphone mute and unmute, deafen and undeafen, someone joining or leaving your channel, leaving voice, being kicked and being banned. Settings > Sounds has a **Sound theme** switch with a preview button to choose between Rich (the default) and **Classic**, the familiar short synthesized tones; the theme applies to every notification sound at once (#325)
+- Quitting Mumcord while you are in a voice channel plays a short, distinctive goodbye sound, so you notice that you just left voice. It plays on every real quit (window close set to Quit, tray Quit, the quit menu or shortcut, and restarting for an update), never when Mumcord only minimises to the tray or when you are not in voice, and it follows the output volume, deafen, the sound theme and its own switch in Settings > Sounds (on by default). Mumcord waits for it at most 1.5 seconds, in parallel with closing the connections; a second quit request exits at once. The sound is local only: others still see the normal leave from the server (#325)
 
 ### Fixed
 

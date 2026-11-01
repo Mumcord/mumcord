@@ -408,6 +408,11 @@
   "sounds": {
     "title": "Hangok",
     "explanation": "Rövid hangok, amelyek ezeknél az eseményeknél szólnak.",
+    "theme": "Hangtéma",
+    "themeClassic": "Klasszikus",
+    "themeRich": "Gazdag",
+    "preview": "Meghallgatás",
+    "previewHint": "A Gazdag teltebb hangokat, a Klasszikus rövid, egyszerű hangokat ad. Az előnézet hangcsatornában hallható.",
     "joinLeave": "Valaki belép a csatornádba vagy elhagyja",
     "voiceJoin": "Belépsz egy hangcsatornába",
     "selfMute": "Némítod magad vagy feloldod a némítást",

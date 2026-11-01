@@ -411,6 +411,11 @@
   "sounds": {
     "title": "Sons",
     "explanation": "Courts sons joués pour ces événements.",
+    "theme": "Thème sonore",
+    "themeClassic": "Classique",
+    "themeRich": "Riche",
+    "preview": "Écouter",
+    "previewHint": "Riche propose des sons plus amples, Classique des tons courts et simples. L'écoute est audible lorsque vous êtes dans un salon vocal.",
     "joinLeave": "Quelqu’un rejoint ou quitte votre canal",
     "voiceJoin": "Vous rejoignez un canal vocal",
     "selfMute": "Vous coupez ou réactivez votre micro",

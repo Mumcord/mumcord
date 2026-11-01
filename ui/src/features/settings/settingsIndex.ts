@@ -340,6 +340,12 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     control: "dnd.follow",
     terms: ["dnd.followDescription"],
   },
+  {
+    section: "voiceAudio",
+    group: "sounds.title",
+    control: "sounds.theme",
+    terms: ["sounds.themeClassic", "sounds.themeRich"],
+  },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.joinLeave" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.voiceJoin" },
   { section: "voiceAudio", group: "sounds.title", control: "sounds.selfMute" },

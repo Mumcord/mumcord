@@ -411,6 +411,11 @@
   "sounds": {
     "title": "Sunete",
     "explanation": "Sunete scurte redate la aceste evenimente.",
+    "theme": "Temă de sunete",
+    "themeClassic": "Clasică",
+    "themeRich": "Bogată",
+    "preview": "Ascultă",
+    "previewHint": "Bogată are sunete mai pline, Clasică tonuri scurte și simple. Previzualizarea se aude cât timp ești pe un canal de voce.",
     "joinLeave": "Cineva intră sau iese din canalul tău",
     "voiceJoin": "Intri într-un canal de voce",
     "selfMute": "Îți oprești sau pornești microfonul",

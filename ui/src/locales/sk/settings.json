@@ -414,6 +414,11 @@
   "sounds": {
     "title": "Zvuky",
     "explanation": "Krátke zvuky, ktoré sa prehrajú pri týchto udalostiach.",
+    "theme": "Zvukový motív",
+    "themeClassic": "Klasický",
+    "themeRich": "Bohatý",
+    "preview": "Prehrať ukážku",
+    "previewHint": "Bohatý má plnšie zvuky, Klasický krátke, jednoduché tóny. Ukážku počuť, keď si v hlasovom kanáli.",
     "joinLeave": "Niekto sa pripojí do tvojho kanála alebo ho opustí",
     "voiceJoin": "Pripojíš sa do kanála na hlasový chat",
     "selfMute": "Stlmíš alebo zapneš svoj mikrofón",

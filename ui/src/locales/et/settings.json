@@ -408,6 +408,11 @@
   "sounds": {
     "title": "Helid",
     "explanation": "Lühikesed helid, mis mängivad nende sündmuste puhul.",
+    "theme": "Heliteema",
+    "themeClassic": "Klassikaline",
+    "themeRich": "Rikkalik",
+    "preview": "Kuula",
+    "previewHint": "Rikkalikul on täidlasemad helid, Klassikalisel lühikesed lihtsad toonid. Eelkuulamine on kuulda, kui oled häälekanalis.",
     "joinLeave": "Keegi liitub sinu kanaliga või lahkub sellest",
     "voiceJoin": "Liitud kanaliga häälega",
     "selfMute": "Vaigistad end või lõpetad vaigistuse",

@@ -2,6 +2,9 @@
 //! your own mute/deafen changes, new messages, your own join of a channel for voice (QA.23) and
 //! hanging up (QA.19). No speech.
 //!
+//! Every sound comes in two themes (#325), chosen in the settings: Classic (short synthesized
+//! tones) and Rich (ElevenLabs sounds). A sound one theme lacks plays from the other.
+//!
 //! The [`SoundHub`] observes the engine's own event flow ([`crate::session::Events::emit`]),
 //! tracks who is in your channel, maps events to a [`Sound`] and, if the per-event toggle in
 //! the settings allows it, writes the embedded 48 kHz mono samples into the mixer's mix-in
@@ -33,7 +36,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
-use mumcord_store::{SoundSettings, Store};
+use mumcord_store::{SoundSettings, SoundTheme, Store};
 
 use crate::session::EngineEvent;
 
@@ -94,36 +97,76 @@ pub fn quit_wait(samples: usize) -> Duration {
 /// At most one joining or leaving activity sound per this span (FR-2.77).
 const ACTIVITY_GAP: Duration = Duration::from_secs(1);
 
+/// Embeds the named files of one theme's folder in `assets/sounds/`.
+macro_rules! sound_set {
+    ($dir:literal: $($name:literal),+ $(,)?) => {
+        &[$(($name, include_bytes!(concat!("../../../assets/sounds/", $dir, "/", $name, ".wav")))),+]
+    };
+}
+
+type SoundSet = &'static [(&'static str, &'static [u8])];
+
+/// The synthesized tones of `assets/sounds/classic/generate.py` (plus the kick and ban effects).
+const CLASSIC: SoundSet = sound_set!("classic":
+    "user_joined", "user_left", "mute", "unmute", "deafen", "undeafen", "message", "mention",
+    "voice_join", "hang_up", "quit", "kicked", "banned",
+);
+
+/// The ElevenLabs sounds of `assets/sounds/rich/`.
+const RICH: SoundSet = sound_set!("rich":
+    "user_joined", "user_left", "mute", "unmute", "deafen", "undeafen", "message", "mention",
+    "voice_join", "hang_up", "quit", "kicked", "banned",
+);
+
+/// The bundled variant of the sound file `name` in `theme`, if that theme has one.
+fn bundled(theme: SoundTheme, name: &str) -> Option<&'static [u8]> {
+    let set = match theme {
+        SoundTheme::Classic => CLASSIC,
+        SoundTheme::Rich => RICH,
+    };
+    set.iter().find(|(n, _)| *n == name).map(|(_, wav)| *wav)
+}
+
+/// The variant of `name` in `theme`; a sound the theme lacks falls back to the other theme, and
+/// one neither has is empty (silent).
+fn resolve(
+    name: &str,
+    theme: SoundTheme,
+    lookup: impl Fn(SoundTheme, &str) -> Option<&'static [u8]>,
+) -> &'static [u8] {
+    let other = match theme {
+        SoundTheme::Classic => SoundTheme::Rich,
+        SoundTheme::Rich => SoundTheme::Classic,
+    };
+    lookup(theme, name)
+        .or_else(|| lookup(other, name))
+        .unwrap_or_default()
+}
+
 impl Sound {
-    fn wav(self) -> &'static [u8] {
+    /// The bundled file this sound plays. Activity sounds reuse others: starts sound like the
+    /// own join, coming and going like people joining and leaving the channel.
+    fn file(self) -> &'static str {
         match self {
-            Self::UserJoined => include_bytes!("../../../assets/sounds/user_joined.wav"),
-            Self::UserLeft => include_bytes!("../../../assets/sounds/user_left.wav"),
-            Self::Mute => include_bytes!("../../../assets/sounds/mute.wav"),
-            Self::Unmute => include_bytes!("../../../assets/sounds/unmute.wav"),
-            Self::Deafen => include_bytes!("../../../assets/sounds/deafen.wav"),
-            Self::Undeafen => include_bytes!("../../../assets/sounds/undeafen.wav"),
-            Self::Message => include_bytes!("../../../assets/sounds/message.wav"),
-            Self::Mention => include_bytes!("../../../assets/sounds/mention.wav"),
-            Self::VoiceJoin => include_bytes!("../../../assets/sounds/voice_join.wav"),
-            Self::HangUp | Self::ShareStopped => {
-                include_bytes!("../../../assets/sounds/hang_up.wav")
-            }
-            // Activity sounds reuse the bundled ones: starts sound like the own join,
-            // coming and going like people joining and leaving the channel.
-            Self::PartyStarted | Self::ShareStarted => {
-                include_bytes!("../../../assets/sounds/voice_join.wav")
-            }
-            Self::PartyJoined | Self::ViewerStarted => {
-                include_bytes!("../../../assets/sounds/user_joined.wav")
-            }
-            Self::PartyLeft | Self::ViewerStopped => {
-                include_bytes!("../../../assets/sounds/user_left.wav")
-            }
-            Self::Quit => include_bytes!("../../../assets/sounds/quit.wav"),
-            Self::Kicked => include_bytes!("../../../assets/sounds/kicked.wav"),
-            Self::Banned => include_bytes!("../../../assets/sounds/banned.wav"),
+            Self::UserJoined | Self::PartyJoined | Self::ViewerStarted => "user_joined",
+            Self::UserLeft | Self::PartyLeft | Self::ViewerStopped => "user_left",
+            Self::Mute => "mute",
+            Self::Unmute => "unmute",
+            Self::Deafen => "deafen",
+            Self::Undeafen => "undeafen",
+            Self::Message => "message",
+            Self::Mention => "mention",
+            Self::VoiceJoin | Self::PartyStarted | Self::ShareStarted => "voice_join",
+            Self::HangUp | Self::ShareStopped => "hang_up",
+            Self::Quit => "quit",
+            Self::Kicked => "kicked",
+            Self::Banned => "banned",
         }
+    }
+
+    /// The WAV bytes of this sound in `theme`, or in the other theme if `theme` has no variant.
+    fn wav(self, theme: SoundTheme) -> &'static [u8] {
+        resolve(self.file(), theme, bundled)
     }
 
     /// Whether the settings enable this sound.
@@ -168,14 +211,17 @@ impl Sound {
         )
     }
 
-    /// 48 kHz mono samples of the sound.
-    pub fn samples(self) -> Vec<f32> {
-        decode_wav(self.wav())
+    /// 48 kHz mono samples of the sound in `theme`.
+    pub fn samples(self, theme: SoundTheme) -> Vec<f32> {
+        decode_wav(self.wav(theme))
     }
 
-    /// Samples with the mix-in gain applied.
-    fn mixed(self) -> Vec<f32> {
-        self.samples().into_iter().map(|s| s * SOUND_GAIN).collect()
+    /// Samples in `theme` with the mix-in gain applied.
+    fn mixed(self, theme: SoundTheme) -> Vec<f32> {
+        self.samples(theme)
+            .into_iter()
+            .map(|s| s * SOUND_GAIN)
+            .collect()
     }
 
     /// A notification about messages or activity, which Do Not Disturb silences (FR-3.111).
@@ -202,8 +248,8 @@ impl Sound {
     }
 }
 
-/// Decodes the embedded 16-bit mono WAV files (RIFF chunks as written by ffmpeg); anything
-/// unexpected yields silence-free empty output.
+/// Decodes the embedded 16-bit mono WAV files (RIFF chunks as written by ffmpeg or
+/// `generate.py`); anything unexpected yields silence-free empty output.
 fn decode_wav(bytes: &[u8]) -> Vec<f32> {
     let mut pos = 12;
     while pos + 8 <= bytes.len() {
@@ -553,12 +599,18 @@ impl SoundHub {
         self.play_locked(&mut state, sound, deaf);
     }
 
+    /// The sound theme the settings choose.
+    pub fn theme(&self) -> SoundTheme {
+        (self.settings)().theme
+    }
+
     /// Plays `sound` now whatever the toggles and the deaf state say: the "Test sound" button
     /// of the output popover must be audible so the user can judge the chosen device and volume.
-    pub fn play_test(&self, sound: Sound) {
+    /// `theme` is the one to hear, which may not be saved yet (the sound theme preview).
+    pub fn play_test(&self, sound: Sound, theme: SoundTheme) {
         let mut state = self.state();
         if let Some(out) = state.out.as_mut()
-            && !out(&sound.mixed())
+            && !out(&sound.mixed(theme))
         {
             tracing::debug!("test sound skipped: mixer input is full");
         }
@@ -593,8 +645,9 @@ impl SoundHub {
         state.pending_join = false;
         state.awaiting_move = None;
         state.tracker.joining = None;
-        (state.out.is_some() && Sound::HangUp.enabled(&(self.settings)()))
-            .then(|| Sound::HangUp.mixed())
+        let settings = (self.settings)();
+        (state.out.is_some() && Sound::HangUp.enabled(&settings))
+            .then(|| Sound::HangUp.mixed(settings.theme))
     }
 
     /// The user quits Mumcord (#325). Returns the quit samples (gain applied) if `in_voice` (a
@@ -604,11 +657,12 @@ impl SoundHub {
     /// pipeline.
     pub fn quit(&self, in_voice: bool) -> Option<Vec<f32>> {
         let state = self.state();
+        let settings = (self.settings)();
         (in_voice
             && state.out.is_some()
             && !state.tracker.own_deaf()
-            && Sound::Quit.enabled(&(self.settings)()))
-        .then(|| Sound::Quit.mixed())
+            && Sound::Quit.enabled(&settings))
+        .then(|| Sound::Quit.mixed(settings.theme))
     }
 
     /// The server removed the own session (#205). Returns the kick or ban samples (gain
@@ -621,8 +675,9 @@ impl SoundHub {
         state.awaiting_move = None;
         state.tracker.joining = None;
         let sound = Sound::for_removal(actor, ban)?;
-        (state.out.is_some() && !state.tracker.own_deaf() && sound.enabled(&(self.settings)()))
-            .then(|| sound.mixed())
+        let settings = (self.settings)();
+        (state.out.is_some() && !state.tracker.own_deaf() && sound.enabled(&settings))
+            .then(|| sound.mixed(settings.theme))
     }
 
     /// Whether a rate-limited `sound` is not too close to the last one. A sound that would
@@ -646,11 +701,12 @@ impl SoundHub {
         if was_deaf && !sound.own_action() {
             return;
         }
-        if !sound.enabled(&(self.settings)()) || self.silenced(sound) {
+        let settings = (self.settings)();
+        if !sound.enabled(&settings) || self.silenced(sound) {
             return;
         }
         if let Some(out) = state.out.as_mut()
-            && !out(&sound.mixed())
+            && !out(&sound.mixed(settings.theme))
         {
             tracing::debug!("notification sound skipped: mixer input is full");
         }
@@ -810,6 +866,7 @@ mod tests {
     #[test]
     fn toggles_gate_each_sound() {
         let off = SoundSettings {
+            theme: SoundTheme::default(),
             user_joined: false,
             user_left: false,
             self_mute: false,
@@ -862,7 +919,7 @@ mod tests {
         hub.observe(&synced(vec![user(1, 10, true, true)]));
         hub.play(Sound::Message);
         assert!(log.lock().unwrap().is_empty());
-        hub.play_test(Sound::Message);
+        hub.play_test(Sound::Message, SoundTheme::default());
         assert_eq!(log.lock().unwrap().len(), 1);
     }
 
@@ -924,41 +981,115 @@ mod tests {
 
     #[test]
     fn wavs_decode_short_and_quiet() {
-        for s in ALL {
-            let wav = s.wav();
-            assert_eq!(&wav[..4], b"RIFF");
-            // 1 channel, 48 kHz, 16 bit.
-            assert_eq!(u16::from_le_bytes([wav[22], wav[23]]), 1);
-            assert_eq!(
-                u32::from_le_bytes([wav[24], wav[25], wav[26], wav[27]]),
-                48_000
-            );
-            assert_eq!(u16::from_le_bytes([wav[34], wav[35]]), 16);
-            let samples = s.samples();
-            assert!(samples.len() > 48_00, "{s:?} too short");
-            // The kick, ban and quit sounds are at most 1 s long; the connect sound (also used for the party and share starts)
-            // is a 1.2 s chime and the new-message sound a 1 s one, the mention 0.7 s, the people joining and leaving 0.8 s and the hang up (also the share stop) 0.9 s; every other cue stays short.
-            let max_ms = match s {
-                Sound::Banned | Sound::Kicked | Sound::Quit => 1000,
-                Sound::VoiceJoin | Sound::PartyStarted | Sound::ShareStarted => 1200,
-                Sound::Message => 1000,
-                Sound::Mention => 700,
+        for theme in [SoundTheme::Classic, SoundTheme::Rich] {
+            for s in ALL {
+                let wav = s.wav(theme);
+                assert_eq!(&wav[..4], b"RIFF");
+                // 1 channel, 48 kHz, 16 bit.
+                assert_eq!(u16::from_le_bytes([wav[22], wav[23]]), 1);
+                assert_eq!(
+                    u32::from_le_bytes([wav[24], wav[25], wav[26], wav[27]]),
+                    48_000
+                );
+                assert_eq!(u16::from_le_bytes([wav[34], wav[35]]), 16);
+                let samples = s.samples(theme);
+                assert!(samples.len() > 48_00, "{theme:?} {s:?} too short");
+                let max_ms = max_ms(theme, s);
+                assert!(
+                    samples.len() <= 48_000 * max_ms / 1000,
+                    "{theme:?} {s:?} longer than {max_ms} ms"
+                );
+                assert!(peak_dbfs(&samples) <= -12.0, "{theme:?} {s:?} too loud");
+                assert!(peak_dbfs(&samples) > -40.0, "{theme:?} {s:?} inaudible");
+            }
+        }
+    }
+
+    /// The longest `s` may be in `theme`. Classic cues stay short except the two-part ban
+    /// effect. Rich: the kick, ban, quit and new-message sounds take at most 1 s, the connect
+    /// chime (also the party and share starts) 1.2 s, the mention 0.7 s, people joining and
+    /// leaving 0.8 s and the hang up (also the share stop) 0.9 s; every other cue stays short.
+    fn max_ms(theme: SoundTheme, s: Sound) -> usize {
+        match (theme, s) {
+            (_, Sound::Banned) => 1000,
+            (SoundTheme::Classic, _) => 500,
+            (SoundTheme::Rich, Sound::Kicked | Sound::Quit | Sound::Message) => 1000,
+            (SoundTheme::Rich, Sound::VoiceJoin | Sound::PartyStarted | Sound::ShareStarted) => {
+                1200
+            }
+            (SoundTheme::Rich, Sound::Mention) => 700,
+            (
+                SoundTheme::Rich,
                 Sound::UserJoined
                 | Sound::UserLeft
                 | Sound::PartyJoined
                 | Sound::PartyLeft
                 | Sound::ViewerStarted
-                | Sound::ViewerStopped => 800,
-                Sound::HangUp | Sound::ShareStopped => 900,
-                _ => 400,
-            };
-            assert!(
-                samples.len() <= 48_000 * max_ms / 1000,
-                "{s:?} longer than {max_ms} ms"
-            );
-            assert!(peak_dbfs(&samples) <= -12.0, "{s:?} too loud");
-            assert!(peak_dbfs(&samples) > -40.0, "{s:?} inaudible");
+                | Sound::ViewerStopped,
+            ) => 800,
+            (SoundTheme::Rich, Sound::HangUp | Sound::ShareStopped) => 900,
+            (SoundTheme::Rich, _) => 400,
         }
+    }
+
+    #[test]
+    fn every_sound_has_a_classic_and_a_rich_variant() {
+        for s in ALL {
+            let classic = bundled(SoundTheme::Classic, s.file()).expect("classic variant");
+            let rich = bundled(SoundTheme::Rich, s.file()).expect("rich variant");
+            assert_ne!(classic, rich, "{s:?} sounds the same in both themes");
+            assert_eq!(s.wav(SoundTheme::Classic), classic);
+            assert_eq!(s.wav(SoundTheme::Rich), rich);
+        }
+    }
+
+    #[test]
+    fn a_missing_variant_falls_back_to_the_other_theme() {
+        const CLASSIC_ONLY: &[u8] = b"classic";
+        const RICH_ONLY: &[u8] = b"rich";
+        let lookup = |theme: SoundTheme, name: &str| match (theme, name) {
+            (SoundTheme::Classic, "old") => Some(CLASSIC_ONLY),
+            (SoundTheme::Rich, "new") => Some(RICH_ONLY),
+            _ => None,
+        };
+        assert_eq!(resolve("old", SoundTheme::Rich, lookup), CLASSIC_ONLY);
+        assert_eq!(resolve("old", SoundTheme::Classic, lookup), CLASSIC_ONLY);
+        assert_eq!(resolve("new", SoundTheme::Classic, lookup), RICH_ONLY);
+        assert!(
+            resolve("none", SoundTheme::Rich, lookup).is_empty(),
+            "silent"
+        );
+    }
+
+    #[test]
+    fn the_theme_setting_picks_the_played_variant() {
+        for theme in [SoundTheme::Classic, SoundTheme::Rich] {
+            let (hub, log) = hub_with_log(SoundSettings {
+                theme,
+                ..SoundSettings::default()
+            });
+            hub.observe(&synced(vec![user(1, 10, false, false)]));
+            hub.play(Sound::Message);
+            let quit = hub.quit(true).expect("quit sound");
+            assert_eq!(
+                played(&log),
+                vec![Sound::Message.samples(theme).len()],
+                "{theme:?}"
+            );
+            assert_eq!(quit.len(), Sound::Quit.samples(theme).len(), "{theme:?}");
+            assert_eq!(hub.theme(), theme);
+        }
+        assert_eq!(SoundSettings::default().theme, SoundTheme::Rich);
+    }
+
+    #[test]
+    fn the_test_sound_plays_the_previewed_theme() {
+        let (hub, log) = hub_with_log(SoundSettings::default());
+        hub.play_test(Sound::VoiceJoin, SoundTheme::Classic);
+        assert_eq!(
+            played(&log),
+            vec![Sound::VoiceJoin.samples(SoundTheme::Classic).len()]
+        );
     }
 
     /// Lengths of the played sounds; compared with [`lens`] of the expected ones. Paired
@@ -968,12 +1099,16 @@ mod tests {
     }
 
     fn lens(sounds: &[Sound]) -> Vec<usize> {
-        sounds.iter().map(|s| s.samples().len()).collect()
+        sounds.iter().map(|s| len(*s)).collect()
+    }
+
+    /// Sample count of `s` in the default theme, which the hubs in these tests play.
+    fn len(s: Sound) -> usize {
+        s.samples(SoundTheme::default()).len()
     }
 
     #[test]
     fn own_and_join_sounds_are_distinct() {
-        let len = |s: Sound| s.samples().len();
         for s in [
             Sound::UserJoined,
             Sound::Mute,
@@ -1079,7 +1214,7 @@ mod tests {
         hub.observe(&synced(vec![user(1, 10, false, false)]));
         hub.observe(&EngineEvent::UserUpserted(user(1, 14, false, false)));
         hub.observe(&EngineEvent::UserUpserted(user(1, 14, true, false)));
-        assert!(!played(&log).contains(&Sound::VoiceJoin.samples().len()));
+        assert!(!played(&log).contains(&Sound::VoiceJoin.samples(SoundTheme::default()).len()));
     }
 
     #[test]
@@ -1136,7 +1271,10 @@ mod tests {
         let (hub, _log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, true, true)]));
         let samples = hub.hang_up().expect("voice on, toggle on, also read-only");
-        assert_eq!(samples.len(), Sound::HangUp.samples().len());
+        assert_eq!(
+            samples.len(),
+            Sound::HangUp.samples(SoundTheme::default()).len()
+        );
 
         let (off, _log) = hub_with_log(SoundSettings {
             hang_up: false,
@@ -1150,7 +1288,6 @@ mod tests {
 
     #[test]
     fn quit_sound_is_distinct() {
-        let len = |s: Sound| s.samples().len();
         for s in [Sound::HangUp, Sound::UserLeft, Sound::Kicked, Sound::Banned] {
             assert_ne!(len(s), len(Sound::Quit), "{s:?}");
         }
@@ -1163,7 +1300,10 @@ mod tests {
         let (hub, _log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, true, false)]));
         let samples = hub.quit(true).expect("in voice, toggle on, muted");
-        assert_eq!(samples.len(), Sound::Quit.samples().len());
+        assert_eq!(
+            samples.len(),
+            Sound::Quit.samples(SoundTheme::default()).len()
+        );
         assert!(hub.quit(false).is_none(), "read-only, not in voice");
 
         let (off, _log) = hub_with_log(SoundSettings {
@@ -1184,7 +1324,7 @@ mod tests {
     #[test]
     fn quit_waits_for_the_sound_but_never_long() {
         assert_eq!(quit_wait(0), Duration::ZERO, "no sound, no wait");
-        let quit = Sound::Quit.samples().len();
+        let quit = Sound::Quit.samples(SoundTheme::default()).len();
         let wait = quit_wait(quit);
         assert!(
             wait > Duration::from_secs_f64(quit as f64 / 48_000.0),
@@ -1215,9 +1355,15 @@ mod tests {
         let (hub, _log) = hub_with_log(SoundSettings::default());
         hub.observe(&synced(vec![user(1, 10, false, false)]));
         let kicked = hub.removed(Some(2), false).expect("kicked");
-        assert_eq!(kicked.len(), Sound::Kicked.samples().len());
+        assert_eq!(
+            kicked.len(),
+            Sound::Kicked.samples(SoundTheme::default()).len()
+        );
         let banned = hub.removed(Some(2), true).expect("banned");
-        assert_eq!(banned.len(), Sound::Banned.samples().len());
+        assert_eq!(
+            banned.len(),
+            Sound::Banned.samples(SoundTheme::default()).len()
+        );
         assert!(hub.removed(None, false).is_none(), "no kick, no sound");
 
         let (off, _log) = hub_with_log(SoundSettings {

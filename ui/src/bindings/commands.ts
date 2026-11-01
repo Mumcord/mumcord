@@ -416,6 +416,11 @@ export const commands = {
 	micTestStart: (devices: MicTestDevices | null) => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_start", { devices })),
 	/**  Plays a short sound on the output device ("Test sound" in the output popover). */
 	audioTestSound: () => typedError<null, ApiError>(__TAURI_INVOKE("audio_test_sound")),
+	/**
+	 *  Plays the connect sound of `theme` ("Preview" next to the sound theme, #325), also before the
+	 *  theme is saved. Only audible while voice audio runs.
+	 */
+	audioPreviewSoundTheme: (theme: SoundTheme) => typedError<null, ApiError>(__TAURI_INVOKE("audio_preview_sound_theme", { theme })),
 	/**  Ends the test wherever it is (recording or playback). */
 	micTestStop: () => typedError<null, ApiError>(__TAURI_INVOKE("mic_test_stop")),
 	/**  The saved whisper targets and whether their keys work here. */
@@ -2654,6 +2659,8 @@ export type Settings = {
 	videoDucking: boolean,
 	/**  The lowered level while people talk, 10–80 % (default 30). */
 	videoDuckingPercent: number,
+	/**  "Sound theme: Classic / Rich" (default rich, #325). */
+	soundTheme: SoundTheme,
 	sounds: SoundSettings,
 	/**  "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c). */
 	notifications: NotificationMode,
@@ -2829,6 +2836,13 @@ export type SoundSettings = {
 	/**  The server bans you (#205). */
 	banned: boolean,
 };
+
+/**  Which set of notification sounds plays (#325). */
+export type SoundTheme = 
+/**  The short synthesized tones. */
+"classic" | 
+/**  Fuller sounds made with ElevenLabs (default). */
+"rich";
 
 /**  Channels received so far while a server is still syncing (FR-2.24). */
 export type SyncProgress = {

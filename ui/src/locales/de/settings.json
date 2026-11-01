@@ -408,6 +408,11 @@
   "sounds": {
     "title": "Töne",
     "explanation": "Kurze Töne, die bei diesen Ereignissen abgespielt werden.",
+    "theme": "Sound-Thema",
+    "themeClassic": "Klassisch",
+    "themeRich": "Reichhaltig",
+    "preview": "Probehören",
+    "previewHint": "Reichhaltig hat vollere Klänge, Klassisch kurze, schlichte Töne. Das Probehören ist zu hören, während du in einem Sprachkanal bist.",
     "joinLeave": "Jemand betritt oder verlässt deinen Kanal",
     "voiceJoin": "Du betrittst einen Sprachkanal",
     "selfMute": "Du schaltest dich stumm oder wieder laut",

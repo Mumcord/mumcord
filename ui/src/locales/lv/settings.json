@@ -411,6 +411,11 @@
   "sounds": {
     "title": "Skaņas",
     "explanation": "Īsas skaņas, kas tiek atskaņotas šiem notikumiem.",
+    "theme": "Skaņu tēma",
+    "themeClassic": "Klasiskā",
+    "themeRich": "Bagātīgā",
+    "preview": "Noklausīties",
+    "previewHint": "Bagātīgajai ir pilnīgākas skaņas, Klasiskajai īsi, vienkārši toņi. Priekšskatījums ir dzirdams, kamēr esi balss kanālā.",
     "joinLeave": "Kāds pievienojas tavam kanālam vai to pamet",
     "voiceJoin": "Tu pievienojies kanālam balsij",
     "selfMute": "Tu izslēdz vai ieslēdz savu mikrofonu",

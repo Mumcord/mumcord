@@ -414,6 +414,11 @@
   "sounds": {
     "title": "Dźwięki",
     "explanation": "Krótkie dźwięki odtwarzane przy tych zdarzeniach.",
+    "theme": "Motyw dźwięków",
+    "themeClassic": "Klasyczny",
+    "themeRich": "Bogaty",
+    "preview": "Odsłuchaj",
+    "previewHint": "Bogaty ma pełniejsze dźwięki, Klasyczny krótkie, proste tony. Odsłuch słychać, gdy jesteś na kanale głosowym.",
     "joinLeave": "Ktoś dołącza do Twojego kanału lub go opuszcza",
     "voiceJoin": "Dołączasz do kanału głosowego",
     "selfMute": "Wyciszasz się lub wyłączasz wyciszenie",
