@@ -101,7 +101,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | H2p | Plugins adopt H2: poll (fallback line + !poll vote lines replaced by card), eve-fit (after EV3/EV4) | open (after H2) | – |
 | H3 | Plugins see chat (chat-match, triggers, chat activity, cards) on EVERY connected server, not only the voice server (user decision 2026-11-01); events carry the server so replies/cards go to the right chat | open (after H2) | – |
 | DBG1 | eve-fit card anchored to previous message when own message still sending | done (5675329e, fe91be1b) | dbg-evefit |
-| Q0 | Fix 2 failing vitest on epic/plugins: PluginDetails.tsx:131 li title, --text-muted in browse.css | in progress | q0-vitest |
+| Q0 | Fix 2 failing vitest on epic/plugins: PluginDetails.tsx:131 li title, --text-muted in browse.css | done (2e3b7078) | q0-vitest |
 | EV1 | New plugin `eve-fit` (Mumcord/plugins, release-independent): detects EFT fits pasted in chat (H1), renders a chat card (ship, slots/modules summary) + popout/side-sheet view; check eveship.fit licence + CCP content policy before bundling anything | done (Mumcord/plugins PR #10: 8b595a2, 961ab01, 86e523e) | ev1-evefit |
 | EV2 | eve-fit: after H1 + R2 are on epic/plugins — cargo update -p mumcord-plugin-sdk, build, run the 3 scenarios (needs the H1 CLI step `event: chat-match`), push to feat/eve-fit | done (feat/eve-fit 7e01120) | ev2-evefit |
 | F38 | Package limits for OFFICIAL plugins raised for bundled web apps (eve-fit): zipped ≤ 64 MiB, unpacked ≤ 96 MiB, files ≤ 10,000 (third-party/dev unchanged); asset-size rule for web/ files; spec addendum; plugins CI | done | f38-limits |
