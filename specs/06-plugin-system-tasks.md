@@ -60,6 +60,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B20b | Deep link: buffer a cold-start `plugins://open-details` until the UI takes it (pending-take command) + Windows runtime registration of `mumcord` in commands/app.rs | done | b20b-deeplink |
 | F1 | Fix: ui tsc error in ui/src/api/mock.ts (missing plugin settings fields from B3) + prettier on crates/plugins/schema/manifest.schema.json | done | f1-uifix |
 | F2 | Fix: safety fixtures pass `prettier --check .` (format them) and builder `common_manifest()` uses only B4 fields (authors/categories) | done | f2-fixtures |
+| F3 | chat.rs GestureGate: a gesture from a typed command (source `command`) allows its one message for up to 8 s (clicks stay 2 s); needed for verified dice rolls (FR-6.44 addendum) | in progress | f3-gesture |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | open | |
 
 ---
