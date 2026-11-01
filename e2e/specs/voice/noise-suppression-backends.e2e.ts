@@ -236,6 +236,7 @@ describe("noise suppression backends", () => {
     }
     await app.restart({ freshProfile: true });
     await wizard("NoiseTester");
+    await app.useClassicSounds();
     await openVoiceSettings();
     const muteSwitch = await switchByText("Connect muted");
     if (await muteSwitch.isSelected()) await muteSwitch.click();
