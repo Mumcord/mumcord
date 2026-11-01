@@ -49,7 +49,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B37 | ⚠ OUTWARD: registry CI and publish workflows | open | |
 | B38 | Template and author docs | open | |
 | B39 | Poll plugin | done (Mumcord/plugins PR #2, not merged) | b39-poll |
-| B40 | Dice roller plugin | open | |
+| B40 | Dice roller plugin | in progress | b40-dice |
 | B41a | Echolings: pet core | in progress | b41a-pets |
 | B41b | Echolings: social + Echo Echo | open | |
 | B41c | Echolings: Snack Race (web view) | open | |
