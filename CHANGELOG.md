@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- The "simultaneously connected servers" number field in Settings > Server is no longer stretched across the whole card; it is now as narrow as the number it holds (#320)
+
 ## [0.5.0] - 2026-11-01
 
 ### Added
