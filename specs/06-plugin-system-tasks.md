@@ -5,20 +5,20 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | ID | Title | Status | Owner |
 |---|---|---|---|
 | B1 | Bring in PR #297 and all epic dependencies | done | b1-deps |
-| B3 | Store: plugin tables and settings keys | in progress | b3-store |
+| B3 | Store: plugin tables and settings keys | done | b3-store |
 | B5 | Protocol: low-priority lane for plugin messages | done | b5-lane |
 | B6 | E2E: two Mumcord clients in one run | in progress | b6-e2e2 |
 | B7 | ⚠ OUTWARD: create the `Mumcord/plugins` repository skeleton | done | b7-pluginsrepo |
 | B8 | ⚠ OUTWARD (repo `Mumcord/mumbot`): module `plugins` (mumbot#20) | done (mumbot PR #33, not merged) | b8-mumbot |
 | B20 | Deep link `mumcord://plugins/<id>` | done | b20-deeplink |
 | B2 | WIT package `mumcord:plugin@1.0.0` | done | b2-wit |
-| B4 | Manifest, permission catalogue and package rules to spec | in progress | b4-manifest |
-| B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | open | |
+| B4 | Manifest, permission catalogue and package rules to spec | done | b4-manifest |
+| B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | in progress | b10-runtime |
 | B11a | Host API: storage and secrets | open | |
 | B11b | Host API: timers, clock, notify, theme, random, log, permission gate, peer key | open | |
 | B12 | Messaging logic (pure) | in progress | b12-msg |
 | B13 | Engine bridge for plugins | in progress | b13-bridge |
-| B14 | Signing and verification | open | |
+| B14 | Signing and verification | in progress | b14-verify |
 | B15 | Registry and repository client | open | |
 | B16a | Safety fixture plugins | in progress | b16a-fixtures |
 | B17a | Plugin service: lifecycle | open | |
@@ -27,7 +27,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B18 | App glue (src-tauri) | open | |
 | B19 | `net.http` executor (official only) | open | |
 | B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
-| B22 | Permission list component and texts | open | |
+| B22 | Permission list component and texts | in progress | b22-permlist |
 | B25a | SDK crate `mumcord-plugin-sdk` | in progress | b25a-sdk |
 | B25b | CLI `mumcord-plugin` (author + registry commands) | open | |
 | B25c | CLI `test` and `preview` | open | |
@@ -419,3 +419,5 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B8 (Mumcord/mumbot PR #33, not merged/released):** data id `mumcord.srvplugins`, sent only to sessions whose `mumcord.hello` lists feature `server-plugins`. JSON `{"v":1,"seq":N,"plugins":[{"id","min","src","key"?,"for"}]}`; `src` = `"official"` or an https index URL; `key` = minisign public key, only for third-party; `for` required (1–40 chars); no `level`; ≤ 8 entries, ≤ 1000 B. ≤ 1 per minute per session. Bot refuses to start the module unless registered and server cert pinned. `seq` persisted, +1 when the list changes between restarts. B9/E2E needs a mumbot release (user's yes) and the fetch-mumbot.sh version + sha line.
 - **B20b (b50f149b):** command `plugins_take_pending_link` (returns the newest pending id or null, clears it); live event `plugins://open-details` unchanged. B24 calls the command once on mount, after subscribing to the event. Windows runtime registration covers `mumble` + `mumcord` (`deeplink::SCHEMES`). Touched `src-tauri/src/lib.rs` (registration) and `ui/src/api/mock.ts` (stub). UI typecheck/lint/vitest NOT run for this change: the next UI task runs them first. Docs gap: `docs/engine-api.md` must list `plugins_take_pending_link` (for the docs task).
 - **B2 (71067a1f):** WIT `mumcord:plugin@1.0.0` in `crates/plugins/wit/`: types, log, storage, timers, clock, notify, theme, random, peers, ui, chat, secrets, http, webview, events. The world imports all of them and exports start / on-event / stop. start-info is unchanged; right after start the host sends settings-changed, language-changed and theme-changed (plus self-changed if permitted). The UI tree is a flat list of nodes (node 0 = root, children by index). Slow calls answer through events (`http.request` → id → `http-response`; timers → `timer`). There's a shared error `invalid`, and http has its own error variant. 19 events (FR-6.16's 17 + http-response + webview-message). webview: `show(place = panel-popover | dialog, entry under web/)`, `hide()`, `post(text)`; incoming messages arrive as `webview-message`, ≤ 16 KiB each, ≤ 60/s. runtime.rs ALLOWED_IMPORTS lists all 15 interfaces; a call the host can't serve yet fails at load. GOTCHA: no double quotes inside `///` WIT doc comments (breaks bindgen). Shape is pinned by `crates/plugins/tests/wit.rs`; changes must be additive and go through the lead.
+- **B4 (b3701f9f):** `permissions::{CATALOGUE, get(id), Permission{id, risk: Risk::{Green,Yellow,Red}, official_only, text_en}}` (19 ids). `manifest::Source::{Official, Repo{repository_id: i64}, Dev}`; `Manifest::parse(bytes)` then `manifest.validate(source)`; text constant `manifest::OFFICIAL_ONLY_TEXT`. `Package::read(bytes, source)`, `read_verified(bytes, source, verifier)`, `install(plugins_dir) -> <dir>/<id>/<version>/`, `file(name)`. Manifest fields: description, authors, categories, icon, `commands: Vec<Command{name,description,usage}>`, `net: Option<Net>`, storage_quota_kib, `messaging: Messaging` (non-optional, max_payload default 997), memory_mib, `has_permission(id)`. Installed SVGs are sanitised, so they differ from the package bytes: B14's per-version re-hash must hash the INSTALLED files, using a fingerprint recorded at install. Old version folders stay for rollback; the lifecycle service (B17a) cleans them up.
+- **B3 (3a39b0e9):** migration v21 creates `plugin`, `plugin_kv`, `plugin_repository`, `server_plugin_suggestion` (server_id/identity_id are INTEGER FKs). `crates/store/src/plugins.rs`: PluginRecord, PluginVisibility, PluginRepository, NewPluginRepository, PluginSuggestion; constants MAX_PLUGIN_KEY_BYTES 128, MAX_PLUGIN_VALUE_BYTES 64 KiB, MAX_PLUGIN_REPOSITORIES 10, REMOVED_DATA_RETENTION_MS 30 days. Store methods: plugins(), plugin(id), save_plugin (upsert, kv kept), mark_plugin_removed, delete_plugin, purge_expired_plugins(now); plugin_kv_get/set(plugin, scope, key, value, quota_bytes, now)/delete/keys/all/usage/clear (quota = key + value bytes across scopes); plugin_repositories, add_plugin_repository (max 10, no duplicate URL), set_plugin_repository_enabled, pause_plugin_repository, record_plugin_repository_check, replace_plugin_repository_key, remove_plugin_repository; save_plugin_suggestion, plugin_suggestions(server, identity). Errors: PluginQuotaExceeded, PluginValueTooLarge, InvalidPluginKey, TooManyPluginRepositories, DuplicatePluginRepository. Settings: plugins_updates (PluginUpdates auto/notify/off, default auto), plugins_all_off, plugins_badge_plugin, plugins_mirror_url, developer_mode (mirrored to UiSettings); plugins_last_official_sequence, plugins_revoked_checked_at (store only).
