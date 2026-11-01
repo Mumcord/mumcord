@@ -15,6 +15,8 @@ use tokio::sync::mpsc::UnboundedSender;
 use wasmtime::component::{Component, HasSelf, InstancePre, Linker};
 use wasmtime::{Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap};
 
+use crate::api::secrets::{PluginSecrets, SecretsApi};
+use crate::api::storage::{Storage, StorageApi};
 use crate::cache;
 use crate::diag::Diagnostics;
 use crate::host::HostEvent;
@@ -87,12 +89,21 @@ pub(crate) trait HostApi {
 type AddToLinker = fn(&mut Linker<PluginState>) -> wasmtime::Result<()>;
 
 /// Every interface the host serves. One line per `api/*` module.
-const HOST_APIS: &[AddToLinker] = &[<LogApi as HostApi>::add_to_linker];
+const HOST_APIS: &[AddToLinker] = &[
+    <LogApi as HostApi>::add_to_linker,
+    <StorageApi as HostApi>::add_to_linker,
+    <SecretsApi as HostApi>::add_to_linker,
+];
 
 /// Services shared by all plugins that host calls need (store, grants, settings …). Later host
 /// API tasks add their fields here; the service builds it once.
 #[derive(Debug, Default)]
-pub struct HostContext {}
+pub struct HostContext {
+    /// `storage` (FR-6.20) and the data helpers for export, reset and remove.
+    pub storage: Storage,
+    /// `secrets` (FR-6.25); `None` turns the interface off (tests, no keychain wanted).
+    pub secrets: Option<Arc<PluginSecrets>>,
+}
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.
 pub struct Runtime {
@@ -142,6 +153,7 @@ pub struct Compiled {
 pub(crate) struct StartParams {
     pub id: Arc<str>,
     pub memory_bytes: usize,
+    pub storage_quota: u64,
     pub previous_version: Option<String>,
     pub ctx: Arc<HostContext>,
     pub outbox: UnboundedSender<HostEvent>,
@@ -167,6 +179,8 @@ pub struct PluginState {
     pub(crate) outbox: UnboundedSender<HostEvent>,
     pub(crate) log: Arc<Mutex<LogBuffer>>,
     pub(crate) diag: Arc<Diagnostics>,
+    /// The manifest's storage quota in bytes (FR-6.20).
+    pub(crate) storage_quota: u64,
     limiter: Limiter,
 }
 
@@ -289,6 +303,7 @@ impl Compiled {
             outbox: params.outbox.clone(),
             log: Arc::clone(&params.log),
             diag: Arc::clone(&params.diag),
+            storage_quota: params.storage_quota,
             limiter: Limiter {
                 limits,
                 diag: Arc::clone(&params.diag),

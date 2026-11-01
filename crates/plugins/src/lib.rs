@@ -4,6 +4,7 @@
 //! The plugin API is the WIT package in `wit/`; the manifest rules are also published as a JSON
 //! schema in `schema/manifest.schema.json`.
 
+pub mod api;
 pub mod cache;
 mod diag;
 mod health;

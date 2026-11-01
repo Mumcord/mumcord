@@ -4107,6 +4107,7 @@ dependencies = [
  "ammonia",
  "base64 0.23.1",
  "hmac 0.13.0",
+ "keyring",
  "minisign",
  "minisign-verify",
  "mumcord-store",

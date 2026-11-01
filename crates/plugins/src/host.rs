@@ -217,6 +217,7 @@ impl PluginHost {
         let params = StartParams {
             id: Arc::from(id),
             memory_bytes: slot.manifest.memory_mib as usize * 1024 * 1024,
+            storage_quota: u64::from(slot.manifest.storage_quota_kib) * 1024,
             previous_version: slot
                 .previous_version
                 .as_ref()
