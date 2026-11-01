@@ -1,0 +1,94 @@
+{
+  "listLabel": "Nainštalované doplnky",
+  "empty": "Zatiaľ žiadne doplnky.",
+  "browse": "Prehliadať doplnky",
+  "enable": "{{name}} zapnutý",
+  "labels": {
+    "official": "Oficiálny",
+    "unofficial": "Neoficiálny · {{repository}}",
+    "unofficialUnknown": "Neoficiálny",
+    "developer": "Vývojársky doplnok",
+    "autoOff": "Vypnutý po opakovaných pádoch",
+    "backingOff": "Reštartuje sa po páde",
+    "notLoaded": "Nepodarilo sa načítať",
+    "revoked": "Vypnuté aplikáciou Mumcord: {{reason}}",
+    "revocationWarning": "Upozornenie od aplikácie Mumcord: {{reason}}",
+    "tampered": "Súbory tohto doplnku boli zmenené",
+    "permission": "Vypnutý, pretože potrebné oprávnenie je vypnuté"
+  },
+  "details": {
+    "open": "Podrobnosti o doplnku {{name}}",
+    "permissions": "Oprávnenia",
+    "visibility": "Kto vidí aktivitu tohto doplnku",
+    "visibilityOptions": {
+      "everyone": "Všetci",
+      "friends": "Iba priatelia",
+      "nobody": "Nikto"
+    },
+    "notifications": "Oznámenia",
+    "pin": "Pripnúť verziu {{version}} (bez automatických aktualizácií)",
+    "settings": "Nastavenia doplnku",
+    "diagnostics": "Diagnostika",
+    "export": "Exportovať údaje",
+    "reset": "Obnoviť údaje",
+    "remove": "Odstrániť"
+  },
+  "badge": {
+    "label": "Odznak zobrazený pri menách",
+    "none": "Žiadny"
+  },
+  "diagnostics": {
+    "loading": "Načítava sa diagnostika…",
+    "failed": "Diagnostiku sa nepodarilo načítať.",
+    "unknown": "Nedostupné",
+    "ms": "{{value}} ms",
+    "cpuTime": "Čas procesora",
+    "memory": "Pamäť",
+    "peakMemory": "Špičková pamäť",
+    "droppedEvents": "Zahodené udalosti",
+    "droppedMessages": "Zahodené správy",
+    "restarts": "Reštarty",
+    "messagesSent": "Odoslané správy",
+    "messagesReceived": "Prijaté správy",
+    "messagesRateLimited": "Správy zadržané limitom rýchlosti",
+    "messagesExpired": "Správy, ktorým vypršala platnosť",
+    "incomingRateDropped": "Prichádzajúce správy zahodené limitom rýchlosti",
+    "incomingInvalid": "Neplatné prichádzajúce správy",
+    "log": "Záznam",
+    "logEmpty": "Záznam je prázdny.",
+    "level": {
+      "debug": "Ladenie",
+      "info": "Info",
+      "warn": "Upozornenie",
+      "error": "Chyba"
+    }
+  },
+  "export": {
+    "title": "Exportovať údaje doplnku {{name}}",
+    "filter": "Súbor JSON",
+    "done": "Údaje boli exportované."
+  },
+  "reset": {
+    "title": "Obnoviť údaje doplnku {{name}}?",
+    "message": "Všetko, čo tento doplnok uložil, sa odstráni. Túto akciu nie je možné vrátiť späť.",
+    "confirm": "Obnoviť údaje",
+    "done": "Údaje boli obnovené."
+  },
+  "remove": {
+    "title": "Odstrániť doplnok {{name}}?",
+    "deleteData": "Odstrániť aj jeho údaje",
+    "hint": "Ponechané údaje sa odstránia po 30 dňoch. Doplnok nainštalujte znova skôr, aby ste ich získali späť.",
+    "confirm": "Odstrániť"
+  },
+  "errors": {
+    "enable": "Doplnok sa nepodarilo prepnúť.",
+    "permissions": "Oprávnenie sa nepodarilo zmeniť.",
+    "visibility": "Viditeľnosť sa nepodarilo zmeniť.",
+    "notifications": "Oznámenia sa nepodarilo zmeniť.",
+    "pin": "Verziu sa nepodarilo pripnúť.",
+    "export": "Údaje sa nepodarilo exportovať.",
+    "reset": "Údaje sa nepodarilo obnoviť.",
+    "remove": "Doplnok sa nepodarilo odstrániť.",
+    "badge": "Odznak sa nepodarilo zmeniť."
+  }
+}

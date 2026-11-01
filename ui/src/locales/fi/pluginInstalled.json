@@ -1,0 +1,94 @@
+{
+  "listLabel": "Asennetut lisäosat",
+  "empty": "Ei vielä lisäosia.",
+  "browse": "Selaa lisäosia",
+  "enable": "{{name}} päällä",
+  "labels": {
+    "official": "Virallinen",
+    "unofficial": "Epävirallinen · {{repository}}",
+    "unofficialUnknown": "Epävirallinen",
+    "developer": "Kehittäjälisäosa",
+    "autoOff": "Poistettu käytöstä toistuvien kaatumisten jälkeen",
+    "backingOff": "Käynnistyy uudelleen kaatumisen jälkeen",
+    "notLoaded": "Lataus epäonnistui",
+    "revoked": "Mumcord poisti käytöstä: {{reason}}",
+    "revocationWarning": "Mumcordin varoitus: {{reason}}",
+    "tampered": "Tämän lisäosan tiedostoja on muutettu",
+    "permission": "Poistettu käytöstä, koska tarvittava lupa on pois päältä"
+  },
+  "details": {
+    "open": "Lisäosan {{name}} tiedot",
+    "permissions": "Luvat",
+    "visibility": "Kuka näkee tämän lisäosan toiminnan",
+    "visibilityOptions": {
+      "everyone": "Kaikki",
+      "friends": "Vain kaverit",
+      "nobody": "Ei kukaan"
+    },
+    "notifications": "Ilmoitukset",
+    "pin": "Kiinnitä versio {{version}} (ei automaattisia päivityksiä)",
+    "settings": "Lisäosan asetukset",
+    "diagnostics": "Diagnostiikka",
+    "export": "Vie tiedot",
+    "reset": "Nollaa tiedot",
+    "remove": "Poista"
+  },
+  "badge": {
+    "label": "Nimien vieressä näkyvä merkki",
+    "none": "Ei mitään"
+  },
+  "diagnostics": {
+    "loading": "Ladataan diagnostiikkaa…",
+    "failed": "Diagnostiikan lataus epäonnistui.",
+    "unknown": "Ei saatavilla",
+    "ms": "{{value}} ms",
+    "cpuTime": "Suoritinaika",
+    "memory": "Muisti",
+    "peakMemory": "Muistin huippu",
+    "droppedEvents": "Pudotetut tapahtumat",
+    "droppedMessages": "Pudotetut viestit",
+    "restarts": "Uudelleenkäynnistykset",
+    "messagesSent": "Lähetetyt viestit",
+    "messagesReceived": "Vastaanotetut viestit",
+    "messagesRateLimited": "Nopeusrajoituksen pidättämät viestit",
+    "messagesExpired": "Vanhentuneet viestit",
+    "incomingRateDropped": "Nopeusrajoituksen pudottamat saapuvat viestit",
+    "incomingInvalid": "Virheelliset saapuvat viestit",
+    "log": "Loki",
+    "logEmpty": "Loki on tyhjä.",
+    "level": {
+      "debug": "Vianetsintä",
+      "info": "Tieto",
+      "warn": "Varoitus",
+      "error": "Virhe"
+    }
+  },
+  "export": {
+    "title": "Vie lisäosan {{name}} tiedot",
+    "filter": "JSON-tiedosto",
+    "done": "Tiedot viety."
+  },
+  "reset": {
+    "title": "Nollataanko lisäosan {{name}} tiedot?",
+    "message": "Kaikki, mitä tämä lisäosa on tallentanut, poistetaan. Tätä ei voi perua.",
+    "confirm": "Nollaa tiedot",
+    "done": "Tiedot nollattu."
+  },
+  "remove": {
+    "title": "Poistetaanko {{name}}?",
+    "deleteData": "Poista myös sen tiedot",
+    "hint": "Säilytetyt tiedot poistetaan 30 päivän kuluttua. Asenna lisäosa uudelleen ennen sitä, niin saat ne takaisin.",
+    "confirm": "Poista"
+  },
+  "errors": {
+    "enable": "Lisäosan tilaa ei voitu vaihtaa.",
+    "permissions": "Lupaa ei voitu muuttaa.",
+    "visibility": "Näkyvyyttä ei voitu muuttaa.",
+    "notifications": "Ilmoituksia ei voitu muuttaa.",
+    "pin": "Versiota ei voitu kiinnittää.",
+    "export": "Tietoja ei voitu viedä.",
+    "reset": "Tietoja ei voitu nollata.",
+    "remove": "Lisäosaa ei voitu poistaa.",
+    "badge": "Merkkiä ei voitu muuttaa."
+  }
+}

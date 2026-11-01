@@ -1,0 +1,94 @@
+{
+  "listLabel": "Nainstalované moduly",
+  "empty": "Zatím žádné moduly.",
+  "browse": "Procházet moduly",
+  "enable": "{{name}} zapnut",
+  "labels": {
+    "official": "Oficiální",
+    "unofficial": "Neoficiální · {{repository}}",
+    "unofficialUnknown": "Neoficiální",
+    "developer": "Vývojářský modul",
+    "autoOff": "Vypnutý po opakovaných pádech",
+    "backingOff": "Restartuje se po pádu",
+    "notLoaded": "Nepodařilo se načíst",
+    "revoked": "Vypnuto aplikací Mumcord: {{reason}}",
+    "revocationWarning": "Varování od aplikace Mumcord: {{reason}}",
+    "tampered": "Soubory tohoto modulu byly změněny",
+    "permission": "Vypnuto, protože je vypnuté potřebné oprávnění"
+  },
+  "details": {
+    "open": "Podrobnosti o modulu {{name}}",
+    "permissions": "Oprávnění",
+    "visibility": "Kdo vidí aktivitu tohoto modulu",
+    "visibilityOptions": {
+      "everyone": "Všichni",
+      "friends": "Pouze přátelé",
+      "nobody": "Nikdo"
+    },
+    "notifications": "Oznámení",
+    "pin": "Připnout verzi {{version}} (bez automatických aktualizací)",
+    "settings": "Nastavení modulu",
+    "diagnostics": "Diagnostika",
+    "export": "Exportovat data",
+    "reset": "Resetovat data",
+    "remove": "Odebrat"
+  },
+  "badge": {
+    "label": "Odznak zobrazený u jmen",
+    "none": "Žádný"
+  },
+  "diagnostics": {
+    "loading": "Načítá se diagnostika…",
+    "failed": "Diagnostiku se nepodařilo načíst.",
+    "unknown": "Nedostupné",
+    "ms": "{{value}} ms",
+    "cpuTime": "Čas procesoru",
+    "memory": "Paměť",
+    "peakMemory": "Špičková paměť",
+    "droppedEvents": "Zahozené události",
+    "droppedMessages": "Zahozené zprávy",
+    "restarts": "Restarty",
+    "messagesSent": "Odeslané zprávy",
+    "messagesReceived": "Přijaté zprávy",
+    "messagesRateLimited": "Zprávy zadržené limitem rychlosti",
+    "messagesExpired": "Zprávy, kterým vypršela platnost",
+    "incomingRateDropped": "Příchozí zprávy zahozené limitem rychlosti",
+    "incomingInvalid": "Neplatné příchozí zprávy",
+    "log": "Záznam",
+    "logEmpty": "Záznam je prázdný.",
+    "level": {
+      "debug": "Ladění",
+      "info": "Info",
+      "warn": "Varování",
+      "error": "Chyba"
+    }
+  },
+  "export": {
+    "title": "Exportovat data modulu {{name}}",
+    "filter": "Soubor JSON",
+    "done": "Data byla exportována."
+  },
+  "reset": {
+    "title": "Resetovat data modulu {{name}}?",
+    "message": "Vše, co tento modul uložil, bude smazáno. Tuto akci nelze vrátit zpět.",
+    "confirm": "Resetovat data",
+    "done": "Data byla resetována."
+  },
+  "remove": {
+    "title": "Odebrat modul {{name}}?",
+    "deleteData": "Smazat také jeho data",
+    "hint": "Ponechaná data se smažou po 30 dnech. Do té doby modul nainstalujte znovu a získáte je zpět.",
+    "confirm": "Odebrat"
+  },
+  "errors": {
+    "enable": "Modul se nepodařilo přepnout.",
+    "permissions": "Oprávnění se nepodařilo změnit.",
+    "visibility": "Viditelnost se nepodařilo změnit.",
+    "notifications": "Oznámení se nepodařilo změnit.",
+    "pin": "Verzi se nepodařilo připnout.",
+    "export": "Data se nepodařilo exportovat.",
+    "reset": "Data se nepodařilo resetovat.",
+    "remove": "Modul se nepodařilo odebrat.",
+    "badge": "Odznak se nepodařilo změnit."
+  }
+}

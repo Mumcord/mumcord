@@ -1,0 +1,94 @@
+{
+  "listLabel": "Instalirani dodaci",
+  "empty": "Još nema dodataka.",
+  "browse": "Pregledaj dodatke",
+  "enable": "{{name}} uključen",
+  "labels": {
+    "official": "Službeni",
+    "unofficial": "Neslužbeni · {{repository}}",
+    "unofficialUnknown": "Neslužbeni",
+    "developer": "Razvojni dodatak",
+    "autoOff": "Isključen nakon ponovljenih rušenja",
+    "backingOff": "Ponovno se pokreće nakon rušenja",
+    "notLoaded": "Nije se mogao učitati",
+    "revoked": "Isključio Mumcord: {{reason}}",
+    "revocationWarning": "Upozorenje od Mumcorda: {{reason}}",
+    "tampered": "Datoteke ovog dodatka su promijenjene",
+    "permission": "Isključen jer je potrebno dopuštenje isključeno"
+  },
+  "details": {
+    "open": "Pojedinosti o dodatku {{name}}",
+    "permissions": "Dopuštenja",
+    "visibility": "Tko vidi aktivnost ovog dodatka",
+    "visibilityOptions": {
+      "everyone": "Svi",
+      "friends": "Samo prijatelji",
+      "nobody": "Nitko"
+    },
+    "notifications": "Obavijesti",
+    "pin": "Prikvači verziju {{version}} (bez automatskih ažuriranja)",
+    "settings": "Postavke dodatka",
+    "diagnostics": "Dijagnostika",
+    "export": "Izvezi podatke",
+    "reset": "Poništi podatke",
+    "remove": "Ukloni"
+  },
+  "badge": {
+    "label": "Značka uz imena",
+    "none": "Nema"
+  },
+  "diagnostics": {
+    "loading": "Učitavanje dijagnostike…",
+    "failed": "Dijagnostika se nije mogla učitati.",
+    "unknown": "Nije dostupno",
+    "ms": "{{value}} ms",
+    "cpuTime": "Procesorsko vrijeme",
+    "memory": "Memorija",
+    "peakMemory": "Vršna memorija",
+    "droppedEvents": "Odbačeni događaji",
+    "droppedMessages": "Odbačene poruke",
+    "restarts": "Ponovna pokretanja",
+    "messagesSent": "Poslane poruke",
+    "messagesReceived": "Primljene poruke",
+    "messagesRateLimited": "Poruke zadržane ograničenjem brzine",
+    "messagesExpired": "Poruke kojima je istekao rok",
+    "incomingRateDropped": "Dolazne poruke odbačene ograničenjem brzine",
+    "incomingInvalid": "Nevaljane dolazne poruke",
+    "log": "Zapisnik",
+    "logEmpty": "Zapisnik je prazan.",
+    "level": {
+      "debug": "Ispravljanje",
+      "info": "Info",
+      "warn": "Upozorenje",
+      "error": "Pogreška"
+    }
+  },
+  "export": {
+    "title": "Izvezi podatke dodatka {{name}}",
+    "filter": "JSON datoteka",
+    "done": "Podaci su izvezeni."
+  },
+  "reset": {
+    "title": "Poništiti podatke dodatka {{name}}?",
+    "message": "Sve što je ovaj dodatak spremio bit će izbrisano. To se ne može poništiti.",
+    "confirm": "Poništi podatke",
+    "done": "Podaci su poništeni."
+  },
+  "remove": {
+    "title": "Ukloniti {{name}}?",
+    "deleteData": "Izbriši i njegove podatke",
+    "hint": "Zadržani podaci brišu se nakon 30 dana. Ponovno instalirajte dodatak prije toga da ih vratite.",
+    "confirm": "Ukloni"
+  },
+  "errors": {
+    "enable": "Dodatak se nije mogao prebaciti.",
+    "permissions": "Dopuštenje se nije moglo promijeniti.",
+    "visibility": "Vidljivost se nije mogla promijeniti.",
+    "notifications": "Obavijesti se nisu mogle promijeniti.",
+    "pin": "Verzija se nije mogla prikvačiti.",
+    "export": "Podaci se nisu mogli izvesti.",
+    "reset": "Podaci se nisu mogli poništiti.",
+    "remove": "Dodatak se nije mogao ukloniti.",
+    "badge": "Značka se nije mogla promijeniti."
+  }
+}

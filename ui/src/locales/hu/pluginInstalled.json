@@ -1,0 +1,94 @@
+{
+  "listLabel": "Telepített bővítmények",
+  "empty": "Még nincs bővítmény.",
+  "browse": "Bővítmények böngészése",
+  "enable": "{{name}} bekapcsolva",
+  "labels": {
+    "official": "Hivatalos",
+    "unofficial": "Nem hivatalos · {{repository}}",
+    "unofficialUnknown": "Nem hivatalos",
+    "developer": "Fejlesztői bővítmény",
+    "autoOff": "Ismételt összeomlások után kikapcsolva",
+    "backingOff": "Összeomlás után újraindul",
+    "notLoaded": "Nem sikerült betölteni",
+    "revoked": "A Mumcord kikapcsolta: {{reason}}",
+    "revocationWarning": "Figyelmeztetés a Mumcordtól: {{reason}}",
+    "tampered": "A bővítmény fájljai megváltoztak",
+    "permission": "Kikapcsolva, mert egy szükséges engedély ki van kapcsolva"
+  },
+  "details": {
+    "open": "{{name}} részletei",
+    "permissions": "Engedélyek",
+    "visibility": "Ki láthatja a bővítmény tevékenységét",
+    "visibilityOptions": {
+      "everyone": "Mindenki",
+      "friends": "Csak barátok",
+      "nobody": "Senki"
+    },
+    "notifications": "Értesítések",
+    "pin": "{{version}} verzió rögzítése (nincs automatikus frissítés)",
+    "settings": "Bővítmény beállításai",
+    "diagnostics": "Diagnosztika",
+    "export": "Adatok exportálása",
+    "reset": "Adatok visszaállítása",
+    "remove": "Eltávolítás"
+  },
+  "badge": {
+    "label": "A nevek mellett megjelenő jelvény",
+    "none": "Nincs"
+  },
+  "diagnostics": {
+    "loading": "Diagnosztika betöltése…",
+    "failed": "A diagnosztikát nem sikerült betölteni.",
+    "unknown": "Nem érhető el",
+    "ms": "{{value}} ms",
+    "cpuTime": "CPU-idő",
+    "memory": "Memória",
+    "peakMemory": "Csúcsmemória",
+    "droppedEvents": "Eldobott események",
+    "droppedMessages": "Eldobott üzenetek",
+    "restarts": "Újraindítások",
+    "messagesSent": "Elküldött üzenetek",
+    "messagesReceived": "Fogadott üzenetek",
+    "messagesRateLimited": "A sebességkorlát által visszatartott üzenetek",
+    "messagesExpired": "Lejárt üzenetek",
+    "incomingRateDropped": "A sebességkorlát által eldobott bejövő üzenetek",
+    "incomingInvalid": "Érvénytelen bejövő üzenetek",
+    "log": "Napló",
+    "logEmpty": "A napló üres.",
+    "level": {
+      "debug": "Hibakeresés",
+      "info": "Infó",
+      "warn": "Figyelmeztetés",
+      "error": "Hiba"
+    }
+  },
+  "export": {
+    "title": "{{name}} adatainak exportálása",
+    "filter": "JSON-fájl",
+    "done": "Az adatok exportálva."
+  },
+  "reset": {
+    "title": "Visszaállítod {{name}} adatait?",
+    "message": "A bővítmény által tárolt minden adat törlődik. Ez nem vonható vissza.",
+    "confirm": "Adatok visszaállítása",
+    "done": "Az adatok visszaállítva."
+  },
+  "remove": {
+    "title": "Eltávolítod: {{name}}?",
+    "deleteData": "Az adatait is töröld",
+    "hint": "A megtartott adatok 30 nap után törlődnek. Telepítsd újra előtte, hogy visszakapd őket.",
+    "confirm": "Eltávolítás"
+  },
+  "errors": {
+    "enable": "A bővítményt nem sikerült átkapcsolni.",
+    "permissions": "Az engedélyt nem sikerült módosítani.",
+    "visibility": "A láthatóságot nem sikerült módosítani.",
+    "notifications": "Az értesítéseket nem sikerült módosítani.",
+    "pin": "A verziót nem sikerült rögzíteni.",
+    "export": "Az adatokat nem sikerült exportálni.",
+    "reset": "Az adatokat nem sikerült visszaállítani.",
+    "remove": "A bővítményt nem sikerült eltávolítani.",
+    "badge": "A jelvényt nem sikerült módosítani."
+  }
+}

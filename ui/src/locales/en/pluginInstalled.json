@@ -1,0 +1,94 @@
+{
+  "listLabel": "Installed plugins",
+  "empty": "No plugins yet.",
+  "browse": "Browse plugins",
+  "enable": "{{name}} on",
+  "labels": {
+    "official": "Official",
+    "unofficial": "Unofficial · {{repository}}",
+    "unofficialUnknown": "Unofficial",
+    "developer": "Developer plugin",
+    "autoOff": "Turned off after repeated crashes",
+    "backingOff": "Restarting after a crash",
+    "notLoaded": "Could not be loaded",
+    "revoked": "Turned off by Mumcord: {{reason}}",
+    "revocationWarning": "Warning from Mumcord: {{reason}}",
+    "tampered": "Files of this plugin were changed",
+    "permission": "Turned off because a required permission is off"
+  },
+  "details": {
+    "open": "Details of {{name}}",
+    "permissions": "Permissions",
+    "visibility": "Who can see this plugin's activity",
+    "visibilityOptions": {
+      "everyone": "Everyone",
+      "friends": "Friends only",
+      "nobody": "Nobody"
+    },
+    "notifications": "Notifications",
+    "pin": "Pin version {{version}} (no automatic updates)",
+    "settings": "Plugin settings",
+    "diagnostics": "Diagnostics",
+    "export": "Export data",
+    "reset": "Reset data",
+    "remove": "Remove"
+  },
+  "badge": {
+    "label": "Badge shown next to names",
+    "none": "None"
+  },
+  "diagnostics": {
+    "loading": "Loading diagnostics…",
+    "failed": "Diagnostics could not be loaded.",
+    "unknown": "Not available",
+    "ms": "{{value}} ms",
+    "cpuTime": "CPU time",
+    "memory": "Memory",
+    "peakMemory": "Peak memory",
+    "droppedEvents": "Dropped events",
+    "droppedMessages": "Dropped messages",
+    "restarts": "Restarts",
+    "messagesSent": "Messages sent",
+    "messagesReceived": "Messages received",
+    "messagesRateLimited": "Messages held back by the rate limit",
+    "messagesExpired": "Messages that expired",
+    "incomingRateDropped": "Incoming messages dropped by the rate limit",
+    "incomingInvalid": "Invalid incoming messages",
+    "log": "Log",
+    "logEmpty": "The log is empty.",
+    "level": {
+      "debug": "Debug",
+      "info": "Info",
+      "warn": "Warning",
+      "error": "Error"
+    }
+  },
+  "export": {
+    "title": "Export the data of {{name}}",
+    "filter": "JSON file",
+    "done": "Data exported."
+  },
+  "reset": {
+    "title": "Reset the data of {{name}}?",
+    "message": "Everything this plugin has stored is deleted. This cannot be undone.",
+    "confirm": "Reset data",
+    "done": "Data reset."
+  },
+  "remove": {
+    "title": "Remove {{name}}?",
+    "deleteData": "Also delete its data",
+    "hint": "Kept data is deleted after 30 days. Reinstall before then to get it back.",
+    "confirm": "Remove"
+  },
+  "errors": {
+    "enable": "The plugin could not be switched.",
+    "permissions": "The permission could not be changed.",
+    "visibility": "The visibility could not be changed.",
+    "notifications": "Notifications could not be changed.",
+    "pin": "The version could not be pinned.",
+    "export": "The data could not be exported.",
+    "reset": "The data could not be reset.",
+    "remove": "The plugin could not be removed.",
+    "badge": "The badge could not be changed."
+  }
+}

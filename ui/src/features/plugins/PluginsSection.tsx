@@ -8,6 +8,7 @@ import { RepositoriesTab, type MirrorSetting } from "./repos";
 import { UpdatesTab } from "./updates";
 import "./plugins.css";
 import { DeveloperTab } from "./developer/DeveloperTab";
+import { InstalledTab } from "./installed/InstalledTab";
 
 const PLUGIN_TABS = ["installed", "browse", "updates", "repositories", "developer"] as const;
 type PluginTab = (typeof PLUGIN_TABS)[number];
@@ -17,7 +18,7 @@ type PluginTab = (typeof PLUGIN_TABS)[number];
  * here with its root component.
  */
 const TAB_CONTENT: Record<PluginTab, ReactNode> = {
-  installed: null,
+  installed: <InstalledTab />,
   browse: null,
   updates: null,
   repositories: <RepositoriesTab />,

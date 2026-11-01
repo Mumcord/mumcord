@@ -1,0 +1,94 @@
+{
+  "listLabel": "Installerede plugins",
+  "empty": "Ingen plugins endnu.",
+  "browse": "Gennemse plugins",
+  "enable": "{{name}} til",
+  "labels": {
+    "official": "Officielt",
+    "unofficial": "Uofficielt · {{repository}}",
+    "unofficialUnknown": "Uofficielt",
+    "developer": "Udviklerplugin",
+    "autoOff": "Slået fra efter gentagne nedbrud",
+    "backingOff": "Genstarter efter et nedbrud",
+    "notLoaded": "Kunne ikke indlæses",
+    "revoked": "Slået fra af Mumcord: {{reason}}",
+    "revocationWarning": "Advarsel fra Mumcord: {{reason}}",
+    "tampered": "Filerne i dette plugin er blevet ændret",
+    "permission": "Slået fra, fordi en nødvendig tilladelse er slået fra"
+  },
+  "details": {
+    "open": "Detaljer om {{name}}",
+    "permissions": "Tilladelser",
+    "visibility": "Hvem kan se dette plugins aktivitet",
+    "visibilityOptions": {
+      "everyone": "Alle",
+      "friends": "Kun venner",
+      "nobody": "Ingen"
+    },
+    "notifications": "Notifikationer",
+    "pin": "Fastlås version {{version}} (ingen automatiske opdateringer)",
+    "settings": "Plugin-indstillinger",
+    "diagnostics": "Diagnostik",
+    "export": "Eksportér data",
+    "reset": "Nulstil data",
+    "remove": "Fjern"
+  },
+  "badge": {
+    "label": "Badge vist ved siden af navne",
+    "none": "Ingen"
+  },
+  "diagnostics": {
+    "loading": "Indlæser diagnostik…",
+    "failed": "Diagnostikken kunne ikke indlæses.",
+    "unknown": "Ikke tilgængelig",
+    "ms": "{{value}} ms",
+    "cpuTime": "CPU-tid",
+    "memory": "Hukommelse",
+    "peakMemory": "Maks. hukommelse",
+    "droppedEvents": "Droppede hændelser",
+    "droppedMessages": "Droppede beskeder",
+    "restarts": "Genstarter",
+    "messagesSent": "Sendte beskeder",
+    "messagesReceived": "Modtagne beskeder",
+    "messagesRateLimited": "Beskeder holdt tilbage af hastighedsgrænsen",
+    "messagesExpired": "Beskeder, der er udløbet",
+    "incomingRateDropped": "Indkommende beskeder droppet af hastighedsgrænsen",
+    "incomingInvalid": "Ugyldige indkommende beskeder",
+    "log": "Log",
+    "logEmpty": "Loggen er tom.",
+    "level": {
+      "debug": "Fejlfinding",
+      "info": "Info",
+      "warn": "Advarsel",
+      "error": "Fejl"
+    }
+  },
+  "export": {
+    "title": "Eksportér data fra {{name}}",
+    "filter": "JSON-fil",
+    "done": "Data eksporteret."
+  },
+  "reset": {
+    "title": "Nulstil data fra {{name}}?",
+    "message": "Alt, hvad dette plugin har gemt, slettes. Det kan ikke fortrydes.",
+    "confirm": "Nulstil data",
+    "done": "Data nulstillet."
+  },
+  "remove": {
+    "title": "Fjern {{name}}?",
+    "deleteData": "Slet også dets data",
+    "hint": "Beholdte data slettes efter 30 dage. Geninstallér inden da for at få dem tilbage.",
+    "confirm": "Fjern"
+  },
+  "errors": {
+    "enable": "Pluginet kunne ikke skiftes.",
+    "permissions": "Tilladelsen kunne ikke ændres.",
+    "visibility": "Synligheden kunne ikke ændres.",
+    "notifications": "Notifikationerne kunne ikke ændres.",
+    "pin": "Versionen kunne ikke fastlåses.",
+    "export": "Dataene kunne ikke eksporteres.",
+    "reset": "Dataene kunne ikke nulstilles.",
+    "remove": "Pluginet kunne ikke fjernes.",
+    "badge": "Badget kunne ikke ændres."
+  }
+}

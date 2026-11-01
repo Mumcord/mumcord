@@ -1,0 +1,94 @@
+{
+  "listLabel": "Plugin installati",
+  "empty": "Ancora nessun plugin.",
+  "browse": "Sfoglia i plugin",
+  "enable": "{{name}} attivo",
+  "labels": {
+    "official": "Ufficiale",
+    "unofficial": "Non ufficiale · {{repository}}",
+    "unofficialUnknown": "Non ufficiale",
+    "developer": "Plugin per sviluppatori",
+    "autoOff": "Disattivato dopo arresti anomali ripetuti",
+    "backingOff": "Riavvio dopo un arresto anomalo",
+    "notLoaded": "Impossibile caricarlo",
+    "revoked": "Disattivato da Mumcord: {{reason}}",
+    "revocationWarning": "Avviso da Mumcord: {{reason}}",
+    "tampered": "I file di questo plugin sono stati modificati",
+    "permission": "Disattivato perché un permesso necessario è disattivato"
+  },
+  "details": {
+    "open": "Dettagli di {{name}}",
+    "permissions": "Permessi",
+    "visibility": "Chi può vedere l'attività di questo plugin",
+    "visibilityOptions": {
+      "everyone": "Tutti",
+      "friends": "Solo amici",
+      "nobody": "Nessuno"
+    },
+    "notifications": "Notifiche",
+    "pin": "Blocca la versione {{version}} (nessun aggiornamento automatico)",
+    "settings": "Impostazioni del plugin",
+    "diagnostics": "Diagnostica",
+    "export": "Esporta i dati",
+    "reset": "Reimposta i dati",
+    "remove": "Rimuovi"
+  },
+  "badge": {
+    "label": "Badge mostrato accanto ai nomi",
+    "none": "Nessuno"
+  },
+  "diagnostics": {
+    "loading": "Caricamento della diagnostica…",
+    "failed": "Impossibile caricare la diagnostica.",
+    "unknown": "Non disponibile",
+    "ms": "{{value}} ms",
+    "cpuTime": "Tempo CPU",
+    "memory": "Memoria",
+    "peakMemory": "Picco di memoria",
+    "droppedEvents": "Eventi scartati",
+    "droppedMessages": "Messaggi scartati",
+    "restarts": "Riavvii",
+    "messagesSent": "Messaggi inviati",
+    "messagesReceived": "Messaggi ricevuti",
+    "messagesRateLimited": "Messaggi trattenuti dal limite di frequenza",
+    "messagesExpired": "Messaggi scaduti",
+    "incomingRateDropped": "Messaggi in arrivo scartati dal limite di frequenza",
+    "incomingInvalid": "Messaggi in arrivo non validi",
+    "log": "Registro",
+    "logEmpty": "Il registro è vuoto.",
+    "level": {
+      "debug": "Debug",
+      "info": "Info",
+      "warn": "Avviso",
+      "error": "Errore"
+    }
+  },
+  "export": {
+    "title": "Esporta i dati di {{name}}",
+    "filter": "File JSON",
+    "done": "Dati esportati."
+  },
+  "reset": {
+    "title": "Reimpostare i dati di {{name}}?",
+    "message": "Tutto ciò che questo plugin ha salvato viene eliminato. L'operazione non si può annullare.",
+    "confirm": "Reimposta i dati",
+    "done": "Dati reimpostati."
+  },
+  "remove": {
+    "title": "Rimuovere {{name}}?",
+    "deleteData": "Elimina anche i suoi dati",
+    "hint": "I dati conservati vengono eliminati dopo 30 giorni. Reinstalla il plugin prima per riaverli.",
+    "confirm": "Rimuovi"
+  },
+  "errors": {
+    "enable": "Impossibile cambiare lo stato del plugin.",
+    "permissions": "Impossibile modificare il permesso.",
+    "visibility": "Impossibile modificare la visibilità.",
+    "notifications": "Impossibile modificare le notifiche.",
+    "pin": "Impossibile bloccare la versione.",
+    "export": "Impossibile esportare i dati.",
+    "reset": "Impossibile reimpostare i dati.",
+    "remove": "Impossibile rimuovere il plugin.",
+    "badge": "Impossibile modificare il badge."
+  }
+}

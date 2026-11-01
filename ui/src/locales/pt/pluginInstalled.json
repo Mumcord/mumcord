@@ -1,0 +1,94 @@
+{
+  "listLabel": "Plugins instalados",
+  "empty": "Ainda sem plugins.",
+  "browse": "Explorar plugins",
+  "enable": "{{name}} ativado",
+  "labels": {
+    "official": "Oficial",
+    "unofficial": "Não oficial · {{repository}}",
+    "unofficialUnknown": "Não oficial",
+    "developer": "Plugin de programador",
+    "autoOff": "Desativado após falhas repetidas",
+    "backingOff": "A reiniciar após uma falha",
+    "notLoaded": "Não foi possível carregar",
+    "revoked": "Desativado pelo Mumcord: {{reason}}",
+    "revocationWarning": "Aviso do Mumcord: {{reason}}",
+    "tampered": "Os ficheiros deste plugin foram alterados",
+    "permission": "Desativado porque uma permissão necessária está desativada"
+  },
+  "details": {
+    "open": "Detalhes de {{name}}",
+    "permissions": "Permissões",
+    "visibility": "Quem pode ver a atividade deste plugin",
+    "visibilityOptions": {
+      "everyone": "Todos",
+      "friends": "Só amigos",
+      "nobody": "Ninguém"
+    },
+    "notifications": "Notificações",
+    "pin": "Fixar a versão {{version}} (sem atualizações automáticas)",
+    "settings": "Definições do plugin",
+    "diagnostics": "Diagnóstico",
+    "export": "Exportar dados",
+    "reset": "Repor dados",
+    "remove": "Remover"
+  },
+  "badge": {
+    "label": "Distintivo junto aos nomes",
+    "none": "Nenhum"
+  },
+  "diagnostics": {
+    "loading": "A carregar o diagnóstico…",
+    "failed": "Não foi possível carregar o diagnóstico.",
+    "unknown": "Indisponível",
+    "ms": "{{value}} ms",
+    "cpuTime": "Tempo de CPU",
+    "memory": "Memória",
+    "peakMemory": "Memória máxima",
+    "droppedEvents": "Eventos descartados",
+    "droppedMessages": "Mensagens descartadas",
+    "restarts": "Reinícios",
+    "messagesSent": "Mensagens enviadas",
+    "messagesReceived": "Mensagens recebidas",
+    "messagesRateLimited": "Mensagens retidas pelo limite de frequência",
+    "messagesExpired": "Mensagens expiradas",
+    "incomingRateDropped": "Mensagens recebidas descartadas pelo limite de frequência",
+    "incomingInvalid": "Mensagens recebidas inválidas",
+    "log": "Registo",
+    "logEmpty": "O registo está vazio.",
+    "level": {
+      "debug": "Depuração",
+      "info": "Info",
+      "warn": "Aviso",
+      "error": "Erro"
+    }
+  },
+  "export": {
+    "title": "Exportar os dados de {{name}}",
+    "filter": "Ficheiro JSON",
+    "done": "Dados exportados."
+  },
+  "reset": {
+    "title": "Repor os dados de {{name}}?",
+    "message": "Tudo o que este plugin guardou é eliminado. Isto não pode ser anulado.",
+    "confirm": "Repor dados",
+    "done": "Dados repostos."
+  },
+  "remove": {
+    "title": "Remover {{name}}?",
+    "deleteData": "Eliminar também os seus dados",
+    "hint": "Os dados mantidos são eliminados ao fim de 30 dias. Reinstale antes disso para os recuperar.",
+    "confirm": "Remover"
+  },
+  "errors": {
+    "enable": "Não foi possível alternar o plugin.",
+    "permissions": "Não foi possível alterar a permissão.",
+    "visibility": "Não foi possível alterar a visibilidade.",
+    "notifications": "Não foi possível alterar as notificações.",
+    "pin": "Não foi possível fixar a versão.",
+    "export": "Não foi possível exportar os dados.",
+    "reset": "Não foi possível repor os dados.",
+    "remove": "Não foi possível remover o plugin.",
+    "badge": "Não foi possível alterar o distintivo."
+  }
+}

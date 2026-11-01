@@ -1,0 +1,94 @@
+{
+  "listLabel": "Installitud pistikprogrammid",
+  "empty": "Pistikprogramme veel pole.",
+  "browse": "Sirvi pistikprogramme",
+  "enable": "{{name}} sees",
+  "labels": {
+    "official": "Ametlik",
+    "unofficial": "Mitteametlik · {{repository}}",
+    "unofficialUnknown": "Mitteametlik",
+    "developer": "Arendaja pistikprogramm",
+    "autoOff": "Välja lülitatud korduvate kokkujooksmiste järel",
+    "backingOff": "Taaskäivitub kokkujooksmise järel",
+    "notLoaded": "Laadimine ei õnnestunud",
+    "revoked": "Mumcord lülitas välja: {{reason}}",
+    "revocationWarning": "Mumcordi hoiatus: {{reason}}",
+    "tampered": "Selle pistikprogrammi faile on muudetud",
+    "permission": "Välja lülitatud, sest vajalik luba on välja lülitatud"
+  },
+  "details": {
+    "open": "{{name}} üksikasjad",
+    "permissions": "Load",
+    "visibility": "Kes näevad selle pistikprogrammi tegevust",
+    "visibilityOptions": {
+      "everyone": "Kõik",
+      "friends": "Ainult sõbrad",
+      "nobody": "Mitte keegi"
+    },
+    "notifications": "Teavitused",
+    "pin": "Kinnita versioon {{version}} (ilma automaatsete uuendusteta)",
+    "settings": "Pistikprogrammi seaded",
+    "diagnostics": "Diagnostika",
+    "export": "Ekspordi andmed",
+    "reset": "Lähtesta andmed",
+    "remove": "Eemalda"
+  },
+  "badge": {
+    "label": "Nimede kõrval kuvatav märk",
+    "none": "Puudub"
+  },
+  "diagnostics": {
+    "loading": "Diagnostikat laaditakse…",
+    "failed": "Diagnostika laadimine ei õnnestunud.",
+    "unknown": "Pole saadaval",
+    "ms": "{{value}} ms",
+    "cpuTime": "Protsessoriaeg",
+    "memory": "Mälu",
+    "peakMemory": "Mälu tipp",
+    "droppedEvents": "Kaotsi läinud sündmused",
+    "droppedMessages": "Kaotsi läinud sõnumid",
+    "restarts": "Taaskäivitused",
+    "messagesSent": "Saadetud sõnumid",
+    "messagesReceived": "Vastuvõetud sõnumid",
+    "messagesRateLimited": "Kiiruspiiranguga edasi lükatud sõnumid",
+    "messagesExpired": "Aegunud sõnumid",
+    "incomingRateDropped": "Kiiruspiiranguga kaotsi läinud sissetulevad sõnumid",
+    "incomingInvalid": "Kehtetud sissetulevad sõnumid",
+    "log": "Logi",
+    "logEmpty": "Logi on tühi.",
+    "level": {
+      "debug": "Silumine",
+      "info": "Teave",
+      "warn": "Hoiatus",
+      "error": "Viga"
+    }
+  },
+  "export": {
+    "title": "Ekspordi {{name}} andmed",
+    "filter": "JSON-fail",
+    "done": "Andmed eksporditud."
+  },
+  "reset": {
+    "title": "Kas lähtestada {{name}} andmed?",
+    "message": "Kõik, mida see pistikprogramm on salvestanud, kustutatakse. Seda ei saa tagasi võtta.",
+    "confirm": "Lähtesta andmed",
+    "done": "Andmed lähtestatud."
+  },
+  "remove": {
+    "title": "Kas eemaldada {{name}}?",
+    "deleteData": "Kustuta ka selle andmed",
+    "hint": "Alles jäetud andmed kustutatakse 30 päeva pärast. Installi pistikprogramm enne seda uuesti, et need tagasi saada.",
+    "confirm": "Eemalda"
+  },
+  "errors": {
+    "enable": "Pistikprogrammi ümberlülitamine ei õnnestunud.",
+    "permissions": "Loa muutmine ei õnnestunud.",
+    "visibility": "Nähtavuse muutmine ei õnnestunud.",
+    "notifications": "Teavituste muutmine ei õnnestunud.",
+    "pin": "Versiooni kinnitamine ei õnnestunud.",
+    "export": "Andmete eksportimine ei õnnestunud.",
+    "reset": "Andmete lähtestamine ei õnnestunud.",
+    "remove": "Pistikprogrammi eemaldamine ei õnnestunud.",
+    "badge": "Märgi muutmine ei õnnestunud."
+  }
+}

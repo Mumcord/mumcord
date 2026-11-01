@@ -1,0 +1,94 @@
+{
+  "listLabel": "Plugins installés",
+  "empty": "Aucun plugin pour l'instant.",
+  "browse": "Parcourir les plugins",
+  "enable": "{{name}} activé",
+  "labels": {
+    "official": "Officiel",
+    "unofficial": "Non officiel · {{repository}}",
+    "unofficialUnknown": "Non officiel",
+    "developer": "Plugin de développeur",
+    "autoOff": "Désactivé après des plantages répétés",
+    "backingOff": "Redémarre après un plantage",
+    "notLoaded": "Impossible à charger",
+    "revoked": "Désactivé par Mumcord : {{reason}}",
+    "revocationWarning": "Avertissement de Mumcord : {{reason}}",
+    "tampered": "Les fichiers de ce plugin ont été modifiés",
+    "permission": "Désactivé car une autorisation requise est désactivée"
+  },
+  "details": {
+    "open": "Détails de {{name}}",
+    "permissions": "Autorisations",
+    "visibility": "Qui peut voir l'activité de ce plugin",
+    "visibilityOptions": {
+      "everyone": "Tout le monde",
+      "friends": "Amis uniquement",
+      "nobody": "Personne"
+    },
+    "notifications": "Notifications",
+    "pin": "Épingler la version {{version}} (pas de mises à jour automatiques)",
+    "settings": "Paramètres du plugin",
+    "diagnostics": "Diagnostic",
+    "export": "Exporter les données",
+    "reset": "Réinitialiser les données",
+    "remove": "Supprimer"
+  },
+  "badge": {
+    "label": "Badge affiché à côté des noms",
+    "none": "Aucun"
+  },
+  "diagnostics": {
+    "loading": "Chargement du diagnostic…",
+    "failed": "Impossible de charger le diagnostic.",
+    "unknown": "Non disponible",
+    "ms": "{{value}} ms",
+    "cpuTime": "Temps CPU",
+    "memory": "Mémoire",
+    "peakMemory": "Pic de mémoire",
+    "droppedEvents": "Événements abandonnés",
+    "droppedMessages": "Messages abandonnés",
+    "restarts": "Redémarrages",
+    "messagesSent": "Messages envoyés",
+    "messagesReceived": "Messages reçus",
+    "messagesRateLimited": "Messages retenus par la limite de débit",
+    "messagesExpired": "Messages expirés",
+    "incomingRateDropped": "Messages entrants abandonnés par la limite de débit",
+    "incomingInvalid": "Messages entrants invalides",
+    "log": "Journal",
+    "logEmpty": "Le journal est vide.",
+    "level": {
+      "debug": "Débogage",
+      "info": "Info",
+      "warn": "Avertissement",
+      "error": "Erreur"
+    }
+  },
+  "export": {
+    "title": "Exporter les données de {{name}}",
+    "filter": "Fichier JSON",
+    "done": "Données exportées."
+  },
+  "reset": {
+    "title": "Réinitialiser les données de {{name}} ?",
+    "message": "Tout ce que ce plugin a enregistré est supprimé. Cette action est irréversible.",
+    "confirm": "Réinitialiser les données",
+    "done": "Données réinitialisées."
+  },
+  "remove": {
+    "title": "Supprimer {{name}} ?",
+    "deleteData": "Supprimer aussi ses données",
+    "hint": "Les données conservées sont supprimées au bout de 30 jours. Réinstallez le plugin avant pour les récupérer.",
+    "confirm": "Supprimer"
+  },
+  "errors": {
+    "enable": "Impossible de basculer le plugin.",
+    "permissions": "Impossible de modifier l'autorisation.",
+    "visibility": "Impossible de modifier la visibilité.",
+    "notifications": "Impossible de modifier les notifications.",
+    "pin": "Impossible d'épingler la version.",
+    "export": "Impossible d'exporter les données.",
+    "reset": "Impossible de réinitialiser les données.",
+    "remove": "Impossible de supprimer le plugin.",
+    "badge": "Impossible de modifier le badge."
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "listLabel": "Pluginuri instalate",
+  "empty": "Încă nu există pluginuri.",
+  "browse": "Răsfoiește pluginurile",
+  "enable": "{{name}} activat",
+  "labels": {
+    "official": "Oficial",
+    "unofficial": "Neoficial · {{repository}}",
+    "unofficialUnknown": "Neoficial",
+    "developer": "Plugin de dezvoltator",
+    "autoOff": "Oprit după blocări repetate",
+    "backingOff": "Repornește după o blocare",
+    "notLoaded": "Nu a putut fi încărcat",
+    "revoked": "Oprit de Mumcord: {{reason}}",
+    "revocationWarning": "Avertisment de la Mumcord: {{reason}}",
+    "tampered": "Fișierele acestui plugin au fost modificate",
+    "permission": "Oprit pentru că o permisiune necesară este dezactivată"
+  },
+  "details": {
+    "open": "Detalii despre {{name}}",
+    "permissions": "Permisiuni",
+    "visibility": "Cine poate vedea activitatea acestui plugin",
+    "visibilityOptions": {
+      "everyone": "Toată lumea",
+      "friends": "Doar prietenii",
+      "nobody": "Nimeni"
+    },
+    "notifications": "Notificări",
+    "pin": "Fixează versiunea {{version}} (fără actualizări automate)",
+    "settings": "Setările pluginului",
+    "diagnostics": "Diagnosticare",
+    "export": "Exportă datele",
+    "reset": "Resetează datele",
+    "remove": "Elimină"
+  },
+  "badge": {
+    "label": "Insignă afișată lângă nume",
+    "none": "Niciuna"
+  },
+  "diagnostics": {
+    "loading": "Se încarcă diagnosticarea…",
+    "failed": "Diagnosticarea nu a putut fi încărcată.",
+    "unknown": "Indisponibil",
+    "ms": "{{value}} ms",
+    "cpuTime": "Timp CPU",
+    "memory": "Memorie",
+    "peakMemory": "Memorie maximă",
+    "droppedEvents": "Evenimente eliminate",
+    "droppedMessages": "Mesaje eliminate",
+    "restarts": "Reporniri",
+    "messagesSent": "Mesaje trimise",
+    "messagesReceived": "Mesaje primite",
+    "messagesRateLimited": "Mesaje reținute de limita de rată",
+    "messagesExpired": "Mesaje expirate",
+    "incomingRateDropped": "Mesaje primite eliminate de limita de rată",
+    "incomingInvalid": "Mesaje primite invalide",
+    "log": "Jurnal",
+    "logEmpty": "Jurnalul este gol.",
+    "level": {
+      "debug": "Depanare",
+      "info": "Info",
+      "warn": "Avertisment",
+      "error": "Eroare"
+    }
+  },
+  "export": {
+    "title": "Exportă datele pentru {{name}}",
+    "filter": "Fișier JSON",
+    "done": "Datele au fost exportate."
+  },
+  "reset": {
+    "title": "Resetezi datele pentru {{name}}?",
+    "message": "Tot ce a stocat acest plugin este șters. Acțiunea nu poate fi anulată.",
+    "confirm": "Resetează datele",
+    "done": "Datele au fost resetate."
+  },
+  "remove": {
+    "title": "Elimini {{name}}?",
+    "deleteData": "Șterge și datele lui",
+    "hint": "Datele păstrate sunt șterse după 30 de zile. Reinstalează pluginul înainte pentru a le recupera.",
+    "confirm": "Elimină"
+  },
+  "errors": {
+    "enable": "Pluginul nu a putut fi comutat.",
+    "permissions": "Permisiunea nu a putut fi schimbată.",
+    "visibility": "Vizibilitatea nu a putut fi schimbată.",
+    "notifications": "Notificările nu au putut fi schimbate.",
+    "pin": "Versiunea nu a putut fi fixată.",
+    "export": "Datele nu au putut fi exportate.",
+    "reset": "Datele nu au putut fi resetate.",
+    "remove": "Pluginul nu a putut fi eliminat.",
+    "badge": "Insigna nu a putut fi schimbată."
+  }
+}

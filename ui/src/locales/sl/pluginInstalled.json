@@ -1,0 +1,94 @@
+{
+  "listLabel": "Nameščeni vtičniki",
+  "empty": "Še ni vtičnikov.",
+  "browse": "Prebrskaj vtičnike",
+  "enable": "{{name}} vklopljen",
+  "labels": {
+    "official": "Uradni",
+    "unofficial": "Neuradni · {{repository}}",
+    "unofficialUnknown": "Neuradni",
+    "developer": "Razvijalski vtičnik",
+    "autoOff": "Izklopljen po ponavljajočih se sesutjih",
+    "backingOff": "Znova se zaganja po sesutju",
+    "notLoaded": "Ni bilo mogoče naložiti",
+    "revoked": "Izklopil Mumcord: {{reason}}",
+    "revocationWarning": "Opozorilo Mumcorda: {{reason}}",
+    "tampered": "Datoteke tega vtičnika so bile spremenjene",
+    "permission": "Izklopljen, ker je zahtevano dovoljenje izklopljeno"
+  },
+  "details": {
+    "open": "Podrobnosti o {{name}}",
+    "permissions": "Dovoljenja",
+    "visibility": "Kdo vidi dejavnost tega vtičnika",
+    "visibilityOptions": {
+      "everyone": "Vsi",
+      "friends": "Samo prijatelji",
+      "nobody": "Nihče"
+    },
+    "notifications": "Obvestila",
+    "pin": "Pripni različico {{version}} (brez samodejnih posodobitev)",
+    "settings": "Nastavitve vtičnika",
+    "diagnostics": "Diagnostika",
+    "export": "Izvozi podatke",
+    "reset": "Ponastavi podatke",
+    "remove": "Odstrani"
+  },
+  "badge": {
+    "label": "Značka ob imenih",
+    "none": "Brez"
+  },
+  "diagnostics": {
+    "loading": "Nalaganje diagnostike …",
+    "failed": "Diagnostike ni bilo mogoče naložiti.",
+    "unknown": "Ni na voljo",
+    "ms": "{{value}} ms",
+    "cpuTime": "Čas procesorja",
+    "memory": "Pomnilnik",
+    "peakMemory": "Največja poraba pomnilnika",
+    "droppedEvents": "Zavrženi dogodki",
+    "droppedMessages": "Zavržena sporočila",
+    "restarts": "Ponovni zagoni",
+    "messagesSent": "Poslana sporočila",
+    "messagesReceived": "Prejeta sporočila",
+    "messagesRateLimited": "Sporočila, zadržana zaradi omejitve hitrosti",
+    "messagesExpired": "Potekla sporočila",
+    "incomingRateDropped": "Dohodna sporočila, zavržena zaradi omejitve hitrosti",
+    "incomingInvalid": "Neveljavna dohodna sporočila",
+    "log": "Dnevnik",
+    "logEmpty": "Dnevnik je prazen.",
+    "level": {
+      "debug": "Razhroščevanje",
+      "info": "Info",
+      "warn": "Opozorilo",
+      "error": "Napaka"
+    }
+  },
+  "export": {
+    "title": "Izvozi podatke vtičnika {{name}}",
+    "filter": "Datoteka JSON",
+    "done": "Podatki so izvoženi."
+  },
+  "reset": {
+    "title": "Ponastavim podatke vtičnika {{name}}?",
+    "message": "Vse, kar je ta vtičnik shranil, bo izbrisano. Tega ni mogoče razveljaviti.",
+    "confirm": "Ponastavi podatke",
+    "done": "Podatki so ponastavljeni."
+  },
+  "remove": {
+    "title": "Odstranim {{name}}?",
+    "deleteData": "Izbriši tudi njegove podatke",
+    "hint": "Ohranjeni podatki se izbrišejo po 30 dneh. Vtičnik pred tem znova namesti, da jih dobiš nazaj.",
+    "confirm": "Odstrani"
+  },
+  "errors": {
+    "enable": "Vtičnika ni bilo mogoče preklopiti.",
+    "permissions": "Dovoljenja ni bilo mogoče spremeniti.",
+    "visibility": "Vidnosti ni bilo mogoče spremeniti.",
+    "notifications": "Obvestil ni bilo mogoče spremeniti.",
+    "pin": "Različice ni bilo mogoče pripeti.",
+    "export": "Podatkov ni bilo mogoče izvoziti.",
+    "reset": "Podatkov ni bilo mogoče ponastaviti.",
+    "remove": "Vtičnika ni bilo mogoče odstraniti.",
+    "badge": "Značke ni bilo mogoče spremeniti."
+  }
+}

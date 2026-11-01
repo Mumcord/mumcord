@@ -1,0 +1,94 @@
+{
+  "listLabel": "Plugins instalados",
+  "empty": "Aún no hay plugins.",
+  "browse": "Explorar plugins",
+  "enable": "{{name}} activado",
+  "labels": {
+    "official": "Oficial",
+    "unofficial": "No oficial · {{repository}}",
+    "unofficialUnknown": "No oficial",
+    "developer": "Plugin de desarrollo",
+    "autoOff": "Desactivado tras fallos repetidos",
+    "backingOff": "Reiniciando tras un fallo",
+    "notLoaded": "No se pudo cargar",
+    "revoked": "Desactivado por Mumcord: {{reason}}",
+    "revocationWarning": "Aviso de Mumcord: {{reason}}",
+    "tampered": "Se modificaron los archivos de este plugin",
+    "permission": "Desactivado porque un permiso necesario está desactivado"
+  },
+  "details": {
+    "open": "Detalles de {{name}}",
+    "permissions": "Permisos",
+    "visibility": "Quién puede ver la actividad de este plugin",
+    "visibilityOptions": {
+      "everyone": "Todos",
+      "friends": "Solo amigos",
+      "nobody": "Nadie"
+    },
+    "notifications": "Notificaciones",
+    "pin": "Fijar la versión {{version}} (sin actualizaciones automáticas)",
+    "settings": "Ajustes del plugin",
+    "diagnostics": "Diagnóstico",
+    "export": "Exportar datos",
+    "reset": "Restablecer datos",
+    "remove": "Quitar"
+  },
+  "badge": {
+    "label": "Insignia junto a los nombres",
+    "none": "Ninguna"
+  },
+  "diagnostics": {
+    "loading": "Cargando diagnóstico…",
+    "failed": "No se pudo cargar el diagnóstico.",
+    "unknown": "No disponible",
+    "ms": "{{value}} ms",
+    "cpuTime": "Tiempo de CPU",
+    "memory": "Memoria",
+    "peakMemory": "Memoria máxima",
+    "droppedEvents": "Eventos descartados",
+    "droppedMessages": "Mensajes descartados",
+    "restarts": "Reinicios",
+    "messagesSent": "Mensajes enviados",
+    "messagesReceived": "Mensajes recibidos",
+    "messagesRateLimited": "Mensajes retenidos por el límite de frecuencia",
+    "messagesExpired": "Mensajes caducados",
+    "incomingRateDropped": "Mensajes entrantes descartados por el límite de frecuencia",
+    "incomingInvalid": "Mensajes entrantes no válidos",
+    "log": "Registro",
+    "logEmpty": "El registro está vacío.",
+    "level": {
+      "debug": "Depuración",
+      "info": "Info",
+      "warn": "Aviso",
+      "error": "Error"
+    }
+  },
+  "export": {
+    "title": "Exportar los datos de {{name}}",
+    "filter": "Archivo JSON",
+    "done": "Datos exportados."
+  },
+  "reset": {
+    "title": "¿Restablecer los datos de {{name}}?",
+    "message": "Se borra todo lo que este plugin ha guardado. No se puede deshacer.",
+    "confirm": "Restablecer datos",
+    "done": "Datos restablecidos."
+  },
+  "remove": {
+    "title": "¿Quitar {{name}}?",
+    "deleteData": "Borrar también sus datos",
+    "hint": "Los datos conservados se borran a los 30 días. Reinstálalo antes para recuperarlos.",
+    "confirm": "Quitar"
+  },
+  "errors": {
+    "enable": "No se pudo cambiar el estado del plugin.",
+    "permissions": "No se pudo cambiar el permiso.",
+    "visibility": "No se pudo cambiar la visibilidad.",
+    "notifications": "No se pudieron cambiar las notificaciones.",
+    "pin": "No se pudo fijar la versión.",
+    "export": "No se pudieron exportar los datos.",
+    "reset": "No se pudieron restablecer los datos.",
+    "remove": "No se pudo quitar el plugin.",
+    "badge": "No se pudo cambiar la insignia."
+  }
+}

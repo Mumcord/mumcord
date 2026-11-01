@@ -1,0 +1,94 @@
+{
+  "listLabel": "Plugins installati",
+  "empty": "Għad m'hemm l-ebda plugin.",
+  "browse": "Ibbrawża l-plugins",
+  "enable": "{{name}} mixgħul",
+  "labels": {
+    "official": "Uffiċjali",
+    "unofficial": "Mhux uffiċjali · {{repository}}",
+    "unofficialUnknown": "Mhux uffiċjali",
+    "developer": "Plugin tal-iżviluppatur",
+    "autoOff": "Mitfi wara krazzjiet ripetuti",
+    "backingOff": "Qed jerġa' jibda wara kraxx",
+    "notLoaded": "Ma setax jitgħabba",
+    "revoked": "Mitfi minn Mumcord: {{reason}}",
+    "revocationWarning": "Twissija minn Mumcord: {{reason}}",
+    "tampered": "Il-fajls ta' dan il-plugin inbidlu",
+    "permission": "Mitfi għax permess meħtieġ huwa mitfi"
+  },
+  "details": {
+    "open": "Dettalji ta' {{name}}",
+    "permissions": "Permessi",
+    "visibility": "Min jista' jara l-attività ta' dan il-plugin",
+    "visibilityOptions": {
+      "everyone": "Kulħadd",
+      "friends": "Ħbieb biss",
+      "nobody": "Ħadd"
+    },
+    "notifications": "Notifiki",
+    "pin": "Waħħal il-verżjoni {{version}} (mingħajr aġġornamenti awtomatiċi)",
+    "settings": "Settings tal-plugin",
+    "diagnostics": "Dijanjostika",
+    "export": "Esporta d-dejta",
+    "reset": "Irrisettja d-dejta",
+    "remove": "Neħħi"
+  },
+  "badge": {
+    "label": "Badge muri maġenb l-ismijiet",
+    "none": "L-ebda wieħed"
+  },
+  "diagnostics": {
+    "loading": "Qed titgħabba d-dijanjostika…",
+    "failed": "Ma setgħatx titgħabba d-dijanjostika.",
+    "unknown": "Mhux disponibbli",
+    "ms": "{{value}} ms",
+    "cpuTime": "Ħin tas-CPU",
+    "memory": "Memorja",
+    "peakMemory": "Memorja massima",
+    "droppedEvents": "Avvenimenti mwaqqgħa",
+    "droppedMessages": "Messaġġi mwaqqgħa",
+    "restarts": "Restarts",
+    "messagesSent": "Messaġġi mibgħuta",
+    "messagesReceived": "Messaġġi riċevuti",
+    "messagesRateLimited": "Messaġġi miżmuma mil-limitu tar-rata",
+    "messagesExpired": "Messaġġi skaduti",
+    "incomingRateDropped": "Messaġġi dieħla mwaqqgħa mil-limitu tar-rata",
+    "incomingInvalid": "Messaġġi dieħla invalidi",
+    "log": "Log",
+    "logEmpty": "Il-log huwa vojt.",
+    "level": {
+      "debug": "Debug",
+      "info": "Info",
+      "warn": "Twissija",
+      "error": "Żball"
+    }
+  },
+  "export": {
+    "title": "Esporta d-dejta ta' {{name}}",
+    "filter": "Fajl JSON",
+    "done": "Id-dejta ġiet esportata."
+  },
+  "reset": {
+    "title": "Tirrisettja d-dejta ta' {{name}}?",
+    "message": "Kull ma ħżen dan il-plugin jitħassar. Dan ma jistax jitreġġa' lura.",
+    "confirm": "Irrisettja d-dejta",
+    "done": "Id-dejta ġiet irrisettjata."
+  },
+  "remove": {
+    "title": "Tneħħi {{name}}?",
+    "deleteData": "Ħassar ukoll id-dejta tiegħu",
+    "hint": "Id-dejta miżmuma titħassar wara 30 jum. Erġa' installa qabel dan biex terġa' tikseb.",
+    "confirm": "Neħħi"
+  },
+  "errors": {
+    "enable": "Il-plugin ma setax jinbidel.",
+    "permissions": "Il-permess ma setax jinbidel.",
+    "visibility": "Il-viżibbiltà ma setgħetx tinbidel.",
+    "notifications": "In-notifiki ma setgħux jinbidlu.",
+    "pin": "Il-verżjoni ma setgħetx tiġi mwaħħla.",
+    "export": "Id-dejta ma setgħetx tiġi esportata.",
+    "reset": "Id-dejta ma setgħetx tiġi rrisettjata.",
+    "remove": "Il-plugin ma setax jitneħħa.",
+    "badge": "Il-badge ma setax jinbidel."
+  }
+}

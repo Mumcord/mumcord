@@ -1,0 +1,94 @@
+{
+  "listLabel": "Installierte Plugins",
+  "empty": "Noch keine Plugins.",
+  "browse": "Plugins durchsuchen",
+  "enable": "{{name}} an",
+  "labels": {
+    "official": "Offiziell",
+    "unofficial": "Inoffiziell · {{repository}}",
+    "unofficialUnknown": "Inoffiziell",
+    "developer": "Entwickler-Plugin",
+    "autoOff": "Nach wiederholten Abstürzen ausgeschaltet",
+    "backingOff": "Startet nach Absturz neu",
+    "notLoaded": "Konnte nicht geladen werden",
+    "revoked": "Von Mumcord ausgeschaltet: {{reason}}",
+    "revocationWarning": "Warnung von Mumcord: {{reason}}",
+    "tampered": "Dateien dieses Plugins wurden verändert",
+    "permission": "Ausgeschaltet, weil eine benötigte Berechtigung aus ist"
+  },
+  "details": {
+    "open": "Details zu {{name}}",
+    "permissions": "Berechtigungen",
+    "visibility": "Wer die Aktivität dieses Plugins sehen kann",
+    "visibilityOptions": {
+      "everyone": "Alle",
+      "friends": "Nur Freunde",
+      "nobody": "Niemand"
+    },
+    "notifications": "Benachrichtigungen",
+    "pin": "Version {{version}} festsetzen (keine automatischen Updates)",
+    "settings": "Plugin-Einstellungen",
+    "diagnostics": "Diagnose",
+    "export": "Daten exportieren",
+    "reset": "Daten zurücksetzen",
+    "remove": "Entfernen"
+  },
+  "badge": {
+    "label": "Abzeichen neben Namen",
+    "none": "Keines"
+  },
+  "diagnostics": {
+    "loading": "Diagnose wird geladen …",
+    "failed": "Die Diagnose konnte nicht geladen werden.",
+    "unknown": "Nicht verfügbar",
+    "ms": "{{value}} ms",
+    "cpuTime": "CPU-Zeit",
+    "memory": "Arbeitsspeicher",
+    "peakMemory": "Spitzen-Arbeitsspeicher",
+    "droppedEvents": "Verworfene Ereignisse",
+    "droppedMessages": "Verworfene Nachrichten",
+    "restarts": "Neustarts",
+    "messagesSent": "Gesendete Nachrichten",
+    "messagesReceived": "Empfangene Nachrichten",
+    "messagesRateLimited": "Durch das Ratenlimit zurückgehaltene Nachrichten",
+    "messagesExpired": "Abgelaufene Nachrichten",
+    "incomingRateDropped": "Durch das Ratenlimit verworfene eingehende Nachrichten",
+    "incomingInvalid": "Ungültige eingehende Nachrichten",
+    "log": "Protokoll",
+    "logEmpty": "Das Protokoll ist leer.",
+    "level": {
+      "debug": "Debug",
+      "info": "Info",
+      "warn": "Warnung",
+      "error": "Fehler"
+    }
+  },
+  "export": {
+    "title": "Daten von {{name}} exportieren",
+    "filter": "JSON-Datei",
+    "done": "Daten exportiert."
+  },
+  "reset": {
+    "title": "Daten von {{name}} zurücksetzen?",
+    "message": "Alles, was dieses Plugin gespeichert hat, wird gelöscht. Das lässt sich nicht rückgängig machen.",
+    "confirm": "Daten zurücksetzen",
+    "done": "Daten zurückgesetzt."
+  },
+  "remove": {
+    "title": "{{name}} entfernen?",
+    "deleteData": "Auch die Daten löschen",
+    "hint": "Behaltene Daten werden nach 30 Tagen gelöscht. Installiere das Plugin vorher erneut, um sie zurückzubekommen.",
+    "confirm": "Entfernen"
+  },
+  "errors": {
+    "enable": "Das Plugin konnte nicht umgeschaltet werden.",
+    "permissions": "Die Berechtigung konnte nicht geändert werden.",
+    "visibility": "Die Sichtbarkeit konnte nicht geändert werden.",
+    "notifications": "Die Benachrichtigungen konnten nicht geändert werden.",
+    "pin": "Die Version konnte nicht festgesetzt werden.",
+    "export": "Die Daten konnten nicht exportiert werden.",
+    "reset": "Die Daten konnten nicht zurückgesetzt werden.",
+    "remove": "Das Plugin konnte nicht entfernt werden.",
+    "badge": "Das Abzeichen konnte nicht geändert werden."
+  }
+}

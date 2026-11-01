@@ -1,0 +1,94 @@
+{
+  "listLabel": "Zainstalowane wtyczki",
+  "empty": "Brak wtyczek.",
+  "browse": "Przeglądaj wtyczki",
+  "enable": "{{name}} włączona",
+  "labels": {
+    "official": "Oficjalna",
+    "unofficial": "Nieoficjalna · {{repository}}",
+    "unofficialUnknown": "Nieoficjalna",
+    "developer": "Wtyczka deweloperska",
+    "autoOff": "Wyłączona po wielokrotnych awariach",
+    "backingOff": "Uruchamia się ponownie po awarii",
+    "notLoaded": "Nie udało się załadować",
+    "revoked": "Wyłączona przez Mumcord: {{reason}}",
+    "revocationWarning": "Ostrzeżenie od Mumcord: {{reason}}",
+    "tampered": "Pliki tej wtyczki zostały zmienione",
+    "permission": "Wyłączona, bo wymagane uprawnienie jest wyłączone"
+  },
+  "details": {
+    "open": "Szczegóły: {{name}}",
+    "permissions": "Uprawnienia",
+    "visibility": "Kto widzi aktywność tej wtyczki",
+    "visibilityOptions": {
+      "everyone": "Wszyscy",
+      "friends": "Tylko znajomi",
+      "nobody": "Nikt"
+    },
+    "notifications": "Powiadomienia",
+    "pin": "Przypnij wersję {{version}} (bez automatycznych aktualizacji)",
+    "settings": "Ustawienia wtyczki",
+    "diagnostics": "Diagnostyka",
+    "export": "Eksportuj dane",
+    "reset": "Resetuj dane",
+    "remove": "Usuń"
+  },
+  "badge": {
+    "label": "Odznaka obok nazw",
+    "none": "Brak"
+  },
+  "diagnostics": {
+    "loading": "Wczytywanie diagnostyki…",
+    "failed": "Nie udało się wczytać diagnostyki.",
+    "unknown": "Niedostępne",
+    "ms": "{{value}} ms",
+    "cpuTime": "Czas procesora",
+    "memory": "Pamięć",
+    "peakMemory": "Szczytowe użycie pamięci",
+    "droppedEvents": "Odrzucone zdarzenia",
+    "droppedMessages": "Odrzucone wiadomości",
+    "restarts": "Ponowne uruchomienia",
+    "messagesSent": "Wysłane wiadomości",
+    "messagesReceived": "Odebrane wiadomości",
+    "messagesRateLimited": "Wiadomości wstrzymane przez limit częstotliwości",
+    "messagesExpired": "Wiadomości, które wygasły",
+    "incomingRateDropped": "Przychodzące wiadomości odrzucone przez limit częstotliwości",
+    "incomingInvalid": "Nieprawidłowe wiadomości przychodzące",
+    "log": "Dziennik",
+    "logEmpty": "Dziennik jest pusty.",
+    "level": {
+      "debug": "Debugowanie",
+      "info": "Info",
+      "warn": "Ostrzeżenie",
+      "error": "Błąd"
+    }
+  },
+  "export": {
+    "title": "Eksportuj dane wtyczki {{name}}",
+    "filter": "Plik JSON",
+    "done": "Dane wyeksportowane."
+  },
+  "reset": {
+    "title": "Zresetować dane wtyczki {{name}}?",
+    "message": "Wszystko, co zapisała ta wtyczka, zostanie usunięte. Tej operacji nie można cofnąć.",
+    "confirm": "Resetuj dane",
+    "done": "Dane zresetowane."
+  },
+  "remove": {
+    "title": "Usunąć wtyczkę {{name}}?",
+    "deleteData": "Usuń także jej dane",
+    "hint": "Zachowane dane są usuwane po 30 dniach. Zainstaluj wtyczkę ponownie przed tym czasem, aby je odzyskać.",
+    "confirm": "Usuń"
+  },
+  "errors": {
+    "enable": "Nie udało się przełączyć wtyczki.",
+    "permissions": "Nie udało się zmienić uprawnienia.",
+    "visibility": "Nie udało się zmienić widoczności.",
+    "notifications": "Nie udało się zmienić powiadomień.",
+    "pin": "Nie udało się przypiąć wersji.",
+    "export": "Nie udało się wyeksportować danych.",
+    "reset": "Nie udało się zresetować danych.",
+    "remove": "Nie udało się usunąć wtyczki.",
+    "badge": "Nie udało się zmienić odznaki."
+  }
+}
