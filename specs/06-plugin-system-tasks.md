@@ -19,7 +19,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B12 | Messaging logic (pure) | done | b12-msg |
 | B13 | Engine bridge for plugins | done | b13-bridge |
 | B14 | Signing and verification | done | b14-verify |
-| B15 | Registry and repository client | in progress | b15-registry |
+| B15 | Registry and repository client | done | b15-registry |
 | B16a | Safety fixture plugins | done | b16a-fixtures |
 | B17a | Plugin service: lifecycle | open | |
 | B17b | Updates and kill switch | open | |
@@ -29,7 +29,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B21 | UI shell: Settings → Plugins, Developer mode, palette, store | open | |
 | B22 | Permission list component and texts | done | b22-permlist |
 | B25a | SDK crate `mumcord-plugin-sdk` | done | b25a-sdk |
-| B25b | CLI `mumcord-plugin` (author + registry commands) | open | |
+| B25b | CLI `mumcord-plugin` (author + registry commands) | in progress | b25b-cli |
 | B25c | CLI `test` and `preview` | open | |
 | B16b | Fixture registry setup for E2E | open | |
 | B9 | Local mumbot instance (music + plugins) | in progress | b9-mumbot |
@@ -48,9 +48,9 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B33c | Developer tab | open | |
 | B37 | ⚠ OUTWARD: registry CI and publish workflows | open | |
 | B38 | Template and author docs | open | |
-| B39 | Poll plugin | open | |
+| B39 | Poll plugin | in progress | b39-poll |
 | B40 | Dice roller plugin | open | |
-| B41a | Echolings: pet core | open | |
+| B41a | Echolings: pet core | in progress | b41a-pets |
 | B41b | Echolings: social + Echo Echo | open | |
 | B41c | Echolings: Snack Race (web view) | open | |
 | B42 | Mumbot Music plugin | open | |
@@ -434,3 +434,5 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B10 (c5f35aa7):** `PluginHost::new(app_version, cache_dir: Option<PathBuf>, ctx: Arc<HostContext>, outbox: tokio UnboundedSender<HostEvent>)`; `load`, `enable` (blocks until start returns and resets the failure count; call it via spawn_blocking), `disable`, `unload`, `set_all_off(bool)` / `all_off()`, `send(id, wit::events::Event) -> bool`, `broadcast(&Event)`, `state(id) -> Option<RunState>`, `diagnostics(id) -> Option<Arc<Diagnostics>>` (`.snapshot()` → serde DiagSnapshot; `.message_dropped()` for B12). `RunState::{Disabled, Running, BackingOff{error, retry_at}, AutoOff{error}, AllOff}`. `HostEvent::{Started{id}, Failed{id, error: CallError, recovery: Recovery}}`; `Recovery::StayOff` = auto-off (show "Turned off after repeated crashes" + notification-centre entry). On Started the service sends settings, language and theme. Later tasks add HostEvent variants additively. `pub(crate) trait HostApi { fn add_to_linker(&mut Linker<PluginState>) }` in runtime.rs: each api/* module implements it plus the generated `bindings::mumcord::plugin::<iface>::Host for PluginState`, and adds ONE line to `HOST_APIS`. `PluginState` has pub(crate) id, ctx, outbox, log, diag. `HostContext` is an empty Default struct; tasks add fields additively. `log` lives in runtime.rs (LogApi) and B11b may move it to api/log.rs. `cache::{key, path, prune(cache_dir, keep)}`. WIT types are at `mumcord_plugins::wit`. Import refusal text: "This plugin uses features Mumcord does not provide".
 - **mumbot 0.3.0 released** (https://github.com/Mumcord/mumbot/releases/tag/v0.3.0, includes the `plugins` module). For `scripts/mumbot.env`: MUMBOT_VERSION=0.3.0; MUMBOT_SHA256_linux_x86_64=2a294cbe3105e82d00a59a4ded77ce8e9bbe5bdf4deb1fdca8ba6422c1c619df; MUMBOT_SHA256_linux_aarch64=a501a9603a19863696555a6640ea8536c1f4eab16e1a09b5653a42fd82d1c354; MUMBOT_SHA256_windows_x86_64=9963fa8ab6bb7faf282289cc415111d0933f57c0d5a74b672cd88f51fc73a731; MUMBOT_SHA256_macos_universal=419b148c039045cfe58dd075003e99c21172322fa7c38a57e1285c2df35dce68.
 - **F2 (568a4fa0):** safety fixtures are prettier-clean; the builder writes only B4 manifest fields (`authors` as plain strings). All 15 parse with B4 rules, BUT they have no README.md/LICENSE: B16b must either add them, for fixtures signed as official (e.g. fx-webview-probe), or load the others as Repo/Dev.
+- **B15 (9f528c51 code, 7e4ae169 docs):** wire format in `docs/plugin-registry-format.md` (the repo address is the index.json URL; revoked.json has a `sequence`; key_rotation signs the new key's base64 line). `registry::Client::new(UrlPolicy::new(developer_mode))`. `fetch_official(&client, cache_dir, &official_base(mirror)?, last_seen) -> Loaded{index, freshness: Fresh|NotModified|Offline|Rejected(err)}`; the caller stores index.sequence. `fetch_revoked` merges with the bundled `crates/plugins/assets/revoked.json` and never fails offline. `RevocationList::find(id, ver, sha256_hex, author_key)` returns the strongest match (disable before warn). `IndexPlugin::{latest(), version(v), entry(v)}`, where entry() is a B14 IndexEntry. `client.download(url, size) -> Download{bytes, signature}` (body > size → Mismatch). Third-party: `check_repository_url(text, dev)`, `preview_repository(&client, url, expected_key, &is_official_id) -> RepoPreview{url, info{name, homepage, contact, public_key}, fingerprint, plugin_count, ignored}`, `fetch_repository(&client, cache_dir, &PluginRepository, &is_official_id) -> Loaded | Rotated{new_key, loaded} | KeyChanged{new_key, fingerprint}`; the caller persists last_sequence / replace key / pause("key-changed"). One cache dir per source (official, repo-<id>). UI texts are `registry::UNREACHABLE_TEXT` / `OFFLINE_TEXT`. Not covered: fetching v1/permissions.json.
+- **Plugin repo tasks (B39–B42):** each works in a clone of Mumcord/plugins on its own branch `feat/<plugin>` and opens a PR there (don't merge; the lead merges). Plugins depend on `mumcord-plugin-sdk` via a git dependency on Mumcord/mumcord branch `epic/plugins` (path `crates/plugin-sdk`), build with `cargo build --release --target wasm32-unknown-unknown`, and get AGPL-3.0 (LICENSE already in each folder).
