@@ -898,10 +898,11 @@ mod tests {
             assert!(samples.len() > 48_00, "{s:?} too short");
             // The ban sound is a two-part slapstick effect (impact, then a squeak) and keeps
             // its full second; the connect sound (also used for the party and share starts)
-            // is a 1.2 s chime; every other cue stays short.
+            // is a 1.2 s chime and the new-message sound a 1 s one; every other cue stays short.
             let max_ms = match s {
                 Sound::Banned => 1000,
                 Sound::VoiceJoin | Sound::PartyStarted | Sound::ShareStarted => 1200,
+                Sound::Message => 1000,
                 _ => 400,
             };
             assert!(

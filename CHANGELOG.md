@@ -9,6 +9,8 @@
 ### Added
 
 - New connect sound
+- New new-message sound
+- New microphone mute sound
 
 ### Fixed
 
