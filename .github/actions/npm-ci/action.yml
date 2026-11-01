@@ -1,0 +1,32 @@
+name: Install npm dependencies
+description: >-
+  Sets up Node.js and restores node_modules from the cache, keyed by the exact package-lock.json,
+  OS and Node version; runs npm ci only on a cache miss. Restoring takes seconds, npm ci about a
+  minute. Pull requests never save it (main and manual runs do): those that change the lockfile
+  run npm ci instead of filling the 10 GB repository cache with copies that evict main's caches.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 24
+
+    - id: key
+      shell: bash
+      run: echo "key=node-modules-$RUNNER_OS-$RUNNER_ARCH-$(node --version)-${{ hashFiles('package-lock.json') }}" >> "$GITHUB_OUTPUT"
+
+    - id: cache
+      uses: actions/cache/restore@v6
+      with:
+        path: node_modules
+        key: ${{ steps.key.outputs.key }}
+
+    - if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm ci
+
+    - if: steps.cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request'
+      uses: actions/cache/save@v6
+      with:
+        path: node_modules
+        key: ${{ steps.key.outputs.key }}

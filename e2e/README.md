@@ -65,7 +65,8 @@ certificates) live in `~/.cache/mumcord-build/e2e/` (override with `MUMCORD_E2E_
 - **CI shards:** `.github/workflows/e2e.yml` builds the image and the binaries once
   (`MUMCORD_E2E_STEP=build`), shares them as an artifact, and runs the shards of `e2e/shards.json`
   in parallel jobs (`MUMCORD_E2E_STEP=test MUMCORD_E2E_SHARD=<n>`, each runner with its own test
-  servers). The "Linux E2E" job fails if the build or any shard failed.
+  servers). The "Linux E2E" job fails if the build or any shard failed. A push to main runs only
+  the build job, to keep its caches warm for pull requests (which only restore caches).
 - **Shard balance:** ten shards, balanced by the measured CI duration of each spec file
   (`e2e/spec-durations.json`). The longest spec (network resilience, ~5 min in CI) is pinned alone
   to shard 1 and sets the floor; the others are spread longest-first onto the emptiest shard.

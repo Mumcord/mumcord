@@ -5,8 +5,13 @@ name: E2E
 # runs. One job builds the image and the debug binaries once, ten shard jobs run the spec files
 # of e2e/shards.json in parallel (each runner has its own test servers), and "Linux E2E" (the
 # check main's branch protection requires) passes only when all of them passed.
+# A push to main runs only the build job, to save the build caches there: pull requests can read
+# main's caches but not each other's, and they only restore, because one ~2 GB copy per pull
+# request filled the 10 GB repository cache and evicted everything else.
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
   workflow_dispatch:
 
@@ -52,13 +57,7 @@ jobs:
           SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: echo "MUMCORD_VERSION=dev~${SHA::7}" >> "$GITHUB_ENV"
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install npm dependencies
-        run: npm ci
+      - uses: ./.github/actions/npm-ci
 
       # A cache entry is never re-saved under the same key, so the week in the key makes the
       # target dir follow the code (one save per week) instead of drifting further from it.
@@ -71,7 +70,8 @@ jobs:
           echo "month=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
 
       # Cargo registry + target dir of the in-container build.
-      - uses: actions/cache@v6
+      - id: target-cache
+        uses: actions/cache/restore@v6
         with:
           path: ${{ env.MUMCORD_E2E_CACHE }}
           key: e2e-${{ hashFiles('Cargo.lock', 'e2e/Dockerfile') }}-${{ steps.keys.outputs.week }}
@@ -86,7 +86,7 @@ jobs:
           tags: mumcord-e2e
           load: true
           cache-from: type=gha,scope=e2e-image-${{ steps.keys.outputs.month }}
-          cache-to: type=gha,mode=max,scope=e2e-image-${{ steps.keys.outputs.month }}
+          cache-to: ${{ github.event_name != 'pull_request' && format('type=gha,mode=max,scope=e2e-image-{0}', steps.keys.outputs.month) || '' }}
 
       # No debug info and no incremental data: faster links and a smaller target cache.
       - name: Build image and binaries
@@ -97,9 +97,16 @@ jobs:
           CARGO_PROFILE_DEV_DEBUG: 0
           CARGO_INCREMENTAL: 0
 
+      - if: github.event_name != 'pull_request' && steps.target-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.MUMCORD_E2E_CACHE }}
+          key: ${{ steps.target-cache.outputs.cache-primary-key }}
+
       # zstd instead of the artifact zip: much faster for the ~3 GB image. tar keeps the
       # executable bits that artifacts would drop.
       - name: Package image and binaries
+        if: github.event_name != 'push'
         run: |
           docker save mumcord-e2e | zstd -T0 -3 -q -o e2e-image.tar.zst
           tar -C "$MUMCORD_E2E_CACHE/target/debug" -cf - mumcord mumbot netsim examples/libtest_plugin.so \
@@ -107,7 +114,8 @@ jobs:
             | zstd -T0 -3 -q -o e2e-bin.tar.zst
           ls -lh e2e-image.tar.zst e2e-bin.tar.zst
 
-      - uses: actions/upload-artifact@v7
+      - if: github.event_name != 'push'
+        uses: actions/upload-artifact@v7
         with:
           name: e2e-build
           path: |
@@ -120,6 +128,7 @@ jobs:
   shard:
     name: E2E shard ${{ matrix.shard }}
     needs: build
+    if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
@@ -130,13 +139,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install npm dependencies
-        run: npm ci
+      - uses: ./.github/actions/npm-ci
 
       - uses: actions/download-artifact@v8
         with:
@@ -169,7 +172,7 @@ jobs:
   e2e:
     name: Linux E2E
     needs: [changes, build, shard]
-    if: always()
+    if: always() && github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:

@@ -204,15 +204,13 @@ jobs:
         with:
           components: rustfmt, clippy
 
+      # Pull requests only restore: each one saving its own ~1 GB copy filled the 10 GB repository
+      # cache and evicted main's caches, so later runs started cold.
       - uses: Swatinem/rust-cache@v2
-
-      - uses: actions/setup-node@v7
         with:
-          node-version: 24
-          cache: npm
+          save-if: ${{ github.event_name != 'pull_request' }}
 
-      - name: Install npm dependencies
-        run: npm ci
+      - uses: ./.github/actions/npm-ci
 
       - name: Rust format
         run: cargo fmt --all --check
