@@ -52,11 +52,14 @@ export function AppShell({
   slots,
   inert = false,
   focus = false,
+  mediaPanel = false,
 }: {
   slots: ShellSlots;
   inert?: boolean;
   /** Focus mode of a media view: only the picture (issue #163, Z or Esc leaves it). */
   focus?: boolean;
+  /** A watch party or screen share panel fills the member column (issue #163). */
+  mediaPanel?: boolean;
 }) {
   const { t } = useTranslation("app");
   const [collapsed, setCollapsed] = useState(loadMembersCollapsed);
@@ -76,7 +79,7 @@ export function AppShell({
   const restoreFocus = useRef(false);
   const [overlayTop, setOverlayTop] = useState(0);
   const overlayShown = narrow && overlayOpen;
-  const widths = useColumnWidths(shellRef, serverBarRef);
+  const widths = useColumnWidths(shellRef, serverBarRef, mediaPanel);
 
   const toggleMembers = useCallback(() => {
     // Remember to move the focus before the focused element leaves with the column.
