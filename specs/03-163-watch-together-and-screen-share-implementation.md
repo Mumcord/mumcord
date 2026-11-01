@@ -50,18 +50,20 @@ Both views are rebuilt on one shared "media view" layer: the watch party and a w
 - **Playlist total duration** is only known for the entry that plays — the engine's link preview does not return durations for the other entries. The list shows duration where it is known, nothing elsewhere.
 - **PiP** as described in the issue (picture over the other columns) is the mini player + focus mode, not a system window (#164).
 - The issue's "Chat tab" in the right panel: the panel shows the *Watching* list; chat remains below the view. Not implemented as a tab yet.
+- **Extra line in the share view header.** Besides what FR-3.126 lists, the header names how the picture arrives and whether the IP is hidden ("Direct · IP visible"). The mockup has no such line; it comes from the peer-to-peer feature (FR-4.19) that the old floating viewer showed, and the redesign would have dropped it with that viewer. It stays: the user can see here whether the connection is direct or through a relay, and whether the other side sees their address.
 
 ## Checks (as of this report)
 
 | Check | Result |
 |---|---|
 | `npm run typecheck` | clean |
-| `npm test` | 157 files, 1945 tests pass |
+| `npm test` | 190 files, 2208 tests pass (after the rebase on main; the share button, its blocking reasons and the sound of the own share are tested again in `sharer.test.tsx`) |
 | `npm run lint` | 0 errors, 4 fast-refresh warnings (same class as existing files) |
 | `cargo test -p mumcord-engine --lib` | 402 pass |
 | i18n tests | 102 pass |
 | Live tests against the local test server (`testenv/up.sh v15`) | ✅ 2026-11-01: `live_watch_party` 4 pass (new: each player reports where it is, host/crown), `live_screen_share` 2 pass (new: source + elapsed reach the viewer), `live_screen_share_media` 1 pass |
-| E2E specs for the two views (UI) | **not written yet** |
+| E2E specs for the two views (UI) | the sharer control bar spec (`e2e/specs/media/share-bar.e2e.ts`) runs in the container; the watch together spec is not written yet |
+| Screenshots (dark and light) of the share view | regenerated from the mock on 2026-11-01 with an ad-hoc Playwright run at 1280×800, scale 1; the mock has no peer, so the picture is its placeholder and the frame chips read `0×0 / 0 fps / 0 kbit/s` |
 | Dark/light screenshots | **not produced** |
 
 ## Acceptance criteria status
@@ -80,8 +82,8 @@ Both views are rebuilt on one shared "media view" layer: the watch party and a w
 
 ## Next steps
 
-1. Write and run the two e2e specs (UI) against the local test server (watch together: second client joins, control moves, sync within 2 s; screen share: figures change, viewer count, quality for one viewer).
-2. Dark and light screenshots of all three views in the running client → `docs/images/screenshots/`, embedded in the PR description.
+1. Write and run the watch together e2e spec (UI) against the local test server (second client joins, control moves, sync within 2 s). The sharer control bar spec already runs in the container; screen share figures, viewer count and per-viewer quality still need their spec.
+2. Dark and light screenshots of the three views → `docs/images/screenshots/`, embedded in the PR description. The share view pair is regenerated (2026-11-01, now with the connection line); the cinema view and the sharer bar shots come from an earlier run and should be retaken against the running client.
 3. Human pass on the new translations (ga, mt, hu, hr, et, lv especially).
 4. Decide: "Previous" button, playlist durations, Chat tab in the panel.
 5. Push and open the PR only on request.
