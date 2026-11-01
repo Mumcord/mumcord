@@ -58,6 +58,21 @@ describe("changedSettings", () => {
     expect(ids(changedSettings(shared, baselineDraft(base, "balanced")))).toEqual(["nowPlaying"]);
   });
 
+  it("counts the update question answered with No as no change, since both mean Off", async () => {
+    const base = defaultDraft(await defaults(), true);
+    expect(base.settings.updateCheck).toBe("unset");
+    const balanced = applyPreset(base, "balanced");
+    const answered = {
+      ...balanced,
+      settings: { ...balanced.settings, updateCheck: "no" as const },
+    };
+    expect(changedSettings(answered, baselineDraft(base, "balanced"))).toEqual([]);
+    const notify = { ...balanced, settings: { ...balanced.settings, updateCheck: "yes" as const } };
+    expect(ids(changedSettings(notify, baselineDraft(base, "balanced")))).toEqual([
+      "updateCheck+updateAutoDownload",
+    ]);
+  });
+
   it("compares with the defaults for Custom", async () => {
     const base = defaultDraft(await defaults(), true);
     const custom: PresetDraft = {

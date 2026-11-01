@@ -14,6 +14,7 @@ import {
   type PresetKey,
 } from "../wizard/presets";
 import type { SectionId } from "./sectionIds";
+import { updateModeOf } from "../updates/updateMode";
 
 /**
  * "Changed" badges, the sidebar dots and "Reset section" (#161). Every setting the Settings
@@ -148,7 +149,12 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   top("general", "appearance.autostart", ["autostart"]),
   top("general", "appearance.startMinimized", ["startMinimized"]),
   top("general", "language.legend", ["language"]),
-  top("general", "updates.mode", ["updateCheck", "updateAutoDownload"]),
+  {
+    ...top("general", "updates.mode", ["updateCheck", "updateAutoDownload"]),
+    // Compared as the mode the page shows: answering the first-start question with No stores
+    // "no" instead of "unset", but both mean Off, so it is no change from the preset.
+    read: (draft) => updateModeOf(draft.settings),
+  },
   top("general", "updates.interval", ["updateIntervalHours"]),
   top("general", "accessibility.keyboardHints", ["keyboardHints"]),
   top("general", "accessibility.announcements", ["announcements"]),
