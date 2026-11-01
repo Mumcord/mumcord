@@ -71,7 +71,8 @@ pub const CHANGELOG: Spec = Spec {
 };
 
 /// What both media pop-outs need: their own window state, the main window's look, and the
-/// server snapshot for the names, avatars and channel the overlay shows.
+/// server state (connections, snapshot, profiles) for the names, avatars and channel the overlay
+/// shows. All of it is read-only.
 macro_rules! popout_commands {
     ($($extra:literal),* $(,)?) => {
         &[
@@ -80,15 +81,18 @@ macro_rules! popout_commands {
             "media_popout_close",
             "media_popout_set_on_top",
             "media_popout_set_title",
+            "connections_list",
+            "voice_server_get",
             "session_snapshot",
+            "person_profile",
             $($extra),*
         ]
     };
 }
 
 /// The watch party player in its own window (issue #164). It drives the party exactly like the
-/// docked player: play, pause, seek and skip, its position reports, and `app_info` for the
-/// codec hint.
+/// docked player: play, pause, seek and skip, its position reports, `link_preview` for the video
+/// title and `app_info` for the codec hint.
 pub const WATCH_POPOUT: Spec = Spec {
     label: "media-popout-watch",
     url: "index.html?window=media-popout&kind=watch",
@@ -97,6 +101,7 @@ pub const WATCH_POPOUT: Spec = Spec {
     min_size: (320.0, 200.0),
     geometry_file: "media-popout-watch-window.json",
     allowed_commands: popout_commands![
+        "link_preview",
         "app_info",
         "watch_party_get",
         "watch_party_player_url",
@@ -108,7 +113,8 @@ pub const WATCH_POPOUT: Spec = Spec {
 };
 
 /// A watched screen share in its own window (issue #164). It takes over the frames of the
-/// running watch (`screen_share_frames_attach`) but can neither start nor stop watching.
+/// running watch (`screen_share_frames_attach`) but can neither start nor stop watching;
+/// `p2p_link` names the path in the stream details.
 pub const SHARE_POPOUT: Spec = Spec {
     label: "media-popout-share",
     url: "index.html?window=media-popout&kind=share",
@@ -117,6 +123,7 @@ pub const SHARE_POPOUT: Spec = Spec {
     min_size: (320.0, 200.0),
     geometry_file: "media-popout-share-window.json",
     allowed_commands: popout_commands![
+        "p2p_link",
         "screen_share_list",
         "screen_share_frames_attach",
         "screen_share_request_keyframe",
@@ -365,7 +372,11 @@ mod tests {
             "media_popout_close",
             "media_popout_set_on_top",
             "media_popout_set_title",
+            "connections_list",
+            "voice_server_get",
             "session_snapshot",
+            "person_profile",
+            "link_preview",
             "app_info",
             "watch_party_get",
             "watch_party_player_url",
@@ -401,7 +412,11 @@ mod tests {
             "media_popout_close",
             "media_popout_set_on_top",
             "media_popout_set_title",
+            "connections_list",
+            "voice_server_get",
             "session_snapshot",
+            "person_profile",
+            "p2p_link",
             "screen_share_list",
             "screen_share_frames_attach",
             "screen_share_request_keyframe",
