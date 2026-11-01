@@ -15,7 +15,8 @@
     "advanced": "Erweitert & Entwickler",
     "about": "Über",
     "packetInspector": "Paketinspektor",
-    "hotkeys": "Tastenkürzel"
+    "hotkeys": "Tastenkürzel",
+    "plugins": "Plugins"
   },
   "sectionDescriptions": {
     "general": "Start, Sprache, Updates und Barrierefreiheit.",
@@ -27,7 +28,8 @@
     "servers": "Verbindungen zu mehreren Servern und Einstellungen pro Server.",
     "gaming": "Das Ingame-Overlay, Positionsaudio und Spiel-Plugins.",
     "advanced": "Entwicklerwerkzeuge, Diagnose, Speicher und Lizenzen.",
-    "about": "Version, Support und der Einrichtungsassistent."
+    "about": "Version, Support und der Einrichtungsassistent.",
+    "plugins": "Plugins installieren, aktualisieren und verwalten."
   },
   "breadcrumb": "Einstellungen / {{section}}",
   "moreInfo": "Mehr Informationen: {{topic}}",
@@ -1036,5 +1038,10 @@
     "addConfirm": "Hinzufügen",
     "reset": "Alle Tastenkürzel zurücksetzen",
     "resetHint": "Entfernt alle Tastenkürzel außer Push-to-Talk; standardmäßig ist nichts festgelegt."
+  },
+  "developerMode": {
+    "title": "Entwicklermodus",
+    "switch": "Entwicklermodus",
+    "hint": "Fügt den Plugins einen Entwickler-Tab hinzu, in dem du unsignierte Plugins aus einem Ordner laden kannst. Schalte ihn nur ein, wenn du selbst Plugins baust."
   }
 }

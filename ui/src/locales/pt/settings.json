@@ -15,7 +15,8 @@
     "advanced": "Avançado e programador",
     "about": "Acerca de",
     "packetInspector": "Inspetor de pacotes",
-    "hotkeys": "Atalhos"
+    "hotkeys": "Atalhos",
+    "plugins": "Plugins"
   },
   "sectionDescriptions": {
     "general": "Arranque, idioma, atualizações e acessibilidade.",
@@ -27,7 +28,8 @@
     "servers": "Ligações a vários servidores e definições por servidor.",
     "gaming": "A sobreposição no jogo, áudio posicional e plugins de jogos.",
     "advanced": "Ferramentas de programador, diagnóstico, armazenamento e licenças.",
-    "about": "Versão, suporte e o assistente de configuração."
+    "about": "Versão, suporte e o assistente de configuração.",
+    "plugins": "Instale, atualize e gira plugins."
   },
   "breadcrumb": "Definições / {{section}}",
   "moreInfo": "Mais informações: {{topic}}",
@@ -1044,5 +1046,10 @@
     "addConfirm": "Adicionar",
     "reset": "Repor todos os atalhos",
     "resetHint": "Remove todos os atalhos exceto push-to-talk; por predefinição, nenhum está definido."
+  },
+  "developerMode": {
+    "title": "Modo de programador",
+    "switch": "Modo de programador",
+    "hint": "Adiciona um separador Programador aos plugins para carregar plugins não assinados de uma pasta. Ative apenas se criar plugins."
   }
 }

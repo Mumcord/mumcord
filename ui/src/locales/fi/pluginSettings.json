@@ -1,0 +1,23 @@
+{
+  "title": "Lisäosat",
+  "tabsLabel": "Lisäosien osiot",
+  "tabs": {
+    "installed": "Asennetut",
+    "browse": "Selaa",
+    "updates": "Päivitykset",
+    "repositories": "Arkistot",
+    "developer": "Kehittäjä"
+  },
+  "turnOffAll": "Poista kaikki lisäosat käytöstä",
+  "turnOnAll": "Ota lisäosat taas käyttöön",
+  "allOff": "Kaikki lisäosat on poistettu käytöstä. Ne pysyvät pois käytöstä myös uudelleenkäynnistyksen jälkeen, kunnes otat ne uudelleen käyttöön.",
+  "noPlugins": "Lisäosat ovat pois käytöstä tässä istunnossa (käynnistetty valinnalla --no-plugins).",
+  "loadFailed": "Lisäosia ei voitu ladata.",
+  "palette": {
+    "label": "Komentopaletti",
+    "placeholder": "Kirjoita komento",
+    "empty": "Ei vastaavaa komentoa",
+    "openPlugins": "Lisäosat",
+    "turnOffAll": "Poista kaikki lisäosat käytöstä"
+  }
+}

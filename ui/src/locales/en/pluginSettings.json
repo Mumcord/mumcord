@@ -1,0 +1,23 @@
+{
+  "title": "Plugins",
+  "tabsLabel": "Plugin sections",
+  "tabs": {
+    "installed": "Installed",
+    "browse": "Browse",
+    "updates": "Updates",
+    "repositories": "Repositories",
+    "developer": "Developer"
+  },
+  "turnOffAll": "Turn off all plugins",
+  "turnOnAll": "Turn plugins on again",
+  "allOff": "All plugins are turned off. They stay off, also after a restart, until you turn them on again.",
+  "noPlugins": "Plugins are off for this session (started with --no-plugins).",
+  "loadFailed": "Plugins could not be loaded.",
+  "palette": {
+    "label": "Command palette",
+    "placeholder": "Type a command",
+    "empty": "No matching command",
+    "openPlugins": "Plugins",
+    "turnOffAll": "Turn off all plugins"
+  }
+}

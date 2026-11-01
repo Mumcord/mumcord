@@ -15,7 +15,8 @@
     "advanced": "Napredno i razvoj",
     "about": "O aplikaciji",
     "packetInspector": "Inspektor paketa",
-    "hotkeys": "Prečaci"
+    "hotkeys": "Prečaci",
+    "plugins": "Dodaci"
   },
   "sectionDescriptions": {
     "general": "Pokretanje, jezik, ažuriranja i pristupačnost.",
@@ -27,7 +28,8 @@
     "servers": "Veze s više poslužitelja i postavke po poslužitelju.",
     "gaming": "Overlay u igri, pozicijski zvuk i dodaci za igre.",
     "advanced": "Razvojni alati, dijagnostika, pohrana i licence.",
-    "about": "Verzija, podrška i čarobnjak za postavljanje."
+    "about": "Verzija, podrška i čarobnjak za postavljanje.",
+    "plugins": "Instalirajte, ažurirajte i upravljajte dodacima."
   },
   "breadcrumb": "Postavke / {{section}}",
   "moreInfo": "Više informacija: {{topic}}",
@@ -1044,5 +1046,10 @@
     "addConfirm": "Dodaj",
     "reset": "Vrati sve prečace na zadano",
     "resetHint": "Uklanja sve prečace osim pritisni za govor; prema zadanim postavkama ništa nije postavljeno."
+  },
+  "developerMode": {
+    "title": "Programerski način",
+    "switch": "Programerski način",
+    "hint": "Dodacima dodaje karticu Programer na kojoj možete učitati nepotpisane dodatke iz mape. Uključite ga samo ako sami izrađujete dodatke."
   }
 }

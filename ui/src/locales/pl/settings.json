@@ -15,7 +15,8 @@
     "advanced": "Zaawansowane i dla programistów",
     "about": "O aplikacji",
     "packetInspector": "Inspektor pakietów",
-    "hotkeys": "Skróty klawiszowe"
+    "hotkeys": "Skróty klawiszowe",
+    "plugins": "Wtyczki"
   },
   "sectionDescriptions": {
     "general": "Uruchamianie, język, aktualizacje i dostępność.",
@@ -27,7 +28,8 @@
     "servers": "Połączenia z wieloma serwerami i ustawienia dla każdego serwera.",
     "gaming": "Nakładka w grze, dźwięk pozycyjny i wtyczki do gier.",
     "advanced": "Narzędzia deweloperskie, diagnostyka, pamięć i licencje.",
-    "about": "Wersja, pomoc i kreator konfiguracji."
+    "about": "Wersja, pomoc i kreator konfiguracji.",
+    "plugins": "Instaluj, aktualizuj i zarządzaj wtyczkami."
   },
   "breadcrumb": "Ustawienia / {{section}}",
   "moreInfo": "Więcej informacji: {{topic}}",
@@ -1052,5 +1054,10 @@
     "addConfirm": "Dodaj",
     "reset": "Zresetuj wszystkie skróty",
     "resetHint": "Usuwa wszystkie skróty oprócz push-to-talk; domyślnie nic nie jest ustawione."
+  },
+  "developerMode": {
+    "title": "Tryb dewelopera",
+    "switch": "Tryb dewelopera",
+    "hint": "Dodaje do wtyczek kartę Deweloper, w której możesz wczytać niepodpisane wtyczki z folderu. Włącz ją tylko, jeśli sam tworzysz wtyczki."
   }
 }

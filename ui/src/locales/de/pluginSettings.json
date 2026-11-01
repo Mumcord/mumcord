@@ -1,0 +1,23 @@
+{
+  "title": "Plugins",
+  "tabsLabel": "Plugin-Bereiche",
+  "tabs": {
+    "installed": "Installiert",
+    "browse": "Entdecken",
+    "updates": "Updates",
+    "repositories": "Quellen",
+    "developer": "Entwickler"
+  },
+  "turnOffAll": "Alle Plugins ausschalten",
+  "turnOnAll": "Plugins wieder einschalten",
+  "allOff": "Alle Plugins sind ausgeschaltet. Sie bleiben aus, auch nach einem Neustart, bis du sie wieder einschaltest.",
+  "noPlugins": "Plugins sind für diese Sitzung aus (gestartet mit --no-plugins).",
+  "loadFailed": "Die Plugins konnten nicht geladen werden.",
+  "palette": {
+    "label": "Befehlspalette",
+    "placeholder": "Befehl eingeben",
+    "empty": "Kein passender Befehl",
+    "openPlugins": "Plugins",
+    "turnOffAll": "Alle Plugins ausschalten"
+  }
+}

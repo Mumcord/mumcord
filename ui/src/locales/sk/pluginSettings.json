@@ -1,0 +1,23 @@
+{
+  "title": "Doplnky",
+  "tabsLabel": "Sekcie doplnkov",
+  "tabs": {
+    "installed": "Nainštalované",
+    "browse": "Prehliadať",
+    "updates": "Aktualizácie",
+    "repositories": "Repozitáre",
+    "developer": "Vývojár"
+  },
+  "turnOffAll": "Vypnúť všetky doplnky",
+  "turnOnAll": "Znova zapnúť doplnky",
+  "allOff": "Všetky doplnky sú vypnuté. Zostanú vypnuté aj po reštarte, kým ich znova nezapnete.",
+  "noPlugins": "Doplnky sú pre túto reláciu vypnuté (spustené s --no-plugins).",
+  "loadFailed": "Doplnky sa nepodarilo načítať.",
+  "palette": {
+    "label": "Paleta príkazov",
+    "placeholder": "Zadajte príkaz",
+    "empty": "Žiadny zodpovedajúci príkaz",
+    "openPlugins": "Doplnky",
+    "turnOffAll": "Vypnúť všetky doplnky"
+  }
+}

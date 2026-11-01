@@ -15,7 +15,8 @@
     "advanced": "Geavanceerd en ontwikkelaar",
     "about": "Over",
     "packetInspector": "Pakketinspecteur",
-    "hotkeys": "Sneltoetsen"
+    "hotkeys": "Sneltoetsen",
+    "plugins": "Plug-ins"
   },
   "sectionDescriptions": {
     "general": "Opstarten, taal, updates en toegankelijkheid.",
@@ -27,7 +28,8 @@
     "servers": "Verbindingen met meerdere servers en instellingen per server.",
     "gaming": "De overlay in games, positionele audio en game-plug-ins.",
     "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
-    "about": "Versie, ondersteuning en de installatiewizard."
+    "about": "Versie, ondersteuning en de installatiewizard.",
+    "plugins": "Plug-ins installeren, bijwerken en beheren."
   },
   "breadcrumb": "Instellingen / {{section}}",
   "moreInfo": "Meer informatie: {{topic}}",
@@ -1036,5 +1038,10 @@
     "addConfirm": "Toevoegen",
     "reset": "Alle sneltoetsen resetten",
     "resetHint": "Verwijdert alle sneltoetsen behalve push-to-talk; standaard is er niets ingesteld."
+  },
+  "developerMode": {
+    "title": "Ontwikkelaarsmodus",
+    "switch": "Ontwikkelaarsmodus",
+    "hint": "Voegt een tabblad Ontwikkelaar toe aan Plug-ins om niet-ondertekende plug-ins uit een map te laden. Zet dit alleen aan als je zelf plug-ins maakt."
   }
 }

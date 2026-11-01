@@ -1,0 +1,37 @@
+import { useEffect } from "react";
+import { getApi } from "../../api";
+import { usePreferences } from "../../app/preferences";
+import { PluginsPalette } from "./PluginsPalette";
+
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+const prefersReducedMotion = () =>
+  typeof window.matchMedia === "function" && window.matchMedia(REDUCED_MOTION).matches;
+
+/**
+ * Tells the plugins which language and colour scheme the app shows (plugins draw their UI in
+ * them, B18) and hosts the command palette. Mount once in the app shell.
+ */
+export function PluginsHost() {
+  const { language, resolvedTheme } = usePreferences();
+  const dark = resolvedTheme === "dark";
+
+  useEffect(() => {
+    const send = () => {
+      getApi()
+        .pluginsSetAppearance(language, dark, prefersReducedMotion())
+        .catch((error: unknown) => {
+          console.error("Sending the appearance to the plugins failed", error);
+        });
+    };
+    send();
+    if (typeof window.matchMedia !== "function") return;
+    const query = window.matchMedia(REDUCED_MOTION);
+    query.addEventListener("change", send);
+    return () => {
+      query.removeEventListener("change", send);
+    };
+  }, [language, dark]);
+
+  return <PluginsPalette />;
+}

@@ -15,7 +15,8 @@
     "advanced": "Papildoma ir kūrėjams",
     "about": "Apie",
     "packetInspector": "Paketų tikrintuvas",
-    "hotkeys": "Spartieji klavišai"
+    "hotkeys": "Spartieji klavišai",
+    "plugins": "Papildiniai"
   },
   "sectionDescriptions": {
     "general": "Paleidimas, kalba, atnaujinimai ir prieinamumas.",
@@ -27,7 +28,8 @@
     "servers": "Ryšiai su keliais serveriais ir kiekvieno serverio nustatymai.",
     "gaming": "Perdanga žaidime, pozicinis garsas ir žaidimų papildiniai.",
     "advanced": "Kūrėjų įrankiai, diagnostika, saugykla ir licencijos.",
-    "about": "Versija, pagalba ir sąrankos vedlys."
+    "about": "Versija, pagalba ir sąrankos vedlys.",
+    "plugins": "Diekite, naujinkite ir tvarkykite papildinius."
   },
   "breadcrumb": "Nustatymai / {{section}}",
   "moreInfo": "Daugiau informacijos: {{topic}}",
@@ -1052,5 +1054,10 @@
     "addConfirm": "Pridėti",
     "reset": "Atstatyti visus spartuosius klavišus",
     "resetHint": "Pašalina visus spartuosius klavišus, išskyrus spausk ir kalbėk; pagal numatytuosius nustatymus nieko nenustatyta."
+  },
+  "developerMode": {
+    "title": "Kūrėjo režimas",
+    "switch": "Kūrėjo režimas",
+    "hint": "Prie papildinių prideda kortelę Kūrėjas, kurioje galima įkelti nepasirašytus papildinius iš aplanko. Įjunkite tik jei patys kuriate papildinius."
   }
 }

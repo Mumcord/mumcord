@@ -1,0 +1,23 @@
+{
+  "title": "Papildiniai",
+  "tabsLabel": "Papildinių skyriai",
+  "tabs": {
+    "installed": "Įdiegti",
+    "browse": "Naršyti",
+    "updates": "Naujinimai",
+    "repositories": "Saugyklos",
+    "developer": "Kūrėjas"
+  },
+  "turnOffAll": "Išjungti visus papildinius",
+  "turnOnAll": "Vėl įjungti papildinius",
+  "allOff": "Visi papildiniai išjungti. Jie lieka išjungti, net ir paleidus iš naujo, kol vėl juos įjungsite.",
+  "noPlugins": "Papildiniai šiai sesijai išjungti (paleista su --no-plugins).",
+  "loadFailed": "Nepavyko įkelti papildinių.",
+  "palette": {
+    "label": "Komandų paletė",
+    "placeholder": "Įveskite komandą",
+    "empty": "Nėra tinkamos komandos",
+    "openPlugins": "Papildiniai",
+    "turnOffAll": "Išjungti visus papildinius"
+  }
+}

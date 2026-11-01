@@ -1,0 +1,23 @@
+{
+  "title": "Plugins",
+  "tabsLabel": "Secciones de plugins",
+  "tabs": {
+    "installed": "Instalados",
+    "browse": "Explorar",
+    "updates": "Actualizaciones",
+    "repositories": "Repositorios",
+    "developer": "Desarrollador"
+  },
+  "turnOffAll": "Desactivar todos los plugins",
+  "turnOnAll": "Volver a activar los plugins",
+  "allOff": "Todos los plugins están desactivados. Seguirán así, incluso tras reiniciar, hasta que los actives de nuevo.",
+  "noPlugins": "Los plugins están desactivados en esta sesión (iniciada con --no-plugins).",
+  "loadFailed": "No se pudieron cargar los plugins.",
+  "palette": {
+    "label": "Paleta de comandos",
+    "placeholder": "Escribe un comando",
+    "empty": "Ningún comando coincide",
+    "openPlugins": "Plugins",
+    "turnOffAll": "Desactivar todos los plugins"
+  }
+}

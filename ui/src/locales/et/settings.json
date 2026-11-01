@@ -15,7 +15,8 @@
     "advanced": "Täpsemad ja arendaja",
     "about": "Teave",
     "packetInspector": "Pakettide inspektor",
-    "hotkeys": "Kiirklahvid"
+    "hotkeys": "Kiirklahvid",
+    "plugins": "Pluginad"
   },
   "sectionDescriptions": {
     "general": "Käivitamine, keel, uuendused ja juurdepääsetavus.",
@@ -27,7 +28,8 @@
     "servers": "Ühendused mitme serveriga ja serveripõhised seaded.",
     "gaming": "Mängusisene ülekate, positsiooniheli ja mängupluginad.",
     "advanced": "Arendaja tööriistad, diagnostika, salvestusruum ja litsentsid.",
-    "about": "Versioon, tugi ja seadistusviisard."
+    "about": "Versioon, tugi ja seadistusviisard.",
+    "plugins": "Paigalda, uuenda ja halda plugin."
   },
   "breadcrumb": "Seaded / {{section}}",
   "moreInfo": "Lisateave: {{topic}}",
@@ -1036,5 +1038,10 @@
     "addConfirm": "Lisa",
     "reset": "Lähtesta kõik kiirklahvid",
     "resetHint": "Eemaldab kõik kiirklahvid peale vajuta-ja-räägi; vaikimisi pole midagi seatud."
+  },
+  "developerMode": {
+    "title": "Arendajarežiim",
+    "switch": "Arendajarežiim",
+    "hint": "Lisab pluginate alla vahekaardi Arendaja, kus saab kaustast laadida allkirjastamata pluginaid. Lülita sisse ainult siis, kui ehitad ise pluginaid."
   }
 }

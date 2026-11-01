@@ -15,7 +15,8 @@
     "advanced": "Papildu un izstrādātājiem",
     "about": "Par lietotni",
     "packetInspector": "Pakešu inspektors",
-    "hotkeys": "Īsinājumtaustiņi"
+    "hotkeys": "Īsinājumtaustiņi",
+    "plugins": "Spraudņi"
   },
   "sectionDescriptions": {
     "general": "Palaišana, valoda, atjauninājumi un pieejamība.",
@@ -27,7 +28,8 @@
     "servers": "Savienojumi ar vairākiem serveriem un iestatījumi katram serverim.",
     "gaming": "Pārklājums spēlē, pozicionālā skaņa un spēļu spraudņi.",
     "advanced": "Izstrādātāju rīki, diagnostika, krātuve un licences.",
-    "about": "Versija, atbalsts un iestatīšanas vednis."
+    "about": "Versija, atbalsts un iestatīšanas vednis.",
+    "plugins": "Instalējiet, atjauniniet un pārvaldiet spraudņus."
   },
   "breadcrumb": "Iestatījumi / {{section}}",
   "moreInfo": "Papildinformācija: {{topic}}",
@@ -1044,5 +1046,10 @@
     "addConfirm": "Pievienot",
     "reset": "Atiestatīt visus īsinājumtaustiņus",
     "resetHint": "Noņem visus īsinājumtaustiņus, izņemot push-to-talk; pēc noklusējuma nekas nav iestatīts."
+  },
+  "developerMode": {
+    "title": "Izstrādātāja režīms",
+    "switch": "Izstrādātāja režīms",
+    "hint": "Pievieno spraudņiem cilni Izstrādātājs, kurā var ielādēt neparakstītus spraudņus no mapes. Ieslēdziet to tikai tad, ja paši veidojat spraudņus."
   }
 }

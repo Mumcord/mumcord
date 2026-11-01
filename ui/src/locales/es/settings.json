@@ -15,7 +15,8 @@
     "advanced": "Avanzado y desarrollo",
     "about": "Acerca de",
     "packetInspector": "Inspector de paquetes",
-    "hotkeys": "Atajos"
+    "hotkeys": "Atajos",
+    "plugins": "Plugins"
   },
   "sectionDescriptions": {
     "general": "Inicio, idioma, actualizaciones y accesibilidad.",
@@ -27,7 +28,8 @@
     "servers": "Conexiones a varios servidores y ajustes por servidor.",
     "gaming": "El overlay en el juego, el audio posicional y los plugins de juegos.",
     "advanced": "Herramientas de desarrollo, diagnóstico, almacenamiento y licencias.",
-    "about": "Versión, soporte y el asistente de configuración."
+    "about": "Versión, soporte y el asistente de configuración.",
+    "plugins": "Instala, actualiza y gestiona plugins."
   },
   "breadcrumb": "Ajustes / {{section}}",
   "moreInfo": "Más información: {{topic}}",
@@ -1044,5 +1046,10 @@
     "addConfirm": "Añadir",
     "reset": "Restablecer todos los atajos",
     "resetHint": "Quita todos los atajos excepto pulsar para hablar; por defecto no hay ninguno."
+  },
+  "developerMode": {
+    "title": "Modo desarrollador",
+    "switch": "Modo desarrollador",
+    "hint": "Añade una pestaña Desarrollador a Plugins para cargar plugins sin firmar desde una carpeta. Actívalo solo si creas plugins."
   }
 }

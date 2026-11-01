@@ -15,7 +15,8 @@
     "advanced": "Lisäasetukset ja kehittäjä",
     "about": "Tietoja",
     "packetInspector": "Pakettitarkastin",
-    "hotkeys": "Pikanäppäimet"
+    "hotkeys": "Pikanäppäimet",
+    "plugins": "Lisäosat"
   },
   "sectionDescriptions": {
     "general": "Käynnistys, kieli, päivitykset ja saavutettavuus.",
@@ -27,7 +28,8 @@
     "servers": "Yhteydet useisiin palvelimiin ja palvelinkohtaiset asetukset.",
     "gaming": "Pelinaikainen peittokuva, paikkaääni ja pelilaajennukset.",
     "advanced": "Kehittäjätyökalut, diagnostiikka, tallennustila ja lisenssit.",
-    "about": "Versio, tuki ja käyttöönottoavustaja."
+    "about": "Versio, tuki ja käyttöönottoavustaja.",
+    "plugins": "Asenna, päivitä ja hallitse lisäosia."
   },
   "breadcrumb": "Asetukset / {{section}}",
   "moreInfo": "Lisätietoja: {{topic}}",
@@ -1036,5 +1038,10 @@
     "addConfirm": "Lisää",
     "reset": "Nollaa kaikki pikanäppäimet",
     "resetHint": "Poistaa kaikki pikanäppäimet paitsi Puhu painamalla; oletuksena mitään ei ole asetettu."
+  },
+  "developerMode": {
+    "title": "Kehittäjätila",
+    "switch": "Kehittäjätila",
+    "hint": "Lisää Lisäosiin Kehittäjä-välilehden, jolla voit ladata allekirjoittamattomia lisäosia kansiosta. Ota se käyttöön vain, jos teet itse lisäosia."
   }
 }
