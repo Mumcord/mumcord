@@ -90,6 +90,34 @@
     "export": "Podatkov ni bilo mogoče izvoziti.",
     "reset": "Podatkov ni bilo mogoče ponastaviti.",
     "remove": "Vtičnika ni bilo mogoče odstraniti.",
-    "badge": "Značke ni bilo mogoče spremeniti."
+    "badge": "Značke ni bilo mogoče spremeniti.",
+    "update": "Vtičnika ni bilo mogoče posodobiti."
+  },
+  "update": {
+    "hint": "Posodobitev {{version}}",
+    "button": "Posodobi"
+  },
+  "visibilityChip": "Komunicira z drugimi uporabniki Mumcorda · {{visibility}}",
+  "chips": {
+    "label": "Uporabljena dovoljenja",
+    "uiPanel": "Plošča",
+    "uiMemberBadge": "Značka člana",
+    "uiProfileCard": "Kartica profila",
+    "uiChatCard": "Klepetalne kartice",
+    "uiUserMenu": "Uporabniški meni",
+    "uiDialog": "Lastno okno",
+    "uiWebview": "Spletna vsebina",
+    "eventsSelf": "Vaš status",
+    "eventsVoice": "Glasovna dejavnost",
+    "eventsPresence": "Prihodi in odhodi",
+    "eventsChatActivity": "Dejavnost v klepetu",
+    "notify": "Obvestila",
+    "randomBytes": "Naključna števila",
+    "commands": "Ukazi",
+    "chatSend": "Piše v klepet",
+    "chatSupersedes": "Nadomesti svojo besedilno vrstico",
+    "chatTriggers": "Sprožilne besede",
+    "netHttp": "Dostop do interneta",
+    "secrets": "Obesek za ključe"
   }
 }

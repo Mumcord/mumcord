@@ -1,4 +1,5 @@
 import type { InstalledPlugin } from "../../../api";
+import { permissionTextKey } from "../permissions/catalogue";
 
 /** A label on a plugin row; `key` is in the `pluginInstalled` namespace. */
 export interface RowLabel {
@@ -77,4 +78,37 @@ export const MESSAGES_PERMISSION = "peers.messages";
 
 export function requests(plugin: InstalledPlugin, permission: string): boolean {
   return plugin.required.includes(permission) || plugin.optional.some((p) => p.id === permission);
+}
+
+/** Chip order on a card: what the plugin shows, then what it reads or does. */
+const CHIP_PERMISSIONS = [
+  "ui.panel",
+  "ui.member-badge",
+  "ui.profile-card",
+  "ui.chat-card",
+  "ui.user-menu",
+  "ui.dialog",
+  "ui.webview",
+  "events.self",
+  "events.voice",
+  "events.presence",
+  "events.chat-activity",
+  "notify",
+  "random.bytes",
+  "commands",
+  "chat.send",
+  "chat.supersedes",
+  "chat.triggers",
+  "net.http",
+  "secrets",
+] as const;
+
+/**
+ * Keys (under `chips` in `pluginInstalled`) for the permissions the plugin asks for and has: all
+ * required ones and the optional ones that are on. `peers.messages` is shown as the visibility
+ * chip instead.
+ */
+export function permissionChips(plugin: InstalledPlugin): string[] {
+  const active = new Set([...plugin.required, ...plugin.granted]);
+  return CHIP_PERMISSIONS.filter((id) => active.has(id)).map(permissionTextKey);
 }

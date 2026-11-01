@@ -90,6 +90,34 @@
     "export": "Neizdevās eksportēt datus.",
     "reset": "Neizdevās atiestatīt datus.",
     "remove": "Neizdevās noņemt spraudni.",
-    "badge": "Neizdevās mainīt nozīmīti."
+    "badge": "Neizdevās mainīt nozīmīti.",
+    "update": "Spraudni neizdevās atjaunināt."
+  },
+  "update": {
+    "hint": "Atjauninājums {{version}}",
+    "button": "Atjaunināt"
+  },
+  "visibilityChip": "Sazinās ar citiem Mumcord lietotājiem · {{visibility}}",
+  "chips": {
+    "label": "Izmantotās atļaujas",
+    "uiPanel": "Panelis",
+    "uiMemberBadge": "Dalībnieka nozīmīte",
+    "uiProfileCard": "Profila karte",
+    "uiChatCard": "Tērzēšanas kartes",
+    "uiUserMenu": "Lietotāja izvēlne",
+    "uiDialog": "Savs logs",
+    "uiWebview": "Tīmekļa saturs",
+    "eventsSelf": "Jūsu statuss",
+    "eventsVoice": "Balss aktivitāte",
+    "eventsPresence": "Pievienošanās un aiziešana",
+    "eventsChatActivity": "Tērzēšanas aktivitāte",
+    "notify": "Paziņojumi",
+    "randomBytes": "Nejauši skaitļi",
+    "commands": "Komandas",
+    "chatSend": "Raksta tērzēšanā",
+    "chatSupersedes": "Aizstāj savu teksta rindu",
+    "chatTriggers": "Aktivizēšanas vārdi",
+    "netHttp": "Piekļuve internetam",
+    "secrets": "Atslēgu piekariņš"
   }
 }

@@ -1852,6 +1852,10 @@ export type InstalledPlugin = {
 	revocation: string | null,
 	/**  The manifest icon (a path under `assets/`, loaded with `plugin_asset`). */
 	icon: string | null,
+	/**  The manifest's one-line description (empty when the plugin could not be loaded). */
+	description: string,
+	/**  The manifest's authors. */
+	authors: string[],
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */

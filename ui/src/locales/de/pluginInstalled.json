@@ -90,6 +90,34 @@
     "export": "Die Daten konnten nicht exportiert werden.",
     "reset": "Die Daten konnten nicht zurückgesetzt werden.",
     "remove": "Das Plugin konnte nicht entfernt werden.",
-    "badge": "Das Abzeichen konnte nicht geändert werden."
+    "badge": "Das Abzeichen konnte nicht geändert werden.",
+    "update": "Das Plugin konnte nicht aktualisiert werden."
+  },
+  "update": {
+    "hint": "Update {{version}}",
+    "button": "Aktualisieren"
+  },
+  "visibilityChip": "Spricht mit anderen Mumcord-Nutzern · {{visibility}}",
+  "chips": {
+    "label": "Genutzte Berechtigungen",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Mitglieder-Abzeichen",
+    "uiProfileCard": "Profilkarte",
+    "uiChatCard": "Chat-Karten",
+    "uiUserMenu": "Nutzermenü",
+    "uiDialog": "Eigenes Fenster",
+    "uiWebview": "Webinhalt",
+    "eventsSelf": "Dein Status",
+    "eventsVoice": "Sprachaktivität",
+    "eventsPresence": "Beitritte und Abgänge",
+    "eventsChatActivity": "Chat-Aktivität",
+    "notify": "Benachrichtigungen",
+    "randomBytes": "Zufallszahlen",
+    "commands": "Befehle",
+    "chatSend": "Schreibt im Chat",
+    "chatSupersedes": "Ersetzt seine Textzeile",
+    "chatTriggers": "Auslösewörter",
+    "netHttp": "Internetzugriff",
+    "secrets": "Schlüsselbund"
   }
 }

@@ -161,6 +161,10 @@ pub struct PluginInfo {
     pub revocation: Option<RevocationNotice>,
     /// The manifest icon, a path under `assets/`.
     pub icon: Option<String>,
+    /// The manifest's one-line description; empty when the plugin could not be loaded.
+    pub description: String,
+    /// The manifest's authors; empty when the plugin could not be loaded.
+    pub authors: Vec<String>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -495,6 +499,8 @@ impl PluginService {
         PluginInfo {
             name: manifest.map(|m| m.name.clone()).unwrap_or_default(),
             icon: manifest.and_then(|m| m.icon.clone()),
+            description: manifest.map(|m| m.description.clone()).unwrap_or_default(),
+            authors: manifest.map(|m| m.authors.clone()).unwrap_or_default(),
             required: manifest
                 .map(|m| m.permissions.required.clone())
                 .unwrap_or_default(),

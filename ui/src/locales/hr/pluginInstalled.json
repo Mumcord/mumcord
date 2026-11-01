@@ -90,6 +90,34 @@
     "export": "Podaci se nisu mogli izvesti.",
     "reset": "Podaci se nisu mogli poništiti.",
     "remove": "Dodatak se nije mogao ukloniti.",
-    "badge": "Značka se nije mogla promijeniti."
+    "badge": "Značka se nije mogla promijeniti.",
+    "update": "Dodatak nije moguće ažurirati."
+  },
+  "update": {
+    "hint": "Ažuriranje {{version}}",
+    "button": "Ažuriraj"
+  },
+  "visibilityChip": "Razgovara s drugim korisnicima Mumcorda · {{visibility}}",
+  "chips": {
+    "label": "Dozvole koje koristi",
+    "uiPanel": "Ploča",
+    "uiMemberBadge": "Oznaka člana",
+    "uiProfileCard": "Kartica profila",
+    "uiChatCard": "Chat kartice",
+    "uiUserMenu": "Korisnički izbornik",
+    "uiDialog": "Vlastiti prozor",
+    "uiWebview": "Web sadržaj",
+    "eventsSelf": "Vaš status",
+    "eventsVoice": "Glasovna aktivnost",
+    "eventsPresence": "Dolasci i odlasci",
+    "eventsChatActivity": "Aktivnost u chatu",
+    "notify": "Obavijesti",
+    "randomBytes": "Slučajni brojevi",
+    "commands": "Naredbe",
+    "chatSend": "Piše u chatu",
+    "chatSupersedes": "Zamjenjuje svoj tekstni redak",
+    "chatTriggers": "Okidačke riječi",
+    "netHttp": "Pristup internetu",
+    "secrets": "Privjesak za ključeve"
   }
 }

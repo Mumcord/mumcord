@@ -90,6 +90,34 @@
     "export": "Az adatokat nem sikerült exportálni.",
     "reset": "Az adatokat nem sikerült visszaállítani.",
     "remove": "A bővítményt nem sikerült eltávolítani.",
-    "badge": "A jelvényt nem sikerült módosítani."
+    "badge": "A jelvényt nem sikerült módosítani.",
+    "update": "A bővítményt nem sikerült frissíteni."
+  },
+  "update": {
+    "hint": "Frissítés {{version}}",
+    "button": "Frissítés"
+  },
+  "visibilityChip": "Más Mumcord-felhasználókkal beszélget · {{visibility}}",
+  "chips": {
+    "label": "Használt engedélyek",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Tagjelvény",
+    "uiProfileCard": "Profilkártya",
+    "uiChatCard": "Csevegőkártyák",
+    "uiUserMenu": "Felhasználói menü",
+    "uiDialog": "Saját ablak",
+    "uiWebview": "Webes tartalom",
+    "eventsSelf": "Az állapotod",
+    "eventsVoice": "Hangaktivitás",
+    "eventsPresence": "Be- és kilépések",
+    "eventsChatActivity": "Csevegési aktivitás",
+    "notify": "Értesítések",
+    "randomBytes": "Véletlen számok",
+    "commands": "Parancsok",
+    "chatSend": "Ír a csevegésbe",
+    "chatSupersedes": "Lecseréli a szöveges sorát",
+    "chatTriggers": "Kiváltó szavak",
+    "netHttp": "Internet-hozzáférés",
+    "secrets": "Kulcstartó"
   }
 }

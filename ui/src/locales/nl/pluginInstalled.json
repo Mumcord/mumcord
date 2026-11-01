@@ -90,6 +90,34 @@
     "export": "De gegevens konden niet worden geëxporteerd.",
     "reset": "De gegevens konden niet worden gereset.",
     "remove": "De plugin kon niet worden verwijderd.",
-    "badge": "De badge kon niet worden gewijzigd."
+    "badge": "De badge kon niet worden gewijzigd.",
+    "update": "De plug-in kon niet worden bijgewerkt."
+  },
+  "update": {
+    "hint": "Update {{version}}",
+    "button": "Bijwerken"
+  },
+  "visibilityChip": "Praat met andere Mumcord-gebruikers · {{visibility}}",
+  "chips": {
+    "label": "Gebruikte rechten",
+    "uiPanel": "Paneel",
+    "uiMemberBadge": "Ledenbadge",
+    "uiProfileCard": "Profielkaart",
+    "uiChatCard": "Chatkaarten",
+    "uiUserMenu": "Gebruikersmenu",
+    "uiDialog": "Eigen venster",
+    "uiWebview": "Webinhoud",
+    "eventsSelf": "Je status",
+    "eventsVoice": "Spraakactiviteit",
+    "eventsPresence": "Binnenkomsten en vertrekken",
+    "eventsChatActivity": "Chatactiviteit",
+    "notify": "Meldingen",
+    "randomBytes": "Willekeurige getallen",
+    "commands": "Commando's",
+    "chatSend": "Schrijft in de chat",
+    "chatSupersedes": "Vervangt zijn tekstregel",
+    "chatTriggers": "Triggerwoorden",
+    "netHttp": "Internettoegang",
+    "secrets": "Sleutelhanger"
   }
 }

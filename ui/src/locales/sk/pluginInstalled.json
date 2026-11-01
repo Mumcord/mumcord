@@ -90,6 +90,34 @@
     "export": "Údaje sa nepodarilo exportovať.",
     "reset": "Údaje sa nepodarilo obnoviť.",
     "remove": "Doplnok sa nepodarilo odstrániť.",
-    "badge": "Odznak sa nepodarilo zmeniť."
+    "badge": "Odznak sa nepodarilo zmeniť.",
+    "update": "Plugin sa nepodarilo aktualizovať."
+  },
+  "update": {
+    "hint": "Aktualizácia {{version}}",
+    "button": "Aktualizovať"
+  },
+  "visibilityChip": "Komunikuje s ostatnými používateľmi Mumcordu · {{visibility}}",
+  "chips": {
+    "label": "Používané oprávnenia",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Odznak člena",
+    "uiProfileCard": "Karta profilu",
+    "uiChatCard": "Chatové karty",
+    "uiUserMenu": "Ponuka používateľa",
+    "uiDialog": "Vlastné okno",
+    "uiWebview": "Webový obsah",
+    "eventsSelf": "Váš stav",
+    "eventsVoice": "Hlasová aktivita",
+    "eventsPresence": "Príchody a odchody",
+    "eventsChatActivity": "Aktivita v chate",
+    "notify": "Oznámenia",
+    "randomBytes": "Náhodné čísla",
+    "commands": "Príkazy",
+    "chatSend": "Píše do chatu",
+    "chatSupersedes": "Nahrádza svoj textový riadok",
+    "chatTriggers": "Spúšťacie slová",
+    "netHttp": "Prístup na internet",
+    "secrets": "Zväzok kľúčov"
   }
 }

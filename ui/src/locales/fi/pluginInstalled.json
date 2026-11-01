@@ -90,6 +90,34 @@
     "export": "Tietoja ei voitu viedä.",
     "reset": "Tietoja ei voitu nollata.",
     "remove": "Lisäosaa ei voitu poistaa.",
-    "badge": "Merkkiä ei voitu muuttaa."
+    "badge": "Merkkiä ei voitu muuttaa.",
+    "update": "Lisäosaa ei voitu päivittää."
+  },
+  "update": {
+    "hint": "Päivitys {{version}}",
+    "button": "Päivitä"
+  },
+  "visibilityChip": "Puhuu muiden Mumcord-käyttäjien kanssa · {{visibility}}",
+  "chips": {
+    "label": "Käyttämät oikeudet",
+    "uiPanel": "Paneeli",
+    "uiMemberBadge": "Jäsenmerkki",
+    "uiProfileCard": "Profiilikortti",
+    "uiChatCard": "Chat-kortit",
+    "uiUserMenu": "Käyttäjävalikko",
+    "uiDialog": "Oma ikkuna",
+    "uiWebview": "Verkkosisältö",
+    "eventsSelf": "Tilasi",
+    "eventsVoice": "Puheaktiivisuus",
+    "eventsPresence": "Liittymiset ja poistumiset",
+    "eventsChatActivity": "Chat-aktiivisuus",
+    "notify": "Ilmoitukset",
+    "randomBytes": "Satunnaisluvut",
+    "commands": "Komennot",
+    "chatSend": "Kirjoittaa chattiin",
+    "chatSupersedes": "Korvaa oman tekstirivinsä",
+    "chatTriggers": "Laukaisusanat",
+    "netHttp": "Internet-yhteys",
+    "secrets": "Avainnippu"
   }
 }

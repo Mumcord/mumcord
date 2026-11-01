@@ -90,6 +90,34 @@
     "export": "Andmete eksportimine ei õnnestunud.",
     "reset": "Andmete lähtestamine ei õnnestunud.",
     "remove": "Pistikprogrammi eemaldamine ei õnnestunud.",
-    "badge": "Märgi muutmine ei õnnestunud."
+    "badge": "Märgi muutmine ei õnnestunud.",
+    "update": "Pluginat ei saanud värskendada."
+  },
+  "update": {
+    "hint": "Värskendus {{version}}",
+    "button": "Värskenda"
+  },
+  "visibilityChip": "Suhtleb teiste Mumcordi kasutajatega · {{visibility}}",
+  "chips": {
+    "label": "Kasutatavad load",
+    "uiPanel": "Paneel",
+    "uiMemberBadge": "Liikme märk",
+    "uiProfileCard": "Profiilikaart",
+    "uiChatCard": "Vestluskaardid",
+    "uiUserMenu": "Kasutaja menüü",
+    "uiDialog": "Oma aken",
+    "uiWebview": "Veebisisu",
+    "eventsSelf": "Sinu olek",
+    "eventsVoice": "Hääletegevus",
+    "eventsPresence": "Liitumised ja lahkumised",
+    "eventsChatActivity": "Vestlustegevus",
+    "notify": "Teavitused",
+    "randomBytes": "Juhuarvud",
+    "commands": "Käsud",
+    "chatSend": "Kirjutab vestlusesse",
+    "chatSupersedes": "Asendab oma tekstirea",
+    "chatTriggers": "Käivitussõnad",
+    "netHttp": "Internetijuurdepääs",
+    "secrets": "Võtmehoidja"
   }
 }

@@ -90,6 +90,34 @@
     "export": "Id-dejta ma setgħetx tiġi esportata.",
     "reset": "Id-dejta ma setgħetx tiġi rrisettjata.",
     "remove": "Il-plugin ma setax jitneħħa.",
-    "badge": "Il-badge ma setax jinbidel."
+    "badge": "Il-badge ma setax jinbidel.",
+    "update": "Il-plagin ma setax jiġi aġġornat."
+  },
+  "update": {
+    "hint": "Aġġornament {{version}}",
+    "button": "Aġġorna"
+  },
+  "visibilityChip": "Titkellem ma' utenti oħra ta' Mumcord · {{visibility}}",
+  "chips": {
+    "label": "Permessi li juża",
+    "uiPanel": "Pannell",
+    "uiMemberBadge": "Badge tal-membru",
+    "uiProfileCard": "Karta tal-profil",
+    "uiChatCard": "Karti taċ-chat",
+    "uiUserMenu": "Menu tal-utent",
+    "uiDialog": "Tieqa tiegħu",
+    "uiWebview": "Kontenut tal-web",
+    "eventsSelf": "L-istatus tiegħek",
+    "eventsVoice": "Attività tal-leħen",
+    "eventsPresence": "Dħul u ħruġ",
+    "eventsChatActivity": "Attività taċ-chat",
+    "notify": "Notifiki",
+    "randomBytes": "Numri każwali",
+    "commands": "Kmandi",
+    "chatSend": "Jikteb fiċ-chat",
+    "chatSupersedes": "Jissostitwixxi l-linja tat-test tiegħu",
+    "chatTriggers": "Kliem li jixgħel",
+    "netHttp": "Aċċess għall-internet",
+    "secrets": "Keychain"
   }
 }

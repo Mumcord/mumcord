@@ -26,6 +26,8 @@ function plugin(id: string, name: string, enabled = true): InstalledPlugin {
     badge: false,
     revocation: null,
     icon: null,
+    description: "",
+    authors: [],
   };
 }
 

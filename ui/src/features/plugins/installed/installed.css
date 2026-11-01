@@ -16,15 +16,22 @@
 }
 
 .plugins-installed-row {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+}
+
+/* Not reviewed by Mumcord, or something needs attention: an amber outline. */
+.plugins-installed-row--unofficial,
+.plugins-installed-row--attention {
+  border-color: var(--color-warning);
 }
 
 .plugins-installed-head {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: var(--space-3);
 }
 
 .plugins-installed-icon {
@@ -32,11 +39,12 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-elevated);
-  color: var(--color-text-muted);
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 35%, var(--color-bg-sidebar));
+  color: var(--color-accent-text);
+  font-size: var(--font-size-lg);
   font-weight: 600;
   overflow: hidden;
 }
@@ -51,31 +59,120 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: var(--space-1);
   min-width: 0;
+}
+
+.plugins-installed-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .plugins-installed-name {
   overflow-wrap: anywhere;
   color: var(--color-text);
+  font-weight: 600;
 }
 
-.plugins-installed-version {
-  color: var(--color-text-muted);
-}
-
-.plugins-installed-labels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.plugins-installed-label {
+.plugins-installed-version,
+.plugins-installed-description {
   color: var(--color-text-muted);
   overflow-wrap: anywhere;
 }
 
-.plugins-installed-label--warning {
+.plugins-installed-pill {
+  padding: 0 var(--space-2);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.plugins-installed-pill--ok {
+  color: var(--color-success);
+}
+
+.plugins-installed-pill--warning {
   color: var(--color-warning);
+}
+
+.plugins-installed-pill--neutral {
+  color: var(--color-text-muted);
+}
+
+.plugins-installed-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plugins-installed-chip {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.plugins-installed-state {
+  overflow-wrap: anywhere;
+  color: var(--color-text-muted);
+}
+
+.plugins-installed-state--warning {
+  color: var(--color-warning);
+}
+
+.plugins-installed-side {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.plugins-installed-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.plugins-installed-remove {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.plugins-installed-remove:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.plugins-installed-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 40rem) {
+  .plugins-installed-head {
+    flex-wrap: wrap;
+  }
+
+  .plugins-installed-side {
+    flex-basis: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .plugins-installed-details {

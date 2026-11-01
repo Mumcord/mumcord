@@ -90,6 +90,34 @@
     "export": "The data could not be exported.",
     "reset": "The data could not be reset.",
     "remove": "The plugin could not be removed.",
-    "badge": "The badge could not be changed."
+    "badge": "The badge could not be changed.",
+    "update": "The plugin could not be updated."
+  },
+  "update": {
+    "hint": "Update {{version}}",
+    "button": "Update"
+  },
+  "visibilityChip": "Talks to other Mumcord users · {{visibility}}",
+  "chips": {
+    "label": "Permissions it uses",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Member badge",
+    "uiProfileCard": "Profile card",
+    "uiChatCard": "Chat cards",
+    "uiUserMenu": "User menu",
+    "uiDialog": "Own window",
+    "uiWebview": "Web content",
+    "eventsSelf": "Your status",
+    "eventsVoice": "Voice activity",
+    "eventsPresence": "Joins and leaves",
+    "eventsChatActivity": "Chat activity",
+    "notify": "Notifications",
+    "randomBytes": "Random numbers",
+    "commands": "Commands",
+    "chatSend": "Posts in chat",
+    "chatSupersedes": "Replaces its text",
+    "chatTriggers": "Trigger words",
+    "netHttp": "Internet access",
+    "secrets": "Keychain"
   }
 }

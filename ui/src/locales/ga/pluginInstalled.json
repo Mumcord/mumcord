@@ -90,6 +90,34 @@
     "export": "Níorbh fhéidir na sonraí a easpórtáil.",
     "reset": "Níorbh fhéidir na sonraí a athshocrú.",
     "remove": "Níorbh fhéidir an breiseán a bhaint.",
-    "badge": "Níorbh fhéidir an suaitheantas a athrú."
+    "badge": "Níorbh fhéidir an suaitheantas a athrú.",
+    "update": "Níorbh fhéidir an breiseán a nuashonrú."
+  },
+  "update": {
+    "hint": "Nuashonrú {{version}}",
+    "button": "Nuashonraigh"
+  },
+  "visibilityChip": "Cumarsáid le húsáideoirí Mumcord eile · {{visibility}}",
+  "chips": {
+    "label": "Ceadanna a úsáidtear",
+    "uiPanel": "Painéal",
+    "uiMemberBadge": "Suaitheantas comhalta",
+    "uiProfileCard": "Cárta próifíle",
+    "uiChatCard": "Cártaí comhrá",
+    "uiUserMenu": "Roghchlár úsáideora",
+    "uiDialog": "Fuinneog féin",
+    "uiWebview": "Ábhar gréasáin",
+    "eventsSelf": "Do stádas",
+    "eventsVoice": "Gníomhaíocht gutha",
+    "eventsPresence": "Teacht isteach agus imeacht",
+    "eventsChatActivity": "Gníomhaíocht comhrá",
+    "notify": "Fógraí",
+    "randomBytes": "Uimhreacha randamacha",
+    "commands": "Orduithe",
+    "chatSend": "Postálann sa chomhrá",
+    "chatSupersedes": "Cuireann ina áit a líne téacs",
+    "chatTriggers": "Focail truicir",
+    "netHttp": "Rochtain idirlín",
+    "secrets": "Eochairshlabhra"
   }
 }

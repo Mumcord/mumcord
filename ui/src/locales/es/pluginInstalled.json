@@ -90,6 +90,34 @@
     "export": "No se pudieron exportar los datos.",
     "reset": "No se pudieron restablecer los datos.",
     "remove": "No se pudo quitar el plugin.",
-    "badge": "No se pudo cambiar la insignia."
+    "badge": "No se pudo cambiar la insignia.",
+    "update": "No se pudo actualizar el plugin."
+  },
+  "update": {
+    "hint": "Actualización {{version}}",
+    "button": "Actualizar"
+  },
+  "visibilityChip": "Habla con otros usuarios de Mumcord · {{visibility}}",
+  "chips": {
+    "label": "Permisos que usa",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Insignia de miembro",
+    "uiProfileCard": "Tarjeta de perfil",
+    "uiChatCard": "Tarjetas de chat",
+    "uiUserMenu": "Menú de usuario",
+    "uiDialog": "Ventana propia",
+    "uiWebview": "Contenido web",
+    "eventsSelf": "Tu estado",
+    "eventsVoice": "Actividad de voz",
+    "eventsPresence": "Entradas y salidas",
+    "eventsChatActivity": "Actividad del chat",
+    "notify": "Notificaciones",
+    "randomBytes": "Números aleatorios",
+    "commands": "Comandos",
+    "chatSend": "Escribe en el chat",
+    "chatSupersedes": "Sustituye su línea de texto",
+    "chatTriggers": "Palabras clave",
+    "netHttp": "Acceso a internet",
+    "secrets": "Llavero"
   }
 }

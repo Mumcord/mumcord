@@ -90,6 +90,34 @@
     "export": "Datele nu au putut fi exportate.",
     "reset": "Datele nu au putut fi resetate.",
     "remove": "Pluginul nu a putut fi eliminat.",
-    "badge": "Insigna nu a putut fi schimbată."
+    "badge": "Insigna nu a putut fi schimbată.",
+    "update": "Pluginul nu a putut fi actualizat."
+  },
+  "update": {
+    "hint": "Actualizare {{version}}",
+    "button": "Actualizează"
+  },
+  "visibilityChip": "Vorbește cu alți utilizatori Mumcord · {{visibility}}",
+  "chips": {
+    "label": "Permisiuni folosite",
+    "uiPanel": "Panou",
+    "uiMemberBadge": "Insignă de membru",
+    "uiProfileCard": "Card de profil",
+    "uiChatCard": "Carduri de chat",
+    "uiUserMenu": "Meniul utilizatorului",
+    "uiDialog": "Fereastră proprie",
+    "uiWebview": "Conținut web",
+    "eventsSelf": "Starea ta",
+    "eventsVoice": "Activitate vocală",
+    "eventsPresence": "Intrări și ieșiri",
+    "eventsChatActivity": "Activitate în chat",
+    "notify": "Notificări",
+    "randomBytes": "Numere aleatorii",
+    "commands": "Comenzi",
+    "chatSend": "Scrie în chat",
+    "chatSupersedes": "Înlocuiește linia sa de text",
+    "chatTriggers": "Cuvinte declanșatoare",
+    "netHttp": "Acces la internet",
+    "secrets": "Breloc de chei"
   }
 }

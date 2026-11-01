@@ -24,6 +24,8 @@ const plugin: InstalledPlugin = {
   badge: false,
   revocation: null,
   icon: null,
+  description: "",
+  authors: [],
 };
 
 const update: PluginUpdate = {

@@ -90,6 +90,34 @@
     "export": "Nie udało się wyeksportować danych.",
     "reset": "Nie udało się zresetować danych.",
     "remove": "Nie udało się usunąć wtyczki.",
-    "badge": "Nie udało się zmienić odznaki."
+    "badge": "Nie udało się zmienić odznaki.",
+    "update": "Nie udało się zaktualizować wtyczki."
+  },
+  "update": {
+    "hint": "Aktualizacja {{version}}",
+    "button": "Aktualizuj"
+  },
+  "visibilityChip": "Komunikuje się z innymi użytkownikami Mumcorda · {{visibility}}",
+  "chips": {
+    "label": "Używane uprawnienia",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Odznaka członka",
+    "uiProfileCard": "Karta profilu",
+    "uiChatCard": "Karty czatu",
+    "uiUserMenu": "Menu użytkownika",
+    "uiDialog": "Własne okno",
+    "uiWebview": "Treść internetowa",
+    "eventsSelf": "Twój status",
+    "eventsVoice": "Aktywność głosowa",
+    "eventsPresence": "Dołączenia i wyjścia",
+    "eventsChatActivity": "Aktywność na czacie",
+    "notify": "Powiadomienia",
+    "randomBytes": "Liczby losowe",
+    "commands": "Polecenia",
+    "chatSend": "Pisze na czacie",
+    "chatSupersedes": "Zastępuje swój wiersz tekstu",
+    "chatTriggers": "Słowa wyzwalające",
+    "netHttp": "Dostęp do internetu",
+    "secrets": "Klucze systemowe"
   }
 }

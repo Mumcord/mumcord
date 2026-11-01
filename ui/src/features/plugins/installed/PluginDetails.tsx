@@ -14,7 +14,6 @@ import { PluginTree } from "../render/PluginTree";
 import { usePluginTree } from "../render/pluginUiStore";
 import { Diagnostics } from "./Diagnostics";
 import { MESSAGES_PERMISSION, displayName, requests } from "./labels";
-import { RemoveDialog } from "./RemoveDialog";
 
 const SETTINGS_SLOT: PluginSlot = { kind: "settings" };
 const VISIBILITIES: readonly PluginVisibilityChoice[] = ["everyone", "friends", "nobody"];
@@ -33,7 +32,7 @@ interface PluginDetailsProps {
 export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
   const { t } = useTranslation("pluginInstalled");
   const baseId = useId();
-  const [dialog, setDialog] = useState<"remove" | "reset" | null>(null);
+  const [dialog, setDialog] = useState<"reset" | null>(null);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const settingsTree = usePluginTree(plugin.id, SETTINGS_SLOT);
@@ -197,18 +196,6 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
         >
           {t("details.reset")}
         </button>
-        {!dev && (
-          <button
-            type="button"
-            className="settings-button settings-button--danger"
-            disabled={busy}
-            onClick={() => {
-              setDialog("remove");
-            }}
-          >
-            {t("details.remove")}
-          </button>
-        )}
       </div>
       {notice !== null && (
         <p role="status" className="settings-hint">
@@ -231,18 +218,6 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
               await getApi().pluginResetData(plugin.id);
               setNotice(t("reset.done"));
             }, "errors.reset");
-          }}
-        />
-      )}
-      {dialog === "remove" && (
-        <RemoveDialog
-          name={name}
-          onCancel={() => {
-            setDialog(null);
-          }}
-          onRemove={(deleteData) => {
-            setDialog(null);
-            void run(() => getApi().pluginRemove(plugin.id, deleteData), "errors.remove");
           }}
         />
       )}

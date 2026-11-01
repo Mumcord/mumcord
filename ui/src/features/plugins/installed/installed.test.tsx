@@ -11,7 +11,7 @@ import {
 } from "../pluginRequestStore";
 import { resetPluginStore } from "../pluginStore";
 import { InstalledTab } from "./InstalledTab";
-import { initials, sourceLabel, stateLabel } from "./labels";
+import { initials, permissionChips, sourceLabel, stateLabel } from "./labels";
 
 let api: MockApi;
 
@@ -34,6 +34,8 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     badge: true,
     revocation: null,
     icon: null,
+    description: "",
+    authors: [],
     ...overrides,
   };
 }
@@ -144,7 +146,7 @@ describe("InstalledTab", () => {
     withPlugins([foo]);
     const setNotifications = vi.spyOn(api, "pluginSetNotifications").mockResolvedValue(null);
     render(<InstalledTab />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details of foo" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Permissions", description: "foo" }));
     expect(screen.getByText("Who can see this plugin's activity")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("switch", { name: "Notifications" }));
     await waitFor(() => {
@@ -165,7 +167,7 @@ describe("InstalledTab", () => {
       },
     ]);
     render(<InstalledTab />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details of foo" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Permissions", description: "foo" }));
     expect(await screen.findByText("/roll: Command taken by Dice")).toBeInTheDocument();
   });
 
@@ -173,8 +175,7 @@ describe("InstalledTab", () => {
     withPlugins([echolings]);
     const remove = vi.spyOn(api, "pluginRemove").mockResolvedValue(null);
     render(<InstalledTab />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details of Echolings" }));
-    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Remove" }));
     const dialog = screen.getByRole("dialog", { name: "Remove Echolings?" });
     expect(
       within(dialog).getByRole("checkbox", { name: "Also delete its data" }),
@@ -186,6 +187,55 @@ describe("InstalledTab", () => {
     });
   });
 
+  it("shows description, permission chips and an update hint with a direct update button", async () => {
+    withPlugins([
+      plugin({
+        id: "dice",
+        name: "Dice Roller",
+        version: "0.4.1",
+        description: "Roll dice together.",
+        authors: ["Pip Larsen"],
+        required: ["ui.chat-card"],
+        optional: [],
+        granted: ["ui.chat-card"],
+      }),
+    ]);
+    vi.spyOn(api, "pluginUpdates").mockResolvedValue([
+      {
+        id: "dice",
+        name: "Dice Roller",
+        from: "0.4.1",
+        to: "0.5.0",
+        source: { kind: "official" },
+        size: 10,
+        approval: null,
+        failed: null,
+      },
+    ]);
+    const apply = vi.spyOn(api, "pluginApplyUpdate").mockResolvedValue(null);
+    render(<InstalledTab />);
+    expect(await screen.findByText("Roll dice together.")).toBeInTheDocument();
+    expect(screen.getByText("0.4.1 · Pip Larsen")).toBeInTheDocument();
+    expect(screen.getByText("Chat cards")).toBeInTheDocument();
+    expect(await screen.findByText("Update 0.5.0")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Update", description: "Dice Roller" }));
+    await waitFor(() => {
+      expect(apply).toHaveBeenCalledWith("dice", ["ui.chat-card"]);
+    });
+  });
+
+  it("lists the active permissions as chips in a fixed order", () => {
+    expect(
+      permissionChips(
+        plugin({
+          required: ["events.voice", "ui.panel"],
+          optional: [{ id: "ui.member-badge", suggested: true }],
+          granted: ["events.voice", "ui.panel"],
+        }),
+      ),
+    ).toEqual(["uiPanel", "eventsVoice"]);
+  });
+
   it("pins the version and exports the data to a chosen file", async () => {
     withPlugins([echolings]);
     const pin = vi.spyOn(api, "pluginSetPinned").mockResolvedValue(null);
@@ -193,7 +243,9 @@ describe("InstalledTab", () => {
     const saveText = vi.spyOn(api, "saveText").mockResolvedValue(null);
     vi.spyOn(window, "prompt").mockReturnValue("/tmp/echolings.json");
     render(<InstalledTab />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details of Echolings" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Permissions", description: "Echolings" }),
+    );
     fireEvent.click(
       screen.getByRole("checkbox", { name: "Pin version 1.2.0 (no automatic updates)" }),
     );
@@ -221,9 +273,8 @@ describe("InstalledTab", () => {
     act(() => {
       routePluginRequest({ kind: "installed", plugin: "foo" });
     });
-    expect(await screen.findByRole("button", { name: "Details of foo" })).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    );
+    expect(
+      await screen.findByRole("button", { name: "Permissions", description: "foo" }),
+    ).toHaveAttribute("aria-expanded", "true");
   });
 });

@@ -90,6 +90,34 @@
     "export": "Datan kunde inte exporteras.",
     "reset": "Datan kunde inte återställas.",
     "remove": "Pluginet kunde inte tas bort.",
-    "badge": "Märket kunde inte ändras."
+    "badge": "Märket kunde inte ändras.",
+    "update": "Tillägget kunde inte uppdateras."
+  },
+  "update": {
+    "hint": "Uppdatering {{version}}",
+    "button": "Uppdatera"
+  },
+  "visibilityChip": "Pratar med andra Mumcord-användare · {{visibility}}",
+  "chips": {
+    "label": "Behörigheter den använder",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Medlemsmärke",
+    "uiProfileCard": "Profilkort",
+    "uiChatCard": "Chattkort",
+    "uiUserMenu": "Användarmeny",
+    "uiDialog": "Eget fönster",
+    "uiWebview": "Webbinnehåll",
+    "eventsSelf": "Din status",
+    "eventsVoice": "Röstaktivitet",
+    "eventsPresence": "Inträden och utträden",
+    "eventsChatActivity": "Chattaktivitet",
+    "notify": "Aviseringar",
+    "randomBytes": "Slumptal",
+    "commands": "Kommandon",
+    "chatSend": "Skriver i chatten",
+    "chatSupersedes": "Ersätter sin textrad",
+    "chatTriggers": "Utlösarord",
+    "netHttp": "Internetåtkomst",
+    "secrets": "Nyckelring"
   }
 }

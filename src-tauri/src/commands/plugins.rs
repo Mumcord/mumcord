@@ -154,6 +154,10 @@ pub struct InstalledPlugin {
     pub revocation: Option<String>,
     /// The manifest icon (a path under `assets/`, loaded with `plugin_asset`).
     pub icon: Option<String>,
+    /// The manifest's one-line description (empty when the plugin could not be loaded).
+    pub description: String,
+    /// The manifest's authors.
+    pub authors: Vec<String>,
 }
 
 /// The name of a third-party repository; empty when it was removed.
@@ -203,6 +207,8 @@ impl InstalledPlugin {
             badge: p.badge,
             revocation: p.revocation.map(|r| r.reason),
             icon: p.icon,
+            description: p.description,
+            authors: p.authors,
         }
     }
 }
@@ -1335,6 +1341,8 @@ mod tests {
                 reason: "Leaks data".into(),
             }),
             icon: None,
+            description: String::new(),
+            authors: Vec::new(),
         }
     }
 

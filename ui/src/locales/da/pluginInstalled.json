@@ -90,6 +90,34 @@
     "export": "Dataene kunne ikke eksporteres.",
     "reset": "Dataene kunne ikke nulstilles.",
     "remove": "Pluginet kunne ikke fjernes.",
-    "badge": "Badget kunne ikke ændres."
+    "badge": "Badget kunne ikke ændres.",
+    "update": "Pluginet kunne ikke opdateres."
+  },
+  "update": {
+    "hint": "Opdatering {{version}}",
+    "button": "Opdater"
+  },
+  "visibilityChip": "Taler med andre Mumcord-brugere · {{visibility}}",
+  "chips": {
+    "label": "Tilladelser den bruger",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Medlemsmærke",
+    "uiProfileCard": "Profilkort",
+    "uiChatCard": "Chatkort",
+    "uiUserMenu": "Brugermenu",
+    "uiDialog": "Eget vindue",
+    "uiWebview": "Webindhold",
+    "eventsSelf": "Din status",
+    "eventsVoice": "Stemmeaktivitet",
+    "eventsPresence": "Ind- og udgange",
+    "eventsChatActivity": "Chataktivitet",
+    "notify": "Notifikationer",
+    "randomBytes": "Tilfældige tal",
+    "commands": "Kommandoer",
+    "chatSend": "Skriver i chatten",
+    "chatSupersedes": "Erstatter sin tekstlinje",
+    "chatTriggers": "Udløserord",
+    "netHttp": "Internetadgang",
+    "secrets": "Nøglering"
   }
 }
