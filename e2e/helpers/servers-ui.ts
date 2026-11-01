@@ -113,9 +113,11 @@ export async function pickOption(label: string, optionText: string): Promise<voi
   await option.click();
 }
 
-/** A button of the settings section itself (never the one inside one of its dialogs). */
+/** A button in a section card's action bar (never the one inside one of its dialogs). */
 export function settingsAction(text: string) {
-  return browser.$(`//div[${hasClass("settings-actions")}]//button[normalize-space()="${text}"]`);
+  return browser.$(
+    `//div[${hasClass("settings-group__actions")}]//button[normalize-space()="${text}"]`,
+  );
 }
 
 export function button(text: string) {
