@@ -13,7 +13,7 @@ use mumcord_plugins::wit::ui::{
     Align, Animation, ButtonKind, Component, Direction, Node, TextStyle,
 };
 
-use crate::test::{PluginFiles, Scenario, Session, SlotSpec};
+use crate::test::{PluginFiles, Scenario, Session, SlotSpec, ThemeSpec};
 
 /// Time for the last events to reach the plugin and its trees to come back.
 const SETTLE: Duration = Duration::from_millis(300);
@@ -31,6 +31,19 @@ pub struct Args {
     /// The HTML file to write.
     #[arg(long, default_value = "preview.html")]
     pub out: PathBuf,
+    /// Force the light or dark palette. Without it the page follows the system theme, which
+    /// headless browsers do not report.
+    #[arg(long, value_enum)]
+    pub theme: Option<ThemeSpec>,
+}
+
+/// What the page needs to know besides the trees.
+#[derive(Default)]
+pub struct Options<'a> {
+    pub dialog: Option<&'a str>,
+    /// The plugin left its panel popover open, so the panel also shows at popover size.
+    pub popover: bool,
+    pub theme: Option<ThemeSpec>,
 }
 
 pub fn run(args: Args) -> Result<()> {
@@ -44,11 +57,20 @@ pub fn run(args: Args) -> Result<()> {
     std::thread::sleep(SETTLE);
     let trees = session.trees();
     let dialog = session.dialog_title();
+    let popover = session.panel_popover_open();
     session.stop();
     if trees.is_empty() {
         bail!("the plugin shows no UI");
     }
-    let page = render_page(&plugin, &trees, dialog.as_deref());
+    let page = render_page(
+        &plugin,
+        &trees,
+        &Options {
+            dialog: dialog.as_deref(),
+            popover,
+            theme: args.theme,
+        },
+    );
     std::fs::write(&args.out, page)
         .with_context(|| format!("could not write {}", args.out.display()))?;
     println!("{}", args.out.display());
@@ -58,12 +80,12 @@ pub fn run(args: Args) -> Result<()> {
 pub fn render_page(
     plugin: &PluginFiles,
     trees: &[(SlotSpec, Vec<Node>)],
-    dialog: Option<&str>,
+    options: &Options,
 ) -> String {
     let name = escape(&plugin.manifest.name);
     let mut body = String::new();
     for (slot, nodes) in trees {
-        let (label, class) = slot_label(slot, dialog);
+        let (label, class) = slot_label(slot, options.dialog);
         let mut content = String::new();
         Renderer {
             plugin,
@@ -77,9 +99,20 @@ pub fn render_page(
             "<section><h2>{}</h2><div class=\"slot {class}\">{content}</div></section>",
             escape(&label)
         );
+        if options.popover && matches!(slot, SlotSpec::Panel) {
+            let _ = writeln!(
+                body,
+                "<section><h2>Panel (popover)</h2><div class=\"slot popover\">{content}</div></section>"
+            );
+        }
     }
+    let theme = match options.theme {
+        Some(ThemeSpec::Light) => " data-theme=\"light\"",
+        Some(ThemeSpec::Dark) => " data-theme=\"dark\"",
+        None => "",
+    };
     format!(
-        "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">\n\
+        "<!doctype html>\n<html lang=\"en\"{theme}><head><meta charset=\"utf-8\">\n\
          <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'\">\n\
          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\
          <title>{name} preview</title>\n<style>{STYLE}</style></head>\n\
@@ -193,8 +226,10 @@ impl Renderer<'_> {
                 };
                 let _ = write!(
                     self.out,
-                    "<button class=\"{kind}\"{anim}{}>{}</button>",
+                    "<button class=\"{kind}\"{anim}{}{}>{}</button>",
                     disabled(b.disabled),
+                    b.expanded
+                        .map_or(String::new(), |open| format!(" aria-expanded=\"{open}\"")),
                     escape(&b.label)
                 );
             }
@@ -418,16 +453,20 @@ const STYLE: &str = "
 :root { color-scheme: light dark;
   --text:#17113a; --text-muted:#5c5677; --accent:#6a40e0; --danger:#b01c1c; --warning:#9a6200;
   --success:#1d7a3a; --surface:#ffffff; --surface-raised:#eee9f8; --border:#d6cfe8; --page:#f5f2fb; }
-@media (prefers-color-scheme: dark) { :root {
+@media (prefers-color-scheme: dark) { :root:not([data-theme=light]) {
   --text:#f6f0e8; --text-muted:#b7aecf; --accent:#a78bff; --danger:#ff8f8f; --warning:#ffc46b;
   --success:#7fdc9a; --surface:#1a1342; --surface-raised:#231b55; --border:#3a3070; --page:#0e0a26; } }
+:root[data-theme=light] { color-scheme:light; }
+:root[data-theme=dark] { color-scheme:dark;
+  --text:#f6f0e8; --text-muted:#b7aecf; --accent:#a78bff; --danger:#ff8f8f; --warning:#ffc46b;
+  --success:#7fdc9a; --surface:#1a1342; --surface-raised:#231b55; --border:#3a3070; --page:#0e0a26; }
 body { margin:0; padding:16px; background:var(--page); color:var(--text);
   font:14px/1.4 system-ui, sans-serif; }
 h1 { font-size:18px; } h2 { font-size:13px; color:var(--text-muted); font-weight:600; }
 section { margin-bottom:24px; }
 .slot { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px;
   overflow:auto; box-sizing:border-box; }
-.panel { width:260px; height:160px; } .profile-card { width:300px; height:220px; }
+.panel { width:260px; height:160px; } .popover { width:420px; height:560px; } .profile-card { width:300px; height:220px; }
 .chat-card { width:440px; max-width:100%; height:160px; } .form { width:420px; max-width:100%; }
 .badge { width:24px; height:24px; padding:0; } .decoration { width:16px; height:16px; padding:0; }
 .stack { display:flex; } p { margin:0; } .heading { font-weight:700; font-size:16px; }
@@ -484,11 +523,12 @@ mod tests {
                     action: "wave".into(),
                     kind: ButtonKind::Primary,
                     disabled: false,
+                    expanded: Some(false),
                 }),
                 vec![],
             ),
         ];
-        let page = render_page(&plugin, &[(SlotSpec::Panel, nodes)], None);
+        let page = render_page(&plugin, &[(SlotSpec::Panel, nodes)], &Options::default());
         assert!(page.contains("&lt;script&gt;alert(1)&lt;/script&gt;"));
         assert!(!page.contains("<script>"));
         assert!(!page.contains("url(x)"));
@@ -496,6 +536,26 @@ mod tests {
         let text = page.find("&lt;script").expect("text");
         let button = page.find(">Wave</button>").expect("button");
         assert!(text < button);
+        assert!(page.contains("aria-expanded=\"false\""));
+        assert!(!page.contains("<html lang=\"en\" data-theme"));
+    }
+
+    #[test]
+    fn forced_theme_and_popover_size_reach_the_page() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let plugin = crate::test::tests::files(dir.path());
+        let nodes = vec![node(Component::Divider, vec![])];
+        let options = Options {
+            dialog: None,
+            popover: true,
+            theme: Some(ThemeSpec::Dark),
+        };
+        let page = render_page(&plugin, &[(SlotSpec::Panel, nodes)], &options);
+        assert!(page.contains("<html lang=\"en\" data-theme=\"dark\">"));
+        assert!(page.contains("class=\"slot panel\""));
+        assert!(page.contains("class=\"slot popover\""));
+        assert!(page.contains(".popover { width:420px; height:560px; }"));
+        assert!(page.contains(":root[data-theme=dark]"));
     }
 
     #[test]
@@ -510,7 +570,7 @@ mod tests {
             }),
             vec![0, 0],
         )];
-        let page = render_page(&plugin, &[(SlotSpec::Panel, looped)], None);
+        let page = render_page(&plugin, &[(SlotSpec::Panel, looped)], &Options::default());
         assert_eq!(page.matches("class=\"stack\"").count(), 1);
     }
 

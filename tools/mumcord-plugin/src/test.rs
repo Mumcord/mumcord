@@ -191,7 +191,7 @@ pub struct BotSpec {
     pub modules: Vec<String>,
 }
 
-#[derive(Debug, Default, Clone, Copy, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Deserialize, clap::ValueEnum)]
 #[serde(rename_all = "kebab-case")]
 pub enum ThemeSpec {
     #[default]
@@ -930,6 +930,17 @@ impl Session {
             }
         }
         title
+    }
+
+    /// Whether the plugin left its panel popover open.
+    pub fn panel_popover_open(&self) -> bool {
+        let mut open = false;
+        for output in lock(&self.outputs).iter() {
+            if let Output::PanelPopover(o) = output {
+                open = *o;
+            }
+        }
+        open
     }
 
     pub fn stop(mut self) {

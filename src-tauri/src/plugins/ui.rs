@@ -166,6 +166,7 @@ pub enum PluginComponent {
         action: String,
         kind: PluginButtonKind,
         disabled: bool,
+        expanded: Option<bool>,
     },
     IconButton {
         icon: String,
@@ -399,6 +400,7 @@ fn component(c: wit::Component) -> PluginComponent {
                 wit::ButtonKind::Danger => PluginButtonKind::Danger,
             },
             disabled: b.disabled,
+            expanded: b.expanded,
         },
         wit::Component::IconButton(b) => P::IconButton {
             icon: b.icon,
@@ -748,6 +750,7 @@ mod tests {
                 action: "vote:1".into(),
                 kind: wit::ButtonKind::Primary,
                 disabled: false,
+                expanded: Some(true),
             }),
             animation: Some(wit::Animation::Hop),
             children: vec![],
@@ -769,6 +772,7 @@ mod tests {
                         action: "vote:1".into(),
                         kind: PluginButtonKind::Primary,
                         disabled: false,
+                        expanded: Some(true),
                     },
                     animation: Some(PluginAnimation::Hop),
                     children: vec![],
@@ -808,6 +812,7 @@ mod tests {
                     action: "off".into(),
                     kind: PluginButtonKind::Secondary,
                     disabled: true,
+                    expanded: None,
                 }),
             ],
         );
@@ -836,6 +841,7 @@ mod tests {
             action: "go".into(),
             kind: PluginButtonKind::Primary,
             disabled: false,
+            expanded: None,
         });
         set(&mut trees, PluginSlot::Dialog, vec![button.clone()]);
         set(&mut trees, PluginSlot::Panel, vec![button]);

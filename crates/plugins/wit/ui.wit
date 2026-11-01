@@ -120,6 +120,9 @@ interface ui {
     action: string,
     kind: button-kind,
     disabled: bool,
+    /// Disclosure state: `some(true)` while the controlled content is open, `some(false)` while
+    /// closed (announced as expanded/collapsed). `none` for ordinary buttons.
+    expanded: option<bool>,
   }
 
   record icon-button {

@@ -556,6 +556,7 @@ mod tests {
                 action: "go".to_owned(),
                 kind: ButtonKind::Primary,
                 disabled: false,
+                expanded: None,
             }),
             vec![],
         )

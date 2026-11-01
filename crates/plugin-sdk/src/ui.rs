@@ -108,6 +108,16 @@ impl El {
         self
     }
 
+    /// Marks a button as a disclosure control: `true` while its content is open (aria-expanded);
+    /// no effect on others.
+    #[must_use]
+    pub fn expanded(mut self, open: bool) -> Self {
+        if let Component::Button(c) = &mut self.component {
+            c.expanded = Some(open);
+        }
+        self
+    }
+
     /// Sets the kind of a button; no effect on others.
     #[must_use]
     pub fn kind(mut self, kind: ButtonKind) -> Self {
@@ -209,6 +219,7 @@ pub fn button(action: &str, label: &str) -> El {
         action: action.to_owned(),
         kind: ButtonKind::Primary,
         disabled: false,
+        expanded: None,
     }))
 }
 

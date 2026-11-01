@@ -166,11 +166,54 @@ describe("PluginTree", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("announces the open or closed state of a disclosure button", () => {
+    show([
+      stack([1, 2, 3]),
+      leaf({
+        type: "button",
+        label: "Open",
+        action: "a",
+        kind: "secondary",
+        disabled: false,
+        expanded: true,
+      }),
+      leaf({
+        type: "button",
+        label: "Closed",
+        action: "b",
+        kind: "secondary",
+        disabled: false,
+        expanded: false,
+      }),
+      leaf({
+        type: "button",
+        label: "Plain",
+        action: "c",
+        kind: "secondary",
+        disabled: false,
+        expanded: null,
+      }),
+    ]);
+    expect(screen.getByRole("button", { name: "Open" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Closed" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: "Plain" })).not.toHaveAttribute("aria-expanded");
+  });
+
   it("sends button, toggle and refresh actions for its slot", () => {
     const action = vi.spyOn(api, "pluginUiAction").mockResolvedValue(null);
     show([
       stack([1, 2]),
-      leaf({ type: "button", label: "Vote", action: "vote", kind: "primary", disabled: false }),
+      leaf({
+        type: "button",
+        label: "Vote",
+        action: "vote",
+        kind: "primary",
+        disabled: false,
+        expanded: null,
+      }),
       leaf({ type: "toggle", label: "Notify", value: false, action: "notify", disabled: false }),
     ]);
     fireEvent.click(screen.getByRole("button", { name: "Vote" }));
@@ -181,7 +224,14 @@ describe("PluginTree", () => {
 
   it("tells the user when an action fails", async () => {
     show([
-      leaf({ type: "button", label: "Vote", action: "vote", kind: "primary", disabled: false }),
+      leaf({
+        type: "button",
+        label: "Vote",
+        action: "vote",
+        kind: "primary",
+        disabled: false,
+        expanded: null,
+      }),
     ]);
     fireEvent.click(screen.getByRole("button", { name: "Vote" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("could not handle");
