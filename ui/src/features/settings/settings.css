@@ -975,8 +975,9 @@
   background: var(--color-warning);
 }
 
+/* Opaque, so the text keeps its contrast on hovered and selected cards too (WCAG AA). */
 .setting-badge--recommended {
-  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  background: color-mix(in srgb, var(--color-success) 12%, var(--color-bg-elevated));
   color: var(--color-success);
 }
 
