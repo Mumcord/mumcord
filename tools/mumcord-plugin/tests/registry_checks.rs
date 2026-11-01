@@ -2,7 +2,8 @@
 //! registry (AC-6.19, AC-6.20): automatic updates, updates that ask, pinning, rollback of a
 //! version that fails to start, and the daily revocation check with updates switched off. Also a
 //! third-party repository (AC-6.22): fingerprint, unofficial install, official ids ignored, the
-//! ten-repository limit and the pause on a key change.
+//! ten-repository limit and the pause on a key change. Official-only permissions from a
+//! third-party repository are refused (AC-6.16).
 //!
 //! All tests trust one test key through `MUMCORD_PLUGIN_REGISTRY_KEY`, set exactly once before
 //! anything else in this binary reads the environment (see [`shared`]).
@@ -118,13 +119,17 @@ fn package(id: &str, version: &str, start: &str, permissions: &[&str]) -> Vec<u8
         .iter()
         .map(|p| serde_json::json!({ "id": p }))
         .collect();
-    let manifest = serde_json::json!({
+    let mut manifest = serde_json::json!({
         "manifest": 1, "id": id, "name": "Test", "version": version, "api": "^1.0",
         "authors": ["Tests"], "description": "A test plugin", "categories": ["tools"],
         "license": "MIT",
         "permissions": {"required": [permissions[0]], "optional": optional},
-    })
-    .to_string();
+    });
+    if permissions.contains(&"net.http") {
+        // `net.http` is only valid together with the hosts it may reach.
+        manifest["net"] = serde_json::json!({ "hosts": "user-configured" });
+    }
+    let manifest = manifest.to_string();
     let wasm = component(start);
     let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
     let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
@@ -177,19 +182,26 @@ impl Registry {
             .spawn()
             .expect("serve-registry starts");
         let stdout = child.stdout.take().expect("stdout");
-        let base = BufReader::new(stdout)
-            .lines()
-            .map_while(Result::ok)
-            .find_map(|l| {
-                l.strip_prefix("official registry base ")
+        // Keep reading after the address: the server prints more lines (the repository key)
+        // and would die of a broken pipe if nobody read them.
+        let (address, found) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            for line in BufReader::new(stdout).lines().map_while(Result::ok) {
+                let base = line
+                    .strip_prefix("official registry base ")
                     .map(str::to_owned)
                     .or_else(|| {
-                        l.strip_prefix("repository address ")
+                        line.strip_prefix("repository address ")
                             .and_then(|url| url.strip_suffix("index.json"))
                             .map(str::to_owned)
-                    })
-            })
-            .expect("serve-registry prints its address");
+                    });
+                if let Some(base) = base {
+                    // Only the first address counts; a closed receiver is fine.
+                    let _ = address.send(base);
+                }
+            }
+        });
+        let base = found.recv().expect("serve-registry prints its address");
         Self {
             child,
             packages,
@@ -443,9 +455,8 @@ fn a_revocation_turns_a_plugin_off_with_updates_off() {
 /// shows the fingerprint and ignores the entry using the official id `poll`, its plugin installs
 /// as unofficial, an 11th repository is refused and a key change pauses the repository and turns
 /// its plugin off.
-#[test]
-fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
-    shared();
+/// A fresh third-party repository key: its folder and the public key line.
+fn repository_key() -> (tempfile::TempDir, String) {
     let keys = tempfile::tempdir().expect("temp dir");
     let out = cli(&[
         "keygen",
@@ -463,6 +474,13 @@ fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
         .expect("key line")
         .trim()
         .to_owned();
+    (keys, public)
+}
+
+#[test]
+fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
+    shared();
+    let (keys, public) = repository_key();
     runtime().block_on(async {
         let registry = Registry::start();
         registry.publish("poll", "1.0.0", OK_START, PERMISSIONS);
@@ -590,5 +608,88 @@ fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
         let fan = app.info("fan-pets");
         assert_eq!(fan.status, Status::Off);
         assert!(!fan.enabled);
+    });
+}
+
+/// AC-6.16: a third-party package that asks for `ui.webview`, `net.http` or `secrets` (required
+/// or optional) is refused at install with the exact user text, and nothing is installed.
+#[test]
+fn a_third_party_repository_cannot_grant_official_only_permissions() {
+    shared();
+    let (keys, _public) = repository_key();
+    runtime().block_on(async {
+        let registry = Registry::start();
+        let repository = Registry::start_repository("Fan Repo", &keys.path().join("repo.key"));
+        let cases: [(&str, &[&str]); 4] = [
+            ("fan-web", &["ui.panel", "ui.webview"]),
+            ("fan-http", &["net.http"]),
+            ("fan-secrets", &["secrets"]),
+            ("fan-plain", &["ui.panel"]),
+        ];
+        for (id, permissions) in cases {
+            repository.publish(id, "1.0.0", OK_START, permissions);
+        }
+        let app = App::new(&registry, |_| {});
+        let url = format!("{}index.json", repository.base);
+        let preview = preview_repository(&app.client, &url, None, &|_: &str| false)
+            .await
+            .expect("valid repository");
+        let repository_id = app
+            .store
+            .lock()
+            .expect("lock")
+            .add_plugin_repository(
+                &NewPluginRepository {
+                    url: preview.url.clone(),
+                    name: preview.info.name.clone(),
+                    public_key: preview.info.public_key.clone(),
+                },
+                0,
+            )
+            .expect("added");
+        let bytes = app.client.download(&url, 1 << 20).await.expect("index");
+        let index = Index::parse(
+            &bytes.bytes,
+            &IndexKind::Repository {
+                is_official_id: &|_: &str| false,
+            },
+        )
+        .expect("index parses");
+
+        for (id, _) in cases {
+            let plugin = index.plugin(id).expect("listed");
+            let latest = plugin.latest();
+            let download = app
+                .client
+                .download(&latest.url, latest.size)
+                .await
+                .expect("download");
+            let request = InstallRequest {
+                source: Source::Repo { repository_id },
+                entry: plugin.entry(latest),
+                optional: vec![],
+                visibility: PluginVisibility::Friends,
+            };
+            let result = app
+                .service
+                .lock()
+                .expect("lock")
+                .install(&request, &download);
+            if id == "fan-plain" {
+                result.expect("a plugin without official-only permissions installs");
+                continue;
+            }
+            let error = result.expect_err("official-only permission refused");
+            assert_eq!(
+                error.to_string(),
+                "This permission is only available to official plugins",
+                "{id}"
+            );
+            let installed = app.service.lock().expect("lock").list().expect("list");
+            assert!(
+                installed.iter().all(|p| p.id != id),
+                "{id} left something behind"
+            );
+        }
     });
 }
