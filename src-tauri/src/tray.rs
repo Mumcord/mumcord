@@ -170,7 +170,7 @@ struct Shown {
 }
 
 /// The flat, outlined tray mark (64 px; trays render at 16–32 px): the full-colour app icon's
-/// speech bubbles and gradients turn to noise at tray size.
+/// cap details, colours and gradients turn to noise at tray size.
 fn base_icon() -> Image<'static> {
     tauri::include_image!("icons/tray.png")
 }
