@@ -10,11 +10,12 @@
 
 use std::collections::{BTreeMap, HashMap};
 use std::fs;
-use std::io::{BufRead, BufReader, Write};
-use std::net::{TcpListener, TcpStream};
+use std::io::{self, BufRead, BufReader, Read, Write};
+use std::net::{Shutdown, TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, PoisonError};
 use std::thread;
+use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 use mumcord_plugins::package::Digest;
@@ -410,17 +411,23 @@ fn handle(stream: TcpStream, registry: &Mutex<Registry>) -> Result<()> {
     let mut request_line = String::new();
     reader.read_line(&mut request_line)?;
     let mut if_none_match = None;
+    let mut content_length = 0;
     loop {
         let mut line = String::new();
         if reader.read_line(&mut line)? == 0 || line == "\r\n" || line == "\n" {
             break;
         }
-        if let Some((name, value)) = line.split_once(':')
-            && name.eq_ignore_ascii_case("if-none-match")
-        {
-            if_none_match = Some(value.trim().to_owned());
+        if let Some((name, value)) = line.split_once(':') {
+            if name.eq_ignore_ascii_case("if-none-match") {
+                if_none_match = Some(value.trim().to_owned());
+            } else if name.eq_ignore_ascii_case("content-length") {
+                content_length = value.trim().parse().context("invalid Content-Length")?;
+            }
         }
     }
+    // No route takes a body, but it must be consumed: closing a socket with unread bytes makes
+    // the OS send a reset instead of a clean close, and the client then loses the response.
+    io::copy(&mut (&mut reader).take(content_length), &mut io::sink())?;
     let mut parts = request_line.split_whitespace();
     let (method, target) = (
         parts.next().unwrap_or_default(),
@@ -459,7 +466,32 @@ fn handle(stream: TcpStream, registry: &Mutex<Registry>) -> Result<()> {
     };
     drop(registry);
     eprintln!("{method} {path} {}", response.status);
-    response.write(stream, method == "HEAD")
+    response.write(&stream, method == "HEAD")?;
+    close_gracefully(&stream, reader)
+}
+
+/// Lingering close: send FIN first, then drain whatever the client still sends (e.g. bytes of a
+/// pipelined request) until it closes too. Dropping the socket with data left in the receive
+/// buffer would reset the connection, and Windows then discards the response the client has not
+/// read yet.
+fn close_gracefully(stream: &TcpStream, mut reader: impl Read) -> Result<()> {
+    stream.shutdown(Shutdown::Write)?;
+    stream.set_read_timeout(Some(Duration::from_secs(2)))?;
+    match io::copy(&mut reader, &mut io::sink()) {
+        Ok(_) => Ok(()),
+        // The response is already complete; a client that resets or idles afterwards is harmless.
+        Err(e)
+            if matches!(
+                e.kind(),
+                io::ErrorKind::ConnectionReset
+                    | io::ErrorKind::WouldBlock
+                    | io::ErrorKind::TimedOut
+            ) =>
+        {
+            Ok(())
+        }
+        Err(e) => Err(e.into()),
+    }
 }
 
 struct Response {
@@ -479,7 +511,7 @@ impl Response {
         }
     }
 
-    fn write(self, mut stream: TcpStream, head: bool) -> Result<()> {
+    fn write(self, mut stream: &TcpStream, head: bool) -> Result<()> {
         let reason = match self.status {
             200 => "OK",
             304 => "Not Modified",
@@ -628,15 +660,21 @@ mod tests {
             etag: Option<&str>,
         ) -> (u16, Option<String>, Vec<u8>) {
             let address = base.trim_start_matches("http://").trim_end_matches('/');
-            let mut stream = TcpStream::connect(address).expect("test step");
             let extra = etag
                 .map(|e| format!("If-None-Match: {e}\r\n"))
                 .unwrap_or_default();
-            write!(
-                stream,
-                "{method} /{path} HTTP/1.1\r\nHost: x\r\n{extra}\r\n"
+            exchange(
+                address,
+                &format!(
+                    "{method} /{path} HTTP/1.1\r\nHost: x\r\nConnection: close\r\nContent-Length: 0\r\n{extra}\r\n"
+                ),
             )
-            .expect("test step");
+        }
+
+        /// Sends `request` in one write and parses the response the server ends with a clean close.
+        fn exchange(address: &str, request: &str) -> (u16, Option<String>, Vec<u8>) {
+            let mut stream = TcpStream::connect(address).expect("test step");
+            stream.write_all(request.as_bytes()).expect("test step");
             let mut raw = Vec::new();
             stream.read_to_end(&mut raw).expect("test step");
             let split = raw.windows(4).position(|w| w == b"\r\n\r\n").expect("head");
@@ -762,6 +800,22 @@ mod tests {
             assert!(index.sequence > 10, "a reload publishes a newer index");
             let (status, _, _) = request(&base, "POST", "_ctl/scenario?set=melt-down", None);
             assert_eq!(status, 400);
+        }
+
+        #[test]
+        fn a_request_body_and_trailing_bytes_still_end_in_a_clean_close() {
+            let fixture = fixture();
+            let running = start(args(&fixture, None)).expect("test step");
+            let address = running
+                .base
+                .trim_start_matches("http://")
+                .trim_end_matches('/');
+            let (status, _, body) = exchange(
+                address,
+                "POST /_ctl/scenario?set= HTTP/1.1\r\nHost: x\r\nContent-Length: 9\r\n\r\nset=dummyGET /v1/index.json HTTP/1.1\r\n\r\n",
+            );
+            assert_eq!(status, 200, "{}", String::from_utf8_lossy(&body));
+            assert_eq!(body, b"ok\n");
         }
 
         #[tokio::test]
