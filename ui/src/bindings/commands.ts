@@ -630,12 +630,13 @@ export const commands = {
 	watchPartyRemove: (serverId: number, entry: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_remove", { serverId, entry })),
 	/**  Moves an entry of the party's playlist to `index` (0 plays next). */
 	watchPartyMove: (serverId: number, entry: number, index: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_move", { serverId, entry, index })),
+	/**  Goes back to the video that played before the current one for everyone (issue #163). */
+	watchPartyPrevious: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_previous", { serverId })),
 	/**
 	 *  Goes on from entry `from` to the next playlist entry for everyone: at the end of a video,
 	 *  or at once with `skip`.
 	 */
 	watchPartyNext: (serverId: number, from: number, skip: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_next", { serverId, from, skip })),
-	watchPartyPrevious: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("watch_party_previous", { serverId })),
 	/**
 	 *  URL of the loopback page that hosts the party's YouTube player (FR-2.41a); starts its server
 	 *  on first use. It stops by itself once the user is in no party and no chat embed plays.
@@ -671,19 +672,20 @@ export const commands = {
 	screenShareRequestKeyframe: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_request_keyframe", { serverId, session })),
 	/**  The shares in the user's channel (for a view opened after the last event). */
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
+	/**
+	 *  What blocks starting a share on the server right now; `null` when sharing is possible. The
+	 *  settings and the relay change without an event, so the UI asks again before starting.
+	 */
+	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
 	/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
 	screenShareQuality: (serverId: number) => typedError<ShareQuality | null, ApiError>(__TAURI_INVOKE("screen_share_quality", { serverId })),
+	/**  The picture the sharer's bar shows: the last keyframe the encoder took (issue #163). */
 	screenShareThumbnail: (serverId: number) => typedError<ShareThumbnail | null, ApiError>(__TAURI_INVOKE("screen_share_thumbnail", { serverId })),
 	/**
 	 *  What the user's own watch of `session`'s share looks like (issue #163); the picture figures are
 	 *  counted in the UI from the frames. `None` while not watching.
 	 */
 	screenShareWatchStats: (serverId: number, session: number) => typedError<WatchStats | null, ApiError>(__TAURI_INVOKE("screen_share_watch_stats", { serverId, session })),
-	/**
-	 *  What blocks starting a share on the server right now; `null` when sharing is possible. The
-	 *  settings and the relay change without an event, so the UI asks again before starting.
-	 */
-	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
 	/**  The updater's current state. */
 	updateStatus: () => __TAURI_INVOKE<UpdateStatus>("update_status"),
 	/**
@@ -1394,6 +1396,12 @@ export type GamePluginProblem =
 "unsupported" | 
 /**  The plugin failed and is not used until it is enabled again. */
 "failed";
+
+/**  One video that already played, for the previous button (issue #163). */
+export type HistoryItem = {
+	id: number,
+	videoId: string,
+};
 
 export type HistoryScope = { kind: "conversation"; serverId: number; conversation: Conversation } | { kind: "server"; serverId: number } | { kind: "all" };
 
@@ -2685,13 +2693,6 @@ export type Settings = {
 	blockedMessages: BlockedMessages,
 };
 
-/**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
-export type ShareStartBlock = {
-	blocked: WatchBlock,
-	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
-	relayReason: RelayUnavailable | null,
-};
-
 /**  What the sharer picked in the system picker (issue #163). */
 export type ShareKind = "window" | "screen";
 
@@ -2699,19 +2700,27 @@ export type ShareKind = "window" | "screen";
 export type SharePath = "direct";
 
 /**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
-export type ShareThumbnail = {
-	width: number,
-	height: number,
-	/**  The last keyframe, scaled down, as a `data:` URL the UI shows as it is. */
-	dataUrl: string,
-};
-
 export type ShareQuality = {
 	width: number,
 	height: number,
 	fps: number,
 	kbps: number,
 	viewers: ViewerQuality[],
+};
+
+/**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */
+export type ShareStartBlock = {
+	blocked: WatchBlock,
+	/**  Why the relay cannot be used, when `blocked` is `relayUnavailable`. */
+	relayReason: RelayUnavailable | null,
+};
+
+/**  The live picture of the own share for the sharer's bar (issue #163, FR-3.127). */
+export type ShareThumbnail = {
+	width: number,
+	height: number,
+	/**  The last keyframe, scaled down, as a `data:` URL the UI shows as it is. */
+	dataUrl: string,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -3042,11 +3051,6 @@ export type WatchBlock =
 export type WatchCommand = { kind: "play"; positionMs: number } | { kind: "pause"; positionMs: number } | { kind: "seek"; positionMs: number };
 
 /**  The running party in the voice channel. */
-export type HistoryItem = {
-	id: number,
-	videoId: string,
-};
-
 export type WatchParty = {
 	channelId: number,
 	videoId: string,
@@ -3076,46 +3080,6 @@ export type WatchPartyChanged = {
 	party: WatchParty | null,
 };
 
-export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
-/**  Why whisper keys cannot work in this session. */
-export type WhisperKeysUnavailable = 
-/**
- *  Native Wayland without the global-shortcuts portal; the X11 compatibility mode offers
- *  the keys.
- */
-"waylandPortal";
-export type WhisperReceivers = 
-/**  People by name: a whisper. */
-{ kind: "people"; names: string[] } | 
-/**  Everyone in the channel at `path` below the root: a shout. */
-{ kind: "channel"; path: string[]; children: boolean; links: boolean; 
-/**  Only members of this ACL group. */
-group: string | null };
-/**  The saved targets and whether their keys work. */
-export type WhisperSetup = {
-	targets: WhisperTarget[],
-	/**  Set when no whisper key can work in this session. */
-	keysUnavailable: WhisperKeysUnavailable | null,
-	/**  Targets whose key could not be registered (e.g. another app holds it). */
-	failedKeys: string[],
-};
-/**  The own whisper or shout. */
-export type WhisperState = { state: "idle" } | 
-/**  `held`: started by holding the target's key (released, it ends), else from the UI. */
-{ state: "active"; targetId: string; held: boolean } | 
-/**  The last start failed; `channel` names the channel without the Whisper permission. */
-{ state: "denied"; targetId: string; reason: WhisperDeniedReason; channel: string | null };
-/**  The own whisper started, stopped or was refused (also when started by its key). */
-export type WhisperStateChanged = {
-	state: WhisperState,
-};
-export type WhisperTarget = {
-	id: string,
-	/**  Plain text, chosen by the user. */
-	name: string,
-	receivers: WhisperReceivers,
-	/**  Hold-to-talk key in the push-to-talk key format, e.g. `"F9"` or `"Ctrl+W"`. */
-	hotkey: string | null,
 /**
  *  What the user's own watch of a share looks like (issue #163); the picture figures come from
  *  the frames themselves and are counted in the UI.
@@ -3128,6 +3092,54 @@ export type WatchStats = {
 	path: SharePath,
 	/**  Sound level of the shared sound at the viewer, 0.0–1.0. */
 	rms: number | null,
+};
+
+export type WhisperDeniedReason = "noVoiceServer" | "muted" | "serverMuted" | "nobodyHere" | "channelNotFound" | "noPermission" | "unknownTarget";
+
+/**  Why whisper keys cannot work in this session. */
+export type WhisperKeysUnavailable = 
+/**
+ *  Native Wayland without the global-shortcuts portal; the X11 compatibility mode offers
+ *  the keys.
+ */
+"waylandPortal";
+
+export type WhisperReceivers = 
+/**  People by name: a whisper. */
+{ kind: "people"; names: string[] } | 
+/**  Everyone in the channel at `path` below the root: a shout. */
+{ kind: "channel"; path: string[]; children: boolean; links: boolean; 
+/**  Only members of this ACL group. */
+group: string | null };
+
+/**  The saved targets and whether their keys work. */
+export type WhisperSetup = {
+	targets: WhisperTarget[],
+	/**  Set when no whisper key can work in this session. */
+	keysUnavailable: WhisperKeysUnavailable | null,
+	/**  Targets whose key could not be registered (e.g. another app holds it). */
+	failedKeys: string[],
+};
+
+/**  The own whisper or shout. */
+export type WhisperState = { state: "idle" } | 
+/**  `held`: started by holding the target's key (released, it ends), else from the UI. */
+{ state: "active"; targetId: string; held: boolean } | 
+/**  The last start failed; `channel` names the channel without the Whisper permission. */
+{ state: "denied"; targetId: string; reason: WhisperDeniedReason; channel: string | null };
+
+/**  The own whisper started, stopped or was refused (also when started by its key). */
+export type WhisperStateChanged = {
+	state: WhisperState,
+};
+
+export type WhisperTarget = {
+	id: string,
+	/**  Plain text, chosen by the user. */
+	name: string,
+	receivers: WhisperReceivers,
+	/**  Hold-to-talk key in the push-to-talk key format, e.g. `"F9"` or `"Ctrl+W"`. */
+	hotkey: string | null,
 };
 
 /**  The look of the main window's root element, for a window of its own to copy. */
