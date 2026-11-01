@@ -97,7 +97,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | P4 | Poll chat card per #284 mockup: top 3 options + "Open" (opens popover) so 4+ options don't clip; plus docs/spec: "byte counter" → character counter (ui.wit comment, FR-6.41) | open | |
 | V-A | Mockup conformance: Plugins settings header, sandbox subtitle, tab counts (see scratchpad v1/deviations.md) | in progress | v-a |
 | V-B | Mockup conformance: Installed tab card rows (see scratchpad v1/deviations.md) | in progress | v-b |
-| V-C | Mockup conformance: Browse two-column grid (see scratchpad v1/deviations.md) | in progress | v-c |
+| V-C | Mockup conformance: Browse two-column grid (see scratchpad v1/deviations.md) | done (1881b87a) | v-c |
 | V-D | Mockup conformance: Plugin detail page (see scratchpad v1/deviations.md) | done (138f2d3d) | v-d |
 | V-E | Mockup conformance: Install prompt redesign (see scratchpad v1/deviations.md) | done (ed55dd0e; per-permission explanations, E4/E5 → V-D2) | v-e |
 | V-F | Mockup conformance: Updates tab redesign (see scratchpad v1/deviations.md) | done (5b360924; later: skip version, release notes, last-checked time) | v-f |
