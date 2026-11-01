@@ -1,25 +1,77 @@
 {
   "progress": "Pass {{current}} minn {{total}}",
   "loadFailed": "Is-setup ma setax jitgħabba.",
-  "finish": "Spiċċa",
+  "recommended": "Rakkomandat",
+  "tipLabel": "Dwar {{name}}",
   "errors": {
     "generic": "Xi ħaġa marret ħażin. Erġa' pprova.",
     "secureStorageUnavailable": "Mumcord ma jistax jilħaq l-ħażna sigura tas-sistema tiegħek. Ħoll il-keyring jew il-password manager tiegħek u erġa' pprova.",
     "saveFailed": "Is-settings tiegħek ma setgħux jiġu ssejvjati. Erġa' pprova."
   },
+  "nav": {
+    "getStarted": "Ejja nibdew",
+    "finishSetup": "Spiċċa s-setup",
+    "startMumcord": "Ibda Mumcord",
+    "finish": "Spiċċa",
+    "skip": "Aqbeż għalissa",
+    "enterKey": "Enter",
+    "enterHint": "biex tkompli"
+  },
+  "rail": {
+    "label": "Passi tas-setup",
+    "appName": "Mumcord",
+    "setup": "Setup",
+    "custom": "Personalizzat",
+    "done": "(lest)",
+    "progress": "Progress tas-setup",
+    "later": "Dak kollu hawnhekk jista' jinbidel aktar tard fis-Settings."
+  },
+  "steps": {
+    "welcome": "Merħba",
+    "import": "Importa minn Mumble",
+    "identity": "Identità",
+    "voice": "Vuċi",
+    "setupStyle": "Stil tas-setup",
+    "privateMessages": "Messaġġi privati",
+    "connections": "Konnessjonijiet",
+    "features": "Karatteristiċi",
+    "appearance": "Dehra",
+    "startup": "Tnedija u aġġornamenti",
+    "summary": "Kollox lest"
+  },
+  "welcome": {
+    "title": "Chat bil-vuċi li tħossu bħal",
+    "titleAccent": "post tiegħek stess.",
+    "subtitle": "Mumcord jitkellem Mumble, għalhekk jaħdem ma' kull server Mumble, u jżid chat modern fuqu. Ejja nissettjawh kif togħġob. Jieħu madwar żewġ minuti.",
+    "voice": {
+      "title": "Vuċi kristallina",
+      "text": "Awdjo b'latenza baxxa b'tnaqqis tal-istorbju inkorporat."
+    },
+    "servers": {
+      "title": "Jaħdem ma' kull server Mumble",
+      "text": "L-ebda kont, l-ebda reġistrazzjoni. Ingħaqad mas-servers li diġà tuża."
+    },
+    "private": {
+      "title": "Privat mid-disinn",
+      "text": "L-ebda telemetrija. Dak li Mumcord jaħżen jibqa' fuq il-kompjuter tiegħek."
+    }
+  },
   "identity": {
-    "title": "L-identità tiegħek",
-    "intro": "Is-servers jagħarfuk mill-identità tiegħek. Oħloq waħda ġdida jew ġib dik li diġà tuża.",
-    "create": "Oħloq waħda ġdida",
-    "import": "Importa fajl",
-    "name": "Isem",
-    "nameHint": "Persuni oħra jaraw dan l-isem. Tista' tbiddlu għal kull server aktar tard.",
+    "title": "Min int fuq Mumble?",
+    "intro": "L-identità tiegħek hija kif is-servers jagħrfuk. Oħloq waħda ġdida, jew ġib dik li diġà tuża.",
+    "legend": "L-identità tiegħek",
+    "create": "Oħloq identità ġdida",
+    "createText": "L-identità tiegħek hija ċertifikat li jipprova min int fuq is-servers ta' Mumble. Iżomm l-isem reġistrat tiegħek u l-permessi tiegħek, biex tkun l-istess persuna kull darba li tingħaqad.",
+    "import": "Importa identità eżistenti",
+    "name": "Isem tal-wiri default",
+    "nameHint": "Jintuża fuq servers li għadhom ma jafukx. Tista' tbiddlu għal kull server.",
     "chooseFile": "Agħżel fajl…",
     "noFile": "L-ebda fajl magħżul",
     "chosenFile": "Fajl magħżul: {{file}}",
-    "password": "Password tal-fajl (jekk hemm)",
+    "password": "Password tal-fajl",
+    "passwordHint": "Il-password tibqa' fuq dan il-kompjuter u qatt ma tintbagħat imkien.",
     "existing": "Qed tuża l-identità {{name}}.",
-    "backup": "L-identità tiegħek hija bħal ċavetta. Agħmel backup tagħha aktar tard f'Settings → Identity.",
+    "backup": "Agħmel backup tagħha aktar tard fis-Settings. Backup jippermettilek tirrestawra l-identità tiegħek fuq kompjuter ġdid.",
     "nameRequired": "Jekk jogħġbok daħħal isem.",
     "fileRequired": "Jekk jogħġbok agħżel fajl tal-identità (.p12 jew .pfx).",
     "fileType": "Fajl tal-identità",
@@ -29,101 +81,142 @@
     "pickFailed": "Is-selettur tal-fajls ma setax jinfetaħ."
   },
   "mic": {
-    "title": "Mikrofonu",
-    "intro": "Agħżel il-mikrofonu u l-ispikers tiegħek. Normalment id-defaults jaħdmu.",
     "input": "Mikrofonu",
     "output": "Spikers jew headphones",
     "systemDefault": "Default tas-sistema",
     "defaultVia": "Default tas-sistema ({{backend}})",
     "level": "Livell tal-mikrofonu",
-    "test": "Ittestja",
-    "stop": "Waqqaf",
     "idle": "Agħfas Ittestja, ikkellem xi ħaġa, u tisma' lilek innifsek.",
     "recording": "Tkellem issa…",
     "playing": "Qed jindaqq il-vuċi tiegħek…",
     "devicesFailed": "L-apparati tal-awdjo tiegħek ma setgħux jiġu elenkati. Tista' tkompli u tagħżilhom aktar tard f'Settings.",
-    "testFailed": "It-test ma setax jibda. Iċċekkja li l-mikrofonu huwa konness."
+    "testFailed": "It-test ma setax jibda. Iċċekkja li l-mikrofonu huwa konness.",
+    "test": "Isma' lilek innifsek",
+    "stop": "Waqqaf"
   },
-  "privacy": {
-    "title": "Il-privatezza tiegħek",
-    "noTelemetry": "Mumcord ma jibgħat l-ebda telemetrija, analitika jew rapporti ta' ċraxxijiet.",
-    "ownServers": "Jikkonnettja biss mas-servers li iżżid int.",
-    "linkPreviews": "Il-previews tal-links u x-xbihat jew il-GIFs mil-links taċ-chat jiġu mgħobbija mis-siti marbuta. Tista' ttifihom fil-pass li jmiss jew aktar tard fis-Settings.",
-    "mumcordUsers": "Il-karatteristiċi ta' Mumcord biss jiskambjaw data biss ma' utenti oħra ta' Mumcord fl-istess server.",
-    "local": "Kull ma jaħżen Mumcord jibqa' fuq il-kompjuter tiegħek.",
-    "statement": "Dikjarazzjoni sħiħa tal-privatezza"
+  "voice": {
+    "title": "Tinstema' tajjeb?",
+    "subtitle": "Agħżel l-apparati tiegħek u għid xi ħaġa. Il-bar għandu jiċċaqlaq waqt li titkellem.",
+    "talkLegend": "Kif trid titkellem?",
+    "tipLabel": "Dwar {{mode}}",
+    "voiceActivationHint": "Tkellem liberament. Mumcord jibgħat l-awdjo meta titkellem.",
+    "pushToTalkHint": "Żomm ċavetta waqt li titkellem. L-aħjar f'postijiet storbjużi.",
+    "keyRequired": "Agħżel ċavetta push-to-talk jew aqleb għall-attivazzjoni bil-vuċi.",
+    "notSure": "Mhux ċert? Ibda bl-attivazzjoni bil-vuċi. Tista' tbiddel meta trid mis-settings rapidi."
   },
-  "updates": {
-    "title": "Verżjonijiet ġodda",
-    "choice": "Meta toħroġ verżjoni ġdida",
-    "auto": "Niżżel awtomatikament",
-    "autoHint": "Mumcord jniżżel u jivverifika l-aġġornament fl-isfond u jistaqsik qabel ma jerġa' jibda.",
-    "notify": "Ibgħat notifika biss",
-    "notifyHint": "Mumcord jgħarrfek dwar verżjoni ġdida u juri x'inbidel. Xejn ma jitniżżel sakemm ma tgħidx int.",
-    "off": "Mitfi",
-    "offHint": "Mumcord ma jistaqsix lil GitHub dwar verżjonijiet ġodda qatt. Taġġorna int stess.",
-    "privacy": "Iċ-ċekk jibgħat lil GitHub biss it-talba nfisha u l-isem u l-verżjoni tal-app. Tista' tibdel dan aktar tard fis-Settings."
-  },
-  "talk": {
-    "title": "Kif trid titkellem?",
-    "mode": "Mod tat-tkellim",
-    "voiceActivation": "Attivazzjoni bil-vuċi",
-    "voiceActivationHint": "Il-mikrofonu tiegħek jixgħel meta titkellem.",
-    "pushToTalk": "Push-to-talk",
-    "pushToTalkHint": "Żomm buttuna waqt li titkellem.",
-    "waylandNoPortal": "Push to talk mhuwiex disponibbli: id-desktop tiegħek ma jħallix lill-apps jużaw shortcuts globali. L-attivazzjoni bil-vuċi taħdem mingħajr buttuna.",
-    "registrationFailed": "Push to talk ma setax jiġi ssettjat fuq din is-sistema. Uża l-attivazzjoni bil-vuċi minflok.",
-    "key": "Buttuna tal-push-to-talk",
-    "noKey": "L-ebda buttuna magħżula",
-    "currentKey": "Buttuna: {{key}}",
-    "chooseKey": "Agħżel buttuna",
-    "changeKey": "Biddel il-buttuna",
-    "pressKey": "Agħfas buttuna… (Escape biex tikkanċella)",
-    "confirmDialog": "Ikkonferma l-shortcut fid-dijalogu tas-sistema jew assenjah fit-tieqa tas-System Settings li se tiftaħ… (Escape biex tikkanċella)",
-    "keyInvalid": "Dik il-buttuna ma tistax tintuża. Ipprova oħra.",
-    "keyNotConfirmed": "Id-desktop ma kkonfermax l-shortcut. Erġa' pprova u aċċetta d-dijalogu tas-sistema, jew assenja l-buttuna fis-settings tal-shortcuts tad-desktop.",
-    "keyRequired": "Agħżel buttuna tal-push-to-talk jew aqleb għall-attivazzjoni bil-vuċi.",
-    "linkHandler": "Iftaħ il-links mumble:// b'Mumcord",
-    "linkHandlerHint": "Meta tikklikkja link ta' server fuq sit, jinfetaħ hawn.",
-    "linkHandlerActive": "Mumcord diġà jiftaħ il-links mumble://.",
-    "linkHandlerFailed": "Mumcord ma setax jiġi ssettjat biex jiftaħ il-links mumble://. Tista' terġa' tipprova f'Settings.",
-    "mouseDisabled": "Push to talk mhuwiex disponibbli b'din il-buttuna tal-maws sakemm \"Allow mouse buttons\" ma jinxtegħelx f'Settings → Voice.",
-    "mouseNeedsInputGroup": "Push to talk mhuwiex disponibbli: Mumcord forsi ma jistax jaqra l-maws tiegħek. Settings → Voice jispjega kif tippermettih.",
-    "mouseNeedsAccessibility": "Push to talk mhuwiex disponibbli: Mumcord jeħtieġ il-permess ta' Accessibility biex jara l-buttuni tal-maws.",
-    "pressKeyOrMouse": "Agħfas buttuna jew buttuna tal-maws (nofsanija jew tal-ġenb)… (Escape biex tikkanċella)",
-    "mouse": {
-      "middle": "Buttuna tan-nofs tal-maws",
-      "back": "Buttuna 4 tal-maws (lura)",
-      "forward": "Buttuna 5 tal-maws ('il quddiem)"
+  "style": {
+    "title": "Kemm trid taqsam?",
+    "subtitle": "Agħżel punt tat-tluq. Terġa' tara kull għażla fl-aħħar skrin u tista' tbiddilha hemm.",
+    "legend": "Stil tas-setup",
+    "everythingOn": {
+      "title": "Kollox mixgħul",
+      "subtitle": "Is-sett sħiħ tal-karatteristiċi",
+      "p1": "L-oħrajn jaraw x'tilgħab u x'tisma'",
+      "p2": "L-IP tiegħek jidher għal persuni li tikkonnettja magħhom direttament",
+      "p3": "Kulħadd jista' jibgħatlek messaġġ; links u immaġini jitgħabbew mill-web",
+      "p4": "L-overlay, is-sinkronizzazzjoni tal-istorja u l-immaġini bid-daqs sħiħ huma mixgħula"
     },
-    "mouseStillWorks": "Xorta tista' tuża buttuna tal-maws.",
-    "mouseOptIn": "Trid tuża buttuna tal-ġenb tal-maws? Ixgħel \"Allow mouse buttons\" f'Settings → Voice wara s-setup.",
-    "autostart": "Ibda Mumcord meta nidħol",
-    "autostartHint": "Tista' tbiddel dan aktar tard f'Settings → Appearance.",
-    "autostartFailed": "Mumcord ma setax jiġi ssettjat biex jibda meta tidħol. Tista' terġa' tipprova f'Settings.",
-    "linkPreviews": "Uri previews u embeds tal-links",
-    "linkPreviewsHint": "Mumcord jgħabbi l-paġni marbuta biex juri previews u video players; dawk is-siti jaraw l-indirizz IP tiegħek.",
-    "historySharing": "Aqsam l-istorja tal-kanali tiegħi",
-    "historySharingHint": "Utenti oħra ta' Mumcord li jingħaqdu ma' kanal warajk jistgħu jaraw il-messaġġi preċedenti tiegħu mill-istorja ssejvjata tiegħek (sa 7 ijiem). Iċ-chats privati qatt ma jinqasmu. Tista' tbiddel dan aktar tard f'Settings → Chat & history.",
-    "ingameOverlay": "Uri l-overlay ġewwa l-logħob",
-    "ingameOverlayHint": "Juri min qed jitkellem fuq il-logħba tiegħek (Linux). Tista' tixgħelha jew titfiha għal kull logħba aktar tard f'Settings.",
-    "ingameOverlayWarning": "Xi logħob b'anti-cheat jistgħu jimmarkaw jew jimblukkaw overlays fil-logħba. Mumcord iżomm logħob magħruf bħala riskjuż (bħal Valorant jew League of Legends) mitfi b'mod default. Ixgħelha biss għal logħob li tafda.",
+    "balanced": {
+      "title": "Bilanċjat",
+      "subtitle": "Bejn il-privatezza u l-kumdità",
+      "p1": "Biss l-ħbieb u n-nies fil-kanal tiegħek jistgħu jibagħtulek messaġġ",
+      "p2": "Konnessjoni diretta, b'relay bħala riserva",
+      "p3": "Il-previews tal-links u l-immaġini bid-daqs sħiħ huma mixgħula",
+      "p4": "Dak li tilgħab u tisma' jibqa' privat"
+    },
+    "maximumPrivacy": {
+      "title": "Privatezza massima",
+      "subtitle": "Aqsam l-inqas possibbli",
+      "p1": "Biss l-ħbieb jistgħu jibagħtulek messaġġ, mingħajr eċċezzjonijiet",
+      "p2": "L-IP tiegħek huwa moħbi; kollox jgħaddi mir-relay",
+      "p3": "L-ebda kontenut minn barra, l-ebda sinkronizzazzjoni tal-istorja, l-ebda qsim",
+      "p4": "L-aġġornamenti jgħarrfuk biss; xejn ma jinqasam dwar dak li tagħmel"
+    },
+    "custom": {
+      "title": "Personalizzat",
+      "subtitle": "Għaddi minn kull għażla",
+      "p1": "Għaddi int stess minn kull pass",
+      "p2": "Ara x'jagħmel kull setting u min jarah",
+      "p3": "L-aħjar jekk taf x'trid"
+    },
+    "presetSelected": "{{preset}} magħżul: qed taqbeż il-passi dettaljati tal-privatezza. Agħżel Personalizzat biex tgħaddi minn kull wieħed.",
+    "customSelected": "Personalizzat magħżul: il-passi li jmiss jgħaddu minn kull għażla."
+  },
+  "pm": {
+    "title": "Min jista' jibgħatlek messaġġ?",
+    "subtitle": "Il-messaġġi privati huma chats wieħed-għal-wieħed. Iċ-chat tal-kanal ma jaffettwax din l-għażla.",
+    "local": "Il-filtrar isir fuq il-kompjuter tiegħek. Dawk li jibagħtu ma jiġux infurmati. Tista' tissettja regola differenti għal kull server aktar tard."
+  },
+  "connections": {
+    "title": "Konnessjonijiet u kontenut",
+    "subtitle": "Xi karatteristiċi jikkonnettjawk direttament ma' utenti oħra ta' Mumcord, u xi kontenut taċ-chat jitgħabba minn websites oħra. Agħżel dak li jaqbillek.",
+    "chatContent": "Kontenut taċ-chat",
+    "sharing": "Qsim ma' utenti ta' Mumcord"
+  },
+  "features": {
+    "title": "Agħmilha tiegħek",
+    "subtitle": "Qabbad l-extras li trid. Kull waħda tgħid min jista' jara xiex.",
+    "seenByMumcordUsers": "Jidher għall-utenti ta' Mumcord fuq l-istess server.",
+    "onlyYou": "Int biss tarah.",
     "ingameOverlayAlt": "Eżempju tal-overlay fil-logħba li juri min qed jitkellem"
+  },
+  "appearance": {
+    "title": "Agħżel id-dehra tiegħek",
+    "subtitle": "It-tieqa tiġi aġġornata hekk kif tagħżel. Hemm aktar temi, u tiegħek stess, fis-Settings."
+  },
+  "startup": {
+    "title": "Tnedija u aġġornamenti",
+    "subtitle": "Kif jibda Mumcord u x'jagħmel dwar verżjonijiet ġodda.",
+    "linkHandler": "Iftaħ links mumble:// b'Mumcord",
+    "linkHandlerHint": "Meta tikklikkja link ta' server fuq website, jinfetaħ hawnhekk.",
+    "linkHandlerActive": "Mumcord diġà jiftaħ links mumble://.",
+    "linkHandlerFailed": "Mumcord ma setax jiġi ssettjat biex jiftaħ links mumble://. Tista' terġa' tipprova fis-Settings.",
+    "autostartFailed": "Mumcord ma setax jiġi ssettjat biex jibda meta tidħol. Tista' terġa' tipprova fis-Settings."
+  },
+  "summary": {
+    "title": "Kollox lest",
+    "titleNamed": "Kollox lest, {{name}}",
+    "subtitle": "Hawn dak li għażilt. Uża Editja fuq kwalunkwe karta biex tibdilha qabel tibda.",
+    "on": "mixgħul",
+    "off": "mitfi",
+    "unavailable": "mhux disponibbli hawnhekk",
+    "editShort": "Editja",
+    "edit": "Editja {{card}}",
+    "cards": {
+      "identity": "Identità",
+      "voice": "Vuċi",
+      "privateMessages": "Messaġġi privati",
+      "connections": "Konnessjonijiet",
+      "chatContent": "Kontenut taċ-chat",
+      "features": "Karatteristiċi",
+      "appearance": "Dehra",
+      "startup": "Tnedija",
+      "updates": "Aġġornamenti"
+    },
+    "identityDetail": "Salvata fil-keychain tas-sistema tiegħek",
+    "voiceDetail": "Tnaqqis tal-istorbju: {{noise}}",
+    "pmDetail": "Il-kanal tiegħi {{channel}} · chats aċċettati {{accepted}} · talbiet {{requests}}",
+    "contentTitle": "Previews tal-links {{previews}}",
+    "contentDetail": "Immaġini bid-daqs sħiħ {{images}} · sinkronizzazzjoni tal-istorja {{sync}}",
+    "featuresTitle": "Overlay fil-logħba {{overlay}}",
+    "featuresDetail": "Segwi Do Not Disturb tas-sistema {{dnd}} · qed jindaqq issa {{playing}} · qed jilgħab issa {{gaming}}",
+    "effectsDetail": "Effetti viżwali {{effects}}",
+    "startupTitle": "Ibda meta tidħol {{login}}",
+    "startupDetail": "Ibda minimizzat {{minimized}} · links mumble:// {{links}}",
+    "updates": {
+      "auto": "Niżżel awtomatikament",
+      "notify": "Ibgħat notifika biss",
+      "off": "Mitfi"
+    },
+    "updatesDetail": "L-aġġornamenti dejjem jiġu ċċekkjati u vverifikati qabel jiġu installati.",
+    "backup": "L-identità tiegħek {{name}} hija salvata fil-keychain tas-sistema tiegħek. Agħmel backup tagħha minn Settings → Identità, biex qatt ma titlef l-isem reġistrat tiegħek.",
+    "nextServer": "Li jmiss: żid l-ewwel server tiegħek",
+    "rerunNote": "Jiġu salvati biss il-valuri li biddilt."
   },
   "rerun": {
     "title": "Wiżard tas-setup",
     "note": "Qed terġa' tgħaddi mis-setup. L-identità tiegħek ma tinbidilx.",
     "manageIdentities": "Immaniġġja l-identitajiet",
-    "stepsLabel": "Passi tas-setup",
-    "stepsSkipped": "(maqbuża, l-identità mhijiex parti minn dan)",
-    "steps": {
-      "identity": "Identità",
-      "mic": "Mikrofonu",
-      "privacy": "Privatezza",
-      "updates": "Aġġornamenti",
-      "talk": "Mod kif titkellem"
-    },
-    "footer": "Ikkanċella jħalli kollox kif inhu. Fl-aħħar jiġu salvati biss il-passi li biddilt.",
     "discardTitle": "Tarmi l-bidliet?",
     "discardBody": "Xejn mhu jiġi salvat qabel ma tispiċċa. Jekk tikkanċella issa, kollox jibqa' kif inhu.",
     "discardKeep": "Kompli teditja",

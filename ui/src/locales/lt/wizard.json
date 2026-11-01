@@ -1,25 +1,77 @@
 {
   "progress": "{{current}} žingsnis iš {{total}}",
   "loadFailed": "Nepavyko įkelti sąrankos.",
-  "finish": "Baigti",
+  "recommended": "Rekomenduojama",
+  "tipLabel": "Apie „{{name}}“",
   "errors": {
     "generic": "Kažkas nepavyko. Bandyk dar kartą.",
     "secureStorageUnavailable": "Mumcord nepasiekia tavo sistemos saugyklos. Atrakink raktų pakabą arba slaptažodžių tvarkyklę ir bandyk dar kartą.",
     "saveFailed": "Nepavyko įrašyti tavo nustatymų. Bandyk dar kartą."
   },
+  "nav": {
+    "getStarted": "Pradėkime",
+    "finishSetup": "Baigti sąranką",
+    "startMumcord": "Paleisti „Mumcord“",
+    "finish": "Baigti",
+    "skip": "Praleisti kol kas",
+    "enterKey": "Enter",
+    "enterHint": "tęsti"
+  },
+  "rail": {
+    "label": "Sąrankos žingsniai",
+    "appName": "Mumcord",
+    "setup": "Sąranka",
+    "custom": "Pasirinktinis",
+    "done": "(atlikta)",
+    "progress": "Sąrankos eiga",
+    "later": "Viską čia galima pakeisti vėliau Nustatymuose."
+  },
+  "steps": {
+    "welcome": "Sveiki",
+    "import": "Importuoti iš „Mumble“",
+    "identity": "Tapatybė",
+    "voice": "Balsas",
+    "setupStyle": "Sąrankos stilius",
+    "privateMessages": "Privačios žinutės",
+    "connections": "Ryšiai",
+    "features": "Funkcijos",
+    "appearance": "Išvaizda",
+    "startup": "Paleidimas ir atnaujinimai",
+    "summary": "Viskas paruošta"
+  },
+  "welcome": {
+    "title": "Balso pokalbiai, kurie atrodo kaip",
+    "titleAccent": "jūsų pačių erdvė.",
+    "subtitle": "„Mumcord“ kalba „Mumble“ protokolu, todėl veikia su kiekvienu „Mumble“ serveriu, o papildomai siūlo modernų pokalbį. Nustatykime jį taip, kaip jums patinka. Tai užtrunka maždaug dvi minutes.",
+    "voice": {
+      "title": "Krištolo skaidrumo balsas",
+      "text": "Mažos delsos garsas su įtaisytu triukšmo slopinimu."
+    },
+    "servers": {
+      "title": "Veikia su bet kuriuo „Mumble“ serveriu",
+      "text": "Jokios paskyros, jokios registracijos. Jungkitės prie serverių, kuriuos jau naudojate."
+    },
+    "private": {
+      "title": "Privatu pagal paskirtį",
+      "text": "Jokios telemetrijos. Tai, ką „Mumcord“ saugo, lieka jūsų kompiuteryje."
+    }
+  },
   "identity": {
-    "title": "Tavo tapatybė",
-    "intro": "Serveriai tave atpažįsta pagal tapatybę. Sukurk naują arba naudok jau turimą.",
-    "create": "Sukurti naują",
-    "import": "Importuoti failą",
-    "name": "Vardas",
-    "nameHint": "Kiti žmonės mato šį vardą. Vėliau gali pakeisti jį kiekvienam serveriui atskirai.",
+    "title": "Kas jūs esate „Mumble“?",
+    "intro": "Tapatybė – tai būdas, kuriuo serveriai jus atpažįsta. Sukurkite naują arba atsineškite jau naudojamą.",
+    "legend": "Jūsų tapatybė",
+    "create": "Sukurti naują tapatybę",
+    "createText": "Jūsų tapatybė yra sertifikatas, įrodantis, kas esate „Mumble“ serveriuose. Jis išsaugo jūsų registruotą vardą ir leidimus, todėl kaskart prisijungę esate tas pats asmuo.",
+    "import": "Importuoti esamą tapatybę",
+    "name": "Numatytasis rodomas vardas",
+    "nameHint": "Naudojamas serveriuose, kurie jūsų dar nepažįsta. Galite jį keisti kiekvienam serveriui.",
     "chooseFile": "Pasirinkti failą…",
     "noFile": "Failas nepasirinktas",
     "chosenFile": "Pasirinktas failas: {{file}}",
-    "password": "Failo slaptažodis (jei yra)",
+    "password": "Failo slaptažodis",
+    "passwordHint": "Slaptažodis lieka šiame kompiuteryje ir niekur nesiunčiamas.",
     "existing": "Naudojama tapatybė {{name}}.",
-    "backup": "Tavo tapatybė – tarsi raktas. Vėliau įrašyk jos atsarginę kopiją skiltyje Nustatymai → Tapatybė.",
+    "backup": "Atsarginę kopiją sukurkite vėliau Nustatymuose. Su ja galėsite atkurti tapatybę naujame kompiuteryje.",
     "nameRequired": "Įvesk vardą.",
     "fileRequired": "Pasirink tapatybės failą (.p12 arba .pfx).",
     "fileType": "Tapatybės failas",
@@ -29,101 +81,142 @@
     "pickFailed": "Nepavyko atidaryti failo parinkiklio."
   },
   "mic": {
-    "title": "Mikrofonas",
-    "intro": "Pasirink mikrofoną ir garsiakalbius. Numatytieji dažniausiai tinka.",
     "input": "Mikrofonas",
     "output": "Garsiakalbiai arba ausinės",
     "systemDefault": "Sistemos numatytasis",
     "defaultVia": "Sistemos numatytasis ({{backend}})",
     "level": "Mikrofono lygis",
-    "test": "Išbandyti",
-    "stop": "Stabdyti",
     "idle": "Spausk „Išbandyti“, pasakyk ką nors ir išgirsi save.",
     "recording": "Kalbėk dabar…",
     "playing": "Atkuriamas tavo balsas…",
     "devicesFailed": "Nepavyko išvardyti tavo garso įrenginių. Gali tęsti ir pasirinkti juos vėliau nustatymuose.",
-    "testFailed": "Nepavyko paleisti bandymo. Patikrink, ar mikrofonas prijungtas."
+    "testFailed": "Nepavyko paleisti bandymo. Patikrink, ar mikrofonas prijungtas.",
+    "test": "Išgirskite save",
+    "stop": "Stabdyti"
   },
-  "privacy": {
-    "title": "Jūsų privatumas",
-    "noTelemetry": "„Mumcord“ nesiunčia telemetrijos, analitikos ar strigčių ataskaitų.",
-    "ownServers": "Jis jungiasi tik prie jūsų pridėtų serverių.",
-    "linkPreviews": "Nuorodų peržiūros ir paveikslėliai ar GIF iš pokalbio nuorodų įkeliami iš susietų svetainių. Tai galite išjungti kitame žingsnyje arba vėliau nustatymuose.",
-    "mumcordUsers": "Tik „Mumcord“ funkcijos keičiasi duomenimis tik su kitais „Mumcord“ naudotojais tame pačiame serveryje.",
-    "local": "Viskas, ką saugo „Mumcord“, lieka jūsų kompiuteryje.",
-    "statement": "Pilnas privatumo pareiškimas"
+  "voice": {
+    "title": "Skamba gerai?",
+    "subtitle": "Pasirinkite įrenginius ir ką nors pasakykite. Kalbant juosta turėtų judėti.",
+    "talkLegend": "Kaip norite kalbėti?",
+    "tipLabel": "Apie režimą „{{mode}}“",
+    "voiceActivationHint": "Kalbėkite laisvai. „Mumcord“ siunčia garsą, kai kalbate.",
+    "pushToTalkHint": "Kalbėdami laikykite nuspaudę klavišą. Geriausia triukšmingose vietose.",
+    "keyRequired": "Pasirinkite „push-to-talk“ klavišą arba perjunkite į balso aktyvavimą.",
+    "notSure": "Nesate tikri? Pradėkite nuo balso aktyvavimo. Bet kada galite perjungti sparčiuosiuose nustatymuose."
   },
-  "updates": {
-    "title": "Naujos versijos",
-    "choice": "Kai išleidžiama nauja versija",
-    "auto": "Atsisiųsti automatiškai",
-    "autoHint": "Mumcord atsisiunčia ir patikrina naujinimą fone ir paklausia tavęs prieš paleisdamas iš naujo.",
-    "notify": "Tik pranešti",
-    "notifyHint": "Mumcord praneša apie naują versiją ir parodo, kas pasikeitė. Nieko neatsisiunčiama, kol to nepasakysi.",
-    "off": "Išjungta",
-    "offHint": "Mumcord niekada neklausia GitHub apie naujas versijas. Atnaujini pats.",
-    "privacy": "Tikrinant GitHub siunčiama tik pati užklausa bei programos pavadinimas ir versija. Vėliau tai gali pakeisti nustatymuose."
-  },
-  "talk": {
-    "title": "Kaip nori kalbėti?",
-    "mode": "Kalbėjimo režimas",
-    "voiceActivation": "Aktyvinimas balsu",
-    "voiceActivationHint": "Mikrofonas įsijungia, kai pradedi kalbėti.",
-    "pushToTalk": "Spausk ir kalbėk",
-    "pushToTalkHint": "Laikyk klavišą, kol kalbi.",
-    "waylandNoPortal": "„Spausk ir kalbėk“ nepasiekiama: tavo darbalaukis neleidžia programoms naudoti visuotinių sparčiųjų klavišų. Aktyvinimas balsu veikia be klavišo.",
-    "registrationFailed": "Nepavyko nustatyti „Spausk ir kalbėk“ šioje sistemoje. Vietoj to naudok aktyvinimą balsu.",
-    "key": "„Spausk ir kalbėk“ klavišas",
-    "noKey": "Klavišas nepasirinktas",
-    "currentKey": "Klavišas: {{key}}",
-    "chooseKey": "Pasirinkti klavišą",
-    "changeKey": "Keisti klavišą",
-    "pressKey": "Paspausk klavišą… (Escape atšaukia)",
-    "confirmDialog": "Patvirtink sparčiąjį klavišą sistemos lange arba priskirk jį atsidariusiame sistemos nustatymų lange… (Escape atšaukia)",
-    "keyInvalid": "Šio klavišo naudoti negalima. Išbandyk kitą.",
-    "keyNotConfirmed": "Darbalaukis nepatvirtino sparčiojo klavišo. Bandyk dar kartą ir priimk sistemos langą arba priskirk klavišą darbalaukio sparčiųjų klavišų nustatymuose.",
-    "keyRequired": "Pasirink „Spausk ir kalbėk“ klavišą arba perjunk į aktyvinimą balsu.",
-    "linkHandler": "Atidaryti mumble:// nuorodas su Mumcord",
-    "linkHandlerHint": "Spustelėjus serverio nuorodą svetainėje, ji atsidarys čia.",
-    "linkHandlerActive": "Mumcord jau atidaro mumble:// nuorodas.",
-    "linkHandlerFailed": "Nepavyko nustatyti, kad Mumcord atidarytų mumble:// nuorodas. Gali pabandyti dar kartą nustatymuose.",
-    "mouseDisabled": "„Spausk ir kalbėk“ su šiuo pelės mygtuku nepasiekiama, kol nustatymuose Balsas įjungta „Leisti pelės mygtukus“.",
-    "mouseNeedsInputGroup": "„Spausk ir kalbėk“ nepasiekiama: Mumcord gali neturėti teisės skaityti tavo pelės. Nustatymuose Balsas paaiškinta, kaip tai leisti.",
-    "mouseNeedsAccessibility": "„Spausk ir kalbėk“ nepasiekiama: Mumcord reikia Prieinamumo leidimo, kad matytų pelės mygtukus.",
-    "pressKeyOrMouse": "Paspausk klavišą arba pelės mygtuką (vidurinį ar šoninį)… (Escape atšaukia)",
-    "mouse": {
-      "middle": "Vidurinis pelės mygtukas",
-      "back": "Pelės mygtukas 4 (atgal)",
-      "forward": "Pelės mygtukas 5 (pirmyn)"
+  "style": {
+    "title": "Kiek norite bendrinti?",
+    "subtitle": "Pasirinkite pradžios tašką. Kiekvieną pasirinkimą vėl pamatysite paskutiniame ekrane ir ten galėsite jį pakeisti.",
+    "legend": "Sąrankos stilius",
+    "everythingOn": {
+      "title": "Viskas įjungta",
+      "subtitle": "Visos funkcijos",
+      "p1": "Kiti mato, ką žaidžiate ir ko klausotės",
+      "p2": "Jūsų IP matomas žmonėms, su kuriais jungiatės tiesiogiai",
+      "p3": "Bet kas gali jums rašyti; nuorodos ir paveikslėliai įkeliami iš interneto",
+      "p4": "Perdanga, istorijos sinchronizavimas ir viso dydžio paveikslėliai įjungti"
     },
-    "mouseStillWorks": "Vis dar gali naudoti pelės mygtuką.",
-    "mouseOptIn": "Nori naudoti šoninį pelės mygtuką? Po sąrankos nustatymuose Balsas įjunk „Leisti pelės mygtukus“.",
-    "autostart": "Paleisti Mumcord, kai prisijungiu prie sistemos",
-    "autostartHint": "Vėliau gali tai pakeisti nustatymuose Išvaizda.",
-    "autostartFailed": "Nepavyko nustatyti, kad Mumcord paleistų prisijungus prie sistemos. Gali pabandyti dar kartą nustatymuose.",
-    "linkPreviews": "Rodyti nuorodų peržiūras ir įterpinius",
-    "linkPreviewsHint": "Mumcord įkelia nuorodų puslapius, kad parodytų peržiūras ir vaizdo grotuvus; tos svetainės mato tavo IP adresą.",
-    "historySharing": "Dalintis mano kanalų istorija",
-    "historySharingHint": "Kiti Mumcord naudotojai, prisijungę prie kanalo po tavęs, gali matyti ankstesnes jo žinutes iš tavo įrašytos istorijos (iki 7 dienų). Privatūs pokalbiai niekada nesidalijami. Vėliau gali tai pakeisti nustatymuose Pokalbiai ir istorija.",
-    "ingameOverlay": "Rodyti perdangą žaidimuose",
-    "ingameOverlayHint": "Piešia, kas kalba, virš tavo žaidimo (Linux). Vėliau nustatymuose gali ją įjungti ar išjungti kiekvienam žaidimui atskirai.",
-    "ingameOverlayWarning": "Kai kurie žaidimai su apsauga nuo sukčiavimo gali pažymėti ar blokuoti perdangas žaidimuose. Mumcord žinomai rizikingus žaidimus (pvz., Valorant ar League of Legends) pagal numatymą palieka išjungtus. Įjunk ją tik žaidimams, kuriais pasitiki.",
+    "balanced": {
+      "title": "Subalansuota",
+      "subtitle": "Tarp privatumo ir patogumo",
+      "p1": "Rašyti gali tik draugai ir jūsų kanalo žmonės",
+      "p2": "Tiesioginis ryšys, atsarginis variantas – perdavimo mazgas",
+      "p3": "Nuorodų peržiūros ir viso dydžio paveikslėliai įjungti",
+      "p4": "Tai, ką žaidžiate ir ko klausotės, lieka privatu"
+    },
+    "maximumPrivacy": {
+      "title": "Maksimalus privatumas",
+      "subtitle": "Bendrinkite kuo mažiau",
+      "p1": "Rašyti gali tik draugai, be išimčių",
+      "p2": "Jūsų IP paslėptas; viskas eina per perdavimo mazgą",
+      "p3": "Jokio išorinio turinio, jokio istorijos sinchronizavimo, jokio bendrinimo",
+      "p4": "Atnaujinimai tik praneša; niekas nebendrinama apie tai, ką darote"
+    },
+    "custom": {
+      "title": "Pasirinktinis",
+      "subtitle": "Peržiūrėkite kiekvieną pasirinkimą",
+      "p1": "Patys peržiūrėkite kiekvieną žingsnį",
+      "p2": "Pamatykite, ką daro kiekvienas nustatymas ir kas jį mato",
+      "p3": "Geriausia, jei žinote, ko norite"
+    },
+    "presetSelected": "Pasirinkta „{{preset}}“: praleidžiate išsamius privatumo žingsnius. Pasirinkite Pasirinktinį, kad peržiūrėtumėte kiekvieną.",
+    "customSelected": "Pasirinktinis: kiti žingsniai peržiūri kiekvieną pasirinkimą."
+  },
+  "pm": {
+    "title": "Kas gali jums rašyti?",
+    "subtitle": "Privačios žinutės yra pokalbiai vienas su vienu. Šis pasirinkimas kanalo pokalbio neveikia.",
+    "local": "Filtravimas vyksta jūsų kompiuteryje. Siuntėjams apie tai nepranešama. Vėliau galėsite nustatyti kitokią taisyklę kiekvienam serveriui."
+  },
+  "connections": {
+    "title": "Ryšiai ir turinys",
+    "subtitle": "Kai kurios funkcijos jus jungia tiesiogiai su kitais „Mumcord“ naudotojais, o dalis pokalbio turinio įkeliama iš kitų svetainių. Pasirinkite, kas jums tinka.",
+    "chatContent": "Pokalbio turinys",
+    "sharing": "Bendrinimas su „Mumcord“ naudotojais"
+  },
+  "features": {
+    "title": "Pritaikykite sau",
+    "subtitle": "Įjunkite norimus priedus. Kiekvienas nurodo, kas ką mato.",
+    "seenByMumcordUsers": "Matoma tame pačiame serveryje esantiems „Mumcord“ naudotojams.",
+    "onlyYou": "Mato tik jūs.",
     "ingameOverlayAlt": "Perdangos žaidime pavyzdys, rodantis, kas kalba"
+  },
+  "appearance": {
+    "title": "Pasirinkite išvaizdą",
+    "subtitle": "Langas atsinaujina jums renkantis. Daugiau temų ir jūsų pačių – Nustatymuose."
+  },
+  "startup": {
+    "title": "Paleidimas ir atnaujinimai",
+    "subtitle": "Kaip „Mumcord“ paleidžiama ir ką daro su naujomis versijomis.",
+    "linkHandler": "Atidaryti mumble:// nuorodas su „Mumcord“",
+    "linkHandlerHint": "Spustelėjus serverio nuorodą svetainėje, ji atsidaro čia.",
+    "linkHandlerActive": "„Mumcord“ jau atidaro mumble:// nuorodas.",
+    "linkHandlerFailed": "Nepavyko nustatyti „Mumcord“ atidaryti mumble:// nuorodų. Galite bandyti dar kartą Nustatymuose.",
+    "autostartFailed": "Nepavyko nustatyti, kad „Mumcord“ būtų paleidžiama prisijungus. Galite bandyti dar kartą Nustatymuose."
+  },
+  "summary": {
+    "title": "Viskas paruošta",
+    "titleNamed": "Viskas paruošta, {{name}}",
+    "subtitle": "Štai ką pasirinkote. Prieš pradėdami naudokite Redaguoti bet kurioje kortelėje, kad ją pakeistumėte.",
+    "on": "įjungta",
+    "off": "išjungta",
+    "unavailable": "čia nepasiekiama",
+    "editShort": "Redaguoti",
+    "edit": "Redaguoti: {{card}}",
+    "cards": {
+      "identity": "Tapatybė",
+      "voice": "Balsas",
+      "privateMessages": "Privačios žinutės",
+      "connections": "Ryšiai",
+      "chatContent": "Pokalbio turinys",
+      "features": "Funkcijos",
+      "appearance": "Išvaizda",
+      "startup": "Paleidimas",
+      "updates": "Atnaujinimai"
+    },
+    "identityDetail": "Išsaugota sistemos raktų pakabuke",
+    "voiceDetail": "Triukšmo slopinimas: {{noise}}",
+    "pmDetail": "Mano kanalas {{channel}} · priimti pokalbiai {{accepted}} · prašymai {{requests}}",
+    "contentTitle": "Nuorodų peržiūros {{previews}}",
+    "contentDetail": "Viso dydžio paveikslėliai {{images}} · istorijos sinchronizavimas {{sync}}",
+    "featuresTitle": "Perdanga žaidime {{overlay}}",
+    "featuresDetail": "Sekti sistemos režimą „Netrukdyti“ {{dnd}} · dabar groja {{playing}} · dabar žaidžia {{gaming}}",
+    "effectsDetail": "Vaizdo efektai {{effects}}",
+    "startupTitle": "Paleisti prisijungus {{login}}",
+    "startupDetail": "Paleisti suskleistą {{minimized}} · mumble:// nuorodos {{links}}",
+    "updates": {
+      "auto": "Atsisiųsti automatiškai",
+      "notify": "Tik pranešti",
+      "off": "Išjungta"
+    },
+    "updatesDetail": "Atnaujinimai visada patikrinami ir patvirtinami prieš įdiegiant.",
+    "backup": "Jūsų tapatybė {{name}} išsaugota sistemos raktų pakabuke. Sukurkite jos atsarginę kopiją per Nustatymai → Tapatybė, kad niekada neprarastumėte registruoto vardo.",
+    "nextServer": "Toliau: pridėkite pirmąjį serverį",
+    "rerunNote": "Išsaugomos tik pakeistos reikšmės."
   },
   "rerun": {
     "title": "Sąrankos vediklis",
     "note": "Vėl atliekate sąranką. Jūsų tapatybė nekeičiama.",
     "manageIdentities": "Tvarkyti tapatybes",
-    "stepsLabel": "Sąrankos žingsniai",
-    "stepsSkipped": "(praleista, tapatybė tam nepriklauso)",
-    "steps": {
-      "identity": "Tapatybė",
-      "mic": "Mikrofonas",
-      "privacy": "Privatumas",
-      "updates": "Atnaujinimai",
-      "talk": "Kalbėjimo režimas"
-    },
-    "footer": "Atšaukimas viską palieka taip, kaip yra. Pabaigoje išsaugomi tik pakeisti žingsniai.",
     "discardTitle": "Atmesti pakeitimus?",
     "discardBody": "Niekas neišsaugoma prieš baigiant. Jei dabar atšauksite, viskas liks taip, kaip yra.",
     "discardKeep": "Tęsti redagavimą",

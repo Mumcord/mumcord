@@ -1,25 +1,77 @@
 {
   "progress": "Samm {{current}} / {{total}}",
   "loadFailed": "Seadistust ei õnnestunud laadida.",
-  "finish": "Lõpeta",
+  "recommended": "Soovitatav",
+  "tipLabel": "Teave: {{name}}",
   "errors": {
     "generic": "Midagi läks valesti. Proovi palun uuesti.",
     "secureStorageUnavailable": "Mumcord ei pääse ligi sinu süsteemi turvahoidlale. Ava oma võtmehoidla või paroolihaldur ja proovi uuesti.",
     "saveFailed": "Sinu seadeid ei õnnestunud salvestada. Proovi palun uuesti."
   },
+  "nav": {
+    "getStarted": "Alustame",
+    "finishSetup": "Lõpeta seadistus",
+    "startMumcord": "Käivita Mumcord",
+    "finish": "Lõpeta",
+    "skip": "Jäta praegu vahele",
+    "enterKey": "Enter",
+    "enterHint": "jätkamiseks"
+  },
+  "rail": {
+    "label": "Seadistuse sammud",
+    "appName": "Mumcord",
+    "setup": "Seadistus",
+    "custom": "Kohandatud",
+    "done": "(tehtud)",
+    "progress": "Seadistuse edenemine",
+    "later": "Kõiki siinseid valikuid saab hiljem seadetes muuta."
+  },
+  "steps": {
+    "welcome": "Tere tulemast",
+    "import": "Impordi Mumblest",
+    "identity": "Identiteet",
+    "voice": "Hääl",
+    "setupStyle": "Seadistuse laad",
+    "privateMessages": "Privaatsõnumid",
+    "connections": "Ühendused",
+    "features": "Funktsioonid",
+    "appearance": "Välimus",
+    "startup": "Käivitus ja uuendused",
+    "summary": "Kõik valmis"
+  },
+  "welcome": {
+    "title": "Häälvestlus, mis tundub nagu",
+    "titleAccent": "sinu enda koht.",
+    "subtitle": "Mumcord räägib Mumble'i keelt, seega töötab see iga Mumble'i serveriga, lisades peale kaasaegse vestluse. Seadistame selle nii, nagu sulle meeldib. See võtab umbes kaks minutit.",
+    "voice": {
+      "title": "Kristallselge hääl",
+      "text": "Madala latentsusega heli sisseehitatud müravähendusega."
+    },
+    "servers": {
+      "title": "Töötab iga Mumble'i serveriga",
+      "text": "Kontot pole, registreerumist pole. Liitu serveritega, mida juba kasutad."
+    },
+    "private": {
+      "title": "Privaatne juba disainis",
+      "text": "Telemeetriat pole. Mida Mumcord salvestab, jääb sinu arvutisse."
+    }
+  },
   "identity": {
-    "title": "Sinu identiteet",
-    "intro": "Serverid tunnevad sind ära identiteedi järgi. Loo uus või too oma olemasolev.",
-    "create": "Loo uus",
-    "import": "Impordi fail",
-    "name": "Nimi",
-    "nameHint": "Teised näevad seda nime. Saad seda hiljem serveri kaupa muuta.",
+    "title": "Kes sa Mumble'is oled?",
+    "intro": "Sinu identiteedi järgi tunnevad serverid sind ära. Loo uus või too kaasa see, mida juba kasutad.",
+    "legend": "Sinu identiteet",
+    "create": "Loo uus identiteet",
+    "createText": "Sinu identiteet on sertifikaat, mis tõendab, kes sa Mumble'i serverites oled. See hoiab sinu registreeritud nime ja õigusi, nii et oled igal liitumisel sama inimene.",
+    "import": "Impordi olemasolev identiteet",
+    "name": "Vaikimisi kuvatav nimi",
+    "nameHint": "Kasutatakse serverites, mis sind veel ei tunne. Seda saab serveripõhiselt muuta.",
     "chooseFile": "Vali fail…",
     "noFile": "Faili pole valitud",
     "chosenFile": "Valitud fail: {{file}}",
-    "password": "Faili parool (kui on)",
+    "password": "Faili parool",
+    "passwordHint": "Parool jääb sellesse arvutisse ega saadeta kuhugi.",
     "existing": "Kasutan identiteeti {{name}}.",
-    "backup": "Sinu identiteet on nagu võti. Tee sellest hiljem varukoopia: Seaded → Identiteet.",
+    "backup": "Tee sellest hiljem seadetes varukoopia. Varukoopiaga saad oma identiteedi uues arvutis taastada.",
     "nameRequired": "Palun sisesta nimi.",
     "fileRequired": "Palun vali identiteedifail (.p12 või .pfx).",
     "fileType": "Identiteedifail",
@@ -29,101 +81,142 @@
     "pickFailed": "Failivalijat ei õnnestunud avada."
   },
   "mic": {
-    "title": "Mikrofon",
-    "intro": "Vali oma mikrofon ja kõlarid. Vaikeseaded töötavad tavaliselt hästi.",
     "input": "Mikrofon",
     "output": "Kõlarid või kõrvaklapid",
     "systemDefault": "Süsteemi vaikeseade",
     "defaultVia": "Süsteemi vaikeseade ({{backend}})",
     "level": "Mikrofoni tase",
-    "test": "Testi",
-    "stop": "Peata",
     "idle": "Vajuta „Testi“, ütle midagi ja kuuled ennast tagasi.",
     "recording": "Räägi nüüd…",
     "playing": "Esitan sinu häält tagasi…",
     "devicesFailed": "Sinu heliseadmeid ei õnnestunud loetleda. Võid jätkata ja need hiljem seadetes valida.",
-    "testFailed": "Testi ei õnnestunud käivitada. Kontrolli, et mikrofon on ühendatud."
+    "testFailed": "Testi ei õnnestunud käivitada. Kontrolli, et mikrofon on ühendatud.",
+    "test": "Kuula ennast",
+    "stop": "Peata"
   },
-  "privacy": {
-    "title": "Teie privaatsus",
-    "noTelemetry": "Mumcord ei saada telemeetriat, analüütikat ega kokkuvarisemisaruandeid.",
-    "ownServers": "See ühendub ainult teie lisatud serveritega.",
-    "linkPreviews": "Linkide eelvaated ning vestluse linkide pildid või GIF-id laaditakse lingitud saitidelt. Saate selle välja lülitada järgmises sammus või hiljem seadetes.",
-    "mumcordUsers": "Ainult Mumcordi funktsioonid vahetavad andmeid vaid teiste Mumcordi kasutajatega samas serveris.",
-    "local": "Kõik, mida Mumcord salvestab, jääb teie arvutisse.",
-    "statement": "Täielik privaatsusavaldus"
+  "voice": {
+    "title": "Kõlab hästi?",
+    "subtitle": "Vali oma seadmed ja ütle midagi. Riba peaks rääkimise ajal liikuma.",
+    "talkLegend": "Kuidas soovid rääkida?",
+    "tipLabel": "Teave: {{mode}}",
+    "voiceActivationHint": "Räägi vabalt. Mumcord saadab heli, kui sa räägid.",
+    "pushToTalkHint": "Hoia rääkimise ajal klahvi all. Parim lärmakates kohtades.",
+    "keyRequired": "Vali räägi-vajutades klahv või lülitu häälaktiveerimisele.",
+    "notSure": "Pole kindel? Alusta häälaktiveerimisega. Saad igal ajal kiirseadetest vahetada."
   },
-  "updates": {
-    "title": "Uued versioonid",
-    "choice": "Kui uus versioon on ilmunud",
-    "auto": "Laadi automaatselt alla",
-    "autoHint": "Mumcord laeb uuenduse taustal alla, kontrollib selle üle ja küsib sinu käest enne taaskäivitamist.",
-    "notify": "Anna ainult teada",
-    "notifyHint": "Mumcord annab uuest versioonist teada ja näitab, mis on muutunud. Midagi ei laadita alla enne, kui sa seda ütled.",
-    "off": "Väljas",
-    "offHint": "Mumcord ei küsi GitHubilt kunagi uusi versioone. Uuendad ise.",
-    "privacy": "Kontrollimisel saadetakse GitHubile ainult päring ise ning rakenduse nimi ja versioon. Seda saad hiljem seadetes muuta."
-  },
-  "talk": {
-    "title": "Kuidas soovid rääkida?",
-    "mode": "Rääkimisrežiim",
-    "voiceActivation": "Hääleaktiveerimine",
-    "voiceActivationHint": "Sinu mikrofon lülitub sisse, kui räägid.",
-    "pushToTalk": "Vajuta ja räägi",
-    "pushToTalkHint": "Hoia rääkides klahvi all.",
-    "waylandNoPortal": "Vajuta ja räägi pole saadaval: sinu töölaud ei lase rakendustel globaalseid kiirklahve kasutada. Hääleaktiveerimine töötab ka ilma klahvita.",
-    "registrationFailed": "Vajuta ja räägi seadistamine sellel süsteemil ei õnnestunud. Kasuta selle asemel hääleaktiveerimist.",
-    "key": "Vajuta ja räägi klahv",
-    "noKey": "Klahvi pole valitud",
-    "currentKey": "Klahv: {{key}}",
-    "chooseKey": "Vali klahv",
-    "changeKey": "Muuda klahvi",
-    "pressKey": "Vajuta klahvi… (tühistamiseks Escape)",
-    "confirmDialog": "Kinnita kiirklahv süsteemi dialoogis või määra see avanevas süsteemiseadete aknas… (tühistamiseks Escape)",
-    "keyInvalid": "Seda klahvi ei saa kasutada. Proovi mõnda teist.",
-    "keyNotConfirmed": "Töölaud ei kinnitanud kiirklahvi. Proovi uuesti ja nõustu süsteemi dialoogiga või määra klahv töölaua kiirklahvide seadetes.",
-    "keyRequired": "Vali vajuta ja räägi klahv või lülitu hääleaktiveerimisele.",
-    "linkHandler": "Ava mumble:// lingid Mumcordiga",
-    "linkHandlerHint": "Serverilingile klõpsamine veebilehel avab selle siis siin.",
-    "linkHandlerActive": "Mumcord avab mumble:// linke juba.",
-    "linkHandlerFailed": "Mumcordi ei õnnestunud mumble:// linke avama seadistada. Võid seadetes uuesti proovida.",
-    "mouseDisabled": "Vajuta ja räägi pole selle hiirenupuga saadaval, enne kui lülitad jaotises Seaded → Hääl sisse „Luba hiirenupud“.",
-    "mouseNeedsInputGroup": "Vajuta ja räägi pole saadaval: Mumcord ei pruugi sinu hiirt lugeda. Jaotis Seaded → Hääl selgitab, kuidas seda lubada.",
-    "mouseNeedsAccessibility": "Vajuta ja räägi pole saadaval: Mumcord vajab hiirenuppude nägemiseks juurdepääsetavuse luba.",
-    "pressKeyOrMouse": "Vajuta klahvi või hiirenuppu (kesk- või külgnupp)… (tühistamiseks Escape)",
-    "mouse": {
-      "middle": "Hiire keskmine nupp",
-      "back": "Hiirenupp 4 (tagasi)",
-      "forward": "Hiirenupp 5 (edasi)"
+  "style": {
+    "title": "Kui palju soovid jagada?",
+    "subtitle": "Vali lähtepunkt. Iga valiku näed uuesti viimasel ekraanil ja saad seal muuta.",
+    "legend": "Seadistuse laad",
+    "everythingOn": {
+      "title": "Kõik sees",
+      "subtitle": "Kõik funktsioonid",
+      "p1": "Teised näevad, mida sa mängid ja kuulad",
+      "p2": "Sinu IP on nähtav inimestele, kellega sa otse ühendud",
+      "p3": "Igaüks saab sulle kirjutada; lingid ja pildid laaditakse veebist",
+      "p4": "Ülekate, ajaloo sünkroonimine ja täissuuruses pildid on sees"
     },
-    "mouseStillWorks": "Hiirenuppu saad ikka kasutada.",
-    "mouseOptIn": "Soovid kasutada hiire külgnuppu? Lülita pärast seadistust jaotises Seaded → Hääl sisse „Luba hiirenupud“.",
-    "autostart": "Käivita Mumcord sisselogimisel",
-    "autostartHint": "Saad seda hiljem muuta: Seaded → Välimus.",
-    "autostartFailed": "Mumcordi ei õnnestunud sisselogimisel käivituma seadistada. Võid seadetes uuesti proovida.",
-    "linkPreviews": "Näita linkide eelvaateid ja manuseid",
-    "linkPreviewsHint": "Mumcord laadib lingitud lehed, et näidata eelvaateid ja videopleiereid; need saidid näevad sinu IP-aadressi.",
-    "historySharing": "Jaga minu kanali ajalugu",
-    "historySharingHint": "Teised Mumcordi kasutajad, kes liituvad kanaliga pärast sind, näevad selle varasemaid sõnumeid sinu salvestatud ajaloost (kuni 7 päeva). Privaatvestlusi ei jagata kunagi. Saad seda hiljem muuta: Seaded → Vestlus ja ajalugu.",
-    "ingameOverlay": "Näita kattekihti mängudes",
-    "ingameOverlayHint": "Joonistab sinu mängu peale, kes räägib (Linux). Saad selle hiljem seadetes mängu kaupa sisse või välja lülitada.",
-    "ingameOverlayWarning": "Mõni petmisvastase kaitsega mäng võib mängusisesed kattekihid märgistada või blokeerida. Mumcord hoiab teadaolevalt riskantsed mängud (nt Valorant või League of Legends) vaikimisi väljas. Luba see ainult mängudele, mida usaldad.",
-    "ingameOverlayAlt": "Näide mängusisesest kattekihist, mis näitab, kes räägib"
+    "balanced": {
+      "title": "Tasakaalustatud",
+      "subtitle": "Privaatsuse ja mugavuse vahel",
+      "p1": "Sulle saavad kirjutada ainult sõbrad ja sinu kanali liikmed",
+      "p2": "Otseühendus, varuks relee",
+      "p3": "Linkide eelvaated ja täissuuruses pildid on sees",
+      "p4": "See, mida sa mängid ja kuulad, jääb privaatseks"
+    },
+    "maximumPrivacy": {
+      "title": "Maksimaalne privaatsus",
+      "subtitle": "Jaga võimalikult vähe",
+      "p1": "Sulle saavad kirjutada ainult sõbrad, erandeid pole",
+      "p2": "Sinu IP on peidetud; kõik käib läbi relee",
+      "p3": "Väliset sisu pole, ajaloo sünkroonimist pole, jagamist pole",
+      "p4": "Uuendused ainult teavitavad sind; sinu tegevuse kohta ei jagata midagi"
+    },
+    "custom": {
+      "title": "Kohandatud",
+      "subtitle": "Käi iga valik läbi",
+      "p1": "Käi iga samm ise läbi",
+      "p2": "Vaata, mida iga seade teeb ja kes seda näeb",
+      "p3": "Parim, kui tead, mida tahad"
+    },
+    "presetSelected": "{{preset}} valitud: jätad üksikasjalikud privaatsusesammud vahele. Vali Kohandatud, et need ükshaaval läbi käia.",
+    "customSelected": "Kohandatud valitud: järgmised sammud käivad iga valiku läbi."
+  },
+  "pm": {
+    "title": "Kes saab sulle kirjutada?",
+    "subtitle": "Privaatsõnumid on kahe inimese vestlused. See valik ei mõjuta kanali vestlust.",
+    "local": "Filtreerimine toimub sinu arvutis. Saatjatele ei öelda midagi. Serveripõhise erineva reegli saad määrata hiljem."
+  },
+  "connections": {
+    "title": "Ühendused ja sisu",
+    "subtitle": "Mõned funktsioonid ühendavad sind otse teiste Mumcordi kasutajatega ja osa vestlussisust laaditakse teistelt veebisaitidelt. Vali, mis sulle sobib.",
+    "chatContent": "Vestlussisu",
+    "sharing": "Jagamine Mumcordi kasutajatega"
+  },
+  "features": {
+    "title": "Tee see enda omaks",
+    "subtitle": "Lülita sisse lisad, mida soovid. Igaühe juures on öeldud, kes mida näeb.",
+    "seenByMumcordUsers": "Nähtav samas serveris olevatele Mumcordi kasutajatele.",
+    "onlyYou": "Näed seda ainult sina.",
+    "ingameOverlayAlt": "Näide mängusisesest ülekattest, mis näitab, kes räägib"
+  },
+  "appearance": {
+    "title": "Vali oma välimus",
+    "subtitle": "Aken uueneb sedamööda, kuidas valid. Seadetes on rohkem kujundusi ja saad luua ka oma."
+  },
+  "startup": {
+    "title": "Käivitus ja uuendused",
+    "subtitle": "Kuidas Mumcord käivitub ja mida ta uute versioonidega teeb.",
+    "linkHandler": "Ava mumble://-lingid Mumcordiga",
+    "linkHandlerHint": "Veebilehel serverilingil klõpsamine avab selle siis siin.",
+    "linkHandlerActive": "Mumcord avab mumble://-linke juba.",
+    "linkHandlerFailed": "Mumcordi ei õnnestunud mumble://-linkide avamiseks seadistada. Võid seadetes uuesti proovida.",
+    "autostartFailed": "Mumcordi ei õnnestunud sisselogimisel käivituma seadistada. Võid seadetes uuesti proovida."
+  },
+  "summary": {
+    "title": "Kõik valmis",
+    "titleNamed": "Kõik valmis, {{name}}",
+    "subtitle": "Siin on sinu valikud. Kasuta mis tahes kaardil nuppu Muuda, et enne alustamist midagi muuta.",
+    "on": "sees",
+    "off": "väljas",
+    "unavailable": "siin pole saadaval",
+    "editShort": "Muuda",
+    "edit": "Muuda: {{card}}",
+    "cards": {
+      "identity": "Identiteet",
+      "voice": "Hääl",
+      "privateMessages": "Privaatsõnumid",
+      "connections": "Ühendused",
+      "chatContent": "Vestlussisu",
+      "features": "Funktsioonid",
+      "appearance": "Välimus",
+      "startup": "Käivitus",
+      "updates": "Uuendused"
+    },
+    "identityDetail": "Salvestatud sinu süsteemi võtmehoidlasse",
+    "voiceDetail": "Müravähendus: {{noise}}",
+    "pmDetail": "Minu kanal {{channel}} · aktsepteeritud vestlused {{accepted}} · taotlused {{requests}}",
+    "contentTitle": "Linkide eelvaated {{previews}}",
+    "contentDetail": "Täissuuruses pildid {{images}} · ajaloo sünkroonimine {{sync}}",
+    "featuresTitle": "Mängusisene ülekate {{overlay}}",
+    "featuresDetail": "Järgi süsteemi režiimi Ära sega {{dnd}} · praegu mängib {{playing}} · praegu mängitakse {{gaming}}",
+    "effectsDetail": "Visuaalefektid {{effects}}",
+    "startupTitle": "Käivita sisselogimisel {{login}}",
+    "startupDetail": "Käivita minimeerituna {{minimized}} · mumble://-lingid {{links}}",
+    "updates": {
+      "auto": "Laadi automaatselt alla",
+      "notify": "Ainult teavita",
+      "off": "Väljas"
+    },
+    "updatesDetail": "Uuendusi kontrollitakse ja verifitseeritakse alati enne paigaldamist.",
+    "backup": "Sinu identiteet {{name}} on salvestatud sinu süsteemi võtmehoidlasse. Tee sellest varukoopia jaotises Seaded → Identiteet, et sa ei kaotaks kunagi oma registreeritud nime.",
+    "nextServer": "Järgmiseks: lisa oma esimene server",
+    "rerunNote": "Salvestatakse ainult need väärtused, mida muutsid."
   },
   "rerun": {
     "title": "Seadistusviisard",
     "note": "Sa läbid seadistust uuesti. Sinu identiteet ei muutu.",
     "manageIdentities": "Halda identiteete",
-    "stepsLabel": "Seadistuse sammud",
-    "stepsSkipped": "(vahele jäetud, identiteet ei kuulu selle juurde)",
-    "steps": {
-      "identity": "Identiteet",
-      "mic": "Mikrofon",
-      "privacy": "Privaatsus",
-      "updates": "Värskendused",
-      "talk": "Rääkimisrežiim"
-    },
-    "footer": "Tühistamine jätab kõik nii, nagu on. Lõpus salvestatakse ainult muudetud sammud.",
     "discardTitle": "Kas hüljata muudatused?",
     "discardBody": "Enne lõpetamist ei salvestata midagi. Kui tühistad nüüd, jääb kõik nii, nagu on.",
     "discardKeep": "Jätka muutmist",

@@ -1,25 +1,77 @@
 {
   "progress": "Pasul {{current}} din {{total}}",
   "loadFailed": "Configurarea nu a putut fi încărcată.",
-  "finish": "Gata",
+  "recommended": "Recomandat",
+  "tipLabel": "Despre {{name}}",
   "errors": {
     "generic": "Ceva n-a mers bine. Încearcă din nou.",
     "secureStorageUnavailable": "Mumcord nu poate accesa stocarea securizată a sistemului tău. Deblochează keyring-ul sau managerul de parole și încearcă din nou.",
     "saveFailed": "Setările tale nu au putut fi salvate. Încearcă din nou."
   },
+  "nav": {
+    "getStarted": "Să începem",
+    "finishSetup": "Finalizează configurarea",
+    "startMumcord": "Pornește Mumcord",
+    "finish": "Finalizează",
+    "skip": "Omite deocamdată",
+    "enterKey": "Enter",
+    "enterHint": "pentru a continua"
+  },
+  "rail": {
+    "label": "Pașii configurării",
+    "appName": "Mumcord",
+    "setup": "Configurare",
+    "custom": "Personalizat",
+    "done": "(făcut)",
+    "progress": "Progresul configurării",
+    "later": "Tot ce e aici poate fi schimbat mai târziu în Setări."
+  },
+  "steps": {
+    "welcome": "Bun venit",
+    "import": "Import din Mumble",
+    "identity": "Identitate",
+    "voice": "Voce",
+    "setupStyle": "Stilul configurării",
+    "privateMessages": "Mesaje private",
+    "connections": "Conexiuni",
+    "features": "Funcții",
+    "appearance": "Aspect",
+    "startup": "Pornire și actualizări",
+    "summary": "Totul e gata"
+  },
+  "welcome": {
+    "title": "Chat vocal care se simte ca",
+    "titleAccent": "propriul tău loc.",
+    "subtitle": "Mumcord vorbește Mumble, așa că funcționează cu orice server Mumble, și adaugă un chat modern deasupra. Hai să-l configurăm cum îți place. Durează cam două minute.",
+    "voice": {
+      "title": "Voce cristalină",
+      "text": "Audio cu latență mică și eliminare a zgomotului integrată."
+    },
+    "servers": {
+      "title": "Funcționează cu orice server Mumble",
+      "text": "Fără cont, fără înregistrare. Intră pe serverele pe care le folosești deja."
+    },
+    "private": {
+      "title": "Privat prin concepție",
+      "text": "Fără telemetrie. Ce stochează Mumcord rămâne pe calculatorul tău."
+    }
+  },
   "identity": {
-    "title": "Identitatea ta",
-    "intro": "Serverele te recunosc după identitatea ta. Creează una nouă sau adu-o pe cea pe care o folosești deja.",
-    "create": "Creează una nouă",
-    "import": "Importă fișier",
-    "name": "Nume",
-    "nameHint": "Ceilalți văd acest nume. Îl poți schimba mai târziu pentru fiecare server.",
+    "title": "Cine ești pe Mumble?",
+    "intro": "Identitatea ta este felul în care te recunosc serverele. Creează una nouă sau adu-o pe cea pe care o folosești deja.",
+    "legend": "Identitatea ta",
+    "create": "Creează o identitate nouă",
+    "createText": "Identitatea ta este un certificat care dovedește cine ești pe serverele Mumble. Păstrează numele tău înregistrat și permisiunile, așa că ești aceeași persoană de fiecare dată când intri.",
+    "import": "Importă o identitate existentă",
+    "name": "Nume afișat implicit",
+    "nameHint": "Folosit pe serverele care nu te cunosc încă. Îl poți schimba pentru fiecare server.",
     "chooseFile": "Alege fișierul…",
     "noFile": "Niciun fișier ales",
     "chosenFile": "Fișier ales: {{file}}",
-    "password": "Parola fișierului (dacă există)",
+    "password": "Parola fișierului",
+    "passwordHint": "Parola rămâne pe acest calculator și nu este trimisă nicăieri.",
     "existing": "Se folosește identitatea {{name}}.",
-    "backup": "Identitatea ta e ca o cheie. Fă-i o copie de rezervă mai târziu în Setări → Identitate.",
+    "backup": "Fă o copie de rezervă mai târziu în Setări. O copie de rezervă îți permite să-ți restaurezi identitatea pe un calculator nou.",
     "nameRequired": "Introdu un nume.",
     "fileRequired": "Alege un fișier de identitate (.p12 sau .pfx).",
     "fileType": "Fișier de identitate",
@@ -29,101 +81,142 @@
     "pickFailed": "Selectorul de fișiere nu a putut fi deschis."
   },
   "mic": {
-    "title": "Microfon",
-    "intro": "Alege microfonul și difuzoarele. De obicei, cele implicite merg.",
     "input": "Microfon",
     "output": "Difuzoare sau căști",
     "systemDefault": "Implicit sistem",
     "defaultVia": "Implicit sistem ({{backend}})",
     "level": "Nivelul microfonului",
-    "test": "Testează",
-    "stop": "Oprește",
     "idle": "Apasă Testează, spune ceva și te vei auzi înapoi.",
     "recording": "Vorbește acum…",
     "playing": "Se redă vocea ta…",
     "devicesFailed": "Dispozitivele audio nu au putut fi listate. Poți continua și le alegi mai târziu în Setări.",
-    "testFailed": "Testul nu a putut porni. Verifică dacă microfonul e conectat."
+    "testFailed": "Testul nu a putut porni. Verifică dacă microfonul e conectat.",
+    "test": "Ascultă-te",
+    "stop": "Oprește"
   },
-  "privacy": {
-    "title": "Confidențialitatea ta",
-    "noTelemetry": "Mumcord nu trimite telemetrie, analize sau rapoarte de erori.",
-    "ownServers": "Se conectează doar la serverele pe care le adaugi.",
-    "linkPreviews": "Previzualizările linkurilor și imaginile sau GIF-urile din linkurile din chat sunt încărcate de pe site-urile cu linkuri. Poți dezactiva acest lucru la pasul următor sau mai târziu în Setări.",
-    "mumcordUsers": "Funcțiile doar pentru Mumcord schimbă date numai cu alți utilizatori Mumcord de pe același server.",
-    "local": "Tot ce salvează Mumcord rămâne pe calculatorul tău.",
-    "statement": "Declarația completă de confidențialitate"
-  },
-  "updates": {
-    "title": "Versiuni noi",
-    "choice": "Când apare o versiune nouă",
-    "auto": "Descarcă automat",
-    "autoHint": "Mumcord descarcă și verifică actualizarea în fundal și te întreabă înainte de a reporni.",
-    "notify": "Doar notifică",
-    "notifyHint": "Mumcord te anunță despre o versiune nouă și arată ce s-a schimbat. Nu se descarcă nimic până nu spui tu.",
-    "off": "Dezactivat",
-    "offHint": "Mumcord nu întreabă niciodată GitHub despre versiuni noi. Actualizezi tu singur.",
-    "privacy": "Verificarea trimite către GitHub doar cererea în sine și numele și versiunea aplicației. Poți schimba asta mai târziu din Setări."
-  },
-  "talk": {
-    "title": "Cum vrei să vorbești?",
-    "mode": "Mod de vorbire",
-    "voiceActivation": "Activare vocală",
-    "voiceActivationHint": "Microfonul tău pornește când vorbești.",
-    "pushToTalk": "Push-to-talk",
-    "pushToTalkHint": "Ține apăsată o tastă cât timp vorbești.",
-    "waylandNoPortal": "Push-to-talk nu e disponibil: desktopul tău nu permite aplicațiilor să folosească scurtături globale. Activarea vocală merge fără tastă.",
-    "registrationFailed": "Push-to-talk nu a putut fi configurat pe acest sistem. Folosește în schimb activarea vocală.",
-    "key": "Tasta push-to-talk",
-    "noKey": "Nicio tastă aleasă",
-    "currentKey": "Tastă: {{key}}",
-    "chooseKey": "Alege tasta",
-    "changeKey": "Schimbă tasta",
-    "pressKey": "Apasă o tastă… (Escape pentru anulare)",
-    "confirmDialog": "Confirmă scurtătura în dialogul sistemului sau atribuie-o în fereastra System Settings care se deschide… (Escape pentru anulare)",
-    "keyInvalid": "Tasta nu poate fi folosită. Încearcă alta.",
-    "keyNotConfirmed": "Desktopul nu a confirmat scurtătura. Încearcă din nou și acceptă dialogul sistemului sau atribuie tasta în setările de scurtături ale desktopului.",
+  "voice": {
+    "title": "Sună bine?",
+    "subtitle": "Alege-ți dispozitivele și spune ceva. Bara ar trebui să se miște cât vorbești.",
+    "talkLegend": "Cum vrei să vorbești?",
+    "tipLabel": "Despre {{mode}}",
+    "voiceActivationHint": "Vorbește liber. Mumcord trimite audio când vorbești.",
+    "pushToTalkHint": "Ține apăsată o tastă cât vorbești. Cel mai bine în locuri zgomotoase.",
     "keyRequired": "Alege o tastă push-to-talk sau treci la activarea vocală.",
+    "notSure": "Nu ești sigur? Începe cu activarea vocală. Poți schimba oricând din setările rapide."
+  },
+  "style": {
+    "title": "Cât vrei să partajezi?",
+    "subtitle": "Alege un punct de plecare. Vezi din nou toate alegerile pe ultimul ecran și le poți schimba acolo.",
+    "legend": "Stilul configurării",
+    "everythingOn": {
+      "title": "Totul activat",
+      "subtitle": "Set complet de funcții",
+      "p1": "Ceilalți văd ce joci și ce asculți",
+      "p2": "IP-ul tău este vizibil pentru persoanele cu care te conectezi direct",
+      "p3": "Oricine îți poate scrie; linkurile și imaginile se încarcă de pe web",
+      "p4": "Suprapunerea, sincronizarea istoricului și imaginile la dimensiune completă sunt activate"
+    },
+    "balanced": {
+      "title": "Echilibrat",
+      "subtitle": "Între confidențialitate și confort",
+      "p1": "Doar prietenii și persoanele din canalul tău îți pot scrie",
+      "p2": "Conexiune directă, cu un releu ca alternativă",
+      "p3": "Previzualizările linkurilor și imaginile la dimensiune completă sunt activate",
+      "p4": "Ce joci și ce asculți rămâne privat"
+    },
+    "maximumPrivacy": {
+      "title": "Confidențialitate maximă",
+      "subtitle": "Partajează cât mai puțin",
+      "p1": "Doar prietenii îți pot scrie, fără excepții",
+      "p2": "IP-ul tău este ascuns; totul trece prin releu",
+      "p3": "Fără conținut extern, fără sincronizarea istoricului, fără partajare",
+      "p4": "Actualizările doar te notifică; nu se partajează nimic despre ce faci"
+    },
+    "custom": {
+      "title": "Personalizat",
+      "subtitle": "Parcurge fiecare alegere",
+      "p1": "Parcurge fiecare pas singur",
+      "p2": "Vezi ce face fiecare setare și cine o vede",
+      "p3": "Cel mai bine dacă știi ce vrei"
+    },
+    "presetSelected": "{{preset}} selectat: omiți pașii detaliați de confidențialitate. Alege Personalizat ca să le parcurgi pe toate.",
+    "customSelected": "Personalizat selectat: pașii următori parcurg fiecare alegere."
+  },
+  "pm": {
+    "title": "Cine îți poate scrie?",
+    "subtitle": "Mesajele private sunt conversații între două persoane. Chatul canalului nu este afectat de această alegere.",
+    "local": "Filtrarea se face pe calculatorul tău. Expeditorii nu sunt înștiințați. Mai târziu poți seta o altă regulă pentru fiecare server."
+  },
+  "connections": {
+    "title": "Conexiuni și conținut",
+    "subtitle": "Unele funcții te conectează direct la alți utilizatori Mumcord, iar o parte din conținutul chatului se încarcă de pe alte site-uri. Alege ce ți se potrivește.",
+    "chatContent": "Conținutul chatului",
+    "sharing": "Partajarea cu utilizatorii Mumcord"
+  },
+  "features": {
+    "title": "Fă-l al tău",
+    "subtitle": "Activează extrele dorite. Fiecare spune cine ce poate vedea.",
+    "seenByMumcordUsers": "Vizibil pentru utilizatorii Mumcord de pe același server.",
+    "onlyYou": "Doar tu vezi asta.",
+    "ingameOverlayAlt": "Exemplu de suprapunere din joc care arată cine vorbește"
+  },
+  "appearance": {
+    "title": "Alege-ți aspectul",
+    "subtitle": "Fereastra se actualizează pe măsură ce alegi. În Setări găsești mai multe teme și le poți crea pe ale tale."
+  },
+  "startup": {
+    "title": "Pornire și actualizări",
+    "subtitle": "Cum pornește Mumcord și ce face cu versiunile noi.",
     "linkHandler": "Deschide linkurile mumble:// cu Mumcord",
-    "linkHandlerHint": "Un clic pe un link de server de pe un site îl va deschide aici.",
+    "linkHandlerHint": "Un clic pe un link de server de pe un site îl deschide aici.",
     "linkHandlerActive": "Mumcord deschide deja linkurile mumble://.",
     "linkHandlerFailed": "Mumcord nu a putut fi configurat să deschidă linkurile mumble://. Poți încerca din nou în Setări.",
-    "mouseDisabled": "Push-to-talk nu e disponibil cu acest buton de mouse până nu activezi „Permite butoanele mouse-ului” în Setări → Voce.",
-    "mouseNeedsInputGroup": "Push-to-talk nu e disponibil: Mumcord nu are voie să-ți citească mouse-ul. Setări → Voce explică cum să permiți asta.",
-    "mouseNeedsAccessibility": "Push-to-talk nu e disponibil: Mumcord are nevoie de permisiunea Accesibilitate ca să vadă butoanele mouse-ului.",
-    "pressKeyOrMouse": "Apasă o tastă sau un buton de mouse (din mijloc sau lateral)… (Escape pentru anulare)",
-    "mouse": {
-      "middle": "Butonul din mijloc al mouse-ului",
-      "back": "Butonul 4 al mouse-ului (înapoi)",
-      "forward": "Butonul 5 al mouse-ului (înainte)"
+    "autostartFailed": "Mumcord nu a putut fi configurat să pornească la autentificare. Poți încerca din nou în Setări."
+  },
+  "summary": {
+    "title": "Totul e gata",
+    "titleNamed": "Totul e gata, {{name}}",
+    "subtitle": "Iată ce ai ales. Folosește Editează pe oricare card ca să schimbi ceva înainte de a începe.",
+    "on": "activat",
+    "off": "dezactivat",
+    "unavailable": "indisponibil aici",
+    "editShort": "Editează",
+    "edit": "Editează {{card}}",
+    "cards": {
+      "identity": "Identitate",
+      "voice": "Voce",
+      "privateMessages": "Mesaje private",
+      "connections": "Conexiuni",
+      "chatContent": "Conținutul chatului",
+      "features": "Funcții",
+      "appearance": "Aspect",
+      "startup": "Pornire",
+      "updates": "Actualizări"
     },
-    "mouseStillWorks": "Poți folosi totuși un buton de mouse.",
-    "mouseOptIn": "Vrei să folosești un buton lateral al mouse-ului? Activează „Permite butoanele mouse-ului” în Setări → Voce după configurare.",
-    "autostart": "Pornește Mumcord când mă autentific",
-    "autostartHint": "Poți schimba asta mai târziu în Setări → Aspect.",
-    "autostartFailed": "Mumcord nu a putut fi setat să pornească la autentificare. Poți încerca din nou în Setări.",
-    "linkPreviews": "Arată previzualizări de linkuri și conținut încorporat",
-    "linkPreviewsHint": "Mumcord încarcă paginile din linkuri ca să afișeze previzualizări și playere video; acele site-uri îți văd adresa IP.",
-    "historySharing": "Partajează istoricul canalelor mele",
-    "historySharingHint": "Alți utilizatori Mumcord care intră într-un canal după tine îi pot vedea mesajele anterioare din istoricul tău salvat (până la 7 zile). Chaturile private nu sunt partajate niciodată. Poți schimba asta mai târziu în Setări → Chat și istoric.",
-    "ingameOverlay": "Arată overlay-ul în jocuri",
-    "ingameOverlayHint": "Afișează cine vorbește peste jocul tău (Linux). Îl poți porni sau opri pentru fiecare joc mai târziu în Setări.",
-    "ingameOverlayWarning": "Unele jocuri cu anti-cheat pot semnala sau bloca overlay-urile din joc. Mumcord ține oprite implicit jocurile cunoscute ca riscante (precum Valorant sau League of Legends). Activează-l doar pentru jocurile în care ai încredere.",
-    "ingameOverlayAlt": "Exemplu de overlay în joc care arată cine vorbește"
+    "identityDetail": "Salvată în depozitul de chei a sistemului",
+    "voiceDetail": "Eliminarea zgomotului: {{noise}}",
+    "pmDetail": "Canalul meu {{channel}} · conversații acceptate {{accepted}} · cereri {{requests}}",
+    "contentTitle": "Previzualizări de linkuri {{previews}}",
+    "contentDetail": "Imagini la dimensiune completă {{images}} · sincronizarea istoricului {{sync}}",
+    "featuresTitle": "Suprapunere în joc {{overlay}}",
+    "featuresDetail": "Urmează Nu deranja din sistem {{dnd}} · se redă acum {{playing}} · joc acum {{gaming}}",
+    "effectsDetail": "Efecte vizuale {{effects}}",
+    "startupTitle": "Pornire la autentificare {{login}}",
+    "startupDetail": "Pornire minimizată {{minimized}} · linkuri mumble:// {{links}}",
+    "updates": {
+      "auto": "Descarcă automat",
+      "notify": "Doar notifică",
+      "off": "Dezactivat"
+    },
+    "updatesDetail": "Actualizările sunt întotdeauna verificate și validate înainte de instalare.",
+    "backup": "Identitatea ta {{name}} este salvată în depozitul de chei a sistemului. Fă o copie de rezervă din Setări → Identitate, ca să nu-ți pierzi niciodată numele înregistrat.",
+    "nextServer": "Urmează: adaugă primul tău server",
+    "rerunNote": "Se salvează doar valorile pe care le-ai schimbat."
   },
   "rerun": {
     "title": "Asistent de configurare",
     "note": "Rulezi din nou configurarea. Identitatea ta nu este modificată.",
     "manageIdentities": "Gestionează identitățile",
-    "stepsLabel": "Pașii configurării",
-    "stepsSkipped": "(omis, identitatea nu face parte din asta)",
-    "steps": {
-      "identity": "Identitate",
-      "mic": "Microfon",
-      "privacy": "Confidențialitate",
-      "updates": "Actualizări",
-      "talk": "Mod de vorbire"
-    },
-    "footer": "Anularea lasă totul așa cum este. La final se salvează doar pașii modificați.",
     "discardTitle": "Renunți la modificări?",
     "discardBody": "Nimic nu este salvat înainte de finalizare. Dacă anulezi acum, totul rămâne așa cum este.",
     "discardKeep": "Continuă editarea",

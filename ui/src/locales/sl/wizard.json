@@ -1,25 +1,77 @@
 {
   "progress": "Korak {{current}} od {{total}}",
   "loadFailed": "Nastavitve ni bilo mogoče naložiti.",
-  "finish": "Dokončaj",
+  "recommended": "Priporočeno",
+  "tipLabel": "O: {{name}}",
   "errors": {
     "generic": "Nekaj je šlo narobe. Poskusi znova.",
     "secureStorageUnavailable": "Mumcord ne more dostopati do varne shrambe tvojega sistema. Odkleni zbirko ključev ali upravitelja gesel in poskusi znova.",
     "saveFailed": "Tvojih nastavitev ni bilo mogoče shraniti. Poskusi znova."
   },
+  "nav": {
+    "getStarted": "Začnimo",
+    "finishSetup": "Dokončaj nastavitev",
+    "startMumcord": "Zaženi Mumcord",
+    "finish": "Dokončaj",
+    "skip": "Zaenkrat preskoči",
+    "enterKey": "Enter",
+    "enterHint": "za nadaljevanje"
+  },
+  "rail": {
+    "label": "Koraki nastavitve",
+    "appName": "Mumcord",
+    "setup": "Nastavitev",
+    "custom": "Po meri",
+    "done": "(končano)",
+    "progress": "Napredek nastavitve",
+    "later": "Vse tukaj lahko pozneje spremeniš v Nastavitvah."
+  },
+  "steps": {
+    "welcome": "Dobrodošel",
+    "import": "Uvoz iz Mumbla",
+    "identity": "Identiteta",
+    "voice": "Glas",
+    "setupStyle": "Slog nastavitve",
+    "privateMessages": "Zasebna sporočila",
+    "connections": "Povezave",
+    "features": "Funkcije",
+    "appearance": "Videz",
+    "startup": "Zagon in posodobitve",
+    "summary": "Vse je pripravljeno"
+  },
+  "welcome": {
+    "title": "Glasovni klepet, ki se počuti kot",
+    "titleAccent": "tvoj lasten prostor.",
+    "subtitle": "Mumcord govori Mumble, zato deluje z vsakim strežnikom Mumble, povrhu pa doda sodoben klepet. Nastavimo ga po tvojem okusu. Traja približno dve minuti.",
+    "voice": {
+      "title": "Kristalno čist glas",
+      "text": "Zvok z nizko zakasnitvijo in vgrajenim odstranjevanjem hrupa."
+    },
+    "servers": {
+      "title": "Deluje z vsakim strežnikom Mumble",
+      "text": "Brez računa, brez registracije. Pridruži se strežnikom, ki jih že uporabljaš."
+    },
+    "private": {
+      "title": "Zasebno že v zasnovi",
+      "text": "Brez telemetrije. Kar Mumcord shrani, ostane v tvojem računalniku."
+    }
+  },
   "identity": {
-    "title": "Tvoja identiteta",
-    "intro": "Strežniki te prepoznajo po tvoji identiteti. Ustvari novo ali uvozi tisto, ki jo že uporabljaš.",
-    "create": "Ustvari novo",
-    "import": "Uvozi datoteko",
-    "name": "Ime",
-    "nameHint": "To ime vidijo drugi. Pozneje ga lahko spremeniš za vsak strežnik posebej.",
+    "title": "Kdo si na Mumblu?",
+    "intro": "Tvoja identiteta je tisto, po čemer te strežniki prepoznajo. Ustvari novo ali prinesi tisto, ki jo že uporabljaš.",
+    "legend": "Tvoja identiteta",
+    "create": "Ustvari novo identiteto",
+    "createText": "Tvoja identiteta je potrdilo, ki dokazuje, kdo si na strežnikih Mumble. Hrani tvoje registrirano ime in dovoljenja, zato si vsakič ista oseba.",
+    "import": "Uvozi obstoječo identiteto",
+    "name": "Privzeto prikazno ime",
+    "nameHint": "Uporabi se na strežnikih, ki te še ne poznajo. Spremeniš ga lahko za vsak strežnik posebej.",
     "chooseFile": "Izberi datoteko …",
     "noFile": "Ni izbrane datoteke",
     "chosenFile": "Izbrana datoteka: {{file}}",
-    "password": "Geslo datoteke (če obstaja)",
+    "password": "Geslo datoteke",
+    "passwordHint": "Geslo ostane v tem računalniku in se nikamor ne pošlje.",
     "existing": "Uporablja se identiteta {{name}}.",
-    "backup": "Tvoja identiteta je kot ključ. Pozneje naredi varnostno kopijo v Nastavitve → Identiteta.",
+    "backup": "Varnostno kopijo naredi pozneje v Nastavitvah. S kopijo lahko identiteto obnoviš v novem računalniku.",
     "nameRequired": "Vpiši ime.",
     "fileRequired": "Izberi datoteko identitete (.p12 ali .pfx).",
     "fileType": "Datoteka identitete",
@@ -29,101 +81,142 @@
     "pickFailed": "Izbirnika datotek ni bilo mogoče odpreti."
   },
   "mic": {
-    "title": "Mikrofon",
-    "intro": "Izberi mikrofon in zvočnike. Privzete nastavitve običajno delujejo.",
     "input": "Mikrofon",
     "output": "Zvočniki ali slušalke",
     "systemDefault": "Sistemsko privzeto",
     "defaultVia": "Sistemsko privzeto ({{backend}})",
     "level": "Raven mikrofona",
-    "test": "Preizkusi",
-    "stop": "Ustavi",
     "idle": "Pritisni Preizkusi, nekaj reci in slišal boš samega sebe.",
     "recording": "Zdaj govori …",
     "playing": "Predvajanje tvojega glasu …",
     "devicesFailed": "Tvojih zvočnih naprav ni bilo mogoče našteti. Lahko nadaljuješ in jih izbereš pozneje v nastavitvah.",
-    "testFailed": "Preizkusa ni bilo mogoče začeti. Preveri, ali je mikrofon priključen."
+    "testFailed": "Preizkusa ni bilo mogoče začeti. Preveri, ali je mikrofon priključen.",
+    "test": "Poslušaj se",
+    "stop": "Ustavi"
   },
-  "privacy": {
-    "title": "Vaša zasebnost",
-    "noTelemetry": "Mumcord ne pošilja telemetrije, analitike ali poročil o zrušitvah.",
-    "ownServers": "Povezuje se samo s strežniki, ki jih dodate.",
-    "linkPreviews": "Predogledi povezav ter slike ali GIF-i iz povezav v klepetu se naložijo s povezanih strani. To lahko izklopite v naslednjem koraku ali pozneje v nastavitvah.",
-    "mumcordUsers": "Funkcije samo za Mumcord izmenjujejo podatke le z drugimi uporabniki Mumcorda na istem strežniku.",
-    "local": "Vse, kar Mumcord shrani, ostane v vašem računalniku.",
-    "statement": "Celotna izjava o zasebnosti"
+  "voice": {
+    "title": "Se sliši dobro?",
+    "subtitle": "Izberi naprave in nekaj reci. Vrstica naj se premika, medtem ko govoriš.",
+    "talkLegend": "Kako želiš govoriti?",
+    "tipLabel": "O: {{mode}}",
+    "voiceActivationHint": "Govori prosto. Mumcord pošilja zvok, ko govoriš.",
+    "pushToTalkHint": "Med govorjenjem drži tipko. Najbolje na hrupnih mestih.",
+    "keyRequired": "Izberi tipko za pritisni za govor ali preklopi na glasovno aktivacijo.",
+    "notSure": "Nisi prepričan? Začni z glasovno aktivacijo. Kadar koli lahko preklopiš v hitrih nastavitvah."
   },
-  "updates": {
-    "title": "Nove različice",
-    "choice": "Ko izide nova različica",
-    "auto": "Samodejno prenesi",
-    "autoHint": "Mumcord posodobitev prenese in preveri v ozadju ter te vpraša, preden se znova zažene.",
-    "notify": "Samo obvesti",
-    "notifyHint": "Mumcord te obvesti o novi različici in pokaže, kaj se je spremenilo. Nič se ne prenese, dokler ne rečeš.",
-    "off": "Izključeno",
-    "offHint": "Mumcord nikoli ne sprašuje GitHuba po novih različicah. Posodobiš sam.",
-    "privacy": "Preverjanje GitHubu pošlje samo samo zahtevo ter ime in različico aplikacije. To lahko pozneje spremeniš v Nastavitvah."
-  },
-  "talk": {
-    "title": "Kako želiš govoriti?",
-    "mode": "Način govora",
-    "voiceActivation": "Glasovna aktivacija",
-    "voiceActivationHint": "Mikrofon se vklopi, ko govoriš.",
-    "pushToTalk": "Pritisni za govor",
-    "pushToTalkHint": "Med govorjenjem drži tipko.",
-    "waylandNoPortal": "Pritisni za govor ni na voljo: tvoje namizje aplikacijam ne dovoli globalnih bližnjic. Glasovna aktivacija deluje brez tipke.",
-    "registrationFailed": "Funkcije Pritisni za govor v tem sistemu ni bilo mogoče nastaviti. Namesto tega uporabi glasovno aktivacijo.",
-    "key": "Tipka za govor",
-    "noKey": "Tipka ni izbrana",
-    "currentKey": "Tipka: {{key}}",
-    "chooseKey": "Izberi tipko",
-    "changeKey": "Spremeni tipko",
-    "pressKey": "Pritisni tipko … (Escape za preklic)",
-    "confirmDialog": "Potrdi bližnjico v sistemskem pogovornem oknu ali jo dodeli v oknu sistemskih nastavitev, ki se odpre … (Escape za preklic)",
-    "keyInvalid": "Te tipke ni mogoče uporabiti. Poskusi drugo.",
-    "keyNotConfirmed": "Namizje ni potrdilo bližnjice. Poskusi znova in sprejmi sistemsko pogovorno okno ali tipko dodeli v nastavitvah bližnjic namizja.",
-    "keyRequired": "Izberi tipko za govor ali preklopi na glasovno aktivacijo.",
-    "linkHandler": "Odpiraj povezave mumble:// z Mumcordom",
-    "linkHandlerHint": "Klik na povezavo do strežnika na spletni strani jo potem odpre tukaj.",
-    "linkHandlerActive": "Mumcord že odpira povezave mumble://.",
-    "linkHandlerFailed": "Mumcorda ni bilo mogoče nastaviti za odpiranje povezav mumble://. Znova lahko poskusiš v nastavitvah.",
-    "mouseDisabled": "Pritisni za govor s tem gumbom miške ni na voljo, dokler v Nastavitve → Glas ne vklopiš »Dovoli gumbe miške«.",
-    "mouseNeedsInputGroup": "Pritisni za govor ni na voljo: Mumcord morda ne sme brati tvoje miške. V Nastavitve → Glas je razloženo, kako to dovoliš.",
-    "mouseNeedsAccessibility": "Pritisni za govor ni na voljo: Mumcord potrebuje dovoljenje za dostopnost, da vidi gumbe miške.",
-    "pressKeyOrMouse": "Pritisni tipko ali gumb miške (srednji ali stranski) … (Escape za preklic)",
-    "mouse": {
-      "middle": "Srednji gumb miške",
-      "back": "Gumb miške 4 (nazaj)",
-      "forward": "Gumb miške 5 (naprej)"
+  "style": {
+    "title": "Koliko želiš deliti?",
+    "subtitle": "Izberi izhodišče. Vse izbire znova vidiš na zadnjem zaslonu in jih tam lahko spremeniš.",
+    "legend": "Slog nastavitve",
+    "everythingOn": {
+      "title": "Vse vklopljeno",
+      "subtitle": "Poln nabor funkcij",
+      "p1": "Drugi vidijo, kaj igraš in kaj poslušaš",
+      "p2": "Tvoj naslov IP je viden ljudem, s katerimi se povezuješ neposredno",
+      "p3": "Vsak ti lahko piše; povezave in slike se naložijo s spleta",
+      "p4": "Prekrivanje, sinhronizacija zgodovine in slike v polni velikosti so vklopljeni"
     },
-    "mouseStillWorks": "Še vedno lahko uporabiš gumb miške.",
-    "mouseOptIn": "Želiš uporabljati stranski gumb miške? Po nastavitvi vklopi »Dovoli gumbe miške« v Nastavitve → Glas.",
-    "autostart": "Zaženi Mumcord ob prijavi",
-    "autostartHint": "To lahko pozneje spremeniš v Nastavitve → Videz.",
-    "autostartFailed": "Mumcorda ni bilo mogoče nastaviti za zagon ob prijavi. Znova lahko poskusiš v nastavitvah.",
-    "linkPreviews": "Pokaži predoglede povezav in vdelave",
-    "linkPreviewsHint": "Mumcord naloži povezane strani za prikaz predogledov in predvajalnikov videa; ta spletna mesta vidijo tvoj naslov IP.",
-    "historySharing": "Deli zgodovino mojih kanalov",
-    "historySharingHint": "Drugi uporabniki Mumcorda, ki se kanalu pridružijo za tabo, lahko vidijo njegova prejšnja sporočila iz tvoje shranjene zgodovine (do 7 dni). Zasebni klepeti se nikoli ne delijo. To lahko pozneje spremeniš v Nastavitve → Klepet in zgodovina.",
-    "ingameOverlay": "Pokaži prekrivni sloj v igrah",
-    "ingameOverlayHint": "Nad tvojo igro prikaže, kdo govori (Linux). Pozneje ga lahko v nastavitvah vklopiš ali izklopiš za vsako igro posebej.",
-    "ingameOverlayWarning": "Nekatere igre s protigoljufijsko zaščito lahko prekrivne sloje v igri označijo ali blokirajo. Mumcord ima znane tvegane igre (na primer Valorant ali League of Legends) privzeto izklopljene. Vklopi ga samo za igre, ki jim zaupaš.",
-    "ingameOverlayAlt": "Primer prekrivnega sloja v igri, ki prikazuje, kdo govori"
+    "balanced": {
+      "title": "Uravnoteženo",
+      "subtitle": "Med zasebnostjo in udobjem",
+      "p1": "Pišejo ti lahko le prijatelji in ljudje v tvojem kanalu",
+      "p2": "Neposredna povezava, s posrednikom kot rezervo",
+      "p3": "Predogledi povezav in slike v polni velikosti so vklopljeni",
+      "p4": "To, kaj igraš in kaj poslušaš, ostane zasebno"
+    },
+    "maximumPrivacy": {
+      "title": "Največja zasebnost",
+      "subtitle": "Deli čim manj",
+      "p1": "Pišejo ti lahko le prijatelji, brez izjem",
+      "p2": "Tvoj naslov IP je skrit; vse gre prek posrednika",
+      "p3": "Brez zunanje vsebine, brez sinhronizacije zgodovine, brez deljenja",
+      "p4": "Posodobitve te le obvestijo; nič se ne deli o tem, kaj počneš"
+    },
+    "custom": {
+      "title": "Po meri",
+      "subtitle": "Pojdi čez vsako izbiro",
+      "p1": "Sam pojdi čez vsak korak",
+      "p2": "Poglej, kaj počne vsaka nastavitev in kdo jo vidi",
+      "p3": "Najboljše, če veš, kaj želiš"
+    },
+    "presetSelected": "Izbrano: {{preset}}. Podrobne korake zasebnosti preskočiš. Izberi Po meri, če želiš iti čez vsakega.",
+    "customSelected": "Izbrano: Po meri. Naslednji koraki gredo čez vsako izbiro."
+  },
+  "pm": {
+    "title": "Kdo ti lahko piše?",
+    "subtitle": "Zasebna sporočila so pogovori ena na ena. Ta izbira ne vpliva na klepet v kanalu.",
+    "local": "Filtriranje poteka v tvojem računalniku. Pošiljatelji o tem niso obveščeni. Pozneje lahko za vsak strežnik določiš drugačno pravilo."
+  },
+  "connections": {
+    "title": "Povezave in vsebina",
+    "subtitle": "Nekatere funkcije te povežejo neposredno z drugimi uporabniki Mumcorda, del vsebine klepeta pa se naloži z drugih spletnih mest. Izberi, kaj ti ustreza.",
+    "chatContent": "Vsebina klepeta",
+    "sharing": "Deljenje z uporabniki Mumcorda"
+  },
+  "features": {
+    "title": "Prilagodi si ga",
+    "subtitle": "Vklopi dodatke, ki jih želiš. Pri vsakem piše, kdo kaj vidi.",
+    "seenByMumcordUsers": "Vidno uporabnikom Mumcorda na istem strežniku.",
+    "onlyYou": "Vidiš samo ti.",
+    "ingameOverlayAlt": "Primer prekrivanja v igri, ki prikazuje, kdo govori"
+  },
+  "appearance": {
+    "title": "Izberi svoj videz",
+    "subtitle": "Okno se posodablja med izbiranjem. V Nastavitvah je več tem, lahko pa ustvariš tudi svojo."
+  },
+  "startup": {
+    "title": "Zagon in posodobitve",
+    "subtitle": "Kako se Mumcord zažene in kaj naredi z novimi različicami.",
+    "linkHandler": "Odpiraj povezave mumble:// z Mumcordom",
+    "linkHandlerHint": "Klik na povezavo do strežnika na spletnem mestu jo nato odpre tukaj.",
+    "linkHandlerActive": "Mumcord že odpira povezave mumble://.",
+    "linkHandlerFailed": "Mumcorda ni bilo mogoče nastaviti za odpiranje povezav mumble://. Poskusiš lahko znova v Nastavitvah.",
+    "autostartFailed": "Mumcorda ni bilo mogoče nastaviti za zagon ob prijavi. Poskusiš lahko znova v Nastavitvah."
+  },
+  "summary": {
+    "title": "Vse je pripravljeno",
+    "titleNamed": "Vse je pripravljeno, {{name}}",
+    "subtitle": "Tukaj je, kar si izbral. Preden začneš, uporabi Uredi na kateri koli kartici, da kaj spremeniš.",
+    "on": "vklopljeno",
+    "off": "izklopljeno",
+    "unavailable": "tu ni na voljo",
+    "editShort": "Uredi",
+    "edit": "Uredi: {{card}}",
+    "cards": {
+      "identity": "Identiteta",
+      "voice": "Glas",
+      "privateMessages": "Zasebna sporočila",
+      "connections": "Povezave",
+      "chatContent": "Vsebina klepeta",
+      "features": "Funkcije",
+      "appearance": "Videz",
+      "startup": "Zagon",
+      "updates": "Posodobitve"
+    },
+    "identityDetail": "Shranjena v sistemskem obesku ključev",
+    "voiceDetail": "Odstranjevanje hrupa: {{noise}}",
+    "pmDetail": "Moj kanal {{channel}} · sprejeti klepeti {{accepted}} · zahteve {{requests}}",
+    "contentTitle": "Predogledi povezav {{previews}}",
+    "contentDetail": "Slike v polni velikosti {{images}} · sinhronizacija zgodovine {{sync}}",
+    "featuresTitle": "Prekrivanje v igri {{overlay}}",
+    "featuresDetail": "Sledi sistemskemu načinu Ne moti {{dnd}} · zdaj se predvaja {{playing}} · zdaj igram {{gaming}}",
+    "effectsDetail": "Vizualni učinki {{effects}}",
+    "startupTitle": "Zagon ob prijavi {{login}}",
+    "startupDetail": "Zagon pomanjšano {{minimized}} · povezave mumble:// {{links}}",
+    "updates": {
+      "auto": "Samodejno prenesi",
+      "notify": "Samo obvesti",
+      "off": "Izklopljeno"
+    },
+    "updatesDetail": "Posodobitve se pred namestitvijo vedno preverijo in overijo.",
+    "backup": "Tvoja identiteta {{name}} je shranjena v sistemskem obesku ključev. Naredi varnostno kopijo v Nastavitve → Identiteta, da nikoli ne izgubiš registriranega imena.",
+    "nextServer": "Naprej: dodaj svoj prvi strežnik",
+    "rerunNote": "Shranijo se samo vrednosti, ki si jih spremenil."
   },
   "rerun": {
     "title": "Čarovnik za nastavitev",
     "note": "Znova greš skozi nastavitev. Tvoja identiteta se ne spremeni.",
     "manageIdentities": "Upravljaj identitete",
-    "stepsLabel": "Koraki nastavitve",
-    "stepsSkipped": "(preskočeno, identiteta ni del tega)",
-    "steps": {
-      "identity": "Identiteta",
-      "mic": "Mikrofon",
-      "privacy": "Zasebnost",
-      "updates": "Posodobitve",
-      "talk": "Način govora"
-    },
-    "footer": "Preklic pusti vse tako, kot je. Na koncu se shranijo samo spremenjeni koraki.",
     "discardTitle": "Zavržeš spremembe?",
     "discardBody": "Nič se ne shrani pred zaključkom. Če zdaj prekličeš, vse ostane tako, kot je.",
     "discardKeep": "Nadaljuj z urejanjem",

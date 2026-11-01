@@ -1,25 +1,77 @@
 {
   "progress": "Passo {{current}} di {{total}}",
   "loadFailed": "Non è stato possibile caricare la configurazione.",
-  "finish": "Fine",
+  "recommended": "Consigliato",
+  "tipLabel": "Informazioni su {{name}}",
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",
     "secureStorageUnavailable": "Mumcord non riesce ad accedere all'archivio sicuro del tuo sistema. Sblocca il portachiavi o il gestore di password e riprova.",
     "saveFailed": "Non è stato possibile salvare le impostazioni. Riprova."
   },
+  "nav": {
+    "getStarted": "Iniziamo",
+    "finishSetup": "Termina la configurazione",
+    "startMumcord": "Avvia Mumcord",
+    "finish": "Fine",
+    "skip": "Salta per ora",
+    "enterKey": "Invio",
+    "enterHint": "per continuare"
+  },
+  "rail": {
+    "label": "Passaggi della configurazione",
+    "appName": "Mumcord",
+    "setup": "Configurazione",
+    "custom": "Personalizzato",
+    "done": "(fatto)",
+    "progress": "Avanzamento della configurazione",
+    "later": "Tutto ciò che è qui può essere modificato in seguito nelle Impostazioni."
+  },
+  "steps": {
+    "welcome": "Benvenuto",
+    "import": "Importa da Mumble",
+    "identity": "Identità",
+    "voice": "Voce",
+    "setupStyle": "Stile di configurazione",
+    "privateMessages": "Messaggi privati",
+    "connections": "Connessioni",
+    "features": "Funzioni",
+    "appearance": "Aspetto",
+    "startup": "Avvio e aggiornamenti",
+    "summary": "Tutto pronto"
+  },
+  "welcome": {
+    "title": "Una chat vocale che sembra",
+    "titleAccent": "uno spazio tutto tuo.",
+    "subtitle": "Mumcord parla Mumble, quindi funziona con ogni server Mumble, e aggiunge una chat moderna. Configuriamolo come piace a te. Ci vogliono circa due minuti.",
+    "voice": {
+      "title": "Voce cristallina",
+      "text": "Audio a bassa latenza con riduzione del rumore integrata."
+    },
+    "servers": {
+      "title": "Funziona con qualsiasi server Mumble",
+      "text": "Nessun account, nessuna registrazione. Entra nei server che già usi."
+    },
+    "private": {
+      "title": "Privato per progetto",
+      "text": "Nessuna telemetria. Ciò che Mumcord memorizza resta sul tuo computer."
+    }
+  },
   "identity": {
-    "title": "La tua identità",
-    "intro": "I server ti riconoscono dalla tua identità. Creane una nuova o porta quella che usi già.",
-    "create": "Crea nuova",
-    "import": "Importa file",
-    "name": "Nome",
-    "nameHint": "Gli altri vedono questo nome. Potrai cambiarlo per ogni server in seguito.",
+    "title": "Chi sei su Mumble?",
+    "intro": "La tua identità è il modo in cui i server ti riconoscono. Creane una nuova oppure porta quella che già usi.",
+    "legend": "La tua identità",
+    "create": "Crea una nuova identità",
+    "createText": "La tua identità è un certificato che dimostra chi sei sui server Mumble. Conserva il tuo nome registrato e i tuoi permessi, così sei la stessa persona ogni volta che entri.",
+    "import": "Importa un'identità esistente",
+    "name": "Nome visualizzato predefinito",
+    "nameHint": "Usato sui server che non ti conoscono ancora. Puoi cambiarlo per ogni server.",
     "chooseFile": "Scegli file…",
     "noFile": "Nessun file scelto",
     "chosenFile": "File scelto: {{file}}",
-    "password": "Password del file (se presente)",
+    "password": "Password del file",
+    "passwordHint": "La password resta su questo computer e non viene mai inviata da nessuna parte.",
     "existing": "Uso l'identità {{name}}.",
-    "backup": "La tua identità è come una chiave. Fanne un backup più tardi in Impostazioni → Identità.",
+    "backup": "Eseguine il backup più tardi nelle Impostazioni. Un backup ti permette di ripristinare la tua identità su un nuovo computer.",
     "nameRequired": "Inserisci un nome.",
     "fileRequired": "Scegli un file di identità (.p12 o .pfx).",
     "fileType": "File di identità",
@@ -29,101 +81,142 @@
     "pickFailed": "Non è stato possibile aprire il selettore di file."
   },
   "mic": {
-    "title": "Microfono",
-    "intro": "Scegli microfono e altoparlanti. Di solito vanno bene quelli predefiniti.",
     "input": "Microfono",
     "output": "Altoparlanti o cuffie",
     "systemDefault": "Predefinito di sistema",
     "defaultVia": "Predefinito di sistema ({{backend}})",
     "level": "Livello del microfono",
-    "test": "Prova",
-    "stop": "Ferma",
     "idle": "Premi Prova, di' qualcosa e ti riascolterai.",
     "recording": "Parla ora…",
     "playing": "Riproduzione della tua voce…",
     "devicesFailed": "Non è stato possibile elencare i tuoi dispositivi audio. Puoi continuare e sceglierli più tardi in Impostazioni.",
-    "testFailed": "Non è stato possibile avviare la prova. Controlla che il microfono sia collegato."
+    "testFailed": "Non è stato possibile avviare la prova. Controlla che il microfono sia collegato.",
+    "test": "Ascoltati",
+    "stop": "Ferma"
   },
-  "privacy": {
-    "title": "La tua privacy",
-    "noTelemetry": "Mumcord non invia telemetria, analisi o rapporti sugli arresti anomali.",
-    "ownServers": "Si connette solo ai server che aggiungi.",
-    "linkPreviews": "Le anteprime dei link e le immagini o le GIF dei link nella chat vengono caricate dai siti collegati. Puoi disattivarlo nel passaggio successivo o più tardi nelle Impostazioni.",
-    "mumcordUsers": "Le funzioni solo Mumcord scambiano dati esclusivamente con altri utenti di Mumcord sullo stesso server.",
-    "local": "Tutto ciò che Mumcord salva resta sul tuo computer.",
-    "statement": "Informativa completa sulla privacy"
+  "voice": {
+    "title": "Suona bene?",
+    "subtitle": "Scegli i tuoi dispositivi e di' qualcosa. La barra dovrebbe muoversi mentre parli.",
+    "talkLegend": "Come vuoi parlare?",
+    "tipLabel": "Informazioni su {{mode}}",
+    "voiceActivationHint": "Parla liberamente. Mumcord invia l'audio quando parli.",
+    "pushToTalkHint": "Tieni premuto un tasto mentre parli. Ideale nei luoghi rumorosi.",
+    "keyRequired": "Scegli un tasto push-to-talk oppure passa all'attivazione vocale.",
+    "notSure": "Non sei sicuro? Inizia con l'attivazione vocale. Puoi cambiare in qualsiasi momento dalle impostazioni rapide."
   },
-  "updates": {
-    "title": "Nuove versioni",
-    "choice": "Quando esce una nuova versione",
-    "auto": "Scarica automaticamente",
-    "autoHint": "Mumcord scarica e verifica l'aggiornamento in background e ti chiede prima di riavviarsi.",
-    "notify": "Solo notifica",
-    "notifyHint": "Mumcord ti avvisa di una nuova versione e mostra cosa è cambiato. Non viene scaricato nulla finché non lo decidi tu.",
-    "off": "Disattivato",
-    "offHint": "Mumcord non chiede mai a GitHub nuove versioni. Aggiorni tu stesso.",
-    "privacy": "Il controllo invia a GitHub solo la richiesta stessa e il nome e la versione dell'app. Puoi cambiarlo più tardi nelle Impostazioni."
-  },
-  "talk": {
-    "title": "Come vuoi parlare?",
-    "mode": "Modalità di conversazione",
-    "voiceActivation": "Attivazione vocale",
-    "voiceActivationHint": "Il microfono si attiva quando parli.",
-    "pushToTalk": "Push-to-talk",
-    "pushToTalkHint": "Tieni premuto un tasto mentre parli.",
-    "waylandNoPortal": "Il push-to-talk non è disponibile: il tuo desktop non permette alle app di usare scorciatoie globali. L'attivazione vocale funziona senza tasto.",
-    "registrationFailed": "Non è stato possibile configurare il push-to-talk su questo sistema. Usa l'attivazione vocale.",
-    "key": "Tasto push-to-talk",
-    "noKey": "Nessun tasto scelto",
-    "currentKey": "Tasto: {{key}}",
-    "chooseKey": "Scegli tasto",
-    "changeKey": "Cambia tasto",
-    "pressKey": "Premi un tasto… (Esc per annullare)",
-    "confirmDialog": "Conferma la scorciatoia nella finestra di sistema o assegnala nella finestra Impostazioni di sistema che si apre… (Esc per annullare)",
-    "keyInvalid": "Questo tasto non può essere usato. Provane un altro.",
-    "keyNotConfirmed": "Il desktop non ha confermato la scorciatoia. Riprova e accetta la finestra di sistema, oppure assegna il tasto nelle impostazioni delle scorciatoie del desktop.",
-    "keyRequired": "Scegli un tasto push-to-talk o passa all'attivazione vocale.",
-    "linkHandler": "Apri i link mumble:// con Mumcord",
-    "linkHandlerHint": "Facendo clic su un link a un server in un sito web, si aprirà qui.",
-    "linkHandlerActive": "Mumcord apre già i link mumble://.",
-    "linkHandlerFailed": "Non è stato possibile configurare Mumcord per aprire i link mumble://. Puoi riprovare in Impostazioni.",
-    "mouseDisabled": "Il push-to-talk non è disponibile con questo pulsante del mouse finché non attivi \"Consenti i pulsanti del mouse\" in Impostazioni → Voce.",
-    "mouseNeedsInputGroup": "Il push-to-talk non è disponibile: Mumcord potrebbe non poter leggere il tuo mouse. In Impostazioni → Voce trovi come consentirlo.",
-    "mouseNeedsAccessibility": "Il push-to-talk non è disponibile: Mumcord ha bisogno del permesso di Accessibilità per vedere i pulsanti del mouse.",
-    "pressKeyOrMouse": "Premi un tasto o un pulsante del mouse (centrale o laterale)… (Esc per annullare)",
-    "mouse": {
-      "middle": "Pulsante centrale del mouse",
-      "back": "Pulsante 4 del mouse (indietro)",
-      "forward": "Pulsante 5 del mouse (avanti)"
+  "style": {
+    "title": "Quanto vuoi condividere?",
+    "subtitle": "Scegli un punto di partenza. Rivedrai ogni scelta nell'ultima schermata e potrai modificarla lì.",
+    "legend": "Stile di configurazione",
+    "everythingOn": {
+      "title": "Tutto attivo",
+      "subtitle": "Tutte le funzioni",
+      "p1": "Gli altri vedono cosa giochi e cosa ascolti",
+      "p2": "Il tuo IP è visibile alle persone a cui ti connetti direttamente",
+      "p3": "Chiunque può scriverti; link e immagini vengono caricati dal web",
+      "p4": "Overlay, sincronizzazione della cronologia e immagini a dimensione intera sono attivi"
     },
-    "mouseStillWorks": "Puoi comunque usare un pulsante del mouse.",
-    "mouseOptIn": "Vuoi usare un pulsante laterale del mouse? Dopo la configurazione, attiva \"Consenti i pulsanti del mouse\" in Impostazioni → Voce.",
-    "autostart": "Avvia Mumcord all'accesso",
-    "autostartHint": "Potrai cambiarlo più tardi in Impostazioni → Aspetto.",
-    "autostartFailed": "Non è stato possibile impostare l'avvio di Mumcord all'accesso. Puoi riprovare in Impostazioni.",
-    "linkPreviews": "Mostra anteprime e incorporamenti dei link",
-    "linkPreviewsHint": "Mumcord carica le pagine collegate per mostrare anteprime e lettori video; quei siti vedono il tuo indirizzo IP.",
-    "historySharing": "Condividi la cronologia dei miei canali",
-    "historySharingHint": "Gli altri utenti Mumcord che entrano in un canale dopo di te possono vedere i suoi messaggi precedenti dalla tua cronologia salvata (fino a 7 giorni). Le chat private non vengono mai condivise. Potrai cambiarlo più tardi in Impostazioni → Chat e cronologia.",
-    "ingameOverlay": "Mostra l'overlay nei giochi",
-    "ingameOverlayHint": "Disegna chi sta parlando sopra il tuo gioco (Linux). Potrai attivarlo o disattivarlo per ogni gioco più tardi in Impostazioni.",
-    "ingameOverlayWarning": "Alcuni giochi con anti-cheat potrebbero segnalare o bloccare gli overlay nel gioco. Mumcord tiene disattivati di default i giochi noti per essere a rischio (come Valorant o League of Legends). Attivalo solo per i giochi di cui ti fidi.",
-    "ingameOverlayAlt": "Esempio dell'overlay nel gioco che mostra chi sta parlando"
+    "balanced": {
+      "title": "Bilanciato",
+      "subtitle": "Tra privacy e comodità",
+      "p1": "Solo gli amici e le persone nel tuo canale possono scriverti",
+      "p2": "Connessione diretta, con un relay come alternativa",
+      "p3": "Anteprime dei link e immagini a dimensione intera sono attive",
+      "p4": "Ciò che giochi e ascolti resta privato"
+    },
+    "maximumPrivacy": {
+      "title": "Privacy massima",
+      "subtitle": "Condividi il minimo possibile",
+      "p1": "Solo gli amici possono scriverti, senza eccezioni",
+      "p2": "Il tuo IP è nascosto; tutto passa dal relay",
+      "p3": "Nessun contenuto esterno, nessuna sincronizzazione della cronologia, nessuna condivisione",
+      "p4": "Gli aggiornamenti ti avvisano soltanto; non viene condiviso nulla di ciò che fai"
+    },
+    "custom": {
+      "title": "Personalizzato",
+      "subtitle": "Passa in rassegna ogni scelta",
+      "p1": "Percorri tu stesso ogni passaggio",
+      "p2": "Scopri cosa fa ogni impostazione e chi la vede",
+      "p3": "Ideale se sai cosa vuoi"
+    },
+    "presetSelected": "{{preset}} selezionato: salti i passaggi dettagliati sulla privacy. Scegli Personalizzato per percorrerli tutti.",
+    "customSelected": "Personalizzato selezionato: i prossimi passaggi passano in rassegna ogni scelta."
+  },
+  "pm": {
+    "title": "Chi può scriverti?",
+    "subtitle": "I messaggi privati sono chat uno a uno. La chat del canale non è influenzata da questa scelta.",
+    "local": "Il filtro avviene sul tuo computer. I mittenti non vengono avvisati. Più avanti potrai impostare una regola diversa per ogni server."
+  },
+  "connections": {
+    "title": "Connessioni e contenuti",
+    "subtitle": "Alcune funzioni ti collegano direttamente ad altri utenti di Mumcord e alcuni contenuti della chat vengono caricati da altri siti web. Scegli cosa va bene per te.",
+    "chatContent": "Contenuti della chat",
+    "sharing": "Condivisione con gli utenti di Mumcord"
+  },
+  "features": {
+    "title": "Rendilo tuo",
+    "subtitle": "Attiva gli extra che vuoi. Ognuno indica chi può vedere cosa.",
+    "seenByMumcordUsers": "Visibile agli utenti di Mumcord sullo stesso server.",
+    "onlyYou": "Lo vedi solo tu.",
+    "ingameOverlayAlt": "Esempio dell'overlay in gioco che mostra chi sta parlando"
+  },
+  "appearance": {
+    "title": "Scegli il tuo aspetto",
+    "subtitle": "La finestra si aggiorna mentre scegli. Altri temi, e i tuoi, sono nelle Impostazioni."
+  },
+  "startup": {
+    "title": "Avvio e aggiornamenti",
+    "subtitle": "Come si avvia Mumcord e cosa fa con le nuove versioni.",
+    "linkHandler": "Apri i link mumble:// con Mumcord",
+    "linkHandlerHint": "Facendo clic su un link a un server in un sito web, questo si apre qui.",
+    "linkHandlerActive": "Mumcord apre già i link mumble://.",
+    "linkHandlerFailed": "Non è stato possibile impostare Mumcord per aprire i link mumble://. Puoi riprovare nelle Impostazioni.",
+    "autostartFailed": "Non è stato possibile impostare Mumcord per l'avvio all'accesso. Puoi riprovare nelle Impostazioni."
+  },
+  "summary": {
+    "title": "Tutto pronto",
+    "titleNamed": "Tutto pronto, {{name}}",
+    "subtitle": "Ecco cosa hai scelto. Usa Modifica su qualsiasi scheda per cambiarla prima di iniziare.",
+    "on": "attivo",
+    "off": "disattivato",
+    "unavailable": "non disponibile qui",
+    "editShort": "Modifica",
+    "edit": "Modifica {{card}}",
+    "cards": {
+      "identity": "Identità",
+      "voice": "Voce",
+      "privateMessages": "Messaggi privati",
+      "connections": "Connessioni",
+      "chatContent": "Contenuti della chat",
+      "features": "Funzioni",
+      "appearance": "Aspetto",
+      "startup": "Avvio",
+      "updates": "Aggiornamenti"
+    },
+    "identityDetail": "Salvata nel portachiavi del sistema",
+    "voiceDetail": "Riduzione del rumore: {{noise}}",
+    "pmDetail": "Il mio canale {{channel}} · chat accettate {{accepted}} · richieste {{requests}}",
+    "contentTitle": "Anteprime dei link {{previews}}",
+    "contentDetail": "Immagini a dimensione intera {{images}} · sincronizzazione della cronologia {{sync}}",
+    "featuresTitle": "Overlay in gioco {{overlay}}",
+    "featuresDetail": "Segui Non disturbare del sistema {{dnd}} · in riproduzione {{playing}} · in gioco {{gaming}}",
+    "effectsDetail": "Effetti visivi {{effects}}",
+    "startupTitle": "Avvio all'accesso {{login}}",
+    "startupDetail": "Avvio ridotto a icona {{minimized}} · link mumble:// {{links}}",
+    "updates": {
+      "auto": "Scarica automaticamente",
+      "notify": "Solo notifica",
+      "off": "Disattivato"
+    },
+    "updatesDetail": "Gli aggiornamenti vengono sempre controllati e verificati prima di essere installati.",
+    "backup": "La tua identità {{name}} è salvata nel portachiavi del sistema. Eseguine il backup da Impostazioni → Identità, così non perdi mai il tuo nome registrato.",
+    "nextServer": "Passo successivo: aggiungi il tuo primo server",
+    "rerunNote": "Vengono salvati solo i valori che hai modificato."
   },
   "rerun": {
     "title": "Procedura guidata",
     "note": "Stai ripetendo la configurazione. La tua identità non viene modificata.",
     "manageIdentities": "Gestisci le identità",
-    "stepsLabel": "Passaggi della configurazione",
-    "stepsSkipped": "(saltato, l'identità non ne fa parte)",
-    "steps": {
-      "identity": "Identità",
-      "mic": "Microfono",
-      "privacy": "Privacy",
-      "updates": "Aggiornamenti",
-      "talk": "Modalità di conversazione"
-    },
-    "footer": "Annulla lascia tutto com'è. Alla fine vengono salvati solo i passaggi che hai modificato.",
     "discardTitle": "Scartare le modifiche?",
     "discardBody": "Niente viene salvato prima della fine. Se annulli ora, tutto resta com'è.",
     "discardKeep": "Continua a modificare",
