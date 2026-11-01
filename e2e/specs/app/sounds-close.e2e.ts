@@ -154,7 +154,8 @@ describe("AC-1.24 join/leave sounds", () => {
     for (const burst of found) {
       expect(burst.peakDb).toBeLessThanOrEqual(-12);
       expect(burst.peakDb).toBeGreaterThan(-40);
-      expect(burst.durationMs).toBeLessThanOrEqual(500);
+      // The default rich join and leave sounds are 0.8 s long (#325), the classic ones 0.24 s.
+      expect(burst.durationMs).toBeLessThanOrEqual(1000);
     }
     // The two cues are ~3 s apart (join, hold 3 s, leave).
     expect(found[1].startMs - found[0].startMs).toBeGreaterThan(2500);
@@ -167,11 +168,12 @@ describe("AC-1.24 join/leave sounds", () => {
     log.otherChannel = bursts(a, b);
     expect(bursts(a, b)).toEqual([]);
     // No speech: every sound in the whole recording is a short cue, never a long utterance.
-    // Cues played back to back (the explicit join's undeafen + unmute) merge into one burst of
-    // ~0.5 s; a spoken utterance would last well over a second.
+    // The longest cue is the default rich connect sound (1.2 s, #325); cues played back to back
+    // (the explicit join's undeafen + unmute) merge into one burst. A spoken announcement of a
+    // join ("Bot joined the channel") takes about two seconds.
     const all = bursts(0, sampleCount());
     log.wholeRecording = all;
-    for (const burst of all) expect(burst.durationMs).toBeLessThanOrEqual(1000);
+    for (const burst of all) expect(burst.durationMs).toBeLessThanOrEqual(1500);
   });
 });
 
