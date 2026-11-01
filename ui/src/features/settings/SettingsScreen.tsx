@@ -110,6 +110,12 @@ export function SettingsScreen({
         setActive(entry.section);
         setJump({ kind: "setting", entry });
       },
+      openCompatibilityMode: () => {
+        setQuery("");
+        setJump(null);
+        setActive("voiceAudio");
+        setCompatibilityFocusPending(true);
+      },
     }),
     [compatibilityFocusPending],
   );

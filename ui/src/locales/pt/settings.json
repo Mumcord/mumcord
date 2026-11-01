@@ -9,7 +9,8 @@
     "servers": "Servidores",
     "privacy": "Privacidade",
     "updates": "Atualizações",
-    "packetInspector": "Inspetor de pacotes"
+    "packetInspector": "Inspetor de pacotes",
+    "hotkeys": "Atalhos"
   },
   "search": {
     "label": "Pesquisar definições",
@@ -241,7 +242,7 @@
       "keyRemove": "Remover tecla",
       "keyTaken": "Esta tecla não pode ser usada: não é uma única tecla com modificadores opcionais, ou já é o push-to-talk ou a tecla de outro destino.",
       "keyFailed": "Esta tecla está a ser usada por outra aplicação, por isso não funciona neste momento.",
-      "keysWayland": "As teclas de sussurro não estão disponíveis nesta sessão Wayland: o portal de atalhos globais do ambiente de trabalho só guarda a tecla push-to-talk. Ativa o modo de compatibilidade para as usares, ou começa a sussurrar a partir do painel do utilizador.",
+      "keysWayland": "As teclas de sussurro não estão disponíveis nesta sessão Wayland: o teu ambiente de trabalho não oferece atalhos globais. Ativa o modo de compatibilidade para as usares, ou começa a sussurrar a partir do painel do utilizador.",
       "save": "Guardar",
       "delete": "Eliminar destino",
       "savedStatus": "Guardado.",
@@ -845,5 +846,57 @@
     "whatsNew": "Novidades",
     "whatsNewHint": "Vê as alterações de cada versão.",
     "openChangelog": "Abrir o registo de alterações"
+  },
+  "hotkeys": {
+    "global": "Atalhos globais",
+    "background": "Funcionar com o Mumcord em segundo plano",
+    "backgroundHint": "Os atalhos funcionam em todo o lado, também em jogos. Por predefinição, nenhum está definido.",
+    "foregroundOnly": "Os atalhos só funcionam enquanto a janela do Mumcord está em primeiro plano.",
+    "portal": "O teu ambiente de trabalho (Wayland) pede-te uma vez para aprovares os atalhos globais.",
+    "noPortal": "O teu ambiente de trabalho não oferece atalhos globais, por isso só funcionam enquanto a janela do Mumcord está em primeiro plano.",
+    "compatLink": "Usar o modo de compatibilidade (X11)",
+    "compatSuffix": "se isso não estiver disponível.",
+    "actions": "Ações",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Silenciar / reativar microfone",
+      "toggleDeafen": "Ensurdecer / desensurdecer",
+      "toggleDnd": "Alternar Não incomodar",
+      "joinLeaveVoice": "Entrar na / sair da voz",
+      "switchVoiceServer": "Mudar de servidor de voz",
+      "switchChannel": "Mudar para o canal…",
+      "previousChannel": "Voltar ao canal anterior",
+      "toggleMemberColumn": "Mostrar / ocultar coluna de membros",
+      "openQuickSettings": "Abrir definições rápidas",
+      "openMumcord": "Abrir o Mumcord"
+    },
+    "pushToTalkHint": "Envia enquanto manténs as teclas premidas",
+    "pushToTalkOff": "Usado quando o modo de fala em Voz é push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Canal raiz",
+    "notSet": "Não definido",
+    "recording": "Prime uma combinação de teclas…",
+    "recordingHint": "Prime <esc>Esc</esc> para cancelar, <back>Backspace</back> para limpar. A gravação pára após 5 segundos.",
+    "clear": "Limpar",
+    "clearLabel": "Limpar {{action}}",
+    "cancel": "Cancelar",
+    "conflictTitle": "Conflito.",
+    "conflict": "Esta combinação já é usada por «{{other}}». Escolhe outra, ou atribui-a aqui e limpa a outra.",
+    "inApp": "Esta combinação é o atalho do próprio Mumcord para {{shortcut}}. Escolhe outra.",
+    "inAppShortcut": {
+      "memberColumn": "mostrar e ocultar a coluna de membros",
+      "notificationCentre": "o centro de notificações",
+      "search": "pesquisar",
+      "closeWindow": "fechar uma janela"
+    },
+    "assignHere": "Atribuir aqui",
+    "rejected": "Esta tecla não pode ser um atalho global. Prime uma tecla diferente de Ctrl, Alt, Shift ou Super, com ou sem elas.",
+    "failed": "Não foi possível registar este atalho. Outra aplicação ou o teu ambiente de trabalho pode já estar a usá-lo.",
+    "add": "Adicionar atalho «mudar para o canal»…",
+    "addChannel": "Canal",
+    "addNone": "Liga-te a um servidor para escolheres um dos seus canais.",
+    "addConfirm": "Adicionar",
+    "reset": "Repor todos os atalhos",
+    "resetHint": "Remove todos os atalhos exceto push-to-talk; por predefinição, nenhum está definido."
   }
 }

@@ -50,8 +50,8 @@ pub enum WhisperReceivers {
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum WhisperKeysUnavailable {
-    /// Native Wayland: global keys go through the desktop portal, which whisper keys do not use
-    /// yet (#64); the X11 compatibility mode offers them.
+    /// Native Wayland without the global-shortcuts portal; the X11 compatibility mode offers
+    /// the keys.
     WaylandPortal,
 }
 
@@ -209,6 +209,7 @@ fn invalid(message: impl Into<String>) -> ApiError {
 fn validated(
     targets: &[WhisperTarget],
     ptt_key: Option<&str>,
+    hotkeys: &[store::Hotkey],
 ) -> ApiResult<Vec<store::WhisperTarget>> {
     if targets.len() > MAX_TARGETS {
         return Err(invalid("too many whisper targets"));
@@ -231,7 +232,7 @@ fn validated(
         }
         if let Some(key) = &t.hotkey {
             let others: Vec<&str> = out.iter().filter_map(|o| o.hotkey.as_deref()).collect();
-            let key = ptt::whisper::validate(key, ptt_key, &others)
+            let key = ptt::whisper::validate(key, ptt_key, hotkeys, &others)
                 .map_err(|e| invalid(format!("whisper key: {e}")))?;
             t.hotkey = Some(key);
         }
@@ -258,8 +259,11 @@ pub fn configure_keys(app: &AppHandle, settings: &store::Settings) {
         .iter()
         .filter_map(|t| Some((t.id.clone(), t.hotkey.clone()?)))
         .collect();
-    let failed = ptt::whisper::configure(app, &keys);
-    *FAILED_KEYS.lock().unwrap_or_else(PoisonError::into_inner) = failed;
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        let failed = ptt::whisper::configure(&app, &keys).await;
+        *FAILED_KEYS.lock().unwrap_or_else(PoisonError::into_inner) = failed;
+    });
 }
 
 /// Connects the whisper keys to [`start`] and [`stop`]; called once at start-up.
@@ -364,7 +368,7 @@ pub async fn whisper_targets_save(
     targets: Vec<WhisperTarget>,
 ) -> ApiResult<WhisperSetup> {
     let mut settings = engine.settings()?;
-    settings.whisper_targets = validated(&targets, settings.ptt_key.as_deref())?;
+    settings.whisper_targets = validated(&targets, settings.ptt_key.as_deref(), &settings.hotkeys)?;
     let stored = engine.update_settings(settings).await?;
     // A deleted or edited target must not keep whispering.
     stop(&app, &engine, None);
@@ -389,8 +393,13 @@ pub fn whisper_key_check(
         .filter(|t| t.id != target_id)
         .filter_map(|t| t.hotkey.as_deref())
         .collect();
-    ptt::whisper::validate(&key, settings.ptt_key.as_deref(), &others)
-        .map_err(|e| invalid(e.to_string()))
+    ptt::whisper::validate(
+        &key,
+        settings.ptt_key.as_deref(),
+        &settings.hotkeys,
+        &others,
+    )
+    .map_err(|e| invalid(e.to_string()))
 }
 
 /// Starts whispering or shouting to a saved target from the UI; it lasts until
@@ -433,9 +442,9 @@ mod tests {
 
     #[test]
     fn saved_targets_are_trimmed_and_keys_canonical() {
-        let saved = validated(&[target("a", Some("control+KeyW"))], Some("F13")).expect("ok");
+        let saved = validated(&[target("a", Some("control+KeyQ"))], Some("F13"), &[]).expect("ok");
         assert_eq!(saved[0].name, "a");
-        assert_eq!(saved[0].hotkey.as_deref(), Some("Ctrl+W"));
+        assert_eq!(saved[0].hotkey.as_deref(), Some("Ctrl+Q"));
         assert_eq!(
             saved[0].receivers,
             store::WhisperReceivers::Channel {
@@ -447,20 +456,27 @@ mod tests {
         );
         assert_eq!(
             WhisperTarget::from(&saved[0]).hotkey.as_deref(),
-            Some("Ctrl+W")
+            Some("Ctrl+Q")
         );
     }
 
     #[test]
     fn conflicting_or_broken_targets_are_refused() {
-        assert!(validated(&[target("a", Some("F13"))], Some("F13")).is_err());
-        assert!(validated(&[target("a", Some("F9")), target("b", Some("F9"))], None).is_err());
-        assert!(validated(&[target("a", None), target("a", None)], None).is_err());
+        assert!(validated(&[target("a", Some("F13"))], Some("F13"), &[]).is_err());
+        assert!(
+            validated(
+                &[target("a", Some("F9")), target("b", Some("F9"))],
+                None,
+                &[]
+            )
+            .is_err()
+        );
+        assert!(validated(&[target("a", None), target("a", None)], None, &[]).is_err());
         let mut empty = target("a", None);
         empty.receivers = WhisperReceivers::People {
             names: vec![" ".into()],
         };
-        assert!(validated(&[empty], None).is_err());
-        assert!(validated(&[target("a", None), target("b", None)], None).is_ok());
+        assert!(validated(&[empty], None, &[]).is_err());
+        assert!(validated(&[target("a", None), target("b", None)], None, &[]).is_ok());
     }
 }

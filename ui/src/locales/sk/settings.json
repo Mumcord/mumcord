@@ -9,7 +9,8 @@
     "servers": "Servery",
     "privacy": "Súkromie",
     "updates": "Aktualizácie",
-    "packetInspector": "Inšpektor paketov"
+    "packetInspector": "Inšpektor paketov",
+    "hotkeys": "Klávesové skratky"
   },
   "search": {
     "label": "Hľadať v nastaveniach",
@@ -243,7 +244,7 @@
       "keyRemove": "Odstrániť kláves",
       "keyTaken": "Tento kláves nemožno použiť: nie je to jeden kláves s voliteľnými modifikátormi, alebo je už push-to-talk či klávesom iného cieľa.",
       "keyFailed": "Tento kláves drží iná aplikácia, takže teraz nefunguje.",
-      "keysWayland": "Klávesy na šepkanie nie sú v tejto relácii Wayland dostupné: portál globálnych skratiek pracovnej plochy drží iba kláves push-to-talk. Zapni režim kompatibility, aby si ich mohol používať, alebo začni šepkať z panela používateľa.",
+      "keysWayland": "Klávesy na šepkanie nie sú v tejto relácii Wayland dostupné: tvoj desktop neponúka globálne skratky. Zapni režim kompatibility, aby si ich mohol používať, alebo začni šepkať z panela používateľa.",
       "save": "Uložiť",
       "delete": "Odstrániť cieľ",
       "savedStatus": "Uložené.",
@@ -851,5 +852,57 @@
     "whatsNew": "Čo je nové",
     "whatsNewHint": "Pozri si zmeny v každej verzii.",
     "openChangelog": "Otvoriť zoznam zmien"
+  },
+  "hotkeys": {
+    "global": "Globálne skratky",
+    "background": "Fungovať, keď Mumcord beží na pozadí",
+    "backgroundHint": "Skratky fungujú všade, aj v hrách. Predvolene nie je nastavené nič.",
+    "foregroundOnly": "Skratky fungujú, iba keď je okno Mumcordu v popredí.",
+    "portal": "Tvoje prostredie (Wayland) ťa raz požiada o schválenie globálnych skratiek.",
+    "noPortal": "Tvoje prostredie globálne skratky neponúka, takže fungujú, iba keď je okno Mumcordu v popredí.",
+    "compatLink": "Použiť režim kompatibility (X11),",
+    "compatSuffix": "ak to nie je dostupné.",
+    "actions": "Akcie",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Stlmiť / zapnúť mikrofón",
+      "toggleDeafen": "Stlmiť / zapnúť zvuk",
+      "toggleDnd": "Prepnúť Nerušiť",
+      "joinLeaveVoice": "Pripojiť sa k hlasu / opustiť hlas",
+      "switchVoiceServer": "Prepnúť hlasový server",
+      "switchChannel": "Prepnúť do kanála…",
+      "previousChannel": "Späť do predchádzajúceho kanála",
+      "toggleMemberColumn": "Zobraziť / skryť stĺpec členov",
+      "openQuickSettings": "Otvoriť rýchle nastavenia",
+      "openMumcord": "Otvoriť Mumcord"
+    },
+    "pushToTalkHint": "Vysiela, kým sú klávesy stlačené",
+    "pushToTalkOff": "Používa sa, keď je režim hovorenia v časti Hlas nastavený na push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Koreňový kanál",
+    "notSet": "Nenastavené",
+    "recording": "Stlač kombináciu klávesov…",
+    "recordingHint": "Stlačením <esc>Esc</esc> zrušíš, <back>Backspace</back> vymaže. Nahrávanie sa po 5 sekundách ukončí.",
+    "clear": "Vymazať",
+    "clearLabel": "Vymazať {{action}}",
+    "cancel": "Zrušiť",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Túto kombináciu už používa „{{other}}“. Vyber inú, alebo ju priraď sem a druhú vymaž.",
+    "inApp": "Táto kombinácia je vlastná skratka Mumcordu pre {{shortcut}}. Vyber inú.",
+    "inAppShortcut": {
+      "memberColumn": "zobrazenie a skrytie stĺpca členov",
+      "notificationCentre": "centrum upozornení",
+      "search": "vyhľadávanie",
+      "closeWindow": "zatvorenie okna"
+    },
+    "assignHere": "Priradiť sem",
+    "rejected": "Tento kláves nemôže byť globálnou skratkou. Stlač iný kláves než Ctrl, Alt, Shift alebo Super, s nimi alebo bez nich.",
+    "failed": "Túto skratku sa nepodarilo zaregistrovať. Možno ju už používa iná aplikácia alebo tvoje prostredie.",
+    "add": "Pridať skratku „prepnúť do kanála“…",
+    "addChannel": "Kanál",
+    "addNone": "Pripoj sa k serveru a vyber jeden z jeho kanálov.",
+    "addConfirm": "Pridať",
+    "reset": "Obnoviť všetky skratky",
+    "resetHint": "Odstráni všetky skratky okrem push-to-talk; predvolene nie je nastavené nič."
   }
 }

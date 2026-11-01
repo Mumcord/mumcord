@@ -9,7 +9,8 @@
     "servers": "Szerverek",
     "privacy": "Adatvédelem",
     "updates": "Frissítések",
-    "packetInspector": "Csomagvizsgáló"
+    "packetInspector": "Csomagvizsgáló",
+    "hotkeys": "Gyorsbillentyűk"
   },
   "search": {
     "label": "Beállítások keresése",
@@ -239,7 +240,7 @@
       "keyRemove": "Billentyű eltávolítása",
       "keyTaken": "Ez a billentyű nem használható: nem egyetlen billentyű opcionális módosítókkal, vagy már a push-to-talk vagy egy másik cél billentyűje.",
       "keyFailed": "Ezt a billentyűt egy másik alkalmazás tartja lefoglalva, ezért most nem működik.",
-      "keysWayland": "A súgóbillentyűk ebben a Wayland-munkamenetben nem érhetők el: az asztal globális billentyűparancs-portálja csak a push-to-talk billentyűt tartja. Kapcsold be a kompatibilitási módot a használatukhoz, vagy kezdj súgni a felhasználói panelről.",
+      "keysWayland": "A súgóbillentyűk ebben a Wayland-munkamenetben nem érhetők el: az asztali környezeted nem kínál globális gyorsbillentyűket. Kapcsold be a kompatibilitási módot a használatukhoz, vagy kezdj súgni a felhasználói panelről.",
       "save": "Mentés",
       "delete": "Cél törlése",
       "savedStatus": "Mentve.",
@@ -839,5 +840,57 @@
     "whatsNew": "Újdonságok",
     "whatsNewHint": "Nézd meg az egyes verziók változásait.",
     "openChangelog": "Változásnapló megnyitása"
+  },
+  "hotkeys": {
+    "global": "Globális gyorsbillentyűk",
+    "background": "Működés, amikor a Mumcord a háttérben van",
+    "backgroundHint": "A gyorsbillentyűk mindenhol működnek, játékokban is. Alapértelmezés szerint semmi nincs beállítva.",
+    "foregroundOnly": "A gyorsbillentyűk csak akkor működnek, ha a Mumcord ablaka az előtérben van.",
+    "portal": "Az asztali környezeted (Wayland) egyszer kéri majd a globális gyorsbillentyűk jóváhagyását.",
+    "noPortal": "Az asztali környezeted nem kínál globális gyorsbillentyűket, ezért azok csak akkor működnek, ha a Mumcord ablaka az előtérben van.",
+    "compatLink": "Kompatibilitási mód (X11) használata,",
+    "compatSuffix": "ha az nem érhető el.",
+    "actions": "Műveletek",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Mikrofon némítása / bekapcsolása",
+      "toggleDeafen": "Hang némítása / visszakapcsolása",
+      "toggleDnd": "Ne zavarjanak váltása",
+      "joinLeaveVoice": "Csatlakozás a hanghoz / kilépés belőle",
+      "switchVoiceServer": "Hangszerver váltása",
+      "switchChannel": "Váltás csatornára…",
+      "previousChannel": "Vissza az előző csatornára",
+      "toggleMemberColumn": "Tagoszlop megjelenítése / elrejtése",
+      "openQuickSettings": "Gyorsbeállítások megnyitása",
+      "openMumcord": "Mumcord megnyitása"
+    },
+    "pushToTalkHint": "Küld, amíg a billentyűk lenyomva vannak",
+    "pushToTalkOff": "Akkor használatos, ha a Hang beszédmódja push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Gyökércsatorna",
+    "notSet": "Nincs beállítva",
+    "recording": "Nyomj meg egy billentyűkombinációt…",
+    "recordingHint": "Nyomd meg az <esc>Esc</esc> billentyűt a megszakításhoz, a <back>Backspace</back> billentyűt a törléshez. A rögzítés 5 másodperc után leáll.",
+    "clear": "Törlés",
+    "clearLabel": "{{action}} törlése",
+    "cancel": "Mégse",
+    "conflictTitle": "Ütközés.",
+    "conflict": "Ezt a kombinációt már a(z) „{{other}}” használja. Válassz másikat, vagy rendeld ide, és töröld a másikat.",
+    "inApp": "Ez a kombináció a Mumcord saját gyorsbillentyűje ehhez: {{shortcut}}. Válassz másikat.",
+    "inAppShortcut": {
+      "memberColumn": "a tagoszlop megjelenítése és elrejtése",
+      "notificationCentre": "az értesítési központ",
+      "search": "a keresés",
+      "closeWindow": "az ablak bezárása"
+    },
+    "assignHere": "Hozzárendelés ide",
+    "rejected": "Ez a billentyű nem lehet globális gyorsbillentyű. Nyomj meg a Ctrl, Alt, Shift vagy Super billentyűktől eltérő billentyűt, velük vagy nélkülük.",
+    "failed": "Ezt a gyorsbillentyűt nem sikerült regisztrálni. Lehet, hogy egy másik alkalmazás vagy az asztali környezeted már használja.",
+    "add": "„Váltás csatornára” gyorsbillentyű hozzáadása…",
+    "addChannel": "Csatorna",
+    "addNone": "Csatlakozz egy szerverhez, hogy kiválaszthasd az egyik csatornáját.",
+    "addConfirm": "Hozzáadás",
+    "reset": "Összes gyorsbillentyű visszaállítása",
+    "resetHint": "Eltávolít minden gyorsbillentyűt a push-to-talk kivételével; alapértelmezés szerint semmi nincs beállítva."
   }
 }

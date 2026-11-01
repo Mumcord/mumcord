@@ -50,6 +50,9 @@ import type {
   GamePlugin,
   InGameOverlayState,
   PmRequests,
+  HotkeyConflict,
+  HotkeysStatus,
+  InAppShortcut,
   PttAvailability,
   PttMouseStatus,
   RelayInfo,
@@ -239,6 +242,8 @@ const DEFAULT_SETTINGS: Settings = {
   pttKey: null,
   allowMouseButtons: false,
   pttCompatibilityMode: false,
+  globalHotkeys: true,
+  hotkeys: [],
   inputDevice: null,
   outputDevice: null,
   noiseSuppression: true,
@@ -819,6 +824,26 @@ function person(session: number, name: string, channelId: number, certHash: stri
     isMumcord: false,
     mumcordFeatures: [],
   };
+}
+
+/** Mumcord's own shortcuts, as the engine refuses them for global hotkeys. */
+const MOCK_IN_APP_SHORTCUTS: Partial<Record<string, InAppShortcut>> = {
+  "Ctrl+Shift+M": "memberColumn",
+  "Ctrl+Shift+N": "notificationCentre",
+  "Ctrl+K": "search",
+  "Ctrl+F": "search",
+  "Ctrl+W": "closeWindow",
+};
+
+/** The engine's canonical key form for the UI's key strings ("Ctrl+KeyA" → "Ctrl+A"). */
+function mockHotkey(key: string): string {
+  const parts = key.split("+");
+  const main = parts.pop() ?? "";
+  if (main === "" || /^(Control|Alt|Shift|Meta)(Left|Right)?$/.test(main)) {
+    fail("invalidInput", "a key other than a modifier is required");
+  }
+  const single = /^(?:Key|Digit)(.)$/.exec(main);
+  return [...parts, single ? single[1] : main].join("+");
 }
 
 function fail(code: ErrorCode, message: string): never {
@@ -2763,6 +2788,26 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pttCaptureKey: (key) => Promise.resolve(demo || /^Mouse(Middle|4|5)$/.test(key) ? key : "F13"),
     pttMouseStatus: () => Promise.resolve<PttMouseStatus>({ support: "native", state: "ready" }),
     pttCaptureCancel: () => Promise.resolve(null),
+
+    // global hotkeys (#64)
+    hotkeyCheck: (key, slot) => {
+      const canonical = mockHotkey(key);
+      const same = (other: string | null) => other !== null && mockHotkey(other) === canonical;
+      const inApp = MOCK_IN_APP_SHORTCUTS[canonical];
+      const index = settings.hotkeys.findIndex(
+        (h, i) => !(slot.kind === "hotkey" && slot.index === i) && same(h.key),
+      );
+      const conflict: HotkeyConflict | null =
+        inApp !== undefined
+          ? { kind: "inApp", shortcut: inApp }
+          : slot.kind !== "pushToTalk" && same(settings.pttKey)
+            ? { kind: "pushToTalk" }
+            : index >= 0
+              ? { kind: "hotkey", index }
+              : null;
+      return Promise.resolve({ key: canonical, conflict });
+    },
+    hotkeysStatus: () => Promise.resolve<HotkeysStatus>({ mode: "global", failed: [] }),
     pttSession: () =>
       Promise.resolve({ waylandDesktop: false, compatibilityActive: false, kde: false }),
     pttOpenKdeX11Settings: () => Promise.resolve(null),

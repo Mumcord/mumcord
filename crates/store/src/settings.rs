@@ -487,6 +487,36 @@ pub enum WhisperReceivers {
     },
 }
 
+/// A global hotkey (issue #64): a key in the push-to-talk key format and what it does.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Hotkey {
+    pub key: String,
+    pub action: HotkeyAction,
+}
+
+/// What a global hotkey does. Hotkeys are global for all servers (Q1.7); only "switch to
+/// channel" names a server, because a channel only exists there.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum HotkeyAction {
+    ToggleMute,
+    ToggleDeafen,
+    ToggleDnd,
+    /// Leaves voice, or joins voice again on the shown server.
+    JoinLeaveVoice,
+    /// Moves voice to the next connected server.
+    SwitchVoiceServer,
+    /// Moves voice to `path` (channel names below the root) on `server_id`.
+    SwitchChannel {
+        server_id: ServerId,
+        path: Vec<String>,
+    },
+    PreviousChannel,
+    ToggleMemberColumn,
+    OpenQuickSettings,
+    OpenMumcord,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -509,6 +539,11 @@ pub struct Settings {
     pub ptt_compatibility_mode: bool,
     /// Whisper and shout targets (issue #67), in the user's order.
     pub whisper_targets: Vec<WhisperTarget>,
+    /// Global hotkeys work while Mumcord is in the background; off, they only work while its
+    /// window has the focus (issue #64).
+    pub global_hotkeys: bool,
+    /// Global hotkeys in the user's order; none by default (Q1.7).
+    pub hotkeys: Vec<Hotkey>,
     /// Device names; `None` uses the system default device.
     pub input_device: Option<String>,
     pub output_device: Option<String>,
@@ -668,6 +703,8 @@ impl Default for Settings {
             allow_mouse_buttons: false,
             ptt_compatibility_mode: false,
             whisper_targets: Vec::new(),
+            global_hotkeys: true,
+            hotkeys: Vec::new(),
             input_device: None,
             output_device: None,
             noise_suppression: true,
@@ -834,6 +871,30 @@ impl Store {
 mod tests {
     use super::*;
     use crate::db::tests::temp_store;
+
+    #[test]
+    fn hotkeys_round_trip() {
+        let (_dir, store) = temp_store();
+        let mut changed = store.settings().expect("defaults");
+        changed.global_hotkeys = false;
+        changed.hotkeys = vec![
+            Hotkey {
+                key: "Ctrl+Shift+F7".into(),
+                action: HotkeyAction::ToggleMute,
+            },
+            Hotkey {
+                key: "Alt+F8".into(),
+                action: HotkeyAction::SwitchChannel {
+                    server_id: 3,
+                    path: vec!["Night Owls".into(), "Lobby".into()],
+                },
+            },
+        ];
+        store.save_settings(&changed).expect("save");
+        let loaded = store.settings().expect("load");
+        assert_eq!(loaded.hotkeys, changed.hotkeys);
+        assert!(!loaded.global_hotkeys);
+    }
 
     #[test]
     fn defaults_then_round_trip() {
@@ -1390,6 +1451,8 @@ mod tests {
             parsed.whisper_targets.is_empty(),
             "no whisper targets or hotkeys by default"
         );
+        assert!(parsed.hotkeys.is_empty(), "no global hotkeys by default");
+        assert!(parsed.global_hotkeys);
         assert!(parsed.start_minimized);
         assert!(parsed.connect_muted, "read-only connect stays the default");
     }

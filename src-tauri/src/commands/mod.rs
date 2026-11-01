@@ -19,6 +19,7 @@ pub mod follow;
 pub mod friends;
 pub mod full_image;
 pub mod history;
+pub mod hotkeys;
 pub mod identity;
 pub mod ingame_overlay;
 pub mod inspector;

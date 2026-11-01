@@ -8,6 +8,7 @@ import { ChatRequestDialogHost, RevokeConsentDialogHost } from "../features/requ
 import { BlockDialogHost } from "../features/blocking";
 import { WizardRerunOverlay } from "../features/wizard";
 import { TraySync } from "../features/tray";
+import { GlobalHotkeys } from "../features/hotkeys";
 import { AppShell } from "./AppShell";
 import {
   ChannelsMount,
@@ -81,6 +82,7 @@ function MainScreen() {
       {overlay === null && <BlockDialogHost />}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       <TraySync onOpenSettings={openSettings} />
+      <GlobalHotkeys overlayOpen={overlay !== null} />
       {devTools && <InspectorViewShare />}
       <WindowLookShare />
     </>

@@ -33,6 +33,7 @@ import { ServerConnectionsCard } from "./sections/ServersSection";
 import { NotificationsCard, SoundsCard } from "./sections/SoundsSection";
 import type { SettingsSectionProps } from "./sections/types";
 import { UpdatesCard } from "./sections/UpdatesSection";
+import { HotkeysCard } from "./sections/HotkeysSection";
 import { ConnectingCard, ProcessingCard, TalkModeCard } from "./sections/VoiceSection";
 import type { SectionId } from "./sectionIds";
 import type { PresetId } from "../wizard/presets";
@@ -82,6 +83,7 @@ export function SettingsPageCards({
           <DevicesCard {...props} />
           <MicTestCard />
           <TalkModeCard {...props} />
+          <HotkeysCard {...props} />
           <ProcessingCard {...props} />
           <WhisperTargetsGroup />
           <ConnectingCard {...props} />

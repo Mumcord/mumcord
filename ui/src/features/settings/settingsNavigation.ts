@@ -8,6 +8,8 @@ export interface SettingsNavigation {
   compatibilityFocused: () => void;
   /** Opens the entry's group, scrolls to its card and highlights the control, like a search pick. */
   jumpTo: (entry: SettingEntry) => void;
+  /** Opens Voice & Audio and focuses the "Compatibility mode (X11)" switch (Linux Wayland). */
+  openCompatibilityMode: () => void;
 }
 
 export const SettingsNavigationContext = createContext<SettingsNavigation | null>(null);

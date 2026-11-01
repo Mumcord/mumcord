@@ -9,7 +9,8 @@
     "servers": "Servere",
     "privacy": "Privatliv",
     "updates": "Opdateringer",
-    "packetInspector": "Pakkeinspektør"
+    "packetInspector": "Pakkeinspektør",
+    "hotkeys": "Genveje"
   },
   "search": {
     "label": "Søg i indstillinger",
@@ -239,7 +240,7 @@
       "keyRemove": "Fjern tast",
       "keyTaken": "Denne tast kan ikke bruges: det er ikke en enkelt tast med valgfrie modifikatorer, eller den bruges allerede til push-to-talk eller et andet mål.",
       "keyFailed": "Tasten holdes af en anden app og virker derfor ikke lige nu.",
-      "keysWayland": "Hviskentaster er ikke tilgængelige i denne Wayland-session: skrivebordets portal til globale genveje holder kun push-to-talk-tasten. Slå kompatibilitetstilstand til for at bruge dem, eller begynd at hviske fra brugerpanelet.",
+      "keysWayland": "Hviskentaster er ikke tilgængelige i denne Wayland-session: dit skrivebord tilbyder ikke globale genveje. Slå kompatibilitetstilstand til for at bruge dem, eller begynd at hviske fra brugerpanelet.",
       "save": "Gem",
       "delete": "Slet mål",
       "savedStatus": "Gemt.",
@@ -839,5 +840,57 @@
     "whatsNew": "Nyheder",
     "whatsNewHint": "Se ændringerne i hver version.",
     "openChangelog": "Åbn ændringsloggen"
+  },
+  "hotkeys": {
+    "global": "Globale genveje",
+    "background": "Virk, mens Mumcord er i baggrunden",
+    "backgroundHint": "Genvejene virker overalt, også i spil. Som standard er intet indstillet.",
+    "foregroundOnly": "Genvejene virker kun, mens Mumcord-vinduet er forrest.",
+    "portal": "Dit skrivebord (Wayland) beder dig godkende globale genveje én gang.",
+    "noPortal": "Dit skrivebord tilbyder ikke globale genveje, så de virker kun, mens Mumcord-vinduet er forrest.",
+    "compatLink": "Brug kompatibilitetstilstand (X11),",
+    "compatSuffix": "hvis det ikke er tilgængeligt.",
+    "actions": "Handlinger",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Slå mikrofon fra / til",
+      "toggleDeafen": "Slå lyd fra / til",
+      "toggleDnd": "Skift Forstyr ikke",
+      "joinLeaveVoice": "Deltag i / forlad tale",
+      "switchVoiceServer": "Skift stemmeserver",
+      "switchChannel": "Skift til kanal…",
+      "previousChannel": "Tilbage til forrige kanal",
+      "toggleMemberColumn": "Vis / skjul medlemskolonne",
+      "openQuickSettings": "Åbn hurtige indstillinger",
+      "openMumcord": "Åbn Mumcord"
+    },
+    "pushToTalkHint": "Sender, mens tasterne holdes nede",
+    "pushToTalkOff": "Bruges, når taletilstanden under Stemme er push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Rodkanal",
+    "notSet": "Ikke indstillet",
+    "recording": "Tryk en tastekombination…",
+    "recordingHint": "Tryk <esc>Esc</esc> for at annullere, <back>Backspace</back> for at rydde. Optagelsen stopper efter 5 sekunder.",
+    "clear": "Ryd",
+    "clearLabel": "Ryd {{action}}",
+    "cancel": "Annuller",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Denne kombination bruges allerede af „{{other}}“. Vælg en anden, eller tildel den her og ryd den anden.",
+    "inApp": "Denne kombination er Mumcords egen genvej til {{shortcut}}. Vælg en anden.",
+    "inAppShortcut": {
+      "memberColumn": "at vise og skjule medlemskolonnen",
+      "notificationCentre": "notifikationscenteret",
+      "search": "søgning",
+      "closeWindow": "at lukke et vindue"
+    },
+    "assignHere": "Tildel her",
+    "rejected": "Denne tast kan ikke være en global genvej. Tryk på en anden tast end Ctrl, Alt, Shift eller Super, med eller uden dem.",
+    "failed": "Genvejen kunne ikke registreres. En anden app eller dit skrivebord bruger den måske allerede.",
+    "add": "Tilføj genvej til „skift til kanal“…",
+    "addChannel": "Kanal",
+    "addNone": "Opret forbindelse til en server for at vælge en af dens kanaler.",
+    "addConfirm": "Tilføj",
+    "reset": "Nulstil alle genveje",
+    "resetHint": "Fjerner alle genveje undtagen push-to-talk; som standard er intet indstillet."
   }
 }

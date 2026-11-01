@@ -9,7 +9,8 @@
     "servers": "Servery",
     "privacy": "Soukromí",
     "updates": "Aktualizace",
-    "packetInspector": "Inspektor paketů"
+    "packetInspector": "Inspektor paketů",
+    "hotkeys": "Klávesové zkratky"
   },
   "search": {
     "label": "Hledat v nastavení",
@@ -243,7 +244,7 @@
       "keyRemove": "Odebrat klávesu",
       "keyTaken": "Tuto klávesu nelze použít: není to jedna klávesa s volitelnými modifikátory, nebo už je to push-to-talk či klávesa jiného cíle.",
       "keyFailed": "Tuto klávesu drží jiná aplikace, takže teď nefunguje.",
-      "keysWayland": "Klávesy pro šeptání nejsou v této relaci Wayland dostupné: portál globálních zkratek pracovní plochy drží jen klávesu push-to-talk. Zapni režim kompatibility, nebo začni šeptat z panelu uživatele.",
+      "keysWayland": "Klávesy pro šeptání nejsou v této relaci Wayland dostupné: tvůj desktop nenabízí globální zkratky. Zapni režim kompatibility, nebo začni šeptat z panelu uživatele.",
       "save": "Uložit",
       "delete": "Smazat cíl",
       "savedStatus": "Uloženo.",
@@ -851,5 +852,57 @@
     "whatsNew": "Co je nového",
     "whatsNewHint": "Podívej se na změny v každé verzi.",
     "openChangelog": "Otevřít seznam změn"
+  },
+  "hotkeys": {
+    "global": "Globální zkratky",
+    "background": "Fungovat, když Mumcord běží na pozadí",
+    "backgroundHint": "Zkratky fungují všude, i ve hrách. Ve výchozím stavu není nic nastaveno.",
+    "foregroundOnly": "Zkratky fungují jen tehdy, když je okno Mumcordu v popředí.",
+    "portal": "Tvé prostředí (Wayland) tě jednou požádá o schválení globálních zkratek.",
+    "noPortal": "Tvé prostředí globální zkratky nenabízí, takže fungují jen tehdy, když je okno Mumcordu v popředí.",
+    "compatLink": "Použít režim kompatibility (X11),",
+    "compatSuffix": "pokud to není k dispozici.",
+    "actions": "Akce",
+    "action": {
+      "pushToTalk": "Push-to-talk",
+      "toggleMute": "Ztlumit / zapnout mikrofon",
+      "toggleDeafen": "Ztlumit / zapnout zvuk",
+      "toggleDnd": "Přepnout Nerušit",
+      "joinLeaveVoice": "Připojit se k hlasu / odejít z hlasu",
+      "switchVoiceServer": "Přepnout hlasový server",
+      "switchChannel": "Přepnout do kanálu…",
+      "previousChannel": "Zpět do předchozího kanálu",
+      "toggleMemberColumn": "Zobrazit / skrýt sloupec členů",
+      "openQuickSettings": "Otevřít rychlé nastavení",
+      "openMumcord": "Otevřít Mumcord"
+    },
+    "pushToTalkHint": "Vysílá, dokud jsou klávesy stisknuté",
+    "pushToTalkOff": "Používá se, když je režim mluvení v části Hlas nastaven na push-to-talk",
+    "channelPlace": "{{channel}} · {{server}}",
+    "rootChannel": "Kořenový kanál",
+    "notSet": "Nenastaveno",
+    "recording": "Stiskni kombinaci kláves…",
+    "recordingHint": "Stisknutím <esc>Esc</esc> zrušíš, <back>Backspace</back> vymaže. Nahrávání se po 5 sekundách ukončí.",
+    "clear": "Vymazat",
+    "clearLabel": "Vymazat {{action}}",
+    "cancel": "Zrušit",
+    "conflictTitle": "Konflikt.",
+    "conflict": "Tato kombinace už se používá pro „{{other}}“. Vyber jinou, nebo ji přiřaď sem a druhou vymaž.",
+    "inApp": "Tato kombinace je vlastní zkratka Mumcordu pro {{shortcut}}. Vyber jinou.",
+    "inAppShortcut": {
+      "memberColumn": "zobrazení a skrytí sloupce členů",
+      "notificationCentre": "centrum oznámení",
+      "search": "hledání",
+      "closeWindow": "zavření okna"
+    },
+    "assignHere": "Přiřadit sem",
+    "rejected": "Tato klávesa nemůže být globální zkratkou. Stiskni jinou klávesu než Ctrl, Alt, Shift nebo Super, s nimi nebo bez nich.",
+    "failed": "Tuto zkratku se nepodařilo zaregistrovat. Možná ji už používá jiná aplikace nebo tvé prostředí.",
+    "add": "Přidat zkratku „přepnout do kanálu“…",
+    "addChannel": "Kanál",
+    "addNone": "Připoj se k serveru a vyber jeden z jeho kanálů.",
+    "addConfirm": "Přidat",
+    "reset": "Obnovit všechny zkratky",
+    "resetHint": "Odebere všechny zkratky kromě push-to-talk; ve výchozím stavu není nic nastaveno."
   }
 }
