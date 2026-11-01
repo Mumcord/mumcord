@@ -85,29 +85,27 @@
 
 /* Label (wrapping, with its "?" kept beside the text) and value (never wraps, right-aligned). */
 .connection-quick__bandwidth-row {
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
   align-items: baseline;
 }
 
 .connection-quick__bandwidth-label {
-  display: flex;
-  flex: 1 1 0;
-  gap: var(--space-1);
-  align-items: baseline;
   min-width: 0;
+  overflow-wrap: break-word;
 }
 
-.connection-quick__bandwidth-text {
-  min-width: 0;
-  overflow-wrap: anywhere;
+.connection-quick__bandwidth-tail {
+  white-space: nowrap;
 }
 
-.connection-quick__bandwidth-label .info-tip {
-  flex: none;
+.connection-quick__bandwidth-tail .info-tip {
+  margin-inline-start: var(--space-1);
 }
 
 .connection-quick__bandwidth-row strong {
   flex: none;
+  margin-inline-start: auto;
   text-align: end;
 }
 
