@@ -25,6 +25,8 @@ use crate::runtime::{HostApi, PluginState};
 
 /// Keychain service of plugin secrets.
 pub const SERVICE: &str = "Mumcord plugins";
+/// The catalogue permission every `secrets` call needs.
+const PERMISSION: &str = "secrets";
 /// Longest secret name in bytes.
 pub const MAX_NAME_BYTES: usize = 128;
 /// Shown instead of the permission when the keychain does not work.
@@ -265,15 +267,9 @@ impl HostApi for SecretsApi {
 }
 
 impl PluginState {
-    /// Denies until the shared permission gate (`grants`) is wired in: secrets must never be
-    /// reachable without the `secrets` grant.
-    #[allow(
-        clippy::unused_self,
-        clippy::unnecessary_wraps,
-        reason = "becomes the grants check of the shared permission gate"
-    )]
+    /// The shared permission gate: grants can change while the plugin runs.
     fn permit_secrets(&self) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+        self.ctx.grants.check(&self.id, PERMISSION)
     }
 
     fn plugin_secrets(&self) -> Result<&PluginSecrets, Error> {
