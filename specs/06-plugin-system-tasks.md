@@ -52,7 +52,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B40 | Dice roller plugin | done (Mumcord/plugins PR #5, not merged) | b40-dice |
 | B41a | Echolings: pet core | done (Mumcord/plugins PR #3, not merged) | b41a-pets |
 | B41b | Echolings: social + Echo Echo | done (PR #3) | b41b-social |
-| B41c | Echolings: Snack Race (web view) | in progress | b41c-snack |
+| B41c | Echolings: Snack Race (web view) | done (feat/echolings 10bb080, 44ec016, 392e1fc; kinds 6–9; real-client 2-player run in C4) | b41c-snack |
 | B42 | Mumbot Music plugin | done (Mumcord/plugins PR #6, not merged) | b42-music |
 | B43 | CI in Mumcord: plugin tests and E2E | in progress | b43-ci |
 | B44 | PRIVACY.md plugins section | done | b44-privacy |
