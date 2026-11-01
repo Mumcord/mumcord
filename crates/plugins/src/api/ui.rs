@@ -16,6 +16,7 @@ use crate::runtime::bindings::mumcord::plugin::ui::{
 use crate::runtime::wit::types::Error;
 use crate::runtime::{HostApi, Level, PluginState};
 
+pub const PANEL_PERMISSION: &str = "ui.panel";
 pub const DIALOG_PERMISSION: &str = "ui.dialog";
 pub const USER_MENU_PERMISSION: &str = "ui.user-menu";
 
@@ -59,7 +60,7 @@ impl HostApi for UiApi {
 /// The permission a slot needs; the settings form needs none.
 pub fn slot_permission(slot: &Slot) -> Option<&'static str> {
     match slot {
-        Slot::Panel => Some("ui.panel"),
+        Slot::Panel => Some(PANEL_PERMISSION),
         Slot::MemberBadge(_) => Some("ui.member-badge"),
         Slot::ProfileCard(_) => Some("ui.profile-card"),
         Slot::ChatCard(_) | Slot::ChatDecoration(_) => Some("ui.chat-card"),
@@ -494,6 +495,19 @@ impl Host for PluginState {
             return Err(Error::TooLarge);
         }
         self.io()?.set_user_menu_entry_for(&self.id, label, filter)
+    }
+
+    fn open_panel_popover(&mut self) -> Result<(), Error> {
+        self.ctx.grants.check(&self.id, PANEL_PERMISSION)?;
+        self.io()?.open_panel_popover(&self.id)
+    }
+
+    fn close_panel_popover(&mut self) {
+        if self.ctx.grants.allows(&self.id, PANEL_PERMISSION)
+            && let Ok(io) = self.io()
+        {
+            io.close_panel_popover(&self.id);
+        }
     }
 }
 

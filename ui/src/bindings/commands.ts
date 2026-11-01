@@ -2631,6 +2631,8 @@ export type PluginUiChange =
 { type: "openDialog"; title: string } | 
 /**  Closes the dialog without telling the plugin. */
 { type: "closeDialog" } | 
+/**  The plugin's panel opens in (`open`) or closes from the strip's large popover. */
+{ type: "panelPopover"; open: boolean } | 
 /**
  *  The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
  *  users it shows on (`None`: every other user in the user's channel).

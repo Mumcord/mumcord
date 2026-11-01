@@ -297,4 +297,13 @@ interface ui {
   /// that leaves is dropped from it. Call it again to change the label or the filter;
   /// `set-user-menu-entry(none)` removes it. Errors: `not-permitted`, `too-large`.
   set-user-menu-entry-for: func(label: string, filter: user-menu-filter) -> result<_, error>;
+
+  /// Opens this plugin's panel in the large panel popover (the strip's expanded view). Only
+  /// allowed right after a user gesture in this plugin's own UI (a click, or a typed slash
+  /// command, within the same 2 s window `chat.send` uses; the gesture is not used up) and
+  /// with `ui.panel`. Errors: `not-permitted`.
+  open-panel-popover: func() -> result<_, error>;
+
+  /// Closes the panel popover again, back to the inline panel. Does nothing when it is not open.
+  close-panel-popover: func();
 }

@@ -73,6 +73,13 @@ impl PluginIo for Recorder {
         Ok(())
     }
     fn close_dialog(&self, _plugin: &str) {}
+    fn open_panel_popover(&self, plugin: &str) -> Result<(), Error> {
+        self.record(format!("{plugin} open_panel_popover"));
+        Ok(())
+    }
+    fn close_panel_popover(&self, plugin: &str) {
+        self.record(format!("{plugin} close_panel_popover"));
+    }
     fn set_user_menu_entry(&self, _plugin: &str, _label: Option<String>) -> Result<(), Error> {
         Ok(())
     }

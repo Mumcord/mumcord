@@ -42,7 +42,7 @@ function PluginIcon({ id, name }: { id: string; name: string }) {
 export function PluginStrip() {
   const t = useT("pluginStrip");
   const { overview } = usePlugins();
-  const { trees } = usePluginUi();
+  const { trees, popoverRequest } = usePluginUi();
   const sharedSupported = useSharedSupported();
   const [collapsed, setCollapsed] = useState(loadCollapsed);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -81,6 +81,21 @@ export function PluginStrip() {
     // `wantedKey` stands for the contents of `wanted`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wantedKey]);
+
+  // A plugin opened or closed its own popover (the host only forwards that after a user gesture).
+  // Adjusting state while rendering, keyed on the request number, avoids an extra effect pass.
+  const [handledPopover, setHandledPopover] = useState(popoverRequest?.seq ?? 0);
+  if (popoverRequest != null && popoverRequest.seq !== handledPopover) {
+    setHandledPopover(popoverRequest.seq);
+    if (popoverRequest.open) {
+      if (withPanel.some((p) => p.id === popoverRequest.plugin)) {
+        setChosen(popoverRequest.plugin);
+        setExpanded(true);
+      }
+    } else if (popoverRequest.plugin === activeId) {
+      setExpanded(false);
+    }
+  }
 
   const popover = activeId !== undefined && expanded;
   const closeRef = useRef<HTMLButtonElement>(null);

@@ -24,6 +24,15 @@ export interface PluginUiState {
   readonly menuEntries: ReadonlyMap<string, PluginMenuEntryState>;
   /** plugin id → its open web view (FR-6.46). */
   readonly webviews: ReadonlyMap<string, PluginWebview>;
+  /** The latest open/close request for a panel popover; `seq` changes on every request. */
+  readonly popoverRequest?: PluginPopoverRequest | null;
+}
+
+/** A plugin asked to open (or close) its panel in the strip's large popover. */
+export interface PluginPopoverRequest {
+  readonly plugin: string;
+  readonly open: boolean;
+  readonly seq: number;
 }
 
 /** A user-menu entry: `sessions` lists the users it shows on, `null` means everyone. */
@@ -44,8 +53,10 @@ const EMPTY: PluginUiState = {
   dialogs: new Map(),
   menuEntries: new Map(),
   webviews: new Map(),
+  popoverRequest: null,
 };
 let webviewSeq = 0;
+let popoverSeq = 0;
 
 /** A stable string for a slot, e.g. `chatCard:poll-1`. */
 export function slotKey(slot: PluginSlot): string {
@@ -88,6 +99,8 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       if (webviews.get(plugin)?.place === "dialog") webviews.delete(plugin);
       return { ...state, trees, dialogs, webviews };
     }
+    case "panelPopover":
+      return { ...state, popoverRequest: { plugin, open: change.open, seq: ++popoverSeq } };
     case "userMenuEntry": {
       const menuEntries = new Map(state.menuEntries);
       if (change.label === null) menuEntries.delete(plugin);

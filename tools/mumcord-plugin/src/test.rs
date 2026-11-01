@@ -352,6 +352,11 @@ pub enum Expect {
         #[serde(default)]
         title: Option<String>,
     },
+    /// The plugin opened (`open: true`, the default) or closed its panel popover.
+    PanelPopover {
+        #[serde(default = "default_true")]
+        open: bool,
+    },
     MenuEntry {
         #[serde(default)]
         label: Option<String>,
@@ -388,6 +393,8 @@ pub enum Output {
     Cleared(SlotSpec),
     Dialog(String),
     DialogClosed,
+    /// The panel popover opened (`true`) or closed (`false`).
+    PanelPopover(bool),
     /// Label (`None`: removed) and, for a filtered entry, the matching sessions.
     MenuEntry(Option<String>, Option<Vec<u32>>),
     Message {
@@ -444,6 +451,18 @@ impl PluginIo for MockIo {
 
     fn close_dialog(&self, _plugin: &str) {
         self.push(Output::DialogClosed);
+    }
+
+    fn open_panel_popover(&self, plugin: &str) -> Result<(), Error> {
+        if !lock(&self.gestures).is_fresh(plugin, Instant::now()) {
+            return Err(Error::NotPermitted);
+        }
+        self.push(Output::PanelPopover(true));
+        Ok(())
+    }
+
+    fn close_panel_popover(&self, _plugin: &str) {
+        self.push(Output::PanelPopover(false));
     }
 
     fn set_user_menu_entry(&self, _plugin: &str, label: Option<String>) -> Result<(), Error> {
@@ -993,6 +1012,7 @@ fn matches(expect: &Expect, output: &Output) -> bool {
             contains(t, title.as_ref()) && contains(b, body.as_ref())
         }
         (Expect::Dialog { title }, Output::Dialog(t)) => contains(t, title.as_ref()),
+        (Expect::PanelPopover { open }, Output::PanelPopover(o)) => open == o,
         (Expect::MenuEntry { label, sessions }, Output::MenuEntry(l, s)) => {
             label == l && (sessions.is_none() || sessions == s)
         }
@@ -1035,6 +1055,9 @@ fn summary(output: &Output) -> String {
         Output::Cleared(slot) => format!("cleared {slot:?}"),
         Output::Dialog(title) => format!("dialog {title:?}"),
         Output::DialogClosed => "dialog closed".into(),
+        Output::PanelPopover(open) => {
+            format!("panel popover {}", if *open { "opened" } else { "closed" })
+        }
         Output::MenuEntry(label, None) => format!("menu entry {label:?}"),
         Output::MenuEntry(label, Some(sessions)) => {
             format!("menu entry {label:?} for {sessions:?}")
@@ -1056,6 +1079,10 @@ fn describe(step: &Step) -> String {
         Step::Wait(ms) => format!("wait {ms} ms"),
         Step::Expect(e) => format!("expect {e:?}"),
     }
+}
+
+fn default_true() -> bool {
+    true
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -1179,6 +1206,26 @@ steps:
         assert!(matches(&expect(Some(vec![2, 4])), &output));
         assert!(matches(&expect(None), &output));
         assert!(!matches(&expect(Some(vec![2])), &output));
+    }
+
+    #[test]
+    fn panel_popover_needs_a_fresh_gesture() {
+        let io = MockIo {
+            name: "Poll".into(),
+            max_payload: MAX_PAYLOAD,
+            channel: Vec::new(),
+            bots: HashMap::new(),
+            outputs: Arc::default(),
+            gestures: Mutex::default(),
+        };
+        assert_eq!(io.open_panel_popover("poll"), Err(Error::NotPermitted));
+        lock(&io.gestures).gesture("poll", Instant::now());
+        assert_eq!(io.open_panel_popover("poll"), Ok(()));
+        io.close_panel_popover("poll");
+        let closed = lock(&io.outputs).pop().expect("closed");
+        let opened = lock(&io.outputs).pop().expect("opened");
+        assert!(matches(&Expect::PanelPopover { open: true }, &opened));
+        assert!(matches(&Expect::PanelPopover { open: false }, &closed));
     }
 
     #[test]

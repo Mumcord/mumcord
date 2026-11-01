@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type InstalledPlugin, type MockApi } from "../../../api";
 import { applyLanguage } from "../../../i18n";
@@ -115,6 +115,20 @@ describe("PluginStrip", () => {
     fireEvent.keyDown(dialog, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(expand).toHaveFocus();
+  });
+
+  it("opens and closes the popover when the plugin asks", async () => {
+    setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
+    render(<PluginStrip />);
+    await screen.findByRole("button", { name: "Expand Pets" });
+    act(() => {
+      api.mock.emit("pluginUi", { plugin: "poll", change: { type: "panelPopover", open: true } });
+    });
+    expect(await screen.findByRole("dialog", { name: "Poll" })).toBeInTheDocument();
+    act(() => {
+      api.mock.emit("pluginUi", { plugin: "poll", change: { type: "panelPopover", open: false } });
+    });
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("shows the plugin's web view in the popover instead of the tree", async () => {

@@ -206,3 +206,11 @@ fn bot_info_and_filtered_user_menu_are_additive() {
     assert!(has_function(&resolve, "ui", "set-user-menu-entry"));
     assert!(has_function(&resolve, "ui", "set-user-menu-entry-for"));
 }
+
+/// The panel popover calls were added to 1.0.0 additively.
+#[test]
+fn panel_popover_calls_are_additive() {
+    let (resolve, _) = package();
+    assert!(has_function(&resolve, "ui", "open-panel-popover"));
+    assert!(has_function(&resolve, "ui", "close-panel-popover"));
+}

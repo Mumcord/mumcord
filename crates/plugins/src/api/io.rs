@@ -34,6 +34,11 @@ pub trait PluginIo: Send + Sync + Debug {
         label: String,
         filter: UserMenuFilter,
     ) -> Result<(), Error>;
+    /// `ui.open-panel-popover`: the caller (api/ui.rs) checked `ui.panel`; the implementation
+    /// checks that a user gesture is fresh and answers not-permitted otherwise.
+    fn open_panel_popover(&self, plugin: &str) -> Result<(), Error>;
+    /// `ui.close-panel-popover`.
+    fn close_panel_popover(&self, plugin: &str);
     /// `peers.send`.
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error>;
     /// `peers.start-game-burst`.

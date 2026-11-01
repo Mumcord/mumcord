@@ -267,6 +267,8 @@ pub enum PluginUiChange {
     OpenDialog { title: String },
     /// Closes the dialog without telling the plugin.
     CloseDialog,
+    /// The plugin's panel opens in (`open`) or closes from the strip's large popover.
+    PanelPopover { open: bool },
     /// The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
     /// users it shows on (`None`: every other user in the user's channel).
     UserMenuEntry {
@@ -512,6 +514,7 @@ impl From<UiUpdate> for PluginUiChange {
             UiUpdate::Clear { slot } => Self::Clear { slot: slot.into() },
             UiUpdate::OpenDialog { title } => Self::OpenDialog { title },
             UiUpdate::CloseDialog => Self::CloseDialog,
+            UiUpdate::PanelPopover { open } => Self::PanelPopover { open },
             UiUpdate::UserMenuEntry { label, sessions } => Self::UserMenuEntry { label, sessions },
             UiUpdate::WebviewShow { place, entry } => Self::WebviewShow {
                 place: place.into(),
@@ -577,6 +580,8 @@ impl Trees {
                     slots.remove(&PluginSlot::Dialog);
                 }
             }
+            // An event for the strip, nothing to remember.
+            PluginUiChange::PanelPopover { .. } => {}
             PluginUiChange::UserMenuEntry { label, sessions } => match label {
                 Some(label) => {
                     self.menu_entries

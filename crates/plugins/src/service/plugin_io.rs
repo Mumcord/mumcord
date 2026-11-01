@@ -71,6 +71,10 @@ pub enum UiUpdate {
         title: String,
     },
     CloseDialog,
+    /// The plugin's panel opens in (or closes from) the large popover.
+    PanelPopover {
+        open: bool,
+    },
     /// `None` removes the entry. `sessions` lists the users it shows on (`None`: everyone).
     UserMenuEntry {
         label: Option<String>,
@@ -257,6 +261,18 @@ impl PluginIo for ServiceIo {
             self.ui(plugin, UiUpdate::WebviewHide);
         }
         self.ui(plugin, UiUpdate::CloseDialog);
+    }
+
+    fn open_panel_popover(&self, plugin: &str) -> Result<(), Error> {
+        if !self.chat().gate.is_fresh(plugin, Instant::now()) {
+            return Err(Error::NotPermitted);
+        }
+        self.ui(plugin, UiUpdate::PanelPopover { open: true });
+        Ok(())
+    }
+
+    fn close_panel_popover(&self, plugin: &str) {
+        self.ui(plugin, UiUpdate::PanelPopover { open: false });
     }
 
     fn set_user_menu_entry(&self, plugin: &str, label: Option<String>) -> Result<(), Error> {
@@ -529,6 +545,33 @@ mod tests {
         assert!(matches!(next(), Some(UiUpdate::WebviewHide)));
         assert!(matches!(next(), Some(UiUpdate::CloseDialog)));
         assert_eq!(io.webview_post("snacks", "hi".into()), Err(Error::Invalid));
+    }
+
+    #[test]
+    fn panel_popover_opens_only_after_a_gesture() {
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        assert_eq!(io.open_panel_popover("poll"), Err(Error::NotPermitted));
+        assert!(rx.try_recv().is_err());
+        io.gesture("poll");
+        assert_eq!(io.open_panel_popover("poll"), Ok(()));
+        // A chat.send afterwards still works: opening does not use the gesture up.
+        assert_eq!(io.chat().gate.is_fresh("poll", Instant::now()), true);
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::PanelPopover { open: true },
+                ..
+            })
+        ));
+        io.close_panel_popover("poll");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::PanelPopover { open: false },
+                ..
+            })
+        ));
     }
 
     #[test]

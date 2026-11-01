@@ -262,6 +262,14 @@ impl GestureGate {
         Ok(prefixed(plugin_name, text))
     }
 
+    /// Whether a gesture for this plugin is still fresh. Unlike [`Self::send`] it does not use
+    /// the gesture up.
+    pub fn is_fresh(&self, plugin: &str, now: Instant) -> bool {
+        self.gestures
+            .get(plugin)
+            .is_some_and(|(at, window)| now.saturating_duration_since(*at) <= *window)
+    }
+
     pub fn forget(&mut self, plugin: &str) {
         self.gestures.remove(plugin);
     }
