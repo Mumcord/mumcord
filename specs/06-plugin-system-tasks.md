@@ -10,7 +10,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B6 | E2E: two Mumcord clients in one run | in progress | b6-e2e2 |
 | B7 | ⚠ OUTWARD: create the `Mumcord/plugins` repository skeleton | done | b7-pluginsrepo |
 | B8 | ⚠ OUTWARD (repo `Mumcord/mumbot`): module `plugins` (mumbot#20) | in progress | b8-mumbot |
-| B20 | Deep link `mumcord://plugins/<id>` | in progress | b20-deeplink |
+| B20 | Deep link `mumcord://plugins/<id>` | done | b20-deeplink |
 | B2 | WIT package `mumcord:plugin@1.0.0` | open | |
 | B4 | Manifest, permission catalogue and package rules to spec | open | |
 | B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | open | |
@@ -57,6 +57,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B43 | CI in Mumcord: plugin tests and E2E | open | |
 | B44 | PRIVACY.md plugins section | done | b44-privacy |
 | K1 | Official plugin registry signing key (generated locally, stored as secret, never committed) | done (public keys: ~/.config/mumcord-signing/plugins/{active,backup}.pub; active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5) | k1-signkey |
+| B20b | Deep link: buffer a cold-start `plugins://open-details` until the UI takes it (pending-take command) + Windows runtime registration of `mumcord` in commands/app.rs | open | |
 
 ---
 
@@ -412,3 +413,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **B5 (3315a4cf):** `Handle::send_plugin_data_low(receivers, data_id, data) -> Result<PluginTicket, CommandError>`; `PluginTicket::outcome().await -> LowOutcome::{Sent, Expired, Disconnected}` (dropping the ticket is fine); `Handle::plugin_data_expired() -> u64` (drops per connection). Core `send_plugin_data` unchanged and always goes first; low frames expire after 10 s; flush/disconnect don't wait for them.
 - **K1:** registry public keys in `~/.config/mumcord-signing/plugins/{active,backup}.pub` (active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5). Embed only public keys. Signing secrets `PLUGIN_SIGNING_KEY` / `PLUGIN_SIGNING_KEY_PASSWORD` live in the `publish` environment of Mumcord/plugins.
 - **B7 (+fix 5dc6e28):** Mumcord/plugins has no repo-wide licence; each official plugin folder (`poll/`, `dice/`, `echolings/`, `mumbot-music/`) has AGPL-3.0, `template/` and `docs/` Apache-2.0. Pages at https://mumcord.github.io/plugins/; environment `publish`; branch protection 1 approval + `check`. Version files live at `plugins/<id>/versions/<ver>.toml`.
+- **B20 (bbf7f399):** Tauri event `plugins://open-details` with payload `{id}` (plain string event, not tauri-specta typed); id validated `^[a-z][a-z0-9-]{2,31}$`; other links ignored; never installs. Schemes `mumble` + `mumcord` in tauri.conf.json; Linux desktop entry lists `x-scheme-handler/mumcord`. Open: cold-start links can be lost (no buffer) → B20b; Windows runtime registration in commands/app.rs still only `mumble` → B20b.
