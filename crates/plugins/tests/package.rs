@@ -351,3 +351,30 @@ fn unofficial_packages_cannot_take_official_or_reserved_ids() {
         .to_string();
     assert!(error.contains("official plugin"), "{error}");
 }
+
+#[test]
+fn chat_pattern_descriptions_follow_the_app_language() {
+    let manifest = MANIFEST.replace(
+        "\"license\"",
+        r#""permissions":{"optional":["chat.patterns"]},
+        "chat_patterns":[{"pattern":"^\\[","description":"Recognise fits"},
+                         {"pattern":"^!fit","description":"Recognise fit commands"}],
+        "license""#,
+    );
+    let package = with(|files| {
+        files[0].1 = manifest.into_bytes();
+        files[2].1 = br#"{"chat_patterns.1.description":"Fit commands (en)"}"#.to_vec();
+        files.push((
+            "i18n/de.json".into(),
+            br#"{"chat_patterns.0.description":"Erkennt Fittings","chat_patterns.1.description":"Bad\u0007"}"#.to_vec(),
+        ));
+    })
+    .expect("valid");
+    let descriptions =
+        |language| mumcord_plugins::i18n::chat_pattern_descriptions(&package, language);
+    assert_eq!(
+        descriptions("de-AT"),
+        ["Erkennt Fittings", "Fit commands (en)"]
+    );
+    assert_eq!(descriptions("fr"), ["Recognise fits", "Fit commands (en)"]);
+}

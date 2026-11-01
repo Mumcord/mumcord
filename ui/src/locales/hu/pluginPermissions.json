@@ -24,6 +24,7 @@
     "chatSend": "Csevegőüzenet küldése a nevedben kattintás vagy parancs után",
     "chatSupersedes": "Saját szövegsorának elrejtése azok elől, akik látják a kártyáját",
     "chatTriggers": "A csevegés azon üzeneteinek olvasása, amelyek a kulcsszavaival kezdődnek, pl. !poll",
+    "chatPatterns": "Bizonyos csevegőüzenetek felismerése, pl. beillesztett játékbeli felszerelések",
     "netHttp": "Kommunikáció egy általad választott kiszolgálóval",
     "secrets": "Titok (pl. API-kulcs) tárolása a rendszer kulcstartójában",
     "uiWebview": "Saját webes tartalom megjelenítése elszigetelt keretben (internet nélkül)"
@@ -46,6 +47,7 @@
     "chatSend": "A nevedben küldhet csevegőüzenetet, de csak a te kattintásod vagy parancsod után.",
     "chatSupersedes": "Aki látja a kártyáját, az nem látja emellett az egyszerű szöveges sorát.",
     "chatTriggers": "Olyan csevegőüzeneteket olvas, amelyek az indítószavaival kezdődnek, például !poll, másokat nem.",
+    "chatPatterns": "Csak a csatornád azon csevegőüzeneteit kapja meg, amelyek az általa megadott módon kezdődnek, például egy beillesztett játékbeli felszerelést. Más csevegőszöveg nem jut el hozzá.",
     "netHttp": "Egyetlen, általad választott szerverrel kommunikálhat, mással nem.",
     "secrets": "Titkot, például API-kulcsot tárolhat a rendszer kulcstartójában.",
     "uiWebview": "Saját webes tartalmat jeleníthet meg zárt keretben, internet-hozzáférés nélkül."

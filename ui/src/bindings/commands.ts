@@ -540,8 +540,6 @@ export const commands = {
 	pluginSetVisibility: (id: string, visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_visibility", { id, visibility })),
 	/**  The plugin's "notifications" switch. */
 	pluginSetNotifications: (id: string, on: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_notifications", { id, on })),
-	/**  "Check now": looks for plugin updates and revocations right away. */
-	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
 	/**  "Pin version": a pinned plugin is not offered updates (FR-6.67). */
 	pluginSetPinned: (id: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_pinned", { id, pinned })),
 	/**  Removes a plugin; its data is kept for 30 days unless `deleteData`. */
@@ -550,6 +548,8 @@ export const commands = {
 	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
 	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
 	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
+	/**  "Check now": looks for plugin updates and revocations right away. */
+	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
 	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
 	pluginExportData: (id: string) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_export_data", { id })),
 	pluginResetData: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_reset_data", { id })),
@@ -2512,6 +2512,11 @@ export type PluginInstallOffer = {
 	optional: PluginOptionalPermission[],
 	/**  Preselected in the visibility choice (shown when `peers.messages` is requested). */
 	defaultVisibility: PluginVisibilityChoice,
+	/**
+	 *  What the plugin's chat patterns recognise, in the app language (shown with
+	 *  `chat.patterns`). Plugin text: plain, untrusted.
+	 */
+	chatPatterns: string[],
 };
 
 /**  `plugins://install-progress`. */

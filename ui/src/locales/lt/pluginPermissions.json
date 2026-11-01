@@ -24,6 +24,7 @@
     "chatSend": "Paskelbti pokalbio žinutę jūsų vardu po paspaudimo ar komandos",
     "chatSupersedes": "Slėpti savo teksto eilutę tiems, kas mato jo kortelę",
     "chatTriggers": "Skaityti pokalbių žinutes, prasidedančias jo raktiniais žodžiais, pvz., !poll",
+    "chatPatterns": "Atpažinti tam tikras pokalbių žinutes, pvz., įklijuotas žaidimo komplektacijas",
     "netHttp": "Bendrauti su jūsų pasirinktu serveriu",
     "secrets": "Saugoti paslaptį (pvz., API raktą) jūsų sistemos raktų pakabuke",
     "uiWebview": "Rodyti savo žiniatinklio turinį izoliuotame rėmelyje (be interneto)"
@@ -46,6 +47,7 @@
     "chatSend": "Gali paskelbti pokalbio žinutę jūsų vardu, tik jums spustelėjus ar įvedus komandą.",
     "chatSupersedes": "Kas mato jo kortelę, papildomai nemato jo paprastos teksto eilutės.",
     "chatTriggers": "Skaito pokalbio žinutes, prasidedančias jo paleidimo žodžiais, pavyzdžiui, !poll, ir jokių kitų.",
+    "chatPatterns": "Jis gauna tik jūsų kanalo pokalbių žinutes, kurios prasideda taip, kaip jis nurodė, pvz., įklijuotą žaidimo komplektaciją. Joks kitas pokalbių tekstas jo nepasiekia.",
     "netHttp": "Gali bendrauti su vienu jūsų pasirinktu serveriu ir tik su juo.",
     "secrets": "Gali saugoti paslaptį, pavyzdžiui, API raktą, sistemos raktų saugykloje.",
     "uiWebview": "Gali rodyti savo žiniatinklio turinį uždarame rėmelyje be prieigos prie interneto."

@@ -117,6 +117,7 @@
     "chatSend": "Écrit dans le chat",
     "chatSupersedes": "Remplace sa ligne de texte",
     "chatTriggers": "Mots déclencheurs",
+    "chatPatterns": "Motifs de chat",
     "netHttp": "Accès à internet",
     "secrets": "Trousseau"
   }

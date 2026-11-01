@@ -117,6 +117,7 @@
     "chatSend": "Jikteb fiċ-chat",
     "chatSupersedes": "Jissostitwixxi l-linja tat-test tiegħu",
     "chatTriggers": "Kliem li jixgħel",
+    "chatPatterns": "Mudelli taċ-chat",
     "netHttp": "Aċċess għall-internet",
     "secrets": "Keychain"
   }

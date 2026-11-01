@@ -15,6 +15,7 @@ mod dev;
 mod install;
 mod lifecycle;
 mod messaging;
+mod patterns;
 mod plugin_io;
 mod revocation;
 mod triggers;
@@ -287,6 +288,8 @@ pub struct PluginService {
     revoked: crate::registry::RevocationList,
     /// Per-sender limit for chat trigger lines.
     trigger_limit: crate::triggers::RateLimit,
+    /// Per-sender limit for chat pattern matches.
+    match_limit: crate::triggers::RateLimit,
 }
 
 impl PluginService {
@@ -344,6 +347,10 @@ impl PluginService {
             updates: updates::Updates::default(),
             revoked: crate::registry::RevocationList::bundled(),
             trigger_limit: crate::triggers::RateLimit::default(),
+            match_limit: crate::triggers::RateLimit::new(
+                crate::patterns::RATE_LIMIT,
+                crate::patterns::RATE_WINDOW,
+            ),
         };
         Ok((service, host_rx, events_rx))
     }
@@ -428,6 +435,11 @@ impl PluginService {
     }
 
     /// The app language changed: running plugins get `language-changed`.
+    /// The app language plugins see (e.g. `de`), for texts the host reads from a package.
+    pub fn language(&self) -> &str {
+        &self.language
+    }
+
     pub fn set_language(&mut self, language: &str) {
         language.clone_into(&mut self.language);
         self.host

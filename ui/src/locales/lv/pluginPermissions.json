@@ -24,6 +24,7 @@
     "chatSend": "Nosūtīt tērzēšanas ziņojumu jūsu vārdā pēc klikšķa vai komandas",
     "chatSupersedes": "Paslēpt savu teksta rindu cilvēkiem, kas redz tā kartīti",
     "chatTriggers": "Lasīt tērzēšanas ziņas, kas sākas ar tā atslēgvārdiem, piem., !poll",
+    "chatPatterns": "Atpazīt noteiktas tērzēšanas ziņas, piem., ielīmētas spēles konfigurācijas",
     "netHttp": "Sazināties ar jūsu izvēlētu serveri",
     "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
     "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)"
@@ -46,6 +47,7 @@
     "chatSend": "Tas var publicēt tērzēšanas ziņu jūsu vārdā, tikai pēc jūsu klikšķa vai komandas.",
     "chatSupersedes": "Kas redz tā kartīti, papildus neredz tā vienkāršo teksta rindu.",
     "chatTriggers": "Tas lasa tērzēšanas ziņas, kas sākas ar tā aktivizēšanas vārdiem, piemēram, !poll, un nevienas citas.",
+    "chatPatterns": "Tas saņem tikai jūsu kanāla tērzēšanas ziņas, kas sākas tā, kā tas norādījis, piemēram, ielīmētu spēles konfigurāciju. Neviens cits tērzēšanas teksts to nesasniedz.",
     "netHttp": "Tas var sazināties ar vienu jūsu izvēlētu serveri un tikai ar to.",
     "secrets": "Tas var glabāt noslēpumu, piemēram, API atslēgu, sistēmas atslēgu saišķī.",
     "uiWebview": "Tas var rādīt savu tīmekļa saturu slēgtā rāmī bez piekļuves internetam."

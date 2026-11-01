@@ -117,6 +117,7 @@
     "chatSend": "Skriver i chatten",
     "chatSupersedes": "Erstatter sin tekstlinje",
     "chatTriggers": "Udløserord",
+    "chatPatterns": "Chatmønstre",
     "netHttp": "Internetadgang",
     "secrets": "Nøglering"
   }

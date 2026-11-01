@@ -99,6 +99,7 @@ const CHIP_PERMISSIONS = [
   "chat.send",
   "chat.supersedes",
   "chat.triggers",
+  "chat.patterns",
   "net.http",
   "secrets",
 ] as const;

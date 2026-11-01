@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Mumcord/mumcord/blob/main/crates/plugins/schema/manifest.schema.json",
   "title": "Mumcord plugin manifest",
-  "description": "manifest.json at the root of a .mcplugin package (format 1, plugin API 1.x, at most 16 KiB). Unknown fields are ignored by the app; the app's parser in crates/plugins is the reference. Rules the schema cannot express: a permission appears only once across required and optional; commands need the permission \"commands\"; triggers need the permission \"chat.triggers\" and are unique; net and the permission \"net.http\" go together; net.http, secrets and ui.webview are only available to official plugins; ids starting with mumcord- or core- are reserved for official plugins.",
+  "description": "manifest.json at the root of a .mcplugin package (format 1, plugin API 1.x, at most 16 KiB). Unknown fields are ignored by the app; the app's parser in crates/plugins is the reference. Rules the schema cannot express: a permission appears only once across required and optional; commands need the permission \"commands\"; triggers need the permission \"chat.triggers\" and are unique; chat_patterns need the permission \"chat.patterns\", must be anchored at the message start (^ or \\A, not in multi-line mode), must compile in Rust's regex crate within its size limits and are unique; net and the permission \"net.http\" go together; net.http, secrets and ui.webview are only available to official plugins; ids starting with mumcord- or core- are reserved for official plugins.",
   "type": "object",
   "required": [
     "manifest",
@@ -198,6 +198,29 @@
       },
       "description": "Chat trigger words, e.g. !poll: channel messages in the user's channel that start with one reach the plugin as a chat-trigger event (permission chat.triggers)."
     },
+    "chat_patterns": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["pattern", "description"],
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "Rust regex syntax (linear time, no look-around or backreferences), anchored at the message start, e.g. ^\\[[^,\\]\\n]{1,64},. Channel messages in the user's channel whose plain text (line breaks as \\n) matches reach the plugin as a chat-match event (permission chat.patterns)."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+            "description": "What the pattern recognises, shown in the install prompt, e.g. Recognise EVE Online fits pasted in chat. Translations: key chat_patterns.<n>.description in i18n/<lang>.json."
+          }
+        }
+      }
+    },
     "net": {
       "type": "object",
       "required": ["hosts"],
@@ -229,6 +252,7 @@
         "chat.send",
         "chat.supersedes",
         "chat.triggers",
+        "chat.patterns",
         "net.http",
         "secrets",
         "ui.webview"

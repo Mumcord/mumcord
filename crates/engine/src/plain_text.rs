@@ -1,5 +1,6 @@
 //! Plain text of incoming Mumble chat HTML, and the chat trigger shape plugins may receive
-//! (`chat.triggers`, e.g. `!poll 2`).
+//! (`chat.triggers`, e.g. `!poll 2`). [`plain_lines`] keeps line breaks for plugin chat
+//! patterns (`chat.patterns`), which recognise multi-line pastes such as game item lists.
 
 /// Longest trigger `args`, in characters.
 pub const MAX_TRIGGER_ARGS_CHARS: usize = 200;
@@ -17,6 +18,56 @@ pub fn plain_text(html: &str) -> String {
     }
     text.push_str(rest);
     decode_entities(&text)
+}
+
+/// Mumble HTML to plain text with its line breaks: `<br>` and the end of a list item, table row,
+/// heading or `<div>` become `\n`, the end of a paragraph `\n\n` (Mumcord sends blank lines as
+/// paragraphs); `<head>`, `<style>` and `<script>` contents are dropped, entities decoded and the
+/// result trimmed. Raw newlines only count in messages without such breaks (plain text from
+/// bots); in HTML with breaks they are source formatting.
+pub fn plain_lines(html: &str) -> String {
+    let lower = html.to_ascii_lowercase();
+    let has_breaks = ["<br", "</p", "</div", "</li", "</tr", "</h"]
+        .iter()
+        .any(|tag| lower.contains(tag));
+    let push_raw = |text: &mut String, raw: &str| {
+        if has_breaks {
+            text.extend(raw.chars().filter(|c| !matches!(c, '\r' | '\n')));
+        } else {
+            text.push_str(&raw.replace("\r\n", "\n"));
+        }
+    };
+    let mut text = String::with_capacity(html.len());
+    let mut rest = html;
+    while let Some(start) = rest.find('<') {
+        push_raw(&mut text, &rest[..start]);
+        let Some(end) = rest[start..].find('>') else {
+            rest = "";
+            break;
+        };
+        let tag = &rest[start + 1..start + end];
+        rest = &rest[start + end + 1..];
+        let name: String = tag
+            .chars()
+            .take_while(|c| c.is_ascii_alphanumeric() || *c == '/')
+            .collect::<String>()
+            .to_ascii_lowercase();
+        match name.as_str() {
+            "br" | "br/" | "/li" | "/tr" | "/div" | "/h1" | "/h2" | "/h3" | "/h4" | "/h5"
+            | "/h6" => text.push('\n'),
+            "/p" => text.push_str("\n\n"),
+            "head" | "style" | "script" => {
+                let close = format!("</{name}");
+                rest = match rest.to_ascii_lowercase().find(&close) {
+                    Some(at) => &rest[at..],
+                    None => "",
+                };
+            }
+            _ => {}
+        }
+    }
+    push_raw(&mut text, rest);
+    decode_entities(&text).trim().to_owned()
 }
 
 fn decode_entities(text: &str) -> String {
@@ -129,5 +180,35 @@ mod tests {
             t(&long).map(|(_, a)| a.chars().count()),
             Some(MAX_TRIGGER_ARGS_CHARS)
         );
+    }
+
+    #[test]
+    fn plain_lines_keep_the_line_breaks() {
+        // Plain Mumble: line breaks as <br />, sometimes followed by a raw newline.
+        assert_eq!(
+            plain_lines("[Rifter, PvP]<br />Damage Control II<br />\n<br />1MN Afterburner II"),
+            "[Rifter, PvP]\nDamage Control II\n\n1MN Afterburner II"
+        );
+        // Mumcord: blank lines become paragraphs.
+        assert_eq!(
+            plain_lines("<p>[Rifter, PvP]<br>Damage Control II</p><p>Hammerhead II x5</p>"),
+            "[Rifter, PvP]\nDamage Control II\n\nHammerhead II x5"
+        );
+        // A Qt rich text document: head and style dropped, source newlines ignored.
+        assert_eq!(
+            plain_lines(
+                "<!DOCTYPE HTML><html><head><meta name=\"qrichtext\" /><style type=\"text/css\">\n\
+                 p, li { white-space: pre-wrap; }\n</style></head><body>\n<p>a &amp; b</p>\n<p>c</p></body></html>"
+            ),
+            "a & b\n\nc"
+        );
+        // Plain text from a bot keeps its own newlines.
+        assert_eq!(
+            plain_lines("  [Rifter, x]\r\nModule\n"),
+            "[Rifter, x]\nModule"
+        );
+        assert_eq!(plain_lines("<B>bold</B><BR>next"), "bold\nnext");
+        assert_eq!(plain_lines("<script>alert(1)</script>ok"), "ok");
+        assert_eq!(plain_lines("cut <b"), "cut");
     }
 }

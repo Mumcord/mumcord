@@ -783,3 +783,165 @@ fn chat_triggers_reach_only_the_owner_and_only_from_my_channel() {
         [(poll.clone(), b"2".to_vec()), (poll, b"3".to_vec())]
     );
 }
+
+/// On a `chat-match` event (case 20), sends its `text` to the channel as a plugin message of
+/// kind 5 + `pattern-index`. In `chat-match`, `pattern-index` is the byte at payload offset 24
+/// and `text` the string at payload offset 28 (the payload starts at offset 8).
+const MATCH_ECHO: &str = r#"
+(module
+  (import "mumcord:plugin/peers@1.0.0" "send" (func $send (param i32 i32 i32 i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param $event i32)
+    (if (i32.eq (i32.load8_u (local.get $event)) (i32.const 20))
+      (then
+        (call $send (i32.const 0) (i32.const 0)
+          (i32.add (i32.const 5) (i32.load8_u (i32.add (local.get $event) (i32.const 32))))
+          (i32.load (i32.add (local.get $event) (i32.const 36)))
+          (i32.load (i32.add (local.get $event) (i32.const 40)))
+          (i32.const 100)))))
+  (func (export "stop"))
+)"#;
+
+fn match_folder(root: &Path, id: &str, extra: &str) -> PathBuf {
+    let dir = root.join(format!("src-{id}"));
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(dir.join("manifest.json"), manifest(id, "0.1.0", extra)).expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), encode(MATCH_ECHO)).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    dir
+}
+
+#[test]
+fn chat_matches_reach_every_matching_plugin_and_only_from_my_channel() {
+    let fx = Fixture::new();
+    fx.set_developer_mode(true);
+    let (mut service, mut host_events, mut events) =
+        fx.service_with_host(Version::new(0, 7, 0), false);
+    service.set_focused_server(Some(1));
+    service.shared_state(1, true);
+    service.peer_capable(1, 7, true);
+    service.peer_joined(1, bob());
+    service.peer_data(
+        1,
+        &bob(),
+        "mumcord.plugins",
+        br#"{"v":1,"p":["fits@1~dev","cmds@1~dev","deaf@1~dev"]}"#,
+    );
+    service.self_changed(
+        1,
+        SelfInfo {
+            me: PeerInfo {
+                session: 1,
+                name: "Me".into(),
+                cert_hash: None,
+                is_friend: false,
+            },
+            channel: Some((3, "Lobby".into())),
+            muted: false,
+            deafened: false,
+        },
+    );
+    assert!(
+        service.chat_pattern_set().is_none(),
+        "no plugin listens yet"
+    );
+    let patterns = |list: &str| {
+        format!(
+            r#","permissions":{{"required":["peers.messages","chat.patterns"]}},"chat_patterns":{list}"#
+        )
+    };
+    let fits = service
+        .load_dev(&match_folder(
+            fx.root.path(),
+            "fits",
+            &patterns(
+                r#"[{"pattern":"^!fit","description":"Fit commands"},
+                    {"pattern":"^\\[[^,\\n]+,[^\\]\\n]*\\]","description":"EVE fits"}]"#,
+            ),
+        ))
+        .expect("loads");
+    let cmds = service
+        .load_dev(&match_folder(
+            fx.root.path(),
+            "cmds",
+            &patterns(r#"[{"pattern":"^!","description":"Commands"}]"#),
+        ))
+        .expect("loads");
+    // Without the permission (and so without patterns) nothing reaches it.
+    let deaf = service
+        .load_dev(&match_folder(
+            fx.root.path(),
+            "deaf",
+            r#","permissions":{"required":["peers.messages"]}"#,
+        ))
+        .expect("loads");
+    for id in [&fits, &cmds, &deaf] {
+        assert_eq!(info(&service, id).status, Status::Running, "{id}");
+    }
+    let set = service.chat_pattern_set().expect("patterns");
+    assert!(set.is_match("[Rifter, PvP]\nx") && set.is_match("!x") && !set.is_match("hi"));
+
+    // Another channel, another server or no pattern matches: nothing.
+    service.chat_match(1, &bob(), 4, "[Rifter, a]");
+    service.chat_match(2, &bob(), 3, "[Rifter, a]");
+    service.chat_match(1, &bob(), 3, "hello");
+    // In my channel: every matching plugin, with its first matching pattern.
+    service.chat_match(1, &bob(), 3, "[Rifter, a]");
+    service.chat_match(1, &bob(), 3, "!fit b");
+    service.chat_match(1, &bob(), 3, "!x c");
+    // A fourth match within 10 seconds is dropped.
+    service.chat_match(1, &bob(), 3, "!fit d");
+
+    let wait = std::time::Duration::from_millis(500);
+    let mut got: Vec<(String, u8, Vec<u8>)> =
+        sent(&mut service, &mut host_events, &mut events, wait);
+    got.sort();
+    assert_eq!(
+        got,
+        [
+            (cmds.clone(), 5, b"!fit b".to_vec()),
+            (cmds, 5, b"!x c".to_vec()),
+            (fits.clone(), 5, b"!fit b".to_vec()),
+            (fits, 6, b"[Rifter, a]".to_vec()),
+        ]
+    );
+}
+
+/// Plugin, message kind and payload of every plugin message sent within `wait`.
+fn sent(
+    service: &mut PluginService,
+    host_events: &mut UnboundedReceiver<HostEvent>,
+    events: &mut UnboundedReceiver<ServiceEvent>,
+    wait: std::time::Duration,
+) -> Vec<(String, u8, Vec<u8>)> {
+    let until = std::time::Instant::now() + wait;
+    let mut out = Vec::new();
+    loop {
+        while let Ok(event) = host_events.try_recv() {
+            service.handle_host_event(event).expect("handled");
+        }
+        while let Ok(event) = events.try_recv() {
+            if let ServiceEvent::PeerSend {
+                plugin, outgoing, ..
+            } = event
+            {
+                out.push((plugin, outgoing.bytes[2], outgoing.bytes[3..].to_vec()));
+            }
+        }
+        if std::time::Instant::now() >= until {
+            return out;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}

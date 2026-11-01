@@ -117,6 +117,7 @@
     "chatSend": "Rašo pokalbyje",
     "chatSupersedes": "Pakeičia savo teksto eilutę",
     "chatTriggers": "Aktyvinimo žodžiai",
+    "chatPatterns": "Pokalbių šablonai",
     "netHttp": "Prieiga prie interneto",
     "secrets": "Raktų pakabukas"
   }

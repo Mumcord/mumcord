@@ -27,6 +27,7 @@ const offer: PluginInstallOffer = {
     { id: "notify", suggested: false },
   ],
   defaultVisibility: "friends",
+  chatPatterns: [],
 };
 
 beforeEach(async () => {
@@ -68,6 +69,21 @@ describe("InstallPrompt boxes", () => {
 });
 
 describe("InstallPrompt", () => {
+  it("shows what the plugin's chat patterns recognise, as plain text", async () => {
+    vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue({
+      ...offer,
+      required: ["chat.patterns"],
+      optional: [],
+      chatPatterns: ["Recognise EVE Online fits pasted in chat", "<b>not markup</b>"],
+    });
+    render(<InstallPrompt plugin={poll} repositoryWarning={false} onClose={vi.fn()} />);
+    expect(
+      await screen.findByText("Recognise certain chat messages, such as pasted game fits"),
+    ).toBeTruthy();
+    expect(screen.getByText("Recognise EVE Online fits pasted in chat")).toBeTruthy();
+    expect(screen.getByText("<b>not markup</b>")).toBeTruthy();
+  });
+
   it("shows required and optional permissions and the visibility choice, then installs", async () => {
     vi.spyOn(api, "pluginInstallPrepare").mockResolvedValue(offer);
     const install = vi.spyOn(api, "pluginInstall").mockResolvedValue(null);

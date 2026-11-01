@@ -40,24 +40,42 @@ pub fn owner<'a>(candidates: &[Candidate<'a>], trigger: &str) -> Option<&'a str>
         .map(|c| c.plugin)
 }
 
-/// At most [`RATE_LIMIT`] trigger lines per sender and [`RATE_WINDOW`]. Only lines that a
-/// plugin owns are counted, so ordinary chat leaves nothing here.
-#[derive(Debug, Default)]
+/// At most `limit` lines per sender and `window` ([`RATE_LIMIT`] per [`RATE_WINDOW`] by default;
+/// chat patterns use their own). Only lines that a plugin gets are counted, so ordinary chat
+/// leaves nothing here.
+#[derive(Debug)]
 pub struct RateLimit {
+    limit: usize,
+    window: Duration,
     /// Recent accepted lines per sender key (e.g. server and session).
     recent: BTreeMap<(ServerId, u32), Vec<Instant>>,
 }
 
+impl Default for RateLimit {
+    fn default() -> Self {
+        Self::new(RATE_LIMIT, RATE_WINDOW)
+    }
+}
+
 impl RateLimit {
+    pub fn new(limit: usize, window: Duration) -> Self {
+        Self {
+            limit,
+            window,
+            recent: BTreeMap::new(),
+        }
+    }
+
     /// True if a line from `sender` at `now` may pass; counts it if so.
     pub fn allow(&mut self, sender: (ServerId, u32), now: Instant) -> bool {
         // Forget senders whose window is over, so the map stays small.
+        let window = self.window;
         self.recent.retain(|_, times| {
-            times.retain(|t| now.saturating_duration_since(*t) < RATE_WINDOW);
+            times.retain(|t| now.saturating_duration_since(*t) < window);
             !times.is_empty()
         });
         let times = self.recent.entry(sender).or_default();
-        if times.len() >= RATE_LIMIT {
+        if times.len() >= self.limit {
             return false;
         }
         times.push(now);

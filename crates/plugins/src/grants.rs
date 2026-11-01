@@ -76,6 +76,7 @@ pub fn event_permission(event: &Event) -> Option<&'static str> {
         Event::HttpResponse(_) => "net.http",
         Event::WebviewMessage(_) => "ui.webview",
         Event::ChatTrigger(_) => "chat.triggers",
+        Event::ChatMatch(_) => "chat.patterns",
         Event::ThemeChanged(_)
         | Event::LanguageChanged(_)
         | Event::SettingsChanged(_)
@@ -148,6 +149,11 @@ mod tests {
                 sender: peer(),
                 trigger: "!poll".into(),
                 args: String::new(),
+            }),
+            Event::ChatMatch(crate::wit::events::ChatMatch {
+                sender: peer(),
+                pattern_index: 0,
+                text: String::new(),
             }),
         ];
         for event in &events {

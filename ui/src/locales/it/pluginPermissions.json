@@ -24,6 +24,7 @@
     "chatSend": "Inviare un messaggio in chat a tuo nome dopo un clic o un comando",
     "chatSupersedes": "Nascondere la propria riga di testo a chi vede la sua scheda",
     "chatTriggers": "Leggere i messaggi della chat che iniziano con le sue parole chiave, come !poll",
+    "chatPatterns": "Riconoscere determinati messaggi della chat, come configurazioni di gioco incollate",
     "netHttp": "Comunicare con un server a tua scelta",
     "secrets": "Conservare un segreto (ad es. una chiave API) nel portachiavi del sistema",
     "uiWebview": "Mostrare contenuti web propri in un riquadro isolato (senza internet)"
@@ -46,6 +47,7 @@
     "chatSend": "Può pubblicare un messaggio di chat a tuo nome, solo dopo un tuo clic o comando.",
     "chatSupersedes": "Chi vede la sua scheda non vede anche la sua riga di testo semplice.",
     "chatTriggers": "Legge i messaggi di chat che iniziano con le sue parole chiave, come !poll, e nessun altro.",
+    "chatPatterns": "Riceve solo i messaggi di chat del tuo canale che iniziano nel modo da lui dichiarato, come una configurazione di gioco incollata. Nessun altro testo della chat gli arriva.",
     "netHttp": "Può parlare con un server che scegli tu, e solo con quello.",
     "secrets": "Può conservare un segreto, come una chiave API, nel portachiavi del sistema.",
     "uiWebview": "Può mostrare contenuti web propri in un riquadro isolato, senza accesso a internet."

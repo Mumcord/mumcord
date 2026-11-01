@@ -155,6 +155,7 @@ export function InstallPrompt({
           <p className="plugin-prompt-subtitle">{t("prompt.intro", { name })}</p>
           <PermissionList
             requested={requestedOf(phase.offer)}
+            chatPatterns={phase.offer.chatPatterns}
             enabled={enabled}
             readOnly={installing}
             onToggle={(id, on) => {

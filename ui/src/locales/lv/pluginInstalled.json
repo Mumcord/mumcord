@@ -117,6 +117,7 @@
     "chatSend": "Raksta tērzēšanā",
     "chatSupersedes": "Aizstāj savu teksta rindu",
     "chatTriggers": "Aktivizēšanas vārdi",
+    "chatPatterns": "Tērzēšanas šabloni",
     "netHttp": "Piekļuve internetam",
     "secrets": "Atslēgu piekariņš"
   }

@@ -24,6 +24,7 @@
     "chatSend": "Postează un mesaj de chat în numele tău după un clic sau o comandă",
     "chatSupersedes": "Ascunde propria linie de text pentru persoanele care îi văd cardul",
     "chatTriggers": "Citește mesajele din chat care încep cu cuvintele sale declanșatoare, de ex. !poll",
+    "chatPatterns": "Recunoaște anumite mesaje din chat, de ex. configurații de joc lipite",
     "netHttp": "Comunică cu un server ales de tine",
     "secrets": "Păstrează un secret (de ex. o cheie API) în breasla de chei a sistemului",
     "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)"
@@ -46,6 +47,7 @@
     "chatSend": "Poate posta un mesaj de chat în numele tău, doar după clicul sau comanda ta.",
     "chatSupersedes": "Cine îi vede cardul nu îi vede în plus linia de text simplu.",
     "chatTriggers": "Citește mesajele de chat care încep cu cuvintele sale declanșatoare, precum !poll, și pe niciun altul.",
+    "chatPatterns": "Primește doar mesajele de chat din canalul tău care încep așa cum a declarat, de exemplu o configurație de joc lipită. Niciun alt text din chat nu ajunge la el.",
     "netHttp": "Poate vorbi cu un singur server ales de tine, și doar cu el.",
     "secrets": "Poate păstra un secret, precum o cheie API, în breasla de chei a sistemului.",
     "uiWebview": "Poate afișa propriul conținut web într-un cadru izolat, fără acces la internet."

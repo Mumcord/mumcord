@@ -24,6 +24,7 @@
     "chatSend": "Skicka ett chattmeddelande åt dig efter ett klick eller ett kommando",
     "chatSupersedes": "Dölja sin egen textrad för dem som ser dess kort",
     "chatTriggers": "Läsa chattmeddelanden som börjar med dess utlösarord, t.ex. !poll",
+    "chatPatterns": "Känna igen vissa chattmeddelanden, t.ex. inklistrade spel-fits",
     "netHttp": "Prata med en server som du väljer",
     "secrets": "Spara en hemlighet (t.ex. en API-nyckel) i systemets nyckelring",
     "uiWebview": "Visa eget webbinnehåll i en isolerad ram (utan internet)"
@@ -46,6 +47,7 @@
     "chatSend": "Det kan skicka ett chattmeddelande i ditt namn, bara efter att du klickat eller skrivit ett kommando.",
     "chatSupersedes": "De som ser dess kort ser inte även dess vanliga textrad.",
     "chatTriggers": "Det läser chattmeddelanden som börjar med dess utlösarord, som !poll, och inga andra.",
+    "chatPatterns": "Det tar bara emot chattmeddelanden i din kanal som börjar på det sätt det har angett, t.ex. ett inklistrat spel-fit. Ingen annan chattext når det.",
     "netHttp": "Det kan prata med en server som du väljer, och bara med den.",
     "secrets": "Det kan spara en hemlighet, som en API-nyckel, i systemets nyckelring.",
     "uiWebview": "Det kan visa eget webbinnehåll i en sluten ram utan internetåtkomst."

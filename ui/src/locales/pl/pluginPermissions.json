@@ -24,6 +24,7 @@
     "chatSend": "Wysłać wiadomość na czacie w Twoim imieniu po kliknięciu lub poleceniu",
     "chatSupersedes": "Ukrywać własny wiersz tekstu dla osób, które widzą jej kartę",
     "chatTriggers": "Czytać wiadomości na czacie zaczynające się od jego słów wyzwalających, np. !poll",
+    "chatPatterns": "Rozpoznawać określone wiadomości na czacie, np. wklejone konfiguracje z gier",
     "netHttp": "Łączyć się z wybranym przez Ciebie serwerem",
     "secrets": "Przechowywać sekret (np. klucz API) w systemowym pęku kluczy",
     "uiWebview": "Pokazywać własną treść internetową w izolowanej ramce (bez internetu)"
@@ -46,6 +47,7 @@
     "chatSend": "Może wysłać wiadomość na czacie w Twoim imieniu, tylko po Twoim kliknięciu lub poleceniu.",
     "chatSupersedes": "Osoby widzące jej kartę nie widzą dodatkowo zwykłej linii tekstu.",
     "chatTriggers": "Czyta wiadomości czatu zaczynające się od jej słów wyzwalających, jak !poll, i żadnych innych.",
+    "chatPatterns": "Otrzymuje tylko wiadomości czatu na Twoim kanale, które zaczynają się tak, jak zadeklarowała, np. wklejoną konfigurację z gry. Żaden inny tekst czatu do niej nie trafia.",
     "netHttp": "Może rozmawiać z jednym wybranym przez Ciebie serwerem i tylko z nim.",
     "secrets": "Może przechowywać sekret, na przykład klucz API, w systemowym schowku kluczy.",
     "uiWebview": "Może pokazywać własną treść internetową w izolowanej ramce bez dostępu do internetu."

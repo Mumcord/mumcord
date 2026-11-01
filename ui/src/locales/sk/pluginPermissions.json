@@ -24,6 +24,7 @@
     "chatSend": "Odoslať za vás správu v chate po kliknutí alebo príkaze",
     "chatSupersedes": "Skryť vlastný textový riadok ľuďom, ktorí vidia jeho kartu",
     "chatTriggers": "Čítať správy v chate, ktoré sa začínajú jeho spúšťacími slovami, napr. !poll",
+    "chatPatterns": "Rozpoznávať určité správy v chate, napr. vložené herné zostavy",
     "netHttp": "Komunikovať so serverom, ktorý si vyberiete",
     "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
     "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)"
@@ -46,6 +47,7 @@
     "chatSend": "Môže odoslať správu do chatu vaším menom, len po vašom kliknutí alebo príkaze.",
     "chatSupersedes": "Kto vidí jeho kartu, nevidí navyše jeho obyčajný textový riadok.",
     "chatTriggers": "Číta správy v chate, ktoré začínajú jeho spúšťacími slovami, napríklad !poll, a žiadne iné.",
+    "chatPatterns": "Dostáva len správy v chate vášho kanála, ktoré začínajú tak, ako deklaroval, napríklad vloženú hernú zostavu. Žiadny iný text z chatu sa k nemu nedostane.",
     "netHttp": "Môže komunikovať s jedným serverom, ktorý zvolíte, a len s ním.",
     "secrets": "Môže uložiť tajomstvo, napríklad kľúč API, do kľúčenky systému.",
     "uiWebview": "Môže zobraziť vlastný webový obsah v uzavretom ráme bez prístupu na internet."

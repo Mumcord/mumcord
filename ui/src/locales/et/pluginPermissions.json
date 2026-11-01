@@ -24,6 +24,7 @@
     "chatSend": "Postitada sinu eest vestlussõnum pärast klõpsu või käsku",
     "chatSupersedes": "Peita oma tekstirida neile, kes näevad selle kaarti",
     "chatTriggers": "Lugeda vestlussõnumeid, mis algavad tema käivitussõnadega, nt !poll",
+    "chatPatterns": "Tuvastada teatud vestlussõnumeid, nt kleebitud mänguvarustusi",
     "netHttp": "Suhelda sinu valitud serveriga",
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
     "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)"
@@ -46,6 +47,7 @@
     "chatSend": "See võib postitada vestlussõnumi sinu nimel, ainult pärast sinu klõpsu või käsku.",
     "chatSupersedes": "Kes näeb selle kaarti, ei näe lisaks tavalist tekstirida.",
     "chatTriggers": "See loeb vestlussõnumeid, mis algavad selle käivitussõnadega, näiteks !poll, ja ühtegi teist.",
+    "chatPatterns": "See saab ainult sinu kanali vestlussõnumeid, mis algavad nii, nagu see on määranud, näiteks kleebitud mänguvarustuse. Muu vestlustekst selleni ei jõua.",
     "netHttp": "See võib suhelda ühe sinu valitud serveriga ja ainult sellega.",
     "secrets": "See võib hoida saladust, näiteks API võtit, süsteemi võtmehoidjas.",
     "uiWebview": "See võib näidata oma veebisisu suletud raamis ilma internetiühenduseta."

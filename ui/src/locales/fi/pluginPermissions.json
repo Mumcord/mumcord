@@ -24,6 +24,7 @@
     "chatSend": "Lähettää keskusteluviestin puolestasi napsautuksen tai komennon jälkeen",
     "chatSupersedes": "Piilottaa oma tekstirivinsä niiltä, jotka näkevät sen kortin",
     "chatTriggers": "Lukea chat-viestejä, jotka alkavat sen käynnistyssanoilla, esim. !poll",
+    "chatPatterns": "Tunnistaa tiettyjä chat-viestejä, esim. liitettyjä pelivarustuksia",
     "netHttp": "Keskustella valitsemasi palvelimen kanssa",
     "secrets": "Säilyttää salaisuus (esim. API-avain) järjestelmäsi avainnipussa",
     "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä (ei internetiä)"
@@ -46,6 +47,7 @@
     "chatSend": "Se voi lähettää keskusteluviestin nimissäsi vasta napsautuksesi tai komentosi jälkeen.",
     "chatSupersedes": "Ne, jotka näkevät sen kortin, eivät näe lisäksi sen tavallista tekstirivia.",
     "chatTriggers": "Se lukee keskusteluviestit, jotka alkavat sen liipaisusanoilla, kuten !poll, eikä muita.",
+    "chatPatterns": "Se saa vain kanavasi chat-viestit, jotka alkavat sen ilmoittamalla tavalla, kuten liitetyn pelivarustuksen. Muuta chat-tekstiä se ei saa.",
     "netHttp": "Se voi puhua yhden valitsemasi palvelimen kanssa, ei muiden.",
     "secrets": "Se voi säilyttää salaisuuden, kuten API-avaimen, järjestelmän avainnipussa.",
     "uiWebview": "Se voi näyttää omaa verkkosisältöä suljetussa kehyksessä ilman internetyhteyttä."

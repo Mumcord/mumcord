@@ -24,6 +24,7 @@
     "chatSend": "Po vašem kliku ali ukazu objavi klepetalno sporočilo namesto vas",
     "chatSupersedes": "Skrij lastno vrstico besedila osebam, ki vidijo njegovo kartico",
     "chatTriggers": "Brati sporočila v klepetu, ki se začnejo z njegovimi sprožilnimi besedami, npr. !poll",
+    "chatPatterns": "Prepoznati določena sporočila v klepetu, npr. prilepljene opreme iz iger",
     "netHttp": "Komuniciraj s strežnikom, ki ga izberete",
     "secrets": "Shrani skrivnost (npr. ključ API) v sistemsko zbirko ključev",
     "uiWebview": "Prikaži lastno spletno vsebino v izoliranem okvirju (brez interneta)"
@@ -46,6 +47,7 @@
     "chatSend": "Lahko objavi klepetalno sporočilo v vašem imenu, le po vašem kliku ali ukazu.",
     "chatSupersedes": "Kdor vidi njegovo kartico, ne vidi dodatno njegove navadne besedilne vrstice.",
     "chatTriggers": "Bere klepetalna sporočila, ki se začnejo z njegovimi sprožilnimi besedami, kot je !poll, in nobenih drugih.",
+    "chatPatterns": "Prejme samo sporočila v klepetu vašega kanala, ki se začnejo tako, kot je navedel, npr. prilepljeno opremo iz igre. Nobeno drugo besedilo klepeta ga ne doseže.",
     "netHttp": "Lahko komunicira z enim strežnikom, ki ga izberete, in samo z njim.",
     "secrets": "Lahko shrani skrivnost, na primer ključ API, v sistemsko zbirko ključev.",
     "uiWebview": "Lahko prikaže lastno spletno vsebino v zaprtem okvirju brez dostopa do interneta."

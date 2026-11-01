@@ -117,6 +117,7 @@
     "chatSend": "Kirjutab vestlusesse",
     "chatSupersedes": "Asendab oma tekstirea",
     "chatTriggers": "Käivitussõnad",
+    "chatPatterns": "Vestlusmustrid",
     "netHttp": "Internetijuurdepääs",
     "secrets": "Võtmehoidja"
   }

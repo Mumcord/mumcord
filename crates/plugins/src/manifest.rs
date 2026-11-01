@@ -8,6 +8,7 @@ use std::collections::BTreeSet;
 use semver::{Op, Version, VersionReq};
 use serde::Deserialize;
 
+use crate::patterns::{MAX_CHAT_PATTERNS, MAX_PATTERN_DESCRIPTION_CHARS};
 use crate::permissions;
 
 /// The only manifest format version this host reads.
@@ -82,6 +83,8 @@ pub struct Manifest {
     pub commands: Vec<Command>,
     /// Chat trigger words such as `!poll` (permission `chat.triggers`); see [`is_trigger`].
     pub triggers: Vec<String>,
+    /// Chat patterns (permission `chat.patterns`); see [`crate::patterns`].
+    pub chat_patterns: Vec<ChatPattern>,
     pub net: Option<Net>,
     /// Path of the icon under `assets/`.
     pub icon: Option<String>,
@@ -121,6 +124,15 @@ pub struct Command {
     pub name: String,
     pub description: String,
     pub usage: Option<String>,
+}
+
+/// A chat pattern: a regular expression anchored at the message start, and what it recognises
+/// in words the install prompt shows (e.g. "Recognise EVE Online fits pasted in chat").
+/// Translations come from the plugin's `i18n/<lang>.json`, key `chat_patterns.<n>.description`.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct ChatPattern {
+    pub pattern: String,
+    pub description: String,
 }
 
 /// `net` (FR-6.37): which hosts `net.http` may reach.
@@ -179,6 +191,13 @@ pub enum ManifestError {
     DuplicateCommand(String),
     #[error("The trigger \"{0}\" is declared twice")]
     DuplicateTrigger(String),
+    #[error("The chat pattern \"{pattern}\" is not allowed: {reason}")]
+    BadChatPattern {
+        pattern: String,
+        reason: crate::patterns::PatternError,
+    },
+    #[error("The chat pattern \"{0}\" is declared twice")]
+    DuplicateChatPattern(String),
     #[error("The path \"{0}\" is not a safe relative path inside the package")]
     BadPath(String),
     #[error("{field} must be between {min} and {max}")]
@@ -215,6 +234,8 @@ struct RawManifest {
     commands: Vec<Command>,
     #[serde(default)]
     triggers: Vec<String>,
+    #[serde(default)]
+    chat_patterns: Vec<ChatPattern>,
     net: Option<Net>,
     icon: Option<String>,
 }
@@ -399,6 +420,38 @@ impl RawManifest {
                 permission: "chat.triggers",
             });
         }
+        if self.chat_patterns.len() > MAX_CHAT_PATTERNS {
+            return Err(ManifestError::OutOfRange {
+                field: "chat_patterns",
+                min: 0,
+                max: MAX_CHAT_PATTERNS as u32,
+            });
+        }
+        let mut chat_patterns = BTreeSet::new();
+        for entry in &self.chat_patterns {
+            crate::patterns::compile(&entry.pattern).map_err(|reason| {
+                ManifestError::BadChatPattern {
+                    pattern: entry.pattern.chars().take(MAX_SHORT_TEXT_CHARS).collect(),
+                    reason,
+                }
+            })?;
+            if !chat_patterns.insert(entry.pattern.as_str()) {
+                return Err(ManifestError::DuplicateChatPattern(
+                    entry.pattern.chars().take(MAX_SHORT_TEXT_CHARS).collect(),
+                ));
+            }
+            text(
+                "chat_patterns.description",
+                &entry.description,
+                MAX_PATTERN_DESCRIPTION_CHARS,
+            )?;
+        }
+        if !self.chat_patterns.is_empty() && !has("chat.patterns") {
+            return Err(ManifestError::MissingPermission {
+                field: "chat_patterns",
+                permission: "chat.patterns",
+            });
+        }
         if self.net.is_some() != has("net.http") {
             return Err(ManifestError::MissingPermission {
                 field: if self.net.is_some() {
@@ -456,6 +509,7 @@ impl RawManifest {
             messaging,
             commands: self.commands,
             triggers: self.triggers,
+            chat_patterns: self.chat_patterns,
             net: self.net,
             icon: self.icon,
         })
@@ -897,6 +951,76 @@ mod tests {
             Err(ManifestError::MissingPermission {
                 field: "triggers",
                 permission: "chat.triggers"
+            })
+        );
+    }
+
+    #[test]
+    fn chat_patterns_are_checked() {
+        let eft = r"^\[[^,\]\n]{1,64},[^\]\n]{0,100}\]\n";
+        let with_patterns = |patterns: serde_json::Value| {
+            with(|v| {
+                v["permissions"]["optional"] = serde_json::json!(["chat.patterns"]);
+                v["chat_patterns"] = patterns;
+            })
+        };
+        let m = with_patterns(serde_json::json!([
+            {"pattern": eft, "description": "Recognise EVE Online fits pasted in chat"}
+        ]))
+        .expect("valid");
+        assert_eq!(m.chat_patterns[0].pattern, eft);
+        assert!(with(|_| {}).expect("valid").chat_patterns.is_empty());
+
+        assert_eq!(
+            with_patterns(serde_json::json!([{"pattern": "\\[Rifter", "description": "x"}])),
+            Err(ManifestError::BadChatPattern {
+                pattern: "\\[Rifter".into(),
+                reason: crate::patterns::PatternError::NotAnchored
+            })
+        );
+        assert!(matches!(
+            with_patterns(serde_json::json!([{"pattern": "^\\w{1000}", "description": "x"}])),
+            Err(ManifestError::BadChatPattern {
+                reason: crate::patterns::PatternError::TooLarge,
+                ..
+            })
+        ));
+        assert_eq!(
+            with_patterns(serde_json::json!([
+                {"pattern": "^a", "description": "x"},
+                {"pattern": "^a", "description": "y"}
+            ])),
+            Err(ManifestError::DuplicateChatPattern("^a".into()))
+        );
+        assert!(matches!(
+            with_patterns(serde_json::json!([
+                {"pattern": "^a", "description": "x"},
+                {"pattern": "^b", "description": "x"},
+                {"pattern": "^c", "description": "x"}
+            ])),
+            Err(ManifestError::OutOfRange {
+                field: "chat_patterns",
+                ..
+            })
+        ));
+        for description in ["", "  ", "a\u{7}", &"a".repeat(81)] {
+            assert!(
+                with_patterns(serde_json::json!([{"pattern": "^a", "description": description}]))
+                    .is_err(),
+                "{description}"
+            );
+        }
+        assert!(
+            with_patterns(serde_json::json!([{"pattern": "^a"}])).is_err(),
+            "description is required"
+        );
+        assert_eq!(
+            with(
+                |v| v["chat_patterns"] = serde_json::json!([{"pattern": "^a", "description": "x"}])
+            ),
+            Err(ManifestError::MissingPermission {
+                field: "chat_patterns",
+                permission: "chat.patterns"
             })
         );
     }

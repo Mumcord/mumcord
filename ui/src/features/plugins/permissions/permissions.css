@@ -54,6 +54,11 @@
   font-size: 0.8125rem;
 }
 
+.perm-detail {
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
 .perm-chip {
   flex: none;
   color: var(--color-text-muted);

@@ -117,6 +117,7 @@
     "chatSend": "Scrie în chat",
     "chatSupersedes": "Înlocuiește linia sa de text",
     "chatTriggers": "Cuvinte declanșatoare",
+    "chatPatterns": "Modele de chat",
     "netHttp": "Acces la internet",
     "secrets": "Breloc de chei"
   }

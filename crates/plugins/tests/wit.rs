@@ -123,6 +123,7 @@ fn every_event_of_fr_6_16_exists() {
             "http-response",
             "webview-message",
             "chat-trigger",
+            "chat-match",
         ]
     );
 }

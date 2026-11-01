@@ -146,6 +146,17 @@ pub enum PluginEngineEvent {
         trigger: String,
         args: String,
     },
+    /// A channel message in the user's current channel whose plain text
+    /// ([`crate::plain_text::plain_lines`]) matches a pattern set with
+    /// [`Engine::plugin_set_chat_patterns`]; the user's own messages included, blocked senders
+    /// never. Messages that match nothing never reach the plugin layer. The plugin service
+    /// decides which plugins' patterns matched and cuts the text for them.
+    ChatMatch {
+        server_id: ServerId,
+        sender: PluginPeer,
+        channel: PluginChannel,
+        text: String,
+    },
     /// Someone mentioned the user (the UI decides what a mention is); no text.
     Mentioned {
         server_id: ServerId,
@@ -258,6 +269,8 @@ pub struct PluginHub {
     rx: Mutex<Option<mpsc::Receiver<PluginEngineEvent>>>,
     servers: Mutex<HashMap<ServerId, ServerView>>,
     stats: Mutex<HashMap<ServerId, PluginTransportStats>>,
+    /// The chat patterns of every active plugin with `chat.patterns`; `None` when there are none.
+    chat_patterns: Mutex<Option<Arc<regex::RegexSet>>>,
 }
 
 impl Default for PluginHub {
@@ -268,6 +281,7 @@ impl Default for PluginHub {
             rx: Mutex::new(Some(rx)),
             servers: Mutex::default(),
             stats: Mutex::default(),
+            chat_patterns: Mutex::default(),
         }
     }
 }
@@ -347,6 +361,7 @@ impl PluginEngineEvent {
             | Self::ScreenShareStarted { server_id, .. }
             | Self::ChatActivity { server_id, .. }
             | Self::ChatTrigger { server_id, .. }
+            | Self::ChatMatch { server_id, .. }
             | Self::Mentioned { server_id, .. }
             | Self::SelfChanged { server_id, .. }
             | Self::PeerData { server_id, .. }
@@ -764,16 +779,25 @@ pub(crate) fn on_text(hub: &PluginHub, ctx: &SessionCtx, blocks: &BlockList, msg
             peer_of(user),
             text_channel(s, msg).map(|c| channel_of(s, c)),
             blocked,
+            s.own_user().map(|me| me.channel_id),
         ))
     });
     drop(blocks);
-    let Some((sender, Some(channel), blocked)) = found else {
+    let Some((sender, Some(channel), blocked, own_channel)) = found else {
         return;
     };
     if blocked {
         return;
     }
     emit_trigger(hub, ctx, &sender, &channel, &msg.message);
+    emit_match(
+        hub,
+        ctx.server_id,
+        &sender,
+        &channel,
+        own_channel,
+        &msg.message,
+    );
     hub.emit(PluginEngineEvent::ChatActivity {
         server_id: ctx.server_id,
         sender,
@@ -800,6 +824,33 @@ fn emit_trigger(
     }
 }
 
+/// A `ChatMatch` if the message was written in the user's current channel and its plain text
+/// matches an active chat pattern; nothing otherwise, and nothing is logged or counted.
+fn emit_match(
+    hub: &PluginHub,
+    server_id: ServerId,
+    sender: &PluginPeer,
+    channel: &PluginChannel,
+    own_channel: Option<u32>,
+    html: &str,
+) {
+    if own_channel != Some(channel.id) {
+        return;
+    }
+    let Some(patterns) = lock(&hub.chat_patterns).clone() else {
+        return;
+    };
+    let text = crate::plain_text::plain_lines(html);
+    if patterns.is_match(&text) {
+        hub.emit(PluginEngineEvent::ChatMatch {
+            server_id,
+            sender: sender.clone(),
+            channel: channel.clone(),
+            text,
+        });
+    }
+}
+
 /// Chat activity for the user's own channel message: the server does not echo it back, and
 /// plugins (e.g. pets reacting to the user's chatting) count it as activity too.
 pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, html: &str) {
@@ -807,10 +858,18 @@ pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, ht
         let me = s.own_user()?;
         s.channels
             .contains_key(&channel_id)
-            .then(|| (peer_of(me), channel_of(s, channel_id)))
+            .then(|| (peer_of(me), channel_of(s, channel_id), me.channel_id))
     });
-    if let Some((sender, channel)) = found {
+    if let Some((sender, channel, own_channel)) = found {
         emit_trigger(hub, ctx, &sender, &channel, html);
+        emit_match(
+            hub,
+            ctx.server_id,
+            &sender,
+            &channel,
+            Some(own_channel),
+            html,
+        );
         hub.emit(PluginEngineEvent::ChatActivity {
             server_id: ctx.server_id,
             sender,
@@ -820,6 +879,13 @@ pub(crate) fn on_own_text(hub: &PluginHub, ctx: &SessionCtx, channel_id: u32, ht
 }
 
 impl Engine {
+    /// The chat patterns of every active plugin with `chat.patterns` (`None`: none). Only
+    /// channel messages in the user's channel that match one become
+    /// [`PluginEngineEvent::ChatMatch`].
+    pub fn plugin_set_chat_patterns(&self, patterns: Option<regex::RegexSet>) {
+        *lock(&self.events().plugins().chat_patterns) = patterns.map(Arc::new);
+    }
+
     /// The plugin event stream. There is one consumer (the plugin service): the first call
     /// takes it, later calls get `None`.
     pub fn plugin_events(&self) -> Option<mpsc::Receiver<PluginEngineEvent>> {
@@ -1005,6 +1071,53 @@ mod tests {
                 other => format!("{other:?}"),
             })
             .collect()
+    }
+
+    #[test]
+    fn only_matching_messages_in_the_own_channel_become_chat_matches() {
+        let hub = PluginHub::default();
+        let mut rx = lock(&hub.rx).take().expect("receiver");
+        let channel = |id| PluginChannel {
+            id,
+            name: format!("c{id}"),
+        };
+        let fit = "[Rifter, PvP]<br>Damage Control II";
+        let send = |own: Option<u32>, written_in: u32, html: &str| {
+            emit_match(&hub, 1, &peer(2), &channel(written_in), own, html);
+        };
+
+        // No active patterns: nothing leaves the engine.
+        send(Some(5), 5, fit);
+        assert!(rx.try_recv().is_err());
+
+        *lock(&hub.chat_patterns) = Some(Arc::new(
+            regex::RegexSet::new([r"^\[[^,\n]+,[^\]\n]*\]\n"]).expect("set"),
+        ));
+        send(Some(5), 5, "hello [Rifter, PvP]<br>x");
+        send(Some(5), 6, fit);
+        send(None, 5, fit);
+        assert!(
+            rx.try_recv().is_err(),
+            "no match, other channel, no own channel"
+        );
+        assert_eq!(
+            lock(&hub.stats).get(&1).copied().unwrap_or_default(),
+            PluginTransportStats::default()
+        );
+
+        send(Some(5), 5, fit);
+        match rx.try_recv().expect("a match") {
+            PluginEngineEvent::ChatMatch {
+                server_id,
+                sender,
+                channel,
+                text,
+            } => {
+                assert_eq!((server_id, sender.session, channel.id), (1, 2, 5));
+                assert_eq!(text, "[Rifter, PvP]\nDamage Control II");
+            }
+            other => panic!("{other:?}"),
+        }
     }
 
     #[test]

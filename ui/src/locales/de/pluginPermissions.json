@@ -24,6 +24,7 @@
     "chatSend": "Nach deinem Klick oder Befehl eine Chatnachricht für dich senden",
     "chatSupersedes": "Die eigene Textzeile für Personen ausblenden, die ihre Karte sehen",
     "chatTriggers": "Chatnachrichten lesen, die mit seinen Auslösewörtern beginnen, z. B. !poll",
+    "chatPatterns": "Bestimmte Chatnachrichten erkennen, z. B. eingefügte Spiel-Fittings",
     "netHttp": "Mit einem Server deiner Wahl kommunizieren",
     "secrets": "Ein Geheimnis (z. B. einen API-Schlüssel) im Schlüsselbund deines Systems speichern",
     "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen (ohne Internet)"
@@ -46,6 +47,7 @@
     "chatSend": "Es kann eine Chatnachricht in deinem Namen senden, aber nur nach deinem Klick oder Befehl.",
     "chatSupersedes": "Wer seine Karte sieht, sieht nicht zusätzlich die einfache Textzeile.",
     "chatTriggers": "Es liest Chatnachrichten, die mit seinen Auslösewörtern beginnen, etwa !poll, und keine anderen.",
+    "chatPatterns": "Es erhält nur Chatnachrichten in deinem Kanal, die so beginnen, wie es angegeben hat, etwa ein eingefügtes Spiel-Fitting. Kein anderer Chattext erreicht es.",
     "netHttp": "Es kann mit einem Server sprechen, den du wählst, und nur mit diesem.",
     "secrets": "Es kann ein Geheimnis, etwa einen API-Schlüssel, in deinem System-Schlüsselbund aufbewahren.",
     "uiWebview": "Es kann eigene Webinhalte in einem abgeschotteten Rahmen ohne Internetzugang zeigen."

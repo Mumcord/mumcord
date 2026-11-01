@@ -117,6 +117,7 @@
     "chatSend": "Piše v klepet",
     "chatSupersedes": "Nadomesti svojo besedilno vrstico",
     "chatTriggers": "Sprožilne besede",
+    "chatPatterns": "Vzorci v klepetu",
     "netHttp": "Dostop do interneta",
     "secrets": "Obesek za ključe"
   }

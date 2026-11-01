@@ -117,6 +117,7 @@
     "chatSend": "Scrive in chat",
     "chatSupersedes": "Sostituisce la sua riga di testo",
     "chatTriggers": "Parole chiave",
+    "chatPatterns": "Modelli di chat",
     "netHttp": "Accesso a internet",
     "secrets": "Portachiavi"
   }

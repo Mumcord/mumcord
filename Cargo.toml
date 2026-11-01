@@ -164,6 +164,10 @@ keyring = "4.2"
 ammonia = "4.2"
 # Tokenizer for page metadata; the same version ammonia already uses.
 html5ever = "0.40"
+# Plugin chat patterns (`chat.patterns`): linear-time matching with size limits; regex-syntax
+# checks that a pattern is anchored at the message start. Both already come in via other crates.
+regex = "1.13"
+regex-syntax = "0.8"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
 
 # In-game overlay (FR-1.46b): glyph rasterizing in the game-side renderer, Vulkan bindings for

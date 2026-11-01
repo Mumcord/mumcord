@@ -117,6 +117,7 @@
     "chatSend": "Píše do chatu",
     "chatSupersedes": "Nahrádza svoj textový riadok",
     "chatTriggers": "Spúšťacie slová",
+    "chatPatterns": "Vzory v chate",
     "netHttp": "Prístup na internet",
     "secrets": "Zväzok kľúčov"
   }

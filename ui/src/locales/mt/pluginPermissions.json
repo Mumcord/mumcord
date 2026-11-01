@@ -24,6 +24,7 @@
     "chatSend": "Ippubblika messaġġ taċ-chat f'ismek wara klikk jew kmand",
     "chatSupersedes": "Aħbi r-riga tat-test tiegħu stess għal dawk li jaraw il-karta tiegħu",
     "chatTriggers": "Jaqra messaġġi taċ-chat li jibdew bil-kliem ta' attivazzjoni tiegħu, bħal !poll",
+    "chatPatterns": "Jagħraf ċerti messaġġi taċ-chat, bħal konfigurazzjonijiet ta' logħob imwaħħlin",
     "netHttp": "Kellem server li tagħżel int",
     "secrets": "Żomm sigriet (eż. ċavetta API) fil-keychain tas-sistema tiegħek",
     "uiWebview": "Uri l-kontenut tal-web tiegħu stess f'qafas issiġillat (mingħajr internet)"
@@ -46,6 +47,7 @@
     "chatSend": "Jista' jippubblika messaġġ taċ-chat f'ismek, biss wara li tikklikkja jew tikteb kmand.",
     "chatSupersedes": "Min jara l-karta tiegħu ma jarax ukoll is-sular tat-test sempliċi tiegħu.",
     "chatTriggers": "Jaqra messaġġi taċ-chat li jibdew bil-kliem tiegħu li jattiva, bħal !poll, u l-ebda oħra.",
+    "chatPatterns": "Jirċievi biss il-messaġġi taċ-chat fil-kanal tiegħek li jibdew kif iddikjara, bħal konfigurazzjoni ta' logħba mwaħħla. L-ebda test ieħor taċ-chat ma jaslilu.",
     "netHttp": "Jista' jkellem server wieħed li tagħżel int, u dak biss.",
     "secrets": "Jista' jżomm sigriet, bħal ċavetta API, fil-keychain tas-sistema tiegħek.",
     "uiWebview": "Jista' juri kontenut tal-web tiegħu stess f'qafas issiġillat mingħajr aċċess għall-internet."

@@ -386,16 +386,19 @@ async fn on_service_event(
 ) -> Result<(), Box<dyn std::error::Error>> {
     match event {
         ServiceEvent::Changed => {
-            let running = plugins
+            let (running, chat_patterns) = plugins
                 .call(|service| {
-                    Ok(service
+                    let running = service
                         .list()?
                         .into_iter()
                         .filter(|p| p.status == Status::Running)
                         .map(|p| p.id)
-                        .collect::<Vec<_>>())
+                        .collect::<Vec<_>>();
+                    Ok((running, service.chat_pattern_set()))
                 })
                 .await?;
+            // The engine forwards only chat messages that match an active plugin's pattern.
+            engine.plugin_set_chat_patterns(chat_patterns);
             plugins.trees().retain(|id| running.iter().any(|r| r == id));
             plugins
                 .webviews()

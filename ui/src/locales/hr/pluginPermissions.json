@@ -24,6 +24,7 @@
     "chatSend": "Objavi chat poruku umjesto vas nakon klika ili naredbe",
     "chatSupersedes": "Sakrij vlastiti redak teksta osobama koje vide njegovu karticu",
     "chatTriggers": "Čitati poruke u chatu koje počinju njegovim okidačkim riječima, npr. !poll",
+    "chatPatterns": "Prepoznavati određene poruke u chatu, npr. zalijepljene opreme iz igre",
     "netHttp": "Komuniciraj s poslužiteljem koji odaberete",
     "secrets": "Pohrani tajnu (npr. API ključ) u sistemski privjesak ključeva",
     "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru (bez interneta)"
@@ -46,6 +47,7 @@
     "chatSend": "Može objaviti chat poruku u vaše ime, samo nakon vašeg klika ili naredbe.",
     "chatSupersedes": "Tko vidi njegovu karticu, ne vidi dodatno njegov obični tekstualni redak.",
     "chatTriggers": "Čita chat poruke koje počinju njegovim okidačkim riječima, poput !poll, i nijedne druge.",
+    "chatPatterns": "Prima samo chat poruke u vašem kanalu koje počinju onako kako je naveo, poput zalijepljene opreme iz igre. Nikakav drugi tekst iz chata ne dolazi do njega.",
     "netHttp": "Može razgovarati s jednim poslužiteljem koji odaberete, i samo s njim.",
     "secrets": "Može čuvati tajnu, poput API ključa, u privjesku ključeva sustava.",
     "uiWebview": "Može prikazati vlastiti web sadržaj u zatvorenom okviru bez pristupa internetu."

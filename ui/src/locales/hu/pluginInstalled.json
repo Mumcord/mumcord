@@ -117,6 +117,7 @@
     "chatSend": "Ír a csevegésbe",
     "chatSupersedes": "Lecseréli a szöveges sorát",
     "chatTriggers": "Kiváltó szavak",
+    "chatPatterns": "Csevegőminták",
     "netHttp": "Internet-hozzáférés",
     "secrets": "Kulcstartó"
   }

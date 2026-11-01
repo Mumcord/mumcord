@@ -117,6 +117,7 @@
     "chatSend": "Pisze na czacie",
     "chatSupersedes": "Zastępuje swój wiersz tekstu",
     "chatTriggers": "Słowa wyzwalające",
+    "chatPatterns": "Wzorce czatu",
     "netHttp": "Dostęp do internetu",
     "secrets": "Klucze systemowe"
   }

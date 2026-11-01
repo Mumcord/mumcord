@@ -16,8 +16,8 @@ use mumcord_plugins::manifest::Source;
 use mumcord_plugins::package::{MANIFEST_FILE, Package};
 use mumcord_plugins::peer_key::PeerKeys;
 use mumcord_plugins::wit::events::{
-    ActionSource, ActionValue, Channel, ChatTrigger, Event, PanelVisibility, PeerMessage,
-    PluginSettings, SelfState, UiAction, Visibility,
+    ActionSource, ActionValue, Channel, ChatMatch, ChatTrigger, Event, PanelVisibility,
+    PeerMessage, PluginSettings, SelfState, UiAction, Visibility,
 };
 use mumcord_plugins::wit::peers::Target;
 use mumcord_plugins::wit::theme::Mode;
@@ -296,6 +296,12 @@ pub enum EventSpec {
         trigger: String,
         #[serde(default)]
         args: String,
+    },
+    /// A channel message matching one of the plugin's chat patterns, e.g. a pasted fit. The
+    /// pattern index is the first manifest pattern that matches `text`.
+    ChatMatch {
+        sender: u32,
+        text: String,
     },
     Mentioned(u32),
     ProfileCardOpened(u32),
@@ -597,6 +603,8 @@ pub struct Session {
     cursor: usize,
     /// The manifest's trigger words; a `chat-trigger` step must use one of them.
     triggers: Vec<String>,
+    /// The manifest's chat patterns; a `chat-match` step's text must match one of them.
+    chat_patterns: Vec<String>,
 }
 
 impl Session {
@@ -683,6 +691,11 @@ impl Session {
             outputs,
             cursor: 0,
             triggers: manifest.triggers.clone(),
+            chat_patterns: manifest
+                .chat_patterns
+                .iter()
+                .map(|p| p.pattern.clone())
+                .collect(),
         };
         if let Err(e) = session.host.enable(&session.id) {
             session.drain_host_events();
@@ -834,6 +847,18 @@ impl Session {
                     sender: self.peer(*sender)?,
                     trigger: trigger.clone(),
                     args: mumcord_plugins::triggers::clip_args(args),
+                })
+            }
+            EventSpec::ChatMatch { sender, text } => {
+                let Some(pattern_index) =
+                    mumcord_plugins::patterns::first_match(&self.chat_patterns, text)
+                else {
+                    bail!("the text matches none of the manifest's chat patterns");
+                };
+                Event::ChatMatch(ChatMatch {
+                    sender: self.peer(*sender)?,
+                    pattern_index,
+                    text: mumcord_plugins::patterns::clip_text(text),
                 })
             }
             EventSpec::Mentioned(s) => Event::Mentioned(self.peer(*s)?),
@@ -1226,13 +1251,14 @@ steps:
   - event: {self-changed: {dnd: true, muted: true, channel: Lobby}}
   - event: {chat-trigger: {sender: 2, trigger: "!poll", args: "2"}}
   - wait: 50
+  - event: {chat-match: {sender: 2, text: "[Rifter, PvP]\nDamage Control II"}}
   - expect: {tree: {slot: panel, text: "Waves: 1"}}
   - expect: {message: {to: channel, kind: 1}}
   - expect: {message: {to: 2}}
   - expect: nothing
 "#;
         let scenario: Scenario = serde_saphyr::from_str(yaml).expect("parses");
-        assert_eq!(scenario.steps.len(), 12);
+        assert_eq!(scenario.steps.len(), 13);
         assert_eq!(scenario.me.session, 1);
         assert!(matches!(
             &scenario.steps[1],
@@ -1250,7 +1276,12 @@ steps:
                 if trigger == "!poll" && args == "2"
         ));
         assert!(matches!(
-            &scenario.steps[10],
+            &scenario.steps[8],
+            Step::Event(EventSpec::ChatMatch { sender: 2, text })
+                if text == "[Rifter, PvP]\nDamage Control II"
+        ));
+        assert!(matches!(
+            &scenario.steps[11],
             Step::Expect(Expect::Message {
                 to: Some(ToSpec::Session(2)),
                 ..

@@ -24,6 +24,7 @@
     "chatSend": "Teachtaireacht chomhrá a phostáil ar do shon tar éis cliceála nó ordaithe",
     "chatSupersedes": "A líne téacs féin a cheilt orthu siúd a fheiceann a chárta",
     "chatTriggers": "Teachtaireachtaí comhrá a thosaíonn lena fhocail spreagtha a léamh, mar shampla !poll",
+    "chatPatterns": "Teachtaireachtaí comhrá áirithe a aithint, mar shampla feistis chluiche a greamaíodh",
     "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
     "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)"
@@ -46,6 +47,7 @@
     "chatSend": "Is féidir leis teachtaireacht chomhrá a phostáil ar do shon, ach amháin tar éis duit cliceáil nó ordú a chlóscríobh.",
     "chatSupersedes": "Ní fheiceann an té a fheiceann a chárta a líne téacs shimplí freisin.",
     "chatTriggers": "Léann sé teachtaireachtaí comhrá a thosaíonn lena fhocail truicir, mar !poll, agus aon cheann eile.",
+    "chatPatterns": "Ní fhaigheann sé ach teachtaireachtaí comhrá i do chainéal a thosaíonn mar a d'fhógair sé, mar shampla feisteas cluiche a greamaíodh. Ní shroicheann aon téacs comhrá eile é.",
     "netHttp": "Is féidir leis labhairt le freastalaí amháin a roghnaíonn tú, agus leis sin amháin.",
     "secrets": "Is féidir leis rún, mar eochair API, a choinneáil i eochairshlabhra do chórais.",
     "uiWebview": "Is féidir leis a ábhar gréasáin féin a thaispeáint i bhfráma séalaithe gan rochtain idirlín."

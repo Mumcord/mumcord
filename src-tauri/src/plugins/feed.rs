@@ -273,6 +273,12 @@ fn feed(service: &mut PluginService, event: PluginEngineEvent, friends: &HashSet
             &trigger,
             &args,
         ),
+        PluginEngineEvent::ChatMatch {
+            server_id,
+            sender,
+            channel,
+            text,
+        } => service.chat_match(server_id, &peer(sender, friends), channel.id, &text),
         PluginEngineEvent::Mentioned { server_id, sender } => {
             service.mentioned(server_id, &peer(sender, friends));
         }

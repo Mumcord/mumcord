@@ -24,6 +24,7 @@
     "chatSend": "Post a chat message for you after you click or type a command",
     "chatSupersedes": "Hide its own text line for people who see its card",
     "chatTriggers": "Read chat messages that start with its trigger words, such as !poll",
+    "chatPatterns": "Recognise certain chat messages, such as pasted game fits",
     "netHttp": "Talk to a server you choose",
     "secrets": "Keep a secret (e.g. an API key) in your system keychain",
     "uiWebview": "Show its own web content in a sealed frame (no internet)"
@@ -46,6 +47,7 @@
     "chatSend": "It can post a chat message in your name, only after you click or type a command.",
     "chatSupersedes": "People who see its card don't also see its plain text line.",
     "chatTriggers": "It reads chat messages that start with its trigger words, such as !poll, and no others.",
+    "chatPatterns": "It only receives chat messages in your channel that start the way it declares, such as a pasted game fit. No other chat text reaches it.",
     "netHttp": "It can talk to one server you choose, and only to that one.",
     "secrets": "It can keep a secret, such as an API key, in your system keychain.",
     "uiWebview": "It can show its own web content in a sealed frame with no internet access."

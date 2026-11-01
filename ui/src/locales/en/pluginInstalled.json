@@ -117,6 +117,7 @@
     "chatSend": "Posts in chat",
     "chatSupersedes": "Replaces its text",
     "chatTriggers": "Trigger words",
+    "chatPatterns": "Chat patterns",
     "netHttp": "Internet access",
     "secrets": "Keychain"
   }

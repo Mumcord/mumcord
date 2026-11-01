@@ -117,6 +117,7 @@
     "chatSend": "Escribe en el chat",
     "chatSupersedes": "Sustituye su línea de texto",
     "chatTriggers": "Palabras clave",
+    "chatPatterns": "Patrones de chat",
     "netHttp": "Acceso a internet",
     "secrets": "Llavero"
   }

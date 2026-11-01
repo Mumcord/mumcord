@@ -104,6 +104,20 @@ interface events {
     args: string,
   }
 
+  /// `chat.patterns`: a channel message in the user's current channel whose plain text matches
+  /// one of this plugin's declared chat patterns (manifest `chat_patterns`), e.g. a pasted EVE
+  /// Online fit. Nothing else of the chat ever reaches a plugin. Messages from blocked users
+  /// never arrive, the user's own messages do, and each sender is limited to 3 matches per
+  /// 10 seconds (more are dropped).
+  record chat-match {
+    sender: peer,
+    /// Which of the plugin's patterns matched (0 or 1); the first one wins.
+    pattern-index: u8,
+    /// The message as plain text: tags dropped, line breaks kept as `\n`, at most 4 KiB
+    /// (longer messages are cut at a character boundary). Untrusted: validate before use.
+    text: string,
+  }
+
   record http-result {
     id: request-id,
     outcome: result<http-response, http-error>,
@@ -154,5 +168,8 @@ interface events {
     webview-message(string),
     /// `chat.triggers`: someone wrote one of this plugin's trigger words in the user's channel.
     chat-trigger(chat-trigger),
+    /// `chat.patterns`: a message in the user's channel matched one of this plugin's chat
+    /// patterns.
+    chat-match(chat-match),
   }
 }

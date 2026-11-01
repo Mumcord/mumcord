@@ -160,6 +160,12 @@ pub const CATALOGUE: &[Permission] = &[
         "Read chat messages that start with its trigger words, such as !poll",
         "It reads chat messages that start with its trigger words, such as !poll, and no others.",
     ),
+    all(
+        "chat.patterns",
+        Risk::Yellow,
+        "Recognise certain chat messages, such as pasted game fits",
+        "It only receives chat messages in your channel that start the way it declares, such as a pasted game fit. No other chat text reaches it.",
+    ),
     official(
         "net.http",
         Risk::Red,
@@ -191,11 +197,11 @@ mod tests {
 
     #[test]
     fn catalogue_is_closed_and_unique() {
-        assert_eq!(CATALOGUE.len(), 20);
+        assert_eq!(CATALOGUE.len(), 21);
         let mut ids: Vec<_> = CATALOGUE.iter().map(|p| p.id).collect();
         ids.sort_unstable();
         ids.dedup();
-        assert_eq!(ids.len(), 20);
+        assert_eq!(ids.len(), 21);
         assert!(get("files").is_none());
     }
 

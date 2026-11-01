@@ -15,6 +15,8 @@ export interface PermissionListProps {
   onToggle: (id: string, on: boolean) => void;
   /** Read-only view (e.g. plugin details): optional rows show their state but cannot be changed. */
   readOnly?: boolean;
+  /** What the plugin's chat patterns recognise (its own words), shown with `chat.patterns`. */
+  chatPatterns?: readonly string[];
 }
 
 /** A decorative glyph per permission (the risk is carried by the text and colour, never the glyph). */
@@ -37,15 +39,19 @@ const ICONS: Record<string, string> = {
   "chat.send": "➤",
   "chat.supersedes": "↻",
   "chat.triggers": "⚑",
+  "chat.patterns": "⌕",
   "net.http": "🌐",
   secrets: "🔑",
 };
 
 function Row({
   id,
+  details = [],
   toggle,
 }: {
   id: string;
+  /** Plugin-provided lines about this permission; rendered as plain text. */
+  details?: readonly string[];
   toggle?: { checked: boolean; disabled: boolean; onChange: (on: boolean) => void };
 }) {
   const { t } = useTranslation("pluginPermissions");
@@ -62,6 +68,11 @@ function Row({
       <span className="perm-body">
         <span className="perm-text">{text}</span>
         {known && <span className="perm-reason">{t(`explanations.${permissionTextKey(id)}`)}</span>}
+        {details.map((line, i) => (
+          <span key={i} className="perm-detail">
+            {line}
+          </span>
+        ))}
       </span>
       {risk === "red" ? (
         <span className="perm-risk-badge">{riskLabel}</span>
@@ -106,19 +117,22 @@ export function PermissionList({
   enabled,
   onToggle,
   readOnly = false,
+  chatPatterns = [],
 }: PermissionListProps) {
   const { t } = useTranslation("pluginPermissions");
   // Required rows first, then optional ones, as one list (spec mockup).
   const rows = [...requested.filter((p) => p.required), ...requested.filter((p) => !p.required)];
+  const detailsOf = (id: string) => (id === "chat.patterns" ? chatPatterns : []);
   return (
     <ul className="perm-rows" aria-label={t("listLabel")}>
       {rows.map((p) =>
         p.required ? (
-          <Row key={p.id} id={p.id} />
+          <Row key={p.id} id={p.id} details={detailsOf(p.id)} />
         ) : (
           <Row
             key={p.id}
             id={p.id}
+            details={detailsOf(p.id)}
             toggle={{
               checked: enabled.has(p.id),
               disabled: readOnly,

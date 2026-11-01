@@ -117,6 +117,7 @@
     "chatSend": "Schrijft in de chat",
     "chatSupersedes": "Vervangt zijn tekstregel",
     "chatTriggers": "Triggerwoorden",
+    "chatPatterns": "Chatpatronen",
     "netHttp": "Internettoegang",
     "secrets": "Sleutelhanger"
   }

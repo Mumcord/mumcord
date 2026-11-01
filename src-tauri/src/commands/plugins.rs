@@ -604,6 +604,9 @@ pub struct PluginInstallOffer {
     pub optional: Vec<PluginOptionalPermission>,
     /// Preselected in the visibility choice (shown when `peers.messages` is requested).
     pub default_visibility: PluginVisibilityChoice,
+    /// What the plugin's chat patterns recognise, in the app language (shown with
+    /// `chat.patterns`). Plugin text: plain, untrusted.
+    pub chat_patterns: Vec<String>,
 }
 
 /// Which store image of an index plugin to load.
@@ -630,7 +633,7 @@ fn indexed_latest(
     ))
 }
 
-fn install_offer(id: &str, manifest: &Manifest) -> PluginInstallOffer {
+fn install_offer(id: &str, manifest: &Manifest, chat_patterns: Vec<String>) -> PluginInstallOffer {
     PluginInstallOffer {
         id: id.to_owned(),
         version: manifest.version.to_string(),
@@ -650,6 +653,7 @@ fn install_offer(id: &str, manifest: &Manifest) -> PluginInstallOffer {
             Some(ManifestVisibility::Nobody) => PluginVisibilityChoice::Nobody,
             Some(ManifestVisibility::Everyone) | None => PluginVisibilityChoice::Everyone,
         },
+        chat_patterns,
     }
 }
 
@@ -667,14 +671,18 @@ pub async fn plugin_install_prepare(
     let plugins = plugins_of(&app)?;
     let (source, entry, url, size) = indexed_latest(&plugins, &id)?;
     let client = registry_client(engine.settings()?.developer_mode)?;
-    let events = plugins.call(|service| Ok(service.events())).await?;
+    let (events, language) = plugins
+        .call(|service| Ok((service.events(), service.language().to_owned())))
+        .await?;
     let download = fetch(&client, &events, &id, &url, size)
         .await
         .map_err(plugins::service_error)?;
     let (download, offer) = tauri::async_runtime::spawn_blocking(move || {
         let verified = verify_package(&download.bytes, &entry, &download.signature, source)
             .map_err(|e| plugins::service_error(e.into()))?;
-        let offer = install_offer(&entry.id, &verified.package.manifest);
+        let package = &verified.package;
+        let chat_patterns = mumcord_plugins::i18n::chat_pattern_descriptions(package, &language);
+        let offer = install_offer(&entry.id, &package.manifest, chat_patterns);
         Ok::<_, ApiError>((download, offer))
     })
     .await
@@ -1478,7 +1486,7 @@ mod tests {
             .as_bytes(),
         )
         .expect("test step");
-        let offer = install_offer("poll", &manifest);
+        let offer = install_offer("poll", &manifest, vec!["Recognise polls".into()]);
         assert_eq!(offer.version, "1.1.0");
         assert_eq!(offer.required, ["ui.chat-card", "peers.messages"]);
         assert_eq!(
@@ -1495,6 +1503,7 @@ mod tests {
             ]
         );
         assert_eq!(offer.default_visibility, PluginVisibilityChoice::Friends);
+        assert_eq!(offer.chat_patterns, ["Recognise polls"]);
     }
 
     fn store_index(ids: &[&str]) -> Index {

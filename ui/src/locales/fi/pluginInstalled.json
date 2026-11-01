@@ -117,6 +117,7 @@
     "chatSend": "Kirjoittaa chattiin",
     "chatSupersedes": "Korvaa oman tekstirivinsä",
     "chatTriggers": "Laukaisusanat",
+    "chatPatterns": "Chat-mallit",
     "netHttp": "Internet-yhteys",
     "secrets": "Avainnippu"
   }
