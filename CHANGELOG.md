@@ -127,6 +127,7 @@
 
 ### Fixed
 
+- The example test scenario of `mumcord-plugin` (`scenarios/hello.yaml`) passes again for a plugin created with `mumcord-plugin new`
 - A plugin card now replaces its chat line right away, even when the line arrives after the card (for example a Poll card and its "Vote with !poll" line), on other clients and in your own chat
 - The chat stays scrolled to the newest message when a plugin card appears or grows after its message (for example while its images load); if you scrolled up to read, it stays where you are
 - A plugin dialog that shows a web page (for example the EVE fit plugin's fitting wheel) is now large (up to 960 × 720 pixels, shrinking with the window) instead of the narrow dialog size, and the page can show its own icons and images

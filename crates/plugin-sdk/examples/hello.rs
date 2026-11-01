@@ -26,9 +26,11 @@ fn waves() -> u32 {
 }
 
 fn render(waves: u32) {
+    // Same texts as the `mumcord-plugin new` template, so one scenario tests both.
+    let unit = if waves == 1 { "wave" } else { "waves" };
     let tree = ui::column()
         .child(ui::heading("Hello"))
-        .child(ui::text(&format!("Waves: {waves}")))
+        .child(ui::text(&format!("{waves} {unit}")))
         .child(ui::button("wave", "Wave").animate(Animation::Wave));
     if let Err(e) = ui::show(Slot::Panel, tree) {
         log::error(&format!("could not show the panel: {e}"));
