@@ -19,6 +19,9 @@ use tauri::{AppHandle, Manager};
 /// Shown in menus and the taskbar.
 const NAME: &str = "Mumcord";
 const MIME_TYPE: &str = "x-scheme-handler/mumble";
+/// Mumcord's own scheme (plugin deep links). Nobody else uses it, so the entry claims it as the
+/// default without asking.
+const OWN_MIME_TYPE: &str = "x-scheme-handler/mumcord";
 /// Marks entries Mumcord wrote itself, so it never overwrites or deletes one the user edited.
 pub(crate) const MANAGED_KEY: &str = "X-Mumcord-Managed=true";
 /// Entry the deep-link plugin used to write; replaced by the app-ID entry.
@@ -120,7 +123,7 @@ fn desktop_file(app_id: &str, program: &str) -> String {
          Icon={app_id}\n\
          Terminal=false\n\
          Categories=Network;Chat;AudioVideo;\n\
-         MimeType={MIME_TYPE};\n\
+         MimeType={MIME_TYPE};{OWN_MIME_TYPE};\n\
          StartupWMClass={app_id}\n\
          {MANAGED_KEY}\n",
         exec_program(program)
@@ -232,6 +235,9 @@ impl Install {
                 self.install_icons()?;
                 tracing::info!(path = %path.display(), "desktop entry written");
                 update_desktop_database(&self.applications());
+                // Tests write into a temp dir and must not touch the real MIME defaults.
+                #[cfg(not(test))]
+                claim_own_scheme(&file_name(&self.app_id));
             }
         }
         Ok(())
@@ -292,6 +298,31 @@ fn update_desktop_database(applications: &Path) {
             tracing::info!("update-desktop-database not installed; skipping the MIME cache update");
         }
         Err(e) => tracing::warn!(error = %e, "running update-desktop-database failed"),
+    }
+}
+
+/// Makes the entry the `mumcord://` handler unless another one is already set. Optional: the
+/// link then just does nothing.
+#[cfg(not(test))]
+fn claim_own_scheme(entry: &str) {
+    let existing = Command::new("xdg-mime")
+        .args(["query", "default", OWN_MIME_TYPE])
+        .output();
+    match existing {
+        Ok(out) if !String::from_utf8_lossy(&out.stdout).trim().is_empty() => return,
+        Ok(_) => {}
+        Err(e) => {
+            tracing::info!(error = %e, "xdg-mime not available; skipping mumcord:// handler setup");
+            return;
+        }
+    }
+    match Command::new("xdg-mime")
+        .args(["default", entry, OWN_MIME_TYPE])
+        .status()
+    {
+        Ok(status) if status.success() => {}
+        Ok(status) => tracing::warn!("xdg-mime default for mumcord:// failed: {status}"),
+        Err(e) => tracing::warn!(error = %e, "xdg-mime default for mumcord:// failed"),
     }
 }
 
@@ -410,7 +441,7 @@ mod tests {
             "Name=Mumcord",
             "Exec=\"/opt/mumcord/mumcord\" %u",
             "Icon=app.mumcord.client",
-            "MimeType=x-scheme-handler/mumble;",
+            "MimeType=x-scheme-handler/mumble;x-scheme-handler/mumcord;",
             "StartupWMClass=app.mumcord.client",
             "Categories=Network;Chat;AudioVideo;",
             "Terminal=false",

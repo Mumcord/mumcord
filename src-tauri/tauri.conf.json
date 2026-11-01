@@ -61,7 +61,7 @@
     },
     "deep-link": {
       "desktop": {
-        "schemes": ["mumble"]
+        "schemes": ["mumble", "mumcord"]
       }
     }
   }

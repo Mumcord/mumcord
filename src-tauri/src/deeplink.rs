@@ -3,7 +3,8 @@
 
 use std::sync::Mutex;
 
-use tauri::{AppHandle, Manager, Url};
+use serde::Serialize;
+use tauri::{AppHandle, Emitter, Manager, Url};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_specta::Event;
 
@@ -63,8 +64,50 @@ pub fn init(app: &AppHandle) {
     deep_link.on_open_url(move |event| open_urls(&handle, &event.urls()));
 }
 
+/// Event the UI listens to; Browse opens the details of the named plugin.
+const OPEN_PLUGIN_DETAILS_EVENT: &str = "plugins://open-details";
+
+#[derive(Serialize, Clone, Debug, PartialEq, Eq)]
+struct OpenPluginDetails {
+    id: String,
+}
+
+/// Plugin ids follow FR-6.11: `^[a-z][a-z0-9-]{2,31}$`.
+fn is_plugin_id(id: &str) -> bool {
+    let bytes = id.as_bytes();
+    (3..=32).contains(&bytes.len())
+        && bytes[0].is_ascii_lowercase()
+        && bytes[1..]
+            .iter()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || *b == b'-')
+}
+
+/// Extracts the plugin id from `mumcord://plugins/<id>`; any other link yields `None`.
+fn parse_plugin_link(url: &Url) -> Option<String> {
+    if url.scheme() != "mumcord" || url.host_str() != Some("plugins") {
+        return None;
+    }
+    let id = url.path().strip_prefix('/')?;
+    is_plugin_id(id).then(|| id.to_owned())
+}
+
+fn open_plugin_details(app: &AppHandle, id: String) {
+    window::show(app);
+    // Never installs: the UI only shows the details.
+    if let Err(e) = app.emit(OPEN_PLUGIN_DETAILS_EVENT, OpenPluginDetails { id }) {
+        tracing::warn!(error = %e, "forwarding a mumcord:// link to the UI failed");
+    }
+}
+
 fn open_urls(app: &AppHandle, urls: &[Url]) {
     for url in urls {
+        if url.scheme() == "mumcord" {
+            match parse_plugin_link(url) {
+                Some(id) => open_plugin_details(app, id),
+                None => tracing::info!("ignoring an unsupported mumcord:// link"),
+            }
+            continue;
+        }
         match parse_link(url.as_str()) {
             Ok(link) => open(app, link),
             // The link itself may hold a password, so it is not logged.
@@ -203,6 +246,48 @@ mod tests {
         assert_eq!(buffer.take(), None);
         assert_eq!(buffer.offer(opened("Raid")), Some(opened("Raid")));
         assert_eq!(buffer.take(), None);
+    }
+
+    fn plugin_link(link: &str) -> Option<String> {
+        parse_plugin_link(&Url::parse(link).expect("valid url"))
+    }
+
+    #[test]
+    fn plugin_link_yields_the_id() {
+        assert_eq!(
+            plugin_link("mumcord://plugins/dice").as_deref(),
+            Some("dice")
+        );
+        // Query parameters never change what happens: the link only opens details.
+        assert_eq!(
+            plugin_link("mumcord://plugins/dice?install=1").as_deref(),
+            Some("dice")
+        );
+    }
+
+    #[test]
+    fn other_links_are_ignored() {
+        for link in [
+            "mumcord://plugins",
+            "mumcord://plugins/",
+            "mumcord://other/dice",
+            "mumcord://plugins/Dice",
+            "mumcord://plugins/ab",
+            "mumcord://plugins/dice/",
+            "mumcord://plugins/dice/install",
+            "mumble://plugins/dice",
+        ] {
+            assert_eq!(plugin_link(link), None, "{link}");
+        }
+    }
+
+    #[test]
+    fn plugin_id_rules() {
+        assert!(is_plugin_id("a-1"));
+        assert!(is_plugin_id(&format!("a{}", "b".repeat(31))));
+        assert!(!is_plugin_id(&format!("a{}", "b".repeat(32))));
+        assert!(!is_plugin_id("1ab"));
+        assert!(!is_plugin_id("ab_c"));
     }
 
     #[test]
