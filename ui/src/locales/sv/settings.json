@@ -413,6 +413,7 @@
     "selfMute": "Du stänger av eller slår på din mikrofon",
     "selfDeaf": "Du stänger av eller slår på ljudet",
     "hangUp": "Du kopplar från en server",
+    "quit": "Du avslutar Mumcord medan du är i en röstkanal",
     "kicked": "Du blir utsparkad från en server",
     "banned": "Du blir bannlyst från en server",
     "messages": "Nytt meddelande i en följd kanal eller privat chatt",

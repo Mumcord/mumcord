@@ -287,6 +287,7 @@ const DEFAULT_SETTINGS: Settings = {
     mentionNotify: true,
     voiceJoin: true,
     hangUp: true,
+    quit: true,
     partyStarted: true,
     partyJoined: true,
     partyLeft: true,

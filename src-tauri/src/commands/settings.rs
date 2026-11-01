@@ -317,6 +317,8 @@ pub struct SoundSettings {
     pub voice_join: bool,
     /// You disconnect from a server yourself (QA.19).
     pub hang_up: bool,
+    /// You quit Mumcord while in a voice channel (#325).
+    pub quit: bool,
     pub party_started: bool,
     pub party_joined: bool,
     pub party_left: bool,
@@ -653,6 +655,7 @@ impl Settings {
                 mention_notify: s.sounds.mention_notify,
                 voice_join: s.sounds.voice_join,
                 hang_up: s.sounds.hang_up,
+                quit: s.sounds.quit,
                 party_started: s.sounds.party_started,
                 party_joined: s.sounds.party_joined,
                 party_left: s.sounds.party_left,
@@ -787,6 +790,7 @@ impl Settings {
         s.sounds.mention_notify = self.sounds.mention_notify;
         s.sounds.voice_join = self.sounds.voice_join;
         s.sounds.hang_up = self.sounds.hang_up;
+        s.sounds.quit = self.sounds.quit;
         s.sounds.party_started = self.sounds.party_started;
         s.sounds.party_joined = self.sounds.party_joined;
         s.sounds.party_left = self.sounds.party_left;
@@ -1090,6 +1094,7 @@ mod tests {
         ui.voice_threshold_dbfs = -25;
         ui.sounds.join_leave = false;
         ui.sounds.hang_up = false;
+        ui.sounds.quit = false;
         ui.sounds.share_stopped = false;
         ui.sounds.banned = false;
         ui.log_level = LogLevel::Debug;
@@ -1139,6 +1144,7 @@ mod tests {
         assert!(stored.wizard_completed);
         assert!(!stored.sounds.user_joined && !stored.sounds.user_left);
         assert!(!stored.sounds.hang_up && stored.sounds.voice_join);
+        assert!(!stored.sounds.quit);
         assert!(!stored.sounds.share_stopped && stored.sounds.party_started);
         assert!(!stored.sounds.banned && stored.sounds.kicked);
         assert_eq!(stored.log_level, store::LogLevel::Debug);
