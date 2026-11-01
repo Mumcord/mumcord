@@ -4,15 +4,15 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 
 | ID | Title | Status | Owner |
 |---|---|---|---|
-| B1 | Bring in PR #297 and all epic dependencies | in progress | b1-deps |
+| B1 | Bring in PR #297 and all epic dependencies | done | b1-deps |
 | B3 | Store: plugin tables and settings keys | in progress | b3-store |
 | B5 | Protocol: low-priority lane for plugin messages | done | b5-lane |
 | B6 | E2E: two Mumcord clients in one run | in progress | b6-e2e2 |
 | B7 | ⚠ OUTWARD: create the `Mumcord/plugins` repository skeleton | done | b7-pluginsrepo |
 | B8 | ⚠ OUTWARD (repo `Mumcord/mumbot`): module `plugins` (mumbot#20) | in progress | b8-mumbot |
 | B20 | Deep link `mumcord://plugins/<id>` | done | b20-deeplink |
-| B2 | WIT package `mumcord:plugin@1.0.0` | open | |
-| B4 | Manifest, permission catalogue and package rules to spec | open | |
+| B2 | WIT package `mumcord:plugin@1.0.0` | in progress | b2-wit |
+| B4 | Manifest, permission catalogue and package rules to spec | in progress | b4-manifest |
 | B10 | Runtime: thread per plugin, limits, back-off, cache, diagnostics | open | |
 | B11a | Host API: storage and secrets | open | |
 | B11b | Host API: timers, clock, notify, theme, random, log, permission gate, peer key | open | |
@@ -414,3 +414,5 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **K1:** registry public keys in `~/.config/mumcord-signing/plugins/{active,backup}.pub` (active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5). Embed only public keys. Signing secrets `PLUGIN_SIGNING_KEY` / `PLUGIN_SIGNING_KEY_PASSWORD` live in the `publish` environment of Mumcord/plugins.
 - **B7 (+fix 5dc6e28):** Mumcord/plugins has no repo-wide licence; each official plugin folder (`poll/`, `dice/`, `echolings/`, `mumbot-music/`) has AGPL-3.0, `template/` and `docs/` Apache-2.0. Pages at https://mumcord.github.io/plugins/; environment `publish`; branch protection 1 approval + `check`. Version files live at `plugins/<id>/versions/<ver>.toml`.
 - **B20 (bbf7f399):** Tauri event `plugins://open-details` with payload `{id}` (plain string event, not tauri-specta typed); id validated `^[a-z][a-z0-9-]{2,31}$`; other links ignored; never installs. Schemes `mumble` + `mumcord` in tauri.conf.json; Linux desktop entry lists `x-scheme-handler/mumcord`. Open: cold-start links can be lost (no buffer) → B20b; Windows runtime registration in commands/app.rs still only `mumble` → B20b.
+- **B1 (4b9bed6b, d15f8ec6, f485644f, 0023f7ba):** PR #297 work is in (`crates/plugins` manifest/package/runtime). New workspace deps: wit-bindgen 0.63, minisign-verify 0.3, minisign 0.10, hmac 0.13, toml 1, serde-saphyr 2 (reqwest, rand, ammonia, tokio, keyring, clap reused). `crates/plugins` (rust 1.97) depends on mumcord-store, minisign-verify, hmac, toml, rand, ammonia, reqwest, tokio. Stub crates `crates/plugin-sdk` (Apache-2.0, rust 1.90) and `tools/mumcord-plugin` (Apache-2.0, rust 1.97; clap, serde-saphyr, toml, minisign, zip, sha2).
+- **Lead decisions after B1:** B25a uses wit-bindgen's `export!` instead of a new `#[plugin]` proc-macro crate (no new workspace member). B25b `serve-registry` uses a minimal std::net HTTP server (no new dependency). Docs (B25/B43) note that the CLI source is Apache-2.0 but the built binary links AGPL code.
