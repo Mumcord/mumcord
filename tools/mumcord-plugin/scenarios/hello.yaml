@@ -4,6 +4,16 @@
 # A scenario starts the plugin in a mock host, sends the events of `steps` in order and checks
 # that the expected output follows. Each `expect` waits up to 1 s for a matching output after
 # the previous match. Texts match as substrings, message payloads exactly.
+#
+# Chat cards (plugins that use chat.current-message / replace / hide / is-replay):
+#   - event: {chat-match:   {sender: 2, text: "[Rifter]", message: 3, replay: true}}
+#   - event: {chat-trigger: {sender: 2, trigger: "!poll", args: "2"}}
+#     `message` names the chat message (default: the next unused number, 1, 2, ...); the plugin
+#     gets a message token only inside these two events, a foreign token is `not-permitted`.
+#     `replay: true` marks a line from stored history (chat.is-replay); like the real host, it
+#     reaches only plugins that import chat.is-replay.
+#   - expect: {replaced: {message: 3, card: fit-3}}   # chat.replace (card is optional)
+#   - expect: {hidden: {message: 2}}                  # chat.hide
 name: Waving counts, stores and tells the channel
 
 # Optional: the granted permissions (default: required + suggested optional ones).

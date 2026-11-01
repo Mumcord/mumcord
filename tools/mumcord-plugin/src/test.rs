@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 use mumcord_plugins::api::storage::Storage;
-use mumcord_plugins::chat::{GestureGate, SendError, line_hash};
+use mumcord_plugins::chat::{ChatRef, GestureGate, MessageClaims, SendError, line_hash};
 use mumcord_plugins::manifest::Source;
 use mumcord_plugins::package::{MANIFEST_FILE, Package};
 use mumcord_plugins::peer_key::PeerKeys;
@@ -35,12 +35,16 @@ const QUIET_TIME: Duration = Duration::from_millis(300);
 const POLL: Duration = Duration::from_millis(5);
 /// Largest payload of one plugin message (FR-6.34).
 const MAX_PAYLOAD: usize = 997;
+/// The server the mock host issues message tokens for.
+const MOCK_SERVER: mumcord_store::ServerId = 1;
 
 #[derive(clap::Args)]
 pub struct Args {
     /// A built `.mcplugin` package or an unpacked plugin folder.
     pub plugin: PathBuf,
-    /// Scenario files (YAML); see `tools/mumcord-plugin/scenarios/`.
+    /// Scenario files (YAML); see `tools/mumcord-plugin/scenarios/`. Chat events take
+    /// `message: N` and `replay: true`; `expect: {replaced: {message: N, card: ID}}` and
+    /// `expect: {hidden: {message: N}}` check `chat.replace` / `chat.hide`.
     #[arg(required = true)]
     pub scenarios: Vec<PathBuf>,
 }
@@ -296,12 +300,26 @@ pub enum EventSpec {
         trigger: String,
         #[serde(default)]
         args: String,
+        /// The chat message this line is, as `expect: replaced` / `hidden` name it. Defaults to
+        /// the next unused number (1, 2, …); the same number twice is the same message.
+        #[serde(default)]
+        message: Option<u64>,
+        /// The line comes from stored history (`chat.is-replay` is true). Like the real host,
+        /// the mock delivers it only to plugins that import `chat.is-replay`.
+        #[serde(default)]
+        replay: bool,
     },
     /// A channel message matching one of the plugin's chat patterns, e.g. a pasted fit. The
     /// pattern index is the first manifest pattern that matches `text`.
     ChatMatch {
         sender: u32,
         text: String,
+        /// See `chat-trigger`.
+        #[serde(default)]
+        message: Option<u64>,
+        /// See `chat-trigger`.
+        #[serde(default)]
+        replay: bool,
     },
     Mentioned(u32),
     ProfileCardOpened(u32),
@@ -398,6 +416,17 @@ pub enum Expect {
         #[serde(default)]
         error: Option<String>,
     },
+    /// The plugin put chat card `card` (any card when omitted) in the place of `message`
+    /// (`chat.replace`).
+    Replaced {
+        message: u64,
+        #[serde(default)]
+        card: Option<String>,
+    },
+    /// The plugin hid `message` (`chat.hide`).
+    Hidden {
+        message: u64,
+    },
     /// The host copied exactly this text after a `copy` step.
     Copied {
         text: String,
@@ -438,6 +467,11 @@ pub enum Output {
         card: String,
         sender: u32,
     },
+    /// `chat.replace` (`Some` card) or `chat.hide` (`None`) of a scenario message number.
+    Replaced {
+        message: u64,
+        card: Option<String>,
+    },
     Notification {
         title: String,
         body: String,
@@ -458,6 +492,8 @@ struct MockIo {
     bots: HashMap<u32, BotInfo>,
     outputs: Arc<Mutex<Vec<Output>>>,
     gestures: Mutex<GestureGate>,
+    /// The message tokens handed out with chat events, like the real host's.
+    claims: Mutex<MessageClaims>,
 }
 
 impl MockIo {
@@ -588,6 +624,17 @@ impl PluginIo for MockIo {
         self.push(Output::Supersede { card, sender });
         Ok(())
     }
+
+    fn replace_message(&self, plugin: &str, token: u64, card: Option<String>) -> Result<(), Error> {
+        let claim = lock(&self.claims)
+            .claim(plugin, token)
+            .ok_or(Error::NotPermitted)?;
+        self.push(Output::Replaced {
+            message: claim.message,
+            card,
+        });
+        Ok(())
+    }
 }
 
 /// One running plugin in the mock host.
@@ -605,6 +652,9 @@ pub struct Session {
     triggers: Vec<String>,
     /// The manifest's chat patterns; a `chat-match` step's text must match one of them.
     chat_patterns: Vec<String>,
+    /// The highest scenario message number used so far; `chat-*` steps without a `message` get
+    /// the next one.
+    last_message: u64,
 }
 
 impl Session {
@@ -653,6 +703,7 @@ impl Session {
             bots,
             outputs: Arc::clone(&outputs),
             gestures: Mutex::default(),
+            claims: Mutex::default(),
         });
         let ctx = Arc::new(HostContext {
             storage,
@@ -696,6 +747,7 @@ impl Session {
                 .iter()
                 .map(|p| p.pattern.clone())
                 .collect(),
+            last_message: 0,
         };
         if let Err(e) = session.host.enable(&session.id) {
             session.drain_host_events();
@@ -745,7 +797,21 @@ impl Session {
         match step {
             Step::Event(spec) => {
                 let event = self.event(spec)?;
-                self.host.send(&self.id, event);
+                let chat = match spec {
+                    EventSpec::ChatMatch {
+                        message, replay, ..
+                    }
+                    | EventSpec::ChatTrigger {
+                        message, replay, ..
+                    } => Some((*message, *replay)),
+                    _ => None,
+                };
+                match chat {
+                    Some((message, replay)) => self.send_chat(event, message, replay),
+                    None => {
+                        self.host.send(&self.id, event);
+                    }
+                }
                 Ok(())
             }
             Step::Wait(ms) => {
@@ -755,6 +821,19 @@ impl Session {
             Step::Copy(spec) => self.copy(spec),
             Step::Expect(expect) => self.expect(expect),
         }
+    }
+
+    /// Sends a chat event with a token for its message, valid only while the plugin handles it
+    /// (the real host hands the token out the same way).
+    fn send_chat(&mut self, event: Event, message: Option<u64>, replay: bool) {
+        let message = message.unwrap_or(self.last_message + 1);
+        self.last_message = self.last_message.max(message);
+        let token = lock(&self.io.claims).issue(&self.id, MOCK_SERVER, message);
+        let chat = ChatRef {
+            token: Some(token),
+            replay,
+        };
+        self.host.send_chat(&self.id, event, chat);
     }
 
     /// Plays the host's side of a copy-button click: finds the button in the slot's latest tree
@@ -839,6 +918,7 @@ impl Session {
                 sender,
                 trigger,
                 args,
+                ..
             } => {
                 if !self.triggers.contains(trigger) {
                     bail!("the manifest does not declare the trigger \"{trigger}\"");
@@ -849,7 +929,7 @@ impl Session {
                     args: mumcord_plugins::triggers::clip_args(args),
                 })
             }
-            EventSpec::ChatMatch { sender, text } => {
+            EventSpec::ChatMatch { sender, text, .. } => {
                 let Some(pattern_index) =
                     mumcord_plugins::patterns::first_match(&self.chat_patterns, text)
                 else {
@@ -1123,6 +1203,20 @@ fn matches(expect: &Expect, output: &Output) -> bool {
         (Expect::MenuEntry { label, sessions }, Output::MenuEntry(l, s)) => {
             label == l && (sessions.is_none() || sessions == s)
         }
+        (
+            Expect::Replaced { message, card },
+            Output::Replaced {
+                message: m,
+                card: Some(c),
+            },
+        ) => message == m && card.as_ref().is_none_or(|card| card == c),
+        (
+            Expect::Hidden { message },
+            Output::Replaced {
+                message: m,
+                card: None,
+            },
+        ) => message == m,
         (Expect::Stopped { error }, Output::Stopped(e)) => contains(e, error.as_ref()),
         (Expect::Copied { text }, Output::Copied(t)) => text == t,
         _ => false,
@@ -1186,6 +1280,14 @@ fn summary(output: &Output) -> String {
         ),
         Output::Chat(line) => format!("chat {line:?}"),
         Output::Supersede { card, sender } => format!("supersede card {card:?} of {sender}"),
+        Output::Replaced {
+            message,
+            card: Some(card),
+        } => format!("message {message} replaced by card {card:?}"),
+        Output::Replaced {
+            message,
+            card: None,
+        } => format!("message {message} hidden"),
         Output::Notification { title, body } => format!("notification {title:?} {body:?}"),
         Output::Stopped(error) => format!("stopped: {error}"),
         Output::Copied(text) => format!("copied {text:?}"),
@@ -1256,9 +1358,28 @@ steps:
   - expect: {message: {to: channel, kind: 1}}
   - expect: {message: {to: 2}}
   - expect: nothing
+  - event: {chat-trigger: {sender: 2, trigger: "!poll", message: 4, replay: true}}
+  - expect: {replaced: {message: 4, card: c1}}
+  - expect: {hidden: {message: 4}}
 "#;
         let scenario: Scenario = serde_saphyr::from_str(yaml).expect("parses");
-        assert_eq!(scenario.steps.len(), 13);
+        assert_eq!(scenario.steps.len(), 16);
+        assert!(matches!(
+            &scenario.steps[13],
+            Step::Event(EventSpec::ChatTrigger {
+                message: Some(4),
+                replay: true,
+                ..
+            })
+        ));
+        assert!(matches!(
+            &scenario.steps[14],
+            Step::Expect(Expect::Replaced { message: 4, card: Some(c) }) if c == "c1"
+        ));
+        assert!(matches!(
+            &scenario.steps[15],
+            Step::Expect(Expect::Hidden { message: 4 })
+        ));
         assert_eq!(scenario.me.session, 1);
         assert!(matches!(
             &scenario.steps[1],
@@ -1272,12 +1393,12 @@ steps:
         ));
         assert!(matches!(
             &scenario.steps[6],
-            Step::Event(EventSpec::ChatTrigger { sender: 2, trigger, args })
+            Step::Event(EventSpec::ChatTrigger { sender: 2, trigger, args, message: None, replay: false })
                 if trigger == "!poll" && args == "2"
         ));
         assert!(matches!(
             &scenario.steps[8],
-            Step::Event(EventSpec::ChatMatch { sender: 2, text })
+            Step::Event(EventSpec::ChatMatch { sender: 2, text, message: None, replay: false })
                 if text == "[Rifter, PvP]\nDamage Control II"
         ));
         assert!(matches!(
@@ -1382,6 +1503,7 @@ steps:
             )]),
             outputs: Arc::default(),
             gestures: Mutex::default(),
+            claims: Mutex::default(),
         };
         let filter = UserMenuFilter {
             bot_name: None,
@@ -1413,6 +1535,7 @@ steps:
             bots: HashMap::new(),
             outputs: Arc::default(),
             gestures: Mutex::default(),
+            claims: Mutex::default(),
         };
         assert_eq!(io.open_panel_popover("poll"), Err(Error::NotPermitted));
         lock(&io.gestures).gesture("poll", Instant::now());
