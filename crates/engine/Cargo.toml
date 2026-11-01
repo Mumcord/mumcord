@@ -102,7 +102,7 @@ tempfile.workspace = true
 # Paused time for the relay timeouts.
 tokio = { workspace = true, features = ["test-util"] }
 # Live tests drive scripted bots through the mumbot library.
-mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.1.1" }
+mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.3.0", features = ["tester"] }
 mumcord-store = { workspace = true, features = ["test-util"] }
 mumcord-audio = { workspace = true, features = ["test-backend"] }
 netsim = { path = "../../tools/netsim" }
