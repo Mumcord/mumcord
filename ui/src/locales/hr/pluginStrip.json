@@ -1,0 +1,9 @@
+{
+  "heading": "Dodaci",
+  "list": "Ploče dodataka",
+  "hide": "Sakrij ploče dodataka",
+  "show": "Prikaži ploče dodataka",
+  "expand": "Proširi {{name}}",
+  "close": "Zatvori",
+  "unsupported": "Ovaj poslužitelj ne podržava zajedničke funkcije dodataka"
+}

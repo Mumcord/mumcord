@@ -1,0 +1,9 @@
+{
+  "heading": "Plugins",
+  "list": "Plugin-paneler",
+  "hide": "Skjul plugin-paneler",
+  "show": "Vis plugin-paneler",
+  "expand": "Udvid {{name}}",
+  "close": "Luk",
+  "unsupported": "Denne server understøtter ikke delte plugin-funktioner"
+}

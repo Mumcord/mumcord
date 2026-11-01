@@ -20,6 +20,7 @@ import { ServerSectionHeader } from "./ServerSectionHeader";
 import { useSelectedConversation } from "./selection";
 import { selfUser, useServerState } from "./serverStore";
 import { BIG_SERVER_CHANNELS } from "./tree";
+import { PluginStrip } from "../plugins/strip";
 
 const SEARCH_DEBOUNCE_MS = 100;
 
@@ -216,6 +217,7 @@ export function ChannelsPanel({
           {joinError}
         </p>
       )}
+      <PluginStrip />
     </div>
   );
 }

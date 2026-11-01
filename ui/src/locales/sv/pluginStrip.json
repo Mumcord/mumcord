@@ -1,0 +1,9 @@
+{
+  "heading": "Tillägg",
+  "list": "Tilläggspaneler",
+  "hide": "Dölj tilläggspaneler",
+  "show": "Visa tilläggspaneler",
+  "expand": "Utöka {{name}}",
+  "close": "Stäng",
+  "unsupported": "Den här servern stöder inte delade tilläggsfunktioner"
+}

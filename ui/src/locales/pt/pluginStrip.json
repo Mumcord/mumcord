@@ -1,0 +1,9 @@
+{
+  "heading": "Plugins",
+  "list": "Painéis de plugins",
+  "hide": "Ocultar painéis de plugins",
+  "show": "Mostrar painéis de plugins",
+  "expand": "Expandir {{name}}",
+  "close": "Fechar",
+  "unsupported": "Este servidor não suporta as funções partilhadas dos plugins"
+}

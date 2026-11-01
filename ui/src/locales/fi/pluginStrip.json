@@ -1,0 +1,9 @@
+{
+  "heading": "Lisäosat",
+  "list": "Lisäosien paneelit",
+  "hide": "Piilota lisäosien paneelit",
+  "show": "Näytä lisäosien paneelit",
+  "expand": "Laajenna {{name}}",
+  "close": "Sulje",
+  "unsupported": "Tämä palvelin ei tue lisäosien yhteisiä toimintoja"
+}

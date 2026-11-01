@@ -1,0 +1,9 @@
+{
+  "heading": "Papildiniai",
+  "list": "Papildinių skydeliai",
+  "hide": "Slėpti papildinių skydelius",
+  "show": "Rodyti papildinių skydelius",
+  "expand": "Išplėsti {{name}}",
+  "close": "Uždaryti",
+  "unsupported": "Šis serveris nepalaiko bendrų papildinių funkcijų"
+}

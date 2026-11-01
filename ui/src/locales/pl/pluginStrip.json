@@ -1,0 +1,9 @@
+{
+  "heading": "Wtyczki",
+  "list": "Panele wtyczek",
+  "hide": "Ukryj panele wtyczek",
+  "show": "Pokaż panele wtyczek",
+  "expand": "Powiększ {{name}}",
+  "close": "Zamknij",
+  "unsupported": "Ten serwer nie obsługuje wspólnych funkcji wtyczek"
+}

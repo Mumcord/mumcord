@@ -1,0 +1,9 @@
+{
+  "heading": "Breiseáin",
+  "list": "Painéil bhreiseán",
+  "hide": "Folaigh painéil na mbreiseán",
+  "show": "Taispeáin painéil na mbreiseán",
+  "expand": "Leathnaigh {{name}}",
+  "close": "Dún",
+  "unsupported": "Ní thacaíonn an freastalaí seo le gnéithe comhroinnte breiseán"
+}

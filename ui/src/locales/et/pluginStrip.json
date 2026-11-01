@@ -1,0 +1,9 @@
+{
+  "heading": "Pluginad",
+  "list": "Pluginapaneelid",
+  "hide": "Peida pluginapaneelid",
+  "show": "Näita pluginapaneele",
+  "expand": "Suurenda {{name}}",
+  "close": "Sulge",
+  "unsupported": "See server ei toeta jagatud pluginafunktsioone"
+}
