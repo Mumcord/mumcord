@@ -450,6 +450,43 @@ fn changed_files_are_found_after_an_app_update_and_old_versions_cleaned() {
     assert!(fx.plugins_dir().join("poll/1.0.0").exists());
 }
 
+#[test]
+fn a_plugin_that_cannot_load_keeps_its_translated_name_and_icon() {
+    let fx = Fixture::new();
+    let (mut service, _events) = fx.service();
+    let dice = signed("dice", OK_START, "", &[]);
+    service
+        .install(&dice.request, &dice.download)
+        .expect("installs");
+    drop(service);
+
+    let installed = fx.plugins_dir().join("dice/1.0.0");
+    let extra = r#","icon":"assets/icon.svg""#;
+    std::fs::write(
+        installed.join("manifest.json"),
+        manifest("dice", "1.0.0", extra),
+    )
+    .expect("manifest");
+    std::fs::create_dir_all(installed.join("assets")).expect("assets");
+    std::fs::write(installed.join("assets/icon.svg"), "<svg/>").expect("icon");
+    std::fs::write(
+        installed.join("i18n/de.json"),
+        r#"{"manifest.name":"Würfel","manifest.description":"Würfelt"}"#,
+    )
+    .expect("translation");
+    std::fs::remove_file(installed.join("plugin.wasm")).expect("break the plugin");
+
+    let (mut service, _events) = fx.service();
+    service.set_language("de");
+    let plugin = info(&service, "dice");
+    assert!(matches!(plugin.status, Status::NotLoaded { .. }));
+    assert_eq!(plugin.name, "Würfel");
+    assert_eq!(plugin.description, "Würfelt");
+    assert_eq!(plugin.icon.as_deref(), Some("assets/icon.svg"));
+    assert_eq!(service.files_dir("dice"), Some(installed));
+    assert!(service.dir("dice").is_none(), "nothing loaded");
+}
+
 fn dev_folder(root: &Path, id: &str, extra: &str) -> PathBuf {
     let dir = root.join(format!("src-{id}"));
     std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");

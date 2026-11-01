@@ -175,6 +175,33 @@ pub struct PluginInfo {
     pub authors: Vec<String>,
 }
 
+/// The manifest in a plugin's installed folder, read for display only (nothing is checked beyond
+/// parsing). `None` when it is missing, broken or belongs to another plugin.
+fn installed_manifest(dir: &Path, id: &str) -> Option<crate::manifest::Manifest> {
+    let path = dir.join(crate::package::MANIFEST_FILE);
+    let too_large = |len: u64| len > crate::manifest::MAX_MANIFEST_BYTES as u64;
+    let read = std::fs::metadata(&path)
+        .and_then(|meta| {
+            if too_large(meta.len()) {
+                Err(io::Error::other("manifest too large"))
+            } else {
+                std::fs::read(&path)
+            }
+        })
+        .map_err(|error| error.to_string())
+        .and_then(|bytes| {
+            crate::manifest::Manifest::parse(&bytes).map_err(|error| error.to_string())
+        });
+    match read {
+        Ok(manifest) if manifest.id == id => Some(manifest),
+        Ok(_) => None,
+        Err(error) => {
+            tracing::debug!(plugin = id, %error, "no manifest to show for a plugin");
+            None
+        }
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum ServiceError {
     #[error(transparent)]
@@ -404,6 +431,22 @@ impl PluginService {
         self.host.dir(id)
     }
 
+    /// The plugin's installed files (assets, translations), also when it could not be loaded.
+    pub fn files_dir(&self, id: &str) -> Option<PathBuf> {
+        let record = self.record(id).ok()?;
+        self.files_dir_of(&record)
+    }
+
+    fn files_dir_of(&self, record: &PluginRecord) -> Option<PathBuf> {
+        if let Some(dir) = self.host.dir(&record.id) {
+            return Some(dir.to_owned());
+        }
+        Some(match Origin::parse(&record.source)? {
+            Origin::Dev(folder) => folder,
+            _ => self.version_dir(&record.id, &record.version),
+        })
+    }
+
     /// Every third-party repository's id and name, for the "Unofficial · <name>" label (FR-6.61).
     pub fn repository_names(&self) -> Result<Vec<(i64, String)>, ServiceError> {
         Ok(self
@@ -497,7 +540,21 @@ impl PluginService {
 
     fn info(&self, record: PluginRecord, badge: Option<&str>) -> PluginInfo {
         let origin = Origin::parse(&record.source);
-        let manifest = self.host.manifest(&record.id);
+        let dir = self.files_dir_of(&record);
+        // A plugin that could not be loaded still shows the name and icon of its installed files.
+        let unloaded;
+        let manifest = match self.host.manifest(&record.id) {
+            Some(manifest) => Some(manifest),
+            None => {
+                unloaded = dir
+                    .as_deref()
+                    .and_then(|dir| installed_manifest(dir, &record.id));
+                unloaded.as_ref()
+            }
+        };
+        let text = manifest
+            .zip(dir.as_deref())
+            .map(|(manifest, dir)| crate::i18n::display_text(manifest, dir, &self.language));
         let status = if self.no_plugins {
             Status::NoPlugins
         } else if let Some(error) = self.load_errors.get(&record.id) {
@@ -519,9 +576,7 @@ impl PluginService {
         };
         let revocation = self.revocation_notice(&record);
         PluginInfo {
-            name: manifest.map(|m| m.name.clone()).unwrap_or_default(),
             icon: manifest.and_then(|m| m.icon.clone()),
-            description: manifest.map(|m| m.description.clone()).unwrap_or_default(),
             authors: manifest.map(|m| m.authors.clone()).unwrap_or_default(),
             required: manifest
                 .map(|m| m.permissions.required.clone())
@@ -534,6 +589,8 @@ impl PluginService {
                 Some(Origin::Dev(path)) => Some(path),
                 _ => None,
             },
+            name: text.as_ref().map(|t| t.name.clone()).unwrap_or_default(),
+            description: text.map(|t| t.description).unwrap_or_default(),
             status,
             badge: badge == Some(record.id.as_str()),
             id: record.id,

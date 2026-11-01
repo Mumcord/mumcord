@@ -1103,9 +1103,9 @@ pub async fn plugin_asset(app: AppHandle, id: String, path: String) -> ApiResult
         .filter(|_| mumcord_plugins::api::ui::is_asset_path(&path))
         .ok_or_else(|| invalid("not an image inside assets/"))?;
     let dir = plugins_of(&app)?
-        .call(move |service| Ok(service.dir(&id).map(PathBuf::from)))
+        .call(move |service| Ok(service.files_dir(&id)))
         .await?
-        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin is not running"))?;
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin is not installed"))?;
     let not_found = |_| ApiError::new(ErrorCode::NotFound, "no such asset");
     let assets = tokio::fs::canonicalize(dir.join("assets"))
         .await

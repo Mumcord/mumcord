@@ -224,6 +224,45 @@ describe("InstalledTab", () => {
     });
   });
 
+  it("shows the name and icon of a plugin that could not be loaded, with its actions", async () => {
+    withPlugins([
+      plugin({
+        id: "dice",
+        name: "Würfel",
+        version: "0.4.1",
+        status: { kind: "notLoaded", error: "incompatible" },
+        icon: "assets/icon.svg",
+      }),
+    ]);
+    vi.spyOn(api, "pluginAsset").mockResolvedValue({
+      mimeType: "image/svg+xml",
+      base64: "PHN2Zy8+",
+    });
+    vi.spyOn(api, "pluginUpdates").mockResolvedValue([
+      {
+        id: "dice",
+        name: "Würfel",
+        from: "0.4.1",
+        to: "0.5.0",
+        source: { kind: "official" },
+        size: 10,
+        approval: null,
+        failed: null,
+      },
+    ]);
+    const { container } = render(<InstalledTab />);
+    expect(await screen.findByText("Could not be loaded")).toBeInTheDocument();
+    expect(container.querySelector(".plugins-installed-name")).toHaveTextContent("Würfel");
+    expect(screen.queryByText("dice")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(container.querySelector(".plugins-installed-icon__image")).not.toBeNull();
+    });
+    expect(
+      await screen.findByRole("button", { name: "Update", description: "Würfel" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
   it("lists the active permissions as chips in a fixed order", () => {
     expect(
       permissionChips(
