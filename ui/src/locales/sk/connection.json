@@ -73,6 +73,8 @@
     "bandwidthLabel": "Odhadovaná šírka pásma vrátane hlavičiek",
     "bandwidthValue": "≈ {{value}} z {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} z {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Pruh zoranžovie od 80 % limitu servera a nad ním zčervenie.",
     "bandwidthHintWithin": "S režimom nízkej latencie: ≈ {{value}} kbit/s (pakety po 10 ms), stále v limite.",
     "bandwidthHintOver": "S režimom nízkej latencie: ≈ {{value}} kbit/s (pakety po 10 ms), nad limitom.",
     "bandwidthHintNoLimit": "S režimom nízkej latencie: ≈ {{value}} kbit/s (pakety po 10 ms).",

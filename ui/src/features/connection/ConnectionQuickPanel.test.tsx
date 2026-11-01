@@ -116,7 +116,16 @@ describe("ConnectionQuickPanel", () => {
     const panel = await openQuick();
     // 64 kbit/s voice plus 14.8 kbit/s of headers for 20 ms packets.
     await within(panel).findByText("≈ 79 of 128 kbit/s");
-    expect(within(panel).getByRole("meter")).toHaveAccessibleName(/Estimated bandwidth/);
+    const meter = within(panel).getByRole("meter");
+    expect(meter).toHaveAccessibleName(/Estimated bandwidth/);
+    expect(meter).toHaveAttribute("aria-valuetext", "79 of 128 kbit/s (62 %)");
+    expect(meter).toHaveAttribute("data-level", "normal");
+    // Label wraps on its own, "?" and value never shrink, so they cannot collide or wrap apart.
+    const label = within(panel).getByText("Estimated bandwidth");
+    expect(label).toHaveClass("connection-quick__bandwidth-text");
+    expect(label.parentElement).toHaveClass("connection-quick__bandwidth-label");
+    expect(label.parentElement?.parentElement).toHaveClass("connection-quick__bandwidth-row");
+    expect(within(panel).getByText("≈ 79 of 128 kbit/s").tagName).toBe("STRONG");
     expect(
       within(panel).getByRole("button", { name: /More information: Estimated bandwidth/ }).dataset
         .tooltip,

@@ -71,6 +71,8 @@
     "bandwidthLabel": "Hinnanguline ribalaius päistega",
     "bandwidthValue": "≈ {{value}} / {{limit}} kbit/s",
     "bandwidthValueNoLimit": "≈ {{value}} kbit/s",
+    "bandwidthMeterText": "{{value}} / {{limit}} kbit/s ({{percent}} %)",
+    "bandwidthThresholds": "Riba muutub merevaigukollaseks alates 80 %-st serveri piirist ja punaseks selle ületamisel.",
     "bandwidthHintWithin": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid), endiselt piirangu sees.",
     "bandwidthHintOver": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid), üle piirangu.",
     "bandwidthHintNoLimit": "Väikese viivitusega režiimis: ≈ {{value}} kbit/s (10 ms paketid).",

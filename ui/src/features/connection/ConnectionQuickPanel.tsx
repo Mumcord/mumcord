@@ -11,7 +11,7 @@ import {
   useActiveAudioProfile,
   type ProfileField,
 } from "../channelaudio";
-import { estimateBandwidth } from "./bandwidth";
+import { bandwidthLevel, estimateBandwidth } from "./bandwidth";
 import { InfoTip } from "../../components/InfoTip";
 import { useServers } from "../servers";
 import { AudioRatingBadge, AudioRatingReason } from "./AudioHealthRating";
@@ -73,6 +73,8 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
             : "quick.bandwidthHintOver",
         { value: Math.round(withLowLatency) },
       );
+  const bandwidthTip =
+    limit === null ? bandwidthHint : `${bandwidthHint} ${t("quick.bandwidthThresholds")}`;
   const warning = [
     bandwidth
       ? t("quick.warningBandwidth", {
@@ -176,10 +178,10 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
       ) : null}
       {bandwidth ? (
         <section className="connection-quick__section connection-quick__bandwidth">
-          <p className="connection-quick__effective">
-            <span id={meterId}>
-              {t("quick.bandwidthLabel")}
-              <InfoTip label={more(t("quick.bandwidthLabel"))} text={bandwidthHint} />
+          <p className="connection-quick__effective connection-quick__bandwidth-row">
+            <span className="connection-quick__bandwidth-label" id={meterId}>
+              <span className="connection-quick__bandwidth-text">{t("quick.bandwidthLabel")}</span>
+              <InfoTip label={more(t("quick.bandwidthLabel"))} text={bandwidthTip} />
             </span>
             <strong>
               {limit === null
@@ -187,16 +189,26 @@ export function ConnectionQuickPanel({ onOpenVoiceSettings }: { onOpenVoiceSetti
                 : t("quick.bandwidthValue", { value: Math.round(bandwidth.kbps), limit })}
             </strong>
           </p>
-          {bandwidth.share !== null ? (
-            <meter
+          {bandwidth.share !== null && limit !== null ? (
+            <div
+              role="meter"
               aria-labelledby={meterId}
-              min={0}
-              max={1}
-              low={0.7}
-              high={0.9}
-              optimum={0}
-              value={bandwidth.share}
-            />
+              aria-valuemin={0}
+              aria-valuemax={limit}
+              aria-valuenow={Math.round(bandwidth.kbps)}
+              aria-valuetext={t("quick.bandwidthMeterText", {
+                value: Math.round(bandwidth.kbps),
+                limit,
+                percent: Math.round(bandwidth.share * 100),
+              })}
+              className="connection-quick__meter"
+              data-level={bandwidthLevel(bandwidth.share)}
+            >
+              <span
+                className="connection-quick__meter-fill"
+                style={{ width: `${String(Math.min(bandwidth.share, 1) * 100)}%` }}
+              />
+            </div>
           ) : null}
         </section>
       ) : null}
