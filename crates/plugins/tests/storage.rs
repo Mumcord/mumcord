@@ -1,11 +1,13 @@
 //! `storage` through the real sandbox: a tiny plugin writes a value at start and the test
 //! checks the database, so the WIT wiring (scope, key, value, error codes) is covered end to end.
+//! Every event writes "v2" to the global scope, for the call-budget tests.
 
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use mumcord_plugins::api::storage::Storage;
+use mumcord_plugins::wit::events::Event;
 use mumcord_plugins::{CallError, HostContext, HostEvent, PluginHost};
 use mumcord_store::{PluginRecord, PluginVisibility, Store};
 use semver::Version;
@@ -20,9 +22,12 @@ const PLUGIN: &str = r#"
   (global $heap (mut i32) (i32.const 4096))
   (data (i32.const 32) "k")
   (data (i32.const 40) "v1")
+  (data (i32.const 44) "v2")
   (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
     (local $p i32)
-    (local.set $p (global.get $heap))
+    ;; Aligned to the requested alignment (events carry 4-byte fields).
+    (local.set $p (i32.and (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
     (global.set $heap (i32.add (local.get $p) (local.get 3)))
     (local.get $p))
   (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
@@ -37,7 +42,12 @@ const PLUGIN: &str = r#"
         (return (i32.const 64))))
     (i32.store8 (i32.const 64) (i32.const 0))
     (i32.const 64))
-  (func (export "on-event") (param i32))
+  (func (export "on-event") (param i32)
+    (call $set (i32.const 1) (i32.const 32) (i32.const 1) (i32.const 44) (i32.const 2)
+      (i32.const 100))
+    ;; A function entry checks the epoch deadline once the host call has returned.
+    (call $own_work))
+  (func $own_work)
   (func (export "stop"))
 )"#;
 const IDENTITY: &str = "0";
@@ -166,5 +176,60 @@ fn the_identity_scope_without_an_identity_is_invalid() {
     assert_eq!(
         refused_with(&mut s.events),
         CallError::Refused(INVALID.into())
+    );
+}
+
+/// Holds the database lock for `hold` while the plugin's event writes, like a slow disk or
+/// the engine writing history. Returns the failure, if the call was stopped.
+fn event_while_the_database_is_busy(hold: Duration) -> Option<CallError> {
+    let mut s = setup("keeper");
+    let dir = plugin_dir(s._root.path(), "keeper", GLOBAL);
+    s.host.load(&dir, None).expect("loads");
+    s.host.enable("keeper").expect("starts");
+    {
+        let _busy = s.store.lock().expect("lock");
+        assert!(s.host.send("keeper", Event::Timer(1)));
+        std::thread::sleep(hold);
+    }
+    let deadline = std::time::Instant::now() + Duration::from_secs(5);
+    while std::time::Instant::now() < deadline {
+        while let Ok(event) = s.events.try_recv() {
+            if let HostEvent::Failed { error, .. } = event {
+                return Some(error);
+            }
+        }
+        let stored = s
+            .store
+            .lock()
+            .expect("lock")
+            .plugin_kv_get("keeper", "global", "k")
+            .expect("read");
+        if stored == Some(b"v2".to_vec()) {
+            // Give a late failure the chance to show up.
+            std::thread::sleep(Duration::from_millis(50));
+            return s.events.try_recv().ok().and_then(|event| match event {
+                HostEvent::Failed { error, .. } => Some(error),
+                _ => None,
+            });
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    panic!("the event never wrote");
+}
+
+/// FR-6.3 addendum: waiting for the database does not count against the 50 ms budget.
+#[test]
+fn waiting_for_storage_does_not_use_up_the_call_budget() {
+    assert_eq!(
+        event_while_the_database_is_busy(Duration::from_millis(200)),
+        None
+    );
+}
+
+#[test]
+fn a_call_is_still_stopped_at_the_hard_cap() {
+    assert_eq!(
+        event_while_the_database_is_busy(Duration::from_millis(800)),
+        Some(CallError::Timeout)
     );
 }

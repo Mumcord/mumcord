@@ -168,21 +168,25 @@ impl HostApi for StorageApi {
 
 impl storage::Host for PluginState {
     fn get(&mut self, scope: Scope, key: String) -> Result<Option<Vec<u8>>, Error> {
-        self.ctx.storage.get(&self.id, scope, &key)
+        let (ctx, id) = (&self.ctx, &self.id);
+        self.clock.waiting(|| ctx.storage.get(id, scope, &key))
     }
 
     fn set(&mut self, scope: Scope, key: String, value: Vec<u8>) -> Result<(), Error> {
-        self.ctx
-            .storage
-            .set(&self.id, self.storage_quota, scope, &key, &value)
+        let (ctx, id, quota) = (&self.ctx, &self.id, self.storage_quota);
+        self.clock
+            .waiting(|| ctx.storage.set(id, quota, scope, &key, &value))
     }
 
     fn delete(&mut self, scope: Scope, key: String) -> Result<(), Error> {
-        self.ctx.storage.delete(&self.id, scope, &key)
+        let (ctx, id) = (&self.ctx, &self.id);
+        self.clock.waiting(|| ctx.storage.delete(id, scope, &key))
     }
 
     fn list_keys(&mut self, scope: Scope, prefix: String) -> Result<Vec<String>, Error> {
-        self.ctx.storage.list_keys(&self.id, scope, &prefix)
+        let (ctx, id) = (&self.ctx, &self.id);
+        self.clock
+            .waiting(|| ctx.storage.list_keys(id, scope, &prefix))
     }
 }
 

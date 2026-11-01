@@ -13,7 +13,9 @@ use std::time::{Duration, Instant};
 use semver::Version;
 use tokio::sync::mpsc::UnboundedSender;
 use wasmtime::component::{Component, InstancePre, Linker};
-use wasmtime::{Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap};
+use wasmtime::{
+    Config, Engine, ResourceLimiter, Store, StoreLimits, StoreLimitsBuilder, Trap, UpdateDeadline,
+};
 
 use crate::api;
 use crate::api::files::Files;
@@ -47,6 +49,9 @@ pub const EPOCH_TICK: Duration = Duration::from_millis(10);
 pub const CALL_TICKS: u64 = 5;
 /// Ticks `start` may use: 500 ms.
 pub const START_TICKS: u64 = 50;
+/// Wall-clock limit of any call, including the time spent waiting in host storage, which
+/// does not count against the plugin's own budget (FR-6.3 addendum).
+pub const CALL_WALL_CAP: Duration = Duration::from_millis(500);
 pub const MAX_TABLE_ELEMENTS: usize = 10_000;
 /// Core instances per plugin. A component from wit-bindgen is a few core modules (the plugin
 /// plus small adapter shims), so this is more than one but still tight.
@@ -215,7 +220,51 @@ pub struct PluginState {
     pub(crate) http: HttpSet,
     /// The FR-6.42 update rate per UI slot.
     pub(crate) ui: api::ui::UiLimiter,
+    pub(crate) clock: CallClock,
     limiter: Limiter,
+}
+
+/// The current call's time. The epoch clock counts wall time, so time spent waiting for the
+/// database (lock, disk) is given back to the plugin at its deadline, up to [`CALL_WALL_CAP`].
+#[derive(Debug)]
+pub(crate) struct CallClock {
+    started: Instant,
+    waited: Duration,
+    refunded: Duration,
+}
+
+impl Default for CallClock {
+    fn default() -> Self {
+        Self {
+            started: Instant::now(),
+            waited: Duration::ZERO,
+            refunded: Duration::ZERO,
+        }
+    }
+}
+
+impl CallClock {
+    /// Runs a host call whose time is waiting, not the plugin's own work.
+    pub(crate) fn waiting<T>(&mut self, f: impl FnOnce() -> T) -> T {
+        let started = Instant::now();
+        let result = f();
+        self.waited += started.elapsed();
+        result
+    }
+
+    /// At the deadline: stop the plugin unless waiting time is still to be given back.
+    fn deadline(&mut self) -> UpdateDeadline {
+        if self.started.elapsed() >= CALL_WALL_CAP {
+            return UpdateDeadline::Interrupt;
+        }
+        let owed = self.waited.saturating_sub(self.refunded);
+        let ticks = u64::try_from(owed.as_nanos() / EPOCH_TICK.as_nanos()).unwrap_or(u64::MAX);
+        if ticks == 0 {
+            return UpdateDeadline::Interrupt;
+        }
+        self.refunded += EPOCH_TICK * u32::try_from(ticks).unwrap_or(u32::MAX);
+        UpdateDeadline::Continue(ticks)
+    }
 }
 
 /// The FR-6.3 store limits, plus the current memory size for Diagnostics.
@@ -344,6 +393,7 @@ impl Compiled {
                 .http
                 .set(Arc::clone(&params.id), Weak::clone(&params.queue)),
             ui: api::ui::UiLimiter::default(),
+            clock: CallClock::default(),
             limiter: Limiter {
                 limits,
                 diag: Arc::clone(&params.diag),
@@ -351,9 +401,10 @@ impl Compiled {
         };
         let mut store = Store::new(&self.engine, state);
         store.limiter(|state| &mut state.limiter);
-        store.epoch_deadline_trap();
+        store.epoch_deadline_callback(|mut state| Ok(state.data_mut().clock.deadline()));
 
         store.set_epoch_deadline(START_TICKS);
+        store.data_mut().clock = CallClock::default();
         let started = Instant::now();
         let result = self.pre.instantiate(&mut store).and_then(|plugin| {
             let info = StartInfo {
@@ -375,6 +426,7 @@ impl Compiled {
 impl Instance {
     pub(crate) fn on_event(&mut self, event: &Event) -> Result<(), CallError> {
         self.store.set_epoch_deadline(CALL_TICKS);
+        self.store.data_mut().clock = CallClock::default();
         let started = Instant::now();
         let result = self.plugin.call_on_event(&mut self.store, event);
         self.store.data().diag.add_cpu(started.elapsed());
@@ -384,6 +436,7 @@ impl Instance {
     /// Calls `stop`. The instance is dropped afterwards either way.
     pub(crate) fn stop(mut self) -> Result<(), CallError> {
         self.store.set_epoch_deadline(CALL_TICKS);
+        self.store.data_mut().clock = CallClock::default();
         let started = Instant::now();
         let result = self.plugin.call_stop(&mut self.store);
         self.store.data().diag.add_cpu(started.elapsed());
