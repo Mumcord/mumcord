@@ -157,11 +157,17 @@ export function ChatMount() {
     ) : view.cinema === "share" ? (
       <ScreenShareView />
     ) : null;
-  // The cinema view (issue #163) sits under the conversation header, so the channel name and its
-  // actions stay at the top and the chat stays usable below it. Focus shows the picture alone; the
-  // mini bar is what remains when the view is left.
-  if (media !== null && view.focus) return media;
-  const chat = (
+  // The channel header always stays at the very top (issue #163): the sharer bar, the mini bars
+  // and the cinema view all sit below it, and focus keeps it while hiding the messages.
+  const bars =
+    serverId === null ? null : (
+      <>
+        <SharerBar />
+        {view.mini.watch && <WatchMiniBar serverId={serverId} />}
+        {view.mini.share && <ShareMiniBar serverId={serverId} />}
+      </>
+    );
+  return (
     <ChatView
       renderChannelTitle={(channelId) => <ChannelHeader channelId={channelId} />}
       renderHeaderActions={(conv) => (
@@ -171,17 +177,16 @@ export function ChatMount() {
           <NotificationBell />
         </>
       )}
-      belowHeader={media ?? undefined}
+      belowHeader={
+        bars === null && media === null ? undefined : (
+          <>
+            {bars}
+            {media}
+          </>
+        )
+      }
+      mediaOnly={media !== null && view.focus}
     />
-  );
-  if (serverId === null || view.cinema !== null) return chat;
-  return (
-    <>
-      <SharerBar />
-      {view.mini.watch && <WatchMiniBar serverId={serverId} />}
-      {view.mini.share && <ShareMiniBar serverId={serverId} />}
-      {chat}
-    </>
   );
 }
 /** The members button in the chat header, wired to the shell's member column (issue #165). */
