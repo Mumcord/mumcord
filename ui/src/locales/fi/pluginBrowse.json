@@ -90,5 +90,11 @@
   "factMinVersion": "Vaatii Mumcordin {{version}} tai uudemman",
   "factSigned": "Allekirjoitettu avaimella {{key}}",
   "factReviewed": "Ylläpitäjien tarkastama {{date}}",
-  "factAdded": "Lisätty {{date}}"
+  "factAdded": "Lisätty {{date}}",
+  "refresh": {
+    "button": "Päivitä luettelo",
+    "updated": "Päivitetty",
+    "offline": "Ei yhteyttä: näytetään tallennettu luettelo",
+    "checkFailed": "Päivitysten tarkistus epäonnistui"
+  }
 }

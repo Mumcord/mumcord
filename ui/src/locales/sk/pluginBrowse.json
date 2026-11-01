@@ -90,5 +90,11 @@
   "factMinVersion": "Vyžaduje Mumcord {{version}} alebo novší",
   "factSigned": "Podpísané kľúčom {{key}}",
   "factReviewed": "Skontrolované správcami dňa {{date}}",
-  "factAdded": "Pridané dňa {{date}}"
+  "factAdded": "Pridané dňa {{date}}",
+  "refresh": {
+    "button": "Obnoviť katalóg",
+    "updated": "Aktualizované",
+    "offline": "Offline: zobrazuje sa uložený zoznam",
+    "checkFailed": "Kontrola aktualizácií zlyhala"
+  }
 }

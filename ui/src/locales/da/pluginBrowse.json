@@ -90,5 +90,11 @@
   "factMinVersion": "Kræver Mumcord {{version}} eller nyere",
   "factSigned": "Signeret med nøgle {{key}}",
   "factReviewed": "Gennemgået af vedligeholderne den {{date}}",
-  "factAdded": "Tilføjet den {{date}}"
+  "factAdded": "Tilføjet den {{date}}",
+  "refresh": {
+    "button": "Opdater kataloget",
+    "updated": "Opdateret",
+    "offline": "Offline: viser den gemte liste",
+    "checkFailed": "Kontrol af opdateringer mislykkedes"
+  }
 }

@@ -9,6 +9,7 @@ import "./browse.css";
 import { loadPluginIndex, usePluginIndex } from "./indexStore";
 import { PluginCard } from "./PluginCard";
 import { PluginDetails } from "./PluginDetails";
+import { RefreshCatalogueButton } from "./RefreshCatalogueButton";
 import { CATEGORIES, visiblePlugins, type Category } from "./filter";
 import { needsRepositoryWarning } from "./source";
 
@@ -129,6 +130,7 @@ export function BrowseTab() {
         />
       ) : (
         <>
+          <RefreshCatalogueButton />
           <div className="plugin-browse-filters">
             <label htmlFor={searchId} className="visually-hidden">
               {t("searchLabel")}

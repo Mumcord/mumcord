@@ -90,5 +90,11 @@
   "factMinVersion": "Mumcord {{version}} vagy újabb szükséges",
   "factSigned": "Aláírva a következő kulccsal: {{key}}",
   "factReviewed": "A karbantartók ellenőrizték: {{date}}",
-  "factAdded": "Hozzáadva: {{date}}"
+  "factAdded": "Hozzáadva: {{date}}",
+  "refresh": {
+    "button": "Katalógus frissítése",
+    "updated": "Frissítve",
+    "offline": "Offline: a mentett lista látható",
+    "checkFailed": "A frissítések keresése nem sikerült"
+  }
 }

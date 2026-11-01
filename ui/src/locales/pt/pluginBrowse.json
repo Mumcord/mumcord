@@ -90,5 +90,11 @@
   "factMinVersion": "Requer o Mumcord {{version}} ou mais recente",
   "factSigned": "Assinado com a chave {{key}}",
   "factReviewed": "Revisto pelos mantenedores em {{date}}",
-  "factAdded": "Adicionado em {{date}}"
+  "factAdded": "Adicionado em {{date}}",
+  "refresh": {
+    "button": "Atualizar catálogo",
+    "updated": "Atualizado",
+    "offline": "Offline: a mostrar a lista guardada",
+    "checkFailed": "Falha ao procurar atualizações"
+  }
 }

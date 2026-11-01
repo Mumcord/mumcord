@@ -6,6 +6,7 @@ import { Switch } from "../../settings/components/Switch";
 import { AddRepositoryDialog } from "./AddRepositoryDialog";
 import { consumePluginRequest, usePendingPluginRequest } from "../pluginRequestStore";
 import { repositoryProblem } from "./describeError";
+import { RefreshCatalogueButton } from "../browse/RefreshCatalogueButton";
 import { KeyChangeDialog } from "./KeyChangeDialog";
 import "./repos.css";
 
@@ -78,6 +79,7 @@ export function RepositoriesTab({ mirror }: { mirror?: MirrorSetting | undefined
   return (
     <div className="plugin-repos">
       <p className="plugin-repos__hint">{t("intro")}</p>
+      <RefreshCatalogueButton />
       <div className="plugin-repos__bar">
         <button
           type="button"

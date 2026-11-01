@@ -90,5 +90,11 @@
   "factMinVersion": "Nepieciešams Mumcord {{version}} vai jaunāks",
   "factSigned": "Parakstīts ar atslēgu {{key}}",
   "factReviewed": "Uzturētāji pārbaudīja {{date}}",
-  "factAdded": "Pievienots {{date}}"
+  "factAdded": "Pievienots {{date}}",
+  "refresh": {
+    "button": "Atsvaidzināt katalogu",
+    "updated": "Atjaunināts",
+    "offline": "Bezsaistē: tiek rādīts saglabātais saraksts",
+    "checkFailed": "Atjauninājumu pārbaude neizdevās"
+  }
 }

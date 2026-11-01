@@ -90,5 +90,11 @@
   "factMinVersion": "Zahteva Mumcord {{version}} ali novejši",
   "factSigned": "Podpisano s ključem {{key}}",
   "factReviewed": "Pregledali vzdrževalci dne {{date}}",
-  "factAdded": "Dodano dne {{date}}"
+  "factAdded": "Dodano dne {{date}}",
+  "refresh": {
+    "button": "Osveži katalog",
+    "updated": "Posodobljeno",
+    "offline": "Brez povezave: prikazan je shranjeni seznam",
+    "checkFailed": "Preverjanje posodobitev ni uspelo"
+  }
 }

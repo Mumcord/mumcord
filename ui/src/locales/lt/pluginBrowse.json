@@ -90,5 +90,11 @@
   "factMinVersion": "Reikia Mumcord {{version}} ar naujesnės",
   "factSigned": "Pasirašyta raktu {{key}}",
   "factReviewed": "Prižiūrėtojų peržiūrėta {{date}}",
-  "factAdded": "Pridėta {{date}}"
+  "factAdded": "Pridėta {{date}}",
+  "refresh": {
+    "button": "Atnaujinti katalogą",
+    "updated": "Atnaujinta",
+    "offline": "Neprisijungus: rodomas išsaugotas sąrašas",
+    "checkFailed": "Nepavyko patikrinti naujinimų"
+  }
 }

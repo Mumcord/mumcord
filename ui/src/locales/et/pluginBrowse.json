@@ -90,5 +90,11 @@
   "factMinVersion": "Vajab Mumcordi {{version}} või uuemat",
   "factSigned": "Allkirjastatud võtmega {{key}}",
   "factReviewed": "Hooldajad vaatasid üle {{date}}",
-  "factAdded": "Lisatud {{date}}"
+  "factAdded": "Lisatud {{date}}",
+  "refresh": {
+    "button": "Värskenda kataloogi",
+    "updated": "Värskendatud",
+    "offline": "Võrguühenduseta: kuvatakse salvestatud loendit",
+    "checkFailed": "Uuenduste kontroll ebaõnnestus"
+  }
 }

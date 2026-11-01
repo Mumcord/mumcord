@@ -90,5 +90,11 @@
   "factMinVersion": "Teastaíonn Mumcord {{version}} nó níos nuaí",
   "factSigned": "Sínithe leis an eochair {{key}}",
   "factReviewed": "Athbhreithnithe ag na cothaitheoirí ar {{date}}",
-  "factAdded": "Curtha leis ar {{date}}"
+  "factAdded": "Curtha leis ar {{date}}",
+  "refresh": {
+    "button": "Athnuaigh an catalóg",
+    "updated": "Nuashonraithe",
+    "offline": "As líne: á thaispeáint an liosta sábháilte",
+    "checkFailed": "Theip ar sheiceáil nuashonruithe"
+  }
 }

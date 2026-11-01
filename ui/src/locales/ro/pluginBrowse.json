@@ -90,5 +90,11 @@
   "factMinVersion": "Necesită Mumcord {{version}} sau mai nou",
   "factSigned": "Semnat cu cheia {{key}}",
   "factReviewed": "Verificat de mentenanți la {{date}}",
-  "factAdded": "Adăugat la {{date}}"
+  "factAdded": "Adăugat la {{date}}",
+  "refresh": {
+    "button": "Reîmprospătează catalogul",
+    "updated": "Actualizat",
+    "offline": "Offline: se afișează lista salvată",
+    "checkFailed": "Verificarea actualizărilor a eșuat"
+  }
 }

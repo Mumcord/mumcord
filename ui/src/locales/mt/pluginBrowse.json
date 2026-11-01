@@ -90,5 +90,11 @@
   "factMinVersion": "Jeħtieġ Mumcord {{version}} jew aktar ġdid",
   "factSigned": "Iffirmat biċ-ċavetta {{key}}",
   "factReviewed": "Eżaminat mill-maintainers fi {{date}}",
-  "factAdded": "Miżjud fi {{date}}"
+  "factAdded": "Miżjud fi {{date}}",
+  "refresh": {
+    "button": "Ġedded il-katalgu",
+    "updated": "Aġġornat",
+    "offline": "Offline: qed tintwera l-lista maħżuna",
+    "checkFailed": "Ma rnexxiex il-verifika tal-aġġornamenti"
+  }
 }

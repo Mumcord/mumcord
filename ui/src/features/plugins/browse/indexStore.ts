@@ -45,6 +45,11 @@ export function loadPluginIndex(language: string): Promise<PluginIndex | null> {
   return promise;
 }
 
+/** The list as it stands now (after `loadPluginIndex` settled). */
+export function currentPluginIndex(): PluginIndexState {
+  return state;
+}
+
 /** The list, loaded again whenever a component using it mounts or the language changes. */
 export function usePluginIndex(language: string): PluginIndexState {
   useEffect(() => {

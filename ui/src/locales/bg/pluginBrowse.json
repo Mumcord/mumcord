@@ -90,5 +90,11 @@
   "factMinVersion": "Изисква Mumcord {{version}} или по-нов",
   "factSigned": "Подписано с ключ {{key}}",
   "factReviewed": "Прегледано от поддържащите на {{date}}",
-  "factAdded": "Добавено на {{date}}"
+  "factAdded": "Добавено на {{date}}",
+  "refresh": {
+    "button": "Обнови каталога",
+    "updated": "Обновено",
+    "offline": "Офлайн: показва се запазеният списък",
+    "checkFailed": "Проверката за актуализации не успя"
+  }
 }

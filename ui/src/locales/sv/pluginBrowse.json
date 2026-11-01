@@ -90,5 +90,11 @@
   "factMinVersion": "Kräver Mumcord {{version}} eller nyare",
   "factSigned": "Signerat med nyckel {{key}}",
   "factReviewed": "Granskat av underhållarna den {{date}}",
-  "factAdded": "Tillagt den {{date}}"
+  "factAdded": "Tillagt den {{date}}",
+  "refresh": {
+    "button": "Uppdatera katalogen",
+    "updated": "Uppdaterad",
+    "offline": "Offline: visar den sparade listan",
+    "checkFailed": "Sökningen efter uppdateringar misslyckades"
+  }
 }

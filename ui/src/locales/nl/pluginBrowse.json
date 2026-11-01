@@ -90,5 +90,11 @@
   "factMinVersion": "Heeft Mumcord {{version}} of nieuwer nodig",
   "factSigned": "Ondertekend met sleutel {{key}}",
   "factReviewed": "Beoordeeld door de beheerders op {{date}}",
-  "factAdded": "Toegevoegd op {{date}}"
+  "factAdded": "Toegevoegd op {{date}}",
+  "refresh": {
+    "button": "Catalogus vernieuwen",
+    "updated": "Bijgewerkt",
+    "offline": "Offline: de opgeslagen lijst wordt getoond",
+    "checkFailed": "Controleren op updates is mislukt"
+  }
 }
