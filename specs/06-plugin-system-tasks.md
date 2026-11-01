@@ -85,12 +85,13 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | M2a | Engine parses hello `bot` field → PluginPeer/PeerInfo; WIT peer gets optional `bot` {name, modules}; user-menu entry filter by bot name/module + per-session allow list for saved bots; UI shows the entry only for matching users | in progress | m2a-menu |
 | M2b | mumbot (Mumcord/mumbot): send `mumcord.hello` with an additive `bot` object {name, version, modules (enabled only)} to Mumcord sessions; new release needs user yes | open | |
 | M2c | Mumbot Music plugin: use M2a so "Configure bot" only shows on users announcing mumbot-music or already saved bots (by peer key) | open | |
-| L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | in progress | l0-sdki18n |
-| L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | open | |
-| L2 | Dice: all 24 languages via L0 | open | |
-| L3 | Echolings: all 24 languages via L0 | open | |
-| L4 | Mumbot Music: all 24 languages via L0 | open | |
-| L5 | Mumcord/plugins CI (check.yml): official plugins must ship i18n files for all 24 Mumcord languages with the same key set as en.json; template + docs explain it | open | |
+| L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | done (ff7d3e6b) | l0-sdki18n |
+| L0b | SDK i18n: full CLDR plural categories (zero/one/two/few/many/other) for the 24 languages in `tn`, falling back to `_other` | in progress | l0b-plurals |
+| L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | in progress | l1 |
+| L2 | Dice: all 24 languages via L0 | in progress | l2 |
+| L3 | Echolings: all 24 languages via L0 | in progress | l3 |
+| L4 | Mumbot Music: all 24 languages via L0 | in progress | l4 |
+| L5 | Mumcord/plugins CI (check.yml): official plugins must ship i18n files for all 24 Mumcord languages with the same key set as en.json; template + docs explain it | in progress | l5 |
 | B6v | Run e2e two-clients.e2e.ts + smoke/app.e2e.ts under the e2e lock; verify tauri:options.args (e.g. --no-plugins) reaches the app; fix harness issues | done (two-clients 2/2, app 3/3, args reach the app) | b6v-e2erun |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
@@ -516,3 +517,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - **New requirement (user, 2026-11-01):** official plugins must support ALL Mumcord languages (the 24 locales in ui/src/locales). Spec addendum in D1.
 - **User feedback (2026-11-01):** "Configure bot" must only appear on music bots, not on every user. Design: mumbot announces `mumbot-music@1` via `mumcord.plugins`; the host limits a plugin's user-menu entry to peers announcing the same plugin, plus an allow list for already saved bots.
 - **User decision (2026-11-01):** bots identify themselves in their `mumcord.hello` (a `bot` object with name, version, enabled modules). This replaces "the bot never sends hello" from Spec 04 for mumbot; addendum in D1.
+- **L0 (ff7d3e6b):** `mumcord_plugin_sdk::i18n`: `Strings::new(i18n_embed!["en", …])` or `i18n_all!()` (all 24 tags in `i18n::LANGUAGES`; a missing file is a compile error); `strings.on_event(&event) -> bool` (LanguageChanged → re-render) or `set_language(tag)`; fallback region → base → en per key; `t(key)`, `t_with(key, &[("name","x")])` for `{{name}}`, `tn(key, count, &[..])` with `key_one` / `key_other` (+ CLDR few/many/two/zero after L0b) and `{{count}}`; an unknown key returns the key + one warning. Keep `Strings` in a `thread_local!<RefCell<Strings>>` (see the template in tools/mumcord-plugin/src/new.rs).
