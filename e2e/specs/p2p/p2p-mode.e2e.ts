@@ -186,7 +186,9 @@ describe("spec 04 peer-to-peer mode without a relay (AC-4.1, 4.8–4.10, 4.23, 4
       const options = await p2pOptions();
       expect(options.map((o) => o.value)).toEqual([...MODES]);
       expect(options.map((o) => o.label)).toEqual(MODES.map((m) => EN_LABELS[m]));
-      expect(await checkedMode()).toBe("directRelay");
+      // Custom starts from the last preset picked: the arrow keys pass Maximum privacy on the
+      // way from Balanced to Custom, so its relay-only choice is preselected.
+      expect(await checkedMode()).toBe("relayOnly");
       expect(await $("fieldset.p2p-modes .p2p-modes__badge").getText()).toBe("Recommended");
       const a11y = await p2pGroupA11y();
       expect(a11y.name).toBe("Peer-to-peer mode");
