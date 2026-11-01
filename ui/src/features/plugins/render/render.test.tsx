@@ -98,9 +98,20 @@ describe("plugin UI store", () => {
     expect(s.trees.get("p")?.has("dialog")).toBe(false);
     s = applyChange(s, { plugin: "p", change: { type: "clear", slot: PANEL } });
     expect(s.trees.get("p")?.size).toBe(0);
-    s = applyChange(s, { plugin: "p", change: { type: "userMenuEntry", label: "Pet" } });
-    expect(s.menuEntries.get("p")).toBe("Pet");
-    s = applyChange(s, { plugin: "p", change: { type: "userMenuEntry", label: null } });
+    s = applyChange(s, {
+      plugin: "p",
+      change: { type: "userMenuEntry", label: "Pet", sessions: null },
+    });
+    expect(s.menuEntries.get("p")).toEqual({ label: "Pet", sessions: null });
+    s = applyChange(s, {
+      plugin: "p",
+      change: { type: "userMenuEntry", label: "Pet", sessions: [4] },
+    });
+    expect(s.menuEntries.get("p")).toEqual({ label: "Pet", sessions: [4] });
+    s = applyChange(s, {
+      plugin: "p",
+      change: { type: "userMenuEntry", label: null, sessions: null },
+    });
     expect(s.menuEntries.size).toBe(0);
   });
 

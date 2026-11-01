@@ -104,7 +104,7 @@ function PersonMenu({
   const { sent } = usePmRequests(state.serverId);
   const consent = useAcceptedConsent(state.serverId, user?.certHash ?? null);
   const block = useBlock(state.serverId, user?.certHash ?? null, user?.name ?? "");
-  const pluginEntries = usePluginMenuEntries();
+  const pluginEntries = usePluginMenuEntries(user?.session);
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);

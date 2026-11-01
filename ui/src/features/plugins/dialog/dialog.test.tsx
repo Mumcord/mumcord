@@ -1,9 +1,10 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { applyLanguage } from "../../../i18n";
 import * as store from "../render/pluginUiStore";
 import { PluginDialogHost } from "./PluginDialog";
 import { rememberDialogOpener, takeDialogOpener } from "./pluginDialogStore";
+import { usePluginMenuEntries } from "./usePluginMenuEntries";
 
 const sendEvent = vi.fn(() => Promise.resolve(null));
 vi.mock("../../../api", async (orig) => ({
@@ -76,5 +77,24 @@ describe("PluginDialogHost", () => {
     rememberDialogOpener("a", button);
     expect(takeDialogOpener("a")).toBe(button);
     expect(takeDialogOpener("a")).toBeUndefined();
+  });
+});
+
+describe("usePluginMenuEntries", () => {
+  it("shows a filtered entry only on the listed users", () => {
+    vi.spyOn(store, "usePluginUi").mockReturnValue({
+      trees: new Map(),
+      dialogs: new Map(),
+      menuEntries: new Map([
+        ["pets", { label: "Pet", sessions: null }],
+        ["mumbot-music", { label: "Configure bot", sessions: [7] }],
+      ]),
+      webviews: new Map(),
+    });
+    const labels = (session: number | undefined) =>
+      renderHook(() => usePluginMenuEntries(session)).result.current.map((e) => e.label);
+    expect(labels(7)).toEqual(["Pet", "Configure bot"]);
+    expect(labels(8)).toEqual(["Pet"]);
+    expect(labels(undefined)).toEqual([]);
   });
 });

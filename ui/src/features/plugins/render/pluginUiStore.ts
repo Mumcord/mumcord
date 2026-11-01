@@ -21,9 +21,15 @@ export interface PluginUiState {
   /** plugin id → title of its open dialog. */
   readonly dialogs: ReadonlyMap<string, string>;
   /** plugin id → its entry in the user context menu. */
-  readonly menuEntries: ReadonlyMap<string, string>;
+  readonly menuEntries: ReadonlyMap<string, PluginMenuEntryState>;
   /** plugin id → its open web view (FR-6.46). */
   readonly webviews: ReadonlyMap<string, PluginWebview>;
+}
+
+/** A user-menu entry: `sessions` lists the users it shows on, `null` means everyone. */
+export interface PluginMenuEntryState {
+  readonly label: string;
+  readonly sessions: readonly number[] | null;
 }
 
 /** An open web view; `seq` changes on every `webviewShow`, so showing a page again reloads it. */
@@ -85,7 +91,7 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
     case "userMenuEntry": {
       const menuEntries = new Map(state.menuEntries);
       if (change.label === null) menuEntries.delete(plugin);
-      else menuEntries.set(plugin, change.label);
+      else menuEntries.set(plugin, { label: change.label, sessions: change.sessions });
       return { ...state, menuEntries };
     }
     case "webviewShow": {

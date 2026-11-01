@@ -7,10 +7,17 @@ export interface PluginMenuEntry {
   label: string;
 }
 
-/** The user-menu entries plugins registered, in the order they registered them. */
-export function usePluginMenuEntries(): PluginMenuEntry[] {
+/**
+ * The user-menu entries plugins registered for the user with `session`, in the order they
+ * registered them. A plugin can limit its entry to some users (e.g. bots); none show without a
+ * session.
+ */
+export function usePluginMenuEntries(session: number | undefined): PluginMenuEntry[] {
   const { menuEntries } = usePluginUi();
-  return [...menuEntries].map(([plugin, label]) => ({ plugin, label }));
+  if (session === undefined) return [];
+  return [...menuEntries]
+    .filter(([, entry]) => entry.sessions === null || entry.sessions.includes(session))
+    .map(([plugin, entry]) => ({ plugin, label: entry.label }));
 }
 
 /** The user picked a plugin's entry for `session`; the plugin answers by opening its dialog. */
