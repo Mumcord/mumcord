@@ -96,7 +96,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F28 | (a) Host `button` gets an optional `expanded: option<bool>` (WIT additive) rendered as aria-expanded, so disclosure buttons (Dice help) announce their state; (b) CLI `preview`: dark mode must actually apply, and the popover slot must render at 420×560 (and dialog/chat-card at their sizes) | done (8a5eda44 + dice 1a5f149; bindings edited by hand → regenerate + bindings test in the next health check) | f28-a11y |
 | P4 | Poll chat card per #284 mockup: top 3 options + "Open" (opens popover) so 4+ options don't clip; plus docs/spec: "byte counter" → character counter (ui.wit comment, FR-6.41) | open | |
 | V-A | Mockup conformance: Plugins settings header, sandbox subtitle, tab counts (see scratchpad v1/deviations.md) | done (64ac8668, f22398a6; A5 sidebar update badge open) | v-a |
-| V-B | Mockup conformance: Installed tab card rows (see scratchpad v1/deviations.md) | in progress | v-b |
+| V-B | Mockup conformance: Installed tab card rows (see scratchpad v1/deviations.md) | done (5d83be6a; B7 footer + B8 badge select style open → Q1) | v-b |
 | V-C | Mockup conformance: Browse two-column grid (see scratchpad v1/deviations.md) | done (1881b87a) | v-c |
 | V-D | Mockup conformance: Plugin detail page (see scratchpad v1/deviations.md) | done (138f2d3d) | v-d |
 | V-E | Mockup conformance: Install prompt redesign (see scratchpad v1/deviations.md) | done (ed55dd0e; per-permission explanations, E4/E5 → V-D2) | v-e |
