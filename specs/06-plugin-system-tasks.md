@@ -54,7 +54,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | B41b | Echolings: social + Echo Echo | done (PR #3) | b41b-social |
 | B41c | Echolings: Snack Race (web view) | done (feat/echolings 10bb080, 44ec016, 392e1fc; kinds 6–9; real-client 2-player run in C4) | b41c-snack |
 | B42 | Mumbot Music plugin | done (Mumcord/plugins PR #6, not merged) | b42-music |
-| B43 | CI in Mumcord: plugin tests and E2E | in progress | b43-ci |
+| B43 | CI in Mumcord: plugin tests and E2E | done (f5c1a116, 1611c215, 3ea6c347; runs on PR to main; official plugins built from branch heads, pin later) | b43-ci |
 | B44 | PRIVACY.md plugins section | done | b44-privacy |
 | K1 | Official plugin registry signing key (generated locally, stored as secret, never committed) | done (public keys: ~/.config/mumcord-signing/plugins/{active,backup}.pub; active id 1CB49831E26E61AD, backup id 7989D354F5AE80C5) | k1-signkey |
 | B20b | Deep link: buffer a cold-start `plugins://open-details` until the UI takes it (pending-take command) + Windows runtime registration of `mumcord` in commands/app.rs | done | b20b-deeplink |
