@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Card from {{plugin}}"
+  },
+  "via": "via {{plugin}}",
+  "supersede": {
+    "showText": "Show text",
+    "hideText": "Hide text"
+  },
+  "command": {
+    "list": "Plugin commands",
+    "keys": "↑↓ choose · Tab complete · Enter run · Esc close",
+    "unavailable": "This command is not available right now.",
+    "failed": "The command could not be run. Please try again."
+  }
+}

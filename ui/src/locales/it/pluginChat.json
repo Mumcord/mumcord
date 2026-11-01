@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Scheda di {{plugin}}"
+  },
+  "via": "tramite {{plugin}}",
+  "supersede": {
+    "showText": "Mostra testo",
+    "hideText": "Nascondi testo"
+  },
+  "command": {
+    "list": "Comandi dei plugin",
+    "keys": "↑↓ scegli · Tab completa · Invio esegui · Esc chiudi",
+    "unavailable": "Questo comando non è disponibile al momento.",
+    "failed": "Impossibile eseguire il comando. Riprova."
+  }
+}

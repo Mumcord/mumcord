@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Tarjeta de {{plugin}}"
+  },
+  "via": "vía {{plugin}}",
+  "supersede": {
+    "showText": "Mostrar texto",
+    "hideText": "Ocultar texto"
+  },
+  "command": {
+    "list": "Comandos de plugins",
+    "keys": "↑↓ elegir · Tab completar · Intro ejecutar · Esc cerrar",
+    "unavailable": "Este comando no está disponible ahora mismo.",
+    "failed": "No se pudo ejecutar el comando. Inténtalo de nuevo."
+  }
+}

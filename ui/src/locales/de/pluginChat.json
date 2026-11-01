@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Karte von {{plugin}}"
+  },
+  "via": "über {{plugin}}",
+  "supersede": {
+    "showText": "Text anzeigen",
+    "hideText": "Text ausblenden"
+  },
+  "command": {
+    "list": "Plugin-Befehle",
+    "keys": "↑↓ wählen · Tab ergänzen · Enter ausführen · Esc schließen",
+    "unavailable": "Dieser Befehl ist gerade nicht verfügbar.",
+    "failed": "Der Befehl konnte nicht ausgeführt werden. Bitte versuche es erneut."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Kortti laajennukselta {{plugin}}"
+  },
+  "via": "{{plugin}} kautta",
+  "supersede": {
+    "showText": "Näytä teksti",
+    "hideText": "Piilota teksti"
+  },
+  "command": {
+    "list": "Laajennusten komennot",
+    "keys": "↑↓ valitse · Tab täydennä · Enter suorita · Esc sulje",
+    "unavailable": "Tämä komento ei ole juuri nyt käytettävissä.",
+    "failed": "Komentoa ei voitu suorittaa. Yritä uudelleen."
+  }
+}

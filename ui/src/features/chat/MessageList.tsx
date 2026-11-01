@@ -68,6 +68,7 @@ import { ImageMenu, type ImageMenuState } from "./ImageMenu";
 import { selectedText } from "./selectionText";
 import { revealDone, usePendingReveal } from "./reveal";
 import { CollapsedMessage } from "../blocking/CollapsedMessage";
+import { LeadingPluginCards, PluginLine } from "../plugins/chat";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -307,7 +308,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
     />
   );
   return (
-    <>
+    <PluginLine message={message}>
       {reply ? <ReplyHeader quote={reply.quote} onJump={onJump} tabIndex={tabIndex} /> : null}
       {body}
       {codeActions}
@@ -328,7 +329,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
         tabIndex={tabIndex}
         onImageClick={onImageClick}
       />
-    </>
+    </PluginLine>
   );
 }
 
@@ -879,6 +880,7 @@ export function MessageList({
               {t("list.loadFailed")}
             </p>
           ) : null}
+          <LeadingPluginCards listKey={listKey} />
           {messages.length === 0 ? (
             log.loaded ? (
               <p className="chat-list__empty">{t("empty")}</p>

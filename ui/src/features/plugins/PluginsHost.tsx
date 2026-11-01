@@ -4,6 +4,7 @@ import { usePreferences } from "../../app/preferences";
 import { PluginDialogHost } from "./dialog";
 import { PluginsPalette } from "./PluginsPalette";
 import { usePluginRequestRouter } from "./pluginRequestStore";
+import { usePluginMentions } from "./chat";
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
@@ -19,6 +20,7 @@ export function PluginsHost() {
   const { language, resolvedTheme } = usePreferences();
   const dark = resolvedTheme === "dark";
   usePluginRequestRouter();
+  usePluginMentions();
 
   useEffect(() => {
     const send = () => {

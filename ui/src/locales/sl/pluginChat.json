@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Kartica od {{plugin}}"
+  },
+  "via": "prek {{plugin}}",
+  "supersede": {
+    "showText": "Pokaži besedilo",
+    "hideText": "Skrij besedilo"
+  },
+  "command": {
+    "list": "Ukazi vtičnikov",
+    "keys": "↑↓ izberi · Tab dopolni · Enter zaženi · Esc zapri",
+    "unavailable": "Ta ukaz trenutno ni na voljo.",
+    "failed": "Ukaza ni bilo mogoče zagnati. Poskusite znova."
+  }
+}

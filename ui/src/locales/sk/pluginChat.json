@@ -1,0 +1,16 @@
+{
+  "card": {
+    "label": "Karta od {{plugin}}"
+  },
+  "via": "cez {{plugin}}",
+  "supersede": {
+    "showText": "Zobraziť text",
+    "hideText": "Skryť text"
+  },
+  "command": {
+    "list": "Príkazy doplnkov",
+    "keys": "↑↓ vybrať · Tab doplniť · Enter spustiť · Esc zavrieť",
+    "unavailable": "Tento príkaz teraz nie je k dispozícii.",
+    "failed": "Príkaz sa nepodarilo spustiť. Skúste to znova."
+  }
+}
