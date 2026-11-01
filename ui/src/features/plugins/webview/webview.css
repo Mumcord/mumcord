@@ -17,3 +17,21 @@
   border: 0;
   border-radius: var(--radius-sm);
 }
+
+/* A dialog showing a web view gets a large, fixed area; at small window sizes it shrinks to the
+   window and the page itself scrolls, never the dialog sideways. */
+.userpanel-modal__dialog.plugin-dialog--webview {
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 94vw);
+  height: min(720px, 88vh);
+  max-height: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.plugin-dialog--webview .plugin-webview {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}

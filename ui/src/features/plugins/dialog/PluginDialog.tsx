@@ -63,6 +63,8 @@ function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialog
       icon={icon === null ? undefined : <img src={icon} alt="" />}
       closeLabel={t("close")}
       onClose={close}
+      // A web page (e.g. a fitting wheel) needs more room than a component tree.
+      className={webview ? "plugin-dialog--webview" : undefined}
     >
       {webview ? (
         <PluginWebView plugin={plugin} webview={webview} title={title} />

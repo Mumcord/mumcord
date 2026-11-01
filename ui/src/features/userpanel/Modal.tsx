@@ -12,10 +12,20 @@ interface ModalProps {
   icon?: ReactNode;
   /** If set, the header gets a ✕ button with this accessible name. */
   closeLabel?: string;
+  /** Extra class on the dialog box, e.g. to size it for its content. */
+  className?: string | undefined;
 }
 
 /** Small modal dialog: Escape closes, Tab stays inside, focus starts on the first control. */
-export function Modal({ title, onClose, children, subtitle, icon, closeLabel }: ModalProps) {
+export function Modal({
+  title,
+  onClose,
+  children,
+  subtitle,
+  icon,
+  closeLabel,
+  className,
+}: ModalProps) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -58,7 +68,7 @@ export function Modal({ title, onClose, children, subtitle, icon, closeLabel }: 
     <div className="userpanel-modal">
       <div
         ref={ref}
-        className="userpanel-modal__dialog"
+        className={className ? `userpanel-modal__dialog ${className}` : "userpanel-modal__dialog"}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
