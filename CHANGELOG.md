@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Quitting Mumcord while you are in a voice channel plays a short, distinctive goodbye sound, so you notice that you just left voice. It plays on every real quit (window close set to Quit, tray Quit, the quit menu or shortcut, and restarting for an update), never when Mumcord only minimises to the tray or when you are not in voice, and it follows the output volume, deafen and its own switch in Settings > Sounds (on by default). Mumcord waits for it at most 1.5 seconds, in parallel with closing the connections; a second quit request exits at once. The sound is local only: others still see the normal leave from the server (#325)
+
 ### Fixed
 
 - The "Change" link in the Settings sidebar's "Active preset" card no longer sticks out of the card when the preset name is long (#321)

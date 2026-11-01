@@ -295,6 +295,7 @@ describe("SettingsScreen", () => {
             mentionNotify: true,
             voiceJoin: true,
             hangUp: true,
+            quit: true,
             partyStarted: true,
             partyJoined: true,
             partyLeft: true,
@@ -323,6 +324,17 @@ describe("SettingsScreen", () => {
         mention: true,
         mentionNotify: false,
       });
+    });
+  });
+
+  it("has its own quit sound switch, on by default", async () => {
+    const update = vi.spyOn(api, "settingsUpdate");
+    await openSection("Voice & Audio");
+    const quit = screen.getByRole("switch", { name: "You quit Mumcord while in a voice channel" });
+    expect(quit).toBeChecked();
+    fireEvent.click(quit);
+    await waitFor(() => {
+      expect(update.mock.lastCall?.[0].sounds).toMatchObject({ hangUp: true, quit: false });
     });
   });
 
