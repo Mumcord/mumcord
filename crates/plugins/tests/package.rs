@@ -2,7 +2,9 @@
 
 use std::io::Write;
 
-use mumcord_plugins::package::{MAX_PACKAGE_BYTES, check_unofficial_id};
+use mumcord_plugins::package::{
+    MAX_OFFICIAL_FILES, MAX_OFFICIAL_PACKAGE_BYTES, MAX_PACKAGE_BYTES, check_unofficial_id,
+};
 use mumcord_plugins::{Digest, ExpectedDigest, ManifestError, Package, PackageError, Source};
 use zip::write::SimpleFileOptions;
 
@@ -148,27 +150,10 @@ fn rejects_too_many_files_and_oversize_packages() {
     let result = with(|f| f.extend((0..200).map(|i| (format!("i18n/x{i}.json"), Vec::new()))));
     assert!(matches!(result, Err(PackageError::TooManyFiles(200))));
 
-    let official = |extra: usize| {
-        let mut files = good_files();
-        files.push(("README.md".into(), b"# Dice".to_vec()));
-        files.push(("LICENSE".into(), b"MIT".to_vec()));
-        let have = files.len();
-        files.extend((0..400 - have + extra).map(|i| {
-            let (a, b) = (b'k' + (i / 26) as u8, b'a' + (i % 26) as u8);
-            (
-                format!("i18n/{}{}.json", a as char, b as char),
-                b"{}".to_vec(),
-            )
-        }));
-        Package::read(&zip(&files), Source::Official)
-    };
-    assert!(official(0).is_ok());
-    assert!(matches!(official(1), Err(PackageError::TooManyFiles(400))));
-
     let big = vec![0u8; MAX_PACKAGE_BYTES as usize + 1];
     assert!(matches!(
         Package::read(&big, REPO),
-        Err(PackageError::TooLarge)
+        Err(PackageError::TooLarge(5))
     ));
 
     // A zip bomb in small: 9 MiB of text deflate to a few KiB, the unpacked limit catches it.
@@ -187,7 +172,7 @@ fn rejects_too_many_files_and_oversize_packages() {
     let bytes = writer.finish().expect("finish").into_inner();
     assert!(matches!(
         Package::read(&bytes, REPO),
-        Err(PackageError::UnpackedTooLarge)
+        Err(PackageError::UnpackedTooLarge(8))
     ));
 }
 
@@ -377,4 +362,97 @@ fn chat_pattern_descriptions_follow_the_app_language() {
         ["Erkennt Fittings", "Fit commands (en)"]
     );
     assert_eq!(descriptions("fr"), ["Recognise fits", "Fit commands (en)"]);
+}
+
+/// An official package with the web permission, the required files and `extra` more entries.
+fn official_web(extra: Vec<(String, Vec<u8>)>) -> Vec<(String, Vec<u8>)> {
+    let mut files = good_files();
+    files[0].1 = manifest_with(r#"{"optional":["ui.webview"]}"#);
+    files.push(("README.md".into(), b"# Dice".to_vec()));
+    files.push(("LICENSE".into(), b"MIT".to_vec()));
+    files.extend(extra);
+    files
+}
+
+#[test]
+fn official_plugins_may_bundle_a_large_web_app() {
+    let count = |n: usize| {
+        let have = official_web(Vec::new()).len();
+        let extra = (0..n - have).map(|i| (format!("web/d/{i}.json"), b"{}".to_vec()));
+        zip(&official_web(extra.collect()))
+    };
+    assert!(Package::read(&count(MAX_OFFICIAL_FILES), Source::Official).is_ok());
+    assert!(matches!(
+        Package::read(&count(MAX_OFFICIAL_FILES + 1), Source::Official),
+        Err(PackageError::TooManyFiles(10_000))
+    ));
+    // Third-party and developer plugins keep 200 files.
+    assert!(matches!(
+        Package::read(&count(201), REPO),
+        Err(PackageError::TooManyFiles(200))
+    ));
+
+    let web_types = official_web(vec![
+        ("web/index.html".into(), b"<p>".to_vec()),
+        ("web/data/sde.json".into(), b"{}".to_vec()),
+        ("web/engine.wasm".into(), b"\0asm".to_vec()),
+        ("web/font.woff2".into(), b"wOF2".to_vec()),
+    ]);
+    assert!(Package::read(&zip(&web_types), Source::Official).is_ok());
+}
+
+#[test]
+fn official_size_limits_are_larger_but_web_files_are_capped() {
+    let deflate = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+    let build = |sizes: &[(&str, usize)]| {
+        let mut writer = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
+        for (name, data) in official_web(Vec::new()) {
+            writer.start_file(name.as_str(), deflate).expect("start");
+            writer.write_all(&data).expect("write");
+        }
+        for (name, size) in sizes {
+            writer.start_file(*name, deflate).expect("start");
+            writer.write_all(&vec![b'a'; *size]).expect("write");
+        }
+        writer.finish().expect("finish").into_inner()
+    };
+    const MIB: usize = 1024 * 1024;
+
+    // Six 16 MiB files: 96 MiB unpacked is still fine for an official plugin...
+    let names = ["web/a.js", "web/b.js", "web/c.js", "web/d.js", "web/e.js"];
+    let five: Vec<_> = names.iter().map(|n| (*n, 16 * MIB)).collect();
+    assert!(Package::read(&build(&five), Source::Official).is_ok());
+    // ...but not for anyone else (the 8 MiB unpacked limit).
+    assert!(matches!(
+        Package::read(&build(&five), REPO),
+        Err(PackageError::UnpackedTooLarge(8))
+    ));
+    let mut over = five.clone();
+    over.push(("web/f.js", 16 * MIB));
+    assert!(matches!(
+        Package::read(&build(&over), Source::Official),
+        Err(PackageError::UnpackedTooLarge(96))
+    ));
+    // A single web file is capped at 16 MiB.
+    assert!(matches!(
+        Package::read(&build(&[("web/big.wasm", 16 * MIB + 1)]), Source::Official),
+        Err(PackageError::WebFileTooLarge(n)) if n == "web/big.wasm"
+    ));
+    // Assets keep their 512 KiB cap even for official plugins.
+    assert!(matches!(
+        Package::read(&build(&[("assets/big.png", 513 * 1024)]), Source::Official),
+        Err(PackageError::BadAsset(_))
+    ));
+
+    // The packed limit: 5 MiB for others, 64 MiB for official.
+    let big = vec![0u8; MAX_PACKAGE_BYTES as usize + 1];
+    assert!(!matches!(
+        Package::read(&big, Source::Official),
+        Err(PackageError::TooLarge(_))
+    ));
+    let huge = vec![0u8; MAX_OFFICIAL_PACKAGE_BYTES as usize + 1];
+    assert!(matches!(
+        Package::read(&huge, Source::Official),
+        Err(PackageError::TooLarge(64))
+    ));
 }

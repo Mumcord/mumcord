@@ -14,6 +14,9 @@ const USER_AGENT_VALUE: &str = "Mumcord";
 const MAX_REDIRECTS: usize = 3;
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 const TOTAL_TIMEOUT: Duration = Duration::from_secs(120);
+/// Slowest connection a download is still expected to finish on, so a 64 MiB official package
+/// gets minutes instead of the two a small index gets.
+const MIN_BYTES_PER_SECOND: u64 = 256 * 1024;
 
 /// Which addresses may be fetched: https always, plain http only for localhost and only in
 /// Developer mode (FR-6.74), which is also how a local test registry is served.
@@ -113,6 +116,7 @@ impl Client {
         let mut request = self
             .http
             .get(url.clone())
+            .timeout(TOTAL_TIMEOUT.max(Duration::from_secs(max as u64 / MIN_BYTES_PER_SECOND)))
             .header(USER_AGENT, USER_AGENT_VALUE);
         if let Some(etag) = etag {
             request = request.header(IF_NONE_MATCH, etag);

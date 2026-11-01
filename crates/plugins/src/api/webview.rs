@@ -32,6 +32,9 @@ const MIME_TYPES: &[(&str, &str)] = &[
     (".html", "text/html; charset=utf-8"),
     (".css", "text/css; charset=utf-8"),
     (".js", "text/javascript; charset=utf-8"),
+    (".json", "application/json"),
+    (".wasm", "application/wasm"),
+    (".woff2", "font/woff2"),
     (".png", "image/png"),
     (".webp", "image/webp"),
     (".svg", "image/svg+xml"),
@@ -111,14 +114,15 @@ pub fn mime_type(path: &str) -> Option<&'static str> {
 
 /// The Content-Security-Policy every `web/` response carries. `origin` is the scheme's origin as
 /// the system web view sees it (e.g. `mumcord-web://localhost`). Scripts, styles and images may
-/// come inline or from this plugin's own folder only; nothing may be fetched, framed, submitted
+/// come inline or from this plugin's own folder only (WebAssembly may be compiled, data files
+/// fetched and fonts loaded from there too); nothing else may be fetched, framed, submitted
 /// or used as a base. The `sandbox` directive repeats the frame's sandbox, so even a page that
 /// ends up outside its frame keeps an opaque origin without popups or navigation of others.
 pub fn content_security_policy(origin: &str, plugin: &str) -> String {
     let own = format!("{origin}/{plugin}/");
     format!(
-        "default-src 'none'; script-src {own} 'unsafe-inline'; style-src {own} 'unsafe-inline'; \
-         img-src {own} data: blob:; connect-src 'none'; frame-src 'none'; worker-src 'none'; \
+        "default-src 'none'; script-src {own} 'unsafe-inline' 'wasm-unsafe-eval'; style-src {own} 'unsafe-inline'; \
+         img-src {own} data: blob:; font-src {own}; connect-src {own}; frame-src 'none'; worker-src 'none'; \
          object-src 'none'; form-action 'none'; base-uri 'none'; sandbox allow-scripts"
     )
 }
@@ -414,8 +418,12 @@ mod tests {
     fn only_web_file_types_are_served() {
         assert_eq!(mime_type("a/b.JS"), Some("text/javascript; charset=utf-8"));
         assert_eq!(mime_type("x.svg"), Some("image/svg+xml"));
-        assert!(!is_web_path("x.wasm"));
-        assert!(!is_web_path("x.json"));
+        assert_eq!(mime_type("d/sde.json"), Some("application/json"));
+        assert_eq!(mime_type("e.wasm"), Some("application/wasm"));
+        assert_eq!(mime_type("f.woff2"), Some("font/woff2"));
+        assert!(is_web_path("x.wasm"));
+        assert!(is_web_path("x.json"));
+        assert!(!is_web_path("x.exe"));
         assert!(is_web_path("img/a-b_c.png"));
     }
 
@@ -423,8 +431,11 @@ mod tests {
     fn the_policy_blocks_the_network_and_scopes_files_to_the_plugin() {
         let csp = content_security_policy("mumcord-web://localhost", "snacks");
         assert!(csp.starts_with("default-src 'none';"));
-        assert!(csp.contains("script-src mumcord-web://localhost/snacks/ 'unsafe-inline';"));
-        assert!(csp.contains("connect-src 'none'"));
+        assert!(csp.contains(
+            "script-src mumcord-web://localhost/snacks/ 'unsafe-inline' 'wasm-unsafe-eval';"
+        ));
+        assert!(csp.contains("connect-src mumcord-web://localhost/snacks/;"));
+        assert!(csp.contains("font-src mumcord-web://localhost/snacks/;"));
         assert!(csp.contains("form-action 'none'"));
         assert!(csp.ends_with("sandbox allow-scripts"));
         assert!(!csp.contains("allow-same-origin"));

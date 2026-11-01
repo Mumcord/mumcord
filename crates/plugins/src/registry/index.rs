@@ -12,7 +12,7 @@ use super::keys::normalize_key;
 use super::{FORMAT_VERSION, MAX_REPOSITORY_PLUGINS, RegistryError};
 use crate::Digest;
 use crate::manifest::is_valid_id;
-use crate::package::{MAX_PACKAGE_BYTES, check_unofficial_id};
+use crate::package::{MAX_OFFICIAL_PACKAGE_BYTES, MAX_PACKAGE_BYTES, check_unofficial_id};
 use crate::verify::IndexEntry;
 
 /// Which kind of index is parsed; third-party indexes get the FR-6.76 rules.
@@ -275,12 +275,16 @@ fn check_plugin(
     if plugin.versions.is_empty() {
         return Err(invalid("no versions"));
     }
+    let max_size = match kind {
+        IndexKind::Official => MAX_OFFICIAL_PACKAGE_BYTES,
+        IndexKind::Repository { .. } => MAX_PACKAGE_BYTES,
+    };
     let mut versions = HashSet::new();
     for version in &plugin.versions {
         if semver::Version::parse(&version.version).is_err() || !versions.insert(&version.version) {
             return Err(invalid("bad or duplicate version"));
         }
-        if version.size == 0 || version.size > MAX_PACKAGE_BYTES {
+        if version.size == 0 || version.size > max_size {
             return Err(invalid("bad package size"));
         }
         if parse_sha256(&version.sha256).is_none() {
@@ -408,6 +412,33 @@ pub(super) mod tests {
     fn official(plugins: Vec<serde_json::Value>) -> Vec<u8> {
         serde_json::to_vec(&json!({"format": 1, "sequence": 7, "plugins": plugins}))
             .expect("test step")
+    }
+
+    #[test]
+    fn only_the_official_index_may_list_big_packages() {
+        let sized = |size: u64, wrap: fn(Vec<serde_json::Value>) -> Vec<u8>| {
+            let mut value = plugin("dice");
+            value["versions"][0]["size"] = json!(size);
+            wrap(vec![value])
+        };
+        let none = |_: &str| false;
+        let repo = IndexKind::Repository {
+            is_official_id: &none,
+        };
+        let repo_index: fn(Vec<serde_json::Value>) -> Vec<u8> = self::repo;
+        let mib = 1024 * 1024;
+        let kept = |bytes: &[u8], kind: &IndexKind<'_>| {
+            Index::parse(bytes, kind)
+                .map(|index| index.plugins.len())
+                .unwrap_or(0)
+        };
+        assert_eq!(kept(&sized(64 * mib, official), &IndexKind::Official), 1);
+        assert_eq!(
+            kept(&sized(64 * mib + 1, official), &IndexKind::Official),
+            0
+        );
+        assert_eq!(kept(&sized(5 * mib, repo_index), &repo), 1);
+        assert_eq!(kept(&sized(5 * mib + 1, repo_index), &repo), 0);
     }
 
     #[test]

@@ -9,6 +9,7 @@ use std::sync::Arc;
 
 use mumcord_plugins::api::webview::{self, SCHEME};
 use mumcord_plugins::manifest::is_valid_id;
+use mumcord_plugins::package::MAX_OFFICIAL_WEB_FILE_BYTES;
 use tauri::http::{Method, Request, Response, StatusCode, header};
 use tauri::{Manager, Runtime, UriSchemeContext, UriSchemeResponder};
 
@@ -60,6 +61,15 @@ fn respond(plugins: Option<&Plugins>, method: &Method, path: &str) -> Response<V
     let Some(found) = plugins.and_then(|p| p.webviews().file(plugin, file)) else {
         return not_found(Some(plugin));
     };
+    // Tauri answers with a whole body, so the size is checked before anything is read: a file
+    // above the package limit (a hand-edited install folder) is never loaded into memory.
+    let too_big = std::fs::metadata(&found)
+        .map(|meta| meta.len() > MAX_OFFICIAL_WEB_FILE_BYTES)
+        .unwrap_or(false);
+    if too_big {
+        tracing::warn!(plugin, "a web view file is larger than the allowed size");
+        return not_found(Some(plugin));
+    }
     let body = match std::fs::read(&found) {
         Ok(body) => body,
         Err(error) => {

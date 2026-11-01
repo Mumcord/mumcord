@@ -34,7 +34,7 @@ checks them with the official keys.
 - `ETag` / `If-None-Match` is used for the index and the revocation list; servers should send an
   `ETag`. Mumcord keeps the last verified copy and works offline with it.
 - Size limits: official index 8 MiB, third-party index 2 MiB, `revoked.json` 1 MiB, signature
-  files 4 KiB, packages 5 MiB (and exactly the `size` the index lists).
+  files 4 KiB, packages 5 MiB, or 64 MiB for official plugins (and exactly the `size` the index lists).
 
 ## Signatures
 
@@ -143,7 +143,7 @@ Version entry:
 | `version`     | semver       | yes      | Must equal the manifest version.                                                                                |
 | `api`         | int          | yes      | Plugin API major version (`1`).                                                                                 |
 | `url`         | URL          | yes      | Package download; author signature at `url` + `.minisig`.                                                       |
-| `size`        | int          | yes      | Exact package size in bytes, 1 … 5 MiB.                                                                         |
+| `size`        | int          | yes      | Exact package size in bytes, 1 … 5 MiB (official index: 64 MiB).                                                                   |
 | `sha256`      | hex          | yes      | Lower-case hex SHA-256 of the package (64 digits).                                                              |
 | `permissions` | array of ids | yes      | Every permission, required or optional, the reviewed version may request. A package asking for more is refused. |
 

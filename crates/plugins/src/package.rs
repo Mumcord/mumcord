@@ -29,13 +29,38 @@ pub const OFFICIAL_FILES: &[&str] = &["README.md", "LICENSE"];
 pub const MAX_PACKAGE_BYTES: u64 = 5 * 1024 * 1024;
 pub const MAX_UNPACKED_BYTES: u64 = 8 * 1024 * 1024;
 pub const MAX_FILES: usize = 200;
-/// Official plugins may ship more files, e.g. a large icon set (FR-6.10).
-pub const MAX_OFFICIAL_FILES: usize = 400;
 pub const MAX_ASSET_BYTES: u64 = 512 * 1024;
+/// Official plugins may bundle a whole web app with its data and images (FR-6.10, addendum
+/// 2026-11-01); third-party, repository and developer plugins keep the limits above.
+pub const MAX_OFFICIAL_PACKAGE_BYTES: u64 = 64 * 1024 * 1024;
+pub const MAX_OFFICIAL_UNPACKED_BYTES: u64 = 96 * 1024 * 1024;
+pub const MAX_OFFICIAL_FILES: usize = 10_000;
+/// Largest single file under `web/` of an official plugin. Other plugins are only held to the
+/// unpacked total.
+pub const MAX_OFFICIAL_WEB_FILE_BYTES: u64 = 16 * 1024 * 1024;
+
+/// The packed size limit for packages from `source`.
+pub fn max_package_bytes(source: Source) -> u64 {
+    if source == Source::Official {
+        MAX_OFFICIAL_PACKAGE_BYTES
+    } else {
+        MAX_PACKAGE_BYTES
+    }
+}
+
+fn max_unpacked_bytes(source: Source) -> u64 {
+    if source == Source::Official {
+        MAX_OFFICIAL_UNPACKED_BYTES
+    } else {
+        MAX_UNPACKED_BYTES
+    }
+}
 
 const ASSET_EXTENSIONS: &[&str] = &[".png", ".webp", ".svg"];
 /// HTML, CSS, JS and images for the sealed web view (FR-6.46).
-const WEB_EXTENSIONS: &[&str] = &[".html", ".css", ".js", ".png", ".webp", ".svg"];
+const WEB_EXTENSIONS: &[&str] = &[
+    ".html", ".css", ".js", ".json", ".wasm", ".woff2", ".png", ".webp", ".svg",
+];
 const SVG_NAMESPACE: &str = "http://www.w3.org/2000/svg";
 
 /// sha256 and size of a package file, as listed in the registry index.
@@ -94,14 +119,16 @@ impl PackageVerifier for ExpectedDigest {
 
 #[derive(Debug, thiserror::Error)]
 pub enum PackageError {
-    #[error("The package is larger than {} MiB", MAX_PACKAGE_BYTES / 1024 / 1024)]
-    TooLarge,
+    #[error("The package is larger than {0} MiB")]
+    TooLarge(u64),
     #[error("The package is not a valid zip file: {0}")]
     Zip(String),
     #[error("The package has more than {0} files")]
     TooManyFiles(usize),
-    #[error("The package unpacks to more than {} MiB", MAX_UNPACKED_BYTES / 1024 / 1024)]
-    UnpackedTooLarge,
+    #[error("The package unpacks to more than {0} MiB")]
+    UnpackedTooLarge(u64),
+    #[error("The web file \"{0}\" is larger than 16 MiB")]
+    WebFileTooLarge(String),
     #[error("\"{0}\" is not allowed in a package (only plain files with safe relative paths)")]
     BadEntry(String),
     #[error("\"{0}\" appears twice in the package (names may not differ only in case)")]
@@ -143,9 +170,11 @@ pub struct Package {
 impl Package {
     /// Reads and checks a package from `source`. Nothing is written to disk.
     pub fn read(bytes: &[u8], source: Source) -> Result<Self, PackageError> {
-        if bytes.len() as u64 > MAX_PACKAGE_BYTES {
-            return Err(PackageError::TooLarge);
+        let max_package = max_package_bytes(source);
+        if bytes.len() as u64 > max_package {
+            return Err(PackageError::TooLarge(max_package / 1024 / 1024));
         }
+        let max_unpacked = max_unpacked_bytes(source);
         let digest = Digest::of(bytes);
         let mut archive = zip::ZipArchive::new(Cursor::new(bytes))
             .map_err(|e| PackageError::Zip(e.to_string()))?;
@@ -191,19 +220,25 @@ impl Package {
             }
             let kind = FileKind::of(&name)?;
             // The size in the zip header is not trusted: read at most what is still allowed.
-            let budget = MAX_UNPACKED_BYTES - unpacked;
+            let budget = max_unpacked - unpacked;
             let mut data = Vec::new();
             (&mut entry)
                 .take(budget + 1)
                 .read_to_end(&mut data)
                 .map_err(|e| PackageError::Zip(e.to_string()))?;
             unpacked += data.len() as u64;
-            if unpacked > MAX_UNPACKED_BYTES {
-                return Err(PackageError::UnpackedTooLarge);
+            if unpacked > max_unpacked {
+                return Err(PackageError::UnpackedTooLarge(max_unpacked / 1024 / 1024));
             }
             let data = match kind {
                 FileKind::Asset if data.len() as u64 > MAX_ASSET_BYTES => {
                     return Err(PackageError::BadAsset(name));
+                }
+                FileKind::Web
+                    if source == Source::Official
+                        && data.len() as u64 > MAX_OFFICIAL_WEB_FILE_BYTES =>
+                {
+                    return Err(PackageError::WebFileTooLarge(name));
                 }
                 FileKind::Translation if data.len() as u64 > MAX_I18N_BYTES => {
                     return Err(PackageError::BadTranslation(name));
