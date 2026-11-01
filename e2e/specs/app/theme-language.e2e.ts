@@ -118,6 +118,8 @@ const neutral = (t: string) =>
   /^Standard$/.test(t) ||
   // "Link" is also the German word; its tooltip adds the shortcut.
   /^Link( \(Ctrl\+K\))?$/.test(t) ||
+  // Settings group names that read the same: "General" in Spanish, "Gaming & Overlay" in German.
+  /^(General|Gaming & Overlay)$/.test(t) ||
   // "In <channel> (<count>)" reads the same in English and German.
   /^In \S+ \(\d+\)$/.test(t) ||
   // Language names in the picker are shown in their own language (endonyms).
