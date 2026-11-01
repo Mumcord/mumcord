@@ -91,7 +91,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | done (feat/poll 1b8a91a) | l1 |
 | L2 | Dice: all 24 languages via L0 | in progress | l2 |
 | L3 | Echolings: all 24 languages via L0 | in progress | l3 |
-| L4 | Mumbot Music: all 24 languages via L0 | in progress | l4 |
+| L4 | Mumbot Music: all 24 languages via L0 | done (feat/mumbot-music a5189a8) | l4 |
 | L5 | Mumcord/plugins CI (check.yml): official plugins must ship i18n files for all 24 Mumcord languages with the same key set as en.json; template + docs explain it | done (Mumcord/plugins PR #8, not merged) | l5 |
 | B6v | Run e2e two-clients.e2e.ts + smoke/app.e2e.ts under the e2e lock; verify tauri:options.args (e.g. --no-plugins) reaches the app; fix harness issues | done (two-clients 2/2, app 3/3, args reach the app) | b6v-e2erun |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
