@@ -43,7 +43,9 @@ describe("chat mount", () => {
     const { container } = render(<ChatMount />);
     const header = await screen.findByRole("heading", { level: 2 });
     // The share view loads as a chunk of its own (issue #323).
-    await waitFor(() => expect(container.querySelector(".media-frame")).not.toBeNull());
+    await waitFor(() => {
+      expect(container.querySelector(".media-frame")).not.toBeNull();
+    });
     const frame = container.querySelector(".media-frame");
     const list = container.querySelector(".chat-list");
 
