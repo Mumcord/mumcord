@@ -16,3 +16,10 @@ serde_json.workspace = true
 
 [lints]
 workspace = true
+
+# A complete plugin. Build it with
+# `cargo build --release --example hello --target wasm32-unknown-unknown`; `mumcord-plugin build`
+# turns the module into a component.
+[[example]]
+name = "hello"
+crate-type = ["cdylib"]
