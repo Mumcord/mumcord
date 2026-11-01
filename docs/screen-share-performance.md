@@ -2,6 +2,8 @@
 
 Measured cost of screen sharing (FR-2.42 – FR-2.46, AC-2.29) for the person sharing and for the people watching: CPU, memory, bitrate and frame rate at the default 720p30 with the maximum of eight viewers, and what happens when the upload is too slow.
 
+These numbers were measured when 720p30 (≈ 2000 kbps) was the best quality step. The default is now 1080p30 at ≈ 4000 kbps, with 720p30 as the next step down, so a sharer's upload and encoding cost at the top step are roughly twice the 720p30 figures below.
+
 ## Method
 
 - **Test:** `crates/engine/tests/live_screen_share_e2e.rs`, test `screen_share_ac_2_29`, built in release mode, against a local Mumble 1.5.735 test server (`testenv/up.sh v15`).

@@ -37,7 +37,6 @@
   "codec": "Códec",
   "delay": "Retardo",
   "droppedFrames": "Fotogramas perdidos",
-  "focus": "Enfoque",
   "fit": "Ajustar",
   "fill": "Rellenar",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Viendo",
   "keys": "Atajos de teclado",
   "keyFullscreen": "pantalla completa",
-  "keyFocus": "enfoque",
   "keyExit": "salir"
 }

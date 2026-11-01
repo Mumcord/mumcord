@@ -37,7 +37,6 @@
   "codec": "Kodek",
   "delay": "Opóźnienie",
   "droppedFrames": "Zgubione klatki",
-  "focus": "Fokus",
   "fit": "Dopasuj",
   "fill": "Wypełnij",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Oglądają",
   "keys": "Skróty klawiszowe",
   "keyFullscreen": "pełny ekran",
-  "keyFocus": "skupienie",
   "keyExit": "wyjście"
 }

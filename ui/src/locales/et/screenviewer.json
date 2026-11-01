@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Viivitus",
   "droppedFrames": "Kaotatud kaadrid",
-  "focus": "Fookus",
   "fit": "Sobita",
   "fill": "Täida",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Vaatavad",
   "keys": "Kiirklahvid",
   "keyFullscreen": "täisekraan",
-  "keyFocus": "fookus",
   "keyExit": "välju"
 }

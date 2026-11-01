@@ -61,7 +61,7 @@
     "generic": "Ten film wymaga obsługi H.264. Zainstaluj gst-libav (wtyczkę libav dla GStreamera) menedżerem pakietów swojego systemu.",
     "rpmFusion": "W Fedorze gst-libav pochodzi z repozytorium RPM Fusion; najpierw włącz RPM Fusion."
   },
-  "keys": "Spacja odtwórz/wstrzymaj · ← → przewiń 5 s · M wycisz · F pełny ekran · Z skupienie",
+  "keys": "Spacja odtwórz/wstrzymaj · ← → przewiń 5 s · M wycisz · F pełny ekran",
   "headerPill": "Oglądajcie razem · {{count}}",
   "miniPlayer": "Miniodtwarzacz",
   "tabs": {

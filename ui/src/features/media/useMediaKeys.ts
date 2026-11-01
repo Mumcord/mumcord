@@ -1,6 +1,6 @@
 /**
  * The keys both media views share (issue #163, FR-3.128): Space play/pause, ← and → seek 5 s,
- * M mute, F full screen, Z focus, 1 for 1:1, Escape leaves full screen or focus. They work while
+ * M mute, F full screen, 1 for 1:1, Escape leaves full screen. They work while
  * the view is open, but not while the user types (the chat input above the player keeps its keys).
  */
 import { useCallback, useEffect } from "react";
@@ -11,9 +11,8 @@ export interface MediaActions {
   seek?: (seconds: number) => void;
   mute?: () => void;
   fullscreen?: () => void;
-  focus?: () => void;
   fitOneToOne?: () => void;
-  /** Escape: leave full screen, then focus. */
+  /** Escape: leave full screen. */
   escape?: () => void;
 }
 
@@ -54,10 +53,6 @@ export function useMediaKeys(actions: MediaActions): void {
         case "f":
         case "F":
           run(actions.fullscreen);
-          break;
-        case "z":
-        case "Z":
-          run(actions.focus);
           break;
         case "1":
           run(actions.fitOneToOne);

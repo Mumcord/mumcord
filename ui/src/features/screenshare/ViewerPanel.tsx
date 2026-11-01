@@ -139,9 +139,6 @@ export function ViewerPanel(): ReactNode {
             <kbd>F</kbd> {t("keyFullscreen")}
           </span>
           <span>
-            <kbd>Z</kbd> {t("keyFocus")}
-          </span>
-          <span>
             <kbd>1</kbd> {t("oneToOne")}
           </span>
           <span>

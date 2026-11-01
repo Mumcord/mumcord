@@ -46,7 +46,7 @@
     "seek": "Buscar",
     "volume": "Volumen",
     "syncedPlay": "Sincronizado",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} tiene el control",
     "inSync": "Sincronizado",
     "inSyncAll": "Todos sincronizados",

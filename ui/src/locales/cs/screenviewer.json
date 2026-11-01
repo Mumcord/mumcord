@@ -37,7 +37,6 @@
   "codec": "Kodek",
   "delay": "Zpoždění",
   "droppedFrames": "Zahozené snímky",
-  "focus": "Fokus",
   "fit": "Přizpůsobit",
   "fill": "Vyplnit",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Sledují",
   "keys": "Klávesové zkratky",
   "keyFullscreen": "celá obrazovka",
-  "keyFocus": "soustředění",
   "keyExit": "konec"
 }

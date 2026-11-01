@@ -53,7 +53,6 @@ function MainScreen() {
     <>
       <AppShell
         inert={overlay !== null && !previewing}
-        focus={media.focus}
         mediaPanel={media.cinema !== null}
         slots={{
           servers: <ServersMount />,

@@ -61,7 +61,7 @@
     "generic": "Ovaj video treba podršku za H.264. Instaliraj gst-libav (GStreamerov libav dodatak) upraviteljem paketa svog sustava.",
     "rpmFusion": "Na Fedori gst-libav dolazi iz repozitorija RPM Fusion; najprije omogući RPM Fusion."
   },
-  "keys": "Razmak reprodukcija/pauza · ← → skok 5 s · M utišaj · F cijeli zaslon · Z fokus",
+  "keys": "Razmak reprodukcija/pauza · ← → skok 5 s · M utišaj · F cijeli zaslon",
   "headerPill": "Gledajte zajedno · {{count}}",
   "miniPlayer": "Mini player",
   "tabs": {

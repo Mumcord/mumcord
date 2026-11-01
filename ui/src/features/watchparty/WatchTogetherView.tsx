@@ -19,7 +19,6 @@ import { mockPlaceholder } from "../media/mockPlaceholder";
 import { SeekBar, type SeekMarker } from "../media/SeekBar";
 import { ShortcutHint, useFirstUse } from "../media/ShortcutHint";
 import { VolumeControl } from "../media/VolumeControl";
-import { useMediaView, setFocus } from "../media/mediaView";
 import { PopoutButtons, PoppedOut } from "../media/PopoutControls";
 import { isPoppedOut, useInPopout, usePopouts, usePopoutTitle } from "../media/popoutStore";
 import { useMediaKeys } from "../media/useMediaKeys";
@@ -49,15 +48,13 @@ const ACTION_ICON: Record<WatchCommand["kind"], MediaIconName> = {
 
 export function WatchTogetherView({ serverId }: { serverId: number }): ReactNode {
   const live = useWatchParty(serverId);
-  const view = useMediaView();
   const popouts = usePopouts();
   const inPopout = useInPopout();
   if (live === null || !live.party.joined) return null;
   // Issue #164: the party plays in its own window, so the player here is unloaded.
   if (!inPopout && isPoppedOut(popouts, "watch", serverId, null))
     return <WatchPoppedOut videoId={live.party.videoId} />;
-  // The pop-out shows only the picture, as in focus.
-  return <Cinema serverId={serverId} live={live} focus={inPopout || view.focus} />;
+  return <Cinema serverId={serverId} live={live} />;
 }
 
 function WatchPoppedOut({ videoId }: { videoId: string }): ReactNode {
@@ -92,15 +89,7 @@ function Icon({
   );
 }
 
-export function Cinema({
-  serverId,
-  live,
-  focus,
-}: {
-  serverId: number;
-  live: LiveParty;
-  focus: boolean;
-}): ReactNode {
+export function Cinema({ serverId, live }: { serverId: number; live: LiveParty }): ReactNode {
   const { t: tc } = useTranslation("common");
   const { t } = useTranslation("watchparty");
   const party = live.party;
@@ -112,6 +101,7 @@ export function Cinema({
   const nowMs = useTick(TICK_MS);
   const first = useFirstUse("watchTogether");
   const windowTitle = usePopoutTitle(serverId, t("title"));
+  const inPopout = useInPopout();
 
   const { player, frameRef: embedRef } = usePartyPlayer(serverId, live);
 
@@ -128,12 +118,8 @@ export function Cinema({
       player.setVolume(player.volume === 0 ? 1 : 0);
     },
     fullscreen: toggle,
-    focus: () => {
-      setFocus(!focus);
-    },
     escape: () => {
       if (fullscreen) exit();
-      else if (focus) setFocus(false);
     },
   });
 
@@ -284,7 +270,8 @@ export function Cinema({
         fullscreenLabel={tc("media.fullscreen")}
         exitFullscreenLabel={tc("media.exitFullscreen")}
       />
-      {!focus && (
+      {/* The pop-out shows only the picture (issue #164). */}
+      {!inPopout && (
         <WatchingStrip
           serverId={serverId}
           users={users}

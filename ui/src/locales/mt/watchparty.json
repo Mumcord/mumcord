@@ -61,7 +61,7 @@
     "generic": "Dan il-video jeħtieġ appoġġ għal H.264. Installa gst-libav (il-plugin libav ta' GStreamer) bil-package manager tas-sistema tiegħek.",
     "rpmFusion": "Fuq Fedora, gst-libav jiġi mir-repożitorju RPM Fusion; l-ewwel ixgħel RPM Fusion."
   },
-  "keys": "Spazju daqq/pawża · ← → aqbeż 5 s · M siekta · F skrin sħiħ · Z fokus",
+  "keys": "Spazju daqq/pawża · ← → aqbeż 5 s · M siekta · F skrin sħiħ",
   "headerPill": "Araw flimkien · {{count}}",
   "miniPlayer": "Mini plejer",
   "tabs": {

@@ -25,14 +25,14 @@ import { useAvatars } from "../members/useAvatars";
 import { bitrate, dimension } from "../media/format";
 import { MediaFrame } from "../media/MediaFrame";
 import { VolumeControl } from "../media/VolumeControl";
-import { mediaView, setFit, setFocus, useMediaView, type FitMode } from "../media/mediaView";
+import { setFit, useMediaView, type FitMode } from "../media/mediaView";
 import { PopoutButtons, PoppedOut } from "../media/PopoutControls";
 import { isPoppedOut, useInPopout, usePopouts, usePopoutTitle } from "../media/popoutStore";
 import { useMediaKeys } from "../media/useMediaKeys";
 import { useFullscreen } from "../media/useFullscreen";
 import { P2pLinkText } from "../p2p/P2pLinkText";
 import { useP2pLink } from "../p2p/useP2pLink";
-import { FocusIcon, InfoCircleIcon, MonitorIcon, SignalIcon } from "./icons";
+import { InfoCircleIcon, MonitorIcon, SignalIcon } from "./icons";
 import { PathTag, SoundLevel } from "./parts";
 import { clockOf } from "./shareFormat";
 import { ScreenStage } from "./ScreenStage";
@@ -128,15 +128,11 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
       setVolume(level === 0 ? 100 : 0);
     },
     fullscreen: toggle,
-    focus: () => {
-      if (mediaView().cinema === "share") setFocus(!view.focus);
-    },
     fitOneToOne: () => {
       setFit("oneToOne");
     },
     escape: () => {
       if (fullscreen) exit();
-      else if (view.focus) setFocus(false);
     },
   });
 
@@ -213,22 +209,6 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
             </>
           )}
           <FitButtons t={t} fit={view.fit} />
-          {/* Focus hides the main window's other columns; the pop-out shows only the picture. */}
-          {!inPopout && (
-            <button
-              type="button"
-              className="button media-frame__icon share-icon-button"
-              aria-label={t("focus")}
-              aria-pressed={view.focus}
-              aria-keyshortcuts="Z"
-              data-tooltip={t("focus")}
-              onClick={() => {
-                setFocus(!view.focus);
-              }}
-            >
-              <FocusIcon />
-            </button>
-          )}
           <PopoutButtons kind="share" serverId={serverId} session={session} title={windowTitle} />
           {/* The main window owns the watch, so only it can stop watching (issue #164). */}
           {!inPopout && (

@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Viive",
   "droppedFrames": "Pudonneet kuvat",
-  "focus": "Keskitä",
   "fit": "Sovita",
   "fill": "Täytä",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Katsovat",
   "keys": "Pikanäppäimet",
   "keyFullscreen": "koko näyttö",
-  "keyFocus": "keskitys",
   "keyExit": "poistu"
 }

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../api";
 import { selectConversation } from "../features/channels";
 import { connectedMock, resetAll } from "../features/channels/testUtils";
-import { leaveCinema, resetMediaView, setFocus } from "../features/media/mediaView";
+import { leaveCinema, resetMediaView } from "../features/media/mediaView";
 import { resetScreenShareStore } from "../features/screenshare/sharesStore";
 import { resetWatchingStore, startWatching } from "../features/screenshare/watching";
 import { ChatMount } from "./mounts";
@@ -62,18 +62,5 @@ describe("chat mount", () => {
     expect(bar).not.toBeNull();
     if (bar === null) return;
     expect(header.compareDocumentPosition(bar)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-  });
-
-  it("keeps the channel header above the picture in focus mode", () => {
-    startWatching(1, ANNA);
-    setFocus(true);
-    const { container } = render(<ChatMount />);
-
-    const header = container.querySelector(".chat-header");
-    const frame = container.querySelector(".media-frame");
-    expect(frame).not.toBeNull();
-    expect(header).not.toBeNull();
-    expect(header?.compareDocumentPosition(frame as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(container.querySelector(".chat-list")).toBeNull();
   });
 });

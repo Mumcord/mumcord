@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Atraso",
   "droppedFrames": "Imagens perdidas",
-  "focus": "Foco",
   "fit": "Ajustar",
   "fill": "Preencher",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "A ver",
   "keys": "Atalhos de teclado",
   "keyFullscreen": "ecrã inteiro",
-  "keyFocus": "foco",
   "keyExit": "sair"
 }

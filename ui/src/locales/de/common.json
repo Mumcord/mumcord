@@ -46,7 +46,7 @@
     "seek": "Springen",
     "volume": "Lautstärke",
     "syncedPlay": "Synchron",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} steuert",
     "inSync": "Im Takt",
     "inSyncAll": "Alle im Takt",

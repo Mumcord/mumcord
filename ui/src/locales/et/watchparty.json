@@ -61,7 +61,7 @@
     "generic": "See video vajab H.264 tuge. Paigalda gst-libav (GStreameri libav-plugin) oma süsteemi paketihalduriga.",
     "rpmFusion": "Fedoras tuleb gst-libav RPM Fusioni hoidlast; luba esmalt RPM Fusion."
   },
-  "keys": "Tühik esita/peata · ← → hüppa 5 s · M vaigista · F täisekraan · Z fookus",
+  "keys": "Tühik esita/peata · ← → hüppa 5 s · M vaigista · F täisekraan",
   "headerPill": "Vaata koos · {{count}}",
   "miniPlayer": "Minimängija",
   "tabs": {

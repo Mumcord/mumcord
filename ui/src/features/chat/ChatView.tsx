@@ -47,19 +47,9 @@ export interface ChatViewProps {
   renderChannelTitle?: (channelId: number) => ReactNode;
   /** A media view between the header and the messages (the cinema views of issue #163). */
   belowHeader?: ReactNode;
-  /**
-   * Focus mode of a media view (issue #163): only the header and the media view are shown, so the
-   * channel header still stays at the very top.
-   */
-  mediaOnly?: boolean;
 }
 
-export function ChatView({
-  renderHeaderActions,
-  renderChannelTitle,
-  belowHeader,
-  mediaOnly = false,
-}: ChatViewProps) {
+export function ChatView({ renderHeaderActions, renderChannelTitle, belowHeader }: ChatViewProps) {
   const { t } = useTranslation("chat");
   const { conversation } = useSelectedConversation();
   if (conversation === null) {
@@ -76,7 +66,6 @@ export function ChatView({
       renderHeaderActions={renderHeaderActions}
       renderChannelTitle={renderChannelTitle}
       belowHeader={belowHeader}
-      mediaOnly={mediaOnly}
     />
   );
 }
@@ -86,7 +75,6 @@ interface ConversationChatProps {
   renderHeaderActions: ChatViewProps["renderHeaderActions"];
   renderChannelTitle: ChatViewProps["renderChannelTitle"];
   belowHeader: ChatViewProps["belowHeader"];
-  mediaOnly: boolean;
 }
 
 function ConversationChat({
@@ -94,7 +82,6 @@ function ConversationChat({
   renderHeaderActions,
   renderChannelTitle,
   belowHeader,
-  mediaOnly,
 }: ConversationChatProps) {
   const { t } = useTranslation("chat");
   const server = useServerState();
@@ -262,44 +249,40 @@ function ConversationChat({
         ) : null}
       </header>
       {belowHeader}
-      {!mediaOnly && pinnedChannelId !== null && <ActivityBanners channelId={pinnedChannelId} />}
-      {!mediaOnly && (
-        <>
-          <PinnedInfoBox blocks={pinnedBlocks} />
-          <MessageList
-            log={log}
-            label={t("list.label", { name: title })}
-            onLoadOlder={() => {
-              void loadOlder(conversation);
-            }}
-            onSyncEarlier={
-              conversation.kind === "channel"
-                ? () => {
-                    void requestSync(conversation);
-                  }
-                : undefined
-            }
-            clickablePeople
-            display={display}
-            avatarFor={avatarFor}
-            linkPreviews={linkPreviews}
-            onReply={blockedReason === null ? setReplyTo : undefined}
-            listKey={`${String(serverId)}:${JSON.stringify(conversation)}`}
-            collapsedIds={blocked.collapsedIds}
-          />
-          <Composer
-            target={info.target}
-            limits={limits}
-            label={t("composer.label", { name: title })}
-            blockedReason={blockedReason}
-            linkPreviews={linkPreviews}
-            reply={blockedReason === null ? replyTo : null}
-            onCancelReply={() => {
-              setReplyTo(null);
-            }}
-          />
-        </>
-      )}
+      {pinnedChannelId !== null && <ActivityBanners channelId={pinnedChannelId} />}
+      <PinnedInfoBox blocks={pinnedBlocks} />
+      <MessageList
+        log={log}
+        label={t("list.label", { name: title })}
+        onLoadOlder={() => {
+          void loadOlder(conversation);
+        }}
+        onSyncEarlier={
+          conversation.kind === "channel"
+            ? () => {
+                void requestSync(conversation);
+              }
+            : undefined
+        }
+        clickablePeople
+        display={display}
+        avatarFor={avatarFor}
+        linkPreviews={linkPreviews}
+        onReply={blockedReason === null ? setReplyTo : undefined}
+        listKey={`${String(serverId)}:${JSON.stringify(conversation)}`}
+        collapsedIds={blocked.collapsedIds}
+      />
+      <Composer
+        target={info.target}
+        limits={limits}
+        label={t("composer.label", { name: title })}
+        blockedReason={blockedReason}
+        linkPreviews={linkPreviews}
+        reply={blockedReason === null ? replyTo : null}
+        onCancelReply={() => {
+          setReplyTo(null);
+        }}
+      />
     </div>
   );
 }

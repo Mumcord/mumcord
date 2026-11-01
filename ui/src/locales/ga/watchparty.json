@@ -61,7 +61,7 @@
     "generic": "Teastaíonn tacaíocht H.264 ón bhfíseán seo. Suiteáil gst-libav (breiseán libav GStreamer) le bainisteoir pacáistí do chórais.",
     "rpmFusion": "Ar Fedora, tagann gst-libav ó stór RPM Fusion; cumasaigh RPM Fusion ar dtús."
   },
-  "keys": "Spás seinn/sos · ← → léim 5 s · M balbhaigh · F lánscáileán · Z fócas",
+  "keys": "Spás seinn/sos · ← → léim 5 s · M balbhaigh · F lánscáileán",
   "headerPill": "Féach le chéile · {{count}}",
   "miniPlayer": "Mionseinnteoir",
   "tabs": {

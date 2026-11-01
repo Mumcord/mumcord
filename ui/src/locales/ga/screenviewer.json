@@ -37,7 +37,6 @@
   "codec": "Códóir",
   "delay": "Moill",
   "droppedFrames": "Fráma caillte",
-  "focus": "Fócas",
   "fit": "Laghdaigh",
   "fill": "Líon",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Ag féachaint",
   "keys": "Aicearraí méarchláir",
   "keyFullscreen": "lánscáileán",
-  "keyFocus": "fócas",
   "keyExit": "scoir"
 }

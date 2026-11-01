@@ -37,7 +37,6 @@
   "codec": "Kodeks",
   "delay": "Kavēšanās",
   "droppedFrames": "Zaudētie kadri",
-  "focus": "Fokuss",
   "fit": "Ietilp",
   "fill": "Aizpildīt",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Skatās",
   "keys": "Īsinājumtaustiņi",
   "keyFullscreen": "pilnekrāns",
-  "keyFocus": "fokuss",
   "keyExit": "iziet"
 }

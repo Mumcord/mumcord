@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Vertraging",
   "droppedFrames": "Weggelaten beelden",
-  "focus": "Focus",
   "fit": "Passend",
   "fill": "Vullend",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Kijken mee",
   "keys": "Sneltoetsen",
   "keyFullscreen": "volledig scherm",
-  "keyFocus": "focus",
   "keyExit": "verlaten"
 }

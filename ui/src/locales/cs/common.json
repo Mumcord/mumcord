@@ -46,7 +46,7 @@
     "seek": "Hledat",
     "volume": "Hlasitost",
     "syncedPlay": "Synchronizováno",
-    "keys": "Space · ← → · M · F · Z · Esc",
+    "keys": "Space · ← → · M · F · Esc",
     "inControl": "{{name}} má kontrolu",
     "inSync": "V synchronizaci",
     "inSyncAll": "Všichni v synchronizaci",

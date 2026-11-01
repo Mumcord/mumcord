@@ -37,7 +37,6 @@
   "codec": "Codec",
   "delay": "Verzögerung",
   "droppedFrames": "Verworfene Bilder",
-  "focus": "Fokus",
   "fit": "Einpassen",
   "fill": "Füllen",
   "oneToOne": "1:1",
@@ -56,6 +55,5 @@
   "watching": "Schauen zu",
   "keys": "Tastenkürzel",
   "keyFullscreen": "Vollbild",
-  "keyFocus": "Fokus",
   "keyExit": "beenden"
 }
