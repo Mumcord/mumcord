@@ -625,3 +625,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 
 ### Acceptance results
 - C8 ✅ AC-6.18–6.21 (abe858b5, tools/mumcord-plugin/tests/registry_checks.rs; c8-registry)
+- C9 ✅ AC-6.22, AC-6.23 (registry_checks.rs a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change, browse/source.test.ts; existing: service.rs remove_keeps_data_for_a_reinstall_unless_asked_to_delete_it, storage.rs delete_and_purge_remove_record_values_and_secrets, installed.test.tsx export/remove, prompt.test.tsx third-party warning; c9-thirdparty)
