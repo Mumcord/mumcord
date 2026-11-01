@@ -68,6 +68,15 @@ function sharesOf(serverId: number | null): readonly ScreenShare[] {
   return (serverId === null ? undefined : shares.get(serverId)) ?? NONE;
 }
 
+/**
+ * Takes the shares the engine listed for a window that opened later (the screen share pop-out,
+ * issue #164); a `screenSharesChanged` that arrived first wins.
+ */
+export function seedScreenShares(serverId: number, list: readonly ScreenShare[]): void {
+  ensureBound();
+  if (!shares.has(serverId)) set(serverId, list);
+}
+
 /** Every share in the user's voice channel on `serverId`, including the own one. */
 export function useScreenShares(serverId: number | null): readonly ScreenShare[] {
   return useSyncExternalStore(subscribe, () => sharesOf(serverId));

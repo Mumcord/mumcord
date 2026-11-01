@@ -26,6 +26,8 @@ import { bitrate, dimension } from "../media/format";
 import { MediaFrame } from "../media/MediaFrame";
 import { VolumeControl } from "../media/VolumeControl";
 import { mediaView, setFit, setFocus, useMediaView, type FitMode } from "../media/mediaView";
+import { PopoutButtons, PoppedOut } from "../media/PopoutControls";
+import { isPoppedOut, useInPopout, usePopouts, usePopoutTitle } from "../media/popoutStore";
 import { useMediaKeys } from "../media/useMediaKeys";
 import { useFullscreen } from "../media/useFullscreen";
 import { P2pLinkText } from "../p2p/P2pLinkText";
@@ -44,8 +46,23 @@ const POLL_MS = 1000;
 
 export function ScreenShareView(): ReactNode {
   const share = useWatchedShare();
+  const popouts = usePopouts();
   if (share === null) return null;
+  // Issue #164: the picture shows in its own window; the watch itself stays open here.
+  if (isPoppedOut(popouts, "share", share.serverId, share.session))
+    return <SharePoppedOut serverId={share.serverId} session={share.session} />;
   return <Viewer serverId={share.serverId} session={share.session} />;
+}
+
+function SharePoppedOut({ serverId, session }: { serverId: number; session: number }): ReactNode {
+  const { t } = useTranslation("screenviewer");
+  const { users } = useServerStateOf(serverId);
+  return (
+    <PoppedOut
+      kind="share"
+      title={t("title", { name: users.get(session)?.name ?? t("someone") })}
+    />
+  );
 }
 
 export function Viewer({ serverId, session }: { serverId: number; session: number }): ReactNode {
@@ -67,6 +84,8 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   const name = user?.name ?? t("someone");
   const sound = share?.sound ?? false;
   const paused = share?.paused ?? false;
+  const inPopout = useInPopout();
+  const windowTitle = usePopoutTitle(serverId, t("title", { name }));
 
   const closeDetails = useCallback(() => {
     setDetails(false);
@@ -194,29 +213,36 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
             </>
           )}
           <FitButtons t={t} fit={view.fit} />
-          <button
-            type="button"
-            className="button media-frame__icon share-icon-button"
-            aria-label={t("focus")}
-            aria-pressed={view.focus}
-            aria-keyshortcuts="Z"
-            data-tooltip={t("focus")}
-            onClick={() => {
-              setFocus(!view.focus);
-            }}
-          >
-            <FocusIcon />
-          </button>
-          <button
-            type="button"
-            className="button share-stop"
-            onClick={() => {
-              stopWatching();
-              setDetails(false);
-            }}
-          >
-            {t("stop")}
-          </button>
+          {/* Focus hides the main window's other columns; the pop-out shows only the picture. */}
+          {!inPopout && (
+            <button
+              type="button"
+              className="button media-frame__icon share-icon-button"
+              aria-label={t("focus")}
+              aria-pressed={view.focus}
+              aria-keyshortcuts="Z"
+              data-tooltip={t("focus")}
+              onClick={() => {
+                setFocus(!view.focus);
+              }}
+            >
+              <FocusIcon />
+            </button>
+          )}
+          <PopoutButtons kind="share" serverId={serverId} session={session} title={windowTitle} />
+          {/* The main window owns the watch, so only it can stop watching (issue #164). */}
+          {!inPopout && (
+            <button
+              type="button"
+              className="button share-stop"
+              onClick={() => {
+                stopWatching();
+                setDetails(false);
+              }}
+            >
+              {t("stop")}
+            </button>
+          )}
         </>
       }
       fullscreen={fullscreen}

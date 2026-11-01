@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { p2pBlockText } from "../p2p/relayReason";
 import { MockPicture } from "../media/MockPicture";
 import { mockPlaceholder } from "../media/mockPlaceholder";
+import { useInPopout } from "../media/popoutStore";
 import { useScreenShareOf } from "./sharesStore";
 import { useScreenWatch } from "./useScreenWatch";
 import type { StreamMeter } from "./streamStats";
@@ -28,6 +29,7 @@ export function ScreenStage({ serverId, session, name, paused, meter }: ScreenSt
   const relayReason = useScreenShareOf(serverId, session)?.relayReason ?? null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { status, retry } = useScreenWatch(serverId, session, canvasRef, paused, meter);
+  const inPopout = useInPopout();
 
   let message: string | null = null;
   if (status.state === "failed")
@@ -59,9 +61,11 @@ export function ScreenStage({ serverId, session, name, paused, meter }: ScreenSt
             <button type="button" className="button" onClick={retry}>
               {t("retry")}
             </button>
-            <button type="button" className="button" onClick={stopWatching}>
-              {t("stop")}
-            </button>
+            {!inPopout && (
+              <button type="button" className="button" onClick={stopWatching}>
+                {t("stop")}
+              </button>
+            )}
           </div>
         )}
       </div>

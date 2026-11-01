@@ -4,10 +4,16 @@
  * the webview cannot decode VP9 the engine decodes and sends RGBA pictures instead. Without a
  * first picture within {@link CONNECT_TIMEOUT_MS} (not counting a pause) the attempt ends as
  * unreachable (FR-2.46); `retry` starts a new one.
+ *
+ * The main window owns the engine watch. While the share is popped out (issue #164) the pop-out
+ * only attaches its own frame channel to that watch, and the main window keeps the watch open and
+ * attaches again when the view docks.
  */
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { getApi, toEngineError } from "../../api";
 import { screenFrameChannel, webCodecsVp9Supported } from "../../api/screenFrames";
+import { isPoppedOut, popouts, useInPopout } from "../media/popoutStore";
+import { keepWatch, takeKeptWatch } from "./frameHandover";
 import { createFrameRenderer } from "./frameRenderer";
 import type { StreamMeter } from "./streamStats";
 import { CONNECT_TIMEOUT_MS, watchFailure, type WatchFailure } from "./watchFailure";
@@ -34,6 +40,7 @@ export function useScreenWatch(
 ): ScreenWatch {
   const [status, setStatus] = useState<WatchStatus>({ state: "starting" });
   const [attempt, setAttempt] = useState(0);
+  const inPopout = useInPopout();
   // Read by the timeout, so pausing does not restart the attempt.
   const pausedRef = useRef(paused);
   useEffect(() => {
@@ -108,14 +115,21 @@ export function useScreenWatch(
       const stop = () => {
         renderer.close();
         channel.onmessage = () => undefined;
+        if (inPopout) return;
+        if (isPoppedOut(popouts(), "share", serverId, session)) {
+          keepWatch({ serverId, session });
+          return;
+        }
         api.screenShareUnwatch(serverId, session).catch((error: unknown) => {
           console.warn("stopping a screen share failed", error);
         });
       };
       // Set before the engine answers, so a timeout meanwhile also ends the engine's attempt.
       stopWatching = stop;
+      const attach = inPopout || takeKeptWatch(serverId, session);
       try {
-        await api.screenShareWatch(serverId, session, channel);
+        if (attach) await api.screenShareFramesAttach(serverId, session, channel);
+        else await api.screenShareWatch(serverId, session, channel);
       } catch (error) {
         // The engine already ended this attempt; only the renderer is left to close.
         stopWatching = null;
@@ -135,7 +149,7 @@ export function useScreenWatch(
       stopped = true;
       stopWatching?.();
     };
-  }, [serverId, session, canvasRef, attempt, meter]);
+  }, [serverId, session, canvasRef, attempt, meter, inPopout]);
 
   const retry = useCallback(() => {
     setAttempt((n) => n + 1);
