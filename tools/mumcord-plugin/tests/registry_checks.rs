@@ -1,8 +1,10 @@
 //! The client's background check (`run_check`) against the real `serve-registry` fixture
 //! registry (AC-6.19, AC-6.20): automatic updates, updates that ask, pinning, rollback of a
-//! version that fails to start, and the daily revocation check with updates switched off.
+//! version that fails to start, and the daily revocation check with updates switched off. Also a
+//! third-party repository (AC-6.22): fingerprint, unofficial install, official ids ignored, the
+//! ten-repository limit and the pause on a key change.
 //!
-//! Both tests trust one test key through `MUMCORD_PLUGIN_REGISTRY_KEY`, set exactly once before
+//! All tests trust one test key through `MUMCORD_PLUGIN_REGISTRY_KEY`, set exactly once before
 //! anything else in this binary reads the environment (see [`shared`]).
 
 use std::io::{BufRead, BufReader, Read, Write};
@@ -12,11 +14,13 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex, OnceLock};
 
 use mumcord_plugins::Source;
-use mumcord_plugins::registry::{Client, IndexKind, UrlPolicy};
+use mumcord_plugins::registry::{
+    Client, Index, IndexKind, UrlPolicy, key_fingerprint, preview_repository,
+};
 use mumcord_plugins::service::{
     InstallRequest, PluginInfo, PluginService, Schedule, ServiceConfig, Status, run_check,
 };
-use mumcord_store::{PluginUpdates, PluginVisibility, Store};
+use mumcord_store::{NewPluginRepository, PluginUpdates, PluginVisibility, Store};
 use semver::Version;
 use zip::write::SimpleFileOptions;
 
@@ -137,7 +141,8 @@ fn package(id: &str, version: &str, start: &str, permissions: &[&str]) -> Vec<u8
     writer.finish().expect("finish").into_inner()
 }
 
-/// A running `serve-registry` (the official registry), stopped on drop.
+/// A running `serve-registry` (the official registry or a third-party repository), stopped on
+/// drop.
 struct Registry {
     child: Child,
     packages: tempfile::TempDir,
@@ -147,12 +152,26 @@ struct Registry {
 
 impl Registry {
     fn start() -> Self {
+        Self::spawn(&shared().key, None)
+    }
+
+    /// A third-party repository called `name`, signed with `key`.
+    fn start_repository(name: &str, key: &Path) -> Self {
+        Self::spawn(key, Some(name))
+    }
+
+    fn spawn(key: &Path, repository: Option<&str>) -> Self {
         let packages = tempfile::tempdir().expect("temp dir");
-        let mut child = Command::new(env!("CARGO_BIN_EXE_mumcord-plugin"))
+        let mut command = Command::new(env!("CARGO_BIN_EXE_mumcord-plugin"));
+        command
             .args(["serve-registry", "--packages"])
             .arg(packages.path())
             .arg("--key")
-            .arg(&shared().key)
+            .arg(key);
+        if let Some(name) = repository {
+            command.args(["--repository", name]);
+        }
+        let mut child = command
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
             .spawn()
@@ -161,7 +180,15 @@ impl Registry {
         let base = BufReader::new(stdout)
             .lines()
             .map_while(Result::ok)
-            .find_map(|l| l.strip_prefix("official registry base ").map(str::to_owned))
+            .find_map(|l| {
+                l.strip_prefix("official registry base ")
+                    .map(str::to_owned)
+                    .or_else(|| {
+                        l.strip_prefix("repository address ")
+                            .and_then(|url| url.strip_suffix("index.json"))
+                            .map(str::to_owned)
+                    })
+            })
             .expect("serve-registry prints its address");
         Self {
             child,
@@ -248,8 +275,7 @@ impl App {
             .download(&format!("{}index.json", registry.base), 1 << 20)
             .await
             .expect("index");
-        let index = mumcord_plugins::registry::Index::parse(&index.bytes, &IndexKind::Official)
-            .expect("index parses");
+        let index = Index::parse(&index.bytes, &IndexKind::Official).expect("index parses");
         let plugin = index.plugin(id).expect("listed");
         let latest = plugin.latest();
         let download = self
@@ -410,5 +436,159 @@ fn a_revocation_turns_a_plugin_off_with_updates_off() {
             "Turned off by Mumcord: Revoked for testing"
         );
         assert_eq!(app.kv("echolings").as_deref(), Some(b"v".as_slice()));
+    });
+}
+
+/// AC-6.22 against a real third-party repository next to the official registry: the add preview
+/// shows the fingerprint and ignores the entry using the official id `poll`, its plugin installs
+/// as unofficial, an 11th repository is refused and a key change pauses the repository and turns
+/// its plugin off.
+#[test]
+fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
+    shared();
+    let keys = tempfile::tempdir().expect("temp dir");
+    let out = cli(&[
+        "keygen",
+        "--unencrypted",
+        "--out",
+        keys.path().to_str().expect("utf-8"),
+        "--name",
+        "repo",
+    ]);
+    assert!(out.status.success(), "keygen failed");
+    let public = std::fs::read_to_string(keys.path().join("repo.pub")).expect("public key");
+    let public = public
+        .lines()
+        .rfind(|l| !l.trim().is_empty())
+        .expect("key line")
+        .trim()
+        .to_owned();
+    runtime().block_on(async {
+        let registry = Registry::start();
+        registry.publish("poll", "1.0.0", OK_START, PERMISSIONS);
+        let repository = Registry::start_repository("Fan Repo", &keys.path().join("repo.key"));
+        repository.publish("fan-pets", "1.0.0", OK_START, PERMISSIONS);
+        repository.publish("poll", "9.0.0", OK_START, PERMISSIONS);
+        let app = App::new(&registry, |_| {});
+        let url = format!("{}index.json", repository.base);
+
+        let is_official = |id: &str| id == "poll";
+        let preview = preview_repository(&app.client, &url, None, &is_official)
+            .await
+            .expect("valid repository");
+        assert_eq!(preview.info.name, "Fan Repo");
+        assert_eq!(Some(preview.fingerprint.clone()), key_fingerprint(&public));
+        assert_eq!(preview.plugin_count, 1);
+        assert_eq!(
+            preview
+                .ignored
+                .iter()
+                .map(|i| i.id.as_str())
+                .collect::<Vec<_>>(),
+            ["poll"]
+        );
+        let repository_id = app
+            .store
+            .lock()
+            .expect("lock")
+            .add_plugin_repository(
+                &NewPluginRepository {
+                    url: preview.url.clone(),
+                    name: preview.info.name.clone(),
+                    public_key: preview.info.public_key.clone(),
+                },
+                0,
+            )
+            .expect("added");
+
+        // The plugin installs from the repository and keeps its unofficial source.
+        let bytes = app.client.download(&url, 1 << 20).await.expect("index");
+        let index = Index::parse(
+            &bytes.bytes,
+            &IndexKind::Repository {
+                is_official_id: &is_official,
+            },
+        )
+        .expect("index parses");
+        assert!(index.plugin("poll").is_none(), "the official id is ignored");
+        let plugin = index.plugin("fan-pets").expect("listed");
+        let latest = plugin.latest();
+        let download = app
+            .client
+            .download(&latest.url, latest.size)
+            .await
+            .expect("download");
+        let request = InstallRequest {
+            source: Source::Repo { repository_id },
+            entry: plugin.entry(latest),
+            optional: vec![],
+            visibility: PluginVisibility::Friends,
+        };
+        app.service
+            .lock()
+            .expect("lock")
+            .install(&request, &download)
+            .expect("installs");
+        app.check().await;
+        let fan = app.info("fan-pets");
+        assert_eq!(fan.source, Source::Repo { repository_id });
+        assert_eq!(fan.status, Status::Running);
+        let names = app
+            .service
+            .lock()
+            .expect("lock")
+            .repository_names()
+            .expect("names");
+        assert_eq!(names, [(repository_id, "Fan Repo".to_owned())]);
+
+        // Ten repositories at most.
+        {
+            let store = app.store.lock().expect("lock");
+            for n in 2..=10 {
+                store
+                    .add_plugin_repository(
+                        &NewPluginRepository {
+                            url: format!("https://repo{n}.example/index.json"),
+                            name: format!("Repo {n}"),
+                            public_key: public.clone(),
+                        },
+                        0,
+                    )
+                    .expect("up to ten");
+            }
+            let eleventh = store.add_plugin_repository(
+                &NewPluginRepository {
+                    url: "https://repo11.example/index.json".into(),
+                    name: "Repo 11".into(),
+                    public_key: public.clone(),
+                },
+                0,
+            );
+            assert!(
+                matches!(
+                    eleventh,
+                    Err(mumcord_store::Error::TooManyPluginRepositories { max: 10 })
+                ),
+                "{eleventh:?}"
+            );
+        }
+
+        // A new key without a rotation entry pauses the repository and turns its plugin off.
+        repository.scenario("key-change");
+        app.check().await;
+        let paused = app
+            .store
+            .lock()
+            .expect("lock")
+            .plugin_repositories()
+            .expect("repositories")
+            .into_iter()
+            .find(|r| r.id == repository_id)
+            .expect("still listed");
+        assert!(paused.paused_reason.is_some(), "paused");
+        assert_eq!(paused.public_key, preview.info.public_key, "old key kept");
+        let fan = app.info("fan-pets");
+        assert_eq!(fan.status, Status::Off);
+        assert!(!fan.enabled);
     });
 }
