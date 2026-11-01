@@ -2815,6 +2815,8 @@ export type SoundSettings = {
 	voiceJoin: boolean,
 	/**  You disconnect from a server yourself (QA.19). */
 	hangUp: boolean,
+	/**  You quit Mumcord while in a voice channel (#325). */
+	quit: boolean,
 	partyStarted: boolean,
 	partyJoined: boolean,
 	partyLeft: boolean,

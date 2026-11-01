@@ -129,6 +129,7 @@ const SOUND_KEYS: readonly (keyof SoundSettings)[] = [
   "selfMute",
   "selfDeaf",
   "hangUp",
+  "quit",
   "messages",
   "mention",
   "mentionNotify",

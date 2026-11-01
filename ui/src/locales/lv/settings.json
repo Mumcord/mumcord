@@ -416,6 +416,7 @@
     "selfMute": "Tu izslēdz vai ieslēdz savu mikrofonu",
     "selfDeaf": "Tu izslēdz vai ieslēdz skaņu",
     "hangUp": "Tu atvienojies no servera",
+    "quit": "Tu aizver Mumcord, atrodoties balss kanālā",
     "kicked": "Tevi izmet no servera",
     "banned": "Tevi nobloķē serverī",
     "messages": "Jauna ziņa kanālā, kuram seko, vai privātā čatā",
