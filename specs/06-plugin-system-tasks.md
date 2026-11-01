@@ -145,6 +145,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
 | S4 | Mumbot Music scenario tests on feat/mumbot-music | done (feat/mumbot-music 235a698; http-response not mockable in CLI — covered by native tests + C11 real bot) | s4-music |
 | M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins); also run `cargo update -p mumcord-plugin-sdk` in every official plugin so they pick up L0b plurals + M2a | open | |
+| M3 | Publish `mumcord-plugin-sdk` (Apache-2.0) on crates.io with 0.6.0: package the WIT files inside the crate (no ../plugins/wit path), add it to the release workflow's crate publishing, docs/template use the crates.io version instead of the git dep; decide CLI distribution (cargo install via crates.io needs mumcord-plugins published too, or release binaries) | open | |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | done (folded into B25c) | b25c-test |
 
 ---
