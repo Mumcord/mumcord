@@ -77,6 +77,17 @@ const MAX_CACHED_IMAGES: usize = 200;
 #[tauri_specta(event_name = "plugins://changed")]
 pub struct PluginsChanged {}
 
+/// `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
+/// engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
+/// answers for a server that decided before the UI listened.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://shared-state")]
+pub struct PluginsSharedState {
+    pub server_id: crate::commands::types::ServerId,
+    pub supported: bool,
+}
+
 /// One step of an install.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "stage", rename_all = "camelCase")]

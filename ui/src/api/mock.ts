@@ -2957,6 +2957,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
     // plugins (spec 06): no plugin is installed in the mock; UI tasks extend this.
     pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: [] }),
+    // Servers older than 1.4 pass no plugin data (FR-6.38).
+    pluginsSharedSupported: () =>
+      Promise.resolve(!serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2")),
     pluginsIndex: () => Promise.resolve({ freshness: "fresh", notice: null, plugins: [] }),
     pluginReposList: () => Promise.resolve(repositories.map((r) => ({ ...r }))),
     pluginRepoPreview: (url, expectedKey) => Promise.resolve(previewRepository(url, expectedKey)),

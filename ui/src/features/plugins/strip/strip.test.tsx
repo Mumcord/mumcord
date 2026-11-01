@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type InstalledPlugin, type MockApi } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
+import { getServerState, resetServerStore } from "../../channels/serverStore";
 import { resetPluginStore } from "../pluginStore";
 import { PluginStrip } from "./PluginStrip";
 
@@ -158,12 +159,38 @@ describe("PluginStrip", () => {
     expect(screen.queryByText("pets panel")).toBeNull();
   });
 
+  async function connect() {
+    const [server] = await api.serversList();
+    await api.connect((server ?? { id: 0 }).id, null, null);
+  }
+
   it("explains greyed shared parts on servers without plugin data", async () => {
+    api = createMockApi({ seed: "ready", serverVersion: "1.3.0" });
+    setApi(api);
+    resetServerStore();
     setup([plugin("pets", "Pets")], ["pets"]);
+    await connect();
     const { container } = render(<PluginStrip />);
     expect(
       await screen.findByText("This server doesn't support shared plugin features"),
     ).toBeInTheDocument();
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("shows no hint on a server with plugin data and follows the engine's decision", async () => {
+    api = createMockApi({ seed: "ready" });
+    setApi(api);
+    resetServerStore();
+    setup([plugin("pets", "Pets")], ["pets"]);
+    await connect();
+    await waitFor(() => { expect(getServerState().serverId).not.toBeNull(); });
+    const serverId = getServerState().serverId;
+    render(<PluginStrip />);
+    await screen.findByText("pets panel");
+    expect(screen.queryByText("This server doesn't support shared plugin features")).toBeNull();
+    api.mock.emit("pluginsSharedState", { serverId: serverId ?? 0, supported: false });
+    expect(
+      await screen.findByText("This server doesn't support shared plugin features"),
+    ).toBeInTheDocument();
   });
 });

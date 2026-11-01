@@ -1191,6 +1191,14 @@ pub fn plugins_mentioned(
     Ok(engine.plugin_mentioned(to_engine_server_id(server_id), session)?)
 }
 
+/// Whether the server passes plugin data (FR-6.38); the answer so far, kept current by the
+/// `plugins://shared-state` event.
+#[tauri::command]
+#[specta::specta]
+pub fn plugins_shared_supported(engine: State<'_, Engine>, server_id: ServerId) -> bool {
+    engine.plugin_shared_supported(to_engine_server_id(server_id))
+}
+
 /// A slash command of an active plugin (FR-6.43).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -1310,6 +1318,7 @@ mod tests {
                 severity: Severity::Disable,
                 reason: "Leaks data".into(),
             }),
+            icon: None,
         }
     }
 

@@ -13,6 +13,9 @@ use mumcord_plugins::service::{PeerInfo, PluginService, SelfInfo};
 use mumcord_protocol::LowOutcome;
 
 use tauri::AppHandle;
+use tauri_specta::Event;
+
+use crate::commands::types::to_api_server_id;
 
 use super::{Plugins, suggestions};
 
@@ -38,6 +41,21 @@ pub fn pump_engine_events(app: &AppHandle, plugins: &Arc<Plugins>, engine: &Engi
                 && let Ok(event) = events.try_recv()
             {
                 batch.push(event);
+            }
+            for event in &batch {
+                if let PluginEngineEvent::SharedState {
+                    server_id,
+                    supported,
+                } = event
+                {
+                    let event = super::PluginsSharedState {
+                        server_id: to_api_server_id(*server_id),
+                        supported: *supported,
+                    };
+                    if let Err(e) = event.emit(&app) {
+                        tracing::warn!(error = %e, "emitting the shared plugin state failed");
+                    }
+                }
             }
             // Server suggestions go to the notification centre, not to the plugins.
             let (announced, batch): (Vec<_>, Vec<_>) = batch

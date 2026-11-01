@@ -506,15 +506,25 @@ export const commands = {
 	pluginsTakePendingLink: () => typedError<string | null, ApiError>(__TAURI_INVOKE("plugins_take_pending_link")),
 	/**  Every installed plugin, developer plugins included. */
 	pluginsList: () => typedError<PluginsOverview, ApiError>(__TAURI_INVOKE("plugins_list")),
-	/**  Loads the official plugin list (cached copy when offline, FR-6.55). */
+	/**
+	 *  Whether the server passes plugin data (FR-6.38); the answer so far, kept current by the
+	 *  `plugins://shared-state` event.
+	 */
+	pluginsSharedSupported: (serverId: number) => __TAURI_INVOKE<boolean>("plugins_shared_supported", { serverId }),
+	/**
+	 *  Loads the official plugin list (cached copy when offline, FR-6.55) followed by the plugins of
+	 *  every switched-on repository (FR-6.61, FR-6.74). A repository that cannot be loaded is left
+	 *  out; one whose key changed is paused and its plugins turned off (FR-6.75).
+	 */
 	pluginsIndex: (language: string) => typedError<PluginIndex, ApiError>(__TAURI_INVOKE("plugins_index", { language })),
 	/**
-	 *  Installs a plugin from the official list loaded by `plugins_index` (latest version unless
+	 *  Installs a plugin from the lists loaded by `plugins_index` (official or a repository) (latest version unless
 	 *  `version` is given), with the optional permissions the user left on.
 	 */
 	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility })),
 	/**
-	 *  Downloads and verifies the latest version of an official plugin before the install prompt
+	 *  Downloads and verifies the latest version of a store plugin (official or from a repository)
+	 *  before the install prompt
 	 *  opens, so the prompt can show the manifest's required and optional permissions. Nothing is
 	 *  unpacked or run; `plugin_install` installs this package once the user agrees.
 	 */
@@ -904,6 +914,7 @@ export const events = {
 	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
 	pluginsOpenDetails: makeEvent<PluginsOpenDetails, PluginsOpenDetails>("plugins://open-details"),
+	pluginsSharedState: makeEvent<PluginsSharedState, PluginsSharedState>("plugins://shared-state"),
 	pluginsSuggestion: makeEvent<PluginSuggestion, PluginSuggestion>("plugins://suggestion"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
@@ -1720,15 +1731,12 @@ export type IndexScreenshot = {
 	alt: string,
 };
 
-/**
- *  Which list a store plugin comes from. Third-party repositories are listed once B33b loads
- *  them; until then every entry is official.
- */
+/**  Which list a store plugin comes from. */
 export type IndexSource = { kind: "official" } | 
 /**  "Unofficial · <name>" (FR-6.61). */
 { kind: "repo"; repositoryId: number; name: string };
 
-/**  One plugin of the official index, texts in the asked language (English fallback). */
+/**  One plugin of the store (official or a repository), texts in the asked language (English fallback). */
 export type IndexedPlugin = {
 	id: string,
 	source: IndexSource,
@@ -1840,9 +1848,7 @@ export type InstalledPlugin = {
 	 *  With `disabledReason` `revoked` the plugin was turned off; otherwise it is a warning.
 	 */
 	revocation: string | null,
-	/**
-	 * The manifest icon (a path under `assets/`, loaded with `plugin_asset`).
-	 */
+	/**  The manifest icon (a path under `assets/`, loaded with `plugin_asset`). */
 	icon: string | null,
 };
 
@@ -2689,6 +2695,16 @@ export type PluginsOverview = {
 	/**  "Turn off all plugins" is on. */
 	allOff: boolean,
 	plugins: InstalledPlugin[],
+};
+
+/**
+ *  `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
+ *  engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
+ *  answers for a server that decided before the UI listened.
+ */
+export type PluginsSharedState = {
+	serverId: number,
+	supported: boolean,
 };
 
 /**  Pin and mute state of a private conversation, by server and the person's certificate hash. */

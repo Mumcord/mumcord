@@ -1,10 +1,10 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { getApi, type PluginPanelVisibility, type PluginSlot } from "../../../api";
 import { useT } from "../../../i18n/useT";
-import { useServerSelector } from "../../channels/serverStore";
 import { PluginTree } from "../render/PluginTree";
 import { usePluginUi } from "../render/pluginUiStore";
 import { usePluginIcon } from "../render/usePluginIcon";
+import { useSharedSupported } from "./useSharedSupported";
 import { usePlugins } from "../pluginStore";
 import { PluginWebView, usePluginWebView } from "../webview";
 import { loadCollapsed, saveCollapsed } from "./stripMemory";
@@ -43,8 +43,7 @@ export function PluginStrip() {
   const t = useT("pluginStrip");
   const { overview } = usePlugins();
   const { trees } = usePluginUi();
-  // Servers older than 1.4 have no plugin data either (FR-6.38); same version threshold as follow.
-  const sharedSupported = useServerSelector((s) => s.info?.followSupported ?? false);
+  const sharedSupported = useSharedSupported();
   const [collapsed, setCollapsed] = useState(loadCollapsed);
   const [chosen, setChosen] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
