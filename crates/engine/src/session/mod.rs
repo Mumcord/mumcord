@@ -112,6 +112,7 @@ pub struct Events {
     tx: mpsc::UnboundedSender<TaggedEvent>,
     sounds: Arc<SoundHub>,
     friends: Arc<FriendHub>,
+    plugins: Arc<crate::plugins::PluginHub>,
     routing: Arc<Routing>,
     server: Option<ServerId>,
 }
@@ -125,6 +126,11 @@ impl Events {
     /// Friends and their online state (FR-1.64).
     pub fn friends(&self) -> &Arc<FriendHub> {
         &self.friends
+    }
+
+    /// The plugin bridge (spec 06).
+    pub(crate) fn plugins(&self) -> &Arc<crate::plugins::PluginHub> {
+        &self.plugins
     }
 
     /// The same output, tagging its events with `server_id`.
@@ -142,6 +148,7 @@ impl Events {
             self.sounds.observe(&event);
         }
         let friends = self.friends.observe(server, &event);
+        self.plugins.observe(server, &event);
         // A closed receiver means the app is shutting down; nobody is left to inform.
         let _ = self.tx.send((server, event));
         if let Some(friends) = friends {
@@ -535,6 +542,7 @@ impl Engine {
             tx,
             sounds: SoundHub::from_store(store.clone()),
             friends: FriendHub::new(store.clone(), rt.clone()),
+            plugins: Arc::default(),
             routing: Arc::default(),
             server: None,
         };
@@ -793,6 +801,7 @@ impl Engine {
         before: &[mumcord_store::BlockedUser],
         after: &[mumcord_store::BlockedUser],
     ) {
+        self.plugin_blocks_changed();
         let mut core = lock(&self.inner.core);
         let Some(server_id) = core.audio_server else {
             return;
@@ -1771,6 +1780,7 @@ impl Inner {
             crate::now_playing::on_disconnect(&self.now_playing, server_id, &session.handle);
             crate::now_gaming::on_disconnect(&self.now_gaming, server_id, &session.handle);
             crate::mumcord::on_disconnect(&self.mumcord, server_id);
+            crate::plugins::on_disconnect(self.events.plugins(), server_id);
             crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
             self.forget_password_attempt(server_id);
@@ -1802,6 +1812,7 @@ impl Inner {
         crate::now_playing::on_synced(&self.now_playing, ctx.server_id);
         crate::now_gaming::on_synced(&self.now_gaming, ctx.server_id);
         crate::mumcord::on_synced(&self.mumcord, ctx);
+        crate::plugins::on_synced(ctx.events.plugins(), ctx, &self.blocked);
         crate::history_sync::on_synced(&self.history_sync, ctx, &self.rt);
         self.full_images.reset(ctx.server_id);
         self.direct.reset(ctx.server_id);
@@ -2610,6 +2621,7 @@ impl Inner {
                         self.user_view_of(server_id, user, setting),
                     ));
                 }
+                crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
             }
             Event::UserRemoved { user, .. } => {
                 let mut core = lock(&self.core);
@@ -2642,6 +2654,7 @@ impl Inner {
                     self.positional.on_user_removed(user.session);
                 }
                 crate::stats::on_user_removed(&self.user_stats, server_id, user.session);
+                crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
                 ctx.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
@@ -2665,12 +2678,21 @@ impl Inner {
             }
             // Nothing a blocked person sends reaches any feature (issue #140).
             Event::PluginData(data)
-                if crate::blocking::sent_by_blocked(ctx, &self.blocked, data) => {}
+                if crate::blocking::sent_by_blocked(ctx, &self.blocked, data) =>
+            {
+                crate::plugins::on_blocked_data(ctx.events.plugins(), ctx, data);
+            }
             Event::PluginData(data) => {
                 crate::now_playing::on_plugin_data(&self.now_playing, ctx, data);
                 crate::now_gaming::on_plugin_data(&self.now_gaming, ctx, data);
                 if let Some(session) = crate::mumcord::on_plugin_data(&self.mumcord, ctx, data) {
                     self.republish_user(ctx, session);
+                    crate::plugins::on_peer_known(
+                        ctx.events.plugins(),
+                        &self.mumcord,
+                        server_id,
+                        session,
+                    );
                     crate::watch_party::on_peer_known(
                         &self.watch_parties,
                         &self.mumcord,
@@ -2691,6 +2713,7 @@ impl Inner {
                 crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
                 self.direct.on_plugin_data(ctx, data);
                 self.relays.on_plugin_data(ctx, data, &self.inspector);
+                crate::plugins::on_plugin_data(ctx.events.plugins(), ctx, data, &self.inspector);
             }
             Event::UserStats(stats) => crate::stats::on_stats(&self.user_stats, ctx, stats),
             // Here rather than in the extension hooks: the private message rule needs to know
@@ -2703,6 +2726,7 @@ impl Inner {
                     &self.pm_requests,
                     &self.blocked,
                 );
+                crate::plugins::on_text(ctx.events.plugins(), ctx, &self.blocked, message);
             }
             Event::ServerConfigUpdated(_) | Event::Disconnected(_) => {}
         }

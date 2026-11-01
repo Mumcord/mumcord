@@ -33,6 +33,8 @@ pub const FEATURES: &[&str] = &[
     crate::watch_party::FEATURE,
     crate::screen_share::signal::FEATURE,
     crate::pm_rules::FEATURE,
+    crate::plugins::FEATURE,
+    crate::plugins::SERVER_FEATURE,
 ];
 const MAX_FEATURES: usize = 16;
 const MAX_FEATURE_LEN: usize = 32;
@@ -272,7 +274,9 @@ mod tests {
                 "now-gaming",
                 "now-playing",
                 "p2p",
+                "plugins",
                 "screen-share",
+                "server-plugins",
                 "watch-party"
             ]
         );
