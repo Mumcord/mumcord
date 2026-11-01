@@ -67,7 +67,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | F7 | Pin `rust-toolchain.toml` (same stable version) in Mumcord/plugins template (feat/template-docs), `mumcord-plugin new` template (tools/mumcord-plugin) and each official plugin branch (feat/poll, feat/dice, feat/echolings, feat/mumbot-music), so reproducible-build hashes match CI | done (Rust 1.99.1; 159ad432 + plugins branches) | f7-toolchain |
 | F8 | docs/engine-api.md: list all new plugin commands/events (B13 engine methods, B18 commands+events, B20b plugins_take_pending_link, renamed game_plugins_*) | open | |
 | F9 | Echolings: singular/plural for "days together" ("1 day") on feat/echolings | done (204cc09) | f9-plural |
-| F10 | CLI `mumcord-plugin test`: support a self-changed event step (DND, mute) so DND → sleeping can be scenario-tested; add the Echolings DND scenario after | in progress | f10-selfevent |
+| F10 | CLI `mumcord-plugin test`: support a self-changed event step (DND, mute) so DND → sleeping can be scenario-tested; add the Echolings DND scenario after | done (115d7b69 + echolings 8852b91; stale comment in echolings/scenarios/hatch-and-care.yaml line 3 to remove in a later echolings commit) | f10-selfevent |
 | S1 | Poll scenario tests (`mumcord-plugin test`, YAML) on Mumcord/plugins feat/poll | done (feat/poll 5e17e72) | s1-poll |
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
