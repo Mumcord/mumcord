@@ -4106,6 +4106,7 @@ version = "0.4.4"
 dependencies = [
  "ammonia",
  "hmac 0.13.0",
+ "minisign",
  "minisign-verify",
  "mumcord-store",
  "rand 0.10.3",

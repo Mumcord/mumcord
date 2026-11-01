@@ -12,6 +12,7 @@ pub mod messaging;
 pub mod package;
 pub mod permissions;
 mod runtime;
+pub mod verify;
 pub mod version;
 
 pub use health::{Health, Recovery};
