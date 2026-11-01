@@ -34,6 +34,7 @@
     "secureStorage": "Varna shramba tvojega sistema ni na voljo ali pa je bil dostop zavrnjen.",
     "io": "Datoteke ni bilo mogoče prebrati ali zapisati. Preveri lokacijo in poskusi znova.",
     "invalidInput": "To ni uspelo: datoteka ali geslo ni veljavno.",
+    "duplicateIdentity": "Ta identiteta je že na seznamu.",
     "notFound": "Datoteke ali elementa ni bilo mogoče najti.",
     "generic": "Nekaj je šlo narobe. Poskusi znova."
   },
@@ -72,7 +73,7 @@
     "fingerprintLine": "Prstni odtis {{fingerprint}}",
     "notUsed": "Zaenkrat je ne uporablja noben strežnik",
     "setDefault": "Nastavi za privzeto",
-    "setDefaultFor": "Nastavi {{identity}} kot privzeto identiteto",
+    "setDefaultFor": "Nastavi za privzeto – {{identity}}",
     "defaultSet": "{{identity}} je zdaj privzeta identiteta.",
     "details": "Podrobnosti",
     "detailsFor": "Prikaži podrobnosti {{identity}}",

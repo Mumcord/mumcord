@@ -33,6 +33,7 @@
     "secureStorage": "El almacenamiento seguro del sistema no está disponible o se denegó el acceso.",
     "io": "No se pudo leer o escribir el archivo. Comprueba la ubicación e inténtalo de nuevo.",
     "invalidInput": "No ha funcionado: el archivo o la contraseña no son válidos.",
+    "duplicateIdentity": "Esta identidad ya está en tu lista.",
     "notFound": "No se encontró el archivo o el elemento.",
     "generic": "Algo salió mal. Inténtalo de nuevo."
   },
@@ -71,7 +72,7 @@
     "fingerprintLine": "Huella {{fingerprint}}",
     "notUsed": "Aún no la usa ningún servidor",
     "setDefault": "Predeterminada",
-    "setDefaultFor": "Hacer {{identity}} la identidad predeterminada",
+    "setDefaultFor": "Predeterminada – {{identity}}",
     "defaultSet": "{{identity}} es ahora la identidad predeterminada.",
     "details": "Detalles",
     "detailsFor": "Ver los detalles de {{identity}}",

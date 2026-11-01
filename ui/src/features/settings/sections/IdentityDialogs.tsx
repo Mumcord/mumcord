@@ -123,6 +123,8 @@ export function ImportIdentityDialog({
   const [label, setLabel] = useState(defaultLabel);
   const [problem, setProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Left untouched, the label stays the engine's default: the certificate's common name (AC-3.3).
+  const [edited, setEdited] = useState(false);
 
   const submit = async (event: SubmitEvent) => {
     event.preventDefault();
@@ -137,7 +139,7 @@ export function ImportIdentityDialog({
       const imported = await getApi().identityImport(
         path,
         password === "" ? null : password,
-        label.trim(),
+        edited ? label.trim() : null,
       );
       onDone(imported);
     } catch (error: unknown) {
@@ -174,6 +176,7 @@ export function ImportIdentityDialog({
           autoComplete="off"
           onChange={(event) => {
             setLabel(event.target.value);
+            setEdited(true);
           }}
         />
         <div role="alert" className="settings-error">

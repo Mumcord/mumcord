@@ -576,9 +576,14 @@ describe("ServerDialog", () => {
     expect(address).toHaveAccessibleDescription(/Enter the server address/);
     expect(address).toHaveFocus();
     fireEvent.change(address, { target: { value: "x.example.org" } });
+    fireEvent.change(screen.getByLabelText("Your name on this server"), { target: { value: "" } });
     fireEvent.click(within(dialog()).getByRole("button", { name: "Add server" }));
+    // AC-3.20: all three messages show, and the dialog jumps to the first invalid field.
     expect(screen.getByLabelText("Port")).toHaveFocus();
     expect(screen.getByLabelText("Port")).toHaveAccessibleDescription(/between 1 and 65535/);
+    expect(screen.getByLabelText("Your name on this server")).toHaveAccessibleDescription(
+      /Enter the name you want to use/,
+    );
   });
 
   it("groups the fields in four tabs and starts on Connection", async () => {

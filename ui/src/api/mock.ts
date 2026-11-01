@@ -1446,7 +1446,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   function addIdentity(label: string, name: string, certHash: string): Identity {
     if (certHash !== "" && identities.some((i) => i.certHash === certHash))
-      fail("invalidInput", "this identity is already in the list");
+      fail("duplicateIdentity", "this identity is already in the list");
     const identity: Identity = {
       id: nextIdentityId++,
       label,
@@ -1907,10 +1907,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     identityImport: (path, _password, label) => {
       const file = path.split(/[\\/]/).pop() ?? "Imported";
       const name = file.replace(/\.p12$|\.pfx$/i, "");
-      const id = nextIdentityId;
-      return Promise.resolve(
-        addIdentity(label ?? name, name, mockCertHash(`imported-${String(id)}`)),
-      );
+      // The hash comes from the file, so importing the same file twice is a duplicate.
+      return Promise.resolve(addIdentity(label ?? name, name, mockCertHash(path)));
     },
     identityRename: (id, label) => {
       requireIdentity(id);

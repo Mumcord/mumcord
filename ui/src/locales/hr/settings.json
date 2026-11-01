@@ -33,6 +33,7 @@
     "secureStorage": "Sigurna pohrana tvog sustava nije dostupna ili je pristup odbijen.",
     "io": "Datoteku nije bilo moguće pročitati ni zapisati. Provjeri lokaciju i pokušaj ponovno.",
     "invalidInput": "To nije uspjelo: datoteka ili lozinka nisu ispravne.",
+    "duplicateIdentity": "Ovaj identitet je već u tvom popisu.",
     "notFound": "Datoteka ili stavka nije pronađena.",
     "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
   },
@@ -71,7 +72,7 @@
     "fingerprintLine": "Otisak {{fingerprint}}",
     "notUsed": "Još ga ne koristi nijedan server",
     "setDefault": "Postavi kao zadani",
-    "setDefaultFor": "Postavi {{identity}} kao zadani identitet",
+    "setDefaultFor": "Postavi kao zadani – {{identity}}",
     "defaultSet": "{{identity}} je sada zadani identitet.",
     "details": "Pojedinosti",
     "detailsFor": "Prikaži pojedinosti {{identity}}",

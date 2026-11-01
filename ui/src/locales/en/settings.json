@@ -32,6 +32,7 @@
     "secureStorage": "Your system's secure storage is not available or access was refused.",
     "io": "The file could not be read or written. Check the location and try again.",
     "invalidInput": "That did not work: the file or password is not valid.",
+    "duplicateIdentity": "This identity is already in your list.",
     "notFound": "The file or item could not be found.",
     "generic": "Something went wrong. Please try again."
   },
@@ -70,7 +71,7 @@
     "fingerprintLine": "Fingerprint {{fingerprint}}",
     "notUsed": "Not used by any server yet",
     "setDefault": "Set as default",
-    "setDefaultFor": "Set {{identity}} as the default identity",
+    "setDefaultFor": "Set as default – {{identity}}",
     "defaultSet": "{{identity}} is now the default identity.",
     "details": "Details",
     "detailsFor": "Show details of {{identity}}",

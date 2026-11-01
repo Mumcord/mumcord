@@ -11,6 +11,8 @@ export function errorText(t: TFunction<"settings">, error: unknown): string {
       return t("errors.io");
     case "invalidInput":
       return t("errors.invalidInput");
+    case "duplicateIdentity":
+      return t("errors.duplicateIdentity");
     case "notFound":
       return t("errors.notFound");
     default:

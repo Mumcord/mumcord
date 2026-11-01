@@ -34,6 +34,7 @@
     "secureStorage": "Zabezpečené úložisko tvojho systému nie je dostupné alebo bol prístup odmietnutý.",
     "io": "Súbor sa nepodarilo prečítať ani zapísať. Skontroluj umiestnenie a skús to znova.",
     "invalidInput": "Nepodarilo sa: súbor alebo heslo nie sú platné.",
+    "duplicateIdentity": "Táto identita je už vo vašom zozname.",
     "notFound": "Súbor alebo položka sa nenašli.",
     "generic": "Niečo sa pokazilo. Skús to znova."
   },
@@ -72,7 +73,7 @@
     "fingerprintLine": "Odtlačok {{fingerprint}}",
     "notUsed": "Zatiaľ ju nepoužíva žiadny server",
     "setDefault": "Nastaviť ako predvolenú",
-    "setDefaultFor": "Nastaviť {{identity}} ako predvolenú identitu",
+    "setDefaultFor": "Nastaviť ako predvolenú – {{identity}}",
     "defaultSet": "{{identity}} je teraz predvolená identita.",
     "details": "Podrobnosti",
     "detailsFor": "Zobraziť podrobnosti {{identity}}",

@@ -223,22 +223,41 @@ impl Engine {
         let data = tokio::fs::read(&path).await.map_err(|e| {
             EngineError::new(ErrorKind::Io, format!("reading the file failed: {e}"))
         })?;
-        self.identity_import_data(data, password, label).await
+        // AC-3.3: the label defaults to the certificate's common name, and to the file name when
+        // the certificate has none (a label the person typed always wins).
+        let file_fallback = path
+            .file_stem()
+            .map(|stem| stem.to_string_lossy().to_string())
+            .unwrap_or_default();
+        self.identity_import_data(data, password, label, &file_fallback)
+            .await
     }
 
     /// Imports PKCS#12 data as an additional identity; shared by the file import and the
-    /// import from the official client (issue #66).
+    /// import from the official client (issue #66). `fallback` is the label to use when the
+    /// certificate carries no common name.
     pub(crate) async fn identity_import_data(
         &self,
         data: Vec<u8>,
         password: Option<String>,
         label: Option<String>,
+        fallback: &str,
     ) -> EngineResult<IdentityView> {
+        let fallback = fallback.to_string();
         let store = self.inner.store.clone();
         let record = self
             .blocking(move |secrets| {
                 let identity = Identity::from_pkcs12(&data, password.as_deref().unwrap_or(""))?;
-                let label = label.as_deref().unwrap_or_else(|| identity.name());
+                let typed = label
+                    .as_deref()
+                    .map(|value| value.trim())
+                    .filter(|value| !value.is_empty());
+                let cert_name = (!identity.name().is_empty()).then_some(identity.name());
+                let named = (!fallback.is_empty()).then_some(fallback.as_str());
+                let label = typed
+                    .or(cert_name)
+                    .or(named)
+                    .unwrap_or_else(|| identity.name());
                 let record = lock(&store).add_identity(&NewIdentity::new(
                     label,
                     identity.name(),
@@ -1007,7 +1026,7 @@ mod tests {
             .identity_import(file, Some("s3cret".into()), None)
             .await
             .expect_err("duplicate");
-        assert_eq!(again.kind, ErrorKind::InvalidInput);
+        assert_eq!(again.kind, ErrorKind::DuplicateIdentity);
         assert_eq!(other.identity_list().await.expect("list").len(), 1);
         let _ = other_dir;
     }

@@ -33,6 +33,7 @@
     "secureStorage": "Stocarea securizată a sistemului tău nu e disponibilă sau accesul a fost refuzat.",
     "io": "Fișierul nu a putut fi citit sau scris. Verifică locația și încearcă din nou.",
     "invalidInput": "Nu a mers: fișierul sau parola nu sunt valide.",
+    "duplicateIdentity": "Această identitate este deja în lista ta.",
     "notFound": "Fișierul sau elementul nu a fost găsit.",
     "generic": "Ceva n-a mers bine. Încearcă din nou."
   },
@@ -71,7 +72,7 @@
     "fingerprintLine": "Amprentă {{fingerprint}}",
     "notUsed": "Încă nu este folosită de niciun server",
     "setDefault": "Setează implicită",
-    "setDefaultFor": "Setează {{identity}} ca identitate implicită",
+    "setDefaultFor": "Setează implicită – {{identity}}",
     "defaultSet": "{{identity}} este acum identitatea implicită.",
     "details": "Detalii",
     "detailsFor": "Arată detaliile pentru {{identity}}",

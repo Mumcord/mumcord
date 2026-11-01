@@ -495,9 +495,8 @@ pub(crate) fn store_error(err: mumcord_store::Error) -> EngineError {
         }
         E::Pkcs12(_) | E::Pkcs12NoIdentity | E::EmptyIdentityName => ErrorKind::InvalidInput,
         E::InvalidVolume(_) | E::InvalidPort => ErrorKind::InvalidInput,
-        E::InvalidIdentityLabel { .. } | E::DuplicateIdentity | E::LastIdentity => {
-            ErrorKind::InvalidInput
-        }
+        E::InvalidIdentityLabel { .. } | E::LastIdentity => ErrorKind::InvalidInput,
+        E::DuplicateIdentity => ErrorKind::DuplicateIdentity,
         E::UnknownServer(_) | E::UnknownIdentity(_) => ErrorKind::NotFound,
         _ => ErrorKind::Internal,
     };

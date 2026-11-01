@@ -1255,6 +1255,8 @@ export type ErrorCode =
 "messageTooLarge" | 
 /**  An argument was invalid (bad address, empty name, malformed link). */
 "invalidInput" | 
+/**  An identity with this certificate hash is already in the list (issue #148, AC-3.3). */
+"duplicateIdentity" | 
 /**  The referenced server, channel, person or file does not exist. */
 "notFound" | 
 /**  The OS secure storage is unavailable or refused access. */

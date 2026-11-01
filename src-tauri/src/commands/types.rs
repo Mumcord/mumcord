@@ -47,6 +47,8 @@ pub enum ErrorCode {
     MessageTooLarge,
     /// An argument was invalid (bad address, empty name, malformed link).
     InvalidInput,
+    /// An identity with this certificate hash is already in the list (issue #148, AC-3.3).
+    DuplicateIdentity,
     /// The referenced server, channel, person or file does not exist.
     NotFound,
     /// The OS secure storage is unavailable or refused access.
@@ -109,6 +111,7 @@ impl From<EngineError> for ApiError {
             ErrorKind::ServerLimitReached => ErrorCode::ServerLimitReached,
             ErrorKind::MessageTooLarge => ErrorCode::MessageTooLarge,
             ErrorKind::InvalidInput => ErrorCode::InvalidInput,
+            ErrorKind::DuplicateIdentity => ErrorCode::DuplicateIdentity,
             ErrorKind::NotFound => ErrorCode::NotFound,
             ErrorKind::ShareFull => ErrorCode::ShareFull,
             ErrorKind::DirectUnavailable => ErrorCode::DirectUnavailable,
