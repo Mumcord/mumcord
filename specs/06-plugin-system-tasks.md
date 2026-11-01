@@ -87,7 +87,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | M2c | Mumbot Music plugin: use M2a so "Configure bot" only shows on users announcing mumbot-music or already saved bots (by peer key) | open | |
 | L0 | SDK i18n helper: `mumcord_plugin_sdk::i18n` that embeds the plugin's i18n/<tag>.json files at build time (include_str via a macro), resolves the current language from language-changed with fallback chain (e.g. de-AT → de → en), and supports {{placeholders}} + plural one/other | done (ff7d3e6b) | l0-sdki18n |
 | L0b | SDK i18n: full CLDR plural categories (zero/one/two/few/many/other) for the 24 languages in `tn`, falling back to `_other` | done (cf033cd5; `plural_category(tag, count)`, tn walks the fallback chain) | l0b-plurals |
-| L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | in progress | l1 |
+| L1 | Poll: all 24 Mumcord languages (i18n/<tag>.json, real translations) via the L0 helper | done (feat/poll 1b8a91a) | l1 |
 | L2 | Dice: all 24 languages via L0 | in progress | l2 |
 | L3 | Echolings: all 24 languages via L0 | in progress | l3 |
 | L4 | Mumbot Music: all 24 languages via L0 | in progress | l4 |
@@ -97,7 +97,7 @@ Maintained by the lead only. Status: open / in progress / done / blocked. Task d
 | S2 | Dice scenario tests on Mumcord/plugins feat/dice | done (feat/dice e815bd5) | s2-dice |
 | S3 | Echolings scenario tests on feat/echolings | done (feat/echolings 281fa50) | s3-pets |
 | S4 | Mumbot Music scenario tests on feat/mumbot-music | done (feat/mumbot-music 235a698; http-response not mockable in CLI — covered by native tests + C11 real bot) | s4-music |
-| M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins) | open | |
+| M1 | Epic merge follow-up: switch the SDK git dep from branch epic/plugins to main (tools/mumcord-plugin new.rs template, Mumcord/plugins template/Cargo.toml and all official plugins); also run `cargo update -p mumcord-plugin-sdk` in every official plugin so they pick up L0b plurals + M2a | open | |
 | B25c2 | Runtime test: build the SDK example (wasm32-unknown-unknown + wit-component) and load/enable it in the real runtime (after B11a/B11b serve storage, ui, peers) | done (folded into B25c) | b25c-test |
 
 ---
