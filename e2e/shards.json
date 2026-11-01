@@ -55,6 +55,7 @@
       "specs/plugins/dice.e2e.ts",
       "specs/plugins/poll.e2e.ts",
       "specs/plugins/registry-install.e2e.ts",
+      "specs/plugins/server-suggestions.e2e.ts",
       "specs/smoke/two-clients.e2e.ts",
       "specs/voice/voice.e2e.ts",
       "specs/wizard/ac-1.2-import-identity.e2e.ts",
