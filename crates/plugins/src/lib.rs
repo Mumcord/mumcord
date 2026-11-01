@@ -13,6 +13,7 @@ pub mod manifest;
 pub mod messaging;
 pub mod package;
 pub mod permissions;
+pub mod registry;
 mod runtime;
 pub mod verify;
 pub mod version;

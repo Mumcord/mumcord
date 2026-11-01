@@ -26,6 +26,9 @@ toml.workspace = true
 rand.workspace = true
 ammonia.workspace = true
 reqwest.workspace = true
+rustls.workspace = true
+rustls-platform-verifier.workspace = true
+base64.workspace = true
 tokio.workspace = true
 
 [dev-dependencies]

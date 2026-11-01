@@ -4105,12 +4105,15 @@ name = "mumcord-plugins"
 version = "0.4.4"
 dependencies = [
  "ammonia",
+ "base64 0.23.1",
  "hmac 0.13.0",
  "minisign",
  "minisign-verify",
  "mumcord-store",
  "rand 0.10.3",
  "reqwest",
+ "rustls",
+ "rustls-platform-verifier",
  "semver",
  "serde",
  "serde_json",
