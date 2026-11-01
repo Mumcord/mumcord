@@ -159,6 +159,34 @@ describe("PluginStrip", () => {
     expect(screen.queryByText("pets panel")).toBeNull();
   });
 
+  it("keeps the icons when collapsed and opens the popover from an icon", async () => {
+    window.localStorage.setItem("mumcord.pluginStrip.collapsed", "1");
+    setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
+    const events = vi.spyOn(api, "pluginUiEvent").mockResolvedValue(null);
+    render(<PluginStrip />);
+    const poll = await screen.findByRole("button", { name: "Poll" });
+    expect(screen.queryByText("pets panel")).toBeNull();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Pets" }), { key: "ArrowRight" });
+    expect(poll).toHaveFocus();
+    fireEvent.click(poll);
+    expect(screen.getByRole("dialog", { name: "Poll" })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(events).toHaveBeenCalledWith("poll", {
+        type: "panelVisibility",
+        visibility: "expanded",
+      });
+    });
+    fireEvent.keyDown(screen.getByRole("dialog", { name: "Poll" }), { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(poll).toHaveFocus();
+    await waitFor(() => {
+      expect(events).toHaveBeenLastCalledWith("poll", {
+        type: "panelVisibility",
+        visibility: "hidden",
+      });
+    });
+  });
+
   async function connect() {
     const [server] = await api.serversList();
     await api.connect((server ?? { id: 0 }).id, null, null);

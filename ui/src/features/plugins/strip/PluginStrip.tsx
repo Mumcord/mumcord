@@ -57,12 +57,13 @@ export function PluginStrip() {
     .map((p) => ({ id: p.id, name: p.name }));
   const active = withPanel.find((p) => p.id === chosen) ?? withPanel[0];
   const activeId = active?.id;
-  const open = !collapsed && activeId !== undefined;
+  const inline = !collapsed && activeId !== undefined;
 
   // Tell each plugin whether its panel is visible (B18 contract); only changes are sent.
   const wanted = new Map<string, PluginPanelVisibility>();
   for (const p of withPanel) {
-    wanted.set(p.id, open && p.id === activeId ? (expanded ? "expanded" : "inline") : "hidden");
+    const shown = p.id === activeId && (expanded || inline);
+    wanted.set(p.id, shown ? (expanded ? "expanded" : "inline") : "hidden");
   }
   const wantedKey = [...wanted].map(([id, v]) => `${id}=${v}`).join("|");
   useEffect(() => {
@@ -81,7 +82,7 @@ export function PluginStrip() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wantedKey]);
 
-  const popover = open && expanded;
+  const popover = activeId !== undefined && expanded;
   const closeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (popover) closeRef.current?.focus();
@@ -94,6 +95,13 @@ export function PluginStrip() {
     setCollapsed(next);
     saveCollapsed(next);
     setExpanded(false);
+  }
+
+  function closePopover() {
+    setExpanded(false);
+    // The inline panel (and its expand button) is hidden while collapsed; go back to the icon.
+    const target = collapsed ? iconRefs.current.get(activeId ?? "") : expandRef.current;
+    target?.focus();
   }
 
   function onIconKeys(event: KeyboardEvent, index: number) {
@@ -119,8 +127,7 @@ export function PluginStrip() {
   function onPopoverKeys(event: KeyboardEvent) {
     if (event.key !== "Escape") return;
     event.stopPropagation();
-    setExpanded(false);
-    expandRef.current?.focus();
+    closePopover();
   }
 
   const panelId = `${baseId}-panel`;
@@ -144,36 +151,38 @@ export function PluginStrip() {
         >
           <span aria-hidden="true">{collapsed ? "▸" : "▾"}</span> {t("heading")}
         </button>
-        {!collapsed && (
-          <div className="pstrip-icons" role="toolbar" aria-label={t("list")}>
-            {withPanel.map((p, index) => (
-              <button
-                key={p.id}
-                type="button"
-                ref={(el) => {
-                  if (el) iconRefs.current.set(p.id, el);
-                  else iconRefs.current.delete(p.id);
-                }}
-                className="pstrip-icon"
-                aria-label={p.name}
-                aria-pressed={p.id === active.id}
-                data-tooltip={p.name}
-                tabIndex={p.id === active.id ? 0 : -1}
-                onClick={() => {
-                  setChosen(p.id);
-                }}
-                onKeyDown={(e) => {
-                  onIconKeys(e, index);
-                }}
-              >
-                <PluginIcon id={p.id} name={p.name} />
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="pstrip-icons" role="toolbar" aria-label={t("list")}>
+          {withPanel.map((p, index) => (
+            <button
+              key={p.id}
+              type="button"
+              ref={(el) => {
+                if (el) iconRefs.current.set(p.id, el);
+                else iconRefs.current.delete(p.id);
+              }}
+              className="pstrip-icon"
+              aria-label={p.name}
+              aria-pressed={collapsed ? undefined : p.id === active.id}
+              aria-haspopup={collapsed ? "dialog" : undefined}
+              aria-expanded={collapsed ? expanded && p.id === active.id : undefined}
+              data-tooltip={p.name}
+              tabIndex={p.id === active.id ? 0 : -1}
+              onClick={() => {
+                setChosen(p.id);
+                // Collapsed, an icon has no inline panel to show, so it opens the large popover.
+                if (collapsed) setExpanded(true);
+              }}
+              onKeyDown={(e) => {
+                onIconKeys(e, index);
+              }}
+            >
+              <PluginIcon id={p.id} name={p.name} />
+            </button>
+          ))}
+        </div>
       </div>
       <div id={panelId} hidden={collapsed}>
-        {open && (
+        {inline && (
           <div className="pstrip-panel" data-shared={sharedSupported ? "on" : "off"}>
             <div className="pstrip-panel-head">
               <span className="pstrip-panel-name">{active.name}</span>
@@ -214,10 +223,7 @@ export function PluginStrip() {
               ref={closeRef}
               aria-label={t("close")}
               data-tooltip={t("close")}
-              onClick={() => {
-                setExpanded(false);
-                expandRef.current?.focus();
-              }}
+              onClick={closePopover}
             >
               <span aria-hidden="true">✕</span>
             </button>
