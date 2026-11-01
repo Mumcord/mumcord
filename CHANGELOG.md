@@ -37,6 +37,7 @@
 - Pasting with Ctrl+V works again on some Linux desktops
 - A plugin that could not be loaded now keeps its name (in your language) and icon in **Settings > Plugins > Installed** instead of showing its internal id
 - A plugin window that shows a web page (for example the EVE fit fitting wheel) now opens right after installing or updating the plugin, instead of only after restarting Mumcord
+- A plugin button that leads to its permissions (for example Poll's **Turn on !poll voting**) now opens that plugin's permissions in **Settings > Plugins > Installed** instead of only the list
 
 ### Internal
 

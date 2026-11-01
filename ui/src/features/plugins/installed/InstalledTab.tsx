@@ -55,8 +55,9 @@ export function InstalledTab() {
   const rows = useRef(new Map<string, HTMLLIElement>());
 
   // "Open in Settings" from a notification: open that plugin's details and bring it into view.
+  // A request made while Settings was closed is already waiting when the tab mounts.
   const request = usePendingPluginRequest("installed");
-  const [handled, setHandled] = useState(request);
+  const [handled, setHandled] = useState<typeof request>(null);
   if (request !== null && request !== handled && overview !== null) {
     setHandled(request);
     if (overview.plugins.some((plugin) => plugin.id === request.plugin)) setOpenId(request.plugin);

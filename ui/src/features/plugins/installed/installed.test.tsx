@@ -350,4 +350,13 @@ describe("InstalledTab", () => {
       await screen.findByRole("button", { name: "Permissions", description: "foo" }),
     ).toHaveAttribute("aria-expanded", "true");
   });
+
+  it("opens the plugin of a request made while Settings was closed", async () => {
+    withPlugins([echolings, foo]);
+    routePluginRequest({ kind: "installed", plugin: "foo" });
+    render(<InstalledTab />);
+    expect(
+      await screen.findByRole("button", { name: "Permissions", description: "foo" }),
+    ).toHaveAttribute("aria-expanded", "true");
+  });
 });
