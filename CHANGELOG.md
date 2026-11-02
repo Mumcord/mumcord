@@ -2,11 +2,18 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)
+
+### Fixed
+
+- macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
+
 ## [0.6.0] - 2026-11-02
 
 ### Changed
 
-- Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)
 - The "Turn off all plugins" switch in Settings → Plugins now sits in a card like the other settings.
 - Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
 - Mumcord now opens with a **start screen** (the logo on the theme background with a slim loading bar) instead of an empty white window and a bare "Loading…" text. The window only appears once the start screen is drawn, the start screen follows your system theme (or the fixed theme you picked) and fades into the app when it is ready; with reduced motion it switches without movement (#323)
@@ -48,7 +55,6 @@
 
 ### Fixed
 
-- macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
 - A plugin is no longer stopped while your system keychain asks you to unlock it or to allow access (KWallet, GNOME Keyring, macOS Keychain), and saving a plugin password while that prompt is open no longer holds up other plugins. If the prompt is not answered within 2 minutes, the plugin is told secrets are unavailable.
 - Plugins: old compiled copies of plugins no longer pile up on disk; Mumcord removes the ones that are no longer needed each time it starts
 - Closing a full profile card with Escape right after using a button in it (for example a plugin button that then greys out) no longer stops that profile card from opening again.
