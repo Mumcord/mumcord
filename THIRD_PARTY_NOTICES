@@ -818,7 +818,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (676 crates)
+* MIT License (668 crates)
 * Apache License 2.0 (43 crates)
 * BSD 3-Clause "New" or "Revised" License (31 crates)
 * ISC License (20 crates)
@@ -4451,7 +4451,7 @@ ISC License
 
 Used by:
   - libloading 0.7.4 (https://github.com/nagisa/rust_libloading/)
-  - libloading 0.8.9 (https://github.com/nagisa/rust_libloading/)
+  - libloading 0.9.0 (https://github.com/nagisa/rust_libloading/)
 
 Copyright © 2015, Simonas Kazlauskas
 
@@ -4692,7 +4692,6 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - sha1 0.10.7 (https://github.com/RustCrypto/hashes)
   - sha2 0.10.9 (https://github.com/RustCrypto/hashes)
 
 Copyright (c) 2006-2009 Graydon Hoare
@@ -5250,7 +5249,7 @@ MIT License
 
 Used by:
   - libsqlite3-sys 0.39.1 (https://github.com/rusqlite/rusqlite)
-  - rusqlite 0.41.0 (https://github.com/rusqlite/rusqlite)
+  - rusqlite 0.41.1 (https://github.com/rusqlite/rusqlite)
 
 Copyright (c) 2014 The rusqlite developers
 
@@ -5436,7 +5435,6 @@ MIT License
 Used by:
   - coreaudio-rs 0.14.2 (https://github.com/RustAudio/coreaudio-rs.git)
   - either 1.19.0 (https://github.com/rayon-rs/either)
-  - itertools 0.13.0 (https://github.com/rust-itertools/itertools)
   - itertools 0.14.0 (https://github.com/rust-itertools/itertools)
   - maplit 1.0.2 (https://github.com/bluss/maplit)
   - petgraph 0.8.3 (https://github.com/petgraph/petgraph)
@@ -9463,11 +9461,11 @@ MIT License
 
 Used by:
   - zbus 5.19.0 (https://github.com/z-galaxy/zbus/)
-  - zbus 6.1.0 (https://github.com/z-galaxy/zbus/)
+  - zbus 6.2.1 (https://github.com/z-galaxy/zbus/)
   - zbus_macros 5.19.0 (https://github.com/z-galaxy/zbus/)
-  - zbus_macros 6.1.0 (https://github.com/z-galaxy/zbus/)
+  - zbus_macros 6.2.1 (https://github.com/z-galaxy/zbus/)
   - zbus_names 4.3.5 (https://github.com/z-galaxy/zbus/)
-  - zbus_utils 6.0.0 (https://github.com/z-galaxy/zbus/)
+  - zbus_utils 6.1.0 (https://github.com/z-galaxy/zbus/)
   - zvariant 5.15.1 (https://github.com/z-galaxy/zbus/)
   - zvariant_derive 5.15.1 (https://github.com/z-galaxy/zbus/)
 
@@ -10944,6 +10942,7 @@ MIT License
 
 Used by:
   - ashpd 0.13.13 (https://github.com/bilelmoussaoui/ashpd)
+  - rfd 0.17.2 (https://github.com/PolyMeilex/rfd)
 
 MIT License
 
@@ -11244,7 +11243,7 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - rfd 0.16.1 (https://github.com/PolyMeilex/rfd)
+  - rfd 0.17.2 (https://github.com/PolyMeilex/rfd)
 
 MIT License
 
@@ -11628,12 +11627,12 @@ Used by:
   - specta-util 0.0.13 (https://github.com/specta-rs/specta)
   - specta 2.0.0-rc.26 (https://github.com/specta-rs/specta)
   - tauri-plugin-clipboard-manager 2.5.0 (https://github.com/tauri-apps/plugins-workspace)
-  - tauri-plugin-deep-link 2.6.2 (https://github.com/tauri-apps/plugins-workspace)
-  - tauri-plugin-dialog 2.8.3 (https://github.com/tauri-apps/plugins-workspace)
+  - tauri-plugin-deep-link 2.6.3 (https://github.com/tauri-apps/plugins-workspace)
+  - tauri-plugin-dialog 2.8.4 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-fs 2.7.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-global-shortcut 2.4.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-opener 2.7.2 (https://github.com/tauri-apps/plugins-workspace)
-  - tauri-plugin-single-instance 2.5.4 (https://github.com/tauri-apps/plugins-workspace)
+  - tauri-plugin-single-instance 2.5.5 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-updater 2.14.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-winrt-notification 0.8.1 (https://github.com/tauri-apps/winrt-notification)
   - webview2-com-macros 0.8.1 (https://github.com/wravery/webview2-rs)
@@ -11649,21 +11648,14 @@ Used by:
   - windows-registry 0.6.1 (https://github.com/microsoft/windows-rs)
   - windows-result 0.4.1 (https://github.com/microsoft/windows-rs)
   - windows-strings 0.5.1 (https://github.com/microsoft/windows-rs)
-  - windows-sys 0.45.0 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.59.0 (https://github.com/microsoft/windows-rs)
-  - windows-sys 0.60.2 (https://github.com/microsoft/windows-rs)
   - windows-sys 0.61.2 (https://github.com/microsoft/windows-rs)
-  - windows-targets 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows-targets 0.52.6 (https://github.com/microsoft/windows-rs)
-  - windows-targets 0.53.5 (https://github.com/microsoft/windows-rs)
   - windows-threading 0.2.1 (https://github.com/microsoft/windows-rs)
   - windows-version 0.1.7 (https://github.com/microsoft/windows-rs)
   - windows 0.62.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_gnu 0.52.6 (https://github.com/microsoft/windows-rs)
-  - windows_x86_64_gnu 0.53.1 (https://github.com/microsoft/windows-rs)
-  - windows_x86_64_msvc 0.42.2 (https://github.com/microsoft/windows-rs)
   - windows_x86_64_msvc 0.52.6 (https://github.com/microsoft/windows-rs)
-  - windows_x86_64_msvc 0.53.1 (https://github.com/microsoft/windows-rs)
 
 MIT License
 
@@ -11995,7 +11987,7 @@ Used by:
   - adler2 2.0.1 (https://github.com/oyvindln/adler2)
   - anyhow 1.0.104 (https://github.com/dtolnay/anyhow)
   - async-channel 2.5.0 (https://github.com/smol-rs/async-channel)
-  - async-executor 1.14.0 (https://github.com/smol-rs/async-executor)
+  - async-executor 1.14.1 (https://github.com/smol-rs/async-executor)
   - async-io 2.6.0 (https://github.com/smol-rs/async-io)
   - async-lock 3.4.2 (https://github.com/smol-rs/async-lock)
   - async-process 2.5.0 (https://github.com/smol-rs/async-process)
@@ -15362,7 +15354,7 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 
 --------------------------------------------------------------------------------
-@tanstack/react-virtual@3.14.19
+@tanstack/react-virtual@3.14.24
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -15392,7 +15384,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-@tanstack/virtual-core@3.19.4
+@tanstack/virtual-core@3.19.9
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -15450,7 +15442,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/tauri.git
 Creator: Person: Daniel Thompson-Yvetot
 
 --------------------------------------------------------------------------------
-@tauri-apps/plugin-deep-link@2.6.2
+@tauri-apps/plugin-deep-link@2.6.3
 --------------------------------------------------------------------------------
 
 License: MIT OR Apache-2.0
@@ -15478,7 +15470,7 @@ PackageDownloadLocation: git+ssh://github.com/tauri-apps/tauri.git
 Creator: Person: Daniel Thompson-Yvetot
 
 --------------------------------------------------------------------------------
-@tauri-apps/plugin-dialog@2.8.3
+@tauri-apps/plugin-dialog@2.8.4
 --------------------------------------------------------------------------------
 
 License: MIT OR Apache-2.0
@@ -15842,7 +15834,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-i18next@26.5.10
+i18next@26.5.12
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -15872,7 +15864,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-marked@18.1.1
+marked@18.1.2
 --------------------------------------------------------------------------------
 
 License: MIT
@@ -15954,7 +15946,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --------------------------------------------------------------------------------
-react-i18next@17.1.8
+react-i18next@17.1.9
 --------------------------------------------------------------------------------
 
 License: MIT

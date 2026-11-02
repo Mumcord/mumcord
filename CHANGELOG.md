@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-11-02
+
 ### Changed
 
 - Linux AppImage: Mumcord's window and extra windows (What's new, packet inspector) open much faster. Each window spent seconds rescanning the system's GStreamer plugins, twice on systems where /usr/lib64 points to /usr/lib
@@ -464,6 +466,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.6.2]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.2
 [0.6.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.1
 [0.6.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.0
 [0.5.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.5.0

@@ -1,0 +1,148 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.6.2-1.aarch64.rpm",
+      "sha256": "1a24d9af715806090e5dacc376db743fa3dea20acbdc1aab0e31922f03e40dc5",
+      "size": 48038930
+    },
+    {
+      "name": "Mumcord-0.6.2-1.x86_64.rpm",
+      "sha256": "d3f4e3cf8a9e34e3c392573aeb5cc674c1626bb2391e8abe9d32f01d9ef3ca60",
+      "size": 47523789
+    },
+    {
+      "name": "Mumcord_0.6.2_aarch64.AppImage",
+      "sha256": "39c7226fda199903d228e8c184a88ee9c9ac6eeff73c1bda9265c0e225aa005b",
+      "size": 129776136
+    },
+    {
+      "name": "Mumcord_0.6.2_aarch64.AppImage.sig",
+      "sha256": "c7ee47a465f6f4e7fc74614048475f5992f0a0d57b323816b8fedeb49658b69d",
+      "size": 440
+    },
+    {
+      "name": "Mumcord_0.6.2_amd64.AppImage",
+      "sha256": "9271f2730da4b2573a0e2f58eb20738d7bca6e1e412b693b9db04d5ba0289815",
+      "size": 131680760
+    },
+    {
+      "name": "Mumcord_0.6.2_amd64.AppImage.sig",
+      "sha256": "63af565c909d04e6a899bad4111676700af3bdc0d957545fc687abe3ec6ff075",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.6.2_amd64.deb",
+      "sha256": "365179310929573190248b00220a11fd3e2cd84b3258f96c81edc6cb41d20274",
+      "size": 47519248
+    },
+    {
+      "name": "Mumcord_0.6.2_arm64.deb",
+      "sha256": "25be233311f269eb67497d298584764a3c09a4a4c1cc3f1c54330603d16b1122",
+      "size": 48032938
+    },
+    {
+      "name": "Mumcord_0.6.2_universal.app.tar.gz",
+      "sha256": "2913da8c51cada2dbce765581d779eb869d91ed97ab917f5823712518f7f4112",
+      "size": 76184191
+    },
+    {
+      "name": "Mumcord_0.6.2_universal.app.tar.gz.sig",
+      "sha256": "502c3346005970bdfbef10b5e195e5ed9c874fc82b31aa852f0fbc5427acf950",
+      "size": 444
+    },
+    {
+      "name": "Mumcord_0.6.2_universal.dmg",
+      "sha256": "6e018b249e0e6b5399acc64eef27221be4fdae024da1201529d6ebf724bc29a0",
+      "size": 76419543
+    },
+    {
+      "name": "Mumcord_0.6.2_x64-portable.zip",
+      "sha256": "503003eccd9976eed83e5b8943080c2676547a32b2add3d2d784732c99810ce3",
+      "size": 37578138
+    },
+    {
+      "name": "Mumcord_0.6.2_x64-setup.exe",
+      "sha256": "1ef8b2cb40852bec0198acff3764eb10ddcb60ece47de96414cccdc76caeccd5",
+      "size": 29267544
+    },
+    {
+      "name": "Mumcord_0.6.2_x64-setup.exe.sig",
+      "sha256": "071c94fbad2e7a32bcf2aea5b23f27a863fb4d5cd39e93be88711b0f7d2bf871",
+      "size": 436
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "96bfc8c2e7a2845769a5583f4881768e5cf7a09ff27a0cb5a4ad866dd7efc0cd",
+      "size": 2132
+    },
+    {
+      "name": "install.sh",
+      "sha256": "02f9c7658b0800b17742fd44b3c9d79338612918a3fe74424364e79654ebcb73",
+      "size": 23508
+    },
+    {
+      "name": "latest.json",
+      "sha256": "846fd52c00a3baa98af1cd216302ad2ea937a3b510318cf77ec55bad74b51601",
+      "size": 3129
+    },
+    {
+      "name": "mumcord-0.6.2-appimage-aarch64.cdx.json",
+      "sha256": "0c8cb0af5501762e80b0892d42547e8f554dd8021052a37e77e7083943efd349",
+      "size": 925704
+    },
+    {
+      "name": "mumcord-0.6.2-appimage-x86_64.cdx.json",
+      "sha256": "79a2a3630eabdb58906c22ed72960f4f57b575d4721bcc9a31d5153672db10c4",
+      "size": 926768
+    },
+    {
+      "name": "mumcord-0.6.2-deb-rpm-aarch64.cdx.json",
+      "sha256": "9bd4487e2a9134cb2ab04626cb3dd22a3cadacfdf4ea0f7c064ed30858473fe9",
+      "size": 875753
+    },
+    {
+      "name": "mumcord-0.6.2-deb-rpm-x86_64.cdx.json",
+      "sha256": "a77ab0e2e19f7d1fe1b8a8c9466abc25d5644d4b223fd8f4576bdb1d1f65d6a1",
+      "size": 876817
+    },
+    {
+      "name": "mumcord-0.6.2-macos-universal.cdx.json",
+      "sha256": "dc166dae06b3d83f927b4c0c0e734492ecc879816726b5719394ab443c371b22",
+      "size": 744693
+    },
+    {
+      "name": "mumcord-0.6.2-windows-x86_64.cdx.json",
+      "sha256": "c5ed41b79df225187a9d5a7480c057035c3a10e8f119ebdb8ac6552049f6baa4",
+      "size": 713592
+    }
+  ],
+  "changelog": {
+    "sha256": "5f9c8b949ef67d14c83d18ed639c90f98e0f131ad1f31b9435efb5ddcba0bff3",
+    "text": "## [0.6.2] - 2026-11-02\n\n### Changed\n\n- Linux AppImage: Mumcord's window and extra windows (What's new, packet inspector) open much faster. Each window spent seconds rescanning the system's GStreamer plugins, twice on systems where /usr/lib64 points to /usr/lib\n\n### Fixed\n\n- \"What's new\" now opens on the notes of the version you are running, followed by the older releases; a release used to open on the previous version's notes, and a section called \"Unreleased\" or notes of newer versions could show up\n- \"What's new\" has its notes built into the app, so it no longer needs to load them and cannot get stuck loading\n- Plugin icons in the strip under the channel list are now centred in their buttons and drawn larger.\n- The disconnect menu of the hang-up button now opens above the button instead of running off the bottom of the window, and \"Switch voice\" has an icon\n\n### Internal\n\n- Updated dependencies: `libloading` 0.9, `sha1` 0.11, the Rust and npm minor and patch updates and the cargo-deny GitHub Action; `async-executor` moves off a yanked release so the dependency audit passes again"
+  },
+  "commit": "7a8084901d84be01a599956adf58c4233e1fb2da",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "cedd74e01c772d558b9557f71464e55644f9bb3e8ddebfc6289028401e067372",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "23c0b4195960abb3d85dabc798f2d161a1ecc781a11cd49652c279858d35adc6",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "fee86fb593fbd7d919a9cd53610857cb419e96f33d5a272a311543da9f631103",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "c353b518aa45971594e92146d9935b108b6b41ec8d0586fbda766919047565c2",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "9820767f5c5145701c4b42b33c72046bfde715db1b6040aac4614c0263d71b23",
+      "yanked": false
+    }
+  },
+  "sha256sums": "96bfc8c2e7a2845769a5583f4881768e5cf7a09ff27a0cb5a4ad866dd7efc0cd",
+  "tag": "v0.6.2"
+}
