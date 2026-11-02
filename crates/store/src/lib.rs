@@ -10,6 +10,7 @@ mod blocked;
 mod channel_audio;
 mod channel_tokens;
 mod db;
+mod encoder_cache;
 mod error;
 mod favorites;
 mod friends;
@@ -30,6 +31,7 @@ pub use blocked::BlockedUser;
 pub use channel_audio::{ChannelAudioProfile, SavedChannelAudio, resolve_channel_audio};
 pub use channel_tokens::{ChannelToken, TokenChannel};
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
+pub use encoder_cache::{EncoderCache, EncoderEntry, SvtSelftest};
 pub use error::{Error, Result};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};
 pub use friends::Friend;
@@ -47,12 +49,13 @@ pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
     BlockedMessages, ChatDisplay, CloseBehaviour, Consent, DEFAULT_APP_THEME_ID,
     DEFAULT_INGAME_OPACITY_PERCENT, DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS,
-    GameKey, GameOverlayEntry, Hotkey, HotkeyAction, InGameOverlayMode, InGameOverlaySettings,
-    LogLevel, MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS, MAX_VIDEO_DUCKING_PERCENT,
-    MIN_MAX_CONNECTED_SERVERS, MIN_UPDATE_INTERVAL_HOURS, MIN_VIDEO_DUCKING_PERCENT, NoiseBackend,
-    NotificationMode, OverlayCorner, OwnVoice, P2pMode, PluginUpdates, PmRule, PositionalSettings,
-    PrivateMessageSettings, Settings, SetupPreset, SoundSettings, SoundTheme, TalkMode, Theme,
-    ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
+    FilesMaxSize, GameKey, GameOverlayEntry, Hotkey, HotkeyAction, InGameOverlayMode,
+    InGameOverlaySettings, LogLevel, MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS,
+    MAX_VIDEO_DUCKING_PERCENT, MIN_MAX_CONNECTED_SERVERS, MIN_UPDATE_INTERVAL_HOURS,
+    MIN_VIDEO_DUCKING_PERCENT, NoiseBackend, NotificationMode, OverlayCorner, OwnVoice, P2pMode,
+    PluginUpdates, PmRule, PositionalSettings, PrivateMessageSettings, ScreenCodec, ScreenFps,
+    ScreenOptimize, ScreenResolution, ScreenUploadLimit, Settings, SetupPreset, SoundSettings,
+    SoundTheme, TalkMode, Theme, ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
 };
 pub use social::{FollowedChannel, PersonSetting};
 pub use synced::RangeSummary;

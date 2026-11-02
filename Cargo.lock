@@ -4051,6 +4051,7 @@ dependencies = [
  "rcgen",
  "regex",
  "reqwest",
+ "ring",
  "rnnoise-rs",
  "rusqlite",
  "rustls",
@@ -4072,6 +4073,8 @@ dependencies = [
  "windows-registry",
  "x11rb 0.14.0",
  "x509-parser",
+ "xattr",
+ "zip",
 ]
 
 [[package]]

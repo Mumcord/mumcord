@@ -1492,6 +1492,9 @@ export type ErrorCode =
 /**  Unexpected internal failure. */
 "internal";
 
+/**  Largest accepted file (Settings → Files). */
+export type FilesMaxSize = "100M" | "500M" | "1G" | "2G";
+
 /**  Outcome of "Follow all channels" (QA.13); already followed channels are not counted. */
 export type FollowAllSummary = {
 	followed: number,
@@ -3110,6 +3113,14 @@ export type SavedServer = {
 	p2pModeOverride: P2pMode | null,
 };
 
+export type ScreenCodec = "auto" | "av1" | "vp9";
+
+export type ScreenFps = "15" | "30" | "60";
+
+export type ScreenOptimize = "balanced" | "text" | "motion";
+
+export type ScreenResolution = "auto" | "720" | "1080" | "1440";
+
 /**  One person sharing their screen in the voice channel. */
 export type ScreenShare = {
 	/**  The sharing person; the own session for the user's share. */
@@ -3138,6 +3149,9 @@ export type ScreenSharesChanged = {
 	serverId: number,
 	shares: ScreenShare[],
 };
+
+/**  Own upload limit in Mbit/s. */
+export type ScreenUploadLimit = "auto" | "2" | "5" | "10" | "20";
 
 /**  A chat request the user sent; a decline is never told, so it stays pending. */
 export type SentChatRequest = {
@@ -3315,7 +3329,7 @@ export type Settings = {
 	videoDucking: boolean,
 	/**  The lowered level while people talk, 10–80 % (default 30). */
 	videoDuckingPercent: number,
-	/**  "Sound theme: Classic / Rich" (default rich, #325). */
+	/**  "Sound theme: Classic / Rich" (default classic, #339). */
 	soundTheme: SoundTheme,
 	sounds: SoundSettings,
 	/**  "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c). */
@@ -3437,6 +3451,18 @@ export type Settings = {
 	privateMessages: PrivateMessageSettings,
 	/**  Channel messages of blocked users: collapsed (default) or hidden (issue #140). */
 	blockedMessages: BlockedMessages,
+	/**  Accept files offered by others (Settings → Files). */
+	filesReceive: boolean,
+	filesMaxSize: FilesMaxSize,
+	/**  Save folder for received files; `None` is the system Downloads folder. */
+	filesSaveFolder: string | null,
+	screenResolution: ScreenResolution,
+	screenFps: ScreenFps,
+	screenOptimize: ScreenOptimize,
+	screenCodec: ScreenCodec,
+	screenUploadLimit: ScreenUploadLimit,
+	screenSound: boolean,
+	screenUseGpu: boolean,
 };
 
 /**  The setup style chosen in the setup wizard (issue #159): one of the three presets or Custom. */

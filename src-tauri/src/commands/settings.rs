@@ -258,6 +258,76 @@ pub enum VoiceActivation {
     Manual,
 }
 
+/// Mirrors of the store's file and screen share option enums, with the UI's wire names.
+macro_rules! mirror_enum {
+    ($(#[$m:meta])* $name:ident => $store:ident { $($(#[$vm:meta])* $v:ident),+ $(,)? }) => {
+        $(#[$m])*
+        #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+        pub enum $name { $($(#[$vm])* $v),+ }
+
+        impl From<store::$store> for $name {
+            fn from(v: store::$store) -> Self {
+                match v { $(store::$store::$v => Self::$v),+ }
+            }
+        }
+
+        impl From<$name> for store::$store {
+            fn from(v: $name) -> Self {
+                match v { $($name::$v => Self::$v),+ }
+            }
+        }
+    };
+}
+
+mirror_enum! {
+    /// Largest accepted file (Settings → Files).
+    FilesMaxSize => FilesMaxSize {
+        #[serde(rename = "100M")] M100,
+        #[serde(rename = "500M")] M500,
+        #[serde(rename = "1G")] G1,
+        #[serde(rename = "2G")] G2,
+    }
+}
+mirror_enum! {
+    ScreenResolution => ScreenResolution {
+        #[serde(rename = "auto")] Auto,
+        #[serde(rename = "720")] P720,
+        #[serde(rename = "1080")] P1080,
+        #[serde(rename = "1440")] P1440,
+    }
+}
+mirror_enum! {
+    ScreenFps => ScreenFps {
+        #[serde(rename = "15")] Fps15,
+        #[serde(rename = "30")] Fps30,
+        #[serde(rename = "60")] Fps60,
+    }
+}
+mirror_enum! {
+    ScreenOptimize => ScreenOptimize {
+        #[serde(rename = "balanced")] Balanced,
+        #[serde(rename = "text")] Text,
+        #[serde(rename = "motion")] Motion,
+    }
+}
+mirror_enum! {
+    ScreenCodec => ScreenCodec {
+        #[serde(rename = "auto")] Auto,
+        #[serde(rename = "av1")] Av1,
+        #[serde(rename = "vp9")] Vp9,
+    }
+}
+mirror_enum! {
+    /// Own upload limit in Mbit/s.
+    ScreenUploadLimit => ScreenUploadLimit {
+        #[serde(rename = "auto")] Auto,
+        #[serde(rename = "2")] Mbit2,
+        #[serde(rename = "5")] Mbit5,
+        #[serde(rename = "10")] Mbit10,
+        #[serde(rename = "20")] Mbit20,
+    }
+}
+
 /// Which noise suppression runs while it is on (Settings → Voice, FR-3.65).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -673,6 +743,18 @@ pub struct Settings {
     pub private_messages: PrivateMessageSettings,
     /// Channel messages of blocked users: collapsed (default) or hidden (issue #140).
     pub blocked_messages: BlockedMessages,
+    /// Accept files offered by others (Settings → Files).
+    pub files_receive: bool,
+    pub files_max_size: FilesMaxSize,
+    /// Save folder for received files; `None` is the system Downloads folder.
+    pub files_save_folder: Option<String>,
+    pub screen_resolution: ScreenResolution,
+    pub screen_fps: ScreenFps,
+    pub screen_optimize: ScreenOptimize,
+    pub screen_codec: ScreenCodec,
+    pub screen_upload_limit: ScreenUploadLimit,
+    pub screen_sound: bool,
+    pub screen_use_gpu: bool,
 }
 
 impl Settings {
@@ -812,6 +894,16 @@ impl Settings {
             setup_preset: s.setup_preset.map(Into::into),
             private_messages: (&s.private_messages).into(),
             blocked_messages: s.blocked_messages.into(),
+            files_receive: s.files_receive,
+            files_max_size: s.files_max_size.into(),
+            files_save_folder: s.files_save_folder.clone(),
+            screen_resolution: s.screen_resolution.into(),
+            screen_fps: s.screen_fps.into(),
+            screen_optimize: s.screen_optimize.into(),
+            screen_codec: s.screen_codec.into(),
+            screen_upload_limit: s.screen_upload_limit.into(),
+            screen_sound: s.screen_sound,
+            screen_use_gpu: s.screen_use_gpu,
         }
     }
 
@@ -949,6 +1041,19 @@ impl Settings {
         s.setup_preset = self.setup_preset.map(Into::into);
         s.private_messages = (&self.private_messages).into();
         s.blocked_messages = self.blocked_messages.into();
+        s.files_receive = self.files_receive;
+        s.files_max_size = self.files_max_size.into();
+        s.files_save_folder = self
+            .files_save_folder
+            .clone()
+            .filter(|folder| !folder.is_empty());
+        s.screen_resolution = self.screen_resolution.into();
+        s.screen_fps = self.screen_fps.into();
+        s.screen_optimize = self.screen_optimize.into();
+        s.screen_codec = self.screen_codec.into();
+        s.screen_upload_limit = self.screen_upload_limit.into();
+        s.screen_sound = self.screen_sound;
+        s.screen_use_gpu = self.screen_use_gpu;
         s
     }
 }

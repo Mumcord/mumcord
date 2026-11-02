@@ -353,6 +353,16 @@ const DEFAULT_SETTINGS: Settings = {
     keepRequests: true,
   },
   blockedMessages: "collapse",
+  filesReceive: true,
+  filesMaxSize: "1G",
+  filesSaveFolder: null,
+  screenResolution: "auto",
+  screenFps: "30",
+  screenOptimize: "balanced",
+  screenCodec: "auto",
+  screenUploadLimit: "auto",
+  screenSound: true,
+  screenUseGpu: true,
 };
 
 /** Fictional titles and covers for the demo party's videos (issue #163). */

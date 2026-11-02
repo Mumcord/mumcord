@@ -60,6 +60,94 @@ pub enum NoiseBackend {
 
 /// Default manual threshold in dBFS.
 pub const DEFAULT_VOICE_THRESHOLD_DBFS: i32 = -40;
+/// Largest file the user accepts from others (Settings → Files, spec 07 §7.1).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum FilesMaxSize {
+    #[serde(rename = "100M")]
+    M100,
+    #[serde(rename = "500M")]
+    M500,
+    #[default]
+    #[serde(rename = "1G")]
+    G1,
+    #[serde(rename = "2G")]
+    G2,
+}
+
+impl FilesMaxSize {
+    /// The limit in bytes.
+    pub const fn bytes(self) -> u64 {
+        match self {
+            Self::M100 => 100 * 1024 * 1024,
+            Self::M500 => 500 * 1024 * 1024,
+            Self::G1 => 1024 * 1024 * 1024,
+            Self::G2 => 2 * 1024 * 1024 * 1024,
+        }
+    }
+}
+
+/// Screen share resolution (Settings → Screen sharing). The 4K option is hidden for now.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScreenResolution {
+    #[default]
+    #[serde(rename = "auto")]
+    Auto,
+    #[serde(rename = "720")]
+    P720,
+    #[serde(rename = "1080")]
+    P1080,
+    #[serde(rename = "1440")]
+    P1440,
+}
+
+/// Screen share frame rate.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScreenFps {
+    #[serde(rename = "15")]
+    Fps15,
+    #[default]
+    #[serde(rename = "30")]
+    Fps30,
+    #[serde(rename = "60")]
+    Fps60,
+}
+
+/// What the screen share encoder favours.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScreenOptimize {
+    #[default]
+    Balanced,
+    Text,
+    Motion,
+}
+
+/// Screen share video codec; `Auto` picks the best one this machine can encode.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScreenCodec {
+    #[default]
+    Auto,
+    Av1,
+    Vp9,
+}
+
+/// Own upload limit for screen sharing in Mbit/s; `Auto` measures it.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScreenUploadLimit {
+    #[default]
+    #[serde(rename = "auto")]
+    Auto,
+    #[serde(rename = "2")]
+    Mbit2,
+    #[serde(rename = "5")]
+    Mbit5,
+    #[serde(rename = "10")]
+    Mbit10,
+    #[serde(rename = "20")]
+    Mbit20,
+}
+
 /// Default for `Settings::preview_cache_days` (QA.42).
 pub const DEFAULT_PREVIEW_CACHE_DAYS: u32 = 7;
 
@@ -728,6 +816,22 @@ pub struct Settings {
     pub private_messages: PrivateMessageSettings,
     /// Channel messages of blocked users: collapsed or hidden (issue #140).
     pub blocked_messages: BlockedMessages,
+    /// Accept files offered by others (spec 07, default on).
+    pub files_receive: bool,
+    /// Largest file accepted from others.
+    pub files_max_size: FilesMaxSize,
+    /// Where received files are saved; `None` is the system Downloads folder, looked up when
+    /// needed so a moved Downloads folder is followed.
+    pub files_save_folder: Option<String>,
+    pub screen_resolution: ScreenResolution,
+    pub screen_fps: ScreenFps,
+    pub screen_optimize: ScreenOptimize,
+    pub screen_codec: ScreenCodec,
+    pub screen_upload_limit: ScreenUploadLimit,
+    /// Share the shared app's sound along with the picture.
+    pub screen_sound: bool,
+    /// Allow hardware encoders; off forces the software encoder.
+    pub screen_use_gpu: bool,
 }
 
 /// Default hours between two update checks (FR-3.144).
@@ -823,6 +927,16 @@ impl Default for Settings {
             legacy_window_overlay_enabled: false,
             private_messages: PrivateMessageSettings::default(),
             blocked_messages: BlockedMessages::default(),
+            files_receive: true,
+            files_max_size: FilesMaxSize::default(),
+            files_save_folder: None,
+            screen_resolution: ScreenResolution::default(),
+            screen_fps: ScreenFps::default(),
+            screen_optimize: ScreenOptimize::default(),
+            screen_codec: ScreenCodec::default(),
+            screen_upload_limit: ScreenUploadLimit::default(),
+            screen_sound: true,
+            screen_use_gpu: true,
         }
     }
 }
@@ -1478,6 +1592,37 @@ mod tests {
             serde_json::from_str(r#"{"sounds":{"theme":"rich"}}"#).expect("parse");
         assert_eq!(parsed.sounds.theme, SoundTheme::Rich);
         assert_eq!(Settings::default().sounds.theme, SoundTheme::Classic);
+    }
+
+    #[test]
+    fn files_and_screen_settings_default_and_persist() {
+        let (_dir, store) = temp_store();
+        let s = store.settings().expect("load");
+        assert!(s.files_receive && s.screen_sound && s.screen_use_gpu);
+        assert_eq!(s.files_max_size, FilesMaxSize::G1);
+        assert_eq!(s.files_max_size.bytes(), 1 << 30);
+        assert_eq!(s.files_save_folder, None);
+        assert_eq!(s.screen_fps, ScreenFps::Fps30);
+        assert_eq!(s.screen_resolution, ScreenResolution::Auto);
+        assert_eq!(s.screen_upload_limit, ScreenUploadLimit::Auto);
+        store
+            .save_settings(&Settings {
+                files_max_size: FilesMaxSize::M500,
+                screen_resolution: ScreenResolution::P1440,
+                screen_fps: ScreenFps::Fps60,
+                screen_codec: ScreenCodec::Vp9,
+                screen_upload_limit: ScreenUploadLimit::Mbit10,
+                files_save_folder: Some("/tmp/x".into()),
+                ..Settings::default()
+            })
+            .expect("save");
+        let s = store.settings().expect("reload");
+        assert_eq!(s.files_max_size, FilesMaxSize::M500);
+        assert_eq!(s.screen_resolution, ScreenResolution::P1440);
+        assert_eq!(s.screen_fps, ScreenFps::Fps60);
+        assert_eq!(s.screen_codec, ScreenCodec::Vp9);
+        assert_eq!(s.screen_upload_limit, ScreenUploadLimit::Mbit10);
+        assert_eq!(s.files_save_folder.as_deref(), Some("/tmp/x"));
     }
 
     #[test]

@@ -78,6 +78,9 @@ base64 = "0.23"
 plist = "1.10"
 windows-registry = "0.6"
 rand = "0.10"
+# Direct use for file sharing and screen sharing (spec 07): AES-GCM, X25519, signatures. The same
+# ring that rustls already uses, so nothing new is linked.
+ring = "0.17"
 sha1 = "0.11"
 # Content hash of full-size images shared between Mumcord clients (FR-1.60c).
 sha2 = "0.11"
@@ -136,6 +139,9 @@ objc2-core-audio-types = { version = "0.3", default-features = false, features =
 wasmtime = { version = "50", default-features = false, features = ["runtime", "cranelift", "component-model", "std"] }
 # Plugin packages (#269): `.mcplugin` zips, stored or deflate only.
 zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+# Mark downloaded files with the OS "from the internet" flag on macOS and Linux (spec 07, FR-7.24).
+# Windows writes its stream with std, which needs no extra crate.
+xattr = "1"
 # Plugin and host API version ranges (#269).
 semver = "1"
 # Test fixtures only: turn core-module text into plugin components.
