@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-02
+
 ### Changed
 
 - A fresh install now starts with the Classic notification sounds instead of the Rich ones; if you already picked a sound theme, your choice is kept (issue #339)
@@ -46,6 +48,7 @@
 
 ### Fixed
 
+- macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
 - A plugin is no longer stopped while your system keychain asks you to unlock it or to allow access (KWallet, GNOME Keyring, macOS Keychain), and saving a plugin password while that prompt is open no longer holds up other plugins. If the prompt is not answered within 2 minutes, the plugin is told secrets are unavailable.
 - Plugins: old compiled copies of plugins no longer pile up on disk; Mumcord removes the ones that are no longer needed each time it starts
 - Closing a full profile card with Escape right after using a button in it (for example a plugin button that then greys out) no longer stops that profile card from opening again.
@@ -430,6 +433,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.6.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.0
 [0.5.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.5.0
 [0.4.4]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.4
 [0.4.3]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.3
