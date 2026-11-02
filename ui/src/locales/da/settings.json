@@ -774,8 +774,6 @@
     "empty": "Ingen post matcher søgningen.",
     "loadFailed": "Ændringsloggen kunne ikke indlæses.",
     "current": "Aktuel",
-    "inDevelopment": "Under udvikling",
-    "unreleased": "Ikke udgivet",
     "forDevelopers": "for udviklere",
     "releasePage": "Udgivelsesside",
     "entries": "Poster: {{count}}",

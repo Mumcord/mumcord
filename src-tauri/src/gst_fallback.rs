@@ -17,6 +17,17 @@
 //! apps, and a host plugin that fails to load here would be cached there as broken and hidden
 //! from the host's own players until it is updated. The AppImage's mount path changes on every
 //! start, so a stale cache cannot hide plugins either: changed paths are rescanned.
+//!
+//! A host directory reached through a symlink (`/usr/lib64` -> `/usr/lib` on Arch) is added only
+//! once. GStreamer keys its registry by plugin file name, so the same plugins under two paths
+//! replace each other on every scan: each new web process (every window) then rescanned all host
+//! plugins, which delayed the first paint by seconds.
+//!
+//! The AppRun hook also turns off reusing the scanner, so every plugin got its own scanner
+//! process. As the mount path changes on every start, all bundled plugins are rescanned on every
+//! start, and a hundred process starts cost about half a second before the first paint. One
+//! reused scanner is still a separate process, so a crashing plugin still cannot take the app
+//! down: GStreamer restarts the scanner and skips that plugin.
 
 use std::ffi::{OsStr, OsString};
 use std::path::{Path, PathBuf};
@@ -32,13 +43,15 @@ const HOST_PLUGIN_DIRS: [&str; 4] = [
 
 const SYSTEM_PATH_VAR: &str = "GST_PLUGIN_SYSTEM_PATH_1_0";
 const REGISTRY_VARS: [&str; 2] = ["GST_REGISTRY_1_0", "GST_REGISTRY"];
+const REUSE_SCANNER_VAR: &str = "GST_REGISTRY_REUSE_PLUGIN_SCANNER";
 
 /// Extends the plugin path and sets the registry file. Must run before WebKit or GStreamer
 /// start and before any other thread exists; does nothing outside an AppImage.
 pub fn prepare(identifier: &str) {
     let appimage = crate::desktop_entry::is_appimage();
     let var = |name: &str| std::env::var_os(name);
-    for (name, value) in changes(appimage, &var, identifier, |dir| dir.is_dir()) {
+    let resolve = |dir: &Path| std::fs::canonicalize(dir).ok().filter(|real| real.is_dir());
+    for (name, value) in changes(appimage, &var, identifier, resolve) {
         // SAFETY: called at the very start of `run`, before Tauri, GTK or the async runtime
         // start any thread, so nothing reads the environment concurrently.
         unsafe { std::env::set_var(name, value) };
@@ -50,14 +63,17 @@ fn changes(
     appimage: bool,
     var: &dyn Fn(&str) -> Option<OsString>,
     identifier: &str,
-    exists: impl Fn(&Path) -> bool,
+    resolve: impl Fn(&Path) -> Option<PathBuf>,
 ) -> Vec<(&'static str, OsString)> {
     if !appimage {
         return Vec::new();
     }
     let mut changes = Vec::new();
-    if let Some(path) = system_path(var(SYSTEM_PATH_VAR).as_deref(), exists) {
+    if let Some(path) = system_path(var(SYSTEM_PATH_VAR).as_deref(), resolve) {
         changes.push((SYSTEM_PATH_VAR, path));
+    }
+    if var(REUSE_SCANNER_VAR).as_deref() != Some(OsStr::new("yes")) {
+        changes.push((REUSE_SCANNER_VAR, OsString::from("yes")));
     }
     // A registry the user chose stays.
     if !REGISTRY_VARS.iter().any(|name| var(name).is_some())
@@ -74,17 +90,26 @@ fn changes(
 
 /// The bundled system path with the existing host plugin directories appended, or `None` when
 /// there is nothing to change. Without a bundled path (no AppRun hook) GStreamer already uses
-/// the host's plugins, so it is left alone.
-fn system_path(current: Option<&OsStr>, exists: impl Fn(&Path) -> bool) -> Option<OsString> {
+/// the host's plugins, so it is left alone. `resolve` gives a directory's real path, or `None`
+/// when it does not exist; directories with the same real path are added once.
+fn system_path(
+    current: Option<&OsStr>,
+    resolve: impl Fn(&Path) -> Option<PathBuf>,
+) -> Option<OsString> {
     let current = current.filter(|path| !path.is_empty())?;
     // The AppImage runtime leaves an empty entry behind ("bundled:"); it names no directory.
     let mut dirs: Vec<PathBuf> = std::env::split_paths(current)
         .filter(|dir| !dir.as_os_str().is_empty())
         .collect();
     let before = dirs.len();
+    let mut added: Vec<PathBuf> = Vec::new();
     for dir in HOST_PLUGIN_DIRS.map(Path::new) {
-        if exists(dir) && !dirs.iter().any(|known| known == dir) {
+        let Some(real) = resolve(dir) else {
+            continue;
+        };
+        if !dirs.iter().any(|known| known == dir) && !added.contains(&real) {
             dirs.push(dir.to_path_buf());
+            added.push(real);
         }
     }
     if dirs.len() == before {
@@ -131,14 +156,14 @@ mod tests {
     #[test]
     fn changes_nothing_outside_an_appimage() {
         let var = env(&[(SYSTEM_PATH_VAR, BUNDLED), ("HOME", "/h")]);
-        assert!(changes(false, &var, "app.id", |_| true).is_empty());
+        assert!(changes(false, &var, "app.id", |dir| Some(dir.to_path_buf())).is_empty());
     }
 
     #[test]
     fn in_an_appimage_extends_the_path_and_sets_the_registry() {
         let var = env(&[(SYSTEM_PATH_VAR, BUNDLED), ("HOME", "/h")]);
         let changes = changes(true, &var, "app.id", |dir| {
-            dir == Path::new("/usr/lib/gstreamer-1.0")
+            (dir == Path::new("/usr/lib/gstreamer-1.0")).then(|| dir.to_path_buf())
         });
         let arch = std::env::consts::ARCH;
         assert_eq!(
@@ -148,6 +173,7 @@ mod tests {
                     SYSTEM_PATH_VAR,
                     OsString::from(format!("{BUNDLED}:/usr/lib/gstreamer-1.0"))
                 ),
+                (REUSE_SCANNER_VAR, OsString::from("yes")),
                 (
                     "GST_REGISTRY_1_0",
                     OsString::from(format!(
@@ -162,14 +188,16 @@ mod tests {
     fn keeps_a_registry_the_user_chose() {
         for name in REGISTRY_VARS {
             let var = env(&[(name, "/mine.bin"), ("HOME", "/h")]);
-            assert!(changes(true, &var, "app.id", |_| false).is_empty());
+            let changes = changes(true, &var, "app.id", |_| None);
+            assert!(changes.iter().all(|(set, _)| !REGISTRY_VARS.contains(set)));
         }
     }
 
     #[test]
     fn appends_existing_host_dirs_after_the_bundled_ones_in_order() {
         let path = system_path(Some(OsStr::new(BUNDLED)), |dir| {
-            dir != Path::new("/usr/lib/aarch64-linux-gnu/gstreamer-1.0")
+            (dir != Path::new("/usr/lib/aarch64-linux-gnu/gstreamer-1.0"))
+                .then(|| dir.to_path_buf())
         });
         assert_eq!(
             path.as_deref(),
@@ -186,7 +214,7 @@ mod tests {
     fn drops_the_empty_entry_the_runtime_leaves() {
         let current = format!("{BUNDLED}:");
         let path = system_path(Some(OsStr::new(&current)), |dir| {
-            dir == Path::new("/usr/lib/gstreamer-1.0")
+            (dir == Path::new("/usr/lib/gstreamer-1.0")).then(|| dir.to_path_buf())
         });
         assert_eq!(
             path,
@@ -197,7 +225,7 @@ mod tests {
     #[test]
     fn skips_missing_host_dirs() {
         let path = system_path(Some(OsStr::new(BUNDLED)), |dir| {
-            dir == Path::new("/usr/lib64/gstreamer-1.0")
+            (dir == Path::new("/usr/lib64/gstreamer-1.0")).then(|| dir.to_path_buf())
         });
         assert_eq!(
             path.as_deref(),
@@ -209,18 +237,48 @@ mod tests {
 
     #[test]
     fn leaves_the_path_alone_without_a_bundled_path_or_host_dirs() {
-        assert_eq!(system_path(None, |_| true), None);
-        assert_eq!(system_path(Some(OsStr::new("")), |_| true), None);
-        assert_eq!(system_path(Some(OsStr::new(BUNDLED)), |_| false), None);
+        assert_eq!(system_path(None, |dir| Some(dir.to_path_buf())), None);
+        assert_eq!(
+            system_path(Some(OsStr::new("")), |dir| Some(dir.to_path_buf())),
+            None
+        );
+        assert_eq!(system_path(Some(OsStr::new(BUNDLED)), |_| None), None);
     }
 
     #[test]
     fn does_not_add_a_dir_twice() {
         let current = format!("{BUNDLED}:/usr/lib/gstreamer-1.0");
         let path = system_path(Some(OsStr::new(&current)), |dir| {
-            dir == Path::new("/usr/lib/gstreamer-1.0")
+            (dir == Path::new("/usr/lib/gstreamer-1.0")).then(|| dir.to_path_buf())
         });
         assert_eq!(path, None);
+    }
+
+    #[test]
+    fn reuses_one_scanner_process() {
+        let hook = env(&[(REUSE_SCANNER_VAR, "no"), ("HOME", "/h")]);
+        let changes = changes(true, &hook, "app.id", |_| None);
+        assert!(changes.contains(&(REUSE_SCANNER_VAR, OsString::from("yes"))));
+        let already = env(&[(REUSE_SCANNER_VAR, "yes"), ("HOME", "/h")]);
+        let changes = super::changes(true, &already, "app.id", |_| None);
+        assert!(changes.iter().all(|(set, _)| *set != REUSE_SCANNER_VAR));
+    }
+
+    #[test]
+    fn adds_a_symlinked_host_dir_only_once() {
+        // Arch: /usr/lib64 -> /usr/lib.
+        let path = system_path(Some(OsStr::new(BUNDLED)), |dir| {
+            [
+                Path::new("/usr/lib/gstreamer-1.0"),
+                Path::new("/usr/lib64/gstreamer-1.0"),
+            ]
+            .contains(&dir)
+            .then(|| PathBuf::from("/usr/lib/gstreamer-1.0"))
+        });
+        assert_eq!(
+            path,
+            Some(OsString::from(format!("{BUNDLED}:/usr/lib/gstreamer-1.0")))
+        );
     }
 
     #[test]

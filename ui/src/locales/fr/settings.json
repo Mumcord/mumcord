@@ -779,8 +779,6 @@
     "empty": "Aucune entrée ne correspond à la recherche.",
     "loadFailed": "Le journal des modifications n'a pas pu être chargé.",
     "current": "Actuelle",
-    "inDevelopment": "En développement",
-    "unreleased": "Non publiée",
     "forDevelopers": "pour les développeurs",
     "releasePage": "Page de la version",
     "entries": "Entrées : {{count}}",

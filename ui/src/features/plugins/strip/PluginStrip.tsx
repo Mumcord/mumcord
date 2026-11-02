@@ -31,7 +31,7 @@ function PluginIcon({ id, name }: { id: string; name: string }) {
   return url === null ? (
     <span aria-hidden="true">{initials(name)}</span>
   ) : (
-    <img src={url} alt="" width={20} height={20} />
+    <img className="pstrip-icon-img" src={url} alt="" width={28} height={28} />
   );
 }
 

@@ -789,8 +789,6 @@
     "empty": "L-ebda entrata ma taqbel mat-tfittxija.",
     "loadFailed": "Ir-reġistru tal-bidliet ma setax jitgħabba.",
     "current": "Attwali",
-    "inDevelopment": "Qed tiġi żviluppata",
-    "unreleased": "Mhux ippubblikata",
     "forDevelopers": "għall-iżviluppaturi",
     "releasePage": "Paġna tar-rilaxx",
     "entries": "Entrati: {{count}}",

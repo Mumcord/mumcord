@@ -24,14 +24,27 @@
 }
 
 .pstrip-icon {
-  display: grid;
-  place-items: center;
+  /* Flex rather than grid, and a fixed square rather than aspect-ratio: WebKitGTK ignores both on
+     <button>, which left the glyph on the first line box at the top-left of the tile. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   box-sizing: border-box;
-  aspect-ratio: 1;
-  min-width: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   border-color: var(--color-border);
   font-size: var(--font-size-xs);
+  line-height: 1;
+}
+
+/* About 70 % of the tile. Plugin icons are 128 px PNGs, so this always scales down and stays sharp
+   on high-DPI screens. Block display drops the inline baseline gap that pushed the image upwards. */
+.pstrip-icon-img {
+  display: block;
+  width: 1.75rem;
+  height: 1.75rem;
+  object-fit: contain;
 }
 
 .pstrip-icon[aria-pressed="true"] {
