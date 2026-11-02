@@ -176,7 +176,7 @@ ab_glyph = "0.2"
 ash = { version = "0.38", default-features = false, features = ["std"] }
 
 # Positional audio / plugin host
-libloading = "0.8"
+libloading = "0.9"
 libc = "0.2"
 windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Memory", "Win32_System_Diagnostics_ToolHelp"] }
 
