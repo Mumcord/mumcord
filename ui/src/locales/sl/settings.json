@@ -636,8 +636,8 @@
     "limitInvalid": "Vpiši celo število od 1 do 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Vizualni učinki (steklo, zrnatost)",
-    "visualEffectsHint": "Meniji iz motnega stekla in rahla filmska zrnatost. Samodejno izklopljeno, ko sistem zahteva manj prosojnosti ali gibanja."
+    "visualEffects": "Filmska zrnatost",
+    "visualEffectsHint": "Rahla filmska zrnatost čez vmesnik. Samodejno izklopljeno, ko sistem zahteva manj prosojnosti ali gibanja."
   },
   "channelList": {
     "title": "Seznam kanalov",

@@ -632,8 +632,8 @@
     "limitInvalid": "Saisissez un nombre entier de 1 à 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Effets visuels (verre, grain)",
-    "visualEffectsHint": "Menus en verre dépoli et léger grain de film. Désactivés automatiquement quand votre système demande moins de transparence ou d’animations."
+    "visualEffects": "Grain de film",
+    "visualEffectsHint": "Un léger grain de film sur l’interface. Désactivé automatiquement quand votre système demande moins de transparence ou d’animations."
   },
   "channelList": {
     "title": "Liste des canaux",

@@ -632,8 +632,8 @@
     "limitInvalid": "Unesi cijeli broj od 1 do 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Vizualni efekti (staklo, zrno)",
-    "visualEffectsHint": "Izbornici od mutnog stakla i blago filmsko zrno. Automatski isključeno kad sustav traži manje prozirnosti ili pokreta."
+    "visualEffects": "Filmsko zrno",
+    "visualEffectsHint": "Blago filmsko zrno preko sučelja. Automatski isključeno kad sustav traži manje prozirnosti ili pokreta."
   },
   "channelList": {
     "title": "Popis kanala",

@@ -85,6 +85,7 @@ Nothing changes on the server side. The server keeps enforcing ACLs on every con
 - **FR-2.17** Per-server theme (Q2.8, Q4.8): right-click a server → "Theme…" and the edit-server dialog let the user pick a theme for that server; default "Use app theme". The per-server theme applies while that server is shown and follows the same Dark / Light / System switch (its dark or light version is shown).
 - **FR-2.18** Website look (Q2.6): the primary button becomes a cream/peach pill with the pink glow and a hover lift (a dark pill in the light theme, via its own tokens); the peach → pink → violet gradient is used on the wizard heading, empty states and icon tiles.
 - **FR-2.19** Visual effects (Q2.6, Q4.7): popovers and menus use a frosted-glass look and the app background gets a subtle film grain like the website. Settings → Appearance → "Visual effects" (default on) switches both off; they are off automatically when the OS asks for reduced transparency or reduced motion.
+  - *Addendum (#337):* popovers, menus, hover cards and the profile card are solid (`--color-bg-elevated`, no transparency, no backdrop blur), because the see-through look hurt readability where blur is unsupported (WebKitGTK). "Visual effects" now covers the film grain only.
 
 ### 4.3 UI polish & big servers
 

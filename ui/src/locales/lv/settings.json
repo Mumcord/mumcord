@@ -632,8 +632,8 @@
     "limitInvalid": "Ievadi veselu skaitli no 1 līdz 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Vizuālie efekti (stikls, graudainība)",
-    "visualEffectsHint": "Matēta stikla izvēlnes un smalka filmas graudainība. Automātiski izslēgti, kad sistēma prasa mazāk caurspīdīguma vai kustību."
+    "visualEffects": "Filmas graudainība",
+    "visualEffectsHint": "Smalka filmas graudainība virs saskarnes. Automātiski izslēgta, kad sistēma prasa mazāk caurspīdīguma vai kustību."
   },
   "channelList": {
     "title": "Kanālu saraksts",

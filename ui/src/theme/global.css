@@ -125,19 +125,6 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Frosted glass for popovers and menus. The fallback colour is the same solid surface they had. */
-.quick-settings,
-.profile-preview,
-.profile-card,
-.server-menu,
-.person-menu,
-.follow-server__menu,
-.gif-picker__popover {
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-filter);
-  backdrop-filter: var(--glass-filter);
-}
-
 /* Gradient accent on the wizard heading and empty states. The solid colour stays as fallback. */
 @supports (background-clip: text) or (-webkit-background-clip: text) {
   .wizard-step h2,
