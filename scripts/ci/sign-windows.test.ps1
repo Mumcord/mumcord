@@ -61,3 +61,6 @@ try {
     Remove-Item -Recurse -Force $work
 }
 Write-Host 'sign-windows.ps1 tests passed.'
+# The last case runs the script so that it fails on purpose; without this its exit code would
+# leak out as $LASTEXITCODE and fail the CI step even though every assertion passed.
+exit 0

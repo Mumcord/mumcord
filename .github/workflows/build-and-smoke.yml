@@ -309,10 +309,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "tauri bundle failed (exit code $LASTEXITCODE)." }
           "MUMCORD_WINDOWS_SIGNED=true" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
 
-      # Portable Windows build (#181): the Mumcord.exe the installer carries (signed in place by
-      # the step above when signing is set up), with the `portable` marker that keeps its data in
-      # MumcordData next to it, a short readme and the licences. No single-file portable exe: it
-      # could not carry the marker or the licences (docs/windows-portable.md).
+      # Portable Windows build (#181): the Mumcord.exe the installer carries, taken out of the
+      # installer itself, with the `portable` marker that keeps its data in MumcordData next to
+      # it, a short readme and the licences. No single-file portable exe: it could not carry the
+      # marker or the licences (docs/windows-portable.md).
+      # Not target/release/mumcord.exe: Tauri patches the bundle type into that file, signs it,
+      # packs it into the installer and then restores the unpatched, unsigned original. Unpacking
+      # the installer (7-Zip reads NSIS installers) gives the exact program users install, and
+      # checking its signature proves the installed Mumcord.exe is signed in a signed release.
       - name: Package portable Windows zip
         if: runner.os == 'Windows'
         shell: pwsh
@@ -320,11 +324,19 @@ jobs:
           $setup = @(Get-ChildItem target/release/bundle/nsis/*-setup.exe)
           if ($setup.Count -ne 1) { throw "expected one NSIS installer, found $($setup.Count)" }
           $zip = $setup[0].FullName -replace '-setup\.exe$', '-portable.zip'
-          $exe = 'target/release/mumcord.exe'
-          if (-not (Test-Path $exe)) { throw "$exe not found" }
+          $sevenZip = (Get-Command 7z.exe -ErrorAction SilentlyContinue).Source
+          if (-not $sevenZip) { $sevenZip = "$env:ProgramFiles\7-Zip\7z.exe" }
+          if (-not (Test-Path $sevenZip)) { throw '7-Zip not found: it is needed to unpack the NSIS installer.' }
+          $unpacked = "$env:RUNNER_TEMP\installer-contents"
+          & $sevenZip x $setup[0].FullName "-o$unpacked" -y | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "7-Zip could not unpack the installer (exit code $LASTEXITCODE)." }
+          $found = @(Get-ChildItem $unpacked -Recurse -File -Filter Mumcord.exe)
+          if ($found.Count -ne 1) { throw "expected one Mumcord.exe in the installer, found $($found.Count)" }
+          $exe = $found[0].FullName
           if ($env:MUMCORD_WINDOWS_SIGNED -eq 'true') {
             $signature = Get-AuthenticodeSignature $exe
-            if ($signature.Status -ne 'Valid') { throw "Mumcord.exe is not signed: $($signature.Status)" }
+            if ($signature.Status -ne 'Valid') { throw "The installer's Mumcord.exe is not signed: $($signature.Status)" }
+            Write-Host "The installer's Mumcord.exe is signed by $($signature.SignerCertificate.Subject)."
           }
           $dir = "$env:RUNNER_TEMP\portable"
           New-Item -ItemType Directory -Force $dir | Out-Null
