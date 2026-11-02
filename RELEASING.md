@@ -2,7 +2,7 @@
 
 Releases are built by GitHub Actions (`.github/workflows/release.yml`). Pushing a version tag such as `v0.1.0` that points to a commit on `main` builds the Windows installer (`.exe`), the macOS disk image (`.dmg`, universal for Apple Silicon and Intel) and the Linux AppImage, smoke-tests each one against a local Mumble server, and creates a **draft** GitHub Release with the files and a `SHA256SUMS` checksum file. Nothing becomes public until you publish the draft.
 
-Builds are unsigned until code signing is set up (Windows via Azure Artifact Signing, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
+Builds are unsigned until code signing is set up (Windows via a Certum code signing certificate in SimplySign, macOS via an Apple Developer ID: see [docs/release-signing.md](docs/release-signing.md) and the [code signing policy](CODE_SIGNING.md)). The release notes say per platform whether the build is signed and explain the SmartScreen and Gatekeeper warnings for unsigned ones.
 
 ## Versions
 

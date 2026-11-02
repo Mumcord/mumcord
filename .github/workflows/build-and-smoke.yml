@@ -5,8 +5,8 @@ name: Build and smoke
 # smoke-tests it against a local Mumble server (scripts/smoke/smoke.sh). Called by
 # test-builds.yml (spec §10, AC-1.30) and release.yml (QA.12). Test builds are never signed.
 # Release builds sign and notarize the macOS DMG only when the Apple secrets exist, and sign the
-# Windows app and installer through Azure Artifact Signing only when the Azure variables exist
-# (docs/release-signing.md); without them those bundles are built unsigned.
+# Windows app and installer with the Certum certificate through SimplySign only when the Certum
+# secrets and variable exist (docs/release-signing.md); without them those bundles are built unsigned.
 # Release builds also bundle the third-party notices that release.yml regenerated (artifact
 # third-party-notices) and upload the list of bundled native libraries for its SBOM job.
 on:
@@ -23,6 +23,10 @@ on:
       APPLE_API_KEY:
         required: false
       APPLE_API_KEY_P8:
+        required: false
+      CERTUM_USER:
+        required: false
+      CERTUM_TOTP_SECRET:
         required: false
     inputs:
       release:
@@ -72,7 +76,8 @@ jobs:
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
-    # The Azure federated credential trusts only jobs in the "release" environment (OIDC).
+    # The Certum signing secrets exist only in the "release" environment, which accepts only
+    # version tags.
     environment: ${{ (inputs.release && matrix.name == 'windows') && 'release' || '' }}
     steps:
       - uses: actions/checkout@v7
@@ -206,20 +211,17 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Check Windows signing setup
-        id: azure
+        id: certum
         if: runner.os == 'Windows' && inputs.release
         shell: bash
         env:
-          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
-          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
-          AZURE_CERT_PROFILE: ${{ vars.AZURE_CERT_PROFILE }}
+          CERTUM_USER: ${{ secrets.CERTUM_USER }}
+          CERTUM_TOTP_SECRET: ${{ secrets.CERTUM_TOTP_SECRET }}
+          CERTUM_CERT_SHA1: ${{ vars.CERTUM_CERT_SHA1 }}
         run: |
-          for v in AZURE_CLIENT_ID AZURE_TENANT_ID AZURE_SUBSCRIPTION_ID AZURE_SIGNING_ENDPOINT AZURE_SIGNING_ACCOUNT AZURE_CERT_PROFILE; do
+          for v in CERTUM_USER CERTUM_TOTP_SECRET CERTUM_CERT_SHA1; do
             if [[ -z "${!v}" ]]; then
-              echo "::warning::Repository variable $v is not set: building the Windows installer unsigned."
+              echo "::warning::$v is not set in the release environment: building the Windows installer unsigned."
               exit 0
             fi
           done
@@ -235,91 +237,75 @@ jobs:
           echo "GSTREAMER_HELPERS_DIR=$(scripts/gst-helpers-dir.sh)" >> "$GITHUB_ENV"
 
       - name: Build bundle
-        if: steps.azure.outputs.enabled != 'true'
+        if: steps.certum.outputs.enabled != 'true'
         run: npm run tauri build -- ${{ matrix.args }}
 
-      # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer with
-      # signtool and Microsoft's Artifact Signing plugin, so the installer contains the signed
-      # exe. The signCommand lives only in this CI overlay, never in tauri.conf.json, so local
-      # builds stay unsigned. The app is compiled before the Azure login because the login's
-      # GitHub token is short-lived and must still be valid when the first file is signed.
+      # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer through
+      # scripts/sign-windows.ps1 (signtool with the Certum certificate from SimplySign Desktop),
+      # so the installer contains the signed exe. The signCommand lives only in this CI overlay,
+      # never in tauri.conf.json, so local builds stay unsigned. The app is compiled before the
+      # SimplySign login so the cloud session is fresh when the first file is signed.
       - name: Build Windows app for signing
-        if: steps.azure.outputs.enabled == 'true'
+        if: steps.certum.outputs.enabled == 'true'
         run: npm run tauri build -- --no-bundle
 
-      - name: Prepare Artifact Signing
-        if: steps.azure.outputs.enabled == 'true'
+      # Certum's official installer, pinned by version and checksum. A new version needs a new
+      # checksum (docs/release-signing.md); the URL follows Certum's download server layout.
+      - name: Install SimplySign Desktop
+        if: steps.certum.outputs.enabled == 'true'
         shell: pwsh
         env:
-          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
-          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
-          AZURE_CERT_PROFILE: ${{ vars.AZURE_CERT_PROFILE }}
+          SIMPLYSIGN_VERSION: 9.4.5.95
+          SIMPLYSIGN_SHA256: 6309e8b46f1f4e786288e777aef515a2c30d885165b71a21191e9941badebd6b
         run: |
-          # Pinned NuGet packages: signtool from the Windows SDK build tools and the Artifact
-          # Signing plugin it loads (runs on the .NET 8 runtime that ships with the runner).
-          $dir = "$env:RUNNER_TEMP\artifact-signing"
-          $packages = @{
-            'microsoft.windows.sdk.buildtools' = '10.0.28000.2705'
-            'microsoft.artifactsigning.client' = '1.0.146'
-          }
-          foreach ($name in $packages.Keys) {
-            $version = $packages[$name]
-            $nupkg = "$dir\$name.zip"
-            New-Item -ItemType Directory -Force $dir | Out-Null
-            Invoke-WebRequest "https://api.nuget.org/v3-flatcontainer/$name/$version/$name.$version.nupkg" -OutFile $nupkg
-            Expand-Archive $nupkg -DestinationPath "$dir\$name"
-          }
-          $signtool = "$dir\microsoft.windows.sdk.buildtools\bin\10.0.28000.0\x64\signtool.exe"
-          $dlib = "$dir\microsoft.artifactsigning.client\bin\x64\Azure.CodeSigning.Dlib.dll"
-          foreach ($file in $signtool, $dlib) {
-            if (-not (Test-Path $file)) { throw "$file not found in the downloaded package" }
-          }
-          # Only the Azure CLI login from the next step may authenticate.
-          $metadata = "$dir\metadata.json"
-          @{
-            Endpoint               = $env:AZURE_SIGNING_ENDPOINT
-            CodeSigningAccountName = $env:AZURE_SIGNING_ACCOUNT
-            CertificateProfileName = $env:AZURE_CERT_PROFILE
-            CorrelationId          = "${{ github.repository }}/${{ github.run_id }}"
-            ExcludeCredentials     = @(
-              'EnvironmentCredential', 'WorkloadIdentityCredential', 'ManagedIdentityCredential',
-              'SharedTokenCacheCredential', 'VisualStudioCredential', 'VisualStudioCodeCredential',
-              'AzurePowerShellCredential', 'AzureDeveloperCliCredential', 'InteractiveBrowserCredential'
-            )
-          } | ConvertTo-Json | Set-Content -Encoding utf8 $metadata
+          $version = $env:SIMPLYSIGN_VERSION
+          $msi = "$env:RUNNER_TEMP\SimplySignDesktop.msi"
+          Invoke-WebRequest "https://files.certum.eu/software/SimplySignDesktop/Windows/$version/SimplySignDesktop-$version-64-bit-en.msi" -OutFile $msi
+          $hash = (Get-FileHash $msi -Algorithm SHA256).Hash
+          if ($hash -ne $env:SIMPLYSIGN_SHA256) { throw "SimplySign Desktop installer checksum mismatch: $hash" }
+          $proc = Start-Process msiexec.exe -ArgumentList '/i', "`"$msi`"", '/qn', '/norestart', '/l*v', "`"$env:RUNNER_TEMP\simplysign-install.log`"" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "SimplySign Desktop installation failed (msiexec exit code $($proc.ExitCode))." }
+
+      - name: Check the TOTP generator
+        if: steps.certum.outputs.enabled == 'true'
+        shell: pwsh
+        run: ./scripts/ci/totp.test.ps1
+
+      # Types the account and a fresh TOTP code into SimplySign Desktop (scripts/ci/simplysign-login.ps1).
+      # Fragile by nature; when it fails, the release fails and the maintainer signs by hand.
+      - name: Log in to SimplySign
+        if: steps.certum.outputs.enabled == 'true'
+        shell: pwsh
+        timeout-minutes: 10
+        env:
+          CERTUM_USER: ${{ secrets.CERTUM_USER }}
+          CERTUM_TOTP_SECRET: ${{ secrets.CERTUM_TOTP_SECRET }}
+          CERTUM_CERT_SHA1: ${{ vars.CERTUM_CERT_SHA1 }}
+        run: |
+          # GitHub masks secrets already; also mask the account name in every form it may take.
+          Write-Host "::add-mask::$env:CERTUM_USER"
+          ./scripts/ci/simplysign-login.ps1
+
+      - name: Bundle and sign Windows installer
+        if: steps.certum.outputs.enabled == 'true'
+        shell: pwsh
+        env:
+          CERTUM_CERT_SHA1: ${{ vars.CERTUM_CERT_SHA1 }}
+        run: |
+          $overlay = "$env:RUNNER_TEMP\tauri.signing.json"
           @{
             bundle = @{
               windows = @{
                 signCommand = @{
-                  cmd  = $signtool
-                  args = @(
-                    'sign', '/v', '/fd', 'SHA256',
-                    '/tr', 'http://timestamp.acs.microsoft.com', '/td', 'SHA256',
-                    '/d', 'Mumcord',
-                    '/dlib', $dlib, '/dmdf', $metadata,
-                    '%1'
-                  )
+                  cmd  = 'pwsh'
+                  args = @('-NoProfile', '-NonInteractive', '-File', "$env:GITHUB_WORKSPACE\scripts\sign-windows.ps1", '%1')
                 }
               }
             }
-          } | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 "$dir\tauri.signing.json"
-          "MUMCORD_SIGNING_CONFIG=$dir\tauri.signing.json" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-
-      # OpenID Connect: GitHub vouches for this workflow run, so no Azure secret is stored.
-      - name: Log in to Azure
-        if: steps.azure.outputs.enabled == 'true'
-        uses: azure/login@v3
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Bundle and sign Windows installer
-        if: steps.azure.outputs.enabled == 'true'
-        shell: bash
-        run: |
-          npm run tauri bundle -- --bundles nsis --config "$MUMCORD_SIGNING_CONFIG"
-          echo "MUMCORD_WINDOWS_SIGNED=true" >> "$GITHUB_ENV"
+          } | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 $overlay
+          npm run tauri bundle -- --bundles nsis --config $overlay
+          if ($LASTEXITCODE -ne 0) { throw "tauri bundle failed (exit code $LASTEXITCODE)." }
+          "MUMCORD_WINDOWS_SIGNED=true" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
 
       # Portable Windows build (#181): the Mumcord.exe the installer carries (signed in place by
       # the step above when signing is set up), with the `portable` marker that keeps its data in
