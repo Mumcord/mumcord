@@ -16,7 +16,7 @@ When the two secrets and the variable below exist in the `release` environment, 
 
 1. compiles the app (`tauri build --no-bundle`),
 2. downloads SimplySign Desktop from Certum's download server (`files.certum.eu`), checks it against the pinned SHA-256 checksum and installs it silently,
-3. checks the built-in TOTP generator against the RFC 6238 test vectors (`scripts/ci/totp.test.ps1`),
+3. checks the built-in TOTP generator against the RFC 6238 test vectors (`scripts/ci/totp.test.ps1`) and the signing script's argument handling (`scripts/ci/sign-windows.test.ps1`, also run on every PR),
 4. logs SimplySign Desktop in (`scripts/ci/simplysign-login.ps1`): it computes the current code from `CERTUM_TOTP_SECRET`, types the account name and the code into the login window and waits until the certificate with the thumbprint `CERTUM_CERT_SHA1` appears in the Windows certificate store,
 5. bundles the NSIS installer with a CI-only Tauri config overlay whose `bundle.windows.signCommand` calls `scripts/sign-windows.ps1`. Tauri signs `mumcord.exe` first, then the uninstaller and finally the installer, so the installer contains the signed app. Each file is signed with
 
