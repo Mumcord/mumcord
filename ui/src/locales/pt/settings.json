@@ -632,8 +632,8 @@
     "limitInvalid": "Introduz um número inteiro de 1 a 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Efeitos visuais (vidro, grão)",
-    "visualEffectsHint": "Menus de vidro fosco e um grão de filme subtil. Desativados automaticamente quando o teu sistema pede menos transparência ou movimento."
+    "visualEffects": "Grão de filme",
+    "visualEffectsHint": "Um grão de filme subtil sobre a interface. Desativado automaticamente quando o teu sistema pede menos transparência ou movimento."
   },
   "channelList": {
     "title": "Lista de canais",

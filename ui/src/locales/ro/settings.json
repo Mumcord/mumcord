@@ -632,8 +632,8 @@
     "limitInvalid": "Introdu un număr întreg de la 1 la 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Efecte vizuale (sticlă, granulație)",
-    "visualEffectsHint": "Meniuri din sticlă mată și o granulație fină de film. Dezactivate automat când sistemul cere mai puțină transparență sau mișcare."
+    "visualEffects": "Granulație de film",
+    "visualEffectsHint": "O granulație fină de film peste interfață. Dezactivată automat când sistemul cere mai puțină transparență sau mișcare."
   },
   "channelList": {
     "title": "Lista canalelor",

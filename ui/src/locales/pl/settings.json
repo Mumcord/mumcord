@@ -636,8 +636,8 @@
     "limitInvalid": "Wpisz liczbę całkowitą od 1 do 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Efekty wizualne (szkło, ziarno)",
-    "visualEffectsHint": "Menu z matowego szkła i subtelne ziarno filmowe. Wyłączane automatycznie, gdy system prosi o mniej przezroczystości lub ruchu."
+    "visualEffects": "Ziarno filmowe",
+    "visualEffectsHint": "Subtelne ziarno filmowe nad interfejsem. Wyłączane automatycznie, gdy system prosi o mniej przezroczystości lub ruchu."
   },
   "channelList": {
     "title": "Lista kanałów",

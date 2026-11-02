@@ -628,8 +628,8 @@
     "limitInvalid": "Ange ett heltal från 1 till 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Visuella effekter (glas, korn)",
-    "visualEffectsHint": "Frostade glasmenyer och ett subtilt filmkorn. Stängs av automatiskt när systemet ber om mindre transparens eller rörelse."
+    "visualEffects": "Filmkorn",
+    "visualEffectsHint": "Ett subtilt filmkorn över gränssnittet. Stängs av automatiskt när systemet ber om mindre transparens eller rörelse."
   },
   "channelList": {
     "title": "Kanallista",

@@ -628,8 +628,8 @@
     "limitInvalid": "Adj meg egy egész számot 1 és 15 között."
   },
   "appearanceEffects": {
-    "visualEffects": "Vizuális effektek (üveg, szemcsésség)",
-    "visualEffectsHint": "Matt üveg menük és finom filmszemcse. Automatikusan kikapcsol, ha a rendszered kevesebb átlátszóságot vagy mozgást kér."
+    "visualEffects": "Filmszemcse",
+    "visualEffectsHint": "Finom filmszemcse a felület fölött. Automatikusan kikapcsol, ha a rendszered kevesebb átlátszóságot vagy mozgást kér."
   },
   "channelList": {
     "title": "Csatornalista",

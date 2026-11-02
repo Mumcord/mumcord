@@ -70,7 +70,7 @@ describe("Epic 2 settings rows", () => {
         <Stateful initial={current} Section={AppearanceCards} />
       </PreferencesProvider>,
     );
-    expect(screen.getByRole("switch", { name: "Visual effects (glass, grain)" })).toBeChecked();
+    expect(screen.getByRole("switch", { name: "Film grain" })).toBeChecked();
     const hide = screen.getByRole("switch", { name: "Hide empty channels" });
     expect(hide).not.toBeChecked();
     fireEvent.click(hide);
