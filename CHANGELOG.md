@@ -5,7 +5,7 @@
 ### Fixed
 
 - "What's new" now opens on the notes of the version you are running, followed by the older releases; a release used to open on the previous version's notes, and a section called "Unreleased" or notes of newer versions could show up
-- "What's new" shows a clear error if the changelog cannot be read, instead of loading forever
+- "What's new" has its notes built into the app, so it no longer needs to load them and cannot get stuck loading
 
 ## [0.6.1] - 2026-11-02
 
