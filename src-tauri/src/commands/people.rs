@@ -33,6 +33,9 @@ pub struct User {
     /// Local playback volume in percent, 0–200 (FR-1.18).
     pub volume: u16,
     pub local_mute: bool,
+    /// Local volume of the person's screen share sound in percent (0–200), separate from
+    /// their voice.
+    pub share_volume: u16,
     /// Another Mumcord client, recognised by its hello (FR-1.61).
     pub is_mumcord: bool,
     /// What that client announced it can do (empty for everyone else).
@@ -94,6 +97,7 @@ impl From<UserView> for User {
             has_comment: v.has_comment,
             volume: v.volume,
             local_mute: v.local_mute,
+            share_volume: v.share_volume,
             is_mumcord: v.mumcord_features.is_some(),
             mumcord_features: v.mumcord_features.unwrap_or_default(),
         }
@@ -120,6 +124,19 @@ pub fn person_set_volume(
     volume: u16,
 ) -> ApiResult<()> {
     Ok(engine.person_set_volume(to_engine_server_id(server_id), session, volume)?)
+}
+
+/// Sets the volume of a person's screen share sound (0–200 %), separate from their voice;
+/// remembered like the voice volume.
+#[tauri::command]
+#[specta::specta]
+pub fn person_set_share_volume(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    volume: u16,
+) -> ApiResult<()> {
+    Ok(engine.person_set_share_volume(to_engine_server_id(server_id), session, volume)?)
 }
 
 /// Moves a person to another channel; the server checks the move permission and the result

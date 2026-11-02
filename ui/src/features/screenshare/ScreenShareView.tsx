@@ -78,8 +78,11 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   const link = useP2pLink(serverId, session);
   const [stats, setStats] = useState<WatchStats | null>(null);
   const [details, setDetails] = useState(false);
-  const [level, setLevel] = useState(100);
   const user = users.get(session);
+  // The share's own volume, remembered per person and separate from their voice (issue #333);
+  // the slider follows a change at once, before the engine confirms it.
+  const [chosenLevel, setLevel] = useState<number | null>(null);
+  const level = chosenLevel ?? user?.shareVolume ?? 100;
   const avatarOf = useAvatars(user ? [user] : [], serverId);
   const name = user?.name ?? t("someone");
   const sound = share?.sound ?? false;
@@ -117,7 +120,7 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   const setVolume = (percent: number) => {
     setLevel(percent);
     getApi()
-      .personSetVolume(serverId, session, percent)
+      .personSetShareVolume(serverId, session, percent)
       .catch((error: unknown) => {
         console.warn("setting the volume of the shared sound failed", error);
       });

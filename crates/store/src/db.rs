@@ -342,6 +342,12 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, identity_id)
     );
     ",
+    // v22: a person's screen share sound gets its own volume, separate from their voice
+    // (issue #333). Existing rows keep their voice volume; their share starts at 100 %.
+    r"
+    ALTER TABLE person_setting ADD COLUMN share_volume INTEGER NOT NULL DEFAULT 100
+        CHECK (share_volume BETWEEN 0 AND 200);
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -430,6 +436,7 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
         assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
+        assert!(MIGRATIONS[21].contains("share_volume"));
     }
 
     #[test]
@@ -532,7 +539,8 @@ pub(crate) mod tests {
             store.person_setting(1, "h1").expect("setting"),
             Some(crate::PersonSetting {
                 volume: 50,
-                local_mute: true
+                local_mute: true,
+                share_volume: 100,
             })
         );
         assert_eq!(store.person_note(1, "h1").expect("note"), "");
@@ -654,7 +662,7 @@ pub(crate) mod tests {
     /// stay v20 after them.
     #[test]
     fn relay_migration_is_v20_after_audio_profile_and_blocked_user() {
-        assert_eq!(MIGRATIONS.len(), 21);
+        assert_eq!(MIGRATIONS.len(), 22);
         assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
         assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
