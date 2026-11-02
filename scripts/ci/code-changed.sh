@@ -16,7 +16,8 @@ fi
 # Allowlist: only these paths can change what gets built or tested.
 is_code() {
   case "$1" in
-    scripts/ci/*) return 1 ;;
+    # Windows-only PowerShell scripts (signing, CI helpers) never run in the Linux E2E suite.
+    scripts/ci/* | *.ps1) return 1 ;;
     # Rust
     *.rs | Cargo.toml | */Cargo.toml | Cargo.lock | */Cargo.lock | .cargo/* | rust-toolchain* \
       | clippy.toml | rustfmt.toml | about.toml | crates/* | tools/* | proto/*) return 0 ;;
