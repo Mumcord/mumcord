@@ -15,9 +15,12 @@ pub struct FollowedChannel {
 /// Local volume and mute for a person, keyed by (server, certificate hash) (FR-1.19).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PersonSetting {
-    /// Percent, 0–200.
+    /// Voice volume in percent, 0–200.
     pub volume: u16,
     pub local_mute: bool,
+    /// Volume of the person's screen share sound in percent, 0–200; independent of their
+    /// voice (issue #333).
+    pub share_volume: u16,
 }
 
 impl Default for PersonSetting {
@@ -25,6 +28,7 @@ impl Default for PersonSetting {
         Self {
             volume: 100,
             local_mute: false,
+            share_volume: 100,
         }
     }
 }
@@ -142,13 +146,14 @@ impl Store {
         Ok(self
             .conn
             .query_row(
-                "SELECT volume, local_mute FROM person_setting
+                "SELECT volume, local_mute, share_volume FROM person_setting
                  WHERE server_id = ?1 AND person_cert_hash = ?2",
                 params![server, cert_hash],
                 |row| {
                     Ok(PersonSetting {
                         volume: row.get(0)?,
                         local_mute: row.get(1)?,
+                        share_volume: row.get(2)?,
                     })
                 },
             )
@@ -161,15 +166,25 @@ impl Store {
         cert_hash: &str,
         setting: &PersonSetting,
     ) -> Result<()> {
-        if setting.volume > 200 {
-            return Err(Error::InvalidVolume(setting.volume));
+        for volume in [setting.volume, setting.share_volume] {
+            if volume > 200 {
+                return Err(Error::InvalidVolume(volume));
+            }
         }
         self.conn.execute(
-            "INSERT INTO person_setting (server_id, person_cert_hash, volume, local_mute)
-             VALUES (?1, ?2, ?3, ?4)
+            "INSERT INTO person_setting
+                 (server_id, person_cert_hash, volume, local_mute, share_volume)
+             VALUES (?1, ?2, ?3, ?4, ?5)
              ON CONFLICT (server_id, person_cert_hash)
-             DO UPDATE SET volume = excluded.volume, local_mute = excluded.local_mute",
-            params![server, cert_hash, setting.volume, setting.local_mute],
+             DO UPDATE SET volume = excluded.volume, local_mute = excluded.local_mute,
+                 share_volume = excluded.share_volume",
+            params![
+                server,
+                cert_hash,
+                setting.volume,
+                setting.local_mute,
+                setting.share_volume
+            ],
         )?;
         Ok(())
     }
@@ -293,6 +308,7 @@ mod tests {
         let loud = PersonSetting {
             volume: 200,
             local_mute: false,
+            share_volume: 30,
         };
         store.set_person_setting(a, "h1", &loud).expect("set");
         assert_eq!(store.person_setting(a, "h1").expect("get"), Some(loud));
@@ -301,16 +317,25 @@ mod tests {
         let muted = PersonSetting {
             volume: 0,
             local_mute: true,
+            share_volume: 30,
         };
         store.set_person_setting(a, "h1", &muted).expect("update");
         assert_eq!(store.person_setting(a, "h1").expect("get"), Some(muted));
 
         let too_loud = PersonSetting {
             volume: 201,
-            local_mute: false,
+            ..PersonSetting::default()
         };
         assert!(matches!(
             store.set_person_setting(a, "h1", &too_loud),
+            Err(Error::InvalidVolume(201))
+        ));
+        let share_too_loud = PersonSetting {
+            share_volume: 201,
+            ..PersonSetting::default()
+        };
+        assert!(matches!(
+            store.set_person_setting(a, "h1", &share_too_loud),
             Err(Error::InvalidVolume(201))
         ));
     }

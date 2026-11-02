@@ -633,6 +633,7 @@ mod tests {
                 &crate::PersonSetting {
                     volume: 50,
                     local_mute: true,
+                    share_volume: 100,
                 },
             )
             .expect("person");

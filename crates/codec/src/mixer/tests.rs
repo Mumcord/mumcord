@@ -435,7 +435,7 @@ fn playback_thread_plays_share_sound_at_its_level() {
     };
     let (playback, mut ports) = Playback::start(sink, PlaybackConfig::default()).expect("playback");
     let stats = Arc::new(ShareStats::default());
-    let (mut writer, source) = share_channel(stats.clone()).expect("channel");
+    let (mut writer, source) = share_channel(stats.clone(), Arc::default()).expect("channel");
     assert!(ports.shares.add(source).is_ok());
 
     let mut encoder = share_encoder().expect("encoder");

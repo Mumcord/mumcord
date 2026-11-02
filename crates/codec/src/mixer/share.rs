@@ -63,6 +63,29 @@ impl ShareGain {
     }
 }
 
+/// Volume of one watched share's sound, 0.0–2.0, set by the engine from the viewer's per-person
+/// setting and read by the playback thread. Separate from the sharer's voice volume (issue #333).
+#[derive(Debug)]
+pub struct ShareVolume(AtomicU32);
+
+impl Default for ShareVolume {
+    fn default() -> Self {
+        Self(AtomicU32::new(1.0_f32.to_bits()))
+    }
+}
+
+impl ShareVolume {
+    /// Sets the volume in percent; above 200 counts as 200.
+    pub fn set_percent(&self, percent: u16) {
+        let volume = f32::from(percent.min(200)) / 100.0;
+        self.0.store(volume.to_bits(), Ordering::Relaxed);
+    }
+
+    pub fn get(&self) -> f32 {
+        f32::from_bits(self.0.load(Ordering::Relaxed))
+    }
+}
+
 /// The sharer's encoder: its own instance, tuned for music (any app sound, not speech), with
 /// 20 ms packets.
 pub fn share_encoder() -> Result<OpusEncoder, CodecError> {
@@ -110,9 +133,11 @@ pub struct ShareSoundStats {
     pub rms: f32,
 }
 
-/// A new share ring: the writer for the engine, the source for [`SharePort::add`].
+/// A new share ring: the writer for the engine, the source for [`SharePort::add`] that plays
+/// at `volume`.
 pub fn share_channel(
     stats: Arc<ShareStats>,
+    volume: Arc<ShareVolume>,
 ) -> Result<(ShareSoundWriter, ShareSource), CodecError> {
     let (producer, consumer) = RingBuffer::new(RING_SAMPLES);
     let writer = ShareSoundWriter {
@@ -125,6 +150,7 @@ pub fn share_channel(
         consumer,
         playing: false,
         stats,
+        volume,
     };
     Ok((writer, source))
 }
@@ -166,6 +192,7 @@ pub struct ShareSource {
     consumer: Consumer<f32>,
     playing: bool,
     stats: Arc<ShareStats>,
+    volume: Arc<ShareVolume>,
 }
 
 impl ShareSource {
@@ -204,9 +231,11 @@ impl ShareSource {
             return false;
         };
         let (a, b) = chunk.as_slices();
+        let volume = self.volume.get();
         let mut energy = 0.0_f32;
+        // The level meter shows the share's own sound, before the viewer's volume.
         for (dst, src) in out.iter_mut().zip(a.iter().chain(b)) {
-            *dst += src;
+            *dst += src * volume;
             energy += src * src;
         }
         chunk.commit_all();
@@ -359,7 +388,7 @@ mod tests {
 
     fn channel() -> (ShareSoundWriter, ShareSource, Arc<ShareStats>) {
         let stats = Arc::new(ShareStats::default());
-        let (writer, source) = share_channel(stats.clone()).unwrap();
+        let (writer, source) = share_channel(stats.clone(), Arc::default()).unwrap();
         (writer, source, stats)
     }
 
@@ -498,6 +527,13 @@ mod tests {
     /// Slots playing 200 ms of a constant 0.5 from one share; samples bypass the codec so gains
     /// read exactly. Keep the producer, or the share counts as ended.
     fn constant_share(gain: &Arc<ShareGain>) -> (ShareSlots, Producer<f32>, SharePort) {
+        constant_share_at(gain, Arc::default())
+    }
+
+    fn constant_share_at(
+        gain: &Arc<ShareGain>,
+        volume: Arc<ShareVolume>,
+    ) -> (ShareSlots, Producer<f32>, SharePort) {
         let (mut port, mut slots) = share_slots(gain.clone());
         let (mut producer, consumer) = RingBuffer::new(RING_SAMPLES);
         for _ in 0..MAX_QUEUED_SAMPLES {
@@ -507,6 +543,7 @@ mod tests {
             consumer,
             playing: false,
             stats: Arc::default(),
+            volume,
         };
         assert!(port.add(source).is_ok());
         slots.update();
@@ -557,6 +594,34 @@ mod tests {
         let mut frame = [0.25; FRAME_SAMPLES];
         assert!(slots.mix_into(&mut frame));
         assert!(frame.iter().all(|s| (s - 0.25).abs() < 1e-6));
+    }
+
+    /// Issue #333: the share's volume scales only the share, never the sound already mixed
+    /// (the sharer's voice among it), and is read live.
+    #[test]
+    fn the_share_volume_scales_only_the_share() {
+        let volume = Arc::new(ShareVolume::default());
+        volume.set_percent(40);
+        let (mut slots, _producer, _port) = constant_share_at(&Arc::default(), volume.clone());
+        let voice = 0.25;
+        let mut frame = [voice; FRAME_SAMPLES];
+        assert!(slots.mix_into(&mut frame));
+        assert!(frame.iter().all(|s| (s - (voice + 0.5 * 0.4)).abs() < 1e-6));
+
+        volume.set_percent(150);
+        frame.fill(voice);
+        assert!(slots.mix_into(&mut frame));
+        assert!(frame.iter().all(|s| (s - (voice + 0.5 * 1.5)).abs() < 1e-6));
+    }
+
+    #[test]
+    fn the_share_volume_starts_at_unity_and_caps_at_200_percent() {
+        let volume = ShareVolume::default();
+        assert_eq!(volume.get(), 1.0);
+        volume.set_percent(0);
+        assert_eq!(volume.get(), 0.0);
+        volume.set_percent(500);
+        assert_eq!(volume.get(), 2.0);
     }
 
     #[test]

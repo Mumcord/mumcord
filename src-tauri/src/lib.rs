@@ -103,6 +103,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             channels::channel_description_request,
             people::person_move,
             people::person_set_volume,
+            people::person_set_share_volume,
             people::person_set_local_mute,
             people::person_set_note,
             people::person_profile,

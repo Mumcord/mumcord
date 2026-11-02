@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Changing the volume of someone's screen share no longer changes their voice volume. The share's sound now has its own volume, remembered per person like their voice volume.
+
 ### Internal
 
 - Windows release builds are signed with a Certum code signing certificate through SimplySign instead of Azure Artifact Signing: the release workflow installs a pinned SimplySign Desktop, logs in with a one-time code generated from the `release` environment secrets, and signs the app, the uninstaller and the installer with `signtool`; `scripts/sign-windows.ps1` does the same by hand. Without the Certum settings the Windows build stays unsigned as before (#340)
