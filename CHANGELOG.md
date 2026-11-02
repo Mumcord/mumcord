@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Linux AppImage: Mumcord's window and extra windows (What's new, packet inspector) open much faster. Each window spent seconds rescanning the system's GStreamer plugins, twice on systems where /usr/lib64 points to /usr/lib
+
 ## [0.6.1] - 2026-11-02
 
 ### Changed
