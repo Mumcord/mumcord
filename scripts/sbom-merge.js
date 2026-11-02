@@ -106,26 +106,32 @@ native(
   "BSD-2-Clause",
   "AV1 screen-share decoder, statically linked.",
 );
-// FFmpeg is missing on macOS, libvpl everywhere but Windows (scripts/sbom-native.sh).
-const [ffmpeg] = field("ffmpeg");
-if (ffmpeg) {
-  native(
-    "ffmpeg",
-    ffmpeg,
-    `pkg:github/FFmpeg/FFmpeg@n${ffmpeg}`,
-    "LGPL-2.1-or-later",
-    "Minimal libavcodec/libavutil for AV1/VP9 hardware screen-share encoders, statically linked.",
-  );
-}
-const [libvpl] = field("libvpl");
-if (libvpl) {
-  native(
+// The hardware encoder interfaces are missing on macOS, the VA-API headers everywhere but Linux
+// (scripts/sbom-native.sh).
+for (const [key, purl, description] of [
+  [
+    "nv-codec-headers",
+    (v) => `pkg:github/FFmpeg/nv-codec-headers@n${v}`,
+    "NVIDIA NVENC API headers for the hardware AV1 encoder, compiled in.",
+  ],
+  [
+    "amf-headers",
+    (v) => `pkg:github/GPUOpen-LibrariesAndSDKs/AMF@v${v}`,
+    "AMD AMF headers for the hardware AV1 encoder, compiled in.",
+  ],
+  [
     "libvpl",
-    libvpl,
-    `pkg:github/intel/libvpl@v${libvpl}`,
-    "MIT",
-    "Intel Quick Sync dispatcher for FFmpeg's hardware encoders, statically linked.",
-  );
+    (v) => `pkg:github/intel/libvpl@v${v}`,
+    "Intel Quick Sync dispatcher for the hardware AV1/VP9 encoders, statically linked.",
+  ],
+  [
+    "libva-headers",
+    (v) => `pkg:github/intel/libva@${v}`,
+    "VA-API headers for the Linux hardware encoders; the system libva is loaded at runtime.",
+  ],
+]) {
+  const [version] = field(key);
+  if (version) native(key, version, purl(version), "MIT", description);
 }
 if (opt.gstreamer === "gst") {
   const [webkit] = field("webkitgtk");

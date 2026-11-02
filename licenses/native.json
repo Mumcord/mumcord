@@ -40,25 +40,28 @@
       "texts": ["licenses/libvpx.txt"]
     },
     {
-      "name": "FFmpeg (libavcodec, libavutil)",
-      "version": "@ffmpeg",
-      "license": "LGPL-2.1-or-later",
-      "repository": "https://ffmpeg.org",
+      "name": "NVIDIA NVENC API headers (nv-codec-headers)",
+      "version": "@nv-codec-headers",
+      "license": "MIT",
+      "repository": "https://github.com/FFmpeg/nv-codec-headers",
       "description": [
-        "Reaches the graphics card's AV1 and VP9 encoders for screen sharing. A minimal build",
-        "(scripts/build-ffmpeg.sh) without GPL or non-free parts and without any other codec,",
-        "statically linked into the Windows and Linux apps; the macOS app does not contain it.",
-        "Relinking: Mumcord's source is public, so it can be rebuilt against a modified FFmpeg",
-        "(see the note in the licence text). The build compiles in NVIDIA's NVENC headers",
-        "(nv-codec-headers) and AMD's AMF headers, both under the MIT licence; the graphics",
-        "drivers themselves are loaded from the system at runtime."
+        "Interface definitions for NVIDIA's hardware AV1 encoder, compiled into the Windows and",
+        "Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The NVIDIA driver itself is",
+        "loaded from the system at runtime."
       ],
-      "texts": [
-        "licenses/ffmpeg.txt",
-        "licenses/lgpl-2.1.txt",
-        "licenses/nv-codec-headers.txt",
-        "licenses/amf.txt"
-      ]
+      "texts": ["licenses/nv-codec-headers.txt"]
+    },
+    {
+      "name": "AMD AMF headers",
+      "version": "@amf",
+      "license": "MIT",
+      "repository": "https://github.com/GPUOpen-LibrariesAndSDKs/AMF",
+      "description": [
+        "Interface definitions for AMD's hardware AV1 encoder, compiled into the Windows and",
+        "Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The AMD driver itself is",
+        "loaded from the system at runtime."
+      ],
+      "texts": ["licenses/amf.txt"]
     },
     {
       "name": "Intel VPL dispatcher (libvpl)",
@@ -66,10 +69,21 @@
       "license": "MIT",
       "repository": "https://github.com/intel/libvpl",
       "description": [
-        "Loads Intel's Quick Sync runtime for FFmpeg's AV1 and VP9 hardware encoders. Statically",
-        "linked into the Windows app only."
+        "Finds and loads Intel's Quick Sync runtime for the hardware AV1 and VP9 encoders of",
+        "Intel graphics. Statically linked into the Windows and Linux apps."
       ],
       "texts": ["licenses/libvpl.txt"]
+    },
+    {
+      "name": "VA-API headers (libva)",
+      "version": "@libva",
+      "license": "MIT",
+      "repository": "https://github.com/intel/libva",
+      "description": [
+        "Interface definitions for the Linux video acceleration API, compiled into the Linux app",
+        "for hardware AV1 and VP9 encoding. The system's libva is loaded at runtime when present."
+      ],
+      "texts": ["licenses/libva.txt"]
     },
     {
       "name": "SVT-AV1",

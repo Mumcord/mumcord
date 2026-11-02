@@ -162,10 +162,22 @@ const match = (file, re, what) => {
 const versions = {
   "@libvpx": () =>
     match(join(opt.root, "scripts/build-libvpx.sh"), /^LIBVPX_VERSION=(\S+)$/mu, "LIBVPX_VERSION"),
-  "@ffmpeg": () =>
-    match(join(opt.root, "scripts/build-ffmpeg.sh"), /^FFMPEG_VERSION=(\S+)$/mu, "FFMPEG_VERSION"),
+  "@nv-codec-headers": () =>
+    match(
+      join(opt.root, "scripts/build-hwenc-sdk.sh"),
+      /^NV_CODEC_HEADERS_VERSION=(\S+)$/mu,
+      "NV_CODEC_HEADERS_VERSION",
+    ),
+  "@amf": () =>
+    match(join(opt.root, "scripts/build-hwenc-sdk.sh"), /^AMF_VERSION=(\S+)$/mu, "AMF_VERSION"),
   "@libvpl": () =>
-    match(join(opt.root, "scripts/build-ffmpeg.sh"), /^LIBVPL_VERSION=(\S+)$/mu, "LIBVPL_VERSION"),
+    match(
+      join(opt.root, "scripts/build-hwenc-sdk.sh"),
+      /^LIBVPL_VERSION=(\S+)$/mu,
+      "LIBVPL_VERSION",
+    ),
+  "@libva": () =>
+    match(join(opt.root, "scripts/build-hwenc-sdk.sh"), /^LIBVA_VERSION=(\S+)$/mu, "LIBVA_VERSION"),
   "@svt-av1": () =>
     match(
       join(opt.root, "scripts/build-svt-av1.sh"),

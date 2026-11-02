@@ -10,8 +10,9 @@ BUNDLED COMPONENTS (not Rust or npm packages)
 
 The Mumble protocol definitions, and the C/C++ libraries that Mumcord compiles in,
 links or loads: libopus and SQLite are compiled in by Rust crates, libvpx,
-SVT-AV1 and dav1d are statically linked into every build, a minimal LGPL FFmpeg
-into the Windows and Linux builds, PipeWire is loaded from the Linux system, and
+SVT-AV1 and dav1d are statically linked into every build, the hardware encoder
+interfaces (NVENC, AMF and VA-API headers, Intel's VPL dispatcher) into the
+Windows and Linux builds, PipeWire is loaded from the Linux system, and
 the Linux AppImage carries GStreamer and WebKitGTK from its Ubuntu 24.04 build host.
 BoringSSL-derived code compiled in by the ring crate is covered by ring's license
 texts in the Rust section below.
@@ -163,37 +164,472 @@ The full text is in the PATENTS file of the libvpx source:
 https://chromium.googlesource.com/webm/libvpx/+/refs/heads/main/PATENTS
 
 --------------------------------------------------------------------------------
-FFmpeg (libavcodec, libavutil) 9.0.2
+NVIDIA NVENC API headers (nv-codec-headers) 12.1.14.0
+--------------------------------------------------------------------------------
+
+License: MIT
+Repository: https://github.com/FFmpeg/nv-codec-headers
+
+Interface definitions for NVIDIA's hardware AV1 encoder, compiled into the Windows and
+Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The NVIDIA driver itself is
+loaded from the system at runtime.
+
+Copyright (c) 2010-2023 NVIDIA Corporation
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the software, and to permit persons to whom the
+software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+AMD AMF headers 1.5.3
+--------------------------------------------------------------------------------
+
+License: MIT
+Repository: https://github.com/GPUOpen-LibrariesAndSDKs/AMF
+
+Interface definitions for AMD's hardware AV1 encoder, compiled into the Windows and
+Linux apps for screen sharing (scripts/build-hwenc-sdk.sh). The AMD driver itself is
+loaded from the system at runtime.
+
+Notice Regarding Standards.  AMD does not provide a license or sublicense to
+any Intellectual Property Rights relating to any standards, including but not
+limited to any audio and/or video codec technologies such as MPEG-2, MPEG-4;
+AVC/H.264; HEVC/H.265; AAC decode/FFMPEG; AAC encode/FFMPEG; VC-1; and MP3
+(collectively, the "Media Technologies"). For clarity, you will pay any
+royalties due for such third party technologies, which may include the Media
+Technologies that are owed as a result of AMD providing the Software to you.
+
+MIT license
+
+Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+Intel VPL dispatcher (libvpl) 2.17.0
+--------------------------------------------------------------------------------
+
+License: MIT
+Repository: https://github.com/intel/libvpl
+
+Finds and loads Intel's Quick Sync runtime for the hardware AV1 and VP9 encoders of
+Intel graphics. Statically linked into the Windows and Linux apps.
+
+MIT License
+
+Copyright (c) 2020 Intel Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------------
+VA-API headers (libva) 2.22.0
+--------------------------------------------------------------------------------
+
+License: MIT
+Repository: https://github.com/intel/libva
+
+Interface definitions for the Linux video acceleration API, compiled into the Linux app
+for hardware AV1 and VP9 encoding. The system's libva is loaded at runtime when present.
+
+Copyright (c) 2007-2009 Intel Corporation. All Rights Reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sub license, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice (including the
+next paragraph) shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+IN NO EVENT SHALL PRECISION INSIGHT AND/OR ITS SUPPLIERS BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+SVT-AV1 4.2.0
+--------------------------------------------------------------------------------
+
+License: BSD-3-Clause-Clear AND LicenseRef-AOM-Patent-License-1.0
+Repository: https://gitlab.com/AOMediaCodec/SVT-AV1
+
+Software AV1 encoder for screen sharing (scripts/build-svt-av1.sh), statically linked
+into every Mumcord build. Licensed under the Clear BSD licence together with the
+Alliance for Open Media Patent License 1.0.
+
+BSD 3-Clause Clear License
+The Clear BSD License
+
+Copyright (c) 2021, Alliance for Open Media
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the disclaimer below)
+provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in
+   the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the Alliance for Open Media nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+**Alliance for Open Media Patent License 1.0**
+
+ 1. **License Terms.**
+
+    **Patent License.** Subject to the terms and conditions of this License, each
+     Licensor, on behalf of itself and successors in interest and assigns,
+     grants Licensee a non-sublicensable, perpetual, worldwide, non-exclusive,
+     no-charge, royalty-free, irrevocable (except as expressly stated in this
+     License) patent license to its Necessary Claims to make, use, sell, offer
+     for sale, import or distribute any Implementation.
+
+     **Conditions.**
+
+    *Availability.* As a condition to the grant of rights to Licensee to make,
+       sell, offer for sale, import or distribute an Implementation under
+       Section 1.1, Licensee must make its Necessary Claims available under
+       this License, and must reproduce this License with any Implementation
+       as follows:
+
+          a. For distribution in source code, by including this License in the
+          root directory of the source code with its Implementation.
+
+          b. For distribution in any other form (including binary, object form,
+          and/or hardware description code (e.g., HDL, RTL, Gate Level Netlist,
+          GDSII, etc.)), by including this License in the documentation, legal
+          notices, and/or other written materials provided with the
+          Implementation.
+
+    *Additional Conditions.* This license is directly from Licensor to
+       Licensee.  Licensee acknowledges as a condition of benefiting from it
+       that no rights from Licensor are received from suppliers, distributors,
+       or otherwise in connection with this License.
+
+    **Defensive Termination**. If any Licensee, its Affiliates, or its agents
+     initiates patent litigation or files, maintains, or voluntarily
+     participates in a lawsuit against another entity or any person asserting
+     that any Implementation infringes Necessary Claims, any patent licenses
+     granted under this License directly to the Licensee are immediately
+     terminated as of the date of the initiation of action unless 1) that suit
+     was in response to a corresponding suit regarding an Implementation first
+     brought against an initiating entity, or 2) that suit was brought to
+     enforce the terms of this License (including intervention in a third-party
+     action by a Licensee).
+
+    **Disclaimers.** The Reference Implementation and Specification are provided
+     "AS IS" and without warranty. The entire risk as to implementing or
+     otherwise using the Reference Implementation or Specification is assumed
+     by the implementer and user. Licensor expressly disclaims any warranties
+     (express, implied, or otherwise), including implied warranties of
+     merchantability, non-infringement, fitness for a particular purpose, or
+     title, related to the material. IN NO EVENT WILL LICENSOR BE LIABLE TO
+     ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL,
+     INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF
+     ACTION OF ANY KIND WITH RESPECT TO THIS LICENSE, WHETHER BASED ON BREACH
+     OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR
+     NOT THE OTHER PARTRY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+2. **Definitions.**
+
+     **Affiliate.**  "Affiliate" means an entity that directly or indirectly
+     Controls, is Controlled by, or is under common Control of that party.
+
+    **Control.** "Control" means direct or indirect control of more than 50% of
+     the voting power to elect directors of that corporation, or for any other
+     entity, the power to direct management of such entity.
+
+    **Decoder.**  "Decoder" means any decoder that conforms fully with all
+     non-optional portions of the Specification.
+
+    **Encoder.**  "Encoder" means any encoder that produces a bitstream that can
+     be decoded by a Decoder only to the extent it produces such a bitstream.
+
+    **Final Deliverable.**  "Final Deliverable" means the final version of a
+     deliverable approved by the Alliance for Open Media as a Final
+     Deliverable.
+
+    **Implementation.**  "Implementation" means any implementation, including the
+     Reference Implementation, that is an Encoder and/or a Decoder. An
+     Implementation also includes components of an Implementation only to the
+     extent they are used as part of an Implementation.
+
+    **License.** "License" means this license.
+
+    **Licensee.** "Licensee" means any person or entity who exercises patent
+     rights granted under this License.
+
+    **Licensor.**  "Licensor" means (i) any Licensee that makes, sells, offers
+     for sale, imports or distributes any Implementation, or (ii) a person
+     or entity that has a licensing obligation to the Implementation as a
+     result of its membership and/or participation in the Alliance for Open
+     Media working group that developed the Specification.
+
+    **Necessary Claims.**  "Necessary Claims" means all claims of patents or
+      patent applications, (a) that currently or at any time in the future,
+      are owned or controlled by the Licensor, and (b) (i) would be an
+      Essential Claim as defined by the W3C Policy as of February 5, 2004
+      (https://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential)
+      as if the Specification was a W3C Recommendation; or (ii) are infringed
+      by the Reference Implementation.
+
+     **Reference Implementation.** "Reference Implementation" means an Encoder
+      and/or Decoder released by the Alliance for Open Media as a Final
+      Deliverable.
+
+     **Specification.** "Specification" means the specification designated by
+      the Alliance for Open Media as a Final Deliverable for which this
+      License was issued.
+
+
+SVT-AV1 compiles in FAST corner detection (third_party/fastfeat):
+
+Copyright (c) 2006, 2008 Edward Rosten
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+
+	*Redistributions of source code must retain the above copyright
+	 notice, this list of conditions and the following disclaimer.
+
+	*Redistributions in binary form must reproduce the above copyright
+	 notice, this list of conditions and the following disclaimer in the
+	 documentation and/or other materials provided with the distribution.
+
+	*Neither the name of the University of Cambridge nor the names of 
+	 its contributors may be used to endorse or promote products derived 
+	 from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+SVT-AV1 compiles in parts of safestringlib (third_party/safestringlib):
+
+MIT License
+
+Copyright (c) 2014-2018 Intel Corporation
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+
+Copyright (C) 2012, 2013 Cisco Systems
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+dav1d 1.5.4
+--------------------------------------------------------------------------------
+
+License: BSD-2-Clause
+Repository: https://code.videolan.org/videolan/dav1d
+
+AV1 decoder for screen sharing when the web view cannot decode AV1 itself
+(scripts/build-dav1d.sh), statically linked into every Mumcord build.
+
+Copyright © 2018-2025, VideoLAN and dav1d authors
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+SQLite 3.54.1
+--------------------------------------------------------------------------------
+
+License: blessing
+Repository: https://sqlite.org
+
+Compiled in by libsqlite3-sys (feature "bundled", via rusqlite) and statically
+linked into Mumcord.
+
+The author disclaims copyright to the SQLite source code. In place of a legal
+notice, here is a blessing:
+
+   * May you do good and not evil.
+   * May you find forgiveness for yourself and forgive others.
+   * May you share freely, never taking more than you give.
+
+SQLite is in the public domain (https://sqlite.org/copyright.html). No license
+is required to use, copy, modify or distribute it.
+
+--------------------------------------------------------------------------------
+PipeWire and libspa
+--------------------------------------------------------------------------------
+
+License: MIT
+Repository: https://gitlab.freedesktop.org/pipewire/pipewire
+
+Wayland screen capture and audio on Linux. Loaded from the system (the AppImage uses
+the host's PipeWire daemon).
+
+Copyright (c) 2018-2024 Wim Taymans and the PipeWire contributors.
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions: The above copyright notice and this
+permission notice shall be included in all copies or substantial portions of
+the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+GStreamer
 --------------------------------------------------------------------------------
 
 License: LGPL-2.1-or-later
-Repository: https://ffmpeg.org
+Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
 
-Reaches the graphics card's AV1 and VP9 encoders for screen sharing. A minimal build
-(scripts/build-ffmpeg.sh) without GPL or non-free parts and without any other codec,
-statically linked into the Windows and Linux apps; the macOS app does not contain it.
-Relinking: Mumcord's source is public, so it can be rebuilt against a modified FFmpeg
-(see the note in the licence text). The build compiles in NVIDIA's NVENC headers
-(nv-codec-headers) and AMD's AMF headers, both under the MIT licence; the graphics
-drivers themselves are loaded from the system at runtime.
-
-FFmpeg (libavcodec and libavutil)
-Copyright (c) the FFmpeg developers, https://ffmpeg.org
-
-This build of FFmpeg is licensed under the GNU Lesser General Public License
-version 2.1 or later (LGPL-2.1-or-later); the full text follows below. It was
-configured without --enable-gpl, --enable-version3 and --enable-nonfree, and with
-every codec disabled except the AV1 and VP9 hardware encoders (av1_nvenc, av1_amf,
-av1_qsv, vp9_qsv on Windows; av1_nvenc, av1_amf, av1_vaapi, vp9_vaapi on Linux).
-The exact configuration is in scripts/build-ffmpeg.sh of the Mumcord source.
-
-Relinking: Mumcord links FFmpeg statically. Mumcord's complete source code,
-including the script that builds this FFmpeg, is available under the GNU AGPL v3
-at https://github.com/Mumcord/mumcord, so you can rebuild Mumcord against a
-modified version of FFmpeg (set FFMPEG_STATIC_DIR to your build). The FFmpeg
-source code of the version used is available at https://ffmpeg.org/releases/ and,
-on request, from the Mumcord maintainers for at least three years after the
-release that contained it.
+GStreamer core libraries from the Ubuntu 24.04 build host, bundled in the AppImage so
+WebKitGTK can play video in watch parties. The .deb, .rpm and Arch packages do not
+contain GStreamer; they depend on the distribution's packages.
 
                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 2.1, February 1999
@@ -697,422 +1133,6 @@ necessary.  Here is a sample; alter the names:
 
 That's all there is to it!
 
-Copyright (c) 2010-2023 NVIDIA Corporation
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the software, and to permit persons to whom the
-software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-Notice Regarding Standards.  AMD does not provide a license or sublicense to
-any Intellectual Property Rights relating to any standards, including but not
-limited to any audio and/or video codec technologies such as MPEG-2, MPEG-4;
-AVC/H.264; HEVC/H.265; AAC decode/FFMPEG; AAC encode/FFMPEG; VC-1; and MP3
-(collectively, the "Media Technologies"). For clarity, you will pay any
-royalties due for such third party technologies, which may include the Media
-Technologies that are owed as a result of AMD providing the Software to you.
-
-MIT license
-
-Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
---------------------------------------------------------------------------------
-Intel VPL dispatcher (libvpl) 2.17.0
---------------------------------------------------------------------------------
-
-License: MIT
-Repository: https://github.com/intel/libvpl
-
-Loads Intel's Quick Sync runtime for FFmpeg's AV1 and VP9 hardware encoders. Statically
-linked into the Windows app only.
-
-MIT License
-
-Copyright (c) 2020 Intel Corporation
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
---------------------------------------------------------------------------------
-SVT-AV1 4.2.0
---------------------------------------------------------------------------------
-
-License: BSD-3-Clause-Clear AND LicenseRef-AOM-Patent-License-1.0
-Repository: https://gitlab.com/AOMediaCodec/SVT-AV1
-
-Software AV1 encoder for screen sharing (scripts/build-svt-av1.sh), statically linked
-into every Mumcord build. Licensed under the Clear BSD licence together with the
-Alliance for Open Media Patent License 1.0.
-
-BSD 3-Clause Clear License
-The Clear BSD License
-
-Copyright (c) 2021, Alliance for Open Media
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted (subject to the limitations in the disclaimer below)
-provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in
-   the documentation and/or other materials provided with the distribution.
-
-3. Neither the name of the Alliance for Open Media nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-**Alliance for Open Media Patent License 1.0**
-
- 1. **License Terms.**
-
-    **Patent License.** Subject to the terms and conditions of this License, each
-     Licensor, on behalf of itself and successors in interest and assigns,
-     grants Licensee a non-sublicensable, perpetual, worldwide, non-exclusive,
-     no-charge, royalty-free, irrevocable (except as expressly stated in this
-     License) patent license to its Necessary Claims to make, use, sell, offer
-     for sale, import or distribute any Implementation.
-
-     **Conditions.**
-
-    *Availability.* As a condition to the grant of rights to Licensee to make,
-       sell, offer for sale, import or distribute an Implementation under
-       Section 1.1, Licensee must make its Necessary Claims available under
-       this License, and must reproduce this License with any Implementation
-       as follows:
-
-          a. For distribution in source code, by including this License in the
-          root directory of the source code with its Implementation.
-
-          b. For distribution in any other form (including binary, object form,
-          and/or hardware description code (e.g., HDL, RTL, Gate Level Netlist,
-          GDSII, etc.)), by including this License in the documentation, legal
-          notices, and/or other written materials provided with the
-          Implementation.
-
-    *Additional Conditions.* This license is directly from Licensor to
-       Licensee.  Licensee acknowledges as a condition of benefiting from it
-       that no rights from Licensor are received from suppliers, distributors,
-       or otherwise in connection with this License.
-
-    **Defensive Termination**. If any Licensee, its Affiliates, or its agents
-     initiates patent litigation or files, maintains, or voluntarily
-     participates in a lawsuit against another entity or any person asserting
-     that any Implementation infringes Necessary Claims, any patent licenses
-     granted under this License directly to the Licensee are immediately
-     terminated as of the date of the initiation of action unless 1) that suit
-     was in response to a corresponding suit regarding an Implementation first
-     brought against an initiating entity, or 2) that suit was brought to
-     enforce the terms of this License (including intervention in a third-party
-     action by a Licensee).
-
-    **Disclaimers.** The Reference Implementation and Specification are provided
-     "AS IS" and without warranty. The entire risk as to implementing or
-     otherwise using the Reference Implementation or Specification is assumed
-     by the implementer and user. Licensor expressly disclaims any warranties
-     (express, implied, or otherwise), including implied warranties of
-     merchantability, non-infringement, fitness for a particular purpose, or
-     title, related to the material. IN NO EVENT WILL LICENSOR BE LIABLE TO
-     ANY OTHER PARTY FOR LOST PROFITS OR ANY FORM OF INDIRECT, SPECIAL,
-     INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER FROM ANY CAUSES OF
-     ACTION OF ANY KIND WITH RESPECT TO THIS LICENSE, WHETHER BASED ON BREACH
-     OF CONTRACT, TORT (INCLUDING NEGLIGENCE), OR OTHERWISE, AND WHETHER OR
-     NOT THE OTHER PARTRY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-2. **Definitions.**
-
-     **Affiliate.**  "Affiliate" means an entity that directly or indirectly
-     Controls, is Controlled by, or is under common Control of that party.
-
-    **Control.** "Control" means direct or indirect control of more than 50% of
-     the voting power to elect directors of that corporation, or for any other
-     entity, the power to direct management of such entity.
-
-    **Decoder.**  "Decoder" means any decoder that conforms fully with all
-     non-optional portions of the Specification.
-
-    **Encoder.**  "Encoder" means any encoder that produces a bitstream that can
-     be decoded by a Decoder only to the extent it produces such a bitstream.
-
-    **Final Deliverable.**  "Final Deliverable" means the final version of a
-     deliverable approved by the Alliance for Open Media as a Final
-     Deliverable.
-
-    **Implementation.**  "Implementation" means any implementation, including the
-     Reference Implementation, that is an Encoder and/or a Decoder. An
-     Implementation also includes components of an Implementation only to the
-     extent they are used as part of an Implementation.
-
-    **License.** "License" means this license.
-
-    **Licensee.** "Licensee" means any person or entity who exercises patent
-     rights granted under this License.
-
-    **Licensor.**  "Licensor" means (i) any Licensee that makes, sells, offers
-     for sale, imports or distributes any Implementation, or (ii) a person
-     or entity that has a licensing obligation to the Implementation as a
-     result of its membership and/or participation in the Alliance for Open
-     Media working group that developed the Specification.
-
-    **Necessary Claims.**  "Necessary Claims" means all claims of patents or
-      patent applications, (a) that currently or at any time in the future,
-      are owned or controlled by the Licensor, and (b) (i) would be an
-      Essential Claim as defined by the W3C Policy as of February 5, 2004
-      (https://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential)
-      as if the Specification was a W3C Recommendation; or (ii) are infringed
-      by the Reference Implementation.
-
-     **Reference Implementation.** "Reference Implementation" means an Encoder
-      and/or Decoder released by the Alliance for Open Media as a Final
-      Deliverable.
-
-     **Specification.** "Specification" means the specification designated by
-      the Alliance for Open Media as a Final Deliverable for which this
-      License was issued.
-
-
-SVT-AV1 compiles in FAST corner detection (third_party/fastfeat):
-
-Copyright (c) 2006, 2008 Edward Rosten
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-
-	*Redistributions of source code must retain the above copyright
-	 notice, this list of conditions and the following disclaimer.
-
-	*Redistributions in binary form must reproduce the above copyright
-	 notice, this list of conditions and the following disclaimer in the
-	 documentation and/or other materials provided with the distribution.
-
-	*Neither the name of the University of Cambridge nor the names of 
-	 its contributors may be used to endorse or promote products derived 
-	 from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-SVT-AV1 compiles in parts of safestringlib (third_party/safestringlib):
-
-MIT License
-
-Copyright (c) 2014-2018 Intel Corporation
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-================================================================================
-
-Copyright (C) 2012, 2013 Cisco Systems
-All rights reserved.
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or
-sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
---------------------------------------------------------------------------------
-dav1d 1.5.4
---------------------------------------------------------------------------------
-
-License: BSD-2-Clause
-Repository: https://code.videolan.org/videolan/dav1d
-
-AV1 decoder for screen sharing when the web view cannot decode AV1 itself
-(scripts/build-dav1d.sh), statically linked into every Mumcord build.
-
-Copyright © 2018-2025, VideoLAN and dav1d authors
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------------------------------------------------------------------------------
-SQLite 3.54.1
---------------------------------------------------------------------------------
-
-License: blessing
-Repository: https://sqlite.org
-
-Compiled in by libsqlite3-sys (feature "bundled", via rusqlite) and statically
-linked into Mumcord.
-
-The author disclaims copyright to the SQLite source code. In place of a legal
-notice, here is a blessing:
-
-   * May you do good and not evil.
-   * May you find forgiveness for yourself and forgive others.
-   * May you share freely, never taking more than you give.
-
-SQLite is in the public domain (https://sqlite.org/copyright.html). No license
-is required to use, copy, modify or distribute it.
-
---------------------------------------------------------------------------------
-PipeWire and libspa
---------------------------------------------------------------------------------
-
-License: MIT
-Repository: https://gitlab.freedesktop.org/pipewire/pipewire
-
-Wayland screen capture and audio on Linux. Loaded from the system (the AppImage uses
-the host's PipeWire daemon).
-
-Copyright (c) 2018-2024 Wim Taymans and the PipeWire contributors.
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions: The above copyright notice and this
-permission notice shall be included in all copies or substantial portions of
-the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
-EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
-
---------------------------------------------------------------------------------
-GStreamer
---------------------------------------------------------------------------------
-
-License: LGPL-2.1-or-later
-Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
-
-GStreamer core libraries from the Ubuntu 24.04 build host, bundled in the AppImage so
-WebKitGTK can play video in watch parties. The .deb, .rpm and Arch packages do not
-contain GStreamer; they depend on the distribution's packages.
-
-(License text: see FFmpeg (libavcodec, libavutil) above.)
-
 --------------------------------------------------------------------------------
 GStreamer Base Plugins
 --------------------------------------------------------------------------------
@@ -1122,7 +1142,7 @@ Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
 
 The plugins of gst-plugins-base, bundled in the AppImage.
 
-(License text: see FFmpeg (libavcodec, libavutil) above.)
+(License text: see GStreamer above.)
 
 --------------------------------------------------------------------------------
 GStreamer Good Plugins
@@ -1136,7 +1156,7 @@ H.264 and H.265 (gst-libav / FFmpeg, x264, x265, OpenH264) and GPL-only codecs
 (a52dec, dtsdec, mpeg2dec, libdvdread, faac, faad) are deliberately not bundled
 (scripts/filter-gst-plugins.sh); the AppImage plays YouTube through VP9.
 
-(License text: see FFmpeg (libavcodec, libavutil) above.)
+(License text: see GStreamer above.)
 
 --------------------------------------------------------------------------------
 GStreamer Bad Plugins (opusparse)
@@ -1148,7 +1168,7 @@ Repository: https://gitlab.freedesktop.org/gstreamer/gstreamer
 Only the Opus parser of gst-plugins-bad, bundled in the AppImage: without it WebKit
 reports no playable audio format for YouTube.
 
-(License text: see FFmpeg (libavcodec, libavutil) above.)
+(License text: see GStreamer above.)
 
 --------------------------------------------------------------------------------
 WebKitGTK and JavaScriptCoreGTK
@@ -1165,7 +1185,7 @@ its code, under the BSD 2-Clause license. Each BSD-licensed file carries its
 license and copyright notice in its source; an overview is at
 https://webkit.org/licensing-webkit/.
 
-(License text: see FFmpeg (libavcodec, libavutil) above.)
+(License text: see GStreamer above.)
 
 OTHER LINUX SYSTEM LIBRARIES
 ============================
@@ -1186,12 +1206,9 @@ similar permissive terms:
 SOURCE CODE OFFER (LGPL and GPL components)
 -------------------------------------------
 
-Several libraries above (FFmpeg, GStreamer, WebKitGTK, GTK, GLib, and others) are
-licensed under the GNU LGPL or GPL. You may replace them with your own build: the
-AppImage loads GStreamer, WebKitGTK and the other system libraries as separate
-shared libraries, and FFmpeg, which is linked statically, can be replaced by
-rebuilding Mumcord from its public source against your FFmpeg build
-(scripts/build-ffmpeg.sh, FFMPEG_STATIC_DIR). The corresponding source code of the exact
+Several libraries above (GStreamer, WebKitGTK, GTK, GLib, and others) are licensed
+under the GNU LGPL or GPL. You may replace them with your own build: the AppImage
+loads them as separate shared libraries. The corresponding source code of the exact
 versions in a Mumcord release is the source of the Ubuntu 24.04 packages used to
 build that release, available with "apt source <package>" on Ubuntu 24.04 or from
   https://archive.ubuntu.com/ubuntu/pool/ and https://launchpad.net/ubuntu
@@ -1200,7 +1217,6 @@ Upstream releases:
   WebKitGTK   https://webkitgtk.org/releases/
   GTK, GLib   https://download.gnome.org/sources/
   libvpx      https://github.com/webmproject/libvpx/releases
-  FFmpeg      https://ffmpeg.org/releases/
   PipeWire    https://gitlab.freedesktop.org/pipewire/pipewire/-/tags
 We also provide the source code of any of these components on request, for at
 least three years after the release that contained it: open an issue at
