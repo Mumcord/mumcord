@@ -686,10 +686,17 @@ describe("copy button", () => {
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent("Could not copy");
     });
-    act(() => {
-      vi.advanceTimersByTime(2500);
-    });
-    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    // The reset timer starts in an effect after the message renders, which can come after
+    // waitFor saw the text on a busy runner, so keep advancing until the message is gone.
+    await waitFor(
+      () => {
+        act(() => {
+          vi.advanceTimersByTime(500);
+        });
+        expect(screen.getByRole("status")).toBeEmptyDOMElement();
+      },
+      { timeout: 5000 },
+    );
   });
 
   it("follows the button kinds", () => {
