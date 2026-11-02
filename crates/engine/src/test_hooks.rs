@@ -1,0 +1,193 @@
+//! Debug-only test hooks for the end-to-end tests of file sharing and screen sharing.
+//!
+//! Each hook is an environment variable read only when `debug_assertions` is on. In release
+//! builds every function returns its inert default, so a user's environment can never change
+//! behaviour there. The pure `parse_*` helpers are always compiled so they stay unit-testable.
+
+use std::time::Duration;
+
+/// Outcome the encoder probe is told to report for one encoder.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProbeResult {
+    /// The encoder is found and its smoke test passes.
+    Ok,
+    /// The encoder is found but its smoke test fails.
+    SmokeFail,
+    /// The encoder is not found.
+    Absent,
+}
+
+/// Forced probe result for one encoder, e.g. `av1_hw:smoke_fail`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProbeOverride {
+    pub encoder: String,
+    pub result: ProbeResult,
+}
+
+/// Forced result of the software AV1 (SVT) self-test.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SvtSelftest {
+    Pass,
+    Fail,
+}
+
+/// Reads a hook variable; always `None` in release builds.
+fn var(name: &str) -> Option<String> {
+    if cfg!(debug_assertions) {
+        std::env::var(name).ok().filter(|v| !v.is_empty())
+    } else {
+        None
+    }
+}
+
+fn flag(name: &str) -> bool {
+    var(name).as_deref() == Some("1")
+}
+
+/// Offer lifetime override (normally 24 h) for AC-7.15.
+pub fn file_expiry() -> Option<Duration> {
+    parse_seconds(var("MUMCORD_TEST_FILE_EXPIRY_S")?.as_str())
+}
+
+/// Flip one byte of a file in transit (AC-7.11).
+pub fn file_corrupt() -> bool {
+    flag("MUMCORD_TEST_FILE_CORRUPT")
+}
+
+/// Forced encoder probe results (AC-7.36, AC-7.37); `None` means probe for real.
+pub fn encoder_probe() -> Option<Vec<ProbeOverride>> {
+    parse_probe_list(var("MUMCORD_TEST_ENCODER_PROBE")?.as_str())
+}
+
+/// Forced software AV1 self-test result; `None` means run the real test.
+pub fn svt_selftest() -> Option<SvtSelftest> {
+    parse_svt(var("MUMCORD_TEST_SVT_SELFTEST")?.as_str())
+}
+
+/// Artificial delay added to every encoded frame (AC-7.38).
+pub fn encode_delay() -> Option<Duration> {
+    parse_millis(var("MUMCORD_TEST_ENCODE_DELAY_MS")?.as_str())
+}
+
+/// Pretend the machine runs on battery (AC-7.40).
+pub fn on_battery() -> bool {
+    flag("MUMCORD_TEST_ON_BATTERY")
+}
+
+/// Pretend the webview cannot decode AV1 via WebCodecs (AC-7.41).
+pub fn no_webcodecs_av1() -> bool {
+    flag("MUMCORD_TEST_NO_WEBCODECS_AV1")
+}
+
+/// Keep using the previous stream key after a rekey (AC-7.30).
+pub fn keep_old_key() -> bool {
+    flag("MUMCORD_TEST_KEEP_OLD_KEY")
+}
+
+fn parse_seconds(raw: &str) -> Option<Duration> {
+    raw.trim().parse().ok().map(Duration::from_secs)
+}
+
+fn parse_millis(raw: &str) -> Option<Duration> {
+    raw.trim().parse().ok().map(Duration::from_millis)
+}
+
+fn parse_svt(raw: &str) -> Option<SvtSelftest> {
+    match raw.trim() {
+        "pass" => Some(SvtSelftest::Pass),
+        "fail" => Some(SvtSelftest::Fail),
+        _ => None,
+    }
+}
+
+/// Parses `encoder[:result],…`; a bare name means `ok`. Returns `None` if any entry is invalid,
+/// so a typo in a test setup is noticed instead of silently probing for real.
+fn parse_probe_list(raw: &str) -> Option<Vec<ProbeOverride>> {
+    raw.split(',')
+        .map(|entry| {
+            let (encoder, result) = entry.trim().split_once(':').unwrap_or((entry.trim(), "ok"));
+            let result = match result {
+                "ok" => ProbeResult::Ok,
+                "smoke_fail" => ProbeResult::SmokeFail,
+                "absent" => ProbeResult::Absent,
+                _ => return None,
+            };
+            (!encoder.is_empty()).then(|| ProbeOverride {
+                encoder: encoder.to_owned(),
+                result,
+            })
+        })
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn probe_list_parses_results() {
+        assert_eq!(
+            parse_probe_list("av1_hw:smoke_fail, vp9_hw"),
+            Some(vec![
+                ProbeOverride {
+                    encoder: "av1_hw".into(),
+                    result: ProbeResult::SmokeFail
+                },
+                ProbeOverride {
+                    encoder: "vp9_hw".into(),
+                    result: ProbeResult::Ok
+                },
+            ])
+        );
+    }
+
+    #[test]
+    fn probe_list_rejects_invalid_entries() {
+        assert!(parse_probe_list("av1_hw:nope").is_none());
+        assert!(parse_probe_list(":ok").is_none());
+        assert!(parse_probe_list("").is_none());
+    }
+
+    #[test]
+    fn numbers_and_svt_parse() {
+        assert_eq!(parse_seconds(" 60 "), Some(Duration::from_secs(60)));
+        assert_eq!(parse_millis("x"), None);
+        assert_eq!(parse_svt("fail"), Some(SvtSelftest::Fail));
+        assert_eq!(parse_svt("maybe"), None);
+    }
+
+    #[cfg(debug_assertions)]
+    #[test]
+    fn hooks_read_environment_in_debug() {
+        // Unique variable (keep_old_key) so parallel tests don't race on shared env.
+        // SAFETY: only this test touches this variable.
+        unsafe { std::env::set_var("MUMCORD_TEST_KEEP_OLD_KEY", "1") };
+        assert!(keep_old_key());
+        unsafe { std::env::remove_var("MUMCORD_TEST_KEEP_OLD_KEY") };
+        assert!(!keep_old_key());
+    }
+
+    #[cfg(not(debug_assertions))]
+    #[test]
+    fn hooks_are_inert_in_release() {
+        // SAFETY: only this test touches these variables.
+        unsafe {
+            std::env::set_var("MUMCORD_TEST_FILE_EXPIRY_S", "60");
+            std::env::set_var("MUMCORD_TEST_FILE_CORRUPT", "1");
+            std::env::set_var("MUMCORD_TEST_ENCODER_PROBE", "av1_hw:smoke_fail");
+            std::env::set_var("MUMCORD_TEST_SVT_SELFTEST", "fail");
+            std::env::set_var("MUMCORD_TEST_ENCODE_DELAY_MS", "50");
+            std::env::set_var("MUMCORD_TEST_ON_BATTERY", "1");
+            std::env::set_var("MUMCORD_TEST_NO_WEBCODECS_AV1", "1");
+            std::env::set_var("MUMCORD_TEST_KEEP_OLD_KEY", "1");
+        }
+        assert!(file_expiry().is_none());
+        assert!(!file_corrupt());
+        assert!(encoder_probe().is_none());
+        assert!(svt_selftest().is_none());
+        assert!(encode_delay().is_none());
+        assert!(!on_battery());
+        assert!(!no_webcodecs_av1());
+        assert!(!keep_old_key());
+    }
+}
