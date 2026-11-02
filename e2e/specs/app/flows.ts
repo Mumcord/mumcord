@@ -297,6 +297,12 @@ export async function openSettings(): Promise<void> {
   await tabTo((f) => f.tag === "button" && ["Quick settings", "Ajustes rápidos", "Schnelleinstellungen"].includes(f.label), "Settings button");
   await browser.keys(["Enter"]);
   await waitFor(".quick-settings");
+  // The menu renders before its settings load and only then focuses its first item; keys sent
+  // earlier go nowhere, so wait for that focus.
+  await browser.waitUntil(
+    () => browser.execute(() => document.activeElement?.closest(".quick-settings") != null),
+    { timeoutMsg: "quick settings never took focus" },
+  );
   await browser.keys(["End", "Enter"]);
   await waitFor(".overlay__dialog");
   await tabTo((f) => f.role === "tab", "settings tabs");
