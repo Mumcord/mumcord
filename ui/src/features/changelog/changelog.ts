@@ -25,12 +25,34 @@ export function isDevBuild(version: string): boolean {
   return version.startsWith("dev~");
 }
 
-/** The versions a build shows: work in progress only in dev builds. */
+/**
+ * The versions a build shows: work in progress only in dev builds. A release is built from its
+ * tag, where CHANGELOG.md still calls its own section `## [X.Y.Z] - Unreleased` or a plain
+ * `## [Unreleased]`; the post-release sync dates it only afterwards. So, like the release notes
+ * (release.yml), a release shows that section as its own version.
+ */
 export function visibleVersions(
   versions: readonly ChangelogVersion[],
   appVersion: string,
 ): ChangelogVersion[] {
-  return isDevBuild(appVersion) ? [...versions] : versions.filter((v) => !v.unreleased);
+  if (isDevBuild(appVersion)) return [...versions];
+  const own =
+    versions.find((v) => v.version === appVersion) ??
+    versions.find((v) => v.unreleased && v.version === "Unreleased" && v.sections.length > 0);
+  return versions.flatMap((v) => {
+    if (v !== own) return v.unreleased ? [] : [v];
+    if (!v.unreleased) return [v];
+    const released: ChangelogVersion = {
+      version: appVersion,
+      date: v.date,
+      unreleased: false,
+      sections: v.sections,
+    };
+    if (v.summary !== undefined) released.summary = v.summary;
+    // The link of a plain "[Unreleased]" compares against the previous tag, not this release.
+    if (v.url !== undefined && v.version === appVersion) released.url = v.url;
+    return [released];
+  });
 }
 
 /**

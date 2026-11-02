@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- "What's new" now shows the changes of the version you are running; a release used to open on the previous version's notes
+- "What's new" no longer keeps loading forever when the changelog does not arrive; after ten seconds it says it could not be loaded
+
 ## [0.6.1] - 2026-11-02
 
 ### Changed

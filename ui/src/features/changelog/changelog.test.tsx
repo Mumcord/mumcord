@@ -13,7 +13,7 @@ import {
   type ChangelogVersion,
 } from "./changelog";
 import { ChangelogView } from "./ChangelogView";
-import { ChangelogWindow } from "./ChangelogWindow";
+import { ChangelogWindow, LOAD_TIMEOUT_MS } from "./ChangelogWindow";
 import { WhatsNewOnStart } from "./WhatsNewOnStart";
 
 let api: MockApi;
@@ -64,6 +64,39 @@ describe("changelog helpers", () => {
   it("shows versions in development only in dev builds", () => {
     expect(visibleVersions(versions, "0.4.3").map((v) => v.version)).toEqual(["0.4.3", "0.4.0"]);
     expect(visibleVersions(versions, "dev~a1b2c3d")).toHaveLength(3);
+  });
+
+  it("shows a release built from its tag with its still undated section as its own", () => {
+    const own = visibleVersions(versions, "0.4.4");
+    expect(own.map((v) => [v.version, v.unreleased])).toEqual([
+      ["0.4.4", false],
+      ["0.4.3", false],
+      ["0.4.0", false],
+    ]);
+    expect(currentVersion(own, "0.4.4")).toBe("0.4.4");
+
+    const plain: ChangelogVersion[] = [
+      {
+        version: "Unreleased",
+        date: null,
+        unreleased: true,
+        url: "https://github.com/Mumcord/mumcord/compare/v0.4.3...HEAD",
+        sections: [{ title: "Fixed", items: ["The changelog window loads"] }],
+      },
+      ...versions.slice(1),
+    ];
+    const released = visibleVersions(plain, "0.4.4");
+    expect(released.map((v) => v.version)).toEqual(["0.4.4", "0.4.3", "0.4.0"]);
+    expect(released[0]?.url).toBeUndefined();
+    expect(released[0]?.sections).toEqual(plain[0]?.sections);
+    expect(currentVersion(released, "0.4.4")).toBe("0.4.4");
+    // An empty "[Unreleased]" after the post-release sync is not taken for the next version.
+    const synced: ChangelogVersion[] = [
+      { version: "Unreleased", date: null, unreleased: true, sections: [] },
+      ...versions.slice(1),
+    ];
+    expect(visibleVersions(synced, "0.4.3").map((v) => v.version)).toEqual(["0.4.3", "0.4.0"]);
+    expect(visibleVersions(synced, "0.4.4").map((v) => v.version)).toEqual(["0.4.3", "0.4.0"]);
   });
 
   it("marks the running release, or the newest entry in a dev build, as current", () => {
@@ -279,6 +312,25 @@ describe("ChangelogWindow", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(<ChangelogWindow />);
     expect(await screen.findByRole("alert")).toHaveTextContent("could not be loaded");
+  });
+
+  it("reports a changelog that never arrives instead of loading forever", async () => {
+    vi.useFakeTimers();
+    try {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(() => new Promise<Response>(() => undefined)),
+      );
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      render(<ChangelogWindow />);
+      expect(screen.getByText("Loading…")).toBeVisible();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(LOAD_TIMEOUT_MS);
+      });
+      expect(screen.getByRole("alert")).toHaveTextContent("could not be loaded");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
