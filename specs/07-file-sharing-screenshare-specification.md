@@ -165,6 +165,12 @@ The client only displays; access decisions on the relay are made by the bot (who
 
 ## 5. UI & UX
 
+> **The mockups are binding.** The UI must match the mockups in the issues: layout, texts, states, icons, spacing and both themes (dark and light).
+> - File sharing: issue #348, mockups 1a–9, 12 and 13. Sources are in `docs/mockups/epic-4.1/` on the branch `mockups/file-sharing`.
+> - Screen sharing: issue #355, mockups 01–05. Sources are in `docs/mockups/epic-4.1-screenshare/` on the branch `mockups/screenshare-41`.
+>
+> The malware mockups (2b, 10, 11, 14) are not part of this epic (#372). If a mockup and this text disagree, or a state has no mockup, ask before building; don't invent a different design. Verification compares screenshots of the running client with the mockups.
+
 ```mermaid
 flowchart LR
     C[Channel chat composer] -->|paperclip / drop| T[Attachment tray chips]
