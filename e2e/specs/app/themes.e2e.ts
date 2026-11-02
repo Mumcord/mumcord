@@ -1,6 +1,6 @@
 // AC-2.12–AC-2.16: theme presets, Dark / Light / System versions, the Light | Dark editor with its
 // contrast gate and auto-generated version, sharing (mct1. codes, theme card, "Apply to" a server),
-// per-server themes, visual effects and the themed dropdowns. The second Mumcord client of AC-2.13
+// per-server themes, film grain and the themed dropdowns. The second Mumcord client of AC-2.13
 // is played by the app itself (receiver) and by the bot (sender / official client).
 import { browser, expect, $, $$ } from "@wdio/globals";
 import { app, testenv } from "../../helpers/index.ts";
@@ -350,7 +350,7 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     }
   });
 
-  it("AC-2.15: primary buttons glow; the Visual effects switch turns glass and grain off", async () => {
+  it("AC-2.15: primary buttons glow; the Film grain switch turns the grain off; popovers stay solid", async () => {
     await appearance();
     await openEditorFromCurrent();
     const glow = await browser.execute(() => {
@@ -360,23 +360,43 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
     expect(glow).not.toBe("none");
     expect(glow).not.toBe("");
     await button("Cancel").click();
+    // Popovers are not open here, so probe each popover class on a temporary element.
     const read = () =>
-      browser.execute(() => ({
-        effects: document.documentElement.dataset.effects ?? "",
-        grain: getComputedStyle(document.body, "::after").opacity,
-        glass: getComputedStyle(document.documentElement).getPropertyValue("--glass-filter").trim(),
-      }));
+      browser.execute(() => {
+        const classes = [
+          "quick-settings",
+          "profile-preview",
+          "profile-card",
+          "server-menu",
+          "person-menu",
+          "follow-server__menu",
+          "gif-picker__popover",
+        ];
+        const blurred = classes.filter((c) => {
+          const probe = document.createElement("div");
+          probe.className = c;
+          document.body.appendChild(probe);
+          const filter = getComputedStyle(probe).backdropFilter;
+          probe.remove();
+          return filter !== "" && filter !== "none";
+        });
+        return {
+          effects: document.documentElement.dataset.effects ?? "",
+          grain: getComputedStyle(document.body, "::after").opacity,
+          blurred,
+        };
+      });
     const on = await read();
     expect(on.effects).toBe("on");
     expect(Number(on.grain)).toBeGreaterThan(0);
-    expect(on.glass).not.toBe("none");
-    const sw = $(`//div[${hasClass('settings-switch')}][.//*[starts-with(normalize-space(.),'Visual effects')]]//input[@role='switch']`);
+    expect(on.blurred).toEqual([]);
+    const sw = $(`//div[${hasClass('settings-switch')}][.//*[normalize-space(.)='Film grain']]//input[@role='switch']`);
     await sw.scrollIntoView();
     await sw.click();
     await browser.waitUntil(async () => (await read()).effects === "off");
     const off = await read();
     expect(Number(off.grain)).toBe(0);
-    expect(off.glass).toBe("none");
+    expect(off.blurred).toEqual([]);
     await sw.click();
     await browser.waitUntil(async () => (await read()).effects === "on");
     await closeSettings();
