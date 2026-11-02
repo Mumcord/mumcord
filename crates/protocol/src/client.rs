@@ -161,6 +161,10 @@ pub enum Event {
     PermissionsUpdated {
         channel_id: Option<u32>,
     },
+    /// A channel's groups and ACL entries, the answer to [`Handle::query_acl`]. Standard servers
+    /// send it only to users with the Write permission; a refusal arrives as
+    /// [`Event::PermissionDenied`] with `permission == [`crate::permissions::WRITE`].
+    Acl(Box<proto::Acl>),
     ServerConfigUpdated(ServerInfo),
     /// UDP crypto parameters for the voice transport, passed through as received (also during
     /// login; the latest value is in `ServerState::crypt`).
@@ -1095,6 +1099,10 @@ impl Dispatcher {
                     channel_id: m.channel_id,
                 });
             }
+            MessageType::Acl => {
+                let m: proto::Acl = decode("Acl", payload)?;
+                self.emit(Event::Acl(Box::new(m)));
+            }
             MessageType::ServerConfig => {
                 let m: proto::ServerConfig = decode("ServerConfig", payload)?;
                 let info = {
@@ -1395,6 +1403,22 @@ impl Handle {
         self.send(Frame::from_message(MessageType::PermissionQuery, &m))
     }
 
+    /// Asks the server for a channel's groups and ACL entries (the ACL editor and the group lookup,
+    /// issue #300). The answer arrives as [`Event::Acl`].
+    ///
+    /// Standard servers answer the query only for users with the Write permission in that channel or
+    /// in the root channel, so a refusal arrives as [`Event::PermissionDenied`] with
+    /// `kind == DenyKind::Permission` and `permission == permissions::WRITE`. The client does not
+    /// decide this itself, because servers differ in who may read a channel's ACLs.
+    pub fn query_acl(&self, channel_id: u32) -> Result<(), CommandError> {
+        let m = proto::Acl {
+            channel_id,
+            query: Some(true),
+            ..Default::default()
+        };
+        self.send(Frame::from_message(MessageType::Acl, &m))
+    }
+
     /// Replaces a channel's ACL and groups (admin tooling such as test bots; needs the Write
     /// permission, e.g. as SuperUser). Unset groups/ACL entries are removed by the server.
     pub fn send_acl(&self, acl: proto::Acl) -> Result<(), CommandError> {
@@ -1487,6 +1511,7 @@ mod tests {
     use prost::Message;
 
     use super::*;
+    use crate::permissions;
 
     #[test]
     fn pings_report_the_own_tcp_and_udp_figures() {
@@ -1539,6 +1564,66 @@ mod tests {
         };
         assert_eq!(frame.kind, MessageType::Acl as u16);
         assert_eq!(proto::Acl::decode(frame.payload).expect("decode"), acl);
+    }
+
+    fn test_shared(state: ServerState) -> Arc<Shared> {
+        Arc::new(Shared {
+            state: Mutex::new(state),
+            shutdown: Notify::new(),
+            closing: AtomicBool::new(false),
+            pong: watch::Sender::new(0),
+            reason: Mutex::new(None),
+            connected: AtomicBool::new(true),
+            ping: Mutex::default(),
+            tap: None,
+            low_expired: AtomicU64::new(0),
+        })
+    }
+
+    #[test]
+    fn acl_query_sends_a_query_and_the_answer_becomes_an_event() {
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        let shared = test_shared(ServerState::default());
+        let handle = Handle {
+            tx: tx.clone(),
+            shared: shared.clone(),
+        };
+        handle.query_acl(2).expect("queued");
+        let Ok(Outgoing::Frame(frame)) = rx.try_recv() else {
+            panic!("expected a frame");
+        };
+        assert_eq!(frame.kind, MessageType::Acl as u16);
+        let m = proto::Acl::decode(frame.payload).expect("decode");
+        assert_eq!((m.channel_id, m.query), (2, Some(true)));
+
+        // The answer is passed through; the client does not store or interpret a channel's ACLs.
+        let (events, mut events_rx) = mpsc::unbounded_channel();
+        let mut dispatcher = Dispatcher {
+            shared,
+            events,
+            synced: true,
+        };
+        let acl = proto::Acl {
+            channel_id: 2,
+            inherit_acls: Some(true),
+            groups: vec![proto::acl::ChanGroup {
+                name: "editors".into(),
+                add: vec![7],
+                ..Default::default()
+            }],
+            acls: vec![proto::acl::ChanAcl {
+                grant: Some(permissions::WRITE),
+                group: Some("editors".into()),
+                ..Default::default()
+            }],
+            query: Some(false),
+        };
+        assert!(matches!(
+            dispatcher.handle(Frame::from_message(MessageType::Acl, &acl)),
+            Control::Continue
+        ));
+        assert!(rx.try_recv().is_err(), "the query is only sent once");
+        assert_eq!(events_rx.try_recv(), Ok(Event::Acl(Box::new(acl))));
     }
 
     #[test]

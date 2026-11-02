@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-02
+
 ### Changed
 
 - Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)
@@ -16,6 +18,7 @@
 
 ### Internal
 
+- `mumcord-protocol` can now read a channel's ACLs: `Handle::query_acl(channel_id)` sends the query and the server's answer arrives as `Event::Acl` (groups and entries), which the ACL editor in Epic 4 needs. A refusal for a user without the Write permission comes as the usual `Event::PermissionDenied` with the Write bit (#300)
 - Windows release builds are signed with a Certum code signing certificate through SimplySign instead of Azure Artifact Signing: the release workflow installs a pinned SimplySign Desktop, logs in with a one-time code generated from the `release` environment secrets, and signs the app, the uninstaller and the installer with `signtool`; `scripts/sign-windows.ps1` does the same by hand. Without the Certum settings the Windows build stays unsigned as before (#340)
 
 ## [0.6.0] - 2026-11-02
@@ -447,6 +450,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.6.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.1
 [0.6.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.0
 [0.5.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.5.0
 [0.4.4]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.4
