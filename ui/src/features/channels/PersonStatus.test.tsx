@@ -66,6 +66,7 @@ describe("voiceState", () => {
     hasComment: false,
     volume: 100,
     localMute: false,
+    shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
   };

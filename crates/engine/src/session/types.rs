@@ -165,9 +165,12 @@ pub struct UserView {
     /// Hex of the avatar texture hash, when the server sent one; changes when the avatar is replaced.
     pub avatar_hash: Option<String>,
     pub has_comment: bool,
-    /// Local volume in percent (0–200).
+    /// Local voice volume in percent (0–200).
     pub volume: u16,
     pub local_mute: bool,
+    /// Local volume of the person's screen share sound in percent (0–200), separate from
+    /// their voice (issue #333).
+    pub share_volume: u16,
     /// Features announced by another Mumcord client (FR-1.61); `None` for everyone else.
     pub mumcord_features: Option<Vec<String>>,
 }

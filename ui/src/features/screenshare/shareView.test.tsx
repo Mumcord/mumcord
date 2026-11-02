@@ -139,4 +139,26 @@ describe("watched share", () => {
     expect(mediaView().fit).toBe("fill");
     expect(document.querySelector(".share-screen--fill")).not.toBeNull();
   });
+
+  it("sets the share's own volume and leaves the sharer's voice volume alone (issue #333)", async () => {
+    await api.personSetVolume(1, ANNA, 60);
+    const setVoice = vi.spyOn(api, "personSetVolume");
+    const setShare = vi.spyOn(api, "personSetShareVolume");
+    render(<Viewer serverId={1} session={ANNA} />);
+    act(() => {
+      api.mock.emit("screenSharesChanged", { serverId: 1, shares: [annaShares()] });
+    });
+    const slider = await screen.findByRole("slider", { name: "Volume" });
+    expect(slider).toHaveValue("100");
+
+    fireEvent.change(slider, { target: { value: "30" } });
+    expect(setShare).toHaveBeenCalledWith(1, ANNA, 30);
+    expect(setVoice).not.toHaveBeenCalled();
+    const anna = (await api.sessionSnapshot(1))?.users.find((u) => u.session === ANNA);
+    expect(anna).toMatchObject({ volume: 60, shareVolume: 30 });
+
+    // The voice volume changing elsewhere leaves the share's slider where it was.
+    await act(() => api.personSetVolume(1, ANNA, 150));
+    expect(slider).toHaveValue("30");
+  });
 });

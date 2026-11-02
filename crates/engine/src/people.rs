@@ -268,6 +268,7 @@ mod tests {
         let quiet = PersonSetting {
             volume: 50,
             local_mute: true,
+            share_volume: 30,
         };
 
         people
@@ -292,7 +293,7 @@ mod tests {
                     &user(5, Some("abc")),
                     PersonSetting {
                         volume: 201,
-                        local_mute: false
+                        ..PersonSetting::default()
                     }
                 )
                 .is_err()

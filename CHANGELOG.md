@@ -9,6 +9,7 @@
 ### Fixed
 
 - macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
+- Changing the volume of someone's screen share no longer changes their voice volume. The share's sound now has its own volume, remembered per person like their voice volume.
 
 ## [0.6.0] - 2026-11-02
 
