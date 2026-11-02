@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)
 - The "Turn off all plugins" switch in Settings → Plugins now sits in a card like the other settings.
 - Mumcord starts faster: the code that has to load before the first screen is about a third smaller (Settings, the setup wizard, watch together, screen share, the server browser, the extra windows and code highlighting in chat now load only when they are first opened), and release builds no longer contain the built-in test data (#323)
 - Mumcord now opens with a **start screen** (the logo on the theme background with a slim loading bar) instead of an empty white window and a bare "Loading…" text. The window only appears once the start screen is drawn, the start screen follows your system theme (or the fixed theme you picked) and fades into the app when it is ready; with reduced motion it switches without movement (#323)

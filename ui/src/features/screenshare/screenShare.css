@@ -192,7 +192,6 @@
   background: var(--media-glass);
   color: var(--media-on-scrim);
   font-size: var(--font-size-sm);
-  backdrop-filter: var(--glass-filter);
 }
 
 .screen-stage__actions {
@@ -473,10 +472,9 @@
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--glass-bg);
+  background: var(--color-bg-elevated);
   box-shadow: var(--shadow-raised);
   font-size: var(--font-size-sm);
-  backdrop-filter: var(--glass-filter);
 }
 
 /* Nothing shared yet: only the "Share screen" button, without the card around it. */
