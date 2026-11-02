@@ -659,3 +659,4 @@ Every AC-6.1 … AC-6.30 is covered by a C task above.
 - C14 ✅ AC-6.29 (f0f5f5ba a11y.e2e.ts 7/7 ×2; fix cbb6e504 modal focus); 🖐 manual screen reader check (steps in D1); at 150 % font Poll card needs "Show more"
 - C5 ✅ AC-6.8, AC-6.9, AC-6.10 (eef7969d, f4f9deb8 safe-mode.e2e.ts 4/4)
 - C4 ✅ AC-6.5, AC-6.6 (cc6f58bc, 0f178939, 34c379b0, d4a67153 echolings.e2e.ts incl. Snack Race, no skips); 🖐 Snack Race on Windows/macOS manual
+- C10 ⏭ skipped for 0.6.0 (user decision); load.e2e.ts present but describe.skip
