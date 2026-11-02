@@ -93,7 +93,7 @@ function banner() {
 function turnOffAll() {
   // The switch is found by its visible label, so it doesn't depend on where the card sits.
   return $(
-    "//input[@role='switch'][@aria-labelledby = //*[normalize-space(.)='Turn off all plugins']/@id]",
+    "//input[@role='switch'][@id = //label[contains(normalize-space(.),'Turn off all plugins')]/@for]",
   );
 }
 
