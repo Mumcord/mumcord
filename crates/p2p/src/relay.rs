@@ -83,6 +83,12 @@ pub enum RelayRefusal {
     Version,
     #[error("the relay did not understand the request")]
     BadRequest,
+    /// The relay owner turned off this use (spec 07, FR-7.1).
+    #[error("the relay does not allow this use")]
+    UseNotAllowed,
+    /// The broadcast has as many viewers as the relay allows (spec 07, FR-7.46).
+    #[error("this share is full")]
+    BroadcastFull,
 }
 
 impl RelayRefusal {
@@ -97,6 +103,8 @@ impl RelayRefusal {
             "rate_limited" => Self::RateLimited,
             "version" => Self::Version,
             "bad_request" => Self::BadRequest,
+            "use_not_allowed" => Self::UseNotAllowed,
+            "broadcast_full" => Self::BroadcastFull,
             _ => return None,
         })
     }
@@ -624,6 +632,8 @@ mod tests {
             ("rate_limited", RelayRefusal::RateLimited),
             ("version", RelayRefusal::Version),
             ("bad_request", RelayRefusal::BadRequest),
+            ("use_not_allowed", RelayRefusal::UseNotAllowed),
+            ("broadcast_full", RelayRefusal::BroadcastFull),
         ] {
             let message = format!(r#"{{"v":1,"t":"error","code":"{code}"}}"#);
             assert!(matches!(

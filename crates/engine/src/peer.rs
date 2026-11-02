@@ -67,7 +67,8 @@ pub enum RelayUnavailable {
 impl From<TokenErrorReason> for RelayUnavailable {
     fn from(reason: TokenErrorReason) -> Self {
         match reason {
-            TokenErrorReason::Denied => Self::Denied,
+            // Closest existing reason until the client handles allowed uses.
+            TokenErrorReason::Denied | TokenErrorReason::UseNotAllowed => Self::Denied,
             TokenErrorReason::PeerGone => Self::PeerGone,
             TokenErrorReason::PeerNotMumcord => Self::PeerCannotRelay,
             TokenErrorReason::RateLimited => Self::RateLimited,
@@ -456,8 +457,15 @@ impl Relays {
             PeerMessage::TokenError { rid, reason } => {
                 self.on_token_error(ctx.server_id, sender, rid, reason);
             }
-            // Only relay bots answer token requests.
-            PeerMessage::TokenRequest { .. } => {}
+            // Only relay bots answer token requests and broadcast messages to the bot; the
+            // client side of broadcasts is not wired up yet.
+            PeerMessage::TokenRequest { .. }
+            | PeerMessage::BroadcastRequest { .. }
+            | PeerMessage::Broadcast { .. }
+            | PeerMessage::BroadcastAdmit { .. }
+            | PeerMessage::BroadcastToken { .. }
+            | PeerMessage::BroadcastKick { .. }
+            | PeerMessage::BroadcastError { .. } => {}
         }
     }
 
@@ -873,7 +881,11 @@ impl Engine {
             .map_err(|_| RelayUnavailable::NotConnected)?;
         let rid = RequestId::random();
         let (bot, ann, rx) = self.relays().begin_request(server_id, peer, rid)?;
-        let message = PeerMessage::TokenRequest { rid, peer };
+        let message = PeerMessage::TokenRequest {
+            rid,
+            peer,
+            relay_use: None,
+        };
         let sent = message
             .encode()
             .map_err(|e| e.to_string())
@@ -927,6 +939,8 @@ mod tests {
             fingerprint: [fp; 32],
             state,
             seq,
+            uses: None,
+            broadcast: None,
         }
     }
 

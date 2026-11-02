@@ -6,6 +6,9 @@
 //! - `token-req` (client → bot): asks for a pair token for the client and one peer session.
 //! - `token` (bot → both clients of a pair): the token both sides bind at the relay.
 //! - `token-err` (bot → requester): why no token was issued.
+//! - `bcast-req`, `bcast`, `bcast-admit`, `bcast-tok`, `bcast-kick`, `bcast-err`: a screen-share
+//!   broadcast through the relay (spec 07, section 6.6); the relay link itself is in
+//!   [`crate::broadcast`].
 //!
 //! Mumcord and mumbot share this module so both sides use one format. Everything received is
 //! untrusted: the decoder checks the size before parsing, ignores unknown fields and validates
@@ -41,6 +44,40 @@ impl RequestId {
     }
 }
 
+/// A broadcast at the relay (16 lowercase hex on the wire), assigned by the relay.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct BroadcastId(pub u64);
+
+/// What a relay connection is used for (spec 07, FR-7.1). Wire names `img`, `file`, `scr`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RelayUse {
+    /// Full-size image downloads.
+    Images,
+    /// File transfers.
+    Files,
+    /// Screen sharing (one copy per viewer and broadcasts).
+    ScreenShare,
+}
+
+impl RelayUse {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Images => "img",
+            Self::Files => "file",
+            Self::ScreenShare => "scr",
+        }
+    }
+
+    fn parse(s: &str) -> Option<Self> {
+        Some(match s {
+            "img" => Self::Images,
+            "file" => Self::Files,
+            "scr" => Self::ScreenShare,
+            _ => return None,
+        })
+    }
+}
+
 /// Whether the relay bot can currently reach its relay.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RelayState {
@@ -62,6 +99,20 @@ pub struct RelayAnnouncement {
     pub state: RelayState,
     /// Increases with every change; an older value than the last seen one is stale.
     pub seq: u32,
+    /// Uses the relay allows (wire `u`). `None` (an older bot) means all are allowed. Use names
+    /// this version doesn't know are dropped on receipt.
+    pub uses: Option<Vec<RelayUse>>,
+    /// Most viewers per broadcast (wire `bc`); `None` means the relay offers no broadcasts.
+    pub broadcast: Option<u16>,
+}
+
+impl RelayAnnouncement {
+    /// Whether the relay may be used for `relay_use` (an announcement without `u` allows all).
+    pub fn allows(&self, relay_use: RelayUse) -> bool {
+        self.uses
+            .as_ref()
+            .is_none_or(|uses| uses.contains(&relay_use))
+    }
 }
 
 /// A pair token for the relay. It is a credential: `Debug` and `Display` show `•••`.
@@ -108,6 +159,8 @@ pub enum TokenErrorReason {
     RateLimited,
     RelayDown,
     RelayFull,
+    /// The relay does not allow the requested use (spec 07, FR-7.5).
+    UseNotAllowed,
 }
 
 impl TokenErrorReason {
@@ -119,6 +172,7 @@ impl TokenErrorReason {
             Self::RateLimited => "rate-limited",
             Self::RelayDown => "relay-down",
             Self::RelayFull => "relay-full",
+            Self::UseNotAllowed => "use-not-allowed",
         }
     }
 
@@ -130,6 +184,50 @@ impl TokenErrorReason {
             "rate-limited" => Self::RateLimited,
             "relay-down" => Self::RelayDown,
             "relay-full" => Self::RelayFull,
+            "use-not-allowed" => Self::UseNotAllowed,
+            _ => return Err(PeerError::BadReason),
+        })
+    }
+}
+
+/// Why the relay bot set up no broadcast or admitted no viewer (`bcast-err`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BroadcastErrorReason {
+    Denied,
+    /// Sharer and viewer are not in the same channel.
+    NotSameChannel,
+    /// The broadcast has no room for another viewer.
+    Full,
+    RelayDown,
+    /// The relay runs as many broadcasts as it allows.
+    RelayFull,
+    /// The relay does not allow screen sharing.
+    UseNotAllowed,
+    RateLimited,
+}
+
+impl BroadcastErrorReason {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Denied => "denied",
+            Self::NotSameChannel => "not-same-channel",
+            Self::Full => "full",
+            Self::RelayDown => "relay-down",
+            Self::RelayFull => "relay-full",
+            Self::UseNotAllowed => "use-not-allowed",
+            Self::RateLimited => "rate-limited",
+        }
+    }
+
+    fn parse(s: &str) -> Result<Self, PeerError> {
+        Ok(match s {
+            "denied" => Self::Denied,
+            "not-same-channel" => Self::NotSameChannel,
+            "full" => Self::Full,
+            "relay-down" => Self::RelayDown,
+            "relay-full" => Self::RelayFull,
+            "use-not-allowed" => Self::UseNotAllowed,
+            "rate-limited" => Self::RateLimited,
             _ => return Err(PeerError::BadReason),
         })
     }
@@ -141,7 +239,13 @@ pub enum PeerMessage {
     /// Bot → client: the relay of this server.
     Relay(RelayAnnouncement),
     /// Client → bot: asks for a token for this client and the user with session `peer`.
-    TokenRequest { rid: RequestId, peer: u32 },
+    TokenRequest {
+        rid: RequestId,
+        peer: u32,
+        /// What the pair will use the relay for (wire `use`); the bot treats `None` (an older
+        /// client) as screen sharing.
+        relay_use: Option<RelayUse>,
+    },
     /// Bot → both clients: the pair token; `a` requested it, `b` is the peer.
     Token {
         rid: RequestId,
@@ -155,6 +259,36 @@ pub enum PeerMessage {
     TokenError {
         rid: RequestId,
         reason: TokenErrorReason,
+    },
+    /// Sharer → bot: asks for a broadcast for up to `max` viewers (`bcast-req`).
+    BroadcastRequest { rid: RequestId, max: u16 },
+    /// Bot → sharer: the broadcast and its publisher token (`bcast`).
+    Broadcast {
+        rid: RequestId,
+        id: BroadcastId,
+        token: RelayToken,
+        /// Seconds the token stays valid until it is bound.
+        ttl: u16,
+    },
+    /// Sharer → bot: admit the user with session `viewer` (`bcast-admit`).
+    BroadcastAdmit {
+        rid: RequestId,
+        id: BroadcastId,
+        viewer: u32,
+    },
+    /// Bot → viewer: the subscriber token for the broadcast of session `sharer` (`bcast-tok`).
+    BroadcastToken {
+        id: BroadcastId,
+        token: RelayToken,
+        ttl: u16,
+        sharer: u32,
+    },
+    /// Sharer → bot: remove the user with session `viewer` from the broadcast (`bcast-kick`).
+    BroadcastKick { id: BroadcastId, viewer: u32 },
+    /// Bot → requester: no broadcast or no admission (`bcast-err`).
+    BroadcastError {
+        rid: RequestId,
+        reason: BroadcastErrorReason,
     },
 }
 
@@ -182,8 +316,14 @@ pub enum PeerError {
     BadSession,
     #[error("invalid token")]
     BadToken,
-    #[error("unknown token error reason")]
+    #[error("unknown error reason")]
     BadReason,
+    #[error("invalid broadcast id")]
+    BadBroadcastId,
+    #[error("unknown relay use")]
+    BadUse,
+    #[error("invalid viewer limit")]
+    BadViewers,
 }
 
 #[derive(Deserialize)]
@@ -208,12 +348,18 @@ struct RelayWire {
     fp: String,
     state: String,
     seq: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    u: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    bc: Option<u16>,
 }
 
 #[derive(Serialize, Deserialize)]
 struct TokenRequestWire {
     rid: String,
     peer: u32,
+    #[serde(rename = "use", default, skip_serializing_if = "Option::is_none")]
+    relay_use: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -226,9 +372,44 @@ struct TokenWire {
 }
 
 #[derive(Serialize, Deserialize)]
-struct TokenErrorWire {
+struct ErrorWire {
     rid: String,
     r: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BroadcastRequestWire {
+    rid: String,
+    max: u16,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BroadcastWire {
+    rid: String,
+    id: String,
+    tok: String,
+    ttl: u16,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BroadcastAdmitWire {
+    rid: String,
+    id: String,
+    viewer: u32,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BroadcastTokenWire {
+    id: String,
+    tok: String,
+    ttl: u16,
+    sharer: u32,
+}
+
+#[derive(Serialize, Deserialize)]
+struct BroadcastKickWire {
+    id: String,
+    viewer: u32,
 }
 
 impl PeerMessage {
@@ -240,6 +421,9 @@ impl PeerMessage {
                 validate_host(&relay.host)?;
                 validate_port(relay.udp)?;
                 validate_port(relay.tcp)?;
+                if relay.broadcast == Some(0) {
+                    return Err(PeerError::BadViewers);
+                }
                 envelope(
                     "relay",
                     RelayWire {
@@ -253,14 +437,24 @@ impl PeerMessage {
                         }
                         .to_owned(),
                         seq: relay.seq,
+                        u: relay
+                            .uses
+                            .as_ref()
+                            .map(|uses| uses.iter().map(|u| u.as_str().to_owned()).collect()),
+                        bc: relay.broadcast,
                     },
                 )?
             }
-            Self::TokenRequest { rid, peer } => envelope(
+            Self::TokenRequest {
+                rid,
+                peer,
+                relay_use,
+            } => envelope(
                 "token-req",
                 TokenRequestWire {
-                    rid: rid_str(*rid),
+                    rid: hex16(rid.0),
                     peer: *peer,
+                    relay_use: relay_use.map(|u| u.as_str().to_owned()),
                 },
             )?,
             Self::Token {
@@ -276,7 +470,7 @@ impl PeerMessage {
                 envelope(
                     "token",
                     TokenWire {
-                        rid: rid_str(*rid),
+                        rid: hex16(rid.0),
                         a: *a,
                         b: *b,
                         tok: token.0.clone(),
@@ -286,8 +480,70 @@ impl PeerMessage {
             }
             Self::TokenError { rid, reason } => envelope(
                 "token-err",
-                TokenErrorWire {
-                    rid: rid_str(*rid),
+                ErrorWire {
+                    rid: hex16(rid.0),
+                    r: reason.as_str().to_owned(),
+                },
+            )?,
+            Self::BroadcastRequest { rid, max } => {
+                if *max == 0 {
+                    return Err(PeerError::BadViewers);
+                }
+                envelope(
+                    "bcast-req",
+                    BroadcastRequestWire {
+                        rid: hex16(rid.0),
+                        max: *max,
+                    },
+                )?
+            }
+            Self::Broadcast {
+                rid,
+                id,
+                token,
+                ttl,
+            } => envelope(
+                "bcast",
+                BroadcastWire {
+                    rid: hex16(rid.0),
+                    id: hex16(id.0),
+                    tok: token.0.clone(),
+                    ttl: *ttl,
+                },
+            )?,
+            Self::BroadcastAdmit { rid, id, viewer } => envelope(
+                "bcast-admit",
+                BroadcastAdmitWire {
+                    rid: hex16(rid.0),
+                    id: hex16(id.0),
+                    viewer: *viewer,
+                },
+            )?,
+            Self::BroadcastToken {
+                id,
+                token,
+                ttl,
+                sharer,
+            } => envelope(
+                "bcast-tok",
+                BroadcastTokenWire {
+                    id: hex16(id.0),
+                    tok: token.0.clone(),
+                    ttl: *ttl,
+                    sharer: *sharer,
+                },
+            )?,
+            Self::BroadcastKick { id, viewer } => envelope(
+                "bcast-kick",
+                BroadcastKickWire {
+                    id: hex16(id.0),
+                    viewer: *viewer,
+                },
+            )?,
+            Self::BroadcastError { rid, reason } => envelope(
+                "bcast-err",
+                ErrorWire {
+                    rid: hex16(rid.0),
                     r: reason.as_str().to_owned(),
                 },
             )?,
@@ -326,6 +582,11 @@ impl PeerMessage {
                     fingerprint: parse_fingerprint(&wire.fp)?,
                     state,
                     seq: wire.seq,
+                    uses: wire
+                        .u
+                        .map(|uses| uses.iter().filter_map(|u| RelayUse::parse(u)).collect()),
+                    // A limit of zero viewers is no broadcast at all.
+                    broadcast: wire.bc.filter(|&max| max > 0),
                 }))
             }
             "token-req" => {
@@ -333,6 +594,10 @@ impl PeerMessage {
                 Ok(Self::TokenRequest {
                     rid: parse_rid(&wire.rid)?,
                     peer: wire.peer,
+                    relay_use: wire
+                        .relay_use
+                        .map(|u| RelayUse::parse(&u).ok_or(PeerError::BadUse))
+                        .transpose()?,
                 })
             }
             "token" => {
@@ -349,10 +614,60 @@ impl PeerMessage {
                 })
             }
             "token-err" => {
-                let wire: TokenErrorWire = parse(bytes)?;
+                let wire: ErrorWire = parse(bytes)?;
                 Ok(Self::TokenError {
                     rid: parse_rid(&wire.rid)?,
                     reason: TokenErrorReason::parse(&wire.r)?,
+                })
+            }
+            "bcast-req" => {
+                let wire: BroadcastRequestWire = parse(bytes)?;
+                if wire.max == 0 {
+                    return Err(PeerError::BadViewers);
+                }
+                Ok(Self::BroadcastRequest {
+                    rid: parse_rid(&wire.rid)?,
+                    max: wire.max,
+                })
+            }
+            "bcast" => {
+                let wire: BroadcastWire = parse(bytes)?;
+                Ok(Self::Broadcast {
+                    rid: parse_rid(&wire.rid)?,
+                    id: parse_broadcast_id(&wire.id)?,
+                    token: RelayToken::parse(&wire.tok)?,
+                    ttl: wire.ttl,
+                })
+            }
+            "bcast-admit" => {
+                let wire: BroadcastAdmitWire = parse(bytes)?;
+                Ok(Self::BroadcastAdmit {
+                    rid: parse_rid(&wire.rid)?,
+                    id: parse_broadcast_id(&wire.id)?,
+                    viewer: wire.viewer,
+                })
+            }
+            "bcast-tok" => {
+                let wire: BroadcastTokenWire = parse(bytes)?;
+                Ok(Self::BroadcastToken {
+                    id: parse_broadcast_id(&wire.id)?,
+                    token: RelayToken::parse(&wire.tok)?,
+                    ttl: wire.ttl,
+                    sharer: wire.sharer,
+                })
+            }
+            "bcast-kick" => {
+                let wire: BroadcastKickWire = parse(bytes)?;
+                Ok(Self::BroadcastKick {
+                    id: parse_broadcast_id(&wire.id)?,
+                    viewer: wire.viewer,
+                })
+            }
+            "bcast-err" => {
+                let wire: ErrorWire = parse(bytes)?;
+                Ok(Self::BroadcastError {
+                    rid: parse_rid(&wire.rid)?,
+                    reason: BroadcastErrorReason::parse(&wire.r)?,
                 })
             }
             _ => Err(PeerError::UnknownType),
@@ -381,17 +696,25 @@ fn is_lower_hex(s: &str, len: usize) -> bool {
     s.len() == len && s.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
 }
 
-fn rid_str(rid: RequestId) -> String {
-    format!("{:016x}", rid.0)
+fn hex16(value: u64) -> String {
+    format!("{value:016x}")
+}
+
+fn parse_hex16(s: &str) -> Option<u64> {
+    if !is_lower_hex(s, 16) {
+        return None;
+    }
+    u64::from_str_radix(s, 16).ok()
 }
 
 fn parse_rid(s: &str) -> Result<RequestId, PeerError> {
-    if !is_lower_hex(s, 16) {
-        return Err(PeerError::BadRequestId);
-    }
-    u64::from_str_radix(s, 16)
-        .map(RequestId)
-        .map_err(|_| PeerError::BadRequestId)
+    parse_hex16(s).map(RequestId).ok_or(PeerError::BadRequestId)
+}
+
+fn parse_broadcast_id(s: &str) -> Result<BroadcastId, PeerError> {
+    parse_hex16(s)
+        .map(BroadcastId)
+        .ok_or(PeerError::BadBroadcastId)
 }
 
 fn parse_fingerprint(s: &str) -> Result<[u8; 32], PeerError> {
@@ -464,6 +787,8 @@ mod tests {
             fingerprint: [0xab; 32],
             state: RelayState::Up,
             seq: 4,
+            uses: None,
+            broadcast: None,
         })
     }
 
@@ -473,7 +798,23 @@ mod tests {
             PeerMessage::TokenRequest {
                 rid: RequestId(0x0123_4567_89ab_cdef),
                 peer: 17,
+                relay_use: None,
             },
+            PeerMessage::TokenRequest {
+                rid: RequestId(2),
+                peer: 18,
+                relay_use: Some(RelayUse::Files),
+            },
+            PeerMessage::Relay(RelayAnnouncement {
+                host: "127.0.0.1".to_owned(),
+                udp: 44759,
+                tcp: 44759,
+                fingerprint: [1; 32],
+                state: RelayState::Up,
+                seq: 1,
+                uses: Some(vec![RelayUse::Images, RelayUse::ScreenShare]),
+                broadcast: Some(25),
+            }),
             PeerMessage::Token {
                 rid: RequestId(1),
                 a: 3,
@@ -484,6 +825,39 @@ mod tests {
             PeerMessage::TokenError {
                 rid: RequestId(u64::MAX),
                 reason: TokenErrorReason::PeerNotMumcord,
+            },
+            PeerMessage::TokenError {
+                rid: RequestId(3),
+                reason: TokenErrorReason::UseNotAllowed,
+            },
+            PeerMessage::BroadcastRequest {
+                rid: RequestId(4),
+                max: 25,
+            },
+            PeerMessage::Broadcast {
+                rid: RequestId(4),
+                id: BroadcastId(0xfedc_ba98_7654_3210),
+                token: RelayToken::parse(TOKEN).expect("token"),
+                ttl: 60,
+            },
+            PeerMessage::BroadcastAdmit {
+                rid: RequestId(5),
+                id: BroadcastId(1),
+                viewer: 9,
+            },
+            PeerMessage::BroadcastToken {
+                id: BroadcastId(1),
+                token: RelayToken::parse(TOKEN).expect("token"),
+                ttl: 60,
+                sharer: 8,
+            },
+            PeerMessage::BroadcastKick {
+                id: BroadcastId(1),
+                viewer: 9,
+            },
+            PeerMessage::BroadcastError {
+                rid: RequestId(5),
+                reason: BroadcastErrorReason::NotSameChannel,
             },
         ]
     }
@@ -515,7 +889,7 @@ mod tests {
 
     #[test]
     fn encodes_wire_field_names() {
-        let json = String::from_utf8(all()[2].encode().expect("encode")).expect("utf8");
+        let json = String::from_utf8(all()[4].encode().expect("encode")).expect("utf8");
         assert_eq!(
             json,
             format!(
@@ -541,6 +915,12 @@ mod tests {
             fingerprint: [0xff; 32],
             state: RelayState::Down,
             seq: u32::MAX,
+            uses: Some(vec![
+                RelayUse::Images,
+                RelayUse::Files,
+                RelayUse::ScreenShare,
+            ]),
+            broadcast: Some(u16::MAX),
         });
         let bytes = message.encode().expect("encode");
         assert_eq!(PeerMessage::decode(&bytes).expect("decode"), message);
@@ -553,7 +933,8 @@ mod tests {
             PeerMessage::decode(json.as_bytes()),
             Ok(PeerMessage::TokenRequest {
                 rid: RequestId(0xff),
-                peer: 9
+                peer: 9,
+                relay_use: None,
             })
         );
     }
@@ -567,7 +948,7 @@ mod tests {
 
     #[test]
     fn token_is_masked_in_debug_and_display() {
-        let message = &all()[2];
+        let message = &all()[4];
         let debug = format!("{message:?}");
         assert!(!debug.contains(TOKEN), "{debug}");
         assert!(debug.contains("•••"));
@@ -631,6 +1012,41 @@ mod tests {
                 r#"{"v":1,"t":"token-err","rid":"0000000000000001","r":"nope"}"#.into(),
                 PeerError::BadReason,
             ),
+            (
+                r#"{"v":1,"t":"token-req","rid":"0000000000000001","peer":2,"use":"music"}"#
+                    .into(),
+                PeerError::BadUse,
+            ),
+            (
+                r#"{"v":1,"t":"bcast-req","rid":"0000000000000001","max":0}"#.into(),
+                PeerError::BadViewers,
+            ),
+            (
+                r#"{"v":1,"t":"bcast-req","rid":"0000000000000001","max":70000}"#.into(),
+                PeerError::Malformed,
+            ),
+            (
+                format!(r#"{{"v":1,"t":"bcast","rid":"0000000000000001","id":"00ff","tok":"{TOKEN}","ttl":60}}"#),
+                PeerError::BadBroadcastId,
+            ),
+            (
+                r#"{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"short","ttl":60,"sharer":1}"#
+                    .into(),
+                PeerError::BadToken,
+            ),
+            (
+                r#"{"v":1,"t":"bcast-kick","id":"000000000000000G","viewer":1}"#.into(),
+                PeerError::BadBroadcastId,
+            ),
+            (
+                r#"{"v":1,"t":"bcast-admit","rid":"0000000000000001","id":"0000000000000001"}"#
+                    .into(),
+                PeerError::Malformed,
+            ),
+            (
+                r#"{"v":1,"t":"bcast-err","rid":"0000000000000001","r":"peer-gone"}"#.into(),
+                PeerError::BadReason,
+            ),
         ];
         for (input, expected) in cases {
             assert_eq!(
@@ -674,5 +1090,124 @@ mod tests {
             relay.host = "bad host".to_owned();
         }
         assert_eq!(message.encode(), Err(PeerError::BadHost));
+        let mut message = relay();
+        if let PeerMessage::Relay(relay) = &mut message {
+            relay.broadcast = Some(0);
+        }
+        assert_eq!(message.encode(), Err(PeerError::BadViewers));
+        let request = PeerMessage::BroadcastRequest {
+            rid: RequestId(1),
+            max: 0,
+        };
+        assert_eq!(request.encode(), Err(PeerError::BadViewers));
+    }
+
+    #[test]
+    fn encodes_spec_07_wire_field_names() {
+        let encode = |message: PeerMessage| {
+            String::from_utf8(message.encode().expect("encode")).expect("utf8")
+        };
+        assert_eq!(
+            encode(PeerMessage::TokenRequest {
+                rid: RequestId(1),
+                peer: 2,
+                relay_use: Some(RelayUse::Images),
+            }),
+            r#"{"v":1,"t":"token-req","rid":"0000000000000001","peer":2,"use":"img"}"#
+        );
+        // Without a use the field is left out, exactly as older clients send it.
+        assert_eq!(
+            encode(PeerMessage::TokenRequest {
+                rid: RequestId(1),
+                peer: 2,
+                relay_use: None,
+            }),
+            r#"{"v":1,"t":"token-req","rid":"0000000000000001","peer":2}"#
+        );
+        let announced = encode(all()[3].clone());
+        assert!(
+            announced.ends_with(r#""seq":1,"u":["img","scr"],"bc":25}"#),
+            "{announced}"
+        );
+        assert!(!encode(relay()).contains(r#""u""#));
+        assert_eq!(
+            encode(PeerMessage::BroadcastAdmit {
+                rid: RequestId(5),
+                id: BroadcastId(0xab),
+                viewer: 9,
+            }),
+            r#"{"v":1,"t":"bcast-admit","rid":"0000000000000005","id":"00000000000000ab","viewer":9}"#
+        );
+        assert_eq!(
+            encode(PeerMessage::BroadcastToken {
+                id: BroadcastId(1),
+                token: RelayToken::parse(TOKEN).expect("token"),
+                ttl: 60,
+                sharer: 8,
+            }),
+            format!(
+                r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":8}}"#
+            )
+        );
+        assert_eq!(
+            encode(PeerMessage::BroadcastError {
+                rid: RequestId(1),
+                reason: BroadcastErrorReason::RelayFull,
+            }),
+            r#"{"v":1,"t":"bcast-err","rid":"0000000000000001","r":"relay-full"}"#
+        );
+    }
+
+    #[test]
+    fn every_error_reason_round_trips() {
+        for reason in [
+            TokenErrorReason::Denied,
+            TokenErrorReason::PeerGone,
+            TokenErrorReason::PeerNotMumcord,
+            TokenErrorReason::RateLimited,
+            TokenErrorReason::RelayDown,
+            TokenErrorReason::RelayFull,
+            TokenErrorReason::UseNotAllowed,
+        ] {
+            assert_eq!(TokenErrorReason::parse(reason.as_str()), Ok(reason));
+        }
+        for reason in [
+            BroadcastErrorReason::Denied,
+            BroadcastErrorReason::NotSameChannel,
+            BroadcastErrorReason::Full,
+            BroadcastErrorReason::RelayDown,
+            BroadcastErrorReason::RelayFull,
+            BroadcastErrorReason::UseNotAllowed,
+            BroadcastErrorReason::RateLimited,
+        ] {
+            assert_eq!(BroadcastErrorReason::parse(reason.as_str()), Ok(reason));
+        }
+    }
+
+    #[test]
+    fn relay_uses_from_a_newer_or_older_bot() {
+        let fp = fp();
+        let decode = |extra: &str| {
+            let json = format!(
+                r#"{{"v":1,"t":"relay","host":"relay","udp":1,"tcp":1,"fp":"{fp}","state":"up","seq":1{extra}}}"#
+            );
+            let Ok(PeerMessage::Relay(relay)) = PeerMessage::decode(json.as_bytes()) else {
+                panic!("not a relay message: {json}");
+            };
+            relay
+        };
+        let old = decode("");
+        assert_eq!((old.uses.clone(), old.broadcast), (None, None));
+        assert!(old.allows(RelayUse::Files));
+
+        let newer = decode(r#","u":["file","holo"],"bc":0"#);
+        assert_eq!(newer.uses, Some(vec![RelayUse::Files]));
+        assert_eq!(newer.broadcast, None);
+        assert!(newer.allows(RelayUse::Files));
+        assert!(!newer.allows(RelayUse::ScreenShare));
+
+        let none = decode(r#","u":[],"bc":4"#);
+        assert!(!none.allows(RelayUse::Images));
+        assert_eq!(none.broadcast, Some(4));
     }
 }

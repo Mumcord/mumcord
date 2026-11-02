@@ -229,6 +229,8 @@ async fn reports_an_unreachable_relay_within_the_setup_timeout() {
         fingerprint: [0; 32],
         state: RelayState::Up,
         seq: 1,
+        uses: None,
+        broadcast: None,
     };
     drop(closed);
     let (alice, _) = identity();
@@ -367,6 +369,8 @@ mod fake {
                 fingerprint: self.fingerprint,
                 state: RelayState::Up,
                 seq: 1,
+                uses: None,
+                broadcast: None,
             }
         }
 
