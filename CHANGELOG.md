@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-11-02
+
 ### Changed
 
 - Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)
@@ -446,6 +448,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.6.1]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.1
 [0.6.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.0
 [0.5.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.5.0
 [0.4.4]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.4
