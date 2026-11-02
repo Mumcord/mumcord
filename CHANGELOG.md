@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Internal
+
+- Updated dependencies: `libloading` 0.9, `sha1` 0.11, the Rust and npm minor and patch updates and the cargo-deny GitHub Action; `async-executor` moves off a yanked release so the dependency audit passes again
+
 ## [0.6.1] - 2026-11-02
 
 ### Changed
