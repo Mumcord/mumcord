@@ -48,9 +48,14 @@ describe("voice: per-channel audio profiles (#171)", () => {
       "//dialog[contains(@class,'channel-audio')]//label[contains(., 'Music')][.//input[@type='radio']]",
     ).click();
     await $("//dialog[contains(@class,'channel-audio')]//button[.='Save']").click();
-    await audioDialog().waitForDisplayed({ reverse: true });
     await expect($("//span[contains(@class,'channel-header__badge')]")).toHaveText(
       expect.stringContaining("Music profile"),
+    );
+    // Checked in the page, without an element handle: WebKitWebDriver fails a lookup with
+    // "stale element" when the dialog unmounts while the lookup runs.
+    await browser.waitUntil(
+      () => browser.execute(() => document.querySelector("dialog.channel-audio") === null),
+      { timeoutMsg: "the channel audio dialog did not close after Save" },
     );
   });
 
