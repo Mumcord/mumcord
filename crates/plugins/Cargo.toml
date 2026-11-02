@@ -1,13 +1,19 @@
 [package]
 name = "mumcord-plugins"
 description = "Plugin host for Mumcord: sandboxed WebAssembly runtime, manifest and package handling"
+repository.workspace = true
+homepage = "https://github.com/Mumcord/mumcord"
+documentation = "https://docs.rs/mumcord-plugins"
+readme = "README.md"
+keywords = ["mumcord", "mumble", "plugin", "wasmtime", "sandbox"]
+categories = ["wasm"]
+# The host bindings, the manifest schema and the revocation list are read at compile time.
+include = ["src/**", "wit/**", "schema/**", "assets/**", "README.md"]
 version.workspace = true
 edition.workspace = true
 # wasmtime 50 needs Rust 1.97; the rest of the workspace builds with older toolchains.
 rust-version = "1.97"
 license.workspace = true
-# Part of the app, not a library for others: the plugin API is the WIT package, not this crate.
-publish = false
 
 [dependencies]
 mumcord-store.workspace = true

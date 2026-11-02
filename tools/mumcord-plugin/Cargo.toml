@@ -1,13 +1,18 @@
 [package]
 name = "mumcord-plugin"
 description = "Command-line tool for Mumcord plugin authors and repository maintainers"
+homepage = "https://github.com/Mumcord/mumcord"
+documentation = "https://docs.rs/mumcord-plugin"
+readme = "README.md"
+keywords = ["mumcord", "mumble", "plugin", "wasm", "cli"]
+categories = ["command-line-utilities", "development-tools", "wasm"]
+include = ["src/**", "scenarios/**", "README.md"]
 version.workspace = true
 edition.workspace = true
 # Runs plugins in the same runtime as the client, which needs Rust 1.97 (wasmtime 50).
 rust-version = "1.97"
 license = "Apache-2.0"
 repository.workspace = true
-publish = false
 
 [dependencies]
 mumcord-plugins.workspace = true

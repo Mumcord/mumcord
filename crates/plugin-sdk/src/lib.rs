@@ -66,8 +66,9 @@ use std::fmt;
 pub mod bindings {
     wit_bindgen::generate!({
         world: "plugin",
-        // The canonical WIT lives in the plugins crate; the SDK never keeps its own copy.
-        path: "../plugins/wit",
+        // A copy of the canonical WIT in crates/plugins/wit, so the published crate is
+        // self-contained; tests/wit_copy.rs keeps the two identical.
+        path: "wit",
         pub_export_macro: true,
         default_bindings_module: "mumcord_plugin_sdk::bindings",
     });

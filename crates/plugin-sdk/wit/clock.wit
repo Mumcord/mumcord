@@ -1,0 +1,13 @@
+/// Wall clock (FR-6.21). Needs no permission. Resolution is 1 second, so it cannot be used to
+/// time other users or the host precisely.
+interface clock {
+  record datetime {
+    /// Seconds since 1970-01-01 UTC, rounded down to the second.
+    unix-seconds: u64,
+    /// The user's current local offset from UTC in minutes (e.g. 60 for CET), so plugins can
+    /// work out 'today' for daily limits and streaks.
+    utc-offset-minutes: s32,
+  }
+
+  now: func() -> datetime;
+}

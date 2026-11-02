@@ -28,7 +28,7 @@ repository = "https://github.com/Mumcord/mumcord"
 [workspace.dependencies]
 # Internal crates
 mumcord-protocol = { path = "crates/protocol", version = "0.5" }
-# The version is the minor series: crates.io needs it for the publish of mumcord-audio and mumcord-p2p, and it only changes with a minor/major bump.
+# The version is the minor series: crates.io needs it for the publish of the crates that depend on it (mumcord-audio, mumcord-p2p, mumcord-plugins, mumcord-plugin), and it only changes with a minor/major bump.
 mumcord-codec = { path = "crates/codec", version = "0.5" }
 mumcord-audio = { path = "crates/audio" }
 mumcord-store = { path = "crates/store", version = "0.5" }
@@ -37,8 +37,8 @@ mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
 mumcord-screenshare = { path = "crates/screenshare" }
-mumcord-plugins = { path = "crates/plugins" }
-mumcord-plugin-sdk = { path = "crates/plugin-sdk" }
+mumcord-plugins = { path = "crates/plugins", version = "0.5" }
+mumcord-plugin-sdk = { path = "crates/plugin-sdk", version = "0.5" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
