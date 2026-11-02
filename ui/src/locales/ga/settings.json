@@ -16,7 +16,8 @@
     "about": "Maidir le",
     "packetInspector": "Cigire paicéad",
     "hotkeys": "Aicearraí",
-    "plugins": "Breiseáin"
+    "plugins": "Breiseáin",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Tosú, teanga, nuashonruithe agus inrochtaineacht.",
@@ -29,7 +30,8 @@
     "gaming": "An forleagan sa chluiche, fuaim shuímh agus breiseáin chluiche.",
     "advanced": "Uirlisí forbróra, diagnóisic, stóras agus ceadúnais.",
     "about": "Leagan, tacaíocht agus an draoi socraithe.",
-    "plugins": "Ritheann breiseáin i bhfianán gainimh agus ní fhaigheann siad ach an méid a cheadaíonn tú. Ní fheiceann siad d'fhuaim, do chomhaid ná do theastas riamh."
+    "plugins": "Ritheann breiseáin i bhfianán gainimh agus ní fhaigheann siad ach an méid a cheadaíonn tú. Ní fheiceann siad d'fhuaim, do chomhaid ná do theastas riamh.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Socruithe / {{section}}",
   "moreInfo": "Tuilleadh eolais: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "spás diosca glan taisce",
     "blocked": "déan neamhaird blocáil balbhaigh daoine",
     "notifications": "foláirimh preabfhuinneoga",
-    "externalContent": "leabaithe íomhánna réamhamharcanna"
+    "externalContent": "leabaithe íomhánna réamhamharcanna",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Cuardaigh socruithe",
@@ -1072,5 +1076,6 @@
     "title": "Mód forbróra",
     "switch": "Mód forbróra",
     "hint": "Cuireann sé cluaisín Forbróir leis na Breiseáin inar féidir breiseáin gan síniú a lódáil ó fhillteán. Cuir air é mura gcruthaíonn tú breiseáin tú féin."
-  }
+  },
+  "newBadge": "New"
 }

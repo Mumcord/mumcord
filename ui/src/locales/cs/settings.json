@@ -16,7 +16,8 @@
     "about": "O aplikaci",
     "packetInspector": "Inspektor paketů",
     "hotkeys": "Klávesové zkratky",
-    "plugins": "Doplňky"
+    "plugins": "Doplňky",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Spuštění, jazyk, aktualizace a přístupnost.",
@@ -29,7 +30,8 @@
     "gaming": "Překryv ve hře, poziční zvuk a herní pluginy.",
     "advanced": "Vývojářské nástroje, diagnostika, úložiště a licence.",
     "about": "Verze, podpora a průvodce nastavením.",
-    "plugins": "Pluginy běží v izolovaném prostředí a dostanou jen to, co povolíte. Nikdy nevidí váš zvuk, soubory ani certifikát."
+    "plugins": "Pluginy běží v izolovaném prostředí a dostanou jen to, co povolíte. Nikdy nevidí váš zvuk, soubory ani certifikát.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Nastavení / {{section}}",
   "moreInfo": "Další informace: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "místo na disku vymazat mezipaměť",
     "blocked": "ignorovat blokovat ztlumit osoby",
     "notifications": "upozornění vyskakovací okna",
-    "externalContent": "vložený obsah obrázky náhledy"
+    "externalContent": "vložený obsah obrázky náhledy",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Hledat v nastavení",
@@ -1064,5 +1068,6 @@
     "title": "Režim vývojáře",
     "switch": "Režim vývojáře",
     "hint": "Přidá k doplňkům kartu Vývojář, kde lze načíst nepodepsané doplňky ze složky. Zapněte jej, jen pokud doplňky sami vytváříte."
-  }
+  },
+  "newBadge": "New"
 }

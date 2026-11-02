@@ -54,5 +54,29 @@
   "watching": "Tittar",
   "keys": "Kortkommandon",
   "keyFullscreen": "helskärm",
-  "keyExit": "avsluta"
+  "keyExit": "avsluta",
+  "quality": {
+    "label": "Quality",
+    "setBySharer": "Set by {{name}}:",
+    "summary": "{{resolution}} · {{fps}} fps · {{codec}}",
+    "frameRate": "Your frame rate",
+    "auto": "Auto",
+    "upTo30": "Up to 30",
+    "upTo15": "Up to 15",
+    "hint": "Lower frame rates save data. The sharer picks the resolution.",
+    "fit": "Fit",
+    "fill": "Fill",
+    "oneToOne": "1:1"
+  },
+  "header": {
+    "subtitle": "{{kind}} · since {{time}}",
+    "kindWindow": "Window",
+    "kindScreen": "Screen",
+    "resolution": "{{resolution}}",
+    "fps": "{{fps}} fps",
+    "relay": "Relay",
+    "direct": "Direct",
+    "codecViaRelay": "{{codec}} · via relay",
+    "codecDirect": "{{codec}} · direct"
+  }
 }

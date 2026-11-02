@@ -307,5 +307,12 @@
     "badge": "Tożsamość: {{identity}}",
     "badgeTitle": "Połączono z tożsamością {{identity}}",
     "missingNotice": "{{server}} połączył się z tożsamością domyślną, ponieważ jego własnej brakuje."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

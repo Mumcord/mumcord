@@ -46,7 +46,8 @@
     "noPermission": "Sul pole luba selles kanalis kirjutada.",
     "unavailable": "See kanal pole enam saadaval.",
     "offline": "{{name}} on võrgust väljas. Saad uuesti kirjutada, kui ta tagasi tuleb.",
-    "unnamedImage": "Kleebitud pilt"
+    "unnamedImage": "Kleebitud pilt",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Saadetavad pildid",

@@ -46,7 +46,8 @@
     "noPermission": "Du har ikke tilladelse til at skrive i denne kanal.",
     "unavailable": "Denne kanal er ikke længere tilgængelig.",
     "offline": "{{name}} er offline. Du kan skrive igen, når vedkommende er tilbage.",
-    "unnamedImage": "Indsat billede"
+    "unnamedImage": "Indsat billede",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Billeder, der skal sendes",

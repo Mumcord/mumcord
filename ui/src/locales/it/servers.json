@@ -307,5 +307,12 @@
     "badge": "Identità: {{identity}}",
     "badgeTitle": "Connesso con l'identità {{identity}}",
     "missingNotice": "{{server}} si è connesso con l'identità predefinita perché la sua manca."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

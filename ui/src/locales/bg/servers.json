@@ -307,5 +307,12 @@
     "badge": "Идентичност: {{identity}}",
     "badgeTitle": "Свързан с идентичност {{identity}}",
     "missingNotice": "{{server}} се свърза с идентичността по подразбиране, защото неговата липсва."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

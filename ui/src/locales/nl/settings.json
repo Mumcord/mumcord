@@ -16,7 +16,8 @@
     "about": "Over",
     "packetInspector": "Pakketinspecteur",
     "hotkeys": "Sneltoetsen",
-    "plugins": "Plug-ins"
+    "plugins": "Plug-ins",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Opstarten, taal, updates en toegankelijkheid.",
@@ -29,7 +30,8 @@
     "gaming": "De overlay in games, positionele audio en game-plug-ins.",
     "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
     "about": "Versie, ondersteuning en de installatiewizard.",
-    "plugins": "Plugins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat."
+    "plugins": "Plugins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Instellingen / {{section}}",
   "moreInfo": "Meer informatie: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "schijfruimte cache wissen",
     "blocked": "negeren blokkeren dempen mensen",
     "notifications": "meldingen pop-ups",
-    "externalContent": "insluitingen afbeeldingen voorbeelden"
+    "externalContent": "insluitingen afbeeldingen voorbeelden",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Instellingen zoeken",
@@ -1048,5 +1052,6 @@
     "title": "Ontwikkelaarsmodus",
     "switch": "Ontwikkelaarsmodus",
     "hint": "Voegt een tabblad Ontwikkelaar toe aan Plug-ins om niet-ondertekende plug-ins uit een map te laden. Zet dit alleen aan als je zelf plug-ins maakt."
-  }
+  },
+  "newBadge": "New"
 }

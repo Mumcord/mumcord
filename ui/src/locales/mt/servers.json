@@ -307,5 +307,12 @@
     "badge": "Identità: {{identity}}",
     "badgeTitle": "Konness bl-identità {{identity}}",
     "missingNotice": "{{server}} għaqqad bl-identità predefinita għax dik tiegħu hija nieqsa."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

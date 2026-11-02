@@ -307,5 +307,12 @@
     "badge": "Identität: {{identity}}",
     "badgeTitle": "Verbunden mit der Identität {{identity}}",
     "missingNotice": "{{server}} hat sich mit der Standardidentität verbunden, weil die eigene Identität fehlt."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

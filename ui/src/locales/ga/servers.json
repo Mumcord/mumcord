@@ -307,5 +307,12 @@
     "badge": "Aitheantas: {{identity}}",
     "badgeTitle": "Ceangailte leis an aitheantas {{identity}}",
     "missingNotice": "Cheangail {{server}} leis an aitheantas réamhshocraithe mar tá a aitheantas féin ar iarraidh."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

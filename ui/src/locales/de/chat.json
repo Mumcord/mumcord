@@ -46,7 +46,8 @@
     "noPermission": "Du darfst in diesem Kanal nicht schreiben.",
     "unavailable": "Dieser Kanal ist nicht mehr verfügbar.",
     "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist.",
-    "unnamedImage": "Eingefügtes Bild"
+    "unnamedImage": "Eingefügtes Bild",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Zu sendende Bilder",

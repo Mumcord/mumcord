@@ -16,7 +16,8 @@
     "about": "Acerca de",
     "packetInspector": "Inspector de paquetes",
     "hotkeys": "Atajos",
-    "plugins": "Plugins"
+    "plugins": "Plugins",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Inicio, idioma, actualizaciones y accesibilidad.",
@@ -29,7 +30,8 @@
     "gaming": "El overlay en el juego, el audio posicional y los plugins de juegos.",
     "advanced": "Herramientas de desarrollo, diagnóstico, almacenamiento y licencias.",
     "about": "Versión, soporte y el asistente de configuración.",
-    "plugins": "Los complementos se ejecutan en un entorno aislado y solo reciben lo que permites. Nunca ven tu audio, tus archivos ni tu certificado."
+    "plugins": "Los complementos se ejecutan en un entorno aislado y solo reciben lo que permites. Nunca ven tu audio, tus archivos ni tu certificado.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Ajustes / {{section}}",
   "moreInfo": "Más información: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "espacio en disco borrar caché",
     "blocked": "ignorar bloquear silenciar personas",
     "notifications": "avisos alertas ventanas emergentes",
-    "externalContent": "incrustados imágenes vistas previas"
+    "externalContent": "incrustados imágenes vistas previas",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Buscar ajustes",
@@ -1056,5 +1060,6 @@
     "title": "Modo desarrollador",
     "switch": "Modo desarrollador",
     "hint": "Añade una pestaña Desarrollador a Plugins para cargar plugins sin firmar desde una carpeta. Actívalo solo si creas plugins."
-  }
+  },
+  "newBadge": "New"
 }

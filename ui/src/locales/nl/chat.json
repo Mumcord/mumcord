@@ -46,7 +46,8 @@
     "noPermission": "Je hebt geen toestemming om in dit kanaal te schrijven.",
     "unavailable": "Dit kanaal is niet meer beschikbaar.",
     "offline": "{{name}} is offline. Je kunt weer schrijven zodra die terug is.",
-    "unnamedImage": "Geplakte afbeelding"
+    "unnamedImage": "Geplakte afbeelding",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Afbeeldingen om te verzenden",

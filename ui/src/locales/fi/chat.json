@@ -46,7 +46,8 @@
     "noPermission": "Sinulla ei ole oikeutta kirjoittaa tälle kanavalle.",
     "unavailable": "Tämä kanava ei ole enää käytettävissä.",
     "offline": "{{name}} on offline-tilassa. Voit kirjoittaa taas, kun hän palaa.",
-    "unnamedImage": "Liitetty kuva"
+    "unnamedImage": "Liitetty kuva",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Lähetettävät kuvat",

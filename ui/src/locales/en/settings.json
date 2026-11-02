@@ -16,7 +16,8 @@
     "about": "About",
     "packetInspector": "Packet inspector",
     "hotkeys": "Hotkeys",
-    "plugins": "Plugins"
+    "plugins": "Plugins",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Startup, language, updates and accessibility.",
@@ -29,7 +30,8 @@
     "gaming": "The in-game overlay, positional audio and game plugins.",
     "advanced": "Developer tools, diagnostics, storage and licences.",
     "about": "Version, support and the setup wizard.",
-    "plugins": "Plugins run in a sandbox and only get what you allow. They never see your audio, files or certificate."
+    "plugins": "Plugins run in a sandbox and only get what you allow. They never see your audio, files or certificate.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Settings / {{section}}",
   "moreInfo": "More information: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "disk space clear cache",
     "blocked": "ignore block mute people",
     "notifications": "alerts pop-ups",
-    "externalContent": "embeds images previews"
+    "externalContent": "embeds images previews",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Search settings",
@@ -1048,5 +1052,6 @@
     "title": "Developer mode",
     "switch": "Developer mode",
     "hint": "Adds a Developer tab to Plugins where you can load unsigned plugins from a folder. Only turn it on if you build plugins yourself."
-  }
+  },
+  "newBadge": "New"
 }

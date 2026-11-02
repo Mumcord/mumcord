@@ -307,5 +307,12 @@
     "badge": "Identitet: {{identity}}",
     "badgeTitle": "Povezano s identitetom {{identity}}",
     "missingNotice": "{{server}} se povezao zadanim identitetom jer njegov vlastiti nedostaje."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

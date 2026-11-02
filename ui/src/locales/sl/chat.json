@@ -50,7 +50,8 @@
     "noPermission": "Nimaš dovoljenja za pisanje v tem kanalu.",
     "unavailable": "Ta kanal ni več na voljo.",
     "offline": "{{name}} ni na spletu. Znova lahko pišeš, ko se vrne.",
-    "unnamedImage": "Prilepljena slika"
+    "unnamedImage": "Prilepljena slika",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Slike za pošiljanje",

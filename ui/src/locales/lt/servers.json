@@ -307,5 +307,12 @@
     "badge": "Tapatybė: {{identity}}",
     "badgeTitle": "Prisijungta su tapatybe {{identity}}",
     "missingNotice": "{{server}} prisijungė su numatytąja tapatybe, nes jo tapatybės nėra."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

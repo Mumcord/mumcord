@@ -307,5 +307,12 @@
     "badge": "Ταυτότητα: {{identity}}",
     "badgeTitle": "Συνδεδεμένος με την ταυτότητα {{identity}}",
     "missingNotice": "Ο {{server}} συνδέθηκε με την προεπιλεγμένη ταυτότητα επειδή λείπει η δική του."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

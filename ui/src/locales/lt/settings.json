@@ -16,7 +16,8 @@
     "about": "Apie",
     "packetInspector": "Paketų tikrintuvas",
     "hotkeys": "Spartieji klavišai",
-    "plugins": "Papildiniai"
+    "plugins": "Papildiniai",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Paleidimas, kalba, atnaujinimai ir prieinamumas.",
@@ -29,7 +30,8 @@
     "gaming": "Perdanga žaidime, pozicinis garsas ir žaidimų papildiniai.",
     "advanced": "Kūrėjų įrankiai, diagnostika, saugykla ir licencijos.",
     "about": "Versija, pagalba ir sąrankos vedlys.",
-    "plugins": "Papildiniai veikia izoliuotoje aplinkoje ir gauna tik tai, ką leidžiate. Jie niekada nemato jūsų garso, failų ar sertifikato."
+    "plugins": "Papildiniai veikia izoliuotoje aplinkoje ir gauna tik tai, ką leidžiate. Jie niekada nemato jūsų garso, failų ar sertifikato.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Nustatymai / {{section}}",
   "moreInfo": "Daugiau informacijos: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "disko vieta išvalyti talpyklą",
     "blocked": "ignoruoti blokuoti nutildyti žmones",
     "notifications": "įspėjimai iššokantys langai",
-    "externalContent": "įterpiniai paveikslėliai peržiūros"
+    "externalContent": "įterpiniai paveikslėliai peržiūros",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -1064,5 +1068,6 @@
     "title": "Kūrėjo režimas",
     "switch": "Kūrėjo režimas",
     "hint": "Prie papildinių prideda kortelę Kūrėjas, kurioje galima įkelti nepasirašytus papildinius iš aplanko. Įjunkite tik jei patys kuriate papildinius."
-  }
+  },
+  "newBadge": "New"
 }

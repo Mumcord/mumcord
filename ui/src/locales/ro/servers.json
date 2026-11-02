@@ -307,5 +307,12 @@
     "badge": "Identitate: {{identity}}",
     "badgeTitle": "Conectat cu identitatea {{identity}}",
     "missingNotice": "{{server}} s-a conectat cu identitatea implicită pentru că a sa lipsește."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

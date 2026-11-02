@@ -16,7 +16,8 @@
     "about": "Относно",
     "packetInspector": "Инспектор на пакети",
     "hotkeys": "Бързи клавиши",
-    "plugins": "Добавки"
+    "plugins": "Добавки",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Стартиране, език, актуализации и достъпност.",
@@ -29,7 +30,8 @@
     "gaming": "Наслагването в играта, позиционният звук и добавките за игри.",
     "advanced": "Инструменти за разработчици, диагностика, хранилище и лицензи.",
     "about": "Версия, поддръжка и помощникът за настройка.",
-    "plugins": "Добавките работят в изолирана среда и получават само това, което разрешите. Те никога не виждат вашето аудио, файлове или сертификат."
+    "plugins": "Добавките работят в изолирана среда и получават само това, което разрешите. Те никога не виждат вашето аудио, файлове или сертификат.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Настройки / {{section}}",
   "moreInfo": "Повече информация: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "дисково пространство изчисти кеша",
     "blocked": "игнорирай блокирай заглуши хора",
     "notifications": "сигнали изскачащи прозорци",
-    "externalContent": "вграждания изображения визуализации"
+    "externalContent": "вграждания изображения визуализации",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Търсене в настройките",
@@ -1048,5 +1052,6 @@
     "title": "Режим за разработчици",
     "switch": "Режим за разработчици",
     "hint": "Добавя раздел „Разработчик“ към добавките, където можете да зареждате неподписани добавки от папка. Включете го само ако сами създавате добавки."
-  }
+  },
+  "newBadge": "New"
 }
