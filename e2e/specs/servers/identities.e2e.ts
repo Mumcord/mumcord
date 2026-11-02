@@ -6,7 +6,7 @@ import { artifactsDir } from "../../helpers/paths.ts";
 import { dumpAppLogs } from "../../helpers/wizard-util.ts";
 import { run, runOk } from "../../helpers/run.ts";
 import { hasClass } from "../../helpers/selectors.ts";
-import { focus, tabTo, typeText } from "../app/flows.ts";
+import { focus, openSettings, tabTo, typeText, waitGone } from "../app/flows.ts";
 import {
   ariaButton,
   menuItem,
@@ -638,12 +638,10 @@ describe("identity manager (issue #148, AC-3.2 – AC-3.14)", function () {
 
     // Start from the main window: close the settings screen the previous test left open.
     if (await browser.$(".overlay__dialog").isExisting()) await browser.keys(["Escape"]);
-    await tabTo((f) => f.label === "Quick settings", "the Quick settings button");
-    await browser.keys(["Enter"]);
-    // The quick settings menu is arrow-navigated (its items have tabindex=-1), so End reaches its
-    // last entry, "All settings…".
-    await browser.keys(["End", "Enter"]);
-    await tabTo((f) => f.role === "tab", "the settings tab list");
+    await waitGone(".overlay__dialog");
+    // openSettings waits for the quick settings menu to take focus before End/Enter, and for the
+    // dialog to render before tabbing; sending those keys early made them go nowhere.
+    await openSettings();
     await browser.keys(["Home"]);
     for (let i = 0; i < 20; i++) {
       if ((await focus()).id.endsWith("-tab-account")) break;
