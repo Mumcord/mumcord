@@ -39,7 +39,7 @@ enum Command {
         /// Folder to create the project in (default: `./<id>`).
         #[arg(long)]
         dir: Option<PathBuf>,
-        /// Use a local checkout of `mumcord-plugin-sdk` instead of the git dependency.
+        /// Use a local checkout of `mumcord-plugin-sdk` instead of the release on crates.io.
         #[arg(long)]
         sdk_path: Option<PathBuf>,
     },

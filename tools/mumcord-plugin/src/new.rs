@@ -9,8 +9,13 @@ use anyhow::{Context, Result, bail};
 use mumcord_plugins::manifest;
 use serde_json::json;
 
-const SDK_GIT: &str = "https://github.com/Mumcord/mumcord";
-const SDK_BRANCH: &str = "epic/plugins";
+/// The SDK is released together with this tool, so a new project asks for the SDK of the same
+/// minor series from crates.io.
+const SDK_VERSION: &str = concat!(
+    env!("CARGO_PKG_VERSION_MAJOR"),
+    ".",
+    env!("CARGO_PKG_VERSION_MINOR")
+);
 
 const LIB_RS: &str = r#"//! A small plugin: a panel with a wave button that counts waves, stores the count and tells the
 //! other users in the channel.
@@ -159,7 +164,7 @@ fn files(id: &str, sdk_path: Option<&Path>) -> Result<Vec<(&'static str, String)
             "{{ path = {} }}",
             toml::Value::from(path.display().to_string())
         ),
-        None => format!("{{ git = \"{SDK_GIT}\", branch = \"{SDK_BRANCH}\" }}"),
+        None => format!("\"{SDK_VERSION}\""),
     };
     let cargo = format!(
         "[package]
@@ -278,6 +283,21 @@ mod tests {
         );
         assert!(run("Bad_Id", Some(dir.path().join("x")), None).is_err());
         assert!(run("core-thing", Some(dir.path().join("y")), None).is_err());
+    }
+
+    #[test]
+    fn sdk_comes_from_crates_io_by_default() {
+        let files = files("abc", None).expect("test step");
+        let cargo: toml::Table = files[0].1.parse().expect("valid Cargo.toml");
+        let wanted = format!(
+            "{}.{}",
+            env!("CARGO_PKG_VERSION_MAJOR"),
+            env!("CARGO_PKG_VERSION_MINOR")
+        );
+        assert_eq!(
+            cargo["dependencies"]["mumcord-plugin-sdk"].as_str(),
+            Some(wanted.as_str())
+        );
     }
 
     #[test]
