@@ -128,7 +128,9 @@ async function audioHealth(serverId: number): Promise<AudioHealth> {
   return stats.audio;
 }
 
-describe("Plugins: voice under load (AC-6.24)", () => {
+// Skipped for 0.6.0 (user decision): the load test was never verified locally; re-enable after a
+// local run on a quiet machine.
+describe.skip("Plugins: voice under load (AC-6.24)", () => {
   let fixtures: registry.FixtureRegistry;
   const bots: ScriptBot[] = [];
   let recorder: ScriptBot;
