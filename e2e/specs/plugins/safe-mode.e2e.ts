@@ -91,7 +91,10 @@ function banner() {
 }
 
 function turnOffAll() {
-  return $("//input[@role='switch'][@aria-labelledby][ancestor::div[contains(@class,'plugins-footer')]]");
+  // The switch is found by its visible label, so it doesn't depend on where the card sits.
+  return $(
+    "//input[@role='switch'][@aria-labelledby = //*[normalize-space(.)='Turn off all plugins']/@id]",
+  );
 }
 
 describe("plugins: limits, back-off and safe mode (AC-6.8 … AC-6.10)", () => {
