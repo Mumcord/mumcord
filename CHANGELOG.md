@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Plugin icons in the strip under the channel list are now centred in their buttons and drawn larger.
+
 ## [0.6.1] - 2026-11-02
 
 ### Changed

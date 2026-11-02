@@ -50,6 +50,10 @@ vi.mock("../webview", () => ({
   PluginWebView: ({ plugin }: { plugin: string }) => <div data-testid="wv">{plugin}</div>,
 }));
 
+vi.mock("../render/usePluginIcon", () => ({
+  usePluginIcon: (id: string | null) => (id === "pets" ? "data:image/png;base64,AA==" : null),
+}));
+
 let api: MockApi;
 
 function setup(plugins: InstalledPlugin[], withPanel: string[]) {
@@ -117,6 +121,19 @@ describe("PluginStrip", () => {
     expect(screen.queryByText("pets panel")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Poll" }));
     expect(screen.queryByText("poll panel")).toBeNull();
+  });
+
+  it("renders the plugin icon as a sized, centred image and falls back to initials", async () => {
+    setup([plugin("pets", "Pets"), plugin("poll", "Poll")], ["pets", "poll"]);
+    render(<PluginStrip />);
+    const pets = await screen.findByRole("button", { name: "Pets" });
+    const img = pets.querySelector("img");
+    expect(img).toHaveClass("pstrip-icon-img");
+    expect(img).toHaveAttribute("width", "28");
+    expect(img).toHaveAttribute("height", "28");
+    const poll = screen.getByRole("button", { name: "Poll" });
+    expect(poll.querySelector("img")).toBeNull();
+    expect(poll).toHaveTextContent("PO");
   });
 
   it("moves between icons with the arrow keys", async () => {
