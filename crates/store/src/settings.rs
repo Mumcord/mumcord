@@ -172,9 +172,9 @@ pub enum NotificationMode {
 #[serde(rename_all = "snake_case")]
 pub enum SoundTheme {
     /// The short synthesized tones Mumcord started with.
+    #[default]
     Classic,
     /// Fuller sounds made with ElevenLabs.
-    #[default]
     Rich,
 }
 
@@ -1473,6 +1473,14 @@ mod tests {
     }
 
     #[test]
+    fn stored_rich_sound_theme_is_kept() {
+        let parsed: Settings =
+            serde_json::from_str(r#"{"sounds":{"theme":"rich"}}"#).expect("parse");
+        assert_eq!(parsed.sounds.theme, SoundTheme::Rich);
+        assert_eq!(Settings::default().sounds.theme, SoundTheme::Classic);
+    }
+
+    #[test]
     fn partial_json_falls_back_to_defaults() {
         let parsed: Settings =
             serde_json::from_str(r#"{"theme":"dark","sounds":{"user_joined":false}}"#)
@@ -1490,8 +1498,8 @@ mod tests {
         );
         assert_eq!(
             parsed.sounds.theme,
-            SoundTheme::Rich,
-            "settings saved before themes existed get the rich sounds"
+            SoundTheme::Classic,
+            "profiles without a stored sound theme get the classic sounds"
         );
         assert!(
             parsed.sounds.party_started && parsed.sounds.viewer_stopped,

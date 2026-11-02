@@ -5,6 +5,7 @@
 ### Changed
 
 - Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)
+- A fresh install now starts with the Classic notification sounds instead of the Rich ones; if you already picked a sound theme, your choice is kept (issue #339)
 
 ### Fixed
 

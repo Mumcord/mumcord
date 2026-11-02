@@ -318,15 +318,15 @@ describe("SettingsScreen", () => {
     const preview = vi.spyOn(api, "audioPreviewSoundTheme");
     await openSection("Voice & Audio");
     const theme = screen.getByRole("radiogroup", { name: "Sound theme" });
-    expect(within(theme).getByRole("radio", { name: "Rich" })).toBeChecked();
-    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
-    expect(preview).toHaveBeenLastCalledWith("rich");
-    fireEvent.click(within(theme).getByRole("radio", { name: "Classic" }));
-    await waitFor(() => {
-      expect(update).toHaveBeenCalledWith(expect.objectContaining({ soundTheme: "classic" }));
-    });
+    expect(within(theme).getByRole("radio", { name: "Classic" })).toBeChecked();
     fireEvent.click(screen.getByRole("button", { name: "Preview" }));
     expect(preview).toHaveBeenLastCalledWith("classic");
+    fireEvent.click(within(theme).getByRole("radio", { name: "Rich" }));
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledWith(expect.objectContaining({ soundTheme: "rich" }));
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+    expect(preview).toHaveBeenLastCalledWith("rich");
   });
 
   it("has a channel switch sound switch, on by default", async () => {

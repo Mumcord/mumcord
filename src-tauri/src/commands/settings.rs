@@ -573,7 +573,7 @@ pub struct Settings {
     pub video_ducking: bool,
     /// The lowered level while people talk, 10–80 % (default 30).
     pub video_ducking_percent: u8,
-    /// "Sound theme: Classic / Rich" (default rich, #325).
+    /// "Sound theme: Classic / Rich" (default classic, #339).
     pub sound_theme: SoundTheme,
     pub sounds: SoundSettings,
     /// "Notifications: In-app / Desktop / Both / Off" (default both, FR-1.48c).
@@ -1175,7 +1175,7 @@ mod tests {
         assert_eq!(ui.log_level, LogLevel::Info);
         assert!(ui.send_default_avatar);
         assert_eq!(ui.notifications, NotificationMode::Both);
-        assert_eq!(ui.sound_theme, SoundTheme::Rich);
+        assert_eq!(ui.sound_theme, SoundTheme::Classic);
         assert!(ui.sounds.channel_switch);
 
         ui.wizard_completed = true;
