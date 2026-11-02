@@ -3,7 +3,7 @@
 // and must show the talking Bot in its frames. Checks the global On/Off switch, a per-game
 // exception, the anti-cheat warning and that per-game options survive a restart. Exclusive
 // fullscreen and the Windows Direct3D 11 hook need real hardware (manual checks in the spec).
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { browser, expect, $ } from "@wdio/globals";
 import { app, artifactsDir, bin, botInBackgroundOn, repoRoot, testenv, type BackgroundBot } from "../../helpers/index.ts";
@@ -22,6 +22,8 @@ let renders = 0;
  * last frame of each run lands in the artifacts for failure analysis. */
 async function render(): Promise<boolean> {
   renders++;
+  // The checker writes its PPM there; nothing else may have created the folder in this shard yet.
+  mkdirSync(artifactsDir, { recursive: true });
   const r = await run(bin.headlessCheck, ["render"], {
     XDG_DATA_HOME: join(app.profile(), "data"),
     MUMCORD_CHECK_PPM: join(artifactsDir, `ingame-${String(renders)}.ppm`),
