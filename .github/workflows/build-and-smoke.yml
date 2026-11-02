@@ -266,10 +266,12 @@ jobs:
           $proc = Start-Process msiexec.exe -ArgumentList '/i', "`"$msi`"", '/qn', '/norestart', '/l*v', "`"$env:RUNNER_TEMP\simplysign-install.log`"" -Wait -PassThru
           if ($proc.ExitCode -ne 0) { throw "SimplySign Desktop installation failed (msiexec exit code $($proc.ExitCode))." }
 
-      - name: Check the TOTP generator
+      - name: Check the TOTP generator and signing script
         if: steps.certum.outputs.enabled == 'true'
         shell: pwsh
-        run: ./scripts/ci/totp.test.ps1
+        run: |
+          ./scripts/ci/totp.test.ps1
+          ./scripts/ci/sign-windows.test.ps1
 
       # Types the account and a fresh TOTP code into SimplySign Desktop (scripts/ci/simplysign-login.ps1).
       # Fragile by nature; when it fails, the release fails and the maintainer signs by hand.

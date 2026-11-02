@@ -7,11 +7,22 @@
 # certificate's SHA-1 thumbprint in -Thumbprint or CERTUM_CERT_SHA1.
 #
 #   pwsh -File scripts/sign-windows.ps1 path\to\file.exe [more files...]
+#
+# $Path needs an explicit Position: a ValueFromRemainingArguments parameter gets no implicit
+# position, so a lone file path (how Tauri's signCommand and the NSIS uninstaller call this
+# script) would bind to -Thumbprint instead and leave $Path empty. It is checked below rather
+# than marked Mandatory so a missing path fails with a message naming what was received.
 param(
-    [Parameter(Mandatory, ValueFromRemainingArguments)][string[]]$Path,
+    [Parameter(Position = 0, ValueFromRemainingArguments)][string[]]$Path,
     [string]$Thumbprint = $env:CERTUM_CERT_SHA1
 )
 $ErrorActionPreference = 'Stop'
+
+if (-not $Path) {
+    # Name only the parameters, never the thumbprint's value.
+    $received = if ($PSBoundParameters.Count) { ($PSBoundParameters.Keys | ForEach-Object { "-$_" }) -join ', ' } else { 'none' }
+    throw "No file to sign: pass the file path(s) as arguments. Parameters received: $received."
+}
 
 if (-not $Thumbprint) { throw 'Pass -Thumbprint or set CERTUM_CERT_SHA1 to the certificate thumbprint.' }
 $Thumbprint = ($Thumbprint -replace '\s', '').ToUpperInvariant()

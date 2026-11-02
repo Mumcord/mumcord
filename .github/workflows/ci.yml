@@ -286,6 +286,15 @@ jobs:
         if: matrix.task == 'check' && runner.os == 'Linux'
         run: scripts/ci/test-notices.sh
 
+      # build-and-smoke.yml signs the Windows release through these scripts; test their argument
+      # handling on every PR, since the real signing only runs for release tags.
+      - name: Windows signing scripts
+        if: matrix.task == 'check' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./scripts/ci/totp.test.ps1
+          ./scripts/ci/sign-windows.test.ps1
+
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
         if: matrix.task == 'check' && runner.os != 'Linux'
