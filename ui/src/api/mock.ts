@@ -303,7 +303,7 @@ const DEFAULT_SETTINGS: Settings = {
   },
   closeBehaviour: "ask",
   chatDisplay: "cozy",
-  soundTheme: "rich",
+  soundTheme: "classic",
   notifications: "both",
   logLevel: "info",
   sendDefaultAvatar: true,
