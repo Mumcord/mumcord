@@ -148,11 +148,6 @@
   color: var(--color-primary-text);
 }
 
-.cl-badge--dev {
-  border: 1px solid var(--color-warning);
-  color: var(--color-warning);
-}
-
 .cl-version__date {
   flex: 0 0 auto;
   color: var(--color-text-secondary);

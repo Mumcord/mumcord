@@ -784,8 +784,6 @@
     "empty": "Iskanju ne ustreza noben vnos.",
     "loadFailed": "Dnevnika sprememb ni bilo mogoče naložiti.",
     "current": "Trenutna",
-    "inDevelopment": "V razvoju",
-    "unreleased": "Neizdana",
     "forDevelopers": "za razvijalce",
     "releasePage": "Stran izdaje",
     "entries": "Vnosi: {{count}}",

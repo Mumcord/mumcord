@@ -784,8 +784,6 @@
     "empty": "Vyhľadávaniu nezodpovedá žiadna položka.",
     "loadFailed": "Zoznam zmien sa nepodarilo načítať.",
     "current": "Aktuálna",
-    "inDevelopment": "Vo vývoji",
-    "unreleased": "Nevydaná",
     "forDevelopers": "pre vývojárov",
     "releasePage": "Stránka vydania",
     "entries": "Položky: {{count}}",

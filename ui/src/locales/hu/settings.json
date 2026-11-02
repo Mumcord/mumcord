@@ -774,8 +774,6 @@
     "empty": "Egy bejegyzés sem felel meg a keresésnek.",
     "loadFailed": "A változásnaplót nem sikerült betölteni.",
     "current": "Jelenlegi",
-    "inDevelopment": "Fejlesztés alatt",
-    "unreleased": "Kiadatlan",
     "forDevelopers": "fejlesztőknek",
     "releasePage": "Kiadási oldal",
     "entries": "Bejegyzések: {{count}}",

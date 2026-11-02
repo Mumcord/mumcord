@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- "What's new" now opens on the notes of the version you are running, followed by the older releases; a release used to open on the previous version's notes, and a section called "Unreleased" or notes of newer versions could show up
+- "What's new" has its notes built into the app, so it no longer needs to load them and cannot get stuck loading
+
 ### Internal
 
 - Updated dependencies: `libloading` 0.9, `sha1` 0.11, the Rust and npm minor and patch updates and the cargo-deny GitHub Action; `async-executor` moves off a yanked release so the dependency audit passes again

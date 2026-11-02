@@ -774,8 +774,6 @@
     "empty": "Kein Eintrag passt zur Suche.",
     "loadFailed": "Die Änderungsliste konnte nicht geladen werden.",
     "current": "Aktuell",
-    "inDevelopment": "In Entwicklung",
-    "unreleased": "Unveröffentlicht",
     "forDevelopers": "für Entwickler",
     "releasePage": "Release-Seite",
     "entries": "Einträge: {{count}}",

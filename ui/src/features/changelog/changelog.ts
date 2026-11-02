@@ -1,8 +1,9 @@
 /**
  * Data and decisions of the "What's new" window (issue #145). The changelog itself is built from
- * CHANGELOG.md at build time and served as changelog.json (see vite.config.ts).
+ * CHANGELOG.md at build time and bundled as the module `virtual:changelog` (see vite.config.ts).
  */
 import { Marked } from "marked";
+import changelog from "virtual:changelog";
 import { escapeHtml } from "../chat/markdown";
 import { sanitizeHtml } from "../chat/sanitize";
 import type { ChangelogVersion } from "./parseChangelog";
@@ -14,23 +15,61 @@ const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/";
 /** Groups meant for developers; collapsed until opened. */
 export const INTERNAL = "Internal";
 
-export async function loadChangelog(): Promise<ChangelogVersion[]> {
-  const response = await fetch(`${import.meta.env.BASE_URL}changelog.json`);
-  if (!response.ok) throw new Error(`HTTP ${String(response.status)}`);
-  return (await response.json()) as ChangelogVersion[];
-}
+/** The whole changelog, newest first, embedded at build time. */
+export const CHANGELOG_VERSIONS: ChangelogVersion[] = changelog;
 
 /** Builds other than releases show `dev~…` (src-tauri/src/version.rs). */
 export function isDevBuild(version: string): boolean {
   return version.startsWith("dev~");
 }
 
-/** The versions a build shows: work in progress only in dev builds. */
+/** The numeric parts of "1.2.3", or null for anything else. */
+function releaseNumbers(version: string): number[] | null {
+  const match = /^(\d+)\.(\d+)\.(\d+)/.exec(version);
+  return match === null ? null : [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function isNewer(version: string, than: string): boolean {
+  const a = releaseNumbers(version);
+  const b = releaseNumbers(than);
+  if (a === null || b === null) return false;
+  for (let i = 0; i < 3; i++) {
+    const diff = (a[i] ?? 0) - (b[i] ?? 0);
+    if (diff !== 0) return diff > 0;
+  }
+  return false;
+}
+
+/**
+ * The versions a build shows, newest first: the running version, then the older releases. An
+ * "Unreleased" section is never shown as such. Dev builds show released versions only. A release
+ * is built from its tag, where CHANGELOG.md still calls its own section `## [X.Y.Z] - Unreleased`
+ * or a plain `## [Unreleased]`; the post-release sync dates it only afterwards. So, like the
+ * release notes (release.yml), a release shows that section under its own version number.
+ * Versions newer than the running one are hidden.
+ */
 export function visibleVersions(
   versions: readonly ChangelogVersion[],
   appVersion: string,
 ): ChangelogVersion[] {
-  return isDevBuild(appVersion) ? [...versions] : versions.filter((v) => !v.unreleased);
+  if (isDevBuild(appVersion)) return versions.filter((v) => !v.unreleased);
+  const own =
+    versions.find((v) => v.version === appVersion) ??
+    versions.find((v) => v.unreleased && v.version === "Unreleased" && v.sections.length > 0);
+  return versions.flatMap((v) => {
+    if (v !== own) return v.unreleased || isNewer(v.version, appVersion) ? [] : [v];
+    if (!v.unreleased) return [v];
+    const released: ChangelogVersion = {
+      version: appVersion,
+      date: v.date,
+      unreleased: false,
+      sections: v.sections,
+    };
+    if (v.summary !== undefined) released.summary = v.summary;
+    // The link of a plain "[Unreleased]" compares against the previous tag, not this release.
+    if (v.url !== undefined && v.version === appVersion) released.url = v.url;
+    return [released];
+  });
 }
 
 /**

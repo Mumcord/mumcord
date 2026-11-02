@@ -779,8 +779,6 @@
     "empty": "Nenhuma entrada corresponde à pesquisa.",
     "loadFailed": "Não foi possível carregar o registo de alterações.",
     "current": "Atual",
-    "inDevelopment": "Em desenvolvimento",
-    "unreleased": "Não publicada",
     "forDevelopers": "para programadores",
     "releasePage": "Página da versão",
     "entries": "Entradas: {{count}}",

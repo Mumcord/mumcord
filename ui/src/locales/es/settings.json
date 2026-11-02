@@ -779,8 +779,6 @@
     "empty": "Ninguna entrada coincide con la búsqueda.",
     "loadFailed": "No se pudo cargar el registro de cambios.",
     "current": "Actual",
-    "inDevelopment": "En desarrollo",
-    "unreleased": "Sin publicar",
     "forDevelopers": "para desarrolladores",
     "releasePage": "Página de la versión",
     "entries": "Entradas: {{count}}",

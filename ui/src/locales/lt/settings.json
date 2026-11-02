@@ -784,8 +784,6 @@
     "empty": "Nė vienas įrašas neatitinka paieškos.",
     "loadFailed": "Nepavyko įkelti pakeitimų žurnalo.",
     "current": "Dabartinė",
-    "inDevelopment": "Kuriama",
-    "unreleased": "Neišleista",
     "forDevelopers": "kūrėjams",
     "releasePage": "Laidos puslapis",
     "entries": "Įrašų: {{count}}",

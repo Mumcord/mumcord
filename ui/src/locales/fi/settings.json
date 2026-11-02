@@ -774,8 +774,6 @@
     "empty": "Mikään merkintä ei vastaa hakua.",
     "loadFailed": "Muutoslokia ei voitu ladata.",
     "current": "Nykyinen",
-    "inDevelopment": "Kehitteillä",
-    "unreleased": "Julkaisematon",
     "forDevelopers": "kehittäjille",
     "releasePage": "Julkaisusivu",
     "entries": "Merkinnät: {{count}}",

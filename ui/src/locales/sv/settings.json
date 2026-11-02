@@ -774,8 +774,6 @@
     "empty": "Ingen post matchar sökningen.",
     "loadFailed": "Ändringsloggen kunde inte läsas in.",
     "current": "Aktuell",
-    "inDevelopment": "Under utveckling",
-    "unreleased": "Ej släppt",
     "forDevelopers": "för utvecklare",
     "releasePage": "Versionssida",
     "entries": "Poster: {{count}}",

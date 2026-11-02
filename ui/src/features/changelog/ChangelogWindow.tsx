@@ -3,7 +3,7 @@ import { LiveRegions } from "../../a11y";
 import { getApi, type WindowLook } from "../../api";
 import { applyLanguage, resolveLanguage } from "../../i18n";
 import { applyRootLook, isCloseShortcut } from "../inspector/inspectorView";
-import { loadChangelog, type ChangelogVersion } from "./changelog";
+import { CHANGELOG_VERSIONS } from "./changelog";
 import { ChangelogView } from "./ChangelogView";
 
 function close() {
@@ -20,7 +20,6 @@ function close() {
  */
 export function ChangelogWindow() {
   const [look, setLook] = useState<WindowLook | null>(null);
-  const [versions, setVersions] = useState<ChangelogVersion[] | null>(null);
   const [appVersion, setAppVersion] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -52,17 +51,21 @@ export function ChangelogWindow() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([loadChangelog(), getApi().appInfo()]).then(
-      ([loaded, info]) => {
-        if (!active) return;
-        setVersions(loaded);
-        setAppVersion(info.version);
-      },
-      (error: unknown) => {
-        console.error("Loading the changelog failed", error);
-        if (active) setFailed(true);
-      },
-    );
+    // No timeout: the webview can take 8-10 s to start (Linux AppImage), and an error shown while
+    // the version is still loading would be wrong. Only a real failure is reported.
+    getApi()
+      .appInfo()
+      .then(
+        (info) => {
+          if (!active) return;
+          setAppVersion(info.version);
+          setFailed(false);
+        },
+        (error: unknown) => {
+          console.error("Loading the app version failed", error);
+          if (active) setFailed(true);
+        },
+      );
     return () => {
       active = false;
     };
@@ -82,7 +85,12 @@ export function ChangelogWindow() {
 
   return (
     <>
-      <ChangelogView versions={versions} appVersion={appVersion} failed={failed} onClose={close} />
+      <ChangelogView
+        versions={appVersion === null ? null : CHANGELOG_VERSIONS}
+        appVersion={appVersion}
+        failed={failed}
+        onClose={close}
+      />
       <LiveRegions />
     </>
   );
