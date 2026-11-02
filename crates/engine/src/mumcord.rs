@@ -28,6 +28,12 @@ pub const DATA_ID: &str = "mumcord.hello";
 pub const VERSION: u32 = 1;
 /// The `app` value of every hello.
 const APP: &str = "mumcord";
+/// Feature name for sending and receiving files (spec 07). Not in [`FEATURES`] until the file
+/// transfer works end to end, so no peer is told about a feature that does not answer yet.
+pub const FEATURE_FILES: &str = "files";
+/// Feature name for relaying a screen share to many viewers through the broadcast service
+/// (spec 07). Added to [`FEATURES`] together with the broadcast sender.
+pub const FEATURE_SCREEN_BROADCAST: &str = "screen-broadcast";
 /// What this client can do for other Mumcord clients.
 pub const FEATURES: &[&str] = &[
     "now-playing",
@@ -330,6 +336,14 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn file_and_broadcast_features_are_valid_names_but_not_announced_yet() {
+        for name in [FEATURE_FILES, FEATURE_SCREEN_BROADCAST] {
+            assert!(!name.is_empty() && name.len() <= MAX_FEATURE_LEN);
+            assert!(!FEATURES.contains(&name));
+        }
+    }
 
     #[test]
     fn hello_round_trips() {

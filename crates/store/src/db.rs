@@ -348,6 +348,28 @@ const MIGRATIONS: &[&str] = &[
     ALTER TABLE person_setting ADD COLUMN share_volume INTEGER NOT NULL DEFAULT 100
         CHECK (share_volume BETWEEN 0 AND 200);
     ",
+    // v23: screen share encoder probe results, one set per machine (spec 07, FR-7.55). `meta`
+    // holds the driver and app version the results were measured with; a change of either
+    // means the probe runs again. `selftest` is the software encoder's measured time per
+    // (resolution, frame rate).
+    r"
+    CREATE TABLE encoder_cache_meta (
+        id          INTEGER PRIMARY KEY CHECK (id = 1),
+        driver_id   TEXT NOT NULL,
+        app_version TEXT NOT NULL
+    );
+    CREATE TABLE encoder_cache (
+        encoder  TEXT PRIMARY KEY,
+        available INTEGER NOT NULL,
+        smoke_ok  INTEGER NOT NULL
+    );
+    CREATE TABLE encoder_selftest (
+        resolution     INTEGER NOT NULL,
+        fps            INTEGER NOT NULL,
+        svt_selftest_ms INTEGER NOT NULL,
+        PRIMARY KEY (resolution, fps)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -662,7 +684,7 @@ pub(crate) mod tests {
     /// stay v20 after them.
     #[test]
     fn relay_migration_is_v20_after_audio_profile_and_blocked_user() {
-        assert_eq!(MIGRATIONS.len(), 22);
+        assert!(MIGRATIONS.len() >= 22);
         assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
         assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
