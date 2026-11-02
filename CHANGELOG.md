@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Internal
+
+- Windows release builds are signed with a Certum code signing certificate through SimplySign instead of Azure Artifact Signing: the release workflow installs a pinned SimplySign Desktop, logs in with a one-time code generated from the `release` environment secrets, and signs the app, the uninstaller and the installer with `signtool`; `scripts/sign-windows.ps1` does the same by hand. Without the Certum settings the Windows build stays unsigned as before (#340)
+
+## [0.6.0] - 2026-11-02
+
 ### Changed
 
 - The "Turn off all plugins" switch in Settings → Plugins now sits in a card like the other settings.
@@ -45,6 +51,7 @@
 
 ### Fixed
 
+- macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
 - A plugin is no longer stopped while your system keychain asks you to unlock it or to allow access (KWallet, GNOME Keyring, macOS Keychain), and saving a plugin password while that prompt is open no longer holds up other plugins. If the prompt is not answered within 2 minutes, the plugin is told secrets are unavailable.
 - Plugins: old compiled copies of plugins no longer pile up on disk; Mumcord removes the ones that are no longer needed each time it starts
 - Closing a full profile card with Escape right after using a button in it (for example a plugin button that then greys out) no longer stops that profile card from opening again.
@@ -71,7 +78,6 @@
 
 ### Internal
 
-- Windows release builds are signed with a Certum code signing certificate through SimplySign instead of Azure Artifact Signing: the release workflow installs a pinned SimplySign Desktop, logs in with a one-time code generated from the `release` environment secrets, and signs the app, the uninstaller and the installer with `signtool`; `scripts/sign-windows.ps1` does the same by hand. Without the Certum settings the Windows build stays unsigned as before (#340)
 - Plugin runtime (Epic 3.1, #268): the new `crates/plugins` runs plugins as WebAssembly components in wasmtime without WASI, so a plugin can only call what Mumcord offers (for now only its own log). Each plugin gets its own store with a 32 MiB memory limit and a CPU deadline per call (500 ms for start, 50 ms otherwise); a plugin that loops, runs out of memory or crashes is stopped while everything else keeps running, restarts with back-off and stays off after 3 failures in 10 minutes. The first version of the plugin API (`mumcord:plugin@1.0.0`) lives in `crates/plugins/wit/`. Not linked into the app yet.
 - Plugin system groundwork (Epic 3.1): empty `crates/plugin-sdk` (plugin SDK) and `tools/mumcord-plugin` (author CLI) crates, both Apache-2.0, and every new dependency of the epic added up front: `minisign-verify` and `minisign` for repository signatures, `hmac` for peer keys, `toml` for repository sources, `wit-bindgen` for the SDK and `serde-saphyr` for CLI test scenarios. `crates/plugins` now depends on the store. Not visible in the app yet.
 - Plugin manifest and package format (Epic 3.1, #269): `manifest.json` is parsed strictly as untrusted input (size and length caps, known permissions and categories only, safe relative paths, caret ranges on the plugin API), with a published JSON schema in `crates/plugins/schema/`. `.mcplugin` zips are checked before anything touches the disk (at most 5 MiB, 200 files and 8 MiB unpacked, no symlinks, encryption or `..` paths, image-only assets), verified against the sha256 and size from the index, and installed atomically. Translated plugin names follow the app language with English fallback; sideloaded packages cannot take an official or reserved id. Not visible in the app yet.
@@ -430,6 +436,7 @@ _**License change:** Mumcord is licensed under the GNU AGPL-3.0 only from this v
 
 _First release._
 
+[0.6.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.6.0
 [0.5.0]: https://github.com/Mumcord/mumcord/releases/tag/v0.5.0
 [0.4.4]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.4
 [0.4.3]: https://github.com/Mumcord/mumcord/releases/tag/v0.4.3
