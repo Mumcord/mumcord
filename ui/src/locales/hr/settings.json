@@ -16,7 +16,8 @@
     "about": "O aplikaciji",
     "packetInspector": "Inspektor paketa",
     "hotkeys": "Prečaci",
-    "plugins": "Dodaci"
+    "plugins": "Dodaci",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Pokretanje, jezik, ažuriranja i pristupačnost.",
@@ -29,7 +30,8 @@
     "gaming": "Overlay u igri, pozicijski zvuk i dodaci za igre.",
     "advanced": "Razvojni alati, dijagnostika, pohrana i licence.",
     "about": "Verzija, podrška i čarobnjak za postavljanje.",
-    "plugins": "Dodaci rade u izoliranom okruženju i dobivaju samo ono što dopustite. Nikada ne vide vaš zvuk, datoteke ni certifikat."
+    "plugins": "Dodaci rade u izoliranom okruženju i dobivaju samo ono što dopustite. Nikada ne vide vaš zvuk, datoteke ni certifikat.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Postavke / {{section}}",
   "moreInfo": "Više informacija: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "prostor na disku očisti predmemoriju",
     "blocked": "ignoriraj blokiraj utišaj osobe",
     "notifications": "upozorenja skočni prozori",
-    "externalContent": "ugradnje slike pretpregledi"
+    "externalContent": "ugradnje slike pretpregledi",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Pretraži postavke",
@@ -1056,5 +1060,6 @@
     "title": "Programerski način",
     "switch": "Programerski način",
     "hint": "Dodacima dodaje karticu Programer na kojoj možete učitati nepotpisane dodatke iz mape. Uključite ga samo ako sami izrađujete dodatke."
-  }
+  },
+  "newBadge": "New"
 }

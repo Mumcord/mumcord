@@ -16,7 +16,8 @@
     "about": "Par lietotni",
     "packetInspector": "Pakešu inspektors",
     "hotkeys": "Īsinājumtaustiņi",
-    "plugins": "Spraudņi"
+    "plugins": "Spraudņi",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Palaišana, valoda, atjauninājumi un pieejamība.",
@@ -29,7 +30,8 @@
     "gaming": "Pārklājums spēlē, pozicionālā skaņa un spēļu spraudņi.",
     "advanced": "Izstrādātāju rīki, diagnostika, krātuve un licences.",
     "about": "Versija, atbalsts un iestatīšanas vednis.",
-    "plugins": "Spraudņi darbojas izolētā vidē un saņem tikai to, ko atļaujat. Tie nekad neredz jūsu audio, failus vai sertifikātu."
+    "plugins": "Spraudņi darbojas izolētā vidē un saņem tikai to, ko atļaujat. Tie nekad neredz jūsu audio, failus vai sertifikātu.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Iestatījumi / {{section}}",
   "moreInfo": "Papildinformācija: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "diska vieta notīrīt kešatmiņu",
     "blocked": "ignorēt bloķēt izslēgt skaņu cilvēki",
     "notifications": "brīdinājumi uznirstošie logi",
-    "externalContent": "iegulumi attēli priekšskatījumi"
+    "externalContent": "iegulumi attēli priekšskatījumi",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -1056,5 +1060,6 @@
     "title": "Izstrādātāja režīms",
     "switch": "Izstrādātāja režīms",
     "hint": "Pievieno spraudņiem cilni Izstrādātājs, kurā var ielādēt neparakstītus spraudņus no mapes. Ieslēdziet to tikai tad, ja paši veidojat spraudņus."
-  }
+  },
+  "newBadge": "New"
 }

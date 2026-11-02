@@ -16,7 +16,8 @@
     "about": "Über",
     "packetInspector": "Paketinspektor",
     "hotkeys": "Tastenkürzel",
-    "plugins": "Plugins"
+    "plugins": "Plugins",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Start, Sprache, Updates und Barrierefreiheit.",
@@ -29,7 +30,8 @@
     "gaming": "Das Ingame-Overlay, Positionsaudio und Spiel-Plugins.",
     "advanced": "Entwicklerwerkzeuge, Diagnose, Speicher und Lizenzen.",
     "about": "Version, Support und der Einrichtungsassistent.",
-    "plugins": "Plugins laufen in einer Sandbox und bekommen nur, was du erlaubst. Sie sehen nie dein Audio, deine Dateien oder dein Zertifikat."
+    "plugins": "Plugins laufen in einer Sandbox und bekommen nur, was du erlaubst. Sie sehen nie dein Audio, deine Dateien oder dein Zertifikat.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Einstellungen / {{section}}",
   "moreInfo": "Mehr Informationen: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "Speicherplatz Cache leeren",
     "blocked": "ignorieren blockieren stummschalten Personen",
     "notifications": "Hinweise Pop-ups",
-    "externalContent": "Einbettungen Bilder Vorschauen"
+    "externalContent": "Einbettungen Bilder Vorschauen",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -1048,5 +1052,6 @@
     "title": "Entwicklermodus",
     "switch": "Entwicklermodus",
     "hint": "Fügt den Plugins einen Entwickler-Tab hinzu, in dem du unsignierte Plugins aus einem Ordner laden kannst. Schalte ihn nur ein, wenn du selbst Plugins baust."
-  }
+  },
+  "newBadge": "New"
 }

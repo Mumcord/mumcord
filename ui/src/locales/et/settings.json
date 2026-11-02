@@ -16,7 +16,8 @@
     "about": "Teave",
     "packetInspector": "Pakettide inspektor",
     "hotkeys": "Kiirklahvid",
-    "plugins": "Pluginad"
+    "plugins": "Pluginad",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Käivitamine, keel, uuendused ja juurdepääsetavus.",
@@ -29,7 +30,8 @@
     "gaming": "Mängusisene ülekate, positsiooniheli ja mängupluginad.",
     "advanced": "Arendaja tööriistad, diagnostika, salvestusruum ja litsentsid.",
     "about": "Versioon, tugi ja seadistusviisard.",
-    "plugins": "Pluginad töötavad liivakastis ja saavad ainult selle, mida lubad. Nad ei näe kunagi sinu heli, faile ega sertifikaati."
+    "plugins": "Pluginad töötavad liivakastis ja saavad ainult selle, mida lubad. Nad ei näe kunagi sinu heli, faile ega sertifikaati.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Seaded / {{section}}",
   "moreInfo": "Lisateave: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "kettaruum tühjenda vahemälu",
     "blocked": "ignoreeri blokeeri vaigista inimesed",
     "notifications": "hoiatused hüpikaknad",
-    "externalContent": "manused pildid eelvaated"
+    "externalContent": "manused pildid eelvaated",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Otsi seadeid",
@@ -1048,5 +1052,6 @@
     "title": "Arendajarežiim",
     "switch": "Arendajarežiim",
     "hint": "Lisab pluginate alla vahekaardi Arendaja, kus saab kaustast laadida allkirjastamata pluginaid. Lülita sisse ainult siis, kui ehitad ise pluginaid."
-  }
+  },
+  "newBadge": "New"
 }

@@ -307,5 +307,12 @@
     "badge": "Identité : {{identity}}",
     "badgeTitle": "Connecté avec l'identité {{identity}}",
     "missingNotice": "{{server}} s'est connecté avec l'identité par défaut car la sienne est introuvable."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

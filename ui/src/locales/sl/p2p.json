@@ -22,7 +22,15 @@
     "trustNew": "Zaupaj novemu releju",
     "keepBlocked": "Ohrani blokiranega",
     "forget": "Pozabi relej",
-    "actionFailed": "Ni uspelo. Poskusi znova."
+    "actionFailed": "Ni uspelo. Poskusi znova.",
+    "noRelay": "This server has no relay, so file sharing isn't available.",
+    "filesDisallowed": "This server's relay doesn't allow file sharing.",
+    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
+    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
+    "noCertificate": "File sharing needs a client certificate.",
+    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
+    "modeOff": "Off",
+    "modeDirectOnly": "Direct only"
   },
   "reason": {
     "p2pOff": "Peer-to-peer je izklopljen.",

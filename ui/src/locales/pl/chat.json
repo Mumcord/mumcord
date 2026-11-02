@@ -50,7 +50,8 @@
     "noPermission": "Nie masz uprawnień do pisania na tym kanale.",
     "unavailable": "Ten kanał nie jest już dostępny.",
     "offline": "{{name}} jest offline. Napiszesz ponownie, gdy ta osoba wróci.",
-    "unnamedImage": "Wklejony obraz"
+    "unnamedImage": "Wklejony obraz",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Obrazy do wysłania",

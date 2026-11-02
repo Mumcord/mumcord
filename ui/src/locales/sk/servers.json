@@ -307,5 +307,12 @@
     "badge": "Identita: {{identity}}",
     "badgeTitle": "Pripojené s identitou {{identity}}",
     "missingNotice": "{{server}} sa pripojil s predvolenou identitou, pretože jeho vlastná chýba."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

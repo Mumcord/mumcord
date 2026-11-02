@@ -48,7 +48,8 @@
     "noPermission": "Tev nav atļaujas rakstīt šajā kanālā.",
     "unavailable": "Šis kanāls vairs nav pieejams.",
     "offline": "{{name}} ir bezsaistē. Vari rakstīt atkal, kad viņš būs atpakaļ.",
-    "unnamedImage": "Ielīmēts attēls"
+    "unnamedImage": "Ielīmēts attēls",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Sūtāmie attēli",

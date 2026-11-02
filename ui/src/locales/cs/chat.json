@@ -50,7 +50,8 @@
     "noPermission": "Nemáš oprávnění psát do tohoto kanálu.",
     "unavailable": "Tento kanál už není k dispozici.",
     "offline": "{{name}} je offline. Psát můžeš znovu, až bude zpátky.",
-    "unnamedImage": "Vložený obrázek"
+    "unnamedImage": "Vložený obrázek",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Obrázky k odeslání",

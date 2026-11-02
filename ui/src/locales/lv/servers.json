@@ -307,5 +307,12 @@
     "badge": "Identitāte: {{identity}}",
     "badgeTitle": "Savienots ar identitāti {{identity}}",
     "missingNotice": "{{server}} savienojās ar noklusējuma identitāti, jo tā paša identitāte trūkst."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

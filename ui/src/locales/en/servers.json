@@ -307,5 +307,12 @@
     "badge": "Identity: {{identity}}",
     "badgeTitle": "Connected with the identity {{identity}}",
     "missingNotice": "{{server}} connected with the default identity because its own identity is missing."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

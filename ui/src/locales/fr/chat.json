@@ -48,7 +48,8 @@
     "noPermission": "Vous n’avez pas la permission d’écrire dans ce canal.",
     "unavailable": "Ce canal n’est plus disponible.",
     "offline": "{{name}} est hors ligne. Vous pourrez de nouveau écrire à son retour.",
-    "unnamedImage": "Image collée"
+    "unnamedImage": "Image collée",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Images à envoyer",

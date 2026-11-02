@@ -16,7 +16,8 @@
     "about": "Névjegy",
     "packetInspector": "Csomagvizsgáló",
     "hotkeys": "Gyorsbillentyűk",
-    "plugins": "Bővítmények"
+    "plugins": "Bővítmények",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Indítás, nyelv, frissítések és kisegítő lehetőségek.",
@@ -29,7 +30,8 @@
     "gaming": "A játékon belüli overlay, a pozicionális hang és a játékbővítmények.",
     "advanced": "Fejlesztői eszközök, diagnosztika, tárhely és licencek.",
     "about": "Verzió, támogatás és a beállítási varázsló.",
-    "plugins": "A bővítmények elszigetelt környezetben futnak, és csak azt kapják meg, amit engedélyezel. Soha nem látják a hangodat, a fájljaidat vagy a tanúsítványodat."
+    "plugins": "A bővítmények elszigetelt környezetben futnak, és csak azt kapják meg, amit engedélyezel. Soha nem látják a hangodat, a fájljaidat vagy a tanúsítványodat.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Beállítások / {{section}}",
   "moreInfo": "További információ: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "lemezterület gyorsítótár törlése",
     "blocked": "mellőzés tiltás némítás személyek",
     "notifications": "riasztások felugró ablakok",
-    "externalContent": "beágyazások képek előnézetek"
+    "externalContent": "beágyazások képek előnézetek",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Beállítások keresése",
@@ -1048,5 +1052,6 @@
     "title": "Fejlesztői mód",
     "switch": "Fejlesztői mód",
     "hint": "Fejlesztő lapot ad a bővítményekhez, ahol aláíratlan bővítményeket tölthetsz be egy mappából. Csak akkor kapcsold be, ha magad készítesz bővítményeket."
-  }
+  },
+  "newBadge": "New"
 }

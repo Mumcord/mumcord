@@ -52,7 +52,8 @@
     "noPermission": "M'għandekx permess tikteb f'dan il-kanal.",
     "unavailable": "Dan il-kanal m'għadux disponibbli.",
     "offline": "{{name}} huwa offline. Tista' terġa' tikteb meta jerġa' jkun lura.",
-    "unnamedImage": "Stampa mwaħħla"
+    "unnamedImage": "Stampa mwaħħla",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Stampi li se jintbagħtu",

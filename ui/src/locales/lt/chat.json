@@ -50,7 +50,8 @@
     "noPermission": "Neturi teisės rašyti šiame kanale.",
     "unavailable": "Šis kanalas nebepasiekiamas.",
     "offline": "{{name}} neprisijungęs (-usi). Galėsi vėl rašyti, kai grįš.",
-    "unnamedImage": "Įklijuotas paveikslėlis"
+    "unnamedImage": "Įklijuotas paveikslėlis",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Siunčiami paveikslėliai",

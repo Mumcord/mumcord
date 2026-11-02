@@ -46,7 +46,8 @@
     "noPermission": "Du har inte behörighet att skriva i den här kanalen.",
     "unavailable": "Den här kanalen finns inte längre.",
     "offline": "{{name}} är offline. Du kan skriva igen när personen är tillbaka.",
-    "unnamedImage": "Inklistrad bild"
+    "unnamedImage": "Inklistrad bild",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Bilder att skicka",

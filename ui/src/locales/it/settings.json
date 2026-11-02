@@ -16,7 +16,8 @@
     "about": "Informazioni",
     "packetInspector": "Ispettore pacchetti",
     "hotkeys": "Scorciatoie",
-    "plugins": "Plugin"
+    "plugins": "Plugin",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Avvio, lingua, aggiornamenti e accessibilità.",
@@ -29,7 +30,8 @@
     "gaming": "L'overlay in gioco, l'audio posizionale e i plugin di gioco.",
     "advanced": "Strumenti per sviluppatori, diagnostica, archiviazione e licenze.",
     "about": "Versione, supporto e procedura guidata di configurazione.",
-    "plugins": "I plugin vengono eseguiti in una sandbox e ricevono solo ciò che consenti. Non vedono mai il tuo audio, i tuoi file o il tuo certificato."
+    "plugins": "I plugin vengono eseguiti in una sandbox e ricevono solo ciò che consenti. Non vedono mai il tuo audio, i tuoi file o il tuo certificato.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Impostazioni / {{section}}",
   "moreInfo": "Ulteriori informazioni: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "spazio su disco svuota cache",
     "blocked": "ignora blocca silenzia persone",
     "notifications": "avvisi popup",
-    "externalContent": "incorporamenti immagini anteprime"
+    "externalContent": "incorporamenti immagini anteprime",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Cerca nelle impostazioni",
@@ -1056,5 +1060,6 @@
     "title": "Modalità sviluppatore",
     "switch": "Modalità sviluppatore",
     "hint": "Aggiunge una scheda Sviluppatore ai plugin per caricare plugin non firmati da una cartella. Attivala solo se crei plugin."
-  }
+  },
+  "newBadge": "New"
 }

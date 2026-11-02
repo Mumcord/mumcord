@@ -307,5 +307,12 @@
     "badge": "Identitás: {{identity}}",
     "badgeTitle": "Csatlakozva a(z) {{identity}} identitással",
     "missingNotice": "A(z) {{server}} az alapértelmezett identitással csatlakozott, mert a sajátja hiányzik."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

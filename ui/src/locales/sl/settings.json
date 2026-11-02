@@ -16,7 +16,8 @@
     "about": "O aplikaciji",
     "packetInspector": "Pregledovalnik paketov",
     "hotkeys": "Bližnjice",
-    "plugins": "Vtičniki"
+    "plugins": "Vtičniki",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Zagon, jezik, posodobitve in dostopnost.",
@@ -29,7 +30,8 @@
     "gaming": "Prekrivanje v igri, pozicijski zvok in vtičniki za igre.",
     "advanced": "Razvijalska orodja, diagnostika, shramba in licence.",
     "about": "Različica, podpora in čarovnik za nastavitev.",
-    "plugins": "Vtičniki delujejo v peskovniku in dobijo le tisto, kar dovolite. Nikoli ne vidijo vašega zvoka, datotek ali potrdila."
+    "plugins": "Vtičniki delujejo v peskovniku in dobijo le tisto, kar dovolite. Nikoli ne vidijo vašega zvoka, datotek ali potrdila.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Nastavitve / {{section}}",
   "moreInfo": "Več informacij: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "prostor na disku počisti predpomnilnik",
     "blocked": "prezri blokiraj utišaj ljudi",
     "notifications": "opozorila pojavna okna",
-    "externalContent": "vdelana vsebina slike predogledi"
+    "externalContent": "vdelana vsebina slike predogledi",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Išči nastavitve",
@@ -1064,5 +1068,6 @@
     "title": "Razvijalski način",
     "switch": "Razvijalski način",
     "hint": "Vtičnikom doda zavihek Razvijalec, kjer lahko naložite nepodpisane vtičnike iz mape. Vklopite ga le, če sami razvijate vtičnike."
-  }
+  },
+  "newBadge": "New"
 }

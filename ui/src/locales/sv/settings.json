@@ -16,7 +16,8 @@
     "about": "Om",
     "packetInspector": "Paketinspektör",
     "hotkeys": "Kortkommandon",
-    "plugins": "Tillägg"
+    "plugins": "Tillägg",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Start, språk, uppdateringar och tillgänglighet.",
@@ -29,7 +30,8 @@
     "gaming": "Överlägget i spel, positionsljud och spelinsticksmoduler.",
     "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
     "about": "Version, support och installationsguiden.",
-    "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat."
+    "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Inställningar / {{section}}",
   "moreInfo": "Mer information: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "diskutrymme rensa cache",
     "blocked": "ignorera blockera tysta personer",
     "notifications": "aviseringar popup-fönster",
-    "externalContent": "inbäddat innehåll bilder förhandsvisningar"
+    "externalContent": "inbäddat innehåll bilder förhandsvisningar",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Sök i inställningar",
@@ -1048,5 +1052,6 @@
     "title": "Utvecklarläge",
     "switch": "Utvecklarläge",
     "hint": "Lägger till fliken Utvecklare under Tillägg, där du kan läsa in osignerade tillägg från en mapp. Slå bara på det om du själv bygger tillägg."
-  }
+  },
+  "newBadge": "New"
 }

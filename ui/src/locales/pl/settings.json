@@ -16,7 +16,8 @@
     "about": "O aplikacji",
     "packetInspector": "Inspektor pakietów",
     "hotkeys": "Skróty klawiszowe",
-    "plugins": "Wtyczki"
+    "plugins": "Wtyczki",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Uruchamianie, język, aktualizacje i dostępność.",
@@ -29,7 +30,8 @@
     "gaming": "Nakładka w grze, dźwięk pozycyjny i wtyczki do gier.",
     "advanced": "Narzędzia deweloperskie, diagnostyka, pamięć i licencje.",
     "about": "Wersja, pomoc i kreator konfiguracji.",
-    "plugins": "Wtyczki działają w piaskownicy i dostają tylko to, na co pozwolisz. Nigdy nie widzą twojego dźwięku, plików ani certyfikatu."
+    "plugins": "Wtyczki działają w piaskownicy i dostają tylko to, na co pozwolisz. Nigdy nie widzą twojego dźwięku, plików ani certyfikatu.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Ustawienia / {{section}}",
   "moreInfo": "Więcej informacji: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "miejsce na dysku wyczyść pamięć podręczną",
     "blocked": "ignoruj blokuj wycisz osoby",
     "notifications": "powiadomienia wyskakujące okna",
-    "externalContent": "osadzone treści obrazy podglądy"
+    "externalContent": "osadzone treści obrazy podglądy",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Szukaj w ustawieniach",
@@ -1064,5 +1068,6 @@
     "title": "Tryb dewelopera",
     "switch": "Tryb dewelopera",
     "hint": "Dodaje do wtyczek kartę Deweloper, w której możesz wczytać niepodpisane wtyczki z folderu. Włącz ją tylko, jeśli sam tworzysz wtyczki."
-  }
+  },
+  "newBadge": "New"
 }

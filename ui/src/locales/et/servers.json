@@ -307,5 +307,12 @@
     "badge": "Identiteet: {{identity}}",
     "badgeTitle": "Ühendatud identiteediga {{identity}}",
     "missingNotice": "{{server}} ühendus vaikimisi identiteediga, sest selle oma identiteet puudub."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

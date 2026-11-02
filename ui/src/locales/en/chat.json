@@ -46,7 +46,8 @@
     "noPermission": "You don't have permission to write in this channel.",
     "unavailable": "This channel is no longer available.",
     "offline": "{{name}} is offline. You can write again when they are back.",
-    "unnamedImage": "Pasted image"
+    "unnamedImage": "Pasted image",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Images to send",

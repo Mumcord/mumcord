@@ -48,7 +48,8 @@
     "noPermission": "Nu ai permisiunea să scrii în acest canal.",
     "unavailable": "Acest canal nu mai este disponibil.",
     "offline": "{{name}} este offline. Poți scrie din nou când revine.",
-    "unnamedImage": "Imagine lipită"
+    "unnamedImage": "Imagine lipită",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Imagini de trimis",

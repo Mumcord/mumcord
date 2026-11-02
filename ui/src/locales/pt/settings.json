@@ -16,7 +16,8 @@
     "about": "Acerca de",
     "packetInspector": "Inspetor de pacotes",
     "hotkeys": "Atalhos",
-    "plugins": "Plugins"
+    "plugins": "Plugins",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Arranque, idioma, atualizações e acessibilidade.",
@@ -29,7 +30,8 @@
     "gaming": "A sobreposição no jogo, áudio posicional e plugins de jogos.",
     "advanced": "Ferramentas de programador, diagnóstico, armazenamento e licenças.",
     "about": "Versão, suporte e o assistente de configuração.",
-    "plugins": "Os plugins são executados num ambiente isolado e só recebem o que permitir. Nunca veem o seu áudio, ficheiros ou certificado."
+    "plugins": "Os plugins são executados num ambiente isolado e só recebem o que permitir. Nunca veem o seu áudio, ficheiros ou certificado.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Definições / {{section}}",
   "moreInfo": "Mais informações: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "espaço em disco limpar cache",
     "blocked": "ignorar bloquear silenciar pessoas",
     "notifications": "alertas pop-ups",
-    "externalContent": "conteúdo incorporado imagens pré-visualizações"
+    "externalContent": "conteúdo incorporado imagens pré-visualizações",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Pesquisar definições",
@@ -1056,5 +1060,6 @@
     "title": "Modo de programador",
     "switch": "Modo de programador",
     "hint": "Adiciona um separador Programador aos plugins para carregar plugins não assinados de uma pasta. Ative apenas se criar plugins."
-  }
+  },
+  "newBadge": "New"
 }

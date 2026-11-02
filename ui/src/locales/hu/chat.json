@@ -46,7 +46,8 @@
     "noPermission": "Nincs jogosultságod írni ebbe a csatornába.",
     "unavailable": "Ez a csatorna már nem érhető el.",
     "offline": "{{name}} offline. Akkor írhatsz újra, ha visszajött.",
-    "unnamedImage": "Beillesztett kép"
+    "unnamedImage": "Beillesztett kép",
+    "attachFiles": "Share files"
   },
   "tray": {
     "label": "Küldendő képek",

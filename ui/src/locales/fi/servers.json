@@ -307,5 +307,12 @@
     "badge": "Identiteetti: {{identity}}",
     "badgeTitle": "Yhdistetty identiteetillä {{identity}}",
     "missingNotice": "{{server}} yhdistettiin oletusidentiteetillä, koska sen oma identiteetti puuttuu."
+  },
+  "relayAllows": {
+    "label": "Relay allows",
+    "line": "Relay allows: {{uses}}",
+    "images": "Images",
+    "files": "Files",
+    "screen": "Screen sharing"
   }
 }

@@ -16,7 +16,8 @@
     "about": "Tietoja",
     "packetInspector": "Pakettitarkastin",
     "hotkeys": "Pikanäppäimet",
-    "plugins": "Lisäosat"
+    "plugins": "Lisäosat",
+    "screenSharing": "Screen sharing"
   },
   "sectionDescriptions": {
     "general": "Käynnistys, kieli, päivitykset ja saavutettavuus.",
@@ -29,7 +30,8 @@
     "gaming": "Pelinaikainen peittokuva, paikkaääni ja pelilaajennukset.",
     "advanced": "Kehittäjätyökalut, diagnostiikka, tallennustila ja lisenssit.",
     "about": "Versio, tuki ja käyttöönottoavustaja.",
-    "plugins": "Lisäosat toimivat hiekkalaatikossa ja saavat vain sen, minkä sallit. Ne eivät koskaan näe ääntäsi, tiedostojasi tai varmennettasi."
+    "plugins": "Lisäosat toimivat hiekkalaatikossa ja saavat vain sen, minkä sallit. Ne eivät koskaan näe ääntäsi, tiedostojasi tai varmennettasi.",
+    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
   },
   "breadcrumb": "Asetukset / {{section}}",
   "moreInfo": "Lisätietoja: {{topic}}",
@@ -45,7 +47,9 @@
     "storage": "levytila tyhjennä välimuisti",
     "blocked": "ohita estä mykistä henkilöt",
     "notifications": "hälytykset ponnahdusikkunat",
-    "externalContent": "upotukset kuvat esikatselut"
+    "externalContent": "upotukset kuvat esikatselut",
+    "fileSharing": "files send receive download save folder attachment zip",
+    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
   },
   "search": {
     "label": "Hae asetuksista",
@@ -1048,5 +1052,6 @@
     "title": "Kehittäjätila",
     "switch": "Kehittäjätila",
     "hint": "Lisää Lisäosiin Kehittäjä-välilehden, jolla voit ladata allekirjoittamattomia lisäosia kansiosta. Ota se käyttöön vain, jos teet itse lisäosia."
-  }
+  },
+  "newBadge": "New"
 }
