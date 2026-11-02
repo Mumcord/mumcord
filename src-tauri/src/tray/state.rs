@@ -332,6 +332,7 @@ pub mod fixtures {
             has_comment: false,
             volume: 100,
             local_mute: false,
+            share_volume: 100,
             mumcord_features: None,
         }
     }

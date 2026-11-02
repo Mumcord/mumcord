@@ -9,7 +9,9 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
-use mumcord_audio::mixer::share::{SharePort, ShareSoundWriter, ShareStats, share_channel};
+use mumcord_audio::mixer::share::{
+    SharePort, ShareSoundWriter, ShareStats, ShareVolume, share_channel,
+};
 
 use crate::session::lock;
 use crate::voice::VoiceShared;
@@ -48,13 +50,17 @@ impl ShareSoundHub {
     }
 
     /// A new ring into the current playback thread, with the generation it belongs to.
-    fn open(&self, stats: &Arc<ShareStats>) -> (u64, Option<ShareSoundWriter>) {
+    fn open(
+        &self,
+        stats: &Arc<ShareStats>,
+        volume: &Arc<ShareVolume>,
+    ) -> (u64, Option<ShareSoundWriter>) {
         let mut slot = lock(&self.port);
         let generation = self.generation();
         let Some(port) = slot.as_mut() else {
             return (generation, None);
         };
-        let (writer, source) = match share_channel(stats.clone()) {
+        let (writer, source) = match share_channel(stats.clone(), volume.clone()) {
             Ok(pair) => pair,
             Err(e) => {
                 tracing::warn!(error = %e, "screen share sound decoder did not start");
@@ -75,20 +81,30 @@ impl ShareSoundHub {
 pub(crate) struct ShareSound {
     voice: Arc<VoiceShared>,
     stats: Arc<ShareStats>,
+    /// Kept across playback threads, so a new ring plays at the volume set before.
+    volume: Arc<ShareVolume>,
     writer: Option<(u64, Option<ShareSoundWriter>)>,
 }
 
 impl ShareSound {
-    pub fn new(voice: Arc<VoiceShared>) -> Self {
+    /// The sound of a share, played at `volume_percent` (0–200).
+    pub fn new(voice: Arc<VoiceShared>, volume_percent: u16) -> Self {
+        let volume = Arc::new(ShareVolume::default());
+        volume.set_percent(volume_percent);
         Self {
             voice,
             stats: Arc::new(ShareStats::default()),
+            volume,
             writer: None,
         }
     }
 
     pub fn stats(&self) -> Arc<ShareStats> {
         self.stats.clone()
+    }
+
+    pub fn volume(&self) -> Arc<ShareVolume> {
+        self.volume.clone()
     }
 
     /// Plays one Opus packet of the share.
@@ -103,7 +119,7 @@ impl ShareSound {
             .as_ref()
             .is_none_or(|(generation, _)| *generation != hub.generation())
         {
-            self.writer = Some(hub.open(&self.stats));
+            self.writer = Some(hub.open(&self.stats, &self.volume));
         }
         if let Some((_, Some(writer))) = &mut self.writer
             && let Err(e) = writer.push_packet(payload)
@@ -133,7 +149,7 @@ mod tests {
     #[test]
     fn packets_wait_for_a_playback_thread_and_follow_it() {
         let voice = Arc::new(VoiceShared::default());
-        let mut sound = ShareSound::new(voice.clone());
+        let mut sound = ShareSound::new(voice.clone(), 100);
         sound.packet(&packet());
         assert_eq!(sound.stats.snapshot().packets, 0, "no playback thread yet");
 

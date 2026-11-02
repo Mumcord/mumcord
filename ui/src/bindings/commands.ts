@@ -125,6 +125,11 @@ export const commands = {
 	personMove: (serverId: number, session: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_move", { serverId, session, channelId })),
 	/**  Sets local volume (0–200 %); remembered by certificate hash per server. */
 	personSetVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_volume", { serverId, session, volume })),
+	/**
+	 *  Sets the volume of a person's screen share sound (0–200 %), separate from their voice;
+	 *  remembered like the voice volume.
+	 */
+	personSetShareVolume: (serverId: number, session: number, volume: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_share_volume", { serverId, session, volume })),
 	/**  Mutes a person locally; remembered by certificate hash per server. */
 	personSetLocalMute: (serverId: number, session: number, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_local_mute", { serverId, session, muted })),
 	/**
@@ -3695,6 +3700,11 @@ export type User = {
 	/**  Local playback volume in percent, 0–200 (FR-1.18). */
 	volume: number,
 	localMute: boolean,
+	/**
+	 *  Local volume of the person's screen share sound in percent (0–200), separate from
+	 *  their voice.
+	 */
+	shareVolume: number,
 	/**  Another Mumcord client, recognised by its hello (FR-1.61). */
 	isMumcord: boolean,
 	/**  What that client announced it can do (empty for everyone else). */

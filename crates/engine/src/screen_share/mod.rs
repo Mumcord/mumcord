@@ -734,6 +734,17 @@ impl Engine {
         self.voice_shared().share_gain.set(level);
     }
 
+    /// Plays the sound of `sharer`'s share at `percent`, if it is being watched.
+    pub(crate) fn screen_share_apply_volume(&self, server_id: ServerId, sharer: u32, percent: u16) {
+        if let Some(Watching::Open(link)) = lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.watching.get(&sharer))
+        {
+            link.set_volume(percent);
+        }
+    }
+
     /// How the sound of `sharer`'s share plays here; `None` while not watching it.
     pub fn screen_share_sound_stats(
         &self,
@@ -832,6 +843,7 @@ impl Engine {
         let opened = self
             .p2p_open_stream(server_id, sharer, crate::p2p::STREAM_SCREEN)
             .await;
+        let volume = self.person_share_volume(server_id, sharer);
         // A newer attempt replaced this one meanwhile: leave its state and the sharer alone.
         let mut superseded = false;
         let result = {
@@ -848,7 +860,7 @@ impl Engine {
                                 server_id,
                                 sharer,
                                 sink,
-                                sound::ShareSound::new(self.voice_shared().clone()),
+                                sound::ShareSound::new(self.voice_shared().clone(), volume),
                                 send,
                                 recv,
                             ));
