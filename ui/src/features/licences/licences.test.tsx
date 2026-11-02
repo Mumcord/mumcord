@@ -17,7 +17,8 @@ import { WindowLookShare } from "./WindowLookShare";
 let api: MockApi;
 
 // jsdom has no layout: the list gets a height and each row one, so the virtualizer renders the
-// rows that fit like in the window.
+// rows that fit like in the window. The virtualizer reads the list's size from clientHeight and
+// clientWidth, and each row's from offsetHeight.
 const LIST_HEIGHT = 800;
 const ROW_HEIGHT = 40;
 
@@ -25,10 +26,13 @@ beforeEach(async () => {
   vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (
     this: HTMLElement,
   ) {
-    if (this.classList.contains("lic-list")) return LIST_HEIGHT;
     return this.classList.contains("lic-row") ? ROW_HEIGHT : 0;
   });
   vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(800);
+  vi.spyOn(Element.prototype, "clientHeight", "get").mockImplementation(function (this: Element) {
+    return this.classList.contains("lic-list") ? LIST_HEIGHT : 0;
+  });
+  vi.spyOn(Element.prototype, "clientWidth", "get").mockReturnValue(800);
   await applyLanguage("en");
   api = createMockApi();
   setApi(api);
