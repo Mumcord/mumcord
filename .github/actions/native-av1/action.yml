@@ -1,8 +1,8 @@
 name: Build the native AV1 libraries
 description: >-
-  Restores or builds the static SVT-AV1, dav1d and (Windows and Linux) FFmpeg that screen sharing
-  links (scripts/build-{svt-av1,dav1d,ffmpeg}.sh) and exports SVTAV1_STATIC_DIR, DAV1D_STATIC_DIR
-  and FFMPEG_STATIC_DIR. Each library is cached per system and architecture; its key changes with
+  Restores or builds the static SVT-AV1 and dav1d that screen sharing links and, on Windows and
+  Linux, the hardware encoder interfaces (scripts/build-{svt-av1,dav1d,hwenc-sdk}.sh), and exports
+  SVTAV1_STATIC_DIR, DAV1D_STATIC_DIR and HWENC_SDK_DIR. Each library is cached per system and architecture; its key changes with
   its build script, which pins the version, so a cache hit skips the build and all build tools.
 runs:
   using: composite
@@ -14,7 +14,7 @@ runs:
         {
           echo "svt-av1=svt-av1-$base-${{ hashFiles('scripts/build-svt-av1.sh') }}"
           echo "dav1d=dav1d-$base-${{ hashFiles('scripts/build-dav1d.sh') }}"
-          echo "ffmpeg=ffmpeg-$base-${{ hashFiles('scripts/build-ffmpeg.sh') }}"
+          echo "hwenc=hwenc-sdk-$base-${{ hashFiles('scripts/build-hwenc-sdk.sh') }}"
         } >> "$GITHUB_OUTPUT"
 
     - id: svt-av1
@@ -29,22 +29,22 @@ runs:
         path: ${{ runner.temp }}/dav1d
         key: ${{ steps.key.outputs.dav1d }}
 
-    # macOS has no AV1 or VP9 hardware encoder, so it gets no FFmpeg (scripts/build-ffmpeg.sh).
-    - id: ffmpeg
+    # macOS has no AV1 or VP9 hardware encoder (scripts/build-hwenc-sdk.sh).
+    - id: hwenc
       if: runner.os != 'macOS'
       uses: actions/cache@v6
       with:
-        path: ${{ runner.temp }}/ffmpeg
-        key: ${{ steps.key.outputs.ffmpeg }}
+        path: ${{ runner.temp }}/hwenc-sdk
+        key: ${{ steps.key.outputs.hwenc }}
 
     - name: Install build tools
       if: >-
         steps.svt-av1.outputs.cache-hit != 'true' || steps.dav1d.outputs.cache-hit != 'true' ||
-        (runner.os != 'macOS' && steps.ffmpeg.outputs.cache-hit != 'true')
+        (runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true')
       shell: bash
       run: |
         case "$RUNNER_OS" in
-          Linux) scripts/ci/apt-install.sh nasm meson ninja-build libva-dev ;;
+          Linux) scripts/ci/apt-install.sh nasm meson ninja-build ;;
           macOS) brew install nasm meson ninja ;;
           Windows)
             pip install --disable-pip-version-check meson ninja
@@ -67,32 +67,10 @@ runs:
       shell: bash
       run: scripts/build-dav1d.sh '${{ runner.temp }}/dav1d'
 
-    - name: Build static FFmpeg (Linux)
-      if: runner.os == 'Linux' && steps.ffmpeg.outputs.cache-hit != 'true'
+    - name: Build the hardware encoder interfaces
+      if: runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true'
       shell: bash
-      run: scripts/build-ffmpeg.sh '${{ runner.temp }}/ffmpeg'
-
-    # FFmpeg's MSVC build runs its configure script and make in MSYS2, inside a Visual Studio
-    # developer environment (cl.exe, link.exe) that MSYS2 inherits through path-type: inherit.
-    - name: Visual Studio environment for FFmpeg
-      if: runner.os == 'Windows' && steps.ffmpeg.outputs.cache-hit != 'true'
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-
-    - name: MSYS2 for FFmpeg
-      if: runner.os == 'Windows' && steps.ffmpeg.outputs.cache-hit != 'true'
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MSYS
-        path-type: inherit
-        update: false
-        install: make diffutils pkgconf
-
-    - name: Build static FFmpeg (Windows)
-      if: runner.os == 'Windows' && steps.ffmpeg.outputs.cache-hit != 'true'
-      shell: msys2 {0}
-      run: scripts/build-ffmpeg.sh "$(cygpath -u '${{ runner.temp }}')/ffmpeg"
+      run: scripts/build-hwenc-sdk.sh '${{ runner.temp }}/hwenc-sdk'
 
     - name: Point the build at the libraries
       shell: bash
@@ -100,5 +78,5 @@ runs:
         {
           echo 'SVTAV1_STATIC_DIR=${{ runner.temp }}/svt-av1'
           echo 'DAV1D_STATIC_DIR=${{ runner.temp }}/dav1d'
-          if [[ "$RUNNER_OS" != macOS ]]; then echo 'FFMPEG_STATIC_DIR=${{ runner.temp }}/ffmpeg'; fi
+          if [[ "$RUNNER_OS" != macOS ]]; then echo 'HWENC_SDK_DIR=${{ runner.temp }}/hwenc-sdk'; fi
         } >> "$GITHUB_ENV"
