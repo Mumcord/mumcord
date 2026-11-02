@@ -1,0 +1,148 @@
+{
+  "assets": [
+    {
+      "name": "Mumcord-0.6.1-1.aarch64.rpm",
+      "sha256": "6149de3963fa418732597eb041188b3116e7bfbfadf775d923273106f4908e9e",
+      "size": 47956110
+    },
+    {
+      "name": "Mumcord-0.6.1-1.x86_64.rpm",
+      "sha256": "901e693ad1c67c3ffb4d5439ff6e58568d99fc22ab7624b16bc56fef58a5b32e",
+      "size": 47477830
+    },
+    {
+      "name": "Mumcord_0.6.1_aarch64.AppImage",
+      "sha256": "d1c446a4e899325ad55f0587ed9951581ac68821f928c0a5b9b50a07451be79c",
+      "size": 129698312
+    },
+    {
+      "name": "Mumcord_0.6.1_aarch64.AppImage.sig",
+      "sha256": "34c190a2ec622bd9c3720b2a4ea5cf29f2ed3ad5410833603e73f1ca6a7af1ea",
+      "size": 440
+    },
+    {
+      "name": "Mumcord_0.6.1_amd64.AppImage",
+      "sha256": "a92ed7d3d66417b8db87ad0fa88fcf0f464bc494dc27c9d77a641fc42d2ca988",
+      "size": 131647992
+    },
+    {
+      "name": "Mumcord_0.6.1_amd64.AppImage.sig",
+      "sha256": "2a751715275f9dcf1bbbae683f1fee793da236a624c5e40aa33d485c01d7f2e3",
+      "size": 436
+    },
+    {
+      "name": "Mumcord_0.6.1_amd64.deb",
+      "sha256": "f4c4d9fff7a5414262d053cfc1fe621fb5ce93b124d5fb4b84eb86289545791e",
+      "size": 47473100
+    },
+    {
+      "name": "Mumcord_0.6.1_arm64.deb",
+      "sha256": "bce9301627b3557d471c6e7839927708020dd078d5631a446bf9e07f6e177f73",
+      "size": 47956674
+    },
+    {
+      "name": "Mumcord_0.6.1_universal.app.tar.gz",
+      "sha256": "b7015f52b62b16fd31eac16c71a58f67d42fb07ac17476deb009ca3768d221af",
+      "size": 76220259
+    },
+    {
+      "name": "Mumcord_0.6.1_universal.app.tar.gz.sig",
+      "sha256": "a75bd54429e8eec7854b3deaab03103caeeab2910da56fbb1343fcd1bacdd163",
+      "size": 444
+    },
+    {
+      "name": "Mumcord_0.6.1_universal.dmg",
+      "sha256": "90df77700778ca7db46f92abe17e464f8c895654b9684c909ec29c6214ff1422",
+      "size": 76450803
+    },
+    {
+      "name": "Mumcord_0.6.1_x64-portable.zip",
+      "sha256": "01805f10db8f8ebb0f9b68ab990476aa54480eb795a3eb7043a925f74a87deb2",
+      "size": 37540699
+    },
+    {
+      "name": "Mumcord_0.6.1_x64-setup.exe",
+      "sha256": "6749b3588a6a5090e7dd410675f946ff4e71229e5472ca79adc2be3c9798f05d",
+      "size": 29243960
+    },
+    {
+      "name": "Mumcord_0.6.1_x64-setup.exe.sig",
+      "sha256": "ed9b23d3048dc9f4d374e6a3f24f1cf117964dd09343dd0a0030f79b171b2701",
+      "size": 436
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "cc78ec290d3b6cb02b84d0dd455edb0a5ad077cf9f6588a4ffcf988c8dd830a8",
+      "size": 2132
+    },
+    {
+      "name": "install.sh",
+      "sha256": "02f9c7658b0800b17742fd44b3c9d79338612918a3fe74424364e79654ebcb73",
+      "size": 23508
+    },
+    {
+      "name": "latest.json",
+      "sha256": "8ad621e12fa14f2383a1dae3ad4f713103ce5324e4c6484b14d3f9bc7c2a3dd4",
+      "size": 3129
+    },
+    {
+      "name": "mumcord-0.6.1-appimage-aarch64.cdx.json",
+      "sha256": "d416085fba8d1be6433f8c25c0f2e68ee92cb9a2d321d260e928c30c4d492f71",
+      "size": 926660
+    },
+    {
+      "name": "mumcord-0.6.1-appimage-x86_64.cdx.json",
+      "sha256": "8ffb0ff01c8c3c6c80c17131b979558761ddb693362ee59713e3e2b1932c21a8",
+      "size": 927724
+    },
+    {
+      "name": "mumcord-0.6.1-deb-rpm-aarch64.cdx.json",
+      "sha256": "50bf912b2221d56fe031948bd87ad329b0cf10105c344fd6e6ac9d1d83ca5dab",
+      "size": 876709
+    },
+    {
+      "name": "mumcord-0.6.1-deb-rpm-x86_64.cdx.json",
+      "sha256": "b7313b693c2563aabe553aecbefdbec5421f54d497a2609933543c2370de3f07",
+      "size": 877773
+    },
+    {
+      "name": "mumcord-0.6.1-macos-universal.cdx.json",
+      "sha256": "9c315fbcc77e0dac1f5cfb97b6c343b4a77ffd0a0435c3275a070c2caeceec4b",
+      "size": 746957
+    },
+    {
+      "name": "mumcord-0.6.1-windows-x86_64.cdx.json",
+      "sha256": "ed93b2ed7353703a22b71f338554ab595450e794150c297d6de5c45c66736a12",
+      "size": 718607
+    }
+  ],
+  "changelog": {
+    "sha256": "1edc97967cacaf1b68b616126944710681b9780e3e13c453259cfb8c873a77e8",
+    "text": "## [0.6.1] - 2026-11-02\n\n### Changed\n\n- Menus, popovers, hover cards and the profile card now have a solid background instead of the see-through frosted-glass look, so text behind them no longer shows through (#337)\n- A fresh install now starts with the Classic notification sounds instead of the Rich ones; if you already picked a sound theme, your choice is kept (issue #339)\n\n### Fixed\n\n- Windows: the portable zip of a signed release now contains the signed Mumcord.exe, the same program the installer installs\n- macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code\n- Changing the volume of someone's screen share no longer changes their voice volume. The share's sound now has its own volume, remembered per person like their voice volume.\n\n### Internal\n\n- Windows release builds are signed with a Certum code signing certificate through SimplySign instead of Azure Artifact Signing: the release workflow installs a pinned SimplySign Desktop, logs in with a one-time code generated from the `release` environment secrets, and signs the app, the uninstaller and the installer with `signtool`; `scripts/sign-windows.ps1` does the same by hand. Without the Certum settings the Windows build stays unsigned as before (#340)"
+  },
+  "commit": "2c49080ea5840e7d45a528f98e984245ead2dc06",
+  "crates.io": {
+    "mumcord-audio": {
+      "cksum": "5bad7330b414238b59313de6ae0d2233c47e9266c7334eba77e4b750be2def3c",
+      "yanked": false
+    },
+    "mumcord-codec": {
+      "cksum": "197acbf7c94832a1b1a65f0caa5e37492a0442a462b7641ac8d9bec0df98841c",
+      "yanked": false
+    },
+    "mumcord-p2p": {
+      "cksum": "dddc9d0a0f533dde376e7f5a39bf13aff078faa59df4f3e4274de03d672e0943",
+      "yanked": false
+    },
+    "mumcord-protocol": {
+      "cksum": "19eb3321641f9c8039ddbb7a4a3d072b3c186eff71adaf107d8d6fce4a60181a",
+      "yanked": false
+    },
+    "mumcord-store": {
+      "cksum": "1df1e120b3597c169ab7b200ad947324041f49b0444916ec9f8c831b029e5d6b",
+      "yanked": false
+    }
+  },
+  "sha256sums": "cc78ec290d3b6cb02b84d0dd455edb0a5ad077cf9f6588a4ffcf988c8dd830a8",
+  "tag": "v0.6.1"
+}
