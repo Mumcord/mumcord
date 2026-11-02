@@ -1,0 +1,35 @@
+{
+  "hint": "Lataa purettu lisäosakansio testataksesi sitä. Kehittäjälisäosat eivät ole allekirjoitettuja, eivät koskaan ole virallisia eivätkä voi saada oikeuksia net.http, secrets tai ui.webview. Ne poistetaan, kun kehittäjätila kytketään pois.",
+  "load": "Lataa lisäosakansio…",
+  "pickFolder": "Valitse lisäosan kansio",
+  "empty": "Kehittäjälisäosaa ei ole ladattu.",
+  "listLabel": "Kehittäjälisäosat",
+  "label": "Kehittäjälisäosa",
+  "status": {
+    "running": "Käynnissä",
+    "off": "Pois päältä",
+    "backingOff": "Käynnistyy uudelleen kaatumisen jälkeen",
+    "autoOff": "Poistettu käytöstä toistuvien kaatumisten jälkeen",
+    "allOff": "Kaikki lisäosat ovat pois päältä",
+    "noPlugins": "Lisäosat ovat pois päältä tämän istunnon ajan",
+    "notLoaded": "Lataus epäonnistui"
+  },
+  "showLog": "Näytä lisäosan {{name}} loki",
+  "reload": "Lataa {{name}} uudelleen",
+  "unload": "Poista {{name}}",
+  "logLabel": "Lisäosan {{name}} loki",
+  "logTitle": "Lisäosan {{name}} loki",
+  "logEmpty": "Lokirivejä ei vielä ole.",
+  "level": {
+    "debug": "Vianetsintä",
+    "info": "Tieto",
+    "warn": "Varoitus",
+    "error": "Virhe"
+  },
+  "errors": {
+    "load": "Lisäosakansion lataus epäonnistui.",
+    "reload": "Lisäosan uudelleenlataus epäonnistui.",
+    "unload": "Lisäosan poisto epäonnistui.",
+    "log": "Lokin lukeminen epäonnistui."
+  }
+}

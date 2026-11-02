@@ -23,7 +23,8 @@
       "all": "Alle",
       "mentions": "Omtaler",
       "requests": "Anmodninger",
-      "invites": "Invitationer"
+      "invites": "Invitationer",
+      "plugins": "Plugins"
     },
     "empty": "Du er helt opdateret.",
     "unread": "Ulæste",

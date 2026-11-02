@@ -1,6 +1,5 @@
 {
   "follow": "Følg",
-  "following": "Følger",
   "unsupported": "For at følge kanaler skal serveren køre version 1.4 eller nyere.",
   "unread_one": "{{count}} ulæst besked",
   "unread_other": "{{count}} ulæste beskeder",

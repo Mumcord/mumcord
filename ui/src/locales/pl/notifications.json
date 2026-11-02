@@ -29,7 +29,8 @@
       "all": "Wszystkie",
       "mentions": "Wzmianki",
       "requests": "Prośby",
-      "invites": "Zaproszenia"
+      "invites": "Zaproszenia",
+      "plugins": "Wtyczki"
     },
     "empty": "Wszystko przeczytane.",
     "unread": "Nieprzeczytane",

@@ -1,0 +1,60 @@
+{
+  "intro": "Krātuves ir papildu spraudņu saraksti, ko uztur citi cilvēki. Mumcord to spraudņus nepārbauda. Pievienojiet tikai krātuves, kurām uzticaties.",
+  "add": {
+    "button": "Pievienot krātuvi",
+    "title": "Pievienot krātuvi",
+    "address": "Krātuves adrese",
+    "expectedKey": "Gaidāmā atslēga (nav obligāta)",
+    "expectedKeyHint": "Ja īpašnieks jums iedeva atslēgu, ielīmējiet to šeit. Tad krātuvei jāizmanto tieši šī atslēga.",
+    "check": "Pārbaudīt krātuvi",
+    "found": "To mēs atradām",
+    "confirm": "Pievienot krātuvi",
+    "subtitle": "Pievienojiet tikai tādu cilvēku krātuves, kuriem uzticaties.",
+    "signatureValid": "paraksts derīgs",
+    "contactLine": "kontakts: {{contact}}",
+    "pluginsLine": "Spraudņi: {{number}}",
+    "signingKey": "Parakstīšanas atslēga",
+    "warningTitle": "Neoficiāla krātuve",
+    "warningBody": "Mumcord šos spraudņus nepārbauda. Atslēga tiek atcerēta: ja tā mainās, krātuve tiek apturēta, līdz to pārbaudāt. Pārlūkojot saimniekdatoram tiek parādīta jūsu IP adrese. Spraudņi ar oficiāliem nosaukumiem no šejienes nekad netiek ņemti."
+  },
+  "limit": "Varat pievienot līdz {{max}} krātuvēm.",
+  "limitReached": "Sasniegts {{max}} krātuvju ierobežojums.",
+  "empty": "Krātuves vēl nav pievienotas.",
+  "listLabel": "Pievienotās krātuves",
+  "loadFailed": "Krātuves neizdevās ielādēt.",
+  "status": {
+    "keyChanged": "Atslēga mainīta, apturēts"
+  },
+  "fingerprintLine": "Atslēgas pirkstu nospiedums: {{fingerprint}}",
+  "neverChecked": "Vēl nav pārbaudīts",
+  "lastChecked": "Pēdējā pārbaude: {{when}}",
+  "installedCount": "Instalētie spraudņi: {{number}}",
+  "toggle": "Izmantot {{name}}",
+  "remove": {
+    "button": "Noņemt",
+    "label": "Noņemt {{name}}",
+    "title": "Vai noņemt {{name}}?",
+    "message": "Krātuve tiek noņemta, un tās spraudņi tiek izslēgti. Tie paliek instalēti ar saviem datiem, bet vairs nesaņem atjauninājumus.",
+    "confirm": "Noņemt"
+  },
+  "keyChange": {
+    "title": "{{name}} nomainīja atslēgu",
+    "message": "Šī krātuve tagad paraksta spraudņu sarakstu ar citu atslēgu. Tā paliek apturēta, līdz izlemsiet. Uzticieties jaunajai atslēgai tikai tad, ja īpašnieks izmaiņas paziņoja.",
+    "oldKey": "Līdz šim uzticētā atslēga",
+    "newKey": "Jaunā atslēga",
+    "keepPaused": "Atstāt apturētu",
+    "trust": "Uzticēties jaunajai atslēgai",
+    "review": "Pārskatīt atslēgas maiņu"
+  },
+  "mirror": {
+    "title": "Papildu",
+    "label": "Oficiālā spraudņu saraksta spogulis (nav obligāts)",
+    "hint": "Mainiet tikai tad, ja saņēmāt spoguļa adresi. Spogulim jāpiedāvā tie paši parakstītie faili; Mumcord tāpat pārbauda katru parakstu.",
+    "save": "Saglabāt",
+    "reset": "Izmantot noklusējumu"
+  },
+  "official": {
+    "name": "Oficiālie Mumcord spraudņi",
+    "alwaysOn": "Vienmēr ieslēgts"
+  }
+}

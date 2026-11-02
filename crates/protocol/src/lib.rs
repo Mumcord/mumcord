@@ -17,9 +17,9 @@ pub mod version;
 pub mod voice;
 
 pub use client::{
-    ConnectConfig, Connection, DisconnectReason, Event, Handle, PLUGIN_DATA_MAX, PluginData,
-    SyncProgress, TextMessage, TextTarget, UdpPing, connect, connect_with_progress,
-    connect_with_tap, set_client_release,
+    ConnectConfig, Connection, DisconnectReason, Event, Handle, LowOutcome, PLUGIN_DATA_MAX,
+    PluginData, PluginTicket, SyncProgress, TextMessage, TextTarget, UdpPing, connect,
+    connect_with_progress, connect_with_tap, set_client_release,
 };
 pub use error::{
     CommandError, ConnectError, DenyKind, PermissionDenied, ProtocolError, RejectReason,

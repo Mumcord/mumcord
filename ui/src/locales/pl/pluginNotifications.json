@@ -1,0 +1,30 @@
+{
+  "type": "Wtyczka",
+  "autoOff": {
+    "title": "Wyłączono wtyczkę {{name}}",
+    "body": "Wyłączona po wielokrotnych awariach",
+    "open": "Pokaż w Wtyczkach"
+  },
+  "update": {
+    "title": "Aktualizacja dla {{name}}",
+    "body": "Wersja {{version}} czeka na karcie Aktualizacje",
+    "open": "Pokaż aktualizacje"
+  },
+  "suggestion": {
+    "title": "Ten serwer używa {{name}}",
+    "noReason": "Zaproponowane przez serwer",
+    "install": "Zainstaluj…",
+    "installLabel": "Zainstaluj {{name}}",
+    "addRepositoryLabel": "Dodaj repozytorium dla {{name}}",
+    "details": "Zobacz szczegóły",
+    "detailsLabel": "Szczegóły: {{name}}",
+    "notNow": "Nie teraz",
+    "notNowLabel": "Ukryj {{name}} na razie",
+    "dontAsk": "Nie pytaj więcej dla tego serwera",
+    "recommended": "Polecane",
+    "official": "Oficjalna",
+    "unofficial": "Nieoficjalna · {{host}}",
+    "footer": "Sugestie same niczego nie instalują. Serwer nie dowiaduje się, co instalujesz."
+  },
+  "failed": "To nie zadziałało. Spróbuj ponownie."
+}

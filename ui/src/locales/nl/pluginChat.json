@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kaart van {{plugin}}",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen"
+  },
+  "via": "via {{plugin}}",
+  "supersede": {
+    "showText": "Originele tekst tonen",
+    "hideText": "Originele tekst verbergen",
+    "hiddenBy": "Verborgen door {{plugin}}"
+  },
+  "command": {
+    "list": "Plug-inopdrachten",
+    "keys": "↑↓ kiezen · Tab aanvullen · Enter uitvoeren · Esc sluiten",
+    "unavailable": "Deze opdracht is nu niet beschikbaar.",
+    "failed": "De opdracht kon niet worden uitgevoerd. Probeer het opnieuw."
+  }
+}

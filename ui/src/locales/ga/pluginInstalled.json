@@ -1,0 +1,125 @@
+{
+  "listLabel": "Breiseáin suiteáilte",
+  "empty": "Gan aon bhreiseán go fóill.",
+  "browse": "Brabhsáil breiseáin",
+  "enable": "{{name}} ar siúl",
+  "labels": {
+    "official": "Oifigiúil",
+    "unofficial": "Neamhoifigiúil · {{repository}}",
+    "unofficialUnknown": "Neamhoifigiúil",
+    "developer": "Breiseán forbróra",
+    "autoOff": "Casta as tar éis tuairteanna arís agus arís eile",
+    "backingOff": "Ag atosú tar éis tuairteála",
+    "notLoaded": "Níorbh fhéidir é a luchtú",
+    "revoked": "Curtha as ag Mumcord: {{reason}}",
+    "revocationWarning": "Rabhadh ó Mumcord: {{reason}}",
+    "tampered": "Athraíodh comhaid an bhreiseáin seo",
+    "permission": "Casta as toisc go bhfuil cead riachtanach as"
+  },
+  "details": {
+    "open": "Sonraí {{name}}",
+    "permissions": "Ceadanna",
+    "visibility": "Cé a fheiceann gníomhaíocht an bhreiseáin seo",
+    "visibilityOptions": {
+      "everyone": "Gach duine",
+      "friends": "Cairde amháin",
+      "nobody": "Duine ar bith"
+    },
+    "notifications": "Fógraí",
+    "pin": "Bioráin leagan {{version}} (gan nuashonruithe uathoibríocha)",
+    "settings": "Socruithe an bhreiseáin",
+    "diagnostics": "Diagnóisic",
+    "export": "Easpórtáil sonraí",
+    "reset": "Athshocraigh sonraí",
+    "remove": "Bain",
+    "commandTaken": "/{{command}}: Tá an t-ordú in úsáid ag {{plugin}}"
+  },
+  "badge": {
+    "label": "Suaitheantas le taobh ainmneacha",
+    "none": "Dada"
+  },
+  "diagnostics": {
+    "loading": "Diagnóisic á luchtú…",
+    "failed": "Níorbh fhéidir an diagnóisic a luchtú.",
+    "unknown": "Níl ar fáil",
+    "ms": "{{value}} ms",
+    "cpuTime": "Am LPM",
+    "memory": "Cuimhne",
+    "peakMemory": "Buaic cuimhne",
+    "droppedEvents": "Imeachtaí a scaoileadh",
+    "droppedMessages": "Teachtaireachtaí a scaoileadh",
+    "restarts": "Atosuithe",
+    "messagesSent": "Teachtaireachtaí seolta",
+    "messagesReceived": "Teachtaireachtaí faighte",
+    "messagesRateLimited": "Teachtaireachtaí coinnithe siar ag an teorainn ráta",
+    "messagesExpired": "Teachtaireachtaí a chuaigh as feidhm",
+    "incomingRateDropped": "Teachtaireachtaí isteach a scaoileadh ag an teorainn ráta",
+    "incomingInvalid": "Teachtaireachtaí isteach neamhbhailí",
+    "log": "Logchomhad",
+    "logEmpty": "Tá an logchomhad folamh.",
+    "level": {
+      "debug": "Dífhabhtú",
+      "info": "Eolas",
+      "warn": "Rabhadh",
+      "error": "Earráid"
+    }
+  },
+  "export": {
+    "title": "Easpórtáil sonraí {{name}}",
+    "filter": "Comhad JSON",
+    "done": "Sonraí easpórtáilte."
+  },
+  "reset": {
+    "title": "Athshocraigh sonraí {{name}}?",
+    "message": "Scriostar gach rud atá stóráilte ag an mbreiseán seo. Ní féidir é seo a chealú.",
+    "confirm": "Athshocraigh sonraí",
+    "done": "Sonraí athshocraithe."
+  },
+  "remove": {
+    "title": "Bain {{name}}?",
+    "deleteData": "Scrios a shonraí freisin",
+    "hint": "Scriostar sonraí a coinníodh tar éis 30 lá. Athshuiteáil roimhe sin chun iad a fháil ar ais.",
+    "confirm": "Bain"
+  },
+  "errors": {
+    "enable": "Níorbh fhéidir an breiseán a athrú.",
+    "permissions": "Níorbh fhéidir an cead a athrú.",
+    "visibility": "Níorbh fhéidir an infheictheacht a athrú.",
+    "notifications": "Níorbh fhéidir na fógraí a athrú.",
+    "pin": "Níorbh fhéidir an leagan a bhioráint.",
+    "export": "Níorbh fhéidir na sonraí a easpórtáil.",
+    "reset": "Níorbh fhéidir na sonraí a athshocrú.",
+    "remove": "Níorbh fhéidir an breiseán a bhaint.",
+    "badge": "Níorbh fhéidir an suaitheantas a athrú.",
+    "update": "Níorbh fhéidir an breiseán a nuashonrú."
+  },
+  "update": {
+    "hint": "Nuashonrú {{version}}",
+    "button": "Nuashonraigh"
+  },
+  "visibilityChip": "Cumarsáid le húsáideoirí Mumcord eile · {{visibility}}",
+  "chips": {
+    "label": "Ceadanna a úsáidtear",
+    "uiPanel": "Painéal",
+    "uiMemberBadge": "Suaitheantas comhalta",
+    "uiProfileCard": "Cárta próifíle",
+    "uiChatCard": "Cártaí comhrá",
+    "uiUserMenu": "Roghchlár úsáideora",
+    "uiDialog": "Fuinneog féin",
+    "uiWebview": "Ábhar gréasáin",
+    "eventsSelf": "Do stádas",
+    "eventsVoice": "Gníomhaíocht gutha",
+    "eventsPresence": "Teacht isteach agus imeacht",
+    "eventsChatActivity": "Gníomhaíocht comhrá",
+    "notify": "Fógraí",
+    "randomBytes": "Uimhreacha randamacha",
+    "commands": "Orduithe",
+    "chatSend": "Postálann sa chomhrá",
+    "chatSupersedes": "Cuireann ina áit a líne téacs",
+    "chatTriggers": "Focail truicir",
+    "chatPatterns": "Patrúin chomhrá",
+    "netHttp": "Rochtain idirlín",
+    "secrets": "Eochairshlabhra"
+  },
+  "offerBadge": "Ceadanna nua"
+}

@@ -23,7 +23,8 @@
       "all": "Kaikki",
       "mentions": "Maininnat",
       "requests": "Pyynnöt",
-      "invites": "Kutsut"
+      "invites": "Kutsut",
+      "plugins": "Laajennukset"
     },
     "empty": "Kaikki on luettu.",
     "unread": "Lukemattomat",

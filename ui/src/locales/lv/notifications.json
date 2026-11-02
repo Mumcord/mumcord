@@ -26,7 +26,8 @@
       "all": "Visi",
       "mentions": "Pieminējumi",
       "requests": "Pieprasījumi",
-      "invites": "Ielūgumi"
+      "invites": "Ielūgumi",
+      "plugins": "Spraudņi"
     },
     "empty": "Viss ir izlasīts.",
     "unread": "Nelasīti",

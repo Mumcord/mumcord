@@ -7,6 +7,9 @@
 //! badge never appears for them. Hellos come from other clients and are untrusted: the decoder
 //! caps size, feature count and feature names.
 //!
+//! A bot (e.g. mumbot) adds a `bot` object with its name, version and modules; plugins use it to
+//! offer bot-specific actions only on bots (see [`crate::plugins::PluginBot`]).
+//!
 //! Features gate Mumcord-only behaviour: ask [`Engine::mumcord_user_has_feature`] before sending
 //! another Mumcord-specific plugin payload to someone.
 
@@ -16,6 +19,7 @@ use mumcord_protocol::{Handle, PLUGIN_DATA_MAX, PluginData};
 use serde::{Deserialize, Serialize};
 
 use crate::ServerId;
+use crate::plugins::PluginBot;
 use crate::session::{Engine, SessionCtx, lock};
 
 /// Plugin data id of the hello; other ids are ignored.
@@ -33,9 +37,14 @@ pub const FEATURES: &[&str] = &[
     crate::watch_party::FEATURE,
     crate::screen_share::signal::FEATURE,
     crate::pm_rules::FEATURE,
+    crate::plugins::FEATURE,
+    crate::plugins::SERVER_FEATURE,
 ];
 const MAX_FEATURES: usize = 16;
 const MAX_FEATURE_LEN: usize = 32;
+/// Caps for the untrusted `bot` object: modules per bot, and the length of names and modules.
+const MAX_BOT_MODULES: usize = 16;
+const MAX_BOT_NAME_LEN: usize = 32;
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum HelloError {
@@ -51,6 +60,53 @@ struct Wire {
     v: u32,
     #[serde(default)]
     features: Vec<String>,
+    /// Kept raw so a malformed bot object does not discard the whole hello.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    bot: Option<serde_json::Value>,
+}
+
+#[derive(Deserialize)]
+struct WireBot {
+    name: String,
+    // `version` is part of the object but not used by this client.
+    #[serde(default)]
+    modules: Vec<String>,
+}
+
+/// A decoded hello.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Hello {
+    pub features: Vec<String>,
+    /// Set when the sender says it is a bot; a malformed `bot` object is ignored.
+    pub bot: Option<PluginBot>,
+}
+
+/// Lowercase letters, digits, `-` and `.`, the alphabet of feature, bot and module names.
+fn valid_name(name: &str, max: usize) -> bool {
+    !name.is_empty()
+        && name.len() <= max
+        && name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.')
+}
+
+fn bot_of(value: serde_json::Value) -> Option<PluginBot> {
+    let wire: WireBot = serde_json::from_value(value).ok()?;
+    if !valid_name(&wire.name, MAX_BOT_NAME_LEN) {
+        return None;
+    }
+    let mut modules: Vec<String> = wire
+        .modules
+        .into_iter()
+        .filter(|m| valid_name(m, MAX_BOT_NAME_LEN))
+        .take(MAX_BOT_MODULES)
+        .collect();
+    modules.sort();
+    modules.dedup();
+    Some(PluginBot {
+        name: wire.name,
+        modules,
+    })
 }
 
 /// The features this client announces, as the engine reports them for ourselves too.
@@ -64,13 +120,14 @@ pub fn encode() -> Vec<u8> {
         app: APP.to_owned(),
         v: VERSION,
         features: own_features(),
+        bot: None,
     };
     serde_json::to_vec(&wire).unwrap_or_default()
 }
 
-/// The features announced in a hello. A higher version is still a Mumcord client: the fields
-/// read here are kept stable, newer versions only add to them.
-pub fn decode(data: &[u8]) -> Result<Vec<String>, HelloError> {
+/// The features (and bot info) announced in a hello. A higher version is still a Mumcord client:
+/// the fields read here are kept stable, newer versions only add to them.
+pub fn decode(data: &[u8]) -> Result<Hello, HelloError> {
     if data.len() > PLUGIN_DATA_MAX {
         return Err(HelloError::TooLarge);
     }
@@ -81,17 +138,15 @@ pub fn decode(data: &[u8]) -> Result<Vec<String>, HelloError> {
     let mut features: Vec<String> = wire
         .features
         .into_iter()
-        .filter(|f| {
-            !f.is_empty()
-                && f.len() <= MAX_FEATURE_LEN
-                && f.chars()
-                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.')
-        })
+        .filter(|f| valid_name(f, MAX_FEATURE_LEN))
         .take(MAX_FEATURES)
         .collect();
     features.sort();
     features.dedup();
-    Ok(features)
+    Ok(Hello {
+        features,
+        bot: wire.bot.and_then(bot_of),
+    })
 }
 
 /// Who is known as a Mumcord user, per connected server.
@@ -102,6 +157,8 @@ pub(crate) type ServerPeers = std::sync::Mutex<HashMap<ServerId, Peers>>;
 pub(crate) struct Peers {
     /// Session → announced features.
     known: HashMap<u32, Vec<String>>,
+    /// Session → bot info, for those whose hello says they are a bot.
+    bots: HashMap<u32, PluginBot>,
     /// Sessions that already got our hello on this connection.
     greeted: HashSet<u32>,
     /// Whether the connection finished syncing; joins before that are covered by the first send.
@@ -113,6 +170,10 @@ impl Peers {
         self.known.get(&session).map(Vec::as_slice)
     }
 
+    pub(crate) fn bot(&self, session: u32) -> Option<&PluginBot> {
+        self.bots.get(&session)
+    }
+
     fn reset(&mut self) {
         *self = Self::default();
     }
@@ -122,6 +183,14 @@ impl Peers {
         self.known.insert(session, features.clone()) != Some(features)
     }
 
+    /// Records the bot info of a hello; true when it changed.
+    fn learn_bot(&mut self, session: u32, bot: Option<PluginBot>) -> bool {
+        match bot {
+            Some(bot) => self.bots.insert(session, bot.clone()) != Some(bot),
+            None => self.bots.remove(&session).is_some(),
+        }
+    }
+
     /// Marks `session` as greeted; true when it was not yet (so a hello must be sent).
     fn greet(&mut self, session: u32) -> bool {
         self.greeted.insert(session)
@@ -129,6 +198,7 @@ impl Peers {
 
     fn forget(&mut self, session: u32) -> bool {
         self.greeted.remove(&session);
+        self.bots.remove(&session);
         self.known.remove(&session).is_some()
     }
 }
@@ -212,8 +282,8 @@ pub(crate) fn on_plugin_data(
     if own == Some(sender) || !known {
         return None;
     }
-    let features = match decode(&data.data) {
-        Ok(features) => features,
+    let hello = match decode(&data.data) {
+        Ok(hello) => hello,
         Err(e) => {
             tracing::debug!(error = %e, "ignoring a mumcord hello");
             return None;
@@ -223,7 +293,7 @@ pub(crate) fn on_plugin_data(
         let mut servers = lock(state);
         let peers = servers.entry(ctx.server_id).or_default();
         (
-            peers.learn(sender, features),
+            peers.learn(sender, hello.features) | peers.learn_bot(sender, hello.bot),
             peers.synced && peers.greet(sender),
         )
     };
@@ -263,7 +333,9 @@ mod tests {
 
     #[test]
     fn hello_round_trips() {
-        let features = decode(&encode()).expect("own hello decodes");
+        let hello = decode(&encode()).expect("own hello decodes");
+        assert_eq!(hello.bot, None);
+        let features = hello.features;
         assert_eq!(
             features,
             [
@@ -272,7 +344,9 @@ mod tests {
                 "now-gaming",
                 "now-playing",
                 "p2p",
+                "plugins",
                 "screen-share",
+                "server-plugins",
                 "watch-party"
             ]
         );
@@ -282,7 +356,10 @@ mod tests {
     #[test]
     fn newer_versions_and_unknown_features_are_accepted() {
         let data = br#"{"app":"mumcord","v":7,"features":["x-new","history-sync"],"extra":1}"#;
-        assert_eq!(decode(data).expect("valid"), ["history-sync", "x-new"]);
+        assert_eq!(
+            decode(data).expect("valid").features,
+            ["history-sync", "x-new"]
+        );
     }
 
     #[test]
@@ -312,9 +389,53 @@ mod tests {
             "ok".into(),
         ]);
         let json = serde_json::json!({ "app": "mumcord", "v": 1, "features": names });
-        let features = decode(json.to_string().as_bytes()).expect("valid");
+        let features = decode(json.to_string().as_bytes()).expect("valid").features;
         assert!(features.len() <= MAX_FEATURES);
         assert!(!features.iter().any(|f| f == "BAD NAME" || f.is_empty()));
+    }
+
+    #[test]
+    fn bot_info_is_read_and_sanitised() {
+        let data = br#"{"app":"mumcord","v":1,"features":["plugins"],
+            "bot":{"name":"mumbot","version":"2.1.0","modules":["music","BAD","music","radio"]}}"#;
+        assert_eq!(
+            decode(data).expect("valid").bot,
+            Some(PluginBot {
+                name: "mumbot".into(),
+                modules: vec!["music".into(), "radio".into()],
+            })
+        );
+        for bad in [
+            r#"{"name":"Mumbot"}"#,
+            r#"{"name":""}"#,
+            r#"{"modules":["music"]}"#,
+            r#""mumbot""#,
+        ] {
+            let data = format!(r#"{{"app":"mumcord","v":1,"bot":{bad}}}"#);
+            let hello = decode(data.as_bytes()).expect("the hello itself stays valid");
+            assert_eq!(hello.bot, None, "{bad}");
+        }
+        let many: Vec<String> = (0..40).map(|i| format!("m{i}")).collect();
+        let json = serde_json::json!({"app":"mumcord","v":1,"bot":{"name":"b","modules":many}});
+        let bot = decode(json.to_string().as_bytes()).expect("valid").bot;
+        assert_eq!(bot.map(|b| b.modules.len()), Some(MAX_BOT_MODULES));
+    }
+
+    #[test]
+    fn bots_are_learned_and_forgotten() {
+        let mut peers = Peers::default();
+        let bot = PluginBot {
+            name: "mumbot".into(),
+            modules: vec!["music".into()],
+        };
+        assert!(peers.learn_bot(5, Some(bot.clone())));
+        assert!(!peers.learn_bot(5, Some(bot.clone())));
+        assert_eq!(peers.bot(5), Some(&bot));
+        assert!(peers.learn_bot(5, None));
+        assert!(!peers.learn_bot(5, None));
+        peers.learn_bot(5, Some(bot));
+        peers.forget(5);
+        assert!(peers.bot(5).is_none());
     }
 
     #[test]

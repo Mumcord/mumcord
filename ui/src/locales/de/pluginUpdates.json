@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Plugin-Updates",
+    "info": "Getrennt vom App-Updater. Mumcord sucht beim Start und danach alle 6 Stunden nach Plugin-Updates.",
+    "infoLabel": "Mehr Informationen: Plugin-Updates",
+    "auto": "Automatisch installieren",
+    "notify": "Nur benachrichtigen",
+    "off": "Aus"
+  },
+  "waiting": "Updates",
+  "empty": "Alle Plugins sind aktuell.",
+  "emptyOff": "Plugin-Updates sind aus. Schalte sie oben ein, um nach Updates zu suchen.",
+  "loadFailed": "Die Updates konnten nicht geladen werden.",
+  "newAuthorKey": "Diese Version ist von einem anderen Autor signiert. Aktualisiere nur, wenn du dem neuen Autor vertraust.",
+  "rolledBack": "Version {{version}} konnte nicht starten, deshalb wurde die vorherige Version wiederhergestellt. Grund:",
+  "review": "Prüfen und aktualisieren",
+  "update": "Aktualisieren",
+  "installFailed": "{{name}} konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+  "pins": "Version festsetzen",
+  "pinsHint": "Ein festgesetztes Plugin bleibt auf seiner aktuellen Version und bekommt keine Updates angeboten.",
+  "pin": "{{name}} auf dieser Version halten",
+  "pinVersion": "Version {{version}}",
+  "versionsTo": "auf",
+  "pill": {
+    "none": "Keine neuen Berechtigungen",
+    "permission": "Braucht eine neue Berechtigung",
+    "author": "Neuer Autor"
+  },
+  "newPermissions": "Neue Berechtigungen",
+  "revoked": {
+    "title": "{{name}} wurde ausgeschaltet",
+    "text": "Version {{version}} steht auf der Sperrliste: {{reason}}. Die Plugin-Daten bleiben erhalten.",
+    "details": "Details",
+    "remove": "Entfernen"
+  },
+  "checkNow": "Jetzt prüfen",
+  "lastChecked": "Zuletzt geprüft um {{time}}",
+  "checkFailed": "Die Prüfung ist fehlgeschlagen. Bitte versuche es erneut.",
+  "modeNote": "Plugin-Updates: {{mode}}. Du kannst das unten ändern.",
+  "settings": "Update-Einstellungen",
+  "offer": {
+    "heading": "Neue Berechtigungen",
+    "title": "{{name}} {{version}} kann jetzt mehr. Diese Optionen bleiben aus, bis du sie einschaltest.",
+    "permission": "Neue optionale Berechtigung: {{permission}}",
+    "save": "Speichern",
+    "notNow": "Nicht jetzt",
+    "failed": "Die Berechtigungen von {{name}} konnten nicht geändert werden. Bitte versuche es erneut."
+  }
+}

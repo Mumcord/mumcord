@@ -1,0 +1,22 @@
+{
+  "title": "Pluginuri",
+  "tabsLabel": "Secțiunile pluginurilor",
+  "tabs": {
+    "installed": "Instalate",
+    "browse": "Răsfoiește",
+    "updates": "Actualizări",
+    "repositories": "Depozite",
+    "developer": "Dezvoltator"
+  },
+  "turnOffAll": "Dezactivează toate pluginurile",
+  "allOff": "Toate pluginurile sunt dezactivate. Rămân dezactivate, chiar și după repornire, până le reactivezi.",
+  "noPlugins": "Pluginurile sunt dezactivate pentru această sesiune (pornit cu --no-plugins).",
+  "loadFailed": "Pluginurile nu au putut fi încărcate.",
+  "palette": {
+    "label": "Paletă de comenzi",
+    "placeholder": "Scrie o comandă",
+    "empty": "Nicio comandă potrivită",
+    "openPlugins": "Pluginuri",
+    "turnOffAll": "Dezactivează toate pluginurile"
+  }
+}

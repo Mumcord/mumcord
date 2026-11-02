@@ -17,6 +17,8 @@ import {
 } from "./centreActions";
 import type { CentreItem, InviteItem, RequestItem, UpdateItem } from "./centreModel";
 import { dismissItem, setCentreOpen } from "./centreStore";
+import { usePluginIcon } from "../plugins/render/usePluginIcon";
+import { PluginActions, usePluginEntryText } from "../plugins/notifications";
 
 type T = TFunction<"notifications">;
 
@@ -27,6 +29,7 @@ function senderOf(item: CentreItem): string {
       return item.request.name;
     case "connection":
     case "update":
+    case "plugin":
       return "";
     default:
       return item.sender;
@@ -50,6 +53,8 @@ function titleOf(item: CentreItem, t: T, server: string): string {
       return t("centre.connection", { server });
     case "update":
       return t("centre.update.title", { version: item.version });
+    case "plugin":
+      return "";
   }
 }
 
@@ -64,6 +69,8 @@ function bodyOf(item: CentreItem, t: T): string {
       return item.text;
     case "update":
       return t("centre.update.body");
+    case "plugin":
+      return "";
     case "invite":
       if (item.invite === "watchParty" || item.invite === "screenShare") return "";
       return item.excerpt ? t("centre.quoted", { text: item.excerpt }) : "";
@@ -81,6 +88,7 @@ function whereOf(item: CentreItem, t: T): string {
   }
   if (item.kind === "connection") return t("centre.type.connection");
   if (item.kind === "update") return t("centre.type.update");
+  if (item.kind === "plugin") return "";
   if (item.kind === "invite") return t("centre.type.invite");
   if (item.conversation.kind !== "channel") return t("centre.type.private");
   const channel = getServerStateOf(item.serverId).channels.get(item.conversation.channelId);
@@ -267,15 +275,19 @@ export function CentreEntry({
   serverName: string;
 }) {
   const { t, i18n } = useTranslation("notifications");
-  const title = titleOf(item, t, serverName);
-  const body = bodyOf(item, t);
+  const plugin = usePluginEntryText(item.kind === "plugin" ? item : null);
+  const title = item.kind === "plugin" ? plugin.title : titleOf(item, t, serverName);
+  const body = item.kind === "plugin" ? plugin.body : bodyOf(item, t);
   const time = relativeTime(new Date(item.at).toISOString(), now, i18n.language);
-  const avatarName = senderOf(item) || serverName || "Mumcord";
+  const pluginId = item.kind === "plugin" ? item.notice.plugin : null;
+  const pluginIcon = usePluginIcon(pluginId);
+  const avatarName =
+    item.kind === "plugin" ? item.notice.name : senderOf(item) || serverName || "Mumcord";
   return (
     <li className="centre-entry" data-unread={!item.read || undefined} data-kind={item.kind}>
       <Avatar
         name={avatarName}
-        src={item.kind === "update" ? `${import.meta.env.BASE_URL}favicon.png` : null}
+        src={item.kind === "update" ? `${import.meta.env.BASE_URL}favicon.png` : pluginIcon}
       />
       <div className="centre-entry__content">
         <button
@@ -298,7 +310,15 @@ export function CentreEntry({
           {body && <span className="centre-entry__body">{body}</span>}
           <span className="centre-entry__chips">
             {serverName && <span className="centre-chip">{serverName}</span>}
-            <span className="centre-chip">{whereOf(item, t)}</span>
+            {item.kind === "plugin" ? (
+              plugin.chips.map((chip) => (
+                <span key={chip.label} className="centre-chip" data-tone={chip.tone}>
+                  {chip.label}
+                </span>
+              ))
+            ) : (
+              <span className="centre-chip">{whereOf(item, t)}</span>
+            )}
           </span>
         </button>
         {item.kind === "request" && (
@@ -316,6 +336,7 @@ export function CentreEntry({
             <UpdateActions item={item} />
           </div>
         )}
+        {item.kind === "plugin" && <PluginActions item={item} />}
       </div>
       {item.kind !== "invite" && (
         <button

@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Pluginate värskendused",
+    "info": "Rakenduse värskendajast eraldi. Mumcord otsib pluginate värskendusi käivitamisel ja seejärel iga 6 tunni järel.",
+    "infoLabel": "Lisateave: pluginate värskendused",
+    "auto": "Installi automaatselt",
+    "notify": "Anna ainult teada",
+    "off": "Väljas"
+  },
+  "waiting": "Värskendused",
+  "empty": "Kõik pluginad on ajakohased.",
+  "emptyOff": "Pluginate värskendused on väljas. Lülita need ülal sisse, et värskendusi otsida.",
+  "loadFailed": "Värskendusi ei õnnestunud laadida.",
+  "newAuthorKey": "Selle versiooni on allkirjastanud teine autor. Värskenda ainult siis, kui usaldad uut autorit.",
+  "rolledBack": "Versioon {{version}} ei käivitunud, seega taastati eelmine versioon. Põhjus:",
+  "review": "Vaata üle ja värskenda",
+  "update": "Värskenda",
+  "installFailed": "Pluginat {{name}} ei õnnestunud värskendada. Proovi uuesti.",
+  "pins": "Kinnita versioon",
+  "pinsHint": "Kinnitatud plugin jääb praegusele versioonile ja talle ei pakuta värskendusi.",
+  "pin": "Hoia {{name}} sellel versioonil",
+  "pinVersion": "Versioon {{version}}",
+  "versionsTo": "versiooniks",
+  "pill": {
+    "none": "Uusi õigusi pole",
+    "permission": "Vajab uut õigust",
+    "author": "Uus autor"
+  },
+  "newPermissions": "Uued õigused",
+  "revoked": {
+    "title": "{{name}} lülitati välja",
+    "text": "Versioon {{version}} on tühistusloendis: {{reason}}. Pluginate andmed säilivad.",
+    "details": "Üksikasjad",
+    "remove": "Eemalda"
+  },
+  "checkNow": "Kontrolli kohe",
+  "lastChecked": "Viimati kontrollitud kell {{time}}",
+  "checkFailed": "Kontroll ebaõnnestus. Proovi uuesti.",
+  "modeNote": "Pluginate uuendused: {{mode}}. Seda saad allpool muuta.",
+  "settings": "Uuenduste seaded",
+  "offer": {
+    "heading": "Uued õigused",
+    "title": "{{name}} {{version}} oskab nüüd rohkem. Need valikud on välja lülitatud, kuni sa need sisse lülitad.",
+    "permission": "Uus valikuline õigus: {{permission}}",
+    "save": "Salvesta",
+    "notNow": "Mitte praegu",
+    "failed": "Lisandmooduli {{name}} õigusi ei õnnestunud muuta. Proovi uuesti."
+  }
+}

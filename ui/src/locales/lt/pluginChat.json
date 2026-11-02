@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kortelė iš {{plugin}}",
+    "showMore": "Rodyti daugiau",
+    "showLess": "Rodyti mažiau"
+  },
+  "via": "per {{plugin}}",
+  "supersede": {
+    "showText": "Rodyti originalų tekstą",
+    "hideText": "Slėpti originalų tekstą",
+    "hiddenBy": "Paslėpė {{plugin}}"
+  },
+  "command": {
+    "list": "Papildinių komandos",
+    "keys": "↑↓ rinktis · Tab užbaigti · Enter vykdyti · Esc uždaryti",
+    "unavailable": "Ši komanda šiuo metu nepasiekiama.",
+    "failed": "Komandos įvykdyti nepavyko. Bandykite dar kartą."
+  }
+}

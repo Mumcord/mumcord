@@ -213,6 +213,20 @@
   opacity: 0;
 }
 
+.channels-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* The tree shrinks and scrolls so the plugins strip below it always stays fully visible. */
+.channels-tree-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .channels-empty {
   color: var(--color-text-secondary);
 }

@@ -1,0 +1,5 @@
+{
+  "id": "fx-notify-flood",
+  "name": "Fixture Notify Flood",
+  "permissions": { "required": ["notify"] }
+}

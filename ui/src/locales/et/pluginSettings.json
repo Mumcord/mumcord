@@ -1,0 +1,22 @@
+{
+  "title": "Pluginad",
+  "tabsLabel": "Pluginate jaotised",
+  "tabs": {
+    "installed": "Paigaldatud",
+    "browse": "Sirvi",
+    "updates": "Uuendused",
+    "repositories": "Hoidlad",
+    "developer": "Arendaja"
+  },
+  "turnOffAll": "Lülita kõik pluginad välja",
+  "allOff": "Kõik pluginad on välja lülitatud. Nad jäävad välja ka pärast taaskäivitust, kuni lülitad need uuesti sisse.",
+  "noPlugins": "Pluginad on selleks seansiks välja lülitatud (käivitatud valikuga --no-plugins).",
+  "loadFailed": "Plugin ei õnnestunud laadida.",
+  "palette": {
+    "label": "Käskude palett",
+    "placeholder": "Sisesta käsk",
+    "empty": "Sobivat käsku pole",
+    "openPlugins": "Pluginad",
+    "turnOffAll": "Lülita kõik pluginad välja"
+  }
+}

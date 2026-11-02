@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Ovaj dodatak ovdje još ništa ne prikazuje.",
+    "actionFailed": "Dodatak to nije mogao obraditi. Pokušajte ponovno."
+  },
+  "progress": {
+    "working": "U tijeku"
+  },
+  "countdown": {
+    "done": "Vrijeme je isteklo"
+  },
+  "select": {
+    "refresh": "Osvježi {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} znakova"
+  },
+  "password": {
+    "save": "Spremi",
+    "saved": "Sigurno spremljeno"
+  },
+  "file": {
+    "choose": "Odaberi datoteku…",
+    "none": "Nije odabrana datoteka"
+  },
+  "list": {
+    "handle": "Premjesti redak {{position}} od {{total}} (strelica gore ili dolje)",
+    "moved": "Redak {{from}} premješten na mjesto {{to}} od {{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopirano",
+    "failed": "Kopiranje nije uspjelo"
+  }
+}

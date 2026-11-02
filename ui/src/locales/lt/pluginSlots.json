@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Šis įskiepis čia dar nieko nerodo.",
+    "actionFailed": "Įskiepis negalėjo to apdoroti. Bandykite dar kartą."
+  },
+  "progress": {
+    "working": "Vykdoma"
+  },
+  "countdown": {
+    "done": "Laikas baigėsi"
+  },
+  "select": {
+    "refresh": "Atnaujinti: {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} simbolių"
+  },
+  "password": {
+    "save": "Išsaugoti",
+    "saved": "Saugiai išsaugota"
+  },
+  "file": {
+    "choose": "Pasirinkti failą…",
+    "none": "Failas nepasirinktas"
+  },
+  "list": {
+    "handle": "Perkelti eilutę {{position}} iš {{total}} (rodyklė aukštyn arba žemyn)",
+    "moved": "Eilutė {{from}} perkelta į {{to}} vietą iš {{total}}"
+  },
+  "copyButton": {
+    "copied": "Nukopijuota",
+    "failed": "Nepavyko nukopijuoti"
+  }
+}

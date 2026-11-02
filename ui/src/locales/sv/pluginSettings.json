@@ -1,0 +1,22 @@
+{
+  "title": "Tillägg",
+  "tabsLabel": "Avsnitt för tillägg",
+  "tabs": {
+    "installed": "Installerade",
+    "browse": "Bläddra",
+    "updates": "Uppdateringar",
+    "repositories": "Förråd",
+    "developer": "Utvecklare"
+  },
+  "turnOffAll": "Stäng av alla tillägg",
+  "allOff": "Alla tillägg är avstängda. De förblir avstängda, även efter omstart, tills du slår på dem igen.",
+  "noPlugins": "Tillägg är avstängda för den här sessionen (startad med --no-plugins).",
+  "loadFailed": "Tilläggen kunde inte läsas in.",
+  "palette": {
+    "label": "Kommandopalett",
+    "placeholder": "Skriv ett kommando",
+    "empty": "Inget matchande kommando",
+    "openPlugins": "Tillägg",
+    "turnOffAll": "Stäng av alla tillägg"
+  }
+}

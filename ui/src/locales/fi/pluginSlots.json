@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Tämä lisäosa ei vielä näytä täällä mitään.",
+    "actionFailed": "Lisäosa ei pystynyt käsittelemään tätä. Yritä uudelleen."
+  },
+  "progress": {
+    "working": "Käynnissä"
+  },
+  "countdown": {
+    "done": "Aika loppui"
+  },
+  "select": {
+    "refresh": "Päivitä {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} merkkiä"
+  },
+  "password": {
+    "save": "Tallenna",
+    "saved": "Tallennettu turvallisesti"
+  },
+  "file": {
+    "choose": "Valitse tiedosto…",
+    "none": "Tiedostoa ei ole valittu"
+  },
+  "list": {
+    "handle": "Siirrä riviä {{position}}/{{total}} (nuoli ylös tai alas)",
+    "moved": "Rivi {{from}} siirretty kohtaan {{to}}/{{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopioitu",
+    "failed": "Kopiointi epäonnistui"
+  }
+}

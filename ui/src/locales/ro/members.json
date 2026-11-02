@@ -39,7 +39,6 @@
     "sessionOnly": "Această persoană nu are certificat, așa că aceste setări durează doar în această sesiune.",
     "sendPrivateMessage": "Trimite mesaj privat",
     "privateMessage": "Mesaj privat",
-    "localSettings": "Setările tale",
     "localSettingsHint": "Doar tu le vezi. Modificările se salvează imediat.",
     "settingsFor": "Setări pentru {{name}}",
     "hintMuted": "Fără sunet",

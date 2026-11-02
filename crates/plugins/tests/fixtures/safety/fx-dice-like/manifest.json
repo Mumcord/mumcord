@@ -1,0 +1,18 @@
+{
+  "id": "fx-dice-like",
+  "name": "Fixture Dice Like",
+  "description": "Declares what Dice declares and posts to chat without a gesture",
+  "permissions": {
+    "required": [
+      "ui.chat-card",
+      "peers.messages",
+      "chat.send",
+      "chat.supersedes",
+      "random.bytes",
+      "commands"
+    ],
+    "optional": ["ui.panel"]
+  },
+  "messaging": { "max_payload": 64, "default_visibility": "everyone" },
+  "commands": [{ "name": "fxroll", "description": "Roll fixture dice", "usage": "/fxroll 2d6" }]
+}

@@ -61,7 +61,7 @@
   margin: 0;
   overflow-wrap: anywhere;
   color: var(--color-text);
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-family-mono);
   text-align: end;
 }
 

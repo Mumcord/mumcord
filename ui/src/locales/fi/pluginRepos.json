@@ -1,0 +1,60 @@
+{
+  "intro": "Arkistot ovat muiden ylläpitämiä lisäosaluetteloita. Mumcord ei tarkista niiden lisäosia. Lisää vain arkistoja, joihin luotat.",
+  "add": {
+    "button": "Lisää arkisto",
+    "title": "Lisää arkisto",
+    "address": "Arkiston osoite",
+    "expectedKey": "Odotettu avain (valinnainen)",
+    "expectedKeyHint": "Jos ylläpitäjä antoi sinulle avaimen, liitä se tähän. Arkiston on silloin käytettävä juuri tätä avainta.",
+    "check": "Tarkista arkisto",
+    "found": "Tämän löysimme",
+    "confirm": "Lisää arkisto",
+    "subtitle": "Lisää vain luotettavien ihmisten arkistoja.",
+    "signatureValid": "allekirjoitus kelvollinen",
+    "contactLine": "yhteystieto: {{contact}}",
+    "pluginsLine": "Liitännäisiä: {{number}}",
+    "signingKey": "Allekirjoitusavain",
+    "warningTitle": "Epävirallinen arkisto",
+    "warningBody": "Mumcord ei tarkista näitä liitännäisiä. Avain muistetaan: jos se muuttuu, arkisto keskeytetään, kunnes tarkistat sen. Selaaminen näyttää IP-osoitteesi ylläpitäjälle. Viralliset nimet omaavia liitännäisiä ei koskaan oteta tästä."
+  },
+  "limit": "Voit lisätä enintään {{max}} arkistoa.",
+  "limitReached": "Enimmäismäärä {{max}} arkistoa on saavutettu.",
+  "empty": "Arkistoja ei ole vielä lisätty.",
+  "listLabel": "Lisätyt arkistot",
+  "loadFailed": "Arkistoja ei voitu ladata.",
+  "status": {
+    "keyChanged": "Avain muuttunut, keskeytetty"
+  },
+  "fingerprintLine": "Avaimen sormenjälki: {{fingerprint}}",
+  "neverChecked": "Ei vielä tarkistettu",
+  "lastChecked": "Viimeksi tarkistettu: {{when}}",
+  "installedCount": "Asennetut lisäosat: {{number}}",
+  "toggle": "Käytä arkistoa {{name}}",
+  "remove": {
+    "button": "Poista",
+    "label": "Poista {{name}}",
+    "title": "Poistetaanko {{name}}?",
+    "message": "Arkisto poistetaan ja sen lisäosat kytketään pois päältä. Ne pysyvät asennettuina tietoineen, mutta eivät saa enää päivityksiä.",
+    "confirm": "Poista"
+  },
+  "keyChange": {
+    "title": "{{name}} vaihtoi avaimensa",
+    "message": "Tämä arkisto allekirjoittaa lisäosaluettelonsa nyt toisella avaimella. Se pysyy keskeytettynä, kunnes päätät. Luota uuteen avaimeen vain, jos ylläpitäjä kertoi muutoksesta.",
+    "oldKey": "Tähän asti luotettu avain",
+    "newKey": "Uusi avain",
+    "keepPaused": "Pidä keskeytettynä",
+    "trust": "Luota uuteen avaimeen",
+    "review": "Tarkista avaimen vaihto"
+  },
+  "mirror": {
+    "title": "Lisäasetukset",
+    "label": "Virallisen lisäosaluettelon peilipalvelin (valinnainen)",
+    "hint": "Muuta tätä vain, jos sait peilin osoitteen. Peilin on tarjottava samat allekirjoitetut tiedostot; Mumcord tarkistaa silti jokaisen allekirjoituksen.",
+    "save": "Tallenna",
+    "reset": "Käytä oletusta"
+  },
+  "official": {
+    "name": "Mumcordin viralliset liitännäiset",
+    "alwaysOn": "Aina käytössä"
+  }
+}

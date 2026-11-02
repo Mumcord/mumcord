@@ -1,6 +1,5 @@
 {
   "follow": "Segui",
-  "following": "Seguito",
   "unsupported": "Per seguire i canali serve un server con versione 1.4 o successiva.",
   "unread_one": "{{count}} messaggio non letto",
   "unread_many": "{{count}} messaggi non letti",

@@ -1,0 +1,125 @@
+{
+  "listLabel": "Geïnstalleerde plugins",
+  "empty": "Nog geen plugins.",
+  "browse": "Plugins bekijken",
+  "enable": "{{name}} aan",
+  "labels": {
+    "official": "Officieel",
+    "unofficial": "Onofficieel · {{repository}}",
+    "unofficialUnknown": "Onofficieel",
+    "developer": "Ontwikkelaarsplugin",
+    "autoOff": "Uitgezet na herhaalde crashes",
+    "backingOff": "Herstart na een crash",
+    "notLoaded": "Kon niet worden geladen",
+    "revoked": "Uitgezet door Mumcord: {{reason}}",
+    "revocationWarning": "Waarschuwing van Mumcord: {{reason}}",
+    "tampered": "De bestanden van deze plugin zijn gewijzigd",
+    "permission": "Uitgezet omdat een vereiste toestemming uit staat"
+  },
+  "details": {
+    "open": "Details van {{name}}",
+    "permissions": "Toestemmingen",
+    "visibility": "Wie de activiteit van deze plugin kan zien",
+    "visibilityOptions": {
+      "everyone": "Iedereen",
+      "friends": "Alleen vrienden",
+      "nobody": "Niemand"
+    },
+    "notifications": "Meldingen",
+    "pin": "Versie {{version}} vastzetten (geen automatische updates)",
+    "settings": "Plugin-instellingen",
+    "diagnostics": "Diagnostiek",
+    "export": "Gegevens exporteren",
+    "reset": "Gegevens resetten",
+    "remove": "Verwijderen",
+    "commandTaken": "/{{command}}: Opdracht al in gebruik door {{plugin}}"
+  },
+  "badge": {
+    "label": "Badge naast namen",
+    "none": "Geen"
+  },
+  "diagnostics": {
+    "loading": "Diagnostiek laden…",
+    "failed": "De diagnostiek kon niet worden geladen.",
+    "unknown": "Niet beschikbaar",
+    "ms": "{{value}} ms",
+    "cpuTime": "CPU-tijd",
+    "memory": "Geheugen",
+    "peakMemory": "Piekgeheugen",
+    "droppedEvents": "Weggegooide gebeurtenissen",
+    "droppedMessages": "Weggegooide berichten",
+    "restarts": "Herstarts",
+    "messagesSent": "Verzonden berichten",
+    "messagesReceived": "Ontvangen berichten",
+    "messagesRateLimited": "Berichten vastgehouden door de snelheidslimiet",
+    "messagesExpired": "Verlopen berichten",
+    "incomingRateDropped": "Inkomende berichten weggegooid door de snelheidslimiet",
+    "incomingInvalid": "Ongeldige inkomende berichten",
+    "log": "Logboek",
+    "logEmpty": "Het logboek is leeg.",
+    "level": {
+      "debug": "Debug",
+      "info": "Info",
+      "warn": "Waarschuwing",
+      "error": "Fout"
+    }
+  },
+  "export": {
+    "title": "Gegevens van {{name}} exporteren",
+    "filter": "JSON-bestand",
+    "done": "Gegevens geëxporteerd."
+  },
+  "reset": {
+    "title": "Gegevens van {{name}} resetten?",
+    "message": "Alles wat deze plugin heeft opgeslagen wordt verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "confirm": "Gegevens resetten",
+    "done": "Gegevens gereset."
+  },
+  "remove": {
+    "title": "{{name}} verwijderen?",
+    "deleteData": "Ook de gegevens verwijderen",
+    "hint": "Bewaarde gegevens worden na 30 dagen verwijderd. Installeer de plugin eerder opnieuw om ze terug te krijgen.",
+    "confirm": "Verwijderen"
+  },
+  "errors": {
+    "enable": "De plugin kon niet worden omgeschakeld.",
+    "permissions": "De toestemming kon niet worden gewijzigd.",
+    "visibility": "De zichtbaarheid kon niet worden gewijzigd.",
+    "notifications": "De meldingen konden niet worden gewijzigd.",
+    "pin": "De versie kon niet worden vastgezet.",
+    "export": "De gegevens konden niet worden geëxporteerd.",
+    "reset": "De gegevens konden niet worden gereset.",
+    "remove": "De plugin kon niet worden verwijderd.",
+    "badge": "De badge kon niet worden gewijzigd.",
+    "update": "De plug-in kon niet worden bijgewerkt."
+  },
+  "update": {
+    "hint": "Update {{version}}",
+    "button": "Bijwerken"
+  },
+  "visibilityChip": "Praat met andere Mumcord-gebruikers · {{visibility}}",
+  "chips": {
+    "label": "Gebruikte rechten",
+    "uiPanel": "Paneel",
+    "uiMemberBadge": "Ledenbadge",
+    "uiProfileCard": "Profielkaart",
+    "uiChatCard": "Chatkaarten",
+    "uiUserMenu": "Gebruikersmenu",
+    "uiDialog": "Eigen venster",
+    "uiWebview": "Webinhoud",
+    "eventsSelf": "Je status",
+    "eventsVoice": "Spraakactiviteit",
+    "eventsPresence": "Binnenkomsten en vertrekken",
+    "eventsChatActivity": "Chatactiviteit",
+    "notify": "Meldingen",
+    "randomBytes": "Willekeurige getallen",
+    "commands": "Commando's",
+    "chatSend": "Schrijft in de chat",
+    "chatSupersedes": "Vervangt zijn tekstregel",
+    "chatTriggers": "Triggerwoorden",
+    "chatPatterns": "Chatpatronen",
+    "netHttp": "Internettoegang",
+    "secrets": "Sleutelhanger"
+  },
+  "offerBadge": "Nieuwe machtigingen"
+}

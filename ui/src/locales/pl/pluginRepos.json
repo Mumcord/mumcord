@@ -1,0 +1,60 @@
+{
+  "intro": "Repozytoria to dodatkowe listy wtyczek prowadzone przez inne osoby. Mumcord nie sprawdza ich wtyczek. Dodawaj tylko repozytoria, którym ufasz.",
+  "add": {
+    "button": "Dodaj repozytorium",
+    "title": "Dodaj repozytorium",
+    "address": "Adres repozytorium",
+    "expectedKey": "Oczekiwany klucz (opcjonalnie)",
+    "expectedKeyHint": "Jeśli właściciel podał Ci klucz, wklej go tutaj. Repozytorium musi wtedy używać dokładnie tego klucza.",
+    "check": "Sprawdź repozytorium",
+    "found": "Oto co znaleźliśmy",
+    "confirm": "Dodaj repozytorium",
+    "subtitle": "Dodawaj tylko repozytoria od osób, którym ufasz.",
+    "signatureValid": "podpis prawidłowy",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Wtyczki: {{number}}",
+    "signingKey": "Klucz podpisu",
+    "warningTitle": "Nieoficjalne repozytorium",
+    "warningBody": "Mumcord nie sprawdza tych wtyczek. Klucz jest zapamiętywany: jeśli się zmieni, repozytorium zostanie wstrzymane, dopóki go nie sprawdzisz. Przeglądanie pokazuje twój adres IP jego hostowi. Wtyczki o oficjalnych nazwach nigdy nie są stąd pobierane."
+  },
+  "limit": "Możesz dodać do {{max}} repozytoriów.",
+  "limitReached": "Osiągnięto limit {{max}} repozytoriów.",
+  "empty": "Nie dodano jeszcze żadnych repozytoriów.",
+  "listLabel": "Dodane repozytoria",
+  "loadFailed": "Nie udało się wczytać repozytoriów.",
+  "status": {
+    "keyChanged": "Klucz zmieniony, wstrzymano"
+  },
+  "fingerprintLine": "Odcisk klucza: {{fingerprint}}",
+  "neverChecked": "Jeszcze nie sprawdzono",
+  "lastChecked": "Ostatnie sprawdzenie: {{when}}",
+  "installedCount": "Zainstalowane wtyczki: {{number}}",
+  "toggle": "Używaj {{name}}",
+  "remove": {
+    "button": "Usuń",
+    "label": "Usuń {{name}}",
+    "title": "Usunąć {{name}}?",
+    "message": "Repozytorium zostanie usunięte, a jego wtyczki wyłączone. Pozostaną zainstalowane razem z danymi, ale nie będą już dostawać aktualizacji.",
+    "confirm": "Usuń"
+  },
+  "keyChange": {
+    "title": "{{name}} zmieniło klucz",
+    "message": "To repozytorium podpisuje teraz listę wtyczek innym kluczem. Pozostaje wstrzymane, dopóki nie zdecydujesz. Zaufaj nowemu kluczowi tylko wtedy, gdy właściciel zapowiedział zmianę.",
+    "oldKey": "Dotąd zaufany klucz",
+    "newKey": "Nowy klucz",
+    "keepPaused": "Zostaw wstrzymane",
+    "trust": "Zaufaj nowemu kluczowi",
+    "review": "Sprawdź zmianę klucza"
+  },
+  "mirror": {
+    "title": "Zaawansowane",
+    "label": "Serwer lustrzany oficjalnej listy wtyczek (opcjonalnie)",
+    "hint": "Zmień to tylko wtedy, gdy dostałeś adres serwera lustrzanego. Serwer musi udostępniać te same podpisane pliki; Mumcord i tak sprawdza każdy podpis.",
+    "save": "Zapisz",
+    "reset": "Użyj domyślnego"
+  },
+  "official": {
+    "name": "Oficjalne wtyczki Mumcord",
+    "alwaysOn": "Zawsze włączone"
+  }
+}

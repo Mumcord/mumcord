@@ -1,0 +1,219 @@
+/* Settings → Plugins → Browse. Colours come from theme tokens only. */
+.plugin-browse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.plugin-browse-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.plugin-browse-categories {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plugin-browse-categories .settings-button {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.plugin-browse-categories [aria-pressed="true"] {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-elevated);
+  font-weight: 600;
+}
+
+.plugin-browse-notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.plugin-browse-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 40rem) {
+  .plugin-browse-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.plugin-browse-search.settings-input {
+  max-width: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.plugin-browse-footer {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.plugin-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.plugin-card:hover {
+  background: var(--color-bg-elevated);
+}
+
+.plugin-card-body {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.plugin-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plugin-card-name {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.plugin-card-open {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.plugin-card-open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+}
+
+.plugin-card-open:focus-visible::after {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.plugin-card-meta,
+.plugin-card-summary {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plugin-card-meta {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.plugin-card-summary {
+  font-size: 0.9rem;
+}
+
+.plugin-card-install,
+.plugin-card-installed {
+  position: relative;
+  flex: none;
+}
+
+.plugin-card-installed {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.plugin-label {
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: 0.85em;
+}
+
+.plugin-label-unofficial {
+  border-style: dashed;
+}
+
+.plugin-browse-icon {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.plugin-browse-initial {
+  display: grid;
+  place-items: center;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.plugin-refresh {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.plugin-refresh .settings-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plugin-refresh__result {
+  color: var(--color-text-muted);
+}
+
+.plugin-refresh__spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: plugin-refresh-spin 0.8s linear infinite;
+}
+
+@keyframes plugin-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plugin-refresh__spinner {
+    animation-duration: 2.4s;
+  }
+}

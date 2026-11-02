@@ -15,7 +15,8 @@
     "advanced": "Advanced & Developer",
     "about": "About",
     "packetInspector": "Packet inspector",
-    "hotkeys": "Hotkeys"
+    "hotkeys": "Hotkeys",
+    "plugins": "Plugins"
   },
   "sectionDescriptions": {
     "general": "Startup, language, updates and accessibility.",
@@ -27,7 +28,8 @@
     "servers": "Connections to several servers and settings per server.",
     "gaming": "The in-game overlay, positional audio and game plugins.",
     "advanced": "Developer tools, diagnostics, storage and licences.",
-    "about": "Version, support and the setup wizard."
+    "about": "Version, support and the setup wizard.",
+    "plugins": "Plugins run in a sandbox and only get what you allow. They never see your audio, files or certificate."
   },
   "breadcrumb": "Settings / {{section}}",
   "moreInfo": "More information: {{topic}}",
@@ -1043,5 +1045,10 @@
     "addConfirm": "Add",
     "reset": "Reset all hotkeys",
     "resetHint": "Removes every hotkey except push-to-talk; nothing is set by default."
+  },
+  "developerMode": {
+    "title": "Developer mode",
+    "switch": "Developer mode",
+    "hint": "Adds a Developer tab to Plugins where you can load unsigned plugins from a folder. Only turn it on if you build plugins yourself."
   }
 }

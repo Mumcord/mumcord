@@ -29,7 +29,6 @@
   "bitrate": "Bitrate",
   "path": "Pad",
   "pathDirect": "Direct",
-  "pathUnknown": "Onbekend",
   "sound": "Geluid",
   "soundOn": "Geluid aan",
   "soundOff": "Geluid uit",

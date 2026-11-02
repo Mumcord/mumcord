@@ -1,0 +1,35 @@
+{
+  "hint": "Carga una carpeta de plugin sin empaquetar para probarla. Los plugins de desarrollo no están firmados, nunca son oficiales y no pueden obtener net.http, secrets ni ui.webview. Se descargan al desactivar el modo de desarrollador.",
+  "load": "Cargar carpeta de plugin…",
+  "pickFolder": "Elige la carpeta del plugin",
+  "empty": "No hay ningún plugin de desarrollo cargado.",
+  "listLabel": "Plugins de desarrollo",
+  "label": "Plugin de desarrollo",
+  "status": {
+    "running": "En ejecución",
+    "off": "Desactivado",
+    "backingOff": "Reiniciando tras un fallo",
+    "autoOff": "Desactivado tras fallos repetidos",
+    "allOff": "Todos los plugins están desactivados",
+    "noPlugins": "Los plugins están desactivados en esta sesión",
+    "notLoaded": "No se pudo cargar"
+  },
+  "showLog": "Mostrar el registro de {{name}}",
+  "reload": "Recargar {{name}}",
+  "unload": "Descargar {{name}}",
+  "logLabel": "Registro de {{name}}",
+  "logTitle": "Registro de {{name}}",
+  "logEmpty": "Aún no hay líneas de registro.",
+  "level": {
+    "debug": "Depuración",
+    "info": "Info",
+    "warn": "Aviso",
+    "error": "Error"
+  },
+  "errors": {
+    "load": "No se pudo cargar la carpeta del plugin.",
+    "reload": "No se pudo recargar el plugin.",
+    "unload": "No se pudo descargar el plugin.",
+    "log": "No se pudo leer el registro."
+  }
+}

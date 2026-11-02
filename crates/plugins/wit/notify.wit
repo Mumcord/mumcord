@@ -1,0 +1,13 @@
+/// Notifications (FR-6.22). Needs the `notify` permission.
+///
+/// Each call adds one entry to Mumcord's notification centre, category Plugins, shown with the
+/// plugin's name and icon; there is never an OS notification. Limits: 1 per 10 minutes and 3 per
+/// day per plugin; title at most 64 characters, body at most 200 characters.
+interface notify {
+  use types.{error};
+
+  /// Errors: `not-permitted`, `too-large`, `rate-limited`. During Do Not Disturb or quiet time,
+  /// or when the user switched this plugin's notifications off, the notification is dropped
+  /// (not queued) and the call still returns ok.
+  send: func(title: string, body: string) -> result<_, error>;
+}

@@ -5,6 +5,7 @@
  * no save button, so nothing at the bottom can be mistaken for one (QA.63). The engine stores
  * them per certificate hash; people without a certificate are only adjusted for this session.
  */
+import { PluginProfileSections } from "../plugins/badges";
 import DOMPurify from "dompurify";
 import {
   useCallback,
@@ -117,6 +118,13 @@ export function ProfileCard({
       aria-labelledby={titleId}
       aria-modal="true"
       onKeyDown={onKeyDown}
+      onCancel={(event) => {
+        // Escape with focus outside the card's content (e.g. on a button that was just
+        // disabled) only fires the native cancel: close through onClose too, or the card's
+        // state stays open and opening the same person again shows nothing.
+        event.preventDefault();
+        onClose();
+      }}
     >
       <ProfileBody
         key={session}
@@ -240,6 +248,7 @@ function ProfileBody({
       {loadError && <p className="profile-card__note">{t("card.loadFailed")}</p>}
       <NowGamingFor session={user.session} serverId={serverId} joinable={!isSelf} />
       <NowPlayingFor session={user.session} serverId={serverId} />
+      <PluginProfileSections session={user.session} />
       {comment && (
         <div
           className="profile-card__comment"

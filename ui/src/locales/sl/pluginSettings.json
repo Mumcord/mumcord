@@ -1,0 +1,22 @@
+{
+  "title": "Vtičniki",
+  "tabsLabel": "Razdelki vtičnikov",
+  "tabs": {
+    "installed": "Nameščeni",
+    "browse": "Brskanje",
+    "updates": "Posodobitve",
+    "repositories": "Repozitoriji",
+    "developer": "Razvijalec"
+  },
+  "turnOffAll": "Izklopi vse vtičnike",
+  "allOff": "Vsi vtičniki so izklopljeni. Ostanejo izklopljeni, tudi po ponovnem zagonu, dokler jih ne vklopite.",
+  "noPlugins": "Vtičniki so za to sejo izklopljeni (zagnano z --no-plugins).",
+  "loadFailed": "Vtičnikov ni bilo mogoče naložiti.",
+  "palette": {
+    "label": "Paleta ukazov",
+    "placeholder": "Vnesite ukaz",
+    "empty": "Ni ustreznega ukaza",
+    "openPlugins": "Vtičniki",
+    "turnOffAll": "Izklopi vse vtičnike"
+  }
+}

@@ -23,7 +23,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost; media-src 'self' blob:; frame-src http://localhost:* https://open.spotify.com/embed/ https://w.soundcloud.com/player/"
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost; media-src 'self' blob:; frame-src http://localhost:* https://open.spotify.com/embed/ https://w.soundcloud.com/player/ mumcord-web://localhost http://mumcord-web.localhost"
     }
   },
   "bundle": {
@@ -61,7 +61,7 @@
     },
     "deep-link": {
       "desktop": {
-        "schemes": ["mumble"]
+        "schemes": ["mumble", "mumcord"]
       }
     }
   }

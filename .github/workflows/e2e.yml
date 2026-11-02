@@ -2,10 +2,11 @@ name: E2E
 
 # UI end-to-end tests in the e2e/ Docker image (WebKitWebDriver + tauri-driver, Xvfb) against
 # the local testenv Mumble servers. Slow, so separate from CI: on pull requests to main and manual
-# runs. One job builds the image and the debug binaries once, eight shard jobs run the spec files
-# of e2e/shards.json in parallel (each runner has its own test servers), and "Linux E2E" (the
-# check main's branch protection requires) passes only when all of them passed.
-# A push to main runs only the build job, to save the build caches there: pull requests can read
+# runs. One job builds the image and the debug binaries once, one the fixture plugin packages,
+# eight shard jobs run the spec files of e2e/shards.json in parallel (each runner has its own test
+# servers), and "Linux E2E" (the check main's branch protection requires) passes only when all of
+# them passed.
+# A push to main runs only the two build jobs, to save the build caches there: pull requests can read
 # main's caches but not each other's, and they only restore, because one ~2 GB copy per pull
 # request filled the 10 GB repository cache and evicted everything else.
 on:
@@ -139,12 +140,66 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  # The fixture plugin registry's CLI and packages (scripts/e2e-plugin-registry.sh): built on the
+  # runner, not in the image, because they need the wasm32 target, the plugins' pinned toolchain
+  # and the Mumcord/plugins sources. Runs next to the build job; the shards take the result.
+  plugins:
+    name: E2E plugin packages
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/target
+      # The plugin sources and their own target dirs, kept in the cache below.
+      MUMCORD_PLUGINS_CACHE: /home/runner/.cache/mumcord-plugins-src
+      # The official plugins pin their toolchain (rust-toolchain.toml, with the wasm32 target);
+      # rustup installs it on first use.
+      RUSTUP_AUTO_INSTALL: 1
+      CARGO_PROFILE_DEV_DEBUG: 0
+      CARGO_INCREMENTAL: 0
+    steps:
+      - uses: actions/checkout@v7
+
+      # The safety fixture builder and the SDK need the wasm32 target of the workspace toolchain.
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: e2e-plugins
+          cache-directories: ${{ env.MUMCORD_PLUGINS_CACHE }}
+          save-if: ${{ github.event_name != 'pull_request' }}
+
+      - name: Build plugin CLI and packages
+        run: scripts/e2e-plugin-registry.sh --build-only "$RUNNER_TEMP/plugins"
+
+      # tar keeps the CLI's executable bit that artifacts would drop.
+      - name: Package plugin CLI and packages
+        if: github.event_name != 'push'
+        run: tar -C "$RUNNER_TEMP/plugins" -cf - bin staged | zstd -T0 -3 -q -o e2e-plugins.tar.zst
+
+      - if: github.event_name != 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-plugins
+          overwrite: true
+          path: e2e-plugins.tar.zst
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
+
   shard:
     name: E2E shard ${{ matrix.shard }}
-    needs: build
+    needs: [build, plugins]
     if: github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      # The plugins job's CLI and packages; e2e/run.sh mounts them into the container, where
+      # scripts/e2e-plugin-registry.sh takes them instead of building.
+      MUMCORD_E2E_PLUGIN_PACKAGES: /home/runner/.cache/mumcord-e2e-plugins
     strategy:
       fail-fast: false
       matrix:
@@ -159,13 +214,18 @@ jobs:
         with:
           name: e2e-build
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: e2e-plugins
+
       - name: Load image and binaries
         shell: bash
         run: |
           zstd -dc e2e-image.tar.zst | docker load -q
-          mkdir -p "$MUMCORD_E2E_CACHE/target/debug"
+          mkdir -p "$MUMCORD_E2E_CACHE/target/debug" "$MUMCORD_E2E_PLUGIN_PACKAGES"
           zstd -dc e2e-bin.tar.zst | tar -C "$MUMCORD_E2E_CACHE/target/debug" -xf -
-          rm e2e-image.tar.zst e2e-bin.tar.zst
+          zstd -dc e2e-plugins.tar.zst | tar -C "$MUMCORD_E2E_PLUGIN_PACKAGES" -xf -
+          rm e2e-image.tar.zst e2e-bin.tar.zst e2e-plugins.tar.zst
 
       # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
       - name: Run E2E shard
@@ -186,19 +246,20 @@ jobs:
   # this job must run and fail when the build failed and the shards were skipped.
   e2e:
     name: Linux E2E
-    needs: [changes, build, shard]
+    needs: [changes, build, plugins, shard]
     if: always() && github.event_name != 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Check build and shard results
         run: |
-          echo "changes: $CHANGES, build: $BUILD, shards: $SHARDS"
+          echo "changes: $CHANGES, build: $BUILD, plugins: $PLUGINS, shards: $SHARDS"
           [ "$CHANGES" = success ] || exit 1
           # No code change: build and shards are skipped on purpose.
-          if [ "$BUILD" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
-          [ "$BUILD" = success ] && [ "$SHARDS" = success ]
+          if [ "$BUILD" = skipped ] && [ "$PLUGINS" = skipped ] && [ "$SHARDS" = skipped ]; then exit 0; fi
+          [ "$BUILD" = success ] && [ "$PLUGINS" = success ] && [ "$SHARDS" = success ]
         env:
           CHANGES: ${{ needs.changes.result }}
           BUILD: ${{ needs.build.result }}
+          PLUGINS: ${{ needs.plugins.result }}
           SHARDS: ${{ needs.shard.result }}

@@ -111,6 +111,35 @@ pub struct ThemeRecord {
     pub dark_generated: bool,
 }
 
+/// How plugin updates are handled.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum PluginUpdates {
+    Auto,
+    Notify,
+    Off,
+}
+
+impl From<store::PluginUpdates> for PluginUpdates {
+    fn from(value: store::PluginUpdates) -> Self {
+        match value {
+            store::PluginUpdates::Auto => Self::Auto,
+            store::PluginUpdates::Notify => Self::Notify,
+            store::PluginUpdates::Off => Self::Off,
+        }
+    }
+}
+
+impl From<PluginUpdates> for store::PluginUpdates {
+    fn from(value: PluginUpdates) -> Self {
+        match value {
+            PluginUpdates::Auto => Self::Auto,
+            PluginUpdates::Notify => Self::Notify,
+            PluginUpdates::Off => Self::Off,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Theme {
@@ -594,6 +623,16 @@ pub struct Settings {
     pub positional: PositionalSettings,
     /// How many servers may be connected at once, 1 – 15 (default 5; FR-2.1).
     pub max_connected_servers: u8,
+    /// Plugin update behaviour (default `auto`).
+    pub plugins_updates: PluginUpdates,
+    /// "Turn off all plugins".
+    pub plugins_all_off: bool,
+    /// The plugin whose badge is shown next to names; `null` for none.
+    pub plugins_badge_plugin: Option<String>,
+    /// Optional mirror of the official plugin repository.
+    pub plugins_mirror_url: Option<String>,
+    /// Developer mode (dev folders, local HTTP repositories).
+    pub developer_mode: bool,
     /// Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14).
     pub app_theme_id: String,
     pub custom_themes: Vec<ThemeRecord>,
@@ -737,6 +776,11 @@ impl Settings {
                 max_distance: s.positional.max_distance,
             },
             max_connected_servers: s.max_connected_servers,
+            plugins_updates: s.plugins_updates.into(),
+            plugins_all_off: s.plugins_all_off,
+            plugins_badge_plugin: s.plugins_badge_plugin.clone(),
+            plugins_mirror_url: s.plugins_mirror_url.clone(),
+            developer_mode: s.developer_mode,
             app_theme_id: s.app_theme_id.clone(),
             custom_themes: s
                 .custom_themes
@@ -892,6 +936,12 @@ impl Settings {
             store::MAX_UPDATE_INTERVAL_HOURS,
         );
         s.update_skipped.clone_from(&self.update_skipped);
+        s.plugins_updates = self.plugins_updates.into();
+        s.plugins_all_off = self.plugins_all_off;
+        s.plugins_badge_plugin
+            .clone_from(&self.plugins_badge_plugin);
+        s.plugins_mirror_url.clone_from(&self.plugins_mirror_url);
+        s.developer_mode = self.developer_mode;
         s.appimage_menu_entry = self.appimage_menu_entry.into();
         s.window_overlay_notice_shown = self.window_overlay_notice_shown;
         s.whats_new_auto = self.whats_new_auto;
@@ -1076,6 +1126,9 @@ pub async fn settings_update(
     }
     if stored.language != previous.language {
         crate::tray::language_changed(&app);
+    }
+    if stored.developer_mode != previous.developer_mode {
+        crate::plugins::developer_mode_changed(&app, stored.developer_mode);
     }
     Ok(Settings::from_store(&stored))
 }

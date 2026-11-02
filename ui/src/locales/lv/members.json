@@ -39,7 +39,6 @@
     "sessionOnly": "Šim cilvēkam nav sertifikāta, tāpēc šie iestatījumi darbojas tikai šajā sesijā.",
     "sendPrivateMessage": "Sūtīt privātu ziņu",
     "privateMessage": "Privāta ziņa",
-    "localSettings": "Tavi iestatījumi",
     "localSettingsHint": "Tikai tu tos redzi. Izmaiņas tiek saglabātas uzreiz.",
     "settingsFor": "{{name}} iestatījumi",
     "hintMuted": "Apklusināts",

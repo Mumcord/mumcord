@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Dieses Plugin zeigt hier noch nichts an.",
+    "actionFailed": "Das Plugin konnte das nicht verarbeiten. Bitte versuche es erneut."
+  },
+  "progress": {
+    "working": "Läuft"
+  },
+  "countdown": {
+    "done": "Zeit abgelaufen"
+  },
+  "select": {
+    "refresh": "{{label}} aktualisieren"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} Zeichen"
+  },
+  "password": {
+    "save": "Speichern",
+    "saved": "Sicher gespeichert"
+  },
+  "file": {
+    "choose": "Datei auswählen…",
+    "none": "Keine Datei ausgewählt"
+  },
+  "list": {
+    "handle": "Zeile {{position}} von {{total}} verschieben (Pfeil nach oben oder unten)",
+    "moved": "Zeile {{from}} an Position {{to}} von {{total}} verschoben"
+  },
+  "copyButton": {
+    "copied": "Kopiert",
+    "failed": "Kopieren fehlgeschlagen"
+  }
+}

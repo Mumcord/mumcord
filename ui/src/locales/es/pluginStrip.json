@@ -1,0 +1,7 @@
+{
+  "heading": "Plugins",
+  "list": "Paneles de plugins",
+  "expand": "Ampliar {{name}}",
+  "close": "Cerrar",
+  "unsupported": "Este servidor no admite las funciones compartidas de los plugins"
+}

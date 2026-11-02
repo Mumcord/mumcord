@@ -1,0 +1,30 @@
+{
+  "type": "Bővítmény",
+  "autoOff": {
+    "title": "A(z) {{name}} ki lett kapcsolva",
+    "body": "Ismételt összeomlások után kikapcsolva",
+    "open": "Megjelenítés a Bővítményekben"
+  },
+  "update": {
+    "title": "Frissítés ehhez: {{name}}",
+    "body": "A(z) {{version}} verzió a Frissítések lapon vár",
+    "open": "Frissítések megjelenítése"
+  },
+  "suggestion": {
+    "title": "Ez a szerver ezt használja: {{name}}",
+    "noReason": "A szerver javasolta",
+    "install": "Telepítés…",
+    "installLabel": "{{name}} telepítése",
+    "addRepositoryLabel": "Tároló hozzáadása ehhez: {{name}}",
+    "details": "Részletek megtekintése",
+    "detailsLabel": "{{name}} részletei",
+    "notNow": "Most nem",
+    "notNowLabel": "{{name}} elrejtése egyelőre",
+    "dontAsk": "Ne kérdezze újra ennél a szervernél",
+    "recommended": "Ajánlott",
+    "official": "Hivatalos",
+    "unofficial": "Nem hivatalos · {{host}}",
+    "footer": "A javaslatok soha nem telepítenek semmit maguktól. A szerver nem tudja meg, mit telepítesz."
+  },
+  "failed": "Ez nem sikerült. Próbálja újra."
+}

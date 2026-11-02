@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Aggiornamenti dei plugin",
+    "info": "Separato dall'aggiornamento dell'app. Mumcord cerca aggiornamenti dei plugin all'avvio e ogni 6 ore.",
+    "infoLabel": "Maggiori informazioni: aggiornamenti dei plugin",
+    "auto": "Installa automaticamente",
+    "notify": "Solo notifica",
+    "off": "Disattivati"
+  },
+  "waiting": "Aggiornamenti",
+  "empty": "Tutti i plugin sono aggiornati.",
+  "emptyOff": "Gli aggiornamenti dei plugin sono disattivati. Attivali qui sopra per cercare aggiornamenti.",
+  "loadFailed": "Impossibile caricare gli aggiornamenti.",
+  "newAuthorKey": "Questa versione è firmata da un altro autore. Aggiorna solo se ti fidi del nuovo autore.",
+  "rolledBack": "La versione {{version}} non si è avviata, quindi è stata ripristinata la versione precedente. Motivo:",
+  "review": "Controlla e aggiorna",
+  "update": "Aggiorna",
+  "installFailed": "Impossibile aggiornare {{name}}. Riprova.",
+  "pins": "Blocca versione",
+  "pinsHint": "Un plugin bloccato resta alla versione attuale e non riceve proposte di aggiornamento.",
+  "pin": "Mantieni {{name}} su questa versione",
+  "pinVersion": "Versione {{version}}",
+  "versionsTo": "a",
+  "pill": {
+    "none": "Nessun nuovo permesso",
+    "permission": "Richiede un nuovo permesso",
+    "author": "Nuovo autore"
+  },
+  "newPermissions": "Nuovi permessi",
+  "revoked": {
+    "title": "{{name}} è stato disattivato",
+    "text": "La versione {{version}} è nell'elenco di revoca: {{reason}}. I dati del plugin vengono conservati.",
+    "details": "Dettagli",
+    "remove": "Rimuovi"
+  },
+  "checkNow": "Controlla ora",
+  "lastChecked": "Ultimo controllo alle {{time}}",
+  "checkFailed": "Il controllo non è riuscito. Riprova.",
+  "modeNote": "Aggiornamenti dei plugin: {{mode}}. Puoi cambiarlo qui sotto.",
+  "settings": "Impostazioni di aggiornamento",
+  "offer": {
+    "heading": "Nuove autorizzazioni",
+    "title": "{{name}} {{version}} ora può fare di più. Queste opzioni restano disattivate finché non le attivi.",
+    "permission": "Nuova autorizzazione facoltativa: {{permission}}",
+    "save": "Salva",
+    "notNow": "Non ora",
+    "failed": "Impossibile modificare le autorizzazioni di {{name}}. Riprova."
+  }
+}

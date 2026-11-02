@@ -1,0 +1,67 @@
+/// Types shared by the host and every plugin.
+///
+/// Additions are minor versions (`mumcord:plugin@1.x`); changing an existing type is a new major
+/// version. The previous major stays supported for two Mumcord releases (FR-6.13).
+interface types {
+  /// What the host tells a plugin when it starts.
+  ///
+  /// Right after a successful `start`, the host delivers the current state as ordinary events
+  /// (`settings-changed`, `language-changed`, `theme-changed` and, with `events.self`,
+  /// `self-changed`), so a plugin handles the first value and every later change the same way.
+  record start-info {
+    /// The host API version, e.g. '1.0.0'.
+    api-version: string,
+    /// The version that was installed before an update, so the plugin can migrate its own data.
+    /// None on a fresh install or when the version did not change.
+    previous-version: option<string>,
+  }
+
+  /// What a bot (e.g. mumbot) says about itself in its Mumcord hello. Untrusted: any client can
+  /// claim to be a bot. Names are 1 to 32 characters of lowercase letters, digits, '-' and '.'.
+  record bot-info {
+    /// The bot software, e.g. 'mumbot'.
+    name: string,
+    /// The modules it runs, e.g. 'music'; sorted, at most 16.
+    modules: list<string>,
+  }
+
+  /// A Mumble session id. Valid only while that user stays connected to the current server;
+  /// use `peer.key` for anything that must survive a reconnect.
+  type session = u32;
+
+  /// Another user (or the local user), as a plugin sees them.
+  ///
+  /// Plugins never see certificate hashes, IP addresses or registered user ids. Nothing from or
+  /// about a blocked user ever reaches a plugin.
+  record peer {
+    session: session,
+    /// Display name as the server reports it. Untrusted text; at most 128 bytes.
+    name: string,
+    /// Stable identity for this plugin: 64 lowercase hex characters of
+    /// HMAC-SHA256(per-install secret, plugin id, certificate hash). The same user gets the same
+    /// key across sessions and restarts, but a different key in every plugin. None for users
+    /// without a certificate; plugins must handle that case (e.g. count them per session).
+    key: option<string>,
+  }
+
+  /// Why a host call was refused.
+  enum error {
+    /// The permission this call needs is not granted (or was revoked at runtime), or the call is
+    /// not allowed right now (e.g. `chat.send` without a recent user gesture).
+    not-permitted,
+    /// A size limit was exceeded; the limits are documented on each call.
+    too-large,
+    /// A rate limit was hit; nothing was done. Try again later.
+    rate-limited,
+    /// A message had nobody to go to (not connected, alone in the channel, or no one in the
+    /// channel runs this plugin).
+    no-recipients,
+    /// The plugin's visibility is 'Nobody', or the recipient is not a friend under 'Friends'.
+    hidden,
+    /// Storage or a per-plugin count limit (e.g. active timers) is full.
+    quota-exceeded,
+    /// The input is malformed: an empty or non-UTF-8 key, an unknown theme token or asset, an
+    /// interactive component without a label, an unknown slot target.
+    invalid,
+  }
+}

@@ -13,6 +13,7 @@ import {
 import { subscribeIncoming } from "../chat";
 import { htmlToText } from "../chat/sanitize";
 import { createMessageAnnouncer } from "../chat/messageAnnouncer";
+import { cardAnnouncement, createLineAnnouncer } from "../plugins/chat";
 import { isConversationMuted } from "../messages/conversationsStore";
 import { useServers as useSavedServers } from "../servers";
 import { personName } from "./directEntries";
@@ -43,6 +44,7 @@ export function MessageNotifications() {
 
   // Polite, throttled notification of messages in chats that are not open.
   useEffect(() => {
+    const lines = createLineAnnouncer();
     const announcer = createMessageAnnouncer(
       (text) => {
         announce(text, "polite");
@@ -57,19 +59,26 @@ export function MessageNotifications() {
       if (onShown && sameConversation(getSelectedConversation(), message.conversation)) return;
       const server = saved ? saved.label || saved.address : "";
       const c: Conversation = message.conversation;
-      const text = htmlToText(message.body).slice(0, SNIPPET_CHARS);
-      if (c.kind === "channel") {
-        if (!getFollowState(serverId).followed.includes(c.channelId)) return;
-        const channel = getServerStateOf(serverId).channels.get(c.channelId)?.name ?? "";
-        const key = onShown ? "notify.channel" : "notify.channelOn";
-        announcer.push(t(key, { name: message.senderName, channel, text, server }));
-      } else {
-        const key = onShown ? "notify.private" : "notify.privateOn";
-        announcer.push(t(key, { name: message.senderName, text, server }));
-      }
+      if (c.kind === "channel" && !getFollowState(serverId).followed.includes(c.channelId)) return;
+      // A line a plugin replaced is read as its card, a hidden one not at all (FR-6.45).
+      lines.resolve(message.id, (view) => {
+        const text =
+          view.kind === "card"
+            ? cardAnnouncement(t, view)
+            : htmlToText(message.body).slice(0, SNIPPET_CHARS);
+        if (c.kind === "channel") {
+          const channel = getServerStateOf(serverId).channels.get(c.channelId)?.name ?? "";
+          const key = onShown ? "notify.channel" : "notify.channelOn";
+          announcer.push(t(key, { name: message.senderName, channel, text, server }));
+        } else {
+          const key = onShown ? "notify.private" : "notify.privateOn";
+          announcer.push(t(key, { name: message.senderName, text, server }));
+        }
+      });
     });
     return () => {
       unsubscribe();
+      lines.dispose();
       announcer.dispose();
     };
   }, [t]);

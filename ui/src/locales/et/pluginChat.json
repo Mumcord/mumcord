@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kaart pistikprogrammilt {{plugin}}",
+    "showMore": "Näita rohkem",
+    "showLess": "Näita vähem"
+  },
+  "via": "läbi {{plugin}}",
+  "supersede": {
+    "showText": "Näita algteksti",
+    "hideText": "Peida algtekst",
+    "hiddenBy": "Peitis {{plugin}}"
+  },
+  "command": {
+    "list": "Pistikprogrammide käsud",
+    "keys": "↑↓ vali · Tab täienda · Enter käivita · Esc sulge",
+    "unavailable": "See käsk pole praegu saadaval.",
+    "failed": "Käsku ei õnnestunud käivitada. Proovi uuesti."
+  }
+}

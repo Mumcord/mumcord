@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Cárta ó {{plugin}}",
+    "showMore": "Taispeáin níos mó",
+    "showLess": "Taispeáin níos lú"
+  },
+  "via": "trí {{plugin}}",
+  "supersede": {
+    "showText": "Taispeáin an buntéacs",
+    "hideText": "Folaigh an buntéacs",
+    "hiddenBy": "Folaithe ag {{plugin}}"
+  },
+  "command": {
+    "list": "Orduithe breiseán",
+    "keys": "↑↓ roghnaigh · Tab críochnaigh · Enter rith · Esc dún",
+    "unavailable": "Níl an t-ordú seo ar fáil faoi láthair.",
+    "failed": "Níorbh fhéidir an t-ordú a rith. Bain triail eile as."
+  }
+}

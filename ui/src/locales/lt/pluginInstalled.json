@@ -1,0 +1,125 @@
+{
+  "listLabel": "Įdiegti papildiniai",
+  "empty": "Papildinių dar nėra.",
+  "browse": "Naršyti papildinius",
+  "enable": "{{name}} įjungtas",
+  "labels": {
+    "official": "Oficialus",
+    "unofficial": "Neoficialus · {{repository}}",
+    "unofficialUnknown": "Neoficialus",
+    "developer": "Kūrėjo papildinys",
+    "autoOff": "Išjungtas po pasikartojančių strigčių",
+    "backingOff": "Paleidžiamas iš naujo po strigties",
+    "notLoaded": "Nepavyko įkelti",
+    "revoked": "Išjungė „Mumcord“: {{reason}}",
+    "revocationWarning": "„Mumcord“ įspėjimas: {{reason}}",
+    "tampered": "Šio papildinio failai buvo pakeisti",
+    "permission": "Išjungtas, nes išjungtas reikalingas leidimas"
+  },
+  "details": {
+    "open": "{{name}} informacija",
+    "permissions": "Leidimai",
+    "visibility": "Kas mato šio papildinio veiklą",
+    "visibilityOptions": {
+      "everyone": "Visi",
+      "friends": "Tik draugai",
+      "nobody": "Niekas"
+    },
+    "notifications": "Pranešimai",
+    "pin": "Prisegti versiją {{version}} (be automatinių atnaujinimų)",
+    "settings": "Papildinio nustatymai",
+    "diagnostics": "Diagnostika",
+    "export": "Eksportuoti duomenis",
+    "reset": "Atstatyti duomenis",
+    "remove": "Pašalinti",
+    "commandTaken": "/{{command}}: Komandą jau naudoja {{plugin}}"
+  },
+  "badge": {
+    "label": "Šalia vardų rodomas ženklelis",
+    "none": "Nėra"
+  },
+  "diagnostics": {
+    "loading": "Įkeliama diagnostika…",
+    "failed": "Nepavyko įkelti diagnostikos.",
+    "unknown": "Nepasiekiama",
+    "ms": "{{value}} ms",
+    "cpuTime": "Procesoriaus laikas",
+    "memory": "Atmintis",
+    "peakMemory": "Didžiausia atmintis",
+    "droppedEvents": "Praleisti įvykiai",
+    "droppedMessages": "Praleisti pranešimai",
+    "restarts": "Paleidimai iš naujo",
+    "messagesSent": "Išsiųsti pranešimai",
+    "messagesReceived": "Gauti pranešimai",
+    "messagesRateLimited": "Dažnio ribos sulaikyti pranešimai",
+    "messagesExpired": "Pasibaigusio galiojimo pranešimai",
+    "incomingRateDropped": "Dažnio ribos atmesti gaunami pranešimai",
+    "incomingInvalid": "Netinkami gaunami pranešimai",
+    "log": "Žurnalas",
+    "logEmpty": "Žurnalas tuščias.",
+    "level": {
+      "debug": "Derinimas",
+      "info": "Informacija",
+      "warn": "Įspėjimas",
+      "error": "Klaida"
+    }
+  },
+  "export": {
+    "title": "Eksportuoti „{{name}}“ duomenis",
+    "filter": "JSON failas",
+    "done": "Duomenys eksportuoti."
+  },
+  "reset": {
+    "title": "Atstatyti „{{name}}“ duomenis?",
+    "message": "Viskas, ką šis papildinys išsaugojo, bus ištrinta. To atšaukti negalima.",
+    "confirm": "Atstatyti duomenis",
+    "done": "Duomenys atstatyti."
+  },
+  "remove": {
+    "title": "Pašalinti „{{name}}“?",
+    "deleteData": "Ištrinti ir jo duomenis",
+    "hint": "Palikti duomenys ištrinami po 30 dienų. Iki tol įdiekite iš naujo, kad juos atgautumėte.",
+    "confirm": "Pašalinti"
+  },
+  "errors": {
+    "enable": "Nepavyko perjungti papildinio.",
+    "permissions": "Nepavyko pakeisti leidimo.",
+    "visibility": "Nepavyko pakeisti matomumo.",
+    "notifications": "Nepavyko pakeisti pranešimų.",
+    "pin": "Nepavyko prisegti versijos.",
+    "export": "Nepavyko eksportuoti duomenų.",
+    "reset": "Nepavyko atstatyti duomenų.",
+    "remove": "Nepavyko pašalinti papildinio.",
+    "badge": "Nepavyko pakeisti ženklelio.",
+    "update": "Įskiepio nepavyko atnaujinti."
+  },
+  "update": {
+    "hint": "Atnaujinimas {{version}}",
+    "button": "Atnaujinti"
+  },
+  "visibilityChip": "Bendrauja su kitais Mumcord naudotojais · {{visibility}}",
+  "chips": {
+    "label": "Naudojami leidimai",
+    "uiPanel": "Skydelis",
+    "uiMemberBadge": "Nario ženklelis",
+    "uiProfileCard": "Profilio kortelė",
+    "uiChatCard": "Pokalbio kortelės",
+    "uiUserMenu": "Naudotojo meniu",
+    "uiDialog": "Savas langas",
+    "uiWebview": "Žiniatinklio turinys",
+    "eventsSelf": "Jūsų būsena",
+    "eventsVoice": "Balso aktyvumas",
+    "eventsPresence": "Prisijungimai ir išėjimai",
+    "eventsChatActivity": "Pokalbio aktyvumas",
+    "notify": "Pranešimai",
+    "randomBytes": "Atsitiktiniai skaičiai",
+    "commands": "Komandos",
+    "chatSend": "Rašo pokalbyje",
+    "chatSupersedes": "Pakeičia savo teksto eilutę",
+    "chatTriggers": "Aktyvinimo žodžiai",
+    "chatPatterns": "Pokalbių šablonai",
+    "netHttp": "Prieiga prie interneto",
+    "secrets": "Raktų pakabukas"
+  },
+  "offerBadge": "Nauji leidimai"
+}

@@ -29,7 +29,8 @@
       "all": "Všetko",
       "mentions": "Zmienky",
       "requests": "Žiadosti",
-      "invites": "Pozvánky"
+      "invites": "Pozvánky",
+      "plugins": "Doplnky"
     },
     "empty": "Všetko je prečítané.",
     "unread": "Neprečítané",

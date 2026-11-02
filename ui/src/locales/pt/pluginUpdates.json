@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Atualizações de plugins",
+    "info": "Separado do atualizador da aplicação. O Mumcord procura atualizações de plugins ao iniciar e a cada 6 horas.",
+    "infoLabel": "Mais informações: atualizações de plugins",
+    "auto": "Instalar automaticamente",
+    "notify": "Apenas notificar",
+    "off": "Desativadas"
+  },
+  "waiting": "Atualizações",
+  "empty": "Todos os plugins estão atualizados.",
+  "emptyOff": "As atualizações de plugins estão desativadas. Ative-as acima para procurar atualizações.",
+  "loadFailed": "Não foi possível carregar as atualizações.",
+  "newAuthorKey": "Esta versão está assinada por outro autor. Atualize apenas se confiar no novo autor.",
+  "rolledBack": "A versão {{version}} não conseguiu iniciar, por isso a versão anterior foi restaurada. Motivo:",
+  "review": "Rever e atualizar",
+  "update": "Atualizar",
+  "installFailed": "Não foi possível atualizar {{name}}. Tente novamente.",
+  "pins": "Fixar versão",
+  "pinsHint": "Um plugin fixado fica na versão atual e não recebe ofertas de atualização.",
+  "pin": "Manter {{name}} nesta versão",
+  "pinVersion": "Versão {{version}}",
+  "versionsTo": "para",
+  "pill": {
+    "none": "Sem novas permissões",
+    "permission": "Precisa de uma nova permissão",
+    "author": "Novo autor"
+  },
+  "newPermissions": "Novas permissões",
+  "revoked": {
+    "title": "{{name}} foi desativado",
+    "text": "A versão {{version}} está na lista de revogação: {{reason}}. Os dados do plugin são mantidos.",
+    "details": "Detalhes",
+    "remove": "Remover"
+  },
+  "checkNow": "Verificar agora",
+  "lastChecked": "Última verificação às {{time}}",
+  "checkFailed": "A verificação falhou. Tente novamente.",
+  "modeNote": "Atualizações de plugins: {{mode}}. Pode alterar isto abaixo.",
+  "settings": "Definições de atualização",
+  "offer": {
+    "heading": "Novas permissões",
+    "title": "{{name}} {{version}} agora pode fazer mais. Estas opções ficam desativadas até as ativar.",
+    "permission": "Nova permissão opcional: {{permission}}",
+    "save": "Guardar",
+    "notNow": "Agora não",
+    "failed": "Não foi possível alterar as permissões de {{name}}. Tente novamente."
+  }
+}

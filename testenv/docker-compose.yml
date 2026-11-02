@@ -65,3 +65,35 @@ services:
       SERVER_PASSWORD: ${SERVER_PASSWORD:-}
     ports: ["${PORT_V13:-64740}:64738/tcp", "${PORT_V13:-64740}:64738/udp"]
     volumes: ["./${DATA_ROOT:-data}/v13:/data", "./certs/${CERT_SET:-A}:/certs:ro"]
+
+  # Local mumbot (music + plugins modules) on v15 for the plugin tests. Only started by
+  # mumbot/up.sh (profile "mumbot"); a plain ./up.sh never starts it.
+  mumbot:
+    profiles: ["mumbot"]
+    image: ghcr.io/mumcord/mumbot:0.4.1
+    command: ["run"]
+    restart: "no"
+    user: "${PUID:-1000}:${PGID:-1000}"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      MUMBOT_CONFIG: /config/bot.toml
+      MUMBOT_DATA: /data
+      SERVER_PASSWORD: ${SERVER_PASSWORD:-}
+    ports:
+      # Loopback only: the API key travels in clear text over plain HTTP.
+      - "127.0.0.1:${MUMBOT_PORT:-8081}:8081"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "./${DATA_ROOT:-data}/mumbot/bot.toml:/config/bot.toml:ro"
+      - "./${DATA_ROOT:-data}/mumbot/data:/data"
+      - "./mumbot/media:/media:ro"
+    # The image's own health check asks the webhook port, which does not run here.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:8081/health | grep -q '\"connected\":true'"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 3

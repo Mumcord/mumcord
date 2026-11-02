@@ -15,7 +15,8 @@
     "advanced": "Speciális és fejlesztői",
     "about": "Névjegy",
     "packetInspector": "Csomagvizsgáló",
-    "hotkeys": "Gyorsbillentyűk"
+    "hotkeys": "Gyorsbillentyűk",
+    "plugins": "Bővítmények"
   },
   "sectionDescriptions": {
     "general": "Indítás, nyelv, frissítések és kisegítő lehetőségek.",
@@ -27,7 +28,8 @@
     "servers": "Kapcsolatok több szerverhez és szerverenkénti beállítások.",
     "gaming": "A játékon belüli overlay, a pozicionális hang és a játékbővítmények.",
     "advanced": "Fejlesztői eszközök, diagnosztika, tárhely és licencek.",
-    "about": "Verzió, támogatás és a beállítási varázsló."
+    "about": "Verzió, támogatás és a beállítási varázsló.",
+    "plugins": "A bővítmények elszigetelt környezetben futnak, és csak azt kapják meg, amit engedélyezel. Soha nem látják a hangodat, a fájljaidat vagy a tanúsítványodat."
   },
   "breadcrumb": "Beállítások / {{section}}",
   "moreInfo": "További információ: {{topic}}",
@@ -1043,5 +1045,10 @@
     "addConfirm": "Hozzáadás",
     "reset": "Összes gyorsbillentyű visszaállítása",
     "resetHint": "Eltávolít minden gyorsbillentyűt a push-to-talk kivételével; alapértelmezés szerint semmi nincs beállítva."
+  },
+  "developerMode": {
+    "title": "Fejlesztői mód",
+    "switch": "Fejlesztői mód",
+    "hint": "Fejlesztő lapot ad a bővítményekhez, ahol aláíratlan bővítményeket tölthetsz be egy mappából. Csak akkor kapcsold be, ha magad készítesz bővítményeket."
   }
 }

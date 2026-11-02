@@ -738,7 +738,10 @@ impl Relays {
 }
 
 /// The identity a server entry connects with: its own if it still exists, else the default.
-fn pin_identity(store: &Store, server_id: ServerId) -> mumcord_store::Result<Option<IdentityId>> {
+pub(crate) fn pin_identity(
+    store: &Store,
+    server_id: ServerId,
+) -> mumcord_store::Result<Option<IdentityId>> {
     if let Some(id) = store.server(server_id)?.and_then(|s| s.identity_id)
         && store.identity(id)?.is_some()
     {

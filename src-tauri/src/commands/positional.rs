@@ -1,6 +1,6 @@
 //! Positional audio status and the official game plugins (FR-1.41–1.43, FR-1.72). The switch
 //! and the distances live in the settings record (`settings_update`); so do the enabled
-//! plugins, but they are changed through `plugin_set_enabled`.
+//! plugins, but they are changed through `game_plugin_set_enabled`.
 
 use mumcord_engine::Engine;
 use mumcord_engine::positional_sources::{
@@ -143,14 +143,14 @@ async fn list(host: &PluginHost) -> ApiResult<Vec<PluginInfo>> {
 /// The official Mumble game plugins found in Mumcord's and Mumble's plugin folders.
 #[tauri::command]
 #[specta::specta]
-pub async fn plugins_list(host: State<'_, PluginHost>) -> ApiResult<Vec<GamePlugin>> {
+pub async fn game_plugins_list(host: State<'_, PluginHost>) -> ApiResult<Vec<GamePlugin>> {
     Ok(list(&host).await?.into_iter().map(Into::into).collect())
 }
 
 /// Enables or disables one game plugin and stores the choice; returns the updated list.
 #[tauri::command]
 #[specta::specta]
-pub async fn plugin_set_enabled(
+pub async fn game_plugin_set_enabled(
     engine: State<'_, Engine>,
     host: State<'_, PluginHost>,
     id: String,

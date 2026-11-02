@@ -1,0 +1,5 @@
+{
+  "id": "fx-badge-two",
+  "name": "Fixture Badge Two",
+  "permissions": { "required": ["ui.member-badge", "events.presence"] }
+}

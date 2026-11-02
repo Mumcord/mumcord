@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Card de la {{plugin}}",
+    "showMore": "Afișează mai mult",
+    "showLess": "Afișează mai puțin"
+  },
+  "via": "prin {{plugin}}",
+  "supersede": {
+    "showText": "Afișează textul original",
+    "hideText": "Ascunde textul original",
+    "hiddenBy": "Ascuns de {{plugin}}"
+  },
+  "command": {
+    "list": "Comenzile pluginurilor",
+    "keys": "↑↓ alege · Tab completează · Enter rulează · Esc închide",
+    "unavailable": "Această comandă nu este disponibilă acum.",
+    "failed": "Comanda nu a putut fi rulată. Încearcă din nou."
+  }
+}

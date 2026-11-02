@@ -1,0 +1,22 @@
+{
+  "title": "Plugins",
+  "tabsLabel": "Plugin-afsnit",
+  "tabs": {
+    "installed": "Installeret",
+    "browse": "Gennemse",
+    "updates": "Opdateringer",
+    "repositories": "Arkiver",
+    "developer": "Udvikler"
+  },
+  "turnOffAll": "Sluk alle plugins",
+  "allOff": "Alle plugins er slukket. De forbliver slukket, også efter en genstart, indtil du tænder dem igen.",
+  "noPlugins": "Plugins er slået fra i denne session (startet med --no-plugins).",
+  "loadFailed": "Pluginsene kunne ikke indlæses.",
+  "palette": {
+    "label": "Kommandopalet",
+    "placeholder": "Skriv en kommando",
+    "empty": "Ingen matchende kommando",
+    "openPlugins": "Plugins",
+    "turnOffAll": "Sluk alle plugins"
+  }
+}

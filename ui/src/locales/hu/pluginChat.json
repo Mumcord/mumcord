@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kártya innen: {{plugin}}",
+    "showMore": "Több megjelenítése",
+    "showLess": "Kevesebb megjelenítése"
+  },
+  "via": "ezen keresztül: {{plugin}}",
+  "supersede": {
+    "showText": "Eredeti szöveg megjelenítése",
+    "hideText": "Eredeti szöveg elrejtése",
+    "hiddenBy": "Elrejtette: {{plugin}}"
+  },
+  "command": {
+    "list": "Bővítményparancsok",
+    "keys": "↑↓ választás · Tab kiegészítés · Enter futtatás · Esc bezárás",
+    "unavailable": "Ez a parancs most nem érhető el.",
+    "failed": "A parancsot nem sikerült futtatni. Próbáld újra."
+  }
+}

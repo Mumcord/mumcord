@@ -1,0 +1,7 @@
+{
+  "heading": "Plugins",
+  "list": "Pannelli tal-plugins",
+  "expand": "Kabbar {{name}}",
+  "close": "Agħlaq",
+  "unsupported": "Dan is-server ma jappoġġax il-funzjonijiet kondiviżi tal-plugins"
+}

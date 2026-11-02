@@ -1,0 +1,35 @@
+{
+  "hint": "Indlæs en udpakket plugin-mappe for at teste den. Udviklerplugins er ikke signeret, aldrig officielle og kan ikke få net.http, secrets eller ui.webview. De fjernes, når udviklertilstand slås fra.",
+  "load": "Indlæs plugin-mappe…",
+  "pickFolder": "Vælg plugin-mappen",
+  "empty": "Intet udviklerplugin er indlæst.",
+  "listLabel": "Udviklerplugins",
+  "label": "Udviklerplugin",
+  "status": {
+    "running": "Kører",
+    "off": "Slået fra",
+    "backingOff": "Genstarter efter et nedbrud",
+    "autoOff": "Slået fra efter gentagne nedbrud",
+    "allOff": "Alle plugins er slået fra",
+    "noPlugins": "Plugins er slået fra i denne session",
+    "notLoaded": "Kunne ikke indlæses"
+  },
+  "showLog": "Vis log for {{name}}",
+  "reload": "Genindlæs {{name}}",
+  "unload": "Fjern {{name}}",
+  "logLabel": "Log for {{name}}",
+  "logTitle": "Log for {{name}}",
+  "logEmpty": "Ingen logposter endnu.",
+  "level": {
+    "debug": "Fejlfinding",
+    "info": "Info",
+    "warn": "Advarsel",
+    "error": "Fejl"
+  },
+  "errors": {
+    "load": "Plugin-mappen kunne ikke indlæses.",
+    "reload": "Pluginet kunne ikke genindlæses.",
+    "unload": "Pluginet kunne ikke fjernes.",
+    "log": "Loggen kunne ikke læses."
+  }
+}

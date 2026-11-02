@@ -16,6 +16,7 @@ mod friends;
 mod history;
 mod identities;
 mod identity;
+mod plugins;
 mod pm_overview;
 mod relay_pin;
 mod secrets;
@@ -35,6 +36,10 @@ pub use friends::Friend;
 pub use history::{ChatMessage, Conversation, NewChatMessage};
 pub use identities::{IdentityId, IdentityRecord, MAX_IDENTITY_LABEL, NewIdentity};
 pub use identity::{Identity, cert_hash};
+pub use plugins::{
+    MAX_PLUGIN_KEY_BYTES, MAX_PLUGIN_REPOSITORIES, MAX_PLUGIN_VALUE_BYTES, NewPluginRepository,
+    PluginRecord, PluginRepository, PluginSuggestion, PluginVisibility, REMOVED_DATA_RETENTION_MS,
+};
 pub use pm_overview::{MUTED_FOREVER, PmConversationPrefs, PrivateConversationSummary};
 pub use relay_pin::RelayPin;
 pub use secrets::{KEYRING_SERVICE, SecretStore};
@@ -45,7 +50,7 @@ pub use settings::{
     GameKey, GameOverlayEntry, Hotkey, HotkeyAction, InGameOverlayMode, InGameOverlaySettings,
     LogLevel, MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS, MAX_VIDEO_DUCKING_PERCENT,
     MIN_MAX_CONNECTED_SERVERS, MIN_UPDATE_INTERVAL_HOURS, MIN_VIDEO_DUCKING_PERCENT, NoiseBackend,
-    NotificationMode, OverlayCorner, OwnVoice, P2pMode, PmRule, PositionalSettings,
+    NotificationMode, OverlayCorner, OwnVoice, P2pMode, PluginUpdates, PmRule, PositionalSettings,
     PrivateMessageSettings, Settings, SetupPreset, SoundSettings, SoundTheme, TalkMode, Theme,
     ThemePreference, VoiceActivation, WhisperReceivers, WhisperTarget,
 };

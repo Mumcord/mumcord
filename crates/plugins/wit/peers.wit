@@ -1,0 +1,44 @@
+/// Plugin messaging between users in the same channel (FR-6.17, FR-6.33 … FR-6.36).
+///
+/// Messages reach only the same plugin id from the same source (official, the same third-party
+/// repository, or developer) in Mumcord clients in the user's current channel on the current
+/// server. The receiver learns the sender from the Mumble session that sent the message, never
+/// from the payload. Incoming messages arrive as the `peer-message` event.
+interface peers {
+  use types.{bot-info, error, peer, session};
+
+  /// Who a message goes to.
+  variant target {
+    /// Everyone in the user's current channel who runs this plugin.
+    channel,
+    /// One user in the user's current channel.
+    direct(session),
+  }
+
+  /// Sends one message. Needs `peers.messages`.
+  ///
+  /// `kind` is the plugin's own message type (byte 2 of the wire envelope; the `direct` event flag is bit 7 of byte 1). `payload` is at most
+  /// 997 bytes and at most the manifest's `messaging.max_payload`.
+  /// Rate limits: per plugin 1 message per 2 s sustained (burst 3), or 4 per second during a game
+  /// burst; all plugins together 1 per second (burst 5). Mumcord's own features go first; a
+  /// message that cannot be sent within 10 s is dropped and counted in Diagnostics.
+  /// With visibility 'Friends' only friends receive it.
+  /// Errors: `not-permitted`, `too-large`, `rate-limited`, `no-recipients` (not connected, server
+  /// without plugin data, or nobody in the channel runs this plugin), `hidden` (visibility
+  /// 'Nobody', or a direct target who is not a friend under 'Friends').
+  send: func(to: target, kind: u8, payload: list<u8>) -> result<_, error>;
+
+  /// Raises this plugin's send rate to 4 messages per second for the next 10 s, for real-time
+  /// games. At most once per minute per plugin, and only one plugin at a time.
+  /// Errors: `not-permitted` (no `peers.messages`), `rate-limited`.
+  start-game-burst: func() -> result<_, error>;
+
+  /// Snapshot of the users in the user's current channel, including the user themselves (first
+  /// entry). Empty while disconnected. Needs `events.presence`. Errors: `not-permitted`.
+  presence: func() -> result<list<peer>, error>;
+
+  /// The bot info of a user in the user's current channel, from their Mumcord hello. None for
+  /// people, for bots that did not say so, and for sessions outside the channel. Needs
+  /// `events.presence`. Errors: `not-permitted`.
+  bot: func(user: session) -> result<option<bot-info>, error>;
+}

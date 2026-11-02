@@ -451,6 +451,13 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     control: "cache.clear",
     terms: ["searchTerms.storage", "cache.hint"],
   },
+  {
+    section: "advanced",
+    group: "developerMode.title",
+    control: "developerMode.switch",
+    terms: ["developerMode.hint"],
+  },
+  { section: "plugins", group: "sections.plugins", terms: ["sectionDescriptions.plugins"] },
   { section: "advanced", group: "diagnostics.title", control: "diagnostics.logLevel" },
   {
     section: "advanced",

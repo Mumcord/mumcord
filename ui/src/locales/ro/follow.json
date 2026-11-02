@@ -1,6 +1,5 @@
 {
   "follow": "Urmărește",
-  "following": "Urmărești",
   "unsupported": "Urmărirea canalelor necesită un server cu versiunea 1.4 sau mai nouă.",
   "unread_one": "{{count}} mesaj necitit",
   "unread_few": "{{count}} mesaje necitite",

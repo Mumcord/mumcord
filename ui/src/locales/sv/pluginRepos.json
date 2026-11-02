@@ -1,0 +1,60 @@
+{
+  "intro": "Förråd är extra pluginlistor som andra människor driver. Mumcord granskar inte deras plugin. Lägg bara till förråd du litar på.",
+  "add": {
+    "button": "Lägg till förråd",
+    "title": "Lägg till förråd",
+    "address": "Förrådets adress",
+    "expectedKey": "Förväntad nyckel (valfritt)",
+    "expectedKeyHint": "Om ägaren gav dig en nyckel, klistra in den här. Förrådet måste då använda exakt den nyckeln.",
+    "check": "Kontrollera förrådet",
+    "found": "Det här hittade vi",
+    "confirm": "Lägg till förråd",
+    "subtitle": "Lägg bara till arkiv från personer du litar på.",
+    "signatureValid": "signaturen är giltig",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Tillägg: {{number}}",
+    "signingKey": "Signeringsnyckel",
+    "warningTitle": "Inofficiellt arkiv",
+    "warningBody": "Mumcord granskar inte dessa tillägg. Nyckeln kommer ihåg: om den ändras pausas arkivet tills du har kontrollerat det. När du bläddrar visas din IP-adress för värden. Tillägg med officiella namn hämtas aldrig härifrån."
+  },
+  "limit": "Du kan lägga till upp till {{max}} förråd.",
+  "limitReached": "Gränsen på {{max}} förråd är nådd.",
+  "empty": "Inga förråd har lagts till ännu.",
+  "listLabel": "Tillagda förråd",
+  "loadFailed": "Förråden kunde inte läsas in.",
+  "status": {
+    "keyChanged": "Nyckeln ändrad, pausad"
+  },
+  "fingerprintLine": "Nyckelns fingeravtryck: {{fingerprint}}",
+  "neverChecked": "Inte kontrollerat ännu",
+  "lastChecked": "Senast kontrollerat: {{when}}",
+  "installedCount": "Installerade plugin: {{number}}",
+  "toggle": "Använd {{name}}",
+  "remove": {
+    "button": "Ta bort",
+    "label": "Ta bort {{name}}",
+    "title": "Ta bort {{name}}?",
+    "message": "Förrådet tas bort och dess plugin stängs av. De ligger kvar installerade med sina data men får inga fler uppdateringar.",
+    "confirm": "Ta bort"
+  },
+  "keyChange": {
+    "title": "{{name}} har bytt nyckel",
+    "message": "Det här förrådet signerar nu sin pluginlista med en annan nyckel. Det förblir pausat tills du bestämmer dig. Lita bara på den nya nyckeln om ägaren har meddelat ändringen.",
+    "oldKey": "Nyckel du litat på hittills",
+    "newKey": "Ny nyckel",
+    "keepPaused": "Behåll pausat",
+    "trust": "Lita på nya nyckeln",
+    "review": "Granska nyckelbytet"
+  },
+  "mirror": {
+    "title": "Avancerat",
+    "label": "Spegel för den officiella pluginlistan (valfritt)",
+    "hint": "Ändra bara detta om du fått en spegeladress. Spegeln måste leverera samma signerade filer; Mumcord kontrollerar ändå varje signatur.",
+    "save": "Spara",
+    "reset": "Använd standard"
+  },
+  "official": {
+    "name": "Officiella Mumcord-tillägg",
+    "alwaysOn": "Alltid på"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "title": "Bővítmények",
+  "tabsLabel": "Bővítményszakaszok",
+  "tabs": {
+    "installed": "Telepítve",
+    "browse": "Böngészés",
+    "updates": "Frissítések",
+    "repositories": "Tárolók",
+    "developer": "Fejlesztő"
+  },
+  "turnOffAll": "Összes bővítmény kikapcsolása",
+  "allOff": "Minden bővítmény ki van kapcsolva. Újraindítás után is kikapcsolva maradnak, amíg újra be nem kapcsolod őket.",
+  "noPlugins": "A bővítmények ki vannak kapcsolva ebben a munkamenetben (--no-plugins kapcsolóval indítva).",
+  "loadFailed": "A bővítményeket nem sikerült betölteni.",
+  "palette": {
+    "label": "Parancspaletta",
+    "placeholder": "Írj be egy parancsot",
+    "empty": "Nincs egyező parancs",
+    "openPlugins": "Bővítmények",
+    "turnOffAll": "Összes bővítmény kikapcsolása"
+  }
+}

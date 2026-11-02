@@ -29,7 +29,6 @@
   "bitrate": "Bitrate",
   "path": "Ruta",
   "pathDirect": "Directa",
-  "pathUnknown": "Desconocida",
   "sound": "Sonido",
   "soundOn": "Sonido activado",
   "soundOff": "Sonido silenciado",

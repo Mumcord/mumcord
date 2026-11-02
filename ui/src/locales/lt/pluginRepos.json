@@ -1,0 +1,60 @@
+{
+  "intro": "Saugyklos yra papildomi įskiepių sąrašai, kuriuos tvarko kiti žmonės. „Mumcord“ jų įskiepių netikrina. Pridėkite tik saugyklas, kuriomis pasitikite.",
+  "add": {
+    "button": "Pridėti saugyklą",
+    "title": "Pridėti saugyklą",
+    "address": "Saugyklos adresas",
+    "expectedKey": "Laukiamas raktas (neprivaloma)",
+    "expectedKeyHint": "Jei savininkas davė raktą, įklijuokite jį čia. Tada saugykla turi naudoti būtent šį raktą.",
+    "check": "Patikrinti saugyklą",
+    "found": "Štai ką radome",
+    "confirm": "Pridėti saugyklą",
+    "subtitle": "Pridėkite tik žmonių, kuriais pasitikite, saugyklas.",
+    "signatureValid": "parašas tinkamas",
+    "contactLine": "kontaktas: {{contact}}",
+    "pluginsLine": "Papildinių: {{number}}",
+    "signingKey": "Pasirašymo raktas",
+    "warningTitle": "Neoficiali saugykla",
+    "warningBody": "„Mumcord“ šių papildinių netikrina. Raktas įsimenamas: jei jis pasikeistų, saugykla bus sustabdyta, kol jį patikrinsite. Naršant šeimininkas mato jūsų IP adresą. Papildiniai su oficialiais pavadinimais iš čia niekada neimami."
+  },
+  "limit": "Galite pridėti iki {{max}} saugyklų.",
+  "limitReached": "Pasiektas {{max}} saugyklų limitas.",
+  "empty": "Saugyklų dar nepridėta.",
+  "listLabel": "Pridėtos saugyklos",
+  "loadFailed": "Nepavyko įkelti saugyklų.",
+  "status": {
+    "keyChanged": "Raktas pasikeitė, pristabdyta"
+  },
+  "fingerprintLine": "Rakto kontrolinis kodas: {{fingerprint}}",
+  "neverChecked": "Dar netikrinta",
+  "lastChecked": "Paskutinį kartą tikrinta: {{when}}",
+  "installedCount": "Įdiegti įskiepiai: {{number}}",
+  "toggle": "Naudoti {{name}}",
+  "remove": {
+    "button": "Pašalinti",
+    "label": "Pašalinti {{name}}",
+    "title": "Pašalinti {{name}}?",
+    "message": "Saugykla pašalinama, o jos įskiepiai išjungiami. Jie lieka įdiegti su savo duomenimis, bet nebegauna naujinimų.",
+    "confirm": "Pašalinti"
+  },
+  "keyChange": {
+    "title": "{{name}} pakeitė raktą",
+    "message": "Ši saugykla dabar pasirašo įskiepių sąrašą kitu raktu. Ji lieka pristabdyta, kol nuspręsite. Pasitikėkite nauju raktu tik jei savininkas pranešė apie pakeitimą.",
+    "oldKey": "Iki šiol patikėtas raktas",
+    "newKey": "Naujas raktas",
+    "keepPaused": "Palikti pristabdytą",
+    "trust": "Pasitikėti nauju raktu",
+    "review": "Peržiūrėti rakto pakeitimą"
+  },
+  "mirror": {
+    "title": "Papildomai",
+    "label": "Oficialaus įskiepių sąrašo veidrodis (neprivaloma)",
+    "hint": "Keiskite tik jei gavote veidrodžio adresą. Veidrodis turi pateikti tuos pačius pasirašytus failus; „Mumcord“ vis tiek tikrina kiekvieną parašą.",
+    "save": "Įrašyti",
+    "reset": "Naudoti numatytąjį"
+  },
+  "official": {
+    "name": "Oficialūs „Mumcord“ papildiniai",
+    "alwaysOn": "Visada įjungta"
+  }
+}

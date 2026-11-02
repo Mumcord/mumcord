@@ -1,0 +1,17 @@
+/// Timers (FR-6.21). Needs no permission. A timer fires as the `timer` event.
+///
+/// Limits: interval at least 250 ms (shorter values are raised to 250 ms), at most 32 active
+/// timers per plugin. Timer events wait in the plugin's event queue like any other event.
+interface timers {
+  use types.{error};
+
+  /// Identifies a timer in `cancel` and in the `timer` event.
+  type timer-id = u32;
+
+  /// Starts a timer that fires after `interval-ms`, and then every `interval-ms` if `repeat`.
+  /// Errors: `quota-exceeded` (32 active timers).
+  start: func(interval-ms: u32, repeat: bool) -> result<timer-id, error>;
+
+  /// Stops a timer. Unknown or already finished ids are ignored.
+  cancel: func(id: timer-id);
+}

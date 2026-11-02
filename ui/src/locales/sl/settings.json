@@ -15,7 +15,8 @@
     "advanced": "Napredno in za razvijalce",
     "about": "O aplikaciji",
     "packetInspector": "Pregledovalnik paketov",
-    "hotkeys": "Bližnjice"
+    "hotkeys": "Bližnjice",
+    "plugins": "Vtičniki"
   },
   "sectionDescriptions": {
     "general": "Zagon, jezik, posodobitve in dostopnost.",
@@ -27,7 +28,8 @@
     "servers": "Povezave z več strežniki in nastavitve za posamezen strežnik.",
     "gaming": "Prekrivanje v igri, pozicijski zvok in vtičniki za igre.",
     "advanced": "Razvijalska orodja, diagnostika, shramba in licence.",
-    "about": "Različica, podpora in čarovnik za nastavitev."
+    "about": "Različica, podpora in čarovnik za nastavitev.",
+    "plugins": "Vtičniki delujejo v peskovniku in dobijo le tisto, kar dovolite. Nikoli ne vidijo vašega zvoka, datotek ali potrdila."
   },
   "breadcrumb": "Nastavitve / {{section}}",
   "moreInfo": "Več informacij: {{topic}}",
@@ -1059,5 +1061,10 @@
     "addConfirm": "Dodaj",
     "reset": "Ponastavi vse bližnjice",
     "resetHint": "Odstrani vse bližnjice razen pritisni za govor; privzeto ni nastavljena nobena."
+  },
+  "developerMode": {
+    "title": "Razvijalski način",
+    "switch": "Razvijalski način",
+    "hint": "Vtičnikom doda zavihek Razvijalec, kjer lahko naložite nepodpisane vtičnike iz mape. Vklopite ga le, če sami razvijate vtičnike."
   }
 }

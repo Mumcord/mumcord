@@ -1,6 +1,5 @@
 {
   "follow": "Volgen",
-  "following": "Volgend",
   "unsupported": "Kanalen volgen vereist een server met versie 1.4 of nieuwer.",
   "unread_one": "{{count}} ongelezen bericht",
   "unread_other": "{{count}} ongelezen berichten",

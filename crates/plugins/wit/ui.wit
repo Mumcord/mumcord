@@ -1,0 +1,385 @@
+/// Declarative UI (FR-6.40 … FR-6.42). Plugins describe what to show; Mumcord renders it with its
+/// own components. User input comes back as the `ui-action` event.
+///
+/// WIT has no recursive types, so a tree is a flat list of nodes: node 0 is the root and
+/// `children` holds indices of later nodes. Every node except the root has exactly one parent.
+///
+/// Limits per slot: 500 nodes, 16 KiB encoded tree, 20 updates per second, text at most 200
+/// characters per string. Every interactive component needs a non-empty `label` for screen
+/// readers. Colours are theme token names (see `theme`); images and sprites name SVG or PNG
+/// assets inside the plugin package.
+interface ui {
+  use types.{error, session};
+
+  /// Where a tree is shown, each with its own permission.
+  variant slot {
+    /// `ui.panel`: 260×160 inline in the Plugins strip, 420×560 when expanded to a popover.
+    panel,
+    /// `ui.member-badge`: 24 px (16 px compact) next to a user's name. At most one badge per
+    /// user across all plugins; the user picks which.
+    member-badge(session),
+    /// `ui.profile-card`: a 300×220 section on a user's profile card. Set it within 500 ms of
+    /// `profile-card-opened`, otherwise the section is skipped.
+    profile-card(session),
+    /// `ui.chat-card`: a 440×160 local item in the chat of the current channel, not a Mumble
+    /// message. The first `set-tree` for a new id appends the card; later calls update it.
+    chat-card(string),
+    /// `ui.chat-card`: a 16 px decoration next to a user's name in chat.
+    chat-decoration(session),
+    /// This plugin's form in Settings → Plugins. Needs no permission.
+    settings,
+    /// `ui.dialog`: the plugin's own dialog while it is open (see `open-dialog`).
+    dialog,
+  }
+
+  type node-index = u32;
+
+  /// Animation presets. All of them stop when the user asks for reduced motion.
+  enum animation {
+    bob,
+    hop,
+    wave,
+    nap,
+    sparkle,
+    shake,
+    fade,
+  }
+
+  enum direction {
+    row,
+    column,
+  }
+
+  enum align {
+    start,
+    center,
+    end,
+    stretch,
+  }
+
+  /// How a stack spreads its children along its direction.
+  enum justify {
+    start,
+    end,
+    /// First child at the start, last at the end, the rest evenly between.
+    space-between,
+    /// Rows only: the first child takes all the free width (its content may shrink and be cut
+    /// off), the others keep their natural width, e.g. an entry button next to a fixed
+    /// 'Copy' button. In a column it behaves like `start`.
+    fill-first,
+  }
+
+  record stack {
+    direction: direction,
+    /// Spacing between children in px, at most 32.
+    gap: u8,
+    /// Cross axis: how children line up across the stack's direction.
+    align: align,
+    /// Main axis; none = start.
+    justify: option<justify>,
+  }
+
+  enum text-style {
+    body,
+    caption,
+    heading,
+    monospace,
+  }
+
+  record text {
+    text: string,
+    style: text-style,
+    /// Theme token; none = the default text colour.
+    color: option<string>,
+  }
+
+  record image {
+    /// Path of an asset in the package, e.g. 'assets/egg.svg'.
+    asset: string,
+    /// Description for screen readers; empty = decorative.
+    alt: string,
+    width: u16,
+    height: u16,
+  }
+
+  /// A horizontal strip of equally sized frames, played in a loop at most 12 frames per second.
+  /// With reduced motion only `still-frame` is shown.
+  record sprite {
+    asset: string,
+    alt: string,
+    frame-width: u16,
+    frame-height: u16,
+    frames: u8,
+    fps: u8,
+    still-frame: u8,
+  }
+
+  /// A labelled level, e.g. a pet's energy.
+  record meter {
+    label: string,
+    /// 0.0 … 1.0.
+    value: f32,
+    color: option<string>,
+  }
+
+  /// Colour role of a chip or a field note; drawn with the theme's colours.
+  enum tone {
+    neutral,
+    success,
+    warning,
+    danger,
+    accent,
+  }
+
+  enum button-kind {
+    /// Filled with the accent colour: the main action, at most one per view.
+    primary,
+    /// Outlined.
+    secondary,
+    /// Filled red: destructive actions.
+    danger,
+  }
+
+  /// Clicking sends a `ui-action` with `action` and no value. A click counts as a user gesture
+  /// (see `chat.send`).
+  record button {
+    label: string,
+    action: string,
+    kind: button-kind,
+    disabled: bool,
+    /// Disclosure state: `some(true)` while the controlled content is open, `some(false)` while
+    /// closed (announced as expanded/collapsed). `none` for ordinary buttons.
+    expanded: option<bool>,
+    /// A muted second line under the label, e.g. 'Tobias · 20:09'; none = label only. Screen
+    /// readers announce it as the button's description.
+    detail: option<string>,
+  }
+
+  record icon-button {
+    /// Asset path of the icon. Drawn monochrome in the theme's text colour (only its shape
+    /// counts), so it stays visible on dark and light themes; use `image` or `sprite` for colour.
+    icon: string,
+    /// Required: the button has no visible text.
+    label: string,
+    action: string,
+    disabled: bool,
+  }
+
+  /// A button the HOST wires to the clipboard: a click copies `text` to the system clipboard and
+  /// shows a short "Copied" confirmation. The plugin never touches the clipboard, reads nothing
+  /// back and gets no event for the click, so it needs no permission. `text` may be up to 8 KiB
+  /// (UTF-8 bytes); `label` follows the 200 character string limit. A click is not a user
+  /// gesture for `chat.send`.
+  record copy-button {
+    /// Required, like every interactive component.
+    label: string,
+    text: string,
+    kind: button-kind,
+  }
+
+  record chip {
+    text: string,
+    /// Theme token for text and border; ignored when `tone` is set.
+    color: option<string>,
+    /// A tinted pill in this tone, e.g. a status like 'Connected' (success).
+    tone: option<tone>,
+  }
+
+  record progress {
+    label: string,
+    /// 0.0 … 1.0; none = indeterminate.
+    value: option<f32>,
+  }
+
+  /// A list whose children are its rows (at most 50). Rows may contain buttons for row actions.
+  record list-props {
+    label: string,
+    /// If set, rows can be dragged into a new order; each drop sends a `ui-action` with this
+    /// action and a `reorder` value. The plugin updates the tree itself.
+    reorder-action: option<string>,
+  }
+
+  record toggle {
+    label: string,
+    value: bool,
+    /// Sends `ui-action` with a `boolean` value.
+    action: string,
+    disabled: bool,
+  }
+
+  record select-option {
+    value: string,
+    label: string,
+  }
+
+  record select {
+    label: string,
+    options: list<select-option>,
+    selected: option<string>,
+    /// Sends `ui-action` with a `text` value (the option's value).
+    action: string,
+    /// If set, a refresh button sends this action with no value so the plugin can replace the
+    /// options.
+    refresh-action: option<string>,
+    disabled: bool,
+  }
+
+  record slider {
+    label: string,
+    min: f32,
+    max: f32,
+    step: f32,
+    value: f32,
+    /// Sends `ui-action` with a `number` value.
+    action: string,
+    disabled: bool,
+  }
+
+  enum input-purpose {
+    plain,
+    /// A server address ('host' or 'host:port', optionally with scheme) the user types. Hosts
+    /// entered here become the only ones this plugin may reach with `http` (FR-6.37).
+    server-address,
+  }
+
+  record text-input {
+    label: string,
+    value: string,
+    placeholder: string,
+    /// At most 64 bytes (UTF-8); the field counts characters for the user.
+    max-bytes: u8,
+    purpose: input-purpose,
+    /// Sends `ui-action` with a `text` value when the user confirms (Enter or leaving the field).
+    action: string,
+    disabled: bool,
+    /// A note under the field, e.g. what to enter or a check result.
+    help: option<string>,
+    /// Colour of `help`; none = muted text.
+    help-tone: option<tone>,
+    /// If set, the field shows an error state and this text replaces `help`.
+    error: option<string>,
+  }
+
+  /// Writes what the user types into the named secret (see `secrets`); the plugin never sees
+  /// the text. Needs `secrets`. Saving sends `ui-action` with `action` and no value.
+  record password {
+    label: string,
+    secret: string,
+    action: string,
+    disabled: bool,
+    /// A note under the field (see `text-input`).
+    help: option<string>,
+    /// Colour of `help`; none = muted text.
+    help-tone: option<tone>,
+    /// If set, the field shows an error state and this text replaces `help`.
+    error: option<string>,
+  }
+
+  /// Lets the user pick one file. Sends `ui-action` with a `file` value: an opaque handle usable
+  /// only in an `http` request of this plugin. Needs `net.http`.
+  record file-picker {
+    label: string,
+    /// File extensions like '.mp3'; empty = any file.
+    accept: list<string>,
+    action: string,
+    disabled: bool,
+  }
+
+  /// Counts down to a moment, rendered by Mumcord so the plugin needs no 1 s timer.
+  record countdown {
+    label: string,
+    /// Unix seconds.
+    until: u64,
+  }
+
+  variant component {
+    stack(stack),
+    text(text),
+    image(image),
+    sprite(sprite),
+    meter(meter),
+    button(button),
+    icon-button(icon-button),
+    chip(chip),
+    divider,
+    progress(progress),
+    %list(list-props),
+    toggle(toggle),
+    select(select),
+    slider(slider),
+    text-input(text-input),
+    password(password),
+    file-picker(file-picker),
+    countdown(countdown),
+    /// Added after 1.0.0 as an additive case (host-side clipboard copy).
+    copy-button(copy-button),
+  }
+
+  record node {
+    component: component,
+    animation: option<animation>,
+    /// Indices of child nodes, in order. Only `stack` and `list` may have children.
+    children: list<node-index>,
+  }
+
+  /// Replaces the tree of a slot. Errors: `not-permitted`, `too-large`, `rate-limited`,
+  /// `invalid` (bad indices, missing label, unknown token or asset, unknown session). Invalid
+  /// trees are not shown and get a Diagnostics entry.
+  set-tree: func(slot: slot, nodes: list<node>) -> result<_, error>;
+
+  /// Removes a slot's tree (a chat card is removed from the chat).
+  clear: func(slot: slot);
+
+  /// Opens this plugin's dialog with a title (at most 64 characters); its content is the
+  /// `dialog` slot. One dialog per plugin; opening it again only changes the title. Focus is
+  /// trapped in the dialog; when the user closes it the plugin gets `dialog-closed`.
+  /// Mumcord draws the header: the plugin's icon, the title and a close button.
+  /// Errors: `not-permitted`, `too-large`.
+  open-dialog: func(title: string) -> result<_, error>;
+
+  /// Like `open-dialog`, with a subtitle (at most 64 characters) under the title, e.g.
+  /// 'Mumbot · Night Owls Guild'; none = no subtitle. Opening again changes title and subtitle.
+  /// Errors: `not-permitted`, `too-large`.
+  open-dialog-with: func(title: string, subtitle: option<string>) -> result<_, error>;
+
+  /// Closes the dialog without a `dialog-closed` event.
+  close-dialog: func();
+
+  /// Sets this plugin's entry (at most 40 characters) in the right-click menu of users in the
+  /// user's own channel; none removes it. Choosing it sends `user-menu-requested`.
+  /// Errors: `not-permitted`, `too-large`.
+  set-user-menu-entry: func(label: option<string>) -> result<_, error>;
+
+  /// Who sees a filtered user-menu entry. A user matches when the bot part matches (at least one
+  /// of `bot-name` and `bot-module` is set, and their bot info has that name and that module),
+  /// or when their session is in `sessions`, e.g. bots the plugin already saved, found by
+  /// `peer.key`.
+  record user-menu-filter {
+    bot-name: option<string>,
+    bot-module: option<string>,
+    /// At most 256 sessions.
+    sessions: list<session>,
+  }
+
+  /// Like `set-user-menu-entry`, but the entry only shows on users that match `filter`. The
+  /// host keeps it current as users join, leave or say they are a bot; a session in the list
+  /// that leaves is dropped from it. Call it again to change the label or the filter;
+  /// `set-user-menu-entry(none)` removes it. Errors: `not-permitted`, `too-large`.
+  set-user-menu-entry-for: func(label: string, filter: user-menu-filter) -> result<_, error>;
+
+  /// Opens this plugin's panel in the large panel popover (the strip's expanded view). Only
+  /// allowed right after a user gesture in this plugin's own UI (a click, or a typed slash
+  /// command, within the same 2 s window `chat.send` uses; the gesture is not used up) and
+  /// with `ui.panel`. Errors: `not-permitted`.
+  open-panel-popover: func() -> result<_, error>;
+
+  /// Closes the panel popover again, back to the inline panel. Does nothing when it is not open.
+  close-panel-popover: func();
+
+  /// Opens Settings → Plugins → Installed on this plugin's details, where the user can turn
+  /// its optional permissions on or off (e.g. a card hint "Turn on !poll voting"). The plugin
+  /// cannot change permissions itself. Only allowed right after a user gesture in this
+  /// plugin's own UI (the same 2 s window `chat.send` uses). Needs no permission. Errors:
+  /// `not-permitted`.
+  open-permissions: func() -> result<_, error>;
+}

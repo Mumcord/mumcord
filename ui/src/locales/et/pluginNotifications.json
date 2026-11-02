@@ -1,0 +1,30 @@
+{
+  "type": "Plugin",
+  "autoOff": {
+    "title": "{{name}} lülitati välja",
+    "body": "Välja lülitatud korduvate kokkujooksmiste tõttu",
+    "open": "Näita Pluginates"
+  },
+  "update": {
+    "title": "Uuendus: {{name}}",
+    "body": "Versioon {{version}} ootab vahekaardil Uuendused",
+    "open": "Näita uuendusi"
+  },
+  "suggestion": {
+    "title": "See server kasutab {{name}}",
+    "noReason": "Serveri soovitatud",
+    "install": "Installi…",
+    "installLabel": "Installi {{name}}",
+    "addRepositoryLabel": "Lisa hoidla: {{name}}",
+    "details": "Vaata üksikasju",
+    "detailsLabel": "Üksikasjad: {{name}}",
+    "notNow": "Mitte praegu",
+    "notNowLabel": "Peida {{name}} praegu",
+    "dontAsk": "Ära enam selle serveri kohta küsi",
+    "recommended": "Soovitatud",
+    "official": "Ametlik",
+    "unofficial": "Mitteametlik · {{host}}",
+    "footer": "Soovitused ei installi iial midagi ise. Server ei saa teada, mida sa installid."
+  },
+  "failed": "See ei õnnestunud. Proovi uuesti."
+}

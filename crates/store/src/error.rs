@@ -42,4 +42,14 @@ pub enum Error {
     InvalidRelayPin,
     #[error("server {0} does not exist")]
     UnknownServer(i64),
+    #[error("plugin storage key must be 1 to {max} bytes")]
+    InvalidPluginKey { max: usize },
+    #[error("plugin storage value is larger than {max} bytes")]
+    PluginValueTooLarge { max: usize },
+    #[error("plugin storage quota exceeded")]
+    PluginQuotaExceeded,
+    #[error("at most {max} plugin repositories can be added")]
+    TooManyPluginRepositories { max: usize },
+    #[error("this plugin repository is already in the list")]
+    DuplicatePluginRepository,
 }

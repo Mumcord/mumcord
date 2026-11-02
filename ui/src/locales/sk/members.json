@@ -40,7 +40,6 @@
     "sessionOnly": "Táto osoba nemá certifikát, preto tieto nastavenia platia len pre túto reláciu.",
     "sendPrivateMessage": "Poslať súkromnú správu",
     "privateMessage": "Súkromná správa",
-    "localSettings": "Tvoje nastavenia",
     "localSettingsHint": "Vidíš ich len ty. Zmeny sa ukladajú okamžite.",
     "settingsFor": "Nastavenia pre {{name}}",
     "hintMuted": "Stlmené",

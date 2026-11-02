@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kartīte no {{plugin}}",
+    "showMore": "Rādīt vairāk",
+    "showLess": "Rādīt mazāk"
+  },
+  "via": "caur {{plugin}}",
+  "supersede": {
+    "showText": "Rādīt oriģinālo tekstu",
+    "hideText": "Paslēpt oriģinālo tekstu",
+    "hiddenBy": "Paslēpa {{plugin}}"
+  },
+  "command": {
+    "list": "Spraudņu komandas",
+    "keys": "↑↓ izvēlēties · Tab pabeigt · Enter izpildīt · Esc aizvērt",
+    "unavailable": "Šī komanda pašlaik nav pieejama.",
+    "failed": "Komandu neizdevās izpildīt. Mēģini vēlreiz."
+  }
+}

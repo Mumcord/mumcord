@@ -1,0 +1,30 @@
+{
+  "type": "Laajennus",
+  "autoOff": {
+    "title": "{{name}} poistettiin käytöstä",
+    "body": "Poistettu käytöstä toistuvien kaatumisten jälkeen",
+    "open": "Näytä Laajennuksissa"
+  },
+  "update": {
+    "title": "Päivitys: {{name}}",
+    "body": "Versio {{version}} odottaa Päivitykset-välilehdellä",
+    "open": "Näytä päivitykset"
+  },
+  "suggestion": {
+    "title": "Tämä palvelin käyttää: {{name}}",
+    "noReason": "Palvelimen ehdottama",
+    "install": "Asenna…",
+    "installLabel": "Asenna {{name}}",
+    "addRepositoryLabel": "Lisää arkisto: {{name}}",
+    "details": "Näytä tiedot",
+    "detailsLabel": "Tiedot: {{name}}",
+    "notNow": "Ei nyt",
+    "notNowLabel": "Piilota {{name}} toistaiseksi",
+    "dontAsk": "Älä kysy enää tästä palvelimesta",
+    "recommended": "Suositeltu",
+    "official": "Virallinen",
+    "unofficial": "Epävirallinen · {{host}}",
+    "footer": "Ehdotukset eivät asenna mitään itsestään. Palvelin ei saa tietää, mitä asennat."
+  },
+  "failed": "Se ei onnistunut. Yritä uudelleen."
+}

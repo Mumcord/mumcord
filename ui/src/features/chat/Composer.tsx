@@ -35,6 +35,7 @@ import {
   type MentionQuery,
 } from "./mentions";
 import { MentionPicker, type MentionOption } from "./MentionPicker";
+import { CommandPicker, commandOptionId, useSlashCommands } from "../plugins/chat";
 import type { ReplyQuote } from "./reply";
 import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
@@ -138,7 +139,10 @@ export function Composer({
   const hintId = useId();
   const errorId = useId();
   const pickerId = useId();
+  const commandListId = `${pickerId}-commands`;
   const disabled = blockedReason !== null;
+  // Plugin slash commands (FR-6.43): a typed command goes to its plugin, never into the chat.
+  const slash = useSlashCommands(composer.text, composer.setText, disabled);
 
   // Mention autocomplete (FR-1.51).
   const [caret, setCaret] = useState(0);
@@ -305,6 +309,7 @@ export function Composer({
   }, [reply]);
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (slash.onKey(event)) return;
     if (onPickerKey(event)) return;
     if (event.key === "Escape" && reply !== null && onCancelReply) {
       event.preventDefault();
@@ -331,7 +336,7 @@ export function Composer({
     }
     if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
-      composer.submit();
+      if (!slash.run(composer.text)) composer.submit();
     }
   }
 
@@ -412,10 +417,15 @@ export function Composer({
         onDrop={onDrop}
         onSubmit={(event) => {
           event.preventDefault();
-          composer.submit();
+          if (!slash.run(composer.text)) composer.submit();
         }}
       >
         {blockedReason ? <p className="chat-composer__blocked">{blockedReason}</p> : null}
+        {slash.error ? (
+          <p className="chat-composer__error" role="alert">
+            {slash.error}
+          </p>
+        ) : null}
         {composer.error ? (
           <p id={errorId} className="chat-composer__error" role="alert">
             {composer.error}
@@ -468,6 +478,7 @@ export function Composer({
             onPick={pick}
           />
         ) : null}
+        <CommandPicker id={commandListId} slash={slash} />
         <p className="visually-hidden" role="status">
           {pickerOpen ? t("mention.found", { count: options.length }) : ""}
         </p>
@@ -498,11 +509,17 @@ export function Composer({
           />
           <textarea
             ref={input}
-            role={pickerOpen ? "combobox" : undefined}
-            aria-expanded={pickerOpen ? true : undefined}
-            aria-controls={pickerOpen ? pickerId : undefined}
-            aria-activedescendant={pickerOpen ? optionId(pickerId, activeIndex) : undefined}
-            aria-autocomplete={pickerOpen ? "list" : undefined}
+            role={pickerOpen || slash.open ? "combobox" : undefined}
+            aria-expanded={pickerOpen || slash.open ? true : undefined}
+            aria-controls={pickerOpen ? pickerId : slash.open ? commandListId : undefined}
+            aria-activedescendant={
+              pickerOpen
+                ? optionId(pickerId, activeIndex)
+                : slash.open
+                  ? commandOptionId(commandListId, slash.active)
+                  : undefined
+            }
+            aria-autocomplete={pickerOpen || slash.open ? "list" : undefined}
             className="chat-composer__input"
             rows={1}
             aria-label={label}

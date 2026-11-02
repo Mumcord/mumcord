@@ -1,0 +1,30 @@
+{
+  "type": "Plugin",
+  "autoOff": {
+    "title": "{{name}} blev slået fra",
+    "body": "Slået fra efter gentagne nedbrud",
+    "open": "Vis i Plugins"
+  },
+  "update": {
+    "title": "Opdatering til {{name}}",
+    "body": "Version {{version}} venter under fanen Opdateringer",
+    "open": "Vis opdateringer"
+  },
+  "suggestion": {
+    "title": "Denne server bruger {{name}}",
+    "noReason": "Foreslået af serveren",
+    "install": "Installer…",
+    "installLabel": "Installer {{name}}",
+    "addRepositoryLabel": "Tilføj repository til {{name}}",
+    "details": "Se detaljer",
+    "detailsLabel": "Detaljer om {{name}}",
+    "notNow": "Ikke nu",
+    "notNowLabel": "Skjul {{name}} for nu",
+    "dontAsk": "Spørg ikke igen for denne server",
+    "recommended": "Anbefalet",
+    "official": "Officiel",
+    "unofficial": "Uofficiel · {{host}}",
+    "footer": "Forslag installerer aldrig noget af sig selv. Serveren får ikke at vide, hvad du installerer."
+  },
+  "failed": "Det virkede ikke. Prøv igen."
+}

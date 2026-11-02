@@ -1,0 +1,47 @@
+# Scenario for the plugin that `mumcord-plugin new` creates.
+# Run it with:  mumcord-plugin test dist/<id>-0.1.0.mcplugin scenarios/hello.yaml
+#
+# A scenario starts the plugin in a mock host, sends the events of `steps` in order and checks
+# that the expected output follows. Each `expect` waits up to 1 s for a matching output after
+# the previous match. Texts match as substrings, message payloads exactly.
+#
+# Chat cards (plugins that use chat.current-message / replace / hide / is-replay):
+#   - event: {chat-match:   {sender: 2, text: "[Rifter]", message: 3, replay: true}}
+#   - event: {chat-trigger: {sender: 2, trigger: "!poll", args: "2"}}
+#     `message` names the chat message (default: the next unused number, 1, 2, ...); the plugin
+#     gets a message token only inside these two events, a foreign token is `not-permitted`.
+#     `replay: true` marks a line from stored history (chat.is-replay); like the real host, it
+#     reaches only plugins that import chat.is-replay.
+#   - event: {chat-match:   {own: true, text: "[Poll] Lunch?", message: 5, replay: true}}
+#     `own: true` is the plugin's own "[Name] " line coming back from history: the host sends it
+#     as chat-match with pattern-index 255 (no manifest pattern needed), only to plugins with
+#     chat.send that import chat.is-replay; without chat.send the mock refuses the step.
+#   - expect: {replaced: {message: 3, card: fit-3}}   # chat.replace (card is optional)
+#   - expect: {hidden: {message: 2}}                  # chat.hide
+name: Waving counts, stores and tells the channel
+
+# Optional: the granted permissions (default: required + suggested optional ones).
+grant: [ui.panel, peers.messages]
+# You (default: session 1, "Me") and the other users in the channel who run this plugin.
+me: { session: 1, name: Alice }
+peers:
+  - { session: 2, name: Bob }
+
+steps:
+  - expect: { tree: { slot: panel, text: "0 waves" } }
+
+  # A click on the "Wave" button.
+  - event: { ui-action: { action: wave } }
+  - expect: { message: { to: channel, kind: 1, text: "null" } }
+  - expect: { tree: { slot: panel, text: "1 wave" } }
+
+  - event: { ui-action: { action: wave } }
+  - expect: { tree: { slot: panel, text: "2 waves" } }
+
+  # Bob waves back.
+  - event: { peer-message: { from: 2, kind: 1, text: "null" } }
+  - expect: { log: { contains: someone waved } }
+
+  # Unknown actions change nothing.
+  - event: { ui-action: { action: dance } }
+  - expect: nothing

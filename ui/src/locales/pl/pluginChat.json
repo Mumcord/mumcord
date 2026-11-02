@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Karta od {{plugin}}",
+    "showMore": "Pokaż więcej",
+    "showLess": "Pokaż mniej"
+  },
+  "via": "przez {{plugin}}",
+  "supersede": {
+    "showText": "Pokaż oryginalny tekst",
+    "hideText": "Ukryj oryginalny tekst",
+    "hiddenBy": "Ukryte przez {{plugin}}"
+  },
+  "command": {
+    "list": "Polecenia wtyczek",
+    "keys": "↑↓ wybierz · Tab uzupełnij · Enter uruchom · Esc zamknij",
+    "unavailable": "To polecenie jest teraz niedostępne.",
+    "failed": "Nie udało się wykonać polecenia. Spróbuj ponownie."
+  }
+}

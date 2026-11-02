@@ -1,0 +1,35 @@
+{
+  "hint": "Chargez un dossier de plugin non empaqueté pour le tester. Les plugins de développeur ne sont pas signés, jamais officiels, et ne peuvent obtenir ni net.http, ni secrets, ni ui.webview. Ils sont déchargés quand le mode développeur est désactivé.",
+  "load": "Charger un dossier de plugin…",
+  "pickFolder": "Choisir le dossier du plugin",
+  "empty": "Aucun plugin de développeur n'est chargé.",
+  "listLabel": "Plugins de développeur",
+  "label": "Plugin de développeur",
+  "status": {
+    "running": "En cours",
+    "off": "Désactivé",
+    "backingOff": "Redémarre après un plantage",
+    "autoOff": "Désactivé après des plantages répétés",
+    "allOff": "Tous les plugins sont désactivés",
+    "noPlugins": "Les plugins sont désactivés pour cette session",
+    "notLoaded": "Impossible à charger"
+  },
+  "showLog": "Afficher le journal de {{name}}",
+  "reload": "Recharger {{name}}",
+  "unload": "Décharger {{name}}",
+  "logLabel": "Journal de {{name}}",
+  "logTitle": "Journal de {{name}}",
+  "logEmpty": "Aucune ligne de journal pour l'instant.",
+  "level": {
+    "debug": "Débogage",
+    "info": "Info",
+    "warn": "Avertissement",
+    "error": "Erreur"
+  },
+  "errors": {
+    "load": "Le dossier du plugin n'a pas pu être chargé.",
+    "reload": "Le plugin n'a pas pu être rechargé.",
+    "unload": "Le plugin n'a pas pu être déchargé.",
+    "log": "Le journal n'a pas pu être lu."
+  }
+}

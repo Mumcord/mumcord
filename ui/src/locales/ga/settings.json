@@ -15,7 +15,8 @@
     "advanced": "Casta agus forbróir",
     "about": "Maidir le",
     "packetInspector": "Cigire paicéad",
-    "hotkeys": "Aicearraí"
+    "hotkeys": "Aicearraí",
+    "plugins": "Breiseáin"
   },
   "sectionDescriptions": {
     "general": "Tosú, teanga, nuashonruithe agus inrochtaineacht.",
@@ -27,7 +28,8 @@
     "servers": "Naisc le roinnt freastalaithe agus socruithe do gach freastalaí.",
     "gaming": "An forleagan sa chluiche, fuaim shuímh agus breiseáin chluiche.",
     "advanced": "Uirlisí forbróra, diagnóisic, stóras agus ceadúnais.",
-    "about": "Leagan, tacaíocht agus an draoi socraithe."
+    "about": "Leagan, tacaíocht agus an draoi socraithe.",
+    "plugins": "Ritheann breiseáin i bhfianán gainimh agus ní fhaigheann siad ach an méid a cheadaíonn tú. Ní fheiceann siad d'fhuaim, do chomhaid ná do theastas riamh."
   },
   "breadcrumb": "Socruithe / {{section}}",
   "moreInfo": "Tuilleadh eolais: {{topic}}",
@@ -1067,5 +1069,10 @@
     "addConfirm": "Cuir leis",
     "reset": "Athshocraigh gach aicearra",
     "resetHint": "Baintear gach aicearra seachas brúigh-chun-cainte; níl aon cheann socraithe de réir réamhshocraithe."
+  },
+  "developerMode": {
+    "title": "Mód forbróra",
+    "switch": "Mód forbróra",
+    "hint": "Cuireann sé cluaisín Forbróir leis na Breiseáin inar féidir breiseáin gan síniú a lódáil ó fhillteán. Cuir air é mura gcruthaíonn tú breiseáin tú féin."
   }
 }

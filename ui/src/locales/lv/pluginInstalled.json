@@ -1,0 +1,125 @@
+{
+  "listLabel": "Instalētie spraudņi",
+  "empty": "Spraudņu vēl nav.",
+  "browse": "Pārlūkot spraudņus",
+  "enable": "{{name}} ieslēgts",
+  "labels": {
+    "official": "Oficiāls",
+    "unofficial": "Neoficiāls · {{repository}}",
+    "unofficialUnknown": "Neoficiāls",
+    "developer": "Izstrādātāja spraudnis",
+    "autoOff": "Izslēgts pēc atkārtotām avārijām",
+    "backingOff": "Pēc avārijas tiek restartēts",
+    "notLoaded": "Neizdevās ielādēt",
+    "revoked": "Izslēdza Mumcord: {{reason}}",
+    "revocationWarning": "Mumcord brīdinājums: {{reason}}",
+    "tampered": "Šī spraudņa faili ir mainīti",
+    "permission": "Izslēgts, jo nepieciešamā atļauja ir izslēgta"
+  },
+  "details": {
+    "open": "Informācija par {{name}}",
+    "permissions": "Atļaujas",
+    "visibility": "Kas redz šī spraudņa darbību",
+    "visibilityOptions": {
+      "everyone": "Visi",
+      "friends": "Tikai draugi",
+      "nobody": "Neviens"
+    },
+    "notifications": "Paziņojumi",
+    "pin": "Piespraust versiju {{version}} (bez automātiskiem atjauninājumiem)",
+    "settings": "Spraudņa iestatījumi",
+    "diagnostics": "Diagnostika",
+    "export": "Eksportēt datus",
+    "reset": "Atiestatīt datus",
+    "remove": "Noņemt",
+    "commandTaken": "/{{command}}: Komandu jau izmanto {{plugin}}"
+  },
+  "badge": {
+    "label": "Nozīmīte blakus vārdiem",
+    "none": "Nav"
+  },
+  "diagnostics": {
+    "loading": "Notiek diagnostikas ielāde…",
+    "failed": "Neizdevās ielādēt diagnostiku.",
+    "unknown": "Nav pieejams",
+    "ms": "{{value}} ms",
+    "cpuTime": "Procesora laiks",
+    "memory": "Atmiņa",
+    "peakMemory": "Maksimālā atmiņa",
+    "droppedEvents": "Izmesti notikumi",
+    "droppedMessages": "Izmestie ziņojumi",
+    "restarts": "Restartēšanas",
+    "messagesSent": "Nosūtītie ziņojumi",
+    "messagesReceived": "Saņemtie ziņojumi",
+    "messagesRateLimited": "Ar ātruma ierobežojumu aizturētie ziņojumi",
+    "messagesExpired": "Ziņojumi, kuriem beidzies derīgums",
+    "incomingRateDropped": "Ar ātruma ierobežojumu izmestie ienākošie ziņojumi",
+    "incomingInvalid": "Nederīgi ienākošie ziņojumi",
+    "log": "Žurnāls",
+    "logEmpty": "Žurnāls ir tukšs.",
+    "level": {
+      "debug": "Atkļūdošana",
+      "info": "Info",
+      "warn": "Brīdinājums",
+      "error": "Kļūda"
+    }
+  },
+  "export": {
+    "title": "Eksportēt spraudņa {{name}} datus",
+    "filter": "JSON fails",
+    "done": "Dati eksportēti."
+  },
+  "reset": {
+    "title": "Atiestatīt spraudņa {{name}} datus?",
+    "message": "Viss, ko šis spraudnis ir saglabājis, tiks izdzēsts. To nevar atsaukt.",
+    "confirm": "Atiestatīt datus",
+    "done": "Dati atiestatīti."
+  },
+  "remove": {
+    "title": "Noņemt {{name}}?",
+    "deleteData": "Izdzēst arī tā datus",
+    "hint": "Paturētie dati tiek izdzēsti pēc 30 dienām. Pārinstalējiet līdz tam, lai tos atgūtu.",
+    "confirm": "Noņemt"
+  },
+  "errors": {
+    "enable": "Neizdevās pārslēgt spraudni.",
+    "permissions": "Neizdevās mainīt atļauju.",
+    "visibility": "Neizdevās mainīt redzamību.",
+    "notifications": "Neizdevās mainīt paziņojumus.",
+    "pin": "Neizdevās piespraust versiju.",
+    "export": "Neizdevās eksportēt datus.",
+    "reset": "Neizdevās atiestatīt datus.",
+    "remove": "Neizdevās noņemt spraudni.",
+    "badge": "Neizdevās mainīt nozīmīti.",
+    "update": "Spraudni neizdevās atjaunināt."
+  },
+  "update": {
+    "hint": "Atjauninājums {{version}}",
+    "button": "Atjaunināt"
+  },
+  "visibilityChip": "Sazinās ar citiem Mumcord lietotājiem · {{visibility}}",
+  "chips": {
+    "label": "Izmantotās atļaujas",
+    "uiPanel": "Panelis",
+    "uiMemberBadge": "Dalībnieka nozīmīte",
+    "uiProfileCard": "Profila karte",
+    "uiChatCard": "Tērzēšanas kartes",
+    "uiUserMenu": "Lietotāja izvēlne",
+    "uiDialog": "Savs logs",
+    "uiWebview": "Tīmekļa saturs",
+    "eventsSelf": "Jūsu statuss",
+    "eventsVoice": "Balss aktivitāte",
+    "eventsPresence": "Pievienošanās un aiziešana",
+    "eventsChatActivity": "Tērzēšanas aktivitāte",
+    "notify": "Paziņojumi",
+    "randomBytes": "Nejauši skaitļi",
+    "commands": "Komandas",
+    "chatSend": "Raksta tērzēšanā",
+    "chatSupersedes": "Aizstāj savu teksta rindu",
+    "chatTriggers": "Aktivizēšanas vārdi",
+    "chatPatterns": "Tērzēšanas šabloni",
+    "netHttp": "Piekļuve internetam",
+    "secrets": "Atslēgu piekariņš"
+  },
+  "offerBadge": "Jaunas atļaujas"
+}

@@ -496,7 +496,7 @@ export const commands = {
 	/**  Disconnects cleanly and starts Mumcord again, e.g. to apply compatibility mode (FR-1.48). */
 	appRestart: () => typedError<null, ApiError>(__TAURI_INVOKE("app_restart")),
 	/**
-	 *  The main window's page painted its start screen; the window can be shown without an empty
+	 *  The main window's page holds its start screen; the window can be shown without an empty
 	 *  frame. Called by the inline script in `ui/index.html`, before the app bundle has loaded.
 	 */
 	appStartPainted: () => __TAURI_INVOKE<void>("app_start_painted"),
@@ -509,6 +509,147 @@ export const commands = {
 	 *  the app), once. Later links arrive only as `deepLinkOpened`.
 	 */
 	deepLinkTakePending: () => typedError<DeepLinkOpened | null, ApiError>(__TAURI_INVOKE("deep_link_take_pending")),
+	/**
+	 *  Returns the plugin id of a `mumcord://plugins/<id>` link that arrived before the UI listened
+	 *  (e.g. the one that launched the app), once. Later links arrive as `plugins://open-details`.
+	 */
+	pluginsTakePendingLink: () => typedError<string | null, ApiError>(__TAURI_INVOKE("plugins_take_pending_link")),
+	/**  Every installed plugin, developer plugins included. */
+	pluginsList: () => typedError<PluginsOverview, ApiError>(__TAURI_INVOKE("plugins_list")),
+	/**
+	 *  Whether the server passes plugin data (FR-6.38); the answer so far, kept current by the
+	 *  `plugins://shared-state` event.
+	 */
+	pluginsSharedSupported: (serverId: number) => __TAURI_INVOKE<boolean>("plugins_shared_supported", { serverId }),
+	/**
+	 *  Loads the official plugin list (cached copy when offline, FR-6.55) followed by the plugins of
+	 *  every switched-on repository (FR-6.61, FR-6.74). A repository that cannot be loaded is left
+	 *  out; one whose key changed is paused and its plugins turned off (FR-6.75).
+	 */
+	pluginsIndex: (language: string) => typedError<PluginIndex, ApiError>(__TAURI_INVOKE("plugins_index", { language })),
+	/**
+	 *  Installs a plugin from the lists loaded by `plugins_index` (official or a repository) (latest version unless
+	 *  `version` is given), with the optional permissions the user left on.
+	 */
+	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility })),
+	/**
+	 *  Downloads and verifies the latest version of a store plugin (official or from a repository)
+	 *  before the install prompt
+	 *  opens, so the prompt can show the manifest's required and optional permissions. Nothing is
+	 *  unpacked or run; `plugin_install` installs this package once the user agrees.
+	 */
+	pluginInstallPrepare: (id: string) => typedError<PluginInstallOffer, ApiError>(__TAURI_INVOKE("plugin_install_prepare", { id })),
+	/**
+	 *  Loads a store image of a plugin in the loaded list as a data URL. It takes an index id, not
+	 *  a URL, so the UI cannot use it to fetch anything else; SVG and oversized files are refused.
+	 */
+	pluginIndexImage: (id: string, image: PluginIndexImage) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_index_image", { id, image })),
+	pluginSetEnabled: (id: string, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_enabled", { id, enabled })),
+	/**  The granted optional permissions (required ones are always granted). */
+	pluginSetPermissions: (id: string, granted: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_permissions", { id, granted })),
+	pluginSetVisibility: (id: string, visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_visibility", { id, visibility })),
+	/**  The plugin's "notifications" switch. */
+	pluginSetNotifications: (id: string, on: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_notifications", { id, on })),
+	/**  "Pin version": a pinned plugin is not offered updates (FR-6.67). */
+	pluginSetPinned: (id: string, pinned: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_pinned", { id, pinned })),
+	/**  Removes a plugin; its data is kept for 30 days unless `deleteData`. */
+	pluginRemove: (id: string, deleteData: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_remove", { id, deleteData })),
+	/**  The updates waiting for the user. */
+	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
+	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
+	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
+	/**  "Check now": looks for plugin updates and revocations right away. */
+	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
+	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
+	pluginExportData: (id: string) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_export_data", { id })),
+	pluginResetData: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_reset_data", { id })),
+	/**  Developer mode: loads an unpacked plugin folder and returns its id. */
+	pluginDevLoad: (folder: string) => typedError<string, ApiError>(__TAURI_INVOKE("plugin_dev_load", { folder })),
+	pluginDevReload: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_dev_reload", { id })),
+	/**  Unloads a developer plugin and deletes its data. */
+	pluginDevUnload: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_dev_unload", { id })),
+	/**  "Turn off all plugins" (FR-6.6); kept across restarts. */
+	pluginsSetAllOff: (allOff: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_set_all_off", { allOff })),
+	/**  Which plugin's member badge is shown (`None`: no badge). */
+	pluginSetBadge: (id: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_badge", { id })),
+	pluginDiagnostics: (id: string) => typedError<PluginDiagnostics, ApiError>(__TAURI_INVOKE("plugin_diagnostics", { id })),
+	pluginAsset: (id: string, path: string) => typedError<PluginAsset, ApiError>(__TAURI_INVOKE("plugin_asset", { id, path })),
+	/**
+	 *  Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
+	 *  after the plugins started. Reload it after `plugins://changed` (stopped plugins lose
+	 *  their UI).
+	 */
+	pluginsUiTrees: () => typedError<PluginUi[], ApiError>(__TAURI_INVOKE("plugins_ui_trees")),
+	/**  The resolved app language and theme for plugins (the UI knows the system values). */
+	pluginsSetAppearance: (language: string, dark: boolean, reducedMotion: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_set_appearance", { language, dark, reducedMotion })),
+	/**
+	 *  The user acted in a plugin's UI (`slot`) or typed one of its slash commands (`slot`
+	 *  `None`: `action` is the command, `value` the rest of the line as text). Actions must
+	 *  belong to an enabled component on screen. Server addresses become reachable for the
+	 *  plugin, password text goes into the secret, a picked file becomes a handle. `server_id`:
+	 *  the server whose chat the action came from (a chat card), where a reply goes.
+	 */
+	pluginUiAction: (id: string, slot: PluginSlot | null, action: string, value: PluginActionValue, serverId: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_ui_action", { id, slot, action, value, serverId })),
+	/**  Other user inputs for a plugin's UI. */
+	pluginUiEvent: (id: string, input: PluginUiInput) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_ui_event", { id, input })),
+	/**
+	 *  The UI found a mention of the user in a message from `session` (plugins get `mentioned`,
+	 *  never the text).
+	 */
+	pluginsMentioned: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_mentioned", { serverId, session })),
+	/**
+	 *  The UI showed the history of a channel, or the plugins changed while it is open: plugins see
+	 *  its stored messages again, render only, so old messages get their cards too (FR-6.45). Only
+	 *  the user's current channel on the focused server is replayed; each message at most once per
+	 *  plugin, so calling this often is cheap.
+	 */
+	pluginsReplayChat: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugins_replay_chat", { serverId, channelId })),
+	/**  Every added repository, oldest first. */
+	pluginReposList: () => typedError<RepositoryView[], ApiError>(__TAURI_INVOKE("plugin_repos_list")),
+	/**
+	 *  Fetches a repository for the Add dialog without adding it. With an "Expected key" the
+	 *  repository must be signed with exactly that key.
+	 */
+	pluginRepoPreview: (url: string, expectedKey: string | null) => typedError<RepositoryPreview, ApiError>(__TAURI_INVOKE("plugin_repo_preview", { url, expectedKey })),
+	/**
+	 *  Adds the repository and pins the key it is signed with (trust on first use). The repository
+	 *  is fetched again, so what is pinned is what was verified just now.
+	 */
+	pluginRepoAdd: (url: string, expectedKey: string | null) => typedError<RepositoryView, ApiError>(__TAURI_INVOKE("plugin_repo_add", { url, expectedKey })),
+	/**
+	 *  Switches a repository on or off. Off turns its plugins off too (FR-6.75). Switching on a
+	 *  repository that was paused for a key change goes through `plugin_repo_accept_key`.
+	 */
+	pluginRepoSetEnabled: (id: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_set_enabled", { id, enabled })),
+	/**
+	 *  Removes a repository. Its plugins are turned off and stay installed, so the user can still
+	 *  export or delete their data; they get no updates any more.
+	 */
+	pluginRepoRemove: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_remove", { id })),
+	/**  Looks at the key a paused repository signs with now (key-change dialog, FR-6.75). */
+	pluginRepoReviewKey: (id: number) => typedError<KeyChangeReview, ApiError>(__TAURI_INVOKE("plugin_repo_review_key", { id })),
+	/**
+	 *  The user trusts the new key: pins it and switches the repository back on. The key is read
+	 *  again from the repository, not taken from the UI.
+	 */
+	pluginRepoAcceptKey: (id: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_repo_accept_key", { id })),
+	/**  The slash commands of all running plugins that hold `commands`, in install order. */
+	pluginCommands: () => typedError<PluginCommand[], ApiError>(__TAURI_INVOKE("plugin_commands")),
+	/**
+	 *  Hands a typed line starting with `/` to the plugin that owns the command, as a `ui-action`
+	 *  with source `command` (action = command name, value = the rest of the line). `server_id`: the
+	 *  server whose chat the line was typed in, where a reply goes.
+	 */
+	pluginRunCommand: (line: string, serverId: number | null) => typedError<PluginCommandOutcome, ApiError>(__TAURI_INVOKE("plugin_run_command", { line, serverId })),
+	/**  "Not now": the suggestion stays hidden until the server's list changes or 30 days pass. */
+	pluginSuggestionNotNow: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_not_now", { serverId, plugin })),
+	/**
+	 *  The user installed a plugin from a suggestion: remember it, so the suggestion does not come
+	 *  back if the plugin is removed before the server's next announcement (AC-6.26).
+	 */
+	pluginSuggestionInstalled: (serverId: number, plugin: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestion_installed", { serverId, plugin })),
+	/**  "Don't ask again for this server". */
+	pluginSuggestionsDismissServer: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_suggestions_dismiss_server", { serverId })),
 	/**  Writes the diagnostic file (no chat contents, passwords, certificates or personal data). */
 	diagnosticsSave: (path: string) => typedError<null, ApiError>(__TAURI_INVOKE("diagnostics_save", { path })),
 	appInfo: () => typedError<AppInfo, ApiError>(__TAURI_INVOKE("app_info")),
@@ -588,9 +729,9 @@ export const commands = {
 	/**  The current positional audio status. */
 	positionalStatus: () => typedError<PositionalStatus, ApiError>(__TAURI_INVOKE("positional_status")),
 	/**  The official Mumble game plugins found in Mumcord's and Mumble's plugin folders. */
-	pluginsList: () => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("plugins_list")),
+	gamePluginsList: () => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("game_plugins_list")),
 	/**  Enables or disables one game plugin and stores the choice; returns the updated list. */
-	pluginSetEnabled: (id: string, enabled: boolean) => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("plugin_set_enabled", { id, enabled })),
+	gamePluginSetEnabled: (id: string, enabled: boolean) => typedError<GamePlugin[], ApiError>(__TAURI_INVOKE("game_plugin_set_enabled", { id, enabled })),
 	/**  Current in-game overlay settings, platform support and the games that can be configured. */
 	ingameOverlayState: () => typedError<InGameOverlayState, ApiError>(__TAURI_INVOKE("ingame_overlay_state")),
 	/**  Sets the global mode (off/on). */
@@ -793,6 +934,14 @@ export const events = {
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
+	pluginSupersede: makeEvent<PluginSupersede, PluginSupersede>("plugin://supersede"),
+	pluginUi: makeEvent<PluginUi, PluginUi>("plugin://ui"),
+	pluginsChanged: makeEvent<PluginsChanged, PluginsChanged>("plugins://changed"),
+	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
+	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
+	pluginsOpenDetails: makeEvent<PluginsOpenDetails, PluginsOpenDetails>("plugins://open-details"),
+	pluginsSharedState: makeEvent<PluginsSharedState, PluginsSharedState>("plugins://shared-state"),
+	pluginsSuggestion: makeEvent<PluginSuggestion, PluginSuggestion>("plugins://suggestion"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
@@ -1596,6 +1745,56 @@ export type IncomingWhisperKind =
 /**  The speaker's target is a channel we are in. */
 "shout";
 
+/**  How fresh the store's plugin list is. */
+export type IndexFreshness = "fresh" | "notModified" | 
+/**  The last known list (`notice` says so). */
+"offline" | 
+/**  A new list failed a check; the last known one is shown. */
+"rejected";
+
+export type IndexScreenshot = {
+	url: string,
+	alt: string,
+};
+
+/**  Which list a store plugin comes from. */
+export type IndexSource = { kind: "official" } | 
+/**  "Unofficial · <name>" (FR-6.61). */
+{ kind: "repo"; repositoryId: number; name: string };
+
+/**  One plugin of the store (official or a repository), texts in the asked language (English fallback). */
+export type IndexedPlugin = {
+	id: string,
+	source: IndexSource,
+	name: string,
+	summary: string,
+	descriptionMdUrl: string | null,
+	icon: string | null,
+	screenshots: IndexScreenshot[],
+	categories: string[],
+	authors: string[],
+	reviewed: boolean,
+	/**  Where the source code lives. */
+	sourceUrl: string | null,
+	/**  SPDX licence expression. */
+	license: string | null,
+	/**  Lowest Mumcord version the plugin needs. */
+	minMumcord: string | null,
+	/**  Day the maintainers reviewed it (`YYYY-MM-DD`). */
+	reviewedOn: string | null,
+	/**  Day it was added to the index (`YYYY-MM-DD`). */
+	addedOn: string | null,
+	/**  Fingerprint (minisign key id) of the key the plugin's packages are signed with. */
+	signingKey: string | null,
+	updated: string,
+	/**  The latest version. */
+	version: string,
+	/**  Package size in bytes. */
+	size: number | null,
+	/**  Every permission (required and optional) the version may ask for. */
+	permissions: string[],
+};
+
 /**  An external image or image link, ready to show inline (FR-1.55). */
 export type InlineImage = {
 	/**  The image link as posted, without fragment. */
@@ -1660,10 +1859,62 @@ export type InstallKind =
 /**  Packages: the package manager updates them. */
 "deb" | "rpm" | "aur" | "otherLinux";
 
+/**  One installed plugin. */
+export type InstalledPlugin = {
+	id: string,
+	/**  Empty when the plugin could not be loaded. */
+	name: string,
+	version: string,
+	source: PluginSourceInfo,
+	status: PluginStatus,
+	/**  Whether the user wants it on. */
+	enabled: boolean,
+	/**  `crashes`, `revoked`, `tampered`, `user` or `permission`. */
+	disabledReason: string | null,
+	required: string[],
+	optional: PluginOptionalPermission[],
+	granted: string[],
+	visibility: PluginVisibilityChoice,
+	pinned: boolean,
+	notifications: boolean,
+	/**  Unix milliseconds. */
+	installedAt: number | null,
+	/**  This plugin's badge is the one shown next to names. */
+	badge: boolean,
+	/**
+	 *  The reason from Mumcord's revocation list for the installed version, in the UI language.
+	 *  With `disabledReason` `revoked` the plugin was turned off; otherwise it is a warning.
+	 */
+	revocation: string | null,
+	/**  The manifest icon (a path under `assets/`, loaded with `plugin_asset`). */
+	icon: string | null,
+	/**  The manifest's one-line description (empty when the plugin could not be loaded). */
+	description: string,
+	/**  The manifest's authors. */
+	authors: string[],
+	/**
+	 *  What the plugin's chat patterns recognise, in the app language (shown with
+	 *  `chat.patterns`). Plugin text: plain, untrusted.
+	 */
+	chatPatterns: string[],
+	/**
+	 *  Optional permissions an update added and the user has not answered yet; they are off.
+	 *  Answering means `plugin_set_permissions` (which clears this).
+	 */
+	offered: string[],
+};
+
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
 export type KdeX11Access = {
 	allowed: boolean,
 	undoAvailable: boolean,
+};
+
+/**  The key a paused repository signs with now (FR-6.75). */
+export type KeyChangeReview = {
+	name: string,
+	oldFingerprint: string,
+	newFingerprint: string,
 };
 
 /**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
@@ -2182,6 +2433,373 @@ export type PlaylistEntry = {
 	addedByName: string | null,
 };
 
+/**  The value of a `ui-action` as the UI sends it. */
+export type PluginActionValue = { type: "none" } | { type: "boolean"; value: boolean } | { type: "number"; value: number | null } | 
+/**  Also the typed text of a password field (it goes into the secret, never to the plugin). */
+{ type: "text"; value: string } | 
+/**  A list row moved from `from` to `to`. */
+{ type: "reorder"; from: number; to: number } | 
+/**  The path the user picked in a file picker. */
+{ type: "file"; path: string };
+
+export type PluginAlign = "start" | "center" | "end" | "stretch";
+
+export type PluginAnimation = "bob" | "hop" | "wave" | "nap" | "sparkle" | "shake" | "fade";
+
+/**
+ *  An image from a plugin's `assets/` folder for the UI renderer (SVG already sanitised at
+ *  install). The UI turns it into a blob URL; it never reads plugin files itself.
+ */
+export type PluginAsset = {
+	mimeType: string,
+	/**  The file's bytes, base64-encoded. */
+	base64: string,
+};
+
+export type PluginButtonKind = "primary" | "secondary" | "danger";
+
+/**  A slash command of an active plugin (FR-6.43). */
+export type PluginCommand = {
+	pluginId: string,
+	pluginName: string,
+	/**  Without the leading `/`. */
+	name: string,
+	description: string,
+	usage: string | null,
+	/**
+	 *  Who owns this name instead: show "Command taken by <takenBy>" in the plugin's settings.
+	 *  `null` when this plugin owns the command (only those are offered in the chat box).
+	 */
+	takenBy: string | null,
+};
+
+/**  What happened to a line typed into the chat box. */
+export type PluginCommandOutcome = 
+/**  A plugin received it; the line is never posted as chat. */
+"plugin" | 
+/**  Not a plugin command: send the line as normal text. */
+"unknown";
+
+/**  One UI component. `color` values are theme token names (unknown ones make a tree invalid). */
+export type PluginComponent = { type: "stack"; direction: PluginDirection; gap: number; align: PluginAlign; 
+/**  `None`: start. */
+justify: PluginJustify | null } | { type: "text"; text: string; style: PluginTextStyle; color: string | null } | 
+/**  `asset` is a path inside the package's `assets/`. */
+{ type: "image"; asset: string; alt: string; width: number; height: number } | { type: "sprite"; asset: string; alt: string; frameWidth: number; frameHeight: number; frames: number; fps: number; stillFrame: number } | { type: "meter"; label: string; value: number | null; color: string | null } | { type: "button"; label: string; action: string; kind: PluginButtonKind; disabled: boolean; expanded: boolean | null; 
+/**  Muted second line under the label; announced as the button's description. */
+detail: string | null } | { type: "iconButton"; icon: string; label: string; action: string; disabled: boolean } | { type: "chip"; text: string; color: string | null; 
+/**  Wins over `color`. */
+tone: PluginTone | null } | { type: "divider" } | 
+/**  `value` none: indeterminate. */
+{ type: "progress"; label: string; value: number | null } | { type: "list"; label: string; reorderAction: string | null } | { type: "toggle"; label: string; value: boolean; action: string; disabled: boolean } | { type: "select"; label: string; options: PluginSelectOption[]; selected: string | null; action: string; refreshAction: string | null; disabled: boolean } | { type: "slider"; label: string; min: number | null; max: number | null; step: number | null; value: number | null; action: string; disabled: boolean } | { type: "textInput"; label: string; value: string; placeholder: string; maxBytes: number; purpose: PluginInputPurpose; action: string; disabled: boolean; help: string | null; helpTone: PluginTone | null; 
+/**  Set: the field is in its error state and this replaces `help`. */
+error: string | null } | 
+/**  What the user types goes into the named secret; the plugin never sees it. */
+{ type: "password"; label: string; secret: string; action: string; disabled: boolean; help: string | null; helpTone: PluginTone | null; error: string | null } | { type: "filePicker"; label: string; accept: string[]; action: string; disabled: boolean } | 
+/**  `until` in Unix seconds. */
+{ type: "countdown"; label: string; until: number | null } | 
+/**  The renderer copies `text` itself on a click; there is no action back to the plugin. */
+{ type: "copyButton"; label: string; text: string; kind: PluginButtonKind };
+
+/**  The Diagnostics section of a plugin (counts only, never payloads). */
+export type PluginDiagnostics = {
+	cpuTimeMs: number | null,
+	memoryBytes: number | null,
+	peakMemoryBytes: number | null,
+	droppedEvents: number | null,
+	droppedMessages: number | null,
+	restarts: number | null,
+	messagesSent: number | null,
+	messagesRateLimited: number | null,
+	messagesExpired: number | null,
+	messagesReceived: number | null,
+	incomingRateDropped: number | null,
+	incomingInvalid: number | null,
+	/**  The plugin's own log lines (in memory only). */
+	log: PluginLogLine[],
+};
+
+export type PluginDirection = "row" | "column";
+
+/**  The store's official plugin list. */
+export type PluginIndex = {
+	freshness: IndexFreshness,
+	/**  A user-facing text when the list is not fresh. */
+	notice: string | null,
+	plugins: IndexedPlugin[],
+};
+
+/**  Which store image of an index plugin to load. */
+export type PluginIndexImage = { kind: "icon" } | { kind: "screenshot"; index: number };
+
+export type PluginInputPurpose = "plain" | 
+/**  Hosts typed here become the only ones the plugin may reach with `net.http`. */
+"serverAddress";
+
+/**
+ *  What the install prompt shows, read from the verified package's manifest (the index only
+ *  lists every permission, not which are required).
+ */
+export type PluginInstallOffer = {
+	id: string,
+	version: string,
+	authors: string[],
+	required: string[],
+	optional: PluginOptionalPermission[],
+	/**  Preselected in the visibility choice (shown when `peers.messages` is requested). */
+	defaultVisibility: PluginVisibilityChoice,
+	/**
+	 *  What the plugin's chat patterns recognise, in the app language (shown with
+	 *  `chat.patterns`). Plugin text: plain, untrusted.
+	 */
+	chatPatterns: string[],
+};
+
+/**  `plugins://install-progress`. */
+export type PluginInstallProgress = {
+	id: string,
+	progress: PluginInstallStage,
+};
+
+/**  One step of an install. */
+export type PluginInstallStage = 
+/**  `received` of `total` package bytes (packages are at most 64 MiB, so u32 fits). */
+{ stage: "downloading"; received: number; total: number } | { stage: "verifying" } | { stage: "unpacking" } | { stage: "starting" } | 
+/**  Installed: the UI shows "<name> installed". */
+{ stage: "done" } | 
+/**  Stopped; `reason` is a user-facing text. */
+{ stage: "failed"; reason: string };
+
+/**  Main-axis spread of a stack. */
+export type PluginJustify = "start" | "end" | "spaceBetween" | 
+/**  Rows: the first child takes the free width, the others keep their natural width. */
+"fillFirst";
+
+export type PluginLogLevel = "debug" | "info" | "warn" | "error";
+
+export type PluginLogLine = {
+	level: PluginLogLevel,
+	text: string,
+};
+
+/**  One node of a flat tree: node 0 is the root, `children` are indices into the same list. */
+export type PluginNode = {
+	component: PluginComponent,
+	animation: PluginAnimation | null,
+	children: number[],
+};
+
+/**  What a plugin notification says. */
+export type PluginNotice = 
+/**  `notify.send`; title and body are untrusted plain text. */
+{ kind: "message"; title: string; body: string } | 
+/**  "Turned off after repeated crashes". */
+{ kind: "autoOff" } | 
+/**  A new version waits in the Updates tab (no OS notification). */
+{ kind: "updateAvailable"; name: string; version: string };
+
+/**  `plugins://notification`: an entry for the notification centre (category Plugins). */
+export type PluginNotification = {
+	plugin: string,
+	notice: PluginNotice,
+};
+
+export type PluginOptionalPermission = {
+	id: string,
+	/**  Preselected in the install prompt. */
+	suggested: boolean,
+};
+
+/**  How the user saw the plugin's panel. */
+export type PluginPanelVisibility = "hidden" | "inline" | "expanded";
+
+export type PluginSelectOption = {
+	value: string,
+	label: string,
+};
+
+/**  Where a plugin tree is shown. */
+export type PluginSlot = 
+/**  260×160 in the Plugins strip, 420×560 expanded. */
+{ kind: "panel" } | 
+/**  Next to a user's name. */
+{ kind: "memberBadge"; session: number } | 
+/**  A section on a user's profile card. */
+{ kind: "profileCard"; session: number } | 
+/**  A local card in the chat of the current channel. */
+{ kind: "chatCard"; id: string } | 
+/**  A decoration next to a user's name in chat. */
+{ kind: "chatDecoration"; session: number } | 
+/**  The plugin's form in Settings → Plugins. */
+{ kind: "settings" } | 
+/**  The plugin's own dialog while it is open. */
+{ kind: "dialog" };
+
+/**  Where an installed plugin came from. */
+export type PluginSourceInfo = { kind: "official" } | { kind: "repo"; repositoryId: number; 
+/**  Shown as "Unofficial · <name>"; empty when the repository was removed. */
+name: string } | 
+/**  "Developer plugin", loaded from `folder`. */
+{ kind: "dev"; folder: string };
+
+/**  Where a plugin is in its life. */
+export type PluginStatus = { kind: "running" } | 
+/**  Off; see `disabledReason`. */
+{ kind: "off" } | 
+/**  Crashed; starts again by itself. */
+{ kind: "backingOff"; error: string } | 
+/**  "Turned off after repeated crashes". */
+{ kind: "autoOff"; error: string } | 
+/**  "Turn off all plugins" is on. */
+{ kind: "allOff" } | 
+/**  Started with `--no-plugins`. */
+{ kind: "noPlugins" } | 
+/**  The installed files could not be loaded. */
+{ kind: "notLoaded"; error: string };
+
+/**  `plugins://suggestion`: the server suggests a plugin. Every text is untrusted plain text. */
+export type PluginSuggestion = {
+	serverId: number,
+	plugin: string,
+	/**  The plugin's name from the official list; the id for third-party plugins. */
+	name: string,
+	/**  Why the server suggests it, written by the server. */
+	reason: string,
+	/**  The announcement number as text (a new one makes "Not now" lapse). */
+	seq: string,
+	source: PluginSuggestionSource,
+};
+
+/**  Where a suggested plugin comes from. */
+export type PluginSuggestionSource = 
+/**  The official list: Install or Details. */
+{ kind: "official"; version: string } | 
+/**  A third-party repository: opens the Add repository dialog with `key` as Expected key. */
+{ kind: "repository"; url: string; key: string | null };
+
+/**
+ *  `plugin://supersede`: hide chat message `messageId` and show the plugin's chat card `card`
+ *  in its place, or only a "Hidden by <plugin>" line when `card` is `null` (FR-6.45). The UI
+ *  keeps the original text one click away and shows the plugin's icon.
+ */
+export type PluginSupersede = {
+	plugin: string,
+	card: string | null,
+	messageId: string,
+};
+
+export type PluginTextStyle = "body" | "caption" | "heading" | "monospace";
+
+/**  Colour role of a chip or a field note. */
+export type PluginTone = "neutral" | "success" | "warning" | "danger" | "accent";
+
+/**  `plugin://ui`: a plugin changed its UI. */
+export type PluginUi = {
+	plugin: string,
+	change: PluginUiChange,
+};
+
+/**  What changed in a plugin's UI. */
+export type PluginUiChange = 
+/**  Replaces the slot's tree (a new chat card id appends the card). */
+{ type: "setTree"; slot: PluginSlot; nodes: PluginNode[]; 
+/**
+ *  For a chat card: the server whose chat a new card goes into (`None`: the voice
+ *  server, and for every other slot).
+ */
+serverId: number | null } | 
+/**  Removes the slot's tree. */
+{ type: "clear"; slot: PluginSlot } | 
+/**  Opens the plugin's dialog, or only changes its title and subtitle when it is open. */
+{ type: "openDialog"; title: string; subtitle: string | null } | 
+/**  Closes the dialog without telling the plugin. */
+{ type: "closeDialog" } | 
+/**  The plugin's panel opens in (`open`) or closes from the strip's large popover. */
+{ type: "panelPopover"; open: boolean } | 
+/**
+ *  Settings → Plugins → Installed opens on the plugin's details, where its permissions are
+ *  (the plugin called `ui.open-permissions` after a user gesture).
+ */
+{ type: "openPermissions" } | 
+/**
+ *  The plugin's entry in the user context menu; `None` removes it. `sessions` lists the
+ *  users it shows on (`None`: every other user in the user's channel).
+ */
+{ type: "userMenuEntry"; label: string | null; sessions: number[] | null } | 
+/**
+ *  The plugin's sealed web view opens (or switches page) at `url`, a `mumcord-web` URL the
+ *  app serves from the plugin's `web/` folder (FR-6.46).
+ */
+{ type: "webviewShow"; place: PluginWebviewPlace; url: string } | 
+/**  The web view closes; its place shows the plugin's tree again. */
+{ type: "webviewHide" } | 
+/**  A bridge message for the page (untrusted text). Not part of the snapshot. */
+{ type: "webviewPost"; message: string };
+
+/**  A user input for a plugin's UI other than an action. */
+export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" } | 
+/**  A bridge message from the plugin's web view page (≤ 16 KiB, ≤ 60/s; dropped otherwise). */
+{ type: "webviewMessage"; text: string };
+
+/**  One update on offer in Settings → Plugins → Updates. */
+export type PluginUpdate = {
+	id: string,
+	/**  From the signed list; untrusted text. */
+	name: string,
+	from: string,
+	to: string,
+	source: PluginSourceInfo,
+	/**  Download size in bytes. */
+	size: number,
+	/**  `None`: may install without asking. */
+	approval: PluginUpdateApproval | null,
+	/**  This version was installed, failed to start and was rolled back: the reason. */
+	failed: string | null,
+};
+
+/**  Why an update waits for the user (FR-6.67). */
+export type PluginUpdateApproval = 
+/**  The new version asks for these permissions on top of what is granted. */
+{ kind: "newPermissions"; permissions: string[] } | 
+/**  The new version is signed by a different author key. */
+{ kind: "newAuthorKey" };
+
+/**  How plugin updates are handled. */
+export type PluginUpdates = "auto" | "notify" | "off";
+
+/**  Who sees that the user has a plugin (FR-6.35). */
+export type PluginVisibilityChoice = "everyone" | "friends" | "nobody";
+
+/**  Where a plugin's web view is shown. */
+export type PluginWebviewPlace = "panelPopover" | "dialog";
+
+/**  `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`. */
+export type PluginsChanged = Record<string, never>;
+
+/**  `plugins://open-details`: Browse opens the details of the named plugin. */
+export type PluginsOpenDetails = {
+	id: string,
+};
+
+/**  Settings → Plugins. */
+export type PluginsOverview = {
+	/**  Started with `--no-plugins`: show the banner. */
+	noPlugins: boolean,
+	/**  "Turn off all plugins" is on. */
+	allOff: boolean,
+	plugins: InstalledPlugin[],
+};
+
+/**
+ *  `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
+ *  engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
+ *  answers for a server that decided before the UI listened.
+ */
+export type PluginsSharedState = {
+	serverId: number,
+	supported: boolean,
+};
+
 /**  Pin and mute state of a private conversation, by server and the person's certificate hash. */
 export type PmConversationPrefs = {
 	serverId: number,
@@ -2412,6 +3030,34 @@ export type ReleaseNote = {
 	date: string | null,
 	/**  The release's CHANGELOG section (`### Added` …) as Markdown, English only; untrusted. */
 	changes: string,
+};
+
+/**  What the Add dialog shows before the user confirms (FR-6.74). */
+export type RepositoryPreview = {
+	url: string,
+	name: string,
+	homepage: string | null,
+	contact: string | null,
+	fingerprint: string,
+	pluginCount: number,
+	/**  Entries left out of the list, as plain-text notes (FR-6.76). */
+	notes: string[],
+};
+
+/**  One added repository as the Repositories tab shows it. */
+export type RepositoryView = {
+	id: number,
+	url: string,
+	name: string,
+	/**  The pinned key's id, e.g. `1CB49831E26E61AD`. */
+	fingerprint: string,
+	enabled: boolean,
+	/**  Paused after the repository started signing with another key. */
+	keyChanged: boolean,
+	/**  Milliseconds since the epoch of the last successful check. */
+	lastChecked: number | null,
+	/**  Plugins installed from this repository. */
+	installedPlugins: number,
 };
 
 /**  A stored channel password without the password itself (FR-2.78, issue #146). */
@@ -2730,6 +3376,16 @@ export type Settings = {
 	positional: PositionalSettings,
 	/**  How many servers may be connected at once, 1 – 15 (default 5; FR-2.1). */
 	maxConnectedServers: number,
+	/**  Plugin update behaviour (default `auto`). */
+	pluginsUpdates: PluginUpdates,
+	/**  "Turn off all plugins". */
+	pluginsAllOff: boolean,
+	/**  The plugin whose badge is shown next to names; `null` for none. */
+	pluginsBadgePlugin: string | null,
+	/**  Optional mirror of the official plugin repository. */
+	pluginsMirrorUrl: string | null,
+	/**  Developer mode (dev folders, local HTTP repositories). */
+	developerMode: boolean,
 	/**  Id of the app theme: a built-in preset or one of `customThemes` (FR-2.14). */
 	appThemeId: string,
 	customThemes: ThemeRecord[],

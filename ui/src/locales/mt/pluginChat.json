@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Karta minn {{plugin}}",
+    "showMore": "Uri aktar",
+    "showLess": "Uri inqas"
+  },
+  "via": "permezz ta' {{plugin}}",
+  "supersede": {
+    "showText": "Uri t-test oriġinali",
+    "hideText": "Aħbi t-test oriġinali",
+    "hiddenBy": "Moħbi minn {{plugin}}"
+  },
+  "command": {
+    "list": "Kmandi tal-plugins",
+    "keys": "↑↓ agħżel · Tab ikkompleta · Enter ħaddem · Esc agħlaq",
+    "unavailable": "Dan il-kmand mhux disponibbli bħalissa.",
+    "failed": "Il-kmand ma setax jitħaddem. Erġa' pprova."
+  }
+}

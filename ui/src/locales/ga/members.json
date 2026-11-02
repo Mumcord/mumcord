@@ -41,7 +41,6 @@
     "sessionOnly": "Níl teastas ag an duine seo, mar sin ní mhaireann na socruithe seo ach don seisiún seo.",
     "sendPrivateMessage": "Seol teachtaireacht phríobháideach",
     "privateMessage": "Teachtaireacht phríobháideach",
-    "localSettings": "Do shocruithe",
     "localSettingsHint": "Ní fheiceann ach tusa iad seo. Sábhálfar na hathruithe láithreach.",
     "settingsFor": "Socruithe do {{name}}",
     "hintMuted": "Balbhaithe",

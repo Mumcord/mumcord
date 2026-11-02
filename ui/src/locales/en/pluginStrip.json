@@ -1,0 +1,7 @@
+{
+  "heading": "Plugins",
+  "list": "Plugin panels",
+  "expand": "Expand {{name}}",
+  "close": "Close",
+  "unsupported": "This server doesn't support shared plugin features"
+}

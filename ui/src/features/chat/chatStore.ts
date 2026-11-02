@@ -466,6 +466,15 @@ export function conversationMessages(
   return (getLogs().get(logKey(serverId, conversation)) ?? EMPTY_LOG).messages;
 }
 
+/** Own messages of a conversation on `serverId` still being sent (not failed), oldest first. */
+export function sendingMessages(
+  conversation: Conversation,
+  serverId: number,
+): readonly ChatMessage[] {
+  const outgoing = getLogs().get(logKey(serverId, conversation))?.outgoing ?? [];
+  return outgoing.filter((item) => item.error === null).map((item) => item.message);
+}
+
 /**
  * Messages and loading state of a conversation on `serverId` (default: the shown server);
  * re-renders on change.

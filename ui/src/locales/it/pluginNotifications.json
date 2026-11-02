@@ -1,0 +1,30 @@
+{
+  "type": "Plugin",
+  "autoOff": {
+    "title": "{{name}} è stato disattivato",
+    "body": "Disattivato dopo arresti anomali ripetuti",
+    "open": "Mostra in Plugin"
+  },
+  "update": {
+    "title": "Aggiornamento per {{name}}",
+    "body": "La versione {{version}} è in attesa nella scheda Aggiornamenti",
+    "open": "Mostra aggiornamenti"
+  },
+  "suggestion": {
+    "title": "Questo server usa {{name}}",
+    "noReason": "Suggerito dal server",
+    "install": "Installa…",
+    "installLabel": "Installa {{name}}",
+    "addRepositoryLabel": "Aggiungi repository per {{name}}",
+    "details": "Vedi dettagli",
+    "detailsLabel": "Dettagli di {{name}}",
+    "notNow": "Non ora",
+    "notNowLabel": "Nascondi {{name}} per ora",
+    "dontAsk": "Non chiedere più per questo server",
+    "recommended": "Consigliato",
+    "official": "Ufficiale",
+    "unofficial": "Non ufficiale · {{host}}",
+    "footer": "I suggerimenti non installano mai nulla da soli. Il server non sa cosa installi."
+  },
+  "failed": "Non ha funzionato. Riprova."
+}

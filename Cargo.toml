@@ -11,7 +11,10 @@ members = [
     "crates/overlay-layer",
     "crates/p2p",
     "crates/screenshare",
+    "crates/plugins",
+    "crates/plugin-sdk",
     "tools/netsim",
+    "tools/mumcord-plugin",
     "src-tauri",
 ]
 
@@ -34,6 +37,8 @@ mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
 mumcord-screenshare = { path = "crates/screenshare" }
+mumcord-plugins = { path = "crates/plugins" }
+mumcord-plugin-sdk = { path = "crates/plugin-sdk" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -125,6 +130,32 @@ objc2-core-video = { version = "0.3", default-features = false, features = ["std
 objc2-core-graphics = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-audio-types = { version = "0.3", default-features = false, features = ["std"] }
 
+# Plugins (Epic 3.1, #268): WebAssembly components run in wasmtime without WASI, so a plugin can
+# only call what Mumcord defines. Only the runtime, the Cranelift compiler and the component model:
+# no async, GC, threads, profiling, cache or pooling allocator (smaller binary, less attack surface).
+wasmtime = { version = "50", default-features = false, features = ["runtime", "cranelift", "component-model", "std"] }
+# Plugin packages (#269): `.mcplugin` zips, stored or deflate only.
+zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+# Plugin and host API version ranges (#269).
+semver = "1"
+# Test fixtures only: turn core-module text into plugin components.
+wat = "1"
+wit-component = "0.263"
+wit-parser = "0.263"
+# Plugin SDK (FR-6.72): guest bindings for the WIT package, built into each plugin.
+wit-bindgen = "0.63"
+# Repository and package signatures (FR-6.53): verify only in the client, sign in the CLI.
+minisign-verify = "0.3"
+minisign = "0.10"
+# Peer keys for plugin messages; the HMAC version matches sha2 0.11.
+hmac = "0.13"
+# Local UTC offset for the plugin clock (FR-6.21); follows DST changes by itself.
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+# Repository sources and registry metadata (FR-6.54).
+toml = "1"
+# Scenario files for `mumcord-plugin test` (FR-6.71); pure Rust, no libyaml.
+serde-saphyr = "2"
+
 # Storage & secrets
 rusqlite = { version = "0.41", features = ["bundled"] }
 keyring = "4.2"
@@ -133,6 +164,10 @@ keyring = "4.2"
 ammonia = "4.2"
 # Tokenizer for page metadata; the same version ammonia already uses.
 html5ever = "0.40"
+# Plugin chat patterns (`chat.patterns`): linear-time matching with size limits; regex-syntax
+# checks that a pattern is anchored at the message start. Both already come in via other crates.
+regex = "1.13"
+regex-syntax = "0.8"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp"] }
 
 # In-game overlay (FR-1.46b): glyph rasterizing in the game-side renderer, Vulkan bindings for

@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Dan il-plugin għadu ma juri xejn hawn.",
+    "actionFailed": "Il-plugin ma setax jieħu ħsieb dan. Erġa' pprova."
+  },
+  "progress": {
+    "working": "Għaddej"
+  },
+  "countdown": {
+    "done": "Spiċċa l-ħin"
+  },
+  "select": {
+    "refresh": "Aġġorna {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} karattri"
+  },
+  "password": {
+    "save": "Issejvja",
+    "saved": "Issejvjat b'mod sigur"
+  },
+  "file": {
+    "choose": "Agħżel fajl…",
+    "none": "L-ebda fajl magħżul"
+  },
+  "list": {
+    "handle": "Ċaqlaq ir-ringiela {{position}} minn {{total}} (vleġġa 'l fuq jew 'l isfel)",
+    "moved": "Ir-ringiela {{from}} ġiet imċaqalqa għall-pożizzjoni {{to}} minn {{total}}"
+  },
+  "copyButton": {
+    "copied": "Ikkopjat",
+    "failed": "Ma setax jiġi kkopjat"
+  }
+}

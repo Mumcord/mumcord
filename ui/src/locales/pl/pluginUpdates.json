@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Aktualizacje wtyczek",
+    "info": "Niezależne od aktualizacji aplikacji. Mumcord szuka aktualizacji wtyczek przy uruchomieniu i co 6 godzin.",
+    "infoLabel": "Więcej informacji: aktualizacje wtyczek",
+    "auto": "Instaluj automatycznie",
+    "notify": "Tylko powiadamiaj",
+    "off": "Wyłączone"
+  },
+  "waiting": "Aktualizacje",
+  "empty": "Wszystkie wtyczki są aktualne.",
+  "emptyOff": "Aktualizacje wtyczek są wyłączone. Włącz je powyżej, aby szukać aktualizacji.",
+  "loadFailed": "Nie udało się wczytać aktualizacji.",
+  "newAuthorKey": "Ta wersja jest podpisana przez innego autora. Aktualizuj tylko, jeśli ufasz nowemu autorowi.",
+  "rolledBack": "Wersja {{version}} nie uruchomiła się, więc przywrócono poprzednią wersję. Powód:",
+  "review": "Sprawdź i zaktualizuj",
+  "update": "Zaktualizuj",
+  "installFailed": "Nie udało się zaktualizować wtyczki {{name}}. Spróbuj ponownie.",
+  "pins": "Przypnij wersję",
+  "pinsHint": "Przypięta wtyczka zostaje przy obecnej wersji i nie dostaje propozycji aktualizacji.",
+  "pin": "Zostaw {{name}} w tej wersji",
+  "pinVersion": "Wersja {{version}}",
+  "versionsTo": "do",
+  "pill": {
+    "none": "Brak nowych uprawnień",
+    "permission": "Wymaga nowego uprawnienia",
+    "author": "Nowy autor"
+  },
+  "newPermissions": "Nowe uprawnienia",
+  "revoked": {
+    "title": "Wtyczka {{name}} została wyłączona",
+    "text": "Wersja {{version}} jest na liście unieważnień: {{reason}}. Dane wtyczki zostają zachowane.",
+    "details": "Szczegóły",
+    "remove": "Usuń"
+  },
+  "checkNow": "Sprawdź teraz",
+  "lastChecked": "Ostatnio sprawdzono o {{time}}",
+  "checkFailed": "Sprawdzanie się nie powiodło. Spróbuj ponownie.",
+  "modeNote": "Aktualizacje wtyczek: {{mode}}. Możesz to zmienić poniżej.",
+  "settings": "Ustawienia aktualizacji",
+  "offer": {
+    "heading": "Nowe uprawnienia",
+    "title": "{{name}} {{version}} potrafi teraz więcej. Te opcje pozostaną wyłączone, dopóki ich nie włączysz.",
+    "permission": "Nowe opcjonalne uprawnienie: {{permission}}",
+    "save": "Zapisz",
+    "notNow": "Nie teraz",
+    "failed": "Nie udało się zmienić uprawnień {{name}}. Spróbuj ponownie."
+  }
+}

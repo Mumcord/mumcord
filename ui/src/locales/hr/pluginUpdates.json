@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Ažuriranja dodataka",
+    "info": "Odvojeno od ažuriranja aplikacije. Mumcord traži ažuriranja dodataka pri pokretanju i zatim svakih 6 sati.",
+    "infoLabel": "Više informacija: ažuriranja dodataka",
+    "auto": "Instaliraj automatski",
+    "notify": "Samo obavijesti",
+    "off": "Isključeno"
+  },
+  "waiting": "Ažuriranja",
+  "empty": "Svi su dodaci ažurni.",
+  "emptyOff": "Ažuriranja dodataka su isključena. Uključite ih iznad za traženje ažuriranja.",
+  "loadFailed": "Ažuriranja nisu mogla biti učitana.",
+  "newAuthorKey": "Ovu je verziju potpisao drugi autor. Ažurirajte samo ako vjerujete novom autoru.",
+  "rolledBack": "Verzija {{version}} nije se pokrenula pa je vraćena prethodna verzija. Razlog:",
+  "review": "Pregledaj i ažuriraj",
+  "update": "Ažuriraj",
+  "installFailed": "Dodatak {{name}} nije bilo moguće ažurirati. Pokušajte ponovno.",
+  "pins": "Prikvači verziju",
+  "pinsHint": "Prikvačeni dodatak ostaje na trenutnoj verziji i za njega se ne nude ažuriranja.",
+  "pin": "Zadrži {{name}} na ovoj verziji",
+  "pinVersion": "Verzija {{version}}",
+  "versionsTo": "na",
+  "pill": {
+    "none": "Nema novih dopuštenja",
+    "permission": "Treba novo dopuštenje",
+    "author": "Novi autor"
+  },
+  "newPermissions": "Nova dopuštenja",
+  "revoked": {
+    "title": "Dodatak {{name}} je isključen",
+    "text": "Verzija {{version}} nalazi se na popisu opozvanih: {{reason}}. Podaci dodatka ostaju sačuvani.",
+    "details": "Pojedinosti",
+    "remove": "Ukloni"
+  },
+  "checkNow": "Provjeri sada",
+  "lastChecked": "Zadnja provjera u {{time}}",
+  "checkFailed": "Provjera nije uspjela. Pokušajte ponovno.",
+  "modeNote": "Ažuriranja dodataka: {{mode}}. To možete promijeniti u nastavku.",
+  "settings": "Postavke ažuriranja",
+  "offer": {
+    "heading": "Nova dopuštenja",
+    "title": "{{name}} {{version}} sada može više. Ove opcije ostaju isključene dok ih ne uključite.",
+    "permission": "Novo neobavezno dopuštenje: {{permission}}",
+    "save": "Spremi",
+    "notNow": "Ne sada",
+    "failed": "Dopuštenja za {{name}} nije bilo moguće promijeniti. Pokušajte ponovno."
+  }
+}

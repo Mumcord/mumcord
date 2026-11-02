@@ -1,0 +1,37 @@
+/* The frame fills its place: the whole panel popover, or a fixed area in the dialog. */
+.plugin-webview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+
+.plugin-webview:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.plugin-webview__frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-sm);
+}
+
+/* A dialog showing a web view gets a large, fixed area; at small window sizes it shrinks to the
+   window and the page itself scrolls, never the dialog sideways. */
+.userpanel-modal__dialog.plugin-dialog--webview {
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 94vw);
+  height: min(720px, 88vh);
+  max-height: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.plugin-dialog--webview .plugin-webview {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}

@@ -1,0 +1,7 @@
+{
+  "heading": "Plugins",
+  "list": "Panneaux des plugins",
+  "expand": "Agrandir {{name}}",
+  "close": "Fermer",
+  "unsupported": "Ce serveur ne prend pas en charge les fonctions partagées des plugins"
+}

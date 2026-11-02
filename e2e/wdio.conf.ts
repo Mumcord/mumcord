@@ -2,9 +2,10 @@ import { globSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { browser } from "@wdio/globals";
-import { driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
+import { capabilities, driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
+import { browserB, runningB, stopB } from "./helpers/apps.ts";
 import { netsim } from "./helpers/index.ts";
-import { artifactsDir, bin } from "./helpers/paths.ts";
+import { artifactsDir } from "./helpers/paths.ts";
 
 const e2eDir = dirname(fileURLToPath(import.meta.url));
 const allSpecs = "specs/**/*.e2e.ts";
@@ -46,12 +47,7 @@ export const config: WebdriverIO.Config = {
   port: driverPort,
   specs: shard ? shardSpecs(shard) : [`./${allSpecs}`],
   maxInstances: 1,
-  capabilities: [
-    {
-      // tauri-driver launches this binary through WebKitWebDriver.
-      "tauri:options": { application: bin.app },
-    } as WebdriverIO.Capabilities,
-  ],
+  capabilities: [capabilities()],
   logLevel: "warn",
   waitforTimeout: 15_000,
   connectionRetryTimeout: 120_000,
@@ -70,22 +66,30 @@ export const config: WebdriverIO.Config = {
     const name = `${test.parent} ${test.title}`.replace(/[^\w-]+/g, "_").slice(0, 120);
     // Best effort: after a hang the session may be dead, and every command would wait for
     // connectionRetryTimeout.
-    try {
-      await withTimeout(
-        browser.saveScreenshot(join(artifactsDir, `${name}.png`)),
-        10_000,
-        "screenshot",
-      );
-      writeFileSync(
-        join(artifactsDir, `${name}.html`),
-        await withTimeout(browser.getPageSource(), 10_000, "page source"),
-      );
-    } catch (e) {
-      console.warn(`[e2e] no failure screenshot/page source: ${String(e)}`);
+    const sessions: [string, WebdriverIO.Browser][] = [[name, browser]];
+    if (runningB()) sessions.push([`${name}-B`, browserB()]);
+    for (const [file, session] of sessions) {
+      try {
+        await withTimeout(
+          session.saveScreenshot(join(artifactsDir, `${file}.png`)),
+          10_000,
+          "screenshot",
+        );
+        writeFileSync(
+          join(artifactsDir, `${file}.html`),
+          await withTimeout(session.getPageSource(), 10_000, "page source"),
+        );
+      } catch (e) {
+        console.warn(`[e2e] no failure screenshot/page source for ${file}: ${String(e)}`);
+      }
     }
   },
 
   afterSession: async () => {
+    // Instance A must be stopped even when B's cleanup fails.
+    await stopB().catch((e: unknown) => {
+      console.warn(`[e2e] stopping instance B failed: ${String(e)}`);
+    });
     netsim.stop();
     await stopDriver();
   },

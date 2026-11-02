@@ -1,0 +1,35 @@
+{
+  "hint": "Lade einen entpackten Plugin-Ordner, um ihn zu testen. Entwickler-Plugins sind nicht signiert, nie offiziell und können weder net.http, secrets noch ui.webview erhalten. Sie werden entladen, wenn der Entwicklermodus ausgeschaltet wird.",
+  "load": "Plugin-Ordner laden …",
+  "pickFolder": "Plugin-Ordner auswählen",
+  "empty": "Es ist kein Entwickler-Plugin geladen.",
+  "listLabel": "Entwickler-Plugins",
+  "label": "Entwickler-Plugin",
+  "status": {
+    "running": "Läuft",
+    "off": "Aus",
+    "backingOff": "Startet nach Absturz neu",
+    "autoOff": "Nach wiederholten Abstürzen ausgeschaltet",
+    "allOff": "Alle Plugins sind aus",
+    "noPlugins": "Plugins sind für diese Sitzung aus",
+    "notLoaded": "Konnte nicht geladen werden"
+  },
+  "showLog": "Protokoll von {{name}} anzeigen",
+  "reload": "{{name}} neu laden",
+  "unload": "{{name}} entladen",
+  "logLabel": "Protokoll von {{name}}",
+  "logTitle": "Protokoll von {{name}}",
+  "logEmpty": "Noch keine Protokollzeilen.",
+  "level": {
+    "debug": "Debug",
+    "info": "Info",
+    "warn": "Warnung",
+    "error": "Fehler"
+  },
+  "errors": {
+    "load": "Der Plugin-Ordner konnte nicht geladen werden.",
+    "reload": "Das Plugin konnte nicht neu geladen werden.",
+    "unload": "Das Plugin konnte nicht entladen werden.",
+    "log": "Das Protokoll konnte nicht gelesen werden."
+  }
+}

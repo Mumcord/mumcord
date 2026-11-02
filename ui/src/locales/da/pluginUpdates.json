@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Plugin-opdateringer",
+    "info": "Adskilt fra appens opdatering. Mumcord søger efter plugin-opdateringer ved start og derefter hver 6. time.",
+    "infoLabel": "Flere oplysninger: plugin-opdateringer",
+    "auto": "Installer automatisk",
+    "notify": "Giv kun besked",
+    "off": "Fra"
+  },
+  "waiting": "Opdateringer",
+  "empty": "Alle plugins er opdaterede.",
+  "emptyOff": "Plugin-opdateringer er slået fra. Slå dem til ovenfor for at søge efter opdateringer.",
+  "loadFailed": "Opdateringerne kunne ikke indlæses.",
+  "newAuthorKey": "Denne version er signeret af en anden udgiver. Opdater kun, hvis du stoler på den nye udgiver.",
+  "rolledBack": "Version {{version}} kunne ikke starte, så den forrige version blev gendannet. Årsag:",
+  "review": "Gennemgå og opdater",
+  "update": "Opdater",
+  "installFailed": "{{name}} kunne ikke opdateres. Prøv igen.",
+  "pins": "Fastlås version",
+  "pinsHint": "Et fastlåst plugin bliver på sin nuværende version og får ikke tilbudt opdateringer.",
+  "pin": "Behold {{name}} på denne version",
+  "pinVersion": "Version {{version}}",
+  "versionsTo": "til",
+  "pill": {
+    "none": "Ingen nye tilladelser",
+    "permission": "Kræver en ny tilladelse",
+    "author": "Ny udvikler"
+  },
+  "newPermissions": "Nye tilladelser",
+  "revoked": {
+    "title": "{{name}} blev slået fra",
+    "text": "Version {{version}} står på tilbagekaldelseslisten: {{reason}}. Pluginets data bevares.",
+    "details": "Detaljer",
+    "remove": "Fjern"
+  },
+  "checkNow": "Tjek nu",
+  "lastChecked": "Sidst tjekket kl. {{time}}",
+  "checkFailed": "Tjekket mislykkedes. Prøv igen.",
+  "modeNote": "Plugin-opdateringer: {{mode}}. Du kan ændre det nedenfor.",
+  "settings": "Opdateringsindstillinger",
+  "offer": {
+    "heading": "Nye tilladelser",
+    "title": "{{name}} {{version}} kan nu mere. Disse muligheder er slået fra, indtil du slår dem til.",
+    "permission": "Ny valgfri tilladelse: {{permission}}",
+    "save": "Gem",
+    "notNow": "Ikke nu",
+    "failed": "Tilladelserne for {{name}} kunne ikke ændres. Prøv igen."
+  }
+}
