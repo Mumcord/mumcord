@@ -206,7 +206,7 @@ Mumcord sends no telemetry. Every network connection it makes is listed in the [
 
 ## Code signing
 
-macOS builds are signed and notarized. Windows releases are signed with a Certum code signing certificate from 0.6.1 on. What is signed, and who builds, reviews and publishes signed releases, is in the [code signing policy](CODE_SIGNING.md).
+macOS builds are signed and notarized. Windows releases are signed with a Certum code signing certificate (SimplySign) from 0.6.1 on. What is signed, and who builds, reviews and publishes signed releases, is in the [code signing policy](CODE_SIGNING.md).
 
 ## Licence
 

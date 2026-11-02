@@ -2,86 +2,107 @@
 
 Release builds (`vX.Y.Z` tags) sign the Windows and macOS bundles only when the matching settings exist; otherwise they are built unsigned (macOS: ad-hoc signed, see below), and the release notes tell users how to open an unsigned app. Test builds are never signed. No signing key, certificate, password or token is ever stored in this repository.
 
-- [Windows signing (Azure Artifact Signing)](#windows-signing-azure-artifact-signing)
+- [Windows signing (Certum SimplySign)](#windows-signing-certum-simplysign)
 - [macOS signing and notarization](#macos-signing-and-notarization)
 - [Updater signing (in-app updater)](#updater-signing-in-app-updater)
 
-## Windows signing (Azure Artifact Signing)
+## Windows signing (Certum SimplySign)
 
-Windows releases are signed with [Azure Artifact Signing](https://learn.microsoft.com/azure/artifact-signing/) (formerly Azure Trusted Signing) under the maintainer's company. Microsoft validates the company and issues short-lived certificates in its name; the private keys never leave Microsoft's hardware. Users see the company's validated legal name, "Tobias Vorwachs Einzelunternehmen", as the publisher in the Windows security prompt and under _Properties → Digital Signatures_.
-
-Artifact Signing is open to organizations in the EU; individuals outside the US and Canada are not eligible, which is why the account belongs to the company (fuewa.systems) and not to a private person. The public side of the policy lives in [CODE_SIGNING.md](../CODE_SIGNING.md) and [PRIVACY.md](../PRIVACY.md).
-
-**Costs:** the Basic plan costs about 10 USD per month (5,000 signatures included; a release uses fewer than ten) and needs a paid Azure subscription. Identity validation is free.
+Windows releases are signed with a [Certum](https://www.certum.eu) code signing certificate whose private key lives in Certum's cloud HSM and is used through **SimplySign** ("Code Signing in the cloud"). The key never leaves Certum; signing works only while SimplySign Desktop is logged in with the account name and a one-time code (TOTP) from the SimplySign mobile app. Users see the name on the certificate as the publisher in the Windows security prompt and under _Properties → Digital Signatures_. The public side of the policy lives in [CODE_SIGNING.md](../CODE_SIGNING.md).
 
 ### How the workflow signs
 
-When all six repository variables below are set, the Windows job in `.github/workflows/build-and-smoke.yml` (release builds only):
+When the two secrets and the variable below exist in the `release` environment, the Windows job in `.github/workflows/build-and-smoke.yml` (release builds only):
 
 1. compiles the app (`tauri build --no-bundle`),
-2. downloads pinned versions of Microsoft's `signtool` and the Artifact Signing plugin it loads, and writes a CI-only Tauri config overlay that sets `bundle.windows.signCommand`,
-3. logs in to Azure with GitHub OpenID Connect (`azure/login`): Azure trusts the workflow run itself, so no client secret or password exists anywhere,
-4. bundles the NSIS installer with that overlay (`tauri bundle --bundles nsis --config …`). Tauri signs `mumcord.exe` first, then the uninstaller and finally the installer, so the installer contains the signed app. Every file is time-stamped by Microsoft, so signatures stay valid after the short-lived certificate expires.
+2. downloads SimplySign Desktop from Certum's download server (`files.certum.eu`), checks it against the pinned SHA-256 checksum and installs it silently,
+3. checks the built-in TOTP generator against the RFC 6238 test vectors (`scripts/ci/totp.test.ps1`),
+4. logs SimplySign Desktop in (`scripts/ci/simplysign-login.ps1`): it computes the current code from `CERTUM_TOTP_SECRET`, types the account name and the code into the login window and waits until the certificate with the thumbprint `CERTUM_CERT_SHA1` appears in the Windows certificate store,
+5. bundles the NSIS installer with a CI-only Tauri config overlay whose `bundle.windows.signCommand` calls `scripts/sign-windows.ps1`. Tauri signs `mumcord.exe` first, then the uninstaller and finally the installer, so the installer contains the signed app. Each file is signed with
 
-The smoke test and the draft release then use the signed installer, and the release notes say it is signed. The signing command is never in `src-tauri/tauri.conf.json`, so local and test builds stay unsigned and need no Azure access. If any variable is missing, the job warns and builds the installer unsigned as before. If the Azure login or a signature fails, the release fails and nothing is published.
+   ```
+   signtool sign /sha1 <CERTUM_CERT_SHA1> /fd sha256 /tr http://time.certum.pl /td sha256 /d Mumcord <file>
+   signtool verify /pa /v <file>
+   ```
 
-Signing needs no manual approval: the job can only sign when it runs in the `release` environment of this repository, which only accepts version tags.
+   The time stamp from Certum keeps the signatures valid after the certificate expires.
+
+The smoke test and the draft release then use the signed installer, and the release notes say it is signed. The signing command is never in `src-tauri/tauri.conf.json`, so local and test builds stay unsigned. If any of the three settings is missing, the job warns and builds the installer unsigned. If the login or a signature fails, the release fails and nothing is published.
+
+Secrets never appear in the log: GitHub masks the secrets, the workflow masks the account name once more, and the scripts never print the TOTP secret or a code. They exist only in the `release` environment, which accepts only version tags.
+
+### How fragile the login is
+
+SimplySign Desktop has no command-line login, so the workflow drives its login window with simulated keystrokes (`WScript.Shell.SendKeys`), the approach other projects use in CI as well. This can break when:
+
+- Certum changes the login window (title, field order) in a new SimplySign Desktop version. The version is pinned, so this only happens when the pin is updated, or when Certum stops offering the pinned version for download (the job then fails at the download step).
+- The runner's desktop shows another window in front (a Windows update notice, a first-start dialog). The script activates the SimplySign window before typing, but cannot handle every dialog.
+- The runner's clock drifts by more than a few seconds, so the code is rejected. The script starts typing only with at least 15 seconds of validity left.
+- The secret is wrong. The script makes **at most two attempts**, so a wrong secret cannot lock the account through repeated failures.
+
+### When the automated login fails
+
+1. Open the failed run and check the "Log in to SimplySign" step. For a timing problem (window not found, certificate not available), choose **Re-run failed jobs**; the second run often passes.
+2. If it keeps failing, sign by hand on a Windows PC (below), or ship this release unsigned for Windows by temporarily deleting the variable `CERTUM_CERT_SHA1` and re-running the release, then fix the automation.
+
+**Signing by hand.** You need a Windows PC with SimplySign Desktop installed and logged in (with the code from the SimplySign mobile app), the Windows SDK (for `signtool`, installed with the Visual Studio C++ tools) and the Mumcord build prerequisites (`README.md`). In PowerShell 7, in a checkout of the release tag:
+
+```powershell
+npm ci
+$env:CERTUM_CERT_SHA1 = '<thumbprint>'
+$sign = Join-Path $PWD 'scripts\sign-windows.ps1'
+$overlay = @{ bundle = @{ windows = @{ signCommand = @{ cmd = 'pwsh'; args = @('-NoProfile', '-File', $sign, '%1') } } } } | ConvertTo-Json -Depth 5 -Compress
+Set-Content -Encoding utf8 tauri.signing.json $overlay
+npm run tauri build -- --bundles nsis --config tauri.signing.json
+Remove-Item tauri.signing.json
+```
+
+This runs the same `signtool` calls as the workflow on `mumcord.exe`, the uninstaller and the installer. To sign or check single files, call the script directly: `pwsh -File scripts/sign-windows.ps1 <file> [<file> …]`. Files signed by hand are not covered by the workflow's later steps: replacing the installer in the draft release also means replacing the portable zip and recreating its updater signature (`.sig`), `latest.json` and `SHA256SUMS`, so prefer re-running the workflow when possible.
 
 ### One-time setup (maintainer)
 
-All steps happen in the [Azure portal](https://portal.azure.com) and on GitHub. Turn on multi-factor authentication for your Microsoft (Azure) account and your GitHub account first.
+Turn on two-factor authentication for your GitHub account first.
 
-1. **Paid Azure subscription.** Create an Azure account for the company with a pay-as-you-go subscription (a free trial subscription cannot use Artifact Signing). Note the **Subscription ID** (_Subscriptions_) and the **Tenant ID** (_Microsoft Entra ID → Overview_).
-2. **Register the resource provider.** _Subscriptions → your subscription → Resource providers_, search `Microsoft.CodeSigning` and choose **Register**.
-3. **Create the Artifact Signing account.** Search the portal for _Artifact Signing accounts → Create_: a new resource group (for example `mumcord-signing`), a globally unique account name (3 to 24 letters and digits, for example `fuewasigning`), region **North Europe (or Poland Central; West Europe currently refuses new customers)**, pricing tier **Basic**. Note the account name and the **Account URI** on its overview page (`https://neu.codesigning.azure.net/` for West Europe).
-4. **Give yourself the identity role.** On the signing account: _Access control (IAM) → Add role assignment_ → **Artifact Signing Identity Verifier** for your own user. Without it the next step is greyed out.
-5. **Validate the organization.** On the signing account: _Identity validations_ → **Organization** → _New identity → Public_, then enter exactly as in the official register or trade registration:
-   - legal name: `Tobias Vorwachs Einzelunternehmen`,
-   - business identifier (for example the trade registration, VAT ID or tax number the form asks for) and the registered address,
-   - primary and secondary email on the company domain (addresses ending in `@fuewa.systems`); Microsoft sends verification links there,
-   - website: `https://fuewa.systems`,
-   - first and last name of the person representing the company, exactly as on your ID card.
+1. **Order the certificate.** In the [Certum shop](https://shop.certum.eu), order a code signing certificate **in the cloud (SimplySign)**: _Open Source Code Signing_ for an individual open source developer, or _Standard Code Signing_ for the company. The name on the certificate (the publisher users see) is the person or company Certum verifies.
+2. **Install the SimplySign mobile app** (Android or iOS) and create the SimplySign account with the e-mail address you will use as `CERTUM_USER`.
+3. **Activate SimplySign and save the TOTP seed.** During activation Certum shows a **QR code** to scan with the SimplySign mobile app. This QR code contains the TOTP seed as text that starts with `otpauth://totp/…?secret=…`. Before or right after scanning it with the phone, read the text of the same QR code (for example save a screenshot and decode it with a QR reader that shows the text instead of opening it, such as `zbarimg` on Linux). Keep the whole `otpauth://` text: it is the `CERTUM_TOTP_SECRET`. Treat it like a password: never save it in a file in the repository, a chat or a ticket; store it only in GitHub and, if you like, in your password manager. The seed cannot be read back from the app later; if you missed it, ask Certum support to reset the SimplySign token activation and repeat this step.
+4. **Get the certificate issued.** Complete Certum's identity verification (ID document, and for a company the registration documents) and, in the Certum panel, generate the certificate in SimplySign. Wait until it is issued.
+5. **Find the thumbprint.** On a Windows PC, install SimplySign Desktop (from [Certum's download server](https://files.certum.eu/software/SimplySignDesktop/Windows/), the `-64-bit-en.msi` of the newest version) and log in with the e-mail address and the code from the mobile app. In PowerShell:
 
-   Use **Certificate subject preview** to check the publisher name before choosing **Create**. When the status changes to **Action Required**, follow the link (also sent to the primary email) to verify yourself with your ID through Microsoft's partner and the Microsoft Authenticator app. Microsoft may also ask for documents (trade registration, domain invoice for fuewa.systems), all issued within the last 12 months. Validation takes 1 to 20 business days; wait for the status **Completed**. The legal name validated here is what users see as the publisher.
+   ```powershell
+   Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert | Format-List Subject, Thumbprint, NotAfter
+   ```
 
-6. **Create the certificate profile.** On the signing account: _Certificate profiles → Create → Public Trust_, a name (for example `mumcord`), and the identity validation from step 5. Note the profile name.
-7. **Create the app registration for GitHub.** _Microsoft Entra ID → App registrations → New registration_, name `mumcord-github-signing`, single tenant, no redirect URI. Note its **Application (client) ID**. Do not create a client secret.
-8. **Trust GitHub (federated credential).** In the app registration: _Certificates & secrets → Federated credentials → Add credential_ → scenario **GitHub Actions deploying Azure resources**:
-   - organization `Mumcord`, repository `mumcord`,
-   - entity type **Environment**, environment name `release`,
-   - name `mumcord-release`.
+   The 40-character `Thumbprint` of the Certum certificate is `CERTUM_CERT_SHA1`.
 
-   This lets only workflow jobs in the `release` environment of `Mumcord/mumcord` sign.
+6. **Create the GitHub environment** if it does not exist yet: repository _Settings → Environments → New environment_ `release`. Under _Deployment branches and tags_ choose **Selected branches and tags** and add the tag rule `v*`, so only release tags can sign.
+7. **Add the secrets and the variable** in that environment (_Settings → Environments → release_), not as repository secrets. Exact names:
 
-9. **Allow the app to sign.** On the signing account (or only the certificate profile from step 6): _Access control (IAM) → Add role assignment_ → **Artifact Signing Certificate Profile Signer** → members: the app registration `mumcord-github-signing`.
-10. **Create the GitHub environment.** Repository _Settings → Environments → New environment_ `release`. Under _Deployment branches and tags_ choose **Selected branches and tags** and add the tag rule `v*`, so only release tags can sign.
-11. **Add the GitHub variables.** Repository _Settings → Secrets and variables → Actions → Variables → New repository variable_. These are identifiers, not secrets; exact names:
+   | Name                 | Kind     | Value                                                       |
+   | -------------------- | -------- | ----------------------------------------------------------- |
+   | `CERTUM_USER`        | secret   | SimplySign account e-mail address (step 2)                  |
+   | `CERTUM_TOTP_SECRET` | secret   | the whole `otpauth://totp/…` text from the QR code (step 3) |
+   | `CERTUM_CERT_SHA1`   | variable | certificate thumbprint (step 5)                             |
 
-    | Variable                 | Value                                                                    |
-    | ------------------------ | ------------------------------------------------------------------------ |
-    | `AZURE_CLIENT_ID`        | Application (client) ID of the app registration (step 7)                 |
-    | `AZURE_TENANT_ID`        | Tenant ID (step 1)                                                       |
-    | `AZURE_SUBSCRIPTION_ID`  | Subscription ID (step 1)                                                 |
-    | `AZURE_SIGNING_ENDPOINT` | Account URI from step 3, for example `https://neu.codesigning.azure.net` |
-    | `AZURE_SIGNING_ACCOUNT`  | Artifact Signing account name (step 3)                                   |
-    | `AZURE_CERT_PROFILE`     | certificate profile name (step 6)                                        |
+   All three must exist. If one is missing, the build warns and produces an unsigned installer. A bare base32 seed (only the `secret=` value) also works; the script then assumes Certum's parameters (HMAC-SHA256, 6 digits, 30 seconds), so the full `otpauth://` text is safer.
 
-    All six must exist. If any is missing, the build warns and produces an unsigned installer. The endpoint must match the account's region, otherwise signing fails with "403 Forbidden".
+8. **Remove the old Azure setup.** Delete the repository variables `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_SIGNING_ENDPOINT`, `AZURE_SIGNING_ACCOUNT` and `AZURE_CERT_PROFILE`, and in the Azure portal the federated credential, the app registration `mumcord-github-signing` and the Artifact Signing account, so it no longer costs money.
 
 ### Test with a pre-release tag
 
-1. Push a pre-release tag as described under macOS below (for example `v0.3.0-rc.1`).
-2. In the Windows build log, check that "Log in to Azure" succeeds and that "Bundle and sign Windows installer" shows signtool reporting "Successfully signed" for each file. The draft release notes then say the Windows build is signed.
-3. On Windows, right-click the downloaded installer → _Properties → Digital Signatures_: the signer is "Tobias Vorwachs Einzelunternehmen" and the signature has a time stamp. After installing, check `mumcord.exe` in the install folder the same way, and that _Details_ shows product name "Mumcord" and the version.
+1. Push a pre-release tag as described under macOS below (for example `v0.6.1-rc.1`).
+2. In the Windows build log, check that "Log in to SimplySign" reports that the certificate is available and that "Bundle and sign Windows installer" shows "Successfully signed" and "Successfully verified" for each file. The draft release notes then say the Windows build is signed.
+3. On Windows, right-click the downloaded installer → _Properties → Digital Signatures_: the signer is the name on the Certum certificate and the signature has a time stamp. After installing, check `mumcord.exe` in the install folder the same way, and that _Details_ shows product name "Mumcord" and the version.
 4. Delete the draft release and the test tag afterwards.
 
 New certificates have no SmartScreen reputation yet, so the first signed releases may still show a SmartScreen warning until enough users have downloaded them.
 
 ### Notes
 
-- Nothing to renew: Microsoft rotates the short-lived certificates automatically. The identity validation must be renewed when Microsoft asks (by email), usually once a year.
-- Removing access: delete the federated credential or the role assignment; no secret needs to be revoked.
-- The Azure login token is short-lived, so the workflow compiles first and logs in right before signing.
+- **Renewal:** the certificate is valid for the period you ordered (one to three years). After renewing, update `CERTUM_CERT_SHA1` to the new thumbprint; the TOTP seed stays the same unless the SimplySign token is re-activated.
+- **Updating SimplySign Desktop:** change `SIMPLYSIGN_VERSION` in the "Install SimplySign Desktop" step and set `SIMPLYSIGN_SHA256` to the checksum of the new installer (`SimplySignDesktop-<version>-64-bit-en.msi` from `https://files.certum.eu/software/SimplySignDesktop/Windows/<version>/`), then test with a pre-release tag, because the login window may have changed.
+- **Removing access:** delete the two secrets. If the TOTP seed may have leaked, ask Certum to reset the SimplySign token activation; the old seed then stops working.
+- The SimplySign session is opened after compiling, right before signing, so it cannot time out during the build.
 
 ## macOS signing and notarization
 

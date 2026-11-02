@@ -104,12 +104,10 @@ jobs:
     with:
       release: true
       version: ${{ needs.guard.outputs.version }}
-    # Passes the optional Apple signing secrets; id-token lets the Windows job log in to Azure
-    # for Artifact Signing without a stored secret (docs/release-signing.md).
+    # Passes the optional Apple and Certum signing secrets (docs/release-signing.md).
     secrets: inherit
     permissions:
       contents: read
-      id-token: write
 
   # One CycloneDX SBOM per bundle type (scripts/generate-sbom.sh), from the tagged commit and the
   # native libraries each build job recorded (scripts/sbom-native.sh).
