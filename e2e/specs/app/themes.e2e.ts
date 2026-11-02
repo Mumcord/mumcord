@@ -428,8 +428,8 @@ describe("themes (AC-2.12 – AC-2.16)", function () {
   it("AC-2.16: controls sit right-aligned in every section card of every settings group", async () => {
     await appearance();
     const names = await $$('[role="tab"]').map((t) => t.getText());
-    // The ten top-level groups of #161.
-    expect(names).toHaveLength(10);
+    // The eleven top-level groups: the ten of #161 plus Plugins.
+    expect(names).toHaveLength(11);
     const off: string[] = [];
     for (const name of names) {
       await $(`[role="tab"]=${name}`).click();
