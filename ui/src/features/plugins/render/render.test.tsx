@@ -680,19 +680,14 @@ describe("copy button", () => {
 
   it("says so when the copy fails and forgets the message again", async () => {
     api.copyText = vi.fn(() => Promise.reject(new Error("no clipboard")));
-    vi.useFakeTimers({ shouldAdvanceTime: true });
     show([copyNode]);
     fireEvent.click(screen.getByRole("button", { name: "Copy fitting" }));
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent("Could not copy");
     });
-    // The reset timer starts in an effect after the message renders, which can come after
-    // waitFor saw the text on a busy runner, so keep advancing until the message is gone.
+    // Real timers: the message clears after its 2 s feedback time.
     await waitFor(
       () => {
-        act(() => {
-          vi.advanceTimersByTime(500);
-        });
         expect(screen.getByRole("status")).toBeEmptyDOMElement();
       },
       { timeout: 5000 },
