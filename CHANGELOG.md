@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Linux AppImage: Mumcord's window and extra windows (What's new, packet inspector) open much faster. Each window spent seconds rescanning the system's GStreamer plugins, twice on systems where /usr/lib64 points to /usr/lib
+
 ### Fixed
 
 - "What's new" now opens on the notes of the version you are running, followed by the older releases; a release used to open on the previous version's notes, and a section called "Unreleased" or notes of newer versions could show up
