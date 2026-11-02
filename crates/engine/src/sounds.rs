@@ -1107,7 +1107,7 @@ mod tests {
             assert_eq!(quit.len(), Sound::Quit.samples(theme).len(), "{theme:?}");
             assert_eq!(hub.theme(), theme);
         }
-        assert_eq!(SoundSettings::default().theme, SoundTheme::Rich);
+        assert_eq!(SoundSettings::default().theme, SoundTheme::Classic);
     }
 
     #[test]
