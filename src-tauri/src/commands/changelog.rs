@@ -1,5 +1,5 @@
 //! The "What's new" window (issue #145): About opens it, and the main window opens it once after
-//! an update. The changelog itself is a static file of the UI (changelog.json), generated from
+//! an update. The changelog itself is embedded in the UI bundle (virtual:changelog), generated from
 //! CHANGELOG.md at build time; the look comes from the main window as for the licences window.
 
 use mumcord_engine::Engine;

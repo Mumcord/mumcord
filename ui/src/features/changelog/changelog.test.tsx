@@ -30,7 +30,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const versions: ChangelogVersion[] = [
+// The window reads the changelog from the bundle; tests replace it with this fixture.
+const versions = vi.hoisted((): ChangelogVersion[] => [
   {
     version: "0.4.4",
     date: null,
@@ -58,7 +59,9 @@ const versions: ChangelogVersion[] = [
     summary: "_Watch party is **Beta**._",
     sections: [{ title: "Multi-server", items: ["Several servers at once"] }],
   },
-];
+]);
+
+vi.mock("virtual:changelog", () => ({ default: versions }));
 
 describe("changelog helpers", () => {
   it("shows the running version first, then older releases, and hides newer ones", () => {
@@ -292,10 +295,6 @@ describe("ChangelogView", () => {
 
 describe("ChangelogWindow", () => {
   it("loads the changelog, follows the shared look and closes", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.resolve(new Response(JSON.stringify(versions)))),
-    );
     const close = vi.spyOn(api, "changelogClose");
     const info = await api.appInfo();
     vi.spyOn(api, "appInfo").mockResolvedValue({ ...info, version: "0.4.3" });
@@ -322,32 +321,19 @@ describe("ChangelogWindow", () => {
     expect(close).toHaveBeenCalledTimes(2);
   });
 
-  it("reports a changelog that cannot be fetched", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.resolve(new Response("", { status: 404 }))),
-    );
+  it("reports a missing app version", async () => {
+    vi.spyOn(api, "appInfo").mockRejectedValue(new Error("boom"));
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(<ChangelogWindow />);
     expect(await screen.findByRole("alert")).toHaveTextContent("could not be loaded");
   });
 
-  it("keeps showing the loading state while the changelog is slow", async () => {
-    vi.useFakeTimers();
-    try {
-      vi.stubGlobal(
-        "fetch",
-        vi.fn(() => new Promise<Response>(() => undefined)),
-      );
-      render(<ChangelogWindow />);
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(120_000);
-      });
-      expect(screen.getByText("Loading…")).toBeVisible();
-      expect(screen.queryByRole("alert")).toBeNull();
-    } finally {
-      vi.useRealTimers();
-    }
+  it("makes no network request", async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+    render(<ChangelogWindow />);
+    expect(await screen.findByRole("heading", { level: 1, name: /^Mumcord/u })).toBeVisible();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
 

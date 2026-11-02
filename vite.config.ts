@@ -1,30 +1,29 @@
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { parseChangelog } from "./ui/src/features/changelog/parseChangelog";
 
 const CHANGELOG = new URL("./CHANGELOG.md", import.meta.url);
-const CHANGELOG_FILE = "changelog.json";
-
-function changelogJson(): string {
-  return JSON.stringify(parseChangelog(readFileSync(CHANGELOG, "utf8")));
-}
+const VIRTUAL_ID = "virtual:changelog";
+const RESOLVED_ID = `\0${VIRTUAL_ID}`;
 
 /**
- * Serves CHANGELOG.md as changelog.json for the "What's new" window (issue #145): generated on
- * every build, so the shipped app always matches the changelog and needs no network.
+ * Provides the parsed CHANGELOG.md as the module `virtual:changelog` for the "What's new" window
+ * (issue #145). It lands in the JS bundle, so the window needs no request, and every build reads
+ * the CHANGELOG.md of the commit it is built from.
  */
 function changelog(): Plugin {
   return {
     name: "mumcord-changelog",
-    configureServer(server) {
-      server.middlewares.use(`/${CHANGELOG_FILE}`, (_request, response) => {
-        response.setHeader("Content-Type", "application/json");
-        response.end(changelogJson());
-      });
+    resolveId(id) {
+      return id === VIRTUAL_ID ? RESOLVED_ID : null;
     },
-    generateBundle() {
-      this.emitFile({ type: "asset", fileName: CHANGELOG_FILE, source: changelogJson() });
+    load(id) {
+      if (id !== RESOLVED_ID) return null;
+      this.addWatchFile(fileURLToPath(CHANGELOG));
+      const versions = parseChangelog(readFileSync(CHANGELOG, "utf8"));
+      return `export default ${JSON.stringify(versions)};`;
     },
   };
 }

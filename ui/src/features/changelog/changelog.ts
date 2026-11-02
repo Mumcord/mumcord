@@ -1,8 +1,9 @@
 /**
  * Data and decisions of the "What's new" window (issue #145). The changelog itself is built from
- * CHANGELOG.md at build time and served as changelog.json (see vite.config.ts).
+ * CHANGELOG.md at build time and bundled as the module `virtual:changelog` (see vite.config.ts).
  */
 import { Marked } from "marked";
+import changelog from "virtual:changelog";
 import { escapeHtml } from "../chat/markdown";
 import { sanitizeHtml } from "../chat/sanitize";
 import type { ChangelogVersion } from "./parseChangelog";
@@ -14,11 +15,8 @@ const ISSUES_URL = "https://github.com/Mumcord/mumcord/issues/";
 /** Groups meant for developers; collapsed until opened. */
 export const INTERNAL = "Internal";
 
-export async function loadChangelog(): Promise<ChangelogVersion[]> {
-  const response = await fetch(`${import.meta.env.BASE_URL}changelog.json`);
-  if (!response.ok) throw new Error(`HTTP ${String(response.status)}`);
-  return (await response.json()) as ChangelogVersion[];
-}
+/** The whole changelog, newest first, embedded at build time. */
+export const CHANGELOG_VERSIONS: ChangelogVersion[] = changelog;
 
 /** Builds other than releases show `dev~…` (src-tauri/src/version.rs). */
 export function isDevBuild(version: string): boolean {
