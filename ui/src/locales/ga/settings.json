@@ -640,8 +640,8 @@
     "limitInvalid": "Cuir isteach slánuimhir ó 1 go 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Maisíochtaí amhairc (gloine, grán)",
-    "visualEffectsHint": "Roghchláir ghloine shioctha agus grán scannáin caolchúiseach. Múchtar go huathoibríoch iad nuair a iarrann do chóras níos lú trédhearcachta nó gluaiseachta."
+    "visualEffects": "Grán scannáin",
+    "visualEffectsHint": "Grán scannáin caolchúiseach thar an gcomhéadan. Múchtar go huathoibríoch é nuair a iarrann do chóras níos lú trédhearcachta nó gluaiseachta."
   },
   "channelList": {
     "title": "Liosta cainéal",

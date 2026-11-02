@@ -636,8 +636,8 @@
     "limitInvalid": "Zadaj celé číslo od 1 do 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Vizuálne efekty (sklo, zrno)",
-    "visualEffectsHint": "Ponuky z matného skla a jemné filmové zrno. Automaticky vypnuté, keď systém žiada menej priehľadnosti alebo pohybu."
+    "visualEffects": "Filmové zrno",
+    "visualEffectsHint": "Jemné filmové zrno cez rozhranie. Automaticky vypnuté, keď systém žiada menej priehľadnosti alebo pohybu."
   },
   "channelList": {
     "title": "Zoznam kanálov",

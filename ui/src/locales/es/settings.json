@@ -632,8 +632,8 @@
     "limitInvalid": "Introduce un número entero del 1 al 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Efectos visuales (cristal, grano)",
-    "visualEffectsHint": "Menús de cristal esmerilado y un grano de película sutil. Se desactivan solos cuando tu sistema pide menos transparencia o movimiento."
+    "visualEffects": "Grano de película",
+    "visualEffectsHint": "Un grano de película sutil sobre la interfaz. Se desactiva solo cuando tu sistema pide menos transparencia o movimiento."
   },
   "channelList": {
     "title": "Lista de canales",

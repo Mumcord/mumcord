@@ -628,8 +628,8 @@
     "limitInvalid": "Indtast et helt tal fra 1 til 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Visuelle effekter (glas, kornethed)",
-    "visualEffectsHint": "Menuer i frostet glas og en diskret filmkornethed. Slås automatisk fra, når dit system beder om mindre gennemsigtighed eller bevægelse."
+    "visualEffects": "Filmkornethed",
+    "visualEffectsHint": "En diskret filmkornethed over brugerfladen. Slås automatisk fra, når dit system beder om mindre gennemsigtighed eller bevægelse."
   },
   "channelList": {
     "title": "Kanalliste",

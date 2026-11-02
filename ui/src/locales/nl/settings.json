@@ -628,8 +628,8 @@
     "limitInvalid": "Voer een geheel getal van 1 tot 15 in."
   },
   "appearanceEffects": {
-    "visualEffects": "Visuele effecten (glas, korrel)",
-    "visualEffectsHint": "Matglazen menu's en een subtiele filmkorrel. Automatisch uit als je systeem om minder transparantie of beweging vraagt."
+    "visualEffects": "Filmkorrel",
+    "visualEffectsHint": "Een subtiele filmkorrel over de interface. Automatisch uit als je systeem om minder transparantie of beweging vraagt."
   },
   "channelList": {
     "title": "Kanaallijst",

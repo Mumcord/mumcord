@@ -640,8 +640,8 @@
     "limitInvalid": "Daħħal numru sħiħ minn 1 sa 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Effetti viżivi (ħġieġ, granulu)",
-    "visualEffectsHint": "Menus tal-ħġieġ smerilat u granulu tal-film sottili. Jintfew awtomatikament meta s-sistema titlob inqas trasparenza jew moviment."
+    "visualEffects": "Granulu tal-film",
+    "visualEffectsHint": "Granulu tal-film sottili fuq l-interfaċċja. Jintefa awtomatikament meta s-sistema titlob inqas trasparenza jew moviment."
   },
   "channelList": {
     "title": "Lista tal-kanali",

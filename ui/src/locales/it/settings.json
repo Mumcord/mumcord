@@ -632,8 +632,8 @@
     "limitInvalid": "Inserisci un numero intero da 1 a 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Effetti visivi (vetro, grana)",
-    "visualEffectsHint": "Menu in vetro smerigliato e una leggera grana pellicola. Disattivati automaticamente quando il sistema chiede meno trasparenza o movimento."
+    "visualEffects": "Grana pellicola",
+    "visualEffectsHint": "Una leggera grana pellicola sopra l’interfaccia. Disattivata automaticamente quando il sistema chiede meno trasparenza o movimento."
   },
   "channelList": {
     "title": "Elenco canali",

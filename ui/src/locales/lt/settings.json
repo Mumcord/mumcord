@@ -636,8 +636,8 @@
     "limitInvalid": "Įvesk sveikąjį skaičių nuo 1 iki 15."
   },
   "appearanceEffects": {
-    "visualEffects": "Vaizdo efektai (stiklas, grūdėtumas)",
-    "visualEffectsHint": "Matinio stiklo meniu ir subtilus juostos grūdėtumas. Išjungiama automatiškai, kai sistema prašo mažiau skaidrumo ar judesio."
+    "visualEffects": "Juostos grūdėtumas",
+    "visualEffectsHint": "Subtilus juostos grūdėtumas virš sąsajos. Išjungiama automatiškai, kai sistema prašo mažiau skaidrumo ar judesio."
   },
   "channelList": {
     "title": "Kanalų sąrašas",

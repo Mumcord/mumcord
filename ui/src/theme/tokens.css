@@ -40,10 +40,7 @@
 
   --width-server-bar: 4.5rem;
 
-  /* Website look (FR-2.19): frosted popovers and film grain. Derived from the theme's own
-     --color-bg-elevated, so custom themes get matching glass. */
-  --glass-bg: color-mix(in srgb, var(--color-bg-elevated) 84%, transparent);
-  --glass-filter: blur(1rem) saturate(1.4);
+  /* Website look (FR-2.19): film grain on the app background. Popovers stay solid (#337). */
   --grain-opacity: 0.06;
 }
 
@@ -177,17 +174,13 @@
 }
 
 /* Visual effects off (FR-2.19): by the setting (data-effects on <html>) or by the OS asking for
-   less motion or transparency. Popovers fall back to solid surfaces, the grain disappears. */
+   less motion or transparency: the grain disappears. */
 :root[data-effects="off"] {
-  --glass-bg: var(--color-bg-elevated);
-  --glass-filter: none;
   --grain-opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) {
   :root {
-    --glass-bg: var(--color-bg-elevated);
-    --glass-filter: none;
     --grain-opacity: 0;
   }
 }
