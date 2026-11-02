@@ -1232,6 +1232,36 @@ impl Engine {
             .change_person(server_id, session, |s| s.volume = volume)
     }
 
+    /// Sets the volume of a person's screen share sound (0–200 %), remembered like their voice
+    /// volume and independent of it (issue #333).
+    pub fn person_set_share_volume(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        volume: u16,
+    ) -> EngineResult<()> {
+        if volume > 200 {
+            return Err(EngineError::invalid("volume must be 0–200"));
+        }
+        self.inner
+            .change_person(server_id, session, |s| s.share_volume = volume)?;
+        self.screen_share_apply_volume(server_id, session, volume);
+        Ok(())
+    }
+
+    /// The share sound volume the user chose for a person; 100 % when unknown.
+    pub(crate) fn person_share_volume(&self, server_id: ServerId, session: u32) -> u16 {
+        let mut core = lock(&self.inner.core);
+        let Ok(user) = Inner::person_in_session(&core, server_id, session) else {
+            return mumcord_store::PersonSetting::default().share_volume;
+        };
+        let store = lock(&self.inner.store);
+        core.slots.get_mut(&server_id).map_or_else(
+            || mumcord_store::PersonSetting::default().share_volume,
+            |slot| slot.people.setting(&store, server_id, &user).share_volume,
+        )
+    }
+
     pub fn person_set_local_mute(
         &self,
         server_id: ServerId,

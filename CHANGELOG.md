@@ -6,6 +6,10 @@
 
 - A fresh install now starts with the Classic notification sounds instead of the Rich ones; if you already picked a sound theme, your choice is kept (issue #339)
 
+### Fixed
+
+- Changing the volume of someone's screen share no longer changes their voice volume. The share's sound now has its own volume, remembered per person like their voice volume.
+
 ## [0.6.0] - 2026-11-02
 
 ### Changed

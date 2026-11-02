@@ -44,6 +44,7 @@ function user(session: number, name: string, change: Partial<User> = {}): User {
     hasComment: false,
     volume: 100,
     localMute: false,
+    shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
     ...change,

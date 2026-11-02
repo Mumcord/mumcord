@@ -248,6 +248,7 @@ export function stressUsers(self: User, channels: readonly ChannelInfo[]): User[
       hasComment: random() < 0.2,
       volume: 100,
       localMute: false,
+      shareVolume: 100,
       isMumcord: false,
       mumcordFeatures: [],
     };

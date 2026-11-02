@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, SyncSender, TrySendError};
 use std::thread;
 
-use mumcord_audio::mixer::share::{ShareSoundStats, ShareStats};
+use mumcord_audio::mixer::share::{ShareSoundStats, ShareStats, ShareVolume};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_screenshare::{Decoder, I420Frame};
 use tokio::sync::Notify;
@@ -47,6 +47,7 @@ impl Control {
 pub(crate) struct WatchLink {
     control: Arc<Control>,
     sound: Arc<ShareStats>,
+    volume: Arc<ShareVolume>,
     tasks: [JoinHandle<()>; 2],
 }
 
@@ -61,6 +62,7 @@ impl WatchLink {
         recv: RecvStream,
     ) -> Self {
         let sound_stats = sound.stats();
+        let volume = sound.volume();
         let control = Arc::new(Control {
             fallback: AtomicBool::new(false),
             keyframe: Notify::new(),
@@ -76,6 +78,7 @@ impl WatchLink {
         Self {
             control,
             sound: sound_stats,
+            volume,
             tasks: [reader, requests],
         }
     }
@@ -89,6 +92,11 @@ impl WatchLink {
 
     pub fn request_keyframe(&self) {
         self.control.request_keyframe();
+    }
+
+    /// Plays the share's sound at `percent` (0–200).
+    pub fn set_volume(&self, percent: u16) {
+        self.volume.set_percent(percent);
     }
 
     pub fn sound_stats(&self) -> ShareSoundStats {

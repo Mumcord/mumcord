@@ -129,7 +129,7 @@ pub const SHARE_POPOUT: Spec = Spec {
         "screen_share_request_keyframe",
         "screen_share_set_decode_fallback",
         "screen_share_watch_stats",
-        "person_set_volume",
+        "person_set_share_volume",
     ],
 };
 
@@ -422,7 +422,7 @@ mod tests {
             "screen_share_request_keyframe",
             "screen_share_set_decode_fallback",
             "screen_share_watch_stats",
-            "person_set_volume",
+            "person_set_share_volume",
         ] {
             assert!(command_allowed(label, command), "{command}");
         }

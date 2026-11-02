@@ -120,6 +120,7 @@ pub fn user_view(user: &User, local: PersonSetting, mumcord: Option<&[String]>) 
             || user.comment.as_ref().is_some_and(|c| !c.is_empty()),
         volume: local.volume,
         local_mute: local.local_mute,
+        share_volume: local.share_volume,
         mumcord_features: mumcord.map(<[String]>::to_vec),
     }
 }

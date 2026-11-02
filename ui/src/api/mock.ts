@@ -861,6 +861,7 @@ function person(session: number, name: string, channelId: number, certHash: stri
     hasComment: false,
     volume: 100,
     localMute: false,
+    shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
   };
@@ -2329,6 +2330,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         fail("invalidInput", "volume must be between 0 and 200");
       }
       updateUser(session, { volume });
+      return Promise.resolve(null);
+    },
+    personSetShareVolume: (serverId, session, volume) => {
+      requireSession(serverId);
+      if (!Number.isInteger(volume) || volume < 0 || volume > 200) {
+        fail("invalidInput", "volume must be between 0 and 200");
+      }
+      updateUser(session, { shareVolume: volume });
       return Promise.resolve(null);
     },
     personMove: (serverId, session, channelId) => {
