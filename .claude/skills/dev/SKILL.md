@@ -27,6 +27,7 @@ The user is a **product manager and not a technical person**, so report outcomes
    - Commits only when the user asks, never `git add -A`, and branch first if on the default branch. Small, focused Conventional Commits; never any AI attribution (no `Co-Authored-By`, no "Generated with", no mention of Claude or AI).
    - Secrets (signing keys, server passwords, private certificates) never go into the repo.
 5. **One task = one fresh agent.** Whenever work is delegated, each task gets its own fresh agent with a self-contained, short prompt. Never bundle several tasks into one agent. The agent ends after its final report (≤ 10 lines); follow-up work goes to a new agent.
+6. **Mockups are binding.** If the spec or its source issues have mockups (images in the GitHub issues, HTML sources on `mockups/*` branches), the UI must match them exactly: layout, texts, states, icons, spacing, dark and light themes. Every agent that builds UI gets the relevant mockup links in its brief. Mockups the spec marks as out of scope are not built. If a mockup and the spec disagree, or a needed state has no mockup, ask the user; don't invent a different design. UI verification puts screenshots of the running client next to the mockups and reports each difference.
 
 ## Step 1 – Parse arguments and resolve the spec
 
