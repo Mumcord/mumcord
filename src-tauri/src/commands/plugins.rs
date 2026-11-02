@@ -1174,6 +1174,9 @@ pub async fn plugin_ui_action(
         None => ActionKind::Plain,
     };
     let source = slot.map_or(ActionSource::Command, |s| ActionSource::Slot(s.into()));
+    if let (ActionKind::Password { secret }, PluginActionValue::Text { value }) = (&kind, &value) {
+        save_secret(&plugins, &id, secret, value).await?;
+    }
     let delivered = plugins
         .call_api(move |service| {
             let ctx = service.context();
@@ -1182,16 +1185,8 @@ pub async fn plugin_ui_action(
                     ctx.http.allow(&id, &value).map_err(invalid)?;
                     ActionValue::Text(value)
                 }
-                (ActionKind::Password { secret }, PluginActionValue::Text { value }) => {
-                    let secrets = ctx
-                        .grants
-                        .check(&id, "secrets")
-                        .ok()
-                        .and(ctx.secrets.as_ref())
-                        .ok_or_else(|| invalid("secrets are not available"))?;
-                    secrets.set(&id, &secret, &value).map_err(invalid)?;
-                    ActionValue::None
-                }
+                // Saved above, outside the service lock.
+                (ActionKind::Password { .. }, PluginActionValue::Text { .. }) => ActionValue::None,
                 (ActionKind::File, PluginActionValue::File { path }) => {
                     ctx.grants
                         .check(&id, "net.http")
@@ -1219,6 +1214,28 @@ pub async fn plugin_ui_action(
         })
         .await?;
     delivered_or_error(delivered)
+}
+
+/// Stores the text of a plugin's `password` field in the OS keychain. The keychain may wait
+/// for the user (a wallet unlock or keychain permission prompt), so the write runs on a
+/// blocking thread without the plugin-service lock: other plugin calls go on meanwhile.
+async fn save_secret(plugins: &Arc<Plugins>, id: &str, secret: &str, value: &str) -> ApiResult<()> {
+    let plugin = id.to_owned();
+    let secrets = plugins
+        .call_api(move |service| {
+            let ctx = service.context();
+            ctx.grants
+                .check(&plugin, "secrets")
+                .ok()
+                .and(ctx.secrets.clone())
+                .ok_or_else(|| invalid("secrets are not available"))
+        })
+        .await?;
+    let (id, secret, value) = (id.to_owned(), secret.to_owned(), value.to_owned());
+    tauri::async_runtime::spawn_blocking(move || secrets.set(&id, &secret, &value))
+        .await
+        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
+        .map_err(invalid)
 }
 
 /// Other user inputs for a plugin's UI.

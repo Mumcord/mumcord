@@ -54,6 +54,10 @@ pub const START_TICKS: u64 = 50;
 /// Wall-clock limit of any call, including the time spent waiting in host storage, which
 /// does not count against the plugin's own budget (FR-6.3 addendum).
 pub const CALL_WALL_CAP: Duration = Duration::from_millis(500);
+/// Longest wait for the OS keychain in one plugin call. The keychain may be waiting for the
+/// user (a wallet unlock or a macOS permission prompt), so this time is outside
+/// [`CALL_WALL_CAP`]; it matches typical OS prompt timeouts (FR-6.3 addendum, F54).
+pub const KEYCHAIN_WAIT_CAP: Duration = Duration::from_secs(120);
 pub const MAX_TABLE_ELEMENTS: usize = 10_000;
 /// Core instances per plugin. A component from wit-bindgen is a few core modules (the plugin
 /// plus small adapter shims), so this is more than one but still tight.
@@ -232,11 +236,15 @@ pub struct PluginState {
 
 /// The current call's time. The epoch clock counts wall time, so time spent waiting for the
 /// database (lock, disk) is given back to the plugin at its deadline, up to [`CALL_WALL_CAP`].
+/// Time spent waiting for the user (a keychain prompt) is given back too and is also outside
+/// that cap.
 #[derive(Debug)]
 pub(crate) struct CallClock {
     started: Instant,
     waited: Duration,
     refunded: Duration,
+    /// Waiting for the user: not counted against [`CALL_WALL_CAP`].
+    excused: Duration,
 }
 
 impl Default for CallClock {
@@ -245,6 +253,7 @@ impl Default for CallClock {
             started: Instant::now(),
             waited: Duration::ZERO,
             refunded: Duration::ZERO,
+            excused: Duration::ZERO,
         }
     }
 }
@@ -258,9 +267,20 @@ impl CallClock {
         result
     }
 
+    /// Runs a host call that may wait for the user, such as a keychain unlock prompt. The call
+    /// itself bounds the wait (see [`KEYCHAIN_WAIT_CAP`]).
+    pub(crate) fn waiting_on_user<T>(&mut self, f: impl FnOnce() -> T) -> T {
+        let started = Instant::now();
+        let result = f();
+        let waited = started.elapsed();
+        self.waited += waited;
+        self.excused += waited;
+        result
+    }
+
     /// At the deadline: stop the plugin unless waiting time is still to be given back.
     fn deadline(&mut self) -> UpdateDeadline {
-        if self.started.elapsed() >= CALL_WALL_CAP {
+        if self.started.elapsed().saturating_sub(self.excused) >= CALL_WALL_CAP {
             return UpdateDeadline::Interrupt;
         }
         let owed = self.waited.saturating_sub(self.refunded);

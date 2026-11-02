@@ -10,18 +10,21 @@
 //!
 //! Every keychain item can cost the user a prompt (unsigned macOS builds), so the index is read
 //! at most once per plugin per session and cached; `exists` answers from it. The OS calls can
-//! block (e.g. while a wallet unlock prompt is open); they run on the plugin's own thread or
-//! a blocking thread of the service, never on the audio path.
+//! block for as long as the user takes to answer a wallet unlock or keychain permission prompt.
+//! A plugin's call waits on a helper thread for at most [`KEYCHAIN_WAIT_CAP`], so only that
+//! plugin waits and it is never stopped for it; the user's own writes run on a blocking thread
+//! outside the plugin-service lock. Never on the UI or audio path.
 
 use std::collections::{BTreeSet, HashMap};
 use std::fmt;
-use std::sync::{Mutex, MutexGuard, OnceLock, PoisonError};
+use std::sync::{Arc, Mutex, MutexGuard, OnceLock, PoisonError, mpsc};
+use std::time::Duration;
 
 use wasmtime::component::{HasSelf, Linker};
 
 use crate::runtime::bindings::mumcord::plugin::secrets;
 use crate::runtime::bindings::mumcord::plugin::types::Error;
-use crate::runtime::{HostApi, PluginState};
+use crate::runtime::{HostApi, KEYCHAIN_WAIT_CAP, PluginState};
 
 /// Keychain service of plugin secrets.
 pub const SERVICE: &str = "Mumcord plugins";
@@ -43,6 +46,8 @@ pub enum SecretsError {
     InvalidName,
     #[error("the keychain failed: {0}")]
     Keychain(String),
+    #[error("the keychain did not answer in time")]
+    TimedOut,
 }
 
 trait Backend: Send + Sync {
@@ -95,6 +100,8 @@ pub struct PluginSecrets {
     /// Names per plugin, read from the index item once. The lock also serialises the index
     /// read-modify-write.
     names: Mutex<HashMap<String, BTreeSet<String>>>,
+    /// How long a plugin's call waits for the keychain.
+    wait_cap: Duration,
 }
 
 impl fmt::Debug for PluginSecrets {
@@ -116,6 +123,33 @@ impl PluginSecrets {
             backend,
             available: OnceLock::new(),
             names: Mutex::new(HashMap::new()),
+            wait_cap: KEYCHAIN_WAIT_CAP,
+        }
+    }
+
+    /// Runs a keychain operation for a plugin's call on a helper thread and waits at most
+    /// [`KEYCHAIN_WAIT_CAP`]. The keychain may be waiting for the user (an unlock prompt), and
+    /// a blocking OS call cannot be cancelled: after the cap the plugin gets an error and the
+    /// helper finishes on its own.
+    fn for_plugin<T: Send + 'static>(
+        self: &Arc<Self>,
+        op: impl FnOnce(&Self) -> Result<T, SecretsError> + Send + 'static,
+    ) -> Result<T, SecretsError> {
+        let (tx, rx) = mpsc::sync_channel(1);
+        let this = Arc::clone(self);
+        std::thread::Builder::new()
+            .name("plugin-keychain".into())
+            .spawn(move || {
+                // The plugin may have given up already; then nobody needs the answer.
+                let _ = tx.send(op(&this));
+            })
+            .map_err(|e| SecretsError::Keychain(e.to_string()))?;
+        match rx.recv_timeout(self.wait_cap) {
+            Ok(result) => result,
+            Err(mpsc::RecvTimeoutError::Timeout) => Err(SecretsError::TimedOut),
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                Err(SecretsError::Keychain("the keychain call panicked".into()))
+            }
         }
     }
 
@@ -246,13 +280,18 @@ fn account(plugin: &str, name: &str) -> String {
 
 /// What a plugin sees of a keychain failure: `not-permitted` when there is no keychain (the
 /// permission is unavailable), `invalid` for a bad name. Other failures are logged without the
-/// name and also reported as `not-permitted`, the one error every caller handles.
+/// name and also reported as `not-permitted`, the one error every caller handles; so is a
+/// keychain that did not answer within [`KEYCHAIN_WAIT_CAP`].
 fn plugin_error(plugin: &str, error: SecretsError) -> Error {
     match error {
         SecretsError::InvalidName => Error::Invalid,
         SecretsError::Unavailable => Error::NotPermitted,
         SecretsError::Keychain(message) => {
             tracing::warn!(plugin, %message, "plugin secrets failed");
+            Error::NotPermitted
+        }
+        SecretsError::TimedOut => {
+            tracing::warn!(plugin, "the keychain did not answer in time");
             Error::NotPermitted
         }
     }
@@ -279,11 +318,12 @@ impl secrets::Host for PluginState {
         if name.len() > MAX_NAME_BYTES {
             return Err(Error::TooLarge);
         }
-        let secrets = self.ctx.secrets.as_deref().ok_or(Error::NotPermitted)?;
-        let id = &self.id;
-        // The keychain is the OS's (D-Bus, a wallet prompt): waiting, not the plugin's own work.
+        let secrets = self.ctx.secrets.clone().ok_or(Error::NotPermitted)?;
+        let id = self.id.clone();
+        // The keychain may wait for the user (an unlock prompt): neither the plugin's own work
+        // nor bounded by the call's wall cap, only by KEYCHAIN_WAIT_CAP.
         self.clock
-            .waiting(|| secrets.exists(id, &name))
+            .waiting_on_user(|| secrets.for_plugin(move |s| s.exists(&id, &name)))
             .map_err(|e| plugin_error(&self.id, e))
     }
 
@@ -292,11 +332,12 @@ impl secrets::Host for PluginState {
         if name.len() > MAX_NAME_BYTES {
             return Err(Error::TooLarge);
         }
-        let secrets = self.ctx.secrets.as_deref().ok_or(Error::NotPermitted)?;
-        let id = &self.id;
-        // The keychain is the OS's (D-Bus, a wallet prompt): waiting, not the plugin's own work.
+        let secrets = self.ctx.secrets.clone().ok_or(Error::NotPermitted)?;
+        let id = self.id.clone();
+        // The keychain may wait for the user (an unlock prompt): neither the plugin's own work
+        // nor bounded by the call's wall cap, only by KEYCHAIN_WAIT_CAP.
         self.clock
-            .waiting(|| secrets.delete(id, &name))
+            .waiting_on_user(|| secrets.for_plugin(move |s| s.delete(&id, &name)))
             .map_err(|e| plugin_error(&self.id, e))
     }
 }
@@ -305,7 +346,7 @@ impl secrets::Host for PluginState {
 mod memory {
     use std::collections::HashMap;
     use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-    use std::sync::{Arc, Mutex};
+    use std::sync::{Arc, Condvar, Mutex};
 
     use super::*;
 
@@ -314,8 +355,22 @@ mod memory {
         pub items: Mutex<HashMap<String, Vec<u8>>>,
         pub reads: AtomicUsize,
         pub broken: AtomicBool,
-        /// How long each read takes, like a keychain behind D-Bus.
-        pub read_delay: Mutex<std::time::Duration>,
+        /// While true, reads block, like a keychain waiting for the user to unlock it.
+        pub held: Mutex<bool>,
+        pub released: Condvar,
+        /// Reads that have started.
+        pub started: AtomicUsize,
+    }
+
+    impl State {
+        pub fn hold(&self) {
+            *self.held.lock().expect("lock") = true;
+        }
+
+        pub fn release(&self) {
+            *self.held.lock().expect("lock") = false;
+            self.released.notify_all();
+        }
     }
 
     pub(super) struct MemoryBackend(pub Arc<State>);
@@ -343,7 +398,14 @@ mod memory {
 
         fn get(&self, account: &str) -> Result<Option<Vec<u8>>, SecretsError> {
             self.fail()?;
-            std::thread::sleep(*self.0.read_delay.lock().expect("lock"));
+            self.0.started.fetch_add(1, Ordering::Relaxed);
+            let held = self.0.held.lock().expect("lock");
+            drop(
+                self.0
+                    .released
+                    .wait_while(held, |held| *held)
+                    .expect("lock"),
+            );
             self.0.reads.fetch_add(1, Ordering::Relaxed);
             Ok(self.0.items.lock().expect("lock").get(account).cloned())
         }
@@ -362,6 +424,11 @@ mod memory {
 
         pub(super) fn in_memory_with(state: Arc<State>) -> Self {
             Self::with_backend(Box::new(MemoryBackend(state)))
+        }
+
+        pub(super) fn with_wait_cap(mut self, cap: Duration) -> Self {
+            self.wait_cap = cap;
+            self
         }
     }
 }
@@ -523,22 +590,18 @@ mod tests {
         dir
     }
 
-    /// Like waiting for the database (FR-6.3 addendum), waiting for a slow keychain (D-Bus, a
-    /// wallet prompt) does not use up the plugin's 50 ms call budget.
+    /// A keychain waiting for the user (an unlock prompt) takes seconds: far beyond the 50 ms
+    /// budget and the 500 ms hard cap, and the plugin is still not stopped (F54).
     #[test]
-    fn waiting_for_the_keychain_does_not_use_up_the_call_budget() {
+    fn waiting_for_a_locked_keychain_does_not_stop_the_plugin() {
         use std::time::{Duration, Instant};
 
+        use crate::runtime::CALL_WALL_CAP;
         use crate::runtime::wit::events::Event;
-        use crate::runtime::{CALL_TICKS, CALL_WALL_CAP, EPOCH_TICK};
         use crate::{HostContext, HostEvent, PluginHost};
 
         let (state, secrets) = secrets();
-        // Far beyond the call budget, far below the hard cap.
-        let read_delay = Duration::from_millis(200);
-        assert!(read_delay >= EPOCH_TICK * u32::try_from(CALL_TICKS * 4).expect("small"));
-        assert!(read_delay * 2 <= CALL_WALL_CAP);
-        *state.read_delay.lock().expect("lock") = read_delay;
+        state.hold();
         let ctx = HostContext {
             secrets: Some(Arc::new(secrets)),
             ..HostContext::default()
@@ -550,30 +613,50 @@ mod tests {
             .expect("runtime starts");
         host.load(&asking_plugin(root.path()), None).expect("loads");
         host.enable("asker").expect("starts");
-        let sent = Instant::now();
         assert!(host.send("asker", Event::Timer(1)));
 
-        // Watch until the read is done and the plugin had ample time to be stopped for overtime.
-        // A starved runner can stretch the read itself past the hard cap, which then stops the
-        // call by design, so only a stop seen before the cap could apply counts as a failure.
-        let deadline = sent + Duration::from_secs(5);
-        let mut read_done: Option<Instant> = None;
-        while read_done.is_none_or(|done| done.elapsed() < CALL_WALL_CAP) {
-            let now = Instant::now();
-            assert!(now < deadline, "the plugin never asked");
-            if read_done.is_none() && state.reads.load(Ordering::Relaxed) > 0 {
-                read_done = Some(now);
-            }
-            while let Ok(event) = events.try_recv() {
-                if matches!(event, HostEvent::Failed { .. }) {
-                    // Taken after the event arrived, so it is never earlier than the stop itself.
-                    assert!(
-                        sent.elapsed() >= CALL_WALL_CAP,
-                        "the plugin was stopped within the hard cap: {event:?}"
-                    );
-                }
-            }
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while state.started.load(Ordering::Relaxed) == 0 {
+            assert!(Instant::now() < deadline, "the plugin never asked");
             std::thread::sleep(Duration::from_millis(5));
         }
+        // The user takes a while to unlock the wallet.
+        std::thread::sleep(CALL_WALL_CAP * 2);
+        state.release();
+        while state.reads.load(Ordering::Relaxed) < 2 {
+            assert!(Instant::now() < deadline, "the reads never finished");
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        // The plugin keeps running: it takes the next event, and nothing reports it stopped.
+        assert!(host.send("asker", Event::Timer(2)));
+        std::thread::sleep(CALL_WALL_CAP);
+        while let Ok(event) = events.try_recv() {
+            assert!(
+                !matches!(event, HostEvent::Failed { .. }),
+                "the plugin was stopped: {event:?}"
+            );
+        }
+    }
+
+    /// A keychain that never answers: the plugin's call gets `not-permitted` after the cap.
+    #[test]
+    fn a_keychain_that_never_answers_returns_an_error_after_the_cap() {
+        use std::time::{Duration, Instant};
+
+        let (state, secrets) = secrets();
+        let secrets = Arc::new(secrets.with_wait_cap(Duration::from_millis(50)));
+        state.hold();
+        let asked = Instant::now();
+        let result = secrets.for_plugin(|s| s.exists("pet", "token"));
+        assert_eq!(result, Err(SecretsError::TimedOut));
+        assert!(asked.elapsed() < Duration::from_secs(5));
+        assert_eq!(
+            plugin_error("pet", SecretsError::TimedOut),
+            Error::NotPermitted
+        );
+
+        // Once the user answers, the next call works.
+        state.release();
+        assert_eq!(secrets.for_plugin(|s| s.exists("pet", "token")), Ok(false));
     }
 }
