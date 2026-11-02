@@ -527,11 +527,18 @@ mod tests {
     /// wallet prompt) does not use up the plugin's 50 ms call budget.
     #[test]
     fn waiting_for_the_keychain_does_not_use_up_the_call_budget() {
+        use std::time::{Duration, Instant};
+
         use crate::runtime::wit::events::Event;
+        use crate::runtime::{CALL_TICKS, CALL_WALL_CAP, EPOCH_TICK};
         use crate::{HostContext, HostEvent, PluginHost};
 
         let (state, secrets) = secrets();
-        *state.read_delay.lock().expect("lock") = std::time::Duration::from_millis(200);
+        // Far beyond the call budget, far below the hard cap.
+        let read_delay = Duration::from_millis(200);
+        assert!(read_delay >= EPOCH_TICK * u32::try_from(CALL_TICKS * 4).expect("small"));
+        assert!(read_delay * 2 <= CALL_WALL_CAP);
+        *state.read_delay.lock().expect("lock") = read_delay;
         let ctx = HostContext {
             secrets: Some(Arc::new(secrets)),
             ..HostContext::default()
@@ -543,23 +550,30 @@ mod tests {
             .expect("runtime starts");
         host.load(&asking_plugin(root.path()), None).expect("loads");
         host.enable("asker").expect("starts");
+        let sent = Instant::now();
         assert!(host.send("asker", Event::Timer(1)));
 
-        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
-        while state.reads.load(Ordering::Relaxed) == 0 {
-            assert!(
-                std::time::Instant::now() < deadline,
-                "the plugin never asked"
-            );
-            std::thread::sleep(std::time::Duration::from_millis(10));
-        }
-        // The read is done; give a stop for overtime the chance to show up.
-        std::thread::sleep(std::time::Duration::from_millis(300));
-        while let Ok(event) = events.try_recv() {
-            assert!(
-                !matches!(event, HostEvent::Failed { .. }),
-                "the plugin was stopped: {event:?}"
-            );
+        // Watch until the read is done and the plugin had ample time to be stopped for overtime.
+        // A starved runner can stretch the read itself past the hard cap, which then stops the
+        // call by design, so only a stop seen before the cap could apply counts as a failure.
+        let deadline = sent + Duration::from_secs(5);
+        let mut read_done: Option<Instant> = None;
+        while read_done.is_none_or(|done| done.elapsed() < CALL_WALL_CAP) {
+            let now = Instant::now();
+            assert!(now < deadline, "the plugin never asked");
+            if read_done.is_none() && state.reads.load(Ordering::Relaxed) > 0 {
+                read_done = Some(now);
+            }
+            while let Ok(event) = events.try_recv() {
+                if matches!(event, HostEvent::Failed { .. }) {
+                    // Taken after the event arrived, so it is never earlier than the stop itself.
+                    assert!(
+                        sent.elapsed() >= CALL_WALL_CAP,
+                        "the plugin was stopped within the hard cap: {event:?}"
+                    );
+                }
+            }
+            std::thread::sleep(Duration::from_millis(5));
         }
     }
 }
