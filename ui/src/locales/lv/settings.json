@@ -779,8 +779,6 @@
     "empty": "Neviens ieraksts neatbilst meklēšanai.",
     "loadFailed": "Izmaiņu žurnālu neizdevās ielādēt.",
     "current": "Pašreizējā",
-    "inDevelopment": "Izstrādē",
-    "unreleased": "Nepublicēta",
     "forDevelopers": "izstrādātājiem",
     "releasePage": "Laidiena lapa",
     "entries": "Ieraksti: {{count}}",

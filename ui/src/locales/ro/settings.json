@@ -779,8 +779,6 @@
     "empty": "Nicio intrare nu corespunde căutării.",
     "loadFailed": "Lista de modificări nu a putut fi încărcată.",
     "current": "Curentă",
-    "inDevelopment": "În dezvoltare",
-    "unreleased": "Nelansată",
     "forDevelopers": "pentru dezvoltatori",
     "releasePage": "Pagina versiunii",
     "entries": "Intrări: {{count}}",

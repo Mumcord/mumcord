@@ -774,8 +774,6 @@
     "empty": "No entry matches the search.",
     "loadFailed": "The changelog could not be loaded.",
     "current": "Current",
-    "inDevelopment": "In development",
-    "unreleased": "Unreleased",
     "forDevelopers": "for developers",
     "releasePage": "Release page",
     "entries": "Entries: {{count}}",

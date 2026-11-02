@@ -779,8 +779,6 @@
     "empty": "Nijedan unos ne odgovara pretrazi.",
     "loadFailed": "Popis promjena nije se mogao učitati.",
     "current": "Trenutačna",
-    "inDevelopment": "U razvoju",
-    "unreleased": "Neobjavljena",
     "forDevelopers": "za programere",
     "releasePage": "Stranica izdanja",
     "entries": "Unosi: {{count}}",

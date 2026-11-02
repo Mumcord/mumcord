@@ -779,8 +779,6 @@
     "empty": "Nessuna voce corrisponde alla ricerca.",
     "loadFailed": "Impossibile caricare l'elenco delle modifiche.",
     "current": "Attuale",
-    "inDevelopment": "In sviluppo",
-    "unreleased": "Non pubblicata",
     "forDevelopers": "per sviluppatori",
     "releasePage": "Pagina della versione",
     "entries": "Voci: {{count}}",

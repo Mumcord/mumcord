@@ -10,7 +10,6 @@ import {
   filterChangelog,
   groupKind,
   INTERNAL,
-  isDevBuild,
   itemHtml,
   summaryOf,
   visibleVersions,
@@ -175,7 +174,6 @@ export function ChangelogView({ versions, appVersion, failed, onClose }: Changel
                   key={version.version}
                   version={version}
                   current={version.version === current}
-                  dev={isDevBuild(appVersion)}
                   open={open.has(version.version)}
                   internalOpen={internalOpen.has(version.version)}
                   onToggle={() => {
@@ -247,7 +245,6 @@ function formatDate(date: string, language: string): string {
 function VersionEntry(props: {
   version: ChangelogVersion;
   current: boolean;
-  dev: boolean;
   open: boolean;
   internalOpen: boolean;
   onToggle: () => void;
@@ -274,16 +271,9 @@ function VersionEntry(props: {
           onKeyDown={props.onKeyDown}
         >
           <span className="cl-chevron" aria-hidden="true" />
-          <span className="cl-version__number">
-            {version.unreleased && version.version === "Unreleased"
-              ? t("changelog.unreleased")
-              : version.version}
-          </span>
+          <span className="cl-version__number">{version.version}</span>
           {props.current && (
             <span className="cl-badge cl-badge--current">{t("changelog.current")}</span>
-          )}
-          {version.unreleased && props.dev && (
-            <span className="cl-badge cl-badge--dev">{t("changelog.inDevelopment")}</span>
           )}
           {version.date !== null && (
             <span className="cl-version__date">{formatDate(version.date, i18n.language)}</span>

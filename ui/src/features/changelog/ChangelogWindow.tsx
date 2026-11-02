@@ -6,8 +6,6 @@ import { applyRootLook, isCloseShortcut } from "../inspector/inspectorView";
 import { loadChangelog, type ChangelogVersion } from "./changelog";
 import { ChangelogView } from "./ChangelogView";
 
-export const LOAD_TIMEOUT_MS = 10_000;
-
 function close() {
   getApi()
     .changelogClose()
@@ -54,31 +52,22 @@ export function ChangelogWindow() {
 
   useEffect(() => {
     let active = true;
-    // Both answers come from the app itself within milliseconds; one that never comes must not
-    // leave the window loading forever.
-    const timer = window.setTimeout(() => {
-      console.error("Loading the changelog timed out");
-      if (active) setFailed(true);
-    }, LOAD_TIMEOUT_MS);
-    Promise.all([loadChangelog(), getApi().appInfo()])
-      .then(
-        ([loaded, info]) => {
-          if (!active) return;
-          setVersions(loaded);
-          setAppVersion(info.version);
-          setFailed(false);
-        },
-        (error: unknown) => {
-          console.error("Loading the changelog failed", error);
-          if (active) setFailed(true);
-        },
-      )
-      .finally(() => {
-        window.clearTimeout(timer);
-      });
+    // No timeout: the webview can take 8-10 s to start (Linux AppImage), and an error shown while
+    // the load is still working would be wrong. Only a real fetch or parse failure is reported.
+    Promise.all([loadChangelog(), getApi().appInfo()]).then(
+      ([loaded, info]) => {
+        if (!active) return;
+        setVersions(loaded);
+        setAppVersion(info.version);
+        setFailed(false);
+      },
+      (error: unknown) => {
+        console.error("Loading the changelog failed", error);
+        if (active) setFailed(true);
+      },
+    );
     return () => {
       active = false;
-      window.clearTimeout(timer);
     };
   }, []);
 

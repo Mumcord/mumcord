@@ -13,7 +13,7 @@ import {
   type ChangelogVersion,
 } from "./changelog";
 import { ChangelogView } from "./ChangelogView";
-import { ChangelogWindow, LOAD_TIMEOUT_MS } from "./ChangelogWindow";
+import { ChangelogWindow } from "./ChangelogWindow";
 import { WhatsNewOnStart } from "./WhatsNewOnStart";
 
 let api: MockApi;
@@ -61,9 +61,24 @@ const versions: ChangelogVersion[] = [
 ];
 
 describe("changelog helpers", () => {
-  it("shows versions in development only in dev builds", () => {
+  it("shows the running version first, then older releases, and hides newer ones", () => {
     expect(visibleVersions(versions, "0.4.3").map((v) => v.version)).toEqual(["0.4.3", "0.4.0"]);
-    expect(visibleVersions(versions, "dev~a1b2c3d")).toHaveLength(3);
+    const newer: ChangelogVersion[] = [
+      { version: "0.5.0", date: "2026-11-01", unreleased: false, sections: [] },
+      ...versions.slice(1),
+    ];
+    expect(visibleVersions(newer, "0.4.3").map((v) => v.version)).toEqual(["0.4.3", "0.4.0"]);
+  });
+
+  it("shows released sections only in dev builds, never Unreleased", () => {
+    const withPlain: ChangelogVersion[] = [
+      { version: "Unreleased", date: null, unreleased: true, sections: [] },
+      ...versions,
+    ];
+    expect(visibleVersions(withPlain, "dev~a1b2c3d").map((v) => v.version)).toEqual([
+      "0.4.3",
+      "0.4.0",
+    ]);
   });
 
   it("shows a release built from its tag with its still undated section as its own", () => {
@@ -89,6 +104,7 @@ describe("changelog helpers", () => {
     expect(released.map((v) => v.version)).toEqual(["0.4.4", "0.4.3", "0.4.0"]);
     expect(released[0]?.url).toBeUndefined();
     expect(released[0]?.sections).toEqual(plain[0]?.sections);
+    expect(released.some((v) => v.version === "Unreleased" || v.unreleased)).toBe(false);
     expect(currentVersion(released, "0.4.4")).toBe("0.4.4");
     // An empty "[Unreleased]" after the post-release sync is not taken for the next version.
     const synced: ChangelogVersion[] = [
@@ -215,7 +231,7 @@ describe("ChangelogView", () => {
   });
 
   it("moves between versions with the arrow keys, Home and End", () => {
-    renderView("dev~a1b2c3d");
+    renderView("0.4.4");
     const [first, second, third] = [toggle(/^0\.4\.4/u), toggle(/^0\.4\.3/u), toggle(/^0\.4\.0/u)];
     first.focus();
     fireEvent.keyDown(first, { key: "ArrowDown" });
@@ -226,12 +242,12 @@ describe("ChangelogView", () => {
     expect(first).toHaveFocus();
   });
 
-  it("marks the version in development in a dev build", () => {
-    renderView("dev~a1b2c3d");
-    const dev = toggle(/^0\.4\.4/u);
-    expect(dev).toHaveAttribute("aria-expanded", "true");
-    expect(within(dev).getByText("Current")).toBeVisible();
-    expect(within(dev).getByText("In development")).toBeVisible();
+  it("opens the running version, labelled current, and never mentions Unreleased", () => {
+    renderView("0.4.4");
+    const running = toggle(/^0\.4\.4/u);
+    expect(running).toHaveAttribute("aria-expanded", "true");
+    expect(within(running).getByText("Current")).toBeVisible();
+    expect(screen.queryByText(/unreleased|in development/iu)).toBeNull();
     expect(toggle(/^0\.4\.3/u)).toHaveAttribute("aria-expanded", "false");
   });
 
@@ -252,7 +268,7 @@ describe("ChangelogView", () => {
 
   it("opens issue links and the release page through the link menu", async () => {
     const open = vi.spyOn(api, "openLink");
-    renderView("dev~a1b2c3d");
+    renderView("0.4.4");
     fireEvent.click(screen.getByRole("link", { name: "#111" }));
     fireEvent.click(await screen.findByRole("menuitem", { name: "Open link" }));
     await waitFor(() => {
@@ -281,6 +297,8 @@ describe("ChangelogWindow", () => {
       vi.fn(() => Promise.resolve(new Response(JSON.stringify(versions)))),
     );
     const close = vi.spyOn(api, "changelogClose");
+    const info = await api.appInfo();
+    vi.spyOn(api, "appInfo").mockResolvedValue({ ...info, version: "0.4.3" });
     render(<ChangelogWindow />);
     expect(await screen.findByRole("heading", { level: 1, name: /^Mumcord/u })).toBeVisible();
     expect(await screen.findByRole("button", { name: /^0\.4\.3/u })).toBeVisible();
@@ -314,20 +332,19 @@ describe("ChangelogWindow", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("could not be loaded");
   });
 
-  it("reports a changelog that never arrives instead of loading forever", async () => {
+  it("keeps showing the loading state while the changelog is slow", async () => {
     vi.useFakeTimers();
     try {
       vi.stubGlobal(
         "fetch",
         vi.fn(() => new Promise<Response>(() => undefined)),
       );
-      vi.spyOn(console, "error").mockImplementation(() => undefined);
       render(<ChangelogWindow />);
-      expect(screen.getByText("Loading…")).toBeVisible();
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(LOAD_TIMEOUT_MS);
+        await vi.advanceTimersByTimeAsync(120_000);
       });
-      expect(screen.getByRole("alert")).toHaveTextContent("could not be loaded");
+      expect(screen.getByText("Loading…")).toBeVisible();
+      expect(screen.queryByRole("alert")).toBeNull();
     } finally {
       vi.useRealTimers();
     }

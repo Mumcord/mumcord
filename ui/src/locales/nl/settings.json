@@ -774,8 +774,6 @@
     "empty": "Geen item komt overeen met de zoekopdracht.",
     "loadFailed": "Het wijzigingslogboek kon niet worden geladen.",
     "current": "Huidig",
-    "inDevelopment": "In ontwikkeling",
-    "unreleased": "Niet uitgebracht",
     "forDevelopers": "voor ontwikkelaars",
     "releasePage": "Releasepagina",
     "entries": "Items: {{count}}",
