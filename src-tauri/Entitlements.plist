@@ -9,5 +9,12 @@
        hardened runtime's library validation would refuse every library not signed by us. -->
   <key>com.apple.security.cs.disable-library-validation</key>
   <true/>
+  <!-- Plugins run as WebAssembly that wasmtime compiles to machine code at run time (and loads
+       from its compile cache). The hardened runtime kills the app with "Code Signature Invalid"
+       when it executes such pages unless unsigned executable memory is allowed. -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
 </dict>
 </plist>

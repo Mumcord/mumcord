@@ -818,7 +818,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (675 crates)
+* MIT License (676 crates)
 * Apache License 2.0 (43 crates)
 * BSD 3-Clause "New" or "Revised" License (31 crates)
 * ISC License (20 crates)
@@ -5436,6 +5436,7 @@ MIT License
 Used by:
   - coreaudio-rs 0.14.2 (https://github.com/RustAudio/coreaudio-rs.git)
   - either 1.19.0 (https://github.com/rayon-rs/either)
+  - itertools 0.13.0 (https://github.com/rust-itertools/itertools)
   - itertools 0.14.0 (https://github.com/rust-itertools/itertools)
   - maplit 1.0.2 (https://github.com/bluss/maplit)
   - petgraph 0.8.3 (https://github.com/petgraph/petgraph)
