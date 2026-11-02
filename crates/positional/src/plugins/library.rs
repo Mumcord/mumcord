@@ -63,10 +63,8 @@ pub(crate) struct PluginLibrary {
 
 /// Looks up a function. `T` must be the function's real type (see [`abi`]).
 fn symbol<T: Copy>(lib: &Library, name: &'static str) -> Option<T> {
-    let mut cname = name.as_bytes().to_vec();
-    cname.push(0);
     // SAFETY: the caller names the type the Mumble plugin interface declares for `name`.
-    unsafe { lib.get::<T>(&cname) }.ok().map(|s| *s)
+    unsafe { lib.get::<T>(name) }.ok().map(|s| *s)
 }
 
 fn required<T: Copy>(lib: &Library, name: &'static str) -> Result<T, LoadError> {
