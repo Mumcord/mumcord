@@ -215,6 +215,8 @@ impl Mumpeer {
             fingerprint: self.fingerprint,
             state: RelayState::Up,
             seq,
+            uses: None,
+            broadcast: None,
         }
     }
 }
@@ -280,7 +282,7 @@ async fn answer_token_requests(bot: Arc<Bot>, relay: Arc<Mumpeer>) {
         if data_id != PEER_DATA_ID {
             continue;
         }
-        let Ok(PeerMessage::TokenRequest { rid, peer }) = PeerMessage::decode(&data) else {
+        let Ok(PeerMessage::TokenRequest { rid, peer, .. }) = PeerMessage::decode(&data) else {
             continue;
         };
         let hash_of = |session: u32| {

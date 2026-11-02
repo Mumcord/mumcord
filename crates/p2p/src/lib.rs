@@ -25,12 +25,17 @@
 //! [`P2p::connect_via_relay`]; the offering side dials the inner connection, the answering side
 //! accepts it. [`PeerConnection::path`] tells how a connection travels.
 //!
+//! Screen-share broadcasts (spec 07): the relay bot sets them up with the `bcast-*` messages of
+//! [`PeerMessage`]; [`broadcast`] holds the relay `bind` with a role and the clear frame header
+//! the relay reads to fan frames out.
+//!
 //! Consent (FR-2.36) is the caller's job: an offer or answer reveals this machine's addresses
 //! (it also opens a router port mapping), and [`PendingOffer::complete`] and
 //! [`PendingAnswer::connect`] are the only calls that dial the peer. Call `offer`/`answer` only
 //! after the user allowed direct connections. [`Reveal`] without `direct` gathers nothing and
 //! opens no port, so the peer never learns this machine's addresses (spec 04, FR-4.13).
 
+pub mod broadcast;
 mod gather;
 mod peer;
 mod relay;
@@ -48,8 +53,8 @@ use tokio::sync::mpsc;
 use tokio::task::JoinSet;
 
 pub use peer::{
-    MAX_PEER_BYTES, PEER_DATA_ID, PEER_VERSION, PeerError, PeerMessage, RelayAnnouncement,
-    RelayState, RelayToken, RequestId, TokenErrorReason,
+    BroadcastErrorReason, BroadcastId, MAX_PEER_BYTES, PEER_DATA_ID, PEER_VERSION, PeerError,
+    PeerMessage, RelayAnnouncement, RelayState, RelayToken, RelayUse, RequestId, TokenErrorReason,
 };
 pub use quinn;
 pub use relay::{RelayRefusal, RelayTransport};
