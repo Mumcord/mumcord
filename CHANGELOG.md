@@ -9,6 +9,7 @@
 
 ### Fixed
 
+- The disconnect menu of the hang-up button now opens above the button instead of running off the bottom of the window, and "Switch voice" has an icon
 - macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
 - Changing the volume of someone's screen share no longer changes their voice volume. The share's sound now has its own volume, remembered per person like their voice volume.
 
