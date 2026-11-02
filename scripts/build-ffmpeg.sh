@@ -82,7 +82,7 @@ configure=(
   --disable-avformat --disable-avfilter --disable-avdevice --disable-swscale --disable-swresample
   --enable-static --disable-shared --enable-pic
   --enable-ffnvcodec --enable-cuda --enable-nvenc --enable-amf
-  --enable-encoder=av1_nvenc,av1_amf
+  "--enable-encoder=av1_nvenc,av1_amf"
   --extra-cflags="-I$deps_pc/include"
 )
 
@@ -97,10 +97,10 @@ if [[ $os == windows ]]; then
   cmake --install "$(cygpath -m "$work/libvpl-build")" --config Release
   configure+=(
     --toolchain=msvc --target-os=win64 --arch=x86_64 --extra-cflags=-MD
-    --enable-d3d11va --enable-libvpl --enable-encoder=av1_qsv,vp9_qsv
+    --enable-d3d11va --enable-libvpl "--enable-encoder=av1_qsv,vp9_qsv"
   )
 else
-  configure+=(--enable-vaapi --enable-encoder=av1_vaapi,vp9_vaapi)
+  configure+=(--enable-vaapi "--enable-encoder=av1_vaapi,vp9_vaapi")
 fi
 
 src="$work/ffmpeg-$FFMPEG_VERSION"
@@ -136,6 +136,7 @@ else
 fi
 cp "$install/lib/pkgconfig/libavcodec.pc" "$install/lib/pkgconfig/libavutil.pc" "$prefix/lib/pkgconfig/"
 # Paths into the temporary build directories become paths relative to the .pc file.
+# shellcheck disable=SC2016 # ${pcfiledir} and ${prefix} are for pkg-config, not the shell
 sed -i -e 's|^prefix=.*|prefix=${pcfiledir}/../..|' \
   -e 's|^libdir=.*|libdir=${prefix}/lib|' -e 's|^includedir=.*|includedir=${prefix}/include|' \
   -e "s|$deps_pc/lib|\${prefix}/lib|g" \

@@ -97,6 +97,7 @@ mkdir -p "$prefix/include" "$prefix/lib/pkgconfig"
 # The installed headers do not depend on the architecture.
 cp -R "$install/include/dav1d" "$prefix/include/"
 cp "$install/lib/$lib" "$prefix/lib/"
+# shellcheck disable=SC2016 # ${pcfiledir} is for pkg-config, not the shell
 sed 's|^prefix=.*|prefix=${pcfiledir}/../..|' "$install/lib/pkgconfig/dav1d.pc" \
   > "$prefix/lib/pkgconfig/dav1d.pc"
 
