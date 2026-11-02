@@ -45,6 +45,7 @@
 
 ### Fixed
 
+- macOS: starting a plugin (for example Echolings) no longer crashes Mumcord. The signed app was missing the permission to run the plugins' compiled WebAssembly code
 - A plugin is no longer stopped while your system keychain asks you to unlock it or to allow access (KWallet, GNOME Keyring, macOS Keychain), and saving a plugin password while that prompt is open no longer holds up other plugins. If the prompt is not answered within 2 minutes, the plugin is told secrets are unavailable.
 - Plugins: old compiled copies of plugins no longer pile up on disk; Mumcord removes the ones that are no longer needed each time it starts
 - Closing a full profile card with Escape right after using a button in it (for example a plugin button that then greys out) no longer stops that profile card from opening again.
