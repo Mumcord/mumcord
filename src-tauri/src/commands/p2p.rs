@@ -179,6 +179,8 @@ impl From<EngineRefusal> for RelayRefusal {
             EngineRefusal::Expired => Self::Expired,
             EngineRefusal::NotAllowed => Self::NotAllowed,
             EngineRefusal::BotGone => Self::BotGone,
+            EngineRefusal::UseNotAllowed => Self::NotAllowed,
+            EngineRefusal::BroadcastFull => Self::RelayFull,
             EngineRefusal::RelayFull => Self::RelayFull,
             EngineRefusal::PeerLimit => Self::PeerLimit,
             EngineRefusal::RateLimited => Self::RateLimited,
