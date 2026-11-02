@@ -2736,6 +2736,9 @@ impl Inner {
             }
             // Collected by the session loop and emitted in batches (`emit_permissions`).
             Event::PermissionsUpdated { .. } => {}
+            // The ACL editor (Epic 4, issue #252) is the consumer of the query answer; nothing here
+            // needs it yet, so the event stays in the protocol layer.
+            Event::Acl(_) => {}
             Event::CryptSetup(setup) => {
                 if let Some(t) = transport {
                     t.on_crypt_setup(setup.clone());

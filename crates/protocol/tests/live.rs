@@ -8,9 +8,10 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use mumcord_protocol::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+use mumcord_protocol::proto;
 use mumcord_protocol::{
     ClientIdentity, CommandError, ConnectConfig, ConnectError, Connection, DenyKind,
-    DisconnectReason, Event, TextTarget, connect,
+    DisconnectReason, Event, TextTarget, connect, permissions,
 };
 use tokio::sync::mpsc::UnboundedReceiver;
 
@@ -54,6 +55,31 @@ async fn login(port: u16, prefix: &str) -> Connection {
     connect(config(port, &unique(prefix), true))
         .await
         .expect("login")
+}
+
+/// The SuperUser account: murmur answers an ACL query only for users with the Write permission, so
+/// seeing an answer needs it. The password is in `testenv/.env` (`up.sh` applies it to the server).
+async fn login_superuser(port: u16) -> Connection {
+    let password = superuser_password().expect("SUPERUSER_PASSWORD in testenv/.env");
+    let mut cfg = config(port, "SuperUser", true);
+    cfg.password = Some(password);
+    connect(cfg).await.expect("SuperUser login")
+}
+
+fn superuser_password() -> Option<String> {
+    let from_env = std::env::var("SUPERUSER_PASSWORD")
+        .ok()
+        .filter(|p| !p.is_empty());
+    from_env.or_else(|| {
+        let dir = std::env::var("MUMCORD_TESTENV_DIR").ok()?;
+        std::fs::read_to_string(format!("{dir}/.env"))
+            .ok()?
+            .lines()
+            .filter_map(|line| line.split_once('='))
+            .find(|(key, _)| *key == "SUPERUSER_PASSWORD")
+            .map(|(_, value)| value.trim().to_owned())
+            .filter(|value| !value.is_empty())
+    })
 }
 
 /// Waits for the first event matching `pred`, skipping others.
@@ -326,4 +352,96 @@ async fn v15_sees_client_version_before_authenticate() {
 #[ignore = "needs testenv/up.sh v14"]
 async fn v14_sees_client_version_before_authenticate() {
     no_old_client_warning(V14).await;
+}
+
+#[tokio::test]
+#[ignore = "needs testenv/up.sh v15 with SUPERUSER_PASSWORD"]
+async fn acl_query_answers_admins_and_refuses_others() {
+    let mut admin = login_superuser(V15).await;
+    // A temporary channel keeps the shared test server clean: murmur removes it once the last user
+    // leaves, so the group and the ACL entry written here disappear with the test.
+    let room_name = unique("acl-room");
+    admin
+        .handle
+        .send_channel_state(proto::ChannelState {
+            parent: Some(0),
+            name: Some(room_name.clone()),
+            temporary: Some(true),
+            ..Default::default()
+        })
+        .expect("create channel");
+    let room = wait_for(&mut admin.events, "acl room", |e| match e {
+        Event::ChannelUpdated(c) if c.name == room_name => Some(c.id),
+        _ => None,
+    })
+    .await;
+    admin.handle.join_channel(room).expect("join");
+    wait_own(&mut admin, "admin in the acl room", |u| {
+        u.channel_id == room
+    })
+    .await;
+
+    let group = proto::acl::ChanGroup {
+        name: "acl-live".into(),
+        add: vec![0],
+        ..Default::default()
+    };
+    let entry = proto::acl::ChanAcl {
+        grant: Some(permissions::WRITE),
+        group: Some("acl-live".into()),
+        ..Default::default()
+    };
+    admin
+        .handle
+        .send_acl(proto::Acl {
+            channel_id: room,
+            groups: vec![group.clone()],
+            acls: vec![entry.clone()],
+            ..Default::default()
+        })
+        .expect("set acl");
+    admin.handle.query_acl(room).expect("query acl");
+    let answer = wait_for(&mut admin.events, "acl answer for the room", |e| match e {
+        Event::Acl(a) if a.channel_id == room => Some((**a).clone()),
+        Event::PermissionDenied(d) => panic!("admin was denied: {d:?}"),
+        _ => None,
+    })
+    .await;
+    // The server also reports the ACLs it inherits from the root, so only our own entries are
+    // checked.
+    let group_entry = answer
+        .groups
+        .iter()
+        .find(|g| g.name == "acl-live")
+        .expect("the group in the answer");
+    assert_eq!(group_entry.add.as_slice(), &[0u32][..]);
+    let acl_entry = answer
+        .acls
+        .iter()
+        .find(|a| a.group.as_deref() == Some("acl-live"))
+        .expect("the ACL entry in the answer");
+    assert_eq!(
+        (acl_entry.grant, acl_entry.inherited),
+        (Some(permissions::WRITE), Some(false))
+    );
+
+    // Someone without the Write permission is refused by the server, and the denial is clear.
+    let mut visitor = login(V15, "acl-visitor").await;
+    visitor.handle.query_acl(room).expect("send");
+    let denied = wait_for(
+        &mut visitor.events,
+        "acl denial for the room",
+        |e| match e {
+            Event::PermissionDenied(d) => Some(d.clone()),
+            _ => None,
+        },
+    )
+    .await;
+    assert_eq!(
+        (denied.kind, denied.permission, denied.channel_id),
+        (DenyKind::Permission, Some(permissions::WRITE), Some(room))
+    );
+
+    admin.handle.disconnect();
+    visitor.handle.disconnect();
 }
