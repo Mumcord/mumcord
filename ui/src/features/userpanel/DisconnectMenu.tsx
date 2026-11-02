@@ -3,6 +3,7 @@ import { ContextMenu, type MenuItem, type MenuPosition } from "../../components/
 
 /** Phone handset, as on the button; marks the menu's disconnecting actions beside their text. */
 const HANG_UP = "M3 14c5-5 13-5 18 0l-2.5 2.5-3-1.5v-2.5a9 9 0 0 0-5 0V15l-3 1.5z";
+const SWAP = "M4 8h15l-4-4M20 16H5l4 4";
 const VOICE_OFF = "M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM4 4l16 16";
 
 export interface VoiceTarget {
@@ -59,6 +60,7 @@ export function DisconnectMenu({
   for (const target of switchTargets) {
     items.push({
       label: t("disconnectMenu.switchTo", { server: target.label }),
+      icon: SWAP,
       onSelect: () => {
         onSwitchVoice(target.serverId);
       },

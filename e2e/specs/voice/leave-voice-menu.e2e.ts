@@ -14,6 +14,26 @@ const notice = () => $(".userpanel-readonly");
 const menu = () => $("[role='menu'][aria-label='Disconnect options']");
 const item = (name: string) => $(`//*[@role='menuitem'][.//span[normalize-space(.)='${name}']]`);
 
+/** Right-clicks the hang-up button with a script event: WebKitWebDriver releases a right-click as
+ * a left button, which hangs up now that the menu opens above the button instead of under the
+ * pointer (see openServerMenu in servers-ui.ts). */
+async function rightClickHangUp(): Promise<void> {
+  await browser.execute(() => {
+    const button = document.querySelector("button[aria-label^='Disconnect from ']");
+    const box = button?.getBoundingClientRect();
+    if (!button || !box) throw new Error("hang-up button not found");
+    button.dispatchEvent(
+      new MouseEvent("contextmenu", {
+        bubbles: true,
+        cancelable: true,
+        button: 2,
+        clientX: box.left + box.width / 2,
+        clientY: box.top + box.height / 2,
+      }),
+    );
+  });
+}
+
 describe("disconnect button menu (#154)", () => {
   before(async () => {
     await testenv.up("v15");
@@ -34,7 +54,7 @@ describe("disconnect button menu (#154)", () => {
     await $(".userpanel-readonly__join").click();
     await notice().waitForExist({ reverse: true, timeout: 15_000 });
 
-    await hangUp().click({ button: "right" });
+    await rightClickHangUp();
     await menu().waitForDisplayed({ timeout: 5_000 });
     await browser.keys("Escape");
     await menu().waitForExist({ reverse: true, timeout: 5_000 });
@@ -42,7 +62,7 @@ describe("disconnect button menu (#154)", () => {
   });
 
   it("Leave voice keeps the connection read-only; joining gives voice back", async () => {
-    await hangUp().click({ button: "right" });
+    await rightClickHangUp();
     await item("Leave voice").waitForDisplayed({ timeout: 5_000 });
     await item("Leave voice").click();
     await notice().waitForDisplayed({ timeout: 15_000 });
