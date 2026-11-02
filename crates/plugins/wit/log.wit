@@ -1,0 +1,13 @@
+/// Plugin diagnostics. Lines go to a small per-plugin buffer shown in Settings, never to the app
+/// log file, so a plugin cannot write personal data into Mumcord's logs.
+interface log {
+  enum level {
+    debug,
+    info,
+    warn,
+    error,
+  }
+
+  /// Long lines are cut; old lines are dropped when the buffer is full.
+  write: func(level: level, message: string);
+}

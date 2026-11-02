@@ -1,0 +1,22 @@
+{
+  "title": "Plug-ins",
+  "tabsLabel": "Plug-in-onderdelen",
+  "tabs": {
+    "installed": "Geïnstalleerd",
+    "browse": "Ontdekken",
+    "updates": "Updates",
+    "repositories": "Bronnen",
+    "developer": "Ontwikkelaar"
+  },
+  "turnOffAll": "Alle plug-ins uitschakelen",
+  "allOff": "Alle plug-ins staan uit. Ze blijven uit, ook na een herstart, tot je ze weer inschakelt.",
+  "noPlugins": "Plug-ins staan uit voor deze sessie (gestart met --no-plugins).",
+  "loadFailed": "De plug-ins konden niet worden geladen.",
+  "palette": {
+    "label": "Opdrachtenpalet",
+    "placeholder": "Typ een opdracht",
+    "empty": "Geen passende opdracht",
+    "openPlugins": "Plug-ins",
+    "turnOffAll": "Alle plug-ins uitschakelen"
+  }
+}

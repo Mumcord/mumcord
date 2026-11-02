@@ -1,0 +1,7 @@
+{
+  "heading": "Pluginy",
+  "list": "Panely pluginů",
+  "expand": "Zvětšit {{name}}",
+  "close": "Zavřít",
+  "unsupported": "Tento server nepodporuje sdílené funkce pluginů"
+}

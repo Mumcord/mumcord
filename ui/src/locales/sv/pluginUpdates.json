@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Tilläggsuppdateringar",
+    "info": "Skilt från appens uppdaterare. Mumcord söker efter tilläggsuppdateringar vid start och sedan var 6:e timme.",
+    "infoLabel": "Mer information: tilläggsuppdateringar",
+    "auto": "Installera automatiskt",
+    "notify": "Bara meddela",
+    "off": "Av"
+  },
+  "waiting": "Uppdateringar",
+  "empty": "Alla tillägg är uppdaterade.",
+  "emptyOff": "Tilläggsuppdateringar är av. Slå på dem ovan för att söka efter uppdateringar.",
+  "loadFailed": "Uppdateringarna kunde inte läsas in.",
+  "newAuthorKey": "Den här versionen är signerad av en annan upphovsperson. Uppdatera bara om du litar på den nya.",
+  "rolledBack": "Version {{version}} kunde inte startas, så den tidigare versionen återställdes. Orsak:",
+  "review": "Granska och uppdatera",
+  "update": "Uppdatera",
+  "installFailed": "{{name}} kunde inte uppdateras. Försök igen.",
+  "pins": "Fäst version",
+  "pinsHint": "Ett fäst tillägg stannar på sin nuvarande version och erbjuds inga uppdateringar.",
+  "pin": "Behåll {{name}} på den här versionen",
+  "pinVersion": "Version {{version}}",
+  "versionsTo": "till",
+  "pill": {
+    "none": "Inga nya behörigheter",
+    "permission": "Behöver en ny behörighet",
+    "author": "Ny upphovsperson"
+  },
+  "newPermissions": "Nya behörigheter",
+  "revoked": {
+    "title": "{{name}} stängdes av",
+    "text": "Version {{version}} finns på återkallelselistan: {{reason}}. Tilläggets data sparas.",
+    "details": "Detaljer",
+    "remove": "Ta bort"
+  },
+  "checkNow": "Kontrollera nu",
+  "lastChecked": "Senast kontrollerad kl. {{time}}",
+  "checkFailed": "Kontrollen misslyckades. Försök igen.",
+  "modeNote": "Tilläggsuppdateringar: {{mode}}. Du kan ändra det nedan.",
+  "settings": "Uppdateringsinställningar",
+  "offer": {
+    "heading": "Nya behörigheter",
+    "title": "{{name}} {{version}} kan nu göra mer. De här alternativen är avstängda tills du slår på dem.",
+    "permission": "Ny valfri behörighet: {{permission}}",
+    "save": "Spara",
+    "notNow": "Inte nu",
+    "failed": "Behörigheterna för {{name}} kunde inte ändras. Försök igen."
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kort fra {{plugin}}",
+    "showMore": "Vis mere",
+    "showLess": "Vis mindre"
+  },
+  "via": "via {{plugin}}",
+  "supersede": {
+    "showText": "Vis original tekst",
+    "hideText": "Skjul original tekst",
+    "hiddenBy": "Skjult af {{plugin}}"
+  },
+  "command": {
+    "list": "Plugin-kommandoer",
+    "keys": "↑↓ vælg · Tab fuldfør · Enter kør · Esc luk",
+    "unavailable": "Denne kommando er ikke tilgængelig lige nu.",
+    "failed": "Kommandoen kunne ikke køres. Prøv igen."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "title": "Spraudņi",
+  "tabsLabel": "Spraudņu sadaļas",
+  "tabs": {
+    "installed": "Instalētie",
+    "browse": "Pārlūkot",
+    "updates": "Atjauninājumi",
+    "repositories": "Krātuves",
+    "developer": "Izstrādātājs"
+  },
+  "turnOffAll": "Izslēgt visus spraudņus",
+  "allOff": "Visi spraudņi ir izslēgti. Tie paliek izslēgti arī pēc pārstartēšanas, līdz tos atkal ieslēgsiet.",
+  "noPlugins": "Spraudņi šai sesijai ir izslēgti (palaists ar --no-plugins).",
+  "loadFailed": "Spraudņus neizdevās ielādēt.",
+  "palette": {
+    "label": "Komandu palete",
+    "placeholder": "Ievadiet komandu",
+    "empty": "Nav atbilstošas komandas",
+    "openPlugins": "Spraudņi",
+    "turnOffAll": "Izslēgt visus spraudņus"
+  }
+}

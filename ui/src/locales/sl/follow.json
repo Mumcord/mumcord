@@ -1,6 +1,5 @@
 {
   "follow": "Sledi",
-  "following": "Slediš",
   "unsupported": "Za sledenje kanalom je potreben strežnik z različico 1.4 ali novejšo.",
   "unread_one": "{{count}} neprebrano sporočilo",
   "unread_two": "{{count}} neprebrani sporočili",

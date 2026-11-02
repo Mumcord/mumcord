@@ -5,6 +5,7 @@ import { openInBrowser } from "../chat/openLink";
 import { revealMessage } from "../chat/reveal";
 import { openRequestsView, selectRequest } from "../requests/useRequestsView";
 import { startWatching } from "../screenshare";
+import { openPluginItem } from "../plugins/notifications";
 import { openUpdateDialog, requestUpdateRestart } from "../updates/dialogRequests";
 import { setWatchParty } from "../watchparty/watchPartyStore";
 import type { CentreItem, UpdateItem } from "./centreModel";
@@ -13,6 +14,10 @@ import { dismissItem, markRead, setCentreOpen } from "./centreStore";
 /** Marks the entry read, closes the panel and shows its server and chat, message or request. */
 export function openItem(item: CentreItem): void {
   markRead(item.id);
+  if (item.kind === "plugin") {
+    openPluginItem(item);
+    return;
+  }
   setCentreOpen(false);
   if (item.kind === "update") {
     openUpdateDialog();

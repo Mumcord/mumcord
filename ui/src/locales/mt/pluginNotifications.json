@@ -1,0 +1,30 @@
+{
+  "type": "Plagin",
+  "autoOff": {
+    "title": "{{name}} ġie mitfi",
+    "body": "Mitfi wara ħabtiet ripetuti",
+    "open": "Uri fil-Plagins"
+  },
+  "update": {
+    "title": "Aġġornament għal {{name}}",
+    "body": "Il-verżjoni {{version}} qed tistenna fit-tab Aġġornamenti",
+    "open": "Uri l-aġġornamenti"
+  },
+  "suggestion": {
+    "title": "Dan is-server juża {{name}}",
+    "noReason": "Issuġġerit mis-server",
+    "install": "Installa…",
+    "installLabel": "Installa {{name}}",
+    "addRepositoryLabel": "Żid ir-repożitorju għal {{name}}",
+    "details": "Ara d-dettalji",
+    "detailsLabel": "Dettalji ta’ {{name}}",
+    "notNow": "Mhux issa",
+    "notNowLabel": "Aħbi {{name}} għalissa",
+    "dontAsk": "Tistaqsix aktar għal dan is-server",
+    "recommended": "Rakkomandat",
+    "official": "Uffiċjali",
+    "unofficial": "Mhux uffiċjali · {{host}}",
+    "footer": "Is-suġġerimenti qatt ma jinstallaw xejn waħedhom. Is-server ma jkunx jaf x'tinstalla."
+  },
+  "failed": "Dan ma ħadimx. Erġa’ pprova."
+}

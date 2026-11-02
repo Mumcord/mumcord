@@ -14,7 +14,7 @@ function useGamePlugins() {
   useEffect(() => {
     let active = true;
     const api = getApi();
-    api.pluginsList().then(
+    api.gamePluginsList().then(
       (loaded) => {
         if (active) setPlugins(loaded);
       },
@@ -43,7 +43,7 @@ function useGamePlugins() {
   const setEnabled = (id: string, enabled: boolean) => {
     setError(null);
     getApi()
-      .pluginSetEnabled(id, enabled)
+      .gamePluginSetEnabled(id, enabled)
       .then(setPlugins, (e: unknown) => {
         console.error("Switching a game plugin failed", e);
         setError("switch");

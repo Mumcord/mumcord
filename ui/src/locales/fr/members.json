@@ -39,7 +39,6 @@
     "sessionOnly": "Cette personne n’a pas de certificat : ces réglages ne durent que pour cette session.",
     "sendPrivateMessage": "Envoyer un message privé",
     "privateMessage": "Message privé",
-    "localSettings": "Vos réglages",
     "localSettingsHint": "Vous seul les voyez. Les modifications sont enregistrées immédiatement.",
     "settingsFor": "Paramètres pour {{name}}",
     "hintMuted": "Muet",

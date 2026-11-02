@@ -23,7 +23,8 @@
       "all": "All",
       "mentions": "Mentions",
       "requests": "Requests",
-      "invites": "Invites"
+      "invites": "Invites",
+      "plugins": "Plugins"
     },
     "empty": "You're all caught up.",
     "unread": "Unread",

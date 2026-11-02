@@ -1,0 +1,22 @@
+{
+  "title": "Plugin",
+  "tabsLabel": "Sezioni dei plugin",
+  "tabs": {
+    "installed": "Installati",
+    "browse": "Sfoglia",
+    "updates": "Aggiornamenti",
+    "repositories": "Repository",
+    "developer": "Sviluppatore"
+  },
+  "turnOffAll": "Disattiva tutti i plugin",
+  "allOff": "Tutti i plugin sono disattivati. Restano disattivati, anche dopo un riavvio, finché non li riattivi.",
+  "noPlugins": "I plugin sono disattivati per questa sessione (avviata con --no-plugins).",
+  "loadFailed": "Impossibile caricare i plugin.",
+  "palette": {
+    "label": "Riquadro comandi",
+    "placeholder": "Digita un comando",
+    "empty": "Nessun comando corrispondente",
+    "openPlugins": "Plugin",
+    "turnOffAll": "Disattiva tutti i plugin"
+  }
+}

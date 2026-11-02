@@ -1,0 +1,60 @@
+{
+  "intro": "Repozitáre sú doplnkové zoznamy zásuvných modulov, ktoré spravujú iní ľudia. Mumcord ich moduly nekontroluje. Pridávajte len repozitáre, ktorým dôverujete.",
+  "add": {
+    "button": "Pridať repozitár",
+    "title": "Pridať repozitár",
+    "address": "Adresa repozitára",
+    "expectedKey": "Očakávaný kľúč (voliteľné)",
+    "expectedKeyHint": "Ak vám vlastník dal kľúč, vložte ho sem. Repozitár potom musí používať presne tento kľúč.",
+    "check": "Skontrolovať repozitár",
+    "found": "Toto sme našli",
+    "confirm": "Pridať repozitár",
+    "subtitle": "Pridávajte iba repozitáre od ľudí, ktorým dôverujete.",
+    "signatureValid": "podpis platný",
+    "contactLine": "kontakt: {{contact}}",
+    "pluginsLine": "Moduly: {{number}}",
+    "signingKey": "Podpisový kľúč",
+    "warningTitle": "Neoficiálny repozitár",
+    "warningBody": "Mumcord tieto moduly nekontroluje. Kľúč sa zapamätá: ak sa zmení, repozitár sa pozastaví, kým ho skontrolujete. Pri prehliadaní uvidí prevádzkovateľ vašu IP adresu. Moduly s oficiálnymi názvami sa odtiaľto nikdy neberú."
+  },
+  "limit": "Môžete pridať najviac {{max}} repozitárov.",
+  "limitReached": "Dosiahol sa limit {{max}} repozitárov.",
+  "empty": "Zatiaľ nebol pridaný žiadny repozitár.",
+  "listLabel": "Pridané repozitáre",
+  "loadFailed": "Repozitáre sa nepodarilo načítať.",
+  "status": {
+    "keyChanged": "Kľúč sa zmenil, pozastavené"
+  },
+  "fingerprintLine": "Odtlačok kľúča: {{fingerprint}}",
+  "neverChecked": "Zatiaľ nekontrolované",
+  "lastChecked": "Naposledy skontrolované: {{when}}",
+  "installedCount": "Nainštalované moduly: {{number}}",
+  "toggle": "Používať {{name}}",
+  "remove": {
+    "button": "Odstrániť",
+    "label": "Odstrániť {{name}}",
+    "title": "Odstrániť {{name}}?",
+    "message": "Repozitár sa odstráni a jeho moduly sa vypnú. Zostanú nainštalované so svojimi údajmi, ale už nedostanú aktualizácie.",
+    "confirm": "Odstrániť"
+  },
+  "keyChange": {
+    "title": "{{name}} zmenil kľúč",
+    "message": "Tento repozitár teraz podpisuje zoznam modulov iným kľúčom. Zostáva pozastavený, kým sa nerozhodnete. Novému kľúču dôverujte, len ak vlastník zmenu oznámil.",
+    "oldKey": "Doteraz dôveryhodný kľúč",
+    "newKey": "Nový kľúč",
+    "keepPaused": "Nechať pozastavené",
+    "trust": "Dôverovať novému kľúču",
+    "review": "Skontrolovať zmenu kľúča"
+  },
+  "mirror": {
+    "title": "Rozšírené",
+    "label": "Zrkadlo oficiálneho zoznamu modulov (voliteľné)",
+    "hint": "Meňte len vtedy, ak ste dostali adresu zrkadla. Zrkadlo musí poskytovať rovnaké podpísané súbory; Mumcord aj tak overuje každý podpis.",
+    "save": "Uložiť",
+    "reset": "Použiť predvolené"
+  },
+  "official": {
+    "name": "Oficiálne moduly Mumcord",
+    "alwaysOn": "Vždy zapnuté"
+  }
+}

@@ -3,6 +3,8 @@
 
 use std::sync::Mutex;
 
+use serde::{Deserialize, Serialize};
+use specta::Type;
 use tauri::{AppHandle, Manager, Url};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_specta::Event;
@@ -13,11 +15,11 @@ use crate::commands::servers::{DeepLinkOpened, LinkOutcome, MumbleLink, parse_li
 use crate::commands::types::{ApiError, to_api_server_id};
 use crate::window;
 
-/// URL scheme Mumcord handles (also declared in tauri.conf.json). macOS registers it through
+/// URL schemes Mumcord handles (also declared in tauri.conf.json). macOS registers them through
 /// Info.plist and Linux through the app's desktop entry (`desktop_entry`), so only Windows
-/// uses it at runtime.
+/// uses them at runtime.
 #[cfg(target_os = "windows")]
-pub const SCHEME: &str = "mumble";
+pub const SCHEMES: [&str; 2] = ["mumble", "mumcord"];
 
 /// Holds links until the UI is ready for them. A link that launches the app arrives before the
 /// web UI listens, so until the UI's first `deep_link_take_pending` links are only kept (the
@@ -50,9 +52,28 @@ impl LinkBuffer {
 #[derive(Default)]
 struct PendingLinks(Mutex<LinkBuffer>);
 
+/// The newest `mumcord://plugins/<id>` id the UI has not taken yet. A link that launches the app
+/// arrives before the web UI listens, so the live event alone would be lost.
+#[derive(Debug, Default)]
+struct PendingPluginLink(Option<String>);
+
+impl PendingPluginLink {
+    fn keep(&mut self, id: String) {
+        self.0 = Some(id);
+    }
+
+    fn take(&mut self) -> Option<String> {
+        self.0.take()
+    }
+}
+
+#[derive(Default)]
+struct PendingPluginLinks(Mutex<PendingPluginLink>);
+
 /// Starts listening for links and picks up the one the app was launched with.
 pub fn init(app: &AppHandle) {
     app.manage(PendingLinks::default());
+    app.manage(PendingPluginLinks::default());
     let deep_link = app.deep_link();
     match deep_link.get_current() {
         Ok(Some(urls)) => open_urls(app, &urls),
@@ -63,8 +84,54 @@ pub fn init(app: &AppHandle) {
     deep_link.on_open_url(move |event| open_urls(&handle, &event.urls()));
 }
 
+/// `plugins://open-details`: Browse opens the details of the named plugin.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[tauri_specta(event_name = "plugins://open-details")]
+pub struct PluginsOpenDetails {
+    pub id: String,
+}
+
+/// Plugin ids follow FR-6.11: `^[a-z][a-z0-9-]{2,31}$`.
+fn is_plugin_id(id: &str) -> bool {
+    let bytes = id.as_bytes();
+    (3..=32).contains(&bytes.len())
+        && bytes[0].is_ascii_lowercase()
+        && bytes[1..]
+            .iter()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || *b == b'-')
+}
+
+/// Extracts the plugin id from `mumcord://plugins/<id>`; any other link yields `None`.
+fn parse_plugin_link(url: &Url) -> Option<String> {
+    if url.scheme() != "mumcord" || url.host_str() != Some("plugins") {
+        return None;
+    }
+    let id = url.path().strip_prefix('/')?;
+    is_plugin_id(id).then(|| id.to_owned())
+}
+
+fn open_plugin_details(app: &AppHandle, id: String) {
+    window::show(app);
+    app.state::<PendingPluginLinks>()
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .keep(id.clone());
+    // Never installs: the UI only shows the details.
+    if let Err(e) = (PluginsOpenDetails { id }).emit(app) {
+        tracing::warn!(error = %e, "forwarding a mumcord:// link to the UI failed");
+    }
+}
+
 fn open_urls(app: &AppHandle, urls: &[Url]) {
     for url in urls {
+        if url.scheme() == "mumcord" {
+            match parse_plugin_link(url) {
+                Some(id) => open_plugin_details(app, id),
+                None => tracing::info!("ignoring an unsupported mumcord:// link"),
+            }
+            continue;
+        }
         match parse_link(url.as_str()) {
             Ok(link) => open(app, link),
             // The link itself may hold a password, so it is not logged.
@@ -174,9 +241,28 @@ pub fn take_pending(app: &AppHandle) -> Option<DeepLinkOpened> {
     link
 }
 
+/// Returns the plugin id of a `mumcord://plugins/<id>` link not yet taken by the UI, once.
+pub fn take_pending_plugin_link(app: &AppHandle) -> Option<String> {
+    app.try_state::<PendingPluginLinks>()?
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pending_plugin_link_keeps_the_newest_and_clears_on_take() {
+        let mut pending = PendingPluginLink::default();
+        assert_eq!(pending.take(), None);
+        pending.keep("dice".to_owned());
+        pending.keep("tarot".to_owned());
+        assert_eq!(pending.take().as_deref(), Some("tarot"));
+        assert_eq!(pending.take(), None);
+    }
 
     fn opened(path: &str) -> DeepLinkOpened {
         DeepLinkOpened {
@@ -203,6 +289,48 @@ mod tests {
         assert_eq!(buffer.take(), None);
         assert_eq!(buffer.offer(opened("Raid")), Some(opened("Raid")));
         assert_eq!(buffer.take(), None);
+    }
+
+    fn plugin_link(link: &str) -> Option<String> {
+        parse_plugin_link(&Url::parse(link).expect("valid url"))
+    }
+
+    #[test]
+    fn plugin_link_yields_the_id() {
+        assert_eq!(
+            plugin_link("mumcord://plugins/dice").as_deref(),
+            Some("dice")
+        );
+        // Query parameters never change what happens: the link only opens details.
+        assert_eq!(
+            plugin_link("mumcord://plugins/dice?install=1").as_deref(),
+            Some("dice")
+        );
+    }
+
+    #[test]
+    fn other_links_are_ignored() {
+        for link in [
+            "mumcord://plugins",
+            "mumcord://plugins/",
+            "mumcord://other/dice",
+            "mumcord://plugins/Dice",
+            "mumcord://plugins/ab",
+            "mumcord://plugins/dice/",
+            "mumcord://plugins/dice/install",
+            "mumble://plugins/dice",
+        ] {
+            assert_eq!(plugin_link(link), None, "{link}");
+        }
+    }
+
+    #[test]
+    fn plugin_id_rules() {
+        assert!(is_plugin_id("a-1"));
+        assert!(is_plugin_id(&format!("a{}", "b".repeat(31))));
+        assert!(!is_plugin_id(&format!("a{}", "b".repeat(32))));
+        assert!(!is_plugin_id("1ab"));
+        assert!(!is_plugin_id("ab_c"));
     }
 
     #[test]

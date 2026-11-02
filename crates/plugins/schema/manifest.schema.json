@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Mumcord/mumcord/blob/main/crates/plugins/schema/manifest.schema.json",
+  "title": "Mumcord plugin manifest",
+  "description": "manifest.json at the root of a .mcplugin package (format 1, plugin API 1.x, at most 16 KiB). Unknown fields are ignored by the app; the app's parser in crates/plugins is the reference. Rules the schema cannot express: a permission appears only once across required and optional; commands need the permission \"commands\"; triggers need the permission \"chat.triggers\" and are unique; chat_patterns need the permission \"chat.patterns\", must be anchored at the message start (^ or \\A, not in multi-line mode), must compile in Rust's regex crate within its size limits and are unique; net and the permission \"net.http\" go together; net.http, secrets and ui.webview are only available to official plugins; ids starting with mumcord- or core- are reserved for official plugins.",
+  "type": "object",
+  "required": [
+    "manifest",
+    "id",
+    "name",
+    "description",
+    "version",
+    "api",
+    "authors",
+    "license",
+    "categories"
+  ],
+  "properties": {
+    "manifest": {
+      "const": 1,
+      "description": "Manifest format version."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,31}$",
+      "description": "Plugin id; the prefixes mumcord- and core- are reserved."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+      "description": "Display name in English; i18n/<lang>.json may translate it with the key manifest.name."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+      "description": "One-line description in English; i18n/<lang>.json may translate it with the key manifest.description."
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the plugin, e.g. 1.2.0."
+    },
+    "api": {
+      "type": "string",
+      "pattern": "^\\^[1-9][0-9]*\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "Caret range of the plugin API (mumcord:plugin) the plugin needs, e.g. ^1.0."
+    },
+    "mumcord": {
+      "type": "string",
+      "description": "Optional semver range of Mumcord app versions, e.g. >=0.7.0."
+    },
+    "authors": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+        "description": "Author name."
+      }
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "SPDX licence expression, e.g. MIT or AGPL-3.0-only."
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["fun", "games", "chat", "voice", "accessibility", "looks", "tools"]
+      }
+    },
+    "icon": {
+      "type": "string",
+      "pattern": "^assets/[A-Za-z0-9._/-]+\\.(png|webp|svg)$",
+      "maxLength": 128,
+      "description": "Icon path inside the package."
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/permission"
+          }
+        },
+        "optional": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/permission"
+              },
+              {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/permission"
+                  },
+                  "suggested": {
+                    "type": "boolean",
+                    "description": "Switched on by default in the install prompt."
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "memory_mib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "default": 32,
+          "description": "Memory limit in MiB."
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "properties": {
+        "quota_kib": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024,
+          "default": 256,
+          "description": "Storage quota in KiB across both scopes."
+        }
+      }
+    },
+    "messaging": {
+      "type": "object",
+      "properties": {
+        "max_payload": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 997,
+          "default": 997,
+          "description": "Largest message payload in bytes."
+        },
+        "default_visibility": {
+          "enum": ["everyone", "friends", "nobody"],
+          "description": "Preselected visibility in the install prompt."
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]{2,16}$",
+            "description": "Typed as /<name>."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 140,
+            "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+            "description": "Shown in the chat box autocompletion."
+          },
+          "usage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+            "description": "Usage hint, e.g. /roll 2d6+3."
+          }
+        }
+      }
+    },
+    "triggers": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^![a-z][a-z0-9-]{1,15}$"
+      },
+      "description": "Chat trigger words, e.g. !poll: channel messages in the user's channel that start with one reach the plugin as a chat-trigger event (permission chat.triggers)."
+    },
+    "chat_patterns": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["pattern", "description"],
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "Rust regex syntax (linear time, no look-around or backreferences), anchored at the message start, e.g. ^\\[[^,\\]\\n]{1,64},. Channel messages in the user's channel whose plain text (line breaks as \\n) matches reach the plugin as a chat-match event (permission chat.patterns)."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[^\\u0000-\\u001f\\u007f]*$",
+            "description": "What the pattern recognises, shown in the install prompt, e.g. Recognise EVE Online fits pasted in chat. Translations: key chat_patterns.<n>.description in i18n/<lang>.json."
+          }
+        }
+      }
+    },
+    "net": {
+      "type": "object",
+      "required": ["hosts"],
+      "properties": {
+        "hosts": {
+          "const": "user-configured",
+          "description": "net.http may only reach hosts the user typed into a form of this plugin."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "permission": {
+      "enum": [
+        "ui.panel",
+        "ui.member-badge",
+        "ui.profile-card",
+        "ui.chat-card",
+        "ui.user-menu",
+        "ui.dialog",
+        "events.self",
+        "events.voice",
+        "events.presence",
+        "events.chat-activity",
+        "peers.messages",
+        "notify",
+        "random.bytes",
+        "commands",
+        "chat.send",
+        "chat.supersedes",
+        "chat.triggers",
+        "chat.patterns",
+        "net.http",
+        "secrets",
+        "ui.webview"
+      ]
+    }
+  }
+}

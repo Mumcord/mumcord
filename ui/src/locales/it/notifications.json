@@ -26,7 +26,8 @@
       "all": "Tutte",
       "mentions": "Menzioni",
       "requests": "Richieste",
-      "invites": "Inviti"
+      "invites": "Inviti",
+      "plugins": "Plugin"
     },
     "empty": "Sei in pari.",
     "unread": "Non lette",

@@ -20,6 +20,7 @@ import { ServerSectionHeader } from "./ServerSectionHeader";
 import { useSelectedConversation } from "./selection";
 import { selfUser, useServerState } from "./serverStore";
 import { BIG_SERVER_CHANNELS } from "./tree";
+import { PluginStrip } from "../plugins/strip";
 
 const SEARCH_DEBOUNCE_MS = 100;
 
@@ -183,7 +184,7 @@ export function ChannelsPanel({
           />
         }
       />
-      <div id={treeId} hidden={collapsed}>
+      <div id={treeId} className="channels-tree-area" hidden={collapsed}>
         <BigServerGate
           // A fresh tree per server, so its expand/collapse state starts from that server's (QA.27).
           key={state.serverId}
@@ -216,6 +217,7 @@ export function ChannelsPanel({
           {joinError}
         </p>
       )}
+      <PluginStrip />
     </div>
   );
 }

@@ -1,0 +1,35 @@
+{
+  "hint": "Load an unpacked plugin folder to test it. Developer plugins are not signed, are never official and cannot get net.http, secrets or ui.webview. They are unloaded when Developer mode is turned off.",
+  "load": "Load plugin folder…",
+  "pickFolder": "Choose the plugin folder",
+  "empty": "No developer plugin is loaded.",
+  "listLabel": "Developer plugins",
+  "label": "Developer plugin",
+  "status": {
+    "running": "Running",
+    "off": "Off",
+    "backingOff": "Restarting after a crash",
+    "autoOff": "Turned off after repeated crashes",
+    "allOff": "All plugins are off",
+    "noPlugins": "Plugins are off for this session",
+    "notLoaded": "Could not be loaded"
+  },
+  "showLog": "Show log of {{name}}",
+  "reload": "Reload {{name}}",
+  "unload": "Unload {{name}}",
+  "logLabel": "Log of {{name}}",
+  "logTitle": "Log of {{name}}",
+  "logEmpty": "No log lines yet.",
+  "level": {
+    "debug": "Debug",
+    "info": "Info",
+    "warn": "Warning",
+    "error": "Error"
+  },
+  "errors": {
+    "load": "The plugin folder could not be loaded.",
+    "reload": "The plugin could not be reloaded.",
+    "unload": "The plugin could not be unloaded.",
+    "log": "The log could not be read."
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Mises à jour des plugins",
+    "info": "Indépendant du programme de mise à jour de l'application. Mumcord cherche des mises à jour au démarrage, puis toutes les 6 heures.",
+    "infoLabel": "Plus d'informations : mises à jour des plugins",
+    "auto": "Installer automatiquement",
+    "notify": "Notifier seulement",
+    "off": "Désactivées"
+  },
+  "waiting": "Mises à jour",
+  "empty": "Tous les plugins sont à jour.",
+  "emptyOff": "Les mises à jour des plugins sont désactivées. Activez-les ci-dessus pour en rechercher.",
+  "loadFailed": "Impossible de charger les mises à jour.",
+  "newAuthorKey": "Cette version est signée par un autre auteur. Ne mettez à jour que si vous faites confiance à ce nouvel auteur.",
+  "rolledBack": "La version {{version}} n'a pas pu démarrer, la version précédente a donc été rétablie. Raison :",
+  "review": "Vérifier et mettre à jour",
+  "update": "Mettre à jour",
+  "installFailed": "Impossible de mettre à jour {{name}}. Veuillez réessayer.",
+  "pins": "Figer la version",
+  "pinsHint": "Un plugin figé reste sur sa version actuelle et ne se voit proposer aucune mise à jour.",
+  "pin": "Garder {{name}} sur cette version",
+  "pinVersion": "Version {{version}}",
+  "versionsTo": "vers",
+  "pill": {
+    "none": "Aucune nouvelle autorisation",
+    "permission": "Demande une nouvelle autorisation",
+    "author": "Nouvel auteur"
+  },
+  "newPermissions": "Nouvelles autorisations",
+  "revoked": {
+    "title": "{{name}} a été désactivé",
+    "text": "La version {{version}} figure sur la liste de révocation : {{reason}}. Les données du plugin sont conservées.",
+    "details": "Détails",
+    "remove": "Supprimer"
+  },
+  "checkNow": "Vérifier maintenant",
+  "lastChecked": "Dernière vérification à {{time}}",
+  "checkFailed": "La vérification a échoué. Veuillez réessayer.",
+  "modeNote": "Mises à jour des plugins : {{mode}}. Vous pouvez le modifier ci-dessous.",
+  "settings": "Réglages des mises à jour",
+  "offer": {
+    "heading": "Nouvelles autorisations",
+    "title": "{{name}} {{version}} peut désormais faire plus. Ces options restent désactivées jusqu'à ce que vous les activiez.",
+    "permission": "Nouvelle autorisation facultative : {{permission}}",
+    "save": "Enregistrer",
+    "notNow": "Pas maintenant",
+    "failed": "Impossible de modifier les autorisations de {{name}}. Veuillez réessayer."
+  }
+}

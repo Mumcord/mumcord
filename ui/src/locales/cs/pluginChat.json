@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Karta od {{plugin}}",
+    "showMore": "Zobrazit více",
+    "showLess": "Zobrazit méně"
+  },
+  "via": "přes {{plugin}}",
+  "supersede": {
+    "showText": "Zobrazit původní text",
+    "hideText": "Skrýt původní text",
+    "hiddenBy": "Skryto pluginem {{plugin}}"
+  },
+  "command": {
+    "list": "Příkazy pluginů",
+    "keys": "↑↓ vybrat · Tab doplnit · Enter spustit · Esc zavřít",
+    "unavailable": "Tento příkaz teď není k dispozici.",
+    "failed": "Příkaz se nepodařilo spustit. Zkuste to znovu."
+  }
+}

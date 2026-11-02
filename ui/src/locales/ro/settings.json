@@ -15,7 +15,8 @@
     "advanced": "Avansat și pentru dezvoltatori",
     "about": "Despre",
     "packetInspector": "Inspector de pachete",
-    "hotkeys": "Comenzi rapide"
+    "hotkeys": "Comenzi rapide",
+    "plugins": "Pluginuri"
   },
   "sectionDescriptions": {
     "general": "Pornire, limbă, actualizări și accesibilitate.",
@@ -27,7 +28,8 @@
     "servers": "Conexiuni la mai multe servere și setări pentru fiecare server.",
     "gaming": "Suprapunerea din joc, audio poziționat și pluginuri pentru jocuri.",
     "advanced": "Instrumente pentru dezvoltatori, diagnosticare, stocare și licențe.",
-    "about": "Versiune, asistență și asistentul de configurare."
+    "about": "Versiune, asistență și asistentul de configurare.",
+    "plugins": "Pluginurile rulează într-un mediu izolat și primesc doar ce permiteți. Nu vă văd niciodată sunetul, fișierele sau certificatul."
   },
   "breadcrumb": "Setări / {{section}}",
   "moreInfo": "Mai multe informații: {{topic}}",
@@ -1051,5 +1053,10 @@
     "addConfirm": "Adaugă",
     "reset": "Resetează toate comenzile rapide",
     "resetHint": "Elimină toate comenzile rapide în afară de push-to-talk; implicit, nu este setată nicio comandă."
+  },
+  "developerMode": {
+    "title": "Mod dezvoltator",
+    "switch": "Mod dezvoltator",
+    "hint": "Adaugă o filă Dezvoltator la Pluginuri, unde poți încărca pluginuri nesemnate dintr-un dosar. Activează-l doar dacă îți creezi singur pluginurile."
   }
 }

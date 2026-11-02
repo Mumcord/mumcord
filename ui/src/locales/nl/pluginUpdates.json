@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Plug-inupdates",
+    "info": "Los van de app-updater. Mumcord zoekt bij het starten en daarna elke 6 uur naar plug-inupdates.",
+    "infoLabel": "Meer informatie: plug-inupdates",
+    "auto": "Automatisch installeren",
+    "notify": "Alleen melden",
+    "off": "Uit"
+  },
+  "waiting": "Updates",
+  "empty": "Alle plug-ins zijn up-to-date.",
+  "emptyOff": "Plug-inupdates staan uit. Zet ze hierboven aan om naar updates te zoeken.",
+  "loadFailed": "De updates konden niet worden geladen.",
+  "newAuthorKey": "Deze versie is door een andere auteur ondertekend. Werk alleen bij als je de nieuwe auteur vertrouwt.",
+  "rolledBack": "Versie {{version}} kon niet starten, daarom is de vorige versie hersteld. Reden:",
+  "review": "Bekijken en bijwerken",
+  "update": "Bijwerken",
+  "installFailed": "{{name}} kon niet worden bijgewerkt. Probeer het opnieuw.",
+  "pins": "Versie vastzetten",
+  "pinsHint": "Een vastgezette plug-in blijft op de huidige versie en krijgt geen updates aangeboden.",
+  "pin": "{{name}} op deze versie houden",
+  "pinVersion": "Versie {{version}}",
+  "versionsTo": "naar",
+  "pill": {
+    "none": "Geen nieuwe rechten",
+    "permission": "Heeft een nieuw recht nodig",
+    "author": "Nieuwe auteur"
+  },
+  "newPermissions": "Nieuwe rechten",
+  "revoked": {
+    "title": "{{name}} is uitgezet",
+    "text": "Versie {{version}} staat op de intrekkingslijst: {{reason}}. De plugingegevens blijven bewaard.",
+    "details": "Details",
+    "remove": "Verwijderen"
+  },
+  "checkNow": "Nu controleren",
+  "lastChecked": "Laatst gecontroleerd om {{time}}",
+  "checkFailed": "De controle is mislukt. Probeer het opnieuw.",
+  "modeNote": "Plugin-updates: {{mode}}. Je kunt dit hieronder wijzigen.",
+  "settings": "Update-instellingen",
+  "offer": {
+    "heading": "Nieuwe machtigingen",
+    "title": "{{name}} {{version}} kan nu meer. Deze opties blijven uit totdat je ze aanzet.",
+    "permission": "Nieuwe optionele machtiging: {{permission}}",
+    "save": "Opslaan",
+    "notNow": "Niet nu",
+    "failed": "De machtigingen van {{name}} konden niet worden gewijzigd. Probeer het opnieuw."
+  }
+}

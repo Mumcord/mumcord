@@ -114,14 +114,15 @@ Mumcord is compatible with Mumble but **not affiliated with or endorsed by the M
 
 ## Ecosystem
 
-| Project                                                                                                          | What it is                                                                                            |
-| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)                                                              | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use             |
-| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)                                                            | Planned optional relay for direct connections when no direct path is possible                         |
-| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol)                                                  | Rust library for the Mumble protocol                                                                  |
-| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)                                                        | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots) |
-| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)                                                        | Audio device input and output on top of `mumcord-codec`                                               |
-| [`mumcord-store`](https://crates.io/crates/mumcord-store), [`mumcord-p2p`](https://crates.io/crates/mumcord-p2p) | Local storage and direct connections, on crates.io since 0.4.3                                        |
+| Project                                                                                                                          | What it is                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [Mumcord/mumbot](https://github.com/Mumcord/mumbot)                                                                              | Webhook bot for posting into Mumble channels, and the scripted test bot the E2E tests use                       |
+| [Mumcord/mumpeer](https://github.com/Mumcord/mumpeer)                                                                            | Planned optional relay for direct connections when no direct path is possible                                   |
+| [`mumcord-protocol`](https://crates.io/crates/mumcord-protocol)                                                                  | Rust library for the Mumble protocol                                                                            |
+| [`mumcord-codec`](https://crates.io/crates/mumcord-codec)                                                                        | Opus codec, jitter buffer, mixer and processing chain, without audio devices (good for headless bots)           |
+| [`mumcord-audio`](https://crates.io/crates/mumcord-audio)                                                                        | Audio device input and output on top of `mumcord-codec`                                                         |
+| [`mumcord-store`](https://crates.io/crates/mumcord-store), [`mumcord-p2p`](https://crates.io/crates/mumcord-p2p)                 | Local storage and direct connections, on crates.io since 0.4.3                                                  |
+| [`mumcord-plugin-sdk`](https://crates.io/crates/mumcord-plugin-sdk), [`mumcord-plugin`](https://crates.io/crates/mumcord-plugin) | SDK and command-line tool for writing Mumcord plugins (`cargo install mumcord-plugin`), on crates.io with 0.6.0 |
 
 ## Roadmap
 

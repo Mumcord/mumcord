@@ -15,7 +15,8 @@
     "advanced": "Avancerat och utveckling",
     "about": "Om",
     "packetInspector": "Paketinspektör",
-    "hotkeys": "Kortkommandon"
+    "hotkeys": "Kortkommandon",
+    "plugins": "Tillägg"
   },
   "sectionDescriptions": {
     "general": "Start, språk, uppdateringar och tillgänglighet.",
@@ -27,7 +28,8 @@
     "servers": "Anslutningar till flera servrar och inställningar per server.",
     "gaming": "Överlägget i spel, positionsljud och spelinsticksmoduler.",
     "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
-    "about": "Version, support och installationsguiden."
+    "about": "Version, support och installationsguiden.",
+    "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat."
   },
   "breadcrumb": "Inställningar / {{section}}",
   "moreInfo": "Mer information: {{topic}}",
@@ -1043,5 +1045,10 @@
     "addConfirm": "Lägg till",
     "reset": "Återställ alla kortkommandon",
     "resetHint": "Tar bort alla kortkommandon utom push-to-talk; som standard är inget inställt."
+  },
+  "developerMode": {
+    "title": "Utvecklarläge",
+    "switch": "Utvecklarläge",
+    "hint": "Lägger till fliken Utvecklare under Tillägg, där du kan läsa in osignerade tillägg från en mapp. Slå bara på det om du själv bygger tillägg."
   }
 }

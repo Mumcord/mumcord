@@ -1,0 +1,27 @@
+/* Plugin badges, chat decorations and profile-card sections. Colours come from theme tokens. */
+.plugin-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 24px;
+  max-height: 24px;
+  margin-inline-start: var(--space-1);
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.plugin-decoration {
+  display: inline-flex;
+  align-items: center;
+  max-width: 16px;
+  max-height: 16px;
+  margin-inline-start: var(--space-1);
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.plugin-profile-section {
+  max-width: 300px;
+  max-height: 220px;
+  overflow: auto;
+  margin-block: var(--space-2);
+}

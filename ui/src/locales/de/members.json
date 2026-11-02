@@ -38,7 +38,6 @@
     "sessionOnly": "Diese Person hat kein Zertifikat, daher gelten diese Einstellungen nur für diese Sitzung.",
     "sendPrivateMessage": "Private Nachricht senden",
     "privateMessage": "Private Nachricht",
-    "localSettings": "Deine Einstellungen",
     "localSettingsHint": "Nur du siehst sie. Änderungen werden sofort gespeichert.",
     "settingsFor": "Einstellungen für {{name}}",
     "hintMuted": "Stummgeschaltet",

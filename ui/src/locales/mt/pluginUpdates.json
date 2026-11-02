@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Aġġornamenti tal-plugins",
+    "info": "Separat mill-aġġornament tal-applikazzjoni. Mumcord ifittex aġġornamenti tal-plugins mal-bidu u wara kull 6 sigħat.",
+    "infoLabel": "Aktar informazzjoni: aġġornamenti tal-plugins",
+    "auto": "Installa awtomatikament",
+    "notify": "Ibgħat notifika biss",
+    "off": "Mitfi"
+  },
+  "waiting": "Aġġornamenti",
+  "empty": "Il-plugins kollha huma aġġornati.",
+  "emptyOff": "L-aġġornamenti tal-plugins huma mitfija. Ixgħelhom hawn fuq biex jinstabu aġġornamenti.",
+  "loadFailed": "L-aġġornamenti ma setgħux jitgħabbew.",
+  "newAuthorKey": "Din il-verżjoni hija ffirmata minn awtur ieħor. Aġġorna biss jekk tafda lill-awtur il-ġdid.",
+  "rolledBack": "Il-verżjoni {{version}} ma setgħetx tibda, għalhekk ġiet restawrata l-verżjoni preċedenti. Raġuni:",
+  "review": "Irrevedi u aġġorna",
+  "update": "Aġġorna",
+  "installFailed": "{{name}} ma setax jiġi aġġornat. Erġa' pprova.",
+  "pins": "Waqqaf il-verżjoni",
+  "pinsHint": "Plugin imwaqqaf jibqa' fuq il-verżjoni attwali tiegħu u ma jiġix offrut aġġornamenti.",
+  "pin": "Żomm {{name}} fuq din il-verżjoni",
+  "pinVersion": "Verżjoni {{version}}",
+  "versionsTo": "għal",
+  "pill": {
+    "none": "Ebda permessi ġodda",
+    "permission": "Teħtieġ permess ġdid",
+    "author": "Awtur ġdid"
+  },
+  "newPermissions": "Permessi ġodda",
+  "revoked": {
+    "title": "{{name}} ġie mitfi",
+    "text": "Il-verżjoni {{version}} tinsab fuq il-lista tar-revoka: {{reason}}. Id-dejta tal-plugin tinżamm.",
+    "details": "Dettalji",
+    "remove": "Neħħi"
+  },
+  "checkNow": "Iċċekkja issa",
+  "lastChecked": "L-aħħar kontroll fil-{{time}}",
+  "checkFailed": "Il-kontroll falla. Erġa' pprova.",
+  "modeNote": "Aġġornamenti tal-plugins: {{mode}}. Tista' tibdel dan hawn taħt.",
+  "settings": "Settings tal-aġġornamenti",
+  "offer": {
+    "heading": "Permessi ġodda",
+    "title": "{{name}} {{version}} issa jista' jagħmel aktar. Dawn l-għażliet jibqgħu mitfija sakemm tixgħelhom.",
+    "permission": "Permess fakultattiv ġdid: {{permission}}",
+    "save": "Issejvja",
+    "notNow": "Mhux issa",
+    "failed": "Il-permessi ta' {{name}} ma setgħux jinbidlu. Erġa' pprova."
+  }
+}

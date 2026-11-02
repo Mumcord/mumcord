@@ -38,7 +38,6 @@
     "sessionOnly": "Tällä henkilöllä ei ole varmennetta, joten nämä asetukset ovat voimassa vain tämän istunnon ajan.",
     "sendPrivateMessage": "Lähetä yksityisviesti",
     "privateMessage": "Yksityisviesti",
-    "localSettings": "Omat asetuksesi",
     "localSettingsHint": "Vain sinä näet nämä. Muutokset tallennetaan heti.",
     "settingsFor": "Asetukset: {{name}}",
     "hintMuted": "Mykistetty",

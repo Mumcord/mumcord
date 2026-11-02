@@ -1,6 +1,5 @@
 {
   "follow": "Sekot",
-  "following": "Seko",
   "unsupported": "Kanālu sekošanai nepieciešams serveris ar versiju 1.4 vai jaunāku.",
   "unread_zero": "{{count}} nelasītu ziņu",
   "unread_one": "{{count}} nelasīta ziņa",

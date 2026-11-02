@@ -1,0 +1,35 @@
+{
+  "hint": "Įkelkite išpakuotą papildinio aplanką jam išbandyti. Kūrėjų papildiniai nėra pasirašyti, niekada nėra oficialūs ir negali gauti net.http, secrets ar ui.webview. Jie išjungiami, kai kūrėjo režimas išjungiamas.",
+  "load": "Įkelti papildinio aplanką…",
+  "pickFolder": "Pasirinkite papildinio aplanką",
+  "empty": "Neįkeltas joks kūrėjo papildinys.",
+  "listLabel": "Kūrėjų papildiniai",
+  "label": "Kūrėjo papildinys",
+  "status": {
+    "running": "Veikia",
+    "off": "Išjungtas",
+    "backingOff": "Paleidžiamas iš naujo po strigties",
+    "autoOff": "Išjungtas po pasikartojančių strigčių",
+    "allOff": "Visi papildiniai išjungti",
+    "noPlugins": "Papildiniai šiai sesijai išjungti",
+    "notLoaded": "Nepavyko įkelti"
+  },
+  "showLog": "Rodyti papildinio {{name}} žurnalą",
+  "reload": "Įkelti {{name}} iš naujo",
+  "unload": "Iškelti {{name}}",
+  "logLabel": "Papildinio {{name}} žurnalas",
+  "logTitle": "Papildinio {{name}} žurnalas",
+  "logEmpty": "Žurnalo eilučių dar nėra.",
+  "level": {
+    "debug": "Derinimas",
+    "info": "Informacija",
+    "warn": "Įspėjimas",
+    "error": "Klaida"
+  },
+  "errors": {
+    "load": "Nepavyko įkelti papildinio aplanko.",
+    "reload": "Nepavyko iš naujo įkelti papildinio.",
+    "unload": "Nepavyko iškelti papildinio.",
+    "log": "Nepavyko perskaityti žurnalo."
+  }
+}

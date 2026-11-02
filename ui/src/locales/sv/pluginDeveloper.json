@@ -1,0 +1,35 @@
+{
+  "hint": "Läs in en uppackad pluginmapp för att testa den. Utvecklarplugin är inte signerade, aldrig officiella och kan inte få net.http, secrets eller ui.webview. De tas bort när utvecklarläget stängs av.",
+  "load": "Läs in pluginmapp…",
+  "pickFolder": "Välj pluginmappen",
+  "empty": "Inget utvecklarplugin är inläst.",
+  "listLabel": "Utvecklarplugin",
+  "label": "Utvecklarplugin",
+  "status": {
+    "running": "Körs",
+    "off": "Av",
+    "backingOff": "Startar om efter en krasch",
+    "autoOff": "Avstängt efter upprepade krascher",
+    "allOff": "Alla plugin är avstängda",
+    "noPlugins": "Plugin är avstängda för den här sessionen",
+    "notLoaded": "Kunde inte läsas in"
+  },
+  "showLog": "Visa loggen för {{name}}",
+  "reload": "Läs in {{name}} igen",
+  "unload": "Ta bort {{name}}",
+  "logLabel": "Logg för {{name}}",
+  "logTitle": "Logg för {{name}}",
+  "logEmpty": "Inga loggrader ännu.",
+  "level": {
+    "debug": "Felsökning",
+    "info": "Info",
+    "warn": "Varning",
+    "error": "Fel"
+  },
+  "errors": {
+    "load": "Pluginmappen kunde inte läsas in.",
+    "reload": "Pluginet kunde inte läsas in igen.",
+    "unload": "Pluginet kunde inte tas bort.",
+    "log": "Loggen kunde inte läsas."
+  }
+}

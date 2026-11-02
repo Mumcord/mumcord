@@ -107,6 +107,7 @@ fn publish(app: &AppHandle, settings: &store::Settings) -> DndState {
     let state = state_from(settings, system(app));
     app.state::<Engine>().set_do_not_disturb(state.active());
     crate::tray::dnd_changed(app, &state);
+    crate::plugins::set_quiet(app, state.active());
     if let Err(e) = (DndChanged {
         state: state.clone(),
     })

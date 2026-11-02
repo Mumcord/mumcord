@@ -110,6 +110,7 @@ const GROUPS = [
   "Voice & Audio",
   "Chat & Notifications",
   "Privacy & Connections",
+  "Plugins",
   "Appearance",
   "Servers",
   "Gaming & Overlay",

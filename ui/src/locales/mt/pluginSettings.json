@@ -1,0 +1,22 @@
+{
+  "title": "Plagins",
+  "tabsLabel": "Taqsimiet tal-plagins",
+  "tabs": {
+    "installed": "Installati",
+    "browse": "Ibbrawża",
+    "updates": "Aġġornamenti",
+    "repositories": "Repożitorji",
+    "developer": "Żviluppatur"
+  },
+  "turnOffAll": "Itfi l-plagins kollha",
+  "allOff": "Il-plagins kollha huma mitfija. Jibqgħu mitfija, anki wara li terġa' tibda, sakemm terġa' tixgħelhom.",
+  "noPlugins": "Il-plagins huma mitfija għal din is-sessjoni (nbdiet b'--no-plugins).",
+  "loadFailed": "Il-plagins ma setgħux jitgħabbew.",
+  "palette": {
+    "label": "Paletta tal-kmandi",
+    "placeholder": "Ittajpja kmand",
+    "empty": "L-ebda kmand li jaqbel",
+    "openPlugins": "Plagins",
+    "turnOffAll": "Itfi l-plagins kollha"
+  }
+}

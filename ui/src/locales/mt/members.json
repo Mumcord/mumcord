@@ -41,7 +41,6 @@
     "sessionOnly": "Din il-persuna m'għandhiex ċertifikat, għalhekk dawn is-settings idumu biss għal din is-sessjoni.",
     "sendPrivateMessage": "Ibgħat messaġġ privat",
     "privateMessage": "Messaġġ privat",
-    "localSettings": "Is-settings tiegħek",
     "localSettingsHint": "Int biss tarahom. It-tibdil jiġi ssejvjat immedjatament.",
     "settingsFor": "Settings għal {{name}}",
     "hintMuted": "Muted",

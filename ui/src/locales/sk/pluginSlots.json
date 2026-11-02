@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Tento plugin tu zatiaľ nič nezobrazuje.",
+    "actionFailed": "Plugin to nedokázal spracovať. Skúste to znova."
+  },
+  "progress": {
+    "working": "Prebieha"
+  },
+  "countdown": {
+    "done": "Čas vypršal"
+  },
+  "select": {
+    "refresh": "Obnoviť {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} znakov"
+  },
+  "password": {
+    "save": "Uložiť",
+    "saved": "Bezpečne uložené"
+  },
+  "file": {
+    "choose": "Vybrať súbor…",
+    "none": "Nie je vybratý žiadny súbor"
+  },
+  "list": {
+    "handle": "Presunúť riadok {{position}} z {{total}} (šípka hore alebo dole)",
+    "moved": "Riadok {{from}} presunutý na pozíciu {{to}} z {{total}}"
+  },
+  "copyButton": {
+    "copied": "Skopírované",
+    "failed": "Kopírovanie zlyhalo"
+  }
+}

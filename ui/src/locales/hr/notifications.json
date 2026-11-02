@@ -26,7 +26,8 @@
       "all": "Sve",
       "mentions": "Spominjanja",
       "requests": "Zahtjevi",
-      "invites": "Pozivnice"
+      "invites": "Pozivnice",
+      "plugins": "Dodaci"
     },
     "empty": "Sve je pročitano.",
     "unread": "Nepročitano",

@@ -1,6 +1,5 @@
 {
   "follow": "Sledovať",
-  "following": "Sleduješ",
   "unsupported": "Sledovanie kanálov vyžaduje server vo verzii 1.4 alebo novšej.",
   "unread_one": "{{count}} neprečítaná správa",
   "unread_few": "{{count}} neprečítané správy",

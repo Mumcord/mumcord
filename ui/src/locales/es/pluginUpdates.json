@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Actualizaciones de plugins",
+    "info": "Independiente del actualizador de la aplicación. Mumcord busca actualizaciones de plugins al iniciar y cada 6 horas.",
+    "infoLabel": "Más información: actualizaciones de plugins",
+    "auto": "Instalar automáticamente",
+    "notify": "Solo avisar",
+    "off": "Desactivadas"
+  },
+  "waiting": "Actualizaciones",
+  "empty": "Todos los plugins están al día.",
+  "emptyOff": "Las actualizaciones de plugins están desactivadas. Actívalas arriba para buscar actualizaciones.",
+  "loadFailed": "No se pudieron cargar las actualizaciones.",
+  "newAuthorKey": "Esta versión está firmada por otro autor. Actualiza solo si confías en el nuevo autor.",
+  "rolledBack": "La versión {{version}} no pudo iniciarse, así que se restauró la versión anterior. Motivo:",
+  "review": "Revisar y actualizar",
+  "update": "Actualizar",
+  "installFailed": "No se pudo actualizar {{name}}. Inténtalo de nuevo.",
+  "pins": "Fijar versión",
+  "pinsHint": "Un plugin fijado se queda en su versión actual y no recibe ofertas de actualización.",
+  "pin": "Mantener {{name}} en esta versión",
+  "pinVersion": "Versión {{version}}",
+  "versionsTo": "a",
+  "pill": {
+    "none": "Sin permisos nuevos",
+    "permission": "Necesita un permiso nuevo",
+    "author": "Autor nuevo"
+  },
+  "newPermissions": "Permisos nuevos",
+  "revoked": {
+    "title": "{{name}} se ha desactivado",
+    "text": "La versión {{version}} está en la lista de revocación: {{reason}}. Los datos del plugin se conservan.",
+    "details": "Detalles",
+    "remove": "Quitar"
+  },
+  "checkNow": "Comprobar ahora",
+  "lastChecked": "Última comprobación a las {{time}}",
+  "checkFailed": "La comprobación ha fallado. Inténtalo de nuevo.",
+  "modeNote": "Actualizaciones de plugins: {{mode}}. Puedes cambiarlo abajo.",
+  "settings": "Ajustes de actualización",
+  "offer": {
+    "heading": "Permisos nuevos",
+    "title": "{{name}} {{version}} ahora puede hacer más. Estas opciones están desactivadas hasta que las actives.",
+    "permission": "Nuevo permiso opcional: {{permission}}",
+    "save": "Guardar",
+    "notNow": "Ahora no",
+    "failed": "No se pudieron cambiar los permisos de {{name}}. Inténtalo de nuevo."
+  }
+}

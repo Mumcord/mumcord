@@ -1,0 +1,35 @@
+{
+  "hint": "Laad een uitgepakte pluginmap om die te testen. Ontwikkelaarsplugins zijn niet ondertekend, nooit officieel en kunnen geen net.http, secrets of ui.webview krijgen. Ze worden verwijderd uit het geheugen als de ontwikkelaarsmodus uitgaat.",
+  "load": "Pluginmap laden…",
+  "pickFolder": "Kies de pluginmap",
+  "empty": "Er is geen ontwikkelaarsplugin geladen.",
+  "listLabel": "Ontwikkelaarsplugins",
+  "label": "Ontwikkelaarsplugin",
+  "status": {
+    "running": "Actief",
+    "off": "Uit",
+    "backingOff": "Herstart na een crash",
+    "autoOff": "Uitgezet na herhaalde crashes",
+    "allOff": "Alle plugins staan uit",
+    "noPlugins": "Plugins staan uit voor deze sessie",
+    "notLoaded": "Kon niet worden geladen"
+  },
+  "showLog": "Logboek van {{name}} tonen",
+  "reload": "{{name}} opnieuw laden",
+  "unload": "{{name}} verwijderen uit het geheugen",
+  "logLabel": "Logboek van {{name}}",
+  "logTitle": "Logboek van {{name}}",
+  "logEmpty": "Nog geen logregels.",
+  "level": {
+    "debug": "Debug",
+    "info": "Info",
+    "warn": "Waarschuwing",
+    "error": "Fout"
+  },
+  "errors": {
+    "load": "De pluginmap kon niet worden geladen.",
+    "reload": "De plugin kon niet opnieuw worden geladen.",
+    "unload": "De plugin kon niet uit het geheugen worden verwijderd.",
+    "log": "Het logboek kon niet worden gelezen."
+  }
+}

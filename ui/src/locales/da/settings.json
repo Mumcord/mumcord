@@ -15,7 +15,8 @@
     "advanced": "Avanceret og udvikler",
     "about": "Om",
     "packetInspector": "Pakkeinspektør",
-    "hotkeys": "Genveje"
+    "hotkeys": "Genveje",
+    "plugins": "Plugins"
   },
   "sectionDescriptions": {
     "general": "Start, sprog, opdateringer og tilgængelighed.",
@@ -27,7 +28,8 @@
     "servers": "Forbindelser til flere servere og indstillinger pr. server.",
     "gaming": "Overlayet i spillet, positionslyd og spilplugins.",
     "advanced": "Udviklerværktøjer, diagnostik, lagring og licenser.",
-    "about": "Version, support og opsætningsguiden."
+    "about": "Version, support og opsætningsguiden.",
+    "plugins": "Plugins kører i en sandbox og får kun det, du tillader. De ser aldrig din lyd, dine filer eller dit certifikat."
   },
   "breadcrumb": "Indstillinger / {{section}}",
   "moreInfo": "Mere information: {{topic}}",
@@ -1043,5 +1045,10 @@
     "addConfirm": "Tilføj",
     "reset": "Nulstil alle genveje",
     "resetHint": "Fjerner alle genveje undtagen push-to-talk; som standard er intet indstillet."
+  },
+  "developerMode": {
+    "title": "Udviklertilstand",
+    "switch": "Udviklertilstand",
+    "hint": "Tilføjer fanen Udvikler til Plugins, hvor du kan indlæse usignerede plugins fra en mappe. Slå den kun til, hvis du selv laver plugins."
   }
 }

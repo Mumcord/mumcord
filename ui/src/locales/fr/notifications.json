@@ -26,7 +26,8 @@
       "all": "Tout",
       "mentions": "Mentions",
       "requests": "Demandes",
-      "invites": "Invitations"
+      "invites": "Invitations",
+      "plugins": "Plugins"
     },
     "empty": "Vous êtes à jour.",
     "unread": "Non lues",

@@ -1,0 +1,125 @@
+{
+  "listLabel": "Installerade plugins",
+  "empty": "Inga plugins ännu.",
+  "browse": "Bläddra bland plugins",
+  "enable": "{{name}} på",
+  "labels": {
+    "official": "Officiell",
+    "unofficial": "Inofficiell · {{repository}}",
+    "unofficialUnknown": "Inofficiell",
+    "developer": "Utvecklarplugin",
+    "autoOff": "Avstängt efter upprepade krascher",
+    "backingOff": "Startar om efter en krasch",
+    "notLoaded": "Kunde inte laddas",
+    "revoked": "Avstängt av Mumcord: {{reason}}",
+    "revocationWarning": "Varning från Mumcord: {{reason}}",
+    "tampered": "Filerna i det här pluginet har ändrats",
+    "permission": "Avstängt eftersom ett nödvändigt tillstånd är av"
+  },
+  "details": {
+    "open": "Detaljer för {{name}}",
+    "permissions": "Behörigheter",
+    "visibility": "Vem som kan se det här pluginets aktivitet",
+    "visibilityOptions": {
+      "everyone": "Alla",
+      "friends": "Bara vänner",
+      "nobody": "Ingen"
+    },
+    "notifications": "Aviseringar",
+    "pin": "Fäst version {{version}} (inga automatiska uppdateringar)",
+    "settings": "Plugininställningar",
+    "diagnostics": "Diagnostik",
+    "export": "Exportera data",
+    "reset": "Återställ data",
+    "remove": "Ta bort",
+    "commandTaken": "/{{command}}: Kommandot används av {{plugin}}"
+  },
+  "badge": {
+    "label": "Märke bredvid namn",
+    "none": "Inget"
+  },
+  "diagnostics": {
+    "loading": "Laddar diagnostik…",
+    "failed": "Diagnostiken kunde inte laddas.",
+    "unknown": "Inte tillgänglig",
+    "ms": "{{value}} ms",
+    "cpuTime": "CPU-tid",
+    "memory": "Minne",
+    "peakMemory": "Toppminne",
+    "droppedEvents": "Tappade händelser",
+    "droppedMessages": "Tappade meddelanden",
+    "restarts": "Omstarter",
+    "messagesSent": "Skickade meddelanden",
+    "messagesReceived": "Mottagna meddelanden",
+    "messagesRateLimited": "Meddelanden som hållits tillbaka av hastighetsgränsen",
+    "messagesExpired": "Meddelanden som har gått ut",
+    "incomingRateDropped": "Inkommande meddelanden som tappats av hastighetsgränsen",
+    "incomingInvalid": "Ogiltiga inkommande meddelanden",
+    "log": "Logg",
+    "logEmpty": "Loggen är tom.",
+    "level": {
+      "debug": "Felsökning",
+      "info": "Info",
+      "warn": "Varning",
+      "error": "Fel"
+    }
+  },
+  "export": {
+    "title": "Exportera data för {{name}}",
+    "filter": "JSON-fil",
+    "done": "Data exporterad."
+  },
+  "reset": {
+    "title": "Återställa data för {{name}}?",
+    "message": "Allt som det här pluginet har sparat raderas. Det går inte att ångra.",
+    "confirm": "Återställ data",
+    "done": "Data återställd."
+  },
+  "remove": {
+    "title": "Ta bort {{name}}?",
+    "deleteData": "Radera även dess data",
+    "hint": "Sparad data raderas efter 30 dagar. Installera om innan dess för att få tillbaka den.",
+    "confirm": "Ta bort"
+  },
+  "errors": {
+    "enable": "Pluginet kunde inte växlas.",
+    "permissions": "Behörigheten kunde inte ändras.",
+    "visibility": "Synligheten kunde inte ändras.",
+    "notifications": "Aviseringarna kunde inte ändras.",
+    "pin": "Versionen kunde inte fästas.",
+    "export": "Datan kunde inte exporteras.",
+    "reset": "Datan kunde inte återställas.",
+    "remove": "Pluginet kunde inte tas bort.",
+    "badge": "Märket kunde inte ändras.",
+    "update": "Tillägget kunde inte uppdateras."
+  },
+  "update": {
+    "hint": "Uppdatering {{version}}",
+    "button": "Uppdatera"
+  },
+  "visibilityChip": "Pratar med andra Mumcord-användare · {{visibility}}",
+  "chips": {
+    "label": "Behörigheter den använder",
+    "uiPanel": "Panel",
+    "uiMemberBadge": "Medlemsmärke",
+    "uiProfileCard": "Profilkort",
+    "uiChatCard": "Chattkort",
+    "uiUserMenu": "Användarmeny",
+    "uiDialog": "Eget fönster",
+    "uiWebview": "Webbinnehåll",
+    "eventsSelf": "Din status",
+    "eventsVoice": "Röstaktivitet",
+    "eventsPresence": "Inträden och utträden",
+    "eventsChatActivity": "Chattaktivitet",
+    "notify": "Aviseringar",
+    "randomBytes": "Slumptal",
+    "commands": "Kommandon",
+    "chatSend": "Skriver i chatten",
+    "chatSupersedes": "Ersätter sin textrad",
+    "chatTriggers": "Utlösarord",
+    "chatPatterns": "Chattmönster",
+    "netHttp": "Internetåtkomst",
+    "secrets": "Nyckelring"
+  },
+  "offerBadge": "Nya behörigheter"
+}

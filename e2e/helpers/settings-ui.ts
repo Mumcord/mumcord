@@ -9,6 +9,7 @@ export const SETTINGS_GROUPS = [
   "Voice & Audio",
   "Chat & Notifications",
   "Privacy & Connections",
+  "Plugins",
   "Appearance",
   "Servers",
   "Gaming & Overlay",
@@ -62,4 +63,18 @@ export async function searchSettings(query: string): Promise<void> {
   await field.waitForDisplayed({ timeout: 10_000 });
   await field.setValue(query);
   await $(".settings-search__results, .settings-search__empty").waitForExist({ timeout: 10_000 });
+}
+
+/**
+ * Turns on Developer mode in Advanced & Developer. The fixture plugin registry serves plain http
+ * on 127.0.0.1, which the client only accepts in Developer mode.
+ */
+export async function turnOnDeveloperMode(): Promise<void> {
+  await openSettingsGroup("Advanced & Developer");
+  const toggle = $(
+    "//div[contains(concat(' ',normalize-space(@class),' '),' settings-switch ')][.//*[starts-with(normalize-space(.),'Developer mode')]]//input[@role='switch']",
+  );
+  await toggle.scrollIntoView();
+  if (!(await toggle.isSelected())) await toggle.click();
+  await browser.waitUntil(() => toggle.isSelected(), { timeoutMsg: "Developer mode stayed off" });
 }

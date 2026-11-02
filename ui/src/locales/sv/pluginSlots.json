@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Det här pluginet visar inget här ännu.",
+    "actionFailed": "Pluginet kunde inte hantera det. Försök igen."
+  },
+  "progress": {
+    "working": "Pågår"
+  },
+  "countdown": {
+    "done": "Tiden är ute"
+  },
+  "select": {
+    "refresh": "Uppdatera {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} tecken"
+  },
+  "password": {
+    "save": "Spara",
+    "saved": "Sparat säkert"
+  },
+  "file": {
+    "choose": "Välj fil…",
+    "none": "Ingen fil vald"
+  },
+  "list": {
+    "handle": "Flytta rad {{position}} av {{total}} (pil upp eller ner)",
+    "moved": "Rad {{from}} flyttad till position {{to}} av {{total}}"
+  },
+  "copyButton": {
+    "copied": "Kopierat",
+    "failed": "Det gick inte att kopiera"
+  }
+}

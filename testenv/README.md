@@ -69,3 +69,18 @@ Check: `openssl s_client -connect localhost:64738 </dev/null 2>/dev/null | opens
     docker stop testenv-v15-1; docker start testenv-v15-1
 
 Restart keeps the certificate set and data. Logs: `docker logs -f testenv-v15-1`.
+
+## Local mumbot (music and plugins)
+
+An optional [mumbot](https://github.com/Mumcord/mumbot) next to `v15` for the plugin tests: the `music` module (HTTP API on `127.0.0.1:8081`) and the `plugins` module announcing `dice`. It is an ordinary client on the server; nothing on the server changes. Needs Docker, the `v15` server running and `MUMBOT_API_KEY` in `.env` (placeholder in `.env.example`; set your own).
+
+    testenv/up.sh v15
+    testenv/mumbot/up.sh      # renders the config, registers the bot once, starts the container
+    testenv/mumbot/down.sh    # stops it; certificate and registration stay
+
+- The bot is `MumbotLocal`, registered on `v15`, pinned to the test certificate (set A). It sits in `Lobby` and plays into `Lobby`, `Raid` and `AFK`.
+- Play a test track: `curl -X POST http://127.0.0.1:8081/play -H "X-API-Key: $MUMBOT_API_KEY" -d '{"file": "tone-a.mp3"}'`. Test MP3s: `mumbot/media/tone-a.mp3`, `tone-b.mp3` (6 s sine tones).
+- URL sources are allowed from `host.docker.internal` (a throwaway HTTP server on the host).
+- Version: the image tag in `docker-compose.yml` and `scripts/mumbot.env` move together. The bot needs the `v15` certificate set `A` (the default); after `up.sh v15 --cert B` rerun `mumbot/up.sh` with `CERT_SET=B`.
+- Port: `MUMBOT_PORT` (default 8081).
+- `up.sh` fetches the tester build of mumbot only to register the bot (`MUMBOT_BIN` overrides).

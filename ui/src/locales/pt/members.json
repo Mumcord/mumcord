@@ -39,7 +39,6 @@
     "sessionOnly": "Esta pessoa não tem certificado, por isso estas definições só duram esta sessão.",
     "sendPrivateMessage": "Enviar mensagem privada",
     "privateMessage": "Mensagem privada",
-    "localSettings": "As tuas definições",
     "localSettingsHint": "Só tu vês isto. As alterações são guardadas de imediato.",
     "settingsFor": "Definições para {{name}}",
     "hintMuted": "Silenciado",

@@ -7,6 +7,7 @@
  * Every message can be replied to (FR-2.60: hover button, context menu or R); a reply shows a
  * compact header with the quote that jumps to the original while it is loaded.
  */
+import { ChatDecoration } from "../plugins/badges";
 import {
   memo,
   useCallback,
@@ -68,6 +69,7 @@ import { ImageMenu, type ImageMenuState } from "./ImageMenu";
 import { selectedText } from "./selectionText";
 import { revealDone, usePendingReveal } from "./reveal";
 import { CollapsedMessage } from "../blocking/CollapsedMessage";
+import { LeadingPluginCards, PluginLine } from "../plugins/chat";
 
 /** Within this distance of the top, older history is loaded; of the bottom, new messages scroll. */
 const EDGE_PX = 48;
@@ -307,7 +309,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
     />
   );
   return (
-    <>
+    <PluginLine message={message}>
       {reply ? <ReplyHeader quote={reply.quote} onJump={onJump} tabIndex={tabIndex} /> : null}
       {body}
       {codeActions}
@@ -328,7 +330,7 @@ function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJu
         tabIndex={tabIndex}
         onImageClick={onImageClick}
       />
-    </>
+    </PluginLine>
   );
 }
 
@@ -592,6 +594,34 @@ export function MessageList({
     const element = scrollRef.current;
     if (element && atBottom.current) element.scrollTop = element.scrollHeight;
   }
+
+  // Plugin cards render and grow after their message (async render, icons, web content), and the
+  // list itself shrinks when the composer grows. A reader at the bottom stays there; one who
+  // scrolled up is left where they are.
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const follow = () => {
+      if (atBottom.current) element.scrollTop = element.scrollHeight;
+    };
+    const resizes = new ResizeObserver(follow);
+    const observeChildren = () => {
+      resizes.disconnect();
+      resizes.observe(element);
+      for (const child of element.children) resizes.observe(child);
+    };
+    // The list's direct children come and go (empty notice, message list, leading cards).
+    const children = new MutationObserver(() => {
+      observeChildren();
+      follow();
+    });
+    observeChildren();
+    children.observe(element, { childList: true });
+    return () => {
+      children.disconnect();
+      resizes.disconnect();
+    };
+  }, []);
 
   function messageImage(target: EventTarget): HTMLImageElement | null {
     const image = target instanceof Element ? target.closest("img") : null;
@@ -879,6 +909,7 @@ export function MessageList({
               {t("list.loadFailed")}
             </p>
           ) : null}
+          <LeadingPluginCards listKey={listKey} loaded={log.loaded} messages={messages} />
           {messages.length === 0 ? (
             log.loaded ? (
               <p className="chat-list__empty">{t("empty")}</p>
@@ -1179,6 +1210,7 @@ const MessageItem = memo(function MessageItem({
       >
         {senderName}
         <MumcordBadge user={senderUser} />
+        <ChatDecoration session={session} />
       </button>,
     )
   ) : (
@@ -1186,6 +1218,7 @@ const MessageItem = memo(function MessageItem({
       <span className="chat-message__sender">
         {senderName}
         <MumcordBadge user={senderUser} />
+        {session !== null && <ChatDecoration session={session} />}
       </span>,
     )
   );

@@ -13,6 +13,7 @@ import {
   type CentreFilter,
   type CentreItem,
 } from "./centreModel";
+import { PluginSuggestionsNote } from "../plugins/notifications";
 import { CENTRE_PANEL_ID, focusBell } from "./centreShortcut";
 import { markAllRead, pruneItems, setCentreOpen } from "./centreStore";
 import { useCentreItems } from "./useCentreItems";
@@ -189,6 +190,9 @@ export function CentrePanel() {
             <CentreEntry key={item.id} item={item} now={now} serverName={serverName(item)} />
           ))}
         </ul>
+      )}
+      {shown.some((item) => item.kind === "plugin" && item.notice.kind === "suggestion") && (
+        <PluginSuggestionsNote />
       )}
       <div className="centre__foot">
         <span className="centre__dnd" data-on={dnd || undefined}>

@@ -15,7 +15,8 @@
     "advanced": "Avancé et développeur",
     "about": "À propos",
     "packetInspector": "Inspecteur de paquets",
-    "hotkeys": "Raccourcis"
+    "hotkeys": "Raccourcis",
+    "plugins": "Plugins"
   },
   "sectionDescriptions": {
     "general": "Démarrage, langue, mises à jour et accessibilité.",
@@ -27,7 +28,8 @@
     "servers": "Connexions à plusieurs serveurs et paramètres par serveur.",
     "gaming": "L'overlay en jeu, l'audio positionnel et les plugins de jeu.",
     "advanced": "Outils de développement, diagnostics, stockage et licences.",
-    "about": "Version, assistance et assistant de configuration."
+    "about": "Version, assistance et assistant de configuration.",
+    "plugins": "Les plugins s'exécutent dans un bac à sable et n'obtiennent que ce que vous autorisez. Ils ne voient jamais votre audio, vos fichiers ni votre certificat."
   },
   "breadcrumb": "Paramètres / {{section}}",
   "moreInfo": "Plus d'informations : {{topic}}",
@@ -1051,5 +1053,10 @@
     "addConfirm": "Ajouter",
     "reset": "Réinitialiser tous les raccourcis",
     "resetHint": "Supprime tous les raccourcis sauf le push-to-talk ; aucun n'est défini par défaut."
+  },
+  "developerMode": {
+    "title": "Mode développeur",
+    "switch": "Mode développeur",
+    "hint": "Ajoute un onglet Développeur aux plugins pour charger des plugins non signés depuis un dossier. À activer seulement si vous créez vous-même des plugins."
   }
 }

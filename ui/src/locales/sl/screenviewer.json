@@ -29,7 +29,6 @@
   "bitrate": "Bitrate",
   "path": "Pot",
   "pathDirect": "Neposredna",
-  "pathUnknown": "Neznana",
   "sound": "Zvok",
   "soundOn": "Zvok vkločen",
   "soundOff": "Zvok izkločen",

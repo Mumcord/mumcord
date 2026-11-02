@@ -104,7 +104,13 @@ describe("notification centre model", () => {
 
   it("counts entries per filter; connection events only count under All", () => {
     const items = buildItems(state([invite, mention("m", NOW), reply, connection]), requests);
-    expect(filterCounts(items)).toEqual({ all: 6, mentions: 2, requests: 2, invites: 1 });
+    expect(filterCounts(items)).toEqual({
+      all: 6,
+      mentions: 2,
+      requests: 2,
+      invites: 1,
+      plugins: 0,
+    });
     expect(visibleItems(items, "mentions").map((item) => item.kind)).toEqual(["mention", "reply"]);
     expect(visibleItems(items, "requests")).toHaveLength(2);
   });

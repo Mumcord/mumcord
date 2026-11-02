@@ -29,7 +29,6 @@
   "bitrate": "Bitrate",
   "path": "Reitti",
   "pathDirect": "Suora",
-  "pathUnknown": "Tuntematon",
   "sound": "Ääni",
   "soundOn": "Ääni päällä",
   "soundOff": "Ääni pois",

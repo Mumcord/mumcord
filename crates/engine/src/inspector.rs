@@ -302,6 +302,11 @@ fn hex(bytes: &[u8]) -> String {
 /// header plus a binary body, and full-image transfers binary; anything else from another
 /// client or plugin is shown as text if it is UTF-8 and as raw hex only otherwise.
 fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
+    // A plugin's own messages are opaque to Mumcord: hex only (FR-6.39). The plugin lists
+    // (`mumcord.plugins`, `mumcord.srvplugins`) are JSON and decoded below.
+    if data_id.starts_with(crate::plugins::MESSAGE_PREFIX) {
+        return None;
+    }
     if data_id == crate::full_image::wire::DATA_ID {
         return crate::full_image::wire::Msg::decode(data).map(|m| image_json(&m));
     }
@@ -554,6 +559,28 @@ mod tests {
         );
         assert_eq!(counts[0].direction, TapDirection::Received);
         assert_eq!(counts[0].count, 1);
+    }
+
+    #[test]
+    fn plugin_messages_are_hex_only_and_plugin_lists_decoded() {
+        assert_eq!(decode("mumcord.p.dice", br#"{"roll":6}"#), None);
+        assert_eq!(
+            decode("mumcord.plugins", br#"{"v":1,"p":["dice@1"]}"#),
+            Some(json!({ "v": 1, "p": ["dice@1"] }))
+        );
+        assert_eq!(
+            decode("mumcord.srvplugins", br#"{"v":1,"seq":2,"plugins":[]}"#),
+            Some(json!({ "v": 1, "seq": 2, "plugins": [] }))
+        );
+        let inspector = Arc::new(Inspector::default());
+        inspector.set_enabled(true);
+        inspector.capture(
+            2,
+            plugin(TapDirection::Received, "mumcord.p.dice", b"\x01\x01\x02hi"),
+        );
+        let packet = &inspector.poll(None, Vec::new()).packets[0];
+        assert_eq!(packet.decoded, None);
+        assert_eq!(packet.raw_hex, "0101026869");
     }
 
     #[test]

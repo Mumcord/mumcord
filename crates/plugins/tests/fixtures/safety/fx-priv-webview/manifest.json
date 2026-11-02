@@ -1,0 +1,5 @@
+{
+  "id": "fx-priv-webview",
+  "name": "Fixture Third-Party Web View",
+  "permissions": { "required": ["ui.webview"] }
+}

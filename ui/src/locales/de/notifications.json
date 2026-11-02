@@ -23,7 +23,8 @@
       "all": "Alle",
       "mentions": "Erwähnungen",
       "requests": "Anfragen",
-      "invites": "Einladungen"
+      "invites": "Einladungen",
+      "plugins": "Plugins"
     },
     "empty": "Du bist auf dem neuesten Stand.",
     "unread": "Ungelesen",

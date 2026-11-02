@@ -33,6 +33,7 @@ import { ServerConnectionsCard } from "./sections/ServersSection";
 import { NotificationsCard, SoundsCard } from "./sections/SoundsSection";
 import type { SettingsSectionProps } from "./sections/types";
 import { UpdatesCard } from "./sections/UpdatesSection";
+import { DeveloperModeCard, PluginsSection } from "../plugins";
 import { HotkeysCard } from "./sections/HotkeysSection";
 import { ConnectingCard, ProcessingCard, TalkModeCard } from "./sections/VoiceSection";
 import type { SectionId } from "./sectionIds";
@@ -112,6 +113,22 @@ export function SettingsPageCards({
           <HistorySyncCard {...props} />
         </>
       );
+    case "plugins":
+      return (
+        <PluginsSection
+          developerMode={settings.developerMode}
+          mirror={{
+            url: settings.pluginsMirrorUrl,
+            onChange: (pluginsMirrorUrl) => {
+              update({ pluginsMirrorUrl });
+            },
+          }}
+          updateMode={settings.pluginsUpdates}
+          onUpdateModeChange={(pluginsUpdates) => {
+            update({ pluginsUpdates });
+          }}
+        />
+      );
     case "appearance":
       return (
         <>
@@ -140,6 +157,7 @@ export function SettingsPageCards({
       return (
         <>
           <BetaFeaturesCard {...props} />
+          <DeveloperModeCard {...props} />
           {devTools && <DeveloperToolsCard />}
           <DiagnosticsCard {...props} />
           <CacheGroup />

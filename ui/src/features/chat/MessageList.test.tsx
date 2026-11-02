@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatDisplay, ChatMessage } from "../../api";
 import { getApi } from "../../api";
 import { applyLanguage } from "../../i18n";
@@ -651,5 +651,76 @@ describe("MessageList replies", () => {
     expect(within(eve).queryByRole("button", { name: /Jump/ })).toBeNull();
     expect(eve).toHaveTextContent("<img src=x onerror=alert(1)>");
     expect(eve.querySelector(".chat-reply img")).toBeNull();
+  });
+});
+
+describe("MessageList follows the bottom when content grows (F40)", () => {
+  const VIEW = 100;
+  let contentHeight = 300;
+  let scrollTop = 0;
+  let resized: () => void = () => undefined;
+
+  function fakeScroller(): HTMLElement {
+    const list = document.querySelector<HTMLElement>(".chat-list");
+    if (!list) throw new Error("no list");
+    Object.defineProperty(list, "scrollTop", {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value: number) => {
+        scrollTop = Math.max(0, Math.min(value, contentHeight - VIEW));
+      },
+    });
+    Object.defineProperty(list, "clientHeight", { configurable: true, get: () => VIEW });
+    Object.defineProperty(list, "scrollHeight", { configurable: true, get: () => contentHeight });
+    return list;
+  }
+
+  beforeEach(() => {
+    contentHeight = 300;
+    scrollTop = 0;
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: ResizeObserverCallback) {
+          resized = () => {
+            callback([], this);
+          };
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("stays at the newest message when a plugin card grows after rendering", () => {
+    renderList("cozy");
+    const list = fakeScroller();
+    list.scrollTop = contentHeight;
+    fireEvent.scroll(list);
+    expect(list.scrollTop).toBe(200);
+
+    // An async plugin card (or its image) grows the last message.
+    contentHeight = 450;
+    act(() => {
+      resized();
+    });
+    expect(list.scrollTop).toBe(350);
+  });
+
+  it("leaves a reader who scrolled up where they are", () => {
+    renderList("cozy");
+    const list = fakeScroller();
+    list.scrollTop = 50;
+    fireEvent.scroll(list);
+
+    contentHeight = 450;
+    act(() => {
+      resized();
+    });
+    expect(list.scrollTop).toBe(50);
   });
 });

@@ -1,7 +1,7 @@
 {
   "shards": [
     ["specs/network/network-resilience.e2e.ts"],
-    ["specs/voice/noise-suppression-backends.e2e.ts"],
+    ["specs/plugins/load.e2e.ts", "specs/voice/noise-suppression-backends.e2e.ts"],
     [
       "specs/app/theme-language.e2e.ts",
       "specs/chat/block.e2e.ts",
@@ -33,6 +33,7 @@
       "specs/chat/dnd.e2e.ts",
       "specs/chat/friends.e2e.ts",
       "specs/chat/notifications.e2e.ts",
+      "specs/plugins/a11y.e2e.ts",
       "specs/positional/positional.e2e.ts",
       "specs/servers/servers.e2e.ts",
       "specs/voice/global-hotkeys.e2e.ts",
@@ -52,6 +53,14 @@
     ],
     [
       "specs/chat/pm-rules.e2e.ts",
+      "specs/plugins/browse-install.e2e.ts",
+      "specs/plugins/dice.e2e.ts",
+      "specs/plugins/notify-webview-old-server.e2e.ts",
+      "specs/plugins/poll.e2e.ts",
+      "specs/plugins/echolings.e2e.ts",
+      "specs/plugins/registry-install.e2e.ts",
+      "specs/plugins/server-suggestions.e2e.ts",
+      "specs/smoke/two-clients.e2e.ts",
       "specs/voice/voice.e2e.ts",
       "specs/wizard/ac-1.2-import-identity.e2e.ts",
       "specs/wizard/ac-149-rerun.e2e.ts"
@@ -66,6 +75,8 @@
       "specs/misc/diagnostics-about.e2e.ts",
       "specs/p2p/p2p-mode.e2e.ts",
       "specs/p2p/relay-live.e2e.ts",
+      "specs/plugins/mumbot-music.e2e.ts",
+      "specs/plugins/safe-mode.e2e.ts",
       "specs/wizard/ac-66-import-mumble.e2e.ts"
     ]
   ]

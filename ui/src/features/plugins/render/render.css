@@ -1,0 +1,467 @@
+/* Plugin UI renderer (FR-6.40 … FR-6.42): Mumcord components, theme tokens only. */
+
+.pr-root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.pr-stack {
+  display: flex;
+  min-width: 0;
+}
+
+.pr-stack--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+/* Justify fill-first: the first child takes the free width, the others keep their natural size,
+   so the row never wraps. With an animation the wrapper grows and passes the width on. */
+.pr-stack--fill-first {
+  flex-wrap: nowrap;
+}
+
+.pr-stack--fill-first > * {
+  flex: 0 0 auto;
+}
+
+.pr-stack--fill-first > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.pr-stack--fill-first > .pr-anim:first-child {
+  display: flex;
+}
+
+.pr-stack--fill-first > .pr-anim:first-child > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.pr-stack--column {
+  flex-direction: column;
+}
+
+.pr-text--caption {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.pr-text--heading {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.pr-text--monospace {
+  font-family: var(--font-family-mono);
+}
+
+.pr-alt,
+.pr-counter {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.pr-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+}
+
+.pr-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.pr-sprite {
+  display: inline-block;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.pr-meter,
+.pr-progress,
+.pr-countdown,
+.pr-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.pr-meter__bar,
+.pr-progress__bar {
+  width: 100%;
+  height: 6px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+  appearance: none;
+  accent-color: var(--color-accent);
+}
+
+.pr-meter__bar::-webkit-meter-bar {
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+}
+
+.pr-meter__bar::-webkit-meter-optimum-value,
+.pr-meter__bar::-webkit-meter-suboptimum-value,
+.pr-meter__bar::-webkit-meter-even-less-good-value {
+  border-radius: var(--radius-full);
+  background: var(--pr-meter-color, var(--color-accent));
+}
+
+.pr-meter__bar::-moz-meter-bar {
+  border-radius: var(--radius-full);
+  background: var(--pr-meter-color, var(--color-accent));
+}
+
+.pr-progress__bar::-webkit-progress-bar {
+  border-radius: var(--radius-full);
+  background: var(--color-bg-hover);
+}
+
+.pr-progress__bar::-webkit-progress-value {
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.pr-progress__bar::-moz-progress-bar {
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.pr-countdown__time {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+}
+
+.pr-chip {
+  align-self: flex-start;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+}
+
+/* Tones (status pills): tinted fill, text in the tone colour. The tone colours are contrast-checked
+   on the app's backgrounds, and a 16 % tint keeps that contrast. */
+.pr-chip[class*="pr-tone--"] {
+  --pr-tone: var(--color-text-muted);
+  border-color: color-mix(in srgb, var(--pr-tone) 45%, transparent);
+  background: color-mix(in srgb, var(--pr-tone) 16%, transparent);
+  color: var(--pr-tone);
+  font-weight: var(--font-weight-bold);
+}
+
+.pr-tone--success,
+.pr-note--success {
+  --pr-tone: var(--color-success);
+}
+
+.pr-tone--warning,
+.pr-note--warning {
+  --pr-tone: var(--color-warning);
+}
+
+.pr-tone--danger,
+.pr-note--danger {
+  --pr-tone: var(--color-danger);
+}
+
+.pr-tone--accent,
+.pr-note--accent {
+  --pr-tone: var(--color-accent-text);
+}
+
+.pr-divider {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+/* A label with a muted second line under it, e.g. who saved an entry and when. */
+.pr-button--detail {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.pr-button__label,
+.pr-button__detail {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pr-button__detail {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  opacity: 0.8;
+}
+
+/* Secondary: an outline on the surface it sits on. */
+.pr-button--secondary {
+  background: transparent;
+}
+
+/* Danger stays an outline like Mumcord's own danger buttons: the danger colour is contrast-checked
+   as text on every background, a filled red button is not. */
+.pr-button--danger,
+.pr-button--danger:hover:not(:disabled) {
+  border-color: var(--color-danger);
+  background: transparent;
+  color: var(--color-danger);
+  font-weight: var(--font-weight-bold);
+}
+
+.button.pr-icon-button {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  min-width: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.pr-icon-mask {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: currentcolor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+.pr-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pr-toggle input {
+  accent-color: var(--color-accent);
+}
+
+.pr-select,
+.pr-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.pr-field > label {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Fields take the full width of a column even when the column aligns its children to one side. */
+.pr-stack--column > .pr-field,
+.pr-root > .pr-field {
+  align-self: stretch;
+}
+
+.pr-field__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.pr-field__foot > .pr-counter {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.pr-note {
+  color: var(--pr-tone, var(--color-text-muted));
+  font-size: var(--font-size-xs);
+}
+
+.pr-input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px var(--color-danger);
+}
+
+.pr-input {
+  min-width: 0;
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.pr-field input[type="range"] {
+  accent-color: var(--color-accent);
+}
+
+.pr-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pr-list__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.pr-list__row[data-dragging] {
+  opacity: 0.6;
+}
+
+.pr-list__row[data-drop-target] {
+  box-shadow: inset 0 2px 0 var(--color-accent);
+}
+
+.pr-list__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.pr-list__handle {
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: grab;
+  touch-action: none;
+}
+
+.pr-list__handle:hover {
+  background: var(--color-bg-hover);
+}
+
+/* Animation presets (FR-6.41). The renderer leaves them out with reduced motion; the media
+   query below also stops them if the setting changes while a tree is on screen. */
+.pr-anim {
+  display: inline-block;
+}
+
+.pr-anim--bob {
+  animation: pr-bob 2s ease-in-out infinite;
+}
+
+.pr-anim--hop {
+  animation: pr-hop 1.2s ease-out infinite;
+}
+
+.pr-anim--wave {
+  animation: pr-wave 1.6s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.pr-anim--nap {
+  animation: pr-nap 4s ease-in-out infinite;
+}
+
+.pr-anim--sparkle {
+  animation: pr-sparkle 1.4s ease-in-out infinite;
+}
+
+.pr-anim--shake {
+  animation: pr-shake 0.6s ease-in-out infinite;
+}
+
+.pr-anim--fade {
+  animation: pr-fade 2.4s ease-in-out infinite;
+}
+
+@keyframes pr-bob {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pr-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pr-wave {
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes pr-nap {
+  50% {
+    transform: scale(0.96, 1.03);
+    opacity: 0.8;
+  }
+}
+
+@keyframes pr-sparkle {
+  50% {
+    filter: brightness(1.35);
+  }
+}
+
+@keyframes pr-shake {
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes pr-fade {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pr-anim {
+    animation: none;
+  }
+}
+
+.pr-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pr-copy__feedback {
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+}

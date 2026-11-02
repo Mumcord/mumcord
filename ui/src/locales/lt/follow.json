@@ -1,6 +1,5 @@
 {
   "follow": "Sekti",
-  "following": "Sekama",
   "unsupported": "Kanalų sekimui reikalingas 1.4 ar naujesnės versijos serveris.",
   "unread_one": "{{count}} neskaityta žinutė",
   "unread_few": "{{count}} neskaitytos žinutės",

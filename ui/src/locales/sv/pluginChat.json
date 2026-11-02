@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kort från {{plugin}}",
+    "showMore": "Visa mer",
+    "showLess": "Visa mindre"
+  },
+  "via": "via {{plugin}}",
+  "supersede": {
+    "showText": "Visa originaltext",
+    "hideText": "Dölj originaltext",
+    "hiddenBy": "Dold av {{plugin}}"
+  },
+  "command": {
+    "list": "Pluginkommandon",
+    "keys": "↑↓ välj · Tab komplettera · Enter kör · Esc stäng",
+    "unavailable": "Det här kommandot är inte tillgängligt just nu.",
+    "failed": "Kommandot kunde inte köras. Försök igen."
+  }
+}

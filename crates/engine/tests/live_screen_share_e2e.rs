@@ -1,7 +1,7 @@
 //! Screen share end to end (AC-2.29, FR-2.42 – FR-2.46) against the local test server, with the
 //! sharer in its own process so its CPU and memory can be measured on their own: the sharer bot
 //! is this test binary started again with `SS13_SHARER=1`, driven over stdin/stdout. Ten viewer
-//! engines run in this process: eight watch the test pattern at 720p30, the ninth gets "This
+//! engines run in this process: eight watch the test pattern at 1080p30, the ninth gets "This
 //! share is full", one in another channel cannot watch. A throttled upload drops quality to
 //! 480p15 and recovers; a second share is watched at the same time; unwatching and stopping end
 //! the streams. Prints CPU, memory, bitrate and fps per process
@@ -43,6 +43,10 @@ const SLOW_KBPS: u32 = 3000;
 const VIEWERS: usize = 8;
 /// Marks the sharer bot's protocol lines among the test harness output.
 const BOT: &str = "SS13BOT ";
+/// The best quality step (1080p30), where a share starts and recovers to.
+const FULL_HD: (u16, u16) = (1920, 1080);
+/// Index of the lowest quality step (480p15) in the sharer's step ladder.
+const FLOOR_STEP: usize = 3;
 
 fn live() -> bool {
     let on = std::env::var("MUMCORD_LIVE").is_ok_and(|v| v == "1");
@@ -574,12 +578,20 @@ async fn screen_share_ac_2_29() {
     for i in 0..=VIEWERS {
         viewers.push(start(&dir, &format!("ss13-v{i}")).await);
     }
-    let outsider = start(&dir, "ss13-out").await;
+    let mut outsider = start(&dir, "ss13-out").await;
     let afk = outsider.channel("AFK");
     outsider
         .engine
         .join_channel(outsider.server(), afk)
         .expect("move outsider");
+    // The move is only requested above; the share must start after the server confirmed it, or
+    // the outsider briefly sees the share in the old channel.
+    let me = outsider.session();
+    wait_for(&mut outsider.rx, "the outsider in AFK", |e| match e {
+        EngineEvent::UserUpserted(u) if u.session == me && u.channel_id == afk => Some(()),
+        _ => None,
+    })
+    .await;
     let sinks: Vec<Arc<Sink>> = (0..=VIEWERS).map(|_| Arc::new(Sink::default())).collect();
     for (v, sink) in viewers.iter().zip(&sinks) {
         v.engine.set_screen_frame_sink(sink.clone());
@@ -622,11 +634,11 @@ async fn screen_share_ac_2_29() {
     assert_eq!(full.kind, ErrorKind::ShareFull);
     println!("ninth viewer: {full}");
 
-    // All eight get 720p30, starting at a keyframe.
+    // All eight get 1080p30, starting at a keyframe.
     tokio::time::sleep(Duration::from_secs(3)).await;
     let load = measure(pid).await;
     let stats = bot.stats().await;
-    report("720p30, 8 viewers", &load, &stats, pid, &sinks[..VIEWERS]);
+    report("1080p30, 8 viewers", &load, &stats, pid, &sinks[..VIEWERS]);
     assert_eq!((stats.step, stats.viewers), (0, VIEWERS));
     for (i, sink) in sinks[..VIEWERS].iter().enumerate() {
         let seen = sink.recent(MEASURE);
@@ -635,7 +647,7 @@ async fn screen_share_ac_2_29() {
             Some(true),
             "viewer {i} keyframe first"
         );
-        assert_eq!(seen.size, (1280, 720), "viewer {i} size");
+        assert_eq!(seen.size, FULL_HD, "viewer {i} size");
         assert!(seen.fps >= 25.0, "viewer {i} gets {:.1} fps", seen.fps);
     }
     assert_eq!(sinks[VIEWERS].count(), 0, "the ninth gets no frames");
@@ -651,7 +663,7 @@ async fn screen_share_ac_2_29() {
     let load = measure(pid).await;
     let stats = bot.stats().await;
     report(
-        "720p30, 8 viewers, all decoding in Rust",
+        "1080p30, 8 viewers, all decoding in Rust",
         &load,
         &stats,
         pid,
@@ -697,17 +709,17 @@ async fn screen_share_ac_2_29() {
         if bot.stats().await.step == 0 {
             break;
         }
-        assert!(Instant::now() < deadline, "no 720p30 within 60 s");
+        assert!(Instant::now() < deadline, "no 1080p30 within 60 s");
         tokio::time::sleep(Duration::from_millis(250)).await;
     }
     println!(
-        "recovered to 720p30 after {:.1} s",
+        "recovered to 1080p30 after {:.1} s",
         began.elapsed().as_secs_f64()
     );
     tokio::time::sleep(Duration::from_secs(4)).await;
     for (i, sink) in sinks[..VIEWERS].iter().enumerate() {
         let seen = sink.recent(Duration::from_secs(2));
-        assert_eq!(seen.size, (1280, 720), "viewer {i} back at 720p");
+        assert_eq!(seen.size, FULL_HD, "viewer {i} back at 1080p");
         assert!(seen.fps >= 20.0, "viewer {i} back at {:.1} fps", seen.fps);
     }
 
@@ -799,7 +811,7 @@ async fn throttle(bot: &mut SharerBot, kbps: u32, pid: u32, sinks: &[Arc<Sink>])
     bot.ask(&format!("limit {kbps}")).await;
     let began = Instant::now();
     let deadline = began + Duration::from_secs(30);
-    while bot.stats().await.step != 2 {
+    while bot.stats().await.step != FLOOR_STEP {
         assert!(
             Instant::now() < deadline,
             "no 480p15 within 30 s at {kbps} kbps"
@@ -810,16 +822,39 @@ async fn throttle(bot: &mut SharerBot, kbps: u32, pid: u32, sinks: &[Arc<Sink>])
         "upload limited to {kbps} kbps: 480p15 after {:.1} s",
         began.elapsed().as_secs_f64()
     );
-    // Long enough for the failed tries to step up (after 5 s, then 10 s) to be over, so the
-    // measurement shows the steady state under the limit.
-    let settle_end = Instant::now() + Duration::from_secs(22);
-    let (mut step, mut tries) = (2, 0);
-    while Instant::now() < settle_end {
+    // From 480p15 the sharer keeps trying 720p15, waiting 5 s, then 10 s, then 20 s after each
+    // failed try. Once two of those tries have failed straight back to 480p15, the next one is at
+    // least 20 s away: room for the viewers' queues to drain for 5 s plus the measurement. A try
+    // that climbs further before failing doubles another step's wait, so it does not count.
+    // Without any try in the first 22 s (upload far too slow, or the waits already grew in an
+    // earlier throttle) the floor is steady as well.
+    let began = Instant::now();
+    let deadline = began + Duration::from_secs(90);
+    let (mut step, mut tries, mut failed) = (FLOOR_STEP, 0, 0);
+    let (mut highest, mut floor_since) = (FLOOR_STEP, began);
+    loop {
         let now = bot.stats().await.step;
         if now < step {
             tries += 1;
         }
+        highest = highest.min(now);
+        if now == FLOOR_STEP && step != FLOOR_STEP {
+            if highest == FLOOR_STEP - 1 {
+                failed += 1;
+            }
+            highest = FLOOR_STEP;
+            floor_since = Instant::now();
+        }
         step = now;
+        let quiet = tries == 0 && began.elapsed() >= Duration::from_secs(22);
+        let drained = floor_since.elapsed() >= Duration::from_secs(5);
+        if step == FLOOR_STEP && drained && (failed >= 2 || quiet) {
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "no steady 480p15 within 90 s at {kbps} kbps"
+        );
         tokio::time::sleep(Duration::from_millis(250)).await;
     }
     println!("{tries} steps up while settling at {kbps} kbps");

@@ -1,0 +1,35 @@
+{
+  "hint": "Töltsön be egy kicsomagolt bővítménymappát a teszteléshez. A fejlesztői bővítmények nincsenek aláírva, soha nem hivatalosak, és nem kaphatják meg a net.http, secrets vagy ui.webview jogosultságot. A fejlesztői mód kikapcsolásakor eltávolításra kerülnek.",
+  "load": "Bővítménymappa betöltése…",
+  "pickFolder": "Válassza ki a bővítmény mappáját",
+  "empty": "Nincs betöltött fejlesztői bővítmény.",
+  "listLabel": "Fejlesztői bővítmények",
+  "label": "Fejlesztői bővítmény",
+  "status": {
+    "running": "Fut",
+    "off": "Kikapcsolva",
+    "backingOff": "Összeomlás után újraindul",
+    "autoOff": "Ismételt összeomlások után kikapcsolva",
+    "allOff": "Minden bővítmény ki van kapcsolva",
+    "noPlugins": "A bővítmények ebben a munkamenetben ki vannak kapcsolva",
+    "notLoaded": "Nem sikerült betölteni"
+  },
+  "showLog": "{{name}} naplójának megjelenítése",
+  "reload": "{{name}} újratöltése",
+  "unload": "{{name}} eltávolítása",
+  "logLabel": "{{name}} naplója",
+  "logTitle": "{{name}} naplója",
+  "logEmpty": "Még nincsenek naplósorok.",
+  "level": {
+    "debug": "Hibakeresés",
+    "info": "Infó",
+    "warn": "Figyelmeztetés",
+    "error": "Hiba"
+  },
+  "errors": {
+    "load": "A bővítménymappát nem sikerült betölteni.",
+    "reload": "A bővítményt nem sikerült újratölteni.",
+    "unload": "A bővítményt nem sikerült eltávolítani.",
+    "log": "A naplót nem sikerült elolvasni."
+  }
+}

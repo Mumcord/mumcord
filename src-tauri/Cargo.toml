@@ -22,6 +22,8 @@ tauri-build.workspace = true
 mumcord-engine.workspace = true
 mumcord-overlay-ipc = { workspace = true, features = ["render"] }
 mumcord-protocol.workspace = true
+mumcord-plugins.workspace = true
+semver.workspace = true
 base64 = "0.23"
 # Not inherited from the workspace: the Tauri CLI ignores the features of inherited dependencies
 # and only bundles the tray library (libayatana-appindicator3) into the AppImage when it sees

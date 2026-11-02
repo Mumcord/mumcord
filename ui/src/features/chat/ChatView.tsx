@@ -30,6 +30,7 @@ import { messageLimits } from "./images";
 import { createMessageAnnouncer } from "./messageAnnouncer";
 import { MessageList } from "./MessageList";
 import { useBlockedView } from "./blockedView";
+import { cardAnnouncement, createLineAnnouncer } from "../plugins/chat";
 import { PinnedInfoBox, type PinnedBlock } from "./PinnedInfo";
 import { pinnedInfo } from "./pinnedInfoModel";
 import { descriptionKey, hideInfo, useHiddenHash, welcomeKey } from "./hiddenInfo";
@@ -196,18 +197,28 @@ function ConversationChat({
       },
       (count) => t("announce.more", { count }),
     );
+    // A line a plugin replaced is read as its card, a hidden one not at all (FR-6.45).
+    const lines = createLineAnnouncer();
     const unsubscribe = subscribeIncoming((message, serverId) => {
       if (serverId !== getShownServerId()) return;
       if (message.own || conversationKey(message.conversation) !== key) return;
-      const text = htmlToText(message.body).slice(0, ANNOUNCE_CHARS);
-      announcer.push(
-        text === "" && hasImage(message.body)
-          ? t("announce.image", { name: message.senderName })
-          : t("announce.message", { name: message.senderName, text }),
-      );
+      lines.resolve(message.id, (view) => {
+        const name = message.senderName;
+        if (view.kind === "card") {
+          announcer.push(t("announce.message", { name, text: cardAnnouncement(t, view) }));
+          return;
+        }
+        const text = htmlToText(message.body).slice(0, ANNOUNCE_CHARS);
+        announcer.push(
+          text === "" && hasImage(message.body)
+            ? t("announce.image", { name })
+            : t("announce.message", { name, text }),
+        );
+      });
     });
     return () => {
       unsubscribe();
+      lines.dispose();
       announcer.dispose();
     };
   }, [conversation, t]);

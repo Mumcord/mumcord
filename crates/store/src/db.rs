@@ -277,6 +277,71 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (server_id, identity_id)
     );
     ",
+    // v21: plugin system (Epic 3.1, spec 06 section 7.1). `plugin` is one row per installed
+    // plugin; `removed_at` is set when it is removed with its data kept (purged after 30
+    // days, FR-6.62). `plugin_kv` holds plugin storage per scope (`global` or the identity id).
+    // `server_plugin_suggestion` remembers what a server suggested to which identity.
+    r"
+    CREATE TABLE plugin (
+        id               TEXT    PRIMARY KEY,
+        version          TEXT    NOT NULL,
+        previous_version TEXT,
+        source           TEXT    NOT NULL,
+        sha256           TEXT,
+        author_key       TEXT,
+        enabled          INTEGER NOT NULL DEFAULT 0,
+        disabled_reason  TEXT CHECK (disabled_reason IN
+            ('crashes', 'revoked', 'tampered', 'user', 'permission')),
+        visibility       TEXT    NOT NULL DEFAULT 'everyone'
+            CHECK (visibility IN ('everyone', 'friends', 'nobody')),
+        granted          TEXT    NOT NULL DEFAULT '[]',
+        pinned           INTEGER NOT NULL DEFAULT 0,
+        notifications    INTEGER NOT NULL DEFAULT 1,
+        removed_at       INTEGER,
+        installed_at     INTEGER NOT NULL
+    );
+
+    CREATE TABLE plugin_kv (
+        plugin_id  TEXT    NOT NULL REFERENCES plugin (id) ON DELETE CASCADE,
+        scope_key  TEXT    NOT NULL,
+        key        TEXT    NOT NULL,
+        value      BLOB    NOT NULL,
+        updated_at INTEGER NOT NULL,
+        PRIMARY KEY (plugin_id, scope_key, key)
+    );
+
+    CREATE TABLE plugin_repository (
+        id            INTEGER PRIMARY KEY,
+        url           TEXT    NOT NULL UNIQUE,
+        name          TEXT    NOT NULL,
+        public_key    TEXT    NOT NULL,
+        pinned_at     INTEGER NOT NULL,
+        enabled       INTEGER NOT NULL DEFAULT 1,
+        paused_reason TEXT CHECK (paused_reason IN ('key-changed')),
+        last_sequence INTEGER NOT NULL DEFAULT 0,
+        last_checked  INTEGER
+    );
+
+    CREATE TABLE server_plugin_suggestion (
+        server_id   INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        identity_id INTEGER NOT NULL REFERENCES identity (id) ON DELETE CASCADE,
+        plugin_id   TEXT    NOT NULL,
+        seq         INTEGER NOT NULL,
+        state       TEXT    NOT NULL
+            CHECK (state IN ('new', 'not-now', 'dismissed', 'installed')),
+        until       INTEGER,
+        sender_pin  TEXT    NOT NULL,
+        PRIMARY KEY (server_id, identity_id, plugin_id)
+    );
+
+    CREATE TABLE plugin_sender_pin (
+        server_id   INTEGER NOT NULL REFERENCES saved_server (id) ON DELETE CASCADE,
+        identity_id INTEGER NOT NULL REFERENCES identity (id) ON DELETE CASCADE,
+        cert_hash   TEXT    NOT NULL,
+        first_seen  INTEGER NOT NULL,
+        PRIMARY KEY (server_id, identity_id)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -294,6 +359,10 @@ impl Store {
     fn from_connection(mut conn: Connection) -> Result<Self> {
         conn.pragma_update(None, "foreign_keys", true)?;
         conn.pragma_update(None, "journal_mode", "WAL")?;
+        // In WAL mode NORMAL only syncs at checkpoints: a commit cannot corrupt the database,
+        // a power cut can lose the last commits, and each write stops waiting for the disk
+        // (plugin storage writes run inside a plugin's 50 ms call budget).
+        conn.pragma_update(None, "synchronous", "NORMAL")?;
         migrate(&mut conn)?;
         Ok(Self { conn })
     }
@@ -334,6 +403,24 @@ pub(crate) mod tests {
         (dir, store)
     }
 
+    #[test]
+    fn commits_do_not_wait_for_the_disk() {
+        let (_dir, store) = temp_store();
+        let mode: String = store
+            .conn
+            .query_row("PRAGMA journal_mode", [], |row| row.get(0))
+            .expect("journal mode");
+        let sync: i64 = store
+            .conn
+            .query_row("PRAGMA synchronous", [], |row| row.get(0))
+            .expect("synchronous");
+        assert_eq!(
+            (mode.as_str(), sync),
+            ("wal", 1),
+            "WAL with synchronous=NORMAL"
+        );
+    }
+
     /// Testers' local databases already have #218's `channel_audio_profile` as v18, so
     /// `blocked_user` must stay v19.
     #[test]
@@ -341,6 +428,8 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
         assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
+        assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
+        assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
     }
 
     #[test]
@@ -565,10 +654,11 @@ pub(crate) mod tests {
     /// stay v20 after them.
     #[test]
     fn relay_migration_is_v20_after_audio_profile_and_blocked_user() {
-        assert_eq!(MIGRATIONS.len(), 20);
+        assert_eq!(MIGRATIONS.len(), 21);
         assert!(MIGRATIONS[16].contains("CREATE TABLE pm_conversation"));
         assert!(MIGRATIONS[17].contains("CREATE TABLE channel_audio_profile"));
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
+        assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
     }
 

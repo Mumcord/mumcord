@@ -29,7 +29,8 @@
       "all": "Vse",
       "mentions": "Omembe",
       "requests": "Prošnje",
-      "invites": "Povabila"
+      "invites": "Povabila",
+      "plugins": "Vtičniki"
     },
     "empty": "Vse je prebrano.",
     "unread": "Neprebrano",

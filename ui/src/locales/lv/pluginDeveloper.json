@@ -1,0 +1,35 @@
+{
+  "hint": "Ielādējiet izpakotu spraudņa mapi, lai to pārbaudītu. Izstrādātāja spraudņi nav parakstīti, nekad nav oficiāli un nevar saņemt net.http, secrets vai ui.webview. Tie tiek izslēgti, kad izstrādātāja režīms tiek izslēgts.",
+  "load": "Ielādēt spraudņa mapi…",
+  "pickFolder": "Izvēlieties spraudņa mapi",
+  "empty": "Nav ielādēts neviens izstrādātāja spraudnis.",
+  "listLabel": "Izstrādātāja spraudņi",
+  "label": "Izstrādātāja spraudnis",
+  "status": {
+    "running": "Darbojas",
+    "off": "Izslēgts",
+    "backingOff": "Pēc avārijas tiek restartēts",
+    "autoOff": "Izslēgts pēc atkārtotām avārijām",
+    "allOff": "Visi spraudņi ir izslēgti",
+    "noPlugins": "Spraudņi šai sesijai ir izslēgti",
+    "notLoaded": "Neizdevās ielādēt"
+  },
+  "showLog": "Rādīt {{name}} žurnālu",
+  "reload": "Pārlādēt {{name}}",
+  "unload": "Izslēgt {{name}}",
+  "logLabel": "{{name}} žurnāls",
+  "logTitle": "{{name}} žurnāls",
+  "logEmpty": "Žurnāla ierakstu vēl nav.",
+  "level": {
+    "debug": "Atkļūdošana",
+    "info": "Info",
+    "warn": "Brīdinājums",
+    "error": "Kļūda"
+  },
+  "errors": {
+    "load": "Spraudņa mapi neizdevās ielādēt.",
+    "reload": "Spraudni neizdevās pārlādēt.",
+    "unload": "Spraudni neizdevās izslēgt.",
+    "log": "Žurnālu neizdevās nolasīt."
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "intro": "Les dépôts sont des listes de plugins supplémentaires gérées par d'autres personnes. Mumcord ne vérifie pas leurs plugins. N'ajoutez qu'un dépôt auquel vous faites confiance.",
+  "add": {
+    "button": "Ajouter un dépôt",
+    "title": "Ajouter un dépôt",
+    "address": "Adresse du dépôt",
+    "expectedKey": "Clé attendue (facultatif)",
+    "expectedKeyHint": "Si le propriétaire vous a donné une clé, collez-la ici. Le dépôt doit alors utiliser exactement cette clé.",
+    "check": "Vérifier le dépôt",
+    "found": "Voici ce que nous avons trouvé",
+    "confirm": "Ajouter le dépôt",
+    "subtitle": "N'ajoutez que des dépôts de personnes en qui vous avez confiance.",
+    "signatureValid": "signature valide",
+    "contactLine": "contact : {{contact}}",
+    "pluginsLine": "Plugins : {{number}}",
+    "signingKey": "Clé de signature",
+    "warningTitle": "Dépôt non officiel",
+    "warningBody": "Mumcord ne vérifie pas ces plugins. Cette clé est mémorisée : si elle change, le dépôt est mis en pause jusqu'à ce que vous la vérifiiez. Le parcourir montre votre adresse IP à son hébergeur. Les plugins portant des noms officiels n'en sont jamais repris."
+  },
+  "limit": "Vous pouvez ajouter jusqu'à {{max}} dépôts.",
+  "limitReached": "La limite de {{max}} dépôts est atteinte.",
+  "empty": "Aucun dépôt ajouté pour l'instant.",
+  "listLabel": "Dépôts ajoutés",
+  "loadFailed": "Impossible de charger les dépôts.",
+  "status": {
+    "keyChanged": "Clé modifiée, en pause"
+  },
+  "fingerprintLine": "Empreinte de la clé : {{fingerprint}}",
+  "neverChecked": "Pas encore vérifié",
+  "lastChecked": "Dernière vérification : {{when}}",
+  "installedCount": "Plugins installés : {{number}}",
+  "toggle": "Utiliser {{name}}",
+  "remove": {
+    "button": "Supprimer",
+    "label": "Supprimer {{name}}",
+    "title": "Supprimer {{name}} ?",
+    "message": "Le dépôt est supprimé et ses plugins sont désactivés. Ils restent installés avec leurs données, mais ne reçoivent plus de mises à jour.",
+    "confirm": "Supprimer"
+  },
+  "keyChange": {
+    "title": "{{name}} a changé de clé",
+    "message": "Ce dépôt signe désormais sa liste de plugins avec une autre clé. Il reste en pause jusqu'à votre décision. Ne faites confiance à la nouvelle clé que si le propriétaire vous a annoncé ce changement.",
+    "oldKey": "Clé approuvée jusqu'ici",
+    "newKey": "Nouvelle clé",
+    "keepPaused": "Laisser en pause",
+    "trust": "Faire confiance à la nouvelle clé",
+    "review": "Examiner le changement de clé"
+  },
+  "mirror": {
+    "title": "Avancé",
+    "label": "Miroir de la liste officielle des plugins (facultatif)",
+    "hint": "Ne modifiez ceci que si on vous a donné une adresse de miroir. Le miroir doit fournir les mêmes fichiers signés ; Mumcord vérifie quand même chaque signature.",
+    "save": "Enregistrer",
+    "reset": "Utiliser la valeur par défaut"
+  },
+  "official": {
+    "name": "Plugins officiels de Mumcord",
+    "alwaysOn": "Toujours actif"
+  }
+}

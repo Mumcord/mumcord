@@ -1,0 +1,35 @@
+{
+  "hint": "Luchtaigh fillteán breiseáin neamhphacáilte chun é a thástáil. Níl na breiseáin forbróra sínithe, ní bhíonn siad oifigiúil riamh agus ní féidir net.http, secrets ná ui.webview a thabhairt dóibh. Díluchtaítear iad nuair a dhíghníomhaítear mód an fhorbróra.",
+  "load": "Luchtaigh fillteán breiseáin…",
+  "pickFolder": "Roghnaigh fillteán an bhreiseáin",
+  "empty": "Níl aon bhreiseán forbróra luchtaithe.",
+  "listLabel": "Breiseáin forbróra",
+  "label": "Breiseán forbróra",
+  "status": {
+    "running": "Ag rith",
+    "off": "As",
+    "backingOff": "Ag atosú tar éis tuairteála",
+    "autoOff": "Casta as tar éis tuairteanna arís agus arís eile",
+    "allOff": "Tá gach breiseán as",
+    "noPlugins": "Tá breiseáin as don seisiún seo",
+    "notLoaded": "Níorbh fhéidir é a luchtú"
+  },
+  "showLog": "Taispeáin logchomhad {{name}}",
+  "reload": "Athluchtaigh {{name}}",
+  "unload": "Díluchtaigh {{name}}",
+  "logLabel": "Logchomhad {{name}}",
+  "logTitle": "Logchomhad {{name}}",
+  "logEmpty": "Níl aon línte logála ann go fóill.",
+  "level": {
+    "debug": "Dífhabhtú",
+    "info": "Eolas",
+    "warn": "Rabhadh",
+    "error": "Earráid"
+  },
+  "errors": {
+    "load": "Níorbh fhéidir fillteán an bhreiseáin a luchtú.",
+    "reload": "Níorbh fhéidir an breiseán a athluchtú.",
+    "unload": "Níorbh fhéidir an breiseán a dhíluchtú.",
+    "log": "Níorbh fhéidir an logchomhad a léamh."
+  }
+}

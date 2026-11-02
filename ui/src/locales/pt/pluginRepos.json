@@ -1,0 +1,60 @@
+{
+  "intro": "Repositórios são listas de plugins extra geridas por outras pessoas. O Mumcord não analisa os plugins deles. Adicione apenas repositórios em que confia.",
+  "add": {
+    "button": "Adicionar repositório",
+    "title": "Adicionar repositório",
+    "address": "Endereço do repositório",
+    "expectedKey": "Chave esperada (opcional)",
+    "expectedKeyHint": "Se o proprietário lhe deu uma chave, cole-a aqui. O repositório terá de usar exatamente essa chave.",
+    "check": "Verificar repositório",
+    "found": "O que encontrámos",
+    "confirm": "Adicionar repositório",
+    "subtitle": "Adicione apenas repositórios de pessoas em quem confia.",
+    "signatureValid": "assinatura válida",
+    "contactLine": "contacto: {{contact}}",
+    "pluginsLine": "Plugins: {{number}}",
+    "signingKey": "Chave de assinatura",
+    "warningTitle": "Repositório não oficial",
+    "warningBody": "O Mumcord não analisa estes plugins. Esta chave fica memorizada: se mudar, o repositório fica em pausa até a verificar. Ao navegar nele, o seu endereço IP é visível para o anfitrião. Plugins com nomes oficiais nunca são obtidos daqui."
+  },
+  "limit": "Pode adicionar até {{max}} repositórios.",
+  "limitReached": "Foi atingido o limite de {{max}} repositórios.",
+  "empty": "Ainda não adicionou repositórios.",
+  "listLabel": "Repositórios adicionados",
+  "loadFailed": "Não foi possível carregar os repositórios.",
+  "status": {
+    "keyChanged": "Chave alterada, em pausa"
+  },
+  "fingerprintLine": "Impressão digital da chave: {{fingerprint}}",
+  "neverChecked": "Ainda não verificado",
+  "lastChecked": "Última verificação: {{when}}",
+  "installedCount": "Plugins instalados: {{number}}",
+  "toggle": "Usar {{name}}",
+  "remove": {
+    "button": "Remover",
+    "label": "Remover {{name}}",
+    "title": "Remover {{name}}?",
+    "message": "O repositório é removido e os seus plugins são desativados. Continuam instalados com os seus dados, mas deixam de receber atualizações.",
+    "confirm": "Remover"
+  },
+  "keyChange": {
+    "title": "{{name}} alterou a chave",
+    "message": "Este repositório passou a assinar a sua lista de plugins com outra chave. Fica em pausa até decidir. Confie na nova chave só se o proprietário o avisou da alteração.",
+    "oldKey": "Chave em que confiava",
+    "newKey": "Nova chave",
+    "keepPaused": "Manter em pausa",
+    "trust": "Confiar na nova chave",
+    "review": "Rever a alteração da chave"
+  },
+  "mirror": {
+    "title": "Avançado",
+    "label": "Espelho da lista oficial de plugins (opcional)",
+    "hint": "Altere isto apenas se lhe deram o endereço de um espelho. O espelho tem de servir os mesmos ficheiros assinados; o Mumcord continua a verificar cada assinatura.",
+    "save": "Guardar",
+    "reset": "Usar o predefinido"
+  },
+  "official": {
+    "name": "Plugins oficiais do Mumcord",
+    "alwaysOn": "Sempre ativo"
+  }
+}

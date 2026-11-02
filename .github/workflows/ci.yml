@@ -204,9 +204,11 @@ jobs:
             echo "LIBCLANG_PATH=$libclang"
           } >> "$GITHUB_ENV"
 
+      # wasm32: the plugin SDK build test and the safety fixtures below (Linux only).
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: ${{ runner.os == 'Linux' && 'wasm32-unknown-unknown' || '' }}
 
       # Pull requests only restore: each one saving its own ~1 GB copy filled the 10 GB repository
       # cache and evicted main's caches, so later runs started cold.
@@ -250,6 +252,26 @@ jobs:
       - name: Codec crate tests
         if: matrix.task == 'test' && runner.os == 'Linux'
         run: cargo test -p mumcord-codec --locked
+
+      # The plugin crates' tests (runtime, frozen WIT snapshot, SDK, CLI scenarios) run in "Rust
+      # tests" above. These cover what that skips: a plugin built with the SDK for wasm32 through
+      # the CLI (new, reproducible build, check, sign), and the safety fixtures, whose builder is a
+      # Cargo project outside the workspace. Both share the workspace target dir and its cache.
+      - name: Plugin SDK build test
+        if: matrix.task == 'test' && runner.os == 'Linux'
+        run: cargo test -p mumcord-plugin --test author_flow --locked -- --ignored
+
+      - name: Plugin fixture builder lint
+        if: matrix.task == 'check' && runner.os == 'Linux'
+        run: cargo clippy --manifest-path crates/plugins/tests/fixtures/safety/builder/Cargo.toml --locked -- -D warnings
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+
+      - name: Plugin safety fixtures build
+        if: matrix.task == 'test' && runner.os == 'Linux'
+        run: scripts/build-plugin-fixtures.sh "$RUNNER_TEMP/plugin-fixtures"
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
 
       # release.yml and publish-crates.yml set the tag's version with this script before building.
       - name: Version script

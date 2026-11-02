@@ -11,11 +11,25 @@ fn local() -> SocketAddr {
     SocketAddr::from(([127, 0, 0, 1], 0))
 }
 
+/// Binds a TCP listener and a UDP socket on the same port. The TCP port is picked by the OS, and
+/// on Windows that number can fall in a range reserved for UDP (os error 10013), so another
+/// port is tried until both sockets fit.
+async fn echo_sockets() -> Result<(TcpListener, UdpSocket, SocketAddr)> {
+    let mut last = None;
+    for _ in 0..20 {
+        let tcp = TcpListener::bind(local()).await?;
+        let target = tcp.local_addr()?;
+        match UdpSocket::bind(target).await {
+            Ok(udp) => return Ok((tcp, udp, target)),
+            Err(e) => last = Some(e),
+        }
+    }
+    Err(last.expect("at least one attempt").into())
+}
+
 /// Starts TCP and UDP echo servers on one port and a proxy in front of them.
 async fn setup() -> Result<Netsim> {
-    let tcp = TcpListener::bind(local()).await?;
-    let target = tcp.local_addr()?;
-    let udp = UdpSocket::bind(target).await?;
+    let (tcp, udp, target) = echo_sockets().await?;
     tokio::spawn(async move {
         loop {
             if let Ok((mut s, _)) = tcp.accept().await {

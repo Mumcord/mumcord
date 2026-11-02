@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "This plugin shows nothing here yet.",
+    "actionFailed": "The plugin could not handle that. Please try again."
+  },
+  "progress": {
+    "working": "In progress"
+  },
+  "countdown": {
+    "done": "Time's up"
+  },
+  "select": {
+    "refresh": "Refresh {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} characters"
+  },
+  "password": {
+    "save": "Save",
+    "saved": "Saved securely"
+  },
+  "file": {
+    "choose": "Choose file…",
+    "none": "No file chosen"
+  },
+  "list": {
+    "handle": "Move row {{position}} of {{total}} (Arrow Up or Down)",
+    "moved": "Moved row {{from}} to position {{to}} of {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copied",
+    "failed": "Could not copy"
+  }
+}

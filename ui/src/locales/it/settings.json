@@ -15,7 +15,8 @@
     "advanced": "Avanzate e sviluppatori",
     "about": "Informazioni",
     "packetInspector": "Ispettore pacchetti",
-    "hotkeys": "Scorciatoie"
+    "hotkeys": "Scorciatoie",
+    "plugins": "Plugin"
   },
   "sectionDescriptions": {
     "general": "Avvio, lingua, aggiornamenti e accessibilità.",
@@ -27,7 +28,8 @@
     "servers": "Connessioni a più server e impostazioni per server.",
     "gaming": "L'overlay in gioco, l'audio posizionale e i plugin di gioco.",
     "advanced": "Strumenti per sviluppatori, diagnostica, archiviazione e licenze.",
-    "about": "Versione, supporto e procedura guidata di configurazione."
+    "about": "Versione, supporto e procedura guidata di configurazione.",
+    "plugins": "I plugin vengono eseguiti in una sandbox e ricevono solo ciò che consenti. Non vedono mai il tuo audio, i tuoi file o il tuo certificato."
   },
   "breadcrumb": "Impostazioni / {{section}}",
   "moreInfo": "Ulteriori informazioni: {{topic}}",
@@ -1051,5 +1053,10 @@
     "addConfirm": "Aggiungi",
     "reset": "Ripristina tutte le scorciatoie",
     "resetHint": "Rimuove tutte le scorciatoie tranne il push-to-talk; per impostazione predefinita non ne è impostata nessuna."
+  },
+  "developerMode": {
+    "title": "Modalità sviluppatore",
+    "switch": "Modalità sviluppatore",
+    "hint": "Aggiunge una scheda Sviluppatore ai plugin per caricare plugin non firmati da una cartella. Attivala solo se crei plugin."
   }
 }

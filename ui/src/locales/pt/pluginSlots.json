@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Este plugin ainda não mostra nada aqui.",
+    "actionFailed": "O plugin não conseguiu tratar isso. Tente novamente."
+  },
+  "progress": {
+    "working": "Em curso"
+  },
+  "countdown": {
+    "done": "O tempo acabou"
+  },
+  "select": {
+    "refresh": "Atualizar {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} caracteres"
+  },
+  "password": {
+    "save": "Guardar",
+    "saved": "Guardado em segurança"
+  },
+  "file": {
+    "choose": "Escolher ficheiro…",
+    "none": "Nenhum ficheiro escolhido"
+  },
+  "list": {
+    "handle": "Mover a linha {{position}} de {{total}} (seta para cima ou para baixo)",
+    "moved": "Linha {{from}} movida para a posição {{to}} de {{total}}"
+  },
+  "copyButton": {
+    "copied": "Copiado",
+    "failed": "Não foi possível copiar"
+  }
+}

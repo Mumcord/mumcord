@@ -278,14 +278,15 @@ pub(crate) fn transient_id() -> String {
 }
 
 /// Incoming text message: route, sanitize, apply blocks (issue #140) and the private message
-/// rule (issue #141), then store, emit and count unread (hook from the session).
+/// rule (issue #141), then store, emit and count unread (hook from the session). Returns the id
+/// of the shown message, so plugin chat events can name it.
 pub(crate) fn on_text(
     ctx: &SessionCtx,
     msg: &TextMessage,
     peers: &crate::mumcord::ServerPeers,
     requests: &crate::pm_rules::ServerRequests,
     block_list: &crate::blocking::BlockList,
-) {
+) -> Option<String> {
     let routed = ctx.handle.with_state(|s| {
         let route = route(s, msg)?;
         let sender = msg.actor.and_then(|a| s.users.get(&a));
@@ -296,9 +297,7 @@ pub(crate) fn on_text(
             is_own_sender(s, msg.actor),
         ))
     });
-    let Some((route, sender_name, sender_cert_hash, own)) = routed else {
-        return;
-    };
+    let (route, sender_name, sender_cert_hash, own) = routed?;
     let conversation = match route {
         Route::Channel(channel_id) => ConversationRef::Channel { channel_id },
         Route::Private { session } => match &sender_cert_hash {
@@ -326,16 +325,16 @@ pub(crate) fn on_text(
     let private = matches!(route, Route::Private { .. });
     let verdict = crate::blocking::text_verdict(private, blocked);
     if verdict == crate::blocking::TextVerdict::Drop {
-        return;
+        return None;
     }
     if let Route::Private { session } = route {
         match crate::pm_rules::screen(ctx, peers, requests, session) {
             crate::pm_rules::Verdict::Show => {}
             crate::pm_rules::Verdict::Hold => {
                 crate::pm_rules::hold(ctx, requests, session, message);
-                return;
+                return None;
             }
-            crate::pm_rules::Verdict::Drop => return,
+            crate::pm_rules::Verdict::Drop => return None,
         }
     }
     // Own messages never count as unread, even when a server or another session of the user
@@ -343,7 +342,7 @@ pub(crate) fn on_text(
     let counts_unread = !own
         && verdict == crate::blocking::TextVerdict::Normal
         && ctx.handle.with_state(|s| counts_unread(s, route));
-    deliver(ctx, message, counts_unread);
+    deliver(ctx, message, counts_unread)
 }
 
 /// Whether `actor` is the user's own session or another session with the user's certificate:
@@ -360,17 +359,22 @@ fn is_own_sender(state: &ServerState, actor: Option<u32>) -> bool {
 }
 
 /// Stores, emits and counts an incoming message; also used for held message requests once
-/// they are accepted (issue #141).
-pub(crate) fn deliver(ctx: &SessionCtx, mut message: ChatMessageView, counts_unread: bool) {
+/// they are accepted (issue #141). Returns the message id.
+pub(crate) fn deliver(
+    ctx: &SessionCtx,
+    mut message: ChatMessageView,
+    counts_unread: bool,
+) -> Option<String> {
     let conversation = message.conversation.clone();
     let Ok(key) = unread_key(ctx, &conversation) else {
-        return;
+        return None;
     };
     let stored = match &key {
         UnreadKey::Stored(c) => Some(c.clone()),
         UnreadKey::Session(_) => None,
     };
     message.id = store_message(&ctx.store(), ctx.server_id, stored, &message);
+    let id = message.id.clone();
     ctx.events
         .emit(EngineEvent::MessageReceived(Box::new(message)));
     if counts_unread {
@@ -385,6 +389,7 @@ pub(crate) fn deliver(ctx: &SessionCtx, mut message: ChatMessageView, counts_unr
             count,
         }));
     }
+    Some(id)
 }
 
 /// Fills `snapshot.unread` after a (re)sync. Followed channels start from the store's read
@@ -538,11 +543,9 @@ impl Engine {
             .send_text(&TextTarget::channel(channel_id), html)
             .map_err(command_error)?;
         await_refusal(&ctx, denials, Some(channel_id)).await?;
-        Ok(own_message(
-            &ctx,
-            ConversationRef::Channel { channel_id },
-            html,
-        ))
+        let message = own_message(&ctx, ConversationRef::Channel { channel_id }, html);
+        crate::plugins::on_own_text(ctx.events.plugins(), &ctx, channel_id, html, &message.id);
+        Ok(message)
     }
 
     /// Sends Mumble HTML to one person on `server_id` and returns the stored own message.

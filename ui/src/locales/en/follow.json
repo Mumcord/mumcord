@@ -1,6 +1,5 @@
 {
   "follow": "Follow",
-  "following": "Following",
   "unsupported": "Following channels needs a server running version 1.4 or newer.",
   "unread_one": "{{count}} unread message",
   "unread_other": "{{count}} unread messages",

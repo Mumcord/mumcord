@@ -1,11 +1,14 @@
 name: Publish crates
 
-# Publishes the library crates mumcord-protocol, mumcord-codec, mumcord-store, mumcord-audio and mumcord-p2p to crates.io so other projects
-# (for example the bot) can depend on them by version. Called by release.yml after the draft
-# release exists, with the tag's version. Runnable by hand from a version tag (or main) to publish
-# a release's crates without a new release. Each job first sets the version in the manifests,
-# which the repository does not carry (scripts/set-version.sh). A version that is already on
-# crates.io is skipped per crate, pre-release versions are never published. See RELEASING.md.
+# Publishes the library crates mumcord-protocol, mumcord-codec, mumcord-store, mumcord-audio and
+# mumcord-p2p to crates.io so other projects (for example the bot) can depend on them by version,
+# and the plugin crates mumcord-plugin-sdk, mumcord-plugins and mumcord-plugin (the CLI), so plugin
+# authors can `cargo install mumcord-plugin` and depend on the SDK. Called by release.yml after the
+# draft release exists, with the tag's version. Runnable by hand from a version tag (or main) to
+# publish a release's crates without a new release. Each job first sets the version in the
+# manifests, which the repository does not carry (scripts/set-version.sh). A version that is
+# already on crates.io is skipped per crate, pre-release versions are never published. See
+# RELEASING.md.
 on:
   workflow_call:
     inputs:
@@ -326,3 +329,172 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         # --allow-dirty: the version step changed the manifests in the checkout.
         run: cargo publish -p mumcord-p2p --locked --allow-dirty
+
+  publish-plugin-sdk:
+    name: Publish mumcord-plugin-sdk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Only publish from main or a version tag
+        if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "::error::Run this workflow from main."
+          exit 1
+
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
+
+      - name: Check whether this version is already published
+        id: check
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.name == "mumcord-plugin-sdk") | .version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-* ]]; then
+            echo "::notice::mumcord-plugin-sdk $version is a pre-release; not publishing."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # crates.io rejects API requests without a User-Agent.
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -A "mumcord-ci (https://github.com/Mumcord/mumcord)" \
+            "https://crates.io/api/v1/crates/mumcord-plugin-sdk/$version")
+          case "$status" in
+            200)
+              echo "::notice::mumcord-plugin-sdk $version is already on crates.io; nothing to do."
+              echo "publish=false" >> "$GITHUB_OUTPUT" ;;
+            404)
+              echo "publish=true" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error::crates.io answered HTTP $status; cannot tell whether $version exists."
+              exit 1 ;;
+          esac
+
+      - name: Publish to crates.io
+        if: steps.check.outputs.publish == 'true'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-plugin-sdk --locked --allow-dirty
+
+  publish-plugins:
+    name: Publish mumcord-plugins
+    # mumcord-plugins depends on mumcord-store, which must be on crates.io first.
+    needs: publish-store
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Only publish from main or a version tag
+        if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "::error::Run this workflow from main."
+          exit 1
+
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
+
+      - name: Check whether this version is already published
+        id: check
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.name == "mumcord-plugins") | .version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-* ]]; then
+            echo "::notice::mumcord-plugins $version is a pre-release; not publishing."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # crates.io rejects API requests without a User-Agent.
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -A "mumcord-ci (https://github.com/Mumcord/mumcord)" \
+            "https://crates.io/api/v1/crates/mumcord-plugins/$version")
+          case "$status" in
+            200)
+              echo "::notice::mumcord-plugins $version is already on crates.io; nothing to do."
+              echo "publish=false" >> "$GITHUB_OUTPUT" ;;
+            404)
+              echo "publish=true" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error::crates.io answered HTTP $status; cannot tell whether $version exists."
+              exit 1 ;;
+          esac
+
+      - name: Publish to crates.io
+        if: steps.check.outputs.publish == 'true'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-plugins --locked --allow-dirty
+
+  publish-plugin-cli:
+    name: Publish mumcord-plugin
+    # The CLI depends on mumcord-plugins and mumcord-store, which must be on crates.io first.
+    needs: [publish-store, publish-plugins]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Only publish from main or a version tag
+        if: github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "::error::Run this workflow from main."
+          exit 1
+
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Set version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "$VERSION" && "$GITHUB_REF" == refs/tags/v* ]]; then VERSION=${GITHUB_REF_NAME#v}; fi
+          scripts/set-version.sh "${VERSION:-$(scripts/latest-release-version.sh)}"
+
+      - name: Check whether this version is already published
+        id: check
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.name == "mumcord-plugin") | .version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-* ]]; then
+            echo "::notice::mumcord-plugin $version is a pre-release; not publishing."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # crates.io rejects API requests without a User-Agent.
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -A "mumcord-ci (https://github.com/Mumcord/mumcord)" \
+            "https://crates.io/api/v1/crates/mumcord-plugin/$version")
+          case "$status" in
+            200)
+              echo "::notice::mumcord-plugin $version is already on crates.io; nothing to do."
+              echo "publish=false" >> "$GITHUB_OUTPUT" ;;
+            404)
+              echo "publish=true" >> "$GITHUB_OUTPUT" ;;
+            *)
+              echo "::error::crates.io answered HTTP $status; cannot tell whether $version exists."
+              exit 1 ;;
+          esac
+
+      - name: Publish to crates.io
+        if: steps.check.outputs.publish == 'true'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        # --allow-dirty: the version step changed the manifests in the checkout.
+        run: cargo publish -p mumcord-plugin --locked --allow-dirty

@@ -482,6 +482,56 @@
   font-size: var(--font-size-lg);
 }
 
+.userpanel-modal__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.userpanel-modal__head > img {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.userpanel-modal__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.userpanel-modal__titles h2 {
+  margin: 0;
+}
+
+.userpanel-modal__subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.userpanel-modal__close {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  align-self: flex-start;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.userpanel-modal__close:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
 .userpanel-form {
   display: flex;
   flex-direction: column;
@@ -524,7 +574,7 @@
   overflow-y: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  background: var(--color-surface);
+  background: var(--color-bg-elevated);
   color: var(--color-text);
 }
 

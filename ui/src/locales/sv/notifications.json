@@ -23,7 +23,8 @@
       "all": "Alla",
       "mentions": "Omnämnanden",
       "requests": "Förfrågningar",
-      "invites": "Inbjudningar"
+      "invites": "Inbjudningar",
+      "plugins": "Tillägg"
     },
     "empty": "Du är ikapp.",
     "unread": "Olästa",

@@ -1,0 +1,35 @@
+{
+  "hint": "Carregue uma pasta de plugin não empacotada para a testar. Os plugins de programador não são assinados, nunca são oficiais e não podem obter net.http, secrets nem ui.webview. São descarregados quando o modo de programador é desativado.",
+  "load": "Carregar pasta do plugin…",
+  "pickFolder": "Escolha a pasta do plugin",
+  "empty": "Nenhum plugin de programador carregado.",
+  "listLabel": "Plugins de programador",
+  "label": "Plugin de programador",
+  "status": {
+    "running": "Em execução",
+    "off": "Desativado",
+    "backingOff": "A reiniciar após uma falha",
+    "autoOff": "Desativado após falhas repetidas",
+    "allOff": "Todos os plugins estão desativados",
+    "noPlugins": "Os plugins estão desativados nesta sessão",
+    "notLoaded": "Não foi possível carregar"
+  },
+  "showLog": "Mostrar o registo de {{name}}",
+  "reload": "Recarregar {{name}}",
+  "unload": "Descarregar {{name}}",
+  "logLabel": "Registo de {{name}}",
+  "logTitle": "Registo de {{name}}",
+  "logEmpty": "Ainda sem linhas de registo.",
+  "level": {
+    "debug": "Depuração",
+    "info": "Info",
+    "warn": "Aviso",
+    "error": "Erro"
+  },
+  "errors": {
+    "load": "Não foi possível carregar a pasta do plugin.",
+    "reload": "Não foi possível recarregar o plugin.",
+    "unload": "Não foi possível descarregar o plugin.",
+    "log": "Não foi possível ler o registo."
+  }
+}

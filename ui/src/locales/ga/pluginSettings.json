@@ -1,0 +1,22 @@
+{
+  "title": "Breiseáin",
+  "tabsLabel": "Rannáin na mbreiseán",
+  "tabs": {
+    "installed": "Suiteáilte",
+    "browse": "Brabhsáil",
+    "updates": "Nuashonruithe",
+    "repositories": "Stórais",
+    "developer": "Forbróir"
+  },
+  "turnOffAll": "Cuir gach breiseán as",
+  "allOff": "Tá gach breiseán as. Fanfaidh siad as, fiú tar éis atosaithe, go dtí go gcuirfidh tú air arís iad.",
+  "noPlugins": "Tá na breiseáin as don seisiún seo (tosaithe le --no-plugins).",
+  "loadFailed": "Níorbh fhéidir na breiseáin a lódáil.",
+  "palette": {
+    "label": "Pailéad ordaithe",
+    "placeholder": "Clóscríobh ordú",
+    "empty": "Níl aon ordú comhoiriúnach ann",
+    "openPlugins": "Breiseáin",
+    "turnOffAll": "Cuir gach breiseán as"
+  }
+}

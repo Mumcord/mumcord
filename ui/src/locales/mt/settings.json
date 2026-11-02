@@ -15,7 +15,8 @@
     "advanced": "Avvanzat u żviluppaturi",
     "about": "Dwar",
     "packetInspector": "Ispettur tal-pakketti",
-    "hotkeys": "Shortcuts"
+    "hotkeys": "Shortcuts",
+    "plugins": "Plagins"
   },
   "sectionDescriptions": {
     "general": "Tnedija, lingwa, aġġornamenti u aċċessibbiltà.",
@@ -27,7 +28,8 @@
     "servers": "Konnessjonijiet ma' diversi servers u settings għal kull server.",
     "gaming": "L-overlay fil-logħba, awdjo pożizzjonali u plugins tal-logħob.",
     "advanced": "Għodod għall-iżviluppaturi, dijanjostika, ħażna u liċenzji.",
-    "about": "Verżjoni, appoġġ u l-wizard tas-setup."
+    "about": "Verżjoni, appoġġ u l-wizard tas-setup.",
+    "plugins": "Il-plugins jaħdmu f'sandbox u jirċievu biss dak li tippermetti. Qatt ma jaraw l-awdjo, il-fajls jew iċ-ċertifikat tiegħek."
   },
   "breadcrumb": "Settings / {{section}}",
   "moreInfo": "Aktar informazzjoni: {{topic}}",
@@ -1067,5 +1069,10 @@
     "addConfirm": "Żid",
     "reset": "Irrisettja s-shortcuts kollha",
     "resetHint": "Ineħħi s-shortcuts kollha ħlief push-to-talk; b'mod awtomatiku ma hemm xejn issettjat."
+  },
+  "developerMode": {
+    "title": "Modalità tal-iżviluppatur",
+    "switch": "Modalità tal-iżviluppatur",
+    "hint": "Iżid tab Żviluppatur mal-Plagins fejn tista' tgħabbi plagins mhux iffirmati minn folder. Ixgħelha biss jekk tibni l-plagins int stess."
   }
 }

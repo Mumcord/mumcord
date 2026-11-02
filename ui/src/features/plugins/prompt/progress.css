@@ -1,0 +1,48 @@
+.plugin-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.plugin-progress__bar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-sidebar);
+}
+
+.plugin-progress--slim .plugin-progress__bar {
+  height: 0.25rem;
+}
+
+.plugin-progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gradient-accent);
+  transition: width var(--duration-normal) linear;
+}
+
+.plugin-progress__text {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-progress--slim .plugin-progress__text {
+  font-size: var(--font-size-xs);
+}
+
+.plugin-progress__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plugin-progress__fill {
+    transition: none;
+  }
+}

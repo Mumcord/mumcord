@@ -29,7 +29,6 @@
   "bitrate": "Bitrate",
   "path": "Vej",
   "pathDirect": "Direkte",
-  "pathUnknown": "Ukendt",
   "sound": "Lyd",
   "soundOn": "Lyd til",
   "soundOff": "Lyd fra",

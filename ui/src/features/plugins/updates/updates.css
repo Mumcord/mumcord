@@ -1,0 +1,220 @@
+.plugin-updates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.plugin-updates__heading {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+
+.plugin-pin {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.plugin-revocation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+}
+
+.plugin-revocation__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 12rem;
+  color: var(--color-text-secondary);
+}
+
+.plugin-revocation__text strong {
+  color: var(--color-text);
+}
+
+.plugin-revocation__link {
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-updates__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plugin-updates__checked {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.plugin-updates__settings summary {
+  cursor: pointer;
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-updates__empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.plugin-updates__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plugin-update {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.plugin-update__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-bold);
+  overflow: hidden;
+}
+
+.plugin-update__icon-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.plugin-update__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.plugin-update__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+}
+
+.plugin-update__name {
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-update__to {
+  color: var(--color-text);
+}
+
+.plugin-update__pill {
+  padding: 0 var(--space-2);
+  border: 1px solid currentcolor;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-update__pill--none {
+  color: var(--color-success);
+}
+
+.plugin-update__pill--permission,
+.plugin-update__pill--author {
+  color: var(--color-warning);
+}
+
+.plugin-update__permissions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  list-style: none;
+}
+
+.plugin-update__permission-mark {
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-update__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.plugin-update__meta,
+.plugin-update__note {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.plugin-update__note--warn {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-update__actions {
+  display: flex;
+  align-self: center;
+  gap: var(--space-2);
+}
+
+/* Optional permissions an update added; the user turns them on here (F39). */
+.plugin-offer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+}
+
+.plugin-offer__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.plugin-offer__permissions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plugin-offer__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

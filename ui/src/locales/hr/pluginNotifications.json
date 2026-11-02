@@ -1,0 +1,30 @@
+{
+  "type": "Dodatak",
+  "autoOff": {
+    "title": "Dodatak {{name}} je isključen",
+    "body": "Isključen nakon ponovljenih rušenja",
+    "open": "Prikaži u Dodacima"
+  },
+  "update": {
+    "title": "Ažuriranje za {{name}}",
+    "body": "Verzija {{version}} čeka na kartici Ažuriranja",
+    "open": "Prikaži ažuriranja"
+  },
+  "suggestion": {
+    "title": "Ovaj poslužitelj koristi {{name}}",
+    "noReason": "Predložio poslužitelj",
+    "install": "Instaliraj…",
+    "installLabel": "Instaliraj {{name}}",
+    "addRepositoryLabel": "Dodaj repozitorij za {{name}}",
+    "details": "Prikaži pojedinosti",
+    "detailsLabel": "Pojedinosti o {{name}}",
+    "notNow": "Ne sada",
+    "notNowLabel": "Za sada sakrij {{name}}",
+    "dontAsk": "Više ne pitaj za ovaj poslužitelj",
+    "recommended": "Preporučeno",
+    "official": "Službeno",
+    "unofficial": "Neslužbeno · {{host}}",
+    "footer": "Prijedlozi nikad ništa ne instaliraju sami. Poslužitelj ne zna što instalirate."
+  },
+  "failed": "Nije uspjelo. Pokušajte ponovno."
+}

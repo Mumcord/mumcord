@@ -15,7 +15,8 @@
     "advanced": "Pokročilé a vývojářské",
     "about": "O aplikaci",
     "packetInspector": "Inspektor paketů",
-    "hotkeys": "Klávesové zkratky"
+    "hotkeys": "Klávesové zkratky",
+    "plugins": "Doplňky"
   },
   "sectionDescriptions": {
     "general": "Spuštění, jazyk, aktualizace a přístupnost.",
@@ -27,7 +28,8 @@
     "servers": "Připojení k více serverům a nastavení pro jednotlivé servery.",
     "gaming": "Překryv ve hře, poziční zvuk a herní pluginy.",
     "advanced": "Vývojářské nástroje, diagnostika, úložiště a licence.",
-    "about": "Verze, podpora a průvodce nastavením."
+    "about": "Verze, podpora a průvodce nastavením.",
+    "plugins": "Pluginy běží v izolovaném prostředí a dostanou jen to, co povolíte. Nikdy nevidí váš zvuk, soubory ani certifikát."
   },
   "breadcrumb": "Nastavení / {{section}}",
   "moreInfo": "Další informace: {{topic}}",
@@ -1059,5 +1061,10 @@
     "addConfirm": "Přidat",
     "reset": "Obnovit všechny zkratky",
     "resetHint": "Odebere všechny zkratky kromě push-to-talk; ve výchozím stavu není nic nastaveno."
+  },
+  "developerMode": {
+    "title": "Režim vývojáře",
+    "switch": "Režim vývojáře",
+    "hint": "Přidá k doplňkům kartu Vývojář, kde lze načíst nepodepsané doplňky ze složky. Zapněte jej, jen pokud doplňky sami vytváříte."
   }
 }

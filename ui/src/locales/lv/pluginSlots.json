@@ -1,0 +1,34 @@
+{
+  "tree": {
+    "empty": "Šis spraudnis šeit vēl neko nerāda.",
+    "actionFailed": "Spraudnis to nevarēja apstrādāt. Lūdzu, mēģiniet vēlreiz."
+  },
+  "progress": {
+    "working": "Notiek"
+  },
+  "countdown": {
+    "done": "Laiks beidzies"
+  },
+  "select": {
+    "refresh": "Atsvaidzināt: {{label}}"
+  },
+  "input": {
+    "chars": "{{used}} / {{max}} rakstzīmes"
+  },
+  "password": {
+    "save": "Saglabāt",
+    "saved": "Droši saglabāts"
+  },
+  "file": {
+    "choose": "Izvēlēties failu…",
+    "none": "Fails nav izvēlēts"
+  },
+  "list": {
+    "handle": "Pārvietot rindu {{position}} no {{total}} (bultiņa augšup vai lejup)",
+    "moved": "Rinda {{from}} pārvietota uz {{to}}. vietu no {{total}}"
+  },
+  "copyButton": {
+    "copied": "Nokopēts",
+    "failed": "Kopēšana neizdevās"
+  }
+}

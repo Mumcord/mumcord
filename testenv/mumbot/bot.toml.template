@@ -1,0 +1,33 @@
+# Template of the local test bot's config. up.sh renders it to <data>/mumbot/bot.toml with the key
+# from testenv/.env and the server's certificate hash; the result holds the key and stays git-ignored.
+[server]
+host = "v15"                 # the compose service; port 64738 inside the compose network
+name = "MumbotLocal"
+cert_name = "mumbotlocal"
+channel = "Lobby"
+server_cert_sha256 = "@CERT_SHA256@"
+
+[modules]
+enabled = ["music", "plugins"]
+
+[music]
+listen = "0.0.0.0:8081"      # inside the container; compose publishes it on 127.0.0.1 only
+channel = "Lobby"
+media_dir = "/media"
+
+# URL sources point at a throwaway HTTP server on the host in the E2E tests.
+[music.urls]
+enabled = true
+allow_hosts = ["host.docker.internal"]
+allow_private = true
+
+[[music.keys]]
+key = "@API_KEY@"
+label = "testenv"
+channels = ["Lobby", "Raid", "AFK"]
+
+[[plugins.announce]]
+id = "dice"
+min = "1.0.0"
+source = "official"
+for = "dice rolls at game nights"

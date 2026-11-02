@@ -1,0 +1,880 @@
+//! Chat integration rules (FR-6.43 … FR-6.45), free of I/O.
+//!
+//! The command registry decides who owns a slash command, the gesture gate decides whether a
+//! plugin may post a chat line right now, the supersede tracker pairs a plugin card with the
+//! plain-text fallback line, and the message claims decide which chat messages a plugin may
+//! replace with a card or hide. Time is passed in as `now` so every rule is testable. Nothing here
+//! logs or keeps chat text beyond a 4-byte hash.
+
+use std::collections::{HashMap, HashSet, VecDeque};
+use std::time::{Duration, Instant};
+
+use mumcord_store::ServerId;
+use sha2::{Digest, Sha256};
+
+use crate::manifest::Command;
+
+/// How long after a user gesture (button click or typed command) `chat.send` is allowed (FR-6.44).
+/// Long enough for a plugin to answer after a click, e.g. a verified dice roll.
+pub const GESTURE_WINDOW: Duration = Duration::from_secs(8);
+/// Longest text a plugin may post, in characters, without the prefix (FR-6.44).
+pub const MAX_SEND_CHARS: usize = 500;
+/// How long a text line and a card may be apart and still match (FR-6.45).
+pub const SUPERSEDE_WINDOW: Duration = Duration::from_secs(10);
+
+/// Who handles a typed slash command.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Resolution {
+    /// A Mumcord command; always wins.
+    Builtin,
+    /// A plugin command; the plugin receives it as a `ui-action` with source `command`.
+    Plugin {
+        plugin: String,
+        action: UiAction,
+    },
+    Unknown,
+}
+
+/// The `ui-action` a typed command turns into: the action is the command name and the value is
+/// the rest of the line (empty if there is none).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UiAction {
+    pub action: String,
+    pub text: String,
+}
+
+/// One autocomplete suggestion.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Suggestion {
+    pub name: String,
+    pub description: String,
+    pub usage: Option<String>,
+    /// The plugin name shown next to the command; `None` for built-ins.
+    pub plugin_name: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+struct Registered {
+    plugin: String,
+    plugin_name: String,
+    commands: Vec<Command>,
+}
+
+/// Slash commands of all installed plugins. Registration order is install order, which decides
+/// clashes between plugins ("first installed wins").
+#[derive(Debug, Default)]
+pub struct CommandRegistry {
+    builtins: Vec<(String, String)>,
+    plugins: Vec<Registered>,
+}
+
+impl CommandRegistry {
+    /// `builtins` are `(name, description)` pairs of the Mumcord commands.
+    pub fn new(builtins: &[(&str, &str)]) -> Self {
+        Self {
+            builtins: builtins
+                .iter()
+                .map(|(name, description)| ((*name).to_owned(), (*description).to_owned()))
+                .collect(),
+            plugins: Vec::new(),
+        }
+    }
+
+    /// Registers (or replaces, keeping its place in the install order) the commands of a plugin.
+    /// Call it for enabled plugins that hold the `commands` permission.
+    pub fn register(&mut self, plugin: &str, plugin_name: &str, commands: &[Command]) {
+        let entry = Registered {
+            plugin: plugin.to_owned(),
+            plugin_name: plugin_name.to_owned(),
+            commands: commands.to_vec(),
+        };
+        match self.plugins.iter_mut().find(|p| p.plugin == plugin) {
+            Some(existing) => *existing = entry,
+            None => self.plugins.push(entry),
+        }
+    }
+
+    /// Drops a plugin (disabled, removed or permission revoked); a later plugin may now own its
+    /// command names.
+    pub fn unregister(&mut self, plugin: &str) {
+        self.plugins.retain(|p| p.plugin != plugin);
+    }
+
+    fn is_builtin(&self, name: &str) -> bool {
+        self.builtins.iter().any(|(n, _)| n == name)
+    }
+
+    /// The plugin that owns `name`, if a plugin does (built-ins win, then the first installed).
+    fn owner(&self, name: &str) -> Option<&Registered> {
+        if self.is_builtin(name) {
+            return None;
+        }
+        self.plugins
+            .iter()
+            .find(|p| p.commands.iter().any(|c| c.name == name))
+    }
+
+    /// For the plugin's settings: `Some("Command taken by <owner>")` if `name` is declared by
+    /// `plugin` but owned by someone else (a built-in counts as "Mumcord").
+    pub fn taken_by(&self, plugin: &str, name: &str) -> Option<String> {
+        let declared = self
+            .plugins
+            .iter()
+            .any(|p| p.plugin == plugin && p.commands.iter().any(|c| c.name == name));
+        if !declared {
+            return None;
+        }
+        if self.is_builtin(name) {
+            return Some("Mumcord".to_owned());
+        }
+        self.owner(name)
+            .filter(|owner| owner.plugin != plugin)
+            .map(|owner| owner.plugin_name.clone())
+    }
+
+    /// All declared command names of `plugin` that it does not own.
+    pub fn lost_commands(&self, plugin: &str) -> Vec<(String, String)> {
+        let Some(entry) = self.plugins.iter().find(|p| p.plugin == plugin) else {
+            return Vec::new();
+        };
+        entry
+            .commands
+            .iter()
+            .filter_map(|c| {
+                self.taken_by(plugin, &c.name)
+                    .map(|by| (c.name.clone(), by))
+            })
+            .collect()
+    }
+
+    /// Decides who handles a typed line. `line` is the chat box content without trimming; only
+    /// lines starting with `/` are commands.
+    pub fn resolve(&self, line: &str) -> Resolution {
+        let Some(rest) = line.strip_prefix('/') else {
+            return Resolution::Unknown;
+        };
+        let (name, text) = match rest.split_once(char::is_whitespace) {
+            Some((name, text)) => (name, text.trim()),
+            None => (rest, ""),
+        };
+        if self.is_builtin(name) {
+            return Resolution::Builtin;
+        }
+        match self.owner(name) {
+            Some(owner) => Resolution::Plugin {
+                plugin: owner.plugin.clone(),
+                action: UiAction {
+                    action: name.to_owned(),
+                    text: text.to_owned(),
+                },
+            },
+            None => Resolution::Unknown,
+        }
+    }
+
+    /// Autocomplete for the text after the `/`. Built-ins first, then plugin commands the
+    /// plugin owns, each with its plugin name.
+    pub fn suggest(&self, prefix: &str) -> Vec<Suggestion> {
+        let mut out: Vec<Suggestion> = self
+            .builtins
+            .iter()
+            .filter(|(name, _)| name.starts_with(prefix))
+            .map(|(name, description)| Suggestion {
+                name: name.clone(),
+                description: description.clone(),
+                usage: None,
+                plugin_name: None,
+            })
+            .collect();
+        let mut seen: HashSet<&str> = HashSet::new();
+        for plugin in &self.plugins {
+            for command in &plugin.commands {
+                if command.name.starts_with(prefix)
+                    && self
+                        .owner(&command.name)
+                        .is_some_and(|owner| owner.plugin == plugin.plugin)
+                    && seen.insert(&command.name)
+                {
+                    out.push(Suggestion {
+                        name: command.name.clone(),
+                        description: command.description.clone(),
+                        usage: command.usage.clone(),
+                        plugin_name: Some(plugin.plugin_name.clone()),
+                    });
+                }
+            }
+        }
+        out
+    }
+}
+
+/// Why `chat.send` was refused (the WIT `types.error` subset).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+pub enum SendError {
+    #[error("not permitted")]
+    NotPermitted,
+    #[error("message too large")]
+    TooLarge,
+    #[error("invalid")]
+    Invalid,
+}
+
+/// Remembers the last user gesture per plugin and lets exactly one `chat.send` through it.
+#[derive(Debug, Default)]
+pub struct GestureGate {
+    gestures: HashMap<String, (Instant, Duration)>,
+}
+
+impl GestureGate {
+    /// A button click for this plugin: allows one `chat.send` for `GESTURE_WINDOW`.
+    pub fn gesture(&mut self, plugin: &str, now: Instant) {
+        self.gestures
+            .insert(plugin.to_owned(), (now, GESTURE_WINDOW));
+    }
+
+    /// A typed slash command for this plugin: same window as a click.
+    pub fn command_gesture(&mut self, plugin: &str, now: Instant) {
+        self.gestures
+            .insert(plugin.to_owned(), (now, GESTURE_WINDOW));
+    }
+
+    /// Checks a `chat.send` and returns the line to post, with the `[Name] ` prefix. A refused
+    /// text (too large or empty) keeps the gesture; a posted one uses it up.
+    pub fn send(
+        &mut self,
+        plugin: &str,
+        plugin_name: &str,
+        text: &str,
+        now: Instant,
+    ) -> Result<String, SendError> {
+        let fresh = self
+            .gestures
+            .get(plugin)
+            .is_some_and(|(at, window)| now.saturating_duration_since(*at) <= *window);
+        if !fresh {
+            return Err(SendError::NotPermitted);
+        }
+        if text.trim().is_empty() {
+            return Err(SendError::Invalid);
+        }
+        if text.chars().count() > MAX_SEND_CHARS {
+            return Err(SendError::TooLarge);
+        }
+        self.gestures.remove(plugin);
+        Ok(prefixed(plugin_name, text))
+    }
+
+    /// Whether a gesture for this plugin is still fresh. Unlike [`Self::send`] it does not use
+    /// the gesture up.
+    pub fn is_fresh(&self, plugin: &str, now: Instant) -> bool {
+        self.gestures
+            .get(plugin)
+            .is_some_and(|(at, window)| now.saturating_duration_since(*at) <= *window)
+    }
+
+    pub fn forget(&mut self, plugin: &str) {
+        self.gestures.remove(plugin);
+    }
+}
+
+/// The line as it appears in the channel.
+pub fn prefixed(plugin_name: &str, text: &str) -> String {
+    format!("[{plugin_name}] {text}")
+}
+
+/// The 4-byte line hash (FR-6.45) over a full line, first four bytes of its SHA-256, big-endian.
+/// Callers pass the plain text of the line exactly as other clients see it.
+pub fn hash_line(line: &str) -> u32 {
+    let digest = Sha256::digest(line.as_bytes());
+    u32::from_be_bytes([digest[0], digest[1], digest[2], digest[3]])
+}
+
+/// `chat.line-hash`: the hash of `text` with the `[Plugin name] ` prefix.
+pub fn line_hash(plugin_name: &str, text: &str) -> u32 {
+    hash_line(&prefixed(plugin_name, text))
+}
+
+/// The plugin name of a line's "[Name] " prefix (see [`prefixed`]), if it has one.
+pub fn poster(line: &str) -> Option<&str> {
+    let rest = line.strip_prefix('[')?;
+    let (name, _) = rest.split_once("] ")?;
+    (!name.is_empty() && !name.contains(']')).then_some(name)
+}
+
+/// What to do with an incoming text message or a new card.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Supersede {
+    /// Show the text line normally / the card has nothing to replace yet.
+    None,
+    /// Hide message `message` and show plugin `plugin`'s card `card` with "Show text".
+    Replace {
+        plugin: String,
+        card: String,
+        message: u64,
+    },
+}
+
+#[derive(Debug)]
+struct PendingCard {
+    /// Sessions are per server: a card only pairs with a line of its own server.
+    server: ServerId,
+    plugin: String,
+    /// Only lines with this plugin's "[Name] " prefix can be hidden.
+    plugin_name: String,
+    card: String,
+    sender: u32,
+    hash: u32,
+    at: Instant,
+}
+
+#[derive(Debug)]
+struct SeenLine {
+    server: ServerId,
+    message: u64,
+    /// The plugin name of the line's "[Name] " prefix, if it has one.
+    poster: Option<String>,
+    sender: u32,
+    hash: u32,
+    at: Instant,
+}
+
+/// Pairs a card with its fallback line in either arrival order (FR-6.45).
+#[derive(Debug, Default)]
+pub struct SupersedeTracker {
+    cards: Vec<PendingCard>,
+    lines: Vec<SeenLine>,
+}
+
+impl SupersedeTracker {
+    fn prune(&mut self, now: Instant) {
+        let fresh = |at: Instant| now.saturating_duration_since(at) <= SUPERSEDE_WINDOW;
+        self.cards.retain(|c| fresh(c.at));
+        self.lines.retain(|l| fresh(l.at));
+    }
+
+    /// `chat.supersede`: a card for a line from `sender` with `hash` on `server`. If the line was
+    /// already shown, returns the replacement now; otherwise waits for it. Only a line the plugin
+    /// posted itself (its "[Name] " prefix) can be hidden, so no plugin can hide what others write.
+    #[allow(clippy::too_many_arguments)]
+    pub fn card(
+        &mut self,
+        server: ServerId,
+        plugin: &str,
+        plugin_name: &str,
+        card: &str,
+        sender: u32,
+        hash: u32,
+        now: Instant,
+    ) -> Supersede {
+        self.prune(now);
+        if let Some(index) = self.lines.iter().position(|l| {
+            l.server == server
+                && l.sender == sender
+                && l.hash == hash
+                && l.poster.as_deref() == Some(plugin_name)
+        }) {
+            let line = self.lines.remove(index);
+            return Supersede::Replace {
+                plugin: plugin.to_owned(),
+                card: card.to_owned(),
+                message: line.message,
+            };
+        }
+        self.cards.push(PendingCard {
+            server,
+            plugin: plugin.to_owned(),
+            plugin_name: plugin_name.to_owned(),
+            card: card.to_owned(),
+            sender,
+            hash,
+            at: now,
+        });
+        Supersede::None
+    }
+
+    /// An incoming text message on `server` with the line's plain text. Only the hash is
+    /// remembered.
+    pub fn text(
+        &mut self,
+        server: ServerId,
+        message: u64,
+        sender: u32,
+        line: &str,
+        now: Instant,
+    ) -> Supersede {
+        self.prune(now);
+        let hash = hash_line(line);
+        let poster = poster(line);
+        if let Some(index) = self.cards.iter().position(|c| {
+            c.server == server
+                && c.sender == sender
+                && c.hash == hash
+                && poster == Some(c.plugin_name.as_str())
+        }) {
+            let card = self.cards.remove(index);
+            return Supersede::Replace {
+                plugin: card.plugin,
+                card: card.card,
+                message,
+            };
+        }
+        self.lines.push(SeenLine {
+            server,
+            message,
+            poster: poster.map(str::to_owned),
+            sender,
+            hash,
+            at: now,
+        });
+        Supersede::None
+    }
+
+    /// A plugin was disabled or removed: its waiting cards are dropped, so its lines show.
+    pub fn forget_plugin(&mut self, plugin: &str) {
+        self.cards.retain(|c| c.plugin != plugin);
+    }
+
+    /// The sender left `server`.
+    pub fn forget_session(&mut self, server: ServerId, sender: u32) {
+        self.cards
+            .retain(|c| c.server != server || c.sender != sender);
+        self.lines
+            .retain(|l| l.server != server || l.sender != sender);
+    }
+}
+
+/// `pattern-index` of a replayed `chat-match` that is a line the plugin posted itself
+/// ("[Name] …", via `chat.send`) rather than a match of one of its patterns.
+pub const OWN_LINE: u8 = u8::MAX;
+
+/// How many messages a plugin can hold a claim on at once; the oldest goes first.
+pub const MAX_CLAIMS: usize = 200;
+
+/// The chat message behind the event a plugin is handling (`chat.current-message`,
+/// `chat.is-replay`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct ChatRef {
+    /// The opaque token for `chat.replace` / `chat.hide`; `None` when the message cannot be
+    /// replaced (it was not stored).
+    pub token: Option<u64>,
+    /// The message came from stored history, not live: render only, no side effects.
+    pub replay: bool,
+    /// The server the event came from: replies (`chat.send`), new chat cards and supersedes go
+    /// to this server's chat. `None` for events of no chat (timers, panels): the voice server.
+    pub server: Option<ServerId>,
+}
+
+/// A message a plugin was handed in a `chat-match` or `chat-trigger` event and may therefore
+/// replace with a card or hide (FR-6.45).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Claim {
+    pub server: ServerId,
+    pub message: u64,
+}
+
+#[derive(Debug)]
+struct Issued {
+    token: u64,
+    plugin: String,
+    claim: Claim,
+}
+
+/// The opaque message tokens handed to plugins. A token is valid only for the plugin it was
+/// issued to, so a plugin can never touch a message it was not shown.
+#[derive(Debug)]
+pub struct MessageClaims {
+    next: u64,
+    issued: VecDeque<Issued>,
+}
+
+impl Default for MessageClaims {
+    fn default() -> Self {
+        // A random start keeps tokens from looking like (or being guessed as) message ids.
+        Self {
+            next: rand::random::<u64>() >> 1,
+            issued: VecDeque::new(),
+        }
+    }
+}
+
+impl MessageClaims {
+    /// A token for `plugin` to name `message` on `server`. The same message gets the same token.
+    pub fn issue(&mut self, plugin: &str, server: ServerId, message: u64) -> u64 {
+        let claim = Claim { server, message };
+        if let Some(known) = self
+            .issued
+            .iter()
+            .find(|i| i.plugin == plugin && i.claim == claim)
+        {
+            return known.token;
+        }
+        if self.issued.iter().filter(|i| i.plugin == plugin).count() >= MAX_CLAIMS
+            && let Some(oldest) = self.issued.iter().position(|i| i.plugin == plugin)
+        {
+            self.issued.remove(oldest);
+        }
+        self.next = self.next.wrapping_add(1);
+        self.issued.push_back(Issued {
+            token: self.next,
+            plugin: plugin.to_owned(),
+            claim,
+        });
+        self.next
+    }
+
+    /// The message behind `token`, if it was issued to `plugin`.
+    pub fn claim(&self, plugin: &str, token: u64) -> Option<Claim> {
+        self.issued
+            .iter()
+            .find(|i| i.token == token && i.plugin == plugin)
+            .map(|i| i.claim.clone())
+    }
+
+    /// The plugin was disabled or removed.
+    pub fn forget_plugin(&mut self, plugin: &str) {
+        self.issued.retain(|i| i.plugin != plugin);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn cmd(name: &str) -> Command {
+        Command {
+            name: name.to_owned(),
+            description: format!("{name} desc"),
+            usage: None,
+        }
+    }
+
+    fn registry() -> CommandRegistry {
+        let mut r = CommandRegistry::new(&[("help", "Show help")]);
+        r.register("dice", "Dice roller", &[cmd("roll"), cmd("help")]);
+        r.register("other", "Other", &[cmd("roll"), cmd("flip")]);
+        r
+    }
+
+    #[test]
+    fn typed_command_becomes_ui_action_for_the_first_installed() {
+        let r = registry();
+        assert_eq!(
+            r.resolve("/roll 2d6"),
+            Resolution::Plugin {
+                plugin: "dice".into(),
+                action: UiAction {
+                    action: "roll".into(),
+                    text: "2d6".into()
+                }
+            }
+        );
+        assert!(
+            matches!(r.resolve("/flip"), Resolution::Plugin { plugin, .. } if plugin == "other")
+        );
+        assert_eq!(r.resolve("/nope"), Resolution::Unknown);
+        assert_eq!(r.resolve("roll"), Resolution::Unknown);
+    }
+
+    #[test]
+    fn builtins_win_and_clashes_are_reported() {
+        let r = registry();
+        assert_eq!(r.resolve("/help"), Resolution::Builtin);
+        assert_eq!(r.taken_by("dice", "help").as_deref(), Some("Mumcord"));
+        assert_eq!(r.taken_by("other", "roll").as_deref(), Some("Dice roller"));
+        assert_eq!(r.taken_by("dice", "roll"), None);
+        assert_eq!(
+            r.lost_commands("other"),
+            vec![("roll".to_owned(), "Dice roller".to_owned())]
+        );
+    }
+
+    #[test]
+    fn unregistering_hands_the_name_to_the_next_plugin() {
+        let mut r = registry();
+        r.unregister("dice");
+        assert!(
+            matches!(r.resolve("/roll"), Resolution::Plugin { plugin, .. } if plugin == "other")
+        );
+        assert_eq!(r.taken_by("other", "roll"), None);
+    }
+
+    #[test]
+    fn suggestions_carry_the_plugin_name_and_skip_lost_commands() {
+        let r = registry();
+        let roll = r.suggest("ro");
+        assert_eq!(roll.len(), 1);
+        assert_eq!(roll[0].plugin_name.as_deref(), Some("Dice roller"));
+        let all: Vec<_> = r.suggest("").into_iter().map(|s| s.name).collect();
+        assert_eq!(all, ["help", "roll", "flip"]);
+    }
+
+    #[test]
+    fn send_needs_a_fresh_gesture_and_uses_it_up() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        assert_eq!(
+            gate.send("dice", "Dice", "hi", t0),
+            Err(SendError::NotPermitted)
+        );
+        gate.gesture("dice", t0);
+        assert_eq!(
+            gate.send("dice", "Dice", "hi", t0 + Duration::from_secs(1))
+                .expect("fresh gesture"),
+            "[Dice] hi"
+        );
+        assert_eq!(
+            gate.send("dice", "Dice", "again", t0 + Duration::from_secs(1)),
+            Err(SendError::NotPermitted)
+        );
+    }
+
+    #[test]
+    fn gesture_expires_after_eight_seconds_and_is_per_plugin() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        gate.gesture("dice", t0);
+        assert_eq!(
+            gate.send("poll", "Poll", "x", t0),
+            Err(SendError::NotPermitted)
+        );
+        assert_eq!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(8001)),
+            Err(SendError::NotPermitted)
+        );
+    }
+
+    #[test]
+    fn click_gesture_lasts_eight_seconds_for_one_message() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        gate.gesture("dice", t0);
+        assert!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(7999))
+                .is_ok()
+        );
+        assert_eq!(
+            gate.send("dice", "Dice", "y", t0 + Duration::from_secs(1)),
+            Err(SendError::NotPermitted)
+        );
+    }
+
+    #[test]
+    fn command_gesture_lasts_eight_seconds_for_one_message() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        gate.command_gesture("dice", t0);
+        assert!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(7999))
+                .is_ok()
+        );
+        assert_eq!(
+            gate.send("dice", "Dice", "y", t0 + Duration::from_secs(1)),
+            Err(SendError::NotPermitted)
+        );
+        gate.command_gesture("dice", t0);
+        assert_eq!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_millis(8001)),
+            Err(SendError::NotPermitted)
+        );
+    }
+
+    #[test]
+    fn a_later_gesture_restarts_the_window() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        gate.gesture("dice", t0);
+        gate.gesture("dice", t0 + Duration::from_secs(5));
+        assert!(
+            gate.send("dice", "Dice", "x", t0 + Duration::from_secs(12))
+                .is_ok()
+        );
+    }
+
+    #[test]
+    fn oversize_and_empty_texts_keep_the_gesture() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        gate.gesture("dice", t0);
+        assert_eq!(
+            gate.send("dice", "Dice", &"a".repeat(501), t0),
+            Err(SendError::TooLarge)
+        );
+        assert_eq!(gate.send("dice", "Dice", "  ", t0), Err(SendError::Invalid));
+        assert!(gate.send("dice", "Dice", &"ä".repeat(500), t0).is_ok());
+    }
+
+    #[test]
+    fn line_hash_includes_the_prefix() {
+        assert_eq!(line_hash("Poll", "Lunch?"), hash_line("[Poll] Lunch?"));
+        assert_ne!(line_hash("Poll", "Lunch?"), hash_line("Lunch?"));
+    }
+
+    #[test]
+    fn card_after_text_replaces_the_line() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let line = "[Poll] Lunch?";
+        assert_eq!(s.text(1, 7, 3, line, t0), Supersede::None);
+        assert_eq!(
+            s.card(
+                1,
+                "poll",
+                "Poll",
+                "c1",
+                3,
+                hash_line(line),
+                t0 + Duration::from_secs(5)
+            ),
+            Supersede::Replace {
+                plugin: "poll".into(),
+                card: "c1".into(),
+                message: 7
+            }
+        );
+    }
+
+    #[test]
+    fn text_after_card_replaces_the_line() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let line = "[Poll] Lunch?";
+        assert_eq!(
+            s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0),
+            Supersede::None
+        );
+        assert_eq!(
+            s.text(1, 9, 3, line, t0 + Duration::from_secs(3)),
+            Supersede::Replace {
+                plugin: "poll".into(),
+                card: "c1".into(),
+                message: 9
+            }
+        );
+    }
+
+    #[test]
+    fn different_session_or_late_line_is_not_hidden() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let line = "[Poll] Lunch?";
+        s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0);
+        assert_eq!(s.text(1, 1, 4, line, t0), Supersede::None);
+        assert_eq!(
+            s.text(1, 2, 3, line, t0 + Duration::from_millis(10_001)),
+            Supersede::None
+        );
+    }
+
+    #[test]
+    fn disabled_plugin_cards_do_not_hide_lines() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let line = "[Poll] Lunch?";
+        s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0);
+        s.forget_plugin("poll");
+        assert_eq!(s.text(1, 1, 3, line, t0), Supersede::None);
+    }
+
+    #[test]
+    fn only_lines_with_the_plugins_own_prefix_are_hidden() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let foreign = "Lunch?";
+        let other = "[Dice] Lunch?";
+        s.text(1, 1, 3, foreign, t0);
+        s.text(1, 2, 3, other, t0);
+        assert_eq!(
+            s.card(1, "poll", "Poll", "c1", 3, hash_line(foreign), t0),
+            Supersede::None,
+            "a line without a prefix"
+        );
+        assert_eq!(
+            s.card(1, "poll", "Poll", "c2", 3, hash_line(other), t0),
+            Supersede::None,
+            "another plugin's line"
+        );
+        s.card(1, "poll", "Poll", "c3", 4, hash_line("x"), t0);
+        assert_eq!(
+            s.text(1, 5, 4, "x", t0),
+            Supersede::None,
+            "card first, no prefix"
+        );
+    }
+
+    #[test]
+    fn a_card_only_hides_a_line_of_its_own_server() {
+        let t0 = Instant::now();
+        let mut s = SupersedeTracker::default();
+        let line = "[Poll] Lunch?";
+        s.card(1, "poll", "Poll", "c1", 3, hash_line(line), t0);
+        assert_eq!(
+            s.text(2, 7, 3, line, t0),
+            Supersede::None,
+            "same session number, other server"
+        );
+        assert_eq!(
+            s.card(1, "poll", "Poll", "c2", 3, hash_line(line), t0),
+            Supersede::None,
+            "the other server's line stays visible"
+        );
+        assert_eq!(
+            s.text(1, 8, 3, line, t0),
+            Supersede::Replace {
+                plugin: "poll".into(),
+                card: "c1".into(),
+                message: 8
+            }
+        );
+    }
+
+    #[test]
+    fn poster_reads_the_prefix() {
+        assert_eq!(poster("[Poll] Lunch?"), Some("Poll"));
+        assert_eq!(poster("[Poll]Lunch?"), None);
+        assert_eq!(poster("[] x"), None);
+        assert_eq!(poster("Poll] x"), None);
+    }
+
+    #[test]
+    fn a_claim_belongs_to_the_plugin_it_was_issued_to() {
+        let mut claims = MessageClaims::default();
+        let token = claims.issue("fit", 1, 42);
+        assert_eq!(
+            claims.issue("fit", 1, 42),
+            token,
+            "same message, same token"
+        );
+        assert_eq!(
+            claims.claim("fit", token),
+            Some(Claim {
+                server: 1,
+                message: 42
+            })
+        );
+        assert_eq!(claims.claim("poll", token), None, "another plugin");
+        assert_eq!(
+            claims.claim("fit", token.wrapping_add(1)),
+            None,
+            "never issued"
+        );
+        let other_server = claims.issue("fit", 2, 42);
+        assert_ne!(other_server, token, "tokens are per server");
+        claims.forget_plugin("fit");
+        assert_eq!(claims.claim("fit", token), None);
+    }
+
+    #[test]
+    fn claims_are_capped_per_plugin() {
+        let mut claims = MessageClaims::default();
+        let first = claims.issue("fit", 1, 0);
+        let poll = claims.issue("poll", 1, 0);
+        for message in 1..=MAX_CLAIMS as u64 {
+            claims.issue("fit", 1, message);
+        }
+        assert_eq!(claims.claim("fit", first), None, "the oldest went first");
+        assert!(
+            claims.claim("poll", poll).is_some(),
+            "other plugins keep theirs"
+        );
+    }
+}

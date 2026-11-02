@@ -1,0 +1,6 @@
+{
+  "id": "fx-update",
+  "name": "Fixture Update",
+  "version": "1.1.0",
+  "description": "Update whose start fails"
+}

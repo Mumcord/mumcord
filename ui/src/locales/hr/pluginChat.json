@@ -1,0 +1,19 @@
+{
+  "card": {
+    "label": "Kartica od {{plugin}}",
+    "showMore": "Prikaži više",
+    "showLess": "Prikaži manje"
+  },
+  "via": "putem {{plugin}}",
+  "supersede": {
+    "showText": "Prikaži izvorni tekst",
+    "hideText": "Sakrij izvorni tekst",
+    "hiddenBy": "Sakrio {{plugin}}"
+  },
+  "command": {
+    "list": "Naredbe dodataka",
+    "keys": "↑↓ odaberi · Tab dovrši · Enter pokreni · Esc zatvori",
+    "unavailable": "Ova naredba trenutačno nije dostupna.",
+    "failed": "Naredba se nije mogla pokrenuti. Pokušaj ponovno."
+  }
+}

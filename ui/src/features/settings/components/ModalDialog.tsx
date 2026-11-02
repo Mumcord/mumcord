@@ -14,6 +14,9 @@ interface ModalDialogProps {
   onClose: () => void;
   /** Extra class on the dialog box, e.g. to make it wider. */
   className?: string;
+  /** Optional icon and one-line subtitle shown beside the title. */
+  icon?: ReactNode;
+  subtitle?: ReactNode;
   children: ReactNode;
 }
 
@@ -25,7 +28,14 @@ const FOCUSABLE =
  * stays inside the dialog, Escape closes only this dialog (not the whole settings overlay) and
  * focus returns to the element that opened it.
  */
-export function ModalDialog({ title, onClose, className, children }: ModalDialogProps) {
+export function ModalDialog({
+  title,
+  onClose,
+  className,
+  icon,
+  subtitle,
+  children,
+}: ModalDialogProps) {
   const titleId = useId();
   const ref = useRef<HTMLDivElement>(null);
   const host = useContext(DialogHostContext);
@@ -75,9 +85,21 @@ export function ModalDialog({ title, onClose, className, children }: ModalDialog
         className={className ? `settings-dialog ${className}` : "settings-dialog"}
         onKeyDown={onKeyDown}
       >
-        <h3 id={titleId} className="settings-dialog__title">
-          {title}
-        </h3>
+        {icon !== undefined || subtitle !== undefined ? (
+          <div className="settings-dialog__header">
+            {icon}
+            <div>
+              <h3 id={titleId} className="settings-dialog__title settings-dialog__title--tight">
+                {title}
+              </h3>
+              {subtitle}
+            </div>
+          </div>
+        ) : (
+          <h3 id={titleId} className="settings-dialog__title">
+            {title}
+          </h3>
+        )}
         {children}
       </div>
     </div>,

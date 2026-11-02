@@ -1,0 +1,49 @@
+{
+  "mode": {
+    "legend": "Bővítményfrissítések",
+    "info": "Az alkalmazásfrissítéstől független. A Mumcord induláskor, majd 6 óránként keres bővítményfrissítéseket.",
+    "infoLabel": "További információ: bővítményfrissítések",
+    "auto": "Telepítés automatikusan",
+    "notify": "Csak értesítés",
+    "off": "Ki"
+  },
+  "waiting": "Frissítések",
+  "empty": "Minden bővítmény naprakész.",
+  "emptyOff": "A bővítményfrissítések ki vannak kapcsolva. Kapcsold be fent a frissítések kereséséhez.",
+  "loadFailed": "A frissítéseket nem sikerült betölteni.",
+  "newAuthorKey": "Ezt a verziót más szerző írta alá. Csak akkor frissíts, ha megbízol az új szerzőben.",
+  "rolledBack": "A(z) {{version}} verzió nem indult el, ezért visszaállt az előző verzió. Ok:",
+  "review": "Átnézés és frissítés",
+  "update": "Frissítés",
+  "installFailed": "A(z) {{name}} frissítése nem sikerült. Próbáld újra.",
+  "pins": "Verzió rögzítése",
+  "pinsHint": "A rögzített bővítmény a jelenlegi verziónál marad, és nem kap frissítési ajánlatot.",
+  "pin": "{{name}} maradjon ezen a verzión",
+  "pinVersion": "{{version}} verzió",
+  "versionsTo": "erre:",
+  "pill": {
+    "none": "Nincs új engedély",
+    "permission": "Új engedélyt kér",
+    "author": "Új szerző"
+  },
+  "newPermissions": "Új engedélyek",
+  "revoked": {
+    "title": "A(z) {{name}} ki lett kapcsolva",
+    "text": "A(z) {{version}} verzió szerepel a visszavonási listán: {{reason}}. A bővítmény adatai megmaradnak.",
+    "details": "Részletek",
+    "remove": "Eltávolítás"
+  },
+  "checkNow": "Ellenőrzés most",
+  "lastChecked": "Utoljára ellenőrizve: {{time}}",
+  "checkFailed": "Az ellenőrzés nem sikerült. Próbáld újra.",
+  "modeNote": "Bővítményfrissítések: {{mode}}. Ezt lent módosíthatod.",
+  "settings": "Frissítési beállítások",
+  "offer": {
+    "heading": "Új engedélyek",
+    "title": "A(z) {{name}} {{version}} most már többre képes. Ezek a beállítások kikapcsolva maradnak, amíg be nem kapcsolod őket.",
+    "permission": "Új választható engedély: {{permission}}",
+    "save": "Mentés",
+    "notNow": "Most nem",
+    "failed": "A(z) {{name}} engedélyeit nem sikerült módosítani. Próbáld újra."
+  }
+}

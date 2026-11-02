@@ -19,7 +19,7 @@ afterEach(() => {
 
 describe("GamePluginsGroup", () => {
   it("lists the plugins with the anti-cheat notice and switches one on", async () => {
-    const setEnabled = vi.spyOn(api, "pluginSetEnabled");
+    const setEnabled = vi.spyOn(api, "gamePluginSetEnabled");
     render(<GamePluginsGroup />);
     expect(screen.getByRole("button", { name: "More information: Game plugins" })).toHaveAttribute(
       "data-tooltip",
@@ -33,7 +33,7 @@ describe("GamePluginsGroup", () => {
   });
 
   it("shows which plugin delivers positions (FR-1.43)", async () => {
-    vi.spyOn(api, "pluginsList").mockResolvedValue([
+    vi.spyOn(api, "gamePluginsList").mockResolvedValue([
       {
         id: "gtav",
         name: "Grand Theft Auto V",
@@ -54,7 +54,7 @@ describe("GamePluginsGroup", () => {
   });
 
   it("explains plugin problems and disables incompatible ones", async () => {
-    vi.spyOn(api, "pluginsList").mockResolvedValue([
+    vi.spyOn(api, "gamePluginsList").mockResolvedValue([
       {
         id: "old",
         name: "Old",
@@ -79,12 +79,12 @@ describe("GamePluginsGroup", () => {
   });
 
   it("says when no plugins are found and reports failures", async () => {
-    vi.spyOn(api, "pluginsList").mockResolvedValue([]);
+    vi.spyOn(api, "gamePluginsList").mockResolvedValue([]);
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     render(<GamePluginsGroup />);
     expect(await screen.findByText(/No game plugins found/)).toBeInTheDocument();
 
-    vi.spyOn(api, "pluginsList").mockRejectedValue(new EngineError("internal", "stuck"));
+    vi.spyOn(api, "gamePluginsList").mockRejectedValue(new EngineError("internal", "stuck"));
     render(<GamePluginsGroup />);
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The game plugins could not be listed.",

@@ -1,0 +1,152 @@
+/* Install prompt and plugin toasts. Colours come from theme tokens only. */
+.plugin-prompt {
+  /* Wide enough for the visibility control to sit beside its explanation. */
+  width: min(36rem, calc(100vw - 2 * var(--space-4)));
+  max-width: none;
+}
+
+.plugin-prompt-source,
+.plugin-prompt-subtitle {
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.plugin-prompt .plugin-browse-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+}
+
+.plugin-prompt .plugin-prompt-source {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.plugin-prompt-visibility {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.plugin-prompt-visibility-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 10rem;
+}
+
+.plugin-prompt-visibility-title {
+  font-weight: 600;
+}
+
+.plugin-prompt-visibility-hint {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.plugin-prompt-segments {
+  display: flex;
+  flex: none;
+  padding: 2px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.plugin-prompt-segment {
+  position: relative;
+  cursor: pointer;
+}
+
+.plugin-prompt-segment input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.plugin-prompt-segment span {
+  display: block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+}
+
+.plugin-prompt-segment input:checked + span {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.plugin-prompt-segment input:focus-visible + span {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.plugin-prompt-actions {
+  align-items: center;
+}
+
+.plugin-prompt-footnote {
+  margin-right: auto;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.plugin-prompt-warning {
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.plugin-prompt-status {
+  margin: var(--space-2) 0;
+}
+
+.plugin-toasts {
+  position: fixed;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.plugin-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+}
+
+.plugin-toast-dismiss {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.plugin-prompt-box {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-hover);
+  font-size: 0.8125rem;
+}
+
+.plugin-prompt-box p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+}

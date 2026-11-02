@@ -1,6 +1,5 @@
 {
   "follow": "Jälgi",
-  "following": "Jälgin",
   "unsupported": "Kanalite jälgimiseks on vaja serverit versiooniga 1.4 või uuemat.",
   "unread_one": "{{count}} lugemata sõnum",
   "unread_other": "{{count}} lugemata sõnumit",

@@ -1,0 +1,22 @@
+{
+  "title": "Plugins",
+  "tabsLabel": "Sections des plugins",
+  "tabs": {
+    "installed": "Installés",
+    "browse": "Parcourir",
+    "updates": "Mises à jour",
+    "repositories": "Dépôts",
+    "developer": "Développeur"
+  },
+  "turnOffAll": "Désactiver tous les plugins",
+  "allOff": "Tous les plugins sont désactivés. Ils le restent, même après un redémarrage, jusqu'à ce que vous les réactiviez.",
+  "noPlugins": "Les plugins sont désactivés pour cette session (démarrage avec --no-plugins).",
+  "loadFailed": "Impossible de charger les plugins.",
+  "palette": {
+    "label": "Palette de commandes",
+    "placeholder": "Saisir une commande",
+    "empty": "Aucune commande correspondante",
+    "openPlugins": "Plugins",
+    "turnOffAll": "Désactiver tous les plugins"
+  }
+}

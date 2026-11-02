@@ -1,0 +1,35 @@
+{
+  "hint": "Carica una cartella di plugin non compressa per provarla. I plugin per sviluppatori non sono firmati, non sono mai ufficiali e non possono ottenere net.http, secrets o ui.webview. Vengono scaricati quando la modalità sviluppatore viene disattivata.",
+  "load": "Carica cartella del plugin…",
+  "pickFolder": "Scegli la cartella del plugin",
+  "empty": "Nessun plugin per sviluppatori caricato.",
+  "listLabel": "Plugin per sviluppatori",
+  "label": "Plugin per sviluppatori",
+  "status": {
+    "running": "In esecuzione",
+    "off": "Disattivato",
+    "backingOff": "Riavvio dopo un arresto anomalo",
+    "autoOff": "Disattivato dopo arresti anomali ripetuti",
+    "allOff": "Tutti i plugin sono disattivati",
+    "noPlugins": "I plugin sono disattivati per questa sessione",
+    "notLoaded": "Impossibile caricare"
+  },
+  "showLog": "Mostra il registro di {{name}}",
+  "reload": "Ricarica {{name}}",
+  "unload": "Scarica {{name}}",
+  "logLabel": "Registro di {{name}}",
+  "logTitle": "Registro di {{name}}",
+  "logEmpty": "Ancora nessuna riga di registro.",
+  "level": {
+    "debug": "Debug",
+    "info": "Info",
+    "warn": "Avviso",
+    "error": "Errore"
+  },
+  "errors": {
+    "load": "Impossibile caricare la cartella del plugin.",
+    "reload": "Impossibile ricaricare il plugin.",
+    "unload": "Impossibile scaricare il plugin.",
+    "log": "Impossibile leggere il registro."
+  }
+}

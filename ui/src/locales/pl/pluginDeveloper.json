@@ -1,0 +1,35 @@
+{
+  "hint": "Wczytaj rozpakowany folder wtyczki, aby ją przetestować. Wtyczki deweloperskie nie są podpisane, nigdy nie są oficjalne i nie mogą otrzymać net.http, secrets ani ui.webview. Są wyładowywane po wyłączeniu trybu dewelopera.",
+  "load": "Wczytaj folder wtyczki…",
+  "pickFolder": "Wybierz folder wtyczki",
+  "empty": "Nie wczytano żadnej wtyczki deweloperskiej.",
+  "listLabel": "Wtyczki deweloperskie",
+  "label": "Wtyczka deweloperska",
+  "status": {
+    "running": "Działa",
+    "off": "Wyłączona",
+    "backingOff": "Uruchamia się ponownie po awarii",
+    "autoOff": "Wyłączona po wielokrotnych awariach",
+    "allOff": "Wszystkie wtyczki są wyłączone",
+    "noPlugins": "Wtyczki są wyłączone w tej sesji",
+    "notLoaded": "Nie udało się wczytać"
+  },
+  "showLog": "Pokaż dziennik wtyczki {{name}}",
+  "reload": "Wczytaj ponownie {{name}}",
+  "unload": "Wyładuj {{name}}",
+  "logLabel": "Dziennik wtyczki {{name}}",
+  "logTitle": "Dziennik wtyczki {{name}}",
+  "logEmpty": "Brak wpisów w dzienniku.",
+  "level": {
+    "debug": "Debugowanie",
+    "info": "Info",
+    "warn": "Ostrzeżenie",
+    "error": "Błąd"
+  },
+  "errors": {
+    "load": "Nie udało się wczytać folderu wtyczki.",
+    "reload": "Nie udało się ponownie wczytać wtyczki.",
+    "unload": "Nie udało się wyładować wtyczki.",
+    "log": "Nie udało się odczytać dziennika."
+  }
+}

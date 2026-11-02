@@ -1,6 +1,5 @@
 {
   "follow": "Obserwuj",
-  "following": "Obserwujesz",
   "unsupported": "Obserwowanie kanałów wymaga serwera w wersji 1.4 lub nowszej.",
   "unread_one": "{{count}} nieprzeczytana wiadomość",
   "unread_few": "{{count}} nieprzeczytane wiadomości",

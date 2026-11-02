@@ -174,12 +174,8 @@
   outline-offset: 2px;
 }
 
-/* The wizard step and the Settings dialog are wider than their defaults: the rows carry a
-   title, a detail line and a badge side by side. */
-.wizard-step.wizard-step--wide {
-  width: min(46rem, 100%);
-}
-
+/* The Settings dialog is wider than its default: the rows carry a title, a detail line and a
+   badge side by side. */
 .settings-dialog.mumble-import-dialog {
   width: min(46rem, calc(100vw - 2 * var(--space-4)));
 }

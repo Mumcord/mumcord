@@ -1,0 +1,30 @@
+{
+  "type": "Doplnok",
+  "autoOff": {
+    "title": "Doplnok {{name}} bol vypnutý",
+    "body": "Vypnuté po opakovaných zlyhaniach",
+    "open": "Zobraziť v Doplnkoch"
+  },
+  "update": {
+    "title": "Aktualizácia pre {{name}}",
+    "body": "Verzia {{version}} čaká na karte Aktualizácie",
+    "open": "Zobraziť aktualizácie"
+  },
+  "suggestion": {
+    "title": "Tento server používa {{name}}",
+    "noReason": "Odporúčané serverom",
+    "install": "Nainštalovať…",
+    "installLabel": "Nainštalovať {{name}}",
+    "addRepositoryLabel": "Pridať repozitár pre {{name}}",
+    "details": "Zobraziť podrobnosti",
+    "detailsLabel": "Podrobnosti o {{name}}",
+    "notNow": "Teraz nie",
+    "notNowLabel": "Zatiaľ skryť {{name}}",
+    "dontAsk": "Pre tento server sa už nepýtať",
+    "recommended": "Odporúčané",
+    "official": "Oficiálne",
+    "unofficial": "Neoficiálne · {{host}}",
+    "footer": "Návrhy nikdy nič samy neinštalujú. Server sa nedozvie, čo inštalujete."
+  },
+  "failed": "Nepodarilo sa. Skúste to znova."
+}

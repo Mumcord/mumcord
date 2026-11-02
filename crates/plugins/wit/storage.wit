@@ -1,0 +1,30 @@
+/// Key–value storage per plugin (FR-6.20). Needs no permission.
+///
+/// Limits: key 1–128 bytes, value at most 64 KiB, quota 256 KiB per plugin by default (up to
+/// 1 MiB if the manifest asks via `storage.quota_kib`). Keys and values count toward the quota.
+/// Values are never logged.
+interface storage {
+  use types.{error};
+
+  /// Where a value lives. There is no server scope: plugins that need per-server data prefix
+  /// their keys, e.g. `bots/<server>/…` with the server key from `self-state`.
+  enum scope {
+    /// Separate per Mumcord identity (client certificate).
+    identity,
+    /// Shared by all identities on this install.
+    global,
+  }
+
+  /// The stored value, or none. Errors: `invalid`, `too-large` (key).
+  get: func(scope: scope, key: string) -> result<option<list<u8>>, error>;
+
+  /// Writes or replaces a value. Errors: `invalid`, `too-large` (key or value),
+  /// `quota-exceeded` (nothing is written).
+  set: func(scope: scope, key: string, value: list<u8>) -> result<_, error>;
+
+  /// Deletes a value; deleting a missing key is not an error. Errors: `invalid`, `too-large`.
+  delete: func(scope: scope, key: string) -> result<_, error>;
+
+  /// Keys starting with `prefix` (empty = all), sorted, at most 1000 per call.
+  list-keys: func(scope: scope, prefix: string) -> result<list<string>, error>;
+}

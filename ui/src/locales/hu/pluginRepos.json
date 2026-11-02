@@ -1,0 +1,60 @@
+{
+  "intro": "A tárolók mások által üzemeltetett további bővítménylisták. A Mumcord nem ellenőrzi a bővítményeiket. Csak olyan tárolót adj hozzá, amelyben megbízol.",
+  "add": {
+    "button": "Tároló hozzáadása",
+    "title": "Tároló hozzáadása",
+    "address": "A tároló címe",
+    "expectedKey": "Várt kulcs (nem kötelező)",
+    "expectedKeyHint": "Ha a tulajdonos megadott egy kulcsot, illeszd be ide. A tárolónak ekkor pontosan ezt a kulcsot kell használnia.",
+    "check": "Tároló ellenőrzése",
+    "found": "Ezt találtuk",
+    "confirm": "Tároló hozzáadása",
+    "subtitle": "Csak olyan emberek tárolóit add hozzá, akikben megbízol.",
+    "signatureValid": "érvényes aláírás",
+    "contactLine": "kapcsolat: {{contact}}",
+    "pluginsLine": "Bővítmények: {{number}}",
+    "signingKey": "Aláírókulcs",
+    "warningTitle": "Nem hivatalos tároló",
+    "warningBody": "A Mumcord nem ellenőrzi ezeket a bővítményeket. A kulcsot megjegyzi: ha megváltozik, a tároló szünetel, amíg meg nem nézed. Böngészéskor a gazdagép látja az IP-címedet. Hivatalos nevű bővítményeket innen soha nem vesz át."
+  },
+  "limit": "Legfeljebb {{max}} tárolót adhatsz hozzá.",
+  "limitReached": "Elérted a {{max}} tárolós korlátot.",
+  "empty": "Még nem adtál hozzá tárolót.",
+  "listLabel": "Hozzáadott tárolók",
+  "loadFailed": "A tárolókat nem sikerült betölteni.",
+  "status": {
+    "keyChanged": "A kulcs megváltozott, szüneteltetve"
+  },
+  "fingerprintLine": "Kulcs ujjlenyomata: {{fingerprint}}",
+  "neverChecked": "Még nincs ellenőrizve",
+  "lastChecked": "Utolsó ellenőrzés: {{when}}",
+  "installedCount": "Telepített bővítmények: {{number}}",
+  "toggle": "{{name}} használata",
+  "remove": {
+    "button": "Eltávolítás",
+    "label": "{{name}} eltávolítása",
+    "title": "Eltávolítod: {{name}}?",
+    "message": "A tároló eltávolításra kerül, a bővítményei pedig kikapcsolnak. Az adataikkal együtt telepítve maradnak, de nem kapnak több frissítést.",
+    "confirm": "Eltávolítás"
+  },
+  "keyChange": {
+    "title": "{{name}} kulcsot váltott",
+    "message": "Ez a tároló mostantól másik kulccsal írja alá a bővítménylistáját. Szüneteltetve marad, amíg döntesz. Csak akkor bízz az új kulcsban, ha a tulajdonos jelezte a változást.",
+    "oldKey": "Eddig megbízott kulcs",
+    "newKey": "Új kulcs",
+    "keepPaused": "Szüneteltetve hagyom",
+    "trust": "Megbízom az új kulcsban",
+    "review": "Kulcsváltás áttekintése"
+  },
+  "mirror": {
+    "title": "Speciális",
+    "label": "A hivatalos bővítménylista tükre (nem kötelező)",
+    "hint": "Csak akkor módosítsd, ha tükörcímet kaptál. A tükörnek ugyanazokat az aláírt fájlokat kell kiszolgálnia; a Mumcord ettől még minden aláírást ellenőriz.",
+    "save": "Mentés",
+    "reset": "Alapértelmezett használata"
+  },
+  "official": {
+    "name": "Hivatalos Mumcord-bővítmények",
+    "alwaysOn": "Mindig bekapcsolva"
+  }
+}

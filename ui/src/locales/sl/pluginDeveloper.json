@@ -1,0 +1,35 @@
+{
+  "hint": "Naložite razpakirano mapo vtičnika in jo preizkusite. Razvijalski vtičniki niso podpisani, nikoli niso uradni in ne morejo dobiti net.http, secrets ali ui.webview. Ob izklopu razvijalskega načina se razložijo.",
+  "load": "Naloži mapo vtičnika …",
+  "pickFolder": "Izberite mapo vtičnika",
+  "empty": "Noben razvijalski vtičnik ni naložen.",
+  "listLabel": "Razvijalski vtičniki",
+  "label": "Razvijalski vtičnik",
+  "status": {
+    "running": "Teče",
+    "off": "Izklopljen",
+    "backingOff": "Znova se zaganja po sesutju",
+    "autoOff": "Izklopljen po ponavljajočih se sesutjih",
+    "allOff": "Vsi vtičniki so izklopljeni",
+    "noPlugins": "Vtičniki so za to sejo izklopljeni",
+    "notLoaded": "Nalaganje ni uspelo"
+  },
+  "showLog": "Pokaži dnevnik vtičnika {{name}}",
+  "reload": "Znova naloži {{name}}",
+  "unload": "Razloži {{name}}",
+  "logLabel": "Dnevnik vtičnika {{name}}",
+  "logTitle": "Dnevnik vtičnika {{name}}",
+  "logEmpty": "Še ni vrstic dnevnika.",
+  "level": {
+    "debug": "Razhroščevanje",
+    "info": "Info",
+    "warn": "Opozorilo",
+    "error": "Napaka"
+  },
+  "errors": {
+    "load": "Mape vtičnika ni bilo mogoče naložiti.",
+    "reload": "Vtičnika ni bilo mogoče znova naložiti.",
+    "unload": "Vtičnika ni bilo mogoče razložiti.",
+    "log": "Dnevnika ni bilo mogoče prebrati."
+  }
+}

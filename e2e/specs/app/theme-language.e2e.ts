@@ -110,9 +110,9 @@ const neutral = (t: string) =>
   /^(null|linux \S+|windows \S+|macos \S+)$/i.test(t) ||
   // "Beta" is the same word in English, German and Spanish; "Details" is the German one.
   /^(Beta|Details)$/.test(t) ||
-  // "Apps" is also the German and Spanish word, "Bitrate", "Status" and "Updates" the German ones;
+  // "Apps" and "Plugins" are also the German and Spanish words, "Bitrate", "Status" and "Updates" the German ones;
   // preset theme names are names, not translated.
-  /^(Apps|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
+  /^(Apps|Plugins|Bitrate|Status|Updates|Deep Ocean|Forest|Paper)$/.test(t) ||
   // "Standard" is the German default-identity badge ("Default"), which only matches the English
   // noise suppression level by chance.
   /^Standard$/.test(t) ||

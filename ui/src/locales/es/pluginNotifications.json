@@ -1,0 +1,30 @@
+{
+  "type": "Complemento",
+  "autoOff": {
+    "title": "{{name}} se ha desactivado",
+    "body": "Desactivado tras fallos repetidos",
+    "open": "Mostrar en Complementos"
+  },
+  "update": {
+    "title": "Actualización de {{name}}",
+    "body": "La versión {{version}} espera en la pestaña Actualizaciones",
+    "open": "Mostrar actualizaciones"
+  },
+  "suggestion": {
+    "title": "Este servidor usa {{name}}",
+    "noReason": "Sugerido por el servidor",
+    "install": "Instalar…",
+    "installLabel": "Instalar {{name}}",
+    "addRepositoryLabel": "Añadir repositorio de {{name}}",
+    "details": "Ver detalles",
+    "detailsLabel": "Detalles de {{name}}",
+    "notNow": "Ahora no",
+    "notNowLabel": "Ocultar {{name}} por ahora",
+    "dontAsk": "No volver a preguntar en este servidor",
+    "recommended": "Recomendado",
+    "official": "Oficial",
+    "unofficial": "No oficial · {{host}}",
+    "footer": "Las sugerencias nunca instalan nada por sí solas. El servidor no sabe lo que instalas."
+  },
+  "failed": "No ha funcionado. Inténtalo de nuevo."
+}

@@ -38,7 +38,6 @@
     "sessionOnly": "Ennek a személynek nincs tanúsítványa, ezért ezek a beállítások csak erre a munkamenetre érvényesek.",
     "sendPrivateMessage": "Privát üzenet küldése",
     "privateMessage": "Privát üzenet",
-    "localSettings": "Saját beállításaid",
     "localSettingsHint": "Ezeket csak te látod. A változások azonnal mentődnek.",
     "settingsFor": "{{name}} beállításai",
     "hintMuted": "Némítva",
