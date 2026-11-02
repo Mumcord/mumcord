@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { type PluginUpdates } from "../../api";
+import { Group } from "../settings/components/Section";
 import { Switch } from "../settings/components/Switch";
 import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginRequestStore";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
@@ -140,14 +141,14 @@ export function PluginsSection({
         )}
       </div>
       {active === "installed" && (
-        <div className="plugins-footer">
+        <Group title={t("tabs.installed")}>
           <Switch
             label={t("turnOffAll")}
             checked={allOff}
             disabled={overview === null}
             onChange={(checked) => void setAllPluginsOff(checked)}
           />
-        </div>
+        </Group>
       )}
     </div>
   );
