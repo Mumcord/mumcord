@@ -89,6 +89,44 @@ native(
   "BSD-3-Clause",
   "VP8/VP9 screen-share codec, statically linked.",
 );
+const [svtAv1] = field("svt-av1");
+const [dav1d] = field("dav1d");
+if (!svtAv1 || !dav1d) throw new Error(`${opt.native} has no SVT-AV1 or dav1d line`);
+native(
+  "svt-av1",
+  svtAv1,
+  `pkg:gitlab/AOMediaCodec/SVT-AV1@v${svtAv1}`,
+  "BSD-3-Clause-Clear",
+  "AV1 software screen-share encoder, statically linked (plus the AOM Patent License 1.0).",
+);
+native(
+  "dav1d",
+  dav1d,
+  `pkg:generic/dav1d@${dav1d}?download_url=https://code.videolan.org/videolan/dav1d`,
+  "BSD-2-Clause",
+  "AV1 screen-share decoder, statically linked.",
+);
+// FFmpeg is missing on macOS, libvpl everywhere but Windows (scripts/sbom-native.sh).
+const [ffmpeg] = field("ffmpeg");
+if (ffmpeg) {
+  native(
+    "ffmpeg",
+    ffmpeg,
+    `pkg:github/FFmpeg/FFmpeg@n${ffmpeg}`,
+    "LGPL-2.1-or-later",
+    "Minimal libavcodec/libavutil for AV1/VP9 hardware screen-share encoders, statically linked.",
+  );
+}
+const [libvpl] = field("libvpl");
+if (libvpl) {
+  native(
+    "libvpl",
+    libvpl,
+    `pkg:github/intel/libvpl@v${libvpl}`,
+    "MIT",
+    "Intel Quick Sync dispatcher for FFmpeg's hardware encoders, statically linked.",
+  );
+}
 if (opt.gstreamer === "gst") {
   const [webkit] = field("webkitgtk");
   if (!webkit) throw new Error(`${opt.native} has no WebKitGTK line`);

@@ -62,8 +62,9 @@ BUNDLED COMPONENTS (not Rust or npm packages)
 =============================================
 
 The Mumble protocol definitions, and the C/C++ libraries that Mumcord compiles in,
-links or loads: libopus and SQLite are compiled in by Rust crates, libvpx is
-statically linked into every build, PipeWire is loaded from the Linux system, and
+links or loads: libopus and SQLite are compiled in by Rust crates, libvpx,
+SVT-AV1 and dav1d are statically linked into every build, a minimal LGPL FFmpeg
+into the Windows and Linux builds, PipeWire is loaded from the Linux system, and
 the Linux AppImage carries GStreamer and WebKitGTK from its Ubuntu 24.04 build host.
 BoringSSL-derived code compiled in by the ring crate is covered by ring's license
 texts in the Rust section below.
@@ -90,9 +91,12 @@ similar permissive terms:
 SOURCE CODE OFFER (LGPL and GPL components)
 -------------------------------------------
 
-Several libraries above (GStreamer, WebKitGTK, GTK, GLib, and others) are licensed
-under the GNU LGPL or GPL. You may replace them with your own build: the AppImage
-loads them as separate shared libraries. The corresponding source code of the exact
+Several libraries above (FFmpeg, GStreamer, WebKitGTK, GTK, GLib, and others) are
+licensed under the GNU LGPL or GPL. You may replace them with your own build: the
+AppImage loads GStreamer, WebKitGTK and the other system libraries as separate
+shared libraries, and FFmpeg, which is linked statically, can be replaced by
+rebuilding Mumcord from its public source against your FFmpeg build
+(scripts/build-ffmpeg.sh, FFMPEG_STATIC_DIR). The corresponding source code of the exact
 versions in a Mumcord release is the source of the Ubuntu 24.04 packages used to
 build that release, available with "apt source <package>" on Ubuntu 24.04 or from
   https://archive.ubuntu.com/ubuntu/pool/ and https://launchpad.net/ubuntu
@@ -101,6 +105,7 @@ Upstream releases:
   WebKitGTK   https://webkitgtk.org/releases/
   GTK, GLib   https://download.gnome.org/sources/
   libvpx      https://github.com/webmproject/libvpx/releases
+  FFmpeg      https://ffmpeg.org/releases/
   PipeWire    https://gitlab.freedesktop.org/pipewire/pipewire/-/tags
 We also provide the source code of any of these components on request, for at
 least three years after the release that contained it: open an issue at

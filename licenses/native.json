@@ -40,6 +40,61 @@
       "texts": ["licenses/libvpx.txt"]
     },
     {
+      "name": "FFmpeg (libavcodec, libavutil)",
+      "version": "@ffmpeg",
+      "license": "LGPL-2.1-or-later",
+      "repository": "https://ffmpeg.org",
+      "description": [
+        "Reaches the graphics card's AV1 and VP9 encoders for screen sharing. A minimal build",
+        "(scripts/build-ffmpeg.sh) without GPL or non-free parts and without any other codec,",
+        "statically linked into the Windows and Linux apps; the macOS app does not contain it.",
+        "Relinking: Mumcord's source is public, so it can be rebuilt against a modified FFmpeg",
+        "(see the note in the licence text). The build compiles in NVIDIA's NVENC headers",
+        "(nv-codec-headers) and AMD's AMF headers, both under the MIT licence; the graphics",
+        "drivers themselves are loaded from the system at runtime."
+      ],
+      "texts": [
+        "licenses/ffmpeg.txt",
+        "licenses/lgpl-2.1.txt",
+        "licenses/nv-codec-headers.txt",
+        "licenses/amf.txt"
+      ]
+    },
+    {
+      "name": "Intel VPL dispatcher (libvpl)",
+      "version": "@libvpl",
+      "license": "MIT",
+      "repository": "https://github.com/intel/libvpl",
+      "description": [
+        "Loads Intel's Quick Sync runtime for FFmpeg's AV1 and VP9 hardware encoders. Statically",
+        "linked into the Windows app only."
+      ],
+      "texts": ["licenses/libvpl.txt"]
+    },
+    {
+      "name": "SVT-AV1",
+      "version": "@svt-av1",
+      "license": "BSD-3-Clause-Clear AND LicenseRef-AOM-Patent-License-1.0",
+      "repository": "https://gitlab.com/AOMediaCodec/SVT-AV1",
+      "description": [
+        "Software AV1 encoder for screen sharing (scripts/build-svt-av1.sh), statically linked",
+        "into every Mumcord build. Licensed under the Clear BSD licence together with the",
+        "Alliance for Open Media Patent License 1.0."
+      ],
+      "texts": ["licenses/svt-av1.txt"]
+    },
+    {
+      "name": "dav1d",
+      "version": "@dav1d",
+      "license": "BSD-2-Clause",
+      "repository": "https://code.videolan.org/videolan/dav1d",
+      "description": [
+        "AV1 decoder for screen sharing when the web view cannot decode AV1 itself",
+        "(scripts/build-dav1d.sh), statically linked into every Mumcord build."
+      ],
+      "texts": ["licenses/dav1d.txt"]
+    },
+    {
       "name": "SQLite",
       "version": "@sqlite",
       "license": "blessing",

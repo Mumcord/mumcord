@@ -1,0 +1,17 @@
+FFmpeg (libavcodec and libavutil)
+Copyright (c) the FFmpeg developers, https://ffmpeg.org
+
+This build of FFmpeg is licensed under the GNU Lesser General Public License
+version 2.1 or later (LGPL-2.1-or-later); the full text follows below. It was
+configured without --enable-gpl, --enable-version3 and --enable-nonfree, and with
+every codec disabled except the AV1 and VP9 hardware encoders (av1_nvenc, av1_amf,
+av1_qsv, vp9_qsv on Windows; av1_nvenc, av1_amf, av1_vaapi, vp9_vaapi on Linux).
+The exact configuration is in scripts/build-ffmpeg.sh of the Mumcord source.
+
+Relinking: Mumcord links FFmpeg statically. Mumcord's complete source code,
+including the script that builds this FFmpeg, is available under the GNU AGPL v3
+at https://github.com/Mumcord/mumcord, so you can rebuild Mumcord against a
+modified version of FFmpeg (set FFMPEG_STATIC_DIR to your build). The FFmpeg
+source code of the version used is available at https://ffmpeg.org/releases/ and,
+on request, from the Mumcord maintainers for at least three years after the
+release that contained it.

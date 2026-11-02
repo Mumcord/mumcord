@@ -16,6 +16,7 @@
 ### Internal
 
 - Updated dependencies: `libloading` 0.9, `sha1` 0.11, the Rust and npm minor and patch updates and the cargo-deny GitHub Action; `async-executor` moves off a yanked release so the dependency audit passes again
+- Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and a minimal LGPL FFmpeg for graphics-card encoders); the licences window and third-party notices list them with their licence texts
 
 ## [0.6.1] - 2026-11-02
 
