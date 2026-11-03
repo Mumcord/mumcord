@@ -33,6 +33,7 @@ function message(id: string, sender: string, minutesAgo: number, body: string): 
     body,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
   };
 }
 

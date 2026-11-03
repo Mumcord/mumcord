@@ -38,6 +38,7 @@ function message(body: string): ChatMessage {
     body,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
   };
 }
 

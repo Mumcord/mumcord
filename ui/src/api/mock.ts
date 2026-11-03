@@ -6,6 +6,7 @@
 import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
   DndState,
+  FileChip,
   InspectorView,
   LinkOutcome,
   MessageNotice,
@@ -859,6 +860,7 @@ function demoHistory(): ChatMessage[] {
     body,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
   }));
 }
 
@@ -1692,6 +1694,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let cachedTempKib = 352;
   // GIF favorites, most recently used first.
   let gifFavorites: string[] = [];
+  let nextChipId = 1;
   /** Originals kept by `fullImageKeep`, by reference. */
   const fullImages = new Map<string, string>();
   const offeredHistory = new Map<
@@ -1962,6 +1965,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       body: html,
       dismissedPreviews: [],
       syncedFrom: null,
+      file: null,
     };
     store(message);
     return message;
@@ -2757,6 +2761,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         body: line.body,
         dismissedPreviews: [],
         syncedFrom: offer?.holderName ?? null,
+        file: null,
       }));
       messages.sort((a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt));
       for (const message of messages) storeByTime(message);
@@ -3233,6 +3238,25 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve({ ...requireServer(serverId) });
     },
     fullImageCancel: () => Promise.resolve(null),
+    filesAvailability: () => Promise.resolve(null),
+    filesChipAdd: (path) => {
+      const chip: FileChip = {
+        id: nextChipId++,
+        name: path.split(/[\\/]/).pop() ?? path,
+        size: 1024,
+        state: { kind: "ready" },
+      };
+      return Promise.resolve(chip);
+    },
+    filesChipRemove: () => Promise.resolve(undefined),
+    filesSend: () => Promise.resolve([]),
+    filesStop: () => Promise.resolve(undefined),
+    filesCard: () => Promise.resolve(null),
+    filesDownload: () => Promise.resolve(null),
+    filesCancel: () => Promise.resolve(undefined),
+    filesSaveFolder: () => Promise.resolve("~/Downloads"),
+    filesOpen: () => Promise.resolve(null),
+    filesOpenFolder: () => Promise.resolve(null),
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
@@ -3546,6 +3570,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           body,
           dismissedPreviews: [],
           syncedFrom: null,
+          file: null,
         })),
         receivedAt: new Date().toISOString(),
       };
@@ -3570,6 +3595,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         body,
         dismissedPreviews: [],
         syncedFrom: null,
+        file: null,
       };
       if (blocked && conversation.kind !== "channel") return message;
       store(message);

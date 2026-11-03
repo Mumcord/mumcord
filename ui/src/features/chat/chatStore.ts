@@ -378,6 +378,7 @@ export function addOutgoing(
       body: send.html,
       dismissedPreviews: [],
       syncedFrom: null,
+      file: null,
     },
     error: null,
   };
