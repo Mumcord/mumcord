@@ -133,6 +133,7 @@ mod tests {
                     Ok(_) if (encoder, codec) == (HardwareEncoder::Nvenc, Codec::Av1) => {}
                     Ok(_) if encoder == HardwareEncoder::Vaapi => {}
                     Ok(_) if (encoder, codec) == (HardwareEncoder::Amf, Codec::Av1) => {}
+                    Ok(_) if encoder == HardwareEncoder::Qsv => {}
                     Ok(_) => panic!("{encoder} {codec:?}: not implemented yet"),
                 }
             }
