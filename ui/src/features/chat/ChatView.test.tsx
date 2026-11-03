@@ -166,6 +166,30 @@ describe("ChatView", () => {
     expect(items[0]?.tabIndex).toBe(0);
   });
 
+  it("shows a file offer as its card instead of the plain line (FR-7.19)", async () => {
+    const api = await renderChat();
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "<p>Anna shared a file: <b>notes.txt</b></p>", 2, {
+        shareId: "s1",
+        name: "notes.txt",
+        size: 2048,
+        mime: "text/plain",
+        sha256: "ab".repeat(32),
+        expires: Math.floor(Date.now() / 1000) + 600,
+        senderName: "Anna",
+        own: false,
+        risky: false,
+        state: { kind: "available" },
+        downloadBlock: null,
+        share: null,
+      });
+    });
+    expect(
+      await screen.findByRole("group", { name: "notes.txt, 2.0 KB, from Anna, available" }),
+    ).toBeVisible();
+    expect(screen.queryByText("Anna shared a file:", { exact: false })).toBeNull();
+  });
+
   it("has no axe violations", async () => {
     const api = await renderChat();
     act(() => {

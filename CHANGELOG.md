@@ -9,6 +9,7 @@
 - Settings → Privacy & Connections has a new "File sharing" card: turn receiving files on or off, pick the maximum file size (100 MB to 2 GB) and choose the folder where received files are saved (by default a "Mumcord" folder inside Downloads).
 - The message input has a paperclip button and accepts dropped files and folders in channels: each becomes a chip with its size or progress and a remove button. The paperclip says why it is unavailable when the server has no relay, the relay doesn't allow files, you have no certificate, or your peer-to-peer setting needs the relay.
 - Dropping images into a channel asks whether to send them as images or share them as files; other files are shared at once. Private chats keep sending dropped images inline.
+- Files shared in a channel show up as a file card with name, size, type and checksum. Every download asks first, programs and scripts get an extra warning before download and before opening, and the card shows the queue position, progress, the check that the file arrived unchanged, and Open / Open folder. Your own shared files show who downloaded them and a Stop sharing button
 
 ### Fixed
 

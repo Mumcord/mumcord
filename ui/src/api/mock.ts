@@ -6,6 +6,7 @@
 import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
   DndState,
+  FileCard,
   FileChip,
   InspectorView,
   LinkOutcome,
@@ -118,8 +119,13 @@ export interface MockControls {
   requirePassword(serverId: number, password: string): void;
   /** The next connect to `serverId` asks for certificate trust first. */
   requireCertTrust(serverId: number, previousFingerprint?: string): void;
-  /** Simulates an incoming message from another person. */
-  receiveMessage(conversation: Conversation, body: string, senderSession: number): ChatMessage;
+  /** Simulates an incoming message from another person; `file` makes it a file offer. */
+  receiveMessage(
+    conversation: Conversation,
+    body: string,
+    senderSession: number,
+    file?: FileCard,
+  ): ChatMessage;
   /**
    * What the next `historySyncRequest` for `channelId` finds in `holderName`'s history
    * (FR-1.60); without it, a sync finds nothing.
@@ -3578,7 +3584,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       setPmRequests(currentServerId, { ...requests, incoming: [...requests.incoming, request] });
       return request;
     },
-    receiveMessage: (conversation, body, senderSession) => {
+    receiveMessage: (conversation, body, senderSession, file) => {
       focused();
       const sender = requireUser(senderSession);
       // Like the engine (issue #140): private messages of blocked people are dropped, their
@@ -3595,7 +3601,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         body,
         dismissedPreviews: [],
         syncedFrom: null,
-        file: null,
+        file: file ?? null,
       };
       if (blocked && conversation.kind !== "channel") return message;
       store(message);

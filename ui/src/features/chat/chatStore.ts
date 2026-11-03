@@ -11,6 +11,7 @@ import {
   getApi,
   type ChatMessage,
   type Conversation,
+  type FileCard,
   type MumcordApi,
   type Unsubscribe,
 } from "../../api";
@@ -254,7 +255,31 @@ function bind(api: MumcordApi): void {
     api.on("connectionStateChanged", ({ serverId, state }) => {
       if (state.state === "disconnected") reset(serverId);
     }),
+    api.on("fileCardChanged", ({ serverId, card }) => {
+      updateFileCard(serverId, card);
+    }),
   ];
+}
+
+/** Puts a file card's new state into the messages that carry it (FR-7.20). */
+function updateFileCard(serverId: number, card: FileCard): void {
+  const prefix = serverPrefix(serverId);
+  let changed = false;
+  const next = new Map(logs);
+  for (const [key, log] of logs) {
+    if (!key.startsWith(prefix)) continue;
+    if (!log.messages.some((m) => m.file?.shareId === card.shareId)) continue;
+    next.set(key, {
+      ...log,
+      messages: log.messages.map((m) =>
+        m.file?.shareId === card.shareId ? { ...m, file: card } : m,
+      ),
+    });
+    changed = true;
+  }
+  if (!changed) return;
+  logs = next;
+  notify();
 }
 
 /** Invalidates the running history requests of every server. */
