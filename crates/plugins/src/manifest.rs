@@ -1010,7 +1010,7 @@ fn bad_value(field: &'static str, kind: &'static str, value: &str) -> ManifestEr
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
 
     /// A manifest using every field.

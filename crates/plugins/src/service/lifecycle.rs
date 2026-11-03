@@ -336,8 +336,8 @@ impl PluginService {
             .ok_or_else(|| ServiceError::NotInstalled(id.to_owned()))
     }
 
-    /// Lets an official plugin with `ui.webview` serve its `web/` folder (FR-6.48); without the
-    /// grant any open web view closes.
+    /// Lets a plugin with `ui.webview` serve its `web/` folder in the places its manifest allows
+    /// (FR-6.48, FR-9.32); without the grant any open web view closes.
     pub(super) fn set_webview_root(
         &self,
         id: &str,
@@ -345,15 +345,19 @@ impl PluginService {
         dir: &Path,
         granted: &[String],
     ) {
-        let allowed =
-            source == Source::Official && granted.iter().any(|g| g == webview::PERMISSION);
+        let places = self
+            .host
+            .manifest(id)
+            .map(webview::allowed_places)
+            .unwrap_or_default();
+        let allowed = may_show_web_content(self.host.manifest(id), source, granted);
         if !allowed {
             self.io.webview_hide(id);
         }
         let web = dir.join("web");
         let webviews = self.io.webviews();
         webviews.set_origins_granted(id, granted.iter().any(|g| g == "net.origins"));
-        webviews.set_root(id, (allowed && web.is_dir()).then_some(web));
+        webviews.set_root(id, (allowed && web.is_dir()).then_some(web), places);
     }
 
     pub(super) fn version_dir(&self, id: &str, version: &str) -> PathBuf {
@@ -471,4 +475,59 @@ fn version_folders(dir: &std::path::Path) -> Vec<String> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// Whether a plugin may show its own web content (FR-9.32): it holds `ui.webview` and is
+/// official (as in 1.0) or built for API 1.1 or later, whose stricter frame rules make web
+/// content safe enough for unofficial plugins.
+fn may_show_web_content(
+    manifest: Option<&crate::Manifest>,
+    source: Source,
+    granted: &[String],
+) -> bool {
+    granted.iter().any(|g| g == webview::PERMISSION)
+        && (source == Source::Official
+            || manifest
+                .is_some_and(|m| crate::version::api_of(m) >= crate::version::ApiMinor::V1_1))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn manifest(api: &str) -> crate::Manifest {
+        let mut manifest = crate::Manifest::parse(crate::manifest::tests::EXAMPLE.as_bytes())
+            .expect("example parses");
+        manifest.api = api.parse().expect("api range");
+        manifest
+    }
+
+    #[test]
+    fn unofficial_plugins_get_web_content_only_with_api_1_1() {
+        let granted = vec![webview::PERMISSION.to_owned()];
+        let (old, new) = (manifest("^1.0"), manifest("^1.1"));
+        assert!(may_show_web_content(Some(&old), Source::Official, &granted));
+        assert!(may_show_web_content(Some(&new), Source::Official, &granted));
+        assert!(!may_show_web_content(
+            Some(&old),
+            Source::Repo { repository_id: 1 },
+            &granted
+        ));
+        assert!(may_show_web_content(
+            Some(&new),
+            Source::Repo { repository_id: 1 },
+            &granted
+        ));
+        assert!(!may_show_web_content(
+            None,
+            Source::Repo { repository_id: 1 },
+            &granted
+        ));
+        assert!(!may_show_web_content(
+            Some(&new),
+            Source::Repo { repository_id: 1 },
+            &[]
+        ));
+        assert!(!may_show_web_content(Some(&new), Source::Official, &[]));
+    }
 }

@@ -1,5 +1,5 @@
-//! `webview` (FR-6.46 … FR-6.48): an official plugin shows HTML from its own `web/` folder in a
-//! sealed frame and talks to it through a message bridge.
+//! `webview` (FR-6.46 … FR-6.48, FR-9.32 … FR-9.40): a plugin shows HTML from its own `web/`
+//! folder in a sealed frame and talks to it through a message bridge.
 //!
 //! The rules live here so the client (plugin service, custom protocol, UI glue) and tests share
 //! them: which entries and files are valid, the frame's Content-Security-Policy, the bridge
@@ -8,7 +8,9 @@
 //!
 //! Since 1.1 (FR-9.32 … FR-9.38) a plugin may have up to three frames at once, one per slot:
 //! stage, side panel and dialog (the panel popover uses the dialog slot). The frame policy also
-//! lets the page reach the websites the plugin declares in `net.origins`.
+//! lets the page reach the websites the plugin declares in `net.origins`. Official plugins and
+//! unofficial ones built for API 1.1 may show web content; a 1.1 plugin only in the places its
+//! manifest lists in `webview.places`. Only one plugin at a time has a side panel.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -19,13 +21,18 @@ use base64::Engine as _;
 use sha2::{Digest, Sha256};
 use wasmtime::component::{HasSelf, Linker};
 
+use crate::manifest::{Manifest, WebviewPlace as DeclaredPlace};
 use crate::origins::{Origin, Scheme};
 use crate::runtime::bindings::mumcord::plugin::webview::{Host, Place, add_to_linker};
 use crate::runtime::wit::types::Error;
 use crate::runtime::{HostApi, PluginState};
 
-/// The permission every `webview` call needs (official plugins only, FR-6.48).
+/// The permission every `webview` call needs (FR-6.48; open to unofficial plugins since 1.1).
 pub const PERMISSION: &str = "ui.webview";
+/// The extra permission a side-panel frame needs (FR-9.39).
+pub const SIDE_PANEL_PERMISSION: &str = "ui.side-panel";
+/// The extra permission a stage frame needs (FR-9.46).
+pub const STAGE_PERMISSION: &str = "ui.stage";
 /// The URI scheme the client serves `web/` files under; the page's frame loads nothing else.
 pub const SCHEME: &str = "mumcord-web";
 /// One bridge message, in UTF-8 bytes (FR-6.47).
@@ -72,7 +79,7 @@ impl HostApi for WebviewApi {
 impl Host for PluginState {
     fn show(&mut self, place: Place, entry: String) -> Result<(), Error> {
         self.ctx.grants.check(&self.id, PERMISSION)?;
-        self.io()?.webview_show(&self.id, place, entry)
+        self.io()?.webview_show(&self.id, place.into(), entry)
     }
 
     fn hide(&mut self) {
@@ -247,6 +254,15 @@ impl WebviewPlace {
         }
     }
 
+    /// The permission this place needs on top of `ui.webview`.
+    pub fn extra_permission(self) -> Option<&'static str> {
+        match self {
+            Self::PanelPopover | Self::Dialog => None,
+            Self::SidePanel => Some(SIDE_PANEL_PERMISSION),
+            Self::Stage => Some(STAGE_PERMISSION),
+        }
+    }
+
     /// The largest bridge message to or from a frame in this place (FR-9.37).
     pub fn max_message_bytes(self) -> usize {
         match self {
@@ -265,6 +281,30 @@ impl From<Place> for WebviewPlace {
     }
 }
 
+impl From<DeclaredPlace> for WebviewPlace {
+    fn from(place: DeclaredPlace) -> Self {
+        match place {
+            DeclaredPlace::Panel => Self::PanelPopover,
+            DeclaredPlace::Dialog => Self::Dialog,
+            DeclaredPlace::SidePanel => Self::SidePanel,
+            DeclaredPlace::Stage => Self::Stage,
+        }
+    }
+}
+
+/// The places a plugin may show web content in: a manifest for API 1.1 or later lists them in
+/// `webview.places` (none without that field); an API 1.0 manifest keeps the two places of 1.0.
+pub fn allowed_places(manifest: &Manifest) -> Vec<WebviewPlace> {
+    if crate::version::api_of(manifest) < crate::version::ApiMinor::V1_1 {
+        return vec![WebviewPlace::PanelPopover, WebviewPlace::Dialog];
+    }
+    manifest
+        .webview
+        .iter()
+        .flat_map(|decl| decl.places.iter().copied().map(WebviewPlace::from))
+        .collect()
+}
+
 /// The three frames a plugin may have at once (FR-9.38). The panel popover and the dialog share
 /// one slot, so a popover while the dialog shows a page (or the other way round) is a fourth
 /// frame.
@@ -281,12 +321,17 @@ pub struct Shown {
     pub place: WebviewPlace,
     /// The validated entry below `web/`, with its query string if any.
     pub entry: String,
+    /// Another plugin whose side panel this one replaced (one side panel at a time, FR-9.39):
+    /// its frame is closed and it should get `surface-closed`.
+    pub replaced: Option<String>,
 }
 
 #[derive(Debug, Default)]
 struct PluginWeb {
     /// The plugin's installed `web/` folder; `None` unless it may show web views.
     root: Option<PathBuf>,
+    /// The places its manifest allows (see [`allowed_places`]).
+    places: Vec<WebviewPlace>,
     /// The plugin's declared `net.origins`.
     origins: Vec<Origin>,
     /// Whether the `net.origins` grant lets its pages reach them.
@@ -348,15 +393,20 @@ impl Webviews {
         self.plugins.lock().unwrap_or_else(PoisonError::into_inner)
     }
 
-    /// Sets the folder a plugin's pages come from, at load. `None` (no `ui.webview` grant, not
-    /// official, no `web/`) closes any web view and serves nothing.
-    pub fn set_root(&self, plugin: &str, root: Option<PathBuf>) {
+    /// Sets the folder a plugin's pages come from and the places they may be shown in, at
+    /// load. `None` (no `ui.webview` grant, an unofficial plugin built for API 1.0, no `web/`)
+    /// closes any web view and serves nothing; a frame in a place no longer allowed closes too.
+    pub fn set_root(&self, plugin: &str, root: Option<PathBuf>, places: Vec<WebviewPlace>) {
         let mut plugins = self.lock();
         let web = plugins.entry(plugin.to_owned()).or_default();
         if root.is_none() {
             web.close_all();
         }
+        for slot in [Slot::Stage, Slot::SidePanel, Slot::Dialog] {
+            web.close(slot, |open| !places.contains(&open));
+        }
         web.root = root;
+        web.places = places;
     }
 
     /// Sets the websites a plugin declares in `net.origins`, at load. Its pages reach them only
@@ -396,9 +446,12 @@ impl Webviews {
     }
 
     /// `webview.show`: opens a frame in `place`, or replaces the page of the frame already there.
-    /// `invalid` for an entry that is not an existing `.html` page in `web/`, or for the dialog
-    /// place without an open dialog; `quota-exceeded` when the place's slot holds the other
-    /// dialog-slot place (a fourth frame, FR-9.38; the spec calls it `limit`).
+    /// `not-permitted` for a place the manifest does not allow; `invalid` for an entry that is
+    /// not an existing `.html` page in `web/`, for the dialog place without an open dialog and
+    /// for the stage without an open stage frame (only `stage.start` opens one, see
+    /// [`Self::open_stage`]); `quota-exceeded` when the place's slot holds the other dialog-slot
+    /// place (a fourth frame, FR-9.38; the spec calls it `limit`). Opening a side panel closes
+    /// another plugin's (FR-9.39), named in [`Shown::replaced`].
     pub fn show(
         &self,
         plugin: &str,
@@ -406,38 +459,88 @@ impl Webviews {
         entry: &str,
         now: Instant,
     ) -> Result<Shown, Error> {
+        self.open(plugin, place, entry, now, false)
+    }
+
+    /// Opens the stage frame of an activity the plugin just started with web content
+    /// (`stage.start` with `stage-content.web`), or replaces its page. The caller has checked
+    /// `ui.stage` and the gesture; errors as [`Self::show`].
+    pub fn open_stage(&self, plugin: &str, entry: &str, now: Instant) -> Result<Shown, Error> {
+        self.open(plugin, WebviewPlace::Stage, entry, now, true)
+    }
+
+    fn open(
+        &self,
+        plugin: &str,
+        place: WebviewPlace,
+        entry: &str,
+        now: Instant,
+        start_stage: bool,
+    ) -> Result<Shown, Error> {
         let (path, _) = parse_entry(entry).ok_or(Error::Invalid)?;
         let mut plugins = self.lock();
         let web = plugins.get_mut(plugin).ok_or(Error::NotPermitted)?;
         let root = web.root.as_deref().ok_or(Error::NotPermitted)?;
-        if resolve(root, path).is_none() || (place == WebviewPlace::Dialog && !web.dialog_open) {
+        if !web.places.contains(&place) {
+            return Err(Error::NotPermitted);
+        }
+        let frame = web.frames[place.slot() as usize];
+        let missing_host = match place {
+            WebviewPlace::Dialog => !web.dialog_open,
+            WebviewPlace::Stage => !start_stage && frame.is_none(),
+            WebviewPlace::PanelPopover | WebviewPlace::SidePanel => false,
+        };
+        if resolve(root, path).is_none() || missing_host {
             return Err(Error::Invalid);
         }
-        let frame = &mut web.frames[place.slot() as usize];
         if frame.is_some_and(|open| open != place) {
             return Err(Error::QuotaExceeded);
         }
-        *frame = Some(place);
+        web.frames[place.slot() as usize] = Some(place);
         web.rates.get_or_insert(Rates {
             to_page: Bucket::new(now),
             from_page: Bucket::new(now),
         });
+        let replaced = if place == WebviewPlace::SidePanel {
+            plugins
+                .iter_mut()
+                .filter(|(id, _)| id.as_str() != plugin)
+                .find_map(|(id, web)| web.close(Slot::SidePanel, |_| true).then(|| id.clone()))
+        } else {
+            None
+        };
         Ok(Shown {
             place,
             entry: entry.to_owned(),
+            replaced,
         })
     }
 
-    /// `webview.hide`: closes the side panel and the dialog-slot frame; returns whether one was
-    /// open. A stage frame belongs to its activity and closes with [`Self::stage_closed`].
-    pub fn hide(&self, plugin: &str) -> bool {
+    /// Whether `plugin` has a frame open in `place`.
+    pub fn is_open(&self, plugin: &str, place: WebviewPlace) -> bool {
+        self.lock()
+            .get(plugin)
+            .is_some_and(|web| web.frames[place.slot() as usize] == Some(place))
+    }
+
+    /// The user closed the frame in `place` (its close button); returns whether one was open.
+    pub fn close(&self, plugin: &str, place: WebviewPlace) -> bool {
+        self.lock()
+            .get_mut(plugin)
+            .is_some_and(|web| web.close(place.slot(), |open| open == place))
+    }
+
+    /// `webview.hide`: closes the side panel and the dialog-slot frame; returns the places that
+    /// were open. A stage frame belongs to its activity and closes with [`Self::stage_closed`].
+    pub fn hide(&self, plugin: &str) -> Vec<WebviewPlace> {
         let mut plugins = self.lock();
         let Some(web) = plugins.get_mut(plugin) else {
-            return false;
+            return Vec::new();
         };
-        let side = web.close(Slot::SidePanel, |_| true);
-        let dialog = web.close(Slot::Dialog, |_| true);
-        side || dialog
+        let open = [Slot::SidePanel, Slot::Dialog].map(|slot| web.frames[slot as usize]);
+        web.close(Slot::SidePanel, |_| true);
+        web.close(Slot::Dialog, |_| true);
+        open.into_iter().flatten().collect()
     }
 
     /// The plugin's stage activity ended; returns whether that closed its stage frame.
@@ -496,16 +599,21 @@ impl Webviews {
         }
     }
 
-    /// Whether a message from a page may reach the plugin: a frame is open, the message fits the
-    /// largest open frame and the rate allows it. Anything else is dropped.
-    pub fn accept_from_page(&self, plugin: &str, message: &str, now: Instant) -> bool {
+    /// Whether a message from the page in `place` may reach the plugin: that frame is open, the
+    /// message fits that place's limit and the rate allows it. Anything else is dropped.
+    pub fn accept_from_page(
+        &self,
+        plugin: &str,
+        place: WebviewPlace,
+        message: &str,
+        now: Instant,
+    ) -> bool {
         let mut plugins = self.lock();
         let Some(web) = plugins.get_mut(plugin) else {
             return false;
         };
-        if web
-            .max_message_bytes()
-            .is_none_or(|max| message.len() > max)
+        if web.frames[place.slot() as usize] != Some(place)
+            || message.len() > place.max_message_bytes()
         {
             return false;
         }
@@ -558,6 +666,13 @@ mod tests {
     use std::time::Duration;
 
     use super::*;
+
+    const ALL: [WebviewPlace; 4] = [
+        WebviewPlace::PanelPopover,
+        WebviewPlace::Dialog,
+        WebviewPlace::SidePanel,
+        WebviewPlace::Stage,
+    ];
 
     fn web_dir() -> (tempfile::TempDir, PathBuf) {
         let dir = tempfile::tempdir().unwrap();
@@ -723,7 +838,7 @@ mod tests {
             views.show("p", WebviewPlace::PanelPopover, "index.html", now),
             Err(Error::NotPermitted)
         );
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         assert!(views.file("p", "index.html").is_none());
         assert_eq!(
             views.show("p", WebviewPlace::PanelPopover, "missing.html", now),
@@ -735,7 +850,7 @@ mod tests {
         assert!(views.file("p", "game/app.js").is_some());
         assert!(views.file("p", "../secret.html").is_none());
         assert!(views.file("other", "index.html").is_none());
-        assert!(views.hide("p"));
+        assert_eq!(views.hide("p"), vec![WebviewPlace::PanelPopover]);
         assert!(views.file("p", "index.html").is_none());
     }
 
@@ -745,7 +860,7 @@ mod tests {
         let (dir, root) = web_dir();
         std::os::unix::fs::symlink(dir.path().join("secret.html"), root.join("out.html")).unwrap();
         let views = Webviews::default();
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         assert_eq!(
             views.show("p", WebviewPlace::PanelPopover, "out.html", Instant::now()),
             Err(Error::Invalid)
@@ -757,7 +872,7 @@ mod tests {
         let (_dir, root) = web_dir();
         let views = Webviews::default();
         let now = Instant::now();
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         assert_eq!(
             views.show("p", WebviewPlace::Dialog, "index.html", now),
             Err(Error::Invalid)
@@ -776,26 +891,26 @@ mod tests {
         let views = Webviews::default();
         let now = Instant::now();
         assert_eq!(views.post("p", "x", now), Err(Error::Invalid));
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         assert_eq!(views.post("p", "x", now), Err(Error::Invalid));
         views
             .show("p", WebviewPlace::PanelPopover, "index.html", now)
             .unwrap();
         let big = "x".repeat(MAX_MESSAGE_BYTES + 1);
         assert_eq!(views.post("p", &big, now), Err(Error::TooLarge));
-        assert!(!views.accept_from_page("p", &big, now));
+        assert!(!views.accept_from_page("p", WebviewPlace::PanelPopover, &big, now));
         for _ in 0..MAX_MESSAGES_PER_SECOND {
             assert_eq!(
                 views.post("p", "x", now),
                 Ok(vec![WebviewPlace::PanelPopover])
             );
-            assert!(views.accept_from_page("p", "x", now));
+            assert!(views.accept_from_page("p", WebviewPlace::PanelPopover, "x", now));
         }
         assert_eq!(views.post("p", "x", now), Err(Error::RateLimited));
-        assert!(!views.accept_from_page("p", "x", now));
+        assert!(!views.accept_from_page("p", WebviewPlace::PanelPopover, "x", now));
         let later = now + Duration::from_millis(100);
         assert!(views.post("p", "x", later).is_ok());
-        assert!(views.accept_from_page("p", "x", later));
+        assert!(views.accept_from_page("p", WebviewPlace::PanelPopover, "x", later));
     }
 
     #[test]
@@ -803,22 +918,20 @@ mod tests {
         let (_dir, root) = web_dir();
         let views = Webviews::default();
         let now = Instant::now();
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         views
             .show("p", WebviewPlace::SidePanel, "index.html", now)
             .unwrap();
-        views
-            .show("p", WebviewPlace::Stage, "index.html", now)
-            .unwrap();
+        views.open_stage("p", "index.html", now).unwrap();
         let stage_sized = "x".repeat(MAX_STAGE_MESSAGE_BYTES);
         assert_eq!(
             views.post("p", &stage_sized, now),
             Ok(vec![WebviewPlace::Stage])
         );
-        assert!(views.accept_from_page("p", &stage_sized, now));
+        assert!(views.accept_from_page("p", WebviewPlace::Stage, &stage_sized, now));
         let too_big = "x".repeat(MAX_STAGE_MESSAGE_BYTES + 1);
         assert_eq!(views.post("p", &too_big, now), Err(Error::TooLarge));
-        assert!(!views.accept_from_page("p", &too_big, now));
+        assert!(!views.accept_from_page("p", WebviewPlace::Stage, &too_big, now));
         assert_eq!(
             views.post("p", "x", now),
             Ok(vec![WebviewPlace::Stage, WebviewPlace::SidePanel])
@@ -838,13 +951,10 @@ mod tests {
         let (_dir, root) = web_dir();
         let views = Webviews::default();
         let now = Instant::now();
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         views.dialog_opened("p");
-        for place in [
-            WebviewPlace::Stage,
-            WebviewPlace::SidePanel,
-            WebviewPlace::Dialog,
-        ] {
+        views.open_stage("p", "index.html", now).unwrap();
+        for place in [WebviewPlace::SidePanel, WebviewPlace::Dialog] {
             views.show("p", place, "index.html", now).unwrap();
         }
         // The popover shares the dialog's slot: a fourth frame.
@@ -869,12 +979,15 @@ mod tests {
             ])
         );
         // `hide` leaves the stage to its activity.
-        assert!(views.hide("p"));
+        assert_eq!(
+            views.hide("p"),
+            vec![WebviewPlace::SidePanel, WebviewPlace::Dialog]
+        );
         assert_eq!(views.post("p", "x", now), Ok(vec![WebviewPlace::Stage]));
         assert!(views.file("p", "index.html").is_some());
         assert!(views.stage_closed("p"));
         assert!(views.file("p", "index.html").is_none());
-        assert!(!views.hide("p"));
+        assert!(views.hide("p").is_empty());
     }
 
     #[test]
@@ -882,7 +995,7 @@ mod tests {
         let (_dir, root) = web_dir();
         let views = Webviews::default();
         let now = Instant::now();
-        views.set_root("p", Some(root));
+        views.set_root("p", Some(root), ALL.to_vec());
         views
             .show("p", WebviewPlace::PanelPopover, "index.html", now)
             .unwrap();
@@ -920,16 +1033,124 @@ mod tests {
         let (_dir, root) = web_dir();
         let views = Webviews::default();
         let now = Instant::now();
-        views.set_root("p", Some(root.clone()));
+        views.set_root("p", Some(root.clone()), ALL.to_vec());
         views
             .show("p", WebviewPlace::PanelPopover, "index.html", now)
             .unwrap();
         views.close_unless(|_| false);
-        assert!(!views.hide("p"));
+        assert!(views.hide("p").is_empty());
         views
             .show("p", WebviewPlace::PanelPopover, "index.html", now)
             .unwrap();
-        views.set_root("p", None);
+        views.set_root("p", None, ALL.to_vec());
         assert!(views.file("p", "index.html").is_none());
+    }
+
+    #[test]
+    fn only_the_places_the_manifest_allows_open() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root.clone()), vec![WebviewPlace::SidePanel]);
+        for place in [WebviewPlace::PanelPopover, WebviewPlace::Stage] {
+            assert_eq!(
+                views.show("p", place, "index.html", now),
+                Err(Error::NotPermitted),
+                "{place:?}"
+            );
+        }
+        assert_eq!(
+            views.open_stage("p", "index.html", now),
+            Err(Error::NotPermitted)
+        );
+        views
+            .show("p", WebviewPlace::SidePanel, "index.html", now)
+            .unwrap();
+        // A reload without the place closes its frame.
+        views.set_root("p", Some(root), vec![WebviewPlace::Dialog]);
+        assert!(!views.is_open("p", WebviewPlace::SidePanel));
+    }
+
+    #[test]
+    fn the_stage_place_only_replaces_the_page_of_a_running_activity() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root), ALL.to_vec());
+        assert_eq!(
+            views.show("p", WebviewPlace::Stage, "index.html", now),
+            Err(Error::Invalid)
+        );
+        views.open_stage("p", "index.html", now).unwrap();
+        views
+            .show("p", WebviewPlace::Stage, "index.html?next", now)
+            .unwrap();
+        assert!(views.stage_closed("p"));
+        assert_eq!(
+            views.show("p", WebviewPlace::Stage, "index.html", now),
+            Err(Error::Invalid)
+        );
+    }
+
+    #[test]
+    fn one_side_panel_at_a_time_across_plugins() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("a", Some(root.clone()), ALL.to_vec());
+        views.set_root("b", Some(root), ALL.to_vec());
+        let first = views
+            .show("a", WebviewPlace::SidePanel, "index.html", now)
+            .unwrap();
+        assert_eq!(first.replaced, None);
+        let again = views
+            .show("a", WebviewPlace::SidePanel, "index.html?2", now)
+            .unwrap();
+        assert_eq!(again.replaced, None, "replacing its own page keeps it");
+        let second = views
+            .show("b", WebviewPlace::SidePanel, "index.html", now)
+            .unwrap();
+        assert_eq!(second.replaced.as_deref(), Some("a"));
+        assert!(!views.is_open("a", WebviewPlace::SidePanel));
+        assert!(views.is_open("b", WebviewPlace::SidePanel));
+    }
+
+    #[test]
+    fn page_messages_need_their_own_frame_and_its_size_limit() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root), ALL.to_vec());
+        views
+            .show("p", WebviewPlace::SidePanel, "index.html", now)
+            .unwrap();
+        assert!(views.accept_from_page("p", WebviewPlace::SidePanel, "x", now));
+        assert!(!views.accept_from_page("p", WebviewPlace::Stage, "x", now));
+        assert!(!views.accept_from_page("p", WebviewPlace::Dialog, "x", now));
+        views.open_stage("p", "index.html", now).unwrap();
+        let big = "x".repeat(MAX_MESSAGE_BYTES + 1);
+        assert!(views.accept_from_page("p", WebviewPlace::Stage, &big, now));
+        assert!(!views.accept_from_page("p", WebviewPlace::SidePanel, &big, now));
+        assert!(views.close("p", WebviewPlace::SidePanel));
+        assert!(!views.accept_from_page("p", WebviewPlace::SidePanel, "x", now));
+        assert!(!views.close("p", WebviewPlace::SidePanel));
+    }
+
+    #[test]
+    fn api_1_0_keeps_its_two_places_and_1_1_uses_the_declared_ones() {
+        let mut manifest = Manifest::parse(crate::manifest::tests::EXAMPLE.as_bytes()).unwrap();
+        assert_eq!(
+            allowed_places(&manifest),
+            vec![WebviewPlace::PanelPopover, WebviewPlace::Dialog]
+        );
+        manifest.api = "^1.1".parse().unwrap();
+        assert!(allowed_places(&manifest).is_empty());
+        manifest.webview = Some(crate::manifest::WebviewDecl {
+            places: vec![DeclaredPlace::SidePanel, DeclaredPlace::Panel],
+        });
+        assert_eq!(
+            allowed_places(&manifest),
+            vec![WebviewPlace::SidePanel, WebviewPlace::PanelPopover]
+        );
     }
 }

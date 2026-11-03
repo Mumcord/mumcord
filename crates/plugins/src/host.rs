@@ -362,6 +362,22 @@ impl PluginHost {
             })
     }
 
+    /// Queues `surface-closed` for plugin `id` if it is running and holds `ui.webview` (a 1.1
+    /// event: a 1.0 plugin never sees it).
+    pub fn send_surface_closed(&self, id: &str, place: crate::api::webview::WebviewPlace) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::webview::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| {
+                worker
+                    .queue
+                    .push(crate::runtime::PluginEvent::SurfaceClosed(place.into()))
+            })
+    }
+
     /// Whether replayed chat events can go to plugin `id` at all.
     pub fn takes_replays(&self, id: &str) -> bool {
         self.plugins

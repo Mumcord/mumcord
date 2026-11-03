@@ -22,7 +22,7 @@ use mumcord_plugins::api::webview::Webviews;
 use mumcord_plugins::registry::{Client, Download, Index, UrlPolicy};
 use mumcord_plugins::service::{
     InstallStage, PluginService, Schedule, ServiceConfig, ServiceError, ServiceEvent, Status,
-    run_check,
+    UiInput, run_check,
 };
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -438,6 +438,11 @@ async fn on_service_event(
             let change = ui::PluginUiChange::new(&plugin, update);
             plugins.trees().apply(&plugin, &change);
             PluginUi { plugin, change }.emit(app)?;
+        }
+        ServiceEvent::SurfaceClosed { plugin, place } => {
+            plugins
+                .call(move |service| Ok(service.ui_input(&plugin, UiInput::SurfaceClosed(place))))
+                .await?;
         }
         ServiceEvent::AutoOff { id } => PluginNotification {
             plugin: id,

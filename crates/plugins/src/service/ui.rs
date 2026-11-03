@@ -6,6 +6,7 @@
 use super::PluginService;
 use super::plugin_io::{PeerInfo, PeersState, wit_peer};
 use crate::api::app_menu::{self, AppMenuEntry};
+use crate::api::webview::WebviewPlace;
 use crate::host::RunState;
 use crate::wit::events::{ActionSource, ActionValue, Event, PanelVisibility, UiAction};
 
@@ -29,9 +30,15 @@ pub enum UiInput {
     UserMenuRequested(u32),
     /// The user closed the plugin's dialog.
     DialogClosed,
-    /// A bridge message from the plugin's web view page (untrusted, never logged). Dropped
-    /// unless the web view is open and the message fits the size and rate limits.
-    WebviewMessage(String),
+    /// A bridge message from the plugin's page in `place` (untrusted, never logged). Dropped
+    /// unless that frame is open and the message fits its size limit and the rate. The plugin
+    /// gets the text only: `webview-message` carries no place (pages that share one plugin tell
+    /// themselves apart in their own payload).
+    WebviewMessage { place: WebviewPlace, text: String },
+    /// The user closed the plugin's frame in `place` (its close button), or another plugin's
+    /// side panel replaced it ([`super::ServiceEvent::SurfaceClosed`]). The frame closes; a
+    /// plugin built for API 1.1 gets `surface-closed`.
+    SurfaceClosed(WebviewPlace),
 }
 
 impl PluginService {
@@ -108,15 +115,19 @@ impl PluginService {
                 None => return false,
             },
             UiInput::DialogClosed => Event::DialogClosed,
-            UiInput::WebviewMessage(text) => {
+            UiInput::WebviewMessage { place, text } => {
                 if !self
                     .io
                     .webviews()
-                    .accept_from_page(id, &text, std::time::Instant::now())
+                    .accept_from_page(id, place, &text, std::time::Instant::now())
                 {
                     return false;
                 }
                 Event::WebviewMessage(text)
+            }
+            UiInput::SurfaceClosed(place) => {
+                self.io.webviews().close(id, place);
+                return self.host.send_surface_closed(id, place);
             }
         };
         self.host.send_chat(id, event, chat)

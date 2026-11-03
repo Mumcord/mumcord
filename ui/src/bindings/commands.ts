@@ -3063,15 +3063,28 @@ serverId: number | null } |
  *  app serves from the plugin's `web/` folder (FR-6.46).
  */
 { type: "webviewShow"; place: PluginWebviewPlace; url: string } | 
-/**  The web view closes; its place shows the plugin's tree again. */
-{ type: "webviewHide" } | 
-/**  A bridge message for the page (untrusted text). Not part of the snapshot. */
-{ type: "webviewPost"; message: string };
+/**
+ *  The web view in `place` closes; the place shows the plugin's tree again (or closes, for
+ *  the side panel and the stage).
+ */
+{ type: "webviewHide"; place: PluginWebviewPlace } | 
+/**  A bridge message for the pages in `places` (untrusted text). Not part of the snapshot. */
+{ type: "webviewPost"; message: string; places: PluginWebviewPlace[] } | 
+/**
+ *  The smallest size the plugin asks for its side panel, in CSS pixels; the UI clamps it to
+ *  the panel's limits and the user may still resize (FR-9.39).
+ */
+{ type: "webviewSizeHint"; minWidth: number; minHeight: number };
 
 /**  A user input for a plugin's UI other than an action. */
 export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" } | 
-/**  A bridge message from the plugin's web view page (≤ 16 KiB, ≤ 60/s; dropped otherwise). */
-{ type: "webviewMessage"; text: string };
+/**
+ *  A bridge message from the plugin's page in `place` (≤ 16 KiB, 64 KiB from the stage,
+ *  ≤ 60/s; dropped otherwise, or when that frame is not open).
+ */
+{ type: "webviewMessage"; place: PluginWebviewPlace; text: string } | 
+/**  The user closed the plugin's frame in `place` (its close button). */
+{ type: "surfaceClosed"; place: PluginWebviewPlace };
 
 /**  One update on offer in Settings → Plugins → Updates. */
 export type PluginUpdate = {

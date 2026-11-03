@@ -13,6 +13,7 @@
 use wasmtime::component::{HasSelf, Linker};
 
 use crate::api::host_calls;
+use crate::api::webview::WebviewPlace;
 use crate::runtime::PluginState;
 use crate::runtime::bindings::mumcord::plugin as v1_0;
 
@@ -435,6 +436,28 @@ variant!(webview::Place {
     Dialog
 });
 
+impl From<wit::webview::Place> for WebviewPlace {
+    fn from(place: wit::webview::Place) -> Self {
+        match place {
+            wit::webview::Place::PanelPopover => Self::PanelPopover,
+            wit::webview::Place::Dialog => Self::Dialog,
+            wit::webview::Place::SidePanel => Self::SidePanel,
+            wit::webview::Place::Stage => Self::Stage,
+        }
+    }
+}
+
+impl From<WebviewPlace> for wit::webview::Place {
+    fn from(place: WebviewPlace) -> Self {
+        match place {
+            WebviewPlace::PanelPopover => Self::PanelPopover,
+            WebviewPlace::Dialog => Self::Dialog,
+            WebviewPlace::SidePanel => Self::SidePanel,
+            WebviewPlace::Stage => Self::Stage,
+        }
+    }
+}
+
 /// Existing features keep producing 1.0 events; they are queued as 1.1 events.
 impl From<v1_0::events::Event> for wit::events::Event {
     fn from(event: v1_0::events::Event) -> Self {
@@ -668,9 +691,11 @@ impl wit::http::Host for PluginState {
 
 impl wit::webview::Host for PluginState {
     fn show(&mut self, place: wit::webview::Place, entry: String) -> Result<(), Error> {
-        // The side panel and the stage come with their feature tasks.
-        let place = place.down().ok_or(Error::NotPermitted)?;
-        up(v1_0::webview::Host::show(self, place, entry))
+        let place = WebviewPlace::from(place);
+        check_webview_place(self, place).map_err(Up::up)?;
+        up(self
+            .io()
+            .and_then(|io| io.webview_show(&self.id, place, entry)))
     }
 
     fn hide(&mut self) {
@@ -681,9 +706,21 @@ impl wit::webview::Host for PluginState {
         up(v1_0::webview::Host::post(self, message))
     }
 
-    fn set_size_hint(&mut self, _min_width: u32, _min_height: u32) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+    fn set_size_hint(&mut self, min_width: u32, min_height: u32) -> Result<(), Error> {
+        check_webview_place(self, WebviewPlace::SidePanel).map_err(Up::up)?;
+        up(self
+            .io()
+            .and_then(|io| io.webview_set_size_hint(&self.id, min_width, min_height)))
     }
+}
+
+/// `ui.webview` plus the permission `place` needs (`ui.side-panel`, `ui.stage`).
+fn check_webview_place(state: &PluginState, place: WebviewPlace) -> Result<(), v1_0::types::Error> {
+    let grants = &state.ctx.grants;
+    grants.check(&state.id, crate::api::webview::PERMISSION)?;
+    place
+        .extra_permission()
+        .map_or(Ok(()), |extra| grants.check(&state.id, extra))
 }
 
 impl wit::stage::Host for PluginState {

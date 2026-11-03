@@ -8,10 +8,10 @@ use std::fmt::Debug;
 use mumcord_store::ServerId;
 
 use crate::api::host_calls::{Picture, PostOutcome, Waiter};
+use crate::api::webview::WebviewPlace;
 use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{BotInfo, Error, Peer};
 use crate::runtime::wit::ui::{Node, Slot, UserMenuFilter};
-use crate::runtime::wit::webview::Place;
 
 /// Carries out what a plugin asks of the UI, other users and the chat. `plugin` is the id of
 /// the calling plugin; its permission for the call has already been checked.
@@ -98,14 +98,34 @@ pub trait PluginIo: Send + Sync + Debug {
     ) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
-    /// `webview.show` (FR-6.46). Hosts without web views refuse it.
-    fn webview_show(&self, _plugin: &str, _place: Place, _entry: String) -> Result<(), Error> {
+    /// `webview.show` (FR-6.46, FR-9.39): the permissions for `place` are checked; the host
+    /// checks the gesture for a new side panel. Hosts without web views refuse it.
+    fn webview_show(
+        &self,
+        _plugin: &str,
+        _place: WebviewPlace,
+        _entry: String,
+    ) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
     /// `webview.hide`.
     fn webview_hide(&self, _plugin: &str) {}
-    /// `webview.post`: a message to the plugin's page.
+    /// `webview.post`: a message to the plugin's pages.
     fn webview_post(&self, _plugin: &str, _message: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `webview.set-size-hint` for the plugin's open side panel (`ui.side-panel` checked).
+    fn webview_set_size_hint(
+        &self,
+        _plugin: &str,
+        _min_width: u32,
+        _min_height: u32,
+    ) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// Opens the stage frame of an activity started with web content (`stage.start` with
+    /// `stage-content.web`, FR-9.46). The caller has checked `ui.stage` and the gesture.
+    fn stage_web_show(&self, _plugin: &str, _entry: String) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
     /// `files.save` (FR-9.103): `name` is already a plain file name and `data` within the

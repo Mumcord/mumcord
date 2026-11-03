@@ -1,6 +1,6 @@
 import { act, fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import type { PluginUi } from "../../../api";
+import type { PluginUi, PluginWebviewPlace } from "../../../api";
 import { applyChange, type PluginUiState } from "../render/pluginUiStore";
 import { createBridge, fitsBridge, MAX_MESSAGE_BYTES, rateLimiter } from "./bridge";
 import { PluginWebView } from "./PluginWebView";
@@ -91,11 +91,15 @@ describe("web view state", () => {
     expect(first?.url).toBe(URL);
     state = applyChange(state, change({ type: "webviewShow", place: "dialog", url: URL }));
     expect(state.webviews.get("snacks")?.seq).not.toBe(first?.seq);
-    expect(applyChange(state, change({ type: "webviewPost", message: "x" }))).toBe(state);
+    expect(
+      applyChange(state, change({ type: "webviewPost", message: "x", places: ["dialog"] })),
+    ).toBe(state);
     state = applyChange(state, change({ type: "closeDialog" }));
     expect(state.webviews.size).toBe(0);
     state = applyChange(state, change({ type: "webviewShow", place: "panelPopover", url: URL }));
-    state = applyChange(state, change({ type: "webviewHide" }));
+    // A hide for another place leaves the frame open.
+    expect(applyChange(state, change({ type: "webviewHide", place: "sidePanel" }))).toBe(state);
+    state = applyChange(state, change({ type: "webviewHide", place: "panelPopover" }));
     expect(state.webviews.size).toBe(0);
   });
 });
@@ -125,10 +129,17 @@ describe("PluginWebView", () => {
     act(() => {
       window.dispatchEvent(new MessageEvent("message", { data: "ready", source: page }));
     });
-    expect(sendEvent).toHaveBeenCalledWith("snacks", { type: "webviewMessage", text: "ready" });
+    expect(sendEvent).toHaveBeenCalledWith("snacks", {
+      type: "webviewMessage",
+      place: "panelPopover",
+      text: "ready",
+    });
     act(() => {
-      uiListener?.({ plugin: "other", change: { type: "webviewPost", message: "no" } });
-      uiListener?.({ plugin: "snacks", change: { type: "webviewPost", message: "go" } });
+      const post = (plugin: string, message: string, places: PluginWebviewPlace[]) =>
+        uiListener?.({ plugin, change: { type: "webviewPost", message, places } });
+      post("other", "no", ["panelPopover"]);
+      post("snacks", "stage only", ["stage"]);
+      post("snacks", "go", ["stage", "panelPopover"]);
     });
     expect(post).toHaveBeenCalledTimes(1);
     expect(post).toHaveBeenCalledWith("go", "*");

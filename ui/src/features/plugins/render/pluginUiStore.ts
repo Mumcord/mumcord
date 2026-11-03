@@ -119,12 +119,16 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       return { ...state, webviews };
     }
     case "webviewHide": {
+      if (state.webviews.get(plugin)?.place !== change.place) return state;
       const webviews = new Map(state.webviews);
       webviews.delete(plugin);
       return { ...state, webviews };
     }
     // Bridge messages go straight to the open frame (see `webview/`), they are not state.
     case "webviewPost":
+      return state;
+    // Side-panel sizing belongs to the side panel host, which does not exist yet.
+    case "webviewSizeHint":
       return state;
     // Opens a settings page (see `bind`); nothing to keep.
     case "openPermissions":

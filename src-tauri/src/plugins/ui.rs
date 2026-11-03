@@ -334,20 +334,39 @@ pub enum PluginUiChange {
         place: PluginWebviewPlace,
         url: String,
     },
-    /// The web view closes; its place shows the plugin's tree again.
-    WebviewHide,
-    /// A bridge message for the page (untrusted text). Not part of the snapshot.
-    WebviewPost { message: String },
+    /// The web view in `place` closes; the place shows the plugin's tree again (or closes, for
+    /// the side panel and the stage).
+    WebviewHide { place: PluginWebviewPlace },
+    /// A bridge message for the pages in `places` (untrusted text). Not part of the snapshot.
+    WebviewPost {
+        message: String,
+        places: Vec<PluginWebviewPlace>,
+    },
+    /// The smallest size the plugin asks for its side panel, in CSS pixels; the UI clamps it to
+    /// the panel's limits and the user may still resize (FR-9.39).
+    #[serde(rename_all = "camelCase")]
+    WebviewSizeHint { min_width: u32, min_height: u32 },
 }
 
 /// Where a plugin's web view is shown.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum PluginWebviewPlace {
     PanelPopover,
     Dialog,
     SidePanel,
     Stage,
+}
+
+impl From<PluginWebviewPlace> for WebviewPlace {
+    fn from(place: PluginWebviewPlace) -> Self {
+        match place {
+            PluginWebviewPlace::PanelPopover => Self::PanelPopover,
+            PluginWebviewPlace::Dialog => Self::Dialog,
+            PluginWebviewPlace::SidePanel => Self::SidePanel,
+            PluginWebviewPlace::Stage => Self::Stage,
+        }
+    }
 }
 
 impl From<WebviewPlace> for PluginWebviewPlace {
@@ -617,8 +636,20 @@ impl From<UiUpdate> for PluginUiChange {
                 place: place.into(),
                 url: entry,
             },
-            UiUpdate::WebviewHide => Self::WebviewHide,
-            UiUpdate::WebviewPost { message } => Self::WebviewPost { message },
+            UiUpdate::WebviewHide { place } => Self::WebviewHide {
+                place: place.into(),
+            },
+            UiUpdate::WebviewPost { message, places } => Self::WebviewPost {
+                message,
+                places: places.into_iter().map(Into::into).collect(),
+            },
+            UiUpdate::WebviewSizeHint {
+                min_width,
+                min_height,
+            } => Self::WebviewSizeHint {
+                min_width,
+                min_height,
+            },
         }
     }
 }
@@ -645,7 +676,10 @@ pub struct Trees {
     dialogs: HashMap<String, (String, Option<String>)>,
     /// Label and the sessions it shows on (`None`: everyone).
     menu_entries: HashMap<String, (String, Option<Vec<u32>>)>,
-    webviews: HashMap<String, (PluginWebviewPlace, String)>,
+    /// The page URL of each open frame, by plugin and place.
+    webviews: HashMap<(String, PluginWebviewPlace), String>,
+    /// The side-panel size hint of each plugin with an open side panel.
+    size_hints: HashMap<String, (u32, u32)>,
 }
 
 impl Trees {
@@ -665,16 +699,14 @@ impl Trees {
             PluginUiChange::OpenDialog { title, subtitle } => {
                 self.dialogs
                     .insert(plugin.to_owned(), (title.clone(), subtitle.clone()));
+                // The modal dialog takes the popover's frame slot (FR-9.38).
+                self.webviews
+                    .remove(&(plugin.to_owned(), PluginWebviewPlace::PanelPopover));
             }
             PluginUiChange::CloseDialog => {
                 self.dialogs.remove(plugin);
-                if self
-                    .webviews
-                    .get(plugin)
-                    .is_some_and(|(place, _)| *place == PluginWebviewPlace::Dialog)
-                {
-                    self.webviews.remove(plugin);
-                }
+                self.webviews
+                    .remove(&(plugin.to_owned(), PluginWebviewPlace::Dialog));
                 if let Some(slots) = self.trees.get_mut(plugin) {
                     slots.remove(&PluginSlot::Dialog);
                 }
@@ -692,12 +724,22 @@ impl Trees {
             },
             PluginUiChange::WebviewShow { place, url } => {
                 self.webviews
-                    .insert(plugin.to_owned(), (*place, url.clone()));
+                    .insert((plugin.to_owned(), *place), url.clone());
             }
-            PluginUiChange::WebviewHide => {
-                self.webviews.remove(plugin);
+            PluginUiChange::WebviewHide { place } => {
+                self.webviews.remove(&(plugin.to_owned(), *place));
+                if *place == PluginWebviewPlace::SidePanel {
+                    self.size_hints.remove(plugin);
+                }
             }
             PluginUiChange::WebviewPost { .. } => {}
+            PluginUiChange::WebviewSizeHint {
+                min_width,
+                min_height,
+            } => {
+                self.size_hints
+                    .insert(plugin.to_owned(), (*min_width, *min_height));
+            }
         }
     }
 
@@ -706,7 +748,8 @@ impl Trees {
         self.trees.retain(|id, _| running(id));
         self.dialogs.retain(|id, _| running(id));
         self.menu_entries.retain(|id, _| running(id));
-        self.webviews.retain(|id, _| running(id));
+        self.webviews.retain(|(id, _), _| running(id));
+        self.size_hints.retain(|id, _| running(id));
     }
 
     /// Everything on screen, as the changes that rebuild it.
@@ -743,12 +786,22 @@ impl Trees {
             });
         }
         // After the dialogs, so a web view in a dialog finds it open.
-        for (plugin, (place, url)) in &self.webviews {
+        for ((plugin, place), url) in &self.webviews {
             out.push(PluginUi {
                 plugin: plugin.clone(),
                 change: PluginUiChange::WebviewShow {
                     place: *place,
                     url: url.clone(),
+                },
+            });
+        }
+        // After the frames, so the side panel the hint is for is open.
+        for (plugin, (min_width, min_height)) in &self.size_hints {
+            out.push(PluginUi {
+                plugin: plugin.clone(),
+                change: PluginUiChange::WebviewSizeHint {
+                    min_width: *min_width,
+                    min_height: *min_height,
                 },
             });
         }
@@ -1002,6 +1055,7 @@ mod tests {
             "snacks",
             &PluginUiChange::WebviewPost {
                 message: "hi".into(),
+                places: vec![PluginWebviewPlace::Dialog],
             },
         );
         let snapshot = trees.snapshot();
@@ -1010,10 +1064,43 @@ mod tests {
         trees.apply("snacks", &PluginUiChange::CloseDialog);
         assert!(trees.snapshot().is_empty());
         trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
-        trees.apply("snacks", &PluginUiChange::WebviewHide);
+        trees.apply(
+            "snacks",
+            &PluginUiChange::WebviewHide {
+                place: PluginWebviewPlace::PanelPopover,
+            },
+        );
         assert!(trees.snapshot().is_empty());
         trees.apply("snacks", &show(PluginWebviewPlace::PanelPopover));
         trees.retain(|_| false);
         assert!(trees.snapshot().is_empty());
+    }
+
+    #[test]
+    fn each_place_keeps_its_own_frame_and_the_side_panel_its_hint() {
+        let mut trees = Trees::default();
+        let show = |place| PluginUiChange::WebviewShow {
+            place,
+            url: "mumcord-web://localhost/board/index.html".into(),
+        };
+        trees.apply("board", &show(PluginWebviewPlace::Stage));
+        trees.apply("board", &show(PluginWebviewPlace::SidePanel));
+        let hint = PluginUiChange::WebviewSizeHint {
+            min_width: 320,
+            min_height: 200,
+        };
+        trees.apply("board", &hint);
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 3);
+        assert_eq!(snapshot[2].change, hint);
+        trees.apply(
+            "board",
+            &PluginUiChange::WebviewHide {
+                place: PluginWebviewPlace::SidePanel,
+            },
+        );
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 1);
+        assert_eq!(snapshot[0].change, show(PluginWebviewPlace::Stage));
     }
 }

@@ -17,7 +17,7 @@ use tokio::sync::mpsc::UnboundedSender;
 use super::ServiceEvent;
 use crate::api::host_calls::{HostCall, HostRequest, Picture, PostOutcome, Waiter, reply_channel};
 use crate::api::io::PluginIo;
-use crate::api::webview::{WebviewPlace, Webviews};
+use crate::api::webview::{Shown, WebviewPlace, Webviews};
 use crate::chat::{self, GestureGate, MessageClaims, Supersede, SupersedeTracker};
 use crate::manifest::Visibility;
 use crate::messaging::{
@@ -28,7 +28,6 @@ use crate::peer_key::PeerKeys;
 use crate::wit::peers;
 use crate::wit::types::{BotInfo as WitBotInfo, Error, Peer};
 use crate::wit::ui::{Node, Slot, UserMenuFilter};
-use crate::wit::webview::Place;
 
 pub use user_menu::BotInfo;
 
@@ -92,11 +91,20 @@ pub enum UiUpdate {
         place: WebviewPlace,
         entry: String,
     },
-    /// The web view closes; the place falls back to its tree.
-    WebviewHide,
-    /// A bridge message to the page (untrusted plugin text, never logged).
+    /// The web view in `place` closes; the place falls back to its tree (or closes).
+    WebviewHide {
+        place: WebviewPlace,
+    },
+    /// A bridge message for the pages in `places` (untrusted plugin text, never logged).
     WebviewPost {
         message: String,
+        places: Vec<WebviewPlace>,
+    },
+    /// `webview.set-size-hint`: the smallest size the side panel should get, in CSS pixels.
+    /// The UI clamps it to the panel's limits.
+    WebviewSizeHint {
+        min_width: u32,
+        min_height: u32,
     },
 }
 
@@ -328,7 +336,12 @@ impl PluginIo for ServiceIo {
 
     fn close_dialog(&self, plugin: &str) {
         if self.webviews.dialog_closed(plugin) {
-            self.ui(plugin, UiUpdate::WebviewHide);
+            self.ui(
+                plugin,
+                UiUpdate::WebviewHide {
+                    place: WebviewPlace::Dialog,
+                },
+            );
         }
         self.ui(plugin, UiUpdate::CloseDialog);
     }
@@ -536,17 +549,42 @@ impl PluginIo for ServiceIo {
         Ok(())
     }
 
-    fn webview_show(&self, plugin: &str, place: Place, entry: String) -> Result<(), Error> {
-        let shown = self
-            .webviews
-            .show(plugin, place.into(), &entry, Instant::now())?;
+    fn webview_show(&self, plugin: &str, place: WebviewPlace, entry: String) -> Result<(), Error> {
+        let now = Instant::now();
+        // A new side panel needs a fresh gesture (FR-9.45); a new page in an open one does not.
+        if place == WebviewPlace::SidePanel
+            && !self.webviews.is_open(plugin, place)
+            && !self.chat().gate.recent(plugin, now)
+        {
+            return Err(Error::NotPermitted);
+        }
+        let shown = self.webviews.show(plugin, place, &entry, now)?;
+        self.shown(plugin, shown);
+        Ok(())
+    }
+
+    fn webview_set_size_hint(
+        &self,
+        plugin: &str,
+        min_width: u32,
+        min_height: u32,
+    ) -> Result<(), Error> {
+        if !self.webviews.is_open(plugin, WebviewPlace::SidePanel) {
+            return Err(Error::Invalid);
+        }
         self.ui(
             plugin,
-            UiUpdate::WebviewShow {
-                place: shown.place,
-                entry: shown.entry,
+            UiUpdate::WebviewSizeHint {
+                min_width,
+                min_height,
             },
         );
+        Ok(())
+    }
+
+    fn stage_web_show(&self, plugin: &str, entry: String) -> Result<(), Error> {
+        let shown = self.webviews.open_stage(plugin, &entry, Instant::now())?;
+        self.shown(plugin, shown);
         Ok(())
     }
 
@@ -564,14 +602,14 @@ impl PluginIo for ServiceIo {
     }
 
     fn webview_hide(&self, plugin: &str) {
-        if self.webviews.hide(plugin) {
-            self.ui(plugin, UiUpdate::WebviewHide);
+        for place in self.webviews.hide(plugin) {
+            self.ui(plugin, UiUpdate::WebviewHide { place });
         }
     }
 
     fn webview_post(&self, plugin: &str, message: String) -> Result<(), Error> {
-        self.webviews.post(plugin, &message, Instant::now())?;
-        self.ui(plugin, UiUpdate::WebviewPost { message });
+        let places = self.webviews.post(plugin, &message, Instant::now())?;
+        self.ui(plugin, UiUpdate::WebviewPost { message, places });
         Ok(())
     }
 
@@ -627,6 +665,26 @@ impl PluginIo for ServiceIo {
 }
 
 impl ServiceIo {
+    /// Tells the UI about a frame that opened or got a new page. A side panel it replaced
+    /// closes, and that plugin learns it through [`ServiceEvent::SurfaceClosed`].
+    fn shown(&self, plugin: &str, shown: Shown) {
+        if let Some(other) = shown.replaced {
+            let place = WebviewPlace::SidePanel;
+            self.ui(&other, UiUpdate::WebviewHide { place });
+            self.emit(ServiceEvent::SurfaceClosed {
+                plugin: other,
+                place,
+            });
+        }
+        self.ui(
+            plugin,
+            UiUpdate::WebviewShow {
+                place: shown.place,
+                entry: shown.entry,
+            },
+        );
+    }
+
     /// Uses the plugin's last gesture for `call`, or refuses with not-permitted (FR-9.106).
     fn take_host_call(&self, plugin: &str, call: HostCall) -> Result<(), Error> {
         if self
@@ -705,20 +763,23 @@ mod tests {
         std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
         let (events, mut rx) = unbounded_channel();
         let io = ServiceIo::new(None, events);
-        io.webviews()
-            .set_root("snacks", Some(dir.path().to_path_buf()));
+        io.webviews().set_root(
+            "snacks",
+            Some(dir.path().to_path_buf()),
+            vec![WebviewPlace::Dialog],
+        );
         let mut next = || match rx.try_recv() {
             Ok(ServiceEvent::Ui { update, .. }) => Some(update),
             _ => None,
         };
         assert_eq!(
-            io.webview_show("snacks", Place::Dialog, "index.html".into()),
+            io.webview_show("snacks", WebviewPlace::Dialog, "index.html".into()),
             Err(Error::Invalid)
         );
         io.open_dialog("snacks", "Snacks".into(), None)
             .expect("dialog opens");
         assert!(matches!(next(), Some(UiUpdate::OpenDialog { .. })));
-        io.webview_show("snacks", Place::Dialog, "index.html?x=1".into())
+        io.webview_show("snacks", WebviewPlace::Dialog, "index.html?x=1".into())
             .expect("web view shows");
         assert!(matches!(
             next(),
@@ -726,11 +787,124 @@ mod tests {
         ));
         io.webview_post("snacks", "hi".into())
             .expect("web view shows");
-        assert!(matches!(next(), Some(UiUpdate::WebviewPost { message }) if message == "hi"));
+        assert!(
+            matches!(next(), Some(UiUpdate::WebviewPost { message, places })
+            if message == "hi" && places == [WebviewPlace::Dialog])
+        );
         io.close_dialog("snacks");
-        assert!(matches!(next(), Some(UiUpdate::WebviewHide)));
+        assert!(matches!(
+            next(),
+            Some(UiUpdate::WebviewHide {
+                place: WebviewPlace::Dialog
+            })
+        ));
         assert!(matches!(next(), Some(UiUpdate::CloseDialog)));
         assert_eq!(io.webview_post("snacks", "hi".into()), Err(Error::Invalid));
+    }
+
+    #[test]
+    fn a_side_panel_opens_after_a_gesture_and_replaces_another_plugins() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        for id in ["a", "b"] {
+            io.webviews().set_root(
+                id,
+                Some(dir.path().to_path_buf()),
+                vec![WebviewPlace::SidePanel],
+            );
+        }
+        let side = WebviewPlace::SidePanel;
+        assert_eq!(
+            io.webview_show("a", side, "index.html".into()),
+            Err(Error::NotPermitted),
+            "no gesture"
+        );
+        assert!(rx.try_recv().is_err());
+        io.gesture("a");
+        io.webview_show("a", side, "index.html".into())
+            .expect("side panel opens");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui { plugin, update: UiUpdate::WebviewShow { place: WebviewPlace::SidePanel, .. } })
+                if plugin == "a"
+        ));
+        assert_eq!(io.webview_set_size_hint("a", 300, 200), Ok(()));
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::WebviewSizeHint {
+                    min_width: 300,
+                    min_height: 200
+                },
+                ..
+            })
+        ));
+        assert_eq!(io.webview_set_size_hint("b", 300, 200), Err(Error::Invalid));
+        io.gesture("b");
+        io.webview_show("b", side, "index.html".into())
+            .expect("b's side panel opens");
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui { plugin, update: UiUpdate::WebviewHide { place: WebviewPlace::SidePanel } })
+                if plugin == "a"
+        ));
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::SurfaceClosed { plugin, place: WebviewPlace::SidePanel }) if plugin == "a"
+        ));
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui { plugin, update: UiUpdate::WebviewShow { .. } }) if plugin == "b"
+        ));
+    }
+
+    #[test]
+    fn a_new_page_in_an_open_side_panel_needs_no_gesture() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (events, _rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        let side = WebviewPlace::SidePanel;
+        io.webviews()
+            .set_root("a", Some(dir.path().to_path_buf()), vec![side]);
+        io.webviews()
+            .show("a", side, "index.html", Instant::now())
+            .expect("opened");
+        assert_eq!(io.webview_show("a", side, "index.html?2".into()), Ok(()));
+    }
+
+    #[test]
+    fn stage_web_content_opens_only_through_the_stage_start_path() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        io.webviews().set_root(
+            "a",
+            Some(dir.path().to_path_buf()),
+            vec![WebviewPlace::Stage],
+        );
+        assert_eq!(
+            io.webview_show("a", WebviewPlace::Stage, "index.html".into()),
+            Err(Error::Invalid)
+        );
+        assert_eq!(io.stage_web_show("a", "index.html".into()), Ok(()));
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::WebviewShow {
+                    place: WebviewPlace::Stage,
+                    ..
+                },
+                ..
+            })
+        ));
+        assert_eq!(
+            io.webview_show("a", WebviewPlace::Stage, "index.html?2".into()),
+            Ok(())
+        );
     }
 
     #[test]

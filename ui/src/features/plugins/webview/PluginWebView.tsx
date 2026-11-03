@@ -9,7 +9,7 @@
  * the frame's wrapper, so the next Escape reaches the dialog or popover around it.
  */
 import { useEffect, useRef, useState } from "react";
-import { getApi, toEngineError } from "../../../api";
+import { getApi, toEngineError, type PluginWebviewPlace } from "../../../api";
 import type { PluginWebview } from "../render/pluginUiStore";
 import { createBridge, type Bridge } from "./bridge";
 import "./webview.css";
@@ -24,10 +24,25 @@ interface Props {
 /** Renders an open web view; the caller decides where (see {@link usePluginWebView}). */
 export function PluginWebView({ plugin, webview, title }: Props) {
   // A new `seq` (the plugin showed a page again) gets a fresh frame.
-  return <SealedFrame key={webview.seq} plugin={plugin} url={webview.url} title={title} />;
+  return (
+    <SealedFrame
+      key={webview.seq}
+      plugin={plugin}
+      place={webview.place}
+      url={webview.url}
+      title={title}
+    />
+  );
 }
 
-function SealedFrame({ plugin, url, title }: { plugin: string; url: string; title: string }) {
+interface FrameProps {
+  readonly plugin: string;
+  readonly place: PluginWebviewPlace;
+  readonly url: string;
+  readonly title: string;
+}
+
+function SealedFrame({ plugin, place, url, title }: FrameProps) {
   const wrapper = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
   const loads = useRef(0);
@@ -41,7 +56,7 @@ function SealedFrame({ plugin, url, title }: { plugin: string; url: string; titl
       frame: () => frame.current?.contentWindow ?? null,
       toPlugin: (text) => {
         getApi()
-          .pluginUiEvent(plugin, { type: "webviewMessage", text })
+          .pluginUiEvent(plugin, { type: "webviewMessage", place, text })
           .catch((error: unknown) => {
             // Dropped by the limits or the plugin stopped; the text is never logged.
             console.debug("A web view message was not delivered", toEngineError(error).code);
@@ -58,7 +73,11 @@ function SealedFrame({ plugin, url, title }: { plugin: string; url: string; titl
     if (loads.current > 0) current.loaded();
     window.addEventListener("message", current.receive);
     const off = getApi().on("pluginUi", (event) => {
-      if (event.plugin === plugin && event.change.type === "webviewPost") {
+      if (
+        event.plugin === plugin &&
+        event.change.type === "webviewPost" &&
+        event.change.places.includes(place)
+      ) {
         current.post(event.change.message);
       }
     });
@@ -67,7 +86,7 @@ function SealedFrame({ plugin, url, title }: { plugin: string; url: string; titl
       off();
       bridge.current = null;
     };
-  }, [plugin]);
+  }, [plugin, place]);
 
   const onLoad = () => {
     loads.current += 1;

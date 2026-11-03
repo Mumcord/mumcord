@@ -102,6 +102,13 @@ pub enum ServiceEvent {
     AppMenuChanged,
     /// A plugin changed its UI (`plugin://ui`). Trees are untrusted.
     Ui { plugin: String, update: UiUpdate },
+    /// A frame of `plugin` closed without the plugin asking (another plugin's side panel took
+    /// its place, FR-9.39); the `Ui` hide went out already. Pass it back as
+    /// [`UiInput::SurfaceClosed`] so the plugin gets `surface-closed`.
+    SurfaceClosed {
+        plugin: String,
+        place: crate::api::webview::WebviewPlace,
+    },
     /// `chat.send` passed the gesture gate: post `line` ("[Name] text") as a channel message
     /// through the normal chat path, into the user's current channel on `server`.
     ChatPost {

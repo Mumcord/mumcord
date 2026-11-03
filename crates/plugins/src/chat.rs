@@ -295,6 +295,14 @@ impl GestureGate {
             .is_some_and(|(at, window)| now.saturating_duration_since(*at) <= *window)
     }
 
+    /// Whether the plugin had a user gesture within [`GESTURE_WINDOW`], used or not: what
+    /// opening a web surface needs (FR-9.45). Uses nothing up.
+    pub fn recent(&self, plugin: &str, now: Instant) -> bool {
+        self.host_calls
+            .get(plugin)
+            .is_some_and(|(at, _)| now.saturating_duration_since(*at) <= GESTURE_WINDOW)
+    }
+
     pub fn forget(&mut self, plugin: &str) {
         self.gestures.remove(plugin);
         self.host_calls.remove(plugin);

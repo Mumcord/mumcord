@@ -37,7 +37,9 @@ use super::plugin_safety::{
 use super::types::{
     ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
 };
-use crate::plugins::ui::{ActionKind, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange};
+use crate::plugins::ui::{
+    ActionKind, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange, PluginWebviewPlace,
+};
 use crate::plugins::{self, Plugins, PreparedInstall, RepoIndex};
 
 /// Who sees that the user has a plugin (FR-6.35).
@@ -425,9 +427,15 @@ pub enum PluginUiInput {
         session: SessionId,
     },
     DialogClosed,
-    /// A bridge message from the plugin's web view page (≤ 16 KiB, ≤ 60/s; dropped otherwise).
+    /// A bridge message from the plugin's page in `place` (≤ 16 KiB, 64 KiB from the stage,
+    /// ≤ 60/s; dropped otherwise, or when that frame is not open).
     WebviewMessage {
+        place: PluginWebviewPlace,
         text: String,
+    },
+    /// The user closed the plugin's frame in `place` (its close button).
+    SurfaceClosed {
+        place: PluginWebviewPlace,
     },
 }
 
@@ -1568,7 +1576,16 @@ pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -
         }
         PluginUiInput::UserMenuRequested { session } => UiInput::UserMenuRequested(session),
         PluginUiInput::DialogClosed => UiInput::DialogClosed,
-        PluginUiInput::WebviewMessage { text } => UiInput::WebviewMessage(text),
+        PluginUiInput::WebviewMessage { place, text } => UiInput::WebviewMessage {
+            place: place.into(),
+            text,
+        },
+        PluginUiInput::SurfaceClosed { place } => {
+            plugins
+                .trees()
+                .apply(&id, &PluginUiChange::WebviewHide { place });
+            UiInput::SurfaceClosed(place.into())
+        }
     };
     let delivered = plugins
         .call(move |service| Ok(service.ui_input(&id, input)))
