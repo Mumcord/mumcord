@@ -550,7 +550,10 @@ fn encode_loop(
         match reconfigure(enc.as_mut(), size, steps.quality()) {
             Ok(resized) => keyframe |= resized,
             Err(e) => {
-                tracing::warn!(error = %e, "screen share quality change failed");
+                // A hardware encoder may refuse a size it would not open at either (AMF wants
+                // 64x16 blocks); opening anew at the new size falls through to the next encoder.
+                tracing::warn!(error = %e, "screen share encoder refused the new quality; opening it again");
+                encoder = None;
                 continue;
             }
         }
@@ -949,6 +952,22 @@ mod tests {
         codec: Codec,
         config: EncoderConfig,
         delay: Duration,
+        /// Like AMF: sizes must be multiples of this, at open and on resize.
+        blocks: Option<(u32, u32)>,
+    }
+
+    impl Fake {
+        fn check_size(&self, width: u32, height: u32) -> mumcord_screenshare::Result<()> {
+            match self.blocks {
+                Some((bw, bh)) if !width.is_multiple_of(bw) || !height.is_multiple_of(bh) => {
+                    Err(mumcord_screenshare::Error::HardwareUnavailable {
+                        encoder: mumcord_screenshare::HardwareEncoder::Amf,
+                        reason: format!("{width}x{height} is not aligned"),
+                    })
+                }
+                _ => Ok(()),
+            }
+        }
     }
 
     impl VideoEncoder for Fake {
@@ -976,6 +995,7 @@ mod tests {
             }])
         }
         fn set_resolution(&mut self, width: u32, height: u32) -> mumcord_screenshare::Result<()> {
+            self.check_size(width, height)?;
             (self.config.width, self.config.height) = (width, height);
             Ok(())
         }
@@ -1006,11 +1026,65 @@ mod tests {
                         codec,
                         config,
                         delay,
+                        blocks: None,
                     }),
                     active,
                 ))
             }),
         }
+    }
+
+    #[test]
+    fn a_hardware_encoder_refusing_a_new_size_falls_back_to_the_next_one() {
+        use mumcord_store::ScreenResolution;
+        const AMD_AV1: ActiveEncoder = ActiveEncoder {
+            codec: Codec::Av1,
+            gpu: Some(super::super::GpuVendor::Amd),
+        };
+        let opened = Arc::new(Mutex::new(Vec::new()));
+        let log = opened.clone();
+        // The selection's order: AMD AV1 that wants 64x16 blocks, else VP9 in software.
+        let factory = EncoderFactory {
+            offers_av1: true,
+            open: Box::new(move |config, _, _| {
+                let amd = Fake {
+                    codec: Codec::Av1,
+                    config,
+                    delay: Duration::ZERO,
+                    blocks: Some((64, 16)),
+                };
+                if amd.check_size(config.width, config.height).is_ok() {
+                    lock(&log).push(AMD_AV1);
+                    return Ok((Box::new(amd), AMD_AV1));
+                }
+                lock(&log).push(SOFTWARE_VP9);
+                let vp9 = Fake {
+                    codec: Codec::Vp9,
+                    config,
+                    delay: Duration::ZERO,
+                    blocks: None,
+                };
+                Ok((Box::new(vp9), SOFTWARE_VP9))
+            }),
+        };
+        let prefs = QualityPrefs {
+            resolution: ScreenResolution::P720,
+            ..QualityPrefs::default()
+        };
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            prefs,
+            factory,
+        );
+        wait_for(&media, |s| s.fps > 0 && s.width == 1280);
+        // 1080 is not a multiple of 16: the resize is refused and AMD does not open either.
+        media.set_prefs(QualityPrefs {
+            resolution: ScreenResolution::P1080,
+            ..prefs
+        });
+        let stats = wait_for(&media, |s| s.width == 1920 && s.fps > 0);
+        assert_eq!((stats.width, stats.height), (1920, 1080));
+        assert_eq!(*lock(&opened), [AMD_AV1, SOFTWARE_VP9]);
     }
 
     #[test]
