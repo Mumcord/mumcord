@@ -2734,8 +2734,13 @@ impl Inner {
                 });
                 self.on_channel_denied(ctx, denied);
             }
-            // Collected by the session loop and emitted in batches (`emit_permissions`).
-            Event::PermissionsUpdated { .. } => {}
+            // Collected by the session loop and emitted in batches (`emit_permissions`); history
+            // sync needs each answer at once for its password check (issue #382).
+            Event::PermissionsUpdated { channel_id } => {
+                if let Some(channel_id) = channel_id {
+                    crate::history_sync::on_permissions(&self.history_sync, ctx, *channel_id);
+                }
+            }
             // The ACL editor (Epic 4, issue #252) is the consumer of the query answer; nothing here
             // needs it yet, so the event stays in the protocol layer.
             Event::Acl(_) => {}

@@ -217,6 +217,8 @@ struct Shared {
     tap: Option<Arc<dyn PacketTap>>,
     /// Low-priority plugin data dropped because it waited too long.
     low_expired: AtomicU64,
+    /// The access tokens last sent to the server (login or [`Handle::set_access_tokens`]).
+    tokens: Mutex<Vec<String>>,
 }
 
 impl Shared {
@@ -412,6 +414,7 @@ async fn connect_inner(
     // so the paced write loop would let the unlimited Authenticate overtake it; both are
     // therefore written here, in order, before the write loop starts.
     let mut handshake = BytesMut::new();
+    let tokens = config.tokens.clone();
     for frame in handshake_frames(config.username, config.password, config.tokens) {
         frame.encode(&mut handshake);
     }
@@ -432,6 +435,7 @@ async fn connect_inner(
         reason: Mutex::new(None),
         connected: AtomicBool::new(true),
         low_expired: AtomicU64::new(0),
+        tokens: Mutex::new(tokens),
         ping: Mutex::default(),
         tap,
     });
@@ -1390,8 +1394,19 @@ impl Handle {
     pub fn set_access_tokens(&self, tokens: Vec<String>) -> Result<(), CommandError> {
         self.send(Frame::from_message(
             MessageType::Authenticate,
-            &access_tokens_message(tokens),
-        ))
+            &access_tokens_message(tokens.clone()),
+        ))?;
+        *self.shared.tokens.lock().unwrap_or_else(|p| p.into_inner()) = tokens;
+        Ok(())
+    }
+
+    /// The access tokens (channel passwords) this session last sent to the server.
+    pub fn access_tokens(&self) -> Vec<String> {
+        self.shared
+            .tokens
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
     }
 
     /// Asks the server for the own permissions in a channel.
@@ -1551,6 +1566,7 @@ mod tests {
                 ping: Mutex::default(),
                 tap: None,
                 low_expired: AtomicU64::new(0),
+                tokens: Mutex::default(),
             }),
         };
         let acl = proto::Acl {
@@ -1577,6 +1593,7 @@ mod tests {
             ping: Mutex::default(),
             tap: None,
             low_expired: AtomicU64::new(0),
+            tokens: Mutex::default(),
         })
     }
 
@@ -1645,6 +1662,7 @@ mod tests {
                 ping: Mutex::default(),
                 tap: None,
                 low_expired: AtomicU64::new(0),
+                tokens: Mutex::default(),
             }),
         };
         assert!(matches!(
@@ -1685,6 +1703,7 @@ mod drain_tests {
             ping: Mutex::default(),
             tap: None,
             low_expired: AtomicU64::new(0),
+            tokens: Mutex::default(),
         })
     }
 
@@ -1998,6 +2017,31 @@ mod handshake_tests {
         let [version, _] = handshake_frames("alice".to_owned(), None, Vec::new());
         let v = proto::Version::decode(version.payload).expect("version");
         assert_eq!(v.release.as_deref(), Some("Mumcord dev~a1b2c3d"));
+    }
+
+    #[test]
+    fn the_handle_remembers_the_tokens_it_sent() {
+        let (tx, _rx) = mpsc::unbounded_channel();
+        let handle = Handle {
+            tx,
+            shared: Arc::new(Shared {
+                state: Mutex::new(ServerState::default()),
+                shutdown: Notify::new(),
+                closing: AtomicBool::new(false),
+                pong: watch::Sender::new(0),
+                reason: Mutex::new(None),
+                connected: AtomicBool::new(true),
+                ping: Mutex::default(),
+                tap: None,
+                low_expired: AtomicU64::new(0),
+                tokens: Mutex::new(vec!["login".into()]),
+            }),
+        };
+        assert_eq!(handle.access_tokens(), ["login"]);
+        handle
+            .set_access_tokens(vec!["one".into(), "two".into()])
+            .expect("queued");
+        assert_eq!(handle.access_tokens(), ["one", "two"]);
     }
 
     #[test]
