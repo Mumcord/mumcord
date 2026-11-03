@@ -102,7 +102,9 @@ export async function registerOnServer(): Promise<void> {
   const gear = $('button[aria-label="Quick settings"]');
   await gear.waitForClickable();
   await gear.click();
-  const item = $('//*[@role="menuitem"][starts-with(normalize-space(), "Register on this server")]');
+  const item = $(
+    '//*[@role="menuitem"][starts-with(normalize-space(), "Register on this server")]',
+  );
   await item.waitForClickable();
   await item.click();
   const confirm = $("button=Register");
@@ -143,9 +145,12 @@ export async function send(): Promise<void> {
   await button.waitForEnabled({ timeout: 20_000 });
   // A notification toast can sit on top of the button; the click still means the button.
   await button.click().catch(async () => {
-    await browser.execute((el: HTMLElement) => {
-      el.click();
-    }, await button);
+    await browser.execute(
+      (el: HTMLElement) => {
+        el.click();
+      },
+      await button,
+    );
   });
 }
 
