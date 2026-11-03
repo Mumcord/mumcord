@@ -1,1148 +1,1063 @@
 [
- {
-  "name": "example: Quiet Notes",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel",
-    "ui.chat-card",
-    "notify"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 2,
-    "band": "low",
-    "e": 3,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "example: Soundboard Deluxe 1.2.0",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.side-panel",
-    "net.origins",
-    "peers.messages",
-    "ui.panel",
-    "notify",
-    "commands"
-   ],
-   "origins": 1,
-   "package_bytes": 5242880,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 45,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 37,
-    "band": "medium",
-    "e": 41,
-    "f_percent": 90,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "example: Soundboard Deluxe 1.3.0",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.side-panel",
-    "net.origins",
-    "peers.messages",
-    "ui.panel",
-    "notify",
-    "commands",
-    "ui.webview",
-    "peers.relay",
-    "events.voice"
-   ],
-   "origins": 1,
-   "package_bytes": 5242880,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 45,
-   "expected_key_matched": false,
-   "history": [
-    {
-     "age_days": 30,
-     "permissions": [
-      "ui.side-panel",
-      "net.origins",
-      "peers.messages",
-      "ui.panel",
-      "notify",
-      "commands"
-     ]
-    }
-   ],
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 71,
-    "band": "high",
-    "e": 59,
-    "f_percent": 90,
-    "h": 18
-   }
-  }
- },
- {
-  "name": "example: Overlay Pals",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.stage",
-    "net.origins",
-    "peers.relay",
-    "events.voice",
-    "chat.send",
-    "ui.panel",
-    "ui.chat-card",
-    "notify",
-    "commands",
-    "ui.app-menu"
-   ],
-   "origins": 2,
-   "package_bytes": 5242880,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": "not_declared",
-   "reproducible": false,
-   "key_age_days": 10,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 72,
-    "band": "high",
-    "e": 63,
-    "f_percent": 115,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "example: Mood Lights floor",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.side-panel",
-    "net.origins",
-    "ui.panel",
-    "notify",
-    "commands"
-   ],
-   "origins": 1,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 30,
-    "band": "medium",
-    "e": 33,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "official is not scored",
-  "facts": {
-   "kind": "official",
-   "permissions": [
-    "net.http"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": "official"
- },
- {
-  "name": "hard stop is refused",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": "unsafe_origin"
-  },
-  "expect": {
-   "refused": "unsafe_origin"
-  }
- },
- {
-  "name": "hard stop revoked",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": "revoked"
-  },
-  "expect": {
-   "refused": "revoked"
-  }
- },
- {
-  "name": "developer: F fixed at 1.00",
-  "facts": {
-   "kind": "developer",
-   "permissions": [
-    "ui.panel"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": false,
-   "licence": "not_declared",
-   "reproducible": false,
-   "key_age_days": null,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 1,
-    "band": "low",
-    "e": 1,
-    "f_percent": 100,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "cap: E 100, F 1.30",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "net.http",
-    "net.origins",
-    "secrets",
-    "ui.stage",
-    "ui.side-panel",
-    "ui.webview",
-    "peers.relay",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity",
-    "peers.messages",
-    "chat.send"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": false,
-   "licence": "not_declared",
-   "reproducible": false,
-   "key_age_days": 5,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 100,
-    "band": "high",
-    "e": 100,
-    "f_percent": 130,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "cap: low permissions at +6, rounds half up",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel",
-    "ui.chat-card",
-    "ui.app-menu",
-    "audio.effects",
-    "commands",
-    "notify",
-    "random.bytes",
-    "events.self",
-    "ui.dialog",
-    "ui.member-badge"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 5,
-    "band": "low",
-    "e": 6,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "cap: websites at +18",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 6,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 14,
-    "band": "low",
-    "e": 18,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "one website adds nothing",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 1,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 0,
-    "band": "low",
-    "e": 0,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "size: 2 MiB",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 2097152,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 0,
-    "band": "low",
-    "e": 0,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "size: over 2 MiB",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 2097153,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 2,
-    "band": "low",
-    "e": 2,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "size: over 10 MiB",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 10485761,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 4,
-    "band": "low",
-    "e": 5,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "size: over 30 MiB",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 31457281,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 6,
-    "band": "low",
-    "e": 8,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "modules: 2",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 2,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 2,
-    "band": "low",
-    "e": 2,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "modules: 4",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 4,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 3,
-    "band": "low",
-    "e": 4,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "modules: 3",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 3,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 2,
-    "band": "low",
-    "e": 2,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "F lower clamp with expected key",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": true,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 1,
-    "band": "low",
-    "e": 1,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "key age 29",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 29,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 38,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 100,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "key age 30",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 30,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 34,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 90,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "key age 179",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 179,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 34,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 90,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "key age 180",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 180,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 30,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 80,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "key age None",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": null,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 38,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 100,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "licence: proprietary",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": "proprietary",
-   "reproducible": false,
-   "key_age_days": 100,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 38,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 100,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "licence: SPDX id not on the OSI list",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "LicenseRef-custom"
-   },
-   "reproducible": false,
-   "key_age_days": 100,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 38,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 100,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "licence: not declared",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": "not_declared",
-   "reproducible": false,
-   "key_age_days": 100,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 40,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 105,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "source link missing",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": false,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 100,
-   "expected_key_matched": false,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 40,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 105,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "expected key matched",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "secrets",
-    "events.voice",
-    "events.presence",
-    "events.chat-activity"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": false,
-   "key_age_days": 100,
-   "expected_key_matched": true,
-   "history": null,
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 32,
-    "band": "medium",
-    "e": 38,
-    "f_percent": 85,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "H cap 25",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "net.http",
-    "net.origins",
-    "secrets",
-    "ui.stage",
-    "ui.webview",
-    "ui.side-panel"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": [
-    {
-     "age_days": 10,
-     "permissions": []
-    }
-   ],
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 84,
-    "band": "high",
-    "e": 78,
-    "f_percent": 75,
-    "h": 25
-   }
-  }
- },
- {
-  "name": "H: versions older than 180 days are ignored",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": [
-    {
-     "age_days": 200,
-     "permissions": []
-    }
-   ],
-   "hard_stop": null
-  },
-  "expect": {
-   "scored": {
-    "value": 1,
-    "band": "low",
-    "e": 1,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "H: only the last 5 versions count",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": [
-    {
-     "age_days": 10,
-     "permissions": [
-      "ui.panel"
-     ]
+  {
+    "name": "example: Quiet Notes",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.panel", "ui.chat-card", "notify"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
     },
-    {
-     "age_days": 20,
-     "permissions": [
-      "ui.panel"
-     ]
-    },
-    {
-     "age_days": 30,
-     "permissions": [
-      "ui.panel"
-     ]
-    },
-    {
-     "age_days": 40,
-     "permissions": [
-      "ui.panel"
-     ]
-    },
-    {
-     "age_days": 50,
-     "permissions": []
+    "expect": {
+      "scored": {
+        "value": 2,
+        "band": "low",
+        "e": 3,
+        "f_percent": 75,
+        "h": 0
+      }
     }
-   ],
-   "hard_stop": null
   },
-  "expect": {
-   "scored": {
-    "value": 1,
-    "band": "low",
-    "e": 1,
-    "f_percent": 75,
-    "h": 0
-   }
-  }
- },
- {
-  "name": "H: oldest version of the window is the baseline",
-  "facts": {
-   "kind": "unofficial",
-   "permissions": [
-    "ui.panel",
-    "notify"
-   ],
-   "origins": 0,
-   "package_bytes": 1048576,
-   "wasm_modules": 1,
-   "source_link": true,
-   "licence": {
-    "spdx": "MIT"
-   },
-   "reproducible": true,
-   "key_age_days": 200,
-   "expected_key_matched": false,
-   "history": [
-    {
-     "age_days": 10,
-     "permissions": [
-      "ui.panel"
-     ]
+  {
+    "name": "example: Soundboard Deluxe 1.2.0",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [
+        "ui.side-panel",
+        "net.origins",
+        "peers.messages",
+        "ui.panel",
+        "notify",
+        "commands"
+      ],
+      "origins": 1,
+      "package_bytes": 5242880,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 45,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
     },
-    {
-     "age_days": 100,
-     "permissions": []
+    "expect": {
+      "scored": {
+        "value": 37,
+        "band": "medium",
+        "e": 41,
+        "f_percent": 90,
+        "h": 0
+      }
     }
-   ],
-   "hard_stop": null
   },
-  "expect": {
-   "scored": {
-    "value": 10,
-    "band": "low",
-    "e": 2,
-    "f_percent": 75,
-    "h": 8
-   }
+  {
+    "name": "example: Soundboard Deluxe 1.3.0",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [
+        "ui.side-panel",
+        "net.origins",
+        "peers.messages",
+        "ui.panel",
+        "notify",
+        "commands",
+        "ui.webview",
+        "peers.relay",
+        "events.voice"
+      ],
+      "origins": 1,
+      "package_bytes": 5242880,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 45,
+      "expected_key_matched": false,
+      "history": [
+        {
+          "age_days": 30,
+          "permissions": [
+            "ui.side-panel",
+            "net.origins",
+            "peers.messages",
+            "ui.panel",
+            "notify",
+            "commands"
+          ]
+        }
+      ],
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 71,
+        "band": "high",
+        "e": 59,
+        "f_percent": 90,
+        "h": 18
+      }
+    }
+  },
+  {
+    "name": "example: Overlay Pals",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [
+        "ui.stage",
+        "net.origins",
+        "peers.relay",
+        "events.voice",
+        "chat.send",
+        "ui.panel",
+        "ui.chat-card",
+        "notify",
+        "commands",
+        "ui.app-menu"
+      ],
+      "origins": 2,
+      "package_bytes": 5242880,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": "not_declared",
+      "reproducible": false,
+      "key_age_days": 10,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 72,
+        "band": "high",
+        "e": 63,
+        "f_percent": 115,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "example: Mood Lights floor",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.side-panel", "net.origins", "ui.panel", "notify", "commands"],
+      "origins": 1,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 30,
+        "band": "medium",
+        "e": 33,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "official is not scored",
+    "facts": {
+      "kind": "official",
+      "permissions": ["net.http"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": "official"
+  },
+  {
+    "name": "hard stop is refused",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.panel"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": "unsafe_origin"
+    },
+    "expect": {
+      "refused": "unsafe_origin"
+    }
+  },
+  {
+    "name": "hard stop revoked",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": "revoked"
+    },
+    "expect": {
+      "refused": "revoked"
+    }
+  },
+  {
+    "name": "developer: F fixed at 1.00",
+    "facts": {
+      "kind": "developer",
+      "permissions": ["ui.panel"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": false,
+      "licence": "not_declared",
+      "reproducible": false,
+      "key_age_days": null,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 1,
+        "band": "low",
+        "e": 1,
+        "f_percent": 100,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "cap: E 100, F 1.30",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [
+        "net.http",
+        "net.origins",
+        "secrets",
+        "ui.stage",
+        "ui.side-panel",
+        "ui.webview",
+        "peers.relay",
+        "events.voice",
+        "events.presence",
+        "events.chat-activity",
+        "peers.messages",
+        "chat.send"
+      ],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": false,
+      "licence": "not_declared",
+      "reproducible": false,
+      "key_age_days": 5,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 100,
+        "band": "high",
+        "e": 100,
+        "f_percent": 130,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "cap: low permissions at +6, rounds half up",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [
+        "ui.panel",
+        "ui.chat-card",
+        "ui.app-menu",
+        "audio.effects",
+        "commands",
+        "notify",
+        "random.bytes",
+        "events.self",
+        "ui.dialog",
+        "ui.member-badge"
+      ],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 5,
+        "band": "low",
+        "e": 6,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "cap: websites at +18",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 6,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 14,
+        "band": "low",
+        "e": 18,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "one website adds nothing",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 1,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 0,
+        "band": "low",
+        "e": 0,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "size: 2 MiB",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 2097152,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 0,
+        "band": "low",
+        "e": 0,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "size: over 2 MiB",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 2097153,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 2,
+        "band": "low",
+        "e": 2,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "size: over 10 MiB",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 10485761,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 4,
+        "band": "low",
+        "e": 5,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "size: over 30 MiB",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 31457281,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 6,
+        "band": "low",
+        "e": 8,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "modules: 2",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 2,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 2,
+        "band": "low",
+        "e": 2,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "modules: 4",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 4,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 3,
+        "band": "low",
+        "e": 4,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "modules: 3",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 3,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 2,
+        "band": "low",
+        "e": 2,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "F lower clamp with expected key",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.panel"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": true,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 1,
+        "band": "low",
+        "e": 1,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "key age 29",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 29,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 38,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 100,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "key age 30",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 30,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 34,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 90,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "key age 179",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 179,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 34,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 90,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "key age 180",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 180,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 30,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 80,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "key age None",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": null,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 38,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 100,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "licence: proprietary",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": "proprietary",
+      "reproducible": false,
+      "key_age_days": 100,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 38,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 100,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "licence: SPDX id not on the OSI list",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "LicenseRef-custom"
+      },
+      "reproducible": false,
+      "key_age_days": 100,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 38,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 100,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "licence: not declared",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": "not_declared",
+      "reproducible": false,
+      "key_age_days": 100,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 40,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 105,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "source link missing",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": false,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 100,
+      "expected_key_matched": false,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 40,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 105,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "expected key matched",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["secrets", "events.voice", "events.presence", "events.chat-activity"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": false,
+      "key_age_days": 100,
+      "expected_key_matched": true,
+      "history": null,
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 32,
+        "band": "medium",
+        "e": 38,
+        "f_percent": 85,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "H cap 25",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": [
+        "net.http",
+        "net.origins",
+        "secrets",
+        "ui.stage",
+        "ui.webview",
+        "ui.side-panel"
+      ],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": [
+        {
+          "age_days": 10,
+          "permissions": []
+        }
+      ],
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 84,
+        "band": "high",
+        "e": 78,
+        "f_percent": 75,
+        "h": 25
+      }
+    }
+  },
+  {
+    "name": "H: versions older than 180 days are ignored",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.panel"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": [
+        {
+          "age_days": 200,
+          "permissions": []
+        }
+      ],
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 1,
+        "band": "low",
+        "e": 1,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "H: only the last 5 versions count",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.panel"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": [
+        {
+          "age_days": 10,
+          "permissions": ["ui.panel"]
+        },
+        {
+          "age_days": 20,
+          "permissions": ["ui.panel"]
+        },
+        {
+          "age_days": 30,
+          "permissions": ["ui.panel"]
+        },
+        {
+          "age_days": 40,
+          "permissions": ["ui.panel"]
+        },
+        {
+          "age_days": 50,
+          "permissions": []
+        }
+      ],
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 1,
+        "band": "low",
+        "e": 1,
+        "f_percent": 75,
+        "h": 0
+      }
+    }
+  },
+  {
+    "name": "H: oldest version of the window is the baseline",
+    "facts": {
+      "kind": "unofficial",
+      "permissions": ["ui.panel", "notify"],
+      "origins": 0,
+      "package_bytes": 1048576,
+      "wasm_modules": 1,
+      "source_link": true,
+      "licence": {
+        "spdx": "MIT"
+      },
+      "reproducible": true,
+      "key_age_days": 200,
+      "expected_key_matched": false,
+      "history": [
+        {
+          "age_days": 10,
+          "permissions": ["ui.panel"]
+        },
+        {
+          "age_days": 100,
+          "permissions": []
+        }
+      ],
+      "hard_stop": null
+    },
+    "expect": {
+      "scored": {
+        "value": 10,
+        "band": "low",
+        "e": 2,
+        "f_percent": 75,
+        "h": 8
+      }
+    }
   }
- }
 ]
