@@ -381,38 +381,12 @@ impl Engine {
         cancel: &Cancel,
         progress: impl Fn(u32, u32),
     ) -> DirectOutcome {
-        let attempt = async {
-            // A connection replaced mid-fetch (a file moved it to the relay) breaks the stream
-            // while a new connection is already open: one more try on that one.
-            let mut retried = false;
-            loop {
-                let (send, recv) = match self
-                    .p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE)
-                    .await
-                {
-                    Ok(stream) => stream,
-                    Err(e) => {
-                        tracing::info!(error = %e, "no direct connection; full image over plugin data");
-                        return DirectOutcome::Fallback;
-                    }
-                };
-                match direct::fetch(send, recv, full, &progress).await {
-                    Ok(bytes) => {
-                        tracing::debug!(bytes = bytes.len(), "full image loaded directly");
-                        return DirectOutcome::Loaded(bytes);
-                    }
-                    Err(direct::DirectFetchError::Unavailable) => return DirectOutcome::Stop,
-                    Err(e) if !retried && self.p2p_connected(server_id, from) => {
-                        tracing::info!(error = %e, "direct full image broke; trying once more");
-                        retried = true;
-                    }
-                    Err(e) => {
-                        tracing::info!(error = %e, "direct full image failed; trying plugin data");
-                        return DirectOutcome::Fallback;
-                    }
-                }
-            }
-        };
+        let attempt = direct::fetch_retrying(
+            || self.p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE),
+            || self.p2p_connected(server_id, from),
+            full,
+            progress,
+        );
         tokio::select! {
             outcome = attempt => outcome,
             () = cancel.wake.notified() => DirectOutcome::Stop,
