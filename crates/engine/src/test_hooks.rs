@@ -54,6 +54,13 @@ pub fn file_corrupt() -> bool {
     flag("MUMCORD_TEST_FILE_CORRUPT")
 }
 
+/// Stop sending file bytes after this many bytes (F3a (e)). Only the file stream pauses, the
+/// client stays connected to the server, so the recipient's stall timer is the one that ends the
+/// transfer. See the flake in <https://github.com/Mumcord/mumcord/issues/420>.
+pub fn file_stall_after_bytes() -> Option<u64> {
+    parse_number(var("MUMCORD_TEST_FILE_STALL_AFTER")?.as_str())
+}
+
 /// Forced encoder probe results (AC-7.36, AC-7.37); `None` means probe for real.
 pub fn encoder_probe() -> Option<Vec<ProbeOverride>> {
     parse_probe_list(var("MUMCORD_TEST_ENCODER_PROBE")?.as_str())
@@ -90,6 +97,10 @@ fn parse_seconds(raw: &str) -> Option<Duration> {
 
 fn parse_millis(raw: &str) -> Option<Duration> {
     raw.trim().parse().ok().map(Duration::from_millis)
+}
+
+fn parse_number(raw: &str) -> Option<u64> {
+    raw.trim().parse().ok()
 }
 
 fn parse_svt(raw: &str) -> Option<SvtSelftest> {
@@ -152,6 +163,8 @@ mod tests {
     fn numbers_and_svt_parse() {
         assert_eq!(parse_seconds(" 60 "), Some(Duration::from_secs(60)));
         assert_eq!(parse_millis("x"), None);
+        assert_eq!(parse_number(" 1048576 "), Some(1048576));
+        assert_eq!(parse_number("x"), None);
         assert_eq!(parse_svt("fail"), Some(SvtSelftest::Fail));
         assert_eq!(parse_svt("maybe"), None);
     }
@@ -172,6 +185,7 @@ mod tests {
     fn hooks_are_inert_in_release() {
         // SAFETY: only this test touches these variables.
         unsafe {
+            std::env::set_var("MUMCORD_TEST_FILE_STALL_AFTER", "1048576");
             std::env::set_var("MUMCORD_TEST_FILE_EXPIRY_S", "60");
             std::env::set_var("MUMCORD_TEST_FILE_CORRUPT", "1");
             std::env::set_var("MUMCORD_TEST_ENCODER_PROBE", "av1_hw:smoke_fail");
@@ -183,6 +197,7 @@ mod tests {
         }
         assert!(file_expiry().is_none());
         assert!(!file_corrupt());
+        assert!(file_stall_after_bytes().is_none());
         assert!(encoder_probe().is_none());
         assert!(svt_selftest().is_none());
         assert!(encode_delay().is_none());
