@@ -1,16 +1,17 @@
-//! The sharer's media path (FR-2.44): capture → one VP9 encoder → every viewer's queue
+//! The sharer's media path (FR-2.44): capture → one encoder (VP9 or AV1) → every viewer's queue
 //! ([`fanout`]) → one writer task per viewer stream.
 //!
 //! Encoding runs on its own thread, never on the audio thread, and shares no lock with audio.
-//! The quality step (1080p30 → 720p30 → 720p15 → 480p15) applies to every viewer, since there is one
+//! The quality step ([`quality`], FR-7.37/7.38) applies to every viewer, since there is one
 //! encoder; it goes down when several viewers lag, when one viewer lost every layer and still
-//! does not keep up, or when encoding itself is too slow, and back up once all is well.
+//! does not keep up, when encoding itself is too slow or when the upload limit no longer fits,
+//! and back up once all is well. The sharer's picks change live ([`Media::set_prefs`]).
 //!
 //! The shared app's sound has its own thread and Opus encoder (music tuning) and goes into the
 //! same viewer queues. Both threads stamp their frames from one clock, the start of the share.
 
 use std::collections::BTreeMap;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU8, AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -19,66 +20,19 @@ use mumcord_audio::codec::MAX_PACKET_BYTES;
 use mumcord_audio::mixer::share::share_encoder;
 use mumcord_audio::{FRAME_SAMPLES, SAMPLE_RATE};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_screenshare::{EncodedFrame, Encoder, EncoderConfig, I420Frame};
+use mumcord_screenshare::{
+    Codec, EncodedFrame, Encoder, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
+};
+use mumcord_store::ScreenOptimize;
 use tokio::task::JoinHandle;
 
 use super::capture::{CaptureSource, SoundSource};
 use super::fanout::{RateLimit, ViewerQueue};
+use super::quality::{Load, LoweredReason, Quality, QualityPrefs, Steps};
 use super::thumbnail::ShareThumbnail;
 use super::wire::{self, Frame, FrameHeader, FrameKind};
 use crate::session::lock;
 
-/// One quality step.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Quality {
-    pub width: u32,
-    pub height: u32,
-    pub fps: u32,
-    pub bitrate_kbps: u32,
-}
-
-/// Best first; the last is the floor of FR-2.44. Full HD by default; smaller sources are never
-/// enlarged, and each step keeps the source's aspect ratio (`convert::fit`).
-pub(crate) const STEPS: [Quality; 4] = [
-    Quality {
-        width: 1920,
-        height: 1080,
-        fps: 30,
-        bitrate_kbps: 4000,
-    },
-    Quality {
-        width: 1280,
-        height: 720,
-        fps: 30,
-        bitrate_kbps: 2000,
-    },
-    Quality {
-        width: 1280,
-        height: 720,
-        fps: 15,
-        bitrate_kbps: 1200,
-    },
-    Quality {
-        width: 854,
-        height: 480,
-        fps: 15,
-        bitrate_kbps: 700,
-    },
-];
-
-/// Pressure has to last this long before quality goes down.
-const DOWN_AFTER: Duration = Duration::from_secs(1);
-/// At least this long between two steps down, so the viewers' queues can settle in between.
-const DOWN_PAUSE: Duration = Duration::from_secs(2);
-/// Everything has to be fine this long before quality goes up again.
-const UP_AFTER: Duration = Duration::from_secs(5);
-/// A step up that goes down again within this time did not fit the upload limit.
-const UP_FAILED_WITHIN: Duration = Duration::from_secs(10);
-/// Longest wait before retrying a step up that failed before; with the 5 s wait for the step
-/// below, recovery after a lifted limit takes 45 s at worst.
-const UP_AFTER_MAX: Duration = Duration::from_secs(40);
-/// A step up that held this long counts as fitting, and its wait starts from `UP_AFTER` again.
-const UP_STABLE: Duration = Duration::from_secs(60);
 /// Encoding slower than this share of the frame time leaves no room for capture and sending.
 const ENCODE_BUDGET: f64 = 0.8;
 /// At most one keyframe per this time on viewer requests; joins always get one.
@@ -109,107 +63,15 @@ impl KeyframeGate {
     }
 }
 
-/// Picks the quality step from what the viewers and the encoder report, without any I/O.
-pub(crate) struct Steps {
-    step: usize,
-    pressure_since: Option<Instant>,
-    fine_since: Option<Instant>,
-    last_change: Option<Instant>,
-    /// How long everything has to be fine before stepping up to each step; doubles when that
-    /// step failed right after being reached.
-    up_after: [Duration; STEPS.len()],
-    /// The latest step up, until it is judged failed or stable.
-    up_at: Option<Instant>,
-}
-
-/// One look at how sending goes.
-#[derive(Debug, Default, Clone, Copy)]
-pub(crate) struct Load {
-    /// Viewers that lost at least one temporal layer.
-    pub lagging: usize,
-    /// Viewers that lost every layer and still do not keep up.
-    pub struggling: usize,
-    /// Encoding takes too much of the frame time.
-    pub encoder_busy: bool,
-}
-
-impl Steps {
-    pub fn new() -> Self {
-        Self {
-            step: 0,
-            pressure_since: None,
-            fine_since: None,
-            last_change: None,
-            up_after: [UP_AFTER; STEPS.len()],
-            up_at: None,
-        }
-    }
-
-    pub fn quality(&self) -> Quality {
-        STEPS[self.step]
-    }
-
-    pub fn step(&self) -> usize {
-        self.step
-    }
-
-    /// Takes in the current load; true when the step changed.
-    pub fn observe(&mut self, load: Load, now: Instant) -> bool {
-        let pressure = load.lagging >= 2 || load.struggling > 0 || load.encoder_busy;
-        let fine = load.lagging == 0 && !load.encoder_busy;
-        if let Some(at) = self.up_at
-            && now.duration_since(at) >= UP_STABLE
-        {
-            self.up_after[self.step] = UP_AFTER;
-            self.up_at = None;
-        }
-        if pressure {
-            self.fine_since = None;
-            let since = *self.pressure_since.get_or_insert(now);
-            let rested = self
-                .last_change
-                .is_none_or(|at| now.duration_since(at) >= DOWN_PAUSE);
-            if self.step + 1 < STEPS.len() && now.duration_since(since) >= DOWN_AFTER && rested {
-                if self
-                    .up_at
-                    .take()
-                    .is_some_and(|at| now.duration_since(at) < UP_FAILED_WITHIN)
-                {
-                    self.up_after[self.step] = (self.up_after[self.step] * 2).min(UP_AFTER_MAX);
-                }
-                self.step += 1;
-                self.changed(now);
-                return true;
-            }
-        } else {
-            self.pressure_since = None;
-            if fine {
-                let since = *self.fine_since.get_or_insert(now);
-                if self.step > 0 && now.duration_since(since) >= self.up_after[self.step - 1] {
-                    self.step -= 1;
-                    self.up_at = Some(now);
-                    self.changed(now);
-                    return true;
-                }
-            } else {
-                self.fine_since = None;
-            }
-        }
-        false
-    }
-
-    fn changed(&mut self, now: Instant) {
-        self.last_change = Some(now);
-        self.pressure_since = None;
-        self.fine_since = None;
-    }
-}
-
 /// How the own share is sent right now (test hook, and the numbers behind AC-2.29).
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct ScreenMediaStats {
-    /// Index into the quality steps: 0 is 1080p30, 3 is 480p15.
+    /// Index into the share's quality steps: 0 is the sharer's pick, the highest the floor.
     pub step: usize,
+    /// The step as the bar names it, e.g. "1080p30".
+    pub quality: String,
+    /// Why the share runs below the sharer's pick ("Lowered to {quality}: {reason}").
+    pub lowered: Option<LoweredReason>,
     pub width: u32,
     pub height: u32,
     /// Frames encoded in the last second.
@@ -250,6 +112,13 @@ struct Hub {
     viewers: Mutex<BTreeMap<u32, Arc<ViewerQueue>>>,
     /// One upload limit for all viewers together (test hook).
     limit: Mutex<Option<RateLimit>>,
+    /// The sharer's upload limit for all viewers together (FR-7.38).
+    upload: Mutex<Option<RateLimit>>,
+    /// New picks for the encode thread, taken with the next frame.
+    prefs: Mutex<Option<QualityPrefs>>,
+    /// Frame rate of the current step and the encoder's top temporal layer, for the stats.
+    step_fps: AtomicU32,
+    top_layer: AtomicU8,
     stats: Mutex<ScreenMediaStats>,
     /// The last keyframe the encoder took, for the picture in the sharer's bar (issue #163).
     thumbnail: Mutex<Option<I420Frame>>,
@@ -269,6 +138,7 @@ impl Hub {
                 load.struggling += usize::from(p.struggling());
             });
         }
+        load.copies = viewers.len();
         load
     }
 }
@@ -278,8 +148,24 @@ pub(crate) struct Media {
     hub: Arc<Hub>,
 }
 
+/// Makes the share's encoder for a size and the "Optimize for" pick; the encoder selection
+/// (FR-7.53) hands in its choice, without one the share uses VP9 in software.
+pub(crate) type EncoderFactory = Box<
+    dyn Fn(EncoderConfig, ScreenOptimize) -> mumcord_screenshare::Result<Box<dyn VideoEncoder>>
+        + Send,
+>;
+
+/// The default encoder: VP9 on libvpx, which every viewer can play.
+pub(crate) fn vp9_encoder() -> EncoderFactory {
+    Box::new(|config, _| Ok(Box::new(Encoder::new(config)?)))
+}
+
 impl Media {
-    pub fn start(capture: Box<dyn CaptureSource>) -> Self {
+    pub fn start(
+        capture: Box<dyn CaptureSource>,
+        prefs: QualityPrefs,
+        encoder: EncoderFactory,
+    ) -> Self {
         let hub = Arc::new(Hub {
             epoch: Instant::now(),
             stop: AtomicBool::new(false),
@@ -290,13 +176,17 @@ impl Media {
             keyframe_requested: AtomicBool::new(false),
             viewers: Mutex::new(BTreeMap::new()),
             limit: Mutex::new(None),
+            upload: Mutex::new(prefs.upload_limit_kbps().map(RateLimit::new)),
+            prefs: Mutex::new(None),
+            step_fps: AtomicU32::new(0),
+            top_layer: AtomicU8::new(TEMPORAL_LAYERS - 1),
             stats: Mutex::new(ScreenMediaStats::default()),
             thumbnail: Mutex::new(None),
         });
         let thread_hub = hub.clone();
         let spawned = thread::Builder::new()
             .name("screen-encode".into())
-            .spawn(move || encode_loop(&thread_hub, capture));
+            .spawn(move || encode_loop(&thread_hub, capture, prefs, &encoder));
         if let Err(e) = spawned {
             tracing::error!(error = %e, "screen share encode thread did not start");
         }
@@ -319,6 +209,13 @@ impl Media {
             // Viewers may have dropped frames while nothing came; restart cleanly.
             self.hub.keyframe.store(true, Ordering::Relaxed);
         }
+    }
+
+    /// Applies new picks from the Quality menu within a frame or two (FR-7.39): the share
+    /// starts over at the new ceiling, with a keyframe when the size changes.
+    pub fn set_prefs(&self, prefs: QualityPrefs) {
+        *lock(&self.hub.upload) = prefs.upload_limit_kbps().map(RateLimit::new);
+        *lock(&self.hub.prefs) = Some(prefs);
     }
 
     /// Sends `source`'s sound along while sound is on ([`Self::set_sound`]); at most one source.
@@ -367,7 +264,8 @@ impl Media {
 
     pub fn stats(&self) -> ScreenMediaStats {
         let mut stats = lock(&self.hub.stats).clone();
-        let base_fps = STEPS[stats.step].fps;
+        let base_fps = self.hub.step_fps.load(Ordering::Relaxed);
+        let top = self.hub.top_layer.load(Ordering::Relaxed);
         stats.viewers = lock(&self.hub.viewers)
             .iter()
             .map(|(session, queue)| {
@@ -376,7 +274,7 @@ impl Media {
                     session: *session,
                     max_layer: layer,
                     // Every layer below the top one halves the frame rate (fanout).
-                    fps: base_fps >> (super::fanout::TOP_LAYER - layer),
+                    fps: base_fps >> top.saturating_sub(layer),
                     struggling: queue.with_policy(super::fanout::Policy::struggling),
                 }
             })
@@ -426,7 +324,7 @@ async fn write_frames(queue: Arc<ViewerQueue>, hub: Arc<Hub>, mut send: SendStre
         let frame = queue.next().await;
         let bytes = wire::HEADER_LEN + frame.payload.len();
         let now = Instant::now();
-        let wait = [&queue.limit, &hub.limit]
+        let wait = [&queue.limit, &hub.limit, &hub.upload]
             .iter()
             .filter_map(|limit| lock(limit).as_mut().map(|l| l.take(bytes, now)))
             .max()
@@ -480,10 +378,15 @@ impl Meter {
     }
 }
 
-fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
+fn encode_loop(
+    hub: &Hub,
+    mut capture: Box<dyn CaptureSource>,
+    prefs: QualityPrefs,
+    make_encoder: &EncoderFactory,
+) {
     let start = hub.epoch;
-    let mut steps = Steps::new();
-    let mut encoder: Option<Encoder> = None;
+    let mut steps = Steps::new(prefs, Codec::Vp9);
+    let mut encoder: Option<Box<dyn VideoEncoder>> = None;
     let mut meter = Meter::new(start);
     let mut keyframes = KeyframeGate::default();
     let mut encode_avg = 0.0_f64;
@@ -492,6 +395,18 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
         if capture.ended() {
             hub.ended.store(true, Ordering::Relaxed);
             return;
+        }
+        if let Some(prefs) = lock(&hub.prefs).take() {
+            let screen_content_changed = prefs.optimize != steps.prefs().optimize;
+            steps.set_prefs(prefs);
+            if screen_content_changed && encoder.as_ref().is_some_and(|e| e.codec() == Codec::Av1) {
+                // AV1's screen-content tools are set when the encoder starts; the new one
+                // begins with a keyframe.
+                encoder = None;
+            }
+        }
+        if steps.limit(hub.load().copies, Instant::now()) {
+            log_quality(steps.quality());
         }
         let quality = steps.quality();
         let frame_time = Duration::from_secs(1) / quality.fps;
@@ -510,27 +425,21 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
             continue;
         };
         let size = (picture.width(), picture.height());
-        let config = EncoderConfig {
-            width: size.0,
-            height: size.1,
-            fps: quality.fps,
-            bitrate_kbps: quality.bitrate_kbps,
-        };
         let mut keyframe = keyframes.due(
             hub.keyframe.swap(false, Ordering::Relaxed),
             hub.keyframe_requested.load(Ordering::Relaxed),
             Instant::now(),
         );
-        match encoder.as_mut() {
-            Some(enc) => match reconfigure(enc, size, quality) {
-                Ok(resized) => keyframe |= resized,
-                Err(e) => {
-                    tracing::warn!(error = %e, "screen share quality change failed");
-                    continue;
-                }
-            },
-            None => match Encoder::new(config) {
+        if encoder.is_none() {
+            let config = EncoderConfig {
+                width: size.0,
+                height: size.1,
+                fps: quality.fps,
+                bitrate_kbps: quality.bitrate_kbps,
+            };
+            match make_encoder(config, steps.prefs().optimize) {
                 Ok(enc) => {
+                    steps.set_codec(enc.codec());
                     encoder = Some(enc);
                     keyframe = true;
                 }
@@ -538,11 +447,21 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
                     tracing::error!(error = %e, "screen share encoder did not start");
                     return;
                 }
-            },
+            }
         }
         let Some(enc) = encoder.as_mut() else {
             continue;
         };
+        match reconfigure(enc.as_mut(), size, steps.quality()) {
+            Ok(resized) => keyframe |= resized,
+            Err(e) => {
+                tracing::warn!(error = %e, "screen share quality change failed");
+                continue;
+            }
+        }
+        hub.step_fps.store(quality.fps, Ordering::Relaxed);
+        let top_layer = enc.temporal_layers().saturating_sub(1);
+        hub.top_layer.store(top_layer, Ordering::Relaxed);
         let pts =
             i64::try_from(Instant::now().duration_since(start).as_millis()).unwrap_or(i64::MAX);
         let began = Instant::now();
@@ -570,20 +489,14 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
                 // given; the sharer's own client does not decode anything for it.
                 lock(&hub.thumbnail).replace(picture.clone());
             }
-            fan_out(hub, to_frame(out, size), now);
+            fan_out(hub, to_frame(out, size), top_layer, now);
         }
         let load = Load {
             encoder_busy: encode_avg > frame_time.as_secs_f64() * ENCODE_BUDGET,
             ..hub.load()
         };
         if steps.observe(load, now) {
-            let q = steps.quality();
-            tracing::info!(
-                width = q.width,
-                height = q.height,
-                fps = q.fps,
-                "screen share quality changed"
-            );
+            log_quality(steps.quality());
         }
         let window = now.duration_since(meter.since);
         if window >= Duration::from_secs(1) {
@@ -592,6 +505,8 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
             let seconds = window.as_secs_f64();
             let mut stats = lock(&hub.stats);
             stats.step = steps.step();
+            stats.quality = steps.quality().label();
+            stats.lowered = steps.lowered();
             (stats.width, stats.height) = size;
             stats.fps = (f64::from(meter.frames) / seconds).round() as u32;
             stats.kbps = (meter.bytes as f64 * 8.0 / 1000.0 / seconds).round() as u32;
@@ -602,10 +517,20 @@ fn encode_loop(hub: &Hub, mut capture: Box<dyn CaptureSource>) {
     }
 }
 
-/// Moves the encoder to `size` and the step's bitrate; true when the size changed, which needs
-/// a keyframe because not every WebCodecs decoder follows a size change on an inter frame.
+fn log_quality(q: Quality) {
+    tracing::info!(
+        width = q.width,
+        height = q.height,
+        fps = q.fps,
+        "screen share quality changed"
+    );
+}
+
+/// Moves the encoder to `size` and the step's frame rate and bitrate; true when the size
+/// changed, which needs a keyframe because not every WebCodecs decoder follows a size change on
+/// an inter frame.
 fn reconfigure(
-    enc: &mut Encoder,
+    enc: &mut dyn VideoEncoder,
     size: (u32, u32),
     quality: Quality,
 ) -> mumcord_screenshare::Result<bool> {
@@ -613,6 +538,9 @@ fn reconfigure(
     let resized = (current.width, current.height) != size;
     if resized {
         enc.set_resolution(size.0, size.1)?;
+    }
+    if current.fps != quality.fps {
+        enc.set_fps(quality.fps)?;
     }
     if current.bitrate_kbps != quality.bitrate_kbps {
         enc.set_bitrate(quality.bitrate_kbps)?;
@@ -661,7 +589,12 @@ fn sound_loop(hub: &Hub, mut source: Box<dyn SoundSource>) {
         let now = Instant::now();
         // The packet's first sample was captured one packet before its last.
         let captured = now.duration_since(hub.epoch).saturating_sub(packet_time);
-        fan_out(hub, sound_frame(&out[..len], captured), now);
+        fan_out(
+            hub,
+            sound_frame(&out[..len], captured),
+            hub.top_layer.load(Ordering::Relaxed),
+            now,
+        );
     }
 }
 
@@ -680,11 +613,11 @@ fn sound_frame(packet: &[u8], captured: Duration) -> Frame {
     }
 }
 
-fn fan_out(hub: &Hub, frame: Frame, now: Instant) {
+fn fan_out(hub: &Hub, frame: Frame, top_layer: u8, now: Instant) {
     let frame = Arc::new(frame);
     let viewers: Vec<Arc<ViewerQueue>> = lock(&hub.viewers).values().cloned().collect();
     for queue in viewers {
-        if queue.push(frame.clone(), now).need_keyframe {
+        if queue.push(frame.clone(), top_layer, now).need_keyframe {
             hub.request_keyframe();
         }
     }
@@ -710,8 +643,13 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32)) -> Frame {
 mod tests {
     use super::*;
 
+    /// The default share's steps (1080p30 → 720p30 → 720p15 → 480p15).
+    fn steps() -> Steps {
+        Steps::new(QualityPrefs::default(), Codec::Vp9)
+    }
+
     /// The lowest quality step (480p15).
-    const FLOOR: usize = STEPS.len() - 1;
+    const FLOOR: usize = 3;
 
     struct Ending;
     impl CaptureSource for Ending {
@@ -725,130 +663,12 @@ mod tests {
 
     #[test]
     fn media_reports_a_capture_that_ended() {
-        let media = Media::start(Box::new(Ending));
+        let media = Media::start(Box::new(Ending), QualityPrefs::default(), vp9_encoder());
         let deadline = Instant::now() + Duration::from_secs(5);
         while !media.ended() && Instant::now() < deadline {
             thread::sleep(Duration::from_millis(10));
         }
         assert!(media.ended());
-    }
-
-    fn load(lagging: usize, struggling: usize) -> Load {
-        Load {
-            lagging,
-            struggling,
-            encoder_busy: false,
-        }
-    }
-
-    #[test]
-    fn one_lagging_viewer_keeps_the_quality() {
-        let now = Instant::now();
-        let mut steps = Steps::new();
-        assert!(!steps.observe(load(1, 0), now));
-        assert!(!steps.observe(load(1, 0), now + Duration::from_secs(10)));
-        assert_eq!(steps.quality(), STEPS[0]);
-    }
-
-    #[test]
-    fn quality_steps_down_to_the_floor_and_back_up() {
-        let start = Instant::now();
-        let mut steps = Steps::new();
-        let at = |s: u64| start + Duration::from_secs(s);
-        assert!(
-            !steps.observe(load(2, 0), at(0)),
-            "a moment of pressure is not enough"
-        );
-        assert!(steps.observe(load(2, 0), at(1)));
-        assert_eq!(steps.quality(), STEPS[1]);
-        assert!(
-            !steps.observe(load(2, 0), at(2)),
-            "pressure starts counting again"
-        );
-        assert!(
-            steps.observe(load(0, 1), at(3)),
-            "one struggling viewer is enough"
-        );
-        assert_eq!(steps.quality().fps, 15);
-        assert!(!steps.observe(load(0, 1), at(5)));
-        assert!(steps.observe(load(0, 1), at(6)));
-        assert_eq!(steps.quality(), STEPS[FLOOR]);
-        assert!(!steps.observe(load(3, 1), at(10)), "the floor holds");
-        assert!(!steps.observe(load(3, 1), at(20)));
-
-        assert!(
-            !steps.observe(load(1, 0), at(21)),
-            "a lagging viewer is not fine yet"
-        );
-        assert!(!steps.observe(load(0, 0), at(22)));
-        assert!(!steps.observe(load(1, 0), at(26)), "lag resets the wait");
-        assert!(!steps.observe(load(0, 0), at(27)));
-        assert!(steps.observe(load(0, 0), at(32)));
-        assert_eq!(steps.step(), FLOOR - 1);
-        assert!(
-            !steps.observe(load(0, 0), at(33)),
-            "each step up waits again"
-        );
-        assert!(steps.observe(load(0, 0), at(38)));
-        assert!(!steps.observe(load(0, 0), at(39)));
-        assert!(steps.observe(load(0, 0), at(44)));
-        assert_eq!(steps.quality(), STEPS[0]);
-    }
-
-    /// Runs the steps once a second against an upload limit that only fits `fits_from` and
-    /// below; returns the number of step-ups and the mean fps over `secs`.
-    fn simulate(
-        steps: &mut Steps,
-        start: Instant,
-        from: u64,
-        secs: u64,
-        fits_from: usize,
-    ) -> (usize, f64) {
-        let (mut ups, mut fps) = (0, 0.0);
-        for s in from..from + secs {
-            let before = steps.step();
-            let pressure = steps.step() < fits_from;
-            let l = if pressure { load(2, 0) } else { load(0, 0) };
-            steps.observe(l, start + Duration::from_secs(s));
-            if steps.step() < before {
-                ups += 1;
-            }
-            fps += f64::from(steps.quality().fps);
-        }
-        (ups, fps / secs as f64)
-    }
-
-    #[test]
-    fn a_step_up_that_keeps_failing_is_tried_less_often() {
-        let start = Instant::now();
-        let mut steps = Steps::new();
-        // Full HD and 720p30 never fit, 720p15 does.
-        simulate(&mut steps, start, 0, 20, 2);
-        let (ups, fps) = simulate(&mut steps, start, 20, 60, 2);
-        assert!(ups <= 2, "{ups} tries in 60 s");
-        assert!(fps >= 14.0, "{fps} fps");
-    }
-
-    #[test]
-    fn recovery_after_a_lifted_limit_stays_under_45_seconds() {
-        let start = Instant::now();
-        let mut steps = Steps::new();
-        simulate(&mut steps, start, 0, 200, 1);
-        let mut t = 200;
-        while steps.step() > 0 {
-            simulate(&mut steps, start, t, 1, 0);
-            t += 1;
-            assert!(t - 200 <= 45, "still at step {} after 45 s", steps.step());
-        }
-    }
-
-    #[test]
-    fn a_step_up_that_held_resets_its_wait() {
-        let start = Instant::now();
-        let mut steps = Steps::new();
-        simulate(&mut steps, start, 0, 200, 1);
-        simulate(&mut steps, start, 200, 100, 0);
-        assert_eq!(steps.up_after[0], UP_AFTER);
     }
 
     #[test]
@@ -863,16 +683,57 @@ mod tests {
         assert!(!gate.due(false, false, now + KEYFRAME_REQUEST_PAUSE));
     }
 
+    /// Software AV1 behind the encoder trait, with screen-content tools for "Sharp text".
+    fn av1_encoder(screen_content: Arc<Mutex<Vec<bool>>>) -> EncoderFactory {
+        Box::new(move |config, optimize| {
+            let options = mumcord_screenshare::Av1Options {
+                screen_content: optimize == ScreenOptimize::Text,
+            };
+            lock(&screen_content).push(options.screen_content);
+            Ok(Box::new(mumcord_screenshare::Av1Encoder::new(
+                config, options,
+            )?))
+        })
+    }
+
+    fn wait_for(media: &Media, what: impl Fn(&ScreenMediaStats) -> bool) -> ScreenMediaStats {
+        let deadline = Instant::now() + Duration::from_secs(10);
+        loop {
+            let stats = media.stats();
+            if what(&stats) || Instant::now() > deadline {
+                return stats;
+            }
+            thread::sleep(Duration::from_millis(50));
+        }
+    }
+
     #[test]
-    fn a_busy_encoder_lowers_quality() {
-        let now = Instant::now();
-        let mut steps = Steps::new();
-        let busy = Load {
-            encoder_busy: true,
-            ..Load::default()
+    fn picks_change_live_and_sharp_text_restarts_av1_with_screen_content() {
+        use mumcord_store::{ScreenFps, ScreenResolution};
+        let made = Arc::new(Mutex::new(Vec::new()));
+        let prefs = QualityPrefs {
+            resolution: ScreenResolution::P720,
+            fps: ScreenFps::Fps15,
+            ..QualityPrefs::default()
         };
-        steps.observe(busy, now);
-        assert!(steps.observe(busy, now + DOWN_AFTER));
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            prefs,
+            av1_encoder(made.clone()),
+        );
+        let stats = wait_for(&media, |s| s.fps > 0);
+        assert_eq!((stats.quality.as_str(), stats.lowered), ("720p15", None));
+        let changed = Instant::now();
+        media.set_prefs(QualityPrefs {
+            resolution: ScreenResolution::P1080,
+            optimize: ScreenOptimize::Text,
+            ..prefs
+        });
+        let stats = wait_for(&media, |s| s.quality == "1080p15");
+        assert_eq!(stats.quality, "1080p15");
+        assert!(changed.elapsed() < Duration::from_secs(3), "applied live");
+        assert_eq!(*lock(&made), [false, true]);
+        assert!(stats.keyframes >= 2, "the new encoder starts on a keyframe");
     }
 
     /// Encodes the test pattern the way the encode loop does: 10 s at 720p30 (long enough for
@@ -884,7 +745,7 @@ mod tests {
         let mut pts = 0_i64;
         let mut per_second = Vec::new();
         for (step, seconds) in [(FLOOR - 2, 10), (FLOOR - 1, 2), (FLOOR, seconds)] {
-            let quality = STEPS[step];
+            let quality = steps().at(step);
             for _ in 0..seconds {
                 let mut bytes = 0;
                 for _ in 0..quality.fps {
@@ -926,7 +787,7 @@ mod tests {
     #[test]
     fn the_floor_stays_near_its_bitrate() {
         let per_second = floor_kbps(10);
-        let target = STEPS[FLOOR].bitrate_kbps as usize;
+        let target = steps().at(FLOOR).bitrate_kbps as usize;
         assert!(
             per_second.iter().all(|kbps| *kbps <= target * 11 / 10),
             "{per_second:?} kbit/s for a target of {target}"
