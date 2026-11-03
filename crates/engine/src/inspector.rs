@@ -310,6 +310,10 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
     if data_id == crate::full_image::wire::DATA_ID {
         return crate::full_image::wire::Msg::decode(data).map(|m| image_json(&m));
     }
+    // Decoded through its own module, so the view stays right when the encoding changes.
+    if data_id == crate::files::wire::DATA_ID {
+        return crate::files::wire::decode(data).map(|m| file_json(&m));
+    }
     if data_id == PEER_DATA_ID {
         return serde_json::from_slice::<Value>(data).ok().map(mask_token);
     }
@@ -324,6 +328,18 @@ fn decode(data_id: &str, data: &[u8]) -> Option<Value> {
     std::str::from_utf8(data)
         .ok()
         .map(|text| Value::String(text.to_owned()))
+}
+
+fn file_json(m: &crate::files::wire::FileMessage) -> Value {
+    use crate::files::wire::FileMessage;
+    match m {
+        FileMessage::Request { id } => json!({ "t": "req", "id": id }),
+        FileMessage::Queued { id, position } => json!({ "t": "queued", "id": id, "pos": position }),
+        FileMessage::Go { id } => json!({ "t": "go", "id": id }),
+        FileMessage::Busy { id } => json!({ "t": "busy", "id": id }),
+        FileMessage::Gone { id } => json!({ "t": "gone", "id": id }),
+        FileMessage::Cancel { id } => json!({ "t": "cancel", "id": id }),
+    }
 }
 
 fn mask_token(mut value: Value) -> Value {
@@ -460,6 +476,22 @@ mod tests {
         inspector.capture(1, control(MessageType::UdpTunnel));
         let poll = inspector.poll(None, Vec::new());
         assert!(poll.packets.is_empty() && poll.counts.is_empty());
+    }
+
+    #[test]
+    fn file_messages_are_decoded() {
+        use crate::files::wire::{DATA_ID, FileMessage, encode};
+        let id = "0123456789abcdef0123456789abcdef".to_owned();
+        let data = encode(&FileMessage::Queued {
+            id: id.clone(),
+            position: 2,
+        })
+        .expect("valid message");
+        assert_eq!(
+            decode(DATA_ID, &data),
+            Some(json!({ "t": "queued", "id": id, "pos": 2 }))
+        );
+        assert_eq!(decode(DATA_ID, b"{\"t\":\"nope\"}"), None);
     }
 
     #[test]
