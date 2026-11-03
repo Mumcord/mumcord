@@ -370,6 +370,15 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (resolution, fps)
     );
     ",
+    // v24: how a file download ended, per chat message carrying the offer (spec 07, section
+    // 7.2); it goes away with the message.
+    r"
+    CREATE TABLE file_card (
+        message_id INTEGER PRIMARY KEY REFERENCES chat_message (id) ON DELETE CASCADE,
+        state      TEXT NOT NULL CHECK (state IN ('done', 'mismatch')),
+        path       TEXT
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -459,6 +468,7 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
         assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
         assert!(MIGRATIONS[21].contains("share_volume"));
+        assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
     }
 
     #[test]
