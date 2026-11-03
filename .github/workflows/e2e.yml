@@ -296,9 +296,11 @@ jobs:
       - name: Point the E2E run at mumpeer
         if: steps.relay.outputs.needed == 'true'
         run: |
-          echo "MUMPEER_DIR=$GITHUB_WORKSPACE/mumpeer" >> "$GITHUB_ENV"
-          echo "MUMPEER_IMAGE=mumpeer:testenv" >> "$GITHUB_ENV"
-          echo "MUMBOT_IMAGE=mumbot:peer-e2e" >> "$GITHUB_ENV"
+          {
+            echo "MUMPEER_DIR=$GITHUB_WORKSPACE/mumpeer"
+            echo "MUMPEER_IMAGE=mumpeer:testenv"
+            echo "MUMBOT_IMAGE=mumbot:peer-e2e"
+          } >> "$GITHUB_ENV"
 
       # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
       # The old relay of AC-7.5 is the published mumpeer 0.1.0 with the mumbot 0.4.1 image (the
