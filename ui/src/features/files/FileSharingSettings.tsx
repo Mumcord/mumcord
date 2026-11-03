@@ -82,7 +82,7 @@ export function FileSharingSettings({ settings, update }: SettingsSectionProps) 
       <div className="settings-control-row files-save-row">
         <span id="files-save-label">{t("settings.saveTo")}</span>
         {/* The folder is text, not a field: only the system picker changes it. */}
-        <span className="files-save-row__path" id="files-save-folder" title={folder}>
+        <span className="files-save-row__path" id="files-save-folder" data-tooltip={folder}>
           {folder}
         </span>
         <button
