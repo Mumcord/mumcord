@@ -164,8 +164,11 @@ fn hardware_encoders() {
     println!("cargo:rustc-link-lib=static=vpl");
     // The dispatcher is C++ and loads Intel's runtime itself. MSVC: the archive was built against
     // the dynamic C runtime (/MD), like Rust's default, so it needs the matching C++ library.
+    // On Windows it also reads the registry (advapi32) and formats adapter GUIDs (ole32).
     if msvc {
         println!("cargo:rustc-link-lib=dylib=msvcprt");
+        println!("cargo:rustc-link-lib=dylib=advapi32");
+        println!("cargo:rustc-link-lib=dylib=ole32");
     } else {
         println!("cargo:rustc-link-lib=dylib=stdc++");
         println!("cargo:rustc-link-lib=dylib=dl");
