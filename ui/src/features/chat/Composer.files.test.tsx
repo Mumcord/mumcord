@@ -6,6 +6,7 @@ import type { FileChip } from "../../bindings/commands";
 import { chipStatus } from "../files/composer/chipView";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { i18n } from "../../i18n";
+import { conversationMessages } from "./chatStore";
 import { Composer } from "./Composer";
 
 const dropHandlers = vi.hoisted(() => new Set<(event: { payload: DragDropEvent }) => void>());
@@ -184,6 +185,19 @@ describe("Composer file sharing", () => {
     fireEvent.click(screen.getByRole("button", { name: "Send" }));
     await waitFor(() => {
       expect(send).toHaveBeenCalledWith(expect.any(Number), 1, [1]);
+    });
+  });
+
+  it("shows the own offer messages in the chat after sending", async () => {
+    vi.spyOn(api, "filesChipAdd").mockResolvedValue(chip(1));
+    const offer = await api.sendChannelMessage(1, 1, "Alice shared a file");
+    vi.spyOn(api, "filesSend").mockResolvedValue([offer]);
+    setup(CHANNEL);
+    emit({ type: "drop", paths: ["/tmp/a.pdf"], position: at(100, 100) });
+    await screen.findByText("18.4 MB · peer-to-peer");
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    await waitFor(() => {
+      expect(conversationMessages(CHANNEL, 1).map((m) => m.id)).toContain(offer.id);
     });
   });
 

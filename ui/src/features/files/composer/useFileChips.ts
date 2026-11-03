@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { EngineError, getApi } from "../../../api";
 import type { FileChip, FilesUnavailable } from "../../../bindings/commands";
 import { shownServerId } from "../../channels/serverStore";
+import { addSentMessage } from "../../chat/chatStore";
 import { isBusy, MAX_CHIPS } from "./chipView";
 
 export interface FileChips {
@@ -113,7 +114,9 @@ export function useFileChips(enabled: boolean): FileChips {
     if (ids.length === 0) return;
     setError(null);
     try {
-      await getApi().filesSend(server, channelId, ids);
+      // Like every own message, the posted offers come back instead of as events.
+      const posted = await getApi().filesSend(server, channelId, ids);
+      for (const message of posted) addSentMessage(message, server);
     } catch (err) {
       console.error("sharing files failed", err);
       setError(err instanceof Error ? err.message : String(err));
