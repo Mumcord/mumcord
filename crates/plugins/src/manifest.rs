@@ -86,6 +86,14 @@ pub struct Manifest {
     /// Chat patterns (permission `chat.patterns`); see [`crate::patterns`].
     pub chat_patterns: Vec<ChatPattern>,
     pub net: Option<Net>,
+    /// Items for the Apps menu (permission `ui.app-menu`, API 1.1).
+    pub app_menu: Vec<AppMenuItem>,
+    /// Media-area activity (permission `ui.stage`, API 1.1).
+    pub stage: Option<StageDecl>,
+    /// Where the plugin's web content may be shown (permission `ui.webview`, API 1.1).
+    pub webview: Option<WebviewDecl>,
+    /// Sounds bundled in the package (permission `audio.effects`, API 1.1).
+    pub audio: Option<AudioDecl>,
     /// Path of the icon under `assets/`.
     pub icon: Option<String>,
 }
@@ -135,10 +143,61 @@ pub struct ChatPattern {
     pub description: String,
 }
 
-/// `net` (FR-6.37): which hosts `net.http` may reach.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+/// `net` (FR-6.37, FR-9.23): which hosts `net.http` may reach and which websites `net.origins`
+/// lists.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub struct Net {
-    pub hosts: NetHosts,
+    pub hosts: Option<NetHosts>,
+    #[serde(default)]
+    pub origins: Vec<NetOrigin>,
+}
+
+/// A website the plugin declares (FR-9.23). The rules for the origin string are checked by the
+/// manifest validation, not here.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct NetOrigin {
+    pub origin: String,
+    /// Translation key of the reason shown next to the origin.
+    pub purpose: String,
+}
+
+/// An Apps-menu entry (FR-9.23).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct AppMenuItem {
+    pub id: String,
+    pub label: String,
+    pub icon: Option<String>,
+}
+
+/// The media-area activity of a plugin (FR-9.23).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct StageDecl {
+    pub title: String,
+    /// At most 16; checked by the manifest validation.
+    pub max_participants: Option<u32>,
+}
+
+/// Where web content may be shown (FR-9.23).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct WebviewDecl {
+    #[serde(default)]
+    pub places: Vec<WebviewPlace>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum WebviewPlace {
+    Stage,
+    SidePanel,
+    Dialog,
+    Panel,
+}
+
+/// Sound files bundled in the package (FR-9.23, FR-9.65).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+pub struct AudioDecl {
+    #[serde(default)]
+    pub sounds: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
@@ -237,6 +296,11 @@ struct RawManifest {
     #[serde(default)]
     chat_patterns: Vec<ChatPattern>,
     net: Option<Net>,
+    #[serde(default)]
+    app_menu: Vec<AppMenuItem>,
+    stage: Option<StageDecl>,
+    webview: Option<WebviewDecl>,
+    audio: Option<AudioDecl>,
     icon: Option<String>,
 }
 
@@ -314,6 +378,16 @@ impl Manifest {
             .iter()
             .map(String::as_str)
             .chain(self.permissions.optional.iter().map(|p| p.id.as_str()))
+    }
+
+    /// The API minor `(major, minor)` the package is built against: the lower bound of `api`
+    /// (FR-9.6). `^1` and `^1.0` are 1.0, `^1.1` is 1.1.
+    pub fn api_minor(&self) -> (u64, u64) {
+        // parse_api_range guarantees exactly one caret comparator with a minor.
+        self.api
+            .comparators
+            .first()
+            .map_or((1, 0), |c| (c.major, c.minor.unwrap_or(0)))
     }
 
     pub fn has_permission(&self, id: &str) -> bool {
@@ -452,18 +526,13 @@ impl RawManifest {
                 permission: "chat.patterns",
             });
         }
-        if self.net.is_some() != has("net.http") {
+        // `net.origins` (the field) is checked against its permission by the manifest
+        // validation, not here.
+        let net_hosts = self.net.as_ref().is_some_and(|n| n.hosts.is_some());
+        if net_hosts != has("net.http") {
             return Err(ManifestError::MissingPermission {
-                field: if self.net.is_some() {
-                    "net"
-                } else {
-                    "net.http"
-                },
-                permission: if self.net.is_some() {
-                    "net.http"
-                } else {
-                    "net"
-                },
+                field: if net_hosts { "net" } else { "net.http" },
+                permission: if net_hosts { "net.http" } else { "net" },
             });
         }
 
@@ -511,6 +580,10 @@ impl RawManifest {
             triggers: self.triggers,
             chat_patterns: self.chat_patterns,
             net: self.net,
+            app_menu: self.app_menu,
+            stage: self.stage,
+            webview: self.webview,
+            audio: self.audio,
             icon: self.icon,
         })
     }
@@ -845,12 +918,13 @@ mod tests {
     fn official_only_permissions_need_an_official_source() {
         let m = with(|v| {
             v["permissions"]["optional"] = serde_json::json!(["ui.webview", "secrets"]);
+            // ui.webview is open to every plugin since API 1.1; secrets stays official-only.
         })
         .expect("valid");
         assert!(m.validate(Source::Official).is_ok());
         for source in [Source::Repo { repository_id: 1 }, Source::Dev] {
             let err = m.validate(source).expect_err("refused");
-            assert_eq!(err, ManifestError::OfficialOnly("ui.webview".into()));
+            assert_eq!(err, ManifestError::OfficialOnly("secrets".into()));
             assert_eq!(
                 err.to_string(),
                 "This permission is only available to official plugins"
@@ -1040,7 +1114,8 @@ mod tests {
         assert_eq!(
             m.net,
             Some(Net {
-                hosts: NetHosts::UserConfigured
+                hosts: Some(NetHosts::UserConfigured),
+                origins: Vec::new(),
             })
         );
         assert!(matches!(
@@ -1058,6 +1133,58 @@ mod tests {
             }),
             Err(ManifestError::Syntax(_))
         ));
+    }
+
+    #[test]
+    fn api_1_1_fields_parse() {
+        let m = with(|v| {
+            v["api"] = "^1.1".into();
+            v["net"] = serde_json::json!({"origins": [{"origin": "https://api.example", "purpose": "origins.api"}]});
+            v["app_menu"] = serde_json::json!([{"id": "play", "label": "Play", "icon": "assets/p.svg"}, {"id": "b", "label": "B"}]);
+            v["stage"] = serde_json::json!({"title": "Game", "max_participants": 4});
+            v["webview"] = serde_json::json!({"places": ["stage", "side-panel", "dialog", "panel"]});
+            v["audio"] = serde_json::json!({"sounds": ["sounds/ding.ogg"]});
+        })
+        .expect("valid");
+        assert_eq!(m.api_minor(), (1, 1));
+        let net = m.net.expect("net");
+        assert_eq!(net.hosts, None);
+        assert_eq!(
+            net.origins,
+            [NetOrigin {
+                origin: "https://api.example".into(),
+                purpose: "origins.api".into()
+            }]
+        );
+        assert_eq!(m.app_menu.len(), 2);
+        assert_eq!(m.app_menu[1].icon, None);
+        assert_eq!(m.stage.expect("stage").max_participants, Some(4));
+        assert_eq!(
+            m.webview.expect("webview").places,
+            [
+                WebviewPlace::Stage,
+                WebviewPlace::SidePanel,
+                WebviewPlace::Dialog,
+                WebviewPlace::Panel
+            ]
+        );
+        assert_eq!(m.audio.expect("audio").sounds, ["sounds/ding.ogg"]);
+    }
+
+    #[test]
+    fn api_1_1_fields_are_optional_and_unknown_ones_ignored() {
+        let m = with(|v| v["future"] = serde_json::json!({"x": 1})).expect("valid");
+        assert!(m.app_menu.is_empty());
+        assert!(m.stage.is_none() && m.webview.is_none() && m.audio.is_none());
+        assert_eq!(m.api_minor(), (1, 0));
+        for api in ["^1.0", "^1.0.0"] {
+            assert_eq!(
+                with(|v| v["api"] = api.into()).expect("valid").api_minor(),
+                (1, 0)
+            );
+        }
+        let unknown = with(|v| v["stage"] = serde_json::json!({"title": "G", "later": true}));
+        assert!(unknown.is_ok());
     }
 
     #[test]

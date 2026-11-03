@@ -1,4 +1,4 @@
-//! The closed permission catalogue of API 1.0 (FR-6.27). Only these ids exist: an unknown id in a
+//! The closed permission catalogue (FR-6.27, FR-9.22). Only these ids exist: an unknown id in a
 //! manifest fails the load, so a plugin never runs without something it depends on. Things that are
 //! never grantable (raw network, files, audio, certificates, clipboard, settings, chat text,
 //! FR-6.28) simply have no id here.
@@ -25,7 +25,15 @@ pub struct Permission {
     /// What the permission means for the user, in one sentence; the English source of the
     /// `pluginPermissions` `explanations` locales.
     pub explanation_en: &'static str,
+    /// First plugin API minor `(major, minor)` that has this permission (FR-9.9). A plugin built
+    /// for an older minor can never hold it.
+    pub min_api: (u64, u64),
 }
+
+/// The API minor every permission of the first catalogue comes with.
+pub const API_1_0: (u64, u64) = (1, 0);
+/// The API minor that added the surface permissions of FR-9.22.
+pub const API_1_1: (u64, u64) = (1, 1);
 
 const fn all(
     id: &'static str,
@@ -39,6 +47,7 @@ const fn all(
         official_only: false,
         text_en,
         explanation_en,
+        min_api: API_1_0,
     }
 }
 
@@ -54,6 +63,20 @@ const fn official(
         official_only: true,
         text_en,
         explanation_en,
+        min_api: API_1_0,
+    }
+}
+
+/// A permission that exists from API 1.1 on, available to every plugin.
+const fn all_1_1(
+    id: &'static str,
+    risk: Risk,
+    text_en: &'static str,
+    explanation_en: &'static str,
+) -> Permission {
+    Permission {
+        min_api: API_1_1,
+        ..all(id, risk, text_en, explanation_en)
     }
 }
 
@@ -178,11 +201,47 @@ pub const CATALOGUE: &[Permission] = &[
         "Keep a secret (e.g. an API key) in your system keychain",
         "It can keep a secret, such as an API key, in your system keychain.",
     ),
-    official(
+    all(
         "ui.webview",
         Risk::Yellow,
         "Show its own web content in a sealed frame (no internet)",
         "It can show its own web content in a sealed frame with no internet access.",
+    ),
+    all_1_1(
+        "ui.stage",
+        Risk::Green,
+        "Show an activity in the media area",
+        "It can show an activity, such as a game, in the media area.",
+    ),
+    all_1_1(
+        "ui.side-panel",
+        Risk::Green,
+        "Show its own content in a side panel",
+        "It can show its own content in a side panel next to the chat.",
+    ),
+    all_1_1(
+        "ui.app-menu",
+        Risk::Green,
+        "Add items to the Apps menu",
+        "It can add items to the Apps menu.",
+    ),
+    all_1_1(
+        "net.origins",
+        Risk::Red,
+        "Talk to these websites",
+        "It can talk to the websites it lists, and only to those.",
+    ),
+    all_1_1(
+        "peers.relay",
+        Risk::Yellow,
+        "Send game data through the server's relay",
+        "It can send game data to other people through the relay of the server.",
+    ),
+    all_1_1(
+        "audio.effects",
+        Risk::Green,
+        "Play short sounds that come with the plugin",
+        "It can play short sounds that are part of the plugin.",
     ),
 ];
 
@@ -197,23 +256,57 @@ mod tests {
 
     #[test]
     fn catalogue_is_closed_and_unique() {
-        assert_eq!(CATALOGUE.len(), 21);
+        assert_eq!(CATALOGUE.len(), 27);
         let mut ids: Vec<_> = CATALOGUE.iter().map(|p| p.id).collect();
         ids.sort_unstable();
         ids.dedup();
-        assert_eq!(ids.len(), 21);
+        assert_eq!(ids.len(), 27);
         assert!(get("files").is_none());
     }
 
     #[test]
-    fn only_three_permissions_are_official_only() {
+    fn only_net_http_and_secrets_are_official_only() {
         let official: Vec<_> = CATALOGUE
             .iter()
             .filter(|p| p.official_only)
             .map(|p| p.id)
             .collect();
-        assert_eq!(official, ["net.http", "secrets", "ui.webview"]);
+        assert_eq!(official, ["net.http", "secrets"]);
         assert_eq!(get("net.http").map(|p| p.risk), Some(Risk::Red));
         assert_eq!(get("events.voice").map(|p| p.risk), Some(Risk::Yellow));
+    }
+
+    #[test]
+    fn api_1_1_permissions_follow_fr_9_22() {
+        let added: Vec<_> = CATALOGUE
+            .iter()
+            .filter(|p| p.min_api == API_1_1)
+            .map(|p| (p.id, p.risk, p.official_only))
+            .collect();
+        assert_eq!(
+            added,
+            [
+                ("ui.stage", Risk::Green, false),
+                ("ui.side-panel", Risk::Green, false),
+                ("ui.app-menu", Risk::Green, false),
+                ("net.origins", Risk::Red, false),
+                ("peers.relay", Risk::Yellow, false),
+                ("audio.effects", Risk::Green, false),
+            ]
+        );
+        assert!(
+            CATALOGUE
+                .iter()
+                .filter(|p| p.min_api != API_1_1)
+                .all(|p| p.min_api == API_1_0)
+        );
+    }
+
+    #[test]
+    fn ui_webview_is_available_to_all() {
+        let webview = get("ui.webview").expect("in the catalogue");
+        assert!(!webview.official_only);
+        assert_eq!(webview.risk, Risk::Yellow);
+        assert_eq!(webview.min_api, API_1_0);
     }
 }
