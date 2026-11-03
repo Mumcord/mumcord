@@ -3,8 +3,11 @@
 //! Everything here comes from or goes to other clients, so decoding validates every field.
 
 pub mod offer;
+pub mod prepare;
+pub mod queue;
 pub mod risky;
 pub mod sanitize;
+pub mod share;
 pub mod wire;
 
 /// Hello feature a client announces when it understands file offers (section 6.4).
