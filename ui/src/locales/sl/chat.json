@@ -51,7 +51,7 @@
     "unavailable": "Ta kanal ni več na voljo.",
     "offline": "{{name}} ni na spletu. Znova lahko pišeš, ko se vrne.",
     "unnamedImage": "Prilepljena slika",
-    "attachFiles": "Share files"
+    "attachFiles": "Deli datoteke"
   },
   "tray": {
     "label": "Slike za pošiljanje",

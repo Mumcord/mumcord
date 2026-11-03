@@ -23,14 +23,14 @@
     "keepBlocked": "Zostaw zablokowany",
     "forget": "Zapomnij przekaźnik",
     "actionFailed": "Nie udało się. Spróbuj ponownie.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Ten serwer nie ma przekaźnika, więc udostępnianie plików jest niedostępne.",
+    "filesDisallowed": "Przekaźnik tego serwera nie zezwala na udostępnianie plików.",
+    "screenDisallowed": "Przekaźnik tego serwera nie zezwala na udostępnianie ekranu.",
+    "imagesDisallowed": "Pełny rozmiar niedostępny: przekaźnik tego serwera nie zezwala na obrazy",
+    "noCertificate": "Udostępnianie plików wymaga certyfikatu klienta.",
+    "modeNeedsRelay": "Udostępnianie plików wymaga przekaźnika; Twoje ustawienie peer-to-peer to {{mode}}.",
+    "modeOff": "Wyłączone",
+    "modeDirectOnly": "Tylko bezpośrednio"
   },
   "reason": {
     "p2pOff": "Peer-to-peer jest wyłączone.",

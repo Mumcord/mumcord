@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} se připojil s výchozí identitou, protože jeho vlastní chybí."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Relay povoluje",
+    "line": "Relay povoluje: {{uses}}",
+    "images": "Obrázky",
+    "files": "Soubory",
+    "screen": "Sdílení obrazovky"
   }
 }
