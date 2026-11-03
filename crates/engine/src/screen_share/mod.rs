@@ -59,8 +59,9 @@ use signal::{DATA_ID, FEATURE, Signal, decode, encode};
 use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
+pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
-pub use media::{ScreenMediaStats, ViewerMediaStats};
+pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
 pub use quality::{LoweredReason, QualityPrefs};
@@ -344,8 +345,9 @@ pub(crate) fn on_plugin_data(
                 Instant::now(),
             ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
-            Signal::Watch { .. } => {
-                match shares.own.as_mut().map(|own| own.admit(sender)) {
+            Signal::Watch { codecs, .. } => {
+                let caps = state::ViewerCaps::from_watch(&codecs);
+                match shares.own.as_mut().map(|own| own.admit(sender, caps)) {
                     Some(Admit::New) => {
                         reply = Some(Signal::Accept);
                         own_viewers = true;
@@ -377,7 +379,7 @@ pub(crate) fn on_plugin_data(
                 own_viewers = shares
                     .own
                     .as_mut()
-                    .is_some_and(|own| own.viewers.remove(&sender).is_some());
+                    .is_some_and(|own| own.remove_viewer(sender));
                 own_viewers
             }
             Signal::Viewers { list } => {
@@ -528,14 +530,15 @@ pub(crate) async fn serve_direct(
             let media = own.media.as_ref()?;
             // An accepted viewer opens a stream again when the connection to them was
             // replaced (a file moved it to the relay); the old stream died with it.
+            let version = own.wire_version(session);
             let slot = own.viewers.get_mut(&session)?;
-            Some((media, slot))
+            Some((media, slot, version))
         });
     match slot {
-        Some((media, slot)) => {
+        Some((media, slot, version)) => {
             // The old link leaves the hub before the new one joins under the same session.
             drop(slot.take());
-            *slot = Some(media.add_viewer(engine.runtime(), session, send, recv));
+            *slot = Some(media.add_viewer(engine.runtime(), session, version, send, recv));
         }
         None => tracing::debug!(
             ?server_id,
@@ -1067,6 +1070,23 @@ impl Engine {
         };
         own.media.as_ref().ok_or_else(not_sharing)?.set_prefs(prefs);
         Ok(())
+    }
+
+    /// "Undo" on "Switched to VP9 to reduce load": back to the encoder before the fallback
+    /// (FR-7.57). Fails when the share offers no Undo (any more).
+    pub fn screen_share_undo_encoder_switch(&self, server_id: ServerId) -> EngineResult<()> {
+        let all = lock(self.screen_share_state());
+        let media = all
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .and_then(|own| own.media.as_ref())
+            .ok_or_else(not_sharing)?;
+        if media.undo_encoder_switch() {
+            Ok(())
+        } else {
+            Err(EngineError::invalid("the share offers no undo"))
+        }
     }
 
     /// The picture the sharer's control bar shows for the own share (issue #163, FR-3.127).

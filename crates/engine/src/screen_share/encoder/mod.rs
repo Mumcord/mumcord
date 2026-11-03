@@ -8,6 +8,7 @@
 
 mod battery;
 mod driver;
+pub(crate) mod monitor;
 mod probe;
 pub(crate) mod select;
 mod selftest;
@@ -382,21 +383,24 @@ const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Makes the share's encoder from the selection: tries each candidate in order, so a
 /// hardware encoder that fails to open falls through to the next one instead of ending the
-/// share. The one that opened is recorded in `active`.
+/// share. Without `av1` (a viewer cannot play it, or the load fallback) AV1 candidates are
+/// skipped. The one that opened is recorded in `active`.
 pub(crate) fn factory(
     candidates: Vec<Candidate>,
     active: Arc<Mutex<Option<ActiveEncoder>>>,
 ) -> EncoderFactory {
-    Box::new(move |config, optimize| {
+    let offers_av1 = candidates.iter().any(|c| c.codec == Codec::Av1);
+    let open = Box::new(move |config, optimize, av1: bool| {
         let mut last = None;
-        for candidate in &candidates {
+        for candidate in candidates.iter().filter(|c| av1 || c.codec != Codec::Av1) {
             match open(*candidate, config, optimize) {
                 Ok(encoder) => {
-                    *lock(&active) = Some(ActiveEncoder {
+                    let opened = ActiveEncoder {
                         codec: candidate.codec,
                         gpu: candidate.gpu(),
-                    });
-                    return Ok(encoder);
+                    };
+                    *lock(&active) = Some(opened);
+                    return Ok((encoder, opened));
                 }
                 Err(e) => {
                     tracing::warn!(?candidate, error = %e, "screen share encoder did not open; trying the next");
@@ -407,7 +411,8 @@ pub(crate) fn factory(
         Err(last.unwrap_or_else(|| {
             mumcord_screenshare::Error::InvalidConfig("no encoder to try".into())
         }))
-    })
+    });
+    EncoderFactory { offers_av1, open }
 }
 
 fn open(
@@ -503,7 +508,8 @@ mod tests {
             ],
             active.clone(),
         );
-        let encoder = make(CONFIG, ScreenOptimize::Balanced).expect("falls back");
+        assert!(make.offers_av1);
+        let (encoder, _) = (make.open)(CONFIG, ScreenOptimize::Balanced, true).expect("falls back");
         assert_eq!(encoder.codec(), Codec::Vp9);
         assert_eq!(
             *lock(&active),
@@ -524,10 +530,8 @@ mod tests {
             }],
             active.clone(),
         );
-        assert_eq!(
-            make(CONFIG, ScreenOptimize::Text).expect("opens").codec(),
-            Codec::Av1
-        );
+        let (encoder, _) = (make.open)(CONFIG, ScreenOptimize::Text, true).expect("opens");
+        assert_eq!(encoder.codec(), Codec::Av1);
         assert_eq!(
             *lock(&active),
             Some(ActiveEncoder {
@@ -535,6 +539,44 @@ mod tests {
                 gpu: Some(GpuVendor::Unknown)
             })
         );
+    }
+
+    #[test]
+    fn without_av1_the_factory_opens_the_first_vp9_encoder() {
+        let active = Arc::new(Mutex::new(None));
+        let make = factory(
+            vec![
+                Candidate {
+                    codec: Codec::Av1,
+                    kind: Kind::Software,
+                },
+                Candidate {
+                    codec: Codec::Vp9,
+                    kind: Kind::FakeHardware,
+                },
+                Candidate {
+                    codec: Codec::Vp9,
+                    kind: Kind::Software,
+                },
+            ],
+            active.clone(),
+        );
+        let (encoder, opened) =
+            (make.open)(CONFIG, ScreenOptimize::Balanced, false).expect("opens");
+        assert_eq!(encoder.codec(), Codec::Vp9);
+        let vp9_gpu = ActiveEncoder {
+            codec: Codec::Vp9,
+            gpu: Some(GpuVendor::Unknown),
+        };
+        assert_eq!((opened, *lock(&active)), (vp9_gpu, Some(vp9_gpu)));
+        let vp9_only = factory(
+            vec![Candidate {
+                codec: Codec::Vp9,
+                kind: Kind::Software,
+            }],
+            active,
+        );
+        assert!(!vp9_only.offers_av1);
     }
 
     fn cached(resolution: u32, fps: u32, optimize: ScreenOptimize, ms: u32) -> CachedSelftest {
