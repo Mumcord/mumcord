@@ -2896,6 +2896,9 @@ export type PluginUpdate = {
 	approval: PluginUpdateApproval | null,
 	/**  This version was installed, failed to start and was rolled back: the reason. */
 	failed: string | null,
+	/**  FR-9.18: set (e.g. "0.8.0") when the newest version needs a newer Mumcord. The plugin
+	 stays on its version; show "Update available after updating Mumcord" and no install. */
+	needsMumcord: string | null,
 };
 
 /**  Why an update waits for the user (FR-6.67). */
