@@ -330,6 +330,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_viewer_fps,
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
+            commands::screen_share::screen_share_set_quality,
+            commands::screen_share::screen_share_undo_encoder_switch,
+            commands::screen_share::screen_encoder_status,
+            commands::screen_share::screen_encoder_check_again,
+            commands::screen_share::screen_encoder_prepare,
             commands::screen_share::screen_share_block,
             commands::screen_share::screen_share_quality,
             commands::screen_share::screen_share_thumbnail,
@@ -401,6 +406,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
+            commands::screen_share::ScreenEncoderStatusChanged,
             commands::updates::UpdateStatusChanged,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
@@ -922,9 +928,12 @@ fn emit_engine_event(
             }
             .emit(app)
         }
-        // Not forwarded to the webview yet; the Settings tab's encoder status is wired up
-        // with its commands.
-        EngineEvent::ScreenEncoderStatusChanged(_) => Ok(()),
+        EngineEvent::ScreenEncoderStatusChanged(status) => {
+            commands::screen_share::ScreenEncoderStatusChanged {
+                status: status.into(),
+            }
+            .emit(app)
+        }
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),

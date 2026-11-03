@@ -877,6 +877,25 @@ export const commands = {
 	/**  The shares in the user's channel (for a view opened after the last event). */
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
 	/**
+	 *  Changes the own share's resolution and frame rate ceiling, "Optimize for" and upload limit
+	 *  while it runs (Quality menu, FR-7.39); applies within a frame or two.
+	 */
+	screenShareSetQuality: (serverId: number, choice: QualityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_quality", { serverId, choice })),
+	/**  "Undo" on "Switched to VP9 to reduce load" (FR-7.57). Errors when no Undo is offered. */
+	screenShareUndoEncoderSwitch: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_undo_encoder_switch", { serverId })),
+	/**  What Settings → Screen sharing shows about the encoders (FR-7.60). */
+	screenEncoderStatus: () => __TAURI_INVOKE<EncoderStatus>("screen_encoder_status"),
+	/**
+	 *  "Check again": probes and self-tests from scratch in the background; the result comes as
+	 *  `screenEncoderStatusChanged`.
+	 */
+	screenEncoderCheckAgain: () => __TAURI_INVOKE<void>("screen_encoder_check_again"),
+	/**
+	 *  Runs the software AV1 self-test for the picks of the start dialog in the background
+	 *  (FR-7.56); the result comes as `screenEncoderStatusChanged`.
+	 */
+	screenEncoderPrepare: (choice: QualityChoice) => __TAURI_INVOKE<void>("screen_encoder_prepare", { choice }),
+	/**
 	 *  What blocks starting a share on the server right now; `null` when sharing is possible. The
 	 *  settings and the relay change without an event, so the UI asks again before starting.
 	 */
@@ -997,6 +1016,7 @@ export const events = {
 	positionalSendingChanged: makeEvent<PositionalSendingChanged, PositionalSendingChanged>("positional-sending-changed"),
 	positionalStatusChanged: makeEvent<PositionalStatusChanged, PositionalStatusChanged>("positional-status-changed"),
 	relayChanged: makeEvent<RelayChanged, RelayChanged>("relay-changed"),
+	screenEncoderStatusChanged: makeEvent<ScreenEncoderStatusChanged, ScreenEncoderStatusChanged>("screen-encoder-status-changed"),
 	screenSharesChanged: makeEvent<ScreenSharesChanged, ScreenSharesChanged>("screen-shares-changed"),
 	serverDenied: makeEvent<ServerDenied, ServerDenied>("server-denied"),
 	serverIdentityMissing: makeEvent<ServerIdentityMissing, ServerIdentityMissing>("server-identity-missing"),
@@ -1044,6 +1064,13 @@ export type ActiveAudioProfile = {
  */
 export type ActiveAudioProfileChanged = {
 	active: ActiveAudioProfile | null,
+};
+
+/**  The encoder a share runs on, for the codec badge ("AV1 · GPU", "VP9"). */
+export type ActiveEncoder = {
+	codec: VideoCodec,
+	/**  `null` when it runs on the processor. */
+	gpu: GpuVendor | null,
 };
 
 /**  Error returned by every failing command. */
@@ -1161,6 +1188,9 @@ export type AudioRatingLabel = {
 	/**  `null` while the rating is good. */
 	issue: AudioIssue | null,
 };
+
+/**  Why Automatic does not pick AV1. */
+export type Av1Skipped = "tooHeavy" | "onBattery" | "aboveSoftwareLimit";
 
 /**
  *  The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
@@ -1502,6 +1532,31 @@ export type Effect =
 /**  On the blocklist and not confirmed. */
 "blocked";
 
+/**  What Settings → Screen sharing shows about the encoders (FR-7.60). */
+export type EncoderStatus = {
+	/**  The probe or a self-test is running ("Checking…"). */
+	checking: boolean,
+	av1Hardware: GpuVendor | null,
+	vp9Hardware: GpuVendor | null,
+	/**  `null` when software AV1 passed no self-test. */
+	av1SoftwareLimit: SoftwareLimit | null,
+	/**  The encoder a share with the Settings defaults starts with. */
+	active: ActiveEncoder,
+	/**  Why that is not AV1 under Automatic. */
+	av1Skipped: Av1Skipped | null,
+	/**  Manual AV1 runs in software without a passed self-test. */
+	softwareWarning: boolean,
+};
+
+/**  The share switched from AV1 to VP9 and still runs on VP9. */
+export type EncoderSwitch = {
+	reason: SwitchReason,
+	from: ActiveEncoder,
+	to: ActiveEncoder,
+	/**  "Undo" is offered (the first load fallback of the share). */
+	undo: boolean,
+};
+
 /**  Machine-readable error category; the UI maps it to a plain-language message. */
 export type ErrorCode = 
 /**  The command exists in the contract but the engine does not implement it yet. */
@@ -1725,6 +1780,9 @@ export type GamePluginProblem =
 "unsupported" | 
 /**  The plugin failed and is not used until it is enabled again. */
 "failed";
+
+/**  Who made the graphics card an encoder runs on. */
+export type GpuVendor = "nvidia" | "amd" | "intel" | "unknown";
 
 /**  One video that already played, for the previous button (issue #163). */
 export type HistoryItem = {
@@ -2131,7 +2189,17 @@ export type LinuxDistro = {
 	idLike: string[],
 };
 
+/**  The numbers behind a load fallback, for the "Details" of the notice. */
+export type LoadDetails = {
+	encodeMs: number | null,
+	budgetMs: number | null,
+	dropped: number,
+};
+
 export type LogLevel = "error" | "warn" | "info" | "debug";
+
+/**  Why the share runs below the sharer's pick. */
+export type LoweredReason = "uploadTooSlow" | "encoderTooSlow" | "manyViewers";
 
 /**  Which views are popped out changed; sent to every window. */
 export type MediaPopoutChanged = {
@@ -3115,6 +3183,14 @@ export type PublicServerPing = {
 	maxUsers: number,
 };
 
+/**  The picks of the start dialog or the Quality menu. */
+export type QualityChoice = {
+	resolution: ScreenResolution,
+	fps: ScreenFps,
+	optimize: ScreenOptimize,
+	uploadLimit: ScreenUploadLimit,
+};
+
 /**  The relay of a server changed (FR-4.20). */
 export type RelayChanged = {
 	serverId: number,
@@ -3264,6 +3340,11 @@ export type SavedServer = {
 };
 
 export type ScreenCodec = "auto" | "av1" | "vp9";
+
+/**  The encoder status changed: a probe or self-test started or finished. */
+export type ScreenEncoderStatusChanged = {
+	status: EncoderStatus,
+};
 
 export type ScreenFps = "15" | "30" | "60";
 
@@ -3637,6 +3718,12 @@ export type SharePath = "direct";
 
 /**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
 export type ShareQuality = {
+	/**  The step the share runs at, as the bar names it, e.g. "1080p30". */
+	quality: string,
+	/**  Why the share runs below the sharer's pick ("Lowered to {quality}: {reason}"). */
+	lowered: LoweredReason | null,
+	/**  The share left its encoder for VP9 (FR-7.57, FR-7.58); `null` while it did not. */
+	switched: EncoderSwitch | null,
 	width: number,
 	height: number,
 	fps: number,
@@ -3657,6 +3744,12 @@ export type ShareThumbnail = {
 	height: number,
 	/**  The last keyframe, scaled down, as a `data:` URL the UI shows as it is. */
 	dataUrl: string,
+};
+
+/**  Highest size and rate software AV1 keeps up with. */
+export type SoftwareLimit = {
+	height: number,
+	fps: number,
 };
 
 /**  Notification sound toggles per event (FR-1.27). */
@@ -3696,6 +3789,13 @@ export type SoundTheme =
 "classic" | 
 /**  Fuller sounds made with ElevenLabs (default). */
 "rich";
+
+/**  Why the share left its encoder for VP9. */
+export type SwitchReason = 
+/**  "Switched to VP9 to reduce load". */
+{ kind: "load"; details: LoadDetails } | 
+/**  "Switched to VP9 for {name}": this viewer cannot play AV1. */
+{ kind: "viewer"; session: number };
 
 /**  Channels received so far while a server is still syncing (FR-2.24). */
 export type SyncProgress = {
@@ -3945,8 +4045,8 @@ export type UserUpserted = {
 	user: User,
 };
 
-/**  A video codec of a watched share. */
-export type VideoCodec = "av1" | "vp9";
+/**  A video codec of a share. */
+export type VideoCodec = "vp9" | "av1";
 
 export type VideoEmbed = {
 	site: VideoSite,
