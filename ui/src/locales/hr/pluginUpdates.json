@@ -24,7 +24,8 @@
   "pill": {
     "none": "Nema novih dopuštenja",
     "permission": "Treba novo dopuštenje",
-    "author": "Novi autor"
+    "author": "Novi autor",
+    "websites": "Talks to new websites"
   },
   "newPermissions": "Nova dopuštenja",
   "revoked": {
@@ -45,5 +46,65 @@
     "save": "Spremi",
     "notNow": "Ne sada",
     "failed": "Dopuštenja za {{name}} nije bilo moguće promijeniti. Pokušajte ponovno."
+  },
+  "waitingHeading": "Updates waiting",
+  "autoNote": "Automatic updates only install when the plugin asks for nothing new and its score stays in the same band or goes down. Everything else waits here.",
+  "needsMumcord": "Update available after updating Mumcord",
+  "band": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "hold": {
+    "newWebsites_one": "This update wants to talk to {{count}} new website. {{name}} stays on {{version}} until you decide.",
+    "newWebsites_other": "This update wants to talk to {{count}} new websites. {{name}} stays on {{version}} until you decide.",
+    "riskUp": "Not installed automatically: the risk went up from {{from}} to {{to}}. Review it first.",
+    "scoreUp": "Not installed automatically: the score went up from {{from}} to {{to}}. Review it first.",
+    "blockedBySafety": "Not installed: this version is high risk and “Don't allow high-risk plugins” is on.",
+    "scoreUnknown": "Not installed automatically: the security score of this version could not be worked out. Review it first.",
+    "newWebsites_few": "This update wants to talk to {{count}} new websites. {{name}} stays on {{version}} until you decide."
+  },
+  "score": {
+    "label": "Security score:",
+    "unchanged": "unchanged",
+    "points": "points",
+    "goesUp": ", the risk goes up",
+    "goesDown": ", the risk goes down"
+  },
+  "dialog": {
+    "title": "Update {{name}} to {{version}}?",
+    "now": "now {{version}}",
+    "sameKey": "same author key",
+    "newKey": "new author key",
+    "newWebsites_one": "This update wants to talk to {{count}} new website.",
+    "newWebsites_other": "This update wants to talk to {{count}} new websites.",
+    "staysOn": "{{name}} stays on {{version}} until you decide.",
+    "otherDomain": "One of them is not on the plugin's own domain.",
+    "websitesLead": "{{name}} and its page could then reach:",
+    "websitesWarning": "These websites can see your IP address and anything {{name}} sends them.",
+    "websitesLabel": "Websites",
+    "new": "New",
+    "changed": "Changed",
+    "noOtherPermissions": "No other permissions change.",
+    "scoreNow": "Now ({{version}})",
+    "scoreAfter": "After the update ({{version}})",
+    "meterNow": "Security score now",
+    "meterAfter": "Security score after the update",
+    "riskUpBy_one": "The risk goes up by {{count}} point",
+    "riskUpBy_other": "The risk goes up by {{count}} points",
+    "asksForMore": "because this version asks for more:",
+    "permissionsLabel": "New permissions",
+    "recentChange": "It also counts as a recent change: new permissions in the last {{versions}} versions add another +{{recent}} points. Together with the +{{permissions}} above (× {{multiplier}}) that is the +{{total}}.",
+    "highTitle": "This update would make the plugin high risk",
+    "highText": "It will not be installed automatically. Staying on {{version}} keeps the current score; you can pin the version in Installed.",
+    "highTick": "I understand the risk went up and I still trust the author",
+    "skipHint": "Skipping keeps {{version}} working.",
+    "skip": "Skip this version",
+    "notNow": "Not now",
+    "allow": "Allow and update",
+    "updateAnyway": "Update anyway",
+    "failed": "{{name}} could not be updated. Please try again.",
+    "newWebsites_few": "This update wants to talk to {{count}} new websites.",
+    "riskUpBy_few": "The risk goes up by {{count}} points"
   }
 }

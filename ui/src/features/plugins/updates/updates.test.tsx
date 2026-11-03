@@ -51,6 +51,8 @@ const update: PluginUpdate = {
   review: {
     origins: [],
     otherDomain: false,
+    permissionEffects: [],
+    recentChange: null,
     risk: null,
     needsHighRiskConfirm: false,
     highRiskConfirmed: false,
@@ -91,10 +93,11 @@ describe("UpdatesTab", () => {
   it("shows the new permission before installing an update that needs it", async () => {
     const { apply } = setup([update]);
     const { container } = render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
-    expect(await screen.findByText("Needs a new permission")).toBeInTheDocument();
+    expect(await screen.findByText("Asks for more permissions")).toBeInTheDocument();
     expect(screen.getByRole("list", { name: "New permissions" })).toHaveTextContent("+");
     expect(apply).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Review and update" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Review and update\s+Poll/u }));
+    fireEvent.click(await screen.findByRole("button", { name: "Allow and update" }));
     await waitFor(() => {
       expect(apply).toHaveBeenCalledWith("poll", ["ui.panel"]);
     });
@@ -139,7 +142,7 @@ describe("UpdatesTab", () => {
   it("installs an update without new permissions in one click", async () => {
     const { apply } = setup([{ ...update, approval: null }]);
     render(<UpdatesTab mode="notify" onModeChange={() => undefined} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Update" }));
+    fireEvent.click(await screen.findByRole("button", { name: /^Update\s+Poll/u }));
     await waitFor(() => {
       expect(apply).toHaveBeenCalledWith("poll", ["ui.panel"]);
     });
@@ -240,5 +243,245 @@ describe("UpdatesBadge", () => {
       expect(getApi().pluginUpdates).toHaveBeenCalled();
     });
     expect(container.textContent).toBe("");
+  });
+});
+
+const risk = { fromValue: 37, fromBand: "medium", toValue: 71, toBand: "high" } as const;
+
+const held: PluginUpdate = {
+  ...update,
+  id: "poll",
+  approval: { kind: "newPermissions", permissions: ["ui.webview", "peers.relay"] },
+  source: { kind: "repo", repositoryId: 1, name: "Lantern Plugin Garden" },
+  hold: { kind: "riskUp", from: "medium", to: "high" },
+  review: {
+    origins: [],
+    otherDomain: false,
+    permissionEffects: [],
+    recentChange: null,
+    risk,
+    needsHighRiskConfirm: true,
+    highRiskConfirmed: false,
+  },
+};
+
+const websites: PluginUpdate = {
+  ...update,
+  approval: null,
+  hold: { kind: "newWebsites", count: 2 },
+  review: {
+    origins: [
+      { origin: "https://api.poll.example", new: false, purpose: null },
+      { origin: "https://stats.poll.example", new: true, purpose: null },
+      { origin: "wss://voice-lab.example", new: true, purpose: null },
+    ],
+    otherDomain: true,
+    permissionEffects: [],
+    recentChange: null,
+    risk: null,
+    needsHighRiskConfirm: false,
+    highRiskConfirmed: false,
+  },
+};
+
+function renderTab() {
+  return render(<UpdatesTab mode="auto" onModeChange={() => undefined} />);
+}
+
+describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", () => {
+  it("shows an update that needs a newer Mumcord without an install button", async () => {
+    setup([{ ...update, approval: null, needsMumcord: "0.8.0" }]);
+    const { container } = renderTab();
+    expect(await screen.findByText("Update available after updating Mumcord")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^(Update|Review and update)\s+Poll/u }),
+    ).toBeNull();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it.each([
+    [
+      { kind: "newWebsites", count: 2 },
+      "This update wants to talk to 2 new websites. Poll stays on 1.0.0 until you decide.",
+    ],
+    [
+      { kind: "riskUp", from: "medium", to: "high" },
+      "Not installed automatically: the risk went up from Medium to High. Review it first.",
+    ],
+    [
+      { kind: "scoreUp", from: 12, to: 25 },
+      "Not installed automatically: the score went up from 12 to 25. Review it first.",
+    ],
+    [
+      { kind: "scoreUnknown" },
+      "Not installed automatically: the security score of this version could not be worked out. Review it first.",
+    ],
+  ] as const)("says why a held update waits: %o", async (hold, text) => {
+    setup([{ ...update, approval: null, hold }]);
+    const { container } = renderTab();
+    expect(await screen.findByText(text)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Review and update\s+Poll/u })).toBeInTheDocument();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("offers no install for an update the safety setting blocks", async () => {
+    setup([{ ...update, approval: null, hold: { kind: "blockedBySafety" } }]);
+    const { container } = renderTab();
+    expect(await screen.findByText(/Don't allow high-risk plugins/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /^(Update|Review and update)\s+Poll/u }),
+    ).toBeNull();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("shows the score before and after with the rise in points", async () => {
+    setup([held]);
+    const { container } = renderTab();
+    expect(await screen.findByText("Security score:")).toBeInTheDocument();
+    expect(
+      screen.getByText("Security score 37 out of 100. Medium risk. Higher means more risk."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Security score 71 out of 100. High risk. Higher means more risk."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("plus 34 points, adds risk")).toBeInTheDocument();
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("says unchanged when the score stays the same", async () => {
+    setup([
+      {
+        ...update,
+        approval: null,
+        review: {
+          ...update.review,
+          risk: { fromValue: 2, fromBand: "low", toValue: 2, toBand: "low" },
+        },
+      },
+    ]);
+    renderTab();
+    expect(await screen.findByText("unchanged")).toBeInTheDocument();
+  });
+
+  it("marks new websites and a website off the plugin's own domain", async () => {
+    const { apply } = setup([websites]);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    const dialog = await screen.findByRole("dialog", { name: "Update Poll to 1.2.0?" });
+    expect(dialog).toHaveTextContent("This update wants to talk to 2 new websites.");
+    expect(dialog).toHaveTextContent("One of them is not on the plugin's own domain.");
+    const list = screen.getByRole("list", { name: "Websites" });
+    expect(list.querySelectorAll("li")).toHaveLength(3);
+    expect(screen.getAllByText("New")).toHaveLength(2);
+    expect(dialog).toHaveTextContent("No other permissions change.");
+    expect(dialog).toHaveTextContent("Skipping keeps 1.0.0 working.");
+    expect(await axeViolations(dialog)).toEqual([]);
+    fireEvent.click(screen.getByRole("button", { name: "Allow and update" }));
+    await waitFor(() => {
+      expect(apply).toHaveBeenCalledWith("poll", ["ui.panel"]);
+    });
+  });
+
+  it("keeps the old version when the user skips", async () => {
+    const { apply } = setup([websites]);
+    const skip = vi.spyOn(getApi(), "pluginSkipUpdateVersion").mockResolvedValue(null);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    fireEvent.click(await screen.findByRole("button", { name: "Skip this version" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+    expect(skip).toHaveBeenCalledWith("poll", "1.2.0");
+    expect(apply).not.toHaveBeenCalled();
+  });
+
+  it("renders origin purposes, permission effects and the recent change once sent", async () => {
+    setup([
+      {
+        ...held,
+        review: {
+          ...held.review,
+          origins: [{ origin: "https://api.poll.example", new: false, purpose: "match history" }],
+          permissionEffects: [
+            { permission: "ui.webview", points: 4 },
+            { permission: "peers.relay", points: 14 },
+          ],
+          recentChange: { points: 18, trustPercent: 90, permissions: ["ui.webview"] },
+        },
+      },
+    ]);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("match history");
+    expect(dialog).toHaveTextContent("plus 4 points, adds risk");
+    expect(dialog).toHaveTextContent(
+      "It also counts as a recent change: new permissions in the last 5 versions add another +18 points. Together with the +18 above (× 0.90) that is the +34.",
+    );
+  });
+
+  it("needs the tick before an update to high risk, then confirms before installing", async () => {
+    const { apply } = setup([held]);
+    const confirm = vi.spyOn(getApi(), "pluginConfirmUpdateHighRisk").mockResolvedValue(null);
+    renderTab();
+    expect(
+      await screen.findByText(
+        "Not installed automatically: the risk went up from Medium to High. Review it first.",
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /^Review and update\s+Poll/u }));
+    const dialog = await screen.findByRole("dialog", { name: "Update Poll to 1.2.0?" });
+    expect(dialog).toHaveTextContent("Unofficial · Lantern Plugin Garden");
+    expect(dialog).toHaveTextContent("The risk goes up by 34 points");
+    expect(screen.getByRole("meter", { name: "Security score now" })).toHaveAttribute(
+      "aria-valuenow",
+      "37",
+    );
+    expect(screen.getByRole("meter", { name: "Security score after the update" })).toHaveAttribute(
+      "aria-valuenow",
+      "71",
+    );
+    expect(await axeViolations(dialog)).toEqual([]);
+    const updateAnyway = screen.getByRole("button", { name: "Update anyway" });
+    expect(updateAnyway).toBeDisabled();
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: "I understand the risk went up and I still trust the author",
+      }),
+    );
+    expect(updateAnyway).toBeEnabled();
+    fireEvent.click(updateAnyway);
+    await waitFor(() => {
+      expect(apply).toHaveBeenCalledWith("poll", ["ui.panel"]);
+    });
+    expect(confirm).toHaveBeenCalledWith("poll", "1.2.0");
+    expect(confirm.mock.invocationCallOrder[0]).toBeLessThan(
+      apply.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("closes the high-risk review with Not now and Escape", async () => {
+    const { apply } = setup([held]);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    fireEvent.click(await screen.findByRole("button", { name: "Not now" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /^Review and update\s+Poll/u }));
+    fireEvent.keyDown(await screen.findByRole("dialog"), { key: "Escape" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(apply).not.toHaveBeenCalled();
+  });
+
+  it("reports a failed install in the review and keeps it open", async () => {
+    const { apply } = setup([websites]);
+    apply.mockRejectedValue(new Error("boom"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    fireEvent.click(await screen.findByRole("button", { name: "Allow and update" }));
+    expect(
+      await screen.findByText("Poll could not be updated. Please try again."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });
