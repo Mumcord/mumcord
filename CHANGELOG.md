@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
+- The server info panel lists what the relay allows ("Relay allows: Images · Files · Screen sharing"), and buttons and the image viewer say so in plain words when the relay doesn't allow a feature.
+
 ### Fixed
 
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart

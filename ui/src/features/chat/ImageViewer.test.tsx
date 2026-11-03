@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { showServer } from "../channels/serverStore";
 import { createMockApi, setApi, type MockApi } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { axeViolations } from "../../test/axe";
@@ -416,6 +417,27 @@ describe("full images", () => {
       expect(screen.getByRole("status")).toHaveTextContent("Full size not available");
     });
     expect(shownSrc()).toBe(PNG);
+  });
+
+  it("says why when the relay doesn't allow images (FR-7.7)", async () => {
+    showServer(1);
+    const info = await api.relayInfo(1);
+    vi.spyOn(api, "relayInfo").mockResolvedValue({
+      ...info,
+      status: { kind: "available" },
+      uses: ["files"],
+    });
+    const { fetch, resolve } = deferredFetch();
+    viewer();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalled();
+    });
+    resolve(null);
+    await waitFor(() => {
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Full size not available: this server's relay doesn't allow images",
+      );
+    });
   });
 
   it("saves the full image once it is there", async () => {
