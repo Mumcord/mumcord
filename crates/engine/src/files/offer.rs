@@ -83,7 +83,7 @@ pub fn encode_offer_html(sender: &str, offer: &FileOffer) -> Result<String, Offe
         return Err(OfferError::Invalid);
     }
     let document = wire::write_document(MAX_DOCUMENT_BYTES, |w| {
-        w.write_uint("v", VERSION.into(), 8, 10)?;
+        w.write_uint("v", VERSION.into(), 8, bovnar::Base::DECIMAL)?;
         w.write_string("id", &wire.id)?;
         // Bovnar strings cannot hold ASCII control characters; the recipient would turn them
         // into `_` anyway (FR-7.23), so a name that has them still gets an offer.
@@ -93,10 +93,10 @@ pub fn encode_offer_html(sender: &str, offer: &FileOffer) -> Result<String, Offe
             .map(|c| if c.is_ascii_control() { '_' } else { c })
             .collect();
         w.write_string("n", &name)?;
-        w.write_uint("s", wire.s, 64, 10)?;
+        w.write_uint("s", wire.s, 64, bovnar::Base::DECIMAL)?;
         w.write_string("m", &wire.m)?;
         w.write_string("h", &wire.h)?;
-        w.write_uint("e", wire.e, 64, 10)
+        w.write_uint("e", wire.e, 64, bovnar::Base::DECIMAL)
     })
     .ok_or(OfferError::Invalid)?;
     Ok(format!(

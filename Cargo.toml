@@ -107,7 +107,7 @@ nnnoiseless = { version = "0.5", default-features = false }
 rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "4430677a365294ca8a6fd0b2e7854c02537a47a4" }
 # Bovnar (MIT) is not published on crates.io; Mumcord pins the Rust binding to the C library on its
 # fork (issue #400). The build compiles the C sources, so it needs a C compiler and Python 3.
-bovnar = { git = "https://github.com/Mumcord/bovnar", rev = "f34eed2f0c3a29b7a94971e9e72340e0fa74d3aa" }
+bovnar = { git = "https://github.com/Mumcord/bovnar", rev = "88f31e2618219144a745f076961d527712c46333" }
 sonora = "0.2"
 rtrb = "0.4"
 rubato = "5.0"

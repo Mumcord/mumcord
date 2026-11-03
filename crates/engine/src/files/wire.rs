@@ -112,11 +112,11 @@ pub fn encode(message: &FileMessage) -> Option<Vec<u8>> {
         FileMessage::Cancel { .. } => ("cancel", None),
     };
     write_document(MAX_PAYLOAD_BYTES, |w| {
-        w.write_uint("v", VERSION.into(), 8, 10)?;
+        w.write_uint("v", VERSION.into(), 8, bovnar::Base::DECIMAL)?;
         w.write_string("t", t)?;
         w.write_string("id", message.id())?;
         if let Some(pos) = pos {
-            w.write_uint("pos", pos.into(), 16, 10)?;
+            w.write_uint("pos", pos.into(), 16, bovnar::Base::DECIMAL)?;
         }
         Ok(())
     })
