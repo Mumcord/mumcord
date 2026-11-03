@@ -692,11 +692,11 @@ impl wit::stage::Host for PluginState {
 impl wit::app_menu::Host for PluginState {
     fn set_state(
         &mut self,
-        _item: String,
-        _enabled: bool,
-        _reason: Option<String>,
+        item: String,
+        enabled: bool,
+        reason: Option<String>,
     ) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+        crate::api::app_menu::set_state(self, &item, enabled, reason).map_err(Up::up)
     }
 }
 

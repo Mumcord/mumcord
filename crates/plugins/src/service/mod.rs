@@ -97,6 +97,9 @@ pub enum ServiceEvent {
         plugin: String,
         outgoing: crate::messaging::Outgoing,
     },
+    /// An Apps-menu item was enabled or disabled: list the items again with
+    /// [`PluginService::app_menu`].
+    AppMenuChanged,
     /// A plugin changed its UI (`plugin://ui`). Trees are untrusted.
     Ui { plugin: String, update: UiUpdate },
     /// `chat.send` passed the gesture gate: post `line` ("[Name] text") as a channel message

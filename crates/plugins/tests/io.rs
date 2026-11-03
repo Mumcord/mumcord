@@ -106,6 +106,16 @@ impl PluginIo for Recorder {
     ) -> Result<(), Error> {
         Ok(())
     }
+    fn app_menu_set_state(
+        &self,
+        plugin: &str,
+        item: &str,
+        enabled: bool,
+        _reason: Option<String>,
+    ) -> Result<(), Error> {
+        self.record(format!("{plugin} app_menu_set_state {item} {enabled}"));
+        Ok(())
+    }
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error> {
         let payload = String::from_utf8_lossy(&payload);
         self.record(format!("{plugin} send {to:?} {kind} {payload}"));
@@ -139,10 +149,18 @@ impl PluginIo for Recorder {
 }
 
 fn component() -> Vec<u8> {
-    let mut module = wat::parse_str(PLUGIN).expect("valid WAT");
+    component_of(PLUGIN, "1.0.0")
+}
+
+fn component_of(wat: &str, version: &str) -> Vec<u8> {
+    let mut module = wat::parse_str(wat).expect("valid WAT");
     let mut resolve = wit_parser::Resolve::default();
     let (package, _) = resolve
-        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("wit/1.0.0"))
+        .push_dir(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("wit")
+                .join(version),
+        )
         .expect("WIT parses");
     let world = resolve
         .select_world(&[package], Some("plugin"))
@@ -163,13 +181,15 @@ fn component() -> Vec<u8> {
         .expect("component encodes")
 }
 
-fn plugin_dir(root: &Path) -> PathBuf {
+fn plugin_dir_of(root: &Path, wasm: &[u8], api: &str) -> PathBuf {
     let dir = root.join("talker");
     std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
-    let manifest = r#"{"manifest":1,"id":"talker","name":"Test","version":"1.0.0","api":"^1.0",
-        "authors":["Tests"],"description":"A test plugin","categories":["tools"],"license":"MIT"}"#;
+    let manifest = format!(
+        r#"{{"manifest":1,"id":"talker","name":"Test","version":"1.0.0","api":"{api}",
+        "authors":["Tests"],"description":"A test plugin","categories":["tools"],"license":"MIT"}}"#
+    );
     std::fs::write(dir.join("manifest.json"), manifest).expect("write manifest");
-    std::fs::write(dir.join("plugin.wasm"), component()).expect("write wasm");
+    std::fs::write(dir.join("plugin.wasm"), wasm).expect("write wasm");
     std::fs::write(dir.join("i18n/en.json"), "{}").expect("write i18n");
     dir
 }
@@ -181,6 +201,10 @@ struct Setup {
 }
 
 fn setup(io: Option<Arc<dyn PluginIo>>, granted: &[&str]) -> Setup {
+    setup_with(io, granted, &component(), "^1.0")
+}
+
+fn setup_with(io: Option<Arc<dyn PluginIo>>, granted: &[&str], wasm: &[u8], api: &str) -> Setup {
     let root = tempfile::tempdir().expect("temp dir");
     let ctx = Arc::new(HostContext {
         io,
@@ -190,7 +214,8 @@ fn setup(io: Option<Arc<dyn PluginIo>>, granted: &[&str]) -> Setup {
     let (outbox, events) = unbounded_channel();
     let mut host = PluginHost::new(Version::new(0, 7, 0), None, Arc::clone(&ctx), outbox)
         .expect("runtime starts");
-    host.load(&plugin_dir(root.path()), None).expect("loads");
+    host.load(&plugin_dir_of(root.path(), wasm, api), None)
+        .expect("loads");
     Setup {
         _root: root,
         host,
@@ -258,4 +283,62 @@ fn without_an_io_a_send_is_not_permitted() {
         refused_with(&mut s.events),
         CallError::Refused(NOT_PERMITTED.into())
     );
+}
+
+/// Core module of a 1.1 plugin: `start` calls `app-menu.set-state("roll", false, some("Busy"))`
+/// and refuses to start with the error's code as a digit.
+const APP_MENU_PLUGIN: &str = r#"
+(module
+  (import "mumcord:plugin/app-menu@1.1.0" "set-state"
+    (func $set (param i32 i32 i32 i32 i32 i32 i32)))
+  (memory (export "memory") 1)
+  (global $heap (mut i32) (i32.const 4096))
+  (data (i32.const 40) "roll")
+  (data (i32.const 44) "Busy")
+  (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
+    (local $p i32)
+    (local.set $p (global.get $heap))
+    (global.set $heap (i32.add (local.get $p) (local.get 3)))
+    (local.get $p))
+  (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
+    (call $set (i32.const 40) (i32.const 4) (i32.const 0) (i32.const 1) (i32.const 44)
+      (i32.const 4) (i32.const 100))
+    (if (i32.load8_u (i32.const 100))
+      (then
+        (i32.store8 (i32.const 48) (i32.add (i32.const 48) (i32.load8_u (i32.const 101))))
+        (i32.store8 (i32.const 64) (i32.const 1))
+        (i32.store (i32.const 68) (i32.const 48))
+        (i32.store (i32.const 72) (i32.const 1))
+        (return (i32.const 64))))
+    (i32.store8 (i32.const 64) (i32.const 0))
+    (i32.const 64))
+  (func (export "on-event") (param i32))
+  (func (export "stop"))
+)"#;
+
+fn app_menu_setup(io: Option<Arc<dyn PluginIo>>, granted: &[&str]) -> Setup {
+    setup_with(io, granted, &component_of(APP_MENU_PLUGIN, "1.1.0"), "^1.1")
+}
+
+#[test]
+fn app_menu_set_state_reaches_the_io_with_the_permission() {
+    let recorder = Arc::new(Recorder::default());
+    let mut s = app_menu_setup(
+        Some(Arc::clone(&recorder) as Arc<dyn PluginIo>),
+        &["ui.app-menu"],
+    );
+    s.host.enable("talker").expect("starts");
+    assert_eq!(recorder.calls(), ["talker app_menu_set_state roll false"]);
+}
+
+#[test]
+fn app_menu_set_state_without_the_permission_is_refused() {
+    let recorder = Arc::new(Recorder::default());
+    let mut s = app_menu_setup(Some(Arc::clone(&recorder) as Arc<dyn PluginIo>), &[]);
+    assert!(s.host.enable("talker").is_err());
+    assert_eq!(
+        refused_with(&mut s.events),
+        CallError::Refused(NOT_PERMITTED.into())
+    );
+    assert!(recorder.calls().is_empty());
 }

@@ -57,6 +57,14 @@ pub trait PluginIo: Send + Sync + Debug {
     fn close_panel_popover(&self, plugin: &str);
     /// `ui.open-permissions`.
     fn open_permissions(&self, plugin: &str) -> Result<(), Error>;
+    /// `app-menu.set-state`: the caller checked `ui.app-menu`.
+    fn app_menu_set_state(
+        &self,
+        plugin: &str,
+        item: &str,
+        enabled: bool,
+        reason: Option<String>,
+    ) -> Result<(), Error>;
     /// `peers.send`.
     fn peer_send(&self, plugin: &str, to: Target, kind: u8, payload: Vec<u8>) -> Result<(), Error>;
     /// `peers.start-game-burst`.

@@ -173,6 +173,7 @@ pub(super) struct ServiceIo {
     keys: Option<PeerKeys>,
     events: UnboundedSender<ServiceEvent>,
     webviews: Arc<Webviews>,
+    app_menus: crate::api::app_menu::AppMenus,
 }
 
 impl ServiceIo {
@@ -183,6 +184,7 @@ impl ServiceIo {
             keys,
             events,
             webviews: Arc::default(),
+            app_menus: Default::default(),
         }
     }
 
@@ -246,6 +248,10 @@ impl ServiceIo {
         self.chat().claims.issue(plugin, server, message)
     }
 
+    pub fn app_menus(&self) -> &crate::api::app_menu::AppMenus {
+        &self.app_menus
+    }
+
     pub fn webviews(&self) -> &Arc<Webviews> {
         &self.webviews
     }
@@ -257,6 +263,7 @@ impl ServiceIo {
             chat.claims.forget_plugin(plugin);
         }
         self.webviews.forget(plugin);
+        self.app_menus.forget(plugin);
         self.menu_forget_plugin(plugin);
     }
 
@@ -539,6 +546,19 @@ impl PluginIo for ServiceIo {
                 entry: shown.entry,
             },
         );
+        Ok(())
+    }
+
+    fn app_menu_set_state(
+        &self,
+        plugin: &str,
+        item: &str,
+        enabled: bool,
+        reason: Option<String>,
+    ) -> Result<(), Error> {
+        if self.app_menus.set_state(plugin, item, enabled, reason)? {
+            self.emit(ServiceEvent::AppMenuChanged);
+        }
         Ok(())
     }
 

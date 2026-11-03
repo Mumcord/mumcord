@@ -348,6 +348,7 @@ impl PluginService {
         };
         let repositories = self.store().plugin_repositories().unwrap_or_default();
         let mut metas = std::collections::HashMap::new();
+        let mut menus = Vec::new();
         if !self.host.all_off() {
             for record in records.iter().filter(|r| r.enabled) {
                 let Some(manifest) = self.host.manifest(&record.id) else {
@@ -367,6 +368,7 @@ impl PluginService {
                 } else {
                     None
                 };
+                menus.push((record.id.clone(), manifest.app_menu.clone()));
                 metas.insert(
                     record.id.clone(),
                     PluginMeta {
@@ -376,6 +378,7 @@ impl PluginService {
                 );
             }
         }
+        self.io.app_menus().sync(menus);
         let mut state = self.io.peers();
         if state.plugins == metas {
             return;
@@ -505,7 +508,7 @@ impl PluginService {
         self.io.chat_text(server, message, sender, line)
     }
 
-    fn loaded_ids(&self) -> Vec<String> {
+    pub(super) fn loaded_ids(&self) -> Vec<String> {
         self.host.ids().map(str::to_owned).collect()
     }
 }

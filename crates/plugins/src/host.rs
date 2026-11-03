@@ -344,6 +344,24 @@ impl PluginHost {
             .is_some_and(|worker| worker.queue.push_chat(event, chat))
     }
 
+    /// Queues `app-menu-activated` for plugin `id` if it is running and holds `ui.app-menu`
+    /// (a 1.1 event, so it skips the 1.0 event path of [`Self::send`]).
+    pub fn send_app_menu_activated(&self, id: &str, item: &str) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::app_menu::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| {
+                worker
+                    .queue
+                    .push(crate::runtime::PluginEvent::AppMenuActivated(
+                        item.to_owned(),
+                    ))
+            })
+    }
+
     /// Whether replayed chat events can go to plugin `id` at all.
     pub fn takes_replays(&self, id: &str) -> bool {
         self.plugins

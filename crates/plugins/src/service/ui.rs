@@ -5,6 +5,8 @@
 
 use super::PluginService;
 use super::plugin_io::{PeerInfo, PeersState, wit_peer};
+use crate::api::app_menu::{self, AppMenuEntry};
+use crate::host::RunState;
 use crate::wit::events::{ActionSource, ActionValue, Event, PanelVisibility, UiAction};
 
 /// One user input for a plugin's UI.
@@ -36,6 +38,38 @@ impl PluginService {
     /// The web view state, shared with the app's `mumcord-web` protocol and bridge (FR-6.47).
     pub fn webviews(&self) -> std::sync::Arc<crate::api::webview::Webviews> {
         std::sync::Arc::clone(self.io.webviews())
+    }
+
+    /// The Apps-menu items of the running plugins that hold `ui.app-menu`, in menu order
+    /// (plugins by id, items as in the manifest). The UI shows the first 8 and puts the rest
+    /// under "More plugins…" (FR-9.53).
+    pub fn app_menu(&self) -> Vec<AppMenuEntry> {
+        let shown = self
+            .loaded_ids()
+            .into_iter()
+            .filter(|id| self.menu_shown(id))
+            .filter_map(|id| {
+                let name = self.host.manifest(&id)?.name.clone();
+                Some((id, name))
+            })
+            .collect();
+        self.io.app_menus().entries(&shown)
+    }
+
+    fn menu_shown(&self, id: &str) -> bool {
+        matches!(self.host.state(id), Some(RunState::Running))
+            && self.ctx.grants.allows(id, app_menu::PERMISSION)
+    }
+
+    /// The user chose Apps-menu item `item` of plugin `id`: opens the 8 s chat gesture window
+    /// and sends `app-menu-activated` (FR-9.55). Returns false, sending nothing, when the item
+    /// is unknown or disabled, or the plugin is not running or lacks `ui.app-menu`.
+    pub fn app_menu_activate(&self, id: &str, item: &str) -> bool {
+        if !self.menu_shown(id) || !self.io.app_menus().is_enabled(id, item) {
+            return false;
+        }
+        self.command_gesture(id);
+        self.host.send_app_menu_activated(id, item)
     }
 
     /// Delivers a UI input to a running plugin. Returns false when the plugin is not running,
