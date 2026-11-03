@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} għaqqad bl-identità predefinita għax dik tiegħu hija nieqsa."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Ir-relay jippermetti",
+    "line": "Ir-relay jippermetti: {{uses}}",
+    "images": "Stampi",
+    "files": "Fajls",
+    "screen": "Qsim tal-iskrin"
   }
 }

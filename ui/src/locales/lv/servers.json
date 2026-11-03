@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} savienojās ar noklusējuma identitāti, jo tā paša identitāte trūkst."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Relejs atļauj",
+    "line": "Relejs atļauj: {{uses}}",
+    "images": "Attēli",
+    "files": "Faili",
+    "screen": "Ekrāna kopīgošana"
   }
 }

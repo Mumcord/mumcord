@@ -51,7 +51,7 @@
     "unavailable": "Šis kanalas nebepasiekiamas.",
     "offline": "{{name}} neprisijungęs (-usi). Galėsi vėl rašyti, kai grįš.",
     "unnamedImage": "Įklijuotas paveikslėlis",
-    "attachFiles": "Share files"
+    "attachFiles": "Bendrinti failus"
   },
   "tray": {
     "label": "Siunčiami paveikslėliai",

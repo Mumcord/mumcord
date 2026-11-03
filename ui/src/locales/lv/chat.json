@@ -49,7 +49,7 @@
     "unavailable": "Šis kanāls vairs nav pieejams.",
     "offline": "{{name}} ir bezsaistē. Vari rakstīt atkal, kad viņš būs atpakaļ.",
     "unnamedImage": "Ielīmēts attēls",
-    "attachFiles": "Share files"
+    "attachFiles": "Kopīgot failus"
   },
   "tray": {
     "label": "Sūtāmie attēli",
