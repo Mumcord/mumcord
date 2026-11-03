@@ -754,3 +754,114 @@
   border-radius: 0;
   box-shadow: none;
 }
+
+/*
+ * The resizable media area (spec 07 §4.9). Without a chosen height nothing changes ("Auto"). With
+ * one, the frame takes the full width and that height; the picture inside keeps 16:9 and is
+ * letterboxed, cropped or shown 1:1 by the view's own rules, never stretched (FR-7.65). Full
+ * screen ignores the chosen height (FR-7.72).
+ */
+.media-area {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.media-area[data-sized] .media-frame:not([data-fullscreen]) {
+  --media-max-width: 100%;
+
+  max-width: var(--media-max-width);
+}
+
+.media-area[data-sized] .media-frame:not([data-fullscreen]) .media-frame__picture {
+  height: var(--media-height);
+  aspect-ratio: auto;
+}
+
+/* Going back to Auto ends at Auto's width, so the last frame of the animation matches it. */
+.media-area[data-auto-width] .media-frame:not([data-fullscreen]) {
+  --media-max-width: calc(58vh * 16 / 9);
+}
+
+/* Snap, reset and minimise animate only when the system allows motion; dragging never does. */
+@media (prefers-reduced-motion: no-preference) {
+  .media-area[data-animate] .media-frame:not([data-fullscreen]) {
+    transition: max-width 120ms var(--ease-out);
+  }
+
+  .media-area[data-animate] .media-frame:not([data-fullscreen]) .media-frame__picture {
+    transition: height 120ms var(--ease-out);
+  }
+}
+
+.media-area__handle {
+  flex: none;
+}
+
+/* Floating read-out at the right end of the handle: while dragging, and on keyboard focus. */
+.media-area__readout {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 6;
+  display: none;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  translate: 0 -50%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.media-area__readout strong {
+  font-weight: var(--font-weight-bold);
+}
+
+.media-area__readout span {
+  color: var(--color-text-muted);
+}
+
+.media-area__readout[data-accent] {
+  border-color: var(--color-accent);
+}
+
+.media-area__handle[data-dragging] .media-area__readout,
+.resize-handle:focus-visible > .media-area__readout {
+  display: inline-flex;
+}
+
+/* Dragged past the minimum: the picture dims and says what releasing does (FR-7.69). */
+.media-area__collapse {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  background: rgb(8 6 20 / 55%);
+  color: var(--media-on-scrim);
+  font-weight: var(--font-weight-bold);
+}
+
+.media-area__collapse span {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: var(--radius-full);
+  background: rgb(8 6 20 / 80%);
+}
+
+.media-area__handle[data-dragging] .resize-handle::after {
+  background: var(--color-accent);
+}
+
+.media-area__handle[data-dragging] .resize-handle::before {
+  height: 0.3125rem;
+  background: var(--color-accent);
+  opacity: 1;
+}
