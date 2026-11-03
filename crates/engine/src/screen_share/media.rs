@@ -323,7 +323,13 @@ impl Drop for ViewerLink {
 async fn write_frames(queue: Arc<ViewerQueue>, hub: Arc<Hub>, mut send: SendStream) {
     loop {
         let frame = queue.next().await;
-        let bytes = wire::HEADER_LEN + frame.payload.len();
+        // Version 2 only where version 1 cannot say the codec; codec negotiation picks the
+        // version per viewer.
+        let version = match frame.header.kind {
+            FrameKind::Video(Codec::Av1) => wire::V2,
+            _ => wire::V1,
+        };
+        let bytes = wire::header_len(version).unwrap_or(wire::MAX_HEADER_LEN) + frame.payload.len();
         let now = Instant::now();
         let wait = [&queue.limit, &hub.limit, &hub.upload]
             .iter()
@@ -333,7 +339,7 @@ async fn write_frames(queue: Arc<ViewerQueue>, hub: Arc<Hub>, mut send: SendStre
         if !wait.is_zero() {
             tokio::time::sleep(wait).await;
         }
-        if let Err(e) = wire::write_frame(&mut send, &frame).await {
+        if let Err(e) = wire::write_frame(&mut send, &frame, version).await {
             tracing::debug!(error = %e, "screen stream to a viewer ended");
             return;
         }
@@ -462,6 +468,7 @@ fn encode_loop(
         }
         hub.step_fps.store(quality.fps, Ordering::Relaxed);
         let top_layer = enc.temporal_layers().saturating_sub(1);
+        let codec = enc.codec();
         hub.top_layer.store(top_layer, Ordering::Relaxed);
         let pts =
             i64::try_from(Instant::now().duration_since(start).as_millis()).unwrap_or(i64::MAX);
@@ -490,7 +497,7 @@ fn encode_loop(
                 // given; the sharer's own client does not decode anything for it.
                 lock(&hub.thumbnail).replace(picture.clone());
             }
-            fan_out(hub, to_frame(out, size), top_layer, now);
+            fan_out(hub, to_frame(out, size, codec), top_layer, now);
         }
         let load = Load {
             encoder_busy: encode_avg > frame_time.as_secs_f64() * ENCODE_BUDGET,
@@ -624,11 +631,11 @@ fn fan_out(hub: &Hub, frame: Frame, top_layer: u8, now: Instant) {
     }
 }
 
-fn to_frame(out: EncodedFrame, (width, height): (u32, u32)) -> Frame {
+fn to_frame(out: EncodedFrame, (width, height): (u32, u32), codec: Codec) -> Frame {
     let payload_len = u32::try_from(out.data.len()).unwrap_or(u32::MAX);
     Frame {
         header: FrameHeader {
-            kind: FrameKind::Video,
+            kind: FrameKind::Video(codec),
             keyframe: out.keyframe,
             temporal_layer: out.temporal_layer,
             timestamp_us: u64::try_from(out.pts).unwrap_or_default() * 1000,

@@ -252,7 +252,9 @@ impl Sink {
         let since = Instant::now() - window;
         let video = || {
             got.encoded.iter().filter(|(at, from, h, _)| {
-                *at >= since && h.kind == FrameKind::Video && sharer.is_none_or(|s| s == *from)
+                *at >= since
+                    && matches!(h.kind, FrameKind::Video(_))
+                    && sharer.is_none_or(|s| s == *from)
             })
         };
         let bytes: usize = video().map(|(.., len)| len).sum();
@@ -273,7 +275,7 @@ impl Sink {
             .expect("sink")
             .encoded
             .iter()
-            .find(|(_, _, h, _)| h.kind == FrameKind::Video)
+            .find(|(_, _, h, _)| matches!(h.kind, FrameKind::Video(_)))
             .map(|(_, _, h, _)| h.keyframe)
     }
 

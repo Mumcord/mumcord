@@ -154,7 +154,7 @@ fn picture_message(frame: &I420Frame) -> Option<Vec<u8>> {
 mod tests {
     use std::sync::Arc;
 
-    use mumcord_engine::screen_share::wire::{FrameHeader, FrameKind};
+    use mumcord_engine::screen_share::wire::{Codec, FrameHeader, FrameKind};
 
     use super::*;
 
@@ -162,7 +162,7 @@ mod tests {
         let payload = vec![0xAA, 0xBB, 0xCC];
         Frame {
             header: FrameHeader {
-                kind: FrameKind::Video,
+                kind: FrameKind::Video(Codec::Vp9),
                 keyframe,
                 temporal_layer: 2,
                 timestamp_us: 0x0102_0304_0506_0708,
