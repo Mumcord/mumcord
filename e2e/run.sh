@@ -86,6 +86,7 @@ exec docker run --rm -i --init "${tty[@]}" \
   --group-add "$(stat -c %g /var/run/docker.sock)" \
   --security-opt seccomp=unconfined \
   --shm-size 1g \
+  --add-host declared.plugins.test:127.0.0.1 --add-host undeclared.plugins.test:127.0.0.1 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$repo:$repo" -w "$repo" \
   -v "$cache/target:/cache/target" \
@@ -95,7 +96,7 @@ exec docker run --rm -i --init "${tty[@]}" \
   -e HOME=/cache/home -e CARGO_HOME=/cache/cargo -e CARGO_TARGET_DIR=/cache/target \
   -e MUMCORD_SKIP_BINDINGS_EXPORT=1 \
   -e CI -e MUMCORD_E2E_SHARD -e MUMCORD_E2E_STEP -e MUMCORD_E2E_RUN -e MUMCORD_VERSION \
-  -e MUMCORD_PORT_BASE -e MUMCORD_PROJECT \
+  -e MUMCORD_PORT_BASE -e MUMCORD_PROJECT -e MUMCORD_TEST_CA -e MUMCORD_PLUGIN_CLI \
   -e MUMCORD_E2E_RELAY -e MUMCORD_E2E_RELAY_PORT -e MUMCORD_E2E_RELAY_HOST \
   -e MUMPEER_PORT_BASE -e MUMPEER_PROJECT -e MUMPEER_PUBLIC_HOST -e MUMPEER_IMAGE -e MUMBOT_IMAGE \
   -e MUMCORD_E2E_OLD_MUMPEER_IMAGE -e MUMCORD_E2E_OLD_MUMBOT_IMAGE \
