@@ -57,6 +57,8 @@ pub enum RelayUse {
     Files,
     /// Screen sharing (one copy per viewer and broadcasts).
     ScreenShare,
+    /// Plugin data between Mumcord clients (spec 09). Wire `plg`; mumpeer calls it `plugin_data`.
+    PluginData,
 }
 
 impl RelayUse {
@@ -65,6 +67,7 @@ impl RelayUse {
             Self::Images => "img",
             Self::Files => "file",
             Self::ScreenShare => "scr",
+            Self::PluginData => "plg",
         }
     }
 
@@ -73,6 +76,7 @@ impl RelayUse {
             "img" => Self::Images,
             "file" => Self::Files,
             "scr" => Self::ScreenShare,
+            "plg" => Self::PluginData,
             _ => return None,
         })
     }
@@ -104,6 +108,9 @@ pub struct RelayAnnouncement {
     pub uses: Option<Vec<RelayUse>>,
     /// Most viewers per broadcast (wire `bc`); `None` means the relay offers no broadcasts.
     pub broadcast: Option<u16>,
+    /// Most kilobits per second one sender may send as plugin data (wire `pk`); `None` means the
+    /// relay announces no limit (an older bot, or plugin data is off).
+    pub plugin_data_kbps: Option<u32>,
 }
 
 impl RelayAnnouncement {
@@ -260,8 +267,14 @@ pub enum PeerMessage {
         rid: RequestId,
         reason: TokenErrorReason,
     },
-    /// Sharer → bot: asks for a broadcast for up to `max` viewers (`bcast-req`).
-    BroadcastRequest { rid: RequestId, max: u16 },
+    /// Sharer → bot: asks for a broadcast for up to `max` viewers (`bcast-req`). `kind` (wire
+    /// `k`) says what the broadcast carries: `scr` or `plg`. `None` means `scr`, which keeps
+    /// bots from before plugin data working.
+    BroadcastRequest {
+        rid: RequestId,
+        max: u16,
+        kind: Option<RelayUse>,
+    },
     /// Bot → sharer: the broadcast and its publisher token (`bcast`).
     Broadcast {
         rid: RequestId,
@@ -352,6 +365,8 @@ struct RelayWire {
     u: Option<Vec<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     bc: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pk: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -381,6 +396,8 @@ struct ErrorWire {
 struct BroadcastRequestWire {
     rid: String,
     max: u16,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    k: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -442,6 +459,7 @@ impl PeerMessage {
                             .as_ref()
                             .map(|uses| uses.iter().map(|u| u.as_str().to_owned()).collect()),
                         bc: relay.broadcast,
+                        pk: relay.plugin_data_kbps,
                     },
                 )?
             }
@@ -485,15 +503,19 @@ impl PeerMessage {
                     r: reason.as_str().to_owned(),
                 },
             )?,
-            Self::BroadcastRequest { rid, max } => {
+            Self::BroadcastRequest { rid, max, kind } => {
                 if *max == 0 {
                     return Err(PeerError::BadViewers);
+                }
+                if matches!(kind, Some(RelayUse::Images | RelayUse::Files)) {
+                    return Err(PeerError::BadUse);
                 }
                 envelope(
                     "bcast-req",
                     BroadcastRequestWire {
                         rid: hex16(rid.0),
                         max: *max,
+                        k: kind.map(|k| k.as_str().to_owned()),
                     },
                 )?
             }
@@ -587,6 +609,8 @@ impl PeerMessage {
                         .map(|uses| uses.iter().filter_map(|u| RelayUse::parse(u)).collect()),
                     // A limit of zero viewers is no broadcast at all.
                     broadcast: wire.bc.filter(|&max| max > 0),
+                    // A limit of zero kbit/s would allow nothing; treat it as not announced.
+                    plugin_data_kbps: wire.pk.filter(|&kbps| kbps > 0),
                 }))
             }
             "token-req" => {
@@ -625,9 +649,17 @@ impl PeerMessage {
                 if wire.max == 0 {
                     return Err(PeerError::BadViewers);
                 }
+                let kind = wire
+                    .k
+                    .map(|k| match RelayUse::parse(&k) {
+                        Some(kind @ (RelayUse::ScreenShare | RelayUse::PluginData)) => Ok(kind),
+                        _ => Err(PeerError::BadUse),
+                    })
+                    .transpose()?;
                 Ok(Self::BroadcastRequest {
                     rid: parse_rid(&wire.rid)?,
                     max: wire.max,
+                    kind,
                 })
             }
             "bcast" => {
@@ -789,6 +821,7 @@ mod tests {
             seq: 4,
             uses: None,
             broadcast: None,
+            plugin_data_kbps: None,
         })
     }
 
@@ -814,6 +847,7 @@ mod tests {
                 seq: 1,
                 uses: Some(vec![RelayUse::Images, RelayUse::ScreenShare]),
                 broadcast: Some(25),
+                plugin_data_kbps: Some(512),
             }),
             PeerMessage::Token {
                 rid: RequestId(1),
@@ -833,6 +867,12 @@ mod tests {
             PeerMessage::BroadcastRequest {
                 rid: RequestId(4),
                 max: 25,
+                kind: None,
+            },
+            PeerMessage::BroadcastRequest {
+                rid: RequestId(6),
+                max: 8,
+                kind: Some(RelayUse::PluginData),
             },
             PeerMessage::Broadcast {
                 rid: RequestId(4),
@@ -919,8 +959,10 @@ mod tests {
                 RelayUse::Images,
                 RelayUse::Files,
                 RelayUse::ScreenShare,
+                RelayUse::PluginData,
             ]),
             broadcast: Some(u16::MAX),
+            plugin_data_kbps: Some(u32::MAX),
         });
         let bytes = message.encode().expect("encode");
         assert_eq!(PeerMessage::decode(&bytes).expect("decode"), message);
@@ -1098,6 +1140,7 @@ mod tests {
         let request = PeerMessage::BroadcastRequest {
             rid: RequestId(1),
             max: 0,
+            kind: None,
         };
         assert_eq!(request.encode(), Err(PeerError::BadViewers));
     }
@@ -1126,10 +1169,27 @@ mod tests {
         );
         let announced = encode(all()[3].clone());
         assert!(
-            announced.ends_with(r#""seq":1,"u":["img","scr"],"bc":25}"#),
+            announced.ends_with(r#""seq":1,"u":["img","scr"],"bc":25,"pk":512}"#),
             "{announced}"
         );
         assert!(!encode(relay()).contains(r#""u""#));
+        assert!(!encode(relay()).contains(r#""pk""#));
+        assert!(
+            encode(PeerMessage::BroadcastRequest {
+                rid: RequestId(6),
+                max: 8,
+                kind: Some(RelayUse::PluginData),
+            })
+            .ends_with(r#""max":8,"k":"plg"}"#)
+        );
+        assert!(
+            !encode(PeerMessage::BroadcastRequest {
+                rid: RequestId(6),
+                max: 8,
+                kind: None,
+            })
+            .contains(r#""k""#)
+        );
         assert_eq!(
             encode(PeerMessage::BroadcastAdmit {
                 rid: RequestId(5),
@@ -1185,6 +1245,30 @@ mod tests {
     }
 
     #[test]
+    fn broadcast_request_kind() {
+        let decode = |extra: &str| {
+            let json =
+                format!(r#"{{"v":1,"t":"bcast-req","rid":"0000000000000001","max":4{extra}}}"#);
+            PeerMessage::decode(json.as_bytes())
+        };
+        let kind = |extra: &str| match decode(extra) {
+            Ok(PeerMessage::BroadcastRequest { kind, .. }) => kind,
+            other => panic!("unexpected: {other:?}"),
+        };
+        assert_eq!(kind(""), None);
+        assert_eq!(kind(r#","k":"scr""#), Some(RelayUse::ScreenShare));
+        assert_eq!(kind(r#","k":"plg""#), Some(RelayUse::PluginData));
+        assert_eq!(decode(r#","k":"img""#), Err(PeerError::BadUse));
+        assert_eq!(decode(r#","k":"holo""#), Err(PeerError::BadUse));
+        let request = PeerMessage::BroadcastRequest {
+            rid: RequestId(1),
+            max: 4,
+            kind: Some(RelayUse::Files),
+        };
+        assert_eq!(request.encode(), Err(PeerError::BadUse));
+    }
+
+    #[test]
     fn relay_uses_from_a_newer_or_older_bot() {
         let fp = fp();
         let decode = |extra: &str| {
@@ -1205,6 +1289,12 @@ mod tests {
         assert_eq!(newer.broadcast, None);
         assert!(newer.allows(RelayUse::Files));
         assert!(!newer.allows(RelayUse::ScreenShare));
+
+        let plugin = decode(r#","u":["plg"],"pk":256"#);
+        assert_eq!(plugin.uses, Some(vec![RelayUse::PluginData]));
+        assert_eq!(plugin.plugin_data_kbps, Some(256));
+        assert_eq!(decode(r#","pk":0"#).plugin_data_kbps, None);
+        assert_eq!(old.plugin_data_kbps, None);
 
         let none = decode(r#","u":[],"bc":4"#);
         assert!(!none.allows(RelayUse::Images));
