@@ -89,6 +89,8 @@ describe("diagnostics and about (AC-1.28, AC-1.29)", () => {
     file = join(app.profile(), found() ?? "");
     expect(statSync(file).size).toBeGreaterThan(50);
     const text = readFileSync(file, "utf8");
+    // A Bovnar document (FR-9.100): it starts with its first `.key = value;` field.
+    expect(text.trimStart().startsWith(".v = ")).toBe(true);
     expect(text).toMatch(/version/i);
     expect(text).toMatch(/os|linux|ubuntu/i);
     expect(text).toMatch(/device/i);
