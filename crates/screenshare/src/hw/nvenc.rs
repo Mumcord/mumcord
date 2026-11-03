@@ -26,10 +26,10 @@ const CUDA: &[&str] = &["libcuda.so.1"];
 /// The most temporal layers any share uses (60 fps down to 7.5 fps).
 const MAX_LAYERS: u8 = 4;
 
-/// Temporal layers for `fps`: like the software encoders 3 up to 30 fps, and 4 above, so a
+/// Temporal layers for `fps`: 3 below 60 fps and 4 from 60 fps (FR-7.37, like VA-API), so a
 /// viewer of a 60 fps share can still drop to 30, 15 or 7.5 fps.
 fn wanted_layers(fps: u32) -> u8 {
-    if fps > 30 { MAX_LAYERS } else { 3 }
+    if fps >= 60 { MAX_LAYERS } else { 3 }
 }
 
 /// Highest frame rate accepted; screen shares stop at 60 fps.
@@ -1439,6 +1439,14 @@ mod tests {
                 Call::CreateInput,
                 Call::CreateOutput
             ]
+        );
+    }
+
+    #[test]
+    fn four_layers_only_from_60_fps() {
+        assert_eq!(
+            [15, 30, 45, 59, 60].map(wanted_layers),
+            [3, 3, 3, 3, MAX_LAYERS]
         );
     }
 

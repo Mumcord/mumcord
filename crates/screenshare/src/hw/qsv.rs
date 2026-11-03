@@ -6,10 +6,10 @@
 //! surface owned by the encoder.
 //!
 //! Temporal layers use the VP9 layer buffer or (AV1) the universal one, dyadic like the software
-//! encoders: 3 layers up to 30 fps, 4 above, or fewer when the runtime refuses that many. oneVPL
-//! doesn't report a frame's layer, so for AV1 it is read from the OBU extension headers of the
-//! frame ([`obu`]). VP9 frames (and AV1 frames without extension headers) get it from the dyadic
-//! pattern, which the runtime restarts at every keyframe.
+//! encoders: 3 layers below 60 fps, 4 from 60 fps, or fewer when the runtime refuses that many.
+//! oneVPL doesn't report a frame's layer, so for AV1 it is read from the OBU extension headers of
+//! the frame ([`obu`]). VP9 frames (and AV1 frames without extension headers) get it from the
+//! dyadic pattern, which the runtime restarts at every keyframe.
 //!
 //! On Linux, Intel GPUs are driven through VA-API instead, so [`open`] refuses there; the code
 //! still compiles on Linux so the tests (which mock oneVPL) run in Linux CI too.
@@ -24,10 +24,10 @@ const ENCODER: HardwareEncoder = HardwareEncoder::Qsv;
 /// The most temporal layers any share uses (60 fps down to 7.5 fps).
 const MAX_LAYERS: u8 = 4;
 
-/// Temporal layers for `fps`: like the software encoders 3 up to 30 fps, and 4 above, so a
+/// Temporal layers for `fps`: 3 below 60 fps and 4 from 60 fps (FR-7.37, like VA-API), so a
 /// viewer of a 60 fps share can still drop to 30, 15 or 7.5 fps.
 fn wanted_layers(fps: u32) -> u8 {
-    if fps > 30 { MAX_LAYERS } else { 3 }
+    if fps >= 60 { MAX_LAYERS } else { 3 }
 }
 
 /// Cumulative share of the bitrate up to each layer, in percent, by layer count (libvpx's split
@@ -1197,6 +1197,14 @@ mod tests {
     }
 
     #[test]
+    fn four_layers_only_from_60_fps() {
+        assert_eq!(
+            [15, 30, 45, 59, 60].map(wanted_layers),
+            [3, 3, 3, 3, MAX_LAYERS]
+        );
+    }
+
+    #[test]
     fn vp9_uses_four_layers_at_60_fps() {
         let encoder = open_mock(Codec::Vp9, config(1920, 1080, 60)).expect("encoder");
         assert_eq!(encoder.codec(), Codec::Vp9);
@@ -1441,6 +1449,10 @@ mod tests {
         encoder
             .encode(&frame(1280, 720), 1, false)
             .expect("encoded");
+        // Within the same layer count (below 60 fps) the frame rate changes in place.
+        encoder.set_fps(50).expect("changed");
+        assert_eq!(calls().last(), Some(&Call::Reset));
+        assert_eq!((encoder.temporal_layers(), last_setup().fps), (3, (50, 1)));
         encoder.set_fps(60).expect("changed");
         assert_eq!(encoder.temporal_layers(), 4);
         assert_eq!(last_setup().fps, (60, 1));
@@ -1448,10 +1460,6 @@ mod tests {
             .encode(&frame(1280, 720), 2, false)
             .expect("encoded");
         assert!(out[0].keyframe);
-        // Within the same layer count the frame rate changes in place.
-        encoder.set_fps(50).expect("changed");
-        assert_eq!(calls().last(), Some(&Call::Reset));
-        assert_eq!(last_setup().fps, (50, 1));
     }
 
     #[test]
