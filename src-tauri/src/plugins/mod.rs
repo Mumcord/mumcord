@@ -78,6 +78,12 @@ const MAX_CACHED_IMAGES: usize = 200;
 #[tauri_specta(event_name = "plugins://changed")]
 pub struct PluginsChanged {}
 
+/// `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://app-menu-changed")]
+pub struct AppMenuChanged {}
+
 /// `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
 /// engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
 /// answers for a server that decided before the UI listened.
@@ -420,6 +426,7 @@ async fn on_service_event(
                 .close_unless(|id| running.iter().any(|r| r == id));
             PluginsChanged {}.emit(app)?;
         }
+        ServiceEvent::AppMenuChanged => AppMenuChanged {}.emit(app)?,
         ServiceEvent::InstallProgress { id, stage } => PluginInstallProgress {
             id,
             progress: stage.into(),

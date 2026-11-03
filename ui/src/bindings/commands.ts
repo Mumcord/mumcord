@@ -1011,6 +1011,7 @@ export const events = {
 	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
 	pluginSupersede: makeEvent<PluginSupersede, PluginSupersede>("plugin://supersede"),
 	pluginUi: makeEvent<PluginUi, PluginUi>("plugin://ui"),
+	pluginsAppMenuChanged: makeEvent<AppMenuChanged, AppMenuChanged>("plugins://app-menu-changed"),
 	pluginsChanged: makeEvent<PluginsChanged, PluginsChanged>("plugins://changed"),
 	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
@@ -1097,6 +1098,9 @@ export type AppInfo = {
 	 */
 	distro: LinuxDistro | null,
 };
+
+/**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
+export type AppMenuChanged = Record<string, never>;
 
 export type AudioDevice = {
 	id: string,

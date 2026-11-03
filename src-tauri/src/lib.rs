@@ -413,6 +413,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::tray::TraySettingsRequested,
             commands::hotkeys::HotkeyPressed,
             plugins::PluginsChanged,
+            plugins::AppMenuChanged,
             plugins::PluginsSharedState,
             deeplink::PluginsOpenDetails,
             plugins::PluginInstallProgress,
