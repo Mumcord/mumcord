@@ -12,6 +12,7 @@
 //! own share and everything watched, and the people still there drop the share and the viewer
 //! themselves when they see the move.
 
+pub mod broadcast;
 pub mod capture;
 #[cfg(any(target_os = "macos", test))]
 pub mod capture_macos;
