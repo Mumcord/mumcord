@@ -278,7 +278,7 @@ async fn screen_share_media_reaches_every_viewer() {
 
     alice
         .engine
-        .screen_share_start(server, false)
+        .screen_share_start(server, false, None, None)
         .await
         .expect("start");
     for v in &mut viewers {

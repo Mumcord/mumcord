@@ -39,7 +39,7 @@ export function useShareActions({ serverId, block, platform, recheck }: OwnShare
     setStarting(true);
     try {
       // Resolves without a share when the picker was closed; nothing changes then.
-      await getApi().screenShareStart(serverId, platform?.sound ?? false);
+      await getApi().screenShareStart(serverId, platform?.sound ?? false, null, null);
     } catch (error: unknown) {
       console.error("Starting the screen share failed", error);
       setFailed(startFailure(error));

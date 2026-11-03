@@ -204,7 +204,7 @@ async fn the_viewer_hears_the_shared_sound_at_its_level() {
     bob.engine.set_self_deaf(false).expect("undeafen");
     alice
         .engine
-        .screen_share_start(server, true)
+        .screen_share_start(server, true, None, None)
         .await
         .expect("start");
     alice

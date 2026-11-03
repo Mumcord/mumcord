@@ -204,6 +204,8 @@ pub async fn screen_share_start(
     window: tauri::WebviewWindow,
     server_id: ServerId,
     with_sound: bool,
+    choice: Option<QualityChoice>,
+    codec: Option<ScreenCodec>,
 ) -> ApiResult<()> {
     // The Windows system picker opens over the window the share was started from.
     #[cfg(windows)]
@@ -216,7 +218,12 @@ pub async fn screen_share_start(
     #[cfg(not(windows))]
     let _ = window;
     engine
-        .screen_share_start(to_engine_server_id(server_id), with_sound)
+        .screen_share_start(
+            to_engine_server_id(server_id),
+            with_sound,
+            choice.map(Into::into),
+            codec.map(Into::into),
+        )
         .await?;
     Ok(())
 }
@@ -833,6 +840,16 @@ pub struct SharePreview {
     /// Why Automatic would not pick AV1.
     pub av1_skipped: Option<Av1Skipped>,
     pub path: PreviewPath,
+    /// Threads the software VP9 encoder is configured with against the machine's cores; `None`
+    /// for hardware encoders and software AV1.
+    pub cpu_cores: Option<CpuCores>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct CpuCores {
+    pub used: u32,
+    pub total: u32,
 }
 
 impl From<engine_share::SharePreview> for SharePreview {
@@ -847,6 +864,10 @@ impl From<engine_share::SharePreview> for SharePreview {
             software_warning: p.software_warning,
             av1_skipped: p.av1_skipped.map(Into::into),
             path: p.path.into(),
+            cpu_cores: p.cpu_cores.map(|c| CpuCores {
+                used: c.used,
+                total: c.total,
+            }),
         }
     }
 }

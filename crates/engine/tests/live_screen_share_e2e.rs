@@ -518,7 +518,11 @@ async fn sharer_bot() {
     while let Some(line) = commands.recv().await {
         let mut words = line.split_whitespace();
         let answer = match (words.next(), words.next()) {
-            (Some("start"), _) => match alice.engine.screen_share_start(server, false).await {
+            (Some("start"), _) => match alice
+                .engine
+                .screen_share_start(server, false, None, None)
+                .await
+            {
                 Ok(StartOutcome::Started) => "ok".to_owned(),
                 Ok(StartOutcome::Cancelled) => "error cancelled".to_owned(),
                 Err(e) => format!("error {e}"),
@@ -730,7 +734,7 @@ async fn screen_share_ac_2_29() {
     let second = &viewers[VIEWERS];
     second
         .engine
-        .screen_share_start(second.server(), false)
+        .screen_share_start(second.server(), false, None, None)
         .await
         .expect("second share");
     wait_watchable(&mut viewers[1], b).await;

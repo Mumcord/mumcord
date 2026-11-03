@@ -877,7 +877,7 @@ export const commands = {
 	 *  Starts sharing in the user's voice channel, optionally with sound. Closing the system
 	 *  picker ends the call quietly without a share.
 	 */
-	screenShareStart: (serverId: number, withSound: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_start", { serverId, withSound })),
+	screenShareStart: (serverId: number, withSound: boolean, choice: QualityChoice | null, codec: ScreenCodec | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_start", { serverId, withSound, choice, codec })),
 	/**  Stops the own share. */
 	screenShareStop: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_stop", { serverId })),
 	/**  Pauses or resumes the own share. */
@@ -1566,6 +1566,11 @@ export type Conversation = { kind: "channel"; channelId: number } |
 
 /**  Screen corner (same values as the window overlay). */
 export type Corner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
+export type CpuCores = {
+	used: number,
+	total: number,
+};
 
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
 export type DeepLinkOpened = {
@@ -3861,6 +3866,11 @@ export type SharePreview = {
 	/**  Why Automatic would not pick AV1. */
 	av1Skipped: Av1Skipped | null,
 	path: PreviewPath,
+	/**
+	 *  Threads the software VP9 encoder is configured with against the machine's cores; `None`
+	 *  for hardware encoders and software AV1.
+	 */
+	cpuCores: CpuCores | null,
 };
 
 /**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */

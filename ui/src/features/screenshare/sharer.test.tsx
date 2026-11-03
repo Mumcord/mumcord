@@ -130,7 +130,7 @@ describe("share start", () => {
     render(<SharerBar />);
     expect(screen.queryByRole("group", { name: BAR_NAME })).toBeNull();
     await act(async () => {
-      await api.screenShareStart(1, false);
+      await api.screenShareStart(1, false, null, null);
     });
     await screen.findByRole("group", { name: BAR_NAME });
     expect(screen.getByRole("button", { name: /0 viewers/ })).toBeInTheDocument();
@@ -143,7 +143,7 @@ describe("sharer controls", () => {
     const api = await linuxMock();
     render(<SharerBar />);
     await act(async () => {
-      await api.screenShareStart(1, false);
+      await api.screenShareStart(1, false, null, null);
     });
     fireEvent.click(await screen.findByRole("button", { name: "Pause" }));
     expect(await screen.findByText(/Paused/)).toBeInTheDocument();
@@ -253,7 +253,7 @@ describe("sharer control bar", () => {
 
   it("shows the source, the running time and that it is live", async () => {
     render(<SharerBar />);
-    await api.screenShareStart(1, false);
+    await api.screenShareStart(1, false, null, null);
     const bar = screen.getByRole("group", { name: BAR_NAME });
     await vi.waitFor(() => {
       expect(bar).toHaveTextContent("Live");
@@ -279,7 +279,7 @@ describe("sharer control bar", () => {
       ],
     });
     render(<SharerBar />);
-    await api.screenShareStart(1, false);
+    await api.screenShareStart(1, false, null, null);
     const bar = screen.getByRole("group", { name: BAR_NAME });
     await vi.waitFor(() => expect(bar).toHaveTextContent("1080p · 60 fps"));
     act(() => {
@@ -301,7 +301,7 @@ describe("sharer control bar", () => {
 
   it("shows the live picture of what the user shares", async () => {
     render(<SharerBar />);
-    await api.screenShareStart(1, false);
+    await api.screenShareStart(1, false, null, null);
     await vi.waitFor(() => {
       const picture = screen.getByRole("img", { name: "Preview of what you share" });
       expect(picture).toHaveAttribute("src", expect.stringMatching(/^data:image\/webp;base64,/));
@@ -310,7 +310,7 @@ describe("sharer control bar", () => {
 
   it("pause reaches the engine and shows the share as paused", async () => {
     render(<SharerBar />);
-    await api.screenShareStart(1, false);
+    await api.screenShareStart(1, false, null, null);
     const call = vi.spyOn(api, "screenShareSetPaused");
     fireEvent.click(screen.getByRole("button", { name: "Pause" }));
     expect(call).toHaveBeenCalledWith(1, true);
@@ -321,7 +321,7 @@ describe("sharer control bar", () => {
 
   it("stop ends the share and the bar goes away", async () => {
     render(<SharerBar />);
-    await api.screenShareStart(1, false);
+    await api.screenShareStart(1, false, null, null);
     fireEvent.click(screen.getByRole("button", { name: "Stop sharing" }));
     await vi.waitFor(() => {
       expect(screen.queryByRole("group", { name: BAR_NAME })).toBeNull();
