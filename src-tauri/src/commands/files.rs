@@ -422,9 +422,16 @@ impl From<ChipView> for FileChip {
 }
 
 fn downloads_dir(app: &AppHandle) -> ApiResult<PathBuf> {
-    app.path()
-        .download_dir()
-        .map_err(|e| ApiError::new(ErrorCode::Io, format!("no Downloads folder: {e}")))
+    let paths = app.path();
+    downloads_or_home(paths.download_dir().ok(), paths.home_dir().ok())
+        .ok_or_else(|| ApiError::new(ErrorCode::Io, "no Downloads folder"))
+}
+
+/// The system's Downloads folder, else `~/Downloads`. On Linux the folder is known only from
+/// `user-dirs.dirs`, which minimal desktops and containers often lack; without the fallback no
+/// file could be received at all.
+fn downloads_or_home(downloads: Option<PathBuf>, home: Option<PathBuf>) -> Option<PathBuf> {
+    downloads.or_else(|| home.map(|home| home.join("Downloads")))
 }
 
 /// Opens `path` with the default program. Windows and macOS use the opener plugin; Linux goes
@@ -585,6 +592,21 @@ mod tests {
     use super::*;
     use mumcord_engine::peer::RelayUnavailable as EngineRelay;
     use mumcord_engine::store::{FilesMaxSize as StoreMax, P2pMode as StoreMode};
+
+    #[test]
+    fn downloads_fall_back_to_the_home_folder() {
+        let home = PathBuf::from("/home/alice");
+        let set = PathBuf::from("/data/dl");
+        assert_eq!(
+            downloads_or_home(Some(set.clone()), Some(home.clone())),
+            Some(set)
+        );
+        assert_eq!(
+            downloads_or_home(None, Some(home)),
+            Some(PathBuf::from("/home/alice/Downloads"))
+        );
+        assert_eq!(downloads_or_home(None, None), None);
+    }
 
     fn json<T: Serialize>(v: &T) -> serde_json::Value {
         serde_json::to_value(v).expect("serializes")
