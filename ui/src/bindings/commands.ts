@@ -573,9 +573,11 @@ export const commands = {
 	pluginsIndex: (language: string) => typedError<PluginIndex, ApiError>(__TAURI_INVOKE("plugins_index", { language })),
 	/**
 	 *  Installs a plugin from the lists loaded by `plugins_index` (official or a repository) (latest version unless
-	 *  `version` is given), with the optional permissions the user left on.
+	 *  `version` is given), with the optional permissions the user left on. `confirmed` is the tick
+	 *  of the prompt's confirmation box (`check.gate.confirm` of the offer); without it a gated
+	 *  plugin is refused, and "Don't allow high-risk plugins" refuses a High one even with it.
 	 */
-	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility })),
+	pluginInstall: (id: string, version: string | null, optional: string[], visibility: PluginVisibilityChoice, confirmed: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_install", { id, version, optional, visibility, confirmed })),
 	/**
 	 *  Downloads and verifies the latest version of a store plugin (official or from a repository)
 	 *  before the install prompt
@@ -602,6 +604,28 @@ export const commands = {
 	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
 	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
 	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
+	/**
+	 *  The security score of a store plugin version (FR-9.72). `listing` scores the signed index
+	 *  entry, as Browse shows it; `package` scores the package the install prompt downloaded for
+	 *  this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
+	 *  defaults to the one the store offers. Never scored in the UI.
+	 */
+	pluginScore: (id: string, version: string | null, from: PluginScoreSource) => typedError<PluginScored, ApiError>(__TAURI_INVOKE("plugin_score", { id, version, from })),
+	/**
+	 *  FR-9.83: the tick "I understand the risk went up and I still trust the author" for the
+	 *  waiting update of `id` to `version`. `plugin_apply_update` needs it for an update that makes
+	 *  the plugin High (`review.needsHighRiskConfirm`); the updates list shows it as
+	 *  `review.highRiskConfirmed` afterwards.
+	 */
+	pluginConfirmUpdateHighRisk: (id: string, version: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_confirm_update_high_risk", { id, version })),
+	/**
+	 *  The websites an installed plugin declares and what it did with them over the last 7 days
+	 *  (FR-9.30). Both are empty for a plugin without websites.
+	 */
+	pluginWebsites: (id: string) => typedError<PluginWebsites, ApiError>(__TAURI_INVOKE("plugin_websites", { id })),
+	pluginPlatformSettings: () => typedError<PluginPlatformSettings, ApiError>(__TAURI_INVOKE("plugin_platform_settings")),
+	/**  Saves the plugin platform's settings; the volume is clamped to 0–100. */
+	pluginSetPlatformSettings: (settings: PluginPlatformSettings) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_platform_settings", { settings })),
 	/**  "Check now": looks for plugin updates and revocations right away. */
 	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
 	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
@@ -1924,6 +1948,13 @@ export type IndexedPlugin = {
 	size: number | null,
 	/**  Every permission (required and optional) the version may ask for. */
 	permissions: string[],
+	/**
+	 *  FR-9.18: set (e.g. "0.8.0") when no version of the plugin runs on this Mumcord yet.
+	 *  The card says "Needs Mumcord 0.8.0 or newer" and Install is disabled.
+	 */
+	needsMumcord: string | null,
+	/**  The websites the shown version declares (`net.origins`); plain, untrusted text. */
+	origins: string[],
 };
 
 /**  An external image or image link, ready to show inline (FR-1.55). */
@@ -2597,6 +2628,8 @@ export type PluginAsset = {
 	base64: string,
 };
 
+export type PluginBand = "low" | "medium" | "high";
+
 export type PluginButtonKind = "primary" | "secondary" | "danger";
 
 /**  A slash command of an active plugin (FR-6.43). */
@@ -2642,6 +2675,13 @@ error: string | null } |
 /**  The renderer copies `text` itself on a click; there is no action back to the plugin. */
 { type: "copyButton"; label: string; text: string; kind: PluginButtonKind };
 
+/**  What the person has to tick before Install is enabled. */
+export type PluginConfirmKind = 
+/**  "I understand the risk and I trust the author" / "Install anyway". */
+"highRisk" | 
+/**  "I understand" / "Install". */
+"understand";
+
 /**  The Diagnostics section of a plugin (counts only, never payloads). */
 export type PluginDiagnostics = {
 	cpuTimeMs: number | null,
@@ -2662,6 +2702,18 @@ export type PluginDiagnostics = {
 
 export type PluginDirection = "row" | "column";
 
+/**  What a factor does to the score: whole points or a percentage. */
+export type PluginEffect = { kind: "points"; value: number } | { kind: "percent"; value: number };
+
+/**  One line of the score breakdown table. */
+export type PluginFactorKind = "highPermission" | "webSurface" | "relay" | "mediumPermission" | "lowPermissions" | "websites" | "packageSize" | "wasmModules" | "sourceLink" | "licence" | "reproducible" | "keyAge" | "expectedKey" | "developerTrust" | "recentChange" | "noHistory" | "networkFloor";
+
+/**  Why the one confirmation box shows. */
+export type PluginGateReason = "highRisk" | "ownCodeAndWebsites" | "repositoryWarning";
+
+/**  Why a package is refused instead of scored (FR-9.78). */
+export type PluginHardStop = "invalidSignature" | "hashMismatch" | "manifestMismatch" | "revoked" | "unsafeOrigin";
+
 /**  The store's official plugin list. */
 export type PluginIndex = {
 	freshness: IndexFreshness,
@@ -2676,6 +2728,24 @@ export type PluginIndexImage = { kind: "icon" } | { kind: "screenshot"; index: n
 export type PluginInputPurpose = "plain" | 
 /**  Hosts typed here become the only ones the plugin may reach with `net.http`. */
 "serverAddress";
+
+/**  What the install prompt shows once the package is downloaded and checked. */
+export type PluginInstallCheck = 
+/**  "Can't be installed": no score, no Install button. */
+{ kind: "refused"; stop: PluginHardStop; 
+/**  User-facing text. */
+reason: string } | { kind: "ready"; score: PluginInstallScore; gate: PluginInstallGate };
+
+export type PluginInstallGate = {
+	/**  `None`: Install is enabled right away. */
+	confirm: PluginConfirmKind | null,
+	/**
+	 *  "Don't allow high-risk plugins" is on and the plugin is High: Install stays disabled
+	 *  with "Blocked by your safety setting".
+	 */
+	blockedBySafety: boolean,
+	reasons: PluginGateReason[],
+};
 
 /**
  *  What the install prompt shows, read from the verified package's manifest (the index only
@@ -2694,12 +2764,26 @@ export type PluginInstallOffer = {
 	 *  `chat.patterns`). Plugin text: plain, untrusted.
 	 */
 	chatPatterns: string[],
+	/**
+	 *  The score, the one confirmation box and the safety setting for this package, or the
+	 *  hard stop that refuses it (`refused`: no Install button, the other fields are empty).
+	 */
+	check: PluginInstallCheck,
 };
 
 /**  `plugins://install-progress`. */
 export type PluginInstallProgress = {
 	id: string,
 	progress: PluginInstallStage,
+};
+
+/**  The package score of the install prompt next to what the listing promised. */
+export type PluginInstallScore = {
+	score: PluginScored,
+	/**  `None` when the version is not listed (e.g. Developer mode). */
+	listing: PluginScored | null,
+	/**  "This plugin scores higher than its listing said." */
+	higherThanListing: boolean,
 };
 
 /**  One step of an install. */
@@ -2721,6 +2805,18 @@ export type PluginLogLevel = "debug" | "info" | "warn" | "error";
 export type PluginLogLine = {
 	level: PluginLogLevel,
 	text: string,
+};
+
+/**  One day of a plugin's network use (kept for 7 days). */
+export type PluginNetworkDay = {
+	/**  Local calendar day, `YYYY-MM-DD`. */
+	day: string,
+	requests: number,
+	blocked: number,
+	/**  Unix milliseconds of the last request. */
+	lastRequestAt: number | null,
+	/**  Host of the last request; plain, untrusted text. */
+	lastHost: string | null,
 };
 
 /**  One node of a flat tree: node 0 is the root, `children` are indices into the same list. */
@@ -2753,6 +2849,65 @@ export type PluginOptionalPermission = {
 
 /**  How the user saw the plugin's panel. */
 export type PluginPanelVisibility = "hidden" | "inline" | "expanded";
+
+/**  The plugin platform's own settings (Settings → Plugins). */
+export type PluginPlatformSettings = {
+	/**  "Don't allow high-risk plugins" (FR-9.81). Off by default. */
+	blockHighRisk: boolean,
+	/**  Plugins may send and receive data through the relay. On by default. */
+	relayDataEnabled: boolean,
+	/**  Plugin sound volume in percent, 0–100. */
+	soundVolume: number,
+	soundMuted: boolean,
+};
+
+/**  One website of an update; plain, untrusted text. */
+export type PluginReviewOrigin = {
+	origin: string,
+	/**  Marked "New". */
+	new: boolean,
+};
+
+/**  The score before and after an update. */
+export type PluginRiskChange = {
+	fromValue: number,
+	fromBand: PluginBand,
+	toValue: number,
+	toBand: PluginBand,
+};
+
+/**  A computed security score: 0–100, its band and the breakdown behind it. */
+export type PluginScore = {
+	value: number,
+	band: PluginBand,
+	e: number,
+	f: number | null,
+	h: number,
+	factors: PluginScoreFactor[],
+	/**  Version of the weights the score was computed with. */
+	version: number,
+};
+
+export type PluginScoreFactor = {
+	kind: PluginFactorKind,
+	effect: PluginEffect,
+	/**  Translation key of the factor's detail text. */
+	detailKey: string,
+};
+
+/**  Where a score is read from. */
+export type PluginScoreSource = 
+/**  The signed index entry, as Browse shows it. */
+"listing" | 
+/**  The package the install prompt downloaded and verified. */
+"package";
+
+/**  The score of a plugin version, or why there is none. */
+export type PluginScored = 
+/**  Official plugins show "Official · reviewed" instead of a number. */
+{ kind: "official" } | 
+/**  Cannot be installed; no number. */
+{ kind: "refused"; stop: PluginHardStop } | { kind: "scored"; score: PluginScore };
 
 export type PluginSelectOption = {
 	value: string,
@@ -2896,9 +3051,18 @@ export type PluginUpdate = {
 	approval: PluginUpdateApproval | null,
 	/**  This version was installed, failed to start and was rolled back: the reason. */
 	failed: string | null,
-	/**  FR-9.18: set (e.g. "0.8.0") when the newest version needs a newer Mumcord. The plugin
-	 stays on its version; show "Update available after updating Mumcord" and no install. */
+	/**
+	 *  FR-9.18: set (e.g. "0.8.0") when the newest version needs a newer Mumcord. The plugin
+	 *  stays on its version; show "Update available after updating Mumcord" and no install.
+	 */
 	needsMumcord: string | null,
+	/**
+	 *  FR-9.81, FR-9.82: why the update does not install by itself although `approval` would let
+	 *  it (new websites, the risk went up, the safety setting). The plugin stays on its version.
+	 */
+	hold: PluginUpdateHold | null,
+	/**  Websites and score before/after, for the review (FR-9.83). */
+	review: PluginUpdateReview,
 };
 
 /**  Why an update waits for the user (FR-6.67). */
@@ -2908,11 +3072,44 @@ export type PluginUpdateApproval =
 /**  The new version is signed by a different author key. */
 { kind: "newAuthorKey" };
 
+/**  Why an update waits for the user although it may otherwise install by itself. */
+export type PluginUpdateHold = { kind: "newWebsites"; count: number } | { kind: "riskUp"; from: PluginBand; to: PluginBand } | { kind: "scoreUp"; from: number; to: number } | { kind: "blockedBySafety" } | { kind: "scoreUnknown" };
+
+/**  What the Updates tab shows to decide on an update. */
+export type PluginUpdateReview = {
+	origins: PluginReviewOrigin[],
+	/**  "One of them is not on the plugin's own domain." */
+	otherDomain: boolean,
+	/**  `None` for official plugins or when a score is unknown. */
+	risk: PluginRiskChange | null,
+	/**
+	 *  The update makes the plugin High: the tick and "Update anyway" are needed
+	 *  (`plugin_confirm_update_high_risk`).
+	 */
+	needsHighRiskConfirm: boolean,
+	highRiskConfirmed: boolean,
+};
+
 /**  How plugin updates are handled. */
 export type PluginUpdates = "auto" | "notify" | "off";
 
 /**  Who sees that the user has a plugin (FR-6.35). */
 export type PluginVisibilityChoice = "everyone" | "friends" | "nobody";
+
+/**  One website an installed plugin declares. */
+export type PluginWebsite = {
+	/**  ASCII form; plain, untrusted text. */
+	origin: string,
+	/**  Translation key of the plugin's reason (resolved in the plugin's own texts). */
+	purpose: string,
+};
+
+/**  The websites an installed plugin may reach and what it did with them (FR-9.30). */
+export type PluginWebsites = {
+	origins: PluginWebsite[],
+	/**  Newest day first. */
+	days: PluginNetworkDay[],
+};
 
 /**  Where a plugin's web view is shown. */
 export type PluginWebviewPlace = "panelPopover" | "dialog";

@@ -28,6 +28,11 @@ const offer: PluginInstallOffer = {
   ],
   defaultVisibility: "friends",
   chatPatterns: [],
+  check: {
+    kind: "ready",
+    score: { score: { kind: "official" }, listing: null, higherThanListing: false },
+    gate: { confirm: null, blockedBySafety: false, reasons: [] },
+  },
 };
 
 beforeEach(async () => {
@@ -106,7 +111,7 @@ describe("InstallPrompt", () => {
     await waitFor(() => {
       expect(onClose).toHaveBeenCalled();
     });
-    expect(install).toHaveBeenCalledWith("poll", "1.1.0", ["ui.panel"], "everyone");
+    expect(install).toHaveBeenCalledWith("poll", "1.1.0", ["ui.panel"], "everyone", true);
     expect(screen.getByText("Poll installed")).toBeTruthy();
   });
 

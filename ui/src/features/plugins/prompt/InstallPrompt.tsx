@@ -92,10 +92,15 @@ export function InstallPrompt({
 
   const installing = phase.kind === "installing";
 
+  // The repository-warning checkbox is the only box this prompt shows. Without it nothing asks
+  // the user yet, so the old always-confirmed behaviour stays until the new confirmation box
+  // (one box for every gate reason) replaces this.
+  const confirmed = repositoryWarning && plugin.source.kind === "repo" ? understood : true;
+
   const install = (offer: PluginInstallOffer) => {
     setPhase({ kind: "installing", offer });
     getApi()
-      .pluginInstall(plugin.id, offer.version, [...enabled], visibility)
+      .pluginInstall(plugin.id, offer.version, [...enabled], visibility, confirmed)
       .then(() => {
         showPluginToast(t("toast.installed", { name }));
         if (suggestedBy) {

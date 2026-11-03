@@ -42,6 +42,13 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
   };
 }
 
+const noReview = {
+  origins: [],
+  otherDomain: false,
+  risk: null,
+  needsHighRiskConfirm: false,
+  highRiskConfirmed: false,
+};
 const echolings = plugin({});
 const foo = plugin({
   id: "foo",
@@ -244,6 +251,9 @@ describe("InstalledTab", () => {
         size: 10,
         approval: null,
         failed: null,
+        needsMumcord: null,
+        hold: null,
+        review: noReview,
       },
     ]);
     const apply = vi.spyOn(api, "pluginApplyUpdate").mockResolvedValue(null);
@@ -282,6 +292,9 @@ describe("InstalledTab", () => {
         size: 10,
         approval: null,
         failed: null,
+        needsMumcord: null,
+        hold: null,
+        review: noReview,
       },
     ]);
     const { container } = render(<InstalledTab />);

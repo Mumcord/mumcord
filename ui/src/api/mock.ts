@@ -67,6 +67,7 @@ import type {
   ServerSnapshot,
   Settings,
   User,
+  PluginPlatformSettings,
   RepositoryPreview,
   RepositoryView,
   WatchParty,
@@ -1047,6 +1048,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   }
   // plugin repositories (spec 06): addresses under example.org work; a "bad" address fails.
   let repositories: RepositoryView[] = [];
+  let platformSettings: PluginPlatformSettings = {
+    blockHighRisk: false,
+    relayDataEnabled: true,
+    soundVolume: 70,
+    soundMuted: false,
+  };
   let nextRepositoryId = 1;
   function previewRepository(url: string, expectedKey: string | null): RepositoryPreview {
     if (!url.startsWith("https://"))
@@ -3069,6 +3076,14 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginUpdates: () => Promise.resolve([]),
     pluginCheckNow: () => Promise.resolve(null),
     pluginApplyUpdate: () => fail("notFound", "no update for this plugin"),
+    pluginScore: () => fail("notFound", "plugin not in the list"),
+    pluginConfirmUpdateHighRisk: () => fail("notFound", "no update for this plugin"),
+    pluginWebsites: () => fail("notFound", "no such plugin"),
+    pluginPlatformSettings: () => Promise.resolve(platformSettings),
+    pluginSetPlatformSettings: (settings) => {
+      platformSettings = { ...settings };
+      return Promise.resolve(null);
+    },
     pluginExportData: () => fail("notFound", "no such plugin"),
     pluginResetData: () => fail("notFound", "no such plugin"),
     pluginDevLoad: () => notImplemented("pluginDevLoad"),

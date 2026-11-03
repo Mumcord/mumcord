@@ -46,6 +46,15 @@ const update: PluginUpdate = {
   size: 340_000,
   approval: { kind: "newPermissions", permissions: ["http.allow"] },
   failed: null,
+  needsMumcord: null,
+  hold: null,
+  review: {
+    origins: [],
+    otherDomain: false,
+    risk: null,
+    needsHighRiskConfirm: false,
+    highRiskConfirmed: false,
+  },
 };
 
 function setup(updates: PluginUpdate[], installed: InstalledPlugin = plugin) {

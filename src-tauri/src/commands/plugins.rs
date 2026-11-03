@@ -10,13 +10,16 @@ use mumcord_engine::Engine;
 use mumcord_engine::store::PluginVisibility;
 use mumcord_plugins::Incompatibility;
 use mumcord_plugins::manifest::Visibility as ManifestVisibility;
+use mumcord_plugins::registry::Download;
 use mumcord_plugins::registry::{
     Choice, Client, Freshness, Index, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES,
     OFFLINE_TEXT, UrlPolicy, fetch_official, official_base,
 };
+use mumcord_plugins::score::Scored;
 use mumcord_plugins::service::{
-    Approval, CommandOutcome, InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService,
-    ServiceError, ServiceEvent, Status, StoredLine, UiInput, fetch, load_repository,
+    Approval, CommandOutcome, InstallCheck, InstallRequest, InstallStage, PeerInfo, PluginInfo,
+    PluginService, ScoreFrom, ServiceError, ServiceEvent, Status, StoredLine, UiInput, fetch,
+    load_repository,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::version::{Release, needs_mumcord_text};
@@ -27,6 +30,10 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use tauri::{AppHandle, Manager, State};
 
+use super::plugin_safety::{
+    PluginInstallCheck, PluginNetworkDay, PluginScoreSource, PluginScored, PluginUpdateHold,
+    PluginUpdateReview, PluginWebsite, PluginWebsites,
+};
 use super::types::{
     ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
 };
@@ -304,15 +311,24 @@ pub struct IndexedPlugin {
     pub size: f64,
     /// Every permission (required and optional) the version may ask for.
     pub permissions: Vec<String>,
+    /// FR-9.18: set (e.g. "0.8.0") when no version of the plugin runs on this Mumcord yet.
+    /// The card says "Needs Mumcord 0.8.0 or newer" and Install is disabled.
+    pub needs_mumcord: Option<String>,
+    /// The websites the shown version declares (`net.origins`); plain, untrusted text.
+    pub origins: Vec<String>,
 }
 
 impl IndexedPlugin {
     /// `None` for a plugin built for an API this Mumcord does not know: it is not listed
     /// (FR-9.16). One that needs a newer Mumcord is listed with its newest version.
     fn new(p: &IndexPlugin, source: IndexSource, language: &str) -> Option<Self> {
+        let mut needs_mumcord = None;
         let latest = match p.choose(&crate::plugins::app_version()) {
             Choice::Runnable(version) => version,
-            Choice::NeedsMumcord(_) => p.latest(),
+            Choice::NeedsMumcord(release) => {
+                needs_mumcord = Some(release.to_string());
+                p.latest()
+            }
             Choice::Unsupported => return None,
         };
         let alt = |texts: &std::collections::BTreeMap<String, String>| {
@@ -353,6 +369,8 @@ impl IndexedPlugin {
             version: latest.version.clone(),
             size: latest.size as f64,
             permissions: latest.permissions.clone(),
+            needs_mumcord,
+            origins: latest.origins.clone(),
         })
     }
 }
@@ -616,7 +634,7 @@ fn find_indexed(plugins: &Plugins, id: &str) -> ApiResult<(Source, IndexPlugin)>
 
 /// What the install prompt shows, read from the verified package's manifest (the index only
 /// lists every permission, not which are required).
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PluginInstallOffer {
     pub id: String,
@@ -629,6 +647,9 @@ pub struct PluginInstallOffer {
     /// What the plugin's chat patterns recognise, in the app language (shown with
     /// `chat.patterns`). Plugin text: plain, untrusted.
     pub chat_patterns: Vec<String>,
+    /// The score, the one confirmation box and the safety setting for this package, or the
+    /// hard stop that refuses it (`refused`: no Install button, the other fields are empty).
+    pub check: PluginInstallCheck,
 }
 
 /// Which store image of an index plugin to load.
@@ -678,7 +699,12 @@ fn indexed_latest(
     ))
 }
 
-fn install_offer(id: &str, manifest: &Manifest, chat_patterns: Vec<String>) -> PluginInstallOffer {
+fn install_offer(
+    id: &str,
+    manifest: &Manifest,
+    chat_patterns: Vec<String>,
+    check: PluginInstallCheck,
+) -> PluginInstallOffer {
     PluginInstallOffer {
         id: id.to_owned(),
         version: manifest.version.to_string(),
@@ -699,6 +725,21 @@ fn install_offer(id: &str, manifest: &Manifest, chat_patterns: Vec<String>) -> P
             Some(ManifestVisibility::Everyone) | None => PluginVisibilityChoice::Everyone,
         },
         chat_patterns,
+        check,
+    }
+}
+
+/// The offer of a package that was refused before it could be read: only the hard stop.
+fn refused_offer(id: &str, version: &str, check: PluginInstallCheck) -> PluginInstallOffer {
+    PluginInstallOffer {
+        id: id.to_owned(),
+        version: version.to_owned(),
+        authors: Vec::new(),
+        required: Vec::new(),
+        optional: Vec::new(),
+        default_visibility: PluginVisibilityChoice::Everyone,
+        chat_patterns: Vec::new(),
+        check,
     }
 }
 
@@ -726,12 +767,27 @@ pub async fn plugin_install_prepare(
         id: id.clone(),
         stage: InstallStage::Verifying,
     });
+    let version = entry.version.clone();
+    let checked = {
+        let entry = entry.clone();
+        plugins
+            .call(move |service| {
+                let check = service.install_check(source, &entry, &download)?;
+                Ok((check, download))
+            })
+            .await?
+    };
+    let (check, download) = checked;
+    let check = PluginInstallCheck::from(check);
+    if matches!(check, PluginInstallCheck::Refused { .. }) {
+        return Ok(refused_offer(&id, &version, check));
+    }
     let (download, offer) = tauri::async_runtime::spawn_blocking(move || {
         let verified = verify_package(&download.bytes, &entry, &download.signature, source)
             .map_err(|e| plugins::service_error(e.into()))?;
         let package = &verified.package;
         let chat_patterns = mumcord_plugins::i18n::chat_pattern_descriptions(package, &language);
-        let offer = install_offer(&entry.id, &package.manifest, chat_patterns);
+        let offer = install_offer(&entry.id, &package.manifest, chat_patterns, check);
         Ok::<_, ApiError>((download, offer))
     })
     .await
@@ -787,7 +843,9 @@ fn image_url(plugin: &IndexPlugin, image: PluginIndexImage) -> Option<(String, u
 }
 
 /// Installs a plugin from the lists loaded by `plugins_index` (official or a repository) (latest version unless
-/// `version` is given), with the optional permissions the user left on.
+/// `version` is given), with the optional permissions the user left on. `confirmed` is the tick
+/// of the prompt's confirmation box (`check.gate.confirm` of the offer); without it a gated
+/// plugin is refused, and "Don't allow high-risk plugins" refuses a High one even with it.
 #[tauri::command]
 #[specta::specta]
 pub async fn plugin_install(
@@ -797,6 +855,7 @@ pub async fn plugin_install(
     version: Option<String>,
     optional: Vec<String>,
     visibility: PluginVisibilityChoice,
+    confirmed: bool,
 ) -> ApiResult<()> {
     let plugins = plugins_of(&app)?;
     let (source, entry, url, size) = {
@@ -845,8 +904,7 @@ pub async fn plugin_install(
         entry,
         optional,
         visibility: visibility.into(),
-        // The prompt already shows its confirmation box; UI1/G1 pass the real tick here.
-        confirmed: true,
+        confirmed,
     };
     plugins
         .call(move |service| service.install(&request, &download))
@@ -928,6 +986,11 @@ pub struct PluginUpdate {
     /// FR-9.18: set (e.g. "0.8.0") when the newest version needs a newer Mumcord. The plugin
     /// stays on its version; show "Update available after updating Mumcord" and no install.
     pub needs_mumcord: Option<String>,
+    /// FR-9.81, FR-9.82: why the update does not install by itself although `approval` would let
+    /// it (new websites, the risk went up, the safety setting). The plugin stays on its version.
+    pub hold: Option<PluginUpdateHold>,
+    /// Websites and score before/after, for the review (FR-9.83).
+    pub review: PluginUpdateReview,
 }
 
 /// The updates waiting for the user.
@@ -961,10 +1024,193 @@ pub async fn plugin_updates(app: AppHandle) -> ApiResult<Vec<PluginUpdate>> {
                     }),
                     failed: u.failed,
                     needs_mumcord: u.needs_mumcord.map(|r| r.to_string()),
+                    hold: u.hold.map(Into::into),
+                    review: u.review.into(),
                 })
                 .collect())
         })
         .await
+}
+
+/// The security score of a store plugin version (FR-9.72). `listing` scores the signed index
+/// entry, as Browse shows it; `package` scores the package the install prompt downloaded for
+/// this version (so `plugin_install_prepare` ran first), as the prompt shows it. `version`
+/// defaults to the one the store offers. Never scored in the UI.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_score(
+    app: AppHandle,
+    id: String,
+    version: Option<String>,
+    from: PluginScoreSource,
+) -> ApiResult<PluginScored> {
+    let plugins = plugins_of(&app)?;
+    let (source, plugin) = find_indexed(&plugins, &id)?;
+    let chosen = match &version {
+        Some(v) => plugin
+            .version(v)
+            .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "version not in the list"))?,
+        None => match plugin.choose(&crate::plugins::app_version()) {
+            Choice::Runnable(version) => version,
+            Choice::NeedsMumcord(_) => plugin.latest(),
+            Choice::Unsupported => {
+                return Err(refused(&Incompatibility::NeedsNewerMumcord.to_string()));
+            }
+        },
+    };
+    let parsed = semver::Version::parse(&chosen.version)
+        .map_err(|e| ApiError::new(ErrorCode::InvalidInput, e.to_string()))?;
+    let scored = match from {
+        PluginScoreSource::Listing => {
+            let target = id.clone();
+            plugins
+                .call(move |service| {
+                    service.plugin_score(&source, &target, &parsed, ScoreFrom::Listing)
+                })
+                .await?
+        }
+        PluginScoreSource::Package => {
+            let entry = plugin.entry(chosen);
+            let download = {
+                let prepared = plugins.prepared();
+                let prepared = prepared
+                    .as_ref()
+                    .filter(|p| p.id == id && p.version == entry.version)
+                    .ok_or_else(|| {
+                        ApiError::new(ErrorCode::NotFound, "the package was not downloaded yet")
+                    })?;
+                Download {
+                    bytes: prepared.download.bytes.clone(),
+                    signature: prepared.download.signature.clone(),
+                }
+            };
+            let check = plugins
+                .call(move |service| service.install_check(source, &entry, &download))
+                .await?;
+            match check {
+                InstallCheck::Ready { score, .. } => score.score,
+                InstallCheck::Refused { refusal } => Scored::Refused(refusal.stop),
+            }
+        }
+    };
+    Ok(scored.into())
+}
+
+/// FR-9.83: the tick "I understand the risk went up and I still trust the author" for the
+/// waiting update of `id` to `version`. `plugin_apply_update` needs it for an update that makes
+/// the plugin High (`review.needsHighRiskConfirm`); the updates list shows it as
+/// `review.highRiskConfirmed` afterwards.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_confirm_update_high_risk(
+    app: AppHandle,
+    id: String,
+    version: String,
+) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.confirm_update_high_risk(&id, &version))
+        .await
+}
+
+/// The websites an installed plugin declares and what it did with them over the last 7 days
+/// (FR-9.30). Both are empty for a plugin without websites.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_websites(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: String,
+) -> ApiResult<PluginWebsites> {
+    let plugins = plugins_of(&app)?;
+    let target = id.clone();
+    let dir = plugins
+        .call(move |service| Ok(service.dir(&target).map(std::path::Path::to_path_buf)))
+        .await?
+        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not installed"))?;
+    let manifest = tauri::async_runtime::spawn_blocking(move || {
+        std::fs::read(dir.join(mumcord_plugins::package::MANIFEST_FILE))
+            .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
+            .and_then(|bytes| {
+                Manifest::parse(&bytes)
+                    .map_err(|e| ApiError::new(ErrorCode::InvalidInput, e.to_string()))
+            })
+    })
+    .await
+    .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))??;
+    let origins = manifest
+        .net
+        .map(|net| {
+            net.origins
+                .into_iter()
+                .map(|o| PluginWebsite {
+                    origin: o.origin,
+                    purpose: o.purpose,
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let counters = {
+        let store = engine.store_handle();
+        let store = store
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        store
+            .plugin_origin_counters(&id)
+            .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
+    };
+    let count = |n: i64| u32::try_from(n).unwrap_or(0);
+    let days = counters
+        .into_iter()
+        .map(|c| PluginNetworkDay {
+            day: c.day,
+            requests: count(c.requests),
+            blocked: count(c.blocked),
+            last_request_at: c.last_request_at.map(|at| at as f64),
+            last_host: c.last_host,
+        })
+        .collect();
+    Ok(PluginWebsites { origins, days })
+}
+
+/// The plugin platform's own settings (Settings → Plugins).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginPlatformSettings {
+    /// "Don't allow high-risk plugins" (FR-9.81). Off by default.
+    pub block_high_risk: bool,
+    /// Plugins may send and receive data through the relay. On by default.
+    pub relay_data_enabled: bool,
+    /// Plugin sound volume in percent, 0–100.
+    pub sound_volume: u8,
+    pub sound_muted: bool,
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn plugin_platform_settings(engine: State<'_, Engine>) -> ApiResult<PluginPlatformSettings> {
+    let plugins = engine.settings()?.plugins;
+    Ok(PluginPlatformSettings {
+        block_high_risk: plugins.block_high_risk,
+        relay_data_enabled: plugins.relay_data_enabled,
+        sound_volume: plugins.sound_volume,
+        sound_muted: plugins.sound_muted,
+    })
+}
+
+/// Saves the plugin platform's settings; the volume is clamped to 0–100.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_platform_settings(
+    engine: State<'_, Engine>,
+    settings: PluginPlatformSettings,
+) -> ApiResult<()> {
+    let mut stored = engine.settings()?;
+    stored.plugins.block_high_risk = settings.block_high_risk;
+    stored.plugins.relay_data_enabled = settings.relay_data_enabled;
+    stored.plugins.sound_volume = settings.sound_volume.min(100);
+    stored.plugins.sound_muted = settings.sound_muted;
+    engine.update_settings(stored).await?;
+    Ok(())
 }
 
 /// Installs the waiting update of `id`; `optional` are the optional permissions to keep on.
@@ -1482,6 +1728,7 @@ pub(super) fn registry_error(error: mumcord_plugins::registry::RegistryError) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::commands::plugin_safety::PluginHardStop;
     use mumcord_plugins::registry::Severity;
     use mumcord_plugins::service::RevocationNotice;
 
@@ -1626,7 +1873,15 @@ mod tests {
             .as_bytes(),
         )
         .expect("test step");
-        let offer = install_offer("poll", &manifest, vec!["Recognise polls".into()]);
+        let offer = install_offer(
+            "poll",
+            &manifest,
+            vec!["Recognise polls".into()],
+            PluginInstallCheck::Refused {
+                stop: PluginHardStop::Revoked,
+                reason: "Turned off".into(),
+            },
+        );
         assert_eq!(offer.version, "1.1.0");
         assert_eq!(offer.required, ["ui.chat-card", "peers.messages"]);
         assert_eq!(
