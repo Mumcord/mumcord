@@ -2,9 +2,10 @@
  * The files waiting in the attachment tray of the message input: adding by path (picker or
  * native drop), live progress from the engine, removing and sending as one offer per file.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { EngineError, getApi } from "../../../api";
+import { ViewContext } from "../../../app/view";
 import type { FileChip, FilesUnavailable } from "../../../bindings/commands";
 import { shownServerId } from "../../channels/serverStore";
 import { addSentMessage } from "../../chat/chatStore";
@@ -50,8 +51,11 @@ export function useFileChips(enabled: boolean): FileChips {
   }, []);
 
   const serverId = shownServerId();
+  // The engine sends no event when settings change: opening and closing the settings reads the
+  // availability again (the peer-to-peer mode lives there).
+  const overlay = useContext(ViewContext)?.overlay ?? null;
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || overlay !== null) return;
     let alive = true;
     const refresh = () => {
       getApi()
@@ -66,13 +70,17 @@ export function useFileChips(enabled: boolean): FileChips {
         );
     };
     refresh();
-    // The peer-to-peer setting is changed in the settings window; looking again on return covers it.
+    // The settings can also change in a separate window; looking again on return covers it.
     window.addEventListener("focus", refresh);
+    const stopRelay = getApi().on("relayChanged", (event) => {
+      if (event.serverId === serverId) refresh();
+    });
     return () => {
       alive = false;
       window.removeEventListener("focus", refresh);
+      stopRelay();
     };
-  }, [enabled, serverId]);
+  }, [enabled, serverId, overlay]);
 
   const addPaths = useCallback(
     async (paths: readonly string[]) => {

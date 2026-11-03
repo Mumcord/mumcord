@@ -2,7 +2,8 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import type { DragDropEvent } from "@tauri-apps/api/webview";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../api";
-import type { FileChip } from "../../bindings/commands";
+import type { FileChip, RelayInfo } from "../../bindings/commands";
+import { ViewContext, type View } from "../../app/view";
 import { chipStatus } from "../files/composer/chipView";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { i18n } from "../../i18n";
@@ -106,6 +107,55 @@ describe("Composer file sharing", () => {
     const button = screen.getByRole("button", { name: "Share files in this channel" });
     expect(button.getAttribute("aria-disabled")).toBe("true");
     expect(button.getAttribute("data-tooltip")).toBe(reason);
+  });
+
+  it("reads the availability again when the relay changes or the settings close", async () => {
+    const availability = vi
+      .spyOn(api, "filesAvailability")
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ kind: "noRelay" })
+      .mockResolvedValue({ kind: "p2pMode", mode: "directOnly" });
+    const view = (overlay: "settings" | null) => ({ overlay }) as unknown as View;
+    const { rerender } = render(
+      <ViewContext.Provider value={view(null)}>
+        <div className="chat">
+          <Composer
+            target={CHANNEL}
+            limits={{ text: 5000, image: 100_000, allowHtml: true }}
+            label="Message #General"
+            blockedReason={null}
+          />
+        </div>
+      </ViewContext.Provider>,
+    );
+    await waitFor(() => {
+      expect(availability).toHaveBeenCalledTimes(1);
+    });
+    act(() => {
+      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+    });
+    expect(
+      await screen.findByText("This server has no relay, so file sharing isn't available."),
+    ).toBeTruthy();
+    const again = (overlay: "settings" | null) => (
+      <ViewContext.Provider value={view(overlay)}>
+        <div className="chat">
+          <Composer
+            target={CHANNEL}
+            limits={{ text: 5000, image: 100_000, allowHtml: true }}
+            label="Message #General"
+            blockedReason={null}
+          />
+        </div>
+      </ViewContext.Provider>
+    );
+    rerender(again("settings"));
+    rerender(again(null));
+    expect(
+      await screen.findByText(
+        "File sharing needs the relay; your peer-to-peer setting is Direct only.",
+      ),
+    ).toBeTruthy();
   });
 
   it("has no paperclip in a private chat and refuses a drop on the chat", () => {
