@@ -243,6 +243,24 @@ pub const CATALOGUE: &[Permission] = &[
         "Play short sounds that come with the plugin",
         "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins.",
     ),
+    all_1_1(
+        "files.save",
+        Risk::Green,
+        "Save files you choose",
+        "Mumcord asks you where to save each file after you click; the plugin never sees your folders.",
+    ),
+    all_1_1(
+        "chat.post-image",
+        Risk::Yellow,
+        "Post an image in chat after you click",
+        "After you click in the plugin, it can post one picture into your current channel, labelled with its name.",
+    ),
+    all_1_1(
+        "files.import-picture",
+        Risk::Green,
+        "Open pictures you choose",
+        "Mumcord lets you pick a picture after you click; the plugin gets only that picture, never your folders.",
+    ),
 ];
 
 /// Looks up a permission by id.
@@ -256,11 +274,11 @@ mod tests {
 
     #[test]
     fn catalogue_is_closed_and_unique() {
-        assert_eq!(CATALOGUE.len(), 27);
+        assert_eq!(CATALOGUE.len(), 30);
         let mut ids: Vec<_> = CATALOGUE.iter().map(|p| p.id).collect();
         ids.sort_unstable();
         ids.dedup();
-        assert_eq!(ids.len(), 27);
+        assert_eq!(ids.len(), 30);
         assert!(get("files").is_none());
     }
 
@@ -292,6 +310,9 @@ mod tests {
                 ("net.origins", Risk::Red, false),
                 ("peers.relay", Risk::Yellow, false),
                 ("audio.effects", Risk::Green, false),
+                ("files.save", Risk::Green, false),
+                ("chat.post-image", Risk::Yellow, false),
+                ("files.import-picture", Risk::Green, false),
             ]
         );
         assert!(
