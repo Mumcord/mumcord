@@ -33,6 +33,8 @@ pub const ENCRYPTION_OVERHEAD: u32 = 64;
 pub const MAX_VIDEO_PAYLOAD: u32 = 4 * 1024 * 1024 + ENCRYPTION_OVERHEAD;
 /// Largest encrypted audio payload: a multi-frame Opus packet plus overhead.
 pub const MAX_AUDIO_PAYLOAD: u32 = 4 * 1024 + ENCRYPTION_OVERHEAD;
+/// Largest encrypted plugin data payload: 64 KiB (mumpeer's default `max_unit_bytes`) plus overhead.
+pub const MAX_DATA_PAYLOAD: u32 = 64 * 1024 + ENCRYPTION_OVERHEAD;
 /// Largest opaque body of a `keyreq` or `key` control message.
 pub const MAX_KEY_BODY: u32 = 1024;
 /// Size of the subscriber slot number that prefixes `keyreq` (added by the relay), `key` (set
@@ -42,6 +44,7 @@ pub const SLOT_LEN: u32 = 2;
 const KIND_VIDEO: u8 = 1;
 const KIND_AUDIO: u8 = 2;
 const KIND_CONTROL: u8 = 3;
+const KIND_DATA: u8 = 4;
 const FLAG_KEYFRAME: u8 = 0b1;
 const CODEC_VP9: u8 = 1;
 const CODEC_AV1: u8 = 2;
@@ -175,6 +178,9 @@ pub enum Content {
     },
     /// An encrypted Opus packet of the share sound.
     Audio,
+    /// An encrypted plugin data unit (spec 09). The relay forwards it without looking inside and
+    /// treats it as the lowest priority.
+    Data,
     /// A control message (not encrypted by this layer; `keyreq`/`key` bodies are protected by
     /// the key exchange itself).
     Control(ControlKind),
@@ -233,6 +239,7 @@ impl Header {
                 },
             ),
             Content::Audio => (KIND_AUDIO, 0, 0, CODEC_OPUS),
+            Content::Data => (KIND_DATA, 0, 0, 0),
             Content::Control(control) => (KIND_CONTROL, 0, 0, control as u8),
         };
         let mut out = [0u8; HEADER_LEN];
@@ -277,6 +284,12 @@ impl Header {
                 }
                 Content::Audio
             }
+            KIND_DATA => {
+                if codec != 0 {
+                    return Err(HeaderError::BadCodec(codec));
+                }
+                Content::Data
+            }
             KIND_CONTROL => {
                 Content::Control(ControlKind::from_byte(codec).ok_or(HeaderError::BadCodec(codec))?)
             }
@@ -309,6 +322,7 @@ impl Header {
                 (1, MAX_VIDEO_PAYLOAD)
             }
             Content::Audio => (1, MAX_AUDIO_PAYLOAD),
+            Content::Data => (1, MAX_DATA_PAYLOAD),
             Content::Control(control) => {
                 if self.key_id != 0 || self.sequence != 0 {
                     return Err(HeaderError::BadControl);
@@ -389,6 +403,15 @@ mod tests {
                 },
             ),
             (
+                "010400000003000000070000015e",
+                Header {
+                    content: Content::Data,
+                    key_id: 3,
+                    sequence: 7,
+                    payload_len: 350,
+                },
+            ),
+            (
                 "0103000001000000000000000062",
                 control(ControlKind::KeyRequest, 98),
             ),
@@ -449,7 +472,7 @@ mod tests {
         let cases = [
             (with(0, 2), HeaderError::UnsupportedVersion(2)),
             (with(1, 0), HeaderError::BadKind(0)),
-            (with(1, 4), HeaderError::BadKind(4)),
+            (with(1, 5), HeaderError::BadKind(5)),
             (with(2, 0b10), HeaderError::BadFlags),
             (with(3, 4), HeaderError::BadLayer(4)),
             (with(4, 3), HeaderError::BadCodec(3)),
@@ -466,6 +489,12 @@ mod tests {
             (
                 size(KIND_AUDIO, CODEC_OPUS, MAX_AUDIO_PAYLOAD + 1),
                 HeaderError::BadSize(MAX_AUDIO_PAYLOAD + 1),
+            ),
+            (size(KIND_DATA, 1, 10), HeaderError::BadCodec(1)),
+            (size(KIND_DATA, 0, 0), HeaderError::BadSize(0)),
+            (
+                size(KIND_DATA, 0, MAX_DATA_PAYLOAD + 1),
+                HeaderError::BadSize(MAX_DATA_PAYLOAD + 1),
             ),
             (size(KIND_CONTROL, 6, 0), HeaderError::BadCodec(6)),
             (size(KIND_CONTROL, 3, 1), HeaderError::BadSize(1)),
