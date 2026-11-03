@@ -511,6 +511,10 @@ pub async fn plugins_index(
             engine.update_settings(stored).await?;
         }
     }
+    let noted = loaded.index.clone();
+    plugins
+        .call(move |service| service.note_index(Source::Official, &noted))
+        .await?;
     let repositories = {
         let store = engine.store_handle();
         let store = store

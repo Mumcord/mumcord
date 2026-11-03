@@ -3,6 +3,7 @@
 
 use std::path::{Path, PathBuf};
 
+use mumcord_store::{Store, UnixMillis, VersionHistoryEntry};
 use reqwest::Url;
 
 use super::cache::{Cache, Cached};
@@ -229,6 +230,35 @@ pub(super) enum Missing {
     Error,
 }
 
+/// Records what a loaded index shows for the security score: the first time this device saw
+/// each key (key age, FR-9.74) and each listed version with its permissions (history, FR-9.73
+/// H; the index has no publication dates). Rows that exist keep their first-seen time, so
+/// calling this on every load is safe.
+pub fn note_index(
+    store: &Store,
+    index: &Index,
+    now: UnixMillis,
+) -> Result<(), mumcord_store::Error> {
+    if let Some(repository) = &index.repository {
+        store.note_repo_key_seen(&repository.public_key, now)?;
+    }
+    for plugin in &index.plugins {
+        for key in &plugin.author_keys {
+            store.note_repo_key_seen(key, now)?;
+        }
+        for version in &plugin.versions {
+            store.record_plugin_version(&VersionHistoryEntry {
+                plugin_id: plugin.id.clone(),
+                version: version.version.clone(),
+                permissions: serde_json::Value::from(version.permissions.clone()).to_string(),
+                origins: serde_json::Value::from(version.origins.clone()).to_string(),
+                seen_at: now,
+            })?;
+        }
+    }
+    Ok(())
+}
+
 /// Shared ETag / verify / offline logic. `accept` checks signature, format and sequence; a
 /// cached copy goes through the same check before it is used.
 pub(super) async fn fetch_signed<T>(
@@ -344,5 +374,40 @@ mod base_tests {
     fn blank_values_are_ignored() {
         let base = official_base_with(Some(" "), Some("")).expect("test step");
         assert_eq!(base.as_str(), OFFICIAL_BASE_URL);
+    }
+
+    #[test]
+    fn note_index_keeps_the_first_seen_time() {
+        use super::super::index::tests::{AUTHOR, plugin};
+        let dir = tempfile::tempdir().expect("temp dir");
+        let store = Store::open(dir.path()).expect("store");
+        let bytes = serde_json::to_vec(&serde_json::json!({
+            "format": 1, "sequence": 1,
+            "repository": {"name": "Repo", "public_key": AUTHOR},
+            "plugins": [plugin("dice")]
+        }))
+        .expect("test step");
+        let none = |_: &str| false;
+        let index = Index::parse(
+            &bytes,
+            &IndexKind::Repository {
+                is_official_id: &none,
+            },
+        )
+        .expect("index");
+
+        note_index(&store, &index, 10).expect("first load");
+        note_index(&store, &index, 20).expect("second load");
+
+        assert_eq!(store.repo_key_first_seen(AUTHOR).expect("key"), Some(10));
+        let history = store.plugin_version_history("dice").expect("history");
+        let rows: Vec<(&str, &str, i64)> = history
+            .iter()
+            .map(|h| (h.version.as_str(), h.permissions.as_str(), h.seen_at))
+            .collect();
+        assert_eq!(
+            rows,
+            vec![("1.0.0", r#"["chat.send"]"#, 10), ("1.2.0", "[]", 10)]
+        );
     }
 }

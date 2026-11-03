@@ -222,6 +222,8 @@ pub async fn run_check(
                 })
                 .await??;
             }
+            let index = loaded.index.clone();
+            with_service(service, move |s| s.note_index(Source::Official, &index)).await??;
             indexes.push((Source::Official, loaded.index));
         }
         Err(error) => tracing::warn!(%error, "could not load the official index"),
@@ -308,6 +310,11 @@ pub async fn load_repository(
         })
         .await??;
     }
+    let index = loaded.index.clone();
+    with_service(service, move |s| {
+        s.note_index(Source::Repo { repository_id: id }, &index)
+    })
+    .await??;
     Ok(Some(loaded.index))
 }
 

@@ -31,7 +31,9 @@ pub use repo::{
     RepoOutcome, RepoPreview, check_repository_url, fetch_repository, preview_repository,
 };
 pub use revoked::{Revocation, RevocationList, Severity};
-pub use sync::{Freshness, Loaded, RevokedLoaded, fetch_official, fetch_revoked, official_base};
+pub use sync::{
+    Freshness, Loaded, RevokedLoaded, fetch_official, fetch_revoked, note_index, official_base,
+};
 
 use crate::verify::VerifyFailure;
 

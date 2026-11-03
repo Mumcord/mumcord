@@ -36,10 +36,11 @@ use crate::api::secrets::PluginSecrets;
 use crate::api::storage::{DataError, Storage};
 use crate::host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 use crate::manifest::{ManifestError, OptionalPermission, Source};
-use crate::package::PackageError;
+use crate::package::{Package, PackageError};
 use crate::peer_key::PeerKeys;
-use crate::registry::RegistryError;
+use crate::registry::{Index, IndexPlugin, RegistryError};
 use crate::runtime::{CompileError, HostContext};
+use crate::score::{Score, Scored, facts};
 use crate::verify::{Integrity, VerifyFailure};
 use crate::wit::events::{Event, PluginSettings};
 use crate::wit::theme::Mode;
@@ -232,6 +233,8 @@ pub enum ServiceError {
     Io(#[from] io::Error),
     #[error("no plugin with the id {0:?} is installed")]
     NotInstalled(String),
+    #[error("{id} {version} is not in the loaded plugin lists")]
+    NotListed { id: String, version: String },
     #[error("This plugin is already installed")]
     AlreadyInstalled,
     #[error("Another plugin with the id {0:?} is already installed")]
@@ -337,6 +340,8 @@ pub struct PluginService {
     match_limit: crate::triggers::RateLimit,
     /// Chat messages each plugin already got, so a history replay never repeats one.
     replayed: replay::Seen,
+    /// The signed indexes last loaded, one per source, for listing scores (FR-9.76).
+    listings: Vec<(Source, Index)>,
 }
 
 impl PluginService {
@@ -400,6 +405,7 @@ impl PluginService {
                 crate::patterns::RATE_WINDOW,
             ),
             replayed: replay::Seen::default(),
+            listings: Vec::new(),
         };
         Ok((service, host_rx, events_rx))
     }
@@ -764,8 +770,164 @@ fn with_required<'a>(
         .chain(optional)
 }
 
+/// What a security score is computed from (FR-9.76).
+pub enum ScoreFrom<'a> {
+    /// The signed index entry, as Browse shows it.
+    Listing,
+    /// The verified package, as the install prompt shows it.
+    Package {
+        package: &'a Package,
+        /// Size of the downloaded `.mcplugin`.
+        bytes: u64,
+        /// The author key the package signature was checked with.
+        author_key: &'a str,
+    },
+}
+
+/// The install prompt's score: the package score, plus whether it is worse than the listing
+/// promised ("This plugin scores higher than its listing said", FR-9.76).
+#[derive(Debug, Clone, PartialEq, serde::Serialize)]
+pub struct InstallScore {
+    pub score: Scored,
+    /// `None` when the version is not listed (e.g. Developer mode).
+    pub listing: Option<Scored>,
+    pub higher_than_listing: bool,
+}
+
+impl PluginService {
+    /// Remembers a freshly loaded signed index for listing scores and records its keys and
+    /// versions as seen on this device. Call it after every successful index load.
+    pub fn note_index(&mut self, source: Source, index: &Index) -> Result<(), ServiceError> {
+        crate::registry::note_index(&self.store(), index, now_millis())?;
+        self.listings.retain(|(known, _)| *known != source);
+        self.listings.push((source, index.clone()));
+        Ok(())
+    }
+
+    fn listed(&self, source: &Source, id: &str) -> Option<&IndexPlugin> {
+        self.listings
+            .iter()
+            .filter(|(known, _)| known == source)
+            .find_map(|(_, index)| index.plugin(id))
+    }
+
+    /// The security score of `id` `version` from `source` (FR-9.72). Official plugins answer
+    /// [`Scored::Official`]. Hard stops are the install flow's to set.
+    pub fn plugin_score(
+        &self,
+        source: &Source,
+        id: &str,
+        version: &Version,
+        from: ScoreFrom<'_>,
+    ) -> Result<Scored, ServiceError> {
+        let plugin = self.listed(source, id);
+        let listed_version = plugin.and_then(|p| {
+            p.versions
+                .iter()
+                .find(|v| Version::parse(&v.version).is_ok_and(|v| v == *version))
+        });
+        let facts = match from {
+            ScoreFrom::Listing => {
+                let (Some(plugin), Some(listed)) = (plugin, listed_version) else {
+                    return Err(ServiceError::NotListed {
+                        id: id.to_owned(),
+                        version: version.to_string(),
+                    });
+                };
+                let keys: Vec<&str> = plugin.author_keys.iter().map(String::as_str).collect();
+                let local = facts::Local::load(&self.store(), id, &keys, now_millis())?;
+                facts::from_listing(source, plugin, listed, &local)
+            }
+            ScoreFrom::Package {
+                package,
+                bytes,
+                author_key,
+            } => {
+                let local = facts::Local::load(&self.store(), id, &[author_key], now_millis())?;
+                let listing = plugin.map(|p| (p, listed_version));
+                facts::from_package(source, package, bytes, author_key, listing, &local)
+            }
+        };
+        Ok(crate::score::score(&facts))
+    }
+
+    /// Scores a verified package for the install prompt and compares it with its listing.
+    pub fn install_score(
+        &self,
+        source: &Source,
+        package: &Package,
+        bytes: u64,
+        author_key: &str,
+    ) -> Result<InstallScore, ServiceError> {
+        let id = &package.manifest.id;
+        let version = &package.manifest.version;
+        let score = self.plugin_score(
+            source,
+            id,
+            version,
+            ScoreFrom::Package {
+                package,
+                bytes,
+                author_key,
+            },
+        )?;
+        let listing = match self.plugin_score(source, id, version, ScoreFrom::Listing) {
+            Ok(listing) => Some(listing),
+            Err(ServiceError::NotListed { .. }) => None,
+            Err(error) => return Err(error),
+        };
+        Ok(InstallScore {
+            higher_than_listing: higher(&score, listing.as_ref()),
+            score,
+            listing,
+        })
+    }
+}
+
+fn higher(package: &Scored, listing: Option<&Scored>) -> bool {
+    let value = |s: &Scored| match s {
+        Scored::Scored(Score { value, .. }) => Some(*value),
+        Scored::Official | Scored::Refused(_) => None,
+    };
+    matches!(
+        (value(package), listing.and_then(value)),
+        (Some(package), Some(listing)) if package > listing
+    )
+}
+
 fn now_millis() -> UnixMillis {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| i64::try_from(d.as_millis()).unwrap_or(i64::MAX))
+}
+
+#[cfg(test)]
+mod score_tests {
+    use super::*;
+    use crate::score::{HardStop, band_of};
+
+    fn scored(value: u8) -> Scored {
+        Scored::Scored(Score {
+            value,
+            band: band_of(value),
+            e: 0,
+            f: 1.0,
+            h: 0,
+            factors: Vec::new(),
+            version: 1,
+        })
+    }
+
+    #[test]
+    fn only_a_worse_package_score_is_flagged() {
+        assert!(higher(&scored(40), Some(&scored(30))));
+        assert!(!higher(&scored(30), Some(&scored(30))));
+        assert!(!higher(&scored(20), Some(&scored(30))));
+        assert!(!higher(&scored(40), None));
+        assert!(!higher(&Scored::Official, Some(&Scored::Official)));
+        assert!(!higher(
+            &Scored::Refused(HardStop::HashMismatch),
+            Some(&scored(30))
+        ));
+    }
 }
