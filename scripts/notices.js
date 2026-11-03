@@ -192,6 +192,13 @@ const versions = {
       /^PACKAGE_VERSION="(.*)"$/mu,
       "the libopus version",
     ),
+  // The Bovnar crate lives in rust/ of the C library's repository (issue #400).
+  "@bovnar": () =>
+    match(
+      join(crateDir("bovnar"), "../include/bovnar.h"),
+      /^#define BVNR_VERSION_STRING\s+"(.*)"$/mu,
+      "the Bovnar version",
+    ),
   "@sqlite": () =>
     match(
       join(crateDir("libsqlite3-sys"), "sqlite3/sqlite3.h"),
@@ -199,7 +206,11 @@ const versions = {
       "the SQLite version",
     ),
 };
-const textFiles = { "@opus-copying": () => join(crateDir("opusic-sys"), "opus/COPYING") };
+const textFiles = {
+  "@opus-copying": () => join(crateDir("opusic-sys"), "opus/COPYING"),
+  "@bovnar-license": () => join(crateDir("bovnar"), "../LICENSE"),
+  "@bovnar-notices": () => join(crateDir("bovnar"), "../THIRD_PARTY_NOTICES.md"),
+};
 const nativeOut = [];
 const printed = new Map();
 for (const c of readJson(join(opt.root, "licenses/native.json")).components) {
