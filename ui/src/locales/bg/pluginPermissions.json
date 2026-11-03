@@ -33,7 +33,10 @@
     "uiAppMenu": "Add items to the Apps menu",
     "netOrigins": "Talk to these websites",
     "peersRelay": "Send data through the server's relay",
-    "audioEffects": "Play short sounds that come with the plugin"
+    "audioEffects": "Play short sounds that come with the plugin",
+    "filesSave": "Save files you choose",
+    "chatPostImage": "Post an image in chat after you click",
+    "filesImportPicture": "Open pictures you choose"
   },
   "explanations": {
     "uiPanel": "Малък панел на тази добавка се показва в лентата с добавки.",
@@ -62,7 +65,10 @@
     "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
     "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
     "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
-    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins.",
+    "filesSave": "Mumcord asks you where to save each file after you click; the plugin never sees your folders.",
+    "chatPostImage": "After you click in the plugin, it can post one picture into your current channel, labelled with its name.",
+    "filesImportPicture": "Mumcord lets you pick a picture after you click; the plugin gets only that picture, never your folders."
   },
   "listLabel": "Разрешения"
 }
