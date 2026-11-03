@@ -36,6 +36,18 @@ function valueOf(label: string): string | null | undefined {
   return screen.getByText(label).closest("div")?.querySelector("dd")?.textContent;
 }
 
+describe("relay allows row", () => {
+  it("lists the allowed uses in a fixed order", () => {
+    view({ ...RELAY, uses: ["screenShare", "images"] });
+    expect(valueOf("Relay allows")).toBe("Images · Screen sharing");
+  });
+
+  it("is hidden when the relay is unusable", () => {
+    view({ ...RELAY, status: { kind: "none" }, uses: [] });
+    expect(screen.queryByText("Relay allows")).toBeNull();
+  });
+});
+
 afterEach(() => {
   setApi(undefined);
 });
