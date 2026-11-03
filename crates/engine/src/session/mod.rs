@@ -254,6 +254,8 @@ struct Inner {
     /// Shared "now gaming" status (FR-1.59).
     now_gaming: Mutex<crate::now_gaming::NowGaming>,
     user_stats: Mutex<crate::stats::UserStatsHub>,
+    /// Ban lists held in memory while the Server administration window is open (issue #254).
+    ban_lists: Mutex<crate::banlist::BanLists>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
@@ -590,6 +592,7 @@ impl Engine {
             now_playing: Mutex::new(crate::now_playing::NowPlaying::new(settings.now_playing)),
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
             user_stats: Mutex::default(),
+            ban_lists: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
@@ -875,6 +878,10 @@ impl Engine {
 
     pub(crate) fn user_stats_state(&self) -> &Mutex<crate::stats::UserStatsHub> {
         &self.inner.user_stats
+    }
+
+    pub(crate) fn ban_lists_state(&self) -> &Mutex<crate::banlist::BanLists> {
+        &self.inner.ban_lists
     }
 
     pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
@@ -1868,6 +1875,7 @@ impl Inner {
             crate::plugins::on_disconnect(self.events.plugins(), server_id);
             crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
+            crate::banlist::on_disconnect(&self.ban_lists, server_id);
             self.forget_password_attempt(server_id);
             self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
@@ -2758,6 +2766,14 @@ impl Inner {
                 ctx.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
+                // A ban-list query is refused with the Ban permission (issue #254).
+                if denied.permission == Some(mumcord_protocol::permissions::BAN) {
+                    crate::banlist::on_denied(
+                        &self.ban_lists,
+                        ctx.server_id,
+                        convert::denial_error(denied),
+                    );
+                }
                 ctx.events.emit(EngineEvent::ServerDenied {
                     error: convert::denial_error(denied),
                     channel_id: denied.channel_id,
@@ -2826,6 +2842,8 @@ impl Inner {
                 crate::plugins::on_plugin_data(ctx.events.plugins(), ctx, data, &self.inspector);
             }
             Event::UserStats(stats) => crate::stats::on_stats(&self.user_stats, ctx, stats),
+            // The Server administration window's Bans tab is the consumer (issue #254).
+            Event::BanList(list) => crate::banlist::on_answer(&self.ban_lists, ctx.server_id, list),
             // Here rather than in the extension hooks: the private message rule needs to know
             // who runs Mumcord (issue #141).
             Event::TextMessage(message) => {

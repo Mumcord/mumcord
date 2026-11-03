@@ -78,6 +78,7 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             move_users: bits
                 .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
                 .is_some_and(|b| b & permissions::MOVE != 0),
+            ban: bits.is_some_and(|b| b & permissions::BAN != 0),
         },
         description: channel
             .description

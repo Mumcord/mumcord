@@ -123,6 +123,9 @@ pub struct ChannelPermissions {
     pub write: bool,
     /// Move other people out of this channel; only true once the server confirmed it.
     pub move_users: bool,
+    /// Ban right (issue #254). The server grants it on the root channel, and ACLs inherit it
+    /// downwards, so this is what decides whether the Ban list entry shows (FR-10.2).
+    pub ban: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
