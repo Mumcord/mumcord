@@ -140,11 +140,12 @@ impl OwnShare {
         removed
     }
 
-    /// The frame version `viewer` reads; version 1 for anyone unknown.
-    pub fn wire_version(&self, viewer: u32) -> u8 {
+    /// What `viewer` can play; an unknown viewer counts as 0.6.x.
+    pub fn viewer_caps(&self, viewer: u32) -> ViewerCaps {
         self.caps
             .get(&viewer)
-            .map_or(super::wire::V1, |caps| caps.wire)
+            .copied()
+            .unwrap_or_else(|| ViewerCaps::from_watch(&[]))
     }
 
     /// The first viewer that cannot play AV1; the share runs VP9 while there is one (FR-7.58).
@@ -416,10 +417,10 @@ mod tests {
         assert_eq!(own.av1_blocker(), None);
         own.admit(4, old);
         assert_eq!(own.av1_blocker(), Some(4));
-        assert_eq!((own.wire_version(1), own.wire_version(4)), (2, 1));
+        assert_eq!((own.viewer_caps(1), own.viewer_caps(4)), (NEW, old));
         assert!(own.remove_viewer(4));
         assert_eq!(own.av1_blocker(), None);
-        assert_eq!(own.wire_version(4), 1, "unknown viewers get version 1");
+        assert_eq!(own.viewer_caps(4), old, "unknown viewers count as 0.6.x");
         own.admit(1, vp9_only);
         assert_eq!(
             own.av1_blocker(),

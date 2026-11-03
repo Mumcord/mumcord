@@ -530,15 +530,15 @@ pub(crate) async fn serve_direct(
             let media = own.media.as_ref()?;
             // An accepted viewer opens a stream again when the connection to them was
             // replaced (a file moved it to the relay); the old stream died with it.
-            let version = own.wire_version(session);
+            let caps = own.viewer_caps(session);
             let slot = own.viewers.get_mut(&session)?;
-            Some((media, slot, version))
+            Some((media, slot, caps))
         });
     match slot {
-        Some((media, slot, version)) => {
+        Some((media, slot, caps)) => {
             // The old link leaves the hub before the new one joins under the same session.
             drop(slot.take());
-            *slot = Some(media.add_viewer(engine.runtime(), session, version, send, recv));
+            *slot = Some(media.add_viewer(engine.runtime(), session, caps, send, recv));
         }
         None => tracing::debug!(
             ?server_id,

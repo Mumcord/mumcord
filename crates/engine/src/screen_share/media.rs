@@ -31,6 +31,7 @@ use super::encoder::ActiveEncoder;
 use super::encoder::monitor::{FrameLoad, LoadDetails, LoadMonitor};
 use super::fanout::{RateLimit, ViewerQueue};
 use super::quality::{Load, LoweredReason, Quality, QualityPrefs, Steps};
+use super::state::ViewerCaps;
 use super::thumbnail::ShareThumbnail;
 use super::wire::{self, Frame, FrameHeader, FrameKind};
 use crate::session::lock;
@@ -299,19 +300,19 @@ impl Media {
         offered
     }
 
-    /// Sends the share to `session` in frame `version` ([`wire::V1`] for 0.6.x).
+    /// Sends the share to `session` in the frame version and codecs it can play.
     pub fn add_viewer(
         &self,
         rt: &tokio::runtime::Handle,
         session: u32,
-        version: u8,
+        caps: ViewerCaps,
         send: SendStream,
         recv: RecvStream,
     ) -> ViewerLink {
         let queue = Arc::new(ViewerQueue::new());
         lock(&self.hub.viewers).insert(session, queue.clone());
         self.hub.keyframe.store(true, Ordering::Relaxed);
-        let writer = rt.spawn(write_frames(queue, self.hub.clone(), send, version));
+        let writer = rt.spawn(write_frames(queue, self.hub.clone(), send, caps));
         let hub = self.hub.clone();
         let requests = rt.spawn(read_requests(hub, recv));
         ViewerLink {
@@ -385,11 +386,17 @@ impl Drop for ViewerLink {
     }
 }
 
-async fn write_frames(queue: Arc<ViewerQueue>, hub: Arc<Hub>, mut send: SendStream, version: u8) {
+async fn write_frames(
+    queue: Arc<ViewerQueue>,
+    hub: Arc<Hub>,
+    mut send: SendStream,
+    caps: ViewerCaps,
+) {
+    let version = caps.wire;
     let header_len = wire::header_len(version).unwrap_or(wire::MAX_HEADER_LEN);
     loop {
         let frame = queue.next().await;
-        if version == wire::V1 && frame.header.kind == FrameKind::Video(Codec::Av1) {
+        if !caps.av1 && frame.header.kind == FrameKind::Video(Codec::Av1) {
             // Left over from before the switch to VP9 for this viewer; the VP9 encoder starts
             // with a keyframe, and the viewer decodes nothing before it.
             continue;
