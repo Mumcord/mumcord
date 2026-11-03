@@ -19,7 +19,8 @@ use mumcord_audio::{FRAME_SAMPLES, Frame};
 use mumcord_engine::EventReceiver;
 use mumcord_engine::positional_sources::{Fetch, Pose, PositionSource, Positional};
 use mumcord_engine::{EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot};
-use mumcord_protocol::voice::VoicePacket;
+// Bot-side packets come from the mumcord-protocol release that mumbot pins (`bot_protocol`).
+use bot_protocol::voice::VoicePacket;
 use tokio::sync::broadcast;
 
 const WAIT: Duration = Duration::from_secs(20);

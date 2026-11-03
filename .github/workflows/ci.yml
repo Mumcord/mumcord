@@ -233,6 +233,11 @@ jobs:
         if: matrix.task == 'check'
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
+      # The live engine tests only exist with this feature, so the lint above never compiles them.
+      - name: Live engine tests compile
+        if: matrix.task == 'check'
+        run: cargo clippy -p mumcord-engine --features test-backend --tests --locked -- -D warnings
+
       # The smoke-test seeder is its own Cargo project outside the workspace, so the steps above
       # never compile it. Checking it here catches store/protocol API changes that would
       # otherwise only break the Smoke jobs of the test builds.

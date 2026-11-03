@@ -16,7 +16,8 @@ use mumcord_engine::now_playing::{DATA_ID, SharedTrack, payload};
 use mumcord_engine::{
     Engine, EngineEvent, LocalTrack, PasswordChange, SecretStore, ServerFields, ServerView,
 };
-use mumcord_protocol::Event;
+// Bot events come from the mumcord-protocol release that mumbot pins (`bot_protocol`).
+use bot_protocol::Event;
 use tokio::sync::broadcast;
 
 const WAIT: Duration = Duration::from_secs(20);
