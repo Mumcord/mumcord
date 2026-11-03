@@ -58,6 +58,13 @@ function open(plugin = unofficial) {
 }
 
 describe("Browse plugin details", () => {
+  it("fills the placeholders of the permission explanations", () => {
+    open({ ...unofficial, permissions: ["ui.stage", "ui.app-menu"] });
+    expect(document.body.textContent).not.toContain("{{");
+    expect(document.body.textContent).toContain(`who have ${unofficial.name} can join`);
+    expect(document.body.textContent).toContain("Up to 2 items");
+  });
+
   it("lists websites, places, own code and relay, and shows the score card", async () => {
     const spy = vi.spyOn(api, "pluginScore").mockResolvedValue(scored);
     const { container } = open();

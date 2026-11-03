@@ -10,6 +10,7 @@ import { usePluginScore } from "./usePluginScore";
 import { PluginIcon } from "./PluginIcon";
 import { sourceLabel } from "./source";
 import { useIndexImage } from "./useIndexImage";
+import { usePermissionExplanation } from "../permissions/usePermissionExplanation";
 import "../permissions/permissions.css";
 import "./details.css";
 
@@ -124,7 +125,7 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
             <h4 id="pd-can-do" className="pd-card-title">
               {t("whatItCanDo")}
             </h4>
-            <PermissionPreview ids={plugin.permissions} />
+            <PermissionPreview ids={plugin.permissions} pluginName={name} />
           </section>
         )}
         <div className="pd-side">
@@ -220,8 +221,9 @@ function formatDate(value: string, language: string): string {
  * Every permission the listed version may ask for. Which are required is only known from the
  * package, so the install prompt shows the split.
  */
-function PermissionPreview({ ids }: { ids: readonly string[] }) {
+function PermissionPreview({ ids, pluginName }: { ids: readonly string[]; pluginName: string }) {
   const { t } = useTranslation("pluginPermissions");
+  const explain = usePermissionExplanation();
   return (
     <ul className="pd-perms">
       {ids.map((id) => {
@@ -234,7 +236,7 @@ function PermissionPreview({ ids }: { ids: readonly string[] }) {
             </span>
             <span className="pd-perm-body">
               <strong>{known ? t(`texts.${permissionTextKey(id)}`) : id}</strong>
-              {known && <span>{t(`explanations.${permissionTextKey(id)}`)}</span>}
+              {known && <span>{explain(id, pluginName)}</span>}
             </span>
             {risk === "red" && <span className="perm-risk-badge">{t("risk.red")}</span>}
           </li>

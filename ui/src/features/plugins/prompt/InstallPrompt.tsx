@@ -164,6 +164,7 @@ export function InstallPrompt({
           <p className="plugin-prompt-subtitle">{t("prompt.intro", { name })}</p>
           <PermissionList
             requested={requestedOf(phase.offer)}
+            pluginName={plugin.name}
             chatPatterns={phase.offer.chatPatterns}
             enabled={enabled}
             readOnly={installing}

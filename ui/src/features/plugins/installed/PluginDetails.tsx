@@ -150,6 +150,7 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
           <PermissionList
             requested={requested}
             enabled={granted}
+            pluginName={plugin.name}
             onToggle={togglePermission}
             readOnly={busy}
             chatPatterns={plugin.chatPatterns}

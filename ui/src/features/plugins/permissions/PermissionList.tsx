@@ -2,11 +2,11 @@ import { useTranslation } from "react-i18next";
 import {
   isPermissionId,
   PERMISSION_RISK,
-  permissionTextKey,
   type PermissionRisk,
   type RequestedPermission,
 } from "./catalogue";
 import { PERMISSION_ICONS, UNKNOWN_PERMISSION_ICON } from "./permissionIcons";
+import { usePermissionExplanation } from "./usePermissionExplanation";
 import { usePermissionText } from "./usePermissionText";
 import "./permissions.css";
 
@@ -14,6 +14,8 @@ export interface PermissionListProps {
   requested: readonly RequestedPermission[];
   /** Ids of the optional permissions that are switched on. */
   enabled: ReadonlySet<string>;
+  /** Name of the plugin, filled into explanations such as "People who have {{plugin}} can join". */
+  pluginName: string;
   onToggle: (id: string, on: boolean) => void;
   /** Read-only view (e.g. plugin details): optional rows show their state but cannot be changed. */
   readOnly?: boolean;
@@ -23,16 +25,19 @@ export interface PermissionListProps {
 
 function Row({
   id,
+  pluginName,
   details = [],
   toggle,
 }: {
   id: string;
+  pluginName: string;
   /** Plugin-provided lines about this permission; rendered as plain text. */
   details?: readonly string[];
   toggle?: { checked: boolean; disabled: boolean; onChange: (on: boolean) => void };
 }) {
   const { t } = useTranslation("pluginPermissions");
   const permissionText = usePermissionText();
+  const explanation = usePermissionExplanation()(id, pluginName);
   // Unknown ids cannot come from a validated manifest; show them as the highest risk, never hide them.
   const known = isPermissionId(id);
   const risk: PermissionRisk = known ? PERMISSION_RISK[id] : "red";
@@ -45,7 +50,7 @@ function Row({
       </span>
       <span className="perm-body">
         <span className="perm-text">{text}</span>
-        {known && <span className="perm-reason">{t(`explanations.${permissionTextKey(id)}`)}</span>}
+        {explanation !== null && <span className="perm-reason">{explanation}</span>}
         {details.map((line, i) => (
           <span key={i} className="perm-detail">
             {line}
@@ -93,6 +98,7 @@ function Row({
 export function PermissionList({
   requested,
   enabled,
+  pluginName,
   onToggle,
   readOnly = false,
   chatPatterns = [],
@@ -105,11 +111,12 @@ export function PermissionList({
     <ul className="perm-rows" aria-label={t("listLabel")}>
       {rows.map((p) =>
         p.required ? (
-          <Row key={p.id} id={p.id} details={detailsOf(p.id)} />
+          <Row key={p.id} id={p.id} pluginName={pluginName} details={detailsOf(p.id)} />
         ) : (
           <Row
             key={p.id}
             id={p.id}
+            pluginName={pluginName}
             details={detailsOf(p.id)}
             toggle={{
               checked: enabled.has(p.id),

@@ -63,7 +63,12 @@ describe("PermissionList", () => {
 
   it("shows required rows fixed, optional rows as toggles and red as High risk text", () => {
     render(
-      <PermissionList requested={requested} enabled={new Set(["ui.panel"])} onToggle={vi.fn()} />,
+      <PermissionList
+        pluginName="Dice"
+        requested={requested}
+        enabled={new Set(["ui.panel"])}
+        onToggle={vi.fn()}
+      />,
     );
     expect(screen.getByText("Show cards in the chat")).toBeTruthy();
     expect(screen.getByText("High risk")).toBeTruthy();
@@ -73,16 +78,47 @@ describe("PermissionList", () => {
     expect((boxes[1] as HTMLInputElement).checked).toBe(false);
   });
 
+  it("fills every placeholder of the explanations", () => {
+    render(
+      <PermissionList
+        pluginName="Dice"
+        requested={[
+          { id: "ui.stage", required: true },
+          { id: "ui.app-menu", required: true },
+          { id: "net.origins", required: true },
+        ]}
+        enabled={new Set()}
+        onToggle={vi.fn()}
+      />,
+    );
+    expect(document.body.textContent).not.toContain("{{");
+    expect(screen.getByText(/People in your channel who have Dice can join/)).toBeTruthy();
+    expect(screen.getByText(/Up to 2 items/)).toBeTruthy();
+  });
+
   it("reports toggles", () => {
     const onToggle = vi.fn();
-    render(<PermissionList requested={requested} enabled={new Set()} onToggle={onToggle} />);
+    render(
+      <PermissionList
+        pluginName="Dice"
+        requested={requested}
+        enabled={new Set()}
+        onToggle={onToggle}
+      />,
+    );
     fireEvent.click(screen.getByRole("switch", { name: /Show notifications/ }));
     expect(onToggle).toHaveBeenCalledWith("notify", true);
   });
 
   it("disables toggles when read-only", () => {
     render(
-      <PermissionList requested={requested} enabled={new Set()} onToggle={vi.fn()} readOnly />,
+      <PermissionList
+        pluginName="Dice"
+        requested={requested}
+        enabled={new Set()}
+        onToggle={vi.fn()}
+        readOnly
+      />,
     );
     for (const box of screen.getAllByRole("switch")) {
       expect((box as HTMLInputElement).disabled).toBe(true);
@@ -91,7 +127,12 @@ describe("PermissionList", () => {
 
   it("has no accessibility violations", async () => {
     const { container } = render(
-      <PermissionList requested={requested} enabled={new Set()} onToggle={vi.fn()} />,
+      <PermissionList
+        pluginName="Dice"
+        requested={requested}
+        enabled={new Set()}
+        onToggle={vi.fn()}
+      />,
     );
     expect(await axeViolations(container)).toEqual([]);
   });
