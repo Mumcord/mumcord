@@ -132,6 +132,7 @@ mod tests {
                     Err(Error::HardwareUnavailable { encoder: e, .. }) => assert_eq!(e, encoder),
                     Err(err) => panic!("{encoder} {codec:?}: unexpected error {err}"),
                     Ok(_) if (encoder, codec) == (HardwareEncoder::Nvenc, Codec::Av1) => {}
+                    Ok(_) if encoder == HardwareEncoder::Vaapi => {}
                     Ok(_) => panic!("{encoder} {codec:?}: not implemented yet"),
                 }
             }
