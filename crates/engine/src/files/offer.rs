@@ -1,21 +1,28 @@
 //! The file offer: a channel text message with a visible line for official clients and a
-//! `data-mumcord-file` element for Mumcord (section 6.4).
+//! `data-mumcord-file` element for Mumcord (section 6.4). The attribute holds a Bovnar document as
+//! standard base64 text, because an HTML attribute cannot carry the raw bytes (FR-7.75).
 
 use std::sync::LazyLock;
 
+use base64::Engine as _;
+use base64::engine::general_purpose::STANDARD as BASE64;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
 
 use super::sanitize::sanitize_file_name;
+use super::wire::{self, Rejected};
 use super::{MAX_FILE_SIZE, is_lower_hex, is_share_id};
 
-/// Attribute that carries the offer JSON.
+/// Attribute that carries the offer.
 pub const ATTRIBUTE: &str = "data-mumcord-file";
 
 /// Current offer format version.
 const VERSION: u8 = 1;
 const MAX_NAME_BYTES: usize = 255;
 const MAX_MIME_CHARS: usize = 100;
+/// Largest offer document, in bytes; a valid offer needs well under half of it.
+const MAX_DOCUMENT_BYTES: usize = 2048;
+/// Base64 length of [`MAX_DOCUMENT_BYTES`], checked before anything is decoded.
+const MAX_ATTRIBUTE_CHARS: usize = MAX_DOCUMENT_BYTES.div_ceil(3) * 4;
 /// An offer lives at most this long after it arrives (FR-7.15).
 const MAX_LIFETIME_SECS: u64 = 24 * 60 * 60;
 
@@ -40,9 +47,7 @@ impl FileOffer {
     }
 }
 
-#[derive(Serialize, Deserialize)]
 struct Wire {
-    v: u8,
     id: String,
     n: String,
     s: u64,
@@ -67,7 +72,6 @@ pub fn encode_offer_html(sender: &str, offer: &FileOffer) -> Result<String, Offe
         return Err(OfferError::TooLarge);
     }
     let wire = Wire {
-        v: VERSION,
         id: offer.id.clone(),
         n: offer.name.clone(),
         s: offer.size,
@@ -78,14 +82,30 @@ pub fn encode_offer_html(sender: &str, offer: &FileOffer) -> Result<String, Offe
     if validate(&wire).is_none() {
         return Err(OfferError::Invalid);
     }
-    let json = serde_json::to_string(&wire).map_err(|_| OfferError::Invalid)?;
+    let document = wire::write_document(MAX_DOCUMENT_BYTES, |w| {
+        w.write_uint("v", VERSION.into(), 8, 10)?;
+        w.write_string("id", &wire.id)?;
+        // Bovnar strings cannot hold ASCII control characters; the recipient would turn them
+        // into `_` anyway (FR-7.23), so a name that has them still gets an offer.
+        let name: String = wire
+            .n
+            .chars()
+            .map(|c| if c.is_ascii_control() { '_' } else { c })
+            .collect();
+        w.write_string("n", &name)?;
+        w.write_uint("s", wire.s, 64, 10)?;
+        w.write_string("m", &wire.m)?;
+        w.write_string("h", &wire.h)?;
+        w.write_uint("e", wire.e, 64, 10)
+    })
+    .ok_or(OfferError::Invalid)?;
     Ok(format!(
         "<p>\u{1F4CE} {} shared a file: <b>{}</b> ({}). Download it with Mumcord.</p>\
          <span {ATTRIBUTE}=\"{}\"></span>",
         escape(sender),
         escape(&offer.display_name()),
         format_size(offer.size),
-        escape(&json),
+        BASE64.encode(document),
     ))
 }
 
@@ -97,19 +117,39 @@ pub fn parse_offer_html(html: &str, arrival: u64) -> Option<FileOffer> {
         Regex::new(&format!(r#"{ATTRIBUTE}\s*=\s*"([^"]*)""#)).expect("static pattern")
     });
     let raw = ATTR.captures(html)?.get(1)?.as_str();
-    decode_attribute(&unescape(raw), arrival)
+    let value = unescape(raw);
+    match decode_attribute(&value, arrival) {
+        Ok(offer) => Some(offer),
+        Err(reason) => {
+            tracing::debug!(%reason, chars = value.len(), "ignoring an invalid file offer");
+            None
+        }
+    }
 }
 
 /// Whether `value` (the attribute value, HTML entities already decoded) is a valid offer; the
 /// chat sanitizer keeps the attribute only then, so the stored history can show the card again.
 pub(crate) fn is_valid_attribute(value: &str) -> bool {
-    decode_attribute(value, 0).is_some()
+    decode_attribute(value, 0).is_ok()
 }
 
-fn decode_attribute(value: &str, arrival: u64) -> Option<FileOffer> {
-    let wire: Wire = serde_json::from_str(value).ok()?;
-    validate(&wire)?;
-    Some(FileOffer {
+fn decode_attribute(value: &str, arrival: u64) -> Result<FileOffer, Rejected> {
+    if value.len() > MAX_ATTRIBUTE_CHARS {
+        return Err(Rejected::TooLarge);
+    }
+    let bytes = BASE64.decode(value).map_err(|_| Rejected::Malformed)?;
+    let doc = wire::parse_document(&bytes, MAX_DOCUMENT_BYTES)?;
+    wire::version_field(&doc, VERSION)?;
+    let wire = Wire {
+        id: wire::str_field(&doc, "id")?.to_owned(),
+        n: wire::str_field(&doc, "n")?.to_owned(),
+        s: wire::u64_field(&doc, "s")?,
+        m: wire::str_field(&doc, "m")?.to_owned(),
+        h: wire::str_field(&doc, "h")?.to_owned(),
+        e: wire::u64_field(&doc, "e")?,
+    };
+    validate(&wire).ok_or(Rejected::Invalid)?;
+    Ok(FileOffer {
         id: wire.id,
         name: wire.n,
         size: wire.s,
@@ -120,8 +160,7 @@ fn decode_attribute(value: &str, arrival: u64) -> Option<FileOffer> {
 }
 
 fn validate(w: &Wire) -> Option<()> {
-    let ok = w.v >= VERSION
-        && is_share_id(&w.id)
+    let ok = is_share_id(&w.id)
         && !w.n.is_empty()
         && w.n.len() <= MAX_NAME_BYTES
         && w.s <= MAX_FILE_SIZE
@@ -177,11 +216,16 @@ mod tests {
         }
     }
 
-    fn html_with(json: &str) -> String {
-        format!("<p>x</p><span {ATTRIBUTE}=\"{}\"></span>", escape(json))
+    /// A message whose attribute carries `document` as base64, like a sender would write it.
+    fn html_with(document: &str) -> String {
+        html_with_value(&BASE64.encode(document))
     }
 
-    const GOOD: &str = r#"{"v":1,"id":"0123456789abcdef0123456789abcdef","n":"a.txt","s":5,"m":"text/plain","h":"0000000000000000000000000000000000000000000000000000000000000000","e":2000}"#;
+    fn html_with_value(value: &str) -> String {
+        format!("<p>x</p><span {ATTRIBUTE}=\"{}\"></span>", escape(value))
+    }
+
+    const GOOD: &str = r#".v = 1; .id = "0123456789abcdef0123456789abcdef"; .n = "a.txt"; .s = 5; .m = "text/plain"; .h = "0000000000000000000000000000000000000000000000000000000000000000"; .e = 2000;"#;
 
     #[test]
     fn round_trip_with_special_characters() {
@@ -189,6 +233,37 @@ mod tests {
         assert!(html.contains("Al&lt;ice&gt; shared a file"));
         assert!(html.contains("(1.5 MB)"));
         assert_eq!(parse_offer_html(&html, 1_000), Some(offer()));
+    }
+
+    #[test]
+    fn the_attribute_is_a_base64_bovnar_document() {
+        let html = encode_offer_html("A", &offer()).expect("valid");
+        let value = html
+            .split(&format!("{ATTRIBUTE}=\""))
+            .nth(1)
+            .and_then(|rest| rest.split('"').next())
+            .expect("attribute");
+        let bytes = BASE64.decode(value).expect("base64");
+        assert_eq!(bovnar::json::detect(&bytes), bovnar::json::Format::Bovnar);
+        let doc = bovnar::DomDoc::parse(&bytes).expect("bovnar");
+        assert_eq!(doc.get("v").and_then(bovnar::DomNode::as_u8), Some(1));
+        assert_eq!(
+            doc.get("s").and_then(bovnar::DomNode::as_u64),
+            Some(1_572_864)
+        );
+        assert_eq!(
+            doc.get("n").and_then(bovnar::DomNode::as_str),
+            Some(offer().name.as_str())
+        );
+    }
+
+    #[test]
+    fn control_characters_in_the_name_still_give_an_offer() {
+        let mut o = offer();
+        o.name = "a\u{7}b\tc\u{7f}.txt".into();
+        let html = encode_offer_html("A", &o).expect("valid");
+        let parsed = parse_offer_html(&html, 1_000).expect("offer");
+        assert_eq!(parsed.name, "a_b_c_.txt");
     }
 
     #[test]
@@ -210,8 +285,8 @@ mod tests {
 
     #[test]
     fn higher_versions_and_unknown_fields_are_accepted() {
-        let json = GOOD.replace("\"v\":1", "\"v\":7,\"extra\":true");
-        assert!(parse_offer_html(&html_with(&json), 0).is_some());
+        let doc = GOOD.replace(".v = 1;", ".v = 7; .extra = true;");
+        assert!(parse_offer_html(&html_with(&doc), 0).is_some());
     }
 
     #[test]
@@ -219,37 +294,86 @@ mod tests {
         let long_name = "n".repeat(256);
         let long_mime = "m".repeat(101);
         let bad = [
-            GOOD.replace("\"v\":1", "\"v\":0"),
-            GOOD.replace(
-                "0123456789abcdef0123456789abcdef",
-                "0123456789ABCDEF0123456789abcdef",
+            (GOOD.replace(".v = 1;", ".v = 0;"), Rejected::Invalid),
+            (
+                GOOD.replace(
+                    "0123456789abcdef0123456789abcdef",
+                    "0123456789ABCDEF0123456789abcdef",
+                ),
+                Rejected::Invalid,
             ),
-            GOOD.replace("0123456789abcdef0123456789abcdef", "0123"),
-            GOOD.replace("\"a.txt\"", "\"\""),
-            GOOD.replace("a.txt", &long_name),
-            GOOD.replace("\"s\":5", "\"s\":2147483649"),
-            GOOD.replace("\"s\":5", "\"s\":-1"),
-            GOOD.replace("text/plain", &long_mime),
-            GOOD.replace(
-                "0000000000000000000000000000000000000000000000000000000000000000",
-                "xyz",
+            (
+                GOOD.replace("0123456789abcdef0123456789abcdef", "0123"),
+                Rejected::Invalid,
             ),
-            GOOD.replace("\"e\":2000", ""),
-            "not json".into(),
+            (GOOD.replace("\"a.txt\"", "\"\""), Rejected::Invalid),
+            (GOOD.replace("a.txt", &long_name), Rejected::Invalid),
+            (
+                GOOD.replace(".s = 5;", ".s = 2147483649;"),
+                Rejected::Invalid,
+            ),
+            (GOOD.replace(".s = 5;", ".s = -1;"), Rejected::WrongType),
+            (GOOD.replace(".s = 5;", ".s = \"5\";"), Rejected::WrongType),
+            (
+                GOOD.replace(".n = \"a.txt\";", ".n = 5;"),
+                Rejected::WrongType,
+            ),
+            (GOOD.replace("text/plain", &long_mime), Rejected::Invalid),
+            (
+                GOOD.replace(
+                    "0000000000000000000000000000000000000000000000000000000000000000",
+                    "xyz",
+                ),
+                Rejected::Invalid,
+            ),
+            (GOOD.replace(".e = 2000;", ""), Rejected::Malformed),
+            (GOOD.replace(".e = 2000;", ".e = 2000"), Rejected::Malformed),
+            ("not bovnar".into(), Rejected::Malformed),
         ];
-        for json in bad {
-            assert_eq!(parse_offer_html(&html_with(&json), 0), None, "{json}");
+        for (doc, reason) in bad {
+            assert_eq!(
+                decode_attribute(&BASE64.encode(&doc), 0),
+                Err(reason),
+                "{doc}"
+            );
+            assert_eq!(parse_offer_html(&html_with(&doc), 0), None, "{doc}");
         }
         assert_eq!(parse_offer_html("<p>plain</p>", 0), None);
     }
 
     #[test]
+    fn truncated_documents_are_rejected() {
+        for len in 0..GOOD.len() {
+            assert_eq!(parse_offer_html(&html_with(&GOOD[..len]), 0), None, "{len}");
+        }
+    }
+
+    #[test]
+    fn bad_base64_and_oversized_attributes_are_rejected() {
+        assert_eq!(decode_attribute("not base64!", 0), Err(Rejected::Malformed));
+        let long = "A".repeat(MAX_ATTRIBUTE_CHARS + 4);
+        assert_eq!(decode_attribute(&long, 0), Err(Rejected::TooLarge));
+        let padded = format!("{GOOD}{}", " ".repeat(MAX_DOCUMENT_BYTES));
+        assert_eq!(
+            decode_attribute(&BASE64.encode(&padded), 0),
+            Err(Rejected::TooLarge)
+        );
+    }
+
+    #[test]
+    fn old_json_offers_are_not_shown() {
+        let json = r#"{"v":1,"id":"0123456789abcdef0123456789abcdef","n":"a.txt","s":5,"m":"text/plain","h":"0000000000000000000000000000000000000000000000000000000000000000","e":2000}"#;
+        assert_eq!(parse_offer_html(&html_with_value(json), 0), None);
+        assert_eq!(parse_offer_html(&html_with(json), 0), None);
+    }
+
+    #[test]
     fn boundary_values_are_accepted() {
-        let json = GOOD
-            .replace("\"s\":5", "\"s\":2147483648")
+        let doc = GOOD
+            .replace(".s = 5;", ".s = 2147483648;")
             .replace("a.txt", &"n".repeat(255));
-        assert!(parse_offer_html(&html_with(&json), 0).is_some());
-        let empty = GOOD.replace("\"s\":5", "\"s\":0");
+        assert!(parse_offer_html(&html_with(&doc), 0).is_some());
+        let empty = GOOD.replace(".s = 5;", ".s = 0;");
         assert!(parse_offer_html(&html_with(&empty), 0).is_some());
     }
 
