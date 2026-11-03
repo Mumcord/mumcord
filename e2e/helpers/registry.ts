@@ -1,7 +1,7 @@
 // Fixture plugin registry for E2E (spec 06, sections 10/11).
 //
-// `start()` runs scripts/e2e-plugin-registry.sh (fixtures, the four official plugins, fresh TEST
-// keys) and then serves two registries on free 127.0.0.1 ports with `mumcord-plugin
+// `start()` runs scripts/e2e-plugin-registry.sh (safety fixtures, the test plugins of
+// e2e/fixtures/plugins, fresh TEST keys) and then serves two registries on free 127.0.0.1 ports with `mumcord-plugin
 // serve-registry`: the "official" one and one third-party repository. The keys are generated per
 // run in the run's cache folder and never committed. Debug builds accept the registry key through
 // `MUMCORD_PLUGIN_REGISTRY_KEY`, which `env()` sets next to the registry URL.

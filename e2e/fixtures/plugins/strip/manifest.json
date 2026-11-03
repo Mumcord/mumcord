@@ -1,0 +1,17 @@
+{
+  "manifest": 1,
+  "id": "fx-strip",
+  "name": "Fixture Strip",
+  "description": "E2E test plugin with a panel and the permissions of a typical chat plugin.",
+  "version": "1.0.0",
+  "api": "^1.0",
+  "authors": ["Mumcord test fixtures"],
+  "license": "Apache-2.0",
+  "categories": ["tools"],
+  "permissions": {
+    "required": ["ui.panel", "ui.chat-card", "peers.messages", "chat.send", "chat.supersedes"],
+    "optional": [{ "id": "chat.triggers", "suggested": true }]
+  },
+  "triggers": ["!fxstrip"],
+  "messaging": { "default_visibility": "everyone" }
+}

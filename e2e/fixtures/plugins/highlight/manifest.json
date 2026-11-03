@@ -1,0 +1,12 @@
+{
+  "manifest": 1,
+  "id": "echolings",
+  "name": "Fixture Highlight",
+  "description": "E2E test plugin under the id Browse highlights (FR-6.59).",
+  "version": "1.0.0",
+  "api": "^1.0",
+  "authors": ["Mumcord test fixtures"],
+  "license": "Apache-2.0",
+  "categories": ["fun"],
+  "permissions": { "required": ["ui.panel"] }
+}
