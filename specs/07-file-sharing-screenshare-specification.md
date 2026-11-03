@@ -291,7 +291,7 @@ Share sound (Windows, macOS) is unchanged in capture and codec (Opus). In a broa
 
 ### 6.2 Codecs and quality
 
-VP9 (libvpx, today) and new AV1 (hardware via FFmpeg's libavcodec, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
+VP9 (libvpx, today) and new AV1 (hardware through the vendor encoder APIs directly, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
 
 ### 6.3 File transfer sequence
 
@@ -516,10 +516,10 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 - **Offer as a normal text message with a data attribute**, like full-size images today (FR-1.60c): official clients see readable text and the offer arrives with the chat, including for history.
 - **SHA-256 via the `sha2` crate** (already in the tree), computed streaming on a worker thread; zip with the `zip` crate (deflate only), in the engine, never on the UI or audio threads.
 - **Mark-of-the-web** in a small platform module (`windows` ADS write, macOS `xattr`, Linux `xattr`).
-- **Hardware encoders via FFmpeg's libavcodec** (LGPL build, only `av1_nvenc`, `av1_amf`, `av1_qsv`, `av1_vaapi`, `vp9_qsv`, `vp9_vaapi` and needed hwcontexts; `--enable-gpl` off): one interface instead of four vendor SDKs; vendor drivers are loaded at runtime, so no SDK ships.
+- **Hardware encoders written directly against the vendor APIs (no FFmpeg):** NVENC via nv-codec-headers with the driver loaded at runtime (dlopen); AMD AMF via the AMF headers, loaded at runtime; Intel Quick Sync via oneVPL/libvpl; Linux VA-API via libva, loaded at runtime (no package dependency). Vendor drivers are loaded at runtime, so no SDK ships. macOS has no hardware encoder for AV1 or VP9; it uses software only.
 - **SVT-AV1** for software AV1 encode (real-time presets, low delay, screen-content mode): the only open encoder fast enough for live 1080p30 (rav1e and libaom are too slow, #355). **dav1d** for AV1 decode in the engine fallback.
 - **Frame encryption** with AES-128-GCM from `ring` (already used by rustls); key exchange with X25519 (`ring`) signed by the Mumble client certificate key (`rustls`/`rcgen` key types already present). SFrame-style framing per RFC 9605, own minimal implementation (no extra dependency).
-- **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, `ffmpeg.rs`, `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
+- **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, one module per vendor API (`nvenc.rs`, `amf.rs`, `qsv.rs`, `vaapi.rs`), `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
 - **mumpeer:** new module `broadcast` (sessions, per-subscriber queues with the `fanout.rs` policy, control forwarding), `uses` in `config` and `api`. **mumbot `peer`:** uses/bc pass-through, `use` on pairs, broadcast messages and admission checks.
 - Threads: encoding on its existing dedicated thread; probes and self-tests on a background worker at low priority; file I/O and hashing on tokio blocking tasks. Nothing new on the audio thread.
 
@@ -535,8 +535,8 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 
 ## 10. Build, packaging & release
 
-- **New native libraries:** FFmpeg libavcodec/libavutil (LGPL, minimal configure), SVT-AV1, dav1d. Each gets a cached build script like `scripts/build-libvpx.sh` for Windows, macOS (x86_64 + arm64) and Linux; CI caches by version. Expected installer growth about 10–20 MB.
-- **Licences:** third-party notices and the licences window list FFmpeg (LGPL-2.1, with the relinking note), SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
+- **New native libraries:** SVT-AV1, dav1d and the vendor encoder SDK headers (nv-codec-headers, AMF, oneVPL/libvpl, libva; headers only, drivers dlopened); software VP9 stays libvpx. Built by `scripts/build-svt-av1.sh`, `scripts/build-dav1d.sh` and `scripts/build-hwenc-sdk.sh` (contract: `SVTAV1_STATIC_DIR`, `DAV1D_STATIC_DIR`, `HWENC_SDK_DIR`), like `scripts/build-libvpx.sh` for Windows, macOS (x86_64 + arm64) and Linux; CI caches by version. Expected installer growth about 10–20 MB.
+- **Licences:** third-party notices and the licences window list SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
 - **mumpeer:** release with broadcast and uses; README sections "Allowed uses" and "Broadcasts and bandwidth"; `testenv/` gains a profile with broadcasts enabled and a scripted subscriber load tool (`bcast-sim`, N fake viewers that are real Mumble clients with certificates, send hello and Watch, join and count frames) for AC-7.29.
 - **mumbot:** release with the `peer` extensions; CHANGELOG.
 - **mumcord-p2p:** version bump on crates.io for the extended `mumcord.peer` types.
@@ -594,7 +594,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 40. **AC-7.40** Battery: test hook reports battery power, no hardware AV1 → Automatic picks VP9.
 41. **AC-7.41** Decoding: B on a machine whose webview lacks `av01` → B still plays the AV1 share (engine dav1d).
 42. **AC-7.42** Accessibility: start dialog, Quality menu, viewer list, Settings tab keyboard operable with screen-reader labels; both themes; one non-English locale.
-43. **AC-7.43** Licences window lists FFmpeg, SVT-AV1 and dav1d with their licence texts.
+43. **AC-7.43** Licences window lists SVT-AV1 and dav1d with their licence texts.
 
 **Resizable media area (#386)**
 44. **AC-7.44** A shares a screen, B watches (and again with a watch party) → a horizontal handle is visible between the picture and the chat in dark, light and a custom theme, matching mockup 01; the default size equals today's (Auto, 16:9, at most 58 % of the window height).
@@ -636,7 +636,8 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Viewer resolution (#355 Q6) | Later; frame-rate choice only | Recommendation of #355 |
 | Settings location (#355 Q7) | Own "Screen sharing" tab | Mockup 05 |
 | Linux share sound (#355 Q8) | Later | Issue table "Later" |
-| Encoder library | libavcodec (LGPL) for hardware, SVT-AV1 software, dav1d decode | #355 §3 / §3b |
+| Encoder library | Direct vendor APIs for hardware (NVENC, AMF, oneVPL/libvpl, VA-API), SVT-AV1 software, dav1d decode, libvpx VP9 | #355 §3 / §3b |
+| No FFmpeg | No FFmpeg; direct vendor encoder APIs | User decision 2026-11-03 |
 | Battery | On battery, Automatic skips software AV1 | #355 risks |
 | Resizable media area (#386) | One shared horizontal handle for screen share, watch party and camera room; Auto default = today's look; collapse to the existing mini bar | User approval 2026-11-03, all recommended answers of issue #386; FR-7.61 … FR-7.74 |
 | Media height: global or per channel (#386 Q1) | Global, stored next to the column widths | User approval 2026-11-03; FR-7.70 |
@@ -664,7 +665,7 @@ Risks:
 - **CPU and battery of software AV1:** mitigated by the self-test, the 1080p30 cap, load monitoring and the battery rule.
 - **Hardware and driver variety:** four vendors plus VA-API, driver bugs; the smoke test catches false positives, but test coverage needs real machines (AC-7.36).
 - **Webview AV1 support varies** (macOS M3+ only, Linux needs a GStreamer plugin); the engine dav1d fallback costs CPU on the viewer.
-- **Build size and CI time:** FFmpeg + SVT-AV1 + dav1d add 10–20 MB and new cached build steps per OS.
+- **Build size and CI time:** SVT-AV1 + dav1d + the vendor SDK headers add 10–20 MB and new cached build steps per OS.
 - **Patents:** AV1/VP9 royalty-free under AOMedia/Google licences; a third-party pool (Sisvel) claims royalties, so far from hardware makers. H.264 left out.
 - **Large files over a 10 Mbit/s relay session:** 2 GB takes about 30 minutes; the sender must stay online and serves one transfer at a time, so queues can be long. Accepted for 4.1.
 - **Offer spoofing:** anyone can post a hand-made offer message; the card always shows the real Mumble sender, and the download is only accepted from that sender's session and checked against the hash.
@@ -685,5 +686,5 @@ Risks:
 |---|---|---|---|
 | Step 0 | — | — | `mumcord-p2p`: extended `mumcord.peer` types (`u`, `bc`, `use`, broadcast messages); publish |
 | Step 1 (parallel) | `[uses]` config, `/v1/status` fields, `use` on pairs | uses/bc pass-through, `use` on pairs | File sharing end to end (offer, cards, settings, queue, transfer through the relay, hash, sanitizing, MOTW); allowed-uses handling (FR-7.7) |
-| Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, FFmpeg/SVT-AV1/dav1d builds, selection and load monitoring; codec negotiation (wire v2) |
+| Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, SVT-AV1/dav1d/vendor-SDK builds, selection and load monitoring; codec negotiation (wire v2) |
 | Step 3 | Release + README | Release | Broadcast publisher/subscriber, frame encryption, key exchange, fallback logic, viewer list; E2E along AC-7.1 … AC-7.43; PRIVACY.md, licences, 24 locales |
