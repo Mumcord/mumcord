@@ -124,6 +124,8 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.33** Speed: no extra limit in the client beyond the relay's per-session bandwidth (10 Mbit/s by default, FR-4.35). Screen sharing on the same connection keeps priority over file data.
 - **FR-7.34** Timeouts: no `go`/`queued` answer within 10 s → Failed "{sender} did not answer". `go` but no data within 30 s → Failed "Couldn't connect through the relay: {reason}" with the relay reasons of FR-4.11. No data for 30 s during a transfer → Failed "The transfer stalled".
 
+- **FR-7.75** **Offer format: Bovnar** (#400, user decision 2026-11-03). The file offer (`data-mumcord-file` payload) and the `mumcord.file` plugin-data messages are Bovnar documents, written and read with the Rust Bovnar implementation from the fork `Mumcord/bovnar`, used as a git dependency pinned to a commit (spec 09 FR-9.99 for the consequences). Bovnar is used here because `mumcord.file` and the offer attribute are new in 0.7.0 and 0.6.2 ignores them. The decoder checks the size before decoding and rejects malformed, truncated or oversized documents without a crash or hang and without logging payload content (FR-7.23 validation then applies to the decoded fields). Every other channel stays as it is: screen-share signalling (`Watch`), `mumcord.peer`, `mumcord.image`, history sync and hello keep their JSON/binary formats; a channel never mixes formats. 0.6.2 and official Mumble clients still show the plain text line of the offer.
+
 ### 4.5 Screen sharing: start dialog and live quality
 
 - **FR-7.35** Pressing Share opens the **share start dialog** (mockup 01) before the system's window/screen picker, every time. Fields and defaults: Resolution **Auto** (720p, 1080p, 1440p), Frame rate **30** (15, 30, 60), Optimize for **Balanced** (Sharp text, Smooth motion), Codec **Automatic** (AV1, VP9), Upload limit **Auto** (2, 5, 10, 20 Mbit/s), Sound **on** (Windows and macOS only; hidden on Linux), "Use these settings next time" (stores them as the defaults of Settings → Screen sharing). Buttons **Start sharing** (default) and **Cancel**. The codec line names the encoder that would be used, e.g. "AV1 (graphics card)", "AV1 (software · higher CPU load)", "VP9 (graphics card)", "VP9".
@@ -324,7 +326,7 @@ sequenceDiagram
 ### 6.4 Wire formats (file sharing)
 
 **Offer (channel text message).** HTML like today's chat messages:
-`<p>📎 Alice shared a file: <b>{name}</b> ({size}). Download it with Mumcord.</p>` followed by an element carrying the attribute `data-mumcord-file` whose value is compact JSON:
+`<p>📎 Alice shared a file: <b>{name}</b> ({size}). Download it with Mumcord.</p>` followed by an element carrying the attribute `data-mumcord-file` whose value is the **Bovnar document** below, encoded as standard base64 text (an HTML attribute cannot carry binary; #400, FR-7.75). Field names and meanings stay as in the table; the types are Bovnar types (unsigned integers, strings, hex strings):
 
 | Field | Type | Rules |
 |---|---|---|
@@ -338,7 +340,7 @@ sequenceDiagram
 
 The receiver validates every field before showing a card (untrusted input) and treats the sender as the Mumble session that sent the message, never a field. The whole message stays well under the server's default message length (5000).
 
-**Plugin data `mumcord.file`** (compact JSON, ≤ 1000 bytes, sent only to the other session):
+**Plugin data `mumcord.file`** (Bovnar document, ≤ 1000 bytes, size-checked before decoding, sent only to the other session; FR-7.75):
 
 | `t` | Direction | Fields |
 |---|---|---|
@@ -439,6 +441,8 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 | Encoder cache (per machine) | `driver_id`, `app_version`, per encoder `available` + `smoke_ok`, per (resolution, fps) `svt_selftest_ms` | | | re-test on driver/app change or Check again |
 | Chat history | file card: offer fields + local state (done path, mismatch) | | | Same retention as chat history; the file itself is not part of history |
 
+Offers are stored in chat history as decoded fields (the Bovnar bytes are not kept); the wire format does not change the stored form.
+
 Not stored: active shares, queues, transfer progress, broadcast tokens and keys (memory only).
 
 ### 7.2 File card state (recipient)
@@ -511,6 +515,8 @@ broadcast_out_mbit = 300    # all copies of one broadcast; counted against total
 In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscribers with slot, hash, queue, max layer, byte counters), as for pairs nothing on disk. Default `total_mbit` stays 200; operators who enable broadcasts are told in the README to raise it to fit (25 × 6 Mbit/s = 150 Mbit/s for one share).
 
 ## 8. Technology & architecture
+
+- **Bovnar (#400):** `files::wire` encodes and decodes the offer and the `mumcord.file` messages with the pinned Bovnar crate (git dependency, `publish = false` upstream); licence notice added to the licences window.
 
 - **File transfer on the existing `mumcord-p2p` connection, forced through the relay.** Reuses the end-to-end encrypted, certificate-pinned QUIC session and the relay of spec 04, so no new crypto or transport is needed.
 - **Offer as a normal text message with a data attribute**, like full-size images today (FR-1.60c): official clients see readable text and the offer arrives with the chat, including for history.
@@ -612,6 +618,11 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 56. **AC-7.56** With the system's "reduce motion" on, snap, reset and collapse are instant; with it off they take about 120 ms; dragging is never animated.
 57. **AC-7.57** When the camera room ships, it shows the same handle with the same behaviour and its tiles re-arrange to the chosen height (check together with the camera spec's acceptance criteria).
 
+**Wire format (Bovnar, #400)**
+58. **AC-7.58** A offers a file to B (both 0.7.0): the packet inspector shows `data-mumcord-file` holding base64 text that decodes as a Bovnar document with the fields of §6.4, and the `mumcord.file` `req`/`go` messages are Bovnar documents; the transfer completes as in AC-7.7.
+59. **AC-7.59** An official Mumble client and a 0.6.2 Mumcord client in the channel see only the plain line "📎 A shared a file …"; no error and no raw attribute text appears.
+60. **AC-7.60** Test CLI sends B a `data-mumcord-file` value that is not valid base64, a truncated Bovnar document, a document with a wrong field type and an oversized `mumcord.file` payload → B shows no card (or ignores the message), nothing crashes or hangs, and the log has one line per rejection without file names or payload content. The same offer as old JSON is also not shown (the offer is Bovnar only).
+
 ## 12. Decision log
 
 | Question | Decision | Note |
@@ -647,6 +658,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Snap points (#386 Q5) | 1/3, 1/2, 2/3; no custom presets in the first version | User approval 2026-11-03; FR-7.64 |
 | Snap bypass (#386 Q6) | Hold Alt; keyboard users are not affected | User approval 2026-11-03; FR-7.64, FR-7.67 |
 | Camera room default height (#386 Q7) | Same Auto default now; revisit with the camera spec | User approval 2026-11-03; FR-7.74 |
+| Offer wire format (#400) | The file offer and `mumcord.file` use **Bovnar** via the Rust implementation from the fork Mumcord/bovnar, pinned git dependency. Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-7.75, §6.4. Base64 for the HTML attribute is an assumption of this spec |
 
 ## 13. Open points & risks
 
