@@ -156,7 +156,9 @@ function merge(
 
 function withMessage(log: ConversationLog, message: ChatMessage): ConversationLog {
   if (log.messages.some((m) => m.id === message.id)) return log;
-  const messages = [...log.messages, message];
+  // By time, not by arrival: an own message is confirmed after a refusal grace, and messages
+  // others sent meanwhile are already listed (issue #379).
+  const messages = insertByTime(log.messages, [message]);
   const overflow = messages.length > MAX_KEPT;
   return {
     ...log,
@@ -359,7 +361,7 @@ function setOutgoing(
   setLog(key, { ...log, outgoing: change(log.outgoing ?? []) });
 }
 
-/** Shows an own message greyed at the end of its conversation until it is confirmed. */
+/** Shows an own message greyed at its send time (the end) until it is confirmed. */
 export function addOutgoing(
   send: Omit<OutgoingSend, "message" | "error">,
   sender: Pick<ChatMessage, "senderName" | "senderCertHash" | "senderSession">,
@@ -387,6 +389,21 @@ export function addOutgoing(
 export function setOutgoingError(entry: OutgoingSend, error: string | null): void {
   setOutgoing(entry.serverId, entry.conversation, (list) =>
     list.map((item) => (item.message.id === entry.message.id ? { ...item, error } : item)),
+  );
+}
+
+/**
+ * Sets the time of an unconfirmed message to now, when it actually goes to the server (after
+ * waiting in the send queue or on retry), so it sorts where the engine will store it.
+ */
+export function stampOutgoing(entry: OutgoingSend): void {
+  const sentAt = new Date().toISOString();
+  setOutgoing(entry.serverId, entry.conversation, (list) =>
+    list.map((item) =>
+      item.message.id === entry.message.id
+        ? { ...item, message: { ...item.message, sentAt } }
+        : item,
+    ),
   );
 }
 
