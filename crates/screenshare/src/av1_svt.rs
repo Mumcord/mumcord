@@ -1,5 +1,6 @@
+use std::ffi::{CStr, c_char, c_void};
 use std::ptr;
-use std::sync::{Mutex, PoisonError};
+use std::sync::{Mutex, Once, PoisonError};
 
 use crate::codec::{Codec, VideoEncoder};
 use crate::{EncodedFrame, EncoderConfig, Error, I420Frame, Result};
@@ -38,6 +39,52 @@ const TIMEBASE_MS: i64 = 1000;
 /// Serialises creating and shutting down encoders: SVT-AV1 sets up process-wide state (CPU
 /// feature dispatch, logging) there without locking, and parallel calls crashed.
 static LIFECYCLE: Mutex<()> = Mutex::new(());
+
+/// SVT-AV1 logs its version banner and configuration at info level to stdout, and warns about
+/// tools the realtime configuration turns off on purpose (every encoder start). The app only
+/// wants its errors, on stderr like the rest of its diagnostics.
+static LOG_CALLBACK: Once = Once::new();
+
+/// How the platform passes a C `va_list` to a function (a pointer, an array or a struct), taken
+/// from the callback type bindgen generated so it matches `vsnprintf` on every target.
+type VaList = <ffi::SvtAv1LogCallback as LastArgument>::Type;
+
+trait LastArgument {
+    type Type;
+}
+
+impl<A, B, C, D, E> LastArgument for Option<unsafe extern "C" fn(A, B, C, D, E)> {
+    type Type = E;
+}
+
+/// Receives every SVT-AV1 log line (on its worker threads too, never on the audio thread).
+unsafe extern "C" fn svt_log(
+    _context: *mut c_void,
+    level: ffi::SvtAv1LogLevel,
+    tag: *const c_char,
+    format: *const c_char,
+    args: VaList,
+) {
+    if level > ffi::SVT_AV1_LOG_ERROR {
+        return;
+    }
+    let mut buffer = [0 as c_char; 512];
+    // SAFETY: SVT-AV1 passes a printf format with its matching arguments; vsnprintf truncates to
+    // the buffer and always terminates it.
+    let message = unsafe {
+        if ffi::vsnprintf(buffer.as_mut_ptr(), buffer.len() as _, format, args) < 0 {
+            return;
+        }
+        CStr::from_ptr(buffer.as_ptr()).to_string_lossy()
+    };
+    let tag = if tag.is_null() {
+        "SVT-AV1".into()
+    } else {
+        // SAFETY: a non-null tag is a NUL-terminated string.
+        unsafe { CStr::from_ptr(tag) }.to_string_lossy()
+    };
+    eprintln!("{tag}: {}", message.trim_end());
+}
 
 /// Software AV1 options that only exist for this encoder.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -322,6 +369,10 @@ fn validate(config: &EncoderConfig) -> Result<()> {
 /// Creates and starts an SVT-AV1 encoder for `config`.
 fn open(config: &EncoderConfig, options: Av1Options) -> Result<*mut ffi::EbComponentType> {
     let _lifecycle = LIFECYCLE.lock().unwrap_or_else(PoisonError::into_inner);
+    // SAFETY: the callback must be registered before the first handle, which fixes the logging
+    // setup; the lifecycle lock keeps it apart from other encoders being created.
+    LOG_CALLBACK
+        .call_once(|| unsafe { ffi::svt_av1_set_log_callback(Some(svt_log), ptr::null_mut()) });
     // SAFETY: svt_av1_enc_init_handle fills the configuration with defaults before it is changed;
     // the handle is released again on every error path.
     unsafe {
