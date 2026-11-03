@@ -52,9 +52,12 @@ else
   cp "$work"/fixtures/*.mcplugin "$work/staged/"
 
   # Each fixture folder may carry an e2e-fixture.json marker:
-  #   {"repo": "official" | "third-party", "check": "pass" | "fail", "versions": ["."] or subfolders}
+  #   {"repo": "official" | "third-party", "check": "pass" | "fail" | "raw", "versions": ["."] or subfolders}
   # Without a marker a folder is one official version that must pass `check --official`. A "fail"
-  # fixture must be rejected by `check --official` (the host refuses it at install time).
+  # fixture must be rejected by `check --official` (the host refuses it at install time). A "raw"
+  # fixture carries a manifest that `build` refuses or rewrites (a reserved Apps-menu label, an
+  # api newer than the SDK): it is built from a copy with a valid manifest, then repacked with the
+  # source manifest.json unchanged. `check` is skipped, the client itself must refuse it.
   : > "$work/staged/routes.txt"
   for dir in "$repo"/e2e/fixtures/plugins/*/; do
     name="$(basename "$dir")"
@@ -69,7 +72,7 @@ else
     target=official check=pass versions=.
     if [ -f "$marker" ]; then
       target="$(jq -er '.repo | select(. == "official" or . == "third-party")' "$marker")"
-      check="$(jq -er '.check | select(. == "pass" or . == "fail")' "$marker")"
+      check="$(jq -er '.check | select(. == "pass" or . == "fail" or . == "raw")' "$marker")"
       versions="$(jq -er '.versions | join("\n")' "$marker")"
     fi
     while IFS= read -r version; do
@@ -77,9 +80,26 @@ else
       one="$work/built-one"
       rm -rf "$one"
       mkdir -p "$one" "$work/built"
-      "$cli" build "$dir/$version" --out "$one" >&2
+      if [ "$check" = raw ]; then
+        # The copy sits next to the original: the plugin's SDK path dependency is relative.
+        src="$dir/../.raw-$name"
+        rm -rf "$src" "$work/raw-pkg"
+        mkdir -p "$src" "$work/raw-pkg"
+        tar -C "$dir/$version" --exclude=target --exclude=dist -cf - . | tar -C "$src" -xf -
+        jq '.api = "^1.1" | (.app_menu[]?.label) = "Fixture"' "$dir/$version/manifest.json" > "$src/manifest.json"
+        "$cli" build "$src" --out "$work/raw-pkg" >&2
+        unzip -q "$work"/raw-pkg/*.mcplugin -d "$work/raw-pkg/x"
+        cp "$dir/$version/manifest.json" "$work/raw-pkg/x/manifest.json"
+        pkg="$(basename "$work"/raw-pkg/*.mcplugin)"
+        (cd "$work/raw-pkg/x" && find . -type f | sed 's|^\./||' | sort | zip -X -q "$one/$pkg" -@)
+        rm -rf "$src" "$work/raw-pkg"
+      else
+        "$cli" build "$dir/$version" --out "$one" >&2
+      fi
       for f in "$one"/*.mcplugin; do
-        if [ "$check" = pass ]; then
+        if [ "$check" = raw ]; then
+          :
+        elif [ "$check" = pass ]; then
           "$cli" check --official "$f" >&2
         elif "$cli" check --official "$f" >/dev/null 2>&1; then
           echo "error: $name/$version is marked check=fail but passes check --official" >&2
