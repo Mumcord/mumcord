@@ -3152,7 +3152,7 @@ export type PluginWebsites = {
 };
 
 /**  Where a plugin's web view is shown. */
-export type PluginWebviewPlace = "panelPopover" | "dialog";
+export type PluginWebviewPlace = "panelPopover" | "dialog" | "sidePanel" | "stage";
 
 /**  `plugins://changed`: the plugin list or a plugin's state changed; reload `plugins_list`. */
 export type PluginsChanged = Record<string, never>;

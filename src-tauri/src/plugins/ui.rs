@@ -346,6 +346,8 @@ pub enum PluginUiChange {
 pub enum PluginWebviewPlace {
     PanelPopover,
     Dialog,
+    SidePanel,
+    Stage,
 }
 
 impl From<WebviewPlace> for PluginWebviewPlace {
@@ -353,6 +355,8 @@ impl From<WebviewPlace> for PluginWebviewPlace {
         match place {
             WebviewPlace::PanelPopover => Self::PanelPopover,
             WebviewPlace::Dialog => Self::Dialog,
+            WebviewPlace::SidePanel => Self::SidePanel,
+            WebviewPlace::Stage => Self::Stage,
         }
     }
 }

@@ -282,6 +282,7 @@ impl PluginService {
         let origins = manifest
             .validate_origins(origin.source() == Source::Dev)
             .unwrap_or_default();
+        self.io.webviews().set_origins(&record.id, origins.clone());
         self.ctx.http.set_origins(&record.id, origins);
         self.set_webview_root(&record.id, origin.source(), &dir, &granted);
         self.ctx.grants.set(&record.id, granted);
@@ -350,9 +351,9 @@ impl PluginService {
             self.io.webview_hide(id);
         }
         let web = dir.join("web");
-        self.io
-            .webviews()
-            .set_root(id, (allowed && web.is_dir()).then_some(web));
+        let webviews = self.io.webviews();
+        webviews.set_origins_granted(id, granted.iter().any(|g| g == "net.origins"));
+        webviews.set_root(id, (allowed && web.is_dir()).then_some(web));
     }
 
     pub(super) fn version_dir(&self, id: &str, version: &str) -> PathBuf {

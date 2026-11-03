@@ -191,11 +191,14 @@ pub fn open_with(
         return window.set_focus();
     }
     // Starts hidden so the stored size and position apply before it shows up.
-    let mut builder = crate::browser::deny_new_windows(WebviewWindowBuilder::new(
+    let mut builder = crate::plugins::webview::harden_builder(
         app,
-        spec.label,
-        WebviewUrl::App(spec.url.into()),
-    ))
+        crate::browser::deny_new_windows(WebviewWindowBuilder::new(
+            app,
+            spec.label,
+            WebviewUrl::App(spec.url.into()),
+        )),
+    )
     .title(title)
     .always_on_top(on_top)
     .inner_size(spec.default_size.0, spec.default_size.1)
@@ -206,6 +209,7 @@ pub fn open_with(
         builder = builder.data_directory(dir);
     }
     let window = builder.build()?;
+    crate::plugins::webview::harden_window(&window);
     if let Some(geometry) = load_geometry(app, spec) {
         restore(&window, geometry);
     }

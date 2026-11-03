@@ -5,14 +5,21 @@
 //! them: which entries and files are valid, the frame's Content-Security-Policy, the bridge
 //! limits, and [`Webviews`], the per-plugin state of open web views. A file is only served while
 //! its plugin has a web view open, so a stopped or hidden plugin exposes nothing.
+//!
+//! Since 1.1 (FR-9.32 … FR-9.38) a plugin may have up to three frames at once, one per slot:
+//! stage, side panel and dialog (the panel popover uses the dialog slot). The frame policy also
+//! lets the page reach the websites the plugin declares in `net.origins`.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard, PoisonError};
 use std::time::Instant;
 
+use base64::Engine as _;
+use sha2::{Digest, Sha256};
 use wasmtime::component::{HasSelf, Linker};
 
+use crate::origins::{Origin, Scheme};
 use crate::runtime::bindings::mumcord::plugin::webview::{Host, Place, add_to_linker};
 use crate::runtime::wit::types::Error;
 use crate::runtime::{HostApi, PluginState};
@@ -23,6 +30,15 @@ pub const PERMISSION: &str = "ui.webview";
 pub const SCHEME: &str = "mumcord-web";
 /// One bridge message, in UTF-8 bytes (FR-6.47).
 pub const MAX_MESSAGE_BYTES: usize = 16 * 1024;
+/// One bridge message to or from a stage frame (FR-9.37).
+pub const MAX_STAGE_MESSAGE_BYTES: usize = 64 * 1024;
+/// Web frames one plugin may have loaded at once: one per [`Slot`] (FR-9.38).
+pub const MAX_FRAMES: usize = 3;
+/// The Permissions-Policy every `web/` response carries (FR-9.34): every powerful feature is
+/// off, whatever the page asks for. Same list as the S0 spike verified on all three platforms.
+pub const PERMISSIONS_POLICY: &str = "camera=(), microphone=(), geolocation=(), clipboard-read=(), \
+    clipboard-write=(), display-capture=(), usb=(), serial=(), hid=(), bluetooth=(), payment=(), \
+    fullscreen=(), autoplay=()";
 /// Bridge messages per second, in each direction (FR-6.47).
 pub const MAX_MESSAGES_PER_SECOND: u32 = 60;
 /// An entry path (below `web/`) longer than this is refused.
@@ -112,18 +128,48 @@ pub fn mime_type(path: &str) -> Option<&'static str> {
         .map(|(_, mime)| *mime)
 }
 
-/// The Content-Security-Policy every `web/` response carries. `origin` is the scheme's origin as
-/// the system web view sees it (e.g. `mumcord-web://localhost`). Scripts, styles and images may
-/// come inline or from this plugin's own folder only (WebAssembly may be compiled, data files
-/// fetched and fonts loaded from there too); nothing else may be fetched, framed, submitted
+/// The Content-Security-Policy every `web/` response carries (FR-9.33), sent as a header so the
+/// page cannot weaken it. `origin` is the scheme's origin as the system web view sees it (e.g.
+/// `mumcord-web://localhost`); `declared` are the plugin's approved `net.origins`.
+///
+/// Scripts come only from this plugin's own folder (plus the host's bootstrap, by hash) and may
+/// compile WebAssembly; styles from the folder or inline. Images, media and fonts may also come
+/// from `blob:`, `data:` and the declared websites, which may serve data (`connect-src`, with
+/// `wss:` origins) but never scripts. Nothing may be framed, run as a worker, embedded, submitted
 /// or used as a base. The `sandbox` directive repeats the frame's sandbox, so even a page that
 /// ends up outside its frame keeps an opaque origin without popups or navigation of others.
-pub fn content_security_policy(origin: &str, plugin: &str) -> String {
+pub fn content_security_policy(origin: &str, plugin: &str, declared: &[Origin]) -> String {
     let own = format!("{origin}/{plugin}/");
+    let mut sites = String::new();
+    let mut connect = String::new();
+    for declared in declared {
+        let ascii = declared.ascii();
+        if declared.scheme != Scheme::Wss {
+            sites.push(' ');
+            sites.push_str(&ascii);
+        }
+        connect.push(' ');
+        connect.push_str(&ascii);
+    }
+    let bootstrap = bootstrap_hash();
     format!(
-        "default-src 'none'; script-src {own} 'unsafe-inline' 'wasm-unsafe-eval'; style-src {own} 'unsafe-inline'; \
-         img-src {own} data: blob:; font-src {own}; connect-src {own}; frame-src 'none'; worker-src 'none'; \
-         object-src 'none'; form-action 'none'; base-uri 'none'; sandbox allow-scripts"
+        "default-src 'none'; script-src {own} '{bootstrap}' 'wasm-unsafe-eval'; style-src {own} 'unsafe-inline'; \
+         img-src {own} blob: data:{sites}; media-src {own} blob: data:{sites}; font-src {own} blob: data:{sites}; \
+         connect-src {own}{connect}; frame-src 'none'; worker-src 'none'; object-src 'none'; \
+         form-action 'none'; base-uri 'none'; sandbox allow-scripts"
+    )
+}
+
+/// The CSP hash source of the inline bootstrap script, the only inline script a page may run.
+fn bootstrap_hash() -> String {
+    let script = ESCAPE_BOOTSTRAP
+        .strip_prefix("<script>")
+        .and_then(|rest| rest.strip_suffix("</script>"))
+        .unwrap_or(ESCAPE_BOOTSTRAP);
+    let digest = Sha256::digest(script.as_bytes());
+    format!(
+        "sha256-{}",
+        base64::engine::general_purpose::STANDARD.encode(digest)
     )
 }
 
@@ -186,6 +232,28 @@ impl Bucket {
 pub enum WebviewPlace {
     PanelPopover,
     Dialog,
+    /// Since 1.1: the docked column right of the chat (FR-9.39).
+    SidePanel,
+    /// Since 1.1: the plugin's activity in the media area (FR-9.45).
+    Stage,
+}
+
+impl WebviewPlace {
+    fn slot(self) -> Slot {
+        match self {
+            Self::PanelPopover | Self::Dialog => Slot::Dialog,
+            Self::SidePanel => Slot::SidePanel,
+            Self::Stage => Slot::Stage,
+        }
+    }
+
+    /// The largest bridge message to or from a frame in this place (FR-9.37).
+    pub fn max_message_bytes(self) -> usize {
+        match self {
+            Self::Stage => MAX_STAGE_MESSAGE_BYTES,
+            Self::PanelPopover | Self::Dialog | Self::SidePanel => MAX_MESSAGE_BYTES,
+        }
+    }
 }
 
 impl From<Place> for WebviewPlace {
@@ -197,6 +265,16 @@ impl From<Place> for WebviewPlace {
     }
 }
 
+/// The three frames a plugin may have at once (FR-9.38). The panel popover and the dialog share
+/// one slot, so a popover while the dialog shows a page (or the other way round) is a fourth
+/// frame.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Slot {
+    Stage = 0,
+    SidePanel = 1,
+    Dialog = 2,
+}
+
 /// A web view a plugin just opened: what the app shows.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Shown {
@@ -205,24 +283,61 @@ pub struct Shown {
     pub entry: String,
 }
 
-#[derive(Debug)]
-struct Open {
-    place: WebviewPlace,
-    to_page: Bucket,
-    from_page: Bucket,
-}
-
 #[derive(Debug, Default)]
 struct PluginWeb {
     /// The plugin's installed `web/` folder; `None` unless it may show web views.
     root: Option<PathBuf>,
+    /// The plugin's declared `net.origins`.
+    origins: Vec<Origin>,
+    /// Whether the `net.origins` grant lets its pages reach them.
+    origins_granted: bool,
     dialog_open: bool,
-    open: Option<Open>,
+    /// The place shown in each [`Slot`], indexed by the slot.
+    frames: [Option<WebviewPlace>; MAX_FRAMES],
+    /// One bridge rate per direction for all of the plugin's frames, set while any is open.
+    rates: Option<Rates>,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Rates {
+    to_page: Bucket,
+    from_page: Bucket,
+}
+
+impl PluginWeb {
+    fn open_places(&self) -> impl Iterator<Item = WebviewPlace> + '_ {
+        self.frames.iter().flatten().copied()
+    }
+
+    /// The largest message any open frame takes; `None` without an open frame.
+    fn max_message_bytes(&self) -> Option<usize> {
+        self.open_places()
+            .map(WebviewPlace::max_message_bytes)
+            .max()
+    }
+
+    /// Closes the frame in `slot` if `close` says so; returns whether one closed.
+    fn close(&mut self, slot: Slot, close: impl Fn(WebviewPlace) -> bool) -> bool {
+        let frame = &mut self.frames[slot as usize];
+        if frame.is_some_and(close) {
+            *frame = None;
+            if self.frames.iter().all(Option::is_none) {
+                self.rates = None;
+            }
+            return true;
+        }
+        false
+    }
+
+    fn close_all(&mut self) {
+        self.frames = [None; MAX_FRAMES];
+        self.rates = None;
+    }
 }
 
 /// The web view state of every plugin. Shared by the plugin service (host calls run on plugin
-/// threads), the custom protocol (file requests) and the bridge command; every method returns
-/// at once.
+/// threads), the custom protocol (file requests and frame policy) and the bridge command; every
+/// method returns at once.
 #[derive(Debug, Default)]
 pub struct Webviews {
     plugins: Mutex<HashMap<String, PluginWeb>>,
@@ -239,13 +354,51 @@ impl Webviews {
         let mut plugins = self.lock();
         let web = plugins.entry(plugin.to_owned()).or_default();
         if root.is_none() {
-            web.open = None;
+            web.close_all();
         }
         web.root = root;
     }
 
-    /// `webview.show`: opens (or replaces) the plugin's web view. `invalid` for an entry that is
-    /// not an existing `.html` page in `web/`, or for the dialog place without an open dialog.
+    /// Sets the websites a plugin declares in `net.origins`, at load. Its pages reach them only
+    /// while [`Self::set_origins_granted`] says so.
+    pub fn set_origins(&self, plugin: &str, origins: Vec<Origin>) {
+        self.lock().entry(plugin.to_owned()).or_default().origins = origins;
+    }
+
+    /// Sets whether the plugin holds the `net.origins` grant, whenever its grants change. Takes
+    /// effect for the next page load; the Windows frame proxy reads it on every connection.
+    pub fn set_origins_granted(&self, plugin: &str, granted: bool) {
+        self.lock()
+            .entry(plugin.to_owned())
+            .or_default()
+            .origins_granted = granted;
+    }
+
+    /// The approved websites of `plugin`, for its frame policy.
+    pub fn origins(&self, plugin: &str) -> Vec<Origin> {
+        self.lock()
+            .get(plugin)
+            .filter(|web| web.origins_granted)
+            .map(|web| web.origins.clone())
+            .unwrap_or_default()
+    }
+
+    /// Whether any plugin's pages may reach `host:port` (`host` in lower-case ASCII).
+    pub fn allows_host(&self, host: &str, port: u16) -> bool {
+        self.lock()
+            .values()
+            .filter(|web| web.origins_granted)
+            .any(|web| {
+                web.origins
+                    .iter()
+                    .any(|origin| origin.host == host && origin.effective_port() == port)
+            })
+    }
+
+    /// `webview.show`: opens a frame in `place`, or replaces the page of the frame already there.
+    /// `invalid` for an entry that is not an existing `.html` page in `web/`, or for the dialog
+    /// place without an open dialog; `quota-exceeded` when the place's slot holds the other
+    /// dialog-slot place (a fourth frame, FR-9.38; the spec calls it `limit`).
     pub fn show(
         &self,
         plugin: &str,
@@ -260,8 +413,12 @@ impl Webviews {
         if resolve(root, path).is_none() || (place == WebviewPlace::Dialog && !web.dialog_open) {
             return Err(Error::Invalid);
         }
-        web.open = Some(Open {
-            place,
+        let frame = &mut web.frames[place.slot() as usize];
+        if frame.is_some_and(|open| open != place) {
+            return Err(Error::QuotaExceeded);
+        }
+        *frame = Some(place);
+        web.rates.get_or_insert(Rates {
             to_page: Bucket::new(now),
             from_page: Bucket::new(now),
         });
@@ -271,20 +428,32 @@ impl Webviews {
         })
     }
 
-    /// `webview.hide`; returns whether a web view was open.
+    /// `webview.hide`: closes the side panel and the dialog-slot frame; returns whether one was
+    /// open. A stage frame belongs to its activity and closes with [`Self::stage_closed`].
     pub fn hide(&self, plugin: &str) -> bool {
-        self.lock()
-            .get_mut(plugin)
-            .and_then(|web| web.open.take())
-            .is_some()
+        let mut plugins = self.lock();
+        let Some(web) = plugins.get_mut(plugin) else {
+            return false;
+        };
+        let side = web.close(Slot::SidePanel, |_| true);
+        let dialog = web.close(Slot::Dialog, |_| true);
+        side || dialog
     }
 
-    /// The plugin opened its dialog, so a web view may now go there.
-    pub fn dialog_opened(&self, plugin: &str) {
+    /// The plugin's stage activity ended; returns whether that closed its stage frame.
+    pub fn stage_closed(&self, plugin: &str) -> bool {
         self.lock()
-            .entry(plugin.to_owned())
-            .or_default()
-            .dialog_open = true;
+            .get_mut(plugin)
+            .is_some_and(|web| web.close(Slot::Stage, |_| true))
+    }
+
+    /// The plugin opened its dialog, so a web view may now go there. The modal dialog takes the
+    /// dialog slot, so a panel popover frame closes.
+    pub fn dialog_opened(&self, plugin: &str) {
+        let mut plugins = self.lock();
+        let web = plugins.entry(plugin.to_owned()).or_default();
+        web.dialog_open = true;
+        web.close(Slot::Dialog, |open| open == WebviewPlace::PanelPopover);
     }
 
     /// The plugin closed its dialog; returns whether that closed a web view shown in it.
@@ -294,49 +463,59 @@ impl Webviews {
             return false;
         };
         web.dialog_open = false;
-        if web
-            .open
-            .as_ref()
-            .is_some_and(|open| open.place == WebviewPlace::Dialog)
-        {
-            web.open = None;
-            return true;
-        }
-        false
+        web.close(Slot::Dialog, |open| open == WebviewPlace::Dialog)
     }
 
-    /// `webview.post`: checks a message from the plugin to its page. Order: size, an open web
-    /// view, then the rate (only a message that passes everything uses up the rate).
-    pub fn post(&self, plugin: &str, message: &str, now: Instant) -> Result<(), Error> {
-        if message.len() > MAX_MESSAGE_BYTES {
+    /// `webview.post`: checks a message from the plugin to its pages and returns the open frames
+    /// it goes to. Order: an open frame, size, then the rate (only a message that passes
+    /// everything uses up the rate). A message above 16 KiB goes to the stage frame only.
+    pub fn post(
+        &self,
+        plugin: &str,
+        message: &str,
+        now: Instant,
+    ) -> Result<Vec<WebviewPlace>, Error> {
+        let mut plugins = self.lock();
+        let web = plugins.get_mut(plugin).ok_or(Error::Invalid)?;
+        let max = web.max_message_bytes().ok_or(Error::Invalid)?;
+        if message.len() > max {
             return Err(Error::TooLarge);
         }
-        let mut plugins = self.lock();
-        let open = plugins
-            .get_mut(plugin)
-            .and_then(|web| web.open.as_mut())
-            .ok_or(Error::Invalid)?;
-        if open.to_page.take(now) {
-            Ok(())
+        let targets = web
+            .open_places()
+            .filter(|place| message.len() <= place.max_message_bytes())
+            .collect();
+        if web
+            .rates
+            .as_mut()
+            .is_some_and(|rates| rates.to_page.take(now))
+        {
+            Ok(targets)
         } else {
             Err(Error::RateLimited)
         }
     }
 
-    /// Whether a message from the page may reach the plugin: the web view is open, the message
-    /// fits and the rate allows it. Anything else is dropped.
+    /// Whether a message from a page may reach the plugin: a frame is open, the message fits the
+    /// largest open frame and the rate allows it. Anything else is dropped.
     pub fn accept_from_page(&self, plugin: &str, message: &str, now: Instant) -> bool {
-        if message.len() > MAX_MESSAGE_BYTES {
+        let mut plugins = self.lock();
+        let Some(web) = plugins.get_mut(plugin) else {
+            return false;
+        };
+        if web
+            .max_message_bytes()
+            .is_none_or(|max| message.len() > max)
+        {
             return false;
         }
-        self.lock()
-            .get_mut(plugin)
-            .and_then(|web| web.open.as_mut())
-            .is_some_and(|open| open.from_page.take(now))
+        web.rates
+            .as_mut()
+            .is_some_and(|rates| rates.from_page.take(now))
     }
 
     /// The file to serve for `path` below the plugin's `web/` folder, only while the plugin has a
-    /// web view open. The resolved file must stay inside the folder (no links out of it).
+    /// frame open. The resolved file must stay inside the folder (no links out of it).
     pub fn file(&self, plugin: &str, path: &str) -> Option<PathBuf> {
         if !is_web_path(path) {
             return None;
@@ -344,7 +523,7 @@ impl Webviews {
         let root = {
             let plugins = self.lock();
             let web = plugins.get(plugin)?;
-            web.open.as_ref()?;
+            web.open_places().next()?;
             web.root.clone()?
         };
         resolve(&root, path)
@@ -354,7 +533,7 @@ impl Webviews {
     pub fn close_unless(&self, running: impl Fn(&str) -> bool) {
         for (id, web) in self.lock().iter_mut() {
             if !running(id) {
-                web.open = None;
+                web.close_all();
                 web.dialog_open = false;
             }
         }
@@ -429,19 +608,100 @@ mod tests {
 
     #[test]
     fn the_policy_blocks_the_network_and_scopes_files_to_the_plugin() {
-        let csp = content_security_policy("mumcord-web://localhost", "snacks");
+        let csp = content_security_policy("mumcord-web://localhost", "snacks", &[]);
         assert!(csp.starts_with("default-src 'none';"));
-        assert!(csp.contains(
-            "script-src mumcord-web://localhost/snacks/ 'unsafe-inline' 'wasm-unsafe-eval';"
-        ));
-        // WebAssembly may be compiled, but JavaScript eval stays blocked.
+        assert!(csp.contains(&format!(
+            "script-src mumcord-web://localhost/snacks/ '{}' 'wasm-unsafe-eval';",
+            bootstrap_hash()
+        )));
+        // WebAssembly may be compiled, but JavaScript eval and other inline scripts stay blocked.
         assert!(!csp.contains("'unsafe-eval'"));
+        assert_eq!(csp.matches("'unsafe-inline'").count(), 1);
+        assert!(csp.contains("style-src mumcord-web://localhost/snacks/ 'unsafe-inline';"));
         assert!(csp.contains("connect-src mumcord-web://localhost/snacks/;"));
         assert_eq!(csp.matches("connect-src").count(), 1);
-        assert!(csp.contains("font-src mumcord-web://localhost/snacks/;"));
-        assert!(csp.contains("form-action 'none'"));
+        assert!(csp.contains("font-src mumcord-web://localhost/snacks/ blob: data:;"));
+        assert!(csp.contains("img-src mumcord-web://localhost/snacks/ blob: data:;"));
+        assert!(csp.contains("media-src mumcord-web://localhost/snacks/ blob: data:;"));
+        for directive in [
+            "frame-src 'none'",
+            "worker-src 'none'",
+            "object-src 'none'",
+            "form-action 'none'",
+            "base-uri 'none'",
+        ] {
+            assert!(csp.contains(directive), "{directive}");
+        }
         assert!(csp.ends_with("sandbox allow-scripts"));
         assert!(!csp.contains("allow-same-origin"));
+    }
+
+    #[test]
+    fn the_policy_lets_pages_reach_the_declared_websites_only_for_data() {
+        let declared = [
+            "https://api.example",
+            "wss://live.example:8443",
+            "https://cdn.example:444",
+        ]
+        .map(|origin| crate::origins::validate(origin, false).unwrap());
+        let csp = content_security_policy("mumcord-web://localhost", "snacks", &declared);
+        let own = "mumcord-web://localhost/snacks/";
+        assert!(csp.contains(&format!(
+            "connect-src {own} https://api.example wss://live.example:8443 https://cdn.example:444;"
+        )));
+        for media in ["img-src", "media-src", "font-src"] {
+            assert!(
+                csp.contains(&format!(
+                    "{media} {own} blob: data: https://api.example https://cdn.example:444;"
+                )),
+                "{media}"
+            );
+        }
+        let scripts = csp.split(';').find(|d| d.contains("script-src")).unwrap();
+        assert!(!scripts.contains("example"), "websites never serve scripts");
+    }
+
+    #[test]
+    fn a_developer_localhost_origin_is_reachable_from_the_page() {
+        let declared = [crate::origins::validate("http://localhost:47180", true).unwrap()];
+        let csp = content_security_policy("mumcord-web://localhost", "dev", &declared);
+        assert!(csp.contains("connect-src mumcord-web://localhost/dev/ http://localhost:47180;"));
+    }
+
+    #[test]
+    fn the_bootstrap_hash_matches_the_injected_script() {
+        let page = String::from_utf8(with_bootstrap(b"<p>x</p>")).unwrap();
+        let script = page
+            .strip_prefix("<script>")
+            .and_then(|rest| rest.split_once("</script>"))
+            .unwrap()
+            .0;
+        let digest = base64::engine::general_purpose::STANDARD.encode(Sha256::digest(script));
+        assert_eq!(bootstrap_hash(), format!("sha256-{digest}"));
+    }
+
+    #[test]
+    fn the_permissions_policy_denies_every_listed_feature() {
+        for feature in [
+            "camera",
+            "microphone",
+            "geolocation",
+            "clipboard-read",
+            "clipboard-write",
+            "display-capture",
+            "usb",
+            "serial",
+            "hid",
+            "bluetooth",
+            "payment",
+            "fullscreen",
+            "autoplay",
+        ] {
+            assert!(
+                PERMISSIONS_POLICY.contains(&format!("{feature}=()")),
+                "{feature}"
+            );
+        }
     }
 
     #[test]
@@ -517,6 +777,7 @@ mod tests {
         let now = Instant::now();
         assert_eq!(views.post("p", "x", now), Err(Error::Invalid));
         views.set_root("p", Some(root));
+        assert_eq!(views.post("p", "x", now), Err(Error::Invalid));
         views
             .show("p", WebviewPlace::PanelPopover, "index.html", now)
             .unwrap();
@@ -524,14 +785,134 @@ mod tests {
         assert_eq!(views.post("p", &big, now), Err(Error::TooLarge));
         assert!(!views.accept_from_page("p", &big, now));
         for _ in 0..MAX_MESSAGES_PER_SECOND {
-            assert_eq!(views.post("p", "x", now), Ok(()));
+            assert_eq!(
+                views.post("p", "x", now),
+                Ok(vec![WebviewPlace::PanelPopover])
+            );
             assert!(views.accept_from_page("p", "x", now));
         }
         assert_eq!(views.post("p", "x", now), Err(Error::RateLimited));
         assert!(!views.accept_from_page("p", "x", now));
         let later = now + Duration::from_millis(100);
-        assert_eq!(views.post("p", "x", later), Ok(()));
+        assert!(views.post("p", "x", later).is_ok());
         assert!(views.accept_from_page("p", "x", later));
+    }
+
+    #[test]
+    fn the_stage_takes_bigger_messages_and_the_rate_is_shared() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root));
+        views
+            .show("p", WebviewPlace::SidePanel, "index.html", now)
+            .unwrap();
+        views
+            .show("p", WebviewPlace::Stage, "index.html", now)
+            .unwrap();
+        let stage_sized = "x".repeat(MAX_STAGE_MESSAGE_BYTES);
+        assert_eq!(
+            views.post("p", &stage_sized, now),
+            Ok(vec![WebviewPlace::Stage])
+        );
+        assert!(views.accept_from_page("p", &stage_sized, now));
+        let too_big = "x".repeat(MAX_STAGE_MESSAGE_BYTES + 1);
+        assert_eq!(views.post("p", &too_big, now), Err(Error::TooLarge));
+        assert!(!views.accept_from_page("p", &too_big, now));
+        assert_eq!(
+            views.post("p", "x", now),
+            Ok(vec![WebviewPlace::Stage, WebviewPlace::SidePanel])
+        );
+        // Two frames still share one rate per direction (the two posts above count).
+        for _ in 2..MAX_MESSAGES_PER_SECOND {
+            assert!(views.post("p", "x", now).is_ok());
+        }
+        assert_eq!(views.post("p", "x", now), Err(Error::RateLimited));
+        assert!(views.stage_closed("p"));
+        let big = "x".repeat(MAX_MESSAGE_BYTES + 1);
+        assert_eq!(views.post("p", &big, now), Err(Error::TooLarge));
+    }
+
+    #[test]
+    fn a_plugin_has_at_most_three_frames_one_per_slot() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root));
+        views.dialog_opened("p");
+        for place in [
+            WebviewPlace::Stage,
+            WebviewPlace::SidePanel,
+            WebviewPlace::Dialog,
+        ] {
+            views.show("p", place, "index.html", now).unwrap();
+        }
+        // The popover shares the dialog's slot: a fourth frame.
+        assert_eq!(
+            views.show("p", WebviewPlace::PanelPopover, "index.html", now),
+            Err(Error::QuotaExceeded)
+        );
+        // Showing a place again only replaces its page.
+        for place in [
+            WebviewPlace::Stage,
+            WebviewPlace::SidePanel,
+            WebviewPlace::Dialog,
+        ] {
+            views.show("p", place, "index.html?again", now).unwrap();
+        }
+        assert_eq!(
+            views.post("p", "x", now),
+            Ok(vec![
+                WebviewPlace::Stage,
+                WebviewPlace::SidePanel,
+                WebviewPlace::Dialog
+            ])
+        );
+        // `hide` leaves the stage to its activity.
+        assert!(views.hide("p"));
+        assert_eq!(views.post("p", "x", now), Ok(vec![WebviewPlace::Stage]));
+        assert!(views.file("p", "index.html").is_some());
+        assert!(views.stage_closed("p"));
+        assert!(views.file("p", "index.html").is_none());
+        assert!(!views.hide("p"));
+    }
+
+    #[test]
+    fn opening_the_dialog_closes_a_popover_frame() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root));
+        views
+            .show("p", WebviewPlace::PanelPopover, "index.html", now)
+            .unwrap();
+        assert_eq!(
+            views.show("p", WebviewPlace::Dialog, "index.html", now),
+            Err(Error::Invalid)
+        );
+        views.dialog_opened("p");
+        views
+            .show("p", WebviewPlace::Dialog, "index.html", now)
+            .unwrap();
+        assert_eq!(views.post("p", "x", now), Ok(vec![WebviewPlace::Dialog]));
+    }
+
+    #[test]
+    fn approved_origins_are_kept_per_plugin() {
+        let views = Webviews::default();
+        let origin = crate::origins::validate("https://api.example:8443", false).unwrap();
+        views.set_origins("p", vec![origin.clone()]);
+        assert!(views.origins("p").is_empty(), "not granted yet");
+        assert!(!views.allows_host("api.example", 8443));
+        views.set_origins_granted("p", true);
+        assert_eq!(views.origins("p"), vec![origin]);
+        assert!(views.origins("other").is_empty());
+        assert!(views.allows_host("api.example", 8443));
+        assert!(!views.allows_host("api.example", 443));
+        assert!(!views.allows_host("evil.example", 8443));
+        // A revoked grant takes effect at once.
+        views.set_origins_granted("p", false);
+        assert!(!views.allows_host("api.example", 8443));
     }
 
     #[test]

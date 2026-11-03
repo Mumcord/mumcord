@@ -3955,6 +3955,7 @@ dependencies = [
  "mumcord-plugins",
  "mumcord-protocol 0.6.2",
  "notify-rust",
+ "objc2",
  "open",
  "rand 0.10.3",
  "semver",

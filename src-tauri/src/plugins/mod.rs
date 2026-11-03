@@ -5,6 +5,8 @@
 //! service events are pumped by background tasks; commands are thin wrappers.
 
 mod feed;
+#[cfg(any(windows, test))]
+mod frame_proxy;
 mod host_calls;
 pub mod suggestions;
 pub mod ui;
