@@ -902,6 +902,8 @@ export const commands = {
 	screenShareBlock: (serverId: number) => typedError<ShareStartBlock | null, ApiError>(__TAURI_INVOKE("screen_share_block", { serverId })),
 	/**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
 	screenShareQuality: (serverId: number) => typedError<ShareQuality | null, ApiError>(__TAURI_INVOKE("screen_share_quality", { serverId })),
+	/**  What a share started now with these picks would get (FR-7.36). Starts no self-test. */
+	screenSharePreview: (serverId: number, choice: QualityChoice, codec: ScreenCodec) => __TAURI_INVOKE<SharePreview>("screen_share_preview", { serverId, choice, codec }),
 	/**  The picture the sharer's bar shows: the last keyframe the encoder took (issue #163). */
 	screenShareThumbnail: (serverId: number) => typedError<ShareThumbnail | null, ApiError>(__TAURI_INVOKE("screen_share_thumbnail", { serverId })),
 	/**
@@ -3091,6 +3093,13 @@ export type PositionalStatusChanged = {
 	status: PositionalStatus,
 };
 
+/**  How the share would reach its viewers, for the start dialog's "Viewers get" line. */
+export type PreviewPath = 
+/**  "sent once via relay, up to {maxViewers} viewers" (fan-out, FR-7.40). */
+{ kind: "broadcast"; maxViewers: number } | 
+/**  "one copy per viewer, up to {maxViewers}". */
+{ kind: "copies"; maxViewers: number };
+
 /**
  *  A stored private conversation: its newest message (with the conversation) and the name the
  *  other person last wrote under, `null` when only own messages are stored.
@@ -3716,6 +3725,23 @@ export type ShareKind = "window" | "screen";
 /**  How the frames of a watched share reach the viewer. */
 export type SharePath = "direct";
 
+/**  The start dialog's "Viewers get" line before the share starts (FR-7.36). */
+export type SharePreview = {
+	/**  The share's top quality step, e.g. "1080p30". */
+	quality: string,
+	width: number,
+	height: number,
+	fps: number,
+	/**  Target bitrate of that step for the encoder's codec. */
+	kbps: number,
+	encoder: ActiveEncoder,
+	/**  Manual AV1 would run in software without a passed self-test (FR-7.54). */
+	softwareWarning: boolean,
+	/**  Why Automatic would not pick AV1. */
+	av1Skipped: Av1Skipped | null,
+	path: PreviewPath,
+};
+
 /**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
 export type ShareQuality = {
 	/**  The step the share runs at, as the bar names it, e.g. "1080p30". */
@@ -3728,6 +3754,8 @@ export type ShareQuality = {
 	height: number,
 	fps: number,
 	kbps: number,
+	/**  The encoder the own share runs on right now (codec badge); `null` until it opened. */
+	encoder: ActiveEncoder | null,
 	viewers: ViewerQuality[],
 };
 
@@ -4061,6 +4089,9 @@ export type VideoEmbed = {
 
 export type VideoSite = "youtube" | "twitch";
 
+/**  How the share reaches one viewer (viewer list, FR-7.52). */
+export type ViewerPath = "direct" | "relay" | "broadcast";
+
 /**  What one viewer gets (issue #163). */
 export type ViewerQuality = {
 	session: number,
@@ -4070,6 +4101,12 @@ export type ViewerQuality = {
 	 *  everyone because of this viewer.
 	 */
 	struggling: boolean,
+	/**  It lost a layer in the last 10 s: the viewer list shows "slow connection" (FR-7.52). */
+	slow: boolean,
+	/**  The share's codec, the same for every viewer; `null` until the encoder opened. */
+	codec: VideoCodec | null,
+	/**  How the share reaches this viewer. */
+	path: ViewerPath,
 };
 
 export type VoiceActivation = "automatic" | "manual";

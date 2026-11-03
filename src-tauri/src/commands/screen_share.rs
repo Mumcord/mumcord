@@ -16,7 +16,9 @@ use tauri_specta::Event;
 use crate::screen_frames::{FrameChannel, ScreenFrames};
 
 use super::p2p::RelayUnavailable;
-use super::settings::{ScreenFps, ScreenOptimize, ScreenResolution, ScreenUploadLimit};
+use super::settings::{
+    ScreenCodec, ScreenFps, ScreenOptimize, ScreenResolution, ScreenUploadLimit,
+};
 use super::types::{ApiResult, ServerId, SessionId, to_engine_server_id};
 
 /// Why "Watch" is disabled (FR-2.46).
@@ -90,6 +92,8 @@ pub struct ShareQuality {
     pub height: u32,
     pub fps: u32,
     pub kbps: u32,
+    /// The encoder the own share runs on right now (codec badge); `null` until it opened.
+    pub encoder: Option<ActiveEncoder>,
     pub viewers: Vec<ViewerQuality>,
 }
 
@@ -102,6 +106,31 @@ pub struct ViewerQuality {
     /// It lost every layer it can and still does not keep up, so the quality step is lowered for
     /// everyone because of this viewer.
     pub struggling: bool,
+    /// It lost a layer in the last 10 s: the viewer list shows "slow connection" (FR-7.52).
+    pub slow: bool,
+    /// The share's codec, the same for every viewer; `null` until the encoder opened.
+    pub codec: Option<VideoCodec>,
+    /// How the share reaches this viewer.
+    pub path: ViewerPath,
+}
+
+/// How the share reaches one viewer (viewer list, FR-7.52).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum ViewerPath {
+    Direct,
+    Relay,
+    Broadcast,
+}
+
+impl From<engine_share::ViewerPath> for ViewerPath {
+    fn from(p: engine_share::ViewerPath) -> Self {
+        match p {
+            engine_share::ViewerPath::Direct => Self::Direct,
+            engine_share::ViewerPath::Relay => Self::Relay,
+            engine_share::ViewerPath::Broadcast => Self::Broadcast,
+        }
+    }
 }
 
 /// What the user's own watch of a share looks like (issue #163); the picture figures come from
@@ -399,8 +428,10 @@ pub fn screen_share_quality(
     engine: State<'_, Engine>,
     server_id: ServerId,
 ) -> ApiResult<Option<ShareQuality>> {
+    let server = to_engine_server_id(server_id);
+    let encoder = engine.screen_share_encoder(server).map(Into::into);
     Ok(engine
-        .screen_share_media_stats(to_engine_server_id(server_id))
+        .screen_share_media_stats(server)
         .map(|s| ShareQuality {
             quality: s.quality,
             lowered: s.lowered.map(Into::into),
@@ -409,6 +440,7 @@ pub fn screen_share_quality(
             height: s.height,
             fps: s.fps,
             kbps: s.kbps,
+            encoder,
             viewers: s
                 .viewers
                 .into_iter()
@@ -416,6 +448,9 @@ pub fn screen_share_quality(
                     session: v.session,
                     fps: v.fps,
                     struggling: v.struggling,
+                    slow: v.slow,
+                    codec: v.codec.map(Into::into),
+                    path: v.path.into(),
                 })
                 .collect(),
         }))
@@ -715,6 +750,18 @@ mod tests {
     }
 
     #[test]
+    fn preview_path_maps_both_kinds() {
+        assert_eq!(
+            PreviewPath::from(engine_share::SharePath::Copies { max_viewers: 8 }),
+            PreviewPath::Copies { max_viewers: 8 }
+        );
+        assert_eq!(
+            PreviewPath::from(engine_share::SharePath::Broadcast { max_viewers: 20 }),
+            PreviewPath::Broadcast { max_viewers: 20 }
+        );
+    }
+
+    #[test]
     fn viewer_switch_keeps_the_session() {
         let av1 = engine_share::ActiveEncoder {
             codec: engine_share::wire::Codec::Av1,
@@ -734,4 +781,79 @@ mod tests {
         assert_eq!(switched.reason, SwitchReason::Viewer { session: 7 });
         assert_eq!(switched.to.codec, VideoCodec::Vp9);
     }
+}
+
+/// How the share would reach its viewers, for the start dialog's "Viewers get" line.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase", tag = "kind")]
+pub enum PreviewPath {
+    /// "sent once via relay, up to {maxViewers} viewers" (fan-out, FR-7.40).
+    #[serde(rename_all = "camelCase")]
+    Broadcast { max_viewers: u32 },
+    /// "one copy per viewer, up to {maxViewers}".
+    #[serde(rename_all = "camelCase")]
+    Copies { max_viewers: u32 },
+}
+
+impl From<engine_share::SharePath> for PreviewPath {
+    fn from(p: engine_share::SharePath) -> Self {
+        let clamp = |n: usize| u32::try_from(n).unwrap_or(u32::MAX);
+        match p {
+            engine_share::SharePath::Broadcast { max_viewers } => Self::Broadcast {
+                max_viewers: clamp(max_viewers),
+            },
+            engine_share::SharePath::Copies { max_viewers } => Self::Copies {
+                max_viewers: clamp(max_viewers),
+            },
+        }
+    }
+}
+
+/// The start dialog's "Viewers get" line before the share starts (FR-7.36).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SharePreview {
+    /// The share's top quality step, e.g. "1080p30".
+    pub quality: String,
+    pub width: u32,
+    pub height: u32,
+    pub fps: u32,
+    /// Target bitrate of that step for the encoder's codec.
+    pub kbps: u32,
+    pub encoder: ActiveEncoder,
+    /// Manual AV1 would run in software without a passed self-test (FR-7.54).
+    pub software_warning: bool,
+    /// Why Automatic would not pick AV1.
+    pub av1_skipped: Option<Av1Skipped>,
+    pub path: PreviewPath,
+}
+
+impl From<engine_share::SharePreview> for SharePreview {
+    fn from(p: engine_share::SharePreview) -> Self {
+        Self {
+            quality: p.quality,
+            width: p.width,
+            height: p.height,
+            fps: p.fps,
+            kbps: p.kbps,
+            encoder: p.encoder.into(),
+            software_warning: p.software_warning,
+            av1_skipped: p.av1_skipped.map(Into::into),
+            path: p.path.into(),
+        }
+    }
+}
+
+/// What a share started now with these picks would get (FR-7.36). Starts no self-test.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_preview(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    choice: QualityChoice,
+    codec: ScreenCodec,
+) -> SharePreview {
+    engine
+        .screen_share_preview(to_engine_server_id(server_id), choice.into(), codec.into())
+        .into()
 }
