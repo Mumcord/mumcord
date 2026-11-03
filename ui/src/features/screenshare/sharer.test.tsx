@@ -256,6 +256,9 @@ describe("sharer control bar", () => {
 
   it("counts the viewers, and the viewers button names them with their quality", async () => {
     vi.spyOn(api, "screenShareQuality").mockResolvedValue({
+      quality: "1080p60",
+      lowered: null,
+      switched: null,
       width: 1920,
       height: 1080,
       fps: 60,
