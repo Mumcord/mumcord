@@ -124,6 +124,8 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.33** Speed: no extra limit in the client beyond the relay's per-session bandwidth (10 Mbit/s by default, FR-4.35). Screen sharing on the same connection keeps priority over file data.
 - **FR-7.34** Timeouts: no `go`/`queued` answer within 10 s → Failed "{sender} did not answer". `go` but no data within 30 s → Failed "Couldn't connect through the relay: {reason}" with the relay reasons of FR-4.11. No data for 30 s during a transfer → Failed "The transfer stalled".
 
+- **FR-7.75** **Offer format: Bovnar** (#400, user decision 2026-11-03). The file offer (`data-mumcord-file` payload) and the `mumcord.file` plugin-data messages are Bovnar documents, written and read with the Rust Bovnar implementation from the fork `Mumcord/bovnar`, used as a git dependency pinned to a commit (spec 09 FR-9.99 for the consequences). Bovnar is used here because `mumcord.file` and the offer attribute are new in 0.7.0 and 0.6.2 ignores them. The decoder checks the size before decoding and rejects malformed, truncated or oversized documents without a crash or hang and without logging payload content (FR-7.23 validation then applies to the decoded fields). Every other channel stays as it is: screen-share signalling (`Watch`), `mumcord.peer`, `mumcord.image`, history sync and hello keep their JSON/binary formats; a channel never mixes formats. 0.6.2 and official Mumble clients still show the plain text line of the offer.
+
 ### 4.5 Screen sharing: start dialog and live quality
 
 - **FR-7.35** Pressing Share opens the **share start dialog** (mockup 01) before the system's window/screen picker, every time. Fields and defaults: Resolution **Auto** (720p, 1080p, 1440p), Frame rate **30** (15, 30, 60), Optimize for **Balanced** (Sharp text, Smooth motion), Codec **Automatic** (AV1, VP9), Upload limit **Auto** (2, 5, 10, 20 Mbit/s), Sound **on** (Windows and macOS only; hidden on Linux), "Use these settings next time" (stores them as the defaults of Settings → Screen sharing). Buttons **Start sharing** (default) and **Cancel**. The codec line names the encoder that would be used, e.g. "AV1 (graphics card)", "AV1 (software · higher CPU load)", "VP9 (graphics card)", "VP9".
@@ -291,7 +293,7 @@ Share sound (Windows, macOS) is unchanged in capture and codec (Opus). In a broa
 
 ### 6.2 Codecs and quality
 
-VP9 (libvpx, today) and new AV1 (hardware via FFmpeg's libavcodec, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
+VP9 (libvpx, today) and new AV1 (hardware through the vendor encoder APIs directly, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
 
 ### 6.3 File transfer sequence
 
@@ -324,7 +326,7 @@ sequenceDiagram
 ### 6.4 Wire formats (file sharing)
 
 **Offer (channel text message).** HTML like today's chat messages:
-`<p>📎 Alice shared a file: <b>{name}</b> ({size}). Download it with Mumcord.</p>` followed by an element carrying the attribute `data-mumcord-file` whose value is compact JSON:
+`<p>📎 Alice shared a file: <b>{name}</b> ({size}). Download it with Mumcord.</p>` followed by an element carrying the attribute `data-mumcord-file` whose value is the **Bovnar document** below, encoded as standard base64 text (an HTML attribute cannot carry binary; #400, FR-7.75). Field names and meanings stay as in the table; the types are Bovnar types (unsigned integers, strings, hex strings):
 
 | Field | Type | Rules |
 |---|---|---|
@@ -338,7 +340,7 @@ sequenceDiagram
 
 The receiver validates every field before showing a card (untrusted input) and treats the sender as the Mumble session that sent the message, never a field. The whole message stays well under the server's default message length (5000).
 
-**Plugin data `mumcord.file`** (compact JSON, ≤ 1000 bytes, sent only to the other session):
+**Plugin data `mumcord.file`** (Bovnar document, ≤ 1000 bytes, size-checked before decoding, sent only to the other session; FR-7.75):
 
 | `t` | Direction | Fields |
 |---|---|---|
@@ -439,6 +441,8 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 | Encoder cache (per machine) | `driver_id`, `app_version`, per encoder `available` + `smoke_ok`, per (resolution, fps) `svt_selftest_ms` | | | re-test on driver/app change or Check again |
 | Chat history | file card: offer fields + local state (done path, mismatch) | | | Same retention as chat history; the file itself is not part of history |
 
+Offers are stored in chat history as decoded fields (the Bovnar bytes are not kept); the wire format does not change the stored form.
+
 Not stored: active shares, queues, transfer progress, broadcast tokens and keys (memory only).
 
 ### 7.2 File card state (recipient)
@@ -512,14 +516,16 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 
 ## 8. Technology & architecture
 
+- **Bovnar (#400):** `files::wire` encodes and decodes the offer and the `mumcord.file` messages with the pinned Bovnar crate (git dependency, `publish = false` upstream); licence notice added to the licences window.
+
 - **File transfer on the existing `mumcord-p2p` connection, forced through the relay.** Reuses the end-to-end encrypted, certificate-pinned QUIC session and the relay of spec 04, so no new crypto or transport is needed.
 - **Offer as a normal text message with a data attribute**, like full-size images today (FR-1.60c): official clients see readable text and the offer arrives with the chat, including for history.
 - **SHA-256 via the `sha2` crate** (already in the tree), computed streaming on a worker thread; zip with the `zip` crate (deflate only), in the engine, never on the UI or audio threads.
 - **Mark-of-the-web** in a small platform module (`windows` ADS write, macOS `xattr`, Linux `xattr`).
-- **Hardware encoders via FFmpeg's libavcodec** (LGPL build, only `av1_nvenc`, `av1_amf`, `av1_qsv`, `av1_vaapi`, `vp9_qsv`, `vp9_vaapi` and needed hwcontexts; `--enable-gpl` off): one interface instead of four vendor SDKs; vendor drivers are loaded at runtime, so no SDK ships.
+- **Hardware encoders written directly against the vendor APIs (no FFmpeg):** NVENC via nv-codec-headers with the driver loaded at runtime (dlopen); AMD AMF via the AMF headers, loaded at runtime; Intel Quick Sync via oneVPL/libvpl; Linux VA-API via libva, loaded at runtime (no package dependency). Vendor drivers are loaded at runtime, so no SDK ships. macOS has no hardware encoder for AV1 or VP9; it uses software only.
 - **SVT-AV1** for software AV1 encode (real-time presets, low delay, screen-content mode): the only open encoder fast enough for live 1080p30 (rav1e and libaom are too slow, #355). **dav1d** for AV1 decode in the engine fallback.
 - **Frame encryption** with AES-128-GCM from `ring` (already used by rustls); key exchange with X25519 (`ring`) signed by the Mumble client certificate key (`rustls`/`rcgen` key types already present). SFrame-style framing per RFC 9605, own minimal implementation (no extra dependency).
-- **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, `ffmpeg.rs`, `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
+- **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, one module per vendor API (`nvenc.rs`, `amf.rs`, `qsv.rs`, `vaapi.rs`), `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
 - **mumpeer:** new module `broadcast` (sessions, per-subscriber queues with the `fanout.rs` policy, control forwarding), `uses` in `config` and `api`. **mumbot `peer`:** uses/bc pass-through, `use` on pairs, broadcast messages and admission checks.
 - Threads: encoding on its existing dedicated thread; probes and self-tests on a background worker at low priority; file I/O and hashing on tokio blocking tasks. Nothing new on the audio thread.
 
@@ -535,8 +541,8 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 
 ## 10. Build, packaging & release
 
-- **New native libraries:** FFmpeg libavcodec/libavutil (LGPL, minimal configure), SVT-AV1, dav1d. Each gets a cached build script like `scripts/build-libvpx.sh` for Windows, macOS (x86_64 + arm64) and Linux; CI caches by version. Expected installer growth about 10–20 MB.
-- **Licences:** third-party notices and the licences window list FFmpeg (LGPL-2.1, with the relinking note), SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
+- **New native libraries:** SVT-AV1, dav1d and the vendor encoder SDK headers (nv-codec-headers, AMF, oneVPL/libvpl, libva; headers only, drivers dlopened); software VP9 stays libvpx. Built by `scripts/build-svt-av1.sh`, `scripts/build-dav1d.sh` and `scripts/build-hwenc-sdk.sh` (contract: `SVTAV1_STATIC_DIR`, `DAV1D_STATIC_DIR`, `HWENC_SDK_DIR`), like `scripts/build-libvpx.sh` for Windows, macOS (x86_64 + arm64) and Linux; CI caches by version. Expected installer growth about 10–20 MB.
+- **Licences:** third-party notices and the licences window list SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
 - **mumpeer:** release with broadcast and uses; README sections "Allowed uses" and "Broadcasts and bandwidth"; `testenv/` gains a profile with broadcasts enabled and a scripted subscriber load tool (`bcast-sim`, N fake viewers that are real Mumble clients with certificates, send hello and Watch, join and count frames) for AC-7.29.
 - **mumbot:** release with the `peer` extensions; CHANGELOG.
 - **mumcord-p2p:** version bump on crates.io for the extended `mumcord.peer` types.
@@ -594,7 +600,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 40. **AC-7.40** Battery: test hook reports battery power, no hardware AV1 → Automatic picks VP9.
 41. **AC-7.41** Decoding: B on a machine whose webview lacks `av01` → B still plays the AV1 share (engine dav1d).
 42. **AC-7.42** Accessibility: start dialog, Quality menu, viewer list, Settings tab keyboard operable with screen-reader labels; both themes; one non-English locale.
-43. **AC-7.43** Licences window lists FFmpeg, SVT-AV1 and dav1d with their licence texts.
+43. **AC-7.43** Licences window lists SVT-AV1 and dav1d with their licence texts.
 
 **Resizable media area (#386)**
 44. **AC-7.44** A shares a screen, B watches (and again with a watch party) → a horizontal handle is visible between the picture and the chat in dark, light and a custom theme, matching mockup 01; the default size equals today's (Auto, 16:9, at most 58 % of the window height).
@@ -611,6 +617,11 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 55. **AC-7.55** B enters fullscreen → the picture fills the screen regardless of the chosen height, and the chosen height is back on exit; B opens the pop-out window → it has no handle and dragging in the main window does not change it.
 56. **AC-7.56** With the system's "reduce motion" on, snap, reset and collapse are instant; with it off they take about 120 ms; dragging is never animated.
 57. **AC-7.57** When the camera room ships, it shows the same handle with the same behaviour and its tiles re-arrange to the chosen height (check together with the camera spec's acceptance criteria).
+
+**Wire format (Bovnar, #400)**
+58. **AC-7.58** A offers a file to B (both 0.7.0): the packet inspector shows `data-mumcord-file` holding base64 text that decodes as a Bovnar document with the fields of §6.4, and the `mumcord.file` `req`/`go` messages are Bovnar documents; the transfer completes as in AC-7.7.
+59. **AC-7.59** An official Mumble client and a 0.6.2 Mumcord client in the channel see only the plain line "📎 A shared a file …"; no error and no raw attribute text appears.
+60. **AC-7.60** Test CLI sends B a `data-mumcord-file` value that is not valid base64, a truncated Bovnar document, a document with a wrong field type and an oversized `mumcord.file` payload → B shows no card (or ignores the message), nothing crashes or hangs, and the log has one line per rejection without file names or payload content. The same offer as old JSON is also not shown (the offer is Bovnar only).
 
 ## 12. Decision log
 
@@ -636,7 +647,8 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Viewer resolution (#355 Q6) | Later; frame-rate choice only | Recommendation of #355 |
 | Settings location (#355 Q7) | Own "Screen sharing" tab | Mockup 05 |
 | Linux share sound (#355 Q8) | Later | Issue table "Later" |
-| Encoder library | libavcodec (LGPL) for hardware, SVT-AV1 software, dav1d decode | #355 §3 / §3b |
+| Encoder library | Direct vendor APIs for hardware (NVENC, AMF, oneVPL/libvpl, VA-API), SVT-AV1 software, dav1d decode, libvpx VP9 | #355 §3 / §3b |
+| No FFmpeg | No FFmpeg; direct vendor encoder APIs | User decision 2026-11-03 |
 | Battery | On battery, Automatic skips software AV1 | #355 risks |
 | Resizable media area (#386) | One shared horizontal handle for screen share, watch party and camera room; Auto default = today's look; collapse to the existing mini bar | User approval 2026-11-03, all recommended answers of issue #386; FR-7.61 … FR-7.74 |
 | Media height: global or per channel (#386 Q1) | Global, stored next to the column widths | User approval 2026-11-03; FR-7.70 |
@@ -646,6 +658,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Snap points (#386 Q5) | 1/3, 1/2, 2/3; no custom presets in the first version | User approval 2026-11-03; FR-7.64 |
 | Snap bypass (#386 Q6) | Hold Alt; keyboard users are not affected | User approval 2026-11-03; FR-7.64, FR-7.67 |
 | Camera room default height (#386 Q7) | Same Auto default now; revisit with the camera spec | User approval 2026-11-03; FR-7.74 |
+| Offer wire format (#400) | The file offer and `mumcord.file` use **Bovnar** via the Rust implementation from the fork Mumcord/bovnar, pinned git dependency. Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-7.75, §6.4. Base64 for the HTML attribute is an assumption of this spec |
 
 ## 13. Open points & risks
 
@@ -664,7 +677,7 @@ Risks:
 - **CPU and battery of software AV1:** mitigated by the self-test, the 1080p30 cap, load monitoring and the battery rule.
 - **Hardware and driver variety:** four vendors plus VA-API, driver bugs; the smoke test catches false positives, but test coverage needs real machines (AC-7.36).
 - **Webview AV1 support varies** (macOS M3+ only, Linux needs a GStreamer plugin); the engine dav1d fallback costs CPU on the viewer.
-- **Build size and CI time:** FFmpeg + SVT-AV1 + dav1d add 10–20 MB and new cached build steps per OS.
+- **Build size and CI time:** SVT-AV1 + dav1d + the vendor SDK headers add 10–20 MB and new cached build steps per OS.
 - **Patents:** AV1/VP9 royalty-free under AOMedia/Google licences; a third-party pool (Sisvel) claims royalties, so far from hardware makers. H.264 left out.
 - **Large files over a 10 Mbit/s relay session:** 2 GB takes about 30 minutes; the sender must stay online and serves one transfer at a time, so queues can be long. Accepted for 4.1.
 - **Offer spoofing:** anyone can post a hand-made offer message; the card always shows the real Mumble sender, and the download is only accepted from that sender's session and checked against the hash.
@@ -685,5 +698,5 @@ Risks:
 |---|---|---|---|
 | Step 0 | — | — | `mumcord-p2p`: extended `mumcord.peer` types (`u`, `bc`, `use`, broadcast messages); publish |
 | Step 1 (parallel) | `[uses]` config, `/v1/status` fields, `use` on pairs | uses/bc pass-through, `use` on pairs | File sharing end to end (offer, cards, settings, queue, transfer through the relay, hash, sanitizing, MOTW); allowed-uses handling (FR-7.7) |
-| Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, FFmpeg/SVT-AV1/dav1d builds, selection and load monitoring; codec negotiation (wire v2) |
+| Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, SVT-AV1/dav1d/vendor-SDK builds, selection and load monitoring; codec negotiation (wire v2) |
 | Step 3 | Release + README | Release | Broadcast publisher/subscriber, frame encryption, key exchange, fallback logic, viewer list; E2E along AC-7.1 … AC-7.43; PRIVACY.md, licences, 24 locales |

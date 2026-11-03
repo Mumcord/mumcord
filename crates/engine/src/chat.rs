@@ -539,11 +539,12 @@ impl Engine {
         }
         check_text_size(&ctx, html)?;
         let denials = subscribe_denials();
+        let sent_at = now_millis();
         ctx.handle
             .send_text(&TextTarget::channel(channel_id), html)
             .map_err(command_error)?;
         await_refusal(&ctx, denials, Some(channel_id)).await?;
-        let message = own_message(&ctx, ConversationRef::Channel { channel_id }, html);
+        let message = own_message(&ctx, ConversationRef::Channel { channel_id }, html, sent_at);
         crate::plugins::on_own_text(ctx.events.plugins(), &ctx, channel_id, html, &message.id);
         Ok(message)
     }
@@ -563,6 +564,7 @@ impl Engine {
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
         check_text_size(&ctx, html)?;
         let denials = subscribe_denials();
+        let sent_at = now_millis();
         ctx.handle
             .send_text(&TextTarget::user(session), html)
             .map_err(command_error)?;
@@ -572,7 +574,7 @@ impl Engine {
             Some(cert_hash) => ConversationRef::Private { cert_hash },
             None => ConversationRef::PrivateSession { session },
         };
-        Ok(own_message(&ctx, conversation, html))
+        Ok(own_message(&ctx, conversation, html, sent_at))
     }
 
     /// Resets the unread count of a conversation (and the stored read marker of a followed
@@ -803,7 +805,15 @@ async fn await_refusal(
 }
 
 /// Stores and returns an own sent message.
-fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> ChatMessageView {
+///
+/// `sent_at` is when it went to the server, taken before the refusal grace: a message someone
+/// else sends meanwhile reaches the server after it and must sort after it (issue #379).
+fn own_message(
+    ctx: &SessionCtx,
+    conversation: ConversationRef,
+    html: &str,
+    sent_at: UnixMillis,
+) -> ChatMessageView {
     let (sender_name, sender_cert_hash, sender_session) = ctx.handle.with_state(|s| {
         let own = s.own_user();
         (
@@ -819,7 +829,7 @@ fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> C
         sender_cert_hash,
         sender_session,
         own: true,
-        sent_at: now_millis(),
+        sent_at,
         body: sanitize_message_html(html),
         dismissed_previews: Vec::new(),
         synced_from: None,

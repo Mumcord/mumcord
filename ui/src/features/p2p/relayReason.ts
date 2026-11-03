@@ -4,10 +4,20 @@
  * in the server info panel.
  */
 import type { TFunction } from "i18next";
-import type { RelayUnavailable, WatchBlock } from "../../api";
+import type { RelayUnavailable, RelayUse, WatchBlock } from "../../api";
 
 /** `t` of the "p2p" namespace. */
 type P2pT = TFunction<"p2p">;
+
+/** The p2p text key explaining that the relay doesn't allow a use (FR-7.7). */
+const USE_REASON_KEY: Record<
+  RelayUse,
+  "imagesDisallowed" | "filesDisallowed" | "screenDisallowed"
+> = {
+  images: "imagesDisallowed",
+  files: "filesDisallowed",
+  screenShare: "screenDisallowed",
+};
 
 export function relayReasonText(t: P2pT, reason: RelayUnavailable): string {
   switch (reason.kind) {
@@ -16,6 +26,8 @@ export function relayReasonText(t: P2pT, reason: RelayUnavailable): string {
     // "relay full" is a refusal of the relay (AC-4.17), whichever side reports it.
     case "relayFull":
       return t("reason.refused", { reason: t("refusal.relayFull") });
+    case "useNotAllowed":
+      return t(`relay.${USE_REASON_KEY[reason.use]}`);
     default:
       return t(`reason.${reason.kind}`);
   }

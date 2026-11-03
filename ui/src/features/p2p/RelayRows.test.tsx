@@ -20,6 +20,8 @@ const RELAY: RelayInfo = {
   host: "relay.example.org",
   status: { kind: "available" },
   firstSeen: "2026-09-01T18:00:00Z",
+  uses: ["images", "files", "screenShare"],
+  broadcastMax: 25,
 };
 
 function view(info: RelayInfo, onAction = vi.fn()) {
@@ -34,13 +36,32 @@ function valueOf(label: string): string | null | undefined {
   return screen.getByText(label).closest("div")?.querySelector("dd")?.textContent;
 }
 
+describe("relay allows row", () => {
+  it("lists the allowed uses in a fixed order", () => {
+    view({ ...RELAY, uses: ["screenShare", "images"] });
+    expect(valueOf("Relay allows")).toBe("Images · Screen sharing");
+  });
+
+  it("is hidden when the relay is unusable", () => {
+    view({ ...RELAY, status: { kind: "none" }, uses: [] });
+    expect(screen.queryByText("Relay allows")).toBeNull();
+  });
+});
+
 afterEach(() => {
   setApi(undefined);
 });
 
 describe("RelayRowsView", () => {
   it("says No twice without an announcement (AC-4.1)", () => {
-    view({ bots: [], host: null, status: { kind: "none" }, firstSeen: null });
+    view({
+      bots: [],
+      host: null,
+      status: { kind: "none" },
+      firstSeen: null,
+      uses: [],
+      broadcastMax: null,
+    });
     expect(valueOf("Mumbot")).toBe("No");
     expect(valueOf("Mumpeer relay")).toBe("No");
     expect(screen.queryByRole("button")).toBeNull();
@@ -80,7 +101,14 @@ describe("RelayRowsView", () => {
   });
 
   it("reports two announcing relays (AC-4.14)", () => {
-    view({ bots: ["BotA", "BotB"], host: null, status: { kind: "conflict" }, firstSeen: null });
+    view({
+      bots: ["BotA", "BotB"],
+      host: null,
+      status: { kind: "conflict" },
+      firstSeen: null,
+      uses: [],
+      broadcastMax: null,
+    });
     expect(valueOf("Mumbot")).toBe("Yes (BotA, BotB)");
     expect(valueOf("Mumpeer relay")).toBe("Two relays are announced on this server; none is used.");
   });

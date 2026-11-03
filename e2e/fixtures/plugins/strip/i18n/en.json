@@ -1,0 +1,4 @@
+{
+  "manifest.description": "E2E test plugin with a panel and the permissions of a typical chat plugin.",
+  "manifest.name": "Fixture Strip"
+}

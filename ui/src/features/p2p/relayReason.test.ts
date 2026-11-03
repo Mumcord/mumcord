@@ -23,6 +23,15 @@ describe("relay reason texts", () => {
     [{ kind: "peerGone" }, "The other person left the server."],
     [{ kind: "rateLimited" }, "Too many relay requests. Try again in a minute."],
     [{ kind: "relayFull" }, "The relay refused the connection: relay full"],
+    [{ kind: "useNotAllowed", use: "files" }, "This server's relay doesn't allow file sharing."],
+    [
+      { kind: "useNotAllowed", use: "screenShare" },
+      "This server's relay doesn't allow screen sharing.",
+    ],
+    [
+      { kind: "useNotAllowed", use: "images" },
+      "Full size not available: this server's relay doesn't allow images",
+    ],
   ] as [RelayUnavailable, string][])("%o reads %s", (reason, text) => {
     expect(relayReasonText(t, reason)).toBe(text);
   });

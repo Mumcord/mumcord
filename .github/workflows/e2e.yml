@@ -141,8 +141,8 @@ jobs:
           if-no-files-found: error
 
   # The fixture plugin registry's CLI and packages (scripts/e2e-plugin-registry.sh): built on the
-  # runner, not in the image, because they need the wasm32 target, the plugins' pinned toolchain
-  # and the Mumcord/plugins sources. Runs next to the build job; the shards take the result.
+  # runner, not in the image, because they need the wasm32 target. Runs next to the build job; the
+  # shards take the result.
   plugins:
     name: E2E plugin packages
     needs: changes
@@ -151,17 +151,13 @@ jobs:
     timeout-minutes: 30
     env:
       CARGO_TARGET_DIR: ${{ github.workspace }}/target
-      # The plugin sources and their own target dirs, kept in the cache below.
-      MUMCORD_PLUGINS_CACHE: /home/runner/.cache/mumcord-plugins-src
-      # The official plugins pin their toolchain (rust-toolchain.toml, with the wasm32 target);
-      # rustup installs it on first use.
-      RUSTUP_AUTO_INSTALL: 1
       CARGO_PROFILE_DEV_DEBUG: 0
       CARGO_INCREMENTAL: 0
     steps:
       - uses: actions/checkout@v7
 
-      # The safety fixture builder and the SDK need the wasm32 target of the workspace toolchain.
+      # The safety fixture builder and the test plugins need the wasm32 target of the workspace
+      # toolchain.
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -169,7 +165,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: e2e-plugins
-          cache-directories: ${{ env.MUMCORD_PLUGINS_CACHE }}
+          # `mumcord-plugin build` puts each test plugin's target dir next to its sources.
+          cache-directories: e2e/fixtures/plugins/*/target
           save-if: ${{ github.event_name != 'pull_request' }}
 
       - name: Build plugin CLI and packages
@@ -227,12 +224,91 @@ jobs:
           zstd -dc e2e-plugins.tar.zst | tar -C "$MUMCORD_E2E_PLUGIN_PACKAGES" -xf -
           rm e2e-image.tar.zst e2e-bin.tar.zst e2e-plugins.tar.zst
 
+      # The relay specs (spec 07) need the mumpeer testenv; only the shard that runs them pays for
+      # the checkout and the image build. shards.json is rebalanced from time to time, so look
+      # the specs of this shard up instead of hard-coding the number.
+      - name: Does this shard run relay specs
+        id: relay
+        run: |
+          node -e '
+            const { shards } = JSON.parse(require("fs").readFileSync("e2e/shards.json", "utf8"));
+            const specs = shards[Number(process.env.SHARD) - 1] ?? [];
+            console.log("needed=" + specs.some((s) => /\/relay-/.test(s)));
+          ' >> "$GITHUB_OUTPUT"
+        env:
+          SHARD: ${{ matrix.shard }}
+
+      # To bump the pinned mumpeer: take the SHA of the new commit on Mumcord/mumpeer main
+      # (git ls-remote https://github.com/Mumcord/mumpeer main) and put it into `ref` below.
+      # A fixed commit keeps a mumpeer change from breaking unrelated pull requests.
+      # The checkout lives inside the workspace (actions/checkout cannot leave it); run.sh mounts
+      # it into the E2E container through MUMPEER_DIR.
+      - name: Check out mumpeer (relay testenv)
+        if: steps.relay.outputs.needed == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: Mumcord/mumpeer
+          ref: c42aa1072cfec9b4d06d2853e459af44ad8bdf92
+          path: mumpeer
+          persist-credentials: false
+
+      # Built once with the layer cache and handed to testenv/up.sh as MUMPEER_IMAGE, which then
+      # skips its own (uncached) docker compose build.
+      - name: Set up buildx for mumpeer
+        if: steps.relay.outputs.needed == 'true'
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build mumpeer image
+        if: steps.relay.outputs.needed == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: mumpeer
+          tags: mumpeer:testenv
+          load: true
+          cache-from: type=gha,scope=e2e-mumpeer
+          cache-to: type=gha,mode=max,scope=e2e-mumpeer
+
+      # The relay bot is `mumbot peer`. The published mumbot image predates that module, so build
+      # the bot from a pinned commit of Mumcord/mumbot main until a mumbot release has it. To bump
+      # it: git ls-remote https://github.com/Mumcord/mumbot main
+      - name: Check out mumbot (relay bot)
+        if: steps.relay.outputs.needed == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: Mumcord/mumbot
+          ref: 62b3d263490158097e2a8f538436d42f0eb62c90
+          path: mumbot
+          persist-credentials: false
+
+      - name: Build mumbot image
+        if: steps.relay.outputs.needed == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: mumbot
+          tags: mumbot:peer-e2e
+          load: true
+          cache-from: type=gha,scope=e2e-mumbot
+          cache-to: type=gha,mode=max,scope=e2e-mumbot
+
+      - name: Point the E2E run at mumpeer
+        if: steps.relay.outputs.needed == 'true'
+        run: |
+          {
+            echo "MUMPEER_DIR=$GITHUB_WORKSPACE/mumpeer"
+            echo "MUMPEER_IMAGE=mumpeer:testenv"
+            echo "MUMBOT_IMAGE=mumbot:peer-e2e"
+          } >> "$GITHUB_ENV"
+
       # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
+      # The old relay of AC-7.5 is the published mumpeer 0.1.0 with the mumbot 0.4.1 image (the
+      # last releases before the allowed-uses and broadcast changes); docker pulls them on use.
       - name: Run E2E shard
         run: npm run e2e
         env:
           MUMCORD_E2E_STEP: test
           MUMCORD_E2E_SHARD: ${{ matrix.shard }}
+          MUMCORD_E2E_OLD_MUMPEER_IMAGE: ghcr.io/mumcord/mumpeer:0.1.0
+          MUMCORD_E2E_OLD_MUMBOT_IMAGE: ghcr.io/mumcord/mumbot:0.4.1
 
       - name: Upload failure artifacts
         if: failure()
