@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
+
 ## [0.6.2] - 2026-11-02
 
 ### Changed
