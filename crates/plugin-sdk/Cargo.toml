@@ -30,6 +30,12 @@ workspace = true
 name = "hello"
 crate-type = ["cdylib"]
 
+# A complete 1.1 plugin: a stage activity, an Apps-menu item and versioned relay messages.
+[[example]]
+name = "stage_board"
+crate-type = ["cdylib"]
+required-features = ["1.1"]
+
 [features]
 # Opts a plugin into the 1.1 API (WIT package mumcord:plugin@1.1.0); off keeps the 1.0 world.
 "1.1" = []

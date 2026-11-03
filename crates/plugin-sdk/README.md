@@ -39,6 +39,16 @@ mumcord_plugin_sdk::export!(Hello);
 
 Plugins are built for `wasm32-unknown-unknown`; `mumcord-plugin build` turns the module into a component and packs it into a `.mcplugin` package. A complete example is `examples/hello.rs`.
 
+## API 1.1
+
+Plugins are written against API 1.0 by default. Enable the feature to use the 1.1 world:
+
+```toml
+mumcord-plugin-sdk = { version = "...", features = ["1.1"] }
+```
+
+With it, the SDK binds `mumcord:plugin@1.1.0` and adds typed wrappers: `stage`, `app_menu`, `relay`, `audio` and `files` (save, import-picture), `chat::post_image`, the `webview` places `SidePanel` and `Stage` with `set_size_hint`, the new `Event` cases and the new `Error` cases (`RelayUnavailable`, `OriginNotAllowed`, `NotFound`). The manifest must then declare `"api": "^1.1"` (`mumcord-plugin build` writes it from the imports). A complete example is `examples/stage_board.rs`; it versions its relay messages with a leading format byte, so a newer plugin can ignore data it does not understand.
+
 ## Licence
 
 Apache-2.0. Plugins built with the SDK can use any licence.
