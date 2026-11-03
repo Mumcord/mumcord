@@ -282,7 +282,9 @@ describe("sharer control bar", () => {
     await vi.waitFor(() => {
       expect(popover).toHaveTextContent("1080p · 60 fps");
       expect(popover).toHaveTextContent("1080p · 20 fps");
-      expect(popover).toHaveTextContent("Quality adapts to the slowest viewer");
+      expect(popover).toHaveTextContent(
+        "Ben gets 20 fps: their connection can't keep up with 60 fps",
+      );
     });
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("group", { name: "Viewers" })).toBeNull();
