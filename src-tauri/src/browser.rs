@@ -8,12 +8,41 @@
 
 use std::io;
 
+use tauri::{Manager, Runtime, WebviewWindowBuilder};
+
 /// Only web and mail links open; anything else from a message is ignored.
 pub fn is_openable(url: &str) -> bool {
     let url = url.trim_start();
     ["http:", "https:", "mailto:"].iter().any(|scheme| {
         url.get(..scheme.len())
             .is_some_and(|start| start.eq_ignore_ascii_case(scheme))
+    })
+}
+
+/// The URL a page's new-window request may open, if any. A middle click on a link, a
+/// `target="_blank"` and `window.open` all ask for a window of their own; Mumcord never opens
+/// one but hands web and mail links to the system browser like a normal click (issue #418).
+pub fn new_window_target(url: &str) -> Option<&str> {
+    let url = url.trim();
+    is_openable(url).then_some(url)
+}
+
+/// Refuses every window a page wants to open and opens web and mail links in the system browser
+/// instead. Used on every webview Mumcord shows (main window, extra windows, plugin frames), so
+/// a page can never end up in a window of its own, with or without the app's commands (#418).
+pub fn deny_new_windows<'a, R: Runtime, M: Manager<R>>(
+    builder: WebviewWindowBuilder<'a, R, M>,
+) -> WebviewWindowBuilder<'a, R, M> {
+    builder.on_new_window(|url, _features| {
+        match new_window_target(url.as_str()) {
+            Some(target) => {
+                if let Err(error) = open_url(target) {
+                    tracing::warn!(error = %error, "opening a link in the system browser failed");
+                }
+            }
+            None => tracing::debug!(scheme = url.scheme(), "refused to open a new window"),
+        }
+        tauri::webview::NewWindowResponse::Deny
     })
 }
 
@@ -120,6 +149,24 @@ mod tests {
         assert!(!is_openable("mumble://example.test"));
         assert!(!is_openable("http"));
         assert!(!is_openable(""));
+    }
+
+    #[test]
+    fn new_windows_only_reach_the_browser_for_web_and_mail_links() {
+        assert_eq!(
+            new_window_target("https://mumcord.app/a"),
+            Some("https://mumcord.app/a")
+        );
+        assert_eq!(
+            new_window_target(" mailto:someone@example.test"),
+            Some("mailto:someone@example.test")
+        );
+        // Nothing else ever becomes a window: no app page, no file, no script.
+        assert_eq!(new_window_target("about:blank"), None);
+        assert_eq!(new_window_target("file:///etc/passwd"), None);
+        assert_eq!(new_window_target("javascript:alert(1)"), None);
+        assert_eq!(new_window_target("tauri://localhost/index.html"), None);
+        assert_eq!(new_window_target(""), None);
     }
 
     #[cfg(target_os = "linux")]

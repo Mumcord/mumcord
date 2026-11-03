@@ -19,6 +19,43 @@ import {
   waitMessage,
 } from "../../helpers/chat-ui.ts";
 
+/**
+ * Clicks an element with the real mouse, holding `modifier` down for the click: `button` counts like
+ * X11 (1 left, 2 middle, 3 right). WebDriver's own `click()` only ever presses the left button, and
+ * its pointer and key actions leave the app's keyboard state shifted (Shift stops working for the
+ * tests after it), so the input comes from xdotool here.
+ */
+async function clickWith(
+  el: WebdriverIO.Element,
+  button: number,
+  modifier?: "ctrl" | "shift",
+): Promise<void> {
+  // The middle of the element in the window, and where that window sits on the screen.
+  const { x, y } = await browser.execute((element) => {
+    const box = element.getBoundingClientRect();
+    return { x: Math.round(box.left + box.width / 2), y: Math.round(box.top + box.height / 2) };
+  }, el);
+  const window = (await runOk("xdotool", ["search", "--onlyvisible", "--name", "^Mumcord$"])).stdout
+    .trim()
+    .split("\n")[0];
+  if (!window) throw new Error("the Mumcord window was not found");
+  const geometry = (await runOk("xdotool", ["getwindowgeometry", "--shell", window])).stdout;
+  const origin = (axis: "X" | "Y"): number =>
+    Number(new RegExp(`^${axis}=(-?\\d+)$`, "m").exec(geometry)?.[1] ?? 0);
+  if (modifier !== undefined) await runOk("xdotool", ["keydown", modifier]);
+  try {
+    await runOk("xdotool", [
+      "mousemove",
+      "--sync",
+      String(origin("X") + x),
+      String(origin("Y") + y),
+    ]);
+    await runOk("xdotool", ["click", String(button)]);
+  } finally {
+    if (modifier !== undefined) await runOk("xdotool", ["keyup", modifier]);
+  }
+}
+
 // AC-1.13 (rendering + sanitizing + links) and AC-1.14 (sending Markdown and pasted images).
 describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
   let opener: { log: string; binDir: string };
@@ -93,6 +130,34 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
     // The webview itself must not navigate away.
     await expect($(".chat-list__items")).toBeDisplayed();
   });
+
+  // #418: a middle click, Ctrl+click or Shift+click is the webview's "open this somewhere else":
+  // a window of its own, or the page in place of the app. Mumcord does neither; the link goes to
+  // the system browser like a normal click.
+  for (const [what, button, modifier] of [
+    ["a middle click", 2, undefined],
+    ["Ctrl+click", 1, "ctrl"],
+    ["Shift+click", 1, "shift"],
+  ] as const) {
+    it(`#418 ${what} on the link opens the browser and no window of its own`, async () => {
+      const link = await $(
+        "//li[contains(@class,'chat-message')]//a[@href='https://www.mumble.info/']",
+      );
+      const opened = () => readFileSync(opener.log, "utf8").split("\n");
+      const before = opened().length;
+      await clickWith(link, button, modifier);
+      await browser.waitUntil(() => opened().length > before, {
+        timeout: 10_000,
+        timeoutMsg: `the system opener was not invoked after ${what}`,
+      });
+      // Once, not twice (the page's own click handling must not open it again).
+      await sleep(500);
+      expect(opened().length).toBe(before + 1);
+      // No second Mumcord window, and the app stayed where it was.
+      expect(await browser.getWindowHandles()).toHaveLength(1);
+      await expect($(".chat-list__items")).toBeDisplayed();
+    });
+  }
 
   it("AC-1.14 sends **bold** and a pasted image as official-client HTML", async () => {
     const listener = new ScriptBot({ name: "SendBot" });
