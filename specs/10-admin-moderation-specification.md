@@ -619,9 +619,9 @@ Test setup for all: local mumble-server with the fixtures of section 10; Mumcord
 
 ## 13. Open points & risks
 
-**Spike results (to be filled in at the start of the build)**
-- S1 ban variants: _pending_ – certificate-only, IP-only, mask handling, quick-ban default length.
-- S2 flood-limit pacing: _pending_ – burst and rate for moving other people on a default server.
+**Spike results** (mumble-server 1.5.735, default settings, local testenv; `crates/protocol/tests/live_ban_list.rs`)
+- S1 ban variants: a `BanList` message without `query` **replaces** the list, so an empty one clears it. The server stores and answers the subnet length as the client sends it, and the start time as extended ISO (`2026-11-03T20:00:00Z`). **Decision for FR-10.14:** the certificate part of an entry is only compared for a **registered** user; for a guest the server matches the address, and an entry with an empty hash matches any client whose stored certificate it does not know — so Mumcord always sends an address with the entry and keeps "Ban by IP address" fixed on, while "Ban by certificate" only works for registered people. The quick ban (a `UserRemove` with `ban`) uses the server's default length, which for murmur is the whole entry as it builds it (no client-side duration).
+- S2 flood-limit pacing: _pending_
 
 **Assumptions made because round 5 was skipped** (confirm or correct during review of the PR)
 - A1: `/ban` without a duration opens with "Permanent" selected; duration tokens are `<n>h`, `<n>d`, `perm` (mockup shows `7d`).

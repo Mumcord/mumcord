@@ -26,6 +26,7 @@ import type {
   AcceptedConversation,
   BlockedUser,
   ActiveAudioProfile,
+  BanEntry,
   PmConversationPrefs,
   PrivateConversation,
   ApiError,
@@ -673,6 +674,7 @@ const allow = {
   whisper: true,
   write: false,
   moveUsers: false,
+  ban: false,
 };
 
 function seedChannels(): ChannelInfo[] {
@@ -2076,6 +2078,36 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (last.identity !== null) identities = identities.filter((i) => i.id !== last.identity);
   }
 
+  /** In-memory ban lists for the Server administration window (issue #254). */
+  const banLists = new Map<number, BanEntry[]>();
+
+  function seedBans(): BanEntry[] {
+    return [
+      {
+        key: "203.0.113.1/32|a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70",
+        name: "Mallory",
+        certHash: "a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70",
+        address: "203.0.113.1",
+        mask: 32,
+        reason: "spam links",
+        start: "2026-11-03T20:21:00.000Z",
+        durationSecs: 604_800,
+        expired: false,
+      },
+      {
+        key: "198.51.100.9/32|",
+        name: null,
+        certHash: null,
+        address: "198.51.100.9",
+        mask: 32,
+        reason: "flooding",
+        start: "2026-10-01T09:00:00.000Z",
+        durationSecs: 0,
+        expired: false,
+      },
+    ];
+  }
+
   const commands: EngineCommands = {
     // identity
     identityGet: () => Promise.resolve(defaultIdentity()),
@@ -3285,6 +3317,52 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     filesSaveFolder: () => Promise.resolve("~/Downloads/Mumcord"),
     filesOpen: () => Promise.resolve(null),
     filesOpenFolder: () => Promise.resolve(null),
+    banListOpen: (serverId) => {
+      if (!banLists.has(serverId)) banLists.set(serverId, seedBans());
+      return Promise.resolve([...(banLists.get(serverId) ?? [])]);
+    },
+    banListSave: (serverId, changes, force) => {
+      // The mock applies the same rule as the engine: the server takes the whole list (FR-10.66).
+      const list = [...(banLists.get(serverId) ?? seedBans())];
+      if (!force) {
+        const moved = changes.find(
+          (change) => change.kind !== "add" && !list.some((e) => e.key === change.key),
+        );
+        if (moved && moved.kind !== "add") {
+          return Promise.resolve({ kind: "conflict", key: moved.key, fresh: list });
+        }
+      }
+      for (const change of changes) {
+        if (change.kind === "add") {
+          list.push({
+            key: `${change.address}/${String(change.mask)}|${change.hash ?? ""}`,
+            name: change.name,
+            certHash: change.hash,
+            address: change.address,
+            mask: change.mask,
+            reason: change.reason,
+            start: new Date().toISOString(),
+            durationSecs: change.duration,
+            expired: false,
+          });
+          continue;
+        }
+        const entry = list.find((e) => e.key === change.key);
+        if (!entry) continue;
+        if (change.kind === "edit") {
+          entry.reason = change.reason;
+          entry.durationSecs = change.duration;
+        } else {
+          list.splice(list.indexOf(entry), 1);
+        }
+      }
+      banLists.set(serverId, list);
+      return Promise.resolve({ kind: "saved", entries: list });
+    },
+    banListClose: (serverId) => {
+      banLists.delete(serverId);
+      return Promise.resolve(null);
+    },
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };

@@ -4,6 +4,7 @@
 //! The voice transport plugs in via [`Event::CryptSetup`] / [`Handle::send_crypt_setup`] for UDP
 //! crypto and [`Event::UdpTunnel`] / [`Handle::send_tunnel`] for TCP-tunnelled voice.
 
+pub mod ban;
 pub mod client;
 pub mod error;
 pub mod framing;
@@ -16,6 +17,7 @@ pub mod tls;
 pub mod version;
 pub mod voice;
 
+pub use ban::{ADDRESS_LEN, Ban, format_start, from_message, parse_iso, query_message, to_message};
 pub use client::{
     ConnectConfig, Connection, DisconnectReason, Event, Handle, LowOutcome, PLUGIN_DATA_MAX,
     PluginData, PluginTicket, SyncProgress, TextMessage, TextTarget, UdpPing, connect,

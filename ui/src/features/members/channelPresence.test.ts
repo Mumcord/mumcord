@@ -17,6 +17,7 @@ const lobby: ChannelInfo = {
     whisper: true,
     write: false,
     moveUsers: false,
+    ban: false,
   },
   description: null,
   hasDescription: false,

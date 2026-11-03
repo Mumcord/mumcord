@@ -165,6 +165,11 @@ pub enum Event {
     /// send it only to users with the Write permission; a refusal arrives as
     /// [`Event::PermissionDenied`] with `permission == [`crate::permissions::WRITE`].
     Acl(Box<proto::Acl>),
+    /// The server's ban list, the answer to [`Handle::query_ban_list`]. Standard servers send it
+    /// only to users with the Ban permission in the root channel, so a refusal arrives as
+    /// [`Event::PermissionDenied`] with `permission == [`crate::permissions::BAN`]. Texts and
+    /// addresses are untrusted server input (issue #254).
+    BanList(Vec<crate::ban::Ban>),
     ServerConfigUpdated(ServerInfo),
     /// UDP crypto parameters for the voice transport, passed through as received (also during
     /// login; the latest value is in `ServerState::crypt`).
@@ -1107,6 +1112,10 @@ impl Dispatcher {
                 let m: proto::Acl = decode("Acl", payload)?;
                 self.emit(Event::Acl(Box::new(m)));
             }
+            MessageType::BanList => {
+                let m: proto::BanList = decode("BanList", payload)?;
+                self.emit(Event::BanList(crate::ban::from_message(&m)));
+            }
             MessageType::ServerConfig => {
                 let m: proto::ServerConfig = decode("ServerConfig", payload)?;
                 let info = {
@@ -1432,6 +1441,26 @@ impl Handle {
             ..Default::default()
         };
         self.send(Frame::from_message(MessageType::Acl, &m))
+    }
+
+    /// Asks the server for its ban list (issue #254); the answer arrives as [`Event::BanList`].
+    /// Standard servers answer only users with the Ban permission in the root channel, so a
+    /// refusal arrives as [`Event::PermissionDenied`].
+    pub fn query_ban_list(&self) -> Result<(), CommandError> {
+        self.send(Frame::from_message(
+            MessageType::BanList,
+            &crate::ban::query_message(),
+        ))
+    }
+
+    /// Replaces the server's ban list. The protocol has no single-entry change: the server takes
+    /// the message as the whole list, so the caller sends back what it read plus its own change
+    /// (FR-10.66). Needs the Ban permission in the root channel.
+    pub fn send_ban_list(&self, bans: &[crate::ban::Ban]) -> Result<(), CommandError> {
+        self.send(Frame::from_message(
+            MessageType::BanList,
+            &crate::ban::to_message(bans),
+        ))
     }
 
     /// Replaces a channel's ACL and groups (admin tooling such as test bots; needs the Write
