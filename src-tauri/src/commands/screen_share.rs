@@ -109,8 +109,7 @@ pub struct ViewerQuality {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct WatchStats {
-    /// Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
-    /// second path.
+    /// A copy of its own over the P2P connection, or the relay broadcast (FR-7.41).
     pub path: SharePath,
     /// Sound level of the shared sound at the viewer, 0.0–1.0.
     pub rms: f32,
@@ -121,6 +120,8 @@ pub struct WatchStats {
 #[serde(rename_all = "camelCase")]
 pub enum SharePath {
     Direct,
+    /// The sharer's single upload, copied to every viewer by the relay.
+    Broadcast,
 }
 
 /// The screen shares on the server changed; carries the full list.
@@ -312,7 +313,8 @@ pub fn screen_share_set_decode_codecs(
 }
 
 /// The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
-/// watched share, by dropping temporal layers; `null` is Auto.
+/// watched share, by dropping temporal layers; `null` is Auto. Through the relay broadcast the
+/// relay drops the layers too (FR-7.45).
 #[tauri::command]
 #[specta::specta]
 pub fn screen_share_set_viewer_fps(
@@ -430,10 +432,15 @@ pub fn screen_share_watch_stats(
     server_id: ServerId,
     session: SessionId,
 ) -> ApiResult<Option<WatchStats>> {
+    let server_id = to_engine_server_id(server_id);
+    let path = match engine.screen_share_watch_via_relay(server_id, session) {
+        Some(true) => SharePath::Broadcast,
+        Some(false) | None => SharePath::Direct,
+    };
     Ok(engine
-        .screen_share_sound_stats(to_engine_server_id(server_id), session)
+        .screen_share_sound_stats(server_id, session)
         .map(|stats| WatchStats {
-            path: SharePath::Direct,
+            path,
             rms: stats.rms,
         }))
 }
