@@ -1,0 +1,62 @@
+# Weights of the plugin security score, formula version 1 (spec 09, FR-9.73).
+# Changing any number here changes scores: bump `version`, update docs/plugin-score.md,
+# the test vectors and the changelog in the same release.
+version = 1
+
+[bands]
+medium_from = 30
+high_from = 60
+
+[e]
+cap = 100
+# Least score a plugin holding one of `floor_permissions` can get.
+floor = 30
+floor_permissions = ["net.http", "net.origins"]
+# Permission classes. Ids in none of these lists use the catalogue risk
+# (red -> high, yellow -> medium, green -> low).
+high = ["net.http", "net.origins", "secrets"]
+high_points = 20
+web = ["ui.stage", "ui.side-panel", "ui.webview"]
+web_first_points = 10
+web_further_points = 4
+relay = ["peers.relay"]
+relay_points = 8
+medium = ["events.voice", "events.presence", "events.chat-activity", "peers.messages", "chat.send", "chat.post-image"]
+medium_points = 6
+low_points = 1
+low_cap = 6
+# From the second declared website on.
+website_points = 6
+website_cap = 18
+# Package size steps: up to each bound (bytes) the points apply; larger gets `size_over_points`.
+size_bounds = [2097152, 10485760, 31457280]
+size_points = [0, 2, 5]
+size_over_points = 8
+# WASM modules: 1 -> 0, 2-3 -> modules_few_points, 4+ -> modules_many_points.
+modules_few_points = 2
+modules_many_points = 4
+
+[f]
+# Percent effects; the total factor is clamped to min_percent ..= max_percent.
+min_percent = 75
+max_percent = 130
+source_link_given = -5
+source_link_missing = 10
+licence_osi = -5
+licence_proprietary = 5
+licence_not_declared = 10
+reproducible = -5
+key_old_days = 180
+key_old = -10
+key_new_days = 30
+key_new = 10
+expected_key_matched = -5
+
+[h]
+cap = 25
+# Looks back over the last `versions` published versions (the one being scored included)
+# and `days` days.
+versions = 5
+days = 180
+medium_points = 4
+high_points = 10

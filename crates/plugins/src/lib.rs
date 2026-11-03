@@ -22,6 +22,7 @@ pub mod peer_key;
 pub mod permissions;
 pub mod registry;
 mod runtime;
+pub mod score;
 pub mod service;
 pub mod sounds;
 pub mod suggestions;

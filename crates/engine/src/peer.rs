@@ -1009,6 +1009,7 @@ mod tests {
             seq,
             uses: None,
             broadcast: None,
+            plugin_data_kbps: None,
         }
     }
 
@@ -1503,6 +1504,7 @@ mod tests {
                 RelayAnnouncement {
                     uses: Some(vec![RelayUse::Images]),
                     broadcast: None,
+                    plugin_data_kbps: None,
                     ..ann(1, RelayState::Up, 2)
                 },
             ));
