@@ -38,4 +38,4 @@ pub use package::{Digest, ExpectedDigest, Package, PackageError, PackageVerifier
 pub use runtime::{
     CallError, CompileError, HostContext, Level, LogBuffer, QUEUE_CAPACITY, TALKING_PER_SECOND, wit,
 };
-pub use version::{API_VERSION, Incompatibility};
+pub use version::{API_VERSION, ApiMinor, Incompatibility};
