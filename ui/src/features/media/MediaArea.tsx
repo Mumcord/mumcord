@@ -102,7 +102,6 @@ export function MediaArea({ children }: { children: ReactNode }) {
     if (area === null) return;
     let pending = 0;
     const update = () => {
-      setFrame(area.querySelector(".media-frame"));
       const next = measure(area, handleRef.current);
       setRoom((prev) => (sameRoom(prev, next) ? prev : next));
     };
@@ -219,6 +218,9 @@ export function MediaArea({ children }: { children: ReactNode }) {
           if (!done) {
             setRaw(start + deltaPx);
             setMediaHeight(result.px / room.column, { animate: result.snapped });
+            // The view may have rebuilt its frame since the last look; the hint goes into the
+            // one shown now.
+            if (result.collapse) setFrame(areaRef.current?.querySelector(".media-frame") ?? null);
             setMediaDrag(true, result.collapse);
             return;
           }

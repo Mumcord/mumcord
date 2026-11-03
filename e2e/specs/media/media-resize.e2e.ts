@@ -64,18 +64,43 @@ async function startParty(): Promise<void> {
   await handle().waitForDisplayed({ timeout: 10_000, timeoutMsg: "no resize handle" });
 }
 
-/** Drags the handle by `dy` pixels with the mouse, in small steps, and releases it. */
+/**
+ * Drags the handle by `dy` pixels with the mouse, in small steps, and releases it. The target is
+ * kept inside the window (WebDriver refuses moves outside it); the chat column's top and bottom
+ * are past the limits anyway.
+ */
 async function drag(dy: number, release = true): Promise<void> {
+  await settle();
+  const el = await handle();
+  const { x, y } = await el.getLocation();
+  const { width, height } = await el.getSize();
+  const startX = Math.round(x + width / 2);
+  const startY = Math.round(y + height / 2);
+  const inner = await browser.execute(() => window.innerHeight);
+  const endY = Math.min(Math.max(startY + dy, 70), inner - 5);
   const steps = 8;
   let pointer = browser
     .action("pointer", { parameters: { pointerType: "mouse" } })
-    .move({ origin: await handle() })
+    .move({ origin: "viewport", x: startX, y: startY })
     .down({ button: 0 });
   for (let i = 1; i <= steps; i++) {
-    pointer = pointer.move({ origin: "pointer", x: 0, y: Math.round(dy / steps), duration: 30 });
+    const at = Math.round(startY + ((endY - startY) * i) / steps);
+    pointer = pointer.move({ origin: "viewport", x: startX, y: at, duration: 30 });
   }
   if (release) pointer = pointer.up({ button: 0 });
   await pointer.perform(!release);
+}
+
+/** Snap, reset and collapse animate for 120 ms; wait so the handle is where it ends up. */
+async function settle(): Promise<void> {
+  await browser.pause(300);
+}
+
+/** Keyboard focus on the handle without a click (a click would also be a tiny drag). */
+async function focusHandle(): Promise<void> {
+  await browser.execute((el) => {
+    el.focus();
+  }, await handle());
 }
 
 async function waitValue(check: (v: number) => boolean, what: string): Promise<void> {
@@ -128,7 +153,7 @@ describe("resizable media area (#386)", () => {
   });
 
   it("AC-7.51: keyboard steps, snap jumps and limits, saved on each key", async () => {
-    await handle().click();
+    await focusHandle();
     await browser.keys("Home");
     const min = await value();
     expect(min).toBeGreaterThanOrEqual(20);
@@ -151,15 +176,24 @@ describe("resizable media area (#386)", () => {
   });
 
   it("AC-7.51: Tab reaches the handle right after the media controls", async () => {
-    const lastControl = $("#media-area .media-frame__controls button:last-of-type");
-    await lastControl.click();
+    // WebKit does not focus buttons on click, so focus the last media control directly.
+    await browser.execute(() => {
+      const buttons = [
+        ...document.querySelectorAll<HTMLElement>("#media-area .media-frame__controls button"),
+      ];
+      buttons.at(-1)?.focus();
+    });
     await browser.keys("Tab");
-    const focused = await browser.execute(() => document.activeElement?.getAttribute("aria-label"));
+    // The class names say where focus went if it is not the handle.
+    const focused = await browser.execute(() => {
+      const el = document.activeElement;
+      return el?.getAttribute("aria-label") ?? `${el?.tagName ?? ""}.${el?.className ?? ""}`;
+    });
     expect(focused).toBe("Resize media area");
   });
 
   it("AC-7.50: Enter and a double-click go back to Auto", async () => {
-    await handle().click();
+    await focusHandle();
     await browser.keys("Home");
     await browser.keys("Enter");
     await browser.waitUntil(async () => (await stored()) === '"auto"', {
@@ -167,6 +201,7 @@ describe("resizable media area (#386)", () => {
       timeoutMsg: "Enter did not reset",
     });
     await browser.keys("Home");
+    await settle();
     await handle().doubleClick();
     await browser.waitUntil(async () => (await stored()) === '"auto"', {
       timeout: 5_000,
@@ -176,14 +211,17 @@ describe("resizable media area (#386)", () => {
   });
 
   it("AC-7.49: dragging below the minimum minimises, Open restores the height", async () => {
-    await handle().click();
+    await focusHandle();
     await browser.keys("PageDown");
     await browser.keys("PageDown");
     const chosen = await value();
     const kept = await stored();
     await drag(-1500, false);
     await $("//*[contains(@class,'media-area__collapse')][contains(., 'Release to minimise to the mini bar')]").waitForDisplayed({ timeout: 5_000 });
-    await browser.action("pointer").up({ button: 0 }).perform();
+    await browser
+      .action("pointer", { parameters: { pointerType: "mouse" } })
+      .up({ button: 0 })
+      .perform();
     await frame().waitForExist({ reverse: true, timeout: 5_000 });
     const open = $("//button[normalize-space()='Open']");
     await open.waitForClickable({ timeout: 5_000 });
@@ -194,14 +232,22 @@ describe("resizable media area (#386)", () => {
   });
 
   it("AC-7.54: a small window shrinks the picture, keeps the chat and the stored value", async () => {
-    await handle().click();
+    await focusHandle();
     await browser.keys("End");
     const kept = await stored();
     await browser.setWindowSize(1400, 640);
     await browser.waitUntil(async () => (await chatRoomRem()) >= 12.9, { timeout: 5_000 });
     expect(await stored()).toBe(kept);
-    await browser.setWindowSize(1400, 420);
+    // The window cannot get shorter than 560 px, so large text makes the chat column too short
+    // for a handle (under 28 rem), as on a very small window.
+    await browser.setWindowSize(1400, 560);
+    await browser.execute(() => {
+      document.documentElement.style.fontSize = "24px";
+    });
     await handle().waitForExist({ reverse: true, timeout: 5_000 });
+    await browser.execute(() => {
+      document.documentElement.style.fontSize = "";
+    });
     await browser.setWindowSize(1400, 900);
     await handle().waitForDisplayed({ timeout: 5_000 });
     expect(await stored()).toBe(kept);
@@ -209,7 +255,7 @@ describe("resizable media area (#386)", () => {
 
   it("AC-7.55: full screen ignores the height and has no handle", async () => {
     const chosen = await value();
-    await frame().click();
+    await focusHandle();
     await browser.keys("f");
     await browser.waitUntil(async () => browser.execute(() => document.fullscreenElement !== null), {
       timeout: 5_000,
@@ -222,7 +268,7 @@ describe("resizable media area (#386)", () => {
   });
 
   it("AC-7.53: the height survives closing the view and a restart", async () => {
-    await handle().click();
+    await focusHandle();
     await browser.keys("Home");
     await browser.keys("PageDown");
     const chosen = await value();
