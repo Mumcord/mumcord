@@ -29,5 +29,19 @@
     "side-panel": "side panel",
     "dialog": "dialog",
     "panel": "Plugins strip"
+  },
+  "highRiskParts": {
+    "webPagesAndWebsites_one": "It can open its own web pages and talk to {{count}} website you can't check.",
+    "webPagesAndWebsites_few": "It can open its own web pages and talk to {{count}} websites you can't check.",
+    "webPagesAndWebsites_many": "It can open its own web pages and talk to {{count}} websites you can't check.",
+    "webPagesAndWebsites_other": "It can open its own web pages and talk to {{count}} websites you can't check.",
+    "websites_one": "It can talk to {{count}} website you can't check.",
+    "websites_few": "It can talk to {{count}} websites you can't check.",
+    "websites_many": "It can talk to {{count}} websites you can't check.",
+    "websites_other": "It can talk to {{count}} websites you can't check.",
+    "webPages": "It can open its own web pages.",
+    "cantSee": "Mumcord cannot see what those websites send to the plugin or what the plugin sends to them.",
+    "newAuthor": "It was published by someone who is new to this computer.",
+    "trust": "Only install it if you know and trust its author."
   }
 }

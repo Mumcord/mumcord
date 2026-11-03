@@ -13,12 +13,19 @@ import { PermissionList } from "../permissions/PermissionList";
 import { PluginIcon } from "../browse/PluginIcon";
 import { sourceLabel } from "../browse/source";
 import { pluginErrorText } from "./errorText";
+import { ScoreChip } from "../score";
+import { ConfirmBox } from "./ConfirmBox";
+import { hasNewAuthorKey } from "./highRisk";
 import { InstallProgress } from "./InstallProgress";
 import { clearInstallProgress } from "./installProgressStore";
 import { showPluginToast } from "./installToast";
+import { ScoreSummary } from "./ScoreSummary";
+import { usePromptRowDetails, type PromptOrigin } from "./usePromptRowDetails";
 import "./prompt.css";
 
 type Phase =
+  /** No version runs on this Mumcord (FR-9.16): nothing is downloaded, Install stays disabled. */
+  | { kind: "needsMumcord"; version: string }
   | { kind: "preparing" }
   | { kind: "ready"; offer: PluginInstallOffer }
   | { kind: "installing"; offer: PluginInstallOffer }
@@ -36,35 +43,39 @@ export interface SuggestedBy {
 
 export interface InstallPromptProps {
   plugin: IndexedPlugin;
-  /** First install from this third-party repository: the user must confirm the warning. */
-  repositoryWarning: boolean;
   suggestedBy?: SuggestedBy | null;
   onClose: () => void;
 }
 
 /**
- * The install prompt (spec §5.3, FR-6.60). The engine first downloads and verifies the package
- * so the prompt can list its required and optional permissions; nothing runs until Install.
+ * The install prompt (spec 06 §5.3, spec 09 §5.2). The engine first downloads and verifies the
+ * package so the prompt can list its permissions, score and gate; nothing runs until Install.
  */
-export function InstallPrompt({
-  plugin,
-  repositoryWarning,
-  suggestedBy = null,
-  onClose,
-}: InstallPromptProps) {
+export function InstallPrompt({ plugin, suggestedBy = null, onClose }: InstallPromptProps) {
   const { t } = useTranslation("pluginBrowse");
+  const { t: tGate } = useTranslation("pluginGate");
+  const { t: tScore } = useTranslation("pluginScore");
+  const { t: tApi } = useTranslation("pluginApi");
   const { servers } = useServers();
   const serverName = servers.find((s) => s.id === suggestedBy?.serverId)?.label ?? null;
-  const [phase, setPhase] = useState<Phase>({ kind: "preparing" });
+  const [phase, setPhase] = useState<Phase>(
+    plugin.needsMumcord === null
+      ? { kind: "preparing" }
+      : { kind: "needsMumcord", version: plugin.needsMumcord },
+  );
   const [enabled, setEnabled] = useState<ReadonlySet<string>>(new Set());
   const [visibility, setVisibility] = useState<PluginVisibilityChoice>("everyone");
-  const [understood, setUnderstood] = useState(false);
+  // The one confirmation box (FR-9.80).
+  const [ticked, setTicked] = useState(false);
   // Bumped by "Try again": downloads and checks the package once more.
   const [attempt, setAttempt] = useState(0);
   const visibilityName = useId();
   const name = plugin.name;
 
+  const needsMumcord = plugin.needsMumcord !== null;
+
   useEffect(() => {
+    if (needsMumcord) return;
     let cancelled = false;
     getApi()
       .pluginInstallPrepare(plugin.id)
@@ -88,19 +99,26 @@ export function InstallPrompt({
     return () => {
       cancelled = true;
     };
-  }, [plugin.id, name, t, attempt]);
+  }, [plugin.id, name, t, attempt, needsMumcord]);
 
   const installing = phase.kind === "installing";
-
-  // The repository-warning checkbox is the only box this prompt shows. Without it nothing asks
-  // the user yet, so the old always-confirmed behaviour stays until the new confirmation box
-  // (one box for every gate reason) replaces this.
-  const confirmed = repositoryWarning && plugin.source.kind === "repo" ? understood : true;
+  const offer = phase.kind === "ready" || phase.kind === "installing" ? phase.offer : null;
+  const check = offer?.check ?? null;
+  const gate = check?.kind === "ready" ? check.gate : null;
+  const repository = plugin.source.kind === "repo" ? plugin.source.name : null;
+  const permissions = offer === null ? [] : requestedOf(offer).map((p) => p.id);
+  // The verified package's websites with purposes are not part of the offer yet; until then the
+  // listing's websites are shown without a purpose.
+  const origins: PromptOrigin[] = plugin.origins.map((origin) => ({ origin, purpose: null }));
+  const rowDetails = usePromptRowDetails({ pluginName: name, repository, permissions, origins });
+  const needsTick = gate !== null && gate.confirm !== null && !gate.blockedBySafety;
+  const canInstall =
+    phase.kind === "ready" && gate !== null && !gate.blockedBySafety && (!needsTick || ticked);
 
   const install = (offer: PluginInstallOffer) => {
     setPhase({ kind: "installing", offer });
     getApi()
-      .pluginInstall(plugin.id, offer.version, [...enabled], visibility, confirmed)
+      .pluginInstall(plugin.id, offer.version, [...enabled], visibility, !needsTick || ticked)
       .then(() => {
         showPluginToast(t("toast.installed", { name }));
         if (suggestedBy) {
@@ -135,7 +153,7 @@ export function InstallPrompt({
       subtitle={
         <p className="plugin-prompt-source">
           {sourceLabel(t, plugin.source)}
-          {phase.kind === "ready" || phase.kind === "installing" ? ` · ${phase.offer.version}` : ""}
+          {offer === null ? "" : ` · ${offer.version}`}
         </p>
       }
     >
@@ -145,13 +163,30 @@ export function InstallPrompt({
         </p>
       )}
       {(phase.kind === "preparing" || installing) && <InstallProgress id={plugin.id} name={name} />}
+      {phase.kind === "needsMumcord" && (
+        <p role="status" className="plugin-prompt-notice">
+          {tApi("tooNew", { version: phase.version })}
+        </p>
+      )}
+      {check?.kind === "refused" && (
+        <div className="plugin-prompt-refused" role="alert">
+          <ScoreChip scored={{ kind: "refused", stop: check.stop }} size="md" />
+          <p>{check.reason}</p>
+        </div>
+      )}
       {phase.kind === "failed" && (
         <p role="alert" className="settings-error">
           {phase.message}
         </p>
       )}
-      {(phase.kind === "ready" || phase.kind === "installing") && (
+      {offer !== null && check?.kind === "ready" && (
         <>
+          <ScoreSummary
+            score={check.score}
+            pluginName={name}
+            blocked={check.gate.blockedBySafety}
+            websites={origins.length}
+          />
           {suggestedBy !== null && (
             <div className="plugin-prompt-box" role="note">
               <strong>
@@ -163,9 +198,10 @@ export function InstallPrompt({
           )}
           <p className="plugin-prompt-subtitle">{t("prompt.intro", { name })}</p>
           <PermissionList
-            requested={requestedOf(phase.offer)}
+            requested={requestedOf(offer)}
             pluginName={plugin.name}
-            chatPatterns={phase.offer.chatPatterns}
+            chatPatterns={offer.chatPatterns}
+            details={rowDetails}
             enabled={enabled}
             readOnly={installing}
             onToggle={(id, on) => {
@@ -177,7 +213,7 @@ export function InstallPrompt({
               });
             }}
           />
-          {asksFor(phase.offer, MESSAGES) && (
+          {asksFor(offer, MESSAGES) && (
             <div className="plugin-prompt-visibility">
               <div className="plugin-prompt-visibility-text">
                 <span id={`${visibilityName}-label`} className="plugin-prompt-visibility-title">
@@ -216,26 +252,28 @@ export function InstallPrompt({
               <p>{t("neverText")}</p>
             </div>
           )}
-          {repositoryWarning && plugin.source.kind === "repo" && (
-            <div
-              className="plugin-prompt-warning"
-              role="group"
-              aria-labelledby={`${visibilityName}-warning`}
-            >
-              <strong id={`${visibilityName}-warning`}>{t("prompt.warningTitle")}</strong>
-              <p>{t("prompt.warningText", { repository: plugin.source.name })}</p>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={understood}
-                  disabled={installing}
-                  onChange={(event) => {
-                    setUnderstood(event.target.checked);
-                  }}
-                />{" "}
-                {t("prompt.understand")}
-              </label>
-            </div>
+          {needsTick && (
+            <ConfirmBox
+              confirm={check.gate.confirm ?? "understand"}
+              reasons={check.gate.reasons}
+              pluginName={name}
+              repository={repository}
+              highRisk={{
+                webPages: permissions.includes("ui.webview"),
+                websites: origins.length,
+                newAuthor:
+                  check.score.score.kind === "scored" &&
+                  hasNewAuthorKey(check.score.score.score.factors),
+              }}
+              checked={ticked}
+              disabled={installing}
+              onChange={setTicked}
+            />
+          )}
+          {check.score.score.kind === "scored" && (
+            <p className="plugin-prompt-honesty">
+              {tGate("scoreCountsOptional")} {tScore("honestyShort")}
+            </p>
           )}
         </>
       )}
@@ -256,18 +294,18 @@ export function InstallPrompt({
             {t("prompt.retry")}
           </button>
         )}
-        {(phase.kind === "ready" || phase.kind === "installing") && (
+        {(phase.kind === "needsMumcord" || check?.kind === "ready") && (
           <button
             type="button"
             className="settings-button settings-button--primary"
-            disabled={
-              installing || (repositoryWarning && plugin.source.kind === "repo" && !understood)
-            }
+            disabled={!canInstall}
             onClick={() => {
-              if (phase.kind === "ready") install(phase.offer);
+              if (phase.kind === "ready" && canInstall) install(phase.offer);
             }}
           >
-            {t("prompt.install")}
+            {gate?.confirm === "highRisk" && !gate.blockedBySafety
+              ? tGate("installAnyway")
+              : t("prompt.install")}
           </button>
         )}
       </div>

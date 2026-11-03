@@ -11,7 +11,6 @@ import { PluginCard } from "./PluginCard";
 import { PluginDetails } from "./PluginDetails";
 import { RefreshCatalogueButton } from "./RefreshCatalogueButton";
 import { CATEGORIES, visiblePlugins, type Category } from "./filter";
-import { needsRepositoryWarning } from "./source";
 
 /**
  * Settings → Plugins → Browse (FR-6.59): the official list (and enabled third-party repositories)
@@ -67,7 +66,6 @@ export function BrowseTab() {
   const prompt = prompted !== null && (
     <InstallPrompt
       plugin={prompted}
-      repositoryWarning={needsRepositoryWarning(prompted.source, installed)}
       suggestedBy={suggestion}
       onClose={() => {
         setPromptId(null);

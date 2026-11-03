@@ -4,6 +4,7 @@
 
 ### Added
 
+- The plugin install prompt shows the security score with its biggest reasons and the full breakdown, lists every website a plugin talks to, says who wrote its own code, and asks for one tick when needed ("I understand", or "Install anyway" for high-risk plugins). It also says when a plugin can't be installed and why, when your safety setting blocks it, when it needs a newer Mumcord, and when the package scores higher than its listing
 - Plugin installs and automatic updates are safer: a package with a bad signature, a download or manifest that doesn't match its listing, a revoked version or a website that breaks the rules can't be installed at all; plugins that need a tick before installing (high risk, own code and websites, first plugin from a repository) are refused without it; and an automatic update waits for you when it adds websites, raises the risk score by 10 points or more, moves to a worse risk band, or would make a plugin high risk while "Don't allow high-risk plugins" is on
 - A plugin that needs a newer Mumcord is refused at install with "Needs Mumcord X.Y.0 or newer" and nothing is written to disk, and automatic updates never move a plugin to a version this Mumcord can't run; the update waits as "Update available after updating Mumcord".
 - The plugin SDK has a `1.1` feature that binds API 1.1 with typed wrappers for the stage, the Apps menu, the relay, sound effects, file save and picture import, posting an image to chat and the new webview places; 1.0 stays the default.

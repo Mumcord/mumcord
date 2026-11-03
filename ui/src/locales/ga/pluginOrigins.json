@@ -3,6 +3,7 @@
   "intro": "{{plugin}} and its page can send and receive data only with:",
   "introUpdate": "{{plugin}} and its page could then reach:",
   "privacy": "These websites can see your IP address and anything {{plugin}} sends them.",
+  "includesNames": "This can include names of people in your channel.",
   "listLabel": "Websites",
   "changesLabel": "Changes",
   "new": "New",
