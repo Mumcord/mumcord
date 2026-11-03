@@ -845,6 +845,8 @@ pub async fn plugin_install(
         entry,
         optional,
         visibility: visibility.into(),
+        // The prompt already shows its confirmation box; UI1/G1 pass the real tick here.
+        confirmed: true,
     };
     plugins
         .call(move |service| service.install(&request, &download))

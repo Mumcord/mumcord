@@ -12,6 +12,7 @@
 
 mod commands;
 mod dev;
+mod gates;
 mod install;
 mod lifecycle;
 mod messaging;
@@ -46,6 +47,10 @@ use crate::wit::events::{Event, PluginSettings};
 use crate::wit::theme::Mode;
 
 pub use commands::{CommandOutcome, PluginCommand};
+pub use gates::{
+    ConfirmKind, GateReason, InstallCheck, InstallGate, Refusal, ReviewOrigin, RiskChange,
+    UpdateHold, UpdateReview,
+};
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
 pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, UiUpdate};
@@ -260,6 +265,12 @@ pub enum ServiceError {
     Incompatible(String),
     #[error("Mumcord turned this plugin off: {0}")]
     Revoked(String),
+    /// FR-9.81: a High plugin while "Don't allow high-risk plugins" is on.
+    #[error("Blocked by your safety setting")]
+    BlockedBySafety,
+    /// FR-9.80, FR-9.83: the prompt's confirmation box was not ticked.
+    #[error("Tick the confirmation box first")]
+    NeedsConfirmation,
 }
 
 /// Where an installed plugin came from, as stored in `plugin.source`.

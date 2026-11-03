@@ -118,6 +118,7 @@ fn signed_wasm(id: &str, wasm: &[u8], extra: &str, optional: &[&str]) -> Signed 
             },
             optional: optional.iter().map(|p| (*p).to_owned()).collect(),
             visibility: PluginVisibility::Friends,
+            confirmed: true,
         },
         download: Download { bytes, signature },
     }

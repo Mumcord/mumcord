@@ -4,6 +4,7 @@
 
 ### Added
 
+- Plugin installs and automatic updates are safer: a package with a bad signature, a download or manifest that doesn't match its listing, a revoked version or a website that breaks the rules can't be installed at all; plugins that need a tick before installing (high risk, own code and websites, first plugin from a repository) are refused without it; and an automatic update waits for you when it adds websites, raises the risk score by 10 points or more, moves to a worse risk band, or would make a plugin high risk while "Don't allow high-risk plugins" is on
 - A plugin that needs a newer Mumcord is refused at install with "Needs Mumcord X.Y.0 or newer" and nothing is written to disk, and automatic updates never move a plugin to a version this Mumcord can't run; the update waits as "Update available after updating Mumcord".
 - The plugin SDK has a `1.1` feature that binds API 1.1 with typed wrappers for the stage, the Apps menu, the relay, sound effects, file save and picture import, posting an image to chat and the new webview places; 1.0 stays the default.
 - The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)

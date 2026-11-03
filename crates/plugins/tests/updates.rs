@@ -9,9 +9,10 @@ use std::time::Instant;
 use minisign::KeyPair;
 use mumcord_plugins::api::webview::WebviewPlace;
 use mumcord_plugins::registry::{Download, Index, IndexKind, RevocationList, Severity};
+use mumcord_plugins::score::HardStop;
 use mumcord_plugins::service::{
-    Approval, InstallRequest, PluginInfo, PluginService, ServiceConfig, ServiceError, ServiceEvent,
-    Status,
+    Approval, ConfirmKind, GateReason, InstallCheck, InstallRequest, PluginInfo, PluginService,
+    ServiceConfig, ServiceError, ServiceEvent, Status, UpdateHold,
 };
 use mumcord_plugins::verify::IndexEntry;
 use mumcord_plugins::{Digest, Source};
@@ -30,7 +31,7 @@ const FAILING_START: &str = "
     (i32.store (i32.const 72) (i32.const 4))
     (i32.const 64)";
 const PERMISSIONS: &[&str] = &["ui.panel", "events.voice"];
-const MORE_PERMISSIONS: &[&str] = &["ui.panel", "events.voice", "chat.send"];
+const MORE_PERMISSIONS: &[&str] = &["ui.panel", "events.voice", "ui.member-badge"];
 
 fn component(start: &str) -> Vec<u8> {
     let core = include_str!("fixtures/plugin.wat")
@@ -174,7 +175,30 @@ impl Release {
             },
             optional: optional.iter().map(|p| (*p).to_owned()).collect(),
             visibility: PluginVisibility::Friends,
+            confirmed: true,
         }
+    }
+}
+
+/// Plans updates the way `run_check` does: every index is noted first, so listing scores exist.
+trait Plan {
+    fn plan(
+        &mut self,
+        indexes: &[(Source, Index)],
+        mode: PluginUpdates,
+    ) -> Result<Vec<mumcord_plugins::service::UpdateInfo>, ServiceError>;
+}
+
+impl Plan for PluginService {
+    fn plan(
+        &mut self,
+        indexes: &[(Source, Index)],
+        mode: PluginUpdates,
+    ) -> Result<Vec<mumcord_plugins::service::UpdateInfo>, ServiceError> {
+        for (source, index) in indexes {
+            self.note_index(*source, index)?;
+        }
+        self.plan_updates(indexes, mode)
     }
 }
 
@@ -304,7 +328,7 @@ fn same_permissions_and_key_update_by_themselves_and_keep_data() {
     let (mut service, mut events) = installed(&fx, &v1);
 
     let automatic = service
-        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Auto)
         .expect("plan");
     assert_eq!(automatic.len(), 1);
     assert_eq!(automatic[0].to, "1.1.0");
@@ -327,7 +351,7 @@ fn same_permissions_and_key_update_by_themselves_and_keep_data() {
     let v12 = Release::new("poll", "1.2.0", OK_START, PERMISSIONS, &key);
     for _ in 0..2 {
         let automatic = service
-            .plan_updates(&index(&[&v11, &v12]), PluginUpdates::Notify)
+            .plan(&index(&[&v11, &v12]), PluginUpdates::Notify)
             .expect("plan");
         assert!(automatic.is_empty());
     }
@@ -335,7 +359,7 @@ fn same_permissions_and_key_update_by_themselves_and_keep_data() {
     assert_eq!(announced(&mut events), [("poll".into(), "1.2.0".into())]);
     // Off: nothing on offer.
     service
-        .plan_updates(&index(&[&v11, &v12]), PluginUpdates::Off)
+        .plan(&index(&[&v11, &v12]), PluginUpdates::Off)
         .expect("plan");
     assert!(service.updates().is_empty());
 }
@@ -350,7 +374,7 @@ fn new_optional_permissions_install_but_stay_off_and_are_offered() {
 
     // The index cannot tell optional from required: the package is fetched and decides.
     let automatic = service
-        .plan_updates(&index(&[&v1, &v12]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v12]), PluginUpdates::Auto)
         .expect("plan");
     assert_eq!(automatic.len(), 1);
     assert!(announced(&mut events).is_empty());
@@ -364,20 +388,27 @@ fn new_optional_permissions_install_but_stay_off_and_are_offered() {
         ["ui.panel", "events.voice"],
         "nothing new granted"
     );
-    assert_eq!(plugin.offered, ["chat.send"]);
+    assert_eq!(plugin.offered, ["ui.member-badge"]);
     assert_eq!(fx.kv("poll").as_deref(), Some(b"v".as_slice()));
 
     // The offer survives a restart and is answered by setting the permissions.
     let (mut service, _events) = fx.service();
-    assert_eq!(info(&service, "poll").offered, ["chat.send"]);
+    assert_eq!(info(&service, "poll").offered, ["ui.member-badge"]);
     service
         .set_permissions(
             "poll",
-            &["ui.panel".into(), "events.voice".into(), "chat.send".into()],
+            &[
+                "ui.panel".into(),
+                "events.voice".into(),
+                "ui.member-badge".into(),
+            ],
         )
         .expect("answers");
     let plugin = info(&service, "poll");
-    assert_eq!(plugin.granted, ["ui.panel", "events.voice", "chat.send"]);
+    assert_eq!(
+        plugin.granted,
+        ["ui.panel", "events.voice", "ui.member-badge"]
+    );
     assert!(plugin.offered.is_empty());
 }
 
@@ -387,10 +418,10 @@ fn a_permission_turned_off_before_is_not_offered_again() {
     let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
     let v1 = Release::new("poll", "1.0.0", OK_START, MORE_PERMISSIONS, &key);
     let v11 = Release::new("poll", "1.1.0", OK_START, MORE_PERMISSIONS, &key);
-    // Installed with only `events.voice` on: `chat.send` was asked about and left off.
+    // Installed with only `events.voice` on: `ui.member-badge` was asked about and left off.
     let (mut service, _events) = installed(&fx, &v1);
     service
-        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Auto)
         .expect("plan");
     service
         .apply_update("poll", &v11.download, None)
@@ -403,13 +434,13 @@ fn new_permissions_or_a_new_key_wait_for_approval() {
     let fx = Fixture::new();
     let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
     let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
-    // `chat.send` becomes required (the first entry is the required one).
-    let required = &["chat.send", "ui.panel", "events.voice"];
+    // `ui.member-badge` becomes required (the first entry is the required one).
+    let required = &["ui.member-badge", "ui.panel", "events.voice"];
     let v12 = Release::new("poll", "1.2.0", OK_START, required, &key);
     let (mut service, mut events) = installed(&fx, &v1);
 
     let automatic = service
-        .plan_updates(&index(&[&v1, &v12]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v12]), PluginUpdates::Auto)
         .expect("plan");
     assert_eq!(automatic.len(), 1, "fetched to read its manifest");
     assert!(matches!(
@@ -420,18 +451,18 @@ fn new_permissions_or_a_new_key_wait_for_approval() {
     let update = &service.updates()[0];
     assert_eq!(
         update.approval,
-        Some(Approval::NewPermissions(vec!["chat.send".into()]))
+        Some(Approval::NewPermissions(vec!["ui.member-badge".into()]))
     );
     assert_eq!(announced(&mut events), [("poll".into(), "1.2.0".into())]);
     // Not fetched again, not announced again.
     let automatic = service
-        .plan_updates(&index(&[&v1, &v12]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v12]), PluginUpdates::Auto)
         .expect("plan");
     assert!(automatic.is_empty());
     assert!(announced(&mut events).is_empty());
     assert_eq!(
         service.updates()[0].approval,
-        Some(Approval::NewPermissions(vec!["chat.send".into()]))
+        Some(Approval::NewPermissions(vec!["ui.member-badge".into()]))
     );
 
     service
@@ -443,14 +474,17 @@ fn new_permissions_or_a_new_key_wait_for_approval() {
         .expect("approved update installs");
     let plugin = info(&service, "poll");
     assert_eq!(plugin.version, "1.2.0");
-    assert_eq!(plugin.granted, ["chat.send", "ui.panel", "events.voice"]);
+    assert_eq!(
+        plugin.granted,
+        ["ui.member-badge", "ui.panel", "events.voice"]
+    );
     assert_eq!(fx.kv("poll").as_deref(), Some(b"v".as_slice()));
 
     // A different author key: the index lists both keys, but the installed one did not sign it.
     let other = KeyPair::generate_unencrypted_keypair().expect("keypair");
     let v13 = Release::new("poll", "1.3.0", OK_START, MORE_PERMISSIONS, &other);
     service
-        .plan_updates(&index(&[&v12, &v13]), PluginUpdates::Auto)
+        .plan(&index(&[&v12, &v13]), PluginUpdates::Auto)
         .expect("plan");
     assert!(matches!(
         service.apply_update("poll", &v13.download, None),
@@ -469,12 +503,12 @@ fn a_pinned_plugin_is_not_offered_updates() {
     let (mut service, _events) = installed(&fx, &v1);
 
     service
-        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Notify)
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Notify)
         .expect("plan");
     service.set_pinned("dice", true).expect("pins");
     assert!(service.updates().is_empty());
     let automatic = service
-        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Auto)
         .expect("plan");
     assert!(automatic.is_empty());
     assert!(service.updates().is_empty());
@@ -490,7 +524,7 @@ fn a_version_that_fails_to_start_is_rolled_back_with_its_reason() {
     let (mut service, _events) = installed(&fx, &v1);
 
     service
-        .plan_updates(&index(&[&v1, &broken]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &broken]), PluginUpdates::Auto)
         .expect("plan");
     assert!(
         service
@@ -508,7 +542,7 @@ fn a_version_that_fails_to_start_is_rolled_back_with_its_reason() {
 
     // Not retried by itself.
     let automatic = service
-        .plan_updates(&index(&[&v1, &broken]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &broken]), PluginUpdates::Auto)
         .expect("plan");
     assert!(automatic.is_empty());
     assert!(service.updates()[0].failed.is_some());
@@ -551,9 +585,7 @@ fn installed_and_updated_official_plugins_serve_their_web_pages() {
         .into_iter()
         .map(|(_, index)| (Source::Official, index))
         .collect();
-    service
-        .plan_updates(&official, PluginUpdates::Auto)
-        .expect("plan");
+    service.plan(&official, PluginUpdates::Auto).expect("plan");
     service
         .apply_update("fit", &v11.download, None)
         .expect("updates");
@@ -599,7 +631,7 @@ fn a_disable_revocation_turns_the_plugin_off_and_keeps_its_data() {
     // The revoked version is not offered; a fixed one is, and may run again.
     let v11 = Release::new("echolings", "1.1.0", OK_START, PERMISSIONS, &key);
     service
-        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Auto)
         .expect("plan");
     service
         .apply_update("echolings", &v11.download, None)
@@ -635,7 +667,7 @@ fn a_warn_revocation_only_shows_and_revoked_versions_are_not_offered() {
         Some((Severity::Warn, "Outdated".into()))
     );
     service
-        .plan_updates(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Auto)
         .expect("plan");
     assert!(service.updates().is_empty());
 }
@@ -749,7 +781,7 @@ fn an_update_that_needs_a_newer_mumcord_waits_even_with_automatic_updates() {
     let (mut service, mut events) = installed(&fx, &v1);
 
     let automatic = service
-        .plan_updates(&index(&[&v1, &v2]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v2]), PluginUpdates::Auto)
         .expect("plan");
     assert!(automatic.is_empty());
     let updates = service.updates();
@@ -772,9 +804,108 @@ fn an_update_that_needs_a_newer_mumcord_waits_even_with_automatic_updates() {
     // A runnable version in between is chosen over the held one.
     let v15 = Release::new("poll", "1.5.0", OK_START, PERMISSIONS, &key);
     let automatic = service
-        .plan_updates(&index(&[&v1, &v15, &v2]), PluginUpdates::Auto)
+        .plan(&index(&[&v1, &v15, &v2]), PluginUpdates::Auto)
         .expect("plan");
     assert_eq!(automatic.len(), 1);
     assert_eq!(automatic[0].to, "1.5.0");
     assert_eq!(automatic[0].needs_mumcord, None);
+}
+
+#[test]
+fn an_update_whose_score_rises_waits_with_its_reason_and_review() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    let riskier = &[
+        "ui.panel",
+        "events.voice",
+        "chat.send",
+        "events.presence",
+        "peers.messages",
+    ];
+    let v12 = Release::new("poll", "1.2.0", OK_START, riskier, &key);
+    let (mut service, mut events) = installed(&fx, &v1);
+
+    let automatic = service
+        .plan(&index(&[&v1, &v12]), PluginUpdates::Auto)
+        .expect("plan");
+    assert!(automatic.is_empty(), "not installed automatically");
+    let update = &service.updates()[0];
+    assert!(
+        matches!(
+            update.hold,
+            Some(UpdateHold::ScoreUp { .. } | UpdateHold::RiskUp { .. })
+        ),
+        "held: {:?}",
+        update.hold
+    );
+    let risk = update.review.risk.as_ref().expect("before/after");
+    assert!(risk.to_value >= risk.from_value + 10);
+    assert_eq!(announced(&mut events), [("poll".into(), "1.2.0".into())]);
+}
+
+#[test]
+fn install_check_refuses_hard_stops_and_gates_the_first_repository_install() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    let (mut service, _events) = fx.service();
+    let request = v1.request(&["events.voice"]);
+
+    let tampered = Download {
+        bytes: [v1.download.bytes.as_slice(), b"x"].concat(),
+        signature: v1.download.signature.clone(),
+    };
+    match service
+        .install_check(REPO, &request.entry, &tampered)
+        .expect("checked")
+    {
+        InstallCheck::Refused { refusal } => assert_eq!(refusal.stop, HardStop::HashMismatch),
+        other => panic!("not refused: {other:?}"),
+    }
+
+    match service
+        .install_check(REPO, &request.entry, &v1.download)
+        .expect("checked")
+    {
+        InstallCheck::Ready { gate, .. } => {
+            assert_eq!(gate.confirm, Some(ConfirmKind::Understand));
+            assert_eq!(gate.reasons, [GateReason::RepositoryWarning]);
+        }
+        other => panic!("refused: {other:?}"),
+    }
+    let unticked = InstallRequest {
+        confirmed: false,
+        ..request.clone()
+    };
+    assert!(matches!(
+        service.install(&unticked, &v1.download),
+        Err(ServiceError::NeedsConfirmation)
+    ));
+    service.install(&request, &v1.download).expect("ticked");
+}
+
+#[test]
+fn a_revoked_package_is_a_hard_stop() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    let (mut service, _events) = fx.service();
+    service
+        .apply_revocations(revocations(json!([{
+            "id": "poll", "severity": "disable", "reason": { "en": "Leaks data" }, "since": "2026-10-01"
+        }])))
+        .expect("applied");
+    let request = v1.request(&["events.voice"]);
+    match service
+        .install_check(REPO, &request.entry, &v1.download)
+        .expect("checked")
+    {
+        InstallCheck::Refused { refusal } => assert_eq!(refusal.stop, HardStop::Revoked),
+        other => panic!("not refused: {other:?}"),
+    }
+    assert!(matches!(
+        service.install(&request, &v1.download),
+        Err(ServiceError::Revoked(_))
+    ));
 }

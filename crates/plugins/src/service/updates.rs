@@ -14,6 +14,12 @@
 //! with new permissions is downloaded and its manifest decides: only new optional ones →
 //! installs and offers them; a new required one → waits for approval as before.
 //!
+//! On top of that, an update installs by itself only if it adds no websites and its score rises
+//! by less than 10 points without a worse band (FR-9.82); with "Don't allow high-risk plugins"
+//! on, an update that would make a plugin High is held (FR-9.81). Both are judged on the
+//! listings first (no download) and again on the downloaded package. Held updates carry an
+//! [`UpdateReview`] for the Updates tab (FR-9.83).
+//!
 //! [`run_check`] does all of this; the app calls it at start and then on a timer (every
 //! 15 minutes is plenty; [`Schedule`] decides what is due).
 
@@ -24,16 +30,19 @@ use std::sync::{Arc, Mutex, PoisonError};
 use mumcord_store::{PluginRecord, PluginRepository, PluginUpdates, Settings, UnixMillis};
 use semver::Version;
 
+use super::gates::{self, UpdateHold, UpdateReview};
 use super::{
-    InstallStage, Origin, PluginService, ServiceError, ServiceEvent, allowed_grants, fetch,
-    now_millis, with_required,
+    InstallStage, Origin, PluginService, ScoreFrom, ServiceError, ServiceEvent, allowed_grants,
+    fetch, now_millis, with_required,
 };
 use crate::manifest::{Manifest, Source};
+use crate::origins;
 use crate::registry::{
     Client, Download, Freshness, Index, IndexPlugin, IndexVersion, RepoOutcome, fetch_official,
     fetch_repository, fetch_revoked, normalize_key, official_base,
 };
-use crate::verify::{IndexEntry, verify_package};
+use crate::score::Scored;
+use crate::verify::IndexEntry;
 use crate::version::{Release, needs_mumcord_text};
 
 /// How often updates are looked for while Mumcord runs (FR-6.66).
@@ -77,6 +86,11 @@ pub struct UpdateInfo {
     /// its version. The update cannot be installed and is never announced; the Updates tab shows
     /// "Update available after updating Mumcord".
     pub needs_mumcord: Option<Release>,
+    /// FR-9.81, FR-9.82: why the update does not install by itself although `approval` would
+    /// let it.
+    pub hold: Option<UpdateHold>,
+    /// Websites and score before/after, for the Updates tab (FR-9.83).
+    pub review: UpdateReview,
 }
 
 /// What the service remembers about updates while it runs.
@@ -90,6 +104,8 @@ pub(super) struct Updates {
     /// id → (version, approval) found in a downloaded package that may not install by itself;
     /// it is not downloaded again in this run.
     held: BTreeMap<String, (String, Approval)>,
+    /// id → (version, hold) found in a downloaded package that the gates keep waiting.
+    gate_held: BTreeMap<String, (String, UpdateHold)>,
 }
 
 /// What a check should do now.
@@ -369,6 +385,7 @@ impl PluginService {
     ) -> Result<Vec<UpdateInfo>, ServiceError> {
         let mut available = BTreeMap::new();
         if mode != PluginUpdates::Off && !self.no_plugins {
+            let block_high_risk = self.store().settings()?.plugins.block_high_risk;
             let records = self.store().plugins()?;
             for record in records {
                 if record.removed_at.is_some() || record.pinned {
@@ -387,7 +404,7 @@ impl PluginService {
                 else {
                     continue;
                 };
-                if let Some(update) = self.update_for(&record, source, plugin) {
+                if let Some(update) = self.update_for(&record, source, plugin, block_high_risk) {
                     available.insert(record.id.clone(), update);
                 }
             }
@@ -395,7 +412,10 @@ impl PluginService {
         let automatic: Vec<UpdateInfo> = available
             .values()
             .filter(|u| {
-                mode == PluginUpdates::Auto && u.failed.is_none() && u.needs_mumcord.is_none()
+                mode == PluginUpdates::Auto
+                    && u.failed.is_none()
+                    && u.needs_mumcord.is_none()
+                    && u.hold.is_none()
             })
             .filter(|u| match &u.approval {
                 None => true,
@@ -433,6 +453,7 @@ impl PluginService {
         record: &PluginRecord,
         source: Source,
         plugin: &IndexPlugin,
+        block_high_risk: bool,
     ) -> Option<UpdateInfo> {
         let installed = Version::parse(&record.version).ok()?;
         let mut newer: Vec<(Version, &IndexVersion)> = plugin
@@ -508,6 +529,39 @@ impl PluginService {
             .get(&record.id)
             .filter(|(failed, _)| *failed == version.version)
             .map(|(_, reason)| reason.clone());
+
+        let old_origins = match self.host.manifest(&record.id) {
+            Some(manifest) => manifest_origins(manifest),
+            None => plugin
+                .versions
+                .iter()
+                .find(|v| v.version == record.version)
+                .map(|v| canonical(v.origins.iter().map(String::as_str)))
+                .unwrap_or_default(),
+        };
+        let new_origins = canonical(version.origins.iter().map(String::as_str));
+        let old_score = self.listing_score(source, &record.id, &record.version);
+        let new_score = self.listing_score(source, &record.id, &version.version);
+        let review = self.review(
+            &record.id,
+            &version.version,
+            (&old_origins, &new_origins),
+            (old_score.as_ref(), new_score.as_ref()),
+        );
+        let hold = match self
+            .updates
+            .gate_held
+            .get(&record.id)
+            .filter(|(held, _)| *held == version.version)
+        {
+            Some((_, hold)) => Some(hold.clone()),
+            None => gates::auto_update_hold(
+                new_count(&review),
+                old_score.as_ref(),
+                new_score.as_ref(),
+                block_high_risk,
+            ),
+        };
         Some(UpdateInfo {
             id: record.id.clone(),
             name: plugin.name(&self.language).to_owned(),
@@ -520,7 +574,63 @@ impl PluginService {
             approval,
             failed,
             needs_mumcord,
+            hold,
+            review,
         })
+    }
+
+    /// The listing score of a version, or `None` when it is not listed (any more).
+    fn listing_score(&self, source: Source, id: &str, version: &str) -> Option<Scored> {
+        let version = Version::parse(version).ok()?;
+        match self.plugin_score(&source, id, &version, ScoreFrom::Listing) {
+            Ok(scored) => Some(scored),
+            Err(ServiceError::NotListed { .. }) => None,
+            Err(error) => {
+                tracing::warn!(plugin = id, %error, "could not score a listed plugin version");
+                None
+            }
+        }
+    }
+
+    /// The review of updating `id` to `version`, with the high-risk tick the user already gave.
+    fn review(
+        &self,
+        id: &str,
+        version: &str,
+        (old_origins, new_origins): (&[String], &[String]),
+        (old, new): (Option<&Scored>, Option<&Scored>),
+    ) -> UpdateReview {
+        let confirmed = gates::becomes_high(old, new)
+            && match self.store().plugin_high_risk_confirmed_at(id, version) {
+                Ok(at) => at.is_some(),
+                Err(error) => {
+                    tracing::warn!(plugin = id, %error, "could not read a high-risk confirmation");
+                    false
+                }
+            };
+        gates::update_review(old_origins, new_origins, old, new, confirmed)
+    }
+
+    /// Records the tick "I understand the risk went up and I still trust the author" for the
+    /// available update of `id` to `version` (FR-9.83); `apply_update` needs it for an update
+    /// that makes the plugin High.
+    pub fn confirm_update_high_risk(
+        &mut self,
+        id: &str,
+        version: &str,
+    ) -> Result<(), ServiceError> {
+        self.store()
+            .confirm_plugin_high_risk(id, version, now_millis())?;
+        if let Some(update) = self
+            .updates
+            .available
+            .get_mut(id)
+            .filter(|u| u.to == version)
+        {
+            update.review.high_risk_confirmed = update.review.needs_high_risk_confirm;
+        }
+        self.changed();
+        Ok(())
     }
 
     /// Pins a plugin to its version (FR-6.67): a pinned plugin is not offered updates.
@@ -581,14 +691,39 @@ impl PluginService {
             return Err(ServiceError::NoUpdate(id.to_owned()));
         }
         self.update_progress(id, InstallStage::Verifying);
-        let verified = verify_package(
-            &download.bytes,
-            &update.entry,
-            &download.signature,
-            update.source,
-        )?;
+        let verified = self.verified(update.source, &update.entry, download)?;
         let manifest = &verified.package.manifest;
         self.refuse_unrunnable(manifest)?;
+
+        // The gates again, now on the package itself (FR-9.81 – FR-9.83).
+        let old_score = self.listing_score(update.source, id, &old.version);
+        let new_score = self.plugin_score(
+            &update.source,
+            id,
+            &manifest.version,
+            ScoreFrom::Package {
+                package: &verified.package,
+                bytes: u64::try_from(download.bytes.len()).unwrap_or(u64::MAX),
+                author_key: &verified.author_key,
+            },
+        )?;
+        let becomes_high = gates::becomes_high(old_score.as_ref(), Some(&new_score));
+        let block_high_risk = self.store().settings()?.plugins.block_high_risk;
+        if block_high_risk && becomes_high {
+            if approved.is_none() {
+                self.hold_gate(update, UpdateHold::BlockedBySafety);
+            }
+            return Err(ServiceError::BlockedBySafety);
+        }
+        if approved.is_some()
+            && becomes_high
+            && self
+                .store()
+                .plugin_high_risk_confirmed_at(id, &update.to)?
+                .is_none()
+        {
+            return Err(ServiceError::NeedsConfirmation);
+        }
         let granted = match approved {
             Some(optional) => allowed_grants(
                 manifest,
@@ -614,6 +749,24 @@ impl PluginService {
                 };
                 if let Some(approval) = approval {
                     self.hold(update, approval);
+                    return Err(ServiceError::NeedsApproval);
+                }
+                let old_origins = self
+                    .host
+                    .manifest(id)
+                    .map(manifest_origins)
+                    .unwrap_or_default();
+                let added = manifest_origins(manifest)
+                    .iter()
+                    .filter(|o| !old_origins.contains(o))
+                    .count();
+                if let Some(hold) = gates::auto_update_hold(
+                    added,
+                    old_score.as_ref(),
+                    Some(&new_score),
+                    block_high_risk,
+                ) {
+                    self.hold_gate(update, hold);
                     return Err(ServiceError::NeedsApproval);
                 }
                 allowed_grants(
@@ -664,7 +817,19 @@ impl PluginService {
         self.updates.available.remove(id);
         self.updates.failed.remove(id);
         self.updates.held.remove(id);
+        self.updates.gate_held.remove(id);
         self.save_offer(id, offered)
+    }
+
+    /// Keeps an automatic update the gates stopped waiting, like [`Self::hold`].
+    fn hold_gate(&mut self, update: &UpdateInfo, hold: UpdateHold) {
+        if let Some(available) = self.updates.available.get_mut(&update.id) {
+            available.hold = Some(hold.clone());
+        }
+        self.updates
+            .gate_held
+            .insert(update.id.clone(), (update.to.clone(), hold));
+        self.announce(update);
     }
 
     /// Keeps an automatic update that turned out to need the user waiting: it is announced
@@ -676,6 +841,11 @@ impl PluginService {
         self.updates
             .held
             .insert(update.id.clone(), (update.to.clone(), approval));
+        self.announce(update);
+    }
+
+    /// Announces a held update in the notification centre, once per version (FR-6.69).
+    fn announce(&mut self, update: &UpdateInfo) {
         if self
             .updates
             .notified
@@ -755,6 +925,28 @@ impl PluginService {
             Err(error) => tracing::warn!(plugin = id, %error, "could not delete a plugin version"),
         }
     }
+}
+
+/// The websites a manifest declares, in ASCII form.
+fn manifest_origins(manifest: &Manifest) -> Vec<String> {
+    canonical(
+        manifest
+            .net
+            .iter()
+            .flat_map(|net| net.origins.iter().map(|o| o.origin.as_str())),
+    )
+}
+
+/// Origins in the form they are stored and shown; one that breaks the rules stays as written
+/// (the package check refuses it anyway).
+fn canonical<'a>(declared: impl Iterator<Item = &'a str>) -> Vec<String> {
+    declared
+        .map(|o| origins::validate(o, false).map_or_else(|_| o.to_owned(), |v| v.ascii()))
+        .collect()
+}
+
+fn new_count(review: &UpdateReview) -> usize {
+    review.origins.iter().filter(|o| o.new).count()
 }
 
 /// The optional permissions to offer after an update: those the new version asks for that the
