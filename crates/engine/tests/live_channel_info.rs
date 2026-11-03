@@ -13,7 +13,8 @@ use mumcord_engine::EventReceiver;
 use mumcord_engine::{
     ChannelView, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, Snapshot,
 };
-use mumcord_protocol::proto;
+// mumbot pins its own mumcord-protocol release (the `bot_protocol` alias), so bot-side messages use its types.
+use bot_protocol::proto;
 
 const WAIT: Duration = Duration::from_secs(20);
 
