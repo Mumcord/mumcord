@@ -4195,6 +4195,7 @@ dependencies = [
  "base64 0.23.1",
  "chrono",
  "hmac 0.13.0",
+ "hound",
  "keyring",
  "lewton",
  "minisign",

@@ -8,6 +8,8 @@ use std::collections::BTreeSet;
 use semver::{Op, Version, VersionReq};
 use serde::Deserialize;
 
+use crate::diag::LoadIssue;
+use crate::origins::{self, HardStop};
 use crate::patterns::{MAX_CHAT_PATTERNS, MAX_PATTERN_DESCRIPTION_CHARS};
 use crate::permissions;
 
@@ -15,7 +17,7 @@ use crate::permissions;
 pub const MANIFEST_FORMAT: u32 = 1;
 /// Larger manifests are refused before parsing.
 pub const MAX_MANIFEST_BYTES: usize = 16 * 1024;
-/// Plugins may lower their memory limit in the manifest, never raise it above this.
+/// Plugins may lower their memory limit in the manifest, never raise it above raw.
 pub const MAX_MEMORY_MIB: u32 = 32;
 /// Storage quota bounds (FR-6.20).
 pub const DEFAULT_STORAGE_QUOTA_KIB: u32 = 256;
@@ -34,6 +36,16 @@ const MAX_SHORT_TEXT_CHARS: usize = 64;
 const MAX_PATH_CHARS: usize = 128;
 const MAX_AUTHORS: usize = 8;
 const MAX_CATEGORIES: usize = 3;
+/// Apps-menu items per plugin (FR-9.53).
+pub const MAX_APP_MENU_ITEMS: usize = 2;
+/// Longest Apps-menu label.
+pub const MAX_LABEL_CHARS: usize = 32;
+/// `stage.max_participants` (FR-9.23).
+pub const MAX_STAGE_PARTICIPANTS: u32 = 16;
+/// Sound files per package (FR-9.65).
+pub const MAX_SOUNDS: usize = 32;
+/// Folder of bundled sounds inside the package.
+pub const SOUNDS_DIR: &str = "sounds/";
 /// At most this many chat trigger words per plugin.
 pub const MAX_TRIGGERS: usize = 4;
 
@@ -246,6 +258,23 @@ pub enum ManifestError {
         field: &'static str,
         permission: &'static str,
     },
+    #[error("The permission \"{permission}\" needs API {needs} but the manifest says ^{has}")]
+    ApiTooOld {
+        permission: String,
+        needs: String,
+        has: String,
+    },
+    /// An origin breaking FR-9.25/FR-9.26: not installable, no score (FR-9.78).
+    #[error("Cannot be installed: {0}")]
+    Origin(#[from] HardStop),
+    #[error("The website \"{0}\" is declared twice")]
+    DuplicateOrigin(String),
+    #[error("The Apps-menu item \"{0}\" is declared twice")]
+    DuplicateAppMenuItem(String),
+    #[error(
+        "The Apps-menu label \"{0}\" is reserved: it is a Mumcord label or starts with \"Mumcord\""
+    )]
+    ReservedLabel(String),
     #[error("The command \"{0}\" is declared twice")]
     DuplicateCommand(String),
     #[error("The trigger \"{0}\" is declared twice")]
@@ -265,6 +294,19 @@ pub enum ManifestError {
         min: u32,
         max: u32,
     },
+}
+
+impl ManifestError {
+    /// The Diagnostics entry (FR-9.90) a load refusal leaves, if it is one of the listed kinds.
+    pub fn diagnostic(&self) -> Option<LoadIssue> {
+        match self {
+            ManifestError::MissingPermission { field, permission } => {
+                Some(LoadIssue::FieldWithoutPermission { field, permission })
+            }
+            ManifestError::ReservedLabel(_) => Some(LoadIssue::RefusedAppMenuLabel),
+            _ => None,
+        }
+    }
 }
 
 /// The manifest as written; [`Manifest::parse`] turns it into a [`Manifest`]. Unknown fields are
@@ -353,6 +395,7 @@ impl Manifest {
     /// The rules that depend on the source: only official plugins may use official-only
     /// permissions (FR-6.12, FR-6.73) and the reserved id prefixes (FR-6.11).
     pub fn validate(&self, source: Source) -> Result<(), ManifestError> {
+        self.validate_origins(source == Source::Dev)?;
         if source == Source::Official {
             return Ok(());
         }
@@ -369,6 +412,24 @@ impl Manifest {
             Some(id) => Err(ManifestError::OfficialOnly(id.to_owned())),
             None => Ok(()),
         }
+    }
+
+    /// The `net.origins` rules (FR-9.25, FR-9.26): every origin valid, no duplicates, at most 8.
+    /// Only a Developer-mode folder may declare `http://localhost:<port>`.
+    pub fn validate_origins(&self, developer: bool) -> Result<Vec<origins::Origin>, ManifestError> {
+        let declared = self.net.as_ref().map_or(&[][..], |n| n.origins.as_slice());
+        if declared.len() > origins::MAX_ORIGINS {
+            return Err(HardStop::TooMany.into());
+        }
+        let mut parsed: Vec<origins::Origin> = Vec::with_capacity(declared.len());
+        for declared in declared {
+            let origin = origins::validate(&declared.origin, developer)?;
+            if parsed.contains(&origin) {
+                return Err(ManifestError::DuplicateOrigin(origin.ascii()));
+            }
+            parsed.push(origin);
+        }
+        Ok(parsed)
     }
 
     /// Every permission the manifest names, required first.
@@ -536,6 +597,46 @@ impl RawManifest {
             });
         }
 
+        let has_api_1_1_field = !self.app_menu.is_empty()
+            || self.stage.is_some()
+            || self.webview.is_some()
+            || self.audio.is_some()
+            || self.net.as_ref().is_some_and(|n| !n.origins.is_empty());
+        let api_minor = api_minor_of(&api);
+        for id in permissions
+            .required
+            .iter()
+            .chain(permissions.optional.iter().map(|p| &p.id))
+        {
+            let min = permissions::get(id).map_or(permissions::API_1_0, |p| p.min_api);
+            if min > api_minor {
+                return Err(ManifestError::ApiTooOld {
+                    permission: id.clone(),
+                    needs: format!("{}.{}", min.0, min.1),
+                    has: format!("{}.{}", api_minor.0, api_minor.1),
+                });
+            }
+        }
+        // The 1.1 fields exist only from API 1.1 on; an older host ignores them, so a 1.0
+        // package using them is a mistake worth a clear error.
+        if has_api_1_1_field && api_minor < permissions::API_1_1 {
+            return Err(ManifestError::ApiTooOld {
+                permission: "the 1.1 manifest fields".into(),
+                needs: "1.1".into(),
+                has: format!("{}.{}", api_minor.0, api_minor.1),
+            });
+        }
+        check_api_1_1_fields(
+            &Fields {
+                net: &self.net,
+                app_menu: &self.app_menu,
+                stage: &self.stage,
+                webview: &self.webview,
+                audio: &self.audio,
+            },
+            &has,
+        )?;
+
         if let Some(icon) = &self.icon {
             asset_path(icon)?;
         }
@@ -587,6 +688,147 @@ impl RawManifest {
             icon: self.icon,
         })
     }
+}
+
+/// Borrowed view of the 1.1 fields (the raw manifest is partly moved by then).
+struct Fields<'a> {
+    net: &'a Option<Net>,
+    app_menu: &'a [AppMenuItem],
+    stage: &'a Option<StageDecl>,
+    webview: &'a Option<WebviewDecl>,
+    audio: &'a Option<AudioDecl>,
+}
+
+/// Each 1.1 field needs its permission (FR-9.23) and obeys its limits.
+fn check_api_1_1_fields(
+    fields: &Fields<'_>,
+    has: &dyn Fn(&str) -> bool,
+) -> Result<(), ManifestError> {
+    let need = |field: &'static str, permission: &'static str| {
+        if has(permission) {
+            Ok(())
+        } else {
+            Err(ManifestError::MissingPermission { field, permission })
+        }
+    };
+
+    if let Some(origins) = fields
+        .net
+        .as_ref()
+        .map(|n| &n.origins)
+        .filter(|o| !o.is_empty())
+    {
+        need("net.origins", "net.origins")?;
+        for origin in origins {
+            text("net.origins.purpose", &origin.purpose, MAX_SHORT_TEXT_CHARS)?;
+        }
+    }
+
+    if !fields.app_menu.is_empty() {
+        need("app_menu", "ui.app-menu")?;
+        count("app_menu", fields.app_menu.len(), MAX_APP_MENU_ITEMS)?;
+        let mut ids = BTreeSet::new();
+        for item in fields.app_menu {
+            if !is_item_id(&item.id) {
+                return Err(bad_value(
+                    "app_menu.id",
+                    "item id (1 to 32 of a-z, 0-9, -)",
+                    &item.id,
+                ));
+            }
+            if !ids.insert(item.id.as_str()) {
+                return Err(ManifestError::DuplicateAppMenuItem(item.id.clone()));
+            }
+            text("app_menu.label", &item.label, MAX_LABEL_CHARS)?;
+            if is_reserved_label(&item.label) {
+                return Err(ManifestError::ReservedLabel(item.label.clone()));
+            }
+            if let Some(icon) = &item.icon {
+                asset_path(icon)?;
+            }
+        }
+    }
+
+    if let Some(stage) = &fields.stage {
+        need("stage", "ui.stage")?;
+        text("stage.title", &stage.title, MAX_NAME_CHARS)?;
+        if let Some(max) = stage.max_participants {
+            in_range("stage.max_participants", max, 1, MAX_STAGE_PARTICIPANTS)?;
+        }
+    }
+
+    if let Some(webview) = &fields.webview {
+        need("webview", "ui.webview")?;
+        if webview.places.contains(&WebviewPlace::SidePanel) {
+            need("webview.places", "ui.side-panel")?;
+        }
+    }
+
+    if let Some(audio) = &fields.audio {
+        need("audio", "audio.effects")?;
+        if audio.sounds.len() > MAX_SOUNDS {
+            return Err(ManifestError::OutOfRange {
+                field: "audio.sounds",
+                min: 0,
+                max: MAX_SOUNDS as u32,
+            });
+        }
+        let mut seen = BTreeSet::new();
+        for sound in &audio.sounds {
+            relative_path(sound)?;
+            let kind_ok = [".ogg", ".wav"].iter().any(|ext| sound.ends_with(ext));
+            if !sound.starts_with(SOUNDS_DIR) || !kind_ok || !seen.insert(sound.as_str()) {
+                return Err(ManifestError::BadPath(sound.clone()));
+            }
+        }
+    }
+    Ok(())
+}
+
+/// The API minor a `^MAJOR.MINOR` range starts at; `parse_api_range` guarantees the shape.
+fn api_minor_of(api: &VersionReq) -> (u64, u64) {
+    api.comparators
+        .first()
+        .map_or(permissions::API_1_0, |c| (c.major, c.minor.unwrap_or(0)))
+}
+
+/// `[a-z0-9-]{1,32}`: an Apps-menu item id.
+fn is_item_id(id: &str) -> bool {
+    (1..=32).contains(&id.len())
+        && id
+            .bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
+/// Lower-case, no whitespace, no trailing ellipsis: how labels are compared (FR-9.54). Must match
+/// `normalize` in `scripts/gen-builtin-labels.mjs`.
+pub fn normalize_label(label: &str) -> String {
+    let squashed: String = label
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .flat_map(char::to_lowercase)
+        .collect();
+    squashed
+        .strip_suffix('…')
+        .or_else(|| squashed.strip_suffix("..."))
+        .unwrap_or(&squashed)
+        .to_owned()
+}
+
+/// A label a plugin may not use in the Apps menu: equal to a built-in menu or palette label in
+/// any of the 24 locales (case- and space-insensitive) or starting with "Mumcord" (FR-9.54).
+pub fn is_reserved_label(label: &str) -> bool {
+    let normalized = normalize_label(label);
+    normalized.starts_with("mumcord") || builtin_labels().contains(&normalized)
+}
+
+static BUILTIN_LABELS_JSON: &str = include_str!("../assets/builtin-labels.json");
+
+fn builtin_labels() -> &'static [String] {
+    static LABELS: std::sync::OnceLock<Vec<String>> = std::sync::OnceLock::new();
+    LABELS.get_or_init(|| {
+        serde_json::from_str(BUILTIN_LABELS_JSON).expect("builtin-labels.json is a string list")
+    })
 }
 
 /// `^[a-z][a-z0-9-]{2,31}$`
@@ -798,6 +1040,23 @@ mod tests {
         let mut value: serde_json::Value = serde_json::from_str(EXAMPLE).expect("example is JSON");
         change(&mut value);
         Manifest::parse(value.to_string().as_bytes())
+    }
+
+    /// An API 1.1 manifest that also names the given (required) permissions.
+    fn with11(
+        permissions: &[&str],
+        change: impl FnOnce(&mut serde_json::Value),
+    ) -> Result<Manifest, ManifestError> {
+        with(|v| {
+            v["api"] = "^1.1".into();
+            for p in permissions {
+                v["permissions"]["required"]
+                    .as_array_mut()
+                    .expect("required")
+                    .push((*p).into());
+            }
+            change(v);
+        })
     }
 
     fn remove(v: &mut serde_json::Value, field: &str) {
@@ -1137,8 +1396,7 @@ mod tests {
 
     #[test]
     fn api_1_1_fields_parse() {
-        let m = with(|v| {
-            v["api"] = "^1.1".into();
+        let m = with11(&["net.origins", "ui.app-menu", "ui.stage", "ui.webview", "ui.side-panel", "audio.effects"], |v| {
             v["net"] = serde_json::json!({"origins": [{"origin": "https://api.example", "purpose": "origins.api"}]});
             v["app_menu"] = serde_json::json!([{"id": "play", "label": "Play", "icon": "assets/p.svg"}, {"id": "b", "label": "B"}]);
             v["stage"] = serde_json::json!({"title": "Game", "max_participants": 4});
@@ -1183,7 +1441,9 @@ mod tests {
                 (1, 0)
             );
         }
-        let unknown = with(|v| v["stage"] = serde_json::json!({"title": "G", "later": true}));
+        let unknown = with11(&["ui.stage"], |v| {
+            v["stage"] = serde_json::json!({"title": "G", "later": true});
+        });
         assert!(unknown.is_ok());
     }
 
@@ -1299,5 +1559,303 @@ mod tests {
         for tag in ["", "EN", "en-us", "en_US", "../x", "en-BR-x"] {
             assert!(!is_language_tag(tag), "{tag}");
         }
+    }
+
+    fn missing(field: &'static str, permission: &'static str) -> Result<Manifest, ManifestError> {
+        Err(ManifestError::MissingPermission { field, permission })
+    }
+
+    #[test]
+    fn each_1_1_field_needs_its_permission() {
+        let origins = serde_json::json!({"origins": [{"origin": "https://api.example", "purpose": "origins.api"}]});
+        assert_eq!(
+            with11(&[], |v| v["net"] = origins.clone()),
+            missing("net.origins", "net.origins")
+        );
+        assert_eq!(
+            with11(&[], |v| v["app_menu"] =
+                serde_json::json!([{"id": "a", "label": "Play"}])),
+            missing("app_menu", "ui.app-menu")
+        );
+        assert_eq!(
+            with11(&[], |v| v["stage"] = serde_json::json!({"title": "G"})),
+            missing("stage", "ui.stage")
+        );
+        assert_eq!(
+            with11(&[], |v| v["webview"] =
+                serde_json::json!({"places": ["dialog"]})),
+            missing("webview", "ui.webview")
+        );
+        assert_eq!(
+            with11(&["ui.webview"], |v| v["webview"] =
+                serde_json::json!({"places": ["side-panel"]})),
+            missing("webview.places", "ui.side-panel")
+        );
+        assert_eq!(
+            with11(&[], |v| v["audio"] =
+                serde_json::json!({"sounds": ["sounds/a.wav"]})),
+            missing("audio", "audio.effects")
+        );
+        assert!(
+            with11(&["ui.webview"], |v| v["webview"] =
+                serde_json::json!({"places": ["dialog"]}))
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn missing_permission_leaves_a_diagnostics_entry() {
+        let err =
+            with11(&[], |v| v["stage"] = serde_json::json!({"title": "G"})).expect_err("refused");
+        assert_eq!(
+            err.diagnostic(),
+            Some(LoadIssue::FieldWithoutPermission {
+                field: "stage",
+                permission: "ui.stage"
+            })
+        );
+        let err = with11(&["ui.app-menu"], |v| {
+            v["app_menu"] = serde_json::json!([{"id": "a", "label": "Mumcord Games"}]);
+        })
+        .expect_err("refused");
+        assert_eq!(err.diagnostic(), Some(LoadIssue::RefusedAppMenuLabel));
+        assert_eq!(ManifestError::TooLarge.diagnostic(), None);
+    }
+
+    #[test]
+    fn stage_participants_are_capped_at_16() {
+        let stage = |n: u32| {
+            with11(&["ui.stage"], |v| {
+                v["stage"] = serde_json::json!({"title": "G", "max_participants": n})
+            })
+        };
+        assert!(stage(1).is_ok());
+        assert!(stage(16).is_ok());
+        for n in [0, 17, 1000] {
+            assert!(
+                matches!(stage(n), Err(ManifestError::OutOfRange { max: 16, .. })),
+                "{n}"
+            );
+        }
+    }
+
+    #[test]
+    fn min_api_is_checked_against_the_declared_api() {
+        // A 1.0 manifest naming a 1.1 permission fails to load.
+        let err =
+            with(|v| v["permissions"]["required"] = serde_json::json!(["ui.stage", "commands"]))
+                .expect_err("refused");
+        assert_eq!(
+            err,
+            ManifestError::ApiTooOld {
+                permission: "ui.stage".into(),
+                needs: "1.1".into(),
+                has: "1.0".into()
+            }
+        );
+        let optional =
+            with(|v| v["permissions"]["optional"] = serde_json::json!(["audio.effects"]));
+        assert!(matches!(optional, Err(ManifestError::ApiTooOld { .. })));
+        // 1.1 fields in a 1.0 manifest are refused too.
+        let field = with(|v| v["stage"] = serde_json::json!({"title": "G"}));
+        assert!(matches!(field, Err(ManifestError::ApiTooOld { .. })));
+        assert!(with11(&["ui.stage"], |_| {}).is_ok());
+    }
+
+    #[test]
+    fn the_api_range_needs_a_minor() {
+        for api in ["^1", "1.0", "~1.0", ">=1.0", "^1.0, ^1.1", "^0.9", "*"] {
+            assert!(
+                matches!(
+                    with(|v| v["api"] = api.into()),
+                    Err(ManifestError::BadApiRange(_))
+                ),
+                "{api}"
+            );
+        }
+        assert!(with(|v| v["api"] = "^1.1".into()).is_ok());
+    }
+
+    #[test]
+    fn origins_are_validated_per_source() {
+        let m = with11(&["net.origins"], |v| {
+            v["net"] = serde_json::json!({"origins": [
+                {"origin": "https://api.example", "purpose": "origins.api"},
+                {"origin": "wss://live.example:8443", "purpose": "origins.live"}
+            ]});
+        })
+        .expect("valid");
+        assert_eq!(m.validate_origins(false).expect("ok").len(), 2);
+        assert!(m.validate(Source::Official).is_ok());
+        assert!(m.validate(Source::Repo { repository_id: 1 }).is_ok());
+
+        let origin = |o: &str| {
+            with11(&["net.origins"], |v| {
+                v["net"] = serde_json::json!({"origins": [{"origin": o, "purpose": "origins.x"}]});
+            })
+            .expect("parses")
+        };
+        let bad = origin("https://1.2.3.4");
+        for source in [
+            Source::Official,
+            Source::Repo { repository_id: 1 },
+            Source::Dev,
+        ] {
+            assert_eq!(
+                bad.validate(source),
+                Err(ManifestError::Origin(HardStop::IpAddress))
+            );
+        }
+        let dev = origin("http://localhost:5173");
+        assert!(dev.validate(Source::Dev).is_ok());
+        assert_eq!(
+            dev.validate(Source::Repo { repository_id: 1 }),
+            Err(ManifestError::Origin(HardStop::NotEncrypted))
+        );
+        assert_eq!(
+            dev.validate(Source::Official),
+            Err(ManifestError::Origin(HardStop::NotEncrypted))
+        );
+    }
+
+    #[test]
+    fn origins_are_capped_and_unique() {
+        let many = |n: usize| {
+            let list: Vec<_> = (0..n)
+                .map(|i| serde_json::json!({"origin": format!("https://a{i}.example"), "purpose": "origins.x"}))
+                .collect();
+            with11(&["net.origins"], |v| {
+                v["net"] = serde_json::json!({"origins": list})
+            })
+            .expect("parses")
+        };
+        assert!(many(8).validate(Source::Official).is_ok());
+        assert_eq!(
+            many(9).validate(Source::Official),
+            Err(ManifestError::Origin(HardStop::TooMany))
+        );
+        let twice = with11(&["net.origins"], |v| {
+            v["net"] = serde_json::json!({"origins": [
+                {"origin": "https://a.example", "purpose": "origins.x"},
+                {"origin": "https://A.example:443", "purpose": "origins.x"}
+            ]});
+        })
+        .expect("parses");
+        assert_eq!(
+            twice.validate(Source::Official),
+            Err(ManifestError::DuplicateOrigin("https://a.example".into()))
+        );
+    }
+
+    #[test]
+    fn app_menu_labels_follow_the_rules() {
+        let item = |id: &str, label: &str| {
+            with11(&["ui.app-menu"], |v| {
+                v["app_menu"] = serde_json::json!([{"id": id, "label": label}]);
+            })
+        };
+        assert!(item("play", "Play dice").is_ok());
+        for label in [
+            "Mumcord",
+            "mumcord games",
+            "  MUMCORD",
+            "Plugins",
+            "settings",
+            "Settings…",
+            "Do  not DISTURB",
+            "Einstellungen",
+            "Beenden",
+            "Quit",
+        ] {
+            assert_eq!(
+                item("a", label),
+                Err(ManifestError::ReservedLabel(label.into())),
+                "{label}"
+            );
+        }
+        assert!(matches!(
+            item("a", &"x".repeat(33)),
+            Err(ManifestError::TooLong { .. })
+        ));
+        assert!(matches!(
+            item("A!", "Play"),
+            Err(ManifestError::BadValue { .. })
+        ));
+        let two = with11(&["ui.app-menu"], |v| {
+            v["app_menu"] =
+                serde_json::json!([{"id": "a", "label": "One"}, {"id": "a", "label": "Two"}]);
+        });
+        assert_eq!(two, Err(ManifestError::DuplicateAppMenuItem("a".into())));
+        let three = with11(&["ui.app-menu"], |v| {
+            v["app_menu"] = serde_json::json!([{"id": "a", "label": "A1"}, {"id": "b", "label": "B1"}, {"id": "c", "label": "C1"}]);
+        });
+        assert!(matches!(
+            three,
+            Err(ManifestError::OutOfRange { max: 2, .. })
+        ));
+    }
+
+    #[test]
+    fn sound_declarations_are_checked() {
+        let sounds = |list: serde_json::Value| {
+            with11(&["audio.effects"], |v| {
+                v["audio"] = serde_json::json!({"sounds": list})
+            })
+        };
+        assert!(sounds(serde_json::json!(["sounds/a.ogg", "sounds/b.wav"])).is_ok());
+        for bad in ["a.ogg", "assets/a.ogg", "sounds/../a.ogg", "/sounds/a.ogg"] {
+            assert!(
+                matches!(
+                    sounds(serde_json::json!([bad])),
+                    Err(ManifestError::BadPath(_))
+                ),
+                "{bad}"
+            );
+        }
+        assert!(matches!(
+            sounds(serde_json::json!(["sounds/a.ogg", "sounds/a.ogg"])),
+            Err(ManifestError::BadPath(_))
+        ));
+        let many: Vec<_> = (0..33).map(|i| format!("sounds/{i}.ogg")).collect();
+        assert!(matches!(
+            sounds(serde_json::json!(many)),
+            Err(ManifestError::OutOfRange { max: 32, .. })
+        ));
+    }
+
+    /// The committed list is what the generator would write from the key list (FR-9.54).
+    #[test]
+    fn builtin_labels_match_the_locale_files() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let keys: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(root.join("scripts/builtin-label-keys.json")).expect("key list"),
+        )
+        .expect("key list is JSON");
+        let mut expected = BTreeSet::new();
+        let mut locales = 0;
+        for dir in std::fs::read_dir(root.join("ui/src/locales")).expect("locales") {
+            let dir = dir.expect("entry").path();
+            locales += 1;
+            for entry in keys["keys"].as_array().expect("keys") {
+                let file = dir.join(format!("{}.json", entry["namespace"].as_str().expect("ns")));
+                let json: serde_json::Value =
+                    serde_json::from_slice(&std::fs::read(&file).expect("locale file"))
+                        .expect("JSON");
+                let value = entry["key"]
+                    .as_str()
+                    .expect("key")
+                    .split('.')
+                    .try_fold(&json, |v, part| v.get(part))
+                    .and_then(|v| v.as_str())
+                    .unwrap_or_else(|| panic!("{} lacks {}", file.display(), entry["key"]));
+                expected.insert(normalize_label(value));
+            }
+        }
+        assert_eq!(locales, 24);
+        let committed: BTreeSet<String> = builtin_labels().iter().cloned().collect();
+        assert_eq!(
+            committed, expected,
+            "run: node scripts/gen-builtin-labels.mjs"
+        );
     }
 }

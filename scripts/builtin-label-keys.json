@@ -1,0 +1,14 @@
+{
+  "comment": "Locale keys of every built-in command-palette and tray-menu label. A plugin Apps-menu label equal to one of these in any locale is refused (FR-9.54). Add the Apps-menu keys here when that menu exists. After a change run: node scripts/gen-builtin-labels.mjs",
+  "keys": [
+    { "namespace": "pluginSettings", "key": "palette.openPlugins" },
+    { "namespace": "pluginSettings", "key": "palette.turnOffAll" },
+    { "namespace": "tray", "key": "show" },
+    { "namespace": "tray", "key": "settings" },
+    { "namespace": "tray", "key": "mute" },
+    { "namespace": "tray", "key": "deafen" },
+    { "namespace": "tray", "key": "dnd" },
+    { "namespace": "tray", "key": "dndSystem" },
+    { "namespace": "tray", "key": "quit" }
+  ]
+}

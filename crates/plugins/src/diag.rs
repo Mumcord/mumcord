@@ -16,6 +16,20 @@ pub struct Diagnostics {
     restarts: AtomicU64,
 }
 
+/// A refusal at load time that FR-9.90 lists for Diagnostics. It carries no label text, payload
+/// or URL, only the manifest field and permission names, which are fixed strings.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum LoadIssue {
+    /// A manifest field was used without the permission it needs (FR-9.23).
+    FieldWithoutPermission {
+        field: &'static str,
+        permission: &'static str,
+    },
+    /// An Apps-menu label equal to a built-in one or starting with "Mumcord" (FR-9.54).
+    RefusedAppMenuLabel,
+}
+
 /// The counters at one moment. `cpu_time_ms` is the time spent inside calls into the plugin.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize)]
 pub struct DiagSnapshot {
