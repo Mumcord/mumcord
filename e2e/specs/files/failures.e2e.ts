@@ -76,7 +76,8 @@ function bFolder(): string[] {
 
   after(async () => {
     await apps.stopB();
-    await relayenv.stopRelay();
+    // Registered names would lock later specs out: leave an empty server behind.
+    await relayenv.resetRelayData();
   });
 
   it("setup: Alice (byte-flip hook) and Bob on a relay that allows files", async () => {

@@ -61,7 +61,8 @@ async function connect(name: string, port: number): Promise<void> {
     plain?.stop();
     await apps.stopC();
     await apps.stopB();
-    await relayenv.stopRelay();
+    // Registered names would lock later specs out: leave an empty server behind.
+    await relayenv.resetRelayData();
   });
 
   it("setup: Alice, Bob and Carol in the channel of a relay that allows files", async () => {
@@ -88,7 +89,7 @@ async function connect(name: string, port: number): Promise<void> {
       await openSettingsGroup("Privacy & Connections");
       const folder = $("#files-save-folder");
       await folder.waitForDisplayed();
-      expect(await folder.getValue()).toBe(join(app.downloadsDir("b"), "Mumcord"));
+      expect(await folder.getProperty("textContent")).toBe(join(app.downloadsDir("b"), "Mumcord"));
       await browser.keys("Escape");
     });
   });

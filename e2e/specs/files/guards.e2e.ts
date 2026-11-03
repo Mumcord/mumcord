@@ -109,7 +109,8 @@ async function setMode(mode: "directRelay" | "relayOnly" | "directOnly"): Promis
 
   after(async () => {
     await apps.stopB();
-    await relayenv.stopRelay();
+    // Registered names would lock later specs out: leave an empty server behind.
+    await relayenv.resetRelayData();
   });
 
   it("setup: Alice and Bob in the channel of a relay that allows files", async () => {
