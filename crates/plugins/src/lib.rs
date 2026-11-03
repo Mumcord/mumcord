@@ -14,6 +14,7 @@ mod host;
 pub mod i18n;
 pub mod manifest;
 pub mod messaging;
+mod net_guard;
 pub mod origins;
 pub mod package;
 pub mod patterns;
