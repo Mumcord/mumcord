@@ -67,7 +67,7 @@ const SIZES: [(u32, u32); 4] = [(2560, 1440), (1920, 1080), (1280, 720), (854, 4
 const RATES_FPS: [u32; 3] = [60, 30, 15];
 
 /// "Auto" resolution tops out at today's best step; 1440p only on a manual pick.
-const AUTO_HEIGHT: u32 = 1080;
+pub(super) const AUTO_HEIGHT: u32 = 1080;
 
 /// Share of the upload limit the video may plan with; the rest is for sound and overhead.
 const LIMIT_SHARE_PERCENT: u64 = 90;

@@ -536,7 +536,8 @@ fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
         .find(|w| w.label == "main")
         .ok_or(tauri::Error::WindowNotFound)?
         .clone();
-    let mut builder = tauri::WebviewWindowBuilder::from_config(app, &config)?;
+    let mut builder =
+        crate::browser::deny_new_windows(tauri::WebviewWindowBuilder::from_config(app, &config)?);
     if let Some(dir) = portable::webview_data_dir() {
         builder = builder.data_directory(dir);
     }
@@ -920,6 +921,9 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        // Not forwarded to the webview yet; the Settings tab's encoder status is wired up
+        // with its commands.
+        EngineEvent::ScreenEncoderStatusChanged(_) => Ok(()),
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),

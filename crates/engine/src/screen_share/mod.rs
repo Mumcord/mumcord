@@ -22,6 +22,7 @@ pub mod capture_windows;
 #[cfg(target_os = "linux")]
 pub mod capture_x11;
 mod convert;
+pub(crate) mod encoder;
 mod fanout;
 mod media;
 mod quality;
@@ -58,7 +59,9 @@ use signal::{DATA_ID, FEATURE, Signal, decode, encode};
 use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
-pub use media::{ScreenMediaStats, ViewerMediaStats};
+pub use encoder::monitor::LoadDetails;
+pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
+pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
 pub use quality::{LoweredReason, QualityPrefs};
@@ -342,8 +345,9 @@ pub(crate) fn on_plugin_data(
                 Instant::now(),
             ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
-            Signal::Watch => {
-                match shares.own.as_mut().map(|own| own.admit(sender)) {
+            Signal::Watch { codecs, .. } => {
+                let caps = state::ViewerCaps::from_watch(&codecs);
+                match shares.own.as_mut().map(|own| own.admit(sender, caps)) {
                     Some(Admit::New) => {
                         reply = Some(Signal::Accept);
                         own_viewers = true;
@@ -375,7 +379,7 @@ pub(crate) fn on_plugin_data(
                 own_viewers = shares
                     .own
                     .as_mut()
-                    .is_some_and(|own| own.viewers.remove(&sender).is_some());
+                    .is_some_and(|own| own.remove_viewer(sender));
                 own_viewers
             }
             Signal::Viewers { list } => {
@@ -526,14 +530,15 @@ pub(crate) async fn serve_direct(
             let media = own.media.as_ref()?;
             // An accepted viewer opens a stream again when the connection to them was
             // replaced (a file moved it to the relay); the old stream died with it.
+            let caps = own.viewer_caps(session);
             let slot = own.viewers.get_mut(&session)?;
-            Some((media, slot))
+            Some((media, slot, caps))
         });
     match slot {
-        Some((media, slot)) => {
+        Some((media, slot, caps)) => {
             // The old link leaves the hub before the new one joins under the same session.
             drop(slot.take());
-            *slot = Some(media.add_viewer(engine.runtime(), session, send, recv));
+            *slot = Some(media.add_viewer(engine.runtime(), session, caps, send, recv));
         }
         None => tracing::debug!(
             ?server_id,
@@ -551,11 +556,12 @@ async fn ask_to_watch(
     mut answer: oneshot::Receiver<Answer>,
 ) -> Option<Result<Answer, oneshot::error::RecvError>> {
     let start = tokio::time::Instant::now();
-    send(handle, &[sharer], &Signal::Watch);
+    let request = signal::watch_request();
+    send(handle, &[sharer], &request);
     for at in WATCH_RESEND {
         tokio::select! {
             answered = &mut answer => return Some(answered),
-            () = tokio::time::sleep_until(start + at) => send(handle, &[sharer], &Signal::Watch),
+            () = tokio::time::sleep_until(start + at) => send(handle, &[sharer], &request),
         }
     }
     tokio::time::timeout_at(start + ANSWER_WAIT, answer)
@@ -607,13 +613,13 @@ impl Engine {
             return Ok(StartOutcome::Cancelled);
         };
         let app_sound = source.take_sound();
-        let prefs = ctx.store().settings().map_or_else(
-            |e| {
-                tracing::warn!(error = %e, "screen share settings not read; using the defaults");
-                QualityPrefs::default()
-            },
-            |settings| QualityPrefs::from_settings(&settings),
-        );
+        let settings = ctx.store().settings().unwrap_or_else(|e| {
+            tracing::warn!(error = %e, "screen share settings not read; using the defaults");
+            mumcord_store::Settings::default()
+        });
+        let selection = self
+            .screen_encoders()
+            .select(&settings, QualityPrefs::from_settings(&settings));
         let token = {
             let mut all = lock(self.screen_share_state());
             let shares = all.servers.entry(server_id).or_default();
@@ -623,7 +629,11 @@ impl Engine {
             }
             let mut own = OwnShare::new(sound, app_sound.is_some());
             own.kind = source.kind();
-            let media = media::Media::start(source, prefs, media::vp9_encoder());
+            let media = media::Media::start(
+                source,
+                selection.prefs,
+                encoder::factory(selection.candidates, own.encoder.clone()),
+            );
             if let Some(app_sound) = app_sound {
                 media.start_sound(app_sound);
             }
@@ -1044,14 +1054,39 @@ impl Engine {
         server_id: ServerId,
         prefs: QualityPrefs,
     ) -> EngineResult<()> {
-        lock(self.screen_share_state())
+        let all = lock(self.screen_share_state());
+        let own = all
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .ok_or_else(not_sharing)?;
+        // Software AV1 stays at 1080p30 at most (FR-7.37).
+        let software_av1 = lock(&own.encoder)
+            .is_some_and(|e| e.codec == mumcord_screenshare::Codec::Av1 && e.gpu.is_none());
+        let prefs = if software_av1 {
+            encoder::select::cap_for_software_av1(prefs)
+        } else {
+            prefs
+        };
+        own.media.as_ref().ok_or_else(not_sharing)?.set_prefs(prefs);
+        Ok(())
+    }
+
+    /// "Undo" on "Switched to VP9 to reduce load": back to the encoder before the fallback
+    /// (FR-7.57). Fails when the share offers no Undo (any more).
+    pub fn screen_share_undo_encoder_switch(&self, server_id: ServerId) -> EngineResult<()> {
+        let all = lock(self.screen_share_state());
+        let media = all
             .servers
             .get(&server_id)
             .and_then(|s| s.own.as_ref())
             .and_then(|own| own.media.as_ref())
-            .ok_or_else(not_sharing)?
-            .set_prefs(prefs);
-        Ok(())
+            .ok_or_else(not_sharing)?;
+        if media.undo_encoder_switch() {
+            Ok(())
+        } else {
+            Err(EngineError::invalid("the share offers no undo"))
+        }
     }
 
     /// The picture the sharer's control bar shows for the own share (issue #163, FR-3.127).

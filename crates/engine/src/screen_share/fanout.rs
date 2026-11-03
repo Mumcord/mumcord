@@ -226,7 +226,7 @@ mod tests {
     fn frame(keyframe: bool, temporal_layer: u8) -> Arc<Frame> {
         Arc::new(Frame {
             header: FrameHeader {
-                kind: FrameKind::Video,
+                kind: FrameKind::Video(super::super::wire::Codec::Vp9),
                 keyframe,
                 temporal_layer,
                 timestamp_us: 0,

@@ -8,6 +8,8 @@
 - The plugin SDK has a `1.1` feature that binds API 1.1 with typed wrappers for the stage, the Apps menu, the relay, sound effects, file save and picture import, posting an image to chat and the new webview places; 1.0 stays the default.
 - The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
+- Screen sharing picks its encoder automatically: Mumcord checks in the background which graphics-card encoders work and how well the processor handles AV1, then uses AV1 on the graphics card, AV1 on the processor (up to 1080p30, not on battery), or VP9. The check runs again after a driver or Mumcord update
+- A screen share switches to VP9 while someone watches with an older Mumcord that can only play VP9, and goes back once they leave. If AV1 on the processor can't keep up, the share switches to VP9 by itself, and you can undo that once per share
 - The server info panel lists what the relay allows ("Relay allows: Images · Files · Screen sharing"), and buttons and the image viewer say so in plain words when the relay doesn't allow a feature.
 - Settings → Privacy & Connections has a new "File sharing" card: turn receiving files on or off, pick the maximum file size (100 MB to 2 GB) and choose the folder where received files are saved (by default a "Mumcord" folder inside Downloads).
 - The message input has a paperclip button and accepts dropped files and folders in channels: each becomes a chip with its size or progress and a remove button. The paperclip says why it is unavailable when the server has no relay, the relay doesn't allow files, you have no certificate, or your peer-to-peer setting needs the relay.
@@ -19,6 +21,7 @@
 
 ### Fixed
 
+- A middle click on a link, or a click with Ctrl, Cmd or Shift held, opens it in your browser like a normal click. It used to load the page inside Mumcord, in a window of its own or in place of the whole app, and no page from outside ever gets a Mumcord window now (#418)
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 - Chat history of locked channels (password or restricted entry) is no longer shared with people who only follow or listen to them: only people inside the channel get its earlier messages, and members who use a channel password must prove they know the current one. "Follow all" now skips channels you may not enter. Older Mumcord versions still share it, so everyone should update (#382)
 - When someone connects to you through the relay without sharing their network address ("Always use relay"), Mumcord no longer sends them yours either; the connection always went through the relay, so your address was revealed for nothing

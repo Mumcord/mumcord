@@ -1,12 +1,14 @@
 //! Who shares and who watches on one server, kept for the user's own channel only.
 
 use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use tokio::sync::oneshot;
 
+use super::encoder::ActiveEncoder;
 use super::media::{Media, ViewerLink};
-use super::signal::MAX_VIEWERS;
+use super::signal::{CodecName, MAX_VIEWERS};
 use super::watch::WatchLink;
 use super::{ScreenShareView, ShareKind, WatchBlock};
 
@@ -20,6 +22,31 @@ pub(crate) const REANNOUNCE: Duration = Duration::from_secs(3);
 pub(crate) enum Answer {
     Accept,
     Full,
+}
+
+/// What a viewer's `Watch` said it can play (FR-7.58).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ViewerCaps {
+    pub av1: bool,
+    /// The frame version the viewer reads ([`super::wire`]).
+    pub wire: u8,
+}
+
+impl ViewerCaps {
+    /// 0.6.x lists no codecs: VP9 only, frame version 1.
+    pub fn from_watch(codecs: &[CodecName]) -> Self {
+        if codecs.is_empty() {
+            Self {
+                av1: false,
+                wire: super::wire::V1,
+            }
+        } else {
+            Self {
+                av1: codecs.contains(&CodecName::Av1),
+                wire: super::wire::V2,
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,12 +64,17 @@ pub(crate) struct OwnShare {
     pub sound_available: bool,
     /// Accepted viewers, with their stream once they opened it.
     pub viewers: BTreeMap<u32, Option<ViewerLink>>,
+    /// What each accepted viewer can play; changed only with `viewers`, through
+    /// [`Self::admit`] and [`Self::remove_viewer`].
+    caps: BTreeMap<u32, ViewerCaps>,
     /// What the user picked in the system picker (issue #163).
     pub kind: Option<ShareKind>,
     /// When the share started, for the "since" line (issue #163).
     pub started_at: Instant,
     /// Capture and encoding; `None` only in tests of the bookkeeping.
     pub media: Option<Media>,
+    /// The encoder the share's media opened (codec badge, FR-7.39).
+    pub encoder: Arc<Mutex<Option<ActiveEncoder>>>,
     /// Newcomers to the channel that get the share once more, and when.
     reannounce: BTreeMap<u32, Instant>,
 }
@@ -54,9 +86,11 @@ impl OwnShare {
             sound: sound && sound_available,
             sound_available,
             viewers: BTreeMap::new(),
+            caps: BTreeMap::new(),
             kind: None,
             started_at: Instant::now(),
             media: None,
+            encoder: Arc::default(),
             reannounce: BTreeMap::new(),
         }
     }
@@ -80,16 +114,52 @@ impl OwnShare {
         due
     }
 
-    /// Takes `viewer` in unless [`MAX_VIEWERS`] others already watch.
-    pub fn admit(&mut self, viewer: u32) -> Admit {
-        if self.viewers.contains_key(&viewer) {
-            return Admit::Already;
-        }
-        if self.viewers.len() >= MAX_VIEWERS {
+    /// Takes `viewer` in unless [`MAX_VIEWERS`] others already watch. Asking again updates
+    /// what the viewer can play.
+    pub fn admit(&mut self, viewer: u32, caps: ViewerCaps) -> Admit {
+        let admit = if self.viewers.contains_key(&viewer) {
+            Admit::Already
+        } else if self.viewers.len() >= MAX_VIEWERS {
             return Admit::Full;
+        } else {
+            self.viewers.insert(viewer, None);
+            Admit::New
+        };
+        self.caps.insert(viewer, caps);
+        self.codecs_changed();
+        admit
+    }
+
+    /// Ends `viewer`'s watching, closing its stream; false if it was not watching.
+    pub fn remove_viewer(&mut self, viewer: u32) -> bool {
+        self.caps.remove(&viewer);
+        let removed = self.viewers.remove(&viewer).is_some();
+        if removed {
+            self.codecs_changed();
         }
-        self.viewers.insert(viewer, None);
-        Admit::New
+        removed
+    }
+
+    /// What `viewer` can play; an unknown viewer counts as 0.6.x.
+    pub fn viewer_caps(&self, viewer: u32) -> ViewerCaps {
+        self.caps
+            .get(&viewer)
+            .copied()
+            .unwrap_or_else(|| ViewerCaps::from_watch(&[]))
+    }
+
+    /// The first viewer that cannot play AV1; the share runs VP9 while there is one (FR-7.58).
+    pub fn av1_blocker(&self) -> Option<u32> {
+        self.caps
+            .iter()
+            .find(|(_, caps)| !caps.av1)
+            .map(|(viewer, _)| *viewer)
+    }
+
+    fn codecs_changed(&self) {
+        if let Some(media) = &self.media {
+            media.set_av1_blocker(self.av1_blocker());
+        }
     }
 
     pub fn viewer_list(&self) -> Vec<u32> {
@@ -269,7 +339,7 @@ impl Shares {
         let own_viewers = self
             .own
             .as_mut()
-            .is_some_and(|own| own.viewers.remove(&session).is_some());
+            .is_some_and(|own| own.remove_viewer(session));
         let mut changed = self.share_ended(session) || own_viewers;
         for share in self.others.values_mut() {
             let before = share.viewers.len();
@@ -323,6 +393,53 @@ fn elapsed(then: Instant, now: Instant) -> u32 {
 mod tests {
     use super::*;
 
+    const NEW: ViewerCaps = ViewerCaps {
+        av1: true,
+        wire: super::super::wire::V2,
+    };
+
+    #[test]
+    fn an_old_viewer_blocks_av1_until_it_leaves() {
+        let old = ViewerCaps::from_watch(&[]);
+        assert_eq!((old.av1, old.wire), (false, super::super::wire::V1));
+        let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9]);
+        assert_eq!(
+            (vp9_only.av1, vp9_only.wire),
+            (false, super::super::wire::V2)
+        );
+        assert_eq!(
+            ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9]),
+            NEW
+        );
+
+        let mut own = OwnShare::new(false, false);
+        own.admit(1, NEW);
+        assert_eq!(own.av1_blocker(), None);
+        own.admit(4, old);
+        assert_eq!(own.av1_blocker(), Some(4));
+        assert_eq!((own.viewer_caps(1), own.viewer_caps(4)), (NEW, old));
+        assert!(own.remove_viewer(4));
+        assert_eq!(own.av1_blocker(), None);
+        assert_eq!(own.viewer_caps(4), old, "unknown viewers count as 0.6.x");
+        own.admit(1, vp9_only);
+        assert_eq!(
+            own.av1_blocker(),
+            Some(1),
+            "asking again updates the codecs"
+        );
+        assert_eq!(own.admit(9, old), Admit::New);
+        let mut full = OwnShare::new(false, false);
+        for viewer in 0..MAX_VIEWERS as u32 {
+            full.admit(viewer, NEW);
+        }
+        assert_eq!(full.admit(99, old), Admit::Full);
+        assert_eq!(
+            full.av1_blocker(),
+            None,
+            "a turned-away viewer does not count"
+        );
+    }
+
     #[test]
     fn sound_follows_the_source_that_take_sound_gave() {
         let mut shares = Shares {
@@ -342,12 +459,16 @@ mod tests {
     fn the_ninth_viewer_is_turned_away() {
         let mut own = OwnShare::new(false, false);
         for viewer in 0..MAX_VIEWERS as u32 {
-            assert_eq!(own.admit(viewer), Admit::New);
+            assert_eq!(own.admit(viewer, NEW), Admit::New);
         }
-        assert_eq!(own.admit(3), Admit::Already, "asking again is fine");
-        assert_eq!(own.admit(100), Admit::Full);
-        own.viewers.remove(&0);
-        assert_eq!(own.admit(100), Admit::New, "a free place is taken again");
+        assert_eq!(own.admit(3, NEW), Admit::Already, "asking again is fine");
+        assert_eq!(own.admit(100, NEW), Admit::Full);
+        assert!(own.remove_viewer(0));
+        assert_eq!(
+            own.admit(100, NEW),
+            Admit::New,
+            "a free place is taken again"
+        );
     }
 
     fn announced(paused: bool, sound: bool) -> Announced {
@@ -424,7 +545,7 @@ mod tests {
     fn leaving_the_channel_ends_sharing_and_watching() {
         let mut shares = Shares::default();
         let mut own = OwnShare::new(true, true);
-        own.admit(7);
+        own.admit(7, NEW);
         shares.own = Some(own);
         shares.share_live(5, &announced(false, false), Instant::now());
         shares.set_viewers(5, vec![1, 7]);
