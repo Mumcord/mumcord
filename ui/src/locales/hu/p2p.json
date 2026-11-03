@@ -23,14 +23,14 @@
     "keepBlocked": "Maradjon letiltva",
     "forget": "Átjátszó elfelejtése",
     "actionFailed": "Ez nem sikerült. Próbáld újra.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Ennek a szervernek nincs átjátszója, ezért a fájlmegosztás nem érhető el.",
+    "filesDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a fájlmegosztást.",
+    "screenDisallowed": "Ennek a szervernek az átjátszója nem engedélyezi a képernyőmegosztást.",
+    "imagesDisallowed": "A teljes méret nem elérhető: ennek a szervernek az átjátszója nem engedélyezi a képeket",
+    "noCertificate": "A fájlmegosztáshoz ügyféltanúsítvány kell.",
+    "modeNeedsRelay": "A fájlmegosztáshoz az átjátszó kell; a peer-to-peer beállításod: {{mode}}.",
+    "modeOff": "Ki",
+    "modeDirectOnly": "Csak közvetlen"
   },
   "reason": {
     "p2pOff": "A peer-to-peer ki van kapcsolva.",

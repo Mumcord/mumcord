@@ -47,7 +47,7 @@
     "unavailable": "See kanal pole enam saadaval.",
     "offline": "{{name}} on võrgust väljas. Saad uuesti kirjutada, kui ta tagasi tuleb.",
     "unnamedImage": "Kleebitud pilt",
-    "attachFiles": "Share files"
+    "attachFiles": "Jaga faile"
   },
   "tray": {
     "label": "Saadetavad pildid",
