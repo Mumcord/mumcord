@@ -97,7 +97,17 @@ pub fn parse_offer_html(html: &str, arrival: u64) -> Option<FileOffer> {
         Regex::new(&format!(r#"{ATTRIBUTE}\s*=\s*"([^"]*)""#)).expect("static pattern")
     });
     let raw = ATTR.captures(html)?.get(1)?.as_str();
-    let wire: Wire = serde_json::from_str(&unescape(raw)).ok()?;
+    decode_attribute(&unescape(raw), arrival)
+}
+
+/// Whether `value` (the attribute value, HTML entities already decoded) is a valid offer; the
+/// chat sanitizer keeps the attribute only then, so the stored history can show the card again.
+pub(crate) fn is_valid_attribute(value: &str) -> bool {
+    decode_attribute(value, 0).is_some()
+}
+
+fn decode_attribute(value: &str, arrival: u64) -> Option<FileOffer> {
+    let wire: Wire = serde_json::from_str(value).ok()?;
     validate(&wire)?;
     Some(FileOffer {
         id: wire.id,
