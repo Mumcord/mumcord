@@ -22,6 +22,7 @@ pub mod capture_windows;
 #[cfg(target_os = "linux")]
 pub mod capture_x11;
 mod convert;
+pub(crate) mod encoder;
 mod fanout;
 mod media;
 mod quality;
@@ -58,6 +59,7 @@ use signal::{DATA_ID, FEATURE, Signal, decode, encode};
 use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
+pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
 pub use media::{ScreenMediaStats, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
@@ -607,13 +609,13 @@ impl Engine {
             return Ok(StartOutcome::Cancelled);
         };
         let app_sound = source.take_sound();
-        let prefs = ctx.store().settings().map_or_else(
-            |e| {
-                tracing::warn!(error = %e, "screen share settings not read; using the defaults");
-                QualityPrefs::default()
-            },
-            |settings| QualityPrefs::from_settings(&settings),
-        );
+        let settings = ctx.store().settings().unwrap_or_else(|e| {
+            tracing::warn!(error = %e, "screen share settings not read; using the defaults");
+            mumcord_store::Settings::default()
+        });
+        let selection = self
+            .screen_encoders()
+            .select(&settings, QualityPrefs::from_settings(&settings));
         let token = {
             let mut all = lock(self.screen_share_state());
             let shares = all.servers.entry(server_id).or_default();
@@ -623,7 +625,11 @@ impl Engine {
             }
             let mut own = OwnShare::new(sound, app_sound.is_some());
             own.kind = source.kind();
-            let media = media::Media::start(source, prefs, media::vp9_encoder());
+            let media = media::Media::start(
+                source,
+                selection.prefs,
+                encoder::factory(selection.candidates, own.encoder.clone()),
+            );
             if let Some(app_sound) = app_sound {
                 media.start_sound(app_sound);
             }
@@ -1044,13 +1050,21 @@ impl Engine {
         server_id: ServerId,
         prefs: QualityPrefs,
     ) -> EngineResult<()> {
-        lock(self.screen_share_state())
+        let all = lock(self.screen_share_state());
+        let own = all
             .servers
             .get(&server_id)
             .and_then(|s| s.own.as_ref())
-            .and_then(|own| own.media.as_ref())
-            .ok_or_else(not_sharing)?
-            .set_prefs(prefs);
+            .ok_or_else(not_sharing)?;
+        // Software AV1 stays at 1080p30 at most (FR-7.37).
+        let software_av1 = lock(&own.encoder)
+            .is_some_and(|e| e.codec == mumcord_screenshare::Codec::Av1 && e.gpu.is_none());
+        let prefs = if software_av1 {
+            encoder::select::cap_for_software_av1(prefs)
+        } else {
+            prefs
+        };
+        own.media.as_ref().ok_or_else(not_sharing)?.set_prefs(prefs);
         Ok(())
     }
 

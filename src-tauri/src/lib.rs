@@ -920,6 +920,9 @@ fn emit_engine_event(
             }
             .emit(app)
         }
+        // Not forwarded to the webview yet; the Settings tab's encoder status is wired up
+        // with its commands.
+        EngineEvent::ScreenEncoderStatusChanged(_) => Ok(()),
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),

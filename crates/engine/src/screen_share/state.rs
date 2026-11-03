@@ -1,10 +1,12 @@
 //! Who shares and who watches on one server, kept for the user's own channel only.
 
 use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use tokio::sync::oneshot;
 
+use super::encoder::ActiveEncoder;
 use super::media::{Media, ViewerLink};
 use super::signal::MAX_VIEWERS;
 use super::watch::WatchLink;
@@ -43,6 +45,8 @@ pub(crate) struct OwnShare {
     pub started_at: Instant,
     /// Capture and encoding; `None` only in tests of the bookkeeping.
     pub media: Option<Media>,
+    /// The encoder the share's media opened (codec badge, FR-7.39).
+    pub encoder: Arc<Mutex<Option<ActiveEncoder>>>,
     /// Newcomers to the channel that get the share once more, and when.
     reannounce: BTreeMap<u32, Instant>,
 }
@@ -57,6 +61,7 @@ impl OwnShare {
             kind: None,
             started_at: Instant::now(),
             media: None,
+            encoder: Arc::default(),
             reannounce: BTreeMap::new(),
         }
     }

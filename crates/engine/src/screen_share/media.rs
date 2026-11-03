@@ -21,7 +21,7 @@ use mumcord_audio::mixer::share::share_encoder;
 use mumcord_audio::{FRAME_SAMPLES, SAMPLE_RATE};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_screenshare::{
-    Codec, EncodedFrame, Encoder, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
+    Codec, EncodedFrame, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
 };
 use mumcord_store::ScreenOptimize;
 use tokio::task::JoinHandle;
@@ -149,15 +149,16 @@ pub(crate) struct Media {
 }
 
 /// Makes the share's encoder for a size and the "Optimize for" pick; the encoder selection
-/// (FR-7.53) hands in its choice, without one the share uses VP9 in software.
+/// (FR-7.53, `encoder::factory`) hands in its choice.
 pub(crate) type EncoderFactory = Box<
     dyn Fn(EncoderConfig, ScreenOptimize) -> mumcord_screenshare::Result<Box<dyn VideoEncoder>>
         + Send,
 >;
 
-/// The default encoder: VP9 on libvpx, which every viewer can play.
+/// VP9 on libvpx, which every viewer can play.
+#[cfg(test)]
 pub(crate) fn vp9_encoder() -> EncoderFactory {
-    Box::new(|config, _| Ok(Box::new(Encoder::new(config)?)))
+    Box::new(|config, _| Ok(Box::new(mumcord_screenshare::Encoder::new(config)?)))
 }
 
 impl Media {
@@ -641,6 +642,8 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32)) -> Frame {
 
 #[cfg(test)]
 mod tests {
+    use mumcord_screenshare::Encoder;
+
     use super::*;
 
     /// The default share's steps (1080p30 → 720p30 → 720p15 → 480p15).

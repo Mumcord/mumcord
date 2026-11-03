@@ -270,6 +270,8 @@ struct Inner {
     watch_parties: crate::watch_party::ServerParties,
     /// Screen shares in the user's channels (FR-2.42).
     screen_shares: crate::screen_share::ServerShares,
+    /// Screen share encoder probe and self-tests (FR-7.55, FR-7.56).
+    screen_encoders: Arc<crate::screen_share::encoder::Encoders>,
     /// Packet inspector capture, shared by every connection (issue #60).
     inspector: Arc<crate::inspector::Inspector>,
     /// File sharing: own shares and the cards of received offers (spec 07).
@@ -595,6 +597,7 @@ impl Engine {
             mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
+            screen_encoders: Arc::default(),
             inspector: Arc::default(),
             positional: crate::positional::Positional::new(
                 voice.positional.clone(),
@@ -611,6 +614,13 @@ impl Engine {
             .link_previews()
             .set_max_age_days(settings.preview_cache_days);
         engine.start_maintenance();
+        // Unit tests build many engines; none of them needs the encoder probe.
+        if !cfg!(test) {
+            engine
+                .inner
+                .screen_encoders
+                .start(engine.store_handle(), engine.events().clone());
+        }
         Ok((engine, EventReceiver(rx)))
     }
 
@@ -849,6 +859,10 @@ impl Engine {
 
     pub(crate) fn screen_share_state(&self) -> &crate::screen_share::ServerShares {
         &self.inner.screen_shares
+    }
+
+    pub(crate) fn screen_encoders(&self) -> &crate::screen_share::encoder::Encoders {
+        &self.inner.screen_encoders
     }
 
     pub(crate) fn voice_shared(&self) -> &Arc<VoiceShared> {
