@@ -15,15 +15,13 @@ import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
 import { clockTime } from "../media/format";
 import { useTick } from "../media/useTick";
-import { useP2pLink } from "../p2p/useP2pLink";
-import { ChevronDownIcon, InfoCircleIcon, WindowIcon } from "./icons";
-import { PathTag } from "./parts";
+import { ChevronDownIcon, WindowIcon } from "./icons";
 import { qualityText } from "./shareFormat";
 import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
 import { useShareActions } from "./useShareActions";
-import { MAX_VIEWERS } from "./Viewers";
+import { MAX_VIEWERS, ViewerList } from "./Viewers";
 
 /** The quality the sharer sends is read once a second (issue #163). */
 const POLL_MS = 1000;
@@ -42,6 +40,7 @@ export function SharerBar(): ReactNode {
   const avatarOf = useAvatars(people, serverId ?? undefined);
   const [quality, setQuality] = useState<ShareQuality | null>(null);
   const [thumb, setThumb] = useState<ShareThumbnail | null>(null);
+  const [limit, setLimit] = useState(MAX_VIEWERS);
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -84,6 +83,29 @@ export function SharerBar(): ReactNode {
     };
   }, [serverId, own]);
 
+  // The viewer limit depends on how the share reaches viewers (relay broadcast or copies), not on
+  // the quality choice, so the preview with the defaults names it.
+  const sharing = own !== null;
+  useEffect(() => {
+    if (serverId === null || !sharing) return;
+    let current = true;
+    getApi()
+      .screenSharePreview(
+        serverId,
+        { resolution: "auto", fps: "30", optimize: "balanced", uploadLimit: "auto" },
+        "auto",
+      )
+      .then((preview) => {
+        if (current) setLimit(preview.path.maxViewers);
+      })
+      .catch((error: unknown) => {
+        console.warn("screen share preview failed", error);
+      });
+    return () => {
+      current = false;
+    };
+  }, [serverId, sharing]);
+
   // Starting a share lives in the composer's Apps menu, which also names what blocks it.
   if (own === null || serverId === null) return null;
   const nameOf = (session: number) => users.get(session)?.name ?? t("someone");
@@ -91,7 +113,6 @@ export function SharerBar(): ReactNode {
     const user = users.get(session);
     return user === undefined ? null : avatarOf(user);
   };
-  const slow = quality?.viewers.find((viewer) => viewer.struggling) ?? null;
   const count = own.viewers.length;
 
   const run = (call: Promise<null>, what: string) => {
@@ -202,42 +223,7 @@ export function SharerBar(): ReactNode {
               role="group"
               aria-label={t("viewersTitle")}
             >
-              <p className="sharer-bar__popover-title">
-                {t("viewersTitle")}{" "}
-                <span className="sharer-bar__popover-count">
-                  {t("ofMax", { count, max: MAX_VIEWERS })}
-                </span>
-              </p>
-              {count === 0 ? (
-                <p className="sharer-bar__empty">{t("viewersNone")}</p>
-              ) : (
-                <ul className="viewer-panel__list">
-                  {own.viewers.map((session) => {
-                    const viewer = quality?.viewers.find((v) => v.session === session);
-                    return (
-                      <ViewerRow
-                        key={session}
-                        serverId={serverId}
-                        session={session}
-                        name={nameOf(session)}
-                        src={srcOf(session)}
-                        quality={
-                          viewer === undefined || quality === null
-                            ? null
-                            : qualityText(quality.height, viewer.fps)
-                        }
-                      />
-                    );
-                  })}
-                </ul>
-              )}
-              {count >= MAX_VIEWERS && <p className="sharer-bar__note">{t("fullShort")}</p>}
-              {slow !== null && (
-                <p className="sharer-bar__note">
-                  <InfoCircleIcon />
-                  {tv("loweredFor", { name: nameOf(slow.session), fps: String(slow.fps) })}
-                </p>
-              )}
+              <ViewerList own={own} quality={quality} nameOf={nameOf} srcOf={srcOf} limit={limit} />
             </div>
           )}
         </span>
@@ -253,32 +239,5 @@ export function SharerBar(): ReactNode {
         </button>
       </span>
     </div>
-  );
-}
-
-/** One viewer in the popover: who, the quality they get and how the picture reaches them. */
-function ViewerRow({
-  serverId,
-  session,
-  name,
-  src,
-  quality,
-}: {
-  serverId: number;
-  session: number;
-  name: string;
-  src: string | null;
-  quality: string | null;
-}): ReactNode {
-  const link = useP2pLink(serverId, session);
-  return (
-    <li className="viewer-panel__person">
-      <Avatar name={name} src={src} />
-      <span className="viewer-panel__text">
-        <span className="viewer-panel__name">{name}</span>
-        {quality !== null && <span className="viewer-panel__sub">{quality}</span>}
-      </span>
-      {link !== null && <PathTag path={link.path} />}
-    </li>
   );
 }

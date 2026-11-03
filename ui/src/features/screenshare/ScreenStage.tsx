@@ -3,14 +3,14 @@
  * failed (FR-2.43 "This share is full", FR-2.46 direct connection needed) with "Try again"
  * and "Stop watching".
  */
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { p2pBlockText } from "../p2p/relayReason";
 import { MockPicture } from "../media/MockPicture";
 import { mockPlaceholder } from "../media/mockPlaceholder";
 import { useInPopout } from "../media/popoutStore";
 import { useScreenShareOf } from "./sharesStore";
-import { useScreenWatch } from "./useScreenWatch";
+import { useScreenWatch, type ScreenWatch } from "./useScreenWatch";
 import type { StreamMeter } from "./streamStats";
 import { stopWatching } from "./watching";
 
@@ -21,14 +21,25 @@ export interface ScreenStageProps {
   paused: boolean;
   /** Counts the frames for the chips and the stream details (issue #163). */
   meter?: StreamMeter;
+  /** Hands the codec and the frame-rate cap to the header, which owns the quality menu. */
+  onWatch?: (watch: Pick<ScreenWatch, "codec" | "maxFps" | "setMaxFps">) => void;
 }
 
-export function ScreenStage({ serverId, session, name, paused, meter }: ScreenStageProps) {
+export function ScreenStage({ serverId, session, name, paused, meter, onWatch }: ScreenStageProps) {
   const { t } = useTranslation("screenviewer");
   const { t: tP2p } = useTranslation("p2p");
   const relayReason = useScreenShareOf(serverId, session)?.relayReason ?? null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { status, retry } = useScreenWatch(serverId, session, canvasRef, paused, meter);
+  const { status, retry, codec, maxFps, setMaxFps } = useScreenWatch(
+    serverId,
+    session,
+    canvasRef,
+    paused,
+    meter,
+  );
+  useEffect(() => {
+    onWatch?.({ codec, maxFps, setMaxFps });
+  }, [onWatch, codec, maxFps, setMaxFps]);
   const inPopout = useInPopout();
 
   let message: string | null = null;

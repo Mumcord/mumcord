@@ -75,7 +75,7 @@ describe("watched share", () => {
     fireEvent.click(screen.getByRole("button", { name: "Stream details" }));
     const details = screen.getByRole("group", { name: "Stream details" });
     expect(details).toHaveTextContent("Via relay (UDP) · IP visible");
-    expect(details).toHaveTextContent("VP9 · Opus");
+    expect(details).toHaveTextContent("— · Opus");
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("group", { name: "Stream details" })).toBeNull();
   });
