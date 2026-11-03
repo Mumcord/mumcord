@@ -20,7 +20,7 @@ use image::{ImageFormat, Rgb, RgbImage};
 use mumbot::protocol::{Event, PluginData};
 use mumbot::{Bot, BotConfig, env};
 use mumcord_engine::p2p::{DirectError, P2pConfig};
-use mumcord_engine::peer::{RelayStatus, RelayUnavailable};
+use mumcord_engine::peer::{RelayStatus, RelayUnavailable, RelayUse};
 use mumcord_engine::store::P2pMode;
 use mumcord_engine::{
     ChatMessageView, Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields,
@@ -609,7 +609,7 @@ async fn closed_udp_port_falls_back_to_the_relay_over_tcp() {
     let alice_session = bob.session_of(&alice.name).await;
     let conn = bob
         .engine
-        .p2p_connection(bob.server(), alice_session)
+        .p2p_connection(bob.server(), alice_session, RelayUse::Images)
         .await
         .expect("connected through the relay");
     assert_eq!(conn.path(), ConnectionPath::Relay(RelayTransport::Tcp));
@@ -630,7 +630,10 @@ async fn relay_only_without_an_announcement_has_no_relay() {
     let dir = work_dir("live_relay_none");
     let (alice, bob) = pair(&dir, P2pMode::DirectRelay, P2pMode::RelayOnly).await;
     let alice_session = bob.session_of(&alice.name).await;
-    let result = bob.engine.p2p_connection(bob.server(), alice_session).await;
+    let result = bob
+        .engine
+        .p2p_connection(bob.server(), alice_session, RelayUse::Images)
+        .await;
     assert!(
         matches!(result, Err(DirectError::Relay(RelayUnavailable::NoRelay))),
         "{:?}",
@@ -670,7 +673,10 @@ async fn changed_fingerprint_is_untrusted_and_not_used() {
     })
     .await;
     let alice_session = bob.session_of(&alice.name).await;
-    let result = bob.engine.p2p_connection(bob.server(), alice_session).await;
+    let result = bob
+        .engine
+        .p2p_connection(bob.server(), alice_session, RelayUse::Images)
+        .await;
     assert!(
         matches!(result, Err(DirectError::Relay(RelayUnavailable::Untrusted))),
         "{:?}",
@@ -702,7 +708,10 @@ async fn relay_with_another_certificate_than_announced_is_untrusted() {
             .await;
     }
     let alice_session = bob.session_of(&alice.name).await;
-    let result = bob.engine.p2p_connection(bob.server(), alice_session).await;
+    let result = bob
+        .engine
+        .p2p_connection(bob.server(), alice_session, RelayUse::Images)
+        .await;
     assert!(
         matches!(result, Err(DirectError::Relay(RelayUnavailable::Untrusted))),
         "{:?}",
