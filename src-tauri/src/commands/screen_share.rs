@@ -3,6 +3,7 @@
 use std::sync::Arc;
 
 use mumcord_engine::Engine;
+use mumcord_engine::screen_share::wire::Codec;
 use mumcord_engine::screen_share::{
     self as engine_share, QualityPrefs, ScreenShareView, ShareKind as EngineShareKind,
     WatchBlock as EngineWatchBlock,
@@ -287,26 +288,42 @@ pub fn screen_share_frames_attach(
     Ok(())
 }
 
-/// Decodes a watched share in Rust and sends RGBA pictures instead of VP9 frames, for a webview
-/// without WebCodecs VP9 (FR-2.44).
+impl From<VideoCodec> for Codec {
+    fn from(codec: VideoCodec) -> Self {
+        match codec {
+            VideoCodec::Av1 => Codec::Av1,
+            VideoCodec::Vp9 => Codec::Vp9,
+        }
+    }
+}
+
+/// Decodes a watched share's frames of `codecs` in Rust and sends RGBA pictures instead, for the
+/// codecs the webview's WebCodecs cannot decode (FR-7.59). Replaces the earlier list.
 #[tauri::command]
 #[specta::specta]
-pub fn screen_share_set_decode_fallback(
+pub fn screen_share_set_decode_codecs(
     engine: State<'_, Engine>,
     server_id: ServerId,
     session: SessionId,
-    enabled: bool,
+    codecs: Vec<VideoCodec>,
 ) -> ApiResult<()> {
-    Ok(
-        engine.screen_share_set_decode_fallback(
-            to_engine_server_id(server_id),
-            session,
-            enabled,
-        )?,
-    )
+    let codecs: Vec<Codec> = codecs.into_iter().map(Codec::from).collect();
+    Ok(engine.screen_share_set_decode_codecs(to_engine_server_id(server_id), session, &codecs)?)
 }
 
-/// Asks the sharer for a keyframe, e.g. after the webview's decoder failed on a frame.
+/// The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
+/// watched share, by dropping temporal layers; `null` is Auto.
+#[tauri::command]
+#[specta::specta]
+pub fn screen_share_set_viewer_fps(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    session: SessionId,
+    max_fps: Option<u32>,
+) -> ApiResult<()> {
+    Ok(engine.screen_share_set_viewer_fps(to_engine_server_id(server_id), session, max_fps)?)
+}
+
 #[tauri::command]
 #[specta::specta]
 pub fn screen_share_request_keyframe(
@@ -440,6 +457,7 @@ impl From<engine_share::LoweredReason> for LoweredReason {
     }
 }
 
+/// A video codec of a share.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum VideoCodec {

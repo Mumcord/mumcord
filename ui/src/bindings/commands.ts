@@ -864,11 +864,15 @@ export const commands = {
 	/**  Stops watching a person's share. */
 	screenShareUnwatch: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_unwatch", { serverId, session })),
 	/**
-	 *  Decodes a watched share in Rust and sends RGBA pictures instead of VP9 frames, for a webview
-	 *  without WebCodecs VP9 (FR-2.44).
+	 *  Decodes a watched share's frames of `codecs` in Rust and sends RGBA pictures instead, for the
+	 *  codecs the webview's WebCodecs cannot decode (FR-7.59). Replaces the earlier list.
 	 */
-	screenShareSetDecodeFallback: (serverId: number, session: number, enabled: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_decode_fallback", { serverId, session, enabled })),
-	/**  Asks the sharer for a keyframe, e.g. after the webview's decoder failed on a frame. */
+	screenShareSetDecodeCodecs: (serverId: number, session: number, codecs: VideoCodec[]) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_decode_codecs", { serverId, session, codecs })),
+	/**
+	 *  The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
+	 *  watched share, by dropping temporal layers; `null` is Auto.
+	 */
+	screenShareSetViewerFps: (serverId: number, session: number, maxFps: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_viewer_fps", { serverId, session, maxFps })),
 	screenShareRequestKeyframe: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_request_keyframe", { serverId, session })),
 	/**  The shares in the user's channel (for a view opened after the last event). */
 	screenShareList: (serverId: number) => typedError<ScreenShare[], ApiError>(__TAURI_INVOKE("screen_share_list", { serverId })),
@@ -4041,6 +4045,7 @@ export type UserUpserted = {
 	user: User,
 };
 
+/**  A video codec of a share. */
 export type VideoCodec = "vp9" | "av1";
 
 export type VideoEmbed = {

@@ -79,12 +79,9 @@ pub enum CodecName {
     Vp9,
 }
 
-/// What this client can play as a viewer, sent in every [`Signal::Watch`].
-///
-/// Only VP9 until the viewer decodes AV1 (task N6 adds [`CodecName::Av1`] here once WebCodecs
-/// `av01` and the dav1d fallback are wired); announcing AV1 earlier would make sharers send
-/// frames this client cannot show.
-pub const PLAYABLE_CODECS: &[CodecName] = &[CodecName::Vp9];
+/// What this client can play as a viewer, sent in every [`Signal::Watch`]: AV1 and VP9 always,
+/// since the engine decodes either (dav1d, libvpx) where the webview's WebCodecs cannot (FR-7.58).
+pub const PLAYABLE_CODECS: &[CodecName] = &[CodecName::Av1, CodecName::Vp9];
 
 /// The watch request this client sends.
 pub fn watch_request() -> Signal {
@@ -252,7 +249,7 @@ mod tests {
     #[test]
     fn this_client_asks_with_its_playable_codecs() {
         let sent = encode(&watch_request());
-        assert_eq!(sent, br#"{"v":2,"t":"watch","codecs":["vp9"]}"#);
+        assert_eq!(sent, br#"{"v":2,"t":"watch","codecs":["av1","vp9"]}"#);
         // 0.6.x reads `{"t":"watch"}` with extra fields as a plain watch (see the test above).
         assert!(decode(&sent).is_some());
     }

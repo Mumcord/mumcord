@@ -21,7 +21,7 @@ use std::time::{Duration, Instant};
 
 use mumbot::env;
 use mumcord_engine::p2p::P2pConfig;
-use mumcord_engine::screen_share::wire::{Frame, FrameHeader, FrameKind};
+use mumcord_engine::screen_share::wire::{Codec, Frame, FrameHeader, FrameKind};
 use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink, ScreenShareView, StartOutcome};
 use mumcord_engine::store::Consent;
 use mumcord_engine::{
@@ -228,7 +228,7 @@ impl ScreenFrameSink for Sink {
         ));
     }
 
-    fn on_decoded(&self, _: ServerId, _: u32, _: &I420Frame) {
+    fn on_decoded(&self, _: ServerId, _: u32, _: Codec, _: &I420Frame) {
         self.0.lock().expect("sink").decoded.push(Instant::now());
     }
 }
@@ -658,7 +658,7 @@ async fn screen_share_ac_2_29() {
     // Worst case for viewers: everyone decodes in Rust (the fallback without WebCodecs).
     for v in &viewers[..VIEWERS] {
         v.engine
-            .screen_share_set_decode_fallback(v.server(), a, true)
+            .screen_share_set_decode_codecs(v.server(), a, &[Codec::Av1, Codec::Vp9])
             .expect("fallback");
     }
     tokio::time::sleep(Duration::from_secs(2)).await;
@@ -681,7 +681,7 @@ async fn screen_share_ac_2_29() {
     }
     for v in &viewers[..VIEWERS] {
         v.engine
-            .screen_share_set_decode_fallback(v.server(), a, false)
+            .screen_share_set_decode_codecs(v.server(), a, &[])
             .expect("fallback off");
     }
 
