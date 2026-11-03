@@ -88,7 +88,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg-elevated);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-raised);
 }
 
 .file-drop-choice__title {
