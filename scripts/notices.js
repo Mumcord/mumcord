@@ -147,7 +147,7 @@ for (const [key, d] of packages) {
 }
 
 // Native components: versions come from the same build inputs the SBOM uses
-// (scripts/generate-sbom.sh, scripts/build-libvpx.sh).
+// (scripts/generate-sbom.sh, scripts/build-*.sh).
 const metadata = readJson(opt.metadata);
 const crateDir = (name) => {
   const p = metadata.packages.find((pkg) => pkg.name === name);
@@ -162,6 +162,30 @@ const match = (file, re, what) => {
 const versions = {
   "@libvpx": () =>
     match(join(opt.root, "scripts/build-libvpx.sh"), /^LIBVPX_VERSION=(\S+)$/mu, "LIBVPX_VERSION"),
+  "@nv-codec-headers": () =>
+    match(
+      join(opt.root, "scripts/build-hwenc-sdk.sh"),
+      /^NV_CODEC_HEADERS_VERSION=(\S+)$/mu,
+      "NV_CODEC_HEADERS_VERSION",
+    ),
+  "@amf": () =>
+    match(join(opt.root, "scripts/build-hwenc-sdk.sh"), /^AMF_VERSION=(\S+)$/mu, "AMF_VERSION"),
+  "@libvpl": () =>
+    match(
+      join(opt.root, "scripts/build-hwenc-sdk.sh"),
+      /^LIBVPL_VERSION=(\S+)$/mu,
+      "LIBVPL_VERSION",
+    ),
+  "@libva": () =>
+    match(join(opt.root, "scripts/build-hwenc-sdk.sh"), /^LIBVA_VERSION=(\S+)$/mu, "LIBVA_VERSION"),
+  "@svt-av1": () =>
+    match(
+      join(opt.root, "scripts/build-svt-av1.sh"),
+      /^SVT_AV1_VERSION=(\S+)$/mu,
+      "SVT_AV1_VERSION",
+    ),
+  "@dav1d": () =>
+    match(join(opt.root, "scripts/build-dav1d.sh"), /^DAV1D_VERSION=(\S+)$/mu, "DAV1D_VERSION"),
   "@libopus": () =>
     match(
       join(crateDir("opusic-sys"), "opus/package_version"),
