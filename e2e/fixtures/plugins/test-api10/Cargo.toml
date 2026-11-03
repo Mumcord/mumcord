@@ -1,0 +1,21 @@
+[package]
+name = "test-api10"
+version = "1.0.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Pinned to the last 1.0-only SDK on purpose: this plugin is the backwards-compatibility fixture
+# for the 1.1 platform and must keep importing WIT 1.0.0 only (FR-9.8).
+mumcord-plugin-sdk = { git = "https://github.com/Mumcord/mumcord", tag = "v0.6.2" }
+
+[profile.release]
+opt-level = "s"
+codegen-units = 1
+
+# A plugin is its own workspace, also inside the Mumcord tree.
+[workspace]
