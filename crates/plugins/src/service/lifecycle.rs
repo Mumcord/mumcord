@@ -358,6 +358,40 @@ impl PluginService {
         let webviews = self.io.webviews();
         webviews.set_origins_granted(id, granted.iter().any(|g| g == "net.origins"));
         webviews.set_root(id, (allowed && web.is_dir()).then_some(web), places);
+        let disabled = self
+            .store()
+            .plugin_web_disabled(id)
+            .unwrap_or_else(|error| {
+                tracing::error!(%error, "reading whether a plugin's web content is off failed");
+                false
+            });
+        webviews.set_web_disabled(id, disabled);
+    }
+
+    /// Turns a plugin's web content off because Mumcord's window stopped answering while one of
+    /// its frames was open (FR-9.42): its frames close, none opens again (also after a restart)
+    /// until [`Self::re_enable_web`], and Diagnostics counts it.
+    pub fn set_web_disabled(&self, id: &str) -> Result<(), ServiceError> {
+        self.io.webviews().set_web_disabled(id, true);
+        if let Some(diag) = self.host.diagnostics(id) {
+            diag.ui_froze();
+        }
+        self.store()
+            .set_plugin_web_disabled(id, true, now_millis())?;
+        Ok(())
+    }
+
+    /// The user turned the plugin's web content on again in Settings → Plugins.
+    pub fn re_enable_web(&self, id: &str) -> Result<(), ServiceError> {
+        self.store()
+            .set_plugin_web_disabled(id, false, now_millis())?;
+        self.io.webviews().set_web_disabled(id, false);
+        Ok(())
+    }
+
+    /// Whether the plugin's web content is off (FR-9.42).
+    pub fn web_disabled(&self, id: &str) -> bool {
+        self.io.webviews().web_disabled(id)
     }
 
     pub(super) fn version_dir(&self, id: &str, version: &str) -> PathBuf {

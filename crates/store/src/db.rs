@@ -446,6 +446,15 @@ const MIGRATIONS: &[&str] = &[
         skipped_at INTEGER NOT NULL
     );
     ",
+    // v29: plugins whose web content was turned off because Mumcord's window stopped answering
+    // while one of their frames was open (FR-9.42). It stays off across restarts until the user
+    // turns it on again in Settings → Plugins; the row is deleted then.
+    r"
+    CREATE TABLE plugin_web_disabled (
+        plugin_id   TEXT PRIMARY KEY,
+        disabled_at INTEGER NOT NULL
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

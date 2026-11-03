@@ -63,10 +63,9 @@ const MIME_TYPES: &[(&str, &str)] = &[
     (".svg", "image/svg+xml"),
 ];
 
-/// Moves keyboard focus out of the frame on Escape (FR-6.48): key events inside the frame never
-/// reach the app, so the page tells the parent. The message is an object, never a string, so the
-/// app tells it apart from the plugin's own bridge messages; a page faking it only loses focus.
-const ESCAPE_BOOTSTRAP: &str = "<script>addEventListener(\"keydown\",function(e){if(e.key===\"Escape\"){parent.postMessage({mumcordWebview:\"escape\"},\"*\")}},true)</script>";
+/// The script in front of every page (FR-9.41–9.43): heartbeat, Escape/F6 focus return and
+/// click-to-sound. It is the only inline script a page's CSP allows.
+const BOOTSTRAP: &str = include_str!("webview_bootstrap.js");
 
 pub(crate) struct WebviewApi;
 
@@ -169,18 +168,14 @@ pub fn content_security_policy(origin: &str, plugin: &str, declared: &[Origin]) 
 
 /// The CSP hash source of the inline bootstrap script, the only inline script a page may run.
 fn bootstrap_hash() -> String {
-    let script = ESCAPE_BOOTSTRAP
-        .strip_prefix("<script>")
-        .and_then(|rest| rest.strip_suffix("</script>"))
-        .unwrap_or(ESCAPE_BOOTSTRAP);
-    let digest = Sha256::digest(script.as_bytes());
+    let digest = Sha256::digest(BOOTSTRAP.as_bytes());
     format!(
         "sha256-{}",
         base64::engine::general_purpose::STANDARD.encode(digest)
     )
 }
 
-/// An HTML page with the Escape bootstrap in front, after a leading doctype (a script before it
+/// An HTML page with the bootstrap in front, after a leading doctype (a script before it
 /// would switch the page into quirks mode).
 pub fn with_bootstrap(html: &[u8]) -> Vec<u8> {
     let start = html
@@ -198,9 +193,11 @@ pub fn with_bootstrap(html: &[u8]) -> Vec<u8> {
     } else {
         0
     };
-    let mut out = Vec::with_capacity(html.len() + ESCAPE_BOOTSTRAP.len());
+    let mut out = Vec::with_capacity(html.len() + BOOTSTRAP.len() + 17);
     out.extend_from_slice(&html[..split]);
-    out.extend_from_slice(ESCAPE_BOOTSTRAP.as_bytes());
+    out.extend_from_slice(b"<script>");
+    out.extend_from_slice(BOOTSTRAP.as_bytes());
+    out.extend_from_slice(b"</script>");
     out.extend_from_slice(&html[split..]);
     out
 }
@@ -337,6 +334,9 @@ struct PluginWeb {
     /// Whether the `net.origins` grant lets its pages reach them.
     origins_granted: bool,
     dialog_open: bool,
+    /// Turned off after it froze Mumcord's window (FR-9.42): no frame opens until the user turns
+    /// it on again. Survives [`Webviews::set_root`], so a reload keeps it.
+    web_disabled: bool,
     /// The place shown in each [`Slot`], indexed by the slot.
     frames: [Option<WebviewPlace>; MAX_FRAMES],
     /// One bridge rate per direction for all of the plugin's frames, set while any is open.
@@ -481,7 +481,7 @@ impl Webviews {
         let mut plugins = self.lock();
         let web = plugins.get_mut(plugin).ok_or(Error::NotPermitted)?;
         let root = web.root.as_deref().ok_or(Error::NotPermitted)?;
-        if !web.places.contains(&place) {
+        if web.web_disabled || !web.places.contains(&place) {
             return Err(Error::NotPermitted);
         }
         let frame = web.frames[place.slot() as usize];
@@ -647,6 +647,30 @@ impl Webviews {
         }
     }
 
+    /// Turns a plugin's web content off (closing its frames) or on again (FR-9.42). The caller
+    /// keeps the stored flag in step.
+    pub fn set_web_disabled(&self, plugin: &str, disabled: bool) {
+        let mut plugins = self.lock();
+        let web = plugins.entry(plugin.to_owned()).or_default();
+        web.web_disabled = disabled;
+        if disabled {
+            web.close_all();
+        }
+    }
+
+    pub fn web_disabled(&self, plugin: &str) -> bool {
+        self.lock().get(plugin).is_some_and(|web| web.web_disabled)
+    }
+
+    /// The plugins with at least one open frame, for the UI watchdog.
+    pub fn with_open_frames(&self) -> Vec<String> {
+        self.lock()
+            .iter()
+            .filter(|(_, web)| web.open_places().next().is_some())
+            .map(|(id, _)| id.clone())
+            .collect()
+    }
+
     /// Drops everything about an unloaded plugin.
     pub fn forget(&self, plugin: &str) {
         self.lock().remove(plugin);
@@ -781,6 +805,53 @@ mod tests {
         let declared = [crate::origins::validate("http://localhost:47180", true).unwrap()];
         let csp = content_security_policy("mumcord-web://localhost", "dev", &declared);
         assert!(csp.contains("connect-src mumcord-web://localhost/dev/ http://localhost:47180;"));
+    }
+
+    #[test]
+    fn the_bootstrap_sends_heartbeats_and_returns_focus_on_escape_and_f6() {
+        assert!(BOOTSTRAP.contains("post(\"heartbeat\")"));
+        assert!(BOOTSTRAP.contains("setInterval"));
+        assert!(BOOTSTRAP.contains("post(\"escape\")"));
+        assert!(BOOTSTRAP.contains("post(\"f6\")"));
+        assert!(BOOTSTRAP.contains("post(\"sound\")"));
+        // It is inlined into a <script> element, which this would end early.
+        assert!(!BOOTSTRAP.contains("</"));
+    }
+
+    #[test]
+    fn disabled_web_content_closes_its_frames_and_opens_none() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        views.set_root("p", Some(root.clone()), ALL.to_vec());
+        views.set_root("q", Some(root.clone()), ALL.to_vec());
+        assert!(views.with_open_frames().is_empty());
+        views
+            .show("p", WebviewPlace::PanelPopover, "index.html", now)
+            .unwrap();
+        views
+            .show("q", WebviewPlace::SidePanel, "index.html", now)
+            .unwrap();
+        let mut open = views.with_open_frames();
+        open.sort();
+        assert_eq!(open, ["p", "q"]);
+
+        views.set_web_disabled("p", true);
+        assert!(views.web_disabled("p"));
+        assert_eq!(views.with_open_frames(), ["q"]);
+        assert!(views.file("p", "index.html").is_none());
+        // A reload keeps it off.
+        views.set_root("p", Some(root), ALL.to_vec());
+        assert_eq!(
+            views.show("p", WebviewPlace::PanelPopover, "index.html", now),
+            Err(Error::NotPermitted)
+        );
+
+        views.set_web_disabled("p", false);
+        assert!(!views.web_disabled("p"));
+        views
+            .show("p", WebviewPlace::PanelPopover, "index.html", now)
+            .unwrap();
     }
 
     #[test]

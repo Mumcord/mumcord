@@ -524,17 +524,20 @@ pub fn run() {
             }
             Ok(())
         })
-        .run(context);
+        .build(context);
 
-    if let Err(err) = app {
-        eprintln!("error while running Mumcord: {err}");
-        std::process::exit(1);
+    match app {
+        Ok(app) => app.run(plugins::watchdog::on_run_event),
+        Err(err) => {
+            eprintln!("error while running Mumcord: {err}");
+            std::process::exit(1);
+        }
     }
 }
 
 /// Creates the main window from its entry in tauri.conf.json (`create: false` there), so that
 /// portable mode can point the web view's data at the portable folder.
-fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
+pub(crate) fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
     let config = app
         .config()
         .app

@@ -14,6 +14,7 @@ pub struct Diagnostics {
     dropped_events: AtomicU64,
     dropped_messages: AtomicU64,
     restarts: AtomicU64,
+    ui_freezes: AtomicU64,
 }
 
 /// A refusal at load time that FR-9.90 lists for Diagnostics. It carries no label text, payload
@@ -39,6 +40,9 @@ pub struct DiagSnapshot {
     pub dropped_events: u64,
     pub dropped_messages: u64,
     pub restarts: u64,
+    /// Times Mumcord's window stopped answering while a frame of this plugin was open and its
+    /// web content was turned off (FR-9.42).
+    pub ui_freezes: u64,
 }
 
 impl Diagnostics {
@@ -67,6 +71,10 @@ impl Diagnostics {
         self.restarts.fetch_add(1, Ordering::Relaxed);
     }
 
+    pub(crate) fn ui_froze(&self) {
+        self.ui_freezes.fetch_add(1, Ordering::Relaxed);
+    }
+
     pub fn snapshot(&self) -> DiagSnapshot {
         DiagSnapshot {
             cpu_time_ms: self.cpu_micros.load(Ordering::Relaxed) / 1000,
@@ -75,6 +83,7 @@ impl Diagnostics {
             dropped_events: self.dropped_events.load(Ordering::Relaxed),
             dropped_messages: self.dropped_messages.load(Ordering::Relaxed),
             restarts: self.restarts.load(Ordering::Relaxed),
+            ui_freezes: self.ui_freezes.load(Ordering::Relaxed),
         }
     }
 }
@@ -93,6 +102,7 @@ mod tests {
         diag.events_dropped(3);
         diag.message_dropped();
         diag.restarted();
+        diag.ui_froze();
         assert_eq!(
             diag.snapshot(),
             DiagSnapshot {
@@ -102,6 +112,7 @@ mod tests {
                 dropped_events: 3,
                 dropped_messages: 1,
                 restarts: 1,
+                ui_freezes: 1,
             }
         );
     }

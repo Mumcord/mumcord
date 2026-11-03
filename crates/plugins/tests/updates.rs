@@ -621,6 +621,43 @@ fn installed_and_updated_official_plugins_serve_their_web_pages() {
     assert!(shows_its_page(&service, "fit"), "after the update");
 }
 
+#[test]
+fn web_content_turned_off_after_a_freeze_stays_off_across_restarts() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let page: &[(&str, &[u8])] = &[
+        ("README.md", b"# Fit"),
+        ("LICENSE", b"MIT"),
+        ("web/index.html", b"<!doctype html><p>fit</p>"),
+    ];
+    let permissions = &["ui.panel", "ui.webview"];
+    let v1 = Release::with_files("fit", "1.0.0", OK_START, permissions, &key, page);
+    let (mut service, _events) = fx.service();
+    let request = InstallRequest {
+        source: Source::Official,
+        ..v1.request(&["ui.webview"])
+    };
+    service.install(&request, &v1.download).expect("installs");
+    assert!(shows_its_page(&service, "fit"));
+
+    service.set_web_disabled("fit").expect("turns off");
+    assert!(service.web_disabled("fit"));
+    assert!(!shows_its_page(&service, "fit"));
+    let diagnostics = service.diagnostics("fit").expect("loaded");
+    assert_eq!(diagnostics.ui_freezes, 1);
+    drop(service);
+
+    let (service, _events) = fx.service();
+    assert!(service.web_disabled("fit"), "after a restart");
+    assert!(!shows_its_page(&service, "fit"));
+
+    service.re_enable_web("fit").expect("turns on");
+    assert!(shows_its_page(&service, "fit"));
+    drop(service);
+    let (service, _events) = fx.service();
+    assert!(shows_its_page(&service, "fit"), "on after a restart");
+}
+
 fn revocations(entries: serde_json::Value) -> RevocationList {
     RevocationList::parse(
         &serde_json::to_vec(&json!({"format": 1, "sequence": 9, "revoked": entries}))

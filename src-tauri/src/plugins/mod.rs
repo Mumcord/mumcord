@@ -10,6 +10,7 @@ mod frame_proxy;
 mod host_calls;
 pub mod suggestions;
 pub mod ui;
+pub mod watchdog;
 pub mod webview;
 
 use std::collections::{HashMap, HashSet};
@@ -309,6 +310,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
             tracing::error!(error = %e, "starting the plugins failed");
         }
     });
+    watchdog::start(app, &plugins);
     pump_host_events(&plugins, host_events);
     pump_service_events(app, &plugins, engine, events);
     feed::pump_engine_events(app, &plugins, engine);
