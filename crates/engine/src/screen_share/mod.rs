@@ -43,21 +43,27 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use mumcord_p2p::DeclineReason;
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_p2p::{DeclineReason, P2pError};
 use mumcord_protocol::{Handle, PluginData};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
-use crate::mumcord::ServerPeers;
+use crate::mumcord::{FEATURE_SCREEN_BROADCAST, ServerPeers};
 use crate::p2p::DirectError;
 use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{
     Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, WeakEngine, lock,
 };
+use broadcast::Fanout;
+use broadcast::admit::{Decision, Path};
+use broadcast::link::Received;
+use mumcord_p2p::{BroadcastId, P2pError};
 use signal::{DATA_ID, FEATURE, Signal, decode, encode};
 use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 
+pub use broadcast::link::MaxFps;
+pub use broadcast::{FanoutInfo, FanoutUnavailable, FanoutView, RelayViewer};
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use media::{ScreenMediaStats, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
@@ -320,8 +326,19 @@ pub(crate) fn on_plugin_data(
     if let Signal::Share { live, .. } = signal {
         tracing::debug!(sender, live, "screen share announcement received");
     }
+    // What a Watch needs to know before the state is locked.
+    let (broadcast_viewer, viewer_hash) = match signal {
+        Signal::Watch => (
+            !capable(peers, ctx.server_id, &[sender], FEATURE_SCREEN_BROADCAST).is_empty(),
+            cert_hash(&ctx.handle, sender),
+        ),
+        _ => (false, None),
+    };
     let mut reply = None;
     let mut own_viewers = false;
+    let mut admit = None;
+    let mut kick = None;
+    let mut relink = false;
     let changed = {
         let mut all = lock(state);
         let shares = all.servers.entry(ctx.server_id).or_default();
@@ -344,13 +361,25 @@ pub(crate) fn on_plugin_data(
             ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
             Signal::Watch => {
-                match shares.own.as_mut().map(|own| own.admit(sender)) {
-                    Some(Admit::New) => {
-                        reply = Some(Signal::Accept);
-                        own_viewers = true;
+                let fanout = shares.own.as_mut().map(|own| {
+                    on_watch(
+                        own,
+                        sender,
+                        broadcast_viewer,
+                        viewer_hash.as_deref(),
+                        Instant::now(),
+                    )
+                });
+                match fanout {
+                    Some(OnWatch::Reply(signal, new)) => {
+                        reply = Some(signal);
+                        own_viewers = new;
                     }
-                    Some(Admit::Already) => reply = Some(Signal::Accept),
-                    Some(Admit::Full) => reply = Some(Signal::Full),
+                    Some(OnWatch::Admit(id, new)) => {
+                        admit = Some(id);
+                        own_viewers = new;
+                    }
+                    Some(OnWatch::Quiet) => {}
                     // Nothing to watch: the request came after the share ended.
                     None => {
                         reply = Some(Signal::Share {
@@ -365,19 +394,37 @@ pub(crate) fn on_plugin_data(
                 own_viewers
             }
             Signal::Accept => {
+                // A share watched through the relay continues on a direct copy once the sharer
+                // lost the relay (FR-7.49).
+                relink = watched_via_relay(shares, sender);
                 shares.answered(sender, Answer::Accept);
                 false
             }
             Signal::Full => {
-                shares.answered(sender, Answer::Full);
-                false
+                if watched_via_relay(shares, sender) {
+                    // The relay is gone and the direct copies are taken (FR-7.49).
+                    shares.watching.remove(&sender);
+                    true
+                } else {
+                    shares.answered(sender, Answer::Full);
+                    false
+                }
             }
             Signal::Unwatch => {
-                own_viewers = shares
-                    .own
-                    .as_mut()
-                    .is_some_and(|own| own.viewers.remove(&sender).is_some());
+                let left = shares.own.as_mut().and_then(|own| leave(own, sender));
+                own_viewers = left.is_some();
+                kick = left.flatten();
                 own_viewers
+            }
+            Signal::Report { fps, slow } => {
+                if let Some(Fanout::Live {
+                    roster, reports, ..
+                }) = shares.own.as_mut().and_then(|own| own.fanout.as_mut())
+                    && roster.path(sender) == Some(Path::Relay)
+                {
+                    reports.insert(sender, (Received { fps, slow }, Instant::now()));
+                }
+                false
             }
             Signal::Viewers { list } => {
                 let list = list
@@ -391,12 +438,116 @@ pub(crate) fn on_plugin_data(
     if let Some(reply) = reply {
         send(&ctx.handle, &[sender], &reply);
     }
+    let engine = lock(state).engine.as_ref().and_then(WeakEngine::upgrade);
+    if let Some(engine) = engine {
+        if let Some(id) = admit {
+            engine.admit_to_broadcast(ctx.server_id, id, sender);
+        }
+        if let Some(id) = kick {
+            engine.relay_broadcast_kick(ctx.server_id, id, sender);
+        }
+        if relink {
+            engine.screen_share_relink(ctx.server_id, sender);
+        }
+    }
     if own_viewers {
         send_viewers(state, peers, ctx, &here.others);
     }
     if changed {
         emit(state, peers, ctx);
     }
+}
+
+/// The certificate hash the Mumble server reports for `session`.
+fn cert_hash(handle: &Handle, session: u32) -> Option<String> {
+    handle.with_state(|s| s.users.get(&session).and_then(|u| u.cert_hash.clone()))
+}
+
+/// Whether the user watches `sharer`'s share through the relay broadcast.
+fn watched_via_relay(shares: &Shares, sharer: u32) -> bool {
+    matches!(shares.watching.get(&sharer), Some(Watching::Open(link)) if link.broadcast().is_some())
+}
+
+/// What to do about a Watch for the own share.
+enum OnWatch {
+    /// Send this; `true` when the viewer is new.
+    Reply(Signal, bool),
+    /// Ask the bot to admit the viewer to this broadcast; `true` when the viewer is new.
+    Admit(BroadcastId, bool),
+    /// Nothing: the viewer asks again (the broadcast is starting, or its token is on the way).
+    Quiet,
+}
+
+/// Decides about a Watch from `viewer`: through the relay broadcast when it is up and the
+/// viewer's Mumcord can join it, else a direct copy as before (FR-7.42, FR-7.48).
+fn on_watch(
+    own: &mut OwnShare,
+    viewer: u32,
+    broadcast: bool,
+    hash: Option<&str>,
+    now: Instant,
+) -> OnWatch {
+    // A viewer without a certificate hash can't do the key exchange.
+    let broadcast = broadcast && hash.is_some();
+    match own.fanout.as_mut() {
+        Some(Fanout::Starting) if broadcast => OnWatch::Quiet,
+        Some(Fanout::Live {
+            publisher,
+            roster,
+            hashes,
+            ..
+        }) => {
+            let new = roster.path(viewer).is_none();
+            match roster.decide(viewer, broadcast, now) {
+                Decision::Relay => {
+                    if let Some(hash) = hash {
+                        publisher.admit(hash);
+                        hashes.insert(viewer, hash.to_owned());
+                    }
+                    OnWatch::Admit(publisher.id(), new)
+                }
+                Decision::Direct => {
+                    own.viewers.entry(viewer).or_insert(None);
+                    OnWatch::Reply(Signal::Accept, new)
+                }
+                Decision::Wait => OnWatch::Quiet,
+                Decision::Full => OnWatch::Reply(Signal::Full, false),
+            }
+        }
+        _ => match own.admit(viewer) {
+            Admit::New => OnWatch::Reply(Signal::Accept, true),
+            Admit::Already => OnWatch::Reply(Signal::Accept, false),
+            Admit::Full => OnWatch::Reply(Signal::Full, false),
+        },
+    }
+}
+
+/// `viewer` stopped watching the own share or left. `None` when it was no viewer; else the
+/// broadcast to remove it from at the relay, if it watched through one. A relay viewer leaving
+/// makes the share switch keys (FR-7.44).
+fn leave(own: &mut OwnShare, viewer: u32) -> Option<Option<BroadcastId>> {
+    let direct = own.viewers.remove(&viewer).is_some();
+    if let Some(Fanout::Live {
+        publisher,
+        roster,
+        hashes,
+        reports,
+        ..
+    }) = own.fanout.as_mut()
+    {
+        reports.remove(&viewer);
+        match roster.remove(viewer) {
+            Some(Path::Relay) => {
+                if let Some(hash) = hashes.remove(&viewer) {
+                    publisher.remove(&hash);
+                }
+                return Some(Some(publisher.id()));
+            }
+            Some(Path::Direct) => return Some(None),
+            None => {}
+        }
+    }
+    direct.then_some(None)
 }
 
 /// Someone left the server.
@@ -410,10 +561,21 @@ pub(crate) fn on_user_removed(
 }
 
 fn forget(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, session: u32) {
-    let forgot = match lock(state).servers.get_mut(&ctx.server_id) {
-        Some(shares) => shares.forget(session),
-        None => return,
+    let (forgot, kick, engine) = {
+        let mut all = lock(state);
+        let engine = all.engine.as_ref().and_then(WeakEngine::upgrade);
+        let Some(shares) = all.servers.get_mut(&ctx.server_id) else {
+            return;
+        };
+        let left = shares.own.as_mut().and_then(|own| leave(own, session));
+        let mut forgot = shares.forget(session);
+        forgot.own_viewers |= left.is_some();
+        forgot.changed |= left.is_some();
+        (forgot, left.flatten(), engine)
     };
+    if let (Some(id), Some(engine)) = (kick, engine) {
+        engine.relay_broadcast_kick(ctx.server_id, id, session);
+    }
     if forgot.own_viewers
         && let Some(here) = here(&ctx.handle)
     {
@@ -488,8 +650,10 @@ fn offer_share(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, sess
     }
 }
 
-/// Sends the own share once more to the newcomers due for it (session tick).
+/// Sends the own share once more to the newcomers due for it, and reports what arrives from
+/// shares watched through the relay (session tick).
 pub(crate) fn on_tick(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx) {
+    broadcast::send_reports(state, ctx);
     let due = lock(state)
         .servers
         .get_mut(&ctx.server_id)
@@ -636,6 +800,7 @@ impl Engine {
         };
         self.share_changed(&ctx, &here);
         self.watch_for_end(server_id, token);
+        self.start_fanout(server_id, token);
         Ok(StartOutcome::Started)
     }
 
@@ -836,6 +1001,9 @@ impl Engine {
         };
         match ask_to_watch(&ctx.handle, sharer, answer).await {
             Some(Ok(Answer::Accept)) => {}
+            Some(Ok(Answer::Broadcast(id, token))) => {
+                return self.watch_broadcast(&ctx, sharer, attempt, id, token).await;
+            }
             Some(Ok(Answer::Full)) => {
                 return Err(EngineError::new(ErrorKind::ShareFull, "this share is full"));
             }

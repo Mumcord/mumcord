@@ -143,6 +143,9 @@ impl Hub {
     }
 }
 
+/// The [`Media::subscribe`] key of the relay broadcast; no Mumble session gets this number.
+pub(crate) const BROADCAST_KEY: u32 = u32::MAX;
+
 /// The running media path of the own share; dropping it stops encoding and every viewer stream.
 pub(crate) struct Media {
     hub: Arc<Hub>,
@@ -255,6 +258,20 @@ impl Media {
         }
     }
 
+    /// A queue of every frame for a sender other than a direct stream: the relay broadcast
+    /// (spec 07, FR-7.41) takes the share once, like one more viewer under `key`. The queue
+    /// loses layers when the upload lags, as a direct viewer's would.
+    pub fn subscribe(&self, key: u32) -> Subscription {
+        let queue = Arc::new(ViewerQueue::new());
+        lock(&self.hub.viewers).insert(key, queue.clone());
+        self.hub.keyframe.store(true, Ordering::Relaxed);
+        Subscription {
+            hub: self.hub.clone(),
+            key,
+            queue,
+        }
+    }
+
     /// The last keyframe as the small picture the sharer's bar shows (issue #163).
     pub fn thumbnail(&self) -> Option<ShareThumbnail> {
         lock(&self.hub.thumbnail)
@@ -268,6 +285,7 @@ impl Media {
         let top = self.hub.top_layer.load(Ordering::Relaxed);
         stats.viewers = lock(&self.hub.viewers)
             .iter()
+            .filter(|(key, _)| **key != BROADCAST_KEY)
             .map(|(session, queue)| {
                 let layer = queue.with_policy(super::fanout::Policy::max_layer);
                 ViewerMediaStats {
@@ -319,19 +337,56 @@ impl Drop for ViewerLink {
     }
 }
 
+/// The next frame for `queue`, once the upload limits allow sending it.
+async fn paced_next(queue: &ViewerQueue, hub: &Hub) -> Arc<Frame> {
+    let frame = queue.next().await;
+    let bytes = wire::HEADER_LEN + frame.payload.len();
+    let now = Instant::now();
+    let wait = [&queue.limit, &hub.limit, &hub.upload]
+        .iter()
+        .filter_map(|limit| lock(limit).as_mut().map(|l| l.take(bytes, now)))
+        .max()
+        .unwrap_or_default();
+    if !wait.is_zero() {
+        tokio::time::sleep(wait).await;
+    }
+    frame
+}
+
+/// A frame queue from [`Media::subscribe`]; dropping it leaves the share.
+pub(crate) struct Subscription {
+    hub: Arc<Hub>,
+    key: u32,
+    queue: Arc<ViewerQueue>,
+}
+
+impl Subscription {
+    /// The next frame to send, once the upload limits allow it.
+    pub async fn next(&self) -> Arc<Frame> {
+        paced_next(&self.queue, &self.hub).await
+    }
+
+    /// Asks the encoder for a keyframe (a new subscriber at the relay, or a rekey).
+    pub fn request_keyframe(&self) {
+        self.hub.request_keyframe();
+    }
+
+    /// The next frame is a keyframe, without waiting out the request pause: a new share key
+    /// takes effect only at a keyframe (FR-7.44).
+    pub fn force_keyframe(&self) {
+        self.hub.keyframe.store(true, Ordering::Relaxed);
+    }
+}
+
+impl Drop for Subscription {
+    fn drop(&mut self) {
+        lock(&self.hub.viewers).remove(&self.key);
+    }
+}
+
 async fn write_frames(queue: Arc<ViewerQueue>, hub: Arc<Hub>, mut send: SendStream) {
     loop {
-        let frame = queue.next().await;
-        let bytes = wire::HEADER_LEN + frame.payload.len();
-        let now = Instant::now();
-        let wait = [&queue.limit, &hub.limit, &hub.upload]
-            .iter()
-            .filter_map(|limit| lock(limit).as_mut().map(|l| l.take(bytes, now)))
-            .max()
-            .unwrap_or_default();
-        if !wait.is_zero() {
-            tokio::time::sleep(wait).await;
-        }
+        let frame = paced_next(&queue, &hub).await;
         if let Err(e) = wire::write_frame(&mut send, &frame).await {
             tracing::debug!(error = %e, "screen stream to a viewer ended");
             return;

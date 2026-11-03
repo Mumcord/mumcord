@@ -31,6 +31,9 @@ pub enum ShareKind {
 }
 /// Viewers per sharer (FR-2.43); the ninth gets [`Signal::Full`].
 pub const MAX_VIEWERS: usize = 8;
+/// Longest viewer list read: a relay broadcast has more viewers than direct copies (spec 07,
+/// FR-7.46; the relay's limit is a u16, 25 by default).
+pub const MAX_LISTED_VIEWERS: usize = 64;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "t", rename_all = "lowercase")]
@@ -57,6 +60,12 @@ pub enum Signal {
     Unwatch,
     /// Everyone watching the sender's share, sorted.
     Viewers { list: Vec<u32> },
+    // BC1 (spec 07, FR-7.52), added before the wire v2 work (N5b): keep this variant when
+    // merging.
+    /// A viewer watching through the relay broadcast tells the sharer what it receives, every
+    /// few seconds: video frames in the last second, and whether layers went missing in the
+    /// last 10 s that it did not turn off itself ("slow connection").
+    Report { fps: u32, slow: bool },
 }
 
 #[derive(Serialize, Deserialize)]
@@ -75,7 +84,7 @@ pub fn encode(signal: &Signal) -> Vec<u8> {
 }
 
 /// The signal in `data`; `None` for anything too large, malformed, unknown or with a viewer
-/// list over [`MAX_VIEWERS`].
+/// list over [`MAX_LISTED_VIEWERS`].
 pub fn decode(data: &[u8]) -> Option<Signal> {
     if data.len() > PLUGIN_DATA_MAX {
         return None;
@@ -86,7 +95,7 @@ pub fn decode(data: &[u8]) -> Option<Signal> {
     }
     match wire.signal {
         Signal::Viewers { mut list } => {
-            if list.len() > MAX_VIEWERS {
+            if list.len() > MAX_LISTED_VIEWERS {
                 return None;
             }
             list.sort_unstable();
@@ -118,6 +127,10 @@ mod tests {
             Signal::Viewers {
                 list: vec![1, 2, 3],
             },
+            Signal::Report {
+                fps: 30,
+                slow: true,
+            },
         ];
         for signal in signals {
             assert_eq!(decode(&encode(&signal)), Some(signal));
@@ -137,6 +150,15 @@ mod tests {
     }
 
     #[test]
+    fn broadcast_viewer_lists_are_read() {
+        let list: Vec<u32> = (1..=25).collect();
+        assert_eq!(
+            decode(&encode(&Signal::Viewers { list: list.clone() })),
+            Some(Signal::Viewers { list })
+        );
+    }
+
+    #[test]
     fn full_viewer_list_fits_plugin_data() {
         let list = (0..MAX_VIEWERS as u32).map(|i| u32::MAX - i).collect();
         assert!(encode(&Signal::Viewers { list }).len() <= PLUGIN_DATA_MAX);
@@ -150,10 +172,9 @@ mod tests {
         assert_eq!(decode(br#"{"t":"watch"}"#), None);
         assert_eq!(decode(br#"{"v":1,"t":"dance"}"#), None);
         assert_eq!(decode(br#"{"v":1,"t":"share","live":true}"#), None);
-        assert_eq!(
-            decode(br#"{"v":1,"t":"viewers","list":[1,2,3,4,5,6,7,8,9]}"#),
-            None
-        );
+        let list: Vec<String> = (0..=MAX_LISTED_VIEWERS).map(|i| i.to_string()).collect();
+        let long = format!(r#"{{"v":1,"t":"viewers","list":[{}]}}"#, list.join(","));
+        assert_eq!(decode(long.as_bytes()), None);
     }
 
     #[test]

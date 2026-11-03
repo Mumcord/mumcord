@@ -3,8 +3,10 @@
 use std::collections::BTreeMap;
 use std::time::{Duration, Instant};
 
+use mumcord_p2p::{BroadcastId, RelayToken};
 use tokio::sync::oneshot;
 
+use super::broadcast::Fanout;
 use super::media::{Media, ViewerLink};
 use super::signal::MAX_VIEWERS;
 use super::watch::WatchLink;
@@ -16,10 +18,12 @@ use super::{ScreenShareView, ShareKind, WatchBlock};
 pub(crate) const REANNOUNCE: Duration = Duration::from_secs(3);
 
 /// The sharer's answer to a watch request.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Answer {
     Accept,
     Full,
+    /// Admitted to the sharer's relay broadcast: the bot's `bcast-tok` (spec 07, FR-7.42).
+    Broadcast(BroadcastId, RelayToken),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,6 +49,8 @@ pub(crate) struct OwnShare {
     pub media: Option<Media>,
     /// Newcomers to the channel that get the share once more, and when.
     reannounce: BTreeMap<u32, Instant>,
+    /// The relay broadcast (spec 07, FR-7.40); `None` until the share decided about one.
+    pub fanout: Option<Fanout>,
 }
 
 impl OwnShare {
@@ -58,6 +64,7 @@ impl OwnShare {
             started_at: Instant::now(),
             media: None,
             reannounce: BTreeMap::new(),
+            fanout: None,
         }
     }
 
@@ -93,7 +100,13 @@ impl OwnShare {
     }
 
     pub fn viewer_list(&self) -> Vec<u32> {
-        self.viewers.keys().copied().collect()
+        let mut list: Vec<u32> = self.viewers.keys().copied().collect();
+        if let Some(fanout) = &self.fanout {
+            list.extend(fanout.relay_viewers());
+            list.sort_unstable();
+            list.dedup();
+        }
+        list
     }
 
     /// How long the share has been running (issue #163).
@@ -251,7 +264,9 @@ impl Shares {
             return;
         };
         let next = match answer {
-            Answer::Accept => self.watching.insert(sharer, Watching::Opening(attempt)),
+            Answer::Accept | Answer::Broadcast(..) => {
+                self.watching.insert(sharer, Watching::Opening(attempt))
+            }
             Answer::Full => self.watching.remove(&sharer),
         };
         if let Some(Watching::Asked { reply, .. }) = next {
