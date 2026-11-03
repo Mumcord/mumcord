@@ -13,9 +13,9 @@ use mumcord_plugins::manifest::Source;
 use mumcord_plugins::package::Package;
 
 use crate::date;
-use crate::registry::{PackageInfo, api_major};
+use crate::registry::PackageInfo;
 use crate::sign;
-use crate::source::{self, PLUGIN_FILE, PluginFile, SourceRef, VersionFile};
+use crate::source::{self, PLUGIN_FILE, PluginFile, SourceApi, SourceRef, VersionFile};
 
 /// The store icon kept in the plugin folder; `site-data` publishes it under `v1/media/<id>/`.
 const ICON_FILE: &str = "icon.png";
@@ -103,13 +103,15 @@ pub fn run(args: Args) -> Result<()> {
     }
     let file = VersionFile {
         version: version.clone(),
-        api: api_major(&manifest.api)?,
+        api: SourceApi(mumcord_plugins::version::api_of(manifest)),
         size: info.bytes.len() as u64,
         sha256: info.sha256.clone(),
         permissions: info.permissions(),
         published: date::today(),
         signature,
         source,
+        min_mumcord: None,
+        origins: info.origins(),
     };
     fs::create_dir_all(version_path.parent().context("no parent")?)?;
     fs::write(&version_path, toml::to_string(&file)?)?;

@@ -1,5 +1,8 @@
 //! `serve-registry`: a local fixture registry for development builds and E2E tests (FR-6.71,
-//! AC-6.18 … AC-6.22, AC-6.28). It signs everything with a test key and serves it over plain HTTP
+//! AC-6.18 … AC-6.22, AC-6.28). Like the real registry it serves two indexes (FR-9.14):
+//! `v1/index.json` (format 1, API 1.0 versions only) and `v1.1/index.json` (format 2, all
+//! versions), for the official registry and for a third-party repository alike. An official and
+//! a third-party repository at once are two processes. It signs everything with a test key and serves it over plain HTTP
 //! on 127.0.0.1 only. Scenario switches produce the broken registries the client must refuse; they
 //! can be set at start and changed while running:
 //!
@@ -23,9 +26,10 @@ use mumcord_plugins::registry::{
     IndexPlugin, KeyRotation, RepositoryInfo, Revocation, SIGNATURE_SUFFIX, Severity,
     key_fingerprint,
 };
+use mumcord_plugins::version::ApiMinor;
 
 use crate::date;
-use crate::registry::{self, PackageInfo};
+use crate::registry::{self, IndexHead, ListedPlugin, PackageInfo};
 use crate::sign::Signer;
 
 #[derive(clap::Args)]
@@ -49,7 +53,7 @@ pub struct Args {
     #[arg(long)]
     pub sequence: Option<u64>,
     /// tampered-hash:<id>, lower-sequence, wrong-key, extra-permission:<id>,
-    /// revoke:<id>[@<version>][:warn], key-change[:rotate]. Repeatable.
+    /// revoke:<id>[@<version>][:warn], key-change[:rotate], no-v1.1. Repeatable.
     #[arg(long = "scenario")]
     pub scenarios: Vec<String>,
 }
@@ -71,6 +75,8 @@ enum Scenario {
     },
     /// The index is signed with a second key; `rotate` adds a `key_rotation` signed by the old one.
     KeyChange { rotate: bool },
+    /// Only `v1/` is served, like a repository that never published a `v1.1` index (FR-9.19).
+    NoV1_1,
 }
 
 impl Scenario {
@@ -101,6 +107,7 @@ impl Scenario {
             }
             ("key-change", None) => Self::KeyChange { rotate: false },
             ("key-change", Some("rotate")) => Self::KeyChange { rotate: true },
+            ("no-v1.1", None) => Self::NoV1_1,
             _ => bail!("unknown scenario {text}"),
         })
     }
@@ -221,13 +228,22 @@ impl Registry {
             }
             _ => None,
         };
-        let index =
-            registry::index_json(sequence, repository.as_ref(), rotation.as_ref(), &plugins)?;
-        files.insert(
-            format!("v1/index.json{SIGNATURE_SUFFIX}"),
-            index_signer.sign(&index)?.into_bytes(),
-        );
-        files.insert("v1/index.json".to_owned(), index);
+        let head = IndexHead {
+            sequence,
+            repository: repository.as_ref(),
+            key_rotation: rotation.as_ref(),
+        };
+        let mut indexes = vec![("v1", registry::index_v1_json(&head, &plugins)?)];
+        if !self.has(&Scenario::NoV1_1) {
+            indexes.push(("v1.1", registry::index_v1_1_json(&head, &plugins)?));
+        }
+        for (folder, index) in indexes {
+            files.insert(
+                format!("{folder}/index.json{SIGNATURE_SUFFIX}"),
+                index_signer.sign(&index)?.into_bytes(),
+            );
+            files.insert(format!("{folder}/index.json"), index);
+        }
 
         if self.repository.is_none() {
             let revoked = registry::revoked_json(self.sequence, &self.revocations())?;
@@ -238,14 +254,20 @@ impl Registry {
             files.insert("v1/revoked.json".to_owned(), revoked);
             files.insert(
                 "v1/permissions.json".to_owned(),
-                registry::permissions_json()?,
+                registry::permissions_json(ApiMinor::V1_0)?,
             );
+            if !self.has(&Scenario::NoV1_1) {
+                files.insert(
+                    "v1.1/permissions.json".to_owned(),
+                    registry::permissions_json(ApiMinor::V1_1)?,
+                );
+            }
         }
         self.files = files;
         Ok(())
     }
 
-    fn index_plugin(&self, id: &str, infos: &[PackageInfo]) -> Result<IndexPlugin> {
+    fn index_plugin(&self, id: &str, infos: &[PackageInfo]) -> Result<ListedPlugin> {
         let latest = latest_package(infos).context("no package")?;
         let manifest = &latest.manifest;
         let manifest_icon_url = latest
@@ -254,9 +276,14 @@ impl Registry {
             .then(|| format!("{}v1/media/{id}/icon.png", self.base));
         let versions = infos
             .iter()
-            .map(|info| info.index_version(format!("{}packages/{}", self.base, info.file_name())))
-            .collect::<Result<_>>()?;
-        Ok(IndexPlugin {
+            .map(|info| {
+                info.listed(
+                    format!("{}packages/{}", self.base, info.file_name()),
+                    date::today(),
+                )
+            })
+            .collect();
+        let plugin = IndexPlugin {
             id: id.to_owned(),
             name: BTreeMap::from([("en".to_owned(), manifest.name.clone())]),
             summary: BTreeMap::from([("en".to_owned(), manifest.description.clone())]),
@@ -273,8 +300,9 @@ impl Registry {
             reviewed_on: self.repository.is_none().then(date::today),
             added_on: Some(date::today()),
             updated: date::today(),
-            versions,
-        })
+            versions: Vec::new(),
+        };
+        Ok(ListedPlugin { plugin, versions })
     }
 
     fn revocations(&self) -> Vec<Revocation> {
@@ -585,6 +613,7 @@ mod tests {
                 severity: Severity::Disable
             }
         );
+        assert_eq!(Scenario::parse("no-v1.1").expect("ok"), Scenario::NoV1_1);
         assert!(Scenario::parse("wrong-key:x").is_err());
         assert!(Scenario::parse("melt-down").is_err());
         assert!(parse_scenarios(["", " "]).expect("ok").is_empty());
@@ -608,7 +637,7 @@ mod tests {
         use mumcord_plugins::verify::{self, RegistryKeys, VerifyFailure, check_sequence};
 
         use super::*;
-        use crate::registry::tests::package;
+        use crate::registry::tests::{package, package_for_api};
         use crate::sign::{self, read_public};
 
         struct Fixture {
@@ -630,6 +659,11 @@ mod tests {
                 )
                 .expect("test step");
             }
+            fs::write(
+                packages.join("stage-1.0.0.mcplugin"),
+                package_for_api("stage", "1.0.0", &[], "^1.1"),
+            )
+            .expect("test step");
             let public = read_public(dir.path().join("registry.pub").to_str().expect("utf-8"))
                 .expect("test step");
             Fixture {
@@ -756,6 +790,25 @@ mod tests {
             let (status, _, _) = request(&base, "GET", "v1/index.json", etag.as_deref());
             assert_eq!(status, 304);
             assert!(!get(&base, "v1/permissions.json").is_empty());
+            assert!(index.plugin("stage").is_none(), "API 1.1 only in v1.1");
+
+            let index_1_1 = get(&base, "v1.1/index.json");
+            let signature =
+                String::from_utf8(get(&base, "v1.1/index.json.minisig")).expect("utf-8");
+            keys.verify(&index_1_1, &signature)
+                .expect("signed by the same key");
+            let index_1_1: serde_json::Value = serde_json::from_slice(&index_1_1).expect("json");
+            assert_eq!(index_1_1["format"], 2);
+            assert_eq!(index_1_1["plugins"][0]["id"], "dice");
+            assert_eq!(index_1_1["plugins"][0]["versions"][1]["api"], "1.0");
+            assert_eq!(index_1_1["plugins"][1]["id"], "stage");
+            assert_eq!(index_1_1["plugins"][1]["versions"][0]["api"], "1.1");
+            assert!(!get(&base, "v1.1/permissions.json").is_empty());
+
+            switch(&base, "no-v1.1");
+            let (status, _, _) = request(&base, "GET", "v1.1/index.json", None);
+            assert_eq!(status, 404);
+            official_index(&base, &keys).expect("v1 is still served");
 
             switch(&base, "tampered-hash:dice");
             let index = official_index(&base, &keys).expect("still signed");
@@ -831,6 +884,10 @@ mod tests {
             assert_eq!(preview.info.name, "Test Repo");
             assert_eq!(Some(preview.fingerprint), key_fingerprint(&fixture.public));
             assert_eq!(preview.plugin_count, 1);
+            let sibling: serde_json::Value =
+                serde_json::from_slice(&get(&running.base, "v1.1/index.json")).expect("json");
+            assert_eq!(sibling["repository"]["name"], "Test Repo");
+            assert_eq!(sibling["plugins"].as_array().map(Vec::len), Some(2));
             let (status, _, _) = request(&running.base, "GET", "v1/revoked.json", None);
             assert_eq!(
                 status, 404,
