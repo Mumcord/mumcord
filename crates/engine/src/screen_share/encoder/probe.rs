@@ -209,13 +209,14 @@ mod tests {
     use super::*;
 
     #[test]
-    fn a_build_or_machine_without_hardware_finds_none_within_the_budget() {
+    fn the_probe_covers_every_platform_encoder_within_the_budget() {
         let started = Instant::now();
         let entries = probe();
         assert!(started.elapsed() < BUDGET + Duration::from_secs(1));
         assert_eq!(entries.len(), targets().len());
-        // The vendor encoders are stubs until they are implemented.
-        assert_eq!(from_entries(&entries), Hardware::default());
+        // Whatever this machine has, nothing failing its smoke test is offered.
+        let found = from_entries(&entries);
+        assert!(found.av1.len() + found.vp9.len() <= entries.iter().filter(|e| e.smoke_ok).count());
     }
 
     #[test]
