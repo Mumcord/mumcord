@@ -65,7 +65,7 @@ pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareL
 pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
-pub use preview::{SharePath, SharePreview};
+pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use start::StartOutcome;
@@ -594,10 +594,15 @@ impl Engine {
     /// that picker gives [`StartOutcome::Cancelled`]. The share stops by itself when the capture
     /// ends (the desktop's stop button). Errors with [`ErrorKind::DirectUnavailable`] and a
     /// [`WatchBlock::code`] when [`Engine::screen_share_block`] blocks it.
+    ///
+    /// `prefs` and `codec` are the start dialog's picks for this one share; `None` takes the
+    /// Settings value. Settings themselves are never changed here.
     pub async fn screen_share_start(
         &self,
         server_id: ServerId,
         sound: bool,
+        prefs: Option<QualityPrefs>,
+        codec: Option<mumcord_store::ScreenCodec>,
     ) -> EngineResult<StartOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
         let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
@@ -619,9 +624,8 @@ impl Engine {
             tracing::warn!(error = %e, "screen share settings not read; using the defaults");
             mumcord_store::Settings::default()
         });
-        let selection = self
-            .screen_encoders()
-            .select(&settings, QualityPrefs::from_settings(&settings));
+        let (settings, prefs) = with_picks(settings, prefs, codec);
+        let selection = self.screen_encoders().select(&settings, prefs);
         let token = {
             let mut all = lock(self.screen_share_state());
             let shares = all.servers.entry(server_id).or_default();
@@ -1189,5 +1193,56 @@ impl Engine {
             |_| Vec::new(),
             |ctx| views(self.screen_share_state(), self.mumcord_state(), &ctx),
         )
+    }
+}
+/// `settings` with this share's picks applied, and the quality prefs to start with. Only the
+/// returned copy changes; the stored Settings stay as they are.
+fn with_picks(
+    mut settings: mumcord_store::Settings,
+    prefs: Option<QualityPrefs>,
+    codec: Option<mumcord_store::ScreenCodec>,
+) -> (mumcord_store::Settings, QualityPrefs) {
+    if let Some(codec) = codec {
+        settings.screen_codec = codec;
+    }
+    let prefs = prefs.unwrap_or_else(|| QualityPrefs::from_settings(&settings));
+    (settings, prefs)
+}
+
+#[cfg(test)]
+mod pick_tests {
+    use mumcord_store::{ScreenCodec, ScreenFps, ScreenResolution, Settings};
+
+    use super::*;
+
+    #[test]
+    fn a_per_share_pick_overrides_the_settings_copy_only() {
+        let stored = Settings {
+            screen_codec: ScreenCodec::Auto,
+            screen_fps: ScreenFps::Fps30,
+            ..Settings::default()
+        };
+        let picks = QualityPrefs {
+            resolution: ScreenResolution::P720,
+            fps: ScreenFps::Fps60,
+            ..QualityPrefs::default()
+        };
+        let (used, prefs) = with_picks(stored.clone(), Some(picks), Some(ScreenCodec::Vp9));
+        assert_eq!(used.screen_codec, ScreenCodec::Vp9);
+        assert_eq!(prefs, picks);
+        assert_eq!(
+            stored.screen_codec,
+            ScreenCodec::Auto,
+            "Settings stay as saved"
+        );
+        assert_eq!(stored.screen_fps, ScreenFps::Fps30);
+    }
+
+    #[test]
+    fn without_picks_the_settings_apply() {
+        let stored = Settings::default();
+        let (used, prefs) = with_picks(stored.clone(), None, None);
+        assert_eq!(used.screen_codec, stored.screen_codec);
+        assert_eq!(prefs, QualityPrefs::from_settings(&stored));
     }
 }

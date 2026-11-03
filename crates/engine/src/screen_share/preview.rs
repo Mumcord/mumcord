@@ -26,6 +26,16 @@ pub struct SharePreview {
     /// Why Automatic would not pick AV1.
     pub av1_skipped: Option<Av1Skipped>,
     pub path: SharePath,
+    /// CPU threads the software encoder is configured with; `None` for hardware encoders and
+    /// for software AV1, whose SVT-AV1 takes a parallelism level, not a thread count.
+    pub cpu_cores: Option<CpuCores>,
+}
+
+/// The encoder's thread count against the machine's cores.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CpuCores {
+    pub used: u32,
+    pub total: u32,
 }
 
 /// How the share would reach its viewers.
@@ -61,6 +71,11 @@ pub(crate) fn preview(
         );
     let quality = Steps::new(selection.prefs, encoder.codec).quality();
     let av1 = encoder.codec == Codec::Av1;
+    let cpu_cores = (encoder.codec == Codec::Vp9 && encoder.gpu.is_none()).then(|| CpuCores {
+        used: mumcord_screenshare::vp9_threads(),
+        total: std::thread::available_parallelism()
+            .map_or(1, |n| u32::try_from(n.get()).unwrap_or(u32::MAX)),
+    });
     SharePreview {
         quality: quality.label(),
         width: quality.width,
@@ -78,6 +93,7 @@ pub(crate) fn preview(
                 max_viewers: usize::from(n),
             },
         ),
+        cpu_cores,
     }
 }
 
@@ -128,6 +144,15 @@ mod tests {
         );
         assert!(got.software_warning);
         assert_eq!(got.path, SharePath::Copies { max_viewers: 8 });
+        assert_eq!(got.cpu_cores, None, "hardware encoders report no cores");
+    }
+
+    #[test]
+    fn software_vp9_reports_its_thread_count_and_the_machine_cores() {
+        let got = preview(&selection(vec![VP9]), false, None);
+        let cores = got.cpu_cores.expect("software VP9 uses CPU cores");
+        assert_eq!(cores.used, mumcord_screenshare::vp9_threads());
+        assert!(cores.used >= 1 && cores.used <= cores.total.max(1));
     }
 
     #[test]

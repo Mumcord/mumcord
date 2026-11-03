@@ -369,7 +369,8 @@ fn set_layer_bitrates(cfg: &mut ffi::vpx_codec_enc_cfg_t, bitrate_kbps: u32) {
     }
 }
 
-fn threads() -> u32 {
+/// The libvpx thread count every software VP9 encoder is configured with.
+pub fn threads() -> u32 {
     // More than four threads gains little at 720p (tile columns cap the parallelism) and takes
     // cores from the game or app being shared.
     std::thread::available_parallelism()

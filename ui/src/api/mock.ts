@@ -3460,6 +3460,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         softwareWarning: false,
         av1Skipped: null,
         path: { kind: "broadcast", maxViewers: 20 },
+        cpuCores: codec === "vp9" ? { used: 4, total: 8 } : null,
       });
     },
     // The mock never switches the encoder on its own, so there is nothing to undo.
@@ -3497,7 +3498,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     // The browser has no system picker: starting shares at once, without video.
-    screenShareStart: (serverId, withSound) => {
+    screenShareStart: (serverId, withSound, _choice, _codec) => {
       if (ownShares.has(serverId)) fail("invalidInput", "already sharing on this server");
       changeOwnShare(serverId, {
         session: SELF_SESSION,
