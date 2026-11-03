@@ -5,17 +5,11 @@
   "description": "E2E test plugin that scores Low risk: one quiet panel permission.",
   "version": "1.0.0",
   "api": "^1.0",
-  "authors": [
-    "Mumcord test fixtures"
-  ],
+  "authors": ["Mumcord test fixtures"],
   "license": "MIT",
-  "categories": [
-    "tools"
-  ],
+  "categories": ["tools"],
   "icon": "assets/icon.svg",
   "permissions": {
-    "required": [
-      "ui.panel"
-    ]
+    "required": ["ui.panel"]
   }
 }

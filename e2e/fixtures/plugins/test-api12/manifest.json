@@ -5,17 +5,11 @@
   "description": "E2E test plugin declaring api ^1.2, newer than this Mumcord; an install must be refused.",
   "version": "1.0.0",
   "api": "^1.2",
-  "authors": [
-    "Mumcord test fixtures"
-  ],
+  "authors": ["Mumcord test fixtures"],
   "license": "MIT",
-  "categories": [
-    "tools"
-  ],
+  "categories": ["tools"],
   "icon": "assets/icon.svg",
   "permissions": {
-    "required": [
-      "ui.panel"
-    ]
+    "required": ["ui.panel"]
   }
 }

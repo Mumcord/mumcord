@@ -5,22 +5,12 @@
   "description": "E2E test plugin that scores Medium risk: one website plus a few chat and voice permissions.",
   "version": "1.0.0",
   "api": "^1.1",
-  "authors": [
-    "Mumcord test fixtures"
-  ],
+  "authors": ["Mumcord test fixtures"],
   "license": "MIT",
-  "categories": [
-    "tools"
-  ],
+  "categories": ["tools"],
   "icon": "assets/icon.svg",
   "permissions": {
-    "required": [
-      "ui.panel",
-      "net.origins",
-      "chat.send",
-      "events.voice",
-      "peers.messages"
-    ]
+    "required": ["ui.panel", "net.origins", "chat.send", "events.voice", "peers.messages"]
   },
   "net": {
     "origins": [
