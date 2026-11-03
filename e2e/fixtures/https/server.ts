@@ -1,5 +1,5 @@
-// HTTPS fixture for the plugin E2E specs (spec 09, F2): two host names on one TLS listener (an
-// origin a plugin declares and one it does not), a redirect route, a WebSocket echo route and a
+// HTTPS fixture for the plugin E2E specs (spec 09, F2): three host names on one TLS listener (an
+// origin a plugin declares, one it does not and one only an update declares), a redirect route, a WebSocket echo route and a
 // STUN listener. The CA and the server certificate are generated per run in a scratch folder and
 // never committed; the app trusts the CA through MUMCORD_TEST_CA.
 import { createHash } from "node:crypto";
@@ -7,7 +7,6 @@ import { createServer, type Server } from "node:https";
 import { createSocket, type Socket } from "node:dgram";
 import { readFileSync } from "node:fs";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runOk } from "../../helpers/run.ts";
@@ -15,6 +14,10 @@ import { runOk } from "../../helpers/run.ts";
 /** Host names of the fixture; e2e/run.sh maps them to 127.0.0.1 in the container. */
 export const DECLARED_HOST = "declared.plugins.test";
 export const UNDECLARED_HOST = "undeclared.plugins.test";
+export const UPDATE_HOST = "update.plugins.test";
+/** Fixed, because plugin manifests declare their origins literally. 47180 stays free for the dev localhost of E2. */
+export const HTTPS_PORT = 47443;
+export const STUN_PORT = 47478;
 
 const WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 const STUN_MAGIC = 0x2112a442;
@@ -24,6 +27,8 @@ export interface HttpsFixture {
   declaredOrigin: string;
   /** `https://undeclared.plugins.test:<port>`. */
   undeclaredOrigin: string;
+  /** `https://update.plugins.test:<port>`, the origin an updated plugin version declares. */
+  updateOrigin: string;
   /** PEM file of the local CA, for MUMCORD_TEST_CA. */
   caFile: string;
   /** UDP port of the STUN listener on 127.0.0.1. */
@@ -46,7 +51,7 @@ async function makeCertificates(dir: string): Promise<{ key: Buffer; cert: Buffe
   ]);
   writeFileSync(
     file("san.ext"),
-    `subjectAltName=DNS:${DECLARED_HOST},DNS:${UNDECLARED_HOST},DNS:localhost,IP:127.0.0.1\n` +
+    `subjectAltName=DNS:${DECLARED_HOST},DNS:${UNDECLARED_HOST},DNS:${UPDATE_HOST},DNS:localhost,IP:127.0.0.1\n` +
       "extendedKeyUsage=serverAuth\n",
   );
   await runOk("openssl", [
@@ -108,15 +113,15 @@ function startStun(): Promise<Socket> {
   });
   return new Promise((resolvePromise, reject) => {
     socket.once("error", reject);
-    socket.bind(0, "127.0.0.1", () => {
+    socket.bind(STUN_PORT, "127.0.0.1", () => {
       resolvePromise(socket);
     });
   });
 }
 
 /**
- * Starts the fixture on free ports. Routes (both hosts): `/` answers "ok <host>", `/redirect`
- * redirects to the other host, `/ws` is a WebSocket echo.
+ * Starts the fixture on its fixed ports. Routes (all hosts): `/` answers "ok <host>", `/redirect`
+ * redirects between the declared and the undeclared host, `/ws` is a WebSocket echo.
  */
 export async function startHttpsFixture(): Promise<HttpsFixture> {
   const dir = mkdtempSync(join(tmpdir(), "mumcord-https-"));
@@ -125,8 +130,7 @@ export async function startHttpsFixture(): Promise<HttpsFixture> {
     const host = (request.headers.host ?? "").split(":")[0] ?? "";
     if (request.url === "/redirect") {
       const other = host === DECLARED_HOST ? UNDECLARED_HOST : DECLARED_HOST;
-      const port = (server.address() as AddressInfo).port;
-      response.writeHead(302, { location: `https://${other}:${String(port)}/` });
+      response.writeHead(302, { location: `https://${other}:${String(HTTPS_PORT)}/` });
       response.end();
       return;
     }
@@ -136,13 +140,13 @@ export async function startHttpsFixture(): Promise<HttpsFixture> {
   echoWebSocket(server);
   await new Promise<void>((resolvePromise, reject) => {
     server.once("error", reject);
-    server.listen(0, "127.0.0.1", resolvePromise);
+    server.listen(HTTPS_PORT, "127.0.0.1", resolvePromise);
   });
   const stun = await startStun();
-  const port = (server.address() as AddressInfo).port;
   return {
-    declaredOrigin: `https://${DECLARED_HOST}:${String(port)}`,
-    undeclaredOrigin: `https://${UNDECLARED_HOST}:${String(port)}`,
+    declaredOrigin: `https://${DECLARED_HOST}:${String(HTTPS_PORT)}`,
+    undeclaredOrigin: `https://${UNDECLARED_HOST}:${String(HTTPS_PORT)}`,
+    updateOrigin: `https://${UPDATE_HOST}:${String(HTTPS_PORT)}`,
     caFile: ca,
     stunPort: stun.address().port,
     stop() {

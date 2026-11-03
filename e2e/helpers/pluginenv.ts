@@ -8,7 +8,7 @@
 //   ...
 //   await pluginenv.stopPluginFixtures();
 import { type ChildProcess, spawn } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { startHttpsFixture, type HttpsFixture } from "../fixtures/https/server.ts";
@@ -19,7 +19,10 @@ const START_TIMEOUT_MS = 30_000;
 
 /** One repository to serve. */
 export interface RepositoryOptions {
-  /** Folder with the `.mcplugin` packages (default: an empty one). */
+  /**
+   * Folder with the `.mcplugin` packages. Default: the fixture plugins built by
+   * scripts/e2e-plugin-registry.sh (`$MUMCORD_E2E_PLUGIN_PACKAGES/packages/...`), else empty.
+   */
   packages?: string;
   /** Failure scenarios active from the start, e.g. `no-v1.1` (see `serve-registry --help`). */
   scenarios?: string[];
@@ -39,7 +42,13 @@ export interface PluginFixtures {
   officialUrl?: string;
   /** Third-party `v1/index.json`; the `v1.1/index.json` sibling is next to it. */
   thirdPartyUrl?: string;
-  httpsOrigins?: { declared: string; undeclared: string; stunPort: number; caFile: string };
+  httpsOrigins?: {
+    declared: string;
+    undeclared: string;
+    update: string;
+    stunPort: number;
+    caFile: string;
+  };
 }
 
 interface Server {
@@ -62,6 +71,12 @@ async function cliPath(): Promise<string> {
     await runOk("cargo", ["build", "--locked", "--quiet", "-p", "mumcord-plugin"]);
   }
   return path;
+}
+
+/** Packages the registry script built for the "official" or "repo" folder, if it was run. */
+function builtPackages(folder: string): string | undefined {
+  const root = process.env.MUMCORD_E2E_PLUGIN_PACKAGES;
+  return root === undefined || root === "" ? undefined : join(root, "packages", folder);
 }
 
 function startServer(cli: string, args: string[], marker: RegExp): Promise<Server> {
@@ -102,9 +117,17 @@ export async function startPluginFixtures(options: PluginFixtureOptions): Promis
   state = { servers, dir };
   try {
     const cli = await cliPath();
-    const launch = async (name: string, repo: RepositoryOptions, repository?: string) => {
-      const packages = repo.packages ?? join(dir, `packages-${name}`);
+    const launch = async (
+      name: string,
+      repo: RepositoryOptions,
+      prebuiltFolder: string,
+      repository?: string,
+    ) => {
+      const packages = join(dir, `packages-${name}`);
       mkdirSync(packages, { recursive: true });
+      // A copy, so specs that publish into the repository never touch the shared build output.
+      const source = repo.packages ?? builtPackages(prebuiltFolder);
+      if (source !== undefined && existsSync(source)) cpSync(source, packages, { recursive: true });
       await runOk(cli, ["keygen", "--unencrypted", "--out", dir, "--name", name]);
       const args = ["--packages", packages, "--key", join(dir, `${name}.key`)];
       if (repository !== undefined) args.push("--repository", repository);
@@ -118,12 +141,12 @@ export async function startPluginFixtures(options: PluginFixtureOptions): Promis
       return server;
     };
     if (options.official !== undefined) {
-      const server = await launch("official", options.official);
+      const server = await launch("official", options.official, "official");
       state.officialKey = server.key;
       next.officialUrl = `${server.base}v1/`;
     }
     if (options.thirdParty !== undefined) {
-      const server = await launch("third-party", options.thirdParty, "E2E third-party");
+      const server = await launch("third-party", options.thirdParty, "repo", "E2E third-party");
       next.thirdPartyUrl = `${server.base}v1/index.json`;
     }
     if (options.https === true) {
@@ -131,6 +154,7 @@ export async function startPluginFixtures(options: PluginFixtureOptions): Promis
       next.httpsOrigins = {
         declared: state.https.declaredOrigin,
         undeclared: state.https.undeclaredOrigin,
+        update: state.https.updateOrigin,
         stunPort: state.https.stunPort,
         caFile: state.https.caFile,
       };

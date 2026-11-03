@@ -87,6 +87,7 @@ exec docker run --rm -i --init "${tty[@]}" \
   --security-opt seccomp=unconfined \
   --shm-size 1g \
   --add-host declared.plugins.test:127.0.0.1 --add-host undeclared.plugins.test:127.0.0.1 \
+  --add-host update.plugins.test:127.0.0.1 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$repo:$repo" -w "$repo" \
   -v "$cache/target:/cache/target" \
