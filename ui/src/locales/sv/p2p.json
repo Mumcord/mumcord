@@ -23,14 +23,14 @@
     "keepBlocked": "Behåll blockerat",
     "forget": "Glöm relä",
     "actionFailed": "Det fungerade inte. Försök igen.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Den här servern har inget relä, så fildelning är inte tillgänglig.",
+    "filesDisallowed": "Den här serverns relä tillåter inte fildelning.",
+    "screenDisallowed": "Den här serverns relä tillåter inte skärmdelning.",
+    "imagesDisallowed": "Full storlek är inte tillgänglig: den här serverns relä tillåter inte bilder",
+    "noCertificate": "Fildelning kräver ett klientcertifikat.",
+    "modeNeedsRelay": "Fildelning kräver reläet; din peer-to-peer-inställning är {{mode}}.",
+    "modeOff": "Av",
+    "modeDirectOnly": "Endast direkt"
   },
   "reason": {
     "p2pOff": "Peer-to-peer är avstängt.",

@@ -23,14 +23,14 @@
     "keepBlocked": "Manter bloqueado",
     "forget": "Esquecer retransmissor",
     "actionFailed": "Não funcionou. Tenta novamente.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Este servidor não tem retransmissor, por isso a partilha de ficheiros não está disponível.",
+    "filesDisallowed": "O retransmissor deste servidor não permite a partilha de ficheiros.",
+    "screenDisallowed": "O retransmissor deste servidor não permite a partilha de ecrã.",
+    "imagesDisallowed": "Tamanho original indisponível: o retransmissor deste servidor não permite imagens",
+    "noCertificate": "A partilha de ficheiros precisa de um certificado de cliente.",
+    "modeNeedsRelay": "A partilha de ficheiros precisa do retransmissor; a tua definição peer-to-peer é {{mode}}.",
+    "modeOff": "Desativado",
+    "modeDirectOnly": "Apenas direto"
   },
   "reason": {
     "p2pOff": "O peer-to-peer está desativado.",

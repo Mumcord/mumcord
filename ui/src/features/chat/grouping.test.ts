@@ -14,6 +14,7 @@ function message(sender: string, sentAt: Date, patch: Partial<ChatMessage> = {})
     body: "hi",
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
     ...patch,
   };
 }

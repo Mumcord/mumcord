@@ -23,14 +23,14 @@
     "keepBlocked": "Geblokkeerd houden",
     "forget": "Relay vergeten",
     "actionFailed": "Dat is niet gelukt. Probeer het opnieuw.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Deze server heeft geen relay, dus bestanden delen is niet beschikbaar.",
+    "filesDisallowed": "De relay van deze server staat bestanden delen niet toe.",
+    "screenDisallowed": "De relay van deze server staat schermdelen niet toe.",
+    "imagesDisallowed": "Volledige grootte niet beschikbaar: de relay van deze server staat geen afbeeldingen toe",
+    "noCertificate": "Bestanden delen vereist een clientcertificaat.",
+    "modeNeedsRelay": "Bestanden delen heeft de relay nodig; je peer-to-peer-instelling is {{mode}}.",
+    "modeOff": "Uit",
+    "modeDirectOnly": "Alleen direct"
   },
   "reason": {
     "p2pOff": "Peer-to-peer staat uit.",

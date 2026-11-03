@@ -32,5 +32,9 @@ pub(crate) fn check(
             format!("{base}: {}", CStr::from_ptr(detail).to_string_lossy())
         }
     };
-    Err(crate::Error::Codec { operation, message })
+    Err(crate::Error::Codec {
+        library: "libvpx",
+        operation,
+        message,
+    })
 }

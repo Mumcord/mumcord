@@ -1,6 +1,6 @@
 [package]
 name = "mumcord-screenshare"
-description = "Screen sharing media: VP9 software encoder and decoder on libvpx"
+description = "Screen sharing media: VP9 (libvpx) and AV1 (SVT-AV1, dav1d) encoders and decoders"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,6 +8,11 @@ license.workspace = true
 
 [dependencies]
 thiserror.workspace = true
+
+# Loads the GPU driver libraries for the hardware encoders at runtime (none on macOS). 0.8, not
+# the workspace's 0.9: bindgen's generated loaders (build.rs) are written against the 0.8 API.
+[target.'cfg(not(target_os = "macos"))'.dependencies]
+libloading = "0.8"
 
 [build-dependencies]
 bindgen.workspace = true

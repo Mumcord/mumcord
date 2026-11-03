@@ -144,6 +144,7 @@ describe("sending", () => {
           body: html,
           dismissedPreviews: [],
           syncedFrom: null,
+          file: null,
         }),
       );
     const { result } = renderHook(() => useComposer({ kind: "channel", channelId: 0 }, LIMITS));

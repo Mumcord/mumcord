@@ -23,14 +23,14 @@
     "keepBlocked": "Ponechat zablokované",
     "forget": "Zapomenout relay",
     "actionFailed": "Nepovedlo se. Zkus to znovu.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Tento server nemá relay, takže sdílení souborů není dostupné.",
+    "filesDisallowed": "Relay tohoto serveru sdílení souborů nepovoluje.",
+    "screenDisallowed": "Relay tohoto serveru sdílení obrazovky nepovoluje.",
+    "imagesDisallowed": "Plná velikost není dostupná: relay tohoto serveru nepovoluje obrázky",
+    "noCertificate": "Sdílení souborů vyžaduje klientský certifikát.",
+    "modeNeedsRelay": "Sdílení souborů potřebuje relay; tvé nastavení peer-to-peer je {{mode}}.",
+    "modeOff": "Vypnuto",
+    "modeDirectOnly": "Pouze přímé"
   },
   "reason": {
     "p2pOff": "Peer-to-peer je vypnuto.",

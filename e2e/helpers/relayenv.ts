@@ -4,7 +4,7 @@
 // The environment lives in the mumpeer repo (`testenv/`). Check it out next to this repo or point
 // `MUMPEER_DIR` at it; e2e/run.sh mounts that folder into the container. Specs that need it call
 // `relayAvailable()` and skip themselves otherwise (CI has no mumpeer checkout).
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { repoRoot } from "./paths.ts";
 import { runOk } from "./run.ts";
@@ -90,6 +90,28 @@ export async function stopRelay(): Promise<void> {
   if (!relayAvailable()) return;
   await runOk(testenvScript("down.sh"), []);
   current = undefined;
+}
+
+/**
+ * Stops the environment and deletes its data: the server database with every registration, the
+ * relay key and the relay bot's identity. Specs whose users register (the relay bot hands out
+ * tokens to registered users only) start with this, so a name a previous spec file registered
+ * with another identity is free again.
+ */
+export async function resetRelayData(): Promise<void> {
+  if (!relayAvailable()) return;
+  await stopRelay();
+  const project = process.env.MUMPEER_PROJECT ?? "mumpeer-testenv";
+  const data = testenvScript("data");
+  if (project !== "mumpeer-testenv") {
+    rmSync(join(data, `_${project}`), { recursive: true, force: true });
+    return;
+  }
+  // The default project's data sits next to the folders of parallel runs (`_<project>`).
+  if (!existsSync(data)) return;
+  for (const entry of readdirSync(data)) {
+    if (!entry.startsWith("_")) rmSync(join(data, entry), { recursive: true, force: true });
+  }
 }
 
 /** The relay's `/v1/status`, parsed (the `uses` list and `broadcast` limits show the profile). */

@@ -47,7 +47,7 @@
     "unavailable": "Ez a csatorna már nem érhető el.",
     "offline": "{{name}} offline. Akkor írhatsz újra, ha visszajött.",
     "unnamedImage": "Beillesztett kép",
-    "attachFiles": "Share files"
+    "attachFiles": "Fájlok megosztása"
   },
   "tray": {
     "label": "Küldendő képek",

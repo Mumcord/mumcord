@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} anslöts med standardidentiteten eftersom dess egen saknas."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Reläet tillåter",
+    "line": "Reläet tillåter: {{uses}}",
+    "images": "Bilder",
+    "files": "Filer",
+    "screen": "Skärmdelning"
   }
 }

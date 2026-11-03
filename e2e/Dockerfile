@@ -13,7 +13,7 @@ ARG TAURI_DRIVER_VERSION=2.0.6
 RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates curl gnupg git build-essential pkg-config cmake file \
+      ca-certificates curl gnupg git build-essential pkg-config cmake file nasm meson ninja-build \
       libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libasound2-dev \
       libssl-dev webkit2gtk-driver libvpx-dev libpipewire-0.3-dev libclang-dev \
       xvfb xauth dbus dbus-x11 libnss-wrapper gnome-keyring libsecret-tools xdotool \

@@ -64,7 +64,7 @@ afterEach(() => {
 function setup() {
   const { container } = render(
     <Composer
-      target={{ kind: "channel", channelId: 1 }}
+      target={{ kind: "private", session: 2 }}
       limits={{ text: 5000, image: 100_000, allowHtml: true }}
       label="Message #Lobby"
       blockedReason={null}
@@ -80,7 +80,7 @@ describe("Composer native file drops", () => {
       .mockResolvedValue({ name: "cat.png", mime: "image/png", data: btoa("x") });
     const form = setup();
     await waitFor(() => {
-      expect(dropHandlers.size).toBe(1);
+      expect(dropHandlers.size).toBe(2);
     });
     // Physical pixels at scale 2: (100, 1500) is (50, 750) in CSS pixels, inside the composer.
     emit({ type: "over", position: at(100, 1500) });
@@ -97,7 +97,7 @@ describe("Composer native file drops", () => {
     const read = vi.spyOn(api, "readDroppedImage");
     setup();
     await waitFor(() => {
-      expect(dropHandlers.size).toBe(1);
+      expect(dropHandlers.size).toBe(2);
     });
     emit({ type: "drop", paths: ["/home/me/cat.png"], position: at(100, 200) });
     expect(read).not.toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe("Composer native file drops", () => {
     vi.spyOn(api, "readDroppedImage").mockRejectedValue(new EngineError("invalidInput", "no"));
     setup();
     await waitFor(() => {
-      expect(dropHandlers.size).toBe(1);
+      expect(dropHandlers.size).toBe(2);
     });
     emit({ type: "drop", paths: ["/home/me/notes.txt"], position: at(100, 1500) });
     expect((await screen.findByRole("alert")).textContent).toBe("Only images can be sent.");

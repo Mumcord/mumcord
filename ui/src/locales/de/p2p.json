@@ -23,14 +23,14 @@
     "keepBlocked": "Gesperrt lassen",
     "forget": "Relay vergessen",
     "actionFailed": "Das hat nicht geklappt. Bitte versuche es erneut.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Dieser Server hat kein Relay, daher ist der Dateiaustausch nicht verfügbar.",
+    "filesDisallowed": "Das Relay dieses Servers erlaubt keinen Dateiaustausch.",
+    "screenDisallowed": "Das Relay dieses Servers erlaubt keine Bildschirmfreigabe.",
+    "imagesDisallowed": "Originalgröße nicht verfügbar: Das Relay dieses Servers erlaubt keine Bilder",
+    "noCertificate": "Für den Dateiaustausch ist ein Client-Zertifikat nötig.",
+    "modeNeedsRelay": "Der Dateiaustausch braucht das Relay; deine Peer-to-Peer-Einstellung ist {{mode}}.",
+    "modeOff": "Aus",
+    "modeDirectOnly": "Nur direkt"
   },
   "reason": {
     "p2pOff": "Peer-to-Peer ist aus.",

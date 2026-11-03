@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
-import type { Conversation } from "../../api";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { Conversation, FileCard } from "../../api";
+import type { RelayInfo } from "../../bindings/commands";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import {
   addSentMessage,
@@ -34,6 +35,78 @@ describe("chat store", () => {
       if (first) api.mock.emit("messageReceived", { serverId: 1, message: first });
     });
     expect(result.current.messages).toHaveLength(1);
+  });
+
+  it("puts a file card's new state into its message (FR-7.20)", async () => {
+    const api = await connectedMock({ bindStore: true });
+    resetChatStore();
+    const { result } = renderHook(() => useConversationLog(LOBBY));
+    const offer: FileCard = {
+      shareId: "s1",
+      name: "slides.pdf",
+      size: 1000,
+      mime: "application/pdf",
+      sha256: "ab".repeat(32),
+      expires: 0,
+      senderName: "Alice",
+      own: false,
+      risky: false,
+      state: { kind: "available" },
+      downloadBlock: null,
+      share: null,
+    };
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "offer", 2, offer);
+      api.mock.receiveMessage(LOBBY, "text", 2);
+    });
+    const text = result.current.messages[1];
+    act(() => {
+      api.mock.emit("fileCardChanged", {
+        serverId: 1,
+        card: { ...offer, state: { kind: "queued", position: 1 } },
+      });
+      api.mock.emit("fileCardChanged", {
+        serverId: 2,
+        card: { ...offer, state: { kind: "checking" } },
+      });
+    });
+    expect(result.current.messages[0]?.file?.state).toEqual({ kind: "queued", position: 1 });
+    expect(result.current.messages[1]).toBe(text);
+  });
+
+  it("reads the file cards of a server again when its relay changes", async () => {
+    const api = await connectedMock({ bindStore: true });
+    resetChatStore();
+    const { result } = renderHook(() => useConversationLog(LOBBY));
+    const offer: FileCard = {
+      shareId: "s1",
+      name: "slides.pdf",
+      size: 1000,
+      mime: "application/pdf",
+      sha256: "ab".repeat(32),
+      expires: 0,
+      senderName: "Alice",
+      own: false,
+      risky: false,
+      state: { kind: "available" },
+      downloadBlock: null,
+      share: null,
+    };
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "offer", 2, offer);
+    });
+    const blocked: FileCard = {
+      ...offer,
+      downloadBlock: { kind: "unavailable", reason: { kind: "noRelay" } },
+    };
+    const read = vi.spyOn(api, "filesCard").mockResolvedValue(blocked);
+    act(() => {
+      api.mock.emit("relayChanged", { serverId: 1, info: {} as RelayInfo });
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.file?.downloadBlock).toEqual(blocked.downloadBlock);
+    });
+    expect(read).toHaveBeenCalledWith(1, "s1");
   });
 
   it("loads history pages, merges live messages and pages backwards", async () => {

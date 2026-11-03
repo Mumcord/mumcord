@@ -3,6 +3,10 @@
     "attach": "Share files",
     "attachLabel": "Share files in this channel",
     "dropTitle": "Drop to share with #{{channel}}",
+    "dropChoiceTitle": "Some of these are images. What should happen with them?",
+    "sendAsImage": "Send as image",
+    "shareAsFile": "Share as file",
+    "dropChoiceCancel": "Cancel",
     "dropHint": "Files go straight to the people who download them, never through the server. Folders are zipped first.",
     "privateChat": "Files can only be shared in channels for now",
     "tooMany": "You can share up to 10 files at once",
@@ -68,6 +72,13 @@
     "cancelled": "Download cancelled",
     "busy": "{{sender}} is busy, try again later",
     "noSpace": "Not enough disk space in {{folder}}",
+    "reason": {
+      "noAnswer": "{{sender}} did not answer",
+      "connect": "Couldn't connect through the relay: {{reason}}",
+      "connectUnknown": "Couldn't connect through the relay",
+      "stalled": "The transfer stalled",
+      "connectionLost": "The connection was lost"
+    },
     "state": {
       "available": "available",
       "queued": "queued",
@@ -101,6 +112,7 @@
     "waiting_other": "{{count}} waiting",
     "sharing": "Sharing while you are online · ends {{when}}",
     "stop": "Stop sharing",
+    "stopFailed": "Couldn't stop sharing: {{reason}}. The file is still shared.",
     "ended": "Sharing ended",
     "endedStopped": "You stopped sharing",
     "endedExpired": "The 24 hours are over",

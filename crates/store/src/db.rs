@@ -370,6 +370,15 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (resolution, fps)
     );
     ",
+    // v24: how a file download ended, per chat message carrying the offer (spec 07, section
+    // 7.2); it goes away with the message.
+    r"
+    CREATE TABLE file_card (
+        message_id INTEGER PRIMARY KEY REFERENCES chat_message (id) ON DELETE CASCADE,
+        state      TEXT NOT NULL CHECK (state IN ('done', 'mismatch')),
+        path       TEXT
+    );
+    ",
     // v25: plugin platform 1.1 trust data (spec 09, section 7.1). Origin approvals, per-day
     // request counters (kept 7 days), the first time a registry key was seen, per-version
     // permission history and confirmed high-risk plugins. v24 is the file-card table of the
@@ -499,6 +508,7 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
         assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
         assert!(MIGRATIONS[21].contains("share_volume"));
+        assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
     }
 
     #[test]
@@ -732,11 +742,11 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
     }
 
-    /// The plugin trust tables are the last migration so far; the file-card table (v24) comes
-    /// before them once that epic is merged.
+    /// The plugin trust tables (v25) come right after the file-card table (v24).
     #[test]
     fn plugin_trust_migration_creates_its_five_tables() {
-        assert!(MIGRATIONS.len() >= 24);
+        assert!(MIGRATIONS.len() >= 25);
+        assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
         let sql = MIGRATIONS.last().expect("migration");
         for table in [
             "plugin_origin_approval",

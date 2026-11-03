@@ -2,10 +2,11 @@ use std::mem::MaybeUninit;
 use std::os::raw::{c_int, c_ulong};
 use std::ptr;
 
+use crate::codec::{Codec, VideoEncoder};
 use crate::ffi::{self, check};
 use crate::{Error, I420Frame, Result};
 
-/// Number of temporal layers (L1T3). Layer ids run 0..TEMPORAL_LAYERS.
+/// Number of VP9 temporal layers (L1T3). Layer ids run 0..TEMPORAL_LAYERS.
 pub const TEMPORAL_LAYERS: u8 = 3;
 
 /// libvpx's two-frame pattern for three layers: layer 0 every 4th frame, layer 1 in between,
@@ -29,12 +30,12 @@ pub struct EncoderConfig {
     pub bitrate_kbps: u32,
 }
 
-/// One compressed VP9 frame, ready to send.
+/// One compressed frame (VP9 or AV1), ready to send.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EncodedFrame {
     pub data: Vec<u8>,
     pub keyframe: bool,
-    /// Temporal layer 0..[`TEMPORAL_LAYERS`]. A viewer that skips all frames above some layer
+    /// Temporal layer 0..[`VideoEncoder::temporal_layers`]. A viewer that skips all frames above some layer
     /// still decodes the rest; keyframes are always layer 0.
     pub temporal_layer: u8,
     /// Milliseconds, as passed to [`Encoder::encode`].
@@ -180,6 +181,7 @@ impl Encoder {
                 .ok()
                 .filter(|id| *id < TEMPORAL_LAYERS)
                 .ok_or_else(|| Error::Codec {
+                    library: "libvpx",
                     operation: "read temporal layer id",
                     message: format!("unexpected layer id {}", layer.temporal_layer_id),
                 })?;
@@ -225,6 +227,13 @@ impl Encoder {
         }
         set_layer_bitrates(&mut self.cfg, bitrate_kbps);
         self.apply_config("set bitrate")
+    }
+
+    /// Changes the frame rate; the frame duration libvpx's rate control plans with follows it.
+    pub fn set_fps(&mut self, fps: u32) -> Result<()> {
+        validate_fps(fps)?;
+        self.fps = fps;
+        Ok(())
     }
 
     fn apply_config(&mut self, operation: &'static str) -> Result<()> {
@@ -285,6 +294,41 @@ impl Encoder {
     }
 }
 
+impl VideoEncoder for Encoder {
+    fn codec(&self) -> Codec {
+        Codec::Vp9
+    }
+
+    fn config(&self) -> EncoderConfig {
+        Encoder::config(self)
+    }
+
+    fn temporal_layers(&self) -> u8 {
+        TEMPORAL_LAYERS
+    }
+
+    fn encode(
+        &mut self,
+        frame: &I420Frame,
+        pts: i64,
+        force_keyframe: bool,
+    ) -> Result<Vec<EncodedFrame>> {
+        Encoder::encode(self, frame, pts, force_keyframe)
+    }
+
+    fn set_resolution(&mut self, width: u32, height: u32) -> Result<()> {
+        Encoder::set_resolution(self, width, height)
+    }
+
+    fn set_bitrate(&mut self, bitrate_kbps: u32) -> Result<()> {
+        Encoder::set_bitrate(self, bitrate_kbps)
+    }
+
+    fn set_fps(&mut self, fps: u32) -> Result<()> {
+        Encoder::set_fps(self, fps)
+    }
+}
+
 impl Drop for Encoder {
     fn drop(&mut self) {
         // SAFETY: the context was initialised in `new` and is destroyed exactly once.
@@ -301,11 +345,16 @@ fn validate(config: &EncoderConfig) -> Result<()> {
             config.width, config.height
         )));
     }
-    if config.fps == 0 || config.fps > TIMEBASE_DEN as u32 {
-        return Err(Error::InvalidConfig(format!("fps {}", config.fps)));
-    }
+    validate_fps(config.fps)?;
     if config.bitrate_kbps == 0 {
         return Err(Error::InvalidConfig("bitrate 0".into()));
+    }
+    Ok(())
+}
+
+fn validate_fps(fps: u32) -> Result<()> {
+    if fps == 0 || fps > TIMEBASE_DEN as u32 {
+        return Err(Error::InvalidConfig(format!("fps {fps}")));
     }
     Ok(())
 }

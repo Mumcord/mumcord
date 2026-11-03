@@ -60,6 +60,7 @@ import { findThemeCode } from "../../theme/shareCodec";
 import { ThemeCard } from "./ThemeCard";
 import { extractCards } from "./cards";
 import { MessageCards } from "./MessageCard";
+import { FileCardView } from "../files/cards/FileCardView";
 import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
@@ -200,7 +201,20 @@ function ReplyIcon({ size }: { size: number }) {
   );
 }
 
-function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJump }: BodyProps) {
+/** A file offer shows its card instead of the plain line official clients see (FR-7.19). */
+function Body(props: BodyProps) {
+  const file = props.message.file;
+  return file === null ? <TextBody {...props} /> : <FileCardView card={file} />;
+}
+
+function TextBody({
+  message,
+  tabIndex,
+  previews,
+  onImageClick,
+  clickablePeople,
+  onJump,
+}: BodyProps) {
   const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);

@@ -11,6 +11,7 @@ import {
   getApi,
   type ChatMessage,
   type Conversation,
+  type FileCard,
   type MumcordApi,
   type Unsubscribe,
 } from "../../api";
@@ -254,7 +255,55 @@ function bind(api: MumcordApi): void {
     api.on("connectionStateChanged", ({ serverId, state }) => {
       if (state.state === "disconnected") reset(serverId);
     }),
+    api.on("fileCardChanged", ({ serverId, card }) => {
+      updateFileCard(serverId, card);
+    }),
+    // Whether a card can be downloaded depends on the relay, which announces no card changes.
+    api.on("relayChanged", ({ serverId }) => {
+      rereadFileCards(api, serverId);
+    }),
   ];
+}
+
+/** Asks the engine for the current state of every file card shown for `serverId`. */
+function rereadFileCards(api: MumcordApi, serverId: number): void {
+  const prefix = serverPrefix(serverId);
+  const shareIds = new Set<string>();
+  for (const [key, log] of logs) {
+    if (!key.startsWith(prefix)) continue;
+    for (const message of log.messages) if (message.file) shareIds.add(message.file.shareId);
+  }
+  for (const shareId of shareIds) {
+    api.filesCard(serverId, shareId).then(
+      (card) => {
+        if (card) updateFileCard(serverId, card);
+      },
+      (error: unknown) => {
+        console.error("Reading a file card failed", error);
+      },
+    );
+  }
+}
+
+/** Puts a file card's new state into the messages that carry it (FR-7.20). */
+function updateFileCard(serverId: number, card: FileCard): void {
+  const prefix = serverPrefix(serverId);
+  let changed = false;
+  const next = new Map(logs);
+  for (const [key, log] of logs) {
+    if (!key.startsWith(prefix)) continue;
+    if (!log.messages.some((m) => m.file?.shareId === card.shareId)) continue;
+    next.set(key, {
+      ...log,
+      messages: log.messages.map((m) =>
+        m.file?.shareId === card.shareId ? { ...m, file: card } : m,
+      ),
+    });
+    changed = true;
+  }
+  if (!changed) return;
+  logs = next;
+  notify();
 }
 
 /** Invalidates the running history requests of every server. */
@@ -378,6 +427,7 @@ export function addOutgoing(
       body: send.html,
       dismissedPreviews: [],
       syncedFrom: null,
+      file: null,
     },
     error: null,
   };

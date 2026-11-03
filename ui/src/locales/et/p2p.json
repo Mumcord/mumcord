@@ -23,14 +23,14 @@
     "keepBlocked": "Hoia blokeerituna",
     "forget": "Unusta releeserver",
     "actionFailed": "See ei õnnestunud. Proovi uuesti.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Sellel serveril pole releeserverit, seega failide jagamine pole saadaval.",
+    "filesDisallowed": "Selle serveri releeserver ei luba failide jagamist.",
+    "screenDisallowed": "Selle serveri releeserver ei luba ekraani jagamist.",
+    "imagesDisallowed": "Täissuurus pole saadaval: selle serveri releeserver ei luba pilte",
+    "noCertificate": "Failide jagamiseks on vaja kliendisertifikaati.",
+    "modeNeedsRelay": "Failide jagamiseks on vaja releeserverit; sinu peer-to-peer seade on {{mode}}.",
+    "modeOff": "Väljas",
+    "modeDirectOnly": "Ainult otse"
   },
   "reason": {
     "p2pOff": "Peer-to-peer on välja lülitatud.",

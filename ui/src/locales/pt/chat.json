@@ -49,7 +49,7 @@
     "unavailable": "Este canal já não está disponível.",
     "offline": "{{name}} está offline. Podes voltar a escrever quando a pessoa regressar.",
     "unnamedImage": "Imagem colada",
-    "attachFiles": "Share files"
+    "attachFiles": "Partilhar ficheiros"
   },
   "tray": {
     "label": "Imagens a enviar",

@@ -343,9 +343,9 @@ describe("Composer Apps button", () => {
     });
     renderComposer();
     const apps = screen.getByRole("button", { name: "Apps" });
-    expect(apps.parentElement?.nextElementSibling).toBe(
-      screen.getByRole("button", { name: "Add image" }),
-    );
+    const paperclip = screen.getByRole("button", { name: "Share files in this channel" });
+    expect(apps.parentElement?.nextElementSibling).toBe(paperclip);
+    expect(paperclip.nextElementSibling).toBe(screen.getByRole("button", { name: "Add image" }));
     expect(screen.queryByRole("menu")).toBeNull();
   });
 

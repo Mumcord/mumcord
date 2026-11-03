@@ -113,6 +113,7 @@ describe("a long conversation", () => {
       body: `message ${String(index)}`,
       dismissedPreviews: [],
       syncedFrom: null,
+      file: null,
     };
   }
 

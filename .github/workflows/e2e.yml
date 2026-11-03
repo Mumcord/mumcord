@@ -68,6 +68,11 @@ jobs:
 
       - uses: ./.github/actions/npm-ci
 
+      # Screen sharing's static AV1 libraries from the same cache as the CI jobs; e2e/run.sh
+      # mounts them into the build container.
+      - name: Native AV1 libraries
+        uses: ./.github/actions/native-av1
+
       # A cache entry is never re-saved under the same key, so the week in the key makes the
       # target dir follow the code (one save per week) instead of drifting further from it.
       # The month scopes the image layer cache (apt, rustup, tauri-driver): rebuilt only when
@@ -224,16 +229,16 @@ jobs:
           zstd -dc e2e-plugins.tar.zst | tar -C "$MUMCORD_E2E_PLUGIN_PACKAGES" -xf -
           rm e2e-image.tar.zst e2e-bin.tar.zst e2e-plugins.tar.zst
 
-      # The relay specs (spec 07) need the mumpeer testenv; only the shard that runs them pays for
-      # the checkout and the image build. shards.json is rebalanced from time to time, so look
-      # the specs of this shard up instead of hard-coding the number.
+      # The relay specs (spec 07: p2p/relay-*, files/*) need the mumpeer testenv; only the shards
+      # that run them pay for the checkout and the image build. shards.json is rebalanced from time
+      # to time, so look the specs of this shard up instead of hard-coding the number.
       - name: Does this shard run relay specs
         id: relay
         run: |
           node -e '
             const { shards } = JSON.parse(require("fs").readFileSync("e2e/shards.json", "utf8"));
             const specs = shards[Number(process.env.SHARD) - 1] ?? [];
-            console.log("needed=" + specs.some((s) => /\/relay-/.test(s)));
+            console.log("needed=" + specs.some((s) => /\/relay-|\/files\//.test(s)));
           ' >> "$GITHUB_OUTPUT"
         env:
           SHARD: ${{ matrix.shard }}
