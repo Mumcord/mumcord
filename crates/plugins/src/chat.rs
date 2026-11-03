@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 use mumcord_store::ServerId;
 use sha2::{Digest, Sha256};
 
+use crate::api::host_calls::HostCall;
 use crate::manifest::Command;
 
 /// How long after a user gesture (button click or typed command) `chat.send` is allowed (FR-6.44).
@@ -223,6 +224,9 @@ pub enum SendError {
 #[derive(Debug, Default)]
 pub struct GestureGate {
     gestures: HashMap<String, (Instant, Duration)>,
+    /// The last gesture per plugin and the host calls it was already used for (FR-9.106). Kept
+    /// apart from `gestures` so a `chat.send` and one host call can follow the same click.
+    host_calls: HashMap<String, (Instant, Vec<HostCall>)>,
 }
 
 impl GestureGate {
@@ -230,12 +234,31 @@ impl GestureGate {
     pub fn gesture(&mut self, plugin: &str, now: Instant) {
         self.gestures
             .insert(plugin.to_owned(), (now, GESTURE_WINDOW));
+        self.host_calls.insert(plugin.to_owned(), (now, Vec::new()));
     }
 
     /// A typed slash command for this plugin: same window as a click.
     pub fn command_gesture(&mut self, plugin: &str, now: Instant) {
-        self.gestures
-            .insert(plugin.to_owned(), (now, GESTURE_WINDOW));
+        self.gesture(plugin, now);
+    }
+
+    /// Whether the last gesture is fresh and was not yet used for `call`.
+    pub fn host_call_allowed(&self, plugin: &str, call: HostCall, now: Instant) -> bool {
+        self.host_calls.get(plugin).is_some_and(|(at, used)| {
+            now.saturating_duration_since(*at) <= GESTURE_WINDOW && !used.contains(&call)
+        })
+    }
+
+    /// Uses the last gesture for `call`: one dialog or image per gesture (FR-9.103 … FR-9.105).
+    /// False when it is stale or was already used for `call`.
+    pub fn take_host_call(&mut self, plugin: &str, call: HostCall, now: Instant) -> bool {
+        if !self.host_call_allowed(plugin, call, now) {
+            return false;
+        }
+        if let Some((_, used)) = self.host_calls.get_mut(plugin) {
+            used.push(call);
+        }
+        true
     }
 
     /// Checks a `chat.send` and returns the line to post, with the `[Name] ` prefix. A refused
@@ -274,6 +297,7 @@ impl GestureGate {
 
     pub fn forget(&mut self, plugin: &str) {
         self.gestures.remove(plugin);
+        self.host_calls.remove(plugin);
     }
 }
 
@@ -626,6 +650,26 @@ mod tests {
             gate.send("dice", "Dice", "again", t0 + Duration::from_secs(1)),
             Err(SendError::NotPermitted)
         );
+    }
+
+    #[test]
+    fn a_gesture_allows_each_host_call_once_for_eight_seconds() {
+        let t0 = Instant::now();
+        let mut gate = GestureGate::default();
+        assert!(!gate.take_host_call("board", HostCall::Save, t0));
+        gate.gesture("board", t0);
+        assert!(!gate.take_host_call("dice", HostCall::Save, t0));
+        // chat.send uses up its own allowance only.
+        assert!(gate.send("board", "Board", "hi", t0).is_ok());
+        assert!(gate.take_host_call("board", HostCall::Save, t0));
+        assert!(!gate.take_host_call("board", HostCall::Save, t0));
+        assert!(gate.take_host_call("board", HostCall::PostImage, t0));
+        let late = t0 + Duration::from_millis(8001);
+        assert!(!gate.take_host_call("board", HostCall::ImportPicture, late));
+        gate.command_gesture("board", late);
+        assert!(gate.take_host_call("board", HostCall::Save, late));
+        gate.forget("board");
+        assert!(!gate.host_call_allowed("board", HostCall::PostImage, late));
     }
 
     #[test]

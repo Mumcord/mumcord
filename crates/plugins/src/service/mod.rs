@@ -109,6 +109,12 @@ pub enum ServiceEvent {
         server: mumcord_store::ServerId,
         line: String,
     },
+    /// A plugin's `files.save`, `files.import-picture` or `chat.post-image` passed its permission
+    /// and gesture checks (FR-9.103 … FR-9.105): the app carries it out and answers.
+    HostCall {
+        plugin: String,
+        request: crate::api::host_calls::HostRequest,
+    },
     /// Hide text message `message` and show the plugin's card `card` instead, or only a
     /// "Hidden by <Plugin>" line when `card` is `None` (FR-6.45).
     Supersede {

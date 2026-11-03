@@ -12,6 +12,7 @@
 
 use wasmtime::component::{HasSelf, Linker};
 
+use crate::api::host_calls;
 use crate::runtime::PluginState;
 use crate::runtime::bindings::mumcord::plugin as v1_0;
 
@@ -622,8 +623,26 @@ impl wit::chat::Host for PluginState {
         up(v1_0::chat::Host::hide(self, message))
     }
 
-    fn post_image(&mut self, _png: Vec<u8>, _alt: String) -> Result<wit::chat::PostOutcome, Error> {
-        Err(Error::NotPermitted)
+    fn post_image(&mut self, png: Vec<u8>, alt: String) -> Result<wit::chat::PostOutcome, Error> {
+        self.ctx
+            .grants
+            .check(&self.id, host_calls::POST_IMAGE_PERMISSION)
+            .map_err(Up::up)?;
+        host_calls::check_post_image(&png, &alt).map_err(Up::up)?;
+        let waiter = self
+            .io()
+            .map_err(Up::up)?
+            .chat_post_image(&self.id, png, alt, self.chat.server)
+            .map_err(Up::up)?;
+        let outcome = self
+            .clock
+            .waiting(|| waiter.wait(host_calls::POST_WAIT_CAP));
+        let result = outcome.unwrap_or(Err(v1_0::types::Error::NoRecipients));
+        tracing::info!(plugin = %self.id, ok = result.is_ok(), "plugin chat.post-image");
+        match result.map_err(Up::up)? {
+            host_calls::PostOutcome::Image => Ok(wit::chat::PostOutcome::Image),
+            host_calls::PostOutcome::FileOffer => Ok(wit::chat::PostOutcome::FileOffer),
+        }
     }
 }
 
@@ -723,12 +742,61 @@ impl wit::audio::Host for PluginState {
 }
 
 impl wit::files::Host for PluginState {
-    fn save(&mut self, _suggested_name: String, _data: Vec<u8>) -> Result<bool, Error> {
-        Err(Error::NotPermitted)
+    fn save(&mut self, suggested_name: String, data: Vec<u8>) -> Result<bool, Error> {
+        self.ctx
+            .grants
+            .check(&self.id, host_calls::SAVE_PERMISSION)
+            .map_err(Up::up)?;
+        let name = host_calls::check_save(&suggested_name, &data).map_err(Up::up)?;
+        let size = data.len();
+        let waiter = self
+            .io()
+            .map_err(Up::up)?
+            .files_save(&self.id, name, data)
+            .map_err(Up::up)?;
+        // The user takes their time in the dialog: waiting, outside the call's wall cap.
+        let saved = self.wait_for_user(waiter).unwrap_or(false);
+        tracing::info!(plugin = %self.id, size, saved, "plugin files.save");
+        Ok(saved)
     }
 
     fn import_picture(&mut self) -> Result<Option<wit::files::Picture>, Error> {
-        Err(Error::NotPermitted)
+        self.ctx
+            .grants
+            .check(&self.id, host_calls::IMPORT_PICTURE_PERMISSION)
+            .map_err(Up::up)?;
+        let waiter = self
+            .io()
+            .map_err(Up::up)?
+            .files_import_picture(&self.id)
+            .map_err(Up::up)?;
+        let picked = self.wait_for_user(waiter).unwrap_or(Ok(None));
+        tracing::info!(
+            plugin = %self.id,
+            size = picked.as_ref().ok().and_then(Option::as_ref).map(|p| p.data.len()),
+            ok = picked.is_ok(),
+            "plugin files.import-picture"
+        );
+        Ok(picked.map_err(Up::up)?.map(|p| wit::files::Picture {
+            name: p.name,
+            data: p.data,
+        }))
+    }
+}
+
+impl PluginState {
+    /// Waits for the user in a host dialog (FR-9.103, FR-9.105). The plugin handles no events
+    /// meanwhile; its queue stays bounded and drops the oldest, so only their count is logged.
+    fn wait_for_user<T>(&mut self, waiter: host_calls::Waiter<T>) -> Option<T> {
+        let dropped = self.diag.snapshot().dropped_events;
+        let answer = self
+            .clock
+            .waiting_on_user(|| waiter.wait(host_calls::DIALOG_WAIT_CAP));
+        let dropped = self.diag.snapshot().dropped_events.saturating_sub(dropped);
+        if dropped > 0 {
+            tracing::info!(plugin = %self.id, dropped, "plugin events dropped while a dialog was open");
+        }
+        answer
     }
 }
 

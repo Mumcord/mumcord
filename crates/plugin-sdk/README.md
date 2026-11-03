@@ -49,6 +49,8 @@ mumcord-plugin-sdk = { version = "...", features = ["1.1"] }
 
 With it, the SDK binds `mumcord:plugin@1.1.0` and adds typed wrappers: `stage`, `app_menu`, `relay`, `audio` and `files` (save, import-picture), `chat::post_image`, the `webview` places `SidePanel` and `Stage` with `set_size_hint`, the new `Event` cases and the new `Error` cases (`RelayUnavailable`, `OriginNotAllowed`, `NotFound`). The manifest must then declare `"api": "^1.1"` (`mumcord-plugin build` writes it from the imports). A complete example is `examples/stage_board.rs`; it versions its relay messages with a leading format byte, so a newer plugin can ignore data it does not understand.
 
+`files.save`, `files.import-picture` and `chat.post-image` open Mumcord's own dialogs or post into the real chat, so the mock host of `mumcord-plugin test` always answers them with `not-permitted`; try them in Mumcord itself.
+
 ## Licence
 
 Apache-2.0. Plugins built with the SDK can use any licence.

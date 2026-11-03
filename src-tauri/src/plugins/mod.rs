@@ -5,6 +5,7 @@
 //! service events are pumped by background tasks; commands are thin wrappers.
 
 mod feed;
+mod host_calls;
 pub mod suggestions;
 pub mod ui;
 pub mod webview;
@@ -474,6 +475,9 @@ async fn on_service_event(
             }
             Err(e) => tracing::info!(plugin, error = %e, "plugin chat line not posted"),
         },
+        ServiceEvent::HostCall { plugin, request } => {
+            host_calls::handle(app, engine, plugin, request);
+        }
         ServiceEvent::Supersede {
             plugin,
             card,
@@ -498,6 +502,9 @@ pub enum PluginNotice {
     AutoOff,
     /// A new version waits in the Updates tab (no OS notification).
     UpdateAvailable { name: String, version: String },
+    /// `files.import-picture` refused the picked file: not a PNG, JPEG or WebP, or above 10 MB
+    /// (FR-9.105, section 5.5).
+    PictureRefused,
 }
 
 /// `plugins://notification`: an entry for the notification centre (category Plugins).

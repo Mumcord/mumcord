@@ -4196,6 +4196,7 @@ dependencies = [
  "chrono",
  "hmac 0.13.0",
  "hound",
+ "image",
  "keyring",
  "lewton",
  "minisign",

@@ -43,6 +43,12 @@ export function usePluginEntryText(item: PluginItem | null): PluginEntryText {
         body: t("autoOff.body"),
         chips,
       };
+    case "pictureRefused":
+      return {
+        title: t("pictureRefused.title", { name: notice.name }),
+        body: t("pictureRefused.body"),
+        chips,
+      };
     case "update":
       return {
         title: t("update.title", { name: notice.name }),
@@ -70,7 +76,7 @@ export function usePluginEntryText(item: PluginItem | null): PluginEntryText {
 export function openPluginItem(item: PluginItem): void {
   markRead(item.id);
   const { notice } = item;
-  if (notice.kind === "message") return;
+  if (notice.kind === "message" || notice.kind === "pictureRefused") return;
   setCentreOpen(false);
   switch (notice.kind) {
     case "autoOff":

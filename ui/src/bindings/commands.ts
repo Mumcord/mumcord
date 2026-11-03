@@ -2838,7 +2838,12 @@ export type PluginNotice =
 /**  "Turned off after repeated crashes". */
 { kind: "autoOff" } | 
 /**  A new version waits in the Updates tab (no OS notification). */
-{ kind: "updateAvailable"; name: string; version: string };
+{ kind: "updateAvailable"; name: string; version: string } | 
+/**
+ *  `files.import-picture` refused the picked file: not a PNG, JPEG or WebP, or above 10 MB
+ *  (FR-9.105, section 5.5).
+ */
+{ kind: "pictureRefused" };
 
 /**  `plugins://notification`: an entry for the notification centre (category Plugins). */
 export type PluginNotification = {

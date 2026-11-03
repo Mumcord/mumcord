@@ -13,6 +13,8 @@ export type PluginNotice =
   | { kind: "message"; plugin: string; name: string; title: string; body: string }
   /** "Turned off after repeated crashes". */
   | { kind: "autoOff"; plugin: string; name: string }
+  /** `files.import-picture` refused the picked file (FR-9.105). */
+  | { kind: "pictureRefused"; plugin: string; name: string }
   /** A newer version waits in the Updates tab. */
   | { kind: "update"; plugin: string; name: string; version: string }
   /** A registered bot of the server suggests a plugin. */

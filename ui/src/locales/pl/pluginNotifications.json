@@ -5,6 +5,10 @@
     "body": "Wyłączona po wielokrotnych awariach",
     "open": "Pokaż w Wtyczkach"
   },
+  "pictureRefused": {
+    "title": "{{name}} couldn't use the picture",
+    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+  },
   "update": {
     "title": "Aktualizacja dla {{name}}",
     "body": "Wersja {{version}} czeka na karcie Aktualizacje",

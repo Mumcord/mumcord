@@ -7,6 +7,7 @@ use std::fmt::Debug;
 
 use mumcord_store::ServerId;
 
+use crate::api::host_calls::{Picture, PostOutcome, Waiter};
 use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{BotInfo, Error, Peer};
 use crate::runtime::wit::ui::{Node, Slot, UserMenuFilter};
@@ -105,6 +106,37 @@ pub trait PluginIo: Send + Sync + Debug {
     fn webview_hide(&self, _plugin: &str) {}
     /// `webview.post`: a message to the plugin's page.
     fn webview_post(&self, _plugin: &str, _message: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `files.save` (FR-9.103): `name` is already a plain file name and `data` within the
+    /// limit. Checks and uses up the gesture, then hands the dialog to the app; the caller
+    /// waits on the answer (true = saved). Hosts without dialogs refuse it.
+    fn files_save(
+        &self,
+        _plugin: &str,
+        _name: String,
+        _data: Vec<u8>,
+    ) -> Result<Waiter<bool>, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `files.import-picture` (FR-9.105): checks and uses up the gesture, then hands the picker
+    /// to the app; the caller waits on the answer (`None` = cancelled).
+    fn files_import_picture(
+        &self,
+        _plugin: &str,
+    ) -> Result<Waiter<Result<Option<Picture>, Error>>, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `chat.post-image` (FR-9.104): `png` is a checked PNG and `alt` within the limit. Checks
+    /// and uses up the gesture, then hands the image to the app for `server`'s chat (see
+    /// [`PluginIo::chat_send`]); the caller waits on how it went out.
+    fn chat_post_image(
+        &self,
+        _plugin: &str,
+        _png: Vec<u8>,
+        _alt: String,
+        _server: Option<ServerId>,
+    ) -> Result<Waiter<Result<PostOutcome, Error>>, Error> {
         Err(Error::NotPermitted)
     }
 }

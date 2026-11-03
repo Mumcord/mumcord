@@ -4,6 +4,7 @@ pub mod app_menu;
 pub mod chat;
 pub mod clock;
 pub mod files;
+pub mod host_calls;
 pub mod http;
 pub mod io;
 pub mod log;

@@ -15,6 +15,7 @@ use mumcord_store::ServerId;
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::ServiceEvent;
+use crate::api::host_calls::{HostCall, HostRequest, Picture, PostOutcome, Waiter, reply_channel};
 use crate::api::io::PluginIo;
 use crate::api::webview::{WebviewPlace, Webviews};
 use crate::chat::{self, GestureGate, MessageClaims, Supersede, SupersedeTracker};
@@ -573,6 +574,78 @@ impl PluginIo for ServiceIo {
         self.ui(plugin, UiUpdate::WebviewPost { message });
         Ok(())
     }
+
+    fn files_save(&self, plugin: &str, name: String, data: Vec<u8>) -> Result<Waiter<bool>, Error> {
+        self.take_host_call(plugin, HostCall::Save)?;
+        let (reply, waiter) = reply_channel();
+        self.host_call(plugin, HostRequest::Save { name, data, reply });
+        Ok(waiter)
+    }
+
+    fn files_import_picture(
+        &self,
+        plugin: &str,
+    ) -> Result<Waiter<Result<Option<Picture>, Error>>, Error> {
+        self.take_host_call(plugin, HostCall::ImportPicture)?;
+        let (reply, waiter) = reply_channel();
+        self.host_call(plugin, HostRequest::ImportPicture { reply });
+        Ok(waiter)
+    }
+
+    fn chat_post_image(
+        &self,
+        plugin: &str,
+        png: Vec<u8>,
+        alt: String,
+        server: Option<ServerId>,
+    ) -> Result<Waiter<Result<PostOutcome, Error>>, Error> {
+        if !self
+            .chat()
+            .gate
+            .host_call_allowed(plugin, HostCall::PostImage, Instant::now())
+        {
+            return Err(Error::NotPermitted);
+        }
+        // Not connected keeps the gesture: nothing was sent.
+        let server = self.chat_server(server).ok_or(Error::NoRecipients)?;
+        self.take_host_call(plugin, HostCall::PostImage)?;
+        let line = chat::prefixed(&self.name(plugin), &alt)
+            .trim_end()
+            .to_owned();
+        let (reply, waiter) = reply_channel();
+        self.host_call(
+            plugin,
+            HostRequest::PostImage {
+                server,
+                line,
+                png,
+                reply,
+            },
+        );
+        Ok(waiter)
+    }
+}
+
+impl ServiceIo {
+    /// Uses the plugin's last gesture for `call`, or refuses with not-permitted (FR-9.106).
+    fn take_host_call(&self, plugin: &str, call: HostCall) -> Result<(), Error> {
+        if self
+            .chat()
+            .gate
+            .take_host_call(plugin, call, Instant::now())
+        {
+            Ok(())
+        } else {
+            Err(Error::NotPermitted)
+        }
+    }
+
+    fn host_call(&self, plugin: &str, request: HostRequest) {
+        self.emit(ServiceEvent::HostCall {
+            plugin: plugin.to_owned(),
+            request,
+        });
+    }
 }
 
 /// A user as plugin `plugin` sees them: with that plugin's own key, never the certificate hash.
@@ -731,6 +804,96 @@ mod tests {
             Err(Error::NotPermitted)
         );
         assert_eq!(io.line_hash("dice", "x"), chat::line_hash("Dice", "x"));
+    }
+
+    fn io_with(
+        plugin: &str,
+        name: &str,
+    ) -> (
+        ServiceIo,
+        tokio::sync::mpsc::UnboundedReceiver<ServiceEvent>,
+    ) {
+        let (events, rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        io.peers().plugins.insert(
+            plugin.into(),
+            PluginMeta {
+                name: name.into(),
+                messaging: None,
+            },
+        );
+        (io, rx)
+    }
+
+    #[test]
+    fn host_calls_need_a_gesture_once_each() {
+        let (io, mut rx) = io_with("board", "Board");
+        assert!(matches!(
+            io.files_save("board", "a.png".into(), vec![1]),
+            Err(Error::NotPermitted)
+        ));
+        assert!(matches!(
+            io.files_import_picture("board"),
+            Err(Error::NotPermitted)
+        ));
+        assert!(rx.try_recv().is_err(), "nothing opens without a gesture");
+        io.gesture("board");
+        let waiter = io
+            .files_save("board", "a.png".into(), vec![1, 2])
+            .expect("allowed");
+        match rx.try_recv() {
+            Ok(ServiceEvent::HostCall {
+                plugin,
+                request: HostRequest::Save { name, data, reply },
+            }) => {
+                assert_eq!(
+                    (plugin.as_str(), name.as_str(), data),
+                    ("board", "a.png", vec![1, 2])
+                );
+                assert!(reply.send(true));
+            }
+            other => panic!("unexpected {other:?}"),
+        }
+        assert_eq!(waiter.wait(std::time::Duration::from_secs(1)), Some(true));
+        assert!(matches!(
+            io.files_save("board", "b.png".into(), vec![1]),
+            Err(Error::NotPermitted)
+        ));
+        assert!(io.files_import_picture("board").is_ok());
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::HostCall {
+                request: HostRequest::ImportPicture { .. },
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn post_image_goes_to_the_current_server_with_the_name_line() {
+        let (io, mut rx) = io_with("board", "Board");
+        io.gesture("board");
+        assert!(matches!(
+            io.chat_post_image("board", vec![1], "Sketch".into(), None),
+            Err(Error::NoRecipients)
+        ));
+        io.peers().focused = Some(3);
+        assert!(
+            io.chat_post_image("board", vec![1], "Sketch".into(), None)
+                .is_ok(),
+            "not connected kept the gesture"
+        );
+        assert!(matches!(
+            rx.try_recv(),
+            Ok(ServiceEvent::HostCall {
+                request: HostRequest::PostImage { server: 3, line, .. },
+                ..
+            }) if line == "[Board] Sketch"
+        ));
+        assert!(matches!(
+            io.chat_post_image("board", vec![1], String::new(), None),
+            Err(Error::NotPermitted)
+        ));
     }
 
     #[test]

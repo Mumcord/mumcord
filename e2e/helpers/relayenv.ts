@@ -152,6 +152,16 @@ export interface TestHooks {
   noWebcodecsAv1?: boolean;
   /** Keep the previous broadcast key after a rotation (AC-7.30). */
   keepOldKey?: boolean;
+  /**
+   * Plugin `files.save` writes to this path instead of opening the save dialog; `"cancel"`
+   * cancels (AC-9.47).
+   */
+  pluginSavePath?: string;
+  /**
+   * Plugin `files.import-picture` picks this file instead of opening the picker; `"cancel"`
+   * cancels (AC-9.49).
+   */
+  pluginPickPath?: string;
 }
 
 /**
@@ -169,5 +179,7 @@ export function hookEnv(h: TestHooks): Record<string, string> {
   if (h.onBattery) env.MUMCORD_TEST_ON_BATTERY = "1";
   if (h.noWebcodecsAv1) env.MUMCORD_TEST_NO_WEBCODECS_AV1 = "1";
   if (h.keepOldKey) env.MUMCORD_TEST_KEEP_OLD_KEY = "1";
+  if (h.pluginSavePath !== undefined) env.MUMCORD_TEST_PLUGIN_SAVE = h.pluginSavePath;
+  if (h.pluginPickPath !== undefined) env.MUMCORD_TEST_PLUGIN_PICK = h.pluginPickPath;
   return env;
 }
