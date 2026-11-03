@@ -139,6 +139,19 @@ export const commands = {
 	personSetNote: (serverId: number, session: number, note: string) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_note", { serverId, session, note })),
 	/**  Comment and avatar of a person, fetched from the server when not known yet. */
 	personProfile: (serverId: number, session: number) => typedError<PersonProfile, ApiError>(__TAURI_INVOKE("person_profile", { serverId, session })),
+	/**
+	 *  Reads the server's ban list for the window (FR-10.51). Fails with `permissionDenied` without
+	 *  the Ban right, and with `serverUnreachable` when the server does not answer within 5 s.
+	 */
+	banListOpen: (serverId: number) => typedError<BanEntry[], ApiError>(__TAURI_INVOKE("ban_list_open", { serverId })),
+	/**
+	 *  Saves the window's changes together. Before sending, the engine re-reads the list; if an entry
+	 *  the user touched changed meanwhile it answers with `conflict` instead of saving (FR-10.66).
+	 *  `force` is the UI's "Save mine anyway".
+	 */
+	banListSave: (serverId: number, changes: BanChangeInput[], force: boolean) => typedError<BanSaveResult, ApiError>(__TAURI_INVOKE("ban_list_save", { serverId, changes, force })),
+	/**  The window closed: what it held is dropped (FR-10.63). */
+	banListClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("ban_list_close", { serverId })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -1188,6 +1201,36 @@ export type AudioRatingLabel = {
 /**  Why Automatic does not pick AV1. */
 export type Av1Skipped = "tooHeavy" | "onBattery" | "aboveSoftwareLimit";
 
+/**  One change the window collected; a save applies all of them at once. */
+export type BanChangeInput = { kind: "add"; name: string | null; hash: string | null; address: string; mask: number; reason: string | null; duration: number } | { kind: "edit"; key: string; reason: string | null; duration: number } | { kind: "remove"; key: string };
+
+/**
+ *  One ban entry as the window shows it. `key` is what identifies the entry across a re-read, so
+ *  an edit or a removal can still be matched (FR-10.66). Name, reason and fingerprint are server
+ *  text: untrusted, and personal data.
+ */
+export type BanEntry = {
+	key: string,
+	name: string | null,
+	/**  Hex certificate hash; empty when the entry bans by address only. */
+	certHash: string | null,
+	/**  Full address, IPv4 in IPv4 form. The UI masks it unless the row was revealed (FR-10.51). */
+	address: string,
+	/**  Subnet length in the family the UI shows: 32 for a single IPv4, 128 for a single IPv6. */
+	mask: number,
+	reason: string | null,
+	/**  RFC 3339, or `null` when the server sent a time Mumcord cannot read. */
+	start: string | null,
+	/**  Seconds; 0 is permanent. */
+	durationSecs: number,
+	expired: boolean,
+};
+
+/**  What a save produced: the new list, or the conflict the UI must ask about (FR-10.66). */
+export type BanSaveResult = { kind: "saved"; entries: BanEntry[] } | 
+/**  The entry was changed or removed on the server while the window was open. */
+{ kind: "conflict"; key: string; fresh: BanEntry[] };
+
 /**
  *  The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
  *  when the voice server changes. `null` without a voice server: show "depends on server".
@@ -1342,6 +1385,11 @@ export type ChannelPermissions = {
 	 *  once the server confirmed it.
 	 */
 	moveUsers: boolean,
+	/**
+	 *  Ban right, granted on the root channel; decides whether the Ban list entry shows
+	 *  (Epic 4, issue #254).
+	 */
+	ban: boolean,
 };
 
 export type ChannelRemoved = {

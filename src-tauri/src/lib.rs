@@ -39,8 +39,8 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow, friends,
-    history, identity, links, mumble_import, notifications as notify, people, pm_overview,
+    admin, app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow,
+    friends, history, identity, links, mumble_import, notifications as notify, people, pm_overview,
     pm_rules, profile, servers, session, settings,
 };
 
@@ -107,6 +107,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::person_set_local_mute,
             people::person_set_note,
             people::person_profile,
+            admin::ban_list_open,
+            admin::ban_list_save,
+            admin::ban_list_close,
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,
