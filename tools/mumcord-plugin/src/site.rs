@@ -60,22 +60,11 @@ pub fn run(args: Args) -> Result<()> {
         key_rotation: None,
     };
     let index = registry::index_v1_json(&head, &plugins)?;
-    // The client drops bad entries with a note; a published index must have none.
-    let parsed =
-        Index::parse(&index, &IndexKind::Official).context("the generated index is invalid")?;
-    if let Some(ignored) = parsed.ignored.first() {
-        bail!(
-            "plugin {} would be ignored by Mumcord: {:?}",
-            ignored.id,
-            ignored.reason
-        );
-    }
+    let parsed = check_with_client(&index, "v1/index.json")?;
+    let index_1_1 = registry::index_v1_1_json(&head, &plugins)?;
+    check_with_client(&index_1_1, "v1.1/index.json")?;
     fs::write(out.join("index.json"), index)?;
-    // TODO(VV1): parse the format-2 index with the client's reader, like format 1 above.
-    fs::write(
-        out_1_1.join("index.json"),
-        registry::index_v1_1_json(&head, &plugins)?,
-    )?;
+    fs::write(out_1_1.join("index.json"), index_1_1)?;
     let revoked = source::load_revoked(&args.repo)?;
     fs::write(
         out.join("revoked.json"),
@@ -168,10 +157,26 @@ fn listed_plugin(
     })
 }
 
+/// Reads a generated index the way Mumcord does. The client drops bad entries with a note; a
+/// published index must have none.
+fn check_with_client(index: &[u8], name: &str) -> Result<Index> {
+    let parsed = Index::parse(index, &IndexKind::Official)
+        .with_context(|| format!("the generated {name} is invalid"))?;
+    if let Some(ignored) = parsed.ignored.first() {
+        bail!(
+            "plugin {} would be ignored by Mumcord in {name}: {:?}",
+            ignored.id,
+            ignored.reason
+        );
+    }
+    Ok(parsed)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::source::tests::write_plugin;
+    use mumcord_plugins::registry::Choice;
 
     #[test]
     fn api_1_1_versions_go_only_into_the_v1_1_index() {
@@ -217,6 +222,21 @@ mod tests {
         assert_eq!(dice["versions"][1]["min_mumcord"], "0.7");
         assert_eq!(dice["versions"][1]["origins"][0], "https://api.example");
         assert_eq!(v2["plugins"][1]["id"], "stage");
+
+        // The client reads the v1.1 index too and picks 1.1.0 only from 0.7 on (AC-9.26 unit).
+        let v1_1 = Index::parse(
+            &fs::read(out.path().join("v1.1/index.json")).expect("test step"),
+            &IndexKind::Official,
+        )
+        .expect("client reads v1.1");
+        let dice = v1_1.plugin("dice").expect("test step");
+        let chosen = |app: &str| match dice.choose(&semver::Version::parse(app).expect("test step"))
+        {
+            Choice::Runnable(v) => v.version.clone(),
+            other => panic!("{other:?}"),
+        };
+        assert_eq!(chosen("0.7.0"), "1.1.0");
+        assert_eq!(chosen("0.9.1"), "1.1.0");
     }
 
     #[test]

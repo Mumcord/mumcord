@@ -284,6 +284,114 @@ async fn third_party_preview_fetch_key_change_and_rotation() {
     ));
 }
 
+/// A format-2 plugin entry whose only version is `version` with API 1.1.
+fn plugin_1_1(id: &str, version: &str) -> serde_json::Value {
+    let mut entry = plugin(id);
+    entry["versions"] = json!([{"version": version, "api": "1.1", "min_mumcord": "0.7",
+        "url": format!("https://example.org/{id}-{version}.mcplugin"),
+        "size": 10, "sha256": "ab".repeat(32), "permissions": []}]);
+    entry
+}
+
+fn listed_version(outcome: RepoOutcome) -> (String, u64, Freshness) {
+    let RepoOutcome::Loaded(loaded) = outcome else {
+        panic!("{outcome:?}");
+    };
+    let foo = loaded.index.plugin("foo").expect("test step");
+    (
+        foo.latest().version.clone(),
+        loaded.index.sequence,
+        loaded.freshness,
+    )
+}
+
+#[tokio::test]
+async fn official_index_is_read_from_the_v1_1_folder() {
+    let official = keypair();
+    let keys = RegistryKeys::pinned(&public(&official)).expect("test step");
+    let server = TestServer::start();
+    let cache = tempfile::tempdir().expect("test step");
+    publish(&server, "v1/index.json", &official, &official_index(5));
+    let v1_1 = json!({"format": 2, "sequence": 5, "plugins": [plugin_1_1("dice", "2.0.0")]});
+    let body = serde_json::to_vec(&v1_1).expect("test step");
+    publish(&server, "v1.1/index.json", &official, &body);
+
+    let root = base(&format!("{}v1/", server.base));
+    let loaded = fetch_official_with(&client(), cache.path(), &root, Some(5), &keys)
+        .await
+        .expect("test step");
+    let dice = loaded.index.plugin("dice").expect("test step");
+    assert_eq!(dice.latest().version, "2.0.0");
+    assert!(cache.path().join("v1.1/index.json").exists());
+    assert!(!cache.path().join("index.json").exists());
+}
+
+/// AC-9.30 (unit) and the per-path cache of spec §7.1.
+#[tokio::test]
+async fn third_party_sibling_v1_1_index_with_404_fallback() {
+    let key = keypair();
+    let is_official = |_: &str| false;
+    let cache = tempfile::tempdir().expect("test step");
+    let client = client();
+    let v1 = |sequence| {
+        serde_json::to_vec(&repo_index(&key, sequence, vec![plugin("foo")])).expect("test step")
+    };
+    let v1_1 = |sequence| {
+        let mut index = repo_index(&key, sequence, vec![plugin_1_1("foo", "2.0.0")]);
+        index["format"] = json!(2);
+        serde_json::to_vec(&index).expect("test step")
+    };
+
+    // The sibling wins, with its own (lower) sequence: no rollback against the added file's.
+    let server = TestServer::start();
+    publish(&server, "repo/v1/index.json", &key, &v1(3));
+    publish(&server, "repo/v1.1/index.json", &key, &v1_1(1));
+    let mut repository = record(format!("{}repo/v1/index.json", server.base), &key);
+    repository.last_sequence = 3;
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+        .await
+        .expect("test step");
+    let (version, sequence, freshness) = listed_version(outcome);
+    assert_eq!((version.as_str(), sequence), ("2.0.0", 1));
+    assert!(matches!(freshness, Freshness::Fresh));
+    assert!(cache.path().join("v1.1/index.json").exists());
+    // The caller stores the sibling's sequence, as it does today.
+    repository.last_sequence = 1;
+
+    // Rollback is checked per path: an older sibling is refused and its cached copy kept.
+    publish(&server, "repo/v1.1/index.json", &key, &v1_1(0));
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+        .await
+        .expect("test step");
+    let (version, sequence, freshness) = listed_version(outcome);
+    assert_eq!((version.as_str(), sequence), ("2.0.0", 1));
+    assert!(matches!(
+        freshness,
+        Freshness::Rejected(RegistryError::Verify(VerifyFailure::Rollback))
+    ));
+
+    // Offline is not a 404: the sibling's cached copy is shown.
+    repository.url = format!("{}repo/v1/index.json", dead_base());
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+        .await
+        .expect("test step");
+    let (version, _, freshness) = listed_version(outcome);
+    assert_eq!(version, "2.0.0");
+    assert!(matches!(freshness, Freshness::Offline));
+
+    // A 404 for the sibling falls back to the added file, even with a cached sibling copy.
+    let plain = TestServer::start();
+    publish(&plain, "repo/v1/index.json", &key, &v1(3));
+    repository.url = format!("{}repo/v1/index.json", plain.base);
+    let outcome = fetch_repository(&client, cache.path(), &repository, &is_official)
+        .await
+        .expect("test step");
+    let (version, sequence, freshness) = listed_version(outcome);
+    assert_eq!((version.as_str(), sequence), ("1.2.0", 3));
+    assert!(matches!(freshness, Freshness::Fresh));
+    assert!(cache.path().join("index.json").exists());
+}
+
 #[tokio::test]
 async fn third_party_index_size_cap() {
     let keys = keypair();

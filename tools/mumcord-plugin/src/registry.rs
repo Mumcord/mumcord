@@ -11,15 +11,12 @@ use mumcord_plugins::manifest::Manifest;
 use mumcord_plugins::package::{Digest, MANIFEST_FILE};
 use mumcord_plugins::permissions::{CATALOGUE, Risk};
 use mumcord_plugins::registry::{
-    FORMAT_VERSION, IndexPlugin, IndexVersion, KeyRotation, MAX_ICON_BYTES, RepositoryInfo,
-    Revocation,
+    FORMAT_VERSION, FORMAT_VERSION_2, IndexPlugin, IndexVersion, KeyRotation, MAX_ICON_BYTES,
+    RepositoryInfo, Revocation,
 };
-use mumcord_plugins::version::{self, ApiMinor};
+use mumcord_plugins::version::{self, ApiMinor, Release};
 use serde::Serialize;
 use serde_json::json;
-
-/// Index format of `v1.1/index.json` (FR-9.15).
-pub const FORMAT_2: u32 = 2;
 
 /// A package file with the facts a registry lists about it.
 pub struct PackageInfo {
@@ -105,8 +102,8 @@ pub struct ListedVersion {
 }
 
 impl ListedVersion {
-    fn format_1(&self) -> Result<IndexVersion> {
-        Ok(IndexVersion {
+    fn format_1(&self) -> Result<IndexVersion1> {
+        Ok(IndexVersion1 {
             version: self.version.clone(),
             api: u32::try_from(self.api.major)?,
             url: self.url.clone(),
@@ -116,75 +113,52 @@ impl ListedVersion {
         })
     }
 
-    fn format_2(&self) -> IndexVersion2 {
-        IndexVersion2 {
+    /// `modules` and `reproducible` are left out: the registry has no verified value for them
+    /// yet.
+    fn format_2(&self) -> IndexVersion {
+        IndexVersion {
             version: self.version.clone(),
-            api: self.api.to_string(),
+            api: self.api,
             url: self.url.clone(),
             size: self.size,
             sha256: self.sha256.clone(),
             permissions: self.permissions.clone(),
             min_mumcord: self.min_mumcord.clone(),
             origins: self.origins.clone(),
+            modules: None,
+            reproducible: None,
         }
     }
 }
 
-/// A format-2 version entry (FR-9.15). `modules` and `reproducible` are left out: the registry
-/// has no verified value for them yet.
-// TODO(VV1): use the format-2 index types of `mumcord_plugins::registry` once VV1 adds them.
+/// A format-1 version entry, frozen for 0.6.x clients: `api` is the integer major. The client
+/// reads it into [`IndexVersion`].
 #[derive(Serialize)]
-struct IndexVersion2 {
+struct IndexVersion1 {
     version: String,
-    api: String,
+    api: u32,
     url: String,
     size: u64,
     sha256: String,
     permissions: Vec<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_mumcord: Option<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    origins: Vec<String>,
-}
-
-/// The first Mumcord release that links an API minor (FR-9.15): 1.0 → 0.6, 1.1 → 0.7.
-pub fn first_release(api: ApiMinor) -> Option<(u64, u64)> {
-    match (api.major, api.minor) {
-        (1, 0) => Some((0, 6)),
-        (1, 1) => Some((0, 7)),
-        _ => None,
-    }
 }
 
 /// Rejects a version whose `min_mumcord` is below the first release supporting its API
 /// (FR-9.20). Only major.minor count (FR-9.13).
 pub fn check_min_mumcord(api: ApiMinor, min_mumcord: Option<&str>) -> Result<()> {
-    let first = first_release(api).with_context(|| format!("API {api} is not known"))?;
+    let first = version::first_release(api).with_context(|| format!("API {api} is not known"))?;
     let Some(text) = min_mumcord else {
         return Ok(());
     };
-    let release = release_of(text).with_context(|| format!("min_mumcord {text} is invalid"))?;
+    let release = Release::parse(text).with_context(|| format!("min_mumcord {text} is invalid"))?;
     if release < first {
         bail!(
             "min_mumcord {text} is lower than {}.{}, the first release with API {api}",
-            first.0,
-            first.1
+            first.major,
+            first.minor
         );
     }
     Ok(())
-}
-
-/// `0.7` or `0.7.3` → (0, 7).
-fn release_of(text: &str) -> Option<(u64, u64)> {
-    let parts: Vec<&str> = text.split('.').collect();
-    if !(2..=3).contains(&parts.len()) {
-        return None;
-    }
-    let numbers: Vec<u64> = parts
-        .iter()
-        .map(|p| p.parse().ok())
-        .collect::<Option<_>>()?;
-    Some((numbers[0], numbers[1]))
 }
 
 /// The manifest icon as PNG: the icon itself, or for an SVG (or WebP) the PNG next to it
@@ -255,11 +229,14 @@ pub fn index_v1_json(head: &IndexHead<'_>, plugins: &[ListedPlugin]) -> Result<V
         };
         let mut plugin = entry.plugin.clone();
         plugin.updated = newest.published.clone();
-        plugin.versions = versions
+        plugin.versions = Vec::new();
+        let mut value = serde_json::to_value(&plugin)?;
+        let format_1 = versions
             .iter()
             .map(|v| v.format_1())
-            .collect::<Result<_>>()?;
-        listed.push(plugin);
+            .collect::<Result<Vec<_>>>()?;
+        value["versions"] = serde_json::to_value(format_1)?;
+        listed.push(value);
     }
     index_file(FORMAT_VERSION, head, listed)
 }
@@ -274,13 +251,10 @@ pub fn index_v1_1_json(head: &IndexHead<'_>, plugins: &[ListedPlugin]) -> Result
         };
         let mut plugin = entry.plugin.clone();
         plugin.updated = newest.published.clone();
-        plugin.versions = Vec::new();
-        let mut value = serde_json::to_value(&plugin)?;
-        value["versions"] =
-            serde_json::to_value(versions.iter().map(|v| v.format_2()).collect::<Vec<_>>())?;
-        listed.push(value);
+        plugin.versions = versions.iter().map(|v| v.format_2()).collect();
+        listed.push(plugin);
     }
-    index_file(FORMAT_2, head, listed)
+    index_file(FORMAT_VERSION_2, head, listed)
 }
 
 /// Oldest first, like format 1 (the client takes the last entry as the newest).

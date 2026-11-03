@@ -30,6 +30,19 @@ impl ApiMinor {
     }
 }
 
+impl std::str::FromStr for ApiMinor {
+    type Err = ();
+
+    /// `"1.1"`; the index and manifests write API minors as major.minor (FR-9.15).
+    fn from_str(text: &str) -> Result<Self, ()> {
+        let (major, minor) = text.split_once('.').ok_or(())?;
+        Ok(Self {
+            major: number(major).ok_or(())?,
+            minor: number(minor).ok_or(())?,
+        })
+    }
+}
+
 impl fmt::Display for ApiMinor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}.{}", self.major, self.minor)
@@ -70,6 +83,68 @@ pub fn imports_api(component: &Component) -> Option<ApiMinor> {
             minor: v.minor,
         })
         .max()
+}
+
+/// A Mumcord release as major.minor (FR-9.13): `min_mumcord` `"0.7.3"` is release 0.7.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Release {
+    pub major: u64,
+    pub minor: u64,
+}
+
+impl Release {
+    /// Reads `"0.7"` or `"0.7.3"`; the patch level is checked but ignored.
+    pub fn parse(text: &str) -> Option<Self> {
+        let mut parts = text.split('.');
+        let major = number(parts.next()?)?;
+        let minor = number(parts.next()?)?;
+        match (parts.next(), parts.next()) {
+            (None, _) => {}
+            (Some(patch), None) => {
+                number(patch)?;
+            }
+            (Some(_), Some(_)) => return None,
+        }
+        Some(Self { major, minor })
+    }
+
+    /// The release of a running app; pre-release tags and patch levels do not count.
+    pub fn of(app: &Version) -> Self {
+        Self {
+            major: app.major,
+            minor: app.minor,
+        }
+    }
+}
+
+impl fmt::Display for Release {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}.{}.0", self.major, self.minor)
+    }
+}
+
+/// A plain decimal number without sign or leading `+`.
+fn number(text: &str) -> Option<u64> {
+    if text.is_empty() || !text.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    text.parse().ok()
+}
+
+/// The first Mumcord release that links an API minor (FR-9.15): 1.0 → 0.6, 1.1 → 0.7.
+/// `None` for an API this build does not know.
+pub fn first_release(api: ApiMinor) -> Option<Release> {
+    match api {
+        ApiMinor::V1_0 => Some(Release { major: 0, minor: 6 }),
+        ApiMinor::V1_1 => Some(Release { major: 0, minor: 7 }),
+        _ => None,
+    }
+}
+
+/// FR-9.16 / FR-9.17: shown when no version of a plugin runs on this Mumcord; `release` is the
+/// lowest release that would run one.
+pub fn needs_mumcord_text(release: Release) -> String {
+    format!("Needs Mumcord {release} or newer")
 }
 
 /// Why a plugin cannot run on this Mumcord.
@@ -216,6 +291,29 @@ mod tests {
         assert!(matches_release(&req("^0.7.3"), &v("0.7.1")));
         assert!(!matches_release(&req(">=0.8.1"), &v("0.7.9")));
         assert_eq!(lowest_bound(&req(">=0.7.3")), Some(v("0.7.0")));
+    }
+
+    #[test]
+    fn api_minors_and_releases_parse_major_minor() {
+        assert_eq!("1.1".parse(), Ok(ApiMinor::V1_1));
+        assert_eq!("1.0".parse(), Ok(ApiMinor::V1_0));
+        for bad in ["1", "1.", "1.x", "+1.0", "1.1.0", ""] {
+            assert!(bad.parse::<ApiMinor>().is_err(), "{bad}");
+        }
+        let r = |major, minor| Some(Release { major, minor });
+        assert_eq!(Release::parse("0.7"), r(0, 7));
+        assert_eq!(Release::parse("0.7.3"), r(0, 7));
+        for bad in ["0", "0.7.3.1", "0.7-dev", "v0.7", "0..7"] {
+            assert_eq!(Release::parse(bad), None, "{bad}");
+        }
+        // FR-9.13: 0.7.0 satisfies min_mumcord 0.7.3.
+        assert!(Release::of(&v("0.7.0-dev")) >= Release::parse("0.7.3").expect("test step"));
+        assert_eq!(
+            needs_mumcord_text(Release { major: 0, minor: 7 }),
+            "Needs Mumcord 0.7.0 or newer"
+        );
+        assert_eq!(first_release(ApiMinor::V1_1), r(0, 7));
+        assert_eq!(first_release(api(2, 0)), None);
     }
 
     #[test]
