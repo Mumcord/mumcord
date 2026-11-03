@@ -273,7 +273,7 @@ export const commands = {
 	filesDownload: (serverId: number, shareId: string) => typedError<null, ApiError>(__TAURI_INVOKE("files_download", { serverId, shareId })),
 	/**  Cancels a running download of the card. */
 	filesCancel: (serverId: number, shareId: string) => __TAURI_INVOKE<void>("files_cancel", { serverId, shareId }),
-	/**  The folder downloads are saved to: the setting, else the system Downloads folder. */
+	/**  The folder downloads are saved to: the setting, else `Mumcord` inside the system Downloads folder. */
 	filesSaveFolder: () => typedError<string, ApiError>(__TAURI_INVOKE("files_save_folder")),
 	/**
 	 *  Opens a downloaded file with the system's default program (FR-7.29). The saved file keeps
