@@ -181,6 +181,7 @@ fn record(url: String, key: &KeyPair) -> PluginRepository {
         paused_reason: None,
         last_sequence: 0,
         last_checked: None,
+        expected_key_matched: false,
     }
 }
 

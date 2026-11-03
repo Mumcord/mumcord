@@ -24,6 +24,8 @@ pub struct Local {
     pub key_first_seen: BTreeMap<String, UnixMillis>,
     /// Versions of the plugin as first seen (index refreshes record every listed version).
     pub versions: Vec<VersionHistoryEntry>,
+    /// Repositories whose "Expected key" matched when they were added (FR-6.74).
+    pub expected_key_repositories: Vec<i64>,
 }
 
 impl Local {
@@ -44,7 +46,18 @@ impl Local {
             now,
             key_first_seen,
             versions: store.plugin_version_history(plugin_id)?,
+            expected_key_repositories: store
+                .plugin_repositories()?
+                .into_iter()
+                .filter(|repository| repository.expected_key_matched)
+                .map(|repository| repository.id)
+                .collect(),
         })
+    }
+
+    fn expected_key_matched(&self, source: &Source) -> bool {
+        matches!(source, Source::Repo { repository_id }
+            if self.expected_key_repositories.contains(repository_id))
     }
 
     /// Whole days this device has known `key`; `None` when it never saw it. The `key_age`
@@ -162,7 +175,7 @@ pub fn from_listing(
         licence: licence_of(plugin.license.as_deref()),
         reproducible: version.reproducible.unwrap_or(false),
         key_age_days,
-        expected_key_matched: false,
+        expected_key_matched: local.expected_key_matched(source),
         history: Version::parse(&version.version)
             .ok()
             .and_then(|v| local.history(&v, &plugin.versions)),
@@ -199,7 +212,7 @@ pub fn from_package(
         licence: licence_of(Some(&manifest.license)),
         reproducible: listed_version.and_then(|v| v.reproducible).unwrap_or(false),
         key_age_days: local.key_age_days(author_key),
-        expected_key_matched: false,
+        expected_key_matched: local.expected_key_matched(source),
         history: local.history(
             &manifest.version,
             plugin.map_or(&[][..], |p| p.versions.as_slice()),
@@ -261,6 +274,7 @@ mod tests {
                 .map(|(k, day)| ((*k).to_owned(), day * DAY_MILLIS))
                 .collect(),
             versions,
+            expected_key_repositories: Vec::new(),
         }
     }
 
@@ -459,5 +473,34 @@ mod tests {
         assert_eq!(loaded.key_age_days(KEY), Some(390));
         assert_eq!(loaded.key_age_days(OTHER), None);
         assert_eq!(loaded.versions.len(), 1);
+    }
+
+    #[test]
+    fn expected_key_match_is_read_per_repository() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let store = Store::open(dir.path()).expect("store");
+        let new = |n: u8| mumcord_store::NewPluginRepository {
+            url: format!("https://r{n}.example.org/"),
+            name: format!("Repo {n}"),
+            public_key: "key".into(),
+        };
+        let keyed = store.add_plugin_repository(&new(1), 5).expect("add");
+        let plain = store.add_plugin_repository(&new(2), 5).expect("add");
+        store
+            .set_plugin_repository_expected_key_matched(keyed, true)
+            .expect("set");
+        let local = Local::load(&store, "p", &[], NOW).expect("load");
+        let p = plugin(json!({}), vec![version("1.0.0", &[])]);
+        let facts = |id| {
+            from_listing(
+                &Source::Repo { repository_id: id },
+                &p,
+                &p.versions[0],
+                &local,
+            )
+        };
+        assert!(facts(keyed).expected_key_matched);
+        assert!(!facts(plain).expected_key_matched);
+        assert!(!from_listing(&Source::Dev, &p, &p.versions[0], &local).expected_key_matched);
     }
 }

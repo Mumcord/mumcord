@@ -419,6 +419,11 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (plugin_id, version)
     );
     ",
+    // v26: whether the "Expected key" entered when a repository was added matched the pinned
+    // key (FR-6.74), for the security score's trust factor. Existing repositories default to 0.
+    r"
+    ALTER TABLE plugin_repository ADD COLUMN expected_key_matched INTEGER NOT NULL DEFAULT 0;
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -742,12 +747,20 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
     }
 
+    /// The repository "Expected key" flag (v26) defaults to false for existing rows.
+    #[test]
+    fn expected_key_migration_defaults_to_false() {
+        assert!(MIGRATIONS.len() >= 26);
+        assert!(MIGRATIONS[25].contains("expected_key_matched"));
+        assert!(MIGRATIONS[25].contains("DEFAULT 0"));
+    }
+
     /// The plugin trust tables (v25) come right after the file-card table (v24).
     #[test]
     fn plugin_trust_migration_creates_its_five_tables() {
         assert!(MIGRATIONS.len() >= 25);
         assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
-        let sql = MIGRATIONS.last().expect("migration");
+        let sql = MIGRATIONS[24];
         for table in [
             "plugin_origin_approval",
             "plugin_origin_counters",
