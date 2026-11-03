@@ -35,16 +35,16 @@ A broadcast link binds with `{"v":1,"t":"bind","tok":"…","role":"pub"|"sub"}` 
 
 After `ready`, every unit on the link starts with a 14-byte clear header; integers are big-endian:
 
-| Offset | Size | Field                                                                                                           |
-| ------ | ---- | --------------------------------------------------------------------------------------------------------------- |
-| 0      | 1    | Version, `1`                                                                                                    |
-| 1      | 1    | Kind: `1` video, `2` audio, `3` control, `4` plugin data                                                        |
-| 2      | 1    | Flags: bit 0 keyframe (video only); all other bits zero                                                         |
-| 3      | 1    | Temporal layer `0`–`3` (video only; `0` otherwise)                                                              |
+| Offset | Size | Field                                                                                                                      |
+| ------ | ---- | -------------------------------------------------------------------------------------------------------------------------- |
+| 0      | 1    | Version, `1`                                                                                                               |
+| 1      | 1    | Kind: `1` video, `2` audio, `3` control, `4` plugin data                                                                   |
+| 2      | 1    | Flags: bit 0 keyframe (video only); all other bits zero                                                                    |
+| 3      | 1    | Temporal layer `0`–`3` (video only; `0` otherwise)                                                                         |
 | 4      | 1    | Video: codec `1` VP9, `2` AV1. Audio: `3` Opus. Control: type `1` keyreq, `2` key, `3` kf, `4` layers, `5` gone. Data: `0` |
-| 5      | 1    | Key id of the share key (`0` for control)                                                                       |
-| 6      | 4    | Sequence: counter of the publisher's media units, video and audio share one counter (`0` for control)           |
-| 10     | 4    | Payload size in bytes                                                                                           |
+| 5      | 1    | Key id of the share key (`0` for control)                                                                                  |
+| 6      | 4    | Sequence: counter of the publisher's media units, video and audio share one counter (`0` for control)                      |
+| 10     | 4    | Payload size in bytes                                                                                                      |
 
 Payload sizes: video 1 to 4 MiB + 64, audio 1 to 4 KiB + 64, plugin data 1 to 64 KiB + 64 (media and plugin data payloads are end-to-end encrypted and opaque to the relay). Control payloads:
 
