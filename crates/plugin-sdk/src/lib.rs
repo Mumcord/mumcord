@@ -66,9 +66,9 @@ use std::fmt;
 pub mod bindings {
     wit_bindgen::generate!({
         world: "plugin",
-        // A copy of the canonical WIT in crates/plugins/wit, so the published crate is
+        // A copy of the canonical WIT in crates/plugins/wit/1.0.0, so the published crate is
         // self-contained; tests/wit_copy.rs keeps the two identical.
-        path: "wit",
+        path: "wit/1.0.0",
         pub_export_macro: true,
         default_bindings_module: "mumcord_plugin_sdk::bindings",
     });

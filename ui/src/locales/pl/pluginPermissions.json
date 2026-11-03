@@ -27,7 +27,13 @@
     "chatPatterns": "Rozpoznawać określone wiadomości na czacie, np. wklejone konfiguracje z gier",
     "netHttp": "Łączyć się z wybranym przez Ciebie serwerem",
     "secrets": "Przechowywać sekret (np. klucz API) w systemowym pęku kluczy",
-    "uiWebview": "Pokazywać własną treść internetową w izolowanej ramce (bez internetu)"
+    "uiWebview": "Pokazywać własną treść internetową w izolowanej ramce (bez internetu)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Mały panel tej wtyczki pojawia się na pasku wtyczek.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Otrzymuje tylko wiadomości czatu na Twoim kanale, które zaczynają się tak, jak zadeklarowała, np. wklejoną konfigurację z gry. Żaden inny tekst czatu do niej nie trafia.",
     "netHttp": "Może rozmawiać z jednym wybranym przez Ciebie serwerem i tylko z nim.",
     "secrets": "Może przechowywać sekret, na przykład klucz API, w systemowym schowku kluczy.",
-    "uiWebview": "Może pokazywać własną treść internetową w izolowanej ramce bez dostępu do internetu."
+    "uiWebview": "Może pokazywać własną treść internetową w izolowanej ramce bez dostępu do internetu.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Uprawnienia"
 }

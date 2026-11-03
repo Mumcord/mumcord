@@ -1,14 +1,14 @@
 //! Version rules (#269): when a plugin may load on this host, and when an update is offered.
 //!
-//! The host API is the WIT package `mumcord:plugin@MAJOR.MINOR.PATCH` in `wit/`. A minor version
-//! only adds (functions, events, components, permissions); a major version breaks. A plugin asks
+//! The host API is the WIT package `mumcord:plugin@MAJOR.MINOR.PATCH` in `wit/<version>/`. A
+//! minor version only adds (functions, events, components, permissions); a major version breaks. A plugin asks
 //! for a caret range such as `^1.3`, which loads on API 1.3 or any newer 1.x.
 
 use semver::{Version, VersionReq};
 
 use crate::manifest::Manifest;
 
-/// The host API this build implements. Must match the version in `wit/world.wit`.
+/// The host API this build implements. Must match the version in `wit/1.0.0/world.wit`.
 pub const API_VERSION: Version = Version::new(1, 0, 0);
 
 /// Why a plugin cannot run on this Mumcord.
@@ -115,7 +115,7 @@ mod tests {
 
     #[test]
     fn wit_package_matches_the_api_version() {
-        let world = include_str!("../wit/world.wit");
+        let world = include_str!("../wit/1.0.0/world.wit");
         assert!(world.contains(&format!("package mumcord:plugin@{API_VERSION};")));
     }
 

@@ -1,0 +1,15 @@
+{
+  "manifest": 1,
+  "id": "test-api10",
+  "name": "Fixture API 1.0",
+  "description": "E2E test plugin built with the 0.6.2 SDK; checks that 1.0 plugins keep working on 1.1.",
+  "version": "1.0.0",
+  "api": "^1.0",
+  "authors": ["Mumcord test fixtures"],
+  "license": "MIT",
+  "categories": ["tools"],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel"]
+  }
+}

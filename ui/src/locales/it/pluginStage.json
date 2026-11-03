@@ -1,0 +1,49 @@
+{
+  "mediaLabel": "Media area: {{plugin}}",
+  "tabsLabel": "What the media area shows",
+  "tab": "{{plugin}} · Plugin",
+  "tabLabel": "{{plugin}}, plugin activity, tab {{index}} of {{count}}",
+  "tabsHint": "Switching never stops anything · Alt+1 / Alt+2",
+  "tabsHintMany": "Switching never stops anything · Alt+1 … Alt+{{count}}",
+  "chipPlugin": "Plugin",
+  "unofficial": "Unofficial",
+  "unofficialRepository": "Unofficial · {{repository}}",
+  "official": "Official",
+  "startedBy": "Started by {{name}} · {{count}} in the game",
+  "startedByYou": "Started by you · {{count}} in the game",
+  "pluginBy": "plugin by {{author}}",
+  "connection": {
+    "relay": "Relay · end-to-end encrypted",
+    "mumble": "Mumble connection · slower"
+  },
+  "controlsLabel": "{{plugin}} controls",
+  "popOut": "Pop out",
+  "fullScreen": "Full screen",
+  "leave": "Leave {{plugin}}",
+  "join": "Join",
+  "activityLine": "{{name}} started {{plugin}} · Join",
+  "noRelayTitle": "No relay for plugin data on this server.",
+  "noRelayText": "{{server}}'s relay doesn't allow plugin data, so {{plugin}} uses the slower Mumble connection: moves can take a moment and big boards are off.",
+  "tooMany": "Too many activities in this channel",
+  "full": "This activity is full",
+  "fullScreenBanner": "{{plugin}} is full screen · Esc to exit",
+  "frame": {
+    "tag": "Plugin content · {{plugin}}",
+    "tagUnofficial": "Plugin content · {{plugin}} · Unofficial",
+    "label": "{{plugin}} content",
+    "stopped": "{{plugin}} stopped responding",
+    "reload": "Reload",
+    "mute": "Mute sounds from {{plugin}}",
+    "unmute": "Unmute sounds from {{plugin}}"
+  },
+  "sidePanel": {
+    "label": "{{plugin}} side panel",
+    "options": "{{plugin}} options",
+    "close": "Close {{plugin}} side panel",
+    "resize": "Resize the {{plugin}} side panel"
+  },
+  "dialog": {
+    "close": "Close {{plugin}}",
+    "footer": "Content inside the frame comes from the plugin. Mumcord never asks for passwords there. Esc closes."
+  }
+}

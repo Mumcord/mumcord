@@ -27,7 +27,13 @@
     "chatPatterns": "Tuvastada teatud vestlussõnumeid, nt kleebitud mänguvarustusi",
     "netHttp": "Suhelda sinu valitud serveriga",
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
-    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)"
+    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Selle plugina väike paneel ilmub pluginate ribale.",
@@ -50,7 +56,13 @@
     "chatPatterns": "See saab ainult sinu kanali vestlussõnumeid, mis algavad nii, nagu see on määranud, näiteks kleebitud mänguvarustuse. Muu vestlustekst selleni ei jõua.",
     "netHttp": "See võib suhelda ühe sinu valitud serveriga ja ainult sellega.",
     "secrets": "See võib hoida saladust, näiteks API võtit, süsteemi võtmehoidjas.",
-    "uiWebview": "See võib näidata oma veebisisu suletud raamis ilma internetiühenduseta."
+    "uiWebview": "See võib näidata oma veebisisu suletud raamis ilma internetiühenduseta.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Õigused"
 }

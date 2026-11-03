@@ -74,7 +74,7 @@ The client only displays relay availability; the relay and bot decide who may cr
 ### 4.2 API versions and backwards compatibility (#396)
 
 - **FR-9.5** Mumcord knows the API minors it supports: 0.7.0 supports `1.0` and `1.1`. Every later 1.x client supports all earlier 1.x minors unchanged.
-- **FR-9.6** The manifest field `api` (caret range, FR-6.11) states the minor a package is built against through its lower bound: `"^1.1"` means API 1.1. `"^1"` and `"^1.0"` mean 1.0. `mumcord-plugin build` and the SDK fill `api` from the SDK feature used; the author never types it.
+- **FR-9.6** The manifest field `api` (caret range, FR-6.11) states the minor a package is built against through its lower bound: `"^1.1"` means API 1.1. `"^1.0"` means 1.0; `"^1"` is invalid because `^MAJOR.MINOR` is required. `mumcord-plugin build` and the SDK fill `api` from the SDK feature used; the author never types it.
 - **FR-9.7** **Minors only add.** A minor may add interfaces, functions, events, error cases, manifest fields and permissions. It never changes or removes existing ones. The frozen WIT of every published minor lives in the repo as a snapshot (`wit-1.0.0.snapshot`, `wit-1.1.0.snapshot`); a test fails if a published snapshot changes.
 - **FR-9.8** The host links each plugin against exactly the WIT minor it declares. A 1.0 plugin never sees 1.1 imports, never receives 1.1 events, and behaves as on 0.6.x; the host converts trees and events for it.
 - **FR-9.9** A new capability is off for old plugins: a 1.0 plugin can never hold a 1.1 permission; a plugin gains one only through a new version and the user's approval (FR-9.83).

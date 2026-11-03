@@ -1,0 +1,4 @@
+{
+  "manifest.description": "E2E test plugin built with the 0.6.2 SDK; checks that 1.0 plugins keep working on 1.1.",
+  "manifest.name": "Fixture API 1.0"
+}
