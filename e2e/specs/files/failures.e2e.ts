@@ -10,13 +10,14 @@
 //   AC-7.14 Stop sharing → B's card "This share ended"; A offline → "Alice went offline"; after A
 //           is back the old share stays unavailable.
 //   AC-7.15 the fileExpirySeconds hook (60 s) → B's card says the share ended.
-//   F3a (e) a sender that stops sending (process paused) → "The transfer stalled" after 30 s.
+//   F3a (e) a sender that stops sending (relay data paused) → "The transfer stalled" after 30 s.
 //
 // Skips itself without a mumpeer checkout.
 import { appendFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { app, apps, relayenv } from "../../helpers/index.ts";
+import { runOk } from "../../helpers/run.ts";
 import { trustIfAsked } from "../../helpers/chat-ui.ts";
 import * as files from "../../helpers/files-ui.ts";
 import { addAndConnect, completeWizard, personRow, waitConnected } from "../../helpers/voice-ui.ts";
@@ -149,15 +150,18 @@ function bFolder(): string[] {
   });
 
   it("F3a (e): a sender that stops sending gives 'The transfer stalled' after 30 s", async () => {
-    const pid = app.appPid("a");
+    // Pausing the relay container stops the data but keeps both Mumble sessions alive. Pausing
+    // Alice's process instead let the server drop her (its 30 s ping timeout) at about the same
+    // moment as the 30 s stall timeout, so the card sometimes said "went offline".
+    const container = `${process.env.MUMPEER_PROJECT ?? "mumpeer-testenv"}-mumpeer-1`;
     await apps.onB(async () => {
       await files.download("movie.dat");
       await files.waitCardText("movie.dat", "% ·", 60_000);
-      process.kill(pid, "SIGSTOP");
+      await runOk("docker", ["pause", container]);
       try {
         await files.waitCardText("movie.dat", "The transfer stalled", 90_000);
       } finally {
-        process.kill(pid, "SIGCONT");
+        await runOk("docker", ["unpause", container]);
       }
     });
     await browser.waitUntil(() => bFolder().length === 0, { timeout: 10_000 });
