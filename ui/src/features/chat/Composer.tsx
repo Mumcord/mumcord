@@ -41,6 +41,8 @@ import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
 import { useComposer } from "./useComposer";
 import { FileChipTray } from "../files/composer/FileChipTray";
+import { DropChoice } from "../files/composer/DropChoice";
+import { splitDropped } from "../files/composer/dropSplit";
 import { FileDropOverlay } from "../files/composer/FileDropOverlay";
 import { PaperclipButton } from "../files/composer/PaperclipButton";
 import { unavailableText } from "../files/composer/unavailableText";
@@ -224,13 +226,20 @@ export function Composer({
   useLayoutEffect(() => {
     setChatHost(formRef.current?.closest<HTMLElement>(".chat") ?? null);
   }, []);
+  const [pendingDrop, setPendingDrop] = useState<readonly string[] | null>(null);
   const dropOver = useFileDrop({
     host: chatHost,
     accept: shareDrops,
     rejectOutside: target?.kind === "private" && !disabled,
     exclude: shareDrops ? null : formRef,
     onPaths: (paths) => {
-      void fileChips.addPaths(paths);
+      const { images, others } = splitDropped(paths);
+      // Images may mean an inline picture or a file to share: ask. Anything else is a file.
+      if (images.length > 0) {
+        setPendingDrop(paths);
+        return;
+      }
+      void fileChips.addPaths(others);
     },
     onRejected: () => {
       fileChips.fail(tFiles("composer.privateChat"));
@@ -616,6 +625,26 @@ export function Composer({
         <p id={hintId} className="visually-hidden">
           {t("composer.hint")}
         </p>
+        {pendingDrop !== null ? (
+          <DropChoice
+            onImage={() => {
+              const { images, others } = splitDropped(pendingDrop);
+              setPendingDrop(null);
+              void composer.addDroppedPaths(images);
+              if (others.length > 0) void fileChips.addPaths(others);
+              input.current?.focus();
+            }}
+            onFile={() => {
+              setPendingDrop(null);
+              void fileChips.addPaths(pendingDrop);
+              input.current?.focus();
+            }}
+            onCancel={() => {
+              setPendingDrop(null);
+              input.current?.focus();
+            }}
+          />
+        ) : null}
         {dropOver && chatHost !== null ? (
           <FileDropOverlay host={chatHost} channel={hereName} />
         ) : null}

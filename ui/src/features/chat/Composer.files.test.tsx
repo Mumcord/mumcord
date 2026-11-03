@@ -164,4 +164,62 @@ describe("Composer file sharing", () => {
       expect(send).toHaveBeenCalledWith(expect.any(Number), 1, [1]);
     });
   });
+
+  describe("dropping images", () => {
+    it("shares non-image files at once without asking", async () => {
+      const add = vi.spyOn(api, "filesChipAdd").mockResolvedValue(chip(1));
+      setup(CHANNEL);
+      emit({ type: "drop", paths: ["/tmp/a.pdf"], position: at(100, 100) });
+      await waitFor(() => {
+        expect(add).toHaveBeenCalledWith("/tmp/a.pdf");
+      });
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    it("asks for images and shares them as files on request", async () => {
+      const add = vi
+        .spyOn(api, "filesChipAdd")
+        .mockImplementation((p) => Promise.resolve(chip(p.length)));
+      const read = vi.spyOn(api, "readDroppedImage");
+      setup(CHANNEL);
+      emit({ type: "drop", paths: ["/tmp/cat.png"], position: at(100, 750) });
+      const dialog = await screen.findByRole("dialog");
+      expect(dialog.textContent).toContain("Send as image");
+      fireEvent.click(screen.getByRole("button", { name: "Share as file" }));
+      await waitFor(() => {
+        expect(add).toHaveBeenCalledWith("/tmp/cat.png");
+      });
+      expect(read).not.toHaveBeenCalled();
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    it("sends images inline on request and shares the rest of a mixed drop", async () => {
+      const add = vi.spyOn(api, "filesChipAdd").mockResolvedValue(chip(1));
+      const read = vi
+        .spyOn(api, "readDroppedImage")
+        .mockResolvedValue({ name: "cat.png", mime: "image/png", data: btoa("x") });
+      setup(CHANNEL);
+      emit({ type: "drop", paths: ["/tmp/cat.png", "/tmp/a.pdf"], position: at(100, 100) });
+      const inline = await screen.findByRole("button", { name: "Send as image" });
+      expect(document.activeElement).toBe(inline);
+      fireEvent.click(inline);
+      await waitFor(() => {
+        expect(read).toHaveBeenCalledWith("/tmp/cat.png");
+        expect(add).toHaveBeenCalledWith("/tmp/a.pdf");
+      });
+      expect(add).not.toHaveBeenCalledWith("/tmp/cat.png");
+    });
+
+    it("does nothing when cancelled with Escape", async () => {
+      const add = vi.spyOn(api, "filesChipAdd");
+      const read = vi.spyOn(api, "readDroppedImage");
+      setup(CHANNEL);
+      emit({ type: "drop", paths: ["/tmp/cat.png"], position: at(100, 100) });
+      await screen.findByRole("dialog");
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(add).not.toHaveBeenCalled();
+      expect(read).not.toHaveBeenCalled();
+    });
+  });
 });
