@@ -27,7 +27,13 @@
     "chatPatterns": "Atpazīt noteiktas tērzēšanas ziņas, piem., ielīmētas spēles konfigurācijas",
     "netHttp": "Sazināties ar jūsu izvēlētu serveri",
     "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
-    "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)"
+    "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Neliels šī spraudņa panelis parādās spraudņu joslā.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Tas saņem tikai jūsu kanāla tērzēšanas ziņas, kas sākas tā, kā tas norādījis, piemēram, ielīmētu spēles konfigurāciju. Neviens cits tērzēšanas teksts to nesasniedz.",
     "netHttp": "Tas var sazināties ar vienu jūsu izvēlētu serveri un tikai ar to.",
     "secrets": "Tas var glabāt noslēpumu, piemēram, API atslēgu, sistēmas atslēgu saišķī.",
-    "uiWebview": "Tas var rādīt savu tīmekļa saturu slēgtā rāmī bez piekļuves internetam."
+    "uiWebview": "Tas var rādīt savu tīmekļa saturu slēgtā rāmī bez piekļuves internetam.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Atļaujas"
 }
