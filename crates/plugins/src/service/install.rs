@@ -6,7 +6,7 @@ use mumcord_store::{PluginRecord, PluginVisibility};
 use tokio::sync::mpsc::UnboundedSender;
 
 use super::{Origin, PluginService, ServiceError, ServiceEvent, allowed_grants, now_millis};
-use crate::manifest::Source;
+use crate::manifest::{Manifest, Source};
 use crate::registry::{Client, Download};
 use crate::verify::{IndexEntry, verify_package};
 
@@ -167,6 +167,7 @@ impl PluginService {
             request.source,
         )?;
         let manifest = &verified.package.manifest;
+        self.refuse_unrunnable(manifest)?;
         let version = manifest.version.to_string();
         let granted = allowed_grants(
             manifest,
@@ -220,6 +221,15 @@ impl PluginService {
         }
         self.default_badge(id)?;
         Ok(())
+    }
+
+    /// FR-9.17: refuses a package this Mumcord cannot run. Runs on the opened package, before
+    /// anything is written to disk.
+    pub(super) fn refuse_unrunnable(&self, manifest: &Manifest) -> Result<(), ServiceError> {
+        match crate::version::refusal(manifest, self.host.app_version()) {
+            Some(text) => Err(ServiceError::Incompatible(text)),
+            None => Ok(()),
+        }
     }
 
     /// Takes back a failed install: stops and forgets the plugin, deletes its files and puts

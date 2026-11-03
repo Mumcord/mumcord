@@ -8,16 +8,18 @@ use std::sync::Arc;
 use base64::Engine as _;
 use mumcord_engine::Engine;
 use mumcord_engine::store::PluginVisibility;
+use mumcord_plugins::Incompatibility;
 use mumcord_plugins::manifest::Visibility as ManifestVisibility;
 use mumcord_plugins::registry::{
-    Client, Freshness, Index, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, OFFLINE_TEXT,
-    UrlPolicy, fetch_official, official_base,
+    Choice, Client, Freshness, Index, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES,
+    OFFLINE_TEXT, UrlPolicy, fetch_official, official_base,
 };
 use mumcord_plugins::service::{
     Approval, CommandOutcome, InstallRequest, InstallStage, PeerInfo, PluginInfo, PluginService,
     ServiceError, ServiceEvent, Status, StoredLine, UiInput, fetch, load_repository,
 };
 use mumcord_plugins::verify::verify_package;
+use mumcord_plugins::version::{Release, needs_mumcord_text};
 use mumcord_plugins::wit::events::{ActionSource, ActionValue};
 use mumcord_plugins::wit::theme::Mode;
 use mumcord_plugins::{Level, Manifest, Source};
@@ -305,8 +307,14 @@ pub struct IndexedPlugin {
 }
 
 impl IndexedPlugin {
-    fn new(p: &IndexPlugin, source: IndexSource, language: &str) -> Self {
-        let latest = p.latest();
+    /// `None` for a plugin built for an API this Mumcord does not know: it is not listed
+    /// (FR-9.16). One that needs a newer Mumcord is listed with its newest version.
+    fn new(p: &IndexPlugin, source: IndexSource, language: &str) -> Option<Self> {
+        let latest = match p.choose(&crate::plugins::app_version()) {
+            Choice::Runnable(version) => version,
+            Choice::NeedsMumcord(_) => p.latest(),
+            Choice::Unsupported => return None,
+        };
         let alt = |texts: &std::collections::BTreeMap<String, String>| {
             texts
                 .get(language)
@@ -314,7 +322,7 @@ impl IndexedPlugin {
                 .cloned()
                 .unwrap_or_default()
         };
-        Self {
+        Some(Self {
             id: p.id.clone(),
             source,
             name: p.name(language).to_owned(),
@@ -345,7 +353,7 @@ impl IndexedPlugin {
             version: latest.version.clone(),
             size: latest.size as f64,
             permissions: latest.permissions.clone(),
-        }
+        })
     }
 }
 
@@ -541,12 +549,12 @@ pub async fn plugins_index(
         .index
         .plugins
         .iter()
-        .map(|p| IndexedPlugin::new(p, IndexSource::Official, &language))
+        .filter_map(|p| IndexedPlugin::new(p, IndexSource::Official, &language))
         .collect();
     listed.extend(
         repo_plugins(Some(&loaded.index), &repo_indexes)
             .into_iter()
-            .map(|(repo, p)| {
+            .filter_map(|(repo, p)| {
                 let source = IndexSource::Repo {
                     repository_id: u32::try_from(repo.repository_id).unwrap_or(u32::MAX),
                     name: repo.name.clone(),
@@ -627,6 +635,23 @@ pub enum PluginIndexImage {
     Screenshot { index: u32 },
 }
 
+fn refused(text: &str) -> ApiError {
+    ApiError::new(ErrorCode::InvalidInput, text)
+}
+
+/// FR-9.17: why the index version `chosen` cannot run on this Mumcord, if it cannot.
+fn refusal_of(
+    plugin: &IndexPlugin,
+    chosen: &mumcord_plugins::registry::IndexVersion,
+) -> Option<String> {
+    let here = Release::of(&crate::plugins::app_version());
+    match plugin.required_release(chosen) {
+        Some(required) if required <= here => None,
+        Some(required) => Some(needs_mumcord_text(required)),
+        None => Some(Incompatibility::NeedsNewerMumcord.to_string()),
+    }
+}
+
 /// The source, latest version's index entry, download URL and size of a plugin in the loaded
 /// lists.
 fn indexed_latest(
@@ -634,12 +659,18 @@ fn indexed_latest(
     id: &str,
 ) -> ApiResult<(Source, mumcord_plugins::verify::IndexEntry, String, u64)> {
     let (source, plugin) = find_indexed(plugins, id)?;
-    let latest = plugin.latest();
+    let chosen = match plugin.choose(&crate::plugins::app_version()) {
+        Choice::Runnable(version) => version,
+        Choice::NeedsMumcord(release) => return Err(refused(&needs_mumcord_text(release))),
+        Choice::Unsupported => {
+            return Err(refused(&Incompatibility::NeedsNewerMumcord.to_string()));
+        }
+    };
     Ok((
         source,
-        plugin.entry(latest),
-        latest.url.clone(),
-        latest.size,
+        plugin.entry(chosen),
+        chosen.url.clone(),
+        chosen.size,
     ))
 }
 
@@ -770,8 +801,19 @@ pub async fn plugin_install(
             Some(v) => plugin
                 .version(v)
                 .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "version not in the list"))?,
-            None => plugin.latest(),
+            None => match plugin.choose(&crate::plugins::app_version()) {
+                Choice::Runnable(version) => version,
+                Choice::NeedsMumcord(release) => {
+                    return Err(refused(&needs_mumcord_text(release)));
+                }
+                Choice::Unsupported => {
+                    return Err(refused(&Incompatibility::NeedsNewerMumcord.to_string()));
+                }
+            },
         };
+        if let Some(text) = refusal_of(&plugin, chosen) {
+            return Err(refused(&text));
+        }
         (
             source,
             plugin.entry(chosen),
@@ -877,6 +919,9 @@ pub struct PluginUpdate {
     pub approval: Option<PluginUpdateApproval>,
     /// This version was installed, failed to start and was rolled back: the reason.
     pub failed: Option<String>,
+    /// FR-9.18: set (e.g. "0.8.0") when the newest version needs a newer Mumcord. The plugin
+    /// stays on its version; show "Update available after updating Mumcord" and no install.
+    pub needs_mumcord: Option<String>,
 }
 
 /// The updates waiting for the user.
@@ -909,6 +954,7 @@ pub async fn plugin_updates(app: AppHandle) -> ApiResult<Vec<PluginUpdate>> {
                         Approval::NewAuthorKey => PluginUpdateApproval::NewAuthorKey,
                     }),
                     failed: u.failed,
+                    needs_mumcord: u.needs_mumcord.map(|r| r.to_string()),
                 })
                 .collect())
         })

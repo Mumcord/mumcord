@@ -252,6 +252,9 @@ pub enum ServiceError {
     /// Updates tab (FR-6.67).
     #[error("This update needs your approval")]
     NeedsApproval,
+    /// FR-9.17: the package needs a newer Mumcord (or is for an older one); nothing was written.
+    #[error("{0}")]
+    Incompatible(String),
     #[error("Mumcord turned this plugin off: {0}")]
     Revoked(String),
 }

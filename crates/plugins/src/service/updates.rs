@@ -34,6 +34,7 @@ use crate::registry::{
     fetch_repository, fetch_revoked, normalize_key, official_base,
 };
 use crate::verify::{IndexEntry, verify_package};
+use crate::version::{Release, needs_mumcord_text};
 
 /// How often updates are looked for while Mumcord runs (FR-6.66).
 pub const UPDATE_INTERVAL_MS: UnixMillis = 6 * 60 * 60 * 1000;
@@ -72,6 +73,10 @@ pub struct UpdateInfo {
     pub approval: Option<Approval>,
     /// This version was installed, failed to start and was rolled back: the reason.
     pub failed: Option<String>,
+    /// FR-9.18: the newest version needs this Mumcord release or later, so the plugin stays on
+    /// its version. The update cannot be installed and is never announced; the Updates tab shows
+    /// "Update available after updating Mumcord".
+    pub needs_mumcord: Option<Release>,
 }
 
 /// What the service remembers about updates while it runs.
@@ -382,7 +387,9 @@ impl PluginService {
         }
         let automatic: Vec<UpdateInfo> = available
             .values()
-            .filter(|u| mode == PluginUpdates::Auto && u.failed.is_none())
+            .filter(|u| {
+                mode == PluginUpdates::Auto && u.failed.is_none() && u.needs_mumcord.is_none()
+            })
             .filter(|u| match &u.approval {
                 None => true,
                 // Maybe only new optional permissions: the package's manifest decides.
@@ -397,7 +404,10 @@ impl PluginService {
             .collect();
         for update in available.values() {
             let key = (update.id.clone(), update.to.clone());
-            if !automatic.iter().any(|a| a.id == update.id) && self.updates.notified.insert(key) {
+            if update.needs_mumcord.is_none()
+                && !automatic.iter().any(|a| a.id == update.id)
+                && self.updates.notified.insert(key)
+            {
                 self.emit(ServiceEvent::UpdateAvailable {
                     id: update.id.clone(),
                     name: update.name.clone(),
@@ -425,15 +435,35 @@ impl PluginService {
             .filter(|(parsed, _)| *parsed > installed)
             .collect();
         newer.sort_by(|a, b| b.0.cmp(&a.0));
-        let (_, version) = newer.into_iter().find(|(_, v)| {
+        let here = Release::of(self.host.app_version());
+        // FR-9.18: the newest version this Mumcord can run. If there is none, the newest one
+        // that a later Mumcord could run is shown as a hold; an unknown API is not offered.
+        let mut held_back = None;
+        let mut runnable = None;
+        for (_, v) in newer {
             let sha256 = plugin.entry(v).digest.sha256_hex();
-            !self.is_revoked(
+            if self.is_revoked(
                 &record.id,
                 &v.version,
                 &sha256,
                 record.author_key.as_deref(),
-            )
-        })?;
+            ) {
+                continue;
+            }
+            let Some(required) = plugin.required_release(v) else {
+                continue;
+            };
+            if required <= here {
+                runnable = Some(v);
+                break;
+            }
+            held_back.get_or_insert((v, required));
+        }
+        let (version, needs_mumcord) = match (runnable, held_back) {
+            (Some(v), _) => (v, None),
+            (None, Some((v, required))) => (v, Some(required)),
+            (None, None) => return None,
+        };
 
         let has = |permission: &str| match self.host.manifest(&record.id) {
             Some(manifest) => manifest.has_permission(permission),
@@ -482,6 +512,7 @@ impl PluginService {
             size: version.size,
             approval,
             failed,
+            needs_mumcord,
         })
     }
 
@@ -513,7 +544,10 @@ impl PluginService {
             .get(id)
             .cloned()
             .ok_or_else(|| ServiceError::NoUpdate(id.to_owned()))?;
-        let result = self.update_inner(&update, download, approved);
+        let result = match update.needs_mumcord {
+            Some(release) => Err(ServiceError::Incompatible(needs_mumcord_text(release))),
+            None => self.update_inner(&update, download, approved),
+        };
         let stage = match &result {
             Ok(()) => InstallStage::Done,
             Err(error) => InstallStage::Failed {
@@ -547,6 +581,7 @@ impl PluginService {
             update.source,
         )?;
         let manifest = &verified.package.manifest;
+        self.refuse_unrunnable(manifest)?;
         let granted = match approved {
             Some(optional) => allowed_grants(
                 manifest,

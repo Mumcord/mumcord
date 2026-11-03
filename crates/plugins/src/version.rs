@@ -177,6 +177,30 @@ pub fn check_compatibility(
     }
 }
 
+/// FR-9.17: the user-facing reason a package cannot be installed on this Mumcord, `None` if it
+/// can run. Names the lowest release that would run it when that is known.
+pub fn refusal(manifest: &Manifest, app_version: &Version) -> Option<String> {
+    match check_compatibility(manifest, app_version) {
+        Ok(()) => None,
+        Err(Incompatibility::TooOld) => Some(Incompatibility::TooOld.to_string()),
+        Err(Incompatibility::NeedsNewerMumcord) => {
+            let from_api = first_release(api_of(manifest));
+            let from_range = manifest
+                .mumcord
+                .as_ref()
+                .and_then(lowest_bound)
+                .map(|low| Release {
+                    major: low.major,
+                    minor: low.minor,
+                });
+            Some(match from_api {
+                Some(api) => needs_mumcord_text(from_range.map_or(api, |range| api.max(range))),
+                None => Incompatibility::NeedsNewerMumcord.to_string(),
+            })
+        }
+    }
+}
+
 /// Whether this host links the API minor a plugin is built against.
 pub fn check_api(api: ApiMinor) -> Result<(), Incompatibility> {
     let newest = SUPPORTED[SUPPORTED.len() - 1];
@@ -277,6 +301,30 @@ mod tests {
             assert!(world.contains(&format!("package mumcord:plugin@{};", api.wit_version())));
         }
         assert_eq!(SUPPORTED.last().map(|a| a.wit_version()), Some(API_VERSION));
+    }
+
+    fn manifest_with(api: &str, mumcord: Option<&str>) -> Manifest {
+        let mumcord = mumcord.map_or(String::new(), |m| format!(r#""mumcord":"{m}","#));
+        let json = format!(
+            r#"{{"manifest":1,"id":"test-plugin","name":"T","version":"1.0.0","api":"{api}",{mumcord}
+            "authors":["A"],"description":"d","categories":["tools"],"license":"MIT",
+            "permissions":{{"required":["ui.panel"]}}}}"#
+        );
+        Manifest::parse(json.as_bytes()).expect("valid manifest")
+    }
+
+    #[test]
+    fn refusal_names_the_release_that_would_run_the_package() {
+        let app = v("0.7.0");
+        assert_eq!(refusal(&manifest_with("^1.1", None), &app), None);
+        assert_eq!(
+            refusal(&manifest_with("^1.0", Some(">=0.8.0")), &app).as_deref(),
+            Some("Needs Mumcord 0.8.0 or newer")
+        );
+        assert_eq!(
+            refusal(&manifest_with("^1.2", None), &app).as_deref(),
+            Some("Needs a newer Mumcord")
+        );
     }
 
     #[test]

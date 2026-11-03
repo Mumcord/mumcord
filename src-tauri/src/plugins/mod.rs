@@ -236,6 +236,12 @@ pub fn state(app: &AppHandle) -> ApiResult<Arc<Plugins>> {
 }
 
 /// Maps service errors; their texts are the user-facing ones of spec §5.7.
+/// The running Mumcord, to pick the plugin versions it can run (FR-9.16). Startup parses the
+/// same string and fails on it, so the fallback is never used; it would hide every plugin.
+pub fn app_version() -> semver::Version {
+    semver::Version::parse(env!("CARGO_PKG_VERSION")).unwrap_or(semver::Version::new(0, 0, 0))
+}
+
 pub fn service_error(error: ServiceError) -> ApiError {
     let code = match &error {
         ServiceError::NotInstalled(_) => ErrorCode::NotFound,

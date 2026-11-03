@@ -96,6 +96,8 @@ struct Release {
     permissions: Vec<String>,
     author: String,
     download: Download,
+    /// The release the index says this version needs (`min_mumcord`).
+    min_mumcord: Option<&'static str>,
 }
 
 impl Release {
@@ -116,6 +118,33 @@ impl Release {
             &component(start),
             extra,
         );
+        Self::signed(id, version, permissions, key, bytes)
+    }
+
+    /// A package whose manifest declares `"mumcord": range` (the app versions it runs on).
+    fn for_app(id: &str, version: &str, range: &str, key: &KeyPair) -> Self {
+        let manifest = manifest(id, version, PERMISSIONS).replacen(
+            '{',
+            &format!(r#"{{"mumcord":"{range}","#),
+            1,
+        );
+        let bytes = package(&manifest, &component(OK_START), &[]);
+        Self::signed(id, version, PERMISSIONS, key, bytes)
+    }
+
+    /// The index lists this version as needing `release` or later.
+    fn needing(mut self, release: &'static str) -> Self {
+        self.min_mumcord = Some(release);
+        self
+    }
+
+    fn signed(
+        id: &str,
+        version: &str,
+        permissions: &[&str],
+        key: &KeyPair,
+        bytes: Vec<u8>,
+    ) -> Self {
         let signature = minisign::sign(Some(&key.pk), &key.sk, &bytes[..], None, None)
             .expect("sign")
             .into_string();
@@ -125,6 +154,7 @@ impl Release {
             permissions: permissions.iter().map(|p| (*p).to_owned()).collect(),
             author: key.pk.to_base64(),
             download: Download { bytes, signature },
+            min_mumcord: None,
         }
     }
 
@@ -158,6 +188,10 @@ fn index(releases: &[&Release]) -> Vec<(Source, Index)> {
             "size": release.download.bytes.len(), "sha256": release.sha256(),
             "permissions": release.permissions,
         });
+        let mut version = version;
+        if let Some(min) = release.min_mumcord {
+            version["min_mumcord"] = json!(min);
+        }
         match plugins.iter_mut().find(|p| p["id"] == release.id) {
             Some(plugin) => {
                 plugin["versions"]
@@ -669,4 +703,78 @@ fn a_paused_repository_turns_off_only_its_own_plugins_and_keeps_their_data() {
         "other repositories are untouched"
     );
     assert_eq!(fx.kv("poll"), Some(b"v".to_vec()), "data is kept");
+}
+
+/// Every file and folder under `dir`, to prove an install wrote nothing.
+fn files_under(dir: &Path) -> Vec<std::path::PathBuf> {
+    let mut found = Vec::new();
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return found;
+    };
+    for entry in entries.flatten() {
+        found.push(entry.path());
+        found.extend(files_under(&entry.path()));
+    }
+    found
+}
+
+#[test]
+fn a_package_for_a_newer_mumcord_is_refused_before_anything_is_written() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let (mut service, _events) = fx.service();
+    let newer = Release::for_app("poll", "1.0.0", ">=0.8.0", &key);
+
+    let error = service
+        .install(&newer.request(&[]), &newer.download)
+        .expect_err("refused");
+    assert!(
+        matches!(&error, ServiceError::Incompatible(text) if text == "Needs Mumcord 0.8.0 or newer")
+    );
+    // The service keeps its own bookkeeping files there; the package must add nothing.
+    let written: Vec<_> = files_under(&fx.root.path().join("plugins"))
+        .into_iter()
+        .filter(|path| path.components().any(|c| c.as_os_str() == "poll"))
+        .collect();
+    assert!(written.is_empty(), "{written:?}");
+    assert!(service.list().expect("list").is_empty());
+}
+
+#[test]
+fn an_update_that_needs_a_newer_mumcord_waits_even_with_automatic_updates() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("poll", "1.0.0", OK_START, PERMISSIONS, &key);
+    let v2 = Release::new("poll", "2.0.0", OK_START, PERMISSIONS, &key).needing("0.8");
+    let (mut service, mut events) = installed(&fx, &v1);
+
+    let automatic = service
+        .plan_updates(&index(&[&v1, &v2]), PluginUpdates::Auto)
+        .expect("plan");
+    assert!(automatic.is_empty());
+    let updates = service.updates();
+    assert_eq!(updates.len(), 1);
+    assert_eq!(updates[0].to, "2.0.0");
+    assert_eq!(
+        updates[0].needs_mumcord.map(|r| r.to_string()).as_deref(),
+        Some("0.8.0")
+    );
+    assert!(
+        announced(&mut events).is_empty(),
+        "a held update is not announced"
+    );
+    assert!(matches!(
+        service.apply_update("poll", &v2.download, None),
+        Err(ServiceError::Incompatible(_))
+    ));
+    assert_eq!(info(&service, "poll").version, "1.0.0");
+
+    // A runnable version in between is chosen over the held one.
+    let v15 = Release::new("poll", "1.5.0", OK_START, PERMISSIONS, &key);
+    let automatic = service
+        .plan_updates(&index(&[&v1, &v15, &v2]), PluginUpdates::Auto)
+        .expect("plan");
+    assert_eq!(automatic.len(), 1);
+    assert_eq!(automatic[0].to, "1.5.0");
+    assert_eq!(automatic[0].needs_mumcord, None);
 }

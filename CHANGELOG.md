@@ -4,6 +4,7 @@
 
 ### Added
 
+- A plugin that needs a newer Mumcord is refused at install with "Needs Mumcord X.Y.0 or newer" and nothing is written to disk, and automatic updates never move a plugin to a version this Mumcord can't run; the update waits as "Update available after updating Mumcord".
 - The plugin SDK has a `1.1` feature that binds API 1.1 with typed wrappers for the stage, the Apps menu, the relay, sound effects, file save and picture import, posting an image to chat and the new webview places; 1.0 stays the default.
 - The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
