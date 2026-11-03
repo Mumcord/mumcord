@@ -1,4 +1,4 @@
-use std::ffi::{CStr, c_char, c_void};
+use std::ffi::{CStr, c_char, c_int, c_void};
 use std::ptr;
 use std::sync::{Mutex, Once, PoisonError};
 
@@ -57,6 +57,12 @@ impl<A, B, C, D, E> LastArgument for Option<unsafe extern "C" fn(A, B, C, D, E)>
     type Type = E;
 }
 
+unsafe extern "C" {
+    /// The C library's; declared here because MSVC's header only has an inline definition that
+    /// bindgen skips.
+    fn vsnprintf(buffer: *mut c_char, size: usize, format: *const c_char, args: VaList) -> c_int;
+}
+
 /// Receives every SVT-AV1 log line (on its worker threads too, never on the audio thread).
 unsafe extern "C" fn svt_log(
     _context: *mut c_void,
@@ -72,7 +78,7 @@ unsafe extern "C" fn svt_log(
     // SAFETY: SVT-AV1 passes a printf format with its matching arguments; vsnprintf truncates to
     // the buffer and always terminates it.
     let message = unsafe {
-        if ffi::vsnprintf(buffer.as_mut_ptr(), buffer.len() as _, format, args) < 0 {
+        if vsnprintf(buffer.as_mut_ptr(), buffer.len(), format, args) < 0 {
             return;
         }
         CStr::from_ptr(buffer.as_ptr()).to_string_lossy()

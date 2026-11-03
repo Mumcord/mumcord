@@ -96,17 +96,14 @@ fn main() {
     generate(
         &svt,
         bindgen::Builder::default()
-            // stdio.h for vsnprintf, which formats SVT-AV1's log messages (see av1_svt.rs).
-            .header_contents(
-                "svt.h",
-                "#include <stdio.h>\n#include <svt-av1/EbSvtAv1Enc.h>\n",
-            )
-            .allowlist_function("svt_av1_.*|vsnprintf")
+            .header_contents("svt.h", "#include <svt-av1/EbSvtAv1Enc.h>\n")
+            .allowlist_function("svt_av1_.*")
             .allowlist_type("Eb.*|SvtAv1.*|PrivDataType|PredStructure")
             .allowlist_var("EB_.*"),
         "svt.rs",
     );
-    // Modern MSVC defines vsnprintf inline in its headers; this library exports it as a function.
+    // av1_svt.rs formats SVT-AV1's log messages with vsnprintf, which modern MSVC only defines
+    // inline in its headers; this library exports it as a function.
     if env::var("CARGO_CFG_TARGET_ENV").is_ok_and(|env| env == "msvc") {
         println!("cargo:rustc-link-lib=dylib=legacy_stdio_definitions");
     }
