@@ -138,7 +138,7 @@ pub(crate) async fn connect(
 ) -> Result<Arc<RelaySocket>, P2pError> {
     let pin = RelayPin::new(relay.fingerprint);
     let crypto = tls::relay_client_config(chain, key, &pin)?;
-    let outer = tokio::time::timeout(SETUP_TIMEOUT, open(relay, crypto, &pin))
+    let outer = tokio::time::timeout(SETUP_TIMEOUT, open(relay, crypto, &pin, Liveness::PAIR))
         .await
         .map_err(|_| P2pError::RelayUnreachable)??;
     tokio::time::timeout(ready_timeout, outer.bind(token))
@@ -161,10 +161,34 @@ enum Outer {
 type Attempt = Result<Outer, Box<dyn std::error::Error + Send + Sync>>;
 
 /// Races QUIC against a delayed TLS-over-TCP attempt and keeps the first outer link that works.
+/// How the outer QUIC link notices a relay that went away.
+#[derive(Clone, Copy)]
+struct Liveness {
+    keep_alive: Duration,
+    /// `None` keeps quinn's default.
+    idle: Option<Duration>,
+}
+
+impl Liveness {
+    /// A pair link: the inner connection has its own timeouts; keep-alives only stop the link
+    /// from idling out while the first side waits for its partner.
+    const PAIR: Self = Self {
+        keep_alive: Duration::from_secs(10),
+        idle: None,
+    };
+    /// A broadcast link: a relay lost mid-share must be noticed quickly, so viewers move to
+    /// direct copies within seconds (FR-7.49).
+    const BROADCAST: Self = Self {
+        keep_alive: Duration::from_secs(1),
+        idle: Some(Duration::from_secs(4)),
+    };
+}
+
 async fn open(
     relay: &RelayAnnouncement,
     crypto: Arc<rustls::ClientConfig>,
     pin: &RelayPin,
+    liveness: Liveness,
 ) -> Result<Outer, P2pError> {
     let udp = match tokio::net::lookup_host((relay.host.as_str(), relay.udp)).await {
         Ok(mut addresses) => addresses.next(),
@@ -188,7 +212,7 @@ async fn open(
             quic_failed.clone(),
         );
         attempts.spawn(async move {
-            let result = open_quic(udp, &host, crypto).await;
+            let result = open_quic(udp, &host, crypto, liveness).await;
             if result.is_err() {
                 quic_failed.notify_one();
             }
@@ -224,7 +248,12 @@ async fn open(
     Err(P2pError::RelayUnreachable)
 }
 
-async fn open_quic(addr: SocketAddr, host: &str, crypto: Arc<rustls::ClientConfig>) -> Attempt {
+async fn open_quic(
+    addr: SocketAddr,
+    host: &str,
+    crypto: Arc<rustls::ClientConfig>,
+    liveness: Liveness,
+) -> Attempt {
     let bind: SocketAddr = if addr.is_ipv6() {
         (Ipv6Addr::UNSPECIFIED, 0).into()
     } else {
@@ -239,7 +268,10 @@ async fn open_quic(addr: SocketAddr, host: &str, crypto: Arc<rustls::ClientConfi
         .mtu_discovery_config(None)
         // The side that bound first may wait for its partner up to the token lifetime; keep the
         // link from idling out meanwhile.
-        .keep_alive_interval(Some(Duration::from_secs(10)));
+        .keep_alive_interval(Some(liveness.keep_alive));
+    if let Some(idle) = liveness.idle {
+        transport.max_idle_timeout(Some(idle.try_into()?));
+    }
     let mut config = quinn::ClientConfig::new(Arc::new(
         quinn::crypto::rustls::QuicClientConfig::try_from(crypto)?,
     ));
@@ -773,9 +805,12 @@ impl crate::P2p {
     ) -> Result<BroadcastLink, P2pError> {
         let pin = RelayPin::new(relay.fingerprint);
         let crypto = tls::relay_client_config(&self.chain, &self.key, &pin)?;
-        let outer = tokio::time::timeout(SETUP_TIMEOUT, open(relay, crypto, &pin))
-            .await
-            .map_err(|_| P2pError::RelayUnreachable)??;
+        let outer = tokio::time::timeout(
+            SETUP_TIMEOUT,
+            open(relay, crypto, &pin, Liveness::BROADCAST),
+        )
+        .await
+        .map_err(|_| P2pError::RelayUnreachable)??;
         let bind = BroadcastBind {
             token: token.clone(),
             role: Some(role),
