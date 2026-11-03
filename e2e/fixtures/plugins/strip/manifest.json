@@ -8,6 +8,7 @@
   "authors": ["Mumcord test fixtures"],
   "license": "MIT",
   "categories": ["tools"],
+  "icon": "assets/icon.svg",
   "permissions": {
     "required": ["ui.panel", "ui.chat-card", "peers.messages", "chat.send", "chat.supersedes"],
     "optional": [{ "id": "chat.triggers", "suggested": true }]

@@ -8,5 +8,8 @@
   "authors": ["Mumcord test fixtures"],
   "license": "MIT",
   "categories": ["fun"],
-  "permissions": { "required": ["ui.panel"] }
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": ["ui.panel"]
+  }
 }
