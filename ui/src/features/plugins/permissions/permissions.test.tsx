@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
@@ -12,6 +12,8 @@ import {
   type RequestedPermission,
 } from "./catalogue";
 import { PermissionList } from "./PermissionList";
+import { PERMISSION_ICONS } from "./permissionIcons";
+import { usePermissionText } from "./usePermissionText";
 import en from "../../../locales/en/pluginPermissions.json";
 
 beforeEach(async () => {
@@ -92,5 +94,18 @@ describe("PermissionList", () => {
       <PermissionList requested={requested} enabled={new Set()} onToggle={vi.fn()} />,
     );
     expect(await axeViolations(container)).toEqual([]);
+  });
+});
+
+describe("permission catalogue helpers", () => {
+  it("has a glyph for every permission", () => {
+    expect(Object.keys(PERMISSION_ICONS).sort()).toEqual(Object.keys(PERMISSION_RISK).sort());
+  });
+
+  it("names permissions in plain language and shows unknown ids as they are", () => {
+    const { result } = renderHook(() => usePermissionText());
+    expect(result.current("net.origins")).toBe("Talk to these websites");
+    expect(result.current("ui.side-panel")).toBe("Show its own content in a side panel");
+    expect(result.current("made.up")).toBe("made.up");
   });
 });

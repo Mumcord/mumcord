@@ -6,6 +6,8 @@ import {
   type PermissionRisk,
   type RequestedPermission,
 } from "./catalogue";
+import { PERMISSION_ICONS, UNKNOWN_PERMISSION_ICON } from "./permissionIcons";
+import { usePermissionText } from "./usePermissionText";
 import "./permissions.css";
 
 export interface PermissionListProps {
@@ -19,31 +21,6 @@ export interface PermissionListProps {
   chatPatterns?: readonly string[];
 }
 
-/** A decorative glyph per permission (the risk is carried by the text and colour, never the glyph). */
-const ICONS: Record<string, string> = {
-  "ui.panel": "▣",
-  "ui.member-badge": "◉",
-  "ui.profile-card": "☰",
-  "ui.chat-card": "▤",
-  "ui.user-menu": "⋮",
-  "ui.dialog": "❏",
-  "ui.webview": "◫",
-  "events.self": "◎",
-  "events.voice": "♫",
-  "events.presence": "●",
-  "events.chat-activity": "✎",
-  "peers.messages": "⇄",
-  notify: "🔔",
-  "random.bytes": "⚄",
-  commands: "/",
-  "chat.send": "➤",
-  "chat.supersedes": "↻",
-  "chat.triggers": "⚑",
-  "chat.patterns": "⌕",
-  "net.http": "🌐",
-  secrets: "🔑",
-};
-
 function Row({
   id,
   details = [],
@@ -55,15 +32,16 @@ function Row({
   toggle?: { checked: boolean; disabled: boolean; onChange: (on: boolean) => void };
 }) {
   const { t } = useTranslation("pluginPermissions");
+  const permissionText = usePermissionText();
   // Unknown ids cannot come from a validated manifest; show them as the highest risk, never hide them.
   const known = isPermissionId(id);
   const risk: PermissionRisk = known ? PERMISSION_RISK[id] : "red";
-  const text = known ? t(`texts.${permissionTextKey(id)}`) : id;
+  const text = permissionText(id);
   const riskLabel = t(`risk.${risk}`);
   const content = (
     <>
       <span className={`perm-icon perm-risk-${risk}`} aria-hidden="true">
-        {ICONS[id] ?? "▲"}
+        {known ? PERMISSION_ICONS[id] : UNKNOWN_PERMISSION_ICON}
       </span>
       <span className="perm-body">
         <span className="perm-text">{text}</span>
