@@ -17,8 +17,11 @@ import { bin } from "./paths.ts";
 import { run } from "./run.ts";
 import { shared } from "./state.ts";
 
-/** Which app instance: `a` is the wdio session every spec has, `b` the optional second client. */
-export type AppId = "a" | "b";
+/**
+ * Which app instance: `a` is the wdio session every spec has, `b` and `c` the optional second and
+ * third client.
+ */
+export type AppId = "a" | "b" | "c";
 
 /**
  * tauri-driver of instance A listens here; it starts WebKitWebDriver on the next port. Parallel
@@ -27,6 +30,8 @@ export type AppId = "a" | "b";
 export const driverPort = 4444 + 2 * Number(process.env.MUMCORD_E2E_RUN ?? 0);
 /** Instance B's tauri-driver: above every port instance A of runs 0-9 can take. */
 const driverPortB = 4544 + 2 * Number(process.env.MUMCORD_E2E_RUN ?? 0);
+/** Instance C's tauri-driver: above every port instance B of runs 0-9 can take. */
+const driverPortC = 4644 + 2 * Number(process.env.MUMCORD_E2E_RUN ?? 0);
 
 /**
  * Marks every process an instance starts (driver, app, private D-Bus, keyring), so cleaning up one
@@ -57,7 +62,7 @@ export interface LaunchOptions {
 }
 
 /**
- * Instance B's own session D-Bus with an unlocked Secret Service. The app's single-instance lock
+ * Instance B's and C's own session D-Bus with an unlocked Secret Service. The app's single-instance lock
  * is a D-Bus name and its secrets live in the Secret Service, so a second app on the shared bus
  * would hand over to the first and exit, or share its identity.
  */
@@ -96,6 +101,7 @@ function newInstance(id: AppId, port: number): Instance {
 const state = shared("app", {
   a: newInstance("a", driverPort),
   b: newInstance("b", driverPortB),
+  c: newInstance("c", driverPortC),
 });
 
 /** State of one instance (for apps.ts). */
@@ -169,7 +175,9 @@ async function waitSecretService(address: string): Promise<void> {
     if (r.stdout.includes("boolean true")) return;
     await new Promise((r) => setTimeout(r, 100));
   }
-  throw new Error("instance B: the Secret Service did not start on its private bus");
+  throw new Error(
+    "the Secret Service did not start on the private bus of a second or third instance",
+  );
 }
 
 /**
@@ -220,13 +228,13 @@ export async function startDriver(inst: Instance = state.a): Promise<void> {
   if (!inst.profileDir) await newProfile(inst);
   const ports = ["--port", String(inst.port), "--native-port", String(inst.port + 1)];
   let own: NodeJS.ProcessEnv = {};
-  if (inst.id === "b") {
+  if (inst.id !== "a") {
     inst.bus = await startPrivateBus(inst);
     own = {
       DBUS_SESSION_BUS_ADDRESS: inst.bus.address,
       XDG_RUNTIME_DIR: inst.bus.runtimeDir,
-      // Abstract socket names are per network namespace, so B needs one apart from A's.
-      MUMCORD_OVERLAY_SOCKET: `${process.env.MUMCORD_OVERLAY_SOCKET ?? "mumcord-overlay-e2e"}-b`,
+      // Abstract socket names are per network namespace, so B and C need one apart from A's.
+      MUMCORD_OVERLAY_SOCKET: `${process.env.MUMCORD_OVERLAY_SOCKET ?? "mumcord-overlay-e2e"}-${inst.id}`,
     };
   }
   inst.driver = spawn("tauri-driver", ports, {
@@ -250,12 +258,15 @@ export async function startDriver(inst: Instance = state.a): Promise<void> {
 /** The instance a process belongs to, from its environment (unmarked = A). */
 function processInstance(pid: string): AppId {
   const environ = readFileSync(`/proc/${pid}/environ`, "utf8");
-  return `\0${environ}`.includes(`\0${instanceMarker}=b\0`) ? "b" : "a";
+  for (const id of ["b", "c"] as const) {
+    if (`\0${environ}`.includes(`\0${instanceMarker}=${id}\0`)) return id;
+  }
+  return "a";
 }
 
 /**
  * PIDs of Mumcord app processes and of the driver processes (tauri-driver, WebKitWebDriver) of
- * one instance; for B also its private bus and keyring daemon.
+ * one instance; for B and C also their private bus and keyring daemon.
  */
 function strayPids(id: AppId): { app: number[]; drivers: number[] } {
   let appExe = bin.app;
@@ -274,7 +285,7 @@ function strayPids(id: AppId): { app: number[]; drivers: number[] } {
       const helper =
         comm === "tauri-driver" ||
         comm === "WebKitWebDriver" ||
-        (id === "b" && (comm === "dbus-daemon" || comm === "gnome-keyring-d"));
+        (id !== "a" && (comm === "dbus-daemon" || comm === "gnome-keyring-d"));
       if (helper) found.drivers.push(pid);
       else if (readlinkSync(`/proc/${name}/exe`).replace(/ \(deleted\)$/, "") === appExe)
         found.app.push(pid);
@@ -329,7 +340,7 @@ export async function killStrays(graceMs = 5_000, id: AppId = "a"): Promise<void
   throw new Error(`could not kill leftover processes ${all.filter(alive).join(",")}`);
 }
 
-/** Stops the instance's driver and app (default: A); for B also its private bus. */
+/** Stops the instance's driver and app (default: A); for B and C also their private bus. */
 export async function stopDriver(inst: Instance = state.a): Promise<void> {
   inst.driver?.kill("SIGTERM");
   inst.driver = undefined;
@@ -343,11 +354,13 @@ export async function stopDriver(inst: Instance = state.a): Promise<void> {
 
 /**
  * Prepares a fresh install for a new spec file (called from wdio.conf.ts before the session):
- * instance A with a new profile and no extras, and no instance B left from an earlier spec.
+ * instance A with a new profile and no extras, and no instances B or C left from an earlier spec.
  */
 export async function prepareFresh(): Promise<void> {
   state.a = newInstance("a", driverPort);
   state.b = newInstance("b", driverPortB);
+  state.c = newInstance("c", driverPortC);
+  await killStrays(0, "c");
   await killStrays(0, "b");
   await killStrays(0, "a");
   await newProfile(state.a);
