@@ -21,6 +21,8 @@ export interface ViewerListProps {
   quality: ShareQuality | null;
   nameOf: (session: number) => string;
   srcOf: (session: number) => string | null;
+  /** Viewer limit of the live share's path; copies and unknown fall back to eight. */
+  limit?: number;
 }
 
 /**
@@ -28,20 +30,27 @@ export interface ViewerListProps {
  * one copy per viewer, and per viewer the quality received, codec, path and a "slow connection"
  * badge.
  */
-export function ViewerList({ own, quality, nameOf, srcOf }: ViewerListProps): ReactNode {
+export function ViewerList({
+  own,
+  quality,
+  nameOf,
+  srcOf,
+  limit = MAX_VIEWERS,
+}: ViewerListProps): ReactNode {
   const { t } = useTranslation("screenshare");
   const count = own.viewers.length;
   const details = new Map((quality?.viewers ?? []).map((viewer) => [viewer.session, viewer]));
   const sentOnce = [...details.values()].some((viewer) => viewer.path !== "direct");
+  // The mockup tags a row's path only when viewers differ; the summary line names a common one.
+  const mixedPaths =
+    new Set(own.viewers.flatMap((session) => details.get(session)?.path ?? [])).size > 1;
   const shown = own.viewers.slice(0, LISTED);
   const slow = quality?.viewers.find((viewer) => viewer.slow || viewer.struggling) ?? null;
   return (
     <>
       <p className="sharer-bar__popover-title">
         {t("viewerList.title")}{" "}
-        <span className="sharer-bar__popover-count">
-          {t("viewerList.count", { count, limit: MAX_VIEWERS })}
-        </span>
+        <span className="sharer-bar__popover-count">{t("viewerList.count", { count, limit })}</span>
       </p>
       {count > 0 && quality !== null && (
         <p className="viewer-list__path" data-tone={sentOnce ? undefined : "warn"}>
@@ -60,6 +69,7 @@ export function ViewerList({ own, quality, nameOf, srcOf }: ViewerListProps): Re
               src={srcOf(session)}
               height={quality?.height ?? null}
               viewer={details.get(session) ?? null}
+              showPath={mixedPaths}
             />
           ))}
         </ul>
@@ -67,7 +77,7 @@ export function ViewerList({ own, quality, nameOf, srcOf }: ViewerListProps): Re
       {count > shown.length && (
         <p className="viewer-list__more">{t("viewerList.more", { count: count - shown.length })}</p>
       )}
-      {count >= MAX_VIEWERS && <p className="sharer-bar__note">{t("fullShort")}</p>}
+      {count >= limit && <p className="sharer-bar__note">{t("fullShort")}</p>}
       {slow !== null && quality !== null && (
         <p className="sharer-bar__note">
           <InfoCircleIcon />
@@ -87,11 +97,13 @@ function ViewerRow({
   src,
   height,
   viewer,
+  showPath,
 }: {
   name: string;
   src: string | null;
   height: number | null;
   viewer: ViewerQuality | null;
+  showPath: boolean;
 }): ReactNode {
   const { t } = useTranslation("screenshare");
   const codec = viewer === null ? null : codecName(viewer.codec);
@@ -106,15 +118,17 @@ function ViewerRow({
         <span className="viewer-panel__name">{name}</span>
         {received !== null && <span className="viewer-panel__sub">{received}</span>}
       </span>
-      {viewer !== null && (
+      {viewer !== null && (viewer.slow || showPath) && (
         <span className="viewer-list__tags">
           {viewer.slow && <span className="viewer-list__slow">{t("viewerList.slow")}</span>}
-          <span
-            className={`share-path share-path--${viewer.path === "direct" ? "direct" : "relay"}`}
-          >
-            {viewer.path === "direct" ? <BoltIcon /> : <RelayIcon />}
-            {t(pathKey(viewer.path))}
-          </span>
+          {showPath && (
+            <span
+              className={`share-path share-path--${viewer.path === "direct" ? "direct" : "relay"}`}
+            >
+              {viewer.path === "direct" ? <BoltIcon /> : <RelayIcon />}
+              {t(pathKey(viewer.path))}
+            </span>
+          )}
         </span>
       )}
     </li>

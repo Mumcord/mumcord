@@ -21,7 +21,7 @@ import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
 import { useShareActions } from "./useShareActions";
-import { ViewerList } from "./Viewers";
+import { MAX_VIEWERS, ViewerList } from "./Viewers";
 
 /** The quality the sharer sends is read once a second (issue #163). */
 const POLL_MS = 1000;
@@ -40,6 +40,7 @@ export function SharerBar(): ReactNode {
   const avatarOf = useAvatars(people, serverId ?? undefined);
   const [quality, setQuality] = useState<ShareQuality | null>(null);
   const [thumb, setThumb] = useState<ShareThumbnail | null>(null);
+  const [limit, setLimit] = useState(MAX_VIEWERS);
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -81,6 +82,29 @@ export function SharerBar(): ReactNode {
       window.clearInterval(timer);
     };
   }, [serverId, own]);
+
+  // The viewer limit depends on how the share reaches viewers (relay broadcast or copies), not on
+  // the quality choice, so the preview with the defaults names it.
+  const sharing = own !== null;
+  useEffect(() => {
+    if (serverId === null || !sharing) return;
+    let current = true;
+    getApi()
+      .screenSharePreview(
+        serverId,
+        { resolution: "auto", fps: "30", optimize: "balanced", uploadLimit: "auto" },
+        "auto",
+      )
+      .then((preview) => {
+        if (current) setLimit(preview.path.maxViewers);
+      })
+      .catch((error: unknown) => {
+        console.warn("screen share preview failed", error);
+      });
+    return () => {
+      current = false;
+    };
+  }, [serverId, sharing]);
 
   // Starting a share lives in the composer's Apps menu, which also names what blocks it.
   if (own === null || serverId === null) return null;
@@ -199,7 +223,7 @@ export function SharerBar(): ReactNode {
               role="group"
               aria-label={t("viewersTitle")}
             >
-              <ViewerList own={own} quality={quality} nameOf={nameOf} srcOf={srcOf} />
+              <ViewerList own={own} quality={quality} nameOf={nameOf} srcOf={srcOf} limit={limit} />
             </div>
           )}
         </span>

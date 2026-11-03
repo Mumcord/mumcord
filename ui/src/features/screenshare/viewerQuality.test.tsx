@@ -90,6 +90,27 @@ describe("viewer list", () => {
     expect(screen.getByText(/One copy per viewer/)).toBeInTheDocument();
   });
 
+  it("tags a row's path only when the viewers' paths differ", () => {
+    const { unmount } = list([2, 3], quality([viewer(2), viewer(3)]));
+    expect(screen.getAllByRole("listitem")[0]).not.toHaveTextContent("Relay");
+    unmount();
+    list([2, 3], quality([viewer(2), viewer(3, { path: "direct" })]));
+    expect(screen.getAllByRole("listitem")[1]).toHaveTextContent("Direct");
+  });
+
+  it("takes the viewer limit from the share's path", () => {
+    render(
+      <ViewerList
+        own={own([2, 3])}
+        quality={quality([viewer(2), viewer(3)])}
+        nameOf={(session) => names[session] ?? "Someone"}
+        srcOf={() => null}
+        limit={20}
+      />,
+    );
+    expect(screen.getByText("2 of 20")).toBeInTheDocument();
+  });
+
   it("folds the viewers beyond six into 'and N more'", () => {
     const sessions = [2, 3, 4, 5, 6, 7, 8, 9];
     list(sessions, quality(sessions.map((session) => viewer(session))));
