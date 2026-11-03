@@ -5,20 +5,22 @@
 //! channel, or asks for earlier messages, the engine asks the other people on the server for
 //! the channel's messages before the moment it started receiving the channel live, fetches
 //! only what it does not have yet and stores it marked with the holder's name. See [`core`]
-//! for the flow and limits, [`wire`] for the packets and [`hash`] for deduplication.
+//! for the flow and limits, [`wire`] for the packets, [`hash`] for deduplication and
+//! [`proof`] for the password proof of locked channels.
 //!
 //! The session task feeds user changes and plugin data in; a small driver task per
 //! connection runs timeouts and sends the paced outgoing packets.
 
 mod core;
 pub mod hash;
+pub mod proof;
 pub mod wire;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
-use mumcord_protocol::{CommandError, PluginData, User};
+use mumcord_protocol::{CommandError, PluginData, ServerState, User, permissions};
 use mumcord_store::{ServerId, Store, UnixMillis};
 use tokio::runtime::Handle as Runtime;
 use tokio::task::JoinHandle;
@@ -89,10 +91,53 @@ impl Env for CtxEnv<'_> {
     fn channel_key(&self, channel: u32) -> Option<String> {
         self.0.channel_path(channel).map(|p| join_path(&p))
     }
+
+    fn channel_locked(&self, channel: u32) -> bool {
+        self.0.handle.with_state(|s| channel_locked(s, channel))
+    }
+
+    fn own_tokens(&self) -> Vec<String> {
+        self.0.handle.access_tokens()
+    }
+
+    fn query_own_permissions(&self, channel: u32) {
+        if let Err(e) = self.0.handle.query_permissions(channel) {
+            tracing::warn!(error = %e, "history sync: asking for the own permissions failed");
+        }
+    }
 }
 
-fn live_channels(user: &User) -> impl Iterator<Item = u32> + '_ {
-    std::iter::once(user.channel_id).chain(user.listening.iter().copied())
+/// Whether `channel` or one of its parents restricts entering (issue #382). The server flags
+/// only channels whose own ACL restricts Enter, so a sub-channel inheriting a deny from its
+/// parent is found through the parent. Unknown channels count as locked.
+fn channel_locked(state: &ServerState, channel: u32) -> bool {
+    let mut next = Some(channel);
+    // The depth bound guards against a malformed (cyclic) tree from the server.
+    for _ in 0..=state.channels.len() {
+        let Some(id) = next else {
+            return false;
+        };
+        let Some(c) = state.channels.get(&id) else {
+            return true;
+        };
+        if c.is_enter_restricted {
+            return true;
+        }
+        next = c.parent;
+    }
+    true
+}
+
+fn see(core: &mut Core, env: &impl Env, user: &User, now: i64) {
+    core.user_seen(
+        env,
+        user.session,
+        &user.name,
+        user.cert_hash.as_deref(),
+        user.channel_id,
+        user.listening.iter().copied(),
+        now,
+    );
 }
 
 /// Runs `f` on the connection's core and emits the events it produced.
@@ -117,11 +162,13 @@ pub(crate) fn on_synced(state: &Arc<Mutex<HistorySync>>, ctx: &SessionCtx, rt: &
         return;
     };
     let mut core = Core::new(own, now);
-    ctx.handle.with_state(|s| {
-        for user in s.users.values() {
-            core.user_seen(user.session, &user.name, live_channels(user), now);
-        }
-    });
+    // Collected first: the environment reads the state again.
+    let users: Vec<User> = ctx
+        .handle
+        .with_state(|s| s.users.values().cloned().collect());
+    for user in &users {
+        see(&mut core, &CtxEnv(ctx), user, now);
+    }
     let connection = Connection {
         core: Some(core),
         driver: rt.spawn(drive(state.clone(), ctx.clone())),
@@ -138,8 +185,20 @@ pub(crate) fn on_disconnect(state: &Mutex<HistorySync>, server_id: ServerId) {
 /// Someone joined, moved, followed or unfollowed (own user included).
 pub(crate) fn on_user(state: &Mutex<HistorySync>, ctx: &SessionCtx, user: &User) {
     let now = now_millis();
+    with_core(state, ctx, |core| see(core, &CtxEnv(ctx), user, now));
+}
+
+/// The server answered a PermissionQuery of the own user for `channel_id`.
+pub(crate) fn on_permissions(state: &Mutex<HistorySync>, ctx: &SessionCtx, channel_id: u32) {
+    let Some(bits) = ctx
+        .handle
+        .with_state(|s| s.permissions.get(&channel_id).copied())
+    else {
+        return;
+    };
+    let now = now_millis();
     with_core(state, ctx, |core| {
-        core.user_seen(user.session, &user.name, live_channels(user), now);
+        core.own_permissions(channel_id, bits & permissions::ENTER != 0, now);
     });
 }
 
@@ -196,15 +255,16 @@ async fn drive(state: Arc<Mutex<HistorySync>>, ctx: SessionCtx) {
 impl Engine {
     /// "Load earlier messages" (FR-1.60): asks other Mumcord users on `server_id` for the
     /// channel's messages before `before` (Unix ms; `None`: up to when the channel started
-    /// arriving live). The channel must be the own or a followed one. Progress arrives as
-    /// `HistorySyncStatus`, messages as `HistorySynced` events.
+    /// arriving live). The channel must be the own or a followed one; a locked channel only
+    /// the own one (issue #382). Progress arrives as `HistorySyncStatus`, messages as
+    /// `HistorySynced` events.
     pub fn history_sync_request(
         &self,
         server_id: ServerId,
         channel_id: u32,
         before: Option<UnixMillis>,
     ) -> EngineResult<()> {
-        self.session_ctx_for(server_id)?;
+        let ctx = self.session_ctx_for(server_id)?;
         let mut state = lock(self.history_sync_state());
         let core = state
             .get_mut(&server_id)
@@ -215,11 +275,15 @@ impl Engine {
                     "history sync needs a Mumble 1.4+ server",
                 )
             })?;
-        core.request(channel_id, before, now_millis())
+        core.request(&CtxEnv(&ctx), channel_id, before, now_millis())
             .map_err(|e| match e {
                 RequestError::NotLive => EngineError::new(
                     ErrorKind::NotFound,
                     "channel is neither joined nor followed",
+                ),
+                RequestError::Locked => EngineError::new(
+                    ErrorKind::PermissionDenied,
+                    "the history of a locked channel is shared only with people inside it",
                 ),
             })
     }

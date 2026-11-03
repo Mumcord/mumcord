@@ -44,3 +44,65 @@
   cursor: col-resize;
   user-select: none;
 }
+
+/*
+ * Horizontal variant between the media area and the chat (spec 07 FR-7.61, mockups 01–06): a
+ * 12 px hit area across the chat width with a small grip, faint at rest and accent on hover, while
+ * dragging and on keyboard focus. It sits in the flow of the chat column, not over a border.
+ */
+.resize-handle[data-orientation="horizontal"] {
+  position: relative;
+  top: auto;
+  bottom: auto;
+  z-index: 5;
+  flex: none;
+  width: auto;
+  height: 0.75rem;
+  margin: 0 var(--space-4);
+  translate: none;
+  cursor: row-resize;
+}
+
+.resize-handle[data-orientation="horizontal"]::after {
+  top: 50%;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  width: auto;
+  height: 2px;
+  translate: 0 -50%;
+}
+
+.resize-handle[data-orientation="horizontal"]::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2.5rem;
+  height: 0.25rem;
+  translate: -50% -50%;
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong, var(--color-border));
+  opacity: 0.55;
+  transition:
+    opacity var(--duration-fast),
+    background-color var(--duration-fast);
+}
+
+.resize-handle[data-orientation="horizontal"]:is(:hover, :active, :focus-visible)::before {
+  height: 0.3125rem;
+  background: var(--color-accent);
+  opacity: 1;
+}
+
+.resize-handle[data-orientation="horizontal"]:focus-visible::after {
+  width: auto;
+  height: var(--focus-ring-width);
+  background: var(--color-focus);
+}
+
+:root[data-row-resizing],
+:root[data-row-resizing] * {
+  cursor: row-resize;
+  user-select: none;
+}

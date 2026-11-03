@@ -1,44 +1,27 @@
-// AC-6.29 (spec 06, C14): accessibility of the plugin UI in the running client. axe (WCAG 2.2 AA,
-// colour contrast included) on the Plugins strip, the install prompt with its progress bar, every
-// Settings → Plugins tab, the Poll card with "Show original text", the Mumbot Music dialog and the
-// EVE fit history panel, in the light and the dark theme; a keyboard-only Poll walkthrough; the
-// screen-reader text of replaced and hidden chat lines (F46, live region); cards at a 150 % font
-// size (F44); reduced motion freezes Echolings; German permission texts.
-// The bot "Carol" stands in for a plain Mumble user; "Tunes" is a local mumbot music module.
-import { type ChildProcess, spawn } from "node:child_process";
-import { randomBytes } from "node:crypto";
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+// AC-6.29 (spec 06, C14): accessibility of the plugin platform UI in the running client. axe
+// (WCAG 2.2 AA, colour contrast included) on every Settings → Plugins tab, the install prompt with
+// its progress bar and the Plugins strip with an open panel, in the light and the dark theme, and
+// the German permission texts. The plugins are the test plugins of e2e/fixtures/plugins; the
+// screens of the official plugins (cards, dialogs, panels) are tested in Mumcord/plugins.
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { $, $$, browser, expect } from "@wdio/globals";
 import type { Result } from "axe-core";
-import { app, axe, bin, registry, repoRoot, testenv } from "../../helpers/index.ts";
-import { composer, joinChannel, ScriptBot, selectChannel } from "../../helpers/chat-ui.ts";
-import { runOk } from "../../helpers/run.ts";
-import { certFingerprint } from "../../helpers/servers-ui.ts";
+import { app, axe, registry, repoRoot, testenv } from "../../helpers/index.ts";
+import { joinChannel, selectChannel } from "../../helpers/chat-ui.ts";
 import { openSettingsGroup, settingsCard } from "../../helpers/settings-ui.ts";
-import { addAndConnect, completeWizard, personRow, reconnect } from "../../helpers/voice-ui.ts";
-import { chooseLanguage, describeFocus, focus, pressUntil, tabTo, typeText } from "../app/flows.ts";
-
-type Element = ReturnType<typeof $>;
+import { addAndConnect, completeWizard, reconnect } from "../../helpers/voice-ui.ts";
+import { chooseLanguage } from "../app/flows.ts";
 
 const CHANNEL = "Lobby";
-const QUESTION = "Pizza or pasta?";
-const FIT = ["[Rifter, Tackle]", "Damage Control II", "Warp Scrambler II"];
-/** A fresh name per run: the server keeps registrations between runs. */
-const MUSIC_BOT = `Tunes${String(Date.now() % 100_000)}`;
+const STRIP = "Fixture Strip";
+const HIGHLIGHT = "Fixture Highlight";
 const PLUGIN_TABS = ["Installed", "Browse", "Updates", "Repositories", "Developer"];
 
 const prompt = "//div[contains(concat(' ',@class,' '),' plugin-prompt ')]";
 const pluginTab = (name: string) =>
-  // Installed carries its count ("Installed 3").
+  // Installed carries its count ("Installed 2").
   $(`//button[@role='tab'][contains(@class,'plugins-tab')][starts-with(normalize-space(.),'${name}')]`);
-const sheet = () => $(".pstrip-sheet");
-const dialog = () => $("//div[@role='dialog' and contains(@class,'userpanel-modal__dialog')]");
-const dialogField = (label: string) =>
-  dialog().$(`.//label[normalize-space(.)='${label}']/following::input[1]`);
-const cardItem = (plugin: string) =>
-  $(`(//li[.//section[contains(@class,'plugin-chat-card')][@aria-label='Card from ${plugin}']])[last()]`);
 
 /** Every violation of one screen, collected so a run reports all screens at once. */
 const findings: string[] = [];
@@ -54,29 +37,6 @@ async function check(label: string, include: string[]): Promise<void> {
 function expectNoFindings(): void {
   const all = findings.splice(0);
   expect(all.join("\n")).toBe("");
-}
-
-async function waitText(el: () => Element, text: string, timeout = 20_000): Promise<void> {
-  await browser.waitUntil(
-    async () => (await el().getProperty("textContent").then(String)).includes(text),
-    { timeout, timeoutMsg: `${JSON.stringify(text)} never showed` },
-  );
-}
-
-/** Puts `value` into a React text field (typed keys lose Shift in some WebKitWebDriver runs). */
-async function setField(input: Element, value: string): Promise<void> {
-  await input.waitForDisplayed({ timeout: 10_000 });
-  await browser.execute(
-    (el: HTMLInputElement, text: string) => {
-      el.focus();
-      Reflect.set(HTMLInputElement.prototype, "value", text, el);
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-      // Some plugin fields commit on leaving the field.
-      el.blur();
-    },
-    (await input.getElement()) as unknown as HTMLInputElement,
-    value,
-  );
 }
 
 async function closeSettings(): Promise<void> {
@@ -178,147 +138,9 @@ async function closePanel(plugin: string): Promise<void> {
   if ((await icon.getAttribute("aria-pressed")) === "true") await icon.click();
 }
 
-/** Creates a poll with the keyboard only: strip button, New poll, fields, Create poll. */
-async function createPollByKeyboard(): Promise<void> {
-  await closePanel("Poll");
-  await $(".pstrip-icons button[aria-label='Poll']").waitForExist({ timeout: 30_000 });
-  // Start from the message field, then walk the focus order to the strip.
-  await composer().click();
-  // The strip is a toolbar: one Tab stop, arrow keys move between its icons.
-  await tabTo((f) => f.cls.includes("pstrip-icon"), "the Plugins strip", true);
-  await pressUntil("ArrowRight", (f) => f.label === "Poll", "Poll in the Plugins strip");
-  await browser.keys("Enter");
-  await $(".pstrip-panel").waitForDisplayed({ timeout: 10_000 });
-  await tabTo((f) => f.text === "New poll", "New poll");
-  await browser.keys("Enter");
-  await sheet().waitForDisplayed({ timeout: 10_000 });
-  await tabTo((f) => f.tag === "input" && f.value === "", "the question field");
-  await typeText(QUESTION);
-  for (const option of ["Pizza", "Pasta"]) {
-    await tabTo((f) => f.tag === "input" && f.value === "", `field for ${option}`);
-    await typeText(option);
-  }
-  await tabTo((f) => f.text === "Create poll", "Create poll");
-  await browser.keys("Enter");
-  await waitText(() => $("body"), "Your poll · 0 votes");
-  if (await sheet().isExisting()) await browser.keys("Escape");
-}
-
-/** Records every text the polite and assertive live regions announce. */
-async function recordAnnouncements(): Promise<void> {
-  await browser.execute(() => {
-    const w = window as unknown as { __c14Said: string[] };
-    w.__c14Said = [];
-    for (const id of ["live-polite", "live-assertive"]) {
-      const region = document.querySelector(`[data-testid='${id}']`);
-      if (region === null) continue;
-      new MutationObserver(() => {
-        const text = region.textContent;
-        if (text !== "") w.__c14Said.push(text);
-      }).observe(region, { childList: true, subtree: true, characterData: true });
-    }
-  });
-}
-
-async function announcements(): Promise<string> {
-  return browser.execute(() => (window as unknown as { __c14Said: string[] }).__c14Said.join("\n"));
-}
-
-async function openMusicDialog(): Promise<void> {
-  const row = personRow(MUSIC_BOT);
-  await row.waitForDisplayed({ timeout: 30_000 });
-  // A contextmenu event like the menu key sends: WebKitWebDriver's right click also sends a click,
-  // which pins the profile preview over the dialog a moment later.
-  await browser.execute((el: HTMLElement) => {
-    const box = el.getBoundingClientRect();
-    el.dispatchEvent(
-      new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: box.left + 10, clientY: box.top + 5 }),
-    );
-  }, (await row.getElement()) as unknown as HTMLElement);
-  const item = $("//*[@role='menuitem'][normalize-space()='Configure bot']");
-  await item.waitForClickable({ timeout: 20_000 });
-  await item.click();
-  await dialog().waitForDisplayed({ timeout: 10_000 });
-}
-
-async function closeDialog(): Promise<void> {
-  // The keyboard way out: Escape from wherever the focus is in the dialog.
-  const where = describeFocus(await focus());
-  expect(where).toContain("userpanel-modal__dialog");
-  await browser.keys("Escape");
-  await dialog().waitForExist({ reverse: true, timeout: 10_000 });
-}
-
-/** EVE fit's panel with its fit history opened. */
-async function openFitHistory(): Promise<void> {
-  await openPanel("EVE fit");
-  const toggle = $(".pstrip-panel").$("button*=Fit history");
-  await toggle.waitForClickable({ timeout: 20_000 });
-  if ((await toggle.getText()).includes("▸")) await toggle.click();
-  await waitText(() => $(".pstrip-panel"), "Tackle");
-}
-
-/** A local mumbot that runs only the music module (its HTTP API on 127.0.0.1). */
-class MusicBot {
-  private child: ChildProcess | undefined;
-  private log = "";
-  readonly key = randomBytes(16).toString("hex");
-  readonly port = testenv.ports.v15 + 61;
-
-  constructor(private readonly dir: string) {}
-
-  private env(): NodeJS.ProcessEnv {
-    return { ...process.env, MUMBOT_DATA: this.dir };
-  }
-
-  async start(): Promise<void> {
-    const args = ["--name", MUSIC_BOT, "--port", String(testenv.ports.v15), "register"];
-    for (let attempt = 1; ; attempt++) {
-      try {
-        await runOk(bin.bot, args, this.env());
-        break;
-      } catch (error) {
-        if (attempt === 5) throw error;
-        await new Promise((r) => setTimeout(r, 2_000));
-      }
-    }
-    const media = join(this.dir, "media");
-    mkdirSync(media, { recursive: true });
-    const config = join(this.dir, "bot.toml");
-    writeFileSync(
-      config,
-      `[server]\nhost = "127.0.0.1"\nport = ${String(testenv.ports.v15)}\nname = "${MUSIC_BOT}"\n` +
-        `channel = "${CHANNEL}"\ndata_dir = "${this.dir}"\n` +
-        `server_cert_sha256 = "${await certFingerprint("A")}"\n\n` +
-        `[music]\nlisten = "127.0.0.1:${String(this.port)}"\nchannel = "${CHANNEL}"\nmedia_dir = "${media}"\n\n` +
-        `[[music.keys]]\nkey = "${this.key}"\nlabel = "c14"\nchannels = ["${CHANNEL}"]\n`,
-    );
-    const child = spawn(bin.bot, ["music", "--config", config], { env: this.env() });
-    child.stdout.on("data", (d: Buffer) => (this.log += d.toString()));
-    child.stderr.on("data", (d: Buffer) => (this.log += d.toString()));
-    this.child = child;
-    const base = `http://127.0.0.1:${String(this.port)}`;
-    await browser.waitUntil(
-      async () =>
-        (await fetch(`${base}/health`)
-          .then((r) => r.json() as Promise<{ connected?: boolean }>)
-          .catch(() => null))?.connected === true,
-      { timeout: 60_000, timeoutMsg: `the music bot did not connect:\n${this.log}` },
-    );
-  }
-
-  stop(): void {
-    this.child?.kill("SIGTERM");
-    this.child = undefined;
-  }
-}
-
 describe("plugins: accessibility of the plugin UI (AC-6.29)", function () {
   this.bail(true);
   let fixtures: registry.FixtureRegistry;
-  let carol: ScriptBot | undefined;
-  let music: MusicBot;
-  let dir: string;
 
   const env = (theme: "light" | "dark") => ({
     ...fixtures.env(),
@@ -327,8 +149,6 @@ describe("plugins: accessibility of the plugin UI (AC-6.29)", function () {
 
   /** Restarts the app (same profile) in `theme`, reconnects and opens the channel chat. */
   async function restartIn(theme: "light" | "dark"): Promise<void> {
-    carol?.stop();
-    carol = undefined;
     await app.restart({ env: env(theme) });
     await reconnect();
     await joinChannel(CHANNEL);
@@ -339,178 +159,54 @@ describe("plugins: accessibility of the plugin UI (AC-6.29)", function () {
     );
   }
 
-  async function startCarol(): Promise<ScriptBot> {
-    const bot = new ScriptBot({ name: "Carol", port: testenv.ports.v15, timeout: 120 });
-    await bot.connected();
-    await bot.run(`join ${CHANNEL}`);
-    carol = bot;
-    return bot;
-  }
-
   before(async function () {
     this.timeout(20 * 60_000);
     await testenv.up("v15");
     fixtures = await registry.start();
-    const eveFit = readdirSync(join(fixtures.workDir, "staged")).find((f) => f.startsWith("eve-fit-"));
-    if (eveFit === undefined) throw new Error("eve-fit was not built (scripts/e2e-plugin-registry.sh)");
-    await fixtures.publish(eveFit.replace(/\.mcplugin$/, ""));
-    dir = mkdtempSync(join(tmpdir(), "mumcord-c14-"));
-    music = new MusicBot(dir);
-    await music.start();
     await app.restart({ env: env("light") });
     await completeWizard("Alice");
   });
 
   after(async () => {
-    carol?.stop();
-    music.stop();
     await fixtures.stop();
-    rmSync(dir, { recursive: true, force: true });
   });
 
   it("light: Settings → Plugins tabs, the install prompt and its progress bar have no violations", async () => {
     await developerMode();
     await checkPluginSettings("light-empty");
     await closeSettings();
-    // Echolings keeps its pet per identity, which plugins only get once a server is focused.
+    // The strip lives in the channel panel, so the app is connected.
     await addAndConnect();
     await joinChannel(CHANNEL);
     await selectChannel(CHANNEL);
     await openSettingsGroup("Plugins");
-    await install("Poll", "light-poll");
-    await install("Echolings");
-    await install("Mumbot Music");
-    await install("EVE fit");
+    await install(STRIP, "light-strip-plugin");
+    await install(HIGHLIGHT);
     await checkPluginSettings("light");
     await closeSettings();
     expectNoFindings();
   });
 
-  it("keyboard only: opens Poll from the strip, creates a poll and toggles the original text", async () => {
-    await recordAnnouncements();
-    await createPollByKeyboard();
-    const item = cardItem("Poll");
-    await item.waitForDisplayed({ timeout: 20_000 });
-    // The card's buttons are in the Tab order after the message field.
-    await composer().click();
-    await tabTo((f) => f.text === "Show original text", "Show original text", true);
-    await browser.keys("Enter");
-    await expect(item).toHaveText(expect.stringContaining("[Poll]"), { wait: 5_000 });
-    expect((await focus()).text).toBe("Hide original text");
-    await browser.keys("Enter");
-    await expect(item).not.toHaveText(expect.stringContaining("[Poll]"), { wait: 5_000 });
-  });
-
-  it("light: strip, Poll card with the original text, EVE fit history, Mumbot dialog, Echolings", async () => {
-    const bot = await startCarol();
+  it("light: the strip with an open panel has no violations", async () => {
+    await openPanel(STRIP);
     await check("light-strip", [".pstrip"]);
-    await check("light-poll-card", ["section[aria-label='Card from Poll']"]);
-    await cardItem("Poll").$("button=Show original text").click();
-    await check("light-poll-original", ["section[aria-label='Card from Poll']"]);
-    await cardItem("Poll").$("button=Hide original text").click();
-
-    // F46: a hidden vote line is not read out, a replaced fit is read as its card.
-    await bot.run(`say --channel ${CHANNEL} "!poll 1"`);
-    await bot.run(`say --channel ${CHANNEL} "${FIT.join("<br>")}"`);
-    await cardItem("EVE fit").waitForDisplayed({ timeout: 20_000 });
-    await browser.waitUntil(async () => (await announcements()).includes("EVE fit"), {
-      timeout: 10_000,
-      timeoutMsg: `the fit card was not announced; said:\n${await announcements()}`,
-    });
-    const said = await announcements();
-    expect(said).not.toContain("!poll 1");
-    expect(said).not.toContain(FIT[1]);
-    expect(said).toContain("Carol");
-
-    await openFitHistory();
-    await check("light-evefit-history", [".pstrip"]);
-    await closePanel("EVE fit");
-
-    await openMusicDialog();
-    await check("light-mumbot-setup", [".userpanel-modal__dialog"]);
-    await setField(dialogField("Bot address (IP or domain, with port)"), `127.0.0.1:${String(music.port)}`);
-    await setField(dialogField("API key"), music.key);
-    await dialog()
-      .$(".//label[normalize-space(.)='API key']/following::button[normalize-space(.)='Save'][1]")
-      .click();
-    await browser.waitUntil(async () => (await dialogField("API key").getValue()) === "", {
-      timeoutMsg: "the API key was not stored",
-    });
-    await dialog().$(".//button[normalize-space(.)='Test connection']").click();
-    await expect(dialog()).toHaveText(expect.stringContaining("Connection works"), { wait: 20_000 });
-    const save = dialog().$(".//button[normalize-space(.)='Save'][not(ancestor::div[contains(@class,'pr-row')])]");
-    await save.click();
-    await expect(dialog()).toHaveText(expect.stringContaining("Nothing is playing"), { wait: 20_000 });
-    await check("light-mumbot-player", [".userpanel-modal__dialog"]);
-    await closeDialog();
-
-    await openPanel("Echolings");
-    await $(".pstrip-panel .pstrip-expand").click();
-    await sheet().waitForDisplayed({ timeout: 10_000 });
-    await waitText(sheet, "Choose your Echoling");
-    await check("light-echolings-picker", [".pstrip-sheet"]);
-    await setField(sheet().$("//div[contains(@class,'pr-field')][label[normalize-space(.)='Name']]//input"), "Pip");
-    await sheet().$("button=Hatch").click();
-    await waitText(sheet, "Pip");
-    await sheet().$("button=Pat").click();
-    await check("light-echolings", [".pstrip-sheet"]);
-    await sheet().$("button.pstrip-expand").click();
-    // Control for the reduced-motion check: with motion on, the own pet badge animates.
-    await expect(personRow("Alice").$(".plugin-badge .pr-anim")).toExist({ wait: 10_000 });
-    expectNoFindings();
-  });
-
-  it("F44: at a 150 % font size every clipped card offers Show more", async () => {
-    await browser.execute(() => (document.documentElement.style.fontSize = "150%"));
-    await browser.pause(1_000);
-    const clipped = await browser.execute(() =>
-      Array.from(document.querySelectorAll<HTMLElement>(".plugin-chat-card")).map((card) => {
-        const body = card.querySelector<HTMLElement>(".plugin-chat-card__body");
-        const overflows = body !== null && body.scrollHeight > body.clientHeight + 1;
-        const more = Array.from(card.querySelectorAll("button")).some((b) => b.textContent === "Show more");
-        return { label: card.getAttribute("aria-label") ?? "", overflows, more };
-      }),
-    );
-    console.log(`[c14] cards at 150 %: ${JSON.stringify(clipped)}`);
-    expect(clipped.length).toBeGreaterThan(0);
-    const missing = clipped.filter((c) => c.overflows && !c.more).map((c) => c.label);
-    expect(missing).toEqual([]);
-    await check("light-cards-150", [".plugin-chat-card"]);
-    await browser.execute(() => (document.documentElement.style.fontSize = ""));
+    // Control for the reduced-motion check: with motion on, the panel's button animates.
+    await expect($(".pstrip-panel .pr-anim")).toExist({ wait: 10_000 });
+    await closePanel(STRIP);
     expectNoFindings();
   });
 
   it("dark: the same screens have no violations", async () => {
     await restartIn("dark");
-    await startCarol();
-    await createPollByKeyboard();
-    await cardItem("Poll").waitForDisplayed({ timeout: 20_000 });
+    await openPanel(STRIP);
     await check("dark-strip", [".pstrip"]);
-    await check("dark-poll-card", ["section[aria-label='Card from Poll']"]);
-    await cardItem("Poll").$("button=Show original text").click();
-    await check("dark-poll-original", ["section[aria-label='Card from Poll']"]);
-    await cardItem("Poll").$("button=Hide original text").click();
-    await carol?.run(`say --channel ${CHANNEL} "${FIT.join("<br>")}"`);
-    await cardItem("EVE fit").waitForDisplayed({ timeout: 20_000 });
-    await openFitHistory();
-    await check("dark-evefit-history", [".pstrip"]);
-    await closePanel("EVE fit");
-    await openMusicDialog();
-    await expect(dialog()).toHaveText(expect.stringContaining("Nothing is playing"), { wait: 20_000 });
-    await check("dark-mumbot-player", [".userpanel-modal__dialog"]);
-    await closeDialog();
-    await openPanel("Echolings");
-    await $(".pstrip-panel .pstrip-expand").click();
-    await waitText(sheet, "Pip");
-    await check("dark-echolings", [".pstrip-sheet"]);
-    await sheet().$("button.pstrip-expand").click();
+    await closePanel(STRIP);
     await checkPluginSettings("dark");
-    await install("Dice roller", "dark-dice");
     await closeSettings();
     expectNoFindings();
   });
 
-  it("reduced motion (GTK animations off) freezes Echolings", async () => {
+  it("reduced motion (GTK animations off) freezes plugin animations", async () => {
     const gtk = join(app.profile(), "config", "gtk-3.0");
     mkdirSync(gtk, { recursive: true });
     writeFileSync(join(gtk, "settings.ini"), "[Settings]\ngtk-enable-animations=false\n");
@@ -518,22 +214,17 @@ describe("plugins: accessibility of the plugin UI (AC-6.29)", function () {
     expect(
       await browser.execute(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches),
     ).toBe(true);
-    await openPanel("Echolings");
-    await $(".pstrip-panel .pstrip-expand").click();
-    await waitText(sheet, "Pip");
-    await sheet().$("button=Pat").click();
+    await openPanel(STRIP);
     await browser.pause(1_000);
     const moving = await browser.execute(() => ({
       presets: document.querySelectorAll(".pr-anim").length,
-      running: document
-        .getAnimations()
-        .filter((a) => {
-          const target = (a.effect as KeyframeEffect | null)?.target;
-          return target instanceof Element && target.closest(".plugin-badge, .pstrip, .pstrip-sheet") !== null;
-        }).length,
+      running: document.getAnimations().filter((a) => {
+        const target = (a.effect as KeyframeEffect | null)?.target;
+        return target instanceof Element && target.closest(".plugin-badge, .pstrip, .pstrip-sheet") !== null;
+      }).length,
     }));
     expect(moving).toEqual({ presets: 0, running: 0 });
-    await sheet().$("button.pstrip-expand").click();
+    await closePanel(STRIP);
   });
 
   it("German: the permission texts are translated and the plugin settings have no violations", async () => {
@@ -549,7 +240,7 @@ describe("plugins: accessibility of the plugin UI (AC-6.29)", function () {
       timeoutMsg: "the app did not switch to German",
     });
     await $("[role='tab'][id$='-tab-plugins']").click();
-    const row = $(`//li[.//span[contains(@class,'plugins-installed-name')][normalize-space(.)='Poll']]`);
+    const row = $(`//li[.//span[contains(@class,'plugins-installed-name')][normalize-space(.)='${STRIP}']]`);
     await row.$(`.//button[normalize-space(.)='${installed.details.permissions}']`).click();
     await expect(row).toHaveText(expect.stringContaining(de.texts.chatTriggers), { wait: 10_000 });
     await check("de-settings-installed", [".overlay__dialog"]);

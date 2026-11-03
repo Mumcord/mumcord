@@ -211,7 +211,14 @@ interface MockSession {
 
 const SELF_SESSION = 1;
 
-const NO_RELAY: RelayInfo = { bots: [], host: null, status: { kind: "none" }, firstSeen: null };
+const NO_RELAY: RelayInfo = {
+  bots: [],
+  host: null,
+  status: { kind: "none" },
+  firstSeen: null,
+  uses: [],
+  broadcastMax: null,
+};
 
 /** A relay announced by a bot and trusted since the first visit (spec 04, FR-4.20). */
 const MOCK_RELAY: RelayInfo = {
@@ -219,6 +226,8 @@ const MOCK_RELAY: RelayInfo = {
   host: "relay.example.org",
   status: { kind: "available" },
   firstSeen: "2026-09-01T18:00:00Z",
+  uses: ["images", "files", "screenShare"],
+  broadcastMax: 25,
 };
 
 /** Per-server switches of a server that was just added. */

@@ -26,6 +26,9 @@ if [ -n "$run" ]; then
   # 4xxxx: the default base 64738 plus the netsim offsets would overflow above ~65400.
   export MUMCORD_PORT_BASE="${MUMCORD_PORT_BASE:-$((40000 + 1000 * run))}"
   export MUMCORD_PROJECT="${MUMCORD_PROJECT:-e2e-$run}"
+  # The mumpeer test environment (relay specs) gets its own ports and project per run as well.
+  export MUMPEER_PORT_BASE="${MUMPEER_PORT_BASE:-$((45000 + 100 * run))}"
+  export MUMPEER_PROJECT="${MUMPEER_PROJECT:-e2e-$run-mumpeer}"
 fi
 
 # Builds and default runs (default test servers and ports) take the lock alone; parallel test runs
@@ -68,6 +71,12 @@ for lib in SVTAV1_STATIC_DIR DAV1D_STATIC_DIR; do
     extra+=(-v "${!lib}:${!lib}:ro" -e "$lib")
   fi
 done
+# The mumpeer checkout (testenv for the relay specs): MUMPEER_DIR, else a sibling folder. Mounted
+# read-write at its host path, like the repo, so docker compose resolves its volumes on the host.
+mumpeer="$(realpath -m "${MUMPEER_DIR:-$repo/../mumpeer}")"
+if [ -f "$mumpeer/testenv/up.sh" ]; then
+  extra+=(-v "$mumpeer:$mumpeer" -e "MUMPEER_DIR=$mumpeer")
+fi
 # Host network: the app, bots and netsim reach the testenv servers on localhost:64738-64741 and
 # netsim on 64800/64801. The repo is mounted at its host path so docker compose (via the host
 # socket) resolves testenv's relative volume paths to real host paths.
@@ -88,6 +97,8 @@ exec docker run --rm -i --init "${tty[@]}" \
   -e CI -e MUMCORD_E2E_SHARD -e MUMCORD_E2E_STEP -e MUMCORD_E2E_RUN -e MUMCORD_VERSION \
   -e MUMCORD_PORT_BASE -e MUMCORD_PROJECT \
   -e MUMCORD_E2E_RELAY -e MUMCORD_E2E_RELAY_PORT -e MUMCORD_E2E_RELAY_HOST \
+  -e MUMPEER_PORT_BASE -e MUMPEER_PROJECT -e MUMPEER_PUBLIC_HOST -e MUMPEER_IMAGE -e MUMBOT_IMAGE \
+  -e MUMCORD_E2E_OLD_MUMPEER_IMAGE -e MUMCORD_E2E_OLD_MUMBOT_IMAGE \
   -e CARGO_PROFILE_DEV_DEBUG -e CARGO_INCREMENTAL \
   "${extra[@]}" \
   "$image" "$@"

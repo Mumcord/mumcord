@@ -8,7 +8,13 @@ import type { TFunction } from "i18next";
 import { announce } from "../../a11y/announcer";
 import { getApi, type ChatMessage, type Conversation } from "../../api";
 import { getServerStateOf, selfUser } from "../channels/serverStore";
-import { addOutgoing, confirmOutgoing, setOutgoingError, type OutgoingSend } from "./chatStore";
+import {
+  addOutgoing,
+  confirmOutgoing,
+  setOutgoingError,
+  stampOutgoing,
+  type OutgoingSend,
+} from "./chatStore";
 import type { SendTarget } from "./conversationInfo";
 import { describeSendError } from "./errors";
 
@@ -56,6 +62,7 @@ async function deliver(t: TFunction<"chat">, entry: OutgoingSend): Promise<void>
     if (target === null) {
       setOutgoingError(entry, t("errors.personOffline"));
     } else {
+      stampOutgoing(entry);
       confirmOutgoing(entry, await sendHtml(entry.serverId, target, entry.html));
       return;
     }

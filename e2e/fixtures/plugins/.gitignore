@@ -1,0 +1,3 @@
+# Build output of `mumcord-plugin build`.
+*/target/
+*/dist/

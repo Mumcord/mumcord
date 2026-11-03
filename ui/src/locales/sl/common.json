@@ -68,6 +68,16 @@
     "popOutFailed": "Ločenega okna ni bilo mogoče odpreti",
     "popInFailed": "Pogleda ni bilo mogoče vrniti",
     "onTopFailed": "Možnosti »Vedno na vrhu« ni bilo mogoče spremeniti",
-    "windowTitle": "{{title}} — {{channel}}"
+    "windowTitle": "{{title}} — {{channel}}",
+    "resize": {
+      "label": "Resize media area",
+      "valueText": "{{percent}}% of the window height",
+      "ofWindow": "of the window height",
+      "chatMinimum": "chat keeps its minimum",
+      "release": "release to collapse",
+      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
+      "releaseHint": "Release to minimise to the mini bar",
+      "minimised": "Media area minimised"
+    }
   }
 }

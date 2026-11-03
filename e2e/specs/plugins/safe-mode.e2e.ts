@@ -187,11 +187,11 @@ describe("plugins: limits, back-off and safe mode (AC-6.8 … AC-6.10)", () => {
 
   it("AC-6.10: Turn off all plugins stops everything and stays off after a restart", async function () {
     this.timeout(5 * 60_000);
-    expect((await install("poll")).error).toBeUndefined();
+    expect((await install("fx-strip")).error).toBeUndefined();
     await browser.waitUntil(
       async () =>
-        (await overview()).plugins.find((p) => p.id === "poll")?.status.kind === "running",
-      { timeout: 20_000, timeoutMsg: "Poll never started" },
+        (await overview()).plugins.find((p) => p.id === "fx-strip")?.status.kind === "running",
+      { timeout: 20_000, timeoutMsg: "the test plugin never started" },
     );
 
     await openInstalled();
@@ -210,14 +210,14 @@ describe("plugins: limits, back-off and safe mode (AC-6.8 … AC-6.10)", () => {
     });
     state = await overview();
     expect(state.allOff).toBe(true);
-    expect(state.plugins.find((p) => p.id === "poll")?.status.kind).toBe("allOff");
+    expect(state.plugins.find((p) => p.id === "fx-strip")?.status.kind).toBe("allOff");
     expect(await turnOffAll().isSelected()).toBe(true);
 
     await turnOffAll().click();
     await browser.waitUntil(
       async () =>
-        (await overview()).plugins.find((p) => p.id === "poll")?.status.kind === "running",
-      { timeout: 20_000, timeoutMsg: "Poll did not start after turning plugins on again" },
+        (await overview()).plugins.find((p) => p.id === "fx-strip")?.status.kind === "running",
+      { timeout: 20_000, timeoutMsg: "the test plugin did not start after turning plugins on again" },
     );
     await expect(banner()).not.toBeExisting();
   });
@@ -233,14 +233,14 @@ describe("plugins: limits, back-off and safe mode (AC-6.8 … AC-6.10)", () => {
     const state = await overview();
     expect(state.noPlugins).toBe(true);
     expect(state.plugins.some((p) => p.status.kind === "running")).toBe(false);
-    expect(state.plugins.find((p) => p.id === "poll")?.status.kind).toBe("noPlugins");
+    expect(state.plugins.find((p) => p.id === "fx-strip")?.status.kind).toBe("noPlugins");
 
     // Without the flag the plugin that was on runs again.
     await app.restart({ args: [] });
     await browser.waitUntil(
       async () =>
-        (await overview()).plugins.find((p) => p.id === "poll")?.status.kind === "running",
-      { timeout: 30_000, timeoutMsg: "Poll did not start again without --no-plugins" },
+        (await overview()).plugins.find((p) => p.id === "fx-strip")?.status.kind === "running",
+      { timeout: 30_000, timeoutMsg: "the test plugin did not start again without --no-plugins" },
     );
   });
 });
