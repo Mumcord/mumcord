@@ -3,8 +3,20 @@
 
 use mumcord_screenshare::I420Frame;
 
-/// Size that fits `src` into the box with its aspect ratio kept, both sides even and at least 2.
-/// Never enlarges.
+/// Rounds a picture size down to what every encoder takes without padding: AMD's AMF pads widths
+/// to a multiple of 8 (a grey edge at the right), and I420 needs even sides. Pictures narrower
+/// than 8 pixels (tests only) just get an even width.
+pub(crate) fn encode_size(width: u32, height: u32) -> (u32, u32) {
+    let width = if width >= 8 {
+        width & !7
+    } else {
+        (width & !1).max(2)
+    };
+    (width, (height & !1).max(2))
+}
+
+/// Size that fits `src` into the box with its aspect ratio kept, rounded down by
+/// [`encode_size`]. Never enlarges.
 pub(crate) fn fit(src_w: u32, src_h: u32, max_w: u32, max_h: u32) -> Option<(u32, u32)> {
     if src_w == 0 || src_h == 0 || max_w < 2 || max_h < 2 {
         return None;
@@ -20,7 +32,8 @@ pub(crate) fn fit(src_w: u32, src_h: u32, max_w: u32, max_h: u32) -> Option<(u32
             h = mh;
         }
     }
-    Some((((w & !1).max(2)) as u32, ((h & !1).max(2)) as u32))
+    let clamp = |v: u64| u32::try_from(v).unwrap_or(u32::MAX);
+    Some(encode_size(clamp(w), clamp(h)))
 }
 
 /// Scales a packed BGRX picture (`src_w * 4` bytes per row) into the box and converts it to
@@ -118,9 +131,23 @@ mod tests {
     }
 
     #[test]
+    fn encode_sizes_have_widths_in_eights_and_even_heights() {
+        assert_eq!(encode_size(1366, 768), (1360, 768));
+        assert_eq!(encode_size(854, 481), (848, 480));
+        assert_eq!(encode_size(1920, 1080), (1920, 1080));
+        assert_eq!(encode_size(15, 9), (8, 8));
+        assert_eq!(encode_size(5, 1), (4, 2), "tiny pictures stay even");
+        for width in 8..2000 {
+            let (w, h) = encode_size(width, width / 2 + 1);
+            assert!(w % 8 == 0 && h % 2 == 0 && w <= width && width - w < 8);
+        }
+    }
+
+    #[test]
     fn fit_keeps_aspect_ratio_even_and_never_enlarges() {
         assert_eq!(fit(2560, 1440, 1920, 1080), Some((1920, 1080)));
-        assert_eq!(fit(1366, 768, 1920, 1080), Some((1366, 768)));
+        assert_eq!(fit(1366, 768, 1920, 1080), Some((1360, 768)));
+        assert_eq!(fit(1920, 1080, 854, 480), Some((848, 480)));
         assert_eq!(fit(1920, 1080, 1280, 720), Some((1280, 720)));
         assert_eq!(fit(2560, 1080, 1280, 720), Some((1280, 540)));
         assert_eq!(fit(1000, 1000, 1281, 721), Some((720, 720)));

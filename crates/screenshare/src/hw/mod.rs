@@ -12,6 +12,9 @@ mod amf;
 mod dl;
 #[cfg(hwenc)]
 mod nvenc;
+// Used by the vendor encoders that don't report temporal layer ids themselves.
+#[cfg(hwenc)]
+mod obu;
 #[cfg(hwenc)]
 mod qsv;
 #[cfg(all(hwenc, target_os = "linux"))]
@@ -112,8 +115,8 @@ pub fn open_hardware_encoder(
 mod tests {
     use super::*;
 
-    // Until the vendor encoders exist, every one of them reports itself unavailable instead of
-    // failing to load or crashing; that is also the path of a machine without the GPU.
+    // Without the GPU (as in CI), every encoder reports itself unavailable instead of failing to
+    // load or crashing. Implemented encoders may open on a machine that has the hardware.
     #[test]
     fn every_hardware_encoder_reports_unavailable() {
         let config = EncoderConfig {
@@ -127,6 +130,10 @@ mod tests {
                 match open_hardware_encoder(encoder, codec, config) {
                     Err(Error::HardwareUnavailable { encoder: e, .. }) => assert_eq!(e, encoder),
                     Err(err) => panic!("{encoder} {codec:?}: unexpected error {err}"),
+                    Ok(_) if (encoder, codec) == (HardwareEncoder::Nvenc, Codec::Av1) => {}
+                    Ok(_) if encoder == HardwareEncoder::Vaapi => {}
+                    Ok(_) if (encoder, codec) == (HardwareEncoder::Amf, Codec::Av1) => {}
+                    Ok(_) if encoder == HardwareEncoder::Qsv => {}
                     Ok(_) => panic!("{encoder} {codec:?}: not implemented yet"),
                 }
             }

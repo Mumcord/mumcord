@@ -326,9 +326,15 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_sound_level,
             commands::screen_share::screen_share_watch,
             commands::screen_share::screen_share_unwatch,
-            commands::screen_share::screen_share_set_decode_fallback,
+            commands::screen_share::screen_share_set_decode_codecs,
+            commands::screen_share::screen_share_set_viewer_fps,
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
+            commands::screen_share::screen_share_set_quality,
+            commands::screen_share::screen_share_undo_encoder_switch,
+            commands::screen_share::screen_encoder_status,
+            commands::screen_share::screen_encoder_check_again,
+            commands::screen_share::screen_encoder_prepare,
             commands::screen_share::screen_share_block,
             commands::screen_share::screen_share_quality,
             commands::screen_share::screen_share_thumbnail,
@@ -400,6 +406,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
+            commands::screen_share::ScreenEncoderStatusChanged,
             commands::updates::UpdateStatusChanged,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
@@ -536,7 +543,8 @@ fn create_main_window(app: &AppHandle) -> tauri::Result<()> {
         .find(|w| w.label == "main")
         .ok_or(tauri::Error::WindowNotFound)?
         .clone();
-    let mut builder = tauri::WebviewWindowBuilder::from_config(app, &config)?;
+    let mut builder =
+        crate::browser::deny_new_windows(tauri::WebviewWindowBuilder::from_config(app, &config)?);
     if let Some(dir) = portable::webview_data_dir() {
         builder = builder.data_directory(dir);
     }
@@ -917,6 +925,12 @@ fn emit_engine_event(
             commands::watch_party::WatchPartyChanged {
                 server_id,
                 party: party.map(Into::into),
+            }
+            .emit(app)
+        }
+        EngineEvent::ScreenEncoderStatusChanged(status) => {
+            commands::screen_share::ScreenEncoderStatusChanged {
+                status: status.into(),
             }
             .emit(app)
         }

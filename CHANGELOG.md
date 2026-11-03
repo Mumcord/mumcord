@@ -6,6 +6,9 @@
 
 - The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
+- Screen sharing picks its encoder automatically: Mumcord checks in the background which graphics-card encoders work and how well the processor handles AV1, then uses AV1 on the graphics card, AV1 on the processor (up to 1080p30, not on battery), or VP9. The check runs again after a driver or Mumcord update
+- Watching a screen share plays AV1 as well as VP9, decoded by the system where it can and by Mumcord itself otherwise, so AV1 shares play on every computer. Viewers can lower the frame rate they receive (Auto, up to 30 or up to 15) without the sharer encoding anything extra
+- A screen share switches to VP9 while someone watches with an older Mumcord that can only play VP9, and goes back once they leave. If AV1 on the processor can't keep up, the share switches to VP9 by itself, and you can undo that once per share
 - The server info panel lists what the relay allows ("Relay allows: Images · Files · Screen sharing"), and buttons and the image viewer say so in plain words when the relay doesn't allow a feature.
 - Settings → Privacy & Connections has a new "File sharing" card: turn receiving files on or off, pick the maximum file size (100 MB to 2 GB) and choose the folder where received files are saved (by default a "Mumcord" folder inside Downloads).
 - The message input has a paperclip button and accepts dropped files and folders in channels: each becomes a chip with its size or progress and a remove button. The paperclip says why it is unavailable when the server has no relay, the relay doesn't allow files, you have no certificate, or your peer-to-peer setting needs the relay.
@@ -15,14 +18,17 @@
 
 ### Fixed
 
+- A middle click on a link, or a click with Ctrl, Cmd or Shift held, opens it in your browser like a normal click. It used to load the page inside Mumcord, in a window of its own or in place of the whole app, and no page from outside ever gets a Mumcord window now (#418)
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 - Chat history of locked channels (password or restricted entry) is no longer shared with people who only follow or listen to them: only people inside the channel get its earlier messages, and members who use a channel password must prove they know the current one. "Follow all" now skips channels you may not enter. Older Mumcord versions still share it, so everyone should update (#382)
 - When someone connects to you through the relay without sharing their network address ("Always use relay"), Mumcord no longer sends them yours either; the connection always went through the relay, so your address was revealed for nothing
+- The letter shown in place of a missing plugin icon in Settings → Plugins → Installed now reads well on its tile: the tile uses checked theme colours, so the letter meets WCAG AA in the dark and light themes and with any accent colour (#405)
 
 ### Internal
 
 - File transfer over the relay (not yet visible in the app): files travel only through the relay on their own stream with a size check, and a screen share or full-size image download continues when that switches the connection from direct to the relay
 - Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
+- The file transfer stall test no longer pauses the sending client's process: a frozen client also stops sending to the Mumble server, whose own 30 s idle timeout can win the race on a loaded CI runner and shows the other failure text. A new debug-only hook `MUMCORD_TEST_FILE_STALL_AFTER` stops file bytes only, so the client's own 30 s stall timer decides the test (#420)
 
 ## [0.6.2] - 2026-11-02
 

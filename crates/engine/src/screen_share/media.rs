@@ -21,14 +21,17 @@ use mumcord_audio::mixer::share::share_encoder;
 use mumcord_audio::{FRAME_SAMPLES, SAMPLE_RATE};
 use mumcord_p2p::quinn::{RecvStream, SendStream};
 use mumcord_screenshare::{
-    Codec, EncodedFrame, Encoder, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
+    Codec, EncodedFrame, EncoderConfig, I420Frame, TEMPORAL_LAYERS, VideoEncoder,
 };
 use mumcord_store::ScreenOptimize;
 use tokio::task::JoinHandle;
 
 use super::capture::{CaptureSource, SoundSource};
+use super::encoder::ActiveEncoder;
+use super::encoder::monitor::{FrameLoad, LoadDetails, LoadMonitor};
 use super::fanout::{RateLimit, ViewerQueue};
 use super::quality::{Load, LoweredReason, Quality, QualityPrefs, Steps};
+use super::state::ViewerCaps;
 use super::thumbnail::ShareThumbnail;
 use super::wire::{self, Frame, FrameHeader, FrameKind};
 use crate::session::lock;
@@ -82,6 +85,26 @@ pub struct ScreenMediaStats {
     pub encode_ms: f64,
     pub keyframes: u32,
     pub viewers: Vec<ViewerMediaStats>,
+    /// The share left its encoder for VP9 (FR-7.57, FR-7.58); the bar shows it as a notice.
+    pub switched: Option<EncoderSwitch>,
+}
+
+/// The share switched from AV1 to VP9 and still runs on VP9.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct EncoderSwitch {
+    pub reason: SwitchReason,
+    pub from: ActiveEncoder,
+    pub to: ActiveEncoder,
+    /// "Undo" is offered: the first load fallback of the share (FR-7.57).
+    pub undo: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum SwitchReason {
+    /// "Switched to VP9 to reduce load", with the numbers for "Details".
+    Load(LoadDetails),
+    /// "Switched to VP9 for {name}": this viewer cannot play AV1.
+    Viewer { session: u32 },
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -93,6 +116,56 @@ pub struct ViewerMediaStats {
     pub fps: u32,
     /// It lost every layer it can and still does not keep up: the quality step is lowered for it.
     pub struggling: bool,
+    /// It lost a layer in the last 10 s: the viewer list shows "slow connection" (FR-7.52).
+    pub slow: bool,
+    /// The share's codec, which every viewer gets; `None` until the encoder opened.
+    pub codec: Option<Codec>,
+    pub path: ViewerPath,
+}
+
+/// How the share reaches one viewer (viewer list, FR-7.52).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum ViewerPath {
+    #[default]
+    Direct,
+    /// A copy of its own over a relayed connection.
+    Relay,
+    /// The single upload the relay copies to every subscriber (set by the broadcast task, BC1).
+    Broadcast,
+}
+
+impl ScreenMediaStats {
+    /// Adds what the media path does not know: the share's codec and how each viewer's
+    /// connection travels.
+    pub(crate) fn add_viewer_paths(
+        &mut self,
+        encoder: Option<ActiveEncoder>,
+        path: impl Fn(u32) -> ViewerPath,
+    ) {
+        for viewer in &mut self.viewers {
+            viewer.codec = encoder.map(|e| e.codec);
+            viewer.path = path(viewer.session);
+        }
+    }
+
+    /// Adds the viewers that get the share through the relay broadcast, as their reports
+    /// describe them (FR-7.52); the relay drops their layers, so none counts as struggling here.
+    pub(crate) fn add_broadcast_viewers(
+        &mut self,
+        encoder: Option<ActiveEncoder>,
+        relay_viewers: &[super::RelayViewer],
+    ) {
+        self.viewers
+            .extend(relay_viewers.iter().map(|viewer| ViewerMediaStats {
+                session: viewer.session,
+                max_layer: wire::MAX_TEMPORAL_LAYER,
+                fps: viewer.fps,
+                struggling: false,
+                slow: viewer.slow,
+                codec: encoder.map(|e| e.codec),
+                path: ViewerPath::Broadcast,
+            }));
+    }
 }
 
 /// What the encode thread, the writer tasks and the engine share.
@@ -116,6 +189,10 @@ struct Hub {
     upload: Mutex<Option<RateLimit>>,
     /// New picks for the encode thread, taken with the next frame.
     prefs: Mutex<Option<QualityPrefs>>,
+    /// A viewer that cannot play AV1; while there is one the share runs VP9 (FR-7.58).
+    av1_blocker: Mutex<Option<u32>>,
+    /// The sharer pressed "Undo" on a load fallback (FR-7.57).
+    undo: AtomicBool,
     /// Frame rate of the current step and the encoder's top temporal layer, for the stats.
     step_fps: AtomicU32,
     top_layer: AtomicU8,
@@ -151,16 +228,37 @@ pub(crate) struct Media {
     hub: Arc<Hub>,
 }
 
-/// Makes the share's encoder for a size and the "Optimize for" pick; the encoder selection
-/// (FR-7.53) hands in its choice, without one the share uses VP9 in software.
-pub(crate) type EncoderFactory = Box<
-    dyn Fn(EncoderConfig, ScreenOptimize) -> mumcord_screenshare::Result<Box<dyn VideoEncoder>>
+/// Opens the share's encoder for a size and the "Optimize for" pick, AV1 only when the flag
+/// allows it; returns which encoder opened.
+pub(crate) type OpenEncoder = Box<
+    dyn Fn(
+            EncoderConfig,
+            ScreenOptimize,
+            bool,
+        ) -> mumcord_screenshare::Result<(Box<dyn VideoEncoder>, ActiveEncoder)>
         + Send,
 >;
 
-/// The default encoder: VP9 on libvpx, which every viewer can play.
+/// The share's encoders as the selection (FR-7.53, `encoder::factory`) hands them in.
+pub(crate) struct EncoderFactory {
+    /// Some encoder of the selection is AV1; without one, viewers never make the share switch.
+    pub offers_av1: bool,
+    pub open: OpenEncoder,
+}
+
+/// VP9 on libvpx, which every viewer can play.
+#[cfg(test)]
 pub(crate) fn vp9_encoder() -> EncoderFactory {
-    Box::new(|config, _| Ok(Box::new(Encoder::new(config)?)))
+    EncoderFactory {
+        offers_av1: false,
+        open: Box::new(|config, _, _| {
+            let opened = ActiveEncoder {
+                codec: Codec::Vp9,
+                gpu: None,
+            };
+            Ok((Box::new(mumcord_screenshare::Encoder::new(config)?), opened))
+        }),
+    }
 }
 
 impl Media {
@@ -181,6 +279,8 @@ impl Media {
             limit: Mutex::new(None),
             upload: Mutex::new(prefs.upload_limit_kbps().map(RateLimit::new)),
             prefs: Mutex::new(None),
+            av1_blocker: Mutex::new(None),
+            undo: AtomicBool::new(false),
             step_fps: AtomicU32::new(0),
             top_layer: AtomicU8::new(TEMPORAL_LAYERS - 1),
             stats: Mutex::new(ScreenMediaStats::default()),
@@ -238,17 +338,34 @@ impl Media {
     }
 
     /// Starts sending to `session` over its screen stream; the returned link ends it on drop.
+    /// The first viewer that cannot play AV1, if any; the encode thread switches codecs with
+    /// the next frame (FR-7.58).
+    pub fn set_av1_blocker(&self, viewer: Option<u32>) {
+        *lock(&self.hub.av1_blocker) = viewer;
+    }
+
+    /// Goes back to the encoder before a load fallback; false when the share offers no Undo.
+    pub fn undo_encoder_switch(&self) -> bool {
+        let offered = lock(&self.hub.stats).switched.is_some_and(|s| s.undo);
+        if offered {
+            self.hub.undo.store(true, Ordering::Relaxed);
+        }
+        offered
+    }
+
+    /// Sends the share to `session` in the frame version and codecs it can play.
     pub fn add_viewer(
         &self,
         rt: &tokio::runtime::Handle,
         session: u32,
+        caps: ViewerCaps,
         send: SendStream,
         recv: RecvStream,
     ) -> ViewerLink {
         let queue = Arc::new(ViewerQueue::new());
         lock(&self.hub.viewers).insert(session, queue.clone());
         self.hub.keyframe.store(true, Ordering::Relaxed);
-        let writer = rt.spawn(write_frames(queue, self.hub.clone(), send));
+        let writer = rt.spawn(write_frames(queue, self.hub.clone(), send, caps));
         let hub = self.hub.clone();
         let requests = rt.spawn(read_requests(hub, recv));
         ViewerLink {
@@ -283,6 +400,7 @@ impl Media {
         let mut stats = lock(&self.hub.stats).clone();
         let base_fps = self.hub.step_fps.load(Ordering::Relaxed);
         let top = self.hub.top_layer.load(Ordering::Relaxed);
+        let now = Instant::now();
         stats.viewers = lock(&self.hub.viewers)
             .iter()
             .filter(|(key, _)| **key != BROADCAST_KEY)
@@ -294,6 +412,9 @@ impl Media {
                     // Every layer below the top one halves the frame rate (fanout).
                     fps: base_fps >> top.saturating_sub(layer),
                     struggling: queue.with_policy(super::fanout::Policy::struggling),
+                    slow: queue.with_policy(|p| p.slow(now)),
+                    codec: None,
+                    path: ViewerPath::Direct,
                 }
             })
             .collect();
@@ -337,10 +458,18 @@ impl Drop for ViewerLink {
     }
 }
 
-/// The next frame for `queue`, once the upload limits allow sending it.
-async fn paced_next(queue: &ViewerQueue, hub: &Hub) -> Arc<Frame> {
-    let frame = queue.next().await;
-    let bytes = wire::HEADER_LEN + frame.payload.len();
+/// The next frame for `queue` that a reader of `av1` can play, once the upload limits allow
+/// sending `header_len` + payload bytes.
+async fn paced_next(queue: &ViewerQueue, hub: &Hub, header_len: usize, av1: bool) -> Arc<Frame> {
+    let frame = loop {
+        let frame = queue.next().await;
+        if av1 || frame.header.kind != FrameKind::Video(Codec::Av1) {
+            break frame;
+        }
+        // Left over from before the switch to VP9 for this viewer; the VP9 encoder starts
+        // with a keyframe, and the viewer decodes nothing before it.
+    };
+    let bytes = header_len + frame.payload.len();
     let now = Instant::now();
     let wait = [&queue.limit, &hub.limit, &hub.upload]
         .iter()
@@ -361,9 +490,12 @@ pub(crate) struct Subscription {
 }
 
 impl Subscription {
-    /// The next frame to send, once the upload limits allow it.
+    /// The next frame to send, once the upload limits allow it. Relay units carry frame
+    /// version 2, and while a viewer that cannot play AV1 watches (on any path), AV1 frames
+    /// left from before the switch to VP9 are skipped (FR-7.58).
     pub async fn next(&self) -> Arc<Frame> {
-        paced_next(&self.queue, &self.hub).await
+        let av1 = lock(&self.hub.av1_blocker).is_none();
+        paced_next(&self.queue, &self.hub, wire::MAX_HEADER_LEN, av1).await
     }
 
     /// Asks the encoder for a keyframe (a new subscriber at the relay, or a rekey).
@@ -384,10 +516,17 @@ impl Drop for Subscription {
     }
 }
 
-async fn write_frames(queue: Arc<ViewerQueue>, hub: Arc<Hub>, mut send: SendStream) {
+async fn write_frames(
+    queue: Arc<ViewerQueue>,
+    hub: Arc<Hub>,
+    mut send: SendStream,
+    caps: ViewerCaps,
+) {
+    let version = caps.wire;
+    let header_len = wire::header_len(version).unwrap_or(wire::MAX_HEADER_LEN);
     loop {
-        let frame = paced_next(&queue, &hub).await;
-        if let Err(e) = wire::write_frame(&mut send, &frame).await {
+        let frame = paced_next(&queue, &hub, header_len, caps.av1).await;
+        if let Err(e) = wire::write_frame(&mut send, &frame, version).await {
             tracing::debug!(error = %e, "screen stream to a viewer ended");
             return;
         }
@@ -442,9 +581,11 @@ fn encode_loop(
     let start = hub.epoch;
     let mut steps = Steps::new(prefs, Codec::Vp9);
     let mut encoder: Option<Box<dyn VideoEncoder>> = None;
+    let mut codecs = CodecChoice::new(make_encoder.offers_av1);
     let mut meter = Meter::new(start);
     let mut keyframes = KeyframeGate::default();
     let mut encode_avg = 0.0_f64;
+    let mut late = 0_u32;
     let mut next = start;
     while !hub.stop.load(Ordering::Relaxed) {
         if capture.ended() {
@@ -460,6 +601,14 @@ fn encode_loop(
                 encoder = None;
             }
         }
+        let undo = hub.undo.swap(false, Ordering::Relaxed);
+        let blocker = *lock(&hub.av1_blocker);
+        if undo || blocker != codecs.blocker {
+            if codecs.update(blocker, undo) {
+                encoder = None;
+            }
+            lock(&hub.stats).switched = codecs.switched;
+        }
         if steps.limit(hub.load().copies, Instant::now()) {
             log_quality(steps.quality());
         }
@@ -472,8 +621,10 @@ fn encode_loop(
         } else {
             // Behind by more than a frame: skip ahead instead of rushing frames out.
             next = now;
+            late = late.saturating_add(1);
         }
         if hub.paused.load(Ordering::Relaxed) {
+            late = 0;
             continue;
         }
         let Some(picture) = capture.frame(quality.width, quality.height) else {
@@ -492,11 +643,15 @@ fn encode_loop(
                 fps: quality.fps,
                 bitrate_kbps: quality.bitrate_kbps,
             };
-            match make_encoder(config, steps.prefs().optimize) {
-                Ok(enc) => {
+            match (make_encoder.open)(config, steps.prefs().optimize, codecs.want_av1()) {
+                Ok((enc, opened)) => {
                     steps.set_codec(enc.codec());
                     encoder = Some(enc);
                     keyframe = true;
+                    // The old encoder's times say nothing about the new one.
+                    encode_avg = 0.0;
+                    late = 0;
+                    lock(&hub.stats).switched = codecs.opened(opened);
                 }
                 Err(e) => {
                     tracing::error!(error = %e, "screen share encoder did not start");
@@ -510,13 +665,17 @@ fn encode_loop(
         match reconfigure(enc.as_mut(), size, steps.quality()) {
             Ok(resized) => keyframe |= resized,
             Err(e) => {
-                tracing::warn!(error = %e, "screen share quality change failed");
+                // A hardware encoder may refuse a size it would not open at either (AMF wants
+                // 64x16 blocks); opening anew at the new size falls through to the next encoder.
+                tracing::warn!(error = %e, "screen share encoder refused the new quality; opening it again");
+                encoder = None;
                 continue;
             }
         }
         hub.step_fps.store(quality.fps, Ordering::Relaxed);
         let top_layer = enc.temporal_layers().saturating_sub(1);
         hub.top_layer.store(top_layer, Ordering::Relaxed);
+        let codec = enc.codec();
         let pts =
             i64::try_from(Instant::now().duration_since(start).as_millis()).unwrap_or(i64::MAX);
         let began = Instant::now();
@@ -528,6 +687,9 @@ fn encode_loop(
                 continue;
             }
         };
+        if let Some(delay) = crate::test_hooks::encode_delay() {
+            thread::sleep(delay);
+        }
         let took = began.elapsed();
         encode_avg = encode_avg * 0.9 + took.as_secs_f64() * 0.1;
         meter.encode += took;
@@ -544,10 +706,21 @@ fn encode_loop(
                 // given; the sharer's own client does not decode anything for it.
                 lock(&hub.thumbnail).replace(picture.clone());
             }
-            fan_out(hub, to_frame(out, size), top_layer, now);
+            fan_out(hub, to_frame(out, size, codec), top_layer, now);
+        }
+        let busy = encode_avg > frame_time.as_secs_f64() * ENCODE_BUDGET;
+        let frame_load = FrameLoad {
+            encode: took,
+            budget: frame_time,
+            busy,
+            dropped: std::mem::take(&mut late),
+        };
+        if codecs.load(frame_load, now) {
+            encoder = None;
         }
         let load = Load {
-            encoder_busy: encode_avg > frame_time.as_secs_f64() * ENCODE_BUDGET,
+            // Software AV1 falls back to VP9 instead of lowering the quality (FR-7.57).
+            encoder_busy: busy && !codecs.on_software_av1(),
             ..hub.load()
         };
         if steps.observe(load, now) {
@@ -569,6 +742,131 @@ fn encode_loop(
             drop(stats);
             meter = Meter::new(now);
         }
+    }
+}
+
+/// Which codec the share runs and why (FR-7.57, FR-7.58). It decides; the encode thread
+/// reopens the encoder (with a keyframe, at the same size) whenever a method says so.
+struct CodecChoice {
+    /// The selection has an AV1 encoder that opened, as far as known.
+    av1_possible: bool,
+    /// The encoder running now.
+    active: Option<ActiveEncoder>,
+    /// A viewer that cannot play AV1.
+    blocker: Option<u32>,
+    /// Load fallbacks in this share; Undo ends with the second.
+    load_fallbacks: u32,
+    /// VP9 because software AV1 could not keep up, until Undo.
+    load_hold: bool,
+    monitor: LoadMonitor,
+    /// Why the next encoder is opened, for the notice.
+    pending: Option<SwitchReason>,
+    /// The notice of the switch that still holds.
+    switched: Option<EncoderSwitch>,
+}
+
+impl CodecChoice {
+    fn new(offers_av1: bool) -> Self {
+        Self {
+            av1_possible: offers_av1,
+            active: None,
+            blocker: None,
+            load_fallbacks: 0,
+            load_hold: false,
+            monitor: LoadMonitor::default(),
+            pending: None,
+            switched: None,
+        }
+    }
+
+    fn want_av1(&self) -> bool {
+        self.av1_possible && !self.load_hold && self.blocker.is_none()
+    }
+
+    fn on_av1(&self) -> bool {
+        self.active.is_some_and(|a| a.codec == Codec::Av1)
+    }
+
+    fn on_software_av1(&self) -> bool {
+        self.active
+            .is_some_and(|a| a.codec == Codec::Av1 && a.gpu.is_none())
+    }
+
+    /// The running encoder no longer fits what is wanted.
+    fn needs_reopen(&self) -> bool {
+        self.active.is_some() && self.on_av1() != self.want_av1()
+    }
+
+    /// The current AV1 blocker and whether the sharer pressed Undo; true when the encoder has
+    /// to change.
+    fn update(&mut self, blocker: Option<u32>, undo: bool) -> bool {
+        if blocker != self.blocker {
+            self.blocker = blocker;
+            let on_av1 = self.on_av1();
+            match (blocker, self.switched.as_mut()) {
+                (Some(session), _) if on_av1 => {
+                    self.pending = Some(SwitchReason::Viewer { session });
+                }
+                (Some(session), Some(switch))
+                    if matches!(switch.reason, SwitchReason::Viewer { .. }) =>
+                {
+                    switch.reason = SwitchReason::Viewer { session };
+                }
+                _ => {}
+            }
+        }
+        if undo && self.switched.is_some_and(|s| s.undo) {
+            self.load_hold = false;
+            if !self.needs_reopen() {
+                // A viewer still holds the share on VP9; the load notice is over all the same.
+                self.switched = None;
+            }
+        }
+        self.needs_reopen()
+    }
+
+    /// One encoded frame; true when software AV1 could not keep up and the share falls back.
+    fn load(&mut self, frame: FrameLoad, now: Instant) -> bool {
+        if !self.on_software_av1() {
+            return false;
+        }
+        let Some(details) = self.monitor.frame(frame, now) else {
+            return false;
+        };
+        tracing::info!(
+            encode_ms = details.encode_ms,
+            budget_ms = details.budget_ms,
+            dropped = details.dropped,
+            "software AV1 cannot keep up; switching the screen share to VP9"
+        );
+        self.load_fallbacks += 1;
+        self.load_hold = true;
+        self.pending = Some(SwitchReason::Load(details));
+        true
+    }
+
+    /// The encoder that just opened; returns the notice that holds now.
+    fn opened(&mut self, opened: ActiveEncoder) -> Option<EncoderSwitch> {
+        let asked_av1 = self.want_av1();
+        let from = self.active.replace(opened);
+        self.monitor.reset();
+        if asked_av1 && opened.codec != Codec::Av1 {
+            // Every AV1 encoder failed to open; staying on VP9 avoids reopening each frame.
+            self.av1_possible = false;
+        }
+        match (self.pending.take(), from) {
+            (Some(reason), Some(from)) if opened.codec == Codec::Vp9 => {
+                self.switched = Some(EncoderSwitch {
+                    reason,
+                    from,
+                    to: opened,
+                    undo: matches!(reason, SwitchReason::Load(_)) && self.load_fallbacks == 1,
+                });
+            }
+            _ if opened.codec == Codec::Av1 => self.switched = None,
+            _ => {}
+        }
+        self.switched
     }
 }
 
@@ -678,11 +976,11 @@ fn fan_out(hub: &Hub, frame: Frame, top_layer: u8, now: Instant) {
     }
 }
 
-fn to_frame(out: EncodedFrame, (width, height): (u32, u32)) -> Frame {
+fn to_frame(out: EncodedFrame, (width, height): (u32, u32), codec: Codec) -> Frame {
     let payload_len = u32::try_from(out.data.len()).unwrap_or(u32::MAX);
     Frame {
         header: FrameHeader {
-            kind: FrameKind::Video,
+            kind: FrameKind::Video(codec),
             keyframe: out.keyframe,
             temporal_layer: out.temporal_layer,
             timestamp_us: u64::try_from(out.pts).unwrap_or_default() * 1000,
@@ -696,6 +994,8 @@ fn to_frame(out: EncodedFrame, (width, height): (u32, u32)) -> Frame {
 
 #[cfg(test)]
 mod tests {
+    use mumcord_screenshare::Encoder;
+
     use super::*;
 
     /// The default share's steps (1080p30 → 720p30 → 720p15 → 480p15).
@@ -705,6 +1005,44 @@ mod tests {
 
     /// The lowest quality step (480p15).
     const FLOOR: usize = 3;
+
+    #[test]
+    fn viewer_stats_get_the_share_codec_and_their_path() {
+        let mut stats = ScreenMediaStats {
+            viewers: vec![
+                ViewerMediaStats {
+                    session: 3,
+                    ..ViewerMediaStats::default()
+                },
+                ViewerMediaStats {
+                    session: 7,
+                    ..ViewerMediaStats::default()
+                },
+            ],
+            ..ScreenMediaStats::default()
+        };
+        stats.add_viewer_paths(None, |_| ViewerPath::Direct);
+        assert_eq!(stats.viewers[0].codec, None, "no encoder opened yet");
+        let av1 = ActiveEncoder {
+            codec: Codec::Av1,
+            gpu: None,
+        };
+        stats.add_viewer_paths(Some(av1), |session| {
+            if session == 7 {
+                ViewerPath::Relay
+            } else {
+                ViewerPath::Direct
+            }
+        });
+        let got: Vec<_> = stats.viewers.iter().map(|v| (v.codec, v.path)).collect();
+        assert_eq!(
+            got,
+            [
+                (Some(Codec::Av1), ViewerPath::Direct),
+                (Some(Codec::Av1), ViewerPath::Relay)
+            ]
+        );
+    }
 
     struct Ending;
     impl CaptureSource for Ending {
@@ -740,15 +1078,292 @@ mod tests {
 
     /// Software AV1 behind the encoder trait, with screen-content tools for "Sharp text".
     fn av1_encoder(screen_content: Arc<Mutex<Vec<bool>>>) -> EncoderFactory {
-        Box::new(move |config, optimize| {
-            let options = mumcord_screenshare::Av1Options {
-                screen_content: optimize == ScreenOptimize::Text,
-            };
-            lock(&screen_content).push(options.screen_content);
-            Ok(Box::new(mumcord_screenshare::Av1Encoder::new(
-                config, options,
-            )?))
-        })
+        EncoderFactory {
+            offers_av1: true,
+            open: Box::new(move |config, optimize, _| {
+                let options = mumcord_screenshare::Av1Options {
+                    screen_content: optimize == ScreenOptimize::Text,
+                };
+                lock(&screen_content).push(options.screen_content);
+                let encoder = mumcord_screenshare::Av1Encoder::new(config, options)?;
+                Ok((Box::new(encoder), SOFTWARE_AV1))
+            }),
+        }
+    }
+
+    const SOFTWARE_AV1: ActiveEncoder = ActiveEncoder {
+        codec: Codec::Av1,
+        gpu: None,
+    };
+    const SOFTWARE_VP9: ActiveEncoder = ActiveEncoder {
+        codec: Codec::Vp9,
+        gpu: None,
+    };
+
+    /// An encoder that only takes time: one tiny frame per picture after `delay`.
+    struct Fake {
+        codec: Codec,
+        config: EncoderConfig,
+        delay: Duration,
+        /// Like AMF: sizes must be multiples of this, at open and on resize.
+        blocks: Option<(u32, u32)>,
+    }
+
+    impl Fake {
+        fn check_size(&self, width: u32, height: u32) -> mumcord_screenshare::Result<()> {
+            match self.blocks {
+                Some((bw, bh)) if !width.is_multiple_of(bw) || !height.is_multiple_of(bh) => {
+                    Err(mumcord_screenshare::Error::HardwareUnavailable {
+                        encoder: mumcord_screenshare::HardwareEncoder::Amf,
+                        reason: format!("{width}x{height} is not aligned"),
+                    })
+                }
+                _ => Ok(()),
+            }
+        }
+    }
+
+    impl VideoEncoder for Fake {
+        fn codec(&self) -> Codec {
+            self.codec
+        }
+        fn config(&self) -> EncoderConfig {
+            self.config
+        }
+        fn temporal_layers(&self) -> u8 {
+            1
+        }
+        fn encode(
+            &mut self,
+            _: &I420Frame,
+            pts: i64,
+            keyframe: bool,
+        ) -> mumcord_screenshare::Result<Vec<EncodedFrame>> {
+            thread::sleep(self.delay);
+            Ok(vec![EncodedFrame {
+                data: vec![0],
+                keyframe,
+                temporal_layer: 0,
+                pts,
+            }])
+        }
+        fn set_resolution(&mut self, width: u32, height: u32) -> mumcord_screenshare::Result<()> {
+            self.check_size(width, height)?;
+            (self.config.width, self.config.height) = (width, height);
+            Ok(())
+        }
+        fn set_bitrate(&mut self, kbps: u32) -> mumcord_screenshare::Result<()> {
+            self.config.bitrate_kbps = kbps;
+            Ok(())
+        }
+        fn set_fps(&mut self, fps: u32) -> mumcord_screenshare::Result<()> {
+            self.config.fps = fps;
+            Ok(())
+        }
+    }
+
+    /// Software AV1 that takes `av1_delay` per frame, else VP9 at no cost; every open is logged.
+    fn fake_encoders(av1_delay: Duration, opened: Arc<Mutex<Vec<Codec>>>) -> EncoderFactory {
+        EncoderFactory {
+            offers_av1: true,
+            open: Box::new(move |config, _, av1| {
+                let (active, delay) = if av1 {
+                    (SOFTWARE_AV1, av1_delay)
+                } else {
+                    (SOFTWARE_VP9, Duration::ZERO)
+                };
+                lock(&opened).push(active.codec);
+                let codec = active.codec;
+                Ok((
+                    Box::new(Fake {
+                        codec,
+                        config,
+                        delay,
+                        blocks: None,
+                    }),
+                    active,
+                ))
+            }),
+        }
+    }
+
+    #[test]
+    fn a_hardware_encoder_refusing_a_new_size_falls_back_to_the_next_one() {
+        use mumcord_store::ScreenResolution;
+        const AMD_AV1: ActiveEncoder = ActiveEncoder {
+            codec: Codec::Av1,
+            gpu: Some(super::super::GpuVendor::Amd),
+        };
+        let opened = Arc::new(Mutex::new(Vec::new()));
+        let log = opened.clone();
+        // The selection's order: AMD AV1 that wants 64x16 blocks, else VP9 in software.
+        let factory = EncoderFactory {
+            offers_av1: true,
+            open: Box::new(move |config, _, _| {
+                let amd = Fake {
+                    codec: Codec::Av1,
+                    config,
+                    delay: Duration::ZERO,
+                    blocks: Some((64, 16)),
+                };
+                if amd.check_size(config.width, config.height).is_ok() {
+                    lock(&log).push(AMD_AV1);
+                    return Ok((Box::new(amd), AMD_AV1));
+                }
+                lock(&log).push(SOFTWARE_VP9);
+                let vp9 = Fake {
+                    codec: Codec::Vp9,
+                    config,
+                    delay: Duration::ZERO,
+                    blocks: None,
+                };
+                Ok((Box::new(vp9), SOFTWARE_VP9))
+            }),
+        };
+        let prefs = QualityPrefs {
+            resolution: ScreenResolution::P720,
+            ..QualityPrefs::default()
+        };
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            prefs,
+            factory,
+        );
+        wait_for(&media, |s| s.fps > 0 && s.width == 1280);
+        // 1080 is not a multiple of 16: the resize is refused and AMD does not open either.
+        media.set_prefs(QualityPrefs {
+            resolution: ScreenResolution::P1080,
+            ..prefs
+        });
+        let stats = wait_for(&media, |s| s.width == 1920 && s.fps > 0);
+        assert_eq!((stats.width, stats.height), (1920, 1080));
+        assert_eq!(*lock(&opened), [AMD_AV1, SOFTWARE_VP9]);
+    }
+
+    #[test]
+    fn a_vp9_only_viewer_switches_the_share_to_vp9_until_it_leaves() {
+        let opened = Arc::new(Mutex::new(Vec::new()));
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            QualityPrefs::default(),
+            fake_encoders(Duration::ZERO, opened.clone()),
+        );
+        wait_for(&media, |s| s.fps > 0);
+        media.set_av1_blocker(Some(7));
+        let stats = wait_for(&media, |s| s.switched.is_some());
+        assert_eq!(
+            stats.switched,
+            Some(EncoderSwitch {
+                reason: SwitchReason::Viewer { session: 7 },
+                from: SOFTWARE_AV1,
+                to: SOFTWARE_VP9,
+                undo: false,
+            })
+        );
+        assert!(!media.undo_encoder_switch(), "no Undo for a viewer switch");
+        media.set_av1_blocker(None);
+        let stats = wait_for(&media, |s| s.switched.is_none());
+        assert_eq!(stats.switched, None);
+        assert_eq!(*lock(&opened), [Codec::Av1, Codec::Vp9, Codec::Av1]);
+    }
+
+    #[test]
+    fn the_relay_subscription_gets_no_av1_while_a_viewer_blocks_it() {
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            QualityPrefs::default(),
+            fake_encoders(Duration::ZERO, Arc::default()),
+        );
+        let subscription = media.subscribe(BROADCAST_KEY);
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_time()
+            .build()
+            .expect("runtime");
+        let video = |frame: Arc<Frame>| match frame.header.kind {
+            FrameKind::Video(codec) => Some(codec),
+            FrameKind::Audio => None,
+        };
+        rt.block_on(async {
+            while video(subscription.next().await) != Some(Codec::Av1) {}
+            // A relay viewer that can only play VP9 joined (FR-7.58).
+            media.set_av1_blocker(Some(7));
+            for _ in 0..20 {
+                let codec = video(subscription.next().await);
+                assert_ne!(codec, Some(Codec::Av1), "AV1 after the blocker came");
+            }
+        });
+    }
+
+    #[test]
+    fn av1_that_never_opens_is_not_asked_for_again() {
+        let mut codecs = CodecChoice::new(true);
+        assert!(codecs.want_av1());
+        assert_eq!(codecs.opened(SOFTWARE_VP9), None);
+        assert!(!codecs.want_av1());
+        assert!(!codecs.update(Some(3), false), "already on VP9");
+        assert!(!codecs.update(None, false), "nothing to go back to");
+    }
+
+    #[test]
+    fn hardware_av1_never_falls_back_for_load() {
+        let mut codecs = CodecChoice::new(true);
+        codecs.opened(ActiveEncoder {
+            codec: Codec::Av1,
+            gpu: Some(super::super::GpuVendor::Nvidia),
+        });
+        let start = Instant::now();
+        let behind = FrameLoad {
+            encode: Duration::from_millis(80),
+            budget: Duration::from_millis(33),
+            busy: true,
+            dropped: 1,
+        };
+        assert!((0..300).all(|n| !codecs.load(behind, start + Duration::from_millis(33 * n))));
+    }
+
+    #[test]
+    fn software_av1_that_falls_behind_switches_to_vp9_with_undo() {
+        use mumcord_store::{ScreenFps, ScreenResolution};
+        let opened = Arc::new(Mutex::new(Vec::new()));
+        // 15 fps leaves 66 ms per frame; 80 ms per AV1 frame is always behind.
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            QualityPrefs {
+                resolution: ScreenResolution::P720,
+                fps: ScreenFps::Fps15,
+                ..QualityPrefs::default()
+            },
+            fake_encoders(Duration::from_millis(80), opened.clone()),
+        );
+        let started = Instant::now();
+        let stats = wait_for(&media, |s| s.switched.is_some());
+        assert!(
+            started.elapsed() < Duration::from_secs(5),
+            "within 5 s (AC-7.38)"
+        );
+        let switch = stats.switched.expect("switched");
+        let SwitchReason::Load(details) = switch.reason else {
+            panic!("not a load switch: {switch:?}");
+        };
+        assert!(
+            details.encode_ms >= 80.0 && details.budget_ms > 60.0,
+            "{details:?}"
+        );
+        assert_eq!(
+            (switch.from, switch.to, switch.undo),
+            (SOFTWARE_AV1, SOFTWARE_VP9, true)
+        );
+        assert_eq!(
+            stats.lowered, None,
+            "AV1 falls back instead of lowering the quality"
+        );
+        assert!(media.undo_encoder_switch());
+        wait_for(&media, |s| s.switched.is_none());
+        assert_eq!(*lock(&opened), [Codec::Av1, Codec::Vp9, Codec::Av1]);
+        // The second fallback of the share ends Undo.
+        let stats = wait_for(&media, |s| s.switched.is_some());
+        assert_eq!(stats.switched.map(|s| s.undo), Some(false));
+        assert!(!media.undo_encoder_switch());
     }
 
     fn wait_for(media: &Media, what: impl Fn(&ScreenMediaStats) -> bool) -> ScreenMediaStats {

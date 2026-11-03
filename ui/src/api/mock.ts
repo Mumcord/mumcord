@@ -62,6 +62,9 @@ import type {
   SavedServer,
   ServerInfo,
   ServerInput,
+  EncoderStatus,
+  EncoderSwitch,
+  LoweredReason,
   ScreenShare,
   ShareStartBlock,
   ServerSnapshot,
@@ -202,6 +205,9 @@ export interface MockMediaDemo {
   readonly share: ScreenShare | null;
   readonly party: WatchParty | null;
   readonly quality: {
+    quality: string;
+    lowered: LoweredReason | null;
+    switched: EncoderSwitch | null;
     width: number;
     height: number;
     fps: number;
@@ -999,6 +1005,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           ],
         },
         quality: {
+          quality: "1080p60",
+          lowered: null,
+          switched: null,
           width: 1920,
           height: 1080,
           fps: 60,
@@ -1012,6 +1021,15 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
     : { picture: "", share: null, party: null, quality: null };
 
+  let encoderStatus: EncoderStatus = {
+    checking: false,
+    av1Hardware: null,
+    vp9Hardware: null,
+    av1SoftwareLimit: { height: 1080, fps: 30 },
+    active: { codec: "av1", gpu: null },
+    av1Skipped: null,
+    softwareWarning: false,
+  };
   const listeners = new Map<EventName, Set<(payload: never) => void>>();
   /** Private notes by session (FR-1.63); the engine keys them by certificate hash. */
   const notes = new Map<number, string>();
@@ -3423,6 +3441,20 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       // The mock's fictional share carries the fictional figures, so the media views show numbers.
       return Promise.resolve(mediaDemo.share !== null && serverId === 1 ? mediaDemo.quality : null);
     },
+    screenShareSetQuality: () => Promise.resolve(null),
+    // The mock never switches the encoder on its own, so there is nothing to undo.
+    screenShareUndoEncoderSwitch: () => Promise.reject(new Error("the share offers no undo")),
+    screenEncoderStatus: () => Promise.resolve(encoderStatus),
+    screenEncoderCheckAgain: () => {
+      encoderStatus = { ...encoderStatus, checking: true };
+      emit("screenEncoderStatusChanged", { status: encoderStatus });
+      setTimeout(() => {
+        encoderStatus = { ...encoderStatus, checking: false };
+        emit("screenEncoderStatusChanged", { status: encoderStatus });
+      }, 800);
+      return Promise.resolve();
+    },
+    screenEncoderPrepare: () => Promise.resolve(),
     // The mock has no capture, so the bar shows its own placeholder picture.
     screenShareThumbnail: (serverId) => {
       if (!ownShares.has(serverId)) return Promise.resolve(null);
@@ -3498,7 +3530,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
       return Promise.resolve(null);
     },
-    screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
+    // Viewer-side choices for the demo share: nothing to decode or thin out in the mock.
+    screenShareSetDecodeCodecs: () => Promise.resolve(null),
+    screenShareSetViewerFps: () => Promise.resolve(null),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
     updateStatus: () => Promise.resolve(updater.status()),
     updateCheckNow: () => Promise.resolve(updater.checkNow()),

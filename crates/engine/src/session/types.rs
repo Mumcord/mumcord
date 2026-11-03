@@ -573,6 +573,9 @@ pub enum EngineEvent {
     WatchPartyChanged(Option<crate::watch_party::WatchPartyView>),
     /// The screen shares in the user's channel changed; the full list (FR-2.42 – FR-2.46).
     ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
+    /// The screen share encoder status changed: a probe or self-test started or finished
+    /// (Settings → Screen sharing, FR-7.60).
+    ScreenEncoderStatusChanged(crate::screen_share::EncoderStatus),
     /// What the server info panel shows about the server's relay changed (FR-4.20).
     RelayChanged(crate::peer::RelayInfo),
     /// A P2P connection to `session` opened (`Some`, with how it travels) or closed (`None`)

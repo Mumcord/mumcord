@@ -32,6 +32,10 @@ pub const ANSWER_TIMEOUT: Duration = Duration::from_secs(10);
 pub const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
 /// No bytes for this long during a transfer → "The transfer stalled" (FR-7.34).
 pub const STALL_TIMEOUT: Duration = Duration::from_secs(30);
+/// How long the debug hook `file_stall_after_bytes` pauses the sender: twice [`STALL_TIMEOUT`].
+/// It has to outlast the stall timeout, or the sender's broken stream would end the transfer and
+/// the recipient's card would show "The connection was lost" instead of "The transfer stalled".
+const HOOK_PAUSE: Duration = Duration::from_secs(60);
 
 /// Bytes of the stream header after the kind byte.
 pub(crate) const HEADER_LEN: usize = 32;
@@ -278,26 +282,41 @@ pub(crate) async fn send_body(
     file: &mut (impl AsyncRead + Unpin),
     progress: impl FnMut(u64),
 ) -> Result<(), TransferError> {
-    let corrupt = crate::test_hooks::file_corrupt();
-    send_body_as(out, header, file, progress, corrupt).await
+    send_body_as(
+        out,
+        header,
+        file,
+        progress,
+        crate::test_hooks::file_corrupt(),
+        crate::test_hooks::file_stall_after_bytes(),
+    )
+    .await
 }
 
 /// [`send_body`]; `corrupt` flips the first body byte (the AC-7.11 test hook), so the recipient's
-/// checksum must catch it.
+/// checksum must catch it. `stall_after` stops the sender after that many bytes (the F3a (e) test
+/// hook): it waits [`HOOK_PAUSE`] without writing — the client stays connected, so only the
+/// recipient's stall timer can end the transfer — and then reports [`TransferError::Stalled`].
 async fn send_body_as(
     out: &mut (impl AsyncWrite + Unpin),
     header: Header,
     file: &mut (impl AsyncRead + Unpin),
     mut progress: impl FnMut(u64),
     corrupt: bool,
+    stall_after: Option<u64>,
 ) -> Result<(), TransferError> {
     write_timed(out, &header.encode()).await?;
     let mut buf = vec![0u8; CHUNK];
     let mut sent = 0u64;
     while sent < header.length {
+        // The hook stops at exactly its byte count, so the recipient sees progress first and then
+        // nothing but the stall.
+        let hook_cap =
+            usize::try_from(stall_after.unwrap_or(u64::MAX) - sent).unwrap_or(usize::MAX);
         let want = buf
             .len()
-            .min(usize::try_from(header.length - sent).unwrap_or(usize::MAX));
+            .min(usize::try_from(header.length - sent).unwrap_or(usize::MAX))
+            .min(hook_cap);
         let read = file
             .read(&mut buf[..want])
             .await
@@ -313,6 +332,11 @@ async fn send_body_as(
         write_timed(out, &buf[..read]).await?;
         sent += read as u64;
         progress(sent);
+        if stall_after.is_some_and(|after| sent >= after) {
+            tracing::debug!(bytes = sent, "test hook stops the file stream");
+            tokio::time::sleep(HOOK_PAUSE).await;
+            return Err(TransferError::Stalled);
+        }
     }
     Ok(())
 }
@@ -546,9 +570,16 @@ mod tests {
     async fn the_corrupt_hook_flips_the_first_body_byte() {
         let body = [7u8; 20];
         let mut wire = Vec::new();
-        send_body_as(&mut wire, header(20), &mut body.as_slice(), |_| {}, true)
-            .await
-            .expect("sent");
+        send_body_as(
+            &mut wire,
+            header(20),
+            &mut body.as_slice(),
+            |_| {},
+            true,
+            None,
+        )
+        .await
+        .expect("sent");
         assert_eq!(wire[HEADER_LEN], 7 ^ 0xFF);
         assert_eq!(&wire[HEADER_LEN + 1..], &body[1..]);
     }
@@ -598,5 +629,28 @@ mod tests {
             .await
             .expect_err("stalled");
         assert!(matches!(err, TransferError::Stalled));
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn the_stall_hook_stops_sending_after_its_byte_count() {
+        let body = [7u8; 200];
+        let mut wire = Vec::new();
+        let started = tokio::time::Instant::now();
+        let err = send_body_as(
+            &mut wire,
+            header(200),
+            &mut body.as_slice(),
+            |_| {},
+            false,
+            Some(100),
+        )
+        .await
+        .expect_err("stalled by the hook");
+        assert!(matches!(err, TransferError::Stalled));
+        // The recipient saw progress before the pause, so its card shows a stall, not a lost
+        // connection: the pause outlasts the recipient's stall timer (issue #420).
+        assert_eq!(&wire[HEADER_LEN..], &body[..100]);
+        assert_eq!(started.elapsed(), HOOK_PAUSE);
+        assert!(HOOK_PAUSE > STALL_TIMEOUT);
     }
 }

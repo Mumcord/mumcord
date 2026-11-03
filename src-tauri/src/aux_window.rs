@@ -127,7 +127,8 @@ pub const SHARE_POPOUT: Spec = Spec {
         "screen_share_list",
         "screen_share_frames_attach",
         "screen_share_request_keyframe",
-        "screen_share_set_decode_fallback",
+        "screen_share_set_decode_codecs",
+        "screen_share_set_viewer_fps",
         "screen_share_watch_stats",
         "person_set_share_volume",
     ],
@@ -191,13 +192,17 @@ pub fn open_with(
         return window.set_focus();
     }
     // Starts hidden so the stored size and position apply before it shows up.
-    let mut builder = WebviewWindowBuilder::new(app, spec.label, WebviewUrl::App(spec.url.into()))
-        .title(title)
-        .always_on_top(on_top)
-        .inner_size(spec.default_size.0, spec.default_size.1)
-        .min_inner_size(spec.min_size.0, spec.min_size.1)
-        .resizable(true)
-        .visible(false);
+    let mut builder = crate::browser::deny_new_windows(WebviewWindowBuilder::new(
+        app,
+        spec.label,
+        WebviewUrl::App(spec.url.into()),
+    ))
+    .title(title)
+    .always_on_top(on_top)
+    .inner_size(spec.default_size.0, spec.default_size.1)
+    .min_inner_size(spec.min_size.0, spec.min_size.1)
+    .resizable(true)
+    .visible(false);
     if let Some(dir) = crate::portable::webview_data_dir() {
         builder = builder.data_directory(dir);
     }
@@ -420,7 +425,8 @@ mod tests {
             "screen_share_list",
             "screen_share_frames_attach",
             "screen_share_request_keyframe",
-            "screen_share_set_decode_fallback",
+            "screen_share_set_decode_codecs",
+            "screen_share_set_viewer_fps",
             "screen_share_watch_stats",
             "person_set_share_volume",
         ] {

@@ -19,11 +19,12 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use mumcord_engine::p2p::P2pConfig;
-use mumcord_engine::screen_share::wire::{Frame, FrameHeader, FrameKind};
+use mumcord_engine::screen_share::wire::{Codec, Frame, FrameHeader, FrameKind};
 use mumcord_engine::screen_share::{
-    FanoutUnavailable, FanoutView, I420Frame, MaxFps, ScreenFrameSink, StartOutcome,
+    FanoutUnavailable, FanoutView, I420Frame, ScreenFrameSink, StartOutcome, SwitchReason,
+    ViewerPath,
 };
-use mumcord_engine::store::Consent;
+use mumcord_engine::store::{Consent, ScreenCodec};
 use mumcord_engine::{
     Engine, EngineEvent, EventReceiver, PasswordChange, SecretStore, ServerFields, ServerId,
     Snapshot,
@@ -187,7 +188,7 @@ impl ScreenFrameSink for Sink {
             .push((Instant::now(), frame.header));
     }
 
-    fn on_decoded(&self, _: ServerId, _: u32, _: &I420Frame) {}
+    fn on_decoded(&self, _: ServerId, _: u32, _: Codec, _: &I420Frame) {}
 }
 
 impl Sink {
@@ -197,7 +198,7 @@ impl Sink {
         let since = Instant::now() - window;
         let got = self.0.lock().expect("sink");
         got.iter()
-            .filter(|(at, h)| *at >= since && h.kind == FrameKind::Video)
+            .filter(|(at, h)| *at >= since && matches!(h.kind, FrameKind::Video(_)))
             .count() as f64
             / window.as_secs_f64()
     }
@@ -207,8 +208,30 @@ impl Sink {
             .lock()
             .expect("sink")
             .iter()
-            .find(|(_, h)| h.kind == FrameKind::Video)
+            .find(|(_, h)| matches!(h.kind, FrameKind::Video(_)))
             .map(|(_, h)| h.keyframe)
+    }
+
+    /// The codecs of the video frames that arrived over the last `window`.
+    fn codecs(&self, window: Duration) -> Vec<Codec> {
+        let since = Instant::now() - window;
+        let mut codecs: Vec<Codec> = self
+            .0
+            .lock()
+            .expect("sink")
+            .iter()
+            .filter(|(at, _)| *at >= since)
+            .filter_map(|(_, h)| match h.kind {
+                FrameKind::Video(codec) => Some(codec),
+                FrameKind::Audio => None,
+            })
+            .collect();
+        codecs.dedup();
+        codecs
+    }
+
+    fn clear(&self) {
+        self.0.lock().expect("sink").clear();
     }
 
     fn count(&self) -> usize {
@@ -347,13 +370,38 @@ async fn fanout_through_the_relay_broadcast() {
     assert!(c.sink.count() > before + 40, "C continues after the rekey");
     assert!(c.sink.fps(Duration::from_secs(2)) > 10.0);
 
-    // C caps itself at 15 fps; the relay drops the top layer (FR-7.51).
+    // The sharer's stats list C as a broadcast viewer (FR-7.52), and the start dialog's path
+    // shows the relay's limit (FR-7.36).
+    let stats = a.engine.screen_share_media_stats(server_a).expect("stats");
+    assert!(
+        stats
+            .viewers
+            .iter()
+            .any(|v| v.session == c.session() && v.path == ViewerPath::Broadcast),
+        "C on the broadcast: {:?}",
+        stats.viewers
+    );
+    assert_eq!(
+        a.engine.screen_broadcast_max(server_a).map(u16::from),
+        Some(limit.min(255))
+    );
+
+    // C caps itself at 15 fps; the relay drops the top layer (FR-7.45, FR-7.51): C's own
+    // report counts what arrives from the relay, before C's local layer filter.
     c.engine
-        .screen_share_set_max_fps(c.server(), sharer, MaxFps::Up15)
+        .screen_share_set_viewer_fps(c.server(), sharer, Some(15))
         .expect("max fps");
     tokio::time::sleep(Duration::from_secs(3)).await;
     let capped = c.sink.fps(Duration::from_secs(2));
     assert!(capped > 3.0 && capped <= 17.0, "capped fps {capped}");
+    poll("C's report at the capped rate", || {
+        a.engine.screen_share_fanout(server_a).and_then(|f| {
+            f.relay_viewers
+                .into_iter()
+                .find(|v| v.session == c.session() && v.fps > 3 && v.fps <= 17)
+        })
+    })
+    .await;
 
     if let Ok(container) = std::env::var("MUMCORD_FANOUT_STOP") {
         // FR-7.49: the relay goes away; C continues on a direct copy within 10 s.
@@ -383,6 +431,99 @@ async fn fanout_through_the_relay_broadcast() {
             })
         );
     }
+
+    a.engine.screen_share_stop(server_a).expect("stop");
+}
+
+/// An AV1 share watched through the relay by an AV1 viewer (B) and a VP9-only one (C): the
+/// share runs VP9 while C watches, and both get playable frames; after C leaves it returns to
+/// AV1 (FR-7.58 on the broadcast path).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs mumpeer's testenv (MUMCORD_LIVE=1)"]
+async fn relay_viewers_choose_the_codec() {
+    if !live() || !broadcast_profile() {
+        return;
+    }
+    let dir = work_dir("live_fanout_codec");
+    let a = start(&dir, "fan-av1").await;
+    let mut b = start(&dir, "fan-b").await;
+    let mut c = start(&dir, "fan-vp9").await;
+    for client in [&a, &b, &c] {
+        wait_relay(client).await;
+    }
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    let mut settings = a.engine.settings().expect("settings");
+    settings.screen_codec = ScreenCodec::Av1;
+    a.engine.update_settings(settings).await.expect("AV1");
+    c.engine
+        .screen_share_set_playable_codecs(Some(&[Codec::Vp9]));
+
+    let (server_a, sharer) = (a.server(), a.session());
+    assert_eq!(
+        a.engine
+            .screen_share_start(server_a, false)
+            .await
+            .expect("start"),
+        StartOutcome::Started
+    );
+    let view = poll("the fan-out decision", || {
+        a.engine
+            .screen_share_fanout(server_a)
+            .map(|f| f.view)
+            .filter(|v| *v != FanoutView::Starting)
+    })
+    .await;
+    assert!(matches!(view, FanoutView::Relay { .. }), "{view:?}");
+
+    watch(&mut b, sharer).await;
+    poll("AV1 frames at B through the relay", || {
+        (b.engine.screen_share_watch_via_relay(b.server(), sharer) == Some(true)
+            && b.sink.codecs(Duration::from_secs(1)) == [Codec::Av1])
+        .then_some(())
+    })
+    .await;
+
+    // The VP9-only viewer joins the broadcast: the share switches to VP9 for it.
+    watch(&mut c, sharer).await;
+    assert_eq!(
+        c.engine.screen_share_watch_via_relay(c.server(), sharer),
+        Some(true)
+    );
+    let switched = poll("the switch to VP9", || {
+        a.engine
+            .screen_share_media_stats(server_a)
+            .and_then(|s| s.switched)
+    })
+    .await;
+    assert_eq!(
+        switched.reason,
+        SwitchReason::Viewer {
+            session: c.session()
+        }
+    );
+    for viewer in [&b, &c] {
+        poll("VP9 frames through the relay", || {
+            (viewer.sink.codecs(Duration::from_secs(1)) == [Codec::Vp9]
+                && viewer.sink.fps(Duration::from_secs(1)) > 10.0)
+                .then_some(())
+        })
+        .await;
+    }
+    assert!(
+        !c.sink.codecs(WAIT).contains(&Codec::Av1),
+        "C never got AV1"
+    );
+    assert_eq!(c.sink.first_is_keyframe(), Some(true));
+
+    // C leaves: the share goes back to AV1 for B.
+    c.engine
+        .screen_share_unwatch(c.server(), sharer)
+        .expect("unwatch");
+    b.sink.clear();
+    poll("AV1 frames at B again", || {
+        (b.sink.codecs(Duration::from_secs(1)) == [Codec::Av1]).then_some(())
+    })
+    .await;
 
     a.engine.screen_share_stop(server_a).expect("stop");
 }

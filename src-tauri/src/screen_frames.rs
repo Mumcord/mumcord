@@ -5,14 +5,14 @@
 //!
 //! | bytes | field                                                        |
 //! |-------|--------------------------------------------------------------|
-//! | 0     | kind: [`KIND_VP9`] or [`KIND_RGBA`]                           |
-//! | 1     | flags: bit 0 = keyframe (VP9 only)                           |
-//! | 2     | temporal layer (VP9 only)                                    |
-//! | 3     | reserved, 0                                                  |
-//! | 4–11  | timestamp in microseconds (VP9 only)                         |
+//! | 0     | kind: [`KIND_ENCODED`] or [`KIND_RGBA`]                       |
+//! | 1     | flags: bit 0 = keyframe (encoded only)                       |
+//! | 2     | temporal layer (encoded only)                                |
+//! | 3     | codec: [`CODEC_VP9`] or [`CODEC_AV1`] (of the picture too)   |
+//! | 4–11  | timestamp in microseconds (encoded only)                     |
 //! | 12–13 | width                                                        |
 //! | 14–15 | height                                                       |
-//! | 16–   | VP9 frame for WebCodecs, or `width * height * 4` RGBA bytes  |
+//! | 16–   | encoded frame for WebCodecs, or `width * height * 4` RGBA    |
 //!
 //! The UI parses it in `ui/src/api/screenFrames.ts`; keep both in step.
 
@@ -20,16 +20,18 @@ use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 
 use mumcord_engine::ServerId;
-use mumcord_engine::screen_share::wire::Frame;
+use mumcord_engine::screen_share::wire::{Codec, Frame, FrameKind};
 use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink};
 use specta::datatype::DataType;
 use tauri::ipc::{Channel, InvokeResponseBody, IpcResponse};
 
 pub const HEADER_LEN: usize = 16;
-/// An encoded VP9 frame, for WebCodecs.
-pub const KIND_VP9: u8 = 1;
-/// A picture decoded in Rust (fallback for webviews without WebCodecs VP9).
+/// An encoded frame, for WebCodecs.
+pub const KIND_ENCODED: u8 = 1;
+/// A picture decoded in Rust (fallback for a codec the webview's WebCodecs cannot decode).
 pub const KIND_RGBA: u8 = 2;
+pub const CODEC_VP9: u8 = 1;
+pub const CODEC_AV1: u8 = 2;
 const FLAG_KEYFRAME: u8 = 1;
 
 /// One channel message. Sent raw, so JavaScript gets an `ArrayBuffer` (a `Vec<u8>` would go as a
@@ -108,43 +110,72 @@ impl ScreenFrames {
 
 impl ScreenFrameSink for ScreenFrames {
     fn on_encoded(&self, server_id: ServerId, sharer: u32, frame: &Frame) {
-        self.send(server_id, sharer, || Some(encoded_message(frame)));
+        self.send(server_id, sharer, || encoded_message(frame));
     }
 
-    fn on_decoded(&self, server_id: ServerId, sharer: u32, frame: &I420Frame) {
-        self.send(server_id, sharer, || picture_message(frame));
+    fn on_decoded(&self, server_id: ServerId, sharer: u32, codec: Codec, frame: &I420Frame) {
+        self.send(server_id, sharer, || picture_message(codec, frame));
     }
 }
 
-fn header(kind: u8, flags: u8, layer: u8, timestamp_us: u64, width: u16, height: u16) -> Vec<u8> {
+fn codec_byte(codec: Codec) -> u8 {
+    match codec {
+        Codec::Vp9 => CODEC_VP9,
+        Codec::Av1 => CODEC_AV1,
+    }
+}
+
+struct Header {
+    kind: u8,
+    flags: u8,
+    layer: u8,
+    codec: Codec,
+    timestamp_us: u64,
+    width: u16,
+    height: u16,
+}
+
+fn header(h: &Header) -> Vec<u8> {
     let mut out = Vec::with_capacity(HEADER_LEN);
-    out.extend([kind, flags, layer, 0]);
+    out.extend([h.kind, h.flags, h.layer, codec_byte(h.codec)]);
+    let (timestamp_us, width, height) = (h.timestamp_us, h.width, h.height);
     out.extend(timestamp_us.to_le_bytes());
     out.extend(width.to_le_bytes());
     out.extend(height.to_le_bytes());
     out
 }
 
-fn encoded_message(frame: &Frame) -> Vec<u8> {
+/// `None` for a sound packet; the engine hands over video frames only.
+fn encoded_message(frame: &Frame) -> Option<Vec<u8>> {
     let h = &frame.header;
     let flags = if h.keyframe { FLAG_KEYFRAME } else { 0 };
-    let mut out = header(
-        KIND_VP9,
+    let FrameKind::Video(codec) = h.kind else {
+        return None;
+    };
+    let mut out = header(&Header {
+        kind: KIND_ENCODED,
         flags,
-        h.temporal_layer,
-        h.timestamp_us,
-        h.width,
-        h.height,
-    );
+        layer: h.temporal_layer,
+        codec,
+        timestamp_us: h.timestamp_us,
+        width: h.width,
+        height: h.height,
+    });
     out.extend_from_slice(&frame.payload);
-    out
+    Some(out)
 }
 
 /// `None` for a picture too large for the header; the sharer never sends one (720p at most).
-fn picture_message(frame: &I420Frame) -> Option<Vec<u8>> {
-    let width = u16::try_from(frame.width()).ok()?;
-    let height = u16::try_from(frame.height()).ok()?;
-    let mut out = header(KIND_RGBA, 0, 0, 0, width, height);
+fn picture_message(codec: Codec, frame: &I420Frame) -> Option<Vec<u8>> {
+    let mut out = header(&Header {
+        kind: KIND_RGBA,
+        flags: 0,
+        layer: 0,
+        codec,
+        timestamp_us: 0,
+        width: u16::try_from(frame.width()).ok()?,
+        height: u16::try_from(frame.height()).ok()?,
+    });
     out.extend(frame.to_rgba());
     Some(out)
 }
@@ -154,15 +185,19 @@ fn picture_message(frame: &I420Frame) -> Option<Vec<u8>> {
 mod tests {
     use std::sync::Arc;
 
-    use mumcord_engine::screen_share::wire::{FrameHeader, FrameKind};
+    use mumcord_engine::screen_share::wire::FrameHeader;
 
     use super::*;
 
     fn vp9(keyframe: bool) -> Frame {
+        video(Codec::Vp9, keyframe)
+    }
+
+    fn video(codec: Codec, keyframe: bool) -> Frame {
         let payload = vec![0xAA, 0xBB, 0xCC];
         Frame {
             header: FrameHeader {
-                kind: FrameKind::Video,
+                kind: FrameKind::Video(codec),
                 keyframe,
                 temporal_layer: 2,
                 timestamp_us: 0x0102_0304_0506_0708,
@@ -188,21 +223,25 @@ mod tests {
 
     #[test]
     fn encoded_frames_keep_header_fields_and_payload() {
-        let message = encoded_message(&vp9(true));
+        let message = encoded_message(&vp9(true)).unwrap();
         assert_eq!(message.len(), HEADER_LEN + 3);
-        assert_eq!(message[..4], [KIND_VP9, FLAG_KEYFRAME, 2, 0]);
+        assert_eq!(message[..4], [KIND_ENCODED, FLAG_KEYFRAME, 2, CODEC_VP9]);
         assert_eq!(message[4..12], 0x0102_0304_0506_0708u64.to_le_bytes());
         assert_eq!(message[12..14], 1280u16.to_le_bytes());
         assert_eq!(message[14..16], 720u16.to_le_bytes());
         assert_eq!(message[16..], [0xAA, 0xBB, 0xCC]);
-        assert_eq!(encoded_message(&vp9(false))[1], 0);
+        assert_eq!(encoded_message(&vp9(false)).unwrap()[1], 0);
+        assert_eq!(
+            encoded_message(&video(Codec::Av1, false)).unwrap()[3],
+            CODEC_AV1
+        );
     }
 
     #[test]
     fn pictures_go_as_rgba() {
         let frame = I420Frame::new(4, 2, vec![16; I420Frame::buffer_len(4, 2)]).unwrap();
-        let message = picture_message(&frame).unwrap();
-        assert_eq!(message[0], KIND_RGBA);
+        let message = picture_message(Codec::Av1, &frame).unwrap();
+        assert_eq!(message[..4], [KIND_RGBA, 0, 0, CODEC_AV1]);
         assert_eq!(message[12..16], [4, 0, 2, 0]);
         assert_eq!(message.len(), HEADER_LEN + 4 * 2 * 4);
     }

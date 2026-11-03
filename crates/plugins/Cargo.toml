@@ -8,7 +8,7 @@ readme = "README.md"
 keywords = ["mumcord", "mumble", "plugin", "wasmtime", "sandbox"]
 categories = ["wasm"]
 # The host bindings, the manifest schema and the revocation list are read at compile time.
-include = ["src/**", "wit/**", "schema/**", "assets/**", "README.md"]
+include = ["src/**", "wit/**", "schema/**", "assets/**", "score-weights.toml", "README.md"]
 version.workspace = true
 edition.workspace = true
 # wasmtime 50 needs Rust 1.97; the rest of the workspace builds with older toolchains.

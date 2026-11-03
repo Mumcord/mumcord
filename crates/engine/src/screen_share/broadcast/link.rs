@@ -25,7 +25,7 @@ use tokio::task::JoinHandle;
 use super::crypto::{FrameOpener, FrameSealer};
 use super::keyx::{self, CertKey, PendingRequest, Reassembler, SharerChannel, ViewerChannel};
 use crate::screen_share::media::Subscription;
-use crate::screen_share::wire::{self, Frame, FrameHeader, FrameKind};
+use crate::screen_share::wire::{self, Codec, Frame, FrameHeader, FrameKind};
 use crate::session::lock;
 
 /// A viewer without the keys asks again after this long, with a new chunk set.
@@ -41,18 +41,13 @@ const FRAME_QUEUE: usize = 16;
 /// Called once when a link ends on its own (not when it is dropped).
 pub(crate) type OnEnd = Box<dyn FnOnce(BroadcastEnd) + Send>;
 
-/// The video codec byte of a broadcast unit.
-///
-/// N5b seam: frames on the direct wire (v1) are always VP9. Once wire v2 carries the codec
-/// per frame, read it from `frame` here; nothing else in the broadcast path depends on it.
-fn video_codec(_frame: &Frame) -> VideoCodec {
-    VideoCodec::Vp9
-}
-
 fn content_of(frame: &Frame) -> Content {
     match frame.header.kind {
-        FrameKind::Video => Content::Video {
-            codec: video_codec(frame),
+        FrameKind::Video(codec) => Content::Video {
+            codec: match codec {
+                Codec::Vp9 => VideoCodec::Vp9,
+                Codec::Av1 => VideoCodec::Av1,
+            },
             keyframe: frame.header.keyframe,
             temporal_layer: frame.header.temporal_layer,
         },
@@ -60,18 +55,20 @@ fn content_of(frame: &Frame) -> Content {
     }
 }
 
-/// The frame as the direct stream would carry it: the plaintext of a media unit.
+/// The frame as a direct stream of frame version 2 would carry it: the plaintext of a media
+/// unit. Every client that joins a broadcast reads version 2 (FR-7.58).
 fn plaintext(frame: &Frame) -> Option<Vec<u8>> {
-    let header = frame.header.encode().ok()?;
-    let mut out = Vec::with_capacity(wire::HEADER_LEN + frame.payload.len());
-    out.extend_from_slice(&header);
+    let header = frame.header.encode(wire::V2).ok()?;
+    let mut out = Vec::with_capacity(header.as_slice().len() + frame.payload.len());
+    out.extend_from_slice(header.as_slice());
     out.extend_from_slice(&frame.payload);
     Some(out)
 }
 
 /// The frame inside a decrypted media unit; `None` for anything malformed.
 fn frame_of(plain: &[u8]) -> Option<Frame> {
-    let (head, payload) = plain.split_first_chunk::<{ wire::HEADER_LEN }>()?;
+    let len = wire::header_len(*plain.first()?)?;
+    let (head, payload) = (plain.get(..len)?, plain.get(len..)?);
     let header = FrameHeader::decode(head).ok()?;
     (usize::try_from(header.payload_len).ok()? == payload.len()).then(|| Frame {
         header,
@@ -349,7 +346,7 @@ impl PublisherControl {
 
 /// The viewer's frame-rate choice (FR-7.51), sent to the relay as the highest temporal layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum MaxFps {
+pub(crate) enum MaxFps {
     #[default]
     Auto,
     Up30,
@@ -357,6 +354,16 @@ pub enum MaxFps {
 }
 
 impl MaxFps {
+    /// The viewer's cap as the relay takes it: "Up to 30" or "Up to 15"; anything above 30
+    /// leaves every layer on.
+    pub(crate) fn from_fps(fps: Option<u32>) -> Self {
+        match fps {
+            Some(fps) if fps <= 15 => Self::Up15,
+            Some(fps) if fps <= 30 => Self::Up30,
+            _ => Self::Auto,
+        }
+    }
+
     fn fps(self) -> Option<u32> {
         match self {
             Self::Auto => None,
@@ -650,7 +657,7 @@ impl SubscriberState {
                 let Some(frame) = frame else {
                     return true;
                 };
-                if frame.header.kind == FrameKind::Video {
+                if matches!(frame.header.kind, FrameKind::Video(_)) {
                     let wanted = self.sent_layer.unwrap_or(MAX_TEMPORAL_LAYER);
                     let layer = {
                         let mut meter = lock(&self.meter);
@@ -742,9 +749,42 @@ async fn send_control(units: &mpsc::Sender<Vec<u8>>, kind: ControlKind, payload:
 mod tests {
     use super::*;
 
+    #[test]
+    fn units_carry_frame_version_2_with_the_codec() {
+        let frame = Frame {
+            header: FrameHeader {
+                kind: FrameKind::Video(Codec::Av1),
+                keyframe: true,
+                payload_len: 3,
+                ..video(1, 5)
+            },
+            payload: vec![1, 2, 3],
+        };
+        let plain = plaintext(&frame).expect("plaintext");
+        assert_eq!(plain[0], wire::V2);
+        assert_eq!(frame_of(&plain).map(|f| f.header), Some(frame.header));
+        assert_eq!(
+            content_of(&frame),
+            Content::Video {
+                codec: VideoCodec::Av1,
+                keyframe: true,
+                temporal_layer: 1,
+            }
+        );
+        assert_eq!(frame_of(&plain[..plain.len() - 1]), None, "short payload");
+    }
+
+    #[test]
+    fn the_viewer_fps_choice_maps_to_the_relay_cap() {
+        assert_eq!(MaxFps::from_fps(None), MaxFps::Auto);
+        assert_eq!(MaxFps::from_fps(Some(30)), MaxFps::Up30);
+        assert_eq!(MaxFps::from_fps(Some(15)), MaxFps::Up15);
+        assert_eq!(MaxFps::from_fps(Some(60)), MaxFps::Auto);
+    }
+
     fn video(layer: u8, ts_ms: u64) -> FrameHeader {
         FrameHeader {
-            kind: FrameKind::Video,
+            kind: FrameKind::Video(Codec::Vp9),
             keyframe: false,
             temporal_layer: layer,
             timestamp_us: ts_ms * 1000,

@@ -7,6 +7,7 @@ import { ChangelogWindow, InspectorWindow, LicencesWindow, MediaPopoutWindow } f
 import { popoutKindOf } from "./features/media/popoutStore";
 import { installNativeMenuSuppression } from "./app/nativeContextMenu";
 import { installNativeDragGuard } from "./app/nativeDrag";
+import { installLinkGuard } from "./app/nativeLinks";
 import { applyThemeToDocument, osPrefersDark, resolveTheme } from "./theme/theme";
 
 const root = document.getElementById("root");
@@ -16,6 +17,7 @@ if (!root) {
 
 installNativeMenuSuppression();
 installNativeDragGuard();
+installLinkGuard();
 
 // Paint the OS theme right away; the stored theme setting replaces it once settings load.
 applyThemeToDocument(resolveTheme("system", osPrefersDark()));

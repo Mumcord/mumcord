@@ -1,22 +1,23 @@
 /**
- * Draws the frames of a watched screen share onto a canvas (FR-2.44). VP9 frames go through a
- * WebCodecs `VideoDecoder`; RGBA pictures (the engine's fallback decode) are drawn directly.
- * The decoder only starts on a keyframe: delta frames before it cannot be decoded, so they are
- * dropped and a keyframe is asked for. A decoder error closes the decoder; the next keyframe
- * starts a fresh one.
+ * Draws the frames of a watched screen share onto a canvas (FR-2.44, FR-7.59). Encoded AV1 and
+ * VP9 frames go through a WebCodecs `VideoDecoder`; RGBA pictures (the engine's decode, for a
+ * codec the webview cannot decode) are drawn directly. Both can arrive in one watch, since the
+ * sharer may switch codecs mid-share. The decoder only starts on a keyframe: delta frames before
+ * it cannot be decoded, so they are dropped and a keyframe is asked for. A decoder error closes
+ * the decoder; the next keyframe starts a fresh one. A codec that fails before its first picture
+ * is reported as unsupported, so the engine can take it over.
  */
-import { VP9_CODEC, type ScreenFrame } from "../../api/screenFrames";
+import type { VideoCodec } from "../../api";
+import { WEBCODECS_CODEC, type ScreenFrame } from "../../api/screenFrames";
 
 export interface FrameRenderer {
-  /** Takes one frame from the channel; frames of the other kind are ignored. */
+  /** Takes one frame from the channel. */
   push(frame: ScreenFrame): void;
   /** Frees the decoder; later frames are ignored. */
   close(): void;
 }
 
 export interface RendererOptions {
-  /** `"vp9"` decodes in the webview, `"rgba"` draws the engine's decoded pictures. */
-  mode: "vp9" | "rgba";
   /** Asks the sharer for a keyframe; called once per wait, not for every dropped frame. */
   requestKeyframe: () => void;
   /** The first picture is on the canvas. */
@@ -25,11 +26,13 @@ export interface RendererOptions {
   onFrame?: (frame: ScreenFrame, atMs: number) => void;
   /** A frame was dropped. */
   onDrop?: (atMs: number) => void;
+  /** WebCodecs failed on `codec` before showing any picture of it: the engine should decode it. */
+  onUnsupported?: (codec: VideoCodec) => void;
 }
 
 export function createFrameRenderer(
   canvas: HTMLCanvasElement,
-  { mode, requestKeyframe, onFirstPicture, onFrame, onDrop }: RendererOptions,
+  { requestKeyframe, onFirstPicture, onFrame, onDrop, onUnsupported }: RendererOptions,
 ): FrameRenderer {
   const context = canvas.getContext("2d");
   let closed = false;
@@ -49,22 +52,12 @@ export function createFrameRenderer(
 
   if (context === null) console.error("screen share canvas has no 2d context");
 
-  if (mode === "rgba") {
-    return {
-      push(frame) {
-        if (frame.kind !== "rgba") return;
-        onFrame?.(frame, Date.now());
-        draw(new ImageData(frame.data, frame.width, frame.height), frame.width, frame.height);
-      },
-      close() {
-        closed = true;
-      },
-    };
-  }
-
   let decoder: VideoDecoder | null = null;
-  let size = "";
+  /** Codec and size the decoder is configured for, e.g. "av1 1920x1080". */
+  let config = "";
   let waitingForKeyframe = false;
+  /** Codecs WebCodecs has shown a picture of in this watch. */
+  const decoded = new Set<VideoCodec>();
 
   function waitForKeyframe(): void {
     if (waitingForKeyframe || closed) return;
@@ -78,20 +71,26 @@ export function createFrameRenderer(
     decoder = null;
   }
 
-  function startDecoder(width: number, height: number): VideoDecoder {
+  function failed(codec: VideoCodec, error: unknown): void {
+    console.warn("screen share decoder failed", codec, error);
+    if (!decoded.has(codec)) onUnsupported?.(codec);
+    waitForKeyframe();
+  }
+
+  function startDecoder(codec: VideoCodec, width: number, height: number): VideoDecoder {
     const next = new VideoDecoder({
       output: (picture) => {
+        decoded.add(codec);
         draw(picture, picture.displayWidth, picture.displayHeight);
         picture.close();
       },
       error: (error) => {
-        console.warn("screen share decoder failed", error);
         if (decoder === next) decoder = null;
-        waitForKeyframe();
+        failed(codec, error);
       },
     });
     next.configure({
-      codec: VP9_CODEC,
+      codec: WEBCODECS_CODEC[codec],
       codedWidth: width,
       codedHeight: height,
       optimizeForLatency: true,
@@ -99,35 +98,44 @@ export function createFrameRenderer(
     return next;
   }
 
+  function pushEncoded(frame: Extract<ScreenFrame, { kind: "encoded" }>): void {
+    const frameConfig = `${frame.codec} ${String(frame.width)}x${String(frame.height)}`;
+    if (!frame.keyframe && (decoder === null || config !== frameConfig)) {
+      waitForKeyframe();
+      return;
+    }
+    try {
+      // A new codec or size (the sharer switched codec or quality step) needs a new decoder.
+      if (decoder === null || config !== frameConfig) {
+        dropDecoder();
+        config = frameConfig;
+        decoder = startDecoder(frame.codec, frame.width, frame.height);
+      }
+      waitingForKeyframe = false;
+      decoder.decode(
+        new EncodedVideoChunk({
+          type: frame.keyframe ? "key" : "delta",
+          timestamp: frame.timestampUs,
+          data: frame.data,
+        }),
+      );
+    } catch (error) {
+      dropDecoder();
+      failed(frame.codec, error);
+    }
+  }
+
   return {
     push(frame) {
-      if (closed || frame.kind !== "vp9") return;
+      if (closed) return;
       onFrame?.(frame, Date.now());
-      const frameSize = `${String(frame.width)}x${String(frame.height)}`;
-      if (frame.keyframe) {
-        // A new size (the quality step changed the resolution) needs a newly configured decoder.
-        if (decoder === null || size !== frameSize) {
-          dropDecoder();
-          decoder = startDecoder(frame.width, frame.height);
-          size = frameSize;
-        }
-        waitingForKeyframe = false;
-      } else if (decoder === null) {
-        waitForKeyframe();
-        return;
-      }
-      try {
-        decoder.decode(
-          new EncodedVideoChunk({
-            type: frame.keyframe ? "key" : "delta",
-            timestamp: frame.timestampUs,
-            data: frame.data,
-          }),
-        );
-      } catch (error) {
-        console.warn("screen share frame could not be decoded", error);
+      if (frame.kind === "rgba") {
+        // The engine decodes this codec now; a later switch back starts at a keyframe.
         dropDecoder();
-        waitForKeyframe();
+        config = "";
+        draw(new ImageData(frame.data, frame.width, frame.height), frame.width, frame.height);
+      } else {
+        pushEncoded(frame);
       }
     },
     close() {

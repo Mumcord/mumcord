@@ -21,7 +21,7 @@ use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{Engine, EngineError, EngineResult, ErrorKind, SessionCtx, lock};
 use admit::{Decision, Roster};
 use keyx::CertKey;
-use link::{MaxFps, OnEnd, Publisher, Subscriber};
+use link::{OnEnd, Publisher, Subscriber};
 
 /// Why the own share sends one copy per viewer instead of once through the relay (FR-7.47,
 /// FR-7.49). The sharer sees it once per share.
@@ -180,6 +180,27 @@ impl Engine {
             let opened = engine.open_fanout(server_id, token).await;
             engine.fanout_opened(server_id, token, opened);
         });
+    }
+
+    /// The relay's broadcast limit when this side can use a broadcast on `server_id` now
+    /// (FR-7.40): the relay allows screen sharing and offers broadcasts, the P2P mode uses the
+    /// relay, and the Mumble server knows the user's certificate. Checked without waiting, as
+    /// the start dialog and a Watch need it; the share's start checks the stored certificate.
+    pub(crate) fn broadcast_limit(&self, server_id: ServerId) -> Option<u16> {
+        self.relays()
+            .availability_for(server_id, RelayUse::ScreenShare)
+            .ok()?;
+        if !self.relay_mode_allows_broadcast(server_id) {
+            return None;
+        }
+        let ctx = self.session_ctx_for(server_id).ok()?;
+        let own = ctx.handle.with_state(|s| s.session)?;
+        super::cert_hash(&ctx.handle, own)?;
+        self.relays()
+            .broadcast_announcement(server_id)
+            .ok()?
+            .broadcast
+            .filter(|max| *max > 0)
     }
 
     async fn open_fanout(
@@ -349,6 +370,10 @@ impl Engine {
         {
             for viewer in &moved {
                 own.viewers.entry(*viewer).or_insert(None);
+            }
+            // What the dropped viewers can play no longer limits the share's codec.
+            for viewer in &dropped {
+                own.remove_viewer(*viewer);
             }
         }
         let Ok(ctx) = self.session_ctx_for(server_id) else {
@@ -576,21 +601,6 @@ impl Engine {
                 emit(engine.screen_share_state(), engine.mumcord_state(), &ctx);
             }
         });
-    }
-
-    /// The viewer's frame-rate choice for `sharer`'s share (FR-7.51): through the relay it
-    /// becomes the highest temporal layer the relay sends; a direct copy is not changed.
-    pub fn screen_share_set_max_fps(
-        &self,
-        server_id: ServerId,
-        sharer: u32,
-        max: MaxFps,
-    ) -> EngineResult<()> {
-        self.with_watch(server_id, sharer, |link| {
-            if let Some(subscriber) = link.broadcast() {
-                subscriber.set_max_fps(max);
-            }
-        })
     }
 
     /// Whether `sharer`'s share arrives through the relay broadcast ("via relay", FR-7.51);
