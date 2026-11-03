@@ -30,6 +30,9 @@ use tokio::task::{AbortHandle, JoinSet};
 use tokio_rustls::TlsConnector;
 use tokio_rustls::client::TlsStream;
 
+use crate::broadcast::{
+    Bind as BroadcastBind, BindRole, Content, ControlKind, HEADER_LEN, Header, HeaderError,
+};
 use crate::tls::{self, RelayPin};
 use crate::{P2pError, RelayAnnouncement, RelayToken};
 
@@ -616,8 +619,490 @@ impl UdpPoller for AlwaysWritable {
     }
 }
 
+// --- Broadcast links (spec 07, FR-7.41; mumpeer `docs/protocol.md` "Screen-share broadcasts") ---
+
+/// Units waiting to be written to a broadcast link. The publisher paces itself before this
+/// queue (one hub queue per link), so it only has to absorb short bursts.
+const UNIT_QUEUE: usize = 64;
+/// Units read from a broadcast link and not yet taken by the engine.
+const UNIT_INBOX: usize = 64;
+/// Unidirectional streams the relay may have open towards this side; the relay needs at least
+/// 64 (protocol).
+const UNI_STREAMS: u32 = 64;
+
+/// Why a broadcast link ended.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BroadcastEnd {
+    /// `closed`: the publisher closed the broadcast (or this side closed its own link).
+    Closed,
+    /// `idle`: no unit from the publisher for the relay's idle timeout.
+    Idle,
+    /// `deleted`: the bot deleted the broadcast or removed this viewer.
+    Deleted,
+    /// `revoked`: the certificate hash was dropped, or this viewer got a new token.
+    Revoked,
+    /// The link broke without an `end` (relay restart, network loss).
+    Lost,
+}
+
+impl BroadcastEnd {
+    fn from_reason(reason: &str) -> Self {
+        match reason {
+            "closed" => Self::Closed,
+            "idle" => Self::Idle,
+            "deleted" => Self::Deleted,
+            "revoked" => Self::Revoked,
+            // A newer relay may name another reason; the broadcast is over all the same.
+            _ => Self::Lost,
+        }
+    }
+}
+
+/// One unit received on a broadcast link: the checked clear header and the whole unit (header
+/// and payload) as it came, ready for decryption in place.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Unit {
+    pub header: Header,
+    pub bytes: Vec<u8>,
+}
+
+impl Unit {
+    /// The payload after the clear header.
+    pub fn payload(&self) -> &[u8] {
+        &self.bytes[HEADER_LEN..]
+    }
+
+    /// A control unit with `payload`; fails for a payload the relay would refuse.
+    pub fn control(kind: ControlKind, payload: &[u8]) -> Result<Vec<u8>, HeaderError> {
+        let header = Header {
+            content: Content::Control(kind),
+            key_id: 0,
+            sequence: 0,
+            payload_len: u32::try_from(payload.len())
+                .map_err(|_| HeaderError::BadSize(u32::MAX))?,
+        };
+        let mut unit = Vec::with_capacity(HEADER_LEN + payload.len());
+        unit.extend_from_slice(&header.encode()?);
+        unit.extend_from_slice(payload);
+        Ok(unit)
+    }
+}
+
+/// A bound broadcast link to the relay, as publisher or subscriber. Dropping it closes the link
+/// (the relay ends the broadcast when it was the publisher's).
+pub struct BroadcastLink {
+    transport: RelayTransport,
+    outbound: mpsc::Sender<Vec<u8>>,
+    inbound: mpsc::Receiver<Unit>,
+    end: Arc<Mutex<Option<BroadcastEnd>>>,
+    tasks: Vec<AbortHandle>,
+    quic: Option<(Connection, Endpoint)>,
+}
+
+impl fmt::Debug for BroadcastLink {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BroadcastLink")
+            .field("transport", &self.transport)
+            .finish_non_exhaustive()
+    }
+}
+
+impl BroadcastLink {
+    pub fn transport(&self) -> RelayTransport {
+        self.transport
+    }
+
+    /// A sender for whole units (clear header + payload), usable from other tasks. Sending
+    /// fails once the link is gone.
+    pub fn sender(&self) -> mpsc::Sender<Vec<u8>> {
+        self.outbound.clone()
+    }
+
+    /// The next unit, or why the link ended.
+    pub async fn recv(&mut self) -> Result<Unit, BroadcastEnd> {
+        match self.inbound.recv().await {
+            Some(unit) => Ok(unit),
+            None => Err(lock_end(&self.end).unwrap_or(BroadcastEnd::Lost)),
+        }
+    }
+}
+
+impl Drop for BroadcastLink {
+    fn drop(&mut self) {
+        for task in &self.tasks {
+            task.abort();
+        }
+        if let Some((connection, _)) = &self.quic {
+            connection.close(0u32.into(), b"closed");
+        }
+    }
+}
+
+fn lock_end(end: &Mutex<Option<BroadcastEnd>>) -> Option<BroadcastEnd> {
+    *end.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+fn set_end(end: &Mutex<Option<BroadcastEnd>>, reason: BroadcastEnd) {
+    end.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+        .get_or_insert(reason);
+}
+
+/// The `end` reason in a control message from the relay, if it is one.
+fn end_of(message: &[u8]) -> Option<BroadcastEnd> {
+    #[derive(Deserialize)]
+    struct End {
+        t: String,
+        #[serde(default)]
+        reason: String,
+    }
+    let end: End = serde_json::from_slice(message).ok()?;
+    (end.t == "end").then(|| BroadcastEnd::from_reason(&end.reason))
+}
+
+impl crate::P2p {
+    /// Opens an outer link to `relay` (QUIC, or TLS over TCP when UDP is blocked) and binds the
+    /// broadcast `token` as `role`. The relay answers `ready` right away; there is no partner to
+    /// wait for. Media units must already be end-to-end encrypted.
+    pub async fn broadcast(
+        &self,
+        relay: &RelayAnnouncement,
+        token: &RelayToken,
+        role: BindRole,
+    ) -> Result<BroadcastLink, P2pError> {
+        let pin = RelayPin::new(relay.fingerprint);
+        let crypto = tls::relay_client_config(&self.chain, &self.key, &pin)?;
+        let outer = tokio::time::timeout(SETUP_TIMEOUT, open(relay, crypto, &pin))
+            .await
+            .map_err(|_| P2pError::RelayUnreachable)??;
+        let bind = BroadcastBind {
+            token: token.clone(),
+            role: Some(role),
+        }
+        .encode();
+        tokio::time::timeout(SETUP_TIMEOUT, outer.bind_broadcast(bind))
+            .await
+            .map_err(|_| P2pError::RelayFailed)?
+    }
+}
+
+impl Outer {
+    async fn bind_broadcast(self, bind: Vec<u8>) -> Result<BroadcastLink, P2pError> {
+        let (out_tx, out_rx) = mpsc::channel(UNIT_QUEUE);
+        let (in_tx, inbound) = mpsc::channel(UNIT_INBOX);
+        let end = Arc::new(Mutex::new(None));
+        match self {
+            Outer::Quic {
+                endpoint,
+                connection,
+            } => {
+                let handshake = async {
+                    let (mut send, recv) = connection.open_bi().await.map_err(failed)?;
+                    let mut line = bind;
+                    line.push(b'\n');
+                    send.write_all(&line).await.map_err(failed)?;
+                    let mut recv = BufReader::new(recv);
+                    while !handle_control(&read_line(&mut recv).await?)? {}
+                    Ok::<_, P2pError>((send, recv))
+                };
+                let (send, recv) = match handshake.await {
+                    Ok(control) => control,
+                    Err(error) => return Err(close_refusal(&connection).unwrap_or(error)),
+                };
+                // The relay sends every unit on its own stream; it may keep this many open.
+                connection.set_max_concurrent_uni_streams(UNI_STREAMS.into());
+                let tasks = vec![
+                    tokio::spawn(read_control(send, recv, end.clone())).abort_handle(),
+                    tokio::spawn(read_unit_streams(connection.clone(), in_tx, end.clone()))
+                        .abort_handle(),
+                    tokio::spawn(write_unit_streams(connection.clone(), out_rx)).abort_handle(),
+                ];
+                Ok(BroadcastLink {
+                    transport: RelayTransport::Udp,
+                    outbound: out_tx,
+                    inbound,
+                    end,
+                    tasks,
+                    quic: Some((connection, endpoint)),
+                })
+            }
+            Outer::Tcp(mut stream) => {
+                write_frame(&mut stream, FRAME_CONTROL, &bind)
+                    .await
+                    .map_err(failed)?;
+                let mut units = UnitStream::default();
+                loop {
+                    match read_frame(&mut stream).await.map_err(failed)? {
+                        (FRAME_CONTROL, message) => {
+                            if handle_control(&message)? {
+                                break;
+                            }
+                        }
+                        // Units only follow `ready`; keep an early one all the same.
+                        (FRAME_INNER, bytes) => {
+                            for unit in units.push(&bytes).map_err(failed)? {
+                                drop(in_tx.try_send(unit));
+                            }
+                        }
+                        (kind, _) => tracing::debug!("relay frame of unknown type {kind} ignored"),
+                    }
+                }
+                let (read, write) = tokio::io::split(*stream);
+                let tasks = vec![
+                    tokio::spawn(read_unit_frames(read, units, in_tx, end.clone())).abort_handle(),
+                    tokio::spawn(write_unit_frames(write, out_rx)).abort_handle(),
+                ];
+                Ok(BroadcastLink {
+                    transport: RelayTransport::Tcp,
+                    outbound: out_tx,
+                    inbound,
+                    end,
+                    tasks,
+                    quic: None,
+                })
+            }
+        }
+    }
+}
+
+/// Keeps the QUIC control stream open (closing it would end the link) and reads the `end`.
+async fn read_control(
+    _send: SendStream,
+    mut recv: BufReader<RecvStream>,
+    end: Arc<Mutex<Option<BroadcastEnd>>>,
+) {
+    while let Ok(line) = read_line(&mut recv).await {
+        if let Some(reason) = end_of(&line) {
+            set_end(&end, reason);
+        }
+    }
+}
+
+/// Reads one unit per incoming unidirectional stream, in the order the streams were opened.
+async fn read_unit_streams(
+    connection: Connection,
+    inbound: mpsc::Sender<Unit>,
+    end: Arc<Mutex<Option<BroadcastEnd>>>,
+) {
+    loop {
+        let stream = match connection.accept_uni().await {
+            Ok(stream) => stream,
+            Err(e) => {
+                if let quinn::ConnectionError::ApplicationClosed(close) = &e
+                    && let Ok(reason) = std::str::from_utf8(&close.reason)
+                {
+                    set_end(&end, BroadcastEnd::from_reason(reason));
+                }
+                tracing::debug!("broadcast link closed: {e}");
+                break;
+            }
+        };
+        match read_unit_stream(stream).await {
+            Ok(unit) => {
+                if inbound.send(unit).await.is_err() {
+                    break;
+                }
+            }
+            Err(e) => {
+                tracing::debug!("broadcast unit refused: {e}");
+                connection.close(0u32.into(), b"bad_request");
+                break;
+            }
+        }
+    }
+}
+
+async fn read_unit_stream(
+    mut stream: RecvStream,
+) -> Result<Unit, Box<dyn std::error::Error + Send + Sync>> {
+    let mut head = [0u8; HEADER_LEN];
+    stream.read_exact(&mut head).await?;
+    let header = Header::decode(&head)?;
+    let len = usize::try_from(header.payload_len)?;
+    let mut bytes = Vec::with_capacity(HEADER_LEN + len);
+    bytes.extend_from_slice(&head);
+    bytes.resize(HEADER_LEN + len, 0);
+    stream.read_exact(&mut bytes[HEADER_LEN..]).await?;
+    // A stream carrying more than its header announces is broken.
+    let mut extra = [0u8; 1];
+    if stream.read(&mut extra).await?.is_some() {
+        return Err("unit longer than its header says".into());
+    }
+    Ok(Unit { header, bytes })
+}
+
+/// Sends every unit on its own unidirectional stream, one after the other, so they stay in
+/// order at the relay.
+async fn write_unit_streams(connection: Connection, mut units: mpsc::Receiver<Vec<u8>>) {
+    while let Some(unit) = units.recv().await {
+        let sent = async {
+            let mut stream = connection.open_uni().await?;
+            stream.write_all(&unit).await?;
+            stream.finish()?;
+            Ok::<_, Box<dyn std::error::Error + Send + Sync>>(())
+        };
+        if let Err(e) = sent.await {
+            tracing::debug!("broadcast link write failed: {e}");
+            return;
+        }
+    }
+}
+
+/// Puts units back together from the byte stream of `0x01` frames on TCP.
+#[derive(Default)]
+struct UnitStream {
+    buffer: Vec<u8>,
+}
+
+impl UnitStream {
+    /// Adds the bytes of one frame; returns the units it completed.
+    fn push(&mut self, bytes: &[u8]) -> Result<Vec<Unit>, HeaderError> {
+        self.buffer.extend_from_slice(bytes);
+        let mut units = Vec::new();
+        loop {
+            if self.buffer.len() < HEADER_LEN {
+                break;
+            }
+            // Checked before any payload is waited for, so a bad size never grows the buffer.
+            let header = Header::decode(&self.buffer)?;
+            let total = HEADER_LEN + usize::try_from(header.payload_len).unwrap_or(usize::MAX);
+            if self.buffer.len() < total {
+                break;
+            }
+            let rest = self.buffer.split_off(total);
+            let bytes = std::mem::replace(&mut self.buffer, rest);
+            units.push(Unit { header, bytes });
+        }
+        Ok(units)
+    }
+}
+
+async fn read_unit_frames(
+    mut reader: ReadHalf<TlsStream<TcpStream>>,
+    mut units: UnitStream,
+    inbound: mpsc::Sender<Unit>,
+    end: Arc<Mutex<Option<BroadcastEnd>>>,
+) {
+    loop {
+        match read_frame(&mut reader).await {
+            Ok((FRAME_INNER, bytes)) => match units.push(&bytes) {
+                Ok(done) => {
+                    for unit in done {
+                        if inbound.send(unit).await.is_err() {
+                            return;
+                        }
+                    }
+                }
+                Err(e) => {
+                    tracing::debug!("broadcast unit refused: {e}");
+                    return;
+                }
+            },
+            Ok((FRAME_CONTROL, message)) => {
+                if let Some(reason) = end_of(&message) {
+                    set_end(&end, reason);
+                }
+            }
+            Ok((kind, _)) => tracing::debug!("relay frame of type {kind} after ready ignored"),
+            Err(e) => {
+                tracing::debug!("broadcast link closed: {e}");
+                return;
+            }
+        }
+    }
+}
+
+/// Cuts units into `0x01` frames of at most [`MAX_FRAME`] bytes.
+async fn write_unit_frames(
+    mut writer: WriteHalf<TlsStream<TcpStream>>,
+    mut units: mpsc::Receiver<Vec<u8>>,
+) {
+    while let Some(unit) = units.recv().await {
+        for chunk in unit.chunks(MAX_FRAME) {
+            if let Err(e) = write_frame(&mut writer, FRAME_INNER, chunk).await {
+                tracing::debug!("broadcast link write failed: {e}");
+                return;
+            }
+        }
+    }
+    if let Err(e) = writer.shutdown().await {
+        tracing::debug!("broadcast link not closed cleanly: {e}");
+    }
+}
+
 #[cfg(test)]
 mod tests {
+
+    fn video_unit(len: usize, sequence: u32) -> Vec<u8> {
+        let header = Header {
+            content: Content::Video {
+                codec: crate::broadcast::VideoCodec::Vp9,
+                keyframe: sequence == 0,
+                temporal_layer: 0,
+            },
+            key_id: 1,
+            sequence,
+            payload_len: u32::try_from(len).expect("test"),
+        };
+        let mut unit = header.encode().expect("test").to_vec();
+        unit.extend((0..len).map(|i| i as u8));
+        unit
+    }
+
+    #[test]
+    fn tcp_units_are_cut_into_frames_and_put_back_together() {
+        let units = [
+            video_unit(4000, 0),
+            Unit::control(ControlKind::KeyframeRequest, &[]).expect("test"),
+            video_unit(10, 1),
+        ];
+        let stream: Vec<u8> = units.concat();
+        let mut reader = UnitStream::default();
+        let mut got = Vec::new();
+        // Frames cut anywhere inside units, as a relay may.
+        for chunk in stream.chunks(MAX_FRAME).flat_map(|c| c.chunks(700)) {
+            got.extend(reader.push(chunk).expect("test"));
+        }
+        let bytes: Vec<Vec<u8>> = got.iter().map(|u| u.bytes.clone()).collect();
+        assert_eq!(bytes, units);
+        assert_eq!(
+            got[1].header.content,
+            Content::Control(ControlKind::KeyframeRequest)
+        );
+        assert_eq!(got[2].payload().len(), 10);
+    }
+
+    #[test]
+    fn a_bad_unit_header_is_refused_before_its_payload() {
+        let mut unit = video_unit(10, 0);
+        unit[0] = 9;
+        assert!(UnitStream::default().push(&unit).is_err());
+    }
+
+    #[test]
+    fn control_units_check_their_payload() {
+        assert!(Unit::control(ControlKind::Layers, &[2]).is_ok());
+        assert!(Unit::control(ControlKind::Layers, &[]).is_err());
+        assert!(Unit::control(ControlKind::Key, &[0; 2000]).is_err());
+    }
+
+    #[test]
+    fn reads_end_reasons() {
+        assert_eq!(
+            end_of(br#"{"v":1,"t":"end","reason":"idle"}"#),
+            Some(BroadcastEnd::Idle)
+        );
+        assert_eq!(
+            end_of(br#"{"v":1,"t":"end","reason":"deleted"}"#),
+            Some(BroadcastEnd::Deleted)
+        );
+        assert_eq!(
+            end_of(br#"{"v":1,"t":"end","reason":"new"}"#),
+            Some(BroadcastEnd::Lost)
+        );
+        assert_eq!(end_of(br#"{"v":1,"t":"ready"}"#), None);
+    }
     use super::*;
 
     #[test]
