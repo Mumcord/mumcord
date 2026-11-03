@@ -14,7 +14,6 @@ mod dl;
 mod nvenc;
 // Used by the vendor encoders that don't report temporal layer ids themselves.
 #[cfg(hwenc)]
-#[cfg_attr(not(test), allow(dead_code))]
 mod obu;
 #[cfg(hwenc)]
 mod qsv;
@@ -133,6 +132,7 @@ mod tests {
                     Err(err) => panic!("{encoder} {codec:?}: unexpected error {err}"),
                     Ok(_) if (encoder, codec) == (HardwareEncoder::Nvenc, Codec::Av1) => {}
                     Ok(_) if encoder == HardwareEncoder::Vaapi => {}
+                    Ok(_) if (encoder, codec) == (HardwareEncoder::Amf, Codec::Av1) => {}
                     Ok(_) => panic!("{encoder} {codec:?}: not implemented yet"),
                 }
             }
