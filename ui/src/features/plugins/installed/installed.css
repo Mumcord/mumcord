@@ -42,7 +42,10 @@
   width: 3rem;
   height: 3rem;
   border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-accent) 35%, var(--color-bg-sidebar));
+  /* A letter mixed onto an accent-tinted tile failed WCAG AA (issue #405): the mixed colour is not
+     one of the checked pairs, so it broke for most accents. Token pairs are checked, in both
+     themes and for every accent colour. */
+  background: var(--color-bg-selected);
   color: var(--color-accent-text);
   font-size: var(--font-size-lg);
   font-weight: 600;
