@@ -164,7 +164,7 @@ The full text is in the PATENTS file of the libvpx source:
 https://chromium.googlesource.com/webm/libvpx/+/refs/heads/main/PATENTS
 
 --------------------------------------------------------------------------------
-NVIDIA NVENC API headers (nv-codec-headers) 12.1.14.0
+NVIDIA NVENC API headers (nv-codec-headers) 13.0.19.0
 --------------------------------------------------------------------------------
 
 License: MIT

@@ -252,7 +252,9 @@ impl Sink {
         let since = Instant::now() - window;
         let video = || {
             got.encoded.iter().filter(|(at, from, h, _)| {
-                *at >= since && h.kind == FrameKind::Video && sharer.is_none_or(|s| s == *from)
+                *at >= since
+                    && matches!(h.kind, FrameKind::Video(_))
+                    && sharer.is_none_or(|s| s == *from)
             })
         };
         let bytes: usize = video().map(|(.., len)| len).sum();
@@ -273,7 +275,7 @@ impl Sink {
             .expect("sink")
             .encoded
             .iter()
-            .find(|(_, _, h, _)| h.kind == FrameKind::Video)
+            .find(|(_, _, h, _)| matches!(h.kind, FrameKind::Video(_)))
             .map(|(_, _, h, _)| h.keyframe)
     }
 
@@ -685,19 +687,19 @@ async fn screen_share_ac_2_29() {
 
     // A slow upload for everyone steps down to 480p15 ...
     let stats = throttle(&mut bot, THROTTLE_KBPS, pid, &sinks[..VIEWERS]).await;
-    assert_eq!((stats.width, stats.height), (854, 480));
+    assert_eq!((stats.width, stats.height), (848, 480));
     assert!(stats.fps <= 16, "sender at {} fps", stats.fps);
     for (i, sink) in sinks[..VIEWERS].iter().enumerate() {
         let seen = sink.recent(MEASURE);
-        assert_eq!(seen.size, (854, 480), "viewer {i} size");
+        assert_eq!(seen.size, (848, 480), "viewer {i} size");
         assert!(seen.fps >= 12.0, "viewer {i} gets {:.1} fps", seen.fps);
     }
     // ... and below what 480p15 needs, viewers lose frame rate but keep the picture.
     let stats = throttle(&mut bot, SLOW_KBPS, pid, &sinks[..VIEWERS]).await;
-    assert_eq!((stats.width, stats.height), (854, 480));
+    assert_eq!((stats.width, stats.height), (848, 480));
     for (i, sink) in sinks[..VIEWERS].iter().enumerate() {
         let seen = sink.recent(MEASURE);
-        assert_eq!(seen.size, (854, 480), "viewer {i} size");
+        assert_eq!(seen.size, (848, 480), "viewer {i} size");
         assert!(seen.fps > 0.0, "viewer {i} still gets frames");
     }
 

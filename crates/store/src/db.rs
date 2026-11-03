@@ -419,6 +419,19 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (plugin_id, version)
     );
     ",
+    // v26: the software AV1 self-test also depends on "Optimize for" (spec 07, FR-7.56): Sharp
+    // text costs about four times as much CPU, so a Balanced pass must not count for it. The
+    // key changes, so the table is rebuilt; old results are dropped and simply measured again.
+    r"
+    DROP TABLE encoder_selftest;
+    CREATE TABLE encoder_selftest (
+        resolution      INTEGER NOT NULL,
+        fps             INTEGER NOT NULL,
+        optimize        TEXT NOT NULL CHECK (optimize IN ('balanced', 'text', 'motion')),
+        svt_selftest_ms INTEGER NOT NULL,
+        PRIMARY KEY (resolution, fps, optimize)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -747,7 +760,9 @@ pub(crate) mod tests {
     fn plugin_trust_migration_creates_its_five_tables() {
         assert!(MIGRATIONS.len() >= 25);
         assert!(MIGRATIONS[23].contains("CREATE TABLE file_card"));
-        let sql = MIGRATIONS.last().expect("migration");
+        // v26 (the AV1 self-test keyed by "Optimize for") comes after it.
+        assert!(MIGRATIONS[25].contains("optimize"));
+        let sql = MIGRATIONS[24];
         for table in [
             "plugin_origin_approval",
             "plugin_origin_counters",

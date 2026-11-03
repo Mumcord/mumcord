@@ -47,8 +47,20 @@ pub enum Signal {
         #[serde(default)]
         elapsed_ms: u32,
     },
-    /// The sender wants to watch the receiver's share.
-    Watch,
+    /// The sender wants to watch the receiver's share. 0.6.x sends neither field: it plays
+    /// VP9 only and reads frame version 1 (FR-7.58).
+    Watch {
+        /// Codecs the viewer can play; unknown names are dropped when read.
+        #[serde(
+            default,
+            deserialize_with = "known_codecs",
+            skip_serializing_if = "Vec::is_empty"
+        )]
+        codecs: Vec<CodecName>,
+        /// 1 when the viewer can join relay broadcasts (FR-7.42).
+        #[serde(default, skip_serializing_if = "is_zero")]
+        bc: u8,
+    },
     /// The receiver may watch the sender's share now.
     Accept,
     /// The sender's share already has [`MAX_VIEWERS`] viewers.
@@ -57,6 +69,45 @@ pub enum Signal {
     Unwatch,
     /// Everyone watching the sender's share, sorted.
     Viewers { list: Vec<u32> },
+}
+
+/// A codec name in [`Signal::Watch`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum CodecName {
+    Av1,
+    Vp9,
+}
+
+/// What this client can play as a viewer, sent in every [`Signal::Watch`].
+///
+/// Only VP9 until the viewer decodes AV1 (task N6 adds [`CodecName::Av1`] here once WebCodecs
+/// `av01` and the dav1d fallback are wired); announcing AV1 earlier would make sharers send
+/// frames this client cannot show.
+pub const PLAYABLE_CODECS: &[CodecName] = &[CodecName::Vp9];
+
+/// The watch request this client sends.
+pub fn watch_request() -> Signal {
+    Signal::Watch {
+        codecs: PLAYABLE_CODECS.to_vec(),
+        // Set by the broadcast task (BC1) once this client can join broadcasts.
+        bc: 0,
+    }
+}
+
+/// Drops codec names this client does not know, so a newer viewer listing one still gets in.
+fn known_codecs<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Vec<CodecName>, D::Error> {
+    let names: Vec<serde_json::Value> = Vec::deserialize(d)?;
+    let mut codecs: Vec<CodecName> = names
+        .into_iter()
+        .filter_map(|name| serde_json::from_value(name).ok())
+        .collect();
+    codecs.dedup();
+    Ok(codecs)
+}
+
+fn is_zero(n: &u8) -> bool {
+    *n == 0
 }
 
 #[derive(Serialize, Deserialize)]
@@ -111,7 +162,14 @@ mod tests {
                 kind: Some(ShareKind::Window),
                 elapsed_ms: 4200,
             },
-            Signal::Watch,
+            Signal::Watch {
+                codecs: vec![],
+                bc: 0,
+            },
+            Signal::Watch {
+                codecs: vec![CodecName::Av1, CodecName::Vp9],
+                bc: 1,
+            },
             Signal::Accept,
             Signal::Full,
             Signal::Unwatch,
@@ -160,11 +218,42 @@ mod tests {
     fn reads_newer_versions_and_normalises_viewers() {
         assert_eq!(
             decode(br#"{"v":2,"t":"watch","extra":1}"#),
-            Some(Signal::Watch)
+            Some(Signal::Watch {
+                codecs: vec![],
+                bc: 0
+            })
         );
         assert_eq!(
             decode(br#"{"v":1,"t":"viewers","list":[3,1,3]}"#),
             Some(Signal::Viewers { list: vec![1, 3] })
         );
+    }
+
+    #[test]
+    fn watch_codecs_are_optional_and_unknown_ones_dropped() {
+        assert_eq!(
+            decode(br#"{"v":2,"t":"watch","codecs":["h266","av1",7,"vp9"],"bc":1}"#),
+            Some(Signal::Watch {
+                codecs: vec![CodecName::Av1, CodecName::Vp9],
+                bc: 1
+            })
+        );
+        assert_eq!(decode(br#"{"v":2,"t":"watch","codecs":"av1"}"#), None);
+        // 0.6.x sends no list; a Watch without codecs stays as short as before.
+        assert_eq!(
+            encode(&Signal::Watch {
+                codecs: vec![],
+                bc: 0
+            }),
+            br#"{"v":2,"t":"watch"}"#
+        );
+    }
+
+    #[test]
+    fn this_client_asks_with_its_playable_codecs() {
+        let sent = encode(&watch_request());
+        assert_eq!(sent, br#"{"v":2,"t":"watch","codecs":["vp9"]}"#);
+        // 0.6.x reads `{"t":"watch"}` with extra fields as a plain watch (see the test above).
+        assert!(decode(&sent).is_some());
     }
 }

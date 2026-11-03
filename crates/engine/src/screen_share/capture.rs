@@ -52,10 +52,10 @@ const BAR_STEP: u32 = 8;
 
 impl CaptureSource for TestPattern {
     fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {
-        let (width, height) = (max_width & !1, max_height & !1);
-        if width == 0 || height == 0 {
+        if max_width < 2 || max_height < 2 {
             return None;
         }
+        let (width, height) = super::convert::encode_size(max_width, max_height);
         let tick = self.tick;
         self.tick = self.tick.wrapping_add(1);
         let luma = (width * height) as usize;
@@ -169,7 +169,7 @@ mod tests {
         let second = pattern.frame(1280, 720).unwrap();
         assert_ne!(first.y(), second.y(), "the bar moved");
         let small = pattern.frame(854, 480).unwrap();
-        assert_eq!((small.width(), small.height()), (854, 480));
+        assert_eq!((small.width(), small.height()), (848, 480));
         assert!(pattern.frame(1, 720).is_none());
     }
 }

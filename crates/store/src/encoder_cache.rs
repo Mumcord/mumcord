@@ -4,6 +4,7 @@
 
 use rusqlite::params;
 
+use crate::ScreenOptimize;
 use crate::db::Store;
 use crate::error::Result;
 
@@ -24,6 +25,7 @@ pub struct SvtSelftest {
     /// Frame height in pixels.
     pub resolution: u32,
     pub fps: u32,
+    pub optimize: ScreenOptimize,
     pub svt_selftest_ms: u32,
 }
 
@@ -73,14 +75,15 @@ impl Store {
         let selftests = self
             .conn
             .prepare(
-                "SELECT resolution, fps, svt_selftest_ms FROM encoder_selftest
-                 ORDER BY resolution, fps",
+                "SELECT resolution, fps, optimize, svt_selftest_ms FROM encoder_selftest
+                 ORDER BY resolution, fps, optimize",
             )?
             .query_map([], |row| {
                 Ok(SvtSelftest {
                     resolution: row.get(0)?,
                     fps: row.get(1)?,
-                    svt_selftest_ms: row.get(2)?,
+                    optimize: optimize_from_sql(&row.get::<_, String>(2)?),
+                    svt_selftest_ms: row.get(3)?,
                 })
             })?
             .collect::<rusqlite::Result<Vec<_>>>()?;
@@ -112,11 +115,16 @@ impl Store {
         }
         for t in &cache.selftests {
             tx.execute(
-                "INSERT INTO encoder_selftest (resolution, fps, svt_selftest_ms)
-                 VALUES (?1, ?2, ?3)
-                 ON CONFLICT (resolution, fps) DO UPDATE SET
+                "INSERT INTO encoder_selftest (resolution, fps, optimize, svt_selftest_ms)
+                 VALUES (?1, ?2, ?3, ?4)
+                 ON CONFLICT (resolution, fps, optimize) DO UPDATE SET
                      svt_selftest_ms = excluded.svt_selftest_ms",
-                params![t.resolution, t.fps, t.svt_selftest_ms],
+                params![
+                    t.resolution,
+                    t.fps,
+                    optimize_to_sql(t.optimize),
+                    t.svt_selftest_ms
+                ],
             )?;
         }
         tx.commit()?;
@@ -129,6 +137,23 @@ impl Store {
             "DELETE FROM encoder_cache_meta; DELETE FROM encoder_cache; DELETE FROM encoder_selftest;",
         )?;
         Ok(())
+    }
+}
+
+fn optimize_to_sql(optimize: ScreenOptimize) -> &'static str {
+    match optimize {
+        ScreenOptimize::Balanced => "balanced",
+        ScreenOptimize::Text => "text",
+        ScreenOptimize::Motion => "motion",
+    }
+}
+
+// The table's CHECK constraint only admits the three values written above.
+fn optimize_from_sql(value: &str) -> ScreenOptimize {
+    match value {
+        "text" => ScreenOptimize::Text,
+        "motion" => ScreenOptimize::Motion,
+        _ => ScreenOptimize::Balanced,
     }
 }
 
@@ -153,11 +178,20 @@ mod tests {
                     smoke_ok: false,
                 },
             ],
-            selftests: vec![SvtSelftest {
-                resolution: 1080,
-                fps: 30,
-                svt_selftest_ms: 21,
-            }],
+            selftests: vec![
+                SvtSelftest {
+                    resolution: 1080,
+                    fps: 30,
+                    optimize: ScreenOptimize::Balanced,
+                    svt_selftest_ms: 21,
+                },
+                SvtSelftest {
+                    resolution: 1080,
+                    fps: 30,
+                    optimize: ScreenOptimize::Text,
+                    svt_selftest_ms: 84,
+                },
+            ],
         }
     }
 
