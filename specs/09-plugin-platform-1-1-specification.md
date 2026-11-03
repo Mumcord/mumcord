@@ -229,6 +229,22 @@ The client only displays relay availability; the relay and bot decide who may cr
 - **FR-9.91** SDK feature `1.1` with typed wrappers for every new interface; `mumcord-plugin new` templates for a stage plugin with tree content and one with web content.
 - **FR-9.92** Docs: author guide sections for every new surface and permission, `docs/plugin-score.md`, `docs/plugin-registry-format.md` (format 2, `v1.1` index, sibling lookup), spec 06 references; review-policy rules "no remote code" and website review in `Mumcord/plugins` `policy/REVIEW.md`; CHANGELOG `[Unreleased]` entries.
 
+### 4.17 Plugin peer data format: Bovnar (#400)
+
+- **FR-9.93** Plugin peer data (Mumble plugin data `mumcord.p.<id>` via `peers.messages`, and `peers.relay` messages) carries **Bovnar documents** (user decision 2026-11-03). Bovnar is a self-describing serialization format (https://github.com/sothis/bovnar, MIT): every value carries its type and optionally its unit. It is used here because API 1.1 plugins are new and 0.6.2 cannot run them.
+- **FR-9.94** **Host and SDK split.** The host treats a plugin's message as opaque bytes and only enforces size limits (FR-9.60, FR-9.61, 997 bytes for the Mumble fallback) and rates; it never parses, rewrites or logs the payload. The **SDK validates on receive**: its helpers decode the bytes into a typed value and return a clean error for malformed, truncated, wrong-typed, too deep or oversized documents. A plugin built without the helpers can still send raw bytes (plugins on SDK 1.0 and plugins that want another format are not blocked), but only Bovnar is documented, supported and tested.
+- **FR-9.95** **SDK helpers** (feature `1.1`, module `bovnar`): `encode` (typed value → bytes, refusing results above the message limit before sending), `decode` (bytes → typed value, with limits for size and nesting depth), `send_document` / `on_document` wrappers for `peers.messages` and `peers.relay`, and an error type with the reasons `malformed`, `too-large`, `wrong-type`. Decode errors are logged by the SDK with the reason and size only, never payload content. The wasm build works (`no_std + alloc`, no `unsafe` in the Bovnar crate).
+- **FR-9.96** **Pure-Rust Bovnar implementation** from the fork **Mumcord/bovnar** (branch `rust-implementation`, folder `rust/`): follows the upstream spec 1.2 and the conformance suite (470 cases), with a differential test against the C reference and fuzzing; includes JSON ↔ Bovnar conversion and a format sniff; the UCUM and CF unit profiles are left out until their licences are clear. Mumcord (`crates/plugin-sdk`, `crates/engine`) uses it as a **git dependency pinned to a commit**; licence notices go into the licences window and the SDK.
+- **FR-9.97** **Docs for plugin authors** (extends FR-9.92): a "Sending data to other players" guide section with Bovnar examples (send, receive, error handling, size limits, relay vs fallback sizes), and the `mumcord-plugin new` templates for a relay plugin use the helpers.
+- **FR-9.98** **Scope of the format.** Only plugin peer data and the new 0.7.0 channels (spec 07 `mumcord.file`, spec 08 `mumcord.camera`) use Bovnar. Existing message channels (`mumcord.peer` including the bcast-* types, history sync, hello, poll/dice data and the like) stay JSON/binary, and existing data packages do not switch in 0.7.0 (#401, 0.8.0 and later); the mumpeer HTTP API, the plugin manifest and the registry indexes stay JSON.
+- **FR-9.99** **Git dependency and publishing.** The Bovnar crate is not published on crates.io (`publish = false`). While `mumcord-plugin-sdk` has a git dependency it cannot be released on crates.io; the SDK is distributed as before (git tag, template) until this is resolved. Whether the code goes upstream as a PR (the author publishes) or stays in the fork is being discussed with the Bovnar author; the crates.io question is decided at the next SDK release. `docs/` and CHANGELOG state this plainly.
+
+### 4.18 Local exports in Bovnar (#400)
+
+- **FR-9.100** Settings export/backup and the diagnostic report are written as **Bovnar documents** (only Mumcord reads them). No spec owned these features before, so this requirement lives here.
+- **FR-9.101** **Reading is tolerant**: import and the report viewer detect the format with the Bovnar format sniff and read both Bovnar and the older JSON. An export written by 0.7.0 imports again; an export from 0.6.x (JSON) still imports. Written JSON is never produced by 0.7.0.
+- **FR-9.102** Import treats the file as untrusted input: malformed or oversized files are refused with a clear message, no crash, no partial import (all or nothing), and the log has no file content. The diagnostic report keeps its privacy rules (no chat contents, audio or personal data).
+
 ## 5. UI & UX
 
 ### 5.1 Navigation
@@ -343,6 +359,7 @@ sequenceDiagram
 - mumpeer: use `plugin_data`, broadcast kind `plg`, `[plugin_data]` limits (FR-9.84 … FR-9.87). mumbot: `plg` tokens and broadcasts (FR-9.88). mumcord-p2p: `RelayUse::PluginData`, header kind `data` (FR-9.89).
 - Mumble: activity announcements and fallback data use existing Mumble plugin data (`mumcord.p.<id>`, FR-6.34) with a host-reserved kind; official "Get plugin" notices use a Mumcord message to peers with the `plugins` hello feature. No new hello feature.
 - Works against unmodified murmur ≥ 1.4 and with an older relay image (no `plugin_data` → fallback).
+- Plugin payloads are Bovnar documents (FR-9.93); the host only sees bytes, so the relay envelope, headers and fallback framing are unchanged. No new hello feature.
 
 ## 7. Data & state model
 
@@ -413,6 +430,7 @@ Mumcord's E2E covers the platform only, with small dedicated test plugins. Offic
 | `test-stage` (1.1) | Tree-content activity, gesture checks, Apps-menu start |
 | `test-stage-official` | Same, served as official by the local fixture registry with its test key (Get plugin notice) |
 | `test-relay` (1.1) | 64 KiB 1:1 and channel sends, `fallback` on/off |
+| `test-bovnar` (1.1) | Sends and receives Bovnar documents with the SDK helpers 1:1 and in a channel, with and without the relay; error mode that sends malformed, wrong-typed and oversized bytes |
 | `test-api10` (built with SDK 1.0, binary kept) and `test-versions` (versions 1.0.0 api 1.0 and 2.0.0 api 1.1) | Backwards compatibility and version choice |
 | `test-score-low` / `-medium` / `-high`, `test-growth` 1.0 → 1.1 (adds `ui.webview`, `peers.relay`) | Score bands and update hold |
 | `test-stop-http`, `-ip`, `-wildcard`, `-userinfo`, `-private` | Hard stops |
@@ -491,6 +509,14 @@ Setup for all unless stated otherwise: section 10.2. Never a public server.
 **Release gate**
 40. **AC-9.40** (manual) On signed builds for Windows, macOS and Linux, the S0 probes (FR-9.1 b, e) run from `test-surface` all fail to leak, and a busy frame doesn't freeze Mumcord.
 
+**Bovnar data (#400)**
+41. **AC-9.41** `test-bovnar` on clients A and B sends a typed document (strings, integers, a value with a unit, nested list) through `peers.messages` (Mumble plugin data, ≤ 997 bytes) and through `peers.relay` with the relay (`plugin-data` profile): B's plugin receives equal values both ways; the packet inspector shows Bovnar bytes; without the relay (`no-plugin-data` profile) the small document arrives via the fallback and a document above the fallback size returns `relay-unavailable`.
+42. **AC-9.42** `test-bovnar` error mode: A sends malformed, truncated, wrong-typed, too deeply nested and above-limit bytes → B's SDK reports `malformed`, `wrong-type` or `too-large`, the plugin keeps running, nothing crashes or hangs, the host passes the valid message sent right after, and logs contain reasons and sizes only, never payload content. Over-limit sends are refused on the sender before leaving the machine.
+43. **AC-9.43** The host does not parse plugin data: `test-api10` (SDK 1.0, raw bytes) still exchanges its messages unchanged between two 0.7.0 clients.
+44. **AC-9.44** 0.6.2 and 0.7.0 clients in one channel: chat, history sync, polls, dice and p2p keep working (E2E with the old build); no Bovnar document appears on any existing channel.
+45. **AC-9.45** Settings export written by 0.7.0 contains a Bovnar document and imports again with equal settings; an export file from 0.6.x (JSON) imports; a truncated or oversized file is refused with a message and changes nothing; the diagnostic report is written as Bovnar and contains no chat contents or personal data.
+46. **AC-9.46** (docs/release check) The plugin author guide has the Bovnar section with a working example; the build uses the pinned Bovnar commit; the licences window lists Bovnar; the SDK documentation states the crates.io limitation.
+
 Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.17, 9.36, 9.18, 9.19, 9.20, 9.39; #395 AC 14 → replaced by AC-9.25 (section 12); #393 AC 1–11 → AC-9.31, 9.32, 9.32, 9.33, 9.9, 9.34, 9.35, 9.36, 9.37, 9.39, 9.38; #396 AC → AC-9.25 … AC-9.30.
 
 ## 12. Decision log
@@ -532,6 +558,8 @@ Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.1
 | #396 index path | `https://mumcord.github.io/plugins/v1.1/index.json`, format 2 | Decided in this spec |
 | #396 backwards compatibility | Minors only add; frozen snapshots; exact-minor linking; aliases for renames; removal only in 2.0; previous major supported for two releases (FR-6.13, stricter than "at least one") | User comment 2026-11-03 |
 | Testing rule | Mumcord e2e covers the platform only with dedicated test plugins; Skyloom (#394), Whiteboard (#397) and other official plugins have their own E2E in the plugins repo | Lead instruction for this spec |
+| Bovnar for plugin data and exports (#400) | Plugin peer data (Mumble plugin data and `peers.relay`) carries Bovnar documents with SDK helpers; the SDK validates on receive, the host enforces only size limits; settings export/backup and the diagnostic report are written as Bovnar and read as Bovnar or JSON. Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. Existing data packages do not switch in 0.7.0 (#401) and the dropped 0.7.0 "foundation" (hello capability, dual read) is not part of this release. | user, 2026-11-03; FR-9.93 … FR-9.102, AC-9.41 … AC-9.46 |
+| Bovnar git dependency (#400) | Pinned git dependency on the fork Mumcord/bovnar (`publish = false`); `mumcord-plugin-sdk` can't go to crates.io while it has it | user, 2026-11-03; FR-9.99; decide at the next SDK release |
 
 ## 13. Open points & risks
 
@@ -543,6 +571,7 @@ Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.1
 - **Score limits** stated plainly in `docs/plugin-score.md`: claims are claims (about 15 %), splitting plugins, harmless-looking abuse, websites are black boxes, waiting out key age, score is not a review.
 - **Existing official-plugin E2E specs in the Mumcord repo** (dice, poll, echolings, music) stay until moved; moving them is not part of this spec.
 - **Relay cost**: operators pay for plugin traffic; default off and caps mitigate.
+- **Bovnar upstream (#400):** upstream PR vs. our own fork is open with the Bovnar author; until then the pinned fork commit is the source of truth and the SDK stays off crates.io (FR-9.99).
 
 ## 14. Impact on the roadmap
 

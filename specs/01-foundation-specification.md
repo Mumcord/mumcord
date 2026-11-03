@@ -570,6 +570,7 @@ Unless stated otherwise: a fresh Mumcord install, a local test server (1.5) runn
 | QA.90 | P2P without STUN in Epic 2: IPv6, router port mapping (UPnP/NAT-PMP/PCP) and LAN only; certificate-authenticated encryption; plugin data as fallback | Addendum 2026-10-25; roadmap row Epic 2 |
 | QA.91 | Epic 2: only the in-game overlay, the window overlay is removed completely, regardless of Windows | Addendum 2026-10-25; roadmap row Epic 2 |
 | QA.92 | Bug: closing Mumcord crashes a game using the in-game overlay (layer loaded from a folder that disappears) – fix in Epic 2; workaround: close the game first or turn the in-game overlay off | Addendum 2026-10-25; roadmap row Epic 2 |
+| QA.93 | 0.7.0: history sync sends inline images as hash references instead of base64 (#402); hello feature `histimg`; 0.6.2 requesters keep getting full bodies; #382 rules apply to the referenced images. Existing message channels stay JSON/binary | user, 2026-11-03; Addendum 0.7.0 (§15), FR-1.60d … FR-1.60g, AC-1.51e … AC-1.51h |
 
 ## 13. Open points & risks
 
@@ -596,3 +597,22 @@ No `specs/roadmap.md` exists yet. This brainstorming proposes it:
 | 6 | GIF search | GIF search (Tenor/Giphy or similar) without shipping an extractable API key – e.g. a small proxy or user-provided keys; decided later (QA.43) |
 
 Renumbering (QA.1): Epic 2 is now Multi-server read-along; Comfort & polish, Admin and Release move to Epics 3, 4 and 5. Later candidates: mobile apps (Android/iOS), recording. Creating `specs/roadmap.md` from this table needs the user's go-ahead.
+
+## 15. Addendum 0.7.0 – History sync image references (#402)
+
+Applies from 0.7.0 on (user, 2026-11-03). Everything in FR-1.60 stays as it is; this addendum only changes how inline images in synced bodies travel. The history channel `mumcord.history` stays JSON/binary (no Bovnar, no format change), so 0.6.2 and mumbot keep working.
+
+**Why.** A history `part` carries stored chat bodies as sanitized HTML in a JSON array. Inline images are `data:image/...;base64` URIs, so each image travels as base64 (4/3 of its size) plus JSON escaping in ~900-byte plugin-data packets, and the same image is re-sent to every peer and on every sync.
+
+- **FR-1.60d** **Hello feature `histimg`** (within the hello limit of 16, spec 06). Every 0.7.0 client announces it; peers record it per session. A client announcing it can resolve image references in history bodies.
+- **FR-1.60e** **Answering a history request.** For a requester that announced `histimg`, the answering client replaces each inline `data:` image in a message body with a **hash reference** in the form chat already uses (`data-mumcord-full="<sha256 hex>:<size>"`, FR-1.60c, with the mime type) and sends no image bytes in the `part`. If the holder cannot serve the original (it has none, or "Offer my full-size images" is off, FR-1.74), it keeps the inline image for that message as today. For a requester without `histimg` (0.6.2, other clients) the answer is the full body exactly as in 0.6.2; the holder never sends references to a peer that did not announce the feature. Content hashes for dedup (QA.48) are computed over the normalized body as before, independent of whether images are inline or referenced, so both forms deduplicate against each other.
+- **FR-1.60f** **Receiving.** The receiver shows each referenced image as a placeholder of the right size, fetches missing images through the **existing full-image path** (FR-1.60c, QA.89): P2P stream kind 1 first, the `mumcord.image` plugin-data fallback otherwise, both raw binary, and replaces the placeholder when the bytes arrive and match the hash. Images already in the local store (same hash) are not fetched again. Failed or refused fetches keep a placeholder with a "Image not available" hint and retry on the next sync; nothing else about the message is lost. Fetched images obey the same size and image limits as chat and the full-image path (FR-1.60c, FR-1.74 "Load full-size images from others" off → the placeholder stays and offers a manual load).
+- **FR-1.60g** **Access rules (#382).** An image is served by hash only to a peer who may read a message containing it under the history rules of FR-1.60: open channels for members and followers, locked channels only for people physically inside them, plus the password proof for holders that use channel passwords, and never from private chats. Requests for hashes that do not appear in a message the holder would share with that peer are refused like unknown hashes, so a hash alone gives no access. Both the fetch via P2P and the plugin-data fallback apply the same check, and the reasons are not distinguishable to the requester.
+
+**Acceptance criteria (verifiable in the running client)**
+- **AC-1.51e** Channel with N inline images across messages; B joins and syncs from A (both 0.7.0): the data transferred for the images is about the raw image bytes once per distinct image (not base64 per message), measured in a test with the numbers in the PR; B shows placeholders, then the images; the stored messages equal the originals once images arrived.
+- **AC-1.51f** B is a 0.6.2 client (E2E with the old build) and syncs the same channel from A (0.7.0) → B receives complete messages with their images, exactly as before; the packet inspector shows no hash references to B.
+- **AC-1.51g** B already holds an image (same hash) in its local store; syncing messages that reference it fetches nothing for that image; a second sync of the same range transfers no image bytes.
+- **AC-1.51h** Locked channel (#382): C is outside the channel and asks A for a hash from a message in that channel through P2P and through the plugin-data fallback → both refused, no bytes sent; B inside the channel (and with the password proof where used) gets the image. A hash that appears only in a private chat is refused for everybody.
+
+Not changed: history sync's limits (7 days, 500 messages, chunking, rate limits), the cutoff rules (QA.49) and the order and scroll rules (FR-1.60b).
