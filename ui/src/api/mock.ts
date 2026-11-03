@@ -6,6 +6,8 @@
 import { mockPublicServerPing, mockPublicServers } from "./mockPublicServers";
 import type {
   DndState,
+  FileCard,
+  FileChip,
   InspectorView,
   LinkOutcome,
   MessageNotice,
@@ -117,8 +119,13 @@ export interface MockControls {
   requirePassword(serverId: number, password: string): void;
   /** The next connect to `serverId` asks for certificate trust first. */
   requireCertTrust(serverId: number, previousFingerprint?: string): void;
-  /** Simulates an incoming message from another person. */
-  receiveMessage(conversation: Conversation, body: string, senderSession: number): ChatMessage;
+  /** Simulates an incoming message from another person; `file` makes it a file offer. */
+  receiveMessage(
+    conversation: Conversation,
+    body: string,
+    senderSession: number,
+    file?: FileCard,
+  ): ChatMessage;
   /**
    * What the next `historySyncRequest` for `channelId` finds in `holderName`'s history
    * (FR-1.60); without it, a sync finds nothing.
@@ -211,7 +218,14 @@ interface MockSession {
 
 const SELF_SESSION = 1;
 
-const NO_RELAY: RelayInfo = { bots: [], host: null, status: { kind: "none" }, firstSeen: null };
+const NO_RELAY: RelayInfo = {
+  bots: [],
+  host: null,
+  status: { kind: "none" },
+  firstSeen: null,
+  uses: [],
+  broadcastMax: null,
+};
 
 /** A relay announced by a bot and trusted since the first visit (spec 04, FR-4.20). */
 const MOCK_RELAY: RelayInfo = {
@@ -219,6 +233,8 @@ const MOCK_RELAY: RelayInfo = {
   host: "relay.example.org",
   status: { kind: "available" },
   firstSeen: "2026-09-01T18:00:00Z",
+  uses: ["images", "files", "screenShare"],
+  broadcastMax: 25,
 };
 
 /** Per-server switches of a server that was just added. */
@@ -850,6 +866,7 @@ function demoHistory(): ChatMessage[] {
     body,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
   }));
 }
 
@@ -1683,6 +1700,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let cachedTempKib = 352;
   // GIF favorites, most recently used first.
   let gifFavorites: string[] = [];
+  let nextChipId = 1;
   /** Originals kept by `fullImageKeep`, by reference. */
   const fullImages = new Map<string, string>();
   const offeredHistory = new Map<
@@ -1953,6 +1971,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       body: html,
       dismissedPreviews: [],
       syncedFrom: null,
+      file: null,
     };
     store(message);
     return message;
@@ -2748,6 +2767,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         body: line.body,
         dismissedPreviews: [],
         syncedFrom: offer?.holderName ?? null,
+        file: null,
       }));
       messages.sort((a, b) => Date.parse(a.sentAt) - Date.parse(b.sentAt));
       for (const message of messages) storeByTime(message);
@@ -3224,6 +3244,25 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve({ ...requireServer(serverId) });
     },
     fullImageCancel: () => Promise.resolve(null),
+    filesAvailability: () => Promise.resolve(null),
+    filesChipAdd: (path) => {
+      const chip: FileChip = {
+        id: nextChipId++,
+        name: path.split(/[\\/]/).pop() ?? path,
+        size: 1024,
+        state: { kind: "ready" },
+      };
+      return Promise.resolve(chip);
+    },
+    filesChipRemove: () => Promise.resolve(undefined),
+    filesSend: () => Promise.resolve([]),
+    filesStop: () => Promise.resolve(undefined),
+    filesCard: () => Promise.resolve(null),
+    filesDownload: () => Promise.resolve(null),
+    filesCancel: () => Promise.resolve(undefined),
+    filesSaveFolder: () => Promise.resolve("~/Downloads/Mumcord"),
+    filesOpen: () => Promise.resolve(null),
+    filesOpenFolder: () => Promise.resolve(null),
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
@@ -3537,6 +3576,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           body,
           dismissedPreviews: [],
           syncedFrom: null,
+          file: null,
         })),
         receivedAt: new Date().toISOString(),
       };
@@ -3544,7 +3584,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       setPmRequests(currentServerId, { ...requests, incoming: [...requests.incoming, request] });
       return request;
     },
-    receiveMessage: (conversation, body, senderSession) => {
+    receiveMessage: (conversation, body, senderSession, file) => {
       focused();
       const sender = requireUser(senderSession);
       // Like the engine (issue #140): private messages of blocked people are dropped, their
@@ -3561,6 +3601,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         body,
         dismissedPreviews: [],
         syncedFrom: null,
+        file: file ?? null,
       };
       if (blocked && conversation.kind !== "channel") return message;
       store(message);

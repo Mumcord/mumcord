@@ -2,7 +2,7 @@
 //!
 //! Layout of the source tree (`fixtures/safety`):
 //! - `cores/<name>.wat`: core module of a plugin, or `<name>.component.wat` for a hand-written
-//!   component. Placeholders are resolved from `crates/plugins/wit`, so the byte offsets of the
+//!   component. Placeholders are resolved from `crates/plugins/wit/1.0.0`, so the byte offsets of the
 //!   canonical ABI never get hard-coded (see `Layout`).
 //! - `<fixture>/manifest.json`: only what is special about the fixture; `common_manifest` fills
 //!   in the rest in one place.

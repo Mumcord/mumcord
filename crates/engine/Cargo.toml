@@ -46,6 +46,8 @@ tracing-appender.workspace = true
 
 [target.'cfg(unix)'.dependencies]
 xattr.workspace = true
+# Free space in the save folder before a download starts (statvfs without unsafe).
+rustix = { version = "1", features = ["fs"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # Core protocol only: whole-screen capture on X11 (GetImage on the root window).
@@ -86,6 +88,7 @@ windows = { version = "0.62", features = [
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Dxgi_Common",
     "Win32_Media_Audio",
+    "Win32_Storage_FileSystem",
     "Win32_System_Com",
     "Win32_System_Com_StructuredStorage",
     "Win32_System_SystemInformation",
@@ -109,6 +112,8 @@ tempfile.workspace = true
 tokio = { workspace = true, features = ["test-util"] }
 # Live tests drive scripted bots through the mumbot library.
 mumbot = { git = "https://github.com/Mumcord/mumbot", tag = "v0.4.1", features = ["tester"] }
+# The release mumbot is built against; bot-side message types must come from it, not the workspace crate.
+bot_protocol = { package = "mumcord-protocol", version = "0.5" }
 mumcord-store = { workspace = true, features = ["test-util"] }
 mumcord-audio = { workspace = true, features = ["test-backend"] }
 netsim = { path = "../../tools/netsim" }

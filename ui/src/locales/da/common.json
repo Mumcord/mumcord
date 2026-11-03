@@ -68,6 +68,16 @@
     "popOutFailed": "Det separate vindue kunne ikke åbnes",
     "popInFailed": "Visningen kunne ikke hentes tilbage",
     "onTopFailed": "Altid øverst kunne ikke ændres",
-    "windowTitle": "{{title}} — {{channel}}"
+    "windowTitle": "{{title}} — {{channel}}",
+    "resize": {
+      "label": "Resize media area",
+      "valueText": "{{percent}}% of the window height",
+      "ofWindow": "of the window height",
+      "chatMinimum": "chat keeps its minimum",
+      "release": "release to collapse",
+      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
+      "releaseHint": "Release to minimise to the mini bar",
+      "minimised": "Media area minimised"
+    }
   }
 }

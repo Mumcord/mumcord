@@ -23,14 +23,14 @@
     "keepBlocked": "Palikti užblokuotą",
     "forget": "Pamiršti perdavimo mazgą",
     "actionFailed": "Nepavyko. Bandyk dar kartą.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Šis serveris neturi perdavimo mazgo, todėl failų bendrinimas nepasiekiamas.",
+    "filesDisallowed": "Šio serverio perdavimo mazgas neleidžia bendrinti failų.",
+    "screenDisallowed": "Šio serverio perdavimo mazgas neleidžia bendrinti ekrano.",
+    "imagesDisallowed": "Visas dydis nepasiekiamas: šio serverio perdavimo mazgas neleidžia paveikslėlių",
+    "noCertificate": "Failų bendrinimui reikalingas kliento sertifikatas.",
+    "modeNeedsRelay": "Failų bendrinimui reikalingas perdavimo mazgas; tavo peer-to-peer nustatymas yra {{mode}}.",
+    "modeOff": "Išjungta",
+    "modeDirectOnly": "Tik tiesiogiai"
   },
   "reason": {
     "p2pOff": "Peer-to-peer išjungtas.",

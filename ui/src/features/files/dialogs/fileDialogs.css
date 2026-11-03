@@ -1,0 +1,83 @@
+/* Download confirmation and risky file warning: the app dialog (FR-7.22, mockup 6 of #348). */
+
+.file-dialog {
+  width: min(28rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.file-dialog p {
+  margin: 0 0 var(--space-3);
+}
+
+.file-dialog__head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.file-dialog__head .app-dialog__title {
+  margin: 0;
+}
+
+.file-dialog__warning {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-warning);
+}
+
+.file-dialog__file {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  overflow-wrap: anywhere;
+}
+
+.file-dialog__file svg {
+  flex: none;
+}
+
+.file-dialog .file-dialog__note {
+  margin-bottom: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.file-dialog__facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+}
+
+.file-dialog__fact {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: var(--space-3);
+}
+
+.file-dialog__fact dt {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.file-dialog__fact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.file-dialog__hash {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: var(--font-size-sm);
+  word-break: break-all;
+}

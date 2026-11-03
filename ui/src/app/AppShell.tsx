@@ -11,7 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SkipLinks } from "../a11y";
 import { onUiHotkey } from "../features/hotkeys";
-import { ResizeHandle } from "./ResizeHandle";
+import { ColumnResizeHandle } from "./ResizeHandle";
 import {
   isMembersShortcut,
   loadMembersCollapsed,
@@ -198,7 +198,7 @@ export function AppShell({
             {slots.userPanel}
           </section>
         </div>
-        <ResizeHandle
+        <ColumnResizeHandle
           column="channels"
           label={t("resize.channels")}
           controls={SHELL_IDS.channels}
@@ -221,7 +221,7 @@ export function AppShell({
           {slots.chatStatus}
           <div className="shell__chat-body">{slots.chat}</div>
         </main>
-        <ResizeHandle
+        <ColumnResizeHandle
           column="members"
           label={t("resize.members")}
           controls={SHELL_IDS.members}

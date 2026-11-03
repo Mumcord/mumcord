@@ -23,6 +23,7 @@ function message(id: string, sender: string, body: string): ChatMessage {
     body,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
   };
 }
 

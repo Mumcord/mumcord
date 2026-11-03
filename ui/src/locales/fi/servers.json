@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} yhdistettiin oletusidentiteetillä, koska sen oma identiteetti puuttuu."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Rele sallii",
+    "line": "Rele sallii: {{uses}}",
+    "images": "Kuvat",
+    "files": "Tiedostot",
+    "screen": "Näytön jako"
   }
 }

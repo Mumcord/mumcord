@@ -55,6 +55,9 @@ pub struct ChatMessageView {
     /// Name of the person whose history this message was synced from (FR-1.60); `None` for
     /// messages received or sent here.
     pub synced_from: Option<String>,
+    /// The file card when the message is a valid file offer from a person who isn't blocked
+    /// (spec 07, FR-7.19); the body then still holds the plain line for other clients.
+    pub file: Option<crate::files::card::FileCardView>,
 }
 
 /// What `history_clear` removes.
@@ -286,6 +289,7 @@ pub(crate) fn on_text(
     peers: &crate::mumcord::ServerPeers,
     requests: &crate::pm_rules::ServerRequests,
     block_list: &crate::blocking::BlockList,
+    files: &crate::files::FileSharing,
 ) -> Option<String> {
     let routed = ctx.handle.with_state(|s| {
         let route = route(s, msg)?;
@@ -307,7 +311,7 @@ pub(crate) fn on_text(
             None => ConversationRef::PrivateSession { session },
         },
     };
-    let message = ChatMessageView {
+    let mut message = ChatMessageView {
         id: String::new(),
         conversation,
         sender_name,
@@ -318,6 +322,7 @@ pub(crate) fn on_text(
         body: sanitize_message_html(&msg.message),
         dismissed_previews: Vec::new(),
         synced_from: None,
+        file: None,
     };
     let blocked = msg
         .actor
@@ -342,6 +347,23 @@ pub(crate) fn on_text(
     let counts_unread = !own
         && verdict == crate::blocking::TextVerdict::Normal
         && ctx.handle.with_state(|s| counts_unread(s, route));
+    // The offer is read from the raw message: the sanitizer keeps only a valid offer attribute,
+    // and offers of blocked people are not shown (FR-7.19). Files are for channels only (FR-7.10).
+    let offer = (matches!(route, Route::Channel(_)) && !blocked)
+        .then(|| {
+            crate::files::offer::parse_offer_html(
+                &msg.message,
+                (message.sent_at / 1000).unsigned_abs(),
+            )
+        })
+        .flatten();
+    if let Some(offer) = offer {
+        let share_id = offer.id.clone();
+        message.file = files.on_offer(ctx.server_id, offer, &message);
+        let id = deliver(ctx, message, counts_unread)?;
+        files.set_message(ctx.server_id, &share_id, &id);
+        return Some(id);
+    }
     deliver(ctx, message, counts_unread)
 }
 
@@ -485,6 +507,7 @@ pub(crate) fn history_view(
         body: m.body,
         dismissed_previews,
         synced_from,
+        file: None,
     }
 }
 
@@ -539,11 +562,12 @@ impl Engine {
         }
         check_text_size(&ctx, html)?;
         let denials = subscribe_denials();
+        let sent_at = now_millis();
         ctx.handle
             .send_text(&TextTarget::channel(channel_id), html)
             .map_err(command_error)?;
         await_refusal(&ctx, denials, Some(channel_id)).await?;
-        let message = own_message(&ctx, ConversationRef::Channel { channel_id }, html);
+        let message = own_message(&ctx, ConversationRef::Channel { channel_id }, html, sent_at);
         crate::plugins::on_own_text(ctx.events.plugins(), &ctx, channel_id, html, &message.id);
         Ok(message)
     }
@@ -563,6 +587,7 @@ impl Engine {
             .ok_or_else(|| EngineError::new(ErrorKind::NotFound, "unknown person"))?;
         check_text_size(&ctx, html)?;
         let denials = subscribe_denials();
+        let sent_at = now_millis();
         ctx.handle
             .send_text(&TextTarget::user(session), html)
             .map_err(command_error)?;
@@ -572,7 +597,7 @@ impl Engine {
             Some(cert_hash) => ConversationRef::Private { cert_hash },
             None => ConversationRef::PrivateSession { session },
         };
-        Ok(own_message(&ctx, conversation, html))
+        Ok(own_message(&ctx, conversation, html, sent_at))
     }
 
     /// Resets the unread count of a conversation (and the stored read marker of a followed
@@ -639,14 +664,73 @@ impl Engine {
             tracing::warn!(error = %e, "reading synced message origins failed");
             Default::default()
         });
-        Ok(rows
+        let mut views: Vec<ChatMessageView> = rows
             .into_iter()
             .map(|m| {
                 let urls = dismissed.remove(&m.id).unwrap_or_default();
                 let origin = origins.remove(&m.id);
                 history_view(m, &conversation, own_hash.as_deref(), urls, origin)
             })
-            .collect())
+            .collect();
+        if matches!(conversation, ConversationRef::Channel { .. }) {
+            self.attach_file_cards(&ctx, &ids, &mut views);
+        }
+        Ok(views)
+    }
+
+    /// Whether the sender of a history message is blocked now (offers of blocked people are not
+    /// shown, FR-7.19).
+    fn history_sender_blocked(&self, ctx: &SessionCtx, view: &ChatMessageView) -> bool {
+        if view.own {
+            return false;
+        }
+        let list = lock(self.blocked_state());
+        let own = ctx
+            .handle
+            .with_state(|s| s.own_user().and_then(|u| u.cert_hash.clone()));
+        crate::blocking::blocks(
+            &list,
+            own.as_deref(),
+            ctx.server_id,
+            view.sender_cert_hash.as_deref(),
+            &view.sender_name,
+        )
+    }
+
+    /// Gives history messages that carry a file offer their card, with the state saved at the
+    /// end of a download (FR-7.20). Synced messages never get one: they are someone else's copy.
+    fn attach_file_cards(&self, ctx: &SessionCtx, ids: &[i64], views: &mut [ChatMessageView]) {
+        let offers: Vec<(usize, crate::files::offer::FileOffer)> = views
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| v.synced_from.is_none() && !self.history_sender_blocked(ctx, v))
+            .filter_map(|(i, v)| {
+                crate::files::offer::parse_offer_html(&v.body, (v.sent_at / 1000).unsigned_abs())
+                    .map(|o| (i, o))
+            })
+            .collect();
+        if offers.is_empty() {
+            return;
+        }
+        let mut stored = ctx.store().file_cards(ids).unwrap_or_else(|e| {
+            // The cards then start as Available; better than no history.
+            tracing::warn!(error = %e, "reading file cards failed");
+            Default::default()
+        });
+        for (i, offer) in offers {
+            let view = &views[i];
+            let message_id = view.id.parse::<i64>().ok();
+            let origin = crate::files::recipient::OfferOrigin {
+                sender_name: view.sender_name.clone(),
+                sender_cert: view.sender_cert_hash.clone(),
+                sender_session: None,
+                message_id,
+                own: view.own,
+            };
+            let record = message_id.and_then(|id| stored.remove(&id));
+            let card = self.files_register_offer(ctx.server_id, offer, origin, record);
+            views[i].file = Some(card);
+        }
     }
 
     /// Remembers that the preview card of `url` under the message was dismissed (QA.42).
@@ -803,7 +887,15 @@ async fn await_refusal(
 }
 
 /// Stores and returns an own sent message.
-fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> ChatMessageView {
+///
+/// `sent_at` is when it went to the server, taken before the refusal grace: a message someone
+/// else sends meanwhile reaches the server after it and must sort after it (issue #379).
+fn own_message(
+    ctx: &SessionCtx,
+    conversation: ConversationRef,
+    html: &str,
+    sent_at: UnixMillis,
+) -> ChatMessageView {
     let (sender_name, sender_cert_hash, sender_session) = ctx.handle.with_state(|s| {
         let own = s.own_user();
         (
@@ -819,10 +911,11 @@ fn own_message(ctx: &SessionCtx, conversation: ConversationRef, html: &str) -> C
         sender_cert_hash,
         sender_session,
         own: true,
-        sent_at: now_millis(),
+        sent_at,
         body: sanitize_message_html(html),
         dismissed_previews: Vec::new(),
         synced_from: None,
+        file: None,
     };
     let stored = match &message.conversation {
         ConversationRef::Channel { channel_id } => ctx

@@ -32,6 +32,8 @@ pub struct ChatMessage {
     /// Name of the person whose history this message was synced from (FR-1.60); `null` for
     /// messages received or sent here. Show "from ‹name›'s history".
     pub synced_from: Option<String>,
+    /// The file card of a file offer (spec 07); show it instead of the plain `body` line.
+    pub file: Option<super::files::FileCard>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
@@ -85,6 +87,7 @@ impl From<ChatMessageView> for ChatMessage {
             body: v.body,
             dismissed_previews: v.dismissed_previews,
             synced_from: v.synced_from,
+            file: v.file.map(Into::into),
         }
     }
 }

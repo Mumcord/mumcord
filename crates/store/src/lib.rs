@@ -13,10 +13,12 @@ mod db;
 mod encoder_cache;
 mod error;
 mod favorites;
+mod file_cards;
 mod friends;
 mod history;
 mod identities;
 mod identity;
+mod plugin_trust;
 mod plugins;
 mod pm_overview;
 mod relay_pin;
@@ -34,10 +36,12 @@ pub use db::{DB_FILE_NAME, Store, UnixMillis};
 pub use encoder_cache::{EncoderCache, EncoderEntry, SvtSelftest};
 pub use error::{Error, Result};
 pub use favorites::{GifFavorite, MAX_GIF_FAVORITES};
+pub use file_cards::FileCardRecord;
 pub use friends::Friend;
 pub use history::{ChatMessage, Conversation, NewChatMessage};
 pub use identities::{IdentityId, IdentityRecord, MAX_IDENTITY_LABEL, NewIdentity};
 pub use identity::{Identity, cert_hash};
+pub use plugin_trust::{OriginApproval, OriginCounters, VersionHistoryEntry};
 pub use plugins::{
     MAX_PLUGIN_KEY_BYTES, MAX_PLUGIN_REPOSITORIES, MAX_PLUGIN_VALUE_BYTES, NewPluginRepository,
     PluginRecord, PluginRepository, PluginSuggestion, PluginVisibility, REMOVED_DATA_RETENTION_MS,

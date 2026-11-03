@@ -68,6 +68,16 @@
     "popOutFailed": "Δεν ήταν δυνατό το άνοιγμα του ξεχωριστού παραθύρου",
     "popInFailed": "Δεν ήταν δυνατή η επαναφορά της προβολής",
     "onTopFailed": "Δεν ήταν δυνατή η αλλαγή του «Πάντα σε πρώτο πλάνο»",
-    "windowTitle": "{{title}} — {{channel}}"
+    "windowTitle": "{{title}} — {{channel}}",
+    "resize": {
+      "label": "Resize media area",
+      "valueText": "{{percent}}% of the window height",
+      "ofWindow": "of the window height",
+      "chatMinimum": "chat keeps its minimum",
+      "release": "release to collapse",
+      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
+      "releaseHint": "Release to minimise to the mini bar",
+      "minimised": "Media area minimised"
+    }
   }
 }

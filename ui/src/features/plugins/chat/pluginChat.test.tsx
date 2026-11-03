@@ -55,6 +55,7 @@ function message(id: string, body: string, own = false): ChatMessage {
     body,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
   };
 }
 

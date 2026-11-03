@@ -142,7 +142,7 @@ fn component() -> Vec<u8> {
     let mut module = wat::parse_str(PLUGIN).expect("valid WAT");
     let mut resolve = wit_parser::Resolve::default();
     let (package, _) = resolve
-        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("wit"))
+        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("wit/1.0.0"))
         .expect("WIT parses");
     let world = resolve
         .select_world(&[package], Some("plugin"))

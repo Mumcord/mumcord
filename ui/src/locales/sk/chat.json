@@ -51,7 +51,7 @@
     "unavailable": "Tento kanál už nie je dostupný.",
     "offline": "{{name}} je offline. Napísať budeš môcť znova, keď sa vráti.",
     "unnamedImage": "Vložený obrázok",
-    "attachFiles": "Share files"
+    "attachFiles": "Zdieľať súbory"
   },
   "tray": {
     "label": "Obrázky na odoslanie",

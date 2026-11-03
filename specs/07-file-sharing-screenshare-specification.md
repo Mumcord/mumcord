@@ -37,6 +37,11 @@ Two things people ask for most after the relay arrived: sending files to the cha
 **Relay allowed uses (user decision 2026-11-02)**
 - mumpeer config: images, files, screen sharing each enabled or disabled (default all enabled); reported in `/v1/status`; carried in the bot's announcement; enforced by the relay when a session is created; honoured by the client with a clear reason.
 
+**Resizable media area (#386, user decision 2026-11-03)**
+- A horizontal handle between the media area (screen-share viewer, watch party, later the camera room) and the chat; drag or keyboard changes the picture height, the chat takes the rest.
+- Default "Auto" (today's look); height stored as a share of the chat column and remembered globally; soft snaps at 1/3, 1/2, 2/3 (Alt bypasses); hard minimum and maximum; dragging below the minimum collapses to the existing mini bar, "Open" restores the last height.
+- Letterboxed picture (never stretched), small-window rules, fullscreen and pop-out behaviour, reduce-motion handling, screen-reader values. Client only; no change to mumpeer, mumbot, the protocol or the engine.
+
 **mumpeer and mumbot parts** of the above (broadcast sessions, allowed uses, new `mumcord.peer` messages).
 
 ### 2.2 Out of scope / later
@@ -51,6 +56,7 @@ Two things people ask for most after the relay arrived: sending files to the cha
 - A second VP9 encode for old viewers inside an AV1 share – later.
 - Share sound on Linux (PipeWire) – later. Windows and macOS keep today's share sound.
 - H.264 and VP8.
+- Per-channel media heights, custom snap presets, a separate default height for the camera room (revisit with the camera spec) – later.
 - Any change to the Mumble server.
 
 ## 3. Roles & permissions
@@ -104,7 +110,7 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.22** Every download needs a click on Download and a confirmation; this can never be switched off. The confirmation dialog shows name, size, sender, the full checksum and the save folder, with **Download** and **Cancel**. For risky types (FR-7.24) the risky-type warning (mockup 6) replaces it: "{name} is a program or script. Only open it if you trust {sender}." with **Don't download** (default, focused) and **Download anyway**.
 - **FR-7.23** File names are sanitized before display and saving: path parts removed (both `/` and `\`), control characters and characters invalid on any of Windows, macOS, Linux replaced with `_`, Windows reserved names (`CON`, `NUL`, `COM1` …) prefixed with `_`, leading dots and trailing dots/spaces removed, length cut to 200 characters keeping the extension, empty result becomes `file`. Right-to-left override and other bidi control characters are removed.
 - **FR-7.24** Risky types (by the extension after sanitizing, case-insensitive, also for a double extension such as `report.pdf.exe`): `exe, msi, msix, msp, appx, bat, cmd, com, scr, pif, cpl, hta, jar, js, jse, vbs, vbe, wsf, ps1, psm1, reg, lnk, url, app, dmg, pkg, command, sh, run, bin, appimage, deb, rpm, apk, py, pl`.
-- **FR-7.25** Saving: into the save folder (default: the system Downloads folder). Data is written to a hidden partial file in that folder and only renamed to the final name after the hash matched. An existing name gets " (1)", " (2)" … before the extension. Not enough free space (checked before start against the announced size) → "Not enough disk space in {folder}" and no transfer starts.
+- **FR-7.25** Saving: into the save folder (default: `<system Downloads>/Mumcord`, created on the first download if missing; a folder the user chose is used as-is). Data is written to a hidden partial file in that folder and only renamed to the final name after the hash matched. An existing name gets " (1)", " (2)" … before the extension. Not enough free space (checked before start against the announced size) → "Not enough disk space in {folder}" and no transfer starts.
 - **FR-7.26** Integrity: after the last byte Mumcord computes the SHA-256 of the received file. Equal to the offer → card Done with "✓ Matches the offer" and the full hash. Different (or more or fewer bytes than announced) → the partial file is deleted, nothing is opened, and the card shows "The file changed in transit or doesn't match the offer – deleted" (mockup 12).
 - **FR-7.27** Mark-of-the-web on the final file: Windows: `Zone.Identifier` stream with `ZoneId=3`; macOS: `com.apple.quarantine` attribute; Linux: extended attribute `user.xdg.origin.url` set to `mumble://{server host}` where the file system supports it (Linux has no blocking mark; this only records the origin). Failing to set it is logged (without the file name) and does not fail the download.
 - **FR-7.28** Progress (mockup 3): bar, percent, "{received} of {size}", speed, time left, **Cancel**. Cancel stops the transfer, deletes the partial file and frees the sender's slot. If the connection drops, the card shows Failed with Retry (a retry starts from zero).
@@ -117,6 +123,8 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.32** The file travels on one new unidirectional QUIC stream of type `file` on the inner connection: a small header (share id, offset 0, length) and then the raw bytes. The receiver rejects a stream whose share id it did not request or whose length differs from the offer.
 - **FR-7.33** Speed: no extra limit in the client beyond the relay's per-session bandwidth (10 Mbit/s by default, FR-4.35). Screen sharing on the same connection keeps priority over file data.
 - **FR-7.34** Timeouts: no `go`/`queued` answer within 10 s → Failed "{sender} did not answer". `go` but no data within 30 s → Failed "Couldn't connect through the relay: {reason}" with the relay reasons of FR-4.11. No data for 30 s during a transfer → Failed "The transfer stalled".
+
+- **FR-7.75** **Offer format: Bovnar** (#400, user decision 2026-11-03). The file offer (`data-mumcord-file` payload) and the `mumcord.file` plugin-data messages are Bovnar documents, written and read with a thin Rust wrapper around the upstream Bovnar C library (fork `Mumcord/bovnar`, branch `rust-binding`), used as a git dependency pinned to a commit (spec 09 FR-9.96 and FR-9.99 for the consequences). Bovnar is used here because `mumcord.file` and the offer attribute are new in 0.7.0 and 0.6.2 ignores them. The decoder checks the size before decoding and rejects malformed, truncated or oversized documents without a crash or hang and without logging payload content (FR-7.23 validation then applies to the decoded fields). Every other channel stays as it is: screen-share signalling (`Watch`), `mumcord.peer`, `mumcord.image`, history sync and hello keep their JSON/binary formats; a channel never mixes formats. 0.6.2 and official Mumble clients still show the plain text line of the offer.
 
 ### 4.5 Screen sharing: start dialog and live quality
 
@@ -163,11 +171,31 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.59** Decoding: WebCodecs `av01` / `vp09` in the webview where supported, otherwise dav1d (AV1) or libvpx (VP9) in the engine.
 - **FR-7.60** Settings → Screen sharing (own tab, mockup 05): default Resolution, Frame rate, Optimize for, Upload limit, Sound; Codec Automatic / AV1 / VP9 with the info line "Automatic uses AV1 when your graphics card or CPU can handle it, otherwise VP9."; "Use graphics card when available" (default on); "Active encoder: {e.g. AV1 (NVIDIA graphics card) · VP9 (AV1 too heavy for this PC)}" with **Check again**.
 
+### 4.9 Resizable media area (#386)
+
+The media area is the shared media frame above the chat that shows a screen-share viewer, a watch party and, when it ships, the camera room. All requirements below apply to all three in the same way. Client only: no change to mumpeer, mumbot, the protocol or the engine.
+
+- **FR-7.61** Handle (mockups 01, 06): a horizontal separator sits between the media area and the chat, full chat width with a 12 px hit area. A small grip is faint at rest and turns accent on hover, while dragging and on keyboard focus; the cursor is `row-resize`. It is the horizontal variant of the existing column resize handle. It is shown only while the big view is open, not in fullscreen and not in the pop-out window. Tab order: after the media controls, before the chat.
+- **FR-7.62** Default: "Auto" is exactly today's look (16:9 picture, at most 58 % of the window height). Nothing changes until the user drags or uses the keyboard.
+- **FR-7.63** Unit and limits: the chosen height is a share of the chat column's height (not pixels) and is shown as a percent. Minimum: 20 % of the chat column height, at least 9 rem. Maximum: 70 %, and the chat always keeps at least 13 rem (composer plus about two messages), whichever is smaller. Minimum and maximum are hard stops.
+- **FR-7.64** Dragging (mockups 02, 03): the picture height follows the pointer live, one layout per animation frame, with no animation, no text selection and no video stall. Soft snaps at 1/3, 1/2 and 2/3 of the chat column height apply within 12 px; holding Alt drags without snapping. There is no snap at the minimum and maximum.
+- **FR-7.65** Picture in the frame: the frame takes the full column width and the chosen height. The picture stays 16:9 and is never stretched: letterboxed (black bars) in **Fit**, cropped in **Fill**, unchanged in **1:1**.
+- **FR-7.66** Reset: double-click or Enter on the handle returns to Auto.
+- **FR-7.67** Keyboard: the handle is focusable with a visible focus ring in every theme (mockup 06). Up/Down change the height by 2 rem, PageUp/PageDown jump to the next/previous snap point, Home = minimum, End = maximum, Enter = reset. Keyboard changes ignore the Alt rule and are saved on each key press.
+- **FR-7.68** Screen reader: `role="separator"`, `aria-orientation="horizontal"`, `aria-label="Resize media area"`, `aria-controls` pointing at the media area, `aria-valuemin`, `aria-valuemax` and `aria-valuenow` in percent, `aria-valuetext` "{n}% of the window height". Changes of the value are announced; collapsing is announced as "Media area minimised".
+- **FR-7.69** Collapse (mockups 04, 05): while dragging below the minimum (about 12 %) the hint "Release to minimise to the mini bar" shows; releasing there collapses the media area to the existing mini bar (same state as leaving the big view with the existing control). "Open" in the mini bar restores the last chosen height (Auto if none was chosen). The existing mini-bar control keeps working as before.
+- **FR-7.70** Remembered: the height is stored globally (one habit per person, not per channel) in the layout settings next to the column widths, default Auto. It is saved when a drag ends or a key is pressed, and survives closing and reopening the viewer, switching channel and an app restart.
+- **FR-7.71** Small windows: the limits are recomputed on every window or text-size change (once per frame). A stored value that no longer fits is shrunk for display and never rewritten; it returns when the window grows again. When the chat column is below about 28 rem in height there is no room for a handle: the handle is hidden and the area uses Auto or the mini bar; nothing overlaps.
+- **FR-7.72** Fullscreen and pop-out: fullscreen ignores the chosen height (the picture fills the screen) and the height is back on exit. The pop-out window fills its own window and has no handle; dragging in the main window does not affect it.
+- **FR-7.73** Reduce motion: dragging is never animated. Snap, reset and collapse animate over 120 ms only when the system allows motion (`prefers-reduced-motion: no-preference`); otherwise they jump.
+- **FR-7.74** Camera room: uses the same frame and handle with the same Auto default; the camera grid fills the chosen height and re-arranges its tiles.
+
 ## 5. UI & UX
 
 > **The mockups are binding.** The UI must match the mockups in the issues: layout, texts, states, icons, spacing and both themes (dark and light).
 > - File sharing: issue #348, mockups 1a–9, 12 and 13. Sources are in `docs/mockups/epic-4.1/` on the branch `mockups/file-sharing`.
 > - Screen sharing: issue #355, mockups 01–05. Sources are in `docs/mockups/epic-4.1-screenshare/` on the branch `mockups/screenshare-41`.
+> - Resizable media area: issue #386, mockups 01–06 (default with handle, dragged small, dragged large, collapse hint, mini bar, keyboard focus; dark and light). Sources are in `docs/mockups/epic-4.1-resize/` on the branch `mockups/media-resize`.
 >
 > The malware mockups (2b, 10, 11, 14) are not part of this epic (#372). If a mockup and this text disagree, or a state has no mockup, ask before building; don't invent a different design. Verification compares screenshots of the running client with the mockups.
 
@@ -236,9 +264,25 @@ Viewers get: 1080p · 30 fps · AV1 · about 4 Mbit/s · sent once via relay, up
 
 **Settings → Screen sharing**: as mockup 05 (fields of FR-7.60).
 
+**Resizable media area** (mockups 01–06)
+
+```
+┌───────────────────────────────────────────────┐
+│ media frame: title · controls (Fit/Fill/1:1)  │  height = chosen share of the
+│ ┌───────────────────────────────────────────┐ │  chat column (Auto = today's size)
+│ │          16:9 picture (letterboxed)       │ │
+│ └───────────────────────────────────────────┘ │
+├───────────────── ═══ grip ═══ ────────────────┤  ← horizontal handle, 12 px, row-resize
+│ chat messages                                 │
+│ composer                       (≥ 13 rem kept) │
+└───────────────────────────────────────────────┘
+  past the minimum:  "Release to minimise to the mini bar"  →  mini bar [ Open ]
+  keyboard: ↑/↓ 2 rem · PgUp/PgDn snap · Home min · End max · Enter reset
+```
+
 - Confirmation dialogs: download confirmation and risky warning (FR-7.22), Stop sharing (no confirmation; it can be undone by sharing again).
 - Notices: fan-out unavailable (FR-7.47, once per share), encoder fallback with Undo/Details (FR-7.57), codec switch for an old viewer (FR-7.58), quality lowered (FR-7.38).
-- No new hotkeys, tray or overlay behaviour. Enter on a focused file card = Download; Escape closes dialogs.
+- No new global hotkeys, tray or overlay behaviour; the media-area handle keys (FR-7.67) work only while the handle has focus. Enter on a focused file card = Download; Escape closes dialogs.
 - Accessibility: all controls keyboard operable; file cards are list items with a label "{name}, {size}, from {sender}, {state}"; the short checksum's accessible name is the full hash; progress uses a progressbar role with value text; state changes (queued, done, mismatch) are announced politely; the risky warning is an alert dialog with focus on "Don't download". Both themes, system scaling, reduced motion (no animated progress stripes). All new texts in all 24 locales.
 
 ## 6. Audio & network
@@ -249,7 +293,7 @@ Share sound (Windows, macOS) is unchanged in capture and codec (Opus). In a broa
 
 ### 6.2 Codecs and quality
 
-VP9 (libvpx, today) and new AV1 (hardware via FFmpeg's libavcodec, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
+VP9 (libvpx, today) and new AV1 (hardware through the vendor encoder APIs directly, software SVT-AV1 encode, dav1d decode); quality steps FR-7.37; temporal layers 3 (≤ 30 fps) or 4 (60 fps). Latency target unchanged from today's screen share (glass to glass ≤ 300 ms on a LAN; the relay adds one hop).
 
 ### 6.3 File transfer sequence
 
@@ -282,7 +326,7 @@ sequenceDiagram
 ### 6.4 Wire formats (file sharing)
 
 **Offer (channel text message).** HTML like today's chat messages:
-`<p>📎 Alice shared a file: <b>{name}</b> ({size}). Download it with Mumcord.</p>` followed by an element carrying the attribute `data-mumcord-file` whose value is compact JSON:
+`<p>📎 Alice shared a file: <b>{name}</b> ({size}). Download it with Mumcord.</p>` followed by an element carrying the attribute `data-mumcord-file` whose value is the **Bovnar document** below, encoded as standard base64 text (an HTML attribute cannot carry binary; #400, FR-7.75). Field names and meanings stay as in the table; the types are Bovnar types (unsigned integers, strings, hex strings):
 
 | Field | Type | Rules |
 |---|---|---|
@@ -296,7 +340,7 @@ sequenceDiagram
 
 The receiver validates every field before showing a card (untrusted input) and treats the sender as the Mumble session that sent the message, never a field. The whole message stays well under the server's default message length (5000).
 
-**Plugin data `mumcord.file`** (compact JSON, ≤ 1000 bytes, sent only to the other session):
+**Plugin data `mumcord.file`** (Bovnar document, ≤ 1000 bytes, size-checked before decoding, sent only to the other session; FR-7.75):
 
 | `t` | Direction | Fields |
 |---|---|---|
@@ -385,7 +429,7 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 |---|---|---|---|---|
 | Settings | `files_receive` | bool | yes | default true |
 | | `files_max_size` | enum 100M/500M/1G/2G | yes | default 1G |
-| | `files_save_folder` | path | yes | default system Downloads |
+| | `files_save_folder` | path | yes | default `<system Downloads>/Mumcord` |
 | | `screen_resolution` | enum auto/720/1080/1440 | yes | default auto |
 | | `screen_fps` | enum 15/30/60 | yes | default 30 |
 | | `screen_optimize` | enum balanced/text/motion | yes | default balanced |
@@ -393,8 +437,11 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 | | `screen_upload_limit` | enum auto/2/5/10/20 | yes | default auto |
 | | `screen_sound` | bool | yes | default true |
 | | `screen_use_gpu` | bool | yes | default true |
+| Layout settings (next to the column widths) | `media_height` | percent of chat column height, or null (Auto) | yes | default null; limits per FR-7.63; global, not per channel; never rewritten when it does not fit (FR-7.71) |
 | Encoder cache (per machine) | `driver_id`, `app_version`, per encoder `available` + `smoke_ok`, per (resolution, fps) `svt_selftest_ms` | | | re-test on driver/app change or Check again |
 | Chat history | file card: offer fields + local state (done path, mismatch) | | | Same retention as chat history; the file itself is not part of history |
+
+Offers are stored in chat history as decoded fields (the Bovnar bytes are not kept); the wire format does not change the stored form.
 
 Not stored: active shares, queues, transfer progress, broadcast tokens and keys (memory only).
 
@@ -469,14 +516,16 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 
 ## 8. Technology & architecture
 
+- **Bovnar (#400):** `files::wire` encodes and decodes the offer and the `mumcord.file` messages with the pinned Bovnar wrapper crate (thin Rust wrapper around the upstream C library, git dependency on the fork Mumcord/bovnar, branch `rust-binding`, `publish = false`; the build needs a C compiler and Python 3); licence notice added to the licences window.
+
 - **File transfer on the existing `mumcord-p2p` connection, forced through the relay.** Reuses the end-to-end encrypted, certificate-pinned QUIC session and the relay of spec 04, so no new crypto or transport is needed.
 - **Offer as a normal text message with a data attribute**, like full-size images today (FR-1.60c): official clients see readable text and the offer arrives with the chat, including for history.
 - **SHA-256 via the `sha2` crate** (already in the tree), computed streaming on a worker thread; zip with the `zip` crate (deflate only), in the engine, never on the UI or audio threads.
 - **Mark-of-the-web** in a small platform module (`windows` ADS write, macOS `xattr`, Linux `xattr`).
-- **Hardware encoders via FFmpeg's libavcodec** (LGPL build, only `av1_nvenc`, `av1_amf`, `av1_qsv`, `av1_vaapi`, `vp9_qsv`, `vp9_vaapi` and needed hwcontexts; `--enable-gpl` off): one interface instead of four vendor SDKs; vendor drivers are loaded at runtime, so no SDK ships.
+- **Hardware encoders written directly against the vendor APIs (no FFmpeg):** NVENC via nv-codec-headers with the driver loaded at runtime (dlopen); AMD AMF via the AMF headers, loaded at runtime; Intel Quick Sync via oneVPL/libvpl; Linux VA-API via libva, loaded at runtime (no package dependency). Vendor drivers are loaded at runtime, so no SDK ships. macOS has no hardware encoder for AV1 or VP9; it uses software only.
 - **SVT-AV1** for software AV1 encode (real-time presets, low delay, screen-content mode): the only open encoder fast enough for live 1080p30 (rav1e and libaom are too slow, #355). **dav1d** for AV1 decode in the engine fallback.
 - **Frame encryption** with AES-128-GCM from `ring` (already used by rustls); key exchange with X25519 (`ring`) signed by the Mumble client certificate key (`rustls`/`rcgen` key types already present). SFrame-style framing per RFC 9605, own minimal implementation (no extra dependency).
-- **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, `ffmpeg.rs`, `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
+- **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, one module per vendor API (`nvenc.rs`, `amf.rs`, `qsv.rs`, `vaapi.rs`), `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
 - **mumpeer:** new module `broadcast` (sessions, per-subscriber queues with the `fanout.rs` policy, control forwarding), `uses` in `config` and `api`. **mumbot `peer`:** uses/bc pass-through, `use` on pairs, broadcast messages and admission checks.
 - Threads: encoding on its existing dedicated thread; probes and self-tests on a background worker at low priority; file I/O and hashing on tokio blocking tasks. Nothing new on the audio thread.
 
@@ -492,8 +541,8 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 
 ## 10. Build, packaging & release
 
-- **New native libraries:** FFmpeg libavcodec/libavutil (LGPL, minimal configure), SVT-AV1, dav1d. Each gets a cached build script like `scripts/build-libvpx.sh` for Windows, macOS (x86_64 + arm64) and Linux; CI caches by version. Expected installer growth about 10–20 MB.
-- **Licences:** third-party notices and the licences window list FFmpeg (LGPL-2.1, with the relinking note), SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
+- **New native libraries:** SVT-AV1, dav1d and the vendor encoder SDK headers (nv-codec-headers, AMF, oneVPL/libvpl, libva; headers only, drivers dlopened); software VP9 stays libvpx. Built by `scripts/build-svt-av1.sh`, `scripts/build-dav1d.sh` and `scripts/build-hwenc-sdk.sh` (contract: `SVTAV1_STATIC_DIR`, `DAV1D_STATIC_DIR`, `HWENC_SDK_DIR`), like `scripts/build-libvpx.sh` for Windows, macOS (x86_64 + arm64) and Linux; CI caches by version. Expected installer growth about 10–20 MB.
+- **Licences:** third-party notices and the licences window list SVT-AV1 (BSD-3-Clause-Clear + AOM Patent License 1.0), dav1d (BSD-2-Clause). No GPL parts, no H.264.
 - **mumpeer:** release with broadcast and uses; README sections "Allowed uses" and "Broadcasts and bandwidth"; `testenv/` gains a profile with broadcasts enabled and a scripted subscriber load tool (`bcast-sim`, N fake viewers that are real Mumble clients with certificates, send hello and Watch, join and count frames) for AC-7.29.
 - **mumbot:** release with the `peer` extensions; CHANGELOG.
 - **mumcord-p2p:** version bump on crates.io for the extended `mumcord.peer` types.
@@ -551,7 +600,28 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 40. **AC-7.40** Battery: test hook reports battery power, no hardware AV1 → Automatic picks VP9.
 41. **AC-7.41** Decoding: B on a machine whose webview lacks `av01` → B still plays the AV1 share (engine dav1d).
 42. **AC-7.42** Accessibility: start dialog, Quality menu, viewer list, Settings tab keyboard operable with screen-reader labels; both themes; one non-English locale.
-43. **AC-7.43** Licences window lists FFmpeg, SVT-AV1 and dav1d with their licence texts.
+43. **AC-7.43** Licences window lists SVT-AV1 and dav1d with their licence texts.
+
+**Resizable media area (#386)**
+44. **AC-7.44** A shares a screen, B watches (and again with a watch party) → a horizontal handle is visible between the picture and the chat in dark, light and a custom theme, matching mockup 01; the default size equals today's (Auto, 16:9, at most 58 % of the window height).
+45. **AC-7.45** B drags the handle up and down → the picture height follows live, the chat gets the freed room, no stutter, no text selection, video keeps playing; screenshots at about 30 % and 64 % match mockups 02 and 03.
+46. **AC-7.46** B drags slowly across 1/3, 1/2 and 2/3 → the height snaps within 12 px; with Alt held it does not snap; no snap at the minimum or maximum.
+47. **AC-7.47** In Fit the picture is letterboxed, in Fill cropped, in 1:1 unchanged, at several heights → never stretched.
+48. **AC-7.48** B drags to the limits → the picture stops at 20 % (or 9 rem) and at 70 %; the chat always keeps 13 rem (check with a short window and with large text size).
+49. **AC-7.49** B drags below the minimum → the hint "Release to minimise to the mini bar" shows (mockup 04); releasing leaves a working mini bar (mockup 05); a screen reader announces "Media area minimised"; "Open" restores the last chosen height.
+50. **AC-7.50** B double-clicks the handle, and separately focuses it and presses Enter → the size returns to Auto (today's size).
+51. **AC-7.51** Keyboard only: Tab reaches the handle after the media controls with a visible focus ring (mockup 06); Up/Down move 2 rem, PageUp/PageDown jump between snap points, Home = minimum, End = maximum, Enter = reset; each key press is saved.
+52. **AC-7.52** With a screen reader (Orca on Linux, NVDA on Windows, VoiceOver on macOS) the handle is announced as "Resize media area, separator", the value as a percent with "{n}% of the window height", and value changes are announced.
+53. **AC-7.53** B sets a height, then closes and reopens the viewer, switches channel, and restarts Mumcord → the same height applies every time, in every channel and for screen share and watch party alike.
+54. **AC-7.54** B makes the window smaller → the chat keeps 13 rem and the picture shrinks; on a very small window the handle is hidden and nothing overlaps; making the window bigger again restores the chosen height (the stored value is unchanged).
+55. **AC-7.55** B enters fullscreen → the picture fills the screen regardless of the chosen height, and the chosen height is back on exit; B opens the pop-out window → it has no handle and dragging in the main window does not change it.
+56. **AC-7.56** With the system's "reduce motion" on, snap, reset and collapse are instant; with it off they take about 120 ms; dragging is never animated.
+57. **AC-7.57** When the camera room ships, it shows the same handle with the same behaviour and its tiles re-arrange to the chosen height (check together with the camera spec's acceptance criteria).
+
+**Wire format (Bovnar, #400)**
+58. **AC-7.58** A offers a file to B (both 0.7.0): the packet inspector shows `data-mumcord-file` holding base64 text that decodes as a Bovnar document with the fields of §6.4, and the `mumcord.file` `req`/`go` messages are Bovnar documents; the transfer completes as in AC-7.7.
+59. **AC-7.59** An official Mumble client and a 0.6.2 Mumcord client in the channel see only the plain line "📎 A shared a file …"; no error and no raw attribute text appears.
+60. **AC-7.60** Test CLI sends B a `data-mumcord-file` value that is not valid base64, a truncated Bovnar document, a document with a wrong field type and an oversized `mumcord.file` payload → B shows no card (or ignores the message), nothing crashes or hangs, and the log has one line per rejection without file names or payload content. The same offer as old JSON is also not shown (the offer is Bovnar only).
 
 ## 12. Decision log
 
@@ -577,8 +647,19 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Viewer resolution (#355 Q6) | Later; frame-rate choice only | Recommendation of #355 |
 | Settings location (#355 Q7) | Own "Screen sharing" tab | Mockup 05 |
 | Linux share sound (#355 Q8) | Later | Issue table "Later" |
-| Encoder library | libavcodec (LGPL) for hardware, SVT-AV1 software, dav1d decode | #355 §3 / §3b |
+| Encoder library | Direct vendor APIs for hardware (NVENC, AMF, oneVPL/libvpl, VA-API), SVT-AV1 software, dav1d decode, libvpx VP9 | #355 §3 / §3b |
+| No FFmpeg | No FFmpeg; direct vendor encoder APIs | User decision 2026-11-03 |
 | Battery | On battery, Automatic skips software AV1 | #355 risks |
+| Resizable media area (#386) | One shared horizontal handle for screen share, watch party and camera room; Auto default = today's look; collapse to the existing mini bar | User approval 2026-11-03, all recommended answers of issue #386; FR-7.61 … FR-7.74 |
+| Media height: global or per channel (#386 Q1) | Global, stored next to the column widths | User approval 2026-11-03; FR-7.70 |
+| Media height: pixels or percent (#386 Q2) | Percent of the chat column height | User approval 2026-11-03; FR-7.63 |
+| Picture when small (#386 Q3) | Full column width with letterboxing, not a centred 16:9 picture | User approval 2026-11-03; FR-7.65 |
+| Collapse (#386 Q4) | Both: dragging below the minimum and the existing mini-bar control | User approval 2026-11-03; FR-7.69 |
+| Snap points (#386 Q5) | 1/3, 1/2, 2/3; no custom presets in the first version | User approval 2026-11-03; FR-7.64 |
+| Snap bypass (#386 Q6) | Hold Alt; keyboard users are not affected | User approval 2026-11-03; FR-7.64, FR-7.67 |
+| Camera room default height (#386 Q7) | Same Auto default now; revisit with the camera spec | User approval 2026-11-03; FR-7.74 |
+| Offer wire format (#400) | The file offer and `mumcord.file` use **Bovnar** via a thin Rust wrapper around the upstream C library (fork Mumcord/bovnar, branch `rust-binding`, pinned git dependency). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-7.75, §6.4. Base64 for the HTML attribute is an assumption of this spec |
+| Default save folder (mockup 8) | `<system Downloads>/Mumcord`, created on the first download; a user-chosen folder is used as-is | mockup 8 wins over the spec text (user decision 2); FR-7.25 |
 
 ## 13. Open points & risks
 
@@ -597,7 +678,7 @@ Risks:
 - **CPU and battery of software AV1:** mitigated by the self-test, the 1080p30 cap, load monitoring and the battery rule.
 - **Hardware and driver variety:** four vendors plus VA-API, driver bugs; the smoke test catches false positives, but test coverage needs real machines (AC-7.36).
 - **Webview AV1 support varies** (macOS M3+ only, Linux needs a GStreamer plugin); the engine dav1d fallback costs CPU on the viewer.
-- **Build size and CI time:** FFmpeg + SVT-AV1 + dav1d add 10–20 MB and new cached build steps per OS.
+- **Build size and CI time:** SVT-AV1 + dav1d + the vendor SDK headers add 10–20 MB and new cached build steps per OS.
 - **Patents:** AV1/VP9 royalty-free under AOMedia/Google licences; a third-party pool (Sisvel) claims royalties, so far from hardware makers. H.264 left out.
 - **Large files over a 10 Mbit/s relay session:** 2 GB takes about 30 minutes; the sender must stay online and serves one transfer at a time, so queues can be long. Accepted for 4.1.
 - **Offer spoofing:** anyone can post a hand-made offer message; the card always shows the real Mumble sender, and the download is only accepted from that sender's session and checked against the hash.
@@ -609,6 +690,7 @@ Risks:
 - **Mumcord/mumbot** module `peer` gains broadcast admission and uses pass-through.
 - **#355 table "Hardware VP9 encode: Later"** is pulled into 4.1 (Intel Quick Sync).
 - **Later epics:** files in private messages; malware check plugin (#372); viewer resolution choice (simulcast); 4K; Linux share sound; second VP9 encode for old viewers.
+- **Epic 4.1 camera spec** reuses the resizable media area (FR-7.74) and must not add its own handle.
 - New hello features `files` and `screen-broadcast` count toward the hello limit of 16 features (spec 06).
 
 ## 15. Implementation split
@@ -617,5 +699,5 @@ Risks:
 |---|---|---|---|
 | Step 0 | — | — | `mumcord-p2p`: extended `mumcord.peer` types (`u`, `bc`, `use`, broadcast messages); publish |
 | Step 1 (parallel) | `[uses]` config, `/v1/status` fields, `use` on pairs | uses/bc pass-through, `use` on pairs | File sharing end to end (offer, cards, settings, queue, transfer through the relay, hash, sanitizing, MOTW); allowed-uses handling (FR-7.7) |
-| Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, FFmpeg/SVT-AV1/dav1d builds, selection and load monitoring; codec negotiation (wire v2) |
+| Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, SVT-AV1/dav1d/vendor-SDK builds, selection and load monitoring; codec negotiation (wire v2) |
 | Step 3 | Release + README | Release | Broadcast publisher/subscriber, frame encryption, key exchange, fallback logic, viewer list; E2E along AC-7.1 … AC-7.43; PRIVACY.md, licences, 24 locales |

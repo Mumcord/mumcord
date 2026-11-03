@@ -1,0 +1,118 @@
+/* File chips and the drop cover of the message input (mockups 1a and 1b of epic 4.1). */
+.file-chip {
+  padding-right: 2rem;
+}
+
+.file-chip__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-accent-text);
+}
+
+.file-chip__error {
+  color: var(--color-danger);
+}
+
+/* The chat column is the drop zone, so the cover is positioned against it. */
+.chat {
+  position: relative;
+}
+
+.file-drop {
+  position: absolute;
+  inset: 3.5rem var(--space-4) var(--space-4);
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--color-accent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg-chat) 82%, transparent);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+.file-drop__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 26rem;
+  text-align: center;
+}
+
+.file-drop__icon {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.file-drop__title {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.file-drop__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* Unavailable file sharing stays focusable so its tooltip and reason can be read. */
+.chat-composer__icon[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Choice for a drop that holds images: a small popover above the message input. */
+.file-drop-choice {
+  position: absolute;
+  right: var(--space-4);
+  bottom: calc(100% + var(--space-2));
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 22rem;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+.file-drop-choice__title {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.file-drop-choice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.file-drop-choice__actions button {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.file-drop-choice__actions .file-drop-choice__primary {
+  border-color: var(--color-accent);
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+}

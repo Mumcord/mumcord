@@ -41,7 +41,13 @@ import {
   requestPreview,
 } from "../members";
 import { useMessageWindow } from "./messageWindow";
-import { OUTGOING_PREFIX, renderKey, type ConversationLog, type OutgoingSend } from "./chatStore";
+import {
+  insertByTime,
+  OUTGOING_PREFIX,
+  renderKey,
+  type ConversationLog,
+  type OutgoingSend,
+} from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { pinnedIndex } from "./pinnedAuthor";
 import { useCodeBlockActions } from "./useCodeBlockActions";
@@ -54,6 +60,7 @@ import { findThemeCode } from "../../theme/shareCodec";
 import { ThemeCard } from "./ThemeCard";
 import { extractCards } from "./cards";
 import { MessageCards } from "./MessageCard";
+import { FileCardView } from "../files/cards/FileCardView";
 import { useSharedTheme, withoutThemeShare } from "./sharedTheme";
 import { ImageViewer, type ViewerImage } from "./ImageViewer";
 import { LinkPreviews } from "./LinkPreviewCard";
@@ -194,7 +201,20 @@ function ReplyIcon({ size }: { size: number }) {
   );
 }
 
-function Body({ message, tabIndex, previews, onImageClick, clickablePeople, onJump }: BodyProps) {
+/** A file offer shows its card instead of the plain line official clients see (FR-7.19). */
+function Body(props: BodyProps) {
+  const file = props.message.file;
+  return file === null ? <TextBody {...props} /> : <FileCardView card={file} />;
+}
+
+function TextBody({
+  message,
+  tabIndex,
+  previews,
+  onImageClick,
+  clickablePeople,
+  onJump,
+}: BodyProps) {
   const { t } = useTranslation("chat");
   const html = message.body;
   const ref = useRef<HTMLDivElement>(null);
@@ -348,11 +368,17 @@ export function MessageList({
   collapsedIds,
 }: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
-  // Own messages not confirmed yet show at the end, greyed (FR-2.74).
+  // Own messages not confirmed yet show greyed (FR-2.74) at their send time, where they stay once
+  // confirmed, even when others write meanwhile (issue #379).
   const outgoing = log.outgoing;
   const allMessages = useMemo(
     () =>
-      outgoing?.length ? [...log.messages, ...outgoing.map((item) => item.message)] : log.messages,
+      outgoing?.length
+        ? insertByTime(
+            log.messages,
+            outgoing.map((item) => item.message),
+          )
+        : log.messages,
     [log.messages, outgoing],
   );
   const {

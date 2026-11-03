@@ -47,7 +47,7 @@
     "unavailable": "Den här kanalen finns inte längre.",
     "offline": "{{name}} är offline. Du kan skriva igen när personen är tillbaka.",
     "unnamedImage": "Inklistrad bild",
-    "attachFiles": "Share files"
+    "attachFiles": "Dela filer"
   },
   "tray": {
     "label": "Bilder att skicka",

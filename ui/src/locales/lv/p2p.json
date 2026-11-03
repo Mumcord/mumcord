@@ -23,14 +23,14 @@
     "keepBlocked": "Atstāt bloķētu",
     "forget": "Aizmirst releju",
     "actionFailed": "Neizdevās. Mēģini vēlreiz.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Šim serverim nav releja, tāpēc failu kopīgošana nav pieejama.",
+    "filesDisallowed": "Šī servera relejs neatļauj failu kopīgošanu.",
+    "screenDisallowed": "Šī servera relejs neatļauj ekrāna kopīgošanu.",
+    "imagesDisallowed": "Pilns izmērs nav pieejams: šī servera relejs neatļauj attēlus",
+    "noCertificate": "Failu kopīgošanai nepieciešams klienta sertifikāts.",
+    "modeNeedsRelay": "Failu kopīgošanai nepieciešams relejs; tavs peer-to-peer iestatījums ir {{mode}}.",
+    "modeOff": "Izslēgts",
+    "modeDirectOnly": "Tikai tiešais"
   },
   "reason": {
     "p2pOff": "Peer-to-peer ir izslēgts.",

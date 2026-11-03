@@ -25,6 +25,7 @@ pub mod capture_x11;
 mod convert;
 mod fanout;
 mod media;
+mod quality;
 pub mod signal;
 pub(crate) mod sound;
 #[cfg(any(target_os = "macos", test))]
@@ -50,7 +51,7 @@ use tokio::sync::oneshot;
 use crate::ServerId;
 use crate::mumcord::ServerPeers;
 use crate::p2p::DirectError;
-use crate::peer::RelayUnavailable;
+use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{
     Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, WeakEngine, lock,
 };
@@ -61,6 +62,7 @@ pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use media::{ScreenMediaStats, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
+pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use start::StartOutcome;
 pub use thumbnail::ShareThumbnail;
@@ -250,7 +252,7 @@ fn send_viewers(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, oth
 fn static_block(state: &ServerShares, ctx: &SessionCtx) -> Option<WatchBlock> {
     let engine = lock(state).engine.as_ref().and_then(WeakEngine::upgrade)?;
     engine
-        .p2p_unavailable(ctx.server_id)
+        .p2p_unavailable(ctx.server_id, RelayUse::ScreenShare)
         .as_ref()
         .and_then(WatchBlock::of)
 }
@@ -523,14 +525,15 @@ pub(crate) async fn serve_direct(
         .and_then(|s| s.own.as_mut())
         .and_then(|own| {
             let media = own.media.as_ref()?;
-            let slot = own
-                .viewers
-                .get_mut(&session)
-                .filter(|slot| slot.is_none())?;
+            // An accepted viewer opens a stream again when the connection to them was
+            // replaced (a file moved it to the relay); the old stream died with it.
+            let slot = own.viewers.get_mut(&session)?;
             Some((media, slot))
         });
     match slot {
         Some((media, slot)) => {
+            // The old link leaves the hub before the new one joins under the same session.
+            drop(slot.take());
             *slot = Some(media.add_viewer(engine.runtime(), session, send, recv));
         }
         None => tracing::debug!(
@@ -574,7 +577,7 @@ impl Engine {
     /// sense: the mode is off, or neither direct (consent) nor the relay may be used (FR-4.3 –
     /// FR-4.5, AC-4.9). `None` when a share may start; a consent not asked yet is no block.
     pub fn screen_share_block(&self, server_id: ServerId) -> Option<WatchBlock> {
-        self.p2p_unavailable(server_id)
+        self.p2p_unavailable(server_id, RelayUse::ScreenShare)
             .as_ref()
             .and_then(WatchBlock::of)
     }
@@ -605,6 +608,13 @@ impl Engine {
             return Ok(StartOutcome::Cancelled);
         };
         let app_sound = source.take_sound();
+        let prefs = ctx.store().settings().map_or_else(
+            |e| {
+                tracing::warn!(error = %e, "screen share settings not read; using the defaults");
+                QualityPrefs::default()
+            },
+            |settings| QualityPrefs::from_settings(&settings),
+        );
         let token = {
             let mut all = lock(self.screen_share_state());
             let shares = all.servers.entry(server_id).or_default();
@@ -614,7 +624,7 @@ impl Engine {
             }
             let mut own = OwnShare::new(sound, app_sound.is_some());
             own.kind = source.kind();
-            let media = media::Media::start(source);
+            let media = media::Media::start(source, prefs, media::vp9_encoder());
             if let Some(app_sound) = app_sound {
                 media.start_sound(app_sound);
             }
@@ -803,7 +813,7 @@ impl Engine {
             return Err(EngineError::invalid("that person is not in your channel"));
         }
         if let Some(block) = self
-            .p2p_unavailable(server_id)
+            .p2p_unavailable(server_id, RelayUse::ScreenShare)
             .as_ref()
             .and_then(WatchBlock::of)
         {
@@ -892,6 +902,69 @@ impl Engine {
         result
     }
 
+    /// The P2P connection to `peer` was replaced by a new one (a file moved it to the relay):
+    /// a share being watched from them continues on the new connection with a fresh stream,
+    /// starting at a keyframe. Where the new connection cannot carry it (the relay does not
+    /// allow screen sharing), the watch ends with that reason as if it had failed to open.
+    pub(crate) fn screen_share_relink(&self, server_id: ServerId, peer: u32) {
+        let watching = lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .is_some_and(|s| matches!(s.watching.get(&peer), Some(Watching::Open(_))));
+        if !watching {
+            return;
+        }
+        let engine = self.clone();
+        self.runtime().spawn(async move {
+            let opened = engine
+                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN)
+                .await;
+            let volume = engine.person_share_volume(server_id, peer);
+            let unwatch = {
+                let mut all = lock(engine.screen_share_state());
+                let sink = all.sink.clone();
+                let Some(shares) = all.servers.get_mut(&server_id) else {
+                    return;
+                };
+                // Stopped watching meanwhile.
+                let Some(Watching::Open(link)) = shares.watching.get_mut(&peer) else {
+                    return;
+                };
+                match opened {
+                    Ok((send, recv)) => {
+                        let fallback = link.decode_fallback();
+                        *link = watch::WatchLink::start(
+                            engine.runtime(),
+                            server_id,
+                            peer,
+                            sink,
+                            sound::ShareSound::new(engine.voice_shared().clone(), volume),
+                            send,
+                            recv,
+                        );
+                        link.set_decode_fallback(fallback);
+                        link.request_keyframe();
+                        false
+                    }
+                    Err(e) => {
+                        tracing::info!(error = %e, "screen share not continued on the new connection");
+                        shares.watching.remove(&peer);
+                        if let Some(block) = WatchBlock::of(&e) {
+                            shares.failed.insert(peer, block);
+                        }
+                        true
+                    }
+                }
+            };
+            if let Ok(ctx) = engine.session_ctx_for(server_id) {
+                if unwatch {
+                    send(&ctx.handle, &[peer], &Signal::Unwatch);
+                }
+                emit(engine.screen_share_state(), engine.mumcord_state(), &ctx);
+            }
+        });
+    }
+
     /// Stops watching `sharer`'s share; its stream closes.
     pub fn screen_share_unwatch(&self, server_id: ServerId, sharer: u32) -> EngineResult<()> {
         let ctx = self.session_ctx_for(server_id)?;
@@ -963,6 +1036,23 @@ impl Engine {
             .and_then(|s| s.own.as_ref())
             .and_then(|own| own.media.as_ref())
             .map(media::Media::stats)
+    }
+
+    /// Changes the own share's resolution and frame rate ceiling, "Optimize for" and upload
+    /// limit while it runs (Quality menu, FR-7.39); applies within a frame or two.
+    pub fn screen_share_set_quality(
+        &self,
+        server_id: ServerId,
+        prefs: QualityPrefs,
+    ) -> EngineResult<()> {
+        lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .and_then(|own| own.media.as_ref())
+            .ok_or_else(not_sharing)?
+            .set_prefs(prefs);
+        Ok(())
     }
 
     /// The picture the sharer's control bar shows for the own share (issue #163, FR-3.127).

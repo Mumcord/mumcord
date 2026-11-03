@@ -204,6 +204,12 @@ jobs:
             echo "LIBCLANG_PATH=$libclang"
           } >> "$GITHUB_ENV"
 
+      # Screen sharing's AV1 libraries (SVT-AV1, dav1d, and the hardware encoder interfaces except
+      # on macOS), built from the pinned versions of their scripts and cached per system and
+      # architecture.
+      - name: Native AV1 libraries
+        uses: ./.github/actions/native-av1
+
       # wasm32: the plugin SDK build test and the safety fixtures below (Linux only).
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -226,6 +232,11 @@ jobs:
       - name: Rust lint
         if: matrix.task == 'check'
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      # The live engine tests only exist with this feature, so the lint above never compiles them.
+      - name: Live engine tests compile
+        if: matrix.task == 'check'
+        run: cargo clippy -p mumcord-engine --features test-backend --tests --locked -- -D warnings
 
       # The smoke-test seeder is its own Cargo project outside the workspace, so the steps above
       # never compile it. Checking it here catches store/protocol API changes that would

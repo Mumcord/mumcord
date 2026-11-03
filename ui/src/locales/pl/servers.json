@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} połączył się z tożsamością domyślną, ponieważ jego własnej brakuje."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Przekaźnik zezwala na",
+    "line": "Przekaźnik zezwala na: {{uses}}",
+    "images": "Obrazy",
+    "files": "Pliki",
+    "screen": "Udostępnianie ekranu"
   }
 }

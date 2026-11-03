@@ -1,0 +1,94 @@
+/// HTTP on the plugin's behalf (FR-6.37). Needs the `net.http` permission (official plugins only).
+///
+/// Mumcord performs the request itself, only to a host and port the user typed into a
+/// `text-input` with purpose `server-address` of this plugin. Rules: exactly that host and port;
+/// no redirects; `https` required for public hosts, plain `http` only for loopback and private
+/// network addresses; certificates are verified. Limits: request body at most 64 KiB, except one
+/// user-picked file per request (at most 50 MiB); response body at most 1 MiB; timeout 10 s
+/// (120 s with a file); at most 5 requests per second per plugin. Requests and responses are
+/// never logged with content.
+///
+/// A call may only take 50 ms, so `request` returns at once and the result arrives later as the
+/// `http-response` event with the same id.
+interface http {
+  use types.{error};
+
+  type request-id = u32;
+
+  enum method {
+    get,
+    post,
+    put,
+    patch,
+    delete,
+  }
+
+  variant header-value {
+    text(string),
+    /// The value of the named secret (see `secrets`), inserted by the host. The plugin never
+    /// sees it.
+    secret(string),
+  }
+
+  record header {
+    name: string,
+    value: header-value,
+  }
+
+  /// A file the user picked in a `file-picker`; usable only in a request of this plugin.
+  type file-handle = u64;
+
+  variant form-value {
+    text(string),
+    file(file-handle),
+  }
+
+  record form-field {
+    name: string,
+    value: form-value,
+  }
+
+  variant body {
+    empty,
+    /// Raw bytes, at most 64 KiB; set the content type in a header.
+    bytes(list<u8>),
+    /// The content of one picked file.
+    file(file-handle),
+    /// `multipart/form-data` with at most one file field.
+    form(list<form-field>),
+  }
+
+  record http-request {
+    method: method,
+    /// Absolute `http` or `https` URL.
+    url: string,
+    headers: list<header>,
+    body: body,
+  }
+
+  record http-response {
+    status: u16,
+    headers: list<tuple<string, string>>,
+    /// At most 1 MiB.
+    body: list<u8>,
+  }
+
+  variant http-error {
+    /// The host is not one the user typed into this plugin's form, or `http` to a public host.
+    host-not-allowed,
+    /// The URL, a header or the body is malformed, or names an unknown secret or file handle.
+    invalid-request,
+    /// The server sent a redirect; redirects are never followed.
+    redirect,
+    timeout,
+    /// The server's certificate is not valid; the text explains why.
+    tls(string),
+    /// The connection failed; the text explains why.
+    connect(string),
+    /// The response body exceeded 1 MiB.
+    response-too-large,
+  }
+
+  /// Starts a request. Errors: `not-permitted`, `too-large` (body), `rate-limited`.
+  request: func(req: http-request) -> result<request-id, error>;
+}

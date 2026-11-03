@@ -137,6 +137,17 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::full_image::full_image_keep,
             commands::full_image::full_image_fetch,
             commands::full_image::full_image_cancel,
+            commands::files::files_availability,
+            commands::files::files_chip_add,
+            commands::files::files_chip_remove,
+            commands::files::files_send,
+            commands::files::files_stop,
+            commands::files::files_card,
+            commands::files::files_download,
+            commands::files::files_cancel,
+            commands::files::files_save_folder,
+            commands::files::files_open,
+            commands::files::files_open_folder,
             links::link_preview,
             links::open_link,
             links::mumble_link_stats,
@@ -359,6 +370,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             history::HistorySynced,
             history::HistorySyncStatus,
             commands::full_image::FullImageProgress,
+            commands::files::FileChipChanged,
+            commands::files::FileCardChanged,
             follow::FollowedChannelsChanged,
             follow::UnreadChanged,
             audio::AudioDevicesChanged,
@@ -859,6 +872,14 @@ fn emit_engine_event(
             reference,
             received,
             total,
+        }
+        .emit(app),
+        EngineEvent::FileChipChanged(chip) => {
+            commands::files::FileChipChanged { chip: chip.into() }.emit(app)
+        }
+        EngineEvent::FileCardChanged(card) => commands::files::FileCardChanged {
+            server_id,
+            card: (*card).into(),
         }
         .emit(app),
         EngineEvent::PositionalStatusChanged(status) => {

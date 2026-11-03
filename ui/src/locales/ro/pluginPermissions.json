@@ -27,7 +27,13 @@
     "chatPatterns": "Recunoaște anumite mesaje din chat, de ex. configurații de joc lipite",
     "netHttp": "Comunică cu un server ales de tine",
     "secrets": "Păstrează un secret (de ex. o cheie API) în breasla de chei a sistemului",
-    "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)"
+    "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Un mic panou al acestui plugin apare în bara de pluginuri.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Primește doar mesajele de chat din canalul tău care încep așa cum a declarat, de exemplu o configurație de joc lipită. Niciun alt text din chat nu ajunge la el.",
     "netHttp": "Poate vorbi cu un singur server ales de tine, și doar cu el.",
     "secrets": "Poate păstra un secret, precum o cheie API, în breasla de chei a sistemului.",
-    "uiWebview": "Poate afișa propriul conținut web într-un cadru izolat, fără acces la internet."
+    "uiWebview": "Poate afișa propriul conținut web într-un cadru izolat, fără acces la internet.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Permisiuni"
 }

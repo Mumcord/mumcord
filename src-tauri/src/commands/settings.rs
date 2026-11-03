@@ -746,7 +746,7 @@ pub struct Settings {
     /// Accept files offered by others (Settings → Files).
     pub files_receive: bool,
     pub files_max_size: FilesMaxSize,
-    /// Save folder for received files; `None` is the system Downloads folder.
+    /// Save folder for received files; `None` is `Mumcord` inside the system Downloads folder.
     pub files_save_folder: Option<String>,
     pub screen_resolution: ScreenResolution,
     pub screen_fps: ScreenFps,

@@ -47,7 +47,7 @@
     "unavailable": "Denne kanal er ikke længere tilgængelig.",
     "offline": "{{name}} er offline. Du kan skrive igen, når vedkommende er tilbage.",
     "unnamedImage": "Indsat billede",
-    "attachFiles": "Share files"
+    "attachFiles": "Del filer"
   },
   "tray": {
     "label": "Billeder, der skal sendes",

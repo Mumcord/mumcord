@@ -103,7 +103,11 @@ from `@wdio/globals`). Import helpers from `e2e/helpers/index.ts`:
 | `app.restart({freshProfile, audio, env, args})`                                            | quit and restart app A (keeps the profile unless `freshProfile`; `env`/`args`: extra app env / CLI arguments)    |
 | `app.profile(id)`                                                                          | profile root of instance `"a"` (default) or `"b"` (check files in `data/app.mumcord.client/` etc.)               |
 | `apps.startB(opts)`, `apps.restartB(opts)`, `apps.stopB()`                                 | second client B (see "Two clients"); `startB` uses a fresh profile unless `freshProfile: false`                  |
+| `apps.startC(opts)`, `apps.restartC(opts)`, `apps.stopC()`                                 | third client C, same as B                                                                                        |
 | `apps.onB(async () => …)`, `apps.browserB()`                                               | run helpers against B (globals `browser`/`$`/`$$` point at B inside); B's raw WebDriver session                  |
+| `apps.onC(async () => …)`, `apps.browserC()`                                               | the same for C                                                                                                   |
+| `relayenv.startRelay(profile, opts)`, `relayenv.stopRelay()`, `relayenv.relay()`           | mumpeer test environment (see "Relay test environment")                                                          |
+| `relayenv.hookEnv({...})`                                                                  | test-hook env of spec 07 for the `env` option                                                                    |
 | `apps.pluginEnv({registryKey, registryUrl, fakeAppVersion, forceDailyCheck, fastBackoff})` | plugin test env for the `env` option (see "Plugin test environment")                                             |
 | `app.invoke(command, args)`                                                                | calls a Tauri command of the app and returns its result (state the UI does not show)                             |
 | `axe.scan(label, options)`, `axe.summarize(violations)`                                    | axe-core WCAG 2.2 AA scan of the current screen; returns violations                                              |
@@ -116,7 +120,9 @@ verify what other users see.
 ## Two clients
 
 Some criteria need two Mumcord users (plugin messaging, blocking). Every spec has instance **A**
-(the normal wdio session, `browser`/`$`). `apps.startB()` starts instance **B** next to it:
+(the normal wdio session, `browser`/`$`). `apps.startB()` starts instance **B** next to it (and
+`apps.startC()` a third client **C**, for file sharing and broadcasts; everything below holds for
+both):
 
 ```ts
 await completeWizard("Alice");
@@ -130,7 +136,7 @@ await personRow("Bob").waitForDisplayed();
 ```
 
 - **Isolation:** B has its own profile dir, its own tauri-driver/WebKitWebDriver ports
-  (`4544+2n`/`4545+2n` for run id n), its own overlay socket name, and its own session D-Bus with
+  (`4544+2n`/`4545+2n` for run id n; C: `4644+2n`/`4645+2n`), its own overlay socket name, and its own session D-Bus with
   its own unlocked gnome-keyring (keyring file inside B's profile). The private bus is what lets a
   second app start at all: the app's single-instance lock is a D-Bus name, and on a shared bus B
   would hand over to A and exit (and share A's identity).
@@ -141,6 +147,29 @@ await personRow("Bob").waitForDisplayed();
   existing UI helper works for B. Keep A and B steps sequential: never mix an `onB` call and A
   commands in one `Promise.all`. Elements fetched inside `onB` stay bound to B.
 - **Cost:** two WebKit apps need about twice the memory and CPU; start B only in specs that need it.
+
+## Relay test environment
+
+Specs for relay allowed uses, file sharing and screen sharing need a relay. `relayenv.startRelay(profile)`
+starts the `testenv/` of the mumpeer repo (Mumble server `relay.port`, relay, API, relay bot) with one of
+the profiles `all`, `no-files`, `no-screen`, `no-images`, `no-broadcast` or `old` (`old` needs
+`{ image, botImage }` of the previous release) and sets `MUMCORD_E2E_RELAY_HOST` /
+`MUMCORD_E2E_RELAY_PORT`. Call `relayenv.stopRelay()` in `after`. The first start builds the mumpeer
+image (minutes). `relayenv.relayStatus()` reads the relay's `/v1/status`.
+
+- **Checkout:** `MUMPEER_DIR`, default a `mumpeer` folder next to this repo; `run.sh` mounts it into the
+  container. Without it `relayenv.relayAvailable()` is false and specs skip themselves (CI).
+- **Parallel runs:** `MUMPEER_PORT_BASE` / `MUMPEER_PROJECT` (run n of `MUMCORD_E2E_RUN` gets
+  `45000+100n` and `e2e-n-mumpeer`).
+- **Registration:** the relay bot hands out tokens to registered users only. File sharing specs call
+  `relayenv.resetRelayData()` before their first `startRelay` and in `after` (an empty server, so names stay free for later specs) and
+  register every client with `files.registerOnServer()` (helpers/files-ui.ts).
+- **Real drops:** `files.dropFiles(id, paths)` drags files onto a client's chat with an XDND source
+  (helpers/x11-drop.py), the same GTK path as a file manager; `files.pickInFileDialog` drives the system
+  file picker. Every client has its own Downloads folder (`app.downloadsDir(id)`).
+- **Test hooks:** `env: relayenv.hookEnv({ fileExpirySeconds, fileCorrupt, encoderProbe, svtSelftest,
+encodeDelayMs, onBattery, noWebcodecsAv1, keepOldKey })` for `app.restart`/`startB`/`startC`; debug
+  builds only.
 
 ## Plugin test environment
 
@@ -160,7 +189,26 @@ The signing key pair is generated per run with `mumcord-plugin keygen` into the 
 is never committed.
 
 `registry.start()` runs `scripts/e2e-plugin-registry.sh`, which builds the CLI, the safety fixtures
-and the official plugins. The image has no wasm32 target, so CI builds them on the runner with
+(`crates/plugins/tests/fixtures/safety`) and the test plugins (`e2e/fixtures/plugins`). The image
+has no wasm32 target, so CI builds them on the runner with
 `scripts/e2e-plugin-registry.sh --build-only <dir>` and sets `MUMCORD_E2E_PLUGIN_PACKAGES=<dir>`:
 `e2e/run.sh` mounts the folder into the container and the script takes the CLI and packages from
 it. The same works locally.
+
+### Test plugins, not the official plugins
+
+The plugin specs here test the platform (install, permissions, registry and signatures, updates,
+safe mode, rendering, the strip, suggestions) with plugins made for the tests, so Mumcord's E2E
+suite never depends on the official plugins. Their own behaviour (Poll, Dice roller, Echolings,
+Mumbot Music, EVE fit) is tested in [Mumcord/plugins](https://github.com/Mumcord/plugins) against a
+pinned Mumcord release.
+
+| Test plugin                                      | Registry                          | What it is for                                                                              |
+| ------------------------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| `fx-strip` "Fixture Strip"                       | official                          | a panel with an animated button (strip icon, render checks) and a chat plugin's permissions |
+| `echolings` "Fixture Highlight"                  | official                          | the same code under the id Browse highlights first (FR-6.59), also a deep-link target       |
+| `fx-*` in `crates/plugins/tests/fixtures/safety` | mostly the third-party repository | misbehaving and edge-case plugins (limits, back-off, web view, updates)                     |
+
+A new test plugin is a folder under `e2e/fixtures/plugins` with a `manifest.json`, `i18n/en.json` and a Rust crate on
+the in-repo SDK (`crates/plugin-sdk`). The script builds every folder; a package whose id starts
+with `fx-` goes to the third-party repository unless the script's `case` lists it as official.

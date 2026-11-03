@@ -23,14 +23,14 @@
     "keepBlocked": "Να παραμείνει αποκλεισμένο",
     "forget": "Διαγραφή ρελέ",
     "actionFailed": "Δεν πέτυχε. Δοκίμασε ξανά.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Αυτός ο διακομιστής δεν έχει ρελέ, οπότε η κοινή χρήση αρχείων δεν είναι διαθέσιμη.",
+    "filesDisallowed": "Το ρελέ αυτού του διακομιστή δεν επιτρέπει την κοινή χρήση αρχείων.",
+    "screenDisallowed": "Το ρελέ αυτού του διακομιστή δεν επιτρέπει την κοινή χρήση οθόνης.",
+    "imagesDisallowed": "Το πλήρες μέγεθος δεν είναι διαθέσιμο: το ρελέ αυτού του διακομιστή δεν επιτρέπει εικόνες",
+    "noCertificate": "Η κοινή χρήση αρχείων απαιτεί πιστοποιητικό πελάτη.",
+    "modeNeedsRelay": "Η κοινή χρήση αρχείων χρειάζεται το ρελέ· η ρύθμισή σου peer-to-peer είναι {{mode}}.",
+    "modeOff": "Ανενεργό",
+    "modeDirectOnly": "Μόνο άμεσα"
   },
   "reason": {
     "p2pOff": "Το peer-to-peer είναι απενεργοποιημένο.",

@@ -16,6 +16,7 @@ use std::sync::LazyLock;
 
 use ammonia::{Builder, UrlRelative};
 
+use crate::files::offer::{ATTRIBUTE as OFFER_ATTRIBUTE, is_valid_attribute};
 use crate::full_image::check::MAX_BYTES;
 use crate::full_image::wire::{ATTRIBUTE as FULL_ATTRIBUTE, FullRef};
 
@@ -80,6 +81,7 @@ fn policy(message: bool) -> Builder<'static> {
     if message {
         tag_attributes.insert("div", HashSet::from([CARD_ATTRIBUTE]));
         tag_attributes.insert("pre", HashSet::from([CODE_LANGUAGE_ATTRIBUTE]));
+        tag_attributes.insert("span", HashSet::from([OFFER_ATTRIBUTE]));
     }
     let mut builder = Builder::empty();
     builder
@@ -98,6 +100,9 @@ fn policy(message: bool) -> Builder<'static> {
                 ("img", FULL_ATTRIBUTE) => FullRef::parse(value, MAX_BYTES)
                     .is_some()
                     .then_some(Cow::Borrowed(value)),
+                ("span", OFFER_ATTRIBUTE) => {
+                    is_valid_attribute(value).then_some(Cow::Borrowed(value))
+                }
                 ("pre", CODE_LANGUAGE_ATTRIBUTE) => {
                     is_code_language(value).then_some(Cow::Borrowed(value))
                 }
@@ -272,6 +277,29 @@ mod tests {
         assert_eq!(
             sanitize_message_html("<span data-mumcord-card=\"body\">x</span>"),
             "<span>x</span>"
+        );
+    }
+
+    #[test]
+    fn messages_keep_a_valid_file_offer_so_history_can_show_the_card() {
+        use crate::files::offer::{FileOffer, encode_offer_html, parse_offer_html};
+        let offer = FileOffer {
+            id: "0123456789abcdef0123456789abcdef".into(),
+            name: "notes <1>.txt".into(),
+            size: 12,
+            mime: "text/plain".into(),
+            sha256: "a".repeat(64),
+            expires: 1_000,
+        };
+        let html = encode_offer_html("Al & Bo", &offer).expect("valid offer");
+        let clean = sanitize_message_html(&html);
+        assert_eq!(parse_offer_html(&clean, 0), Some(offer));
+        assert_eq!(parse_offer_html(&sanitize_html(&html), 0), None);
+        let forged = "<span data-mumcord-file=\"{&quot;v&quot;:1}\">x</span>";
+        assert_eq!(sanitize_message_html(forged), "<span>x</span>");
+        assert_eq!(
+            sanitize_message_html("<b data-mumcord-file=\"x\">y</b>"),
+            "<b>y</b>"
         );
     }
 

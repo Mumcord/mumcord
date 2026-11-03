@@ -68,6 +68,16 @@
     "popOutFailed": "Отделният прозорец не можа да се отвори",
     "popInFailed": "Изгледът не можа да се върне",
     "onTopFailed": "„Винаги отгоре“ не можа да се промени",
-    "windowTitle": "{{title}} — {{channel}}"
+    "windowTitle": "{{title}} — {{channel}}",
+    "resize": {
+      "label": "Resize media area",
+      "valueText": "{{percent}}% of the window height",
+      "ofWindow": "of the window height",
+      "chatMinimum": "chat keeps its minimum",
+      "release": "release to collapse",
+      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
+      "releaseHint": "Release to minimise to the mini bar",
+      "minimised": "Media area minimised"
+    }
   }
 }

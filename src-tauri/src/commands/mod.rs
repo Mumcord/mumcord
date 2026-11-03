@@ -15,6 +15,7 @@ pub mod chat;
 pub mod diagnostics;
 pub mod dnd;
 pub mod dropped;
+pub mod files;
 pub mod follow;
 pub mod friends;
 pub mod full_image;

@@ -98,6 +98,19 @@ pub enum RelayRefusal {
     RateLimited,
     Version,
     BadRequest,
+    /// The relay's owner turned off what the connection was for (FR-7.4).
+    UseNotAllowed,
+    /// The broadcast has no room for another viewer.
+    BroadcastFull,
+}
+
+/// What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing".
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum RelayUse {
+    Images,
+    Files,
+    ScreenShare,
 }
 
 /// Why the relay cannot be used; the UI shows the text of FR-4.4, FR-4.11 or FR-4.14.
@@ -129,6 +142,11 @@ pub enum RelayUnavailable {
     PeerGone,
     RateLimited,
     RelayFull,
+    /// "This server's relay doesn't allow {images / file sharing / screen sharing}" (FR-7.7).
+    UseNotAllowed {
+        #[serde(rename = "use")]
+        relay_use: RelayUse,
+    },
 }
 
 /// State of the server's relay in the server info panel (FR-4.20).
@@ -162,6 +180,10 @@ pub struct RelayInfo {
     pub status: RelayStatus,
     /// When the pinned relay was first accepted (RFC 3339).
     pub first_seen: Option<String>,
+    /// "Relay allows: …" (FR-7.7): all uses for an older bot, empty without a relay.
+    pub uses: Vec<RelayUse>,
+    /// Most viewers per broadcast; `null` when the relay offers no broadcasts.
+    pub broadcast_max: Option<u16>,
 }
 
 /// The relay of a server changed (FR-4.20).
@@ -179,13 +201,24 @@ impl From<EngineRefusal> for RelayRefusal {
             EngineRefusal::Expired => Self::Expired,
             EngineRefusal::NotAllowed => Self::NotAllowed,
             EngineRefusal::BotGone => Self::BotGone,
-            EngineRefusal::UseNotAllowed => Self::NotAllowed,
-            EngineRefusal::BroadcastFull => Self::RelayFull,
+            EngineRefusal::UseNotAllowed => Self::UseNotAllowed,
+            EngineRefusal::BroadcastFull => Self::BroadcastFull,
             EngineRefusal::RelayFull => Self::RelayFull,
             EngineRefusal::PeerLimit => Self::PeerLimit,
             EngineRefusal::RateLimited => Self::RateLimited,
             EngineRefusal::Version => Self::Version,
             EngineRefusal::BadRequest => Self::BadRequest,
+        }
+    }
+}
+
+impl From<peer::RelayUse> for RelayUse {
+    fn from(u: peer::RelayUse) -> Self {
+        match u {
+            peer::RelayUse::Images => Self::Images,
+            // Plugin data has no UI variant until the plugin host lands (spec 09, R3a).
+            peer::RelayUse::Files | peer::RelayUse::PluginData => Self::Files,
+            peer::RelayUse::ScreenShare => Self::ScreenShare,
         }
     }
 }
@@ -210,6 +243,9 @@ impl From<peer::RelayUnavailable> for RelayUnavailable {
             R::PeerGone => Self::PeerGone,
             R::RateLimited => Self::RateLimited,
             R::RelayFull => Self::RelayFull,
+            R::UseNotAllowed(relay_use) => Self::UseNotAllowed {
+                relay_use: relay_use.into(),
+            },
         }
     }
 }
@@ -235,6 +271,8 @@ impl From<peer::RelayInfo> for RelayInfo {
             host: i.host,
             status: i.status.into(),
             first_seen: i.first_seen.map(rfc3339),
+            uses: i.uses.into_iter().map(Into::into).collect(),
+            broadcast_max: i.broadcast_max,
         }
     }
 }
@@ -265,4 +303,35 @@ pub fn relay_keep_blocked(engine: State<'_, Engine>, server_id: ServerId) -> Api
 #[specta::specta]
 pub fn relay_forget(engine: State<'_, Engine>, server_id: ServerId) -> ApiResult<()> {
     Ok(engine.relay_forget(to_engine_server_id(server_id))?)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_disabled_use_reaches_the_ui_with_its_name() {
+        let reason: RelayUnavailable =
+            peer::RelayUnavailable::UseNotAllowed(peer::RelayUse::ScreenShare).into();
+        assert_eq!(
+            serde_json::to_value(reason).expect("json"),
+            serde_json::json!({"kind": "useNotAllowed", "use": "screenShare"})
+        );
+        let refused: RelayRefusal = EngineRefusal::UseNotAllowed.into();
+        assert_eq!(refused, RelayRefusal::UseNotAllowed);
+    }
+
+    #[test]
+    fn relay_info_carries_uses_and_broadcast_size() {
+        let info: RelayInfo = peer::RelayInfo {
+            uses: vec![peer::RelayUse::Images, peer::RelayUse::Files],
+            broadcast_max: Some(25),
+            ..peer::RelayInfo::default()
+        }
+        .into();
+        assert_eq!(info.uses, [RelayUse::Images, RelayUse::Files]);
+        let json = serde_json::to_value(&info).expect("json");
+        assert_eq!(json["uses"], serde_json::json!(["images", "files"]));
+        assert_eq!(json["broadcastMax"], 25);
+    }
 }
