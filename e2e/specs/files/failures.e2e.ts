@@ -10,14 +10,14 @@
 //   AC-7.14 Stop sharing → B's card "This share ended"; A offline → "Alice went offline"; after A
 //           is back the old share stays unavailable.
 //   AC-7.15 the fileExpirySeconds hook (60 s) → B's card says the share ended.
-//   F3a (e) a sender that stops sending (relay data paused) → "The transfer stalled" after 30 s.
+//   F3a (e) a sender that stops sending file bytes (test hook, so it stays connected) → "The
+//           transfer stalled" after 30 s.
 //
 // Skips itself without a mumpeer checkout.
 import { appendFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { app, apps, relayenv } from "../../helpers/index.ts";
-import { runOk } from "../../helpers/run.ts";
 import { trustIfAsked } from "../../helpers/chat-ui.ts";
 import * as files from "../../helpers/files-ui.ts";
 import { addAndConnect, completeWizard, personRow, waitConnected } from "../../helpers/voice-ui.ts";
@@ -150,24 +150,27 @@ function bFolder(): string[] {
   });
 
   it("F3a (e): a sender that stops sending gives 'The transfer stalled' after 30 s", async () => {
-    // Pausing the relay container stops the data but keeps both Mumble sessions alive. Pausing
-    // Alice's process instead let the server drop her (its 30 s ping timeout) at about the same
-    // moment as the 30 s stall timeout, so the card sometimes said "went offline".
-    const container = `${process.env.MUMPEER_PROJECT ?? "mumpeer-testenv"}-mumpeer-1`;
+    // The test hook, not a paused process: freezing Alice also stops her traffic to the Mumble
+    // server, whose own 30 s idle timeout can win the race on a loaded CI runner and shows the
+    // other FR-7.34 text instead (issue #420). With the hook only file bytes stop, so the client's
+    // stall timer is the one that ends the transfer.
+    await restartAlice({ fileStallAfterBytes: 4 * MB });
+    const name = await offer(files.randomFile(dir, "stalled.dat", 400 * MB));
     await apps.onB(async () => {
-      await files.download("movie.dat");
-      await files.waitCardText("movie.dat", "% ·", 60_000);
-      await runOk("docker", ["pause", container]);
-      try {
-        await files.waitCardText("movie.dat", "The transfer stalled", 90_000);
-      } finally {
-        await runOk("docker", ["unpause", container]);
-      }
+      const started = Date.now();
+      await files.download(name);
+      await files.waitCardText(name, "% ·", 60_000);
+      await files.waitCardText(name, "The transfer stalled", 90_000);
+      // Measured from the click, so it is a lower bound for the client's 30 s timer: the card only
+      // changes after the last byte, and the UI redraws when it notices.
+      expect(Date.now() - started).toBeGreaterThanOrEqual(30_000);
     });
     await browser.waitUntil(() => bFolder().length === 0, { timeout: 10_000 });
   });
 
   it("AC-7.14: Stop sharing ends the share for Bob", async () => {
+    // Without the stall hook of the previous test, so a small file transfers normally.
+    await restartAlice({});
     const name = await offer(files.randomFile(dir, "stopped.dat", 64 * 1024));
     await apps.onB(() => files.waitCardText(name, "Available while Alice is online"));
     await files.cardButton(name, "Stop sharing").click();
