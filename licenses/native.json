@@ -1,5 +1,5 @@
 {
-  "$comment": "Components that are neither Rust crates nor npm packages, for scripts/generate-notices.sh. A version of the form @name is read from the build inputs (scripts/notices.js); an empty one comes from the Ubuntu 24.04 build host. texts are files relative to the repository root, @opus-copying is the COPYING file of the libopus source vendored by opusic-sys.",
+  "$comment": "Components that are neither Rust crates nor npm packages, for scripts/generate-notices.sh. A version of the form @name is read from the build inputs (scripts/notices.js); an empty one comes from the Ubuntu 24.04 build host. texts are files relative to the repository root, @opus-copying is the COPYING file of the libopus source vendored by opusic-sys; @bovnar-license and @bovnar-notices are the LICENSE and THIRD_PARTY_NOTICES.md of the Bovnar repository the bovnar crate is pinned to.",
   "components": [
     {
       "name": "Mumble protocol and plugin interface",
@@ -96,6 +96,19 @@
         "Alliance for Open Media Patent License 1.0."
       ],
       "texts": ["licenses/svt-av1.txt"]
+    },
+    {
+      "name": "Bovnar C library",
+      "version": "@bovnar",
+      "license": "MIT",
+      "repository": "https://github.com/sothis/bovnar",
+      "description": [
+        "Reference implementation of the Bovnar data format, compiled from source by the bovnar",
+        "crate (Mumcord's fork https://github.com/Mumcord/bovnar, pinned to one commit). File",
+        "offers and the diagnostic file are Bovnar documents. The library compiles in the unit",
+        "identifiers of the vocabularies listed in its third-party notices below."
+      ],
+      "texts": ["@bovnar-license", "@bovnar-notices"]
     },
     {
       "name": "dav1d",

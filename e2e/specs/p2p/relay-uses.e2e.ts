@@ -185,7 +185,11 @@ async function expectFullSizeNote(expected: string): Promise<void> {
   await viewer.waitForDisplayed();
   const hint = viewer.$(".image-viewer__hint");
   await hint.waitForDisplayed({ timeout: 30_000, timeoutMsg: "the viewer shows no full-size note" });
-  expect((await hint.getText()).trim()).toContain(expected);
+  // The hint reads "Loading full size…" until the failed fetch resolves, so wait for the note.
+  await browser.waitUntil(async () => (await hint.getText()).includes(expected), {
+    timeout: 30_000,
+    timeoutMsg: `the full-size note never said "${expected}"`,
+  });
   await browser.keys("Escape");
   await viewer.waitForExist({ reverse: true });
 }

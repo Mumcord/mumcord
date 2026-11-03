@@ -15,6 +15,10 @@
 - Dropping images into a channel asks whether to send them as images or share them as files; other files are shared at once. Private chats keep sending dropped images inline.
 - Files shared in a channel show up as a file card with name, size, type and checksum. Every download asks first, programs and scripts get an extra warning before download and before opening, and the card shows the queue position, progress, the check that the file arrived unchanged, and Open / Open folder. Your own shared files show who downloaded them and a Stop sharing button (with a clear message if stopping fails)
 
+### Changed
+
+- The diagnostic file (Settings → Advanced & Developer → Save diagnostic file) is now a Bovnar document: the same facts as before, still readable in any text editor, in a structured form (#400)
+
 ### Fixed
 
 - A middle click on a link, or a click with Ctrl, Cmd or Shift held, opens it in your browser like a normal click. It used to load the page inside Mumcord, in a window of its own or in place of the whole app, and no page from outside ever gets a Mumcord window now (#418)
@@ -25,6 +29,7 @@
 
 ### Internal
 
+- File offers and the file-sharing messages between Mumcord clients use the Bovnar data format through a pinned build of the Bovnar library; the plain line that official Mumble clients and older Mumcord versions see is unchanged, and the licences window lists Bovnar (#400)
 - File transfer over the relay (not yet visible in the app): files travel only through the relay on their own stream with a size check, and a screen share or full-size image download continues when that switches the connection from direct to the relay
 - Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
 - The file transfer stall test no longer pauses the sending client's process: a frozen client also stops sending to the Mumble server, whose own 30 s idle timeout can win the race on a loaded CI runner and shows the other failure text. A new debug-only hook `MUMCORD_TEST_FILE_STALL_AFTER` stops file bytes only, so the client's own 30 s stall timer decides the test (#420)
