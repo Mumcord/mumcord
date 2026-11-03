@@ -180,6 +180,6 @@ pinned Mumcord release.
 | `echolings` "Fixture Highlight"                  | official                          | the same code under the id Browse highlights first (FR-6.59), also a deep-link target       |
 | `fx-*` in `crates/plugins/tests/fixtures/safety` | mostly the third-party repository | misbehaving and edge-case plugins (limits, back-off, web view, updates)                     |
 
-A new test plugin is a folder under `e2e/fixtures/plugins` with a `manifest.json` and a Rust crate on
+A new test plugin is a folder under `e2e/fixtures/plugins` with a `manifest.json`, `i18n/en.json` and a Rust crate on
 the in-repo SDK (`crates/plugin-sdk`). The script builds every folder; a package whose id starts
 with `fx-` goes to the third-party repository unless the script's `case` lists it as official.
