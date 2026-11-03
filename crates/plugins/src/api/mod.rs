@@ -14,4 +14,5 @@ pub mod storage;
 pub mod theme;
 pub mod timers;
 pub mod ui;
+pub mod v1_1;
 pub mod webview;

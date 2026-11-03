@@ -786,6 +786,7 @@ mod tests {
 
     use super::*;
     use crate::api::files::Files;
+    use crate::api::v1_1::Down;
     use crate::diag::Diagnostics;
     use crate::runtime::Next;
     use crate::runtime::wit::http::{FormField, HeaderValue as WitHeaderValue};
@@ -822,8 +823,8 @@ mod tests {
         fn send(&mut self, req: HttpRequest) -> Result<HttpResponse, HttpError> {
             let id = self.set.request(&self.ctx, req).expect("accepted");
             match self.queue.pop() {
-                Next::Event(event, _) => match *event {
-                    Event::HttpResponse(result) => {
+                Next::Event(event, _) => match event.down() {
+                    Some(Event::HttpResponse(result)) => {
                         assert_eq!(result.id, id);
                         result.outcome
                     }

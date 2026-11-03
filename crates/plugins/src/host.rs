@@ -24,7 +24,7 @@ use crate::runtime::{
     CallError, CompileError, Compiled, EventQueue, HostContext, Instance, Level, LogBuffer, Next,
     Runtime, StartParams,
 };
-use crate::version::{Incompatibility, check_compatibility};
+use crate::version::{Incompatibility, api_of, check_compatibility};
 
 /// Largest component file that is read from disk; matches the unpacked package limit.
 const MAX_ENTRY_BYTES: u64 = crate::package::MAX_UNPACKED_BYTES;
@@ -180,7 +180,9 @@ impl PluginHost {
         if std::fs::metadata(&entry)?.len() > MAX_ENTRY_BYTES {
             return Err(LoadError::EntryTooLarge);
         }
-        let compiled = self.runtime.compile(&std::fs::read(&entry)?)?;
+        let compiled = self
+            .runtime
+            .compile(&std::fs::read(&entry)?, api_of(&manifest))?;
 
         let id = manifest.id.clone();
         let state = if self.all_off {
@@ -493,7 +495,7 @@ fn serve(instance: &mut Instance, queue: &EventQueue) -> Option<CallError> {
         match queue.pop() {
             Next::Stop => return None,
             Next::Event(event, chat) => {
-                if let Err(error) = instance.on_event(&event, chat) {
+                if let Err(error) = instance.on_event(*event, chat) {
                     return Some(error);
                 }
             }
