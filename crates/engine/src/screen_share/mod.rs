@@ -941,7 +941,8 @@ impl Engine {
                 };
                 match opened {
                     Ok((send, recv)) => {
-                        let fallback = link.decode_fallback();
+                        let decode_codecs = link.decode_codecs();
+                        let max_fps = link.max_fps();
                         *link = watch::WatchLink::start(
                             engine.runtime(),
                             server_id,
@@ -951,7 +952,8 @@ impl Engine {
                             send,
                             recv,
                         );
-                        link.set_decode_fallback(fallback);
+                        link.set_decode_codecs(&decode_codecs);
+                        link.set_max_fps(max_fps);
                         link.request_keyframe();
                         false
                     }
@@ -994,16 +996,27 @@ impl Engine {
         lock(self.screen_share_state()).sink = Some(sink);
     }
 
-    /// Decodes `sharer`'s frames here (libvpx) and hands pictures to
-    /// [`ScreenFrameSink::on_decoded`] instead of encoded frames, for webviews without
-    /// WebCodecs VP9 (FR-2.44).
-    pub fn screen_share_set_decode_fallback(
+    /// Decodes `sharer`'s frames of `codecs` here (dav1d for AV1, libvpx for VP9) and hands
+    /// pictures to [`ScreenFrameSink::on_decoded`] instead of encoded frames, for the codecs the
+    /// webview's WebCodecs cannot decode (FR-7.59). Replaces the earlier list.
+    pub fn screen_share_set_decode_codecs(
         &self,
         server_id: ServerId,
         sharer: u32,
-        on: bool,
+        codecs: &[wire::Codec],
     ) -> EngineResult<()> {
-        self.with_watch(server_id, sharer, |link| link.set_decode_fallback(on))
+        self.with_watch(server_id, sharer, |link| link.set_decode_codecs(codecs))
+    }
+
+    /// The viewer's frame-rate choice for `sharer`'s share (FR-7.51): at most about `max_fps`
+    /// frames per second, by dropping temporal layers here; `None` is Auto.
+    pub fn screen_share_set_viewer_fps(
+        &self,
+        server_id: ServerId,
+        sharer: u32,
+        max_fps: Option<u32>,
+    ) -> EngineResult<()> {
+        self.with_watch(server_id, sharer, |link| link.set_max_fps(max_fps))
     }
 
     /// Asks `sharer` for a keyframe, e.g. after the UI's decoder failed on a frame.

@@ -58,7 +58,8 @@ describe("media pop-out", () => {
     vi.spyOn(api, "screenShareWatch").mockResolvedValue(null);
     vi.spyOn(api, "screenShareUnwatch").mockResolvedValue(null);
     vi.spyOn(api, "screenShareFramesAttach").mockResolvedValue(null);
-    vi.spyOn(api, "screenShareSetDecodeFallback").mockResolvedValue(null);
+    vi.spyOn(api, "screenShareSetDecodeCodecs").mockResolvedValue(null);
+    vi.spyOn(api, "screenShareSetViewerFps").mockResolvedValue(null);
   });
 
   afterEach(() => {

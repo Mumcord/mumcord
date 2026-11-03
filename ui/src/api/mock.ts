@@ -3498,7 +3498,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
       return Promise.resolve(null);
     },
-    screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
+    // Viewer-side choices for the demo share: nothing to decode or thin out in the mock.
+    screenShareSetDecodeCodecs: () => Promise.resolve(null),
+    screenShareSetViewerFps: () => Promise.resolve(null),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
     updateStatus: () => Promise.resolve(updater.status()),
     updateCheckNow: () => Promise.resolve(updater.checkNow()),
