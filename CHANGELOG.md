@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
+
 ## [0.6.2] - 2026-11-02
 
 ### Changed
