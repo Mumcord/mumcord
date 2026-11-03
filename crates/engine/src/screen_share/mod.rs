@@ -25,6 +25,7 @@ mod convert;
 pub(crate) mod encoder;
 mod fanout;
 mod media;
+mod preview;
 mod quality;
 pub mod signal;
 pub(crate) mod sound;
@@ -61,9 +62,10 @@ use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
-pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats};
+pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
+pub use preview::{SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use start::StartOutcome;
@@ -1039,12 +1041,61 @@ impl Engine {
 
     /// How the own share on `server_id` is sent right now; `None` without one.
     pub fn screen_share_media_stats(&self, server_id: ServerId) -> Option<ScreenMediaStats> {
+        let (mut stats, encoder) = {
+            let all = lock(self.screen_share_state());
+            let own = all.servers.get(&server_id)?.own.as_ref()?;
+            (own.media.as_ref()?.stats(), own.active_encoder())
+        };
+        // Read after the share state is released: the P2P links have their own lock.
+        stats.add_viewer_paths(encoder, |session| {
+            match self.p2p_link(server_id, session).map(|l| l.path) {
+                Some(mumcord_p2p::ConnectionPath::Relay(_)) => ViewerPath::Relay,
+                Some(mumcord_p2p::ConnectionPath::Direct) | None => ViewerPath::Direct,
+            }
+        });
+        Some(stats)
+    }
+
+    /// The encoder the own share on `server_id` runs on (codec badge, FR-7.39); `None` without
+    /// a share or before its encoder opened.
+    pub fn screen_share_encoder(&self, server_id: ServerId) -> Option<ActiveEncoder> {
         lock(self.screen_share_state())
+            .servers
+            .get(&server_id)?
+            .own
+            .as_ref()?
+            .active_encoder()
+    }
+
+    /// The start dialog's "Viewers get" line for these picks (FR-7.36): the encoder, rate and
+    /// path a share started now would get. Starts no self-test ([`Self::screen_encoder_prepare`]
+    /// does).
+    pub fn screen_share_preview(
+        &self,
+        server_id: ServerId,
+        prefs: QualityPrefs,
+        codec: mumcord_store::ScreenCodec,
+    ) -> SharePreview {
+        let mut settings = self.encoder_settings();
+        settings.screen_codec = codec;
+        let selection = self.screen_encoders().preview(&settings, prefs);
+        let av1_blocked = lock(self.screen_share_state())
             .servers
             .get(&server_id)
             .and_then(|s| s.own.as_ref())
-            .and_then(|own| own.media.as_ref())
-            .map(media::Media::stats)
+            .is_some_and(|own| own.av1_blocker().is_some());
+        preview::preview(
+            &selection,
+            av1_blocked,
+            self.screen_broadcast_max(server_id),
+        )
+    }
+
+    /// How many viewers a relay broadcast takes on `server_id` (FR-7.40); `None` without
+    /// fan-out.
+    // Seam for BC1, which checks relay, bc announcement, P2P mode and certificate here.
+    pub fn screen_broadcast_max(&self, _server_id: ServerId) -> Option<u8> {
+        None
     }
 
     /// Changes the own share's resolution and frame rate ceiling, "Optimize for" and upload

@@ -199,6 +199,12 @@ impl Encoders {
 
     /// Runs the self-test for these picks in the background if it hasn't run yet (the start
     /// dialog calls this while the user picks).
+    /// The selection a share with these picks would start with, without starting a self-test
+    /// (start dialog, FR-7.36).
+    pub(crate) fn preview(&self, settings: &Settings, prefs: QualityPrefs) -> Selection {
+        self.select_quietly(settings, prefs).0
+    }
+
     pub(crate) fn prepare(&self, settings: &Settings, prefs: QualityPrefs) {
         if let (_, Some(key)) = self.select_quietly(settings, prefs) {
             self.send(Job::Selftest(key));

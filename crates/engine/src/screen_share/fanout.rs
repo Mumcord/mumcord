@@ -26,6 +26,8 @@ const DROP_PAUSE: Duration = Duration::from_millis(500);
 const RAISE_AFTER: Duration = Duration::from_secs(3);
 /// Top layer until the encoder says otherwise.
 const TOP_LAYER: u8 = TEMPORAL_LAYERS - 1;
+/// A viewer that lost a layer this recently shows "slow connection" (FR-7.52).
+const SLOW_FOR: Duration = Duration::from_secs(10);
 /// Sound packets waiting for one viewer (half a second of 20 ms packets).
 const AUDIO_CAPACITY: usize = 25;
 
@@ -133,6 +135,12 @@ impl Policy {
     /// Lost at least one layer.
     pub fn lagging(&self) -> bool {
         self.max_layer < self.top
+    }
+
+    /// Lost a layer (or overflowed) within the last [`SLOW_FOR`].
+    pub fn slow(&self, now: Instant) -> bool {
+        self.last_drop
+            .is_some_and(|at| now.saturating_duration_since(at) < SLOW_FOR)
     }
 
     /// Lost every layer it can and still does not keep up: only a lower quality step helps.
@@ -286,6 +294,23 @@ mod tests {
         policy.push(frame(false, 0), now);
         assert_eq!(policy.max_layer(), TOP_LAYER);
         assert!(!policy.lagging());
+    }
+
+    #[test]
+    fn a_viewer_is_slow_for_ten_seconds_after_losing_a_layer() {
+        let start = Instant::now();
+        let mut policy = Policy::new();
+        policy.push(frame(true, 0), start);
+        assert!(!policy.slow(start), "joining is not losing a layer");
+        let mut now = start;
+        for n in 1..6 {
+            now = start + Duration::from_millis(33 * n as u64);
+            policy.push(frame(false, layer(n)), now);
+        }
+        assert!(policy.lagging());
+        assert!(policy.slow(now));
+        assert!(policy.slow(now + SLOW_FOR - Duration::from_millis(500)));
+        assert!(!policy.slow(now + SLOW_FOR));
     }
 
     #[test]
