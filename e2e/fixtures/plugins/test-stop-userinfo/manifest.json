@@ -1,0 +1,30 @@
+{
+  "manifest": 1,
+  "id": "test-stop-userinfo",
+  "name": "Fixture stop-userinfo",
+  "description": "E2E hard-stop test plugin: declares user info in the address; must never install.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": [
+    "Mumcord test fixtures"
+  ],
+  "license": "MIT",
+  "categories": [
+    "tools"
+  ],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel",
+      "net.origins"
+    ]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://user:secret@fixture-a.example",
+        "purpose": "origin_0"
+      }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "manifest.description": "E2E hard-stop test plugin: declares a wildcard; must never install.",
+  "manifest.name": "Fixture stop-wildcard",
+  "origin_0": "Loads the fixture content"
+}

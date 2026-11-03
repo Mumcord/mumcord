@@ -1,0 +1,30 @@
+{
+  "manifest": 1,
+  "id": "test-stop-wildcard",
+  "name": "Fixture stop-wildcard",
+  "description": "E2E hard-stop test plugin: declares a wildcard; must never install.",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": [
+    "Mumcord test fixtures"
+  ],
+  "license": "MIT",
+  "categories": [
+    "tools"
+  ],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel",
+      "net.origins"
+    ]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://*.fixture-a.example",
+        "purpose": "origin_0"
+      }
+    ]
+  }
+}

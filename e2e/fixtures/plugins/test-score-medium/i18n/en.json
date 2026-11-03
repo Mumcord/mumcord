@@ -1,0 +1,5 @@
+{
+  "manifest.description": "E2E test plugin that scores Medium risk: one website plus a few chat and voice permissions.",
+  "manifest.name": "Fixture score-medium",
+  "origin_0": "Loads the fixture content"
+}

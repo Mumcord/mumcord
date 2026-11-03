@@ -1,0 +1,21 @@
+{
+  "manifest": 1,
+  "id": "test-score-low",
+  "name": "Fixture score-low",
+  "description": "E2E test plugin that scores Low risk: one quiet panel permission.",
+  "version": "1.0.0",
+  "api": "^1.0",
+  "authors": [
+    "Mumcord test fixtures"
+  ],
+  "license": "MIT",
+  "categories": [
+    "tools"
+  ],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel"
+    ]
+  }
+}

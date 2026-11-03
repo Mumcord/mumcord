@@ -1,0 +1,33 @@
+{
+  "manifest": 1,
+  "id": "test-growth",
+  "name": "Fixture growth",
+  "description": "E2E test plugin, version 1.0.0: scores Medium risk (update hold, before).",
+  "version": "1.0.0",
+  "api": "^1.1",
+  "authors": [
+    "Mumcord test fixtures"
+  ],
+  "license": "MIT",
+  "categories": [
+    "tools"
+  ],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel",
+      "net.origins",
+      "chat.send",
+      "events.voice",
+      "peers.messages"
+    ]
+  },
+  "net": {
+    "origins": [
+      {
+        "origin": "https://fixture-a.example",
+        "purpose": "origin_0"
+      }
+    ]
+  }
+}
