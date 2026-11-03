@@ -7,6 +7,7 @@
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
 - The server info panel lists what the relay allows ("Relay allows: Images · Files · Screen sharing"), and buttons and the image viewer say so in plain words when the relay doesn't allow a feature.
 - Settings → Privacy & Connections has a new "File sharing" card: turn receiving files on or off, pick the maximum file size (100 MB to 2 GB) and choose the folder where received files are saved.
+- The message input has a paperclip button and accepts dropped files and folders in channels: each becomes a chip with its size or progress and a remove button. The paperclip says why it is unavailable when the server has no relay, the relay doesn't allow files, you have no certificate, or your peer-to-peer setting needs the relay.
 
 ### Fixed
 
