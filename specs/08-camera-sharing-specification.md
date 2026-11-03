@@ -17,7 +17,7 @@ People in a voice channel want to see each other, the way they do in Teams or Me
 - Camera sharing only through the relay, with the new relay allowed use `camera` (default on), availability reasons in the UI.
 - Native camera capture per OS: Media Foundation (Windows), AVFoundation (macOS), xdg-desktop-portal Camera + PipeWire (Linux) with V4L2 fallback; MJPEG decode with `zune-jpeg`; device list with hot-plug; permission errors with links to the system settings.
 - Mandatory preview before going live; camera choice, background None / Blur / Image, blur strength, built-in and own background images, effect load display.
-- Background segmentation with the MediaPipe Selfie Segmenter (Apache-2.0) via `tract` (fallback `ort`, decided by spike CA0), edge refinement, temporal smoothing, blur and image compositing, automatic quality.
+- Background segmentation with the MediaPipe Selfie Segmenter (Apache-2.0) via ONNX Runtime (`ort`, CPU execution provider; spike CA0 decided, no `tract` fallback), edge refinement, temporal smoothing, blur and image compositing, two speed-based quality levels picked when the camera starts.
 - One relay broadcast per camera (`use: "camera"`), automatic admission of all eligible Mumcord users in the same channel, end-to-end encryption and rekeying as in FR-7.43/FR-7.44, temporal layers L1T3, resolution from the viewers' tile sizes (`want`), max 720p30.
 - Camera room: grid for 1 to 9 cameras, Grid / Speaker layout, speaking frame, self-view, people without camera, room bar, pop-out; combined layouts with a screen share or watch party (cameras beside / above / hidden).
 - Viewer controls per tile: Pin for me, Show large, Hide video, Quality for me (Auto / Data saver / Best).
@@ -77,7 +77,7 @@ The client only displays availability; the bot and relay decide who may create o
 
 - **FR-8.9** Entry points: the Apps-menu entry **Turn on camera** (subtitle "You see a preview first. Only people in {channel} can see you.", mockup 01), the camera button in the user panel next to mute and deafen, the room bar's camera button, and a configurable global hotkey (FR-8.20). The camera always starts off; nothing turns it on by itself.
 - **FR-8.10** Turning the camera on **always** opens the preview dialog first (mockups 03–04); it can't be skipped or disabled. While the dialog is open the local camera runs but **nothing is sent**: no `bcast-req`, no broadcast, no state announcement. The dialog subtitle reads "Preview · nobody sees this yet" and the info line "Only people in {channel} see your camera, and only after you press Turn on camera. Mumcord never records cameras."
-- **FR-8.11** Preview contents: the live mirrored (per setting) picture with the chosen effect; **Camera** device picker; **Background** None / Blur / Image; for Blur a **Blur strength** slider Light … Strong; for Image the library (six built-in images, the user's own images marked "Yours", and **Add image**); the line "Effects run on this device. Load: {low|medium|high} ({graphics card|CPU})"; the checkbox **Use this background next time** (saves the choice as the default background, FR-8.75); **Cancel** and **Turn on camera**.
+- **FR-8.11** Preview contents: the live mirrored (per setting) picture with the chosen effect; **Camera** device picker; **Background** None / Blur / Image; for Blur a **Blur strength** slider Light … Strong; for Image the library (six built-in images, the user's own images marked "Yours", and **Add image**); the line "Effects run on this device. Load: {low|medium|high}"; the checkbox **Use this background next time** (saves the choice as the default background, FR-8.75); **Cancel** and **Turn on camera**.
 - **FR-8.12** **Cancel**, Escape or closing the dialog turns the camera off and releases the device (camera light off within 1 s).
 - **FR-8.13** **Turn on camera** sends `bcast-req` with kind `cam` (section 6.6). The dialog stays open with a busy state until the broadcast exists; then it closes and the camera is on air. Errors keep the dialog open with the reason text (section 5.6) and the button enabled for a retry.
 - **FR-8.14** **Add image** opens the system file picker for PNG, JPEG or WebP up to 10 MB. The image is decoded, scaled to at most 1920 px wide, re-encoded (which strips all metadata) and copied into Mumcord's data folder; the original path is not kept. Unsupported or larger files show "This image can't be used. Use a PNG, JPEG or WebP file up to 10 MB." Own images are never uploaded, synced, sent or logged; only the finished composited picture is sent (info line in the dialog, mockup 04).
@@ -111,19 +111,19 @@ The client only displays availability; the bot and relay decide who may create o
 ### 4.5 Background effects
 
 - **FR-8.32** Backgrounds: **None**, **Blur** (strength slider Light … Strong, two blur radii and a blend in between), **Image** (built-in or own). The effect is applied before encoding; viewers receive only the finished picture.
-- **FR-8.33** Segmentation model: MediaPipe **Selfie Segmenter** (landscape, 144×256, Apache-2.0), converted once to ONNX and shipped with the app; run with `tract` on the CPU. If spike CA0 shows `tract` above budget, ONNX Runtime via `ort` is used instead (decision recorded in this spec by CA0, section 13).
-- **FR-8.34** Quality pipeline per frame (#388 §2):
-  1. run the model on a downscaled frame (144×256);
-  2. upsample the mask with a joint-bilateral / fast guided filter guided by the full-resolution frame, so edges follow hair and shoulders;
+- **FR-8.33** Segmentation model: MediaPipe **Selfie Segmenter** (Apache-2.0), converted once to ONNX and shipped with the app, run with ONNX Runtime through the `ort` crate on the CPU (spike CA0, section 13: about 4× faster than `tract` with identical masks). Two model shapes are shipped: the **square 256×256** model for the full level ("Best", FR-8.35) and the **landscape 144×256** model for the light level. There is no `tract` fallback and no graphics-card path. If ONNX Runtime is not available on a system (library missing or fails to load), background effects are disabled with a clear reason ("Background effects are not available on this PC: {reason}"); the camera itself still works with Background None. MediaPipe Selfie Multiclass is not used (its file is about 16.5 MB).
+- **FR-8.34** Quality pipeline per frame (#388 §2), at the **full** level; the **light** level (FR-8.35) replaces step 2 with a simpler edge cleanup (plain bilinear upsampling of the mask plus a small edge blur) and step 5 with a coarser blur:
+  1. run the model on a downscaled frame (256×256 at the full level, 144×256 at the light level);
+  2. upsample the mask with a fast guided filter guided by the full-resolution frame (full level), so edges follow hair and shoulders;
   3. temporal smoothing weighted by motion (fast movement trusts the new mask, still areas use the history), so there is no flicker and no ghosting;
   4. composite: shrink the mask slightly against halos, feather 2–3 px, and for images add a light wrap;
   5. blur at quarter resolution (separable Gaussian), upscale and blend with the mask.
-- **FR-8.35** **Effect quality** (Settings, mockup 11): **Auto** (default), **Best (graphics card)**, **Light (saves battery)**.
-  - **Best:** MediaPipe Selfie Multiclass (256×256, Apache-2.0), on the graphics card where the runtime chosen by CA0 supports it, otherwise on the CPU (the label then reads "Best").
-  - **Light:** Selfie Segmenter with the model at 15 fps (the smoothed mask is reused in between), no light wrap.
-  - **Auto:** the full pipeline of FR-8.34 at 30 fps; it steps down when the effect time per frame stays above budget (FR-8.37) for 3 s, or on battery power: first model at 15 fps, then Light. It steps back up after 30 s under budget on mains power.
-- **FR-8.36** The preview shows the current load: low (< 50 % of budget), medium (50–100 %), high (> 100 %, Auto is stepping down), and where the effect runs (graphics card or CPU).
-- **FR-8.37** Budget: effects ≤ 8 ms per 720p frame (median) on a 4-core laptop CPU from 2020; blur and image cost the same. If even Light can't hold 30 fps, the camera keeps running at the frame rate the effects can deliver (min 15 fps); below that, the preview shows "Your PC is too busy for this background effect. Try None." and the effect stays on.
+- **FR-8.35** **Effect quality** (Settings, mockup 11): **Auto** (default), **Best**, **Light (saves battery)**. There are two quality levels, **full** and **light**, and the level is picked by speed, not by hardware.
+  - **Best:** the full level: square Selfie Segmenter (256×256) with the complete pipeline of FR-8.34 at 30 fps, always on the CPU. The label is just "Best" (it replaces the mockup label "Best (graphics card)"; the mockup text is updated accordingly).
+  - **Light:** the light level: landscape Selfie Segmenter (144×256) with the model at 15 fps (the smoothed mask is reused in between), simpler edge cleanup, coarser blur, no light wrap.
+  - **Auto:** when the camera starts, Mumcord measures how long the full level takes per frame on this PC (a short self-test on live frames, the same approach as the screen-share encoder self-test) and picks the full level if it holds 30 fps with headroom, otherwise the light level. During the call it steps down to the light level when the effect time per frame stays above the frame budget (FR-8.37) for 3 s, or on battery power. It steps back up after 30 s under budget on mains power.
+- **FR-8.36** The preview shows the current load: low (< 50 % of the frame budget), medium (50–100 %), high (> 100 %, Auto is stepping down), and which level runs (Best or Light). Effects always run on the CPU.
+- **FR-8.37** Frame budget: there is no fixed per-frame time. The budget is the frame interval at the target frame rate (about 33 ms at 30 fps) minus headroom for capture and encoding; the level that fits is chosen at camera start (FR-8.35). Spike CA0 measured about 10–14 ms per 720p frame for the full level on a 2020 reference laptop, so a fixed 8 ms limit is not reachable with full post-processing. If even Light can't hold 30 fps, the camera keeps running at the frame rate the effects can deliver (min 15 fps); below that, the preview shows "Your PC is too busy for this background effect. Try None." and the effect stays on.
 - **FR-8.38** Effects run on a dedicated effects thread, never on the audio thread or the UI thread. Background None skips the model entirely.
 - **FR-8.39** Built-in background images: six images made for Mumcord (our own work), each ≤ 300 KB, shipped with the app, source recorded in the third-party notices.
 - **FR-8.40** The background choice can be changed while the camera is on (room bar "Background: {name}" opens the same picker as a popover, without stopping the broadcast).
@@ -207,7 +207,7 @@ The client only displays availability; the bot and relay decide who may create o
 
 ### 4.13 Signalling format (Bovnar, #400)
 
-- **FR-8.91** The `mumcord.camera` messages (`on`, `off`, `cam-join`, `cam-leave`) are **Bovnar documents** (user decision 2026-11-03), written and read with the Rust Bovnar implementation from the fork `Mumcord/bovnar`, a git dependency pinned to a commit (spec 09 FR-9.99). The channel is new in 0.7.0, so no older client has to read it. The decoder rejects malformed, truncated, wrong-typed or oversized documents without a crash or hang and logs one line without payload content. The other camera-related messages keep their formats: `mumcord.peer` (`relay`, `bcast-req`, `bcast-err`), broadcast control and the allowlist API stay JSON/binary, because 0.6.2 and mumbot read them and one channel never mixes formats.
+- **FR-8.91** The `mumcord.camera` messages (`on`, `off`, `cam-join`, `cam-leave`) are **Bovnar documents** (user decision 2026-11-03), written and read with a thin Rust wrapper around the upstream Bovnar C library (fork `Mumcord/bovnar`, branch `rust-binding`), used as a git dependency pinned to a commit (spec 09 FR-9.96 and FR-9.99). The channel is new in 0.7.0, so no older client has to read it. The decoder rejects malformed, truncated, wrong-typed or oversized documents without a crash or hang and logs one line without payload content. The other camera-related messages keep their formats: `mumcord.peer` (`relay`, `bcast-req`, `bcast-err`), broadcast control and the allowlist API stay JSON/binary, because 0.6.2 and mumbot read them and one channel never mixes formats.
 
 ## 5. UI & UX
 
@@ -469,7 +469,7 @@ stateDiagram-v2
 
 - **Native capture in the engine** (new crate `crates/camera`, next to screen capture): Media Foundation via the `windows` crate, AVFoundation via `objc2` + `objc2-av-foundation`, xdg camera portal via `ashpd` + PipeWire via `pipewire`, V4L2 via the `v4l` crate. Frames, effects, encoders and the relay link all live in the engine, so no frame crosses the WebView twice. Not `getUserMedia` (patchy on WebKitGTK, extra permission plumbing, expensive frame transfer) and not `nokhwa` (second abstraction, no portal support).
 - **MJPEG decode with `zune-jpeg`** (pure Rust, MIT/Apache/Zlib), keeping the no-FFmpeg decision.
-- **Segmentation:** MediaPipe Selfie Segmenter (and Selfie Multiclass for Best) as ONNX, run with `tract` (pure Rust, MIT/Apache, no native library); `ort` (ONNX Runtime) only if CA0 shows `tract` above budget; it also enables a graphics-card path for Best.
+- **Segmentation:** MediaPipe Selfie Segmenter (square 256×256 for Best, landscape 144×256 for Light) as ONNX, run with ONNX Runtime via `ort` on the CPU (spike CA0: about 4× faster than `tract`, identical masks). No `tract` fallback and no graphics-card path; without ONNX Runtime, background effects are disabled with a reason (FR-8.33).
 - **Compositing** (guided filter, blur, blend) in Rust with SIMD on the CPU, on a dedicated effects thread.
 - **Encoding and broadcast:** reuse `screen_share` encoders (SVT-AV1, libvpx, direct hardware encoders NVENC / AMF / QSV / VA-API, no FFmpeg) and `screen_share::broadcast` (`FrameSealer` / `FrameOpener`, key exchange, reassembler, publisher / subscriber link) unchanged; a camera session owns its own encoder instance.
 - **`mumcord-p2p`:** `RelayUse::Camera` (wire `cam`), `bcast-req` kind, `BroadcastErrorReason::RoomFull`, control kind `want`, hello feature `camera`; version bump.
@@ -479,7 +479,7 @@ stateDiagram-v2
 
 ## 9. Non-functional requirements
 
-- **Performance:** effects ≤ 8 ms median per 720p frame on a 4-core 2020 laptop CPU (confirmed by CA0); camera capture + effects + encode at 720p30 ≤ 1.5 cores in total; nine received 360p tiles decode and draw at 30 fps without dropping voice packets. Camera start (Turn on camera → tile on viewers) ≤ 3 s on a LAN relay; stop ≤ 1 s.
+- **Performance:** the quality level is picked by speed when the camera starts (FR-8.35); the full level measured about 10–14 ms median per 720p frame on a 4-core 2020 laptop CPU (spike CA0); camera capture + effects + encode at 720p30 ≤ 1.5 cores in total; nine received 360p tiles decode and draw at 30 fps without dropping voice packets. Camera start (Turn on camera → tile on viewers) ≤ 3 s on a LAN relay; stop ≤ 1 s.
 - **Battery:** on battery, Auto effect quality uses Light; Automatic encoder skips software AV1 (FR-7.53).
 - **Security:** every frame end-to-end encrypted (FR-8.48); `mumcord.camera` and control messages are untrusted, size-checked and validated; `cam-join` accepted only from same-channel, unblocked sessions; tokens accepted only from the pinned bot.
 - **Privacy:** the camera never starts by itself and the preview can't be skipped; no frames, masks, device names, background image paths or file names in logs (only counts, chosen codec, resolution and effect tier at `info`); own images never leave the device; no recording, no frames on disk. The relay operator sees who publishes and who subscribes (certificate hashes), volume and timing, not the picture. PRIVACY.md gets a camera section.
@@ -493,8 +493,8 @@ stateDiagram-v2
 
 - macOS: `NSCameraUsageDescription` in `Info.plist` and the `com.apple.security.device.camera` entitlement for the hardened runtime.
 - Linux: the Flatpak build uses only the portal path (no extra device permission); `.deb` and AppImage need no new system packages.
-- Bundled assets: the Selfie Segmenter and Selfie Multiclass ONNX files (≈ 0.25 MB and ≈ 1 MB) and six background images (≤ 300 KB each); with `ort` add its native library (≈ 10–20 MB per platform).
-- Licences: third-party notices and the licences window list MediaPipe Selfie Segmenter / Multiclass (Apache-2.0, model cards), `tract` (MIT/Apache) or `ort` + ONNX Runtime (MIT), `zune-jpeg` (MIT/Apache/Zlib), `v4l` (MIT), `objc2-av-foundation` (MIT), and the source of the built-in background images (own work).
+- Bundled assets: the two Selfie Segmenter ONNX files (square 256×256 and landscape 144×256) and six background images (≤ 300 KB each); ONNX Runtime's native library (≈ 10–20 MB per platform) ships with the app. MediaPipe Selfie Multiclass (≈ 16.5 MB) is not bundled.
+- Licences: third-party notices and the licences window list MediaPipe Selfie Segmenter (Apache-2.0, model card), `ort` + ONNX Runtime (MIT), `zune-jpeg` (MIT/Apache/Zlib), `v4l` (MIT), `objc2-av-foundation` (MIT), and the source of the built-in background images (own work).
 
 ### 10.2 Releases
 
@@ -542,7 +542,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 14. **AC-8.14** (AC-C14) C shares a screen and B watches it while A's and C's cameras are on → the share is the main picture; the switch moves cameras beside, above and hidden; Hidden unbinds B from both camera broadcasts; ending the share returns the grid. The same with a watch party (mockup 09).
 15. **AC-8.15** (AC-C15) Keyboard only on B: reach the room, arrow through tiles, Enter opens the tile menu, P pins (Speaker layout with that tile large and `want` = 720 at the sender, debug panel), H hides, Quality → Data saver (relay shows `layers` cap); screen-reader names read "A, camera on, speaking" while A talks; the live region announces "C turned on their camera".
 16. **AC-8.16** (AC-C16) Reduce motion on (system, then the app switch) → the speaking frame is a static border (no CSS animation or transition on the tile) and switching layouts doesn't animate.
-17. **AC-8.17** (AC-C17, automated part) `netns.sh` throttles B to 1 Mbit/s → B's tiles drop to 15 or 7.5 fps with the fps badge while C keeps 30 fps. Manual checklist part: on a 4-core 2020 laptop, blur at 720p30 takes ≤ 8 ms per frame (median, debug panel).
+17. **AC-8.17** (AC-C17, automated part) `netns.sh` throttles B to 1 Mbit/s → B's tiles drop to 15 or 7.5 fps with the fps badge while C keeps 30 fps. Manual checklist part: on a 4-core 2020 laptop, blur at 720p30 runs at 30 fps with the level Auto picked (effect time per frame in the debug panel).
 18. **AC-8.18** (AC-C18) "Turn my camera off when my screen locks" on → screen-lock test hook turns A's camera off; with the setting off it stays on.
 19. **AC-8.19** (AC-C19) Change every Settings → Camera value, restart → values kept; the next preview starts with the default background and blur strength.
 20. **AC-8.20** A minimises the window while on air → B keeps receiving frames; the tray shows the camera badge and "Camera on"; the tray entry "Turn off camera" stops it.
@@ -553,9 +553,9 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 
 **Manual checklist (real hardware; untested hardware is reported as "not verified")**
 - **AC-8.25** Real webcam on Windows (Media Foundation, including the Windows privacy refusal and its settings button), macOS (AVFoundation, first-use permission prompt and refusal), Linux with portal (GNOME or KDE) and without portal (V4L2); one MJPEG-only USB 2 camera reaches 720p30; hot-plug updates the list; the camera light goes off within 1 s on every stop rule.
-- **AC-8.26** Effect quality Best on a machine with a supported graphics card shows "Load: … (graphics card)"; on battery Auto switches to Light.
+- **AC-8.26** Effect quality Best shows "Load: … " with the level "Best" and runs on the CPU (no graphics-card text anywhere); on battery Auto switches to Light.
 - **AC-8.27** Visual quality: blur and image edges follow hair and shoulders without visible flicker or halo with a real person, compared side by side with a Meet or Teams call (subjective sign-off by the user).
-- **AC-8.28** Effects ≤ 8 ms median per 720p frame on the 2020 reference laptop (part of AC-C17).
+- **AC-8.28** Auto picks its level when the camera starts: on a machine where the full level holds 30 fps it runs Best, on a slower one (or with a forced slow effect via the test hook) it runs Light; on the 2020 reference laptop the full level measures about 10–14 ms per 720p frame (part of AC-C17). With ONNX Runtime made unavailable (test hook or missing library), background effects are disabled with a reason and the camera still starts with Background None.
 
 **Signalling format (Bovnar, #400)**
 25. **AC-8.25** A turns the camera on in a channel with B (both 0.7.0): the packet inspector shows `mumcord.camera` `on` and `cam-join` as Bovnar documents with the fields of §6.5; the camera room works as in the other ACs.
@@ -572,35 +572,35 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | #388 Q3 preview skippable | **No**, always shown | User decision 2026-11-03 (privacy) |
 | #388 Q4 show cameras automatically | **Yes** ("Always" default), plus "When I open the room" and "Never" | User decision 2026-11-03 |
 | #388 Q5 chat line for plain Mumble users | **No** | User decision 2026-11-03 |
-| #388 Q6 RVM "Best" matting tier | **Not in this epic** | User decision 2026-11-03; revisit after CA0, only with commercially cleared training data |
+| #388 Q6 RVM "Best" matting tier | **Not in this epic** | User decision 2026-11-03; revisit only with commercially cleared training data (the CA0 spike did not change this) |
 | #388 Q7 max send resolution | **720p30**, 3 temporal layers | User decision 2026-11-03; 1080p with simulcast later |
 | #388 Q8 camera while minimised | **Keeps sending**, tray shows "Camera on" | User decision 2026-11-03 |
 | #388 Q9 built-in backgrounds | **Six images made for Mumcord** (own work, ElevenLabs paid plan allows commercial use), source in third-party notices | User decision 2026-11-03 |
 | #388 Q10 own spec, build order | Spec 08; build **after the Epic 4.1 broadcast work (BC1, MP3, MB2) is merged** | User decision 2026-11-03 |
 | Capture | Native per OS (Media Foundation, AVFoundation, xdg camera portal + PipeWire, V4L2 fallback), MJPEG via `zune-jpeg` | #388 §1; no FFmpeg (user decision 2026-11-03, spec 07 task decisions item 7) |
-| Segmentation | MediaPipe Selfie Segmenter (Apache-2.0) via `tract`, `ort` as fallback; spike CA0 confirms performance first | #388 §2 |
+| Segmentation | MediaPipe Selfie Segmenter (Apache-2.0) with ONNX Runtime (`ort`, CPU); no `tract` fallback; effects disabled with a reason if ONNX Runtime is unavailable | #388 §2; user decision after spike CA0, 2026-11-03 |
 | Limits | 720p30 max, L1T3, 9 cameras per channel, 25 viewers per camera, 18 camera broadcasts per relay, 2.5 Mbit/s per camera | #388 §4 |
 | mumbot changes | `cam` pass-through, `bcast-req` kind, broadcasts per session and kind, per-channel limit (`room-full`), camera ends on channel change, own rate-limit bucket | #388 "mumbot changes" |
 | Camera on channel change | Camera ends (unlike screen shares, which keep running) | #388; screen-share rule unchanged |
 | Admission | Automatic: viewer sends `cam-join`, sender's client admits without a prompt; hide = unbind + `cam-leave` + rekey | Refines #388 §3 ("nobody has to press Watch") so that hidden viewers and "Never" download nothing and relay viewer tokens don't expire unused |
 | Camera state signalling | New plugin data id `mumcord.camera` and hello feature `camera`, announced like screen shares (FR-2.75) | #388 "announced the same way as the screen share state" |
-| Effect quality "Best (graphics card)" | Mockup label kept; Best = Selfie Multiclass on the graphics card where the CA0 runtime supports it, otherwise on the CPU with the label "Best" | Mockups are binding; GPU support depends on CA0 (open point Q-CA1) |
+| Effect quality "Best" | Label is "Best" (not "Best (graphics card)"): square 256×256 Selfie Segmenter on the CPU, no GPU path | User decision after spike CA0, 2026-11-03 (supersedes the mockup label) |
 | Mockups vs. issue text | Mockups win (Send quality options Auto / 720p · 15 fps / 360p · 30 fps; room bar buttons; tile menu wording) | Same rule as spec 07 (user decision 2026-11-02) |
 | Pure client | Works against an unmodified Mumble server; mumpeer and mumbot are the user's own projects and are extended | Project rule |
-| Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (Rust implementation from the fork Mumcord/bovnar, pinned git dependency). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
+| Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (thin Rust wrapper around the upstream C library, fork Mumcord/bovnar branch `rust-binding`, pinned git dependency; building needs a C compiler and Python 3). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
 
 ## 13. Open points & risks
 
 Open points (the recommended answer is already written into this spec):
 
-- **Q-CA0** Spike result (task CA0): `tract` vs `ort`, Selfie landscape vs multiclass timings on 3 reference PCs; recorded here before CC2 starts. If neither meets 8 ms, Auto starts with the model at 15 fps. Owner: CA0 agent, then user.
-- **Q-CA1** If CA0 keeps `tract` (CPU only), "Best (graphics card)" can't use the graphics card; this spec then shows the label "Best" (FR-8.35). Owner: user, after CA0.
+- **Q-CA0** Resolved by spike CA0 (product owner decisions, 2026-11-03): `ort` with ONNX Runtime (CPU) is about 4× faster than `tract` with identical masks, so `tract` is dropped and there is no fallback (FR-8.33). Selfie Multiclass is about 16.5 MB (not about 1 MB as first assumed) and is not used. The full level measured about 10–14 ms per 720p frame on a 2020 reference laptop, so the fixed 8 ms budget is replaced by two speed-based quality levels picked at camera start (FR-8.35, FR-8.37).
+- **Q-CA1** Resolved: no graphics-card path; the quality label is just "Best" (FR-8.35).
 - **Assumptions** (not in #388, chosen for consistency with spec 07): a client certificate is required (reason text FR-8.4 item 5); the Windows / macOS / Linux error texts and the "No camera found" text; the hide-equals-kick-and-rekey rule; default blur strength 50 and default background Blur; the tab position of Settings → Camera.
 
 Risks:
 - **Relay bandwidth:** a full room of 25 people needs ≈ 100 Mbit/s out, worst case 260 Mbit/s; small relays hit their budget and drop layers. Defaults and operator limits mitigate it.
 - **CPU load:** capture + effects + encode on older laptops, more with a parallel screen share; mitigated by Auto effect quality, 720p cap, `want`-driven resolution and encoder load monitoring.
-- **Segmentation quality** on hair and in poor light is below a GPU matting model; acceptable for the MVP, revisit after CA0 (Q6).
+- **Segmentation quality** on hair and in poor light is below a GPU matting model; acceptable for the MVP (Q6 stays out of this epic).
 - **Linux variety:** camera portal support differs by desktop and distribution; the V4L2 fallback covers the rest but not inside Flatpak without device access.
 - **macOS entitlements and signing:** a missing camera entitlement silently blocks capture in signed builds; covered by AC-8.25 on a signed build.
 - **Model licence:** the MediaPipe model cards state Apache-2.0; the converted ONNX file keeps the licence notice. RVM stays out because of GPL and non-commercial training data.
@@ -621,7 +621,7 @@ Task IDs from #388; one fresh agent per task.
 
 | Order | mumpeer | mumbot | mumcord |
 |---|---|---|---|
-| Step 0 (parallel) | — | — | CA0 spike (segmentation runtime and model, timings); CB1 `mumcord-p2p` (`RelayUse::Camera`, kind, `want`, hello `camera`); CB2 settings schema, background-image store, English texts; CU7 six background images |
+| Step 0 (parallel) | — | — | CA0 spike (done, results in section 13 Q-CA0); CB1 `mumcord-p2p` (`RelayUse::Camera`, kind, `want`, hello `camera`); CB2 settings schema, background-image store, English texts; CU7 six background images |
 | Step 1 | CMP1 `camera` use, `use` on broadcasts, camera limits, `want`, `no-camera` profile | CMB1 `cam` pass-through, kind, per-channel limit, end on channel change | CC1 camera capture (all OS, test hook); CU1 camera button and availability |
 | Step 2 | — | — | CC2 background effects; CC3 camera send; CU2 preview dialog; CU6 Settings → Camera |
 | Step 3 | — | — | CC4 camera receive; CU3 camera room; CU4 combined layouts; CU5 viewer controls |

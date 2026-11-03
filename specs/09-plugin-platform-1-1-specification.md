@@ -32,7 +32,7 @@ Plugins in 0.6.0 live in small places (panel, chat cards, badges) and only offic
 ### 2.2 Out of scope / later
 
 - **Official plugins built on 1.1**: Skyloom (#394) and Whiteboard (#397) are consumers of this platform. They are specified, built and E2E-tested in the plugins repository, not here.
-- Whiteboard's proposed host calls (save file, post image to chat, import picture; #397): a later WIT minor, after their own approval.
+- Whiteboard's three host calls (save file, post image to chat, import picture; #397) are in scope as addendum W1x (section 4.19).
 - Pointer lock for action games (#395 Q4). Full screen only via Mumcord's button.
 - Wildcard websites (`*.example`) (#395 Q5).
 - Web content in chat cards, badges, profile cards or menus (#395 D5).
@@ -109,6 +109,9 @@ The client only displays relay availability; the relay and bot decide who may cr
 | `net.origins` | Talk to these websites | red | all | FR-9.25 |
 | `peers.relay` | Send game data through the server's relay | yellow | all | optional; FR-9.57 |
 | `audio.effects` | Play short sounds that come with the plugin | green | all | optional; FR-9.65 |
+| `files.save` | Save files you choose | green | all | optional; FR-9.103 |
+| `chat.post-image` | Post an image in chat after you click | yellow | all | optional; FR-9.104 |
+| `files.import-picture` | Open pictures you choose | green | all | optional; FR-9.105 |
 
   `ui.webview` becomes available to all plugins (yellow). Its unofficial prompt text is "Show its own content in a sealed frame" with the sub-text "Runs code made by <repository>. Mumcord has not reviewed it. It can't see Mumcord, your files, microphone, camera or clipboard. Shown only in: <places>." (mockup 01). Official text stays as in spec 06 without "(no internet)" when the plugin declares websites. All texts exist in the 24 locales (FR-6.32).
 - **FR-9.23** Manifest additions (1.1): `net.origins: [{ "origin": "https://api.example", "purpose": "origins.api" }]` (`purpose` is a translation key shown next to the origin); `app_menu: [{ "id", "label", "icon" }]`; `stage: { "title", "max_participants" ≤ 16 }`; `webview: { "places": ["stage" | "side-panel" | "dialog" | "panel"] }`; `audio: { "sounds": ["sounds/…"] }`. A field without its permission fails the load with a Diagnostics entry.
@@ -120,7 +123,9 @@ The client only displays relay availability; the relay and bot decide who may cr
   - new `audio`: `play(sound, gain: option<f32>) -> result`, `stop-all()`.
   - `http`: same functions; unofficial plugins are checked against `net.origins`.
   - `event` gains `stage-activity-started(peer, activity-id)`, `stage-activity-ended(activity-id)`, `stage-joined(peer)`, `stage-left(peer)`, `stage-visibility-changed(bool)`, `app-menu-activated(item)`, `relay-message(peer, data)`, `relay-status-changed(relay-status)`, `surface-closed(place)`.
-  - `error` gains `relay-unavailable` and `origin-not-allowed`.
+  - `error` gains `relay-unavailable`, `origin-not-allowed` and `not-found`.
+  - `ui.slot` gains `stage` (the slot of a tree-content activity, FR-9.46).
+  - W1x addendum (section 4.19): new `files` interface (`save`, `import-picture`) and `chat.post-image`, all additive.
 
 ### 4.5 Declared websites (`net.origins`)
 
@@ -233,17 +238,28 @@ The client only displays relay availability; the relay and bot decide who may cr
 
 - **FR-9.93** Plugin peer data (Mumble plugin data `mumcord.p.<id>` via `peers.messages`, and `peers.relay` messages) carries **Bovnar documents** (user decision 2026-11-03). Bovnar is a self-describing serialization format (https://github.com/sothis/bovnar, MIT): every value carries its type and optionally its unit. It is used here because API 1.1 plugins are new and 0.6.2 cannot run them.
 - **FR-9.94** **Host and SDK split.** The host treats a plugin's message as opaque bytes and only enforces size limits (FR-9.60, FR-9.61, 997 bytes for the Mumble fallback) and rates; it never parses, rewrites or logs the payload. The **SDK validates on receive**: its helpers decode the bytes into a typed value and return a clean error for malformed, truncated, wrong-typed, too deep or oversized documents. A plugin built without the helpers can still send raw bytes (plugins on SDK 1.0 and plugins that want another format are not blocked), but only Bovnar is documented, supported and tested.
-- **FR-9.95** **SDK helpers** (feature `1.1`, module `bovnar`): `encode` (typed value → bytes, refusing results above the message limit before sending), `decode` (bytes → typed value, with limits for size and nesting depth), `send_document` / `on_document` wrappers for `peers.messages` and `peers.relay`, and an error type with the reasons `malformed`, `too-large`, `wrong-type`. Decode errors are logged by the SDK with the reason and size only, never payload content. The wasm build works (`no_std + alloc`, no `unsafe` in the Bovnar crate).
-- **FR-9.96** **Pure-Rust Bovnar implementation** from the fork **Mumcord/bovnar** (branch `rust-implementation`, folder `rust/`): follows the upstream spec 1.2 and the conformance suite (470 cases), with a differential test against the C reference and fuzzing; includes JSON ↔ Bovnar conversion and a format sniff; the UCUM and CF unit profiles are left out until their licences are clear. Mumcord (`crates/plugin-sdk`, `crates/engine`) uses it as a **git dependency pinned to a commit**; licence notices go into the licences window and the SDK.
+- **FR-9.95** **SDK helpers** (feature `1.1`, module `bovnar`): `encode` (typed value → bytes, refusing results above the message limit before sending), `decode` (bytes → typed value, with limits for size and nesting depth), `send_document` / `on_document` wrappers for `peers.messages` and `peers.relay`, and an error type with the reasons `malformed`, `too-large`, `wrong-type`. Decode errors are logged by the SDK with the reason and size only, never payload content. The wasm build works: the wrapper compiles the C library to wasm with wasi-sdk (FR-9.96).
+- **FR-9.96** **Bovnar implementation: a thin Rust wrapper around the upstream C library.** The fork **Mumcord/bovnar** (branch `rust-binding`) holds a small Rust crate that binds the upstream Bovnar C library (spec 1.2) and exposes typed encode/decode, JSON ↔ Bovnar conversion and the format sniff. **Every unit profile is switched on** (nothing is left out). The wrapper necessarily contains `unsafe` for the C boundary, kept in that one crate behind a safe API. Mumcord (`crates/plugin-sdk`, `crates/engine`) uses it as a **git dependency pinned to a commit**; licence notices go into the licences window and the SDK. **Build requirements:** building Mumcord, or the SDK with the Bovnar helpers, needs a C compiler and Python 3 (the upstream build generates sources with Python); **plugin wasm builds** additionally need wasi-sdk, found through the environment variable `WASI_SDK_PATH`, and the plugin template, CI and the author guide document this.
 - **FR-9.97** **Docs for plugin authors** (extends FR-9.92): a "Sending data to other players" guide section with Bovnar examples (send, receive, error handling, size limits, relay vs fallback sizes), and the `mumcord-plugin new` templates for a relay plugin use the helpers.
 - **FR-9.98** **Scope of the format.** Only plugin peer data and the new 0.7.0 channels (spec 07 `mumcord.file`, spec 08 `mumcord.camera`) use Bovnar. Existing message channels (`mumcord.peer` including the bcast-* types, history sync, hello, poll/dice data and the like) stay JSON/binary, and existing data packages do not switch in 0.7.0 (#401, 0.8.0 and later); the mumpeer HTTP API, the plugin manifest and the registry indexes stay JSON.
 - **FR-9.99** **Git dependency and publishing.** The Bovnar crate is not published on crates.io (`publish = false`). While `mumcord-plugin-sdk` has a git dependency it cannot be released on crates.io; the SDK is distributed as before (git tag, template) until this is resolved. Whether the code goes upstream as a PR (the author publishes) or stays in the fork is being discussed with the Bovnar author; the crates.io question is decided at the next SDK release. `docs/` and CHANGELOG state this plainly.
 
-### 4.18 Local exports in Bovnar (#400)
+### 4.18 Diagnostic file in Bovnar (#400)
 
-- **FR-9.100** Settings export/backup and the diagnostic report are written as **Bovnar documents** (only Mumcord reads them). No spec owned these features before, so this requirement lives here.
-- **FR-9.101** **Reading is tolerant**: import and the report viewer detect the format with the Bovnar format sniff and read both Bovnar and the older JSON. An export written by 0.7.0 imports again; an export from 0.6.x (JSON) still imports. Written JSON is never produced by 0.7.0.
-- **FR-9.102** Import treats the file as untrusted input: malformed or oversized files are refused with a clear message, no crash, no partial import (all or nothing), and the log has no file content. The diagnostic report keeps its privacy rules (no chat contents, audio or personal data).
+- **FR-9.100** The **diagnostic report** is written as a **Bovnar document** (only Mumcord reads it). There is **no settings export or backup** feature, and none is built in this epic: the diagnostic file is the only local export that uses Bovnar. No spec owned the diagnostic report before, so this requirement lives here.
+- **FR-9.101** **Reading is tolerant**: the report viewer detects the format with the Bovnar format sniff and reads both Bovnar and JSON. Written JSON is never produced by 0.7.0 for the diagnostic report.
+- **FR-9.102** The report viewer treats the file as untrusted input: malformed or oversized files are refused with a clear message, no crash, and the log has no file content. The diagnostic report keeps its privacy rules (no chat contents, audio or personal data).
+
+### 4.19 Host calls for Whiteboard (addendum W1x, #397)
+
+Whiteboard (#397) needs three Mumcord-owned actions that no plugin can do itself. They are added to WIT 1.1 before it freezes, are purely additive (no 1.0 item changes) and follow the same rule as `chat.send`: Mumcord owns the dialog or the send, the plugin hands over or receives bytes, never a path and never the chat itself.
+
+- **FR-9.103** **`files.save`** (new interface `files`): `save(suggested-name: string, data: list<u8>) -> result<bool, error>` opens Mumcord's system save dialog with the suggested name; `true` = saved, `false` = the user cancelled. Needs permission `files.save` (green, all plugins, prompt text "Save files you choose"). Allowed only within 8 s after a user gesture for that plugin (FR-9.45 rule), one dialog per gesture. The name is reduced to a plain file name (no folders, no `..`, ≤ 120 bytes); data is ≤ 32 MiB (assumption of this spec); errors `not-permitted`, `invalid`, `too-large`. The plugin never learns the chosen folder or path. Mumcord writes the file itself.
+- **FR-9.104** **`chat.post-image`** (in the existing `chat` interface): `post-image(png: list<u8>, alt: string) -> result<post-outcome, error>` with `post-outcome = image | file-offer`. Needs permission `chat.post-image` (yellow, all plugins, prompt text "Post an image in chat after you click"). Allowed only within 8 s after a user gesture, one image per gesture, into the user's current channel. Mumcord checks that the bytes are a valid PNG (else `invalid`), and sends them through the **normal chat image path** (the same one as a pasted picture, including the server's image size limit); `alt` (≤ 200 bytes) becomes the accessible description and the plain text line for official Mumble clients, prefixed with the plugin name as for `chat.send`. When the PNG is too large for the server's image limit, Mumcord offers it through **file sharing** (spec 07) instead and returns `file-offer`; above the file-sharing limit the error is `too-large`. Errors also `not-permitted` and `no-recipients` (not connected). The plugin never sees the chat.
+- **FR-9.105** **`files.import-picture`** (in `files`): `import-picture() -> result<option<picture>, error>` with `picture = { name: string, data: list<u8> }` opens Mumcord's picker for PNG, JPEG or WebP; `none` = the user cancelled. Needs permission `files.import-picture` (green, all plugins, prompt text "Open pictures you choose"). Allowed only within 8 s after a user gesture, one picker per gesture. Pictures above 10 MB are refused (`too-large`), other types `invalid`; `name` is the file name only, never a path.
+- **FR-9.106** **Gestures and permissions.** A gesture is the same user gesture as in FR-9.45 (button click or Apps-menu click inside the plugin's own surface); a call without a fresh gesture or without its permission returns `not-permitted` and nothing opens or is sent. The three permissions are optional in the manifest, are shown in the install prompt and the score inputs like other permissions (green/yellow as listed), and exist in the 24 locales.
+- **FR-9.107** **WIT and SDK.** `mumcord:plugin@1.1.0` gains the `files` interface and `chat.post-image`; nothing in 1.0 changes, a 1.0 or older 1.1 plugin is unaffected, and the 1.1 snapshot test (AC-9.50) proves it. The SDK feature `1.1` gets typed wrappers. The `permission` list gains the three names (FR-9.22).
+- **FR-9.108** **Privacy and logging.** Logs hold call names, sizes and outcomes only, never file or image content, names the user typed or paths. Hosts never keep a copy of saved or posted bytes.
 
 ## 5. UI & UX
 
@@ -321,6 +337,7 @@ Focus lands on the title; the confirmation box is the first focusable control af
 | Safety setting | Blocked by your safety setting |
 | Package scores higher | This plugin scores higher than its listing said |
 | Website privacy | These websites can see your IP address and anything <plugin> sends them. |
+| Picture import (host call) | This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB. |
 
 ### 5.6 Design and accessibility
 
@@ -431,6 +448,7 @@ Mumcord's E2E covers the platform only, with small dedicated test plugins. Offic
 | `test-stage-official` | Same, served as official by the local fixture registry with its test key (Get plugin notice) |
 | `test-relay` (1.1) | 64 KiB 1:1 and channel sends, `fallback` on/off |
 | `test-bovnar` (1.1) | Sends and receives Bovnar documents with the SDK helpers 1:1 and in a channel, with and without the relay; error mode that sends malformed, wrong-typed and oversized bytes |
+| `test-host-calls` (1.1) | Buttons for `files.save`, `chat.post-image` and `files.import-picture` with small, oversized and invalid inputs, with and without gesture and permission |
 | `test-api10` (built with SDK 1.0, binary kept) and `test-versions` (versions 1.0.0 api 1.0 and 2.0.0 api 1.1) | Backwards compatibility and version choice |
 | `test-score-low` / `-medium` / `-high`, `test-growth` 1.0 → 1.1 (adds `ui.webview`, `peers.relay`) | Score bands and update hold |
 | `test-stop-http`, `-ip`, `-wildcard`, `-userinfo`, `-private` | Hard stops |
@@ -514,8 +532,14 @@ Setup for all unless stated otherwise: section 10.2. Never a public server.
 42. **AC-9.42** `test-bovnar` error mode: A sends malformed, truncated, wrong-typed, too deeply nested and above-limit bytes → B's SDK reports `malformed`, `wrong-type` or `too-large`, the plugin keeps running, nothing crashes or hangs, the host passes the valid message sent right after, and logs contain reasons and sizes only, never payload content. Over-limit sends are refused on the sender before leaving the machine.
 43. **AC-9.43** The host does not parse plugin data: `test-api10` (SDK 1.0, raw bytes) still exchanges its messages unchanged between two 0.7.0 clients.
 44. **AC-9.44** 0.6.2 and 0.7.0 clients in one channel: chat, history sync, polls, dice and p2p keep working (E2E with the old build); no Bovnar document appears on any existing channel.
-45. **AC-9.45** Settings export written by 0.7.0 contains a Bovnar document and imports again with equal settings; an export file from 0.6.x (JSON) imports; a truncated or oversized file is refused with a message and changes nothing; the diagnostic report is written as Bovnar and contains no chat contents or personal data.
-46. **AC-9.46** (docs/release check) The plugin author guide has the Bovnar section with a working example; the build uses the pinned Bovnar commit; the licences window lists Bovnar; the SDK documentation states the crates.io limitation.
+45. **AC-9.45** The diagnostic report written by 0.7.0 is a Bovnar document, opens again in the report viewer, and contains no chat contents or personal data; a report written as JSON still opens; a truncated or oversized file is refused with a message and nothing crashes. No settings export exists in the app.
+46. **AC-9.46** (docs/release check) The plugin author guide has the Bovnar section with a working example; the build uses the pinned Bovnar commit of the fork branch `rust-binding`; the docs state the build requirements (C compiler, Python 3, and wasi-sdk with `WASI_SDK_PATH` for plugin wasm builds); the licences window lists Bovnar; the SDK documentation states the crates.io limitation.
+
+**Host calls for Whiteboard (W1x, #397)**
+47. **AC-9.47** `test-host-calls` with `files.save`: a click calls `save` with a small file → the Mumcord save dialog opens, the chosen file contains exactly the bytes; Cancel returns `false` and writes nothing; the plugin never receives a path; a call without a fresh gesture or without the permission returns `not-permitted`, an empty name or oversized data `invalid` or `too-large`, and no dialog opens.
+48. **AC-9.48** `test-host-calls` with `chat.post-image`: a click posts a small PNG → A and B both see it as a normal chat image (B on 0.7.0 and the packet inspector show the normal image path); a PNG above the server's image limit is offered through file sharing instead and the result says `file-offer`; bytes that are not a PNG return `invalid`; a second call for the same gesture, no gesture or no permission returns `not-permitted`; not connected returns `no-recipients`. Official Mumble clients see the plain text line only.
+49. **AC-9.49** `test-host-calls` with `files.import-picture`: a click opens the Mumcord picker; picking a PNG, JPEG or WebP up to 10 MB returns its bytes and file name only (no path); Cancel returns `none`; a file of another type or above the limit is refused with the message in section 5.5 and returns `invalid` or `too-large`.
+50. **AC-9.50** The three calls appear in the install prompt only as their permissions ("Save files you choose", "Post an image in chat after you click", "Open pictures you choose"); a plugin built for API 1.0 or 1.1 without them keeps working; the 1.1 WIT snapshot test shows the additions as additive only (no changed or removed 1.0 item); logs contain names and sizes only, never file or image content.
 
 Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.17, 9.36, 9.18, 9.19, 9.20, 9.39; #395 AC 14 → replaced by AC-9.25 (section 12); #393 AC 1–11 → AC-9.31, 9.32, 9.32, 9.33, 9.9, 9.34, 9.35, 9.36, 9.37, 9.39, 9.38; #396 AC → AC-9.25 … AC-9.30.
 
@@ -558,8 +582,9 @@ Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.1
 | #396 index path | `https://mumcord.github.io/plugins/v1.1/index.json`, format 2 | Decided in this spec |
 | #396 backwards compatibility | Minors only add; frozen snapshots; exact-minor linking; aliases for renames; removal only in 2.0; previous major supported for two releases (FR-6.13, stricter than "at least one") | User comment 2026-11-03 |
 | Testing rule | Mumcord e2e covers the platform only with dedicated test plugins; Skyloom (#394), Whiteboard (#397) and other official plugins have their own E2E in the plugins repo | Lead instruction for this spec |
-| Bovnar for plugin data and exports (#400) | Plugin peer data (Mumble plugin data and `peers.relay`) carries Bovnar documents with SDK helpers; the SDK validates on receive, the host enforces only size limits; settings export/backup and the diagnostic report are written as Bovnar and read as Bovnar or JSON. Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. Existing data packages do not switch in 0.7.0 (#401) and the dropped 0.7.0 "foundation" (hello capability, dual read) is not part of this release. | user, 2026-11-03; FR-9.93 … FR-9.102, AC-9.41 … AC-9.46 |
-| Bovnar git dependency (#400) | Pinned git dependency on the fork Mumcord/bovnar (`publish = false`); `mumcord-plugin-sdk` can't go to crates.io while it has it | user, 2026-11-03; FR-9.99; decide at the next SDK release |
+| Bovnar for plugin data and exports (#400) | Plugin peer data (Mumble plugin data and `peers.relay`) carries Bovnar documents with SDK helpers; the SDK validates on receive, the host enforces only size limits; the diagnostic report is written as Bovnar and read as Bovnar or JSON (there is no settings export). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. Existing data packages do not switch in 0.7.0 (#401) and the dropped 0.7.0 "foundation" (hello capability, dual read) is not part of this release. | user, 2026-11-03; FR-9.93 … FR-9.102, AC-9.41 … AC-9.46 |
+| Bovnar git dependency (#400) | Thin Rust wrapper around the upstream C library, fork Mumcord/bovnar branch `rust-binding`, pinned git dependency (`publish = false`), every unit profile ON; needs a C compiler and Python 3 to build, wasi-sdk (`WASI_SDK_PATH`) for plugin wasm builds; `mumcord-plugin-sdk` can't go to crates.io while it has it | user, 2026-11-03; FR-9.99; decide at the next SDK release |
+| Whiteboard host calls (W1x) | Three additive host-owned calls join WIT 1.1 before it freezes: `files.save` (system save dialog), `chat.post-image` (PNG through the normal chat image path, file-sharing fallback when too large) and `files.import-picture` (picker). Each needs a user gesture and its own permission; the plugin gets bytes in and out, never a path and never the chat itself. They are not postponed to WIT 1.2. | Needed by #397 Whiteboard export to chat (lead decision, 2026-11-03); FR-9.103 … FR-9.108, AC-9.47 … AC-9.50 |
 
 ## 13. Open points & risks
 
@@ -580,7 +605,7 @@ Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.1
 - **Official plugins** Skyloom (#394) and Whiteboard (#397) can start once W1 (WIT 1.1 + SDK) is merged; their E2E lives in the plugins repo and runs against the current and previous Mumcord release.
 - **Spec 07/08**: the media area gains the stage switcher for all kinds; camera strip rules unchanged.
 - **Mumcord/mumpeer** minor release (`plugin_data`, limits, profiles); **Mumcord/mumbot** release (`plg`); **mumcord-p2p** version bump (crates.io only with the user's OK).
-- **Later**: Whiteboard host calls (save file, post image, import picture) as WIT 1.2; pointer lock; verified reproducible builds; `ws://localhost` for developers.
+- **Later**: pointer lock; verified reproducible builds; `ws://localhost` for developers.
 
 ## 15. Implementation split
 
