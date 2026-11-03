@@ -21,9 +21,9 @@
 # generator) on the dynamic C runtime, like Rust's MSVC target.
 set -euo pipefail
 
-# The oldest NVENC API with AV1, so older NVIDIA drivers keep working (SDK 12.1 needs driver
-# 531.61 on Windows, 530.41 on Linux).
-NV_CODEC_HEADERS_VERSION=12.1.14.0
+# The oldest NVENC API with AV1 temporal layers (SDK 13.0, driver 570 or newer). With an older
+# driver NVENC reports itself unavailable and screen sharing falls back to the software encoders.
+NV_CODEC_HEADERS_VERSION=13.0.19.0
 AMF_VERSION=1.5.3
 LIBVPL_VERSION=2.17.0
 # VA-API 1.22. Headers only: the code checks the runtime's version before using newer calls.

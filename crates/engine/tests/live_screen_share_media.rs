@@ -404,8 +404,8 @@ async fn screen_share_media_reaches_every_viewer() {
         stats.fps,
         stats.kbps
     );
-    assert_eq!((stats.width, stats.height), (854, 480));
-    assert_eq!(size, (854, 480));
+    assert_eq!((stats.width, stats.height), (848, 480));
+    assert_eq!(size, (848, 480));
 
     // ... and back up once the upload recovers.
     alice
