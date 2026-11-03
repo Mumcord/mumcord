@@ -82,6 +82,12 @@ fn new_build_reproducibly_check_and_sign() {
     );
 
     let package = project.join("dist/wave-demo-0.1.0.mcplugin");
+    let archive = std::fs::File::open(&package).expect("test step");
+    let mut archive = zip::ZipArchive::new(archive).expect("zip");
+    let manifest: serde_json::Value =
+        serde_json::from_reader(archive.by_name("manifest.json").expect("manifest")).expect("json");
+    let api = manifest["api"].as_str().expect("build writes api");
+    assert!(api.starts_with("^1."), "{api}");
     let package = package.to_str().expect("utf-8");
     assert!(cli(work.path(), &["check", package]).contains(&first));
 

@@ -13,6 +13,7 @@
 - Dropping images into a channel asks whether to send them as images or share them as files; other files are shared at once. Private chats keep sending dropped images inline.
 - Files shared in a channel show up as a file card with name, size, type and checksum. Every download asks first, programs and scripts get an extra warning before download and before opening, and the card shows the queue position, progress, the check that the file arrived unchanged, and Open / Open folder. Your own shared files show who downloaded them and a Stop sharing button (with a clear message if stopping fails)
 - Plugins that talk to websites can only reach the websites they declared, on the exact address and port, and only at public internet addresses with a valid certificate; anything else is blocked, and each plugin's requests and blocked attempts are counted per day
+- Plugin authors: `mumcord-plugin build` writes the manifest's `api` from the plugin API the plugin is built with and packs a `sounds/` folder; `mumcord-plugin check` fails when `api` doesn't match the plugin's imports and warns about a deprecated API
 
 ### Fixed
 
