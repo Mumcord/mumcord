@@ -1,9 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { InstallProgress } from "../prompt/InstallProgress";
 import type { IndexedPlugin } from "../../../api";
+import type { PluginScored } from "../../../bindings/commands";
 import { isPermissionId, PERMISSION_RISK, permissionTextKey } from "../permissions/catalogue";
+import { ScoreBreakdown, ScoreChip, ScoreMeter, type ScoreFacts } from "../score";
 import { formatSize } from "../updates/formatSize";
+import { usePluginScore } from "./usePluginScore";
 import { PluginIcon } from "./PluginIcon";
 import { sourceLabel } from "./source";
 import { useIndexImage } from "./useIndexImage";
@@ -25,7 +28,14 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
   useEffect(() => {
     heading.current?.focus();
   }, [plugin.id]);
+  const { t: tOrigins } = useTranslation("pluginOrigins");
   const name = plugin.name;
+  const scored = usePluginScore(
+    plugin.id,
+    plugin.version,
+    "listing",
+    plugin.source.kind === "official",
+  );
 
   const official = plugin.source.kind === "official";
   const repository = plugin.source.kind === "repo" ? plugin.source.name : null;
@@ -60,6 +70,7 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
                   : t("official")
                 : sourceLabel(t, plugin.source)}
             </span>
+            {scored !== null && scored.kind !== "official" && <ScoreChip scored={scored} />}
           </div>
           <p className="pd-meta">{meta.join(" · ")}</p>
           <p className="pd-summary">{plugin.summary}</p>
@@ -98,6 +109,15 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
           </div>
         </div>
       )}
+      <PluginScoreCard
+        name={name}
+        scored={scored}
+        official={official}
+        facts={{
+          websites: plugin.origins.length,
+          ...(plugin.size !== null ? { packageSize: formatSize(plugin.size, i18n.language) } : {}),
+        }}
+      />
       <div className="pd-columns">
         {plugin.permissions.length > 0 && (
           <section className="pd-card" aria-labelledby="pd-can-do">
@@ -156,6 +176,25 @@ export function PluginDetails({ plugin, installed, onBack, onInstall }: PluginDe
           )}
         </div>
       </div>
+      <div className="pd-surfaces">
+        {plugin.origins.length > 0 && (
+          <DetailSection title={tOrigins("details.title")}>
+            <p className="pd-hint">{tOrigins("intro", { plugin: name })}</p>
+            <ul className="ps-origins" aria-label={tOrigins("listLabel")}>
+              {plugin.origins.map((origin) => (
+                <li key={origin} className="ps-origin">
+                  <code>{origin}</code>
+                </li>
+              ))}
+            </ul>
+          </DetailSection>
+        )}
+        <PluginPlaces permissions={plugin.permissions} />
+        <OwnCode
+          permissions={plugin.permissions}
+          relay={plugin.permissions.includes(RELAY) ? <>{tOrigins("details.relayAsks")}</> : null}
+        />
+      </div>
     </article>
   );
 }
@@ -202,5 +241,165 @@ function PermissionPreview({ ids }: { ids: readonly string[] }) {
         );
       })}
     </ul>
+  );
+}
+
+const RELAY = "peers.relay";
+const WEBVIEW = "ui.webview";
+
+/** The places a plugin can show something, in the order of the mockup. */
+const PLACES: readonly { permission: string; key: string }[] = [
+  { permission: "ui.stage", key: "stage" },
+  { permission: "ui.side-panel", key: "side-panel" },
+  { permission: "ui.dialog", key: "dialog" },
+  { permission: "ui.panel", key: "panel" },
+  { permission: "ui.app-menu", key: "appMenu" },
+  { permission: "ui.chat-card", key: "chat" },
+];
+
+/** A titled block of the details page; shared by Browse and Installed. */
+export function DetailSection({ title, children }: { title: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <section className="pd-section" aria-labelledby={id}>
+      <h4 id={id} className="pd-card-title">
+        {title}
+      </h4>
+      {children}
+    </section>
+  );
+}
+
+/** "Where it shows" (FR-9.30): one chip per surface the plugin's permissions give it. */
+export function PluginPlaces({ permissions }: { permissions: readonly string[] }) {
+  const { t } = useTranslation("pluginOrigins");
+  const places = PLACES.filter((place) => permissions.includes(place.permission));
+  if (places.length === 0) return null;
+  return (
+    <DetailSection title={t("details.wherePlace")}>
+      <ul className="ps-places">
+        {places.map((place) => (
+          <li key={place.key} className="ps-chip">
+            {place.key === "appMenu" ? t("details.tags.appMenu") : t(`details.places.${place.key}`)}
+          </li>
+        ))}
+      </ul>
+    </DetailSection>
+  );
+}
+
+/**
+ * "Own code" and "Relay data": what the sealed page can and cannot touch. The row only appears for
+ * a plugin that has its own web page or asks for the relay.
+ */
+export function OwnCode({
+  permissions,
+  relay,
+}: {
+  permissions: readonly string[];
+  /** The content of the "Relay data" row; `null` leaves the row out. */
+  relay: ReactNode;
+}) {
+  const { t } = useTranslation("pluginOrigins");
+  const webview = permissions.includes(WEBVIEW);
+  if (!webview && relay === null) return null;
+  return (
+    <DetailSection title={t("details.ownCode")}>
+      <dl className="ps-facts">
+        {webview && (
+          <>
+            <dt>{t("details.sealedPage")}</dt>
+            <dd>{t("details.sealedPageTextNoSize", { entry: "web/index.html" })}</dd>
+          </>
+        )}
+        {relay !== null && (
+          <>
+            <dt>{t("details.relayData")}</dt>
+            <dd>{relay}</dd>
+          </>
+        )}
+      </dl>
+    </DetailSection>
+  );
+}
+
+export interface PluginScoreCardProps {
+  name: string;
+  /** From `usePluginScore`; `null` draws nothing. */
+  scored: PluginScored | null;
+  /** Official plugins show the review instead of a number (mockup 06). */
+  official: boolean;
+  /** Developer plugins are scored for information only. */
+  developer?: boolean;
+  facts?: ScoreFacts;
+}
+
+/** The score card of the details page (score mockups 02 and 06); the engine does all the maths. */
+export function PluginScoreCard({
+  name,
+  scored,
+  official,
+  developer = false,
+  facts,
+}: PluginScoreCardProps) {
+  const { t } = useTranslation("pluginScore");
+  const { t: tOrigins } = useTranslation("pluginOrigins");
+  const titleId = useId();
+
+  if (official) {
+    return (
+      <section className="pd-score" data-level="official" aria-labelledby={titleId}>
+        <h4 id={titleId} className="pd-card-title">
+          {tOrigins("details.securityTitle")}
+        </h4>
+        <div className="pd-score-official">
+          <ScoreChip scored={{ kind: "official" }} size="md" />
+          <p className="pd-score-lead">{t("officialNoScore")}</p>
+        </div>
+      </section>
+    );
+  }
+  if (scored === null) return null;
+  if (scored.kind !== "scored") {
+    return (
+      <section className="pd-score" data-level="high" aria-labelledby={titleId}>
+        <h4 id={titleId} className="pd-card-title">
+          {t("title")}
+        </h4>
+        <ScoreChip scored={scored} size="md" />
+      </section>
+    );
+  }
+  const { value, band } = scored.score;
+  return (
+    <section className="pd-score" data-level={band} aria-labelledby={titleId}>
+      <h4 id={titleId} className="pd-card-title">
+        {t("title")}
+      </h4>
+      <div className="pd-score-top">
+        <div className="pd-score-big" aria-hidden="true">
+          <span className="pd-score-num">{value}</span>
+          <span className="pd-score-of">{t("outOf")}</span>
+        </div>
+        <div className="pd-score-gauge">
+          <ScoreChip scored={scored} developer={developer} size="md" />
+          <ScoreMeter value={value} band={band} />
+        </div>
+        <p className="pd-score-lead">
+          <strong>{t("higherMeansMore")}</strong> {t("explain")}
+        </p>
+      </div>
+      {developer && <p className="pd-score-note">{t("developerNote")}</p>}
+      <p className="pd-score-note">
+        <span aria-hidden="true">ⓘ</span>
+        <span>{t("honesty")}</span>
+      </p>
+      <ScoreBreakdown
+        score={scored.score}
+        pluginName={name}
+        {...(facts !== undefined ? { facts } : {})}
+        collapsible
+      />
+    </section>
   );
 }
