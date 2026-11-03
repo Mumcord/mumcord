@@ -236,8 +236,16 @@
             "type": "object",
             "required": ["origin", "purpose"],
             "properties": {
-              "origin": { "type": "string", "maxLength": 256, "description": "For example https://api.example." },
-              "purpose": { "type": "string", "maxLength": 64, "description": "Translation key of the reason shown next to the origin." }
+              "origin": {
+                "type": "string",
+                "maxLength": 256,
+                "description": "For example https://api.example."
+              },
+              "purpose": {
+                "type": "string",
+                "maxLength": 64,
+                "description": "Translation key of the reason shown next to the origin."
+              }
             }
           }
         }

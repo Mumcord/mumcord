@@ -26,6 +26,12 @@ export const PERMISSION_RISK = {
   "net.http": "red",
   secrets: "red",
   "ui.webview": "yellow",
+  "ui.stage": "green",
+  "ui.side-panel": "green",
+  "ui.app-menu": "green",
+  "net.origins": "red",
+  "peers.relay": "yellow",
+  "audio.effects": "green",
 } as const satisfies Record<string, PermissionRisk>;
 
 export type PermissionId = keyof typeof PERMISSION_RISK;
