@@ -261,9 +261,19 @@ describe("resizable media area (#386)", () => {
       timeout: 5_000,
       timeoutMsg: "no full screen",
     });
-    expect(await handle().isExisting()).toBe(false);
+    // Queried in the page: the handle leaves while WebDriver looks, which makes a stale element.
+    const handleGone = () =>
+      browser.execute(() => document.querySelector("[aria-label='Resize media area']") === null);
+    await browser.waitUntil(handleGone, { timeout: 5_000, timeoutMsg: "handle in full screen" });
     await browser.keys("Escape");
-    await handle().waitForDisplayed({ timeout: 5_000 });
+    await browser.waitUntil(async () => browser.execute(() => document.fullscreenElement === null), {
+      timeout: 5_000,
+      timeoutMsg: "full screen did not end",
+    });
+    await browser.waitUntil(async () => !(await handleGone()), {
+      timeout: 5_000,
+      timeoutMsg: "no handle after full screen",
+    });
     expect(await value()).toBe(chosen);
   });
 
