@@ -1,6 +1,7 @@
-// A second Mumcord client ("B") next to the wdio session of every spec ("A"), for criteria that
-// need two Mumcord users (plugin messaging, blocking, ...). B is its own app process with its own
-// profile, keyring and WebDriver session; see e2e/README.md "Two clients".
+// A second and third Mumcord client ("B", "C") next to the wdio session of every spec ("A"), for
+// criteria that need two or three Mumcord users (plugin messaging, blocking, file sharing, ...).
+// Each is its own app process with its own profile, keyring and WebDriver session; see
+// e2e/README.md "Two clients".
 import { remote } from "webdriverio";
 import {
   applyLaunchOptions,
@@ -9,90 +10,113 @@ import {
   startDriver,
   stopDriver,
   withTimeout,
+  type AppId,
   type LaunchOptions,
 } from "./app.ts";
 import { shared } from "./state.ts";
 
-const b = instance("b");
+/** Start, restart, stop and the WebDriver session of one extra client (B or C). */
+function extraClient(id: Exclude<AppId, "a">) {
+  const label = id.toUpperCase();
+  // Looked up on every use: prepareFresh() gives each spec file new instance objects.
+  const inst = (): ReturnType<typeof instance> => instance(id);
+  const session = shared(`app${label}`, { browser: undefined as WebdriverIO.Browser | undefined });
 
-const session = shared("appB", { browser: undefined as WebdriverIO.Browser | undefined });
+  function browserOf(): WebdriverIO.Browser {
+    if (!session.browser)
+      throw new Error(`instance ${label} is not running (call start${label} first)`);
+    return session.browser;
+  }
 
-/** The WebDriver session of instance B; throws when B is not running. */
-export function browserB(): WebdriverIO.Browser {
-  if (!session.browser) throw new Error("instance B is not running (call startB first)");
-  return session.browser;
-}
-
-/** Whether instance B has a session (for the failure artifacts in wdio.conf.ts). */
-export function runningB(): boolean {
-  return session.browser !== undefined;
-}
-
-async function openSession(): Promise<void> {
-  await startDriver(b);
-  session.browser = await withTimeout(
-    remote({
-      hostname: "127.0.0.1",
-      port: b.port,
-      capabilities: capabilities(b),
-      logLevel: "warn",
-      waitforTimeout: 15_000,
-      connectionRetryTimeout: 120_000,
-      connectionRetryCount: 1,
-    }),
-    60_000,
-    "instance B: new session (app did not start)",
-  );
-}
-
-async function closeSession(): Promise<void> {
-  const current = session.browser;
-  session.browser = undefined;
-  if (current) {
-    // A broken session (an earlier test failed or timed out) must not stop the cleanup.
-    await withTimeout(current.deleteSession(), 15_000, "instance B: deleteSession").catch(
-      (e: unknown) => {
-        console.warn(`[e2e] ending the session of instance B failed: ${String(e)}`);
-      },
+  async function openSession(): Promise<void> {
+    await startDriver(inst());
+    session.browser = await withTimeout(
+      remote({
+        hostname: "127.0.0.1",
+        port: inst().port,
+        capabilities: capabilities(inst()),
+        logLevel: "warn",
+        waitforTimeout: 15_000,
+        connectionRetryTimeout: 120_000,
+        connectionRetryCount: 1,
+      }),
+      60_000,
+      `instance ${label}: new session (app did not start)`,
     );
   }
-  await stopDriver(b);
+
+  async function closeSession(): Promise<void> {
+    const current = session.browser;
+    session.browser = undefined;
+    if (current) {
+      // A broken session (an earlier test failed or timed out) must not stop the cleanup.
+      await withTimeout(current.deleteSession(), 15_000, `instance ${label}: deleteSession`).catch(
+        (e: unknown) => {
+          console.warn(`[e2e] ending the session of instance ${label} failed: ${String(e)}`);
+        },
+      );
+    }
+    await stopDriver(inst());
+  }
+
+  return {
+    browser: browserOf,
+    running: (): boolean => session.browser !== undefined,
+    start: async (opts: LaunchOptions = {}): Promise<void> => {
+      if (session.browser) throw new Error(`instance ${label} is already running`);
+      await applyLaunchOptions(inst(), { ...opts, freshProfile: opts.freshProfile ?? true });
+      await openSession();
+    },
+    restart: async (opts: LaunchOptions = {}): Promise<void> => {
+      await closeSession();
+      await applyLaunchOptions(inst(), opts);
+      await openSession();
+    },
+    stop: async (): Promise<void> => {
+      if (!session.browser && !inst().driver) return;
+      await closeSession();
+    },
+  };
 }
+
+const clientB = extraClient("b");
+const clientC = extraClient("c");
+
+/** The WebDriver session of instance B; throws when B is not running. */
+export const browserB = clientB.browser;
+/** The WebDriver session of instance C; throws when C is not running. */
+export const browserC = clientC.browser;
+
+/** Whether instance B has a session (for the failure artifacts in wdio.conf.ts). */
+export const runningB = clientB.running;
+/** Whether instance C has a session (for the failure artifacts in wdio.conf.ts). */
+export const runningC = clientC.running;
 
 /**
  * Starts instance B. It starts with a fresh profile (new identity, empty keyring) unless
  * `freshProfile: false` is given and B ran before in this spec file. Other options like
  * `restart` in app.ts.
  */
-export async function startB(opts: LaunchOptions = {}): Promise<void> {
-  if (session.browser) throw new Error("instance B is already running");
-  await applyLaunchOptions(b, { ...opts, freshProfile: opts.freshProfile ?? true });
-  await openSession();
-}
+export const startB = clientB.start;
+/** Starts instance C like `startB`; use it for specs with three Mumcord users. */
+export const startC = clientC.start;
 
 /** Quits app B and starts it again; keeps its profile (and identity) by default. */
-export async function restartB(opts: LaunchOptions = {}): Promise<void> {
-  await closeSession();
-  await applyLaunchOptions(b, opts);
-  await openSession();
-}
+export const restartB = clientB.restart;
+/** Quits app C and starts it again; keeps its profile (and identity) by default. */
+export const restartC = clientC.restart;
 
 /** Quits app B (no-op when it is not running). */
-export async function stopB(): Promise<void> {
-  if (!session.browser && !b.driver) return;
-  await closeSession();
-}
-
-let insideB = false;
+export const stopB = clientB.stop;
+/** Quits app C (no-op when it is not running). */
+export const stopC = clientC.stop;
 
 /**
- * Runs `fn` with the wdio globals (`browser`, `driver`, `$`, `$$`) pointed at instance B, so every
- * UI helper written for the normal session drives B. A and B steps must stay sequential: never
- * put an `onB` call and A commands into one `Promise.all`.
+ * Runs `fn` with the wdio globals (`browser`, `driver`, `$`, `$$`) pointed at `target`, so every
+ * UI helper written for the normal session drives that client. Nested calls restore the outer
+ * target on the way out.
  */
-export async function onB<T>(fn: () => Promise<T>): Promise<T> {
-  if (insideB) return fn();
-  const target = browserB();
+async function onClient<T>(target: WebdriverIO.Browser, fn: () => Promise<T>): Promise<T> {
   // @wdio/globals resolves its exports from this map on every access (see its proxyHandler).
   const globals = (globalThis as unknown as { _wdioGlobals: Map<string, unknown> })._wdioGlobals;
   const saved = new Map(["browser", "driver", "$", "$$"].map((k) => [k, globals.get(k)]));
@@ -100,14 +124,20 @@ export async function onB<T>(fn: () => Promise<T>): Promise<T> {
   globals.set("driver", target);
   globals.set("$", target.$.bind(target));
   globals.set("$$", target.$$.bind(target));
-  insideB = true;
   try {
     return await fn();
   } finally {
-    insideB = false;
     for (const [k, v] of saved) globals.set(k, v);
   }
 }
+
+/**
+ * Runs `fn` against instance B. A, B and C steps must stay sequential: never put an `onB`/`onC`
+ * call and commands of another client into one `Promise.all`.
+ */
+export const onB = <T>(fn: () => Promise<T>): Promise<T> => onClient(clientB.browser(), fn);
+/** Runs `fn` against instance C; same rules as `onB`. */
+export const onC = <T>(fn: () => Promise<T>): Promise<T> => onClient(clientC.browser(), fn);
 
 /** Test settings for the plugin system, turned into app environment by `pluginEnv`. */
 export interface PluginTestEnv {

@@ -5,10 +5,17 @@
  */
 import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type RelayInfo } from "../../api";
+import { getApi, type RelayInfo, type RelayUse } from "../../api";
 import { relayReasonText } from "./relayReason";
 import { useRelayInfo } from "./useRelayInfo";
 import "./p2p.css";
+
+const USE_KEY: Record<RelayUse, "images" | "files" | "screen"> = {
+  images: "images",
+  files: "files",
+  screenShare: "screen",
+};
+const USE_ORDER: RelayUse[] = ["images", "files", "screenShare"];
 
 export type RelayAction = "trustNew" | "keepBlocked" | "forget";
 
@@ -49,7 +56,12 @@ export function RelayRowsView({
   Row: RowComponent;
 }) {
   const { t } = useTranslation("p2p");
+  const { t: tServers } = useTranslation("servers");
   const { status } = info;
+  // Only a usable relay has uses worth listing (FR-7.7).
+  const allowed = USE_ORDER.filter((use) => info.uses.includes(use))
+    .map((use) => tServers(`relayAllows.${USE_KEY[use]}`))
+    .join(" · ");
   const bots =
     info.bots.length > 0 ? t("relay.yesNamed", { names: info.bots.join(", ") }) : t("relay.no");
   // A pin exists once a relay was accepted; a changed relay offers its own choices instead.
@@ -109,6 +121,9 @@ export function RelayRowsView({
           </span>
         )}
       </Row>
+      {status.kind === "available" && allowed !== "" && (
+        <Row label={tServers("relayAllows.label")}>{allowed}</Row>
+      )}
     </>
   );
 }

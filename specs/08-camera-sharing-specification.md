@@ -205,6 +205,10 @@ The client only displays availability; the bot and relay decide who may create o
 - **FR-8.89** Admission and channel checks as for screen shares (MB2); camera admits are counted in their own rate-limit bucket that allows a burst of 24 admits (a sender admits everyone in the channel at once) and 60 per minute per session.
 - **FR-8.90** Errors and limits are logged without names, certificate hashes in full or IP addresses (spec 04 logging rules).
 
+### 4.13 Signalling format (Bovnar, #400)
+
+- **FR-8.91** The `mumcord.camera` messages (`on`, `off`, `cam-join`, `cam-leave`) are **Bovnar documents** (user decision 2026-11-03), written and read with the Rust Bovnar implementation from the fork `Mumcord/bovnar`, a git dependency pinned to a commit (spec 09 FR-9.99). The channel is new in 0.7.0, so no older client has to read it. The decoder rejects malformed, truncated, wrong-typed or oversized documents without a crash or hang and logs one line without payload content. The other camera-related messages keep their formats: `mumcord.peer` (`relay`, `bcast-req`, `bcast-err`), broadcast control and the allowlist API stay JSON/binary, because 0.6.2 and mumbot read them and one channel never mixes formats.
+
 ## 5. UI & UX
 
 ### 5.1 Navigation
@@ -399,7 +403,7 @@ stateDiagram-v2
 | `bcast-req` | sender → bot | + `k` = `scr` \| `cam` (missing = `scr`) | One broadcast per session and kind |
 | `bcast-err` | bot → requester | + `r = "room-full"` | Only for `k = cam` |
 
-**`mumcord.camera` (new plugin data id, Mumcord users in the same channel only)**, JSON, each ≤ 512 bytes, size-checked before parsing:
+**`mumcord.camera` (new plugin data id, Mumcord users in the same channel only)**, **Bovnar documents** (FR-8.91), each ≤ 512 bytes, size-checked before decoding; field names as below, types are Bovnar types (unsigned integers, strings):
 
 | `t` | Direction | Fields | Rules |
 |---|---|---|---|
@@ -553,6 +557,11 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 - **AC-8.27** Visual quality: blur and image edges follow hair and shoulders without visible flicker or halo with a real person, compared side by side with a Meet or Teams call (subjective sign-off by the user).
 - **AC-8.28** Effects ≤ 8 ms median per 720p frame on the 2020 reference laptop (part of AC-C17).
 
+**Signalling format (Bovnar, #400)**
+25. **AC-8.25** A turns the camera on in a channel with B (both 0.7.0): the packet inspector shows `mumcord.camera` `on` and `cam-join` as Bovnar documents with the fields of §6.5; the camera room works as in the other ACs.
+26. **AC-8.26** Test CLI sends B a truncated Bovnar document, a document with a wrong field type, a JSON document and an oversized (> 512 bytes) payload on `mumcord.camera` → all are ignored, nothing crashes or hangs, the log has one line each without payload content, and B's camera state is unchanged.
+27. **AC-8.27** A 0.6.2 client in the channel sees no camera and no error; chat, history sync and polls between all clients keep working.
+
 ## 12. Decision log
 
 | Question | Decision | Note |
@@ -578,6 +587,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Effect quality "Best (graphics card)" | Mockup label kept; Best = Selfie Multiclass on the graphics card where the CA0 runtime supports it, otherwise on the CPU with the label "Best" | Mockups are binding; GPU support depends on CA0 (open point Q-CA1) |
 | Mockups vs. issue text | Mockups win (Send quality options Auto / 720p · 15 fps / 360p · 30 fps; room bar buttons; tile menu wording) | Same rule as spec 07 (user decision 2026-11-02) |
 | Pure client | Works against an unmodified Mumble server; mumpeer and mumbot are the user's own projects and are extended | Project rule |
+| Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (Rust implementation from the fork Mumcord/bovnar, pinned git dependency). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
 
 ## 13. Open points & risks
 

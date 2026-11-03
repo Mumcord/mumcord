@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { browser } from "@wdio/globals";
 import { capabilities, driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
-import { browserB, runningB, stopB } from "./helpers/apps.ts";
+import { browserB, browserC, runningB, runningC, stopB, stopC } from "./helpers/apps.ts";
 import { netsim } from "./helpers/index.ts";
 import { artifactsDir } from "./helpers/paths.ts";
 
@@ -68,6 +68,7 @@ export const config: WebdriverIO.Config = {
     // connectionRetryTimeout.
     const sessions: [string, WebdriverIO.Browser][] = [[name, browser]];
     if (runningB()) sessions.push([`${name}-B`, browserB()]);
+    if (runningC()) sessions.push([`${name}-C`, browserC()]);
     for (const [file, session] of sessions) {
       try {
         await withTimeout(
@@ -86,7 +87,10 @@ export const config: WebdriverIO.Config = {
   },
 
   afterSession: async () => {
-    // Instance A must be stopped even when B's cleanup fails.
+    // Instance A must be stopped even when B's or C's cleanup fails.
+    await stopC().catch((e: unknown) => {
+      console.warn(`[e2e] stopping instance C failed: ${String(e)}`);
+    });
     await stopB().catch((e: unknown) => {
       console.warn(`[e2e] stopping instance B failed: ${String(e)}`);
     });
