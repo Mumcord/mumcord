@@ -55,6 +55,8 @@ else
     echo "building the test plugin $(basename "$dir")" >&2
     "$cli" build "$dir" --out "$work/built" >&2
   done
+  # They are served as official plugins, so they must pass the client's official-package rules.
+  for f in "$work"/built/*.mcplugin; do "$cli" check --official "$f" >&2; done
   cp "$work"/built/*.mcplugin "$work/staged/"
 fi
 
