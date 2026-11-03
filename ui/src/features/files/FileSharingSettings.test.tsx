@@ -39,9 +39,14 @@ describe("FileSharingSettings", () => {
     pick.mockResolvedValueOnce("/data/in");
     const update = await renderCard();
     await waitFor(() => {
-      expect(screen.getByLabelText("Save files to")).toHaveValue("~/Downloads/Mumcord");
+      expect(
+        screen.getByRole("button", {
+          name: "Save files to Change…",
+          description: "~/Downloads/Mumcord",
+        }),
+      ).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByRole("button", { name: "Change…" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save files to Change…" }));
     await waitFor(() => {
       expect(update).toHaveBeenCalledWith({ filesSaveFolder: "/data/in" });
     });

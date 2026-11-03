@@ -79,25 +79,22 @@ export function FileSharingSettings({ settings, update }: SettingsSectionProps) 
         />
       </div>
       <p className="settings-hint">{t("settings.maxSizeHint")}</p>
-      <label className="settings-field" htmlFor="files-save-folder">
-        {t("settings.saveTo")}
-      </label>
-      <div className="settings-field-row files-save-row">
-        <input
-          id="files-save-folder"
-          className="settings-input"
-          type="text"
-          readOnly
-          value={folder}
-        />
+      <div className="settings-control-row files-save-row">
+        <span id="files-save-label">{t("settings.saveTo")}</span>
+        {/* The folder is text, not a field: only the system picker changes it. */}
+        <span className="files-save-row__path" id="files-save-folder" title={folder}>
+          {folder}
+        </span>
         <button
           type="button"
           className="settings-button"
+          aria-labelledby="files-save-label files-save-change"
+          aria-describedby="files-save-folder"
           onClick={() => {
             void change();
           }}
         >
-          {t("settings.change")}
+          <span id="files-save-change">{t("settings.change")}</span>
         </button>
       </div>
       <p className="settings-hint files-relay-note">

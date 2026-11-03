@@ -1135,3 +1135,14 @@
   display: flex;
   gap: var(--space-2);
 }
+
+/* The file sharing save folder: the path shrinks with an ellipsis before the Change button. */
+.files-save-row__path {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: end;
+  color: var(--color-text-secondary);
+}
