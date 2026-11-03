@@ -1120,3 +1120,18 @@
 .preset-dialog {
   width: min(56rem, calc(100vw - 2 * var(--space-5)));
 }
+
+/* File sharing: the folder field takes the row, the button sits beside it. */
+.files-save-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.files-save-row .settings-input {
+  flex: 1 1 auto;
+}
+
+.files-relay-note {
+  display: flex;
+  gap: var(--space-2);
+}
