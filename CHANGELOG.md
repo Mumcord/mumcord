@@ -11,6 +11,7 @@
 - The message input has a paperclip button and accepts dropped files and folders in channels: each becomes a chip with its size or progress and a remove button. The paperclip says why it is unavailable when the server has no relay, the relay doesn't allow files, you have no certificate, or your peer-to-peer setting needs the relay.
 - Dropping images into a channel asks whether to send them as images or share them as files; other files are shared at once. Private chats keep sending dropped images inline.
 - Files shared in a channel show up as a file card with name, size, type and checksum. Every download asks first, programs and scripts get an extra warning before download and before opening, and the card shows the queue position, progress, the check that the file arrived unchanged, and Open / Open folder. Your own shared files show who downloaded them and a Stop sharing button (with a clear message if stopping fails)
+- Plugins that talk to websites can only reach the websites they declared, on the exact address and port, and only at public internet addresses with a valid certificate; anything else is blocked, and each plugin's requests and blocked attempts are counted per day
 
 ### Fixed
 

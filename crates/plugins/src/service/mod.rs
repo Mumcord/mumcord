@@ -364,7 +364,7 @@ impl PluginService {
             storage: Storage::new(Arc::clone(&store)),
             secrets,
             peer_keys: Some(peer_keys),
-            http: crate::api::http::Http::new(&config.plugins_dir),
+            http: crate::api::http::Http::new(&config.plugins_dir, Some(Arc::clone(&store))),
             io: Some(Arc::clone(&io) as Arc<dyn crate::api::io::PluginIo>),
             ..HostContext::default()
         });

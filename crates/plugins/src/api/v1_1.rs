@@ -639,7 +639,11 @@ impl wit::secrets::Host for PluginState {
 
 impl wit::http::Host for PluginState {
     fn request(&mut self, req: wit::http::HttpRequest) -> Result<u32, Error> {
-        up(v1_0::http::Host::request(self, down(req)?))
+        self.http_request(down(req)?)
+            .map_err(|refused| match refused {
+                crate::api::http::Refused::Api(error) => error.up(),
+                crate::api::http::Refused::OriginNotAllowed => Error::OriginNotAllowed,
+            })
     }
 }
 

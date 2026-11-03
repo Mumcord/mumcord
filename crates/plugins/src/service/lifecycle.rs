@@ -278,6 +278,11 @@ impl PluginService {
             origin.source(),
             record.granted.iter().map(String::as_str),
         );
+        // `validate` above already accepted these origins, so this cannot fail here.
+        let origins = manifest
+            .validate_origins(origin.source() == Source::Dev)
+            .unwrap_or_default();
+        self.ctx.http.set_origins(&record.id, origins);
         self.set_webview_root(&record.id, origin.source(), &dir, &granted);
         self.ctx.grants.set(&record.id, granted);
         self.ctx

@@ -1,5 +1,7 @@
-//! `http` (FR-6.37, official plugins only): Mumcord makes HTTP requests on the plugin's behalf,
-//! only to a host and port the user typed into a `server-address` field of that plugin.
+//! `http` (FR-6.37, FR-9.28): Mumcord makes HTTP requests on the plugin's behalf. Official
+//! plugins (`net.http`) reach a host and port the user typed into a `server-address` field of
+//! that plugin, or one of their declared origins. Other plugins (`net.origins`) reach only their
+//! declared origins, at public addresses, and every such request is counted per day (FR-9.30).
 //!
 //! The host call only validates and returns an id; the request runs on one shared background
 //! thread with a small tokio runtime, and the result goes into the plugin's event queue as
@@ -19,8 +21,12 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 use wasmtime::component::{HasSelf, Linker};
 
+use mumcord_store::Store;
+
 use crate::api::files::Picked;
 use crate::api::secrets::PluginSecrets;
+use crate::net_guard::{self, Blocked, Counters, NetHooks};
+use crate::origins::Origin;
 use crate::runtime::bindings::mumcord::plugin::http::{
     Body, FormValue, Header, Host, HttpError, HttpRequest, HttpResponse, Method, RequestId,
     add_to_linker,
@@ -56,8 +62,37 @@ impl HostApi for HttpApi {
 
 impl Host for PluginState {
     fn request(&mut self, req: HttpRequest) -> Result<RequestId, Error> {
-        self.ctx.grants.check(&self.id, "net.http")?;
-        self.http.request(&self.ctx, req)
+        self.http_request(req).map_err(|refused| match refused {
+            Refused::Api(error) => error,
+            // A 1.0 manifest cannot declare origins (FR-9.23), so a 1.0 plugin only gets here
+            // without `net.http`, and 1.0 has no `origin-not-allowed`.
+            Refused::OriginNotAllowed => Error::NotPermitted,
+        })
+    }
+}
+
+/// Why `http.request` refused a request before it started.
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) enum Refused {
+    Api(Error),
+    /// The URL is not one of the plugin's declared origins (FR-9.28).
+    OriginNotAllowed,
+}
+
+impl From<Error> for Refused {
+    fn from(error: Error) -> Self {
+        Self::Api(error)
+    }
+}
+
+impl PluginState {
+    /// `http.request` for every API minor; each minor maps [`Refused`] to its own error type.
+    pub(crate) fn http_request(&mut self, req: HttpRequest) -> Result<RequestId, Refused> {
+        let official = self.ctx.grants.allows(&self.id, "net.http");
+        if !official {
+            self.ctx.grants.check(&self.id, "net.origins")?;
+        }
+        self.http.request(&self.ctx, req, official)
     }
 }
 
@@ -79,6 +114,10 @@ struct Address {
 /// The `http` service shared by all plugins; lives in [`crate::HostContext`].
 pub struct Http {
     addresses: Mutex<Addresses>,
+    /// The checked `net.origins` of each loaded plugin, set by the service on load.
+    origins: Mutex<BTreeMap<String, Arc<[Origin]>>>,
+    counters: Arc<Counters>,
+    hooks: NetHooks,
     worker: OnceLock<Result<Worker, String>>,
     timeout: Duration,
     upload_timeout: Duration,
@@ -107,13 +146,14 @@ impl std::fmt::Debug for Http {
 impl Default for Http {
     /// Keeps allowed addresses in memory only (tests, `--no-plugins`).
     fn default() -> Self {
-        Self::with_addresses(Addresses::default())
+        Self::with_addresses(Addresses::default(), None)
     }
 }
 
 impl Http {
     /// Loads the allowed addresses from `<plugins_dir>/net-hosts.json`; changes are saved there.
-    pub fn new(plugins_dir: &Path) -> Self {
+    /// Requests to declared origins are counted in `store` (FR-9.30).
+    pub fn new(plugins_dir: &Path, store: Option<Arc<Mutex<Store>>>) -> Self {
         let file = plugins_dir.join(ADDRESSES_FILE);
         let by_plugin = match std::fs::read(&file) {
             Ok(bytes) => serde_json::from_slice(&bytes).unwrap_or_else(|error| {
@@ -126,15 +166,21 @@ impl Http {
                 BTreeMap::new()
             }
         };
-        Self::with_addresses(Addresses {
-            file: Some(file),
-            by_plugin,
-        })
+        Self::with_addresses(
+            Addresses {
+                file: Some(file),
+                by_plugin,
+            },
+            store,
+        )
     }
 
-    fn with_addresses(addresses: Addresses) -> Self {
+    fn with_addresses(addresses: Addresses, store: Option<Arc<Mutex<Store>>>) -> Self {
         Self {
             addresses: Mutex::new(addresses),
+            origins: Mutex::new(BTreeMap::new()),
+            counters: Arc::new(Counters::new(store)),
+            hooks: NetHooks::from_env(),
             worker: OnceLock::new(),
             timeout: TIMEOUT,
             upload_timeout: UPLOAD_TIMEOUT,
@@ -164,6 +210,21 @@ impl Http {
         }
     }
 
+    /// Sets the declared origins of `plugin` (already checked by `Manifest::validate_origins`);
+    /// the service calls this whenever it loads the plugin.
+    pub fn set_origins(&self, plugin: &str, origins: Vec<Origin>) {
+        self.origins
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .insert(plugin.to_owned(), origins.into());
+    }
+
+    /// The declared origin of `plugin` that `url` belongs to.
+    fn origin_for(&self, plugin: &str, url: &Url) -> Option<Origin> {
+        let origins = self.origins.lock().unwrap_or_else(PoisonError::into_inner);
+        net_guard::match_origin(origins.get(plugin)?, url).cloned()
+    }
+
     /// The request state of one plugin instance that delivers results into `queue`.
     pub(crate) fn set(&self, plugin: Arc<str>, queue: Weak<EventQueue>) -> HttpSet {
         HttpSet {
@@ -189,7 +250,7 @@ impl Http {
 
     fn worker(&self) -> Result<&Worker, String> {
         self.worker
-            .get_or_init(Worker::start)
+            .get_or_init(|| Worker::start(&self.hooks))
             .as_ref()
             .map_err(Clone::clone)
     }
@@ -254,13 +315,18 @@ fn parse_address(text: &str) -> Result<Address, AddressError> {
 }
 
 impl Worker {
-    fn start() -> Result<Self, String> {
-        use rustls_platform_verifier::BuilderVerifierExt;
+    fn start(hooks: &NetHooks) -> Result<Self, String> {
         let provider = Arc::new(rustls::crypto::ring::default_provider());
+        let verifier = rustls_platform_verifier::Verifier::new_with_extra_roots(
+            test_roots(hooks)?,
+            Arc::clone(&provider),
+        )
+        .map_err(|e| e.to_string())?;
         let tls = rustls::ClientConfig::builder_with_provider(provider)
             .with_safe_default_protocol_versions()
-            .and_then(|builder| builder.with_platform_verifier())
             .map_err(|e| e.to_string())?
+            .dangerous()
+            .with_custom_certificate_verifier(Arc::new(verifier))
             .with_no_client_auth();
         let runtime = tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -282,6 +348,17 @@ impl Worker {
     }
 }
 
+/// The E2E fixture CA (debug builds only, see [`crate::test_hooks`]) on top of the system roots.
+fn test_roots(hooks: &NetHooks) -> Result<Vec<rustls::pki_types::CertificateDer<'static>>, String> {
+    use rustls::pki_types::pem::PemObject;
+    let Some(file) = &hooks.test_ca else {
+        return Ok(Vec::new());
+    };
+    rustls::pki_types::CertificateDer::pem_file_iter(file)
+        .and_then(|certs| certs.collect::<Result<Vec<_>, _>>())
+        .map_err(|e| format!("the test CA is unreadable: {e}"))
+}
+
 /// The `http` state of one plugin instance: rate limit and request ids.
 pub(crate) struct HttpSet {
     plugin: Arc<str>,
@@ -297,9 +374,32 @@ pub(crate) struct HttpSet {
 struct Prepared {
     method: reqwest::Method,
     url: Url,
+    route: Route,
     headers: Vec<(HeaderName, PreparedValue)>,
     body: PreparedBody,
     timeout: Duration,
+}
+
+/// Why a request may go to its host.
+enum Route {
+    /// The user typed this host and port into the plugin's form (official plugins).
+    Address,
+    /// A declared origin: public addresses only, counted per day.
+    Origin(Origin),
+}
+
+/// Why `prepare` did not produce a request.
+enum NotPrepared {
+    /// Reported later as the request's `http-response`.
+    Failed(HttpError),
+    /// Refused right away with `origin-not-allowed`; `host` is counted as blocked.
+    OriginNotAllowed { host: String },
+}
+
+impl From<HttpError> for NotPrepared {
+    fn from(error: HttpError) -> Self {
+        Self::Failed(error)
+    }
 }
 
 enum PreparedValue {
@@ -320,14 +420,19 @@ enum PreparedField {
 }
 
 impl HttpSet {
-    fn request(&mut self, ctx: &HostContext, req: HttpRequest) -> Result<RequestId, Error> {
+    fn request(
+        &mut self,
+        ctx: &HostContext,
+        req: HttpRequest,
+        official: bool,
+    ) -> Result<RequestId, Refused> {
         if body_bytes(&req.body) > MAX_BODY_BYTES {
-            return Err(Error::TooLarge);
+            return Err(Error::TooLarge.into());
         }
         self.take_token()?;
         let uploads = has_file(&req.body);
         if uploads && self.uploading.swap(true, Ordering::AcqRel) {
-            return Err(Error::RateLimited);
+            return Err(Error::RateLimited.into());
         }
         self.last_id = self.last_id.wrapping_add(1);
         let id = self.last_id;
@@ -338,11 +443,15 @@ impl HttpSet {
         } else {
             ctx.http.timeout
         };
-        let prepared = match prepare(ctx, &self.plugin, req, timeout) {
+        let prepared = match prepare(ctx, &self.plugin, req, timeout, official) {
             Ok(prepared) => prepared,
-            Err(error) => {
+            Err(NotPrepared::Failed(error)) => {
                 deliver(&self.queue, id, Err(error));
                 return Ok(id);
+            }
+            Err(NotPrepared::OriginNotAllowed { host }) => {
+                ctx.http.count(&self.plugin, host, true);
+                return Err(Refused::OriginNotAllowed);
             }
         };
         let worker = match ctx.http.worker() {
@@ -361,16 +470,19 @@ impl HttpSet {
         };
         let queue = Weak::clone(&self.queue);
         let plugin = Arc::clone(&self.plugin);
-        let secrets = ctx.secrets.clone();
-        let tls = worker.tls.clone();
+        let net = Net {
+            secrets: ctx.secrets.clone(),
+            tls: worker.tls.clone(),
+            hooks: ctx.http.hooks.clone(),
+            counters: Arc::clone(&ctx.http.counters),
+        };
         let job = async move {
             let timeout = prepared.timeout;
-            let outcome =
-                match tokio::time::timeout(timeout, execute(prepared, &plugin, secrets, tls)).await
-                {
-                    Ok(outcome) => outcome,
-                    Err(_) => Err(HttpError::Timeout),
-                };
+            let outcome = match tokio::time::timeout(timeout, execute(prepared, &plugin, net)).await
+            {
+                Ok(outcome) => outcome,
+                Err(_) => Err(HttpError::Timeout),
+            };
             drop(upload_guard);
             if let Err(error) = &outcome {
                 tracing::debug!(plugin = %plugin, error = error_kind(error), "plugin request failed");
@@ -412,6 +524,27 @@ impl Drop for UploadGuard {
     }
 }
 
+impl Http {
+    /// Counts a request to a declared origin (or a blocked one) on the worker, so the plugin's
+    /// thread never waits for the database.
+    fn count(&self, plugin: &str, host: String, blocked: bool) {
+        let Ok(worker) = self.worker() else {
+            return;
+        };
+        let counters = Arc::clone(&self.counters);
+        let plugin = plugin.to_owned();
+        let job = async move { count(counters, plugin, host, blocked) };
+        if worker.jobs.send(Box::pin(job)).is_err() {
+            tracing::warn!("the plugin HTTP worker has stopped; a request was not counted");
+        }
+    }
+}
+
+/// Must run inside the worker's runtime.
+fn count(counters: Arc<Counters>, plugin: String, host: String, blocked: bool) {
+    tokio::task::spawn_blocking(move || counters.record(&plugin, &host, blocked));
+}
+
 fn deliver(queue: &Weak<EventQueue>, id: RequestId, outcome: Result<HttpResponse, HttpError>) {
     // A plugin that stopped or restarted in the meantime no longer wants the answer.
     if let Some(queue) = queue.upgrade() {
@@ -447,19 +580,28 @@ fn prepare(
     plugin: &str,
     req: HttpRequest,
     timeout: Duration,
-) -> Result<Prepared, HttpError> {
+    official: bool,
+) -> Result<Prepared, NotPrepared> {
     let url = Url::parse(&req.url).map_err(|_| HttpError::InvalidRequest)?;
     if !matches!(url.scheme(), "http" | "https")
         || !url.username().is_empty()
         || url.password().is_some()
     {
-        return Err(HttpError::InvalidRequest);
+        return Err(HttpError::InvalidRequest.into());
     }
-    if !ctx.http.is_allowed(plugin, &url) {
-        return Err(HttpError::HostNotAllowed);
-    }
+    // A typed address wins for official plugins: the user chose it, and it may be on the LAN.
+    let route = if official && ctx.http.is_allowed(plugin, &url) {
+        Route::Address
+    } else if let Some(origin) = ctx.http.origin_for(plugin, &url) {
+        Route::Origin(origin)
+    } else if official {
+        return Err(HttpError::HostNotAllowed.into());
+    } else {
+        let host = url.host_str().unwrap_or_default().to_owned();
+        return Err(NotPrepared::OriginNotAllowed { host });
+    };
     if req.headers.len() > MAX_HEADERS {
-        return Err(HttpError::InvalidRequest);
+        return Err(HttpError::InvalidRequest.into());
     }
     let headers = req
         .headers
@@ -480,7 +622,7 @@ fn prepare(
             let mut out = Vec::with_capacity(fields.len());
             for field in fields {
                 if field.name.is_empty() || field.name.contains(['"', '\r', '\n']) {
-                    return Err(HttpError::InvalidRequest);
+                    return Err(HttpError::InvalidRequest.into());
                 }
                 let value = match field.value {
                     FormValue::Text(text) => PreparedField::Text(text),
@@ -492,7 +634,7 @@ fn prepare(
                 out.push((field.name, value));
             }
             if files > 1 {
-                return Err(HttpError::InvalidRequest);
+                return Err(HttpError::InvalidRequest.into());
             }
             PreparedBody::Form(out)
         }
@@ -506,6 +648,7 @@ fn prepare(
             Method::Delete => reqwest::Method::DELETE,
         },
         url,
+        route,
         headers,
         body,
         timeout,
@@ -527,12 +670,15 @@ fn prepare_header(header: Header) -> Result<(HeaderName, PreparedValue), HttpErr
     Ok((name, value))
 }
 
-async fn execute(
-    p: Prepared,
-    plugin: &str,
+/// What a running request needs from the shared `Http` service.
+struct Net {
     secrets: Option<Arc<PluginSecrets>>,
     tls: rustls::ClientConfig,
-) -> Result<HttpResponse, HttpError> {
+    hooks: NetHooks,
+    counters: Arc<Counters>,
+}
+
+async fn execute(p: Prepared, plugin: &str, net: Net) -> Result<HttpResponse, HttpError> {
     let host = p
         .url
         .host_str()
@@ -544,17 +690,39 @@ async fn execute(
         .ok_or(HttpError::InvalidRequest)?;
     // Resolve once and connect only to the checked addresses, so a DNS answer can't change
     // between the check and the connection.
-    let addrs = resolve(&p.url, port).await?;
-    if p.url.scheme() == "http" && !addrs.iter().all(|a| is_local(a.ip())) {
-        return Err(HttpError::HostNotAllowed);
-    }
+    let addrs = match &p.route {
+        Route::Address => {
+            let addrs = resolve(&p.url, port).await?;
+            if p.url.scheme() == "http" && !addrs.iter().all(|a| is_local(a.ip())) {
+                return Err(HttpError::HostNotAllowed);
+            }
+            addrs
+        }
+        Route::Origin(origin) => {
+            let checked = net_guard::resolve_checked(origin, &net.hooks).await;
+            let blocked = matches!(checked, Err(Blocked::Address));
+            count(
+                Arc::clone(&net.counters),
+                plugin.to_owned(),
+                host.clone(),
+                blocked,
+            );
+            match checked {
+                Ok(addrs) => addrs,
+                Err(Blocked::Address) => return Err(HttpError::HostNotAllowed),
+                Err(Blocked::NotFound) => {
+                    return Err(HttpError::Connect("Can't find this address".into()));
+                }
+            }
+        }
+    };
 
     let mut headers = HeaderMap::new();
     for (name, value) in p.headers {
         let value = match value {
             PreparedValue::Text(value) => value,
             PreparedValue::Secret(secret) => {
-                secret_header(secrets.as_ref(), plugin, secret).await?
+                secret_header(net.secrets.as_ref(), plugin, secret).await?
             }
         };
         headers.append(name, value);
@@ -571,7 +739,7 @@ async fn execute(
     };
 
     let mut builder = reqwest::Client::builder()
-        .tls_backend_preconfigured(tls)
+        .tls_backend_preconfigured(net.tls)
         .no_proxy()
         .referer(false)
         .redirect(redirect::Policy::none());
@@ -797,6 +965,8 @@ mod tests {
         ctx: HostContext,
         queue: Arc<EventQueue>,
         set: HttpSet,
+        /// Whether the plugin has `net.http` (official) rather than only `net.origins`.
+        official: bool,
     }
 
     fn harness_with(http: Http) -> Harness {
@@ -812,7 +982,12 @@ mod tests {
         };
         let queue = Arc::new(EventQueue::new(Arc::new(Diagnostics::default())));
         let set = ctx.http.set(PLUGIN.into(), Arc::downgrade(&queue));
-        Harness { ctx, queue, set }
+        Harness {
+            ctx,
+            queue,
+            set,
+            official: true,
+        }
     }
 
     fn harness() -> Harness {
@@ -820,8 +995,12 @@ mod tests {
     }
 
     impl Harness {
+        fn start(&mut self, req: HttpRequest) -> Result<RequestId, Refused> {
+            self.set.request(&self.ctx, req, self.official)
+        }
+
         fn send(&mut self, req: HttpRequest) -> Result<HttpResponse, HttpError> {
-            let id = self.set.request(&self.ctx, req).expect("accepted");
+            let id = self.start(req).expect("accepted");
             match self.queue.pop() {
                 Next::Event(event, _) => match event.down() {
                     Some(Event::HttpResponse(result)) => {
@@ -954,14 +1133,14 @@ mod tests {
     #[test]
     fn addresses_survive_a_restart_and_keep_the_newest() {
         let dir = tempfile::tempdir().expect("test value");
-        let http = Http::new(dir.path());
+        let http = Http::new(dir.path(), None);
         for port in 0..=MAX_ADDRESSES {
             http.allow(PLUGIN, &format!("127.0.0.1:{}", 9000 + port))
                 .expect("test value");
         }
         http.allow("dice", "10.0.0.1:1").expect("test value");
         drop(http);
-        let http = Http::new(dir.path());
+        let http = Http::new(dir.path(), None);
         let allowed = |plugin, url: &str| http.is_allowed(plugin, &Url::parse(url).expect("url"));
         assert!(!allowed(PLUGIN, "http://127.0.0.1:9000"));
         assert!(allowed(PLUGIN, "http://127.0.0.1:9001"));
@@ -972,7 +1151,7 @@ mod tests {
         http.forget("dice");
         drop(http);
         assert!(
-            !Http::new(dir.path())
+            !Http::new(dir.path(), None)
                 .is_allowed("dice", &Url::parse("http://10.0.0.1:1").expect("url"))
         );
     }
@@ -1211,15 +1390,13 @@ mod tests {
             body: Body::Bytes(vec![0; MAX_BODY_BYTES + 1]),
             ..get("http://127.0.0.1:1/")
         };
-        assert_eq!(h.set.request(&h.ctx, big), Err(Error::TooLarge));
+        assert_eq!(h.start(big), Err(Refused::Api(Error::TooLarge)));
         for _ in 0..5 {
-            h.set
-                .request(&h.ctx, get("http://127.0.0.1:1/"))
-                .expect("test value");
+            h.start(get("http://127.0.0.1:1/")).expect("test value");
         }
         assert_eq!(
-            h.set.request(&h.ctx, get("http://127.0.0.1:1/")),
-            Err(Error::RateLimited)
+            h.start(get("http://127.0.0.1:1/")),
+            Err(Refused::Api(Error::RateLimited))
         );
     }
 
@@ -1316,5 +1493,206 @@ mod tests {
             matches!(&outcome, Err(HttpError::Tls(text)) if text == "The certificate is not trusted"),
             "{outcome:?}"
         );
+    }
+
+    /// The E2E fixture setup in small: `fixture.test` resolves to 127.0.0.1 and that address
+    /// counts as public, as with `MUMCORD_TEST_RESOLVE` and `MUMCORD_TEST_PUBLIC_ADDR`.
+    fn fixture_hooks(test_ca: Option<PathBuf>) -> NetHooks {
+        NetHooks {
+            test_ca,
+            public_addr: Some(Ipv4Addr::LOCALHOST.into()),
+            resolve: |name| (name == "fixture.test").then_some(Ipv4Addr::LOCALHOST.into()),
+        }
+    }
+
+    /// A harness for a third-party plugin with only `net.origins` and `origins` declared.
+    fn origins_harness(
+        hooks: NetHooks,
+        store: Option<Arc<Mutex<Store>>>,
+        origins: &[&str],
+    ) -> Harness {
+        let http = Http {
+            hooks,
+            ..Http::with_addresses(Addresses::default(), store)
+        };
+        let declared = origins
+            .iter()
+            .map(|o| crate::origins::validate(o, false).expect("valid origin"))
+            .collect();
+        http.set_origins(PLUGIN, declared);
+        let mut h = harness_with(http);
+        h.official = false;
+        h
+    }
+
+    /// A TLS server for `name` whose certificate a fresh CA signed; answers one request with
+    /// `response`. Returns the port and the CA as a PEM file.
+    fn tls_server(name: &str, response: Vec<u8>) -> (u16, tempfile::NamedTempFile) {
+        let ca_key = rcgen::KeyPair::generate().expect("key");
+        let mut ca_params = rcgen::CertificateParams::new(Vec::<String>::new()).expect("params");
+        ca_params.is_ca = rcgen::IsCa::Ca(rcgen::BasicConstraints::Unconstrained);
+        let ca = rcgen::CertifiedIssuer::self_signed(ca_params, ca_key).expect("ca");
+        let leaf_key = rcgen::KeyPair::generate().expect("key");
+        let leaf = rcgen::CertificateParams::new(vec![name.to_owned()])
+            .expect("params")
+            .signed_by(&leaf_key, &ca)
+            .expect("leaf");
+        let mut ca_file = tempfile::NamedTempFile::new().expect("temp file");
+        ca_file.write_all(ca.pem().as_bytes()).expect("write ca");
+
+        let key = rustls::pki_types::PrivateKeyDer::Pkcs8(leaf_key.serialize_der().into());
+        let config = rustls::ServerConfig::builder_with_provider(Arc::new(
+            rustls::crypto::ring::default_provider(),
+        ))
+        .with_safe_default_protocol_versions()
+        .expect("test value")
+        .with_no_client_auth()
+        .with_single_cert(vec![leaf.der().clone(), ca.der().clone()], key)
+        .expect("test value");
+        let config = Arc::new(config);
+        let listener = TcpListener::bind("127.0.0.1:0").expect("test value");
+        let port = listener.local_addr().expect("test value").port();
+        std::thread::spawn(move || {
+            if let Some(Ok(mut tcp)) = listener.incoming().next() {
+                let mut conn = rustls::ServerConnection::new(config).expect("test value");
+                let mut tls = rustls::Stream::new(&mut conn, &mut tcp);
+                let mut buf = [0; 4096];
+                if matches!(tls.read(&mut buf), Ok(n) if n > 0) {
+                    tls.write_all(&response).ok();
+                    tls.flush().ok();
+                }
+            }
+        });
+        (port, ca_file)
+    }
+
+    fn counters(store: &Arc<Mutex<Store>>) -> (i64, i64, Option<String>) {
+        // Counting runs on the worker after the answer; give it a moment.
+        for _ in 0..100 {
+            let rows = store
+                .lock()
+                .expect("lock")
+                .plugin_origin_counters(PLUGIN)
+                .expect("counters");
+            if let Some(row) = rows.first() {
+                return (row.requests, row.blocked, row.last_host.clone());
+            }
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        (0, 0, None)
+    }
+
+    #[test]
+    fn a_declared_origin_is_reached_and_counted() {
+        let (port, ca) = tls_server("fixture.test", ok("hello"));
+        let dir = tempfile::tempdir().expect("temp dir");
+        let store = Arc::new(Mutex::new(Store::open(dir.path()).expect("store")));
+        let origin = format!("https://fixture.test:{port}");
+        let mut h = origins_harness(
+            fixture_hooks(Some(ca.path().to_owned())),
+            Some(Arc::clone(&store)),
+            &[&origin],
+        );
+        let response = h.send(get(&format!("{origin}/api"))).expect("response");
+        assert_eq!((response.status, response.body), (200, b"hello".to_vec()));
+        assert_eq!(counters(&store), (1, 0, Some("fixture.test".into())));
+    }
+
+    #[test]
+    fn undeclared_hosts_and_ports_are_refused_and_counted_as_blocked() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let store = Arc::new(Mutex::new(Store::open(dir.path()).expect("store")));
+        let mut h = origins_harness(
+            fixture_hooks(None),
+            Some(Arc::clone(&store)),
+            &["https://fixture.test"],
+        );
+        for url in [
+            "https://other.test/",
+            "https://fixture.test:8443/",
+            "http://fixture.test/",
+        ] {
+            assert_eq!(h.start(get(url)), Err(Refused::OriginNotAllowed), "{url}");
+        }
+        let (requests, blocked, _) = counters(&store);
+        assert!(requests >= 1 && requests == blocked, "{requests} {blocked}");
+    }
+
+    #[test]
+    fn a_plugin_without_origins_gets_origin_not_allowed() {
+        let mut h = origins_harness(fixture_hooks(None), None, &[]);
+        assert_eq!(
+            h.start(get("https://fixture.test/")),
+            Err(Refused::OriginNotAllowed)
+        );
+    }
+
+    #[test]
+    fn a_declared_name_resolving_to_a_local_address_is_blocked() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        let store = Arc::new(Mutex::new(Store::open(dir.path()).expect("store")));
+        // Without the public-address hook, 127.0.0.1 is local: the DNS rebinding case.
+        let hooks = NetHooks {
+            public_addr: None,
+            ..fixture_hooks(None)
+        };
+        let mut h = origins_harness(hooks, Some(Arc::clone(&store)), &["https://fixture.test"]);
+        assert!(matches!(
+            h.send(get("https://fixture.test/")),
+            Err(HttpError::HostNotAllowed)
+        ));
+        assert_eq!(counters(&store), (1, 1, Some("fixture.test".into())));
+    }
+
+    #[test]
+    fn redirects_from_a_declared_origin_are_not_followed() {
+        let (port, ca) = tls_server(
+            "fixture.test",
+            b"HTTP/1.1 302 Found\r\nlocation: https://other.test/\r\ncontent-length: 0\r\n\r\n"
+                .to_vec(),
+        );
+        let origin = format!("https://fixture.test:{port}");
+        let mut h = origins_harness(fixture_hooks(Some(ca.path().to_owned())), None, &[&origin]);
+        assert!(matches!(
+            h.send(get(&format!("{origin}/"))),
+            Err(HttpError::Redirect)
+        ));
+    }
+
+    #[test]
+    fn the_certificate_must_match_the_declared_name() {
+        let (port, ca) = tls_server("other.test", ok("hello"));
+        let origin = format!("https://fixture.test:{port}");
+        let mut h = origins_harness(fixture_hooks(Some(ca.path().to_owned())), None, &[&origin]);
+        let outcome = h.send(get(&format!("{origin}/")));
+        assert!(matches!(&outcome, Err(HttpError::Tls(_))), "{outcome:?}");
+    }
+
+    #[test]
+    fn the_fixture_certificate_is_untrusted_without_the_test_ca() {
+        let (port, _ca) = tls_server("fixture.test", ok("hello"));
+        let origin = format!("https://fixture.test:{port}");
+        let mut h = origins_harness(fixture_hooks(None), None, &[&origin]);
+        let outcome = h.send(get(&format!("{origin}/")));
+        assert!(
+            matches!(&outcome, Err(HttpError::Tls(text)) if text == "The certificate is not trusted"),
+            "{outcome:?}"
+        );
+    }
+
+    #[test]
+    fn official_plugins_may_also_use_declared_origins() {
+        let (port, ca) = tls_server("fixture.test", ok("hi"));
+        let origin = format!("https://fixture.test:{port}");
+        let mut h = origins_harness(fixture_hooks(Some(ca.path().to_owned())), None, &[&origin]);
+        h.official = true;
+        assert_eq!(
+            h.send(get(&format!("{origin}/"))).expect("response").status,
+            200
+        );
+        assert!(matches!(
+            h.send(get("https://other.test/")),
+            Err(HttpError::HostNotAllowed)
+        ));
     }
 }
