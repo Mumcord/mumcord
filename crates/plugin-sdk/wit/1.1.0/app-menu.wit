@@ -1,0 +1,13 @@
+/// Since 1.1. Apps-menu and command-palette items (FR-9.53 … FR-9.56). Needs `ui.app-menu`.
+///
+/// Items are declared in the manifest's `app_menu` (at most 2, each with an `id`, a translated
+/// label and an icon); Mumcord always shows them with the plugin's name. Choosing an item sends
+/// `app-menu-activated` and counts as a user gesture.
+interface app-menu {
+  use types.{error};
+
+  /// Enables or disables the manifest item `item`. A disabled item shows `reason` (at most 64
+  /// characters) as its sub-line. Errors: `not-permitted`, `invalid` (unknown item, or a disabled
+  /// item without a reason).
+  set-state: func(item: string, enabled: bool, reason: option<string>) -> result<_, error>;
+}
