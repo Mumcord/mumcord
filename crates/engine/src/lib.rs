@@ -6,6 +6,7 @@ mod blocking;
 pub mod cache;
 pub mod chat;
 pub mod diag;
+pub mod files;
 pub mod follow;
 pub mod friends;
 pub mod full_image;
