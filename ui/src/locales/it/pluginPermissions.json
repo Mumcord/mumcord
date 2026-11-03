@@ -27,7 +27,13 @@
     "chatPatterns": "Riconoscere determinati messaggi della chat, come configurazioni di gioco incollate",
     "netHttp": "Comunicare con un server a tua scelta",
     "secrets": "Conservare un segreto (ad es. una chiave API) nel portachiavi del sistema",
-    "uiWebview": "Mostrare contenuti web propri in un riquadro isolato (senza internet)"
+    "uiWebview": "Mostrare contenuti web propri in un riquadro isolato (senza internet)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Un piccolo pannello di questo plugin appare nella barra dei plugin.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Riceve solo i messaggi di chat del tuo canale che iniziano nel modo da lui dichiarato, come una configurazione di gioco incollata. Nessun altro testo della chat gli arriva.",
     "netHttp": "Può parlare con un server che scegli tu, e solo con quello.",
     "secrets": "Può conservare un segreto, come una chiave API, nel portachiavi del sistema.",
-    "uiWebview": "Può mostrare contenuti web propri in un riquadro isolato, senza accesso a internet."
+    "uiWebview": "Può mostrare contenuti web propri in un riquadro isolato, senza accesso a internet.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Permessi"
 }

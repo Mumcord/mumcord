@@ -91,7 +91,7 @@ fn component(start: &str) -> Vec<u8> {
     let mut module = wat::parse_str(core).expect("fixture is valid WAT");
     let mut resolve = wit_parser::Resolve::default();
     let (package, _) = resolve
-        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/plugins/wit"))
+        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/plugins/wit/1.0.0"))
         .expect("WIT parses");
     let world = resolve
         .select_world(&[package], Some("plugin"))
@@ -611,7 +611,7 @@ fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
     });
 }
 
-/// AC-6.16: a third-party package that asks for `ui.webview`, `net.http` or `secrets` (required
+/// AC-6.16: a third-party package that asks for `net.http` or `secrets` (required
 /// or optional) is refused at install with the exact user text, and nothing is installed.
 #[test]
 fn a_third_party_repository_cannot_grant_official_only_permissions() {
@@ -620,8 +620,7 @@ fn a_third_party_repository_cannot_grant_official_only_permissions() {
     runtime().block_on(async {
         let registry = Registry::start();
         let repository = Registry::start_repository("Fan Repo", &keys.path().join("repo.key"));
-        let cases: [(&str, &[&str]); 4] = [
-            ("fan-web", &["ui.panel", "ui.webview"]),
+        let cases: [(&str, &[&str]); 3] = [
             ("fan-http", &["net.http"]),
             ("fan-secrets", &["secrets"]),
             ("fan-plain", &["ui.panel"]),

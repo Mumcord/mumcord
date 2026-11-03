@@ -24,11 +24,11 @@ describe("permission catalogue", () => {
     "utf8",
   );
   const rustEntries = [
-    ...rust.matchAll(/\b(?:all|official)\(\s*"([^"]+)",\s*Risk::(Green|Yellow|Red)/g),
+    ...rust.matchAll(/\b(?:all|all_1_1|official)\(\s*"([^"]+)",\s*Risk::(Green|Yellow|Red)/g),
   ].map((m) => [m[1], (m[2] ?? "").toLowerCase()]);
 
   it("matches the Rust catalogue (ids and risks)", () => {
-    expect(rustEntries).toHaveLength(21);
+    expect(rustEntries).toHaveLength(27);
     expect(Object.fromEntries(rustEntries)).toEqual(PERMISSION_RISK);
   });
 
@@ -40,7 +40,7 @@ describe("permission catalogue", () => {
   it("has an English explanation for every id, equal to the Rust source text", () => {
     const rustExplanations = [
       ...rust.matchAll(
-        /\b(?:all|official)\(\s*"([^"]+)",\s*Risk::\w+,\s*"(?:[^"\\]|\\.)*",\s*"((?:[^"\\]|\\.)*)",?\s*\)/g,
+        /\b(?:all|all_1_1|official)\(\s*"([^"]+)",\s*Risk::\w+,\s*"(?:[^"\\]|\\.)*",\s*"((?:[^"\\]|\\.)*)",?\s*\)/g,
       ),
     ].map((m) => [permissionTextKey(m[1] as PermissionId), m[2]]);
     expect(Object.fromEntries(rustExplanations)).toEqual(en.explanations);

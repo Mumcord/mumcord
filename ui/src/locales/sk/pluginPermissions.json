@@ -27,7 +27,13 @@
     "chatPatterns": "Rozpoznávať určité správy v chate, napr. vložené herné zostavy",
     "netHttp": "Komunikovať so serverom, ktorý si vyberiete",
     "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
-    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)"
+    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Malý panel tohto pluginu sa zobrazí v lište pluginov.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Dostáva len správy v chate vášho kanála, ktoré začínajú tak, ako deklaroval, napríklad vloženú hernú zostavu. Žiadny iný text z chatu sa k nemu nedostane.",
     "netHttp": "Môže komunikovať s jedným serverom, ktorý zvolíte, a len s ním.",
     "secrets": "Môže uložiť tajomstvo, napríklad kľúč API, do kľúčenky systému.",
-    "uiWebview": "Môže zobraziť vlastný webový obsah v uzavretom ráme bez prístupu na internet."
+    "uiWebview": "Môže zobraziť vlastný webový obsah v uzavretom ráme bez prístupu na internet.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Oprávnenia"
 }

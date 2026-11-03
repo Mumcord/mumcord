@@ -29,3 +29,7 @@ workspace = true
 [[example]]
 name = "hello"
 crate-type = ["cdylib"]
+
+[features]
+# Opts a plugin into the 1.1 API (WIT package mumcord:plugin@1.1.0); off keeps the 1.0 world.
+"1.1" = []

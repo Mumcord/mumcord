@@ -13,4 +13,4 @@ out="${1:-${MUMCORD_FIXTURE_OUT:-$HOME/.cache/mumcord-build/plugin-fixtures}}"
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$out.target}"
 
 cargo run --quiet --manifest-path "$src/builder/Cargo.toml" -- \
-  "$src" "$repo/crates/plugins/wit" "$out"
+  "$src" "$repo/crates/plugins/wit/1.0.0" "$out"

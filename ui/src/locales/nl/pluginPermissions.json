@@ -27,7 +27,13 @@
     "chatPatterns": "Bepaalde chatberichten herkennen, zoals geplakte game-fits",
     "netHttp": "Praten met een server die je kiest",
     "secrets": "Een geheim (bijv. een API-sleutel) bewaren in de sleutelhanger van je systeem",
-    "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)"
+    "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Een klein paneel van deze plugin verschijnt in de pluginbalk.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Het ontvangt alleen chatberichten in je kanaal die beginnen zoals het heeft opgegeven, zoals een geplakte game-fit. Geen andere chattekst bereikt het.",
     "netHttp": "Het kan praten met één server die jij kiest, en alleen met die.",
     "secrets": "Het kan een geheim, zoals een API-sleutel, bewaren in de sleutelhanger van je systeem.",
-    "uiWebview": "Het kan eigen webinhoud tonen in een afgesloten kader zonder internettoegang."
+    "uiWebview": "Het kan eigen webinhoud tonen in een afgesloten kader zonder internettoegang.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Rechten"
 }

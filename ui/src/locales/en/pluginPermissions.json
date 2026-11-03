@@ -27,7 +27,13 @@
     "chatPatterns": "Recognise certain chat messages, such as pasted game fits",
     "netHttp": "Talk to a server you choose",
     "secrets": "Keep a secret (e.g. an API key) in your system keychain",
-    "uiWebview": "Show its own web content in a sealed frame (no internet)"
+    "uiWebview": "Show its own web content in a sealed frame (no internet)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "A small panel for this plugin appears in the Plugins strip.",
@@ -50,7 +56,13 @@
     "chatPatterns": "It only receives chat messages in your channel that start the way it declares, such as a pasted game fit. No other chat text reaches it.",
     "netHttp": "It can talk to one server you choose, and only to that one.",
     "secrets": "It can keep a secret, such as an API key, in your system keychain.",
-    "uiWebview": "It can show its own web content in a sealed frame with no internet access."
+    "uiWebview": "It can show its own web content in a sealed frame with no internet access.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Permissions"
 }

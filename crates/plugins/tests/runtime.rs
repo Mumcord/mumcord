@@ -37,7 +37,10 @@ fn component_with_events(start: &str, event: &str, stop: &str) -> Vec<u8> {
         .replace("{{START}}", start)
         .replace("{{EVENT}}", event)
         .replace("{{STOP}}", stop);
-    component_from(&core, &Path::new(env!("CARGO_MANIFEST_DIR")).join("wit"))
+    component_from(
+        &core,
+        &Path::new(env!("CARGO_MANIFEST_DIR")).join("wit/1.0.0"),
+    )
 }
 
 /// Encodes a core module of the fixture as a component against the WIT package in `wit`.
@@ -663,7 +666,7 @@ fn events_need_their_permission_at_the_time_they_are_sent() {
 /// WIT and once against it without the `fill-first` case.
 #[test]
 fn ui_types_must_match_the_host_exactly() {
-    let wit = Path::new(env!("CARGO_MANIFEST_DIR")).join("wit");
+    let wit = Path::new(env!("CARGO_MANIFEST_DIR")).join("wit/1.0.0");
     let older = tempfile::tempdir().expect("temp dir");
     for entry in std::fs::read_dir(&wit).expect("wit dir") {
         let path = entry.expect("entry").path();

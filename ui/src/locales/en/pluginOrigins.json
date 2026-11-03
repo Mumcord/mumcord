@@ -1,0 +1,55 @@
+{
+  "title": "Talk to these websites",
+  "intro": "{{plugin}} and its page can send and receive data only with:",
+  "introUpdate": "{{plugin}} and its page could then reach:",
+  "privacy": "These websites can see your IP address and anything {{plugin}} sends them.",
+  "listLabel": "Websites",
+  "changesLabel": "Changes",
+  "new": "New",
+  "changed": "Changed",
+  "notOwnDomain": "One of them is not on the plugin's own domain.",
+  "details": {
+    "title": "Websites it talks to",
+    "text": "{{plugin}} and its page can reach only these. You approved them on {{date}}; an update that adds one waits for your approval.",
+    "lastRequest": "Last request",
+    "requestsToday": "Requests today",
+    "requestsTodayValue": "{{count}} (blocked: {{blocked}})",
+    "none": "None yet",
+    "wherePlace": "Where it shows",
+    "places": {
+      "stage": "Media area",
+      "side-panel": "Side panel",
+      "dialog": "Dialog",
+      "panel": "Plugins strip",
+      "appMenu": "Apps menu · {{count}} items",
+      "chat": "Chat cards"
+    },
+    "ownCode": "Own code",
+    "sealedPage": "Sealed page",
+    "sealedPageText": "{{entry}} · {{size}} · no access to Mumcord, files, microphone, camera or clipboard",
+    "relayData": "Relay data",
+    "relayOff": "Off ·",
+    "relayOn": "On",
+    "turnOnInPermissions": "Turn on in permissions",
+    "tags": {
+      "webview": "Own web content",
+      "origins": "{{count}} websites",
+      "stage": "Media area",
+      "sidePanel": "Side panel",
+      "relay": "Relay data",
+      "appMenu": "Apps menu"
+    }
+  },
+  "update": {
+    "wantsNew_one": "This update wants to talk to {{count}} new website.",
+    "wantsNew_other": "This update wants to talk to {{count}} new websites.",
+    "staysOn": "{{plugin}} stays on {{version}} until you decide.",
+    "banner_one": "{{count}} update waits for you. Updates that add permissions or websites are never installed automatically.",
+    "banner_other": "{{count}} updates wait for you. Updates that add permissions or websites are never installed automatically.",
+    "noOther": "No other permissions change.",
+    "whatsNew": "What's new in {{version}}",
+    "skipKeeps": "Skipping keeps {{version}} working.",
+    "skip": "Skip this version",
+    "allow": "Allow and update"
+  }
+}

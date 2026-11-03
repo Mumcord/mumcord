@@ -1,0 +1,17 @@
+/// Since 1.1. Short sound effects bundled in the plugin package (FR-9.65 … FR-9.68). Needs
+/// `audio.effects`.
+///
+/// Played locally only, never sent to others; ducked while anyone talks, muted while the user is
+/// deafened, and subject to the user's plugin-sound volume. At most 4 plugin sounds play at once
+/// across all plugins; the oldest stops.
+interface audio {
+  use types.{error};
+
+  /// Plays `sound`, a file declared in the manifest's `audio.sounds` such as 'sounds/win.ogg'.
+  /// `gain` from 0.0 to 1.0 scales it (default 1.0). Errors: `not-permitted`, `not-found` (not
+  /// declared), `rate-limited`.
+  play: func(sound: string, gain: option<f32>) -> result<_, error>;
+
+  /// Stops every sound this plugin plays.
+  stop-all: func();
+}
