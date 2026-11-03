@@ -370,6 +370,46 @@ const MIGRATIONS: &[&str] = &[
         PRIMARY KEY (resolution, fps)
     );
     ",
+    // v25: plugin platform 1.1 trust data (spec 09, section 7.1). Origin approvals, per-day
+    // request counters (kept 7 days), the first time a registry key was seen, per-version
+    // permission history and confirmed high-risk plugins. v24 is the file-card table of the
+    // file-sharing epic.
+    r"
+    CREATE TABLE plugin_origin_approval (
+        plugin_id   TEXT NOT NULL,
+        origin      TEXT NOT NULL,
+        purpose_key TEXT NOT NULL,
+        approved_at INTEGER NOT NULL,
+        PRIMARY KEY (plugin_id, origin)
+    );
+    CREATE TABLE plugin_origin_counters (
+        plugin_id       TEXT NOT NULL,
+        day             TEXT NOT NULL,
+        requests        INTEGER NOT NULL DEFAULT 0,
+        blocked         INTEGER NOT NULL DEFAULT 0,
+        last_request_at INTEGER,
+        last_host       TEXT,
+        PRIMARY KEY (plugin_id, day)
+    );
+    CREATE TABLE repo_key_first_seen (
+        key_id        TEXT PRIMARY KEY,
+        first_seen_at INTEGER NOT NULL
+    );
+    CREATE TABLE plugin_version_history (
+        plugin_id   TEXT NOT NULL,
+        version     TEXT NOT NULL,
+        permissions TEXT NOT NULL,
+        origins     TEXT NOT NULL,
+        seen_at     INTEGER NOT NULL,
+        PRIMARY KEY (plugin_id, version)
+    );
+    CREATE TABLE plugin_high_risk_confirmed (
+        plugin_id    TEXT NOT NULL,
+        version      TEXT NOT NULL,
+        confirmed_at INTEGER NOT NULL,
+        PRIMARY KEY (plugin_id, version)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
@@ -690,6 +730,23 @@ pub(crate) mod tests {
         assert!(MIGRATIONS[18].contains("CREATE TABLE blocked_user"));
         assert!(MIGRATIONS[20].contains("CREATE TABLE plugin "));
         assert!(MIGRATIONS[19].contains("CREATE TABLE relay_pin"));
+    }
+
+    /// The plugin trust tables are the last migration so far; the file-card table (v24) comes
+    /// before them once that epic is merged.
+    #[test]
+    fn plugin_trust_migration_creates_its_five_tables() {
+        assert!(MIGRATIONS.len() >= 24);
+        let sql = MIGRATIONS.last().expect("migration");
+        for table in [
+            "plugin_origin_approval",
+            "plugin_origin_counters",
+            "repo_key_first_seen",
+            "plugin_version_history",
+            "plugin_high_risk_confirmed",
+        ] {
+            assert!(sql.contains(&format!("CREATE TABLE {table} ")), "{table}");
+        }
     }
 
     #[test]
