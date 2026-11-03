@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Lo que muestra el área multimedia",
+      "hint": "Cambiar no detiene nada",
+      "share": "Pantalla compartida",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, pestaña {{index}} de {{count}}",
+      "tabNameNew": "{{label}}, nuevo, pestaña {{index}} de {{count}}",
+      "pluginTabName": "{{label}}, actividad de plugin, pestaña {{index}} de {{count}}",
+      "pluginTabNameNew": "{{label}}, actividad de plugin, nuevo, pestaña {{index}} de {{count}}"
     }
   }
 }

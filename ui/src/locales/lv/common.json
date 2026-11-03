@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Ko rāda multivides apgabals",
+      "hint": "Pārslēgšana neko neaptur",
+      "share": "Ekrāna kopīgošana",
+      "plugin": "Spraudnis",
+      "tabName": "{{label}}, cilne {{index}} no {{count}}",
+      "tabNameNew": "{{label}}, jauns, cilne {{index}} no {{count}}",
+      "pluginTabName": "{{label}}, spraudņa aktivitāte, cilne {{index}} no {{count}}",
+      "pluginTabNameNew": "{{label}}, spraudņa aktivitāte, jauns, cilne {{index}} no {{count}}"
     }
   }
 }

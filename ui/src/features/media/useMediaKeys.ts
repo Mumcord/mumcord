@@ -1,9 +1,11 @@
 /**
  * The keys both media views share (issue #163, FR-3.128): Space play/pause, ← and → seek 5 s,
  * M mute, F full screen, 1 for 1:1, Escape leaves full screen. They work while
- * the view is open, but not while the user types (the chat input above the player keeps its keys).
+ * the view is open, but not while the user types (the chat input above the player keeps its keys),
+ * and only for the main item of the media area (FR-9.44).
  */
 import { useCallback, useEffect } from "react";
+import { useStageShown } from "./stageContext";
 
 export interface MediaActions {
   playPause?: () => void;
@@ -27,6 +29,7 @@ function typingIn(target: EventTarget): boolean {
 export const SEEK_STEP = 5;
 
 export function useMediaKeys(actions: MediaActions): void {
+  const shown = useStageShown();
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -67,9 +70,10 @@ export function useMediaKeys(actions: MediaActions): void {
   );
 
   useEffect(() => {
+    if (!shown) return;
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [onKeyDown]);
+  }, [onKeyDown, shown]);
 }

@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Co pokazuje obszar multimediów",
+      "hint": "Przełączanie niczego nie zatrzymuje",
+      "share": "Udostępnianie ekranu",
+      "plugin": "Wtyczka",
+      "tabName": "{{label}}, karta {{index}} z {{count}}",
+      "tabNameNew": "{{label}}, nowe, karta {{index}} z {{count}}",
+      "pluginTabName": "{{label}}, aktywność wtyczki, karta {{index}} z {{count}}",
+      "pluginTabNameNew": "{{label}}, aktywność wtyczki, nowe, karta {{index}} z {{count}}"
     }
   }
 }

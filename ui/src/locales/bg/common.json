@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Какво показва медийната област",
+      "hint": "Превключването не спира нищо",
+      "share": "Споделяне на екрана",
+      "plugin": "Плъгин",
+      "tabName": "{{label}}, раздел {{index}} от {{count}}",
+      "tabNameNew": "{{label}}, ново, раздел {{index}} от {{count}}",
+      "pluginTabName": "{{label}}, активност на плъгин, раздел {{index}} от {{count}}",
+      "pluginTabNameNew": "{{label}}, активност на плъгин, ново, раздел {{index}} от {{count}}"
     }
   }
 }

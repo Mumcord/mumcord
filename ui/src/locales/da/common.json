@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Hvad medieområdet viser",
+      "hint": "Skift stopper ikke noget",
+      "share": "Skærmdeling",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, fane {{index}} af {{count}}",
+      "tabNameNew": "{{label}}, ny, fane {{index}} af {{count}}",
+      "pluginTabName": "{{label}}, plugin-aktivitet, fane {{index}} af {{count}}",
+      "pluginTabNameNew": "{{label}}, plugin-aktivitet, ny, fane {{index}} af {{count}}"
     }
   }
 }

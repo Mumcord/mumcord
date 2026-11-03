@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Kaj prikazuje predstavnostno območje",
+      "hint": "Preklop ničesar ne ustavi",
+      "share": "Deljenje zaslona",
+      "plugin": "Vtičnik",
+      "tabName": "{{label}}, zavihek {{index}} od {{count}}",
+      "tabNameNew": "{{label}}, novo, zavihek {{index}} od {{count}}",
+      "pluginTabName": "{{label}}, dejavnost vtičnika, zavihek {{index}} od {{count}}",
+      "pluginTabNameNew": "{{label}}, dejavnost vtičnika, novo, zavihek {{index}} od {{count}}"
     }
   }
 }

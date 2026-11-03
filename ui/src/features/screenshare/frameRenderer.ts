@@ -10,6 +10,11 @@ import { VP9_CODEC, type ScreenFrame } from "../../api/screenFrames";
 export interface FrameRenderer {
   /** Takes one frame from the channel; frames of the other kind are ignored. */
   push(frame: ScreenFrame): void;
+  /**
+   * While hidden (another stage tab is the main item, FR-9.44) frames are still taken and decoded,
+   * but only the latest picture is kept; it is drawn once the canvas shows again.
+   */
+  setHidden(hidden: boolean): void;
   /** Frees the decoder; later frames are ignored. */
   close(): void;
 }
@@ -34,6 +39,15 @@ export function createFrameRenderer(
   const context = canvas.getContext("2d");
   let closed = false;
   let pictured = false;
+  let hidden = false;
+  /** The latest picture that came while hidden, drawn when the canvas shows again. */
+  let held: VideoFrame | Extract<ScreenFrame, { kind: "rgba" }> | null = null;
+
+  function firstPicture(): void {
+    if (pictured) return;
+    pictured = true;
+    onFirstPicture?.();
+  }
 
   function draw(source: CanvasImageSource | ImageData, width: number, height: number): void {
     if (closed || context === null) return;
@@ -41,10 +55,33 @@ export function createFrameRenderer(
     if (canvas.height !== height) canvas.height = height;
     if (source instanceof ImageData) context.putImageData(source, 0, 0);
     else context.drawImage(source, 0, 0, width, height);
-    if (!pictured) {
-      pictured = true;
-      onFirstPicture?.();
-    }
+    firstPicture();
+  }
+
+  function drawRgba(frame: Extract<ScreenFrame, { kind: "rgba" }>): void {
+    draw(new ImageData(frame.data, frame.width, frame.height), frame.width, frame.height);
+  }
+
+  /** Keeps the picture instead of drawing it; the share still counts as live. */
+  function hold(picture: NonNullable<typeof held>): void {
+    if (held !== null && held !== picture && "close" in held) held.close();
+    held = picture;
+    firstPicture();
+  }
+
+  function releaseHeld(): void {
+    const picture = held;
+    held = null;
+    if (picture === null) return;
+    if ("close" in picture) {
+      draw(picture, picture.displayWidth, picture.displayHeight);
+      picture.close();
+    } else drawRgba(picture);
+  }
+
+  function setHidden(next: boolean): void {
+    hidden = next;
+    if (!hidden) releaseHeld();
   }
 
   if (context === null) console.error("screen share canvas has no 2d context");
@@ -54,10 +91,13 @@ export function createFrameRenderer(
       push(frame) {
         if (frame.kind !== "rgba") return;
         onFrame?.(frame, Date.now());
-        draw(new ImageData(frame.data, frame.width, frame.height), frame.width, frame.height);
+        if (hidden) hold(frame);
+        else drawRgba(frame);
       },
+      setHidden,
       close() {
         closed = true;
+        held = null;
       },
     };
   }
@@ -81,6 +121,10 @@ export function createFrameRenderer(
   function startDecoder(width: number, height: number): VideoDecoder {
     const next = new VideoDecoder({
       output: (picture) => {
+        if (hidden && !closed) {
+          hold(picture);
+          return;
+        }
         draw(picture, picture.displayWidth, picture.displayHeight);
         picture.close();
       },
@@ -130,8 +174,11 @@ export function createFrameRenderer(
         waitForKeyframe();
       }
     },
+    setHidden,
     close() {
       closed = true;
+      if (held !== null && "close" in held) held.close();
+      held = null;
       dropDecoder();
     },
   };

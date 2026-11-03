@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Wat het mediagebied toont",
+      "hint": "Wisselen stopt niets",
+      "share": "Schermdeling",
+      "plugin": "Plug-in",
+      "tabName": "{{label}}, tabblad {{index}} van {{count}}",
+      "tabNameNew": "{{label}}, nieuw, tabblad {{index}} van {{count}}",
+      "pluginTabName": "{{label}}, plug-inactiviteit, tabblad {{index}} van {{count}}",
+      "pluginTabNameNew": "{{label}}, plug-inactiviteit, nieuw, tabblad {{index}} van {{count}}"
     }
   }
 }

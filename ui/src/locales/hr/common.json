@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Što prikazuje medijsko područje",
+      "hint": "Prebacivanje ništa ne zaustavlja",
+      "share": "Dijeljenje zaslona",
+      "plugin": "Dodatak",
+      "tabName": "{{label}}, kartica {{index}} od {{count}}",
+      "tabNameNew": "{{label}}, novo, kartica {{index}} od {{count}}",
+      "pluginTabName": "{{label}}, aktivnost dodatka, kartica {{index}} od {{count}}",
+      "pluginTabNameNew": "{{label}}, aktivnost dodatka, novo, kartica {{index}} od {{count}}"
     }
   }
 }

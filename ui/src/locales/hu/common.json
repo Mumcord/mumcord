@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Mit mutat a médiaterület",
+      "hint": "A váltás semmit sem állít le",
+      "share": "Képernyőmegosztás",
+      "plugin": "Bővítmény",
+      "tabName": "{{label}}, {{index}}. lap / {{count}}",
+      "tabNameNew": "{{label}}, új, {{index}}. lap / {{count}}",
+      "pluginTabName": "{{label}}, bővítménytevékenység, {{index}}. lap / {{count}}",
+      "pluginTabNameNew": "{{label}}, bővítménytevékenység, új, {{index}}. lap / {{count}}"
     }
   }
 }

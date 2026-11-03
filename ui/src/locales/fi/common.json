@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Mitä media-alue näyttää",
+      "hint": "Vaihtaminen ei pysäytä mitään",
+      "share": "Näytön jako",
+      "plugin": "Laajennus",
+      "tabName": "{{label}}, välilehti {{index}}/{{count}}",
+      "tabNameNew": "{{label}}, uusi, välilehti {{index}}/{{count}}",
+      "pluginTabName": "{{label}}, laajennuksen toiminta, välilehti {{index}}/{{count}}",
+      "pluginTabNameNew": "{{label}}, laajennuksen toiminta, uusi, välilehti {{index}}/{{count}}"
     }
   }
 }

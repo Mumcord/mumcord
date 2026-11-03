@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "An rud a thaispeánann an limistéar meán",
+      "hint": "Ní stopann athrú aon rud",
+      "share": "Comhroinnt scáileáin",
+      "plugin": "Breiseán",
+      "tabName": "{{label}}, cluaisín {{index}} as {{count}}",
+      "tabNameNew": "{{label}}, nua, cluaisín {{index}} as {{count}}",
+      "pluginTabName": "{{label}}, gníomhaíocht breiseáin, cluaisín {{index}} as {{count}}",
+      "pluginTabNameNew": "{{label}}, gníomhaíocht breiseáin, nua, cluaisín {{index}} as {{count}}"
     }
   }
 }

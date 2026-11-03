@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Vad mediaytan visar",
+      "hint": "Att byta stoppar ingenting",
+      "share": "Skärmdelning",
+      "plugin": "Tillägg",
+      "tabName": "{{label}}, flik {{index}} av {{count}}",
+      "tabNameNew": "{{label}}, ny, flik {{index}} av {{count}}",
+      "pluginTabName": "{{label}}, tilläggsaktivitet, flik {{index}} av {{count}}",
+      "pluginTabNameNew": "{{label}}, tilläggsaktivitet, ny, flik {{index}} av {{count}}"
     }
   }
 }

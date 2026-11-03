@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Mida meediaala näitab",
+      "hint": "Vahetamine ei peata midagi",
+      "share": "Ekraani jagamine",
+      "plugin": "Pistikprogramm",
+      "tabName": "{{label}}, vahekaart {{index}}/{{count}}",
+      "tabNameNew": "{{label}}, uus, vahekaart {{index}}/{{count}}",
+      "pluginTabName": "{{label}}, pistikprogrammi tegevus, vahekaart {{index}}/{{count}}",
+      "pluginTabNameNew": "{{label}}, pistikprogrammi tegevus, uus, vahekaart {{index}}/{{count}}"
     }
   }
 }

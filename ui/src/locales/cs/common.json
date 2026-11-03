@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Co zobrazuje oblast médií",
+      "hint": "Přepnutí nic nezastaví",
+      "share": "Sdílení obrazovky",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, karta {{index}} z {{count}}",
+      "tabNameNew": "{{label}}, nové, karta {{index}} z {{count}}",
+      "pluginTabName": "{{label}}, aktivita pluginu, karta {{index}} z {{count}}",
+      "pluginTabNameNew": "{{label}}, aktivita pluginu, nové, karta {{index}} z {{count}}"
     }
   }
 }

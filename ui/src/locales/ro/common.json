@@ -78,6 +78,16 @@
       "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
       "releaseHint": "Release to minimise to the mini bar",
       "minimised": "Media area minimised"
+    },
+    "stage": {
+      "tabs": "Ce arată zona media",
+      "hint": "Comutarea nu oprește nimic",
+      "share": "Partajare ecran",
+      "plugin": "Plugin",
+      "tabName": "{{label}}, fila {{index}} din {{count}}",
+      "tabNameNew": "{{label}}, nou, fila {{index}} din {{count}}",
+      "pluginTabName": "{{label}}, activitate plugin, fila {{index}} din {{count}}",
+      "pluginTabNameNew": "{{label}}, activitate plugin, nou, fila {{index}} din {{count}}"
     }
   }
 }
