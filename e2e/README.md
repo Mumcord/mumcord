@@ -183,7 +183,26 @@ The signing key pair is generated per run with `mumcord-plugin keygen` into the 
 is never committed.
 
 `registry.start()` runs `scripts/e2e-plugin-registry.sh`, which builds the CLI, the safety fixtures
-and the official plugins. The image has no wasm32 target, so CI builds them on the runner with
+(`crates/plugins/tests/fixtures/safety`) and the test plugins (`e2e/fixtures/plugins`). The image
+has no wasm32 target, so CI builds them on the runner with
 `scripts/e2e-plugin-registry.sh --build-only <dir>` and sets `MUMCORD_E2E_PLUGIN_PACKAGES=<dir>`:
 `e2e/run.sh` mounts the folder into the container and the script takes the CLI and packages from
 it. The same works locally.
+
+### Test plugins, not the official plugins
+
+The plugin specs here test the platform (install, permissions, registry and signatures, updates,
+safe mode, rendering, the strip, suggestions) with plugins made for the tests, so Mumcord's E2E
+suite never depends on the official plugins. Their own behaviour (Poll, Dice roller, Echolings,
+Mumbot Music, EVE fit) is tested in [Mumcord/plugins](https://github.com/Mumcord/plugins) against a
+pinned Mumcord release.
+
+| Test plugin                                      | Registry                          | What it is for                                                                              |
+| ------------------------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| `fx-strip` "Fixture Strip"                       | official                          | a panel with an animated button (strip icon, render checks) and a chat plugin's permissions |
+| `echolings` "Fixture Highlight"                  | official                          | the same code under the id Browse highlights first (FR-6.59), also a deep-link target       |
+| `fx-*` in `crates/plugins/tests/fixtures/safety` | mostly the third-party repository | misbehaving and edge-case plugins (limits, back-off, web view, updates)                     |
+
+A new test plugin is a folder under `e2e/fixtures/plugins` with a `manifest.json`, `i18n/en.json` and a Rust crate on
+the in-repo SDK (`crates/plugin-sdk`). The script builds every folder; a package whose id starts
+with `fx-` goes to the third-party repository unless the script's `case` lists it as official.

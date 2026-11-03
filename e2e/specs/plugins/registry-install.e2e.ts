@@ -1,5 +1,5 @@
 // Harness check for the fixture plugin registry (spec 06 B16b): the client, pointed at the
-// run's registry through the test environment, lists Poll in Browse and installs it.
+// run's registry through the test environment, lists a test plugin (e2e/fixtures/plugins) in Browse and installs it.
 import { $, expect } from "@wdio/globals";
 import { app, registry } from "../../helpers/index.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
@@ -17,7 +17,7 @@ describe("harness: fixture plugin registry", () => {
     await fixtures.stop();
   });
 
-  it("installs Poll from the fixture registry", async () => {
+  it("installs a test plugin from the fixture registry", async () => {
     await app.restart({ env: fixtures.env() });
     await completeWizard("Alice");
 
@@ -31,7 +31,7 @@ describe("harness: fixture plugin registry", () => {
 
     await openSettingsGroup("Plugins");
     await $("//button[@role='tab'][contains(@class,'plugins-tab')][normalize-space(.)='Browse']").click();
-    const install = $("button[aria-label='Install Poll']");
+    const install = $("button[aria-label='Install Fixture Strip']");
     await install.waitForClickable({ timeout: 30_000 });
     await install.click();
 
@@ -41,11 +41,11 @@ describe("harness: fixture plugin registry", () => {
     );
     await confirm.waitForClickable({ timeout: 60_000 });
     await confirm.click();
-    await expect($(".plugin-toast")).toHaveText(expect.stringContaining("Poll installed"), {
+    await expect($(".plugin-toast")).toHaveText(expect.stringContaining("Fixture Strip installed"), {
       wait: 60_000,
     });
     await expect(
-      $("//li[@class='plugin-card'][.//h3[contains(.,'Poll')]]//span[@class='plugin-card-installed']"),
+      $("//li[@class='plugin-card'][.//h3[contains(.,'Fixture Strip')]]//span[@class='plugin-card-installed']"),
     ).toBeDisplayed();
   });
 });

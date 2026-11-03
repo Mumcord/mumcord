@@ -1,5 +1,5 @@
 // AC-6.26 (spec 06, FR-6.77 … FR-6.79) with the real mumbot `plugins` module: a registered bot
-// announces Dice; the client shows a notification-centre entry and no OS notification (the
+// announces a test plugin (e2e/fixtures/plugins); the client shows a notification-centre entry and no OS notification (the
 // container has no notification service, so an OS notification would fall back to an in-app
 // toast); Not now hides it until the bot's `seq` changes; Install from the entry installs the
 // plugin; Don't ask again for this server silences every later list. The unregistered sender
@@ -21,9 +21,10 @@ interface Announce {
   for: string;
 }
 
-const DICE: Announce = { id: "dice", for: "board game nights" };
-const POLL: Announce = { id: "poll", for: "votes on the raid time" };
-const PETS: Announce = { id: "echolings", for: "pets in the lobby" };
+// Official plugins of the run's fixture registry: the two test plugins and fx-webview-probe.
+const STRIP: Announce = { id: "fx-strip", for: "board game nights" };
+const HIGHLIGHT: Announce = { id: "echolings", for: "votes on the raid time" };
+const PROBE: Announce = { id: "fx-webview-probe", for: "pets in the lobby" };
 
 /** A registered mumbot that runs only the `plugins` module (`mumbot plugins --config`). */
 class PluginsBot {
@@ -162,49 +163,49 @@ describe("plugins: server suggestions from mumbot (AC-6.26)", function () {
     await fixtures.stop();
   });
 
-  it("shows Dice in the notification centre, without an OS notification", async () => {
-    await mumbot.start([DICE]);
+  it("shows the test plugin in the notification centre, without an OS notification", async () => {
+    await mumbot.start([STRIP]);
     await mumbot.announced();
     await browser.waitUntil(async () => /unread/.test((await bell().getAttribute("aria-label")) ?? ""), {
       timeout: 30_000,
-      timeoutMsg: "no unread entry after the bot announced Dice",
+      timeoutMsg: "no unread entry after the bot announced the test plugin",
     });
     await expectNoToast();
     await openCentre();
-    await expect(entry(DICE)).toHaveText(expect.stringContaining("This server uses"));
+    await expect(entry(STRIP)).toHaveText(expect.stringContaining("This server uses"));
     for (const id of ["centre-plugin-install", "centre-plugin-details", "centre-plugin-not-now", "centre-plugin-dont-ask"]) {
-      await expect(entryButton(DICE, id)).toBeDisplayed();
+      await expect(entryButton(STRIP, id)).toBeDisplayed();
     }
   });
 
-  it("Not now hides Dice until the bot's list changes", async () => {
-    await entryButton(DICE, "centre-plugin-not-now").click();
-    await entry(DICE).waitForExist({ reverse: true, timeout: 10_000 });
+  it("Not now hides the test plugin until the bot's list changes", async () => {
+    await entryButton(STRIP, "centre-plugin-not-now").click();
+    await entry(STRIP).waitForExist({ reverse: true, timeout: 10_000 });
     await closeCentre();
 
     // Same list again: same seq, so nothing comes back.
-    await mumbot.start([DICE]);
+    await mumbot.start([STRIP]);
     await mumbot.announced();
     await browser.pause(3_000);
     expect(await suggestionEntries()).toBe(0);
     await closeCentre();
 
-    // A changed list raises seq: Dice returns, Poll is new.
-    await mumbot.start([DICE, POLL]);
+    // A changed list raises seq: the test plugin returns, the highlighted one is new.
+    await mumbot.start([STRIP, HIGHLIGHT]);
     await openCentre();
-    await entry(DICE).waitForDisplayed({ timeout: 30_000 });
-    await entry(POLL).waitForDisplayed({ timeout: 10_000 });
+    await entry(STRIP).waitForDisplayed({ timeout: 30_000 });
+    await entry(HIGHLIGHT).waitForDisplayed({ timeout: 10_000 });
     await expectNoToast();
   });
 
-  it("installs Dice from its entry", async () => {
-    await entryButton(DICE, "centre-plugin-install").click();
+  it("installs the test plugin from its entry", async () => {
+    await entryButton(STRIP, "centre-plugin-install").click();
     const confirm = $(
       "//div[contains(concat(' ',@class,' '),' plugin-prompt ')]//button[normalize-space(.)='Install']",
     );
     // The prompt names the server's suggestion and its reason (FR-6.79).
     await expect($("//div[contains(concat(' ',@class,' '),' plugin-prompt ')]")).toHaveText(
-      expect.stringContaining(DICE.for),
+      expect.stringContaining(STRIP.for),
       { wait: 30_000 },
     );
     // The permission list pushes Install below the fold of the dialog.
@@ -218,14 +219,14 @@ describe("plugins: server suggestions from mumbot (AC-6.26)", function () {
 
   it("Don't ask again silences every later list of this server", async () => {
     await openCentre();
-    await entryButton(POLL, "centre-plugin-dont-ask").click();
+    await entryButton(HIGHLIGHT, "centre-plugin-dont-ask").click();
     await browser.waitUntil(async () => (await suggestionEntries()) === 0, {
       timeout: 10_000,
       timeoutMsg: "suggestions still shown after Don't ask again",
     });
     await closeCentre();
 
-    await mumbot.start([POLL, PETS]);
+    await mumbot.start([HIGHLIGHT, PROBE]);
     await mumbot.announced();
     await browser.pause(3_000);
     expect(await suggestionEntries()).toBe(0);

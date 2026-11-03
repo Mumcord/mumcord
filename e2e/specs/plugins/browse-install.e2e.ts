@@ -1,13 +1,18 @@
 // AC-6.1 and AC-6.30 (spec 06): one app against the fixture registry and the local test server.
-// Browse puts Echolings first and nothing is installed; installing Poll shows the coloured
-// permission rows, the visibility choice and the progress bar, then a toast and the Poll icon in
-// the Plugins strip. `mumcord://plugins/dice` opens Dice's details without installing it, and a
-// link to a third-party plugin id does nothing.
+// The official plugins are the test plugins of e2e/fixtures/plugins: "Fixture Highlight" has the
+// id Browse highlights (echolings), "Fixture Strip" a panel and Poll's permissions. Browse puts the
+// highlighted plugin first and nothing is installed; installing Fixture Strip shows the coloured
+// permission rows, the visibility choice and the progress bar, then a toast and its icon in the
+// Plugins strip. `mumcord://plugins/echolings` opens that plugin's details without installing it,
+// and a link to a third-party plugin id does nothing.
 import { $, $$, browser, expect } from "@wdio/globals";
 import { app, registry, testenv } from "../../helpers/index.ts";
 import { fill, launchWithLink } from "../../helpers/servers-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { addAndConnect, completeWizard } from "../../helpers/voice-ui.ts";
+
+const STRIP = "Fixture Strip";
+const HIGHLIGHT = { id: "echolings", name: "Fixture Highlight" };
 
 /** A third-party plugin of the fixture repository (spec 06 §11). */
 const THIRD_PARTY_ID = "fx-dice-like";
@@ -66,16 +71,16 @@ describe("plugins: Browse, install prompt and deep links (AC-6.1, AC-6.30)", () 
     await fixtures.stop();
   });
 
-  it("AC-6.1: nothing is installed and Browse lists Echolings first", async () => {
+  it("AC-6.1: nothing is installed and Browse lists the highlighted plugin first", async () => {
     await openPlugins("Installed");
     await expect($("//p[normalize-space(.)='No plugins yet.']")).toBeDisplayed({ wait: 10_000 });
     await pluginTab("Browse").click();
-    await $("button[aria-label='Install Poll']").waitForClickable({ timeout: 30_000 });
+    await $(`button[aria-label='Install ${STRIP}']`).waitForClickable({ timeout: 30_000 });
     const names = await $$("ul.plugin-browse-list > li.plugin-card .plugin-card-name").map((el) =>
       el.getText(),
     );
-    expect(names[0]).toContain("Echolings");
-    expect(names.join(" | ")).toEqual(expect.stringContaining("Poll"));
+    expect(names[0]).toContain(HIGHLIGHT.name);
+    expect(names.join(" | ")).toEqual(expect.stringContaining(STRIP));
     await expect($(".plugin-card-installed")).not.toBeExisting();
   });
 
@@ -94,13 +99,13 @@ describe("plugins: Browse, install prompt and deep links (AC-6.1, AC-6.30)", () 
       });
       observer.observe(document.body, { childList: true, subtree: true });
     });
-    await $("button[aria-label='Install Poll']").click();
+    await $(`button[aria-label='Install ${STRIP}']`).click();
     await prompt().waitForDisplayed({ timeout: 30_000 });
     const rows = $$("ul.perm-rows > li.perm-row");
     await rows[0].waitForDisplayed({ timeout: 30_000 });
-    // Poll's five required permissions each carry the "Required" chip.
+    // The five required permissions each carry the "Required" chip.
     expect(await $$("ul.perm-rows .perm-chip").length).toBe(5);
-    // Every row shows its risk colour; Poll asks for green and yellow ones, drawn differently.
+    // Every row shows its risk colour; the plugin asks for green and yellow ones, drawn differently.
     const risks = await $$("ul.perm-rows .perm-icon").map(async (icon) => {
       const cls = (await icon.getAttribute("class")) ?? "";
       const risk = /perm-risk-(green|yellow|red)/.exec(cls)?.[1];
@@ -116,7 +121,7 @@ describe("plugins: Browse, install prompt and deep links (AC-6.1, AC-6.30)", () 
     expect(green).toBeDefined();
     expect(yellow).toBeDefined();
     expect(green?.colour).not.toEqual(yellow?.colour);
-    // Poll talks to peers, so the prompt asks who may tell; the manifest default is Everyone.
+    // The plugin talks to peers, so the prompt asks who may tell; the manifest default is Everyone.
     const group = $(".plugin-prompt-visibility [role='radiogroup']");
     await expect(group).toBeDisplayed();
     const choices = await group.$$("input[type='radio']").map((r) => r.getAttribute("value"));
@@ -124,11 +129,11 @@ describe("plugins: Browse, install prompt and deep links (AC-6.1, AC-6.30)", () 
     await expect(group.$("input[value='everyone']")).toBeSelected();
   });
 
-  it("AC-6.1: Install shows the progress bar, a toast and the Poll icon in the strip", async () => {
+  it("AC-6.1: Install shows the progress bar, a toast and the plugin's icon in the strip", async () => {
     const install = prompt().$("button=Install");
     await install.waitForClickable({ timeout: 60_000 });
     await install.click();
-    await expect($(".plugin-toast")).toHaveText(expect.stringContaining("Poll installed"), {
+    await expect($(".plugin-toast")).toHaveText(expect.stringContaining(`${STRIP} installed`), {
       wait: 30_000,
     });
     const sawProgress = await browser.execute(
@@ -136,15 +141,15 @@ describe("plugins: Browse, install prompt and deep links (AC-6.1, AC-6.30)", () 
     );
     expect(sawProgress).toBe(true);
     await closeSettings();
-    await expect(stripIcon("Poll")).toBeDisplayed({ wait: 30_000 });
+    await expect(stripIcon(STRIP)).toBeDisplayed({ wait: 30_000 });
   });
 
-  it("AC-6.30: mumcord://plugins/dice opens Dice in Browse without installing it", async () => {
-    await sendLink("mumcord://plugins/dice");
-    await details("dice").waitForDisplayed({ timeout: 30_000 });
-    await expect(details("dice").$("button[aria-label='Install Dice roller']")).toBeDisplayed();
-    await expect($(".plugin-toast*=Dice installed")).not.toBeExisting();
-    await details("dice").$("button.pd-back").click();
+  it("AC-6.30: mumcord://plugins/echolings opens that plugin in Browse without installing it", async () => {
+    await sendLink(`mumcord://plugins/${HIGHLIGHT.id}`);
+    await details(HIGHLIGHT.id).waitForDisplayed({ timeout: 30_000 });
+    await expect(details(HIGHLIGHT.id).$(`button[aria-label='Install ${HIGHLIGHT.name}']`)).toBeDisplayed();
+    await expect($(`.plugin-toast*=${HIGHLIGHT.name} installed`)).not.toBeExisting();
+    await details(HIGHLIGHT.id).$("button.pd-back").click();
     await closeSettings();
   });
 
@@ -172,7 +177,7 @@ describe("plugins: Browse, install prompt and deep links (AC-6.1, AC-6.30)", () 
     await expect(details(THIRD_PARTY_ID)).not.toBeExisting();
 
     // The same path still works for an official id afterwards, so the link really arrived.
-    await sendLink("mumcord://plugins/dice");
-    await details("dice").waitForDisplayed({ timeout: 30_000 });
+    await sendLink(`mumcord://plugins/${HIGHLIGHT.id}`);
+    await details(HIGHLIGHT.id).waitForDisplayed({ timeout: 30_000 });
   });
 });
