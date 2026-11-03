@@ -72,6 +72,13 @@
     "cancelled": "Download cancelled",
     "busy": "{{sender}} is busy, try again later",
     "noSpace": "Not enough disk space in {{folder}}",
+    "reason": {
+      "noAnswer": "{{sender}} did not answer",
+      "connect": "Couldn't connect through the relay: {{reason}}",
+      "connectUnknown": "Couldn't connect through the relay",
+      "stalled": "The transfer stalled",
+      "connectionLost": "The connection was lost"
+    },
     "state": {
       "available": "available",
       "queued": "queued",
