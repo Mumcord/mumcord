@@ -62,8 +62,10 @@ BUNDLED COMPONENTS (not Rust or npm packages)
 =============================================
 
 The Mumble protocol definitions, and the C/C++ libraries that Mumcord compiles in,
-links or loads: libopus and SQLite are compiled in by Rust crates, libvpx is
-statically linked into every build, PipeWire is loaded from the Linux system, and
+links or loads: libopus and SQLite are compiled in by Rust crates, libvpx,
+SVT-AV1 and dav1d are statically linked into every build, the hardware encoder
+interfaces (NVENC, AMF and VA-API headers, Intel's VPL dispatcher) into the
+Windows and Linux builds, PipeWire is loaded from the Linux system, and
 the Linux AppImage carries GStreamer and WebKitGTK from its Ubuntu 24.04 build host.
 BoringSSL-derived code compiled in by the ring crate is covered by ring's license
 texts in the Rust section below.

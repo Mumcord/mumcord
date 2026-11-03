@@ -1,0 +1,82 @@
+name: Build the native AV1 libraries
+description: >-
+  Restores or builds the static SVT-AV1 and dav1d that screen sharing links and, on Windows and
+  Linux, the hardware encoder interfaces (scripts/build-{svt-av1,dav1d,hwenc-sdk}.sh), and exports
+  SVTAV1_STATIC_DIR, DAV1D_STATIC_DIR and HWENC_SDK_DIR. Each library is cached per system and architecture; its key changes with
+  its build script, which pins the version, so a cache hit skips the build and all build tools.
+runs:
+  using: composite
+  steps:
+    - id: key
+      shell: bash
+      run: |
+        base="$RUNNER_OS-$RUNNER_ARCH"
+        {
+          echo "svt-av1=svt-av1-$base-${{ hashFiles('scripts/build-svt-av1.sh') }}"
+          echo "dav1d=dav1d-$base-${{ hashFiles('scripts/build-dav1d.sh') }}"
+          echo "hwenc=hwenc-sdk-$base-${{ hashFiles('scripts/build-hwenc-sdk.sh') }}"
+        } >> "$GITHUB_OUTPUT"
+
+    - id: svt-av1
+      uses: actions/cache@v6
+      with:
+        path: ${{ runner.temp }}/svt-av1
+        key: ${{ steps.key.outputs.svt-av1 }}
+
+    - id: dav1d
+      uses: actions/cache@v6
+      with:
+        path: ${{ runner.temp }}/dav1d
+        key: ${{ steps.key.outputs.dav1d }}
+
+    # macOS has no AV1 or VP9 hardware encoder (scripts/build-hwenc-sdk.sh).
+    - id: hwenc
+      if: runner.os != 'macOS'
+      uses: actions/cache@v6
+      with:
+        path: ${{ runner.temp }}/hwenc-sdk
+        key: ${{ steps.key.outputs.hwenc }}
+
+    - name: Install build tools
+      if: >-
+        steps.svt-av1.outputs.cache-hit != 'true' || steps.dav1d.outputs.cache-hit != 'true' ||
+        (runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true')
+      shell: bash
+      run: |
+        case "$RUNNER_OS" in
+          Linux) scripts/ci/apt-install.sh nasm meson ninja-build ;;
+          macOS) brew install nasm meson ninja ;;
+          Windows)
+            pip install --disable-pip-version-check meson ninja
+            # The official NASM build: cmake and meson run it as a native Windows program.
+            nasm=2.16.03
+            curl -fsSL -o "$RUNNER_TEMP/nasm.zip" \
+              "https://www.nasm.us/pub/nasm/releasebuilds/$nasm/win64/nasm-$nasm-win64.zip"
+            unzip -q "$RUNNER_TEMP/nasm.zip" -d "$RUNNER_TEMP"
+            cygpath -w "$RUNNER_TEMP/nasm-$nasm" >> "$GITHUB_PATH"
+            ;;
+        esac
+
+    - name: Build static SVT-AV1
+      if: steps.svt-av1.outputs.cache-hit != 'true'
+      shell: bash
+      run: scripts/build-svt-av1.sh '${{ runner.temp }}/svt-av1'
+
+    - name: Build static dav1d
+      if: steps.dav1d.outputs.cache-hit != 'true'
+      shell: bash
+      run: scripts/build-dav1d.sh '${{ runner.temp }}/dav1d'
+
+    - name: Build the hardware encoder interfaces
+      if: runner.os != 'macOS' && steps.hwenc.outputs.cache-hit != 'true'
+      shell: bash
+      run: scripts/build-hwenc-sdk.sh '${{ runner.temp }}/hwenc-sdk'
+
+    - name: Point the build at the libraries
+      shell: bash
+      run: |
+        {
+          echo 'SVTAV1_STATIC_DIR=${{ runner.temp }}/svt-av1'
+          echo 'DAV1D_STATIC_DIR=${{ runner.temp }}/dav1d'
+          if [[ "$RUNNER_OS" != macOS ]]; then echo 'HWENC_SDK_DIR=${{ runner.temp }}/hwenc-sdk'; fi
+        } >> "$GITHUB_ENV"
