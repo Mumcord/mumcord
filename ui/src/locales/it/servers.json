@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} si è connesso con l'identità predefinita perché la sua manca."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Il relay consente",
+    "line": "Il relay consente: {{uses}}",
+    "images": "Immagini",
+    "files": "File",
+    "screen": "Condivisione dello schermo"
   }
 }

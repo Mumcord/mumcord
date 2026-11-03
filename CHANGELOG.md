@@ -7,14 +7,20 @@
 - The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
 - The server info panel lists what the relay allows ("Relay allows: Images · Files · Screen sharing"), and buttons and the image viewer say so in plain words when the relay doesn't allow a feature.
+- Settings → Privacy & Connections has a new "File sharing" card: turn receiving files on or off, pick the maximum file size (100 MB to 2 GB) and choose the folder where received files are saved (by default a "Mumcord" folder inside Downloads).
+- The message input has a paperclip button and accepts dropped files and folders in channels: each becomes a chip with its size or progress and a remove button. The paperclip says why it is unavailable when the server has no relay, the relay doesn't allow files, you have no certificate, or your peer-to-peer setting needs the relay.
+- Dropping images into a channel asks whether to send them as images or share them as files; other files are shared at once. Private chats keep sending dropped images inline.
+- Files shared in a channel show up as a file card with name, size, type and checksum. Every download asks first, programs and scripts get an extra warning before download and before opening, and the card shows the queue position, progress, the check that the file arrived unchanged, and Open / Open folder. Your own shared files show who downloaded them and a Stop sharing button (with a clear message if stopping fails)
 
 ### Fixed
 
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 - Chat history of locked channels (password or restricted entry) is no longer shared with people who only follow or listen to them: only people inside the channel get its earlier messages, and members who use a channel password must prove they know the current one. "Follow all" now skips channels you may not enter. Older Mumcord versions still share it, so everyone should update (#382)
+- When someone connects to you through the relay without sharing their network address ("Always use relay"), Mumcord no longer sends them yours either; the connection always went through the relay, so your address was revealed for nothing
 
 ### Internal
 
+- File transfer over the relay (not yet visible in the app): files travel only through the relay on their own stream with a size check, and a screen share or full-size image download continues when that switches the connection from direct to the relay
 - Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
 
 ## [0.6.2] - 2026-11-02

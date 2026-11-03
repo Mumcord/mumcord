@@ -4055,6 +4055,7 @@ dependencies = [
  "ring",
  "rnnoise-rs",
  "rusqlite",
+ "rustix",
  "rustls",
  "rustls-platform-verifier",
  "serde",

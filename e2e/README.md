@@ -161,6 +161,12 @@ image (minutes). `relayenv.relayStatus()` reads the relay's `/v1/status`.
   container. Without it `relayenv.relayAvailable()` is false and specs skip themselves (CI).
 - **Parallel runs:** `MUMPEER_PORT_BASE` / `MUMPEER_PROJECT` (run n of `MUMCORD_E2E_RUN` gets
   `45000+100n` and `e2e-n-mumpeer`).
+- **Registration:** the relay bot hands out tokens to registered users only. File sharing specs call
+  `relayenv.resetRelayData()` before their first `startRelay` and in `after` (an empty server, so names stay free for later specs) and
+  register every client with `files.registerOnServer()` (helpers/files-ui.ts).
+- **Real drops:** `files.dropFiles(id, paths)` drags files onto a client's chat with an XDND source
+  (helpers/x11-drop.py), the same GTK path as a file manager; `files.pickInFileDialog` drives the system
+  file picker. Every client has its own Downloads folder (`app.downloadsDir(id)`).
 - **Test hooks:** `env: relayenv.hookEnv({ fileExpirySeconds, fileCorrupt, encoderProbe, svtSelftest,
 encodeDelayMs, onBattery, noWebcodecsAv1, keepOldKey })` for `app.restart`/`startB`/`startC`; debug
   builds only.

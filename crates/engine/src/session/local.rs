@@ -756,6 +756,12 @@ impl Engine {
             self.direct()
                 .consent_changed(settings.allow_direct_connections);
         }
+        if previous.files_receive != settings.files_receive
+            || previous.files_max_size != settings.files_max_size
+            || previous.p2p_mode != settings.p2p_mode
+        {
+            self.files_settings_changed();
+        }
         if previous.positional != settings.positional {
             self.positional_configure(&settings.positional);
         }

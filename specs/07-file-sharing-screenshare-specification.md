@@ -110,7 +110,7 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.22** Every download needs a click on Download and a confirmation; this can never be switched off. The confirmation dialog shows name, size, sender, the full checksum and the save folder, with **Download** and **Cancel**. For risky types (FR-7.24) the risky-type warning (mockup 6) replaces it: "{name} is a program or script. Only open it if you trust {sender}." with **Don't download** (default, focused) and **Download anyway**.
 - **FR-7.23** File names are sanitized before display and saving: path parts removed (both `/` and `\`), control characters and characters invalid on any of Windows, macOS, Linux replaced with `_`, Windows reserved names (`CON`, `NUL`, `COM1` …) prefixed with `_`, leading dots and trailing dots/spaces removed, length cut to 200 characters keeping the extension, empty result becomes `file`. Right-to-left override and other bidi control characters are removed.
 - **FR-7.24** Risky types (by the extension after sanitizing, case-insensitive, also for a double extension such as `report.pdf.exe`): `exe, msi, msix, msp, appx, bat, cmd, com, scr, pif, cpl, hta, jar, js, jse, vbs, vbe, wsf, ps1, psm1, reg, lnk, url, app, dmg, pkg, command, sh, run, bin, appimage, deb, rpm, apk, py, pl`.
-- **FR-7.25** Saving: into the save folder (default: the system Downloads folder). Data is written to a hidden partial file in that folder and only renamed to the final name after the hash matched. An existing name gets " (1)", " (2)" … before the extension. Not enough free space (checked before start against the announced size) → "Not enough disk space in {folder}" and no transfer starts.
+- **FR-7.25** Saving: into the save folder (default: `<system Downloads>/Mumcord`, created on the first download if missing; a folder the user chose is used as-is). Data is written to a hidden partial file in that folder and only renamed to the final name after the hash matched. An existing name gets " (1)", " (2)" … before the extension. Not enough free space (checked before start against the announced size) → "Not enough disk space in {folder}" and no transfer starts.
 - **FR-7.26** Integrity: after the last byte Mumcord computes the SHA-256 of the received file. Equal to the offer → card Done with "✓ Matches the offer" and the full hash. Different (or more or fewer bytes than announced) → the partial file is deleted, nothing is opened, and the card shows "The file changed in transit or doesn't match the offer – deleted" (mockup 12).
 - **FR-7.27** Mark-of-the-web on the final file: Windows: `Zone.Identifier` stream with `ZoneId=3`; macOS: `com.apple.quarantine` attribute; Linux: extended attribute `user.xdg.origin.url` set to `mumble://{server host}` where the file system supports it (Linux has no blocking mark; this only records the origin). Failing to set it is logged (without the file name) and does not fail the download.
 - **FR-7.28** Progress (mockup 3): bar, percent, "{received} of {size}", speed, time left, **Cancel**. Cancel stops the transfer, deletes the partial file and frees the sender's slot. If the connection drops, the card shows Failed with Retry (a retry starts from zero).
@@ -429,7 +429,7 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 |---|---|---|---|---|
 | Settings | `files_receive` | bool | yes | default true |
 | | `files_max_size` | enum 100M/500M/1G/2G | yes | default 1G |
-| | `files_save_folder` | path | yes | default system Downloads |
+| | `files_save_folder` | path | yes | default `<system Downloads>/Mumcord` |
 | | `screen_resolution` | enum auto/720/1080/1440 | yes | default auto |
 | | `screen_fps` | enum 15/30/60 | yes | default 30 |
 | | `screen_optimize` | enum balanced/text/motion | yes | default balanced |
@@ -659,6 +659,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Snap bypass (#386 Q6) | Hold Alt; keyboard users are not affected | User approval 2026-11-03; FR-7.64, FR-7.67 |
 | Camera room default height (#386 Q7) | Same Auto default now; revisit with the camera spec | User approval 2026-11-03; FR-7.74 |
 | Offer wire format (#400) | The file offer and `mumcord.file` use **Bovnar** via the Rust implementation from the fork Mumcord/bovnar, pinned git dependency. Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-7.75, §6.4. Base64 for the HTML attribute is an assumption of this spec |
+| Default save folder (mockup 8) | `<system Downloads>/Mumcord`, created on the first download; a user-chosen folder is used as-is | mockup 8 wins over the spec text (user decision 2); FR-7.25 |
 
 ## 13. Open points & risks
 

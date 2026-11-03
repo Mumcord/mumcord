@@ -23,14 +23,14 @@
     "keepBlocked": "Coinnigh blocáilte",
     "forget": "Déan dearmad ar an athsheachadán",
     "actionFailed": "Níor oibrigh sé sin. Bain triail eile as.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Níl athsheachadán ag an bhfreastalaí seo, mar sin níl comhroinnt comhad ar fáil.",
+    "filesDisallowed": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt comhad.",
+    "screenDisallowed": "Ní cheadaíonn athsheachadán an fhreastalaí seo comhroinnt scáileáin.",
+    "imagesDisallowed": "Níl an méid iomlán ar fáil: ní cheadaíonn athsheachadán an fhreastalaí seo íomhánna",
+    "noCertificate": "Teastaíonn teastas cliaint le haghaidh comhroinnte comhad.",
+    "modeNeedsRelay": "Teastaíonn an t-athsheachadán le haghaidh comhroinnte comhad; is é {{mode}} do shocrú peer-to-peer.",
+    "modeOff": "As",
+    "modeDirectOnly": "Díreach amháin"
   },
   "reason": {
     "p2pOff": "Tá piarbhrearthóireacht múchta.",

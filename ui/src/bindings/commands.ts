@@ -245,6 +245,45 @@ export const commands = {
 	 */
 	fullImageCancel: (serverId: number, reference: string) => typedError<null, ApiError>(__TAURI_INVOKE("full_image_cancel", { serverId, reference })),
 	/**
+	 *  Why file sharing is unavailable on the server, or `null` when it works (FR-7.9). The
+	 *  paperclip button's disabled state and tooltip.
+	 */
+	filesAvailability: (serverId: number) => __TAURI_INVOKE<FilesUnavailable | null>("files_availability", { serverId }),
+	/**
+	 *  Adds a file or folder to the attachment tray (FR-7.11 – 7.13) and returns its chip; a folder
+	 *  is zipped in the background and reported as `fileChipChanged`.
+	 */
+	filesChipAdd: (path: string) => __TAURI_INVOKE<FileChip>("files_chip_add", { path }),
+	/**  Takes a chip out of the tray (and drops its zip). */
+	filesChipRemove: (chipId: number) => __TAURI_INVOKE<void>("files_chip_remove", { chipId }),
+	/**
+	 *  Posts one offer message per chip into the channel (FR-7.14) and returns the posted own
+	 *  messages. A chip the server refused stays in the tray as failed. Errors: `invalidInput`
+	 *  above 10 chips, `permissionDenied` when file sharing is unavailable.
+	 */
+	filesSend: (serverId: number, channelId: number, chipIds: number[]) => typedError<ChatMessage[], ApiError>(__TAURI_INVOKE("files_send", { serverId, channelId, chipIds })),
+	/**  Ends an own share ("Stop sharing", FR-7.16). */
+	filesStop: (shareId: string) => __TAURI_INVOKE<void>("files_stop", { shareId }),
+	/**  The current card of a share, or `null` when unknown. */
+	filesCard: (serverId: number, shareId: string) => __TAURI_INVOKE<FileCard | null>("files_card", { serverId, shareId }),
+	/**
+	 *  Starts the download of a card after the user confirmed it (FR-7.22); also used by Retry.
+	 *  Returns once the request is on its way; the card reports progress as `fileCardChanged`.
+	 */
+	filesDownload: (serverId: number, shareId: string) => typedError<null, ApiError>(__TAURI_INVOKE("files_download", { serverId, shareId })),
+	/**  Cancels a running download of the card. */
+	filesCancel: (serverId: number, shareId: string) => __TAURI_INVOKE<void>("files_cancel", { serverId, shareId }),
+	/**  The folder downloads are saved to: the setting, else the system Downloads folder. */
+	filesSaveFolder: () => typedError<string, ApiError>(__TAURI_INVOKE("files_save_folder")),
+	/**
+	 *  Opens a downloaded file with the system's default program (FR-7.29). The saved file keeps
+	 *  its mark-of-the-web, so the system still warns about it. Errors: `notFound` with "The file is
+	 *  no longer in {folder}" when it was moved or deleted.
+	 */
+	filesOpen: (serverId: number, shareId: string) => typedError<null, ApiError>(__TAURI_INVOKE("files_open", { serverId, shareId })),
+	/**  Shows a downloaded file in the system's file manager (FR-7.29). Same errors as `files_open`. */
+	filesOpenFolder: (serverId: number, shareId: string) => typedError<null, ApiError>(__TAURI_INVOKE("files_open_folder", { serverId, shareId })),
+	/**
 	 *  Preview of an http(s) link in a message; `null` when previews are switched off in the
 	 *  settings (then nothing is fetched) or there is nothing to show.
 	 */
@@ -922,6 +961,8 @@ export const events = {
 	defaultAvatarSkipped: makeEvent<DefaultAvatarSkipped, DefaultAvatarSkipped>("default-avatar-skipped"),
 	directConsentRequired: makeEvent<DirectConsentRequired, DirectConsentRequired>("direct-consent-required"),
 	dndChanged: makeEvent<DndChanged, DndChanged>("dnd-changed"),
+	fileCardChanged: makeEvent<FileCardChanged, FileCardChanged>("file-card-changed"),
+	fileChipChanged: makeEvent<FileChipChanged, FileChipChanged>("file-chip-changed"),
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
@@ -1317,7 +1358,21 @@ export type ChatMessage = {
 	 *  messages received or sent here. Show "from ‹name›'s history".
 	 */
 	syncedFrom: string | null,
+	/**  The file card of a file offer (spec 07); show it instead of the plain `body` line. */
+	file: FileCard | null,
 };
+
+/**  Why a chip could not be shared. */
+export type ChipError = 
+/**  `name` is larger than 2 GB. */
+{ kind: "tooLarge"; name: string } | { kind: "unreadable"; path: string } | 
+/**  The server refused the offer message; `reason` is its text. */
+{ kind: "serverRefused"; reason: string } | { kind: "other"; message: string };
+
+/**  A chip's state in the attachment tray (mockup 1b). */
+export type ChipState = { kind: "zipping"; done: number; total: number } | { kind: "ready" } | { kind: "checking"; done: number; total: number } | { kind: "failed"; error: ChipError } | 
+/**  The offer was posted; the chip leaves the tray. */
+{ kind: "sent" };
 
 export type CloseBehaviour = "ask" | "minimizeToTray" | "quit";
 
@@ -1415,6 +1470,13 @@ export type DndState = {
 	system: SystemDnd,
 };
 
+/**  Why a card's Download button is disabled (FR-7.21). */
+export type DownloadBlock = 
+/**  Own offer: no Download at all. */
+{ kind: "own" } | { kind: "unavailable"; reason: FilesUnavailable } | { kind: "receiveOff" } | 
+/**  Larger than the user's limit. */
+{ kind: "tooLarge"; limit: FilesMaxSize } | { kind: "anotherDownload" };
+
 /**  A dropped image file, ready to go into the attachment tray. */
 export type DroppedImage = {
 	/**  File name without the folder. */
@@ -1492,8 +1554,69 @@ export type ErrorCode =
 /**  Unexpected internal failure. */
 "internal";
 
+/**  Why a download failed (FR-7.20, FR-7.34). */
+export type FailReason = { kind: "noAnswer" } | { kind: "busy" } | 
+/**  The relay connection failed; `reason` is `null` when the relay gave none. */
+{ kind: "connect"; reason: RelayUnavailable | null } | { kind: "stalled" } | { kind: "connectionLost" } | 
+/**  Not enough disk space in `folder`; nothing was requested. */
+{ kind: "noSpace"; folder: string } | 
+/**  Writing the file failed; `message` is the system's text. */
+{ kind: "io"; message: string };
+
+/**  A file card in the chat. Sizes and times are plain numbers (bytes, Unix seconds). */
+export type FileCard = {
+	shareId: string,
+	/**  Sanitized name. */
+	name: string,
+	size: number,
+	/**  Display only; untrusted. */
+	mime: string,
+	sha256: string,
+	expires: number,
+	senderName: string,
+	own: boolean,
+	/**  A program or script: the risky warning replaces the plain confirmation (FR-7.24). */
+	risky: boolean,
+	state: FileCardState,
+	downloadBlock: DownloadBlock | null,
+	share: OwnShare | null,
+};
+
+/**  A card changed: a received offer's state or progress, or an own share's details. */
+export type FileCardChanged = {
+	serverId: number,
+	card: FileCard,
+};
+
+/**  A card's state as the recipient sees it (section 7.2). */
+export type FileCardState = { kind: "available" } | { kind: "unavailable"; reason: UnavailableReason } | { kind: "requested" } | 
+/**  1 = next. */
+{ kind: "queued"; position: number } | { kind: "downloading"; received: number; bytesPerSec: number } | { kind: "checking" } | 
+/**  `path` is where the file was saved. */
+{ kind: "done"; path: string } | 
+/**  The file did not match the offer and was deleted. */
+{ kind: "mismatch" } | { kind: "failed"; reason: FailReason } | { kind: "cancelled" };
+
+/**  A file or folder in the composer's attachment tray. */
+export type FileChip = {
+	id: number,
+	name: string,
+	size: number | null,
+	state: ChipState,
+};
+
+/**  A chip changed. Not tied to a server: chips exist before they are sent. */
+export type FileChipChanged = {
+	chip: FileChip,
+};
+
 /**  Largest accepted file (Settings → Files). */
 export type FilesMaxSize = "100M" | "500M" | "1G" | "2G";
+
+/**  Why file sharing is not available on a server (FR-7.9), in the order the spec shows them. */
+export type FilesUnavailable = { kind: "noRelay" } | { kind: "relayNoFiles" } | { kind: "noCertificate" } | 
+/**  File sharing needs the relay; the peer-to-peer setting is `mode` (`off` or `directOnly`). */
+{ kind: "p2pMode"; mode: P2pMode };
 
 /**  Outcome of "Follow all channels" (QA.13); already followed channels are not counted. */
 export type FollowAllSummary = {
@@ -2318,6 +2441,16 @@ export type NowPlayingStatus = {
 	supported: boolean,
 	/**  `null` while the setting is off or nothing plays. */
 	track: NowPlaying | null,
+};
+
+/**  The sender's view of an own share (FR-7.16). */
+export type OwnShare = {
+	/**  True once sharing ended; `endReason` is `null` when it ended before this run of Mumcord. */
+	ended: boolean,
+	endReason: ShareEndReason | null,
+	downloadedBy: string[],
+	sendingTo: SendingTo | null,
+	waiting: number,
 };
 
 /**
@@ -3166,6 +3299,12 @@ export type ScreenSharesChanged = {
 /**  Own upload limit in Mbit/s. */
 export type ScreenUploadLimit = "auto" | "2" | "5" | "10" | "20";
 
+/**  The running transfer of an own share. */
+export type SendingTo = {
+	recipient: string,
+	percent: number,
+};
+
 /**  A chat request the user sent; a decline is never told, so it stays pending. */
 export type SentChatRequest = {
 	session: number,
@@ -3467,7 +3606,7 @@ export type Settings = {
 	/**  Accept files offered by others (Settings → Files). */
 	filesReceive: boolean,
 	filesMaxSize: FilesMaxSize,
-	/**  Save folder for received files; `None` is the system Downloads folder. */
+	/**  Save folder for received files; `None` is `Mumcord` inside the system Downloads folder. */
 	filesSaveFolder: string | null,
 	screenResolution: ScreenResolution,
 	screenFps: ScreenFps,
@@ -3482,6 +3621,9 @@ export type Settings = {
 export type SetupPreset = "everythingOn" | 
 /**  "Balanced (Recommended)". */
 "balanced" | "maximumPrivacy" | "custom";
+
+/**  Why an own share ended (the sender's card says "Sharing ended"). */
+export type ShareEndReason = "expired" | "stopped" | "leftServer" | "quit" | "fileChanged";
 
 /**  What the sharer picked in the system picker (issue #163). */
 export type ShareKind = "window" | "screen";
@@ -3639,6 +3781,11 @@ export type TrayChat = {
 
 /**  "Settings…" was chosen in the tray menu; the window is already in front. */
 export type TraySettingsRequested = Record<string, never>;
+
+/**  Why a card is unavailable (FR-7.20). */
+export type UnavailableReason = "senderOffline" | 
+/**  The sender answered that the share is gone. */
+"ended" | "expired";
 
 export type UnreadChanged = {
 	serverId: number,

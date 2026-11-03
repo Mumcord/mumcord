@@ -34,6 +34,7 @@ function message(
     body,
     dismissedPreviews: [],
     syncedFrom,
+    file: null,
   };
 }
 

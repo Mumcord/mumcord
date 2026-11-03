@@ -309,10 +309,10 @@
     "missingNotice": "Ο {{server}} συνδέθηκε με την προεπιλεγμένη ταυτότητα επειδή λείπει η δική του."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Το ρελέ επιτρέπει",
+    "line": "Το ρελέ επιτρέπει: {{uses}}",
+    "images": "Εικόνες",
+    "files": "Αρχεία",
+    "screen": "Κοινή χρήση οθόνης"
   }
 }

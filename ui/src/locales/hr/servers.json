@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} se povezao zadanim identitetom jer njegov vlastiti nedostaje."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Relej dopušta",
+    "line": "Relej dopušta: {{uses}}",
+    "images": "Slike",
+    "files": "Datoteke",
+    "screen": "Dijeljenje zaslona"
   }
 }

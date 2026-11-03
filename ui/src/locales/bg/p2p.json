@@ -23,14 +23,14 @@
     "keepBlocked": "Остави блокирано",
     "forget": "Забрави релето",
     "actionFailed": "Не се получи. Опитай отново.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Този сървър няма реле, затова споделянето на файлове не е налично.",
+    "filesDisallowed": "Релето на този сървър не позволява споделяне на файлове.",
+    "screenDisallowed": "Релето на този сървър не позволява споделяне на екрана.",
+    "imagesDisallowed": "Пълният размер не е наличен: релето на този сървър не позволява изображения",
+    "noCertificate": "Споделянето на файлове изисква клиентски сертификат.",
+    "modeNeedsRelay": "Споделянето на файлове изисква релето; настройката ти за peer-to-peer е {{mode}}.",
+    "modeOff": "Изкл.",
+    "modeDirectOnly": "Само директно"
   },
   "reason": {
     "p2pOff": "Peer-to-peer е изключено.",

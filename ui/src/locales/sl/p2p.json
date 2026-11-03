@@ -23,14 +23,14 @@
     "keepBlocked": "Ohrani blokiranega",
     "forget": "Pozabi relej",
     "actionFailed": "Ni uspelo. Poskusi znova.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Ta strežnik nima releja, zato deljenje datotek ni na voljo.",
+    "filesDisallowed": "Relej tega strežnika ne dovoljuje deljenja datotek.",
+    "screenDisallowed": "Relej tega strežnika ne dovoljuje deljenja zaslona.",
+    "imagesDisallowed": "Polna velikost ni na voljo: relej tega strežnika ne dovoljuje slik",
+    "noCertificate": "Deljenje datotek zahteva odjemalčevo potrdilo.",
+    "modeNeedsRelay": "Deljenje datotek potrebuje relej; tvoja nastavitev peer-to-peer je {{mode}}.",
+    "modeOff": "Izklopljeno",
+    "modeDirectOnly": "Samo neposredno"
   },
   "reason": {
     "p2pOff": "Peer-to-peer je izklopljen.",

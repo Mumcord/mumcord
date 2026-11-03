@@ -272,6 +272,8 @@ struct Inner {
     screen_shares: crate::screen_share::ServerShares,
     /// Packet inspector capture, shared by every connection (issue #60).
     inspector: Arc<crate::inspector::Inspector>,
+    /// File sharing: own shares and the cards of received offers (spec 07).
+    files: crate::files::FileSharing,
 }
 
 #[derive(Default)]
@@ -579,6 +581,7 @@ impl Engine {
             queries: queries.clone(),
             public_servers: crate::public_servers::PublicServers::new(queries),
             full_images: crate::full_image::ServerTransfers::default(),
+            files: crate::files::FileSharing::default(),
             direct: crate::p2p::Direct::default(),
             relays: crate::peer::Relays::default(),
             core: Mutex::new(Core::default()),
@@ -601,6 +604,7 @@ impl Engine {
         let engine = Self { inner };
         engine.inner.direct.bind(engine.downgrade());
         engine.inner.relays.bind(engine.downgrade());
+        engine.inner.files.bind(&engine);
         lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
         engine.positional_poll_restart();
         engine
@@ -763,6 +767,10 @@ impl Engine {
 
     pub(crate) fn now_playing_state(&self) -> &Mutex<crate::now_playing::NowPlaying> {
         &self.inner.now_playing
+    }
+
+    pub(crate) fn files(&self) -> &crate::files::FileSharing {
+        &self.inner.files
     }
 
     pub(crate) fn direct(&self) -> &crate::p2p::Direct {
@@ -1033,6 +1041,7 @@ impl Engine {
     /// in a voice channel it also waits for the quit sound (#325), at most
     /// [`QUIT_WAIT_MAX`](crate::sounds::QUIT_WAIT_MAX), in parallel with the drain.
     pub fn shutdown(&self) -> impl Future<Output = ()> + Send + use<> {
+        self.files_quit();
         let mut core = lock(&self.inner.core);
         let mut slots: Vec<(ServerId, u64)> = core
             .slots
@@ -1846,6 +1855,7 @@ impl Inner {
             crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
             self.forget_password_attempt(server_id);
+            self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
             self.direct.reset(server_id);
             if self.relays.reset(server_id) {
@@ -1876,6 +1886,7 @@ impl Inner {
         crate::mumcord::on_synced(&self.mumcord, ctx);
         crate::plugins::on_synced(ctx.events.plugins(), ctx, &self.blocked);
         crate::history_sync::on_synced(&self.history_sync, ctx, &self.rt);
+        self.files.on_connection_reset(ctx.server_id);
         self.full_images.reset(ctx.server_id);
         self.direct.reset(ctx.server_id);
         if self.relays.reset(ctx.server_id) {
@@ -2683,6 +2694,10 @@ impl Inner {
                         self.user_view_of(server_id, user, setting),
                     ));
                 }
+                if change.joined {
+                    self.files
+                        .on_user_joined(server_id, user.cert_hash.as_deref());
+                }
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
             }
             Event::UserRemoved { user, .. } => {
@@ -2718,6 +2733,7 @@ impl Inner {
                     user.session,
                 );
                 self.full_images.forget(server_id, user.session);
+                self.files.on_user_removed(server_id, user.session);
                 self.direct.forget(server_id, user.session);
                 self.relays.on_user_removed(ctx, user.session);
                 if audio {
@@ -2758,6 +2774,7 @@ impl Inner {
             Event::PluginData(data)
                 if crate::blocking::sent_by_blocked(ctx, &self.blocked, data) =>
             {
+                self.files.on_blocked_data(ctx, data);
                 crate::plugins::on_blocked_data(ctx.events.plugins(), ctx, data);
             }
             Event::PluginData(data) => {
@@ -2789,6 +2806,7 @@ impl Inner {
                 crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
                 crate::pm_rules::on_plugin_data(ctx, &self.pm_requests, data);
                 crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
+                self.files.on_plugin_data(ctx, data);
                 self.direct.on_plugin_data(ctx, data);
                 self.relays.on_plugin_data(ctx, data, &self.inspector);
                 crate::plugins::on_plugin_data(ctx.events.plugins(), ctx, data, &self.inspector);
@@ -2803,6 +2821,7 @@ impl Inner {
                     &self.mumcord,
                     &self.pm_requests,
                     &self.blocked,
+                    &self.files,
                 );
                 crate::plugins::on_text(
                     ctx.events.plugins(),

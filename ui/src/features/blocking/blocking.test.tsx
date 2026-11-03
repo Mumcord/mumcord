@@ -41,6 +41,7 @@ function message(id: string, overrides: Partial<ChatMessage> = {}): ChatMessage 
     own: false,
     dismissedPreviews: [],
     syncedFrom: null,
+    file: null,
     ...overrides,
   };
 }

@@ -51,7 +51,7 @@
     "unavailable": "Ten kanał nie jest już dostępny.",
     "offline": "{{name}} jest offline. Napiszesz ponownie, gdy ta osoba wróci.",
     "unnamedImage": "Wklejony obraz",
-    "attachFiles": "Share files"
+    "attachFiles": "Udostępnij pliki"
   },
   "tray": {
     "label": "Obrazy do wysłania",

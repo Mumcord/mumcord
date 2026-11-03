@@ -26,6 +26,7 @@ function message(body: string, dismissedPreviews: string[] = []): ChatMessage {
     body,
     dismissedPreviews,
     syncedFrom: null,
+    file: null,
   };
 }
 

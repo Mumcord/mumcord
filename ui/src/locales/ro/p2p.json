@@ -23,14 +23,14 @@
     "keepBlocked": "Păstrează blocat",
     "forget": "Uită releul",
     "actionFailed": "Nu a funcționat. Încearcă din nou.",
-    "noRelay": "This server has no relay, so file sharing isn't available.",
-    "filesDisallowed": "This server's relay doesn't allow file sharing.",
-    "screenDisallowed": "This server's relay doesn't allow screen sharing.",
-    "imagesDisallowed": "Full size not available: this server's relay doesn't allow images",
-    "noCertificate": "File sharing needs a client certificate.",
-    "modeNeedsRelay": "File sharing needs the relay; your peer-to-peer setting is {{mode}}.",
-    "modeOff": "Off",
-    "modeDirectOnly": "Direct only"
+    "noRelay": "Acest server nu are releu, deci partajarea fișierelor nu este disponibilă.",
+    "filesDisallowed": "Releul acestui server nu permite partajarea fișierelor.",
+    "screenDisallowed": "Releul acestui server nu permite partajarea ecranului.",
+    "imagesDisallowed": "Dimensiunea completă nu este disponibilă: releul acestui server nu permite imagini",
+    "noCertificate": "Partajarea fișierelor necesită un certificat de client.",
+    "modeNeedsRelay": "Partajarea fișierelor are nevoie de releu; setarea ta peer-to-peer este {{mode}}.",
+    "modeOff": "Dezactivat",
+    "modeDirectOnly": "Doar direct"
   },
   "reason": {
     "p2pOff": "Peer-to-peer este dezactivat.",

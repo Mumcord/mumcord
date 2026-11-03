@@ -8,6 +8,7 @@ import {
   readlinkSync,
   realpathSync,
   rmSync,
+  writeFileSync,
 } from "node:fs";
 import { createConnection } from "node:net";
 import { tmpdir } from "node:os";
@@ -129,7 +130,18 @@ async function clearKeyring(): Promise<void> {
 export async function newProfile(inst: Instance = state.a): Promise<void> {
   inst.profileDir = mkdtempSync(join(tmpdir(), `mumcord-profile-${inst.id}-`));
   for (const d of ["data", "config", "cache"]) mkdirSync(join(inst.profileDir, d));
+  // Every instance gets its own Downloads folder (they share HOME), as a desktop names it.
+  mkdirSync(downloadsDir(inst.id));
+  writeFileSync(
+    join(inst.profileDir, "config", "user-dirs.dirs"),
+    `XDG_DOWNLOAD_DIR="${downloadsDir(inst.id)}"\n`,
+  );
   if (inst.id === "a") await clearKeyring();
+}
+
+/** The system Downloads folder of an instance (default: A). */
+export function downloadsDir(id: AppId = "a"): string {
+  return join(state[id].profileDir, "Downloads");
 }
 
 /** The WebDriver capabilities that launch the app binary with the instance's arguments. */
@@ -294,6 +306,13 @@ function strayPids(id: AppId): { app: number[]; drivers: number[] } {
     }
   }
   return found;
+}
+
+/** The PID of the running app process of an instance (default: A). */
+export function appPid(id: AppId = "a"): number {
+  const pid = strayPids(id).app.at(0);
+  if (pid === undefined) throw new Error(`app ${id.toUpperCase()} is not running`);
+  return pid;
 }
 
 function alive(pid: number): boolean {

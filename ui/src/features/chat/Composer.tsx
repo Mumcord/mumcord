@@ -40,6 +40,14 @@ import type { ReplyQuote } from "./reply";
 import { credentialLinks as countCredentials, mumbleLinks } from "./mumbleLink";
 import { MumbleLinkCard } from "./MumbleLinkCard";
 import { useComposer } from "./useComposer";
+import { FileChipTray } from "../files/composer/FileChipTray";
+import { DropChoice } from "../files/composer/DropChoice";
+import { splitDropped } from "../files/composer/dropSplit";
+import { FileDropOverlay } from "../files/composer/FileDropOverlay";
+import { PaperclipButton } from "../files/composer/PaperclipButton";
+import { unavailableText } from "../files/composer/unavailableText";
+import { useFileChips } from "../files/composer/useFileChips";
+import { useFileDrop } from "../files/composer/useFileDrop";
 
 export interface ComposerProps {
   target: SendTarget | null;
@@ -127,7 +135,12 @@ export function Composer({
   onCancelReply,
 }: ComposerProps) {
   const { t } = useTranslation("chat");
+  const { t: tFiles } = useTranslation("files");
+  const { t: tP2p } = useTranslation("p2p");
   const composer = useComposer(target, limits, reply, onCancelReply);
+  const inChannelTarget = target?.kind === "channel";
+  const fileChips = useFileChips(inChannelTarget);
+  const reasonId = useId();
   // A `mumble://` link the user typed is shown as its card before sending (issue #175).
   const previewLinks = useMemo(() => mumbleLinks(composer.text), [composer.text]);
   const credentialLinks = useMemo(() => countCredentials(previewLinks), [previewLinks]);
@@ -207,9 +220,40 @@ export function Composer({
   const [dragging, setDragging] = useState(false);
   // Native file drags (desktop app) over the composer; they bypass the HTML5 drag events.
   const [nativeOver, setNativeOver] = useState(false);
-  const nativeDrop = useRef({ disabled, addDroppedPaths: composer.addDroppedPaths });
+  // In a channel where sharing works, every drop on the chat becomes a file chip instead.
+  const shareDrops = inChannelTarget && fileChips.unavailable === null && !disabled;
+  const [chatHost, setChatHost] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    setChatHost(formRef.current?.closest<HTMLElement>(".chat") ?? null);
+  }, []);
+  const [pendingDrop, setPendingDrop] = useState<readonly string[] | null>(null);
+  const dropOver = useFileDrop({
+    host: chatHost,
+    accept: shareDrops,
+    rejectOutside: target?.kind === "private" && !disabled,
+    exclude: shareDrops ? null : formRef,
+    onPaths: (paths) => {
+      const { images, others } = splitDropped(paths);
+      // Images may mean an inline picture or a file to share: ask. Anything else is a file.
+      if (images.length > 0) {
+        setPendingDrop(paths);
+        return;
+      }
+      void fileChips.addPaths(others);
+    },
+    onRejected: () => {
+      fileChips.fail(tFiles("composer.privateChat"));
+    },
+  });
+  const nativeDrop = useRef({
+    disabled: disabled || shareDrops,
+    addDroppedPaths: composer.addDroppedPaths,
+  });
   useEffect(() => {
-    nativeDrop.current = { disabled, addDroppedPaths: composer.addDroppedPaths };
+    nativeDrop.current = {
+      disabled: disabled || shareDrops,
+      addDroppedPaths: composer.addDroppedPaths,
+    };
   });
 
   useEffect(() => {
@@ -243,6 +287,13 @@ export function Composer({
     element.focus();
     element.setSelectionRange(pending.selectionStart, pending.selectionEnd);
   }, [composer.text]);
+
+  /** Sends the typed text and images, then one offer per ready file chip. */
+  function submitAll() {
+    if (fileChips.busy) return;
+    composer.submit();
+    if (target?.kind === "channel" && fileChips.hasSendable) void fileChips.send(target.channelId);
+  }
 
   function format(kind: Format) {
     const element = input.current;
@@ -336,7 +387,7 @@ export function Composer({
     }
     if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
-      if (!slash.run(composer.text)) composer.submit();
+      if (!slash.run(composer.text)) submitAll();
     }
   }
 
@@ -417,10 +468,20 @@ export function Composer({
         onDrop={onDrop}
         onSubmit={(event) => {
           event.preventDefault();
-          if (!slash.run(composer.text)) composer.submit();
+          if (!slash.run(composer.text)) submitAll();
         }}
       >
         {blockedReason ? <p className="chat-composer__blocked">{blockedReason}</p> : null}
+        {inChannelTarget && fileChips.unavailable !== null ? (
+          <p id={reasonId} className="chat-composer__blocked">
+            {unavailableText(tP2p, fileChips.unavailable)}
+          </p>
+        ) : null}
+        {fileChips.error ? (
+          <p className="chat-composer__error" role="alert">
+            {fileChips.error}
+          </p>
+        ) : null}
         {slash.error ? (
           <p className="chat-composer__error" role="alert">
             {slash.error}
@@ -467,6 +528,7 @@ export function Composer({
             ))}
           </div>
         ) : null}
+        <FileChipTray chips={fileChips.chips} onRemove={fileChips.remove} />
         <AttachmentTray items={composer.attachments} onRemove={composer.removeAttachment} />
         {pickerOpen ? (
           <MentionPicker
@@ -485,6 +547,18 @@ export function Composer({
         <FormatToolbar onFormat={format} disabled={disabled} />
         <div className="chat-composer__row">
           <ChatActionRow />
+          {inChannelTarget ? (
+            <PaperclipButton
+              disabled={disabled}
+              reason={
+                fileChips.unavailable === null ? null : unavailableText(tP2p, fileChips.unavailable)
+              }
+              describedBy={reasonId}
+              onPick={(paths) => {
+                void fileChips.addPaths(paths);
+              }}
+            />
+          ) : null}
           <button
             type="button"
             className="chat-composer__icon"
@@ -551,6 +625,29 @@ export function Composer({
         <p id={hintId} className="visually-hidden">
           {t("composer.hint")}
         </p>
+        {pendingDrop !== null ? (
+          <DropChoice
+            onImage={() => {
+              const { images, others } = splitDropped(pendingDrop);
+              setPendingDrop(null);
+              void composer.addDroppedPaths(images);
+              if (others.length > 0) void fileChips.addPaths(others);
+              input.current?.focus();
+            }}
+            onFile={() => {
+              setPendingDrop(null);
+              void fileChips.addPaths(pendingDrop);
+              input.current?.focus();
+            }}
+            onCancel={() => {
+              setPendingDrop(null);
+              input.current?.focus();
+            }}
+          />
+        ) : null}
+        {dropOver && chatHost !== null ? (
+          <FileDropOverlay host={chatHost} channel={hereName} />
+        ) : null}
       </form>
     </>
   );

@@ -26,6 +26,7 @@ import { NowPlayingGroup } from "./sections/NowPlayingGroup";
 import { InGameOverlayCard } from "./sections/OverlaySection";
 import { DeveloperToolsCard } from "./sections/PacketInspectorSection";
 import { PositionalGroup } from "./sections/PositionalGroup";
+import { FileSharingSettings } from "../files/FileSharingSettings";
 import { ConnectionsCard } from "./sections/PrivacySection";
 import { PrivacySummaryCard } from "./sections/PrivacySummaryCard";
 import { PrivateMessagesGroup } from "./sections/PrivateMessagesGroup";
@@ -108,6 +109,7 @@ export function SettingsPageCards({
       return (
         <>
           <PrivacySummaryCard settings={settings} presetMatch={presetMatch} />
+          <FileSharingSettings {...props} />
           <ConnectionsCard {...props} />
           <ExternalContentCard {...props} />
           <HistorySyncCard {...props} />
