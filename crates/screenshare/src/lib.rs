@@ -1,27 +1,40 @@
-//! Screen sharing media (FR-2.42, FR-2.44): VP9 software encoder and decoder on libvpx.
+//! Screen sharing media (FR-2.42, FR-2.44, FR-7.37, FR-7.59): realtime video encoders and
+//! decoders behind one interface ([`VideoEncoder`], [`VideoDecoder`]).
 //!
-//! The encoder runs in libvpx realtime mode with three temporal layers (L1T3, pattern 0-2-1-2):
-//! dropping every layer-2 frame halves the frame rate, dropping layers 1 and 2 quarters it, and
-//! the remaining frames still decode. Each [`EncodedFrame`] carries its layer id so the sender can
-//! thin out the stream per viewer without re-encoding. Resolution steps (720p ↔ 480p) are a
-//! runtime reconfiguration of the same encoder.
+//! - VP9 on libvpx ([`Encoder`], [`Decoder`]): realtime mode with three temporal layers (L1T3,
+//!   pattern 0-2-1-2).
+//! - AV1: SVT-AV1 encodes ([`Av1Encoder`]) in its low-delay realtime mode with the same three
+//!   temporal layers; dav1d decodes ([`Av1Decoder`]) where the webview has no
+//!   WebCodecs AV1.
+//!
+//! Dropping every frame of the top layer halves the frame rate, dropping the top two quarters
+//! it, and the remaining frames still decode. Each [`EncodedFrame`] carries its layer id so the
+//! sender can thin out the stream per viewer without re-encoding. Resolution steps are a runtime
+//! reconfiguration of the same encoder.
 //!
 //! Frames are I420 in one tightly packed buffer (Y, then U, then V; chroma planes are half the
 //! size, rounded up).
 
+mod av1_dav1d;
+mod av1_svt;
+mod codec;
 mod decoder;
 mod encoder;
 mod ffi;
 mod frame;
 
+pub use av1_dav1d::Av1Decoder;
+pub use av1_svt::{AV1_TEMPORAL_LAYERS, Av1Encoder, Av1Options};
+pub use codec::{Codec, VideoDecoder, VideoEncoder};
 pub use decoder::Decoder;
 pub use encoder::{EncodedFrame, Encoder, EncoderConfig, TEMPORAL_LAYERS};
 pub use frame::I420Frame;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("libvpx {operation} failed: {message}")]
+    #[error("{library} {operation} failed: {message}")]
     Codec {
+        library: &'static str,
         operation: &'static str,
         message: String,
     },

@@ -1,6 +1,6 @@
 [package]
 name = "mumcord-screenshare"
-description = "Screen sharing media: VP9 software encoder and decoder on libvpx"
+description = "Screen sharing media: VP9 (libvpx) and AV1 (SVT-AV1, dav1d) encoders and decoders"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
