@@ -536,6 +536,12 @@ pub enum EngineEvent {
         received: u32,
         total: u32,
     },
+    /// A chip in the composer's file tray changed (spec 07, FR-7.11 – FR-7.14). Not tied to a
+    /// server: chips exist before they are sent.
+    FileChipChanged(crate::files::sender::ChipView),
+    /// A file card changed: a received offer's state or progress, or an own share's details
+    /// (spec 07, FR-7.16, FR-7.20). Cards are identified by their share id.
+    FileCardChanged(Box<crate::files::card::FileCardView>),
     /// The friends list changed: a friend was added or removed, came online, moved, was
     /// renamed or went offline (FR-1.64). Online friends first.
     FriendsChanged(Vec<crate::friends::FriendView>),

@@ -114,6 +114,12 @@ impl ShareRegistry {
         Some(&share.downloaded_by)
     }
 
+    /// The offer message was refused, so the share never started: forgets it without deleting
+    /// its file (the chip keeps it for another try).
+    pub fn withdraw(&mut self, id: &str) -> Option<Share> {
+        self.shares.remove(id)
+    }
+
     /// Stop sharing.
     pub fn stop(&mut self, id: &str) -> Option<Ended> {
         self.end(id, EndReason::Stopped)

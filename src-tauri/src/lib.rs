@@ -861,6 +861,8 @@ fn emit_engine_event(
             total,
         }
         .emit(app),
+        // Spec 07 file sharing: the UI events come with the file commands (task F5).
+        EngineEvent::FileChipChanged(_) | EngineEvent::FileCardChanged(_) => Ok(()),
         EngineEvent::PositionalStatusChanged(status) => {
             commands::positional::PositionalStatusChanged {
                 status: status.into(),

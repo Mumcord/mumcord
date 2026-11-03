@@ -937,6 +937,7 @@ impl Core {
                         body: new.body,
                         dismissed_previews: Vec::new(),
                         synced_from: Some(holder_name.clone()),
+                        file: None,
                     }
                 })
                 .collect()
