@@ -224,6 +224,8 @@ impl Engine {
     ) -> FileCardView {
         let share_id = offer.id.clone();
         let key = (server_id, share_id.clone());
+        let expires = offer.expires;
+        let new = !self.recipient().cards.contains_key(&key);
         {
             let mut recipient = self.recipient();
             let card = recipient.cards.entry(key).or_insert_with(|| Card {
@@ -242,8 +244,35 @@ impl Engine {
                 card.sender_session = origin.sender_session;
             }
         }
+        if new {
+            self.show_card_at_expiry(server_id, &share_id, expires);
+        }
         self.file_card(server_id, &share_id)
             .expect("the card was just registered")
+    }
+
+    /// Nothing else happens when an offer runs out, so the card is shown again at that moment
+    /// (AC-7.15).
+    fn show_card_at_expiry(&self, server_id: ServerId, share_id: &str, expires: u64) {
+        let left = expires.saturating_sub(unix_now());
+        if left == 0 {
+            return;
+        }
+        let engine = self.downgrade();
+        let share_id = share_id.to_owned();
+        self.runtime().spawn(async move {
+            // One second late, so the card is past its expiry when it is looked at again.
+            tokio::time::sleep(Duration::from_secs(left + 1)).await;
+            if let Some(engine) = engine.upgrade() {
+                engine.emit_card(server_id, &share_id);
+            }
+        });
+    }
+
+    /// The receive switch, the size limit or the peer-to-peer mode changed: every received card
+    /// may have a new download block.
+    pub(crate) fn files_settings_changed(&self) {
+        self.emit_cards(|_, card| !card.own);
     }
 
     /// The stored message that carries the offer, once known.
@@ -731,6 +760,55 @@ mod tests {
         assert_eq!(expired.state, CardState::Unavailable(Unavailable::Expired));
         let refused = engine.files_download(1, &card.share_id, Path::new("/tmp"));
         assert!(refused.is_err(), "no download while the sender is offline");
+    }
+
+    /// The next FileCardChanged event, if one comes within `wait`.
+    async fn next_card(rx: &mut crate::EventReceiver, wait: Duration) -> Option<FileCardView> {
+        tokio::time::timeout(wait, async {
+            loop {
+                if let EngineEvent::FileCardChanged(view) = rx.recv().await? {
+                    return Some(*view);
+                }
+            }
+        })
+        .await
+        .ok()
+        .flatten()
+    }
+
+    #[tokio::test]
+    async fn a_card_is_shown_again_when_its_offer_expires() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, mut rx) = Engine::new(
+            dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        engine.files_register_offer(1, offer(unix_now() + 1), origin(false), None);
+        let view = next_card(&mut rx, Duration::from_secs(5))
+            .await
+            .expect("a card event at the expiry");
+        assert_eq!(view.state, CardState::Unavailable(Unavailable::Expired));
+    }
+
+    #[tokio::test]
+    async fn changing_the_receive_settings_shows_the_cards_again() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        let (engine, mut rx) = Engine::new(
+            dir.path(),
+            crate::SecretStore::in_memory(),
+            tokio::runtime::Handle::current(),
+        )
+        .expect("engine");
+        engine.files_register_offer(1, offer(unix_now() + 600), origin(false), None);
+        let mut settings = engine.settings().expect("settings");
+        settings.files_receive = false;
+        engine.update_settings(settings).await.expect("update");
+        let view = next_card(&mut rx, Duration::from_secs(5))
+            .await
+            .expect("a card event after the settings change");
+        assert_eq!(view.share_id, offer(0).id);
     }
 
     #[tokio::test]
