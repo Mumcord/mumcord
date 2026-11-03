@@ -15,6 +15,13 @@
 //! never private chats, and only up to the moment the requester started receiving that
 //! channel live as seen here (join or follow); requests reaching later are clamped.
 //!
+//! **Locked channels** (the channel or a parent restricts entering, issue #382): following
+//! is not enough. Only requesters physically in the channel are answered, checked again for
+//! every request and before sending messages; open answers end when the requester leaves.
+//! An answerer that holds access tokens also asks for the password proof ([`super::proof`])
+//! and answers only while its own Enter permission there is confirmed by a fresh
+//! PermissionQuery. The own user asks for a locked channel's history only while inside it.
+//!
 //! Abuse limits: a per-person request budget, at most [`MAX_SERVES`] open answers, size
 //! caps on everything, and data that does not answer an own open request is ignored.
 //! Outgoing packets are paced below the server's plugin message rate limit and sent round
@@ -29,6 +36,7 @@ use std::sync::MutexGuard;
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
 
 use super::hash::{Content, content_hash, text_key, variants};
+use super::proof::{self, NONCE_TTL_MS, Nonce};
 use super::wire::{self, Hash, MAX_MESSAGES, Packet, WireMessage};
 use crate::chat::{ChatMessageView, sanitize_message_html, transient_id};
 use crate::maintenance::history_cutoff;
@@ -78,12 +86,22 @@ pub(crate) trait Env {
     fn channel_key(&self, channel: u32) -> Option<String>;
     /// The "delete history after N days" setting. Never called while [`Env::store`] is held.
     fn history_max_age_days(&self) -> Option<u32>;
+    /// Whether the channel or one of its parents restricts entering; unknown channels count as
+    /// locked.
+    fn channel_locked(&self, channel: u32) -> bool;
+    /// The access tokens (channel passwords) this session sent to the server.
+    fn own_tokens(&self) -> Vec<String>;
+    /// Asks the server for the own permissions in `channel`; the answer comes back through
+    /// [`Core::own_permissions`].
+    fn query_own_permissions(&self, channel: u32);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum RequestError {
     /// The user neither is in nor follows the channel.
     NotLive,
+    /// The channel is locked and the user only follows it.
+    Locked,
 }
 
 /// A token bucket over Unix milliseconds.
@@ -148,6 +166,9 @@ impl Outbox {
 
 struct Peer {
     name: String,
+    cert: Option<String>,
+    /// The channel this person is physically in.
+    inside: u32,
     /// Channels this person receives live (in it or following it) and since when.
     live: HashMap<u32, UnixMillis>,
     budget: Bucket,
@@ -262,8 +283,24 @@ enum HolderState {
 struct Serve {
     requester: u32,
     req: u32,
+    channel: u32,
+    /// A locked channel: the requester must stay inside it.
+    locked: bool,
+    /// Answered after the password proof: the own Enter permission must still hold.
+    proven: bool,
     created: UnixMillis,
     messages: Vec<ChatMessage>,
+}
+
+/// A `hreq` for a locked channel waiting for the requester's password proof.
+struct Challenge {
+    requester: u32,
+    req: u32,
+    channel: u32,
+    from: UnixMillis,
+    to: UnixMillis,
+    nonce: Nonce,
+    created: UnixMillis,
 }
 
 pub(crate) struct Core {
@@ -273,6 +310,9 @@ pub(crate) struct Core {
     pending: VecDeque<Pending>,
     job: Option<Job>,
     serves: Vec<Serve>,
+    challenges: Vec<Challenge>,
+    /// The own Enter permission per channel as last answered by the server, and when.
+    permissions: HashMap<u32, (UnixMillis, bool)>,
     outbox: Outbox,
     pacing: Bucket,
     events: Vec<EngineEvent>,
@@ -287,29 +327,40 @@ impl Core {
             pending: VecDeque::new(),
             job: None,
             serves: Vec::new(),
+            challenges: Vec::new(),
+            permissions: HashMap::new(),
             outbox: Outbox::default(),
             pacing: Bucket::new(SEND_RATE, SEND_BURST, now),
             events: Vec::new(),
         }
     }
 
-    /// A person's current state: `channels` are the channel they are in plus the ones they
-    /// follow. For the own user, every channel that starts arriving live queues a sync up to
-    /// that moment (QA.49).
+    /// A person's current state: `inside` is the channel they are in, `listening` the ones
+    /// they follow. For the own user, every channel that starts arriving live queues a sync up
+    /// to that moment (QA.49); a locked one only once the user is inside it (issue #382).
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn user_seen(
         &mut self,
+        env: &impl Env,
         session: u32,
         name: &str,
-        channels: impl IntoIterator<Item = u32>,
+        cert: Option<&str>,
+        inside: u32,
+        listening: impl IntoIterator<Item = u32>,
         now: UnixMillis,
     ) {
         let peer = self.peers.entry(session).or_insert_with(|| Peer {
             name: String::new(),
+            cert: None,
+            inside,
             live: HashMap::new(),
             budget: Bucket::new(PEER_RATE, PEER_BURST, now),
         });
         name.clone_into(&mut peer.name);
-        let channels: HashSet<u32> = channels.into_iter().collect();
+        peer.cert = cert.map(str::to_owned);
+        let entered = peer.inside != inside;
+        peer.inside = inside;
+        let channels: HashSet<u32> = std::iter::once(inside).chain(listening).collect();
         peer.live.retain(|c, _| channels.contains(c));
         let mut added: Vec<u32> = channels
             .into_iter()
@@ -319,16 +370,39 @@ impl Core {
         for &channel in &added {
             peer.live.insert(channel, now);
         }
+        // Answers for a locked channel end as soon as the requester is no longer inside it.
+        self.serves
+            .retain(|s| s.requester != session || !s.locked || s.channel == inside);
+        self.challenges
+            .retain(|c| c.requester != session || c.channel == inside);
         if session == self.own {
+            // Entering a locked channel that was only followed so far reaches back to the
+            // follow, like any other live channel.
+            let since = self.peers[&session].live.get(&inside).copied();
+            if entered
+                && !added.contains(&inside)
+                && env.channel_locked(inside)
+                && let Some(since) = since
+            {
+                self.queue(inside, since);
+            }
             for channel in added {
-                self.queue(channel, now);
+                if channel == inside || !env.channel_locked(channel) {
+                    self.queue(channel, now);
+                }
             }
         }
+    }
+
+    /// The server's answer to a PermissionQuery for the own user in `channel`.
+    pub(crate) fn own_permissions(&mut self, channel: u32, enter: bool, now: UnixMillis) {
+        self.permissions.insert(channel, (now, enter));
     }
 
     pub(crate) fn user_left(&mut self, session: u32) {
         self.peers.remove(&session);
         self.serves.retain(|s| s.requester != session);
+        self.challenges.retain(|c| c.requester != session);
         self.outbox.forget(session);
         if let Some(Job {
             stage: Stage::Transfer { holders, .. },
@@ -344,16 +418,20 @@ impl Core {
     /// "Load earlier messages": sync the channel up to `before` (or its cutoff).
     pub(crate) fn request(
         &mut self,
+        env: &impl Env,
         channel: u32,
         before: Option<UnixMillis>,
         _now: UnixMillis,
     ) -> Result<(), RequestError> {
-        let since = self
-            .peers
-            .get(&self.own)
-            .and_then(|p| p.live.get(&channel))
+        let own = self.peers.get(&self.own).ok_or(RequestError::NotLive)?;
+        let since = own
+            .live
+            .get(&channel)
             .copied()
             .ok_or(RequestError::NotLive)?;
+        if own.inside != channel && env.channel_locked(channel) {
+            return Err(RequestError::Locked);
+        }
         self.queue(channel, before.map_or(since, |b| b.min(since)));
         Ok(())
     }
@@ -389,6 +467,16 @@ impl Core {
     pub(crate) fn tick(&mut self, env: &impl Env, now: UnixMillis) {
         self.serves
             .retain(|s| now.saturating_sub(s.created) < SERVE_TTL_MS);
+        let (expired, open): (Vec<_>, Vec<_>) = std::mem::take(&mut self.challenges)
+            .into_iter()
+            .partition(|c| now.saturating_sub(c.created) > NONCE_TTL_MS);
+        self.challenges = open;
+        for challenge in expired {
+            self.outbox.push(
+                vec![challenge.requester],
+                &Packet::Deny { req: challenge.req },
+            );
+        }
         if self.job.is_none() {
             self.start_next(env, now);
         }
@@ -641,6 +729,12 @@ impl Core {
                 to,
             } => self.answer_hashes(env, sender, req, channel, from, to, now),
             Packet::Fetch { req, wanted } => self.answer_fetch(env, sender, req, &wanted, now),
+            Packet::Proof { req, macs } => self.answer_proof(env, sender, req, &macs, now),
+            Packet::Challenge {
+                req,
+                channel,
+                nonce,
+            } => self.prove(env, sender, req, channel, &nonce, now),
             Packet::Availability {
                 req,
                 channel,
@@ -692,6 +786,47 @@ impl Core {
                 self.advance(now);
             }
         }
+    }
+
+    /// A holder asks for the password proof of the own `hreq`. Proofs go only to holders inside
+    /// the channel, so nobody outside it can collect them to guess the password offline.
+    fn prove(
+        &mut self,
+        env: &impl Env,
+        sender: u32,
+        req: u32,
+        channel: u32,
+        nonce: &Nonce,
+        now: UnixMillis,
+    ) {
+        let holder_cert = self
+            .peers
+            .get(&sender)
+            .filter(|p| p.inside == channel)
+            .and_then(|p| p.cert.clone());
+        let tokens = env.own_tokens();
+        let own_cert = env.own_cert();
+        let job_channel = self.job.as_ref().map(|j| j.channel);
+        let Some(holder) = self.holder(sender, req) else {
+            return;
+        };
+        if !matches!(holder.state, HolderState::Listing { .. }) {
+            return;
+        }
+        let macs = match (holder_cert, own_cert) {
+            (Some(holder_cert), Some(own_cert))
+                if job_channel == Some(channel) && !tokens.is_empty() =>
+            {
+                proof::prove(&tokens, nonce, channel, &own_cert, &holder_cert)
+            }
+            _ => {
+                // No proof to give: do not wait for this holder.
+                holder.drop_out();
+                self.advance(now);
+                return;
+            }
+        };
+        self.outbox.push(vec![sender], &Packet::Proof { req, macs });
     }
 
     /// The open transfer of `req` with `sender`, if any.
@@ -829,7 +964,12 @@ impl Core {
             return None;
         }
         // Only people who receive the channel live, and only up to when they started to.
-        let since = *self.peers.get(&sender)?.live.get(&channel)?;
+        let peer = self.peers.get(&sender)?;
+        let since = *peer.live.get(&channel)?;
+        // Following a locked channel is not enough: only people inside it may read it.
+        if peer.inside != channel && env.channel_locked(channel) {
+            return None;
+        }
         let to = to.min(since).min(now);
         let from = from.max(now - MAX_AGE_MS);
         if from >= to {
@@ -908,14 +1048,149 @@ impl Core {
             return;
         }
         self.serves.retain(|s| s.requester != sender);
+        self.challenges.retain(|c| c.requester != sender);
         let range = self.answer_range(env, sender, channel, from, to, now);
-        let Some((key, from, to)) = range.filter(|_| self.serves.len() < MAX_SERVES) else {
+        let Some((key, clamped_from, clamped_to)) =
+            range.filter(|_| self.serves.len() + self.challenges.len() < MAX_SERVES)
+        else {
             self.outbox.push(vec![sender], &Packet::Deny { req });
             return;
         };
+        if !env.channel_locked(channel) || env.own_tokens().is_empty() {
+            // Tokenless answerers cannot tell a password channel from one locked by groups:
+            // being inside is all they check.
+            self.serve_hashes(
+                env,
+                sender,
+                req,
+                channel,
+                &key,
+                clamped_from,
+                clamped_to,
+                false,
+                now,
+            );
+            return;
+        }
+        // Holding tokens: the requester proves a password first, and the server confirms
+        // that the own tokens still let this client in.
+        let peer_cert = self.peers.get(&sender).and_then(|p| p.cert.clone());
+        let (Some(_), Some(_), Some(nonce)) = (peer_cert, env.own_cert(), proof::nonce()) else {
+            self.outbox.push(vec![sender], &Packet::Deny { req });
+            return;
+        };
+        env.query_own_permissions(channel);
+        self.challenges.push(Challenge {
+            requester: sender,
+            req,
+            channel,
+            from,
+            to,
+            nonce,
+            created: now,
+        });
+        self.outbox.push(
+            vec![sender],
+            &Packet::Challenge {
+                req,
+                channel,
+                nonce,
+            },
+        );
+    }
+
+    /// The requester's password proof for an open challenge. The nonce is used up by the first
+    /// proof that names it, valid or not.
+    fn answer_proof(
+        &mut self,
+        env: &impl Env,
+        sender: u32,
+        req: u32,
+        macs: &[proof::Mac],
+        now: UnixMillis,
+    ) {
+        if !self.spend(sender, now) {
+            return;
+        }
+        let Some(at) = self
+            .challenges
+            .iter()
+            .position(|c| c.requester == sender && c.req == req)
+        else {
+            return;
+        };
+        let challenge = self.challenges.swap_remove(at);
+        let fresh = now.saturating_sub(challenge.created) <= NONCE_TTL_MS;
+        let range = self.answer_range(
+            env,
+            sender,
+            challenge.channel,
+            challenge.from,
+            challenge.to,
+            now,
+        );
+        let proven = fresh
+            && self.may_enter_since(challenge.channel, challenge.created)
+            && match (
+                self.peers.get(&sender).and_then(|p| p.cert.as_deref()),
+                env.own_cert(),
+            ) {
+                (Some(requester), Some(own)) => proof::verify(
+                    &env.own_tokens(),
+                    macs,
+                    &challenge.nonce,
+                    challenge.channel,
+                    requester,
+                    &own,
+                ),
+                _ => false,
+            };
+        match range.filter(|_| proven && self.serves.len() < MAX_SERVES) {
+            Some((key, from, to)) => {
+                self.serve_hashes(
+                    env,
+                    sender,
+                    req,
+                    challenge.channel,
+                    &key,
+                    from,
+                    to,
+                    true,
+                    now,
+                );
+            }
+            None => {
+                tracing::debug!("history sync: password proof not accepted");
+                self.outbox.push(vec![sender], &Packet::Deny { req });
+            }
+        }
+    }
+
+    /// Whether the server confirmed the own Enter permission in `channel` at or after `since`.
+    fn may_enter_since(&self, channel: u32, since: UnixMillis) -> bool {
+        self.permissions
+            .get(&channel)
+            .is_some_and(|&(at, enter)| enter && at >= since)
+    }
+
+    /// Answers a hash request for a channel the requester may read: sends the hash list and
+    /// keeps the messages for the requester's `get`.
+    #[allow(clippy::too_many_arguments)]
+    fn serve_hashes(
+        &mut self,
+        env: &impl Env,
+        sender: u32,
+        req: u32,
+        channel: u32,
+        key: &str,
+        from: UnixMillis,
+        to: UnixMillis,
+        proven: bool,
+        now: UnixMillis,
+    ) {
         let rows = env.store().messages_between(
             env.server_id(),
-            &Conversation::Channel(key.clone()),
+            &Conversation::Channel(key.to_owned()),
             from,
             to,
             u32::try_from(MAX_MESSAGES).unwrap_or(u32::MAX),
@@ -933,7 +1208,7 @@ impl Core {
         };
         let hashes: Vec<Hash> = messages
             .iter()
-            .map(|m| content_hash(&stored_content(&key, m)))
+            .map(|m| content_hash(&stored_content(key, m)))
             .collect();
         tracing::debug!(count = hashes.len(), "history sync: sending a hash list");
         for packet in wire::chunk_hashes(req, &hashes) {
@@ -942,6 +1217,9 @@ impl Core {
         self.serves.push(Serve {
             requester: sender,
             req,
+            channel,
+            locked: env.channel_locked(channel),
+            proven,
             created: now,
             messages,
         });
@@ -966,7 +1244,19 @@ impl Core {
             return;
         };
         let serve = self.serves.swap_remove(at);
-        if !env.sharing() {
+        // Checked again: the requester may have left a locked channel, or the own password
+        // may have stopped working since the hash list went out.
+        let still_inside = !(serve.locked || env.channel_locked(serve.channel))
+            || self
+                .peers
+                .get(&sender)
+                .is_some_and(|p| p.inside == serve.channel);
+        let still_entering = !serve.proven
+            || self
+                .permissions
+                .get(&serve.channel)
+                .is_some_and(|&(_, enter)| enter);
+        if !env.sharing() || !still_inside || !still_entering {
             self.outbox.push(vec![sender], &Packet::Deny { req });
             return;
         }
