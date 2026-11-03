@@ -1,0 +1,21 @@
+{
+  "manifest": 1,
+  "id": "test-api12",
+  "name": "Fixture API 1.2",
+  "description": "E2E test plugin declaring api ^1.2, newer than this Mumcord; an install must be refused.",
+  "version": "1.0.0",
+  "api": "^1.2",
+  "authors": [
+    "Mumcord test fixtures"
+  ],
+  "license": "MIT",
+  "categories": [
+    "tools"
+  ],
+  "icon": "assets/icon.svg",
+  "permissions": {
+    "required": [
+      "ui.panel"
+    ]
+  }
+}
