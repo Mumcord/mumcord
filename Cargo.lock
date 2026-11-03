@@ -713,7 +713,7 @@ dependencies = [
 [[package]]
 name = "bovnar"
 version = "2.0.0"
-source = "git+https://github.com/Mumcord/bovnar?rev=88f31e2618219144a745f076961d527712c46333#88f31e2618219144a745f076961d527712c46333"
+source = "git+https://github.com/Mumcord/bovnar?rev=595dbb44e6ea57caa6652aed4ceae68926ffda8a#595dbb44e6ea57caa6652aed4ceae68926ffda8a"
 dependencies = [
  "cc",
  "num-bigint",
