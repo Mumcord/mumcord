@@ -2,6 +2,7 @@
 //! offer message, the `mumcord.file` plugin data, file-name sanitizing and the risky-type list.
 //! Everything here comes from or goes to other clients, so decoding validates every field.
 
+pub mod card;
 mod motw;
 pub mod offer;
 pub mod prepare;
@@ -27,3 +28,4 @@ pub(crate) fn is_share_id(id: &str) -> bool {
 pub(crate) fn is_lower_hex(s: &str) -> bool {
     s.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
 }
+
