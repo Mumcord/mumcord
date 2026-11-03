@@ -39,7 +39,7 @@ describe("FileSharingSettings", () => {
     pick.mockResolvedValueOnce("/data/in");
     const update = await renderCard();
     await waitFor(() => {
-      expect(screen.getByLabelText("Save files to")).toHaveValue("~/Downloads");
+      expect(screen.getByLabelText("Save files to")).toHaveValue("~/Downloads/Mumcord");
     });
     fireEvent.click(screen.getByRole("button", { name: "Change…" }));
     await waitFor(() => {

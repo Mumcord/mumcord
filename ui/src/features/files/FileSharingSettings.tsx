@@ -20,7 +20,7 @@ const SIZES: readonly { value: FilesMaxSize; key: string }[] = [
 export function FileSharingSettings({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("files");
   const [defaultFolder, setDefaultFolder] = useState<string | null>(null);
-  // None means "the system Downloads folder"; the engine resolves it for display.
+  // None means "Mumcord inside the system Downloads folder"; the engine resolves it for display.
   useEffect(() => {
     if (settings.filesSaveFolder !== null) return;
     let live = true;

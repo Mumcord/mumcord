@@ -546,7 +546,7 @@ pub fn files_cancel(engine: State<'_, Engine>, server_id: ServerId, share_id: St
     engine.files_cancel(to_engine_server_id(server_id), &share_id);
 }
 
-/// The folder downloads are saved to: the setting, else the system Downloads folder.
+/// The folder downloads are saved to: the setting, else `Mumcord` inside the system Downloads folder.
 #[tauri::command]
 #[specta::specta]
 pub fn files_save_folder(app: AppHandle, engine: State<'_, Engine>) -> ApiResult<String> {

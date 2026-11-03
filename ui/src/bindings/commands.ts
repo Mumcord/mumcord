@@ -3606,7 +3606,7 @@ export type Settings = {
 	/**  Accept files offered by others (Settings → Files). */
 	filesReceive: boolean,
 	filesMaxSize: FilesMaxSize,
-	/**  Save folder for received files; `None` is the system Downloads folder. */
+	/**  Save folder for received files; `None` is `Mumcord` inside the system Downloads folder. */
 	filesSaveFolder: string | null,
 	screenResolution: ScreenResolution,
 	screenFps: ScreenFps,

@@ -14,6 +14,9 @@ use super::card::{
     Unavailable, availability, download_block, shown_state,
 };
 use super::offer::FileOffer;
+
+/// Subfolder of the system Downloads folder that receives files by default (FR-7.25).
+const DEFAULT_SAVE_SUBFOLDER: &str = "Mumcord";
 use super::receive::{IncomingFile, ReceiveError};
 use super::transfer::{ANSWER_TIMEOUT, TransferError};
 use super::unix_now;
@@ -130,13 +133,13 @@ impl Engine {
         availability(relay, has_certificate, mode)
     }
 
-    /// The folder downloads are saved to (FR-7.25): the setting, else `downloads` (the system
-    /// Downloads folder, which only the app layer knows).
+    /// The folder downloads are saved to (FR-7.25): the setting as-is, else `Mumcord` inside
+    /// `downloads` (the system Downloads folder, which only the app layer knows).
     pub fn files_save_folder(&self, downloads: &Path) -> PathBuf {
         self.settings()
             .ok()
             .and_then(|s| s.files_save_folder)
-            .map_or_else(|| downloads.to_path_buf(), PathBuf::from)
+            .map_or_else(|| downloads.join(DEFAULT_SAVE_SUBFOLDER), PathBuf::from)
     }
 
     /// The session that posted the card's offer, if it is online and not this client.
@@ -689,6 +692,23 @@ mod tests {
             message_id: None,
             own,
         }
+    }
+
+    #[tokio::test]
+    async fn default_save_folder_is_mumcord_inside_downloads_and_a_chosen_one_is_kept() {
+        let (_dir, engine) = engine().await;
+        let downloads = Path::new("/home/a/Downloads");
+        assert_eq!(
+            engine.files_save_folder(downloads),
+            downloads.join("Mumcord")
+        );
+        let mut settings = engine.settings().expect("settings");
+        settings.files_save_folder = Some("/data/in".into());
+        engine.update_settings(settings).await.expect("update");
+        assert_eq!(
+            engine.files_save_folder(downloads),
+            PathBuf::from("/data/in")
+        );
     }
 
     #[tokio::test]

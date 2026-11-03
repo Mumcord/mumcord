@@ -50,6 +50,8 @@ impl IncomingFile {
         size: u64,
         sha256: &str,
     ) -> Result<Self, ReceiveError> {
+        // The default `<Downloads>/Mumcord` folder does not exist before the first download.
+        fs::create_dir_all(folder)?;
         ensure_space(folder, available_space(folder)?, size)?;
         let partial = folder.join(format!(".mumcord-{id}.part"));
         let file = create_hidden(&partial)?;
@@ -272,6 +274,15 @@ mod tests {
         file.write(b"ab").unwrap();
         assert_eq!(file.received(), 2);
         assert_eq!(entries(dir.path()), [format!(".mumcord-{ID}.part")]);
+    }
+
+    #[test]
+    fn missing_save_folder_is_created_on_first_download() {
+        let dir = tempfile::tempdir().unwrap();
+        let folder = dir.path().join("Mumcord");
+        let file = IncomingFile::create(&folder, ID, "a.txt", 3, &sha(b"abc")).unwrap();
+        assert!(folder.is_dir());
+        drop(file);
     }
 
     #[test]
