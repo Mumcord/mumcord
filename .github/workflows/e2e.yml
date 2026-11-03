@@ -141,8 +141,8 @@ jobs:
           if-no-files-found: error
 
   # The fixture plugin registry's CLI and packages (scripts/e2e-plugin-registry.sh): built on the
-  # runner, not in the image, because they need the wasm32 target, the plugins' pinned toolchain
-  # and the Mumcord/plugins sources. Runs next to the build job; the shards take the result.
+  # runner, not in the image, because they need the wasm32 target. Runs next to the build job; the
+  # shards take the result.
   plugins:
     name: E2E plugin packages
     needs: changes
@@ -151,17 +151,13 @@ jobs:
     timeout-minutes: 30
     env:
       CARGO_TARGET_DIR: ${{ github.workspace }}/target
-      # The plugin sources and their own target dirs, kept in the cache below.
-      MUMCORD_PLUGINS_CACHE: /home/runner/.cache/mumcord-plugins-src
-      # The official plugins pin their toolchain (rust-toolchain.toml, with the wasm32 target);
-      # rustup installs it on first use.
-      RUSTUP_AUTO_INSTALL: 1
       CARGO_PROFILE_DEV_DEBUG: 0
       CARGO_INCREMENTAL: 0
     steps:
       - uses: actions/checkout@v7
 
-      # The safety fixture builder and the SDK need the wasm32 target of the workspace toolchain.
+      # The safety fixture builder and the test plugins need the wasm32 target of the workspace
+      # toolchain.
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
@@ -169,7 +165,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: e2e-plugins
-          cache-directories: ${{ env.MUMCORD_PLUGINS_CACHE }}
+          # `mumcord-plugin build` puts each test plugin's target dir next to its sources.
+          cache-directories: e2e/fixtures/plugins/*/target
           save-if: ${{ github.event_name != 'pull_request' }}
 
       - name: Build plugin CLI and packages
