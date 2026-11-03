@@ -25,6 +25,7 @@ use std::str::FromStr;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use bovnar::Value;
 use serde::{Deserialize, Serialize};
 use tracing::field::{Field, Visit};
 use tracing::{Event, Subscriber};
@@ -336,119 +337,118 @@ pub fn save_diagnostic_file(path: &Path, info: &DiagnosticInfo) -> io::Result<()
     write_diagnostic(path, info, &recent_log_lines())
 }
 
-fn write_audio_health(out: &mut String, audio: Option<&crate::AudioHealthView>) {
-    let _ = writeln!(out, "\nAudio:");
-    let Some(a) = audio else {
-        let _ = writeln!(out, "  (voice not running)");
-        return;
-    };
-    let r = &a.rating;
-    let issue = r.issue.map_or(String::new(), |i| format!(" ({i:?})"));
-    let _ = writeln!(
-        out,
-        "  rating: {:?}{issue} over the last {} s: dropouts {}, late frames {}, \
-         concealed {} of {} received frames, processing max {} µs",
-        r.rating,
-        r.window_secs,
-        r.dropouts,
-        r.late_frames,
-        r.concealed_frames,
-        r.received_frames,
-        r.processing_max_us
-    );
-    let _ = writeln!(out, "  real-time threads: {}", a.realtime_threads);
-    let _ = writeln!(
-        out,
-        "  device xruns / stream restarts: {} / {}",
-        a.device_xruns, a.stream_restarts
-    );
-    let _ = writeln!(
-        out,
-        "  capture overruns / playback underruns: {} / {}",
-        a.capture_overruns, a.playback_underruns
-    );
-    let _ = writeln!(
-        out,
-        "  late capture frames / late playback wake-ups: {} / {}",
-        a.capture_late_frames, a.playback_late_wakeups
-    );
-    let _ = writeln!(
-        out,
-        "  concealed frames / late packets: {} / {}",
-        a.concealed_frames, a.late_packets
-    );
-    let _ = writeln!(out, "  jitter buffer: {} ms", a.jitter_delay_ms);
-    let _ = writeln!(
-        out,
-        "  capture time avg / max: {} / {} µs",
-        a.capture_time_avg_us, a.capture_time_max_us
-    );
-    let _ = writeln!(
-        out,
-        "  mix time avg / max: {} / {} µs",
-        a.mix_time_avg_us, a.mix_time_max_us
-    );
+/// Bovnar strings cannot hold ASCII control characters; the scrubbed log lines and device names
+/// keep their text with spaces in their place.
+fn text(s: &str) -> Value {
+    Value::String(
+        s.chars()
+            .map(|c| if c.is_ascii_control() { ' ' } else { c })
+            .collect(),
+    )
 }
 
+fn int(n: impl Into<i128>) -> Value {
+    Value::Int(n.into())
+}
+
+fn entries<const N: usize>(fields: [(&str, Value); N]) -> Value {
+    Value::Struct(fields.into_iter().map(|(k, v)| (k.to_owned(), v)).collect())
+}
+
+fn audio_health(audio: Option<&crate::AudioHealthView>) -> Value {
+    let Some(a) = audio else {
+        return Value::Null;
+    };
+    let r = &a.rating;
+    entries([
+        (
+            "rating",
+            entries([
+                ("rating", text(&format!("{:?}", r.rating))),
+                (
+                    "issue",
+                    r.issue.map_or(Value::Null, |i| text(&format!("{i:?}"))),
+                ),
+                ("window_secs", int(r.window_secs)),
+                ("dropouts", int(r.dropouts)),
+                ("late_frames", int(r.late_frames)),
+                ("concealed_frames", int(r.concealed_frames)),
+                ("received_frames", int(r.received_frames)),
+                ("processing_max_us", int(r.processing_max_us)),
+            ]),
+        ),
+        ("realtime_threads", int(a.realtime_threads)),
+        ("device_xruns", int(a.device_xruns)),
+        ("stream_restarts", int(a.stream_restarts)),
+        ("capture_overruns", int(a.capture_overruns)),
+        ("playback_underruns", int(a.playback_underruns)),
+        ("capture_late_frames", int(a.capture_late_frames)),
+        ("playback_late_wakeups", int(a.playback_late_wakeups)),
+        ("concealed_frames", int(a.concealed_frames)),
+        ("late_packets", int(a.late_packets)),
+        ("jitter_delay_ms", int(a.jitter_delay_ms)),
+        ("capture_time_avg_us", int(a.capture_time_avg_us)),
+        ("capture_time_max_us", int(a.capture_time_max_us)),
+        ("mix_time_avg_us", int(a.mix_time_avg_us)),
+        ("mix_time_max_us", int(a.mix_time_max_us)),
+    ])
+}
+
+/// Writes the diagnostic file as a Bovnar document (FR-9.100), indented so people can still read
+/// it. Format version 1.
 fn write_diagnostic(path: &Path, info: &DiagnosticInfo, lines: &[String]) -> io::Result<()> {
-    let mut out = String::new();
-    let _ = writeln!(out, "Mumcord diagnostic file");
-    let _ = writeln!(out, "App version: {}", info.app_version);
-    let _ = writeln!(out, "OS: {}", info.os);
-    let _ = writeln!(out, "\nAudio devices:");
-    if info.audio_devices.is_empty() {
-        let _ = writeln!(out, "  (none)");
-    }
-    for d in &info.audio_devices {
-        let _ = writeln!(
-            out,
-            "  {} {}{}",
-            if d.is_input { "input: " } else { "output:" },
-            scrub_value(&d.name),
-            if d.is_default { " (default)" } else { "" }
-        );
-    }
     let c = &info.connection;
-    let _ = writeln!(out, "\nConnection:");
-    let _ = writeln!(out, "  connected: {}", c.connected);
-    let _ = writeln!(
-        out,
-        "  transport: {}",
-        c.transport.as_deref().unwrap_or("-")
-    );
-    match c.ping_ms {
-        Some(ping) => {
-            let _ = writeln!(out, "  ping: {ping:.1} ms");
-        }
-        None => {
-            let _ = writeln!(out, "  ping: -");
-        }
-    }
-    let _ = writeln!(
-        out,
-        "  packets good/late/lost: {}/{}/{}",
-        c.packets_good, c.packets_late, c.packets_lost
-    );
-    let _ = writeln!(out, "  loss: {:.1} %", c.loss_percent);
-    let kbps = |v: Option<u32>| v.map_or_else(|| "-".to_owned(), |v| format!("{v} kbit/s"));
-    let _ = writeln!(out, "  send bitrate: {}", kbps(c.send_bitrate_kbps));
-    let _ = writeln!(
-        out,
-        "  server max bandwidth: {}",
-        kbps(c.server_max_bandwidth_kbps)
-    );
-    let _ = writeln!(
-        out,
-        "  packets sent/received: {}/{}",
-        c.packets_sent, c.packets_received
-    );
-    let _ = writeln!(out, "  reconnects: {}", c.reconnect_count);
-    write_audio_health(&mut out, c.audio.as_ref());
-    let _ = writeln!(out, "\nRecent log lines:");
-    for line in lines {
-        let _ = writeln!(out, "{}", scrub_value(line));
-    }
-    std::fs::write(path, out)
+    let devices = info
+        .audio_devices
+        .iter()
+        .map(|d| {
+            entries([
+                ("name", text(&scrub_value(&d.name))),
+                ("input", Value::Bool(d.is_input)),
+                ("default", Value::Bool(d.is_default)),
+            ])
+        })
+        .collect();
+    let opt_int = |v: Option<u32>| v.map_or(Value::Null, int);
+    let doc = entries([
+        ("v", int(1u8)),
+        ("app_version", text(&info.app_version)),
+        ("os", text(&info.os)),
+        ("audio_devices", Value::Array(devices)),
+        (
+            "connection",
+            entries([
+                ("connected", Value::Bool(c.connected)),
+                (
+                    "transport",
+                    c.transport.as_deref().map_or(Value::Null, text),
+                ),
+                (
+                    "ping_ms",
+                    c.ping_ms.map_or(Value::Null, |p| Value::Float(p.into())),
+                ),
+                ("packets_good", int(c.packets_good)),
+                ("packets_late", int(c.packets_late)),
+                ("packets_lost", int(c.packets_lost)),
+                ("loss_percent", Value::Float(c.loss_percent.into())),
+                ("send_bitrate_kbps", opt_int(c.send_bitrate_kbps)),
+                (
+                    "server_max_bandwidth_kbps",
+                    opt_int(c.server_max_bandwidth_kbps),
+                ),
+                ("packets_sent", int(c.packets_sent)),
+                ("packets_received", int(c.packets_received)),
+                ("reconnects", int(c.reconnect_count)),
+            ]),
+        ),
+        ("audio", audio_health(c.audio.as_ref())),
+        (
+            "log",
+            Value::Array(lines.iter().map(|l| text(&scrub_value(l))).collect()),
+        ),
+    ]);
+    let bytes = bovnar::to_string(&doc, true).map_err(io::Error::other)?;
+    std::fs::write(path, bytes)
 }
 
 #[cfg(test)]
@@ -466,6 +466,16 @@ mod tests {
         let (sub, shared) = build(dir.path(), level, 7).unwrap();
         tracing::subscriber::with_default(sub, f);
         (dir, shared)
+    }
+
+    /// Writes the diagnostic file and parses it back.
+    fn written(info: &DiagnosticInfo, lines: &[String]) -> bovnar::DomDoc {
+        let dir = tempfile::tempdir().unwrap();
+        let file = dir.path().join("diag.bovnar");
+        write_diagnostic(&file, info, lines).unwrap();
+        let bytes = std::fs::read(&file).unwrap();
+        assert_eq!(bovnar::json::detect(&bytes), bovnar::json::Format::Bovnar);
+        bovnar::DomDoc::parse(&bytes).unwrap()
     }
 
     #[test]
@@ -487,10 +497,18 @@ mod tests {
         for secret in [PASSWORD, MESSAGE, USER, "MIIFAKE", "BEGIN CERTIFICATE"] {
             assert!(!text.contains(secret), "leaked {secret}");
         }
-        assert!(text.contains("App version: 1.2.3"));
-        assert!(text.contains("user_id=4"));
-        assert!(text.contains("chat received"));
-        assert!(text.contains("line one forged line"));
+        let doc = bovnar::DomDoc::parse(text.as_bytes()).unwrap();
+        assert_eq!(doc.get("v").and_then(bovnar::DomNode::as_u8), Some(1));
+        assert_eq!(
+            doc.get("app_version").and_then(bovnar::DomNode::as_str),
+            Some("1.2.3")
+        );
+        let log: Vec<&str> = (0..doc.get("log").unwrap().len())
+            .filter_map(|i| doc.lookup("log").unwrap().at(i)?.as_str())
+            .collect();
+        assert!(log.iter().any(|l| l.contains("user_id=4")));
+        assert!(log.iter().any(|l| l.contains("chat received")));
+        assert!(log.iter().any(|l| l.contains("line one forged line")));
 
         let on_disk: String = std::fs::read_dir(dir.path())
             .unwrap()
@@ -506,7 +524,6 @@ mod tests {
 
     #[test]
     fn diagnostic_file_lists_link_figures() {
-        let dir = tempfile::tempdir().unwrap();
         let mut info = DiagnosticInfo::new("1.2.3");
         info.connection = DiagConnectionStats {
             connected: true,
@@ -535,29 +552,38 @@ mod tests {
             }),
             ..DiagConnectionStats::default()
         };
-        let file = dir.path().join("diag.txt");
-        write_diagnostic(&file, &info, &[]).unwrap();
-        let text = std::fs::read_to_string(&file).unwrap();
-        for line in [
-            "transport: udp",
-            "loss: 12.5 %",
-            "send bitrate: 40 kbit/s",
-            "server max bandwidth: 72 kbit/s",
-            "real-time threads: 2",
-            "rating: Fair (Network) over the last 120 s: dropouts 0, late frames 0, concealed 20 of 980 received frames",
-            "device xruns / stream restarts: 3 / 0",
-            "concealed frames / late packets: 5 / 0",
-            "jitter buffer: 40 ms",
-            "capture time avg / max: 250 / 900 µs",
-            "packets sent/received: 7/9",
+        let doc = written(&info, &[]);
+        let str_at = |path: &str| doc.lookup(path).and_then(bovnar::DomNode::as_str);
+        let u64_at = |path: &str| doc.lookup(path).and_then(bovnar::DomNode::as_u64);
+        assert_eq!(str_at("connection.transport"), Some("udp"));
+        assert_eq!(
+            doc.lookup("connection.loss_percent")
+                .and_then(bovnar::DomNode::as_float),
+            Some(12.5)
+        );
+        assert!(doc.lookup("connection.ping_ms").unwrap().is_null());
+        for (path, value) in [
+            ("connection.send_bitrate_kbps", 40),
+            ("connection.server_max_bandwidth_kbps", 72),
+            ("connection.packets_sent", 7),
+            ("connection.packets_received", 9),
+            ("audio.realtime_threads", 2),
+            ("audio.rating.window_secs", 120),
+            ("audio.rating.concealed_frames", 20),
+            ("audio.rating.received_frames", 980),
+            ("audio.device_xruns", 3),
+            ("audio.concealed_frames", 5),
+            ("audio.jitter_delay_ms", 40),
+            ("audio.capture_time_max_us", 900),
         ] {
-            assert!(text.contains(line), "missing {line}");
+            assert_eq!(u64_at(path), Some(value), "{path}");
         }
+        assert_eq!(str_at("audio.rating.rating"), Some("Fair"));
+        assert_eq!(str_at("audio.rating.issue"), Some("Network"));
     }
 
     #[test]
     fn diagnostic_file_lists_audio_devices() {
-        let dir = tempfile::tempdir().unwrap();
         let mut info = DiagnosticInfo::new("1.2.3");
         info.audio_devices = vec![
             DiagAudioDevice {
@@ -571,12 +597,54 @@ mod tests {
                 is_default: false,
             },
         ];
-        let file = dir.path().join("diag.txt");
-        write_diagnostic(&file, &info, &[]).unwrap();
-        let text = std::fs::read_to_string(&file).unwrap();
-        assert!(text.contains("input:  MacBook Pro Microphone (default)"));
-        assert!(text.contains("output: MacBook Pro Speakers\n"));
-        assert!(!text.contains("(none)"));
+        let doc = written(&info, &[]);
+        let devices = doc.get("audio_devices").unwrap();
+        assert_eq!(devices.len(), 2);
+        let mic = devices.at(0).unwrap();
+        assert_eq!(
+            mic.get("name").and_then(bovnar::DomNode::as_str),
+            Some("MacBook Pro Microphone")
+        );
+        assert_eq!(
+            mic.get("input").and_then(bovnar::DomNode::as_bool),
+            Some(true)
+        );
+        assert_eq!(
+            mic.get("default").and_then(bovnar::DomNode::as_bool),
+            Some(true)
+        );
+        let speakers = devices.at(1).unwrap();
+        assert_eq!(
+            speakers.get("input").and_then(bovnar::DomNode::as_bool),
+            Some(false)
+        );
+        assert!(doc.get("audio").unwrap().is_null());
+    }
+
+    #[test]
+    fn diagnostic_file_survives_control_characters() {
+        let mut info = DiagnosticInfo::new("1.2.3");
+        info.audio_devices = vec![DiagAudioDevice {
+            name: "Mic\u{1b}[31m".to_owned(),
+            is_input: true,
+            is_default: false,
+        }];
+        let doc = written(&info, &["bell\u{7}line".to_owned()]);
+        assert_eq!(
+            doc.lookup("log")
+                .unwrap()
+                .at(0)
+                .and_then(bovnar::DomNode::as_str),
+            Some("bell line")
+        );
+        assert_eq!(
+            doc.lookup("audio_devices")
+                .unwrap()
+                .at(0)
+                .and_then(|d| d.get("name"))
+                .and_then(bovnar::DomNode::as_str),
+            Some("Mic [31m")
+        );
     }
 
     #[test]

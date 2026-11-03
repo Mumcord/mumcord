@@ -3,7 +3,7 @@
 //
 //   AC-7.16 setup.exe and report.pdf.exe → the risky warning with "Don't download" focused; Enter
 //           cancels; "Download anyway" downloads; Open on the done card asks again.
-//   AC-7.17 a hand-made offer (sent by the test bot) named "../../evil\x07.txt" with a
+//   AC-7.17 a hand-made offer (sent by the test bot) named "../../evil\t.txt" with a
 //           right-to-left override shows as "evil_.txt" without bidi characters.
 //   AC-7.19 B's maximum size 100 MB, A offers 200 MB → "Larger than your limit of 100 MB"; a file
 //           over 2 GB is refused at the chip.
@@ -151,15 +151,18 @@ async function setMode(mode: "directRelay" | "relayOnly" | "directOnly"): Promis
   });
 
   it("AC-7.17: a hand-made offer with a hostile name shows the sanitized name", async () => {
-    const wire = JSON.stringify({
-      v: 1,
-      id: "0123456789abcdef0123456789abcdef",
-      n: "../../evil\u0007‮txt.exe.txt",
-      s: 1234,
-      m: "text/plain",
-      h: "a".repeat(64),
-      e: Math.floor(Date.now() / 1000) + 3600,
-    }).replace(/"/g, "&quot;");
+    // The offer is a Bovnar document as base64 (FR-7.75). Bovnar strings cannot carry most control
+    // characters, so a tab stands in for them; it must not survive sanitizing either.
+    const doc = [
+      ".v = 1;",
+      '.id = "0123456789abcdef0123456789abcdef";',
+      '.n = "../../evil\t\u202Etxt.exe.txt";',
+      ".s = 1234;",
+      '.m = "text/plain";',
+      `.h = "${"a".repeat(64)}";`,
+      `.e = ${String(Math.floor(Date.now() / 1000) + 3600)};`,
+    ].join(" ");
+    const wire = Buffer.from(doc, "utf8").toString("base64");
     await bot(["say", `<p>Mallory shared a file</p><span data-mumcord-file="${wire}"></span>`], {
       name: "Mallory",
       port,
