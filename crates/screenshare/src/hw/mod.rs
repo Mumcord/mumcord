@@ -12,6 +12,10 @@ mod amf;
 mod dl;
 #[cfg(hwenc)]
 mod nvenc;
+// Used by the vendor encoders that don't report temporal layer ids themselves.
+#[cfg(hwenc)]
+#[cfg_attr(not(test), allow(dead_code))]
+mod obu;
 #[cfg(hwenc)]
 mod qsv;
 #[cfg(all(hwenc, target_os = "linux"))]
