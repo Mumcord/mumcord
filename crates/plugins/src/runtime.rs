@@ -1,7 +1,7 @@
 //! The wasmtime sandbox (#268, FR-6.1–6.3). A plugin is a WebAssembly component that can only
-//! call the imports in `wit/`: there is no WASI, so no files, sockets, clocks or randomness. Each
-//! running plugin has its own `Store` with a memory limit, and every call into it has a CPU
-//! deadline enforced by epoch interruption. Events reach a plugin through its [`EventQueue`].
+//! call the imports in `wit/1.0.0/`: there is no WASI, so no files, sockets, clocks or
+//! randomness. Each running plugin has its own `Store` with a memory limit, and every call into
+//! it has a CPU deadline enforced by epoch interruption. Events reach a plugin through its [`EventQueue`].
 
 use std::collections::VecDeque;
 use std::path::PathBuf;
@@ -35,7 +35,7 @@ use crate::host::HostEvent;
 use crate::peer_key::PeerKeys;
 
 pub(crate) mod bindings {
-    wasmtime::component::bindgen!({ path: "wit", world: "plugin" });
+    wasmtime::component::bindgen!({ path: "wit/1.0.0", world: "plugin" });
 }
 
 /// The WIT types (events, peers, UI tree …) as Rust types, for the service that feeds plugins.

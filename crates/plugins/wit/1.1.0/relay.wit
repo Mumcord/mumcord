@@ -1,0 +1,34 @@
+/// Since 1.1. Plugin data through the server community's mumpeer relay, end-to-end encrypted
+/// (FR-9.57 … FR-9.64). Needs `peers.relay`.
+///
+/// Reach and visibility as `peers.send`: the own channel, or one person in it. Limits per
+/// plugin: each message at most 64 KiB, 256 kbit/s sustained with a 1 MiB burst. Payloads are
+/// opaque bytes to Mumcord; the SDK helpers encode them as Bovnar documents. Messages arrive as
+/// `relay-message`, once and in order per sender.
+interface relay {
+  use types.{error, session};
+
+  /// Whether relay plugin data can be used right now.
+  enum relay-status {
+    /// The relay carries this plugin's data.
+    available,
+    /// The server's relay does not allow plugin data, or the user's P2P mode or missing client
+    /// certificate rules it out.
+    not-allowed,
+    /// The server has no relay.
+    no-relay,
+    /// The user switched relay plugin data off, globally or for this plugin.
+    switched-off,
+  }
+
+  status: func() -> relay-status;
+
+  /// Sends `data` to everyone in the channel who runs this plugin. Without the relay, a message
+  /// of at most 997 bytes goes through Mumble plugin data when `fallback` is true. Errors:
+  /// `not-permitted`, `too-large`, `rate-limited`, `no-recipients`, `hidden`,
+  /// `relay-unavailable`.
+  send-channel: func(data: list<u8>, fallback: bool) -> result<_, error>;
+
+  /// Sends `data` to one person in the channel; same rules and errors as `send-channel`.
+  send-direct: func(peer: session, data: list<u8>, fallback: bool) -> result<_, error>;
+}

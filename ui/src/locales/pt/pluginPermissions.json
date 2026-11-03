@@ -27,7 +27,13 @@
     "chatPatterns": "Reconhecer certas mensagens do chat, como configurações de jogo coladas",
     "netHttp": "Comunicar com um servidor à sua escolha",
     "secrets": "Guardar um segredo (p. ex., uma chave de API) no porta-chaves do sistema",
-    "uiWebview": "Mostrar o seu próprio conteúdo web numa moldura isolada (sem internet)"
+    "uiWebview": "Mostrar o seu próprio conteúdo web numa moldura isolada (sem internet)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Um pequeno painel deste plugin aparece na barra de plugins.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Só recebe as mensagens de chat do seu canal que começam da forma que declarou, como uma configuração de jogo colada. Nenhum outro texto do chat lhe chega.",
     "netHttp": "Pode falar com um servidor que escolhes, e só com esse.",
     "secrets": "Pode guardar um segredo, como uma chave de API, no porta-chaves do sistema.",
-    "uiWebview": "Pode mostrar o seu próprio conteúdo web numa moldura isolada, sem acesso à internet."
+    "uiWebview": "Pode mostrar o seu próprio conteúdo web numa moldura isolada, sem acesso à internet.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Permissões"
 }

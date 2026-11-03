@@ -832,6 +832,8 @@ pub struct Settings {
     pub screen_sound: bool,
     /// Allow hardware encoders; off forces the software encoder.
     pub screen_use_gpu: bool,
+    /// Plugin platform 1.1 settings (spec 09).
+    pub plugins: PluginSettings,
 }
 
 /// Default hours between two update checks (FR-3.144).
@@ -937,6 +939,51 @@ impl Default for Settings {
             screen_upload_limit: ScreenUploadLimit::default(),
             screen_sound: true,
             screen_use_gpu: true,
+            plugins: PluginSettings::default(),
+        }
+    }
+}
+
+/// Side panel width limits in rem (FR-9.39).
+pub const MIN_SIDE_PANEL_WIDTH_REM: f32 = 18.0;
+pub const MAX_SIDE_PANEL_WIDTH_REM: f32 = 32.0;
+
+/// Settings of the plugin platform (spec 09).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct PluginSettings {
+    /// Plugins may send and receive data through the relay. On by default.
+    pub relay_data_enabled: bool,
+    /// Block plugins rated high risk from being installed. Off by default.
+    pub block_high_risk: bool,
+    /// Plugin sound volume in percent, 0–100.
+    pub sound_volume: u8,
+    pub sound_muted: bool,
+    /// Last side panel width per plugin id, in rem. Clamped on load.
+    pub side_panel_width: BTreeMap<String, f32>,
+}
+
+impl Default for PluginSettings {
+    fn default() -> Self {
+        Self {
+            relay_data_enabled: true,
+            block_high_risk: false,
+            sound_volume: 70,
+            sound_muted: false,
+            side_panel_width: BTreeMap::new(),
+        }
+    }
+}
+
+impl PluginSettings {
+    fn clamp(&mut self) {
+        self.sound_volume = self.sound_volume.min(100);
+        for width in self.side_panel_width.values_mut() {
+            *width = if width.is_finite() {
+                width.clamp(MIN_SIDE_PANEL_WIDTH_REM, MAX_SIDE_PANEL_WIDTH_REM)
+            } else {
+                MIN_SIDE_PANEL_WIDTH_REM
+            };
         }
     }
 }
@@ -998,6 +1045,7 @@ impl Store {
                     .update_interval_hours
                     .clamp(MIN_UPDATE_INTERVAL_HOURS, MAX_UPDATE_INTERVAL_HOURS);
                 settings.input_gain_percent = settings.input_gain_percent.min(200);
+                settings.plugins.clamp();
                 settings.output_volume_percent = settings.output_volume_percent.min(100);
                 Ok(settings)
             }
@@ -1395,6 +1443,31 @@ mod tests {
                 expected
             );
         }
+    }
+
+    #[test]
+    fn plugin_settings_have_defaults_and_are_clamped_on_load() {
+        let (_dir, store) = temp_store();
+        let defaults = store.settings().expect("load").plugins;
+        assert!(defaults.relay_data_enabled);
+        assert!(!defaults.block_high_risk);
+        assert_eq!(defaults.sound_volume, 70);
+        assert!(!defaults.sound_muted);
+        assert!(defaults.side_panel_width.is_empty());
+        store
+            .conn
+            .execute(
+                "INSERT INTO settings (id, data) VALUES (1, ?1)
+                 ON CONFLICT (id) DO UPDATE SET data = excluded.data",
+                params![r#"{"plugins":{"sound_volume":250,"side_panel_width":{"a":5.0,"b":24.0,"c":99.0}}}"#],
+            )
+            .expect("insert");
+        let loaded = store.settings().expect("load").plugins;
+        assert_eq!(loaded.sound_volume, 100);
+        assert_eq!(loaded.side_panel_width["a"], 18.0);
+        assert_eq!(loaded.side_panel_width["b"], 24.0);
+        assert_eq!(loaded.side_panel_width["c"], 32.0);
+        assert!(loaded.relay_data_enabled);
     }
 
     #[test]

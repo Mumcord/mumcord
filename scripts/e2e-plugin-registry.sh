@@ -52,6 +52,12 @@ else
   cp "$work"/fixtures/*.mcplugin "$work/staged/"
 
   for dir in "$repo"/e2e/fixtures/plugins/*/; do
+    # test-api10 is built once with the 0.6.2 SDK; its committed package is used as-is.
+    if [ "$(basename "$dir")" = test-api10 ]; then
+      mkdir -p "$work/built"
+      cp "$dir"test-api10.mcplugin "$work/built/"
+      continue
+    fi
     echo "building the test plugin $(basename "$dir")" >&2
     "$cli" build "$dir" --out "$work/built" >&2
   done

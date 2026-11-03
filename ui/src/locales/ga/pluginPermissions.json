@@ -27,7 +27,13 @@
     "chatPatterns": "Teachtaireachtaí comhrá áirithe a aithint, mar shampla feistis chluiche a greamaíodh",
     "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
-    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)"
+    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)",
+    "uiStage": "Show an activity in the media area",
+    "uiSidePanel": "Show its own content in a side panel",
+    "uiAppMenu": "Add items to the Apps menu",
+    "netOrigins": "Talk to these websites",
+    "peersRelay": "Send data through the server's relay",
+    "audioEffects": "Play short sounds that come with the plugin"
   },
   "explanations": {
     "uiPanel": "Taispeántar painéal beag den bhreiseán seo i stiall na mbreiseán.",
@@ -50,7 +56,13 @@
     "chatPatterns": "Ní fhaigheann sé ach teachtaireachtaí comhrá i do chainéal a thosaíonn mar a d'fhógair sé, mar shampla feisteas cluiche a greamaíodh. Ní shroicheann aon téacs comhrá eile é.",
     "netHttp": "Is féidir leis labhairt le freastalaí amháin a roghnaíonn tú, agus leis sin amháin.",
     "secrets": "Is féidir leis rún, mar eochair API, a choinneáil i eochairshlabhra do chórais.",
-    "uiWebview": "Is féidir leis a ábhar gréasáin féin a thaispeáint i bhfráma séalaithe gan rochtain idirlín."
+    "uiWebview": "Is féidir leis a ábhar gréasáin féin a thaispeáint i bhfráma séalaithe gan rochtain idirlín.",
+    "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
+    "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
+    "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",
+    "netOrigins": "{{plugin}} and its page can send and receive data only with the websites listed below.",
+    "peersRelay": "Faster and larger moves. End-to-end encrypted; the relay can't read it.",
+    "audioEffects": "Short sounds that come with the plugin. You can turn them down or mute them in Settings → Plugins."
   },
   "listLabel": "Ceadanna"
 }

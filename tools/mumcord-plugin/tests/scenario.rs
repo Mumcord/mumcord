@@ -37,7 +37,7 @@ fn build_plugin(root: &Path, folder: &str, wat_source: &str, manifest: &str) -> 
     let mut module = wat::parse_str(wat_source).expect("valid WAT");
     let mut resolve = wit_parser::Resolve::default();
     let (package, _) = resolve
-        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/plugins/wit"))
+        .push_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/plugins/wit/1.0.0"))
         .expect("WIT parses");
     let world = resolve
         .select_world(&[package], Some("plugin"))

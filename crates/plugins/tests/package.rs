@@ -254,7 +254,7 @@ fn web_content_needs_the_webview_permission() {
 
 #[test]
 fn official_only_permissions_are_refused_outside_the_official_index() {
-    for permission in ["ui.webview", "net.http", "secrets"] {
+    for permission in ["net.http", "secrets"] {
         let mut files = good_files();
         files[0].1 = if permission == "net.http" {
             MANIFEST
