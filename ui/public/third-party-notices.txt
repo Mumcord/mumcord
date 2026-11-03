@@ -1231,10 +1231,10 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (668 crates)
+* MIT License (671 crates)
 * Apache License 2.0 (43 crates)
-* BSD 3-Clause "New" or "Revised" License (31 crates)
-* ISC License (20 crates)
+* BSD 3-Clause "New" or "Revised" License (32 crates)
+* ISC License (21 crates)
 * Unicode License v3 (19 crates)
 * Mozilla Public License 2.0 (7 crates)
 * zlib License (3 crates)
@@ -4123,6 +4123,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
+BSD 3-Clause "New" or "Revised" License
+--------------------------------------------------------------------------------
+
+Used by:
+  - ogg 0.8.0 (https://github.com/RustAudio/ogg)
+
+NOTE:
+The full list of contributors can be obtained by looking
+at the VCS log (originally, this crate was git versioned,
+there you can do "git shortlog -sn" for this task).
+
+License text
+------------
+Copyright (c) 2016-2017 est31 <MTest31@outlook.com> and contributors
+Copyright (c) 2002-2015 Xiph.org Foundation
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+- Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+- Neither the name of the Xiph.org Foundation nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+--------------------------------------------------------------------------------
 Boost Software License 1.0
 --------------------------------------------------------------------------------
 
@@ -4864,6 +4909,7 @@ ISC License
 
 Used by:
   - libloading 0.7.4 (https://github.com/nagisa/rust_libloading/)
+  - libloading 0.8.9 (https://github.com/nagisa/rust_libloading/)
   - libloading 0.9.0 (https://github.com/nagisa/rust_libloading/)
 
 Copyright © 2015, Simonas Kazlauskas
@@ -10718,6 +10764,36 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - psl 2.1.246 (https://github.com/addr-rs/psl)
+
+MIT License
+
+Copyright (c) 2016 Rushmore Mushambi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - field-offset 0.3.6 (https://github.com/Diggsey/rust-field-offset)
 
 MIT License
@@ -11566,6 +11642,36 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - psl-types 2.0.11 (https://github.com/addr-rs/psl-types)
+
+MIT License
+
+Copyright (c) 2021 Rushmore Mushambi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - urlpattern 0.6.0 (https://github.com/denoland/rust-urlpattern)
 
 MIT License
@@ -12007,6 +12113,7 @@ Used by:
   - dlopen2_derive 0.4.3 (https://github.com/OpenByteDev/dlopen2)
   - dpi 0.1.2 (https://github.com/rust-windowing/winit)
   - granit-parser 2.0.0 (https://github.com/bourumir-wyngs/granit-parser)
+  - lewton 0.10.2 (https://github.com/RustAudio/lewton)
   - libappindicator-sys 0.9.0
   - libm 0.2.16 (https://github.com/rust-lang/compiler-builtins)
   - mac-notification-sys 0.6.15 (https://github.com/h4llow3En/mac-notification-sys)
