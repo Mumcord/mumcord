@@ -37,6 +37,11 @@ Two things people ask for most after the relay arrived: sending files to the cha
 **Relay allowed uses (user decision 2026-11-02)**
 - mumpeer config: images, files, screen sharing each enabled or disabled (default all enabled); reported in `/v1/status`; carried in the bot's announcement; enforced by the relay when a session is created; honoured by the client with a clear reason.
 
+**Resizable media area (#386, user decision 2026-11-03)**
+- A horizontal handle between the media area (screen-share viewer, watch party, later the camera room) and the chat; drag or keyboard changes the picture height, the chat takes the rest.
+- Default "Auto" (today's look); height stored as a share of the chat column and remembered globally; soft snaps at 1/3, 1/2, 2/3 (Alt bypasses); hard minimum and maximum; dragging below the minimum collapses to the existing mini bar, "Open" restores the last height.
+- Letterboxed picture (never stretched), small-window rules, fullscreen and pop-out behaviour, reduce-motion handling, screen-reader values. Client only; no change to mumpeer, mumbot, the protocol or the engine.
+
 **mumpeer and mumbot parts** of the above (broadcast sessions, allowed uses, new `mumcord.peer` messages).
 
 ### 2.2 Out of scope / later
@@ -51,6 +56,7 @@ Two things people ask for most after the relay arrived: sending files to the cha
 - A second VP9 encode for old viewers inside an AV1 share – later.
 - Share sound on Linux (PipeWire) – later. Windows and macOS keep today's share sound.
 - H.264 and VP8.
+- Per-channel media heights, custom snap presets, a separate default height for the camera room (revisit with the camera spec) – later.
 - Any change to the Mumble server.
 
 ## 3. Roles & permissions
@@ -163,11 +169,31 @@ The client only displays; access decisions on the relay are made by the bot (who
 - **FR-7.59** Decoding: WebCodecs `av01` / `vp09` in the webview where supported, otherwise dav1d (AV1) or libvpx (VP9) in the engine.
 - **FR-7.60** Settings → Screen sharing (own tab, mockup 05): default Resolution, Frame rate, Optimize for, Upload limit, Sound; Codec Automatic / AV1 / VP9 with the info line "Automatic uses AV1 when your graphics card or CPU can handle it, otherwise VP9."; "Use graphics card when available" (default on); "Active encoder: {e.g. AV1 (NVIDIA graphics card) · VP9 (AV1 too heavy for this PC)}" with **Check again**.
 
+### 4.9 Resizable media area (#386)
+
+The media area is the shared media frame above the chat that shows a screen-share viewer, a watch party and, when it ships, the camera room. All requirements below apply to all three in the same way. Client only: no change to mumpeer, mumbot, the protocol or the engine.
+
+- **FR-7.61** Handle (mockups 01, 06): a horizontal separator sits between the media area and the chat, full chat width with a 12 px hit area. A small grip is faint at rest and turns accent on hover, while dragging and on keyboard focus; the cursor is `row-resize`. It is the horizontal variant of the existing column resize handle. It is shown only while the big view is open, not in fullscreen and not in the pop-out window. Tab order: after the media controls, before the chat.
+- **FR-7.62** Default: "Auto" is exactly today's look (16:9 picture, at most 58 % of the window height). Nothing changes until the user drags or uses the keyboard.
+- **FR-7.63** Unit and limits: the chosen height is a share of the chat column's height (not pixels) and is shown as a percent. Minimum: 20 % of the chat column height, at least 9 rem. Maximum: 70 %, and the chat always keeps at least 13 rem (composer plus about two messages), whichever is smaller. Minimum and maximum are hard stops.
+- **FR-7.64** Dragging (mockups 02, 03): the picture height follows the pointer live, one layout per animation frame, with no animation, no text selection and no video stall. Soft snaps at 1/3, 1/2 and 2/3 of the chat column height apply within 12 px; holding Alt drags without snapping. There is no snap at the minimum and maximum.
+- **FR-7.65** Picture in the frame: the frame takes the full column width and the chosen height. The picture stays 16:9 and is never stretched: letterboxed (black bars) in **Fit**, cropped in **Fill**, unchanged in **1:1**.
+- **FR-7.66** Reset: double-click or Enter on the handle returns to Auto.
+- **FR-7.67** Keyboard: the handle is focusable with a visible focus ring in every theme (mockup 06). Up/Down change the height by 2 rem, PageUp/PageDown jump to the next/previous snap point, Home = minimum, End = maximum, Enter = reset. Keyboard changes ignore the Alt rule and are saved on each key press.
+- **FR-7.68** Screen reader: `role="separator"`, `aria-orientation="horizontal"`, `aria-label="Resize media area"`, `aria-controls` pointing at the media area, `aria-valuemin`, `aria-valuemax` and `aria-valuenow` in percent, `aria-valuetext` "{n}% of the window height". Changes of the value are announced; collapsing is announced as "Media area minimised".
+- **FR-7.69** Collapse (mockups 04, 05): while dragging below the minimum (about 12 %) the hint "Release to minimise to the mini bar" shows; releasing there collapses the media area to the existing mini bar (same state as leaving the big view with the existing control). "Open" in the mini bar restores the last chosen height (Auto if none was chosen). The existing mini-bar control keeps working as before.
+- **FR-7.70** Remembered: the height is stored globally (one habit per person, not per channel) in the layout settings next to the column widths, default Auto. It is saved when a drag ends or a key is pressed, and survives closing and reopening the viewer, switching channel and an app restart.
+- **FR-7.71** Small windows: the limits are recomputed on every window or text-size change (once per frame). A stored value that no longer fits is shrunk for display and never rewritten; it returns when the window grows again. When the chat column is below about 28 rem in height there is no room for a handle: the handle is hidden and the area uses Auto or the mini bar; nothing overlaps.
+- **FR-7.72** Fullscreen and pop-out: fullscreen ignores the chosen height (the picture fills the screen) and the height is back on exit. The pop-out window fills its own window and has no handle; dragging in the main window does not affect it.
+- **FR-7.73** Reduce motion: dragging is never animated. Snap, reset and collapse animate over 120 ms only when the system allows motion (`prefers-reduced-motion: no-preference`); otherwise they jump.
+- **FR-7.74** Camera room: uses the same frame and handle with the same Auto default; the camera grid fills the chosen height and re-arranges its tiles.
+
 ## 5. UI & UX
 
 > **The mockups are binding.** The UI must match the mockups in the issues: layout, texts, states, icons, spacing and both themes (dark and light).
 > - File sharing: issue #348, mockups 1a–9, 12 and 13. Sources are in `docs/mockups/epic-4.1/` on the branch `mockups/file-sharing`.
 > - Screen sharing: issue #355, mockups 01–05. Sources are in `docs/mockups/epic-4.1-screenshare/` on the branch `mockups/screenshare-41`.
+> - Resizable media area: issue #386, mockups 01–06 (default with handle, dragged small, dragged large, collapse hint, mini bar, keyboard focus; dark and light). Sources are in `docs/mockups/epic-4.1-resize/` on the branch `mockups/media-resize`.
 >
 > The malware mockups (2b, 10, 11, 14) are not part of this epic (#372). If a mockup and this text disagree, or a state has no mockup, ask before building; don't invent a different design. Verification compares screenshots of the running client with the mockups.
 
@@ -236,9 +262,25 @@ Viewers get: 1080p · 30 fps · AV1 · about 4 Mbit/s · sent once via relay, up
 
 **Settings → Screen sharing**: as mockup 05 (fields of FR-7.60).
 
+**Resizable media area** (mockups 01–06)
+
+```
+┌───────────────────────────────────────────────┐
+│ media frame: title · controls (Fit/Fill/1:1)  │  height = chosen share of the
+│ ┌───────────────────────────────────────────┐ │  chat column (Auto = today's size)
+│ │          16:9 picture (letterboxed)       │ │
+│ └───────────────────────────────────────────┘ │
+├───────────────── ═══ grip ═══ ────────────────┤  ← horizontal handle, 12 px, row-resize
+│ chat messages                                 │
+│ composer                       (≥ 13 rem kept) │
+└───────────────────────────────────────────────┘
+  past the minimum:  "Release to minimise to the mini bar"  →  mini bar [ Open ]
+  keyboard: ↑/↓ 2 rem · PgUp/PgDn snap · Home min · End max · Enter reset
+```
+
 - Confirmation dialogs: download confirmation and risky warning (FR-7.22), Stop sharing (no confirmation; it can be undone by sharing again).
 - Notices: fan-out unavailable (FR-7.47, once per share), encoder fallback with Undo/Details (FR-7.57), codec switch for an old viewer (FR-7.58), quality lowered (FR-7.38).
-- No new hotkeys, tray or overlay behaviour. Enter on a focused file card = Download; Escape closes dialogs.
+- No new global hotkeys, tray or overlay behaviour; the media-area handle keys (FR-7.67) work only while the handle has focus. Enter on a focused file card = Download; Escape closes dialogs.
 - Accessibility: all controls keyboard operable; file cards are list items with a label "{name}, {size}, from {sender}, {state}"; the short checksum's accessible name is the full hash; progress uses a progressbar role with value text; state changes (queued, done, mismatch) are announced politely; the risky warning is an alert dialog with focus on "Don't download". Both themes, system scaling, reduced motion (no animated progress stripes). All new texts in all 24 locales.
 
 ## 6. Audio & network
@@ -393,6 +435,7 @@ Mumble server ≥ 1.4 (plugin data), unmodified. Only standard messages: TextMes
 | | `screen_upload_limit` | enum auto/2/5/10/20 | yes | default auto |
 | | `screen_sound` | bool | yes | default true |
 | | `screen_use_gpu` | bool | yes | default true |
+| Layout settings (next to the column widths) | `media_height` | percent of chat column height, or null (Auto) | yes | default null; limits per FR-7.63; global, not per channel; never rewritten when it does not fit (FR-7.71) |
 | Encoder cache (per machine) | `driver_id`, `app_version`, per encoder `available` + `smoke_ok`, per (resolution, fps) `svt_selftest_ms` | | | re-test on driver/app change or Check again |
 | Chat history | file card: offer fields + local state (done path, mismatch) | | | Same retention as chat history; the file itself is not part of history |
 
@@ -553,6 +596,22 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 42. **AC-7.42** Accessibility: start dialog, Quality menu, viewer list, Settings tab keyboard operable with screen-reader labels; both themes; one non-English locale.
 43. **AC-7.43** Licences window lists FFmpeg, SVT-AV1 and dav1d with their licence texts.
 
+**Resizable media area (#386)**
+44. **AC-7.44** A shares a screen, B watches (and again with a watch party) → a horizontal handle is visible between the picture and the chat in dark, light and a custom theme, matching mockup 01; the default size equals today's (Auto, 16:9, at most 58 % of the window height).
+45. **AC-7.45** B drags the handle up and down → the picture height follows live, the chat gets the freed room, no stutter, no text selection, video keeps playing; screenshots at about 30 % and 64 % match mockups 02 and 03.
+46. **AC-7.46** B drags slowly across 1/3, 1/2 and 2/3 → the height snaps within 12 px; with Alt held it does not snap; no snap at the minimum or maximum.
+47. **AC-7.47** In Fit the picture is letterboxed, in Fill cropped, in 1:1 unchanged, at several heights → never stretched.
+48. **AC-7.48** B drags to the limits → the picture stops at 20 % (or 9 rem) and at 70 %; the chat always keeps 13 rem (check with a short window and with large text size).
+49. **AC-7.49** B drags below the minimum → the hint "Release to minimise to the mini bar" shows (mockup 04); releasing leaves a working mini bar (mockup 05); a screen reader announces "Media area minimised"; "Open" restores the last chosen height.
+50. **AC-7.50** B double-clicks the handle, and separately focuses it and presses Enter → the size returns to Auto (today's size).
+51. **AC-7.51** Keyboard only: Tab reaches the handle after the media controls with a visible focus ring (mockup 06); Up/Down move 2 rem, PageUp/PageDown jump between snap points, Home = minimum, End = maximum, Enter = reset; each key press is saved.
+52. **AC-7.52** With a screen reader (Orca on Linux, NVDA on Windows, VoiceOver on macOS) the handle is announced as "Resize media area, separator", the value as a percent with "{n}% of the window height", and value changes are announced.
+53. **AC-7.53** B sets a height, then closes and reopens the viewer, switches channel, and restarts Mumcord → the same height applies every time, in every channel and for screen share and watch party alike.
+54. **AC-7.54** B makes the window smaller → the chat keeps 13 rem and the picture shrinks; on a very small window the handle is hidden and nothing overlaps; making the window bigger again restores the chosen height (the stored value is unchanged).
+55. **AC-7.55** B enters fullscreen → the picture fills the screen regardless of the chosen height, and the chosen height is back on exit; B opens the pop-out window → it has no handle and dragging in the main window does not change it.
+56. **AC-7.56** With the system's "reduce motion" on, snap, reset and collapse are instant; with it off they take about 120 ms; dragging is never animated.
+57. **AC-7.57** When the camera room ships, it shows the same handle with the same behaviour and its tiles re-arrange to the chosen height (check together with the camera spec's acceptance criteria).
+
 ## 12. Decision log
 
 | Question | Decision | Note |
@@ -579,6 +638,14 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Linux share sound (#355 Q8) | Later | Issue table "Later" |
 | Encoder library | libavcodec (LGPL) for hardware, SVT-AV1 software, dav1d decode | #355 §3 / §3b |
 | Battery | On battery, Automatic skips software AV1 | #355 risks |
+| Resizable media area (#386) | One shared horizontal handle for screen share, watch party and camera room; Auto default = today's look; collapse to the existing mini bar | User approval 2026-11-03, all recommended answers of issue #386; FR-7.61 … FR-7.74 |
+| Media height: global or per channel (#386 Q1) | Global, stored next to the column widths | User approval 2026-11-03; FR-7.70 |
+| Media height: pixels or percent (#386 Q2) | Percent of the chat column height | User approval 2026-11-03; FR-7.63 |
+| Picture when small (#386 Q3) | Full column width with letterboxing, not a centred 16:9 picture | User approval 2026-11-03; FR-7.65 |
+| Collapse (#386 Q4) | Both: dragging below the minimum and the existing mini-bar control | User approval 2026-11-03; FR-7.69 |
+| Snap points (#386 Q5) | 1/3, 1/2, 2/3; no custom presets in the first version | User approval 2026-11-03; FR-7.64 |
+| Snap bypass (#386 Q6) | Hold Alt; keyboard users are not affected | User approval 2026-11-03; FR-7.64, FR-7.67 |
+| Camera room default height (#386 Q7) | Same Auto default now; revisit with the camera spec | User approval 2026-11-03; FR-7.74 |
 
 ## 13. Open points & risks
 
@@ -609,6 +676,7 @@ Risks:
 - **Mumcord/mumbot** module `peer` gains broadcast admission and uses pass-through.
 - **#355 table "Hardware VP9 encode: Later"** is pulled into 4.1 (Intel Quick Sync).
 - **Later epics:** files in private messages; malware check plugin (#372); viewer resolution choice (simulcast); 4K; Linux share sound; second VP9 encode for old viewers.
+- **Epic 4.1 camera spec** reuses the resizable media area (FR-7.74) and must not add its own handle.
 - New hello features `files` and `screen-broadcast` count toward the hello limit of 16 features (spec 06).
 
 ## 15. Implementation split
