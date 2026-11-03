@@ -14,6 +14,8 @@ import { useShownServerId, useVoiceServerId } from "../channels";
 import { showInfo, useHiddenHash, welcomeKey } from "../chat/hiddenInfo";
 import { useFollowStates } from "../follow/followStore";
 import { displayName, initials } from "./format";
+import { openServerAdmin } from "../admin";
+import { canBan } from "../admin/permissions";
 import { mentionCount, useMentions } from "./mentions";
 import { ServerMenu, type MenuItem } from "./ServerMenu";
 import {
@@ -140,6 +142,17 @@ function ServerOptions({
       label: t("menu.showWelcome"),
       onSelect: act(() => {
         showInfo(welcomeKey(server.id));
+      }),
+    });
+  }
+  // Epic 4, issue #254: the window is only reachable with the Ban right on the root channel.
+  if (canBan(server.id)) {
+    items.push({
+      id: "banList",
+      label: t("admin:banList"),
+      separatorBefore: true,
+      onSelect: act(() => {
+        openServerAdmin(server.id);
       }),
     });
   }

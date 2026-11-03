@@ -352,6 +352,7 @@ pub mod fixtures {
                 whisper: true,
                 write: false,
                 move_users: false,
+                ban: false,
             },
             description: None,
             has_description: false,

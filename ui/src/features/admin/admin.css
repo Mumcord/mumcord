@@ -1,0 +1,153 @@
+/* Server administration window, Bans tab (Epic 4, issue #254). Design tokens only, so the window
+   follows the theme and stays readable in light, dark and custom themes. */
+.servers-dialog.admin-window {
+  width: min(58rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.admin-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.admin-tabs__tab {
+  padding: var(--space-1) var(--space-3);
+  border-bottom: 2px solid var(--color-accent);
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+
+.admin-server {
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1 1 12rem;
+}
+
+.admin-field span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-field input {
+  width: 100%;
+}
+
+.admin-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.admin-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.admin-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) 7rem 9rem minmax(6rem, 1fr) 6rem 6rem 10rem;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-row--head {
+  border-bottom-color: var(--color-border-strong);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* An entry the user changed here and has not saved yet (FR-10.66). */
+.admin-row--pending {
+  background: var(--color-bg-hover);
+}
+
+.admin-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-sort {
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.admin-cell--actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.admin-pending {
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+}
+
+.admin-empty {
+  margin: var(--space-4) 0;
+  color: var(--color-text-muted);
+}
+
+.admin-error {
+  margin: 0 0 var(--space-3);
+  color: var(--color-danger);
+}
+
+.admin-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.admin-footer__count {
+  flex: 1 1 auto;
+  color: var(--color-text-muted);
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.admin-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.admin-form__help {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-ends {
+  margin: var(--space-3) 0 0;
+}
