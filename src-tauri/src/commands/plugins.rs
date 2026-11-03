@@ -1112,6 +1112,20 @@ pub async fn plugin_confirm_update_high_risk(
         .await
 }
 
+/// FR-9.83 "Skip this version": the waiting update of `id` to `version` is no longer offered or
+/// installed automatically; a newer version is offered again.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_skip_update_version(
+    app: AppHandle,
+    id: String,
+    version: String,
+) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.skip_update_version(&id, &version))
+        .await
+}
+
 /// The websites an installed plugin declares and what it did with them over the last 7 days
 /// (FR-9.30). Both are empty for a plugin without websites.
 #[tauri::command]

@@ -48,6 +48,8 @@ const noReview = {
   risk: null,
   needsHighRiskConfirm: false,
   highRiskConfirmed: false,
+  permissionEffects: [],
+  recentChange: null,
 };
 const echolings = plugin({});
 const foo = plugin({

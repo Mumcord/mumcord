@@ -3078,6 +3078,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginApplyUpdate: () => fail("notFound", "no update for this plugin"),
     pluginScore: () => fail("notFound", "plugin not in the list"),
     pluginConfirmUpdateHighRisk: () => fail("notFound", "no update for this plugin"),
+    pluginSkipUpdateVersion: () => fail("notFound", "no update for this plugin"),
     pluginWebsites: () => fail("notFound", "no such plugin"),
     pluginPlatformSettings: () => Promise.resolve(platformSettings),
     pluginSetPlatformSettings: (settings) => {

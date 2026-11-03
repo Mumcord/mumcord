@@ -238,6 +238,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_apply_update,
             commands::plugins::plugin_score,
             commands::plugins::plugin_confirm_update_high_risk,
+            commands::plugins::plugin_skip_update_version,
             commands::plugins::plugin_websites,
             commands::plugins::plugin_platform_settings,
             commands::plugins::plugin_set_platform_settings,

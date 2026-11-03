@@ -619,6 +619,11 @@ export const commands = {
 	 */
 	pluginConfirmUpdateHighRisk: (id: string, version: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_confirm_update_high_risk", { id, version })),
 	/**
+	 *  FR-9.83 "Skip this version": the waiting update of `id` to `version` is no longer offered or
+	 *  installed automatically; a newer version is offered again.
+	 */
+	pluginSkipUpdateVersion: (id: string, version: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_skip_update_version", { id, version })),
+	/**
 	 *  The websites an installed plugin declares and what it did with them over the last 7 days
 	 *  (FR-9.30). Both are empty for a plugin without websites.
 	 */
@@ -2850,6 +2855,12 @@ export type PluginOptionalPermission = {
 /**  How the user saw the plugin's panel. */
 export type PluginPanelVisibility = "hidden" | "inline" | "expanded";
 
+/**  The points one permission that is new in an update adds to the score. */
+export type PluginPermissionEffect = {
+	permission: string,
+	points: number,
+};
+
 /**  The plugin platform's own settings (Settings → Plugins). */
 export type PluginPlatformSettings = {
 	/**  "Don't allow high-risk plugins" (FR-9.81). Off by default. */
@@ -2861,11 +2872,27 @@ export type PluginPlatformSettings = {
 	soundMuted: boolean,
 };
 
+/**  The "recent change" part of the score: new permissions within the last versions. */
+export type PluginRecentChange = {
+	/**  Points added on top (outside the trust percentage). */
+	points: number,
+	/**  The trust percentage applied to the permission points, e.g. 90. */
+	trustPercent: number,
+	/**  The permissions that count as a recent change. */
+	permissions: string[],
+};
+
 /**  One website of an update; plain, untrusted text. */
 export type PluginReviewOrigin = {
 	origin: string,
 	/**  Marked "New". */
 	new: boolean,
+	/**
+	 *  Translation key of the purpose the installed version declares for this website
+	 *  (resolved in the plugin's own texts). `None` for a new website: the registry index lists
+	 *  no purposes and the new package is not downloaded before the user decides.
+	 */
+	purpose: string | null,
 };
 
 /**  The score before and after an update. */
@@ -3082,6 +3109,10 @@ export type PluginUpdateReview = {
 	otherDomain: boolean,
 	/**  `None` for official plugins or when a score is unknown. */
 	risk: PluginRiskChange | null,
+	/**  Points each new permission adds; empty when the score is unknown. */
+	permissionEffects: PluginPermissionEffect[],
+	/**  `None` when no permission is new in the last versions. */
+	recentChange: PluginRecentChange | null,
 	/**
 	 *  The update makes the plugin High: the tick and "Update anyway" are needed
 	 *  (`plugin_confirm_update_high_risk`).

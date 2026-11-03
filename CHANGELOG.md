@@ -20,6 +20,7 @@
 - Plugins that talk to websites can only reach the websites they declared, on the exact address and port, and only at public internet addresses with a valid certificate; anything else is blocked, and each plugin's requests and blocked attempts are counted per day
 - Plugin authors: `mumcord-plugin build` writes the manifest's `api` from the plugin API the plugin is built with and packs a `sounds/` folder; `mumcord-plugin check` fails when `api` doesn't match the plugin's imports and warns about a deprecated API
 - Plugin registries: `mumcord-plugin site-data` and `serve-registry` publish two indexes, `v1/index.json` with only API 1.0 versions for Mumcord 0.6 and `v1.1/index.json` (format 2) with every version, plus `v1.1/permissions.json`; registry version files accept `api = "1.1"`, `min_mumcord` and `origins`
+- Plugin update review: "Skip this version" hides that version (a newer one is offered again), and the review shows the points each new permission adds and the recent-change points of the score.
 
 ### Fixed
 

@@ -9,7 +9,7 @@
 //!
 //! Everything here is plain data for the UI; the service decides when to compute it.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use serde::Serialize;
 
@@ -17,7 +17,7 @@ use super::{InstallScore, ServiceError};
 use crate::manifest::{ManifestError, Source};
 use crate::origins;
 use crate::package::PackageError;
-use crate::score::{Band, HardStop, Score, Scored};
+use crate::score::{Band, Effect, FactorKind, HardStop, Score, Scored};
 use crate::verify::VerifyFailure;
 
 /// Permissions that make an unofficial plugin bring its own code and talk to websites, which
@@ -235,6 +235,32 @@ pub struct ReviewOrigin {
     pub origin: String,
     /// Marked "New".
     pub new: bool,
+    /// The purpose key the manifest declares (e.g. `origins.api`), plain untrusted text. Only
+    /// known for a website the installed version already declares: the registry index lists
+    /// origins without purposes and the new package is not downloaded before the user decides,
+    /// so a new website has `None`.
+    pub purpose: Option<String>,
+}
+
+/// The points one new permission adds to the score ("+4 points" next to it in the review).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PermissionEffect {
+    pub permission: String,
+    pub points: i32,
+}
+
+/// The "recent change" part of the new version's score: new permissions within the look-back
+/// window add points on top, outside the trust percentage.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecentChange {
+    /// Points added (H, capped).
+    pub points: u32,
+    /// The trust percentage applied to the capability points (F, e.g. 90).
+    pub trust_percent: u32,
+    /// The permissions that count as a recent change.
+    pub permissions: Vec<String>,
 }
 
 /// The score before and after an update ("before/after" in the Updates tab).
@@ -257,6 +283,11 @@ pub struct UpdateReview {
     pub other_domain: bool,
     /// `None` for official plugins or when a score is unknown.
     pub risk: Option<RiskChange>,
+    /// The points each permission that is new in this version adds; empty when the score is
+    /// unknown or no permission is new.
+    pub permission_effects: Vec<PermissionEffect>,
+    /// New permissions within the recent versions; `None` when there are none.
+    pub recent_change: Option<RecentChange>,
     /// The update makes the plugin High: the tick "I understand the risk went up and I still
     /// trust the author" and "Update anyway" are needed.
     pub needs_high_risk_confirm: bool,
@@ -269,6 +300,7 @@ pub struct UpdateReview {
 pub fn update_review(
     old_origins: &[String],
     new_origins: &[String],
+    old_purposes: &BTreeMap<String, String>,
     old: Option<&Scored>,
     new: Option<&Scored>,
     high_risk_confirmed: bool,
@@ -278,6 +310,7 @@ pub fn update_review(
         .map(|origin| ReviewOrigin {
             origin: origin.clone(),
             new: !old_origins.contains(origin),
+            purpose: old_purposes.get(origin).cloned(),
         })
         .collect();
     let own: BTreeSet<Option<String>> = old_origins.iter().map(|o| domain_of(o)).collect();
@@ -304,9 +337,66 @@ pub fn update_review(
         origins,
         other_domain,
         risk,
+        permission_effects: permission_effects(old, new),
+        recent_change: recent_change(new),
         needs_high_risk_confirm,
         high_risk_confirmed: needs_high_risk_confirm && high_risk_confirmed,
     }
+}
+
+fn is_permission_factor(kind: FactorKind) -> bool {
+    matches!(
+        kind,
+        FactorKind::HighPermission
+            | FactorKind::WebSurface
+            | FactorKind::Relay
+            | FactorKind::MediumPermission
+            | FactorKind::LowPermissions
+    )
+}
+
+/// The capability points of every permission the new score has and the old one did not. With an
+/// unknown old score nothing can be called new.
+fn permission_effects(old: Option<&Scored>, new: Option<&Scored>) -> Vec<PermissionEffect> {
+    let (Some(Scored::Scored(old)), Some(Scored::Scored(new))) = (old, new) else {
+        return Vec::new();
+    };
+    let had: BTreeSet<&str> = old
+        .factors
+        .iter()
+        .filter(|f| is_permission_factor(f.kind))
+        .map(|f| f.detail_key.as_str())
+        .collect();
+    new.factors
+        .iter()
+        .filter(|f| is_permission_factor(f.kind) && !had.contains(f.detail_key.as_str()))
+        .filter_map(|f| match f.effect {
+            Effect::Points(points) => Some(PermissionEffect {
+                permission: f.detail_key.clone(),
+                points,
+            }),
+            Effect::Percent(_) => None,
+        })
+        .collect()
+}
+
+fn recent_change(new: Option<&Scored>) -> Option<RecentChange> {
+    let Some(Scored::Scored(new)) = new else {
+        return None;
+    };
+    if new.h == 0 {
+        return None;
+    }
+    Some(RecentChange {
+        points: new.h,
+        trust_percent: (new.f * 100.0).round() as u32,
+        permissions: new
+            .factors
+            .iter()
+            .filter(|f| f.kind == FactorKind::RecentChange)
+            .map(|f| f.detail_key.clone())
+            .collect(),
+    })
 }
 
 /// The registrable domain of an origin (`https://api.example.co.uk:8443` → `example.co.uk`),
@@ -586,39 +676,41 @@ mod tests {
     fn new_websites_are_marked_and_another_domain_is_noticed() {
         let old = strings(&["https://api.example.com"]);
         let same = strings(&["https://api.example.com", "wss://live.example.com:8443"]);
-        let review = update_review(&old, &same, None, None, false);
+        let review = update_review(&old, &same, &BTreeMap::new(), None, None, false);
         assert_eq!(
             review.origins,
             vec![
                 ReviewOrigin {
                     origin: "https://api.example.com".into(),
-                    new: false
+                    new: false,
+                    purpose: None
                 },
                 ReviewOrigin {
                     origin: "wss://live.example.com:8443".into(),
-                    new: true
+                    new: true,
+                    purpose: None
                 },
             ]
         );
         assert!(!review.other_domain);
 
         let other = strings(&["https://api.example.com", "https://cdn.other.co.uk"]);
-        assert!(update_review(&old, &other, None, None, false).other_domain);
+        assert!(update_review(&old, &other, &BTreeMap::new(), None, None, false).other_domain);
     }
 
     #[test]
     fn the_registrable_domain_respects_public_suffixes() {
         let old = strings(&["https://a.example.co.uk"]);
         let sibling = strings(&["https://b.example.co.uk"]);
-        assert!(!update_review(&old, &sibling, None, None, false).other_domain);
+        assert!(!update_review(&old, &sibling, &BTreeMap::new(), None, None, false).other_domain);
         let neighbour = strings(&["https://b.another.co.uk"]);
-        assert!(update_review(&old, &neighbour, None, None, false).other_domain);
+        assert!(update_review(&old, &neighbour, &BTreeMap::new(), None, None, false).other_domain);
     }
 
     #[test]
     fn a_plugin_without_websites_has_no_own_domain() {
         let new = strings(&["https://api.example.com"]);
-        let review = update_review(&[], &new, None, None, false);
+        let review = update_review(&[], &new, &BTreeMap::new(), None, None, false);
         assert!(review.origins[0].new);
         assert!(!review.other_domain);
     }
@@ -626,7 +718,7 @@ mod tests {
     #[test]
     fn an_update_to_high_needs_and_records_the_tick() {
         let (old, new) = (with_band(39, Band::Medium), with_band(41, Band::High));
-        let review = update_review(&[], &[], Some(&old), Some(&new), false);
+        let review = update_review(&[], &[], &BTreeMap::new(), Some(&old), Some(&new), false);
         assert!(review.needs_high_risk_confirm);
         assert!(!review.high_risk_confirmed);
         assert_eq!(
@@ -638,10 +730,81 @@ mod tests {
                 to_band: Band::High,
             })
         );
-        assert!(update_review(&[], &[], Some(&old), Some(&new), true).high_risk_confirmed);
+        assert!(
+            update_review(&[], &[], &BTreeMap::new(), Some(&old), Some(&new), true)
+                .high_risk_confirmed
+        );
 
-        let review = update_review(&[], &[], Some(&new), Some(&new), true);
+        let review = update_review(&[], &[], &BTreeMap::new(), Some(&new), Some(&new), true);
         assert!(!review.needs_high_risk_confirm);
         assert!(!review.high_risk_confirmed);
+    }
+
+    fn factor(kind: FactorKind, points: i32, key: &str) -> crate::score::Factor {
+        crate::score::Factor {
+            kind,
+            effect: Effect::Points(points),
+            detail_key: key.to_owned(),
+        }
+    }
+
+    #[test]
+    fn each_new_permission_shows_its_points_and_recent_changes_are_exposed() {
+        let old = Scored::Scored(Score {
+            factors: vec![factor(FactorKind::MediumPermission, 6, "chat.read")],
+            ..match scored(10) {
+                Scored::Scored(s) => s,
+                _ => unreachable!(),
+            }
+        });
+        let new = Scored::Scored(Score {
+            h: 18,
+            f: 0.9,
+            factors: vec![
+                factor(FactorKind::MediumPermission, 6, "chat.read"),
+                factor(FactorKind::WebSurface, 4, "ui.webview"),
+                factor(FactorKind::Relay, 8, "net.relay"),
+                factor(FactorKind::Websites, 3, "origins"),
+                factor(FactorKind::RecentChange, 9, "net.relay"),
+                factor(FactorKind::RecentChange, 9, "ui.webview"),
+            ],
+            ..match scored(60) {
+                Scored::Scored(s) => s,
+                _ => unreachable!(),
+            }
+        });
+        let review = update_review(&[], &[], &BTreeMap::new(), Some(&old), Some(&new), false);
+        let effects: Vec<(&str, i32)> = review
+            .permission_effects
+            .iter()
+            .map(|e| (e.permission.as_str(), e.points))
+            .collect();
+        assert_eq!(effects, [("ui.webview", 4), ("net.relay", 8)]);
+        assert_eq!(
+            review.recent_change,
+            Some(RecentChange {
+                points: 18,
+                trust_percent: 90,
+                permissions: strings(&["net.relay", "ui.webview"]),
+            })
+        );
+
+        let quiet = update_review(&[], &[], &BTreeMap::new(), Some(&old), Some(&old), false);
+        assert!(quiet.permission_effects.is_empty() && quiet.recent_change.is_none());
+        let unknown = update_review(&[], &[], &BTreeMap::new(), None, Some(&new), false);
+        assert!(unknown.permission_effects.is_empty());
+    }
+
+    #[test]
+    fn known_origins_carry_their_declared_purpose() {
+        let old = strings(&["https://api.example.com"]);
+        let new = strings(&["https://api.example.com", "wss://live.example.com"]);
+        let purposes = BTreeMap::from([(
+            "https://api.example.com".to_owned(),
+            "origins.api".to_owned(),
+        )]);
+        let review = update_review(&old, &new, &purposes, None, None, false);
+        assert_eq!(review.origins[0].purpose.as_deref(), Some("origins.api"));
+        assert_eq!(review.origins[1].purpose, None);
     }
 }

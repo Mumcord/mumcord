@@ -437,6 +437,15 @@ const MIGRATIONS: &[&str] = &[
     r"
     ALTER TABLE plugin_repository ADD COLUMN expected_key_matched INTEGER NOT NULL DEFAULT 0;
     ",
+    // v28: "Skip this version" in the plugin Updates tab (FR-9.83): the newest version the user
+    // skipped per plugin. That version and older ones are no longer offered; a newer one is.
+    r"
+    CREATE TABLE plugin_skipped_update (
+        plugin_id  TEXT PRIMARY KEY,
+        version    TEXT NOT NULL,
+        skipped_at INTEGER NOT NULL
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.

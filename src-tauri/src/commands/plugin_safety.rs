@@ -361,6 +361,10 @@ pub struct PluginReviewOrigin {
     pub origin: String,
     /// Marked "New".
     pub new: bool,
+    /// Translation key of the purpose the installed version declares for this website
+    /// (resolved in the plugin's own texts). `None` for a new website: the registry index lists
+    /// no purposes and the new package is not downloaded before the user decides.
+    pub purpose: Option<String>,
 }
 
 impl From<ReviewOrigin> for PluginReviewOrigin {
@@ -368,8 +372,29 @@ impl From<ReviewOrigin> for PluginReviewOrigin {
         Self {
             origin: origin.origin,
             new: origin.new,
+            purpose: origin.purpose,
         }
     }
+}
+
+/// The points one permission that is new in an update adds to the score.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginPermissionEffect {
+    pub permission: String,
+    pub points: i32,
+}
+
+/// The "recent change" part of the score: new permissions within the last versions.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginRecentChange {
+    /// Points added on top (outside the trust percentage).
+    pub points: u32,
+    /// The trust percentage applied to the permission points, e.g. 90.
+    pub trust_percent: u32,
+    /// The permissions that count as a recent change.
+    pub permissions: Vec<String>,
 }
 
 /// The score before and after an update.
@@ -402,6 +427,10 @@ pub struct PluginUpdateReview {
     pub other_domain: bool,
     /// `None` for official plugins or when a score is unknown.
     pub risk: Option<PluginRiskChange>,
+    /// Points each new permission adds; empty when the score is unknown.
+    pub permission_effects: Vec<PluginPermissionEffect>,
+    /// `None` when no permission is new in the last versions.
+    pub recent_change: Option<PluginRecentChange>,
     /// The update makes the plugin High: the tick and "Update anyway" are needed
     /// (`plugin_confirm_update_high_risk`).
     pub needs_high_risk_confirm: bool,
@@ -414,6 +443,19 @@ impl From<UpdateReview> for PluginUpdateReview {
             origins: review.origins.into_iter().map(Into::into).collect(),
             other_domain: review.other_domain,
             risk: review.risk.map(Into::into),
+            permission_effects: review
+                .permission_effects
+                .into_iter()
+                .map(|e| PluginPermissionEffect {
+                    permission: e.permission,
+                    points: e.points,
+                })
+                .collect(),
+            recent_change: review.recent_change.map(|r| PluginRecentChange {
+                points: r.points,
+                trust_percent: r.trust_percent,
+                permissions: r.permissions,
+            }),
             needs_high_risk_confirm: review.needs_high_risk_confirm,
             high_risk_confirmed: review.high_risk_confirmed,
         }
@@ -456,6 +498,7 @@ pub struct PluginWebsites {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use mumcord_plugins::service::{PermissionEffect, RecentChange};
 
     #[test]
     fn a_refusal_keeps_its_hard_stop_and_text() {
@@ -508,7 +551,17 @@ mod tests {
             origins: vec![ReviewOrigin {
                 origin: "https://api.example".into(),
                 new: true,
+                purpose: Some("origins.api".into()),
             }],
+            permission_effects: vec![PermissionEffect {
+                permission: "net.relay".into(),
+                points: 8,
+            }],
+            recent_change: Some(RecentChange {
+                points: 18,
+                trust_percent: 90,
+                permissions: vec!["net.relay".into()],
+            }),
             other_domain: true,
             risk: Some(RiskChange {
                 from_value: 10,
@@ -520,6 +573,9 @@ mod tests {
             high_risk_confirmed: false,
         });
         assert!(review.origins[0].new);
+        assert_eq!(review.origins[0].purpose.as_deref(), Some("origins.api"));
+        assert_eq!(review.permission_effects[0].points, 8);
+        assert_eq!(review.recent_change.map(|r| r.trust_percent), Some(90));
         assert_eq!(review.risk.map(|r| r.to_band), Some(PluginBand::High));
         assert!(review.needs_high_risk_confirm);
     }

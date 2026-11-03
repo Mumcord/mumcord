@@ -462,6 +462,18 @@ impl PluginService {
             .filter_map(|v| Version::parse(&v.version).ok().map(|parsed| (parsed, v)))
             .filter(|(parsed, _)| *parsed > installed)
             .collect();
+        // "Skip this version": that version and older ones stay hidden; a newer one is offered.
+        match self.store().plugin_skipped_update(&record.id) {
+            Ok(Some(skipped)) => {
+                if let Ok(skipped) = Version::parse(&skipped) {
+                    newer.retain(|(parsed, _)| *parsed > skipped);
+                }
+            }
+            Ok(None) => {}
+            Err(error) => {
+                tracing::warn!(plugin = %record.id, %error, "could not read a skipped update");
+            }
+        }
         newer.sort_by(|a, b| b.0.cmp(&a.0));
         let here = Release::of(self.host.app_version());
         // FR-9.18: the newest version this Mumcord can run. If there is none, the newest one
@@ -546,6 +558,7 @@ impl PluginService {
             &record.id,
             &version.version,
             (&old_origins, &new_origins),
+            &self.declared_purposes(&record.id),
             (old_score.as_ref(), new_score.as_ref()),
         );
         let hold = match self
@@ -598,6 +611,7 @@ impl PluginService {
         id: &str,
         version: &str,
         (old_origins, new_origins): (&[String], &[String]),
+        purposes: &BTreeMap<String, String>,
         (old, new): (Option<&Scored>, Option<&Scored>),
     ) -> UpdateReview {
         let confirmed = gates::becomes_high(old, new)
@@ -608,7 +622,7 @@ impl PluginService {
                     false
                 }
             };
-        gates::update_review(old_origins, new_origins, old, new, confirmed)
+        gates::update_review(old_origins, new_origins, purposes, old, new, confirmed)
     }
 
     /// Records the tick "I understand the risk went up and I still trust the author" for the
@@ -629,6 +643,39 @@ impl PluginService {
         {
             update.review.high_risk_confirmed = update.review.needs_high_risk_confirm;
         }
+        self.changed();
+        Ok(())
+    }
+
+    /// The purpose of each website the installed version declares, by canonical origin. Empty
+    /// when the manifest is not loaded.
+    fn declared_purposes(&self, id: &str) -> BTreeMap<String, String> {
+        let Some(net) = self.host.manifest(id).and_then(|m| m.net.as_ref()) else {
+            return BTreeMap::new();
+        };
+        net.origins
+            .iter()
+            .map(|o| {
+                let origin = canonical(std::iter::once(o.origin.as_str())).remove(0);
+                (origin, o.purpose.clone())
+            })
+            .collect()
+    }
+
+    /// "Skip this version" (FR-9.83): the waiting update of `id` to `version` is no longer
+    /// offered or installed automatically. A newer version is offered again.
+    pub fn skip_update_version(&mut self, id: &str, version: &str) -> Result<(), ServiceError> {
+        Version::parse(version).map_err(|_| ServiceError::NoUpdate(id.to_owned()))?;
+        if !self
+            .updates
+            .available
+            .get(id)
+            .is_some_and(|u| u.to == version)
+        {
+            return Err(ServiceError::NoUpdate(id.to_owned()));
+        }
+        self.store().skip_plugin_update(id, version, now_millis())?;
+        self.updates.available.remove(id);
         self.changed();
         Ok(())
     }

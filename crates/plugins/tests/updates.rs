@@ -516,6 +516,34 @@ fn a_pinned_plugin_is_not_offered_updates() {
 }
 
 #[test]
+fn a_skipped_version_is_not_offered_or_installed_but_a_newer_one_is() {
+    let fx = Fixture::new();
+    let key = KeyPair::generate_unencrypted_keypair().expect("keypair");
+    let v1 = Release::new("dice", "1.0.0", OK_START, PERMISSIONS, &key);
+    let v11 = Release::new("dice", "1.1.0", OK_START, PERMISSIONS, &key);
+    let v12 = Release::new("dice", "1.2.0", OK_START, PERMISSIONS, &key);
+    let (mut service, _events) = installed(&fx, &v1);
+
+    service
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Notify)
+        .expect("plan");
+    assert!(service.skip_update_version("dice", "9.9.9").is_err());
+    service.skip_update_version("dice", "1.1.0").expect("skips");
+    assert!(service.updates().is_empty());
+
+    let automatic = service
+        .plan(&index(&[&v1, &v11]), PluginUpdates::Auto)
+        .expect("plan");
+    assert!(automatic.is_empty());
+    assert!(service.updates().is_empty());
+
+    service
+        .plan(&index(&[&v1, &v11, &v12]), PluginUpdates::Notify)
+        .expect("plan");
+    assert_eq!(service.updates()[0].to, "1.2.0");
+}
+
+#[test]
 fn a_version_that_fails_to_start_is_rolled_back_with_its_reason() {
     let fx = Fixture::new();
     let key = KeyPair::generate_unencrypted_keypair().expect("keypair");

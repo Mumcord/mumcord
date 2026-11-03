@@ -48,8 +48,8 @@ use crate::wit::theme::Mode;
 
 pub use commands::{CommandOutcome, PluginCommand};
 pub use gates::{
-    ConfirmKind, GateReason, InstallCheck, InstallGate, Refusal, ReviewOrigin, RiskChange,
-    UpdateHold, UpdateReview,
+    ConfirmKind, GateReason, InstallCheck, InstallGate, PermissionEffect, RecentChange, Refusal,
+    ReviewOrigin, RiskChange, UpdateHold, UpdateReview,
 };
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;

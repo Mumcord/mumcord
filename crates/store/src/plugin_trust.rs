@@ -206,6 +206,30 @@ impl Store {
         Ok(())
     }
 
+    /// Remembers that the user skipped this version of a plugin ("Skip this version").
+    pub fn skip_plugin_update(&self, plugin_id: &str, version: &str, at: UnixMillis) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO plugin_skipped_update (plugin_id, version, skipped_at)
+             VALUES (?1, ?2, ?3)
+             ON CONFLICT (plugin_id) DO UPDATE SET
+                 version = excluded.version, skipped_at = excluded.skipped_at",
+            params![plugin_id, version, at],
+        )?;
+        Ok(())
+    }
+
+    /// The version the user skipped last for this plugin, if any.
+    pub fn plugin_skipped_update(&self, plugin_id: &str) -> Result<Option<String>> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT version FROM plugin_skipped_update WHERE plugin_id = ?1",
+                params![plugin_id],
+                |row| row.get(0),
+            )
+            .optional()?)
+    }
+
     /// When the user confirmed this version as high risk, if they did.
     pub fn plugin_high_risk_confirmed_at(
         &self,
@@ -334,6 +358,23 @@ mod tests {
         assert_eq!(
             store.plugin_version_history("p").expect("read"),
             vec![first, second]
+        );
+    }
+
+    #[test]
+    fn skipped_update_is_remembered_per_plugin_and_replaced() {
+        let (_dir, store) = temp_store();
+        assert_eq!(store.plugin_skipped_update("p").expect("store"), None);
+        store.skip_plugin_update("p", "1.1.0", 1).expect("store");
+        store.skip_plugin_update("q", "2.0.0", 2).expect("store");
+        store.skip_plugin_update("p", "1.2.0", 3).expect("store");
+        assert_eq!(
+            store.plugin_skipped_update("p").expect("store").as_deref(),
+            Some("1.2.0")
+        );
+        assert_eq!(
+            store.plugin_skipped_update("q").expect("store").as_deref(),
+            Some("2.0.0")
         );
     }
 
