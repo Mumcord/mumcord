@@ -269,6 +269,20 @@ describe("own file card", () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
+  it("shows a failed Stop sharing as an alert", async () => {
+    vi.spyOn(api, "filesStop").mockRejectedValue(new Error("engine gone"));
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(
+      <FileCardView
+        card={own({ ended: false, endReason: null, downloadedBy: [], sendingTo: null, waiting: 0 })}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Stop sharing" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Couldn't stop sharing: engine gone. The file is still shared.",
+    );
+  });
+
   it("shows waiting requests", () => {
     render(
       <FileCardView

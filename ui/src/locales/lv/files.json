@@ -110,6 +110,7 @@
     "waiting_other": "{{count}} waiting",
     "sharing": "Sharing while you are online · ends {{when}}",
     "stop": "Stop sharing",
+    "stopFailed": "Couldn't stop sharing: {{reason}}. The file is still shared.",
     "ended": "Sharing ended",
     "endedStopped": "You stopped sharing",
     "endedExpired": "The 24 hours are over",

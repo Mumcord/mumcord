@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getApi, type FileCard, type OwnShare, type ShareEndReason } from "../../../api";
 import { CardHead, HashRow } from "./CardParts";
@@ -23,11 +24,19 @@ export function OwnFileCard({ card }: { card: FileCard }) {
   const share = card.share;
   const ended = share?.ended ?? false;
   const ends = useEndsText(card.expires);
+  const [error, setError] = useState<string | null>(null);
   const stop = () => {
+    setError(null);
     getApi()
       .filesStop(card.shareId)
       .catch((cause: unknown) => {
         console.error("Stopping the share failed", cause);
+        // The share keeps running, so the sender must see that the click did nothing.
+        setError(
+          t("sender.stopFailed", {
+            reason: cause instanceof Error ? cause.message : String(cause),
+          }),
+        );
       });
   };
 
@@ -73,6 +82,11 @@ export function OwnFileCard({ card }: { card: FileCard }) {
             </button>
           </div>
         </>
+      )}
+      {error !== null && !ended && (
+        <p className="file-card__error" role="alert">
+          {error}
+        </p>
       )}
     </div>
   );
