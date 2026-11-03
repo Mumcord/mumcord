@@ -6,6 +6,10 @@
 
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 
+### Internal
+
+- Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
+
 ## [0.6.2] - 2026-11-02
 
 ### Changed
