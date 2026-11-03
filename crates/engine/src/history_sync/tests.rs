@@ -2,7 +2,7 @@
 //! AC-1.51b, AC-1.51c): each client has its own store; packets are passed on as the server
 //! would forward plugin data.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::{Mutex, MutexGuard};
 
 use mumcord_store::{Conversation, NewChatMessage, NewServer, ServerId, Store, UnixMillis};
@@ -17,6 +17,8 @@ const START: UnixMillis = 1_700_000_000_000;
 const LOBBY: u32 = 1;
 const RAID: u32 = 2;
 const ROOT: u32 = 0;
+/// A sub-channel of the raid channel.
+const SQUAD: u32 = 3;
 
 struct TestEnv {
     _dir: tempfile::TempDir,
@@ -25,6 +27,22 @@ struct TestEnv {
     sharing: bool,
     cert: String,
     max_age_days: Option<u32>,
+    /// Channels whose own ACL restricts entering, as the server flags them.
+    restricted: HashSet<u32>,
+    /// Access tokens sent to the server.
+    tokens: Vec<String>,
+    /// Channels the server no longer lets this client enter (password changed).
+    no_entry: HashSet<u32>,
+    /// PermissionQueries sent, answered by [`Net::run`] on the next step.
+    queried: Mutex<Vec<u32>>,
+}
+
+fn parent(channel: u32) -> Option<u32> {
+    match channel {
+        ROOT => None,
+        SQUAD => Some(RAID),
+        _ => Some(ROOT),
+    }
 }
 
 impl Env for TestEnv {
@@ -46,15 +64,22 @@ impl Env for TestEnv {
     fn channel_key(&self, channel: u32) -> Option<String> {
         match channel {
             ROOT => Some(String::new()),
-            LOBBY => Some("Lobby".into()),
-            RAID => Some("Raid".into()),
+            LOBBY | RAID | SQUAD => Some(key(channel).into()),
             _ => None,
         }
+    }
+    fn channel_locked(&self, channel: u32) -> bool {
+        std::iter::successors(Some(channel), |&c| parent(c)).any(|c| self.restricted.contains(&c))
+    }
+    fn own_tokens(&self) -> Vec<String> {
+        self.tokens.clone()
+    }
+    fn query_own_permissions(&self, channel: u32) {
+        self.queried.lock().expect("queried").push(channel);
     }
 }
 
 struct Node {
-    name: String,
     core: Core,
     env: TestEnv,
     events: Vec<EngineEvent>,
@@ -72,7 +97,11 @@ struct Net {
 }
 
 fn key(channel: u32) -> &'static str {
-    if channel == LOBBY { "Lobby" } else { "Raid" }
+    match channel {
+        LOBBY => "Lobby",
+        SQUAD => "Raid/Squad",
+        _ => "Raid",
+    }
 }
 
 fn cert(session: u32) -> String {
@@ -99,7 +128,6 @@ impl Net {
             nodes.insert(
                 session,
                 Node {
-                    name: format!("user{session}"),
                     core: Core::new(session, START),
                     env: TestEnv {
                         _dir: dir,
@@ -108,6 +136,10 @@ impl Net {
                         sharing: true,
                         cert: cert(session),
                         max_age_days: None,
+                        restricted: HashSet::new(),
+                        tokens: Vec::new(),
+                        no_entry: HashSet::new(),
+                        queried: Mutex::new(Vec::new()),
                     },
                     events: Vec::new(),
                     ignores_from: false,
@@ -125,13 +157,53 @@ impl Net {
         net
     }
 
-    /// Everyone sees `session` in / following `channels` now.
+    /// Everyone sees `session` in `channels[0]` and following the rest now.
     fn place(&mut self, session: u32, channels: &[u32]) {
-        let name = self.nodes[&session].name.clone();
+        self.place_in(session, channels[0], &channels[1..]);
+    }
+
+    /// Everyone sees `session` inside `inside` and following `listening` now.
+    fn place_in(&mut self, session: u32, inside: u32, listening: &[u32]) {
+        let name = format!("user{session}");
+        let cert = cert(session);
         for node in self.nodes.values_mut() {
-            node.core
-                .user_seen(session, &name, channels.iter().copied(), self.now);
+            node.core.user_seen(
+                &node.env,
+                session,
+                &name,
+                Some(&cert),
+                inside,
+                listening.iter().copied(),
+                self.now,
+            );
+            node.events.extend(node.core.take_events());
         }
+    }
+
+    /// The server restricts entering `channel` (its own ACL), as every client sees it.
+    fn lock(&mut self, channel: u32) {
+        for node in self.nodes.values_mut() {
+            node.env.restricted.insert(channel);
+        }
+    }
+
+    /// "Load earlier messages" at `session`.
+    fn request(
+        &mut self,
+        session: u32,
+        channel: u32,
+        before: Option<UnixMillis>,
+    ) -> Result<(), RequestError> {
+        let now = self.now;
+        let node = self.node(session);
+        let result = node.core.request(&node.env, channel, before, now);
+        node.events.extend(node.core.take_events());
+        result
+    }
+
+    /// `session` holds these access tokens.
+    fn tokens(&mut self, session: u32, tokens: &[&str]) {
+        self.node(session).env.tokens = tokens.iter().map(|t| (*t).to_owned()).collect();
     }
 
     fn node(&mut self, session: u32) -> &mut Node {
@@ -191,6 +263,12 @@ impl Net {
             self.now += 100;
             let mut sent = Vec::new();
             for (&session, node) in &mut self.nodes {
+                // The server answers PermissionQueries before later plugin data.
+                let queried = std::mem::take(&mut *node.env.queried.lock().expect("queried"));
+                for channel in queried {
+                    let enter = !node.env.no_entry.contains(&channel);
+                    node.core.own_permissions(channel, enter, self.now);
+                }
                 node.core.tick(&node.env, self.now);
                 node.events.extend(node.core.take_events());
                 for (to, data) in node.core.take_outgoing(self.now) {
@@ -526,9 +604,9 @@ fn requests_and_sending_are_rate_limited() {
     assert_eq!(answers, 6, "per-person request budget");
 
     let mut core = Core::new(1, START);
-    core.user_seen(1, "me", [LOBBY], START);
-    core.user_seen(2, "other", [LOBBY], START);
     let env = &net.nodes[&1].env;
+    core.user_seen(env, 1, "me", None, LOBBY, [], START);
+    core.user_seen(env, 2, "other", None, LOBBY, [], START);
     for _ in 0..20 {
         core.on_packet(env, 2, &request, START);
     }
@@ -544,14 +622,8 @@ fn load_earlier_needs_a_live_channel_and_reaches_before_the_given_time() {
     net.run(5000);
     net.hold(1, LOBBY, 3, START - 10_000, "older");
     net.hold(1, LOBBY, 3, START - 2_000, "newer");
-    assert_eq!(
-        net.node(2).core.request(RAID, None, START),
-        Err(RequestError::NotLive)
-    );
-    net.node(2)
-        .core
-        .request(LOBBY, Some(START - 5_000), START)
-        .expect("request");
+    assert_eq!(net.request(2, RAID, None), Err(RequestError::NotLive));
+    net.request(2, LOBBY, Some(START - 5_000)).expect("request");
     net.run(5000);
     let got: HashMap<_, _> = net
         .synced(2)
@@ -840,4 +912,363 @@ fn holders_answer_only_from_the_requested_start() {
         body: "after the start",
     });
     assert_eq!(hashes, [after]);
+}
+
+// Locked channels (issue #382).
+
+/// Packets `from` sent to `to`.
+fn sent(net: &Net, from: u32, to: u32) -> Vec<Packet> {
+    net.log
+        .iter()
+        .filter(|(f, t, _)| *f == from && t == &[to])
+        .map(|(_, _, p)| p.clone())
+        .collect()
+}
+
+fn hash_lists(net: &Net, from: u32, to: u32) -> usize {
+    sent(net, from, to)
+        .iter()
+        .filter(|p| matches!(p, Packet::Hashes { .. }))
+        .count()
+}
+
+/// A raid channel only members may enter; user 1 is inside and holds a message.
+fn locked_raid(sessions: &[u32]) -> Net {
+    let mut net = Net::new(sessions);
+    net.lock(RAID);
+    net.place_in(1, RAID, &[]);
+    net.hold(1, RAID, 3, START - 5000, "secret");
+    net.run(1000);
+    net
+}
+
+#[test]
+fn listeners_of_a_locked_channel_get_no_history() {
+    let mut net = locked_raid(&[1, 2]);
+    net.place_in(2, ROOT, &[RAID]); // in ROOT, listening to RAID
+    net.run(5000);
+    assert!(net.synced(2).is_empty());
+    assert_eq!(net.fetches(1, 2), 0);
+
+    // Even when asked directly, the holder neither summarizes nor lists anything.
+    let request = |req| {
+        wire::encode(&Packet::HashRequest {
+            req,
+            channel: RAID,
+            from: 0,
+            to: START + 10_000,
+        })
+    };
+    net.deliver(2, &[1], &request(90));
+    net.deliver(
+        2,
+        &[1],
+        &wire::encode(&Packet::AvailabilityRequest {
+            req: 91,
+            channel: RAID,
+            from: 0,
+            to: START + 10_000,
+        }),
+    );
+    net.run(2000);
+    assert_eq!(hash_lists(&net, 1, 2), 0);
+    assert!(
+        !sent(&net, 1, 2)
+            .iter()
+            .any(|p| matches!(p, Packet::Availability { .. }))
+    );
+}
+
+#[test]
+fn a_member_entering_a_locked_channel_gets_its_earlier_history() {
+    let mut net = locked_raid(&[1, 2]);
+    net.place_in(2, ROOT, &[RAID]);
+    net.run(3000);
+    net.hold(1, RAID, 3, net.now - 500, "while following");
+    net.place_in(2, RAID, &[]);
+    net.run(5000);
+    // History from before following; what arrived live while following is not synced.
+    assert_eq!(bodies(&net.synced(2)), ["secret"]);
+}
+
+#[test]
+fn a_requester_leaving_the_locked_channel_before_the_fetch_gets_nothing() {
+    let mut net = locked_raid(&[1, 2]);
+    net.place_in(2, RAID, &[]);
+    while hash_lists(&net, 1, 2) == 0 {
+        assert!(net.now < START + 20_000, "no hash list");
+        net.run(100);
+    }
+    // Steps out (still listening) before its `get` reaches the holder.
+    net.place_in(2, ROOT, &[RAID]);
+    net.run(5000);
+    assert!(net.synced(2).is_empty());
+    assert!(
+        !sent(&net, 1, 2)
+            .iter()
+            .any(|p| matches!(p, Packet::Part { .. }))
+    );
+}
+
+#[test]
+fn a_sub_channel_of_a_locked_channel_is_locked_too() {
+    let mut net = Net::new(&[1, 2]);
+    net.lock(RAID);
+    net.place_in(1, SQUAD, &[]);
+    net.hold(1, SQUAD, 3, START - 5000, "squad secret");
+    net.run(1000);
+    net.place_in(2, ROOT, &[SQUAD]);
+    net.run(5000);
+    assert!(net.synced(2).is_empty());
+    assert_eq!(net.fetches(2, 1), 0);
+    net.place_in(2, SQUAD, &[]);
+    net.run(5000);
+    assert_eq!(bodies(&net.synced(2)), ["squad secret"]);
+}
+
+#[test]
+fn following_a_locked_channel_asks_for_nothing() {
+    let mut net = locked_raid(&[1, 2]);
+    net.place_in(2, ROOT, &[RAID]);
+    net.run(5000);
+    let asked_raid = net
+        .log
+        .iter()
+        .any(|(f, _, p)| *f == 2 && matches!(p, Packet::AvailabilityRequest { channel: RAID, .. }));
+    assert!(!asked_raid);
+    assert_eq!(net.request(2, RAID, None), Err(RequestError::Locked));
+    // An open channel followed the same way still works.
+    assert_eq!(net.request(2, ROOT, None), Ok(()));
+}
+
+#[test]
+fn members_holding_the_password_prove_it_and_get_the_history() {
+    let mut net = locked_raid(&[1, 2]);
+    net.tokens(1, &["pw"]);
+    net.tokens(2, &["other", "pw"]);
+    net.place_in(2, RAID, &[]);
+    net.run(5000);
+    assert_eq!(bodies(&net.synced(2)), ["secret"]);
+    assert!(
+        sent(&net, 1, 2)
+            .iter()
+            .any(|p| matches!(p, Packet::Challenge { channel: RAID, .. }))
+    );
+    let proof = sent(&net, 2, 1)
+        .into_iter()
+        .find(|p| matches!(p, Packet::Proof { .. }))
+        .expect("proof");
+    let Packet::Proof { macs, .. } = &proof else {
+        unreachable!();
+    };
+    assert_eq!(macs.len(), 2, "one proof per token");
+
+    // Replaying the proof gets nothing: the nonce is used up.
+    let lists = hash_lists(&net, 1, 2);
+    net.deliver(2, &[1], &wire::encode(&proof));
+    net.run(2000);
+    assert_eq!(hash_lists(&net, 1, 2), lists);
+}
+
+#[test]
+fn a_wrong_password_gets_nothing() {
+    let mut net = locked_raid(&[1, 2]);
+    net.tokens(1, &["pw"]);
+    net.tokens(2, &["guess"]);
+    net.place_in(2, RAID, &[]);
+    net.run(5000);
+    assert!(net.synced(2).is_empty());
+    assert_eq!(hash_lists(&net, 1, 2), 0);
+    assert!(
+        sent(&net, 1, 2)
+            .iter()
+            .any(|p| matches!(p, Packet::Deny { .. }))
+    );
+}
+
+#[test]
+fn a_member_without_any_password_gets_nothing_from_a_password_holder() {
+    let mut net = locked_raid(&[1, 2]);
+    net.tokens(1, &["pw"]);
+    net.place_in(2, RAID, &[]);
+    net.run(5000);
+    assert!(net.synced(2).is_empty());
+    assert_eq!(net.finished(2, RAID), Some(0), "gives up at once");
+}
+
+#[test]
+fn a_holder_whose_password_stopped_working_does_not_answer() {
+    let mut net = locked_raid(&[1, 2]);
+    net.tokens(1, &["pw"]);
+    net.tokens(2, &["pw"]);
+    // The password was changed on the server: the own Enter is gone for the holder.
+    net.node(1).env.no_entry.insert(RAID);
+    net.place_in(2, RAID, &[]);
+    net.run(5000);
+    assert!(net.synced(2).is_empty());
+    assert_eq!(hash_lists(&net, 1, 2), 0);
+}
+
+#[test]
+fn a_holder_without_tokens_answers_members_on_presence() {
+    let mut net = locked_raid(&[1, 2]);
+    net.tokens(2, &["pw"]);
+    net.place_in(2, RAID, &[]);
+    net.run(5000);
+    assert_eq!(bodies(&net.synced(2)), ["secret"]);
+    assert!(
+        !sent(&net, 1, 2)
+            .iter()
+            .any(|p| matches!(p, Packet::Challenge { .. }))
+    );
+}
+
+/// A scripted requester `session` inside the raid channel asks holder 1 for hashes and gets
+/// its challenge.
+fn challenged(net: &mut Net, session: u32, req: u32) -> super::proof::Nonce {
+    net.place_in(session, RAID, &[]);
+    net.deliver(
+        session,
+        &[1],
+        &wire::encode(&Packet::HashRequest {
+            req,
+            channel: RAID,
+            from: 0,
+            to: net.now,
+        }),
+    );
+    net.run(500);
+    sent(net, 1, session)
+        .into_iter()
+        .rev()
+        .find_map(|p| match p {
+            Packet::Challenge { req: r, nonce, .. } if r == req => Some(nonce),
+            _ => None,
+        })
+        .expect("challenge")
+}
+
+fn proof_packet(session: u32, req: u32, nonce: &super::proof::Nonce) -> Vec<u8> {
+    let macs = super::proof::prove(&["pw".to_owned()], nonce, RAID, &cert(session), &cert(1));
+    wire::encode(&Packet::Proof { req, macs })
+}
+
+#[test]
+fn a_valid_proof_after_the_nonce_expired_gets_nothing() {
+    let mut net = locked_raid(&[1]);
+    net.tokens(1, &["pw"]);
+    let nonce = challenged(&mut net, 9, 1);
+    net.run(11_000);
+    net.deliver(9, &[1], &proof_packet(9, 1, &nonce));
+    net.run(1000);
+    assert_eq!(hash_lists(&net, 1, 9), 0);
+
+    // The same in time is answered.
+    let nonce = challenged(&mut net, 9, 2);
+    net.deliver(9, &[1], &proof_packet(9, 2, &nonce));
+    net.run(1000);
+    assert_eq!(hash_lists(&net, 1, 9), 1);
+}
+
+#[test]
+fn a_proof_made_for_another_requester_gets_nothing() {
+    let mut net = locked_raid(&[1]);
+    net.tokens(1, &["pw"]);
+    let nonce_9 = challenged(&mut net, 9, 1);
+    let nonce_8 = challenged(&mut net, 8, 1);
+    // 8 sends 9's proof, for its own request and as if it were 9's.
+    let stolen = proof_packet(9, 1, &nonce_9);
+    net.deliver(8, &[1], &stolen);
+    net.run(1000);
+    assert_eq!(hash_lists(&net, 1, 8), 0);
+    // 9's own challenge was not touched by that and still works; 8's is used up.
+    net.deliver(9, &[1], &stolen);
+    net.deliver(8, &[1], &proof_packet(8, 1, &nonce_8));
+    net.run(1000);
+    assert_eq!(hash_lists(&net, 1, 9), 1);
+    assert_eq!(hash_lists(&net, 1, 8), 0);
+}
+
+#[test]
+fn proofs_go_only_to_holders_inside_the_channel() {
+    let mut net = Net::new(&[2]);
+    net.lock(RAID);
+    net.tokens(2, &["pw"]);
+    // 9 only listens to the raid channel and pretends to hold it.
+    net.place_in(9, ROOT, &[RAID]);
+    net.place_in(2, RAID, &[]);
+    // After the root channel's discovery, the raid channel's.
+    net.run(2000);
+    let req = net
+        .log
+        .iter()
+        .find_map(|(f, _, p)| match p {
+            Packet::AvailabilityRequest {
+                req, channel: RAID, ..
+            } if *f == 2 => Some(*req),
+            _ => None,
+        })
+        .expect("asked");
+    let offer = wire::encode(&Packet::Availability {
+        req,
+        channel: RAID,
+        count: 5,
+        oldest: START - 9000,
+        newest: START - 1000,
+    });
+    net.deliver(9, &[2], &offer);
+    net.run(2000);
+    let hreq = sent(&net, 2, 9)
+        .into_iter()
+        .find_map(|p| match p {
+            Packet::HashRequest { req, .. } => Some(req),
+            _ => None,
+        })
+        .expect("hash request");
+    net.deliver(
+        9,
+        &[2],
+        &wire::encode(&Packet::Challenge {
+            req: hreq,
+            channel: RAID,
+            nonce: [7; 16],
+        }),
+    );
+    net.run(1000);
+    assert!(
+        !sent(&net, 2, 9)
+            .iter()
+            .any(|p| matches!(p, Packet::Proof { .. }))
+    );
+}
+
+#[test]
+fn locks_are_inherited_from_parents_and_unknown_channels_count_as_locked() {
+    use mumcord_protocol::{Channel, ServerState};
+    let mut s = ServerState::default();
+    for (id, parent) in [(ROOT, None), (RAID, Some(ROOT)), (SQUAD, Some(RAID))] {
+        s.channels.insert(
+            id,
+            Channel {
+                id,
+                parent,
+                ..Channel::default()
+            },
+        );
+    }
+    assert!(!super::channel_locked(&s, SQUAD));
+    s.channels.get_mut(&RAID).expect("raid").is_enter_restricted = true;
+    assert!(super::channel_locked(&s, SQUAD));
+    assert!(!super::channel_locked(&s, ROOT));
+    assert!(super::channel_locked(&s, 42));
+    s.channels.get_mut(&ROOT).expect("root").is_enter_restricted = true;
+    assert!(
+        super::channel_locked(&s, LOBBY),
+        "unknown, and the root is locked"
+    );
+    // A cyclic tree from a broken server ends as locked instead of looping.
+    s.channels.get_mut(&ROOT).expect("root").is_enter_restricted = false;
+    s.channels.get_mut(&RAID).expect("raid").is_enter_restricted = false;
+    s.channels.get_mut(&ROOT).expect("root").parent = Some(SQUAD);
+    assert!(super::channel_locked(&s, SQUAD));
 }

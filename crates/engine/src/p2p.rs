@@ -35,7 +35,7 @@ use mumcord_store::{Consent, P2pMode, Store};
 use tokio::sync::{Notify, oneshot};
 
 use crate::ServerId;
-use crate::peer::RelayUnavailable;
+use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{Engine, EngineEvent, EngineResult, SessionCtx, WeakEngine, lock};
 
 /// Feature announced in the Mumcord hello; direct connections are only offered to peers that
@@ -45,6 +45,15 @@ pub const FEATURE: &str = "p2p";
 /// First byte of a stream on a direct connection: what it carries.
 pub const STREAM_FULL_IMAGE: u8 = 1;
 pub const STREAM_SCREEN: u8 = 2;
+
+/// What a stream of `kind` uses the relay for (FR-7.6); `None` for an unknown kind.
+pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
+    match kind {
+        STREAM_FULL_IMAGE => Some(RelayUse::Images),
+        STREAM_SCREEN => Some(RelayUse::ScreenShare),
+        _ => None,
+    }
+}
 
 /// How long an offer waits for the other side's answer or decline.
 const ANSWER_WAIT: Duration = Duration::from_secs(15);
@@ -127,8 +136,13 @@ impl Plan {
     }
 }
 
-/// What this side may use given the effective mode of the server, the relay's availability and
-/// the consent (FR-4.3 – FR-4.5). Errors: P2P features are unavailable on this server.
+/// What this side may use given the effective mode of the server, the relay's availability for
+/// the feature and the consent (FR-4.3 – FR-4.5). Errors: P2P features are unavailable on this
+/// server.
+///
+/// A relay that is there but does not allow the feature's use (FR-7.7) is not "no relay": "always
+/// relay" does not fall back to direct then, and where only the relay could work the error names
+/// the disabled use.
 pub(crate) fn plan(
     mode: P2pMode,
     relay: Result<(), RelayUnavailable>,
@@ -140,6 +154,18 @@ pub(crate) fn plan(
         Consent::No => DirectUse::No,
     };
     let available = relay.is_ok();
+    // Only a mode that would use the relay reports its disabled use.
+    let use_refused = match relay {
+        Err(e @ RelayUnavailable::UseNotAllowed(_)) if mode != P2pMode::DirectOnly => {
+            Some(DirectError::Relay(e))
+        }
+        _ => None,
+    };
+    if mode == P2pMode::RelayFirst
+        && let Some(e) = use_refused
+    {
+        return Err(e);
+    }
     let plan = match mode {
         P2pMode::Off => return Err(DirectError::Off),
         P2pMode::DirectRelay => Plan {
@@ -173,7 +199,7 @@ pub(crate) fn plan(
         }
     };
     if plan.direct == DirectUse::No && !plan.relay {
-        return Err(DirectError::NotAllowed);
+        return Err(use_refused.unwrap_or(DirectError::NotAllowed));
     }
     Ok(plan)
 }
@@ -624,6 +650,12 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
                 tracing::debug!(error = %e, "direct stream ended before its kind");
                 return;
             }
+            if let Some(relay_use) = stream_use(kind[0])
+                && !relayed_use_allowed(&engine, key, relay_use)
+            {
+                tracing::debug!(kind = kind[0], "refusing a stream the relay does not allow");
+                return;
+            }
             match kind[0] {
                 STREAM_FULL_IMAGE => crate::full_image::serve_direct(&engine, send, recv).await,
                 STREAM_SCREEN => {
@@ -639,6 +671,16 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
         emit_link(&engine, key, None);
     }
     tracing::info!("peer-to-peer connection closed");
+}
+
+/// Whether the open link to `key` may carry `relay_use`: always when it is direct, else only
+/// while the relay allows that use (FR-7.6; the relay may have been opened for another feature).
+fn relayed_use_allowed(engine: &Engine, key: Key, relay_use: RelayUse) -> bool {
+    let relayed = engine
+        .direct()
+        .open_link(key, |l| l.conn.path() != ConnectionPath::Direct)
+        .unwrap_or(false);
+    !relayed || engine.relays().allows(key.0, relay_use)
 }
 
 fn client_identity(identity: &mumcord_store::Identity) -> ClientIdentity {
@@ -717,26 +759,51 @@ impl Engine {
         self.direct().open_link((server_id, session), Link::info)
     }
 
-    /// Why P2P features cannot be used on `server_id` at all right now (mode, relay, consent;
-    /// FR-4.3, FR-4.4); `None` when an attempt may work.
-    pub(crate) fn p2p_unavailable(&self, server_id: ServerId) -> Option<DirectError> {
-        let relay = self.relays().availability(server_id);
+    /// Why the feature with `relay_use` cannot use P2P on `server_id` at all right now (mode,
+    /// relay and its allowed uses, consent; FR-4.3, FR-4.4, FR-7.7); `None` when an attempt may
+    /// work.
+    pub(crate) fn p2p_unavailable(
+        &self,
+        server_id: ServerId,
+        relay_use: RelayUse,
+    ) -> Option<DirectError> {
+        let relay = self.relays().availability_for(server_id, relay_use);
         let store = self.store_handle();
         let store = lock(&store);
         plan_for(&store, server_id, relay).err()
     }
 
-    /// The P2P connection to `session` on `server_id`: the open one, else a new one, direct or
-    /// through the relay as the mode allows (FR-4.14). Errors mean the feature has to use
-    /// plugin data (or is unavailable).
+    /// The open connection to `key` if the feature with `relay_use` may use it: a relayed one
+    /// only while the relay allows that use (FR-7.6). A refused one stays open for the features
+    /// that may use it; there is one connection per person.
+    fn p2p_open_for(
+        &self,
+        key: Key,
+        relay_use: RelayUse,
+    ) -> Option<Result<Arc<PeerConnection>, DirectError>> {
+        let conn = self.direct().open(key)?;
+        if relayed_use_allowed(self, key, relay_use) {
+            Some(Ok(conn))
+        } else {
+            Some(Err(DirectError::Relay(RelayUnavailable::UseNotAllowed(
+                relay_use,
+            ))))
+        }
+    }
+
+    /// The P2P connection to `session` on `server_id` for a feature with `relay_use`: the open
+    /// one, else a new one, direct or through the relay as the mode and the relay's allowed uses
+    /// allow (FR-4.14, FR-7.6). Errors mean the feature has to use plugin data (or is
+    /// unavailable).
     pub async fn p2p_connection(
         &self,
         server_id: ServerId,
         session: u32,
+        relay_use: RelayUse,
     ) -> Result<Arc<PeerConnection>, DirectError> {
         let key = (server_id, session);
-        if let Some(conn) = self.direct().open(key) {
-            return Ok(conn);
+        if let Some(open) = self.p2p_open_for(key, relay_use) {
+            return open;
         }
         let ctx = self
             .session_ctx_for(server_id)
@@ -750,7 +817,7 @@ impl Engine {
         if !self.mumcord_user_has_feature(server_id, session, FEATURE) {
             return Err(DirectError::Unsupported);
         }
-        let relay = self.relays().availability(server_id);
+        let relay = self.relays().availability_for(server_id, relay_use);
         let plan = plan_for(&ctx.store(), server_id, relay)?;
         let asked = plan.direct == DirectUse::Ask && self.direct_allowed(&ctx).await;
         let reveal = plan.reveal(asked)?;
@@ -760,8 +827,8 @@ impl Engine {
             .or_default()
             .clone();
         let _attempt = attempt.lock().await;
-        if let Some(conn) = self.direct().open(key) {
-            return Ok(conn);
+        if let Some(open) = self.p2p_open_for(key, relay_use) {
+            return open;
         }
         let Some((p2p, own_hash)) = self.p2p().await else {
             return Err(DirectError::Unsupported);
@@ -809,10 +876,16 @@ impl Engine {
                     Then::PeerCannotRelay => {
                         return Err(DirectError::Relay(RelayUnavailable::PeerCannotRelay));
                     }
-                    Then::NoPath => return Err(P2pError::NoDirectPath.into()),
+                    // Only the relay could have worked: say why it was not used (FR-7.7).
+                    Then::NoPath => {
+                        return Err(match relay {
+                            Err(e @ RelayUnavailable::UseNotAllowed(_)) => DirectError::Relay(e),
+                            _ => P2pError::NoDirectPath.into(),
+                        });
+                    }
                 }
                 let (ann, token) = self
-                    .relay_token_request(server_id, session)
+                    .relay_token_request(server_id, session, relay_use)
                     .await
                     .map_err(DirectError::Relay)?;
                 let conn = p2p
@@ -828,8 +901,8 @@ impl Engine {
                     2 * lock(&self.direct().config).connect_timeout + ANSWER_WAIT + TOKEN_AWAIT;
                 let deadline = tokio::time::Instant::now() + wait;
                 loop {
-                    if let Some(conn) = self.direct().open(key) {
-                        return Ok(conn);
+                    if let Some(open) = self.p2p_open_for(key, relay_use) {
+                        return open;
                     }
                     if tokio::time::timeout_at(deadline, opened.as_mut())
                         .await
@@ -858,7 +931,9 @@ impl Engine {
         session: u32,
         kind: u8,
     ) -> Result<(SendStream, RecvStream), DirectError> {
-        let conn = self.p2p_connection(server_id, session).await?;
+        let relay_use =
+            stream_use(kind).ok_or_else(|| DirectError::Stream(format!("unknown kind {kind}")))?;
+        let conn = self.p2p_connection(server_id, session, relay_use).await?;
         let (mut send, recv) = conn
             .connection()
             .open_bi()
@@ -971,6 +1046,73 @@ mod tests {
             result,
             Err(DirectError::Relay(RelayUnavailable::BotLeft))
         ));
+    }
+
+    /// The plan when the relay is there but does not allow the feature's use (FR-7.7).
+    fn plan_without_use(mode: P2pMode, consent: Consent) -> Result<Plan, DirectError> {
+        plan(
+            mode,
+            Err(RelayUnavailable::UseNotAllowed(RelayUse::ScreenShare)),
+            consent,
+        )
+    }
+
+    fn refused_for_use(result: &Result<Plan, DirectError>) -> bool {
+        matches!(
+            result,
+            Err(DirectError::Relay(RelayUnavailable::UseNotAllowed(
+                RelayUse::ScreenShare
+            )))
+        )
+    }
+
+    #[test]
+    fn a_disabled_use_never_plans_the_relay() {
+        for mode in MODES {
+            for consent in CONSENTS {
+                if let Ok(plan) = plan_without_use(mode, consent) {
+                    assert!(!plan.relay, "{mode:?} {consent:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn a_disabled_use_keeps_direct_where_the_mode_allows_it() {
+        let plan = plan_without_use(P2pMode::DirectRelay, Consent::Yes).expect("direct");
+        assert_eq!(plan.direct, DirectUse::Yes);
+        let plan = plan_without_use(P2pMode::DirectOnly, Consent::No);
+        assert!(matches!(plan, Err(DirectError::NotAllowed)), "own choice");
+    }
+
+    #[test]
+    fn where_only_the_relay_would_work_the_disabled_use_is_the_reason() {
+        for consent in CONSENTS {
+            assert!(refused_for_use(&plan_without_use(
+                P2pMode::RelayOnly,
+                consent
+            )));
+            // A relay that exists is no "no relay": "always relay" does not go direct.
+            assert!(refused_for_use(&plan_without_use(
+                P2pMode::RelayFirst,
+                consent
+            )));
+        }
+        assert!(refused_for_use(&plan_without_use(
+            P2pMode::DirectRelay,
+            Consent::No
+        )));
+        assert!(matches!(
+            plan_without_use(P2pMode::Off, Consent::Yes),
+            Err(DirectError::Off)
+        ));
+    }
+
+    #[test]
+    fn streams_map_to_their_relay_use() {
+        assert_eq!(stream_use(STREAM_FULL_IMAGE), Some(RelayUse::Images));
+        assert_eq!(stream_use(STREAM_SCREEN), Some(RelayUse::ScreenShare));
+        assert_eq!(stream_use(0), None);
     }
 
     #[test]

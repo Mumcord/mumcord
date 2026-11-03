@@ -2993,10 +2993,18 @@ export type RelayInfo = {
 	status: RelayStatus,
 	/**  When the pinned relay was first accepted (RFC 3339). */
 	firstSeen: string | null,
+	/**  "Relay allows: …" (FR-7.7): all uses for an older bot, empty without a relay. */
+	uses: RelayUse[],
+	/**  Most viewers per broadcast; `null` when the relay offers no broadcasts. */
+	broadcastMax: number | null,
 };
 
 /**  Why the relay refused a connection (spec 04 section 6.5). */
-export type RelayRefusal = "unknownToken" | "expired" | "notAllowed" | "botGone" | "relayFull" | "peerLimit" | "rateLimited" | "version" | "badRequest";
+export type RelayRefusal = "unknownToken" | "expired" | "notAllowed" | "botGone" | "relayFull" | "peerLimit" | "rateLimited" | "version" | "badRequest" | 
+/**  The relay's owner turned off what the connection was for (FR-7.4). */
+"useNotAllowed" | 
+/**  The broadcast has no room for another viewer. */
+"broadcastFull";
 
 /**  State of the server's relay in the server info panel (FR-4.20). */
 export type RelayStatus = 
@@ -3029,7 +3037,12 @@ export type RelayUnavailable =
 /**  "The relay could not be reached over UDP or TCP 443." */
 { kind: "unreachable" } | 
 /**  "The other person can't use the relay (older Mumcord or relay turned off)." */
-{ kind: "peerCannotRelay" } | { kind: "denied" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" };
+{ kind: "peerCannotRelay" } | { kind: "denied" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" } | 
+/**  "This server's relay doesn't allow {images / file sharing / screen sharing}" (FR-7.7). */
+{ kind: "useNotAllowed"; use: RelayUse };
+
+/**  What the relay may be used for (FR-7.7): "Images", "Files", "Screen sharing". */
+export type RelayUse = "images" | "files" | "screenShare";
 
 /**  The changes of one release between the installed and the offered version. */
 export type ReleaseNote = {

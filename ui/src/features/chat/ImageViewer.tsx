@@ -19,6 +19,8 @@ import { useTranslation } from "react-i18next";
 import { BetaBadge } from "../../components/BetaBadge";
 import { removeFavorite, saveFavorite, useGifFavorites } from "./favorites";
 import { useDisplaySrc } from "./displaySrc";
+import { useShownServerId } from "../channels/serverStore";
+import { useRelayInfo } from "../p2p/useRelayInfo";
 import { useFullImage, type FullImageSource } from "./fullImage";
 import { copyImage, imageActionError, saveImageAs } from "./imageActions";
 import { openInBrowser } from "./openLink";
@@ -55,6 +57,8 @@ const FOCUSABLE = "button:not([disabled])";
 /** Loading progress of the full image, or that only the thumbnail is available. */
 function FullImageHint({ state }: { state: ReturnType<typeof useFullImage> }) {
   const { t } = useTranslation("chat");
+  const { t: tP2p } = useTranslation("p2p");
+  const relay = useRelayInfo(useShownServerId());
   if (state.status === "loading") {
     // The badge sits outside the live region so screen readers don't repeat it on every progress tick.
     return (
@@ -71,7 +75,9 @@ function FullImageHint({ state }: { state: ReturnType<typeof useFullImage> }) {
   if (state.status === "failed") {
     return (
       <p className="image-viewer__hint" role="status">
-        {t("viewer.fullUnavailable")}
+        {relay !== null && relay.status.kind === "available" && !relay.uses.includes("images")
+          ? tP2p("relay.imagesDisallowed")
+          : t("viewer.fullUnavailable")}
       </p>
     );
   }

@@ -41,7 +41,13 @@ import {
   requestPreview,
 } from "../members";
 import { useMessageWindow } from "./messageWindow";
-import { OUTGOING_PREFIX, renderKey, type ConversationLog, type OutgoingSend } from "./chatStore";
+import {
+  insertByTime,
+  OUTGOING_PREFIX,
+  renderKey,
+  type ConversationLog,
+  type OutgoingSend,
+} from "./chatStore";
 import { daysAgo, messageLayout } from "./grouping";
 import { pinnedIndex } from "./pinnedAuthor";
 import { useCodeBlockActions } from "./useCodeBlockActions";
@@ -348,11 +354,17 @@ export function MessageList({
   collapsedIds,
 }: MessageListProps) {
   const { t, i18n } = useTranslation("chat");
-  // Own messages not confirmed yet show at the end, greyed (FR-2.74).
+  // Own messages not confirmed yet show greyed (FR-2.74) at their send time, where they stay once
+  // confirmed, even when others write meanwhile (issue #379).
   const outgoing = log.outgoing;
   const allMessages = useMemo(
     () =>
-      outgoing?.length ? [...log.messages, ...outgoing.map((item) => item.message)] : log.messages,
+      outgoing?.length
+        ? insertByTime(
+            log.messages,
+            outgoing.map((item) => item.message),
+          )
+        : log.messages,
     [log.messages, outgoing],
   );
   const {

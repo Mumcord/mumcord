@@ -49,7 +49,7 @@ use tokio::sync::oneshot;
 use crate::ServerId;
 use crate::mumcord::ServerPeers;
 use crate::p2p::DirectError;
-use crate::peer::RelayUnavailable;
+use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{
     Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, WeakEngine, lock,
 };
@@ -249,7 +249,7 @@ fn send_viewers(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, oth
 fn static_block(state: &ServerShares, ctx: &SessionCtx) -> Option<WatchBlock> {
     let engine = lock(state).engine.as_ref().and_then(WeakEngine::upgrade)?;
     engine
-        .p2p_unavailable(ctx.server_id)
+        .p2p_unavailable(ctx.server_id, RelayUse::ScreenShare)
         .as_ref()
         .and_then(WatchBlock::of)
 }
@@ -573,7 +573,7 @@ impl Engine {
     /// sense: the mode is off, or neither direct (consent) nor the relay may be used (FR-4.3 –
     /// FR-4.5, AC-4.9). `None` when a share may start; a consent not asked yet is no block.
     pub fn screen_share_block(&self, server_id: ServerId) -> Option<WatchBlock> {
-        self.p2p_unavailable(server_id)
+        self.p2p_unavailable(server_id, RelayUse::ScreenShare)
             .as_ref()
             .and_then(WatchBlock::of)
     }
@@ -802,7 +802,7 @@ impl Engine {
             return Err(EngineError::invalid("that person is not in your channel"));
         }
         if let Some(block) = self
-            .p2p_unavailable(server_id)
+            .p2p_unavailable(server_id, RelayUse::ScreenShare)
             .as_ref()
             .and_then(WatchBlock::of)
         {

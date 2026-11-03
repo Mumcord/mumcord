@@ -17,7 +17,7 @@ use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 
 use mumcord_p2p::{MAX_PEER_BYTES, PEER_DATA_ID, PeerMessage, RequestId, TokenErrorReason};
-pub use mumcord_p2p::{RelayAnnouncement, RelayRefusal, RelayState, RelayToken};
+pub use mumcord_p2p::{RelayAnnouncement, RelayRefusal, RelayState, RelayToken, RelayUse};
 use mumcord_protocol::PluginData;
 use mumcord_store::{IdentityId, RelayPin, ServerId, Store, UnixMillis};
 use tokio::sync::oneshot;
@@ -62,13 +62,17 @@ pub enum RelayUnavailable {
     RateLimited,
     /// The relay has no room for another pair (`relay-full`).
     RelayFull,
+    /// The relay's owner turned this use off (FR-7.7): "This server's relay doesn't allow …".
+    /// Announced in `u`, or the bot's `use-not-allowed` answer.
+    UseNotAllowed(RelayUse),
 }
 
-impl From<TokenErrorReason> for RelayUnavailable {
-    fn from(reason: TokenErrorReason) -> Self {
+impl RelayUnavailable {
+    /// The bot's `token-err` for a token request made for `relay_use`.
+    fn of_token_error(reason: TokenErrorReason, relay_use: RelayUse) -> Self {
         match reason {
-            // Closest existing reason until the client handles allowed uses.
-            TokenErrorReason::Denied | TokenErrorReason::UseNotAllowed => Self::Denied,
+            TokenErrorReason::Denied => Self::Denied,
+            TokenErrorReason::UseNotAllowed => Self::UseNotAllowed(relay_use),
             TokenErrorReason::PeerGone => Self::PeerGone,
             TokenErrorReason::PeerNotMumcord => Self::PeerCannotRelay,
             TokenErrorReason::RateLimited => Self::RateLimited,
@@ -77,6 +81,9 @@ impl From<TokenErrorReason> for RelayUnavailable {
         }
     }
 }
+
+/// Every use, in the order the server info panel lists them (FR-7.7).
+const ALL_USES: [RelayUse; 3] = [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare];
 
 /// State of the server's relay for the server info panel (FR-4.20).
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -106,6 +113,11 @@ pub struct RelayInfo {
     pub status: RelayStatus,
     /// When the pinned relay was first accepted.
     pub first_seen: Option<UnixMillis>,
+    /// What the announced relay may be used for ("Relay allows: …", FR-7.7); all uses when
+    /// the announcement has no `u` (older bot, FR-7.6), none without an announced relay.
+    pub uses: Vec<RelayUse>,
+    /// Most viewers per broadcast (`bc`, FR-7.3); `None` when the relay offers no broadcasts.
+    pub broadcast_max: Option<u16>,
 }
 
 /// Waiting times of the relay logic; shorter in tests.
@@ -228,9 +240,9 @@ impl ServerRelay {
         if self.announcers.len() > 1 {
             return RelayInfo {
                 bots: self.announcers.values().map(|a| a.name.clone()).collect(),
-                host: None,
                 status: RelayStatus::Conflict,
                 first_seen,
+                ..RelayInfo::default()
             };
         }
         let Some(announcer) = self.single() else {
@@ -259,6 +271,11 @@ impl ServerRelay {
             host: Some(announcer.ann.host.clone()),
             status,
             first_seen,
+            uses: ALL_USES
+                .into_iter()
+                .filter(|u| announcer.ann.allows(*u))
+                .collect(),
+            broadcast_max: announcer.ann.broadcast,
         }
     }
 
@@ -279,6 +296,15 @@ impl ServerRelay {
         }
         if announcer.ann.state == RelayState::Down {
             return Err(RelayUnavailable::RelayDown);
+        }
+        Ok(announcer)
+    }
+
+    /// [`Self::usable`] for `relay_use`: the announcement must allow it (FR-7.6).
+    fn usable_for(&self, relay_use: RelayUse) -> Result<&Announcer, RelayUnavailable> {
+        let announcer = self.usable()?;
+        if !announcer.ann.allows(relay_use) {
+            return Err(RelayUnavailable::UseNotAllowed(relay_use));
         }
         Ok(announcer)
     }
@@ -322,6 +348,8 @@ type TokenReply = Result<RelayToken, RelayUnavailable>;
 struct Pending {
     bot: u32,
     peer: u32,
+    /// What the token was asked for; names the use a `use-not-allowed` answer refers to.
+    relay_use: RelayUse,
     reply: oneshot::Sender<TokenReply>,
 }
 
@@ -373,6 +401,31 @@ impl Relays {
             .ok_or(RelayUnavailable::NoRelay)?
             .usable()
             .map(|_| ())
+    }
+
+    /// [`Self::availability`] for one use (FR-7.6): the relay must also allow `relay_use`.
+    pub(crate) fn availability_for(
+        &self,
+        server_id: ServerId,
+        relay_use: RelayUse,
+    ) -> Result<(), RelayUnavailable> {
+        lock(&self.state)
+            .servers
+            .get(&server_id)
+            .ok_or(RelayUnavailable::NoRelay)?
+            .usable_for(relay_use)
+            .map(|_| ())
+    }
+
+    /// Whether the relay of `server_id` may carry `relay_use` by its current announcement. Only
+    /// a relay that is in use can carry anything, so without one this is `true`: there is no
+    /// relayed connection to refuse.
+    pub(crate) fn allows(&self, server_id: ServerId, relay_use: RelayUse) -> bool {
+        lock(&self.state)
+            .servers
+            .get(&server_id)
+            .and_then(ServerRelay::single)
+            .is_none_or(|a| a.ann.allows(relay_use))
     }
 
     /// Runs `change` on the server's relay; returns the new info if the panel changes.
@@ -571,7 +624,10 @@ impl Relays {
         if state.requests.get(&key).is_some_and(|p| p.bot == sender)
             && let Some(pending) = state.requests.remove(&key)
         {
-            let _ = pending.reply.send(Err(reason.into()));
+            let _ = pending.reply.send(Err(RelayUnavailable::of_token_error(
+                reason,
+                pending.relay_use,
+            )));
         }
     }
 
@@ -671,18 +727,25 @@ impl Relays {
         server_id: ServerId,
         peer: u32,
         rid: RequestId,
+        relay_use: RelayUse,
     ) -> Result<(u32, RelayAnnouncement, oneshot::Receiver<TokenReply>), RelayUnavailable> {
         let mut state = lock(&self.state);
         let (bot, ann) = state
             .servers
             .get(&server_id)
             .ok_or(RelayUnavailable::NoRelay)?
-            .usable()
+            .usable_for(relay_use)
             .map(|a| (a.session, a.ann.clone()))?;
         let (reply, rx) = oneshot::channel();
-        state
-            .requests
-            .insert((server_id, rid), Pending { bot, peer, reply });
+        state.requests.insert(
+            (server_id, rid),
+            Pending {
+                bot,
+                peer,
+                relay_use,
+                reply,
+            },
+        );
         Ok((bot, ann, rx))
     }
 
@@ -870,21 +933,26 @@ impl Engine {
     }
 
     /// Asks the pinned relay bot of `server_id` for a token for this client and `peer` (the
-    /// offering side, FR-4.14). Returns the announcement to connect to and the token.
+    /// offering side, FR-4.14), for the feature's `relay_use` (FR-7.5). Returns the announcement
+    /// to connect to and the token. A use the relay does not allow is not asked for (FR-7.6).
     pub async fn relay_token_request(
         &self,
         server_id: ServerId,
         peer: u32,
+        relay_use: RelayUse,
     ) -> Result<(RelayAnnouncement, RelayToken), RelayUnavailable> {
         let ctx = self
             .session_ctx_for(server_id)
             .map_err(|_| RelayUnavailable::NotConnected)?;
         let rid = RequestId::random();
-        let (bot, ann, rx) = self.relays().begin_request(server_id, peer, rid)?;
+        let (bot, ann, rx) = self
+            .relays()
+            .begin_request(server_id, peer, rid, relay_use)?;
+        // Always named: the relay refuses a pair without `use` unless every use is on.
         let message = PeerMessage::TokenRequest {
             rid,
             peer,
-            relay_use: None,
+            relay_use: Some(relay_use),
         };
         let sent = message
             .encode()
@@ -1187,9 +1255,10 @@ mod tests {
             R::RateLimited,
             R::RelayDown,
             R::RelayFull,
+            R::UseNotAllowed,
         ]
         .into_iter()
-        .map(Into::into)
+        .map(|r| RelayUnavailable::of_token_error(r, RelayUse::Files))
         .collect();
         assert_eq!(
             mapped,
@@ -1200,6 +1269,7 @@ mod tests {
                 RelayUnavailable::RateLimited,
                 RelayUnavailable::RelayDown,
                 RelayUnavailable::RelayFull,
+                RelayUnavailable::UseNotAllowed(RelayUse::Files),
             ]
         );
     }
@@ -1221,7 +1291,9 @@ mod tests {
     async fn a_token_request_times_out_without_an_answer() {
         let relays = relays();
         let rid = RequestId(1);
-        let (bot, _, rx) = relays.begin_request(1, 2, rid).expect("usable");
+        let (bot, _, rx) = relays
+            .begin_request(1, 2, rid, RelayUse::Images)
+            .expect("usable");
         assert_eq!(bot, 5);
         assert_eq!(
             relays.finish_request(1, rid, rx).await,
@@ -1233,7 +1305,9 @@ mod tests {
     #[tokio::test(start_paused = true)]
     async fn a_token_request_gets_the_token_or_the_mapped_error() {
         let relays = relays();
-        let (_, _, rx) = relays.begin_request(1, 2, RequestId(1)).expect("usable");
+        let (_, _, rx) = relays
+            .begin_request(1, 2, RequestId(1), RelayUse::Images)
+            .expect("usable");
         // Wrong sender, wrong peer, and someone else's pair are ignored.
         relays.on_token(1, Some(1), 6, RequestId(1), 1, 2, token('x'), 30);
         relays.on_token(1, Some(1), 5, RequestId(1), 1, 3, token('x'), 30);
@@ -1244,7 +1318,9 @@ mod tests {
             Ok(token('a'))
         );
 
-        let (_, _, rx) = relays.begin_request(1, 2, RequestId(2)).expect("usable");
+        let (_, _, rx) = relays
+            .begin_request(1, 2, RequestId(2), RelayUse::Images)
+            .expect("usable");
         relays.on_token_error(1, 6, RequestId(2), TokenErrorReason::RelayFull);
         relays.on_token_error(1, 5, RequestId(2), TokenErrorReason::PeerNotMumcord);
         assert_eq!(
@@ -1257,12 +1333,16 @@ mod tests {
     fn a_token_request_needs_a_usable_relay() {
         let relays = Relays::default();
         assert_eq!(
-            relays.begin_request(1, 2, RequestId(1)).err(),
+            relays
+                .begin_request(1, 2, RequestId(1), RelayUse::Images)
+                .err(),
             Some(RelayUnavailable::NoRelay)
         );
         let relays = relays_with_down();
         assert_eq!(
-            relays.begin_request(1, 2, RequestId(1)).err(),
+            relays
+                .begin_request(1, 2, RequestId(1), RelayUse::Images)
+                .err(),
             Some(RelayUnavailable::RelayDown)
         );
     }
@@ -1332,7 +1412,9 @@ mod tests {
     #[test]
     fn reset_fails_waiting_requests_and_clears_the_server() {
         let relays = relays();
-        let (_, _, mut rx) = relays.begin_request(1, 2, RequestId(1)).expect("usable");
+        let (_, _, mut rx) = relays
+            .begin_request(1, 2, RequestId(1), RelayUse::Images)
+            .expect("usable");
         assert!(relays.reset(1));
         assert_eq!(rx.try_recv(), Ok(Err(RelayUnavailable::NotConnected)));
         assert_eq!(relays.info(1), RelayInfo::default());
@@ -1349,6 +1431,111 @@ mod tests {
         assert_eq!(
             relays.expire(1, 3).map(|i| i.status),
             Some(RelayStatus::Unavailable(RelayUnavailable::BotLeft))
+        );
+    }
+
+    /// Relays on server 1 whose trusted bot announces `uses` and `bc`.
+    fn relays_with_uses(uses: Option<Vec<RelayUse>>, broadcast: Option<u16>) -> Relays {
+        let relays = Relays::default();
+        relays.change(1, |relay| {
+            *relay = trusted_relay(announcer(
+                5,
+                BOT,
+                RelayAnnouncement {
+                    uses,
+                    broadcast,
+                    ..ann(1, RelayState::Up, 1)
+                },
+            ));
+        });
+        relays
+    }
+
+    #[test]
+    fn an_announcement_without_uses_allows_everything() {
+        let relays = relays_with_uses(None, None);
+        for relay_use in ALL_USES {
+            assert_eq!(relays.availability_for(1, relay_use), Ok(()));
+            assert!(relays.allows(1, relay_use));
+        }
+        let info = relays.info(1);
+        assert_eq!(info.uses, ALL_USES);
+        assert_eq!(info.broadcast_max, None);
+    }
+
+    #[test]
+    fn a_disabled_use_makes_the_relay_unavailable_for_it_only() {
+        let relays = relays_with_uses(
+            Some(vec![RelayUse::ScreenShare, RelayUse::Images]),
+            Some(25),
+        );
+        assert_eq!(relays.availability(1), Ok(()));
+        assert_eq!(relays.availability_for(1, RelayUse::Images), Ok(()));
+        assert_eq!(
+            relays.availability_for(1, RelayUse::Files),
+            Err(RelayUnavailable::UseNotAllowed(RelayUse::Files))
+        );
+        assert!(!relays.allows(1, RelayUse::Files));
+        let info = relays.info(1);
+        assert_eq!(info.status, RelayStatus::Available);
+        assert_eq!(
+            info.uses,
+            [RelayUse::Images, RelayUse::ScreenShare],
+            "panel order"
+        );
+        assert_eq!(info.broadcast_max, Some(25));
+        assert_eq!(
+            relays
+                .begin_request(1, 2, RequestId(1), RelayUse::Files)
+                .err(),
+            Some(RelayUnavailable::UseNotAllowed(RelayUse::Files)),
+            "no token is asked for a disabled use"
+        );
+    }
+
+    #[test]
+    fn other_uses_in_a_new_announcement_change_the_panel() {
+        let relays = relays_with_uses(None, Some(25));
+        let changed = relays.change(1, |relay| {
+            relay.announce(announcer(
+                5,
+                BOT,
+                RelayAnnouncement {
+                    uses: Some(vec![RelayUse::Images]),
+                    broadcast: None,
+                    ..ann(1, RelayState::Up, 2)
+                },
+            ));
+        });
+        let info = changed.expect("the panel changes");
+        assert_eq!(info.uses, [RelayUse::Images]);
+        assert_eq!(info.broadcast_max, None);
+    }
+
+    #[test]
+    fn without_a_relay_nothing_is_allowed_or_refused() {
+        let relays = Relays::default();
+        assert!(relays.info(1).uses.is_empty());
+        assert_eq!(
+            relays.availability_for(1, RelayUse::Images),
+            Err(RelayUnavailable::NoRelay)
+        );
+        assert!(
+            relays.allows(1, RelayUse::Images),
+            "no relayed link to refuse"
+        );
+    }
+
+    #[tokio::test(start_paused = true)]
+    async fn use_not_allowed_names_the_requested_use() {
+        let relays = relays();
+        let (_, _, rx) = relays
+            .begin_request(1, 2, RequestId(1), RelayUse::ScreenShare)
+            .expect("usable");
+        relays.on_token_error(1, 5, RequestId(1), TokenErrorReason::UseNotAllowed);
+        assert_eq!(
+            relays.finish_request(1, RequestId(1), rx).await,
+            Err(RelayUnavailable::UseNotAllowed(RelayUse::ScreenShare))
         );
     }
 }

@@ -270,6 +270,71 @@ describe("ChatView instant send (FR-2.74)", () => {
     expect(screen.getAllByText("hi Anna")).toHaveLength(1);
   });
 
+  // Issue #379: Mumble does not acknowledge messages, so a send is confirmed only after a short
+  // refusal grace. A message someone else sends in that window reached the server later; the own
+  // message stays above it while sending, once confirmed and when it is loaded again.
+  it("keeps the own message above a reply that arrives while it is confirmed", async () => {
+    const api = await renderChat();
+    const original = api.sendChannelMessage.bind(api);
+    let release = (): void => undefined;
+    vi.spyOn(api, "sendChannelMessage").mockImplementationOnce((serverId, channelId, html) => {
+      // Like the engine: the stored time is when the message went to the server.
+      const sentAt = new Date().toISOString();
+      return new Promise((resolve, reject) => {
+        release = () => {
+          original(serverId, channelId, html).then((m) => {
+            resolve({ ...m, sentAt });
+          }, reject);
+        };
+      });
+    });
+    const order = () =>
+      screen.getAllByRole("listitem").flatMap((li) => {
+        const text = li.textContent;
+        if (text.includes("mine first")) return ["mine"];
+        if (text.includes("their reply")) return ["theirs"];
+        return [];
+      });
+
+    send("mine first");
+    const pending = (await screen.findByText("mine first")).closest("li");
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "their reply", 2);
+    });
+    await screen.findByText("their reply");
+    expect(order()).toEqual(["mine", "theirs"]);
+
+    act(() => {
+      release();
+    });
+    await waitFor(() => {
+      expect(pending).not.toHaveClass("chat-message--pending");
+    });
+    expect(pending?.isConnected).toBe(true);
+    expect(order()).toEqual(["mine", "theirs"]);
+  });
+
+  it("moves a retried message to the time it is sent again", async () => {
+    const api = await renderChat();
+    api.mock.failNext("sendChannelMessage", "notConnected");
+    send("second try");
+    await screen.findByText("Not sent.");
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    act(() => {
+      api.mock.receiveMessage(LOBBY, "in between", 2);
+    });
+    await screen.findByText("in between");
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    await waitFor(() => {
+      expect(screen.queryByText("Not sent.")).not.toBeInTheDocument();
+    });
+    const texts = screen.getAllByRole("listitem").map((li) => li.textContent);
+    expect(texts.findIndex((t) => t.includes("in between"))).toBeLessThan(
+      texts.findIndex((t) => t.includes("second try")),
+    );
+  });
+
   it("keeps a failed direct message for retry", async () => {
     const api = await renderChat();
     act(() => {

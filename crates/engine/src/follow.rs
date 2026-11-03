@@ -113,7 +113,7 @@ pub struct FollowAllSummary {
     pub followed: u32,
     /// Skipped because the server's listener limit was reached.
     pub limit_reached: u32,
-    /// Skipped because the user may not listen to them.
+    /// Skipped because the user may not listen to or enter them.
     pub not_allowed: u32,
     /// Skipped because the server neither confirmed nor refused in time.
     pub no_answer: u32,
@@ -257,28 +257,15 @@ impl Engine {
 }
 
 impl Engine {
-    /// Follows every channel the user may listen to, except their own voice channel (QA.13).
+    /// Follows every channel the user may listen to and enter, except their own voice channel
+    /// (QA.13, issue #382).
     /// One batched listen request; the server refuses what exceeds its listener limit.
     /// Errors: `ServerTooOld` (< 1.4).
     pub async fn channel_follow_all(&self, server_id: ServerId) -> EngineResult<FollowAllSummary> {
         let ctx = self.session_ctx_for(server_id)?;
         let followed = ctx.followed_channel_ids();
         let (supported, volume, candidates, not_allowed) = ctx.handle.with_state(|s| {
-            let own = s.own_user().map(|u| u.channel_id);
-            let mut candidates = Vec::new();
-            let mut not_allowed = 0;
-            for channel in s.channels.values() {
-                if Some(channel.id) == own || followed.contains(&channel.id) {
-                    continue;
-                }
-                if channel_view(s, channel).permissions.listen {
-                    if let Some(path) = channel_path(s, channel.id) {
-                        candidates.push((channel.id, join_path(&path)));
-                    }
-                } else {
-                    not_allowed += 1;
-                }
-            }
+            let (candidates, not_allowed) = follow_all_candidates(s, &followed);
             (
                 s.server.supports_listening(),
                 s.server.supports_listener_volume(),
@@ -411,6 +398,29 @@ impl Engine {
     }
 }
 
+/// The channels "Follow all" asks for, with their paths, and how many it skips as not allowed.
+/// Channels the user may not enter are skipped too: "all" means the channels the user belongs
+/// in, and a locked channel's history is never shared with followers (issue #382).
+fn follow_all_candidates(s: &ServerState, followed: &[u32]) -> (Vec<(u32, String)>, u32) {
+    let own = s.own_user().map(|u| u.channel_id);
+    let mut candidates = Vec::new();
+    let mut not_allowed = 0;
+    for channel in s.channels.values() {
+        if Some(channel.id) == own || followed.contains(&channel.id) {
+            continue;
+        }
+        let permissions = channel_view(s, channel).permissions;
+        if permissions.listen && permissions.enter {
+            if let Some(path) = channel_path(s, channel.id) {
+                candidates.push((channel.id, join_path(&path)));
+            }
+        } else {
+            not_allowed += 1;
+        }
+    }
+    (candidates, not_allowed)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -440,6 +450,44 @@ mod tests {
         assert_eq!(denial_error(&perm).kind, ErrorKind::PermissionDenied);
         assert!(!is_listen_denial(&denial(DenyKind::Permission, Some(3)), 2));
         assert!(!is_listen_denial(&denial(DenyKind::TextTooLong, None), 2));
+    }
+
+    #[test]
+    fn follow_all_skips_channels_the_user_may_not_enter() {
+        use mumcord_protocol::{Channel, User};
+        let mut s = ServerState {
+            session: Some(5),
+            ..ServerState::default()
+        };
+        let channel = |id, parent, name: &str, locked, can_enter| Channel {
+            id,
+            parent,
+            name: name.into(),
+            is_enter_restricted: locked,
+            can_enter,
+            ..Channel::default()
+        };
+        s.channels.insert(0, channel(0, None, "Root", false, None));
+        s.channels
+            .insert(1, channel(1, Some(0), "Open", false, None));
+        s.channels
+            .insert(2, channel(2, Some(0), "Locked", true, Some(false)));
+        s.channels
+            .insert(3, channel(3, Some(0), "Mine", true, Some(true)));
+        s.users.insert(
+            5,
+            User {
+                session: 5,
+                channel_id: 0,
+                ..User::default()
+            },
+        );
+        let (candidates, not_allowed) = follow_all_candidates(&s, &[]);
+        assert_eq!(
+            candidates,
+            vec![(1, "Open".to_owned()), (3, "Mine".to_owned())]
+        );
+        assert_eq!(not_allowed, 1);
     }
 
     #[test]
