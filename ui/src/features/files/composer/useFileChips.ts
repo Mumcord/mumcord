@@ -76,15 +76,18 @@ export function useFileChips(enabled: boolean): FileChips {
   const addPaths = useCallback(
     async (paths: readonly string[]) => {
       setError(null);
+      // Counted here, not read back from state: a render committed before an add resolved can
+      // still hand the effect an older list, and building on that list lost dropped files.
+      let count = chipsRef.current.length;
       for (const path of paths) {
-        if (chipsRef.current.length >= MAX_CHIPS) {
+        if (count >= MAX_CHIPS) {
           setError(t("composer.tooMany"));
           return;
         }
         try {
           const chip = await getApi().filesChipAdd(path);
-          chipsRef.current = [...chipsRef.current, chip];
-          setChips(chipsRef.current);
+          count += 1;
+          setChips((list) => [...list, chip]);
         } catch (err) {
           console.error("adding a file failed", err);
           setError(err instanceof EngineError ? err.message : t("composer.unreadable", { path }));

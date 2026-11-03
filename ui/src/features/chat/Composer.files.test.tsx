@@ -131,6 +131,28 @@ describe("Composer file sharing", () => {
     expect(screen.queryByText("file1.pdf")).toBeNull();
   });
 
+  it("keeps every file of a drop while the first one's events re-render the tray", async () => {
+    let second: (value: FileChip) => void = () => undefined;
+    vi.spyOn(api, "filesChipAdd")
+      .mockResolvedValueOnce(chip(1, { state: { kind: "checking", done: 0, total: 100 } }))
+      .mockImplementationOnce(
+        () =>
+          new Promise<FileChip>((resolve) => {
+            second = resolve;
+          }),
+      );
+    setup(CHANNEL);
+    emit({ type: "drop", paths: ["/tmp/a.bin", "/tmp/b.bin"], position: at(100, 100) });
+    expect(await screen.findByText("file1.pdf")).toBeTruthy();
+    act(() => {
+      emit({ type: "over", position: at(120, 120) });
+      api.mock.emit("fileChipChanged", { chip: chip(1) });
+      second(chip(2));
+    });
+    expect(await screen.findByText("file2.pdf")).toBeTruthy();
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
   it("refuses an eleventh file", async () => {
     let next = 0;
     vi.spyOn(api, "filesChipAdd").mockImplementation(() => Promise.resolve(chip(++next)));
