@@ -1,0 +1,212 @@
+/* File cards in the chat (FR-7.16 – 7.29, mockups 2 – 7, 12, 13 of #348): the audio card frame
+   with a status line, progress and actions. */
+
+.file-card {
+  margin-top: var(--space-1);
+  max-width: 30rem;
+}
+
+.file-card .audio-card__icon {
+  color: var(--color-accent-text);
+}
+
+.file-card[data-state="gone"] {
+  border-left-color: var(--color-border-strong);
+}
+
+.file-card[data-state="gone"] .audio-card__name,
+.file-card[data-state="gone"] .audio-card__icon {
+  color: var(--color-text-muted);
+}
+
+.file-card[data-state="done"] {
+  border-left-color: var(--color-success);
+}
+
+.file-card[data-state="mismatch"] {
+  border-left-color: var(--color-danger);
+}
+
+.file-card[data-state="mismatch"] .audio-card__icon {
+  color: var(--color-danger);
+}
+
+.file-card__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.file-card__status svg {
+  flex: none;
+}
+
+.file-card__blocked {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+
+.file-card__blocked svg {
+  margin-top: 0.2em;
+  color: var(--color-warning);
+}
+
+.file-card__problem svg {
+  color: var(--color-danger);
+}
+
+.file-card__muted {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.file-card__dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+}
+
+.file-card__dot[data-online] {
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+.file-card__ok {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
+}
+
+.file-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.file-card__button {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.file-card__button[aria-disabled="true"] {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.file-card__button--danger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.file-card__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.file-card__peers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.file-card__peers p {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.file-card__hash {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.file-card__hash--full {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.file-card__hash-value {
+  border-radius: var(--radius-sm);
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  word-break: break-all;
+}
+
+.file-card__hash--full .file-card__hash-value {
+  padding-inline: var(--space-1);
+}
+
+.file-card__hash-value:focus-visible,
+.file-card__link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.file-card__copy {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  padding-block: 2px;
+}
+
+.file-card__alert {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+  font-size: var(--font-size-sm);
+}
+
+.file-card__alert-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: #fff;
+}
+
+:root[data-theme="dark"] .file-card__alert-icon {
+  color: #2a0a14;
+}
+
+.file-card .file-card__alert-title {
+  margin-bottom: var(--space-1);
+  color: var(--color-danger);
+  font-size: var(--font-size-md, 1rem);
+  font-weight: var(--font-weight-bold);
+}
+
+.file-card__error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
