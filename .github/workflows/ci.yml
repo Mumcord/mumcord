@@ -204,6 +204,12 @@ jobs:
             echo "LIBCLANG_PATH=$libclang"
           } >> "$GITHUB_ENV"
 
+      # Screen sharing's AV1 libraries (SVT-AV1, dav1d, and the hardware encoder interfaces except
+      # on macOS), built from the pinned versions of their scripts and cached per system and
+      # architecture.
+      - name: Native AV1 libraries
+        uses: ./.github/actions/native-av1
+
       # wasm32: the plugin SDK build test and the safety fixtures below (Linux only).
       - uses: dtolnay/rust-toolchain@stable
         with:

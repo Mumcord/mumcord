@@ -1,5 +1,6 @@
 //! History sync between two Mumcord engines against the local test server (AC-1.51,
-//! AC-1.51c), and deleted history staying deleted (issue #119). `testenv/up.sh v15`, then:
+//! AC-1.51c), deleted history staying deleted (issue #119), and locked channels shared only
+//! with people inside them (issue #382). `testenv/up.sh v15`, then:
 //! `MUMCORD_LIVE=1 cargo test -p mumcord-engine --features test-backend --test live_history_sync -- --ignored --test-threads=1`
 #![cfg(feature = "test-backend")]
 
@@ -14,7 +15,8 @@ use mumcord_engine::{
     ChatMessageView, Engine, EngineEvent, PasswordChange, SecretStore, ServerFields, ServerView,
     Snapshot,
 };
-use mumcord_protocol::proto;
+// The bot speaks the published protocol crate it was built with.
+use mumbot::protocol::proto;
 
 const WAIT: Duration = Duration::from_secs(20);
 
@@ -357,6 +359,83 @@ async fn deleted_history_stays_deleted_after_rejoining() {
 
     a.disconnect(a_id);
     b.disconnect(only_server(&b));
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn a_password_channel_shares_history_only_with_members_who_know_the_password() {
+    if !live() {
+        return;
+    }
+    // SAFETY: set before any audio thread exists; tests run with --test-threads=1.
+    unsafe { std::env::set_var("MUMCORD_AUDIO_BACKEND", "null") };
+    let dir = work_dir("engine-live-history-locked");
+    let (a_name, b_name, c_name) = (unique("mc-hla"), unique("mc-hlb"), unique("mc-hlc"));
+    let (a, mut a_rx) = start_engine(&dir.join("a"), &a_name).await;
+    let (b, mut b_rx) = start_engine(&dir.join("b"), &b_name).await;
+    let (c, mut c_rx) = start_engine(&dir.join("c"), &c_name).await;
+    let (admin, _bot, room) = temp_room(&dir, &unique("mc-hlbot")).await;
+    admin.require_token(&room, "pw382").await.expect("ACL");
+
+    // A enters with the password; the admin (inside) posts while A is there.
+    let a_server = add_server(&a, &a_name).await;
+    let snapshot = connect(&a, &mut a_rx, &a_server).await;
+    let locked = channel(&snapshot, &room);
+    a.channel_join_with_password(only_server(&a), locked, "pw382".into())
+        .await
+        .expect("A joins with the password");
+    admin
+        .wait_user(&a_name, &in_channel(&room))
+        .await
+        .expect("A in the locked room");
+    for body in ["locked one", "locked two"] {
+        admin.send_channel(Some(&room), body).expect("send");
+        wait_message(&mut a_rx, body).await;
+    }
+    tokio::time::sleep(Duration::from_millis(1100)).await;
+
+    // AC-1: C knows no password. "Follow all" skips the room, following it alone brings no
+    // history and "load earlier" is refused.
+    let c_server = add_server(&c, &c_name).await;
+    connect(&c, &mut c_rx, &c_server).await;
+    let c_id = only_server(&c);
+    c.channel_follow_all(c_id).await.expect("follow all");
+    assert!(
+        c.history_sync_request(c_id, locked, None).is_err(),
+        "follow all did not follow the locked room"
+    );
+    c.channel_follow(c_id, locked).await.expect("C listens");
+    let refused = c
+        .history_sync_request(c_id, locked, None)
+        .expect_err("load earlier is refused");
+    assert_eq!(refused.kind, mumcord_engine::ErrorKind::PermissionDenied);
+
+    // AC-2: B enters with the password later, proves it to A and gets A's history.
+    let b_server = add_server(&b, &b_name).await;
+    connect(&b, &mut b_rx, &b_server).await;
+    b.channel_join_with_password(only_server(&b), locked, "pw382".into())
+        .await
+        .expect("B joins with the password");
+    let (synced, added) = wait_sync(&mut b_rx, locked).await;
+    let bodies: Vec<&str> = synced.iter().map(|m| m.body.as_str()).collect();
+    assert_eq!(bodies, ["locked one", "locked two"]);
+    assert_eq!(added, 2);
+    assert!(
+        synced
+            .iter()
+            .all(|m| m.synced_from.as_deref() == Some(a_name.as_str()))
+    );
+
+    // C, still only following, never received any of it.
+    while let Ok(event) = c_rx.try_recv() {
+        if let EngineEvent::HistorySynced { channel_id, .. } = event {
+            assert_ne!(channel_id, locked, "C got locked history");
+        }
+    }
+
+    a.disconnect(only_server(&a));
+    b.disconnect(only_server(&b));
+    c.disconnect(c_id);
 }
 
 /// The test's only connected server (0, which no call accepts, when none is).
