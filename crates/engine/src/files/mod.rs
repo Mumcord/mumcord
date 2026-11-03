@@ -10,6 +10,7 @@ pub mod receive;
 pub mod risky;
 pub mod sanitize;
 pub mod share;
+pub mod transfer;
 pub mod wire;
 
 /// Hello feature a client announces when it understands file offers (section 6.4).

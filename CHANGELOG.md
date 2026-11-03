@@ -11,9 +11,11 @@
 
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 - Chat history of locked channels (password or restricted entry) is no longer shared with people who only follow or listen to them: only people inside the channel get its earlier messages, and members who use a channel password must prove they know the current one. "Follow all" now skips channels you may not enter. Older Mumcord versions still share it, so everyone should update (#382)
+- When someone connects to you through the relay without sharing their network address ("Always use relay"), Mumcord no longer sends them yours either; the connection always went through the relay, so your address was revealed for nothing
 
 ### Internal
 
+- File transfer over the relay (not yet visible in the app): files travel only through the relay on their own stream with a size check, and a screen share or full-size image download continues when that switches the connection from direct to the relay
 - Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
 
 ## [0.6.2] - 2026-11-02

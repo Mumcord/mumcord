@@ -94,6 +94,10 @@ impl WatchLink {
         self.control.request_keyframe();
     }
 
+    pub fn decode_fallback(&self) -> bool {
+        self.control.fallback.load(Ordering::Relaxed)
+    }
+
     /// Plays the share's sound at `percent` (0–200).
     pub fn set_volume(&self, percent: u16) {
         self.volume.set_percent(percent);
