@@ -379,6 +379,19 @@ const MIGRATIONS: &[&str] = &[
         path       TEXT
     );
     ",
+    // v25: the software AV1 self-test also depends on "Optimize for" (spec 07, FR-7.56): Sharp
+    // text costs about four times as much CPU, so a Balanced pass must not count for it. The
+    // key changes, so the table is rebuilt; old results are dropped and simply measured again.
+    r"
+    DROP TABLE encoder_selftest;
+    CREATE TABLE encoder_selftest (
+        resolution      INTEGER NOT NULL,
+        fps             INTEGER NOT NULL,
+        optimize        TEXT NOT NULL CHECK (optimize IN ('balanced', 'text', 'motion')),
+        svt_selftest_ms INTEGER NOT NULL,
+        PRIMARY KEY (resolution, fps, optimize)
+    );
+    ",
 ];
 
 /// Handle to the local database. Not `Sync`; callers share it behind a mutex.
