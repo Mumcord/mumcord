@@ -1724,7 +1724,10 @@ const APP_MENU_CORE: &str = r#"
   (data (i32.const 264) "refused")
   (func (export "cabi_realloc") (param i32 i32 i32 i32) (result i32)
     (local $p i32)
-    (local.set $p (global.get $heap))
+    ;; Round the bump pointer up to the requested alignment; the host refuses unaligned results.
+    (local.set $p (i32.and
+      (i32.add (global.get $heap) (i32.sub (local.get 2) (i32.const 1)))
+      (i32.sub (i32.const 0) (local.get 2))))
     (global.set $heap (i32.add (local.get $p) (local.get 3)))
     (local.get $p))
   (func (export "start") (param i32 i32 i32 i32 i32) (result i32)
