@@ -101,6 +101,183 @@ impl Plugin for Hello {
 mumcord_plugin_sdk::export!(Hello);
 "#;
 
+const STAGE_TREE_LIB_RS: &str = r#"//! A stage plugin with tree content: an Apps-menu item starts a click counter in the media area.
+//! The stage is drawn from building blocks, so no web page is needed.
+
+use std::cell::{Cell, RefCell};
+
+use mumcord_plugin_sdk::{Plugin, events::Event, i18n::Strings, log, stage, types::StartInfo, ui};
+
+const START_ITEM: &str = "start";
+
+struct Counter;
+
+thread_local! {
+    // Embeds i18n/en.json. Add a language by adding i18n/<tag>.json and its tag here.
+    static STRINGS: RefCell<Strings> =
+        RefCell::new(Strings::new(mumcord_plugin_sdk::i18n_embed!["en"]));
+    static CLICKS: Cell<u32> = const { Cell::new(0) };
+    static RUNNING: Cell<bool> = const { Cell::new(false) };
+}
+
+fn board() -> ui::El {
+    let clicks = CLICKS.get();
+    STRINGS.with_borrow(|s| {
+        ui::column()
+            .child(ui::heading(&s.t("heading")))
+            .child(ui::text(&s.tn("clicks", u64::from(clicks), &[])))
+            .child(ui::button("click", &s.t("click")))
+    })
+}
+
+impl Plugin for Counter {
+    fn start(_info: StartInfo) -> Result<(), String> {
+        Ok(())
+    }
+
+    fn on_event(event: Event) {
+        match event {
+            Event::LanguageChanged(tag) => {
+                STRINGS.with_borrow_mut(|s| s.set_language(&tag));
+                if RUNNING.get() {
+                    if let Err(e) = stage::show_tree(board()) {
+                        log::warn(&format!("could not redraw the stage: {e:?}"));
+                    }
+                }
+            }
+            // Picking the item counts as the user gesture that `stage::start_tree` needs.
+            Event::AppMenuActivated(item) if item == START_ITEM => {
+                CLICKS.set(0);
+                let title = STRINGS.with_borrow(|s| s.t("title"));
+                match stage::start_tree(&title, board()) {
+                    Ok(_) => RUNNING.set(true),
+                    // For example: not in a voice channel, or the channel has too many activities.
+                    Err(e) => log::warn(&format!("could not start the activity: {e:?}")),
+                }
+            }
+            Event::UiAction(action) if action.action == "click" => {
+                CLICKS.set(CLICKS.get().saturating_add(1));
+                if let Err(e) = stage::show_tree(board()) {
+                    log::warn(&format!("could not redraw the stage: {e:?}"));
+                }
+            }
+            // Also fires when the user leaves the channel or disconnects.
+            Event::StageActivityEnded(_) => RUNNING.set(false),
+            _ => {}
+        }
+    }
+
+    fn stop() {
+        if RUNNING.get() {
+            stage::end();
+        }
+    }
+}
+
+mumcord_plugin_sdk::export!(Counter);
+"#;
+
+const STAGE_WEB_LIB_RS: &str = r#"//! A stage plugin with web content: an Apps-menu item starts an activity that shows
+//! `web/index.html` in the media area. The page and the plugin talk through the message bridge.
+
+use std::cell::{Cell, RefCell};
+
+use mumcord_plugin_sdk::{Plugin, events::Event, i18n::Strings, log, stage, types::StartInfo, webview};
+
+const START_ITEM: &str = "start";
+
+struct Counter;
+
+thread_local! {
+    // Embeds i18n/en.json. Add a language by adding i18n/<tag>.json and its tag here.
+    static STRINGS: RefCell<Strings> =
+        RefCell::new(Strings::new(mumcord_plugin_sdk::i18n_embed!["en"]));
+    static CLICKS: Cell<u32> = const { Cell::new(0) };
+    static RUNNING: Cell<bool> = const { Cell::new(false) };
+}
+
+/// Sends the count to the page. The page is untrusted code in a sandbox, so the plugin keeps the
+/// real state and the page only displays it.
+fn tell_page() {
+    if let Err(e) = webview::post(&CLICKS.get().to_string()) {
+        log::warn(&format!("could not message the page: {e:?}"));
+    }
+}
+
+impl Plugin for Counter {
+    fn start(_info: StartInfo) -> Result<(), String> {
+        Ok(())
+    }
+
+    fn on_event(event: Event) {
+        match event {
+            Event::LanguageChanged(tag) => {
+                STRINGS.with_borrow_mut(|s| s.set_language(&tag));
+            }
+            // Picking the item counts as the user gesture that `stage::start_web` needs.
+            Event::AppMenuActivated(item) if item == START_ITEM => {
+                CLICKS.set(0);
+                let title = STRINGS.with_borrow(|s| s.t("title"));
+                match stage::start_web(&title, "index.html") {
+                    Ok(_) => RUNNING.set(true),
+                    // For example: not in a voice channel, or the channel has too many activities.
+                    Err(e) => log::warn(&format!("could not start the activity: {e:?}")),
+                }
+            }
+            // Messages from the page are untrusted: accept only what is expected.
+            Event::WebviewMessage(message) if message == "click" => {
+                CLICKS.set(CLICKS.get().saturating_add(1));
+                tell_page();
+            }
+            Event::WebviewMessage(message) if message == "ready" => tell_page(),
+            Event::StageActivityEnded(_) => RUNNING.set(false),
+            _ => {}
+        }
+    }
+
+    fn stop() {
+        if RUNNING.get() {
+            stage::end();
+        }
+    }
+}
+
+mumcord_plugin_sdk::export!(Counter);
+"#;
+
+const STAGE_WEB_INDEX_HTML: &str = r#"<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Click counter</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+  main { text-align: center; }
+  button { font: inherit; font-size: 1.25rem; padding: 0.75rem 1.5rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Click counter</h1>
+  <p aria-live="polite">Clicks: <output id="count">0</output></p>
+  <button id="click" type="button">Click</button>
+</main>
+<script>
+  // The page has no network and no storage. It talks only to its plugin through the bridge:
+  // strings in both directions.
+  const count = document.getElementById("count");
+  document.getElementById("click").addEventListener("click", () => window.parent.postMessage("click", "*"));
+  window.addEventListener("message", (event) => {
+    if (typeof event.data === "string" && /^[0-9]{1,9}$/.test(event.data)) count.textContent = event.data;
+  });
+  window.parent.postMessage("ready", "*");
+</script>
+</body>
+</html>
+"#;
+
 const README: &str = "# {name}
 
 A Mumcord plugin.
@@ -126,7 +303,24 @@ folder (`manifest.json`, `plugin.wasm` and `i18n/en.json`), not a `.mcplugin` pa
 Add a `LICENSE` file with an OSI-approved licence before publishing.
 ";
 
-pub fn run(id: &str, dir: Option<PathBuf>, sdk_path: Option<&Path>) -> Result<()> {
+/// Which project `new` creates.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, clap::ValueEnum)]
+pub enum Template {
+    /// A panel with a wave button (API 1.0).
+    #[default]
+    Hello,
+    /// A stage activity drawn from building blocks (API 1.1).
+    StageTree,
+    /// A stage activity that shows a web page (API 1.1).
+    StageWeb,
+}
+
+pub fn run(
+    id: &str,
+    dir: Option<PathBuf>,
+    sdk_path: Option<&Path>,
+    template: Template,
+) -> Result<()> {
     if !manifest::is_valid_id(id) {
         bail!(
             "{id} is not a valid plugin id (a-z, 0-9 and -, 3 to 32 characters, starting with a letter)"
@@ -146,7 +340,7 @@ pub fn run(id: &str, dir: Option<PathBuf>, sdk_path: Option<&Path>) -> Result<()
                 .with_context(|| format!("{} does not exist", p.display()))
         })
         .transpose()?;
-    for (path, body) in files(id, sdk_path.as_deref())? {
+    for (path, body) in files(id, sdk_path.as_deref(), template)? {
         let path = dir.join(path);
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
@@ -157,7 +351,11 @@ pub fn run(id: &str, dir: Option<PathBuf>, sdk_path: Option<&Path>) -> Result<()
     Ok(())
 }
 
-fn files(id: &str, sdk_path: Option<&Path>) -> Result<Vec<(&'static str, String)>> {
+fn files(
+    id: &str,
+    sdk_path: Option<&Path>,
+    template: Template,
+) -> Result<Vec<(&'static str, String)>> {
     let name = title(id);
     let sdk = match sdk_path {
         Some(path) => format!(
@@ -165,6 +363,14 @@ fn files(id: &str, sdk_path: Option<&Path>) -> Result<Vec<(&'static str, String)
             toml::Value::from(path.display().to_string())
         ),
         None => format!("\"{SDK_VERSION}\""),
+    };
+    let sdk = if template == Template::Hello {
+        sdk
+    } else if sdk.starts_with('{') {
+        // `{ path = "…" }` → `{ path = "…", features = ["1.1"] }`
+        format!("{}, features = [\"1.1\"] }}", sdk.trim_end_matches(" }"))
+    } else {
+        format!("{{ version = {sdk}, features = [\"1.1\"] }}")
     };
     let cargo = format!(
         "[package]
@@ -189,29 +395,76 @@ codegen-units = 1
 [workspace]
 "
     );
-    let manifest = json!({
-        "manifest": 1,
-        "id": id,
-        "name": name,
-        "description": "Wave at the channel.",
-        "version": "0.1.0",
-        "api": "^1.0",
-        "authors": ["Your name"],
-        "license": "Apache-2.0",
-        "categories": ["fun"],
-        "permissions": { "required": ["ui.panel", "peers.messages"] },
-    });
-    let english = json!({
-        "manifest.name": name,
-        "manifest.description": "Wave at the channel.",
-        "heading": "Hello",
-        "wave": "Wave",
-        "waves_one": "{{count}} wave",
-        "waves_other": "{{count}} waves",
-    });
-    Ok(vec![
+    let (manifest, english, lib) = match template {
+        Template::Hello => (
+            json!({
+                "manifest": 1,
+                "id": id,
+                "name": name,
+                "description": "Wave at the channel.",
+                "version": "0.1.0",
+                "api": "^1.0",
+                "authors": ["Your name"],
+                "license": "Apache-2.0",
+                "categories": ["fun"],
+                "permissions": { "required": ["ui.panel", "peers.messages"] },
+            }),
+            json!({
+                "manifest.name": name,
+                "manifest.description": "Wave at the channel.",
+                "heading": "Hello",
+                "wave": "Wave",
+                "waves_one": "{{count}} wave",
+                "waves_other": "{{count}} waves",
+            }),
+            LIB_RS,
+        ),
+        Template::StageTree | Template::StageWeb => {
+            let web = template == Template::StageWeb;
+            let mut required = vec!["ui.stage", "ui.app-menu"];
+            let mut manifest = json!({
+                "manifest": 1,
+                "id": id,
+                "name": name,
+                "description": "A click counter in the media area.",
+                "version": "0.1.0",
+                "api": "^1.1",
+                "authors": ["Your name"],
+                "license": "Apache-2.0",
+                "categories": ["fun"],
+                "app_menu": [{ "id": "start", "label": "Start counter" }],
+                "stage": { "title": name, "max_participants": 8 },
+            });
+            if web {
+                required.push("ui.webview");
+                manifest["webview"] = json!({ "places": ["stage"] });
+            }
+            manifest["permissions"] = json!({ "required": required });
+            let mut english = json!({
+                "manifest.name": name,
+                "manifest.description": "A click counter in the media area.",
+                "title": name,
+            });
+            if !web {
+                english["heading"] = "Click counter".into();
+                english["click"] = "Click".into();
+                english["clicks_one"] = "{{count}} click".into();
+                english["clicks_other"] = "{{count}} clicks".into();
+            }
+            (
+                manifest,
+                english,
+                if web {
+                    STAGE_WEB_LIB_RS
+                } else {
+                    STAGE_TREE_LIB_RS
+                },
+            )
+        }
+    };
+    let mut files = vec![
         ("Cargo.toml", cargo),
-        ("src/lib.rs", LIB_RS.to_owned()),
+        ("src/lib.rs", lib.to_owned()),
         (
             "manifest.json",
             format!("{}\n", serde_json::to_string_pretty(&manifest)?),
@@ -227,7 +480,11 @@ codegen-units = 1
         (".gitignore", "/target\n/dist\n".to_owned()),
         // Pinned so that reproducible builds give the same hash on every machine.
         ("rust-toolchain.toml", TOOLCHAIN.to_owned()),
-    ])
+    ];
+    if template == Template::StageWeb {
+        files.push(("web/index.html", STAGE_WEB_INDEX_HTML.to_owned()));
+    }
+    Ok(files)
 }
 
 const TOOLCHAIN: &str = "[toolchain]
@@ -256,7 +513,7 @@ mod tests {
     fn creates_a_project_with_a_valid_manifest() {
         let dir = tempfile::tempdir().expect("test step");
         let project = dir.path().join("wave-demo");
-        run("wave-demo", Some(project.clone()), None).expect("test step");
+        run("wave-demo", Some(project.clone()), None, Template::Hello).expect("test step");
 
         let manifest =
             Manifest::parse(&fs::read(project.join("manifest.json")).expect("test step"))
@@ -278,16 +535,61 @@ mod tests {
         assert_eq!(toolchain["toolchain"]["channel"].as_str(), Some("1.99.1"));
 
         assert!(
-            run("wave-demo", Some(project), None).is_err(),
+            run("wave-demo", Some(project), None, Template::Hello).is_err(),
             "never overwrites a project"
         );
-        assert!(run("Bad_Id", Some(dir.path().join("x")), None).is_err());
-        assert!(run("core-thing", Some(dir.path().join("y")), None).is_err());
+        assert!(run("Bad_Id", Some(dir.path().join("x")), None, Template::Hello).is_err());
+        assert!(
+            run(
+                "core-thing",
+                Some(dir.path().join("y")),
+                None,
+                Template::Hello
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn stage_templates_have_valid_1_1_manifests() {
+        for (template, web) in [(Template::StageTree, false), (Template::StageWeb, true)] {
+            let dir = tempfile::tempdir().expect("test step");
+            let project = dir.path().join("stage-demo");
+            run("stage-demo", Some(project.clone()), None, template).expect("test step");
+
+            let manifest =
+                Manifest::parse(&fs::read(project.join("manifest.json")).expect("test step"))
+                    .expect("valid manifest");
+            manifest
+                .validate(Source::Repo { repository_id: 0 })
+                .expect("valid for third-party repos");
+            assert_eq!(manifest.api_minor(), (1, 1));
+            assert!(manifest.stage.is_some());
+            assert_eq!(manifest.app_menu.len(), 1);
+            assert_eq!(manifest.webview.is_some(), web);
+            assert_eq!(project.join("web/index.html").exists(), web);
+            let cargo: toml::Table = fs::read_to_string(project.join("Cargo.toml"))
+                .expect("test step")
+                .parse()
+                .expect("valid Cargo.toml");
+            let sdk = &cargo["dependencies"]["mumcord-plugin-sdk"];
+            assert_eq!(sdk["features"][0].as_str(), Some("1.1"));
+        }
+    }
+
+    #[test]
+    fn stage_template_with_local_sdk_keeps_path_and_adds_feature() {
+        let files =
+            files("abc", Some(Path::new("/tmp/my sdk")), Template::StageTree).expect("test step");
+        let cargo: toml::Table = files[0].1.parse().expect("valid Cargo.toml");
+        let sdk = &cargo["dependencies"]["mumcord-plugin-sdk"];
+        assert_eq!(sdk["path"].as_str(), Some("/tmp/my sdk"));
+        assert_eq!(sdk["features"][0].as_str(), Some("1.1"));
     }
 
     #[test]
     fn sdk_comes_from_crates_io_by_default() {
-        let files = files("abc", None).expect("test step");
+        let files = files("abc", None, Template::Hello).expect("test step");
         let cargo: toml::Table = files[0].1.parse().expect("valid Cargo.toml");
         let wanted = format!(
             "{}.{}",
@@ -302,7 +604,8 @@ mod tests {
 
     #[test]
     fn local_sdk_path_is_quoted() {
-        let files = files("abc", Some(Path::new("/tmp/my sdk"))).expect("test step");
+        let files =
+            files("abc", Some(Path::new("/tmp/my sdk")), Template::Hello).expect("test step");
         assert!(
             files[0]
                 .1
