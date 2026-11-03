@@ -258,7 +258,31 @@ function bind(api: MumcordApi): void {
     api.on("fileCardChanged", ({ serverId, card }) => {
       updateFileCard(serverId, card);
     }),
+    // Whether a card can be downloaded depends on the relay, which announces no card changes.
+    api.on("relayChanged", ({ serverId }) => {
+      rereadFileCards(api, serverId);
+    }),
   ];
+}
+
+/** Asks the engine for the current state of every file card shown for `serverId`. */
+function rereadFileCards(api: MumcordApi, serverId: number): void {
+  const prefix = serverPrefix(serverId);
+  const shareIds = new Set<string>();
+  for (const [key, log] of logs) {
+    if (!key.startsWith(prefix)) continue;
+    for (const message of log.messages) if (message.file) shareIds.add(message.file.shareId);
+  }
+  for (const shareId of shareIds) {
+    api.filesCard(serverId, shareId).then(
+      (card) => {
+        if (card) updateFileCard(serverId, card);
+      },
+      (error: unknown) => {
+        console.error("Reading a file card failed", error);
+      },
+    );
+  }
 }
 
 /** Puts a file card's new state into the messages that carry it (FR-7.20). */
