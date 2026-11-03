@@ -23,6 +23,7 @@
 
 - File transfer over the relay (not yet visible in the app): files travel only through the relay on their own stream with a size check, and a screen share or full-size image download continues when that switches the connection from direct to the relay
 - Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
+- The file transfer stall test no longer pauses the sending client's process: a frozen client also stops sending to the Mumble server, whose own 30 s idle timeout can win the race on a loaded CI runner and shows the other failure text. A new debug-only hook `MUMCORD_TEST_FILE_STALL_AFTER` stops file bytes only, so the client's own 30 s stall timer decides the test (#420)
 
 ## [0.6.2] - 2026-11-02
 
