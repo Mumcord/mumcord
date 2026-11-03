@@ -100,6 +100,7 @@ export function ReceivedFileCard({ card }: { card: FileCard }) {
     <div
       className="audio-card file-card"
       data-state={edge(card, dismissed)}
+      data-risky={card.risky || undefined}
       role="group"
       aria-label={label}
     >

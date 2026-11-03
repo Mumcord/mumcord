@@ -10,6 +10,10 @@
   color: var(--color-accent-text);
 }
 
+.file-card[data-risky] .audio-card__icon {
+  color: var(--color-warning);
+}
+
 .file-card[data-state="gone"] {
   border-left-color: var(--color-border-strong);
 }
