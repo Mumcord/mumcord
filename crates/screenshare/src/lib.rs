@@ -6,6 +6,8 @@
 //! - AV1: SVT-AV1 encodes ([`Av1Encoder`]) in its low-delay realtime mode with the same three
 //!   temporal layers; dav1d decodes ([`Av1Decoder`]) where the webview has no
 //!   WebCodecs AV1.
+//! - Hardware encoders ([`open_hardware_encoder`]): NVENC, VA-API, AMF and Quick Sync, built
+//!   only with the vendor SDK (`HWENC_SDK_DIR`) and usable only where the GPU driver loads.
 //!
 //! Dropping every frame of the top layer halves the frame rate, dropping the top two quarters
 //! it, and the remaining frames still decode. Each [`EncodedFrame`] carries its layer id so the
@@ -22,6 +24,7 @@ mod decoder;
 mod encoder;
 mod ffi;
 mod frame;
+mod hw;
 
 pub use av1_dav1d::Av1Decoder;
 pub use av1_svt::{AV1_TEMPORAL_LAYERS, Av1Encoder, Av1Options};
@@ -29,6 +32,7 @@ pub use codec::{Codec, VideoDecoder, VideoEncoder};
 pub use decoder::Decoder;
 pub use encoder::{EncodedFrame, Encoder, EncoderConfig, TEMPORAL_LAYERS};
 pub use frame::I420Frame;
+pub use hw::{HardwareEncoder, open_hardware_encoder};
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -42,6 +46,12 @@ pub enum Error {
     InvalidFrame(String),
     #[error("invalid encoder configuration: {0}")]
     InvalidConfig(String),
+    /// The hardware encoder can't be used here (build, driver or GPU); use a software encoder.
+    #[error("{encoder} hardware encoder unavailable: {reason}")]
+    HardwareUnavailable {
+        encoder: HardwareEncoder,
+        reason: String,
+    },
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

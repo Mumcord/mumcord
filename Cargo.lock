@@ -4268,6 +4268,7 @@ name = "mumcord-screenshare"
 version = "0.6.2"
 dependencies = [
  "bindgen",
+ "libloading 0.8.9",
  "pkg-config",
  "thiserror 2.0.21",
 ]
