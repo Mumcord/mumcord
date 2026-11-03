@@ -276,7 +276,20 @@ pub(crate) async fn send_body(
     out: &mut (impl AsyncWrite + Unpin),
     header: Header,
     file: &mut (impl AsyncRead + Unpin),
+    progress: impl FnMut(u64),
+) -> Result<(), TransferError> {
+    let corrupt = crate::test_hooks::file_corrupt();
+    send_body_as(out, header, file, progress, corrupt).await
+}
+
+/// [`send_body`]; `corrupt` flips the first body byte (the AC-7.11 test hook), so the recipient's
+/// checksum must catch it.
+async fn send_body_as(
+    out: &mut (impl AsyncWrite + Unpin),
+    header: Header,
+    file: &mut (impl AsyncRead + Unpin),
     mut progress: impl FnMut(u64),
+    corrupt: bool,
 ) -> Result<(), TransferError> {
     write_timed(out, &header.encode()).await?;
     let mut buf = vec![0u8; CHUNK];
@@ -293,6 +306,9 @@ pub(crate) async fn send_body(
             return Err(TransferError::Read(
                 std::io::ErrorKind::UnexpectedEof.into(),
             ));
+        }
+        if corrupt && sent == 0 {
+            buf[0] ^= 0xFF;
         }
         write_timed(out, &buf[..read]).await?;
         sent += read as u64;
@@ -524,6 +540,17 @@ mod tests {
         let mut stream = IncomingStream::new(&wire[HEADER_LEN..], 200);
         assert_eq!(read_all(&mut stream).await.expect("read"), body);
         assert_eq!(stream.received(), 200);
+    }
+
+    #[tokio::test]
+    async fn the_corrupt_hook_flips_the_first_body_byte() {
+        let body = [7u8; 20];
+        let mut wire = Vec::new();
+        send_body_as(&mut wire, header(20), &mut body.as_slice(), |_| {}, true)
+            .await
+            .expect("sent");
+        assert_eq!(wire[HEADER_LEN], 7 ^ 0xFF);
+        assert_eq!(&wire[HEADER_LEN + 1..], &body[1..]);
     }
 
     #[tokio::test]
