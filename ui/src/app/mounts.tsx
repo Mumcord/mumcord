@@ -41,6 +41,7 @@ import {
   WatchHeaderTitle,
   WatchMiniBar,
 } from "../features/watchparty";
+import { MediaArea } from "../features/media/MediaArea";
 import { MediaPopoutHost } from "../features/media/MediaPopoutHost";
 import { useMediaView } from "../features/media/mediaView";
 import { ConnectionStatus, RejoinPrompt, ServersRoot } from "../features/servers";
@@ -174,15 +175,20 @@ export function ChatMount() {
   const view = useMediaView();
   if (requests)
     return <RequestsView serverId={requests.serverId} selectedId={requests.selectedId} />;
+  // One resizable media area for whichever view is big (spec 07 §4.9).
   const media =
     serverId === null ? null : view.cinema === "watch" ? (
-      <LazyBoundary>
-        <WatchTogetherView serverId={serverId} />
-      </LazyBoundary>
+      <MediaArea>
+        <LazyBoundary>
+          <WatchTogetherView serverId={serverId} />
+        </LazyBoundary>
+      </MediaArea>
     ) : view.cinema === "share" ? (
-      <LazyBoundary>
-        <ScreenShareView />
-      </LazyBoundary>
+      <MediaArea>
+        <LazyBoundary>
+          <ScreenShareView />
+        </LazyBoundary>
+      </MediaArea>
     ) : null;
   // The channel header always stays at the very top (issue #163): the sharer bar, the mini bars
   // and the cinema view all sit below it, and focus keeps it while hiding the messages.

@@ -68,6 +68,16 @@
     "popOutFailed": "Ma setgħetx tinfetaħ it-tieqa separata",
     "popInFailed": "Ma setax jinġieb lura l-wiri",
     "onTopFailed": "Ma setax jinbidel “Dejjem fuq”",
-    "windowTitle": "{{title}} — {{channel}}"
+    "windowTitle": "{{title}} — {{channel}}",
+    "resize": {
+      "label": "Resize media area",
+      "valueText": "{{percent}}% of the window height",
+      "ofWindow": "of the window height",
+      "chatMinimum": "chat keeps its minimum",
+      "release": "release to collapse",
+      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
+      "releaseHint": "Release to minimise to the mini bar",
+      "minimised": "Media area minimised"
+    }
   }
 }

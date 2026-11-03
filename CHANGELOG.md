@@ -4,6 +4,7 @@
 
 ### Added
 
+- The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
 - The server info panel lists what the relay allows ("Relay allows: Images · Files · Screen sharing"), and buttons and the image viewer say so in plain words when the relay doesn't allow a feature.
 - Settings → Privacy & Connections has a new "File sharing" card: turn receiving files on or off, pick the maximum file size (100 MB to 2 GB) and choose the folder where received files are saved (by default a "Mumcord" folder inside Downloads).
