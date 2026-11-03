@@ -49,7 +49,6 @@
 
 ### Internal
 
-- `mumcord-protocol` can now read a channel's ACLs: `Handle::query_acl(channel_id)` sends the query and the server's answer arrives as `Event::Acl` (groups and entries), which the ACL editor in Epic 4 needs. A refusal for a user without the Write permission comes as the usual `Event::PermissionDenied` with the Write bit (#300)
 - Windows release builds are signed with a Certum code signing certificate through SimplySign instead of Azure Artifact Signing: the release workflow installs a pinned SimplySign Desktop, logs in with a one-time code generated from the `release` environment secrets, and signs the app, the uninstaller and the installer with `signtool`; `scripts/sign-windows.ps1` does the same by hand. Without the Certum settings the Windows build stays unsigned as before (#340)
 
 ## [0.6.0] - 2026-11-02
