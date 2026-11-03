@@ -3,6 +3,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { contrastRatio } from "./contrast";
+import { deriveTokens, type ThemeToken } from "./derive";
+import { MUMCORD_PRESET } from "./themeModel";
 
 // Read from disk: vitest does not process CSS, so a `?raw` import would be empty.
 const tokensCss = readFileSync(new URL("./tokens.css", import.meta.url), "utf8");
@@ -104,6 +106,57 @@ describe.each([':root[data-theme="dark"]', ':root[data-theme="light"]'])(
     });
   },
 );
+
+// Settings → Plugins → Installed draws a plugin without an icon as a letter on a tile (issue #405).
+// The pair must be one of the checked pairs above: a colour mixed from the accent is not, so a
+// custom accent can break AA even when the theme itself passes.
+const installedCss = readFileSync(
+  new URL("../features/plugins/installed/installed.css", import.meta.url),
+  "utf8",
+);
+const PLACEHOLDER: [ThemeToken, ThemeToken] = ["accent-text", "bg-selected"];
+
+/** The declarations of one class rule in installed.css. */
+function cssRule(selector: string): Map<string, string> {
+  const block = new RegExp(`^\\.${selector} \\{([^}]*)\\}`, "m").exec(installedCss);
+  if (!block) throw new Error(`No rule for .${selector} in installed.css`);
+  const declarations = new Map<string, string>();
+  for (const [, name = "", value = ""] of (block[1] ?? "").matchAll(/([-\w]+):\s*([^;]+)/g)) {
+    declarations.set(name, value.trim());
+  }
+  return declarations;
+}
+
+describe("plugin icon placeholder", () => {
+  const rule = cssRule("plugins-installed-icon");
+
+  it("draws the letter with the checked pair accent-text on bg-selected", () => {
+    expect(rule.get("color")).toBe(`var(--color-${PLACEHOLDER[0]})`);
+    expect(rule.get("background")).toBe(`var(--color-${PLACEHOLDER[1]})`);
+  });
+
+  const accents = [
+    "#a78bff",
+    "#6a40e0",
+    "#2a2060",
+    "#d1462e",
+    "#3b6ef6",
+    "#e0b400",
+    "#0f8a5f",
+    "#f04a9c",
+  ];
+  const variants = ["dark", "light"] as const;
+
+  it.each(variants.flatMap((variant) => accents.map((accent) => [variant, accent] as const)))(
+    "the letter reaches 4.5:1 in the %s theme with accent %s",
+    (variant, accent) => {
+      const tokens = deriveTokens({ ...MUMCORD_PRESET[variant], accent });
+      expect(contrastRatio(tokens[PLACEHOLDER[0]], tokens[PLACEHOLDER[1]])).toBeGreaterThanOrEqual(
+        4.5,
+      );
+    },
+  );
+});
 
 describe("contrastRatio", () => {
   it("matches the WCAG reference values", () => {

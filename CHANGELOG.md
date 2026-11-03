@@ -17,6 +17,7 @@
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 - Chat history of locked channels (password or restricted entry) is no longer shared with people who only follow or listen to them: only people inside the channel get its earlier messages, and members who use a channel password must prove they know the current one. "Follow all" now skips channels you may not enter. Older Mumcord versions still share it, so everyone should update (#382)
 - When someone connects to you through the relay without sharing their network address ("Always use relay"), Mumcord no longer sends them yours either; the connection always went through the relay, so your address was revealed for nothing
+- The letter shown in place of a missing plugin icon in Settings → Plugins → Installed now reads well on its tile: the tile uses checked theme colours, so the letter meets WCAG AA in the dark and light themes and with any accent colour (#405)
 
 ### Internal
 
