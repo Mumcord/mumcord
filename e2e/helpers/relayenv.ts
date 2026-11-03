@@ -140,6 +140,8 @@ export interface TestHooks {
   fileExpirySeconds?: number;
   /** Flip one byte of a file in transit (AC-7.11). */
   fileCorrupt?: boolean;
+  /** Stop sending file bytes after this many bytes; the client stays connected (F3a (e), issue #420). */
+  fileStallAfterBytes?: number;
   /** Force encoder probe results, e.g. `["av1_hw:smoke_fail"]` (AC-7.36, 7.37). */
   encoderProbe?: string[];
   /** Force the SVT-AV1 self-test result (AC-7.37). */
@@ -163,6 +165,8 @@ export function hookEnv(h: TestHooks): Record<string, string> {
   if (h.fileExpirySeconds !== undefined)
     env.MUMCORD_TEST_FILE_EXPIRY_S = String(h.fileExpirySeconds);
   if (h.fileCorrupt) env.MUMCORD_TEST_FILE_CORRUPT = "1";
+  if (h.fileStallAfterBytes !== undefined)
+    env.MUMCORD_TEST_FILE_STALL_AFTER = String(h.fileStallAfterBytes);
   if (h.encoderProbe !== undefined) env.MUMCORD_TEST_ENCODER_PROBE = h.encoderProbe.join(",");
   if (h.svtSelftest !== undefined) env.MUMCORD_TEST_SVT_SELFTEST = h.svtSelftest;
   if (h.encodeDelayMs !== undefined) env.MUMCORD_TEST_ENCODE_DELAY_MS = String(h.encodeDelayMs);
