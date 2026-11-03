@@ -263,9 +263,10 @@ describe("sharer control bar", () => {
       height: 1080,
       fps: 60,
       kbps: 4230,
+      encoder: null,
       viewers: [
-        { session: ANNA, fps: 60, struggling: false },
-        { session: BEN, fps: 20, struggling: true },
+        { session: ANNA, fps: 60, struggling: false, slow: false, codec: null, path: "direct" },
+        { session: BEN, fps: 20, struggling: true, slow: true, codec: null, path: "direct" },
       ],
     });
     render(<SharerBar />);

@@ -336,6 +336,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_encoder_prepare,
             commands::screen_share::screen_share_block,
             commands::screen_share::screen_share_quality,
+            commands::screen_share::screen_share_preview,
             commands::screen_share::screen_share_thumbnail,
             commands::screen_share::screen_share_watch_stats,
             commands::screen_share::screen_share_frames_attach,
