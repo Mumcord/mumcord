@@ -271,11 +271,34 @@ jobs:
           cache-from: type=gha,scope=e2e-mumpeer
           cache-to: type=gha,mode=max,scope=e2e-mumpeer
 
+      # The relay bot is `mumbot peer`. The published mumbot image predates that module, so build
+      # the bot from a pinned commit of Mumcord/mumbot main until a mumbot release has it. To bump
+      # it: git ls-remote https://github.com/Mumcord/mumbot main
+      - name: Check out mumbot (relay bot)
+        if: steps.relay.outputs.needed == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: Mumcord/mumbot
+          ref: 62b3d263490158097e2a8f538436d42f0eb62c90
+          path: mumbot
+          persist-credentials: false
+
+      - name: Build mumbot image
+        if: steps.relay.outputs.needed == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: mumbot
+          tags: mumbot:peer-e2e
+          load: true
+          cache-from: type=gha,scope=e2e-mumbot
+          cache-to: type=gha,mode=max,scope=e2e-mumbot
+
       - name: Point the E2E run at mumpeer
         if: steps.relay.outputs.needed == 'true'
         run: |
           echo "MUMPEER_DIR=$GITHUB_WORKSPACE/mumpeer" >> "$GITHUB_ENV"
           echo "MUMPEER_IMAGE=mumpeer:testenv" >> "$GITHUB_ENV"
+          echo "MUMBOT_IMAGE=mumbot:peer-e2e" >> "$GITHUB_ENV"
 
       # run.sh creates testenv/.env with a random SuperUser password; no secrets needed.
       # The old relay of AC-7.5 is the published mumpeer 0.1.0 with the mumbot 0.4.1 image (the
