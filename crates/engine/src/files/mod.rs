@@ -2,9 +2,11 @@
 //! offer message, the `mumcord.file` plugin data, file-name sanitizing and the risky-type list.
 //! Everything here comes from or goes to other clients, so decoding validates every field.
 
+mod motw;
 pub mod offer;
 pub mod prepare;
 pub mod queue;
+pub mod receive;
 pub mod risky;
 pub mod sanitize;
 pub mod share;
