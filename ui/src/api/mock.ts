@@ -64,10 +64,12 @@ import type {
   ServerInput,
   EncoderStatus,
   EncoderSwitch,
+  ActiveEncoder,
   LoweredReason,
   ScreenShare,
   ShareStartBlock,
   ServerSnapshot,
+  ViewerQuality,
   Settings,
   User,
   RepositoryPreview,
@@ -212,7 +214,8 @@ export interface MockMediaDemo {
     height: number;
     fps: number;
     kbps: number;
-    viewers: { session: number; fps: number; struggling: boolean }[];
+    encoder: ActiveEncoder | null;
+    viewers: ViewerQuality[];
   } | null;
 }
 
@@ -1012,10 +1015,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           height: 1080,
           fps: 60,
           kbps: 4230,
+          encoder: { codec: "av1", gpu: "nvidia" },
           viewers: [
-            { session: 1, fps: 60, struggling: false },
-            { session: 2, fps: 60, struggling: false },
-            { session: 5, fps: 20, struggling: true },
+            { session: 1, fps: 60, struggling: false, slow: false, codec: "av1", path: "direct" },
+            { session: 2, fps: 60, struggling: false, slow: false, codec: "av1", path: "relay" },
+            { session: 5, fps: 20, struggling: true, slow: true, codec: "av1", path: "relay" },
           ],
         },
       }
@@ -3442,6 +3446,22 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(mediaDemo.share !== null && serverId === 1 ? mediaDemo.quality : null);
     },
     screenShareSetQuality: () => Promise.resolve(null),
+    // The "Viewers get" line of the start dialog; the mock always has a relay with fan-out.
+    screenSharePreview: (_serverId, choice, codec) => {
+      const small = choice.resolution === "720";
+      const fps = choice.fps === "60" ? 60 : 30;
+      return Promise.resolve({
+        quality: `${small ? "720p" : "1080p"}${String(fps)}`,
+        width: small ? 1280 : 1920,
+        height: small ? 720 : 1080,
+        fps,
+        kbps: codec === "vp9" ? 4500 : 3000,
+        encoder: { codec: codec === "vp9" ? "vp9" : "av1", gpu: codec === "vp9" ? null : "nvidia" },
+        softwareWarning: false,
+        av1Skipped: null,
+        path: { kind: "broadcast", maxViewers: 20 },
+      });
+    },
     // The mock never switches the encoder on its own, so there is nothing to undo.
     screenShareUndoEncoderSwitch: () => Promise.reject(new Error("the share offers no undo")),
     screenEncoderStatus: () => Promise.resolve(encoderStatus),

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type FileCard, type MockApi } from "../../../api";
 import { subscribeAnnouncements } from "../../../a11y/announcer";
 import { applyLanguage } from "../../../i18n";
@@ -35,8 +35,16 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  // The cards say "ends today at" only when the expiry is on the same day, so a test run just
+  // before midnight would see "tomorrow". Pin the date to midday; timers keep running for real.
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date(2026, 5, 15, 12, 0, 0));
   api = createMockApi();
   setApi(api);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("received file card", () => {
