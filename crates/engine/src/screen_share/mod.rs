@@ -24,6 +24,7 @@ pub mod capture_x11;
 mod convert;
 mod fanout;
 mod media;
+mod quality;
 pub mod signal;
 pub(crate) mod sound;
 #[cfg(any(target_os = "macos", test))]
@@ -60,6 +61,7 @@ pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use media::{ScreenMediaStats, ViewerMediaStats};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
+pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use start::StartOutcome;
 pub use thumbnail::ShareThumbnail;
@@ -605,6 +607,13 @@ impl Engine {
             return Ok(StartOutcome::Cancelled);
         };
         let app_sound = source.take_sound();
+        let prefs = ctx.store().settings().map_or_else(
+            |e| {
+                tracing::warn!(error = %e, "screen share settings not read; using the defaults");
+                QualityPrefs::default()
+            },
+            |settings| QualityPrefs::from_settings(&settings),
+        );
         let token = {
             let mut all = lock(self.screen_share_state());
             let shares = all.servers.entry(server_id).or_default();
@@ -614,7 +623,7 @@ impl Engine {
             }
             let mut own = OwnShare::new(sound, app_sound.is_some());
             own.kind = source.kind();
-            let media = media::Media::start(source);
+            let media = media::Media::start(source, prefs, media::vp9_encoder());
             if let Some(app_sound) = app_sound {
                 media.start_sound(app_sound);
             }
@@ -1026,6 +1035,23 @@ impl Engine {
             .and_then(|s| s.own.as_ref())
             .and_then(|own| own.media.as_ref())
             .map(media::Media::stats)
+    }
+
+    /// Changes the own share's resolution and frame rate ceiling, "Optimize for" and upload
+    /// limit while it runs (Quality menu, FR-7.39); applies within a frame or two.
+    pub fn screen_share_set_quality(
+        &self,
+        server_id: ServerId,
+        prefs: QualityPrefs,
+    ) -> EngineResult<()> {
+        lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .and_then(|own| own.media.as_ref())
+            .ok_or_else(not_sharing)?
+            .set_prefs(prefs);
+        Ok(())
     }
 
     /// The picture the sharer's control bar shows for the own share (issue #163, FR-3.127).

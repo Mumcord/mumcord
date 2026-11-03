@@ -2,6 +2,7 @@ use std::mem::MaybeUninit;
 use std::os::raw::{c_int, c_uint};
 use std::ptr;
 
+use crate::codec::{Codec, VideoDecoder};
 use crate::ffi::{self, check};
 use crate::{Error, I420Frame, Result};
 
@@ -59,6 +60,16 @@ impl Decoder {
             }
             Ok(picture)
         }
+    }
+}
+
+impl VideoDecoder for Decoder {
+    fn codec(&self) -> Codec {
+        Codec::Vp9
+    }
+
+    fn decode(&mut self, data: &[u8]) -> Result<Option<I420Frame>> {
+        Decoder::decode(self, data)
     }
 }
 

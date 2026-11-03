@@ -1,6 +1,6 @@
 //! One encoded stream, many viewers (FR-2.44): every viewer has a small queue in front of its
 //! stream writer. A viewer whose queue backs up loses temporal layers first (30 → 15 → 7.5 fps
-//! with L1T3) and gets them back once it keeps up; a queue that overflows is cleared and the
+//! with three layers, 60 → 30 → 15 → 7.5 with four) and gets them back once it keeps up; a queue that overflows is cleared and the
 //! viewer waits for the next keyframe, so a slow viewer never holds up the others.
 //!
 //! Sound packets have their own short queue: they are small, go out before waiting pictures and
@@ -24,7 +24,8 @@ const LAG_AT: usize = 3;
 const DROP_PAUSE: Duration = Duration::from_millis(500);
 /// How long a viewer has to keep up before it gets the next layer back.
 const RAISE_AFTER: Duration = Duration::from_secs(3);
-pub(crate) const TOP_LAYER: u8 = TEMPORAL_LAYERS - 1;
+/// Top layer until the encoder says otherwise.
+const TOP_LAYER: u8 = TEMPORAL_LAYERS - 1;
 /// Sound packets waiting for one viewer (half a second of 20 ms packets).
 const AUDIO_CAPACITY: usize = 25;
 
@@ -38,6 +39,8 @@ pub(crate) struct Pushed {
 pub(crate) struct Policy {
     frames: VecDeque<Arc<Frame>>,
     audio: VecDeque<Arc<Frame>>,
+    /// Highest temporal layer the encoder makes.
+    top: u8,
     /// Highest temporal layer this viewer gets.
     max_layer: u8,
     /// After a join or an overflow nothing decodes until the next keyframe.
@@ -51,11 +54,21 @@ impl Policy {
         Self {
             frames: VecDeque::with_capacity(CAPACITY),
             audio: VecDeque::with_capacity(AUDIO_CAPACITY),
+            top: TOP_LAYER,
             max_layer: TOP_LAYER,
             wait_keyframe: true,
             last_drop: None,
             keeping_up_since: None,
         }
+    }
+
+    /// Follows the encoder's layer count (it changes with the encoder and the frame rate): a
+    /// viewer that had every layer keeps having them, one that lost some keeps no more than that.
+    pub fn set_top(&mut self, top: u8) {
+        if self.max_layer == self.top || self.max_layer > top {
+            self.max_layer = top;
+        }
+        self.top = top;
     }
 
     pub fn push(&mut self, frame: Arc<Frame>, now: Instant) -> Pushed {
@@ -102,7 +115,7 @@ impl Policy {
             }
         } else if backlog <= 1 {
             let since = *self.keeping_up_since.get_or_insert(now);
-            if self.max_layer < TOP_LAYER && now.duration_since(since) >= RAISE_AFTER {
+            if self.max_layer < self.top && now.duration_since(since) >= RAISE_AFTER {
                 self.max_layer += 1;
                 self.keeping_up_since = Some(now);
             }
@@ -119,7 +132,7 @@ impl Policy {
 
     /// Lost at least one layer.
     pub fn lagging(&self) -> bool {
-        self.max_layer < TOP_LAYER
+        self.max_layer < self.top
     }
 
     /// Lost every layer it can and still does not keep up: only a lower quality step helps.
@@ -145,8 +158,13 @@ impl ViewerQueue {
         }
     }
 
-    pub fn push(&self, frame: Arc<Frame>, now: Instant) -> Pushed {
-        let pushed = lock(&self.policy).push(frame, now);
+    /// Queues `frame` of a stream whose highest temporal layer is `top`.
+    pub fn push(&self, frame: Arc<Frame>, top: u8, now: Instant) -> Pushed {
+        let pushed = {
+            let mut policy = lock(&self.policy);
+            policy.set_top(top);
+            policy.push(frame, now)
+        };
         self.ready.notify_one();
         pushed
     }
@@ -166,7 +184,7 @@ impl ViewerQueue {
     }
 }
 
-/// A token bucket standing in for a slow upload, so tests can throttle without root.
+/// A token bucket: the sharer's upload limit, and a slow upload in tests without root.
 pub(crate) struct RateLimit {
     bytes_per_second: u64,
     /// May go negative: a frame larger than the bucket is sent and paid off afterwards.
@@ -175,7 +193,6 @@ pub(crate) struct RateLimit {
 }
 
 impl RateLimit {
-    #[cfg(any(test, feature = "test-backend"))]
     pub fn new(kbps: u32) -> Self {
         let bytes_per_second = u64::from(kbps.max(1)) * 1000 / 8;
         Self {
@@ -337,5 +354,26 @@ mod tests {
         assert_eq!(limit.take(0, later), Duration::ZERO);
         let wait = limit.take(10_000, later);
         assert!(wait >= Duration::from_millis(999) && wait <= Duration::from_millis(1001));
+    }
+
+    #[test]
+    fn four_layers_at_60_fps_are_dropped_one_by_one() {
+        let start = Instant::now();
+        let mut policy = Policy::new();
+        policy.set_top(3);
+        assert_eq!(
+            policy.max_layer(),
+            3,
+            "a viewer with every layer keeps them"
+        );
+        policy.push(frame(true, 0), start);
+        for n in 1..=4 {
+            let now = start + DROP_PAUSE * n;
+            policy.push(frame(false, 0), now);
+        }
+        assert_eq!(policy.max_layer(), 1);
+        assert!(policy.lagging());
+        policy.set_top(2);
+        assert_eq!(policy.max_layer(), 1, "a lost layer stays lost");
     }
 }

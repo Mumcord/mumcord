@@ -11,7 +11,7 @@ cache="${MUMCORD_E2E_CACHE:-$HOME/.cache/mumcord-build/e2e}"
 image="${MUMCORD_E2E_IMAGE:-mumcord-e2e}"
 run="${MUMCORD_E2E_RUN:-}"
 home="$cache/home${run:+-$run}"
-mkdir -p "$cache"/{target,cargo} "$home"
+mkdir -p "$cache"/{target,cargo,native} "$home"
 
 if [ -n "$run" ]; then
   if ! [[ "$run" =~ ^[1-9]$ ]]; then
@@ -64,6 +64,13 @@ read -r -a extra <<< "${MUMCORD_E2E_DOCKER_ARGS:-}"
 if [ -n "${MUMCORD_E2E_PLUGIN_PACKAGES:-}" ]; then
   extra+=(-v "$MUMCORD_E2E_PLUGIN_PACKAGES:$MUMCORD_E2E_PLUGIN_PACKAGES:ro" -e MUMCORD_E2E_PLUGIN_PACKAGES)
 fi
+# Screen sharing's static AV1 libraries (SVT-AV1, dav1d): CI passes the ones its native-av1 cache
+# restored; without them container-run.sh builds them once into the native cache.
+for lib in SVTAV1_STATIC_DIR DAV1D_STATIC_DIR; do
+  if [ -n "${!lib:-}" ]; then
+    extra+=(-v "${!lib}:${!lib}:ro" -e "$lib")
+  fi
+done
 # The mumpeer checkout (testenv for the relay specs): MUMPEER_DIR, else a sibling folder. Mounted
 # read-write at its host path, like the repo, so docker compose resolves its volumes on the host.
 mumpeer="$(realpath -m "${MUMPEER_DIR:-$repo/../mumpeer}")"
@@ -83,6 +90,7 @@ exec docker run --rm -i --init "${tty[@]}" \
   -v "$repo:$repo" -w "$repo" \
   -v "$cache/target:/cache/target" \
   -v "$cache/cargo:/cache/cargo" \
+  -v "$cache/native:/cache/native" \
   -v "$home:/cache/home" \
   -e HOME=/cache/home -e CARGO_HOME=/cache/cargo -e CARGO_TARGET_DIR=/cache/target \
   -e MUMCORD_SKIP_BINDINGS_EXPORT=1 \

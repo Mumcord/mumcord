@@ -52,6 +52,16 @@ export LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1
 # it shared. Unset = both.
 step="${MUMCORD_E2E_STEP:-}"
 if [ "$step" != test ]; then
+  # Screen sharing links static SVT-AV1 and dav1d; Ubuntu's packages are too old. The scripts
+  # return at once when the library is already in the native cache.
+  if [ -z "${SVTAV1_STATIC_DIR:-}" ]; then
+    scripts/build-svt-av1.sh /cache/native/svt-av1
+    export SVTAV1_STATIC_DIR=/cache/native/svt-av1
+  fi
+  if [ -z "${DAV1D_STATIC_DIR:-}" ]; then
+    scripts/build-dav1d.sh /cache/native/dav1d
+    export DAV1D_STATIC_DIR=/cache/native/dav1d
+  fi
   echo "building app (debug, test-backend), netsim, test game plugin..."
   npx tauri build --debug --no-bundle --features test-backend -- --locked
   cargo build --locked --quiet -p netsim
