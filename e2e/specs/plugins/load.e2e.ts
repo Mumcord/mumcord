@@ -1,11 +1,12 @@
-// AC-6.24 (spec 06): voice stays smooth with the five official plugins active and 20 bots in the
-// channel. Alice talks for two minutes (speech file as microphone) while a bot plays a steady tone
-// to her, once with `--no-plugins` (baseline) and once with Poll, Dice roller, Echolings, Mumbot
-// Music and EVE fit running, on the same profile, server and bots. The engine's audio health
+// AC-6.24 (spec 06): voice stays smooth with plugins active and 20 bots in the channel. Alice
+// talks for two minutes (speech file as microphone) while a bot plays a steady tone to her, once
+// with `--no-plugins` (baseline) and once with the official plugins of the fixture registry running
+// (the test plugins of e2e/fixtures/plugins and fx-webview-probe), on the same profile, server and
+// bots. The official plugins' own load is covered in Mumcord/plugins. The engine's audio health
 // (jitter buffer, concealed frames, dropouts, late frames) and the glitches in Alice's playback of
 // the tone are compared against the baseline; a bot records what it hears of Alice in both runs
 // for the manual listening check (artifacts/plugin-load/b-*.wav).
-import { mkdirSync, readdirSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { $, $$, browser, expect } from "@wdio/globals";
 import { app, registry, repoRoot, testenv } from "../../helpers/index.ts";
@@ -17,7 +18,7 @@ import { addAndConnect, completeWizard, ownChannel, reconnect } from "../../help
 const CHANNEL = "Lobby";
 const ME = "Alice";
 const BOTS = 20;
-const PLUGINS = ["Poll", "Dice roller", "Echolings", "Mumbot Music", "EVE fit"];
+const PLUGINS = ["Fixture Strip", "Fixture Highlight", "Fixture Web View"];
 const TALK_SECONDS = 120;
 const TONE_HZ = 440;
 const TONE_AMPLITUDE = 0.2;
@@ -128,8 +129,8 @@ async function audioHealth(serverId: number): Promise<AudioHealth> {
   return stats.audio;
 }
 
-// Skipped for 0.6.0 (user decision): the load test was never verified locally; re-enable after a
-// local run on a quiet machine.
+// Skipped (user decision): it compares two-minute voice measurements against a baseline, which a
+// busy machine or a shared CI runner skews. Re-enable after a local run on a quiet machine.
 describe.skip("Plugins: voice under load (AC-6.24)", () => {
   let fixtures: registry.FixtureRegistry;
   const bots: ScriptBot[] = [];
@@ -145,7 +146,7 @@ describe.skip("Plugins: voice under load (AC-6.24)", () => {
     await button.click();
     const confirm = $(`${prompt}//button[normalize-space(.)='Install']`);
     await confirm.waitForClickable({ timeout: 60_000 });
-    // Every optional permission on: talking events and member badges are the load under test.
+    // Every optional permission on, so each plugin runs with all it can do.
     for (const box of await $$(`${prompt}//label[contains(@class,'perm-label')]//input[@type='checkbox']`)) {
       if (!(await box.isSelected())) await box.click();
     }
@@ -166,7 +167,7 @@ describe.skip("Plugins: voice under load (AC-6.24)", () => {
         async () =>
           (await invoke<PluginsOverview>("plugins_list")).plugins.filter((p) => p.status.kind === "running")
             .length === PLUGINS.length,
-        { timeout: 30_000, timeoutMsg: "not all five plugins are running" },
+        { timeout: 30_000, timeoutMsg: "not all plugins are running" },
       );
     }
     const serverId = await invoke<number | null>("voice_server_get");
@@ -222,9 +223,6 @@ describe.skip("Plugins: voice under load (AC-6.24)", () => {
 
     await testenv.up("v15");
     fixtures = await registry.start();
-    const eveFit = readdirSync(join(fixtures.workDir, "staged")).find((n) => n.startsWith("eve-fit-"));
-    if (eveFit === undefined) throw new Error("eve-fit was not built (scripts/e2e-plugin-registry.sh)");
-    await fixtures.publish(eveFit.replace(/\.mcplugin$/, ""));
     await app.restart({ env: fixtures.env(), audio: `file:${f("mic.wav")}:${f("a-setup.wav")}` });
     await completeWizard(ME);
     await addAndConnect();
@@ -249,7 +247,7 @@ describe.skip("Plugins: voice under load (AC-6.24)", () => {
     return fixtures.stop();
   });
 
-  it("AC-6.24: five plugins and 20 bots leave the voice statistics within normal variance", async function () {
+  it("AC-6.24: plugins and 20 bots leave the voice statistics within normal variance", async function () {
     this.timeout(15 * 60_000);
     const baseline = await measure("baseline", ["--no-plugins"]);
     const loaded = await measure("plugins", []);
