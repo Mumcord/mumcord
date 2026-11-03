@@ -344,7 +344,7 @@ pub(crate) fn on_plugin_data(
                 Instant::now(),
             ),
             Signal::Share { live: false, .. } => shares.share_ended(sender),
-            Signal::Watch => {
+            Signal::Watch { .. } => {
                 match shares.own.as_mut().map(|own| own.admit(sender)) {
                     Some(Admit::New) => {
                         reply = Some(Signal::Accept);
@@ -553,11 +553,12 @@ async fn ask_to_watch(
     mut answer: oneshot::Receiver<Answer>,
 ) -> Option<Result<Answer, oneshot::error::RecvError>> {
     let start = tokio::time::Instant::now();
-    send(handle, &[sharer], &Signal::Watch);
+    let request = signal::watch_request();
+    send(handle, &[sharer], &request);
     for at in WATCH_RESEND {
         tokio::select! {
             answered = &mut answer => return Some(answered),
-            () = tokio::time::sleep_until(start + at) => send(handle, &[sharer], &Signal::Watch),
+            () = tokio::time::sleep_until(start + at) => send(handle, &[sharer], &request),
         }
     }
     tokio::time::timeout_at(start + ANSWER_WAIT, answer)
