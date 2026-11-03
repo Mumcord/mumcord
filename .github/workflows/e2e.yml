@@ -68,6 +68,11 @@ jobs:
 
       - uses: ./.github/actions/npm-ci
 
+      # Screen sharing's static AV1 libraries from the same cache as the CI jobs; e2e/run.sh
+      # mounts them into the build container.
+      - name: Native AV1 libraries
+        uses: ./.github/actions/native-av1
+
       # A cache entry is never re-saved under the same key, so the week in the key makes the
       # target dir follow the code (one save per week) instead of drifting further from it.
       # The month scopes the image layer cache (apt, rustup, tauri-driver): rebuilt only when
