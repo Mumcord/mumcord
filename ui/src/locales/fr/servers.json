@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} s'est connecté avec l'identité par défaut car la sienne est introuvable."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
+    "label": "Le relais autorise",
+    "line": "Le relais autorise : {{uses}}",
     "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "files": "Fichiers",
+    "screen": "Partage d’écran"
   }
 }

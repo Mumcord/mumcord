@@ -47,7 +47,7 @@
     "unavailable": "Dieser Kanal ist nicht mehr verfügbar.",
     "offline": "{{name}} ist offline. Du kannst wieder schreiben, sobald die Person zurück ist.",
     "unnamedImage": "Eingefügtes Bild",
-    "attachFiles": "Share files"
+    "attachFiles": "Dateien teilen"
   },
   "tray": {
     "label": "Zu sendende Bilder",

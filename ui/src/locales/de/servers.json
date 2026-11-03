@@ -309,10 +309,10 @@
     "missingNotice": "{{server}} hat sich mit der Standardidentität verbunden, weil die eigene Identität fehlt."
   },
   "relayAllows": {
-    "label": "Relay allows",
-    "line": "Relay allows: {{uses}}",
-    "images": "Images",
-    "files": "Files",
-    "screen": "Screen sharing"
+    "label": "Relay erlaubt",
+    "line": "Relay erlaubt: {{uses}}",
+    "images": "Bilder",
+    "files": "Dateien",
+    "screen": "Bildschirmfreigabe"
   }
 }
