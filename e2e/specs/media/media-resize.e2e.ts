@@ -15,6 +15,7 @@ import {
   addFirstServer,
   finishWizard,
   joinChannel,
+  selectChannel,
   reconnectSaved,
 } from "../../helpers/chat-ui.ts";
 
@@ -286,7 +287,13 @@ describe("resizable media area (#386)", () => {
     await app.restart();
     await browser.setWindowSize(1400, 900);
     await reconnectSaved();
-    await joinChannel("Lobby");
+    // After a restart the app offers to rejoin the last channel (FR-1.14).
+    const rejoin = $("//div[@aria-label='Rejoin last channel']//button[normalize-space(.)='Rejoin']");
+    if (await rejoin.waitForClickable({ timeout: 10_000 }).catch(() => false)) {
+      await rejoin.click();
+      // Rejoining leaves the server's root chat selected; the party starts from Lobby's chat.
+      await selectChannel("Lobby");
+    } else await joinChannel("Lobby");
     expect(await stored()).toBe(kept);
     await startParty();
     await waitValue((v) => v === chosen, "the height was not restored after a restart");
