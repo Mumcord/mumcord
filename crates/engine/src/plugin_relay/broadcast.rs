@@ -523,9 +523,9 @@ impl Engine {
         }
     }
 
-    /// The bot's `bcast-tok` that the screen share did not take: `sharer` admitted this client
-    /// to its plugin-data broadcast `id`. Joined when relay plugin data is on and allowed here
-    /// and the sender is in the user's channel.
+    /// The bot's `bcast-tok` of kind `plg` (already checked to come from the pinned bot):
+    /// `sharer` admitted this client to its plugin-data broadcast `id`. Joined when relay plugin
+    /// data is on and allowed here and the sender is in the user's channel.
     pub(crate) fn plugin_relay_broadcast_token(
         &self,
         ctx: &SessionCtx,

@@ -407,5 +407,10 @@
     "several_one": "{{count}} pré-visualização oculta, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
     "several_many": "{{count}} pré-visualizações ocultas, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>.",
     "several_other": "{{count}} pré-visualizações ocultas, porque as pré-visualizações e o conteúdo incorporado de ligações estão desativados em <settings>Definições > Privacidade</settings>."
+  },
+  "historyImage": {
+    "loading": "A carregar imagem…",
+    "unavailable": "Imagem não disponível",
+    "load": "Carregar imagem"
   }
 }

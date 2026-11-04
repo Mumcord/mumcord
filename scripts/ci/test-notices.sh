@@ -69,6 +69,22 @@ mkdir -p "$work/opus/opus" "$work/sqlite/sqlite3" "$work/bovnar/c/include" \
 echo '#define BVNR_VERSION_STRING		"2.0.0"' > "$work/bovnar/c/include/bovnar.h"
 echo "Bovnar licence" > "$work/bovnar/LICENSE"
 echo "Bovnar third-party notices" > "$work/bovnar/THIRD_PARTY_NOTICES.md"
+# The crate's PROVENANCE.json (Bovnar 2.0.2 and later): release tag, commit, every file's SHA-256.
+node - "$work/bovnar" <<'NODE'
+const { createHash } = require("node:crypto");
+const fs = require("node:fs");
+const dir = process.argv[2];
+const files = {};
+for (const rel of ["c/include/bovnar.h", "LICENSE", "THIRD_PARTY_NOTICES.md"]) {
+  const sha256 = createHash("sha256").update(fs.readFileSync(`${dir}/${rel}`)).digest("hex");
+  files[rel] = { sha256, from: rel };
+}
+const commit = "0123456789abcdef0123456789abcdef01234567";
+fs.writeFileSync(`${dir}/PROVENANCE.json`, JSON.stringify({
+  schema: 1, crate: "bovnar", version: "2.0.0", repository: "https://github.com/sothis/bovnar",
+  commit, tag: "v2.0.0", dirty: false, generators: [], files,
+}));
+NODE
 echo 'PACKAGE_VERSION="1.0.0"' > "$work/opus/opus/package_version"
 echo "Opus licence" > "$work/opus/opus/COPYING"
 echo '#define SQLITE_VERSION        "3.0.0"' > "$work/sqlite/sqlite3/sqlite3.h"
@@ -116,7 +132,20 @@ const a = thirdParty.find((e) => e.name === "a");
 if (a.licenses.join(" ") !== "MIT GPL-3.0-only") fail(`licence ids of a: ${a.licenses.join(" ")}`);
 const opus = data.entries.find((e) => e.name === "libopus");
 if (opus.version !== "1.0.0" || data.texts[opus.textIds[0]] !== "Opus licence") fail("libopus");
+const bovnar = data.entries.find((e) => e.name === "Bovnar C library");
+if (!bovnar.description.includes("v2.0.0, commit 0123456789abcdef0123456789abcdef01234567"))
+  fail(`the Bovnar entry does not name its revision: ${bovnar.description}`);
 NODE
+
+# A Bovnar crate that is not what its PROVENANCE.json lists fails the run.
+echo "changed" >> "$work/bovnar/LICENSE"
+if npm "MIT" 2> "$work/err.txt"; then
+  echo "FAIL: a Bovnar crate that differs from its PROVENANCE.json was accepted" >&2
+  exit 1
+fi
+grep -q "LICENSE: SHA-256 differs" "$work/err.txt" \
+  || { echo "FAIL: the rejection does not name the changed Bovnar file" >&2; exit 1; }
+echo "Bovnar licence" > "$work/bovnar/LICENSE"
 
 if npm "GPL-3.0-only" 2> "$work/err.txt"; then
   echo "FAIL: an npm package under GPL-3.0-only was accepted" >&2

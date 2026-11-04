@@ -398,5 +398,10 @@
     "link": "Länkförhandsvisning dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
     "several_one": "{{count}} förhandsvisning dold, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>.",
     "several_other": "{{count}} förhandsvisningar dolda, eftersom länkförhandsvisningar och inbäddningar är avstängda i <settings>Inställningar > Integritet</settings>."
+  },
+  "historyImage": {
+    "loading": "Läser in bild…",
+    "unavailable": "Bilden är inte tillgänglig",
+    "load": "Läs in bild"
   }
 }

@@ -31,13 +31,14 @@
 //! [`Core::take_outgoing`], so all of it runs in unit tests without a server.
 
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::sync::MutexGuard;
+use std::sync::{Arc, MutexGuard};
 
 use mumcord_store::{ChatMessage, Conversation, NewChatMessage, ServerId, Store, UnixMillis};
 
 use super::hash::{Content, content_hash, text_key, variants};
+use super::images::{self, ImageRef};
 use super::proof::{self, NONCE_TTL_MS, Nonce};
-use super::wire::{self, Hash, MAX_MESSAGES, Packet, WireMessage};
+use super::wire::{self, HASH_LEN, Hash, MAX_MESSAGES, Packet, WireMessage};
 use crate::chat::{ChatMessageView, sanitize_message_html, transient_id};
 use crate::maintenance::history_cutoff;
 use crate::session::{ConversationRef, EngineEvent};
@@ -74,6 +75,11 @@ const PEER_BURST: f64 = 6.0;
 /// (4 per second, burst 15).
 const SEND_RATE: f64 = 3.0;
 const SEND_BURST: f64 = 10.0;
+/// How long a requester may fetch the images of an answer after it was sent or last used;
+/// requesters space their fetches to the full-image rate limit, so many images take a while.
+const GRANT_TTL_MS: i64 = 60 * 60 * 1000;
+/// Most image bytes held for answers at the same time; further images stay inline.
+const MAX_GRANT_BYTES: usize = 32 * 1024 * 1024;
 
 /// What the state machine needs from the connection.
 pub(crate) trait Env {
@@ -94,6 +100,11 @@ pub(crate) trait Env {
     /// Asks the server for the own permissions in `channel`; the answer comes back through
     /// [`Core::own_permissions`].
     fn query_own_permissions(&self, channel: u32);
+    /// Whether `session` announced [`images::FEATURE`] (resolves image references).
+    fn resolves_images(&self, session: u32) -> bool;
+    /// The "Offer my full-size images" setting (FR-1.74). Never called while [`Env::store`] is
+    /// held.
+    fn offer_images(&self) -> bool;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -289,7 +300,38 @@ struct Serve {
     /// Answered after the password proof: the own Enter permission must still hold.
     proven: bool,
     created: UnixMillis,
-    messages: Vec<ChatMessage>,
+    messages: Vec<Served>,
+}
+
+/// A stored message prepared for one requester.
+struct Served {
+    message: ChatMessage,
+    hash: Hash,
+    /// For requesters that resolve image references: the body with its images as references,
+    /// and those images.
+    referenced: Option<(String, Vec<SharedImage>)>,
+}
+
+/// An image of a served message, shared with the grants made for it.
+type SharedImage = (ImageRef, Arc<Vec<u8>>);
+
+/// An image a requester may fetch by hash because it was sent a message containing it
+/// (FR-1.60g); the access rules of that answer are checked again on every fetch.
+struct Grant {
+    channel: u32,
+    locked: bool,
+    proven: bool,
+    used: UnixMillis,
+    bytes: Arc<Vec<u8>>,
+}
+
+/// Referenced images of synced messages to fetch from the holder that sent them.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ImageFetch {
+    pub holder: u32,
+    pub channel: u32,
+    pub key: String,
+    pub refs: Vec<ImageRef>,
 }
 
 /// A `hreq` for a locked channel waiting for the requester's password proof.
@@ -316,6 +358,9 @@ pub(crate) struct Core {
     outbox: Outbox,
     pacing: Bucket,
     events: Vec<EngineEvent>,
+    /// Images requesters may fetch, by requester and image hash.
+    grants: HashMap<(u32, [u8; 32]), Grant>,
+    image_fetches: Vec<ImageFetch>,
 }
 
 impl Core {
@@ -332,6 +377,8 @@ impl Core {
             outbox: Outbox::default(),
             pacing: Bucket::new(SEND_RATE, SEND_BURST, now),
             events: Vec::new(),
+            grants: HashMap::new(),
+            image_fetches: Vec::new(),
         }
     }
 
@@ -403,6 +450,8 @@ impl Core {
         self.peers.remove(&session);
         self.serves.retain(|s| s.requester != session);
         self.challenges.retain(|c| c.requester != session);
+        self.grants
+            .retain(|(requester, _), _| *requester != session);
         self.outbox.forget(session);
         if let Some(Job {
             stage: Stage::Transfer { holders, .. },
@@ -450,6 +499,56 @@ impl Core {
         req
     }
 
+    /// Referenced images of received messages that still have to be fetched.
+    pub(crate) fn take_image_fetches(&mut self) -> Vec<ImageFetch> {
+        std::mem::take(&mut self.image_fetches)
+    }
+
+    /// The bytes of an image `requester` asks for by hash, if it was sent a message containing
+    /// it and may still read that message (FR-1.60g). Everything else gets `None`, so a hash
+    /// alone gives no access and the reasons look the same to the requester.
+    pub(crate) fn image_for(
+        &mut self,
+        env: &impl Env,
+        requester: u32,
+        hash: &[u8; 32],
+        now: UnixMillis,
+    ) -> Option<Arc<Vec<u8>>> {
+        let grant = self.grants.get(&(requester, *hash))?;
+        if now.saturating_sub(grant.used) >= GRANT_TTL_MS {
+            return None;
+        }
+        let inside = !(grant.locked || env.channel_locked(grant.channel))
+            || self
+                .peers
+                .get(&requester)
+                .is_some_and(|p| p.inside == grant.channel);
+        let entering = !grant.proven
+            || self
+                .permissions
+                .get(&grant.channel)
+                .is_some_and(|&(_, enter)| enter);
+        if !inside || !entering || !env.sharing() || !env.offer_images() {
+            return None;
+        }
+        let grant = self.grants.get_mut(&(requester, *hash))?;
+        grant.used = now;
+        Some(grant.bytes.clone())
+    }
+
+    /// Image bytes held for open answers and grants (counted once per holder of a copy).
+    fn held_image_bytes(&self) -> usize {
+        let granted: usize = self.grants.values().map(|g| g.bytes.len()).sum();
+        let prepared: usize = self
+            .serves
+            .iter()
+            .flat_map(|s| &s.messages)
+            .flat_map(|m| m.referenced.iter().flat_map(|(_, images)| images))
+            .map(|(_, bytes)| bytes.len())
+            .sum();
+        granted + prepared
+    }
+
     pub(crate) fn take_events(&mut self) -> Vec<EngineEvent> {
         std::mem::take(&mut self.events)
     }
@@ -467,6 +566,8 @@ impl Core {
     pub(crate) fn tick(&mut self, env: &impl Env, now: UnixMillis) {
         self.serves
             .retain(|s| now.saturating_sub(s.created) < SERVE_TTL_MS);
+        self.grants
+            .retain(|_, g| now.saturating_sub(g.used) < GRANT_TTL_MS);
         let (expired, open): (Vec<_>, Vec<_>) = std::mem::take(&mut self.challenges)
             .into_iter()
             .partition(|c| now.saturating_sub(c.created) > NONCE_TTL_MS);
@@ -866,6 +967,7 @@ impl Core {
             }
         };
         let mut accepted: Vec<(Hash, NewChatMessage)> = Vec::new();
+        let mut fetch: Vec<ImageRef> = Vec::new();
         // Text keys of this batch join `known` only afterwards: one holder's repeated
         // message ("ok", "ok") is two messages, while another source's copy is a duplicate.
         let mut texts = Vec::new();
@@ -884,12 +986,31 @@ impl Core {
                 sent_at: m.ts,
                 body: &m.b,
             };
-            let hash = content_hash(&content);
+            let refs = images::references(&m.b);
+            // A body with image references carries the hash of the holder's inline body.
+            let hash = if refs.is_empty() {
+                content_hash(&content)
+            } else {
+                match m.k.as_deref().and_then(parse_hash) {
+                    Some(hash) => hash,
+                    None => continue,
+                }
+            };
             // Only what was asked for, each at most once; and nothing already here.
-            if !wanted.remove(&hash) || known.contains(&hash, &content) {
+            if !wanted.remove(&hash) {
                 continue;
             }
-            known.hashes.extend(variants(&content));
+            if known.contains(&hash, &content) {
+                // The copy here may still lack its images: a failed fetch is retried now.
+                fetch.extend(refs);
+                continue;
+            }
+            if refs.is_empty() {
+                known.hashes.extend(variants(&content));
+            } else {
+                known.hashes.insert(hash);
+            }
+            fetch.extend(refs);
             texts.push((text_key(&content), m.ts));
             let Some(name) = crate::web::meta::clean(&m.n, MAX_NAME) else {
                 continue;
@@ -907,6 +1028,16 @@ impl Core {
         }
         for (key, sent_at) in texts {
             known.add_text(key, sent_at);
+        }
+        let mut seen = HashSet::new();
+        fetch.retain(|image| seen.insert(image.full.hash));
+        if !fetch.is_empty() {
+            self.image_fetches.push(ImageFetch {
+                holder: sender,
+                channel: job.channel,
+                key: job.key.clone(),
+                refs: fetch,
+            });
         }
         if accepted.is_empty() {
             return;
@@ -1196,10 +1327,13 @@ impl Core {
             to,
             u32::try_from(MAX_MESSAGES).unwrap_or(u32::MAX),
         );
-        let messages: Vec<ChatMessage> = match rows {
+        // Answered with image references only while the own images may be offered (FR-1.60e).
+        let referencing = env.resolves_images(sender) && env.offer_images();
+        let mut budget = MAX_GRANT_BYTES.saturating_sub(self.held_image_bytes());
+        let messages: Vec<Served> = match rows {
             Ok(rows) => rows
                 .into_iter()
-                .filter(|m| m.body.len() <= MAX_BODY)
+                .filter_map(|m| served(key, m, referencing, &mut budget))
                 .collect(),
             Err(e) => {
                 tracing::warn!(error = %e, "history sync: reading messages failed");
@@ -1207,10 +1341,7 @@ impl Core {
                 return;
             }
         };
-        let hashes: Vec<Hash> = messages
-            .iter()
-            .map(|m| content_hash(&stored_content(key, m)))
-            .collect();
+        let hashes: Vec<Hash> = messages.iter().map(|m| m.hash).collect();
         tracing::debug!(count = hashes.len(), "history sync: sending a hash list");
         for packet in wire::chunk_hashes(req, &hashes) {
             self.outbox.push(vec![sender], &packet);
@@ -1264,16 +1395,34 @@ impl Core {
         let mut size = 0;
         let mut messages = Vec::new();
         for k in wire::selected(wanted, serve.messages.len()) {
-            let m = &serve.messages[k];
+            let served = &serve.messages[k];
+            let m = &served.message;
+            let (body, hash) = match &served.referenced {
+                Some((body, _)) => (body.clone(), Some(hex(&served.hash))),
+                None => (m.body.clone(), None),
+            };
             let message = WireMessage {
                 ts: m.sent_at,
                 n: m.sender_name.clone(),
                 h: m.sender_cert_hash.clone(),
-                b: m.body.clone(),
+                b: body,
+                k: hash,
             };
             size += wire::encode_messages(std::slice::from_ref(&message)).len();
             if size > MAX_STREAM {
                 break;
+            }
+            for (image, bytes) in served.referenced.iter().flat_map(|(_, images)| images) {
+                self.grants.insert(
+                    (sender, image.full.hash),
+                    Grant {
+                        channel: serve.channel,
+                        locked: serve.locked,
+                        proven: serve.proven,
+                        used: now,
+                        bytes: bytes.clone(),
+                    },
+                );
             }
             messages.push(message);
         }
@@ -1282,6 +1431,68 @@ impl Core {
             self.outbox.push(vec![sender], &packet);
         }
     }
+}
+
+/// A stored message as it goes to the requester, or `None` when its body is too large. With
+/// `referencing`, inline images become references while `budget` (bytes) lasts, and the size
+/// limit applies to the body as sent: the images travel through the full-image path with its
+/// own limits (FR-1.60e).
+fn served(
+    key: &str,
+    message: ChatMessage,
+    referencing: bool,
+    budget: &mut usize,
+) -> Option<Served> {
+    let hash = content_hash(&stored_content(key, &message));
+    let mut referenced = None;
+    if referencing && message.body.contains("data:image/") {
+        let (body, found) = images::to_references(&message.body, |_, bytes| {
+            let fits = bytes.len() <= *budget;
+            if fits {
+                *budget -= bytes.len();
+            }
+            fits
+        });
+        if !found.is_empty() {
+            let images = found
+                .into_iter()
+                .map(|(image, bytes)| (image, Arc::new(bytes)))
+                .collect::<Vec<_>>();
+            referenced = Some((body, images));
+        }
+    }
+    let size = referenced
+        .as_ref()
+        .map_or(message.body.len(), |(body, _)| body.len());
+    if size > MAX_BODY {
+        let held: usize = referenced
+            .iter()
+            .flat_map(|(_, images)| images)
+            .map(|(_, bytes)| bytes.len())
+            .sum();
+        *budget += held;
+        return None;
+    }
+    Some(Served {
+        message,
+        hash,
+        referenced,
+    })
+}
+
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
+}
+
+fn parse_hash(text: &str) -> Option<Hash> {
+    if text.len() != HASH_LEN * 2 {
+        return None;
+    }
+    let mut hash = [0; HASH_LEN];
+    for (i, b) in hash.iter_mut().enumerate() {
+        *b = u8::from_str_radix(text.get(i * 2..i * 2 + 2)?, 16).ok()?;
+    }
+    Some(hash)
 }
 
 fn stored_content<'a>(key: &'a str, m: &'a ChatMessage) -> Content<'a> {
@@ -1331,7 +1542,15 @@ fn known_messages(env: &impl Env, key: &str, from: UnixMillis, to: UnixMillis) -
     match rows {
         Ok(rows) => {
             for m in &rows {
-                known.add(&stored_content(key, m));
+                let content = stored_content(key, m);
+                if m.body.contains(images::ATTRIBUTE) && !images::references(&m.body).is_empty() {
+                    // Its images are still missing, so its hash differs from the holder's
+                    // (inline) one: only the text key matches, and fetching it again retries
+                    // the images (FR-1.60f).
+                    known.add_text(text_key(&content), m.sent_at);
+                } else {
+                    known.add(&content);
+                }
             }
         }
         Err(e) => {

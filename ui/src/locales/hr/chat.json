@@ -407,5 +407,10 @@
     "several_one": "{{count}} pregled je skriven, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
     "several_few": "{{count}} pregleda su skrivena, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>.",
     "several_other": "{{count}} pregleda je skriveno, jer su pregledi i ugradnje poveznica isključeni u <settings>Postavke > Privatnost</settings>."
+  },
+  "historyImage": {
+    "loading": "Učitavanje slike…",
+    "unavailable": "Slika nije dostupna",
+    "load": "Učitaj sliku"
   }
 }

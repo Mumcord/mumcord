@@ -712,9 +712,9 @@ dependencies = [
 
 [[package]]
 name = "bovnar"
-version = "2.0.0"
+version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2453d11e374fcaa6edeb1ec25c8fe96c8a232274c5ad2eb12ebcae73837b8241"
+checksum = "01367c94658245a977ed5fa04ca767707ca5877305220fa5ebe9496e2db4c707"
 dependencies = [
  "cc",
  "num-bigint",
@@ -4060,6 +4060,7 @@ dependencies = [
  "block2",
  "bovnar",
  "bytes",
+ "crossbeam-queue",
  "dispatch2",
  "futures-util",
  "hound",

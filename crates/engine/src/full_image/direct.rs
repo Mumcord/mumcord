@@ -3,8 +3,8 @@
 //!
 //! Request: the image's SHA-256 (32 bytes). Reply: [`FOUND`] and the size (4 bytes, big
 //! endian) followed by the image, or [`UNAVAILABLE`]. The same rules as for plugin data apply:
-//! only own images are served while "Offer my full-size images" is on, and the received bytes
-//! must match the announced size and hash.
+//! only own images (and images of history answers, FR-1.60g) are served while "Offer my
+//! full-size images" is on, and the received bytes must match the announced size and hash.
 
 use std::time::Duration;
 
@@ -90,7 +90,12 @@ pub(crate) async fn fetch(
 }
 
 /// Answers one request on a stream the other side opened.
-pub(crate) async fn serve(engine: &Engine, mut send: SendStream, mut recv: RecvStream) {
+pub(crate) async fn serve(
+    engine: &Engine,
+    (server_id, requester): (crate::ServerId, u32),
+    mut send: SendStream,
+    mut recv: RecvStream,
+) {
     let mut hash = [0u8; 32];
     if let Err(e) = read_exact(&mut recv, &mut hash).await {
         tracing::debug!(error = %e, "direct full image request incomplete");
@@ -99,8 +104,12 @@ pub(crate) async fn serve(engine: &Engine, mut send: SendStream, mut recv: RecvS
     let lookup = originals(
         engine.link_previews_arc(),
         setting(engine.settings(), |s| s.offer_full_images),
+        engine
+            .session_ctx_for(server_id)
+            .ok()
+            .map(|ctx| (engine.history_sync_arc(), ctx)),
     );
-    let image = tokio::task::spawn_blocking(move || lookup(&hash))
+    let image = tokio::task::spawn_blocking(move || lookup(requester, &hash))
         .await
         .ok()
         .flatten()
@@ -188,7 +197,10 @@ mod tests {
 
     async fn connected() -> (PeerConnection, PeerConnection) {
         let config = P2pConfig {
-            connect_timeout: Duration::from_secs(3),
+            // Only an upper bound (a connection returns as soon as it is up). Generous because
+            // the whole lib suite runs in parallel on loaded CI runners, where a 3 s budget
+            // for the debug-build QUIC handshake ended in a spurious `NoDirectPath`.
+            connect_timeout: Duration::from_secs(10),
             port_mapping: false,
             allow_loopback: true,
         };

@@ -118,6 +118,9 @@ pub enum SoundOutcome {
     /// Nothing to share, and nothing went wrong: no single app behind the picked window, or
     /// "No sound" chosen.
     NoSound,
+    /// The picked window has no clear app (Linux, FR-7.82): the user picks one of these in
+    /// "Which app's sound?" (FR-7.83); the share starts without sound meanwhile.
+    Choose(Vec<SoundApp>),
     /// Sound cannot be shared.
     Unavailable(SoundUnavailable),
 }
@@ -131,6 +134,24 @@ pub struct SoundStatus {
     pub app: Option<AppName>,
     /// Why there is no sound; `None` while there is some or none was asked for.
     pub unavailable: Option<SoundUnavailable>,
+    /// The apps offered in "Which app's sound?" while the user has not answered it yet
+    /// (Linux, FR-7.83); `None` when nothing is asked.
+    pub choice: Option<Vec<SoundApp>>,
+}
+
+/// One app offered in "Which app's sound?" (FR-7.83). Stays on the sharer's device (FR-7.87).
+#[derive(Clone, PartialEq, Eq)]
+pub struct SoundApp {
+    /// What the answer names; stays the same while the app keeps playing.
+    pub id: String,
+    pub name: AppName,
+}
+
+impl std::fmt::Debug for SoundApp {
+    /// The id holds the binary or a process id, which never reach a log (FR-7.87).
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("SoundApp(..)")
+    }
 }
 
 impl SoundStatus {
@@ -154,6 +175,14 @@ impl SoundStatus {
             mode: ShareSoundMode::Desktop,
             ..Self::default()
         }
+    }
+
+    /// The capture failed during the share (FR-7.84): no sound any more, with the reason.
+    pub fn capture_failed(&mut self) {
+        *self = Self {
+            unavailable: Some(SoundUnavailable::CaptureFailed),
+            ..Self::default()
+        };
     }
 
     /// Mode and reason code at `info`, never the app (FR-7.87).
@@ -181,11 +210,18 @@ impl SoundOutcome {
                     SoundStatus {
                         mode,
                         app,
-                        unavailable: None,
+                        ..SoundStatus::default()
                     },
                 )
             }
             Self::NoSound => (None, SoundStatus::default()),
+            Self::Choose(apps) => (
+                None,
+                SoundStatus {
+                    choice: Some(apps),
+                    ..SoundStatus::default()
+                },
+            ),
             Self::Unavailable(reason) => (
                 None,
                 SoundStatus {
@@ -216,6 +252,20 @@ mod tests {
     use super::super::super::capture::TestTone;
     use super::*;
     use mumcord_screenshare::I420Frame;
+
+    #[test]
+    fn a_capture_that_fails_during_the_share_leaves_no_sound_with_the_reason() {
+        let mut status = SoundStatus {
+            mode: ShareSoundMode::App,
+            app: Some(AppName::new("Spotify")),
+            ..SoundStatus::default()
+        };
+        status.capture_failed();
+        assert!(!status.available());
+        assert_eq!(status.effective(true), ShareSoundMode::None);
+        assert_eq!(status.app, None);
+        assert_eq!(status.unavailable, Some(SoundUnavailable::CaptureFailed));
+    }
 
     #[test]
     fn the_pick_decides_the_request() {
@@ -260,9 +310,17 @@ mod tests {
         let status = SoundStatus {
             mode: ShareSoundMode::App,
             app: Some(AppName::new("Secret Player")),
-            unavailable: None,
+            ..SoundStatus::default()
         };
         assert!(!format!("{status:?}").contains("Secret"));
+        let asking = SoundOutcome::Choose(vec![SoundApp {
+            id: "bin:secret-player".into(),
+            name: AppName::new("Secret Player"),
+        }]);
+        let (source, asking) = asking.into_parts();
+        assert!(source.is_none());
+        assert!(!asking.available(), "no sound until the user picks");
+        assert!(!format!("{asking:?}").to_lowercase().contains("secret"));
         assert_eq!(status.app.unwrap().as_str(), "Secret Player");
     }
 

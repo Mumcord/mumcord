@@ -407,5 +407,10 @@
     "several_one": "{{count}} previzualizare ascunsă, deoarece previzualizările de linkuri și conținutul încorporat sunt dezactivate în <settings>Setări > Confidențialitate</settings>.",
     "several_few": "{{count}} previzualizări ascunse, deoarece previzualizările de linkuri și conținutul încorporat sunt dezactivate în <settings>Setări > Confidențialitate</settings>.",
     "several_other": "{{count}} de previzualizări ascunse, deoarece previzualizările de linkuri și conținutul încorporat sunt dezactivate în <settings>Setări > Confidențialitate</settings>."
+  },
+  "historyImage": {
+    "loading": "Se încarcă imaginea…",
+    "unavailable": "Imaginea nu este disponibilă",
+    "load": "Încarcă imaginea"
   }
 }

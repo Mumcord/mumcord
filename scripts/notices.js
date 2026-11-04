@@ -8,8 +8,8 @@
 // --rust is `cargo about generate --format json`, --npm license-checker's JSON, --metadata
 // `cargo metadata --format-version 1`. Fails when an npm package has a licence outside --npm-allowed.
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, sep } from "node:path";
 import process from "node:process";
 import { parseArgs } from "node:util";
 
@@ -211,6 +211,55 @@ const textFiles = {
   "@bovnar-license": () => join(crateDir("bovnar"), "LICENSE"),
   "@bovnar-notices": () => join(crateDir("bovnar"), "THIRD_PARTY_NOTICES.md"),
 };
+// Bovnar's crate (2.0.2 and later) carries PROVENANCE.json: the upstream tag and commit it was
+// staged from and the SHA-256 of every file in it. The notices name that revision, and the run
+// fails unless the crate cargo compiles is exactly what the manifest lists, so the shipped library
+// and its notices are tied to one upstream release.
+const crateFiles = (dir) =>
+  readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => relative(dir, join(e.parentPath, e.name)).split(sep).join("/"));
+// Files cargo adds when it packs or unpacks a crate: its normalized Cargo.toml (the original is
+// Cargo.toml.orig), the VCS info and the registry's unpack marker.
+const CARGO_MADE = new Set(["Cargo.toml", ".cargo_vcs_info.json", ".cargo-ok"]);
+const revisions = {
+  "@bovnar": () => {
+    const dir = crateDir("bovnar");
+    const where = join(dir, "PROVENANCE.json");
+    if (!existsSync(where)) throw new Error(`${where} is missing; Bovnar 2.0.2 or later ships it`);
+    const m = readJson(where);
+    if (m.schema !== 1) throw new Error(`${where}: unknown schema ${m.schema}`);
+    if (m.dirty || m.tag !== `v${m.version}`) {
+      throw new Error(
+        `${where}: not a release (tag ${m.tag}, commit ${m.commit}, dirty ${m.dirty})`,
+      );
+    }
+    const header = versions["@bovnar"]();
+    if (header !== m.version) throw new Error(`${where}: version ${m.version}, bovnar.h ${header}`);
+    const packed = existsSync(join(dir, "Cargo.toml.orig"));
+    const have = new Map();
+    for (const rel of crateFiles(dir)) {
+      if (rel === "PROVENANCE.json" || (packed && CARGO_MADE.has(rel))) continue;
+      have.set(rel === "Cargo.toml.orig" ? "Cargo.toml" : rel, join(dir, rel));
+    }
+    const sha256 = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
+    const problems = [
+      ...[...have.keys()]
+        .filter((rel) => !m.files[rel])
+        .map((rel) => `${rel}: not in the manifest`),
+      ...Object.keys(m.files)
+        .filter((rel) => !have.has(rel))
+        .map((rel) => `${rel}: missing`),
+      ...[...have]
+        .filter(([rel, file]) => m.files[rel] && sha256(file) !== m.files[rel].sha256)
+        .map(([rel]) => `${rel}: SHA-256 differs`),
+    ];
+    if (problems.length) {
+      throw new Error(`the bovnar crate in ${dir} is not ${m.tag}:\n  ${problems.join("\n  ")}`);
+    }
+    return `Upstream revision: ${m.repository} ${m.tag}, commit ${m.commit}; all ${have.size} files of the crate match its PROVENANCE.json.`;
+  },
+};
 const nativeOut = [];
 const printed = new Map();
 for (const c of readJson(join(opt.root, "licenses/native.json")).components) {
@@ -219,8 +268,9 @@ for (const c of readJson(join(opt.root, "licenses/native.json")).components) {
     textId(readFileSync(textFiles[t]?.() ?? join(opt.root, t), "utf8")),
   );
   const title = version ? `${c.name} ${version}` : c.name;
+  const description = c.revision ? [...c.description, revisions[c.revision]()] : c.description;
   nativeOut.push(bar, title, bar, "", `License: ${c.license}`, `Repository: ${c.repository}`, "");
-  nativeOut.push(...c.description, "");
+  nativeOut.push(...description, "");
   // The LGPL is shared by several components; its text is printed once.
   for (const id of ids) {
     nativeOut.push(
@@ -237,7 +287,7 @@ for (const c of readJson(join(opt.root, "licenses/native.json")).components) {
     repository: c.repository,
     source: "native",
     textIds: ids,
-    description: c.description.join(" "),
+    description: description.join(" "),
   });
 }
 

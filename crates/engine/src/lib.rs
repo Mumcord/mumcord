@@ -70,7 +70,7 @@ pub use session::{
     ActiveAudioProfile, AudioDeviceList, AudioDeviceView, AudioHealthView, CertificateState,
     ChannelAudioView, ChannelPasswordChannel, ChannelPasswordState, ChannelPasswordView,
     ChannelPermissions, ChannelView, ConnState, ConnectionStatsView, ConversationRef, EngineError,
-    EngineEvent, EngineResult, ErrorKind, EventReceiver, Events, IdentityView,
+    EngineEvent, EngineResult, ErrorKind, EventReceiver, Events, HistoryImageState, IdentityView,
     MAX_RECONNECT_ATTEMPTS, MicTestDevices, MicTestPhase, PasswordChange, ProfileView,
     ServerFields, ServerInfoView, ServerTestInput, ServerView, SessionCtx, Snapshot, TaggedEvent,
     TestConnectionView, UnreadView, UserView, VoiceTransportKind,

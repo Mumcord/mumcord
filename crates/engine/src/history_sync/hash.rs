@@ -46,7 +46,8 @@ pub fn variants(content: &Content<'_>) -> [Hash; 3] {
 /// are off by more than [`variants`] covers stamp the same message seconds apart; the sync
 /// compares this key within a small time window to catch those duplicates.
 pub fn text_key(content: &Content<'_>) -> Hash {
-    let body = normalize(content.body);
+    // Image references and inline images compare equal (FR-1.60e).
+    let body = normalize(&super::images::canonical(content.body));
     digest(&[
         TEXT_DOMAIN,
         content.channel.as_bytes(),

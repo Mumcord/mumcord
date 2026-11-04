@@ -73,7 +73,7 @@ pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use sound::{
-    AppName, ShareSoundMode, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+    AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
 };
 pub use start::StartOutcome;
 pub use thumbnail::ShareThumbnail;
@@ -802,7 +802,12 @@ impl Engine {
         let Some(mut source) = start::into_outcome(start::open_source().await)? else {
             return Ok(StartOutcome::Cancelled);
         };
-        let (app_sound, sound_status) = sound::status::take(source.as_mut(), sound::unavailable());
+        let (app_sound, mut sound_status) =
+            sound::status::take(source.as_mut(), sound::unavailable());
+        // With the switch off nobody asked for sound, so "Which app's sound?" is not shown.
+        if !sound {
+            sound_status.choice = None;
+        }
         let settings = ctx.store().settings().unwrap_or_else(|e| {
             tracing::warn!(error = %e, "screen share settings not read; using the defaults");
             mumcord_store::Settings::default()
@@ -922,6 +927,59 @@ impl Engine {
             if let Some(media) = &own.media {
                 media.set_sound(own.sound);
             }
+        })
+    }
+
+    /// The apps playing sound now, for "Which app's sound?" while the own share waits for the
+    /// user's pick (Linux, FR-7.83); call it again to refresh the open list. Empty elsewhere.
+    pub fn screen_share_sound_apps(&self) -> EngineResult<Vec<SoundApp>> {
+        #[cfg(target_os = "linux")]
+        {
+            sound::pick::list().map_err(|reason| EngineError::invalid(reason.code()))
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            Ok(Vec::new())
+        }
+    }
+
+    /// The answer to "Which app's sound?" (FR-7.83): `Some(id)` (a [`SoundApp::id`]) shares
+    /// that app's sound and turns sound on; `None` ("No sound" or Cancel) keeps the share
+    /// silent. Errors when nothing is asked, or when the app stopped playing meanwhile (the
+    /// list stays open and should be refreshed).
+    pub fn screen_share_choose_sound(
+        &self,
+        server_id: ServerId,
+        app: Option<&str>,
+    ) -> EngineResult<()> {
+        let asked = lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .is_some_and(|own| own.sound_status.choice.is_some());
+        if !asked {
+            return Err(EngineError::invalid("no sound choice is asked"));
+        }
+        let outcome = match app {
+            None => SoundOutcome::NoSound,
+            Some(id) => chosen_sound(id)?,
+        };
+        let (source, status) = outcome.into_parts();
+        let mut source = Some(source);
+        self.update_own_share(server_id, |own| {
+            // Another answer may have come first.
+            if own.sound_status.choice.is_none() {
+                return;
+            }
+            let Some(media) = &own.media else { return };
+            own.sound_status = status;
+            own.sound = false;
+            if let Some(source) = source.take().flatten() {
+                media.start_sound(source);
+                own.sound = true;
+            }
+            media.set_sound(own.sound);
+            own.sound_status.log(own.sound);
         })
     }
 
@@ -1069,7 +1127,12 @@ impl Engine {
             }
         }
         let opened = self
-            .p2p_open_stream(server_id, sharer, crate::p2p::STREAM_SCREEN)
+            .p2p_open_stream(
+                server_id,
+                sharer,
+                crate::p2p::STREAM_SCREEN,
+                crate::p2p::ConsentPrompt::Allowed,
+            )
             .await;
         let volume = self.person_share_volume(server_id, sharer);
         // A newer attempt replaced this one meanwhile: leave its state and the sharer alone.
@@ -1134,7 +1197,7 @@ impl Engine {
         let engine = self.clone();
         self.runtime().spawn(async move {
             let opened = engine
-                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN)
+                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN, crate::p2p::ConsentPrompt::Allowed)
                 .await;
             let volume = engine.person_share_volume(server_id, peer);
             let unwatch = {
@@ -1477,6 +1540,24 @@ fn with_picks(
     }
     let prefs = prefs.unwrap_or_else(|| QualityPrefs::from_settings(&settings));
     (settings, prefs)
+}
+
+/// The capture of the app the user chose in "Which app's sound?"; an error when it stopped
+/// playing meanwhile.
+fn chosen_sound(id: &str) -> EngineResult<SoundOutcome> {
+    #[cfg(target_os = "linux")]
+    {
+        match sound::pick::start_chosen(id) {
+            Ok(Some(outcome)) => Ok(outcome),
+            Ok(None) => Err(EngineError::invalid("that app no longer plays sound")),
+            Err(reason) => Ok(SoundOutcome::Unavailable(reason)),
+        }
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = id;
+        Err(EngineError::invalid("no sound choice on this system"))
+    }
 }
 
 #[cfg(test)]

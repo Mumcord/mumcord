@@ -250,9 +250,11 @@ jobs:
           # linuxdeploy only finds the plugin scanner by itself on Debian paths; pass it explicitly.
           echo "GSTREAMER_HELPERS_DIR=$(scripts/gst-helpers-dir.sh)" >> "$GITHUB_ENV"
 
+      # --locked: the bundle is built from exactly the dependencies in Cargo.lock, the same ones the
+      # notices job read (scripts/generate-notices.sh), or the build fails instead of resolving anew.
       - name: Build bundle
         if: steps.certum.outputs.enabled != 'true'
-        run: npm run tauri build -- ${{ matrix.args }}
+        run: npm run tauri build -- ${{ matrix.args }} -- --locked
 
       # Signed Windows release: Tauri signs the app exe, the uninstaller and the installer through
       # scripts/sign-windows.ps1 (signtool with the Certum certificate from SimplySign Desktop),
@@ -261,7 +263,7 @@ jobs:
       # SimplySign login so the cloud session is fresh when the first file is signed.
       - name: Build Windows app for signing
         if: steps.certum.outputs.enabled == 'true'
-        run: npm run tauri build -- --no-bundle
+        run: npm run tauri build -- --no-bundle -- --locked
 
       # Certum's official installer, pinned by version and checksum. A new version needs a new
       # checksum (docs/release-signing.md); the URL follows Certum's download server layout.

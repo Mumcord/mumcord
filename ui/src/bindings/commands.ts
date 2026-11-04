@@ -433,6 +433,13 @@ export const commands = {
 	 *  Progress arrives as `historySyncStatus`, messages as `historySynced`.
 	 */
 	historySyncRequest: (serverId: number, channelId: number) => typedError<null, ApiError>(__TAURI_INVOKE("history_sync_request", { serverId, channelId })),
+	/**
+	 *  "Load image" on the placeholder of a synced message (FR-1.60f): fetches the referenced
+	 *  image from the person whose history it came from, also while "Load full-size images from
+	 *  others" is off. `notFound` when nobody offers it any more. The outcome arrives as
+	 *  `historySynced` (updated message) or `historyImageStatus`.
+	 */
+	historyImageLoad: (serverId: number, reference: string) => typedError<null, ApiError>(__TAURI_INVOKE("history_image_load", { serverId, reference })),
 	/**  Sets the own avatar from an image file, scaled to the server limit; `null` removes it. */
 	setOwnAvatar: (serverId: number, path: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("set_own_avatar", { serverId, path })),
 	/**  The default avatar as a `data:` URL, or `null` if none is set. */
@@ -1136,6 +1143,7 @@ export const events = {
 	followedChannelsChanged: makeEvent<FollowedChannelsChanged, FollowedChannelsChanged>("followed-channels-changed"),
 	friendsChanged: makeEvent<FriendsChanged, FriendsChanged>("friends-changed"),
 	fullImageProgress: makeEvent<FullImageProgress, FullImageProgress>("full-image-progress"),
+	historyImageStatus: makeEvent<HistoryImageStatus, HistoryImageStatus>("history-image-status"),
 	historySyncStatus: makeEvent<HistorySyncStatus, HistorySyncStatus>("history-sync-status"),
 	historySynced: makeEvent<HistorySynced, HistorySynced>("history-synced"),
 	hotkeyPressed: makeEvent<HotkeyPressed, HotkeyPressed>("hotkey-pressed"),
@@ -2042,6 +2050,24 @@ export type GamePluginProblem =
 
 /**  Who made the graphics card an encoder runs on. */
 export type GpuVendor = "nvidia" | "amd" | "intel" | "unknown";
+
+/**  Why a referenced image of a synced message is still a placeholder (FR-1.60f). */
+export type HistoryImageState = 
+/**  Could not be loaded from the holder; retried on the next sync. */
+"unavailable" | 
+/**  "Load full-size images from others" is off: offer a manual load. */
+"manual";
+
+/**
+ *  The placeholder of a referenced image in synced messages (`data-mumcord-image` equal to
+ *  `reference`) needs a hint. A loaded image arrives as an updated message in `historySynced`
+ *  (same id) instead.
+ */
+export type HistoryImageStatus = {
+	serverId: number,
+	reference: string,
+	state: HistoryImageState,
+};
 
 /**  One video that already played, for the previous button (issue #163). */
 export type HistoryItem = {

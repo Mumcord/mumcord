@@ -531,7 +531,7 @@ mod tests {
         let app = SoundStatus {
             mode: ShareSoundMode::App,
             app: Some(AppName::new("Player")),
-            unavailable: None,
+            ..SoundStatus::default()
         };
         shares.own = Some(OwnShare::new(true, app.clone()));
         let view = &shares.views(1)[0];
@@ -549,7 +549,7 @@ mod tests {
             SoundStatus {
                 mode: ShareSoundMode::App,
                 app: Some(AppName::new("Player")),
-                unavailable: None,
+                ..SoundStatus::default()
             },
         );
         own.sound_failed();

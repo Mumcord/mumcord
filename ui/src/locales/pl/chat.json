@@ -416,5 +416,10 @@
     "several_few": "{{count}} podglądy ukryte, ponieważ podglądy linków i osadzenia są wyłączone w <settings>Ustawienia > Prywatność</settings>.",
     "several_many": "{{count}} podglądów ukrytych, ponieważ podglądy linków i osadzenia są wyłączone w <settings>Ustawienia > Prywatność</settings>.",
     "several_other": "{{count}} podglądu ukrytego, ponieważ podglądy linków i osadzenia są wyłączone w <settings>Ustawienia > Prywatność</settings>."
+  },
+  "historyImage": {
+    "loading": "Wczytywanie obrazu…",
+    "unavailable": "Obraz niedostępny",
+    "load": "Wczytaj obraz"
   }
 }

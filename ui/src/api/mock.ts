@@ -3450,6 +3450,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve({ ...requireServer(serverId) });
     },
     fullImageCancel: () => Promise.resolve(null),
+    historyImageLoad: () => Promise.resolve(null),
     filesAvailability: () => Promise.resolve(null),
     filesChipAdd: (path) => {
       const chip: FileChip = {

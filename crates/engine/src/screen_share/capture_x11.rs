@@ -3,6 +3,9 @@
 //! On X11 only the whole screen is shared, so the root window is read with the core `GetImage`
 //! request. That needs no extension and no extra crate beyond the `x11rb` the app already uses.
 //! The picture is scaled into the encoder's box and converted to I420 in one pass.
+//!
+//! The sound is the desktop's through PipeWire, as on Wayland (FR-7.81): with the whole screen
+//! shared there is no window whose app could be asked for.
 
 use mumcord_screenshare::I420Frame;
 use x11rb::connection::Connection;
@@ -12,6 +15,7 @@ use x11rb::rust_connection::RustConnection;
 use super::capture::CaptureSource;
 use super::convert::bgrx_to_i420;
 use super::signal::ShareKind;
+use super::sound::{SoundOutcome, SoundRequest, pick};
 
 /// Why the screen cannot be captured.
 #[derive(Debug, thiserror::Error)]
@@ -65,6 +69,10 @@ impl CaptureSource for X11Capture {
     /// X11 has no picker: the whole screen is shared.
     fn kind(&self) -> Option<ShareKind> {
         Some(ShareKind::Screen)
+    }
+
+    fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
+        pick::take(request, &[])
     }
 
     fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {

@@ -107,11 +107,10 @@ nnnoiseless = { version = "0.5", default-features = false }
 # dependencies). The library name is `rnnoise`, and the build needs network for it. It is used by
 # the engine, because a published crate cannot carry a git dependency (issue #176).
 rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "4430677a365294ca8a6fd0b2e7854c02537a47a4" }
-# Bovnar (MIT, issue #400): the published crates.io crate, every unit profile on. The build compiles
-# the C sources, so it needs a C compiler. The plugin SDK pins this exact version and bundles a
-# prebuilt wasm32 library of the same sources (scripts/build-bovnar-wasm.sh), so a new Bovnar
-# version only arrives with an SDK upgrade.
-bovnar = "=2.0.0"
+# Bovnar (MIT), published on crates.io (issue #400). The build compiles the bundled C sources, so
+# it needs a C compiler but no Python. All unit-profile features stay on (the default). 2.0.2 is
+# the first release whose crate carries PROVENANCE.json, which scripts/notices.js checks.
+bovnar = "2.0.2"
 sonora = "0.2"
 rtrb = "0.4"
 # Lock-free bounded queue: the camera frame pool hands buffers between capture and consumer

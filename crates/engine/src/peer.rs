@@ -17,8 +17,8 @@ use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 
 use mumcord_p2p::{
-    BroadcastErrorReason, BroadcastId, MAX_PEER_BYTES, PEER_DATA_ID, PeerMessage, RequestId,
-    TokenErrorReason,
+    BroadcastErrorReason, BroadcastId, BroadcastKind, MAX_PEER_BYTES, PEER_DATA_ID, PeerMessage,
+    RequestId, TokenErrorReason,
 };
 pub use mumcord_p2p::{RelayAnnouncement, RelayRefusal, RelayState, RelayToken, RelayUse};
 use mumcord_protocol::PluginData;
@@ -374,6 +374,16 @@ type TokenReply = Result<RelayToken, RelayUnavailable>;
 /// The bot's answer to `bcast-req` or `bcast-admit` (spec 07, section 6.6).
 type BroadcastReply = Result<Option<(BroadcastId, RelayToken)>, BroadcastErrorReason>;
 
+/// Where a `bcast-tok` goes. A sender can run a broadcast of each kind at once, so the token is
+/// handed only to the side of the kind the bot named.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum BroadcastTokenRoute {
+    ScreenShare,
+    PluginData,
+    /// No side takes it; only the reason is logged.
+    Ignore(&'static str),
+}
+
 /// How long the sharer listens for a `bcast-err` after `bcast-admit`; the bot answers a
 /// successful admission only to the viewer, so silence means admitted.
 const ADMIT_ERROR_WAIT: Duration = Duration::from_secs(5);
@@ -568,8 +578,12 @@ impl Relays {
                 self.on_broadcast_reply(ctx.server_id, sender, rid, Err(reason));
             }
             PeerMessage::BroadcastToken {
-                id, token, sharer, ..
-            } => self.on_broadcast_token(ctx, sender, sharer, id, token),
+                id,
+                token,
+                sharer,
+                kind,
+                ..
+            } => self.on_broadcast_token(ctx, sender, sharer, kind, id, token),
             // Only relay bots receive token requests and the sharer's broadcast messages.
             PeerMessage::TokenRequest { .. }
             | PeerMessage::BroadcastRequest { .. }
@@ -685,36 +699,57 @@ impl Relays {
         }
     }
 
-    /// `bcast-tok` (FR-7.42, FR-9.59): taken only from the pinned bot. The screen share side
-    /// takes it while this client asked that sharer to watch; otherwise it is a plugin-data
-    /// broadcast the sender admitted this client to (the token carries no kind).
+    /// `bcast-tok` (FR-7.42): handed to the side of its broadcast kind; each side checks that
+    /// this client waits for that sharer.
     fn on_broadcast_token(
         &self,
         ctx: &SessionCtx,
         sender: u32,
         sharer: u32,
+        kind: BroadcastKind,
         id: BroadcastId,
         token: RelayToken,
     ) {
-        let pinned = |relay_use| {
-            lock(&self.state)
-                .servers
-                .get(&ctx.server_id)
-                .and_then(|r| r.usable_for(relay_use).ok())
-                .is_some_and(|a| a.session == sender)
-        };
-        let Some(engine) = self.engine.get().and_then(WeakEngine::upgrade) else {
-            return;
-        };
-        if pinned(RelayUse::ScreenShare)
-            && engine.screen_share_broadcast_token(ctx, sharer, id, token.clone())
-        {
-            return;
+        let route = self.broadcast_token_route(ctx.server_id, sender, kind);
+        let engine = || self.engine.get().and_then(WeakEngine::upgrade);
+        match route {
+            BroadcastTokenRoute::ScreenShare => {
+                if let Some(engine) = engine() {
+                    engine.screen_share_broadcast_token(ctx, sharer, id, token);
+                }
+            }
+            BroadcastTokenRoute::PluginData => {
+                if let Some(engine) = engine() {
+                    engine.plugin_relay_broadcast_token(ctx, sharer, id, token);
+                }
+            }
+            BroadcastTokenRoute::Ignore(reason) => {
+                tracing::debug!("ignoring a broadcast token: {reason}");
+            }
         }
-        if pinned(RelayUse::PluginData) {
-            engine.plugin_relay_broadcast_token(ctx, sharer, id, token);
-        } else {
-            tracing::debug!("ignoring a broadcast token not from the pinned relay bot");
+    }
+
+    /// Only the pinned bot that is usable for the token's kind may hand out its tokens.
+    fn broadcast_token_route(
+        &self,
+        server_id: ServerId,
+        sender: u32,
+        kind: BroadcastKind,
+    ) -> BroadcastTokenRoute {
+        let pinned = lock(&self.state)
+            .servers
+            .get(&server_id)
+            .and_then(|r| r.usable_for(kind.relay_use()).ok())
+            .is_some_and(|a| a.session == sender);
+        if !pinned {
+            return BroadcastTokenRoute::Ignore("not from the pinned relay bot for its kind");
+        }
+        match kind {
+            BroadcastKind::ScreenShare => BroadcastTokenRoute::ScreenShare,
+            BroadcastKind::PluginData => BroadcastTokenRoute::PluginData,
+            BroadcastKind::Camera => {
+                BroadcastTokenRoute::Ignore("no camera broadcast is waiting on this client")
+            }
         }
     }
 
@@ -1777,6 +1812,62 @@ mod tests {
         assert_eq!(relays.availability_for(1, RelayUse::PluginData), Ok(()));
         assert_eq!(relays.plugin_data_kbps(1), Some(512));
         assert_eq!(relays.info(1).uses, [RelayUse::PluginData]);
+    }
+
+    #[test]
+    fn broadcast_tokens_go_to_the_side_of_their_kind() {
+        let relays = relays_with_uses(
+            Some(vec![RelayUse::ScreenShare, RelayUse::PluginData]),
+            Some(10),
+        );
+        // A sender with a screen share, plugin data and a camera broadcast at once: each token
+        // reaches only its own side.
+        assert_eq!(
+            relays.broadcast_token_route(1, 5, BroadcastKind::ScreenShare),
+            BroadcastTokenRoute::ScreenShare
+        );
+        assert_eq!(
+            relays.broadcast_token_route(1, 5, BroadcastKind::PluginData),
+            BroadcastTokenRoute::PluginData
+        );
+        assert!(matches!(
+            relays.broadcast_token_route(1, 5, BroadcastKind::Camera),
+            BroadcastTokenRoute::Ignore(_)
+        ));
+    }
+
+    #[test]
+    fn an_old_bot_without_kind_reaches_screen_sharing_only() {
+        let relays = relays_with_uses(None, Some(10));
+        let old_bot = format!(
+            r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{}","ttl":60,"sharer":8}}"#,
+            "A".repeat(43)
+        );
+        let Ok(PeerMessage::BroadcastToken { kind, .. }) = PeerMessage::decode(old_bot.as_bytes())
+        else {
+            panic!("an old bot's token must decode");
+        };
+        assert_eq!(
+            relays.broadcast_token_route(1, 5, kind),
+            BroadcastTokenRoute::ScreenShare
+        );
+    }
+
+    #[test]
+    fn broadcast_tokens_need_the_pinned_bot_usable_for_their_kind() {
+        let relays = relays_with_uses(Some(vec![RelayUse::ScreenShare]), Some(10));
+        assert!(matches!(
+            relays.broadcast_token_route(1, 5, BroadcastKind::PluginData),
+            BroadcastTokenRoute::Ignore(_)
+        ));
+        assert!(matches!(
+            relays.broadcast_token_route(1, 6, BroadcastKind::ScreenShare),
+            BroadcastTokenRoute::Ignore(_)
+        ));
+        assert!(matches!(
+            relays.broadcast_token_route(2, 5, BroadcastKind::ScreenShare),
+            BroadcastTokenRoute::Ignore(_)
+        ));
     }
 
     #[test]

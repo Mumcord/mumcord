@@ -107,6 +107,16 @@ pub struct P2pLink {
     pub ip_hidden: bool,
 }
 
+/// Whether a new connection may show the direct connection question (FR-2.36).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConsentPrompt {
+    /// The user started the action (sharing, opening a full image): ask while undecided.
+    Allowed,
+    /// Background work (synced history images): never interrupt the user; while the consent
+    /// is undecided only the relay is used, and without it the caller falls back to plugin data.
+    Never,
+}
+
 /// Whether this side may connect directly (FR-4.5).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum DirectUse {
@@ -742,7 +752,9 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
                 return;
             }
             match kind[0] {
-                STREAM_FULL_IMAGE => crate::full_image::serve_direct(&engine, send, recv).await,
+                STREAM_FULL_IMAGE => {
+                    crate::full_image::serve_direct(&engine, key, send, recv).await;
+                }
                 STREAM_SCREEN => {
                     crate::screen_share::serve_direct(&engine, key.0, key.1, send, recv).await;
                 }
@@ -950,6 +962,18 @@ impl Engine {
         session: u32,
         relay_use: RelayUse,
     ) -> Result<Arc<PeerConnection>, DirectError> {
+        self.p2p_connection_prompting(server_id, session, relay_use, ConsentPrompt::Allowed)
+            .await
+    }
+
+    /// [`Engine::p2p_connection`], asking the consent question only when `prompt` allows it.
+    async fn p2p_connection_prompting(
+        &self,
+        server_id: ServerId,
+        session: u32,
+        relay_use: RelayUse,
+        prompt: ConsentPrompt,
+    ) -> Result<Arc<PeerConnection>, DirectError> {
         let key = (server_id, session);
         if let Some(open) = self.p2p_open_for(key, relay_use, false) {
             return open;
@@ -957,7 +981,9 @@ impl Engine {
         let (ctx, peer_hash) = self.p2p_peer(server_id, session)?;
         let relay = self.relays().availability_for(server_id, relay_use);
         let plan = plan_for(&ctx.store(), server_id, relay)?;
-        let asked = plan.direct == DirectUse::Ask && self.direct_allowed(&ctx).await;
+        let asked = plan.direct == DirectUse::Ask
+            && prompt == ConsentPrompt::Allowed
+            && self.direct_allowed(&ctx).await;
         let reveal = plan.reveal(asked)?;
         self.p2p_offer(&ctx, key, &peer_hash, reveal, relay, relay_use, false)
             .await
@@ -1123,16 +1149,20 @@ impl Engine {
 
     /// Opens a stream of `kind` (a `STREAM_*` constant) on the direct connection to `session`,
     /// connecting first when needed. The kind byte is already sent; the other side routes the
-    /// stream to its handler for that kind.
+    /// stream to its handler for that kind. `prompt` says whether a new connection may ask the
+    /// consent question.
     pub async fn p2p_open_stream(
         &self,
         server_id: ServerId,
         session: u32,
         kind: u8,
+        prompt: ConsentPrompt,
     ) -> Result<(SendStream, RecvStream), DirectError> {
         let relay_use =
             stream_use(kind).ok_or_else(|| DirectError::Stream(format!("unknown kind {kind}")))?;
-        let conn = self.p2p_connection(server_id, session, relay_use).await?;
+        let conn = self
+            .p2p_connection_prompting(server_id, session, relay_use, prompt)
+            .await?;
         let (mut send, recv) = conn
             .connection()
             .open_bi()

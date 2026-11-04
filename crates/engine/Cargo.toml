@@ -61,6 +61,8 @@ x11rb.workspace = true
 ashpd = { workspace = true, features = ["screencast"] }
 pipewire.workspace = true
 futures-util.workspace = true
+# Ready share-sound frames go from the PipeWire loop to the sound thread without locks.
+crossbeam-queue.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Screen capture with the shared app's sound: ScreenCaptureKit (macOS 12.3+, sound 13+, system
@@ -92,10 +94,12 @@ windows = { version = "0.62", features = [
     "Win32_Graphics_Dwm",
     "Win32_Graphics_Dxgi",
     "Win32_Graphics_Dxgi_Common",
+    "Win32_Graphics_Gdi",
     "Win32_Media_Audio",
     "Win32_Storage_FileSystem",
     "Win32_System_Com",
     "Win32_System_Com_StructuredStorage",
+    "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_Power",
     "Win32_System_SystemInformation",
     "Win32_System_Threading",

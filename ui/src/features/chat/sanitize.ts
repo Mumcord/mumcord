@@ -6,6 +6,7 @@
 import DOMPurify from "dompurify";
 import { canonicalLink } from "./mumbleLink";
 import { FULL_ATTRIBUTE, FULL_REFERENCE } from "./fullImage";
+import { IMAGE_REF_ATTRIBUTE, IMAGE_REFERENCE, withPlaceholders } from "./historyImages";
 
 /** Marks a message card on the wire (see `cards.ts`); kept on `<div>` only. */
 const CARD_ATTRIBUTE = "data-mumcord-card";
@@ -76,6 +77,9 @@ const purifier = DOMPurify(window);
 purifier.addHook("uponSanitizeAttribute", (node, data) => {
   if (node.nodeName === "IMG" && data.attrName === FULL_ATTRIBUTE) {
     data.forceKeepAttr = FULL_REFERENCE.test(data.attrValue);
+  } else if (node.nodeName === "IMG" && data.attrName === IMAGE_REF_ATTRIBUTE) {
+    // A synced image that is still being fetched (FR-1.60f); becomes a placeholder below.
+    data.forceKeepAttr = IMAGE_REFERENCE.test(data.attrValue);
   } else if (node.nodeName === "DIV" && data.attrName === CARD_ATTRIBUTE) {
     // Plain data; `cards.ts` parses the value strictly.
     data.forceKeepAttr = true;
@@ -91,7 +95,8 @@ purifier.addHook("afterSanitizeAttributes", (node) => {
     node.setAttribute("rel", "noopener noreferrer");
   } else if (node.nodeName === "IMG") {
     const src = node.getAttribute("src");
-    if (src === null || !SAFE_IMAGE.test(src.trim())) node.remove();
+    const waiting = src === null && node.hasAttribute(IMAGE_REF_ATTRIBUTE);
+    if (!waiting && (src === null || !SAFE_IMAGE.test(src.trim()))) node.remove();
   }
 });
 
@@ -107,7 +112,7 @@ export function sanitizeHtml(html: string): string {
   });
   // A `mumble://` link is never opened by itself, and its credentials never reach the screen
   // (issue #175). The card under the message has the buttons.
-  return clean.replace(MUMBLE_TEXT, (match) => canonicalLink(match));
+  return withPlaceholders(clean.replace(MUMBLE_TEXT, (match) => canonicalLink(match)));
 }
 
 /** Visible text of a message, e.g. for screen-reader announcements. */
