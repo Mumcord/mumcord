@@ -47,7 +47,7 @@ export function ActivityLine({ activity }: { activity: StageActivityView }) {
 
   return (
     <li className="plugin-activity">
-      <StageIcon name={plugin} url={icon} small />
+      <StageIcon id={activity.plugin} name={plugin} url={icon} small />
       <span className="plugin-activity__text">
         {t(getPlugin ? "activityPlaying" : "activityStarted", {
           name: activity.starterName,

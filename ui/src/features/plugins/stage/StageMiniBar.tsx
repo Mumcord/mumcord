@@ -22,7 +22,7 @@ function StageMiniBar({ activity }: { activity: StageActivityView }) {
     <MiniBar
       label={t("mediaLabel", { plugin: name })}
       title={activity.title || name}
-      thumbnail={<StageIcon name={name} url={icon} />}
+      thumbnail={<StageIcon id={activity.plugin} name={name} url={icon} />}
       progress={
         activity.startedByMe
           ? t("startedByYou", { count })

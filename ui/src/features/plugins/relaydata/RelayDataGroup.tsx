@@ -3,7 +3,8 @@ import { getApi, type InstalledPlugin, type PluginRelayAvailability } from "../.
 import { Group } from "../../settings/components/Section";
 import { Switch } from "../../settings/components/Switch";
 import { useServers } from "../../servers/store";
-import { displayName, initials } from "../installed/labels";
+import { displayName } from "../installed/labels";
+import { PluginTile } from "../render/PluginTile";
 import { updatePlatformSettings, usePlatformSettings } from "../platformSettings";
 import { usePlugins } from "../pluginStore";
 import { RELAY, asksForRelay } from "./relayPermission";
@@ -76,9 +77,7 @@ function PluginRow({ plugin, bytes }: { plugin: InstalledPlugin; bytes: number |
   const size = formatSize(bytes ?? 0, i18n.language);
   return (
     <li className="relay-plugin">
-      <span className="relay-plugin__icon" aria-hidden="true">
-        {initials(name)}
-      </span>
+      <PluginTile id={plugin.id} name={name} className="relay-plugin__icon" />
       <span className="relay-plugin__text">
         {name}
         <small>

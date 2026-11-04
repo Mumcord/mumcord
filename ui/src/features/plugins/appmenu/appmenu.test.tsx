@@ -45,8 +45,8 @@ describe("PluginMenuItems", () => {
       Promise.resolve([entry("brawl", "a"), entry("brawl", "b"), entry("dice", "roll")]);
     const { container } = render(<Menu />);
     await screen.findByRole("menuitem", { name: /dice roll/ });
-    const hues = Array.from(container.querySelectorAll<HTMLElement>(".appmenu__icon--tile")).map(
-      (tile) => tile.style.getPropertyValue("--appmenu-hue"),
+    const hues = Array.from(container.querySelectorAll<HTMLElement>(".plugin-tile")).map((tile) =>
+      tile.style.getPropertyValue("--plugin-hue"),
     );
     expect(hues).toHaveLength(3);
     expect(hues[0]).toBe(hues[1]);

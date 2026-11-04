@@ -4,7 +4,7 @@
 
 ### Added
 
-- The Apps menu now shows icons for "Share your screen" and "Watch together", and plugins without an icon get a coloured tile of their own
+- The Apps menu now shows icons for "Share your screen" and "Watch together", and plugins without an icon get a coloured tile of their own, also in the side panel, dialogs, the media area, plugin details and the relay data card
 - Plugins can add up to two items each to the Apps menu in the chat, under a "Plugins" group with the plugin's icon and name (more than eight go under "More plugins…"), and the same items show in the command palette (Ctrl+Shift+P) as "Plugin: Item". A plugin can grey an item out with a reason shown below it.
 - Plugins built for API 1.1 can send game data to one person through the server's relay when the relay allows plugin data: up to 64 KB per message, end-to-end encrypted, behind voice, screen sharing and files. Without the relay, small messages still go through the Mumble server. Turning off "Let plugins use a server's relay" moves plugin data off the relay at once.
 - Settings → Plugins has a "Plugin data through the relay" card: the on/off switch, whether each of your servers' relays allows plugin data (and how fast), and per plugin a switch plus how much data it used this session. The game stage shows the same state as a chip: "Relay · end-to-end encrypted" or "Mumble connection · slower".

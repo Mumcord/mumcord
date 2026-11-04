@@ -16,6 +16,7 @@ import { ResizeHandle } from "../../../app/ResizeHandle";
 import { ContextMenu, type MenuPosition } from "../../../components/ContextMenu";
 import { requestPluginScreen } from "../notifications/pluginRequests";
 import { usePlugins } from "../pluginStore";
+import { PluginTile } from "../render/PluginTile";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { usePluginUi, type PluginWebview } from "../render/pluginUiStore";
 import { PluginFrame } from "../webview";
@@ -211,9 +212,7 @@ function SidePanel({ open }: { readonly open: Open }) {
       />
       <header className="plugin-sidepanel__head">
         {icon === null ? (
-          <span className="plugin-sidepanel__icon" aria-hidden="true">
-            {name.slice(0, 1).toUpperCase()}
-          </span>
+          <PluginTile id={plugin} name={name} className="plugin-sidepanel__icon" />
         ) : (
           <img className="plugin-sidepanel__icon" src={icon} alt="" />
         )}

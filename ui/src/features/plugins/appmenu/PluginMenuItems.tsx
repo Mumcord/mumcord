@@ -1,28 +1,14 @@
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePluginIconUrl } from "../render/assets";
+import { PluginTile } from "../render/PluginTile";
 import { activateAppMenuItem, MENU_LIMIT, useAppMenu, type AppMenuEntry } from "./useAppMenu";
 import "./appmenu.css";
-
-/** A stable hue (0-359) per plugin id, so a plugin keeps its tile colour everywhere. */
-function pluginHue(pluginId: string): number {
-  let hash = 2166136261;
-  for (const char of pluginId) {
-    hash = Math.imul(hash ^ (char.codePointAt(0) ?? 0), 16777619) >>> 0;
-  }
-  return hash % 360;
-}
 
 function EntryIcon({ entry }: { entry: AppMenuEntry }) {
   const url = usePluginIconUrl(entry.plugin, entry.icon);
   return url === null ? (
-    <span
-      className="appmenu__icon appmenu__icon--tile"
-      style={{ "--appmenu-hue": pluginHue(entry.plugin) } as CSSProperties}
-      aria-hidden="true"
-    >
-      {Array.from(entry.pluginName)[0]?.toUpperCase()}
-    </span>
+    <PluginTile id={entry.plugin} name={entry.pluginName} className="appmenu__icon" />
   ) : (
     <img className="appmenu__icon" src={url} alt="" width={20} height={20} />
   );

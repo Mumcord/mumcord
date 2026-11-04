@@ -35,7 +35,7 @@ function StageEntry({ activity }: { activity: StageActivityView }) {
   useEffect(() => {
     unregister.current = registerStageItem(`plugin:${activity.plugin}`, {
       label,
-      icon: <StageIcon name={label} url={icon} small />,
+      icon: <StageIcon id={activity.plugin} name={label} url={icon} small />,
       render: () => <DockedStage activity={activity} />,
     });
   }, [activity, label, icon]);

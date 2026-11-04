@@ -46,8 +46,6 @@
   height: 1.75rem;
   overflow: hidden;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #e0524d, #e2a72e);
-  color: #fff;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
 }
@@ -59,7 +57,8 @@
   font-size: 0.6875rem;
 }
 
-.plugin-stage__icon img {
+.plugin-stage__icon img,
+.plugin-stage__icon .plugin-stage__tile {
   width: 100%;
   height: 100%;
   object-fit: cover;

@@ -5,21 +5,28 @@
  */
 import { useTranslation } from "react-i18next";
 import type { InstalledPlugin, StageActivityView } from "../../../api";
+import { PluginTile } from "../render/PluginTile";
 import { StageConnection } from "./StageConnection";
 
 /** The plugin's icon, or its first letter when it has none. */
 export function StageIcon({
+  id,
   name,
   url,
   small = false,
 }: {
+  id: string;
   name: string;
   url: string | null;
   small?: boolean;
 }) {
   return (
     <span className="plugin-stage__icon" data-small={small || undefined} aria-hidden="true">
-      {url === null ? (Array.from(name)[0] ?? "").toUpperCase() : <img src={url} alt="" />}
+      {url === null ? (
+        <PluginTile id={id} name={name} className="plugin-stage__tile" />
+      ) : (
+        <img src={url} alt="" />
+      )}
     </span>
   );
 }
@@ -50,7 +57,7 @@ export function StageHeader({ activity, plugin, icon, serverId }: StageHeaderPro
   const unofficial = plugin !== undefined && plugin.source.kind !== "official";
   return (
     <header className="plugin-stage__head">
-      <StageIcon name={name} url={icon} />
+      <StageIcon id={activity.plugin} name={name} url={icon} />
       <span className="plugin-stage__titles">
         <span className="plugin-stage__title">{activity.title || name}</span>
         <span className="plugin-stage__sub">

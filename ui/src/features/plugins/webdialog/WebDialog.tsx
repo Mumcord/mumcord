@@ -15,6 +15,7 @@ import { getApi, toEngineError } from "../../../api";
 import { takeDialogOpener } from "../dialog/pluginDialogStore";
 import { usePlugins } from "../pluginStore";
 import { closePluginDialog, usePluginUi, type PluginWebview } from "../render/pluginUiStore";
+import { PluginTile } from "../render/PluginTile";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { PluginFrame } from "../webview";
 import "./webdialog.css";
@@ -109,9 +110,7 @@ export function WebDialog({ plugin, title, webview }: Props) {
       >
         <div className="plugin-web-dialog__head">
           {icon === null ? (
-            <span className="plugin-web-dialog__icon" aria-hidden="true">
-              {name.slice(0, 1).toUpperCase()}
-            </span>
+            <PluginTile id={plugin} name={name} className="plugin-web-dialog__icon" />
           ) : (
             <img className="plugin-web-dialog__icon" src={icon} alt="" />
           )}
