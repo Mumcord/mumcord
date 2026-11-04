@@ -398,5 +398,10 @@
     "link": "Linkvisning skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
     "several_one": "{{count}} visning skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>.",
     "several_other": "{{count}} visninger skjult, fordi linkvisninger og indlejringer er slået fra i <settings>Indstillinger > Privatliv</settings>."
+  },
+  "historyImage": {
+    "loading": "Indlæser billede…",
+    "unavailable": "Billedet er ikke tilgængeligt",
+    "load": "Indlæs billede"
   }
 }

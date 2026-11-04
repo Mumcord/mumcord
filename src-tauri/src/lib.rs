@@ -185,6 +185,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             history::history_cleared_at,
             history::history_set_saving,
             history::history_sync_request,
+            history::history_image_load,
             profile::set_own_avatar,
             profile::default_avatar_get,
             profile::default_avatar_set,
@@ -383,6 +384,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             chat::MessageReceived,
             history::HistorySynced,
             history::HistorySyncStatus,
+            history::HistoryImageStatus,
             commands::full_image::FullImageProgress,
             commands::files::FileChipChanged,
             commands::files::FileCardChanged,
@@ -853,6 +855,12 @@ fn emit_engine_event(
             channel_id,
             running,
             added,
+        }
+        .emit(app),
+        EngineEvent::HistoryImageStatus { reference, state } => history::HistoryImageStatus {
+            server_id,
+            reference,
+            state: state.into(),
         }
         .emit(app),
         EngineEvent::FriendsChanged(list) => friends::FriendsChanged {

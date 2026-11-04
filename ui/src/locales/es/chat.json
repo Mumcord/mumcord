@@ -407,5 +407,10 @@
     "several_one": "{{count}} vista previa oculta, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
     "several_many": "{{count}} vistas previas ocultas, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>.",
     "several_other": "{{count}} vistas previas ocultas, porque las vistas previas de enlaces y el contenido incrustado están desactivados en <settings>Ajustes > Privacidad</settings>."
+  },
+  "historyImage": {
+    "loading": "Cargando imagen…",
+    "unavailable": "Imagen no disponible",
+    "load": "Cargar imagen"
   }
 }

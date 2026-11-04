@@ -425,5 +425,10 @@
     "several_few": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
     "several_many": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>.",
     "several_other": "{{count}} réamhamharc i bhfolach, mar go bhfuil réamhamhairc agus leabuithe nasc múchta i <settings>Socruithe > Príobháideachas</settings>."
+  },
+  "historyImage": {
+    "loading": "Íomhá á lódáil…",
+    "unavailable": "Níl an íomhá ar fáil",
+    "load": "Lódáil an íomhá"
   }
 }

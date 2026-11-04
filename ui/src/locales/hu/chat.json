@@ -398,5 +398,10 @@
     "link": "Linkelőnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
     "several_one": "{{count}} előnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>.",
     "several_other": "{{count}} előnézet elrejtve, mert a linkelőnézetek és beágyazások ki vannak kapcsolva itt: <settings>Beállítások > Adatvédelem</settings>."
+  },
+  "historyImage": {
+    "loading": "Kép betöltése…",
+    "unavailable": "A kép nem érhető el",
+    "load": "Kép betöltése"
   }
 }

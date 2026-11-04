@@ -407,5 +407,10 @@
     "several_one": "{{count}} aperçu masqué, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
     "several_many": "{{count}} aperçus masqués, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>.",
     "several_other": "{{count}} aperçus masqués, car les aperçus et intégrations de liens sont désactivés dans <settings>Paramètres > Confidentialité</settings>."
+  },
+  "historyImage": {
+    "loading": "Chargement de l’image…",
+    "unavailable": "Image non disponible",
+    "load": "Charger l’image"
   }
 }
