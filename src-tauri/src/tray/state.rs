@@ -353,6 +353,7 @@ pub mod fixtures {
                 write: false,
                 move_users: false,
                 ban: false,
+                kick: false,
             },
             description: None,
             has_description: false,

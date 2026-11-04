@@ -9,16 +9,7 @@ import { useTranslation } from "react-i18next";
 import type { BanChangeInput, BanEntry } from "../../api";
 import { Dialog } from "../servers/Dialog";
 import { initials } from "../servers/format";
-import { looksLikeAddress, maskAddress } from "./banFormat";
-
-/** The durations both forms offer (FR-10.12, issue #436). */
-const CHIPS: { secs: number; key: string }[] = [
-  { secs: 3600, key: "chipHour" },
-  { secs: 86_400, key: "chipDay" },
-  { secs: 604_800, key: "chipWeek" },
-  { secs: 2_592_000, key: "chipMonth" },
-  { secs: 0, key: "chipPermanent" },
-];
+import { DURATION_CHIPS, looksLikeAddress, maskAddress } from "./banFormat";
 
 /** The two kinds this dialog writes; a removal has no form. */
 export type BanDraft =
@@ -174,7 +165,7 @@ export function BanEditDialog({ change, entry, serverName, onStage, onClose }: B
         </div>
 
         <div className="admin-chips" role="group" aria-label={t("admin:duration")}>
-          {CHIPS.map((chip) => (
+          {DURATION_CHIPS.map((chip) => (
             <button
               key={chip.key}
               type="button"

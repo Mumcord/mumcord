@@ -28,6 +28,7 @@ import type {
   ActiveAudioProfile,
   BanEntry,
   PmConversationPrefs,
+  PersonTarget,
   PrivateConversation,
   ApiError,
   AudioDevices,
@@ -169,6 +170,11 @@ export interface MockControls {
   removeUser(session: number): void;
   /** Simulates a person joining the server (or changing, if the session exists). */
   upsertUser(user: User): void;
+  /**
+   * What `personTarget` answers for a person (issue #253): the address the server shows, how long
+   * they are connected, whether the ban list can be read, and the rights.
+   */
+  setPersonTarget(serverId: number, session: number, patch: Partial<PersonTarget>): void;
   /** Takes away the Enter permission of a channel; `MOCK_CHANNEL_PASSWORD` opens it (FR-2.78). */
   lockChannel(channelId: number): void;
   /** Changes a channel as a server update would, e.g. its user limit or permissions. */
@@ -675,6 +681,7 @@ const allow = {
   write: false,
   moveUsers: false,
   ban: false,
+  kick: false,
 };
 
 function seedChannels(): ChannelInfo[] {
@@ -784,9 +791,9 @@ function demoChannels(serverName: string): ChannelInfo[] {
     parentId,
     name,
     position,
-    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), and the
-    // server menu offers the ban list (#436).
-    permissions: { ...allow, moveUsers: true, ban: true },
+    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), the
+    // server menu offers the ban list (#436), and the person menu offers Kick… and Ban… (#253).
+    permissions: { ...allow, moveUsers: true, ban: true, kick: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -2081,6 +2088,31 @@ export function createMockApi(options: MockOptions = {}): MockApi {
 
   /** In-memory ban lists for the Server administration window (issue #254). */
   const banLists = new Map<number, BanEntry[]>();
+  /** What the kick and ban dialogs read about a person, per server and session (issue #253). */
+  const personTargets = new Map<number, Map<number, PersonTarget>>();
+
+  /**
+   * What `personTarget` can answer for a person: the rights come from the root channel as the
+   * engine reads them, the address from the `UserStats` answer the server only sends to admins.
+   */
+  function personTargetFor(serverId: number, session: number): PersonTarget | null {
+    const seeded = personTargets.get(serverId)?.get(session);
+    if (seeded) return seeded;
+    const snap = sessions.get(serverId)?.snapshot;
+    const user = snap?.users.find((u) => u.session === session);
+    if (!snap || !user) return null;
+    const root = snap.channels.find((c) => c.id === 0);
+    return {
+      session,
+      // Only documentation addresses (issue #436).
+      address: `198.51.100.${String(session)}`,
+      onlineSecs: 7200,
+      banListReadable: root?.permissions.ban === true,
+      certHash: user.certHash,
+      canKick: root?.permissions.kick === true,
+      canBan: root?.permissions.ban === true,
+    };
+  }
 
   // A mixed list for screenshots: active and expired entries, one without a name, one network
   // ban, and only documentation addresses (issue #436).
@@ -3410,6 +3442,68 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       banLists.delete(serverId);
       return Promise.resolve(null);
     },
+    personTarget: (serverId, session) => {
+      const target = personTargetFor(serverId, session);
+      if (!target) return fail("notFound", "the person is not on this server");
+      if (!target.canKick && !target.canBan) {
+        return fail("permissionDenied", "kick or ban right in the root channel");
+      }
+      return Promise.resolve(target);
+    },
+    personKick: (serverId, session, reason) => {
+      const outcome = checkAction(serverId, session, "kick");
+      if (outcome === "denied") return fail("permissionDenied", "kick right in the root channel");
+      if (outcome === "self") return fail("invalidInput", "kicking yourself is not offered");
+      removePerson(serverId, session);
+      // A send the server confirms is one it answers with the person's removal (issue #253).
+      return Promise.resolve(reason ? "confirmed" : "unconfirmed");
+    },
+    personBan: (serverId, session, input) => {
+      const target = personTargetFor(serverId, session);
+      if (!target) return fail("notFound", "the person is not on this server");
+      if (!target.canBan) return fail("permissionDenied", "ban right in the root channel");
+      const outcome = checkAction(serverId, session, "ban");
+      if (outcome === "denied") return fail("permissionDenied", "ban right in the root channel");
+      if (!input.byCert && !input.byIp)
+        return fail("invalidInput", "at least one target must stay on");
+      if (input.quick) {
+        removePerson(serverId, session);
+        return Promise.resolve({ kind: "quickBanned" });
+      }
+      const list = [...(banLists.get(serverId) ?? seedBans())];
+      const cert = input.byCert ? (target.certHash ?? "") : "";
+      const key = `${target.address ?? ""}/${String(input.mask)}|${cert}`;
+      const existing = list.find((entry) => entry.key === key);
+      if (
+        existing &&
+        !input.force &&
+        (existing.reason !== (input.reason ?? null) || existing.durationSecs !== input.duration)
+      ) {
+        return Promise.resolve({ kind: "conflict", key, fresh: list });
+      }
+      // The engine always applies its own change to the fresh copy (FR-10.66), so a second entry
+      // with the same key is what "Save mine anyway" sends.
+      {
+        list.push({
+          key,
+          name: nameOf(serverId, session),
+          certHash: cert === "" ? null : cert,
+          address: target.address ?? "",
+          mask: input.mask,
+          reason: input.reason ?? null,
+          start: new Date().toISOString(),
+          durationSecs: input.duration,
+          expired: false,
+        });
+        banLists.set(serverId, list);
+      }
+      if (input.removeNow) removePerson(serverId, session);
+      return Promise.resolve({ kind: "saved", key, removed: input.removeNow });
+    },
+    personActionClose: (serverId) => {
+      personTargets.delete(serverId);
+      return Promise.resolve(null);
+    },
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
@@ -3717,6 +3811,31 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     }),
   ) as EngineCommands;
 
+  /**
+   * The mock's stand-in for what the engine checks before a kick or a ban (issue #253): the rights
+   * the root channel grants, and that nobody acts on themselves.
+   */
+  function checkAction(
+    serverId: number,
+    session: number,
+    action: "kick" | "ban",
+  ): "ok" | "self" | "denied" {
+    const target = personTargetFor(serverId, session);
+    if (!target) return "denied";
+    if (sessions.get(serverId)?.snapshot?.selfSession === session) return "self";
+    return action === "kick" && !target.canKick ? "denied" : "ok";
+  }
+
+  function nameOf(serverId: number, session: number): string | null {
+    return sessions.get(serverId)?.snapshot?.users.find((u) => u.session === session)?.name ?? null;
+  }
+
+  /** Takes the person off the mock server, like a server that answers a kick with their removal. */
+  function removePerson(serverId: number, session: number): void {
+    currentServerId = serverId;
+    mock.removeUser(session);
+  }
+
   const mock: MockControls = {
     emit,
     failNext: (command, code, message = "injected failure") => {
@@ -3851,6 +3970,23 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const snap = requireSnapshot();
       snap.users = [...snap.users.filter((u) => u.session !== user.session), user];
       emitServer("userUpserted", { user });
+    },
+    setPersonTarget: (serverId, session, patch) => {
+      const byServer = personTargets.get(serverId) ?? new Map<number, PersonTarget>();
+      const current = personTargetFor(serverId, session);
+      byServer.set(session, {
+        ...(current ?? {
+          session,
+          address: null,
+          onlineSecs: null,
+          banListReadable: false,
+          certHash: null,
+          canKick: false,
+          canBan: false,
+        }),
+        ...patch,
+      });
+      personTargets.set(serverId, byServer);
     },
     lockChannel: (channelId) => {
       focused();
