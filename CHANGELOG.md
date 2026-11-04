@@ -27,6 +27,7 @@
 
 ### Changed
 
+- The third-party notices (About → Licences) name the exact Bovnar release and upstream commit the app is built from (Bovnar 2.0.2). The notices are only generated when every file of the Bovnar crate matches the provenance manifest it ships, so the library in the app and its licence notices are tied to one upstream release
 - The diagnostic file (Settings → Advanced & Developer → Save diagnostic file) is now a Bovnar document: the same facts as before, still readable in any text editor, in a structured form (#400)
 
 ### Fixed

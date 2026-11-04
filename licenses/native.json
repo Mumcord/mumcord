@@ -108,7 +108,8 @@
         "File offers and the diagnostic file are Bovnar documents. The library compiles in the unit",
         "identifiers of the vocabularies listed in its third-party notices below."
       ],
-      "texts": ["@bovnar-license", "@bovnar-notices"]
+      "texts": ["@bovnar-license", "@bovnar-notices"],
+      "revision": "@bovnar"
     },
     {
       "name": "dav1d",
