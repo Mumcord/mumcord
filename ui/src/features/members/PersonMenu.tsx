@@ -3,6 +3,10 @@
  * their channel, add or remove friend (FR-1.64), view profile, revoke chat consent, local mute and
  * volume slider. Reuses the profile card's volume slider and local-mute action, so both
  * places store the same per-certificate settings. Yourself only gets "View profile".
+ *
+ * Epic 4, issue #253 adds the "Admin ▸" sub-menu after the normal items (FR-10.6, FR-10.7): Kick…
+ * and Ban…, in red, only with the right the server grants on the root channel (FR-10.1, FR-10.2),
+ * and never for yourself. The other admin items come with their own issues.
  */
 import {
   useEffect,
@@ -26,6 +30,9 @@ import { openRevokeConsentDialog } from "../requests/revokeConsentStore";
 import { useAcceptedConsent, usePmRequests } from "../requests/requestsStore";
 import { blockTargetFor, openBlockDialog, unblock, useBlock } from "../blocking";
 import { BLOCK_PATH } from "../blocking/BlockIcon";
+import { ContextMenu, type MenuPosition, type MenuItem } from "../../components/ContextMenu";
+import { canBan, canKick } from "../admin/permissions";
+import { openPersonAction } from "../admin/personActionStore";
 import "../userpanel/quicksettings.css";
 import "./members.css";
 import { joinTarget } from "./joinTarget";
@@ -48,6 +55,11 @@ import { requestPluginMenu, usePluginMenuEntries } from "../plugins/dialog";
 const EDGE = 8;
 
 const ITEMS = '[role="menuitem"], [role="menuitemcheckbox"], input[type="range"]';
+
+/** Shield for the admin sub-menu; the meaning also sits in its label (FR-2.16). */
+const ADMIN_ICON = "M12 3l8 3v6c0 4.5-3.5 8-8 9-4.5-1-8-4.5-8-9V6z";
+/** Leaving the server: a door with an arrow out, so a kick does not rest on its red colour alone. */
+const KICK_ICON = "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9";
 
 /** Decorative: the entry's label is the accessible name, so the icon stays hidden. */
 function MenuIcon({ children }: { children: ReactNode }) {
@@ -108,6 +120,9 @@ function PersonMenu({
   const ref = useRef<HTMLDivElement>(null);
   // The menu closes once the join succeeds; a failure keeps it open to show why.
   const [joinError, setJoinError] = useState<string | null>(null);
+  // The "Admin ▸" sub-menu (FR-10.6): it opens from its item and keeps the person menu open.
+  const [adminMenu, setAdminMenu] = useState<MenuPosition | null>(null);
+  const tAdmin = useTranslation("admin").t;
 
   const close = (returnFocus: boolean) => {
     closePersonMenu();
@@ -168,6 +183,50 @@ function PersonMenu({
   const ownChannel =
     state.selfSession === null ? undefined : state.users.get(state.selfSession)?.channelId;
   const inOwnChannel = user && !isSelf && ownChannel !== undefined && user.channelId === ownChannel;
+
+  // Kick… and Ban… only with the right the server granted on the root channel (FR-10.1, FR-10.2),
+  // never for yourself (issue #253), and never as a disabled item (FR-10.2).
+  const serverId = shownServerId();
+  const openAction = (mode: "kick" | "ban") => {
+    if (!user) return;
+    closePersonMenu();
+    openPersonAction(
+      serverId,
+      user.session,
+      user.name,
+      state.channels.get(user.channelId)?.name ?? "",
+      mode,
+    );
+  };
+  const adminItems: MenuItem[] =
+    user && !isSelf
+      ? [
+          ...(canKick(serverId)
+            ? [
+                {
+                  label: tAdmin("menuKick"),
+                  icon: KICK_ICON,
+                  danger: true,
+                  onSelect: () => {
+                    openAction("kick");
+                  },
+                },
+              ]
+            : []),
+          ...(canBan(serverId)
+            ? [
+                {
+                  label: tAdmin("menuBan"),
+                  icon: BLOCK_PATH,
+                  danger: true,
+                  onSelect: () => {
+                    openAction("ban");
+                  },
+                },
+              ]
+            : []),
+        ]
+      : [];
 
   // Chat requests (issue #141) reach Mumcord users who announced them, and only make sense for
   // people who may not write yet: not friends, no accepted conversation, no accepted request.
@@ -462,7 +521,53 @@ function PersonMenu({
             </MenuIcon>
             {block ? t("block.unblock") : t("block.menu")}
           </button>
+          {adminItems.length > 0 && (
+            <>
+              <div role="separator" className="person-menu__separator" />
+              {/* The sub-menu of the admin items (FR-10.6, FR-10.7); the arrow says it opens. */}
+              <button
+                type="button"
+                role="menuitem"
+                tabIndex={-1}
+                aria-haspopup="menu"
+                aria-expanded={adminMenu !== null}
+                className="server-menu__item person-menu__item"
+                onClick={(event) => {
+                  const opener = event.currentTarget;
+                  const rect = opener.getBoundingClientRect();
+                  setAdminMenu({ x: rect.right + 4, y: rect.top, opener });
+                }}
+              >
+                <MenuIcon>
+                  <path d={ADMIN_ICON} />
+                </MenuIcon>
+                <span className="quick-settings__text">
+                  <span className="quick-settings__label">{tAdmin("menuAdmin")}</span>
+                </span>
+                <svg
+                  className="server-menu__submenu"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </button>
+            </>
+          )}
         </>
+      )}
+      {adminMenu !== null && adminItems.length > 0 && (
+        <ContextMenu
+          menu={adminMenu}
+          label={tAdmin("menuAdmin")}
+          items={adminItems}
+          onClose={() => {
+            setAdminMenu(null);
+          }}
+        />
       )}
     </div>
   );

@@ -291,6 +291,17 @@
   gap: var(--space-1);
 }
 
+/* The mask reads as part of the address ("/24"), which is how the mockup shows it. */
+.admin-mask {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.admin-mask__sign {
+  color: var(--color-text-muted);
+}
+
 .admin-form__help {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
@@ -321,4 +332,35 @@
 
 .admin-ends {
   margin: 0;
+}
+
+/* The kick and ban dialogs (issue #253, mockup `03-ban-dialog`): who the dialog is about, and the
+   line that explains what the action does. Both read as plain text, never as a colour alone. */
+.admin-dialog__person {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.admin-dialog__note {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* A switch row as the mockup draws it: the switch first, then its label and what it applies to. The
+   state is on the input (role="switch"), so a screen reader says "on" or "off". */
+.admin-switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-switch__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.admin-switch__label {
+  font-weight: var(--font-weight-bold);
 }

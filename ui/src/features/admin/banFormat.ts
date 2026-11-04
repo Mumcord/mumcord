@@ -5,6 +5,15 @@
  */
 import type { BanEntry } from "../../api";
 
+/** The lengths both ban forms offer (FR-10.12, issue #436); 0 is permanent. */
+export const DURATION_CHIPS: readonly { secs: number; key: string }[] = [
+  { secs: 3600, key: "chipHour" },
+  { secs: 86_400, key: "chipDay" },
+  { secs: 604_800, key: "chipWeek" },
+  { secs: 2_592_000, key: "chipMonth" },
+  { secs: 0, key: "chipPermanent" },
+];
+
 /** Server text is untrusted: render it as plain text, without control characters (FR-10.67). */
 export function plain(value: string | null): string {
   return (value ?? "").replace(/\p{C}/gu, "").slice(0, 200);
