@@ -67,12 +67,12 @@ const dataRoot =
 
 /**
  * What this module knows about the environment across spec files (each spec file runs in its own
- * worker process): `config` is the running configuration (unset while stopped), `dirty` that a
- * spec registered users on its server since the last data reset.
+ * worker process): `config` is the running configuration (unset while stopped), `dirty` the worker
+ * process whose spec registered users on its server since the last data reset (`true`: unknown).
  */
 interface RelayState {
   config?: string;
-  dirty: boolean;
+  dirty: number | boolean;
 }
 
 const stateFile = join(dataRoot, "e2e-state.json");
@@ -133,8 +133,11 @@ export async function startRelay(
     apiPort: portBase + 2,
   };
   const state = readState();
-  if (state.dirty) {
+  // Only a later spec file wipes the data: the spec that registered keeps its registrations while
+  // it switches profiles, or its users would come back unregistered and get no relay tokens.
+  if (state.dirty !== false && state.dirty !== process.pid) {
     await resetRelayData();
+    state.dirty = false;
   } else if (state.config === config && (await reusable())) {
     console.log(`[relayenv] reusing the running '${profile}' environment`);
     publish(current);
@@ -145,7 +148,7 @@ export async function startRelay(
   if (opts.botImage) env.MUMBOT_IMAGE = opts.botImage;
   // up.sh recreates the relay and the server with the new profile; no stop needed in between.
   await runOk(testenvScript("up.sh"), [], env);
-  writeState({ config, dirty: false });
+  writeState({ config, dirty: state.dirty });
   publish(current);
   return current;
 }
@@ -161,7 +164,7 @@ function publish(r: Relay): void {
  * certificates) out, so the next `startRelay` wipes the server data first.
  */
 export function noteRegistration(): void {
-  if (relayAvailable()) writeState({ ...readState(), dirty: true });
+  if (relayAvailable()) writeState({ ...readState(), dirty: process.pid });
 }
 
 /**
