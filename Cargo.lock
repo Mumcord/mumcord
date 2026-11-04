@@ -4059,6 +4059,7 @@ dependencies = [
  "block2",
  "bovnar",
  "bytes",
+ "crossbeam-queue",
  "dispatch2",
  "futures-util",
  "html5ever 0.40.1",
