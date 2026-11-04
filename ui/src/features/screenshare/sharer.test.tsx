@@ -157,6 +157,15 @@ describe("sharer controls", () => {
 
   it("lists who is watching and says when the share is full", async () => {
     const api = await linuxMock();
+    const preview = await api.screenSharePreview(
+      1,
+      { resolution: "auto", fps: "30", optimize: "balanced", uploadLimit: "auto" },
+      "auto",
+    );
+    vi.spyOn(api, "screenSharePreview").mockResolvedValue({
+      ...preview,
+      path: { kind: "copies", maxViewers: 8 },
+    });
     render(<SharerBar />);
     act(() => {
       api.mock.emit("screenSharesChanged", {
@@ -282,7 +291,9 @@ describe("sharer control bar", () => {
     await vi.waitFor(() => {
       expect(popover).toHaveTextContent("1080p · 60 fps");
       expect(popover).toHaveTextContent("1080p · 20 fps");
-      expect(popover).toHaveTextContent("Quality adapts to the slowest viewer");
+      expect(popover).toHaveTextContent(
+        "Ben gets 20 fps: their connection can't keep up with 60 fps",
+      );
     });
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("group", { name: "Viewers" })).toBeNull();

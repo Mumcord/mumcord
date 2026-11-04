@@ -24,6 +24,7 @@ function channel(id: number, parentId: number | null, name: string): ChannelInfo
       whisper: true,
       write: false,
       moveUsers: false,
+      ban: false,
     },
     description: null,
     hasDescription: false,

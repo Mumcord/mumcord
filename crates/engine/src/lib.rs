@@ -2,6 +2,7 @@
 //! (`src-tauri`) talks only to [`Engine`] and converts its types into command/event types.
 
 pub mod audio_rating;
+pub mod banlist;
 mod blocking;
 pub mod cache;
 pub mod chat;
@@ -41,6 +42,7 @@ pub mod watch_party;
 pub mod web;
 pub mod whisper;
 
+pub use banlist::{BanChange, BanSaveOutcome, BanView};
 pub use chat::{ChatMessageView, HistoryScope};
 pub use follow::FollowAllSummary;
 pub use friends::{FriendPresence, FriendView};

@@ -274,10 +274,11 @@ describe("sharer live bar", () => {
       optimize: "balanced",
       uploadLimit: "auto",
     });
-    await waitFor(() => { expect(heard).toContainEqual({
+    await waitFor(() => {
+      expect(heard).toContainEqual({
         message: "The screen share did not take your change.",
         politeness: "assertive",
-      }); },
-    );
+      });
+    });
   });
 });

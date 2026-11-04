@@ -427,7 +427,7 @@ describe("joinTarget", () => {
     if (!gaming) throw new Error("seed channel missing");
     const denied = new Map(state.channels).set(2, {
       ...gaming,
-      permissions: { ...gaming.permissions, enter: false },
+      permissions: { ...gaming.permissions, enter: false, ban: false },
     });
     expect(joinTarget({ ...state, channels: denied }, carla)?.blocked).toBe("locked");
     expect(joinTarget(state, carla)?.blocked).toBeNull();

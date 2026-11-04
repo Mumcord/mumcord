@@ -34,8 +34,10 @@ import { P2pLinkText } from "../p2p/P2pLinkText";
 import { useP2pLink } from "../p2p/useP2pLink";
 import { InfoCircleIcon, MonitorIcon, SignalIcon } from "./icons";
 import { PathTag, SoundLevel } from "./parts";
-import { clockOf } from "./shareFormat";
+import { clockOf, codecName, viaRelay } from "./shareFormat";
 import { ScreenStage } from "./ScreenStage";
+import type { ScreenWatch } from "./useScreenWatch";
+import { ViewerQualityMenu } from "./ViewerQuality";
 import { useDismiss } from "./useDismiss";
 import { shareStartedAt, useScreenShareOf } from "./sharesStore";
 import type { StreamStats } from "./streamStats";
@@ -78,6 +80,9 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
   const link = useP2pLink(serverId, session);
   const [stats, setStats] = useState<WatchStats | null>(null);
   const [details, setDetails] = useState(false);
+  const [watch, setWatch] = useState<Pick<ScreenWatch, "codec" | "maxFps" | "setMaxFps"> | null>(
+    null,
+  );
   const user = users.get(session);
   // The share's own volume, remembered per person and separate from their voice (issue #333);
   // the slider follows a change at once, before the engine confirms it.
@@ -176,6 +181,9 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
             t={t}
             shown={shown}
             link={link}
+            stats={stats}
+            watch={watch}
+            name={name}
             sound={sound}
             details={details}
             detailsButton={detailsButton}
@@ -193,8 +201,17 @@ export function Viewer({ serverId, session }: { serverId: number; session: numbe
             name={name}
             paused={paused}
             meter={meter}
+            onWatch={setWatch}
           />
-          {details && <StreamDetails t={t} shown={shown} link={link} panelRef={detailsPanel} />}
+          {details && (
+            <StreamDetails
+              t={t}
+              shown={shown}
+              link={link}
+              codec={codecName(watch?.codec ?? null)}
+              panelRef={detailsPanel}
+            />
+          )}
         </div>
       }
       controls={
@@ -241,6 +258,9 @@ function Chips({
   t,
   shown,
   link,
+  stats,
+  watch,
+  name,
   sound,
   details,
   detailsButton,
@@ -249,6 +269,9 @@ function Chips({
   t: TFunction<"screenviewer">;
   shown: StreamStats;
   link: P2pLink | null;
+  stats: WatchStats | null;
+  watch: Pick<ScreenWatch, "codec" | "maxFps" | "setMaxFps"> | null;
+  name: string;
   sound: boolean;
   details: boolean;
   detailsButton: RefObject<HTMLButtonElement | null>;
@@ -256,6 +279,10 @@ function Chips({
 }): ReactNode {
   // Before the first frame there is nothing to count yet; the chips appear with the picture.
   const live = shown.width > 0;
+  const relayed = stats !== null && viaRelay(stats.path);
+  const codec = codecName(watch?.codec ?? null);
+  const how =
+    codec === null ? null : t(relayed ? "header.codecViaRelay" : "header.codecDirect", { codec });
   return (
     <span className="share-chips">
       {live && (
@@ -275,7 +302,12 @@ function Chips({
           )}
         </>
       )}
-      {link !== null && <PathTag path={link.path} chip />}
+      {how !== null && (
+        <span className="share-chip" data-tooltip={t("codec")} aria-label={how}>
+          {codec}
+        </span>
+      )}
+      {link !== null && <PathTag path={relayed ? "relayUdp" : link.path} chip />}
       <span className="share-chip" data-tooltip={t("sound")}>
         <VolumeIcon muted={!sound} size={14} />
         {t(sound ? "soundOn" : "soundOff")}
@@ -291,6 +323,20 @@ function Chips({
       >
         <InfoCircleIcon />
       </button>
+      {watch !== null && (
+        <ViewerQualityMenu
+          name={name}
+          summary={
+            live
+              ? [`${String(shown.height)}p`, `${String(shown.fps)} fps`, codec]
+                  .filter((part) => part !== null)
+                  .join(" · ")
+              : null
+          }
+          maxFps={watch.maxFps}
+          onMaxFps={watch.setMaxFps}
+        />
+      )}
     </span>
   );
 }
@@ -322,11 +368,13 @@ function StreamDetails({
   t,
   shown,
   link,
+  codec,
   panelRef,
 }: {
   t: TFunction<"screenviewer">;
   shown: StreamStats;
   link: P2pLink | null;
+  codec: string | null;
   panelRef: RefObject<HTMLDivElement | null>;
 }): ReactNode {
   const { i18n } = useTranslation();
@@ -337,7 +385,7 @@ function StreamDetails({
     [t("resolution"), live ? dimension(shown.width, shown.height) : unknown],
     [t("frameRate"), live ? `${String(shown.fps)} fps` : unknown],
     [t("bitrate"), shown.kbps === null ? unknown : bitrate(shown.kbps)],
-    [t("codec"), "VP9 · Opus"],
+    [t("codec"), `${codec ?? unknown} · Opus`],
     [t("path"), link === null ? unknown : <P2pLinkText link={link} />],
     [t("delay"), shown.delayMs === null ? unknown : `${String(shown.delayMs)} ms`],
     [

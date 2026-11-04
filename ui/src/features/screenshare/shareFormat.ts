@@ -1,3 +1,5 @@
+import type { VideoCodec } from "../../api";
+
 /** Figures as the screen share views write them (issue #163); pure, so tests can check them. */
 
 /** What one viewer gets: 1080, 60 → "1080p · 60 fps". */
@@ -14,4 +16,14 @@ export function clockOf(atMs: number, language: string): string {
 export function litBars(rms: number | null): number {
   if (rms === null) return 0;
   return Math.min(5, Math.ceil(Math.max(0, rms) * 5));
+}
+
+/** Codec names as people say them ("AV1", "VP9"). */
+export function codecName(codec: VideoCodec | null): string | null {
+  return codec === null ? null : codec.toUpperCase();
+}
+
+/** Whether a path goes through the server's relay (broadcast or per-viewer copies). */
+export function viaRelay(path: string): boolean {
+  return path !== "direct";
 }
