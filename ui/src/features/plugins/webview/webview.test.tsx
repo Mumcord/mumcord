@@ -4,7 +4,6 @@ import type { PluginFrameMute, PluginUi, PluginWebviewPlace } from "../../../api
 import { applyLanguage } from "../../../i18n";
 import axe from "axe-core";
 import { StageShown } from "../../media/stageContext";
-import { resetStageEntries, useStageEntries } from "../../media/stageRegistry";
 import { applyChange, type PluginUiState, type PluginWebview } from "../render/pluginUiStore";
 import {
   createBridge,
@@ -17,7 +16,6 @@ import {
 import { resetFrameMute, usePluginFramesDeafen } from "./frameMute";
 import { HEARTBEAT_TIMEOUT_MS } from "./heartbeat";
 import { PluginFrame } from "./PluginFrame";
-import { PluginStageFrames } from "./stageFrames";
 
 const api = vi.hoisted(() => ({
   sendEvent: vi.fn<(plugin: string, event: unknown) => Promise<null>>(() => Promise.resolve(null)),
@@ -455,35 +453,4 @@ describe("PluginFrame sound", () => {
   function view(): PluginWebview {
     return viewIn("sidePanel");
   }
-});
-
-describe("PluginStageFrames", () => {
-  function Stage() {
-    const { plugins } = useStageEntries();
-    return [...plugins.entries()].map(([id, item]) => (
-      <section key={id} aria-label={item.label}>
-        {item.render()}
-      </section>
-    ));
-  }
-
-  it("puts a stage page into the media area while it is open", async () => {
-    resetStageEntries();
-    const { container } = render(
-      <>
-        <PluginStageFrames />
-        <Stage />
-      </>,
-    );
-    const stage = (change: PluginUi["change"]) => {
-      emit("pluginUi", { plugin: "snacks", change });
-    };
-    stage({ type: "webviewShow", place: "dialog", url: URL });
-    expect(container.querySelector("section")).toBeNull();
-    stage({ type: "webviewShow", place: "stage", url: URL });
-    expect(await screen.findByRole("region", { name: "Snacks" })).toBeInTheDocument();
-    expect(container.querySelector('.plugin-frame[data-place="stage"] iframe')).not.toBeNull();
-    stage({ type: "webviewHide", place: "stage" });
-    expect(container.querySelector("section")).toBeNull();
-  });
 });

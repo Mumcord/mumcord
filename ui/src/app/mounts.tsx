@@ -25,7 +25,7 @@ import { ChannelAudioHost } from "../features/channelaudio";
 import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { Updater } from "../features/updates";
-import { PluginsHost } from "../features/plugins";
+import { PluginActivityLines, PluginsHost } from "../features/plugins";
 import { SidePanelHost } from "../features/plugins/sidepanel";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
@@ -206,6 +206,7 @@ export function ChatMount() {
         <SharerBar />
         {view.mini.watch && <WatchMiniBar serverId={serverId} />}
         {view.mini.share && <ShareMiniBar serverId={serverId} />}
+        <PluginActivityLines />
       </>
     );
   return (

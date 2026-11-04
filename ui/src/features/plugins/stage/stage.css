@@ -1,0 +1,224 @@
+/*
+ * A plugin activity in the media area (mockup surfaces 03). Like the other media views the card is
+ * dark in every theme, so its colours are fixed; a building-block tree inside it is the app's own
+ * UI and keeps the theme's colours on its own surface.
+ */
+.media-area .media-frame.plugin-stage:not([data-fullscreen]) {
+  max-width: none;
+}
+
+.plugin-stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-sizing: border-box;
+  padding: var(--space-3);
+  background: #0c0920;
+}
+
+/* The tab row and the activity form one card, as in the mockup. */
+.media-area:has(> .media-stage__panel:not([hidden]) > .plugin-stage) > .media-stage__row {
+  max-width: none;
+  margin-bottom: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background: #0c0920;
+  box-shadow: none;
+}
+
+.media-area:has(> .media-stage__row) .plugin-stage:not([data-fullscreen]) {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.plugin-stage__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+}
+
+.plugin-stage__icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #e0524d, #e2a72e);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-stage__icon[data-small] {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.6875rem;
+}
+
+.plugin-stage__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plugin-stage__titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.plugin-stage__title {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+}
+
+.plugin-stage__sub {
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+}
+
+.plugin-stage__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  margin-left: auto;
+}
+
+.plugin-stage__chip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  color: var(--media-on-scrim-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.plugin-stage__chip[data-tone="unofficial"] {
+  border-style: dashed;
+  border-color: rgb(255 207 112 / 55%);
+  color: #ffcf70;
+}
+
+.plugin-stage__chip[data-tone="ok"] {
+  border-color: #3ee39e;
+  color: #3ee39e;
+}
+
+.plugin-stage__chip[data-tone="warn"] {
+  border-color: rgb(255 207 112 / 70%);
+  color: #ffcf70;
+}
+
+/* The plugin's content: about 22 rem high in Auto, the chosen height once the area is resized. */
+.plugin-stage .plugin-stage__content {
+  height: min(22rem, 58vh);
+  aspect-ratio: auto;
+  border-radius: var(--radius-md);
+}
+
+.plugin-stage[data-fullscreen] .plugin-stage__content {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+.plugin-stage__content > * {
+  flex: 1;
+  align-self: stretch;
+}
+
+.plugin-stage__tree {
+  box-sizing: border-box;
+  padding: var(--space-3);
+  overflow: auto;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+}
+
+.plugin-stage__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+}
+
+.plugin-stage__button {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  height: 2.25rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-glass);
+  color: var(--media-on-scrim);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.plugin-stage__button:hover {
+  background: var(--media-hover);
+}
+
+.plugin-stage__button[aria-pressed="true"] {
+  background: rgb(255 255 255 / 16%);
+}
+
+.plugin-stage__button[data-tone="leave"] {
+  border-color: #ff8f8f;
+  color: #ff8f8f;
+}
+
+/* The dark theme's focus colour, since the card is dark in every theme. */
+.plugin-stage__button:focus-visible {
+  outline: 2px solid #ffb08a;
+  outline-offset: 2px;
+}
+
+.plugin-stage__banner {
+  position: absolute;
+  top: var(--space-4);
+  left: 50%;
+  z-index: 5;
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--media-glass-border);
+  border-radius: var(--radius-full);
+  background: var(--media-scrim);
+  color: var(--media-on-scrim);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .plugin-stage {
+    border: 1px solid CanvasText;
+  }
+
+  .plugin-stage__chip,
+  .plugin-stage__button,
+  .plugin-stage__banner {
+    border: 1px solid ButtonText;
+  }
+
+  .plugin-stage__button[aria-pressed="true"] {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
