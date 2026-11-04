@@ -103,29 +103,11 @@ async function expectShareReason(expected: string | null): Promise<void> {
   }
 }
 
-/**
- * Settings → Privacy & Connections: answers the direct connection question (FR-2.36) ahead of
- * time. Otherwise the first direct attempt (B fetching A's synced history images, FR-1.60f) opens
- * the consent dialog at an unpredictable moment, and its backdrop blocks the clicks that follow.
- */
-async function allowDirectConnections(): Promise<void> {
-  await openSettingsGroup("Privacy & Connections");
-  const toggle = $(
-    "//div[contains(concat(' ',normalize-space(@class),' '),' settings-switch ')][.//*[normalize-space(.)='Allow direct connections to other Mumcord users']]//input[@role='switch']",
-  );
-  await toggle.scrollIntoView();
-  if (!(await toggle.isSelected())) await toggle.click();
-  await browser.waitUntil(() => toggle.isSelected(), { timeoutMsg: "direct connections stayed off" });
-  await browser.keys("Escape");
-  await $("fieldset.p2p-modes").waitForExist({ reverse: true });
-}
-
 /** B joins the server of the running relay environment as `name` (fresh profile). */
 async function startB(name: string, port: number): Promise<void> {
   await apps.startB();
   await apps.onB(async () => {
     await completeWizard(name);
-    await allowDirectConnections();
     await addAndConnect(`localhost:${String(port)}`);
     await joinVoice();
   });
