@@ -3320,6 +3320,12 @@ export type PluginUiInput = { type: "profileCardOpened"; session: number } | { t
  *  ≤ 60/s; dropped otherwise, or when that frame is not open).
  */
 { type: "webviewMessage"; place: PluginWebviewPlace; text: string } | 
+/**
+ *  A genuine click or key press inside the plugin's page in `place` (FR-9.45), reported by
+ *  the page's bootstrap with the frame's key, which the UI checked. Counts as a user gesture
+ *  for the plugin; dropped when that frame is not open or the reports come too fast.
+ */
+{ type: "webviewGesture"; place: PluginWebviewPlace } | 
 /**  The user closed the plugin's frame in `place` (its close button). */
 { type: "surfaceClosed"; place: PluginWebviewPlace };
 

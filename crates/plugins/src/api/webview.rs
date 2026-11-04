@@ -15,7 +15,7 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard, PoisonError};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use base64::Engine as _;
 use sha2::{Digest, Sha256};
@@ -48,6 +48,9 @@ pub const PERMISSIONS_POLICY: &str = "camera=(), microphone=(), geolocation=(), 
     fullscreen=(), autoplay=()";
 /// Bridge messages per second, in each direction (FR-6.47).
 pub const MAX_MESSAGES_PER_SECOND: u32 = 60;
+/// The shortest time between two counted clicks or key presses from one plugin's pages
+/// (FR-9.45). The bootstrap reports at most every 250 ms; this is the host's own limit.
+pub const MIN_GESTURE_INTERVAL: Duration = Duration::from_millis(200);
 /// An entry path (below `web/`) longer than this is refused.
 const MAX_ENTRY_BYTES: usize = 512;
 /// The file types a package may carry in `web/` (same list as the package reader).
@@ -63,8 +66,8 @@ const MIME_TYPES: &[(&str, &str)] = &[
     (".svg", "image/svg+xml"),
 ];
 
-/// The script in front of every page (FR-9.41–9.43): heartbeat, Escape/F6 focus return and
-/// click-to-sound. It is the only inline script a page's CSP allows.
+/// The script in front of every page (FR-9.41–9.43, FR-9.45): heartbeat, Escape/F6 focus
+/// return, click-to-sound and trusted-input gesture reports. It is the only inline script a page's CSP allows.
 const BOOTSTRAP: &str = include_str!("webview_bootstrap.js");
 
 pub(crate) struct WebviewApi;
@@ -341,6 +344,8 @@ struct PluginWeb {
     frames: [Option<WebviewPlace>; MAX_FRAMES],
     /// One bridge rate per direction for all of the plugin's frames, set while any is open.
     rates: Option<Rates>,
+    /// The last click or key press in one of its pages that counted as a gesture (FR-9.45).
+    last_gesture: Option<Instant>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -620,6 +625,27 @@ impl Webviews {
         web.rates
             .as_mut()
             .is_some_and(|rates| rates.from_page.take(now))
+    }
+
+    /// Whether a click or key press reported from the page in `place` counts as a user gesture
+    /// (FR-9.45): that frame is open and the last counted one is at least
+    /// [`MIN_GESTURE_INTERVAL`] ago. The app checked the frame's key before it got here.
+    pub fn accept_gesture(&self, plugin: &str, place: WebviewPlace, now: Instant) -> bool {
+        let mut plugins = self.lock();
+        let Some(web) = plugins.get_mut(plugin) else {
+            return false;
+        };
+        if web.frames[place.slot() as usize] != Some(place) {
+            return false;
+        }
+        if web
+            .last_gesture
+            .is_some_and(|last| now.saturating_duration_since(last) < MIN_GESTURE_INTERVAL)
+        {
+            return false;
+        }
+        web.last_gesture = Some(now);
+        true
     }
 
     /// The file to serve for `path` below the plugin's `web/` folder, only while the plugin has a
@@ -906,6 +932,46 @@ mod tests {
         assert!(text.ends_with("</script><p>x</p>"));
         let bare = String::from_utf8(with_bootstrap(b"<p>x</p>")).unwrap();
         assert!(bare.starts_with("<script>"));
+    }
+
+    #[test]
+    fn the_bootstrap_reports_only_trusted_input_with_the_frame_key() {
+        for needle in [
+            "event.isTrusted",
+            "\"pointerdown\", \"click\", \"keydown\"",
+            "mumcordWebview: \"gesture\", key: key",
+            "stopEvent(event)",
+            "GESTURE_REPORT_MS = 250",
+        ] {
+            assert!(BOOTSTRAP.contains(needle), "{needle}");
+        }
+        // The key arrives later by message: it is never part of the served page.
+        assert!(!BOOTSTRAP.contains("key = \""));
+    }
+
+    #[test]
+    fn page_gestures_count_only_for_open_frames_and_are_rate_limited() {
+        let (_dir, root) = web_dir();
+        let views = Webviews::default();
+        let now = Instant::now();
+        assert!(!views.accept_gesture("p", WebviewPlace::Dialog, now));
+        views.set_root("p", Some(root), ALL.to_vec());
+        views.dialog_opened("p");
+        views
+            .show("p", WebviewPlace::Dialog, "index.html", now)
+            .unwrap();
+        assert!(
+            !views.accept_gesture("p", WebviewPlace::PanelPopover, now),
+            "that frame is not open"
+        );
+        assert!(views.accept_gesture("p", WebviewPlace::Dialog, now));
+        let soon = now + MIN_GESTURE_INTERVAL - Duration::from_millis(1);
+        assert!(!views.accept_gesture("p", WebviewPlace::Dialog, soon));
+        let later = now + MIN_GESTURE_INTERVAL;
+        assert!(views.accept_gesture("p", WebviewPlace::Dialog, later));
+        assert!(views.dialog_closed("p"));
+        let after = later + Duration::from_secs(1);
+        assert!(!views.accept_gesture("p", WebviewPlace::Dialog, after));
     }
 
     #[test]

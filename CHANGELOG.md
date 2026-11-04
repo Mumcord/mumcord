@@ -40,6 +40,7 @@
 - Plugin registries: `mumcord-plugin site-data` and `serve-registry` publish two indexes, `v1/index.json` with only API 1.0 versions for Mumcord 0.6 and `v1.1/index.json` (format 2) with every version, plus `v1.1/permissions.json`; registry version files accept `api = "1.1"`, `min_mumcord` and `origins`
 - Plugin update review: "Skip this version" hides that version (a newer one is offered again), and the review shows the points each new permission adds and the recent-change points of the score.
 - Screen sharing through the relay: when the server's relay offers it, your share is uploaded once and the relay sends it to every viewer, so up to the relay's limit (25 by default) can watch without costing you more upload. The picture is end-to-end encrypted, so the relay can't see it, and viewers who stop watching can't read what comes after. Viewers on older Mumcord versions still get their own copy, and if the relay goes away during a share, the first 8 viewers continue on their own copies without interruption
+- A real click or key press inside a plugin's own web page now counts as a user gesture for that plugin, so it can open its side panel, dialog or activity, save a file or post to chat right after you click in its page. Clicks or key presses that the page fakes never count.
 
 ### Changed
 

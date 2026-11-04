@@ -35,6 +35,13 @@ pub enum UiInput {
     /// gets the text only: `webview-message` carries no place (pages that share one plugin tell
     /// themselves apart in their own payload).
     WebviewMessage { place: WebviewPlace, text: String },
+    /// A genuine click or key press inside the plugin's page in `place`, reported by the page's
+    /// bootstrap with its frame key (checked by the app). Counts as a user gesture for the plugin
+    /// (FR-9.45) while that frame is open, at most every [`MIN_GESTURE_INTERVAL`]; the plugin
+    /// gets no event.
+    ///
+    /// [`MIN_GESTURE_INTERVAL`]: crate::api::webview::MIN_GESTURE_INTERVAL
+    WebviewGesture(WebviewPlace),
     /// The user closed the plugin's frame in `place` (its close button), or another plugin's
     /// side panel replaced it ([`super::ServiceEvent::SurfaceClosed`]). The frame closes; a
     /// plugin built for API 1.1 gets `surface-closed`.
@@ -124,6 +131,16 @@ impl PluginService {
                     return false;
                 }
                 Event::WebviewMessage(text)
+            }
+            UiInput::WebviewGesture(place) => {
+                let counted =
+                    self.io
+                        .webviews()
+                        .accept_gesture(id, place, std::time::Instant::now());
+                if counted {
+                    self.gesture(id);
+                }
+                return counted;
             }
             UiInput::SurfaceClosed(place) => {
                 self.io.webviews().close(id, place);

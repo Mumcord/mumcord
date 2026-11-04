@@ -5,13 +5,16 @@
  * Content-Security-Policy (set by the `mumcord-web` protocol) blocks the network. The frame may
  * load its page once: any further load is a navigation, and the frame is removed.
  *
+ * A genuine click or key press inside the page counts as a user gesture for the plugin
+ * (FR-9.45), reported by the page's bootstrap with this frame's key.
+ *
  * Keyboard: Tab moves into and out of the frame as usual; Escape inside the page moves focus to
  * the frame's wrapper, so the next Escape reaches the dialog or popover around it.
  */
 import { useEffect, useRef, useState } from "react";
 import { getApi, toEngineError, type PluginWebviewPlace } from "../../../api";
 import type { PluginWebview } from "../render/pluginUiStore";
-import { createBridge, type Bridge } from "./bridge";
+import { createBridge, newGestureKey, type Bridge } from "./bridge";
 import "./webview.css";
 
 interface Props {
@@ -47,6 +50,8 @@ function SealedFrame({ plugin, place, url, title }: FrameProps) {
   const frame = useRef<HTMLIFrameElement>(null);
   const loads = useRef(0);
   const [navigated, setNavigated] = useState(false);
+  // One key for the frame's whole life: its bootstrap keeps the first key it gets.
+  const [gestureKey] = useState(newGestureKey);
 
   const bridge = useRef<Bridge | null>(null);
 
@@ -63,6 +68,15 @@ function SealedFrame({ plugin, place, url, title }: FrameProps) {
           });
       },
       onEscape: () => wrapper.current?.focus(),
+      gestureKey,
+      onGesture: () => {
+        getApi()
+          .pluginUiEvent(plugin, { type: "webviewGesture", place })
+          .catch((error: unknown) => {
+            // Too fast, or the frame closed meanwhile.
+            console.debug("A web view gesture was not counted", toEngineError(error).code);
+          });
+      },
       onDropped: () => {
         if (warned) return;
         warned = true;
@@ -86,7 +100,7 @@ function SealedFrame({ plugin, place, url, title }: FrameProps) {
       off();
       bridge.current = null;
     };
-  }, [plugin, place]);
+  }, [plugin, place, gestureKey]);
 
   const onLoad = () => {
     loads.current += 1;
