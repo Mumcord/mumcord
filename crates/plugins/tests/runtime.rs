@@ -166,9 +166,10 @@ fn endless_loop_is_stopped_and_the_host_keeps_working() {
 
     let started = Instant::now();
     assert!(host.enable("spinner").is_err());
-    // `start` has 500 ms; generous slack for a loaded CI machine.
+    // `start` has 500 ms of budget. The bound only proves the loop ends instead of hanging; it is
+    // far above the budget because shared CI runners (macOS) can stall a thread for seconds.
     assert!(
-        started.elapsed() < Duration::from_secs(3),
+        started.elapsed() < Duration::from_secs(30),
         "took {:?}",
         started.elapsed()
     );
