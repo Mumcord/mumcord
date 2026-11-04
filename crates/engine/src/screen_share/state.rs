@@ -162,6 +162,11 @@ impl OwnShare {
         }
     }
 
+    /// The encoder the share's media opened; `None` until it opened one.
+    pub fn active_encoder(&self) -> Option<ActiveEncoder> {
+        *crate::session::lock(&self.encoder)
+    }
+
     pub fn viewer_list(&self) -> Vec<u32> {
         self.viewers.keys().copied().collect()
     }
@@ -397,6 +402,18 @@ mod tests {
         av1: true,
         wire: super::super::wire::V2,
     };
+
+    #[test]
+    fn the_active_encoder_is_whatever_the_media_opened() {
+        let own = OwnShare::new(false, false);
+        assert_eq!(own.active_encoder(), None);
+        let opened = ActiveEncoder {
+            codec: mumcord_screenshare::Codec::Av1,
+            gpu: None,
+        };
+        *crate::session::lock(&own.encoder) = Some(opened);
+        assert_eq!(own.active_encoder(), Some(opened));
+    }
 
     #[test]
     fn an_old_viewer_blocks_av1_until_it_leaves() {

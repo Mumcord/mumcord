@@ -15,7 +15,7 @@ use std::time::{Duration, Instant};
 
 use mumbot::env;
 use mumcord_engine::p2p::P2pConfig;
-use mumcord_engine::screen_share::wire::{Frame, FrameHeader};
+use mumcord_engine::screen_share::wire::{Codec, Frame, FrameHeader};
 use mumcord_engine::screen_share::{I420Frame, ScreenFrameSink, ScreenShareView};
 use mumcord_engine::store::Consent;
 use mumcord_engine::{
@@ -197,7 +197,7 @@ impl ScreenFrameSink for Sink {
             .push((Instant::now(), frame.header));
     }
 
-    fn on_decoded(&self, _: ServerId, _: u32, frame: &I420Frame) {
+    fn on_decoded(&self, _: ServerId, _: u32, _: Codec, frame: &I420Frame) {
         self.0
             .lock()
             .expect("sink")
@@ -332,7 +332,7 @@ async fn screen_share_media_reaches_every_viewer() {
     // The Rust decoder fallback hands out pictures.
     let v2 = &viewers[2];
     v2.engine
-        .screen_share_set_decode_fallback(v2.server(), a, true)
+        .screen_share_set_decode_codecs(v2.server(), a, &[Codec::Av1, Codec::Vp9])
         .expect("fallback");
     tokio::time::sleep(Duration::from_secs(3)).await;
     let (fps, size) = sinks[2].decoded_recent(WINDOW);
@@ -340,7 +340,7 @@ async fn screen_share_media_reaches_every_viewer() {
     assert_eq!(size, (1920, 1080));
     assert!(fps >= 25.0, "decoded {fps} fps");
     v2.engine
-        .screen_share_set_decode_fallback(v2.server(), a, false)
+        .screen_share_set_decode_codecs(v2.server(), a, &[])
         .expect("fallback off");
 
     // One slow viewer loses layers; the others keep 30 fps and the quality stays.

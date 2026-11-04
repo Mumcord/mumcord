@@ -1,7 +1,9 @@
 /**
  * Watches one person's screen share while the component is mounted (FR-2.43, FR-2.44): asks the
- * engine for the stream, draws its frames onto the canvas and stops watching on unmount. Where
- * the webview cannot decode VP9 the engine decodes and sends RGBA pictures instead. Without a
+ * engine for the stream, draws its frames onto the canvas and stops watching on unmount. For each
+ * codec the webview's WebCodecs cannot decode (AV1, VP9) the engine decodes and sends RGBA
+ * pictures instead (FR-7.59). It also tells the codec on screen and carries the viewer's
+ * frame-rate choice to the engine (FR-7.51), which drops temporal layers to meet it. Without a
  * first picture within {@link CONNECT_TIMEOUT_MS} (not counting a pause) the attempt ends as
  * unreachable (FR-2.46); `retry` starts a new one.
  *
@@ -10,8 +12,8 @@
  * attaches again when the view docks.
  */
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
-import { getApi, toEngineError } from "../../api";
-import { screenFrameChannel, webCodecsVp9Supported } from "../../api/screenFrames";
+import { getApi, toEngineError, type VideoCodec } from "../../api";
+import { screenFrameChannel, VIDEO_CODECS, webCodecsCodecs } from "../../api/screenFrames";
 import { isPoppedOut, popouts, useInPopout } from "../media/popoutStore";
 import { keepWatch, takeKeptWatch } from "./frameHandover";
 import { createFrameRenderer, type FrameRenderer } from "./frameRenderer";
@@ -26,9 +28,16 @@ export type WatchStatus =
   /** The engine refused or no picture came in time. */
   | { state: "failed"; reason: WatchFailure };
 
+/** The viewer's frame-rate choice (FR-7.51): Auto (`null`, the sharer's rate) or a cap. */
+export type ViewerFps = null | 30 | 15;
+
 export interface ScreenWatch {
   status: WatchStatus;
   retry: () => void;
+  /** Codec of the frames on screen; `null` until the first frame. */
+  codec: VideoCodec | null;
+  maxFps: ViewerFps;
+  setMaxFps: (fps: ViewerFps) => void;
 }
 
 export function useScreenWatch(
@@ -42,6 +51,12 @@ export function useScreenWatch(
 ): ScreenWatch {
   const [status, setStatus] = useState<WatchStatus>({ state: "starting" });
   const [attempt, setAttempt] = useState(0);
+  const [codec, setCodec] = useState<VideoCodec | null>(null);
+  const [maxFps, setMaxFpsState] = useState<ViewerFps>(null);
+  // Read when a watch starts, so changing it does not restart the attempt.
+  const maxFpsRef = useRef<ViewerFps>(null);
+  // Set once the engine has the stream, for frame-rate changes during the watch.
+  const liveRef = useRef(false);
   const inPopout = useInPopout();
   // Read by the timeout, so pausing does not restart the attempt.
   const pausedRef = useRef(paused);
@@ -88,13 +103,18 @@ export function useScreenWatch(
     armTimeout();
 
     const run = async () => {
-      const decodeHere = await webCodecsVp9Supported();
+      const inWebview = await webCodecsCodecs();
       if (isStopped()) return;
+      // Codecs the engine decodes for this webview; grows when WebCodecs fails on one.
+      const inEngine = new Set(VIDEO_CODECS.filter((c) => !inWebview.includes(c)));
+      let engineHasStream = false;
+      const sendDecodeCodecs = () =>
+        api.screenShareSetDecodeCodecs(serverId, session, [...inEngine]).catch(fail);
       const renderer = createFrameRenderer(canvas, {
-        mode: decodeHere ? "vp9" : "rgba",
         onFrame: (frame, atMs) => {
+          setCodec(frame.codec);
           // Decoded pictures still tell the size and the frame rate, so the chips work there too.
-          const encoded = frame.kind === "vp9";
+          const encoded = frame.kind === "encoded";
           meter?.frame({
             atMs,
             timestampUs: encoded ? frame.timestampUs : null,
@@ -105,6 +125,12 @@ export function useScreenWatch(
         },
         onDrop: (atMs) => {
           meter?.drop(atMs);
+        },
+        onUnsupported: (failed) => {
+          if (inEngine.has(failed)) return;
+          console.warn("WebCodecs cannot play this share; the engine decodes it", failed);
+          inEngine.add(failed);
+          if (engineHasStream) void sendDecodeCodecs();
         },
         requestKeyframe: () => {
           api.screenShareRequestKeyframe(serverId, session).catch((error: unknown) => {
@@ -150,12 +176,18 @@ export function useScreenWatch(
       }
       // Unmounted or timed out while the engine was still starting the stream: `stop` ran.
       if (isStopped()) return;
-      if (!decodeHere) await api.screenShareSetDecodeFallback(serverId, session, true).catch(fail);
+      engineHasStream = true;
+      liveRef.current = true;
+      // Always sent: a watch kept from another window may carry that window's choices.
+      await sendDecodeCodecs();
+      if (isStopped()) return;
+      await api.screenShareSetViewerFps(serverId, session, maxFpsRef.current).catch(fail);
     };
     void run();
 
     return () => {
       clearTimeout(timer);
+      liveRef.current = false;
       if (isStopped()) return;
       stopped = true;
       stopWatching?.();
@@ -166,5 +198,19 @@ export function useScreenWatch(
     setAttempt((n) => n + 1);
   }, []);
 
-  return { status, retry };
+  const setMaxFps = useCallback(
+    (fps: ViewerFps) => {
+      maxFpsRef.current = fps;
+      setMaxFpsState(fps);
+      if (!liveRef.current) return;
+      getApi()
+        .screenShareSetViewerFps(serverId, session, fps)
+        .catch((error: unknown) => {
+          console.warn("setting the screen share frame rate failed", error);
+        });
+    },
+    [serverId, session],
+  );
+
+  return { status, retry, codec, maxFps, setMaxFps };
 }

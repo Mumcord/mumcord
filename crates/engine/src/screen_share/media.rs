@@ -116,6 +116,37 @@ pub struct ViewerMediaStats {
     pub fps: u32,
     /// It lost every layer it can and still does not keep up: the quality step is lowered for it.
     pub struggling: bool,
+    /// It lost a layer in the last 10 s: the viewer list shows "slow connection" (FR-7.52).
+    pub slow: bool,
+    /// The share's codec, which every viewer gets; `None` until the encoder opened.
+    pub codec: Option<Codec>,
+    pub path: ViewerPath,
+}
+
+/// How the share reaches one viewer (viewer list, FR-7.52).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum ViewerPath {
+    #[default]
+    Direct,
+    /// A copy of its own over a relayed connection.
+    Relay,
+    /// The single upload the relay copies to every subscriber (set by the broadcast task, BC1).
+    Broadcast,
+}
+
+impl ScreenMediaStats {
+    /// Adds what the media path does not know: the share's codec and how each viewer's
+    /// connection travels.
+    pub(crate) fn add_viewer_paths(
+        &mut self,
+        encoder: Option<ActiveEncoder>,
+        path: impl Fn(u32) -> ViewerPath,
+    ) {
+        for viewer in &mut self.viewers {
+            viewer.codec = encoder.map(|e| e.codec);
+            viewer.path = path(viewer.session);
+        }
+    }
 }
 
 /// What the encode thread, the writer tasks and the engine share.
@@ -333,6 +364,7 @@ impl Media {
         let mut stats = lock(&self.hub.stats).clone();
         let base_fps = self.hub.step_fps.load(Ordering::Relaxed);
         let top = self.hub.top_layer.load(Ordering::Relaxed);
+        let now = Instant::now();
         stats.viewers = lock(&self.hub.viewers)
             .iter()
             .map(|(session, queue)| {
@@ -343,6 +375,9 @@ impl Media {
                     // Every layer below the top one halves the frame rate (fanout).
                     fps: base_fps >> top.saturating_sub(layer),
                     struggling: queue.with_policy(super::fanout::Policy::struggling),
+                    slow: queue.with_policy(|p| p.slow(now)),
+                    codec: None,
+                    path: ViewerPath::Direct,
                 }
             })
             .collect();
@@ -890,6 +925,44 @@ mod tests {
 
     /// The lowest quality step (480p15).
     const FLOOR: usize = 3;
+
+    #[test]
+    fn viewer_stats_get_the_share_codec_and_their_path() {
+        let mut stats = ScreenMediaStats {
+            viewers: vec![
+                ViewerMediaStats {
+                    session: 3,
+                    ..ViewerMediaStats::default()
+                },
+                ViewerMediaStats {
+                    session: 7,
+                    ..ViewerMediaStats::default()
+                },
+            ],
+            ..ScreenMediaStats::default()
+        };
+        stats.add_viewer_paths(None, |_| ViewerPath::Direct);
+        assert_eq!(stats.viewers[0].codec, None, "no encoder opened yet");
+        let av1 = ActiveEncoder {
+            codec: Codec::Av1,
+            gpu: None,
+        };
+        stats.add_viewer_paths(Some(av1), |session| {
+            if session == 7 {
+                ViewerPath::Relay
+            } else {
+                ViewerPath::Direct
+            }
+        });
+        let got: Vec<_> = stats.viewers.iter().map(|v| (v.codec, v.path)).collect();
+        assert_eq!(
+            got,
+            [
+                (Some(Codec::Av1), ViewerPath::Direct),
+                (Some(Codec::Av1), ViewerPath::Relay)
+            ]
+        );
+    }
 
     struct Ending;
     impl CaptureSource for Ending {

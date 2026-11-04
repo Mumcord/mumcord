@@ -39,8 +39,8 @@ use tauri::{AppHandle, Manager};
 use tauri_specta::{Builder, Event, collect_commands, collect_events};
 
 use commands::{
-    app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow, friends,
-    history, identity, links, mumble_import, notifications as notify, people, pm_overview,
+    admin, app, audio, blocking, channel_audio, channels, chat, diagnostics, dropped, follow,
+    friends, history, identity, links, mumble_import, notifications as notify, people, pm_overview,
     pm_rules, profile, servers, session, settings,
 };
 
@@ -107,6 +107,9 @@ fn specta_builder() -> Builder<tauri::Wry> {
             people::person_set_local_mute,
             people::person_set_note,
             people::person_profile,
+            admin::ban_list_open,
+            admin::ban_list_save,
+            admin::ban_list_close,
             friends::friends_list,
             friends::friend_add,
             friends::friend_remove,
@@ -332,11 +335,18 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::screen_share::screen_share_set_sound_level,
             commands::screen_share::screen_share_watch,
             commands::screen_share::screen_share_unwatch,
-            commands::screen_share::screen_share_set_decode_fallback,
+            commands::screen_share::screen_share_set_decode_codecs,
+            commands::screen_share::screen_share_set_viewer_fps,
             commands::screen_share::screen_share_request_keyframe,
             commands::screen_share::screen_share_list,
+            commands::screen_share::screen_share_set_quality,
+            commands::screen_share::screen_share_undo_encoder_switch,
+            commands::screen_share::screen_encoder_status,
+            commands::screen_share::screen_encoder_check_again,
+            commands::screen_share::screen_encoder_prepare,
             commands::screen_share::screen_share_block,
             commands::screen_share::screen_share_quality,
+            commands::screen_share::screen_share_preview,
             commands::screen_share::screen_share_thumbnail,
             commands::screen_share::screen_share_watch_stats,
             commands::screen_share::screen_share_frames_attach,
@@ -406,6 +416,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::p2p::P2pLinkChanged,
             commands::watch_party::WatchPartyChanged,
             commands::screen_share::ScreenSharesChanged,
+            commands::screen_share::ScreenEncoderStatusChanged,
             commands::updates::UpdateStatusChanged,
             commands::inspector::InspectorViewChanged,
             commands::licences::WindowLookChanged,
@@ -934,9 +945,12 @@ fn emit_engine_event(
             }
             .emit(app)
         }
-        // Not forwarded to the webview yet; the Settings tab's encoder status is wired up
-        // with its commands.
-        EngineEvent::ScreenEncoderStatusChanged(_) => Ok(()),
+        EngineEvent::ScreenEncoderStatusChanged(status) => {
+            commands::screen_share::ScreenEncoderStatusChanged {
+                status: status.into(),
+            }
+            .emit(app)
+        }
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),

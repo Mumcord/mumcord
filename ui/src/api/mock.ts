@@ -26,6 +26,7 @@ import type {
   AcceptedConversation,
   BlockedUser,
   ActiveAudioProfile,
+  BanEntry,
   PmConversationPrefs,
   PrivateConversation,
   ApiError,
@@ -62,9 +63,14 @@ import type {
   SavedServer,
   ServerInfo,
   ServerInput,
+  EncoderStatus,
+  EncoderSwitch,
+  ActiveEncoder,
+  LoweredReason,
   ScreenShare,
   ShareStartBlock,
   ServerSnapshot,
+  ViewerQuality,
   Settings,
   User,
   PluginPlatformSettings,
@@ -203,11 +209,15 @@ export interface MockMediaDemo {
   readonly share: ScreenShare | null;
   readonly party: WatchParty | null;
   readonly quality: {
+    quality: string;
+    lowered: LoweredReason | null;
+    switched: EncoderSwitch | null;
     width: number;
     height: number;
     fps: number;
     kbps: number;
-    viewers: { session: number; fps: number; struggling: boolean }[];
+    encoder: ActiveEncoder | null;
+    viewers: ViewerQuality[];
   } | null;
 }
 
@@ -665,6 +675,7 @@ const allow = {
   whisper: true,
   write: false,
   moveUsers: false,
+  ban: false,
 };
 
 function seedChannels(): ChannelInfo[] {
@@ -1000,19 +1011,32 @@ export function createMockApi(options: MockOptions = {}): MockApi {
           ],
         },
         quality: {
+          quality: "1080p60",
+          lowered: null,
+          switched: null,
           width: 1920,
           height: 1080,
           fps: 60,
           kbps: 4230,
+          encoder: { codec: "av1", gpu: "nvidia" },
           viewers: [
-            { session: 1, fps: 60, struggling: false },
-            { session: 2, fps: 60, struggling: false },
-            { session: 5, fps: 20, struggling: true },
+            { session: 1, fps: 60, struggling: false, slow: false, codec: "av1", path: "direct" },
+            { session: 2, fps: 60, struggling: false, slow: false, codec: "av1", path: "relay" },
+            { session: 5, fps: 20, struggling: true, slow: true, codec: "av1", path: "relay" },
           ],
         },
       }
     : { picture: "", share: null, party: null, quality: null };
 
+  let encoderStatus: EncoderStatus = {
+    checking: false,
+    av1Hardware: null,
+    vp9Hardware: null,
+    av1SoftwareLimit: { height: 1080, fps: 30 },
+    active: { codec: "av1", gpu: null },
+    av1Skipped: null,
+    softwareWarning: false,
+  };
   const listeners = new Map<EventName, Set<(payload: never) => void>>();
   /** Private notes by session (FR-1.63); the engine keys them by certificate hash. */
   const notes = new Map<number, string>();
@@ -2059,6 +2083,36 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     lastMumbleImport = null;
     servers = servers.filter((s) => !last.servers.includes(s.id));
     if (last.identity !== null) identities = identities.filter((i) => i.id !== last.identity);
+  }
+
+  /** In-memory ban lists for the Server administration window (issue #254). */
+  const banLists = new Map<number, BanEntry[]>();
+
+  function seedBans(): BanEntry[] {
+    return [
+      {
+        key: "203.0.113.1/32|a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70",
+        name: "Mallory",
+        certHash: "a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70",
+        address: "203.0.113.1",
+        mask: 32,
+        reason: "spam links",
+        start: "2026-11-03T20:21:00.000Z",
+        durationSecs: 604_800,
+        expired: false,
+      },
+      {
+        key: "198.51.100.9/32|",
+        name: null,
+        certHash: null,
+        address: "198.51.100.9",
+        mask: 32,
+        reason: "flooding",
+        start: "2026-10-01T09:00:00.000Z",
+        durationSecs: 0,
+        expired: false,
+      },
+    ];
   }
 
   const commands: EngineCommands = {
@@ -3279,6 +3333,52 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     filesSaveFolder: () => Promise.resolve("~/Downloads/Mumcord"),
     filesOpen: () => Promise.resolve(null),
     filesOpenFolder: () => Promise.resolve(null),
+    banListOpen: (serverId) => {
+      if (!banLists.has(serverId)) banLists.set(serverId, seedBans());
+      return Promise.resolve([...(banLists.get(serverId) ?? [])]);
+    },
+    banListSave: (serverId, changes, force) => {
+      // The mock applies the same rule as the engine: the server takes the whole list (FR-10.66).
+      const list = [...(banLists.get(serverId) ?? seedBans())];
+      if (!force) {
+        const moved = changes.find(
+          (change) => change.kind !== "add" && !list.some((e) => e.key === change.key),
+        );
+        if (moved && moved.kind !== "add") {
+          return Promise.resolve({ kind: "conflict", key: moved.key, fresh: list });
+        }
+      }
+      for (const change of changes) {
+        if (change.kind === "add") {
+          list.push({
+            key: `${change.address}/${String(change.mask)}|${change.hash ?? ""}`,
+            name: change.name,
+            certHash: change.hash,
+            address: change.address,
+            mask: change.mask,
+            reason: change.reason,
+            start: new Date().toISOString(),
+            durationSecs: change.duration,
+            expired: false,
+          });
+          continue;
+        }
+        const entry = list.find((e) => e.key === change.key);
+        if (!entry) continue;
+        if (change.kind === "edit") {
+          entry.reason = change.reason;
+          entry.durationSecs = change.duration;
+        } else {
+          list.splice(list.indexOf(entry), 1);
+        }
+      }
+      banLists.set(serverId, list);
+      return Promise.resolve({ kind: "saved", entries: list });
+    },
+    banListClose: (serverId) => {
+      banLists.delete(serverId);
+      return Promise.resolve(null);
+    },
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
@@ -3439,6 +3539,36 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       // The mock's fictional share carries the fictional figures, so the media views show numbers.
       return Promise.resolve(mediaDemo.share !== null && serverId === 1 ? mediaDemo.quality : null);
     },
+    screenShareSetQuality: () => Promise.resolve(null),
+    // The "Viewers get" line of the start dialog; the mock always has a relay with fan-out.
+    screenSharePreview: (_serverId, choice, codec) => {
+      const small = choice.resolution === "720";
+      const fps = choice.fps === "60" ? 60 : 30;
+      return Promise.resolve({
+        quality: `${small ? "720p" : "1080p"}${String(fps)}`,
+        width: small ? 1280 : 1920,
+        height: small ? 720 : 1080,
+        fps,
+        kbps: codec === "vp9" ? 4500 : 3000,
+        encoder: { codec: codec === "vp9" ? "vp9" : "av1", gpu: codec === "vp9" ? null : "nvidia" },
+        softwareWarning: false,
+        av1Skipped: null,
+        path: { kind: "broadcast", maxViewers: 20 },
+      });
+    },
+    // The mock never switches the encoder on its own, so there is nothing to undo.
+    screenShareUndoEncoderSwitch: () => Promise.reject(new Error("the share offers no undo")),
+    screenEncoderStatus: () => Promise.resolve(encoderStatus),
+    screenEncoderCheckAgain: () => {
+      encoderStatus = { ...encoderStatus, checking: true };
+      emit("screenEncoderStatusChanged", { status: encoderStatus });
+      setTimeout(() => {
+        encoderStatus = { ...encoderStatus, checking: false };
+        emit("screenEncoderStatusChanged", { status: encoderStatus });
+      }, 800);
+      return Promise.resolve();
+    },
+    screenEncoderPrepare: () => Promise.resolve(),
     // The mock has no capture, so the bar shows its own placeholder picture.
     screenShareThumbnail: (serverId) => {
       if (!ownShares.has(serverId)) return Promise.resolve(null);
@@ -3514,7 +3644,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       }
       return Promise.resolve(null);
     },
-    screenShareSetDecodeFallback: () => notImplemented("screenShareSetDecodeFallback"),
+    // Viewer-side choices for the demo share: nothing to decode or thin out in the mock.
+    screenShareSetDecodeCodecs: () => Promise.resolve(null),
+    screenShareSetViewerFps: () => Promise.resolve(null),
     screenShareRequestKeyframe: () => notImplemented("screenShareRequestKeyframe"),
     updateStatus: () => Promise.resolve(updater.status()),
     updateCheckNow: () => Promise.resolve(updater.checkNow()),

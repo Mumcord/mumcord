@@ -4,6 +4,7 @@
 //! human-readable contract is `docs/engine-api.md`; the TypeScript bindings are generated
 //! into `ui/src/bindings/commands.ts`.
 
+pub mod admin;
 pub mod app;
 pub mod audio;
 pub mod blocking;
