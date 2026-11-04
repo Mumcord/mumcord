@@ -71,7 +71,7 @@ export function PluginFrame({ plugin, webview, onEscape }: Props) {
       {stopped ? (
         <div className="plugin-frame__stopped">
           <p role="alert">{t("frame.stopped", { plugin: name })}</p>
-          <button ref={reload} type="button" className="settings-button" onClick={onReload}>
+          <button ref={reload} type="button" className="button" onClick={onReload}>
             {t("frame.reload")}
           </button>
         </div>
