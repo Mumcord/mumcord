@@ -4,6 +4,7 @@
 
 ### Added
 
+- Settings → Screen sharing has an "Ask for these settings each time I share" switch and shows whether this computer plays AV1 and VP9 with hardware or software
 - The picture of a watched screen share or watch party can be made taller or smaller: drag the handle between the picture and the chat, or focus it and use the arrow keys, Page Up/Down, Home and End. It snaps at a third, half and two thirds, Enter or a double-click goes back to the original size, dragging it all the way up minimises it to the mini bar, and the height is remembered (#386)
 - Mumcord respects what a server's relay allows: if the relay owner turned off images, files or screen sharing, that feature no longer goes through the relay. Screen sharing still works over a direct connection, and full-size images use a direct connection or the Mumble server instead
 - Screen sharing picks its encoder automatically: Mumcord checks in the background which graphics-card encoders work and how well the processor handles AV1, then uses AV1 on the graphics card, AV1 on the processor (up to 1080p30, not on battery), or VP9. The check runs again after a driver or Mumcord update

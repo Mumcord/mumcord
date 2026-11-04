@@ -210,6 +210,7 @@ export const TRACKED_SETTINGS: readonly TrackedSetting[] = [
   top("screenSharing", "screenShare.fps", ["screenFps"]),
   top("screenSharing", "screenShare.optimize", ["screenOptimize"]),
   top("screenSharing", "screenShare.uploadLimit", ["screenUploadLimit"]),
+  top("screenSharing", "screenShare.askEachTime", ["screenAskEachTime"]),
   top("screenSharing", "screenShare.codec", ["screenCodec"]),
   top("screenSharing", "screenShare.useGpu", ["screenUseGpu"]),
   top("appearance", "appearance.modeLegend", ["theme"]),

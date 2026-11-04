@@ -10,6 +10,8 @@ import {
   type ScreenResolution,
   type ScreenUploadLimit,
 } from "../../../api";
+import type { VideoCodec } from "../../../bindings/commands";
+import { webCodecsCodecs } from "../../../api/screenFrames";
 import { Group } from "../components/Section";
 import { SettingsIcon } from "../components/SettingsIcon";
 import { Switch } from "../components/Switch";
@@ -136,6 +138,13 @@ export function QualityDefaultsCard({ settings, update }: SettingsSectionProps) 
       <p id={uploadHint} className="settings-hint">
         {t("screenShare.uploadHint")}
       </p>
+      <Switch
+        label={t("screenShare.askEachTime")}
+        checked={settings.screenAskEachTime}
+        onChange={(screenAskEachTime) => {
+          update({ screenAskEachTime });
+        }}
+      />
     </Group>
   );
 }
@@ -208,6 +217,26 @@ function useEncoderStatus(): EncoderStatus | null {
   return status;
 }
 
+/** Codecs this webview plays itself; the engine's software decoder covers the rest. */
+function useWebCodecs(): readonly VideoCodec[] {
+  const [codecs, setCodecs] = useState<readonly VideoCodec[]>([]);
+  useEffect(() => {
+    let active = true;
+    webCodecsCodecs().then(
+      (found) => {
+        if (active) setCodecs(found);
+      },
+      (error: unknown) => {
+        console.error("Checking the playback support failed", error);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
+  return codecs;
+}
+
 function EncoderRow({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (
     <li className="settings-hwlist__row">
@@ -224,6 +253,9 @@ function EncoderRow({ label, value, ok }: { label: string; value: string; ok: bo
 export function HardwareCard({ settings, update }: SettingsSectionProps) {
   const { t } = useTranslation("settings");
   const status = useEncoderStatus();
+  const playable = useWebCodecs();
+  const playback = (codec: VideoCodec) =>
+    t(playable.includes(codec) ? "screenShare.playbackHardware" : "screenShare.playbackSoftware");
   const [error, setError] = useState<string | null>(null);
 
   const gpu = (vendor: GpuVendor) => t(GPU_KEYS[vendor]);
@@ -292,11 +324,21 @@ export function HardwareCard({ settings, update }: SettingsSectionProps) {
               }
             />
             <EncoderRow
+              label={t("screenShare.av1Playback")}
+              ok={playable.includes("av1")}
+              value={playback("av1")}
+            />
+            <EncoderRow
               label={t("screenShare.vp9Encode")}
               ok={status.vp9Hardware !== null}
               value={
                 status.vp9Hardware === null ? t("screenShare.software") : gpu(status.vp9Hardware)
               }
+            />
+            <EncoderRow
+              label={t("screenShare.vp9Playback")}
+              ok={playable.includes("vp9")}
+              value={playback("vp9")}
             />
           </ul>
           {status.softwareWarning && (

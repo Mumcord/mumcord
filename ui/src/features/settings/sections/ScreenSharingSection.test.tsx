@@ -86,6 +86,38 @@ describe("Screen sharing settings (FR-7.60)", () => {
     vi.useRealTimers();
   });
 
+  it("saves the ask-each-time switch", () => {
+    const update = vi.fn();
+    render(<Page update={update} />);
+    const toggle = screen.getByRole("switch", { name: /Ask for these settings each time/ });
+    expect(toggle).toBeChecked();
+    fireEvent.click(toggle);
+    expect(update).toHaveBeenCalledWith({ screenAskEachTime: false });
+  });
+
+  it("shows software playback when WebCodecs cannot decode", async () => {
+    render(<Page update={vi.fn()} />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(screen.getByText("AV1 playback").nextSibling?.textContent).toBe("Software");
+    expect(screen.getByText("VP9 playback").nextSibling?.textContent).toBe("Software");
+  });
+
+  it("shows hardware playback when WebCodecs supports the codec", async () => {
+    vi.stubGlobal("VideoDecoder", {
+      isConfigSupported: (config: { codec: string }) =>
+        Promise.resolve({ supported: config.codec.startsWith("vp09") }),
+    });
+    render(<Page update={vi.fn()} />);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(screen.getByText("AV1 playback").nextSibling?.textContent).toBe("Software");
+    expect(screen.getByText("VP9 playback").nextSibling?.textContent).toBe("Hardware");
+    vi.unstubAllGlobals();
+  });
+
   it("has no axe violations", async () => {
     const { container } = render(<Page update={vi.fn()} />);
     await act(async () => {

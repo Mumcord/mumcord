@@ -3707,6 +3707,7 @@ export type Settings = {
 	screenOptimize: ScreenOptimize,
 	screenCodec: ScreenCodec,
 	screenUploadLimit: ScreenUploadLimit,
+	screenAskEachTime: boolean,
 	screenSound: boolean,
 	screenUseGpu: boolean,
 };
