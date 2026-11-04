@@ -29,6 +29,7 @@
   "activitiesLabel": "Plugin-aktiviteter",
   "noRelayTitle": "Intet relæ til plugin-data på denne server.",
   "noRelayText": "{{server}}s relæ tillader ikke plugin-data, så {{plugin}} bruger den langsommere Mumble-forbindelse: Træk kan tage et øjeblik, og store brætter er slået fra.",
+  "noRelayDetails": "Detaljer",
   "tooMany": "For mange aktiviteter i denne kanal",
   "full": "Denne aktivitet er fuld",
   "joinGone": "Denne aktivitet er slut",

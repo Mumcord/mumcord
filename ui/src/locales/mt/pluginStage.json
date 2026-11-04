@@ -29,6 +29,7 @@
   "activitiesLabel": "Attivitajiet tal-plugins",
   "noRelayTitle": "L-ebda relay għal data tal-plugins fuq dan is-server.",
   "noRelayText": "Ir-relay ta' {{server}} ma jippermettix data tal-plugins, għalhekk {{plugin}} juża l-konnessjoni Mumble l-aktar bil-mod: il-mozzjonijiet jistgħu jieħdu ftit u l-bordijiet kbar huma mitfija.",
+  "noRelayDetails": "Dettalji",
   "tooMany": "Wisq attivitajiet f'dan il-kanal",
   "full": "Din l-attività hija mimlija",
   "joinGone": "Din l-attività spiċċat",

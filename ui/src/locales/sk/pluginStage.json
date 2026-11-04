@@ -29,6 +29,7 @@
   "activitiesLabel": "Aktivity pluginov",
   "noRelayTitle": "Na tomto serveri nie je relay pre údaje doplnkov.",
   "noRelayText": "Relay servera {{server}} nepovoľuje údaje doplnkov, preto {{plugin}} používa pomalšie pripojenie Mumble: ťahy môžu chvíľu trvať a veľké hracie plochy sú vypnuté.",
+  "noRelayDetails": "Podrobnosti",
   "tooMany": "V tomto kanáli je príliš veľa aktivít",
   "full": "Táto aktivita je plná",
   "joinGone": "Táto aktivita sa skončila",

@@ -29,6 +29,7 @@
   "activitiesLabel": "Activités de plugins",
   "noRelayTitle": "Pas de relais pour les données des plugins sur ce serveur.",
   "noRelayText": "Le relais de {{server}} n'autorise pas les données des plugins, donc {{plugin}} utilise la connexion Mumble, plus lente : les coups peuvent prendre un moment et les grands plateaux sont désactivés.",
+  "noRelayDetails": "Détails",
   "tooMany": "Trop d'activités dans ce salon",
   "full": "Cette activité est complète",
   "joinGone": "Cette activité est terminée",

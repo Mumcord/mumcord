@@ -1121,9 +1121,16 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   // for trying and photographing the updater.
   const mockUpdate = demo && new URLSearchParams(window.location.search).has("mockUpdate");
   const inspector = createMockInspector();
-  const popouts = createMockPopouts((state) => {
-    emit("mediaPopoutChanged", { state });
-  });
+  // `?window=media-popout&kind=stage&plugin=<id>`: the stage pop-out page of that plugin.
+  const popoutQuery = new URLSearchParams(
+    typeof window === "undefined" ? "" : window.location.search,
+  );
+  const popouts = createMockPopouts(
+    (state) => {
+      emit("mediaPopoutChanged", { state });
+    },
+    popoutQuery.get("kind") === "stage" ? popoutQuery.get("plugin") : null,
+  );
   const updater = createMockUpdater({
     demo,
     startupCheck: mockUpdate,

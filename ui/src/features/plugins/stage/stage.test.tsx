@@ -1,11 +1,19 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { PluginNode, StageActivityView } from "../../../api";
+import type {
+  MediaPopoutState,
+  PluginNode,
+  PluginRelayAvailability,
+  StageActivityView,
+} from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { StageShown } from "../../media/stageContext";
 import { resetStageEntries, useStageEntries } from "../../media/stageRegistry";
+import { MediaPopoutHost } from "../../media/MediaPopoutHost";
 import { leaveCinema, mediaView, openMedia, resetMediaView } from "../../media/mediaView";
+import { InPopout, resetPopoutStore } from "../../media/popoutStore";
+import { resetPluginRequestStore, useRequestedPluginTab } from "../pluginRequestStore";
 import { resetActivityStore } from "./activityStore";
 import { FULLSCREEN_BANNER_MS, PluginStage } from "./PluginStage";
 import { PluginStageHost } from "./PluginStageHost";
@@ -13,7 +21,24 @@ import { PluginMiniBars } from "./StageMiniBar";
 
 const api = vi.hoisted(() => ({
   activities: [] as StageActivityView[],
-  plugins: [] as { id: string; name: string; source: unknown; icon: null }[],
+  plugins: [] as {
+    id: string;
+    name: string;
+    source: unknown;
+    icon: null;
+    required: string[];
+    optional: { id: string }[];
+    granted: string[];
+  }[],
+  relay: ((): PluginRelayAvailability => ({ kind: "available", kbps: null }))(),
+  popouts: ((): MediaPopoutState => ({
+    watch: { target: null, onTop: false },
+    share: { target: null, onTop: false },
+    stage: { target: null, onTop: false },
+  }))(),
+  popOut: vi.fn<(...args: unknown[]) => Promise<null>>(() => Promise.resolve(null)),
+  popIn: vi.fn<(...args: unknown[]) => Promise<null>>(() => Promise.resolve(null)),
+  setTitle: vi.fn<(...args: unknown[]) => Promise<null>>(() => Promise.resolve(null)),
   listeners: new Map<string, (payload: unknown) => void>(),
   visibility: vi.fn<(plugin: string, visible: boolean) => Promise<null>>(() =>
     Promise.resolve(null),
@@ -32,6 +57,19 @@ vi.mock("../../../api", async (orig) => {
     pluginFramesMuteState: () => Promise.resolve({ all: false, plugins: [] }),
     pluginsUiTrees: () => Promise.resolve([]),
     pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: api.plugins }),
+    pluginRelayAvailability: () => Promise.resolve(api.relay),
+    pluginPlatformSettings: () =>
+      Promise.resolve({
+        blockHighRisk: false,
+        relayDataEnabled: true,
+        soundVolume: 70,
+        soundMuted: false,
+      }),
+    mediaPopoutState: () => Promise.resolve(api.popouts),
+    mediaPopoutOpen: api.popOut,
+    mediaPopoutClose: api.popIn,
+    mediaPopoutSetOnTop: () => Promise.resolve(null),
+    mediaPopoutSetTitle: api.setTitle,
     on: (name: string, handler: (payload: unknown) => void) => {
       const key = `${name}:${String(Math.random())}`;
       api.listeners.set(key, handler);
@@ -45,8 +83,16 @@ vi.mock("../../../api", async (orig) => {
 
 vi.mock("../../channels/serverStore", () => ({
   useVoiceServerId: () => 1,
-  useServerStateOf: () => ({}),
+  useServerStateOf: () => ({
+    channels: new Map([[0, { name: "Study Club Root" }]]),
+    users: new Map(),
+    selfSession: null,
+  }),
   selfUser: () => ({ selfDeaf: false, serverDeaf: false }),
+}));
+
+vi.mock("../../servers/store", () => ({
+  useServers: () => ({ servers: [{ id: 1, label: "Study Club" }] }),
 }));
 
 function emit(name: string, payload: unknown) {
@@ -72,6 +118,18 @@ const BRAWL: StageActivityView = {
 
 const MEEPLE = { kind: "repo", repositoryId: 1, name: "Meeple Works" };
 
+function plugin(source: unknown, granted: string[] = []) {
+  return {
+    id: "brawl",
+    name: "Board Brawl",
+    source,
+    icon: null,
+    required: ["peers.relay"],
+    optional: [],
+    granted,
+  };
+}
+
 async function violations(container: Element): Promise<string[]> {
   const results = await axe.run(container, { iframes: false });
   return results.violations.map((violation) => violation.id);
@@ -91,7 +149,18 @@ beforeAll(async () => {
 
 beforeEach(() => {
   api.activities = [];
-  api.plugins = [{ id: "brawl", name: "Board Brawl", source: MEEPLE, icon: null }];
+  api.plugins = [plugin(MEEPLE)];
+  api.relay = { kind: "available", kbps: null };
+  api.popouts = {
+    watch: { target: null, onTop: false },
+    share: { target: null, onTop: false },
+    stage: { target: null, onTop: false },
+  };
+  api.popOut.mockClear();
+  api.popIn.mockClear();
+  api.setTitle.mockClear();
+  resetPopoutStore();
+  resetPluginRequestStore();
   api.visibility.mockClear();
   api.leave.mockClear();
   api.action.mockClear();
@@ -122,7 +191,7 @@ describe("stage header", () => {
   });
 
   it("says 'you' for the starter and has no chip or maker for official plugins", async () => {
-    api.plugins = [{ id: "brawl", name: "Board Brawl", source: { kind: "official" }, icon: null }];
+    api.plugins = [plugin({ kind: "official" })];
     render(<PluginStage activity={{ ...BRAWL, startedByMe: true, participants: [7] }} />);
     await settle();
     expect(screen.getByText("Started by you · 1 in the game")).toBeInTheDocument();
@@ -301,5 +370,165 @@ describe("PluginMiniBars", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Leave Board Brawl" }));
     expect(api.leave).toHaveBeenCalledWith("a1");
+  });
+});
+
+describe("connection chip and no-relay banner", () => {
+  it("shows the relay chip when the relay may carry the plugin's data", async () => {
+    api.plugins = [plugin(MEEPLE, ["peers.relay"])];
+    render(<PluginStage activity={BRAWL} />);
+    await settle();
+    expect(screen.getByText("Relay · end-to-end encrypted")).toBeInTheDocument();
+    expect(screen.queryByText("No relay for plugin data on this server.")).toBeNull();
+  });
+
+  it("shows the Mumble connection without a banner when the user did not grant the relay", async () => {
+    render(<PluginStage activity={BRAWL} />);
+    await settle();
+    expect(screen.getByText("Mumble connection · slower")).toBeInTheDocument();
+    expect(screen.queryByText("No relay for plugin data on this server.")).toBeNull();
+  });
+
+  it("explains a server without relay plugin data and opens its settings from Details", async () => {
+    api.plugins = [plugin(MEEPLE, ["peers.relay"])];
+    api.relay = { kind: "useNotAllowed" };
+    function Requested() {
+      return <output data-testid="tab">{useRequestedPluginTab() ?? ""}</output>;
+    }
+    const { container } = render(
+      <>
+        <PluginStage activity={BRAWL} />
+        <Requested />
+      </>,
+    );
+    await settle();
+    expect(screen.getByText("Mumble connection · slower")).toBeInTheDocument();
+    const banner = screen.getByText("No relay for plugin data on this server.").closest("div");
+    expect(banner).toHaveTextContent(
+      "Study Club's relay doesn't allow plugin data, so Board Brawl uses the slower Mumble connection",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    expect(screen.getByTestId("tab")).toHaveTextContent("installed");
+    expect(await violations(container)).toEqual([]);
+  });
+
+  it("follows the relay's availability as it changes", async () => {
+    api.plugins = [plugin(MEEPLE, ["peers.relay"])];
+    api.relay = { kind: "noRelay" };
+    render(<PluginStage activity={BRAWL} />);
+    await settle();
+    expect(screen.getByText("No relay for plugin data on this server.")).toBeInTheDocument();
+    emit("pluginsRelayAvailability", {
+      serverId: 1,
+      availability: { kind: "available", kbps: 64 },
+    });
+    expect(screen.queryByText("No relay for plugin data on this server.")).toBeNull();
+    expect(screen.getByText("Relay · end-to-end encrypted")).toBeInTheDocument();
+  });
+
+  it("names the server after its root channel in the pop-out and has no Details there", async () => {
+    api.relay = { kind: "useNotAllowed" };
+    render(
+      <InPopout value>
+        <PluginStage activity={BRAWL} />
+      </InPopout>,
+    );
+    await settle();
+    expect(
+      screen.getByText(/Study Club Root's relay doesn't allow plugin data/),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Details" })).toBeNull();
+  });
+});
+
+describe("stage pop-out", () => {
+  const POPPED: MediaPopoutState["stage"] = {
+    target: { serverId: 1, session: null, plugin: "brawl" },
+    onTop: false,
+  };
+
+  it("pops the activity out from the control row", async () => {
+    render(<PluginStage activity={BRAWL} />);
+    await settle();
+    const bar = screen.getByRole("toolbar", { name: "Board Brawl controls" });
+    const button = screen.getByRole("button", { name: "Pop out" });
+    expect(bar).toContainElement(button);
+    fireEvent.click(button);
+    expect(api.popOut).toHaveBeenCalledWith(
+      "stage",
+      { serverId: 1, session: null, plugin: "brawl" },
+      "Board Brawl",
+      null,
+    );
+  });
+
+  it("offers always on top and Pop back in inside the pop-out window", async () => {
+    render(
+      <InPopout value>
+        <PluginStage activity={BRAWL} />
+      </InPopout>,
+    );
+    await settle();
+    expect(screen.queryByRole("button", { name: "Pop out" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Always on top" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Pop back in" }));
+    expect(api.popIn).toHaveBeenCalledWith("stage");
+  });
+
+  it("shows a placeholder in the main window while the activity is popped out", async () => {
+    api.activities = [BRAWL];
+    function Shown() {
+      const { plugins } = useStageEntries();
+      return [...plugins.values()].map((item) => <div key={item.label}>{item.render()}</div>);
+    }
+    render(
+      <>
+        <PluginStageHost />
+        <Shown />
+      </>,
+    );
+    await settle();
+    expect(screen.getByRole("region", { name: "Media area: Board Brawl" })).toBeInTheDocument();
+    emit("mediaPopoutChanged", { state: { ...api.popouts, stage: POPPED } });
+    expect(screen.queryByRole("region", { name: "Media area: Board Brawl" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Board Brawl" })).toHaveTextContent(
+      "Playing in separate window",
+    );
+  });
+
+  it("closes the pop-out once the user is no longer in the activity", async () => {
+    api.activities = [BRAWL];
+    api.popouts = { ...api.popouts, stage: POPPED };
+    render(
+      <>
+        <PluginStageHost />
+        <MediaPopoutHost />
+      </>,
+    );
+    await settle();
+    expect(api.popIn).not.toHaveBeenCalled();
+    api.activities = [];
+    emit("pluginsStageChanged", {});
+    await settle();
+    expect(api.popIn).toHaveBeenCalledWith("stage");
+  });
+
+  it("brings the activity's tab to the front when its window closes", async () => {
+    api.activities = [BRAWL];
+    api.popouts = { ...api.popouts, stage: POPPED };
+    render(
+      <>
+        <PluginStageHost />
+        <MediaPopoutHost />
+      </>,
+    );
+    await settle();
+    emit("mediaPopoutChanged", {
+      state: { ...api.popouts, stage: { target: null, onTop: false } },
+    });
+    expect(mediaView().cinema).toBe("plugin:brawl");
   });
 });

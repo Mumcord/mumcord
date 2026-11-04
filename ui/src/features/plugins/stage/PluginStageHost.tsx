@@ -8,12 +8,24 @@ import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { announce } from "../../../a11y";
 import { getApi, type StageActivityView } from "../../../api";
+import { PoppedOut } from "../../media/PopoutControls";
+import { isStagePoppedOut, usePopouts } from "../../media/popoutStore";
 import { registerStageItem } from "../../media/stageRegistry";
 import { showPluginToast } from "../prompt/installToast";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { useStageActivities } from "./activityStore";
 import { PluginStage } from "./PluginStage";
 import { StageIcon } from "./StageHeader";
+
+/** The activity, or the placeholder while it plays in the pop-out window (FR-9.48). */
+function DockedStage({ activity }: { activity: StageActivityView }) {
+  const poppedOut = isStagePoppedOut(usePopouts(), activity.plugin);
+  if (poppedOut)
+    return (
+      <PoppedOut kind="stage" title={activity.title || activity.pluginName || activity.plugin} />
+    );
+  return <PluginStage activity={activity} />;
+}
 
 function StageEntry({ activity }: { activity: StageActivityView }) {
   const icon = usePluginIcon(activity.plugin);
@@ -24,7 +36,7 @@ function StageEntry({ activity }: { activity: StageActivityView }) {
     unregister.current = registerStageItem(`plugin:${activity.plugin}`, {
       label,
       icon: <StageIcon name={label} url={icon} small />,
-      render: () => <PluginStage activity={activity} />,
+      render: () => <DockedStage activity={activity} />,
     });
   }, [activity, label, icon]);
   useEffect(

@@ -8,12 +8,15 @@ import { useSyncExternalStore } from "react";
 import { getApi, toEngineError, type StageActivityView, type StageJoinError } from "../../../api";
 
 let activities: readonly StageActivityView[] = [];
+/** The host answered at least once; until then the empty list means nothing. */
+let loaded = false;
 const listeners = new Set<() => void>();
 let unsubscribers: (() => void)[] = [];
 let loadId = 0;
 
 function publish(next: readonly StageActivityView[]): void {
   activities = next;
+  loaded = true;
   for (const listener of listeners) listener();
 }
 
@@ -45,6 +48,16 @@ function subscribe(listener: () => void): () => void {
     for (const unsubscribe of unsubscribers) unsubscribe();
     unsubscribers = [];
   };
+}
+
+/** Whether the list came from the host yet; read next to `useStageActivities`. */
+export function activitiesLoaded(): boolean {
+  return loaded;
+}
+
+/** The activity of `plugin` the user is in, if any, for code outside React. */
+export function joinedActivityOf(plugin: string): StageActivityView | undefined {
+  return activities.find((a) => a.plugin === plugin && a.kind === "activity" && a.joined);
 }
 
 export function useStageActivities(): readonly StageActivityView[] {
@@ -91,5 +104,6 @@ export function resetActivityStore(): void {
   unsubscribers = [];
   listeners.clear();
   activities = [];
+  loaded = false;
   loadId++;
 }

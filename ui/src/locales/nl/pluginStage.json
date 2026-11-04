@@ -29,6 +29,7 @@
   "activitiesLabel": "Plugin-activiteiten",
   "noRelayTitle": "Geen relay voor plug-ingegevens op deze server.",
   "noRelayText": "De relay van {{server}} staat geen plug-ingegevens toe, dus {{plugin}} gebruikt de tragere Mumble-verbinding: zetten kunnen even duren en grote borden zijn uitgeschakeld.",
+  "noRelayDetails": "Details",
   "tooMany": "Te veel activiteiten in dit kanaal",
   "full": "Deze activiteit is vol",
   "joinGone": "Deze activiteit is afgelopen",

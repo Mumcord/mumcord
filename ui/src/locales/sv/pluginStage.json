@@ -29,6 +29,7 @@
   "activitiesLabel": "Plugin-aktiviteter",
   "noRelayTitle": "Inget relä för tilläggsdata på den här servern.",
   "noRelayText": "{{server}}s relä tillåter inte tilläggsdata, så {{plugin}} använder den långsammare Mumble-anslutningen: drag kan ta en stund och stora brädor är avstängda.",
+  "noRelayDetails": "Detaljer",
   "tooMany": "För många aktiviteter i den här kanalen",
   "full": "Den här aktiviteten är full",
   "joinGone": "Den här aktiviteten har avslutats",
