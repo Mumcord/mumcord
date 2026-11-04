@@ -104,7 +104,7 @@ describe("sharer live bar", () => {
     vi.spyOn(api, "settingsGet").mockResolvedValue({ ...loaded, ...settings });
     render(<SharerBar />);
     await act(async () => {
-      await api.screenShareStart(1, false);
+      await api.screenShareStart(1, false, null, null);
     });
     const share: ScreenShare = {
       session: SELF,
