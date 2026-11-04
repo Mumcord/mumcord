@@ -669,6 +669,13 @@ export const commands = {
 	pluginPlatformSettings: () => typedError<PluginPlatformSettings, ApiError>(__TAURI_INVOKE("plugin_platform_settings")),
 	/**  Saves the plugin platform's settings; the volume is clamped to 0–100. */
 	pluginSetPlatformSettings: (settings: PluginPlatformSettings) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_platform_settings", { settings })),
+	/**
+	 *  The relay's plugin-data availability on `server_id`; kept current by the
+	 *  `plugins://relay-availability` event.
+	 */
+	pluginRelayAvailability: (serverId: number) => typedError<PluginRelayAvailability, ApiError>(__TAURI_INVOKE("plugin_relay_availability", { serverId })),
+	/**  Relay data used this session, one entry per installed plugin (zero when unused). */
+	pluginRelayUsage: () => typedError<PluginRelayUsage[], ApiError>(__TAURI_INVOKE("plugin_relay_usage")),
 	/**  "Check now": looks for plugin updates and revocations right away. */
 	pluginCheckNow: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_check_now")),
 	/**  The plugin's stored data as JSON (never secrets); the UI saves it with `save_text`. */
@@ -1113,6 +1120,7 @@ export const events = {
 	pluginsInstallProgress: makeEvent<PluginInstallProgress, PluginInstallProgress>("plugins://install-progress"),
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
 	pluginsOpenDetails: makeEvent<PluginsOpenDetails, PluginsOpenDetails>("plugins://open-details"),
+	pluginsRelayAvailability: makeEvent<PluginRelayAvailabilityChanged, PluginRelayAvailabilityChanged>("plugins://relay-availability"),
 	pluginsSharedState: makeEvent<PluginsSharedState, PluginsSharedState>("plugins://shared-state"),
 	pluginsStageChanged: makeEvent<StageChanged, StageChanged>("plugins://stage-changed"),
 	pluginsStageRefused: makeEvent<StageRefused, StageRefused>("plugins://stage-refused"),
@@ -3184,6 +3192,35 @@ export type PluginRecentChange = {
 	trustPercent: number,
 	/**  The permissions that count as a recent change. */
 	permissions: string[],
+};
+
+/**
+ *  Whether `server`'s relay can carry plugin data right now (FR-9.57), before the global
+ *  switch and a plugin's own permission.
+ */
+export type PluginRelayAvailability = 
+/**  No relay is connected on this server. */
+{ kind: "noRelay" } | 
+/**  The relay does not announce `plugin_data`. */
+{ kind: "useNotAllowed" } | 
+/**  The P2P mode does not allow the relay, or there is no client certificate. */
+{ kind: "notAllowedHere" } | 
+/**  `kbps`: the relay's per-sender cap, when it announces one. */
+{ kind: "available"; kbps: number | null };
+
+/**
+ *  `plugins://relay-availability`: whether `serverId`'s relay can carry plugin data changed
+ *  (FR-9.57). `plugin_relay_availability` answers for a server that changed before the UI listened.
+ */
+export type PluginRelayAvailabilityChanged = {
+	serverId: number,
+	availability: PluginRelayAvailability,
+};
+
+/**  Plugin data a plugin sent and received through relays in this app session (FR-9.64). */
+export type PluginRelayUsage = {
+	pluginId: string,
+	bytes: number | null,
 };
 
 /**  One website of an update; plain, untrusted text. */

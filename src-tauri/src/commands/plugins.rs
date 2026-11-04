@@ -1347,6 +1347,74 @@ pub async fn plugin_set_platform_settings(
     Ok(())
 }
 
+/// Whether `server`'s relay can carry plugin data right now (FR-9.57), before the global
+/// switch and a plugin's own permission.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum PluginRelayAvailability {
+    /// No relay is connected on this server.
+    NoRelay,
+    /// The relay does not announce `plugin_data`.
+    UseNotAllowed,
+    /// The P2P mode does not allow the relay, or there is no client certificate.
+    NotAllowedHere,
+    /// `kbps`: the relay's per-sender cap, when it announces one.
+    #[serde(rename_all = "camelCase")]
+    Available { kbps: Option<u32> },
+}
+
+impl From<mumcord_plugins::api::relay::Availability> for PluginRelayAvailability {
+    fn from(a: mumcord_plugins::api::relay::Availability) -> Self {
+        use mumcord_plugins::api::relay::Availability as A;
+        match a {
+            A::NoRelay => Self::NoRelay,
+            A::UseNotAllowed => Self::UseNotAllowed,
+            A::NotAllowedHere => Self::NotAllowedHere,
+            A::Available { kbps } => Self::Available { kbps },
+        }
+    }
+}
+
+/// Plugin data a plugin sent and received through relays in this app session (FR-9.64).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginRelayUsage {
+    pub plugin_id: String,
+    pub bytes: f64,
+}
+
+/// The relay's plugin-data availability on `server_id`; kept current by the
+/// `plugins://relay-availability` event.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_relay_availability(
+    app: AppHandle,
+    server_id: ServerId,
+) -> ApiResult<PluginRelayAvailability> {
+    let server = to_engine_server_id(server_id);
+    plugins_of(&app)?
+        .call(move |service| Ok(service.relay_availability(server).into()))
+        .await
+}
+
+/// Relay data used this session, one entry per installed plugin (zero when unused).
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_relay_usage(app: AppHandle) -> ApiResult<Vec<PluginRelayUsage>> {
+    plugins_of(&app)?
+        .call(|service| {
+            Ok(service
+                .list()?
+                .into_iter()
+                .map(|p| PluginRelayUsage {
+                    bytes: service.relay_usage(&p.id) as f64,
+                    plugin_id: p.id,
+                })
+                .collect())
+        })
+        .await
+}
+
 /// Installs the waiting update of `id`; `optional` are the optional permissions to keep on.
 #[tauri::command]
 #[specta::specta]

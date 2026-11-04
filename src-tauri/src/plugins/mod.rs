@@ -115,6 +115,16 @@ pub struct PluginsSharedState {
     pub supported: bool,
 }
 
+/// `plugins://relay-availability`: whether `serverId`'s relay can carry plugin data changed
+/// (FR-9.57). `plugin_relay_availability` answers for a server that changed before the UI listened.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://relay-availability")]
+pub struct PluginRelayAvailabilityChanged {
+    pub server_id: crate::commands::types::ServerId,
+    pub availability: crate::commands::plugins::PluginRelayAvailability,
+}
+
 /// One step of an install.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "stage", rename_all = "camelCase")]
@@ -307,6 +317,12 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
     let (mut service, host_events, events) =
         PluginService::new(config, engine.store_handle(), secrets)?;
     test_hooks(&mut service);
+    // The engine's own relay switch starts from the stored choice too (FR-9.63).
+    engine.plugin_relay_set_enabled(
+        engine
+            .settings()
+            .map_or(true, |s| s.plugins.relay_data_enabled),
+    );
     tracing::info!(no_plugins, "plugin service ready");
     let webviews = service.webviews();
     let plugins = Arc::new(Plugins {
@@ -655,6 +671,18 @@ pub fn on_engine_event(
     }
 }
 
+/// Re-checks relay plugin-data availability on every connected server. Call after a P2P mode or
+/// identity change: the engine announces neither as a relay change.
+pub fn refresh_all_relay_availability(app: &AppHandle) {
+    let Ok(plugins) = state(app) else {
+        return;
+    };
+    let engine = app.state::<Engine>().inner().clone();
+    for server_id in engine.connections().iter().filter_map(|c| c.server_id()) {
+        refresh_relay_availability(app, &plugins, server_id);
+    }
+}
+
 /// Tells the plugin service whether `server_id`'s relay can carry plugin data now (FR-9.57).
 pub fn refresh_relay_availability(
     app: &AppHandle,
@@ -665,6 +693,7 @@ pub fn refresh_relay_availability(
     use mumcord_plugins::api::relay::Availability;
     let engine = app.state::<Engine>().inner().clone();
     let plugins = Arc::clone(plugins);
+    let app = app.clone();
     tauri::async_runtime::spawn(async move {
         let availability = match engine.plugin_relay_availability(server_id).await {
             A::NoRelay => Availability::NoRelay,
@@ -674,12 +703,23 @@ pub fn refresh_relay_availability(
         };
         let result = plugins
             .call(move |service| {
+                let changed = service.relay_availability(server_id) != availability;
                 service.set_relay_availability(server_id, availability);
-                Ok(())
+                Ok(changed)
             })
             .await;
-        if let Err(e) = result {
-            tracing::warn!(error = %e, "updating the relay plugin data status failed");
+        match result {
+            Ok(true) => {
+                let event = PluginRelayAvailabilityChanged {
+                    server_id: crate::commands::types::to_api_server_id(server_id),
+                    availability: availability.into(),
+                };
+                if let Err(e) = event.emit(&app) {
+                    tracing::warn!(error = %e, "emitting the relay availability failed");
+                }
+            }
+            Ok(false) => {}
+            Err(e) => tracing::warn!(error = %e, "updating the relay plugin data status failed"),
         }
     });
 }

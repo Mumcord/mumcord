@@ -3155,6 +3155,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     // Servers older than 1.4 pass no plugin data (FR-6.38).
     pluginsSharedSupported: () =>
       Promise.resolve(!serverVersion.startsWith("1.3") && !serverVersion.startsWith("1.2")),
+    pluginRelayAvailability: () => Promise.resolve({ kind: "available", kbps: 64 }),
+    pluginRelayUsage: () => Promise.resolve([]),
     pluginsIndex: () => Promise.resolve({ freshness: "fresh", notice: null, plugins: [] }),
     pluginReposList: () => Promise.resolve(repositories.map((r) => ({ ...r }))),
     pluginRepoPreview: (url, expectedKey) => Promise.resolve(previewRepository(url, expectedKey)),
