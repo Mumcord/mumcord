@@ -26,6 +26,7 @@ import { ChannelHeader, ChannelTreeMenu } from "../features/channelheader";
 import { ChatView } from "../features/chat";
 import { Updater } from "../features/updates";
 import { PluginsHost } from "../features/plugins";
+import { SidePanelHost } from "../features/plugins/sidepanel";
 import { UserStatsWatcher } from "../features/connection";
 import { FriendsList } from "../features/friends";
 import {
@@ -271,6 +272,13 @@ export function MediaWidgetsMount() {
 /** Member list (B20) with the friends list below (FR-1.64); the party's panel takes the column
 while its cinema view is open (issue #163). */
 export function MembersMount() {
+  return (
+    <SidePanelHost>
+      <MembersColumn />
+    </SidePanelHost>
+  );
+}
+function MembersColumn() {
   const view = useMediaView();
   const serverId = useVoiceServerId();
   const { users, selfSession } = useServerStateOf(serverId);

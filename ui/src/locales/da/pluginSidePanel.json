@@ -1,0 +1,6 @@
+{
+  "region": "{{plugin}}s sidepanel",
+  "close": "Luk {{plugin}}s sidepanel",
+  "resize": "Tilpas størrelsen på {{plugin}}s sidepanel",
+  "failed": "{{plugin}}s sidepanel kunne ikke lukkes. Prøv igen."
+}

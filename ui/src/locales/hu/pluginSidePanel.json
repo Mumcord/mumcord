@@ -1,0 +1,6 @@
+{
+  "region": "{{plugin}} oldalpanelje",
+  "close": "{{plugin}} oldalpanelének bezárása",
+  "resize": "{{plugin}} oldalpanelének átméretezése",
+  "failed": "A(z) {{plugin}} oldalpanelét nem sikerült bezárni. Próbáld újra."
+}

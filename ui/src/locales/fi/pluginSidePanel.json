@@ -1,0 +1,6 @@
+{
+  "region": "{{plugin}}n sivupaneeli",
+  "close": "Sulje {{plugin}}n sivupaneeli",
+  "resize": "Muuta {{plugin}}n sivupaneelin kokoa",
+  "failed": "{{plugin}}n sivupaneelia ei voitu sulkea. Yritä uudelleen."
+}

@@ -1,0 +1,6 @@
+{
+  "region": "Stranska plošča {{plugin}}",
+  "close": "Zapri stransko ploščo {{plugin}}",
+  "resize": "Spremeni velikost stranske plošče {{plugin}}",
+  "failed": "Stranske plošče {{plugin}} ni bilo mogoče zapreti. Poskusi znova."
+}

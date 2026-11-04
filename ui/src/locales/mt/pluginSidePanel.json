@@ -1,0 +1,6 @@
+{
+  "region": "Pannell tal-ġenb ta' {{plugin}}",
+  "close": "Agħlaq il-pannell tal-ġenb ta' {{plugin}}",
+  "resize": "Biddel id-daqs tal-pannell tal-ġenb ta' {{plugin}}",
+  "failed": "Ma setgħetx tagħlaq il-pannell tal-ġenb ta' {{plugin}}. Erġa' pprova."
+}

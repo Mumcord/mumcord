@@ -1,0 +1,6 @@
+{
+  "region": "{{plugin}} sānjosla",
+  "close": "Aizvērt {{plugin}} sānjoslu",
+  "resize": "Mainīt {{plugin}} sānjoslas izmēru",
+  "failed": "Neizdevās aizvērt {{plugin}} sānjoslu. Mēģini vēlreiz."
+}

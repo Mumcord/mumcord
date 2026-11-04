@@ -1,0 +1,6 @@
+{
+  "region": "Panneau latéral de {{plugin}}",
+  "close": "Fermer le panneau latéral de {{plugin}}",
+  "resize": "Redimensionner le panneau latéral de {{plugin}}",
+  "failed": "Le panneau latéral de {{plugin}} n'a pas pu être fermé. Réessaie."
+}
