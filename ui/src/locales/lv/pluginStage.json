@@ -29,6 +29,7 @@
   "activitiesLabel": "Spraudņu aktivitātes",
   "noRelayTitle": "Šajā serverī nav releja spraudņu datiem.",
   "noRelayText": "{{server}} relejs neatļauj spraudņu datus, tāpēc {{plugin}} izmanto lēnāko Mumble savienojumu: gājieni var aizkavēties, un lielie laukumi ir izslēgti.",
+  "noRelayDetails": "Sīkāk",
   "tooMany": "Šajā kanālā ir pārāk daudz aktivitāšu",
   "full": "Šī aktivitāte ir pilna",
   "joinGone": "Šī aktivitāte ir beigusies",

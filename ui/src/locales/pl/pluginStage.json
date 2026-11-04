@@ -29,6 +29,7 @@
   "activitiesLabel": "Aktywności wtyczek",
   "noRelayTitle": "Ten serwer nie ma przekaźnika dla danych wtyczek.",
   "noRelayText": "Przekaźnik serwera {{server}} nie zezwala na dane wtyczek, więc {{plugin}} używa wolniejszego połączenia Mumble: ruchy mogą chwilę trwać, a duże plansze są wyłączone.",
+  "noRelayDetails": "Szczegóły",
   "tooMany": "Zbyt wiele aktywności na tym kanale",
   "full": "Ta aktywność jest pełna",
   "joinGone": "Ta aktywność się zakończyła",

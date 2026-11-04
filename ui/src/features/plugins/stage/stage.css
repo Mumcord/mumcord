@@ -222,3 +222,69 @@
     color: HighlightText;
   }
 }
+
+/* "No relay for plugin data on this server." (mockup surfaces 08): amber on the dark card. */
+.plugin-stage__relay {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgb(255 207 112 / 55%);
+  border-radius: var(--radius-md);
+  background: rgb(255 207 112 / 10%);
+  color: #ffe2a3;
+  font-size: var(--font-size-sm);
+}
+
+.plugin-stage__relay strong {
+  color: #fff;
+}
+
+.plugin-stage__relay-icon {
+  flex: none;
+  margin-top: 2px;
+}
+
+.plugin-stage .plugin-stage__banner-button {
+  flex: none;
+  height: 1.75rem;
+  margin-left: auto;
+}
+
+/* The shared relay chip keeps the card's fixed colours, which are dark in every theme. */
+.plugin-stage .relay-chip {
+  border-color: var(--media-glass-border);
+  background: var(--media-glass);
+}
+
+.plugin-stage .relay-chip--ok {
+  border-color: #3ee39e;
+  color: #3ee39e;
+}
+
+.plugin-stage .relay-chip--warn {
+  border-color: rgb(255 207 112 / 70%);
+  color: #ffcf70;
+}
+
+/* In its own window the activity fills it. */
+.media-popout > .media-frame.plugin-stage {
+  flex: 1;
+  align-self: stretch;
+  max-width: none;
+  min-width: 0;
+  border-radius: 0;
+}
+
+.media-popout > .plugin-stage .plugin-stage__content {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+@media (forced-colors: active) {
+  .plugin-stage__relay,
+  .plugin-stage .relay-chip {
+    border: 1px solid CanvasText;
+  }
+}

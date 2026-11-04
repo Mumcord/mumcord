@@ -29,6 +29,7 @@
   "activitiesLabel": "Actividades de plugins",
   "noRelayTitle": "Este servidor no tiene relé para datos de plugins.",
   "noRelayText": "El relé de {{server}} no admite datos de plugins, así que {{plugin}} usa la conexión de Mumble, más lenta: los movimientos pueden tardar un momento y los tableros grandes están desactivados.",
+  "noRelayDetails": "Detalles",
   "tooMany": "Demasiadas actividades en este canal",
   "full": "Esta actividad está completa",
   "joinGone": "Esta actividad ha terminado",

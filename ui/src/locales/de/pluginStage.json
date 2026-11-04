@@ -29,6 +29,7 @@
   "activitiesLabel": "Plugin-Aktivitäten",
   "noRelayTitle": "Kein Relay für Plugin-Daten auf diesem Server.",
   "noRelayText": "Das Relay von {{server}} erlaubt keine Plugin-Daten, daher nutzt {{plugin}} die langsamere Mumble-Verbindung: Züge können einen Moment dauern, und große Spielbretter sind nicht verfügbar.",
+  "noRelayDetails": "Details",
   "tooMany": "Zu viele Aktivitäten in diesem Kanal",
   "full": "Diese Aktivität ist voll",
   "joinGone": "Diese Aktivität ist beendet",

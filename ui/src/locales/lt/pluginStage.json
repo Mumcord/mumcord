@@ -29,6 +29,7 @@
   "activitiesLabel": "Papildinių veiklos",
   "noRelayTitle": "Šiame serveryje nėra papildinių duomenų perdavimo mazgo.",
   "noRelayText": "{{server}} perdavimo mazgas neleidžia papildinių duomenų, todėl {{plugin}} naudoja lėtesnį Mumble ryšį: ėjimai gali užtrukti, o dideli žaidimo laukai išjungti.",
+  "noRelayDetails": "Išsamiau",
   "tooMany": "Per daug veiklų šiame kanale",
   "full": "Ši veikla pilna",
   "joinGone": "Ši veikla baigėsi",

@@ -1,7 +1,8 @@
 /**
  * One plugin activity in the media area (FR-9.46, FR-9.48, FR-9.49, mockup surfaces 03): Mumcord's
- * header, the plugin's content (its `stage` tree or its web page) and the control row with
- * Full screen and Leave. Full screen only ever starts from Mumcord's button, shows the banner for
+ * header, the "No relay" banner when it applies, the plugin's content (its `stage` tree or its web
+ * page) and the control row with Pop out, Full screen and Leave. In the pop-out window Pop out
+ * becomes always on top and Pop back in. Full screen only ever starts from Mumcord's button, shows the banner for
  * 3 s and Esc always ends it. The plugin hears whether its tab is on screen (`stage-visibility`).
  */
 import { useEffect, useRef, useState } from "react";
@@ -10,13 +11,16 @@ import { announce } from "../../../a11y";
 import { getApi, toEngineError, type StageActivityView } from "../../../api";
 import { useFullscreen } from "../../media/useFullscreen";
 import { MediaIcon } from "../../media/icons";
+import { popIn, popOut, setPopoutOnTop, useInPopout, usePopouts } from "../../media/popoutStore";
 import { useStageShown } from "../../media/stageContext";
+import { useVoiceServerId } from "../../channels/serverStore";
 import { usePlugins } from "../pluginStore";
 import { PluginTree } from "../render/PluginTree";
 import { usePluginTree } from "../render/pluginUiStore";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { PluginFrame, usePluginWebView } from "../webview";
 import { leaveActivity } from "./activityStore";
+import { NoRelayBanner } from "./StageConnection";
 import { StageHeader } from "./StageHeader";
 import "../../media/media.css";
 import "./stage.css";
@@ -77,6 +81,7 @@ export function PluginStage({ activity }: { activity: StageActivityView }) {
   const plugin = usePlugins().overview?.plugins.find((p) => p.id === activity.plugin);
   const icon = usePluginIcon(activity.plugin);
   const name = activity.pluginName || activity.plugin;
+  const serverId = useVoiceServerId();
 
   useStageVisibility(activity.plugin, shown);
 
@@ -127,7 +132,8 @@ export function PluginStage({ activity }: { activity: StageActivityView }) {
       aria-label={t("mediaLabel", { plugin: name })}
       data-fullscreen={fullscreen || undefined}
     >
-      <StageHeader activity={activity} plugin={plugin} icon={icon} />
+      <StageHeader activity={activity} plugin={plugin} icon={icon} serverId={serverId} />
+      <NoRelayBanner serverId={serverId} plugin={name} />
       <div className="media-frame__picture plugin-stage__content">
         <StageContent activity={activity} onEscape={exit} />
       </div>
@@ -136,6 +142,9 @@ export function PluginStage({ activity }: { activity: StageActivityView }) {
         role="toolbar"
         aria-label={t("controlsLabel", { plugin: name })}
       >
+        {serverId !== null && (
+          <WindowButtons plugin={activity.plugin} serverId={serverId} name={name} />
+        )}
         <button
           type="button"
           className="plugin-stage__button"
@@ -157,6 +166,66 @@ export function PluginStage({ activity }: { activity: StageActivityView }) {
         </p>
       )}
     </section>
+  );
+}
+
+/**
+ * "Pop out" in the main window; always on top and "Pop back in" in the pop-out window. The main
+ * window renames the pop-out to the plugin and channel once it is open.
+ */
+function WindowButtons({
+  plugin,
+  serverId,
+  name,
+}: {
+  plugin: string;
+  serverId: number;
+  name: string;
+}) {
+  const { t } = useTranslation("pluginStage");
+  const { t: tc } = useTranslation("common", { keyPrefix: "media" });
+  const inPopout = useInPopout();
+  const onTop = usePopouts().stage.onTop;
+  if (!inPopout) {
+    return (
+      <button
+        type="button"
+        className="plugin-stage__button"
+        onClick={() => {
+          popOut("stage", { serverId, session: null, plugin }, name, tc("popOutFailed"));
+        }}
+      >
+        <MediaIcon name="open" />
+        {t("popOut")}
+      </button>
+    );
+  }
+  return (
+    <>
+      <button
+        type="button"
+        className="plugin-stage__button"
+        aria-label={tc("onTop")}
+        data-tooltip={tc("onTop")}
+        aria-pressed={onTop}
+        onClick={() => {
+          setPopoutOnTop("stage", !onTop, tc("onTopFailed"));
+        }}
+      >
+        <MediaIcon name="pin" />
+      </button>
+      <button
+        type="button"
+        className="plugin-stage__button"
+        aria-keyshortcuts="Control+W"
+        onClick={() => {
+          popIn("stage", tc("popInFailed"));
+        }}
+      >
+        <MediaIcon name="popIn" />
+        {tc("popIn")}
+      </button>
+    </>
   );
 }
 

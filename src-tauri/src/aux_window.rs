@@ -1,6 +1,6 @@
 //! Windows of their own next to the main window: the packet inspector (issue #60), the
-//! third-party licences (issue #138), "What's new" (issue #145) and the watch party and screen
-//! share pop-outs (issue #164). Each is open at most once at a time, may call only the few
+//! third-party licences (issue #138), "What's new" (issue #145) and the watch party, screen
+//! share and plugin stage pop-outs (issue #164, FR-9.48). Each is open at most once at a time, may call only the few
 //! commands it needs, and remembers its size and position on this device.
 
 use std::path::PathBuf;
@@ -134,16 +134,50 @@ pub const SHARE_POPOUT: Spec = Spec {
     ],
 };
 
-const ALL: [&Spec; 5] = [
+/// A plugin activity in its own window (FR-9.48). It shows the plugin's stage tree or web page and
+/// passes the user's clicks and the page's messages to the plugin like the docked stage. It can
+/// leave the activity but not start or join one, and reads the frames' mute state so a deafen
+/// from before it opened still silences the page. The relay commands drive the connection chip.
+pub const STAGE_POPOUT: Spec = Spec {
+    label: "media-popout-stage",
+    url: "index.html?window=media-popout&kind=stage",
+    title: "Plugin activity — Mumcord",
+    default_size: (960.0, 640.0),
+    min_size: (360.0, 280.0),
+    geometry_file: "media-popout-stage-window.json",
+    allowed_commands: popout_commands![
+        "plugins_list",
+        "plugin_asset",
+        "plugin_platform_settings",
+        "plugins_ui_trees",
+        "plugin_ui_action",
+        "plugin_ui_event",
+        "plugin_frames_mute",
+        "plugin_frames_mute_state",
+        "plugin_relay_availability",
+        "stage_activities",
+        "stage_leave",
+        "stage_visibility",
+    ],
+};
+
+const ALL: [&Spec; 6] = [
     &INSPECTOR,
     &LICENCES,
     &CHANGELOG,
     &WATCH_POPOUT,
     &SHARE_POPOUT,
+    &STAGE_POPOUT,
 ];
 
 /// The windows that follow the main window's theme and language.
-pub const FOLLOW_LOOK: [&Spec; 4] = [&LICENCES, &CHANGELOG, &WATCH_POPOUT, &SHARE_POPOUT];
+pub const FOLLOW_LOOK: [&Spec; 5] = [
+    &LICENCES,
+    &CHANGELOG,
+    &WATCH_POPOUT,
+    &SHARE_POPOUT,
+    &STAGE_POPOUT,
+];
 
 /// Whether the webview `label` may call `command`; only the windows above are limited.
 pub fn command_allowed(label: &str, command: &str) -> bool {
@@ -445,6 +479,43 @@ mod tests {
             "watch_party_command",
             "person_set_local_mute",
             "settings_get",
+            "settings_update",
+        ] {
+            assert!(!command_allowed(label, command), "{command}");
+        }
+    }
+
+    #[test]
+    fn the_stage_popout_gets_only_the_stage_commands() {
+        let label = STAGE_POPOUT.label;
+        for command in [
+            "window_look",
+            "media_popout_state",
+            "media_popout_close",
+            "media_popout_set_on_top",
+            "plugins_list",
+            "plugin_asset",
+            "plugins_ui_trees",
+            "plugin_ui_action",
+            "plugin_ui_event",
+            "plugin_frames_mute",
+            "plugin_frames_mute_state",
+            "plugin_relay_availability",
+            "stage_activities",
+            "stage_leave",
+            "stage_visibility",
+        ] {
+            assert!(command_allowed(label, command), "{command}");
+        }
+        for command in [
+            "media_popout_open",
+            "stage_join",
+            "plugin_install",
+            "plugin_set_permissions",
+            "plugin_set_platform_settings",
+            "plugins_set_all_off",
+            "screen_share_frames_attach",
+            "watch_party_command",
             "settings_update",
         ] {
             assert!(!command_allowed(label, command), "{command}");

@@ -29,6 +29,7 @@
   "activitiesLabel": "Aktivnosti dodataka",
   "noRelayTitle": "Na ovom poslužitelju nema releja za podatke dodataka.",
   "noRelayText": "Relej poslužitelja {{server}} ne dopušta podatke dodataka, pa {{plugin}} koristi sporiju Mumble vezu: potezi mogu malo kasniti, a velike ploče su isključene.",
+  "noRelayDetails": "Pojedinosti",
   "tooMany": "Previše aktivnosti u ovom kanalu",
   "full": "Ova aktivnost je puna",
   "joinGone": "Ova aktivnost je završila",

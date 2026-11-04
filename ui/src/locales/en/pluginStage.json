@@ -29,6 +29,7 @@
   "activitiesLabel": "Plugin activities",
   "noRelayTitle": "No relay for plugin data on this server.",
   "noRelayText": "{{server}}'s relay doesn't allow plugin data, so {{plugin}} uses the slower Mumble connection: moves can take a moment and big boards are off.",
+  "noRelayDetails": "Details",
   "tooMany": "Too many activities in this channel",
   "full": "This activity is full",
   "joinGone": "This activity has ended",

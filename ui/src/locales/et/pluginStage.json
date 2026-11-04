@@ -29,6 +29,7 @@
   "activitiesLabel": "Pistikprogrammide tegevused",
   "noRelayTitle": "Sellel serveril pole plugina andmete releeserverit.",
   "noRelayText": "Serveri {{server}} releeserver ei luba plugina andmeid, seega kasutab {{plugin}} aeglasemat Mumble'i ühendust: käigud võivad võtta hetke ja suured lauad on välja lülitatud.",
+  "noRelayDetails": "Üksikasjad",
   "tooMany": "Selles kanalis on liiga palju tegevusi",
   "full": "See tegevus on täis",
   "joinGone": "See tegevus on lõppenud",

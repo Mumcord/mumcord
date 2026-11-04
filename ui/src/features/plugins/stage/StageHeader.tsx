@@ -34,9 +34,11 @@ interface StageHeaderProps {
   activity: StageActivityView;
   plugin: InstalledPlugin | undefined;
   icon: string | null;
+  /** The server whose relay the connection chip describes. */
+  serverId: number | null;
 }
 
-export function StageHeader({ activity, plugin, icon }: StageHeaderProps) {
+export function StageHeader({ activity, plugin, icon, serverId }: StageHeaderProps) {
   const { t } = useTranslation("pluginStage");
   const name = activity.pluginName || activity.plugin;
   const count = activity.participants.length;
@@ -61,7 +63,7 @@ export function StageHeader({ activity, plugin, icon }: StageHeaderProps) {
             {t("unofficial")}
           </span>
         )}
-        <StageConnection />
+        <StageConnection serverId={serverId} plugin={plugin} />
       </span>
     </header>
   );

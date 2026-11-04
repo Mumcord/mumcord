@@ -29,6 +29,7 @@
   "activitiesLabel": "Dejavnosti vtičnikov",
   "noRelayTitle": "Na tem strežniku ni releja za podatke vtičnikov.",
   "noRelayText": "Relej strežnika {{server}} ne dovoljuje podatkov vtičnikov, zato {{plugin}} uporablja počasnejšo povezavo Mumble: poteze lahko trajajo trenutek, velike table pa so izklopljene.",
+  "noRelayDetails": "Podrobnosti",
   "tooMany": "Preveč dejavnosti v tem kanalu",
   "full": "Ta dejavnost je polna",
   "joinGone": "Ta dejavnost se je končala",

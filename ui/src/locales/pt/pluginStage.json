@@ -29,6 +29,7 @@
   "activitiesLabel": "Atividades de plugins",
   "noRelayTitle": "Sem retransmissão para dados de plugins neste servidor.",
   "noRelayText": "A retransmissão de {{server}} não permite dados de plugins, por isso {{plugin}} usa a ligação Mumble, mais lenta: as jogadas podem demorar um pouco e os tabuleiros grandes ficam desativados.",
+  "noRelayDetails": "Detalhes",
   "tooMany": "Demasiadas atividades neste canal",
   "full": "Esta atividade está cheia",
   "joinGone": "Esta atividade terminou",

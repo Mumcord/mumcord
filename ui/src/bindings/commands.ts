@@ -2453,7 +2453,9 @@ export type MediaPopoutKind =
 /**  The watch party player. */
 "watch" | 
 /**  A watched screen share. */
-"share";
+"share" | 
+/**  A plugin activity on the stage. */
+"stage";
 
 /**  One kind of pop-out. */
 export type MediaPopoutSlot = {
@@ -2463,17 +2465,23 @@ export type MediaPopoutSlot = {
 	onTop: boolean,
 };
 
-/**  Both pop-outs. */
+/**  All pop-outs. */
 export type MediaPopoutState = {
 	watch: MediaPopoutSlot,
 	share: MediaPopoutSlot,
+	stage: MediaPopoutSlot,
 };
 
-/**  What a pop-out shows: the party of `serverId`, or the share of `session` on `serverId`. */
+/**
+ *  What a pop-out shows: the party of `serverId`, the share of `session` on `serverId`, or the
+ *  activity of `plugin` in the user's channel on `serverId`.
+ */
 export type MediaPopoutTarget = {
 	serverId: number,
-	/**  The sharer; `null` for the watch party. */
+	/**  The sharer; `null` for the watch party and the stage. */
 	session: number | null,
+	/**  The plugin whose activity the stage pop-out shows; `null` for the other kinds. */
+	plugin: string | null,
 };
 
 /**  One new message as the UI would announce it. Texts are translated and plain (no HTML). */

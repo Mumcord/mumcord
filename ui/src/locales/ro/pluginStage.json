@@ -29,6 +29,7 @@
   "activitiesLabel": "Activități ale pluginurilor",
   "noRelayTitle": "Niciun relay pentru datele de plugin pe acest server.",
   "noRelayText": "Relay-ul serverului {{server}} nu permite date de plugin, așa că {{plugin}} folosește conexiunea Mumble, mai lentă: mutările pot dura puțin, iar tablele mari sunt dezactivate.",
+  "noRelayDetails": "Detalii",
   "tooMany": "Prea multe activități pe acest canal",
   "full": "Această activitate este plină",
   "joinGone": "Această activitate s-a încheiat",

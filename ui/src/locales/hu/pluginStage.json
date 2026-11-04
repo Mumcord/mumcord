@@ -29,6 +29,7 @@
   "activitiesLabel": "Bővítménytevékenységek",
   "noRelayTitle": "Ezen a szerveren nincs továbbító a bővítményadatokhoz.",
   "noRelayText": "A(z) {{server}} továbbítója nem engedi a bővítményadatokat, ezért a(z) {{plugin}} a lassabb Mumble-kapcsolatot használja: a lépések késhetnek, a nagy táblák pedig ki vannak kapcsolva.",
+  "noRelayDetails": "Részletek",
   "tooMany": "Túl sok tevékenység ezen a csatornán",
   "full": "Ez a tevékenység betelt",
   "joinGone": "Ez a tevékenység véget ért",

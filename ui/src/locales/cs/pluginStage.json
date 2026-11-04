@@ -29,6 +29,7 @@
   "activitiesLabel": "Aktivity pluginů",
   "noRelayTitle": "Tento server nemá relay pro data doplňků.",
   "noRelayText": "Relay serveru {{server}} nepovoluje data doplňků, takže {{plugin}} používá pomalejší spojení Mumble: tahy mohou chvíli trvat a velké herní plochy jsou vypnuté.",
+  "noRelayDetails": "Podrobnosti",
   "tooMany": "V tomto kanálu je příliš mnoho aktivit",
   "full": "Tato aktivita je plná",
   "joinGone": "Tato aktivita skončila",

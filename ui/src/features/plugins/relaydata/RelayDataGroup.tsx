@@ -6,11 +6,10 @@ import { useServers } from "../../servers/store";
 import { displayName, initials } from "../installed/labels";
 import { updatePlatformSettings, usePlatformSettings } from "../platformSettings";
 import { usePlugins } from "../pluginStore";
+import { RELAY, asksForRelay } from "./relayPermission";
 import { useRelayAvailability } from "./useRelayAvailability";
 import { useRelayUsage } from "./useRelayUsage";
 import "./relaydata.css";
-
-const RELAY = "peers.relay";
 
 const DOT_TONE: Record<PluginRelayAvailability["kind"], string> = {
   available: "ok",
@@ -58,10 +57,6 @@ function formatSize(bytes: number, language: string): string {
     unitDisplay: "short",
     maximumFractionDigits: unit === "byte" ? 0 : 1,
   }).format(bytes / divisor);
-}
-
-function asksForRelay(plugin: InstalledPlugin): boolean {
-  return plugin.required.includes(RELAY) || plugin.optional.some((o) => o.id === RELAY);
 }
 
 function PluginRow({ plugin, bytes }: { plugin: InstalledPlugin; bytes: number | null }) {
