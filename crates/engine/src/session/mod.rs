@@ -256,6 +256,8 @@ struct Inner {
     user_stats: Mutex<crate::stats::UserStatsHub>,
     /// Ban lists held in memory while the Server administration window is open (issue #254).
     ban_lists: Mutex<crate::banlist::BanLists>,
+    /// What the open kick and ban dialogs hold per connection (issue #253).
+    admin: Mutex<crate::admin::Admin>,
     /// Other Mumcord users on each server (FR-1.61).
     mumcord: crate::mumcord::ServerPeers,
     /// Chat and message requests per server (issue #141).
@@ -593,6 +595,7 @@ impl Engine {
             now_gaming: Mutex::new(crate::now_gaming::NowGaming::new(settings.now_gaming)),
             user_stats: Mutex::default(),
             ban_lists: Mutex::default(),
+            admin: Mutex::default(),
             mumcord: Mutex::default(),
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
@@ -882,6 +885,11 @@ impl Engine {
 
     pub(crate) fn ban_lists_state(&self) -> &Mutex<crate::banlist::BanLists> {
         &self.inner.ban_lists
+    }
+
+    /// What the open kick and ban dialogs hold (issue #253).
+    pub(crate) fn admin_state(&self) -> &Mutex<crate::admin::Admin> {
+        &self.inner.admin
     }
 
     pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
@@ -1876,6 +1884,7 @@ impl Inner {
             crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
             crate::banlist::on_disconnect(&self.ban_lists, server_id);
+            crate::admin::on_disconnect(&self.admin, server_id);
             self.forget_password_attempt(server_id);
             self.files.on_connection_reset(server_id);
             self.full_images.reset(server_id);
@@ -2762,10 +2771,13 @@ impl Inner {
                     self.positional.on_user_removed(user.session);
                 }
                 crate::stats::on_user_removed(&self.user_stats, server_id, user.session);
+                crate::admin::on_removed(&self.admin, server_id, user.session);
                 crate::plugins::on_users_changed(ctx.events.plugins(), ctx, &self.blocked);
                 ctx.events.emit(EngineEvent::UserRemoved(user.session));
             }
             Event::PermissionDenied(denied) => {
+                // A refusal answers the open kick or ban dialog (issue #253, FR-10.59).
+                crate::admin::on_denied(&self.admin, ctx.server_id, denied);
                 // A ban-list query is refused with the Ban permission (issue #254).
                 if denied.permission == Some(mumcord_protocol::permissions::BAN) {
                     crate::banlist::on_denied(
@@ -2841,7 +2853,11 @@ impl Inner {
                 self.relays.on_plugin_data(ctx, data, &self.inspector);
                 crate::plugins::on_plugin_data(ctx.events.plugins(), ctx, data, &self.inspector);
             }
-            Event::UserStats(stats) => crate::stats::on_stats(&self.user_stats, ctx, stats),
+            Event::UserStats(stats) => {
+                crate::stats::on_stats(&self.user_stats, ctx, stats);
+                // The kick and ban dialogs read the address out of the same answer (issue #253).
+                crate::admin::on_stats(&self.admin, ctx.server_id, stats);
+            }
             // The Server administration window's Bans tab is the consumer (issue #254).
             Event::BanList(list) => crate::banlist::on_answer(&self.ban_lists, ctx.server_id, list),
             // Here rather than in the extension hooks: the private message rule needs to know
