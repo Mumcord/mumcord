@@ -713,7 +713,8 @@ dependencies = [
 [[package]]
 name = "bovnar"
 version = "2.0.0"
-source = "git+https://github.com/Mumcord/bovnar?rev=1e68b93573553b2f67edca6e9fc70f3c2248b59f#1e68b93573553b2f67edca6e9fc70f3c2248b59f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2453d11e374fcaa6edeb1ec25c8fe96c8a232274c5ad2eb12ebcae73837b8241"
 dependencies = [
  "cc",
  "num-bigint",
@@ -4196,6 +4197,7 @@ dependencies = [
 name = "mumcord-plugin-sdk"
 version = "0.6.2"
 dependencies = [
+ "bovnar",
  "serde",
  "serde_json",
  "wit-bindgen 0.63.0",
