@@ -52,4 +52,11 @@ pub enum Error {
     TooManyPluginRepositories { max: usize },
     #[error("this plugin repository is already in the list")]
     DuplicatePluginRepository,
+    #[error("background image could not be stored: {0}")]
+    BackgroundIo(#[from] std::io::Error),
+    /// The picture is not a PNG, JPEG or WebP file up to 10 MB, or could not be decoded safely.
+    #[error("this image can't be used; use a PNG, JPEG or WebP file up to 10 MB")]
+    InvalidBackgroundImage,
+    #[error("background image {0} does not exist")]
+    UnknownBackgroundImage(String),
 }
