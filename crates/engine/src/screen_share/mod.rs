@@ -29,7 +29,7 @@ mod media;
 mod preview;
 mod quality;
 pub mod signal;
-pub(crate) mod sound;
+pub mod sound;
 mod start;
 mod state;
 mod thumbnail;
