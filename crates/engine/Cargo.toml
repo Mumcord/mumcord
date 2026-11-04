@@ -41,6 +41,9 @@ serde.workspace = true
 serde_json.workspace = true
 specta.workspace = true
 thiserror.workspace = true
+# Plugin sound effects (spec 09): bundled Ogg Vorbis and WAV files.
+lewton.workspace = true
+hound.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true

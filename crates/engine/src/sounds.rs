@@ -39,6 +39,7 @@ use std::time::{Duration, Instant};
 
 use mumcord_store::{SoundSettings, SoundTheme, Store};
 
+use crate::plugin_sounds::PluginSounds;
 use crate::session::EngineEvent;
 
 /// Mix-in gain of the sounds on top of their already low level.
@@ -515,12 +516,29 @@ pub struct SoundHub {
     state: Mutex<State>,
     /// Do Not Disturb is in effect (manual switch or the followed system state).
     do_not_disturb: AtomicBool,
+    /// Plugin sound effects (spec 09), mixed into this hub's output.
+    plugins: PluginSounds,
 }
 
 impl SoundHub {
     /// `settings` returns the current per-event toggles.
     pub fn new(settings: impl Fn() -> SoundSettings + Send + Sync + 'static) -> Arc<Self> {
-        Arc::new(Self {
+        Arc::new_cyclic(|hub: &std::sync::Weak<Self>| {
+            let hub = hub.clone();
+            Self::with_plugin_sounds(
+                settings,
+                PluginSounds::new(Box::new(move |samples| {
+                    hub.upgrade().is_some_and(|hub| hub.push_out(samples))
+                })),
+            )
+        })
+    }
+
+    fn with_plugin_sounds(
+        settings: impl Fn() -> SoundSettings + Send + Sync + 'static,
+        plugins: PluginSounds,
+    ) -> Self {
+        Self {
             settings: Box::new(settings),
             state: Mutex::new(State {
                 tracker: Tracker::default(),
@@ -530,14 +548,20 @@ impl SoundHub {
                 last_burst: None,
             }),
             do_not_disturb: AtomicBool::new(false),
-        })
+            plugins,
+        }
     }
 
     /// A hub reading the toggles from the store. Emitting can happen while the store is
     /// locked on the same thread; then the last read value is used instead of blocking.
     pub fn from_store(store: Arc<Mutex<Store>>) -> Arc<Self> {
+        // Seeds the plugin-sound volume and mute; the app updates them when the settings change.
+        let plugin_settings = store
+            .try_lock()
+            .ok()
+            .map(|s| s.settings().map(|s| s.plugins));
         let cache = Mutex::new(SoundSettings::default());
-        Self::new(move || {
+        let hub = Self::new(move || {
             let mut cached = cache.lock().unwrap_or_else(PoisonError::into_inner);
             if let Ok(store) = store.try_lock()
                 && let Ok(settings) = store.settings()
@@ -545,7 +569,29 @@ impl SoundHub {
                 *cached = settings.sounds;
             }
             cached.clone()
-        })
+        });
+        match plugin_settings {
+            Some(Ok(p)) => {
+                hub.plugins.set_volume(p.sound_volume);
+                hub.plugins.set_muted(p.sound_muted);
+            }
+            Some(Err(error)) => {
+                tracing::error!(%error, "reading the plugin-sound settings failed");
+            }
+            None => tracing::warn!("plugin-sound settings not read: the store is busy"),
+        }
+        hub
+    }
+
+    /// Plugin sound effects (spec 09): play requests from the plugin host, the plugin-sound
+    /// volume and mute, and the debug meter.
+    pub fn plugin_sounds(&self) -> &PluginSounds {
+        &self.plugins
+    }
+
+    /// Writes mixed plugin-sound chunks into the output; `false` without output or room.
+    fn push_out(&self, samples: &[f32]) -> bool {
+        self.state().out.as_mut().is_some_and(|out| out(samples))
     }
 
     fn state(&self) -> std::sync::MutexGuard<'_, State> {
@@ -573,6 +619,7 @@ impl SoundHub {
     /// Audio closed: no sounds until the next [`attach`](Self::attach).
     pub fn detach(&self) {
         self.state().out = None;
+        self.plugins.reset();
     }
 
     /// Feeds one engine event (called for every emitted event).
@@ -595,6 +642,8 @@ impl SoundHub {
             self.arrival_sound(&mut state, sound);
         }
         let deaf = state.tracker.own_deaf();
+        self.plugins.set_deafened(deaf);
+        self.plugins.observe(event);
         for sound in activity {
             if sound.rate_limited() && !self.burst_allowed(&mut state, sound) {
                 continue;
@@ -731,7 +780,10 @@ impl SoundHub {
         if !sound.enabled(&settings) || self.silenced(sound) {
             return;
         }
-        if let Some(out) = state.out.as_mut()
+        if self.plugins.mixing() {
+            // Plugin sounds play: the plugin-sound worker sums this in (spec 09).
+            self.plugins.notification(&sound.mixed(settings.theme));
+        } else if let Some(out) = state.out.as_mut()
             && !out(&sound.mixed(settings.theme))
         {
             tracing::debug!("notification sound skipped: mixer input is full");
