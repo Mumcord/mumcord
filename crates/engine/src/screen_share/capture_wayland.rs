@@ -5,8 +5,13 @@
 //! arrive on a PipeWire thread in shared memory (no DMA-BUF: without announcing modifiers the
 //! compositor falls back to memory the CPU can read), are copied into one "latest picture" slot
 //! as tight BGRX, and the encode thread scales and converts the newest one when it asks for it.
-//! No sound: the portal does not reveal which app owns the shared window (FR-2.42). Nothing is
-//! remembered between shares, so the picker shows every time.
+//! Nothing is remembered between shares, so the picker shows every time.
+//!
+//! Sound comes from PipeWire (FR-7.81, FR-7.82): a whole screen shares the desktop sound. For a
+//! window the portal does not say which app owns it, and no common compositor (GNOME, KDE,
+//! wlroots) puts that on the screen cast either, so the matcher gets no hint and the user picks
+//! the app in "Which app's sound?" (FR-7.83). The compositor's own name on the screen cast node
+//! is deliberately not used as a hint: it would match the desktop's own sounds.
 
 use std::io::Cursor;
 use std::os::fd::OwnedFd;
@@ -34,6 +39,8 @@ use tokio::sync::oneshot;
 
 use super::capture::CaptureSource;
 use super::convert::bgrx_to_i420;
+use super::signal::ShareKind;
+use super::sound::{SoundOutcome, SoundRequest, pick};
 use crate::session::lock;
 
 /// Why a Wayland share could not start.
@@ -82,6 +89,8 @@ pub struct WaylandCapture {
     spare: Vec<u8>,
     quit: pw::channel::Sender<()>,
     thread: Option<JoinHandle<()>>,
+    /// What the user picked in the system picker; `None` when the portal did not say.
+    kind: Option<ShareKind>,
     /// Dropped to close the portal session.
     _close: oneshot::Sender<()>,
 }
@@ -122,18 +131,18 @@ impl WaylandCapture {
                 .start(&session, None, StartCastOptions::default())
                 .await?
                 .response()?;
-            let node = streams
+            let (node, kind) = streams
                 .streams()
                 .first()
-                .map(|s| s.pipe_wire_node_id())
+                .map(|s| (s.pipe_wire_node_id(), share_kind(s.source_type())))
                 .ok_or(WaylandCaptureError::NoStream)?;
             let fd = portal
                 .open_pipe_wire_remote(&session, OpenPipeWireRemoteOptions::default())
                 .await?;
-            Ok::<_, WaylandCaptureError>((node, fd))
+            Ok::<_, WaylandCaptureError>((node, kind, fd))
         }
         .await;
-        let (node, fd) = match streams {
+        let (node, kind, fd) = match streams {
             Ok(started) => started,
             Err(error) => {
                 if let Err(close) = session.close().await {
@@ -164,6 +173,7 @@ impl WaylandCapture {
             spare: Vec::new(),
             quit,
             thread: Some(thread),
+            kind,
             _close: close,
         })
     }
@@ -175,9 +185,26 @@ impl WaylandCapture {
     }
 }
 
+/// The share kind of the portal's source type. A virtual monitor is a whole screen.
+fn share_kind(source: Option<SourceType>) -> Option<ShareKind> {
+    match source? {
+        SourceType::Monitor | SourceType::Virtual => Some(ShareKind::Screen),
+        SourceType::Window => Some(ShareKind::Window),
+    }
+}
+
 impl CaptureSource for WaylandCapture {
     fn ended(&self) -> bool {
         WaylandCapture::ended(self)
+    }
+
+    fn kind(&self) -> Option<ShareKind> {
+        self.kind
+    }
+
+    fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
+        // The portal tells nothing about the window's app (see the module docs).
+        pick::take(request, &[])
     }
 
     fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {
@@ -532,6 +559,23 @@ fn run_stream(
 mod tests {
     use super::*;
 
+    #[test]
+    fn the_portal_pick_decides_the_kind() {
+        assert_eq!(
+            share_kind(Some(SourceType::Monitor)),
+            Some(ShareKind::Screen)
+        );
+        assert_eq!(
+            share_kind(Some(SourceType::Virtual)),
+            Some(ShareKind::Screen)
+        );
+        assert_eq!(
+            share_kind(Some(SourceType::Window)),
+            Some(ShareKind::Window)
+        );
+        assert_eq!(share_kind(None), None, "a portal that does not say");
+    }
+
     fn fixed_format(format: VideoFormat, width: u32, height: u32) -> Vec<u8> {
         serialize(Object {
             type_: SpaTypes::ObjectParamFormat.as_raw(),
@@ -633,6 +677,7 @@ mod tests {
             spare: Vec::new(),
             quit,
             thread: None,
+            kind: None,
             _close: close,
         };
         assert!(capture.frame(1280, 720).is_none());

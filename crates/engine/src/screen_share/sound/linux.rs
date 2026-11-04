@@ -1103,10 +1103,16 @@ mod tests {
         /// `pw-play` outside this process tree (the shell exits, so it is re-parented): to
         /// Mumcord it is another app. Returns its pid.
         fn foreign_player(file: &Path, name: &str) -> u32 {
+            foreign_player_as(Path::new("pw-play"), file, name)
+        }
+
+        /// [`foreign_player`] run as `program`, a link to `pw-play` under another binary name.
+        fn foreign_player_as(program: &Path, file: &Path, name: &str) -> u32 {
             let out = Command::new("sh")
                 .arg("-c")
                 .arg(format!(
-                    "pw-play -P '{{ application.name = {name} }}' '{}' >/dev/null 2>&1 & echo $!",
+                    "'{}' -P '{{ application.name = {name} }}' '{}' >/dev/null 2>&1 & echo $!",
+                    program.display(),
                     file.display()
                 ))
                 .output()
@@ -1143,6 +1149,11 @@ mod tests {
         fn record(target: SoundTarget, started: impl FnOnce()) -> Vec<f32> {
             let mut sound = PipeWireSound::start(target).unwrap();
             started();
+            listen(&mut sound)
+        }
+
+        /// Half a second of `sound`, after the links settled.
+        fn listen(sound: &mut dyn SoundSource) -> Vec<f32> {
             let mut frame = [0.0; FRAME_SAMPLES];
             let settle = Instant::now() + Duration::from_millis(300);
             while Instant::now() < settle {
@@ -1222,6 +1233,77 @@ mod tests {
             assert!(!heard(&desktop, HIGH), "desktop leaves Mumcord out");
             assert!(heard(&app, LOW), "the app is heard");
             assert!(!heard(&app, MID) && !heard(&app, HIGH), "only the app");
+        }
+
+        /// The window path of the capture files (FR-7.82, FR-7.83): a hint that matches one
+        /// app shares it right away; without one the list offers both apps, and the chosen
+        /// one is shared.
+        #[test]
+        fn a_window_share_takes_the_matched_or_the_chosen_app() {
+            use crate::screen_share::sound::pick;
+            use crate::screen_share::sound::{SoundOutcome, SoundRequest};
+
+            if !wanted() {
+                return;
+            }
+            let dir =
+                std::env::temp_dir().join(format!("mumcord-pw-window-{}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let out = Command::new("sh")
+                .args(["-c", "command -v pw-play"])
+                .output()
+                .unwrap();
+            let pw_play = String::from_utf8(out.stdout).unwrap();
+            // Distinct binaries, so the players are two apps and not one app's two streams.
+            let [p1, p2] =
+                [(LOW, "mumcord-test-p1"), (MID, "mumcord-test-p2")].map(|(hz, name)| {
+                    let file = dir.join(format!("{hz}.wav"));
+                    tone(&file, hz, 8);
+                    let program = dir.join(name);
+                    std::os::unix::fs::symlink(pw_play.trim(), &program).unwrap();
+                    foreign_player_as(&program, &file, name)
+                });
+            std::thread::sleep(Duration::from_millis(700));
+
+            let clear = pick::take(SoundRequest::Window, &["mumcord-test-p1"]);
+            let SoundOutcome::Choose(listed) = pick::take(SoundRequest::Window, &[]) else {
+                panic!("no hint asks the user");
+            };
+            let names: Vec<_> = listed.iter().map(|a| a.name.as_str().to_owned()).collect();
+            let p2_id = listed
+                .iter()
+                .find(|a| a.name.as_str() == "mumcord-test-p2")
+                .map(|a| a.id.clone())
+                .unwrap();
+            let SoundOutcome::Captured {
+                source: mut matched,
+                ..
+            } = clear
+            else {
+                panic!("a clear hint captures the app");
+            };
+            let matched = listen(matched.as_mut());
+            let Some(SoundOutcome::Captured {
+                source: mut chosen, ..
+            }) = pick::start_chosen(&p2_id).unwrap()
+            else {
+                panic!("the chosen app is captured");
+            };
+            let chosen = listen(chosen.as_mut());
+
+            kill(p1);
+            kill(p2);
+            let _ = std::fs::remove_dir_all(&dir);
+
+            assert!(names.iter().any(|n| n == "mumcord-test-p1") && names.len() >= 2);
+            assert!(
+                heard(&matched, LOW) && !heard(&matched, MID),
+                "only the matched app"
+            );
+            assert!(
+                heard(&chosen, MID) && !heard(&chosen, LOW),
+                "only the chosen app"
+            );
         }
     }
 }
