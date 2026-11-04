@@ -2,6 +2,9 @@
 //! review and the websites a plugin may reach. The types mirror the plugin crate's serde-only
 //! types so the generated bindings describe them; the UI never computes a score or a gate.
 
+use std::collections::BTreeMap;
+
+use mumcord_plugins::i18n::PurposeTexts;
 use mumcord_plugins::score::{Band, Effect, Factor, FactorKind, HardStop, Score, Scored};
 use mumcord_plugins::service::{
     ConfirmKind, GateReason, InstallCheck, InstallGate, InstallScore, Refusal, ReviewOrigin,
@@ -361,9 +364,9 @@ pub struct PluginReviewOrigin {
     pub origin: String,
     /// Marked "New".
     pub new: bool,
-    /// Translation key of the purpose the installed version declares for this website
-    /// (resolved in the plugin's own texts). `None` for a new website: the registry index lists
-    /// no purposes and the new package is not downloaded before the user decides.
+    /// The plugin's reason for this website in the app language (its own text). `None` for a
+    /// new website until `plugin_update_review_prepare` has read the new package: the registry
+    /// index lists no purposes. Before `resolve_purposes` it holds the manifest's key.
     pub purpose: Option<String>,
 }
 
@@ -437,6 +440,23 @@ pub struct PluginUpdateReview {
     pub high_risk_confirmed: bool,
 }
 
+impl PluginUpdateReview {
+    /// Turns the purpose keys into the plugin's text. `declared` (canonical origin → key) from
+    /// a newly read manifest takes precedence, so websites that are new get a purpose too.
+    pub fn resolve_purposes(
+        &mut self,
+        texts: &PurposeTexts,
+        declared: Option<&BTreeMap<String, String>>,
+    ) {
+        for origin in &mut self.origins {
+            let key = declared
+                .and_then(|d| d.get(&origin.origin).cloned())
+                .or_else(|| origin.purpose.take());
+            origin.purpose = key.map(|key| texts.resolve(&key));
+        }
+    }
+}
+
 impl From<UpdateReview> for PluginUpdateReview {
     fn from(review: UpdateReview) -> Self {
         Self {
@@ -468,7 +488,8 @@ impl From<UpdateReview> for PluginUpdateReview {
 pub struct PluginWebsite {
     /// ASCII form; plain, untrusted text.
     pub origin: String,
-    /// Translation key of the plugin's reason (resolved in the plugin's own texts).
+    /// The plugin's reason in the app language (its own text; the manifest's key when it has
+    /// none). Plugin text: plain, untrusted.
     pub purpose: String,
 }
 
@@ -578,6 +599,51 @@ mod tests {
         assert_eq!(review.recent_change.map(|r| r.trust_percent), Some(90));
         assert_eq!(review.risk.map(|r| r.to_band), Some(PluginBand::High));
         assert!(review.needs_high_risk_confirm);
+    }
+
+    #[test]
+    fn review_purposes_become_the_plugins_text_and_new_websites_get_one() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::create_dir(dir.path().join("i18n")).expect("mkdir");
+        std::fs::write(
+            dir.path().join("i18n/en.json"),
+            r#"{"origins.api":"Loads prices","origins.live":"Live scores"}"#,
+        )
+        .expect("write");
+        let texts = PurposeTexts::from_dir(dir.path(), "en");
+        let origin = |origin: &str, new: bool, purpose: Option<&str>| PluginReviewOrigin {
+            origin: origin.into(),
+            new,
+            purpose: purpose.map(Into::into),
+        };
+        let review = || PluginUpdateReview {
+            origins: vec![
+                origin("https://api.example", false, Some("origins.api")),
+                origin("https://live.example", true, None),
+            ],
+            other_domain: false,
+            risk: None,
+            permission_effects: Vec::new(),
+            recent_change: None,
+            needs_high_risk_confirm: false,
+            high_risk_confirmed: false,
+        };
+
+        // Without the new package a new website stays without a purpose.
+        let mut known = review();
+        known.resolve_purposes(&texts, None);
+        assert_eq!(known.origins[0].purpose.as_deref(), Some("Loads prices"));
+        assert_eq!(known.origins[1].purpose, None);
+
+        // With the new package's manifest every website has one.
+        let declared = BTreeMap::from([
+            ("https://api.example".to_owned(), "origins.api".to_owned()),
+            ("https://live.example".to_owned(), "origins.live".to_owned()),
+        ]);
+        let mut full = review();
+        full.resolve_purposes(&texts, Some(&declared));
+        assert_eq!(full.origins[0].purpose.as_deref(), Some("Loads prices"));
+        assert_eq!(full.origins[1].purpose.as_deref(), Some("Live scores"));
     }
 
     #[test]

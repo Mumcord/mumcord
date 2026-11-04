@@ -296,6 +296,7 @@ impl App {
             .await
             .expect("download");
         let request = InstallRequest {
+            confirmed: true,
             source: Source::Official,
             entry: plugin.entry(latest),
             optional: vec!["events.voice".into()],
@@ -538,6 +539,7 @@ fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
             .await
             .expect("download");
         let request = InstallRequest {
+            confirmed: true,
             source: Source::Repo { repository_id },
             entry: plugin.entry(latest),
             optional: vec![],
@@ -666,6 +668,7 @@ fn a_third_party_repository_cannot_grant_official_only_permissions() {
                 .await
                 .expect("download");
             let request = InstallRequest {
+                confirmed: true,
                 source: Source::Repo { repository_id },
                 entry: plugin.entry(latest),
                 optional: vec![],

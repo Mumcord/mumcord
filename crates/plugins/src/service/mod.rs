@@ -57,7 +57,9 @@ pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, UiUpdate};
 pub use replay::{REPLAY_PER_PLUGIN, StoredLine};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
 pub use ui::UiInput;
-pub use updates::{Approval, Due, Schedule, UpdateInfo, load_repository, run_check};
+pub use updates::{
+    Approval, Due, Schedule, UpdateInfo, load_repository, manifest_purposes, run_check,
+};
 
 /// The permission that lets a plugin show a badge next to user names (FR-6.63).
 const BADGE_PERMISSION: &str = "ui.member-badge";
@@ -201,6 +203,30 @@ pub struct PluginInfo {
     /// Optional permissions an update added that the user has not answered yet (never
     /// granted by the update; Plugins → Updates offers them).
     pub offered: Vec<String>,
+    /// How many Apps-menu items the manifest declares.
+    pub app_menu_items: u32,
+    /// Total size in bytes of the plugin's `web/` files; `None` when it has none.
+    pub web_size: Option<u64>,
+}
+
+/// The total size of the regular files under `dir/web`, `None` when there is no such folder.
+/// Symbolic links are not followed.
+fn web_size(dir: &Path) -> Option<u64> {
+    fn walk(dir: &Path) -> u64 {
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return 0;
+        };
+        entries
+            .flatten()
+            .map(|entry| match entry.file_type() {
+                Ok(kind) if kind.is_dir() => walk(&entry.path()),
+                Ok(kind) if kind.is_file() => entry.metadata().map_or(0, |m| m.len()),
+                _ => 0,
+            })
+            .sum()
+    }
+    let web = dir.join("web");
+    web.is_dir().then(|| walk(&web))
 }
 
 /// The manifest in a plugin's installed folder, read for display only (nothing is checked beyond
@@ -624,6 +650,9 @@ impl PluginService {
             }
         };
         let revocation = self.revocation_notice(&record);
+        let app_menu_items =
+            manifest.map_or(0, |m| u32::try_from(m.app_menu.len()).unwrap_or(u32::MAX));
+        let web_size = dir.as_deref().and_then(web_size);
         PluginInfo {
             icon: manifest.and_then(|m| m.icon.clone()),
             authors: manifest.map(|m| m.authors.clone()).unwrap_or_default(),
@@ -644,6 +673,8 @@ impl PluginService {
                 .map(|t| t.description.clone())
                 .unwrap_or_default(),
             chat_patterns: text.map(|t| t.chat_patterns).unwrap_or_default(),
+            app_menu_items,
+            web_size,
             status,
             badge: badge == Some(record.id.as_str()),
             id: record.id,

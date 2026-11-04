@@ -39,6 +39,8 @@ function plugin(overrides: Partial<InstalledPlugin>): InstalledPlugin {
     authors: [],
     chatPatterns: [],
     offered: [],
+    appMenuItems: 0,
+    webSize: null,
     ...overrides,
   };
 }

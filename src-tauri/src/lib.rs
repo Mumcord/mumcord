@@ -238,6 +238,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_set_pinned,
             commands::plugins::plugin_remove,
             commands::plugins::plugin_updates,
+            commands::plugins::plugin_update_review_prepare,
             commands::plugins::plugin_apply_update,
             commands::plugins::plugin_score,
             commands::plugins::plugin_confirm_update_high_risk,

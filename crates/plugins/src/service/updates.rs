@@ -650,16 +650,10 @@ impl PluginService {
     /// The purpose of each website the installed version declares, by canonical origin. Empty
     /// when the manifest is not loaded.
     fn declared_purposes(&self, id: &str) -> BTreeMap<String, String> {
-        let Some(net) = self.host.manifest(id).and_then(|m| m.net.as_ref()) else {
-            return BTreeMap::new();
-        };
-        net.origins
-            .iter()
-            .map(|o| {
-                let origin = canonical(std::iter::once(o.origin.as_str())).remove(0);
-                (origin, o.purpose.clone())
-            })
-            .collect()
+        self.host
+            .manifest(id)
+            .map(manifest_purposes)
+            .unwrap_or_default()
     }
 
     /// "Skip this version" (FR-9.83): the waiting update of `id` to `version` is no longer
@@ -982,6 +976,20 @@ fn manifest_origins(manifest: &Manifest) -> Vec<String> {
             .iter()
             .flat_map(|net| net.origins.iter().map(|o| o.origin.as_str())),
     )
+}
+
+/// The purpose key of each website a manifest declares, by canonical origin (the form
+/// [`ReviewOrigin`](gates::ReviewOrigin) uses).
+pub fn manifest_purposes(manifest: &Manifest) -> BTreeMap<String, String> {
+    manifest
+        .net
+        .iter()
+        .flat_map(|net| net.origins.iter())
+        .map(|o| {
+            let origin = canonical(std::iter::once(o.origin.as_str())).remove(0);
+            (origin, o.purpose.clone())
+        })
+        .collect()
 }
 
 /// Origins in the form they are stored and shown; one that breaks the rules stays as written

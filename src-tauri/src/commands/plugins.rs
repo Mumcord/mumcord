@@ -9,7 +9,9 @@ use base64::Engine as _;
 use mumcord_engine::Engine;
 use mumcord_engine::store::PluginVisibility;
 use mumcord_plugins::Incompatibility;
+use mumcord_plugins::i18n::PurposeTexts;
 use mumcord_plugins::manifest::Visibility as ManifestVisibility;
+use mumcord_plugins::package::Package;
 use mumcord_plugins::registry::Download;
 use mumcord_plugins::registry::{
     Choice, Client, Freshness, Index, IndexPlugin, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES,
@@ -19,7 +21,7 @@ use mumcord_plugins::score::Scored;
 use mumcord_plugins::service::{
     Approval, CommandOutcome, InstallCheck, InstallRequest, InstallStage, PeerInfo, PluginInfo,
     PluginService, ScoreFrom, ServiceError, ServiceEvent, Status, StoredLine, UiInput, fetch,
-    load_repository,
+    load_repository, manifest_purposes,
 };
 use mumcord_plugins::verify::verify_package;
 use mumcord_plugins::version::{Release, needs_mumcord_text};
@@ -177,6 +179,10 @@ pub struct InstalledPlugin {
     /// Optional permissions an update added and the user has not answered yet; they are off.
     /// Answering means `plugin_set_permissions` (which clears this).
     pub offered: Vec<String>,
+    /// How many Apps-menu items the plugin declares (Details → Places).
+    pub app_menu_items: u32,
+    /// Size in bytes of the plugin's web pages (its `web/` files); `None` when it has none.
+    pub web_size: Option<f64>,
 }
 
 /// The name of a third-party repository; empty when it was removed.
@@ -230,6 +236,8 @@ impl InstalledPlugin {
             chat_patterns: p.chat_patterns,
             authors: p.authors,
             offered: p.offered,
+            app_menu_items: p.app_menu_items,
+            web_size: p.web_size.map(|bytes| bytes as f64),
         }
     }
 }
@@ -655,6 +663,9 @@ pub struct PluginInstallOffer {
     /// What the plugin's chat patterns recognise, in the app language (shown with
     /// `chat.patterns`). Plugin text: plain, untrusted.
     pub chat_patterns: Vec<String>,
+    /// The websites the package declares, each with its reason in the app language (the
+    /// plugin's own text; the key itself when it has none). Plugin text: plain, untrusted.
+    pub origins: Vec<PluginWebsite>,
     /// The score, the one confirmation box and the safety setting for this package, or the
     /// hard stop that refuses it (`refused`: no Install button, the other fields are empty).
     pub check: PluginInstallCheck,
@@ -707,10 +718,31 @@ fn indexed_latest(
     ))
 }
 
+/// The websites a manifest declares, each with its purpose resolved in `texts`.
+fn websites(manifest: &Manifest, texts: &PurposeTexts) -> Vec<PluginWebsite> {
+    manifest
+        .net
+        .iter()
+        .flat_map(|net| net.origins.iter())
+        .map(|o| PluginWebsite {
+            origin: o.origin.clone(),
+            purpose: texts.resolve(&o.purpose),
+        })
+        .collect()
+}
+
+fn package_websites(package: &Package, language: &str) -> Vec<PluginWebsite> {
+    websites(
+        &package.manifest,
+        &PurposeTexts::from_package(package, language),
+    )
+}
+
 fn install_offer(
     id: &str,
     manifest: &Manifest,
     chat_patterns: Vec<String>,
+    origins: Vec<PluginWebsite>,
     check: PluginInstallCheck,
 ) -> PluginInstallOffer {
     PluginInstallOffer {
@@ -733,6 +765,7 @@ fn install_offer(
             Some(ManifestVisibility::Everyone) | None => PluginVisibilityChoice::Everyone,
         },
         chat_patterns,
+        origins,
         check,
     }
 }
@@ -747,6 +780,7 @@ fn refused_offer(id: &str, version: &str, check: PluginInstallCheck) -> PluginIn
         optional: Vec::new(),
         default_visibility: PluginVisibilityChoice::Everyone,
         chat_patterns: Vec::new(),
+        origins: Vec::new(),
         check,
     }
 }
@@ -795,7 +829,8 @@ pub async fn plugin_install_prepare(
             .map_err(|e| plugins::service_error(e.into()))?;
         let package = &verified.package;
         let chat_patterns = mumcord_plugins::i18n::chat_pattern_descriptions(package, &language);
-        let offer = install_offer(&entry.id, &package.manifest, chat_patterns, check);
+        let origins = package_websites(package, &language);
+        let offer = install_offer(&entry.id, &package.manifest, chat_patterns, origins, check);
         Ok::<_, ApiError>((download, offer))
     })
     .await
@@ -1008,36 +1043,94 @@ pub async fn plugin_updates(app: AppHandle) -> ApiResult<Vec<PluginUpdate>> {
     plugins_of(&app)?
         .call(|service| {
             let repositories = service.repository_names()?;
+            let language = service.language().to_owned();
             Ok(service
                 .updates()
                 .into_iter()
-                .map(|u| PluginUpdate {
-                    id: u.id,
-                    name: u.name,
-                    from: u.from,
-                    to: u.to,
-                    source: match u.source {
-                        Source::Repo { repository_id } => PluginSourceInfo::Repo {
-                            repository_id: u32::try_from(repository_id).unwrap_or(u32::MAX),
-                            name: repository_name(&repositories, repository_id),
+                .map(|u| {
+                    // A new website has no purpose yet: its package is not downloaded
+                    // (`plugin_update_review_prepare` fills it in).
+                    let mut review = PluginUpdateReview::from(u.review);
+                    if let Some(dir) = service.dir(&u.id) {
+                        review.resolve_purposes(&PurposeTexts::from_dir(dir, &language), None);
+                    }
+                    PluginUpdate {
+                        id: u.id,
+                        name: u.name,
+                        from: u.from,
+                        to: u.to,
+                        source: match u.source {
+                            Source::Repo { repository_id } => PluginSourceInfo::Repo {
+                                repository_id: u32::try_from(repository_id).unwrap_or(u32::MAX),
+                                name: repository_name(&repositories, repository_id),
+                            },
+                            _ => PluginSourceInfo::Official,
                         },
-                        _ => PluginSourceInfo::Official,
-                    },
-                    size: u32::try_from(u.size).unwrap_or(u32::MAX),
-                    approval: u.approval.map(|a| match a {
-                        Approval::NewPermissions(permissions) => {
-                            PluginUpdateApproval::NewPermissions { permissions }
-                        }
-                        Approval::NewAuthorKey => PluginUpdateApproval::NewAuthorKey,
-                    }),
-                    failed: u.failed,
-                    needs_mumcord: u.needs_mumcord.map(|r| r.to_string()),
-                    hold: u.hold.map(Into::into),
-                    review: u.review.into(),
+                        size: u32::try_from(u.size).unwrap_or(u32::MAX),
+                        approval: u.approval.map(|a| match a {
+                            Approval::NewPermissions(permissions) => {
+                                PluginUpdateApproval::NewPermissions { permissions }
+                            }
+                            Approval::NewAuthorKey => PluginUpdateApproval::NewAuthorKey,
+                        }),
+                        failed: u.failed,
+                        needs_mumcord: u.needs_mumcord.map(|r| r.to_string()),
+                        hold: u.hold.map(Into::into),
+                        review,
+                    }
                 })
                 .collect())
         })
         .await
+}
+
+/// The review of the waiting update of `id` to `version` with every website's purpose, new
+/// ones included. Their purposes are plugin text that only the new package holds, so this
+/// downloads and verifies it first (as `plugin_install_prepare` does) and reads nothing else
+/// from it. Nothing is unpacked or run.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_update_review_prepare(
+    app: AppHandle,
+    engine: State<'_, Engine>,
+    id: String,
+    version: String,
+) -> ApiResult<PluginUpdateReview> {
+    let plugins = plugins_of(&app)?;
+    let target = id.clone();
+    let (update, events, language) = plugins
+        .call(move |service| {
+            let update = service
+                .updates()
+                .into_iter()
+                .find(|u| u.id == target && u.to == version)
+                .ok_or(ServiceError::NoUpdate(target))?;
+            Ok((update, service.events(), service.language().to_owned()))
+        })
+        .await?;
+    let client = registry_client(engine.settings()?.developer_mode)?;
+    let download = fetch(&client, &events, &id, &update.url, update.size)
+        .await
+        .map_err(plugins::service_error)?;
+    tauri::async_runtime::spawn_blocking(move || {
+        let verified = verify_package(
+            &download.bytes,
+            &update.entry,
+            &download.signature,
+            update.source,
+        )
+        .map_err(|e| plugins::service_error(e.into()))?;
+        let package = &verified.package;
+        let declared = manifest_purposes(&package.manifest);
+        let mut review = PluginUpdateReview::from(update.review);
+        review.resolve_purposes(
+            &PurposeTexts::from_package(package, &language),
+            Some(&declared),
+        );
+        Ok(review)
+    })
+    .await
+    .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))?
 }
 
 /// The security score of a store plugin version (FR-9.72). `listing` scores the signed index
@@ -1145,32 +1238,26 @@ pub async fn plugin_websites(
 ) -> ApiResult<PluginWebsites> {
     let plugins = plugins_of(&app)?;
     let target = id.clone();
-    let dir = plugins
-        .call(move |service| Ok(service.dir(&target).map(std::path::Path::to_path_buf)))
-        .await?
-        .ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not installed"))?;
-    let manifest = tauri::async_runtime::spawn_blocking(move || {
+    let (dir, language) = plugins
+        .call(move |service| {
+            Ok((
+                service.dir(&target).map(std::path::Path::to_path_buf),
+                service.language().to_owned(),
+            ))
+        })
+        .await?;
+    let dir = dir.ok_or_else(|| ApiError::new(ErrorCode::NotFound, "plugin not installed"))?;
+    let origins = tauri::async_runtime::spawn_blocking(move || {
         std::fs::read(dir.join(mumcord_plugins::package::MANIFEST_FILE))
             .map_err(|e| ApiError::new(ErrorCode::Io, e.to_string()))
             .and_then(|bytes| {
                 Manifest::parse(&bytes)
                     .map_err(|e| ApiError::new(ErrorCode::InvalidInput, e.to_string()))
             })
+            .map(|manifest| websites(&manifest, &PurposeTexts::from_dir(&dir, &language)))
     })
     .await
     .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))??;
-    let origins = manifest
-        .net
-        .map(|net| {
-            net.origins
-                .into_iter()
-                .map(|o| PluginWebsite {
-                    origin: o.origin,
-                    purpose: o.purpose,
-                })
-                .collect()
-        })
-        .unwrap_or_default();
     let counters = {
         let store = engine.store_handle();
         let store = store
@@ -1790,6 +1877,8 @@ mod tests {
             authors: Vec::new(),
             chat_patterns: Vec::new(),
             offered: Vec::new(),
+            app_menu_items: 0,
+            web_size: None,
         }
     }
 
@@ -1908,6 +1997,7 @@ mod tests {
             "poll",
             &manifest,
             vec!["Recognise polls".into()],
+            Vec::new(),
             PluginInstallCheck::Refused {
                 stop: PluginHardStop::Revoked,
                 reason: "Turned off".into(),

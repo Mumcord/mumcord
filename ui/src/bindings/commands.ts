@@ -615,6 +615,13 @@ export const commands = {
 	pluginRemove: (id: string, deleteData: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_remove", { id, deleteData })),
 	/**  The updates waiting for the user. */
 	pluginUpdates: () => typedError<PluginUpdate[], ApiError>(__TAURI_INVOKE("plugin_updates")),
+	/**
+	 *  The review of the waiting update of `id` to `version` with every website's purpose, new
+	 *  ones included. Their purposes are plugin text that only the new package holds, so this
+	 *  downloads and verifies it first (as `plugin_install_prepare` does) and reads nothing else
+	 *  from it. Nothing is unpacked or run.
+	 */
+	pluginUpdateReviewPrepare: (id: string, version: string) => typedError<PluginUpdateReview, ApiError>(__TAURI_INVOKE("plugin_update_review_prepare", { id, version })),
 	/**  Installs the waiting update of `id`; `optional` are the optional permissions to keep on. */
 	pluginApplyUpdate: (id: string, optional: string[]) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_apply_update", { id, optional })),
 	/**
@@ -2185,6 +2192,10 @@ export type InstalledPlugin = {
 	 *  Answering means `plugin_set_permissions` (which clears this).
 	 */
 	offered: string[],
+	/**  How many Apps-menu items the plugin declares (Details → Places). */
+	appMenuItems: number,
+	/**  Size in bytes of the plugin's web pages (its `web/` files); `None` when it has none. */
+	webSize: number | null,
 };
 
 /**  KDE only: whether X11 apps may see mouse buttons now, and whether Mumcord can undo its change. */
@@ -2896,6 +2907,11 @@ export type PluginInstallOffer = {
 	 */
 	chatPatterns: string[],
 	/**
+	 *  The websites the package declares, each with its reason in the app language (the
+	 *  plugin's own text; the key itself when it has none). Plugin text: plain, untrusted.
+	 */
+	origins: PluginWebsite[],
+	/**
 	 *  The score, the one confirmation box and the safety setting for this package, or the
 	 *  hard stop that refuses it (`refused`: no Install button, the other fields are empty).
 	 */
@@ -3019,9 +3035,9 @@ export type PluginReviewOrigin = {
 	/**  Marked "New". */
 	new: boolean,
 	/**
-	 *  Translation key of the purpose the installed version declares for this website
-	 *  (resolved in the plugin's own texts). `None` for a new website: the registry index lists
-	 *  no purposes and the new package is not downloaded before the user decides.
+	 *  The plugin's reason for this website in the app language (its own text). `None` for a
+	 *  new website until `plugin_update_review_prepare` has read the new package: the registry
+	 *  index lists no purposes. Before `resolve_purposes` it holds the manifest's key.
 	 */
 	purpose: string | null,
 };
@@ -3275,7 +3291,10 @@ export type PluginVisibilityChoice = "everyone" | "friends" | "nobody";
 export type PluginWebsite = {
 	/**  ASCII form; plain, untrusted text. */
 	origin: string,
-	/**  Translation key of the plugin's reason (resolved in the plugin's own texts). */
+	/**
+	 *  The plugin's reason in the app language (its own text; the manifest's key when it has
+	 *  none). Plugin text: plain, untrusted.
+	 */
 	purpose: string,
 };
 
