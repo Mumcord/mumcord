@@ -5,6 +5,7 @@
  */
 import { useEffect, useEffectEvent, useId, useRef, useState, type ReactNode } from "react";
 import type { TFunction } from "i18next";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { getApi, type Settings, type SharePreview } from "../../../api";
 import {
@@ -129,7 +130,9 @@ function StartDialogContent({
   const note = preview === undefined ? null : codecNote(t, picks, preview);
   const hint = preview === undefined ? null : encoderHint(t, preview);
 
-  return (
+  // Rendered into <body>: the Apps menu sits inside the composer's <form>, and a nested form is
+  // invalid HTML; WebKit then submitted the dialog's form natively and reloaded the page.
+  return createPortal(
     <dialog
       ref={ref}
       className="app-dialog share-start"
@@ -146,6 +149,8 @@ function StartDialogContent({
       <form
         onSubmit={(event) => {
           event.preventDefault();
+          // React bubbles the submit through the portal to the composer's form.
+          event.stopPropagation();
           confirm();
         }}
       >
@@ -289,7 +294,8 @@ function StartDialogContent({
           </button>
         </div>
       </form>
-    </dialog>
+    </dialog>,
+    document.body,
   );
 }
 
