@@ -207,7 +207,7 @@ The client only displays availability; the bot and relay decide who may create o
 
 ### 4.13 Signalling format (Bovnar, #400)
 
-- **FR-8.91** The `mumcord.camera` messages (`on`, `off`, `cam-join`, `cam-leave`) are **Bovnar documents** (user decision 2026-11-03), written and read with a thin Rust wrapper around the upstream Bovnar C library (fork `Mumcord/bovnar`, branch `rust-binding`), used as a git dependency pinned to a commit (spec 09 FR-9.96 and FR-9.99). The channel is new in 0.7.0, so no older client has to read it. The decoder rejects malformed, truncated, wrong-typed or oversized documents without a crash or hang and logs one line without payload content. The other camera-related messages keep their formats: `mumcord.peer` (`relay`, `bcast-req`, `bcast-err`), broadcast control and the allowlist API stay JSON/binary, because 0.6.2 and mumbot read them and one channel never mixes formats.
+- **FR-8.91** The `mumcord.camera` messages (`on`, `off`, `cam-join`, `cam-leave`) are **Bovnar documents** (user decision 2026-11-03), written and read with a thin Rust wrapper around the upstream Bovnar C library (the published crates.io crate `bovnar`, one version pinned in Cargo.lock; until 12b34052 a git dependency on the fork `Mumcord/bovnar`; spec 09 FR-9.96 and FR-9.99). The channel is new in 0.7.0, so no older client has to read it. The decoder rejects malformed, truncated, wrong-typed or oversized documents without a crash or hang and logs one line without payload content. The other camera-related messages keep their formats: `mumcord.peer` (`relay`, `bcast-req`, `bcast-err`), broadcast control and the allowlist API stay JSON/binary, because 0.6.2 and mumbot read them and one channel never mixes formats.
 
 ## 5. UI & UX
 
@@ -587,7 +587,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Effect quality "Best" | Label is "Best" (not "Best (graphics card)"): square 256×256 Selfie Segmenter on the CPU, no GPU path | User decision after spike CA0, 2026-11-03 (supersedes the mockup label) |
 | Mockups vs. issue text | Mockups win (Send quality options Auto / 720p · 15 fps / 360p · 30 fps; room bar buttons; tile menu wording) | Same rule as spec 07 (user decision 2026-11-02) |
 | Pure client | Works against an unmodified Mumble server; mumpeer and mumbot are the user's own projects and are extended | Project rule |
-| Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (thin Rust wrapper around the upstream C library, fork Mumcord/bovnar branch `rust-binding`, pinned git dependency; building needs a C compiler and Python 3). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
+| Camera signalling format (#400) | `mumcord.camera` uses **Bovnar** from the start (thin Rust wrapper around the upstream C library; decided as a pinned git dependency on the fork Mumcord/bovnar, since 12b34052 the published crates.io crate `bovnar`; building needs a C compiler). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-8.91, §6.5 |
 
 ## 13. Open points & risks
 

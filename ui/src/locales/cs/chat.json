@@ -416,5 +416,10 @@
     "several_few": "{{count}} náhledy jsou skryté, protože náhledy odkazů a vložený obsah jsou vypnuté v <settings>Nastavení > Soukromí</settings>.",
     "several_many": "{{count}} náhledu je skryto, protože náhledy odkazů a vložený obsah jsou vypnuté v <settings>Nastavení > Soukromí</settings>.",
     "several_other": "{{count}} náhledů je skryto, protože náhledy odkazů a vložený obsah jsou vypnuté v <settings>Nastavení > Soukromí</settings>."
+  },
+  "historyImage": {
+    "loading": "Načítání obrázku…",
+    "unavailable": "Obrázek není k dispozici",
+    "load": "Načíst obrázek"
   }
 }

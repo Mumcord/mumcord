@@ -7,6 +7,7 @@
  * the engine. Functions without a `serverId` act on the shown server.
  */
 import { useCallback, useSyncExternalStore } from "react";
+import { bindHistoryImages } from "./historyImages";
 import {
   getApi,
   type ChatMessage,
@@ -203,6 +204,9 @@ function insertSynced(serverId: number, channelId: number, incoming: readonly Ch
   const log = getLog(key);
   // Not shown yet: the first history page will contain them (they are already stored).
   if (!log.loaded) return;
+  const updates = new Map(incoming.map((m) => [m.id, m]));
+  // A message shown already comes again when its synced images arrived (FR-1.60f).
+  const current = log.messages.map((m) => updates.get(m.id) ?? m);
   const known = new Set(log.messages.map((m) => m.id));
   const oldest = log.messages[0];
   // Older than the loaded window: paging back brings them in the right place; inserting them
@@ -212,8 +216,12 @@ function insertSynced(serverId: number, channelId: number, incoming: readonly Ch
       !known.has(m.id) &&
       (!log.hasMore || (oldest !== undefined && Date.parse(m.sentAt) >= Date.parse(oldest.sentAt))),
   );
-  if (fits.length === 0) return;
-  const messages = insertByTime(log.messages, fits);
+  const updated = current.some((m, i) => m !== log.messages[i]);
+  if (fits.length === 0) {
+    if (updated) setLog(key, { ...log, messages: current });
+    return;
+  }
+  const messages = insertByTime(current, fits);
   const overflow = messages.length > MAX_KEPT;
   setLog(key, {
     ...log,
@@ -246,6 +254,7 @@ function bind(api: MumcordApi): void {
     api.on("historySynced", ({ serverId, channelId, messages }) => {
       insertSynced(serverId, channelId, messages);
     }),
+    bindHistoryImages(api),
     api.on("historySyncStatus", ({ serverId, channelId, running, added }) => {
       onSyncStatus(serverId, channelId, running, added);
     }),

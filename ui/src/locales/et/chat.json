@@ -398,5 +398,10 @@
     "link": "Lingi eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
     "several_one": "{{count}} eelvaade on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>.",
     "several_other": "{{count}} eelvaadet on peidetud, sest linkide eelvaated ja manused on välja lülitatud jaotises <settings>Seaded > Privaatsus</settings>."
+  },
+  "historyImage": {
+    "loading": "Pilti laaditakse…",
+    "unavailable": "Pilt pole saadaval",
+    "load": "Laadi pilt"
   }
 }

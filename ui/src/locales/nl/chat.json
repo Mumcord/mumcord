@@ -398,5 +398,10 @@
     "link": "Linkvoorbeeld verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
     "several_one": "{{count}} voorbeeld verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>.",
     "several_other": "{{count}} voorbeelden verborgen, omdat linkvoorbeelden en insluitingen uit staan in <settings>Instellingen > Privacy</settings>."
+  },
+  "historyImage": {
+    "loading": "Afbeelding laden…",
+    "unavailable": "Afbeelding niet beschikbaar",
+    "load": "Afbeelding laden"
   }
 }

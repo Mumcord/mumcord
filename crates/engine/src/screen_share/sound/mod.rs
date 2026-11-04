@@ -1,5 +1,5 @@
 //! Screen-share sound. The sharer's side: what the share's sound is and why it may be missing
-//! ([`status`]), and the OS captures ([`windows`], [`macos`]).
+//! ([`status`]), and the OS captures ([`windows`], [`macos`], [`linux`]).
 //!
 //! The viewer's side is here (FR-2.42): the Opus packets of a watched share are decoded on its
 //! reader task and played as their own source of the playback mix
@@ -9,10 +9,14 @@
 //! the pipeline attaches its share port to [`ShareSoundHub`] while it runs, and each watch opens
 //! a new ring whenever the hub's generation changed.
 
+#[cfg(any(target_os = "linux", test))]
+pub mod linux;
 #[cfg(any(target_os = "macos", test))]
 pub mod macos;
 #[cfg(any(target_os = "linux", test))]
 pub mod matcher;
+#[cfg(any(target_os = "linux", test))]
+pub mod pick;
 pub(crate) mod status;
 #[cfg(windows)]
 pub(crate) mod windows;
@@ -28,7 +32,7 @@ use crate::session::lock;
 use crate::voice::VoiceShared;
 
 pub use status::{
-    AppName, ShareSoundMode, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+    AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
 };
 
 /// Why this system cannot share sound at all (FR-7.84), checked before the share starts and
@@ -43,8 +47,11 @@ pub(crate) fn unavailable() -> Option<SoundUnavailable> {
         let (major, _) = super::capture_macos::os_version();
         (!super::capture_macos::sound_supported(major)).then_some(SoundUnavailable::OsTooOld)
     }
-    // No Linux sound capture yet: treated like a system without PipeWire.
-    #[cfg(not(any(windows, target_os = "macos")))]
+    #[cfg(target_os = "linux")]
+    {
+        (!linux::running()).then_some(SoundUnavailable::NoPipeWire)
+    }
+    #[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
     {
         Some(SoundUnavailable::NoPipeWire)
     }

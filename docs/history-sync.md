@@ -120,6 +120,13 @@ waiting for its hash list:
 | `proof` without a matching challenge (replay, other requester) | silence |
 | `get` after the requester left or the own _Enter_ was lost     | `deny`  |
 
+## Images as hash references (0.7.0, issue #402)
+
+A `part` carries stored bodies as sanitized HTML, so inline pictures used to travel as base64 inside the JSON, once per message and per sync. From 0.7.0, clients announce the hello feature `histimg`. For a requester that announced it, the answering client replaces the `src="data:image/…;base64,…"` attribute of each inline picture with `data-mumcord-image="<sha256 hex>:<size>:<type>:<width>x<height>"` and sends the content hash of its stored body in the message's `k` field (the requester cannot compute it without the image bytes). Nothing else in the body changes, so putting the `src` back gives the holder's body byte for byte. The body limit of 8 KiB applies to the body as sent; the pictures follow the full-image limits.
+
+- **Requester:** stores and shows the body with placeholders of the right size, then fetches each missing picture from the holder through the full-image path (direct stream kind 1, else `mumcord.image` plugin data), one at a time and spaced to the holder's request limit. Bytes must match hash, size, type and pixel size; pictures already in the local image cache are not fetched. The arrived picture is written back into every stored message of the channel that waits for it, and the message is sent to the UI again (`historySynced`, same id). A message still waiting for a picture counts as known only by its text key, so the next sync fetches it again and retries the picture without storing a second copy. With "Load full-size images from others" off, the placeholder offers a manual load.
+- **Holder:** answers with references only while "Offer my full-size images" is on and only to requesters that announced `histimg`; everybody else gets the full bodies exactly as before. A picture is served by hash only to a requester that was sent a message containing it (a grant per requester and picture, valid for an hour after last use) and only while it may still read that message: a locked channel only while the requester is inside, with the own Enter permission confirmed where the password proof was used. Pictures of private chats are never granted. Any other request is answered like an unknown hash.
+
 ## Compatibility
 
 - Older Mumcord requesters never answer `chal`: they get no history from answerers with

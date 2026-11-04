@@ -117,6 +117,41 @@ impl Store {
         Ok(rows.collect::<rusqlite::Result<_>>()?)
     }
 
+    /// The newest `limit` messages of a conversation whose body contains `needle` (plain
+    /// text, no patterns), oldest first. Finds synced messages still waiting for an image
+    /// (spec 01, FR-1.60f).
+    pub fn messages_containing(
+        &self,
+        server: ServerId,
+        conversation: &Conversation,
+        needle: &str,
+        limit: u32,
+    ) -> Result<Vec<ChatMessage>> {
+        let (kind, key) = conversation.parts();
+        let mut stmt = self.conn.prepare(
+            "SELECT * FROM (
+                 SELECT id, conversation_kind, conversation_key, sender_name, sender_cert_hash,
+                        sent_at, body
+                 FROM chat_message
+                 WHERE server_id = ?1 AND conversation_kind = ?2 AND conversation_key = ?3
+                   AND instr(body, ?4) > 0
+                 ORDER BY sent_at DESC, id DESC
+                 LIMIT ?5)
+             ORDER BY sent_at, id",
+        )?;
+        let rows = stmt.query_map(params![server, kind, key, needle, limit], message_from_row)?;
+        Ok(rows.collect::<rusqlite::Result<_>>()?)
+    }
+
+    /// Replaces the body of a stored message (a synced message whose images arrived).
+    pub fn set_message_body(&self, id: i64, body: &str) -> Result<()> {
+        self.conn.execute(
+            "UPDATE chat_message SET body = ?2 WHERE id = ?1",
+            params![id, body],
+        )?;
+        Ok(())
+    }
+
     /// Count and time span of a conversation's messages sent in `[from, to)`.
     pub fn range_summary(
         &self,
@@ -242,6 +277,40 @@ mod tests {
                 .insert_synced_message(id, &msg(2, "skipped"), "Bob")
                 .expect("insert"),
             None
+        );
+    }
+
+    #[test]
+    fn messages_waiting_for_an_image_are_found_and_updated() {
+        let (_dir, store) = temp_store();
+        let id = server(&store);
+        let waiting = store
+            .insert_synced_message(id, &msg(1, "<img data-mumcord-image=\"ab%_\">"), "Bob")
+            .expect("synced")
+            .expect("stored");
+        store
+            .append_message(id, &msg(2, "<img data-mumcord-image=\"abx\">"))
+            .expect("other");
+        let lobby = Conversation::Channel("Lobby".into());
+        let found = store
+            .messages_containing(id, &lobby, "\"ab%_\"", 10)
+            .expect("containing");
+        assert_eq!(found.iter().map(|m| m.id).collect::<Vec<_>>(), [waiting]);
+        store
+            .set_message_body(waiting, "<img src=\"data:image/png;base64,AA==\">")
+            .expect("update");
+        assert!(
+            store
+                .messages_containing(id, &lobby, "\"ab%_\"", 10)
+                .expect("containing")
+                .is_empty()
+        );
+        let private = Conversation::Private("aa".into());
+        assert!(
+            store
+                .messages_containing(id, &private, "abx", 10)
+                .expect("private")
+                .is_empty()
         );
     }
 

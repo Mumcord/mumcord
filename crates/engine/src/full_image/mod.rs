@@ -29,6 +29,8 @@ use tokio::sync::Notify;
 use mumcord_protocol::{Handle, PluginData};
 
 use crate::ServerId;
+use crate::history_sync::HistorySync;
+use crate::p2p::ConsentPrompt;
 use crate::session::{Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, lock};
 use crate::web::{FullImage, LinkPreviews};
 pub use transfer::FetchError;
@@ -54,17 +56,29 @@ impl Link for HandleLink {
     }
 }
 
-/// Own originals by content hash, for answering requests.
+/// The history sync state and connection, for serving images of history answers.
+type History = (Arc<Mutex<HistorySync>>, SessionCtx);
+
+/// Own originals by content hash, for answering requests, and the images a history answer
+/// sent to the requester as references (FR-1.60g, checked by the history sync).
 /// With "Offer my full-size images" off nothing is served, so every request is declined.
-fn originals(previews: Arc<LinkPreviews>, offer: bool) -> Originals {
-    Arc::new(move |hash: &[u8; 32]| {
+fn originals(previews: Arc<LinkPreviews>, offer: bool, history: Option<History>) -> Originals {
+    Arc::new(move |requester: u32, hash: &[u8; 32]| {
         if !offer {
             return None;
         }
         let hex: String = hash.iter().map(|b| format!("{b:02x}")).collect();
-        let image = previews.full_image(&hex).filter(|image| image.own)?;
-        let (_, payload) = image.data_url.split_once(";base64,")?;
-        crate::people::base64_decode(payload)
+        let own = previews
+            .full_image(&hex)
+            .filter(|image| image.own)
+            .and_then(|image| {
+                let (_, payload) = image.data_url.split_once(";base64,")?;
+                crate::people::base64_decode(payload)
+            });
+        own.or_else(|| {
+            let (state, ctx) = history.as_ref()?;
+            crate::history_sync::image_for(state, ctx, requester, hash)
+        })
     })
 }
 
@@ -161,6 +175,7 @@ impl ServerTransfers {
 pub(crate) fn on_plugin_data(
     transfers: &ServerTransfers,
     previews: &Arc<LinkPreviews>,
+    history: &Arc<Mutex<HistorySync>>,
     ctx: &SessionCtx,
     data: &PluginData,
 ) {
@@ -187,13 +202,19 @@ pub(crate) fn on_plugin_data(
         originals(
             previews.clone(),
             setting(ctx.store().settings(), |s| s.offer_full_images),
+            Some((history.clone(), ctx.clone())),
         ),
     );
 }
 
 /// A request on a direct connection (the stream kind is already read).
-pub(crate) async fn serve_direct(engine: &Engine, send: SendStream, recv: RecvStream) {
-    direct::serve(engine, send, recv).await;
+pub(crate) async fn serve_direct(
+    engine: &Engine,
+    from: (ServerId, u32),
+    send: SendStream,
+    recv: RecvStream,
+) {
+    direct::serve(engine, from, send, recv).await;
 }
 
 /// How the direct attempt of a fetch ended.
@@ -290,27 +311,45 @@ impl Engine {
             return None;
         }
         let full = FullRef::parse(reference, check::MAX_BYTES)?;
-        let previews = self.link_previews_arc();
-        let hex = full.hash_hex();
-        let cached = {
-            let previews = previews.clone();
-            let hex = hex.clone();
-            tokio::task::spawn_blocking(move || previews.full_image(&hex))
-                .await
-                .ok()
-                .flatten()
-        };
-        if let Some(image) = cached {
-            return Some(image.data_url);
+        if let Some(data_url) = self.full_image_cached(&full).await {
+            return Some(data_url);
         }
         let ctx = self.session_ctx_for(server_id).ok()?;
         let from = online_sender(&ctx.handle, sender_session, sender_cert_hash.as_deref())?;
+        self.full_image_download(server_id, full, from, ConsentPrompt::Allowed)
+            .await
+    }
+
+    /// The image from the local image cache as a `data:` URL, if it is there.
+    pub(crate) async fn full_image_cached(&self, full: &FullRef) -> Option<String> {
+        let previews = self.link_previews_arc();
+        let hex = full.hash_hex();
+        tokio::task::spawn_blocking(move || previews.full_image(&hex))
+            .await
+            .ok()
+            .flatten()
+            .map(|image| image.data_url)
+    }
+
+    /// Fetches `full` from the session `from` (direct first, then plugin data), checks it
+    /// and keeps it in the image cache. Emits [`EngineEvent::FullImageProgress`]. `prompt` says
+    /// whether a new direct connection may ask the consent question.
+    pub(crate) async fn full_image_download(
+        &self,
+        server_id: ServerId,
+        full: FullRef,
+        from: u32,
+        prompt: ConsentPrompt,
+    ) -> Option<String> {
+        let ctx = self.session_ctx_for(server_id).ok()?;
         if !self.mumcord_user_has_feature(server_id, from, FEATURE) {
             return None;
         }
+        let previews = self.link_previews_arc();
+        let hex = full.hash_hex();
         let progress = {
             let events = ctx.events.clone();
-            let reference = reference.to_owned();
+            let reference = full.to_string();
             move |received, total| {
                 events.emit(EngineEvent::FullImageProgress {
                     reference: reference.clone(),
@@ -323,7 +362,14 @@ impl Engine {
             .full_image_transfers()
             .start_fetch(server_id, full.hash);
         let bytes = match self
-            .full_image_direct(server_id, from, full, &fetch.cancel, progress.clone())
+            .full_image_direct(
+                server_id,
+                from,
+                full,
+                prompt,
+                &fetch.cancel,
+                progress.clone(),
+            )
             .await
         {
             DirectOutcome::Loaded(bytes) => Ok(bytes),
@@ -378,11 +424,12 @@ impl Engine {
         server_id: ServerId,
         from: u32,
         full: FullRef,
+        prompt: ConsentPrompt,
         cancel: &Cancel,
         progress: impl Fn(u32, u32),
     ) -> DirectOutcome {
         let attempt = direct::fetch_retrying(
-            || self.p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE),
+            || self.p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE, prompt),
             || self.p2p_connected(server_id, from),
             full,
             progress,
@@ -419,9 +466,12 @@ mod tests {
         for (i, b) in key.iter_mut().enumerate() {
             *b = u8::from_str_radix(&hex[i * 2..i * 2 + 2], 16).expect("hex");
         }
-        assert_eq!(originals(previews.clone(), true)(&key), Some(bytes));
         assert_eq!(
-            originals(previews, false)(&key),
+            originals(previews.clone(), true, None)(7, &key),
+            Some(bytes)
+        );
+        assert_eq!(
+            originals(previews, false, None)(7, &key),
             None,
             "nothing served while off"
         );

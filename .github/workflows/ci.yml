@@ -236,20 +236,6 @@ jobs:
           key: ${{ matrix.task }}
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
-      # Trial (#479): compiler-level cache on the Linux tests only, next to rust-cache.
-      - name: Set up sccache
-        if: runner.os == 'Linux' && matrix.task == 'test'
-        uses: mozilla-actions/sccache-action@v0.0.11
-
-      - name: Use sccache
-        if: runner.os == 'Linux' && matrix.task == 'test'
-        run: |
-          {
-            echo 'SCCACHE_GHA_ENABLED=true'
-            echo 'RUSTC_WRAPPER=sccache'
-            echo 'CARGO_INCREMENTAL=0'
-          } >> "$GITHUB_ENV"
-
       - uses: ./.github/actions/npm-ci
 
       - name: Rust format
@@ -275,10 +261,6 @@ jobs:
       - name: Rust tests
         if: matrix.task == 'test' || runner.os == 'macOS'
         run: cargo test --workspace --locked
-
-      - name: sccache statistics
-        if: always() && runner.os == 'Linux' && matrix.task == 'test'
-        run: sccache --show-stats
 
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
       # tested and free of the device crates (cpal/ALSA) and the resampler.
@@ -340,7 +322,7 @@ jobs:
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
         if: matrix.task == 'check' && runner.os != 'Linux'
-        run: npm run tauri build -- --debug --no-bundle
+        run: npm run tauri build -- --debug --no-bundle -- --locked
 
   # The UI checks are platform-independent (vitest runs in jsdom), so they run once, on Linux, in
   # parallel with the Rust jobs. The ubuntu-24.04 result check below requires this job.

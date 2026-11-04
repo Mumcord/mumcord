@@ -2079,3 +2079,40 @@ a.message-card__title:hover {
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
+
+/* A synced image still being fetched (FR-1.60f): a box of the image's size. */
+.history-image {
+  display: block;
+  max-width: min(100%, 25rem);
+  max-height: 20rem;
+  margin: var(--space-1) 0;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+}
+
+.history-image-hint {
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.85em;
+  text-indent: 0;
+}
+
+.history-image-hint__load {
+  padding: 2px 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.history-image-hint__load:hover {
+  background: var(--color-bg-hover);
+}
+
+.history-image-hint__load:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}

@@ -19,6 +19,7 @@ use ammonia::{Builder, UrlRelative};
 use crate::files::offer::{ATTRIBUTE as OFFER_ATTRIBUTE, is_valid_attribute};
 use crate::full_image::check::MAX_BYTES;
 use crate::full_image::wire::{ATTRIBUTE as FULL_ATTRIBUTE, FullRef};
+use crate::history_sync::images::{ATTRIBUTE as IMAGE_REF_ATTRIBUTE, ImageRef};
 
 const TAGS: &[&str] = &[
     "a",
@@ -73,6 +74,7 @@ fn policy(message: bool) -> Builder<'static> {
     let mut image_attributes = HashSet::from(["src", "alt", "title", "width", "height"]);
     if message {
         image_attributes.insert(FULL_ATTRIBUTE);
+        image_attributes.insert(IMAGE_REF_ATTRIBUTE);
     }
     let mut tag_attributes = HashMap::from([
         ("a", HashSet::from(["href", "title"])),
@@ -97,6 +99,9 @@ fn policy(message: bool) -> Builder<'static> {
                 ("img", "src") => (is_embedded_image(value)
                     || (message && is_external_image(value)))
                 .then_some(Cow::Borrowed(value)),
+                ("img", IMAGE_REF_ATTRIBUTE) => ImageRef::parse(value)
+                    .is_some()
+                    .then_some(Cow::Borrowed(value)),
                 ("img", FULL_ATTRIBUTE) => FullRef::parse(value, MAX_BYTES)
                     .is_some()
                     .then_some(Cow::Borrowed(value)),
@@ -169,6 +174,21 @@ fn is_embedded_image(src: &str) -> bool {
         rest.get(..t.len() + 8)
             .is_some_and(|p| p.eq_ignore_ascii_case(&format!("{t};base64,")))
     })
+}
+
+#[cfg(test)]
+mod image_ref_tests {
+    use super::*;
+
+    #[test]
+    fn history_image_references_survive_only_in_messages_and_their_exact_shape() {
+        let reference = format!("{}:68:png:1x1", "ab".repeat(32));
+        let html = format!("<img {IMAGE_REF_ATTRIBUTE}=\"{reference}\" alt=\"x\">");
+        assert_eq!(sanitize_message_html(&html), html);
+        assert_eq!(sanitize_html(&html), "<img alt=\"x\">");
+        let bad = format!("<img {IMAGE_REF_ATTRIBUTE}=\"{reference}:x\">");
+        assert_eq!(sanitize_message_html(&bad), "<img>");
+    }
 }
 
 #[cfg(test)]

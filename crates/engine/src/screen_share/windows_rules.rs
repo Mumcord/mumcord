@@ -8,6 +8,8 @@ use std::collections::VecDeque;
 
 use mumcord_audio::{FRAME_SAMPLES, Frame};
 
+use super::signal::ShareKind;
+
 /// Windows 10 1903: the free-threaded capture frame pool, so frames can be taken on the encode
 /// thread without a UI thread.
 pub(super) const CAPTURE_MIN_BUILD: u32 = 18362;
@@ -46,6 +48,115 @@ pub(super) fn sound_process(windows: &[TopWindow], picked: &str, own_pid: u32) -
         return None;
     }
     Some(pid)
+}
+
+/// What the user picked (FR-7.76). The picker hands back only a display name and a size, so a
+/// pick counts as a whole screen only when no window has that name and its size is a monitor's.
+/// Anything unclear counts as a window, which never shares more than one app's sound (FR-7.87).
+pub(super) fn pick_kind(
+    windows: &[TopWindow],
+    picked: &str,
+    size: (i32, i32),
+    monitors: &[(i32, i32)],
+) -> ShareKind {
+    let titled = picked.is_empty() || windows.iter().any(|w| w.title == picked);
+    if !titled && monitors.contains(&size) {
+        ShareKind::Screen
+    } else {
+        ShareKind::Window
+    }
+}
+
+/// A running process as the system's process snapshot lists it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct ProcessEntry {
+    pub pid: u32,
+    pub parent: u32,
+    /// The program's file name, e.g. `chrome.exe`.
+    pub exe: String,
+}
+
+/// The app whose sound goes with a window drawn by `pid` (FR-7.79): the root of its process
+/// tree and the app's name for the sharer's live bar.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct OwnerTree {
+    pub root: u32,
+    pub name: Option<String>,
+}
+
+/// The process tree that owns a window drawn by `pid`: the topmost ancestor running the same
+/// program, so a window of one process of a multi-process app (browsers, Electron apps) brings
+/// the sound its sibling processes play too. `None` when the window belongs to Mumcord's own
+/// tree, e.g. a window of its web view: Mumcord is never part of the share sound (FR-7.77).
+pub(super) fn owner_tree(processes: &[ProcessEntry], pid: u32, own_pid: u32) -> Option<OwnerTree> {
+    if pid == own_pid {
+        return None;
+    }
+    let find = |pid: u32| processes.iter().find(|p| p.pid == pid);
+    let Some(start) = find(pid) else {
+        return Some(OwnerTree {
+            root: pid,
+            name: None,
+        });
+    };
+    let mut root = pid;
+    let mut same_program = true;
+    let mut current = start;
+    // Bounded: a recycled parent id can make the chain loop.
+    for _ in 0..processes.len() {
+        if current.parent == 0 || current.parent == current.pid {
+            break;
+        }
+        let Some(parent) = find(current.parent) else {
+            break;
+        };
+        if parent.pid == own_pid {
+            return None;
+        }
+        same_program &= parent.exe.eq_ignore_ascii_case(&start.exe);
+        if same_program {
+            root = parent.pid;
+        }
+        current = parent;
+    }
+    Some(OwnerTree {
+        root,
+        name: app_name(&start.exe),
+    })
+}
+
+/// `chrome.exe` → `chrome`; nothing for an empty name.
+fn app_name(exe: &str) -> Option<String> {
+    let stem = match exe.len().checked_sub(4) {
+        Some(cut) if exe.is_char_boundary(cut) && exe[cut..].eq_ignore_ascii_case(".exe") => {
+            &exe[..cut]
+        }
+        _ => exe,
+    };
+    (!stem.is_empty()).then(|| stem.to_owned())
+}
+
+/// After this many failures in a row (opening the loopback or reading from it), the share sound
+/// counts as failed (FR-7.84) instead of being retried forever.
+pub(super) const MAX_FAILURES: u32 = 3;
+
+/// Counts the loopback's failures in a row; sound that arrives starts the count anew.
+#[derive(Debug, Default)]
+pub(super) struct Reopen {
+    failures: u32,
+}
+
+impl Reopen {
+    /// Records a failure; `true` once the sound should be given up.
+    pub fn failed(&mut self) -> bool {
+        self.failures += 1;
+        self.failures >= MAX_FAILURES
+    }
+
+    /// Sound arrived: the loopback works.
+    pub fn worked(&mut self) {
+        self.failures = 0;
+    }
 }
 
 /// At most this much sound waits for the share's sound thread; older sound is dropped so a
@@ -148,6 +259,103 @@ mod tests {
         assert_eq!(sound_process(&windows, "Untitled", 7), None, "two apps");
         assert_eq!(sound_process(&windows, "Mumcord", 7), None, "own voice");
         assert_eq!(sound_process(&windows, "", 7), None);
+    }
+
+    const MONITORS: [(i32, i32); 2] = [(2560, 1440), (1920, 1080)];
+
+    #[test]
+    fn a_monitor_sized_pick_without_a_window_of_that_name_is_a_screen() {
+        let windows = [window("Spotify Premium", 40)];
+        assert_eq!(
+            pick_kind(&windows, "Generic PnP Monitor", (1920, 1080), &MONITORS),
+            ShareKind::Screen
+        );
+    }
+
+    #[test]
+    fn unclear_picks_count_as_windows() {
+        let windows = [window("Doom", 50)];
+        assert_eq!(
+            pick_kind(&windows, "Doom", (1920, 1080), &MONITORS),
+            ShareKind::Window,
+            "a full-screen window"
+        );
+        assert_eq!(
+            pick_kind(&windows, "Renamed tab", (1280, 720), &MONITORS),
+            ShareKind::Window,
+            "title changed since the pick"
+        );
+        assert_eq!(
+            pick_kind(&windows, "", (1920, 1080), &MONITORS),
+            ShareKind::Window,
+            "no name"
+        );
+    }
+
+    fn process(pid: u32, parent: u32, exe: &str) -> ProcessEntry {
+        ProcessEntry {
+            pid,
+            parent,
+            exe: exe.to_owned(),
+        }
+    }
+
+    fn tree(root: u32, name: &str) -> Option<OwnerTree> {
+        Some(OwnerTree {
+            root,
+            name: Some(name.to_owned()),
+        })
+    }
+
+    #[test]
+    fn a_window_brings_its_whole_app_tree() {
+        let processes = [
+            process(4, 0, "explorer.exe"),
+            process(10, 4, "chrome.exe"),
+            process(11, 10, "chrome.exe"),
+            process(12, 11, "CHROME.EXE"),
+            process(20, 4, "Spotify.exe"),
+        ];
+        assert_eq!(owner_tree(&processes, 12, 7), tree(10, "CHROME"));
+        assert_eq!(owner_tree(&processes, 20, 7), tree(20, "Spotify"));
+    }
+
+    #[test]
+    fn mumcord_s_own_tree_never_gives_sound() {
+        let processes = [
+            process(4, 0, "explorer.exe"),
+            process(7, 4, "mumcord.exe"),
+            process(8, 7, "msedgewebview2.exe"),
+            process(9, 8, "msedgewebview2.exe"),
+        ];
+        assert_eq!(owner_tree(&processes, 7, 7), None, "Mumcord itself");
+        assert_eq!(owner_tree(&processes, 9, 7), None, "its web view");
+    }
+
+    #[test]
+    fn odd_snapshots_still_give_an_answer() {
+        assert_eq!(
+            owner_tree(&[], 30, 7),
+            Some(OwnerTree {
+                root: 30,
+                name: None
+            }),
+            "process gone from the snapshot"
+        );
+        let looped = [process(30, 31, "a.exe"), process(31, 30, "a.exe")];
+        assert!(owner_tree(&looped, 30, 7).is_some(), "recycled parent ids");
+        assert_eq!(owner_tree(&[process(5, 5, "x")], 5, 7), tree(5, "x"));
+    }
+
+    #[test]
+    fn reopening_gives_up_after_repeated_failures() {
+        let mut reopen = Reopen::default();
+        assert!(!reopen.failed());
+        assert!(!reopen.failed());
+        reopen.worked();
+        assert!(!reopen.failed(), "sound that arrived starts anew");
+        assert!(!reopen.failed());
+        assert!(reopen.failed());
     }
 
     #[test]

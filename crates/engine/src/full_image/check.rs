@@ -58,6 +58,13 @@ fn decode(bytes: &[u8], kind: ImageKind) -> Result<DynamicImage, CheckError> {
     reader.decode().map_err(|_| CheckError::NotImage)
 }
 
+/// The pixel size of an image of a known type, read from its header only (no full decode).
+pub fn dimensions(bytes: &[u8], kind: ImageKind) -> Option<(u32, u32)> {
+    ImageReader::with_format(Cursor::new(bytes), image_format(kind))
+        .into_dimensions()
+        .ok()
+}
+
 /// Checks bytes received from another client (or about to be shared): format by content,
 /// [`MAX_BYTES`], [`MAX_SIDE`] and a complete decode.
 pub fn check(bytes: &[u8]) -> Result<Checked, CheckError> {
