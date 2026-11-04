@@ -1726,6 +1726,27 @@ export type FailReason = { kind: "noAnswer" } | { kind: "busy" } |
 /**  Writing the file failed; `message` is the system's text. */
 { kind: "io"; message: string };
 
+/**  Why the share sends one copy per viewer, as the fan-out notice names it (FR-7.47). */
+export type FanoutReason = 
+/**  The server announces no relay. */
+"noRelay" | 
+/**  The relay offers no broadcasts (older relay, or broadcasts turned off). */
+"oldRelay" | 
+/**  The relay does not allow screen sharing. */
+"disallowed" | 
+/**  The bot refused the broadcast. */
+"refused" | 
+/**  The relay runs as many broadcasts as it may. */
+"full" | 
+/**  The relay was lost during the share (FR-7.49). */
+"lost" | 
+/**  The user's P2P mode leaves the relay out ("off" or "direct only"). */
+"mode" | 
+/**  The user has no client certificate. */
+"noCertificate" | 
+/**  The relay can't be used right now for another reason (not reachable, bot gone, …). */
+"unavailable";
+
 /**  A file card in the chat. Sizes and times are plain numbers (bytes, Unix seconds). */
 export type FileCard = {
 	shareId: string,
@@ -3843,6 +3864,15 @@ export type SetupPreset = "everythingOn" |
 /**  Why an own share ended (the sender's card says "Sharing ended"). */
 export type ShareEndReason = "expired" | "stopped" | "leftServer" | "quit" | "fileChanged";
 
+/**  How the own share reaches its viewers (FR-7.40, FR-7.47). */
+export type ShareFanout = 
+/**  Asking the relay bot for a broadcast. */
+{ kind: "starting" } | 
+/**  Sent once via the relay, up to `limit` viewers in all. */
+{ kind: "relay"; limit: number } | 
+/**  One copy per viewer, up to 8; the sharer sees the notice once per share. */
+{ kind: "direct"; reason: FanoutReason };
+
 /**  What the sharer picked in the system picker (issue #163). */
 export type ShareKind = "window" | "screen";
 
@@ -3888,6 +3918,10 @@ export type ShareQuality = {
 	/**  The encoder the own share runs on right now (codec badge); `null` until it opened. */
 	encoder: ActiveEncoder | null,
 	viewers: ViewerQuality[],
+	/**  The sharer's current picks, which the Quality menu shows checked (FR-7.39). */
+	choice: QualityChoice,
+	/**  How the share reaches its viewers; `null` while the share has not asked for fan-out. */
+	fanout: ShareFanout | null,
 };
 
 /**  Why the user cannot start a share on the server: nobody could watch it (FR-4.3 – FR-4.5). */

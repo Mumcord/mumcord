@@ -5,7 +5,7 @@
  */
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { MockApi, ScreenShare, Settings, ShareQuality } from "../../../api";
+import type { MockApi, QualityChoice, ScreenShare, Settings, ShareQuality } from "../../../api";
 import { subscribeAnnouncements, type Announcement } from "../../../a11y/announcer";
 import { axeViolations } from "../../../test/axe";
 import { connectedMock, resetAll, stubDialog } from "../../channels/testUtils";
@@ -35,6 +35,8 @@ function quality(patch: Partial<ShareQuality> = {}): ShareQuality {
     kbps: 4000,
     encoder: { codec: "av1", gpu: null },
     viewers: [],
+    choice: CHOICE,
+    fanout: null,
     ...patch,
   };
 }
@@ -104,7 +106,7 @@ describe("sharer live bar", () => {
     vi.spyOn(api, "settingsGet").mockResolvedValue({ ...loaded, ...settings });
     render(<SharerBar />);
     await act(async () => {
-      await api.screenShareStart(1, false);
+      await api.screenShareStart(1, false, null, null);
     });
     const share: ScreenShare = {
       session: SELF,
@@ -210,7 +212,7 @@ describe("sharer live bar", () => {
 
   it("changes the quality from the menu with the keyboard", async () => {
     const set = vi.spyOn(api, "screenShareSetQuality");
-    const bar = await sharing(quality(), { screenResolution: "1080", screenFps: "30" });
+    const bar = await sharing(quality(), { screenResolution: "720", screenFps: "30" });
     const button = within(bar).getByRole("button", { name: "Quality" });
     await waitFor(() => expect(button).toBeEnabled());
     fireEvent.click(button);
@@ -260,7 +262,10 @@ describe("sharer live bar", () => {
     const set = vi
       .spyOn(api, "screenShareSetQuality")
       .mockRejectedValue({ code: "invalid", message: "no" });
-    const bar = await sharing(quality(), { screenResolution: "720", screenFps: "15" });
+    const bar = await sharing(quality({ choice: { ...CHOICE, resolution: "720", fps: "15" } }), {
+      screenResolution: "1080",
+      screenFps: "15",
+    });
     const button = within(bar).getByRole("button", { name: "Quality" });
     await waitFor(() => expect(button).toBeEnabled());
     fireEvent.click(button);
@@ -280,5 +285,38 @@ describe("sharer live bar", () => {
         politeness: "assertive",
       });
     });
+  });
+
+  it("checks the share's own pick, not the Settings, and follows the engine", async () => {
+    let choice: QualityChoice = { ...CHOICE, resolution: "1440", fps: "60" };
+    vi.spyOn(api, "screenShareSetQuality").mockImplementation((_serverId, next) => {
+      choice = next;
+      return Promise.resolve(null);
+    });
+    const bar = await sharing(quality(), { screenResolution: "720", screenFps: "30" });
+    vi.spyOn(api, "screenShareQuality").mockImplementation(() =>
+      Promise.resolve(quality({ choice })),
+    );
+    const button = within(bar).getByRole("button", { name: "Quality" });
+    fireEvent.click(button);
+    await waitFor(() => {
+      expect(screen.getByRole("menuitemradio", { name: /1440p · 60 fps/ })).toHaveAttribute(
+        "aria-checked",
+        "true",
+      );
+    });
+    fireEvent.click(screen.getByRole("menuitemradio", { name: /720p · 30 fps/ }));
+    fireEvent.click(button);
+    expect(screen.getByRole("menuitemradio", { name: /720p · 30 fps/ })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1100));
+    });
+    expect(screen.getByRole("menuitemradio", { name: /720p · 30 fps/ })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
   });
 });
