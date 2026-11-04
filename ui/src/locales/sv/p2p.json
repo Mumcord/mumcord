@@ -45,6 +45,7 @@
     "unreachable": "Reläet kunde inte nås varken via UDP eller TCP 443.",
     "peerCannotRelay": "Den andra personen kan inte använda reläet (äldre Mumcord eller relä avstängt).",
     "denied": "Relä-boten avvisade begäran.",
+    "notRegistered": "Den här serverns relä är bara tillgängligt för registrerade användare. Registrera dig på den här servern för att använda det.",
     "peerGone": "Den andra personen lämnade servern.",
     "rateLimited": "För många relä-begäranden. Försök igen om en minut."
   },

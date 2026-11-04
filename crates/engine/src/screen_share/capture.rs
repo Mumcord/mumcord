@@ -92,8 +92,8 @@ pub trait SoundSource: Send {
     /// the frames, at the rate the OS delivers them.
     fn next_frame(&mut self, frame: &mut Frame, timeout: Duration) -> bool;
 
-    /// The capture broke for good during the share (sound server gone, device lost): the share
-    /// goes on without sound and the sharer sees why (FR-7.84).
+    /// The capture broke for good during the share (device lost, permission revoked, a format
+    /// it cannot send): no more sound comes, and the share says why (FR-7.84).
     fn failed(&self) -> bool {
         false
     }

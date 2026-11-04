@@ -148,14 +148,6 @@ impl SoundStatus {
         }
     }
 
-    /// The capture broke during the share (FR-7.84): no sound from here on, with the reason.
-    pub fn fail(&mut self) {
-        *self = Self {
-            unavailable: Some(SoundUnavailable::CaptureFailed),
-            ..Self::default()
-        };
-    }
-
     /// The status a test sound source gives (test hook): desktop sound.
     pub fn test_source() -> Self {
         Self {
@@ -272,19 +264,6 @@ mod tests {
         };
         assert!(!format!("{status:?}").contains("Secret"));
         assert_eq!(status.app.unwrap().as_str(), "Secret Player");
-    }
-
-    #[test]
-    fn a_broken_capture_leaves_no_sound_with_the_reason() {
-        let mut status = SoundStatus {
-            mode: ShareSoundMode::App,
-            app: Some(AppName::new("Player")),
-            unavailable: None,
-        };
-        status.fail();
-        assert!(!status.available());
-        assert_eq!(status.app, None);
-        assert_eq!(status.unavailable, Some(SoundUnavailable::CaptureFailed));
     }
 
     #[test]

@@ -175,11 +175,11 @@ struct Hub {
     stop: AtomicBool,
     /// The capture ended on its own ([`CaptureSource::ended`]).
     ended: AtomicBool,
+    /// The sound capture broke for good ([`SoundSource::failed`]).
+    sound_failed: AtomicBool,
     paused: AtomicBool,
     /// The sharer has sound on (FR-2.45).
     sound: AtomicBool,
-    /// The sound capture broke during the share ([`SoundSource::failed`]).
-    sound_failed: AtomicBool,
     /// The next frame has to be a keyframe.
     keyframe: AtomicBool,
     /// A viewer lost frames and waits for a keyframe ([`KeyframeGate`]).
@@ -275,9 +275,9 @@ impl Media {
             epoch: Instant::now(),
             stop: AtomicBool::new(false),
             ended: AtomicBool::new(false),
+            sound_failed: AtomicBool::new(false),
             paused: AtomicBool::new(false),
             sound: AtomicBool::new(false),
-            sound_failed: AtomicBool::new(false),
             keyframe: AtomicBool::new(true),
             keyframe_requested: AtomicBool::new(false),
             viewers: Mutex::new(BTreeMap::new()),
@@ -314,7 +314,7 @@ impl Media {
         self.hub.ended.load(Ordering::Relaxed)
     }
 
-    /// The sound capture broke; the share goes on without sound.
+    /// The sound capture broke during the share; the video goes on (FR-7.84).
     pub fn sound_failed(&self) -> bool {
         self.hub.sound_failed.load(Ordering::Relaxed)
     }
@@ -1105,8 +1105,8 @@ mod tests {
         assert!(media.ended());
     }
 
-    struct Broken;
-    impl SoundSource for Broken {
+    struct BrokenSound;
+    impl SoundSource for BrokenSound {
         fn next_frame(&mut self, _: &mut mumcord_audio::Frame, _: Duration) -> bool {
             false
         }
@@ -1116,10 +1116,10 @@ mod tests {
     }
 
     #[test]
-    fn media_reports_a_sound_capture_that_broke() {
+    fn media_reports_a_broken_sound_capture() {
         let media = Media::start(Box::new(Ending), QualityPrefs::default(), vp9_encoder());
         assert!(!media.sound_failed());
-        media.start_sound(Box::new(Broken));
+        media.start_sound(Box::new(BrokenSound));
         let deadline = Instant::now() + Duration::from_secs(5);
         while !media.sound_failed() && Instant::now() < deadline {
             thread::sleep(Duration::from_millis(10));
