@@ -61,9 +61,14 @@ export function isGestureReport(data: unknown, key: string): boolean {
   return signalKind(data) === "gesture" && (data as { key?: unknown }).key === key;
 }
 
+/** Where the bridge posts to: the iframe's window, or a child web view's stand-in (macOS). */
+export interface FrameTarget {
+  postMessage(message: unknown, targetOrigin: string): void;
+}
+
 export interface BridgeOptions {
   /** The frame's window right now (`null` while it is not mounted). */
-  readonly frame: () => Window | null;
+  readonly frame: () => FrameTarget | null;
   /** Hands a page message to the plugin. */
   readonly toPlugin: (text: string) => void;
   /** Escape inside the page: focus goes back to the app (and a dialog closes, FR-9.41). */
@@ -86,6 +91,8 @@ export interface BridgeOptions {
 export interface Bridge {
   /** Feeds a `message` event of the app window. */
   readonly receive: (event: MessageEvent) => void;
+  /** Feeds a message already known to come from this frame (a child web view's event). */
+  readonly receiveData: (data: unknown) => void;
   /** Sends a plugin message to the page (queued until {@link Bridge.loaded}). */
   readonly post: (message: string) => void;
   /** The page finished loading: the gesture key and then queued posts go out. */
@@ -106,41 +113,43 @@ export function createBridge(options: BridgeOptions): Bridge {
     options.frame()?.postMessage(message, "*");
   };
 
+  const receiveData = (data: unknown) => {
+    switch (signalKind(data)) {
+      case null:
+        break;
+      case "escape":
+        options.onEscape();
+        return;
+      case "f6":
+        options.onF6?.();
+        return;
+      case "heartbeat":
+        options.onHeartbeat?.();
+        return;
+      case "sound":
+        options.onSound?.();
+        return;
+      case "gesture":
+        // A hidden app window gets no real clicks, so a report then is not the user's.
+        if (isGestureReport(data, options.gestureKey) && document.visibilityState === "visible")
+          options.onGesture();
+        return;
+      default:
+        // An unknown signal is never a bridge message (those are strings).
+        options.onDropped?.();
+        return;
+    }
+    if (fitsBridge(data) && allow()) options.toPlugin(data);
+    else options.onDropped?.();
+  };
+
   return {
     receive: (event) => {
       const frame = options.frame();
       if (frame === null || event.source !== frame) return;
-      switch (signalKind(event.data)) {
-        case null:
-          break;
-        case "escape":
-          options.onEscape();
-          return;
-        case "f6":
-          options.onF6?.();
-          return;
-        case "heartbeat":
-          options.onHeartbeat?.();
-          return;
-        case "sound":
-          options.onSound?.();
-          return;
-        case "gesture":
-          // A hidden app window gets no real clicks, so a report then is not the user's.
-          if (
-            isGestureReport(event.data, options.gestureKey) &&
-            document.visibilityState === "visible"
-          )
-            options.onGesture();
-          return;
-        default:
-          // An unknown signal is never a bridge message (those are strings).
-          options.onDropped?.();
-          return;
-      }
-      if (fitsBridge(event.data) && allow()) options.toPlugin(event.data);
-      else options.onDropped?.();
+      receiveData(event.data);
     },
+    receiveData,
     post: (message) => {
       if (ready) send(message);
       else if (queue.length < MAX_QUEUED) queue.push(message);

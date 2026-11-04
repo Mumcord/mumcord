@@ -13,16 +13,29 @@
  *
  * Keyboard (FR-9.41): Tab moves into and out of the frame as usual; Escape or F6 inside the page
  * moves focus to the frame's wrapper (Escape also reaches `onEscape`, e.g. to close a dialog).
+ *
+ * On macOS the page is a child web view laid over a placeholder instead (FR-9.3, see
+ * `childFrame.ts`); it is drawn above the app, so the tag and the mute button sit in a bar below
+ * it there instead of floating over its corners.
  */
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, toEngineError, type PluginWebviewPlace } from "../../../api";
+import { getApi, toEngineError, type PluginWebviewPlace, type Unsubscribe } from "../../../api";
 import { useStageShown } from "../../media/stageContext";
 import { usePlugins } from "../pluginStore";
 import type { PluginWebview } from "../render/pluginUiStore";
-import { createBridge, newGestureKey, type Bridge } from "./bridge";
+import { createBridge, newGestureKey, type Bridge, type FrameTarget } from "./bridge";
+import {
+  childFramesUsed,
+  listenFrame,
+  measurePlacement,
+  newFrameId,
+  pagePost,
+  toDelivery,
+  trackPlacement,
+} from "./childFrame";
 import { setPluginFramesMuted, useFrameMute } from "./frameMute";
-import { watchHeartbeat } from "./heartbeat";
+import { watchHeartbeat, type HeartbeatWatch } from "./heartbeat";
 import "./webview.css";
 
 interface Props {
@@ -66,33 +79,10 @@ export function PluginFrame({ plugin, webview, onEscape }: Props) {
   };
 
   const muteLabel = t(byUser ? "frame.unmute" : "frame.mute", { plugin: name });
-  return (
-    <div ref={root} className="plugin-frame" data-place={webview.place}>
-      {stopped ? (
-        <div className="plugin-frame__stopped">
-          <p role="alert">{t("frame.stopped", { plugin: name })}</p>
-          <button ref={reload} type="button" className="button" onClick={onReload}>
-            {t("frame.reload")}
-          </button>
-        </div>
-      ) : (
-        // A new `seq` (the plugin showed a page again) or a reload gets a fresh frame.
-        <SealedFrame
-          key={`${String(webview.seq)}:${String(reloads)}`}
-          plugin={plugin}
-          place={webview.place}
-          url={webview.url}
-          label={t("frame.label", { plugin: name })}
-          muted={muted}
-          watched={shown}
-          focusOnMount={reloads > 0}
-          onEscape={onEscape}
-          onSound={() => {
-            setSound(true);
-          }}
-          onStopped={onStopped}
-        />
-      )}
+  const child = childFramesUsed();
+  const Frame = child ? ChildFrame : SealedFrame;
+  const chrome = (
+    <>
       <span className="plugin-frame__tag">
         <LockIcon />
         {t(unofficial ? "frame.tagUnofficial" : "frame.tag", { plugin: name })}
@@ -112,6 +102,41 @@ export function PluginFrame({ plugin, webview, onEscape }: Props) {
           <SpeakerIcon muted={byUser} />
         </button>
       )}
+    </>
+  );
+  return (
+    <div
+      ref={root}
+      className="plugin-frame"
+      data-place={webview.place}
+      data-child={child || undefined}
+    >
+      {stopped ? (
+        <div className="plugin-frame__stopped">
+          <p role="alert">{t("frame.stopped", { plugin: name })}</p>
+          <button ref={reload} type="button" className="button" onClick={onReload}>
+            {t("frame.reload")}
+          </button>
+        </div>
+      ) : (
+        // A new `seq` (the plugin showed a page again) or a reload gets a fresh frame.
+        <Frame
+          key={`${String(webview.seq)}:${String(reloads)}`}
+          plugin={plugin}
+          place={webview.place}
+          url={webview.url}
+          label={t("frame.label", { plugin: name })}
+          muted={muted}
+          watched={shown}
+          focusOnMount={reloads > 0}
+          onEscape={onEscape}
+          onSound={() => {
+            setSound(true);
+          }}
+          onStopped={onStopped}
+        />
+      )}
+      {child ? <div className="plugin-frame__bar">{chrome}</div> : chrome}
     </div>
   );
 }
@@ -146,64 +171,29 @@ function SealedFrame(props: FrameProps) {
   });
 
   const bridge = useRef<Bridge | null>(null);
-  const watch = useRef<ReturnType<typeof watchHeartbeat> | null>(null);
+  const watch = useRef<HeartbeatWatch | null>(null);
 
   useEffect(() => {
     if (focusOnMount) wrapper.current?.focus();
   }, [focusOnMount]);
 
   useEffect(() => {
-    let warned = false;
-    const focusApp = () => wrapper.current?.focus();
-    const current = createBridge({
-      frame: () => frame.current?.contentWindow ?? null,
-      toPlugin: (text) => {
-        getApi()
-          .pluginUiEvent(plugin, { type: "webviewMessage", place, text })
-          .catch((error: unknown) => {
-            // Dropped by the limits or the plugin stopped; the text is never logged.
-            console.debug("A web view message was not delivered", toEngineError(error).code);
-          });
-      },
-      onEscape: () => {
-        focusApp();
-        callbacks.current.onEscape?.();
-      },
-      onF6: focusApp,
-      onHeartbeat: () => watch.current?.beat(),
-      onSound: () => {
-        callbacks.current.onSound();
-      },
+    const current = frameBridge({
+      plugin,
+      place,
       gestureKey,
-      onGesture: () => {
-        getApi()
-          .pluginUiEvent(plugin, { type: "webviewGesture", place })
-          .catch((error: unknown) => {
-            // Too fast, or the frame closed meanwhile.
-            console.debug("A web view gesture was not counted", toEngineError(error).code);
-          });
-      },
-      onDropped: () => {
-        if (warned) return;
-        warned = true;
-        console.warn("A plugin web view sent messages above the bridge limits; they were dropped");
-      },
+      frame: () => frame.current?.contentWindow ?? null,
+      focusApp: () => wrapper.current?.focus(),
+      callbacks,
+      watch,
     });
     bridge.current = current;
     if (loads.current > 0) current.loaded();
     window.addEventListener("message", current.receive);
-    const off = getApi().on("pluginUi", (event) => {
-      if (
-        event.plugin === plugin &&
-        event.change.type === "webviewPost" &&
-        event.change.places.includes(place)
-      ) {
-        current.post(event.change.message);
-      }
-    });
+    const stopFollowing = followPlugin(plugin, place, current);
     return () => {
       window.removeEventListener("message", current.receive);
-      off();
+      stopFollowing();
       bridge.current = null;
     };
   }, [plugin, place, gestureKey]);
@@ -247,6 +237,230 @@ function SealedFrame(props: FrameProps) {
           referrerPolicy="no-referrer"
           allow=""
           onLoad={onLoad}
+        />
+      )}
+    </div>
+  );
+}
+
+interface FrameBridgeArgs {
+  readonly plugin: string;
+  readonly place: PluginWebviewPlace;
+  readonly gestureKey: string;
+  readonly frame: () => FrameTarget | null;
+  /** Escape or F6 inside the page: focus back to the app. */
+  readonly focusApp: () => void;
+  readonly callbacks: { readonly current: FrameProps };
+  readonly watch: { readonly current: HeartbeatWatch | null };
+}
+
+/** The bridge of one frame, the same for an iframe and a child web view. */
+function frameBridge(args: FrameBridgeArgs): Bridge {
+  const { plugin, place, callbacks, watch, focusApp } = args;
+  let warned = false;
+  return createBridge({
+    frame: args.frame,
+    toPlugin: (text) => {
+      getApi()
+        .pluginUiEvent(plugin, { type: "webviewMessage", place, text })
+        .catch((error: unknown) => {
+          // Dropped by the limits or the plugin stopped; the text is never logged.
+          console.debug("A web view message was not delivered", toEngineError(error).code);
+        });
+    },
+    onEscape: () => {
+      focusApp();
+      callbacks.current.onEscape?.();
+    },
+    onF6: focusApp,
+    onHeartbeat: () => watch.current?.beat(),
+    onSound: () => {
+      callbacks.current.onSound();
+    },
+    gestureKey: args.gestureKey,
+    onGesture: () => {
+      getApi()
+        .pluginUiEvent(plugin, { type: "webviewGesture", place })
+        .catch((error: unknown) => {
+          // Too fast, or the frame closed meanwhile.
+          console.debug("A web view gesture was not counted", toEngineError(error).code);
+        });
+    },
+    onDropped: () => {
+      if (warned) return;
+      warned = true;
+      console.warn("A plugin web view sent messages above the bridge limits; they were dropped");
+    },
+  });
+}
+
+/** Hands the plugin's `webview.post` messages for this place to the page. */
+function followPlugin(plugin: string, place: PluginWebviewPlace, bridge: Bridge): Unsubscribe {
+  return getApi().on("pluginUi", (event) => {
+    if (
+      event.plugin === plugin &&
+      event.change.type === "webviewPost" &&
+      event.change.places.includes(place)
+    ) {
+      bridge.post(event.change.message);
+    }
+  });
+}
+
+function logFrameError(what: string) {
+  return (error: unknown) => {
+    console.debug(what, toEngineError(error).code);
+  };
+}
+
+/** Before its first placement a new child web view waits as one pixel in the corner. */
+const FIRST_PLACE = { x: 0, y: 0, width: 1, height: 1 };
+
+/**
+ * The page in a child web view over a placeholder (macOS): same bridge, heartbeat and focus
+ * rules as {@link SealedFrame}. Each mount opens a web view with a fresh id and closing it
+ * needs nothing from the page, so a frozen page is simply closed and Reload opens a new one.
+ */
+function ChildFrame(props: FrameProps) {
+  const { plugin, place, url, label, muted, watched, focusOnMount } = props;
+  const wrapper = useRef<HTMLDivElement>(null);
+  const placeholder = useRef<HTMLDivElement>(null);
+  const frameId = useRef<string | null>(null);
+  const [navigated, setNavigated] = useState(false);
+  const [gestureKey] = useState(newGestureKey);
+  const callbacks = useRef(props);
+  useEffect(() => {
+    callbacks.current = props;
+  });
+
+  const bridge = useRef<Bridge | null>(null);
+  const watch = useRef<HeartbeatWatch | null>(null);
+
+  useEffect(() => {
+    if (focusOnMount) wrapper.current?.focus();
+  }, [focusOnMount]);
+
+  useEffect(() => {
+    const api = getApi();
+    // A new id per run, so a quick close and reopen never meet in the same web view label.
+    const id = newFrameId();
+    frameId.current = id;
+    const target: FrameTarget = {
+      postMessage: (data) => {
+        const delivery = toDelivery(data);
+        if (delivery === null) return;
+        api
+          .pluginFramePost(id, delivery)
+          .catch(logFrameError("A message for a plugin frame was not delivered"));
+      },
+    };
+    const current = frameBridge({
+      plugin,
+      place,
+      gestureKey,
+      frame: () => target,
+      focusApp: () => {
+        // The page's web view holds the keyboard until the app's own takes it back.
+        api.pluginFrameFocus(null).catch(logFrameError("Focus did not return to the app"));
+        wrapper.current?.focus();
+      },
+      callbacks,
+      watch,
+    });
+    bridge.current = current;
+
+    let closed = false;
+    let stopTracking = () => {};
+    const close = () => {
+      stopTracking();
+      api.pluginFrameClose(id).catch(logFrameError("A plugin frame did not close"));
+    };
+    let loaded = false;
+    const stopListening = listenFrame(id, (change) => {
+      switch (change.type) {
+        case "loaded":
+          if (loaded) return;
+          loaded = true;
+          current.loaded();
+          // The bootstrap's heartbeat runs from now on.
+          watch.current = watchHeartbeat(() => {
+            callbacks.current.onStopped();
+          });
+          watch.current.setActive(callbacks.current.watched);
+          return;
+        case "navigated":
+          // The page tried to leave its own file: never keep what it loaded.
+          console.warn("A plugin web view navigated and was closed");
+          watch.current?.stop();
+          close();
+          setNavigated(true);
+          return;
+        default:
+          current.receiveData(pagePost(change));
+      }
+    });
+    const stopFollowing = followPlugin(plugin, place, current);
+
+    const element = placeholder.current;
+    const first = element === null ? null : measurePlacement(element);
+    api.pluginFrameOpen(id, plugin, url, first ?? FIRST_PLACE).then(
+      () => {
+        // Unmounted while it opened: the close went out before the web view existed.
+        if (closed) close();
+        else if (element !== null) {
+          stopTracking = trackPlacement(element, (bounds) => {
+            api
+              .pluginFrameBounds(id, bounds)
+              .catch(logFrameError("A plugin frame could not follow its place"));
+          });
+        }
+      },
+      (error: unknown) => {
+        console.error("A plugin frame could not be opened", toEngineError(error).code);
+      },
+    );
+
+    return () => {
+      closed = true;
+      close();
+      stopListening();
+      stopFollowing();
+      watch.current?.stop();
+      watch.current = null;
+      bridge.current = null;
+      frameId.current = null;
+    };
+  }, [plugin, place, url, gestureKey]);
+
+  // Sent again after every load, so a fresh page starts silent while muted or deafened.
+  useEffect(() => {
+    bridge.current?.mute(muted);
+  }, [muted]);
+
+  useEffect(() => {
+    watch.current?.setActive(watched);
+  }, [watched]);
+
+  const enter = () => {
+    const id = frameId.current;
+    if (id === null) return;
+    getApi().pluginFrameFocus(id).catch(logFrameError("Focus did not move into the plugin frame"));
+  };
+
+  return (
+    <div ref={wrapper} className="plugin-webview" tabIndex={-1}>
+      {!navigated && (
+        // Tab stops here like on an iframe and hands the keyboard to the page's web view: the
+        // placeholder stands in for the frame, which is focusable without a role of its own.
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+        <div
+          ref={placeholder}
+          className="plugin-webview__frame"
+          role="application"
+          aria-label={label}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
+          onFocus={enter}
         />
       )}
     </div>
