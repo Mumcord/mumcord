@@ -25,7 +25,7 @@ import { useTranslation } from "react-i18next";
 import { useT } from "../../i18n/useT";
 import { getApi, type ChatDisplay, type ChatMessage } from "../../api";
 import { useServerSelector } from "../channels";
-import { shownServerId } from "../channels/serverStore";
+import { shownServerId, useShownServerId } from "../channels/serverStore";
 import { useServers } from "../servers/store";
 import { MumcordBadge } from "../channels/MumcordBadge";
 import {
@@ -55,6 +55,8 @@ import { useHighlightedCode } from "./highlight";
 import { hideShownLinks, useInlineShown } from "./inlineLinks";
 import { fullImageSource } from "./fullImage";
 import { FullImageBars } from "./FullImageBars";
+import { HistoryImageHints } from "./HistoryImageHints";
+import { PLACEHOLDER_CLASS } from "./historyImages";
 import { SendFailure } from "./SendFailure";
 import { findThemeCode } from "../../theme/shareCodec";
 import { ThemeCard } from "./ThemeCard";
@@ -225,6 +227,7 @@ function TextBody({
   const reply = useMemo(() => parseReply(sanitizedHtml), [sanitizedHtml]);
   const cleaned = reply?.rest ?? sanitizedHtml;
   const inlineShown = useInlineShown(message.id);
+  const serverId = useShownServerId();
   const users = useServerSelector((state) => state.users);
   // A link whose image is shown below gives way to the image (QA.43).
   const sharedTheme = useSharedTheme(cleaned);
@@ -251,6 +254,11 @@ function TextBody({
     }
     for (const link of ref.current?.querySelectorAll("a") ?? []) {
       link.tabIndex = tabIndex;
+    }
+    // Synced images still on their way: a sized box, announced as loading (FR-1.60f).
+    for (const placeholder of ref.current?.querySelectorAll(`.${PLACEHOLDER_CLASS}`) ?? []) {
+      placeholder.setAttribute("role", "img");
+      placeholder.setAttribute("aria-label", t("historyImage.loading"));
     }
     // Images sent inside the message open the viewer; the click is handled on the list.
     for (const image of ref.current?.querySelectorAll("img") ?? []) {
@@ -340,6 +348,7 @@ function TextBody({
         onImageClick={onImageClick}
       />
       <FullImageBars html={cleaned} />
+      <HistoryImageHints html={cleaned} serverId={serverId} tabIndex={tabIndex} />
       <ThemeCard html={cleaned} tabIndex={tabIndex} />
       <LinkPreviews
         messageId={message.id}

@@ -12,7 +12,9 @@
 //! connection runs timeouts and sends the paced outgoing packets.
 
 mod core;
+mod fetch;
 pub mod hash;
+pub mod images;
 pub mod proof;
 pub mod wire;
 
@@ -27,8 +29,10 @@ use tokio::task::JoinHandle;
 
 use self::core::{Core, Env, RequestError};
 use crate::chat::now_millis;
+use crate::mumcord::ServerPeers;
 use crate::session::convert::join_path;
 use crate::session::{Engine, EngineError, EngineResult, ErrorKind, SessionCtx, lock};
+pub(crate) use fetch::HistoryImages;
 pub use wire::DATA_ID;
 
 /// How often timeouts are checked and queued packets go out.
@@ -51,7 +55,8 @@ impl Drop for Connection {
     }
 }
 
-struct CtxEnv<'a>(&'a SessionCtx);
+/// The connection, and the Mumcord hellos where a decision depends on the peer's features.
+struct CtxEnv<'a>(&'a SessionCtx, Option<&'a ServerPeers>);
 
 impl Env for CtxEnv<'_> {
     fn server_id(&self) -> ServerId {
@@ -104,6 +109,25 @@ impl Env for CtxEnv<'_> {
         if let Err(e) = self.0.handle.query_permissions(channel) {
             tracing::warn!(error = %e, "history sync: asking for the own permissions failed");
         }
+    }
+
+    fn resolves_images(&self, session: u32) -> bool {
+        self.1.is_some_and(|peers| {
+            lock(peers)
+                .get(&self.0.server_id)
+                .and_then(|p| p.features(session))
+                .is_some_and(|f| f.iter().any(|x| x == images::FEATURE))
+        })
+    }
+
+    fn offer_images(&self) -> bool {
+        self.0.store().settings().map_or_else(
+            |e| {
+                tracing::warn!(error = %e, "reading settings failed; not offering images");
+                false
+            },
+            |s| s.offer_full_images,
+        )
     }
 }
 
@@ -167,7 +191,7 @@ pub(crate) fn on_synced(state: &Arc<Mutex<HistorySync>>, ctx: &SessionCtx, rt: &
         .handle
         .with_state(|s| s.users.values().cloned().collect());
     for user in &users {
-        see(&mut core, &CtxEnv(ctx), user, now);
+        see(&mut core, &CtxEnv(ctx, None), user, now);
     }
     let connection = Connection {
         core: Some(core),
@@ -185,7 +209,7 @@ pub(crate) fn on_disconnect(state: &Mutex<HistorySync>, server_id: ServerId) {
 /// Someone joined, moved, followed or unfollowed (own user included).
 pub(crate) fn on_user(state: &Mutex<HistorySync>, ctx: &SessionCtx, user: &User) {
     let now = now_millis();
-    with_core(state, ctx, |core| see(core, &CtxEnv(ctx), user, now));
+    with_core(state, ctx, |core| see(core, &CtxEnv(ctx, None), user, now));
 }
 
 /// The server answered a PermissionQuery of the own user for `channel_id`.
@@ -211,7 +235,13 @@ pub(crate) fn on_user_removed(state: &Mutex<HistorySync>, server_id: ServerId, s
     }
 }
 
-pub(crate) fn on_plugin_data(state: &Mutex<HistorySync>, ctx: &SessionCtx, data: &PluginData) {
+pub(crate) fn on_plugin_data(
+    state: &Mutex<HistorySync>,
+    images: &HistoryImages,
+    peers: &ServerPeers,
+    ctx: &SessionCtx,
+    data: &PluginData,
+) {
     if data.data_id != DATA_ID {
         return;
     }
@@ -219,9 +249,27 @@ pub(crate) fn on_plugin_data(state: &Mutex<HistorySync>, ctx: &SessionCtx, data:
         return;
     };
     let now = now_millis();
+    let mut fetches = Vec::new();
     with_core(state, ctx, |core| {
-        core.on_packet(&CtxEnv(ctx), sender, &data.data, now);
+        core.on_packet(&CtxEnv(ctx, Some(peers)), sender, &data.data, now);
+        fetches = core.take_image_fetches();
     });
+    images.fetch(ctx.server_id, fetches);
+}
+
+/// The bytes of an image that `requester` asks for by hash through the full-image path, if a
+/// history answer sent it a message containing that image and it may still read it
+/// (FR-1.60g).
+pub(crate) fn image_for(
+    state: &Mutex<HistorySync>,
+    ctx: &SessionCtx,
+    requester: u32,
+    hash: &[u8; 32],
+) -> Option<Vec<u8>> {
+    let mut state = lock(state);
+    let core = state.get_mut(&ctx.server_id)?.core.as_mut()?;
+    core.image_for(&CtxEnv(ctx, None), requester, hash, now_millis())
+        .map(|bytes| bytes.as_ref().clone())
 }
 
 /// Timeouts, the next queued channel and paced sending, until the connection ends.
@@ -232,7 +280,7 @@ async fn drive(state: Arc<Mutex<HistorySync>>, ctx: SessionCtx) {
         let now = now_millis();
         let mut outgoing = Vec::new();
         with_core(&state, &ctx, |core| {
-            core.tick(&CtxEnv(&ctx), now);
+            core.tick(&CtxEnv(&ctx, None), now);
             outgoing = core.take_outgoing(now);
         });
         for (receivers, data) in outgoing {
@@ -275,7 +323,7 @@ impl Engine {
                     "history sync needs a Mumble 1.4+ server",
                 )
             })?;
-        core.request(&CtxEnv(&ctx), channel_id, before, now_millis())
+        core.request(&CtxEnv(&ctx, None), channel_id, before, now_millis())
             .map_err(|e| match e {
                 RequestError::NotLive => EngineError::new(
                     ErrorKind::NotFound,

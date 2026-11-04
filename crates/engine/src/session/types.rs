@@ -534,6 +534,14 @@ pub enum EngineEvent {
         running: bool,
         added: u32,
     },
+    /// The placeholder of a referenced image in synced messages (FR-1.60f) needs a hint:
+    /// the image could not be loaded, or waits for a manual load. A loaded image arrives as an
+    /// updated message in `HistorySynced` instead.
+    HistoryImageStatus {
+        /// The placeholder's reference (`data-mumcord-image`).
+        reference: String,
+        state: HistoryImageState,
+    },
     /// A direct connection would be used while `allow_direct_connections` is still unset: ask
     /// the user once and answer with `Engine::p2p_consent_decide` (FR-2.36).
     DirectConsentRequired,
@@ -597,6 +605,15 @@ pub enum EngineEvent {
     ServerIdentityMissing {
         server_id: ServerId,
     },
+}
+
+/// Why a referenced image of a synced message is still a placeholder (FR-1.60f).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HistoryImageState {
+    /// Not available from the holder (gone, refused or broken); retried on the next sync.
+    Unavailable,
+    /// "Load full-size images from others" is off: the user can load it by hand.
+    Manual,
 }
 
 /// Phase of the mic test: record, play back, finished or failed to start.

@@ -21,8 +21,8 @@ use super::wire::{CHUNK_LEN, FullRef, Msg};
 use crate::session::lock;
 
 /// Requests served per requester within [`REQUEST_WINDOW`]; more are ignored unanswered.
-const MAX_REQUESTS: usize = 6;
-const REQUEST_WINDOW: Duration = Duration::from_secs(60);
+pub(crate) const MAX_REQUESTS: usize = 6;
+pub(crate) const REQUEST_WINDOW: Duration = Duration::from_secs(60);
 /// Requests waiting behind the running transfer; more are answered "unavailable".
 const MAX_QUEUE: usize = 4;
 /// Transfers this client receives at the same time.
@@ -35,7 +35,8 @@ pub(crate) trait Link: Send + Sync + 'static {
 }
 
 /// Looks up the bytes of an image this client sent itself (blocking file access).
-pub(crate) type Originals = Arc<dyn Fn(&[u8; 32]) -> Option<Vec<u8>> + Send + Sync>;
+/// The bytes of an image a requester (session) asks for by hash, if it may have them.
+pub(crate) type Originals = Arc<dyn Fn(u32, &[u8; 32]) -> Option<Vec<u8>> + Send + Sync>;
 
 /// Timing of transfers; tests use shorter values.
 #[derive(Debug, Clone, Copy)]
@@ -224,8 +225,8 @@ impl Transfers {
                 }
             };
             let lookup = originals.clone();
-            let hash = job.hash;
-            let bytes = tokio::task::spawn_blocking(move || lookup(&hash))
+            let (hash, requester) = (job.hash, job.to);
+            let bytes = tokio::task::spawn_blocking(move || lookup(requester, &hash))
                 .await
                 .ok()
                 .flatten()
@@ -433,7 +434,7 @@ mod tests {
         tamper: impl Fn(Msg) -> Option<Msg> + Send + Sync + 'static,
     ) -> Arc<Client> {
         let originals: Originals =
-            Arc::new(move |hash| own.iter().find(|b| FullRef::of(b).hash == *hash).cloned());
+            Arc::new(move |_, hash| own.iter().find(|b| FullRef::of(b).hash == *hash).cloned());
         Arc::new(Client {
             transfers: Arc::new(Transfers::new(timing())),
             wire: Arc::new(Wire {
