@@ -45,6 +45,7 @@
     "unreachable": "Níorbh fhéidir teacht ar an athsheachadán thar UDP ná TCP 443.",
     "peerCannotRelay": "Ní féidir leis an duine eile an t-athsheachadán a úsáid (Mumcord níos sine nó athsheachadán múchta).",
     "denied": "Dhiúltaigh bot an athsheachadáin don iarratas.",
+    "notRegistered": "Níl athsheachadán an fhreastalaí seo ar fáil ach d'úsáideoirí cláraithe. Cláraigh ar an bhfreastalaí seo chun é a úsáid.",
     "peerGone": "D’fhág an duine eile an freastalaí.",
     "rateLimited": "An iomarca iarratas athsheachadáin. Bain triail eile as i gceann nóiméid."
   },

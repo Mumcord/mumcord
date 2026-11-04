@@ -839,13 +839,12 @@ impl Engine {
         Ok(StartOutcome::Started)
     }
 
-    /// Stops the share once its capture ended on its own, unless it was replaced meanwhile. A
-    /// sound capture that failed meanwhile turns the share's sound off with the reason, once
-    /// (FR-7.84).
+    /// Stops the share once its capture ended on its own, unless it was replaced meanwhile, and
+    /// shows a broken sound capture once.
     fn watch_for_end(&self, server_id: ServerId, token: usize) {
         let engine = self.clone();
         self.runtime().spawn(async move {
-            let mut sound_failed = false;
+            let mut sound_failed_seen = false;
             loop {
                 tokio::time::sleep(start::ENDED_POLL).await;
                 let state = {
@@ -856,16 +855,14 @@ impl Engine {
                         .and_then(|o| o.media.as_ref())
                         .map(|m| (m.token(), m.ended(), m.sound_failed()))
                 };
-                if let Some((t, false, true)) = state
-                    && t == token
-                    && !sound_failed
-                {
-                    sound_failed = true;
-                    engine.sound_capture_failed(server_id);
-                }
-                match state.map(|(t, ended, _)| (t, ended)) {
-                    Some((t, false)) if t == token => {}
-                    Some((t, true)) if t == token => {
+                match state {
+                    Some((t, false, failed)) if t == token => {
+                        if failed && !sound_failed_seen {
+                            sound_failed_seen = true;
+                            engine.share_sound_failed(server_id);
+                        }
+                    }
+                    Some((t, true, _)) if t == token => {
                         if let Err(e) = engine.screen_share_stop(server_id) {
                             tracing::debug!(error = %e, "ended screen share could not be stopped");
                         }
@@ -877,18 +874,18 @@ impl Engine {
         });
     }
 
-    /// The own share's sound capture failed: the video goes on without sound (FR-7.84).
-    fn sound_capture_failed(&self, server_id: ServerId) {
-        let failed = self.update_own_share(server_id, |own| {
-            own.sound_status.capture_failed();
-            own.sound = false;
+    /// The own share's sound capture broke (FR-7.84): the video goes on, the live bar shows
+    /// "No sound" with the reason.
+    fn share_sound_failed(&self, server_id: ServerId) {
+        let updated = self.update_own_share(server_id, |own| {
+            own.sound_failed();
             own.sound_status.log(own.sound);
             if let Some(media) = &own.media {
                 media.set_sound(false);
             }
         });
-        if let Err(e) = failed {
-            tracing::debug!(error = %e, "failed screen share sound not shown");
+        if let Err(e) = updated {
+            tracing::debug!(error = %e, "screen share sound failure not shown");
         }
     }
 

@@ -45,6 +45,7 @@
     "unreachable": "Não foi possível contactar o retransmissor por UDP nem por TCP 443.",
     "peerCannotRelay": "A outra pessoa não pode usar o retransmissor (Mumcord mais antigo ou retransmissor desativado).",
     "denied": "O bot do retransmissor recusou o pedido.",
+    "notRegistered": "O retransmissor deste servidor só está disponível para utilizadores registados. Regista-te neste servidor para o usar.",
     "peerGone": "A outra pessoa saiu do servidor.",
     "rateLimited": "Demasiados pedidos ao retransmissor. Tenta novamente dentro de um minuto."
   },

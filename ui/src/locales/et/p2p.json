@@ -45,6 +45,7 @@
     "unreachable": "Releeserverit ei saanud kätte ei UDP ega TCP 443 kaudu.",
     "peerCannotRelay": "Teine inimene ei saa releeserverit kasutada (vanem Mumcord või releeserver välja lülitatud).",
     "denied": "Releebot keeldus päringust.",
+    "notRegistered": "Selle serveri releeserver on saadaval ainult registreeritud kasutajatele. Selle kasutamiseks registreeru sellel serveril.",
     "peerGone": "Teine inimene lahkus serverist.",
     "rateLimited": "Liiga palju releepäringuid. Proovi minuti pärast uuesti."
   },

@@ -161,14 +161,20 @@ async function expectWatch(reason: string | null): Promise<void> {
  * from an absent sender, and the viewer says why.
  */
 async function expectFullSizeNote(expected: string): Promise<void> {
+  // Earlier tests leave their images in the channel history, so this test counts what is already
+  // there and targets the one image that arrives after it.
+  const before = (await $$(".chat-message__body img")).length;
   await apps.onB(async () => {
     await pasteImage(700, 700, true);
     await $("//*[starts-with(@alt,'Image to send')]").waitForExist({ timeout: 20_000 });
     await composer().waitForEnabled();
     await browser.keys("Enter");
   });
-  const thumb = $(".chat-message__body img");
-  await thumb.waitForExist({ timeout: 30_000, timeoutMsg: "A never got B's image" });
+  await browser.waitUntil(async () => (await $$(".chat-message__body img")).length > before, {
+    timeout: 30_000,
+    timeoutMsg: "A never got B's image",
+  });
+  const thumb = (await $$(".chat-message__body img"))[before];
   await apps.stopB();
   await browser.waitUntil(async () => !(await personRow("Bob").isExisting()), { timeout: 30_000 });
   await thumb.click();
