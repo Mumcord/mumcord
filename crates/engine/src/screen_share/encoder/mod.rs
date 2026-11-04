@@ -98,6 +98,8 @@ struct State {
     selftests: Vec<CachedSelftest>,
     /// Self-tests asked for and not finished yet, so a key is queued once.
     queued: Vec<TestKey>,
+    /// A "Check again" probe is queued or running; more clicks until it ends add nothing.
+    rechecking: bool,
 }
 
 /// The engine-wide encoder knowledge; one per engine.
@@ -138,6 +140,13 @@ impl Encoders {
         let Some(tx) = jobs.as_ref() else {
             return;
         };
+        if let Job::Probe { fresh: true } = job {
+            let mut state = lock(&self.state);
+            if state.rechecking {
+                return;
+            }
+            state.rechecking = true;
+        }
         if let Job::Selftest(key) = job {
             let mut state = lock(&self.state);
             if state.queued.contains(&key) {
@@ -148,7 +157,9 @@ impl Encoders {
         lock(&self.state).busy += 1;
         if tx.send(job).is_err() {
             tracing::warn!("encoder probe thread is gone");
-            lock(&self.state).busy -= 1;
+            let mut state = lock(&self.state);
+            state.busy -= 1;
+            state.rechecking = false;
         }
     }
 
@@ -336,6 +347,9 @@ impl Worker<'_> {
         }
         for key in startup_tests(&self.settings()) {
             self.selftest(key);
+        }
+        if fresh {
+            lock(&self.encoders.state).rechecking = false;
         }
     }
 
@@ -644,6 +658,27 @@ mod tests {
                 .iter()
                 .any(|c| c.codec == Codec::Av1 && c.kind == Kind::Software)
         );
+    }
+
+    #[test]
+    fn check_again_while_a_recheck_is_pending_queues_no_second_probe() {
+        let encoders = Encoders::default();
+        let (tx, rx) = mpsc::channel();
+        *lock(&encoders.jobs) = Some(tx);
+        encoders.check_again();
+        encoders.check_again();
+        encoders.check_again();
+        let probes = rx
+            .try_iter()
+            .filter(|job| matches!(job, Job::Probe { fresh: true }))
+            .count();
+        assert_eq!(probes, 1);
+        assert_eq!(lock(&encoders.state).busy, 1);
+
+        // Once that probe has finished, "Check again" measures anew.
+        lock(&encoders.state).rechecking = false;
+        encoders.check_again();
+        assert!(matches!(rx.try_recv(), Ok(Job::Probe { fresh: true })));
     }
 
     #[test]
