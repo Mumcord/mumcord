@@ -30,10 +30,33 @@ import "./quality.css";
 
 const ITEM = '[role="menuitemradio"]';
 
-export function QualityMenu({ serverId }: { serverId: number }): ReactNode {
+/** A pick sent to the engine; `settled` once the engine took it, so the next reading shows it. */
+interface Pending {
+  choice: QualityChoice;
+  settled: boolean;
+}
+
+/**
+ * `current` is the share's pick as the engine reports it, which may come from the start dialog
+ * for this share only; a new pick shows at once and gives way to the engine's next reading.
+ */
+export function QualityMenu({
+  serverId,
+  current,
+}: {
+  serverId: number;
+  current: QualityChoice | null;
+}): ReactNode {
   const { t } = useTranslation("screenshare");
   const [open, setOpen] = useState(false);
-  const [choice, setChoice] = useState<QualityChoice | null>(null);
+  const [pending, setPending] = useState<Pending | null>(null);
+  // A reading that comes after the engine took the pick replaces it.
+  const [seen, setSeen] = useState(current);
+  if (seen !== current) {
+    setSeen(current);
+    if (pending?.settled === true) setPending(null);
+  }
+  const choice = pending?.choice ?? current;
   const [settingsFps, setSettingsFps] = useState<ScreenFps>("30");
   const button = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -49,25 +72,19 @@ export function QualityMenu({ serverId }: { serverId: number }): ReactNode {
   const dismissRefs = useMemo(() => [button, popover], []);
   useDismiss(dismissRefs, open, close);
 
+  // "Auto" keeps the frame rate from Settings.
   useEffect(() => {
-    let current = true;
+    let live = true;
     getApi()
       .settingsGet()
       .then((settings) => {
-        if (!current) return;
-        setSettingsFps(settings.screenFps);
-        setChoice({
-          resolution: settings.screenResolution,
-          fps: settings.screenFps,
-          optimize: settings.screenOptimize,
-          uploadLimit: settings.screenUploadLimit,
-        });
+        if (live) setSettingsFps(settings.screenFps);
       })
       .catch((error: unknown) => {
         console.error("reading the screen sharing settings failed", error);
       });
     return () => {
-      current = false;
+      live = false;
     };
   }, []);
 
@@ -85,14 +102,17 @@ export function QualityMenu({ serverId }: { serverId: number }): ReactNode {
 
   const apply = (next: QualityChoice) => {
     if (choice === null) return;
-    const before = choice;
-    setChoice(next);
+    const sent: Pending = { choice: next, settled: false };
+    setPending(sent);
     closeToButton();
     getApi()
       .screenShareSetQuality(serverId, next)
+      .then(() => {
+        setPending((p) => (p === sent ? { ...sent, settled: true } : p));
+      })
       .catch((error: unknown) => {
         console.error("changing the screen share quality failed", error);
-        setChoice(before);
+        setPending((p) => (p === sent ? null : p));
         announce(t("changeFailed"), "assertive");
       });
   };

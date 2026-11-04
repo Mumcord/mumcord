@@ -70,6 +70,8 @@ pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
 pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
+/// Why the bot refused a broadcast, part of [`FanoutUnavailable::Refused`].
+pub use mumcord_p2p::BroadcastErrorReason;
 pub use mumcord_screenshare::I420Frame;
 pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
@@ -1321,6 +1323,19 @@ impl Engine {
             Some(FanoutView::Starting) | None => self.broadcast_limit(server_id)?,
         };
         Some(u8::try_from(limit).unwrap_or(u8::MAX))
+    }
+
+    /// The own share's current picks, so the Quality menu checks what the share really uses,
+    /// including a pick made only for this share in the start dialog; `None` without a share.
+    pub fn screen_share_choice(&self, server_id: ServerId) -> Option<QualityPrefs> {
+        lock(self.screen_share_state())
+            .servers
+            .get(&server_id)?
+            .own
+            .as_ref()?
+            .media
+            .as_ref()
+            .map(media::Media::choice)
     }
 
     /// Changes the own share's resolution and frame rate ceiling, "Optimize for" and upload

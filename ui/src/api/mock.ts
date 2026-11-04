@@ -72,6 +72,8 @@ import type {
   ShareStartBlock,
   ServerSnapshot,
   ViewerQuality,
+  QualityChoice,
+  ShareFanout,
   Settings,
   User,
   RepositoryPreview,
@@ -223,6 +225,8 @@ export interface MockMediaDemo {
     kbps: number;
     encoder: ActiveEncoder | null;
     viewers: ViewerQuality[];
+    choice: QualityChoice;
+    fanout: ShareFanout | null;
   } | null;
 }
 
@@ -1032,6 +1036,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
             { session: 2, fps: 60, struggling: false, slow: false, codec: "av1", path: "relay" },
             { session: 5, fps: 20, struggling: true, slow: true, codec: "av1", path: "relay" },
           ],
+          choice: { resolution: "1080", fps: "60", optimize: "balanced", uploadLimit: "auto" },
+          fanout: { kind: "relay", limit: 20 },
         },
       }
     : { picture: "", share: null, party: null, quality: null };

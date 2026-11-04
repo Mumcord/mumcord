@@ -44,7 +44,6 @@ export function SharerBar(): ReactNode {
   const avatarOf = useAvatars(people, serverId ?? undefined);
   const [quality, setQuality] = useState<ShareQuality | null>(null);
   const [thumb, setThumb] = useState<ShareThumbnail | null>(null);
-  const [limit, setLimit] = useState(MAX_VIEWERS);
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -87,29 +86,6 @@ export function SharerBar(): ReactNode {
     };
   }, [serverId, own]);
 
-  // The viewer limit depends on how the share reaches viewers (relay broadcast or copies), not on
-  // the quality choice, so the preview with the defaults names it.
-  const sharing = own !== null;
-  useEffect(() => {
-    if (serverId === null || !sharing) return;
-    let current = true;
-    getApi()
-      .screenSharePreview(
-        serverId,
-        { resolution: "auto", fps: "30", optimize: "balanced", uploadLimit: "auto" },
-        "auto",
-      )
-      .then((preview) => {
-        if (current) setLimit(preview.path.maxViewers);
-      })
-      .catch((error: unknown) => {
-        console.warn("screen share preview failed", error);
-      });
-    return () => {
-      current = false;
-    };
-  }, [serverId, sharing]);
-
   // Starting a share lives in the composer's Apps menu, which also names what blocks it.
   if (own === null || serverId === null) return null;
   const nameOf = (session: number) => users.get(session)?.name ?? t("someone");
@@ -118,6 +94,8 @@ export function SharerBar(): ReactNode {
     return user === undefined ? null : avatarOf(user);
   };
   const count = own.viewers.length;
+  // A relay broadcast takes as many viewers as the relay grants; direct copies take eight.
+  const limit = quality?.fanout?.kind === "relay" ? quality.fanout.limit : MAX_VIEWERS;
 
   const run = (call: Promise<null>, what: string) => {
     call.catch((error: unknown) => {
@@ -205,7 +183,7 @@ export function SharerBar(): ReactNode {
               {noSound}
             </span>
           )}
-          <QualityMenu serverId={serverId} />
+          <QualityMenu serverId={serverId} current={quality?.choice ?? null} />
           <button type="button" className="button sharer-bar__button" onClick={changeWindow}>
             <WindowIcon />
             {t("changeWindow")}
@@ -261,7 +239,7 @@ export function SharerBar(): ReactNode {
           </button>
         </span>
       </div>
-      <ShareNotices serverId={serverId} quality={quality} />
+      <ShareNotices serverId={serverId} own={own} quality={quality} />
     </>
   );
 }
