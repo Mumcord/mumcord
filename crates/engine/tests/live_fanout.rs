@@ -289,7 +289,7 @@ async fn fanout_through_the_relay_broadcast() {
     let (server_a, sharer) = (a.server(), a.session());
     assert_eq!(
         a.engine
-            .screen_share_start(server_a, false)
+            .screen_share_start(server_a, false, None, None)
             .await
             .expect("start"),
         StartOutcome::Started
@@ -461,7 +461,7 @@ async fn relay_viewers_choose_the_codec() {
     let (server_a, sharer) = (a.server(), a.session());
     assert_eq!(
         a.engine
-            .screen_share_start(server_a, false)
+            .screen_share_start(server_a, false, None, None)
             .await
             .expect("start"),
         StartOutcome::Started
