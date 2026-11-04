@@ -14,7 +14,7 @@
     "unreadable": "Tiedostoa {{path}} ei voitu lukea",
     "serverRefused": "Palvelin hylkäsi viestin: {{reason}}",
     "trayLabel": "Jaettavat tiedostot",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · vertaisyhteys",
     "zipping": "Pakataan kansiota… {{percent}} %",
     "checking": "Tarkistetaan…",
     "checkingPercent": "Tarkistetaan… {{percent}} %",

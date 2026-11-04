@@ -1,6 +1,7 @@
 /** Pure channel-tree model: nesting, ordering and the visible rows for keyboard navigation. */
 import type { ChannelInfo, User } from "../../api";
 import type { ServerState } from "./serverStore";
+import { isHiddenBot } from "./mumcord";
 
 export interface ChannelNode {
   channel: ChannelInfo;
@@ -52,6 +53,8 @@ export function buildTree(
     nodes.set(channel.id, { channel, children: [], members: [] });
   }
   for (const user of state.users.values()) {
+    // Bots without voice are listed only under "Bots on this server" (issue #458).
+    if (isHiddenBot(user)) continue;
     nodes.get(user.channelId)?.members.push(user);
   }
   const roots: ChannelNode[] = [];

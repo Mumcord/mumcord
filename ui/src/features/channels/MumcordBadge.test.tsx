@@ -2,11 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import "../../i18n";
 import { MumcordBadge } from "./MumcordBadge";
-import { hasMumcordFeature, isMumcord } from "./mumcord";
+import { announcedClient, hasMumcordFeature, isMumcord } from "./mumcord";
 
 describe("MumcordBadge", () => {
   it("renders a labelled badge for Mumcord users", () => {
-    render(<MumcordBadge user={{ isMumcord: true }} />);
+    render(<MumcordBadge user={{ isMumcord: true, bot: null }} />);
     expect(screen.getByRole("img", { name: "Uses Mumcord" })).toHaveAttribute(
       "data-tooltip",
       "Uses Mumcord",
@@ -19,7 +19,7 @@ describe("MumcordBadge", () => {
       <div role="treeitem" aria-selected={false} aria-labelledby="name">
         <span id="name">
           Mira
-          <MumcordBadge user={{ isMumcord: true }} />
+          <MumcordBadge user={{ isMumcord: true, bot: null }} />
         </span>
       </div>,
     );
@@ -27,7 +27,7 @@ describe("MumcordBadge", () => {
   });
 
   it("renders nothing for other clients or unknown people", () => {
-    const { container, rerender } = render(<MumcordBadge user={{ isMumcord: false }} />);
+    const { container, rerender } = render(<MumcordBadge user={{ isMumcord: false, bot: null }} />);
     expect(container).toBeEmptyDOMElement();
     rerender(<MumcordBadge user={undefined} />);
     expect(container).toBeEmptyDOMElement();
@@ -41,5 +41,23 @@ describe("MumcordBadge", () => {
     expect(
       hasMumcordFeature({ isMumcord: false, mumcordFeatures: ["now-gaming"] }, "now-gaming"),
     ).toBe(false);
+  });
+});
+
+describe("announcedClient", () => {
+  const bot = { voice: false, modules: ["peer"] };
+
+  it("names the product and version a bot announces", () => {
+    expect(announcedClient({ bot, product: "Mumbot", version: "0.4.1" })).toBe("Mumbot 0.4.1");
+  });
+
+  it("names the product alone when the bot sent no version", () => {
+    expect(announcedClient({ bot, product: "Mumbot", version: null })).toBe("Mumbot");
+  });
+
+  it("is null for people and unknown users, so the release string stays", () => {
+    expect(announcedClient({ bot: null, product: "Mumbot", version: "0.4.1" })).toBeNull();
+    expect(announcedClient({ bot, product: null, version: "0.4.1" })).toBeNull();
+    expect(announcedClient(undefined)).toBeNull();
   });
 });

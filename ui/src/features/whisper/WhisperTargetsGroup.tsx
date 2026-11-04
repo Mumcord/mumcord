@@ -15,6 +15,7 @@ import {
   type WhisperDraft,
 } from "./whisperStore";
 import { WhisperKindIcon } from "./WhisperKindIcon";
+import { isHiddenBot } from "../channels/mumcord";
 import "./whisper.css";
 
 const newId = () => `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -242,7 +243,7 @@ function TargetEditor({
   const people = useMemo(
     () =>
       [...server.users.values()]
-        .filter((user) => user.session !== server.selfSession)
+        .filter((user) => user.session !== server.selfSession && !isHiddenBot(user))
         .map((user) => user.name)
         .sort((a, b) => a.localeCompare(b)),
     [server.users, server.selfSession],

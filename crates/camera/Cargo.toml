@@ -1,0 +1,16 @@
+[package]
+name = "mumcord-camera"
+description = "Camera capture: backend trait, frame pool, device list with hot-plug, and the test camera"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+crossbeam-queue.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true

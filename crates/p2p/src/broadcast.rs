@@ -40,6 +40,8 @@ pub const MAX_KEY_BODY: u32 = 1024;
 /// Size of the subscriber slot number that prefixes `keyreq` (added by the relay), `key` (set
 /// by the publisher) and `gone`.
 pub const SLOT_LEN: u32 = 2;
+/// Size of the tile height in a `want` message (u16, big endian).
+pub const HEIGHT_LEN: u32 = 2;
 
 const KIND_VIDEO: u8 = 1;
 const KIND_AUDIO: u8 = 2;
@@ -141,6 +143,9 @@ pub enum ControlKind {
     Layers = 4,
     /// Relay → publisher: the subscriber in this slot left.
     Gone = 5,
+    /// Subscriber → relay → publisher: the tile height the subscriber draws (u16); the relay
+    /// prepends the subscriber's slot (camera sharing, spec 08).
+    Want = 6,
 }
 
 impl ControlKind {
@@ -151,6 +156,7 @@ impl ControlKind {
             3 => Self::KeyframeRequest,
             4 => Self::Layers,
             5 => Self::Gone,
+            6 => Self::Want,
             _ => return None,
         })
     }
@@ -162,6 +168,7 @@ impl ControlKind {
             Self::KeyRequest | Self::Key => (0, SLOT_LEN + MAX_KEY_BODY),
             Self::KeyframeRequest => (0, 0),
             Self::Layers => (1, 1),
+            Self::Want => (HEIGHT_LEN, SLOT_LEN + HEIGHT_LEN),
             Self::Gone => (SLOT_LEN, SLOT_LEN),
         }
     }
@@ -431,6 +438,14 @@ mod tests {
                 "0103000005000000000000000002",
                 control(ControlKind::Gone, 2),
             ),
+            (
+                "0103000006000000000000000002",
+                control(ControlKind::Want, 2),
+            ),
+            (
+                "0103000006000000000000000004",
+                control(ControlKind::Want, 4),
+            ),
         ]
     }
 
@@ -496,7 +511,9 @@ mod tests {
                 size(KIND_DATA, 0, MAX_DATA_PAYLOAD + 1),
                 HeaderError::BadSize(MAX_DATA_PAYLOAD + 1),
             ),
-            (size(KIND_CONTROL, 6, 0), HeaderError::BadCodec(6)),
+            (size(KIND_CONTROL, 7, 0), HeaderError::BadCodec(7)),
+            (size(KIND_CONTROL, 6, 0), HeaderError::BadSize(0)),
+            (size(KIND_CONTROL, 6, 5), HeaderError::BadSize(5)),
             (size(KIND_CONTROL, 3, 1), HeaderError::BadSize(1)),
             (size(KIND_CONTROL, 4, 2), HeaderError::BadSize(2)),
             (size(KIND_CONTROL, 5, 1), HeaderError::BadSize(1)),

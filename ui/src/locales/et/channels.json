@@ -36,6 +36,17 @@
     "unregistered": "registreerimata"
   },
   "mumcordBadge": "Kasutab Mumcordi",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Botid selles serveris ({{total}})",
+    "inChannel": "kanalis {{channel}}",
+    "modules": {
+      "peer": "Relee",
+      "music": "Mängib muusikat",
+      "history": "Vestluse ajalugu",
+      "webhook": "Veebihaagid"
+    }
+  },
   "statusTip": {
     "registered": "Registreeritud sellel serveril",
     "listening": "Ainult kuulab",

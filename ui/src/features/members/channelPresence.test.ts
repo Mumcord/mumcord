@@ -49,6 +49,9 @@ function user(session: number, name: string, change: Partial<User> = {}): User {
     shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
+    product: null,
+    version: null,
+    bot: null,
     ...change,
   };
 }
@@ -83,6 +86,14 @@ describe("channelPresence", () => {
       count: 4,
       talkers: [],
     });
+  });
+
+  it("does not count a bot without voice, but a voice bot (issue #458)", () => {
+    const bots = [
+      user(6, "Relay", { bot: { voice: false, modules: ["peer"] } }),
+      user(7, "DJ", { bot: { voice: true, modules: ["music"] } }),
+    ];
+    expect(channelPresence(state(bots, []), { kind: "channel", channelId: 1 })?.count).toBe(1);
   });
 
   it("names the talkers in the channel by name, without listeners or people elsewhere", () => {

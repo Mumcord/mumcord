@@ -1,6 +1,6 @@
 {
   "link": {
-    "label": "Peer-to-peer",
+    "label": "Vienādranga savienojums",
     "direct": "Tieši",
     "relayUdp": "Caur releju (UDP)",
     "relayTcp": "Caur releju (TCP 443)",

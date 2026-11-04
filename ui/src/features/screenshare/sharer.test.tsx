@@ -7,7 +7,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, ScreenShare } from "../../api";
-import { connectedMock, resetAll } from "../channels/testUtils";
+import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { ChannelsPanel } from "../channels";
 import { MembersPanel } from "../members/MembersPanel";
 import { platformOf, shareBlock } from "./availability";
@@ -236,6 +236,25 @@ describe("sharer control bar", () => {
   function watchedBy(own: ScreenShare): void {
     api.mock.emit("screenSharesChanged", { serverId: 1, shares: [own] });
   }
+
+  it("asks for the quality again on Change window and keeps the share when cancelled", async () => {
+    stubDialog();
+    render(<SharerBar />);
+    await api.screenShareStart(1, false, null, null);
+    const stop = vi.spyOn(api, "screenShareStop");
+    const start = vi.spyOn(api, "screenShareStart");
+    fireEvent.click(await screen.findByRole("button", { name: "Change window" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel" }, { timeout: 5000 }));
+    expect(stop).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Change window" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Choose what to share" }, { timeout: 5000 }),
+    );
+    await waitFor(() => {
+      expect(start).toHaveBeenCalledTimes(1);
+    });
+    expect(stop).toHaveBeenCalledWith(1);
+  });
 
   it("shows nothing while nothing is shared", () => {
     const { container } = render(<SharerBar />);

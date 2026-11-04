@@ -233,7 +233,9 @@ describe("chat: rendering and sending (AC-1.13, AC-1.14, AC-1.43)", () => {
   });
 
   it("AC-1.14 compresses (or refuses with a message) an image above the server limit", async () => {
-    const listener = new ScriptBot({ name: "SendBot2" });
+    // The bot's timeout runs from its start, and compressing the 16 MB image on a slow runner can
+    // take most of the default 20 s before the message is even sent.
+    const listener = new ScriptBot({ name: "SendBot2", timeout: 120 });
     try {
       await listener.connected();
       await listener.run("join Lobby");

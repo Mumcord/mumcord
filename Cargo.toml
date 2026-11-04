@@ -11,6 +11,7 @@ members = [
     "crates/overlay-layer",
     "crates/p2p",
     "crates/screenshare",
+    "crates/camera",
     "crates/plugins",
     "crates/plugin-sdk",
     "tools/netsim",
@@ -19,7 +20,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.6.2"
+version = "0.7.0-dev"
 edition = "2024"
 rust-version = "1.90"
 license = "AGPL-3.0-only"
@@ -27,18 +28,19 @@ repository = "https://github.com/Mumcord/mumcord"
 
 [workspace.dependencies]
 # Internal crates
-mumcord-protocol = { path = "crates/protocol", version = "0.6" }
+mumcord-protocol = { path = "crates/protocol", version = "0.7.0-dev" }
 # The version is the minor series: crates.io needs it for the publish of the crates that depend on it (mumcord-audio, mumcord-p2p, mumcord-plugins, mumcord-plugin), and it only changes with a minor/major bump.
-mumcord-codec = { path = "crates/codec", version = "0.6" }
+mumcord-codec = { path = "crates/codec", version = "0.7.0-dev" }
 mumcord-audio = { path = "crates/audio" }
-mumcord-store = { path = "crates/store", version = "0.6" }
+mumcord-store = { path = "crates/store", version = "0.7.0-dev" }
 mumcord-engine = { path = "crates/engine" }
 mumcord-positional = { path = "crates/positional" }
 mumcord-overlay-ipc = { path = "crates/overlay-ipc" }
 mumcord-p2p = { path = "crates/p2p" }
 mumcord-screenshare = { path = "crates/screenshare" }
-mumcord-plugins = { path = "crates/plugins", version = "0.6" }
-mumcord-plugin-sdk = { path = "crates/plugin-sdk", version = "0.6" }
+mumcord-camera = { path = "crates/camera" }
+mumcord-plugins = { path = "crates/plugins", version = "0.7.0-dev" }
+mumcord-plugin-sdk = { path = "crates/plugin-sdk", version = "0.7.0-dev" }
 
 # Async, networking, TLS
 tokio = { version = "1.54", features = ["full"] }
@@ -110,6 +112,9 @@ rnnoise-rs = { git = "https://github.com/Mumcord/rnnoise-rs", rev = "4430677a365
 bovnar = "2.0.0"
 sonora = "0.2"
 rtrb = "0.4"
+# Lock-free bounded queue: the camera frame pool hands buffers between capture and consumer
+# threads without locks or allocation.
+crossbeam-queue = "0.3"
 rubato = "5.0"
 # Lists the sound server's sinks and sources with their default flags (issue #183). Pure Rust
 # PulseAudio protocol client; PipeWire answers it through pipewire-pulse.

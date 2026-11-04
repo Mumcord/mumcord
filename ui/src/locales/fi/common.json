@@ -46,7 +46,7 @@
     "seek": "Siirry",
     "volume": "Äänenvoimakkuus",
     "syncedPlay": "Synkassa",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Välilyönti · ← → · M · F · Esc",
     "inControl": "{{name}} hallitsee",
     "inSync": "Synkassa",
     "inSyncAll": "Kaikki synkassa",
@@ -70,14 +70,14 @@
     "onTopFailed": "Asetusta Aina päällimmäisenä ei voitu muuttaa",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Muuta mediaalueen kokoa",
+      "valueText": "{{percent}} % ikkunan korkeudesta",
+      "ofWindow": "ikkunan korkeudesta",
+      "chatMinimum": "chat säilyttää vähimmäiskokonsa",
+      "release": "vapauta tiivistääksesi",
+      "keys": "↑ ↓ koko · PageUp/PageDown kiinnittyminen · Home/End · Enter palauttaa",
+      "releaseHint": "Vapauta pienentääksesi minipalkkiin",
+      "minimised": "Mediaalue pienennetty"
     }
   }
 }

@@ -45,6 +45,17 @@
     "unregistered": "mhux irreġistrat"
   },
   "mumcordBadge": "Juża Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Bots fuq dan is-server ({{total}})",
+    "inChannel": "f’{{channel}}",
+    "modules": {
+      "peer": "Relay",
+      "music": "Idoqq il-mużika",
+      "history": "Storja taċ-chat",
+      "webhook": "Webhooks"
+    }
+  },
   "statusTip": {
     "registered": "Irreġistrat fuq dan is-server",
     "listening": "Qed jisma' biss",

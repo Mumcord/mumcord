@@ -70,14 +70,14 @@
     "onTopFailed": "„Винаги отгоре“ не можа да се промени",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Промяна на размера на медийната област",
+      "valueText": "{{percent}}% от височината на прозореца",
+      "ofWindow": "от височината на прозореца",
+      "chatMinimum": "чатът запазва минимума си",
+      "release": "отпусни за свиване",
+      "keys": "↑ ↓ промяна на размера · PageUp/PageDown прилепване · Home/End · Enter нулира",
+      "releaseHint": "Отпусни, за да се свие до малката лента",
+      "minimised": "Медийната област е свита"
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "link": {
-    "label": "Peer-to-peer",
+    "label": "Vertaisyhteys",
     "direct": "Suora",
     "relayUdp": "Releen kautta (UDP)",
     "relayTcp": "Releen kautta (TCP 443)",

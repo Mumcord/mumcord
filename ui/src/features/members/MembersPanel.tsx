@@ -18,6 +18,7 @@ import type { User } from "../../api";
 import { StatusIcons } from "../channels/PersonStatus";
 import { WhisperBadge } from "../whisper/WhisperBadge";
 import { MumcordBadge } from "../channels/MumcordBadge";
+import { isHiddenBot } from "../channels/mumcord";
 import { BlockedBadge } from "../blocking/BlockedBadge";
 import { LiveAvatar, LiveBadge } from "../screenshare/LiveBadge";
 import { useStatusText } from "../channels/statusText";
@@ -62,7 +63,8 @@ export function MembersPanel({ onSendPrivateMessage }: MembersPanelProps) {
 
   const channel =
     conversation?.kind === "channel" ? state.channels.get(conversation.channelId) : undefined;
-  const users = channel ? [...state.users.values()] : [];
+  // Bots without voice are listed only under "Bots on this server" (issue #458).
+  const users = channel ? [...state.users.values()].filter((u) => !isHiddenBot(u)) : [];
   const members = users.filter((u) => u.channelId === channel?.id);
   const listeners = users.filter(
     (u) =>

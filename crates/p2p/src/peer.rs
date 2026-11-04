@@ -27,6 +27,10 @@ pub const PEER_DATA_ID: &str = "mumcord.peer";
 /// The message version this side sends. Any version >= 1 is accepted on receipt and unknown
 /// fields are ignored; a breaking change gets a new data id.
 pub const PEER_VERSION: u32 = 1;
+
+/// The hello feature of clients that can send and show cameras (spec 08). Hello features live in
+/// the engine's hello; this is the wire name it announces.
+pub const CAMERA_FEATURE: &str = "camera";
 /// Largest message accepted or produced (bytes); standard servers drop bigger plugin data.
 pub const MAX_PEER_BYTES: usize = PLUGIN_DATA_MAX;
 /// Longest relay host name (a DNS name is at most 253 characters).
@@ -59,6 +63,8 @@ pub enum RelayUse {
     ScreenShare,
     /// Plugin data between Mumcord clients (spec 09). Wire `plg`; mumpeer calls it `plugin_data`.
     PluginData,
+    /// Camera sharing (spec 08). Wire `cam`; mumpeer calls it `camera`.
+    Camera,
 }
 
 impl RelayUse {
@@ -68,6 +74,7 @@ impl RelayUse {
             Self::Files => "file",
             Self::ScreenShare => "scr",
             Self::PluginData => "plg",
+            Self::Camera => "cam",
         }
     }
 
@@ -77,6 +84,7 @@ impl RelayUse {
             "file" => Self::Files,
             "scr" => Self::ScreenShare,
             "plg" => Self::PluginData,
+            "cam" => Self::Camera,
             _ => return None,
         })
     }
@@ -216,6 +224,9 @@ pub enum BroadcastErrorReason {
     /// The relay does not allow screen sharing.
     UseNotAllowed,
     RateLimited,
+    /// The sender's channel already has as many camera broadcasts as the bot allows (only for
+    /// `k = cam`).
+    RoomFull,
 }
 
 impl BroadcastErrorReason {
@@ -228,6 +239,7 @@ impl BroadcastErrorReason {
             Self::RelayFull => "relay-full",
             Self::UseNotAllowed => "use-not-allowed",
             Self::RateLimited => "rate-limited",
+            Self::RoomFull => "room-full",
         }
     }
 
@@ -240,6 +252,7 @@ impl BroadcastErrorReason {
             "relay-full" => Self::RelayFull,
             "use-not-allowed" => Self::UseNotAllowed,
             "rate-limited" => Self::RateLimited,
+            "room-full" => Self::RoomFull,
             _ => return Err(PeerError::BadReason),
         })
     }
@@ -657,7 +670,10 @@ impl PeerMessage {
                 let kind = wire
                     .k
                     .map(|k| match RelayUse::parse(&k) {
-                        Some(kind @ (RelayUse::ScreenShare | RelayUse::PluginData)) => Ok(kind),
+                        Some(
+                            kind
+                            @ (RelayUse::ScreenShare | RelayUse::PluginData | RelayUse::Camera),
+                        ) => Ok(kind),
                         _ => Err(PeerError::BadUse),
                     })
                     .transpose()?;
@@ -879,6 +895,11 @@ mod tests {
                 max: 8,
                 kind: Some(RelayUse::PluginData),
             },
+            PeerMessage::BroadcastRequest {
+                rid: RequestId(7),
+                max: 8,
+                kind: Some(RelayUse::Camera),
+            },
             PeerMessage::Broadcast {
                 rid: RequestId(4),
                 id: BroadcastId(0xfedc_ba98_7654_3210),
@@ -903,6 +924,10 @@ mod tests {
             PeerMessage::BroadcastError {
                 rid: RequestId(5),
                 reason: BroadcastErrorReason::NotSameChannel,
+            },
+            PeerMessage::BroadcastError {
+                rid: RequestId(8),
+                reason: BroadcastErrorReason::RoomFull,
             },
         ]
     }
@@ -965,12 +990,50 @@ mod tests {
                 RelayUse::Files,
                 RelayUse::ScreenShare,
                 RelayUse::PluginData,
+                RelayUse::Camera,
             ]),
             broadcast: Some(u16::MAX),
             plugin_data_kbps: Some(u32::MAX),
         });
         let bytes = message.encode().expect("encode");
         assert_eq!(PeerMessage::decode(&bytes).expect("decode"), message);
+    }
+
+    #[test]
+    fn camera_wire_names_and_old_bot_compatibility() {
+        let req = PeerMessage::decode(
+            br#"{"v":1,"t":"bcast-req","rid":"0000000000000001","max":9,"k":"cam"}"#,
+        )
+        .expect("decode");
+        assert_eq!(
+            req,
+            PeerMessage::BroadcastRequest {
+                rid: RequestId(1),
+                max: 9,
+                kind: Some(RelayUse::Camera),
+            }
+        );
+        let err = PeerMessage::decode(
+            br#"{"v":1,"t":"bcast-err","rid":"0000000000000001","r":"room-full"}"#,
+        )
+        .expect("decode");
+        assert_eq!(
+            err,
+            PeerMessage::BroadcastError {
+                rid: RequestId(1),
+                reason: BroadcastErrorReason::RoomFull,
+            }
+        );
+        // A bot without camera support announces no `cam`: it is simply not in the list, and an
+        // unknown use from a newer bot is dropped rather than failing the announcement.
+        let relay = PeerMessage::decode(
+            br#"{"v":1,"t":"relay","host":"r.example","udp":1,"tcp":2,"fp":"0000000000000000000000000000000000000000000000000000000000000000","st":"up","seq":1,"u":["scr","cam","zzz"],"bc":9}"#,
+        );
+        if let Ok(PeerMessage::Relay(a)) = relay {
+            assert!(a.allows(RelayUse::Camera));
+            assert!(a.allows(RelayUse::ScreenShare));
+        }
+        assert_eq!(CAMERA_FEATURE, "camera");
     }
 
     #[test]

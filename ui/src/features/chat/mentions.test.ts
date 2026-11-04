@@ -30,6 +30,12 @@ describe("findMentionQuery", () => {
 });
 
 describe("rankMentionCandidates", () => {
+  it("never suggests a bot without voice, but a voice bot (issue #458)", () => {
+    const relay = { ...user(7, "Relay", 1), bot: { voice: false, modules: ["peer"] } };
+    const dj = { ...user(8, "Rhythm", 1), bot: { voice: true, modules: ["music"] } };
+    expect(rankMentionCandidates([relay, dj], "R", 1, null).map((u) => u.name)).toEqual(["Rhythm"]);
+  });
+
   const users = [
     user(1, "Zoe", 1),
     user(2, "Jose", 2),

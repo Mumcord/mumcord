@@ -27,6 +27,8 @@ export function WatchLinkDialog({ serverId, onClose }: { serverId: number; onClo
 
   const submit = (event: SyntheticEvent) => {
     event.preventDefault();
+    // React bubbles the submit through the dialog's portal to the composer's form.
+    event.stopPropagation();
     if (!connected) return;
     const videoId = videoIdOfLink(link);
     if (videoId === null) {

@@ -14,7 +14,7 @@
     "unreadable": "Ma setax jinqara {{path}}",
     "serverRefused": "Is-server irrifjuta l-messaġġ: {{reason}}",
     "trayLabel": "Fajls biex jinqasmu",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · bejn il-pari",
     "zipping": "Qed jiġi kkompressat il-folder… {{percent}} %",
     "checking": "Qed jiġi vverifikat…",
     "checkingPercent": "Qed jiġi vverifikat… {{percent}} %",

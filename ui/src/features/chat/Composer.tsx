@@ -48,6 +48,7 @@ import { PaperclipButton } from "../files/composer/PaperclipButton";
 import { unavailableText } from "../files/composer/unavailableText";
 import { useFileChips } from "../files/composer/useFileChips";
 import { useFileDrop } from "../files/composer/useFileDrop";
+import { isHiddenBot } from "../channels/mumcord";
 
 export interface ComposerProps {
   target: SendTarget | null;
@@ -181,6 +182,7 @@ export function Composer({
     let members = 0;
     let readers = 0;
     for (const user of users.values()) {
+      if (isHiddenBot(user)) continue;
       const member = user.channelId === hereChannel;
       if (member) members += 1;
       if (member || (hereChannel !== null && user.listeningChannelIds.includes(hereChannel))) {

@@ -108,6 +108,31 @@ describe("MembersPanel", () => {
     expect(screen.getByRole("heading", { name: "In Raid (1)" })).toBeInTheDocument();
   });
 
+  it("leaves out bots without voice and badges voice bots (issue #458)", async () => {
+    await renderPanel();
+    const anna = getServerState().users.get(2);
+    if (!anna) throw new Error("Anna is missing");
+    act(() => {
+      api.mock.upsertUser({
+        ...anna,
+        session: 20,
+        name: "Relay",
+        bot: { voice: false, modules: ["peer"] },
+      });
+      api.mock.upsertUser({
+        ...anna,
+        session: 21,
+        name: "DJ Byte",
+        bot: { voice: true, modules: ["music"] },
+      });
+      api.mock.upsertUser({ ...anna, session: 22, name: "Testy", isMumcord: true, bot: null });
+    });
+    expect(screen.getByRole("heading", { name: "In Lobby (6)" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Relay/ })).not.toBeInTheDocument();
+    expect(member(/^DJ Byte Bot/)).toBeInTheDocument();
+    expect(member(/^Testy Uses Mumcord/)).toBeInTheDocument();
+  });
+
   it("collapses the sections and lists people of other channels, collapsed at first", async () => {
     await renderPanel();
     const others = screen.getByRole("button", { name: "In other channels" });

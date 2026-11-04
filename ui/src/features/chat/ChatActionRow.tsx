@@ -9,7 +9,13 @@ import { useSelectedConversation, useServerState, useShownServerId } from "../ch
 import { useEmbedsAllowed } from "../../app/preferences";
 import { useOpenPrivacySettings } from "../../app/view";
 import { getApi } from "../../api";
-import { Viewers, shareBlockText, useOwnShare, useShareActions } from "../screenshare";
+import {
+  ShareStartDialog,
+  Viewers,
+  shareBlockText,
+  useOwnShare,
+  useShareActions,
+} from "../screenshare";
 import { WatchLinkDialog, useWatchParty } from "../watchparty";
 import "./chatActionRow.css";
 
@@ -201,6 +207,7 @@ export function ChatActionRow() {
           {tShare(shareActions.failed)}
         </p>
       )}
+      {shareActions.startDialog !== null && <ShareStartDialog {...shareActions.startDialog} />}
       {open && (
         <WatchLinkDialog
           serverId={serverId}
