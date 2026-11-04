@@ -48,6 +48,8 @@ pub const STREAM_FULL_IMAGE: u8 = 1;
 pub const STREAM_SCREEN: u8 = 2;
 /// A shared file, on a unidirectional stream of a relayed connection only (FR-7.32).
 pub const STREAM_FILE: u8 = 3;
+/// Plugin data to one person (spec 09 FR-9.59), on a one-way stream.
+pub const STREAM_PLUGIN_DATA: u8 = 4;
 
 /// What a stream of `kind` uses the relay for (FR-7.6); `None` for an unknown kind.
 pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
@@ -55,6 +57,7 @@ pub(crate) fn stream_use(kind: u8) -> Option<RelayUse> {
         STREAM_FULL_IMAGE => Some(RelayUse::Images),
         STREAM_SCREEN => Some(RelayUse::ScreenShare),
         STREAM_FILE => Some(RelayUse::Files),
+        STREAM_PLUGIN_DATA => Some(RelayUse::PluginData),
         _ => None,
     }
 }
@@ -261,7 +264,7 @@ pub(crate) fn route(own: Reveal, own_sent: bool, peer_sent: bool, peer_relay: bo
 
 /// The effective mode of `server_id` and the consent; "off" when they cannot be read, as
 /// nothing may be revealed without knowing.
-fn mode_and_consent(store: &Store, server_id: ServerId) -> (P2pMode, Consent) {
+pub(crate) fn mode_and_consent(store: &Store, server_id: ServerId) -> (P2pMode, Consent) {
     let read = store.settings().and_then(|settings| {
         let mode = store
             .server(server_id)?
@@ -359,6 +362,8 @@ pub(crate) struct Direct {
     config: Mutex<P2pConfig>,
     /// Downloads waiting for their file stream.
     files: Arc<Incoming<RecvStream>>,
+    /// Plugin data streams (spec 09).
+    plugin_relay: crate::plugin_relay::PluginRelay,
 }
 
 impl Direct {
@@ -370,6 +375,10 @@ impl Direct {
 
     pub(crate) fn files(&self) -> &Arc<Incoming<RecvStream>> {
         &self.files
+    }
+
+    pub(crate) fn plugin_relay(&self) -> &crate::plugin_relay::PluginRelay {
+        &self.plugin_relay
     }
 
     fn engine(&self) -> Option<Engine> {
@@ -730,7 +739,8 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
 }
 
 /// Routes the unidirectional streams the other side opens on `connection` until it closes.
-/// Only files use them, and only on a relayed connection (files never go direct, FR-7.9).
+/// Files use them on a relayed connection only (files never go direct, FR-7.9); plugin data
+/// on any connection the relay allows it on (spec 09 FR-9.59).
 async fn accept_uni_streams(
     engine: WeakEngine,
     key: Key,
@@ -750,6 +760,9 @@ async fn accept_uni_streams(
             match kind[0] {
                 STREAM_FILE if relayed && engine.relays().allows(key.0, RelayUse::Files) => {
                     crate::files::transfer::accept(engine.direct().files(), key, recv).await;
+                }
+                STREAM_PLUGIN_DATA if relayed_use_allowed(&engine, key, RelayUse::PluginData) => {
+                    crate::plugin_relay::accept(engine.downgrade(), key, recv).await;
                 }
                 other => {
                     tracing::debug!(kind = other, relayed, "refusing a one-way stream");
@@ -1255,6 +1268,7 @@ mod tests {
         assert_eq!(stream_use(STREAM_FULL_IMAGE), Some(RelayUse::Images));
         assert_eq!(stream_use(STREAM_SCREEN), Some(RelayUse::ScreenShare));
         assert_eq!(stream_use(STREAM_FILE), Some(RelayUse::Files));
+        assert_eq!(stream_use(STREAM_PLUGIN_DATA), Some(RelayUse::PluginData));
         assert_eq!(stream_use(0), None);
     }
 

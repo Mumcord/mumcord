@@ -103,7 +103,8 @@ pub struct RelayAnnouncement {
     pub state: RelayState,
     /// Increases with every change; an older value than the last seen one is stale.
     pub seq: u32,
-    /// Uses the relay allows (wire `u`). `None` (an older bot) means all are allowed. Use names
+    /// Uses the relay allows (wire `u`). `None` (an older bot) means all but plugin data are
+    /// allowed (plugin data is off unless announced, FR-9.84). Use names
     /// this version doesn't know are dropped on receipt.
     pub uses: Option<Vec<RelayUse>>,
     /// Most viewers per broadcast (wire `bc`); `None` means the relay offers no broadcasts.
@@ -114,11 +115,13 @@ pub struct RelayAnnouncement {
 }
 
 impl RelayAnnouncement {
-    /// Whether the relay may be used for `relay_use` (an announcement without `u` allows all).
+    /// Whether the relay may be used for `relay_use`. An announcement without `u` comes from a
+    /// bot older than plugin data: it allows every use except [`RelayUse::PluginData`].
     pub fn allows(&self, relay_use: RelayUse) -> bool {
-        self.uses
-            .as_ref()
-            .is_none_or(|uses| uses.contains(&relay_use))
+        match &self.uses {
+            Some(uses) => uses.contains(&relay_use),
+            None => relay_use != RelayUse::PluginData,
+        }
     }
 }
 
@@ -1283,6 +1286,10 @@ mod tests {
         let old = decode("");
         assert_eq!((old.uses.clone(), old.broadcast), (None, None));
         assert!(old.allows(RelayUse::Files));
+        assert!(
+            !old.allows(RelayUse::PluginData),
+            "plugin data is off unless announced"
+        );
 
         let newer = decode(r#","u":["file","holo"],"bc":0"#);
         assert_eq!(newer.uses, Some(vec![RelayUse::Files]));

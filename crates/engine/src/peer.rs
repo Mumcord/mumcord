@@ -83,7 +83,12 @@ impl RelayUnavailable {
 }
 
 /// Every use, in the order the server info panel lists them (FR-7.7).
-const ALL_USES: [RelayUse; 3] = [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare];
+const ALL_USES: [RelayUse; 4] = [
+    RelayUse::Images,
+    RelayUse::Files,
+    RelayUse::ScreenShare,
+    RelayUse::PluginData,
+];
 
 /// State of the server's relay for the server info panel (FR-4.20).
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -415,6 +420,16 @@ impl Relays {
             .ok_or(RelayUnavailable::NoRelay)?
             .usable_for(relay_use)
             .map(|_| ())
+    }
+
+    /// The relay's per-sender cap for plugin data (`pk`), when it announces one.
+    pub(crate) fn plugin_data_kbps(&self, server_id: ServerId) -> Option<u32> {
+        lock(&self.state)
+            .servers
+            .get(&server_id)
+            .and_then(ServerRelay::single)
+            .filter(|a| a.ann.allows(RelayUse::PluginData))
+            .and_then(|a| a.ann.plugin_data_kbps)
     }
 
     /// Whether the relay of `server_id` may carry `relay_use` by its current announcement. Only
@@ -1453,14 +1468,40 @@ mod tests {
     }
 
     #[test]
-    fn an_announcement_without_uses_allows_everything() {
+    fn plugin_data_needs_its_use_and_reports_the_cap() {
+        let relays = Relays::default();
+        relays.change(1, |relay| {
+            *relay = trusted_relay(announcer(
+                5,
+                BOT,
+                RelayAnnouncement {
+                    uses: Some(vec![RelayUse::PluginData]),
+                    plugin_data_kbps: Some(512),
+                    ..ann(1, RelayState::Up, 1)
+                },
+            ));
+        });
+        assert_eq!(relays.availability_for(1, RelayUse::PluginData), Ok(()));
+        assert_eq!(relays.plugin_data_kbps(1), Some(512));
+        assert_eq!(relays.info(1).uses, [RelayUse::PluginData]);
+    }
+
+    #[test]
+    fn an_announcement_without_uses_allows_everything_but_plugin_data() {
         let relays = relays_with_uses(None, None);
-        for relay_use in ALL_USES {
+        let old_uses = [RelayUse::Images, RelayUse::Files, RelayUse::ScreenShare];
+        for relay_use in old_uses {
             assert_eq!(relays.availability_for(1, relay_use), Ok(()));
             assert!(relays.allows(1, relay_use));
         }
+        // Plugin data is off unless announced (spec 09 FR-9.84).
+        assert_eq!(
+            relays.availability_for(1, RelayUse::PluginData),
+            Err(RelayUnavailable::UseNotAllowed(RelayUse::PluginData))
+        );
+        assert_eq!(relays.plugin_data_kbps(1), None);
         let info = relays.info(1);
-        assert_eq!(info.uses, ALL_USES);
+        assert_eq!(info.uses, old_uses);
         assert_eq!(info.broadcast_max, None);
     }
 
@@ -1511,6 +1552,7 @@ mod tests {
         });
         let info = changed.expect("the panel changes");
         assert_eq!(info.uses, [RelayUse::Images]);
+        assert_eq!(relays.plugin_data_kbps(1), None);
         assert_eq!(info.broadcast_max, None);
     }
 
