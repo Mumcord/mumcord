@@ -814,6 +814,14 @@ mod tests {
         assert!(BOOTSTRAP.contains("post(\"escape\")"));
         assert!(BOOTSTRAP.contains("post(\"f6\")"));
         assert!(BOOTSTRAP.contains("post(\"sound\")"));
+        for name in [
+            "RTCPeerConnection",
+            "webkitRTCPeerConnection",
+            "RTCDataChannel",
+        ] {
+            assert!(BOOTSTRAP.contains(name), "{name} must be deleted");
+        }
+        assert!(BOOTSTRAP.contains("delete window[name]"));
         // It is inlined into a <script> element, which this would end early.
         assert!(!BOOTSTRAP.contains("</"));
     }

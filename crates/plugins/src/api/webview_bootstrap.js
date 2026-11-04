@@ -6,6 +6,17 @@
 (function () {
   "use strict";
   var host = parent;
+
+  // Backup for the WebRTC browser flag on Windows (a WebRTC peer connection can leak the user's
+  // IP addresses past the frame proxy): the page never sees the WebRTC constructors.
+  ["RTCPeerConnection", "webkitRTCPeerConnection", "RTCDataChannel"].forEach(function (name) {
+    try {
+      delete window[name];
+    } catch (e) {
+      // A non-configurable property cannot be removed; the browser flag still applies.
+    }
+  });
+
   function post(kind) {
     host.postMessage({ mumcordWebview: kind }, "*");
   }

@@ -162,22 +162,30 @@ pub fn harden_builder<'a, R: Runtime, M: Manager<R>>(
     builder
 }
 
-/// The WebView2 arguments of every window: Tauri's defaults plus the frame proxy (started with
-/// the first window).
+/// Tauri's own WebView2 defaults: wry drops them once any arguments are given.
+#[cfg(any(windows, test))]
+const WEBVIEW2_DEFAULT_ARGS: &str =
+    "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection";
+
+/// Stops WebRTC from using UDP outside the frame proxy, which would leak the user's addresses
+/// (the proxy cannot carry UDP). The force and Blink-feature switches do not work in WebView2.
+#[cfg(any(windows, test))]
+const WEBRTC_POLICY_ARG: &str = "--webrtc-ip-handling-policy=disable_non_proxied_udp";
+
+/// The WebView2 argument string: defaults, the WebRTC policy and, when it started, the proxy.
+#[cfg(any(windows, test))]
+fn compose_browser_args(proxy: Option<&str>) -> String {
+    match proxy {
+        Some(proxy) => format!("{WEBVIEW2_DEFAULT_ARGS} {WEBRTC_POLICY_ARG} {proxy}"),
+        None => format!("{WEBVIEW2_DEFAULT_ARGS} {WEBRTC_POLICY_ARG}"),
+    }
+}
+
+/// The WebView2 arguments of every window (the frame proxy is started with the first window).
 #[cfg(windows)]
 fn windows_browser_args<R: Runtime>(app: &tauri::AppHandle<R>) -> &'static str {
     static ARGS: std::sync::OnceLock<String> = std::sync::OnceLock::new();
-    // TODO(S0b): WebRTC still reaches the network on Windows (UDP, it bypasses the proxy). S0b
-    // tests WebView2's WebRTC policy and a disable switch; until one closes it this is a
-    // release gate for 1.1 on Windows.
-    ARGS.get_or_init(|| {
-        // Tauri's own defaults: wry drops them once any arguments are given.
-        let defaults = "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection";
-        match super::frame_proxy::start(app) {
-            Some(proxy) => format!("{defaults} {proxy}"),
-            None => defaults.to_owned(),
-        }
-    })
+    ARGS.get_or_init(|| compose_browser_args(super::frame_proxy::start(app).as_deref()))
 }
 
 /// Engine settings applied once a window exists (S0 closing measures, FR-9.2).
@@ -292,6 +300,18 @@ mod macos {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_browser_arguments_close_webrtc_with_and_without_the_proxy() {
+        let proxy = "--proxy-server=http://127.0.0.1:1 --proxy-bypass-list=<-loopback>";
+        let with = compose_browser_args(Some(proxy));
+        assert!(with.contains("--webrtc-ip-handling-policy=disable_non_proxied_udp"));
+        assert!(with.contains(proxy));
+        assert!(with.starts_with(WEBVIEW2_DEFAULT_ARGS));
+        let without = compose_browser_args(None);
+        assert!(without.contains("--webrtc-ip-handling-policy=disable_non_proxied_udp"));
+        assert!(!without.contains("--proxy-server"));
+    }
 
     #[test]
     fn urls_use_the_platform_origin() {
