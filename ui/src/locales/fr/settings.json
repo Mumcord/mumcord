@@ -1072,7 +1072,8 @@
     "title": "Sons des plugins",
     "volume": "Volume des sons des plugins",
     "mute": "Couper les sons des plugins",
-    "hint": "S’applique à chaque son joué par un plugin. Les sons des plugins sont plus faibles pendant que des personnes parlent."
+    "hint": "S’applique à chaque son joué par un plugin. Les sons des plugins sont plus faibles pendant que des personnes parlent.",
+    "meter": "Niveau de sortie (débogage)"
   },
   "screenShare": {
     "newBadge": "Nouveau",

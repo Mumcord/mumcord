@@ -1072,7 +1072,8 @@
     "title": "Sunetele pluginurilor",
     "volume": "Volumul sunetelor pluginurilor",
     "mute": "Oprește sunetul pluginurilor",
-    "hint": "Se aplică fiecărui sunet redat de un plugin. Sunetele pluginurilor sunt mai încet cât timp vorbesc oamenii."
+    "hint": "Se aplică fiecărui sunet redat de un plugin. Sunetele pluginurilor sunt mai încet cât timp vorbesc oamenii.",
+    "meter": "Nivel de ieșire (depanare)"
   },
   "screenShare": {
     "newBadge": "Nou",

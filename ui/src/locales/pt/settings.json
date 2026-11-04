@@ -1072,7 +1072,8 @@
     "title": "Sons dos plugins",
     "volume": "Volume dos sons dos plugins",
     "mute": "Silenciar sons dos plugins",
-    "hint": "Aplica-se a todos os sons reproduzidos por um plugin. Os sons dos plugins ficam mais baixos enquanto as pessoas falam."
+    "hint": "Aplica-se a todos os sons reproduzidos por um plugin. Os sons dos plugins ficam mais baixos enquanto as pessoas falam.",
+    "meter": "Nível de saída (depuração)"
   },
   "screenShare": {
     "newBadge": "Novo",

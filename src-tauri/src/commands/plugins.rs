@@ -1319,6 +1319,13 @@ pub fn plugin_platform_settings(engine: State<'_, Engine>) -> ApiResult<PluginPl
     })
 }
 
+/// Current output level (0.0 … 1.0) of plugin sounds, for the debug audio meter (AC-9.23).
+#[tauri::command]
+#[specta::specta]
+pub fn plugin_sound_meter(engine: State<'_, Engine>) -> f32 {
+    engine.sound_hub().plugin_sounds().meter()
+}
+
 /// Saves the plugin platform's settings; the volume is clamped to 0–100.
 #[tauri::command]
 #[specta::specta]
@@ -1334,6 +1341,11 @@ pub async fn plugin_set_platform_settings(
     stored.plugins.sound_volume = settings.sound_volume.min(100);
     stored.plugins.sound_muted = settings.sound_muted;
     engine.update_settings(stored).await?;
+    plugins::sound::apply_settings(
+        &engine.sound_hub(),
+        settings.sound_volume,
+        settings.sound_muted,
+    );
     if relay_was != settings.relay_data_enabled {
         // FR-9.63: off ends the relay streams at once and plugins hear the new status.
         let enabled = settings.relay_data_enabled;

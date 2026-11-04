@@ -150,6 +150,16 @@ impl PluginSounds {
         self.shared.muted.store(muted, Ordering::Relaxed);
     }
 
+    /// The plugin-sound volume in percent.
+    pub fn volume(&self) -> u8 {
+        self.shared.volume.load(Ordering::Relaxed)
+    }
+
+    /// Whether plugin sounds are muted.
+    pub fn muted(&self) -> bool {
+        self.shared.muted.load(Ordering::Relaxed)
+    }
+
     /// The user's own deafen state; plugin sounds are silent while deafened.
     pub fn set_deafened(&self, deaf: bool) {
         self.shared.deaf.store(deaf, Ordering::Relaxed);

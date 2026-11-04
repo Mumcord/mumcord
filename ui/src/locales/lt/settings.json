@@ -1080,7 +1080,8 @@
     "title": "Papildinių garsai",
     "volume": "Papildinių garsų garsumas",
     "mute": "Nutildyti papildinių garsus",
-    "hint": "Taikoma kiekvienam garsui, kurį groja papildinys. Papildinių garsai tylesni, kai žmonės kalba."
+    "hint": "Taikoma kiekvienam garsui, kurį groja papildinys. Papildinių garsai tylesni, kai žmonės kalba.",
+    "meter": "Išvesties lygis (derinimas)"
   },
   "screenShare": {
     "newBadge": "Nauja",

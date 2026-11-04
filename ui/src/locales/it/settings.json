@@ -1072,7 +1072,8 @@
     "title": "Suoni dei plugin",
     "volume": "Volume dei suoni dei plugin",
     "mute": "Disattiva i suoni dei plugin",
-    "hint": "Vale per ogni suono riprodotto da un plugin. I suoni dei plugin sono più bassi mentre le persone parlano."
+    "hint": "Vale per ogni suono riprodotto da un plugin. I suoni dei plugin sono più bassi mentre le persone parlano.",
+    "meter": "Livello di uscita (debug)"
   },
   "screenShare": {
     "newBadge": "Novità",

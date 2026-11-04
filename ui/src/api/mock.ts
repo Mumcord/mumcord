@@ -3242,6 +3242,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginSkipUpdateVersion: () => fail("notFound", "no update for this plugin"),
     pluginWebsites: () => fail("notFound", "no such plugin"),
     pluginPlatformSettings: () => Promise.resolve(platformSettings),
+    pluginSoundMeter: () => Promise.resolve(0),
     pluginSetPlatformSettings: (settings) => {
       platformSettings = { ...settings };
       return Promise.resolve(null);

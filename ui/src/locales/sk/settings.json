@@ -1080,7 +1080,8 @@
     "title": "Zvuky pluginov",
     "volume": "Hlasitosť zvukov pluginov",
     "mute": "Stlmiť zvuky pluginov",
-    "hint": "Platí pre každý zvuk, ktorý plugin prehrá. Zvuky pluginov sú tichšie, keď ľudia hovoria."
+    "hint": "Platí pre každý zvuk, ktorý plugin prehrá. Zvuky pluginov sú tichšie, keď ľudia hovoria.",
+    "meter": "Výstupná úroveň (ladenie)"
   },
   "screenShare": {
     "newBadge": "Nové",

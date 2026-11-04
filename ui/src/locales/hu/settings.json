@@ -1064,7 +1064,8 @@
     "title": "Bővítményhangok",
     "volume": "Bővítményhangok hangereje",
     "mute": "Bővítményhangok némítása",
-    "hint": "Minden hangra vonatkozik, amelyet egy bővítmény lejátszik. A bővítményhangok halkabbak, amíg az emberek beszélnek."
+    "hint": "Minden hangra vonatkozik, amelyet egy bővítmény lejátszik. A bővítményhangok halkabbak, amíg az emberek beszélnek.",
+    "meter": "Kimeneti szint (hibakeresés)"
   },
   "screenShare": {
     "newBadge": "Új",

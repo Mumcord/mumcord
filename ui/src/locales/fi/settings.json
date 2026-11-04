@@ -1064,7 +1064,8 @@
     "title": "Lisäosien äänet",
     "volume": "Lisäosien äänenvoimakkuus",
     "mute": "Mykistä lisäosien äänet",
-    "hint": "Koskee kaikkia ääniä, joita lisäosa toistaa. Lisäosien äänet ovat hiljaisempia, kun ihmiset puhuvat."
+    "hint": "Koskee kaikkia ääniä, joita lisäosa toistaa. Lisäosien äänet ovat hiljaisempia, kun ihmiset puhuvat.",
+    "meter": "Lähtötaso (vianetsintä)"
   },
   "screenShare": {
     "newBadge": "Uusi",

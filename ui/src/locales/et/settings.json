@@ -1064,7 +1064,8 @@
     "title": "Pluginate helid",
     "volume": "Pluginate helide helitugevus",
     "mute": "Vaigista pluginate helid",
-    "hint": "Kehtib kõigile helidele, mida plugin esitab. Pluginate helid on vaiksemad, kui inimesed räägivad."
+    "hint": "Kehtib kõigile helidele, mida plugin esitab. Pluginate helid on vaiksemad, kui inimesed räägivad.",
+    "meter": "Väljundtase (silumine)"
   },
   "screenShare": {
     "newBadge": "Uus",

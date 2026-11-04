@@ -1064,7 +1064,8 @@
     "title": "Plugin sounds",
     "volume": "Plugin sound volume",
     "mute": "Mute plugin sounds",
-    "hint": "Applies to every sound a plugin plays. Plugin sounds are quieter while people talk."
+    "hint": "Applies to every sound a plugin plays. Plugin sounds are quieter while people talk.",
+    "meter": "Output level (debug)"
   },
   "screenShare": {
     "newBadge": "New",

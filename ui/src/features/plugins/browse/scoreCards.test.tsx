@@ -119,4 +119,13 @@ describe("platform settings groups", () => {
     expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ soundVolume: 75 }));
     expect(await axeViolations(view.container)).toEqual([]);
   });
+
+  it("shows the plugin sound output level on the debug meter", async () => {
+    vi.spyOn(api, "pluginSoundMeter").mockResolvedValue(0.42);
+    render(<PluginSoundsGroup />);
+    const meter = await screen.findByRole("meter", { name: "Output level (debug)" });
+    await waitFor(() => {
+      expect(meter).toHaveAttribute("aria-valuenow", "42");
+    });
+  });
 });

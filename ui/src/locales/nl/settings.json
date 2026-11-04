@@ -1064,7 +1064,8 @@
     "title": "Pluginigeluiden",
     "volume": "Volume van pluginigeluiden",
     "mute": "Pluginigeluiden dempen",
-    "hint": "Geldt voor elk geluid dat een plugin afspeelt. Pluginigeluiden klinken zachter terwijl mensen praten."
+    "hint": "Geldt voor elk geluid dat een plugin afspeelt. Pluginigeluiden klinken zachter terwijl mensen praten.",
+    "meter": "Uitvoerniveau (foutopsporing)"
   },
   "screenShare": {
     "newBadge": "Nieuw",

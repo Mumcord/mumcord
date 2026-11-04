@@ -1064,7 +1064,8 @@
     "title": "Pluginljud",
     "volume": "Volym för pluginljud",
     "mute": "Stäng av pluginljud",
-    "hint": "Gäller varje ljud som ett plugin spelar upp. Pluginljud är lägre medan folk pratar."
+    "hint": "Gäller varje ljud som ett plugin spelar upp. Pluginljud är lägre medan folk pratar.",
+    "meter": "Utnivå (felsökning)"
   },
   "screenShare": {
     "newBadge": "Ny",

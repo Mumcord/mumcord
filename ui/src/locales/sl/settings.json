@@ -1080,7 +1080,8 @@
     "title": "Zvoki vtičnikov",
     "volume": "Glasnost zvokov vtičnikov",
     "mute": "Utišaj zvoke vtičnikov",
-    "hint": "Velja za vsak zvok, ki ga predvaja vtičnik. Zvoki vtičnikov so tišji, ko ljudje govorijo."
+    "hint": "Velja za vsak zvok, ki ga predvaja vtičnik. Zvoki vtičnikov so tišji, ko ljudje govorijo.",
+    "meter": "Izhodna raven (odpravljanje napak)"
   },
   "screenShare": {
     "newBadge": "Novo",

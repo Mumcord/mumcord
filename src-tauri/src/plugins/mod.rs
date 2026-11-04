@@ -35,6 +35,8 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use crate::commands::types::{ApiError, ApiResult, ErrorCode};
 use ui::{PluginUi, Trees};
 
+pub mod sound;
+
 /// The command-line flag that starts Mumcord without any plugin (FR-6.6).
 const NO_PLUGINS_FLAG: &str = "--no-plugins";
 /// How often updates and revocations are checked for (B17b decides what is due).
@@ -318,6 +320,7 @@ fn try_start(app: &AppHandle, engine: &Engine) -> Result<(), Box<dyn std::error:
     let (mut service, host_events, events) =
         PluginService::new(config, engine.store_handle(), secrets)?;
     test_hooks(&mut service);
+    sound::register(&service.context().audio, engine.sound_hub());
     // The engine's own relay switch starts from the stored choice too (FR-9.63).
     engine.plugin_relay_set_enabled(
         engine

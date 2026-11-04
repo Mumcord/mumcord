@@ -1064,7 +1064,8 @@
     "title": "Plugin-lyde",
     "volume": "Lydstyrke for plugin-lyde",
     "mute": "Slå plugin-lyde fra",
-    "hint": "Gælder for alle lyde, et plugin afspiller. Plugin-lyde er lavere, mens folk taler."
+    "hint": "Gælder for alle lyde, et plugin afspiller. Plugin-lyde er lavere, mens folk taler.",
+    "meter": "Udgangsniveau (fejlfinding)"
   },
   "screenShare": {
     "newBadge": "Ny",

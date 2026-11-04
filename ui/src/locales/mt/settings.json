@@ -1088,7 +1088,8 @@
     "title": "Ħsejjes tal-plagins",
     "volume": "Volum tal-ħsejjes tal-plagins",
     "mute": "Għolq il-ħsejjes tal-plagins",
-    "hint": "Japplika għal kull ħoss li jdoqq plagin. Il-ħsejjes tal-plagins ikunu aktar baxxi waqt li n-nies jitkellmu."
+    "hint": "Japplika għal kull ħoss li jdoqq plagin. Il-ħsejjes tal-plagins ikunu aktar baxxi waqt li n-nies jitkellmu.",
+    "meter": "Livell tal-output (debug)"
   },
   "screenShare": {
     "newBadge": "Ġdid",

@@ -1064,7 +1064,8 @@
     "title": "Plugin-Sounds",
     "volume": "Lautstärke der Plugin-Sounds",
     "mute": "Plugin-Sounds stummschalten",
-    "hint": "Gilt für jeden Sound, den ein Plugin abspielt. Plugin-Sounds sind leiser, während Leute sprechen."
+    "hint": "Gilt für jeden Sound, den ein Plugin abspielt. Plugin-Sounds sind leiser, während Leute sprechen.",
+    "meter": "Ausgangspegel (Debug)"
   },
   "screenShare": {
     "newBadge": "Neu",

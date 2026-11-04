@@ -249,6 +249,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_skip_update_version,
             commands::plugins::plugin_websites,
             commands::plugins::plugin_platform_settings,
+            commands::plugins::plugin_sound_meter,
             commands::plugins::plugin_set_platform_settings,
             commands::plugins::plugin_side_panel_width,
             commands::plugins::plugin_set_side_panel_width,

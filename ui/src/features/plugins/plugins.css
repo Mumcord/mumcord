@@ -105,3 +105,25 @@
   color: var(--color-text-secondary);
   font-size: 0.85rem;
 }
+
+.plugins-sound-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.plugins-sound-meter-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.plugins-sound-meter-fill {
+  height: 100%;
+  background: var(--color-accent);
+}

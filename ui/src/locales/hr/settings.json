@@ -1072,7 +1072,8 @@
     "title": "Zvukovi dodataka",
     "volume": "Glasnoća zvukova dodataka",
     "mute": "Utišaj zvukove dodataka",
-    "hint": "Odnosi se na svaki zvuk koji dodatak reproducira. Zvukovi dodataka tiši su dok ljudi govore."
+    "hint": "Odnosi se na svaki zvuk koji dodatak reproducira. Zvukovi dodataka tiši su dok ljudi govore.",
+    "meter": "Izlazna razina (otklanjanje pogrešaka)"
   },
   "screenShare": {
     "newBadge": "Novo",

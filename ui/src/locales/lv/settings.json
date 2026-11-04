@@ -1072,7 +1072,8 @@
     "title": "Spraudņu skaņas",
     "volume": "Spraudņu skaņu skaļums",
     "mute": "Izslēgt spraudņu skaņas",
-    "hint": "Attiecas uz katru skaņu, ko atskaņo spraudnis. Spraudņu skaņas ir klusākas, kamēr cilvēki runā."
+    "hint": "Attiecas uz katru skaņu, ko atskaņo spraudnis. Spraudņu skaņas ir klusākas, kamēr cilvēki runā.",
+    "meter": "Izvades līmenis (atkļūdošana)"
   },
   "screenShare": {
     "newBadge": "Jaunums",

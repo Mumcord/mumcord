@@ -1080,7 +1080,8 @@
     "title": "Dźwięki wtyczek",
     "volume": "Głośność dźwięków wtyczek",
     "mute": "Wycisz dźwięki wtyczek",
-    "hint": "Dotyczy każdego dźwięku odtwarzanego przez wtyczkę. Dźwięki wtyczek są cichsze, gdy ktoś mówi."
+    "hint": "Dotyczy każdego dźwięku odtwarzanego przez wtyczkę. Dźwięki wtyczek są cichsze, gdy ktoś mówi.",
+    "meter": "Poziom wyjścia (debugowanie)"
   },
   "screenShare": {
     "newBadge": "Nowość",

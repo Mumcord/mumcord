@@ -667,6 +667,8 @@ export const commands = {
 	 */
 	pluginWebsites: (id: string) => typedError<PluginWebsites, ApiError>(__TAURI_INVOKE("plugin_websites", { id })),
 	pluginPlatformSettings: () => typedError<PluginPlatformSettings, ApiError>(__TAURI_INVOKE("plugin_platform_settings")),
+	/**  Current output level (0.0 … 1.0) of plugin sounds, for the debug audio meter (AC-9.23). */
+	pluginSoundMeter: () => __TAURI_INVOKE<number | null>("plugin_sound_meter"),
 	/**  Saves the plugin platform's settings; the volume is clamped to 0–100. */
 	pluginSetPlatformSettings: (settings: PluginPlatformSettings) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_platform_settings", { settings })),
 	/**  The width in rem the user last gave `plugin`'s side panel (FR-9.39), if any. */
