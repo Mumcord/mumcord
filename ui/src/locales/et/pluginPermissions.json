@@ -59,7 +59,7 @@
     "chatPatterns": "See saab ainult sinu kanali vestlussõnumeid, mis algavad nii, nagu see on määranud, näiteks kleebitud mänguvarustuse. Muu vestlustekst selleni ei jõua.",
     "netHttp": "See võib suhelda ühe sinu valitud serveriga ja ainult sellega.",
     "secrets": "See võib hoida saladust, näiteks API võtit, süsteemi võtmehoidjas.",
-    "uiWebview": "See võib näidata oma veebisisu suletud raamis ilma internetiühenduseta.",
+    "uiWebview": "See ei näe Mumcordi, sinu faile, mikrofoni, kaamerat ega lõikelauda.",
     "uiStage": "Ainult siis, kui sa selle käivitad või sellega liitud. Sinu kanalis olevad inimesed, kellel on {{plugin}}, saavad liituda.",
     "uiSidePanel": "Selle sisu ilmub vestluse kõrvale veergu, ainult siis, kui sa selle avad.",
     "uiAppMenu": "Kuni {{count}} kirjet, kuvatakse jaotises „Pluginad“.",

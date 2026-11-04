@@ -3334,6 +3334,8 @@ export type PluginReviewOrigin = {
 	 *  index lists no purposes. Before `resolve_purposes` it holds the manifest's key.
 	 */
 	purpose: string | null,
+	/**  A new website outside every domain the installed version already used. */
+	otherDomain: boolean,
 };
 
 /**  The score before and after an update. */

@@ -59,7 +59,7 @@
     "chatPatterns": "Es erhält nur Chatnachrichten in deinem Kanal, die so beginnen, wie es angegeben hat, etwa ein eingefügtes Spiel-Fitting. Kein anderer Chattext erreicht es.",
     "netHttp": "Es kann mit einem Server sprechen, den du wählst, und nur mit diesem.",
     "secrets": "Es kann ein Geheimnis, etwa einen API-Schlüssel, in deinem System-Schlüsselbund aufbewahren.",
-    "uiWebview": "Es kann eigene Webinhalte in einem abgeschotteten Rahmen ohne Internetzugang zeigen.",
+    "uiWebview": "Es kann weder Mumcord noch deine Dateien, dein Mikrofon, deine Kamera oder die Zwischenablage sehen.",
     "uiStage": "Nur wenn du sie startest oder ihr beitrittst. Personen in deinem Kanal, die {{plugin}} haben, können beitreten.",
     "uiSidePanel": "Der Inhalt erscheint in einer Spalte neben dem Chat, nur wenn du sie öffnest.",
     "uiAppMenu": "Bis zu {{count}} Einträge, angezeigt unter „Plugins“.",

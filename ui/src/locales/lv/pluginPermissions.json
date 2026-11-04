@@ -59,7 +59,7 @@
     "chatPatterns": "Tas saņem tikai jūsu kanāla tērzēšanas ziņas, kas sākas tā, kā tas norādījis, piemēram, ielīmētu spēles konfigurāciju. Neviens cits tērzēšanas teksts to nesasniedz.",
     "netHttp": "Tas var sazināties ar vienu jūsu izvēlētu serveri un tikai ar to.",
     "secrets": "Tas var glabāt noslēpumu, piemēram, API atslēgu, sistēmas atslēgu saišķī.",
-    "uiWebview": "Tas var rādīt savu tīmekļa saturu slēgtā rāmī bez piekļuves internetam.",
+    "uiWebview": "Tas neredz Mumcord, tavus failus, mikrofonu, kameru vai starpliktuvi.",
     "uiStage": "Tikai tad, kad tu to sāc vai pievienojies. Pievienoties var cilvēki tavā kanālā, kuriem ir {{plugin}}.",
     "uiSidePanel": "Tā saturs parādās kolonnā blakus tērzēšanai, tikai kad tu to atver.",
     "uiAppMenu": "Līdz {{count}} vienumiem, rādīti sadaļā “Spraudņi”.",

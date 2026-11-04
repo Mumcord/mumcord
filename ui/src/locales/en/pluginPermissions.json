@@ -59,7 +59,7 @@
     "chatPatterns": "It only receives chat messages in your channel that start the way it declares, such as a pasted game fit. No other chat text reaches it.",
     "netHttp": "It can talk to one server you choose, and only to that one.",
     "secrets": "It can keep a secret, such as an API key, in your system keychain.",
-    "uiWebview": "It can show its own web content in a sealed frame with no internet access.",
+    "uiWebview": "It can't see Mumcord, your files, microphone, camera or clipboard.",
     "uiStage": "Only when you start or join it. People in your channel who have {{plugin}} can join.",
     "uiSidePanel": "Its content appears in a column next to the chat, only when you open it.",
     "uiAppMenu": "Up to {{count}} items, shown under “Plugins”.",

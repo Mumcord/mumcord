@@ -59,7 +59,7 @@
     "chatPatterns": "Ní fhaigheann sé ach teachtaireachtaí comhrá i do chainéal a thosaíonn mar a d'fhógair sé, mar shampla feisteas cluiche a greamaíodh. Ní shroicheann aon téacs comhrá eile é.",
     "netHttp": "Is féidir leis labhairt le freastalaí amháin a roghnaíonn tú, agus leis sin amháin.",
     "secrets": "Is féidir leis rún, mar eochair API, a choinneáil i eochairshlabhra do chórais.",
-    "uiWebview": "Is féidir leis a ábhar gréasáin féin a thaispeáint i bhfráma séalaithe gan rochtain idirlín.",
+    "uiWebview": "Ní féidir leis Mumcord, do chuid comhad, do mhicreafón, do cheamara ná do ghearrthaisce a fheiceáil.",
     "uiStage": "Ach amháin nuair a thosaíonn tú nó nuair a bhaineann tú leis. Is féidir le daoine i do chainéal a bhfuil {{plugin}} acu bheith páirteach.",
     "uiSidePanel": "Tagann a inneachar chun solais i gcolún cois an chomhrá, ach nuair a osclaíonn tú é.",
     "uiAppMenu": "Suas le {{count}} mír, le feiceáil faoi “Breiseáin”.",

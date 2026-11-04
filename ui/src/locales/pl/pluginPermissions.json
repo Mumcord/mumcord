@@ -59,7 +59,7 @@
     "chatPatterns": "Otrzymuje tylko wiadomości czatu na Twoim kanale, które zaczynają się tak, jak zadeklarowała, np. wklejoną konfigurację z gry. Żaden inny tekst czatu do niej nie trafia.",
     "netHttp": "Może rozmawiać z jednym wybranym przez Ciebie serwerem i tylko z nim.",
     "secrets": "Może przechowywać sekret, na przykład klucz API, w systemowym schowku kluczy.",
-    "uiWebview": "Może pokazywać własną treść internetową w izolowanej ramce bez dostępu do internetu.",
+    "uiWebview": "Nie widzi Mumcord, Twoich plików, mikrofonu, kamery ani schowka.",
     "uiStage": "Tylko gdy ją uruchomisz lub dołączysz. Mogą dołączyć osoby z Twojego kanału, które mają {{plugin}}.",
     "uiSidePanel": "Jej treść pojawia się w kolumnie obok czatu, tylko gdy ją otworzysz.",
     "uiAppMenu": "Maksymalnie pozycji: {{count}}, pokazywanych pod „Wtyczki”.",

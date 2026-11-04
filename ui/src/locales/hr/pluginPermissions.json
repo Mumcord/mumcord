@@ -59,7 +59,7 @@
     "chatPatterns": "Prima samo chat poruke u vašem kanalu koje počinju onako kako je naveo, poput zalijepljene opreme iz igre. Nikakav drugi tekst iz chata ne dolazi do njega.",
     "netHttp": "Može razgovarati s jednim poslužiteljem koji odaberete, i samo s njim.",
     "secrets": "Može čuvati tajnu, poput API ključa, u privjesku ključeva sustava.",
-    "uiWebview": "Može prikazati vlastiti web sadržaj u zatvorenom okviru bez pristupa internetu.",
+    "uiWebview": "Ne vidi Mumcord, tvoje datoteke, mikrofon, kameru ni međuspremnik.",
     "uiStage": "Samo kad je ti pokreneš ili joj se pridružiš. Pridružiti se mogu ljudi u tvom kanalu koji imaju {{plugin}}.",
     "uiSidePanel": "Sadržaj se prikazuje u stupcu pokraj chata, samo kad ga otvoriš.",
     "uiAppMenu": "Do {{count}} stavki, prikazanih pod „Dodaci”.",

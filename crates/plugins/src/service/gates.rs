@@ -240,6 +240,9 @@ pub struct ReviewOrigin {
     /// origins without purposes and the new package is not downloaded before the user decides,
     /// so a new website has `None`.
     pub purpose: Option<String>,
+    /// A new website outside every domain the installed version already used; the plugin's
+    /// words about it are shown quoted because it is not the plugin's own site.
+    pub other_domain: bool,
 }
 
 /// The points one new permission adds to the score ("+4 points" next to it in the review).
@@ -305,24 +308,27 @@ pub fn update_review(
     new: Option<&Scored>,
     high_risk_confirmed: bool,
 ) -> UpdateReview {
+    let own: BTreeSet<Option<String>> = old_origins.iter().map(|o| domain_of(o)).collect();
     let origins: Vec<ReviewOrigin> = new_origins
         .iter()
-        .map(|origin| ReviewOrigin {
-            origin: origin.clone(),
-            new: !old_origins.contains(origin),
-            purpose: old_purposes.get(origin).cloned(),
+        .map(|origin| {
+            let new = !old_origins.contains(origin);
+            // Without any website before, there is no "own domain" to compare with.
+            let other_domain = new
+                && !own.is_empty()
+                && match domain_of(origin) {
+                    Some(domain) => !own.contains(&Some(domain)),
+                    None => true,
+                };
+            ReviewOrigin {
+                origin: origin.clone(),
+                new,
+                purpose: old_purposes.get(origin).cloned(),
+                other_domain,
+            }
         })
         .collect();
-    let own: BTreeSet<Option<String>> = old_origins.iter().map(|o| domain_of(o)).collect();
-    // Without any website before, there is no "own domain" to compare with.
-    let other_domain = !own.is_empty()
-        && origins
-            .iter()
-            .filter(|o| o.new)
-            .any(|o| match domain_of(&o.origin) {
-                Some(domain) => !own.contains(&Some(domain)),
-                None => true,
-            });
+    let other_domain = origins.iter().any(|o| o.other_domain);
     let risk = match (old, new) {
         (Some(Scored::Scored(old)), Some(Scored::Scored(new))) => Some(RiskChange {
             from_value: old.value,
@@ -683,19 +689,24 @@ mod tests {
                 ReviewOrigin {
                     origin: "https://api.example.com".into(),
                     new: false,
-                    purpose: None
+                    purpose: None,
+                    other_domain: false,
                 },
                 ReviewOrigin {
                     origin: "wss://live.example.com:8443".into(),
                     new: true,
-                    purpose: None
+                    purpose: None,
+                    other_domain: false,
                 },
             ]
         );
         assert!(!review.other_domain);
 
         let other = strings(&["https://api.example.com", "https://cdn.other.co.uk"]);
-        assert!(update_review(&old, &other, &BTreeMap::new(), None, None, false).other_domain);
+        let review = update_review(&old, &other, &BTreeMap::new(), None, None, false);
+        assert!(review.other_domain);
+        let flags: Vec<bool> = review.origins.iter().map(|o| o.other_domain).collect();
+        assert_eq!(flags, [false, true]);
     }
 
     #[test]

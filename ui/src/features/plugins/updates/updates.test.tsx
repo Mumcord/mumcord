@@ -273,9 +273,9 @@ const websites: PluginUpdate = {
   hold: { kind: "newWebsites", count: 2 },
   review: {
     origins: [
-      { origin: "https://api.poll.example", new: false, purpose: null },
-      { origin: "https://stats.poll.example", new: true, purpose: null },
-      { origin: "wss://voice-lab.example", new: true, purpose: null },
+      { origin: "https://api.poll.example", new: false, purpose: null, otherDomain: false },
+      { origin: "https://stats.poll.example", new: true, purpose: null, otherDomain: false },
+      { origin: "wss://voice-lab.example", new: true, purpose: null, otherDomain: true },
     ],
     otherDomain: true,
     permissionEffects: [],
@@ -392,9 +392,24 @@ describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", 
     const prepare = vi.spyOn(getApi(), "pluginUpdateReviewPrepare").mockResolvedValue({
       ...websites.review,
       origins: [
-        { origin: "https://api.poll.example", new: false, purpose: "match history" },
-        { origin: "https://stats.poll.example", new: true, purpose: "rankings" },
-        { origin: "wss://voice-lab.example", new: true, purpose: "experimental features" },
+        {
+          origin: "https://api.poll.example",
+          new: false,
+          purpose: "match history",
+          otherDomain: false,
+        },
+        {
+          origin: "https://stats.poll.example",
+          new: true,
+          purpose: "rankings",
+          otherDomain: false,
+        },
+        {
+          origin: "wss://voice-lab.example",
+          new: true,
+          purpose: "experimental features",
+          otherDomain: true,
+        },
       ],
     });
     renderTab();
@@ -412,7 +427,7 @@ describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", 
     renderTab();
     fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
     const chip = await screen.findByText("Unofficial · Lantern Plugin Garden");
-    expect(chip).toHaveClass("plugin-review__chip--unofficial");
+    expect(chip).toHaveClass("plugin-prompt-chip--unofficial");
   });
 
   it("keeps the old version when the user skips", async () => {
@@ -434,7 +449,14 @@ describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", 
         ...held,
         review: {
           ...held.review,
-          origins: [{ origin: "https://api.poll.example", new: false, purpose: "match history" }],
+          origins: [
+            {
+              origin: "https://api.poll.example",
+              new: false,
+              purpose: "match history",
+              otherDomain: false,
+            },
+          ],
           permissionEffects: [
             { permission: "ui.webview", points: 4 },
             { permission: "peers.relay", points: 14 },

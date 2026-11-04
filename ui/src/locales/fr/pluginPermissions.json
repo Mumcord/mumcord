@@ -59,7 +59,7 @@
     "chatPatterns": "Il ne reçoit que les messages de chat de votre salon qui commencent comme il l'a déclaré, par exemple une configuration de jeu collée. Aucun autre texte du chat ne lui parvient.",
     "netHttp": "Il peut parler à un serveur que vous choisissez, et uniquement à celui-là.",
     "secrets": "Il peut garder un secret, comme une clé d'API, dans le trousseau de votre système.",
-    "uiWebview": "Il peut afficher son propre contenu web dans un cadre isolé, sans accès à Internet.",
+    "uiWebview": "Il ne peut voir ni Mumcord, ni vos fichiers, ni votre microphone, ni votre caméra, ni le presse-papiers.",
     "uiStage": "Seulement quand vous le lancez ou le rejoignez. Les personnes de votre salon qui ont {{plugin}} peuvent le rejoindre.",
     "uiSidePanel": "Son contenu apparaît dans une colonne à côté de la discussion, uniquement quand vous l'ouvrez.",
     "uiAppMenu": "Jusqu'à {{count}} éléments, affichés sous « Plugins ».",

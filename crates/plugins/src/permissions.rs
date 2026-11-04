@@ -205,7 +205,7 @@ pub const CATALOGUE: &[Permission] = &[
         "ui.webview",
         Risk::Yellow,
         "Show its own web content in a sealed frame (no internet)",
-        "It can show its own web content in a sealed frame with no internet access.",
+        "It can't see Mumcord, your files, microphone, camera or clipboard.",
     ),
     all_1_1(
         "ui.stage",

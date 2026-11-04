@@ -59,7 +59,7 @@
     "chatPatterns": "Csak a csatornád azon csevegőüzeneteit kapja meg, amelyek az általa megadott módon kezdődnek, például egy beillesztett játékbeli felszerelést. Más csevegőszöveg nem jut el hozzá.",
     "netHttp": "Egyetlen, általad választott szerverrel kommunikálhat, mással nem.",
     "secrets": "Titkot, például API-kulcsot tárolhat a rendszer kulcstartójában.",
-    "uiWebview": "Saját webes tartalmat jeleníthet meg zárt keretben, internet-hozzáférés nélkül.",
+    "uiWebview": "Nem látja a Mumcordot, a fájljaidat, a mikrofonodat, a kamerádat és a vágólapodat.",
     "uiStage": "Csak akkor, ha te indítod el vagy csatlakozol hozzá. A csatornádon lévők, akiknél megvan a(z) {{plugin}}, csatlakozhatnak.",
     "uiSidePanel": "A tartalma a csevegés melletti oszlopban jelenik meg, csak ha megnyitod.",
     "uiAppMenu": "Legfeljebb {{count}} elem, a „Bővítmények” alatt megjelenítve.",

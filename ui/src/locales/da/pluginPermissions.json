@@ -59,7 +59,7 @@
     "chatPatterns": "Det modtager kun chatbeskeder i din kanal, der starter, som det har angivet, f.eks. et indsat spil-fit. Ingen anden chattekst når frem til det.",
     "netHttp": "Det kan tale med én server, du vælger, og kun den.",
     "secrets": "Det kan gemme en hemmelighed, som en API-nøgle, i systemets nøglering.",
-    "uiWebview": "Det kan vise eget webindhold i en lukket ramme uden internetadgang.",
+    "uiWebview": "Det kan ikke se Mumcord, dine filer, mikrofon, kamera eller udklipsholder.",
     "uiStage": "Kun når du starter eller deltager. Personer i din kanal, der har {{plugin}}, kan deltage.",
     "uiSidePanel": "Indholdet vises i en kolonne ved siden af chatten, kun når du åbner det.",
     "uiAppMenu": "Op til {{count}} punkter, vist under “Plugins”.",

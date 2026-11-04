@@ -59,7 +59,7 @@
     "chatPatterns": "Het ontvangt alleen chatberichten in je kanaal die beginnen zoals het heeft opgegeven, zoals een geplakte game-fit. Geen andere chattekst bereikt het.",
     "netHttp": "Het kan praten met één server die jij kiest, en alleen met die.",
     "secrets": "Het kan een geheim, zoals een API-sleutel, bewaren in de sleutelhanger van je systeem.",
-    "uiWebview": "Het kan eigen webinhoud tonen in een afgesloten kader zonder internettoegang.",
+    "uiWebview": "Hij kan Mumcord, je bestanden, microfoon, camera of klembord niet zien.",
     "uiStage": "Alleen wanneer jij hem start of eraan deelneemt. Mensen in je kanaal met {{plugin}} kunnen meedoen.",
     "uiSidePanel": "De inhoud verschijnt in een kolom naast de chat, alleen wanneer jij hem opent.",
     "uiAppMenu": "Maximaal {{count}} items, getoond onder “Plug-ins”.",

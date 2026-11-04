@@ -274,13 +274,28 @@
   font-size: var(--font-size-sm);
 }
 
+.plugin-review--websites {
+  width: min(36rem, calc(100vw - 2 * var(--space-4)));
+}
+
 .plugin-review__alert {
-  display: flex;
-  gap: var(--space-2);
   padding: var(--space-3);
-  border: 1px solid var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 60%, transparent);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.plugin-review__alert p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.plugin-review__alert strong {
+  color: var(--color-text);
+}
+
+.plugin-review__alert svg {
+  vertical-align: text-bottom;
 }
 
 .plugin-review__scores {
@@ -307,114 +322,9 @@
 
 .plugin-review__score-label,
 .plugin-review__muted,
-.plugin-review__purpose,
-.plugin-review__hint,
-.plugin-review__changed {
+.plugin-review__hint {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-}
-
-.plugin-review__websites {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.plugin-review__websites-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-hover);
-  color: var(--color-danger);
-}
-
-.plugin-review__websites-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.plugin-review__origins {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin: var(--space-1) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.plugin-review__origin {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-2);
-  align-items: baseline;
-}
-
-.plugin-review__origin-url {
-  /* The 1 px of padding stands in for the border of a new origin, so the rows line up; a
-     transparent border would show up in forced colours. */
-  padding: 1px calc(var(--space-1) + 1px);
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-hover);
-  overflow-wrap: anywhere;
-}
-
-.plugin-review__origin-url--new {
-  padding: 0 var(--space-1);
-  border: 1px solid var(--color-danger);
-}
-
-.plugin-review__new {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-}
-
-.plugin-review__permissions {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.plugin-review__permission {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--space-3);
-  align-items: center;
-  padding: var(--space-1) 0;
-  border-bottom: 1px solid var(--color-border);
-  font-weight: var(--font-weight-bold);
-}
-
-.plugin-review__permission:last-child {
-  border-bottom: 0;
-}
-
-.plugin-review__plus {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-hover);
-  color: var(--color-warning);
-}
-
-.plugin-review__effect {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: normal;
-}
-
-.plugin-review__effect .risk-eff {
-  color: inherit;
 }
 
 .plugin-review__note {
@@ -423,16 +333,6 @@
   background: var(--color-bg-hover);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
-}
-
-.plugin-review__link {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--color-accent-text);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 .plugin-review__high {
@@ -467,24 +367,20 @@
   gap: var(--space-2);
 }
 
-/* The source of the plugin, as in the update mockup: unofficial sources get a dashed amber chip. */
-.plugin-review__chip {
-  display: inline-block;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-full);
+/* A website the update adds: outlined like the mockup's "New" origins. */
+.plugin-prompt-origin--new code {
+  background: color-mix(in srgb, var(--color-danger) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-danger) 60%, transparent);
 }
 
-.plugin-review__chip--unofficial {
-  border-style: dashed;
-  border-color: color-mix(in srgb, var(--color-warning) 60%, transparent);
-  color: var(--color-warning);
+.plugin-prompt-origin .plugin-prompt-origin__new {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
 }
 
 @media (forced-colors: active) {
-  .plugin-review__chip,
-  .plugin-review__chip--unofficial {
-    border-color: CanvasText;
-    color: CanvasText;
+  .plugin-prompt-origin--new code {
+    outline: 1px solid CanvasText;
   }
 }

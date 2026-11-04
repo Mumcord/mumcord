@@ -59,7 +59,7 @@
     "chatPatterns": "Prejme samo sporočila v klepetu vašega kanala, ki se začnejo tako, kot je navedel, npr. prilepljeno opremo iz igre. Nobeno drugo besedilo klepeta ga ne doseže.",
     "netHttp": "Lahko komunicira z enim strežnikom, ki ga izberete, in samo z njim.",
     "secrets": "Lahko shrani skrivnost, na primer ključ API, v sistemsko zbirko ključev.",
-    "uiWebview": "Lahko prikaže lastno spletno vsebino v zaprtem okvirju brez dostopa do interneta.",
+    "uiWebview": "Ne vidi Mumcorda, tvojih datotek, mikrofona, kamere ali odložišča.",
     "uiStage": "Samo ko ga začneš ali se mu pridružiš. Pridružijo se lahko ljudje v tvojem kanalu, ki imajo {{plugin}}.",
     "uiSidePanel": "Vsebina se prikaže v stolpcu ob klepetu, samo ko ga odpreš.",
     "uiAppMenu": "Do {{count}} vnosov, prikazanih pod »Vtičniki«.",

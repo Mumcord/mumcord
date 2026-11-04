@@ -368,6 +368,8 @@ pub struct PluginReviewOrigin {
     /// new website until `plugin_update_review_prepare` has read the new package: the registry
     /// index lists no purposes. Before `resolve_purposes` it holds the manifest's key.
     pub purpose: Option<String>,
+    /// A new website outside every domain the installed version already used.
+    pub other_domain: bool,
 }
 
 impl From<ReviewOrigin> for PluginReviewOrigin {
@@ -376,6 +378,7 @@ impl From<ReviewOrigin> for PluginReviewOrigin {
             origin: origin.origin,
             new: origin.new,
             purpose: origin.purpose,
+            other_domain: origin.other_domain,
         }
     }
 }
@@ -573,6 +576,7 @@ mod tests {
                 origin: "https://api.example".into(),
                 new: true,
                 purpose: Some("origins.api".into()),
+                other_domain: true,
             }],
             permission_effects: vec![PermissionEffect {
                 permission: "net.relay".into(),
@@ -594,6 +598,7 @@ mod tests {
             high_risk_confirmed: false,
         });
         assert!(review.origins[0].new);
+        assert!(review.origins[0].other_domain);
         assert_eq!(review.origins[0].purpose.as_deref(), Some("origins.api"));
         assert_eq!(review.permission_effects[0].points, 8);
         assert_eq!(review.recent_change.map(|r| r.trust_percent), Some(90));
@@ -615,6 +620,7 @@ mod tests {
             origin: origin.into(),
             new,
             purpose: purpose.map(Into::into),
+            other_domain: false,
         };
         let review = || PluginUpdateReview {
             origins: vec![

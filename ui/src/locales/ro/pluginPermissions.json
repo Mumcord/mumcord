@@ -59,7 +59,7 @@
     "chatPatterns": "Primește doar mesajele de chat din canalul tău care încep așa cum a declarat, de exemplu o configurație de joc lipită. Niciun alt text din chat nu ajunge la el.",
     "netHttp": "Poate vorbi cu un singur server ales de tine, și doar cu el.",
     "secrets": "Poate păstra un secret, precum o cheie API, în breasla de chei a sistemului.",
-    "uiWebview": "Poate afișa propriul conținut web într-un cadru izolat, fără acces la internet.",
+    "uiWebview": "Nu poate vedea Mumcord, fișierele tale, microfonul, camera sau clipboardul.",
     "uiStage": "Doar când o pornești sau te alături. Persoanele de pe canalul tău care au {{plugin}} se pot alătura.",
     "uiSidePanel": "Conținutul său apare într-o coloană lângă chat, doar când îl deschizi.",
     "uiAppMenu": "Până la {{count}} intrări, afișate sub „Pluginuri”.",

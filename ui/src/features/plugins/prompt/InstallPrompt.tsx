@@ -153,8 +153,17 @@ export function InstallPrompt({ plugin, suggestedBy = null, onClose }: InstallPr
       icon={<PluginIcon id={plugin.id} name={name} hasIcon={plugin.icon !== null} />}
       subtitle={
         <p className="plugin-prompt-source">
-          {sourceLabel(t, plugin.source)}
+          {plugin.source.kind === "official" ? (
+            sourceLabel(t, plugin.source)
+          ) : (
+            <span className="plugin-prompt-chip plugin-prompt-chip--unofficial">
+              {sourceLabel(t, plugin.source)}
+            </span>
+          )}
           {offer === null ? "" : ` · ${offer.version}`}
+          {offer !== null &&
+            offer.authors.length > 0 &&
+            ` · ${t("by", { authors: offer.authors.join(", ") })}`}
         </p>
       }
     >

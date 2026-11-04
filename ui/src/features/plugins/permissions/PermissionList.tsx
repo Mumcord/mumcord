@@ -58,7 +58,15 @@ function Row({
         {known ? PERMISSION_ICONS[id] : UNKNOWN_PERMISSION_ICON}
       </span>
       <span className="perm-body">
-        <span className="perm-text">{text}</span>
+        <span className="perm-text">
+          {text}
+          {risk === "red" && (
+            <>
+              {" "}
+              <span className="perm-risk-badge">{riskLabel}</span>
+            </>
+          )}
+        </span>
         {custom ?? (
           <>
             {explanation !== null && <span className="perm-reason">{explanation}</span>}
@@ -70,11 +78,7 @@ function Row({
           </>
         )}
       </span>
-      {risk === "red" ? (
-        <span className="perm-risk-badge">{riskLabel}</span>
-      ) : (
-        <span className="perm-sr-only">{riskLabel}</span>
-      )}
+      {risk !== "red" && <span className="perm-sr-only">{riskLabel}</span>}
     </>
   );
   if (toggle === undefined) {

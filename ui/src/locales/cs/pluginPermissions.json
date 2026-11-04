@@ -59,7 +59,7 @@
     "chatPatterns": "Dostává jen zprávy v chatu vašeho kanálu, které začínají tak, jak deklaruje, například vloženou herní sestavu. Žádný jiný text z chatu k němu nedorazí.",
     "netHttp": "Může komunikovat s jedním serverem, který zvolíte, a jen s ním.",
     "secrets": "Může uložit tajemství, například klíč API, do klíčenky systému.",
-    "uiWebview": "Může zobrazit vlastní webový obsah v uzavřeném rámu bez přístupu k internetu.",
+    "uiWebview": "Nevidí Mumcord, tvoje soubory, mikrofon, kameru ani schránku.",
     "uiStage": "Jen když ji spustíš nebo se k ní připojíš. Připojit se mohou lidé v tvém kanálu, kteří mají {{plugin}}.",
     "uiSidePanel": "Obsah se zobrazí ve sloupci vedle chatu, jen když ho otevřeš.",
     "uiAppMenu": "Až {{count}} položek, zobrazených pod „Doplňky“.",

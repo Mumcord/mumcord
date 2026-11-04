@@ -59,7 +59,7 @@
     "chatPatterns": "Se saa vain kanavasi chat-viestit, jotka alkavat sen ilmoittamalla tavalla, kuten liitetyn pelivarustuksen. Muuta chat-tekstiä se ei saa.",
     "netHttp": "Se voi puhua yhden valitsemasi palvelimen kanssa, ei muiden.",
     "secrets": "Se voi säilyttää salaisuuden, kuten API-avaimen, järjestelmän avainnipussa.",
-    "uiWebview": "Se voi näyttää omaa verkkosisältöä suljetussa kehyksessä ilman internetyhteyttä.",
+    "uiWebview": "Se ei näe Mumcordia, tiedostojasi, mikrofoniasi, kameraasi eikä leikepöytääsi.",
     "uiStage": "Vain kun käynnistät sen tai liityt siihen. Kanavasi käyttäjät, joilla on {{plugin}}, voivat liittyä.",
     "uiSidePanel": "Sen sisältö näkyy chatin vieressä sarakkeessa, vain kun avaat sen.",
     "uiAppMenu": "Enintään {{count}} kohdetta, näytetään kohdassa ”Lisäosat”.",

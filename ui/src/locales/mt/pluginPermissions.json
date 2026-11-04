@@ -59,7 +59,7 @@
     "chatPatterns": "Jirċievi biss il-messaġġi taċ-chat fil-kanal tiegħek li jibdew kif iddikjara, bħal konfigurazzjoni ta' logħba mwaħħla. L-ebda test ieħor taċ-chat ma jaslilu.",
     "netHttp": "Jista' jkellem server wieħed li tagħżel int, u dak biss.",
     "secrets": "Jista' jżomm sigriet, bħal ċavetta API, fil-keychain tas-sistema tiegħek.",
-    "uiWebview": "Jista' juri kontenut tal-web tiegħu stess f'qafas issiġillat mingħajr aċċess għall-internet.",
+    "uiWebview": "Ma jistax jara Mumcord, il-fajls, il-mikrofonu, il-kamera jew il-clipboard tiegħek.",
     "uiStage": "Biss meta tibdieh jew tingħaqad miegħu. In-nies fil-kanal tiegħek li għandhom {{plugin}} jistgħu jingħaqdu.",
     "uiSidePanel": "Il-kontenut tiegħu jidher f'kolonna ħdejn iċ-chat, biss meta tiftaħha.",
     "uiAppMenu": "Sa {{count}} elementi, murija taħt “Plugins”.",
