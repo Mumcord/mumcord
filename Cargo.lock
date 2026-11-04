@@ -4306,8 +4306,10 @@ dependencies = [
 name = "mumcord-store"
 version = "0.6.2"
 dependencies = [
+ "image",
  "keyring",
  "p12-keystore",
+ "rand 0.10.3",
  "rcgen",
  "rsa",
  "rusqlite",
