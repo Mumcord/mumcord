@@ -17,7 +17,7 @@
     "packetInspector": "Paketų tikrintuvas",
     "hotkeys": "Spartieji klavišai",
     "plugins": "Papildiniai",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Ekrano bendrinimas"
   },
   "sectionDescriptions": {
     "general": "Paleidimas, kalba, atnaujinimai ir prieinamumas.",
@@ -31,7 +31,7 @@
     "advanced": "Kūrėjų įrankiai, diagnostika, saugykla ir licencijos.",
     "about": "Versija, pagalba ir sąrankos vedlys.",
     "plugins": "Papildiniai veikia izoliuotoje aplinkoje ir gauna tik tai, ką leidžiate. Jie niekada nemato jūsų garso, failų ar sertifikato.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Ekrano bendrinimo kokybė, kodekas ir aparatinė įranga. Žiūrovai visada mato tai, ką pasirinkai prieš pradėdamas."
   },
   "breadcrumb": "Nustatymai / {{section}}",
   "moreInfo": "Daugiau informacijos: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "įspėjimai iššokantys langai",
     "externalContent": "įterpiniai paveikslėliai peržiūros",
     "fileSharing": "failai siųsti gauti atsisiųsti išsaugoti aplankas priedas zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "ekrano bendrinimas kokybė skiriamoji geba fps kodekas AV1 VP9 kodavimo įrenginys vaizdo plokštė"
   },
   "search": {
     "label": "Ieškoti nustatymų",
@@ -1069,5 +1069,62 @@
     "switch": "Kūrėjo režimas",
     "hint": "Prie papildinių prideda kortelę Kūrėjas, kurioje galima įkelti nepasirašytus papildinius iš aplanko. Įjunkite tik jei patys kuriate papildinius."
   },
-  "newBadge": "New"
+  "newBadge": "Nauja",
+  "screenShare": {
+    "newBadge": "Nauja",
+    "qualityTitle": "Numatytoji kokybė",
+    "resolution": "Skiriamoji geba",
+    "resolutionAuto": "Automatinė",
+    "resolutionHint": "Automatinis režimas pradeda nuo geriausios kokybės, kurią leidžia tavo siuntimo sparta ir žiūrovai, ir sumažina ją, kai šie nebespėja.",
+    "fps": "Kadrų dažnis",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimizuoti pagal",
+    "optimizeBalanced": "Subalansuota",
+    "optimizeText": "Ryškus tekstas (kodas, skaidrės)",
+    "optimizeMotion": "Sklandus judesys (žaidimai, vaizdo įrašai)",
+    "uploadLimit": "Siuntimo riba",
+    "uploadAuto": "Automatinė",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Daugiausia duomenų, kiek tavo transliacija iš viso siunčia. Naudinga bendrame ar ribotame ryšyje.",
+    "codecTitle": "Kodekas",
+    "codec": "Kodekas",
+    "codecAuto": "Automatinis (rekomenduojama)",
+    "codecAutoHint": "Pirmiausia AV1 vaizdo plokštėje, paskui AV1 procesoriuje, jei trumpas patikrinimas rodo, kad jis spėja, kitaip VP9. AV1 tik tada, kai jį gali atkurti visi žiūrovai.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Ryškiausias vaizdas naudojant tiek pat duomenų. Žiūrovai, kurie negali jo atkurti, gauna VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Tai, ką Mumcord naudojo iki šiol. Veikia visiems žiūrovams.",
+    "codecInfo": "Be vaizdo plokštės AV1 naudoja procesorių (SVT-AV1). Jei kompiuteris nespėja, Mumcord pereina prie VP9.",
+    "codecOlder": "Žiūrovai su senesne Mumcord versija visada gauna VP9, ką bepasirinktum.",
+    "hardwareTitle": "Aparatinis spartinimas",
+    "useGpu": "Naudoti vaizdo plokštę, kai įmanoma",
+    "useGpuHint": "AV1 koduojamas vaizdo plokštėje, todėl bendrinimas beveik neapkrauna procesoriaus. Išjungus AV1 naudoja procesorių.",
+    "statusList": "Kodavimo įrenginio būsena",
+    "av1Encode": "AV1 kodavimas",
+    "askEachTime": "Klausti šių nustatymų kiekvieną kartą, kai bendrinu",
+    "av1Playback": "AV1 atkūrimas",
+    "vp9Playback": "VP9 atkūrimas",
+    "playbackHardware": "Aparatinis",
+    "playbackSoftware": "Programinis",
+    "av1EncodeCpu": "AV1 kodavimas procesoriumi",
+    "vp9Encode": "VP9 kodavimas",
+    "gpuNvidia": "NVIDIA vaizdo plokštė",
+    "gpuAmd": "AMD vaizdo plokštė",
+    "gpuIntel": "Intel vaizdo plokštė",
+    "gpuUnknown": "Vaizdo plokštė",
+    "software": "Programinis",
+    "softwareLimit": "Programinis, spėja iki {{height}}p{{fps}}",
+    "notAvailable": "Nepasiekiama",
+    "checking": "Tikrinama…",
+    "active": "Aktyvus kodavimo įrenginys: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (procesorius)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (programinis)",
+    "skippedTooHeavy": "VP9 (AV1 per sunkus šiam kompiuteriui)",
+    "skippedOnBattery": "VP9 (naudojama baterija)",
+    "skippedAboveLimit": "VP9 (tavo vaizdas viršija tai, ką čia gali AV1)",
+    "softwareWarning": "AV1 veiks procesoriumi be išlaikyto patikrinimo ir gali būti per sunkus šiam kompiuteriui.",
+    "checkAgain": "Tikrinti dar kartą"
+  }
 }

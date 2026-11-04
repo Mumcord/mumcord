@@ -1146,3 +1146,88 @@
   text-align: end;
   color: var(--color-text-secondary);
 }
+
+/* "New" pill after a side-list entry (screen sharing tab). */
+.settings__tab-new {
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+  font-size: var(--font-size-xs);
+}
+
+/* Screen sharing tab: codec hints under their option and the encoder list. */
+.settings-radios--hinted .settings-radios__row {
+  flex-wrap: wrap;
+}
+
+.settings-radios--hinted .settings-radios__row .settings-hint {
+  flex-basis: 100%;
+  margin: 0 0 var(--space-1) 1.6rem;
+}
+
+.settings-infoline {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.settings-infoline svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--color-accent-text);
+}
+
+.settings-hwlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-chat);
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+
+.settings-hwlist__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+.settings-hwlist__value {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  color: var(--color-text-muted);
+}
+
+.settings-hwlist__value[data-ok] {
+  color: var(--color-success);
+}
+
+@media (forced-colors: active) {
+  .settings__tab-new,
+  .settings-infoline,
+  .settings-hwlist {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .settings-infoline svg,
+  .settings-hwlist__value,
+  .settings-hwlist__value[data-ok],
+  .settings-hwlist__row {
+    color: CanvasText;
+  }
+}

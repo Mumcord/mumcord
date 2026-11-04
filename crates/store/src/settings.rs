@@ -828,6 +828,8 @@ pub struct Settings {
     pub screen_optimize: ScreenOptimize,
     pub screen_codec: ScreenCodec,
     pub screen_upload_limit: ScreenUploadLimit,
+    /// Open the share start dialog before every share; off starts with the saved defaults.
+    pub screen_ask_each_time: bool,
     /// Share the shared app's sound along with the picture.
     pub screen_sound: bool,
     /// Allow hardware encoders; off forces the software encoder.
@@ -937,6 +939,7 @@ impl Default for Settings {
             screen_optimize: ScreenOptimize::default(),
             screen_codec: ScreenCodec::default(),
             screen_upload_limit: ScreenUploadLimit::default(),
+            screen_ask_each_time: true,
             screen_sound: true,
             screen_use_gpu: true,
             plugins: PluginSettings::default(),
@@ -1671,7 +1674,7 @@ mod tests {
     fn files_and_screen_settings_default_and_persist() {
         let (_dir, store) = temp_store();
         let s = store.settings().expect("load");
-        assert!(s.files_receive && s.screen_sound && s.screen_use_gpu);
+        assert!(s.files_receive && s.screen_sound && s.screen_use_gpu && s.screen_ask_each_time);
         assert_eq!(s.files_max_size, FilesMaxSize::G1);
         assert_eq!(s.files_max_size.bytes(), 1 << 30);
         assert_eq!(s.files_save_folder, None);

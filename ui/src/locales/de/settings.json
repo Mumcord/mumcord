@@ -17,7 +17,7 @@
     "packetInspector": "Paketinspektor",
     "hotkeys": "Tastenkürzel",
     "plugins": "Plugins",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Bildschirmfreigabe"
   },
   "sectionDescriptions": {
     "general": "Start, Sprache, Updates und Barrierefreiheit.",
@@ -31,7 +31,7 @@
     "advanced": "Entwicklerwerkzeuge, Diagnose, Speicher und Lizenzen.",
     "about": "Version, Support und der Einrichtungsassistent.",
     "plugins": "Plugins laufen in einer Sandbox und bekommen nur, was du erlaubst. Sie sehen nie dein Audio, deine Dateien oder dein Zertifikat.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Qualität, Codec und Hardware für die Freigabe deines Bildschirms. Zuschauer sehen immer das, was du auswählst, bevor du startest."
   },
   "breadcrumb": "Einstellungen / {{section}}",
   "moreInfo": "Mehr Informationen: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "Hinweise Pop-ups",
     "externalContent": "Einbettungen Bilder Vorschauen",
     "fileSharing": "dateien senden empfangen herunterladen speichern ordner anhang zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "Bildschirmfreigabe Qualität Auflösung fps Videocodec AV1 VP9 Encoder Grafikkarte"
   },
   "search": {
     "label": "Einstellungen durchsuchen",
@@ -1053,5 +1053,62 @@
     "switch": "Entwicklermodus",
     "hint": "Fügt den Plugins einen Entwickler-Tab hinzu, in dem du unsignierte Plugins aus einem Ordner laden kannst. Schalte ihn nur ein, wenn du selbst Plugins baust."
   },
-  "newBadge": "New"
+  "newBadge": "Neu",
+  "screenShare": {
+    "newBadge": "Neu",
+    "qualityTitle": "Standardqualität",
+    "resolution": "Auflösung",
+    "resolutionAuto": "Automatisch",
+    "resolutionHint": "Automatisch startet mit der besten Qualität, die dein Upload und deine Zuschauer zulassen, und schaltet herunter, wenn sie nicht mithalten.",
+    "fps": "Bildrate",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimieren für",
+    "optimizeBalanced": "Ausgewogen",
+    "optimizeText": "Scharfer Text (Code, Folien)",
+    "optimizeMotion": "Flüssige Bewegung (Spiele, Video)",
+    "uploadLimit": "Upload-Limit",
+    "uploadAuto": "Automatisch",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Das Maximum, das deine Freigabe insgesamt sendet. Nützlich bei geteilter oder getakteter Verbindung.",
+    "codecTitle": "Videocodec",
+    "codec": "Videocodec",
+    "codecAuto": "Automatisch (empfohlen)",
+    "codecAutoHint": "Zuerst AV1 auf deiner Grafikkarte, dann AV1 auf dem Prozessor, falls ein kurzer Test zeigt, dass er mithält, sonst VP9. AV1 nur, wenn alle Zuschauer es abspielen können.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Schärfstes Bild bei gleicher Datenmenge. Zuschauer, die es nicht abspielen können, bekommen VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Das hat Mumcord bisher verwendet. Funktioniert für alle Zuschauer.",
+    "codecInfo": "Ohne Grafikkarte nutzt AV1 den Prozessor (SVT-AV1). Mumcord wechselt zu VP9, wenn dein Computer nicht mithalten kann.",
+    "codecOlder": "Zuschauer mit einem älteren Mumcord bekommen immer VP9, egal was du auswählst.",
+    "hardwareTitle": "Hardwarebeschleunigung",
+    "useGpu": "Grafikkarte verwenden, wenn verfügbar",
+    "useGpuHint": "Kodiert AV1 auf deiner Grafikkarte, sodass die Freigabe fast keine CPU-Leistung kostet. Aus: AV1 nutzt den Prozessor.",
+    "statusList": "Encoder-Status",
+    "av1Encode": "AV1-Kodierung",
+    "askEachTime": "Bei jeder Freigabe nach diesen Einstellungen fragen",
+    "av1Playback": "AV1-Wiedergabe",
+    "vp9Playback": "VP9-Wiedergabe",
+    "playbackHardware": "Hardwarebeschleunigt",
+    "playbackSoftware": "Softwarebasiert",
+    "av1EncodeCpu": "AV1-Kodierung auf dem Prozessor",
+    "vp9Encode": "VP9-Kodierung",
+    "gpuNvidia": "NVIDIA-Grafikkarte",
+    "gpuAmd": "AMD-Grafikkarte",
+    "gpuIntel": "Intel-Grafikkarte",
+    "gpuUnknown": "Grafikkarte",
+    "software": "Softwarebasiert",
+    "softwareLimit": "Softwarebasiert, schafft bis zu {{height}}p{{fps}}",
+    "notAvailable": "Nicht verfügbar",
+    "checking": "Wird geprüft…",
+    "active": "Aktiver Encoder: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (Prozessor)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (softwarebasiert)",
+    "skippedTooHeavy": "VP9 (AV1 zu schwer für diesen PC)",
+    "skippedOnBattery": "VP9 (im Akkubetrieb)",
+    "skippedAboveLimit": "VP9 (dein Bild liegt über dem, was AV1 hier schafft)",
+    "softwareWarning": "AV1 läuft ohne bestandenen Test auf dem Prozessor und ist für diesen PC möglicherweise zu schwer.",
+    "checkAgain": "Erneut prüfen"
+  }
 }

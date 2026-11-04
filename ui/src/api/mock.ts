@@ -394,6 +394,7 @@ const DEFAULT_SETTINGS: Settings = {
   screenCodec: "auto",
   screenUploadLimit: "auto",
   screenSound: true,
+  screenAskEachTime: true,
   screenUseGpu: true,
 };
 

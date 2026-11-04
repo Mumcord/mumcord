@@ -17,7 +17,7 @@
     "packetInspector": "Inspektor pakietów",
     "hotkeys": "Skróty klawiszowe",
     "plugins": "Wtyczki",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Udostępnianie ekranu"
   },
   "sectionDescriptions": {
     "general": "Uruchamianie, język, aktualizacje i dostępność.",
@@ -31,7 +31,7 @@
     "advanced": "Narzędzia deweloperskie, diagnostyka, pamięć i licencje.",
     "about": "Wersja, pomoc i kreator konfiguracji.",
     "plugins": "Wtyczki działają w piaskownicy i dostają tylko to, na co pozwolisz. Nigdy nie widzą twojego dźwięku, plików ani certyfikatu.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Jakość, kodek i sprzęt do udostępniania ekranu. Widzowie zawsze widzą to, co wybierzesz, zanim zaczniesz."
   },
   "breadcrumb": "Ustawienia / {{section}}",
   "moreInfo": "Więcej informacji: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "powiadomienia wyskakujące okna",
     "externalContent": "osadzone treści obrazy podglądy",
     "fileSharing": "pliki wyślij odbierz pobierz zapisz folder załącznik zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "udostępnianie ekranu jakość rozdzielczość fps kodek AV1 VP9 enkoder karta graficzna"
   },
   "search": {
     "label": "Szukaj w ustawieniach",
@@ -1069,5 +1069,62 @@
     "switch": "Tryb dewelopera",
     "hint": "Dodaje do wtyczek kartę Deweloper, w której możesz wczytać niepodpisane wtyczki z folderu. Włącz ją tylko, jeśli sam tworzysz wtyczki."
   },
-  "newBadge": "New"
+  "newBadge": "Nowość",
+  "screenShare": {
+    "newBadge": "Nowość",
+    "qualityTitle": "Domyślna jakość",
+    "resolution": "Rozdzielczość",
+    "resolutionAuto": "Automatyczna",
+    "resolutionHint": "Automatyczna zaczyna od najlepszej jakości, na jaką pozwalają Twoje wysyłanie i widzowie, i obniża ją, gdy nie nadążają.",
+    "fps": "Liczba klatek",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optymalizuj pod kątem",
+    "optimizeBalanced": "Zrównoważone",
+    "optimizeText": "Ostry tekst (kod, slajdy)",
+    "optimizeMotion": "Płynny ruch (gry, wideo)",
+    "uploadLimit": "Limit wysyłania",
+    "uploadAuto": "Automatyczny",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Maksimum, jakie Twoje udostępnianie wysyła łącznie. Przydatne przy współdzielonym lub limitowanym łączu.",
+    "codecTitle": "Kodek wideo",
+    "codec": "Kodek wideo",
+    "codecAuto": "Automatyczny (zalecany)",
+    "codecAutoHint": "Najpierw AV1 na karcie graficznej, potem AV1 na procesorze, jeśli krótki test pokaże, że nadąża, w przeciwnym razie VP9. AV1 tylko wtedy, gdy każdy widz może go odtworzyć.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Najostrzejszy obraz przy tej samej ilości danych. Widzowie, którzy nie mogą go odtworzyć, dostają VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Tego Mumcord używał dotychczas. Działa dla każdego widza.",
+    "codecInfo": "Bez karty graficznej AV1 używa procesora (SVT-AV1). Mumcord przełącza się na VP9, jeśli komputer nie nadąża.",
+    "codecOlder": "Widzowie ze starszym Mumcordem zawsze dostają VP9, niezależnie od Twojego wyboru.",
+    "hardwareTitle": "Akceleracja sprzętowa",
+    "useGpu": "Używaj karty graficznej, gdy jest dostępna",
+    "useGpuHint": "Koduje AV1 na karcie graficznej, więc udostępnianie prawie nie obciąża CPU. Wyłączone: AV1 używa procesora.",
+    "statusList": "Stan enkodera",
+    "av1Encode": "Kodowanie AV1",
+    "askEachTime": "Pytaj o te ustawienia przy każdym udostępnianiu",
+    "av1Playback": "Odtwarzanie AV1",
+    "vp9Playback": "Odtwarzanie VP9",
+    "playbackHardware": "Sprzętowo",
+    "playbackSoftware": "Programowo",
+    "av1EncodeCpu": "Kodowanie AV1 na procesorze",
+    "vp9Encode": "Kodowanie VP9",
+    "gpuNvidia": "Karta graficzna NVIDIA",
+    "gpuAmd": "Karta graficzna AMD",
+    "gpuIntel": "Karta graficzna Intel",
+    "gpuUnknown": "Karta graficzna",
+    "software": "Programowo",
+    "softwareLimit": "Programowo, wytrzymuje do {{height}}p{{fps}}",
+    "notAvailable": "Niedostępne",
+    "checking": "Sprawdzanie…",
+    "active": "Aktywny enkoder: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (procesor)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (programowo)",
+    "skippedTooHeavy": "VP9 (AV1 zbyt ciężki dla tego komputera)",
+    "skippedOnBattery": "VP9 (zasilanie z baterii)",
+    "skippedAboveLimit": "VP9 (Twój obraz przekracza to, z czym AV1 tu sobie radzi)",
+    "softwareWarning": "AV1 będzie działać na procesorze bez zaliczonego testu i może być zbyt ciężki dla tego komputera.",
+    "checkAgain": "Sprawdź ponownie"
+  }
 }

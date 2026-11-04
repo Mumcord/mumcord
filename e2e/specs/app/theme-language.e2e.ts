@@ -131,6 +131,9 @@ const neutral = (t: string) =>
   /^dev~[\w.-]+$/.test(t) ||
   // Pixel values like "240 px" (and the bare unit) are not translated.
   /^(\d+\s*)?px$/.test(t) ||
+  // Frame rates ("30 fps") and video codec names read the same in every language.
+  /^(\d+ )?fps$/.test(t) ||
+  /^(AV1|VP9)$/.test(t) ||
   /^(Mumcord|Lobby|Raid|AFK|Root|Chat|Audio|Normal|Port|Version|System|Name|Overlay|Position|Support|C7Lang\w*|localhost.*|OK|Opus|UDP|TCP|TLS|mumble:\/\/.*|v?\d[\w.-]*|https?:\/\/.*|\w+@\w+.*)$/i.test(t);
 
 describe("AC-1.26 theme follows OS + manual override", () => {

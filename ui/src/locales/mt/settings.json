@@ -17,7 +17,7 @@
     "packetInspector": "Ispettur tal-pakketti",
     "hotkeys": "Shortcuts",
     "plugins": "Plagins",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Qsim tal-iskrin"
   },
   "sectionDescriptions": {
     "general": "Tnedija, lingwa, aġġornamenti u aċċessibbiltà.",
@@ -31,7 +31,7 @@
     "advanced": "Għodod għall-iżviluppaturi, dijanjostika, ħażna u liċenzji.",
     "about": "Verżjoni, appoġġ u l-wizard tas-setup.",
     "plugins": "Il-plugins jaħdmu f'sandbox u jirċievu biss dak li tippermetti. Qatt ma jaraw l-awdjo, il-fajls jew iċ-ċertifikat tiegħek.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Kwalità, kodek u ħardwer biex taqsam l-iskrin tiegħek. Dawk li jaraw dejjem jaraw dak li tagħżel qabel tibda."
   },
   "breadcrumb": "Settings / {{section}}",
   "moreInfo": "Aktar informazzjoni: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "twissijiet pop-ups",
     "externalContent": "embeds immaġini previews",
     "fileSharing": "fajls ibgħat irċievi niżżel sejvja folder anness zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "qsim tal-iskrin kwalità riżoluzzjoni fps kodek AV1 VP9 enkoder karta grafika"
   },
   "search": {
     "label": "Fittex fis-settings",
@@ -1077,5 +1077,62 @@
     "switch": "Modalità tal-iżviluppatur",
     "hint": "Iżid tab Żviluppatur mal-Plagins fejn tista' tgħabbi plagins mhux iffirmati minn folder. Ixgħelha biss jekk tibni l-plagins int stess."
   },
-  "newBadge": "New"
+  "newBadge": "Ġdid",
+  "screenShare": {
+    "newBadge": "Ġdid",
+    "qualityTitle": "Kwalità awtomatika",
+    "resolution": "Riżoluzzjoni",
+    "resolutionAuto": "Awtomatiku",
+    "resolutionHint": "L-awtomatiku jibda bl-aħjar kwalità li jippermettu l-upload tiegħek u dawk li jaraw, u jinżel meta ma jifilħux.",
+    "fps": "Rata tal-frejms",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Ottimizza għal",
+    "optimizeBalanced": "Bilanċjat",
+    "optimizeText": "Test ċar (kodiċi, slajds)",
+    "optimizeMotion": "Moviment bla xkiel (logħob, vidjo)",
+    "uploadLimit": "Limitu tal-upload",
+    "uploadAuto": "Awtomatiku",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "L-aktar li l-qsim tiegħek jibgħat b'kollox. Utli fuq konnessjoni maqsuma jew b'limitu tad-data.",
+    "codecTitle": "Kodek",
+    "codec": "Kodek",
+    "codecAuto": "Awtomatiku (rakkomandat)",
+    "codecAutoHint": "L-ewwel AV1 fuq il-karta grafika, imbagħad AV1 fuq il-proċessur jekk verifika qasira turi li jifilħu, inkella VP9. AV1 biss meta kull min jara jista' jixxegħlu.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "L-aktar immaġni ċara bl-istess data. Dawk li ma jistgħux jixxegħluh jieħdu VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Dak li Mumcord uża s'issa. Jaħdem għal kull min jara.",
+    "codecInfo": "Mingħajr karta grafika, AV1 juża l-proċessur (SVT-AV1). Mumcord jaqleb għal VP9 jekk il-kompjuter tiegħek ma jifilħx.",
+    "codecOlder": "Dawk li jaraw b'Mumcord eqdem dejjem jieħdu VP9, kemm-il darba tagħżel.",
+    "hardwareTitle": "Aċċelerazzjoni bil-ħardwer",
+    "useGpu": "Uża l-karta grafika meta tkun disponibbli",
+    "useGpuHint": "Jikkodifika AV1 fuq il-karta grafika, għalhekk il-qsim kważi ma jiswa xejn CPU. Mitfi: AV1 juża l-proċessur.",
+    "statusList": "Stat tal-enkoder",
+    "av1Encode": "Kodifikazzjoni AV1",
+    "askEachTime": "Staqsini għal dawn l-issettjar kull darba li naqsam",
+    "av1Playback": "Riproduzzjoni AV1",
+    "vp9Playback": "Riproduzzjoni VP9",
+    "playbackHardware": "Ħardwer",
+    "playbackSoftware": "Softwer",
+    "av1EncodeCpu": "Kodifikazzjoni AV1 fuq il-proċessur",
+    "vp9Encode": "Kodifikazzjoni VP9",
+    "gpuNvidia": "Karta grafika NVIDIA",
+    "gpuAmd": "Karta grafika AMD",
+    "gpuIntel": "Karta grafika Intel",
+    "gpuUnknown": "Karta grafika",
+    "software": "Softwer",
+    "softwareLimit": "Softwer, jifilħu sa {{height}}p{{fps}}",
+    "notAvailable": "Mhux disponibbli",
+    "checking": "Qed jiġi vverifikat…",
+    "active": "Enkoder attiv: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (proċessur)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (softwer)",
+    "skippedTooHeavy": "VP9 (AV1 tqil wisq għal dan il-PC)",
+    "skippedOnBattery": "VP9 (fuq il-batterija)",
+    "skippedAboveLimit": "VP9 (l-immaġni tiegħek hija ogħla minn dak li AV1 jimmaniġġja hawn)",
+    "softwareWarning": "AV1 se jaħdem fuq il-proċessur mingħajr verifika li għaddiet u jista' jkun tqil wisq għal dan il-PC.",
+    "checkAgain": "Iċċekkja mill-ġdid"
+  }
 }
