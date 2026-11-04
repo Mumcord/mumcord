@@ -7,4 +7,5 @@ export { SharerBar } from "./SharerBar";
 export { ShareMiniBar } from "./ShareMiniBar";
 export { Viewers, MAX_VIEWERS } from "./Viewers";
 export { useShareActions } from "./useShareActions";
+export { ShareStartDialog } from "./start/ShareStartDialog";
 export { shareBlockText } from "./availability";
