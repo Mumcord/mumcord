@@ -1,6 +1,6 @@
 /**
  * "Apps" button left of the image picker (FR-2.65) with a menu of start actions: "Share screen"
- * (or pause, stop and viewers while sharing) and "Watch together" (paste a YouTube link). Shown
+ * (or pause, stop and viewers while sharing) and "Watch together" (paste a YouTube link), then the plugins' items (FR-9.53). Shown
  * only in the chat of the channel the user is in by voice; disabled entries show their reason.
  */
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
@@ -17,6 +17,7 @@ import {
   useShareActions,
 } from "../screenshare";
 import { WatchLinkDialog, useWatchParty } from "../watchparty";
+import { PluginMenuItems } from "../plugins/appmenu";
 import "./chatActionRow.css";
 
 const APPS_ICON = "M5 5h5v5H5zM14 5h5v5h-5zM5 14h5v5H5zM14 14h5v5h-5z";
@@ -200,6 +201,11 @@ export function ChatActionRow() {
             setOpen(true);
           })}
           {embedsOff && openPrivacy !== null && item(tParty("openPrivacy"), null, openPrivacy)}
+          <PluginMenuItems
+            onChosen={() => {
+              closeMenu(true);
+            }}
+          />
         </div>
       )}
       {shareActions.failed !== null && (
