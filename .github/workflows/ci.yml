@@ -94,6 +94,26 @@ jobs:
     name: Dependency checks
     uses: ./.github/workflows/dependency-audit.yml
 
+  # The plugin SDK bundles a prebuilt Bovnar library for wasm32 (spec FR-9.96). Rebuild it from
+  # the Bovnar version pinned in Cargo.lock with the pinned compiler and fail when it, or its
+  # licence files, differ from the committed copies. Cheap, so it runs outside the changes gate.
+  bovnar-wasm:
+    name: Bundled Bovnar library
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Rebuild and compare
+        run: |
+          scripts/build-bovnar-wasm.sh "$RUNNER_TEMP/bovnar-wasm"
+          for f in libbovnar_wasm.a LICENSE THIRD_PARTY_NOTICES.md; do
+            cmp "$RUNNER_TEMP/bovnar-wasm/$f" "crates/plugin-sdk/bovnar-wasm/$f" || {
+              echo "::error::crates/plugin-sdk/bovnar-wasm/$f does not match the pinned Bovnar; run scripts/build-bovnar-wasm.sh"
+              exit 1
+            }
+          done
+
   # Two jobs per OS that run side by side, each about half the old single job: "check" (format,
   # clippy, the app build on Windows/macOS and the CI script tests) and "test" (cargo test). They
   # build different artifacts (check metadata vs. test binaries), so each keeps its own cache.
