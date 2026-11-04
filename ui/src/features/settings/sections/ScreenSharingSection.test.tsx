@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockApi, setApi, type Settings } from "../../../api";
 import { applyLanguage } from "../../../i18n";
+import { chooseOption, optionLabels } from "../../../components/SelectTestUtils";
 import { axeViolations } from "../../../test/axe";
 import { CodecCard, HardwareCard, QualityDefaultsCard } from "./ScreenSharingSection";
 
@@ -33,22 +34,14 @@ describe("Screen sharing settings (FR-7.60)", () => {
     const update = vi.fn();
     render(<Page update={update} />);
     const resolution = screen.getByRole("combobox", { name: "Resolution" });
-    expect(Array.from((resolution as HTMLSelectElement).options).map((o) => o.text)).toEqual([
-      "Auto",
-      "720p",
-      "1080p",
-      "1440p",
-    ]);
-    fireEvent.change(resolution, { target: { value: "1080" } });
-    fireEvent.change(screen.getByRole("combobox", { name: "Frame rate" }), {
-      target: { value: "60" },
-    });
-    fireEvent.change(screen.getByRole("combobox", { name: "Optimize for" }), {
-      target: { value: "text" },
-    });
-    fireEvent.change(screen.getByRole("combobox", { name: "Upload limit" }), {
-      target: { value: "5" },
-    });
+    expect(optionLabels(resolution)).toEqual(["Auto", "720p", "1080p", "1440p"]);
+    chooseOption(resolution, "1080p");
+    chooseOption(screen.getByRole("combobox", { name: "Frame rate" }), "60 fps");
+    chooseOption(
+      screen.getByRole("combobox", { name: "Optimize for" }),
+      "Sharp text (code, slides)",
+    );
+    chooseOption(screen.getByRole("combobox", { name: "Upload limit" }), "5 Mbit/s");
     expect(update.mock.calls).toEqual([
       [{ screenResolution: "1080" }],
       [{ screenFps: "60" }],

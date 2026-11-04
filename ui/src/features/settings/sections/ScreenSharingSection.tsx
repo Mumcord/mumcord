@@ -11,6 +11,7 @@ import {
   type ScreenUploadLimit,
 } from "../../../api";
 import type { VideoCodec } from "../../../bindings/commands";
+import { Select } from "../../../components/Select";
 import { webCodecsCodecs } from "../../../api/screenFrames";
 import { Group } from "../components/Section";
 import { SettingsIcon } from "../components/SettingsIcon";
@@ -62,22 +63,16 @@ function SelectRow<T extends string>({
   return (
     <div className="settings-control-row">
       <label htmlFor={id}>{label}</label>
-      <select
+      <Select
         id={id}
-        className="settings-input settings-input--compact"
         value={value}
-        aria-describedby={describedBy}
-        onChange={(event) => {
-          const next = options.find((option) => option.value === event.target.value);
-          if (next !== undefined) onChange(next.value);
+        describedBy={describedBy}
+        options={options}
+        onChange={(next) => {
+          const option = options.find((candidate) => candidate.value === next);
+          if (option !== undefined) onChange(option.value);
         }}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      />
     </div>
   );
 }

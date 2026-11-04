@@ -11,6 +11,8 @@ interface SelectProps {
   id?: string;
   /** Accessible name when there is no visible label. */
   ariaLabel?: string;
+  /** Id of a hint that describes the control. */
+  describedBy?: string | undefined;
   value: string;
   options: readonly SelectOption[];
   onChange: (value: string) => void;
@@ -25,6 +27,7 @@ interface SelectProps {
 export function Select({
   id,
   ariaLabel,
+  describedBy,
   value,
   options,
   onChange,
@@ -155,6 +158,7 @@ export function Select({
         role="combobox"
         className="select__button"
         aria-label={ariaLabel}
+        aria-describedby={describedBy}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
