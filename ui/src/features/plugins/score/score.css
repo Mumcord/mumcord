@@ -211,3 +211,20 @@
   gap: var(--space-2);
   justify-content: space-between;
 }
+
+/* Forced colours drop background colours, so the meter fill and band edges use system colours. */
+@media (forced-colors: active) {
+  .risk-meter__track {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .risk-meter__fill {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  .risk-meter__tick {
+    background: CanvasText;
+  }
+}

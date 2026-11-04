@@ -27,7 +27,7 @@
     "chatPatterns": "Atpazīt noteiktas tērzēšanas ziņas, piem., ielīmētas spēles konfigurācijas",
     "netHttp": "Sazināties ar jūsu izvēlētu serveri",
     "secrets": "Glabāt noslēpumu (piem., API atslēgu) jūsu sistēmas atslēgu saišķī",
-    "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī (bez interneta)",
+    "uiWebview": "Rādīt savu tīmekļa saturu izolētā rāmī",
     "uiStage": "Rādīt aktivitāti mediju zonā",
     "uiSidePanel": "Rādīt savu saturu sānu panelī",
     "uiAppMenu": "Pievienot vienumus lietotņu izvēlnei",

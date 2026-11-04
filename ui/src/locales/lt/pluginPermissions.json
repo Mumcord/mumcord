@@ -27,7 +27,7 @@
     "chatPatterns": "Atpažinti tam tikras pokalbių žinutes, pvz., įklijuotas žaidimo komplektacijas",
     "netHttp": "Bendrauti su jūsų pasirinktu serveriu",
     "secrets": "Saugoti paslaptį (pvz., API raktą) jūsų sistemos raktų pakabuke",
-    "uiWebview": "Rodyti savo žiniatinklio turinį izoliuotame rėmelyje (be interneto)",
+    "uiWebview": "Rodyti savo žiniatinklio turinį izoliuotame rėmelyje",
     "uiStage": "Rodyti veiklą medijos srityje",
     "uiSidePanel": "Rodyti savo turinį šoniniame skydelyje",
     "uiAppMenu": "Pridėti elementų į Programėlių meniu",

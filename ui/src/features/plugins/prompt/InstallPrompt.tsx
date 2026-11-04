@@ -107,9 +107,9 @@ export function InstallPrompt({ plugin, suggestedBy = null, onClose }: InstallPr
   const gate = check?.kind === "ready" ? check.gate : null;
   const repository = plugin.source.kind === "repo" ? plugin.source.name : null;
   const permissions = offer === null ? [] : requestedOf(offer).map((p) => p.id);
-  // The verified package's websites with purposes are not part of the offer yet; until then the
-  // listing's websites are shown without a purpose.
-  const origins: PromptOrigin[] = plugin.origins.map((origin) => ({ origin, purpose: null }));
+  // The verified package's websites with their purposes; until it is checked, the listing's.
+  const origins: PromptOrigin[] =
+    offer === null ? plugin.origins.map((origin) => ({ origin, purpose: null })) : offer.origins;
   const rowDetails = usePromptRowDetails({ pluginName: name, repository, permissions, origins });
   const needsTick = gate !== null && gate.confirm !== null && !gate.blockedBySafety;
   const canInstall =
@@ -149,6 +149,7 @@ export function InstallPrompt({ plugin, suggestedBy = null, onClose }: InstallPr
       title={t("prompt.title", { name })}
       onClose={close}
       className="plugin-prompt"
+      focusTitle
       icon={<PluginIcon id={plugin.id} name={name} hasIcon={plugin.icon !== null} />}
       subtitle={
         <p className="plugin-prompt-source">

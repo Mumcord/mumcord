@@ -47,12 +47,14 @@ export function ScoreChip({
     return (
       <span className="risk-chip" data-level="blocked">
         <ShieldIcon kind="blocked" size={iconSize} />
-        <span aria-hidden="true">
-          {refused ? t("legend.cannotInstall") : t("legend.blockedSetting")}
-        </span>
-        <span className="visually-hidden">
-          {refused ? t("hardStop.title") : t("blocked.setting")}
-        </span>
+        {refused ? (
+          <>
+            <span aria-hidden="true">{t("legend.cannotInstall")}</span>
+            <span className="visually-hidden">{t("hardStop.title")}</span>
+          </>
+        ) : (
+          <span>{t("blocked.setting")}</span>
+        )}
       </span>
     );
   }

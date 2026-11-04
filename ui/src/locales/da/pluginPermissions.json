@@ -27,7 +27,7 @@
     "chatPatterns": "Genkende bestemte chatbeskeder, f.eks. indsatte spil-fits",
     "netHttp": "Tale med en server, du vælger",
     "secrets": "Gemme en hemmelighed (f.eks. en API-nøgle) i dit systems nøglering",
-    "uiWebview": "Vise eget webindhold i en lukket ramme (uden internet)",
+    "uiWebview": "Vise eget webindhold i en lukket ramme",
     "uiStage": "Vise en aktivitet i medieområdet",
     "uiSidePanel": "Vise eget indhold i et sidepanel",
     "uiAppMenu": "Tilføje punkter til Apps-menuen",

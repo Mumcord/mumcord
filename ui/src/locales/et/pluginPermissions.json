@@ -27,7 +27,7 @@
     "chatPatterns": "Tuvastada teatud vestlussõnumeid, nt kleebitud mänguvarustusi",
     "netHttp": "Suhelda sinu valitud serveriga",
     "secrets": "Hoida saladust (nt API-võtit) sinu süsteemi võtmehoidjas",
-    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis (ilma internetita)",
+    "uiWebview": "Kuvada oma veebisisu isoleeritud raamis",
     "uiStage": "Näita tegevust meediaalal",
     "uiSidePanel": "Näita oma sisu külgpaneelis",
     "uiAppMenu": "Lisa kirjeid rakenduste menüüsse",

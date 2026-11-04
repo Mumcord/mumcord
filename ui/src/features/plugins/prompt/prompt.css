@@ -1,7 +1,7 @@
 /* Install prompt and plugin toasts. Colours come from theme tokens only. */
 .plugin-prompt {
-  /* Wide enough for the visibility control to sit beside its explanation. */
-  width: min(36rem, calc(100vw - 2 * var(--space-4)));
+  /* Wide enough for the score chip line (score mockup 03) and the visibility control. */
+  width: min(40rem, calc(100vw - 2 * var(--space-4)));
   max-width: none;
 }
 

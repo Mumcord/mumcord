@@ -27,7 +27,7 @@
     "chatPatterns": "Bestimmte Chatnachrichten erkennen, z. B. eingefügte Spiel-Fittings",
     "netHttp": "Mit einem Server deiner Wahl kommunizieren",
     "secrets": "Ein Geheimnis (z. B. einen API-Schlüssel) im Schlüsselbund deines Systems speichern",
-    "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen (ohne Internet)",
+    "uiWebview": "Eigene Webinhalte in einem abgeschotteten Rahmen anzeigen",
     "uiStage": "Eine Aktivität im Medienbereich anzeigen",
     "uiSidePanel": "Eigene Inhalte in einer Seitenleiste anzeigen",
     "uiAppMenu": "Einträge zum Apps-Menü hinzufügen",

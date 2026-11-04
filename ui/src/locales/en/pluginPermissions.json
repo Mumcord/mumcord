@@ -27,7 +27,7 @@
     "chatPatterns": "Recognise certain chat messages, such as pasted game fits",
     "netHttp": "Talk to a server you choose",
     "secrets": "Keep a secret (e.g. an API key) in your system keychain",
-    "uiWebview": "Show its own web content in a sealed frame (no internet)",
+    "uiWebview": "Show its own content in a sealed frame",
     "uiStage": "Show an activity in the media area",
     "uiSidePanel": "Show its own content in a side panel",
     "uiAppMenu": "Add items to the Apps menu",

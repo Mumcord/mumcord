@@ -27,7 +27,7 @@
     "chatPatterns": "Rozpoznávať určité správy v chate, napr. vložené herné zostavy",
     "netHttp": "Komunikovať so serverom, ktorý si vyberiete",
     "secrets": "Uložiť tajomstvo (napr. kľúč API) do zväzku kľúčov systému",
-    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme (bez internetu)",
+    "uiWebview": "Zobraziť vlastný webový obsah v izolovanom ráme",
     "uiStage": "Zobraziť aktivitu v mediálnej oblasti",
     "uiSidePanel": "Zobraziť vlastný obsah v bočnom paneli",
     "uiAppMenu": "Pridať položky do ponuky aplikácií",

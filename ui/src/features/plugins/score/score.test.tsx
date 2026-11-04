@@ -67,7 +67,6 @@ describe("ScoreChip", () => {
     expect(container.textContent).toContain("Can't be installed");
     expect(container.textContent).not.toMatch(/\d/);
     rerender(<ScoreChip scored={{ kind: "scored", score: overlay }} blocked />);
-    expect(container.textContent).toContain("Blocked by your setting");
     expect(container.textContent).toContain("Blocked by your safety setting");
     expect(container.textContent).not.toMatch(/\d/);
   });

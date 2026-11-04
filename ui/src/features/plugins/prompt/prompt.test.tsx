@@ -224,6 +224,10 @@ function gated(
     id: "brawl",
     version: "2.1.0",
     required: ["ui.webview", "net.origins", "ui.stage"],
+    origins: [
+      { origin: "https://api.boardbrawl.example", purpose: "accounts and match history" },
+      { origin: "wss://play.boardbrawl.example", purpose: "live match connection" },
+    ],
     optional: [{ id: "peers.relay", suggested: false }],
     check: {
       kind: "ready",

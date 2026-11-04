@@ -27,7 +27,7 @@
     "chatPatterns": "Riconoscere determinati messaggi della chat, come configurazioni di gioco incollate",
     "netHttp": "Comunicare con un server a tua scelta",
     "secrets": "Conservare un segreto (ad es. una chiave API) nel portachiavi del sistema",
-    "uiWebview": "Mostrare contenuti web propri in un riquadro isolato (senza internet)",
+    "uiWebview": "Mostrare contenuti web propri in un riquadro isolato",
     "uiStage": "Mostrare un'attività nell'area multimediale",
     "uiSidePanel": "Mostrare il proprio contenuto in un pannello laterale",
     "uiAppMenu": "Aggiungere voci al menu App",

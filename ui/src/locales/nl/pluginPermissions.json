@@ -27,7 +27,7 @@
     "chatPatterns": "Bepaalde chatberichten herkennen, zoals geplakte game-fits",
     "netHttp": "Praten met een server die je kiest",
     "secrets": "Een geheim (bijv. een API-sleutel) bewaren in de sleutelhanger van je systeem",
-    "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader (geen internet)",
+    "uiWebview": "Eigen webinhoud tonen in een afgeschermd kader",
     "uiStage": "Een activiteit tonen in het mediagedeelte",
     "uiSidePanel": "Eigen inhoud tonen in een zijpaneel",
     "uiAppMenu": "Items toevoegen aan het Apps-menu",

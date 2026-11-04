@@ -27,7 +27,7 @@
     "chatPatterns": "Recunoaște anumite mesaje din chat, de ex. configurații de joc lipite",
     "netHttp": "Comunică cu un server ales de tine",
     "secrets": "Păstrează un secret (de ex. o cheie API) în breasla de chei a sistemului",
-    "uiWebview": "Afișează propriul conținut web într-un cadru izolat (fără internet)",
+    "uiWebview": "Afișează propriul conținut web într-un cadru izolat",
     "uiStage": "Afișează o activitate în zona media",
     "uiSidePanel": "Afișează propriul conținut într-un panou lateral",
     "uiAppMenu": "Adaugă intrări în meniul Aplicații",

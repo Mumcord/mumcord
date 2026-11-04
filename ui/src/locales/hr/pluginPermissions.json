@@ -27,7 +27,7 @@
     "chatPatterns": "Prepoznavati određene poruke u chatu, npr. zalijepljene opreme iz igre",
     "netHttp": "Komuniciraj s poslužiteljem koji odaberete",
     "secrets": "Pohrani tajnu (npr. API ključ) u sistemski privjesak ključeva",
-    "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru (bez interneta)",
+    "uiWebview": "Prikaži vlastiti web sadržaj u izoliranom okviru",
     "uiStage": "Prikaži aktivnost u medijskom području",
     "uiSidePanel": "Prikaži vlastiti sadržaj u bočnoj ploči",
     "uiAppMenu": "Dodaj stavke u izbornik aplikacija",

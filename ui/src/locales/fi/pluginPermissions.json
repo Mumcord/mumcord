@@ -27,7 +27,7 @@
     "chatPatterns": "Tunnistaa tiettyjä chat-viestejä, esim. liitettyjä pelivarustuksia",
     "netHttp": "Keskustella valitsemasi palvelimen kanssa",
     "secrets": "Säilyttää salaisuus (esim. API-avain) järjestelmäsi avainnipussa",
-    "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä (ei internetiä)",
+    "uiWebview": "Näyttää oma verkkosisältö eristetyssä kehyksessä",
     "uiStage": "Näytä toiminto mediaalueella",
     "uiSidePanel": "Näytä oma sisältö sivupaneelissa",
     "uiAppMenu": "Lisää kohteita sovellusvalikkoon",

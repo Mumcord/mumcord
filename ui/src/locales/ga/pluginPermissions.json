@@ -27,7 +27,7 @@
     "chatPatterns": "Teachtaireachtaí comhrá áirithe a aithint, mar shampla feistis chluiche a greamaíodh",
     "netHttp": "Cumarsáid a dhéanamh le freastalaí de do rogha",
     "secrets": "Rún (m.sh. eochair API) a choinneáil i eochairchiseán do chórais",
-    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe (gan idirlíon)",
+    "uiWebview": "A ábhar gréasáin féin a thaispeáint i bhfráma séalaithe",
     "uiStage": "Taispeáin gníomhaíocht i limistéar na meán",
     "uiSidePanel": "Taispeáin a chuid inneachair féin i bpainéal taoibh",
     "uiAppMenu": "Cuir míreanna le roghchlár na bhfeidhmchlár",

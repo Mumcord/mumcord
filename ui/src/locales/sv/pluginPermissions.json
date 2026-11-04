@@ -27,7 +27,7 @@
     "chatPatterns": "Känna igen vissa chattmeddelanden, t.ex. inklistrade spel-fits",
     "netHttp": "Prata med en server som du väljer",
     "secrets": "Spara en hemlighet (t.ex. en API-nyckel) i systemets nyckelring",
-    "uiWebview": "Visa eget webbinnehåll i en isolerad ram (utan internet)",
+    "uiWebview": "Visa eget webbinnehåll i en isolerad ram",
     "uiStage": "Visa en aktivitet i mediaytan",
     "uiSidePanel": "Visa eget innehåll i en sidopanel",
     "uiAppMenu": "Lägga till poster i appmenyn",
