@@ -17,7 +17,7 @@ import {
   usePluginUi,
   type PluginDialogHeader,
 } from "../render/pluginUiStore";
-import { PluginWebView, usePluginWebView } from "../webview";
+import { PluginFrame, usePluginWebView } from "../webview";
 import { takeDialogOpener } from "./pluginDialogStore";
 
 /** Renders the open plugin dialog, if any; mount once. */
@@ -67,7 +67,7 @@ function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialog
       className={webview ? "plugin-dialog--webview" : undefined}
     >
       {webview ? (
-        <PluginWebView plugin={plugin} webview={webview} title={title} />
+        <PluginFrame plugin={plugin} webview={webview} />
       ) : (
         nodes && <PluginTree plugin={plugin} slot={{ kind: "dialog" }} nodes={nodes} />
       )}

@@ -29,7 +29,12 @@ function withDialog(title: string | null, subtitle: string | null = null, webvie
       ? new Map([
           [
             "mumbot-music",
-            { place: "dialog", url: "mumcord-web://localhost/mumbot-music/index.html", seq: 1 },
+            new Map([
+              [
+                "dialog",
+                { place: "dialog", url: "mumcord-web://localhost/mumbot-music/index.html", seq: 1 },
+              ],
+            ]),
           ],
         ])
       : new Map(),

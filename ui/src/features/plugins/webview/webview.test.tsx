@@ -1,7 +1,11 @@
-import { act, fireEvent, render } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import type { PluginUi, PluginWebviewPlace } from "../../../api";
-import { applyChange, type PluginUiState } from "../render/pluginUiStore";
+import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import type { PluginFrameMute, PluginUi, PluginWebviewPlace } from "../../../api";
+import { applyLanguage } from "../../../i18n";
+import axe from "axe-core";
+import { StageShown } from "../../media/stageContext";
+import { resetStageEntries, useStageEntries } from "../../media/stageRegistry";
+import { applyChange, type PluginUiState, type PluginWebview } from "../render/pluginUiStore";
 import {
   createBridge,
   fitsBridge,
@@ -10,23 +14,49 @@ import {
   newGestureKey,
   rateLimiter,
 } from "./bridge";
-import { PluginWebView } from "./PluginWebView";
+import { resetFrameMute, usePluginFramesDeafen } from "./frameMute";
+import { HEARTBEAT_TIMEOUT_MS } from "./heartbeat";
+import { PluginFrame } from "./PluginFrame";
+import { PluginStageFrames } from "./stageFrames";
 
-const sendEvent = vi.fn(() => Promise.resolve(null));
-let uiListener: ((event: PluginUi) => void) | undefined;
-vi.mock("../../../api", async (orig) => ({
-  ...(await orig<typeof import("../../../api")>()),
-  getApi: () => ({
-    pluginUiEvent: sendEvent,
-    on: (_name: string, handler: (event: PluginUi) => void) => {
-      uiListener = handler;
+const api = vi.hoisted(() => ({
+  sendEvent: vi.fn<(plugin: string, event: unknown) => Promise<null>>(() => Promise.resolve(null)),
+  framesMute: vi.fn<(plugin: string | null, muted: boolean) => Promise<null>>(() =>
+    Promise.resolve(null),
+  ),
+  listeners: new Map<string, (payload: unknown) => void>(),
+  plugins: [] as { id: string; name: string; source: { kind: string } }[],
+}));
+vi.mock("../../../api", async (orig) => {
+  // One object, so the stores bind to it once.
+  const mocked = {
+    pluginUiEvent: api.sendEvent,
+    pluginFramesMute: api.framesMute,
+    pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: api.plugins }),
+    on: (name: string, handler: (payload: unknown) => void) => {
+      const key = `${name}:${String(Math.random())}`;
+      api.listeners.set(key, handler);
       return () => {
-        uiListener = undefined;
+        api.listeners.delete(key);
       };
     },
     pluginsUiTrees: () => Promise.resolve([]),
-  }),
+  };
+  return { ...(await orig<typeof import("../../../api")>()), getApi: () => mocked };
+});
+
+const deaf = vi.hoisted(() => ({ self: false, server: false, voice: 1 }));
+vi.mock("../../channels/serverStore", () => ({
+  useVoiceServerId: () => deaf.voice,
+  useServerStateOf: () => ({}),
+  selfUser: () => ({ selfDeaf: deaf.self, serverDeaf: deaf.server }),
 }));
+
+function emit(name: string, payload: unknown) {
+  act(() => {
+    for (const [key, handler] of api.listeners) if (key.startsWith(`${name}:`)) handler(payload);
+  });
+}
 
 const URL = "mumcord-web://localhost/snacks/index.html";
 
@@ -41,6 +71,29 @@ function pageOf(container: HTMLElement): Window {
   if (page === null) throw new Error("no page");
   return page;
 }
+
+function fromPage(page: Window, data: unknown) {
+  act(() => {
+    window.dispatchEvent(new MessageEvent("message", { data, source: page }));
+  });
+}
+
+/** axe on the chrome only: the sealed page is the plugin's, and jsdom cannot reach into it. */
+async function axeViolations(container: Element): Promise<string[]> {
+  const results = await axe.run(container, { iframes: false });
+  return results.violations.map((violation) => violation.id);
+}
+
+beforeAll(async () => {
+  await applyLanguage("en");
+});
+
+beforeEach(() => {
+  api.sendEvent.mockClear();
+  api.framesMute.mockClear();
+  api.plugins = [{ id: "snacks", name: "Snacks", source: { kind: "official" } }];
+  resetFrameMute();
+});
 
 describe("bridge limits", () => {
   it("passes strings up to 16 KiB in UTF-8 only", () => {
@@ -80,12 +133,38 @@ describe("bridge limits", () => {
     expect(toPlugin).toHaveBeenCalledTimes(1);
     expect(onEscape).toHaveBeenCalledTimes(1);
     bridge.post("early");
+    bridge.mute(true);
     expect(postMessage).not.toHaveBeenCalled();
     bridge.loaded();
     bridge.post("late");
-    expect(postMessage).toHaveBeenNthCalledWith(1, { mumcordWebview: "key", key: "k" }, "*");
-    expect(postMessage).toHaveBeenNthCalledWith(2, "early", "*");
-    expect(postMessage).toHaveBeenNthCalledWith(3, "late", "*");
+    expect(postMessage.mock.calls).toEqual([
+      [{ mumcordWebview: "key", key: "k" }, "*"],
+      ["early", "*"],
+      [{ mumcordWebview: "mute", muted: true }, "*"],
+      ["late", "*"],
+    ]);
+  });
+
+  it("routes the bootstrap's heartbeat, F6 and sound signals and never passes them on", () => {
+    const frame = { postMessage: vi.fn() } as unknown as Window;
+    const calls: string[] = [];
+    const bridge = createBridge({
+      frame: () => frame,
+      toPlugin: () => calls.push("plugin"),
+      onEscape: () => calls.push("escape"),
+      onF6: () => calls.push("f6"),
+      onHeartbeat: () => calls.push("heartbeat"),
+      onSound: () => calls.push("sound"),
+      onDropped: () => calls.push("dropped"),
+      gestureKey: "k",
+      onGesture: vi.fn(),
+    });
+    for (const kind of ["heartbeat", "f6", "sound", "escape", "mute", "key"]) {
+      bridge.receive(
+        new MessageEvent("message", { data: { mumcordWebview: kind }, source: frame }),
+      );
+    }
+    expect(calls).toEqual(["heartbeat", "f6", "sound", "escape", "dropped", "dropped"]);
   });
 
   it("counts only gesture reports that carry the frame's key", () => {
@@ -124,106 +203,272 @@ describe("web view state", () => {
     webviews: new Map(),
   };
   const change = (c: PluginUi["change"]): PluginUi => ({ plugin: "snacks", change: c });
+  const show = (place: PluginWebviewPlace) => change({ type: "webviewShow", place, url: URL });
 
-  it("opens, reloads on a new show and closes with its dialog", () => {
+  it("keeps one frame per place, reloads on a new show and closes the dialog's with it", () => {
     let state = applyChange(empty, change({ type: "openDialog", title: "Snacks", subtitle: null }));
-    state = applyChange(state, change({ type: "webviewShow", place: "dialog", url: URL }));
-    const first = state.webviews.get("snacks");
+    state = applyChange(state, show("dialog"));
+    const first = state.webviews.get("snacks")?.get("dialog");
     expect(first?.url).toBe(URL);
-    state = applyChange(state, change({ type: "webviewShow", place: "dialog", url: URL }));
-    expect(state.webviews.get("snacks")?.seq).not.toBe(first?.seq);
+    state = applyChange(state, show("dialog"));
+    expect(state.webviews.get("snacks")?.get("dialog")?.seq).not.toBe(first?.seq);
+    state = applyChange(state, show("stage"));
+    state = applyChange(state, show("sidePanel"));
+    expect([...(state.webviews.get("snacks")?.keys() ?? [])]).toEqual([
+      "dialog",
+      "stage",
+      "sidePanel",
+    ]);
     expect(
       applyChange(state, change({ type: "webviewPost", message: "x", places: ["dialog"] })),
     ).toBe(state);
     state = applyChange(state, change({ type: "closeDialog" }));
+    expect([...(state.webviews.get("snacks")?.keys() ?? [])]).toEqual(["stage", "sidePanel"]);
+    // A hide for a place without a frame changes nothing.
+    expect(applyChange(state, change({ type: "webviewHide", place: "panelPopover" }))).toBe(state);
+    state = applyChange(state, change({ type: "webviewHide", place: "stage" }));
+    state = applyChange(state, change({ type: "webviewHide", place: "sidePanel" }));
     expect(state.webviews.size).toBe(0);
-    state = applyChange(state, change({ type: "webviewShow", place: "panelPopover", url: URL }));
-    // A hide for another place leaves the frame open.
-    expect(applyChange(state, change({ type: "webviewHide", place: "sidePanel" }))).toBe(state);
-    state = applyChange(state, change({ type: "webviewHide", place: "panelPopover" }));
-    expect(state.webviews.size).toBe(0);
+  });
+
+  it("keeps the side panel's size hint", () => {
+    const state = applyChange(
+      empty,
+      change({ type: "webviewSizeHint", minWidth: 320, minHeight: 200 }),
+    );
+    expect(state.sizeHints?.get("snacks")).toEqual({ minWidth: 320, minHeight: 200 });
   });
 });
 
-describe("PluginWebView", () => {
-  const view = { place: "panelPopover" as const, url: URL, seq: 1 };
+const PLACES: PluginWebviewPlace[] = ["stage", "sidePanel", "dialog", "panelPopover"];
+const viewIn = (place: PluginWebviewPlace, seq = 1): PluginWebview => ({ place, url: URL, seq });
+
+describe("PluginFrame", () => {
+  const view = viewIn("panelPopover");
+
+  it.each(PLACES)(
+    "mounts in the %s with its tag and accessible name, without axe findings",
+    async (place) => {
+      const { container } = render(<PluginFrame plugin="snacks" webview={viewIn(place)} />);
+      await screen.findByText("Plugin content · Snacks");
+      expect(frameOf(container).title).toBe("Snacks content");
+      expect(container.querySelector(`.plugin-frame[data-place="${place}"]`)).not.toBeNull();
+      expect(await axeViolations(container)).toEqual([]);
+    },
+  );
+
+  it("tags unofficial plugins", async () => {
+    api.plugins = [{ id: "snacks", name: "Snacks", source: { kind: "repo" } }];
+    render(<PluginFrame plugin="snacks" webview={view} />);
+    expect(await screen.findByText("Plugin content · Snacks · Unofficial")).toBeInTheDocument();
+  });
 
   it("renders a sandboxed frame without same-origin and closes it when the page navigates", () => {
-    const { container } = render(<PluginWebView plugin="snacks" webview={view} title="Snacks" />);
+    const { container } = render(<PluginFrame plugin="snacks" webview={view} />);
     const frame = frameOf(container);
     expect(frame.getAttribute("sandbox")).toBe("allow-scripts");
     expect(frame.getAttribute("src")).toBe(URL);
-    expect(frame.title).toBe("Snacks");
     fireEvent.load(frame);
     expect(container.querySelector("iframe")).not.toBeNull();
     fireEvent.load(frame);
     expect(container.querySelector("iframe")).toBeNull();
   });
 
-  it("hands page messages to its plugin and plugin posts to the page", () => {
-    sendEvent.mockClear();
-    const { container } = render(<PluginWebView plugin="snacks" webview={view} title="Snacks" />);
+  it("hands page messages to its plugin and plugin posts to its place only", () => {
+    const { container } = render(<PluginFrame plugin="snacks" webview={view} />);
     const frame = frameOf(container);
     const page = pageOf(container);
     const post = vi.spyOn(page, "postMessage");
     fireEvent.load(frame);
-    act(() => {
-      window.dispatchEvent(new MessageEvent("message", { data: "ready", source: page }));
-    });
-    expect(sendEvent).toHaveBeenCalledWith("snacks", {
+    fromPage(page, "ready");
+    expect(api.sendEvent).toHaveBeenCalledWith("snacks", {
       type: "webviewMessage",
       place: "panelPopover",
       text: "ready",
     });
-    act(() => {
-      const post = (plugin: string, message: string, places: PluginWebviewPlace[]) =>
-        uiListener?.({ plugin, change: { type: "webviewPost", message, places } });
-      post("other", "no", ["panelPopover"]);
-      post("snacks", "stage only", ["stage"]);
-      post("snacks", "go", ["stage", "panelPopover"]);
-    });
+    const postTo = (plugin: string, message: string, places: PluginWebviewPlace[]) => {
+      emit("pluginUi", { plugin, change: { type: "webviewPost", message, places } });
+    };
+    postTo("other", "no", ["panelPopover"]);
+    postTo("snacks", "stage only", ["stage"]);
+    postTo("snacks", "go", ["stage", "panelPopover"]);
     const strings = post.mock.calls.filter(([message]) => typeof message === "string");
     expect(strings).toEqual([["go", "*"]]);
   });
 
   it("hands the page its key once and reports keyed gestures for its place", () => {
-    sendEvent.mockClear();
-    const { container, rerender } = render(
-      <PluginWebView plugin="snacks" webview={view} title="Snacks" />,
-    );
+    const { container, rerender } = render(<PluginFrame plugin="snacks" webview={view} />);
     const frame = frameOf(container);
     const page = pageOf(container);
     const post = vi.spyOn(page, "postMessage");
     fireEvent.load(frame);
-    rerender(<PluginWebView plugin="snacks" webview={view} title="Snacks!" />);
-    const keys = post.mock.calls.map(([message]) => message as { key?: string });
+    rerender(<PluginFrame plugin="snacks" webview={view} onEscape={vi.fn()} />);
+    const keys = post.mock.calls
+      .map(([message]) => message as { mumcordWebview?: string; key?: string })
+      .filter((message) => message.mumcordWebview === "key");
     expect(keys).toHaveLength(1);
     const key = keys[0]?.key;
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", { data: { mumcordWebview: "gesture" }, source: page }),
-      );
-    });
-    expect(sendEvent).not.toHaveBeenCalled();
-    act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", { data: { mumcordWebview: "gesture", key }, source: page }),
-      );
-    });
-    expect(sendEvent).toHaveBeenCalledWith("snacks", {
+    fromPage(page, { mumcordWebview: "gesture" });
+    expect(api.sendEvent).not.toHaveBeenCalled();
+    fromPage(page, { mumcordWebview: "gesture", key });
+    expect(api.sendEvent).toHaveBeenCalledWith("snacks", {
       type: "webviewGesture",
       place: "panelPopover",
     });
   });
 
-  it("moves focus out of the frame on the page's Escape signal", () => {
-    const { container } = render(<PluginWebView plugin="snacks" webview={view} title="Snacks" />);
+  it("returns focus to Mumcord on Escape and F6; only Escape reaches the place", () => {
+    const onEscape = vi.fn();
+    const { container } = render(
+      <PluginFrame plugin="snacks" webview={viewIn("dialog")} onEscape={onEscape} />,
+    );
+    const page = pageOf(container);
+    const wrapper = container.querySelector(".plugin-webview");
+    fromPage(page, { mumcordWebview: "f6" });
+    expect(document.activeElement).toBe(wrapper);
+    expect(onEscape).not.toHaveBeenCalled();
+    act(() => {
+      (document.activeElement as HTMLElement).blur();
+    });
+    fromPage(page, { mumcordWebview: "escape" });
+    expect(document.activeElement).toBe(wrapper);
+    expect(onEscape).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("PluginFrame heartbeat", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("removes a silent page, says it stopped and reloads it", () => {
+    const { container } = render(<PluginFrame plugin="snacks" webview={viewIn("stage")} />);
+    fireEvent.load(frameOf(container));
     const page = pageOf(container);
     act(() => {
-      window.dispatchEvent(
-        new MessageEvent("message", { data: { mumcordWebview: "escape" }, source: page }),
-      );
+      vi.advanceTimersByTime(2000);
     });
+    fromPage(page, { mumcordWebview: "heartbeat" });
+    act(() => {
+      vi.advanceTimersByTime(2500);
+    });
+    expect(container.querySelector("iframe")).not.toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(HEARTBEAT_TIMEOUT_MS);
+    });
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(screen.getByRole("alert")).toHaveTextContent(/stopped responding/);
+    fireEvent.click(screen.getByRole("button", { name: "Reload" }));
+    expect(container.querySelector("iframe")).not.toBeNull();
     expect(document.activeElement).toBe(container.querySelector(".plugin-webview"));
+  });
+
+  it("does not watch a hidden stage tab", () => {
+    const { container } = render(
+      <StageShown.Provider value={false}>
+        <PluginFrame plugin="snacks" webview={viewIn("stage")} />
+      </StageShown.Provider>,
+    );
+    fireEvent.load(frameOf(container));
+    act(() => {
+      vi.advanceTimersByTime(HEARTBEAT_TIMEOUT_MS * 3);
+    });
+    expect(container.querySelector("iframe")).not.toBeNull();
+  });
+});
+
+describe("PluginFrame sound", () => {
+  const muteMessages = (post: { mock: { calls: unknown[][] } }) =>
+    post.mock.calls
+      .map(([message]) => message as { mumcordWebview?: string; muted?: boolean })
+      .filter((message) => message.mumcordWebview === "mute")
+      .map((message) => message.muted);
+
+  it("shows the mute button once the page plays sound and mutes through Rust", async () => {
+    const { container } = render(<PluginFrame plugin="snacks" webview={view()} />);
+    await screen.findByText("Plugin content · Snacks");
+    const page = pageOf(container);
+    const post = vi.spyOn(page, "postMessage");
+    fireEvent.load(frameOf(container));
+    expect(muteMessages(post)).toEqual([false]);
+    expect(screen.queryByRole("button", { name: /Mute/ })).toBeNull();
+    fromPage(page, { mumcordWebview: "sound" });
+    fireEvent.click(screen.getByRole("button", { name: "Mute sounds from Snacks" }));
+    expect(api.framesMute).toHaveBeenCalledWith("snacks", true);
+    emit("pluginFrameMute", { plugin: "snacks", muted: true } satisfies PluginFrameMute);
+    expect(muteMessages(post)).toEqual([false, true]);
+    expect(screen.getByRole("button", { name: "Unmute sounds from Snacks" })).toBeInTheDocument();
+    // Another plugin's mute changes nothing here.
+    emit("pluginFrameMute", { plugin: "other", muted: false } satisfies PluginFrameMute);
+    expect(muteMessages(post)).toEqual([false, true]);
+    expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("mutes every frame while deafened and resends the state to a frame that opens later", () => {
+    renderHook(() => {
+      usePluginFramesDeafen();
+    });
+    emit("pluginFrameMute", { plugin: null, muted: true } satisfies PluginFrameMute);
+    const { container } = render(<PluginFrame plugin="snacks" webview={view()} />);
+    const page = pageOf(container);
+    const post = vi.spyOn(page, "postMessage");
+    fireEvent.load(frameOf(container));
+    expect(muteMessages(post)).toEqual([true]);
+    emit("pluginFrameMute", { plugin: null, muted: false } satisfies PluginFrameMute);
+    expect(muteMessages(post)).toEqual([true, false]);
+  });
+
+  it("asks Rust to mute all frames while the user is deafened", () => {
+    deaf.self = false;
+    const { rerender } = renderHook(() => {
+      usePluginFramesDeafen();
+    });
+    expect(api.framesMute).toHaveBeenLastCalledWith(null, false);
+    deaf.self = true;
+    rerender();
+    expect(api.framesMute).toHaveBeenLastCalledWith(null, true);
+    deaf.self = false;
+    deaf.server = true;
+    rerender();
+    expect(api.framesMute).toHaveBeenCalledTimes(2);
+    deaf.server = false;
+  });
+
+  function view(): PluginWebview {
+    return viewIn("sidePanel");
+  }
+});
+
+describe("PluginStageFrames", () => {
+  function Stage() {
+    const { plugins } = useStageEntries();
+    return [...plugins.entries()].map(([id, item]) => (
+      <section key={id} aria-label={item.label}>
+        {item.render()}
+      </section>
+    ));
+  }
+
+  it("puts a stage page into the media area while it is open", async () => {
+    resetStageEntries();
+    const { container } = render(
+      <>
+        <PluginStageFrames />
+        <Stage />
+      </>,
+    );
+    const stage = (change: PluginUi["change"]) => {
+      emit("pluginUi", { plugin: "snacks", change });
+    };
+    stage({ type: "webviewShow", place: "dialog", url: URL });
+    expect(container.querySelector("section")).toBeNull();
+    stage({ type: "webviewShow", place: "stage", url: URL });
+    expect(await screen.findByRole("region", { name: "Snacks" })).toBeInTheDocument();
+    expect(container.querySelector('.plugin-frame[data-place="stage"] iframe')).not.toBeNull();
+    stage({ type: "webviewHide", place: "stage" });
+    expect(container.querySelector("section")).toBeNull();
   });
 });

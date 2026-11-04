@@ -28,8 +28,10 @@ export interface PluginUiState {
   readonly dialogs: ReadonlyMap<string, PluginDialogHeader>;
   /** plugin id → its entry in the user context menu. */
   readonly menuEntries: ReadonlyMap<string, PluginMenuEntryState>;
-  /** plugin id → its open web view (FR-6.46). */
-  readonly webviews: ReadonlyMap<string, PluginWebview>;
+  /** plugin id → place → its open web view there (FR-6.46; up to three places, FR-9.38). */
+  readonly webviews: ReadonlyMap<string, ReadonlyMap<PluginWebviewPlace, PluginWebview>>;
+  /** plugin id → the smallest size its side panel page asked for (FR-9.39). */
+  readonly sizeHints?: ReadonlyMap<string, PluginWebviewSizeHint>;
   /** The latest open/close request for a panel popover; `seq` changes on every request. */
   readonly popoverRequest?: PluginPopoverRequest | null;
 }
@@ -52,6 +54,28 @@ export interface PluginWebview {
   readonly place: PluginWebviewPlace;
   readonly url: string;
   readonly seq: number;
+}
+
+/** The minimum size, in CSS pixels, a plugin page asked for. */
+export interface PluginWebviewSizeHint {
+  readonly minWidth: number;
+  readonly minHeight: number;
+}
+
+/** `webviews` with the plugin's frame in `place` set (`view`) or removed (`null`). */
+function withWebview(
+  webviews: PluginUiState["webviews"],
+  plugin: string,
+  place: PluginWebviewPlace,
+  view: PluginWebview | null,
+): PluginUiState["webviews"] {
+  const places = new Map(webviews.get(plugin));
+  if (view === null) places.delete(place);
+  else places.set(place, view);
+  const next = new Map(webviews);
+  if (places.size === 0) next.delete(plugin);
+  else next.set(plugin, places);
+  return next;
 }
 
 const EMPTY: PluginUiState = {
@@ -101,8 +125,7 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       dialogs.delete(plugin);
       slots.delete(slotKey({ kind: "dialog" }));
       trees.set(plugin, slots);
-      const webviews = new Map(state.webviews);
-      if (webviews.get(plugin)?.place === "dialog") webviews.delete(plugin);
+      const webviews = withWebview(state.webviews, plugin, "dialog", null);
       return { ...state, trees, dialogs, webviews };
     }
     case "panelPopover":
@@ -114,22 +137,22 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       return { ...state, menuEntries };
     }
     case "webviewShow": {
-      const webviews = new Map(state.webviews);
-      webviews.set(plugin, { place: change.place, url: change.url, seq: ++webviewSeq });
-      return { ...state, webviews };
+      const view = { place: change.place, url: change.url, seq: ++webviewSeq };
+      return { ...state, webviews: withWebview(state.webviews, plugin, change.place, view) };
     }
     case "webviewHide": {
-      if (state.webviews.get(plugin)?.place !== change.place) return state;
-      const webviews = new Map(state.webviews);
-      webviews.delete(plugin);
-      return { ...state, webviews };
+      if (!state.webviews.get(plugin)?.has(change.place)) return state;
+      return { ...state, webviews: withWebview(state.webviews, plugin, change.place, null) };
     }
     // Bridge messages go straight to the open frame (see `webview/`), they are not state.
     case "webviewPost":
       return state;
-    // Side-panel sizing belongs to the side panel host, which does not exist yet.
-    case "webviewSizeHint":
-      return state;
+    // Read by the side panel host for its smallest width.
+    case "webviewSizeHint": {
+      const sizeHints = new Map(state.sizeHints);
+      sizeHints.set(plugin, { minWidth: change.minWidth, minHeight: change.minHeight });
+      return { ...state, sizeHints };
+    }
     // Opens a settings page (see `bind`); nothing to keep.
     case "openPermissions":
       return state;

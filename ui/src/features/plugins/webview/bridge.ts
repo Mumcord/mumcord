@@ -7,6 +7,9 @@
  * Gestures (FR-9.45): once the page has loaded, the bridge hands the page's bootstrap script a
  * random key that the page's own code never sees. The bootstrap reports genuine clicks and key
  * presses with that key; a report without it is page code pretending and never counts.
+ *
+ * The bootstrap's other signals (heartbeat, Escape, F6, sound) are objects too, so a page can
+ * never smuggle them in as bridge strings; faking one only hurts the page itself.
  */
 
 /** One bridge message, in UTF-8 bytes. */
@@ -40,13 +43,11 @@ export function fitsBridge(data: unknown): data is string {
   return typeof data === "string" && encoder.encode(data).length <= MAX_MESSAGE_BYTES;
 }
 
-/** Whether `data` is the Escape signal of the page's bootstrap script (served by Rust). */
-export function isEscapeSignal(data: unknown): boolean {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    (data as { mumcordWebview?: unknown }).mumcordWebview === "escape"
-  );
+/** The `mumcordWebview` kind of a bootstrap signal (served by Rust), or `null` for others. */
+export function signalKind(data: unknown): string | null {
+  if (typeof data !== "object" || data === null) return null;
+  const kind = (data as { mumcordWebview?: unknown }).mumcordWebview;
+  return typeof kind === "string" ? kind : null;
 }
 
 /** A fresh random key for one frame's gesture reports (128 bits, hex). */
@@ -57,17 +58,7 @@ export function newGestureKey(): string {
 
 /** Whether `data` is a gesture report of the bootstrap that holds `key`. */
 export function isGestureReport(data: unknown, key: string): boolean {
-  if (typeof data !== "object" || data === null) return false;
-  const report = data as { mumcordWebview?: unknown; key?: unknown };
-  return report.mumcordWebview === "gesture" && report.key === key;
-}
-
-function isGestureShaped(data: unknown): boolean {
-  return (
-    typeof data === "object" &&
-    data !== null &&
-    (data as { mumcordWebview?: unknown }).mumcordWebview === "gesture"
-  );
+  return signalKind(data) === "gesture" && (data as { key?: unknown }).key === key;
 }
 
 export interface BridgeOptions {
@@ -75,8 +66,14 @@ export interface BridgeOptions {
   readonly frame: () => Window | null;
   /** Hands a page message to the plugin. */
   readonly toPlugin: (text: string) => void;
-  /** The page asked to give keyboard focus back to the app. */
+  /** Escape inside the page: focus goes back to the app (and a dialog closes, FR-9.41). */
   readonly onEscape: () => void;
+  /** F6 inside the page: focus goes back to the app only. */
+  readonly onF6?: () => void;
+  /** The page's once-a-second sign of life (FR-9.42). */
+  readonly onHeartbeat?: () => void;
+  /** The page started playing sound after a click inside it (FR-9.43). */
+  readonly onSound?: () => void;
   /** This frame's gesture key (see {@link newGestureKey}); keep it for the frame's lifetime. */
   readonly gestureKey: string;
   /** The user really clicked or pressed a key in the visible page (FR-9.45). */
@@ -93,11 +90,14 @@ export interface Bridge {
   readonly post: (message: string) => void;
   /** The page finished loading: the gesture key and then queued posts go out. */
   readonly loaded: () => void;
+  /** Mutes or unmutes the page's sound (mute button, deafened); sent at once when loaded. */
+  readonly mute: (muted: boolean) => void;
 }
 
 export function createBridge(options: BridgeOptions): Bridge {
   const allow = rateLimiter(options.now);
   let ready = false;
+  let muted: boolean | null = null;
   const queue: string[] = [];
 
   const send = (message: string) => {
@@ -110,18 +110,33 @@ export function createBridge(options: BridgeOptions): Bridge {
     receive: (event) => {
       const frame = options.frame();
       if (frame === null || event.source !== frame) return;
-      if (isEscapeSignal(event.data)) {
-        options.onEscape();
-        return;
-      }
-      if (isGestureShaped(event.data)) {
-        // A hidden app window gets no real clicks, so a report then is not the user's.
-        if (
-          isGestureReport(event.data, options.gestureKey) &&
-          document.visibilityState === "visible"
-        )
-          options.onGesture();
-        return;
+      switch (signalKind(event.data)) {
+        case null:
+          break;
+        case "escape":
+          options.onEscape();
+          return;
+        case "f6":
+          options.onF6?.();
+          return;
+        case "heartbeat":
+          options.onHeartbeat?.();
+          return;
+        case "sound":
+          options.onSound?.();
+          return;
+        case "gesture":
+          // A hidden app window gets no real clicks, so a report then is not the user's.
+          if (
+            isGestureReport(event.data, options.gestureKey) &&
+            document.visibilityState === "visible"
+          )
+            options.onGesture();
+          return;
+        default:
+          // An unknown signal is never a bridge message (those are strings).
+          options.onDropped?.();
+          return;
       }
       if (fitsBridge(event.data) && allow()) options.toPlugin(event.data);
       else options.onDropped?.();
@@ -134,6 +149,11 @@ export function createBridge(options: BridgeOptions): Bridge {
       ready = true;
       options.frame()?.postMessage({ mumcordWebview: "key", key: options.gestureKey }, "*");
       for (const message of queue.splice(0)) send(message);
+      if (muted !== null) options.frame()?.postMessage({ mumcordWebview: "mute", muted }, "*");
+    },
+    mute: (next) => {
+      muted = next;
+      if (ready) options.frame()?.postMessage({ mumcordWebview: "mute", muted }, "*");
     },
   };
 }

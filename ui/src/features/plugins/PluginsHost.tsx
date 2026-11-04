@@ -5,6 +5,7 @@ import { PluginDialogHost } from "./dialog";
 import { usePluginDeepLinks } from "./browse/deepLink";
 import { PluginsPalette } from "./PluginsPalette";
 import { PluginToasts } from "./prompt/PluginToasts";
+import { PluginStageFrames, usePluginFramesDeafen } from "./webview";
 import { usePluginRequestRouter } from "./pluginRequestStore";
 import { usePluginMentions } from "./chat";
 
@@ -24,6 +25,7 @@ export function PluginsHost() {
   usePluginRequestRouter();
   usePluginMentions();
   usePluginDeepLinks();
+  usePluginFramesDeafen();
 
   useEffect(() => {
     const send = () => {
@@ -47,6 +49,7 @@ export function PluginsHost() {
       <PluginsPalette />
       <PluginDialogHost />
       <PluginToasts />
+      <PluginStageFrames />
     </>
   );
 }
