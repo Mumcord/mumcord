@@ -45,6 +45,7 @@
     "unreachable": "Perdavimo mazgo nepavyko pasiekti nei per UDP, nei per TCP 443.",
     "peerCannotRelay": "Kitas asmuo negali naudoti perdavimo mazgo (senesnis Mumcord arba perdavimo mazgas išjungtas).",
     "denied": "Perdavimo mazgo botas atmetė užklausą.",
+    "notRegistered": "Šio serverio perdavimo mazgas prieinamas tik registruotiems naudotojams. Norėdamas (-a) juo naudotis, užsiregistruok šiame serveryje.",
     "peerGone": "Kitas asmuo paliko serverį.",
     "rateLimited": "Per daug perdavimo mazgo užklausų. Bandyk dar kartą po minutės."
   },

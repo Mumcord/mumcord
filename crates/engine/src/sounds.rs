@@ -1537,7 +1537,7 @@ mod tests {
                     session: *session,
                     paused: false,
                     sound: false,
-                    sound_available: false,
+                    sound_status: Default::default(),
                     viewers: viewers.to_vec(),
                     blocked: None,
                     kind: None,

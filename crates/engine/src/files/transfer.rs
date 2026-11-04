@@ -355,13 +355,25 @@ async fn write_timed(
     }
 }
 
-/// [`TransferError::Connect`] with the relay's current reason for `server_id`.
+/// [`TransferError::Connect`] with the relay's current reason for `server_id`. With a relay in
+/// place, a guest's transfer that never connected was almost always refused by the relay's
+/// default "registered users only" rule (#406); the bot tells only the requester, so say that
+/// instead of "not reachable".
 fn connect_failed(engine: &Engine, server_id: ServerId) -> TransferError {
     let reason = engine
         .relays()
         .availability_for(server_id, RelayUse::Files)
         .err()
-        .unwrap_or(RelayUnavailable::Unreachable);
+        .unwrap_or_else(|| {
+            let guest = engine
+                .session_ctx_for(server_id)
+                .is_ok_and(|ctx| !crate::peer::self_registered(&ctx));
+            if guest {
+                RelayUnavailable::NotRegistered
+            } else {
+                RelayUnavailable::Unreachable
+            }
+        });
     TransferError::Connect(DirectError::Relay(reason))
 }
 

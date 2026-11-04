@@ -545,3 +545,35 @@
 .tree-person[draggable="true"] {
   cursor: grab;
 }
+
+/* "Bots on this server" (issue #458): pinned below the scrolling tree, above the plugins strip. */
+.bots-section.collapsible-section {
+  flex: none;
+  max-height: 40%;
+  margin: var(--space-2);
+  overflow-y: auto;
+  border-top: 1px solid var(--color-border);
+}
+
+.bot-row__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bot-row__name {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bot-row__what {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

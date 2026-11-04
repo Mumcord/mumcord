@@ -1,10 +1,21 @@
-//! The viewer's sound path (FR-2.42): the Opus packets of a watched share are decoded on its
+//! Screen-share sound. The sharer's side: what the share's sound is and why it may be missing
+//! ([`status`]), and the OS captures ([`windows`], [`macos`]).
+//!
+//! The viewer's side is here (FR-2.42): the Opus packets of a watched share are decoded on its
 //! reader task and played as their own source of the playback mix
 //! ([`mumcord_audio::mixer::share`]).
 //!
 //! The playback thread comes and goes with the voice pipeline, so watches do not hold on to it:
 //! the pipeline attaches its share port to [`ShareSoundHub`] while it runs, and each watch opens
 //! a new ring whenever the hub's generation changed.
+
+#[cfg(any(target_os = "macos", test))]
+pub mod macos;
+#[cfg(any(target_os = "linux", test))]
+pub mod matcher;
+pub(crate) mod status;
+#[cfg(windows)]
+pub(crate) mod windows;
 
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
@@ -15,6 +26,29 @@ use mumcord_audio::mixer::share::{
 
 use crate::session::lock;
 use crate::voice::VoiceShared;
+
+pub use status::{
+    AppName, ShareSoundMode, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+};
+
+/// Why this system cannot share sound at all (FR-7.84), checked before the share starts and
+/// shown in the start dialog; `None` where it can.
+pub(crate) fn unavailable() -> Option<SoundUnavailable> {
+    #[cfg(windows)]
+    {
+        (!super::capture_windows::sound_available()).then_some(SoundUnavailable::OsTooOld)
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let (major, _) = super::capture_macos::os_version();
+        (!super::capture_macos::sound_supported(major)).then_some(SoundUnavailable::OsTooOld)
+    }
+    // No Linux sound capture yet: treated like a system without PipeWire.
+    #[cfg(not(any(windows, target_os = "macos")))]
+    {
+        Some(SoundUnavailable::NoPipeWire)
+    }
+}
 
 /// Where watched shares' sound goes: the share port of the running playback thread, if any.
 #[derive(Default)]

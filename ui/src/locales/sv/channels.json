@@ -36,6 +36,17 @@
     "unregistered": "inte registrerad"
   },
   "mumcordBadge": "Använder Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Bottar på den här servern ({{total}})",
+    "inChannel": "i {{channel}}",
+    "modules": {
+      "peer": "Relä",
+      "music": "Spelar musik",
+      "history": "Chatthistorik",
+      "webhook": "Webhooks"
+    }
+  },
   "statusTip": {
     "registered": "Registrerad på den här servern",
     "listening": "Lyssnar bara",

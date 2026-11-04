@@ -5,8 +5,9 @@
 //! asks for the system picker and no own picker UI, so there the main screen is shared whole,
 //! as on X11. The stream delivers BGRA pictures, already scaled by the system into the encoder's
 //! largest box, and with macOS 13+ also the sound of exactly the shared content without
-//! Mumcord's own output ([`super::sound_macos`]). On a whole screen that is every app's sound
-//! but Mumcord's.
+//! Mumcord's own output ([`super::sound::macos`]). On a whole screen that is every app's sound
+//! but Mumcord's; on one window or one app only that app's sound (FR-7.76, FR-7.80). Sound needs
+//! no permission beyond screen recording.
 //!
 //! Screen recording needs the user's permission. Without it the share fails with
 //! [`MacCaptureError::ScreenRecordingDenied`], which the UI explains with a pointer to System
@@ -15,6 +16,7 @@
 //! The parts without macOS calls are compiled everywhere for the tests.
 
 use super::convert::fit;
+use super::signal::ShareKind;
 
 /// The encoder's largest picture (the 1080p30 quality step); the system scales into it, so a 5K
 /// screen costs no more than a Full HD one.
@@ -56,6 +58,33 @@ pub fn plan(major: i64, minor: i64) -> Plan {
 /// ScreenCaptureKit captures sound from macOS 13 on (FR-2.42).
 pub fn sound_supported(major: i64) -> bool {
     major >= 13
+}
+
+/// The sound each delivery may bring, in samples (1 s); the buffer is made this big up front, so
+/// the delivery queue never allocates.
+pub const SOUND_BUFFER: usize = mumcord_audio::SAMPLE_RATE as usize;
+
+/// What the user picked in the system picker.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Picked {
+    Display,
+    Window,
+    App,
+}
+
+/// What a pick shares (FR-7.76): a screen the desktop sound, a window or an app only that app's
+/// sound. An unknown pick stays unknown, which never shares the desktop sound (FR-7.87).
+pub fn picked_kind(picked: Option<Picked>) -> Option<ShareKind> {
+    match picked? {
+        Picked::Display => Some(ShareKind::Screen),
+        Picked::Window | Picked::App => Some(ShareKind::Window),
+    }
+}
+
+/// The picked content names its app from macOS 15.2 on; before, the live bar shows the sound
+/// as an app's without the name.
+pub fn app_names_known(major: i64, minor: i64) -> bool {
+    (major, minor) >= (15, 2)
 }
 
 /// Stream size for content of `width` × `height` pixels: fitted into [`CAPTURE_BOX`], never
@@ -109,16 +138,21 @@ mod sck {
     use objc2_foundation::{NSArray, NSError, NSObject, NSObjectProtocol, NSProcessInfo};
     use objc2_screen_capture_kit::{
         SCContentFilter, SCContentSharingPicker, SCContentSharingPickerConfiguration,
-        SCContentSharingPickerMode, SCContentSharingPickerObserver, SCShareableContent, SCStream,
-        SCStreamConfiguration, SCStreamDelegate, SCStreamErrorCode, SCStreamOutput,
-        SCStreamOutputType,
+        SCContentSharingPickerMode, SCContentSharingPickerObserver, SCShareableContent,
+        SCShareableContentStyle, SCStream, SCStreamConfiguration, SCStreamDelegate,
+        SCStreamErrorCode, SCStreamOutput, SCStreamOutputType,
     };
     use tokio::sync::oneshot;
 
-    use super::super::capture::{CaptureSource, SoundSource};
+    use super::super::capture::CaptureSource;
     use super::super::convert::{bgrx_to_i420, pack_rows};
-    use super::super::sound_macos::{MacSound, SoundSender, sound_channel};
-    use super::{MacCaptureError, Plan, is_share_sound, plan, sound_supported, stream_size};
+    use super::super::signal::ShareKind;
+    use super::super::sound::macos::{MacSound, SoundSender, sound_channel};
+    use super::super::sound::{AppName, ShareSoundMode, SoundOutcome, SoundRequest};
+    use super::{
+        MacCaptureError, Picked, Plan, SOUND_BUFFER, app_names_known, is_share_sound, picked_kind,
+        plan, sound_supported, stream_size,
+    };
     use crate::session::lock;
 
     /// Frames per second the stream delivers at most, the encoder's top rate.
@@ -157,8 +191,6 @@ mod sck {
         latest: Mutex<Latest>,
         sound: Mutex<Option<SoundFeed>>,
         ended: AtomicBool,
-        /// A sound format we cannot send was reported once already.
-        odd_sound: AtomicBool,
     }
 
     define_class!(
@@ -305,9 +337,13 @@ mod sck {
         unsafe { CVPixelBufferUnlockBaseAddress(&pixels, CVPixelBufferLockFlags::ReadOnly) };
     }
 
-    /// Hands the shared content's sound to the share. Runs on the sound queue.
+    /// Hands the shared content's sound to the share. Runs on the sound queue, the real-time
+    /// path: no waiting for a lock, no allocation, no logging.
     fn sound(shared: &Shared, buffer: &CMSampleBuffer) {
-        let mut feed = lock(&shared.sound);
+        // Only the capture's end holds the lock, and then this sound is not wanted any more.
+        let Ok(mut feed) = shared.sound.try_lock() else {
+            return;
+        };
         let Some(feed) = feed.as_mut() else {
             return;
         };
@@ -329,14 +365,7 @@ mod sck {
             asbd.mBitsPerChannel,
             asbd.mChannelsPerFrame,
         ) {
-            if !shared.odd_sound.swap(true, Ordering::Relaxed) {
-                tracing::warn!(
-                    rate = asbd.mSampleRate,
-                    channels = asbd.mChannelsPerFrame,
-                    bits = asbd.mBitsPerChannel,
-                    "screen share sound has an unexpected format and is left out"
-                );
-            }
+            feed.sender.fail();
             return;
         }
         // SAFETY: a valid sample buffer from the stream.
@@ -345,10 +374,11 @@ mod sck {
         };
         // SAFETY: the block buffer is valid while `data` is held.
         let len = unsafe { data.data_length() } / size_of::<f32>();
-        feed.samples.resize(len, 0.0);
-        if len == 0 {
+        if len == 0 || len > feed.samples.capacity() {
             return;
         }
+        // Within the capacity reserved at the start, so this never allocates.
+        feed.samples.resize(len, 0.0);
         let dest = NonNull::from(&mut feed.samples[..]).cast();
         // SAFETY: `dest` has room for exactly `len` floats, copied byte for byte.
         if unsafe { data.copy_data_bytes(0, len * size_of::<f32>(), dest) } != 0 {
@@ -366,6 +396,10 @@ mod sck {
         spare: Vec<u8>,
         /// Until the share takes it ([`CaptureSource::take_sound`]).
         sound: Option<MacSound>,
+        /// What the user picked, as viewers and the sound see it.
+        kind: Option<ShareKind>,
+        /// The picked app, where the system names it.
+        app: Option<AppName>,
         stream: Retained<SCStream>,
         _handler: Retained<StreamHandler>,
         _queues: [DispatchRetained<DispatchQueue>; 2],
@@ -380,9 +414,12 @@ mod sck {
         /// starts capturing it, with the shared content's sound where the system has it.
         pub async fn open() -> Result<Self, MacCaptureError> {
             let (major, minor) = os_version();
-            let (filter, size) = match plan(major, minor) {
+            let (filter, size, kind, app) = match plan(major, minor) {
                 Plan::Unsupported => return Err(MacCaptureError::Unsupported),
-                Plan::MainDisplay => main_display().await?,
+                Plan::MainDisplay => {
+                    let (filter, size) = main_display().await?;
+                    (filter, size, Some(ShareKind::Screen), None)
+                }
                 Plan::Picker => {
                     let filter = pick().await?;
                     // SAFETY: macOS 14+ API on the picked filter.
@@ -393,11 +430,49 @@ mod sck {
                         )
                     };
                     let size = stream_size(rect.size.width * scale, rect.size.height * scale);
-                    (filter, size)
+                    let pick = picked(&filter.0);
+                    let app = match pick {
+                        Some(Picked::Window | Picked::App) if app_names_known(major, minor) => {
+                            app_name(&filter.0)
+                        }
+                        _ => None,
+                    };
+                    (filter, size, picked_kind(pick), app)
                 }
             };
-            start(filter, size, sound_supported(major)).await
+            let mut capture = start(filter, size, sound_supported(major)).await?;
+            capture.kind = kind;
+            capture.app = app;
+            Ok(capture)
         }
+    }
+
+    /// What the picked filter shows (macOS 14+).
+    fn picked(filter: &SCContentFilter) -> Option<Picked> {
+        // SAFETY: macOS 14+ API, called only after the picker.
+        match unsafe { filter.style() } {
+            SCShareableContentStyle::Display => Some(Picked::Display),
+            SCShareableContentStyle::Window => Some(Picked::Window),
+            SCShareableContentStyle::Application => Some(Picked::App),
+            _ => None,
+        }
+    }
+
+    /// The name of the app behind a window or app pick (macOS 15.2+); it stays on this device
+    /// (FR-7.87).
+    fn app_name(filter: &SCContentFilter) -> Option<AppName> {
+        // SAFETY: macOS 15.2+ API, checked by the caller.
+        let app = unsafe {
+            filter.includedApplications().firstObject().or_else(|| {
+                filter
+                    .includedWindows()
+                    .firstObject()
+                    .and_then(|w| w.owningApplication())
+            })
+        }?;
+        // SAFETY: plain property of a valid app.
+        let name = unsafe { app.applicationName() }.to_string();
+        (!name.is_empty()).then(|| AppName::new(name))
     }
 
     type Filter = Moved<Retained<SCContentFilter>>;
@@ -512,7 +587,7 @@ mod sck {
             let (sender, source) = sound_channel();
             *lock(&shared.sound) = Some(SoundFeed {
                 sender,
-                samples: Vec::new(),
+                samples: Vec::with_capacity(SOUND_BUFFER),
             });
             source
         });
@@ -529,6 +604,8 @@ mod sck {
             shared,
             spare: Vec::new(),
             sound,
+            kind: None,
+            app: None,
             stream,
             _handler: handler,
             _queues: queues,
@@ -610,10 +687,25 @@ mod sck {
             self.shared.ended.load(Ordering::Relaxed)
         }
 
-        fn take_sound(&mut self) -> Option<Box<dyn SoundSource>> {
-            self.sound
-                .take()
-                .map(|s| Box::new(s) as Box<dyn SoundSource>)
+        fn kind(&self) -> Option<ShareKind> {
+            self.kind
+        }
+
+        fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
+            let Some(sound) = self.sound.take() else {
+                return SoundOutcome::NoSound;
+            };
+            // The stream's filter already limits the sound to what was picked (FR-7.80).
+            let mode = request.mode();
+            SoundOutcome::Captured {
+                source: Box::new(sound),
+                mode,
+                app: if mode == ShareSoundMode::App {
+                    self.app.take()
+                } else {
+                    None
+                },
+            }
         }
 
         fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {
@@ -659,6 +751,26 @@ mod tests {
         assert!(!sound_supported(12));
         assert!(sound_supported(13));
         assert!(sound_supported(26));
+    }
+
+    #[test]
+    fn the_pick_decides_the_sound() {
+        assert_eq!(picked_kind(Some(Picked::Display)), Some(ShareKind::Screen));
+        assert_eq!(picked_kind(Some(Picked::Window)), Some(ShareKind::Window));
+        assert_eq!(
+            picked_kind(Some(Picked::App)),
+            Some(ShareKind::Window),
+            "an app shares only its own sound"
+        );
+        assert_eq!(picked_kind(None), None);
+    }
+
+    #[test]
+    fn app_names_need_15_2() {
+        assert!(!app_names_known(14, 6));
+        assert!(!app_names_known(15, 1));
+        assert!(app_names_known(15, 2));
+        assert!(app_names_known(26, 0));
     }
 
     #[test]

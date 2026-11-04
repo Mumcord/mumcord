@@ -54,6 +54,18 @@ describe("ban list window", () => {
     expect(await axeViolations(dialog)).toEqual([]);
   });
 
+  it("has a visible close button that closes the window, and does not take the first focus (issue #468)", async () => {
+    const dialog = await openWindow();
+    const close = within(dialog).getByRole("button", { name: "Close" });
+    expect(document.activeElement).not.toBe(close);
+    act(() => {
+      fireEvent.click(close);
+    });
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: TITLE })).toBeNull();
+    });
+  });
+
   it("reveals one address and masks it again when hidden (FR-10.51)", async () => {
     const dialog = await openWindow();
     const row = rowOf(dialog, "Mallory");
@@ -249,7 +261,7 @@ describe("ban list window", () => {
     });
     expect(within(dialog).getByText(/Unsaved changes are gone\./)).toBeTruthy();
     expect(within(dialog).queryByRole("button", { name: "Save ban list" })).toBeNull();
-    expect(within(dialog).getByRole("button", { name: "Close" })).toBeTruthy();
+    expect(within(dialog).getAllByRole("button", { name: "Close" })).not.toHaveLength(0);
   });
 
   it("shows skeletons while the server's list is on its way (issue #436)", async () => {

@@ -39,6 +39,17 @@
     "unregistered": "nereģistrēts"
   },
   "mumcordBadge": "Izmanto Mumcord",
+  "botBadge": "Bots",
+  "bots": {
+    "title": "Boti šajā serverī ({{total}})",
+    "inChannel": "kanālā {{channel}}",
+    "modules": {
+      "peer": "Relejs",
+      "music": "Atskaņo mūziku",
+      "history": "Tērzēšanas vēsture",
+      "webhook": "Tīmekļa āķi"
+    }
+  },
   "statusTip": {
     "registered": "Reģistrēts šajā serverī",
     "listening": "Tikai klausās",

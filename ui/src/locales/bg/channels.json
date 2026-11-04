@@ -36,6 +36,17 @@
     "unregistered": "нерегистриран"
   },
   "mumcordBadge": "Използва Mumcord",
+  "botBadge": "Бот",
+  "bots": {
+    "title": "Ботове на този сървър ({{total}})",
+    "inChannel": "в канал {{channel}}",
+    "modules": {
+      "peer": "Реле",
+      "music": "Пуска музика",
+      "history": "История на чата",
+      "webhook": "Уебхукове"
+    }
+  },
   "statusTip": {
     "registered": "Регистриран на този сървър",
     "listening": "Само слушане",

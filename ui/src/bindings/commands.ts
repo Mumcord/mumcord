@@ -3811,7 +3811,12 @@ export type RelayUnavailable =
 /**  "The relay could not be reached over UDP or TCP 443." */
 { kind: "unreachable" } | 
 /**  "The other person can't use the relay (older Mumcord or relay turned off)." */
-{ kind: "peerCannotRelay" } | { kind: "denied" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" } | 
+{ kind: "peerCannotRelay" } | { kind: "denied" } | 
+/**
+ *  "This server's relay is only available to registered users. Register on this server to
+ *  use it."
+ */
+{ kind: "notRegistered" } | { kind: "peerGone" } | { kind: "rateLimited" } | { kind: "relayFull" } | 
 /**  "This server's relay doesn't allow {images / file sharing / screen sharing}" (FR-7.7). */
 { kind: "useNotAllowed"; use: RelayUse };
 

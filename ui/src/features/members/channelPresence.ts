@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import type { Conversation } from "../../api";
 import { useSelectedConversation } from "../channels/selection";
 import { useServerSelector, type ServerState } from "../channels/serverStore";
+import { isHiddenBot } from "../channels/mumcord";
 
 /** Who is in a channel, as the members button in the chat header summarises it (issue #165). */
 export interface ChannelPresence {
@@ -23,6 +24,7 @@ export function channelPresence(
   let count = 0;
   const talkers: string[] = [];
   for (const user of state.users.values()) {
+    if (isHiddenBot(user)) continue;
     if (user.channelId === channelId) {
       count += 1;
       if (state.talking.has(user.session)) talkers.push(user.name);

@@ -45,6 +45,7 @@
     "unreachable": "Relej nije bilo moguće dosegnuti ni preko UDP-a ni preko TCP 443.",
     "peerCannotRelay": "Druga osoba ne može koristiti relej (stariji Mumcord ili isključen relej).",
     "denied": "Bot releja odbio je zahtjev.",
+    "notRegistered": "Relej ovog poslužitelja dostupan je samo registriranim korisnicima. Registriraj se na ovom poslužitelju da bi ga koristio.",
     "peerGone": "Druga osoba napustila je poslužitelj.",
     "rateLimited": "Previše zahtjeva za relej. Pokušaj ponovno za minutu."
   },

@@ -45,6 +45,7 @@
     "unreachable": "Releul nu a putut fi contactat nici prin UDP, nici prin TCP 443.",
     "peerCannotRelay": "Cealaltă persoană nu poate folosi releul (Mumcord mai vechi sau releu dezactivat).",
     "denied": "Botul releului a refuzat cererea.",
+    "notRegistered": "Releul acestui server este disponibil doar pentru utilizatorii înregistrați. Înregistrează-te pe acest server ca să-l folosești.",
     "peerGone": "Cealaltă persoană a părăsit serverul.",
     "rateLimited": "Prea multe cereri către releu. Încearcă din nou peste un minut."
   },

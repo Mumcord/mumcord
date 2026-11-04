@@ -45,6 +45,7 @@
     "unreachable": "No se pudo acceder al relé por UDP ni por TCP 443.",
     "peerCannotRelay": "La otra persona no puede usar el relé (Mumcord antiguo o relé desactivado).",
     "denied": "El bot del relé rechazó la solicitud.",
+    "notRegistered": "El relé de este servidor solo está disponible para usuarios registrados. Regístrate en este servidor para usarlo.",
     "peerGone": "La otra persona salió del servidor.",
     "rateLimited": "Demasiadas solicitudes al relé. Inténtalo de nuevo en un minuto."
   },
