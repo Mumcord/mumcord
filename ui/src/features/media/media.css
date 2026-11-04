@@ -971,9 +971,25 @@
     border: 1px solid ButtonText;
   }
 
-  .media-stage__tab[aria-selected="true"] {
+  .media-stage__tab {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  /* System colours on the tab and every child, so the name cannot inherit a colour that
+     matches the highlight. The thick underline and bold weight keep the selected state
+     visible without relying on colour alone. */
+  .media-stage__tab[aria-selected="true"],
+  .media-stage__tab[aria-selected="true"] > * {
     background: Highlight;
     color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .media-stage__tab[aria-selected="true"] {
+    border-bottom: 4px solid HighlightText;
+    box-shadow: 0 0 0 2px Highlight;
+    font-weight: var(--font-weight-bold);
   }
 
   .media-stage__dot {
