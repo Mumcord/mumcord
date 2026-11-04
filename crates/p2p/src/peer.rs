@@ -90,6 +90,42 @@ impl RelayUse {
     }
 }
 
+/// What a relay broadcast carries (wire `k` on `bcast-tok`). A sender can run one broadcast of
+/// each kind at once, so a viewer needs the kind to hand a token to the right one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum BroadcastKind {
+    /// Screen sharing (spec 07), wire `scr`; also what a bot that sends no `k` means.
+    ScreenShare,
+    /// Plugin data (spec 09), wire `plg`.
+    PluginData,
+    /// Camera sharing (spec 08), wire `cam`.
+    Camera,
+}
+
+impl BroadcastKind {
+    pub fn as_str(self) -> &'static str {
+        self.relay_use().as_str()
+    }
+
+    /// The relay use the broadcast counts against.
+    pub fn relay_use(self) -> RelayUse {
+        match self {
+            Self::ScreenShare => RelayUse::ScreenShare,
+            Self::PluginData => RelayUse::PluginData,
+            Self::Camera => RelayUse::Camera,
+        }
+    }
+
+    fn parse(s: &str) -> Option<Self> {
+        Some(match RelayUse::parse(s)? {
+            RelayUse::ScreenShare => Self::ScreenShare,
+            RelayUse::PluginData => Self::PluginData,
+            RelayUse::Camera => Self::Camera,
+            RelayUse::Images | RelayUse::Files => return None,
+        })
+    }
+}
+
 /// Whether the relay bot can currently reach its relay.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RelayState {
@@ -307,12 +343,14 @@ pub enum PeerMessage {
         id: BroadcastId,
         viewer: u32,
     },
-    /// Bot → viewer: the subscriber token for the broadcast of session `sharer` (`bcast-tok`).
+    /// Bot → viewer: the subscriber token for the `kind` broadcast of session `sharer`
+    /// (`bcast-tok`). Bots from before wire `k` send none, which means screen sharing.
     BroadcastToken {
         id: BroadcastId,
         token: RelayToken,
         ttl: u16,
         sharer: u32,
+        kind: BroadcastKind,
     },
     /// Sharer → bot: remove the user with session `viewer` from the broadcast (`bcast-kick`).
     BroadcastKick { id: BroadcastId, viewer: u32 },
@@ -439,6 +477,8 @@ struct BroadcastTokenWire {
     tok: String,
     ttl: u16,
     sharer: u32,
+    #[serde(default)]
+    k: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -564,6 +604,7 @@ impl PeerMessage {
                 token,
                 ttl,
                 sharer,
+                kind,
             } => envelope(
                 "bcast-tok",
                 BroadcastTokenWire {
@@ -571,6 +612,7 @@ impl PeerMessage {
                     tok: token.0.clone(),
                     ttl: *ttl,
                     sharer: *sharer,
+                    k: Some(kind.as_str().to_owned()),
                 },
             )?,
             Self::BroadcastKick { id, viewer } => envelope(
@@ -707,6 +749,11 @@ impl PeerMessage {
                     token: RelayToken::parse(&wire.tok)?,
                     ttl: wire.ttl,
                     sharer: wire.sharer,
+                    kind: wire
+                        .k
+                        .map(|k| BroadcastKind::parse(&k).ok_or(PeerError::BadUse))
+                        .transpose()?
+                        .unwrap_or(BroadcastKind::ScreenShare),
                 })
             }
             "bcast-kick" => {
@@ -916,6 +963,7 @@ mod tests {
                 token: RelayToken::parse(TOKEN).expect("token"),
                 ttl: 60,
                 sharer: 8,
+                kind: BroadcastKind::Camera,
             },
             PeerMessage::BroadcastKick {
                 id: BroadcastId(1),
@@ -1145,6 +1193,14 @@ mod tests {
                 PeerError::BadToken,
             ),
             (
+                format!(r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":1,"k":"file"}}"#),
+                PeerError::BadUse,
+            ),
+            (
+                format!(r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":1,"k":"vid"}}"#),
+                PeerError::BadUse,
+            ),
+            (
                 r#"{"v":1,"t":"bcast-kick","id":"000000000000000G","viewer":1}"#.into(),
                 PeerError::BadBroadcastId,
             ),
@@ -1272,9 +1328,10 @@ mod tests {
                 token: RelayToken::parse(TOKEN).expect("token"),
                 ttl: 60,
                 sharer: 8,
+                kind: BroadcastKind::PluginData,
             }),
             format!(
-                r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":8}}"#
+                r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":8,"k":"plg"}}"#
             )
         );
         assert_eq!(
@@ -1284,6 +1341,36 @@ mod tests {
             }),
             r#"{"v":1,"t":"bcast-err","rid":"0000000000000001","r":"relay-full"}"#
         );
+    }
+
+    #[test]
+    fn a_broadcast_token_names_its_kind_and_defaults_to_screen_sharing() {
+        let old_bot = format!(
+            r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":8}}"#
+        );
+        let Ok(PeerMessage::BroadcastToken { kind, sharer, .. }) =
+            PeerMessage::decode(old_bot.as_bytes())
+        else {
+            panic!("old bot token must decode");
+        };
+        assert_eq!((kind, sharer), (BroadcastKind::ScreenShare, 8));
+        for (wire, expected) in [
+            ("scr", BroadcastKind::ScreenShare),
+            ("plg", BroadcastKind::PluginData),
+            ("cam", BroadcastKind::Camera),
+        ] {
+            let bytes = format!(
+                r#"{{"v":1,"t":"bcast-tok","id":"0000000000000001","tok":"{TOKEN}","ttl":60,"sharer":8,"k":"{wire}"}}"#
+            );
+            let message = PeerMessage::decode(bytes.as_bytes()).expect(wire);
+            assert!(
+                matches!(message, PeerMessage::BroadcastToken { kind, .. } if kind == expected),
+                "{wire}"
+            );
+            assert_eq!(expected.as_str(), wire);
+            let again = message.encode().expect("encode");
+            assert_eq!(PeerMessage::decode(&again).expect("round trip"), message);
+        }
     }
 
     #[test]
