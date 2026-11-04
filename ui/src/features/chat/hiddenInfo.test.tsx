@@ -63,6 +63,7 @@ function serverWith(welcomeText: string): ServerState {
             write: false,
             moveUsers: false,
             ban: false,
+            kick: false,
           },
           description: null,
           hasDescription: false,

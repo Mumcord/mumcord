@@ -61,7 +61,7 @@ describe("shared channel actions (issue #172)", () => {
     await renderTree();
     act(() => {
       api.mock.updateChannel(2, {
-        permissions: { ...permissionsOf(2), moveUsers: true, ban: false },
+        permissions: { ...permissionsOf(2), moveUsers: true, ban: false, kick: false },
       });
     });
     const tree = itemLabels(openTreeMenu(/^Raid/));
@@ -74,7 +74,7 @@ describe("shared channel actions (issue #172)", () => {
     resetChatStore();
     act(() => {
       api.mock.updateChannel(2, {
-        permissions: { ...permissionsOf(2), moveUsers: true, ban: false },
+        permissions: { ...permissionsOf(2), moveUsers: true, ban: false, kick: false },
       });
     });
     render(<ChatView renderChannelTitle={(id) => <ChannelHeader channelId={id} />} />);
@@ -210,7 +210,7 @@ describe("moving people (issue #172)", () => {
     act(() => {
       for (const id of [1, 2]) {
         api.mock.updateChannel(id, {
-          permissions: { ...permissionsOf(id), moveUsers: true, ban: false },
+          permissions: { ...permissionsOf(id), moveUsers: true, ban: false, kick: false },
         });
       }
     });
@@ -243,7 +243,7 @@ describe("moving people (issue #172)", () => {
     act(() => {
       for (const id of [1, 2]) {
         api.mock.updateChannel(id, {
-          permissions: { ...permissionsOf(id), moveUsers: true, ban: false },
+          permissions: { ...permissionsOf(id), moveUsers: true, ban: false, kick: false },
         });
       }
     });
