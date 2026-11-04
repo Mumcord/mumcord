@@ -50,7 +50,7 @@ export function PluginCard({ plugin, installed, onDetails, onInstall }: PluginCa
             </button>
           </h3>
           <span className={official ? "plugin-label" : "plugin-label plugin-label-unofficial"}>
-            {official ? `✓ ${sourceLabel(t, plugin.source)}` : sourceLabel(t, plugin.source)}
+            {official ? `✓ ${t("officialReviewed")}` : sourceLabel(t, plugin.source)}
           </span>
         </div>
         <p className="plugin-card-meta">{meta.join(" · ")}</p>
@@ -82,7 +82,8 @@ export function PluginCard({ plugin, installed, onDetails, onInstall }: PluginCa
           disabled={needsMumcord !== null || blocked}
           onClick={onInstall}
         >
-          {t("install")}
+          {/* Unofficial plugins open a confirmation first (mockup 01). */}
+          {official ? t("install") : `${t("install")}…`}
         </button>
       )}
     </li>
