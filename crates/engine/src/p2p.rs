@@ -713,7 +713,9 @@ async fn accept_streams(engine: WeakEngine, key: Key, connection: quinn::Connect
                 return;
             }
             match kind[0] {
-                STREAM_FULL_IMAGE => crate::full_image::serve_direct(&engine, send, recv).await,
+                STREAM_FULL_IMAGE => {
+                    crate::full_image::serve_direct(&engine, key, send, recv).await;
+                }
                 STREAM_SCREEN => {
                     crate::screen_share::serve_direct(&engine, key.0, key.1, send, recv).await;
                 }

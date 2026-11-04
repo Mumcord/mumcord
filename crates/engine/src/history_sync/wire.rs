@@ -104,8 +104,14 @@ pub struct WireMessage {
     /// Sender certificate hash, if the sender had one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub h: Option<String>,
-    /// Body as stored by the holder (sanitized HTML; sanitized again on receipt).
+    /// Body as stored by the holder (sanitized HTML; sanitized again on receipt). For a
+    /// requester that announced `histimg`, inline images may be hash references
+    /// ([`super::images`]).
     pub b: String,
+    /// Content hash of the holder's stored body (hex), sent only with a body whose images
+    /// became references: the requester cannot compute it without the image bytes.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub k: Option<String>,
 }
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
@@ -605,12 +611,14 @@ mod tests {
                 n: "Alice".into(),
                 h: Some("ab".into()),
                 b: "<b>hi</b>\n".into(),
+                k: None,
             },
             WireMessage {
                 ts: 2,
                 n: "Guest".into(),
                 h: None,
                 b: String::new(),
+                k: None,
             },
         ];
         assert_eq!(decode_messages(&encode_messages(&messages)), Ok(messages));
