@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Plugin-indhold · {{plugin}}",
     "tagUnofficial": "Plugin-indhold · {{plugin}} · Uofficielt",
-    "label": "Indhold fra {{plugin}}",
+    "label": "{{plugin}}, plugin-indhold",
     "stopped": "{{plugin}} svarer ikke længere",
     "reload": "Genindlæs",
     "mute": "Slå lyde fra {{plugin}} fra",

@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Sadržaj dodatka · {{plugin}}",
     "tagUnofficial": "Sadržaj dodatka · {{plugin}} · Neslužbeni",
-    "label": "Sadržaj dodatka {{plugin}}",
+    "label": "{{plugin}}, sadržaj dodatka",
     "stopped": "{{plugin}} više ne odgovara",
     "reload": "Učitaj ponovno",
     "mute": "Utišaj zvukove dodatka {{plugin}}",

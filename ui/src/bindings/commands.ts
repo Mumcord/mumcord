@@ -703,6 +703,11 @@ export const commands = {
 	 */
 	pluginFramesMute: (plugin: string | null, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frames_mute", { plugin, muted })),
 	/**
+	 *  The current frame mute state. A window that opens later (a popped-out stage) reads it once and
+	 *  then follows `plugin://frame-mute`.
+	 */
+	pluginFramesMuteState: () => __TAURI_INVOKE<PluginFrameMuteState>("plugin_frames_mute_state"),
+	/**
 	 *  The plugin activities in the user's channel on the focused server (activity lines, stage
 	 *  tabs and header). Re-fetch on `plugins://stage-changed`.
 	 */
@@ -3013,6 +3018,17 @@ export type PluginFactorKind = "highPermission" | "webSurface" | "relay" | "medi
 export type PluginFrameMute = {
 	plugin: string | null,
 	muted: boolean,
+};
+
+/**
+ *  What every plugin frame must currently hear, kept so a window that opens later (a popped-out
+ *  stage) can still mute its frames for a mute or deafen that happened before.
+ */
+export type PluginFrameMuteState = {
+	/**  All frames are muted (the user is deafened). */
+	all: boolean,
+	/**  Plugins whose frames the user muted, sorted. */
+	plugins: string[],
 };
 
 /**  Why the one confirmation box shows. */

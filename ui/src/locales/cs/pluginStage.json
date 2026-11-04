@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Obsah doplňku · {{plugin}}",
     "tagUnofficial": "Obsah doplňku · {{plugin}} · Neoficiální",
-    "label": "Obsah doplňku {{plugin}}",
+    "label": "{{plugin}}, obsah doplňku",
     "stopped": "{{plugin}} přestal reagovat",
     "reload": "Načíst znovu",
     "mute": "Ztlumit zvuky z {{plugin}}",

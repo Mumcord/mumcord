@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Contenido del plugin · {{plugin}}",
     "tagUnofficial": "Contenido del plugin · {{plugin}} · No oficial",
-    "label": "Contenido de {{plugin}}",
+    "label": "{{plugin}}, contenido del plugin",
     "stopped": "{{plugin}} dejó de responder",
     "reload": "Recargar",
     "mute": "Silenciar los sonidos de {{plugin}}",

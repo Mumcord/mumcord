@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Spraudņa saturs · {{plugin}}",
     "tagUnofficial": "Spraudņa saturs · {{plugin}} · Neoficiāls",
-    "label": "{{plugin}} saturs",
+    "label": "{{plugin}}, spraudņa saturs",
     "stopped": "{{plugin}} pārstāja reaģēt",
     "reload": "Ielādēt vēlreiz",
     "mute": "Izslēgt {{plugin}} skaņas",

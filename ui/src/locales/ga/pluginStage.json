@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Inneachar breiseáin · {{plugin}}",
     "tagUnofficial": "Inneachar breiseáin · {{plugin}} · Neamhoifigiúil",
-    "label": "Inneachar {{plugin}}",
+    "label": "{{plugin}}, inneachar breiseáin",
     "stopped": "Stop {{plugin}} de fhreagairt",
     "reload": "Athluchtaigh",
     "mute": "Balbhaigh fuaimeanna ó {{plugin}}",

@@ -263,6 +263,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_diagnostics,
             commands::plugins::plugin_reenable_web,
             commands::plugins::plugin_frames_mute,
+            commands::plugins::plugin_frames_mute_state,
             commands::plugins::stage_activities,
             commands::plugins::stage_join,
             commands::plugins::stage_leave,
@@ -525,6 +526,7 @@ pub fn run() {
         .manage(window::StartReveal::default())
         .manage(dropped::DroppedFiles::default())
         .manage(aux_window::OpenLock::default())
+        .manage(plugins::ui::FrameMuteStore::default())
         .manage(commands::inspector::SharedView::default())
         .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())

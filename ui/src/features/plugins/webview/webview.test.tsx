@@ -24,6 +24,7 @@ const api = vi.hoisted(() => ({
   framesMute: vi.fn<(plugin: string | null, muted: boolean) => Promise<null>>(() =>
     Promise.resolve(null),
   ),
+  muteState: { all: false, plugins: [] as string[] },
   listeners: new Map<string, (payload: unknown) => void>(),
   plugins: [] as { id: string; name: string; source: { kind: string } }[],
 }));
@@ -32,6 +33,7 @@ vi.mock("../../../api", async (orig) => {
   const mocked = {
     pluginUiEvent: api.sendEvent,
     pluginFramesMute: api.framesMute,
+    pluginFramesMuteState: () => Promise.resolve({ ...api.muteState }),
     pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: api.plugins }),
     on: (name: string, handler: (payload: unknown) => void) => {
       const key = `${name}:${String(Math.random())}`;
@@ -89,6 +91,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  api.muteState = { all: false, plugins: [] };
   api.sendEvent.mockClear();
   api.framesMute.mockClear();
   api.plugins = [{ id: "snacks", name: "Snacks", source: { kind: "official" } }];
@@ -251,7 +254,7 @@ describe("PluginFrame", () => {
     async (place) => {
       const { container } = render(<PluginFrame plugin="snacks" webview={viewIn(place)} />);
       await screen.findByText("Plugin content · Snacks");
-      expect(frameOf(container).title).toBe("Snacks content");
+      expect(frameOf(container).title).toBe("Snacks, plugin content");
       expect(container.querySelector(`.plugin-frame[data-place="${place}"]`)).not.toBeNull();
       expect(await axeViolations(container)).toEqual([]);
     },
@@ -405,6 +408,18 @@ describe("PluginFrame sound", () => {
     emit("pluginFrameMute", { plugin: "other", muted: false } satisfies PluginFrameMute);
     expect(muteMessages(post)).toEqual([false, true]);
     expect(await axeViolations(container)).toEqual([]);
+  });
+
+  it("replays the stored mute state to a window that opens after the mute", async () => {
+    api.muteState = { all: false, plugins: ["snacks"] };
+    const { container } = render(<PluginFrame plugin="snacks" webview={view()} />);
+    await screen.findByText("Plugin content · Snacks");
+    const page = pageOf(container);
+    const post = vi.spyOn(page, "postMessage");
+    fireEvent.load(frameOf(container));
+    fromPage(page, { mumcordWebview: "sound" });
+    await screen.findByRole("button", { name: "Unmute sounds from Snacks" });
+    expect(muteMessages(post).at(-1)).toBe(true);
   });
 
   it("mutes every frame while deafened and resends the state to a frame that opens later", () => {

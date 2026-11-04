@@ -40,8 +40,9 @@ use super::types::{
     ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
 };
 use crate::plugins::ui::{
-    ActionKind, AppMenuItem, PluginFrameMute, PluginPanelVisibility, PluginSlot, PluginUi,
-    PluginUiChange, PluginWebviewPlace, StageActivityView, StageJoinError,
+    ActionKind, AppMenuItem, FrameMuteStore, PluginFrameMute, PluginFrameMuteState,
+    PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange, PluginWebviewPlace,
+    StageActivityView, StageJoinError,
 };
 use crate::plugins::{self, Plugins, PluginsChanged, PreparedInstall, RepoIndex};
 use tauri_specta::Event as _;
@@ -1594,9 +1595,19 @@ pub async fn plugin_reenable_web(app: AppHandle, id: String) -> ApiResult<()> {
 #[tauri::command]
 #[specta::specta]
 pub fn plugin_frames_mute(app: AppHandle, plugin: Option<String>, muted: bool) -> ApiResult<()> {
-    PluginFrameMute { plugin, muted }
+    let change = PluginFrameMute { plugin, muted };
+    app.state::<FrameMuteStore>().apply(&change);
+    change
         .emit(&app)
         .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
+}
+
+/// The current frame mute state. A window that opens later (a popped-out stage) reads it once and
+/// then follows `plugin://frame-mute`.
+#[tauri::command]
+#[specta::specta]
+pub fn plugin_frames_mute_state(app: AppHandle) -> PluginFrameMuteState {
+    app.state::<FrameMuteStore>().snapshot()
 }
 
 /// The plugin activities in the user's channel on the focused server (activity lines, stage

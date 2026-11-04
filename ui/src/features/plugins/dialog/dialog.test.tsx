@@ -13,6 +13,7 @@ vi.mock("../../../api", async (orig) => ({
     pluginUiEvent: sendEvent,
     on: () => () => undefined,
     pluginsUiTrees: () => Promise.resolve([]),
+    pluginFramesMuteState: () => Promise.resolve({ all: false, plugins: [] }),
   }),
 }));
 

@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Vsebina vtičnika · {{plugin}}",
     "tagUnofficial": "Vsebina vtičnika · {{plugin}} · Neuradni",
-    "label": "Vsebina {{plugin}}",
+    "label": "{{plugin}}, vsebina vtičnika",
     "stopped": "{{plugin}} se ne odziva več",
     "reload": "Znova naloži",
     "mute": "Utišaj zvoke vtičnika {{plugin}}",

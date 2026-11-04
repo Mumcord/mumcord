@@ -411,6 +411,51 @@ pub struct PluginFrameMute {
     pub muted: bool,
 }
 
+/// What every plugin frame must currently hear, kept so a window that opens later (a popped-out
+/// stage) can still mute its frames for a mute or deafen that happened before.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PluginFrameMuteState {
+    /// All frames are muted (the user is deafened).
+    pub all: bool,
+    /// Plugins whose frames the user muted, sorted.
+    pub plugins: Vec<String>,
+}
+
+/// The mute state behind [`PluginFrameMuteState`], kept in the app's managed state.
+#[derive(Default)]
+pub struct FrameMuteStore(std::sync::Mutex<PluginFrameMuteState>);
+
+impl FrameMuteStore {
+    /// Records one `plugin://frame-mute` change.
+    pub fn apply(&self, change: &PluginFrameMute) {
+        let mut state = self
+            .0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        match &change.plugin {
+            None => state.all = change.muted,
+            Some(plugin) => {
+                let position = state.plugins.binary_search(plugin);
+                match (position, change.muted) {
+                    (Err(at), true) => state.plugins.insert(at, plugin.clone()),
+                    (Ok(at), false) => {
+                        state.plugins.remove(at);
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    pub fn snapshot(&self) -> PluginFrameMuteState {
+        self.0
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .clone()
+    }
+}
+
 /// How the user saw the plugin's panel.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -1047,6 +1092,40 @@ fn kind_of(component: &PluginComponent, wanted: &str) -> Option<ActionKind> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn mute(plugin: Option<&str>, muted: bool) -> PluginFrameMute {
+        PluginFrameMute {
+            plugin: plugin.map(str::to_owned),
+            muted,
+        }
+    }
+
+    #[test]
+    fn frame_mute_store_keeps_deafen_and_per_plugin_state() {
+        let store = FrameMuteStore::default();
+        assert_eq!(store.snapshot(), PluginFrameMuteState::default());
+        store.apply(&mute(None, true));
+        store.apply(&mute(Some("b"), true));
+        store.apply(&mute(Some("a"), true));
+        store.apply(&mute(Some("a"), true));
+        assert_eq!(
+            store.snapshot(),
+            PluginFrameMuteState {
+                all: true,
+                plugins: vec!["a".into(), "b".into()]
+            }
+        );
+        store.apply(&mute(Some("a"), false));
+        store.apply(&mute(Some("zzz"), false));
+        store.apply(&mute(None, false));
+        assert_eq!(
+            store.snapshot(),
+            PluginFrameMuteState {
+                all: false,
+                plugins: vec!["b".into()]
+            }
+        );
+    }
 
     fn node(component: PluginComponent) -> PluginNode {
         PluginNode {

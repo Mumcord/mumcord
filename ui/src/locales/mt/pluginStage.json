@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Kontenut tal-plugin · {{plugin}}",
     "tagUnofficial": "Kontenut tal-plugin · {{plugin}} · Mhux uffiċjali",
-    "label": "Kontenut ta' {{plugin}}",
+    "label": "{{plugin}}, kontenut tal-plugin",
     "stopped": "{{plugin}} waqaf iwieġeb",
     "reload": "Erġa' tella'",
     "mute": "Skuta l-ħsejjes minn {{plugin}}",

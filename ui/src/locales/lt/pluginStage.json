@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Papildinio turinys · {{plugin}}",
     "tagUnofficial": "Papildinio turinys · {{plugin}} · Neoficialus",
-    "label": "{{plugin}} turinys",
+    "label": "{{plugin}}, papildinio turinys",
     "stopped": "{{plugin}} nustojo atsakyti",
     "reload": "Įkelti iš naujo",
     "mute": "Nutildyti {{plugin}} garsus",

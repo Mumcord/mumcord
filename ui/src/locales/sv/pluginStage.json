@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Tilläggsinnehåll · {{plugin}}",
     "tagUnofficial": "Tilläggsinnehåll · {{plugin}} · Inofficiellt",
-    "label": "Innehåll från {{plugin}}",
+    "label": "{{plugin}}, tilläggsinnehåll",
     "stopped": "{{plugin}} slutade svara",
     "reload": "Läs in igen",
     "mute": "Stäng av ljud från {{plugin}}",

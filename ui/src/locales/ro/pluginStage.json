@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Conținut de plugin · {{plugin}}",
     "tagUnofficial": "Conținut de plugin · {{plugin}} · Neoficial",
-    "label": "Conținut {{plugin}}",
+    "label": "{{plugin}}, conținut de plugin",
     "stopped": "{{plugin}} nu mai răspunde",
     "reload": "Reîncarcă",
     "mute": "Dezactivează sunetele de la {{plugin}}",

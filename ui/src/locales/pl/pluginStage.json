@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Treść wtyczki · {{plugin}}",
     "tagUnofficial": "Treść wtyczki · {{plugin}} · Nieoficjalna",
-    "label": "Treść wtyczki {{plugin}}",
+    "label": "{{plugin}}, treść wtyczki",
     "stopped": "{{plugin}} przestała odpowiadać",
     "reload": "Wczytaj ponownie",
     "mute": "Wycisz dźwięki z {{plugin}}",

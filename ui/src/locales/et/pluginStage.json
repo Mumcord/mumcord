@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Plugina sisu · {{plugin}}",
     "tagUnofficial": "Plugina sisu · {{plugin}} · Mitteametlik",
-    "label": "{{plugin}} sisu",
+    "label": "{{plugin}}, plugina sisu",
     "stopped": "{{plugin}} lakkas vastamast",
     "reload": "Laadi uuesti",
     "mute": "Vaigista plugina {{plugin}} helid",

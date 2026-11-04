@@ -1254,6 +1254,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   let activeAudio: ActiveAudioProfile | null = null;
   let pendingConnect: { serverId: number; channelPath: string[] | null } | null = null;
   let muteBeforeDeaf = false;
+  // Like Rust: the frame mute state a later window reads.
+  const frameMute = { all: false, plugins: new Set<string>() };
+  function applyFrameMute(plugin: string | null, muted: boolean): void {
+    if (plugin === null) frameMute.all = muted;
+    else if (muted) frameMute.plugins.add(plugin);
+    else frameMute.plugins.delete(plugin);
+  }
   // Like the engine (QA.7): the forced read-only state of a fresh connect, and the user's last
   // own mute/deafen choice while joined for voice, which a join restores.
   let ownVoice = { mute: false, deaf: false };
@@ -3244,7 +3251,13 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginsSetAppearance: () => Promise.resolve(null),
     pluginUiAction: () => fail("invalidInput", "no such action on screen"),
     pluginReenableWeb: () => Promise.resolve(null),
-    pluginFramesMute: () => Promise.resolve(null),
+    pluginFramesMute: (plugin, muted) => {
+      applyFrameMute(plugin, muted);
+      emit("pluginFrameMute", { plugin, muted });
+      return Promise.resolve(null);
+    },
+    pluginFramesMuteState: () =>
+      Promise.resolve({ all: frameMute.all, plugins: [...frameMute.plugins].sort() }),
     stageActivities: () => Promise.resolve([]),
     stageJoin: () => Promise.resolve(null),
     stageLeave: () => Promise.resolve(null),

@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Plug-in-inhoud · {{plugin}}",
     "tagUnofficial": "Plug-in-inhoud · {{plugin}} · Onofficieel",
-    "label": "Inhoud van {{plugin}}",
+    "label": "{{plugin}}, plug-in-inhoud",
     "stopped": "{{plugin}} reageert niet meer",
     "reload": "Opnieuw laden",
     "mute": "Geluiden van {{plugin}} dempen",

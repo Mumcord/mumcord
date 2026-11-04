@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Lisäosan sisältö · {{plugin}}",
     "tagUnofficial": "Lisäosan sisältö · {{plugin}} · Epävirallinen",
-    "label": "{{plugin}}: sisältö",
+    "label": "{{plugin}}, lisäosan sisältö",
     "stopped": "{{plugin}} lakkasi vastaamasta",
     "reload": "Lataa uudelleen",
     "mute": "Mykistä lisäosan {{plugin}} äänet",

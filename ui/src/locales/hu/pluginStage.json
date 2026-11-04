@@ -30,7 +30,7 @@
   "frame": {
     "tag": "Bővítménytartalom · {{plugin}}",
     "tagUnofficial": "Bővítménytartalom · {{plugin}} · Nem hivatalos",
-    "label": "{{plugin}} tartalma",
+    "label": "{{plugin}}, bővítménytartalom",
     "stopped": "A(z) {{plugin}} nem válaszol",
     "reload": "Újratöltés",
     "mute": "{{plugin}} hangjainak némítása",
