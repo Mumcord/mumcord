@@ -95,6 +95,77 @@ pub struct ShareQuality {
     /// The encoder the own share runs on right now (codec badge); `null` until it opened.
     pub encoder: Option<ActiveEncoder>,
     pub viewers: Vec<ViewerQuality>,
+    /// The sharer's current picks, which the Quality menu shows checked (FR-7.39).
+    pub choice: QualityChoice,
+    /// How the share reaches its viewers; `null` while the share has not asked for fan-out.
+    pub fanout: Option<ShareFanout>,
+}
+
+/// How the own share reaches its viewers (FR-7.40, FR-7.47).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "camelCase")]
+pub enum ShareFanout {
+    /// Asking the relay bot for a broadcast.
+    Starting,
+    /// Sent once via the relay, up to `limit` viewers in all.
+    Relay { limit: u16 },
+    /// One copy per viewer, up to 8; the sharer sees the notice once per share.
+    Direct { reason: FanoutReason },
+}
+
+/// Why the share sends one copy per viewer, as the fan-out notice names it (FR-7.47).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum FanoutReason {
+    /// The server announces no relay.
+    NoRelay,
+    /// The relay offers no broadcasts (older relay, or broadcasts turned off).
+    OldRelay,
+    /// The relay does not allow screen sharing.
+    Disallowed,
+    /// The bot refused the broadcast.
+    Refused,
+    /// The relay runs as many broadcasts as it may.
+    Full,
+    /// The relay was lost during the share (FR-7.49).
+    Lost,
+    /// The user's P2P mode leaves the relay out ("off" or "direct only").
+    Mode,
+    /// The user has no client certificate.
+    NoCertificate,
+    /// The relay can't be used right now for another reason (not reachable, bot gone, …).
+    Unavailable,
+}
+
+impl From<engine_share::FanoutView> for ShareFanout {
+    fn from(view: engine_share::FanoutView) -> Self {
+        match view {
+            engine_share::FanoutView::Starting => Self::Starting,
+            engine_share::FanoutView::Relay { limit } => Self::Relay { limit },
+            engine_share::FanoutView::Direct { reason } => Self::Direct {
+                reason: reason.into(),
+            },
+        }
+    }
+}
+
+impl From<engine_share::FanoutUnavailable> for FanoutReason {
+    fn from(reason: engine_share::FanoutUnavailable) -> Self {
+        use engine_share::BroadcastErrorReason as Bcast;
+        use engine_share::FanoutUnavailable as F;
+        use mumcord_engine::peer::RelayUnavailable as R;
+        match reason {
+            F::Relay(R::NoRelay) => Self::NoRelay,
+            F::Relay(R::UseNotAllowed(_)) | F::Refused(Bcast::UseNotAllowed) => Self::Disallowed,
+            F::Relay(R::RelayFull) | F::Refused(Bcast::RelayFull | Bcast::Full) => Self::Full,
+            F::Relay(R::Denied) | F::Refused(_) => Self::Refused,
+            F::Relay(_) => Self::Unavailable,
+            F::NotOffered => Self::OldRelay,
+            F::Mode => Self::Mode,
+            F::NoCertificate => Self::NoCertificate,
+            F::Lost => Self::Lost,
+        }
+    }
 }
 
 /// What one viewer gets (issue #163).
@@ -138,8 +209,7 @@ impl From<engine_share::ViewerPath> for ViewerPath {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct WatchStats {
-    /// Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
-    /// second path.
+    /// A copy of its own over the P2P connection, or the relay broadcast (FR-7.41).
     pub path: SharePath,
     /// Sound level of the shared sound at the viewer, 0.0–1.0.
     pub rms: f32,
@@ -150,6 +220,8 @@ pub struct WatchStats {
 #[serde(rename_all = "camelCase")]
 pub enum SharePath {
     Direct,
+    /// The sharer's single upload, copied to every viewer by the relay.
+    Broadcast,
 }
 
 /// The screen shares on the server changed; carries the full list.
@@ -203,6 +275,8 @@ pub async fn screen_share_start(
     window: tauri::WebviewWindow,
     server_id: ServerId,
     with_sound: bool,
+    choice: Option<QualityChoice>,
+    codec: Option<ScreenCodec>,
 ) -> ApiResult<()> {
     // The Windows system picker opens over the window the share was started from.
     #[cfg(windows)]
@@ -215,7 +289,12 @@ pub async fn screen_share_start(
     #[cfg(not(windows))]
     let _ = window;
     engine
-        .screen_share_start(to_engine_server_id(server_id), with_sound)
+        .screen_share_start(
+            to_engine_server_id(server_id),
+            with_sound,
+            choice.map(Into::into),
+            codec.map(Into::into),
+        )
         .await?;
     Ok(())
 }
@@ -341,7 +420,8 @@ pub fn screen_share_set_decode_codecs(
 }
 
 /// The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
-/// watched share, by dropping temporal layers; `null` is Auto.
+/// watched share, by dropping temporal layers; `null` is Auto. Through the relay broadcast the
+/// relay drops the layers too (FR-7.45).
 #[tauri::command]
 #[specta::specta]
 pub fn screen_share_set_viewer_fps(
@@ -430,6 +510,12 @@ pub fn screen_share_quality(
 ) -> ApiResult<Option<ShareQuality>> {
     let server = to_engine_server_id(server_id);
     let encoder = engine.screen_share_encoder(server).map(Into::into);
+    let Some(choice) = engine.screen_share_choice(server) else {
+        return Ok(None);
+    };
+    let fanout = engine
+        .screen_share_fanout(server)
+        .map(|info| info.view.into());
     Ok(engine
         .screen_share_media_stats(server)
         .map(|s| ShareQuality {
@@ -453,6 +539,8 @@ pub fn screen_share_quality(
                     path: v.path.into(),
                 })
                 .collect(),
+            choice: choice.into(),
+            fanout,
         }))
 }
 
@@ -465,10 +553,15 @@ pub fn screen_share_watch_stats(
     server_id: ServerId,
     session: SessionId,
 ) -> ApiResult<Option<WatchStats>> {
+    let server_id = to_engine_server_id(server_id);
+    let path = match engine.screen_share_watch_via_relay(server_id, session) {
+        Some(true) => SharePath::Broadcast,
+        Some(false) | None => SharePath::Direct,
+    };
     Ok(engine
-        .screen_share_sound_stats(to_engine_server_id(server_id), session)
+        .screen_share_sound_stats(server_id, session)
         .map(|stats| WatchStats {
-            path: SharePath::Direct,
+            path,
             rms: stats.rms,
         }))
 }
@@ -677,6 +770,17 @@ pub struct QualityChoice {
     pub upload_limit: ScreenUploadLimit,
 }
 
+impl From<QualityPrefs> for QualityChoice {
+    fn from(p: QualityPrefs) -> Self {
+        Self {
+            resolution: p.resolution.into(),
+            fps: p.fps.into(),
+            optimize: p.optimize.into(),
+            upload_limit: p.upload_limit.into(),
+        }
+    }
+}
+
 impl From<QualityChoice> for QualityPrefs {
     fn from(c: QualityChoice) -> Self {
         Self {
@@ -736,6 +840,51 @@ pub fn screen_encoder_prepare(engine: State<'_, Engine>, choice: QualityChoice) 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn engine_prefs_map_back_to_the_menu_choice() {
+        let choice = QualityChoice {
+            resolution: ScreenResolution::P1440,
+            fps: ScreenFps::Fps60,
+            optimize: ScreenOptimize::Motion,
+            upload_limit: ScreenUploadLimit::Mbit5,
+        };
+        assert_eq!(QualityChoice::from(QualityPrefs::from(choice)), choice);
+    }
+
+    #[test]
+    fn fanout_view_maps_for_the_notice_and_the_viewer_limit() {
+        use engine_share::{BroadcastErrorReason as Bcast, FanoutUnavailable as F, FanoutView};
+        use mumcord_engine::peer::RelayUnavailable as R;
+        assert_eq!(
+            ShareFanout::from(FanoutView::Relay { limit: 20 }),
+            ShareFanout::Relay { limit: 20 }
+        );
+        assert_eq!(
+            ShareFanout::from(FanoutView::Starting),
+            ShareFanout::Starting
+        );
+        let direct = |reason| match ShareFanout::from(FanoutView::Direct { reason }) {
+            ShareFanout::Direct { reason } => reason,
+            other => panic!("expected direct copies, got {other:?}"),
+        };
+        assert_eq!(direct(F::Relay(R::NoRelay)), FanoutReason::NoRelay);
+        assert_eq!(direct(F::NotOffered), FanoutReason::OldRelay);
+        assert_eq!(
+            direct(F::Refused(Bcast::UseNotAllowed)),
+            FanoutReason::Disallowed
+        );
+        assert_eq!(direct(F::Relay(R::RelayFull)), FanoutReason::Full);
+        assert_eq!(direct(F::Refused(Bcast::RelayFull)), FanoutReason::Full);
+        assert_eq!(
+            direct(F::Refused(Bcast::RateLimited)),
+            FanoutReason::Refused
+        );
+        assert_eq!(direct(F::Relay(R::BotLeft)), FanoutReason::Unavailable);
+        assert_eq!(direct(F::Lost), FanoutReason::Lost);
+        assert_eq!(direct(F::Mode), FanoutReason::Mode);
+        assert_eq!(direct(F::NoCertificate), FanoutReason::NoCertificate);
+    }
 
     #[test]
     fn quality_choice_maps_to_engine_prefs() {
@@ -826,6 +975,16 @@ pub struct SharePreview {
     /// Why Automatic would not pick AV1.
     pub av1_skipped: Option<Av1Skipped>,
     pub path: PreviewPath,
+    /// Threads the software VP9 encoder is configured with against the machine's cores; `None`
+    /// for hardware encoders and software AV1.
+    pub cpu_cores: Option<CpuCores>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct CpuCores {
+    pub used: u32,
+    pub total: u32,
 }
 
 impl From<engine_share::SharePreview> for SharePreview {
@@ -840,6 +999,10 @@ impl From<engine_share::SharePreview> for SharePreview {
             software_warning: p.software_warning,
             av1_skipped: p.av1_skipped.map(Into::into),
             path: p.path.into(),
+            cpu_cores: p.cpu_cores.map(|c| CpuCores {
+                used: c.used,
+                total: c.total,
+            }),
         }
     }
 }

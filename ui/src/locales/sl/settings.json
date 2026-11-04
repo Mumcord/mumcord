@@ -17,7 +17,7 @@
     "packetInspector": "Pregledovalnik paketov",
     "hotkeys": "Bližnjice",
     "plugins": "Vtičniki",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Deljenje zaslona"
   },
   "sectionDescriptions": {
     "general": "Zagon, jezik, posodobitve in dostopnost.",
@@ -31,7 +31,7 @@
     "advanced": "Razvijalska orodja, diagnostika, shramba in licence.",
     "about": "Različica, podpora in čarovnik za nastavitev.",
     "plugins": "Vtičniki delujejo v peskovniku in dobijo le tisto, kar dovolite. Nikoli ne vidijo vašega zvoka, datotek ali potrdila.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Kakovost, kodek in strojna oprema za deljenje zaslona. Gledalci vedno vidijo tisto, kar izbereš pred začetkom."
   },
   "breadcrumb": "Nastavitve / {{section}}",
   "moreInfo": "Več informacij: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "opozorila pojavna okna",
     "externalContent": "vdelana vsebina slike predogledi",
     "fileSharing": "datoteke pošlji prejmi prenesi shrani mapa priloga zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "deljenje zaslona kakovost ločljivost fps kodek AV1 VP9 kodirnik grafična kartica"
   },
   "search": {
     "label": "Išči nastavitve",
@@ -1069,5 +1069,62 @@
     "switch": "Razvijalski način",
     "hint": "Vtičnikom doda zavihek Razvijalec, kjer lahko naložite nepodpisane vtičnike iz mape. Vklopite ga le, če sami razvijate vtičnike."
   },
-  "newBadge": "New"
+  "newBadge": "Novo",
+  "screenShare": {
+    "newBadge": "Novo",
+    "qualityTitle": "Privzeta kakovost",
+    "resolution": "Ločljivost",
+    "resolutionAuto": "Samodejno",
+    "resolutionHint": "Samodejni način začne z najboljšo kakovostjo, ki jo dovoljujeta tvoj prenos navzgor in gledalci, in jo zniža, ko ne dohajajo.",
+    "fps": "Hitrost sličic",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimiziraj za",
+    "optimizeBalanced": "Uravnoteženo",
+    "optimizeText": "Ostro besedilo (koda, diapozitivi)",
+    "optimizeMotion": "Gladko gibanje (igre, video)",
+    "uploadLimit": "Omejitev prenosa navzgor",
+    "uploadAuto": "Samodejno",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Največ podatkov, ki jih tvoje deljenje pošlje skupaj. Uporabno pri skupni ali omejeni povezavi.",
+    "codecTitle": "Kodek",
+    "codec": "Kodek",
+    "codecAuto": "Samodejno (priporočeno)",
+    "codecAutoHint": "Najprej AV1 na grafični kartici, nato AV1 na procesorju, če kratek preizkus pokaže, da ga zmore, sicer VP9. AV1 samo, če ga lahko predvajajo vsi gledalci.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Najostrejša slika z enako količino podatkov. Gledalci, ki ga ne morejo predvajati, dobijo VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Kar je Mumcord uporabljal doslej. Deluje za vse gledalce.",
+    "codecInfo": "Brez grafične kartice AV1 uporablja procesor (SVT-AV1). Mumcord preklopi na VP9, če tvoj računalnik ne dohaja.",
+    "codecOlder": "Gledalci s starejšim Mumcordom vedno dobijo VP9, ne glede na tvojo izbiro.",
+    "hardwareTitle": "Strojno pospeševanje",
+    "useGpu": "Uporabi grafično kartico, ko je na voljo",
+    "useGpuHint": "AV1 kodira na grafični kartici, zato deljenje skoraj ne obremenjuje procesorja. Izklopljeno: AV1 uporablja procesor.",
+    "statusList": "Stanje kodirnika",
+    "av1Encode": "Kodiranje AV1",
+    "askEachTime": "Vprašaj za te nastavitve ob vsakem deljenju",
+    "av1Playback": "Predvajanje AV1",
+    "vp9Playback": "Predvajanje VP9",
+    "playbackHardware": "Strojno",
+    "playbackSoftware": "Programsko",
+    "av1EncodeCpu": "Kodiranje AV1 na procesorju",
+    "vp9Encode": "Kodiranje VP9",
+    "gpuNvidia": "Grafična kartica NVIDIA",
+    "gpuAmd": "Grafična kartica AMD",
+    "gpuIntel": "Grafična kartica Intel",
+    "gpuUnknown": "Grafična kartica",
+    "software": "Programsko",
+    "softwareLimit": "Programsko, zmore do {{height}}p{{fps}}",
+    "notAvailable": "Ni na voljo",
+    "checking": "Preverjanje …",
+    "active": "Aktivni kodirnik: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (procesor)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (programsko)",
+    "skippedTooHeavy": "VP9 (AV1 je za ta računalnik preveč zahteven)",
+    "skippedOnBattery": "VP9 (na bateriji)",
+    "skippedAboveLimit": "VP9 (tvoja slika presega to, kar AV1 tukaj zmore)",
+    "softwareWarning": "AV1 bo tekel na procesorju brez opravljenega preizkusa in je lahko za ta računalnik preveč zahteven.",
+    "checkAgain": "Preveri znova"
+  }
 }

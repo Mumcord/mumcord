@@ -13,6 +13,7 @@ const allow = {
   write: false,
   moveUsers: false,
   ban: false,
+  kick: false,
 };
 
 function channel(id: number, patch: Partial<ChannelInfo> = {}): ChannelInfo {

@@ -2,6 +2,8 @@ import { useEffect, useEffectEvent, useId, useRef, type ReactNode, type RefObjec
 
 interface DialogProps {
   title: string;
+  /** Shown before the title text, hidden from screen readers (the title already names it). */
+  titleLead?: ReactNode;
   onClose: () => void;
   children: ReactNode;
   /** "alertdialog" for blocking warnings such as a changed certificate. */
@@ -21,6 +23,7 @@ const FOCUSABLE = "input, select, textarea, button";
  */
 export function Dialog({
   title,
+  titleLead,
   onClose,
   children,
   role = "dialog",
@@ -64,6 +67,7 @@ export function Dialog({
       aria-describedby={describedBy}
     >
       <h2 id={titleId} className="servers-dialog__title">
+        {titleLead}
         {title}
       </h2>
       {children}

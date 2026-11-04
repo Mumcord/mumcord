@@ -16,7 +16,10 @@ use std::fmt::Write as _;
 use std::sync::{Mutex, OnceLock};
 use std::time::Duration;
 
-use mumcord_p2p::{MAX_PEER_BYTES, PEER_DATA_ID, PeerMessage, RequestId, TokenErrorReason};
+use mumcord_p2p::{
+    BroadcastErrorReason, BroadcastId, MAX_PEER_BYTES, PEER_DATA_ID, PeerMessage, RequestId,
+    TokenErrorReason,
+};
 pub use mumcord_p2p::{RelayAnnouncement, RelayRefusal, RelayState, RelayToken, RelayUse};
 use mumcord_protocol::PluginData;
 use mumcord_store::{IdentityId, RelayPin, ServerId, Store, UnixMillis};
@@ -24,6 +27,7 @@ use tokio::sync::oneshot;
 use tokio::time::Instant;
 
 use crate::inspector::Inspector;
+use crate::screen_share::broadcast::FanoutUnavailable;
 use crate::session::{
     Engine, EngineError, EngineEvent, EngineResult, Events, SessionCtx, WeakEngine, lock,
     store_error,
@@ -350,6 +354,18 @@ fn route_token(own: Option<u32>, bot: Option<u32>, sender: u32, a: u32, b: u32) 
 
 type TokenReply = Result<RelayToken, RelayUnavailable>;
 
+/// The bot's answer to `bcast-req` or `bcast-admit` (spec 07, section 6.6).
+type BroadcastReply = Result<Option<(BroadcastId, RelayToken)>, BroadcastErrorReason>;
+
+/// How long the sharer listens for a `bcast-err` after `bcast-admit`; the bot answers a
+/// successful admission only to the viewer, so silence means admitted.
+const ADMIT_ERROR_WAIT: Duration = Duration::from_secs(5);
+
+struct BroadcastPending {
+    bot: u32,
+    reply: oneshot::Sender<BroadcastReply>,
+}
+
 struct Pending {
     bot: u32,
     peer: u32,
@@ -367,6 +383,8 @@ struct State {
     arrived: HashMap<(ServerId, u32), (RelayToken, Instant)>,
     /// The P2P step waiting for the token of a requester.
     waiting: HashMap<(ServerId, u32), oneshot::Sender<RelayToken>>,
+    /// Own `bcast-req` and `bcast-admit` waiting for the bot.
+    broadcasts: HashMap<(ServerId, RequestId), BroadcastPending>,
     /// Generation of the bot-gone timers; unique across servers and reconnects.
     generation: u64,
 }
@@ -525,15 +543,20 @@ impl Relays {
             PeerMessage::TokenError { rid, reason } => {
                 self.on_token_error(ctx.server_id, sender, rid, reason);
             }
-            // Only relay bots answer token requests and broadcast messages to the bot; the
-            // client side of broadcasts is not wired up yet.
+            PeerMessage::Broadcast { rid, id, token, .. } => {
+                self.on_broadcast_reply(ctx.server_id, sender, rid, Ok(Some((id, token))));
+            }
+            PeerMessage::BroadcastError { rid, reason } => {
+                self.on_broadcast_reply(ctx.server_id, sender, rid, Err(reason));
+            }
+            PeerMessage::BroadcastToken {
+                id, token, sharer, ..
+            } => self.on_broadcast_token(ctx, sender, sharer, id, token),
+            // Only relay bots receive token requests and the sharer's broadcast messages.
             PeerMessage::TokenRequest { .. }
             | PeerMessage::BroadcastRequest { .. }
-            | PeerMessage::Broadcast { .. }
             | PeerMessage::BroadcastAdmit { .. }
-            | PeerMessage::BroadcastToken { .. }
-            | PeerMessage::BroadcastKick { .. }
-            | PeerMessage::BroadcastError { .. } => {}
+            | PeerMessage::BroadcastKick { .. } => {}
         }
     }
 
@@ -627,6 +650,114 @@ impl Relays {
         }
     }
 
+    /// `bcast` or `bcast-err` for an own request; only the bot it went to may answer.
+    fn on_broadcast_reply(
+        &self,
+        server_id: ServerId,
+        sender: u32,
+        rid: RequestId,
+        reply: BroadcastReply,
+    ) {
+        let mut state = lock(&self.state);
+        let key = (server_id, rid);
+        if state.broadcasts.get(&key).is_some_and(|p| p.bot == sender)
+            && let Some(pending) = state.broadcasts.remove(&key)
+        {
+            let _ = pending.reply.send(reply);
+        }
+    }
+
+    /// `bcast-tok` (FR-7.42): taken only from the pinned bot that is usable for screen
+    /// sharing; the screen share side checks that this client asked that sharer.
+    fn on_broadcast_token(
+        &self,
+        ctx: &SessionCtx,
+        sender: u32,
+        sharer: u32,
+        id: BroadcastId,
+        token: RelayToken,
+    ) {
+        let pinned = lock(&self.state)
+            .servers
+            .get(&ctx.server_id)
+            .and_then(|r| r.usable_for(RelayUse::ScreenShare).ok())
+            .is_some_and(|a| a.session == sender);
+        if !pinned {
+            tracing::debug!("ignoring a broadcast token not from the pinned relay bot");
+            return;
+        }
+        if let Some(engine) = self.engine.get().and_then(WeakEngine::upgrade) {
+            engine.screen_share_broadcast_token(ctx, sharer, id, token);
+        }
+    }
+
+    /// The announcement of the relay usable for screen sharing, with the bot to ask.
+    fn broadcast_bot(
+        &self,
+        server_id: ServerId,
+    ) -> Result<(u32, RelayAnnouncement), RelayUnavailable> {
+        lock(&self.state)
+            .servers
+            .get(&server_id)
+            .ok_or(RelayUnavailable::NoRelay)?
+            .usable_for(RelayUse::ScreenShare)
+            .map(|a| (a.session, a.ann.clone()))
+    }
+
+    /// The relay announcement for joining a broadcast as a viewer.
+    pub(crate) fn broadcast_announcement(
+        &self,
+        server_id: ServerId,
+    ) -> Result<RelayAnnouncement, RelayUnavailable> {
+        self.broadcast_bot(server_id).map(|(_, ann)| ann)
+    }
+
+    /// Sends a broadcast message to `bot` and registers `rid` for the answer.
+    fn send_broadcast(
+        &self,
+        ctx: &SessionCtx,
+        bot: u32,
+        rid: RequestId,
+        message: &PeerMessage,
+    ) -> Option<oneshot::Receiver<BroadcastReply>> {
+        let (reply, rx) = oneshot::channel();
+        lock(&self.state)
+            .broadcasts
+            .insert((ctx.server_id, rid), BroadcastPending { bot, reply });
+        let sent = message
+            .encode()
+            .map_err(|e| e.to_string())
+            .and_then(|bytes| {
+                ctx.handle
+                    .send_plugin_data(&[bot], PEER_DATA_ID, bytes)
+                    .map_err(|e| e.to_string())
+            });
+        if let Err(e) = sent {
+            tracing::debug!(error = %e, "relay broadcast message not sent");
+            lock(&self.state).broadcasts.remove(&(ctx.server_id, rid));
+            return None;
+        }
+        Some(rx)
+    }
+
+    /// Waits up to `wait` for the answer to `rid`; `Ok(None)` when none came.
+    async fn finish_broadcast(
+        &self,
+        server_id: ServerId,
+        rid: RequestId,
+        rx: oneshot::Receiver<BroadcastReply>,
+        wait: Duration,
+    ) -> Option<BroadcastReply> {
+        let answer = tokio::time::timeout(wait, rx).await;
+        lock(&self.state).broadcasts.remove(&(server_id, rid));
+        match answer {
+            Ok(Ok(reply)) => Some(reply),
+            // The bot left (the request was dropped) or the server connection ended.
+            Ok(Err(_)) => Some(Err(BroadcastErrorReason::RelayDown)),
+            Err(_) => None,
+        }
+    }
+
     fn on_token_error(
         &self,
         server_id: ServerId,
@@ -663,6 +794,9 @@ impl Relays {
                 .filter(|((id, _), p)| *id == server_id && (p.peer == session || p.bot == session))
                 .map(|(key, _)| *key)
                 .collect();
+            state
+                .broadcasts
+                .retain(|(id, _), p| *id != server_id || p.bot != session);
             for key in gone {
                 if let Some(pending) = state.requests.remove(&key) {
                     let reason = if pending.bot == session {
@@ -986,6 +1120,96 @@ impl Engine {
         }
         let token = self.relays().finish_request(server_id, rid, rx).await?;
         Ok((ann, token))
+    }
+
+    /// Asks the relay bot for a broadcast of the own screen share for up to `max` viewers
+    /// (`bcast-req`, FR-7.40). Returns the relay to bind to, the broadcast and the publisher
+    /// token, or why fan-out is not available.
+    pub(crate) async fn relay_broadcast_request(
+        &self,
+        server_id: ServerId,
+        max: u16,
+    ) -> Result<(RelayAnnouncement, BroadcastId, RelayToken), FanoutUnavailable> {
+        let ctx = self
+            .session_ctx_for(server_id)
+            .map_err(|_| FanoutUnavailable::Relay(RelayUnavailable::NotConnected))?;
+        let (bot, ann) = self
+            .relays()
+            .broadcast_bot(server_id)
+            .map_err(FanoutUnavailable::Relay)?;
+        let rid = RequestId::random();
+        let message = PeerMessage::BroadcastRequest {
+            rid,
+            max,
+            kind: None,
+        };
+        let rx = self
+            .relays()
+            .send_broadcast(&ctx, bot, rid, &message)
+            .ok_or(FanoutUnavailable::Relay(RelayUnavailable::NotConnected))?;
+        let wait = self.relays().timings().token_wait;
+        match self
+            .relays()
+            .finish_broadcast(server_id, rid, rx, wait)
+            .await
+        {
+            Some(Ok(Some((id, token)))) => Ok((ann, id, token)),
+            Some(Ok(None)) => Err(FanoutUnavailable::Relay(RelayUnavailable::BotNoAnswer)),
+            Some(Err(reason)) => Err(FanoutUnavailable::Refused(reason)),
+            None => Err(FanoutUnavailable::Relay(RelayUnavailable::BotNoAnswer)),
+        }
+    }
+
+    /// Asks the relay bot to admit `viewer` to broadcast `id` (`bcast-admit`, FR-7.42). The bot
+    /// answers only a refusal; `Ok` after a short wait without one.
+    pub(crate) async fn relay_broadcast_admit(
+        &self,
+        server_id: ServerId,
+        id: BroadcastId,
+        viewer: u32,
+    ) -> Result<(), BroadcastErrorReason> {
+        let ctx = self
+            .session_ctx_for(server_id)
+            .map_err(|_| BroadcastErrorReason::RelayDown)?;
+        let (bot, _) = self
+            .relays()
+            .broadcast_bot(server_id)
+            .map_err(|_| BroadcastErrorReason::RelayDown)?;
+        let rid = RequestId::random();
+        let message = PeerMessage::BroadcastAdmit { rid, id, viewer };
+        let rx = self
+            .relays()
+            .send_broadcast(&ctx, bot, rid, &message)
+            .ok_or(BroadcastErrorReason::RelayDown)?;
+        match self
+            .relays()
+            .finish_broadcast(server_id, rid, rx, ADMIT_ERROR_WAIT)
+            .await
+        {
+            Some(Err(reason)) => Err(reason),
+            Some(Ok(_)) | None => Ok(()),
+        }
+    }
+
+    /// Tells the relay bot that `viewer` left broadcast `id` (`bcast-kick`); no answer.
+    pub(crate) fn relay_broadcast_kick(&self, server_id: ServerId, id: BroadcastId, viewer: u32) {
+        let Ok(ctx) = self.session_ctx_for(server_id) else {
+            return;
+        };
+        let Ok((bot, _)) = self.relays().broadcast_bot(server_id) else {
+            return;
+        };
+        let sent = PeerMessage::BroadcastKick { id, viewer }
+            .encode()
+            .map_err(|e| e.to_string())
+            .and_then(|bytes| {
+                ctx.handle
+                    .send_plugin_data(&[bot], PEER_DATA_ID, bytes)
+                    .map_err(|e| e.to_string())
+            });
+        if let Err(e) = sent {
+            tracing::debug!(error = %e, "relay broadcast kick not sent");
+        }
     }
 
     /// Waits up to `wait` for the token the pinned bot sends this client as the peer of

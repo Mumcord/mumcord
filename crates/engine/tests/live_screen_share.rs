@@ -198,11 +198,15 @@ async fn screen_shares_between_mumcord_clients() {
     // Alice shares: everyone sees her "Live", nobody watches yet.
     alice
         .engine
-        .screen_share_start(server, true)
+        .screen_share_start(server, true, None, None)
         .await
         .expect("start");
     assert!(
-        alice.engine.screen_share_start(server, true).await.is_err(),
+        alice
+            .engine
+            .screen_share_start(server, true, None, None)
+            .await
+            .is_err(),
         "one share per server"
     );
     let own = alice.engine.screen_shares(server);
@@ -279,7 +283,7 @@ async fn screen_shares_between_mumcord_clients() {
     let b = viewers[8].session();
     viewers[8]
         .engine
-        .screen_share_start(viewers[8].server(), false)
+        .screen_share_start(viewers[8].server(), false, None, None)
         .await
         .expect("second share");
     wait_watchable(&mut viewers[0], b).await;
@@ -379,7 +383,7 @@ async fn the_sharer_says_what_was_picked_and_how_long_it_runs() {
     let own_server = viewer.server();
     sharer
         .engine
-        .screen_share_start(server, false)
+        .screen_share_start(server, false, None, None)
         .await
         .expect("start");
     let seen = wait_shares(&mut viewer.rx, "the share", |shares| {

@@ -1443,6 +1443,27 @@ impl Handle {
         self.send(Frame::from_message(MessageType::Acl, &m))
     }
 
+    /// Removes a person from the server (issue #253). `ban` is false for a kick, which the person
+    /// can come back from; true bans them with the server's default length on the certificate and
+    /// address the server itself knows, so a chosen duration or a single target needs the ban list
+    /// instead (see [`Handle::query_ban_list`]). Needs the Kick, or the Ban, permission in the root
+    /// channel; a refusal arrives as [`Event::PermissionDenied`], the removal as
+    /// [`Event::UserRemoved`] for our own session too.
+    pub fn remove_user(
+        &self,
+        session: u32,
+        reason: Option<&str>,
+        ban: bool,
+    ) -> Result<(), CommandError> {
+        let m = proto::UserRemove {
+            session,
+            actor: None,
+            reason: reason.filter(|r| !r.is_empty()).map(|r| r.to_owned()),
+            ban: Some(ban),
+        };
+        self.send(Frame::from_message(MessageType::UserRemove, &m))
+    }
+
     /// Asks the server for its ban list (issue #254); the answer arrives as [`Event::BanList`].
     /// Standard servers answer only users with the Ban permission in the root channel, so a
     /// refusal arrives as [`Event::PermissionDenied`].

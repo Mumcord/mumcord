@@ -35,8 +35,7 @@ image.workspace = true
 # rnnoise-rs is a git source (Mumcord's fork); see the workspace Cargo.toml. A published
 # crate cannot carry it, so the backend implementation lives here (issue #176).
 rnnoise-rs.workspace = true
-# File offers and the diagnostic file are Bovnar documents (issue #400); git source, see the
-# workspace Cargo.toml.
+# File offers and the diagnostic file are Bovnar documents (issue #400).
 bovnar.workspace = true
 serde.workspace = true
 serde_json.workspace = true

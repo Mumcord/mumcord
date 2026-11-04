@@ -57,7 +57,7 @@ pub use peer::{
     PeerMessage, RelayAnnouncement, RelayState, RelayToken, RelayUse, RequestId, TokenErrorReason,
 };
 pub use quinn;
-pub use relay::{RelayRefusal, RelayTransport};
+pub use relay::{BroadcastEnd, BroadcastLink, RelayRefusal, RelayTransport, Unit};
 pub use signal::{
     DATA_ID, DeclineReason, MAX_CANDIDATES, MAX_SIGNAL_BYTES, SessionId, Signal, SignalError,
     VERSION,

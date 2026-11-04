@@ -126,6 +126,9 @@ pub struct ChannelPermissions {
     /// Ban right (issue #254). The server grants it on the root channel, and ACLs inherit it
     /// downwards, so this is what decides whether the Ban list entry shows (FR-10.2).
     pub ban: bool,
+    /// Kick right (issue #253), granted on the root channel; decides whether "Kick…" shows in a
+    /// person's menu (FR-10.1, FR-10.11).
+    pub kick: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

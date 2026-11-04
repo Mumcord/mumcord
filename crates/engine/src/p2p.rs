@@ -839,6 +839,30 @@ impl Engine {
         ))
     }
 
+    /// What a screen-share broadcast through the relay needs from this side (spec 07,
+    /// FR-7.40): a P2P mode of `server_id` that uses the relay (not "off" or "direct only").
+    pub(crate) fn relay_mode_allows_broadcast(&self, server_id: ServerId) -> bool {
+        let Ok(ctx) = self.session_ctx_for(server_id) else {
+            return false;
+        };
+        let (mode, _) = mode_and_consent(&ctx.store(), server_id);
+        relay_only_reveal(mode, Ok(())).is_ok()
+    }
+
+    /// A relay link helper and the user's identity (certificate and key, for the broadcast key
+    /// exchange); `None` before the wizard ran.
+    pub(crate) async fn p2p_with_identity(&self) -> Option<(P2p, mumcord_store::Identity)> {
+        let identity = match self.stored_identity().await {
+            Ok(identity) => identity?,
+            Err(e) => {
+                tracing::warn!(error = %e, "identity for a relay broadcast not readable");
+                return None;
+            }
+        };
+        let config = lock(&self.direct().config).clone();
+        Some((P2p::new(&client_identity(&identity), config), identity))
+    }
+
     /// Stores the answer to [`EngineEvent::DirectConsentRequired`] as the
     /// `allow_direct_connections` setting; waiting features continue or fall back.
     pub async fn p2p_consent_decide(&self, allow: bool) -> EngineResult<()> {

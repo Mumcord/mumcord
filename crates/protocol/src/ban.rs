@@ -15,11 +15,14 @@ use crate::proto;
 /// Length of an address on the wire: IPv4 arrives and goes out IPv4-mapped.
 pub const ADDRESS_LEN: usize = 16;
 
-/// One ban entry. `mask` is the subnet length as the server carries it, counted on the 16-byte
-/// wire address; [`Ban::mask_bits`] gives the length in the address family it displays as.
+/// One ban entry. `mask` is the subnet length in the address family the address displays as (32 for
+/// a single IPv4, 128 for a single IPv6), which is what the UI shows and what the change carries;
+/// the wire form counts it on the 16-byte address, so it is written back as
+/// [`wire_mask`] (issue #254, issue #253).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ban {
     pub address: IpAddr,
+    /// Subnet length in the family of `address`.
     pub mask: u32,
     pub name: Option<String>,
     /// Hex SHA-1 certificate hash; empty or `None` means the ban covers the address only.
@@ -33,15 +36,9 @@ pub struct Ban {
 }
 
 impl Ban {
-    /// Subnet length in the family `address` shows: 32 for a single IPv4, 128 for a single IPv6.
-    /// Servers count the bits on the 16-byte wire address (so an IPv4-mapped /32 arrives as 128),
-    /// while clients such as the official client send the family's own length; both read the same.
+    /// The same length; `mask` is already held in the family the address shows.
     pub fn mask_bits(&self) -> u32 {
-        match self.address {
-            IpAddr::V4(_) if self.mask > 32 => self.mask - 96,
-            IpAddr::V4(_) => self.mask,
-            IpAddr::V6(_) => self.mask,
-        }
+        self.mask
     }
 
     /// Whether the entry bans a certificate at all.
@@ -73,7 +70,7 @@ impl Ban {
         format!(
             "{}/{}|{}",
             self.address,
-            self.mask,
+            self.mask_bits(),
             self.hash.as_deref().unwrap_or("")
         )
     }
@@ -85,9 +82,12 @@ pub fn from_message(message: &proto::BanList) -> Vec<Ban> {
         .bans
         .iter()
         .filter_map(|e| {
+            let address = read_address(&e.address)?;
             Some(Ban {
-                address: read_address(&e.address)?,
-                mask: e.mask,
+                address,
+                // The server counts the length on the 16-byte wire form, so it is read back in the
+                // address's own family (issue #254).
+                mask: family_mask(address, e.mask),
                 name: e.name.clone(),
                 hash: e.hash.clone(),
                 reason: e.reason.clone(),
@@ -114,10 +114,29 @@ pub fn to_message(bans: &[Ban]) -> proto::BanList {
     }
 }
 
+/// The length the server counts on the 16-byte wire address. mumble-server compares the first
+/// `mask` bits of that form, so an IPv4 entry written as 32 matches every IPv4 client: a single
+/// address must go out as 128 (issue #253, measured against the local test server).
+/// The length in the family the address shows: servers count the bits on the 16-byte wire form, so
+/// an IPv4-mapped entry arrives as 128 for what the UI calls /32.
+fn family_mask(address: IpAddr, bits: u32) -> u32 {
+    match address {
+        IpAddr::V4(_) if bits > 32 => bits - 96,
+        _ => bits,
+    }
+}
+
+pub fn wire_mask(address: IpAddr, bits: u32) -> u32 {
+    match address {
+        IpAddr::V4(_) if bits <= 32 => bits + 96,
+        _ => bits,
+    }
+}
+
 fn entry(ban: &Ban) -> proto::ban_list::BanEntry {
     proto::ban_list::BanEntry {
         address: write_address(ban.address),
-        mask: ban.mask,
+        mask: wire_mask(ban.address, ban.mask),
         name: ban.name.clone(),
         hash: ban.hash.clone(),
         reason: ban.reason.clone(),
@@ -127,8 +146,9 @@ fn entry(ban: &Ban) -> proto::ban_list::BanEntry {
 }
 
 /// IPv4 is read as IPv4-mapped when the server sends 16 bytes (the protocol's own form), and as
-/// 4 bytes on servers that still write it that way.
-fn read_address(bytes: &[u8]) -> Option<IpAddr> {
+/// 4 bytes on servers that still write it that way. Also used for the address a `UserStats` answer
+/// carries (issue #253).
+pub fn read_address(bytes: &[u8]) -> Option<IpAddr> {
     match bytes {
         &[a, b, c, d] => Some(IpAddr::V4([a, b, c, d].into())),
         &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, a, b, c, d] => {
@@ -267,10 +287,10 @@ mod tests {
     }
 
     #[test]
-    fn mask_is_shown_in_the_address_family() {
+    fn the_mask_is_kept_in_the_address_family() {
         let v4 = Ban {
             address: IpAddr::V4([203, 0, 113, 7].into()),
-            mask: 128,
+            mask: 32,
             name: None,
             hash: None,
             reason: None,
@@ -278,6 +298,11 @@ mod tests {
             duration: 0,
         };
         assert_eq!(v4.mask_bits(), 32);
+        assert_eq!(
+            family_mask(v4.address, 128),
+            32,
+            "the wire form reads back as /32"
+        );
         let v6 = Ban {
             address: IpAddr::V6("2001:db8::1".parse().expect("v6")),
             mask: 64,

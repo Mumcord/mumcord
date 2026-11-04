@@ -30,6 +30,8 @@ function quality(viewers: ViewerFigures[]): ShareQuality {
     kbps: 6000,
     encoder: { codec: "av1", gpu: "nvidia" },
     viewers,
+    choice: { resolution: "1440", fps: "60", optimize: "balanced", uploadLimit: "auto" },
+    fanout: { kind: "relay", limit: 20 },
   };
 }
 

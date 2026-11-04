@@ -17,7 +17,7 @@
     "packetInspector": "Pakešu inspektors",
     "hotkeys": "Īsinājumtaustiņi",
     "plugins": "Spraudņi",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Ekrāna kopīgošana"
   },
   "sectionDescriptions": {
     "general": "Palaišana, valoda, atjauninājumi un pieejamība.",
@@ -31,7 +31,7 @@
     "advanced": "Izstrādātāju rīki, diagnostika, krātuve un licences.",
     "about": "Versija, atbalsts un iestatīšanas vednis.",
     "plugins": "Spraudņi darbojas izolētā vidē un saņem tikai to, ko atļaujat. Tie nekad neredz jūsu audio, failus vai sertifikātu.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Ekrāna kopīgošanas kvalitāte, kodeks un aparatūra. Skatītāji vienmēr redz to, ko izvēlies pirms sākšanas."
   },
   "breadcrumb": "Iestatījumi / {{section}}",
   "moreInfo": "Papildinformācija: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "brīdinājumi uznirstošie logi",
     "externalContent": "iegulumi attēli priekšskatījumi",
     "fileSharing": "faili sūtīt saņemt lejupielādēt saglabāt mape pielikums zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "ekrāna kopīgošana kvalitāte izšķirtspēja fps kodeks AV1 VP9 kodētājs grafiskā karte"
   },
   "search": {
     "label": "Meklēt iestatījumos",
@@ -1061,5 +1061,62 @@
     "switch": "Izstrādātāja režīms",
     "hint": "Pievieno spraudņiem cilni Izstrādātājs, kurā var ielādēt neparakstītus spraudņus no mapes. Ieslēdziet to tikai tad, ja paši veidojat spraudņus."
   },
-  "newBadge": "New"
+  "newBadge": "Jaunums",
+  "screenShare": {
+    "newBadge": "Jaunums",
+    "qualityTitle": "Noklusējuma kvalitāte",
+    "resolution": "Izšķirtspēja",
+    "resolutionAuto": "Automātiski",
+    "resolutionHint": "Automātiskais režīms sāk ar labāko kvalitāti, ko atļauj tavs augšupielādes ātrums un skatītāji, un samazina to, ja viņi netiek līdzi.",
+    "fps": "Kadru nomaiņas ātrums",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimizēt",
+    "optimizeBalanced": "Līdzsvaroti",
+    "optimizeText": "Skaidrs teksts (kods, slaidi)",
+    "optimizeMotion": "Plūstoša kustība (spēles, video)",
+    "uploadLimit": "Augšupielādes ierobežojums",
+    "uploadAuto": "Automātiski",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Lielākais datu apjoms, ko tava kopīgošana sūta kopā. Noder koplietotā vai ierobežotā savienojumā.",
+    "codecTitle": "Kodeks",
+    "codec": "Kodeks",
+    "codecAuto": "Automātiski (ieteicams)",
+    "codecAutoHint": "Vispirms AV1 grafiskajā kartē, tad AV1 procesorā, ja īsa pārbaude rāda, ka tas tiek līdzi, citādi VP9. AV1 tikai tad, ja to var atskaņot visi skatītāji.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Visskaidrākais attēls ar tādu pašu datu apjomu. Skatītāji, kas to nevar atskaņot, saņem VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "To Mumcord izmantoja līdz šim. Darbojas visiem skatītājiem.",
+    "codecInfo": "Bez grafiskās kartes AV1 izmanto procesoru (SVT-AV1). Mumcord pārslēdzas uz VP9, ja dators netiek līdzi.",
+    "codecOlder": "Skatītāji ar vecāku Mumcord versiju vienmēr saņem VP9, ko arī izvēlētos.",
+    "hardwareTitle": "Aparatūras paātrināšana",
+    "useGpu": "Izmantot grafisko karti, kad iespējams",
+    "useGpuHint": "AV1 tiek kodēts grafiskajā kartē, tāpēc kopīgošana gandrīz neslogo procesoru. Izslēgts: AV1 izmanto procesoru.",
+    "statusList": "Kodētāja statuss",
+    "av1Encode": "AV1 kodēšana",
+    "askEachTime": "Vaicāt pēc šiem iestatījumiem katru reizi, kad kopīgoju",
+    "av1Playback": "AV1 atskaņošana",
+    "vp9Playback": "VP9 atskaņošana",
+    "playbackHardware": "Aparatūra",
+    "playbackSoftware": "Programmatūra",
+    "av1EncodeCpu": "AV1 kodēšana procesorā",
+    "vp9Encode": "VP9 kodēšana",
+    "gpuNvidia": "NVIDIA grafiskā karte",
+    "gpuAmd": "AMD grafiskā karte",
+    "gpuIntel": "Intel grafiskā karte",
+    "gpuUnknown": "Grafiskā karte",
+    "software": "Programmatūra",
+    "softwareLimit": "Programmatūra, tiek līdzi līdz {{height}}p{{fps}}",
+    "notAvailable": "Nav pieejams",
+    "checking": "Pārbauda…",
+    "active": "Aktīvais kodētājs: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (procesors)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (programmatūra)",
+    "skippedTooHeavy": "VP9 (AV1 šim datoram ir pārāk smags)",
+    "skippedOnBattery": "VP9 (darbība no akumulatora)",
+    "skippedAboveLimit": "VP9 (tavs attēls pārsniedz to, ko AV1 šeit spēj)",
+    "softwareWarning": "AV1 darbosies procesorā bez izturētas pārbaudes un var būt pārāk smags šim datoram.",
+    "checkAgain": "Pārbaudīt vēlreiz"
+  }
 }

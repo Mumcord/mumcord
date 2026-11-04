@@ -17,7 +17,7 @@
     "packetInspector": "Inspector de pachete",
     "hotkeys": "Comenzi rapide",
     "plugins": "Pluginuri",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Partajarea ecranului"
   },
   "sectionDescriptions": {
     "general": "Pornire, limbă, actualizări și accesibilitate.",
@@ -31,7 +31,7 @@
     "advanced": "Instrumente pentru dezvoltatori, diagnosticare, stocare și licențe.",
     "about": "Versiune, asistență și asistentul de configurare.",
     "plugins": "Pluginurile rulează într-un mediu izolat și primesc doar ce permiteți. Nu vă văd niciodată sunetul, fișierele sau certificatul.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Calitate, codec și hardware pentru partajarea ecranului. Spectatorii văd mereu ce alegi înainte de a începe."
   },
   "breadcrumb": "Setări / {{section}}",
   "moreInfo": "Mai multe informații: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "alerte ferestre pop-up",
     "externalContent": "conținut încorporat imagini previzualizări",
     "fileSharing": "fișiere trimite primește descarcă salvează folder atașament zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "partajare ecran calitate rezoluție fps codec AV1 VP9 encoder placă video"
   },
   "search": {
     "label": "Caută în setări",
@@ -1061,5 +1061,62 @@
     "switch": "Mod dezvoltator",
     "hint": "Adaugă o filă Dezvoltator la Pluginuri, unde poți încărca pluginuri nesemnate dintr-un dosar. Activează-l doar dacă îți creezi singur pluginurile."
   },
-  "newBadge": "New"
+  "newBadge": "Nou",
+  "screenShare": {
+    "newBadge": "Nou",
+    "qualityTitle": "Calitate implicită",
+    "resolution": "Rezoluție",
+    "resolutionAuto": "Automată",
+    "resolutionHint": "Modul automat pornește de la cea mai bună calitate permisă de încărcarea ta și de spectatori și coboară când aceștia nu fac față.",
+    "fps": "Rată de cadre",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimizează pentru",
+    "optimizeBalanced": "Echilibrat",
+    "optimizeText": "Text clar (cod, prezentări)",
+    "optimizeMotion": "Mișcare fluidă (jocuri, video)",
+    "uploadLimit": "Limită de încărcare",
+    "uploadAuto": "Automată",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Cantitatea maximă de date trimisă în total de partajarea ta. Util pe o conexiune comună sau cu trafic limitat.",
+    "codecTitle": "Codec video",
+    "codec": "Codec video",
+    "codecAuto": "Automat (recomandat)",
+    "codecAutoHint": "Mai întâi AV1 pe placa video, apoi AV1 pe procesor dacă o scurtă verificare arată că face față, altfel VP9. AV1 doar dacă îl poate reda toți spectatorii.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Cea mai clară imagine cu aceeași cantitate de date. Spectatorii care nu îl pot reda primesc VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Ce a folosit Mumcord până acum. Funcționează pentru toți spectatorii.",
+    "codecInfo": "Fără placă video, AV1 folosește procesorul (SVT-AV1). Mumcord trece la VP9 dacă calculatorul tău nu face față.",
+    "codecOlder": "Spectatorii cu un Mumcord mai vechi primesc mereu VP9, indiferent ce alegi.",
+    "hardwareTitle": "Accelerare hardware",
+    "useGpu": "Folosește placa video când este disponibilă",
+    "useGpuHint": "Codifică AV1 pe placa video, deci partajarea consumă aproape deloc CPU. Dezactivat: AV1 folosește procesorul.",
+    "statusList": "Starea encoderului",
+    "av1Encode": "Codificare AV1",
+    "askEachTime": "Întreabă-mă aceste setări la fiecare partajare",
+    "av1Playback": "Redare AV1",
+    "vp9Playback": "Redare VP9",
+    "playbackHardware": "Prin hardware",
+    "playbackSoftware": "Prin software",
+    "av1EncodeCpu": "Codificare AV1 pe procesor",
+    "vp9Encode": "Codificare VP9",
+    "gpuNvidia": "Placă video NVIDIA",
+    "gpuAmd": "Placă video AMD",
+    "gpuIntel": "Placă video Intel",
+    "gpuUnknown": "Placă video",
+    "software": "Prin software",
+    "softwareLimit": "Prin software, face față până la {{height}}p{{fps}}",
+    "notAvailable": "Indisponibil",
+    "checking": "Se verifică…",
+    "active": "Encoder activ: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (procesor)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (prin software)",
+    "skippedTooHeavy": "VP9 (AV1 e prea greu pentru acest PC)",
+    "skippedOnBattery": "VP9 (pe baterie)",
+    "skippedAboveLimit": "VP9 (imaginea ta depășește ce poate AV1 aici)",
+    "softwareWarning": "AV1 va rula pe procesor fără o verificare trecută și poate fi prea greu pentru acest PC.",
+    "checkAgain": "Verifică din nou"
+  }
 }

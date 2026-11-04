@@ -168,41 +168,15 @@ impl Engine {
         let before = lock(self.ban_lists_state()).loaded(server_id);
         let fresh = query(&ctx, self.ban_lists_state()).await?;
 
-        if !force {
-            for change in changes {
-                let key = match change {
-                    BanChange::Add { .. } => String::new(),
-                    BanChange::Edit { key, .. } | BanChange::Remove { key } => key.clone(),
-                };
-                if key.is_empty() {
-                    continue;
-                }
-                let now = fresh.iter().find(|b| b.key() == key);
-                let was = before.iter().find(|b| b.key() == key);
-                match (was, now) {
-                    (Some(loaded), Some(current)) if touched_elsewhere(loaded, current) => {
-                        return Ok(BanSaveOutcome::Conflict {
-                            key,
-                            fresh: fresh
-                                .iter()
-                                .map(|b| to_view(b, SystemTime::now()))
-                                .collect(),
-                        });
-                    }
-                    (Some(_), None) => {
-                        return Ok(BanSaveOutcome::Conflict {
-                            key,
-                            fresh: fresh
-                                .iter()
-                                .map(|b| to_view(b, SystemTime::now()))
-                                .collect(),
-                        });
-                    }
-                    _ => {}
-                }
-            }
+        if !force && let Some(key) = find_conflict(changes, &before, &fresh) {
+            return Ok(BanSaveOutcome::Conflict {
+                key,
+                fresh: fresh
+                    .iter()
+                    .map(|b| to_view(b, SystemTime::now()))
+                    .collect(),
+            });
         }
-
         let out = apply(&fresh, changes);
         ctx.handle
             .send_ban_list(&out)
@@ -249,6 +223,63 @@ async fn query(ctx: &SessionCtx, hub: &Mutex<BanLists>) -> EngineResult<Vec<Ban>
             "the server did not answer the ban list query within 5 s",
         )),
     }
+}
+
+/// The key that identifies a change in the list: the parts the ban acts on, so an entry can be
+/// matched again after the re-read (FR-10.66).
+pub fn change_key(change: &BanChange) -> String {
+    match change {
+        BanChange::Add {
+            address,
+            mask,
+            cert_hash,
+            ..
+        } => format!(
+            "{}/{}|{}",
+            address,
+            if address.is_ipv4() {
+                (*mask).min(32)
+            } else {
+                *mask
+            },
+            cert_hash.as_deref().unwrap_or("")
+        ),
+        BanChange::Edit { key, .. } | BanChange::Remove { key } => key.clone(),
+    }
+}
+
+/// The first change whose entry the server holds in another form than the user wrote (FR-10.66):
+/// the change is applied to the fresh copy, so only what someone else did here counts.
+fn find_conflict(changes: &[BanChange], before: &[Ban], fresh: &[Ban]) -> Option<String> {
+    for change in changes {
+        let key = change_key(change);
+        let now = fresh.iter().find(|b| b.key() == key);
+        match change {
+            // An entry the user adds must not already stand with other values.
+            BanChange::Add {
+                reason,
+                duration_secs,
+                ..
+            } => {
+                if now.is_some_and(|current| {
+                    current.reason != *reason || current.duration != *duration_secs
+                }) {
+                    return Some(key);
+                }
+            }
+            BanChange::Edit { key: touched, .. } | BanChange::Remove { key: touched } => {
+                let was = before.iter().find(|b| b.key() == *touched);
+                match (was, now) {
+                    (Some(loaded), Some(current)) if touched_elsewhere(loaded, current) => {
+                        return Some(key);
+                    }
+                    (Some(_), None) => return Some(key),
+                    _ => {}
+                }
+            }
+        }
+    }
+    None
 }
 
 /// Whether the server's copy of the entry is something other than what the user edited (FR-10.66).
@@ -380,6 +411,32 @@ mod tests {
     }
 
     #[test]
+    fn an_added_entry_that_already_stands_in_another_form_is_a_conflict() {
+        let fresh = [entry("a3f9")];
+        let change = BanChange::Add {
+            name: Some("Mallory".into()),
+            cert_hash: Some("a3f9".into()),
+            address: "203.0.113.1".parse().expect("address"),
+            mask: 32,
+            reason: Some("spam links".into()),
+            duration_secs: 3600,
+        };
+        let key = change_key(&change);
+        assert_eq!(find_conflict(&[change], &[], &fresh), Some(key));
+
+        // The same entry the user writes is nothing to ask about.
+        let same = BanChange::Add {
+            name: Some("Mallory".into()),
+            cert_hash: Some("a3f9".into()),
+            address: "203.0.113.1".parse().expect("address"),
+            mask: 32,
+            reason: Some("spam".into()),
+            duration_secs: 3600,
+        };
+        assert_eq!(find_conflict(&[same], &[], &fresh), None);
+    }
+
+    #[test]
     fn a_server_change_to_the_same_entry_is_a_conflict() {
         let loaded = entry("a3f9");
         let mut other = loaded.clone();
@@ -414,9 +471,24 @@ mod tests {
     }
 
     #[test]
+    fn the_mask_rounds_trip_in_the_form_the_server_counts() {
+        let stored = entry("a3f9");
+        let wire = ban::to_message(std::slice::from_ref(&stored));
+        assert_eq!(
+            wire.bans[0].mask, 128,
+            "a single IPv4 goes out as the wire length"
+        );
+        assert_eq!(
+            ban::from_message(&wire).first().expect("entry").mask,
+            32,
+            "and reads back as /32"
+        );
+    }
+
+    #[test]
     fn a_view_carries_the_mask_of_its_family_and_the_end() {
-        let mut mapped = entry("a3f9");
-        mapped.mask = 128;
+        // The length a view shows is the family's own, which is what a change carries (issue #253).
+        let mapped = entry("a3f9");
         // A fixed clock so the test does not depend on the machine's date.
         let now = ban::parse_iso("2026-11-03T19:00:00Z").expect("fixed now");
         let shown = to_view(&mapped, now);

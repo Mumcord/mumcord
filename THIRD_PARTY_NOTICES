@@ -674,7 +674,8 @@ them. It does not, and cannot, grant rights in third-party material. See
 # Part 1 — Unit vocabularies
 
 The unit-profile tables in `src/gendata/` — and the C tables generated from them
-into the library, the amalgamation, the WebAssembly build and the Python wheel —
+into the library, the amalgamation, the WebAssembly build, the Python wheel and
+the Rust crate —
 carry identifier strings from **six external vocabularies**. This part records,
 for each, what was taken, which published version the table is verified against,
 under which licence, and what remains open.
@@ -777,7 +778,8 @@ measure, or to dilute UCUM's purpose:
 **Open action:** request written permission from Regenstrief Institute to
 distribute this derived mapping table. Until that is granted, the `ucum:`
 profile can be excluded from any build with `-DBVNR_WITH_UCUM_PROFILE=OFF`
-(`doc/11` §9.4), which drops the table from the library entirely.
+(`doc/11` §9.4), which drops the table from the library entirely; the Rust crate
+drops it when its `ucum` feature is off.
 
 ---
 
@@ -916,7 +918,8 @@ files worldwide — but there is no grant to point at.
 **Open action:** ask the CF community to declare an explicit licence for the
 standard name table, proposing CC0 1.0 to match the conventions document. Until
 then this attribution stands in its place, and the `cf:` profile can be excluded
-from any build with `-DBVNR_WITH_CF_PROFILE=OFF`.
+from any build with `-DBVNR_WITH_CF_PROFILE=OFF` (in the Rust crate, with its
+`cf` feature off).
 
 ---
 
@@ -5693,6 +5696,44 @@ fn is_meta_character(c: char) -> bool {
         _ => false,
     }
 }
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
+  - bovnar 2.0.0 (https://github.com/sothis/bovnar)
+
+/*
+ * SPDX-License-Identifier: MIT
+ *
+ * Copyright (c) 2026 Janos Sonntag
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#ifndef BVN_FLOAT_LEGACY_SHIM_H_
+#define BVN_FLOAT_LEGACY_SHIM_H_
+#include "../../include/bvn_float.h"
+#include "bvn_float_impl.h"
+#endif
 
 
 --------------------------------------------------------------------------------
@@ -12749,7 +12790,6 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
-  - bovnar 2.0.0
   - anymap3 1.1.0 (https://github.com/reivilibre/anymap3)
   - asn1-rs-impl 0.2.0 (https://github.com/rusticata/asn1-rs.git)
   - block2 0.6.2 (https://github.com/madsmtm/objc2)

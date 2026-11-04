@@ -12,7 +12,7 @@ use mumcord_p2p::quinn::{RecvStream, SendStream};
 
 use super::check::MAX_BYTES;
 use super::wire::FullRef;
-use super::{originals, setting};
+use super::{DirectOutcome, originals, setting};
 use crate::session::Engine;
 
 const FOUND: u8 = 0;
@@ -125,6 +125,47 @@ pub(crate) async fn serve(engine: &Engine, mut send: SendStream, mut recv: RecvS
     }
 }
 
+/// Fetches `full` with `open` (a new stream on the direct connection) and falls back when no
+/// stream can be opened. A connection replaced mid-fetch (a file moved it to the relay) breaks
+/// the stream while a new connection is already open: one more try on that one, but only while
+/// `connected` says a connection exists.
+pub(super) async fn fetch_retrying<O, F>(
+    mut open: O,
+    connected: impl Fn() -> bool,
+    full: FullRef,
+    progress: impl Fn(u32, u32),
+) -> DirectOutcome
+where
+    O: FnMut() -> F,
+    F: std::future::Future<Output = Result<(SendStream, RecvStream), crate::p2p::DirectError>>,
+{
+    let mut retried = false;
+    loop {
+        let (send, recv) = match open().await {
+            Ok(stream) => stream,
+            Err(e) => {
+                tracing::info!(error = %e, "no direct connection; full image over plugin data");
+                return DirectOutcome::Fallback;
+            }
+        };
+        match fetch(send, recv, full, &progress).await {
+            Ok(bytes) => {
+                tracing::debug!(bytes = bytes.len(), "full image loaded directly");
+                return DirectOutcome::Loaded(bytes);
+            }
+            Err(DirectFetchError::Unavailable) => return DirectOutcome::Stop,
+            Err(e) if !retried && connected() => {
+                tracing::info!(error = %e, "direct full image broke; trying once more");
+                retried = true;
+            }
+            Err(e) => {
+                tracing::info!(error = %e, "direct full image failed; trying plugin data");
+                return DirectOutcome::Fallback;
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use mumcord_p2p::{P2p, P2pConfig, PeerConnection, Signal};
@@ -233,5 +274,102 @@ mod tests {
             fetch_with_reply(full, found(&image)[..500].to_vec()).await,
             Err(DirectFetchError::Broken(_))
         ));
+    }
+
+    /// Reads the kind byte and the request, then answers with `reply`.
+    async fn serve_after_kind(b: &PeerConnection, reply: Vec<u8>) {
+        let (mut send, mut recv) = b.connection().accept_bi().await.expect("accept");
+        let mut kind = [0u8; 1];
+        recv.read_exact(&mut kind).await.expect("kind");
+        let mut hash = [0u8; 32];
+        recv.read_exact(&mut hash).await.expect("request");
+        send.write_all(&reply).await.expect("reply");
+        send.finish().expect("finish");
+        send.stopped().await.ok();
+    }
+
+    async fn run_retrying(
+        a: &PeerConnection,
+        connected: bool,
+        full: FullRef,
+    ) -> (DirectOutcome, usize) {
+        let opened = std::sync::atomic::AtomicUsize::new(0);
+        let outcome = fetch_retrying(
+            || {
+                opened.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                let connection = a.connection().clone();
+                async move {
+                    let (mut send, recv) = connection
+                        .open_bi()
+                        .await
+                        .map_err(|e| crate::p2p::DirectError::Stream(e.to_string()))?;
+                    // Opening a stream sends nothing until written to; the kind byte makes
+                    // the server's accept_bi return, as the real opener does.
+                    send.write_all(&[crate::p2p::STREAM_FULL_IMAGE])
+                        .await
+                        .map_err(|e| crate::p2p::DirectError::Stream(e.to_string()))?;
+                    Ok((send, recv))
+                }
+            },
+            || connected,
+            full,
+            |_, _| {},
+        )
+        .await;
+        (outcome, opened.load(std::sync::atomic::Ordering::SeqCst))
+    }
+
+    /// F3a(d): a stream that breaks while the connection is still open is retried once on it.
+    #[tokio::test]
+    async fn broken_stream_is_retried_once_while_connected() {
+        let image: Vec<u8> = (0..50_000u32).map(|i| (i % 251) as u8).collect();
+        let full = FullRef::of(&image);
+        let (a, b) = connected().await;
+        let server = tokio::spawn(async move {
+            let mut kind = [0u8; 1];
+            for reply in [found(&image)[..500].to_vec(), found(&image)] {
+                let (mut send, mut recv) = b.connection().accept_bi().await.expect("accept");
+                recv.read_exact(&mut kind).await.expect("kind");
+                let mut hash = [0u8; 32];
+                recv.read_exact(&mut hash).await.expect("request");
+                send.write_all(&reply).await.expect("reply");
+                send.finish().expect("finish");
+                send.stopped().await.ok();
+            }
+            image
+        });
+        let (outcome, opened) = run_retrying(&a, true, full).await;
+        let image = server.await.expect("server");
+        assert!(matches!(outcome, DirectOutcome::Loaded(bytes) if bytes == image));
+        assert_eq!(opened, 2, "one failed try and one retry");
+    }
+
+    /// F3a(d): without an open connection, or after the retry broke too, plugin data takes over.
+    #[tokio::test]
+    async fn retry_is_once_and_needs_a_connection() {
+        let image: Vec<u8> = (0..50_000u32).map(|i| (i % 251) as u8).collect();
+        let full = FullRef::of(&image);
+        let cut = found(&image)[..500].to_vec();
+
+        let (a, b) = connected().await;
+        let server = tokio::spawn({
+            let cut = cut.clone();
+            async move {
+                for _ in 0..2 {
+                    serve_after_kind(&b, cut.clone()).await;
+                }
+            }
+        });
+        let (outcome, opened) = run_retrying(&a, true, full).await;
+        server.await.expect("server");
+        assert!(matches!(outcome, DirectOutcome::Fallback));
+        assert_eq!(opened, 2, "never a third try");
+
+        let (a, b) = connected().await;
+        let server = tokio::spawn(async move { serve_after_kind(&b, cut).await });
+        let (outcome, opened) = run_retrying(&a, false, full).await;
+        server.await.expect("server");
+        assert!(matches!(outcome, DirectOutcome::Fallback));
+        assert_eq!(opened, 1, "no retry without a connection");
     }
 }

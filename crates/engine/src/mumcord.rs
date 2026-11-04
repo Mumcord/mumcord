@@ -30,8 +30,8 @@ pub const VERSION: u32 = 1;
 const APP: &str = "mumcord";
 /// Feature name for sending and receiving files (spec 07, section 6.4).
 pub const FEATURE_FILES: &str = crate::files::FEATURE;
-/// Feature name for relaying a screen share to many viewers through the broadcast service
-/// (spec 07). Added to [`FEATURES`] together with the broadcast sender.
+/// Feature name of clients that can watch a screen share through the relay broadcast (spec 07,
+/// FR-7.48); viewers without it get a direct copy.
 pub const FEATURE_SCREEN_BROADCAST: &str = "screen-broadcast";
 /// What this client can do for other Mumcord clients.
 pub const FEATURES: &[&str] = &[
@@ -42,6 +42,7 @@ pub const FEATURES: &[&str] = &[
     crate::p2p::FEATURE,
     crate::watch_party::FEATURE,
     crate::screen_share::signal::FEATURE,
+    FEATURE_SCREEN_BROADCAST,
     crate::pm_rules::FEATURE,
     crate::plugins::FEATURE,
     crate::plugins::SERVER_FEATURE,
@@ -338,12 +339,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn file_and_broadcast_features_are_valid_names_and_only_files_is_announced() {
+    fn file_and_broadcast_features_are_valid_names_and_announced() {
         for name in [FEATURE_FILES, FEATURE_SCREEN_BROADCAST] {
             assert!(!name.is_empty() && name.len() <= MAX_FEATURE_LEN);
+            assert!(FEATURES.contains(&name));
         }
-        assert!(FEATURES.contains(&FEATURE_FILES));
-        assert!(!FEATURES.contains(&FEATURE_SCREEN_BROADCAST));
     }
 
     #[test]
@@ -361,6 +361,7 @@ mod tests {
                 "now-playing",
                 "p2p",
                 "plugins",
+                "screen-broadcast",
                 "screen-share",
                 "server-plugins",
                 "watch-party"

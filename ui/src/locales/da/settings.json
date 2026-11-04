@@ -17,7 +17,7 @@
     "packetInspector": "Pakkeinspektør",
     "hotkeys": "Genveje",
     "plugins": "Plugins",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Skærmdeling"
   },
   "sectionDescriptions": {
     "general": "Start, sprog, opdateringer og tilgængelighed.",
@@ -31,7 +31,7 @@
     "advanced": "Udviklerværktøjer, diagnostik, lagring og licenser.",
     "about": "Version, support og opsætningsguiden.",
     "plugins": "Plugins kører i en sandbox og får kun det, du tillader. De ser aldrig din lyd, dine filer eller dit certifikat.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Kvalitet, kodek og hardware til deling af din skærm. Seerne ser altid det, du vælger, før du starter."
   },
   "breadcrumb": "Indstillinger / {{section}}",
   "moreInfo": "Mere information: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "alarmer pop-ups",
     "externalContent": "indlejringer billeder forhåndsvisninger",
     "fileSharing": "filer send modtag download gem mappe vedhæftning zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "skærmdeling kvalitet opløsning fps kodek AV1 VP9 encoder grafikkort"
   },
   "search": {
     "label": "Søg i indstillinger",
@@ -1053,5 +1053,62 @@
     "switch": "Udviklertilstand",
     "hint": "Tilføjer fanen Udvikler til Plugins, hvor du kan indlæse usignerede plugins fra en mappe. Slå den kun til, hvis du selv laver plugins."
   },
-  "newBadge": "New"
+  "newBadge": "Ny",
+  "screenShare": {
+    "newBadge": "Ny",
+    "qualityTitle": "Standardkvalitet",
+    "resolution": "Opløsning",
+    "resolutionAuto": "Automatisk",
+    "resolutionHint": "Automatisk starter med den bedste kvalitet, som din upload og dine seere tillader, og går ned, når de ikke kan følge med.",
+    "fps": "Billedfrekvens",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimér til",
+    "optimizeBalanced": "Balanceret",
+    "optimizeText": "Skarp tekst (kode, slides)",
+    "optimizeMotion": "Jævn bevægelse (spil, video)",
+    "uploadLimit": "Uploadgrænse",
+    "uploadAuto": "Automatisk",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Det mest, din deling sender i alt. Nyttigt på en delt eller datamålt forbindelse.",
+    "codecTitle": "Kodek",
+    "codec": "Kodek",
+    "codecAuto": "Automatisk (anbefalet)",
+    "codecAutoHint": "Først AV1 på dit grafikkort, derefter AV1 på processoren, hvis en kort test viser, at den kan følge med, ellers VP9. AV1 kun når alle seere kan afspille det.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Skarpeste billede for de samme data. Seere, der ikke kan afspille det, får VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Det, Mumcord har brugt indtil nu. Virker for alle seere.",
+    "codecInfo": "Uden grafikkort bruger AV1 processoren (SVT-AV1). Mumcord skifter til VP9, hvis din computer ikke kan følge med.",
+    "codecOlder": "Seere med en ældre Mumcord får altid VP9, uanset hvad du vælger.",
+    "hardwareTitle": "Hardwareacceleration",
+    "useGpu": "Brug grafikkort, når det er tilgængeligt",
+    "useGpuHint": "Koder AV1 på dit grafikkort, så deling næsten ikke belaster CPU'en. Fra: AV1 bruger processoren.",
+    "statusList": "Encoderstatus",
+    "av1Encode": "AV1-kodning",
+    "askEachTime": "Spørg om disse indstillinger, hver gang jeg deler",
+    "av1Playback": "AV1-afspilning",
+    "vp9Playback": "VP9-afspilning",
+    "playbackHardware": "Hardwarebaseret",
+    "playbackSoftware": "Softwarebaseret",
+    "av1EncodeCpu": "AV1-kodning på processoren",
+    "vp9Encode": "VP9-kodning",
+    "gpuNvidia": "NVIDIA-grafikkort",
+    "gpuAmd": "AMD-grafikkort",
+    "gpuIntel": "Intel-grafikkort",
+    "gpuUnknown": "Grafikkort",
+    "software": "Softwarebaseret",
+    "softwareLimit": "Softwarebaseret, klarer op til {{height}}p{{fps}}",
+    "notAvailable": "Ikke tilgængelig",
+    "checking": "Tjekker…",
+    "active": "Aktiv encoder: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (på processoren)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (softwarebaseret)",
+    "skippedTooHeavy": "VP9 (AV1 er for tungt for denne pc)",
+    "skippedOnBattery": "VP9 (på batteri)",
+    "skippedAboveLimit": "VP9 (dit billede er over, hvad AV1 klarer her)",
+    "softwareWarning": "AV1 kører på processoren uden en bestået test og kan være for tungt for denne pc.",
+    "checkAgain": "Tjek igen"
+  }
 }
