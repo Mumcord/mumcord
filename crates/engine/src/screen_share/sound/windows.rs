@@ -31,8 +31,8 @@ use windows::Win32::System::Threading::{CreateEventW, WaitForSingleObject};
 use windows::Win32::System::Variant::VT_BLOB;
 use windows::core::{HRESULT, IUnknown, Interface, Ref, implement};
 
-use super::capture::SoundSource;
-use super::windows_rules::MonoFrames;
+use super::super::capture::SoundSource;
+use super::super::windows_rules::MonoFrames;
 
 /// Stereo 16-bit PCM is what process loopback is documented with; the mixdown to mono happens
 /// in [`MonoFrames`]. The rate is the share's, so Windows resamples, not Mumcord.

@@ -11,6 +11,7 @@ use super::broadcast::Fanout;
 use super::encoder::ActiveEncoder;
 use super::media::{Media, ViewerLink};
 use super::signal::{CodecName, MAX_VIEWERS};
+use super::sound::SoundStatus;
 use super::watch::WatchLink;
 use super::{ScreenShareView, ShareKind, WatchBlock};
 
@@ -64,8 +65,8 @@ pub(crate) enum Admit {
 pub(crate) struct OwnShare {
     pub paused: bool,
     pub sound: bool,
-    /// The capture gave a sound source; without one `sound` stays off.
-    pub sound_available: bool,
+    /// What the capture gave (FR-7.76, FR-7.84); without a source `sound` stays off.
+    pub sound_status: SoundStatus,
     /// Accepted viewers, with their stream once they opened it.
     pub viewers: BTreeMap<u32, Option<ViewerLink>>,
     /// What each viewer can play, direct and relay ones alike: the share's single encoder has
@@ -87,11 +88,11 @@ pub(crate) struct OwnShare {
 }
 
 impl OwnShare {
-    pub fn new(sound: bool, sound_available: bool) -> Self {
+    pub fn new(sound: bool, sound_status: SoundStatus) -> Self {
         Self {
             paused: false,
-            sound: sound && sound_available,
-            sound_available,
+            sound: sound && sound_status.available(),
+            sound_status,
             viewers: BTreeMap::new(),
             caps: BTreeMap::new(),
             kind: None,
@@ -390,7 +391,7 @@ impl Shares {
             session: own,
             paused: share.paused,
             sound: share.sound,
-            sound_available: share.sound_available,
+            sound_status: share.sound_status.clone(),
             viewers: share.viewer_list(),
             blocked: None,
             kind: share.kind,
@@ -400,7 +401,7 @@ impl Shares {
             session: *session,
             paused: share.paused,
             sound: share.sound,
-            sound_available: false,
+            sound_status: SoundStatus::default(),
             viewers: share.viewers.clone(),
             blocked: self.failed.get(session).copied(),
             kind: share.kind,
@@ -422,6 +423,7 @@ fn elapsed(then: Instant, now: Instant) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::screen_share::sound::{AppName, ShareSoundMode, SoundUnavailable};
 
     const NEW: ViewerCaps = ViewerCaps {
         av1: true,
@@ -430,7 +432,7 @@ mod tests {
 
     #[test]
     fn the_active_encoder_is_whatever_the_media_opened() {
-        let own = OwnShare::new(false, false);
+        let own = OwnShare::new(false, SoundStatus::default());
         assert_eq!(own.active_encoder(), None);
         let opened = ActiveEncoder {
             codec: mumcord_screenshare::Codec::Av1,
@@ -454,7 +456,7 @@ mod tests {
             NEW
         );
 
-        let mut own = OwnShare::new(false, false);
+        let mut own = OwnShare::new(false, SoundStatus::default());
         own.admit(1, NEW);
         assert_eq!(own.av1_blocker(), None);
         own.admit(4, old);
@@ -470,7 +472,7 @@ mod tests {
             "asking again updates the codecs"
         );
         assert_eq!(own.admit(9, old), Admit::New);
-        let mut full = OwnShare::new(false, false);
+        let mut full = OwnShare::new(false, SoundStatus::default());
         for viewer in 0..MAX_VIEWERS as u32 {
             full.admit(viewer, NEW);
         }
@@ -485,7 +487,7 @@ mod tests {
     #[test]
     fn relay_viewers_count_for_the_codec_without_a_direct_copy() {
         let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9]);
-        let mut own = OwnShare::new(false, false);
+        let mut own = OwnShare::new(false, SoundStatus::default());
         own.admit(1, ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9]));
         own.set_caps(30, vp9_only);
         assert_eq!(own.av1_blocker(), Some(30));
@@ -500,22 +502,38 @@ mod tests {
 
     #[test]
     fn sound_follows_the_source_that_take_sound_gave() {
+        let unavailable = SoundStatus {
+            unavailable: Some(SoundUnavailable::OsTooOld),
+            ..SoundStatus::default()
+        };
         let mut shares = Shares {
-            own: Some(OwnShare::new(true, false)),
+            own: Some(OwnShare::new(true, unavailable.clone())),
             ..Shares::default()
         };
         let view = &shares.views(1)[0];
-        assert!(!view.sound_available);
+        assert_eq!(
+            view.sound_status, unavailable,
+            "the reason reaches the view"
+        );
         assert!(!view.sound, "asking for sound without a source stays off");
 
-        shares.own = Some(OwnShare::new(true, true));
+        let app = SoundStatus {
+            mode: ShareSoundMode::App,
+            app: Some(AppName::new("Player")),
+            unavailable: None,
+        };
+        shares.own = Some(OwnShare::new(true, app.clone()));
         let view = &shares.views(1)[0];
-        assert!(view.sound_available && view.sound);
+        assert!(view.sound);
+        assert_eq!(view.sound_status, app);
+
+        shares.own = Some(OwnShare::new(false, app));
+        assert!(!shares.views(1)[0].sound, "switched off");
     }
 
     #[test]
     fn the_ninth_viewer_is_turned_away() {
-        let mut own = OwnShare::new(false, false);
+        let mut own = OwnShare::new(false, SoundStatus::default());
         for viewer in 0..MAX_VIEWERS as u32 {
             assert_eq!(own.admit(viewer, NEW), Admit::New);
         }
@@ -602,7 +620,7 @@ mod tests {
     #[test]
     fn leaving_the_channel_ends_sharing_and_watching() {
         let mut shares = Shares::default();
-        let mut own = OwnShare::new(true, true);
+        let mut own = OwnShare::new(true, SoundStatus::test_source());
         own.admit(7, NEW);
         shares.own = Some(own);
         shares.share_live(5, &announced(false, false), Instant::now());
@@ -633,7 +651,7 @@ mod tests {
     fn newcomers_hear_of_the_own_share_once_more() {
         let now = Instant::now();
         let mut shares = Shares {
-            own: Some(OwnShare::new(false, false)),
+            own: Some(OwnShare::new(false, SoundStatus::default())),
             ..Shares::default()
         };
         let own = shares.own.as_mut().expect("own share");
@@ -660,7 +678,7 @@ mod tests {
         let mut shares = Shares::default();
         shares.share_live(2, &announced(true, false), Instant::now());
         shares.failed.insert(2, WatchBlock::NoDirectPath);
-        shares.own = Some(OwnShare::new(true, true));
+        shares.own = Some(OwnShare::new(true, SoundStatus::test_source()));
         let views = shares.views(9);
         assert_eq!(views.len(), 2);
         assert_eq!((views[0].session, views[0].sound), (9, true));

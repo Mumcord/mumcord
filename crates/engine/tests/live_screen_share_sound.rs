@@ -196,7 +196,7 @@ async fn the_viewer_hears_the_shared_sound_at_its_level() {
     let a = alice.session();
     let server = alice.server();
     assert!(
-        !alice.engine.screen_share_sound_available(),
+        alice.engine.screen_share_sound_unavailable().is_some(),
         "no app sound on Linux (FR-2.42)"
     );
 

@@ -1,5 +1,5 @@
 //! The shared app's sound on macOS (FR-2.42). ScreenCaptureKit delivers it in the same stream
-//! as the pictures ([`super::capture_macos`]), already limited to the shared content and without
+//! as the pictures ([`super::super::capture_macos`]), already limited to the shared content and without
 //! Mumcord's own output (`excludesCurrentProcessAudio`). Its callback cuts the samples into
 //! 10 ms frames and hands them over here; the share's sound thread takes them as a
 //! [`SoundSource`].
@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-use super::capture::SoundSource;
+use super::super::capture::SoundSource;
 
 /// Frames that may wait for the sound thread (0.5 s); older sound is dropped instead of piling
 /// up latency behind a stalled thread.
