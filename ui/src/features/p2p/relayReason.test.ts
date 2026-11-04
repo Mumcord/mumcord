@@ -20,6 +20,10 @@ describe("relay reason texts", () => {
       "The other person can't use the relay (older Mumcord or relay turned off).",
     ],
     [{ kind: "denied" }, "The relay bot refused the request."],
+    [
+      { kind: "notRegistered" },
+      "This server's relay is only available to registered users. Register on this server to use it.",
+    ],
     [{ kind: "peerGone" }, "The other person left the server."],
     [{ kind: "rateLimited" }, "Too many relay requests. Try again in a minute."],
     [{ kind: "relayFull" }, "The relay refused the connection: relay full"],

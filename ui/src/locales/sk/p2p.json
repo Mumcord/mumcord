@@ -45,6 +45,7 @@
     "unreachable": "Relay sa nepodarilo zastihnúť cez UDP ani TCP 443.",
     "peerCannotRelay": "Druhá osoba nemôže relay použiť (staršie Mumcord alebo vypnuté relay).",
     "denied": "Bot relay požiadavku odmietol.",
+    "notRegistered": "Relay tohto servera je dostupný len registrovaným používateľom. Ak ho chceš používať, zaregistruj sa na tomto serveri.",
     "peerGone": "Druhá osoba opustila server.",
     "rateLimited": "Príliš veľa požiadaviek na relay. Skús to o minútu."
   },
