@@ -1231,3 +1231,55 @@
     color: CanvasText;
   }
 }
+
+/* Forced colours replace backgrounds, which would hide the knob and the checked track. System
+   colours are set explicitly, and the states differ in shape too: an off knob is a hollow ring,
+   an on knob is solid and sits on the other side. */
+@media (forced-colors: active) {
+  .settings-switch__input {
+    forced-color-adjust: none;
+    border: 2px solid ButtonText;
+    background: Canvas;
+  }
+
+  .settings-switch__input::after {
+    top: 0.125rem;
+    left: 0.125rem;
+    box-sizing: border-box;
+    border: 2px solid ButtonText;
+    background: Canvas;
+  }
+
+  .settings-switch__input:checked {
+    border-color: ButtonText;
+    background: Highlight;
+  }
+
+  .settings-switch__input:checked::after {
+    border-color: HighlightText;
+    background: HighlightText;
+    transform: translateX(1rem);
+  }
+
+  .settings-switch__input:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .settings-switch__input:disabled {
+    border-color: GrayText;
+    opacity: 1;
+  }
+
+  .settings-switch__input:disabled::after {
+    border-color: GrayText;
+  }
+
+  .settings-switch__input:disabled:checked {
+    background: Canvas;
+  }
+
+  .settings-switch__input:disabled:checked::after {
+    background: GrayText;
+  }
+}

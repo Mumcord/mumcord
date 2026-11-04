@@ -31,6 +31,7 @@
 
 ### Fixed
 
+- Switches stay visible in high-contrast (forced-colours) mode: the knob and track are drawn in system colours, and on and off differ by shape as well as colour
 - Screen sharing now speaks your language: the share dialog, the live bar with its quality menu, the viewer list, the stream viewer, the encoder and relay notices and the media area resize hints were still shown in English in all languages other than English.
 - Starting a watch party or adding a video from the Apps menu no longer reloads the app when you confirm the link
 - A mumbot shows as "Mumbot <version>" in the profile preview and the connection details instead of "Mumcord <version>", from what it announces about itself; older mumbots get the same label from their name and version (#459)
