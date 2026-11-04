@@ -5,10 +5,11 @@ import type { PluginNode, StageActivityView } from "../../../api";
 import { applyLanguage } from "../../../i18n";
 import { StageShown } from "../../media/stageContext";
 import { resetStageEntries, useStageEntries } from "../../media/stageRegistry";
-import { resetMediaView } from "../../media/mediaView";
+import { leaveCinema, mediaView, openMedia, resetMediaView } from "../../media/mediaView";
 import { resetActivityStore } from "./activityStore";
 import { FULLSCREEN_BANNER_MS, PluginStage } from "./PluginStage";
 import { PluginStageHost } from "./PluginStageHost";
+import { PluginMiniBars } from "./StageMiniBar";
 
 const api = vi.hoisted(() => ({
   activities: [] as StageActivityView[],
@@ -28,6 +29,7 @@ vi.mock("../../../api", async (orig) => {
     pluginUiAction: api.action,
     pluginUiEvent: () => Promise.resolve(null),
     pluginFramesMute: () => Promise.resolve(null),
+    pluginFramesMuteState: () => Promise.resolve({ all: false, plugins: [] }),
     pluginsUiTrees: () => Promise.resolve([]),
     pluginsList: () => Promise.resolve({ noPlugins: false, allOff: false, plugins: api.plugins }),
     on: (name: string, handler: (payload: unknown) => void) => {
@@ -275,5 +277,29 @@ describe("PluginStageHost", () => {
     expect(await screen.findByText("Too many activities in this channel")).toBeInTheDocument();
     emit("pluginsStageRefused", { plugin: "brawl", reason: "full" });
     expect(await screen.findByText("This activity is full")).toBeInTheDocument();
+  });
+});
+
+describe("PluginMiniBars", () => {
+  it("keeps the activity as a mini bar while the media area is closed", async () => {
+    api.activities = [BRAWL];
+    render(<PluginMiniBars />);
+    await settle();
+    act(() => {
+      openMedia("plugin:brawl");
+    });
+    expect(screen.queryByRole("group")).toBeNull();
+    act(() => {
+      leaveCinema();
+    });
+    const bar = screen.getByRole("group", { name: "Media area: Board Brawl" });
+    expect(bar).toHaveTextContent("Started by Maya · 3 in the game");
+    fireEvent.click(screen.getByRole("button", { name: "Open" }));
+    expect(mediaView().cinema).toBe("plugin:brawl");
+    act(() => {
+      leaveCinema();
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Leave Board Brawl" }));
+    expect(api.leave).toHaveBeenCalledWith("a1");
   });
 });
