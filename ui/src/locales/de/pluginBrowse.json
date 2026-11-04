@@ -96,5 +96,7 @@
     "unpacking": "Wird entpackt…",
     "starting": "Wird gestartet…",
     "announce": "{{name}}: {{percent}} % heruntergeladen"
-  }
+  },
+  "needsMumcord": "Benötigt Mumcord {{version}} oder neuer",
+  "updateMumcord": "Mumcord aktualisieren"
 }

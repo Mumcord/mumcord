@@ -96,5 +96,7 @@
     "unpacking": "Uitpakken…",
     "starting": "Starten…",
     "announce": "{{name}}: {{percent}}% gedownload"
-  }
+  },
+  "needsMumcord": "Vereist Mumcord {{version}} of nieuwer",
+  "updateMumcord": "Mumcord updaten"
 }

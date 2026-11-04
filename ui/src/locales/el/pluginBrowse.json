@@ -96,5 +96,7 @@
     "unpacking": "Αποσυμπίεση…",
     "starting": "Εκκίνηση…",
     "announce": "{{name}}: λήφθηκε {{percent}}%"
-  }
+  },
+  "needsMumcord": "Απαιτεί Mumcord {{version}} ή νεότερο",
+  "updateMumcord": "Ενημέρωση του Mumcord"
 }

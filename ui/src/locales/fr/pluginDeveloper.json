@@ -22,7 +22,7 @@
   "logEmpty": "Aucune ligne de journal pour l'instant.",
   "level": {
     "debug": "Débogage",
-    "info": "Info",
+    "info": "Infos",
     "warn": "Avertissement",
     "error": "Erreur"
   },

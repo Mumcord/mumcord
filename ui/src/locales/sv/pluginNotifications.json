@@ -6,8 +6,8 @@
     "open": "Visa i Tillägg"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} kunde inte använda bilden",
+    "body": "Den här bilden kan inte användas. Använd en PNG-, JPEG- eller WebP-fil på högst 10 MB."
   },
   "update": {
     "title": "Uppdatering för {{name}}",

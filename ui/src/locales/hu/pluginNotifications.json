@@ -6,8 +6,8 @@
     "open": "Megjelenítés a Bővítményekben"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "A(z) {{name}} nem tudta használni a képet",
+    "body": "Ez a kép nem használható. Használj legfeljebb 10 MB-os PNG, JPEG vagy WebP fájlt."
   },
   "update": {
     "title": "Frissítés ehhez: {{name}}",

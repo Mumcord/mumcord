@@ -59,7 +59,7 @@
     "logEmpty": "El registro está vacío.",
     "level": {
       "debug": "Depuración",
-      "info": "Info",
+      "info": "Información",
       "warn": "Aviso",
       "error": "Error"
     }

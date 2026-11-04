@@ -1,9 +1,9 @@
 {
   "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "moreItems": "Weitere Plugins…",
+  "subline": "{{plugin}} · Inoffiziell",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Plugin-Einträge zeigen immer den Namen des Plugins. Verwalte sie unter Einstellungen → Plugins.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Wird nach einem Problem neu gestartet, versuche es gleich noch einmal"
 }

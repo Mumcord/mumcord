@@ -6,8 +6,8 @@
     "open": "Afișează în Pluginuri"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} nu a putut folosi imaginea",
+    "body": "Această imagine nu poate fi folosită. Folosește un fișier PNG, JPEG sau WebP de până la 10 MB."
   },
   "update": {
     "title": "Actualizare pentru {{name}}",

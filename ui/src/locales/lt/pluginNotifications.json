@@ -6,8 +6,8 @@
     "open": "Rodyti skiltyje Papildiniai"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} negalėjo naudoti paveikslėlio",
+    "body": "Šio paveikslėlio naudoti negalima. Naudok PNG, JPEG arba WebP failą iki 10 MB."
   },
   "update": {
     "title": "{{name}} naujinys",

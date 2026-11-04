@@ -100,7 +100,7 @@
   "visibilityChip": "Spricht mit anderen Mumcord-Nutzern · {{visibility}}",
   "chips": {
     "label": "Genutzte Berechtigungen",
-    "uiPanel": "Panel",
+    "uiPanel": "Leiste",
     "uiMemberBadge": "Mitglieder-Abzeichen",
     "uiProfileCard": "Profilkarte",
     "uiChatCard": "Chat-Karten",

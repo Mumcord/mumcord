@@ -96,5 +96,7 @@
     "unpacking": "Puretaan…",
     "starting": "Käynnistetään…",
     "announce": "{{name}}: {{percent}} % ladattu"
-  }
+  },
+  "needsMumcord": "Vaatii Mumcordin version {{version}} tai uudemman",
+  "updateMumcord": "Päivitä Mumcord"
 }

@@ -6,8 +6,8 @@
     "open": "Näita Pluginates"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} ei saanud pilti kasutada",
+    "body": "Seda pilti ei saa kasutada. Kasuta PNG-, JPEG- või WebP-faili kuni 10 MB."
   },
   "update": {
     "title": "Uuendus: {{name}}",

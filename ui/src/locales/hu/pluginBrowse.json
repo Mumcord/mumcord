@@ -96,5 +96,7 @@
     "unpacking": "Kicsomagolás…",
     "starting": "Indítás…",
     "announce": "{{name}}: {{percent}}% letöltve"
-  }
+  },
+  "needsMumcord": "Mumcord {{version}} vagy újabb szükséges hozzá",
+  "updateMumcord": "Mumcord frissítése"
 }

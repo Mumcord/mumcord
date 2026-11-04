@@ -96,5 +96,7 @@
     "unpacking": "Išpakuojama…",
     "starting": "Paleidžiama…",
     "announce": "{{name}}: atsisiųsta {{percent}} %"
-  }
+  },
+  "needsMumcord": "Reikia Mumcord {{version}} ar naujesnės versijos",
+  "updateMumcord": "Atnaujinti Mumcord"
 }

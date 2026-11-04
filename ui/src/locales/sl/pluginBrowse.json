@@ -96,5 +96,7 @@
     "unpacking": "Razpakiranje…",
     "starting": "Zagon…",
     "announce": "{{name}}: preneseno {{percent}} %"
-  }
+  },
+  "needsMumcord": "Potrebuje Mumcord {{version}} ali novejši",
+  "updateMumcord": "Posodobi Mumcord"
 }

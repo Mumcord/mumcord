@@ -96,5 +96,7 @@
     "unpacking": "Décompression…",
     "starting": "Démarrage…",
     "announce": "{{name}} : {{percent}} % téléchargés"
-  }
+  },
+  "needsMumcord": "Nécessite Mumcord {{version}} ou une version plus récente",
+  "updateMumcord": "Mettre à jour Mumcord"
 }

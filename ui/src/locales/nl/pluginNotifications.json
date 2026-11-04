@@ -6,8 +6,8 @@
     "open": "Tonen in Plug-ins"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} kon de afbeelding niet gebruiken",
+    "body": "Deze afbeelding kan niet worden gebruikt. Gebruik een PNG-, JPEG- of WebP-bestand tot 10 MB."
   },
   "update": {
     "title": "Update voor {{name}}",

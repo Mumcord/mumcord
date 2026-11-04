@@ -96,5 +96,7 @@
     "unpacking": "Atarhivē…",
     "starting": "Palaiž…",
     "announce": "{{name}}: lejupielādēti {{percent}}%"
-  }
+  },
+  "needsMumcord": "Nepieciešams Mumcord {{version}} vai jaunāks",
+  "updateMumcord": "Atjaunināt Mumcord"
 }

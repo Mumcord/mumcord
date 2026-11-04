@@ -59,7 +59,7 @@
     "logEmpty": "Zapisnik je prazan.",
     "level": {
       "debug": "Ispravljanje",
-      "info": "Info",
+      "info": "Informacija",
       "warn": "Upozorenje",
       "error": "Pogreška"
     }

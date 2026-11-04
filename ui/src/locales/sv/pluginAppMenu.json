@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Tillägg",
+  "moreItems": "Fler tillägg…",
+  "subline": "{{plugin}} · Inofficiellt",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Poster från tillägg visar alltid tilläggets namn. Hantera dem under Inställningar → Tillägg.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Startar om efter ett problem, försök igen om en stund"
 }

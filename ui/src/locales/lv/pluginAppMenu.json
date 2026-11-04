@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Spraudņi",
+  "moreItems": "Vairāk spraudņu…",
+  "subline": "{{plugin}} · Neoficiāls",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Spraudņu vienumiem vienmēr tiek rādīts spraudņa nosaukums. Pārvaldi tos sadaļā Iestatījumi → Spraudņi.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Notiek restartēšana pēc kļūmes, mēģini pēc brīža"
 }

@@ -96,5 +96,7 @@
     "unpacking": "Udpakker…",
     "starting": "Starter…",
     "announce": "{{name}}: {{percent}} % downloadet"
-  }
+  },
+  "needsMumcord": "Kræver Mumcord {{version}} eller nyere",
+  "updateMumcord": "Opdatér Mumcord"
 }

@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Добавки",
+  "moreItems": "Още добавки…",
+  "subline": "{{plugin}} · Неофициална",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "Елементите от добавки винаги показват името на добавката. Управлявай ги в Настройки → Добавки.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Рестартиране след проблем, опитай отново след малко"
 }

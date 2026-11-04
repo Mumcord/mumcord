@@ -96,5 +96,7 @@
     "unpacking": "Разархивиране…",
     "starting": "Стартиране…",
     "announce": "{{name}}: {{percent}}% изтеглени"
-  }
+  },
+  "needsMumcord": "Изисква Mumcord {{version}} или по-нова",
+  "updateMumcord": "Обнови Mumcord"
 }

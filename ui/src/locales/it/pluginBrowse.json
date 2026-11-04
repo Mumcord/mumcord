@@ -96,5 +96,7 @@
     "unpacking": "Estrazione…",
     "starting": "Avvio…",
     "announce": "{{name}}: {{percent}}% scaricato"
-  }
+  },
+  "needsMumcord": "Richiede Mumcord {{version}} o successivo",
+  "updateMumcord": "Aggiorna Mumcord"
 }

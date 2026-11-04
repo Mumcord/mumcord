@@ -96,5 +96,7 @@
     "unpacking": "Á dhíphacáil…",
     "starting": "Á thosú…",
     "announce": "{{name}}: {{percent}}% íoslódáilte"
-  }
+  },
+  "needsMumcord": "Teastaíonn Mumcord {{version}} nó níos nuaí",
+  "updateMumcord": "Nuashonraigh Mumcord"
 }

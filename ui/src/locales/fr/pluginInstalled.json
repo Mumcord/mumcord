@@ -59,7 +59,7 @@
     "logEmpty": "Le journal est vide.",
     "level": {
       "debug": "Débogage",
-      "info": "Info",
+      "info": "Infos",
       "warn": "Avertissement",
       "error": "Erreur"
     }

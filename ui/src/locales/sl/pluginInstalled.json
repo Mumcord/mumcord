@@ -59,7 +59,7 @@
     "logEmpty": "Dnevnik je prazen.",
     "level": {
       "debug": "Razhroščevanje",
-      "info": "Info",
+      "info": "Informacija",
       "warn": "Opozorilo",
       "error": "Napaka"
     }

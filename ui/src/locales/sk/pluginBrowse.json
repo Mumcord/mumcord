@@ -96,5 +96,7 @@
     "unpacking": "Rozbaľovanie…",
     "starting": "Spúšťanie…",
     "announce": "{{name}}: stiahnuté {{percent}} %"
-  }
+  },
+  "needsMumcord": "Vyžaduje Mumcord {{version}} alebo novší",
+  "updateMumcord": "Aktualizovať Mumcord"
 }

@@ -6,8 +6,8 @@
     "open": "Vis i Plugins"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} kunne ikke bruge billedet",
+    "body": "Dette billede kan ikke bruges. Brug en PNG-, JPEG- eller WebP-fil på op til 10 MB."
   },
   "update": {
     "title": "Opdatering til {{name}}",

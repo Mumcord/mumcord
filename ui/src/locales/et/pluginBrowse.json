@@ -96,5 +96,7 @@
     "unpacking": "Lahtipakkimine…",
     "starting": "Käivitamine…",
     "announce": "{{name}}: {{percent}}% alla laaditud"
-  }
+  },
+  "needsMumcord": "Vajab Mumcordi versiooni {{version}} või uuemat",
+  "updateMumcord": "Uuenda Mumcordi"
 }

@@ -6,8 +6,8 @@
     "open": "Εμφάνιση στα Πρόσθετα"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "Το {{name}} δεν μπόρεσε να χρησιμοποιήσει την εικόνα",
+    "body": "Αυτή η εικόνα δεν μπορεί να χρησιμοποιηθεί. Χρησιμοποιήστε αρχείο PNG, JPEG ή WebP έως 10 MB."
   },
   "update": {
     "title": "Ενημέρωση για το {{name}}",

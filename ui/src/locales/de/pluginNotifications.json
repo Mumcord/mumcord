@@ -6,8 +6,8 @@
     "open": "In Plugins anzeigen"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} konnte das Bild nicht verwenden",
+    "body": "Dieses Bild kann nicht verwendet werden. Nimm eine PNG-, JPEG- oder WebP-Datei bis 10 MB."
   },
   "update": {
     "title": "Update für {{name}}",

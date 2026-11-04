@@ -96,5 +96,7 @@
     "unpacking": "Qed jinfetaħ…",
     "starting": "Qed jibda…",
     "announce": "{{name}}: {{percent}}% imniżżel"
-  }
+  },
+  "needsMumcord": "Jeħtieġ Mumcord {{version}} jew aktar ġdid",
+  "updateMumcord": "Aġġorna Mumcord"
 }

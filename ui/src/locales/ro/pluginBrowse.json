@@ -96,5 +96,7 @@
     "unpacking": "Se dezarhivează…",
     "starting": "Se pornește…",
     "announce": "{{name}}: {{percent}}% descărcat"
-  }
+  },
+  "needsMumcord": "Necesită Mumcord {{version}} sau mai nou",
+  "updateMumcord": "Actualizează Mumcord"
 }

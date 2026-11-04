@@ -96,5 +96,7 @@
     "unpacking": "Packar upp…",
     "starting": "Startar…",
     "announce": "{{name}}: {{percent}} % hämtat"
-  }
+  },
+  "needsMumcord": "Kräver Mumcord {{version}} eller senare",
+  "updateMumcord": "Uppdatera Mumcord"
 }

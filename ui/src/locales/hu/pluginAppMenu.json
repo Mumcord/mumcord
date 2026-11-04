@@ -1,9 +1,9 @@
 {
-  "pluginsGroup": "Plugins",
-  "moreItems": "More plugins…",
-  "subline": "{{plugin}} · Unofficial",
+  "pluginsGroup": "Bővítmények",
+  "moreItems": "További bővítmények…",
+  "subline": "{{plugin}} · Nem hivatalos",
   "sublineOfficial": "{{plugin}}",
-  "footer": "Plugin items always show the plugin's name. Manage them in Settings → Plugins.",
+  "footer": "A bővítmények elemei mindig a bővítmény nevével jelennek meg. Kezelésük: Beállítások → Bővítmények.",
   "paletteItem": "{{plugin}}: {{label}}",
-  "disabledRestarting": "Restarting after a problem, try again in a moment"
+  "disabledRestarting": "Hiba miatt újraindul, próbáld újra egy pillanat múlva"
 }

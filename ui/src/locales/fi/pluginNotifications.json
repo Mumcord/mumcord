@@ -6,8 +6,8 @@
     "open": "Näytä Laajennuksissa"
   },
   "pictureRefused": {
-    "title": "{{name}} couldn't use the picture",
-    "body": "This picture can't be used. Use a PNG, JPEG or WebP file up to 10 MB."
+    "title": "{{name}} ei voinut käyttää kuvaa",
+    "body": "Tätä kuvaa ei voi käyttää. Käytä PNG-, JPEG- tai WebP-tiedostoa, enintään 10 Mt."
   },
   "update": {
     "title": "Päivitys: {{name}}",
