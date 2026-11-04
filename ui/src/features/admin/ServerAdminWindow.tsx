@@ -1,21 +1,30 @@
 /**
- * The Server administration state, ban list (Epic 4, issue #254, FR-10.50 ff.).
+ * The Server administration state, ban list (Epic 4, issue #254, FR-10.50 ff.; polish in #436).
  *
- * Follows mockup `ban-list-dark`/`ban-list-light`: search and filter on top, the list with
- * sortable columns, edit in place for one entry (reason and end, or unban), and one save that
- * sends the whole list. The save first re-reads the server's list, so a change someone else made
- * meanwhile is asked about before anything is sent (FR-10.66). Fingerprints are shortened and
- * addresses masked, and only this window shows them (FR-10.51, FR-10.65). Only the rows that are
- * visible are drawn, so a list of thousands scrolls smoothly (FR-10.53).
+ * Follows the mockup: search and filters on top, the list with sortable columns, one form for
+ * adding and changing an entry, and one save that sends the whole list. The save first re-reads
+ * the server's list, so a change someone else made meanwhile is asked about before anything is
+ * sent (FR-10.66). Fingerprints are shortened and addresses masked, and only this window shows
+ * them (FR-10.51, FR-10.65). Only the rows that are visible are drawn, so a list of thousands
+ * scrolls smoothly (FR-10.53). Arrow keys move through the rows; the window keeps the focus where
+ * the user was when the list changes.
  */
-import { useId, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { announce } from "../../a11y";
 import { getApi, type BanChangeInput, type BanEntry } from "../../api";
 import { ConfirmDialog } from "../servers/ConfirmDialog";
 import { Dialog } from "../servers/Dialog";
-import { displayName } from "../servers/format";
+import { displayName, initials } from "../servers/format";
 import { useServers } from "../servers/store";
 import { errorText } from "./errors";
 import {
@@ -39,7 +48,7 @@ import {
   useServerAdmin,
   type BanWindow,
 } from "./banStore";
-import { BanEditDialog } from "./BanEditDialog";
+import { BanEditDialog, type BanDraft } from "./BanEditDialog";
 import { ConflictDialog } from "./ConflictDialog";
 import "./admin.css";
 
@@ -52,26 +61,19 @@ const COLUMNS: { id: SortColumn; label: string }[] = [
   { id: "ends", label: "columns.ends" },
 ];
 
-const END_CHIPS: { secs: number; key: string }[] = [
-  { secs: 86_400, key: "chipExtendDay" },
-  { secs: 0, key: "chipPermanent" },
-];
-
 type SortColumn = "name" | "certHash" | "address" | "reason" | "start" | "ends";
 type SortState = { column: SortColumn; ascending: boolean };
+type Filter = "all" | "active" | "expired";
+type Form = { kind: "add" } | { kind: "edit"; entry: BanEntry };
+type SavedCounts = { added: number; edited: number; removed: number };
 
 export function ServerAdminWindowHost() {
   const state = useServerAdmin();
   return state ? <ServerAdminWindow state={state} /> : null;
 }
 
-/** The rows the table shows: the loaded entries with the pending changes, searched and sorted. */
-function rowsOf(
-  state: BanWindow,
-  query: string,
-  filter: "all" | "active" | "expired",
-  sort: SortState,
-): BanEntry[] {
+/** The loaded entries with the pending changes, as one list before filter, search and sort. */
+function mergedEntries(state: BanWindow): BanEntry[] {
   const merged = (entry: BanEntry): BanEntry => {
     const change = state.changes.get(entry.key);
     if (change?.kind !== "edit") return entry;
@@ -90,26 +92,60 @@ function rowsOf(
       durationSecs: change.duration,
       expired: false,
     }));
-  return sortBans(
-    searchBans(filterBans([...state.entries.map(merged), ...added], filter), query),
-    sort,
-  );
+  return [...state.entries.map(merged), ...added];
+}
+
+function countsOf(changes: BanWindow["changes"]): SavedCounts {
+  const counts = { added: 0, edited: 0, removed: 0 };
+  for (const change of changes.values()) {
+    if (change.kind === "add") counts.added += 1;
+    else if (change.kind === "edit") counts.edited += 1;
+    else counts.removed += 1;
+  }
+  return counts;
 }
 
 function ServerAdminWindow({ state }: { state: BanWindow }) {
   const { t, i18n } = useTranslation(["admin", "common", "servers"]);
   const servers = useServers();
   const server = servers.servers.find((s) => s.id === state.serverId);
+  const serverName = server ? displayName(server) : t("servers:unknownServer");
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<"all" | "active" | "expired">("all");
+  const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<SortState>({ column: "name", ascending: true });
   const [selected, setSelected] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
+  const [form, setForm] = useState<Form | null>(null);
   const [removing, setRemoving] = useState<BanEntry | null>(null);
+  const [confirmClose, setConfirmClose] = useState(false);
+  const [saved, setSaved] = useState<SavedCounts | null>(null);
+  /** Changes the ending connection took with it, so the window can say so (issue #436). */
+  const [dropped, setDropped] = useState(0);
+  const [focusRequest, setFocusRequest] = useState({ key: "", nonce: 0 });
+  const rowRefs = useRef(new Map<string, HTMLDivElement>());
+  const lastFocusNonce = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const descId = useId();
 
-  const rows = useMemo(() => rowsOf(state, query, filter, sort), [state, query, filter, sort]);
+  // A connection that ends turns the window read-only and keeps nothing unsaved (FR-10.58).
+  const connection = servers.connections.get(state.serverId);
+  const connected = !servers.ready || connection?.state === "connected";
+  const readOnly = !connected;
+
+  const base = useMemo(() => mergedEntries(state), [state]);
+  const counts = useMemo(
+    () => ({
+      all: base.length,
+      active: base.filter((entry) => !entry.expired).length,
+      expired: base.filter((entry) => entry.expired).length,
+    }),
+    [base],
+  );
+  const rows = useMemo(
+    () => sortBans(searchBans(filterBans(base, filter), query), sort),
+    [base, filter, query, sort],
+  );
+  const filtering = query.trim() !== "" || filter !== "all";
+
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
@@ -124,6 +160,8 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
       ? virtualizer.getVirtualItems()
       : rows.map((entry, index) => ({ index, key: entry.key, size: 44 }));
 
+  const selectedEntry = rows.find((entry) => entry.key === selected) ?? rows[0] ?? null;
+
   const date = (value: string | null) =>
     value === null
       ? "—"
@@ -136,71 +174,172 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
     return end === null ? t("admin:endsUnknown") : date(end.toISOString());
   };
 
-  const selectedEntry = rows.find((entry) => entry.key === selected);
-  const pending = selectedEntry ? pendingFor(state, selectedEntry) : undefined;
+  /** What a row is called in the label of its own buttons. */
+  const rowName = (entry: BanEntry) =>
+    plain(entry.name) || `${maskAddress(entry.address, entry.mask)}/${String(entry.mask)}`;
+
+  const focusRow = (key: string) => {
+    setSelected(key);
+    setFocusRequest((current) => ({ key, nonce: current.nonce + 1 }));
+  };
+
+  // Move the focus to the row it belongs to, also after the list re-rendered or scrolled.
+  useEffect(() => {
+    if (focusRequest.key === "" || focusRequest.nonce === lastFocusNonce.current) return;
+    const index = rows.findIndex((row) => row.key === focusRequest.key);
+    if (index < 0) return;
+    lastFocusNonce.current = focusRequest.nonce;
+    virtualizer.scrollToIndex(index, { align: "auto" });
+    const frame = requestAnimationFrame(() => {
+      rowRefs.current.get(focusRequest.key)?.focus();
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [focusRequest, rows, virtualizer]);
+
+  // A new list keeps the focus where it was: on the same entry, or on the first one (issue #436).
+  const afterRowsChanged = useEffectEvent(() => {
+    const active = selectedEntry?.key ?? null;
+    // Only a row keeps its place; a click on the search field or a column header must stay there.
+    const listHadFocus = document.activeElement?.closest("[role='row']") !== null;
+    if (active !== null && !rows.some((row) => row.key === active)) {
+      setSelected(rows[0]?.key ?? null);
+    }
+    if (!listHadFocus) return;
+    const target = rows.find((row) => row.key === active) ?? rows[0];
+    if (target) focusRow(target.key);
+  });
+  useEffect(() => {
+    afterRowsChanged();
+  }, [rows]);
+
+  // Nothing collected here survives the connection: say so instead of losing it silently.
+  const changesDropped = useEffectEvent((count: number) => {
+    setDropped(count);
+    discardChanges();
+    announce(t("admin:announcedDiscarded", { count }));
+  });
+  useEffect(() => {
+    if (readOnly && state.changes.size > 0) changesDropped(state.changes.size);
+  }, [readOnly, state.changes]);
+
+  const requestClose = () => {
+    if (state.changes.size > 0) setConfirmClose(true);
+    else closeServerAdmin();
+  };
+
+  const stage = (change: BanChangeInput) => {
+    stageChange(change);
+    setSaved(null);
+    setForm(null);
+    announce(t("admin:announcedStaged"));
+  };
 
   const save = async () => {
+    const countsNow = countsOf(state.changes);
     const outcome = await saveChanges(false);
-    if (outcome?.kind === "saved") announce(t("admin:announcedSaved"));
+    if (outcome?.kind !== "saved") return;
+    setSaved(countsNow);
+    announce(t("admin:announcedSaved"));
+  };
+
+  /** Arrow keys walk the list; Enter changes the row the focus is on. */
+  const onListKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (
+      event.target !== event.currentTarget &&
+      event.key !== "ArrowUp" &&
+      event.key !== "ArrowDown"
+    ) {
+      return;
+    }
+    if (rows.length === 0) return;
+    const index = selectedEntry === null ? -1 : rows.indexOf(selectedEntry);
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const step = event.key === "ArrowDown" ? 1 : -1;
+      const next = rows[Math.min(rows.length - 1, Math.max(0, index + step))];
+      if (next) focusRow(next.key);
+      return;
+    }
+    if ((event.key === "Enter" || event.key === " ") && event.target === event.currentTarget) {
+      event.preventDefault();
+      if (selectedEntry) setForm({ kind: "edit", entry: selectedEntry });
+    }
+  };
+
+  const pendingEdit = (entry: BanEntry): BanDraft => {
+    const change = state.changes.get(entry.key);
+    return change?.kind === "edit"
+      ? change
+      : { kind: "edit", key: entry.key, reason: entry.reason, duration: entry.durationSecs };
   };
 
   return (
     <Dialog
-      title={t("admin:windowTitle")}
+      title={t("admin:windowTitle", { server: serverName })}
+      titleLead={
+        <span className="admin-title-mark" aria-hidden="true">
+          {initials(serverName)}
+        </span>
+      }
       describedBy={descId}
-      onClose={closeServerAdmin}
+      onClose={requestClose}
       className="admin-window"
     >
-      <p id={descId} className="admin-server">
-        {server ? displayName(server) : t("servers:unknownServer")}
-      </p>
-
-      <div className="admin-toolbar">
-        <label className="admin-field">
-          <span>{t("admin:searchPlaceholder")}</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-            }}
-          />
-        </label>
-        <div className="admin-chips" role="group" aria-label={t("admin:filter")}>
-          {(["all", "active", "expired"] as const).map((option) => (
-            <button
-              key={option}
-              type="button"
-              className="button button--small"
-              aria-pressed={filter === option}
-              onClick={() => {
-                setFilter(option);
-              }}
-            >
-              {t(
-                `admin:filter${option === "all" ? "All" : option === "active" ? "Active" : "Expired"}`,
-              )}
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          className="button button--primary"
-          onClick={() => {
-            setAdding(true);
-          }}
-        >
-          + {t("admin:addBan")}
-        </button>
-        <button
-          type="button"
-          className="button button--small"
-          onClick={() => void load()}
-          disabled={state.loading}
-        >
-          {t("admin:refresh")}
-        </button>
+      <div className="admin-tabs">
+        <span className="admin-tabs__tab">{`${t("admin:bansTab")} (${String(counts.all)})`}</span>
       </div>
+
+      {readOnly ? (
+        <p id={descId} className="admin-notice admin-notice--danger" role="status">
+          <span>{t("admin:disconnected", { server: serverName })}</span>
+          {dropped === 0 ? null : <span> {t("admin:disconnectedLost")}</span>}
+        </p>
+      ) : (
+        <>
+          <div className="admin-toolbar">
+            <label className="admin-field">
+              <span>{t("admin:searchPlaceholder")}</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                }}
+              />
+            </label>
+            <div className="admin-chips" role="group" aria-label={t("admin:filter")}>
+              {(["all", "active", "expired"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className="button button--small"
+                  aria-pressed={filter === option}
+                  onClick={() => {
+                    setFilter(option);
+                  }}
+                >
+                  {`${t(
+                    `admin:filter${option === "all" ? "All" : option === "active" ? "Active" : "Expired"}`,
+                  )} (${String(counts[option])})`}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="button"
+              onClick={() => void load()}
+              disabled={state.loading}
+            >
+              {t("admin:refresh")}
+            </button>
+          </div>
+          <p id={descId} className="admin-count" role="status">
+            {t("admin:shownOfTotal", { shown: rows.length, total: counts.all })}
+          </p>
+        </>
+      )}
 
       {state.error ? (
         <p className="admin-error" role="status">
@@ -215,7 +354,8 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
         <div
           className="admin-table"
           role="table"
-          aria-label={`${t("admin:bansTab")} (${String(rows.length)})`}
+          aria-label={`${t("admin:bansTab")} (${String(counts.all)})`}
+          aria-busy={state.loading}
         >
           <div className="admin-row admin-row--head" role="row">
             {COLUMNS.map((column) => (
@@ -241,79 +381,137 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
                 </button>
               </div>
             ))}
-            <div className="admin-cell admin-cell--head" role="columnheader">
-              {t("admin:edit")}
-            </div>
           </div>
 
-          {rows.length === 0 ? (
-            <p className="admin-empty">{state.loading ? t("common:loading") : t("admin:empty")}</p>
+          {state.loading && rows.length === 0 ? (
+            <>
+              <p className="visually-hidden" role="status">
+                {t("common:loading")}
+              </p>
+              {[0, 1, 2, 3].map((line) => (
+                <div key={line} className="admin-row admin-row--skeleton" aria-hidden="true">
+                  {COLUMNS.map((column) => (
+                    <div key={column.id} className="admin-cell">
+                      <span className="admin-skeleton" />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </>
+          ) : null}
+
+          {!state.loading && rows.length === 0 ? (
+            <p className="admin-empty">{filtering ? t("admin:emptySearch") : t("admin:empty")}</p>
           ) : null}
 
           {items.map((item) => {
             const entry = rows[item.index];
             if (!entry) return null;
             const revealed = state.revealed.has(entry.key);
+            const name = rowName(entry);
+            const active = selectedEntry?.key === entry.key;
+            const unsaved = pendingFor(state, entry) !== undefined;
             return (
               <div
                 key={item.key}
-                className={`admin-row${pendingFor(state, entry) ? " admin-row--pending" : ""}`}
+                ref={(element) => {
+                  if (element) rowRefs.current.set(entry.key, element);
+                  else rowRefs.current.delete(entry.key);
+                }}
+                className={`admin-row${active ? " admin-row--active" : ""}${
+                  unsaved ? " admin-row--pending" : ""
+                }`}
                 role="row"
+                aria-selected={active}
+                tabIndex={active ? 0 : -1}
+                data-expired={entry.expired || undefined}
                 style={{ height: `${String(item.size)}px` }}
+                onFocus={() => {
+                  setSelected(entry.key);
+                }}
+                onClick={() => {
+                  setSelected(entry.key);
+                }}
+                onDoubleClick={() => {
+                  if (!readOnly) setForm({ kind: "edit", entry });
+                }}
+                onKeyDown={onListKeyDown}
               >
-                <div className="admin-cell" role="cell">
-                  {plain(entry.name) || t("admin:noName")}
+                <div className="admin-cell admin-cell--name" role="cell">
+                  <span
+                    className="admin-cell__text"
+                    data-tooltip={plain(entry.name) || undefined}
+                    data-tooltip-overflow
+                  >
+                    {plain(entry.name) || t("admin:noName")}
+                  </span>
+                  {unsaved ? (
+                    <span className="admin-badge admin-badge--pending">{t("admin:pending")}</span>
+                  ) : null}
                 </div>
-                <div className="admin-cell" role="cell">
-                  <span data-tooltip={entry.certHash ?? undefined} data-tooltip-overflow>
-                    {shortHash(entry.certHash) || "—"}
-                  </span>{" "}
+                <div className="admin-cell admin-cell--actions" role="cell">
+                  <span className="admin-cell__text">{shortHash(entry.certHash) || "—"}</span>
                   <button
                     type="button"
                     className="button button--small"
-                    aria-label={t("admin:copyCertificate")}
-                    disabled={!entry.certHash}
+                    aria-label={t("admin:copyFingerprintOf", { name })}
+                    tabIndex={active ? 0 : -1}
+                    data-tooltip={t("admin:copyFullHint")}
+                    disabled={!entry.certHash || readOnly}
                     onClick={() => void getApi().copyText(entry.certHash ?? "")}
                   >
                     {t("admin:copy")}
                   </button>
                 </div>
-                <div className="admin-cell" role="cell">
-                  <span data-tooltip={revealed ? entry.address : undefined} data-tooltip-overflow>
+                <div className="admin-cell admin-cell--actions" role="cell">
+                  <span className="admin-cell__text">
                     {revealed ? entry.address : maskAddress(entry.address, entry.mask)}
                     {`/${String(entry.mask)}`}
-                  </span>{" "}
+                  </span>
                   <button
                     type="button"
                     className="button button--small"
                     aria-pressed={revealed}
+                    aria-label={
+                      revealed
+                        ? t("admin:hideAddressOf", { name })
+                        : t("admin:showAddressOf", { name })
+                    }
+                    tabIndex={active ? 0 : -1}
+                    disabled={readOnly}
                     onClick={() => {
                       reveal(entry.key, !revealed);
                     }}
                   >
                     {revealed ? t("admin:hide") : t("admin:show")}
                   </button>
+                  <button
+                    type="button"
+                    className="button button--small"
+                    aria-label={t("admin:copyAddressOf", { name })}
+                    tabIndex={active ? 0 : -1}
+                    data-tooltip={t("admin:copyFullHint")}
+                    disabled={readOnly}
+                    onClick={() => void getApi().copyText(entry.address)}
+                  >
+                    {t("admin:copy")}
+                  </button>
                 </div>
                 <div className="admin-cell" role="cell">
-                  {plain(entry.reason) || "—"}
+                  <span
+                    className="admin-cell__text"
+                    data-tooltip={plain(entry.reason) || undefined}
+                  >
+                    {plain(entry.reason) || "—"}
+                  </span>
                 </div>
                 <div className="admin-cell" role="cell">
                   {date(entry.start)}
                 </div>
                 <div className="admin-cell" role="cell">
-                  {endsText(entry)}
-                </div>
-                <div className="admin-cell admin-cell--actions" role="cell">
-                  <button
-                    type="button"
-                    className="button button--small"
-                    aria-pressed={selected === entry.key}
-                    onClick={() => {
-                      setSelected(entry.key);
-                    }}
-                  >
-                    {t("admin:edit")}
-                  </button>
+                  <span className={entry.expired ? "admin-ends-mark" : undefined}>
+                    {endsText(entry)}
+                  </span>
                 </div>
               </div>
             );
@@ -321,70 +519,125 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
         </div>
       </div>
 
-      {selectedEntry ? (
-        <EditPanel
-          entry={selectedEntry}
-          pending={pending}
-          onUnban={(entry) => {
-            setRemoving(entry);
-          }}
-        />
+      {saved ? (
+        <p className="admin-notice" role="status">
+          {t("admin:savedSummary", {
+            added: saved.added,
+            edited: saved.edited,
+            removed: saved.removed,
+          })}
+        </p>
       ) : null}
 
-      <div className="admin-footer">
-        <span className="admin-footer__count">
-          <span className="admin-badge">{String(state.changes.size)}</span>{" "}
-          {t("admin:changesNotSaved")}
-        </span>
-        <button
-          type="button"
-          className="button"
-          onClick={discardChanges}
-          disabled={state.changes.size === 0}
-        >
-          {t("admin:discard")}
-        </button>
-        <button
-          type="button"
-          className="button button--primary"
-          onClick={() => void save()}
-          disabled={state.changes.size === 0}
-        >
-          {t("admin:saveBanList")}
-        </button>
-      </div>
+      {readOnly ? null : (
+        <div className="admin-footer">
+          <div className="admin-footer__actions">
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => {
+                setForm({ kind: "add" });
+              }}
+            >
+              + {t("admin:addBan")}
+            </button>
+            <button
+              type="button"
+              className="button"
+              disabled={selectedEntry === null}
+              onClick={() => {
+                if (selectedEntry) setForm({ kind: "edit", entry: selectedEntry });
+              }}
+            >
+              {t("admin:edit")}
+            </button>
+            <button
+              type="button"
+              className="button button--danger"
+              disabled={selectedEntry === null}
+              onClick={() => {
+                if (selectedEntry) setRemoving(selectedEntry);
+              }}
+            >
+              {t("admin:remove")}
+            </button>
+          </div>
+          <span className="admin-footer__count">
+            <span className="admin-badge">{String(state.changes.size)}</span>{" "}
+            {t("admin:changesNotSaved")}
+          </span>
+          <div className="admin-footer__buttons">
+            <button
+              type="button"
+              className="button"
+              onClick={() => {
+                discardChanges();
+                setSaved(null);
+              }}
+              disabled={state.changes.size === 0}
+            >
+              {t("admin:discard")}
+            </button>
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => void save()}
+              disabled={state.changes.size === 0}
+            >
+              {t("admin:saveBanList")}
+            </button>
+          </div>
+        </div>
+      )}
 
-      {adding ? (
+      {readOnly ? (
+        <div className="admin-footer">
+          <span className="admin-footer__count" />
+          <button type="button" className="button button--primary" onClick={closeServerAdmin}>
+            {t("common:close")}
+          </button>
+        </div>
+      ) : null}
+
+      {form ? (
         <BanEditDialog
-          change={{
-            kind: "add",
-            name: null,
-            hash: null,
-            address: "",
-            mask: 32,
-            reason: null,
-            duration: 0,
-          }}
-          entry={null}
-          onStage={(change) => {
-            stageChange(change);
-            setAdding(false);
-            announce(t("admin:announcedStaged"));
-          }}
+          serverName={serverName}
+          change={
+            form.kind === "add"
+              ? {
+                  kind: "add",
+                  name: null,
+                  hash: null,
+                  address: "",
+                  mask: 32,
+                  reason: null,
+                  duration: 0,
+                }
+              : pendingEdit(form.entry)
+          }
+          entry={form.kind === "edit" ? form.entry : null}
+          onStage={stage}
           onClose={() => {
-            setAdding(false);
+            setForm(null);
           }}
         />
       ) : null}
 
       {removing ? (
         <ConfirmDialog
-          title={t("admin:unbanQuestion", { name: plain(removing.name) || t("admin:noName") })}
-          message={t("admin:unbanNote", { name: plain(removing.name) || t("admin:noName") })}
+          title={t("admin:unbanQuestion", { name: rowName(removing) })}
+          message={`${t("admin:unbanDetails", {
+            reason: plain(removing.reason) || t("admin:unbanReasonMissing"),
+            ends:
+              removing.expired || removing.durationSecs === 0
+                ? endsText(removing)
+                : t("admin:unbanUntil", { date: endsText(removing) }),
+          })} ${t("admin:unbanNote", { name: rowName(removing) })}`}
           confirmLabel={t("admin:unban")}
           danger
           onConfirm={() => {
             stageChange({ kind: "remove", key: removing.key });
+            setSaved(null);
             setRemoving(null);
             announce(t("admin:announcedStaged"));
           }}
@@ -394,125 +647,23 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
         />
       ) : null}
 
+      {confirmClose ? (
+        <ConfirmDialog
+          title={t("admin:discardTitle", { count: state.changes.size })}
+          message={t("admin:discardNote")}
+          confirmLabel={t("admin:discardAndClose")}
+          danger
+          onConfirm={() => {
+            setConfirmClose(false);
+            closeServerAdmin();
+          }}
+          onClose={() => {
+            setConfirmClose(false);
+          }}
+        />
+      ) : null}
+
       {state.conflict ? <ConflictDialog /> : null}
     </Dialog>
-  );
-}
-
-/** Edit in place: reason, end, or unban for the selected entry (FR-10.51). */
-function EditPanel({
-  entry,
-  pending,
-  onUnban,
-}: {
-  entry: BanEntry;
-  pending: BanChangeInput | undefined;
-  onUnban: (entry: BanEntry) => void;
-}) {
-  const { t, i18n } = useTranslation(["admin"]);
-  const [reason, setReason] = useState(
-    pending?.kind === "edit" ? (pending.reason ?? "") : (entry.reason ?? ""),
-  );
-  const [duration, setDuration] = useState(
-    pending?.kind === "edit" ? pending.duration : entry.durationSecs,
-  );
-  const [custom, setCustom] = useState(false);
-  const reasonId = useId();
-  const [now] = useState(() => Date.now());
-  const end = duration === 0 ? null : new Date(now + duration * 1000);
-
-  const stage = (nextReason: string | null, nextDuration: number) => {
-    stageChange({ kind: "edit", key: entry.key, reason: nextReason, duration: nextDuration });
-  };
-
-  return (
-    <section
-      className="admin-edit"
-      role="group"
-      aria-label={`${t("admin:editPanel")} · ${plain(entry.name) || t("admin:noName")}`}
-    >
-      <h2 className="admin-edit__title">
-        {t("admin:editPanel")} · {plain(entry.name) || t("admin:noName")}
-      </h2>
-      <div className="admin-edit__grid">
-        <div className="admin-form__field">
-          <label htmlFor={reasonId}>{t("admin:reason")}</label>
-          <input
-            id={reasonId}
-            type="text"
-            value={reason}
-            onChange={(event) => {
-              setReason(event.target.value);
-            }}
-            onBlur={() => {
-              stage(reason.trim() === "" ? null : reason.trim(), duration);
-            }}
-          />
-        </div>
-        <div className="admin-form__field">
-          <span>{t("admin:columns.ends")}</span>
-          <div className="admin-chips">
-            {END_CHIPS.map((chip) => (
-              <button
-                key={chip.key}
-                type="button"
-                className="button button--small"
-                aria-pressed={!custom && duration === chip.secs}
-                onClick={() => {
-                  setCustom(false);
-                  setDuration(chip.secs);
-                  stage(reason.trim() === "" ? null : reason.trim(), chip.secs);
-                }}
-              >
-                {t(`admin:${chip.key}`)}
-              </button>
-            ))}
-            <button
-              type="button"
-              className="button button--small"
-              aria-pressed={custom}
-              onClick={() => {
-                setCustom(true);
-              }}
-            >
-              {t("admin:chipCustom")}
-            </button>
-          </div>
-          {custom ? (
-            <input
-              type="date"
-              aria-label={t("admin:endsOnDate")}
-              onChange={(event) => {
-                const when = event.target.valueAsNumber;
-                if (Number.isNaN(when)) return;
-                stage(
-                  reason.trim() === "" ? null : reason.trim(),
-                  Math.max(0, Math.round((when - Date.now()) / 1000)),
-                );
-              }}
-            />
-          ) : null}
-          <span className="admin-form__help">
-            {end === null
-              ? t("admin:endsPermanent")
-              : t("admin:endsOn", {
-                  date: new Intl.DateTimeFormat(i18n.language, { dateStyle: "long" }).format(end),
-                })}
-          </span>
-        </div>
-      </div>
-      <div className="admin-edit__unban">
-        <button
-          type="button"
-          className="button button--danger"
-          onClick={() => {
-            onUnban(entry);
-          }}
-        >
-          {t("admin:unban")}
-        </button>
-        <span>{t("admin:unbanNote", { name: plain(entry.name) || t("admin:noName") })}</span>
-      </div>
-    </section>
   );
 }

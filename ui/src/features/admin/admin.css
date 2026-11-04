@@ -1,7 +1,29 @@
-/* Server administration window, Bans tab (Epic 4, issue #254). Design tokens only, so the window
-   follows the theme and stays readable in light, dark and custom themes. */
+/* Server administration window, Bans tab (Epic 4, issues #254 and #436). Design tokens only, so
+   the window follows the theme and stays readable in light, dark and custom themes. */
 .servers-dialog.admin-window {
   width: min(58rem, calc(100vw - 2 * var(--space-4)));
+}
+
+/* The server's mark in the title (FR-10.58), as in the server info panel. */
+.admin-title-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  vertical-align: middle;
+}
+
+/* A disabled button must not look like it would work, e.g. in the read-only state (FR-10.58). */
+.admin-window .button:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 .admin-tabs {
@@ -17,29 +39,34 @@
   font-weight: var(--font-weight-bold);
 }
 
-.admin-server {
-  margin: 0 0 var(--space-3);
-  color: var(--color-text-muted);
-}
-
 .admin-toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .admin-field {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  flex: 1 1 12rem;
+  flex: 1 1 14rem;
 }
 
 .admin-field span {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+/* The same field look as the server dialogs, so no input falls back to the browser's grey. */
+.admin-field input,
+.admin-form input:not([type="checkbox"]) {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sidebar);
+  color: var(--color-text);
 }
 
 .admin-field input {
@@ -52,40 +79,92 @@
   gap: var(--space-1);
 }
 
+/* "4 of 6 entries": what search and filter did to the list (issue #436). */
+.admin-count {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* The list scrolls on its own, so the toolbar, the form row and the footer stay in place. On a
+   narrow window the table scrolls sideways instead of squeezing the reason (issue #436). */
 .admin-scroll {
-  max-height: 60vh;
-  overflow-y: auto;
+  max-height: 48vh;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .admin-table {
   display: flex;
   flex-direction: column;
+  min-width: 46rem;
 }
 
 .admin-row {
   display: grid;
-  grid-template-columns: minmax(6rem, 1fr) 7rem 9rem minmax(6rem, 1fr) 6rem 6rem 10rem;
-  gap: var(--space-2);
+  grid-template-columns:
+    minmax(7.5rem, 1fr) 10rem minmax(16rem, 1.4fr)
+    minmax(6rem, 1fr) 6rem 7rem;
+  gap: var(--space-1);
   align-items: center;
-  padding: var(--space-1) 0;
+  padding: 0 var(--space-2);
   border-bottom: 1px solid var(--color-border);
 }
 
 .admin-row--head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 2rem;
+  background: var(--color-bg-elevated);
   border-bottom-color: var(--color-border-strong);
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
-/* An entry the user changed here and has not saved yet (FR-10.66). */
-.admin-row--pending {
+/* The row the Arrow keys and the footer actions work on. */
+.admin-row--active {
   background: var(--color-bg-hover);
+  outline: 1px solid var(--color-accent);
+  outline-offset: -1px;
+}
+
+/* An entry the user changed here and has not saved yet (FR-10.66). The word on the row says so,
+   the colour only repeats it. */
+.admin-row--pending {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+/* Expired entries are the ones to clean up, so they read dimmer than the active ones. */
+.admin-row[data-expired] {
+  color: var(--color-text-muted);
+}
+
+.admin-row--skeleton {
+  height: 44px;
 }
 
 .admin-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.admin-cell__text {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.admin-cell--name {
+  gap: var(--space-2);
+}
+
+.admin-cell--actions {
+  min-width: 0;
 }
 
 .admin-sort {
@@ -97,15 +176,55 @@
   padding: 0;
 }
 
-.admin-cell--actions {
-  display: flex;
+.admin-badge {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  justify-content: center;
+  min-width: 1.4rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
 }
 
-.admin-pending {
+.admin-badge--pending {
+  flex: none;
+  border: 1px solid var(--color-accent);
+  background: transparent;
   color: var(--color-accent);
-  font-size: var(--font-size-sm);
+  font-weight: normal;
+}
+
+/* The word next to the end date, so an expired row does not depend on colour alone. */
+.admin-ends-mark {
+  padding: 0 var(--space-1);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  text-transform: lowercase;
+}
+
+.admin-skeleton {
+  display: block;
+  width: 100%;
+  height: 0.75rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-text-muted) 30%, transparent);
+  animation: admin-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes admin-skeleton-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-skeleton {
+    animation: none;
+  }
 }
 
 .admin-empty {
@@ -118,17 +237,46 @@
   color: var(--color-danger);
 }
 
+/* A line the window says back: the save summary, or the connection ending (issue #436). */
+.admin-notice {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-bg-hover);
+  border-radius: var(--radius-sm);
+}
+
+.admin-notice--danger {
+  border-left-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
 .admin-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
 }
 
+/* The summary sits on its own line, so the buttons stay together on one row. */
 .admin-footer__count {
-  flex: 1 1 auto;
+  flex: 1 1 100%;
   color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-footer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.admin-footer__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
 }
 
 .admin-form {
@@ -148,6 +296,29 @@
   font-size: var(--font-size-sm);
 }
 
+/* What the edit form changes: the entry itself, with the values that identify it. */
+.admin-dialog__entry {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.admin-dialog__entry dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-dialog__entry dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-dialog__value {
+  font-family: var(--font-family-mono, monospace);
+  font-size: var(--font-size-sm);
+}
+
 .admin-ends {
-  margin: var(--space-3) 0 0;
+  margin: 0;
 }
