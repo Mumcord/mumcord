@@ -6,8 +6,11 @@
 
 use std::collections::HashMap;
 
+use mumcord_plugins::api::app_menu::AppMenuEntry;
 use mumcord_plugins::api::webview::WebviewPlace;
+use mumcord_plugins::service::StageActivity;
 use mumcord_plugins::service::UiUpdate;
+use mumcord_plugins::stage::{ActivityKind, JoinError, Refusal};
 use mumcord_plugins::wit::events::PanelVisibility as WitPanelVisibility;
 use mumcord_plugins::wit::ui as wit;
 use serde::{Deserialize, Serialize};
@@ -34,6 +37,9 @@ pub enum PluginSlot {
     Settings,
     /// The plugin's own dialog while it is open.
     Dialog,
+    /// The plugin's activity in the media area (FR-9.46). Only the source of `ui-action`s: the
+    /// tree arrives as [`PluginUiChange::StageTree`].
+    Stage,
 }
 
 impl From<wit::Slot> for PluginSlot {
@@ -50,17 +56,20 @@ impl From<wit::Slot> for PluginSlot {
     }
 }
 
-impl From<PluginSlot> for wit::Slot {
-    fn from(slot: PluginSlot) -> Self {
-        match slot {
-            PluginSlot::Panel => Self::Panel,
-            PluginSlot::MemberBadge { session } => Self::MemberBadge(session),
-            PluginSlot::ProfileCard { session } => Self::ProfileCard(session),
-            PluginSlot::ChatCard { id } => Self::ChatCard(id),
-            PluginSlot::ChatDecoration { session } => Self::ChatDecoration(session),
-            PluginSlot::Settings => Self::Settings,
-            PluginSlot::Dialog => Self::Dialog,
-        }
+impl PluginSlot {
+    /// The slot as plugins built for API 1.0 know it; `None` for the stage, whose actions go
+    /// out as 1.1 events (see `PluginService::stage_action`).
+    pub fn into_wit(self) -> Option<wit::Slot> {
+        Some(match self {
+            Self::Panel => wit::Slot::Panel,
+            Self::MemberBadge { session } => wit::Slot::MemberBadge(session),
+            Self::ProfileCard { session } => wit::Slot::ProfileCard(session),
+            Self::ChatCard { id } => wit::Slot::ChatCard(id),
+            Self::ChatDecoration { session } => wit::Slot::ChatDecoration(session),
+            Self::Settings => wit::Slot::Settings,
+            Self::Dialog => wit::Slot::Dialog,
+            Self::Stage => return None,
+        })
     }
 }
 
@@ -670,6 +679,125 @@ impl From<UiUpdate> for PluginUiChange {
     }
 }
 
+/// One plugin activity as the stage and the activity line show it (mirrors the host's
+/// `ActivitySnapshot` plus the starter's name). Text is untrusted.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StageActivityView {
+    pub id: String,
+    pub plugin: String,
+    pub plugin_name: String,
+    pub title: String,
+    pub starter: u32,
+    pub starter_name: String,
+    pub participants: Vec<u32>,
+    pub max: u32,
+    pub joined: bool,
+    pub started_by_me: bool,
+    /// The content is the plugin's web page rather than a tree.
+    pub web: bool,
+    pub kind: StageActivityKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StageActivityKind {
+    /// "<name> started <plugin> · Join".
+    Activity,
+    /// "<name> is playing <plugin> · Get plugin".
+    GetPlugin,
+}
+
+impl From<StageActivity> for StageActivityView {
+    fn from(a: StageActivity) -> Self {
+        let s = a.activity;
+        Self {
+            id: s.id,
+            plugin: s.plugin,
+            plugin_name: s.plugin_name,
+            title: s.title,
+            starter: s.starter,
+            starter_name: a.starter_name,
+            participants: s.participants,
+            max: s.max,
+            joined: s.joined,
+            started_by_me: s.started_by_me,
+            web: s.web,
+            kind: match s.kind {
+                ActivityKind::Activity => StageActivityKind::Activity,
+                ActivityKind::GetPlugin => StageActivityKind::GetPlugin,
+            },
+        }
+    }
+}
+
+/// Why `stage_join` failed, for the UI texts ("This activity is full", "no longer running").
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StageJoinError {
+    Gone,
+    Full,
+    NotPermitted,
+    /// The host failed internally; nothing was joined.
+    Failed,
+}
+
+impl From<JoinError> for StageJoinError {
+    fn from(e: JoinError) -> Self {
+        match e {
+            JoinError::Gone => Self::Gone,
+            JoinError::Full => Self::Full,
+            JoinError::NotPermitted => Self::NotPermitted,
+        }
+    }
+}
+
+/// The limit text for a plugin's own `stage.start` / `stage.join` that was refused.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum StageRefusal {
+    /// "Too many activities in this channel".
+    TooMany,
+    /// "This activity is full".
+    Full,
+}
+
+impl From<Refusal> for StageRefusal {
+    fn from(r: Refusal) -> Self {
+        match r {
+            Refusal::TooMany => Self::TooMany,
+            Refusal::Full => Self::Full,
+        }
+    }
+}
+
+/// One Apps-menu item (FR-9.53); text is untrusted.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AppMenuItem {
+    pub plugin: String,
+    pub plugin_name: String,
+    pub item: String,
+    pub label: String,
+    pub icon: Option<String>,
+    pub enabled: bool,
+    pub reason: Option<String>,
+}
+
+impl From<AppMenuEntry> for AppMenuItem {
+    fn from(e: AppMenuEntry) -> Self {
+        Self {
+            plugin: e.plugin,
+            plugin_name: e.plugin_name,
+            item: e.item,
+            label: e.label,
+            icon: e.icon,
+            enabled: e.enabled,
+            reason: e.reason,
+        }
+    }
+}
+
 /// What an action needs from the app before the plugin gets it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ActionKind {
@@ -748,8 +876,22 @@ impl Trees {
                     self.size_hints.remove(plugin);
                 }
             }
-            // Posts are not replayed; the stage tree joins the snapshot with the stage view (ST3).
-            PluginUiChange::WebviewPost { .. } | PluginUiChange::StageTree { .. } => {}
+            // The stage tree is kept as the `Stage` slot, so a `ui-action` from it is checked like
+            // any other and a late window gets it in the snapshot. Empty: the user left.
+            PluginUiChange::StageTree { nodes } => {
+                if nodes.is_empty() {
+                    if let Some(slots) = self.trees.get_mut(plugin) {
+                        slots.remove(&PluginSlot::Stage);
+                    }
+                } else {
+                    self.trees
+                        .entry(plugin.to_owned())
+                        .or_default()
+                        .insert(PluginSlot::Stage, nodes.clone());
+                }
+            }
+            // Posts are not replayed.
+            PluginUiChange::WebviewPost { .. } => {}
             PluginUiChange::WebviewSizeHint {
                 min_width,
                 min_height,
@@ -774,13 +916,20 @@ impl Trees {
         let mut out = Vec::new();
         for (plugin, slots) in &self.trees {
             for (slot, nodes) in slots {
-                out.push(PluginUi {
-                    plugin: plugin.clone(),
-                    change: PluginUiChange::SetTree {
+                let change = if *slot == PluginSlot::Stage {
+                    PluginUiChange::StageTree {
+                        nodes: nodes.clone(),
+                    }
+                } else {
+                    PluginUiChange::SetTree {
                         slot: slot.clone(),
                         nodes: nodes.clone(),
                         server_id: None,
-                    },
+                    }
+                };
+                out.push(PluginUi {
+                    plugin: plugin.clone(),
+                    change,
                 });
             }
         }
@@ -1019,6 +1168,60 @@ mod tests {
             None,
             "another slot"
         );
+    }
+
+    #[test]
+    fn stage_errors_and_refusals_map_one_to_one() {
+        assert_eq!(StageJoinError::from(JoinError::Gone), StageJoinError::Gone);
+        assert_eq!(StageJoinError::from(JoinError::Full), StageJoinError::Full);
+        assert_eq!(
+            StageJoinError::from(JoinError::NotPermitted),
+            StageJoinError::NotPermitted
+        );
+        assert_eq!(StageRefusal::from(Refusal::TooMany), StageRefusal::TooMany);
+        assert_eq!(StageRefusal::from(Refusal::Full), StageRefusal::Full);
+    }
+
+    #[test]
+    fn the_stage_slot_has_no_1_0_form() {
+        assert!(PluginSlot::Stage.into_wit().is_none());
+        assert!(matches!(
+            PluginSlot::Panel.into_wit(),
+            Some(wit::Slot::Panel)
+        ));
+    }
+
+    #[test]
+    fn the_stage_tree_is_replayed_and_its_actions_are_checked() {
+        let mut trees = Trees::default();
+        let button = node(PluginComponent::Button {
+            label: "Roll".into(),
+            action: "roll".into(),
+            kind: PluginButtonKind::Primary,
+            disabled: false,
+            expanded: None,
+            detail: None,
+        });
+        trees.apply(
+            "poll",
+            &PluginUiChange::StageTree {
+                nodes: vec![button],
+            },
+        );
+        assert!(matches!(
+            trees.snapshot().as_slice(),
+            [PluginUi {
+                change: PluginUiChange::StageTree { nodes },
+                ..
+            }] if nodes.len() == 1
+        ));
+        assert_eq!(
+            trees.action_kind("poll", &PluginSlot::Stage, "roll"),
+            Some(ActionKind::Plain)
+        );
+        trees.apply("poll", &PluginUiChange::StageTree { nodes: vec![] });
+        assert!(trees.snapshot().is_empty(), "left: nothing to replay");
+        assert_eq!(trees.action_kind("poll", &PluginSlot::Stage, "roll"), None);
     }
 
     #[test]

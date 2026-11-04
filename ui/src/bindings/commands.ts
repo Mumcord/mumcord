@@ -695,6 +695,27 @@ export const commands = {
 	 *  `{mumcordWebview:"mute", muted}`.
 	 */
 	pluginFramesMute: (plugin: string | null, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frames_mute", { plugin, muted })),
+	/**
+	 *  The plugin activities in the user's channel on the focused server (activity lines, stage
+	 *  tabs and header). Re-fetch on `plugins://stage-changed`.
+	 */
+	stageActivities: () => typedError<StageActivityView[], ApiError>(__TAURI_INVOKE("stage_activities")),
+	/**  The user clicked Join on an activity line or the stage (FR-9.45). */
+	stageJoin: (activity: string) => typedError<null, StageJoinError>(__TAURI_INVOKE("stage_join", { activity })),
+	/**  The user clicked Leave in the stage header. */
+	stageLeave: (activity: string) => typedError<null, ApiError>(__TAURI_INVOKE("stage_leave", { activity })),
+	/**  The plugin's stage tab became visible or hidden: the plugin gets `stage-visibility-changed`. */
+	stageVisibility: (plugin: string, visible: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("stage_visibility", { plugin, visible })),
+	/**
+	 *  The Apps-menu items of the running plugins, in menu order. Re-fetch on
+	 *  `plugins://app-menu-changed` and `plugins://changed`.
+	 */
+	appMenu: () => typedError<AppMenuItem[], ApiError>(__TAURI_INVOKE("app_menu")),
+	/**
+	 *  The user picked an Apps-menu item: the plugin gets `app-menu-activated` and an 8 s chat
+	 *  gesture window.
+	 */
+	appMenuActivate: (plugin: string, item: string) => typedError<null, ApiError>(__TAURI_INVOKE("app_menu_activate", { plugin, item })),
 	pluginAsset: (id: string, path: string) => typedError<PluginAsset, ApiError>(__TAURI_INVOKE("plugin_asset", { id, path })),
 	/**
 	 *  Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
@@ -1093,6 +1114,8 @@ export const events = {
 	pluginsNotification: makeEvent<PluginNotification, PluginNotification>("plugins://notification"),
 	pluginsOpenDetails: makeEvent<PluginsOpenDetails, PluginsOpenDetails>("plugins://open-details"),
 	pluginsSharedState: makeEvent<PluginsSharedState, PluginsSharedState>("plugins://shared-state"),
+	pluginsStageChanged: makeEvent<StageChanged, StageChanged>("plugins://stage-changed"),
+	pluginsStageRefused: makeEvent<StageRefused, StageRefused>("plugins://stage-refused"),
 	pluginsSuggestion: makeEvent<PluginSuggestion, PluginSuggestion>("plugins://suggestion"),
 	pmConversationPrefsChanged: makeEvent<PmConversationPrefsChanged, PmConversationPrefsChanged>("pm-conversation-prefs-changed"),
 	pmRequestsChanged: makeEvent<PmRequestsChanged, PmRequestsChanged>("pm-requests-changed"),
@@ -1185,6 +1208,17 @@ export type AppInfo = {
 
 /**  `plugins://app-menu-changed`: a plugin changed its Apps menu entries; the UI re-fetches them. */
 export type AppMenuChanged = Record<string, never>;
+
+/**  One Apps-menu item (FR-9.53); text is untrusted. */
+export type AppMenuItem = {
+	plugin: string,
+	pluginName: string,
+	item: string,
+	label: string,
+	icon: string | null,
+	enabled: boolean,
+	reason: string | null,
+};
 
 export type AudioDevice = {
 	id: string,
@@ -3226,7 +3260,12 @@ export type PluginSlot =
 /**  The plugin's form in Settings → Plugins. */
 { kind: "settings" } | 
 /**  The plugin's own dialog while it is open. */
-{ kind: "dialog" };
+{ kind: "dialog" } | 
+/**
+ *  The plugin's activity in the media area (FR-9.46). Only the source of `ui-action`s: the
+ *  tree arrives as [`PluginUiChange::StageTree`].
+ */
+{ kind: "stage" };
 
 /**  Where an installed plugin came from. */
 export type PluginSourceInfo = { kind: "official" } | { kind: "repo"; repositoryId: number; 
@@ -4289,6 +4328,59 @@ export type SoundTheme =
 "classic" | 
 /**  Fuller sounds made with ElevenLabs (default). */
 "rich";
+
+export type StageActivityKind = 
+/**  "<name> started <plugin> · Join". */
+"activity" | 
+/**  "<name> is playing <plugin> · Get plugin". */
+"getPlugin";
+
+/**
+ *  One plugin activity as the stage and the activity line show it (mirrors the host's
+ *  `ActivitySnapshot` plus the starter's name). Text is untrusted.
+ */
+export type StageActivityView = {
+	id: string,
+	plugin: string,
+	pluginName: string,
+	title: string,
+	starter: number,
+	starterName: string,
+	participants: number[],
+	max: number,
+	joined: boolean,
+	startedByMe: boolean,
+	/**  The content is the plugin's web page rather than a tree. */
+	web: boolean,
+	kind: StageActivityKind,
+};
+
+/**
+ *  `plugins://stage-changed`: the activities in the user's channel changed; re-fetch them with
+ *  `stage_activities`.
+ */
+export type StageChanged = Record<string, never>;
+
+/**  Why `stage_join` failed, for the UI texts ("This activity is full", "no longer running"). */
+export type StageJoinError = "gone" | "full" | "notPermitted" | 
+/**  The host failed internally; nothing was joined. */
+"failed";
+
+/**  The limit text for a plugin's own `stage.start` / `stage.join` that was refused. */
+export type StageRefusal = 
+/**  "Too many activities in this channel". */
+"tooMany" | 
+/**  "This activity is full". */
+"full";
+
+/**
+ *  `plugins://stage-refused`: a plugin's own `stage.start` or `stage.join` hit a limit; show the
+ *  text for `reason`.
+ */
+export type StageRefused = {
+	plugin: string,
+	reason: StageRefusal,
+};
 
 /**  Why the share left its encoder for VP9. */
 export type SwitchReason = 

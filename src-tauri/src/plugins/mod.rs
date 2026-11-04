@@ -87,6 +87,23 @@ pub struct PluginsChanged {}
 #[tauri_specta(event_name = "plugins://app-menu-changed")]
 pub struct AppMenuChanged {}
 
+/// `plugins://stage-changed`: the activities in the user's channel changed; re-fetch them with
+/// `stage_activities`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://stage-changed")]
+pub struct StageChanged {}
+
+/// `plugins://stage-refused`: a plugin's own `stage.start` or `stage.join` hit a limit; show the
+/// text for `reason`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugins://stage-refused")]
+pub struct StageRefused {
+    pub plugin: String,
+    pub reason: ui::StageRefusal,
+}
+
 /// `plugins://shared-state`: whether `server` passes plugin data (FR-6.38). Sent whenever the
 /// engine decides, so the UI can show the "not supported" hint; `plugins_shared_supported`
 /// answers for a server that decided before the UI listened.
@@ -454,8 +471,12 @@ async fn on_service_event(
                 })
                 .await?;
         }
-        // The stage UI lists the activities and shows the limit texts (G3, ST3).
-        ServiceEvent::StageChanged | ServiceEvent::StageRefused { .. } => {}
+        ServiceEvent::StageChanged => StageChanged {}.emit(app)?,
+        ServiceEvent::StageRefused { plugin, reason } => StageRefused {
+            plugin,
+            reason: reason.into(),
+        }
+        .emit(app)?,
         ServiceEvent::AutoOff { id } => PluginNotification {
             plugin: id,
             notice: PluginNotice::AutoOff,

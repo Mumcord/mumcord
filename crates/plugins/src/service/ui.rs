@@ -86,6 +86,37 @@ impl PluginService {
         self.host.send_app_menu_activated(id, item)
     }
 
+    /// The plugin's stage tab became visible or hidden (`stage-visibility-changed`, FR-9.46).
+    /// Returns false when the plugin is not running or lacks `ui.stage`.
+    pub fn stage_visibility(&self, id: &str, visible: bool) -> bool {
+        self.host.send_stage(
+            id,
+            crate::runtime::PluginEvent::StageVisibilityChanged(visible),
+        )
+    }
+
+    /// The user acted in the plugin's stage tree: a `ui-action` from the `stage` slot (a 1.1
+    /// slot, so it skips the 1.0 path of [`Self::ui_input`]). Opens the chat gesture window.
+    pub fn stage_action(&self, id: &str, action: String, value: ActionValue) -> bool {
+        use crate::api::v1_1::wit::{events as v1_1, ui::Slot};
+        self.gesture(id);
+        self.host.send_stage(
+            id,
+            crate::runtime::PluginEvent::UiAction(v1_1::UiAction {
+                source: v1_1::ActionSource::Slot(Slot::Stage),
+                action,
+                value: match value {
+                    ActionValue::None => v1_1::ActionValue::None,
+                    ActionValue::Boolean(v) => v1_1::ActionValue::Boolean(v),
+                    ActionValue::Number(v) => v1_1::ActionValue::Number(v),
+                    ActionValue::Text(v) => v1_1::ActionValue::Text(v),
+                    ActionValue::Reorder(v) => v1_1::ActionValue::Reorder(v),
+                    ActionValue::File(v) => v1_1::ActionValue::File(v),
+                },
+            }),
+        )
+    }
+
     /// Delivers a UI input to a running plugin. Returns false when the plugin is not running,
     /// lacks the permission for the event, or `session` is not someone the plugin may see (the
     /// user or a member of the user's channel on the focused server).

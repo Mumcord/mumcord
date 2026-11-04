@@ -40,8 +40,8 @@ use super::types::{
     ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
 };
 use crate::plugins::ui::{
-    ActionKind, PluginFrameMute, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange,
-    PluginWebviewPlace,
+    ActionKind, AppMenuItem, PluginFrameMute, PluginPanelVisibility, PluginSlot, PluginUi,
+    PluginUiChange, PluginWebviewPlace, StageActivityView, StageJoinError,
 };
 use crate::plugins::{self, Plugins, PluginsChanged, PreparedInstall, RepoIndex};
 use tauri_specta::Event as _;
@@ -1531,6 +1531,73 @@ pub fn plugin_frames_mute(app: AppHandle, plugin: Option<String>, muted: bool) -
         .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
 }
 
+/// The plugin activities in the user's channel on the focused server (activity lines, stage
+/// tabs and header). Re-fetch on `plugins://stage-changed`.
+#[tauri::command]
+#[specta::specta]
+pub async fn stage_activities(app: AppHandle) -> ApiResult<Vec<StageActivityView>> {
+    let activities = plugins_of(&app)?
+        .call(|service| Ok(service.stage_activities()))
+        .await?;
+    Ok(activities.into_iter().map(Into::into).collect())
+}
+
+/// The user clicked Join on an activity line or the stage (FR-9.45).
+#[tauri::command]
+#[specta::specta]
+pub async fn stage_join(app: AppHandle, activity: String) -> Result<(), StageJoinError> {
+    let plugins = plugins_of(&app).map_err(|_| StageJoinError::Failed)?;
+    plugins
+        .call(move |service| Ok(service.stage_join(&activity)))
+        .await
+        .map_err(|_| StageJoinError::Failed)?
+        .map_err(Into::into)
+}
+
+/// The user clicked Leave in the stage header.
+#[tauri::command]
+#[specta::specta]
+pub async fn stage_leave(app: AppHandle, activity: String) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| {
+            service.stage_leave(&activity);
+            Ok(())
+        })
+        .await
+}
+
+/// The plugin's stage tab became visible or hidden: the plugin gets `stage-visibility-changed`.
+#[tauri::command]
+#[specta::specta]
+pub async fn stage_visibility(app: AppHandle, plugin: String, visible: bool) -> ApiResult<()> {
+    let delivered = plugins_of(&app)?
+        .call(move |service| Ok(service.stage_visibility(&plugin, visible)))
+        .await?;
+    delivered_or_error(delivered)
+}
+
+/// The Apps-menu items of the running plugins, in menu order. Re-fetch on
+/// `plugins://app-menu-changed` and `plugins://changed`.
+#[tauri::command]
+#[specta::specta]
+pub async fn app_menu(app: AppHandle) -> ApiResult<Vec<AppMenuItem>> {
+    let items = plugins_of(&app)?
+        .call(|service| Ok(service.app_menu()))
+        .await?;
+    Ok(items.into_iter().map(Into::into).collect())
+}
+
+/// The user picked an Apps-menu item: the plugin gets `app-menu-activated` and an 8 s chat
+/// gesture window.
+#[tauri::command]
+#[specta::specta]
+pub async fn app_menu_activate(app: AppHandle, plugin: String, item: String) -> ApiResult<()> {
+    let delivered = plugins_of(&app)?
+        .call(move |service| Ok(service.app_menu_activate(&plugin, &item)))
+        .await?;
+    delivered_or_error(delivered)
+}
+
 /// Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
 /// after the plugins started. Reload it after `plugins://changed` (stopped plugins lose
 /// their UI).
@@ -1631,7 +1698,12 @@ pub async fn plugin_ui_action(
             .ok_or_else(|| ApiError::new(ErrorCode::InvalidInput, "no such action on screen"))?,
         None => ActionKind::Plain,
     };
-    let source = slot.map_or(ActionSource::Command, |s| ActionSource::Slot(s.into()));
+    let stage = slot == Some(PluginSlot::Stage);
+    let source = match slot.map(PluginSlot::into_wit) {
+        Some(Some(slot)) => ActionSource::Slot(slot),
+        // The stage has no 1.0 slot; its action goes out as a 1.1 event below.
+        Some(None) | None => ActionSource::Command,
+    };
     if let (ActionKind::Password { secret }, PluginActionValue::Text { value }) = (&kind, &value) {
         save_secret(&plugins, &id, secret, value).await?;
     }
@@ -1660,6 +1732,9 @@ pub async fn plugin_ui_action(
                 }
                 (_, value) => action_value(value),
             };
+            if stage {
+                return Ok(service.stage_action(&id, action, value));
+            }
             Ok(service.ui_input(
                 &id,
                 UiInput::Action {
