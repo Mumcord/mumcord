@@ -20,7 +20,7 @@
 // (MUMBOT_IMAGE, see .github/workflows/e2e.yml).
 import { browser, $, expect } from "@wdio/globals";
 import { apps, relayenv } from "../../helpers/index.ts";
-import { composer, pasteImage } from "../../helpers/chat-ui.ts";
+import { composer, pasteImage, startScreenShare } from "../../helpers/chat-ui.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
 import { addAndConnect, completeWizard, personRow } from "../../helpers/voice-ui.ts";
 
@@ -115,16 +115,7 @@ async function startB(name: string, port: number): Promise<void> {
 
 /** B starts sharing its screen (Xvfb: the whole X screen, no picker). */
 async function bStartsSharing(): Promise<void> {
-  await apps.onB(async () => {
-    await $("button.chat-apps__button").click();
-    await $(
-      "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
-    ).click();
-    await $("//div[contains(@class,'sharer-bar')]").waitForExist({
-      timeout: 30_000,
-      timeoutMsg: "B's share never started",
-    });
-  });
+  await apps.onB(startScreenShare);
 }
 
 /** B stops its share. */

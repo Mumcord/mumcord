@@ -24,6 +24,7 @@ import { ShareBadges } from "./quality/ShareBadges";
 import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
+import { ShareStartDialog } from "./start/ShareStartDialog";
 import { useShareActions } from "./useShareActions";
 import { MAX_VIEWERS, ViewerList } from "./Viewers";
 
@@ -36,7 +37,7 @@ export function SharerBar(): ReactNode {
   const { t } = useTranslation("screenshare");
   const { t: tv } = useTranslation("screenviewer");
   const share = useOwnShare();
-  const { start, stop } = useShareActions(share);
+  const { start, stop, startDialog } = useShareActions(share);
   const serverId = share.serverId;
   const own = share.own;
   const { users } = useServerStateOf(serverId);
@@ -104,9 +105,8 @@ export function SharerBar(): ReactNode {
     });
   };
 
-  // The system picker only opens with a fresh share: end this one and choose again.
+  // The start dialog ends this share before the picker opens for a fresh one.
   const changeWindow = () => {
-    stop();
     void start();
   };
 
@@ -240,6 +240,7 @@ export function SharerBar(): ReactNode {
         </span>
       </div>
       <ShareNotices serverId={serverId} own={own} quality={quality} />
+      {startDialog !== null && <ShareStartDialog {...startDialog} />}
     </>
   );
 }

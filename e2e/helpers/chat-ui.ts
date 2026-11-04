@@ -347,3 +347,25 @@ export async function readClipboard(kind: "text" | "png"): Promise<string> {
   const result = await run("python3", ["-I", script, kind]);
   return result.code === 0 ? result.stdout : "";
 }
+
+/**
+ * Starts the own screen share from the composer's Apps menu and waits for the sharer bar. The share
+ * start dialog (FR-7.35) comes before the system picker, so it is confirmed with its defaults; on
+ * Xvfb the whole X screen is shared without a picker.
+ */
+export async function startScreenShare(): Promise<void> {
+  await $("button.chat-apps__button").click();
+  await $(
+    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+  ).click();
+  const confirm = $("//dialog//button[normalize-space()='Choose what to share']");
+  await confirm.waitForClickable({
+    timeout: 20_000,
+    timeoutMsg: "the share start dialog never opened",
+  });
+  await confirm.click();
+  await $("//div[contains(@class,'sharer-bar')]").waitForExist({
+    timeout: 30_000,
+    timeoutMsg: "the screen share never started",
+  });
+}
