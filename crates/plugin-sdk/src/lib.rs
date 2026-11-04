@@ -103,6 +103,8 @@ pub use bindings::mumcord::plugin::{
 pub mod app_menu;
 #[cfg(feature = "1.1")]
 pub mod audio;
+#[cfg(feature = "1.1")]
+pub mod bovnar;
 pub mod chat_card;
 #[cfg(feature = "1.1")]
 pub mod files;
