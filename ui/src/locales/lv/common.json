@@ -46,7 +46,7 @@
     "seek": "Meklēt",
     "volume": "Skaļums",
     "syncedPlay": "Sinhronizēts",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Atstarpe · ← → · M · F · Esc",
     "inControl": "{{name}} kontrolē",
     "inSync": "Sinhronizēts",
     "inSyncAll": "Visi sinhronizēti",
@@ -70,14 +70,14 @@
     "onTopFailed": "Neizdevās mainīt iestatījumu “Vienmēr virspusē”",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Mainīt multivides apgabala izmēru",
+      "valueText": "{{percent}}% no loga augstuma",
+      "ofWindow": "no loga augstuma",
+      "chatMinimum": "tērzēšana paliek minimālajā izmērā",
+      "release": "atlaid, lai sakļautu",
+      "keys": "↑ ↓ mainīt izmēru · PageUp/PageDown fiksēt · Home/End · Enter atiestata",
+      "releaseHint": "Atlaid, lai samazinātu līdz mazajai joslai",
+      "minimised": "Multivides apgabals samazināts"
     }
   }
 }

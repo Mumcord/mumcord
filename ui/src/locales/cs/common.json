@@ -46,7 +46,7 @@
     "seek": "Hledat",
     "volume": "Hlasitost",
     "syncedPlay": "Synchronizováno",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Mezerník · ← → · M · F · Esc",
     "inControl": "{{name}} má kontrolu",
     "inSync": "V synchronizaci",
     "inSyncAll": "Všichni v synchronizaci",
@@ -70,14 +70,14 @@
     "onTopFailed": "Nastavení „Vždy navrchu“ se nepodařilo změnit",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Změnit velikost oblasti médií",
+      "valueText": "{{percent}} % výšky okna",
+      "ofWindow": "výšky okna",
+      "chatMinimum": "chat si drží minimum",
+      "release": "pusť pro sbalení",
+      "keys": "↑ ↓ změna velikosti · PageUp/PageDown přichycení · Home/End · Enter obnoví",
+      "releaseHint": "Pusť pro sbalení do malého pruhu",
+      "minimised": "Oblast médií je sbalená"
     }
   }
 }

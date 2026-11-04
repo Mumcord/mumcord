@@ -46,7 +46,7 @@
     "seek": "Vai a",
     "volume": "Volume",
     "syncedPlay": "Sincronizzato",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Spazio · ← → · M · F · Esc",
     "inControl": "{{name}} ha il controllo",
     "inSync": "Sincronizzato",
     "inSyncAll": "Tutti sincronizzati",
@@ -70,14 +70,14 @@
     "onTopFailed": "Impossibile modificare «Sempre in primo piano»",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Ridimensiona l’area multimediale",
+      "valueText": "{{percent}}% dell’altezza della finestra",
+      "ofWindow": "dell’altezza della finestra",
+      "chatMinimum": "la chat mantiene il suo minimo",
+      "release": "rilascia per comprimere",
+      "keys": "↑ ↓ ridimensiona · PagSù/PagGiù aggancia · Home/Fine · Invio ripristina",
+      "releaseHint": "Rilascia per ridurre a mini barra",
+      "minimised": "Area multimediale ridotta"
     }
   }
 }

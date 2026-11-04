@@ -14,7 +14,7 @@
     "unreadable": "Neizdevās nolasīt {{path}}",
     "serverRefused": "Serveris noraidīja ziņojumu: {{reason}}",
     "trayLabel": "Faili kopīgošanai",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · vienādranga",
     "zipping": "Mape tiek saspiesta… {{percent}} %",
     "checking": "Pārbauda…",
     "checkingPercent": "Pārbauda… {{percent}} %",
