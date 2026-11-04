@@ -4,8 +4,10 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use mumcord_p2p::{BroadcastId, RelayToken};
 use tokio::sync::oneshot;
 
+use super::broadcast::Fanout;
 use super::encoder::ActiveEncoder;
 use super::media::{Media, ViewerLink};
 use super::signal::{CodecName, MAX_VIEWERS};
@@ -18,10 +20,12 @@ use super::{ScreenShareView, ShareKind, WatchBlock};
 pub(crate) const REANNOUNCE: Duration = Duration::from_secs(3);
 
 /// The sharer's answer to a watch request.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Answer {
     Accept,
     Full,
+    /// Admitted to the sharer's relay broadcast: the bot's `bcast-tok` (spec 07, FR-7.42).
+    Broadcast(BroadcastId, RelayToken),
 }
 
 /// What a viewer's `Watch` said it can play (FR-7.58).
@@ -64,8 +68,9 @@ pub(crate) struct OwnShare {
     pub sound_available: bool,
     /// Accepted viewers, with their stream once they opened it.
     pub viewers: BTreeMap<u32, Option<ViewerLink>>,
-    /// What each accepted viewer can play; changed only with `viewers`, through
-    /// [`Self::admit`] and [`Self::remove_viewer`].
+    /// What each viewer can play, direct and relay ones alike: the share's single encoder has
+    /// to suit all of them. Changed through [`Self::admit`], [`Self::set_caps`] and
+    /// [`Self::remove_viewer`].
     caps: BTreeMap<u32, ViewerCaps>,
     /// What the user picked in the system picker (issue #163).
     pub kind: Option<ShareKind>,
@@ -77,6 +82,8 @@ pub(crate) struct OwnShare {
     pub encoder: Arc<Mutex<Option<ActiveEncoder>>>,
     /// Newcomers to the channel that get the share once more, and when.
     reannounce: BTreeMap<u32, Instant>,
+    /// The relay broadcast (spec 07, FR-7.40); `None` until the share decided about one.
+    pub fanout: Option<Fanout>,
 }
 
 impl OwnShare {
@@ -92,6 +99,7 @@ impl OwnShare {
             media: None,
             encoder: Arc::default(),
             reannounce: BTreeMap::new(),
+            fanout: None,
         }
     }
 
@@ -130,14 +138,23 @@ impl OwnShare {
         admit
     }
 
-    /// Ends `viewer`'s watching, closing its stream; false if it was not watching.
+    /// Ends `viewer`'s watching, closing its direct stream and forgetting what it can play;
+    /// false if it had no direct copy.
     pub fn remove_viewer(&mut self, viewer: u32) -> bool {
-        self.caps.remove(&viewer);
+        let had_caps = self.caps.remove(&viewer).is_some();
         let removed = self.viewers.remove(&viewer).is_some();
-        if removed {
+        if removed || had_caps {
             self.codecs_changed();
         }
         removed
+    }
+
+    /// Records what `viewer` can play when it was taken in elsewhere (the relay broadcast, or
+    /// a direct copy the fan-out decided on).
+    pub fn set_caps(&mut self, viewer: u32, caps: ViewerCaps) {
+        if self.caps.insert(viewer, caps) != Some(caps) {
+            self.codecs_changed();
+        }
     }
 
     /// What `viewer` can play; an unknown viewer counts as 0.6.x.
@@ -168,7 +185,13 @@ impl OwnShare {
     }
 
     pub fn viewer_list(&self) -> Vec<u32> {
-        self.viewers.keys().copied().collect()
+        let mut list: Vec<u32> = self.viewers.keys().copied().collect();
+        if let Some(fanout) = &self.fanout {
+            list.extend(fanout.relay_viewers());
+            list.sort_unstable();
+            list.dedup();
+        }
+        list
     }
 
     /// How long the share has been running (issue #163).
@@ -326,7 +349,9 @@ impl Shares {
             return;
         };
         let next = match answer {
-            Answer::Accept => self.watching.insert(sharer, Watching::Opening(attempt)),
+            Answer::Accept | Answer::Broadcast(..) => {
+                self.watching.insert(sharer, Watching::Opening(attempt))
+            }
             Answer::Full => self.watching.remove(&sharer),
         };
         if let Some(Watching::Asked { reply, .. }) = next {
@@ -455,6 +480,22 @@ mod tests {
             None,
             "a turned-away viewer does not count"
         );
+    }
+
+    #[test]
+    fn relay_viewers_count_for_the_codec_without_a_direct_copy() {
+        let vp9_only = ViewerCaps::from_watch(&[CodecName::Vp9]);
+        let mut own = OwnShare::new(false, false);
+        own.admit(1, ViewerCaps::from_watch(&[CodecName::Av1, CodecName::Vp9]));
+        own.set_caps(30, vp9_only);
+        assert_eq!(own.av1_blocker(), Some(30));
+        assert_eq!(
+            own.viewer_list(),
+            [1],
+            "no direct copy for the relay viewer"
+        );
+        assert!(!own.remove_viewer(30), "it had no direct copy");
+        assert_eq!(own.av1_blocker(), None, "its codecs are forgotten");
     }
 
     #[test]

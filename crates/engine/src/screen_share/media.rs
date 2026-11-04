@@ -147,6 +147,25 @@ impl ScreenMediaStats {
             viewer.path = path(viewer.session);
         }
     }
+
+    /// Adds the viewers that get the share through the relay broadcast, as their reports
+    /// describe them (FR-7.52); the relay drops their layers, so none counts as struggling here.
+    pub(crate) fn add_broadcast_viewers(
+        &mut self,
+        encoder: Option<ActiveEncoder>,
+        relay_viewers: &[super::RelayViewer],
+    ) {
+        self.viewers
+            .extend(relay_viewers.iter().map(|viewer| ViewerMediaStats {
+                session: viewer.session,
+                max_layer: wire::MAX_TEMPORAL_LAYER,
+                fps: viewer.fps,
+                struggling: false,
+                slow: viewer.slow,
+                codec: encoder.map(|e| e.codec),
+                path: ViewerPath::Broadcast,
+            }));
+    }
 }
 
 /// What the encode thread, the writer tasks and the engine share.
@@ -200,6 +219,9 @@ impl Hub {
         load
     }
 }
+
+/// The [`Media::subscribe`] key of the relay broadcast; no Mumble session gets this number.
+pub(crate) const BROADCAST_KEY: u32 = u32::MAX;
 
 /// The running media path of the own share; dropping it stops encoding and every viewer stream.
 pub(crate) struct Media {
@@ -353,6 +375,20 @@ impl Media {
         }
     }
 
+    /// A queue of every frame for a sender other than a direct stream: the relay broadcast
+    /// (spec 07, FR-7.41) takes the share once, like one more viewer under `key`. The queue
+    /// loses layers when the upload lags, as a direct viewer's would.
+    pub fn subscribe(&self, key: u32) -> Subscription {
+        let queue = Arc::new(ViewerQueue::new());
+        lock(&self.hub.viewers).insert(key, queue.clone());
+        self.hub.keyframe.store(true, Ordering::Relaxed);
+        Subscription {
+            hub: self.hub.clone(),
+            key,
+            queue,
+        }
+    }
+
     /// The last keyframe as the small picture the sharer's bar shows (issue #163).
     pub fn thumbnail(&self) -> Option<ShareThumbnail> {
         lock(&self.hub.thumbnail)
@@ -367,6 +403,7 @@ impl Media {
         let now = Instant::now();
         stats.viewers = lock(&self.hub.viewers)
             .iter()
+            .filter(|(key, _)| **key != BROADCAST_KEY)
             .map(|(session, queue)| {
                 let layer = queue.with_policy(super::fanout::Policy::max_layer);
                 ViewerMediaStats {
@@ -421,6 +458,64 @@ impl Drop for ViewerLink {
     }
 }
 
+/// The next frame for `queue` that a reader of `av1` can play, once the upload limits allow
+/// sending `header_len` + payload bytes.
+async fn paced_next(queue: &ViewerQueue, hub: &Hub, header_len: usize, av1: bool) -> Arc<Frame> {
+    let frame = loop {
+        let frame = queue.next().await;
+        if av1 || frame.header.kind != FrameKind::Video(Codec::Av1) {
+            break frame;
+        }
+        // Left over from before the switch to VP9 for this viewer; the VP9 encoder starts
+        // with a keyframe, and the viewer decodes nothing before it.
+    };
+    let bytes = header_len + frame.payload.len();
+    let now = Instant::now();
+    let wait = [&queue.limit, &hub.limit, &hub.upload]
+        .iter()
+        .filter_map(|limit| lock(limit).as_mut().map(|l| l.take(bytes, now)))
+        .max()
+        .unwrap_or_default();
+    if !wait.is_zero() {
+        tokio::time::sleep(wait).await;
+    }
+    frame
+}
+
+/// A frame queue from [`Media::subscribe`]; dropping it leaves the share.
+pub(crate) struct Subscription {
+    hub: Arc<Hub>,
+    key: u32,
+    queue: Arc<ViewerQueue>,
+}
+
+impl Subscription {
+    /// The next frame to send, once the upload limits allow it. Relay units carry frame
+    /// version 2, and while a viewer that cannot play AV1 watches (on any path), AV1 frames
+    /// left from before the switch to VP9 are skipped (FR-7.58).
+    pub async fn next(&self) -> Arc<Frame> {
+        let av1 = lock(&self.hub.av1_blocker).is_none();
+        paced_next(&self.queue, &self.hub, wire::MAX_HEADER_LEN, av1).await
+    }
+
+    /// Asks the encoder for a keyframe (a new subscriber at the relay, or a rekey).
+    pub fn request_keyframe(&self) {
+        self.hub.request_keyframe();
+    }
+
+    /// The next frame is a keyframe, without waiting out the request pause: a new share key
+    /// takes effect only at a keyframe (FR-7.44).
+    pub fn force_keyframe(&self) {
+        self.hub.keyframe.store(true, Ordering::Relaxed);
+    }
+}
+
+impl Drop for Subscription {
+    fn drop(&mut self) {
+        lock(&self.hub.viewers).remove(&self.key);
+    }
+}
+
 async fn write_frames(
     queue: Arc<ViewerQueue>,
     hub: Arc<Hub>,
@@ -430,22 +525,7 @@ async fn write_frames(
     let version = caps.wire;
     let header_len = wire::header_len(version).unwrap_or(wire::MAX_HEADER_LEN);
     loop {
-        let frame = queue.next().await;
-        if !caps.av1 && frame.header.kind == FrameKind::Video(Codec::Av1) {
-            // Left over from before the switch to VP9 for this viewer; the VP9 encoder starts
-            // with a keyframe, and the viewer decodes nothing before it.
-            continue;
-        }
-        let bytes = header_len + frame.payload.len();
-        let now = Instant::now();
-        let wait = [&queue.limit, &hub.limit, &hub.upload]
-            .iter()
-            .filter_map(|limit| lock(limit).as_mut().map(|l| l.take(bytes, now)))
-            .max()
-            .unwrap_or_default();
-        if !wait.is_zero() {
-            tokio::time::sleep(wait).await;
-        }
+        let frame = paced_next(&queue, &hub, header_len, caps.av1).await;
         if let Err(e) = wire::write_frame(&mut send, &frame, version).await {
             tracing::debug!(error = %e, "screen stream to a viewer ended");
             return;
@@ -1185,6 +1265,33 @@ mod tests {
         let stats = wait_for(&media, |s| s.switched.is_none());
         assert_eq!(stats.switched, None);
         assert_eq!(*lock(&opened), [Codec::Av1, Codec::Vp9, Codec::Av1]);
+    }
+
+    #[test]
+    fn the_relay_subscription_gets_no_av1_while_a_viewer_blocks_it() {
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            QualityPrefs::default(),
+            fake_encoders(Duration::ZERO, Arc::default()),
+        );
+        let subscription = media.subscribe(BROADCAST_KEY);
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_time()
+            .build()
+            .expect("runtime");
+        let video = |frame: Arc<Frame>| match frame.header.kind {
+            FrameKind::Video(codec) => Some(codec),
+            FrameKind::Audio => None,
+        };
+        rt.block_on(async {
+            while video(subscription.next().await) != Some(Codec::Av1) {}
+            // A relay viewer that can only play VP9 joined (FR-7.58).
+            media.set_av1_blocker(Some(7));
+            for _ in 0..20 {
+                let codec = video(subscription.next().await);
+                assert_ne!(codec, Some(Codec::Av1), "AV1 after the blocker came");
+            }
+        });
     }
 
     #[test]

@@ -3,7 +3,8 @@
  * engine for the stream, draws its frames onto the canvas and stops watching on unmount. For each
  * codec the webview's WebCodecs cannot decode (AV1, VP9) the engine decodes and sends RGBA
  * pictures instead (FR-7.59). It also tells the codec on screen and carries the viewer's
- * frame-rate choice to the engine (FR-7.51), which drops temporal layers to meet it. Without a
+ * frame-rate choice to the engine (FR-7.51), which drops temporal layers to meet it, on either
+ * path: through the relay broadcast the relay drops them too (FR-7.45). Without a
  * first picture within {@link CONNECT_TIMEOUT_MS} (not counting a pause) the attempt ends as
  * unreachable (FR-2.46); `retry` starts a new one.
  *

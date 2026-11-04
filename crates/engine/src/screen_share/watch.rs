@@ -16,6 +16,11 @@ use mumcord_screenshare::{Av1Decoder, Decoder, I420Frame, VideoDecoder};
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 
+use mumcord_p2p::Unit;
+use mumcord_p2p::broadcast::ControlKind;
+use tokio::sync::mpsc as mpsc_async;
+
+use super::broadcast::link::{MaxFps, Subscriber};
 use super::sound::ShareSound;
 use super::wire::{self, Codec, Frame, FrameHeader, FrameKind};
 use crate::ServerId;
@@ -73,6 +78,32 @@ pub(crate) struct WatchLink {
     sound: Arc<ShareStats>,
     volume: Arc<ShareVolume>,
     tasks: [JoinHandle<()>; 2],
+    /// The subscriber end of a relay broadcast (spec 07); `None` on a direct stream.
+    broadcast: Option<Subscriber>,
+}
+
+/// Where a watched share's frames come from.
+pub(crate) enum FrameSource {
+    /// The direct stream from the sharer.
+    Stream(RecvStream),
+    /// Frames decrypted from the relay broadcast.
+    Broadcast(mpsc_async::Receiver<Frame>),
+}
+
+impl FrameSource {
+    async fn next(&mut self) -> Result<Option<Frame>, wire::WireError> {
+        match self {
+            Self::Stream(recv) => wire::read_frame(recv).await,
+            Self::Broadcast(frames) => Ok(frames.recv().await),
+        }
+    }
+}
+
+/// Where keyframe requests go.
+pub(crate) enum RequestSink {
+    Stream(SendStream),
+    /// The broadcast link: a `kf` control unit, which the relay rate-limits and forwards.
+    Broadcast(mpsc_async::Sender<Vec<u8>>),
 }
 
 impl WatchLink {
@@ -84,6 +115,50 @@ impl WatchLink {
         sound: ShareSound,
         send: SendStream,
         recv: RecvStream,
+    ) -> Self {
+        Self::start_with(
+            rt,
+            Source { server_id, sharer },
+            sink,
+            sound,
+            FrameSource::Stream(recv),
+            RequestSink::Stream(send),
+            None,
+        )
+    }
+
+    /// Plays a share that arrives through the relay broadcast: `frames` are already decrypted,
+    /// keyframe requests go out as `kf` units on `units`, and `subscriber` ends with the link.
+    #[allow(clippy::too_many_arguments)]
+    pub fn start_broadcast(
+        rt: &tokio::runtime::Handle,
+        server_id: ServerId,
+        sharer: u32,
+        sink: Option<Arc<dyn ScreenFrameSink>>,
+        sound: ShareSound,
+        frames: mpsc_async::Receiver<Frame>,
+        units: mpsc_async::Sender<Vec<u8>>,
+        subscriber: Subscriber,
+    ) -> Self {
+        Self::start_with(
+            rt,
+            Source { server_id, sharer },
+            sink,
+            sound,
+            FrameSource::Broadcast(frames),
+            RequestSink::Broadcast(units),
+            Some(subscriber),
+        )
+    }
+
+    fn start_with(
+        rt: &tokio::runtime::Handle,
+        source: Source,
+        sink: Option<Arc<dyn ScreenFrameSink>>,
+        sound: ShareSound,
+        frames: FrameSource,
+        requests: RequestSink,
+        broadcast: Option<Subscriber>,
     ) -> Self {
         let sound_stats = sound.stats();
         let volume = sound.volume();
@@ -98,19 +173,14 @@ impl WatchLink {
             max_fps: AtomicU32::new(0),
             keyframe: Notify::new(),
         });
-        let reader = rt.spawn(read_frames(
-            Source { server_id, sharer },
-            sink,
-            sound,
-            control.clone(),
-            recv,
-        ));
-        let requests = rt.spawn(send_requests(control.clone(), send));
+        let reader = rt.spawn(read_frames(source, sink, sound, control.clone(), frames));
+        let requests = rt.spawn(send_requests(control.clone(), requests));
         Self {
             control,
             sound: sound_stats,
             volume,
             tasks: [reader, requests],
+            broadcast,
         }
     }
 
@@ -131,12 +201,21 @@ impl WatchLink {
             .collect()
     }
 
+    /// The relay broadcast this share arrives through; `None` on a direct stream.
+    pub fn broadcast(&self) -> Option<&Subscriber> {
+        self.broadcast.as_ref()
+    }
+
     /// Shows at most about `fps` frames per second (FR-7.51) by dropping temporal layers; `None`
-    /// shows every frame the sharer sends.
+    /// shows every frame the sharer sends. Through the relay the cap also becomes the highest
+    /// layer the relay sends, so the dropped layers don't cost download either (FR-7.45).
     pub fn set_max_fps(&self, fps: Option<u32>) {
         self.control
             .max_fps
             .store(fps.unwrap_or(0), Ordering::Relaxed);
+        if let Some(broadcast) = &self.broadcast {
+            broadcast.set_max_fps(MaxFps::from_fps(fps));
+        }
     }
 
     pub fn max_fps(&self) -> Option<u32> {
@@ -176,12 +255,12 @@ async fn read_frames(
     sink: Option<Arc<dyn ScreenFrameSink>>,
     mut sound: ShareSound,
     control: Arc<Control>,
-    mut recv: RecvStream,
+    mut frames: FrameSource,
 ) {
     let mut decoder: Option<DecodeThread> = None;
     let mut layers = LayerFilter::default();
     loop {
-        let frame = match wire::read_frame(&mut recv).await {
+        let frame = match frames.next().await {
             Ok(Some(frame)) => frame,
             Ok(None) => return,
             Err(e) => {
@@ -290,10 +369,21 @@ fn halvings(fps: f64, cap: u32, top: u8) -> u8 {
     dropped
 }
 
-async fn send_requests(control: Arc<Control>, mut send: SendStream) {
+async fn send_requests(control: Arc<Control>, mut requests: RequestSink) {
     loop {
         control.keyframe.notified().await;
-        if let Err(e) = send.write_all(&[wire::KEYFRAME_REQUEST]).await {
+        let sent = match &mut requests {
+            RequestSink::Stream(send) => send
+                .write_all(&[wire::KEYFRAME_REQUEST])
+                .await
+                .map_err(|e| e.to_string()),
+            RequestSink::Broadcast(units) => match Unit::control(ControlKind::KeyframeRequest, &[])
+            {
+                Ok(unit) => units.send(unit).await.map_err(|e| e.to_string()),
+                Err(e) => Err(e.to_string()),
+            },
+        };
+        if let Err(e) = sent {
             tracing::debug!(error = %e, "screen stream to a sharer ended");
             return;
         }

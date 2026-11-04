@@ -883,7 +883,8 @@ export const commands = {
 	screenShareSetDecodeCodecs: (serverId: number, session: number, codecs: VideoCodec[]) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_decode_codecs", { serverId, session, codecs })),
 	/**
 	 *  The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
-	 *  watched share, by dropping temporal layers; `null` is Auto.
+	 *  watched share, by dropping temporal layers; `null` is Auto. Through the relay broadcast the
+	 *  relay drops the layers too (FR-7.45).
 	 */
 	screenShareSetViewerFps: (serverId: number, session: number, maxFps: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_viewer_fps", { serverId, session, maxFps })),
 	screenShareRequestKeyframe: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_request_keyframe", { serverId, session })),
@@ -3771,7 +3772,9 @@ export type ShareEndReason = "expired" | "stopped" | "leftServer" | "quit" | "fi
 export type ShareKind = "window" | "screen";
 
 /**  How the frames of a watched share reach the viewer. */
-export type SharePath = "direct";
+export type SharePath = "direct" | 
+/**  The sharer's single upload, copied to every viewer by the relay. */
+"broadcast";
 
 /**  The start dialog's "Viewers get" line before the share starts (FR-7.36). */
 export type SharePreview = {
@@ -4230,10 +4233,7 @@ export type WatchPartyChanged = {
  *  the frames themselves and are counted in the UI.
  */
 export type WatchStats = {
-	/**
-	 *  Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
-	 *  second path.
-	 */
+	/**  A copy of its own over the P2P connection, or the relay broadcast (FR-7.41). */
 	path: SharePath,
 	/**  Sound level of the shared sound at the viewer, 0.0–1.0. */
 	rms: number | null,
