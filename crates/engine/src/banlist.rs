@@ -473,7 +473,7 @@ mod tests {
     #[test]
     fn the_mask_rounds_trip_in_the_form_the_server_counts() {
         let stored = entry("a3f9");
-        let wire = ban::to_message(&[stored.clone()]);
+        let wire = ban::to_message(std::slice::from_ref(&stored));
         assert_eq!(
             wire.bans[0].mask, 128,
             "a single IPv4 goes out as the wire length"
