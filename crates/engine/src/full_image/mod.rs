@@ -30,6 +30,7 @@ use mumcord_protocol::{Handle, PluginData};
 
 use crate::ServerId;
 use crate::history_sync::HistorySync;
+use crate::p2p::ConsentPrompt;
 use crate::session::{Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, lock};
 use crate::web::{FullImage, LinkPreviews};
 pub use transfer::FetchError;
@@ -315,7 +316,8 @@ impl Engine {
         }
         let ctx = self.session_ctx_for(server_id).ok()?;
         let from = online_sender(&ctx.handle, sender_session, sender_cert_hash.as_deref())?;
-        self.full_image_download(server_id, full, from).await
+        self.full_image_download(server_id, full, from, ConsentPrompt::Allowed)
+            .await
     }
 
     /// The image from the local image cache as a `data:` URL, if it is there.
@@ -330,12 +332,14 @@ impl Engine {
     }
 
     /// Fetches `full` from the session `from` (direct first, then plugin data), checks it
-    /// and keeps it in the image cache. Emits [`EngineEvent::FullImageProgress`].
+    /// and keeps it in the image cache. Emits [`EngineEvent::FullImageProgress`]. `prompt` says
+    /// whether a new direct connection may ask the consent question.
     pub(crate) async fn full_image_download(
         &self,
         server_id: ServerId,
         full: FullRef,
         from: u32,
+        prompt: ConsentPrompt,
     ) -> Option<String> {
         let ctx = self.session_ctx_for(server_id).ok()?;
         if !self.mumcord_user_has_feature(server_id, from, FEATURE) {
@@ -358,7 +362,14 @@ impl Engine {
             .full_image_transfers()
             .start_fetch(server_id, full.hash);
         let bytes = match self
-            .full_image_direct(server_id, from, full, &fetch.cancel, progress.clone())
+            .full_image_direct(
+                server_id,
+                from,
+                full,
+                prompt,
+                &fetch.cancel,
+                progress.clone(),
+            )
             .await
         {
             DirectOutcome::Loaded(bytes) => Ok(bytes),
@@ -413,11 +424,12 @@ impl Engine {
         server_id: ServerId,
         from: u32,
         full: FullRef,
+        prompt: ConsentPrompt,
         cancel: &Cancel,
         progress: impl Fn(u32, u32),
     ) -> DirectOutcome {
         let attempt = direct::fetch_retrying(
-            || self.p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE),
+            || self.p2p_open_stream(server_id, from, crate::p2p::STREAM_FULL_IMAGE, prompt),
             || self.p2p_connected(server_id, from),
             full,
             progress,
