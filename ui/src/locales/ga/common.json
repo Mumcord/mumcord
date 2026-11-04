@@ -46,7 +46,7 @@
     "seek": "Lorg",
     "volume": "Kreath",
     "syncedPlay": "Sioncronaithe",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Spás · ← → · M · F · Esc",
     "inControl": "Tá an rialú ag {{name}}",
     "inSync": "Sioncronaithe",
     "inSyncAll": "Tá allt sioncronaithe",
@@ -70,14 +70,14 @@
     "onTopFailed": "Níorbh fhéidir “I gcónaí ar barr” a athrú",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Athraigh méid limistéar na meán",
+      "valueText": "{{percent}}% d’airde na fuinneoige",
+      "ofWindow": "d’airde na fuinneoige",
+      "chatMinimum": "fanann an comhrá ag a íosmhéid",
+      "release": "lig uait chun a laghdú",
+      "keys": "↑ ↓ athraigh méid · PageUp/PageDown gliogáil · Home/End · Enter athshocraíonn",
+      "releaseHint": "Lig uait chun é a íoslaghdú go dtí an barra beag",
+      "minimised": "Limistéar na meán íoslaghdaithe"
     }
   }
 }

@@ -46,7 +46,7 @@
     "seek": "Recherche",
     "volume": "Volume",
     "syncedPlay": "Synchro",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Espace · ← → · M · F · Échap",
     "inControl": "{{name}} a la main",
     "inSync": "Synchro",
     "inSyncAll": "Tout le monde est synchronisé",
@@ -70,14 +70,14 @@
     "onTopFailed": "Impossible de modifier « Toujours au premier plan »",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Redimensionner la zone multimédia",
+      "valueText": "{{percent}} % de la hauteur de la fenêtre",
+      "ofWindow": "de la hauteur de la fenêtre",
+      "chatMinimum": "le chat garde sa taille minimale",
+      "release": "relâchez pour réduire",
+      "keys": "↑ ↓ redimensionner · PageUp/PageDown aimanter · Début/Fin · Entrée réinitialise",
+      "releaseHint": "Relâchez pour réduire en mini-barre",
+      "minimised": "Zone multimédia réduite"
     }
   }
 }

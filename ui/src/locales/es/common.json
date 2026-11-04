@@ -46,7 +46,7 @@
     "seek": "Buscar",
     "volume": "Volumen",
     "syncedPlay": "Sincronizado",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Espacio · ← → · M · F · Esc",
     "inControl": "{{name}} tiene el control",
     "inSync": "Sincronizado",
     "inSyncAll": "Todos sincronizados",
@@ -70,14 +70,14 @@
     "onTopFailed": "No se pudo cambiar «Siempre visible»",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Cambiar el tamaño del área multimedia",
+      "valueText": "{{percent}} % de la altura de la ventana",
+      "ofWindow": "de la altura de la ventana",
+      "chatMinimum": "el chat conserva su mínimo",
+      "release": "suelta para contraer",
+      "keys": "↑ ↓ cambiar tamaño · AvPág/RePág ajustar · Inicio/Fin · Intro restablece",
+      "releaseHint": "Suelta para minimizar a la mini barra",
+      "minimised": "Área multimedia minimizada"
     }
   }
 }

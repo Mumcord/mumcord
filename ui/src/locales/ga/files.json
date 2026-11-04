@@ -14,7 +14,7 @@
     "unreadable": "Níorbh fhéidir {{path}} a léamh",
     "serverRefused": "Dhiúltaigh an freastalaí don teachtaireacht: {{reason}}",
     "trayLabel": "Comhaid le comhroinnt",
-    "chipPeerToPeer": "{{size}} · peer-to-peer",
+    "chipPeerToPeer": "{{size}} · piaraí-le-piaraí",
     "zipping": "Fillteán á chomhbhrú… {{percent}} %",
     "checking": "Ag seiceáil…",
     "checkingPercent": "Ag seiceáil… {{percent}} %",

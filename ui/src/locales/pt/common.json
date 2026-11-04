@@ -46,7 +46,7 @@
     "seek": "Procurar",
     "volume": "Volume",
     "syncedPlay": "Sincronizado",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Espaço · ← → · M · F · Esc",
     "inControl": "{{name}} tem o controlo",
     "inSync": "Sincronizado",
     "inSyncAll": "Todos sincronizados",
@@ -70,14 +70,14 @@
     "onTopFailed": "Não foi possível alterar «Sempre visível»",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Redimensionar a área de multimédia",
+      "valueText": "{{percent}}% da altura da janela",
+      "ofWindow": "da altura da janela",
+      "chatMinimum": "o chat mantém o seu mínimo",
+      "release": "solte para recolher",
+      "keys": "↑ ↓ redimensionar · PageUp/PageDown encaixar · Home/End · Enter repõe",
+      "releaseHint": "Solte para minimizar na mini barra",
+      "minimised": "Área de multimédia minimizada"
     }
   }
 }

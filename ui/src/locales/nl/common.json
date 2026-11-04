@@ -70,14 +70,14 @@
     "onTopFailed": "Altijd bovenop kon niet worden gewijzigd",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Mediagedeelte van grootte wijzigen",
+      "valueText": "{{percent}}% van de vensterhoogte",
+      "ofWindow": "van de vensterhoogte",
+      "chatMinimum": "chat behoudt zijn minimum",
+      "release": "loslaten om in te klappen",
+      "keys": "↑ ↓ grootte wijzigen · PageUp/PageDown vastklikken · Home/End · Enter herstelt",
+      "releaseHint": "Loslaten om te verkleinen tot de minibalk",
+      "minimised": "Mediagedeelte verkleind"
     }
   }
 }
