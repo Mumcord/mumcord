@@ -5,7 +5,7 @@
 //! asks for the system picker and no own picker UI, so there the main screen is shared whole,
 //! as on X11. The stream delivers BGRA pictures, already scaled by the system into the encoder's
 //! largest box, and with macOS 13+ also the sound of exactly the shared content without
-//! Mumcord's own output ([`super::sound_macos`]). On a whole screen that is every app's sound
+//! Mumcord's own output ([`super::sound::macos`]). On a whole screen that is every app's sound
 //! but Mumcord's.
 //!
 //! Screen recording needs the user's permission. Without it the share fails with
@@ -115,9 +115,10 @@ mod sck {
     };
     use tokio::sync::oneshot;
 
-    use super::super::capture::{CaptureSource, SoundSource};
+    use super::super::capture::CaptureSource;
     use super::super::convert::{bgrx_to_i420, pack_rows};
-    use super::super::sound_macos::{MacSound, SoundSender, sound_channel};
+    use super::super::sound::macos::{MacSound, SoundSender, sound_channel};
+    use super::super::sound::{ShareSoundMode, SoundOutcome, SoundRequest};
     use super::{MacCaptureError, Plan, is_share_sound, plan, sound_supported, stream_size};
     use crate::session::lock;
 
@@ -610,10 +611,21 @@ mod sck {
             self.shared.ended.load(Ordering::Relaxed)
         }
 
-        fn take_sound(&mut self) -> Option<Box<dyn SoundSource>> {
-            self.sound
-                .take()
-                .map(|s| Box::new(s) as Box<dyn SoundSource>)
+        fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
+            let Some(sound) = self.sound.take() else {
+                return SoundOutcome::NoSound;
+            };
+            let (major, minor) = os_version();
+            // Without the picker the whole main screen is shared: its sound is the desktop's.
+            let mode = match plan(major, minor) {
+                Plan::MainDisplay => ShareSoundMode::Desktop,
+                _ => request.mode(),
+            };
+            SoundOutcome::Captured {
+                source: Box::new(sound),
+                mode,
+                app: None,
+            }
         }
 
         fn frame(&mut self, max_width: u32, max_height: u32) -> Option<I420Frame> {

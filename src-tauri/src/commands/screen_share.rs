@@ -250,7 +250,7 @@ impl From<ScreenShareView> for ScreenShare {
             session: v.session,
             paused: v.paused,
             sound: v.sound,
-            sound_available: v.sound_available,
+            sound_available: v.sound_status.available(),
             viewers: v.viewers,
             blocked: v.blocked.map(Into::into),
             relay_reason: match v.blocked {

@@ -44,7 +44,8 @@ use windows::core::{BOOL, Interface};
 
 use super::capture::{CaptureSource, SoundSource};
 use super::convert::{bgrx_to_i420, pack_rows};
-use super::sound_windows::ProcessLoopback;
+use super::sound::windows::ProcessLoopback;
+use super::sound::{ShareSoundMode, SoundOutcome, SoundRequest};
 use super::windows_rules::{TopWindow, capture_supported, sound_process, sound_supported};
 
 /// Why no capture was started.
@@ -301,8 +302,16 @@ impl CaptureSource for WindowsCapture {
         self.ended.load(Ordering::Relaxed)
     }
 
-    fn take_sound(&mut self) -> Option<Box<dyn SoundSource>> {
-        self.sound.take()
+    // Today only a window share has sound, whatever was asked: the app behind the window.
+    fn take_sound(&mut self, _request: SoundRequest) -> SoundOutcome {
+        match self.sound.take() {
+            Some(source) => SoundOutcome::Captured {
+                source,
+                mode: ShareSoundMode::App,
+                app: None,
+            },
+            None => SoundOutcome::NoSound,
+        }
     }
 }
 
