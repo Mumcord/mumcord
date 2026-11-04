@@ -21,6 +21,7 @@ vi.mock("../../../api", async (orig) => {
       return Promise.resolve(null);
     },
     pluginFramesMute: () => Promise.resolve(null),
+    pluginFramesMuteState: () => Promise.resolve({ all: false, plugins: [] }),
     pluginsList: () =>
       Promise.resolve({
         noPlugins: false,
