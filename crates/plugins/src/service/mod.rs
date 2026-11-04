@@ -53,7 +53,7 @@ pub use gates::{
 };
 pub use install::{InstallRequest, InstallStage, fetch};
 pub use messaging::Announce;
-pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, UiUpdate};
+pub use plugin_io::{BotInfo, PeerInfo, SelfInfo, StageActivity, UiUpdate};
 pub use replay::{REPLAY_PER_PLUGIN, StoredLine};
 pub use revocation::{REVOKED_PREFIX_TEXT, RevocationNotice, cached_revocations};
 pub use ui::UiInput;
@@ -130,6 +130,21 @@ pub enum ServiceEvent {
         plugin: String,
         card: Option<String>,
         message: u64,
+    },
+    /// The plugin activities in the user's channel changed: list them again with
+    /// [`PluginService::stage_activities`].
+    StageChanged,
+    /// A plugin's own `stage.start` or `stage.join` hit a limit: show its text ("Too many
+    /// activities in this channel", "This activity is full").
+    StageRefused {
+        plugin: String,
+        reason: crate::stage::Refusal,
+    },
+    /// A stage event for `plugin` that came out of the plugin's own call; pass it back with
+    /// [`PluginService::stage_event`] (it cannot be queued from the plugin's worker).
+    StageEvent {
+        plugin: String,
+        event: crate::runtime::PluginEvent,
     },
     /// A new plugin version is waiting in the Updates tab: a notification-centre entry, no OS
     /// notification (FR-6.69). Sent once per version.

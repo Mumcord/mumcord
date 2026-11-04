@@ -6,6 +6,11 @@
 //! (`peers.send` with a direct target); the low 7 bits are the API major. Both are part of
 //! envelope version 1, which is unreleased, so no version bump is needed.
 //! The sender is the Mumble session that sent the frame; nothing in the envelope claims identity.
+//!
+//! Host frames share the data id but carry [`HOST_FRAME_VERSION`] in byte 0 and a host kind in
+//! byte 1; the rest is a host document (stage announcements, FR-9.47). They never reach a plugin:
+//! this build takes them out before the plugin path, and older builds drop them as an unknown
+//! envelope version. Plugins keep all 256 message kinds.
 
 use super::SendError;
 
@@ -13,6 +18,10 @@ use super::SendError;
 pub const DATA_ID_PREFIX: &str = "mumcord.p.";
 /// The only envelope version this build reads and writes.
 pub const ENVELOPE_VERSION: u8 = 1;
+/// Byte 0 of a host frame: bit 7 marks the host, the low bits are its version (1).
+pub const HOST_FRAME_VERSION: u8 = 0x81;
+/// Host kind of the stage frames (`stage::announce`).
+pub const HOST_KIND_STAGE: u8 = 1;
 /// Bit 7 of the API major byte: the message was sent to one user, not the whole channel.
 pub const DIRECT_FLAG: u8 = 0x80;
 /// The bits of byte 1 that hold the plugin API major.
@@ -73,6 +82,23 @@ pub fn encode(
     bytes.extend_from_slice(&[ENVELOPE_VERSION, flagged_major, kind]);
     bytes.extend_from_slice(payload);
     Ok(bytes)
+}
+
+/// A host frame: byte 0 [`HOST_FRAME_VERSION`], byte 1 the host kind, then the body. The body's
+/// encoder bounds its size.
+pub fn encode_host(kind: u8, body: &[u8]) -> Vec<u8> {
+    let mut bytes = Vec::with_capacity(2 + body.len());
+    bytes.extend_from_slice(&[HOST_FRAME_VERSION, kind]);
+    bytes.extend_from_slice(body);
+    bytes
+}
+
+/// The host kind and body of a host frame, or `None` for anything else (a plugin envelope).
+pub fn decode_host(bytes: &[u8]) -> Option<(u8, &[u8])> {
+    match bytes {
+        [HOST_FRAME_VERSION, kind, body @ ..] => Some((*kind, body)),
+        _ => None,
+    }
 }
 
 /// Decodes a received frame.
@@ -160,6 +186,16 @@ mod tests {
         let mut big = vec![1, 1, 0];
         big.extend_from_slice(&[0; 998]);
         assert_eq!(decode(&big), Err(DecodeError::TooLarge));
+    }
+
+    #[test]
+    fn host_frames_round_trip_and_are_never_plugin_envelopes() {
+        let bytes = encode_host(HOST_KIND_STAGE, b"body");
+        assert_eq!(&bytes[..2], &[0x81, 1]);
+        assert_eq!(decode_host(&bytes), Some((HOST_KIND_STAGE, &b"body"[..])));
+        assert_eq!(decode(&bytes), Err(DecodeError::UnknownVersion));
+        assert_eq!(decode_host(&encode(1, false, 1, b"x", 997).unwrap()), None);
+        assert_eq!(decode_host(&[0x81]), None);
     }
 
     #[test]

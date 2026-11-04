@@ -25,6 +25,7 @@ mod runtime;
 pub mod score;
 pub mod service;
 pub mod sounds;
+pub mod stage;
 pub mod suggestions;
 pub mod test_hooks;
 pub mod triggers;

@@ -3212,7 +3212,9 @@ serverId: number | null } |
  *  The smallest size the plugin asks for its side panel, in CSS pixels; the UI clamps it to
  *  the panel's limits and the user may still resize (FR-9.39).
  */
-{ type: "webviewSizeHint"; minWidth: number; minHeight: number };
+{ type: "webviewSizeHint"; minWidth: number; minHeight: number } | 
+/**  The tree of the plugin's stage activity (FR-9.46); empty once the user left it. */
+{ type: "stageTree"; nodes: PluginNode[] };
 
 /**  A user input for a plugin's UI other than an action. */
 export type PluginUiInput = { type: "profileCardOpened"; session: number } | { type: "panelVisibility"; visibility: PluginPanelVisibility } | { type: "userMenuRequested"; session: number } | { type: "dialogClosed" } | 

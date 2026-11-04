@@ -446,6 +446,16 @@ async fn on_service_event(
                 .call(move |service| Ok(service.ui_input(&plugin, UiInput::SurfaceClosed(place))))
                 .await?;
         }
+        ServiceEvent::StageEvent { plugin, event } => {
+            plugins
+                .call(move |service| {
+                    service.stage_event(&plugin, event);
+                    Ok(())
+                })
+                .await?;
+        }
+        // The stage UI lists the activities and shows the limit texts (G3, ST3).
+        ServiceEvent::StageChanged | ServiceEvent::StageRefused { .. } => {}
         ServiceEvent::AutoOff { id } => PluginNotification {
             plugin: id,
             notice: PluginNotice::AutoOff,

@@ -44,6 +44,7 @@ psl.workspace = true
 lewton.workspace = true
 hound.workspace = true
 image.workspace = true
+bovnar.workspace = true
 
 [dev-dependencies]
 mumcord-store = { workspace = true, features = ["test-util"] }

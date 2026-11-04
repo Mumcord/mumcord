@@ -133,6 +133,12 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
     // Opens a settings page (see `bind`); nothing to keep.
     case "openPermissions":
       return state;
+    // The stage activity's tree under the key "stage"; empty once the user left it.
+    case "stageTree":
+      if (change.nodes.length === 0) slots.delete("stage");
+      else slots.set("stage", change.nodes);
+      trees.set(plugin, slots);
+      return { ...state, trees };
   }
 }
 

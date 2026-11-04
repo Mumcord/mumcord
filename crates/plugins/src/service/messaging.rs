@@ -18,7 +18,7 @@ use super::plugin_io::{
 use super::{Origin, PluginService};
 use crate::manifest::Visibility;
 use crate::messaging::announce::{self, ANNOUNCE_DATA_ID, AnnounceEntry, SourceTag};
-use crate::messaging::envelope::plugin_id_of;
+use crate::messaging::envelope::{self, plugin_id_of};
 use crate::messaging::{Counters, Member, PluginRef};
 use crate::registry::key_fingerprint_prefix;
 use crate::wit::events::{Channel, Event, PeerMessage, SelfState};
@@ -39,6 +39,8 @@ impl PluginService {
         if changed {
             self.io.menu_forget_sessions(None);
             self.io.refresh_menus();
+            // A server switch leaves the activities on the old one, which stays connected.
+            self.stage_sync_place(true);
         }
         self.broadcast_self();
     }
@@ -63,6 +65,7 @@ impl PluginService {
         if focused {
             self.io.menu_forget_sessions(None);
             self.io.refresh_menus();
+            self.stage_sync_place(false);
             self.broadcast_self();
         }
     }
@@ -87,6 +90,10 @@ impl PluginService {
             .members
             .insert(peer.session, peer.clone());
         self.io.refresh_menus();
+        if self.io.peers().focused == Some(server) {
+            // Their announce may have come first; running activities reach them either way.
+            self.stage_member_announced(peer.session);
+        }
         self.dispatch(server, |keys, id| Event::Joined(wit_peer(keys, id, &peer)));
     }
 
@@ -106,6 +113,9 @@ impl PluginService {
 
     /// Someone left the user's channel or the server, or the user left their channel.
     pub fn peer_left(&mut self, server: ServerId, peer: &PeerInfo) {
+        if self.io.peers().focused == Some(server) {
+            self.stage_peer_left(peer.session);
+        }
         {
             let mut state = self.io.peers();
             let connection = connection(&mut state.connections, server);
@@ -173,6 +183,8 @@ impl PluginService {
             state.focused == Some(server)
         };
         if focused {
+            // A channel change leaves the activities of the old channel (FR-9.51).
+            self.stage_sync_place(false);
             self.broadcast_self();
         }
     }
@@ -198,6 +210,9 @@ impl PluginService {
             };
             connection.announced.insert(sender.session, entries);
             drop(state);
+            if focused {
+                self.stage_member_announced(sender.session);
+            }
             // A poll or game state sent before this announce never reached them (FR-6.35).
             let keys = self.ctx.peer_keys.as_ref();
             for id in ready {
@@ -212,7 +227,18 @@ impl PluginService {
         if state.focused != Some(server) {
             return;
         }
-        let Some(meta) = state.plugins.get(plugin).and_then(|m| m.messaging.clone()) else {
+        // Stage host frames are the host's own, never a plugin's message (FR-9.47).
+        if envelope::decode_host(data).is_some() {
+            drop(state);
+            self.stage_frame(sender.session, plugin, data);
+            return;
+        }
+        let Some(meta) = state
+            .plugins
+            .get(plugin)
+            .and_then(|m| m.messaging.clone())
+            .filter(|m| m.messages)
+        else {
             return;
         };
         let Some(connection) = state.connections.get_mut(&server) else {
@@ -354,7 +380,21 @@ impl PluginService {
                 let Some(manifest) = self.host.manifest(&record.id) else {
                     continue;
                 };
-                let messaging = if self.ctx.grants.allows(&record.id, "peers.messages") {
+                let messages = self.ctx.grants.allows(&record.id, "peers.messages");
+                let stage = self
+                    .ctx
+                    .grants
+                    .allows(&record.id, crate::api::stage::PERMISSION)
+                    .then(|| {
+                        manifest
+                            .stage
+                            .as_ref()
+                            .and_then(|s| s.max_participants)
+                            .unwrap_or(crate::stage::MAX_PARTICIPANTS)
+                    });
+                // Stage plugins are announced too, so peers with the same plugin see their
+                // activities without `peers.messages`.
+                let messaging = if messages || stage.is_some() {
                     self.source_tag(&record.source, &repositories)
                         .map(|source| MessagingMeta {
                             source,
@@ -364,6 +404,7 @@ impl PluginService {
                                 PluginVisibility::Nobody => Visibility::Nobody,
                             },
                             max_payload: manifest.messaging.max_payload,
+                            messages,
                         })
                 } else {
                     None
@@ -374,6 +415,7 @@ impl PluginService {
                     PluginMeta {
                         name: manifest.name.clone(),
                         messaging,
+                        stage,
                     },
                 );
             }
@@ -539,7 +581,7 @@ fn newly_reachable(
     plugins
         .iter()
         .filter_map(|(id, meta)| {
-            let messaging = meta.messaging.as_ref()?;
+            let messaging = meta.messaging.as_ref().filter(|m| m.messages)?;
             let plugin = PluginRef {
                 id,
                 source: messaging.source,

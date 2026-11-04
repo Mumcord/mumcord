@@ -724,24 +724,30 @@ fn check_webview_place(state: &PluginState, place: WebviewPlace) -> Result<(), v
 }
 
 impl wit::stage::Host for PluginState {
-    fn start(
-        &mut self,
-        _title: String,
-        _content: wit::stage::StageContent,
-    ) -> Result<String, Error> {
-        Err(Error::NotPermitted)
+    fn start(&mut self, title: String, content: wit::stage::StageContent) -> Result<String, Error> {
+        let content = match content {
+            wit::stage::StageContent::Tree(nodes) => {
+                crate::api::io::StageContent::Tree(down(nodes)?)
+            }
+            wit::stage::StageContent::Web(entry) => crate::api::io::StageContent::Web(entry),
+        };
+        crate::api::stage::start(self, title, content).map_err(Up::up)
     }
 
-    fn join(&mut self, _activity: String) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+    fn join(&mut self, activity: String) -> Result<(), Error> {
+        crate::api::stage::join(self, &activity).map_err(Up::up)
     }
 
-    fn leave(&mut self) {}
+    fn leave(&mut self) {
+        crate::api::stage::leave(self);
+    }
 
-    fn end(&mut self) {}
+    fn end(&mut self) {
+        crate::api::stage::end(self);
+    }
 
-    fn set_tree(&mut self, _nodes: Vec<wit::ui::Node>) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+    fn set_tree(&mut self, nodes: Vec<wit::ui::Node>) -> Result<(), Error> {
+        crate::api::stage::set_tree(self, down(nodes)?).map_err(Up::up)
     }
 }
 

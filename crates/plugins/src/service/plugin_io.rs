@@ -5,6 +5,7 @@
 //! `peers` works on the messaging state per connection ([`PeersState`], one
 //! [`Messenger`] each), which the service feeds from engine events (see `messaging.rs`).
 
+mod stage;
 mod user_menu;
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
@@ -29,6 +30,7 @@ use crate::wit::peers;
 use crate::wit::types::{BotInfo as WitBotInfo, Error, Peer};
 use crate::wit::ui::{Node, Slot, UserMenuFilter};
 
+pub use stage::StageActivity;
 pub use user_menu::BotInfo;
 
 /// The plugin API major this host speaks; written into every envelope and announce entry.
@@ -100,6 +102,11 @@ pub enum UiUpdate {
         message: String,
         places: Vec<WebviewPlace>,
     },
+    /// The tree of the plugin's stage activity (`stage.start` with a tree, `stage.set-tree`).
+    /// Empty when the user left the activity. Untrusted, as every tree.
+    StageTree {
+        nodes: Vec<Node>,
+    },
     /// `webview.set-size-hint`: the smallest size the side panel should get, in CSS pixels.
     /// The UI clamps it to the panel's limits.
     WebviewSizeHint {
@@ -113,8 +120,10 @@ pub enum UiUpdate {
 pub(super) struct PluginMeta {
     /// Shown in the "[Name] " chat prefix.
     pub name: String,
-    /// `None` without `peers.messages`: not announced, messages refused.
+    /// `None` without `peers.messages` and `ui.stage`: not announced, messages refused.
     pub messaging: Option<MessagingMeta>,
+    /// With `ui.stage`: the most participants of its activities (manifest, default 16).
+    pub stage: Option<u32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -122,6 +131,9 @@ pub(super) struct MessagingMeta {
     pub source: SourceTag,
     pub visibility: Visibility,
     pub max_payload: u32,
+    /// `peers.messages` is granted. Without it the plugin is still announced for its stage
+    /// activities (FR-9.47), but sends and receives no messages.
+    pub messages: bool,
 }
 
 #[derive(Debug, Default)]
@@ -183,6 +195,7 @@ pub(super) struct ServiceIo {
     events: UnboundedSender<ServiceEvent>,
     webviews: Arc<Webviews>,
     app_menus: crate::api::app_menu::AppMenus,
+    stages: Mutex<crate::stage::Stages>,
 }
 
 impl ServiceIo {
@@ -194,6 +207,7 @@ impl ServiceIo {
             events,
             webviews: Arc::default(),
             app_menus: Default::default(),
+            stages: Mutex::default(),
         }
     }
 
@@ -271,6 +285,7 @@ impl ServiceIo {
             chat.gate.forget(plugin);
             chat.claims.forget_plugin(plugin);
         }
+        self.forget_stage(plugin);
         self.webviews.forget(plugin);
         self.app_menus.forget(plugin);
         self.menu_forget_plugin(plugin);
@@ -402,6 +417,7 @@ impl PluginIo for ServiceIo {
         let meta = plugins
             .get(plugin)
             .and_then(|meta| meta.messaging.clone())
+            .filter(|meta| meta.messages)
             .ok_or(Error::NotPermitted)?;
         let (server, connection) = focused
             .and_then(|server| connections.get_mut(&server).map(|c| (server, c)))
@@ -586,6 +602,31 @@ impl PluginIo for ServiceIo {
         let shown = self.webviews.open_stage(plugin, &entry, Instant::now())?;
         self.shown(plugin, shown);
         Ok(())
+    }
+
+    fn stage_start(
+        &self,
+        plugin: &str,
+        title: String,
+        content: crate::api::io::StageContent,
+    ) -> Result<String, Error> {
+        self.start_activity(plugin, title, content)
+    }
+
+    fn stage_join(&self, plugin: &str, activity: &str) -> Result<(), Error> {
+        self.join_activity_from_plugin(plugin, activity)
+    }
+
+    fn stage_leave(&self, plugin: &str) {
+        self.leave_activity(plugin);
+    }
+
+    fn stage_end(&self, plugin: &str) {
+        self.end_activity(plugin);
+    }
+
+    fn stage_set_tree(&self, plugin: &str, nodes: Vec<Node>) -> Result<(), Error> {
+        self.set_stage_tree(plugin, nodes)
     }
 
     fn app_menu_set_state(
@@ -960,6 +1001,7 @@ mod tests {
             PluginMeta {
                 name: "Dice".into(),
                 messaging: None,
+                stage: None,
             },
         );
         io.peers().focused = Some(1);
@@ -994,6 +1036,7 @@ mod tests {
             PluginMeta {
                 name: name.into(),
                 messaging: None,
+                stage: None,
             },
         );
         (io, rx)
@@ -1079,6 +1122,7 @@ mod tests {
             PluginMeta {
                 name: "Poll".into(),
                 messaging: None,
+                stage: None,
             },
         );
         let hash = chat::line_hash("Poll", "Lunch?");
@@ -1100,6 +1144,7 @@ mod tests {
             PluginMeta {
                 name: "Poll".into(),
                 messaging: None,
+                stage: None,
             },
         );
         let hash = chat::line_hash("Poll", "Lunch?");
@@ -1125,6 +1170,7 @@ mod tests {
             PluginMeta {
                 name: "Poll".into(),
                 messaging: None,
+                stage: None,
             },
         );
         // The user talks on server 1 and reads the chat of server 2.

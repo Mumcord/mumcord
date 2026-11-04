@@ -13,6 +13,14 @@ use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{BotInfo, Error, Peer};
 use crate::runtime::wit::ui::{Node, Slot, UserMenuFilter};
 
+/// What a new activity shows (WIT `stage.stage-content`), already checked.
+#[derive(Debug, Clone)]
+pub enum StageContent {
+    Tree(Vec<Node>),
+    /// The entry below `web/`.
+    Web(String),
+}
+
 /// Carries out what a plugin asks of the UI, other users and the chat. `plugin` is the id of
 /// the calling plugin; its permission for the call has already been checked.
 ///
@@ -126,6 +134,29 @@ pub trait PluginIo: Send + Sync + Debug {
     /// Opens the stage frame of an activity started with web content (`stage.start` with
     /// `stage-content.web`, FR-9.46). The caller has checked `ui.stage` and the gesture.
     fn stage_web_show(&self, _plugin: &str, _entry: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `stage.start` (FR-9.45, FR-9.46): the caller checked `ui.stage`, the title and the content
+    /// (and `ui.webview` for web content). Checks the gesture, the channel and the limits, opens
+    /// web content and returns the new activity id.
+    fn stage_start(
+        &self,
+        _plugin: &str,
+        _title: String,
+        _content: StageContent,
+    ) -> Result<String, Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `stage.join` from the plugin's own Join button: needs a fresh gesture.
+    fn stage_join(&self, _plugin: &str, _activity: &str) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
+    /// `stage.leave`.
+    fn stage_leave(&self, _plugin: &str) {}
+    /// `stage.end`.
+    fn stage_end(&self, _plugin: &str) {}
+    /// `stage.set-tree`: the caller validated the tree; `invalid` without a tree activity.
+    fn stage_set_tree(&self, _plugin: &str, _nodes: Vec<Node>) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
     /// `files.save` (FR-9.103): `name` is already a plain file name and `data` within the

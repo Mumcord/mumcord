@@ -12,6 +12,7 @@ pub mod notify;
 pub mod peers;
 pub mod random;
 pub mod secrets;
+pub mod stage;
 pub mod storage;
 pub mod theme;
 pub mod timers;

@@ -346,6 +346,8 @@ pub enum PluginUiChange {
     /// the panel's limits and the user may still resize (FR-9.39).
     #[serde(rename_all = "camelCase")]
     WebviewSizeHint { min_width: u32, min_height: u32 },
+    /// The tree of the plugin's stage activity (FR-9.46); empty once the user left it.
+    StageTree { nodes: Vec<PluginNode> },
 }
 
 /// Where a plugin's web view is shown.
@@ -650,6 +652,9 @@ impl From<UiUpdate> for PluginUiChange {
                 min_width,
                 min_height,
             },
+            UiUpdate::StageTree { nodes } => Self::StageTree {
+                nodes: nodes.into_iter().map(Into::into).collect(),
+            },
         }
     }
 }
@@ -732,7 +737,8 @@ impl Trees {
                     self.size_hints.remove(plugin);
                 }
             }
-            PluginUiChange::WebviewPost { .. } => {}
+            // Posts are not replayed; the stage tree joins the snapshot with the stage view (ST3).
+            PluginUiChange::WebviewPost { .. } | PluginUiChange::StageTree { .. } => {}
             PluginUiChange::WebviewSizeHint {
                 min_width,
                 min_height,
