@@ -239,6 +239,17 @@ describe("web view state", () => {
     );
     expect(state.sizeHints?.get("snacks")).toEqual({ minWidth: 320, minHeight: 200 });
   });
+
+  it("keeps the side panel's status until it is cleared or the panel closes", () => {
+    const open = applyChange(empty, change({ type: "webviewShow", place: "sidePanel", url: URL }));
+    let state = applyChange(open, change({ type: "sidePanelStatus", text: "3 drawing" }));
+    expect(state.sidePanelStatus?.get("snacks")).toBe("3 drawing");
+    state = applyChange(state, change({ type: "sidePanelStatus", text: "" }));
+    expect(state.sidePanelStatus?.has("snacks")).toBe(false);
+    state = applyChange(state, change({ type: "sidePanelStatus", text: "relay" }));
+    state = applyChange(state, change({ type: "webviewHide", place: "sidePanel" }));
+    expect(state.sidePanelStatus?.has("snacks")).toBe(false);
+  });
 });
 
 const PLACES: PluginWebviewPlace[] = ["stage", "sidePanel", "dialog", "panelPopover"];

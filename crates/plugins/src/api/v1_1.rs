@@ -712,6 +712,14 @@ impl wit::webview::Host for PluginState {
             .io()
             .and_then(|io| io.webview_set_size_hint(&self.id, min_width, min_height)))
     }
+
+    fn set_status(&mut self, text: String) -> Result<(), Error> {
+        check_webview_place(self, WebviewPlace::SidePanel).map_err(Up::up)?;
+        let text = crate::api::webview_status::clean_status(&text).ok_or(Error::Invalid)?;
+        up(self
+            .io()
+            .and_then(|io| io.webview_set_status(&self.id, text)))
+    }
 }
 
 /// `ui.webview` plus the permission `place` needs (`ui.side-panel`, `ui.stage`).

@@ -3432,6 +3432,11 @@ serverId: number | null } |
  *  the panel's limits and the user may still resize (FR-9.39).
  */
 { type: "webviewSizeHint"; minWidth: number; minHeight: number } | 
+/**
+ *  The plain-text status line under the plugin's side panel (untrusted text, at most 80
+ *  characters, no markup); empty clears it. Gone once the side panel closes.
+ */
+{ type: "sidePanelStatus"; text: string } | 
 /**  The tree of the plugin's stage activity (FR-9.46); empty once the user left it. */
 { type: "stageTree"; nodes: PluginNode[] };
 

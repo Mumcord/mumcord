@@ -409,6 +409,7 @@ fn webview_1_1_gains_side_panel_stage_and_size_hint() {
         ["panel-popover", "dialog", "side-panel", "stage"]
     );
     assert!(has_function(&resolve, "webview", "set-size-hint"));
+    assert!(has_function(&resolve, "webview", "set-status"));
     let (resolve, slot) = type_in_1_1("ui", "slot");
     assert_eq!(
         case_names(&resolve, slot).last().map(String::as_str),

@@ -570,6 +570,7 @@ show: func(place: place, entry: string) -> result<_, error>;
 hide: func();
 post: func(message: string) -> result<_, error>;
 set-size-hint: func(min-width: u32, min-height: u32) -> result<_, error>;
+set-status: func(text: string) -> result<_, error>;
 }
 == world.wit
 package mumcord:plugin@1.1.0;

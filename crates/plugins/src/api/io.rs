@@ -132,6 +132,11 @@ pub trait PluginIo: Send + Sync + Debug {
     ) -> Result<(), Error> {
         Err(Error::NotPermitted)
     }
+    /// `webview.set-status` for the plugin's open side panel (`ui.side-panel` checked; `text`
+    /// already cleaned, empty clears the line).
+    fn webview_set_status(&self, _plugin: &str, _text: String) -> Result<(), Error> {
+        Err(Error::NotPermitted)
+    }
     /// Opens the stage frame of an activity started with web content (`stage.start` with
     /// `stage-content.web`, FR-9.46). The caller has checked `ui.stage` and the gesture.
     fn stage_web_show(&self, _plugin: &str, _entry: String) -> Result<(), Error> {

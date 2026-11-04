@@ -144,7 +144,13 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
     }
     case "webviewHide": {
       if (!state.webviews.get(plugin)?.has(change.place)) return state;
-      return { ...state, webviews: withWebview(state.webviews, plugin, change.place, null) };
+      const webviews = withWebview(state.webviews, plugin, change.place, null);
+      if (change.place !== "sidePanel" || !state.sidePanelStatus?.has(plugin)) {
+        return { ...state, webviews };
+      }
+      const sidePanelStatus = new Map(state.sidePanelStatus);
+      sidePanelStatus.delete(plugin);
+      return { ...state, webviews, sidePanelStatus };
     }
     // Bridge messages go straight to the open frame (see `webview/`), they are not state.
     case "webviewPost":
@@ -154,6 +160,13 @@ export function applyChange(state: PluginUiState, { plugin, change }: PluginUi):
       const sizeHints = new Map(state.sizeHints);
       sizeHints.set(plugin, { minWidth: change.minWidth, minHeight: change.minHeight });
       return { ...state, sizeHints };
+    }
+    // Read by the side panel footer; an empty text clears the line.
+    case "sidePanelStatus": {
+      const sidePanelStatus = new Map(state.sidePanelStatus);
+      if (change.text === "") sidePanelStatus.delete(plugin);
+      else sidePanelStatus.set(plugin, change.text);
+      return { ...state, sidePanelStatus };
     }
     // Opens a settings page (see `bind`); nothing to keep.
     case "openPermissions":

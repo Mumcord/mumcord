@@ -355,6 +355,9 @@ pub enum PluginUiChange {
     /// the panel's limits and the user may still resize (FR-9.39).
     #[serde(rename_all = "camelCase")]
     WebviewSizeHint { min_width: u32, min_height: u32 },
+    /// The plain-text status line under the plugin's side panel (untrusted text, at most 80
+    /// characters, no markup); empty clears it. Gone once the side panel closes.
+    SidePanelStatus { text: String },
     /// The tree of the plugin's stage activity (FR-9.46); empty once the user left it.
     StageTree { nodes: Vec<PluginNode> },
 }
@@ -717,6 +720,7 @@ impl From<UiUpdate> for PluginUiChange {
                 min_width,
                 min_height,
             },
+            UiUpdate::SidePanelStatus { text } => Self::SidePanelStatus { text },
             UiUpdate::StageTree { nodes } => Self::StageTree {
                 nodes: nodes.into_iter().map(Into::into).collect(),
             },
@@ -869,6 +873,8 @@ pub struct Trees {
     webviews: HashMap<(String, PluginWebviewPlace), String>,
     /// The side-panel size hint of each plugin with an open side panel.
     size_hints: HashMap<String, (u32, u32)>,
+    /// The status line of each plugin with an open side panel; never empty.
+    statuses: HashMap<String, String>,
 }
 
 impl Trees {
@@ -919,6 +925,7 @@ impl Trees {
                 self.webviews.remove(&(plugin.to_owned(), *place));
                 if *place == PluginWebviewPlace::SidePanel {
                     self.size_hints.remove(plugin);
+                    self.statuses.remove(plugin);
                 }
             }
             // The stage tree is kept as the `Stage` slot, so a `ui-action` from it is checked like
@@ -944,6 +951,13 @@ impl Trees {
                 self.size_hints
                     .insert(plugin.to_owned(), (*min_width, *min_height));
             }
+            PluginUiChange::SidePanelStatus { text } => {
+                if text.is_empty() {
+                    self.statuses.remove(plugin);
+                } else {
+                    self.statuses.insert(plugin.to_owned(), text.clone());
+                }
+            }
         }
     }
 
@@ -954,6 +968,7 @@ impl Trees {
         self.menu_entries.retain(|id, _| running(id));
         self.webviews.retain(|(id, _), _| running(id));
         self.size_hints.retain(|id, _| running(id));
+        self.statuses.retain(|id, _| running(id));
     }
 
     /// Everything on screen, as the changes that rebuild it.
@@ -1014,6 +1029,12 @@ impl Trees {
                     min_width: *min_width,
                     min_height: *min_height,
                 },
+            });
+        }
+        for (plugin, text) in &self.statuses {
+            out.push(PluginUi {
+                plugin: plugin.clone(),
+                change: PluginUiChange::SidePanelStatus { text: text.clone() },
             });
         }
         out
@@ -1401,5 +1422,32 @@ mod tests {
         let snapshot = trees.snapshot();
         assert_eq!(snapshot.len(), 1);
         assert_eq!(snapshot[0].change, show(PluginWebviewPlace::Stage));
+    }
+
+    #[test]
+    fn the_side_panel_status_is_replayed_until_cleared_or_the_panel_closes() {
+        let mut trees = Trees::default();
+        trees.apply(
+            "board",
+            &PluginUiChange::WebviewShow {
+                place: PluginWebviewPlace::SidePanel,
+                url: "mumcord-web://localhost/board/index.html".into(),
+            },
+        );
+        let status = |text: &str| PluginUiChange::SidePanelStatus { text: text.into() };
+        trees.apply("board", &status("3 drawing"));
+        let snapshot = trees.snapshot();
+        assert_eq!(snapshot.len(), 2);
+        assert_eq!(snapshot[1].change, status("3 drawing"));
+        trees.apply("board", &status(""));
+        assert_eq!(trees.snapshot().len(), 1);
+        trees.apply("board", &status("relay"));
+        trees.apply(
+            "board",
+            &PluginUiChange::WebviewHide {
+                place: PluginWebviewPlace::SidePanel,
+            },
+        );
+        assert!(trees.snapshot().is_empty());
     }
 }

@@ -20,6 +20,7 @@ use super::ServiceEvent;
 use crate::api::host_calls::{HostCall, HostRequest, Picture, PostOutcome, Waiter, reply_channel};
 use crate::api::io::PluginIo;
 use crate::api::webview::{Shown, WebviewPlace, Webviews};
+use crate::api::webview_status::{Admit, StatusLimiter};
 use crate::chat::{self, GestureGate, MessageClaims, Supersede, SupersedeTracker};
 use crate::manifest::Visibility;
 use crate::messaging::{
@@ -114,6 +115,11 @@ pub enum UiUpdate {
         min_width: u32,
         min_height: u32,
     },
+    /// `webview.set-status`: the plain-text line under the side panel; empty clears it.
+    /// Untrusted text, at most 80 characters, without markup or control characters.
+    SidePanelStatus {
+        text: String,
+    },
 }
 
 /// How a switched-on plugin takes part in messaging and chat.
@@ -195,6 +201,7 @@ pub(super) struct ServiceIo {
     keys: Option<PeerKeys>,
     events: UnboundedSender<ServiceEvent>,
     webviews: Arc<Webviews>,
+    statuses: Arc<StatusLimiter>,
     app_menus: crate::api::app_menu::AppMenus,
     stages: Mutex<crate::stage::Stages>,
     relay: Mutex<relay::RelayState>,
@@ -208,6 +215,7 @@ impl ServiceIo {
             keys,
             events,
             webviews: Arc::default(),
+            statuses: Arc::default(),
             app_menus: Default::default(),
             stages: Mutex::default(),
             relay: Mutex::default(),
@@ -290,6 +298,7 @@ impl ServiceIo {
         }
         self.forget_stage(plugin);
         self.webviews.forget(plugin);
+        self.statuses.forget(plugin);
         self.app_menus.forget(plugin);
         self.menu_forget_plugin(plugin);
     }
@@ -298,6 +307,33 @@ impl ServiceIo {
         // The app holds the receiver for as long as plugins run; a closed channel only happens
         // at shutdown, when nobody needs the event any more.
         let _ = self.events.send(event);
+    }
+
+    /// Shows the merged status update once the rate limit allows. A short-lived thread, because
+    /// the plugin may not call again; at most one per plugin waits at a time.
+    fn flush_status_after(&self, id: &str, wait: std::time::Duration) {
+        let plugin = id.to_owned();
+        let statuses = Arc::clone(&self.statuses);
+        let webviews = Arc::clone(&self.webviews);
+        let events = self.events.clone();
+        let spawned = std::thread::Builder::new()
+            .name("plugin-status".into())
+            .spawn(move || {
+                std::thread::sleep(wait);
+                let Some(text) = statuses.flush(&plugin, Instant::now()) else {
+                    return;
+                };
+                if webviews.is_open(&plugin, WebviewPlace::SidePanel) {
+                    let update = UiUpdate::SidePanelStatus { text };
+                    // A closed channel only happens at shutdown.
+                    let _ = events.send(ServiceEvent::Ui { plugin, update });
+                }
+            });
+        if let Err(error) = spawned {
+            // Without the thread the update would wait forever and block later ones.
+            tracing::warn!(%error, "could not schedule a plugin status update");
+            self.statuses.forget(id);
+        }
     }
 
     fn ui(&self, plugin: &str, update: UiUpdate) {
@@ -615,6 +651,18 @@ impl PluginIo for ServiceIo {
         Ok(())
     }
 
+    fn webview_set_status(&self, plugin: &str, text: String) -> Result<(), Error> {
+        if !self.webviews.is_open(plugin, WebviewPlace::SidePanel) {
+            return Err(Error::Invalid);
+        }
+        match self.statuses.admit(plugin, text, Instant::now()) {
+            Admit::Send(text) => self.ui(plugin, UiUpdate::SidePanelStatus { text }),
+            Admit::Schedule(wait) => self.flush_status_after(plugin, wait),
+            Admit::Merged => {}
+        }
+        Ok(())
+    }
+
     fn stage_web_show(&self, plugin: &str, entry: String) -> Result<(), Error> {
         let shown = self.webviews.open_stage(plugin, &entry, Instant::now())?;
         self.shown(plugin, shown);
@@ -916,6 +964,45 @@ mod tests {
             rx.try_recv(),
             Ok(ServiceEvent::Ui { plugin, update: UiUpdate::WebviewShow { .. } }) if plugin == "b"
         ));
+    }
+
+    #[test]
+    fn the_side_panel_status_needs_an_open_side_panel_and_keeps_the_last_quick_update() {
+        let dir = tempfile::tempdir().expect("temp dir");
+        std::fs::write(dir.path().join("index.html"), "<p>hi</p>").expect("page written");
+        let (events, mut rx) = unbounded_channel();
+        let io = ServiceIo::new(None, events);
+        let side = WebviewPlace::SidePanel;
+        io.webviews()
+            .set_root("a", Some(dir.path().to_path_buf()), vec![side]);
+        assert_eq!(io.webview_set_status("a", "x".into()), Err(Error::Invalid));
+        io.webviews()
+            .show("a", side, "index.html", Instant::now())
+            .expect("opened");
+        let mut status = || match rx.try_recv() {
+            Ok(ServiceEvent::Ui {
+                update: UiUpdate::SidePanelStatus { text },
+                ..
+            }) => Some(text),
+            _ => None,
+        };
+        for text in ["1", "2", "3", ""] {
+            assert_eq!(io.webview_set_status("a", text.into()), Ok(()));
+            assert_eq!(status().as_deref(), Some(text));
+        }
+        assert_eq!(io.webview_set_status("a", "5".into()), Ok(()));
+        assert_eq!(io.webview_set_status("a", "last".into()), Ok(()));
+        assert_eq!(status(), None, "over the limit: merged, not sent yet");
+        let deadline = Instant::now() + std::time::Duration::from_secs(3);
+        let flushed = loop {
+            if let Some(text) = status() {
+                break text;
+            }
+            assert!(Instant::now() < deadline, "the merged update never came");
+            std::thread::sleep(std::time::Duration::from_millis(20));
+        };
+        assert_eq!(flushed, "last");
+        assert_eq!(status(), None);
     }
 
     #[test]
