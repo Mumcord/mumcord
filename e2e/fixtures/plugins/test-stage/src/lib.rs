@@ -3,6 +3,8 @@
 //! change (AC-9.15). `test-stage-official` builds the same code under its own id. The stage and
 //! the panel show an event log so the E2E test can read what the plugin received.
 
+mod messages;
+
 use std::cell::RefCell;
 use std::collections::{BTreeSet, VecDeque};
 
@@ -27,6 +29,7 @@ struct State {
     /// The activity seen last, own or someone else's.
     activity: Option<String>,
     late_timer: Option<u32>,
+    pings: u32,
     participants: BTreeSet<u32>,
     log: VecDeque<String>,
 }
@@ -131,7 +134,14 @@ fn act(action: &str) {
             stage::end();
             note("end: ok".to_owned());
         }
-        "ping" => note("ping".to_owned()),
+        "ping" => {
+            note("ping".to_owned());
+            let n = STATE.with_borrow_mut(|s| {
+                s.pings = s.pings.wrapping_add(1);
+                s.pings
+            });
+            note(format!("ping-doc: {}", messages::round_trip(n)));
+        }
         _ => {}
     }
 }

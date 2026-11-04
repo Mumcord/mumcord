@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 mumcord-plugin-sdk = { path = "../../../../crates/plugin-sdk", features = ["1.1"] }
+serde = { version = "1", features = ["derive"] }
 
 [profile.release]
 opt-level = "s"

@@ -5,6 +5,7 @@
 //! it shows every result so the E2E test can read them without entering a frame.
 
 mod bridge;
+mod messages;
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap, VecDeque};
@@ -89,6 +90,7 @@ fn panel() -> ui::El {
         ("http-redirect", "HTTP redirect"),
         ("item-disable", "Disable panel item"),
         ("item-enable", "Enable panel item"),
+        ("bovnar-check", "Bovnar round trip"),
     ];
     let mut controls = ui::list("Controls");
     for (action, label) in buttons {
@@ -159,6 +161,7 @@ fn act(action: &str) {
         "http-redirect" => get(action, &format!("{DECLARED}/redirect")),
         "item-disable" => outcome(action, app_menu::disable("side", "Disabled by the test")),
         "item-enable" => outcome(action, app_menu::enable("side")),
+        "bovnar-check" => note(format!("{action}: {}", messages::round_trip(1))),
         _ => {}
     }
 }

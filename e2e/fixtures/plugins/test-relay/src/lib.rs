@@ -8,6 +8,7 @@ mod messages;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 
+use mumcord_plugin_sdk::bovnar::{self, Destination};
 use mumcord_plugin_sdk::events::Event;
 use mumcord_plugin_sdk::types::{Session, StartInfo};
 use mumcord_plugin_sdk::ui::{self, Slot};
@@ -51,6 +52,7 @@ fn view(with_buttons: bool) -> ui::El {
         ("channel-small-fallback", "Channel small, fallback"),
         ("direct-big", "Direct 64 KiB"),
         ("direct-small-fallback", "Direct small, fallback"),
+        ("channel-malformed", "Channel malformed bytes"),
     ];
     STATE.with_borrow(|s| {
         let mut column = ui::column()
@@ -87,20 +89,37 @@ fn send(action: &str, size: usize, fallback: bool, direct: bool) {
         s.seq = s.seq.wrapping_add(1);
         (s.seq, s.peer.as_ref().map(|(session, _)| *session))
     });
-    let data = messages::encode(seq, size);
+    let Some(message) = messages::message(seq, size) else {
+        note(format!("{action}: cannot build {size} B"));
+        return;
+    };
     let result = if direct {
         match peer {
-            Some(peer) => relay::send_direct(peer, &data, fallback),
+            Some(peer) => {
+                bovnar::send_document(Destination::RelayDirect { peer, fallback }, &message)
+            }
             None => {
                 note(format!("{action}: no peer"));
                 return;
             }
         }
     } else {
-        relay::send_channel(&data, fallback)
+        bovnar::send_document(Destination::RelayChannel { fallback }, &message)
     };
     match result {
         Ok(()) => note(format!("{action}: sent #{seq} {size} B")),
+        // The host's own refusals keep their plain names (`RelayUnavailable`).
+        Err(bovnar::Error::Host(e)) => note(format!("{action}: {e:?}")),
+        Err(e) => note(format!("{action}: {e}")),
+    }
+}
+
+/// Raw bytes that are not a Bovnar document: the receiver's SDK drops them, the host must still
+/// deliver them unchanged.
+fn send_malformed(action: &str) {
+    let data = messages::malformed();
+    match relay::send_channel(&data, true) {
+        Ok(()) => note(format!("{action}: sent {} B", data.len())),
         Err(e) => note(format!("{action}: {e:?}")),
     }
 }
@@ -120,6 +139,7 @@ fn act(action: &str) {
         "channel-small-fallback" => send(action, SMALL, true, false),
         "direct-big" => send(action, BIG, false, true),
         "direct-small-fallback" => send(action, SMALL, true, true),
+        "channel-malformed" => send_malformed(action),
         _ => {}
     }
 }
@@ -152,6 +172,12 @@ impl Plugin for TestRelay {
                         s.peer.get_or_insert((peer.session, peer.name));
                     });
                 }
+                // The SDK has logged the reason and size; the host passes the bytes unchanged.
+                None if data == messages::malformed() => note(format!(
+                    "received malformed {} B dropped, bytes unchanged from {}",
+                    data.len(),
+                    peer.name
+                )),
                 None => note(format!(
                     "received {} B unknown from {}",
                     data.len(),
