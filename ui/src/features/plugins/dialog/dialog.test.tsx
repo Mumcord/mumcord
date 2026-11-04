@@ -20,24 +20,12 @@ vi.mock("../render/usePluginIcon", () => ({
   usePluginIcon: () => "data:image/svg+xml,icon",
 }));
 
-function withDialog(title: string | null, subtitle: string | null = null, webview = false) {
+function withDialog(title: string | null, subtitle: string | null = null) {
   vi.spyOn(store, "usePluginUi").mockReturnValue({
     trees: new Map(),
     dialogs: title === null ? new Map() : new Map([["mumbot-music", { title, subtitle }]]),
     menuEntries: new Map(),
-    webviews: webview
-      ? new Map([
-          [
-            "mumbot-music",
-            new Map([
-              [
-                "dialog",
-                { place: "dialog", url: "mumcord-web://localhost/mumbot-music/index.html", seq: 1 },
-              ],
-            ]),
-          ],
-        ])
-      : new Map(),
+    webviews: new Map(),
   });
 }
 
@@ -63,21 +51,6 @@ describe("PluginDialogHost", () => {
       "",
     );
     expect(screen.getAllByRole("button")).toHaveLength(1);
-  });
-
-  it("gives a web view the large dialog size, and a tree the normal one", () => {
-    withDialog("Rifter", null, true);
-    const { unmount } = render(<PluginDialogHost />);
-    expect(screen.getByRole("dialog", { name: "Rifter" })).toHaveClass(
-      "userpanel-modal__dialog",
-      "plugin-dialog--webview",
-    );
-    unmount();
-    withDialog("Configure bot");
-    render(<PluginDialogHost />);
-    expect(screen.getByRole("dialog", { name: "Configure bot" })).not.toHaveClass(
-      "plugin-dialog--webview",
-    );
   });
 
   it("sends dialog-closed on Escape and on Close", () => {

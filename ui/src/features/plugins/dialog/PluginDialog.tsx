@@ -17,15 +17,23 @@ import {
   usePluginUi,
   type PluginDialogHeader,
 } from "../render/pluginUiStore";
-import { PluginFrame, usePluginWebView } from "../webview";
+import { WebDialog } from "../webdialog";
 import { takeDialogOpener } from "./pluginDialogStore";
 
 /** Renders the open plugin dialog, if any; mount once. */
 export function PluginDialogHost() {
-  const { dialogs } = usePluginUi();
+  const { dialogs, webviews } = usePluginUi();
   // One dialog at a time: the plugin that opened last wins.
   const open = [...dialogs.entries()].at(-1);
-  return open ? <PluginDialog key={open[0]} plugin={open[0]} header={open[1]} /> : null;
+  if (!open) return null;
+  const [plugin, header] = open;
+  // An open web view replaces the dialog tree (FR-6.46) and gets its own dialog (FR-9.40).
+  const webview = webviews.get(plugin)?.get("dialog");
+  return webview ? (
+    <WebDialog key={plugin} plugin={plugin} title={header.title} webview={webview} />
+  ) : (
+    <PluginDialog key={plugin} plugin={plugin} header={header} />
+  );
 }
 
 function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialogHeader }) {
@@ -33,8 +41,6 @@ function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialog
   const { title, subtitle } = header;
   const icon = usePluginIcon(plugin);
   const nodes = usePluginTree(plugin, { kind: "dialog" });
-  // An open web view replaces the dialog tree (FR-6.46).
-  const webview = usePluginWebView(plugin, "dialog");
 
   const close = useCallback(() => {
     // Closed here first: the plugin only gets told, it cannot keep the dialog open.
@@ -63,14 +69,8 @@ function PluginDialog({ plugin, header }: { plugin: string; header: PluginDialog
       icon={icon === null ? undefined : <img src={icon} alt="" />}
       closeLabel={t("close")}
       onClose={close}
-      // A web page (e.g. a fitting wheel) needs more room than a component tree.
-      className={webview ? "plugin-dialog--webview" : undefined}
     >
-      {webview ? (
-        <PluginFrame plugin={plugin} webview={webview} />
-      ) : (
-        nodes && <PluginTree plugin={plugin} slot={{ kind: "dialog" }} nodes={nodes} />
-      )}
+      {nodes && <PluginTree plugin={plugin} slot={{ kind: "dialog" }} nodes={nodes} />}
     </Modal>
   );
 }
