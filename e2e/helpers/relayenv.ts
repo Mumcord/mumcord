@@ -3,11 +3,12 @@
 //
 // The environment lives in the mumpeer repo (`testenv/`). Check it out next to this repo or point
 // `MUMPEER_DIR` at it; e2e/run.sh mounts that folder into the container. Specs that need it call
-// `relayAvailable()` and skip themselves otherwise (CI has no mumpeer checkout).
-import { existsSync, readFileSync, readdirSync, rmSync } from "node:fs";
+// `relayAvailable()` and skip themselves otherwise. CI checks mumpeer out only for the shards that
+// run such specs (scripts/e2e-shards.js groups them).
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { repoRoot } from "./paths.ts";
-import { runOk } from "./run.ts";
+import { run, runOk } from "./run.ts";
 
 /** The relay configurations of mumpeer's testenv (`MUMPEER_PROFILE`). */
 export type RelayProfile = "all" | "no-files" | "no-screen" | "no-images" | "no-broadcast" | "old";
@@ -57,10 +58,64 @@ export interface StartRelayOptions {
   botImage?: string;
 }
 
+const project = process.env.MUMPEER_PROJECT ?? "mumpeer-testenv";
+// testenv/env.sh: the default project keeps its data in data/, others in data/_<project>.
+const dataRoot =
+  project === "mumpeer-testenv"
+    ? testenvScript("data")
+    : join(testenvScript("data"), `_${project}`);
+
 /**
- * Starts (or recreates with another profile) the mumpeer test environment and publishes where it
- * listens as `MUMCORD_E2E_RELAY_HOST` / `MUMCORD_E2E_RELAY_PORT` in this process. The first call
- * builds the mumpeer image, which takes minutes.
+ * What this module knows about the environment across spec files (each spec file runs in its own
+ * worker process): `config` is the running configuration (unset while stopped), `dirty` that a
+ * spec registered users on its server since the last data reset.
+ */
+interface RelayState {
+  config?: string;
+  dirty: boolean;
+}
+
+const stateFile = join(dataRoot, "e2e-state.json");
+
+function readState(): RelayState {
+  if (existsSync(stateFile)) return JSON.parse(readFileSync(stateFile, "utf8")) as RelayState;
+  // No state file but server data: left behind by an older run, so it may hold registrations.
+  return { dirty: existsSync(join(dataRoot, "mumble")) };
+}
+
+function writeState(state: RelayState): void {
+  mkdirSync(dataRoot, { recursive: true });
+  writeFileSync(stateFile, JSON.stringify(state));
+}
+
+/**
+ * Whether the running environment can serve the next spec file as is: all three services are up
+ * (a spec may stop the relay bot) and the relay carries no session of a previous spec file.
+ */
+async function reusable(): Promise<boolean> {
+  const running = await run("docker", [
+    "ps",
+    "-q",
+    "--filter",
+    `label=com.docker.compose.project=${project}`,
+    "--filter",
+    "status=running",
+  ]);
+  if (running.code !== 0 || running.stdout.trim().split("\n").length !== 3) return false;
+  try {
+    return (await relayStatus()).sessions === 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Starts the mumpeer test environment with a profile, or switches the running one to it, and
+ * publishes where it listens as `MUMCORD_E2E_RELAY_HOST` / `MUMCORD_E2E_RELAY_PORT` in this
+ * process. The environment is shared by the spec files of a run (wdio.conf.ts stops it at the
+ * end): an idle one with the same configuration is reused as is, and one whose server got
+ * registrations is wiped first, so every spec file starts on an empty server without anyone else's
+ * relay sessions. Without `MUMPEER_IMAGE` the first call builds the mumpeer image (minutes).
  */
 export async function startRelay(
   profile: RelayProfile = "all",
@@ -69,10 +124,7 @@ export async function startRelay(
   if (!relayAvailable()) {
     throw new Error(`no mumpeer testenv at ${mumpeerDir} (set MUMPEER_DIR to a mumpeer checkout)`);
   }
-  const env: NodeJS.ProcessEnv = { MUMPEER_PROFILE: profile };
-  if (opts.image) env.MUMPEER_IMAGE = opts.image;
-  if (opts.botImage) env.MUMBOT_IMAGE = opts.botImage;
-  await runOk(testenvScript("up.sh"), [], env);
+  const config = JSON.stringify({ profile, image: opts.image, botImage: opts.botImage });
   current = {
     profile,
     host: process.env.MUMPEER_PUBLIC_HOST ?? "127.0.0.1",
@@ -80,37 +132,63 @@ export async function startRelay(
     relayPort: portBase + 1,
     apiPort: portBase + 2,
   };
-  process.env.MUMCORD_E2E_RELAY_HOST = current.host;
-  process.env.MUMCORD_E2E_RELAY_PORT = String(current.port);
+  const state = readState();
+  if (state.dirty) {
+    await resetRelayData();
+  } else if (state.config === config && (await reusable())) {
+    console.log(`[relayenv] reusing the running '${profile}' environment`);
+    publish(current);
+    return current;
+  }
+  const env: NodeJS.ProcessEnv = { MUMPEER_PROFILE: profile };
+  if (opts.image) env.MUMPEER_IMAGE = opts.image;
+  if (opts.botImage) env.MUMBOT_IMAGE = opts.botImage;
+  // up.sh recreates the relay and the server with the new profile; no stop needed in between.
+  await runOk(testenvScript("up.sh"), [], env);
+  writeState({ config, dirty: false });
+  publish(current);
   return current;
 }
 
-/** Stops the environment (no-op if nothing runs); data, secret and relay key are kept. */
+function publish(r: Relay): void {
+  process.env.MUMCORD_E2E_RELAY_HOST = r.host;
+  process.env.MUMCORD_E2E_RELAY_PORT = String(r.port);
+}
+
+/**
+ * Notes that a user registers on the environment's server: the relay bot hands out tokens to
+ * registered users only, and a registered name would lock later spec files (with new
+ * certificates) out, so the next `startRelay` wipes the server data first.
+ */
+export function noteRegistration(): void {
+  if (relayAvailable()) writeState({ ...readState(), dirty: true });
+}
+
+/**
+ * Stops the environment `startRelay` started (no-op otherwise); data, secret and relay key are
+ * kept.
+ */
 export async function stopRelay(): Promise<void> {
-  if (!relayAvailable()) return;
+  if (!relayAvailable() || readState().config === undefined) return;
   await runOk(testenvScript("down.sh"), []);
+  writeState({ dirty: readState().dirty });
   current = undefined;
 }
 
 /**
  * Stops the environment and deletes its data: the server database with every registration, the
- * relay key and the relay bot's identity. Specs whose users register (the relay bot hands out
- * tokens to registered users only) start with this, so a name a previous spec file registered
- * with another identity is free again.
+ * relay key and the relay bot's identity.
  */
-export async function resetRelayData(): Promise<void> {
-  if (!relayAvailable()) return;
-  await stopRelay();
-  const project = process.env.MUMPEER_PROJECT ?? "mumpeer-testenv";
-  const data = testenvScript("data");
+async function resetRelayData(): Promise<void> {
+  await runOk(testenvScript("down.sh"), []);
   if (project !== "mumpeer-testenv") {
-    rmSync(join(data, `_${project}`), { recursive: true, force: true });
+    rmSync(dataRoot, { recursive: true, force: true });
     return;
   }
   // The default project's data sits next to the folders of parallel runs (`_<project>`).
-  if (!existsSync(data)) return;
-  for (const entry of readdirSync(data)) {
-    if (!entry.startsWith("_")) rmSync(join(data, entry), { recursive: true, force: true });
+  if (!existsSync(dataRoot)) return;
+  for (const entry of readdirSync(dataRoot)) {
+    if (!entry.startsWith("_")) rmSync(join(dataRoot, entry), { recursive: true, force: true });
   }
 }
 

@@ -62,12 +62,9 @@ async function connect(name: string, port: number): Promise<void> {
     plain?.stop();
     await apps.stopC();
     await apps.stopB();
-    // Registered names would lock later specs out: leave an empty server behind.
-    await relayenv.resetRelayData();
   });
 
   it("setup: Alice, Bob and Carol in the channel of a relay that allows files", async () => {
-    await relayenv.resetRelayData();
     port = (await relayenv.startRelay("all")).port;
     // O, a plain Mumble client, listens for the fallback line from the start.
     plain = botInBackground(["script"], { name: "Olga", port, timeout: 300 });

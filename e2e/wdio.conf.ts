@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { browser } from "@wdio/globals";
 import { capabilities, driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
 import { browserB, browserC, runningB, runningC, stopB, stopC } from "./helpers/apps.ts";
-import { netsim } from "./helpers/index.ts";
+import { netsim, relayenv } from "./helpers/index.ts";
 import { artifactsDir } from "./helpers/paths.ts";
 
 const e2eDir = dirname(fileURLToPath(import.meta.url));
@@ -55,6 +55,11 @@ export const config: WebdriverIO.Config = {
   framework: "mocha",
   mochaOpts: { ui: "bdd", timeout: 180_000 },
   reporters: ["spec"],
+
+  // The relay environment outlives the spec files that share it (helpers/relayenv.ts).
+  onComplete: async () => {
+    await relayenv.stopRelay();
+  },
 
   beforeSession: async () => {
     await prepareFresh();

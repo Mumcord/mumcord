@@ -199,7 +199,6 @@ async function expectFullSizeNote(expected: string): Promise<void> {
 
   after(async () => {
     await apps.stopB();
-    await relayenv.stopRelay();
   });
 
   it("AC-7.1: the default relay allows everything and says so in server info", async () => {

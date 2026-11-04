@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { appPid, type AppId } from "./app.ts";
 import { repoRoot } from "./paths.ts";
+import * as relayenv from "./relayenv.ts";
 import { run, runOk } from "./run.ts";
 
 /** A new folder for the files one test offers. */
@@ -99,6 +100,7 @@ export async function pickInFileDialog(title: string, path: string): Promise<voi
  * relay bot hands out relay tokens to registered users only.
  */
 export async function registerOnServer(): Promise<void> {
+  relayenv.noteRegistration();
   const gear = $('button[aria-label="Quick settings"]');
   await gear.waitForClickable();
   await gear.click();
