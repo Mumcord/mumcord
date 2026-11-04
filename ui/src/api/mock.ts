@@ -784,8 +784,9 @@ function demoChannels(serverName: string): ChannelInfo[] {
     parentId,
     name,
     position,
-    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172).
-    permissions: { ...allow, moveUsers: true },
+    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), and the
+    // server menu offers the ban list (#436).
+    permissions: { ...allow, moveUsers: true, ban: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -2081,6 +2082,8 @@ export function createMockApi(options: MockOptions = {}): MockApi {
   /** In-memory ban lists for the Server administration window (issue #254). */
   const banLists = new Map<number, BanEntry[]>();
 
+  // A mixed list for screenshots: active and expired entries, one without a name, one network
+  // ban, and only documentation addresses (issue #436).
   function seedBans(): BanEntry[] {
     return [
       {
@@ -2104,6 +2107,50 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         start: "2026-10-01T09:00:00.000Z",
         durationSecs: 0,
         expired: false,
+      },
+      {
+        key: "198.51.100.23/32|7c2b8d0e5a1f3c9b6e4d2a8f0b7c5d3e1a9f6b4c",
+        name: "Ben",
+        certHash: "7c2b8d0e5a1f3c9b6e4d2a8f0b7c5d3e1a9f6b4c",
+        address: "198.51.100.23",
+        mask: 32,
+        reason: "spam links",
+        start: "2026-11-01T10:00:00.000Z",
+        durationSecs: 2_592_000,
+        expired: false,
+      },
+      {
+        key: "192.0.2.0/24|",
+        name: null,
+        certHash: null,
+        address: "192.0.2.0",
+        mask: 24,
+        reason: "repeated joins from one network",
+        start: "2026-09-14T08:00:00.000Z",
+        durationSecs: 0,
+        expired: false,
+      },
+      {
+        key: "192.0.2.44/32|5e1d9c3b7a2f6048d5b8e1c4a7f2d9b6e3c0a5f8",
+        name: "Priya",
+        certHash: "5e1d9c3b7a2f6048d5b8e1c4a7f2d9b6e3c0a5f8",
+        address: "192.0.2.44",
+        mask: 32,
+        reason: "flooding in Music Room",
+        start: "2026-10-20T18:00:00.000Z",
+        durationSecs: 86_400,
+        expired: true,
+      },
+      {
+        key: "203.0.113.77/32|",
+        name: "Tim",
+        certHash: null,
+        address: "203.0.113.77",
+        mask: 32,
+        reason: "abuse",
+        start: "2026-10-05T12:00:00.000Z",
+        durationSecs: 604_800,
+        expired: true,
       },
     ];
   }
