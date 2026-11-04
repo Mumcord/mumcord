@@ -278,6 +278,10 @@
   width: min(36rem, calc(100vw - 2 * var(--space-4)));
 }
 
+.plugin-review__notes {
+  font-size: var(--font-size-sm);
+}
+
 .plugin-review__alert {
   padding: var(--space-3);
   border: 1px solid color-mix(in srgb, var(--color-danger) 60%, transparent);

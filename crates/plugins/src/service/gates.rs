@@ -296,6 +296,8 @@ pub struct UpdateReview {
     pub needs_high_risk_confirm: bool,
     /// The user already gave that tick for this version.
     pub high_risk_confirmed: bool,
+    /// The author's release notes for the new version (an https link), when the registry has one.
+    pub notes_url: Option<String>,
 }
 
 /// Builds the review of an update from the installed and the new version's websites and
@@ -347,6 +349,7 @@ pub fn update_review(
         recent_change: recent_change(new),
         needs_high_risk_confirm,
         high_risk_confirmed: needs_high_risk_confirm && high_risk_confirmed,
+        notes_url: None,
     }
 }
 

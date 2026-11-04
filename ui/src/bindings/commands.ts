@@ -3595,6 +3595,8 @@ export type PluginUpdateReview = {
 	 */
 	needsHighRiskConfirm: boolean,
 	highRiskConfirmed: boolean,
+	/**  The author's release notes for the new version: an https link, or `None`. */
+	notesUrl: string | null,
 };
 
 /**  How plugin updates are handled. */

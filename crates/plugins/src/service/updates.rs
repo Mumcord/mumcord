@@ -554,13 +554,14 @@ impl PluginService {
         let new_origins = canonical(version.origins.iter().map(String::as_str));
         let old_score = self.listing_score(source, &record.id, &record.version);
         let new_score = self.listing_score(source, &record.id, &version.version);
-        let review = self.review(
+        let mut review = self.review(
             &record.id,
             &version.version,
             (&old_origins, &new_origins),
             &self.declared_purposes(&record.id),
             (old_score.as_ref(), new_score.as_ref()),
         );
+        review.notes_url.clone_from(&version.notes_url);
         let hold = match self
             .updates
             .gate_held

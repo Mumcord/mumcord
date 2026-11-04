@@ -79,6 +79,7 @@
     "newWebsites_other": "Deze update wil communiceren met {{count}} nieuwe websites.",
     "staysOn": "{{name}} blijft op {{version}} tot jij beslist.",
     "otherDomain": "Een ervan staat niet op het eigen domein van de plug-in.",
+    "whatsNew": "Wat is er nieuw in {{version}}",
     "websitesLead": "{{name}} en de bijbehorende pagina zouden dan toegang hebben tot:",
     "websitesWarning": "Deze websites kunnen je IP-adres zien en alles wat {{name}} hun stuurt.",
     "websitesLabel": "Websites",

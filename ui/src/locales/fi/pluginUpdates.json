@@ -79,6 +79,7 @@
     "newWebsites_other": "Tämä päivitys haluaa ottaa yhteyttä {{count}} uuteen verkkosivustoon.",
     "staysOn": "{{name}} pysyy versiossa {{version}}, kunnes päätät.",
     "otherDomain": "Yksi niistä ei ole lisäosan omalla verkkotunnuksella.",
+    "whatsNew": "Uutta versiossa {{version}}",
     "websitesLead": "{{name}} ja sen sivu voisivat sitten ottaa yhteyttä näihin:",
     "websitesWarning": "Nämä verkkosivustot näkevät IP-osoitteesi ja kaiken, mitä {{name}} niille lähettää.",
     "websitesLabel": "Verkkosivustot",

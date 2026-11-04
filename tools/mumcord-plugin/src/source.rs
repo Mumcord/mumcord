@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use mumcord_plugins::manifest;
-use mumcord_plugins::registry::Revocation;
+use mumcord_plugins::registry::{MAX_NOTES_URL_LEN, Revocation, is_notes_url};
 use mumcord_plugins::version::ApiMinor;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -88,6 +88,10 @@ pub struct VersionFile {
     /// The origins the manifest declares (`net.origins`), listed in the format-2 index.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub origins: Vec<String>,
+    /// Where the author explains what changed in this version (https, at most 512 characters);
+    /// listed in the format-2 index only.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes_url: Option<String>,
 }
 
 /// The API minor of a version: `1` (written by 0.6-era tools, meaning 1.0) or `"1.1"`. 1.0 is
@@ -213,6 +217,14 @@ fn load_plugin(repo: &Path, id: String) -> Result<SourcePlugin> {
             }
             registry::check_min_mumcord(version.api.0, version.min_mumcord.as_deref())
                 .with_context(|| path.display().to_string())?;
+            if let Some(url) = &version.notes_url
+                && !is_notes_url(url)
+            {
+                bail!(
+                    "{}: notes_url must be an https URL of at most {MAX_NOTES_URL_LEN} characters",
+                    path.display()
+                );
+            }
             versions.push(version);
         }
     }
@@ -288,6 +300,7 @@ pub mod tests {
                 },
                 min_mumcord: None,
                 origins: Vec::new(),
+                notes_url: None,
             };
             fs::write(
                 version_path(repo, id, version),
@@ -335,6 +348,24 @@ pub mod tests {
         };
         assert_eq!(write(ApiMinor::V1_0), "api = 1\n");
         assert_eq!(write(ApiMinor::V1_1), "api = \"1.1\"\n");
+    }
+
+    #[test]
+    fn rejects_a_notes_url_that_is_not_https() {
+        let repo = tempfile::tempdir().expect("test step");
+        write_plugin(repo.path(), "dice", &["1.0.0"]);
+        let path = version_path(repo.path(), "dice", "1.0.0");
+        let text = fs::read_to_string(&path).expect("test step");
+        fs::write(
+            &path,
+            format!("{text}notes_url = \"http://example.org/n\"\n"),
+        )
+        .expect("test step");
+        let error = format!(
+            "{:#}",
+            load_plugins(repo.path()).err().expect("http is refused")
+        );
+        assert!(error.contains("notes_url"), "{error}");
     }
 
     #[test]

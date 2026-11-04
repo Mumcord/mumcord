@@ -58,6 +58,7 @@ const update: PluginUpdate = {
     risk: null,
     needsHighRiskConfirm: false,
     highRiskConfirmed: false,
+    notesUrl: null,
   },
 };
 
@@ -264,6 +265,7 @@ const held: PluginUpdate = {
     risk,
     needsHighRiskConfirm: true,
     highRiskConfirmed: false,
+    notesUrl: null,
   },
 };
 
@@ -283,6 +285,7 @@ const websites: PluginUpdate = {
     risk: null,
     needsHighRiskConfirm: false,
     highRiskConfirmed: false,
+    notesUrl: null,
   },
 };
 
@@ -420,6 +423,23 @@ describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", 
     expect(screen.getByText("“experimental features”")).toBeInTheDocument();
     expect(screen.getByText("match history")).toBeInTheDocument();
     expect(dialog).not.toHaveTextContent("“rankings”");
+  });
+
+  it("links to the release notes through the safe external-link path, only when there are some", async () => {
+    setup([{ ...held, review: { ...held.review, notesUrl: "https://poll.example/notes/1.2.0" } }]);
+    const openLink = vi.spyOn(getApi(), "openLink").mockResolvedValue(null);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    fireEvent.click(await screen.findByRole("link", { name: "What's new in 1.2.0" }));
+    expect(openLink).toHaveBeenCalledWith("https://poll.example/notes/1.2.0");
+  });
+
+  it("shows no release-notes link when the author gave none", async () => {
+    setup([held]);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    await screen.findByRole("dialog");
+    expect(screen.queryByRole("link", { name: /What's new/u })).not.toBeInTheDocument();
   });
 
   it("shows an unofficial source as a dashed chip", async () => {

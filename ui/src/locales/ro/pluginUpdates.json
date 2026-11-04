@@ -81,6 +81,7 @@
     "newWebsites_other": "Această actualizare dorește să comunice cu {{count}} de site-uri web noi.",
     "staysOn": "{{name}} rămâne pe {{version}} până decizi tu.",
     "otherDomain": "Unul dintre ele nu se află pe domeniul propriu al pluginului.",
+    "whatsNew": "Ce este nou în versiunea {{version}}",
     "websitesLead": "{{name}} și pagina sa ar putea accesa apoi:",
     "websitesWarning": "Aceste site-uri web îți pot vedea adresa IP și tot ce le trimite {{name}}.",
     "websitesLabel": "Site-uri web",

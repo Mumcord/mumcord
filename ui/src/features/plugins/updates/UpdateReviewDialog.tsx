@@ -6,6 +6,7 @@ import { usePermissionText } from "../permissions/usePermissionText";
 import "../permissions/permissions.css";
 import "../prompt/prompt.css";
 import { EffectText, ScoreChip, ScoreMeter } from "../score";
+import { openInBrowser } from "../../chat/openLink";
 import { newPermissionsOf, scoredOf } from "./reviewData";
 
 /** Versions the score looks back on for a recently added permission (term H of the spec 09 score). */
@@ -125,6 +126,21 @@ export function UpdateReviewDialog({
       icon={icon}
       subtitle={<p className="plugin-review__subtitle">{subtitle}</p>}
     >
+      {review.notesUrl !== null && (
+        <p className="plugin-review__notes">
+          <a
+            href={review.notesUrl}
+            rel="noreferrer noopener"
+            onClick={(event) => {
+              event.preventDefault();
+              if (review.notesUrl !== null) openInBrowser(review.notesUrl);
+            }}
+          >
+            {t("dialog.whatsNew", { version: update.to })}
+          </a>
+        </p>
+      )}
+
       {newOrigins > 0 && (
         <div className="plugin-review__alert" role="note">
           <p>

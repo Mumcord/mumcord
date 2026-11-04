@@ -79,6 +79,7 @@
     "newWebsites_other": "Ez a frissítés {{count}} új weboldallal akar kommunikálni.",
     "staysOn": "A(z) {{name}} a(z) {{version}} verzión marad, amíg nem döntesz.",
     "otherDomain": "Az egyik nem a bővítmény saját domainjén van.",
+    "whatsNew": "Újdonságok a {{version}} verzióban",
     "websitesLead": "A(z) {{name}} és az oldala ezután elérhetné ezeket:",
     "websitesWarning": "Ezek a weboldalak látják az IP-címedet és mindent, amit a(z) {{name}} küld nekik.",
     "websitesLabel": "Weboldalak",

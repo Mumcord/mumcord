@@ -85,6 +85,7 @@
     "newWebsites_other": "Ba mhaith leis an nuashonrú seo labhairt le {{count}} suíomh gréasáin nua.",
     "staysOn": "Fanann {{name}} ar {{version}} go gcinnfidh tú.",
     "otherDomain": "Níl ceann acu ar fhearann an bhreiseáin féin.",
+    "whatsNew": "Cad atá nua i {{version}}",
     "websitesLead": "Ina dhiaidh sin, d'fhéadfadh {{name}} agus a leathanach teacht ar:",
     "websitesWarning": "Is féidir leis na suíomhanna gréasáin seo do sheoladh IP agus aon rud a sheolann {{name}} chucu a fheiceáil.",
     "websitesLabel": "Suíomhanna gréasáin",

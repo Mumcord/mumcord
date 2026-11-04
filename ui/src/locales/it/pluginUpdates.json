@@ -81,6 +81,7 @@
     "newWebsites_other": "Questo aggiornamento vuole comunicare con {{count}} nuovi siti web.",
     "staysOn": "{{name}} resta sulla {{version}} finché non decidi.",
     "otherDomain": "Uno di questi non appartiene al dominio del plugin.",
+    "whatsNew": "Novità della {{version}}",
     "websitesLead": "{{name}} e la sua pagina potrebbero poi raggiungere:",
     "websitesWarning": "Questi siti web possono vedere il tuo indirizzo IP e tutto ciò che {{name}} invia loro.",
     "websitesLabel": "Siti web",

@@ -79,6 +79,7 @@
     "newWebsites_other": "Denne opdatering vil kontakte {{count}} nye websteder.",
     "staysOn": "{{name}} bliver på {{version}}, indtil du beslutter dig.",
     "otherDomain": "Et af dem ligger ikke på pluginets eget domæne.",
+    "whatsNew": "Nyt i {{version}}",
     "websitesLead": "{{name}} og dets side kunne så nå:",
     "websitesWarning": "Disse websteder kan se din IP-adresse og alt, hvad {{name}} sender dem.",
     "websitesLabel": "Websteder",

@@ -112,6 +112,7 @@ pub fn run(args: Args) -> Result<()> {
         source,
         min_mumcord: None,
         origins: info.origins(),
+        notes_url: None,
     };
     fs::create_dir_all(version_path.parent().context("no parent")?)?;
     fs::write(&version_path, toml::to_string(&file)?)?;

@@ -83,6 +83,7 @@
     "newWebsites_other": "Ta aktualizacja chce łączyć się z {{count}} nowej strony.",
     "staysOn": "{{name}} zostaje przy wersji {{version}}, dopóki nie zdecydujesz.",
     "otherDomain": "Jedna z nich nie należy do domeny wtyczki.",
+    "whatsNew": "Co nowego w wersji {{version}}",
     "websitesLead": "{{name}} i jej strona mogłyby wtedy łączyć się z:",
     "websitesWarning": "Te strony widzą Twój adres IP i wszystko, co wyśle im {{name}}.",
     "websitesLabel": "Strony internetowe",

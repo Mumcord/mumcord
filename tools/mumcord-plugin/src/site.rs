@@ -149,6 +149,7 @@ fn listed_plugin(
             published: v.published.clone(),
             min_mumcord: v.min_mumcord.clone(),
             origins: v.origins.clone(),
+            notes_url: v.notes_url.clone(),
         })
         .collect();
     Ok(ListedPlugin {
@@ -188,7 +189,7 @@ mod tests {
             let text = fs::read_to_string(&path).expect("test step");
             let text = text.replace(
                 "api = 1",
-                "api = \"1.1\"\nmin_mumcord = \"0.7\"\norigins = [\"https://api.example\"]",
+                "api = \"1.1\"\nmin_mumcord = \"0.7\"\norigins = [\"https://api.example\"]\nnotes_url = \"https://example.org/notes\"",
             );
             fs::write(&path, text).expect("test step");
         }
@@ -221,6 +222,11 @@ mod tests {
         assert_eq!(dice["versions"][1]["api"], "1.1");
         assert_eq!(dice["versions"][1]["min_mumcord"], "0.7");
         assert_eq!(dice["versions"][1]["origins"][0], "https://api.example");
+        assert_eq!(
+            dice["versions"][1]["notes_url"],
+            "https://example.org/notes"
+        );
+        assert!(dice["versions"][0].get("notes_url").is_none());
         assert_eq!(v2["plugins"][1]["id"], "stage");
 
         // The client reads the v1.1 index too and picks 1.1.0 only from 0.7 on (AC-9.26 unit).

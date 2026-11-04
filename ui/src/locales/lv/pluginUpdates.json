@@ -81,6 +81,7 @@
     "newWebsites_other": "Šis atjauninājums vēlas sazināties ar {{count}} jaunām tīmekļa vietnēm.",
     "staysOn": "{{name}} paliek pie {{version}}, līdz izlemsi.",
     "otherDomain": "Viena no tām nav paša spraudņa domēnā.",
+    "whatsNew": "Kas jauns versijā {{version}}",
     "websitesLead": "{{name}} un tā lapa tad varētu sazināties ar:",
     "websitesWarning": "Šīs vietnes var redzēt tavu IP adresi un visu, ko {{name}} tām sūta.",
     "websitesLabel": "Vietnes",

@@ -81,6 +81,7 @@
     "newWebsites_other": "Ovo ažuriranje želi komunicirati s {{count}} novih web stranica.",
     "staysOn": "{{name}} ostaje na {{version}} dok ne odlučiš.",
     "otherDomain": "Jedna od njih nije na vlastitoj domeni dodatka.",
+    "whatsNew": "Što je novo u verziji {{version}}",
     "websitesLead": "{{name}} i njegova stranica tada bi mogli doseći:",
     "websitesWarning": "Ove web stranice vide tvoju IP adresu i sve što im {{name}} pošalje.",
     "websitesLabel": "Web stranice",

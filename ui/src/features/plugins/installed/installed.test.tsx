@@ -51,6 +51,7 @@ const noReview = {
   risk: null,
   needsHighRiskConfirm: false,
   highRiskConfirmed: false,
+  notesUrl: null,
   permissionEffects: [],
   recentChange: null,
 };

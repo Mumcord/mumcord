@@ -73,6 +73,7 @@ impl PackageInfo {
             published,
             min_mumcord: None,
             origins: self.origins(),
+            notes_url: None,
         }
     }
 }
@@ -99,6 +100,7 @@ pub struct ListedVersion {
     pub published: String,
     pub min_mumcord: Option<String>,
     pub origins: Vec<String>,
+    pub notes_url: Option<String>,
 }
 
 impl ListedVersion {
@@ -125,6 +127,7 @@ impl ListedVersion {
             permissions: self.permissions.clone(),
             min_mumcord: self.min_mumcord.clone(),
             origins: self.origins.clone(),
+            notes_url: self.notes_url.clone(),
             modules: None,
             reproducible: None,
         }
@@ -410,6 +413,7 @@ pub mod tests {
             published: published.into(),
             min_mumcord: (api == ApiMinor::V1_1).then(|| "0.7".into()),
             origins: vec!["https://api.example".into()],
+            notes_url: None,
         }
     }
 

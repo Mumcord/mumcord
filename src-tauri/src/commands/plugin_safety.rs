@@ -441,6 +441,8 @@ pub struct PluginUpdateReview {
     /// (`plugin_confirm_update_high_risk`).
     pub needs_high_risk_confirm: bool,
     pub high_risk_confirmed: bool,
+    /// The author's release notes for the new version: an https link, or `None`.
+    pub notes_url: Option<String>,
 }
 
 impl PluginUpdateReview {
@@ -481,6 +483,7 @@ impl From<UpdateReview> for PluginUpdateReview {
             }),
             needs_high_risk_confirm: review.needs_high_risk_confirm,
             high_risk_confirmed: review.high_risk_confirmed,
+            notes_url: review.notes_url,
         }
     }
 }
@@ -596,6 +599,7 @@ mod tests {
             }),
             needs_high_risk_confirm: true,
             high_risk_confirmed: false,
+            notes_url: None,
         });
         assert!(review.origins[0].new);
         assert!(review.origins[0].other_domain);
@@ -633,6 +637,7 @@ mod tests {
             recent_change: None,
             needs_high_risk_confirm: false,
             high_risk_confirmed: false,
+            notes_url: None,
         };
 
         // Without the new package a new website stays without a purpose.

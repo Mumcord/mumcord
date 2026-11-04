@@ -83,6 +83,7 @@
     "newWebsites_other": "Tato aktualizace chce komunikovat s {{count}} novými weby.",
     "staysOn": "{{name}} zůstane na verzi {{version}}, dokud se nerozhodneš.",
     "otherDomain": "Jeden z nich není na vlastní doméně doplňku.",
+    "whatsNew": "Co je nového ve verzi {{version}}",
     "websitesLead": "{{name}} a jeho stránka by pak mohly komunikovat s:",
     "websitesWarning": "Tyto weby vidí tvoji IP adresu a vše, co jim {{name}} pošle.",
     "websitesLabel": "Weby",

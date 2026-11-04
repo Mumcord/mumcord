@@ -79,6 +79,7 @@
     "newWebsites_other": "This update wants to talk to {{count}} new websites.",
     "staysOn": "{{name}} stays on {{version}} until you decide.",
     "otherDomain": "One of them is not on the plugin's own domain.",
+    "whatsNew": "What's new in {{version}}",
     "websitesLead": "{{name}} and its page could then reach:",
     "websitesWarning": "These websites can see your IP address and anything {{name}} sends them.",
     "websitesLabel": "Websites",

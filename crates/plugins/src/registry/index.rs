@@ -126,6 +126,10 @@ pub struct IndexVersion {
     /// Score input: the network origins the version declares.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub origins: Vec<String>,
+    /// Where the author explains what changed in this version (format 2, optional): https only,
+    /// at most [`MAX_NOTES_URL_LEN`] characters. Anything else is dropped when the index is read.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes_url: Option<String>,
     /// Score input: number of WASM modules in the package.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub modules: Option<u32>,
@@ -332,8 +336,10 @@ fn check_plugin(
         IndexKind::Repository { .. } => MAX_PACKAGE_BYTES,
     };
     let mut versions = HashSet::new();
-    for version in &plugin.versions {
-        if semver::Version::parse(&version.version).is_err() || !versions.insert(&version.version) {
+    for version in &mut plugin.versions {
+        if semver::Version::parse(&version.version).is_err()
+            || !versions.insert(version.version.clone())
+        {
             return Err(invalid("bad or duplicate version"));
         }
         if version.size == 0 || version.size > max_size {
@@ -357,6 +363,16 @@ fn check_plugin(
         {
             return Err(invalid("bad origins"));
         }
+        if let Some(url) = &version.notes_url
+            && !is_notes_url(url)
+        {
+            tracing::warn!(
+                plugin = plugin.id,
+                version = version.version,
+                "ignoring a release-notes link that is not a short https URL"
+            );
+            version.notes_url = None;
+        }
     }
     Ok(plugin)
 }
@@ -364,6 +380,15 @@ fn check_plugin(
 /// The index only repeats a manifest's origin list, so the same bound applies (FR-9.25).
 const MAX_VERSION_ORIGINS: usize = crate::origins::MAX_ORIGINS;
 const MAX_ORIGIN_LEN: usize = 300;
+/// Longest release-notes link accepted from a registry.
+pub const MAX_NOTES_URL_LEN: usize = 512;
+
+/// A release-notes link must be a plain `https` URL; the link opens in the user's browser.
+pub fn is_notes_url(text: &str) -> bool {
+    text.len() <= MAX_NOTES_URL_LEN
+        && reqwest::Url::parse(text)
+            .is_ok_and(|url| url.scheme() == "https" && url.host().is_some())
+}
 
 /// The optional details fields come from the repository, so they are length-limited and checked
 /// before the UI shows them.
@@ -556,6 +581,27 @@ pub(super) mod tests {
         let entry = dice.entry(dice.version("1.0.0").expect("test step"));
         assert_eq!(entry.digest.sha256, [0xab; 32]);
         assert_eq!(entry.permissions, vec!["chat.send".to_owned()]);
+    }
+
+    #[test]
+    fn notes_url_is_kept_only_when_it_is_a_short_https_url() {
+        let long = format!("https://example.org/{}", "a".repeat(MAX_NOTES_URL_LEN));
+        let cases = [
+            (json!("https://example.org/notes/2.0"), true),
+            (json!("http://example.org/notes"), false),
+            (json!("javascript:alert(1)"), false),
+            (json!("not a url"), false),
+            (json!(long), false),
+        ];
+        for (value, kept) in cases {
+            let mut v = entry("2.0.0", json!("1.1"), None);
+            v["notes_url"] = value.clone();
+            let p = with_versions(vec![v]);
+            let got = p.version("2.0.0").expect("test step").notes_url.clone();
+            assert_eq!(got.is_some(), kept, "{value}");
+        }
+        let p = with_versions(vec![entry("2.0.0", json!("1.1"), None)]);
+        assert_eq!(p.version("2.0.0").expect("test step").notes_url, None);
     }
 
     #[test]

@@ -83,6 +83,7 @@
     "newWebsites_other": "Ta posodobitev želi komunicirati s {{count}} novimi spletnimi mesti.",
     "staysOn": "{{name}} ostane na {{version}}, dokler se ne odločiš.",
     "otherDomain": "Eno od njih ni na lastni domeni vtičnika.",
+    "whatsNew": "Kaj je novega v različici {{version}}",
     "websitesLead": "{{name}} in njegova stran bi potem lahko dosegla:",
     "websitesWarning": "Ta spletna mesta vidijo tvoj naslov IP in vse, kar jim pošlje {{name}}.",
     "websitesLabel": "Spletna mesta",

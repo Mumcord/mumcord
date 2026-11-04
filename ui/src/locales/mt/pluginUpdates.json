@@ -85,6 +85,7 @@
     "newWebsites_other": "Dan l-aġġornament irid jikkellem {{count}} siti web ġodda.",
     "staysOn": "{{name}} jibqa' fuq {{version}} sakemm tiddeċiedi.",
     "otherDomain": "Wieħed minnhom mhux fid-dominju tal-plugin stess.",
+    "whatsNew": "X'hemm ġdid fil-verżjoni {{version}}",
     "websitesLead": "{{name}} u l-paġna tiegħu mbagħad jistgħu jaslu għal:",
     "websitesWarning": "Dawn is-siti web jistgħu jaraw l-indirizz IP tiegħek u kull ma {{name}} jibgħatilhom.",
     "websitesLabel": "Siti web",

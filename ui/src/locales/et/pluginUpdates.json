@@ -79,6 +79,7 @@
     "newWebsites_other": "See uuendus soovib suhelda {{count}} uue veebisaidiga.",
     "staysOn": "{{name}} jääb versioonile {{version}}, kuni otsustad.",
     "otherDomain": "Üks neist ei asu plugina enda domeenil.",
+    "whatsNew": "Mis on uut versioonis {{version}}",
     "websitesLead": "{{name}} ja selle leht pääseksid siis ligi nendele:",
     "websitesWarning": "Need veebisaidid näevad sinu IP-aadressi ja kõike, mida {{name}} neile saadab.",
     "websitesLabel": "Veebisaidid",

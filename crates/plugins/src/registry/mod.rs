@@ -23,7 +23,7 @@ mod test_server;
 pub use fetch::{Client, Download, UrlPolicy};
 pub use index::{
     Choice, IGNORED_PREFIX_TEXT, Ignored, IgnoredReason, Index, IndexKind, IndexPlugin,
-    IndexVersion, KeyRotation, RepositoryInfo, Screenshot,
+    IndexVersion, KeyRotation, MAX_NOTES_URL_LEN, RepositoryInfo, Screenshot, is_notes_url,
 };
 pub use keys::{key_fingerprint, key_fingerprint_prefix, normalize_key};
 pub use media::{Image, MAX_ICON_BYTES, MAX_SCREENSHOT_BYTES, sniff_image};

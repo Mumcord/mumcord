@@ -83,6 +83,7 @@
     "newWebsites_other": "Šis naujinimas nori jungtis prie {{count}} naujų svetainių.",
     "staysOn": "{{name}} lieka ties {{version}}, kol nuspręsi.",
     "otherDomain": "Viena iš jų nėra paties papildinio domene.",
+    "whatsNew": "Kas naujo {{version}} versijoje",
     "websitesLead": "{{name}} ir jo puslapis tada galėtų pasiekti:",
     "websitesWarning": "Šios svetainės gali matyti tavo IP adresą ir viską, ką {{name}} joms siunčia.",
     "websitesLabel": "Svetainės",
