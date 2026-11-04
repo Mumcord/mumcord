@@ -105,18 +105,19 @@ describe("BotsSection", () => {
 
   it("moves focus with the arrow keys behind one Tab stop", async () => {
     await renderPanel();
-    const dj = botButton(/^DJ Byte/);
+    // Bots listed nowhere else come first, as in the mockups.
     const relay = botButton(/^Night Owls Relay/);
-    expect(dj).toHaveAttribute("tabindex", "0");
-    expect(relay).toHaveAttribute("tabindex", "-1");
-    dj.focus();
-    fireEvent.keyDown(dj, { key: "ArrowDown" });
-    expect(relay).toHaveFocus();
+    const dj = botButton(/^DJ Byte/);
     expect(relay).toHaveAttribute("tabindex", "0");
-    fireEvent.keyDown(relay, { key: "Home" });
+    expect(dj).toHaveAttribute("tabindex", "-1");
+    relay.focus();
+    fireEvent.keyDown(relay, { key: "ArrowDown" });
     expect(dj).toHaveFocus();
-    fireEvent.keyDown(dj, { key: "End" });
+    expect(dj).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(dj, { key: "Home" });
     expect(relay).toHaveFocus();
+    fireEvent.keyDown(relay, { key: "End" });
+    expect(dj).toHaveFocus();
   });
 
   it("opens the person menu for a bot, as for people", async () => {
