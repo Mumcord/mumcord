@@ -123,6 +123,10 @@ async fn wait_sync_restored(rx: &mut EventReceiver, channel: u32) -> Synced {
             EngineEvent::HistoryImageStatus { reference, state } => {
                 panic!("history image {reference} not loaded: {state:?}")
             }
+            // Fetching synced images is background work: it never interrupts the user.
+            EngineEvent::DirectConsentRequired => {
+                panic!("a background history image fetch asked for direct connections")
+            }
             _ => {}
         }
         (ended && synced.latest.values().all(|b| !b.contains(REFERENCE))).then_some(())
@@ -132,6 +136,11 @@ async fn wait_sync_restored(rx: &mut EventReceiver, channel: u32) -> Synced {
 }
 
 async fn start_engine(dir: &Path, name: &str) -> (Engine, EventReceiver) {
+    start_engine_with(dir, name, Consent::No).await
+}
+
+/// An engine whose direct connection consent is `consent`.
+async fn start_engine_with(dir: &Path, name: &str, consent: Consent) -> (Engine, EventReceiver) {
     let (engine, rx) = Engine::new(
         &dir.join("data"),
         SecretStore::in_memory(),
@@ -142,11 +151,10 @@ async fn start_engine(dir: &Path, name: &str) -> (Engine, EventReceiver) {
         .identity_create(name.to_owned(), None)
         .await
         .expect("identity");
-    // Plugin data only: an unanswered direct-connection question would hold every image fetch
-    // for a minute before it falls back.
+    // Consent::No: plugin data only, which every test here measures.
     let mut settings = engine.settings().expect("settings");
-    settings.allow_direct_connections = Consent::No;
-    engine.update_settings(settings).await.expect("no direct");
+    settings.allow_direct_connections = consent;
+    engine.update_settings(settings).await.expect("consent");
     (engine, rx)
 }
 
@@ -509,6 +517,53 @@ async fn synced_images_travel_once_as_references() {
     assert_eq!(refetched, 0, "a held image is not fetched again");
 
     a.set_packet_capture(false);
+    a.disconnect(only_server(&a));
+    b.disconnect(only_server(&b));
+}
+
+/// FR-1.60f with FR-2.36: B has never answered the direct connection question. Fetching the
+/// synced images is not something B started, so it must not ask (the UI would show a dialog
+/// out of nowhere); without a relay the images come over plugin data right away.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "needs testenv v15 (MUMCORD_LIVE=1)"]
+async fn a_background_fetch_never_asks_for_direct_connections() {
+    if !live() {
+        return;
+    }
+    audio_off();
+    let dir = work_dir("engine-live-history-images-consent");
+    let (a_name, b_name, bot_name) = (unique("mc-hca"), unique("mc-hcb"), unique("mc-hcbot"));
+    let (a, mut a_rx) = start_engine(&dir.join("a"), &a_name).await;
+    let (b, mut b_rx) = start_engine_with(&dir.join("b"), &b_name, Consent::Unset).await;
+    let (_admin, bot, room) = temp_room(&dir, &bot_name).await;
+
+    let a_server = add_server(&a, &a_name).await;
+    let snapshot = connect(&a, &mut a_rx, &a_server).await;
+    let lobby = channel(&snapshot, &room);
+    a.join_channel(only_server(&a), lobby)
+        .expect("A joins the room");
+    bot.wait_user(&a_name, &in_channel(&room))
+        .await
+        .expect("A in the room");
+    bot.send_channel(Some(&room), &image_message("a picture", &picture(31)))
+        .expect("send");
+    wait_message(&mut a_rx, "a picture").await;
+    tokio::time::sleep(Duration::from_millis(1100)).await;
+
+    let b_server = add_server(&b, &b_name).await;
+    connect(&b, &mut b_rx, &b_server).await;
+    b.join_channel(only_server(&b), lobby)
+        .expect("B joins the room");
+    // Fails on a consent question; restored well within the minute an unanswered one would hold.
+    let synced = wait_sync_restored(&mut b_rx, lobby).await;
+    assert_eq!(synced.added, 1);
+    assert_eq!(stored(&b, lobby), stored(&a, lobby), "B has A's exact body");
+    assert_eq!(
+        b.settings().expect("settings").allow_direct_connections,
+        Consent::Unset,
+        "the question is still open for the user's first own action"
+    );
+
     a.disconnect(only_server(&a));
     b.disconnect(only_server(&b));
 }

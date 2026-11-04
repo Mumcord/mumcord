@@ -17,6 +17,7 @@ use mumcord_store::{Conversation, ServerId};
 use super::core::ImageFetch;
 use super::images::{self, ImageRef};
 use crate::full_image::check;
+use crate::p2p::ConsentPrompt;
 use crate::session::{
     ConversationRef, Engine, EngineError, EngineEvent, EngineResult, ErrorKind, HistoryImageState,
     WeakEngine, lock,
@@ -104,8 +105,14 @@ async fn load(engine: &Engine, server_id: ServerId, waiting: Waiting, manual: bo
                 tokio::time::sleep_until(at + SPACING).await;
             }
             *last = Some(tokio::time::Instant::now());
+            // Only a load the user asked for may show the direct connection question.
+            let prompt = if manual {
+                ConsentPrompt::Allowed
+            } else {
+                ConsentPrompt::Never
+            };
             engine
-                .full_image_download(server_id, image.full, waiting.holder)
+                .full_image_download(server_id, image.full, waiting.holder, prompt)
                 .await
                 .and_then(|url| decoded(&url))
                 .filter(|bytes| fits(&image, bytes))

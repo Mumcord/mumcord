@@ -1057,7 +1057,12 @@ impl Engine {
             }
         }
         let opened = self
-            .p2p_open_stream(server_id, sharer, crate::p2p::STREAM_SCREEN)
+            .p2p_open_stream(
+                server_id,
+                sharer,
+                crate::p2p::STREAM_SCREEN,
+                crate::p2p::ConsentPrompt::Allowed,
+            )
             .await;
         let volume = self.person_share_volume(server_id, sharer);
         // A newer attempt replaced this one meanwhile: leave its state and the sharer alone.
@@ -1122,7 +1127,7 @@ impl Engine {
         let engine = self.clone();
         self.runtime().spawn(async move {
             let opened = engine
-                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN)
+                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN, crate::p2p::ConsentPrompt::Allowed)
                 .await;
             let volume = engine.person_share_volume(server_id, peer);
             let unwatch = {
