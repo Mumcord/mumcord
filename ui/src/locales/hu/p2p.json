@@ -45,6 +45,7 @@
     "unreachable": "Az átjátszó UDP-n és TCP 443-on sem volt elérhető.",
     "peerCannotRelay": "A másik fél nem tudja használni az átjátszót (régebbi Mumcord vagy kikapcsolt átjátszó).",
     "denied": "Az átjátszó botja elutasította a kérést.",
+    "notRegistered": "Ennek a szervernek az átjátszója csak regisztrált felhasználók számára érhető el. Használatához regisztrálj ezen a szerveren.",
     "peerGone": "A másik fél elhagyta a szervert.",
     "rateLimited": "Túl sok átjátszókérés. Próbáld újra egy perc múlva."
   },

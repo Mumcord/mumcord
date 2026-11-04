@@ -116,7 +116,7 @@ jobs:
 
       - name: Restore static libvpx
         id: libvpx-cache
-        uses: actions/cache@v6
+        uses: actions/cache/restore@v6
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -128,6 +128,13 @@ jobs:
           if [[ "$RUNNER_OS" == macOS ]]; then brew install nasm; fi
           if [[ "$RUNNER_OS" == Linux ]]; then scripts/ci/apt-install.sh nasm; fi
           scripts/build-libvpx.sh '${{ runner.temp }}/libvpx'
+
+      - name: Save static libvpx
+        if: steps.libvpx-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/libvpx
+          key: ${{ steps.libvpx.outputs.key }}
 
       # bindgen (crates/screenshare/build.rs) loads libclang: LLVM on the Windows runner, Xcode's
       # toolchain on macOS, libclang-dev (found on its own) on Linux.
@@ -158,6 +165,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: release
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - uses: actions/setup-node@v7
         with:
@@ -477,12 +485,13 @@ jobs:
       - name: Cache Mumble server (macOS)
         if: runner.os == 'macOS'
         id: server-cache
-        uses: actions/cache@v6
+        uses: actions/cache/restore@v6
         with:
           path: ~/mumble-server
           key: mumble-server-${{ env.MUMBLE_SERVER_VERSION }}-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Mumble server (macOS)
+        id: server-build
         if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true'
         continue-on-error: true
         run: |
@@ -496,6 +505,13 @@ jobs:
           cmake --build "$RUNNER_TEMP/mumble-build" -j "$(sysctl -n hw.ncpu)"
           mkdir -p ~/mumble-server
           cp "$(find "$RUNNER_TEMP/mumble-build" -type f -perm -u+x -name 'mumble-server' | head -n 1)" ~/mumble-server/
+
+      - name: Save Mumble server (macOS)
+        if: runner.os == 'macOS' && steps.server-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main' && steps.server-build.outcome == 'success'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/mumble-server
+          key: ${{ steps.server-cache.outputs.cache-primary-key }}
 
       - name: Start test server (macOS)
         if: runner.os == 'macOS'
@@ -520,6 +536,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: smoke
+          save-if: ${{ github.ref == 'refs/heads/main' }}
           workspaces: |
             . -> target
             scripts/smoke/seed -> target
@@ -528,13 +545,20 @@ jobs:
         run: CARGO_TARGET_DIR="$PWD/target" cargo build --release --locked --manifest-path scripts/smoke/seed/Cargo.toml
 
       # The archive name carries the version, so a bump in scripts/mumbot.env misses the cache.
-      - uses: actions/cache@v6
+      - id: mumbot-cache
+        uses: actions/cache/restore@v6
         with:
           path: ~/.cache/mumbot
           key: mumbot-${{ matrix.mumbot }}-${{ hashFiles('scripts/mumbot.env') }}
 
       - name: Fetch mumbot
         run: scripts/fetch-mumbot.sh ${{ matrix.mumbot }} "$RUNNER_TEMP/mumbot"
+
+      - if: steps.mumbot-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/.cache/mumbot
+          key: ${{ steps.mumbot-cache.outputs.cache-primary-key }}
 
       # --- Install the build and run the smoke test ------------------------------------------
 

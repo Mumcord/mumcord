@@ -211,7 +211,7 @@ async fn screen_shares_between_mumcord_clients() {
     );
     let own = alice.engine.screen_shares(server);
     assert_eq!(
-        (own[0].sound, own[0].sound_available),
+        (own[0].sound, own[0].sound_status.available()),
         (false, false),
         "no app sound on Linux (FR-2.42)"
     );

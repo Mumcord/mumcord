@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { MockApi, WhisperTarget } from "../../api";
+import { getServerState } from "../channels/serverStore";
 import { connectedMock, resetAll } from "../channels/testUtils";
 import { WhisperBadge } from "./WhisperBadge";
 import { WhisperBanner } from "./WhisperBanner";
@@ -175,6 +176,31 @@ describe("whisper targets in Settings (issue #67)", () => {
       expect.objectContaining({ name: "Anna", receivers: { kind: "people", names: ["Anna"] } }),
     ]);
     expect(screen.getByRole("button", { name: /Anna.*1 person · whisper.*Not set/ })).toBeVisible();
+  });
+
+  it("offers no bot without voice as a receiver (issue #458)", async () => {
+    const anna = getServerState().users.get(2);
+    if (!anna) throw new Error("Anna is missing");
+    act(() => {
+      api.mock.upsertUser({
+        ...anna,
+        session: 20,
+        name: "Relay",
+        bot: { voice: false, modules: ["peer"] },
+      });
+      api.mock.upsertUser({
+        ...anna,
+        session: 21,
+        name: "DJ Byte",
+        bot: { voice: true, modules: ["music"] },
+      });
+    });
+    render(<WhisperTargetsGroup />);
+    act(() => {
+      createWhisperTarget({ name: "Anna", receivers: { kind: "people", names: ["Anna"] } });
+    });
+    expect(await screen.findByRole("checkbox", { name: "DJ Byte" })).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "Relay" })).not.toBeInTheDocument();
   });
 
   it("captures a hold-to-talk key and refuses one already in use", async () => {

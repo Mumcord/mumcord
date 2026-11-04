@@ -179,6 +179,9 @@ pub enum TokenErrorReason {
     RelayFull,
     /// The relay does not allow the requested use (spec 07, FR-7.5).
     UseNotAllowed,
+    /// The relay only serves registered users and the requester is a guest (#406). Current
+    /// bots answer `denied` instead; this code is accepted so a bot that names it is understood.
+    NotRegistered,
 }
 
 impl TokenErrorReason {
@@ -191,6 +194,7 @@ impl TokenErrorReason {
             Self::RelayDown => "relay-down",
             Self::RelayFull => "relay-full",
             Self::UseNotAllowed => "use-not-allowed",
+            Self::NotRegistered => "not-registered",
         }
     }
 
@@ -203,6 +207,7 @@ impl TokenErrorReason {
             "relay-down" => Self::RelayDown,
             "relay-full" => Self::RelayFull,
             "use-not-allowed" => Self::UseNotAllowed,
+            "not-registered" => Self::NotRegistered,
             _ => return Err(PeerError::BadReason),
         })
     }
@@ -1294,6 +1299,7 @@ mod tests {
             TokenErrorReason::RelayDown,
             TokenErrorReason::RelayFull,
             TokenErrorReason::UseNotAllowed,
+            TokenErrorReason::NotRegistered,
         ] {
             assert_eq!(TokenErrorReason::parse(reason.as_str()), Ok(reason));
         }

@@ -23,7 +23,7 @@ runs:
       run: echo "root=$HOME/.cargo-tools/$CRATE-$VERSION" >> "$GITHUB_OUTPUT"
 
     - id: cache
-      uses: actions/cache@v6
+      uses: actions/cache/restore@v6
       with:
         path: ${{ steps.dir.outputs.root }}
         key: cargo-tool-${{ runner.os }}-${{ runner.arch }}-${{ inputs.crate }}-${{ inputs.version }}-${{ inputs.features }}
@@ -36,6 +36,13 @@ runs:
         FEATURES: ${{ inputs.features }}
         ROOT: ${{ steps.dir.outputs.root }}
       run: cargo install "$CRATE" --version "$VERSION" --locked --root "$ROOT" ${FEATURES:+--features "$FEATURES"}
+
+    # Only main saves: branch caches would evict main's from the 10 GB repository limit.
+    - if: steps.cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ steps.dir.outputs.root }}
+        key: ${{ steps.cache.outputs.cache-primary-key }}
 
     - shell: bash
       env:

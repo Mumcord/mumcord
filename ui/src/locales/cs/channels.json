@@ -42,6 +42,17 @@
     "unregistered": "neregistrovaný"
   },
   "mumcordBadge": "Používá Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Boti na tomto serveru ({{total}})",
+    "inChannel": "v kanálu {{channel}}",
+    "modules": {
+      "peer": "Relay",
+      "music": "Pouští hudbu",
+      "history": "Historie chatu",
+      "webhook": "Webhooky"
+    }
+  },
   "statusTip": {
     "registered": "Registrovaný na tomto serveru",
     "listening": "Pouze poslouchá",

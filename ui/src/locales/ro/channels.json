@@ -39,6 +39,17 @@
     "unregistered": "neînregistrat"
   },
   "mumcordBadge": "Folosește Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Boți pe acest server ({{total}})",
+    "inChannel": "în {{channel}}",
+    "modules": {
+      "peer": "Releu",
+      "music": "Redă muzică",
+      "history": "Istoricul conversației",
+      "webhook": "Webhookuri"
+    }
+  },
   "statusTip": {
     "registered": "Înregistrat pe acest server",
     "listening": "Doar ascultă",
