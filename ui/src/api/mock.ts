@@ -3498,7 +3498,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return Promise.resolve(null);
     },
     // The browser has no system picker: starting shares at once, without video.
-    screenShareStart: (serverId, withSound, _choice, _codec) => {
+    screenShareStart: (serverId, withSound) => {
       if (ownShares.has(serverId)) fail("invalidInput", "already sharing on this server");
       changeOwnShare(serverId, {
         session: SELF_SESSION,
