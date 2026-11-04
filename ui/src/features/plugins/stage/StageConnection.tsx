@@ -38,7 +38,7 @@ export function NoRelayBanner({ serverId, plugin }: { serverId: number | null; p
   const availability = useRelayAvailability(serverId);
   const inPopout = useInPopout();
   if (serverId === null || availability === null || availability.kind === "available") return null;
-  // The pop-out window cannot open the settings, so "Details" stays with the main window.
+  // The pop-out cannot show the settings itself; its "Details" asks the main window to.
   return inPopout ? (
     <PopoutBanner serverId={serverId} plugin={plugin} />
   ) : (
@@ -65,6 +65,7 @@ function MainBanner({ serverId, plugin }: { serverId: number; plugin: string }) 
 }
 
 function PopoutBanner({ serverId, plugin }: { serverId: number; plugin: string }) {
+  const { t } = useTranslation("pluginStage");
   // The pop-out never loads the servers store, so it reads the saved label itself.
   const [server, setServer] = useState("");
   useEffect(() => {
@@ -83,7 +84,23 @@ function PopoutBanner({ serverId, plugin }: { serverId: number; plugin: string }
       live = false;
     };
   }, [serverId]);
-  return <Banner server={server} plugin={plugin} />;
+  return (
+    <Banner server={server} plugin={plugin}>
+      <button
+        type="button"
+        className="plugin-stage__button plugin-stage__banner-button"
+        onClick={() => {
+          getApi()
+            .pluginDetailsOpen()
+            .catch((error: unknown) => {
+              console.error("Opening the plugin details failed", error);
+            });
+        }}
+      >
+        {t("noRelayDetails")}
+      </button>
+    </Banner>
+  );
 }
 
 function Banner({

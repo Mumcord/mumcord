@@ -13,7 +13,11 @@ import { resetStageEntries, useStageEntries } from "../../media/stageRegistry";
 import { MediaPopoutHost } from "../../media/MediaPopoutHost";
 import { leaveCinema, mediaView, openMedia, resetMediaView } from "../../media/mediaView";
 import { InPopout, resetPopoutStore } from "../../media/popoutStore";
-import { resetPluginRequestStore, useRequestedPluginTab } from "../pluginRequestStore";
+import {
+  resetPluginRequestStore,
+  useRequestedPluginTab,
+  usePluginRequestRouter,
+} from "../pluginRequestStore";
 import { resetActivityStore } from "./activityStore";
 import { FULLSCREEN_BANNER_MS, PluginStage } from "./PluginStage";
 import { PluginStageHost } from "./PluginStageHost";
@@ -43,6 +47,7 @@ const api = vi.hoisted(() => ({
   visibility: vi.fn<(plugin: string, visible: boolean) => Promise<null>>(() =>
     Promise.resolve(null),
   ),
+  detailsOpen: vi.fn<() => Promise<null>>(() => Promise.resolve(null)),
   leave: vi.fn<(activity: string) => Promise<null>>(() => Promise.resolve(null)),
   action: vi.fn<(...args: unknown[]) => Promise<null>>(() => Promise.resolve(null)),
 }));
@@ -66,6 +71,7 @@ vi.mock("../../../api", async (orig) => {
         soundMuted: false,
       }),
     serversList: () => Promise.resolve([{ id: 1, label: "Study Club" }]),
+    pluginDetailsOpen: api.detailsOpen,
     mediaPopoutState: () => Promise.resolve(api.popouts),
     mediaPopoutOpen: api.popOut,
     mediaPopoutClose: api.popIn,
@@ -157,6 +163,7 @@ beforeEach(() => {
     share: { target: null, onTop: false },
     stage: { target: null, onTop: false },
   };
+  api.detailsOpen.mockClear();
   api.popOut.mockClear();
   api.popIn.mockClear();
   api.setTitle.mockClear();
@@ -425,6 +432,28 @@ describe("connection chip and no-relay banner", () => {
     });
     expect(screen.queryByText("No relay for plugin data on this server.")).toBeNull();
     expect(screen.getByText("Relay · end-to-end encrypted")).toBeInTheDocument();
+  });
+
+  it("asks the main window for the plugin details from the pop-out banner", async () => {
+    api.relay = { kind: "useNotAllowed" };
+    render(
+      <InPopout value>
+        <PluginStage activity={BRAWL} />
+      </InPopout>,
+    );
+    await settle();
+    fireEvent.click(screen.getByRole("button", { name: "Details" }));
+    expect(api.detailsOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens the installed plugins in the main window when a pop-out asks", () => {
+    function Requested() {
+      usePluginRequestRouter();
+      return <output data-testid="tab">{useRequestedPluginTab() ?? ""}</output>;
+    }
+    render(<Requested />);
+    emit("pluginDetailsRequested", {});
+    expect(screen.getByTestId("tab")).toHaveTextContent("installed");
   });
 
   it("names the server by its saved label in the pop-out", async () => {

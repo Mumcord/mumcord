@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { getApi } from "../../api";
 import { openSettingsSection } from "../settings/settingsOpener";
 import { subscribePluginRequests, type PluginRequest } from "./notifications/pluginRequests";
 
@@ -81,6 +82,14 @@ export function consumeRequestedPluginTab(): void {
 /** Subscribes the router to the request bus while mounted. PluginsHost (always mounted) calls it. */
 export function usePluginRequestRouter(): void {
   useEffect(() => subscribePluginRequests(routePluginRequest), []);
+  // The stage pop-out's "Details" button asks the main window to show the installed plugins.
+  useEffect(
+    () =>
+      getApi().on("pluginDetailsRequested", () => {
+        openPluginTab("installed");
+      }),
+    [],
+  );
 }
 
 /** Tests only. */

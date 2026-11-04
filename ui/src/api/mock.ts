@@ -3386,6 +3386,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     notificationDismiss: () => Promise.resolve(null),
     trayAttentionSet: () => Promise.resolve(null),
+    pluginDetailsOpen: () => Promise.resolve(null),
     dndState: () => Promise.resolve(dnd),
     dndSet: (on) => setDnd({ ...dnd, manual: on }),
     dndSetFollowSystem: (on) => setDnd({ ...dnd, followSystem: on }),

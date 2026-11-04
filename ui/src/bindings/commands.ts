@@ -886,6 +886,11 @@ export const commands = {
 	notificationDismiss: (serverId: number, conversation: Conversation) => typedError<null, ApiError>(__TAURI_INVOKE("notification_dismiss", { serverId, conversation })),
 	/**  Replaces the tray's unread summary and recent chats. */
 	trayAttentionSet: (attention: TrayAttention) => typedError<null, ApiError>(__TAURI_INVOKE("tray_attention_set", { attention })),
+	/**
+	 *  Brings the main window to the front and tells it to open Settings → Plugins → Installed, for
+	 *  the "Details" button of the stage pop-out's no-relay banner.
+	 */
+	pluginDetailsOpen: () => typedError<null, ApiError>(__TAURI_INVOKE("plugin_details_open")),
 	/**  Platform support and the own shared track (for the settings). */
 	nowPlayingStatus: () => typedError<NowPlayingStatus, ApiError>(__TAURI_INVOKE("now_playing_status")),
 	/**
@@ -1143,6 +1148,7 @@ export const events = {
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
+	pluginDetailsRequested: makeEvent<PluginDetailsRequested, PluginDetailsRequested>("plugin-details-requested"),
 	pluginFrame: makeEvent<PluginFrameEvent, PluginFrameEvent>("plugin://frame"),
 	pluginFrameMute: makeEvent<PluginFrameMute, PluginFrameMute>("plugin://frame-mute"),
 	pluginSupersede: makeEvent<PluginSupersede, PluginSupersede>("plugin://supersede"),
@@ -3014,6 +3020,12 @@ export type PluginConfirmKind =
 "highRisk" | 
 /**  "I understand" / "Install". */
 "understand";
+
+/**
+ *  A pop-out window asked for the installed plugins' settings; the main window is already in
+ *  front.
+ */
+export type PluginDetailsRequested = Record<string, never>;
 
 /**  The Diagnostics section of a plugin (counts only, never payloads). */
 export type PluginDiagnostics = {

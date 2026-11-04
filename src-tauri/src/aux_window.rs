@@ -158,6 +158,7 @@ pub const STAGE_POPOUT: Spec = Spec {
         "stage_activities",
         "stage_leave",
         "stage_visibility",
+        "plugin_details_open",
     ],
 };
 
@@ -375,6 +376,13 @@ mod tests {
         assert!(!command_allowed(label, "packet_inspector_open"));
         assert!(!command_allowed(label, "deep_link_take_pending"));
         assert!(!command_allowed(label, "settings_update"));
+    }
+
+    #[test]
+    fn the_stage_popout_may_ask_for_the_plugin_details_only_there() {
+        assert!(command_allowed(STAGE_POPOUT.label, "plugin_details_open"));
+        assert!(!command_allowed(SHARE_POPOUT.label, "plugin_details_open"));
+        assert!(!command_allowed(STAGE_POPOUT.label, "settings_update"));
     }
 
     #[test]
