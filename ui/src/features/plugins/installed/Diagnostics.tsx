@@ -5,7 +5,7 @@ import { formatSize } from "../../settings/formatSize";
 
 type Counter = Exclude<
   keyof PluginDiagnostics,
-  "log" | "cpuTimeMs" | "memoryBytes" | "peakMemoryBytes"
+  "log" | "cpuTimeMs" | "memoryBytes" | "peakMemoryBytes" | "webDisabled"
 >;
 
 const COUNTERS: readonly Counter[] = [

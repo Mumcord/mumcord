@@ -40,9 +40,11 @@ use super::types::{
     ApiError, ApiResult, ChannelId, ErrorCode, ServerId, SessionId, to_engine_server_id,
 };
 use crate::plugins::ui::{
-    ActionKind, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange, PluginWebviewPlace,
+    ActionKind, PluginFrameMute, PluginPanelVisibility, PluginSlot, PluginUi, PluginUiChange,
+    PluginWebviewPlace,
 };
-use crate::plugins::{self, Plugins, PreparedInstall, RepoIndex};
+use crate::plugins::{self, Plugins, PluginsChanged, PreparedInstall, RepoIndex};
+use tauri_specta::Event as _;
 
 /// Who sees that the user has a plugin (FR-6.35).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
@@ -485,6 +487,10 @@ pub struct PluginDiagnostics {
     pub messages_received: f64,
     pub incoming_rate_dropped: f64,
     pub incoming_invalid: f64,
+    /// Times the window stopped answering while a frame of this plugin was open (FR-9.42).
+    pub ui_freezes: f64,
+    /// The plugin's web content is turned off after a freeze, until the user re-enables it.
+    pub web_disabled: bool,
     /// The plugin's own log lines (in memory only).
     pub log: Vec<PluginLogLine>,
 }
@@ -1493,10 +1499,36 @@ pub async fn plugin_diagnostics(app: AppHandle, id: String) -> ApiResult<PluginD
                 messages_received: m.received as f64,
                 incoming_rate_dropped: m.incoming_rate_dropped as f64,
                 incoming_invalid: m.incoming_invalid as f64,
+                ui_freezes: d.ui_freezes as f64,
+                web_disabled: service.web_disabled(&id),
                 log,
             })
         })
         .await
+}
+
+/// The user turned a plugin's web content on again in Settings → Plugins (FR-9.42); it was off
+/// after the window froze while one of its frames was open.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_reenable_web(app: AppHandle, id: String) -> ApiResult<()> {
+    plugins_of(&app)?
+        .call(move |service| service.re_enable_web(&id))
+        .await?;
+    PluginsChanged {}
+        .emit(&app)
+        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
+}
+
+/// Mutes or unmutes the sound of plugin frames: one plugin's (`plugin` set, the frame's mute
+/// button) or all of them (`plugin` empty, deafen). The frame hosts forward it to the page as
+/// `{mumcordWebview:"mute", muted}`.
+#[tauri::command]
+#[specta::specta]
+pub fn plugin_frames_mute(app: AppHandle, plugin: Option<String>, muted: bool) -> ApiResult<()> {
+    PluginFrameMute { plugin, muted }
+        .emit(&app)
+        .map_err(|e| ApiError::new(ErrorCode::Internal, e.to_string()))
 }
 
 /// Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts

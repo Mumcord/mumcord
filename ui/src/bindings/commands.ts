@@ -684,6 +684,17 @@ export const commands = {
 	/**  Which plugin's member badge is shown (`None`: no badge). */
 	pluginSetBadge: (id: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_badge", { id })),
 	pluginDiagnostics: (id: string) => typedError<PluginDiagnostics, ApiError>(__TAURI_INVOKE("plugin_diagnostics", { id })),
+	/**
+	 *  The user turned a plugin's web content on again in Settings → Plugins (FR-9.42); it was off
+	 *  after the window froze while one of its frames was open.
+	 */
+	pluginReenableWeb: (id: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_reenable_web", { id })),
+	/**
+	 *  Mutes or unmutes the sound of plugin frames: one plugin's (`plugin` set, the frame's mute
+	 *  button) or all of them (`plugin` empty, deafen). The frame hosts forward it to the page as
+	 *  `{mumcordWebview:"mute", muted}`.
+	 */
+	pluginFramesMute: (plugin: string | null, muted: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frames_mute", { plugin, muted })),
 	pluginAsset: (id: string, path: string) => typedError<PluginAsset, ApiError>(__TAURI_INVOKE("plugin_asset", { id, path })),
 	/**
 	 *  Every plugin UI currently on screen, as `plugin://ui` changes; for a window that mounts
@@ -1073,6 +1084,7 @@ export const events = {
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
+	pluginFrameMute: makeEvent<PluginFrameMute, PluginFrameMute>("plugin://frame-mute"),
 	pluginSupersede: makeEvent<PluginSupersede, PluginSupersede>("plugin://supersede"),
 	pluginUi: makeEvent<PluginUi, PluginUi>("plugin://ui"),
 	pluginsAppMenuChanged: makeEvent<AppMenuChanged, AppMenuChanged>("plugins://app-menu-changed"),
@@ -2935,6 +2947,10 @@ export type PluginDiagnostics = {
 	messagesReceived: number | null,
 	incomingRateDropped: number | null,
 	incomingInvalid: number | null,
+	/**  Times the window stopped answering while a frame of this plugin was open (FR-9.42). */
+	uiFreezes: number | null,
+	/**  The plugin's web content is turned off after a freeze, until the user re-enables it. */
+	webDisabled: boolean,
 	/**  The plugin's own log lines (in memory only). */
 	log: PluginLogLine[],
 };
@@ -2946,6 +2962,16 @@ export type PluginEffect = { kind: "points"; value: number } | { kind: "percent"
 
 /**  One line of the score breakdown table. */
 export type PluginFactorKind = "highPermission" | "webSurface" | "relay" | "mediumPermission" | "lowPermissions" | "websites" | "packageSize" | "wasmModules" | "sourceLink" | "licence" | "reproducible" | "keyAge" | "expectedKey" | "developerTrust" | "recentChange" | "noHistory" | "networkFloor";
+
+/**
+ *  `plugin://frame-mute`: mute (or unmute) the sound of one plugin's frames (`plugin` set) or of
+ *  all of them (`plugin` empty). The frame hosts send `{mumcordWebview:"mute", muted}` to the
+ *  page's bootstrap.
+ */
+export type PluginFrameMute = {
+	plugin: string | null,
+	muted: boolean,
+};
 
 /**  Why the one confirmation box shows. */
 export type PluginGateReason = "highRisk" | "ownCodeAndWebsites" | "repositoryWarning";

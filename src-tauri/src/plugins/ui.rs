@@ -391,6 +391,17 @@ pub struct PluginUi {
     pub change: PluginUiChange,
 }
 
+/// `plugin://frame-mute`: mute (or unmute) the sound of one plugin's frames (`plugin` set) or of
+/// all of them (`plugin` empty). The frame hosts send `{mumcordWebview:"mute", muted}` to the
+/// page's bootstrap.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+#[tauri_specta(event_name = "plugin://frame-mute")]
+pub struct PluginFrameMute {
+    pub plugin: Option<String>,
+    pub muted: bool,
+}
+
 /// How the user saw the plugin's panel.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
