@@ -157,15 +157,6 @@ describe("sharer controls", () => {
 
   it("lists who is watching and says when the share is full", async () => {
     const api = await linuxMock();
-    const preview = await api.screenSharePreview(
-      1,
-      { resolution: "auto", fps: "30", optimize: "balanced", uploadLimit: "auto" },
-      "auto",
-    );
-    vi.spyOn(api, "screenSharePreview").mockResolvedValue({
-      ...preview,
-      path: { kind: "copies", maxViewers: 8 },
-    });
     render(<SharerBar />);
     act(() => {
       api.mock.emit("screenSharesChanged", {
@@ -296,6 +287,8 @@ describe("sharer control bar", () => {
         { session: ANNA, fps: 60, struggling: false, slow: false, codec: null, path: "direct" },
         { session: BEN, fps: 20, struggling: true, slow: true, codec: null, path: "direct" },
       ],
+      choice: { resolution: "1080", fps: "60", optimize: "balanced", uploadLimit: "auto" },
+      fanout: null,
     });
     render(<SharerBar />);
     await api.screenShareStart(1, false, null, null);

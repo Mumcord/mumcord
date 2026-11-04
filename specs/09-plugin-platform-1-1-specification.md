@@ -588,7 +588,7 @@ Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.1
 
 ## 13. Open points & risks
 
-- **S0 result** (to be filled by the S0 task before V1 starts): per platform, probe → result → closing measure → go/fallback. Owner: S0 agent, then user.
+- **S0 result**: see §13.1. Open from S0: Esc/F6 focus return on Windows and macOS, and DNS prefetch behind the Windows proxy, are checked manually (AC-9.40). Owner: user.
 - **Assumptions made in this spec** (confirm or correct): third-party sibling lookup `/v1.1/index.json` (FR-9.19); index format 2 field shapes (FR-9.15); side panel is web content only (FR-9.39); sound effect file limits and −12 dB ducking (FR-9.65, FR-9.67); 4 concurrent plugin sounds; key first-seen and history stores (§7.1).
 - **`ws://localhost` for developer plugins**: not included by #395 Q6; add later if game authors need it.
 - **WebView TLS for the fixture CA**: each platform needs its own way to trust a test CA in the webview; E2E runs on Linux, Windows/macOS rely on the manual checklist.
@@ -597,6 +597,65 @@ Mapping: #395 AC 1–13, 15 → AC-9.6, 9.2, 9.7, 9.3, 9.4, 9.5, 9.11, 9.13, 9.1
 - **Existing official-plugin E2E specs in the Mumcord repo** (dice, poll, echolings, music) stay until moved; moving them is not part of this spec.
 - **Relay cost**: operators pay for plugin traffic; default off and caps mitigate.
 - **Bovnar upstream (#400):** upstream PR vs. our own fork is open with the Bovnar author; until then the pinned fork commit is the source of truth and the SDK stays off crates.io (FR-9.99).
+
+### 13.1 S0 result
+
+Measured by spike S0 with a throw-away Tauri 2.12.5 probe harness (not committed) on GitHub-hosted runners `ubuntu-24.04` (WebKitGTK 4.1), `windows-latest` (WebView2) and `macos-latest` (WKWebView), plus one local Linux run (CachyOS). The probe page ran in a sandboxed frame (opaque origin, `sandbox` without `allow-same-origin`) with the FR-9.33/FR-9.34 response-header CSP and Permissions-Policy, served from the app's custom protocol. Every probe also ran once without the sandbox as a positive control. All network targets were local collectors on `127.0.0.1` (a hostname mapped to `127.0.0.1` in the hosts file for the proxy runs); no public server was contacted. "Leaks" means a local collector saw at least a TCP connection or UDP packet from the sandboxed frame, even if no HTTP request followed.
+
+Variants: **base** (0.6.0 setup plus the headers), **proxy** (all webview traffic through a local deny-all proxy), **features** (platform switches only), and S0b follow-ups for WebView2 WebRTC and a separate Linux child webview.
+
+**Blocked on all three platforms in the base setup** (no closing measure needed beyond the frame policy): `fetch`/XHR/`sendBeacon`/`EventSource`/`WebSocket`; CSS `@import`/`url()`, images, fonts, media; dedicated, shared and service workers; remote script and remote WebAssembly; `<link rel=prefetch|preload>`, speculation rules; form submission; top-level navigation; `alert`/`confirm`/`prompt`; `parent`/`top` DOM access; Tauri IPC; `localStorage`/IndexedDB/cookies/Cache Storage; clipboard; camera, microphone, screen capture, geolocation. The response-header CSP is enforced and `'wasm-unsafe-eval'` lets WebAssembly compile while `eval`/`new Function` stay blocked. A 1.5 GB memory-hungry frame did not freeze the UI on any platform.
+
+#### Linux (WebKitGTK)
+
+| Probe | Observed result | Closing measure | Verdict |
+|---|---|---|---|
+| WebRTC | Blocked: `RTCPeerConnection` is not exposed | Keep `enable-webrtc=false` | go |
+| DNS prefetch | Blocked (CI); not verifiable on the local run | none | go |
+| `<link rel=preconnect>` | **Leaks**: TCP connection opened, no HTTP request | Turn off the WebKit runtime feature `LinkPreconnect` (verified); a deny-all proxy also closes it | go |
+| `window.open` popup | **Leaks**: TCP connection opened, no HTTP request | Same as preconnect (`LinkPreconnect` off or deny-all proxy); deny `on_new_window` | go |
+| `<a ping>`, meta refresh, self-navigation, `<object>`/`<embed>`, downloads | Blocked | Deny `on_new_window` and `on_download` | go |
+| Esc / F6 focus return | Works with real key input (xdotool) | none | go |
+| Busy loop in the frame | UI frozen; reloading the UI is not enough; the Rust watchdog recovers by terminating the web process (`terminate_web_process`) after about 13 s | Rust watchdog terminates the web process and recreates the UI | go |
+| Memory-hungry frame (1.5 GB) | Contained | none | go |
+| Child-webview fallback (busy page in its own webview) | UI frozen (about 5 s heartbeat gap), also when the child gets its own `WebKitWebContext` (own web process) | none: the child webview does not isolate a busy plugin on Linux | not usable |
+
+**Linux verdict: go** (sandboxed frame with `LinkPreconnect` off and the Rust watchdog that terminates the web process). The child-webview fallback brings no benefit on Linux.
+
+#### Windows (WebView2)
+
+| Probe | Observed result | Closing measure | Verdict |
+|---|---|---|---|
+| WebRTC | **Leaks**: STUN over UDP and TURN over TCP reach the collector, also through the deny-all proxy | Browser argument `--webrtc-ip-handling-policy=disable_non_proxied_udp` together with the proxy arguments: 0 ICE candidates, no packet reaches the collector, TURN only tries the deny-all proxy (verified). Not effective: `--force-webrtc-ip-handling-policy=disable_non_proxied_udp`, `--disable-blink-features=RTCPeerConnection`. An initialization script for all frames that deletes `RTCPeerConnection` also closes it (verified) | go |
+| DNS prefetch | **Leaks** in base; not verifiable with the proxy (the net log did not show the control lookup) | Deny-all proxy | go (manual re-check AC-9.40) |
+| `<link rel=preconnect>`, `<object>`/`<embed>`, `<a ping>`, meta refresh, self-navigation, downloads | **Leak**: TCP connection opened, no HTTP request | Deny-all proxy: `--proxy-server=http://127.0.0.1:<port> --proxy-bypass-list=<-loopback>` (verified; wry drops its own proxy argument when additional browser arguments are set, so both go into the argument string) | go |
+| `window.open` popup | Blocked (`on_new_window` denied) | Deny `on_new_window` | go |
+| Esc / F6 focus return | Not verified on CI (no real key input; a synthetic Escape reaches the bootstrap) | Manual check (AC-9.40) | open |
+| Busy loop in the frame | Contained: UI heartbeat stays under 300 ms, the frame watchdog removes the frame | Frame watchdog | go |
+| Memory-hungry frame (1.5 GB) | Contained | none | go |
+| Child-webview fallback | Not measured (the "contained" child result is void): creating a second webview with different browser arguments fails (`0x8007139F`); all webviews in one WebView2 environment must share the same arguments | Not needed | n/a |
+
+Full Windows probe run with the final arguments (`--proxy-server=… --proxy-bypass-list=<-loopback> --webrtc-ip-handling-policy=disable_non_proxied_udp`): every probe blocked, WebRTC with 0 ICE candidates; DNS prefetch and Esc/F6 not verifiable on CI; busy and memory-hungry frames contained.
+
+**Windows verdict: go** (sandboxed frame, deny-all proxy plus the WebRTC IP handling policy argument).
+
+#### macOS (WKWebView)
+
+| Probe | Observed result | Closing measure | Verdict |
+|---|---|---|---|
+| WebRTC | **Leaks**: STUN over UDP and TURN over TCP reach the collector; the deny-all proxy does not stop it | WKPreferences feature `PeerConnectionEnabled` off (verified) | go |
+| DNS prefetch | Blocked | none | go |
+| `<link rel=preconnect>` | **Leaks**: TCP connection opened, no HTTP request | WKPreferences feature `LinkPreconnect` off, or the deny-all proxy (both verified) | go |
+| `window.open` popup | **Leaks**: TCP connection opened, no HTTP request | `LinkPreconnect` off or deny-all proxy; deny `on_new_window` | go |
+| `<a ping>`, meta refresh, self-navigation, `<object>`/`<embed>`, downloads | Blocked | Deny `on_new_window` and `on_download` | go |
+| Esc / F6 focus return | Not verified on CI (no real key input; a synthetic Escape reaches the bootstrap) | Manual check (AC-9.40) | open |
+| Busy loop in the frame | UI frozen; reloading the UI is not enough; the Rust watchdog recovers by recreating the webview after about 13 s | Rust watchdog recreates the webview | fallback |
+| Memory-hungry frame (1.5 GB) | Contained | none | go |
+| Child-webview fallback (busy page in its own webview) | Contained: UI heartbeat stays under 350 ms | Child webview per plugin activity | go |
+
+**macOS verdict: fallback** (child webview for plugin content; in the shared frame a busy plugin freezes the UI until the watchdog recreates the webview). The network measures above apply to the child webview as well.
+
+**Measures V1 must carry on every platform** (from the results above): the response-header CSP and Permissions-Policy as tested, with `worker-src 'none'` added (gap against FR-9.33); deny `on_new_window` and `on_download`; a Rust watchdog that terminates or recreates the webview instead of only reloading it; the platform switches listed per table.
 
 ## 14. Impact on the roadmap
 

@@ -17,7 +17,7 @@
     "packetInspector": "Inspektor paketů",
     "hotkeys": "Klávesové zkratky",
     "plugins": "Doplňky",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Sdílení obrazovky"
   },
   "sectionDescriptions": {
     "general": "Spuštění, jazyk, aktualizace a přístupnost.",
@@ -31,7 +31,7 @@
     "advanced": "Vývojářské nástroje, diagnostika, úložiště a licence.",
     "about": "Verze, podpora a průvodce nastavením.",
     "plugins": "Pluginy běží v izolovaném prostředí a dostanou jen to, co povolíte. Nikdy nevidí váš zvuk, soubory ani certifikát.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Kvalita, kodek a hardware pro sdílení tvé obrazovky. Diváci vždy vidí to, co vybereš, ještě než začneš."
   },
   "breadcrumb": "Nastavení / {{section}}",
   "moreInfo": "Další informace: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "upozornění vyskakovací okna",
     "externalContent": "vložený obsah obrázky náhledy",
     "fileSharing": "soubory odeslat přijmout stáhnout uložit složka příloha zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "sdílení obrazovky kvalita rozlišení fps kodek AV1 VP9 enkodér grafická karta"
   },
   "search": {
     "label": "Hledat v nastavení",
@@ -1069,5 +1069,62 @@
     "switch": "Režim vývojáře",
     "hint": "Přidá k doplňkům kartu Vývojář, kde lze načíst nepodepsané doplňky ze složky. Zapněte jej, jen pokud doplňky sami vytváříte."
   },
-  "newBadge": "New"
+  "newBadge": "Nové",
+  "screenShare": {
+    "newBadge": "Nové",
+    "qualityTitle": "Výchozí kvalita",
+    "resolution": "Rozlišení",
+    "resolutionAuto": "Automaticky",
+    "resolutionHint": "Automaticky začne s nejlepší kvalitou, kterou umožní tvé nahrávání a tví diváci, a sníží ji, když to nestíhají.",
+    "fps": "Snímková frekvence",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimalizovat pro",
+    "optimizeBalanced": "Vyváženě",
+    "optimizeText": "Ostrý text (kód, prezentace)",
+    "optimizeMotion": "Plynulý pohyb (hry, video)",
+    "uploadLimit": "Limit nahrávání",
+    "uploadAuto": "Automaticky",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Nejvíc, co tvé sdílení odešle celkem. Hodí se u sdíleného nebo měřeného připojení.",
+    "codecTitle": "Kodek",
+    "codec": "Kodek",
+    "codecAuto": "Automaticky (doporučeno)",
+    "codecAutoHint": "Nejdřív AV1 na grafické kartě, pak AV1 na procesoru, pokud krátký test ukáže, že to zvládá, jinak VP9. AV1 jen tehdy, když ho umí přehrát každý divák.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Nejostřejší obraz při stejném množství dat. Diváci, kteří ho nepřehrají, dostanou VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Co Mumcord používal dosud. Funguje pro každého diváka.",
+    "codecInfo": "Bez grafické karty používá AV1 procesor (SVT-AV1). Mumcord přepne na VP9, pokud to tvůj počítač nestíhá.",
+    "codecOlder": "Diváci se starším Mumcordem vždy dostanou VP9, ať vybereš cokoli.",
+    "hardwareTitle": "Hardwarová akcelerace",
+    "useGpu": "Použít grafickou kartu, když je dostupná",
+    "useGpuHint": "Kóduje AV1 na grafické kartě, takže sdílení téměř nezatěžuje procesor. Vypnuto: AV1 používá procesor.",
+    "statusList": "Stav enkodéru",
+    "av1Encode": "Kódování AV1",
+    "askEachTime": "Ptát se na tato nastavení při každém sdílení",
+    "av1Playback": "Přehrávání AV1",
+    "vp9Playback": "Přehrávání VP9",
+    "playbackHardware": "Hardwarově",
+    "playbackSoftware": "Softwarově",
+    "av1EncodeCpu": "Kódování AV1 na procesoru",
+    "vp9Encode": "Kódování VP9",
+    "gpuNvidia": "Grafická karta NVIDIA",
+    "gpuAmd": "Grafická karta AMD",
+    "gpuIntel": "Grafická karta Intel",
+    "gpuUnknown": "Grafická karta",
+    "software": "Softwarově",
+    "softwareLimit": "Softwarově, zvládne až {{height}}p{{fps}}",
+    "notAvailable": "Není k dispozici",
+    "checking": "Kontroluje se…",
+    "active": "Aktivní enkodér: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (procesor)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (softwarově)",
+    "skippedTooHeavy": "VP9 (AV1 je pro tento počítač příliš náročný)",
+    "skippedOnBattery": "VP9 (na baterii)",
+    "skippedAboveLimit": "VP9 (tvůj obraz je nad tím, co AV1 tady zvládne)",
+    "softwareWarning": "AV1 poběží na procesoru bez úspěšného testu a může být pro tento počítač příliš náročný.",
+    "checkAgain": "Zkontrolovat znovu"
+  }
 }

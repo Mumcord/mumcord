@@ -753,6 +753,7 @@ pub struct Settings {
     pub screen_optimize: ScreenOptimize,
     pub screen_codec: ScreenCodec,
     pub screen_upload_limit: ScreenUploadLimit,
+    pub screen_ask_each_time: bool,
     pub screen_sound: bool,
     pub screen_use_gpu: bool,
 }
@@ -902,6 +903,7 @@ impl Settings {
             screen_optimize: s.screen_optimize.into(),
             screen_codec: s.screen_codec.into(),
             screen_upload_limit: s.screen_upload_limit.into(),
+            screen_ask_each_time: s.screen_ask_each_time,
             screen_sound: s.screen_sound,
             screen_use_gpu: s.screen_use_gpu,
         }
@@ -1052,6 +1054,7 @@ impl Settings {
         s.screen_optimize = self.screen_optimize.into();
         s.screen_codec = self.screen_codec.into();
         s.screen_upload_limit = self.screen_upload_limit.into();
+        s.screen_ask_each_time = self.screen_ask_each_time;
         s.screen_sound = self.screen_sound;
         s.screen_use_gpu = self.screen_use_gpu;
         s

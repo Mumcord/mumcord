@@ -20,7 +20,13 @@ import { SettingsSearch } from "./SettingsSearch";
 import type { SearchResult } from "./settingsIndex";
 import { findGroup, findTarget, headingOf, type JumpTarget } from "./settingsJump";
 import { SettingsPageCards } from "./SettingsPages";
-import { SECTION_ICONS, SECTION_IDS, SET_APART_SECTIONS, type SectionId } from "./sectionIds";
+import {
+  NEW_SECTIONS,
+  SECTION_ICONS,
+  SECTION_IDS,
+  SET_APART_SECTIONS,
+  type SectionId,
+} from "./sectionIds";
 import { useIsMacos } from "../../api/useIsMacos";
 import { useDevToolsUnlocked } from "../inspector/devTools";
 import { UpdatesBadge } from "../plugins/updates/UpdatesBadge";
@@ -261,6 +267,11 @@ export function SettingsScreen({
                   <SettingsIcon name={SECTION_ICONS[id]} />
                   {t(`sections.${id}`)}
                   {id === "plugins" && <UpdatesBadge />}
+                  {NEW_SECTIONS.includes(id) && (
+                    <span className="settings__tab-new" aria-hidden="true">
+                      {t("screenShare.newBadge")}
+                    </span>
+                  )}
                   {dotSections.has(id) && <span className="settings__tab-dot" aria-hidden="true" />}
                 </button>
               ))}

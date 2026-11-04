@@ -226,6 +226,8 @@ pub(crate) const BROADCAST_KEY: u32 = u32::MAX;
 /// The running media path of the own share; dropping it stops encoding and every viewer stream.
 pub(crate) struct Media {
     hub: Arc<Hub>,
+    /// The sharer's current picks, as the Quality menu shows them checked.
+    choice: Mutex<QualityPrefs>,
 }
 
 /// Opens the share's encoder for a size and the "Optimize for" pick, AV1 only when the flag
@@ -293,7 +295,10 @@ impl Media {
         if let Err(e) = spawned {
             tracing::error!(error = %e, "screen share encode thread did not start");
         }
-        Self { hub }
+        Self {
+            hub,
+            choice: Mutex::new(prefs),
+        }
     }
 
     /// Tells this media apart from a later one of the same server.
@@ -319,6 +324,12 @@ impl Media {
     pub fn set_prefs(&self, prefs: QualityPrefs) {
         *lock(&self.hub.upload) = prefs.upload_limit_kbps().map(RateLimit::new);
         *lock(&self.hub.prefs) = Some(prefs);
+        *lock(&self.choice) = prefs;
+    }
+
+    /// The sharer's current picks: those the share started with or the last Quality menu change.
+    pub fn choice(&self) -> QualityPrefs {
+        *lock(&self.choice)
     }
 
     /// Sends `source`'s sound along while sound is on ([`Self::set_sound`]); at most one source.
@@ -1052,6 +1063,24 @@ mod tests {
         fn ended(&self) -> bool {
             true
         }
+    }
+
+    #[test]
+    fn media_keeps_the_current_choice_for_the_quality_menu() {
+        use mumcord_store::{ScreenFps, ScreenResolution};
+        let start = QualityPrefs {
+            resolution: ScreenResolution::P720,
+            ..QualityPrefs::default()
+        };
+        let media = Media::start(Box::new(Ending), start, vp9_encoder());
+        assert_eq!(media.choice(), start);
+        let changed = QualityPrefs {
+            resolution: ScreenResolution::P1440,
+            fps: ScreenFps::Fps60,
+            ..start
+        };
+        media.set_prefs(changed);
+        assert_eq!(media.choice(), changed);
     }
 
     #[test]

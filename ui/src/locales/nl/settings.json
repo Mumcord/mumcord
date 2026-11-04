@@ -17,7 +17,7 @@
     "packetInspector": "Pakketinspecteur",
     "hotkeys": "Sneltoetsen",
     "plugins": "Plug-ins",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Scherm delen"
   },
   "sectionDescriptions": {
     "general": "Opstarten, taal, updates en toegankelijkheid.",
@@ -31,7 +31,7 @@
     "advanced": "Ontwikkelaarstools, diagnostiek, opslag en licenties.",
     "about": "Versie, ondersteuning en de installatiewizard.",
     "plugins": "Plugins draaien in een sandbox en krijgen alleen wat jij toestaat. Ze zien nooit je audio, bestanden of certificaat.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Kwaliteit, codec en hardware voor het delen van je scherm. Kijkers zien altijd wat je kiest voordat je begint."
   },
   "breadcrumb": "Instellingen / {{section}}",
   "moreInfo": "Meer informatie: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "meldingen pop-ups",
     "externalContent": "insluitingen afbeeldingen voorbeelden",
     "fileSharing": "bestanden versturen ontvangen downloaden opslaan map bijlage zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "scherm delen kwaliteit resolutie fps videocodec AV1 VP9 encoder videokaart"
   },
   "search": {
     "label": "Instellingen zoeken",
@@ -1053,5 +1053,62 @@
     "switch": "Ontwikkelaarsmodus",
     "hint": "Voegt een tabblad Ontwikkelaar toe aan Plug-ins om niet-ondertekende plug-ins uit een map te laden. Zet dit alleen aan als je zelf plug-ins maakt."
   },
-  "newBadge": "New"
+  "newBadge": "Nieuw",
+  "screenShare": {
+    "newBadge": "Nieuw",
+    "qualityTitle": "Standaardkwaliteit",
+    "resolution": "Resolutie",
+    "resolutionAuto": "Automatisch",
+    "resolutionHint": "Automatisch begint met de beste kwaliteit die je upload en je kijkers toelaten, en schakelt terug als ze het niet bijhouden.",
+    "fps": "Beeldsnelheid",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimaliseren voor",
+    "optimizeBalanced": "Gebalanceerd",
+    "optimizeText": "Scherpe tekst (code, dia's)",
+    "optimizeMotion": "Vloeiende beweging (games, video)",
+    "uploadLimit": "Uploadlimiet",
+    "uploadAuto": "Automatisch",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Het maximum dat je scherm in totaal verstuurt. Handig bij een gedeelde of beperkte verbinding.",
+    "codecTitle": "Videocodec",
+    "codec": "Videocodec",
+    "codecAuto": "Automatisch (aanbevolen)",
+    "codecAutoHint": "Eerst AV1 op je videokaart, dan AV1 op de processor als een korte test laat zien dat die het bijhoudt, anders VP9. AV1 alleen als alle kijkers het kunnen afspelen.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Scherpste beeld voor dezelfde hoeveelheid data. Kijkers die het niet kunnen afspelen krijgen VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Wat Mumcord tot nu toe gebruikte. Werkt voor alle kijkers.",
+    "codecInfo": "Zonder videokaart gebruikt AV1 de processor (SVT-AV1). Mumcord schakelt over op VP9 als je computer het niet bijhoudt.",
+    "codecOlder": "Kijkers met een oudere Mumcord krijgen altijd VP9, wat je ook kiest.",
+    "hardwareTitle": "Hardwareversnelling",
+    "useGpu": "Videokaart gebruiken indien beschikbaar",
+    "useGpuHint": "Codeert AV1 op je videokaart, zodat delen bijna geen CPU kost. Uit: AV1 gebruikt de processor.",
+    "statusList": "Encoderstatus",
+    "av1Encode": "AV1-codering",
+    "askEachTime": "Vraag me bij elke keer delen om deze instellingen",
+    "av1Playback": "AV1-weergave",
+    "vp9Playback": "VP9-weergave",
+    "playbackHardware": "Hardwarematig",
+    "playbackSoftware": "Softwarematig",
+    "av1EncodeCpu": "AV1-codering op de processor",
+    "vp9Encode": "VP9-codering",
+    "gpuNvidia": "NVIDIA-videokaart",
+    "gpuAmd": "AMD-videokaart",
+    "gpuIntel": "Intel-videokaart",
+    "gpuUnknown": "Videokaart",
+    "software": "Softwarematig",
+    "softwareLimit": "Softwarematig, houdt tot {{height}}p{{fps}} bij",
+    "notAvailable": "Niet beschikbaar",
+    "checking": "Controleren…",
+    "active": "Actieve encoder: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (CPU)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (softwarematig)",
+    "skippedTooHeavy": "VP9 (AV1 te zwaar voor deze pc)",
+    "skippedOnBattery": "VP9 (op batterij)",
+    "skippedAboveLimit": "VP9 (je beeld is hoger dan wat AV1 hier aankan)",
+    "softwareWarning": "AV1 draait op de processor zonder geslaagde test en kan te zwaar zijn voor deze pc.",
+    "checkAgain": "Opnieuw controleren"
+  }
 }

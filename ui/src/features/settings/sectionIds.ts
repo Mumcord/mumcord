@@ -5,6 +5,7 @@ export const SECTION_IDS = [
   "general",
   "account",
   "voiceAudio",
+  "screenSharing",
   "chatNotifications",
   "privacy",
   "plugins",
@@ -23,6 +24,7 @@ export const SECTION_ICONS: Record<SectionId, SettingsIconName> = {
   general: "settings",
   account: "user",
   voiceAudio: "mic",
+  screenSharing: "monitor",
   chatNotifications: "message",
   privacy: "shield",
   plugins: "puzzle",
@@ -32,3 +34,6 @@ export const SECTION_ICONS: Record<SectionId, SettingsIconName> = {
   advanced: "code",
   about: "info",
 };
+
+/** Groups that carry a "New" pill in the side list until the next release cycle. */
+export const NEW_SECTIONS: readonly SectionId[] = ["screenSharing"];

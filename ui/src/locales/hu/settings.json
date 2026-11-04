@@ -17,7 +17,7 @@
     "packetInspector": "Csomagvizsgáló",
     "hotkeys": "Gyorsbillentyűk",
     "plugins": "Bővítmények",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Képernyőmegosztás"
   },
   "sectionDescriptions": {
     "general": "Indítás, nyelv, frissítések és kisegítő lehetőségek.",
@@ -31,7 +31,7 @@
     "advanced": "Fejlesztői eszközök, diagnosztika, tárhely és licencek.",
     "about": "Verzió, támogatás és a beállítási varázsló.",
     "plugins": "A bővítmények elszigetelt környezetben futnak, és csak azt kapják meg, amit engedélyezel. Soha nem látják a hangodat, a fájljaidat vagy a tanúsítványodat.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Minőség, kodek és hardver a képernyőd megosztásához. A nézők mindig azt látják, amit a kezdés előtt kiválasztasz."
   },
   "breadcrumb": "Beállítások / {{section}}",
   "moreInfo": "További információ: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "riasztások felugró ablakok",
     "externalContent": "beágyazások képek előnézetek",
     "fileSharing": "fájlok küldés fogadás letöltés mentés mappa melléklet zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "képernyőmegosztás képernyő minőség felbontás fps kodek AV1 VP9 kódoló videokártya"
   },
   "search": {
     "label": "Beállítások keresése",
@@ -1053,5 +1053,62 @@
     "switch": "Fejlesztői mód",
     "hint": "Fejlesztő lapot ad a bővítményekhez, ahol aláíratlan bővítményeket tölthetsz be egy mappából. Csak akkor kapcsold be, ha magad készítesz bővítményeket."
   },
-  "newBadge": "New"
+  "newBadge": "Új",
+  "screenShare": {
+    "newBadge": "Új",
+    "qualityTitle": "Alapértelmezett minőség",
+    "resolution": "Felbontás",
+    "resolutionAuto": "Automatikus",
+    "resolutionHint": "Az automatikus a feltöltési sebességed és a nézőid által engedett legjobb minőségről indul, és visszalép, ha nem bírják tartani.",
+    "fps": "Képkockasebesség",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimalizálás erre",
+    "optimizeBalanced": "Kiegyensúlyozott",
+    "optimizeText": "Éles szöveg (kód, diák)",
+    "optimizeMotion": "Folyamatos mozgás (játékok, videó)",
+    "uploadLimit": "Feltöltési korlát",
+    "uploadAuto": "Automatikus",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "A megosztásod által küldött adat összesített felső határa. Hasznos megosztott vagy forgalomkorlátos kapcsolaton.",
+    "codecTitle": "Kodek",
+    "codec": "Kodek",
+    "codecAuto": "Automatikus (ajánlott)",
+    "codecAutoHint": "Először AV1 a videokártyán, majd AV1 a processzoron, ha egy rövid teszt szerint bírja a terhelést, egyébként VP9. AV1 csak akkor, ha minden néző le tudja játszani.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Ugyanannyi adatból a legélesebb kép. Aki nem tudja lejátszani, VP9-et kap.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Ezt használta eddig a Mumcord. Minden nézőnél működik.",
+    "codecInfo": "Videokártya nélkül az AV1 a processzort használja (SVT-AV1). A Mumcord VP9-re vált, ha a gép nem bírja.",
+    "codecOlder": "A régebbi Mumcordot használó nézők mindig VP9-et kapnak, bármit választasz.",
+    "hardwareTitle": "Hardveres gyorsítás",
+    "useGpu": "Videokártya használata, ha elérhető",
+    "useGpuHint": "Az AV1 kódolása a videokártyán történik, így a megosztás szinte nem terheli a CPU-t. Kikapcsolva az AV1 a processzort használja.",
+    "statusList": "Kódoló állapota",
+    "av1Encode": "AV1 kódolás",
+    "askEachTime": "Kérdezz rá ezekre a beállításokra minden megosztáskor",
+    "av1Playback": "AV1 lejátszás",
+    "vp9Playback": "VP9 lejátszás",
+    "playbackHardware": "Hardveres",
+    "playbackSoftware": "Szoftveres",
+    "av1EncodeCpu": "AV1 kódolás a processzoron",
+    "vp9Encode": "VP9 kódolás",
+    "gpuNvidia": "NVIDIA videokártya",
+    "gpuAmd": "AMD videokártya",
+    "gpuIntel": "Intel videokártya",
+    "gpuUnknown": "Videokártya",
+    "software": "Szoftveres",
+    "softwareLimit": "Szoftveres, legfeljebb {{height}}p{{fps}} tartható",
+    "notAvailable": "Nem elérhető",
+    "checking": "Ellenőrzés…",
+    "active": "Aktív kódoló: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (processzor)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (szoftveres)",
+    "skippedTooHeavy": "VP9 (az AV1 túl nehéz ennek a gépnek)",
+    "skippedOnBattery": "VP9 (akkumulátoros üzem)",
+    "skippedAboveLimit": "VP9 (a képed meghaladja, amit az AV1 itt kezelni tud)",
+    "softwareWarning": "Az AV1 sikeres ellenőrzés nélkül a processzoron fut, és túl nehéz lehet ennek a gépnek.",
+    "checkAgain": "Ellenőrzés újra"
+  }
 }

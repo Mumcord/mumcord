@@ -17,7 +17,7 @@
     "packetInspector": "Paketinspektör",
     "hotkeys": "Kortkommandon",
     "plugins": "Tillägg",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Skärmdelning"
   },
   "sectionDescriptions": {
     "general": "Start, språk, uppdateringar och tillgänglighet.",
@@ -31,7 +31,7 @@
     "advanced": "Utvecklarverktyg, diagnostik, lagring och licenser.",
     "about": "Version, support och installationsguiden.",
     "plugins": "Tillägg körs i en sandlåda och får bara det du tillåter. De ser aldrig ditt ljud, dina filer eller ditt certifikat.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Kvalitet, kodek och hårdvara för att dela din skärm. Tittarna ser alltid det du väljer innan du börjar."
   },
   "breadcrumb": "Inställningar / {{section}}",
   "moreInfo": "Mer information: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "aviseringar popup-fönster",
     "externalContent": "inbäddat innehåll bilder förhandsvisningar",
     "fileSharing": "filer skicka ta emot ladda ner spara mapp bilaga zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "skärmdelning kvalitet upplösning fps videokodek AV1 VP9 kodare grafikkort"
   },
   "search": {
     "label": "Sök i inställningar",
@@ -1053,5 +1053,62 @@
     "switch": "Utvecklarläge",
     "hint": "Lägger till fliken Utvecklare under Tillägg, där du kan läsa in osignerade tillägg från en mapp. Slå bara på det om du själv bygger tillägg."
   },
-  "newBadge": "New"
+  "newBadge": "Ny",
+  "screenShare": {
+    "newBadge": "Ny",
+    "qualityTitle": "Standardkvalitet",
+    "resolution": "Upplösning",
+    "resolutionAuto": "Automatisk",
+    "resolutionHint": "Automatisk börjar med bästa kvalitet som din uppladdning och dina tittare tillåter, och går ner när de inte hänger med.",
+    "fps": "Bildfrekvens",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Optimera för",
+    "optimizeBalanced": "Balanserat",
+    "optimizeText": "Skarp text (kod, bildspel)",
+    "optimizeMotion": "Mjuk rörelse (spel, video)",
+    "uploadLimit": "Uppladdningsgräns",
+    "uploadAuto": "Automatisk",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "Det mesta din delning skickar totalt. Praktiskt på en delad eller begränsad anslutning.",
+    "codecTitle": "Videokodek",
+    "codec": "Videokodek",
+    "codecAuto": "Automatisk (rekommenderas)",
+    "codecAutoHint": "Först AV1 på ditt grafikkort, sedan AV1 på processorn om ett kort test visar att den hänger med, annars VP9. AV1 bara när alla tittare kan spela upp det.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "Skarpaste bilden för samma datamängd. Tittare som inte kan spela upp det får VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "Det Mumcord använt hittills. Fungerar för alla tittare.",
+    "codecInfo": "Utan grafikkort använder AV1 processorn (SVT-AV1). Mumcord byter till VP9 om din dator inte hänger med.",
+    "codecOlder": "Tittare med en äldre Mumcord får alltid VP9, oavsett vad du väljer.",
+    "hardwareTitle": "Hårdvaruacceleration",
+    "useGpu": "Använd grafikkortet när det finns",
+    "useGpuHint": "Kodar AV1 på ditt grafikkort, så delningen kostar nästan ingen CPU. Av: AV1 använder processorn.",
+    "statusList": "Kodarstatus",
+    "av1Encode": "AV1-kodning",
+    "askEachTime": "Fråga efter dessa inställningar varje gång jag delar",
+    "av1Playback": "AV1-uppspelning",
+    "vp9Playback": "VP9-uppspelning",
+    "playbackHardware": "Maskinvara",
+    "playbackSoftware": "Programvara",
+    "av1EncodeCpu": "AV1-kodning på processorn",
+    "vp9Encode": "VP9-kodning",
+    "gpuNvidia": "NVIDIA-grafikkort",
+    "gpuAmd": "AMD-grafikkort",
+    "gpuIntel": "Intel-grafikkort",
+    "gpuUnknown": "Grafikkort",
+    "software": "Programvara",
+    "softwareLimit": "Programvara, klarar upp till {{height}}p{{fps}}",
+    "notAvailable": "Inte tillgängligt",
+    "checking": "Kontrollerar…",
+    "active": "Aktiv kodare: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (processorn)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (programvara)",
+    "skippedTooHeavy": "VP9 (AV1 för tungt för den här datorn)",
+    "skippedOnBattery": "VP9 (på batteri)",
+    "skippedAboveLimit": "VP9 (din bild är över vad AV1 klarar här)",
+    "softwareWarning": "AV1 körs på processorn utan godkänt test och kan vara för tungt för den här datorn.",
+    "checkAgain": "Kontrollera igen"
+  }
 }

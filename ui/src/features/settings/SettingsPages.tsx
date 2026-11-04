@@ -30,6 +30,7 @@ import { FileSharingSettings } from "../files/FileSharingSettings";
 import { ConnectionsCard } from "./sections/PrivacySection";
 import { PrivacySummaryCard } from "./sections/PrivacySummaryCard";
 import { PrivateMessagesGroup } from "./sections/PrivateMessagesGroup";
+import { CodecCard, HardwareCard, QualityDefaultsCard } from "./sections/ScreenSharingSection";
 import { ServerConnectionsCard } from "./sections/ServersSection";
 import { NotificationsCard, SoundsCard } from "./sections/SoundsSection";
 import type { SettingsSectionProps } from "./sections/types";
@@ -130,6 +131,14 @@ export function SettingsPageCards({
             update({ pluginsUpdates });
           }}
         />
+      );
+    case "screenSharing":
+      return (
+        <>
+          <QualityDefaultsCard {...props} />
+          <CodecCard {...props} />
+          <HardwareCard {...props} />
+        </>
       );
     case "appearance":
       return (

@@ -215,6 +215,48 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
       "hotkeys.action.openMumcord",
     ],
   },
+  {
+    section: "screenSharing",
+    group: "screenShare.qualityTitle",
+    control: "screenShare.resolution",
+    terms: ["screenShare.resolutionHint", "searchTerms.screenSharing"],
+  },
+  { section: "screenSharing", group: "screenShare.qualityTitle", control: "screenShare.fps" },
+  {
+    section: "screenSharing",
+    group: "screenShare.qualityTitle",
+    control: "screenShare.optimize",
+    terms: ["screenShare.optimizeText", "screenShare.optimizeMotion"],
+  },
+  {
+    section: "screenSharing",
+    group: "screenShare.qualityTitle",
+    control: "screenShare.uploadLimit",
+    terms: ["screenShare.uploadHint"],
+  },
+  {
+    section: "screenSharing",
+    group: "screenShare.codecTitle",
+    control: "screenShare.codec",
+    terms: [
+      "screenShare.codecAuto",
+      "screenShare.codecAv1",
+      "screenShare.codecVp9",
+      "screenShare.codecInfo",
+    ],
+  },
+  {
+    section: "screenSharing",
+    group: "screenShare.hardwareTitle",
+    control: "screenShare.useGpu",
+    terms: ["screenShare.useGpuHint"],
+  },
+  {
+    section: "screenSharing",
+    group: "screenShare.hardwareTitle",
+    control: "screenShare.checkAgain",
+    terms: ["screenShare.av1Encode", "screenShare.vp9Encode"],
+  },
   { section: "voiceAudio", group: "sections.hotkeys", control: "hotkeys.add" },
   { section: "voiceAudio", group: "sections.hotkeys", control: "hotkeys.reset" },
   {

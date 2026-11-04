@@ -17,7 +17,7 @@
     "packetInspector": "Inspetor de pacotes",
     "hotkeys": "Atalhos",
     "plugins": "Plugins",
-    "screenSharing": "Screen sharing"
+    "screenSharing": "Partilha de ecrã"
   },
   "sectionDescriptions": {
     "general": "Arranque, idioma, atualizações e acessibilidade.",
@@ -31,7 +31,7 @@
     "advanced": "Ferramentas de programador, diagnóstico, armazenamento e licenças.",
     "about": "Versão, suporte e o assistente de configuração.",
     "plugins": "Os plugins são executados num ambiente isolado e só recebem o que permitir. Nunca veem o seu áudio, ficheiros ou certificado.",
-    "screenSharing": "Quality, codec and hardware for sharing your screen. Viewers always see what you pick before you start."
+    "screenSharing": "Qualidade, codec e hardware para partilhares o teu ecrã. Os espectadores veem sempre o que escolhes antes de começares."
   },
   "breadcrumb": "Definições / {{section}}",
   "moreInfo": "Mais informações: {{topic}}",
@@ -49,7 +49,7 @@
     "notifications": "alertas pop-ups",
     "externalContent": "conteúdo incorporado imagens pré-visualizações",
     "fileSharing": "ficheiros enviar receber descarregar guardar pasta anexo zip",
-    "screenSharing": "screen share quality resolution fps codec AV1 VP9 encoder graphics card"
+    "screenSharing": "partilha ecrã qualidade resolução fps codec AV1 VP9 codificador placa gráfica"
   },
   "search": {
     "label": "Pesquisar definições",
@@ -1061,5 +1061,62 @@
     "switch": "Modo de programador",
     "hint": "Adiciona um separador Programador aos plugins para carregar plugins não assinados de uma pasta. Ative apenas se criar plugins."
   },
-  "newBadge": "New"
+  "newBadge": "Novo",
+  "screenShare": {
+    "newBadge": "Novo",
+    "qualityTitle": "Qualidade predefinida",
+    "resolution": "Resolução",
+    "resolutionAuto": "Automática",
+    "resolutionHint": "Automática começa com a melhor qualidade que o teu upload e os teus espectadores permitem, e baixa quando não acompanham.",
+    "fps": "Taxa de fotogramas",
+    "fpsOption": "{{fps}} fps",
+    "optimize": "Otimizar para",
+    "optimizeBalanced": "Equilibrado",
+    "optimizeText": "Texto nítido (código, diapositivos)",
+    "optimizeMotion": "Movimento fluido (jogos, vídeo)",
+    "uploadLimit": "Limite de upload",
+    "uploadAuto": "Automático",
+    "uploadOption": "{{mbit}} Mbit/s",
+    "uploadHint": "O máximo que a tua partilha envia no total. Útil numa ligação partilhada ou com dados limitados.",
+    "codecTitle": "Codec de vídeo",
+    "codec": "Codec de vídeo",
+    "codecAuto": "Automático (recomendado)",
+    "codecAutoHint": "Primeiro AV1 na placa gráfica, depois AV1 no processador se um teste curto mostrar que aguenta, caso contrário VP9. AV1 só quando todos os espectadores o conseguem reproduzir.",
+    "codecAv1": "AV1",
+    "codecAv1Hint": "A imagem mais nítida com os mesmos dados. Os espectadores que não o conseguem reproduzir recebem VP9.",
+    "codecVp9": "VP9",
+    "codecVp9Hint": "O que o Mumcord usava até agora. Funciona para todos os espectadores.",
+    "codecInfo": "Sem placa gráfica, o AV1 usa o processador (SVT-AV1). O Mumcord muda para VP9 se o teu computador não aguentar.",
+    "codecOlder": "Os espectadores com um Mumcord mais antigo recebem sempre VP9, seja o que for que escolhas.",
+    "hardwareTitle": "Aceleração por hardware",
+    "useGpu": "Usar a placa gráfica quando disponível",
+    "useGpuHint": "Codifica AV1 na tua placa gráfica, por isso a partilha quase não gasta CPU. Desligado: o AV1 usa o processador.",
+    "statusList": "Estado do codificador",
+    "av1Encode": "Codificação AV1",
+    "askEachTime": "Perguntar por estas definições sempre que partilhar",
+    "av1Playback": "Reprodução AV1",
+    "vp9Playback": "Reprodução VP9",
+    "playbackHardware": "Por hardware",
+    "playbackSoftware": "Por software",
+    "av1EncodeCpu": "Codificação AV1 no processador",
+    "vp9Encode": "Codificação VP9",
+    "gpuNvidia": "Placa gráfica NVIDIA",
+    "gpuAmd": "Placa gráfica AMD",
+    "gpuIntel": "Placa gráfica Intel",
+    "gpuUnknown": "Placa gráfica",
+    "software": "Por software",
+    "softwareLimit": "Por software, aguenta até {{height}}p{{fps}}",
+    "notAvailable": "Indisponível",
+    "checking": "A verificar…",
+    "active": "Codificador ativo: {{encoder}}",
+    "activeAv1Gpu": "AV1 ({{gpu}})",
+    "activeAv1Cpu": "AV1 (processador)",
+    "activeVp9Gpu": "VP9 ({{gpu}})",
+    "activeVp9Cpu": "VP9 (por software)",
+    "skippedTooHeavy": "VP9 (AV1 demasiado pesado para este PC)",
+    "skippedOnBattery": "VP9 (com bateria)",
+    "skippedAboveLimit": "VP9 (a tua imagem excede o que o AV1 gere aqui)",
+    "softwareWarning": "O AV1 vai correr no processador sem um teste aprovado e pode ser demasiado pesado para este PC.",
+    "checkAgain": "Verificar novamente"
+  }
 }
