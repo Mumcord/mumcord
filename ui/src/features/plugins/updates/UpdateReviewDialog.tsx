@@ -86,6 +86,22 @@ export function UpdateReviewDialog({
     </>
   );
 
+  const notesUrl = review.notesUrl;
+  const notesLink =
+    notesUrl === null ? null : (
+      <a
+        className="settings-link"
+        href={notesUrl}
+        rel="noreferrer noopener"
+        onClick={(event) => {
+          event.preventDefault();
+          openInBrowser(notesUrl);
+        }}
+      >
+        {t("dialog.whatsNew", { version: update.to })}
+      </a>
+    );
+
   const install = async () => {
     setBusy(true);
     setFailed(false);
@@ -126,21 +142,6 @@ export function UpdateReviewDialog({
       icon={icon}
       subtitle={<p className="plugin-review__subtitle">{subtitle}</p>}
     >
-      {review.notesUrl !== null && (
-        <p className="plugin-review__notes">
-          <a
-            href={review.notesUrl}
-            rel="noreferrer noopener"
-            onClick={(event) => {
-              event.preventDefault();
-              if (review.notesUrl !== null) openInBrowser(review.notesUrl);
-            }}
-          >
-            {t("dialog.whatsNew", { version: update.to })}
-          </a>
-        </p>
-      )}
-
       {newOrigins > 0 && (
         <div className="plugin-review__alert" role="note">
           <p>
@@ -264,8 +265,14 @@ export function UpdateReviewDialog({
             })}
           </ul>
         </>
-      ) : (
-        <p className="plugin-review__muted-line">{t("dialog.noOtherPermissions")}</p>
+      ) : null}
+
+      {(newPermissions.length === 0 || notesLink !== null) && (
+        <p className="settings-hint plugin-review__hintline">
+          {newPermissions.length === 0 && t("dialog.noOtherPermissions")}
+          {newPermissions.length === 0 && notesLink !== null && " "}
+          {notesLink}
+        </p>
       )}
 
       {riskUp && review.recentChange !== null && (

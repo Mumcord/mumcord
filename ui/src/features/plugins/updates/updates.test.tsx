@@ -426,11 +426,17 @@ describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", 
   });
 
   it("links to the release notes through the safe external-link path, only when there are some", async () => {
-    setup([{ ...held, review: { ...held.review, notesUrl: "https://poll.example/notes/1.2.0" } }]);
+    setup([
+      { ...websites, review: { ...websites.review, notesUrl: "https://poll.example/notes/1.2.0" } },
+    ]);
     const openLink = vi.spyOn(getApi(), "openLink").mockResolvedValue(null);
     renderTab();
     fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
-    fireEvent.click(await screen.findByRole("link", { name: "What's new in 1.2.0" }));
+    const link = await screen.findByRole("link", { name: "What's new in 1.2.0" });
+    expect(link.parentElement).toHaveTextContent(
+      /^No other permissions change\. What's new in 1\.2\.0$/u,
+    );
+    fireEvent.click(link);
     expect(openLink).toHaveBeenCalledWith("https://poll.example/notes/1.2.0");
   });
 

@@ -278,8 +278,8 @@
   width: min(36rem, calc(100vw - 2 * var(--space-4)));
 }
 
-.plugin-review__notes {
-  font-size: var(--font-size-sm);
+.plugin-review__hintline {
+  margin: 0;
 }
 
 .plugin-review__alert {
