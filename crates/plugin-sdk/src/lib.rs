@@ -99,6 +99,11 @@ pub use bindings::mumcord::plugin::{
     chat, clock, events, http, notify, random, secrets, theme, timers, types, webview,
 };
 
+/// Compiles the examples of the Bovnar author guide as doc tests, so they cannot go stale.
+#[cfg(all(doctest, feature = "1.1"))]
+#[doc = include_str!("../../../docs/plugins/peer-data-bovnar.md")]
+struct PeerDataGuide;
+
 #[cfg(feature = "1.1")]
 pub mod app_menu;
 #[cfg(feature = "1.1")]
