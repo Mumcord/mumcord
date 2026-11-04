@@ -1062,6 +1062,18 @@
     "hint": "Dodacima dodaje karticu Programer na kojoj možete učitati nepotpisane dodatke iz mape. Uključite ga samo ako sami izrađujete dodatke."
   },
   "newBadge": "Novo",
+  "pluginSafety": {
+    "title": "Sigurnost dodataka",
+    "blockHighRisk": "Ne dopuštaj dodatke s visokim rizikom",
+    "hint": "Skriva gumb Instaliraj za dodatke s ocjenom 60 ili višom i zaustavlja ažuriranja koja bi instalirani dodatak dovela na tu razinu. Dodaci koje si već instalirao i dalje rade.",
+    "note": "Prema zadanim postavkama isključeno. Službeni dodaci i razvojni dodaci nikad nisu zahvaćeni. Ocjene su procjene, a ne jamstvo."
+  },
+  "pluginSounds": {
+    "title": "Zvukovi dodataka",
+    "volume": "Glasnoća zvukova dodataka",
+    "mute": "Utišaj zvukove dodataka",
+    "hint": "Odnosi se na svaki zvuk koji dodatak reproducira. Zvukovi dodataka tiši su dok ljudi govore."
+  },
   "screenShare": {
     "newBadge": "Novo",
     "qualityTitle": "Zadana kvaliteta",

@@ -56,14 +56,14 @@
     "results": "Výsledky hledání",
     "empty": "Hledání „{{query}}“ neodpovídá žádné nastavení.",
     "count_one": "Nalezeno {{count}} nastavení",
-    "count_other": "Nalezeno {{count}} nastavení",
     "count_few": "Nalezena {{count}} nastavení",
     "count_many": "Nalezeno {{count}} nastavení",
+    "count_other": "Nalezeno {{count}} nastavení",
     "shortcut": "Ctrl F",
     "groupCount_one": "{{count}} výsledek",
-    "groupCount_other": "{{count}} výsledků",
     "groupCount_few": "{{count}} výsledky",
-    "groupCount_many": "{{count}} výsledku"
+    "groupCount_many": "{{count}} výsledku",
+    "groupCount_other": "{{count}} výsledků"
   },
   "errors": {
     "secureStorage": "Zabezpečené úložiště tvého systému není dostupné, nebo byl přístup odmítnut.",
@@ -276,9 +276,9 @@
       "noServer": "Připoj se k serveru a vyber lidi nebo kanál.",
       "missingChannel": "{{channel}} (není na tomto serveru)",
       "summaryPeople_one": "{{count}} osoba · šeptání",
-      "summaryPeople_other": "{{count}} osob · šeptání",
       "summaryPeople_few": "{{count}} osoby · šeptání",
       "summaryPeople_many": "{{count}} osoby · šeptání",
+      "summaryPeople_other": "{{count}} osob · šeptání",
       "summaryChannel": "Jen kanál · volání",
       "summaryChannelTree": "Kanál a podkanály · volání",
       "hotkey": "Podrž pro mluvení:",
@@ -592,9 +592,9 @@
   },
   "retention": {
     "days_one": "{{count}} den",
-    "days_other": "{{count}} dní",
     "days_few": "{{count}} dny",
-    "days_many": "{{count}} dne"
+    "days_many": "{{count}} dne",
+    "days_other": "{{count}} dní"
   },
   "nowGaming": {
     "title": "Právě hraju",
@@ -720,9 +720,9 @@
     },
     "details": "Podrobnosti paketu z {{time}}",
     "toUsers_one": "→ {{count}} uživatel",
-    "toUsers_other": "→ {{count}} uživatelů",
     "toUsers_few": "→ {{count}} uživatelé",
     "toUsers_many": "→ {{count}} uživatele",
+    "toUsers_other": "→ {{count}} uživatelů",
     "delayed": "zpožděno o {{ms}} ms",
     "notDelayed": "bez zpoždění",
     "tokensLeft": "zbývající tokeny: {{tokens}}",
@@ -881,14 +881,14 @@
     "autoUnavailable": "Tato kopie se nemůže aktualizovat sama, proto tě Mumcord jen upozorní na nové verze.",
     "interval": "Kontrolovat aktualizace",
     "intervalHint_one": "Při spuštění a každou hodinu",
-    "intervalHint_other": "Při spuštění a každých {{count}} hodin",
     "intervalHint_few": "Při spuštění a každé {{count}} hodiny",
     "intervalHint_many": "Při spuštění a každých {{count}} hodiny",
+    "intervalHint_other": "Při spuštění a každých {{count}} hodin",
     "intervalWeekHint": "Při spuštění a jednou týdně",
     "intervalHours_one": "Každou hodinu",
-    "intervalHours_other": "Každých {{count}} hodin",
     "intervalHours_few": "Každé {{count}} hodiny",
     "intervalHours_many": "Každých {{count}} hodiny",
+    "intervalHours_other": "Každých {{count}} hodin",
     "intervalWeek": "Jednou týdně",
     "state": {
       "idle": "Zatím nezkontrolováno",
@@ -934,9 +934,9 @@
     "none": "Žádná předvolba",
     "customised": "{{preset}}, upraveno",
     "changed_one": "Od nastavení byla změněna {{count}} položka",
-    "changed_other": "Od nastavení bylo změněno {{count}} položek",
     "changed_few": "Od nastavení byly změněny {{count}} položky",
     "changed_many": "Od nastavení bylo změněno {{count}} položky",
+    "changed_other": "Od nastavení bylo změněno {{count}} položek",
     "unchanged": "Od nastavení žádné změny",
     "switch": "Přepnout",
     "switchLabel": "Přepnout předvolbu",
@@ -1070,6 +1070,18 @@
     "hint": "Přidá k doplňkům kartu Vývojář, kde lze načíst nepodepsané doplňky ze složky. Zapněte jej, jen pokud doplňky sami vytváříte."
   },
   "newBadge": "Nové",
+  "pluginSafety": {
+    "title": "Bezpečnost pluginů",
+    "blockHighRisk": "Nepovolovat vysoce rizikové pluginy",
+    "hint": "Skryje tlačítko Nainstalovat u pluginů se skóre 60 nebo vyšším a zablokuje aktualizace, které by nainstalovaný plugin na tuto hranici dostaly. Již nainstalované pluginy fungují dál.",
+    "note": "Ve výchozím stavu vypnuto. Oficiálních pluginů a pluginů pro vývojáře se to nikdy netýká. Skóre jsou odhady, nikoli záruka."
+  },
+  "pluginSounds": {
+    "title": "Zvuky pluginů",
+    "volume": "Hlasitost zvuků pluginů",
+    "mute": "Ztlumit zvuky pluginů",
+    "hint": "Platí pro každý zvuk, který plugin přehraje. Zvuky pluginů jsou tišší, když lidé mluví."
+  },
   "screenShare": {
     "newBadge": "Nové",
     "qualityTitle": "Výchozí kvalita",

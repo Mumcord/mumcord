@@ -1070,6 +1070,18 @@
     "hint": "Prie papildinių prideda kortelę Kūrėjas, kurioje galima įkelti nepasirašytus papildinius iš aplanko. Įjunkite tik jei patys kuriate papildinius."
   },
   "newBadge": "Nauja",
+  "pluginSafety": {
+    "title": "Papildinių sauga",
+    "blockHighRisk": "Neleisti didelės rizikos papildinių",
+    "hint": "Paslepia mygtuką Įdiegti papildiniams, kurių balas yra 60 ar didesnis, ir sustabdo naujinimus, dėl kurių įdiegtas papildinys pasiektų šią ribą. Jau įdiegti papildiniai toliau veikia.",
+    "note": "Pagal numatytuosius nustatymus išjungta. Oficialių ir kūrėjų papildinių tai niekada neliečia. Balai yra įvertinimai, o ne garantija."
+  },
+  "pluginSounds": {
+    "title": "Papildinių garsai",
+    "volume": "Papildinių garsų garsumas",
+    "mute": "Nutildyti papildinių garsus",
+    "hint": "Taikoma kiekvienam garsui, kurį groja papildinys. Papildinių garsai tylesni, kai žmonės kalba."
+  },
   "screenShare": {
     "newBadge": "Nauja",
     "qualityTitle": "Numatytoji kokybė",

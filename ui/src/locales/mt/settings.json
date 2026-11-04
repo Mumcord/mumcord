@@ -1078,6 +1078,18 @@
     "hint": "Iżid tab Żviluppatur mal-Plagins fejn tista' tgħabbi plagins mhux iffirmati minn folder. Ixgħelha biss jekk tibni l-plagins int stess."
   },
   "newBadge": "Ġdid",
+  "pluginSafety": {
+    "title": "Sigurtà tal-plagins",
+    "blockHighRisk": "Tippermettix plagins ta' riskju għoli",
+    "hint": "Taħbi l-buttuna Installa għal plagins b'punteġġ ta' 60 jew aktar, u twaqqaf aġġornamenti li jwasslu plagin installat hemmhekk. Il-plagins li diġà installajt ikomplu jaħdmu.",
+    "note": "Mitfi awtomatikament. Il-plagins uffiċjali u l-plagins tal-iżviluppaturi qatt ma jintlaqtu. Il-punteġġi huma stimi, mhux garanzija."
+  },
+  "pluginSounds": {
+    "title": "Ħsejjes tal-plagins",
+    "volume": "Volum tal-ħsejjes tal-plagins",
+    "mute": "Għolq il-ħsejjes tal-plagins",
+    "hint": "Japplika għal kull ħoss li jdoqq plagin. Il-ħsejjes tal-plagins ikunu aktar baxxi waqt li n-nies jitkellmu."
+  },
   "screenShare": {
     "newBadge": "Ġdid",
     "qualityTitle": "Kwalità awtomatika",

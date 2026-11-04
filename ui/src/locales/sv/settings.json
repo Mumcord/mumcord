@@ -1054,6 +1054,18 @@
     "hint": "Lägger till fliken Utvecklare under Tillägg, där du kan läsa in osignerade tillägg från en mapp. Slå bara på det om du själv bygger tillägg."
   },
   "newBadge": "Ny",
+  "pluginSafety": {
+    "title": "Pluginsäkerhet",
+    "blockHighRisk": "Tillåt inte plugins med hög risk",
+    "hint": "Döljer knappen Installera för plugins med en poäng på 60 eller mer och stoppar uppdateringar som skulle föra ett installerat plugin dit. Plugins du redan har installerat fortsätter fungera.",
+    "note": "Av som standard. Officiella plugins och utvecklarplugins påverkas aldrig. Poäng är uppskattningar, ingen garanti."
+  },
+  "pluginSounds": {
+    "title": "Pluginljud",
+    "volume": "Volym för pluginljud",
+    "mute": "Stäng av pluginljud",
+    "hint": "Gäller varje ljud som ett plugin spelar upp. Pluginljud är lägre medan folk pratar."
+  },
   "screenShare": {
     "newBadge": "Ny",
     "qualityTitle": "Standardkvalitet",

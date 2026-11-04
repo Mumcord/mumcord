@@ -1054,6 +1054,18 @@
     "hint": "Voegt een tabblad Ontwikkelaar toe aan Plug-ins om niet-ondertekende plug-ins uit een map te laden. Zet dit alleen aan als je zelf plug-ins maakt."
   },
   "newBadge": "Nieuw",
+  "pluginSafety": {
+    "title": "Pluginveiligheid",
+    "blockHighRisk": "Plugins met een hoog risico niet toestaan",
+    "hint": "Verbergt de knop Installeren bij plugins met een score van 60 of hoger en blokkeert updates die een geïnstalleerde plugin daar zouden brengen. Plugins die je al hebt geïnstalleerd blijven werken.",
+    "note": "Standaard uit. Officiële plugins en ontwikkelaarsplugins worden nooit beïnvloed. Scores zijn schattingen, geen garantie."
+  },
+  "pluginSounds": {
+    "title": "Pluginigeluiden",
+    "volume": "Volume van pluginigeluiden",
+    "mute": "Pluginigeluiden dempen",
+    "hint": "Geldt voor elk geluid dat een plugin afspeelt. Pluginigeluiden klinken zachter terwijl mensen praten."
+  },
   "screenShare": {
     "newBadge": "Nieuw",
     "qualityTitle": "Standaardkwaliteit",

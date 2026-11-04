@@ -1062,6 +1062,18 @@
     "hint": "Adiciona um separador Programador aos plugins para carregar plugins não assinados de uma pasta. Ative apenas se criar plugins."
   },
   "newBadge": "Novo",
+  "pluginSafety": {
+    "title": "Segurança dos plugins",
+    "blockHighRisk": "Não permitir plugins de risco elevado",
+    "hint": "Oculta o botão Instalar para plugins com pontuação de 60 ou mais e impede atualizações que levariam um plugin instalado a esse nível. Os plugins já instalados continuam a funcionar.",
+    "note": "Desativado por predefinição. Os plugins oficiais e de programador nunca são afetados. As pontuações são estimativas, não uma garantia."
+  },
+  "pluginSounds": {
+    "title": "Sons dos plugins",
+    "volume": "Volume dos sons dos plugins",
+    "mute": "Silenciar sons dos plugins",
+    "hint": "Aplica-se a todos os sons reproduzidos por um plugin. Os sons dos plugins ficam mais baixos enquanto as pessoas falam."
+  },
   "screenShare": {
     "newBadge": "Novo",
     "qualityTitle": "Qualidade predefinida",
