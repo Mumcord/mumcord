@@ -36,6 +36,17 @@
     "unregistered": "μη εγγεγραμμένος"
   },
   "mumcordBadge": "Χρησιμοποιεί το Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Bot σε αυτόν τον διακομιστή ({{total}})",
+    "inChannel": "στο κανάλι {{channel}}",
+    "modules": {
+      "peer": "Ρελέ",
+      "music": "Παίζει μουσική",
+      "history": "Ιστορικό συνομιλίας",
+      "webhook": "Webhooks"
+    }
+  },
   "statusTip": {
     "registered": "Εγγεγραμμένος σε αυτόν τον διακομιστή",
     "listening": "Μόνο ακρόαση",

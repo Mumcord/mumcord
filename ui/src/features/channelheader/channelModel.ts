@@ -1,5 +1,6 @@
 import type { ChannelInfo, SavedChannelPassword, ServerInfo, User } from "../../api";
 import { htmlToText } from "../chat/sanitize";
+import { isHiddenBot } from "../channels/mumcord";
 
 /** Channel names from below the root down to `channelId`; empty for the root and unknown ids. */
 export function channelPath(
@@ -41,7 +42,9 @@ export function shortDescription(html: string | null): string {
 /** People currently in the channel. */
 export function userCount(users: ReadonlyMap<number, User>, channelId: number): number {
   let count = 0;
-  for (const user of users.values()) if (user.channelId === channelId) count += 1;
+  for (const user of users.values()) {
+    if (user.channelId === channelId && !isHiddenBot(user)) count += 1;
+  }
   return count;
 }
 
@@ -76,6 +79,7 @@ export function movablePeople(
     .filter(
       (user) =>
         user.session !== selfSession &&
+        !isHiddenBot(user) &&
         user.channelId !== channelId &&
         channels.get(user.channelId)?.permissions.moveUsers === true,
     )

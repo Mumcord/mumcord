@@ -42,6 +42,17 @@
     "unregistered": "neregistruotas (-a)"
   },
   "mumcordBadge": "Naudoja Mumcord",
+  "botBadge": "Botas",
+  "bots": {
+    "title": "Botai šiame serveryje ({{total}})",
+    "inChannel": "kanale {{channel}}",
+    "modules": {
+      "peer": "Perdavimo mazgas",
+      "music": "Groja muziką",
+      "history": "Pokalbių istorija",
+      "webhook": "Webhook’ai"
+    }
+  },
   "statusTip": {
     "registered": "Registruotas (-a) šiame serveryje",
     "listening": "Tik klauso",

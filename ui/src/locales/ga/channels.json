@@ -45,6 +45,17 @@
     "unregistered": "gan chlárú"
   },
   "mumcordBadge": "Úsáideann sé Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Botanna ar an bhfreastalaí seo ({{total}})",
+    "inChannel": "in {{channel}}",
+    "modules": {
+      "peer": "Athsheachadán",
+      "music": "Seinneann sé ceol",
+      "history": "Stair an chomhrá",
+      "webhook": "Crúcaí gréasáin"
+    }
+  },
   "statusTip": {
     "registered": "Cláraithe ar an bhfreastalaí seo",
     "listening": "Ag éisteacht amháin",

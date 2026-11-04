@@ -4,9 +4,12 @@
  */
 import { useT } from "../../i18n/useT";
 import type { User } from "../../api";
-import { isMumcord } from "./mumcord";
+import { BotBadge } from "./BotBadge";
+import { isBot, isMumcord } from "./mumcord";
 
 /**
+ * Bots get the BOT badge instead (issue #458).
+ *
  * The app icon in miniature: the two-people "M" with the cap and the beanie on its violet tile,
  * which keeps the same contrast on light and dark themes.
  */
@@ -14,10 +17,11 @@ export function MumcordBadge({
   user,
   size = 13,
 }: {
-  user: Pick<User, "isMumcord"> | undefined;
+  user: Pick<User, "isMumcord" | "bot"> | undefined;
   size?: number;
 }) {
   const t = useT("channels");
+  if (isBot(user)) return <BotBadge />;
   if (!isMumcord(user)) return null;
   const label = t("mumcordBadge");
   // The leading space keeps the badge a separate word in the accessible name: inline elements

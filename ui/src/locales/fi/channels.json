@@ -36,6 +36,17 @@
     "unregistered": "ei rekisteröitynyt"
   },
   "mumcordBadge": "Käyttää Mumcordia",
+  "botBadge": "Botti",
+  "bots": {
+    "title": "Botit tällä palvelimella ({{total}})",
+    "inChannel": "kanavalla {{channel}}",
+    "modules": {
+      "peer": "Rele",
+      "music": "Soittaa musiikkia",
+      "history": "Keskusteluhistoria",
+      "webhook": "Webhookit"
+    }
+  },
   "statusTip": {
     "registered": "Rekisteröitynyt tälle palvelimelle",
     "listening": "Vain kuuntelee",

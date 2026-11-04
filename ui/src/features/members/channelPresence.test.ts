@@ -88,6 +88,14 @@ describe("channelPresence", () => {
     });
   });
 
+  it("does not count a bot without voice, but a voice bot (issue #458)", () => {
+    const bots = [
+      user(6, "Relay", { bot: { voice: false, modules: ["peer"] } }),
+      user(7, "DJ", { bot: { voice: true, modules: ["music"] } }),
+    ];
+    expect(channelPresence(state(bots, []), { kind: "channel", channelId: 1 })?.count).toBe(1);
+  });
+
   it("names the talkers in the channel by name, without listeners or people elsewhere", () => {
     const presence = channelPresence(state(people, [1, 2, 4, 5]), {
       kind: "channel",

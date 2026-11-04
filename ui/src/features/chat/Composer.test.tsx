@@ -146,6 +146,36 @@ describe("Composer mentions", () => {
     expect(names()).toEqual(["@channel", "Carla"]);
   });
 
+  it("suggests voice bots with the bot badge and never a bot without voice (issue #458)", async () => {
+    const api = await connectedMock({ bindStore: true });
+    const view = renderComposer();
+    await waitFor(() => {
+      expect(view.input).toBeEnabled();
+    });
+    const { getServerState } = await import("../channels/serverStore");
+    const anna = getServerState().users.get(2);
+    if (!anna) throw new Error("Anna is missing");
+    act(() => {
+      api.mock.upsertUser({
+        ...anna,
+        session: 20,
+        name: "Relay",
+        bot: { voice: false, modules: ["peer"] },
+      });
+      api.mock.upsertUser({
+        ...anna,
+        session: 21,
+        name: "DJ Byte",
+        bot: { voice: true, modules: ["music"] },
+      });
+    });
+    type(view.input, "@", 1);
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+    expect(names()).toEqual(["@channel", "@all", "Anna", "Ben", "DJ Byte", "Carla"]);
+    const dj = screen.getAllByRole("option").find((o) => o.textContent.includes("DJ Byte"));
+    expect(dj && within(dj).getByRole("img", { name: "Bot" })).toBeInTheDocument();
+  });
+
   it("offers @channel and @all in a channel with what they reach, and inserts the keyword", async () => {
     const { input } = await setup();
     type(input, "Heads up @", 10);

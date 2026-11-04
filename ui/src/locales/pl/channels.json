@@ -42,6 +42,17 @@
     "unregistered": "niezarejestrowany(-a)"
   },
   "mumcordBadge": "Używa Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Boty na tym serwerze ({{total}})",
+    "inChannel": "na kanale {{channel}}",
+    "modules": {
+      "peer": "Przekaźnik",
+      "music": "Odtwarza muzykę",
+      "history": "Historia czatu",
+      "webhook": "Webhooki"
+    }
+  },
   "statusTip": {
     "registered": "Zarejestrowany(-a) na tym serwerze",
     "listening": "Tylko słucha",
