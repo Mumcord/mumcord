@@ -273,7 +273,14 @@ export function DetailSection({ title, children }: { title: string; children: Re
 }
 
 /** "Where it shows" (FR-9.30): one chip per surface the plugin's permissions give it. */
-export function PluginPlaces({ permissions }: { permissions: readonly string[] }) {
+export function PluginPlaces({
+  permissions,
+  appMenuItems = 0,
+}: {
+  permissions: readonly string[];
+  /** How many Apps-menu items the installed plugin declares; the count is shown from two on. */
+  appMenuItems?: number;
+}) {
   const { t } = useTranslation("pluginOrigins");
   const places = PLACES.filter((place) => permissions.includes(place.permission));
   if (places.length === 0) return null;
@@ -282,7 +289,11 @@ export function PluginPlaces({ permissions }: { permissions: readonly string[] }
       <ul className="ps-places">
         {places.map((place) => (
           <li key={place.key} className="ps-chip">
-            {place.key === "appMenu" ? t("details.tags.appMenu") : t(`details.places.${place.key}`)}
+            {place.key === "appMenu"
+              ? appMenuItems > 1
+                ? t("details.places.appMenu", { count: appMenuItems })
+                : t("details.tags.appMenu")
+              : t(`details.places.${place.key}`)}
           </li>
         ))}
       </ul>
@@ -297,12 +308,15 @@ export function PluginPlaces({ permissions }: { permissions: readonly string[] }
 export function OwnCode({
   permissions,
   relay,
+  webSize = null,
 }: {
   permissions: readonly string[];
+  /** Size in bytes of the plugin's web pages, when known (installed plugins). */
+  webSize?: number | null;
   /** The content of the "Relay data" row; `null` leaves the row out. */
   relay: ReactNode;
 }) {
-  const { t } = useTranslation("pluginOrigins");
+  const { t, i18n } = useTranslation("pluginOrigins");
   const webview = permissions.includes(WEBVIEW);
   if (!webview && relay === null) return null;
   return (
@@ -311,7 +325,14 @@ export function OwnCode({
         {webview && (
           <>
             <dt>{t("details.sealedPage")}</dt>
-            <dd>{t("details.sealedPageTextNoSize", { entry: "web/index.html" })}</dd>
+            <dd>
+              {webSize === null
+                ? t("details.sealedPageTextNoSize", { entry: "web/index.html" })
+                : t("details.sealedPageText", {
+                    entry: "web/index.html",
+                    size: formatSize(webSize, i18n.language),
+                  })}
+            </dd>
           </>
         )}
         {relay !== null && (

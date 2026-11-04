@@ -120,9 +120,10 @@ export function PluginDetails({ plugin, run, busy }: PluginDetailsProps) {
         />
       )}
       <WebsitesSection name={name} websites={websites} approvedOn={plugin.installedAt} />
-      <PluginPlaces permissions={shown} />
+      <PluginPlaces permissions={shown} appMenuItems={plugin.appMenuItems} />
       <OwnCode
         permissions={shown}
+        webSize={plugin.webSize}
         relay={
           plugin.granted.includes(RELAY) ? (
             tOrigins("details.relayOn")

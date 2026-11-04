@@ -102,6 +102,25 @@ describe("Installed plugin details", () => {
     });
   });
 
+  it("shows the Apps-menu item count and the size of the web pages", async () => {
+    render(
+      <PluginDetails
+        plugin={{
+          ...brawl,
+          required: [...brawl.required, "ui.app-menu"],
+          appMenuItems: 2,
+          webSize: 1_800_000,
+        }}
+        run={vi.fn().mockResolvedValue(true)}
+        busy={false}
+      />,
+    );
+    const places = await screen.findByRole("region", { name: "Where it shows" });
+    expect(within(places).getByText("Apps menu · 2 items")).toBeTruthy();
+    const own = screen.getByRole("region", { name: "Own code" });
+    expect(within(own).getByText(/web\/index\.html · 1\.8 MB/)).toBeTruthy();
+  });
+
   it("moves focus to the permissions from 'Turn on in permissions'", async () => {
     render(<PluginDetails plugin={brawl} run={vi.fn().mockResolvedValue(true)} busy={false} />);
     (await screen.findByRole("button", { name: "Turn on in permissions" })).click();
