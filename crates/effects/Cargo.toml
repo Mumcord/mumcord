@@ -1,0 +1,25 @@
+[package]
+name = "mumcord-effects"
+description = "Camera background effects: person segmentation, edge refinement, blur and image backgrounds"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+image.workspace = true
+mumcord-camera.workspace = true
+mumcord-store.workspace = true
+ort.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[build-dependencies]
+sha2.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true
