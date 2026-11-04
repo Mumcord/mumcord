@@ -66,7 +66,7 @@ describe("RelayDataChip", () => {
     availability({ kind: "available", kbps: 512 });
     render(<RelayDataChip serverId={1} />);
     const chip = await screen.findByText("Relay · end-to-end encrypted");
-    expect(chip).toHaveAttribute("title", "up to 512 kbit/s per plugin");
+    expect(chip).toHaveAttribute("data-tooltip", "up to 512 kbit/s per plugin");
     act(() => {
       api.mock.emit("pluginsRelayAvailability", { serverId: 1, availability: { kind: "noRelay" } });
     });

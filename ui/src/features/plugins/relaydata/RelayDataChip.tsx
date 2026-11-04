@@ -24,7 +24,7 @@ export function RelayDataChip({ serverId, usable = true }: RelayDataChipProps) {
     return (
       <span
         className="relay-chip relay-chip--ok"
-        title={
+        data-tooltip={
           availability.kbps === null
             ? undefined
             : tRelay("serverAllowsRate", { rate: availability.kbps })
@@ -37,7 +37,7 @@ export function RelayDataChip({ serverId, usable = true }: RelayDataChipProps) {
   return (
     <span
       className="relay-chip relay-chip--warn"
-      title={availability.kind === "available" ? undefined : t("noRelayTitle")}
+      data-tooltip={availability.kind === "available" ? undefined : t("noRelayTitle")}
     >
       {t("connection.mumble")}
     </span>
