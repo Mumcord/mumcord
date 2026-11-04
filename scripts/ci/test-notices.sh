@@ -64,9 +64,9 @@ NODE
 
 # Small inputs: two crates and two npm packages, all with the same MIT text.
 mit=$'MIT License\n\nPermission is hereby granted, free of charge.'
-mkdir -p "$work/opus/opus" "$work/sqlite/sqlite3" "$work/bovnar/rust" "$work/bovnar/include" \
+mkdir -p "$work/opus/opus" "$work/sqlite/sqlite3" "$work/bovnar/c/include" \
   "$work/npm/a" "$work/npm/b" "$work/out"
-echo '#define BVNR_VERSION_STRING		"2.0.0"' > "$work/bovnar/include/bovnar.h"
+echo '#define BVNR_VERSION_STRING		"2.0.0"' > "$work/bovnar/c/include/bovnar.h"
 echo "Bovnar licence" > "$work/bovnar/LICENSE"
 echo "Bovnar third-party notices" > "$work/bovnar/THIRD_PARTY_NOTICES.md"
 echo 'PACKAGE_VERSION="1.0.0"' > "$work/opus/opus/package_version"
@@ -77,7 +77,7 @@ printf '%s\r\n' "$mit" > "$work/npm/b/LICENSE"
 cat > "$work/metadata.json" <<JSON
 {"packages": [{"name": "opusic-sys", "manifest_path": "$work/opus/Cargo.toml"},
               {"name": "libsqlite3-sys", "manifest_path": "$work/sqlite/Cargo.toml"},
-              {"name": "bovnar", "manifest_path": "$work/bovnar/rust/Cargo.toml"}]}
+              {"name": "bovnar", "manifest_path": "$work/bovnar/Cargo.toml"}]}
 JSON
 node - "$mit" "$work" <<'NODE'
 const [mit, out] = process.argv.slice(2);

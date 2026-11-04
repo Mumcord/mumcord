@@ -192,10 +192,10 @@ const versions = {
       /^PACKAGE_VERSION="(.*)"$/mu,
       "the libopus version",
     ),
-  // The Bovnar crate lives in rust/ of the C library's repository (issue #400).
+  // The published Bovnar crate bundles the C library sources under c/ (issue #400).
   "@bovnar": () =>
     match(
-      join(crateDir("bovnar"), "../include/bovnar.h"),
+      join(crateDir("bovnar"), "c/include/bovnar.h"),
       /^#define BVNR_VERSION_STRING\s+"(.*)"$/mu,
       "the Bovnar version",
     ),
@@ -208,8 +208,8 @@ const versions = {
 };
 const textFiles = {
   "@opus-copying": () => join(crateDir("opusic-sys"), "opus/COPYING"),
-  "@bovnar-license": () => join(crateDir("bovnar"), "../LICENSE"),
-  "@bovnar-notices": () => join(crateDir("bovnar"), "../THIRD_PARTY_NOTICES.md"),
+  "@bovnar-license": () => join(crateDir("bovnar"), "LICENSE"),
+  "@bovnar-notices": () => join(crateDir("bovnar"), "THIRD_PARTY_NOTICES.md"),
 };
 const nativeOut = [];
 const printed = new Map();
