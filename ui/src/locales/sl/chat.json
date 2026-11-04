@@ -416,5 +416,10 @@
     "several_two": "{{count}} predogleda sta skrita, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
     "several_few": "{{count}} predogledi so skriti, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>.",
     "several_other": "{{count}} predogledov je skritih, ker so predogledi povezav in vdelave izklopljeni v <settings>Nastavitve > Zasebnost</settings>."
+  },
+  "historyImage": {
+    "loading": "Nalaganje slike…",
+    "unavailable": "Slika ni na voljo",
+    "load": "Naloži sliko"
   }
 }

@@ -407,5 +407,10 @@
     "several_zero": "Paslēpti {{count}} priekšskatījumi, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
     "several_one": "Paslēpts {{count}} priekšskatījums, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>.",
     "several_other": "Paslēpti {{count}} priekšskatījumi, jo saišu priekšskatījumi un iegultie elementi ir izslēgti sadaļā <settings>Iestatījumi > Privātums</settings>."
+  },
+  "historyImage": {
+    "loading": "Ielādē attēlu…",
+    "unavailable": "Attēls nav pieejams",
+    "load": "Ielādēt attēlu"
   }
 }

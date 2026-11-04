@@ -285,6 +285,7 @@ function ServerAdminWindow({ state }: { state: BanWindow }) {
       }
       describedBy={descId}
       onClose={requestClose}
+      closeLabel={t("common:close")}
       className="admin-window"
     >
       <div className="admin-tabs">

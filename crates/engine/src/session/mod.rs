@@ -266,6 +266,8 @@ struct Inner {
     blocked: crate::blocking::BlockList,
     /// History sync with other Mumcord users (FR-1.60).
     history_sync: Arc<Mutex<crate::history_sync::HistorySync>>,
+    /// Images of synced messages still being fetched (FR-1.60f).
+    history_images: crate::history_sync::HistoryImages,
     /// What the last import from the official Mumble client added, for its undo (issue #66).
     mumble_import: Mutex<Option<mumble_import::LastImport>>,
     /// Positional audio (FR-1.41).
@@ -600,6 +602,7 @@ impl Engine {
             pm_requests: Mutex::default(),
             blocked: Mutex::new(blocked),
             history_sync: Arc::default(),
+            history_images: crate::history_sync::HistoryImages::default(),
             mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
@@ -614,6 +617,7 @@ impl Engine {
         engine.inner.direct.bind(engine.downgrade());
         engine.inner.relays.bind(engine.downgrade());
         engine.inner.files.bind(&engine);
+        engine.inner.history_images.bind(&engine);
         lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
         engine.positional_poll_restart();
         engine
@@ -894,6 +898,14 @@ impl Engine {
 
     pub(crate) fn history_sync_state(&self) -> &Mutex<crate::history_sync::HistorySync> {
         &self.inner.history_sync
+    }
+
+    pub(crate) fn history_sync_arc(&self) -> Arc<Mutex<crate::history_sync::HistorySync>> {
+        self.inner.history_sync.clone()
+    }
+
+    pub(crate) fn history_images(&self) -> &crate::history_sync::HistoryImages {
+        &self.inner.history_images
     }
 
     pub(crate) fn positional(&self) -> &crate::positional::Positional {
@@ -1883,6 +1895,7 @@ impl Inner {
             crate::plugins::on_disconnect(self.events.plugins(), server_id);
             crate::pm_rules::on_disconnect(&self.pm_requests, server_id);
             crate::history_sync::on_disconnect(&self.history_sync, server_id);
+            self.history_images.reset(server_id);
             crate::banlist::on_disconnect(&self.ban_lists, server_id);
             crate::admin::on_disconnect(&self.admin, server_id);
             self.forget_password_attempt(server_id);
@@ -2845,9 +2858,21 @@ impl Inner {
                 }
                 crate::watch_party::on_plugin_data(&self.watch_parties, ctx, data);
                 crate::screen_share::on_plugin_data(&self.screen_shares, &self.mumcord, ctx, data);
-                crate::history_sync::on_plugin_data(&self.history_sync, ctx, data);
+                crate::history_sync::on_plugin_data(
+                    &self.history_sync,
+                    &self.history_images,
+                    &self.mumcord,
+                    ctx,
+                    data,
+                );
                 crate::pm_rules::on_plugin_data(ctx, &self.pm_requests, data);
-                crate::full_image::on_plugin_data(&self.full_images, &self.previews, ctx, data);
+                crate::full_image::on_plugin_data(
+                    &self.full_images,
+                    &self.previews,
+                    &self.history_sync,
+                    ctx,
+                    data,
+                );
                 self.files.on_plugin_data(ctx, data);
                 self.direct.on_plugin_data(ctx, data);
                 self.relays.on_plugin_data(ctx, data, &self.inspector);

@@ -45,6 +45,7 @@
     "unreachable": "Le relais est injoignable en UDP comme en TCP 443.",
     "peerCannotRelay": "L’autre personne ne peut pas utiliser le relais (Mumcord plus ancien ou relais désactivé).",
     "denied": "Le bot du relais a refusé la demande.",
+    "notRegistered": "Le relais de ce serveur est réservé aux utilisateurs enregistrés. Enregistrez-vous sur ce serveur pour l’utiliser.",
     "peerGone": "L’autre personne a quitté le serveur.",
     "rateLimited": "Trop de demandes de relais. Réessayez dans une minute."
   },

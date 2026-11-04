@@ -425,5 +425,10 @@
     "several_few": "{{count}} previews moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
     "several_many": "{{count}} preview moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>.",
     "several_other": "{{count}} preview moħbija, għax il-previews u l-embeds tal-links mitfija f'<settings>Settings > Privatezza</settings>."
+  },
+  "historyImage": {
+    "loading": "Qed titgħabba l-immaġni…",
+    "unavailable": "L-immaġni mhix disponibbli",
+    "load": "Għabbi l-immaġni"
   }
 }

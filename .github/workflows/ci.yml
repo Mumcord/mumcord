@@ -155,7 +155,7 @@ jobs:
         run: sudo rm -rf ~/apt-archives/lock ~/apt-archives/partial
 
       - name: Save apt packages
-        if: always() && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
+        if: always() && github.ref == 'refs/heads/main' && runner.os == 'Linux' && steps.apt-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
           path: ~/apt-archives
@@ -180,7 +180,7 @@ jobs:
       - name: Restore static libvpx
         id: libvpx-cache
         if: runner.os != 'Linux'
-        uses: actions/cache@v6
+        uses: actions/cache/restore@v6
         with:
           path: ${{ runner.temp }}/libvpx
           key: ${{ steps.libvpx.outputs.key }}
@@ -191,6 +191,13 @@ jobs:
         run: |
           if [[ "$RUNNER_OS" == macOS ]]; then brew install nasm; fi
           scripts/build-libvpx.sh '${{ runner.temp }}/libvpx'
+
+      - name: Save static libvpx
+        if: runner.os != 'Linux' && steps.libvpx-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/libvpx
+          key: ${{ steps.libvpx.outputs.key }}
 
       # bindgen (crates/screenshare/build.rs) loads libclang: LLVM on the Windows runner, Xcode's
       # toolchain on macOS.
@@ -227,7 +234,21 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.task }}
-          save-if: ${{ github.event_name != 'pull_request' }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      # Trial (#479): compiler-level cache on the Linux tests only, next to rust-cache.
+      - name: Set up sccache
+        if: runner.os == 'Linux' && matrix.task == 'test'
+        uses: mozilla-actions/sccache-action@v0.0.11
+
+      - name: Use sccache
+        if: runner.os == 'Linux' && matrix.task == 'test'
+        run: |
+          {
+            echo 'SCCACHE_GHA_ENABLED=true'
+            echo 'RUSTC_WRAPPER=sccache'
+            echo 'CARGO_INCREMENTAL=0'
+          } >> "$GITHUB_ENV"
 
       - uses: ./.github/actions/npm-ci
 
@@ -254,6 +275,10 @@ jobs:
       - name: Rust tests
         if: matrix.task == 'test' || runner.os == 'macOS'
         run: cargo test --workspace --locked
+
+      - name: sccache statistics
+        if: always() && runner.os == 'Linux' && matrix.task == 'test'
+        run: sccache --show-stats
 
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,
       # tested and free of the device crates (cpal/ALSA) and the resampler.
@@ -315,7 +340,7 @@ jobs:
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
         if: matrix.task == 'check' && runner.os != 'Linux'
-        run: npm run tauri build -- --debug --no-bundle
+        run: npm run tauri build -- --debug --no-bundle -- --locked
 
   # The UI checks are platform-independent (vitest runs in jsdom), so they run once, on Linux, in
   # parallel with the Rust jobs. The ubuntu-24.04 result check below requires this job.

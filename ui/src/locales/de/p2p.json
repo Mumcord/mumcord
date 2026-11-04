@@ -45,6 +45,7 @@
     "unreachable": "Das Relay war weder per UDP noch per TCP 443 erreichbar.",
     "peerCannotRelay": "Die andere Person kann das Relay nicht nutzen (älteres Mumcord oder Relay ausgeschaltet).",
     "denied": "Der Relay-Bot hat die Anfrage abgelehnt.",
+    "notRegistered": "Das Relay dieses Servers steht nur registrierten Benutzern zur Verfügung. Registriere dich auf diesem Server, um es zu nutzen.",
     "peerGone": "Die andere Person hat den Server verlassen.",
     "rateLimited": "Zu viele Relay-Anfragen. Versuche es in einer Minute erneut."
   },

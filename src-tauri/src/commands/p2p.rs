@@ -139,6 +139,9 @@ pub enum RelayUnavailable {
     /// "The other person can't use the relay (older Mumcord or relay turned off)."
     PeerCannotRelay,
     Denied,
+    /// "This server's relay is only available to registered users. Register on this server to
+    /// use it."
+    NotRegistered,
     PeerGone,
     RateLimited,
     RelayFull,
@@ -243,6 +246,7 @@ impl From<peer::RelayUnavailable> for RelayUnavailable {
             R::Unreachable => Self::Unreachable,
             R::PeerCannotRelay => Self::PeerCannotRelay,
             R::Denied => Self::Denied,
+            R::NotRegistered => Self::NotRegistered,
             R::PeerGone => Self::PeerGone,
             R::RateLimited => Self::RateLimited,
             R::RelayFull => Self::RelayFull,

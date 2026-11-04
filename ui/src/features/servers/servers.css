@@ -292,6 +292,32 @@
   font-size: var(--font-size-lg);
 }
 
+.servers-dialog__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.servers-dialog__close {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.servers-dialog__close:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
 .servers-dialog__actions {
   display: flex;
   justify-content: flex-end;

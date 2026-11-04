@@ -407,5 +407,10 @@
     "several_one": "{{count}} anteprima nascosta, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
     "several_many": "{{count}} anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>.",
     "several_other": "{{count}} anteprime nascoste, perché le anteprime e gli incorporamenti dei link sono disattivati in <settings>Impostazioni > Privacy</settings>."
+  },
+  "historyImage": {
+    "loading": "Caricamento immagine…",
+    "unavailable": "Immagine non disponibile",
+    "load": "Carica immagine"
   }
 }

@@ -45,6 +45,7 @@
     "unreachable": "Releju neizdevās sasniegt ne pa UDP, ne pa TCP 443.",
     "peerCannotRelay": "Otra persona nevar izmantot releju (vecāks Mumcord vai relejs izslēgts).",
     "denied": "Releja bots noraidīja pieprasījumu.",
+    "notRegistered": "Šī servera relejs ir pieejams tikai reģistrētiem lietotājiem. Lai to izmantotu, reģistrējies šajā serverī.",
     "peerGone": "Otra persona atstāja serveri.",
     "rateLimited": "Pārāk daudz releja pieprasījumu. Mēģini vēlreiz pēc minūtes."
   },

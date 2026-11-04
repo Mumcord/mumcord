@@ -416,5 +416,10 @@
     "several_few": "{{count}} náhľady sú skryté, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
     "several_many": "{{count}} náhľadu je skrytých, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>.",
     "several_other": "{{count}} náhľadov je skrytých, pretože náhľady odkazov a vložený obsah sú vypnuté v <settings>Nastavenia > Súkromie</settings>."
+  },
+  "historyImage": {
+    "loading": "Načítava sa obrázok…",
+    "unavailable": "Obrázok nie je k dispozícii",
+    "load": "Načítať obrázok"
   }
 }

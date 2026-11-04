@@ -1,17 +1,23 @@
 //! The shared app's sound on macOS (FR-2.42). ScreenCaptureKit delivers it in the same stream
-//! as the pictures ([`super::capture_macos`]), already limited to the shared content and without
+//! as the pictures ([`super::super::capture_macos`]), already limited to the shared content and without
 //! Mumcord's own output (`excludesCurrentProcessAudio`). Its callback cuts the samples into
 //! 10 ms frames and hands them over here; the share's sound thread takes them as a
 //! [`SoundSource`].
 //!
+//! The capture side runs on ScreenCaptureKit's delivery queue, the real-time path of this
+//! sound: it never blocks, allocates or logs. What goes wrong there is counted or flagged and
+//! reported later from the share's side.
+//!
 //! Free of macOS calls, so it is tested on every system.
 
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError, SyncSender, TrySendError, sync_channel};
 use std::time::Duration;
 
 use mumcord_audio::{FRAME_SAMPLES, Frame};
 
-use super::capture::SoundSource;
+use super::super::capture::SoundSource;
 
 /// Frames that may wait for the sound thread (0.5 s); older sound is dropped instead of piling
 /// up latency behind a stalled thread.
@@ -23,24 +29,28 @@ pub struct SoundSender {
     filled: usize,
     tx: SyncSender<Frame>,
     dropped: u64,
+    failed: Arc<AtomicBool>,
 }
 
 /// The sound thread's side.
 pub struct MacSound {
     rx: Receiver<Frame>,
+    failed: Arc<AtomicBool>,
 }
 
 /// A connected pair; dropping the sender ends the sound.
 pub fn sound_channel() -> (SoundSender, MacSound) {
     let (tx, rx) = sync_channel(QUEUE_FRAMES);
+    let failed = Arc::new(AtomicBool::new(false));
     (
         SoundSender {
             frame: [0.0; FRAME_SAMPLES],
             filled: 0,
             tx,
             dropped: 0,
+            failed: failed.clone(),
         },
-        MacSound { rx },
+        MacSound { rx, failed },
     )
 }
 
@@ -59,16 +69,23 @@ impl SoundSender {
             self.filled = 0;
             match self.tx.try_send(self.frame) {
                 Ok(()) | Err(TrySendError::Disconnected(_)) => {}
-                Err(TrySendError::Full(_)) => {
-                    self.dropped += 1;
-                    if self.dropped.is_power_of_two() {
-                        tracing::debug!(
-                            dropped = self.dropped,
-                            "screen share sound frames dropped"
-                        );
-                    }
-                }
+                Err(TrySendError::Full(_)) => self.dropped += 1,
             }
+        }
+    }
+
+    /// The system delivers sound the share cannot use: the share goes on without sound and
+    /// says why (FR-7.84).
+    pub fn fail(&self) {
+        self.failed.store(true, Ordering::Relaxed);
+    }
+}
+
+impl Drop for SoundSender {
+    fn drop(&mut self) {
+        // Dropped when the capture stops, off the delivery queue, so logging is fine here.
+        if self.dropped > 0 {
+            tracing::debug!(dropped = self.dropped, "screen share sound frames dropped");
         }
     }
 }
@@ -88,6 +105,10 @@ impl SoundSource for MacSound {
                 false
             }
         }
+    }
+
+    fn failed(&self) -> bool {
+        self.failed.load(Ordering::Relaxed)
     }
 }
 
@@ -140,5 +161,14 @@ mod tests {
         let started = std::time::Instant::now();
         assert!(!rx.next_frame(&mut frame, WAIT));
         assert!(started.elapsed() >= WAIT, "waits instead of spinning");
+        assert!(!rx.failed(), "a stopped capture is not a failure");
+    }
+
+    #[test]
+    fn a_failure_reaches_the_sound_thread() {
+        let (tx, rx) = sound_channel();
+        assert!(!rx.failed());
+        tx.fail();
+        assert!(rx.failed());
     }
 }

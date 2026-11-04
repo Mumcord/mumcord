@@ -4,8 +4,8 @@
 //! only has to keep its latest picture at hand. The OS capture backends plug in here; until then
 //! [`TestPattern`] is shared.
 //!
-//! Sound is only the shared app's own sound (FR-2.42), from per-app capture where the OS has it
-//! (Windows process loopback, macOS ScreenCaptureKit); [`TestTone`] stands in for tests.
+//! Sound follows the pick (FR-7.76): the desktop sound for a whole screen, the app's own sound
+//! for a window, never Mumcord's ([`super::sound`]); [`TestTone`] stands in for tests.
 
 use std::time::{Duration, Instant};
 
@@ -13,6 +13,7 @@ use mumcord_audio::{Frame, SAMPLE_RATE};
 use mumcord_screenshare::I420Frame;
 
 use super::signal::ShareKind;
+use super::sound::{SoundOutcome, SoundRequest};
 
 /// A source of pictures for the own share.
 pub trait CaptureSource: Send {
@@ -33,10 +34,11 @@ pub trait CaptureSource: Send {
         None
     }
 
-    /// The picked app's own sound, taken once when the share starts; `None` where the OS cannot
-    /// isolate it (FR-2.42).
-    fn take_sound(&mut self) -> Option<Box<dyn SoundSource>> {
-        None
+    /// The share's sound for `request`, taken once when the share starts (FR-7.76). Only asked
+    /// where the system can share sound at all; [`SoundOutcome::NoSound`] where the capture has
+    /// none.
+    fn take_sound(&mut self, _request: SoundRequest) -> SoundOutcome {
+        SoundOutcome::NoSound
     }
 }
 
@@ -89,6 +91,12 @@ pub trait SoundSource: Send {
     /// silent. Called on the share's sound thread, never on the audio thread; the source paces
     /// the frames, at the rate the OS delivers them.
     fn next_frame(&mut self, frame: &mut Frame, timeout: Duration) -> bool;
+
+    /// The capture broke for good during the share (device lost, permission revoked, a format
+    /// it cannot send): no more sound comes, and the share says why (FR-7.84).
+    fn failed(&self) -> bool {
+        false
+    }
 }
 
 /// A steady sine for tests: what the viewer hears has to match its level.

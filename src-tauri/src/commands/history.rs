@@ -116,6 +116,50 @@ pub struct HistorySyncStatus {
     pub added: u32,
 }
 
+/// Why a referenced image of a synced message is still a placeholder (FR-1.60f).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum HistoryImageState {
+    /// Could not be loaded from the holder; retried on the next sync.
+    Unavailable,
+    /// "Load full-size images from others" is off: offer a manual load.
+    Manual,
+}
+
+impl From<mumcord_engine::HistoryImageState> for HistoryImageState {
+    fn from(state: mumcord_engine::HistoryImageState) -> Self {
+        match state {
+            mumcord_engine::HistoryImageState::Unavailable => Self::Unavailable,
+            mumcord_engine::HistoryImageState::Manual => Self::Manual,
+        }
+    }
+}
+
+/// The placeholder of a referenced image in synced messages (`data-mumcord-image` equal to
+/// `reference`) needs a hint. A loaded image arrives as an updated message in `historySynced`
+/// (same id) instead.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type, Event)]
+#[serde(rename_all = "camelCase")]
+pub struct HistoryImageStatus {
+    pub server_id: ServerId,
+    pub reference: String,
+    pub state: HistoryImageState,
+}
+
+/// "Load image" on the placeholder of a synced message (FR-1.60f): fetches the referenced
+/// image from the person whose history it came from, also while "Load full-size images from
+/// others" is off. `notFound` when nobody offers it any more. The outcome arrives as
+/// `historySynced` (updated message) or `historyImageStatus`.
+#[tauri::command]
+#[specta::specta]
+pub fn history_image_load(
+    engine: State<'_, Engine>,
+    server_id: ServerId,
+    reference: String,
+) -> ApiResult<()> {
+    Ok(engine.history_image_load(to_engine_server_id(server_id), &reference)?)
+}
+
 /// "Load earlier messages" (FR-1.60): asks other Mumcord users for the channel's messages
 /// from before the user started receiving it live. The channel must be the own or a followed
 /// one (`notFound` otherwise); `serverTooOld` on servers that cannot forward plugin data.

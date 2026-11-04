@@ -398,5 +398,10 @@
     "link": "Linkvorschau ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
     "several_one": "{{count}} Vorschau ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind.",
     "several_other": "{{count}} Vorschauen ausgeblendet, weil Linkvorschauen und Einbettungen in <settings>Einstellungen > Datenschutz</settings> ausgeschaltet sind."
+  },
+  "historyImage": {
+    "loading": "Bild wird geladen…",
+    "unavailable": "Bild nicht verfügbar",
+    "load": "Bild laden"
   }
 }

@@ -416,5 +416,10 @@
     "several_few": "Paslėptos {{count}} peržiūros, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
     "several_many": "Paslėpta {{count}} peržiūros, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>.",
     "several_other": "Paslėpta {{count}} peržiūrų, nes nuorodų peržiūros ir įterpiniai išjungti skiltyje <settings>Nustatymai > Privatumas</settings>."
+  },
+  "historyImage": {
+    "loading": "Įkeliamas vaizdas…",
+    "unavailable": "Vaizdas nepasiekiamas",
+    "load": "Įkelti vaizdą"
   }
 }

@@ -29,13 +29,7 @@ mod media;
 mod preview;
 mod quality;
 pub mod signal;
-pub(crate) mod sound;
-#[cfg(any(target_os = "macos", test))]
-pub mod sound_macos;
-#[cfg(any(target_os = "linux", test))]
-pub mod sound_match;
-#[cfg(windows)]
-mod sound_windows;
+pub mod sound;
 mod start;
 mod state;
 mod thumbnail;
@@ -78,6 +72,9 @@ pub use mumcord_screenshare::I420Frame;
 pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
+pub use sound::{
+    AppName, ShareSoundMode, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+};
 pub use start::StartOutcome;
 pub use thumbnail::ShareThumbnail;
 pub use watch::ScreenFrameSink;
@@ -128,8 +125,9 @@ pub struct ScreenShareView {
     pub session: u32,
     pub paused: bool,
     pub sound: bool,
-    /// The own share has a sound source; always false for the shares of others.
-    pub sound_available: bool,
+    /// What the own share's sound is or why it has none (FR-7.84, FR-7.85); the default (no
+    /// sound, no reason) for the shares of others.
+    pub sound_status: SoundStatus,
     /// Who is watching (at most [`signal::MAX_VIEWERS`]), sorted.
     pub viewers: Vec<u32>,
     /// Why "Watch" is not possible; always `None` for the own share.
@@ -804,7 +802,7 @@ impl Engine {
         let Some(mut source) = start::into_outcome(start::open_source().await)? else {
             return Ok(StartOutcome::Cancelled);
         };
-        let app_sound = source.take_sound();
+        let (app_sound, sound_status) = sound::status::take(source.as_mut(), sound::unavailable());
         let settings = ctx.store().settings().unwrap_or_else(|e| {
             tracing::warn!(error = %e, "screen share settings not read; using the defaults");
             mumcord_store::Settings::default()
@@ -818,7 +816,8 @@ impl Engine {
             if shares.own.is_some() {
                 return Err(EngineError::invalid("already sharing on this server"));
             }
-            let mut own = OwnShare::new(sound, app_sound.is_some());
+            let mut own = OwnShare::new(sound, sound_status);
+            own.sound_status.log(own.sound);
             own.kind = source.kind();
             let media = media::Media::start(
                 source,
@@ -840,10 +839,12 @@ impl Engine {
         Ok(StartOutcome::Started)
     }
 
-    /// Stops the share once its capture ended on its own, unless it was replaced meanwhile.
+    /// Stops the share once its capture ended on its own, unless it was replaced meanwhile, and
+    /// shows a broken sound capture once.
     fn watch_for_end(&self, server_id: ServerId, token: usize) {
         let engine = self.clone();
         self.runtime().spawn(async move {
+            let mut sound_failed_seen = false;
             loop {
                 tokio::time::sleep(start::ENDED_POLL).await;
                 let state = {
@@ -852,11 +853,16 @@ impl Engine {
                         .get(&server_id)
                         .and_then(|s| s.own.as_ref())
                         .and_then(|o| o.media.as_ref())
-                        .map(|m| (m.token(), m.ended()))
+                        .map(|m| (m.token(), m.ended(), m.sound_failed()))
                 };
                 match state {
-                    Some((t, false)) if t == token => {}
-                    Some((t, true)) if t == token => {
+                    Some((t, false, failed)) if t == token => {
+                        if failed && !sound_failed_seen {
+                            sound_failed_seen = true;
+                            engine.share_sound_failed(server_id);
+                        }
+                    }
+                    Some((t, true, _)) if t == token => {
                         if let Err(e) = engine.screen_share_stop(server_id) {
                             tracing::debug!(error = %e, "ended screen share could not be stopped");
                         }
@@ -866,6 +872,21 @@ impl Engine {
                 }
             }
         });
+    }
+
+    /// The own share's sound capture broke (FR-7.84): the video goes on, the live bar shows
+    /// "No sound" with the reason.
+    fn share_sound_failed(&self, server_id: ServerId) {
+        let updated = self.update_own_share(server_id, |own| {
+            own.sound_failed();
+            own.sound_status.log(own.sound);
+            if let Some(media) = &own.media {
+                media.set_sound(false);
+            }
+        });
+        if let Err(e) = updated {
+            tracing::debug!(error = %e, "screen share sound failure not shown");
+        }
     }
 
     /// Stops the own share; its viewers' streams close. Nothing happens without one.
@@ -896,29 +917,19 @@ impl Engine {
     /// Turns the own share's sound on or off (FR-2.45).
     pub fn screen_share_set_sound(&self, server_id: ServerId, sound: bool) -> EngineResult<()> {
         self.update_own_share(server_id, |own| {
-            own.sound = sound && own.sound_available;
+            own.sound = sound && own.sound_status.available();
+            own.sound_status.log(own.sound);
             if let Some(media) = &own.media {
                 media.set_sound(own.sound);
             }
         })
     }
 
-    /// Whether this system can send the shared app's sound (FR-2.42); without it the sharer sees
-    /// the hint and no sound is sent. Linux never can (no way to tell which app owns the shared
-    /// window); Windows 10 2004+ can (process loopback), macOS 13+ too (ScreenCaptureKit).
-    pub fn screen_share_sound_available(&self) -> bool {
-        #[cfg(windows)]
-        {
-            capture_windows::sound_available()
-        }
-        #[cfg(target_os = "macos")]
-        {
-            capture_macos::sound_supported(capture_macos::os_version().0)
-        }
-        #[cfg(not(any(windows, target_os = "macos")))]
-        {
-            false
-        }
+    /// Why this system cannot share sound (FR-7.84): the start dialog then shows the Sound
+    /// switch off and disabled with the matching note; `None` where it can. Windows needs 10
+    /// version 2004 (process loopback), macOS 13 (ScreenCaptureKit), Linux PipeWire.
+    pub fn screen_share_sound_unavailable(&self) -> Option<SoundUnavailable> {
+        sound::unavailable()
     }
 
     /// Sends `source` as the own share's sound instead of OS capture, e.g. a [`TestTone`]
@@ -934,8 +945,9 @@ impl Engine {
             if let Some(media) = &own.media {
                 media.start_sound(source);
                 media.set_sound(true);
-                own.sound_available = true;
+                own.sound_status = SoundStatus::test_source();
                 own.sound = true;
+                own.sound_status.log(own.sound);
             }
         })
     }
@@ -1057,7 +1069,12 @@ impl Engine {
             }
         }
         let opened = self
-            .p2p_open_stream(server_id, sharer, crate::p2p::STREAM_SCREEN)
+            .p2p_open_stream(
+                server_id,
+                sharer,
+                crate::p2p::STREAM_SCREEN,
+                crate::p2p::ConsentPrompt::Allowed,
+            )
             .await;
         let volume = self.person_share_volume(server_id, sharer);
         // A newer attempt replaced this one meanwhile: leave its state and the sharer alone.
@@ -1122,7 +1139,7 @@ impl Engine {
         let engine = self.clone();
         self.runtime().spawn(async move {
             let opened = engine
-                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN)
+                .p2p_open_stream(server_id, peer, crate::p2p::STREAM_SCREEN, crate::p2p::ConsentPrompt::Allowed)
                 .await;
             let volume = engine.person_share_volume(server_id, peer);
             let unwatch = {
