@@ -55,6 +55,10 @@
     "messagesExpired": "Potekla sporočila",
     "incomingRateDropped": "Dohodna sporočila, zavržena zaradi omejitve hitrosti",
     "incomingInvalid": "Neveljavna dohodna sporočila",
+    "uiFreezes": "Kolikokrat je Mumcord zamrznil, ko je bila spletna vsebina odprta",
+    "webDisabled": "Spletna vsebina je izklopljena, ker se Mumcord ni več odzival, ko je bila odprta.",
+    "reenableWeb": "Vklopi spletno vsebino",
+    "reenableFailed": "Spletne vsebine ni bilo mogoče vklopiti.",
     "log": "Dnevnik",
     "logEmpty": "Dnevnik je prazen.",
     "level": {

@@ -55,6 +55,10 @@
     "messagesExpired": "Poruke kojima je istekao rok",
     "incomingRateDropped": "Dolazne poruke odbačene ograničenjem brzine",
     "incomingInvalid": "Nevaljane dolazne poruke",
+    "uiFreezes": "Koliko se puta Mumcord zamrznuo dok je web-sadržaj bio otvoren",
+    "webDisabled": "Web-sadržaj je isključen jer Mumcord nije odgovarao dok je bio otvoren.",
+    "reenableWeb": "Uključi web-sadržaj",
+    "reenableFailed": "Web-sadržaj nije bilo moguće uključiti.",
     "log": "Zapisnik",
     "logEmpty": "Zapisnik je prazan.",
     "level": {

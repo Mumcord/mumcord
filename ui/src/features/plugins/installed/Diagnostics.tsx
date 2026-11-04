@@ -18,17 +18,20 @@ const COUNTERS: readonly Counter[] = [
   "messagesExpired",
   "incomingRateDropped",
   "incomingInvalid",
+  "uiFreezes",
 ];
 
 /**
  * Diagnostics of one plugin (FR-6.8): CPU time, memory and the counters, read once when opened.
- * The plugin's own log is only shown in Developer mode.
+ * The plugin's own log is only shown in Developer mode. After Mumcord froze while the plugin's
+ * web content was open, that content stays off until the user turns it on here (FR-9.42).
  */
 export function Diagnostics({ id }: { id: string }) {
   const { t } = useTranslation("pluginInstalled");
   const [data, setData] = useState<PluginDiagnostics | null>(null);
   const [developerMode, setDeveloperMode] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [reenableFailed, setReenableFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -70,8 +73,36 @@ export function Diagnostics({ id }: { id: string }) {
     ["peakMemory", size(data.peakMemoryBytes)],
     ...COUNTERS.map((key): [string, string] => [key, value(data[key])]),
   ];
+  const reenable = () => {
+    setReenableFailed(false);
+    getApi()
+      .pluginReenableWeb(id)
+      .then(
+        () => {
+          setData((current) => current && { ...current, webDisabled: false });
+        },
+        (cause: unknown) => {
+          console.error("Turning a plugin's web content on failed", cause);
+          setReenableFailed(true);
+        },
+      );
+  };
+
   return (
     <div className="plugins-installed-diagnostics">
+      {data.webDisabled && (
+        <div className="plugins-installed-webdisabled">
+          <p>{t("diagnostics.webDisabled")}</p>
+          <button type="button" className="settings-button" onClick={reenable}>
+            {t("diagnostics.reenableWeb")}
+          </button>
+          {reenableFailed && (
+            <p role="alert" className="settings-error">
+              {t("diagnostics.reenableFailed")}
+            </p>
+          )}
+        </div>
+      )}
       <dl>
         {rows.map(([key, shown]) => (
           <div key={key} className="plugins-installed-diagnostics-pair">

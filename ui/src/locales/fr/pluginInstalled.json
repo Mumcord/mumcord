@@ -55,6 +55,10 @@
     "messagesExpired": "Messages expirés",
     "incomingRateDropped": "Messages entrants abandonnés par la limite de débit",
     "incomingInvalid": "Messages entrants invalides",
+    "uiFreezes": "Nombre de blocages de Mumcord pendant que son contenu web était ouvert",
+    "webDisabled": "Son contenu web est désactivé, car Mumcord a cessé de répondre pendant qu'il était ouvert.",
+    "reenableWeb": "Activer le contenu web",
+    "reenableFailed": "Impossible d'activer le contenu web.",
     "log": "Journal",
     "logEmpty": "Le journal est vide.",
     "level": {

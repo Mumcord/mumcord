@@ -218,6 +218,23 @@
   display: contents;
 }
 
+/* Web content turned off after a freeze (FR-9.42): a warning box with the way to turn it on. */
+.plugins-installed-webdisabled {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 60%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.plugins-installed-webdisabled p {
+  flex: 1 1 16rem;
+  margin: 0;
+}
+
 .plugins-installed-diagnostics dd {
   margin: 0;
 }
