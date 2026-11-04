@@ -476,6 +476,13 @@ async fn on_service_event(
             plugin,
             outgoing,
         } => feed::send(plugins, engine, server, plugin, outgoing),
+        ServiceEvent::RelaySend {
+            server,
+            plugin,
+            session,
+            api,
+            data,
+        } => engine.plugin_relay_send(server, session, &plugin, api, data),
         ServiceEvent::ChatPost {
             plugin,
             server,
@@ -599,8 +606,61 @@ pub fn on_engine_event(
                 }
             });
         }
+        // The relay's announcement changed: its plugin-data availability may have too.
+        mumcord_engine::EngineEvent::RelayChanged(_) => {
+            refresh_relay_availability(app, &plugins, server_id);
+        }
+        mumcord_engine::EngineEvent::PluginRelayData {
+            session,
+            plugin,
+            data,
+            ..
+        } => {
+            let (session, plugin, data) = (*session, plugin.clone(), data.0.clone());
+            let plugins = Arc::clone(&plugins);
+            tauri::async_runtime::spawn(async move {
+                let result = plugins
+                    .call(move |service| {
+                        service.relay_received(server_id, session, &plugin, data);
+                        Ok(())
+                    })
+                    .await;
+                if let Err(e) = result {
+                    tracing::warn!(error = %e, "delivering relay plugin data failed");
+                }
+            });
+        }
         _ => {}
     }
+}
+
+/// Tells the plugin service whether `server_id`'s relay can carry plugin data now (FR-9.57).
+pub fn refresh_relay_availability(
+    app: &AppHandle,
+    plugins: &Arc<Plugins>,
+    server_id: mumcord_engine::ServerId,
+) {
+    use mumcord_engine::plugin_relay::PluginRelayAvailability as A;
+    use mumcord_plugins::api::relay::Availability;
+    let engine = app.state::<Engine>().inner().clone();
+    let plugins = Arc::clone(plugins);
+    tauri::async_runtime::spawn(async move {
+        let availability = match engine.plugin_relay_availability(server_id).await {
+            A::NoRelay => Availability::NoRelay,
+            A::UseNotAllowed => Availability::UseNotAllowed,
+            A::NotAllowedHere => Availability::NotAllowedHere,
+            A::Available { kbps } => Availability::Available { kbps },
+        };
+        let result = plugins
+            .call(move |service| {
+                service.set_relay_availability(server_id, availability);
+                Ok(())
+            })
+            .await;
+        if let Err(e) = result {
+            tracing::warn!(error = %e, "updating the relay plugin data status failed");
+        }
+    });
 }
 
 /// Plugins see the server the user is on; identity-scoped storage follows its identity.

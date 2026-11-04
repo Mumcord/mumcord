@@ -1310,15 +1310,28 @@ pub fn plugin_platform_settings(engine: State<'_, Engine>) -> ApiResult<PluginPl
 #[tauri::command]
 #[specta::specta]
 pub async fn plugin_set_platform_settings(
+    app: AppHandle,
     engine: State<'_, Engine>,
     settings: PluginPlatformSettings,
 ) -> ApiResult<()> {
     let mut stored = engine.settings()?;
+    let relay_was = stored.plugins.relay_data_enabled;
     stored.plugins.block_high_risk = settings.block_high_risk;
     stored.plugins.relay_data_enabled = settings.relay_data_enabled;
     stored.plugins.sound_volume = settings.sound_volume.min(100);
     stored.plugins.sound_muted = settings.sound_muted;
     engine.update_settings(stored).await?;
+    if relay_was != settings.relay_data_enabled {
+        // FR-9.63: off ends the relay streams at once and plugins hear the new status.
+        let enabled = settings.relay_data_enabled;
+        engine.plugin_relay_set_enabled(enabled);
+        plugins_of(&app)?
+            .call(move |service| {
+                service.set_relay_data_enabled(enabled);
+                Ok(())
+            })
+            .await?;
+    }
     Ok(())
 }
 
