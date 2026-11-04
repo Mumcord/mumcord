@@ -839,10 +839,13 @@ impl Engine {
         Ok(StartOutcome::Started)
     }
 
-    /// Stops the share once its capture ended on its own, unless it was replaced meanwhile.
+    /// Stops the share once its capture ended on its own, unless it was replaced meanwhile. A
+    /// sound capture that failed meanwhile turns the share's sound off with the reason, once
+    /// (FR-7.84).
     fn watch_for_end(&self, server_id: ServerId, token: usize) {
         let engine = self.clone();
         self.runtime().spawn(async move {
+            let mut sound_failed = false;
             loop {
                 tokio::time::sleep(start::ENDED_POLL).await;
                 let state = {
@@ -851,9 +854,16 @@ impl Engine {
                         .get(&server_id)
                         .and_then(|s| s.own.as_ref())
                         .and_then(|o| o.media.as_ref())
-                        .map(|m| (m.token(), m.ended()))
+                        .map(|m| (m.token(), m.ended(), m.sound_failed()))
                 };
-                match state {
+                if let Some((t, false, true)) = state
+                    && t == token
+                    && !sound_failed
+                {
+                    sound_failed = true;
+                    engine.sound_capture_failed(server_id);
+                }
+                match state.map(|(t, ended, _)| (t, ended)) {
                     Some((t, false)) if t == token => {}
                     Some((t, true)) if t == token => {
                         if let Err(e) = engine.screen_share_stop(server_id) {
@@ -865,6 +875,21 @@ impl Engine {
                 }
             }
         });
+    }
+
+    /// The own share's sound capture failed: the video goes on without sound (FR-7.84).
+    fn sound_capture_failed(&self, server_id: ServerId) {
+        let failed = self.update_own_share(server_id, |own| {
+            own.sound_status.capture_failed();
+            own.sound = false;
+            own.sound_status.log(own.sound);
+            if let Some(media) = &own.media {
+                media.set_sound(false);
+            }
+        });
+        if let Err(e) = failed {
+            tracing::debug!(error = %e, "failed screen share sound not shown");
+        }
     }
 
     /// Stops the own share; its viewers' streams close. Nothing happens without one.

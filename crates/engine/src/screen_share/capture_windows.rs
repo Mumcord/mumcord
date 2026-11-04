@@ -2,9 +2,9 @@
 //!
 //! The system picker (Windows.Graphics.Capture) lets the user choose a window or a screen. The
 //! frames land in a free-threaded frame pool as GPU textures; the encode thread copies the newest
-//! one into a CPU-readable texture, then scales and converts it like the Linux backends. When the
-//! picked item has an app behind it and Windows can isolate that app's sound, the capture comes
-//! with a [`ProcessLoopback`] for it.
+//! one into a CPU-readable texture, then scales and converts it like the Linux backends. The
+//! share's sound is a [`ProcessLoopback`] (FR-7.79): for a window the app behind it, for a whole
+//! screen everything except Mumcord.
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicIsize, Ordering};
@@ -18,7 +18,7 @@ use windows::Graphics::DirectX::Direct3D11::IDirect3DDevice;
 use windows::Graphics::DirectX::DirectXPixelFormat;
 use windows::Graphics::SizeInt32;
 use windows::Wdk::System::SystemServices::RtlGetVersion;
-use windows::Win32::Foundation::{HMODULE, HWND, LPARAM, WPARAM};
+use windows::Win32::Foundation::{CloseHandle, HMODULE, HWND, LPARAM, RECT, WPARAM};
 use windows::Win32::Graphics::Direct3D::{
     D3D_DRIVER_TYPE, D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP,
 };
@@ -29,6 +29,10 @@ use windows::Win32::Graphics::Direct3D11::{
 };
 use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
 use windows::Win32::Graphics::Dxgi::IDXGIDevice;
+use windows::Win32::Graphics::Gdi::{EnumDisplayMonitors, HDC, HMONITOR};
+use windows::Win32::System::Diagnostics::ToolHelp::{
+    CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW, TH32CS_SNAPPROCESS,
+};
 use windows::Win32::System::SystemInformation::OSVERSIONINFOW;
 use windows::Win32::System::Threading::{GetCurrentProcessId, GetCurrentThreadId};
 use windows::Win32::System::WinRT::Direct3D11::{
@@ -42,11 +46,15 @@ use windows::Win32::UI::WindowsAndMessaging::{
 };
 use windows::core::{BOOL, Interface};
 
-use super::capture::{CaptureSource, SoundSource};
+use super::capture::CaptureSource;
 use super::convert::{bgrx_to_i420, pack_rows};
-use super::sound::windows::ProcessLoopback;
-use super::sound::{ShareSoundMode, SoundOutcome, SoundRequest};
-use super::windows_rules::{TopWindow, capture_supported, sound_process, sound_supported};
+use super::signal::ShareKind;
+use super::sound::windows::{LoopbackTarget, ProcessLoopback};
+use super::sound::{AppName, ShareSoundMode, SoundOutcome, SoundRequest};
+use super::windows_rules::{
+    OwnerTree, ProcessEntry, TopWindow, capture_supported, owner_tree, pick_kind, sound_process,
+    sound_supported,
+};
 
 /// Why no capture was started.
 #[derive(Debug, thiserror::Error)]
@@ -114,7 +122,10 @@ pub struct WindowsCapture {
     picture: Vec<u8>,
     picture_size: (u32, u32),
     ended: Arc<AtomicBool>,
-    sound: Option<Box<dyn SoundSource>>,
+    /// What the user picked, as far as the picker's answer tells.
+    kind: ShareKind,
+    /// The app behind a picked window, for its sound; taken when the share starts.
+    app: Option<OwnerTree>,
 }
 
 // SAFETY: the WinRT capture objects are agile. The D3D11 device is free-threaded; its immediate
@@ -144,9 +155,7 @@ impl WindowsCapture {
             .await
             .map_err(|_| WindowsCaptureError::Picker("the picker thread ended".into()))??;
         let mut capture = Self::start(item)?;
-        if sound_supported(build) {
-            capture.sound = capture.sound_source();
-        }
+        capture.classify(sound_supported(build));
         Ok(capture)
     }
 
@@ -185,28 +194,34 @@ impl WindowsCapture {
             picture: Vec::new(),
             picture_size: (0, 0),
             ended,
-            sound: None,
+            kind: ShareKind::Window,
+            app: None,
         })
     }
 
-    /// The picked app's sound, when the picked item is one app's window.
-    fn sound_source(&self) -> Option<Box<dyn SoundSource>> {
+    /// Tells a whole screen from a window and, for a window, finds the app behind it when its
+    /// sound can be shared (FR-7.76, FR-7.79).
+    fn classify(&mut self, sound: bool) {
         let name = match self.item.DisplayName() {
             Ok(name) => name.to_string_lossy(),
             Err(e) => {
-                tracing::warn!(error = %e, "screen share: the picked item has no name; no sound");
-                return None;
+                tracing::warn!(
+                    code = e.code().0,
+                    "screen share: the picked item has no name"
+                );
+                String::new()
             }
         };
+        let windows = top_windows();
+        let size = (self.pool_size.Width, self.pool_size.Height);
+        self.kind = pick_kind(&windows, &name, size, &monitor_sizes());
+        if !sound || self.kind != ShareKind::Window {
+            return;
+        }
         // SAFETY: no preconditions.
         let own = unsafe { GetCurrentProcessId() };
-        match sound_process(&top_windows(), &name, own) {
-            Some(pid) => Some(Box::new(ProcessLoopback::new(pid))),
-            None => {
-                tracing::info!("screen share: no single app behind the picked item; no sound");
-                None
-            }
-        }
+        self.app =
+            sound_process(&windows, &name, own).and_then(|pid| owner_tree(&processes(), pid, own));
     }
 
     /// Copies the newest frame, if one came, into `picture`.
@@ -302,15 +317,36 @@ impl CaptureSource for WindowsCapture {
         self.ended.load(Ordering::Relaxed)
     }
 
-    // Today only a window share has sound, whatever was asked: the app behind the window.
-    fn take_sound(&mut self, _request: SoundRequest) -> SoundOutcome {
-        match self.sound.take() {
-            Some(source) => SoundOutcome::Captured {
-                source,
-                mode: ShareSoundMode::App,
-                app: None,
+    fn kind(&self) -> Option<ShareKind> {
+        Some(self.kind)
+    }
+
+    fn take_sound(&mut self, request: SoundRequest) -> SoundOutcome {
+        match request {
+            SoundRequest::Display => {
+                // SAFETY: no preconditions.
+                let own = unsafe { GetCurrentProcessId() };
+                SoundOutcome::Captured {
+                    source: Box::new(ProcessLoopback::new(LoopbackTarget::AllExcept(own))),
+                    mode: ShareSoundMode::Desktop,
+                    app: None,
+                }
+            }
+            SoundRequest::Window => match self.app.take() {
+                Some(tree) => SoundOutcome::Captured {
+                    source: Box::new(ProcessLoopback::new(LoopbackTarget::App(tree.root))),
+                    mode: ShareSoundMode::App,
+                    app: tree.name.map(AppName::new),
+                },
+                None => {
+                    tracing::info!(
+                        mode = ShareSoundMode::None.code(),
+                        reason = "no_single_app",
+                        "screen share sound"
+                    );
+                    SoundOutcome::NoSound
+                }
             },
-            None => SoundOutcome::NoSound,
         }
     }
 }
@@ -464,4 +500,78 @@ fn top_windows() -> Vec<TopWindow> {
         tracing::warn!(error = %e, "screen share: windows could not be listed");
     }
     windows
+}
+
+/// The pixel sizes of all monitors, to recognise a whole-screen pick.
+fn monitor_sizes() -> Vec<(i32, i32)> {
+    unsafe extern "system" fn collect(_: HMONITOR, _: HDC, rect: *mut RECT, list: LPARAM) -> BOOL {
+        // SAFETY: `list` is the Vec passed to EnumDisplayMonitors below, alive for the whole
+        // call; `rect` is the monitor's rectangle, valid during this callback.
+        unsafe {
+            let sizes = &mut *(list.0 as *mut Vec<(i32, i32)>);
+            if let Some(rect) = rect.as_ref() {
+                sizes.push((rect.right - rect.left, rect.bottom - rect.top));
+            }
+        }
+        true.into()
+    }
+
+    let mut sizes: Vec<(i32, i32)> = Vec::new();
+    // SAFETY: `collect` only touches `sizes`, which outlives the call.
+    let listed = unsafe {
+        EnumDisplayMonitors(
+            None,
+            None,
+            Some(collect),
+            LPARAM(&mut sizes as *mut Vec<(i32, i32)> as isize),
+        )
+    };
+    if !listed.as_bool() {
+        tracing::warn!("screen share: monitors could not be listed");
+    }
+    sizes
+}
+
+/// All running processes with their parents, to find the app tree behind a window.
+fn processes() -> Vec<ProcessEntry> {
+    let mut list = Vec::new();
+    // SAFETY: a process snapshot; the handle is closed below.
+    let snapshot = match unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) } {
+        Ok(snapshot) => snapshot,
+        Err(e) => {
+            tracing::warn!(
+                code = e.code().0,
+                "screen share: processes could not be listed"
+            );
+            return list;
+        }
+    };
+    let mut entry = PROCESSENTRY32W {
+        dwSize: size_of::<PROCESSENTRY32W>() as u32,
+        ..Default::default()
+    };
+    // SAFETY: `entry` has its size set; the snapshot is open.
+    let mut more = unsafe { Process32FirstW(snapshot, &mut entry) }.is_ok();
+    while more {
+        let len = entry
+            .szExeFile
+            .iter()
+            .position(|&c| c == 0)
+            .unwrap_or(entry.szExeFile.len());
+        list.push(ProcessEntry {
+            pid: entry.th32ProcessID,
+            parent: entry.th32ParentProcessID,
+            exe: String::from_utf16_lossy(&entry.szExeFile[..len]),
+        });
+        // SAFETY: as above.
+        more = unsafe { Process32NextW(snapshot, &mut entry) }.is_ok();
+    }
+    // SAFETY: the snapshot handle is ours.
+    if let Err(e) = unsafe { CloseHandle(snapshot) } {
+        tracing::debug!(
+            code = e.code().0,
+            "screen share: process snapshot not closed"
+        );
+    }
+    list
 }

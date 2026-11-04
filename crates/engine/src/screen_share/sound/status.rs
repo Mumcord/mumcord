@@ -156,6 +156,14 @@ impl SoundStatus {
         }
     }
 
+    /// The capture failed during the share (FR-7.84): no sound any more, with the reason.
+    pub fn capture_failed(&mut self) {
+        *self = Self {
+            unavailable: Some(SoundUnavailable::CaptureFailed),
+            ..Self::default()
+        };
+    }
+
     /// Mode and reason code at `info`, never the app (FR-7.87).
     pub fn log(&self, sound: bool) {
         tracing::info!(
@@ -216,6 +224,20 @@ mod tests {
     use super::super::super::capture::TestTone;
     use super::*;
     use mumcord_screenshare::I420Frame;
+
+    #[test]
+    fn a_capture_that_fails_during_the_share_leaves_no_sound_with_the_reason() {
+        let mut status = SoundStatus {
+            mode: ShareSoundMode::App,
+            app: Some(AppName::new("Spotify")),
+            unavailable: None,
+        };
+        status.capture_failed();
+        assert!(!status.available());
+        assert_eq!(status.effective(true), ShareSoundMode::None);
+        assert_eq!(status.app, None);
+        assert_eq!(status.unavailable, Some(SoundUnavailable::CaptureFailed));
+    }
 
     #[test]
     fn the_pick_decides_the_request() {

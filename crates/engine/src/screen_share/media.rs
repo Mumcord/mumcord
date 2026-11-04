@@ -178,6 +178,8 @@ struct Hub {
     paused: AtomicBool,
     /// The sharer has sound on (FR-2.45).
     sound: AtomicBool,
+    /// The sound source gave up ([`SoundSource::failed`]); the video goes on (FR-7.84).
+    sound_failed: AtomicBool,
     /// The next frame has to be a keyframe.
     keyframe: AtomicBool,
     /// A viewer lost frames and waits for a keyframe ([`KeyframeGate`]).
@@ -275,6 +277,7 @@ impl Media {
             ended: AtomicBool::new(false),
             paused: AtomicBool::new(false),
             sound: AtomicBool::new(false),
+            sound_failed: AtomicBool::new(false),
             keyframe: AtomicBool::new(true),
             keyframe_requested: AtomicBool::new(false),
             viewers: Mutex::new(BTreeMap::new()),
@@ -341,6 +344,11 @@ impl Media {
         if let Err(e) = spawned {
             tracing::error!(error = %e, "screen share sound thread did not start");
         }
+    }
+
+    /// Whether the share's sound capture failed for good (FR-7.84).
+    pub fn sound_failed(&self) -> bool {
+        self.hub.sound_failed.load(Ordering::Relaxed)
     }
 
     /// Turns sending the sound on or off (FR-2.45).
@@ -929,6 +937,10 @@ fn sound_loop(hub: &Hub, mut source: Box<dyn SoundSource>) {
     let mut sending = false;
     while !hub.stop.load(Ordering::Relaxed) {
         if !source.next_frame(&mut frame, SOUND_WAIT) {
+            if source.failed() {
+                hub.sound_failed.store(true, Ordering::Relaxed);
+                return;
+            }
             continue;
         }
         if !hub.sound.load(Ordering::Relaxed) || hub.paused.load(Ordering::Relaxed) {
@@ -1091,6 +1103,36 @@ mod tests {
             thread::sleep(Duration::from_millis(10));
         }
         assert!(media.ended());
+    }
+
+    /// Gives up at once, like a loopback whose device is gone for good.
+    struct BrokenSound;
+
+    impl SoundSource for BrokenSound {
+        fn next_frame(&mut self, _: &mut mumcord_audio::Frame, _: Duration) -> bool {
+            false
+        }
+
+        fn failed(&self) -> bool {
+            true
+        }
+    }
+
+    #[test]
+    fn media_reports_a_sound_capture_that_failed() {
+        let media = Media::start(
+            Box::new(super::super::capture::TestPattern::default()),
+            QualityPrefs::default(),
+            vp9_encoder(),
+        );
+        assert!(!media.sound_failed());
+        media.start_sound(Box::new(BrokenSound));
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !media.sound_failed() && Instant::now() < deadline {
+            thread::sleep(Duration::from_millis(10));
+        }
+        assert!(media.sound_failed());
+        assert!(!media.ended(), "the video goes on");
     }
 
     #[test]
