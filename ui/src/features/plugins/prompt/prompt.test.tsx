@@ -31,6 +31,7 @@ const offer: PluginInstallOffer = {
   ],
   defaultVisibility: "friends",
   chatPatterns: [],
+  origins: [],
   check: {
     kind: "ready",
     score: { score: { kind: "official" }, listing: null, higherThanListing: false },

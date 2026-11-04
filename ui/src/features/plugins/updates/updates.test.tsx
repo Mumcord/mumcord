@@ -35,6 +35,8 @@ const plugin: InstalledPlugin = {
   authors: [],
   chatPatterns: [],
   offered: [],
+  appMenuItems: 0,
+  webSize: null,
 };
 
 const update: PluginUpdate = {
