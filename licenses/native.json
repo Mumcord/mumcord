@@ -103,9 +103,9 @@
       "license": "MIT",
       "repository": "https://github.com/sothis/bovnar",
       "description": [
-        "Reference implementation of the Bovnar data format, compiled from source by the bovnar",
-        "crate (Mumcord's fork https://github.com/Mumcord/bovnar, pinned to one commit). File",
-        "offers and the diagnostic file are Bovnar documents. The library compiles in the unit",
+        "Reference implementation of the Bovnar data format, compiled from the C sources bundled in",
+        "the published bovnar crate (crates.io; the version and checksum are pinned in Cargo.lock).",
+        "File offers and the diagnostic file are Bovnar documents. The library compiles in the unit",
         "identifiers of the vocabularies listed in its third-party notices below."
       ],
       "texts": ["@bovnar-license", "@bovnar-notices"]
