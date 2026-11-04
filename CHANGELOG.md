@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- A mumbot shows as "Mumbot <version>" in the profile preview and the connection details instead of "Mumcord <version>", from what it announces about itself; older mumbots get the same label from their name and version (#459)
 - A middle click on a link, or a click with Ctrl, Cmd or Shift held, opens it in your browser like a normal click. It used to load the page inside Mumcord, in a window of its own or in place of the whole app, and no page from outside ever gets a Mumcord window now (#418)
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
 - Chat history of locked channels (password or restricted entry) is no longer shared with people who only follow or listen to them: only people inside the channel get its earlier messages, and members who use a channel password must prove they know the current one. "Follow all" now skips channels you may not enter. Older Mumcord versions still share it, so everyone should update (#382)

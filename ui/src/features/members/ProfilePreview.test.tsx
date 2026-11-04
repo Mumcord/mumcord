@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi, NowPlaying } from "../../api";
+import { getServerState } from "../channels/serverStore";
 import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { resetNowPlayingStore } from "../nowplaying";
 import { MembersPanel } from "./MembersPanel";
@@ -136,6 +137,23 @@ describe("ProfilePreview", () => {
     await wait(1);
     expect(preview()).toBeNull();
     expect(trigger(/^Anna/)).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("names the software a bot announces instead of its Mumble release (issue #459)", async () => {
+    await renderWithPreview();
+    const anna = getServerState().users.get(2);
+    if (!anna) throw new Error("Anna is missing");
+    act(() => {
+      api.mock.upsertUser({
+        ...anna,
+        isMumcord: true,
+        product: "Mumbot",
+        version: "0.4.1",
+        bot: { voice: false, modules: ["peer"] },
+      });
+    });
+    await hover(/^Anna/);
+    expect(screen.getByRole("tooltip")).toHaveTextContent("Mumbot 0.4.1 · Registered");
   });
 
   it("closes on Escape, scroll and window blur", async () => {

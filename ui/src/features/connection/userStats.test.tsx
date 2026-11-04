@@ -160,6 +160,15 @@ describe("profile card figures", () => {
     expect(client.textContent.length).toBe(64);
   });
 
+  it("prefers the client a bot announces over its release string (issue #459)", async () => {
+    render(<ConnectionQuality session={ANNA} announcedClient="Mumbot 0.4.1" />);
+    report({ clientRelease: "Mumcord 0.4.1" });
+    fireEvent.click(await screen.findByRole("button", { name: /^Connection:/ }));
+    const list = await screen.findByLabelText("Connection");
+    expect(list).toHaveTextContent("ClientMumbot 0.4.1");
+    expect(list).not.toHaveTextContent("Mumcord");
+  });
+
   it("is cleared when the person leaves", async () => {
     render(<ConnectionQuality session={ANNA} />);
     report({ pingMs: 10 });

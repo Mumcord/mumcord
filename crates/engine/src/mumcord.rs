@@ -7,7 +7,8 @@
 //! badge never appears for them. Hellos come from other clients and are untrusted: the decoder
 //! caps size, feature count and feature names.
 //!
-//! A bot (e.g. mumbot) adds a `bot` object with its name, version and modules; plugins use it to
+//! A bot (e.g. mumbot) adds a `bot` object with its name, product, version, modules and whether
+//! it uses voice. The UI labels and places bots with it (issues #458, #459); plugins use it to
 //! offer bot-specific actions only on bots (see [`crate::plugins::PluginBot`]).
 //!
 //! Features gate Mumcord-only behaviour: ask [`Engine::mumcord_user_has_feature`] before sending
@@ -52,6 +53,12 @@ const MAX_FEATURE_LEN: usize = 32;
 /// Caps for the untrusted `bot` object: modules per bot, and the length of names and modules.
 const MAX_BOT_MODULES: usize = 16;
 const MAX_BOT_NAME_LEN: usize = 32;
+/// Caps for the bot's product name ("Mumbot") and version ("0.4.1"), shown as plain text.
+const MAX_BOT_PRODUCT_LEN: usize = 32;
+const MAX_BOT_VERSION_LEN: usize = 32;
+/// The module that makes a bot speak; older bots without the `voice` field are voice bots when
+/// they run it (issue #458).
+const VOICE_MODULE: &str = "music";
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum HelloError {
@@ -72,12 +79,43 @@ struct Wire {
     bot: Option<serde_json::Value>,
 }
 
+/// Optional bot fields stay raw: a wrong type drops only that field, not the whole bot.
 #[derive(Deserialize)]
 struct WireBot {
     name: String,
-    // `version` is part of the object but not used by this client.
+    #[serde(default)]
+    product: Option<serde_json::Value>,
+    #[serde(default)]
+    version: Option<serde_json::Value>,
     #[serde(default)]
     modules: Vec<String>,
+    #[serde(default)]
+    voice: Option<serde_json::Value>,
+}
+
+/// What a bot says about itself in its hello, sanitised.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Bot {
+    pub name: String,
+    /// Display name of the bot software, e.g. "Mumbot". Older bots send none; then it is the
+    /// capitalised `name` (decision on issue #459).
+    pub product: String,
+    /// Version of the bot software, e.g. "0.4.1", when it sent a valid one.
+    pub version: Option<String>,
+    /// Sorted, deduplicated module names, e.g. `history`, `peer`.
+    pub modules: Vec<String>,
+    /// Whether the bot speaks in its channel; such bots stay visible there (issue #458).
+    pub voice: bool,
+}
+
+impl Bot {
+    /// The part plugins see.
+    pub fn plugin(&self) -> PluginBot {
+        PluginBot {
+            name: self.name.clone(),
+            modules: self.modules.clone(),
+        }
+    }
 }
 
 /// A decoded hello.
@@ -85,7 +123,7 @@ struct WireBot {
 pub struct Hello {
     pub features: Vec<String>,
     /// Set when the sender says it is a bot; a malformed `bot` object is ignored.
-    pub bot: Option<PluginBot>,
+    pub bot: Option<Bot>,
 }
 
 /// Lowercase letters, digits, `-` and `.`, the alphabet of feature, bot and module names.
@@ -97,7 +135,44 @@ fn valid_name(name: &str, max: usize) -> bool {
             .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '.')
 }
 
-fn bot_of(value: serde_json::Value) -> Option<PluginBot> {
+/// Display text from another client: printable ASCII letters, digits, spaces, `-` and `.`, with
+/// no space at either end, so it can neither spoof markup nor break the layout.
+fn valid_product(text: &str) -> bool {
+    !text.is_empty()
+        && text.len() <= MAX_BOT_PRODUCT_LEN
+        && text.trim() == text
+        && !text.contains("  ")
+        && text
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == ' ' || c == '-' || c == '.')
+}
+
+/// A version like `0.4.1` or `1.0.0-rc.1+abc`.
+fn valid_version(text: &str) -> bool {
+    !text.is_empty()
+        && text.len() <= MAX_BOT_VERSION_LEN
+        && text
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '+'))
+}
+
+fn string_if(value: Option<serde_json::Value>, valid: fn(&str) -> bool) -> Option<String> {
+    match value {
+        Some(serde_json::Value::String(s)) if valid(&s) => Some(s),
+        _ => None,
+    }
+}
+
+/// `mumbot` → `Mumbot`; the name is already limited to lowercase ASCII.
+fn capitalised(name: &str) -> String {
+    let mut chars = name.chars();
+    chars
+        .next()
+        .map(|first| first.to_ascii_uppercase().to_string() + chars.as_str())
+        .unwrap_or_default()
+}
+
+fn bot_of(value: serde_json::Value) -> Option<Bot> {
     let wire: WireBot = serde_json::from_value(value).ok()?;
     if !valid_name(&wire.name, MAX_BOT_NAME_LEN) {
         return None;
@@ -110,9 +185,17 @@ fn bot_of(value: serde_json::Value) -> Option<PluginBot> {
         .collect();
     modules.sort();
     modules.dedup();
-    Some(PluginBot {
+    let voice = match wire.voice {
+        Some(serde_json::Value::Bool(voice)) => voice,
+        // Bots from before the field: those with music are the ones that speak.
+        _ => modules.iter().any(|m| m == VOICE_MODULE),
+    };
+    Some(Bot {
+        product: string_if(wire.product, valid_product).unwrap_or_else(|| capitalised(&wire.name)),
+        version: string_if(wire.version, valid_version),
         name: wire.name,
         modules,
+        voice,
     })
 }
 
@@ -165,7 +248,7 @@ pub(crate) struct Peers {
     /// Session → announced features.
     known: HashMap<u32, Vec<String>>,
     /// Session → bot info, for those whose hello says they are a bot.
-    bots: HashMap<u32, PluginBot>,
+    bots: HashMap<u32, Bot>,
     /// Sessions that already got our hello on this connection.
     greeted: HashSet<u32>,
     /// Whether the connection finished syncing; joins before that are covered by the first send.
@@ -177,7 +260,7 @@ impl Peers {
         self.known.get(&session).map(Vec::as_slice)
     }
 
-    pub(crate) fn bot(&self, session: u32) -> Option<&PluginBot> {
+    pub(crate) fn bot(&self, session: u32) -> Option<&Bot> {
         self.bots.get(&session)
     }
 
@@ -191,7 +274,7 @@ impl Peers {
     }
 
     /// Records the bot info of a hello; true when it changed.
-    fn learn_bot(&mut self, session: u32, bot: Option<PluginBot>) -> bool {
+    fn learn_bot(&mut self, session: u32, bot: Option<Bot>) -> bool {
         match bot {
             Some(bot) => self.bots.insert(session, bot.clone()) != Some(bot),
             None => self.bots.remove(&session).is_some(),
@@ -417,9 +500,12 @@ mod tests {
             "bot":{"name":"mumbot","version":"2.1.0","modules":["music","BAD","music","radio"]}}"#;
         assert_eq!(
             decode(data).expect("valid").bot,
-            Some(PluginBot {
+            Some(Bot {
                 name: "mumbot".into(),
+                product: "Mumbot".into(),
+                version: Some("2.1.0".into()),
                 modules: vec!["music".into(), "radio".into()],
+                voice: true,
             })
         );
         for bad in [
@@ -438,13 +524,113 @@ mod tests {
         assert_eq!(bot.map(|b| b.modules.len()), Some(MAX_BOT_MODULES));
     }
 
+    fn bot_of_hello(bot: &str) -> Option<Bot> {
+        let data = format!(r#"{{"app":"mumcord","v":1,"features":[],"bot":{bot}}}"#);
+        decode(data.as_bytes()).expect("the hello stays valid").bot
+    }
+
+    #[test]
+    fn new_bot_fields_are_read() {
+        let bot = bot_of_hello(
+            r#"{"name":"mumbot","product":"Mumbot","version":"0.4.1",
+                "modules":["history","peer","webhook"],"voice":false,"look":"bot"}"#,
+        )
+        .expect("bot");
+        assert_eq!(bot.product, "Mumbot");
+        assert_eq!(bot.version.as_deref(), Some("0.4.1"));
+        assert_eq!(bot.modules, ["history", "peer", "webhook"]);
+        assert!(!bot.voice);
+        let dj = bot_of_hello(r#"{"name":"mumbot","product":"Mumbot DJ","voice":true}"#);
+        assert_eq!(
+            dj.as_ref().map(|b| (b.product.as_str(), b.voice)),
+            Some(("Mumbot DJ", true))
+        );
+        assert_eq!(dj.and_then(|b| b.version), None);
+    }
+
+    #[test]
+    fn old_bots_get_a_product_from_their_name_and_voice_from_music() {
+        let relay = bot_of_hello(
+            r#"{"name":"mumbot","version":"0.4.1","modules":["history","peer","webhook"]}"#,
+        )
+        .expect("bot");
+        assert_eq!(relay.product, "Mumbot");
+        assert_eq!(relay.version.as_deref(), Some("0.4.1"));
+        assert!(!relay.voice);
+        let dj = bot_of_hello(r#"{"name":"mumbot","modules":["music"]}"#).expect("bot");
+        assert!(dj.voice, "music without the voice field means it speaks");
+        let quiet =
+            bot_of_hello(r#"{"name":"mumbot","modules":["music"],"voice":false}"#).expect("bot");
+        assert!(!quiet.voice, "an explicit voice field wins");
+    }
+
+    #[test]
+    fn garbage_bot_fields_drop_only_that_field() {
+        let long = "x".repeat(MAX_BOT_PRODUCT_LEN + 1);
+        for product in [
+            "\"<b>Evil</b>\"".to_owned(),
+            "\"Mum\\nbot\"".to_owned(),
+            "\" Mumbot\"".to_owned(),
+            "\"Mum  bot\"".to_owned(),
+            "\"\"".to_owned(),
+            "\"Mümbot\"".to_owned(),
+            format!("\"{long}\""),
+            "42".to_owned(),
+            "null".to_owned(),
+            "[\"Mumbot\"]".to_owned(),
+        ] {
+            let bot = bot_of_hello(&format!(r#"{{"name":"mumbot","product":{product}}}"#))
+                .expect("the bot stays valid");
+            assert_eq!(bot.product, "Mumbot", "{product}");
+        }
+        let long = "1".repeat(MAX_BOT_VERSION_LEN + 1);
+        for version in [
+            "\"1.0 beta\"".to_owned(),
+            "\"<1>\"".to_owned(),
+            "\"\"".to_owned(),
+            format!("\"{long}\""),
+            "1".to_owned(),
+            "{}".to_owned(),
+        ] {
+            let bot = bot_of_hello(&format!(r#"{{"name":"mumbot","version":{version}}}"#))
+                .expect("the bot stays valid");
+            assert_eq!(bot.version, None, "{version}");
+        }
+        let bot = bot_of_hello(r#"{"name":"mumbot","version":"1.0.0-rc.1+abc"}"#);
+        assert_eq!(
+            bot.and_then(|b| b.version).as_deref(),
+            Some("1.0.0-rc.1+abc")
+        );
+        for voice in ["\"yes\"", "1", "null"] {
+            let bot = bot_of_hello(&format!(r#"{{"name":"mumbot","voice":{voice}}}"#))
+                .expect("the bot stays valid");
+            assert!(!bot.voice, "{voice}");
+        }
+    }
+
+    #[test]
+    fn hellos_without_a_bot_are_people() {
+        let data = br#"{"app":"mumcord","v":1,"features":["files"]}"#;
+        assert_eq!(decode(data).expect("valid").bot, None);
+    }
+
     #[test]
     fn bots_are_learned_and_forgotten() {
         let mut peers = Peers::default();
-        let bot = PluginBot {
+        let bot = Bot {
             name: "mumbot".into(),
+            product: "Mumbot".into(),
+            version: None,
             modules: vec!["music".into()],
+            voice: true,
         };
+        assert_eq!(
+            bot.plugin(),
+            PluginBot {
+                name: "mumbot".into(),
+                modules: vec!["music".into()],
+            }
+        );
         assert!(peers.learn_bot(5, Some(bot.clone())));
         assert!(!peers.learn_bot(5, Some(bot.clone())));
         assert_eq!(peers.bot(5), Some(&bot));

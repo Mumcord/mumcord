@@ -14,8 +14,8 @@ const MAX_TEXT = 64;
 const cap = (text: string): string => text.slice(0, MAX_TEXT);
 
 /** Client line, e.g. "Mumcord 1.2.0"; the release string already carries the version. */
-function clientText(stats: UserStats): string | null {
-  const text = stats.clientRelease ?? stats.clientVersion;
+function clientText(stats: UserStats, announced: string | null): string | null {
+  const text = announced ?? stats.clientRelease ?? stats.clientVersion;
   return text ? cap(text) : null;
 }
 
@@ -32,9 +32,12 @@ function osText(stats: UserStats): string | null {
 export function ConnectionQuality({
   session,
   serverId,
+  announcedClient = null,
 }: {
   session: number;
   serverId?: number | undefined;
+  /** What the person's hello says it runs, e.g. "Mumbot 0.4.1"; wins over the release string. */
+  announcedClient?: string | null;
 }) {
   const { t } = useTranslation("members");
   const { t: tp } = useTranslation("p2p");
@@ -59,7 +62,7 @@ export function ConnectionQuality({
       rows.push([t("quality.bandwidth"), t("quality.kbps", { value: stats.bandwidthKbps })]);
     if (stats.transport !== null)
       rows.push([t("quality.transport"), stats.transport === "udp" ? "UDP" : "TCP"]);
-    const client = clientText(stats);
+    const client = clientText(stats, announcedClient);
     if (client) rows.push([t("quality.client"), client]);
     const os = osText(stats);
     if (os) rows.push([t("quality.os"), os]);
