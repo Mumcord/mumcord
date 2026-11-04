@@ -4,7 +4,7 @@ import { InstallProgress } from "../prompt/InstallProgress";
 import type { IndexedPlugin } from "../../../api";
 import type { PluginScored } from "../../../bindings/commands";
 import { isPermissionId, PERMISSION_RISK, permissionTextKey } from "../permissions/catalogue";
-import { ScoreBreakdown, ScoreChip, ScoreMeter, type ScoreFacts } from "../score";
+import { openScoreDoc, ScoreBreakdown, ScoreChip, ScoreMeter, type ScoreFacts } from "../score";
 import { formatSize } from "../updates/formatSize";
 import { usePluginScore } from "./usePluginScore";
 import { PluginIcon } from "./PluginIcon";
@@ -422,6 +422,7 @@ export function PluginScoreCard({
         pluginName={name}
         {...(facts !== undefined ? { facts } : {})}
         collapsible
+        onHowCalculated={openScoreDoc}
       />
     </section>
   );

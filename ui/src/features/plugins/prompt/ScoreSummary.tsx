@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { PluginInstallScore } from "../../../api";
-import { ScoreBreakdown, ScoreChip, ScoreMeter, ScoreReasons } from "../score";
+import { openScoreDoc, ScoreBreakdown, ScoreChip, ScoreMeter, ScoreReasons } from "../score";
 
 export interface ScoreSummaryProps {
   score: PluginInstallScore;
@@ -51,7 +51,12 @@ export function ScoreSummary({ score, pluginName, blocked, websites }: ScoreSumm
       </button>
       <div id={breakdownId} hidden={!open}>
         {open && (
-          <ScoreBreakdown score={scored.score} pluginName={pluginName} facts={{ websites }} />
+          <ScoreBreakdown
+            score={scored.score}
+            pluginName={pluginName}
+            facts={{ websites }}
+            onHowCalculated={openScoreDoc}
+          />
         )}
       </div>
     </section>

@@ -8,3 +8,4 @@ export {
 } from "./ScoreBreakdown";
 export { ScoreReasons } from "./ScoreReasons";
 export { ShieldIcon, type ShieldKind } from "./ShieldIcon";
+export { openScoreDoc, SCORE_DOC_URL } from "./scoreDoc";

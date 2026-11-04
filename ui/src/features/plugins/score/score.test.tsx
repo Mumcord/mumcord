@@ -4,7 +4,8 @@ import type { PluginScore, PluginScoreFactor } from "../../../bindings/commands"
 import { applyLanguage } from "../../../i18n";
 import { axeViolations } from "../../../test/axe";
 import { biggestReasons, breakdownRows } from "./breakdownRows";
-import { ScoreBreakdown, ScoreChip, ScoreMeter, ScoreReasons } from "./index";
+import { getApi } from "../../../api";
+import { openScoreDoc, ScoreBreakdown, ScoreChip, ScoreMeter, ScoreReasons } from "./index";
 
 beforeEach(async () => {
   await applyLanguage("en");
@@ -250,5 +251,16 @@ describe("ScoreReasons", () => {
   it("renders nothing without reasons", () => {
     const { container } = render(<ScoreReasons factors={[]} />);
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe("openScoreDoc", () => {
+  it("opens the score document on the main branch through the safe opener", async () => {
+    const open = vi.spyOn(getApi(), "openLink").mockResolvedValue(null);
+    openScoreDoc();
+    await Promise.resolve();
+    expect(open).toHaveBeenCalledWith(
+      "https://github.com/Mumcord/mumcord/blob/main/docs/plugin-score.md",
+    );
   });
 });
