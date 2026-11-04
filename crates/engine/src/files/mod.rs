@@ -26,7 +26,7 @@ use std::sync::{Mutex, OnceLock};
 use mumcord_protocol::PluginData;
 
 use crate::ServerId;
-use crate::session::{Engine, SessionCtx, WeakEngine};
+use crate::session::{Engine, SessionCtx, WeakEngine, lock};
 use wire::FileMessage;
 
 /// Hello feature a client announces when it understands file offers (section 6.4).
@@ -57,6 +57,8 @@ pub(crate) struct FileSharing {
     engine: OnceLock<WeakEngine>,
     sender: Mutex<sender::Sender>,
     recipient: Mutex<recipient::Recipient>,
+    /// The start-up removal of old zips; whoever writes into the same folder waits for it first.
+    cleanup: Mutex<Option<std::thread::JoinHandle<()>>>,
 }
 
 impl FileSharing {
@@ -65,13 +67,24 @@ impl FileSharing {
     pub(crate) fn bind(&self, engine: &Engine) {
         let _ = self.engine.set(engine.downgrade());
         let leftovers = zip_cache(engine.data_dir()).join("files");
-        engine.runtime().spawn_blocking(move || {
+        let handle = std::thread::spawn(move || {
             if let Err(e) = std::fs::remove_dir_all(&leftovers)
                 && e.kind() != std::io::ErrorKind::NotFound
             {
                 tracing::warn!(error = %e, "removing old shared-folder zips failed");
             }
         });
+        *lock(&self.cleanup) = Some(handle);
+    }
+
+    /// Waits until the start-up removal is done, so it cannot delete a copy written meanwhile.
+    pub(crate) fn finish_cleanup(&self) {
+        let handle = lock(&self.cleanup).take();
+        if let Some(handle) = handle
+            && handle.join().is_err()
+        {
+            tracing::warn!("removing old shared-folder zips panicked");
+        }
     }
 
     fn engine(&self) -> Option<Engine> {

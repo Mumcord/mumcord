@@ -219,6 +219,7 @@ impl Engine {
     /// to `name` in a folder of their own in Mumcord's cache, which the share owns like a zip, so
     /// the copy is deleted when the chip is removed or the share ends.
     pub fn files_chip_add_owned(&self, name: &str, bytes: &[u8]) -> std::io::Result<ChipView> {
+        self.file_sharing().finish_cleanup();
         let dir = super::zip_cache(self.data_dir())
             .join("files")
             .join(prepare::random_hex(8));
