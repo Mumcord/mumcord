@@ -39,6 +39,7 @@ pub const FEATURES: &[&str] = &[
     "now-playing",
     "now-gaming",
     crate::full_image::FEATURE,
+    crate::history_sync::images::FEATURE,
     FEATURE_FILES,
     crate::p2p::FEATURE,
     crate::watch_party::FEATURE,

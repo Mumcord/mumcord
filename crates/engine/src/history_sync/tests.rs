@@ -7,8 +7,9 @@ use std::sync::{Mutex, MutexGuard};
 
 use mumcord_store::{Conversation, NewChatMessage, NewServer, ServerId, Store, UnixMillis};
 
-use super::core::{Core, Env, MAX_AGE_MS, RequestError};
+use super::core::{Core, Env, ImageFetch, MAX_AGE_MS, RequestError};
 use super::hash::{Content, content_hash};
+use super::images::{self, ImageRef};
 use super::wire::{self, Packet, WireMessage};
 use crate::chat::ChatMessageView;
 use crate::session::EngineEvent;
@@ -35,6 +36,10 @@ struct TestEnv {
     no_entry: HashSet<u32>,
     /// PermissionQueries sent, answered by [`Net::run`] on the next step.
     queried: Mutex<Vec<u32>>,
+    /// Peers that announced `histimg` (all of them unless a test says otherwise).
+    old_peers: HashSet<u32>,
+    /// "Offer my full-size images".
+    offer: bool,
 }
 
 fn parent(channel: u32) -> Option<u32> {
@@ -77,12 +82,20 @@ impl Env for TestEnv {
     fn query_own_permissions(&self, channel: u32) {
         self.queried.lock().expect("queried").push(channel);
     }
+    fn resolves_images(&self, session: u32) -> bool {
+        !self.old_peers.contains(&session)
+    }
+    fn offer_images(&self) -> bool {
+        self.offer
+    }
 }
 
 struct Node {
     core: Core,
     env: TestEnv,
     events: Vec<EngineEvent>,
+    /// Image fetches the core asked for after receiving messages.
+    fetches: Vec<ImageFetch>,
     /// Answers as if every request reached back the full week, like a client that ignores
     /// the requested range.
     ignores_from: bool,
@@ -140,8 +153,11 @@ impl Net {
                         tokens: Vec::new(),
                         no_entry: HashSet::new(),
                         queried: Mutex::new(Vec::new()),
+                        old_peers: HashSet::new(),
+                        offer: true,
                     },
                     events: Vec::new(),
+                    fetches: Vec::new(),
                     ignores_from: false,
                 },
             );
@@ -252,6 +268,7 @@ impl Net {
                 };
                 node.core.on_packet(&node.env, from, &data, self.now);
                 node.events.extend(node.core.take_events());
+                node.fetches.extend(node.core.take_image_fetches());
             }
         }
     }
@@ -536,6 +553,7 @@ fn unsolicited_and_tampered_data_is_ignored() {
         n: "evil".into(),
         h: None,
         b: "spam".into(),
+        k: None,
     }]);
     for packet in wire::chunk_stream(1, &stream)
         .into_iter()
@@ -577,6 +595,7 @@ fn unsolicited_and_tampered_data_is_ignored() {
         n: "user3".into(),
         h: Some(cert(3)),
         b: "forged".into(),
+        k: None,
     }]);
     for packet in wire::chunk_stream(fetch_req, &forged) {
         net.deliver(1, &[2], &wire::encode(&packet));
@@ -1271,4 +1290,277 @@ fn locks_are_inherited_from_parents_and_unknown_channels_count_as_locked() {
     s.channels.get_mut(&RAID).expect("raid").is_enter_restricted = false;
     s.channels.get_mut(&ROOT).expect("root").parent = Some(SQUAD);
     assert!(super::channel_locked(&s, SQUAD));
+}
+
+/// A noisy PNG of a few KiB (fits the body limit inline too, so old peers get it as well).
+fn noisy_png(seed: u32) -> Vec<u8> {
+    let image = image::RgbImage::from_fn(36, 36, |x, y| {
+        let v = (x * 7919 + y * 104_729 + seed * 31).wrapping_mul(2_654_435_761);
+        image::Rgb([(v >> 8) as u8, (v >> 16) as u8, (v >> 24) as u8])
+    });
+    let mut bytes = Vec::new();
+    image
+        .write_to(
+            &mut std::io::Cursor::new(&mut bytes),
+            image::ImageFormat::Png,
+        )
+        .expect("png");
+    bytes
+}
+
+fn inline(png: &[u8]) -> String {
+    format!(
+        "<img src=\"data:image/png;base64,{}\">",
+        crate::people::base64(png)
+    )
+}
+
+/// Bytes of all `part` packets `from` sent to `to`.
+fn part_bytes(net: &Net, from: u32, to: u32) -> usize {
+    sent(net, from, to)
+        .iter()
+        .map(|p| match p {
+            Packet::Part { data, .. } => data.len(),
+            _ => 0,
+        })
+        .sum()
+}
+
+/// Two image messages (one image-only, one with text and the same image) held by 1; 2 joins.
+fn image_lobby(old_peer: bool) -> (Net, Vec<u8>, [String; 2]) {
+    let mut net = Net::new(&[1, 2]);
+    if old_peer {
+        net.node(1).env.old_peers.insert(2);
+    }
+    net.place(1, &[LOBBY]);
+    let png = noisy_png(1);
+    let bodies = [inline(&png), format!("<p>look</p>{}", inline(&png))];
+    net.hold(1, LOBBY, 3, START - 60_000, &bodies[0]);
+    net.hold(1, LOBBY, 3, START - 50_000, &bodies[1]);
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+    (net, png, bodies)
+}
+
+fn restore_all(net: &mut Net, session: u32, png: &[u8]) {
+    let node = net.node(session);
+    let store = node.env.store();
+    let rows = store
+        .messages(
+            node.env.server,
+            &Conversation::Channel(key(LOBBY).into()),
+            100,
+        )
+        .expect("messages");
+    for m in rows {
+        let body = images::restore(&m.body, |_| Some(png.to_vec())).into_owned();
+        store.set_message_body(m.id, &body).expect("restore");
+    }
+}
+
+#[test]
+fn image_references_replace_inline_images_for_peers_that_resolve_them() {
+    let (mut net, png, originals) = image_lobby(false);
+    let synced = net.synced(2);
+    assert_eq!(synced.len(), 2);
+    let image = images::references(&synced[0].body)[0];
+    assert!(image.full.matches(&png));
+    assert!(
+        synced.iter().all(|m| !m.body.contains("base64")),
+        "no image bytes in the stream"
+    );
+    assert!(part_bytes(&net, 1, 2) < png.len(), "parts carry no image");
+    // One fetch for the image both messages share, from the holder that sent them.
+    assert_eq!(
+        net.nodes[&2].fetches,
+        [ImageFetch {
+            holder: 1,
+            channel: LOBBY,
+            key: key(LOBBY).into(),
+            refs: vec![image],
+        }]
+    );
+    // The holder serves the image to the requester only.
+    let now = net.now;
+    let holder = net.node(1);
+    assert_eq!(
+        holder
+            .core
+            .image_for(&holder.env, 2, &image.full.hash, now)
+            .as_deref(),
+        Some(&png)
+    );
+    assert_eq!(
+        holder.core.image_for(&holder.env, 3, &image.full.hash, now),
+        None
+    );
+    // Restored, the stored messages equal the holder's.
+    restore_all(&mut net, 2, &png);
+    let stored: Vec<String> = net.stored(2, LOBBY).into_iter().map(|(_, b)| b).collect();
+    assert_eq!(stored, originals);
+}
+
+#[test]
+fn old_peers_get_the_full_bodies_and_no_references() {
+    let (mut net, png, originals) = image_lobby(true);
+    assert_eq!(
+        bodies(&net.synced(2)),
+        originals.each_ref().map(String::as_str)
+    );
+    assert!(net.nodes[&2].fetches.is_empty());
+    let parts = sent(&net, 1, 2)
+        .into_iter()
+        .filter_map(|p| match p {
+            Packet::Part { data, .. } => Some(String::from_utf8_lossy(&data).into_owned()),
+            _ => None,
+        })
+        .collect::<String>();
+    assert!(!parts.contains(images::ATTRIBUTE) && !parts.contains("\"k\""));
+    assert!(
+        part_bytes(&net, 1, 2) > png.len(),
+        "the image travels inline"
+    );
+    let now = net.now;
+    let holder = net.node(1);
+    let hash = ImageRef::parse(
+        &images::to_references(&originals[0], |_, _| true).1[0]
+            .0
+            .to_string(),
+    )
+    .expect("ref")
+    .full
+    .hash;
+    assert_eq!(
+        holder.core.image_for(&holder.env, 2, &hash, now),
+        None,
+        "nothing granted"
+    );
+}
+
+#[test]
+fn images_stay_inline_while_offering_is_off() {
+    let mut net = Net::new(&[1, 2]);
+    net.node(1).env.offer = false;
+    net.place(1, &[LOBBY]);
+    let body = inline(&noisy_png(2));
+    net.hold(1, LOBBY, 3, START - 60_000, &body);
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+    assert_eq!(bodies(&net.synced(2)), [body.as_str()]);
+    assert!(net.nodes[&2].fetches.is_empty());
+}
+
+#[test]
+fn a_message_waiting_for_its_image_is_not_stored_twice_and_retries_the_image() {
+    let (mut net, png, originals) = image_lobby(false);
+    net.node(2).fetches.clear();
+    net.node(2).events.clear();
+    net.rejoin_lobby(2, 2000);
+    assert!(net.synced(2).is_empty(), "no duplicates");
+    assert_eq!(net.stored(2, LOBBY).len(), 2);
+    assert_eq!(
+        net.nodes[&2].fetches.len(),
+        1,
+        "the missing image is fetched again"
+    );
+
+    // Once the image is here, a further sync fetches neither messages nor images.
+    restore_all(&mut net, 2, &png);
+    net.node(2).fetches.clear();
+    let before = net.fetches(2, 1);
+    net.rejoin_lobby(2, 2000);
+    assert_eq!(net.fetches(2, 1), before);
+    assert!(net.nodes[&2].fetches.is_empty());
+    let stored: Vec<String> = net.stored(2, LOBBY).into_iter().map(|(_, b)| b).collect();
+    assert_eq!(stored, originals);
+}
+
+#[test]
+fn an_inline_copy_matches_a_copy_still_waiting_for_its_image() {
+    let mut net = Net::new(&[1, 2, 4]);
+    let body = inline(&noisy_png(5));
+    for holder in [1, 4] {
+        net.place(holder, &[LOBBY]);
+        net.hold(holder, LOBBY, 3, START - 60_000, &body);
+    }
+    // First only 1 answers, with a reference that is never resolved.
+    net.node(4).env.sharing = false;
+    net.place(2, &[LOBBY]);
+    net.run(10_000);
+    let stored = net.stored(2, LOBBY);
+    assert_eq!(stored.len(), 1);
+    assert!(stored[0].1.contains(images::ATTRIBUTE));
+    // Then only 4 answers, inline (it does not offer images): still the same message.
+    net.node(1).env.sharing = false;
+    net.node(4).env.sharing = true;
+    net.node(4).env.offer = false;
+    net.node(2).events.clear();
+    net.rejoin_lobby(2, 2000);
+    assert!(net.synced(2).is_empty());
+    assert_eq!(net.stored(2, LOBBY).len(), 1);
+}
+
+#[test]
+fn referenced_images_follow_the_locked_channel_rules() {
+    let mut net = Net::new(&[1, 2, 3]);
+    net.lock(RAID);
+    net.place_in(1, RAID, &[]);
+    let png = noisy_png(3);
+    net.hold(1, RAID, 4, START - 5000, &inline(&png));
+    // An image that only appears in a private chat.
+    let secret = noisy_png(4);
+    let server = net.nodes[&1].env.server;
+    net.node(1)
+        .env
+        .store()
+        .append_message(
+            server,
+            &NewChatMessage {
+                conversation: Conversation::Private(cert(3)),
+                sender_name: "user3".into(),
+                sender_cert_hash: Some(cert(3)),
+                sent_at: START - 3000,
+                body: inline(&secret),
+            },
+        )
+        .expect("private");
+    net.run(1000);
+    net.place_in(2, RAID, &[]);
+    net.place_in(3, ROOT, &[RAID]);
+    net.run(10_000);
+    assert_eq!(net.synced(2).len(), 1);
+    assert!(net.synced(3).is_empty());
+    let hash = crate::full_image::wire::FullRef::of(&png).hash;
+    let private = crate::full_image::wire::FullRef::of(&secret).hash;
+    let now = net.now;
+    let holder = net.node(1);
+    assert!(holder.core.image_for(&holder.env, 2, &hash, now).is_some());
+    for (who, hash) in [(3, hash), (2, private), (3, private)] {
+        assert_eq!(holder.core.image_for(&holder.env, who, &hash, now), None);
+    }
+    // Leaving the locked channel ends the access.
+    net.place_in(2, ROOT, &[RAID]);
+    let holder = net.node(1);
+    assert_eq!(holder.core.image_for(&holder.env, 2, &hash, now), None);
+}
+
+#[test]
+fn image_grants_end_when_sharing_or_offering_stops() {
+    let (mut net, png, _) = image_lobby(false);
+    let hash = crate::full_image::wire::FullRef::of(&png).hash;
+    let now = net.now;
+    let holder = net.node(1);
+    holder.env.offer = false;
+    assert_eq!(holder.core.image_for(&holder.env, 2, &hash, now), None);
+    holder.env.offer = true;
+    holder.env.sharing = false;
+    assert_eq!(holder.core.image_for(&holder.env, 2, &hash, now), None);
+    holder.env.sharing = true;
+    assert!(holder.core.image_for(&holder.env, 2, &hash, now).is_some());
+    let later = now + 11 * 60 * 1000;
+    assert_eq!(
+        holder.core.image_for(&holder.env, 2, &hash, later),
+        None,
+        "grants expire"
+    );
 }
