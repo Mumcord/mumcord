@@ -40,6 +40,23 @@ pub struct User {
     pub is_mumcord: bool,
     /// What that client announced it can do (empty for everyone else).
     pub mumcord_features: Vec<String>,
+    /// Software the person's hello announces, e.g. "Mumbot"; only bots send it (issue #459).
+    /// Untrusted plain text, already limited to letters, digits, spaces, `-` and `.`.
+    pub product: Option<String>,
+    /// Version of that software, e.g. "0.4.1".
+    pub version: Option<String>,
+    /// Set when the person's hello says it is a bot (issue #458).
+    pub bot: Option<UserBot>,
+}
+
+/// What a bot says about itself in its hello.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UserBot {
+    /// Speaks in its channel, so it stays visible there.
+    pub voice: bool,
+    /// What it runs, e.g. `history`, `peer`, `webhook`, `music`; sorted.
+    pub modules: Vec<String>,
 }
 
 /// Comment, avatar and private note, fetched on demand when the profile card opens.
@@ -100,6 +117,12 @@ impl From<UserView> for User {
             share_volume: v.share_volume,
             is_mumcord: v.mumcord_features.is_some(),
             mumcord_features: v.mumcord_features.unwrap_or_default(),
+            product: v.mumcord_bot.as_ref().map(|b| b.product.clone()),
+            version: v.mumcord_bot.as_ref().and_then(|b| b.version.clone()),
+            bot: v.mumcord_bot.map(|b| UserBot {
+                voice: b.voice,
+                modules: b.modules,
+            }),
         }
     }
 }

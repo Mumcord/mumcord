@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { VOICE_STATE_KEY, voiceState } from "../channels/statusText";
 import { MumcordBadge } from "../channels/MumcordBadge";
+import { announcedClient } from "../channels/mumcord";
 import { useServerStateOf, useShownServerId } from "../channels/serverStore";
 import { FriendButton } from "./FriendButton";
 import { ConnectionQuality } from "../connection/ConnectionQuality";
@@ -350,6 +351,7 @@ function PreviewBody({
   // Sanitized here like on the full card: server comments are untrusted.
   const comment = profile?.comment ? DOMPurify.sanitize(profile.comment) : "";
   const state = voiceState(user);
+  const client = announcedClient(user);
   const voice = [
     talking && tStatus("status.talking"),
     state && tStatus(VOICE_STATE_KEY[state]),
@@ -367,12 +369,14 @@ function PreviewBody({
             <PositionalBadge session={user.session} serverId={serverId} />
           </p>
           <p className="profile-preview__meta">
-            {user.registered ? t("registered") : t("unregistered")}
+            {[client, user.registered ? t("registered") : t("unregistered")]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
           {voice.length > 0 && <p className="profile-preview__voice">{voice.join(", ")}</p>}
         </div>
       </div>
-      <ConnectionQuality session={user.session} serverId={serverId} />
+      <ConnectionQuality session={user.session} serverId={serverId} announcedClient={client} />
       <NowGamingFor session={user.session} serverId={serverId} compact />
       <NowPlayingFor session={user.session} serverId={serverId} compact />
       {comment && (

@@ -46,7 +46,7 @@
     "seek": "Sök",
     "volume": "Volym",
     "syncedPlay": "Synkat",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Blanksteg · ← → · M · F · Esc",
     "inControl": "{{name}} har kontrollen",
     "inSync": "Synkat",
     "inSyncAll": "Alla är synkade",
@@ -70,14 +70,14 @@
     "onTopFailed": "Alltid överst kunde inte ändras",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Ändra storlek på mediayta",
+      "valueText": "{{percent}}% av fönsterhöjden",
+      "ofWindow": "av fönsterhöjden",
+      "chatMinimum": "chatten behåller sitt minimum",
+      "release": "släpp för att fälla ihop",
+      "keys": "↑ ↓ ändra storlek · PageUp/PageDown fäst · Home/End · Enter återställer",
+      "releaseHint": "Släpp för att minimera till minifältet",
+      "minimised": "Mediaytan minimerad"
     },
     "stage": {
       "tabs": "Vad mediaytan visar",

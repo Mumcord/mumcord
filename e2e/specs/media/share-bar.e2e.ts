@@ -54,6 +54,8 @@ describe("sharer control bar (#163)", () => {
   it.skip("shows the source and the running time while sharing", async () => {
     const start = await $("//button[contains(normalize-space(.), 'Share screen')]");
     await start.click();
+    // The share start dialog (FR-7.35) comes before the system picker.
+    await $("//dialog//button[normalize-space()='Choose what to share']").click();
     const shown = await bar();
     await waitText(shown, "Live");
     expect(await shown.getText()).toContain("Screen");

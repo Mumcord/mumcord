@@ -46,7 +46,7 @@
     "seek": "Fittex",
     "volume": "Volum",
     "syncedPlay": "Sincronizzat",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Spazju · ← → · M · F · Esc",
     "inControl": "{{name}} għandha l-kontroll",
     "inSync": "Sincronizzat",
     "inSyncAll": "Kollha sincronizzati",
@@ -70,14 +70,14 @@
     "onTopFailed": "Ma setax jinbidel “Dejjem fuq”",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Ibdel id-daqs taż-żona tal-media",
+      "valueText": "{{percent}}% mill-għoli tat-twieqa",
+      "ofWindow": "mill-għoli tat-twieqa",
+      "chatMinimum": "iċ-chat jibqa' fil-minimu tiegħu",
+      "release": "ħalli biex tikkollassa",
+      "keys": "↑ ↓ ibdel id-daqs · PageUp/PageDown aqbad · Home/End · Enter jirrisetja",
+      "releaseHint": "Ħalli biex timminimizza għall-bar żgħir",
+      "minimised": "Iż-żona tal-media ġiet minimizzata"
     },
     "stage": {
       "tabs": "X'turi ż-żona tal-midja",

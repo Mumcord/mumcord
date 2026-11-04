@@ -24,6 +24,8 @@ serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
+image.workspace = true
+rand.workspace = true
 
 [features]
 # Public in-memory `SecretStore` for tests in other crates.

@@ -836,6 +836,133 @@ pub struct Settings {
     pub screen_use_gpu: bool,
     /// Plugin platform 1.1 settings (spec 09).
     pub plugins: PluginSettings,
+    /// Stable id of the last used camera; `None` uses the system default (FR-8.27).
+    pub camera_device_id: Option<String>,
+    pub camera_send_quality: CameraSendQuality,
+    /// Mirror the own self-view (FR-8.11).
+    pub camera_mirror_self: bool,
+    pub camera_default_background: CameraBackground,
+    /// Blur strength 0–100 (Light … Strong). Clamped on load.
+    pub camera_blur_strength: u8,
+    pub camera_effect_quality: CameraEffectQuality,
+    /// Turn the camera off when the screen locks (FR-8.75).
+    pub camera_off_on_lock: bool,
+    pub camera_show: CameraShow,
+    /// Data saver: up to 15 fps for everyone (FR-8.75).
+    pub camera_data_saver: bool,
+    pub camera_reduce_motion: CameraReduceMotion,
+    pub camera_strip_position: CameraStripPosition,
+    /// Global hotkey that opens the preview or turns the camera off (FR-8.20); unset by default.
+    pub camera_hotkey: Option<String>,
+}
+
+/// Default and bounds of the camera blur strength.
+pub const DEFAULT_CAMERA_BLUR_STRENGTH: u8 = 50;
+pub const MAX_CAMERA_BLUR_STRENGTH: u8 = 100;
+
+/// Send quality of the own camera (FR-8.45).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CameraSendQuality {
+    #[default]
+    #[serde(rename = "auto")]
+    Auto,
+    #[serde(rename = "720p15")]
+    P720F15,
+    #[serde(rename = "360p30")]
+    P360F30,
+}
+
+/// Background behind the person (FR-8.11). Stored as `none`, `blur`, `builtin:{id}` or `own:{id}`.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub enum CameraBackground {
+    None,
+    #[default]
+    Blur,
+    Builtin(String),
+    Own(String),
+}
+
+impl CameraBackground {
+    fn as_stored(&self) -> String {
+        match self {
+            Self::None => "none".to_owned(),
+            Self::Blur => "blur".to_owned(),
+            Self::Builtin(id) => format!("builtin:{id}"),
+            Self::Own(id) => format!("own:{id}"),
+        }
+    }
+
+    fn from_stored(value: &str) -> Option<Self> {
+        match value {
+            "none" => Some(Self::None),
+            "blur" => Some(Self::Blur),
+            _ => match value.split_once(':')? {
+                ("builtin", id) if !id.is_empty() => Some(Self::Builtin(id.to_owned())),
+                ("own", id) if !id.is_empty() => Some(Self::Own(id.to_owned())),
+                _ => None,
+            },
+        }
+    }
+}
+
+impl Serialize for CameraBackground {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<S::Ok, S::Error> {
+        serializer.serialize_str(&self.as_stored())
+    }
+}
+
+impl<'de> Deserialize<'de> for CameraBackground {
+    fn deserialize<D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> std::result::Result<Self, D::Error> {
+        let value = String::deserialize(deserializer)?;
+        // An unknown value (for example from a newer version) must not break loading the
+        // settings file, so it falls back to the default.
+        Ok(Self::from_stored(&value).unwrap_or_default())
+    }
+}
+
+/// Quality level of the background effects (FR-8.35).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CameraEffectQuality {
+    #[default]
+    Auto,
+    Best,
+    Light,
+}
+
+/// When other people's cameras are shown (FR-8.75).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CameraShow {
+    #[default]
+    Always,
+    OnOpen,
+    Never,
+}
+
+/// "Reduce motion" for the speaking frame; `System` follows the operating system.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CameraReduceMotion {
+    #[default]
+    System,
+    On,
+    Off,
+}
+
+/// Where the camera strip sits while something is shared (FR-8.72).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CameraStripPosition {
+    #[default]
+    Beside,
+    Above,
+    Hidden,
 }
 
 /// Default hours between two update checks (FR-3.144).
@@ -943,6 +1070,18 @@ impl Default for Settings {
             screen_sound: true,
             screen_use_gpu: true,
             plugins: PluginSettings::default(),
+            camera_device_id: None,
+            camera_send_quality: CameraSendQuality::default(),
+            camera_mirror_self: true,
+            camera_default_background: CameraBackground::default(),
+            camera_blur_strength: DEFAULT_CAMERA_BLUR_STRENGTH,
+            camera_effect_quality: CameraEffectQuality::default(),
+            camera_off_on_lock: true,
+            camera_show: CameraShow::default(),
+            camera_data_saver: false,
+            camera_reduce_motion: CameraReduceMotion::default(),
+            camera_strip_position: CameraStripPosition::default(),
+            camera_hotkey: None,
         }
     }
 }
@@ -1049,6 +1188,8 @@ impl Store {
                     .clamp(MIN_UPDATE_INTERVAL_HOURS, MAX_UPDATE_INTERVAL_HOURS);
                 settings.input_gain_percent = settings.input_gain_percent.min(200);
                 settings.plugins.clamp();
+                settings.camera_blur_strength =
+                    settings.camera_blur_strength.min(MAX_CAMERA_BLUR_STRENGTH);
                 settings.output_volume_percent = settings.output_volume_percent.min(100);
                 Ok(settings)
             }
@@ -1513,6 +1654,61 @@ mod tests {
             assert!(!loaded.video_ducking);
             assert_eq!(loaded.video_ducking_percent, expected);
         }
+    }
+
+    #[test]
+    fn camera_settings_default_and_round_trip() {
+        let (_dir, store) = temp_store();
+        let defaults = store.settings().expect("load");
+        assert_eq!(defaults.camera_device_id, None);
+        assert_eq!(defaults.camera_send_quality, CameraSendQuality::Auto);
+        assert!(defaults.camera_mirror_self);
+        assert_eq!(defaults.camera_default_background, CameraBackground::Blur);
+        assert_eq!(defaults.camera_blur_strength, 50);
+        assert_eq!(defaults.camera_effect_quality, CameraEffectQuality::Auto);
+        assert!(defaults.camera_off_on_lock);
+        assert_eq!(defaults.camera_show, CameraShow::Always);
+        assert!(!defaults.camera_data_saver);
+        assert_eq!(defaults.camera_reduce_motion, CameraReduceMotion::System);
+        assert_eq!(defaults.camera_strip_position, CameraStripPosition::Beside);
+        assert_eq!(defaults.camera_hotkey, None);
+
+        let changed = Settings {
+            camera_device_id: Some("cam-1".to_owned()),
+            camera_send_quality: CameraSendQuality::P360F30,
+            camera_mirror_self: false,
+            camera_default_background: CameraBackground::Own("abc".to_owned()),
+            camera_blur_strength: 80,
+            camera_effect_quality: CameraEffectQuality::Light,
+            camera_off_on_lock: false,
+            camera_show: CameraShow::OnOpen,
+            camera_data_saver: true,
+            camera_reduce_motion: CameraReduceMotion::On,
+            camera_strip_position: CameraStripPosition::Hidden,
+            camera_hotkey: Some("Ctrl+Shift+V".to_owned()),
+            ..Settings::default()
+        };
+        store.save_settings(&changed).expect("save");
+        assert_eq!(store.settings().expect("reload"), changed);
+    }
+
+    #[test]
+    fn camera_wire_values_and_old_files() {
+        let loaded = load_raw(
+            r#"{"camera_send_quality":"720p15","camera_default_background":"builtin:sunrise","camera_blur_strength":250}"#,
+        );
+        assert_eq!(loaded.camera_send_quality, CameraSendQuality::P720F15);
+        assert_eq!(
+            loaded.camera_default_background,
+            CameraBackground::Builtin("sunrise".to_owned())
+        );
+        assert_eq!(loaded.camera_blur_strength, 100);
+        // Unknown background values fall back to the default instead of failing the load.
+        let unknown = load_raw(r#"{"camera_default_background":"hologram:1"}"#);
+        assert_eq!(unknown.camera_default_background, CameraBackground::Blur);
+        // A file from before the camera existed loads with the camera defaults.
+        let old = load_raw(r#"{"wizard_completed":true}"#);
+        assert!(old.camera_mirror_self && old.camera_off_on_lock);
     }
 
     #[test]

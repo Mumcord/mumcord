@@ -2899,8 +2899,10 @@ impl Inner {
         setting: mumcord_store::PersonSetting,
     ) -> UserView {
         let peers = lock(&self.mumcord);
-        let features = peers.get(&server_id).and_then(|p| p.features(user.session));
-        user_view(user, setting, features)
+        let known = peers.get(&server_id);
+        let features = known.and_then(|p| p.features(user.session));
+        let bot = known.and_then(|p| p.bot(user.session));
+        user_view(user, setting, features, bot)
     }
 
     /// Emits the person again, e.g. after they were recognised as a Mumcord user.

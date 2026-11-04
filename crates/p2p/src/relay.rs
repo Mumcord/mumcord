@@ -1120,6 +1120,11 @@ mod tests {
         assert!(Unit::control(ControlKind::Layers, &[2]).is_ok());
         assert!(Unit::control(ControlKind::Layers, &[]).is_err());
         assert!(Unit::control(ControlKind::Key, &[0; 2000]).is_err());
+        // want: subscriber sends the u16 height, the publisher receives slot + height.
+        assert!(Unit::control(ControlKind::Want, &360u16.to_be_bytes()).is_ok());
+        assert!(Unit::control(ControlKind::Want, &[0, 7, 1, 104]).is_ok());
+        assert!(Unit::control(ControlKind::Want, &[]).is_err());
+        assert!(Unit::control(ControlKind::Want, &[0; 5]).is_err());
     }
 
     #[test]

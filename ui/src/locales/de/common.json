@@ -46,7 +46,7 @@
     "seek": "Springen",
     "volume": "Lautstärke",
     "syncedPlay": "Synchron",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Leertaste · ← → · M · F · Esc",
     "inControl": "{{name}} steuert",
     "inSync": "Im Takt",
     "inSyncAll": "Alle im Takt",
@@ -70,14 +70,14 @@
     "onTopFailed": "„Immer im Vordergrund“ konnte nicht geändert werden",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Medienbereich anpassen",
+      "valueText": "{{percent}} % der Fensterhöhe",
+      "ofWindow": "der Fensterhöhe",
+      "chatMinimum": "der Chat behält seine Mindesthöhe",
+      "release": "loslassen zum Einklappen",
+      "keys": "↑ ↓ Größe ändern · Bild↑/Bild↓ rasten ein · Pos1/Ende · Eingabe setzt zurück",
+      "releaseHint": "Loslassen, um auf die Minileiste zu verkleinern",
+      "minimised": "Medienbereich verkleinert"
     },
     "stage": {
       "tabs": "Was der Medienbereich zeigt",

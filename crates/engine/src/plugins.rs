@@ -572,7 +572,9 @@ pub(crate) fn on_peer_known(
             known
                 .and_then(|p| p.features(session))
                 .is_some_and(|f| f.iter().any(|x| x == FEATURE)),
-            known.and_then(|p| p.bot(session)).cloned(),
+            known
+                .and_then(|p| p.bot(session))
+                .map(crate::mumcord::Bot::plugin),
         )
     };
     let (changed, bot_changed) = {

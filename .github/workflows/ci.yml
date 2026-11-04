@@ -126,6 +126,12 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-latest, macos-latest]
         task: [check, test]
+        exclude:
+          # macOS runners are scarce: with two macOS jobs per run, the test job often waited 15
+          # minutes for a runner and was cancelled, failing the whole run. The macOS "check" job
+          # runs the tests too, so each run needs one macOS runner.
+          - os: macos-latest
+            task: test
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -266,7 +272,7 @@ jobs:
         run: cargo clippy --manifest-path scripts/smoke/seed/Cargo.toml --locked -- -D warnings
 
       - name: Rust tests
-        if: matrix.task == 'test'
+        if: matrix.task == 'test' || runner.os == 'macOS'
         run: cargo test --workspace --locked
 
       # The headless bot builds mumcord-codec for static musl binaries, so it must stay lint-clean,

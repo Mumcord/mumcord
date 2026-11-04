@@ -179,6 +179,8 @@ pub struct UserView {
     pub share_volume: u16,
     /// Features announced by another Mumcord client (FR-1.61); `None` for everyone else.
     pub mumcord_features: Option<Vec<String>>,
+    /// Set when that client's hello says it is a bot (issues #458, #459).
+    pub mumcord_bot: Option<crate::mumcord::Bot>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

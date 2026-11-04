@@ -46,7 +46,7 @@
     "seek": "Søg",
     "volume": "Lydstyrke",
     "syncedPlay": "Synkroniseret",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Mellemrum · ← → · M · F · Esc",
     "inControl": "{{name}} har kontrol",
     "inSync": "Synkroniseret",
     "inSyncAll": "Alle er synkroniseret",
@@ -70,14 +70,14 @@
     "onTopFailed": "Altid øverst kunne ikke ændres",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Tilpas medieområdets størrelse",
+      "valueText": "{{percent}}% af vinduets højde",
+      "ofWindow": "af vinduets højde",
+      "chatMinimum": "chatten beholder sit minimum",
+      "release": "slip for at folde sammen",
+      "keys": "↑ ↓ tilpas størrelse · PageUp/PageDown fastgør · Home/End · Enter nulstiller",
+      "releaseHint": "Slip for at minimere til minilinjen",
+      "minimised": "Medieområdet er minimeret"
     },
     "stage": {
       "tabs": "Hvad medieområdet viser",

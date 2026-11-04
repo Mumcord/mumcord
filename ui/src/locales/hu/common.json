@@ -46,7 +46,7 @@
     "seek": "Ugrás",
     "volume": "Hangerő",
     "syncedPlay": "Szinkronban",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Szóköz · ← → · M · F · Esc",
     "inControl": "{{name}} irányít",
     "inSync": "Szinkronban",
     "inSyncAll": "Mindenki szinkronban",
@@ -70,14 +70,14 @@
     "onTopFailed": "Nem sikerült módosítani a „Mindig felül” beállítást",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Médiaterület átméretezése",
+      "valueText": "Az ablakmagasság {{percent}}%-a",
+      "ofWindow": "az ablakmagasságból",
+      "chatMinimum": "a csevegő megtartja a minimumot",
+      "release": "engedd el az összecsukáshoz",
+      "keys": "↑ ↓ átméretezés · PageUp/PageDown lépcsőzés · Home/End · Enter visszaállít",
+      "releaseHint": "Engedd el a minisávra kicsinyítéshez",
+      "minimised": "A médiaterület kicsinyítve"
     },
     "stage": {
       "tabs": "Mit mutat a médiaterület",

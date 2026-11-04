@@ -46,7 +46,7 @@
     "seek": "Peržiūra",
     "volume": "Garsumas",
     "syncedPlay": "Sinchronizuota",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Tarpas · ← → · M · F · Esc",
     "inControl": "{{name}} valdo",
     "inSync": "Sinchronizuota",
     "inSyncAll": "Visi sinchronizuoti",
@@ -70,14 +70,14 @@
     "onTopFailed": "Nepavyko pakeisti nustatymo „Visada viršuje“",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Keisti medijos srities dydį",
+      "valueText": "{{percent}} % lango aukščio",
+      "ofWindow": "lango aukščio",
+      "chatMinimum": "pokalbis išlaiko savo minimumą",
+      "release": "atleisk, kad sutrauktum",
+      "keys": "↑ ↓ keisti dydį · PageUp/PageDown prisegti · Home/End · Enter atstato",
+      "releaseHint": "Atleisk, kad sumažintum į mini juostą",
+      "minimised": "Medijos sritis sumažinta"
     },
     "stage": {
       "tabs": "Ką rodo medijos sritis",

@@ -280,8 +280,9 @@ impl PublisherControl {
                     Err(e) => tracing::debug!(error = %e, "broadcast key request chunk dropped"),
                 }
             }
-            // Not the publisher's to receive.
-            ControlKind::Key | ControlKind::Layers => {}
+            // `want` is camera sharing's resolution hint; a screen share encodes one size for all.
+            // Not the publisher's to receive: `key` and `layers`.
+            ControlKind::Want | ControlKind::Key | ControlKind::Layers => {}
         }
         true
     }

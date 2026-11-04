@@ -46,7 +46,7 @@
     "seek": "Liikumine",
     "volume": "Helitugevus",
     "syncedPlay": "Sünkroniseeritud",
-    "keys": "Space · ← → · M · F · Esc",
+    "keys": "Tühik · ← → · M · F · Esc",
     "inControl": "{{name}} juhib",
     "inSync": "Sünkroonis",
     "inSyncAll": "Kõik sünkroonis",
@@ -70,14 +70,14 @@
     "onTopFailed": "Valikut „Alati peal“ ei õnnestunud muuta",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Muuda meediaala suurust",
+      "valueText": "{{percent}}% akna kõrgusest",
+      "ofWindow": "akna kõrgusest",
+      "chatMinimum": "vestlus säilitab oma miinimumi",
+      "release": "vabasta ahendamiseks",
+      "keys": "↑ ↓ suurus · PageUp/PageDown kinnitumine · Home/End · Enter lähtestab",
+      "releaseHint": "Vabasta minimeerimiseks miniribale",
+      "minimised": "Meediaala minimeeritud"
     },
     "stage": {
       "tabs": "Mida meediaala näitab",

@@ -1,6 +1,6 @@
 {
   "link": {
-    "label": "Peer-to-peer",
+    "label": "Bejn il-pari",
     "direct": "Dirett",
     "relayUdp": "Permezz ta' relay (UDP)",
     "relayTcp": "Permezz ta' relay (TCP 443)",

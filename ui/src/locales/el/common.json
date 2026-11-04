@@ -70,14 +70,14 @@
     "onTopFailed": "Δεν ήταν δυνατή η αλλαγή του «Πάντα σε πρώτο πλάνο»",
     "windowTitle": "{{title}} — {{channel}}",
     "resize": {
-      "label": "Resize media area",
-      "valueText": "{{percent}}% of the window height",
-      "ofWindow": "of the window height",
-      "chatMinimum": "chat keeps its minimum",
-      "release": "release to collapse",
-      "keys": "↑ ↓ resize · PageUp/PageDown snap · Home/End · Enter resets",
-      "releaseHint": "Release to minimise to the mini bar",
-      "minimised": "Media area minimised"
+      "label": "Αλλαγή μεγέθους της περιοχής πολυμέσων",
+      "valueText": "{{percent}}% του ύψους του παραθύρου",
+      "ofWindow": "του ύψους του παραθύρου",
+      "chatMinimum": "η συνομιλία κρατά το ελάχιστό της",
+      "release": "άφησε για σύμπτυξη",
+      "keys": "↑ ↓ αλλαγή μεγέθους · PageUp/PageDown προσκόλληση · Home/End · Enter επαναφέρει",
+      "releaseHint": "Άφησε για ελαχιστοποίηση στη μικρή γραμμή",
+      "minimised": "Η περιοχή πολυμέσων ελαχιστοποιήθηκε"
     },
     "stage": {
       "tabs": "Τι δείχνει η περιοχή πολυμέσων",
