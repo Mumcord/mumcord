@@ -152,6 +152,24 @@ export const commands = {
 	banListSave: (serverId: number, changes: BanChangeInput[], force: boolean) => typedError<BanSaveResult, ApiError>(__TAURI_INVOKE("ban_list_save", { serverId, changes, force })),
 	/**  The window closed: what it held is dropped (FR-10.63). */
 	banListClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("ban_list_close", { serverId })),
+	/**
+	 *  Reads what the kick or ban dialog needs about a person (issue #253). Fails with
+	 *  `permissionDenied` without the Kick or the Ban right in the root channel.
+	 */
+	personTarget: (serverId: number, session: number) => typedError<PersonTarget, ApiError>(__TAURI_INVOKE("person_target", { serverId, session })),
+	/**
+	 *  Kicks a person with an optional reason (FR-10.11). A refusal arrives as an error, which the open
+	 *  dialog shows; yourself is never offered, so it is refused here too.
+	 */
+	personKick: (serverId: number, session: number, reason: string | null) => typedError<KickResult, ApiError>(__TAURI_INVOKE("person_kick", { serverId, session, reason })),
+	/**
+	 *  Bans a person: one entry added to the server's ban list with the safe save of FR-10.66, then the
+	 *  person is removed when the dialog asked for it. Without a readable ban list the dialog sends the
+	 *  server's own message instead (FR-10.13).
+	 */
+	personBan: (serverId: number, session: number, input: BanInput) => typedError<BanResult, ApiError>(__TAURI_INVOKE("person_ban", { serverId, session, input })),
+	/**  The dialog closed: what it held is dropped (FR-10.63). */
+	personActionClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_action_close", { serverId })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -1233,6 +1251,31 @@ export type BanEntry = {
 	expired: boolean,
 };
 
+/**  What the ban dialog sends (FR-10.12). */
+export type BanInput = {
+	reason: string | null,
+	/**  Seconds; 0 is permanent. Ignored when `quick` is set. */
+	duration: number,
+	byCert: boolean,
+	byIp: boolean,
+	/**  Subnet length in the family of the address: 32 for a single IPv4, 128 for a single IPv6. */
+	mask: number,
+	removeNow: boolean,
+	/**  The dialog's "Save mine anyway" after a conflict (FR-10.66). */
+	force: boolean,
+	/**  The quick-ban path, which only a server that will not show its list allows (FR-10.13). */
+	quick: boolean,
+};
+
+/**  What a ban produced (FR-10.12, FR-10.13, FR-10.66). */
+export type BanResult = 
+/**  One entry added to the server's list; `removed` says whether the person was taken off too. */
+{ kind: "saved"; key: string; removed: boolean } | 
+/**  The server's own "remove with ban" message with its default length (FR-10.13). */
+{ kind: "quickBanned" } | 
+/**  The entry the dialog wanted to add is different on the server already (FR-10.66). */
+{ kind: "conflict"; key: string; fresh: BanEntry[] };
+
 /**  What a save produced: the new list, or the conflict the UI must ask about (FR-10.66). */
 export type BanSaveResult = { kind: "saved"; entries: BanEntry[] } | 
 /**  The entry was changed or removed on the server while the window was open. */
@@ -1397,6 +1440,11 @@ export type ChannelPermissions = {
 	 *  (Epic 4, issue #254).
 	 */
 	ban: boolean,
+	/**
+	 *  Kick right, granted on the root channel; decides whether "Kick…" shows in a person's menu
+	 *  (Epic 4, issue #253).
+	 */
+	kick: boolean,
 };
 
 export type ChannelRemoved = {
@@ -2161,6 +2209,9 @@ export type KeyChangeReview = {
 	newFingerprint: string,
 };
 
+/**  What a kick produced: the server's answer, or nothing within 5 s. */
+export type KickResult = "confirmed" | "unconfirmed";
+
 /**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
 export type KnownGame = {
 	key: GameKey,
@@ -2686,6 +2737,25 @@ export type PersonProfile = {
 	avatar: string | null,
 	/**  The user's private note about this person; empty when there is none. */
 	note: string,
+};
+
+/**
+ *  What a kick or ban dialog needs to know about a person before it can be filled (issue #253):
+ *  the address the server reports only to admins, how long the person is connected, whether the ban
+ *  list can be read, the certificate hash, and the two rights (FR-10.11, FR-10.12, FR-10.13).
+ */
+export type PersonTarget = {
+	session: number,
+	/**  Full address; the UI masks it by default (FR-10.51, FR-10.65). */
+	address: string | null,
+	/**  Seconds the person is connected, `null` when the server did not report it. */
+	onlineSecs: number | null,
+	/**  False when the server will not show its list, so only its own default ban length works. */
+	banListReadable: boolean,
+	certHash: string | null,
+	/**  The rights in the root channel, which decide what the menu offers at all (FR-10.1, FR-10.2). */
+	canKick: boolean,
+	canBan: boolean,
 };
 
 /**  A video waiting in the party's playlist (FR-2.69). */
