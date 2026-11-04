@@ -81,7 +81,7 @@ fn runtime_for(os: &str, arch: &str) -> Option<Runtime> {
                 sha256: "b4d513ab2b26f088c66891dbbc1408166708773d7cc4163de7bdca0e9bbb7856",
                 name: "onnxruntime-osx-arm64-1.23.2.tgz",
             },
-            member: "onnxruntime-osx-arm64-1.23.2/lib/libonnxruntime.1.23.2.dylib",
+            member: "./onnxruntime-osx-arm64-1.23.2/lib/libonnxruntime.1.23.2.dylib",
             library: "libonnxruntime.1.23.2.dylib",
         },
         ("macos", "x86_64") => Runtime {
@@ -90,7 +90,7 @@ fn runtime_for(os: &str, arch: &str) -> Option<Runtime> {
                 sha256: "d10359e16347b57d9959f7e80a225a5b4a66ed7d7e007274a15cae86836485a6",
                 name: "onnxruntime-osx-x86_64-1.23.2.tgz",
             },
-            member: "onnxruntime-osx-x86_64-1.23.2/lib/libonnxruntime.1.23.2.dylib",
+            member: "./onnxruntime-osx-x86_64-1.23.2/lib/libonnxruntime.1.23.2.dylib",
             library: "libonnxruntime.1.23.2.dylib",
         },
         _ => return None,
