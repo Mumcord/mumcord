@@ -156,7 +156,7 @@ fn relay_reason(e: &P2pError) -> RelayUnavailable {
     }
 }
 
-fn cert_key(identity: &mumcord_store::Identity) -> Option<CertKey> {
+pub(crate) fn cert_key(identity: &mumcord_store::Identity) -> Option<CertKey> {
     CertKey::new(identity.cert_der().to_vec(), identity.key_pkcs8_der())
         .inspect_err(|e| tracing::warn!(error = %e, "certificate not usable for a broadcast"))
         .ok()
@@ -227,7 +227,9 @@ impl Engine {
             .ok_or(FanoutUnavailable::NoCertificate)?;
         let me = cert_key(&identity).ok_or(FanoutUnavailable::NoCertificate)?;
         self.with_fanout(server_id, token, |fanout| *fanout = Some(Fanout::Starting));
-        let (ann, id, relay_token) = self.relay_broadcast_request(server_id, limit).await?;
+        let (ann, id, relay_token) = self
+            .relay_broadcast_request(server_id, RelayUse::ScreenShare, limit)
+            .await?;
         let link = p2p
             .broadcast(&ann, &relay_token, BindRole::Publisher)
             .await
@@ -403,7 +405,10 @@ impl Engine {
     pub(super) fn admit_to_broadcast(&self, server_id: ServerId, id: BroadcastId, viewer: u32) {
         let engine = self.clone();
         self.runtime().spawn(async move {
-            let Err(reason) = engine.relay_broadcast_admit(server_id, id, viewer).await else {
+            let Err(reason) = engine
+                .relay_broadcast_admit(server_id, RelayUse::ScreenShare, id, viewer)
+                .await
+            else {
                 return;
             };
             tracing::info!(?reason, "viewer not admitted to the broadcast");
@@ -453,23 +458,22 @@ impl Engine {
     }
 
     /// The bot's `bcast-tok` for this client (from the pinned bot, checked by the caller):
-    /// taken only while a watch request to `sharer` waits for its answer (section 6.6).
+    /// taken only while a watch request to `sharer` waits for its answer (section 6.6). False
+    /// when it was not taken.
     pub(crate) fn screen_share_broadcast_token(
         &self,
         ctx: &SessionCtx,
         sharer: u32,
         id: BroadcastId,
         token: RelayToken,
-    ) {
+    ) -> bool {
         if !here(&ctx.handle).is_some_and(|h| h.others.contains(&sharer)) {
-            return;
+            return false;
         }
-        if let Some(shares) = lock(self.screen_share_state())
+        lock(self.screen_share_state())
             .servers
             .get_mut(&ctx.server_id)
-        {
-            shares.answered(sharer, Answer::Broadcast(id, token));
-        }
+            .is_some_and(|shares| shares.answered(sharer, Answer::Broadcast(id, token)))
     }
 
     /// Opens the subscriber end of `sharer`'s broadcast `id` for watch `attempt` (FR-7.42).

@@ -354,10 +354,10 @@ impl Shares {
         current
     }
 
-    /// Hands `sharer`'s answer to the waiting watch request; ignored when nobody asked.
-    pub fn answered(&mut self, sharer: u32, answer: Answer) {
+    /// Hands `sharer`'s answer to the waiting watch request; ignored (false) when nobody asked.
+    pub fn answered(&mut self, sharer: u32, answer: Answer) -> bool {
         let Some(&Watching::Asked { attempt, .. }) = self.watching.get(&sharer) else {
-            return;
+            return false;
         };
         let next = match answer {
             Answer::Accept | Answer::Broadcast(..) => {
@@ -369,6 +369,7 @@ impl Shares {
             // The asking call may have timed out already.
             let _ = reply.send(answer);
         }
+        true
     }
 
     /// `session` is no longer in the user's channel: their share, their watching and the user
