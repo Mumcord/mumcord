@@ -17,7 +17,9 @@ pub mod tls;
 pub mod version;
 pub mod voice;
 
-pub use ban::{ADDRESS_LEN, Ban, format_start, from_message, parse_iso, query_message, to_message};
+pub use ban::{
+    ADDRESS_LEN, Ban, format_start, from_message, parse_iso, query_message, to_message, wire_mask,
+};
 pub use client::{
     ConnectConfig, Connection, DisconnectReason, Event, Handle, LowOutcome, PLUGIN_DATA_MAX,
     PluginData, PluginTicket, SyncProgress, TextMessage, TextTarget, UdpPing, connect,
