@@ -49,6 +49,9 @@ function user(session: number, name: string, change: Partial<User> = {}): User {
     shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
+    product: null,
+    version: null,
+    bot: null,
     ...change,
   };
 }

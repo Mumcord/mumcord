@@ -24,6 +24,7 @@ import { getApi, toEngineError, type User } from "../../api";
 import { shownServerId, useServerStateOf, useShownServerId } from "../channels/serverStore";
 import { setFriend, useFriend } from "../friends";
 import { MumcordBadge } from "../channels/MumcordBadge";
+import { announcedClient } from "../channels/mumcord";
 import { ConnectionQuality } from "../connection/ConnectionQuality";
 import { NowGamingFor } from "../nowgaming";
 import { PositionalBadge } from "../positional";
@@ -243,7 +244,11 @@ function ProfileBody({
         </p>
       </div>
       <div data-connection-section tabIndex={-1} className="profile-card__connection">
-        <ConnectionQuality session={user.session} serverId={serverId} />
+        <ConnectionQuality
+          session={user.session}
+          serverId={serverId}
+          announcedClient={announcedClient(user)}
+        />
       </div>
       {loadError && <p className="profile-card__note">{t("card.loadFailed")}</p>}
       <NowGamingFor session={user.session} serverId={serverId} joinable={!isSelf} />

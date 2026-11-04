@@ -106,7 +106,12 @@ fn hex(bytes: &[u8]) -> String {
     })
 }
 
-pub fn user_view(user: &User, local: PersonSetting, mumcord: Option<&[String]>) -> UserView {
+pub fn user_view(
+    user: &User,
+    local: PersonSetting,
+    mumcord: Option<&[String]>,
+    bot: Option<&crate::mumcord::Bot>,
+) -> UserView {
     UserView {
         session: user.session,
         channel_id: user.channel_id,
@@ -128,6 +133,7 @@ pub fn user_view(user: &User, local: PersonSetting, mumcord: Option<&[String]>) 
         local_mute: local.local_mute,
         share_volume: local.share_volume,
         mumcord_features: mumcord.map(<[String]>::to_vec),
+        mumcord_bot: bot.cloned(),
     }
 }
 

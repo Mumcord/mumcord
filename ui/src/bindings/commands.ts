@@ -4193,6 +4193,23 @@ export type User = {
 	isMumcord: boolean,
 	/**  What that client announced it can do (empty for everyone else). */
 	mumcordFeatures: string[],
+	/**
+	 *  Software the person's hello announces, e.g. "Mumbot"; only bots send it (issue #459).
+	 *  Untrusted plain text, already limited to letters, digits, spaces, `-` and `.`.
+	 */
+	product: string | null,
+	/**  Version of that software, e.g. "0.4.1". */
+	version: string | null,
+	/**  Set when the person's hello says it is a bot (issue #458). */
+	bot: UserBot | null,
+};
+
+/**  What a bot says about itself in its hello. */
+export type UserBot = {
+	/**  Speaks in its channel, so it stays visible there. */
+	voice: boolean,
+	/**  What it runs, e.g. `history`, `peer`, `webhook`, `music`; sorted. */
+	modules: string[],
 };
 
 export type UserRemoved = {

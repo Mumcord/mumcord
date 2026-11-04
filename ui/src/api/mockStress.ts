@@ -253,6 +253,9 @@ export function stressUsers(self: User, channels: readonly ChannelInfo[]): User[
       shareVolume: 100,
       isMumcord: false,
       mumcordFeatures: [],
+      product: null,
+      version: null,
+      bot: null,
     };
   });
   return [self, ...others];
