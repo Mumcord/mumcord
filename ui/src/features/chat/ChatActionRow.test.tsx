@@ -11,7 +11,7 @@ import type { MockApi, WatchParty } from "../../api";
 import { applyLanguage } from "../../i18n";
 import { getServerState } from "../channels/serverStore";
 import { selectConversation } from "../channels/selection";
-import { connectedMock, resetAll } from "../channels/testUtils";
+import { connectedMock, resetAll, stubDialog } from "../channels/testUtils";
 import { resetScreenShareStore } from "../screenshare";
 import { resetWatchPartyStore } from "../watchparty";
 import { ChatActionRow } from "./ChatActionRow";
@@ -24,6 +24,7 @@ let api: MockApi;
 let own: number;
 
 beforeAll(async () => {
+  stubDialog();
   await applyLanguage("en");
 });
 
@@ -53,6 +54,12 @@ const withOs = (os: string) => {
 };
 const asLinux = () => {
   withOs("linux x86_64");
+};
+/** Confirms the share start dialog that opens before the system's picker (FR-7.35). */
+const chooseWhatToShare = async () => {
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Choose what to share" }, { timeout: 5000 }),
+  );
 };
 
 describe("visibility", () => {
@@ -134,6 +141,7 @@ describe("share toggle", () => {
       expect(share).not.toHaveAttribute("aria-disabled");
     });
     fireEvent.click(share);
+    await chooseWhatToShare();
     await waitFor(() => {
       expect(appsButton()).toHaveAccessibleName("Apps (you are sharing your screen)");
     });
@@ -223,6 +231,7 @@ describe("share entry", () => {
     const error = vi.spyOn(console, "error");
     render(<ChatActionRow />);
     fireEvent.click(await ready());
+    await chooseWhatToShare();
     await act(async () => {
       finish(null);
       await Promise.resolve();
@@ -232,12 +241,23 @@ describe("share entry", () => {
     expect(error).not.toHaveBeenCalled();
   });
 
+  it("opens the start dialog first and starts nothing when it is cancelled", async () => {
+    asLinux();
+    const start = vi.spyOn(api, "screenShareStart");
+    render(<ChatActionRow />);
+    fireEvent.click(await ready());
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel" }, { timeout: 5000 }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(start).not.toHaveBeenCalled();
+  });
+
   it("reports a failed start", async () => {
     asLinux();
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     api.mock.failNext("screenShareStart", "internal", "capture failed");
     render(<ChatActionRow />);
     fireEvent.click(await ready());
+    await chooseWhatToShare();
     expect(await screen.findByRole("alert")).toHaveTextContent("Screen sharing could not start.");
   });
 
@@ -247,6 +267,7 @@ describe("share entry", () => {
     api.mock.failNext("screenShareStart", "permissionDenied", "screenRecording");
     render(<ChatActionRow />);
     fireEvent.click(await ready());
+    await chooseWhatToShare();
     expect(await screen.findByRole("alert")).toHaveTextContent("Allow it in System Settings");
   });
 });

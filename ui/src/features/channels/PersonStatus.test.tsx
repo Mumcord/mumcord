@@ -69,6 +69,9 @@ describe("voiceState", () => {
     shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
+    product: null,
+    version: null,
+    bot: null,
   };
 
   it("puts what the server imposes before the person's own choice", () => {

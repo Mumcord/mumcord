@@ -7,6 +7,7 @@
 
 mod accepted;
 mod blocked;
+mod camera_backgrounds;
 mod channel_audio;
 mod channel_tokens;
 mod db;
@@ -30,6 +31,9 @@ mod synced;
 
 pub use accepted::AcceptedConversation;
 pub use blocked::BlockedUser;
+pub use camera_backgrounds::{
+    CameraBackgrounds, MAX_BACKGROUND_FILE_BYTES, MAX_BACKGROUND_PX, OwnBackground,
+};
 pub use channel_audio::{ChannelAudioProfile, SavedChannelAudio, resolve_channel_audio};
 pub use channel_tokens::{ChannelToken, TokenChannel};
 pub use db::{DB_FILE_NAME, Store, UnixMillis};
@@ -51,7 +55,8 @@ pub use relay_pin::RelayPin;
 pub use secrets::{KEYRING_SERVICE, SecretStore};
 pub use servers::{DEFAULT_PORT, NewServer, SavedServer, ServerId};
 pub use settings::{
-    BlockedMessages, ChatDisplay, CloseBehaviour, Consent, DEFAULT_APP_THEME_ID,
+    BlockedMessages, CameraBackground, CameraEffectQuality, CameraReduceMotion, CameraSendQuality,
+    CameraShow, CameraStripPosition, ChatDisplay, CloseBehaviour, Consent, DEFAULT_APP_THEME_ID,
     DEFAULT_INGAME_OPACITY_PERCENT, DEFAULT_INGAME_SIZE_PERCENT, DEFAULT_MAX_CONNECTED_SERVERS,
     FilesMaxSize, GameKey, GameOverlayEntry, Hotkey, HotkeyAction, InGameOverlayMode,
     InGameOverlaySettings, LogLevel, MAX_MAX_CONNECTED_SERVERS, MAX_UPDATE_INTERVAL_HOURS,

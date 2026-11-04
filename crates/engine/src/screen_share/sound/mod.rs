@@ -11,6 +11,8 @@
 
 #[cfg(any(target_os = "macos", test))]
 pub mod macos;
+#[cfg(any(target_os = "linux", test))]
+pub mod matcher;
 pub(crate) mod status;
 #[cfg(windows)]
 pub(crate) mod windows;

@@ -1,0 +1,207 @@
+/* Share start dialog (FR-7.35, mockup 01 of epic 4.1 screen sharing). */
+
+.share-start {
+  width: min(38rem, calc(100vw - 2 * var(--space-4)));
+}
+
+.share-start p {
+  margin: 0;
+}
+
+.share-start__lead {
+  margin-bottom: var(--space-4) !important;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.share-start__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.share-start__fieldset {
+  min-width: 0;
+  margin-inline: 0;
+  padding: 0;
+  border: 0;
+}
+
+.share-start__fieldset > .share-start__label {
+  margin-bottom: var(--space-1);
+  padding: 0;
+}
+
+.share-start__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary);
+}
+
+.share-start__seg {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-chat);
+}
+
+.share-start__seg-button {
+  min-width: 4rem;
+  height: 2rem;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.share-start__seg-button:hover {
+  color: var(--color-text);
+}
+
+.share-start__seg-button[aria-pressed="true"] {
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.share-start__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.share-start__note {
+  display: flex;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.share-start__note svg {
+  flex: none;
+  margin-top: 0.15rem;
+  color: var(--color-accent-text);
+}
+
+.share-start__modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.share-start__mode {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-content: start;
+  gap: 2px var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-chat);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.share-start__mode[data-picked] {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.share-start__mode input {
+  grid-row: span 2;
+  align-self: start;
+  margin: 0.2rem 0 0;
+  accent-color: var(--color-accent);
+}
+
+.share-start__mode-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.share-start__row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.share-start__row2 .settings-input {
+  width: 100%;
+}
+
+.share-start__switch {
+  margin-bottom: var(--space-3);
+}
+
+.share-start__gets {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  margin: var(--space-2) 0 var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg-chat));
+}
+
+/* Stays in the page while the preview loads, so screen readers hear the first answer too. */
+.share-start__gets:empty {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.share-start__gets-icon {
+  color: var(--color-accent-text);
+}
+
+.share-start__gets-main {
+  font-size: var(--font-size-md);
+}
+
+.share-start__gets-sub {
+  display: flex;
+  gap: var(--space-1);
+  align-items: flex-start;
+  margin-top: var(--space-1) !important;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.share-start__gets-sub svg {
+  flex: none;
+  margin-top: 0.2rem;
+}
+
+.share-start__gets-sub[data-path="broadcast"] svg {
+  color: var(--color-success);
+}
+
+@media (max-width: 34rem) {
+  .share-start__modes,
+  .share-start__row2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (forced-colors: active) {
+  .share-start__seg-button[aria-pressed="true"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .share-start__mode[data-picked] {
+    border: 2px solid Highlight;
+  }
+
+  .share-start__gets {
+    border-color: CanvasText;
+  }
+}

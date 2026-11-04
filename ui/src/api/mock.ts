@@ -915,6 +915,9 @@ function person(session: number, name: string, channelId: number, certHash: stri
     shareVolume: 100,
     isMumcord: false,
     mumcordFeatures: [],
+    product: null,
+    version: null,
+    bot: null,
   };
 }
 

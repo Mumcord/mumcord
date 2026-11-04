@@ -19,6 +19,7 @@ import { join } from "node:path";
 import { browser, $, expect } from "@wdio/globals";
 import { app, apps, relayenv } from "../../helpers/index.ts";
 import { botInBackground, type BackgroundBot } from "../../helpers/bot.ts";
+import { startScreenShare } from "../../helpers/chat-ui.ts";
 import * as files from "../../helpers/files-ui.ts";
 import { run } from "../../helpers/run.ts";
 import { openSettingsGroup } from "../../helpers/settings-ui.ts";
@@ -196,13 +197,7 @@ async function connect(name: string, port: number): Promise<void> {
   });
 
   it("F3a (c): a watched screen share keeps running when a download moves the link to the relay", async () => {
-    await apps.onB(async () => {
-      await $("button.chat-apps__button").click();
-      await $(
-        "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
-      ).click();
-      await $("//div[contains(@class,'sharer-bar')]").waitForExist({ timeout: 30_000 });
-    });
+    await apps.onB(startScreenShare);
     const watch = $(
       "//div[contains(@class,'activity-banner')][contains(.,'is sharing their screen')]//button[normalize-space()='Watch']",
     );

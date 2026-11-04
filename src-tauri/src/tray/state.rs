@@ -334,6 +334,7 @@ pub mod fixtures {
             local_mute: false,
             share_volume: 100,
             mumcord_features: None,
+            mumcord_bot: None,
         }
     }
 
