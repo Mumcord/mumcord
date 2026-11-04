@@ -188,7 +188,10 @@ mod tests {
 
     async fn connected() -> (PeerConnection, PeerConnection) {
         let config = P2pConfig {
-            connect_timeout: Duration::from_secs(3),
+            // Only an upper bound (a connection returns as soon as it is up). Generous because
+            // the whole lib suite runs in parallel on loaded CI runners, where a 3 s budget
+            // for the debug-build QUIC handshake ended in a spurious `NoDirectPath`.
+            connect_timeout: Duration::from_secs(10),
             port_mapping: false,
             allow_loopback: true,
         };
