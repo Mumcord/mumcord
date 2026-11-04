@@ -15,6 +15,8 @@ pub mod linux;
 pub mod macos;
 #[cfg(any(target_os = "linux", test))]
 pub mod matcher;
+#[cfg(any(target_os = "linux", test))]
+pub mod pick;
 pub(crate) mod status;
 #[cfg(windows)]
 pub(crate) mod windows;
@@ -30,7 +32,7 @@ use crate::session::lock;
 use crate::voice::VoiceShared;
 
 pub use status::{
-    AppName, ShareSoundMode, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
+    AppName, ShareSoundMode, SoundApp, SoundOutcome, SoundRequest, SoundStatus, SoundUnavailable,
 };
 
 /// Why this system cannot share sound at all (FR-7.84), checked before the share starts and
