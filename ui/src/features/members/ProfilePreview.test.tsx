@@ -149,7 +149,8 @@ describe("ProfilePreview", () => {
         isMumcord: true,
         product: "Mumbot",
         version: "0.4.1",
-        bot: { voice: false, modules: ["peer"] },
+        // A voice bot, so it stays in the member list (issue #458).
+        bot: { voice: true, modules: ["music"] },
       });
     });
     await hover(/^Anna/);

@@ -42,11 +42,17 @@ export function isHiddenBot(user: Pick<User, "bot"> | undefined): boolean {
 /** Modules in the order the line names them: the bot's main job first. */
 export const BOT_MODULES = ["peer", "music", "history", "webhook"];
 
-/** The bots on the server, by name. */
+/**
+ * The bots on the server: those listed nowhere else first, as in the mockups, then by name.
+ */
 export function serverBots(users: ReadonlyMap<number, User>): User[] {
   return [...users.values()]
     .filter((user) => isBot(user))
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    .sort(
+      (a, b) =>
+        Number(isHiddenBot(b)) - Number(isHiddenBot(a)) ||
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
 }
 
 /** Known modules first in `BOT_MODULES`, unknown ones after them alphabetically. */
