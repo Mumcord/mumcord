@@ -44,6 +44,7 @@ pub const FEATURES: &[&str] = &[
     crate::p2p::FEATURE,
     crate::watch_party::FEATURE,
     crate::screen_share::signal::FEATURE,
+    crate::camera::signal::FEATURE,
     FEATURE_SCREEN_BROADCAST,
     crate::pm_rules::FEATURE,
     crate::plugins::FEATURE,
@@ -438,6 +439,7 @@ mod tests {
         assert_eq!(
             features,
             [
+                "camera",
                 "chat-request",
                 "files",
                 "full-image",
