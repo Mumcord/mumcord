@@ -1147,9 +1147,17 @@
   color: var(--color-text-secondary);
 }
 
+/* The label absorbs the free space and wraps, so the pill and dot stay fully visible. */
+.settings__tab-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 /* "New" pill after a side-list entry (screen sharing tab). */
 .settings__tab-new {
-  margin-left: var(--space-2);
+  flex: 0 0 auto;
+  white-space: nowrap;
   padding: 0 var(--space-2);
   border-radius: var(--radius-full);
   background: var(--gradient-accent);

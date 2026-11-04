@@ -265,7 +265,7 @@ export function SettingsScreen({
                   }}
                 >
                   <SettingsIcon name={SECTION_ICONS[id]} />
-                  {t(`sections.${id}`)}
+                  <span className="settings__tab-label">{t(`sections.${id}`)}</span>
                   {id === "plugins" && <UpdatesBadge />}
                   {NEW_SECTIONS.includes(id) && (
                     <span className="settings__tab-new" aria-hidden="true">
