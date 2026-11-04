@@ -32,6 +32,8 @@ pub mod signal;
 pub(crate) mod sound;
 #[cfg(any(target_os = "macos", test))]
 pub mod sound_macos;
+#[cfg(any(target_os = "linux", test))]
+pub mod sound_match;
 #[cfg(windows)]
 mod sound_windows;
 mod start;
