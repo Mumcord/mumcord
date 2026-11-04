@@ -301,7 +301,6 @@ impl App {
             entry: plugin.entry(latest),
             optional: vec!["events.voice".into()],
             visibility: PluginVisibility::Friends,
-            confirmed: false,
         };
         self.service
             .lock()
@@ -544,7 +543,6 @@ fn a_third_party_repository_is_pinned_limited_and_paused_on_a_key_change() {
             entry: plugin.entry(latest),
             optional: vec![],
             visibility: PluginVisibility::Friends,
-            confirmed: false,
         };
         app.service
             .lock()
@@ -673,7 +671,6 @@ fn a_third_party_repository_cannot_grant_official_only_permissions() {
                 entry: plugin.entry(latest),
                 optional: vec![],
                 visibility: PluginVisibility::Friends,
-                confirmed: false,
             };
             let result = app
                 .service
