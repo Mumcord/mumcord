@@ -3241,7 +3241,9 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     pluginSidePanelWidth: (plugin) => Promise.resolve(sidePanelWidths.get(plugin) ?? null),
     pluginSetSidePanelWidth: (plugin, width) => {
-      sidePanelWidths.set(plugin, Math.min(32, Math.max(18, width)));
+      // null resets to the default width, like the real command.
+      if (width === null) sidePanelWidths.delete(plugin);
+      else sidePanelWidths.set(plugin, Math.min(32, Math.max(18, width)));
       return Promise.resolve(null);
     },
     pluginExportData: () => fail("notFound", "no such plugin"),
