@@ -51,6 +51,18 @@ pub fn handle<R: Runtime>(
         .map(|s| Arc::clone(&s));
     let method = request.method().clone();
     let path = request.uri().path().to_owned();
+    // A page message from a plugin frame web view (macOS, see `child_webview`).
+    if method == Method::POST
+        && super::child_webview::receive(
+            ctx.app_handle(),
+            ctx.webview_label(),
+            &path,
+            request.body(),
+        )
+    {
+        responder.respond(signal_received());
+        return;
+    }
     tauri::async_runtime::spawn_blocking(move || {
         responder.respond(respond(plugins.as_deref(), &method, &path));
     });
@@ -98,6 +110,23 @@ fn respond(plugins: Option<&Plugins>, method: &Method, path: &str) -> Response<V
     };
     let origins = plugins.webviews().origins(plugin);
     response(StatusCode::OK, Some((plugin, &origins)), Some(mime), body)
+}
+
+/// The answer to a frame's page message: empty, readable by the frame's opaque origin.
+fn signal_received() -> Response<Vec<u8>> {
+    Response::builder()
+        .status(StatusCode::NO_CONTENT)
+        .header(
+            header::CONTENT_SECURITY_POLICY,
+            "default-src 'none'; sandbox",
+        )
+        .header(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+        .header(header::CACHE_CONTROL, "no-store")
+        .body(Vec::new())
+        .unwrap_or_else(|error| {
+            tracing::warn!(%error, "a web view response could not be built");
+            Response::new(Vec::new())
+        })
 }
 
 fn not_found(plugin: Option<&str>) -> Response<Vec<u8>> {
@@ -200,6 +229,14 @@ pub fn harden_window<R: Runtime>(window: &WebviewWindow<R>) {
     }
     #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     let _ = window;
+}
+
+/// The macOS closing measures for a plugin frame's own web view (`child_webview`).
+#[cfg(target_os = "macos")]
+pub fn harden_child<R: Runtime>(webview: &tauri::Webview<R>) {
+    if let Err(error) = webview.with_webview(|webview| macos::harden(webview.inner())) {
+        tracing::error!(%error, "the plugin frame settings could not be applied");
+    }
 }
 
 /// WebKitGTK: no link preconnect (S0: a `<link rel="preconnect">` and `window.open` opened TCP

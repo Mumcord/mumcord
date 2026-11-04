@@ -712,6 +712,28 @@ export const commands = {
 	 */
 	pluginFramesMuteState: () => __TAURI_INVOKE<PluginFrameMuteState>("plugin_frames_mute_state"),
 	/**
+	 *  Opens plugin `plugin`'s page `url` as frame `frame` at `bounds` in the main window. The UI
+	 *  listens for `plugin://frame` events of `frame` before calling this. macOS only.
+	 */
+	pluginFrameOpen: (frame: string, plugin: string, url: string, bounds: PluginFrameBounds) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_open", { frame, plugin, url, bounds })),
+	/**
+	 *  Moves frame `frame` to `bounds`, or hides it (`None`: its place is off screen, covered or in
+	 *  a hidden tab).
+	 */
+	pluginFrameBounds: (frame: string, bounds: PluginFrameBounds | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_bounds", { frame, bounds })),
+	/**  Hands one bridge message, the gesture key or the mute state to frame `frame`'s page. */
+	pluginFramePost: (frame: string, delivery: PluginFrameDelivery) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_post", { frame, delivery })),
+	/**
+	 *  Moves keyboard focus into frame `frame`, or back to the main window (`None`; Escape or F6
+	 *  inside the page, FR-9.41).
+	 */
+	pluginFrameFocus: (frame: string | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_focus", { frame })),
+	/**
+	 *  Closes frame `frame` (unmounted, stopped responding or navigated away). Closing needs nothing
+	 *  from the frame's own web process, so it also ends a frozen page.
+	 */
+	pluginFrameClose: (frame: string) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_frame_close", { frame })),
+	/**
 	 *  The plugin activities in the user's channel on the focused server (activity lines, stage
 	 *  tabs and header). Re-fetch on `plugins://stage-changed`.
 	 */
@@ -1121,6 +1143,7 @@ export const events = {
 	nowGamingChanged: makeEvent<NowGamingChanged, NowGamingChanged>("now-gaming-changed"),
 	nowPlayingChanged: makeEvent<NowPlayingChanged, NowPlayingChanged>("now-playing-changed"),
 	p2pLinkChanged: makeEvent<P2pLinkChanged, P2pLinkChanged>("p2p-link-changed"),
+	pluginFrame: makeEvent<PluginFrameEvent, PluginFrameEvent>("plugin://frame"),
 	pluginFrameMute: makeEvent<PluginFrameMute, PluginFrameMute>("plugin://frame-mute"),
 	pluginSupersede: makeEvent<PluginSupersede, PluginSupersede>("plugin://supersede"),
 	pluginUi: makeEvent<PluginUi, PluginUi>("plugin://ui"),
@@ -3021,6 +3044,43 @@ export type PluginEffect = { kind: "points"; value: number } | { kind: "percent"
 
 /**  One line of the score breakdown table. */
 export type PluginFactorKind = "highPermission" | "webSurface" | "relay" | "mediumPermission" | "lowPermissions" | "websites" | "packageSize" | "wasmModules" | "sourceLink" | "licence" | "reproducible" | "keyAge" | "expectedKey" | "developerTrust" | "recentChange" | "noHistory" | "networkFloor";
+
+/**
+ *  Where a frame sits in the main window, in physical (device) pixels from the top left corner
+ *  of its web view: the UI's CSS pixels times its device pixel ratio, so page zoom and display
+ *  scale are already in.
+ */
+export type PluginFrameBounds = {
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+};
+
+export type PluginFrameChange = 
+/**  The page posted a string (a bridge message for the plugin). */
+{ type: "message"; text: string } | 
+/**  The bootstrap (or the page pretending) posted `{mumcordWebview: kind, key?}`. */
+{ type: "signal"; kind: string; key: string | null } | 
+/**  The page finished loading. */
+{ type: "loaded" } | 
+/**  The page tried to leave its own file; the frame must be closed. */
+{ type: "navigated" };
+
+/**  A message for a frame's page, as the UI's bridge sends it. */
+export type PluginFrameDelivery = 
+/**  A plugin's bridge message (a `message` event with the text as data). */
+{ type: "text"; text: string } | 
+/**  The bootstrap's gesture key (`{mumcordWebview:"key", key}`). */
+{ type: "key"; key: string } | 
+/**  Mute or unmute the page (`{mumcordWebview:"mute", muted}`). */
+{ type: "mute"; muted: boolean };
+
+/**  `plugin://frame`: something from a frame's web view, for the main window only. */
+export type PluginFrameEvent = {
+	frame: string,
+	change: PluginFrameChange,
+};
 
 /**
  *  `plugin://frame-mute`: mute (or unmute) the sound of one plugin's frames (`plugin` set) or of

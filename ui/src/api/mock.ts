@@ -3273,6 +3273,12 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     },
     pluginFramesMuteState: () =>
       Promise.resolve({ all: frameMute.all, plugins: [...frameMute.plugins].sort() }),
+    // Child web view frames exist only in the macOS app; the mock always uses iframes.
+    pluginFrameOpen: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFrameBounds: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFramePost: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFrameFocus: () => fail("notImplemented", "plugin frames are iframes here"),
+    pluginFrameClose: () => fail("notImplemented", "plugin frames are iframes here"),
     stageActivities: () => Promise.resolve([]),
     stageJoin: () => Promise.resolve(null),
     stageLeave: () => Promise.resolve(null),

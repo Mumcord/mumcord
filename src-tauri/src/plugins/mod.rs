@@ -4,6 +4,7 @@
 //! starting a plugin can take a while and must never stall the async runtime. Engine and
 //! service events are pumped by background tasks; commands are thin wrappers.
 
+pub mod child_webview;
 mod feed;
 #[cfg(any(windows, test))]
 mod frame_proxy;

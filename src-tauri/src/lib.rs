@@ -266,6 +266,11 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_reenable_web,
             commands::plugins::plugin_frames_mute,
             commands::plugins::plugin_frames_mute_state,
+            plugins::child_webview::plugin_frame_open,
+            plugins::child_webview::plugin_frame_bounds,
+            plugins::child_webview::plugin_frame_post,
+            plugins::child_webview::plugin_frame_focus,
+            plugins::child_webview::plugin_frame_close,
             commands::plugins::stage_activities,
             commands::plugins::stage_join,
             commands::plugins::stage_leave,
@@ -451,6 +456,7 @@ fn specta_builder() -> Builder<tauri::Wry> {
             plugins::PluginInstallProgress,
             plugins::ui::PluginUi,
             plugins::ui::PluginFrameMute,
+            plugins::child_webview::PluginFrameEvent,
             plugins::PluginNotification,
             plugins::PluginSupersede,
             plugins::suggestions::PluginSuggestion,
@@ -516,7 +522,10 @@ pub fn run() {
         )
         .invoke_handler(move |call| {
             let label = call.message.webview_ref().label().to_owned();
-            if !aux_window::command_allowed(&label, call.message.command()) {
+            // Plugin frame web views (macOS) get no command at all, whatever their page tries.
+            if !aux_window::command_allowed(&label, call.message.command())
+                || !plugins::child_webview::command_allowed(&label)
+            {
                 call.resolver.reject(commands::types::ApiError::new(
                     commands::types::ErrorCode::PermissionDenied,
                     "this command is not available in this window",
@@ -529,6 +538,7 @@ pub fn run() {
         .manage(dropped::DroppedFiles::default())
         .manage(aux_window::OpenLock::default())
         .manage(plugins::ui::FrameMuteStore::default())
+        .manage(plugins::child_webview::Frames::default())
         .manage(commands::inspector::SharedView::default())
         .manage(commands::inspector::CaptureMode::default())
         .manage(commands::licences::SharedLook::default())
