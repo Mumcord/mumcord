@@ -843,6 +843,7 @@ impl Engine {
     fn watch_for_end(&self, server_id: ServerId, token: usize) {
         let engine = self.clone();
         self.runtime().spawn(async move {
+            let mut sound_failed = false;
             loop {
                 tokio::time::sleep(start::ENDED_POLL).await;
                 let state = {
@@ -851,11 +852,20 @@ impl Engine {
                         .get(&server_id)
                         .and_then(|s| s.own.as_ref())
                         .and_then(|o| o.media.as_ref())
-                        .map(|m| (m.token(), m.ended()))
+                        .map(|m| (m.token(), m.ended(), m.sound_failed()))
                 };
+                if let Some((t, false, true)) = state
+                    && t == token
+                    && !sound_failed
+                {
+                    sound_failed = true;
+                    if let Err(e) = engine.screen_share_sound_failed(server_id) {
+                        tracing::debug!(error = %e, "broken screen share sound not shown");
+                    }
+                }
                 match state {
-                    Some((t, false)) if t == token => {}
-                    Some((t, true)) if t == token => {
+                    Some((t, false, _)) if t == token => {}
+                    Some((t, true, _)) if t == token => {
                         if let Err(e) = engine.screen_share_stop(server_id) {
                             tracing::debug!(error = %e, "ended screen share could not be stopped");
                         }
@@ -900,6 +910,19 @@ impl Engine {
             if let Some(media) = &own.media {
                 media.set_sound(own.sound);
             }
+        })
+    }
+
+    /// The own share's sound capture broke during the share (FR-7.84): the video goes on and
+    /// the live bar shows "No sound" with the reason; the switch cannot turn it back on.
+    pub fn screen_share_sound_failed(&self, server_id: ServerId) -> EngineResult<()> {
+        self.update_own_share(server_id, |own| {
+            own.sound_status.fail();
+            own.sound = false;
+            if let Some(media) = &own.media {
+                media.set_sound(false);
+            }
+            own.sound_status.log(own.sound);
         })
     }
 
