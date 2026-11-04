@@ -139,6 +139,37 @@ export const commands = {
 	personSetNote: (serverId: number, session: number, note: string) => typedError<null, ApiError>(__TAURI_INVOKE("person_set_note", { serverId, session, note })),
 	/**  Comment and avatar of a person, fetched from the server when not known yet. */
 	personProfile: (serverId: number, session: number) => typedError<PersonProfile, ApiError>(__TAURI_INVOKE("person_profile", { serverId, session })),
+	/**
+	 *  Reads the server's ban list for the window (FR-10.51). Fails with `permissionDenied` without
+	 *  the Ban right, and with `serverUnreachable` when the server does not answer within 5 s.
+	 */
+	banListOpen: (serverId: number) => typedError<BanEntry[], ApiError>(__TAURI_INVOKE("ban_list_open", { serverId })),
+	/**
+	 *  Saves the window's changes together. Before sending, the engine re-reads the list; if an entry
+	 *  the user touched changed meanwhile it answers with `conflict` instead of saving (FR-10.66).
+	 *  `force` is the UI's "Save mine anyway".
+	 */
+	banListSave: (serverId: number, changes: BanChangeInput[], force: boolean) => typedError<BanSaveResult, ApiError>(__TAURI_INVOKE("ban_list_save", { serverId, changes, force })),
+	/**  The window closed: what it held is dropped (FR-10.63). */
+	banListClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("ban_list_close", { serverId })),
+	/**
+	 *  Reads what the kick or ban dialog needs about a person (issue #253). Fails with
+	 *  `permissionDenied` without the Kick or the Ban right in the root channel.
+	 */
+	personTarget: (serverId: number, session: number) => typedError<PersonTarget, ApiError>(__TAURI_INVOKE("person_target", { serverId, session })),
+	/**
+	 *  Kicks a person with an optional reason (FR-10.11). A refusal arrives as an error, which the open
+	 *  dialog shows; yourself is never offered, so it is refused here too.
+	 */
+	personKick: (serverId: number, session: number, reason: string | null) => typedError<KickResult, ApiError>(__TAURI_INVOKE("person_kick", { serverId, session, reason })),
+	/**
+	 *  Bans a person: one entry added to the server's ban list with the safe save of FR-10.66, then the
+	 *  person is removed when the dialog asked for it. Without a readable ban list the dialog sends the
+	 *  server's own message instead (FR-10.13).
+	 */
+	personBan: (serverId: number, session: number, input: BanInput) => typedError<BanResult, ApiError>(__TAURI_INVOKE("person_ban", { serverId, session, input })),
+	/**  The dialog closed: what it held is dropped (FR-10.63). */
+	personActionClose: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("person_action_close", { serverId })),
 	/**  Friends with their online state, online first. */
 	friendsList: () => typedError<Friend[], ApiError>(__TAURI_INVOKE("friends_list")),
 	/**
@@ -846,7 +877,7 @@ export const commands = {
 	 *  Starts sharing in the user's voice channel, optionally with sound. Closing the system
 	 *  picker ends the call quietly without a share.
 	 */
-	screenShareStart: (serverId: number, withSound: boolean) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_start", { serverId, withSound })),
+	screenShareStart: (serverId: number, withSound: boolean, choice: QualityChoice | null, codec: ScreenCodec | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_start", { serverId, withSound, choice, codec })),
 	/**  Stops the own share. */
 	screenShareStop: (serverId: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_stop", { serverId })),
 	/**  Pauses or resumes the own share. */
@@ -870,7 +901,8 @@ export const commands = {
 	screenShareSetDecodeCodecs: (serverId: number, session: number, codecs: VideoCodec[]) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_decode_codecs", { serverId, session, codecs })),
 	/**
 	 *  The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
-	 *  watched share, by dropping temporal layers; `null` is Auto.
+	 *  watched share, by dropping temporal layers; `null` is Auto. Through the relay broadcast the
+	 *  relay drops the layers too (FR-7.45).
 	 */
 	screenShareSetViewerFps: (serverId: number, session: number, maxFps: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_set_viewer_fps", { serverId, session, maxFps })),
 	screenShareRequestKeyframe: (serverId: number, session: number) => typedError<null, ApiError>(__TAURI_INVOKE("screen_share_request_keyframe", { serverId, session })),
@@ -1194,6 +1226,61 @@ export type AudioRatingLabel = {
 /**  Why Automatic does not pick AV1. */
 export type Av1Skipped = "tooHeavy" | "onBattery" | "aboveSoftwareLimit";
 
+/**  One change the window collected; a save applies all of them at once. */
+export type BanChangeInput = { kind: "add"; name: string | null; hash: string | null; address: string; mask: number; reason: string | null; duration: number } | { kind: "edit"; key: string; reason: string | null; duration: number } | { kind: "remove"; key: string };
+
+/**
+ *  One ban entry as the window shows it. `key` is what identifies the entry across a re-read, so
+ *  an edit or a removal can still be matched (FR-10.66). Name, reason and fingerprint are server
+ *  text: untrusted, and personal data.
+ */
+export type BanEntry = {
+	key: string,
+	name: string | null,
+	/**  Hex certificate hash; empty when the entry bans by address only. */
+	certHash: string | null,
+	/**  Full address, IPv4 in IPv4 form. The UI masks it unless the row was revealed (FR-10.51). */
+	address: string,
+	/**  Subnet length in the family the UI shows: 32 for a single IPv4, 128 for a single IPv6. */
+	mask: number,
+	reason: string | null,
+	/**  RFC 3339, or `null` when the server sent a time Mumcord cannot read. */
+	start: string | null,
+	/**  Seconds; 0 is permanent. */
+	durationSecs: number,
+	expired: boolean,
+};
+
+/**  What the ban dialog sends (FR-10.12). */
+export type BanInput = {
+	reason: string | null,
+	/**  Seconds; 0 is permanent. Ignored when `quick` is set. */
+	duration: number,
+	byCert: boolean,
+	byIp: boolean,
+	/**  Subnet length in the family of the address: 32 for a single IPv4, 128 for a single IPv6. */
+	mask: number,
+	removeNow: boolean,
+	/**  The dialog's "Save mine anyway" after a conflict (FR-10.66). */
+	force: boolean,
+	/**  The quick-ban path, which only a server that will not show its list allows (FR-10.13). */
+	quick: boolean,
+};
+
+/**  What a ban produced (FR-10.12, FR-10.13, FR-10.66). */
+export type BanResult = 
+/**  One entry added to the server's list; `removed` says whether the person was taken off too. */
+{ kind: "saved"; key: string; removed: boolean } | 
+/**  The server's own "remove with ban" message with its default length (FR-10.13). */
+{ kind: "quickBanned" } | 
+/**  The entry the dialog wanted to add is different on the server already (FR-10.66). */
+{ kind: "conflict"; key: string; fresh: BanEntry[] };
+
+/**  What a save produced: the new list, or the conflict the UI must ask about (FR-10.66). */
+export type BanSaveResult = { kind: "saved"; entries: BanEntry[] } | 
+/**  The entry was changed or removed on the server while the window was open. */
+{ kind: "conflict"; key: string; fresh: BanEntry[] };
+
 /**
  *  The highest bitrate the bitrate slider can reach changed (FR-2.64), e.g. on connecting or
  *  when the voice server changes. `null` without a voice server: show "depends on server".
@@ -1348,6 +1435,16 @@ export type ChannelPermissions = {
 	 *  once the server confirmed it.
 	 */
 	moveUsers: boolean,
+	/**
+	 *  Ban right, granted on the root channel; decides whether the Ban list entry shows
+	 *  (Epic 4, issue #254).
+	 */
+	ban: boolean,
+	/**
+	 *  Kick right, granted on the root channel; decides whether "Kick…" shows in a person's menu
+	 *  (Epic 4, issue #253).
+	 */
+	kick: boolean,
 };
 
 export type ChannelRemoved = {
@@ -1469,6 +1566,11 @@ export type Conversation = { kind: "channel"; channelId: number } |
 
 /**  Screen corner (same values as the window overlay). */
 export type Corner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
+export type CpuCores = {
+	used: number,
+	total: number,
+};
 
 /**  A `mumble://` link was opened from outside (startup argument or second launch). */
 export type DeepLinkOpened = {
@@ -2112,6 +2214,9 @@ export type KeyChangeReview = {
 	newFingerprint: string,
 };
 
+/**  What a kick produced: the server's answer, or nothing within 5 s. */
+export type KickResult = "confirmed" | "unconfirmed";
+
 /**  A game offered to the user to configure: one it ran this session, or one on the blocklist. */
 export type KnownGame = {
 	key: GameKey,
@@ -2637,6 +2742,25 @@ export type PersonProfile = {
 	avatar: string | null,
 	/**  The user's private note about this person; empty when there is none. */
 	note: string,
+};
+
+/**
+ *  What a kick or ban dialog needs to know about a person before it can be filled (issue #253):
+ *  the address the server reports only to admins, how long the person is connected, whether the ban
+ *  list can be read, the certificate hash, and the two rights (FR-10.11, FR-10.12, FR-10.13).
+ */
+export type PersonTarget = {
+	session: number,
+	/**  Full address; the UI masks it by default (FR-10.51, FR-10.65). */
+	address: string | null,
+	/**  Seconds the person is connected, `null` when the server did not report it. */
+	onlineSecs: number | null,
+	/**  False when the server will not show its list, so only its own default ban length works. */
+	banListReadable: boolean,
+	certHash: string | null,
+	/**  The rights in the root channel, which decide what the menu offers at all (FR-10.1, FR-10.2). */
+	canKick: boolean,
+	canBan: boolean,
 };
 
 /**  A video waiting in the party's playlist (FR-2.69). */
@@ -3724,7 +3848,9 @@ export type ShareEndReason = "expired" | "stopped" | "leftServer" | "quit" | "fi
 export type ShareKind = "window" | "screen";
 
 /**  How the frames of a watched share reach the viewer. */
-export type SharePath = "direct";
+export type SharePath = "direct" | 
+/**  The sharer's single upload, copied to every viewer by the relay. */
+"broadcast";
 
 /**  The start dialog's "Viewers get" line before the share starts (FR-7.36). */
 export type SharePreview = {
@@ -3741,6 +3867,11 @@ export type SharePreview = {
 	/**  Why Automatic would not pick AV1. */
 	av1Skipped: Av1Skipped | null,
 	path: PreviewPath,
+	/**
+	 *  Threads the software VP9 encoder is configured with against the machine's cores; `None`
+	 *  for hardware encoders and software AV1.
+	 */
+	cpuCores: CpuCores | null,
 };
 
 /**  How the own share is sent right now, for the sharer's bar and the viewers popover (issue #163). */
@@ -4183,10 +4314,7 @@ export type WatchPartyChanged = {
  *  the frames themselves and are counted in the UI.
  */
 export type WatchStats = {
-	/**
-	 *  Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
-	 *  second path.
-	 */
+	/**  A copy of its own over the P2P connection, or the relay broadcast (FR-7.41). */
 	path: SharePath,
 	/**  Sound level of the shared sound at the viewer, 0.0–1.0. */
 	rms: number | null,

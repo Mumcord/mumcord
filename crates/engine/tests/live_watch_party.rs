@@ -484,7 +484,7 @@ async fn newcomers_in_the_channel_get_the_party_once() {
     })
     .await;
     b.engine
-        .screen_share_start(b.server(), false)
+        .screen_share_start(b.server(), false, None, None)
         .await
         .expect("share");
     tokio::time::sleep(Duration::from_millis(500)).await;

@@ -138,8 +138,7 @@ impl From<engine_share::ViewerPath> for ViewerPath {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct WatchStats {
-    /// Media only travels over a direct connection today (FR-2.46); the relay (#62) can add a
-    /// second path.
+    /// A copy of its own over the P2P connection, or the relay broadcast (FR-7.41).
     pub path: SharePath,
     /// Sound level of the shared sound at the viewer, 0.0–1.0.
     pub rms: f32,
@@ -150,6 +149,8 @@ pub struct WatchStats {
 #[serde(rename_all = "camelCase")]
 pub enum SharePath {
     Direct,
+    /// The sharer's single upload, copied to every viewer by the relay.
+    Broadcast,
 }
 
 /// The screen shares on the server changed; carries the full list.
@@ -203,6 +204,8 @@ pub async fn screen_share_start(
     window: tauri::WebviewWindow,
     server_id: ServerId,
     with_sound: bool,
+    choice: Option<QualityChoice>,
+    codec: Option<ScreenCodec>,
 ) -> ApiResult<()> {
     // The Windows system picker opens over the window the share was started from.
     #[cfg(windows)]
@@ -215,7 +218,12 @@ pub async fn screen_share_start(
     #[cfg(not(windows))]
     let _ = window;
     engine
-        .screen_share_start(to_engine_server_id(server_id), with_sound)
+        .screen_share_start(
+            to_engine_server_id(server_id),
+            with_sound,
+            choice.map(Into::into),
+            codec.map(Into::into),
+        )
         .await?;
     Ok(())
 }
@@ -341,7 +349,8 @@ pub fn screen_share_set_decode_codecs(
 }
 
 /// The viewer's frame-rate choice (FR-7.51): at most about `max_fps` frames per second of a
-/// watched share, by dropping temporal layers; `null` is Auto.
+/// watched share, by dropping temporal layers; `null` is Auto. Through the relay broadcast the
+/// relay drops the layers too (FR-7.45).
 #[tauri::command]
 #[specta::specta]
 pub fn screen_share_set_viewer_fps(
@@ -465,10 +474,15 @@ pub fn screen_share_watch_stats(
     server_id: ServerId,
     session: SessionId,
 ) -> ApiResult<Option<WatchStats>> {
+    let server_id = to_engine_server_id(server_id);
+    let path = match engine.screen_share_watch_via_relay(server_id, session) {
+        Some(true) => SharePath::Broadcast,
+        Some(false) | None => SharePath::Direct,
+    };
     Ok(engine
-        .screen_share_sound_stats(to_engine_server_id(server_id), session)
+        .screen_share_sound_stats(server_id, session)
         .map(|stats| WatchStats {
-            path: SharePath::Direct,
+            path,
             rms: stats.rms,
         }))
 }
@@ -826,6 +840,16 @@ pub struct SharePreview {
     /// Why Automatic would not pick AV1.
     pub av1_skipped: Option<Av1Skipped>,
     pub path: PreviewPath,
+    /// Threads the software VP9 encoder is configured with against the machine's cores; `None`
+    /// for hardware encoders and software AV1.
+    pub cpu_cores: Option<CpuCores>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct CpuCores {
+    pub used: u32,
+    pub total: u32,
 }
 
 impl From<engine_share::SharePreview> for SharePreview {
@@ -840,6 +864,10 @@ impl From<engine_share::SharePreview> for SharePreview {
             software_warning: p.software_warning,
             av1_skipped: p.av1_skipped.map(Into::into),
             path: p.path.into(),
+            cpu_cores: p.cpu_cores.map(|c| CpuCores {
+                used: c.used,
+                total: c.total,
+            }),
         }
     }
 }

@@ -26,7 +26,9 @@ import type {
   AcceptedConversation,
   BlockedUser,
   ActiveAudioProfile,
+  BanEntry,
   PmConversationPrefs,
+  PersonTarget,
   PrivateConversation,
   ApiError,
   AudioDevices,
@@ -168,6 +170,11 @@ export interface MockControls {
   removeUser(session: number): void;
   /** Simulates a person joining the server (or changing, if the session exists). */
   upsertUser(user: User): void;
+  /**
+   * What `personTarget` answers for a person (issue #253): the address the server shows, how long
+   * they are connected, whether the ban list can be read, and the rights.
+   */
+  setPersonTarget(serverId: number, session: number, patch: Partial<PersonTarget>): void;
   /** Takes away the Enter permission of a channel; `MOCK_CHANNEL_PASSWORD` opens it (FR-2.78). */
   lockChannel(channelId: number): void;
   /** Changes a channel as a server update would, e.g. its user limit or permissions. */
@@ -674,6 +681,8 @@ const allow = {
   whisper: true,
   write: false,
   moveUsers: false,
+  ban: false,
+  kick: false,
 };
 
 function seedChannels(): ChannelInfo[] {
@@ -783,8 +792,9 @@ function demoChannels(serverName: string): ChannelInfo[] {
     parentId,
     name,
     position,
-    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172).
-    permissions: { ...allow, moveUsers: true },
+    // The demo user moderates, so the tree shows "Move users here…" and dragging (#172), the
+    // server menu offers the ban list (#436), and the person menu offers Kick… and Ban… (#253).
+    permissions: { ...allow, moveUsers: true, ban: true, kick: true },
     description: DEMO_DESCRIPTIONS.get(id) ?? null,
     hasDescription: DEMO_DESCRIPTIONS.has(id),
     maxUsers: null,
@@ -2077,6 +2087,107 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     if (last.identity !== null) identities = identities.filter((i) => i.id !== last.identity);
   }
 
+  /** In-memory ban lists for the Server administration window (issue #254). */
+  const banLists = new Map<number, BanEntry[]>();
+  /** What the kick and ban dialogs read about a person, per server and session (issue #253). */
+  const personTargets = new Map<number, Map<number, PersonTarget>>();
+
+  /**
+   * What `personTarget` can answer for a person: the rights come from the root channel as the
+   * engine reads them, the address from the `UserStats` answer the server only sends to admins.
+   */
+  function personTargetFor(serverId: number, session: number): PersonTarget | null {
+    const seeded = personTargets.get(serverId)?.get(session);
+    if (seeded) return seeded;
+    const snap = sessions.get(serverId)?.snapshot;
+    const user = snap?.users.find((u) => u.session === session);
+    if (!snap || !user) return null;
+    const root = snap.channels.find((c) => c.id === 0);
+    return {
+      session,
+      // Only documentation addresses (issue #436).
+      address: `198.51.100.${String(session)}`,
+      onlineSecs: 7200,
+      banListReadable: root?.permissions.ban === true,
+      certHash: user.certHash,
+      canKick: root?.permissions.kick === true,
+      canBan: root?.permissions.ban === true,
+    };
+  }
+
+  // A mixed list for screenshots: active and expired entries, one without a name, one network
+  // ban, and only documentation addresses (issue #436).
+  function seedBans(): BanEntry[] {
+    return [
+      {
+        key: "203.0.113.1/32|a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70",
+        name: "Mallory",
+        certHash: "a3f9c21e8b4d6f2a1c5e7b9d0f1a2b3c4d5e6f70",
+        address: "203.0.113.1",
+        mask: 32,
+        reason: "spam links",
+        start: "2026-11-03T20:21:00.000Z",
+        durationSecs: 604_800,
+        expired: false,
+      },
+      {
+        key: "198.51.100.9/32|",
+        name: null,
+        certHash: null,
+        address: "198.51.100.9",
+        mask: 32,
+        reason: "flooding",
+        start: "2026-10-01T09:00:00.000Z",
+        durationSecs: 0,
+        expired: false,
+      },
+      {
+        key: "198.51.100.23/32|7c2b8d0e5a1f3c9b6e4d2a8f0b7c5d3e1a9f6b4c",
+        name: "Ben",
+        certHash: "7c2b8d0e5a1f3c9b6e4d2a8f0b7c5d3e1a9f6b4c",
+        address: "198.51.100.23",
+        mask: 32,
+        reason: "spam links",
+        start: "2026-11-01T10:00:00.000Z",
+        durationSecs: 2_592_000,
+        expired: false,
+      },
+      {
+        key: "192.0.2.0/24|",
+        name: null,
+        certHash: null,
+        address: "192.0.2.0",
+        mask: 24,
+        reason: "repeated joins from one network",
+        start: "2026-09-14T08:00:00.000Z",
+        durationSecs: 0,
+        expired: false,
+      },
+      {
+        key: "192.0.2.44/32|5e1d9c3b7a2f6048d5b8e1c4a7f2d9b6e3c0a5f8",
+        name: "Priya",
+        certHash: "5e1d9c3b7a2f6048d5b8e1c4a7f2d9b6e3c0a5f8",
+        address: "192.0.2.44",
+        mask: 32,
+        reason: "flooding in Music Room",
+        start: "2026-10-20T18:00:00.000Z",
+        durationSecs: 86_400,
+        expired: true,
+      },
+      {
+        key: "203.0.113.77/32|",
+        name: "Tim",
+        certHash: null,
+        address: "203.0.113.77",
+        mask: 32,
+        reason: "abuse",
+        start: "2026-10-05T12:00:00.000Z",
+        durationSecs: 604_800,
+        expired: true,
+      },
+    ];
+  }
+
   const commands: EngineCommands = {
     // identity
     identityGet: () => Promise.resolve(defaultIdentity()),
@@ -3286,6 +3397,114 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     filesSaveFolder: () => Promise.resolve("~/Downloads/Mumcord"),
     filesOpen: () => Promise.resolve(null),
     filesOpenFolder: () => Promise.resolve(null),
+    banListOpen: (serverId) => {
+      if (!banLists.has(serverId)) banLists.set(serverId, seedBans());
+      return Promise.resolve([...(banLists.get(serverId) ?? [])]);
+    },
+    banListSave: (serverId, changes, force) => {
+      // The mock applies the same rule as the engine: the server takes the whole list (FR-10.66).
+      const list = [...(banLists.get(serverId) ?? seedBans())];
+      if (!force) {
+        const moved = changes.find(
+          (change) => change.kind !== "add" && !list.some((e) => e.key === change.key),
+        );
+        if (moved && moved.kind !== "add") {
+          return Promise.resolve({ kind: "conflict", key: moved.key, fresh: list });
+        }
+      }
+      for (const change of changes) {
+        if (change.kind === "add") {
+          list.push({
+            key: `${change.address}/${String(change.mask)}|${change.hash ?? ""}`,
+            name: change.name,
+            certHash: change.hash,
+            address: change.address,
+            mask: change.mask,
+            reason: change.reason,
+            start: new Date().toISOString(),
+            durationSecs: change.duration,
+            expired: false,
+          });
+          continue;
+        }
+        const entry = list.find((e) => e.key === change.key);
+        if (!entry) continue;
+        if (change.kind === "edit") {
+          entry.reason = change.reason;
+          entry.durationSecs = change.duration;
+        } else {
+          list.splice(list.indexOf(entry), 1);
+        }
+      }
+      banLists.set(serverId, list);
+      return Promise.resolve({ kind: "saved", entries: list });
+    },
+    banListClose: (serverId) => {
+      banLists.delete(serverId);
+      return Promise.resolve(null);
+    },
+    personTarget: (serverId, session) => {
+      const target = personTargetFor(serverId, session);
+      if (!target) return fail("notFound", "the person is not on this server");
+      if (!target.canKick && !target.canBan) {
+        return fail("permissionDenied", "kick or ban right in the root channel");
+      }
+      return Promise.resolve(target);
+    },
+    personKick: (serverId, session, reason) => {
+      const outcome = checkAction(serverId, session, "kick");
+      if (outcome === "denied") return fail("permissionDenied", "kick right in the root channel");
+      if (outcome === "self") return fail("invalidInput", "kicking yourself is not offered");
+      removePerson(serverId, session);
+      // A send the server confirms is one it answers with the person's removal (issue #253).
+      return Promise.resolve(reason ? "confirmed" : "unconfirmed");
+    },
+    personBan: (serverId, session, input) => {
+      const target = personTargetFor(serverId, session);
+      if (!target) return fail("notFound", "the person is not on this server");
+      if (!target.canBan) return fail("permissionDenied", "ban right in the root channel");
+      const outcome = checkAction(serverId, session, "ban");
+      if (outcome === "denied") return fail("permissionDenied", "ban right in the root channel");
+      if (!input.byCert && !input.byIp)
+        return fail("invalidInput", "at least one target must stay on");
+      if (input.quick) {
+        removePerson(serverId, session);
+        return Promise.resolve({ kind: "quickBanned" });
+      }
+      const list = [...(banLists.get(serverId) ?? seedBans())];
+      const cert = input.byCert ? (target.certHash ?? "") : "";
+      const key = `${target.address ?? ""}/${String(input.mask)}|${cert}`;
+      const existing = list.find((entry) => entry.key === key);
+      if (
+        existing &&
+        !input.force &&
+        (existing.reason !== (input.reason ?? null) || existing.durationSecs !== input.duration)
+      ) {
+        return Promise.resolve({ kind: "conflict", key, fresh: list });
+      }
+      // The engine always applies its own change to the fresh copy (FR-10.66), so a second entry
+      // with the same key is what "Save mine anyway" sends.
+      {
+        list.push({
+          key,
+          name: nameOf(serverId, session),
+          certHash: cert === "" ? null : cert,
+          address: target.address ?? "",
+          mask: input.mask,
+          reason: input.reason ?? null,
+          start: new Date().toISOString(),
+          durationSecs: input.duration,
+          expired: false,
+        });
+        banLists.set(serverId, list);
+      }
+      if (input.removeNow) removePerson(serverId, session);
+      return Promise.resolve({ kind: "saved", key, removed: input.removeNow });
+    },
+    personActionClose: (serverId) => {
+      personTargets.delete(serverId);
+      return Promise.resolve(null);
+    },
     userStatsWatch: () => Promise.resolve(null),
     p2pConsentDecide: (allow) => {
       settings = { ...settings, allowDirectConnections: allow ? "yes" : "no" };
@@ -3461,6 +3680,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
         softwareWarning: false,
         av1Skipped: null,
         path: { kind: "broadcast", maxViewers: 20 },
+        cpuCores: codec === "vp9" ? { used: 4, total: 8 } : null,
       });
     },
     // The mock never switches the encoder on its own, so there is nothing to undo.
@@ -3592,6 +3812,31 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       return [name, run];
     }),
   ) as EngineCommands;
+
+  /**
+   * The mock's stand-in for what the engine checks before a kick or a ban (issue #253): the rights
+   * the root channel grants, and that nobody acts on themselves.
+   */
+  function checkAction(
+    serverId: number,
+    session: number,
+    action: "kick" | "ban",
+  ): "ok" | "self" | "denied" {
+    const target = personTargetFor(serverId, session);
+    if (!target) return "denied";
+    if (sessions.get(serverId)?.snapshot?.selfSession === session) return "self";
+    return action === "kick" && !target.canKick ? "denied" : "ok";
+  }
+
+  function nameOf(serverId: number, session: number): string | null {
+    return sessions.get(serverId)?.snapshot?.users.find((u) => u.session === session)?.name ?? null;
+  }
+
+  /** Takes the person off the mock server, like a server that answers a kick with their removal. */
+  function removePerson(serverId: number, session: number): void {
+    currentServerId = serverId;
+    mock.removeUser(session);
+  }
 
   const mock: MockControls = {
     emit,
@@ -3727,6 +3972,23 @@ export function createMockApi(options: MockOptions = {}): MockApi {
       const snap = requireSnapshot();
       snap.users = [...snap.users.filter((u) => u.session !== user.session), user];
       emitServer("userUpserted", { user });
+    },
+    setPersonTarget: (serverId, session, patch) => {
+      const byServer = personTargets.get(serverId) ?? new Map<number, PersonTarget>();
+      const current = personTargetFor(serverId, session);
+      byServer.set(session, {
+        ...(current ?? {
+          session,
+          address: null,
+          onlineSecs: null,
+          banListReadable: false,
+          certHash: null,
+          canKick: false,
+          canBan: false,
+        }),
+        ...patch,
+      });
+      personTargets.set(serverId, byServer);
     },
     lockChannel: (channelId) => {
       focused();

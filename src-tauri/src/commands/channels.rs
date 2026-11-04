@@ -25,6 +25,12 @@ pub struct ChannelPermissions {
     /// Move other people out of this channel (drag a person, "Move users here…"); only true
     /// once the server confirmed it.
     pub move_users: bool,
+    /// Ban right, granted on the root channel; decides whether the Ban list entry shows
+    /// (Epic 4, issue #254).
+    pub ban: bool,
+    /// Kick right, granted on the root channel; decides whether "Kick…" shows in a person's menu
+    /// (Epic 4, issue #253).
+    pub kick: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
@@ -161,6 +167,8 @@ impl From<ChannelView> for ChannelInfo {
                 whisper: v.permissions.whisper,
                 write: v.permissions.write,
                 move_users: v.permissions.move_users,
+                ban: v.permissions.ban,
+                kick: v.permissions.kick,
             },
             description: v.description,
             has_description: v.has_description,

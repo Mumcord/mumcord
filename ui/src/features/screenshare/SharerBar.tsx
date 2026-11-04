@@ -2,7 +2,8 @@
  * The sharer's control bar (issue #163, FR-3.127): a compact card at the top of the chat while the
  * user shares — the live picture of what is shared, LIVE, how long it runs, what is shared and the
  * quality it sends, with Pause, Sound, Change window, Viewers (each viewer's quality and path, and
- * the hint when quality is lowered for one of them) and Stop. It replaces the red bar in the sidebar
+ * the hint when quality is lowered for one of them) and Stop. The quality, codec and path badges,
+ * the Quality menu and the quality notices come from spec 07 (FR-7.38, 7.39, 7.57, 7.58). It replaces the red bar in the sidebar
  * and the controls in the user panel.
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
@@ -15,15 +16,16 @@ import { Avatar } from "../members/Avatar";
 import { useAvatars } from "../members/useAvatars";
 import { clockTime } from "../media/format";
 import { useTick } from "../media/useTick";
-import { useP2pLink } from "../p2p/useP2pLink";
-import { ChevronDownIcon, InfoCircleIcon, WindowIcon } from "./icons";
-import { PathTag } from "./parts";
-import { qualityText } from "./shareFormat";
+import { ChevronDownIcon, WindowIcon } from "./icons";
+import { BarNotes } from "./notices/BarNotes";
+import { ShareNotices } from "./notices/ShareNotices";
+import { QualityMenu } from "./quality/QualityMenu";
+import { ShareBadges } from "./quality/ShareBadges";
 import { shareStartedAt } from "./sharesStore";
 import { useOwnShare } from "./useOwnShare";
 import { useDismiss } from "./useDismiss";
 import { useShareActions } from "./useShareActions";
-import { MAX_VIEWERS } from "./Viewers";
+import { MAX_VIEWERS, ViewerList } from "./Viewers";
 
 /** The quality the sharer sends is read once a second (issue #163). */
 const POLL_MS = 1000;
@@ -42,6 +44,7 @@ export function SharerBar(): ReactNode {
   const avatarOf = useAvatars(people, serverId ?? undefined);
   const [quality, setQuality] = useState<ShareQuality | null>(null);
   const [thumb, setThumb] = useState<ShareThumbnail | null>(null);
+  const [limit, setLimit] = useState(MAX_VIEWERS);
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const popover = useRef<HTMLDivElement>(null);
@@ -84,6 +87,29 @@ export function SharerBar(): ReactNode {
     };
   }, [serverId, own]);
 
+  // The viewer limit depends on how the share reaches viewers (relay broadcast or copies), not on
+  // the quality choice, so the preview with the defaults names it.
+  const sharing = own !== null;
+  useEffect(() => {
+    if (serverId === null || !sharing) return;
+    let current = true;
+    getApi()
+      .screenSharePreview(
+        serverId,
+        { resolution: "auto", fps: "30", optimize: "balanced", uploadLimit: "auto" },
+        "auto",
+      )
+      .then((preview) => {
+        if (current) setLimit(preview.path.maxViewers);
+      })
+      .catch((error: unknown) => {
+        console.warn("screen share preview failed", error);
+      });
+    return () => {
+      current = false;
+    };
+  }, [serverId, sharing]);
+
   // Starting a share lives in the composer's Apps menu, which also names what blocks it.
   if (own === null || serverId === null) return null;
   const nameOf = (session: number) => users.get(session)?.name ?? t("someone");
@@ -91,7 +117,6 @@ export function SharerBar(): ReactNode {
     const user = users.get(session);
     return user === undefined ? null : avatarOf(user);
   };
-  const slow = quality?.viewers.find((viewer) => viewer.struggling) ?? null;
   const count = own.viewers.length;
 
   const run = (call: Promise<null>, what: string) => {
@@ -116,169 +141,127 @@ export function SharerBar(): ReactNode {
           : "sharedUnknown",
     ),
   ];
-  if (quality !== null && quality.height > 0) source.push(qualityText(quality.height, quality.fps));
   source.push(tv(own.sound ? "soundOnShort" : "soundOffShort"));
   const noSound = t(share.platform?.sound === false ? "noSound" : "noSoundForShare");
 
   return (
-    <div className="sharer-bar" role="group" aria-label={t("controls")}>
-      <span className="sharer-bar__thumb">
-        {thumb !== null && (
-          <img src={thumb.dataUrl} alt={t("thumbnail")} width={thumb.width} height={thumb.height} />
-        )}
-      </span>
-      <span className="sharer-bar__info">
-        <span className="sharer-bar__line">
-          <span className="live-badge live-badge--large" data-paused={own.paused || undefined}>
-            {own.paused ? t("paused") : t("live")}
-          </span>
-          <span className="sharer-bar__title">{t("youAreSharing")}</span>
-          <span className="sharer-bar__time">{clockTime((now - shareStartedAt(own)) / 1000)}</span>
-        </span>
-        <span className="sharer-bar__source">{source.join(" · ")}</span>
-      </span>
-      <span className="sharer-bar__actions">
-        <button
-          type="button"
-          className="button sharer-bar__button"
-          aria-pressed={own.paused}
-          onClick={() => {
-            run(getApi().screenShareSetPaused(serverId, !own.paused), "pause");
-          }}
-        >
-          {own.paused ? <PlayIcon size={14} /> : <PauseIcon size={14} />}
-          {own.paused ? t("resume") : t("pause")}
-        </button>
-        <button
-          type="button"
-          className="button sharer-bar__button"
-          aria-pressed={own.soundAvailable ? own.sound : undefined}
-          aria-disabled={!own.soundAvailable || undefined}
-          aria-describedby={own.soundAvailable ? undefined : noSoundId}
-          data-tooltip={own.soundAvailable ? t("sound") : noSound}
-          onClick={() => {
-            if (own.soundAvailable)
-              run(getApi().screenShareSetSound(serverId, !own.sound), "sound");
-          }}
-        >
-          <VolumeIcon muted={!own.sound} size={14} />
-          {tv("sound")}
-        </button>
-        {!own.soundAvailable && (
-          <span id={noSoundId} className="visually-hidden">
-            {noSound}
-          </span>
-        )}
-        <button type="button" className="button sharer-bar__button" onClick={changeWindow}>
-          <WindowIcon />
-          {t("changeWindow")}
-        </button>
-        <span className="sharer-bar__viewers">
-          <button
-            ref={button}
-            type="button"
-            className="button sharer-bar__button sharer-bar__viewers-button"
-            aria-expanded={open}
-            aria-controls={open ? popoverId : undefined}
-            onClick={() => {
-              setOpen((value) => !value);
-            }}
-          >
-            {count > 0 && (
-              <span className="sharer-bar__stack" aria-hidden="true">
-                {own.viewers.slice(0, STACKED).map((session) => (
-                  <Avatar key={session} name={nameOf(session)} src={srcOf(session)} size="sm" />
-                ))}
-              </span>
-            )}
-            {t("viewerCount", { count })}
-            <ChevronDownIcon />
-          </button>
-          {open && (
-            <div
-              ref={popover}
-              id={popoverId}
-              className="sharer-bar__popover"
-              role="group"
-              aria-label={t("viewersTitle")}
-            >
-              <p className="sharer-bar__popover-title">
-                {t("viewersTitle")}{" "}
-                <span className="sharer-bar__popover-count">
-                  {t("ofMax", { count, max: MAX_VIEWERS })}
-                </span>
-              </p>
-              {count === 0 ? (
-                <p className="sharer-bar__empty">{t("viewersNone")}</p>
-              ) : (
-                <ul className="viewer-panel__list">
-                  {own.viewers.map((session) => {
-                    const viewer = quality?.viewers.find((v) => v.session === session);
-                    return (
-                      <ViewerRow
-                        key={session}
-                        serverId={serverId}
-                        session={session}
-                        name={nameOf(session)}
-                        src={srcOf(session)}
-                        quality={
-                          viewer === undefined || quality === null
-                            ? null
-                            : qualityText(quality.height, viewer.fps)
-                        }
-                      />
-                    );
-                  })}
-                </ul>
-              )}
-              {count >= MAX_VIEWERS && <p className="sharer-bar__note">{t("fullShort")}</p>}
-              {slow !== null && (
-                <p className="sharer-bar__note">
-                  <InfoCircleIcon />
-                  {tv("loweredFor", { name: nameOf(slow.session), fps: String(slow.fps) })}
-                </p>
-              )}
-            </div>
+    <>
+      <div className="sharer-bar" role="group" aria-label={t("controls")}>
+        <span className="sharer-bar__thumb">
+          {thumb !== null && (
+            <img
+              src={thumb.dataUrl}
+              alt={t("thumbnail")}
+              width={thumb.width}
+              height={thumb.height}
+            />
           )}
         </span>
-        <button
-          type="button"
-          className="button sharer-bar__button sharer-bar__stop"
-          aria-label={t("stop")}
-          data-tooltip={t("stop")}
-          onClick={stop}
-        >
-          <StopIcon size={12} />
-          {t("stopShort")}
-        </button>
-      </span>
-    </div>
-  );
-}
-
-/** One viewer in the popover: who, the quality they get and how the picture reaches them. */
-function ViewerRow({
-  serverId,
-  session,
-  name,
-  src,
-  quality,
-}: {
-  serverId: number;
-  session: number;
-  name: string;
-  src: string | null;
-  quality: string | null;
-}): ReactNode {
-  const link = useP2pLink(serverId, session);
-  return (
-    <li className="viewer-panel__person">
-      <Avatar name={name} src={src} />
-      <span className="viewer-panel__text">
-        <span className="viewer-panel__name">{name}</span>
-        {quality !== null && <span className="viewer-panel__sub">{quality}</span>}
-      </span>
-      {link !== null && <PathTag path={link.path} />}
-    </li>
+        <span className="sharer-bar__info">
+          <span className="sharer-bar__line">
+            <span className="live-badge live-badge--large" data-paused={own.paused || undefined}>
+              {own.paused ? t("paused") : t("live")}
+            </span>
+            <span className="sharer-bar__title">{t("youAreSharing")}</span>
+            <span className="sharer-bar__time">
+              {clockTime((now - shareStartedAt(own)) / 1000)}
+            </span>
+          </span>
+          <span className="sharer-bar__source">
+            {source.join(" · ")}
+            {quality !== null && <ShareBadges quality={quality} />}
+          </span>
+          <BarNotes quality={quality} nameOf={nameOf} />
+        </span>
+        <span className="sharer-bar__actions">
+          <button
+            type="button"
+            className="button sharer-bar__button"
+            aria-pressed={own.paused}
+            onClick={() => {
+              run(getApi().screenShareSetPaused(serverId, !own.paused), "pause");
+            }}
+          >
+            {own.paused ? <PlayIcon size={14} /> : <PauseIcon size={14} />}
+            {own.paused ? t("resume") : t("pause")}
+          </button>
+          <button
+            type="button"
+            className="button sharer-bar__button"
+            aria-pressed={own.soundAvailable ? own.sound : undefined}
+            aria-disabled={!own.soundAvailable || undefined}
+            aria-describedby={own.soundAvailable ? undefined : noSoundId}
+            data-tooltip={own.soundAvailable ? t("sound") : noSound}
+            onClick={() => {
+              if (own.soundAvailable)
+                run(getApi().screenShareSetSound(serverId, !own.sound), "sound");
+            }}
+          >
+            <VolumeIcon muted={!own.sound} size={14} />
+            {tv("sound")}
+          </button>
+          {!own.soundAvailable && (
+            <span id={noSoundId} className="visually-hidden">
+              {noSound}
+            </span>
+          )}
+          <QualityMenu serverId={serverId} />
+          <button type="button" className="button sharer-bar__button" onClick={changeWindow}>
+            <WindowIcon />
+            {t("changeWindow")}
+          </button>
+          <span className="sharer-bar__viewers">
+            <button
+              ref={button}
+              type="button"
+              className="button sharer-bar__button sharer-bar__viewers-button"
+              aria-expanded={open}
+              aria-controls={open ? popoverId : undefined}
+              onClick={() => {
+                setOpen((value) => !value);
+              }}
+            >
+              {count > 0 && (
+                <span className="sharer-bar__stack" aria-hidden="true">
+                  {own.viewers.slice(0, STACKED).map((session) => (
+                    <Avatar key={session} name={nameOf(session)} src={srcOf(session)} size="sm" />
+                  ))}
+                </span>
+              )}
+              {t("viewerCount", { count })}
+              <ChevronDownIcon />
+            </button>
+            {open && (
+              <div
+                ref={popover}
+                id={popoverId}
+                className="sharer-bar__popover"
+                role="group"
+                aria-label={t("viewersTitle")}
+              >
+                <ViewerList
+                  own={own}
+                  quality={quality}
+                  nameOf={nameOf}
+                  srcOf={srcOf}
+                  limit={limit}
+                />
+              </div>
+            )}
+          </span>
+          <button
+            type="button"
+            className="button sharer-bar__button sharer-bar__stop"
+            aria-label={t("stop")}
+            data-tooltip={t("stop")}
+            onClick={stop}
+          >
+            <StopIcon size={12} />
+            {t("stopShort")}
+          </button>
+        </span>
+      </div>
+      <ShareNotices serverId={serverId} quality={quality} />
+    </>
   );
 }

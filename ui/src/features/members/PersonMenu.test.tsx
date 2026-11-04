@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockApi } from "../../api";
 import { getServerState } from "../channels/serverStore";
@@ -296,6 +296,50 @@ describe("PersonMenu", () => {
     expect(screen.queryByRole("slider")).not.toBeInTheDocument();
   });
 
+  it("offers Kick… and Ban… only with the right on the root channel, and never for yourself (FR-10.6, FR-10.2, FR-10.11, issue #253)", async () => {
+    await renderPanel();
+    const grant = (patch: { kick?: boolean; ban?: boolean }) => {
+      const root = getServerState().channels.get(0);
+      if (!root) throw new Error("seed channel missing");
+      act(() => {
+        api.mock.updateChannel(0, { ...root, permissions: { ...root.permissions, ...patch } });
+      });
+    };
+
+    fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
+    expect(screen.queryByRole("menuitem", { name: "Admin" })).not.toBeInTheDocument();
+
+    grant({ kick: true });
+    const admin = screen.getByRole("menuitem", { name: "Admin" });
+    expect(admin).toHaveAttribute("aria-haspopup", "menu");
+    fireEvent.click(admin);
+    const submenu = screen.getAllByRole("menu").at(-1);
+    if (!submenu) throw new Error("the Admin sub-menu did not open");
+    expect(
+      within(submenu)
+        .getAllByRole("menuitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Kick…"]);
+
+    // A red item still says what it is by its label, and the right decides what shows (FR-10.2).
+    grant({ ban: true });
+    expect(
+      within(submenu)
+        .getAllByRole("menuitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Kick…", "Ban…"]);
+    expect(within(submenu).getByRole("menuitem", { name: "Kick…" })).toHaveTextContent("Kick…");
+
+    act(() => {
+      closePersonMenu();
+    });
+    fireEvent.contextMenu(screen.getByRole("button", { name: /\(you\)/i }), {
+      clientX: 1,
+      clientY: 1,
+    });
+    expect(screen.queryByRole("menuitem", { name: "Admin" })).not.toBeInTheDocument();
+  });
+
   it("closes on outside click and replaces an open menu with the next", async () => {
     await renderPanel();
     fireEvent.contextMenu(member(/^Anna/), { clientX: 1, clientY: 1 });
@@ -427,7 +471,7 @@ describe("joinTarget", () => {
     if (!gaming) throw new Error("seed channel missing");
     const denied = new Map(state.channels).set(2, {
       ...gaming,
-      permissions: { ...gaming.permissions, enter: false },
+      permissions: { ...gaming.permissions, enter: false, ban: false },
     });
     expect(joinTarget({ ...state, channels: denied }, carla)?.blocked).toBe("locked");
     expect(joinTarget(state, carla)?.blocked).toBeNull();

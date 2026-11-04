@@ -78,6 +78,12 @@ pub fn channel_view(state: &ServerState, channel: &Channel) -> ChannelView {
             move_users: bits
                 .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
                 .is_some_and(|b| b & permissions::MOVE != 0),
+            ban: bits.is_some_and(|b| b & permissions::BAN != 0),
+            // Kick is a root-only right, so the root channel's answer stands for a channel whose
+            // own answer is not known yet (FR-10.1, FR-10.11).
+            kick: bits
+                .or_else(|| state.permissions.get(&ROOT_CHANNEL).copied())
+                .is_some_and(|b| b & permissions::KICK != 0),
         },
         description: channel
             .description

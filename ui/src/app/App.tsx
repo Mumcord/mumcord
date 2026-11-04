@@ -44,6 +44,12 @@ const WizardRerunOverlay = lazy(() =>
 const ServerBrowser = lazy(() =>
   import("../features/serverbrowser/ServerBrowser").then((m) => ({ default: m.ServerBrowser })),
 );
+const ServerAdminWindowHost = lazy(() =>
+  import("../features/admin").then((m) => ({ default: m.ServerAdminWindowHost })),
+);
+const PersonActionHost = lazy(() =>
+  import("../features/admin").then((m) => ({ default: m.PersonActionHost })),
+);
 
 function MainScreen() {
   const { overlay, closeOverlay, openSettings, rerunWizard, closeRerunWizard } = useView();
@@ -100,6 +106,16 @@ function MainScreen() {
       {overlay === null && <ChatRequestDialogHost />}
       {overlay === null && <RevokeConsentDialogHost />}
       {overlay === null && <BlockDialogHost />}
+      {overlay === null && (
+        <LazyBoundary>
+          <ServerAdminWindowHost />
+        </LazyBoundary>
+      )}
+      {overlay === null && (
+        <LazyBoundary>
+          <PersonActionHost />
+        </LazyBoundary>
+      )}
       <NotificationsHost overlayOpen={overlay !== null} onOpenChat={closeOverlay} />
       <TraySync onOpenSettings={openSettings} />
       <GlobalHotkeys overlayOpen={overlay !== null} />

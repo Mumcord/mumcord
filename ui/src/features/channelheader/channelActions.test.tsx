@@ -60,7 +60,9 @@ describe("shared channel actions (issue #172)", () => {
   it("gives the header and the tree the same list; the tree adds Join and Move", async () => {
     await renderTree();
     act(() => {
-      api.mock.updateChannel(2, { permissions: { ...permissionsOf(2), moveUsers: true } });
+      api.mock.updateChannel(2, {
+        permissions: { ...permissionsOf(2), moveUsers: true, ban: false, kick: false },
+      });
     });
     const tree = itemLabels(openTreeMenu(/^Raid/));
     fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
@@ -71,7 +73,9 @@ describe("shared channel actions (issue #172)", () => {
     api = await connectedMock({ bindStore: true });
     resetChatStore();
     act(() => {
-      api.mock.updateChannel(2, { permissions: { ...permissionsOf(2), moveUsers: true } });
+      api.mock.updateChannel(2, {
+        permissions: { ...permissionsOf(2), moveUsers: true, ban: false, kick: false },
+      });
     });
     render(<ChatView renderChannelTitle={(id) => <ChannelHeader channelId={id} />} />);
     act(() => {
@@ -205,7 +209,9 @@ describe("moving people (issue #172)", () => {
 
     act(() => {
       for (const id of [1, 2]) {
-        api.mock.updateChannel(id, { permissions: { ...permissionsOf(id), moveUsers: true } });
+        api.mock.updateChannel(id, {
+          permissions: { ...permissionsOf(id), moveUsers: true, ban: false, kick: false },
+        });
       }
     });
     expect(carla()).toHaveAttribute("draggable", "true");
@@ -236,7 +242,9 @@ describe("moving people (issue #172)", () => {
     await renderTree();
     act(() => {
       for (const id of [1, 2]) {
-        api.mock.updateChannel(id, { permissions: { ...permissionsOf(id), moveUsers: true } });
+        api.mock.updateChannel(id, {
+          permissions: { ...permissionsOf(id), moveUsers: true, ban: false, kick: false },
+        });
       }
     });
     const move = vi.spyOn(api, "personMove");

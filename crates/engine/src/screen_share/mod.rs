@@ -12,6 +12,7 @@
 //! own share and everything watched, and the people still there drop the share and the viewer
 //! themselves when they see the move.
 
+pub mod broadcast;
 pub mod capture;
 #[cfg(any(target_os = "macos", test))]
 pub mod capture_macos;
@@ -44,28 +45,33 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use mumcord_p2p::DeclineReason;
 use mumcord_p2p::quinn::{RecvStream, SendStream};
-use mumcord_p2p::{DeclineReason, P2pError};
 use mumcord_protocol::{Handle, PluginData};
 use tokio::sync::oneshot;
 
 use crate::ServerId;
-use crate::mumcord::ServerPeers;
+use crate::mumcord::{FEATURE_SCREEN_BROADCAST, ServerPeers};
 use crate::p2p::DirectError;
 use crate::peer::{RelayUnavailable, RelayUse};
 use crate::session::{
     Engine, EngineError, EngineEvent, EngineResult, ErrorKind, SessionCtx, WeakEngine, lock,
 };
+use broadcast::Fanout;
+use broadcast::admit::{Decision, Path};
+use broadcast::link::Received;
+use mumcord_p2p::{BroadcastId, P2pError};
 use signal::{DATA_ID, FEATURE, Signal, decode, encode};
 use state::{Admit, Announced, Answer, OwnShare, Shares, Watching};
 
+pub use broadcast::{FanoutInfo, FanoutUnavailable, FanoutView, RelayViewer};
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
 pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 pub use mumcord_screenshare::I420Frame;
-pub use preview::{SharePath, SharePreview};
+pub use preview::{CpuCores, SharePath, SharePreview};
 pub use quality::{LoweredReason, QualityPrefs};
 pub use signal::ShareKind;
 pub use start::StartOutcome;
@@ -138,6 +144,9 @@ pub(crate) struct ScreenShares {
     sink: Option<Arc<dyn ScreenFrameSink>>,
     /// Reaches the relay and P2P settings for what blocks watching; set once at start.
     pub(crate) engine: Option<WeakEngine>,
+    /// What watch requests claim this client can play instead of every codec (test hook).
+    #[cfg(feature = "test-backend")]
+    playable: Option<Vec<signal::CodecName>>,
 }
 
 impl WatchBlock {
@@ -324,8 +333,20 @@ pub(crate) fn on_plugin_data(
     if let Signal::Share { live, .. } = signal {
         tracing::debug!(sender, live, "screen share announcement received");
     }
+    // What a Watch needs to know before the state is locked.
+    let (broadcast_viewer, viewer_hash) = match signal {
+        Signal::Watch { bc, .. } => (
+            bc == 1
+                && !capable(peers, ctx.server_id, &[sender], FEATURE_SCREEN_BROADCAST).is_empty(),
+            cert_hash(&ctx.handle, sender),
+        ),
+        _ => (false, None),
+    };
     let mut reply = None;
     let mut own_viewers = false;
+    let mut admit = None;
+    let mut kick = None;
+    let mut relink = false;
     let changed = {
         let mut all = lock(state);
         let shares = all.servers.entry(ctx.server_id).or_default();
@@ -349,13 +370,26 @@ pub(crate) fn on_plugin_data(
             Signal::Share { live: false, .. } => shares.share_ended(sender),
             Signal::Watch { codecs, .. } => {
                 let caps = state::ViewerCaps::from_watch(&codecs);
-                match shares.own.as_mut().map(|own| own.admit(sender, caps)) {
-                    Some(Admit::New) => {
-                        reply = Some(Signal::Accept);
-                        own_viewers = true;
+                let fanout = shares.own.as_mut().map(|own| {
+                    on_watch(
+                        own,
+                        sender,
+                        caps,
+                        broadcast_viewer,
+                        viewer_hash.as_deref(),
+                        Instant::now(),
+                    )
+                });
+                match fanout {
+                    Some(OnWatch::Reply(signal, new)) => {
+                        reply = Some(signal);
+                        own_viewers = new;
                     }
-                    Some(Admit::Already) => reply = Some(Signal::Accept),
-                    Some(Admit::Full) => reply = Some(Signal::Full),
+                    Some(OnWatch::Admit(id, new)) => {
+                        admit = Some(id);
+                        own_viewers = new;
+                    }
+                    Some(OnWatch::Quiet) => {}
                     // Nothing to watch: the request came after the share ended.
                     None => {
                         reply = Some(Signal::Share {
@@ -370,19 +404,37 @@ pub(crate) fn on_plugin_data(
                 own_viewers
             }
             Signal::Accept => {
+                // A share watched through the relay continues on a direct copy once the sharer
+                // lost the relay (FR-7.49).
+                relink = watched_via_relay(shares, sender);
                 shares.answered(sender, Answer::Accept);
                 false
             }
             Signal::Full => {
-                shares.answered(sender, Answer::Full);
-                false
+                if watched_via_relay(shares, sender) {
+                    // The relay is gone and the direct copies are taken (FR-7.49).
+                    shares.watching.remove(&sender);
+                    true
+                } else {
+                    shares.answered(sender, Answer::Full);
+                    false
+                }
             }
             Signal::Unwatch => {
-                own_viewers = shares
-                    .own
-                    .as_mut()
-                    .is_some_and(|own| own.remove_viewer(sender));
+                let left = shares.own.as_mut().and_then(|own| leave(own, sender));
+                own_viewers = left.is_some();
+                kick = left.flatten();
                 own_viewers
+            }
+            Signal::Report { fps, slow } => {
+                if let Some(Fanout::Live {
+                    roster, reports, ..
+                }) = shares.own.as_mut().and_then(|own| own.fanout.as_mut())
+                    && roster.path(sender) == Some(Path::Relay)
+                {
+                    reports.insert(sender, (Received { fps, slow }, Instant::now()));
+                }
+                false
             }
             Signal::Viewers { list } => {
                 let list = list
@@ -396,12 +448,128 @@ pub(crate) fn on_plugin_data(
     if let Some(reply) = reply {
         send(&ctx.handle, &[sender], &reply);
     }
+    let engine = lock(state).engine.as_ref().and_then(WeakEngine::upgrade);
+    if let Some(engine) = engine {
+        if let Some(id) = admit {
+            engine.admit_to_broadcast(ctx.server_id, id, sender);
+        }
+        if let Some(id) = kick {
+            engine.relay_broadcast_kick(ctx.server_id, id, sender);
+        }
+        if relink {
+            engine.screen_share_relink(ctx.server_id, sender);
+        }
+    }
     if own_viewers {
         send_viewers(state, peers, ctx, &here.others);
     }
     if changed {
         emit(state, peers, ctx);
     }
+}
+
+/// The certificate hash the Mumble server reports for `session`.
+fn cert_hash(handle: &Handle, session: u32) -> Option<String> {
+    handle.with_state(|s| s.users.get(&session).and_then(|u| u.cert_hash.clone()))
+}
+
+/// Whether the user watches `sharer`'s share through the relay broadcast.
+fn watched_via_relay(shares: &Shares, sharer: u32) -> bool {
+    matches!(shares.watching.get(&sharer), Some(Watching::Open(link)) if link.broadcast().is_some())
+}
+
+/// What to do about a Watch for the own share.
+enum OnWatch {
+    /// Send this; `true` when the viewer is new.
+    Reply(Signal, bool),
+    /// Ask the bot to admit the viewer to this broadcast; `true` when the viewer is new.
+    Admit(BroadcastId, bool),
+    /// Nothing: the viewer asks again (the broadcast is starting, or its token is on the way).
+    Quiet,
+}
+
+/// Decides about a Watch from `viewer`: through the relay broadcast when it is up and the
+/// viewer's Mumcord can join it, else a direct copy as before (FR-7.42, FR-7.48).
+fn on_watch(
+    own: &mut OwnShare,
+    viewer: u32,
+    caps: state::ViewerCaps,
+    broadcast: bool,
+    hash: Option<&str>,
+    now: Instant,
+) -> OnWatch {
+    // A viewer without a certificate hash can't do the key exchange.
+    let broadcast = broadcast && hash.is_some();
+    let decided = match own.fanout.as_mut() {
+        Some(Fanout::Starting) if broadcast => return OnWatch::Quiet,
+        Some(Fanout::Live {
+            publisher,
+            roster,
+            hashes,
+            ..
+        }) => {
+            let new = roster.path(viewer).is_none();
+            Some(match roster.decide(viewer, broadcast, now) {
+                Decision::Relay => {
+                    if let Some(hash) = hash {
+                        publisher.admit(hash);
+                        hashes.insert(viewer, hash.to_owned());
+                    }
+                    OnWatch::Admit(publisher.id(), new)
+                }
+                Decision::Direct => {
+                    own.viewers.entry(viewer).or_insert(None);
+                    OnWatch::Reply(Signal::Accept, new)
+                }
+                Decision::Wait => OnWatch::Quiet,
+                Decision::Full => OnWatch::Reply(Signal::Full, false),
+            })
+        }
+        _ => None,
+    };
+    if let Some(decided) = decided {
+        if matches!(
+            decided,
+            OnWatch::Admit(..) | OnWatch::Reply(Signal::Accept, _)
+        ) {
+            // The share's one encoder has to suit relay viewers too (FR-7.58).
+            own.set_caps(viewer, caps);
+        }
+        return decided;
+    }
+    match own.admit(viewer, caps) {
+        Admit::New => OnWatch::Reply(Signal::Accept, true),
+        Admit::Already => OnWatch::Reply(Signal::Accept, false),
+        Admit::Full => OnWatch::Reply(Signal::Full, false),
+    }
+}
+
+/// `viewer` stopped watching the own share or left. `None` when it was no viewer; else the
+/// broadcast to remove it from at the relay, if it watched through one. A relay viewer leaving
+/// makes the share switch keys (FR-7.44).
+fn leave(own: &mut OwnShare, viewer: u32) -> Option<Option<BroadcastId>> {
+    let direct = own.remove_viewer(viewer);
+    if let Some(Fanout::Live {
+        publisher,
+        roster,
+        hashes,
+        reports,
+        ..
+    }) = own.fanout.as_mut()
+    {
+        reports.remove(&viewer);
+        match roster.remove(viewer) {
+            Some(Path::Relay) => {
+                if let Some(hash) = hashes.remove(&viewer) {
+                    publisher.remove(&hash);
+                }
+                return Some(Some(publisher.id()));
+            }
+            Some(Path::Direct) => return Some(None),
+            None => {}
+        }
+    }
+    direct.then_some(None)
 }
 
 /// Someone left the server.
@@ -415,10 +583,21 @@ pub(crate) fn on_user_removed(
 }
 
 fn forget(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, session: u32) {
-    let forgot = match lock(state).servers.get_mut(&ctx.server_id) {
-        Some(shares) => shares.forget(session),
-        None => return,
+    let (forgot, kick, engine) = {
+        let mut all = lock(state);
+        let engine = all.engine.as_ref().and_then(WeakEngine::upgrade);
+        let Some(shares) = all.servers.get_mut(&ctx.server_id) else {
+            return;
+        };
+        let left = shares.own.as_mut().and_then(|own| leave(own, session));
+        let mut forgot = shares.forget(session);
+        forgot.own_viewers |= left.is_some();
+        forgot.changed |= left.is_some();
+        (forgot, left.flatten(), engine)
     };
+    if let (Some(id), Some(engine)) = (kick, engine) {
+        engine.relay_broadcast_kick(ctx.server_id, id, session);
+    }
     if forgot.own_viewers
         && let Some(here) = here(&ctx.handle)
     {
@@ -493,8 +672,10 @@ fn offer_share(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, sess
     }
 }
 
-/// Sends the own share once more to the newcomers due for it (session tick).
+/// Sends the own share once more to the newcomers due for it, and reports what arrives from
+/// shares watched through the relay (session tick).
 pub(crate) fn on_tick(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx) {
+    broadcast::send_reports(state, ctx);
     let due = lock(state)
         .servers
         .get_mut(&ctx.server_id)
@@ -555,10 +736,10 @@ pub(crate) async fn serve_direct(
 async fn ask_to_watch(
     handle: &Handle,
     sharer: u32,
+    request: Signal,
     mut answer: oneshot::Receiver<Answer>,
 ) -> Option<Result<Answer, oneshot::error::RecvError>> {
     let start = tokio::time::Instant::now();
-    let request = signal::watch_request();
     send(handle, &[sharer], &request);
     for at in WATCH_RESEND {
         tokio::select! {
@@ -594,10 +775,15 @@ impl Engine {
     /// that picker gives [`StartOutcome::Cancelled`]. The share stops by itself when the capture
     /// ends (the desktop's stop button). Errors with [`ErrorKind::DirectUnavailable`] and a
     /// [`WatchBlock::code`] when [`Engine::screen_share_block`] blocks it.
+    ///
+    /// `prefs` and `codec` are the start dialog's picks for this one share; `None` takes the
+    /// Settings value. Settings themselves are never changed here.
     pub async fn screen_share_start(
         &self,
         server_id: ServerId,
         sound: bool,
+        prefs: Option<QualityPrefs>,
+        codec: Option<mumcord_store::ScreenCodec>,
     ) -> EngineResult<StartOutcome> {
         let ctx = self.session_ctx_for(server_id)?;
         let here = here(&ctx.handle).ok_or_else(EngineError::not_connected)?;
@@ -619,9 +805,8 @@ impl Engine {
             tracing::warn!(error = %e, "screen share settings not read; using the defaults");
             mumcord_store::Settings::default()
         });
-        let selection = self
-            .screen_encoders()
-            .select(&settings, QualityPrefs::from_settings(&settings));
+        let (settings, prefs) = with_picks(settings, prefs, codec);
+        let selection = self.screen_encoders().select(&settings, prefs);
         let token = {
             let mut all = lock(self.screen_share_state());
             let shares = all.servers.entry(server_id).or_default();
@@ -647,6 +832,7 @@ impl Engine {
         };
         self.share_changed(&ctx, &here);
         self.watch_for_end(server_id, token);
+        self.start_fanout(server_id, token);
         Ok(StartOutcome::Started)
     }
 
@@ -845,8 +1031,12 @@ impl Engine {
             };
             begun
         };
-        match ask_to_watch(&ctx.handle, sharer, answer).await {
+        let request = self.watch_request(server_id);
+        match ask_to_watch(&ctx.handle, sharer, request, answer).await {
             Some(Ok(Answer::Accept)) => {}
+            Some(Ok(Answer::Broadcast(id, token))) => {
+                return self.watch_broadcast(&ctx, sharer, attempt, id, token).await;
+            }
             Some(Ok(Answer::Full)) => {
                 return Err(EngineError::new(ErrorKind::ShareFull, "this share is full"));
             }
@@ -1010,8 +1200,9 @@ impl Engine {
         self.with_watch(server_id, sharer, |link| link.set_decode_codecs(codecs))
     }
 
-    /// The viewer's frame-rate choice for `sharer`'s share (FR-7.51): at most about `max_fps`
-    /// frames per second, by dropping temporal layers here; `None` is Auto.
+    /// The viewer's frame-rate choice for `sharer`'s share (FR-7.51), on either path: at most
+    /// about `max_fps` frames per second, by dropping temporal layers here and, through the
+    /// relay broadcast, at the relay too (FR-7.45); `None` is Auto.
     pub fn screen_share_set_viewer_fps(
         &self,
         server_id: ServerId,
@@ -1054,10 +1245,19 @@ impl Engine {
 
     /// How the own share on `server_id` is sent right now; `None` without one.
     pub fn screen_share_media_stats(&self, server_id: ServerId) -> Option<ScreenMediaStats> {
-        let (mut stats, encoder) = {
+        let (mut stats, encoder, relay_viewers) = {
             let all = lock(self.screen_share_state());
             let own = all.servers.get(&server_id)?.own.as_ref()?;
-            (own.media.as_ref()?.stats(), own.active_encoder())
+            let relay_viewers = own
+                .fanout
+                .as_ref()
+                .map(|f| f.info(Instant::now()).relay_viewers)
+                .unwrap_or_default();
+            (
+                own.media.as_ref()?.stats(),
+                own.active_encoder(),
+                relay_viewers,
+            )
         };
         // Read after the share state is released: the P2P links have their own lock.
         stats.add_viewer_paths(encoder, |session| {
@@ -1066,6 +1266,7 @@ impl Engine {
                 Some(mumcord_p2p::ConnectionPath::Direct) | None => ViewerPath::Direct,
             }
         });
+        stats.add_broadcast_viewers(encoder, &relay_viewers);
         Some(stats)
     }
 
@@ -1105,10 +1306,21 @@ impl Engine {
     }
 
     /// How many viewers a relay broadcast takes on `server_id` (FR-7.40); `None` without
-    /// fan-out.
-    // Seam for BC1, which checks relay, bc announcement, P2P mode and certificate here.
-    pub fn screen_broadcast_max(&self, _server_id: ServerId) -> Option<u8> {
-        None
+    /// fan-out. A running share answers with its own broadcast, or `None` once it is on
+    /// direct copies.
+    pub fn screen_broadcast_max(&self, server_id: ServerId) -> Option<u8> {
+        let running = lock(self.screen_share_state())
+            .servers
+            .get(&server_id)
+            .and_then(|s| s.own.as_ref())
+            .and_then(|own| own.fanout.as_ref())
+            .map(Fanout::view);
+        let limit = match running {
+            Some(FanoutView::Relay { limit }) => limit,
+            Some(FanoutView::Direct { .. }) => return None,
+            Some(FanoutView::Starting) | None => self.broadcast_limit(server_id)?,
+        };
+        Some(u8::try_from(limit).unwrap_or(u8::MAX))
     }
 
     /// Changes the own share's resolution and frame rate ceiling, "Optimize for" and upload
@@ -1163,6 +1375,39 @@ impl Engine {
             .and_then(media::Media::thumbnail)
     }
 
+    /// Makes this client's watch requests list only `codecs`, like a viewer that cannot play
+    /// the others (test hook, FR-7.58); `None` lists every codec again.
+    #[cfg(feature = "test-backend")]
+    pub fn screen_share_set_playable_codecs(&self, codecs: Option<&[wire::Codec]>) {
+        lock(self.screen_share_state()).playable = codecs.map(|codecs| {
+            codecs
+                .iter()
+                .map(|codec| match codec {
+                    wire::Codec::Vp9 => signal::CodecName::Vp9,
+                    wire::Codec::Av1 => signal::CodecName::Av1,
+                })
+                .collect()
+        });
+    }
+
+    /// The watch request for a share on `server_id`: through the relay broadcast when this
+    /// side can join one (FR-7.42).
+    fn watch_request(&self, server_id: ServerId) -> Signal {
+        #[cfg_attr(
+            not(feature = "test-backend"),
+            expect(unused_mut, reason = "test hook")
+        )]
+        let mut request = signal::watch_request(self.broadcast_limit(server_id).is_some());
+        #[cfg(feature = "test-backend")]
+        if let (Some(playable), Signal::Watch { codecs, .. }) = (
+            lock(self.screen_share_state()).playable.clone(),
+            &mut request,
+        ) {
+            *codecs = playable;
+        }
+        request
+    }
+
     /// Throttles the own share's upload in-process, to `viewer` or (with `None`) to all viewers
     /// together, since network-level throttling needs root; `kbps: None` lifts it (AC-2.29).
     #[cfg(feature = "test-backend")]
@@ -1189,5 +1434,56 @@ impl Engine {
             |_| Vec::new(),
             |ctx| views(self.screen_share_state(), self.mumcord_state(), &ctx),
         )
+    }
+}
+/// `settings` with this share's picks applied, and the quality prefs to start with. Only the
+/// returned copy changes; the stored Settings stay as they are.
+fn with_picks(
+    mut settings: mumcord_store::Settings,
+    prefs: Option<QualityPrefs>,
+    codec: Option<mumcord_store::ScreenCodec>,
+) -> (mumcord_store::Settings, QualityPrefs) {
+    if let Some(codec) = codec {
+        settings.screen_codec = codec;
+    }
+    let prefs = prefs.unwrap_or_else(|| QualityPrefs::from_settings(&settings));
+    (settings, prefs)
+}
+
+#[cfg(test)]
+mod pick_tests {
+    use mumcord_store::{ScreenCodec, ScreenFps, ScreenResolution, Settings};
+
+    use super::*;
+
+    #[test]
+    fn a_per_share_pick_overrides_the_settings_copy_only() {
+        let stored = Settings {
+            screen_codec: ScreenCodec::Auto,
+            screen_fps: ScreenFps::Fps30,
+            ..Settings::default()
+        };
+        let picks = QualityPrefs {
+            resolution: ScreenResolution::P720,
+            fps: ScreenFps::Fps60,
+            ..QualityPrefs::default()
+        };
+        let (used, prefs) = with_picks(stored.clone(), Some(picks), Some(ScreenCodec::Vp9));
+        assert_eq!(used.screen_codec, ScreenCodec::Vp9);
+        assert_eq!(prefs, picks);
+        assert_eq!(
+            stored.screen_codec,
+            ScreenCodec::Auto,
+            "Settings stay as saved"
+        );
+        assert_eq!(stored.screen_fps, ScreenFps::Fps30);
+    }
+
+    #[test]
+    fn without_picks_the_settings_apply() {
+        let stored = Settings::default();
+        let (used, prefs) = with_picks(stored.clone(), None, None);
+        assert_eq!(used.screen_codec, stored.screen_codec);
+        assert_eq!(prefs, QualityPrefs::from_settings(&stored));
     }
 }
