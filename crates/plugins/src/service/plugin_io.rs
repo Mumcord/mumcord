@@ -5,6 +5,7 @@
 //! `peers` works on the messaging state per connection ([`PeersState`], one
 //! [`Messenger`] each), which the service feeds from engine events (see `messaging.rs`).
 
+mod relay;
 mod stage;
 mod user_menu;
 
@@ -196,6 +197,7 @@ pub(super) struct ServiceIo {
     webviews: Arc<Webviews>,
     app_menus: crate::api::app_menu::AppMenus,
     stages: Mutex<crate::stage::Stages>,
+    relay: Mutex<relay::RelayState>,
 }
 
 impl ServiceIo {
@@ -208,6 +210,7 @@ impl ServiceIo {
             webviews: Arc::default(),
             app_menus: Default::default(),
             stages: Mutex::default(),
+            relay: Mutex::default(),
         }
     }
 
@@ -313,6 +316,20 @@ impl ServiceIo {
 }
 
 impl PluginIo for ServiceIo {
+    fn relay_status(&self, _plugin: &str) -> crate::api::relay::RelayStatus {
+        self.relay_status_of()
+    }
+
+    fn relay_send(
+        &self,
+        plugin: &str,
+        target: crate::messaging::Target,
+        data: Vec<u8>,
+        fallback: bool,
+    ) -> Result<(), crate::api::relay::SendError> {
+        self.relay_send_to(plugin, target, data, fallback)
+    }
+
     fn set_tree(
         &self,
         plugin: &str,

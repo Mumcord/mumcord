@@ -41,6 +41,7 @@ impl PluginService {
             self.io.refresh_menus();
             // A server switch leaves the activities on the old one, which stays connected.
             self.stage_sync_place(true);
+            self.relay_refresh();
         }
         self.broadcast_self();
     }
@@ -67,6 +68,10 @@ impl PluginService {
             self.io.refresh_menus();
             self.stage_sync_place(false);
             self.broadcast_self();
+        }
+        self.io.relay_forget_server(server);
+        if focused {
+            self.relay_refresh();
         }
     }
 
@@ -227,10 +232,15 @@ impl PluginService {
         if state.focused != Some(server) {
             return;
         }
-        // Stage host frames are the host's own, never a plugin's message (FR-9.47).
-        if envelope::decode_host(data).is_some() {
+        // Host frames are the host's own, never a plugin's message: stage frames (FR-9.47)
+        // and `relay` messages through the Mumble fallback (FR-9.61).
+        if let Some((kind, body)) = envelope::decode_host(data) {
             drop(state);
-            self.stage_frame(sender.session, plugin, data);
+            if kind == envelope::HOST_KIND_RELAY {
+                self.relay_fallback_frame(server, sender.session, plugin, body);
+            } else {
+                self.stage_frame(sender.session, plugin, data);
+            }
             return;
         }
         let Some(meta) = state
@@ -392,9 +402,13 @@ impl PluginService {
                             .and_then(|s| s.max_participants)
                             .unwrap_or(crate::stage::MAX_PARTICIPANTS)
                     });
-                // Stage plugins are announced too, so peers with the same plugin see their
-                // activities without `peers.messages`.
-                let messaging = if messages || stage.is_some() {
+                // Stage and relay plugins are announced too, so peers with the same plugin see
+                // their activities and reach them without `peers.messages`.
+                let relay = self
+                    .ctx
+                    .grants
+                    .allows(&record.id, crate::api::relay::PERMISSION);
+                let messaging = if messages || stage.is_some() || relay {
                     self.source_tag(&record.source, &repositories)
                         .map(|source| MessagingMeta {
                             source,
@@ -423,6 +437,9 @@ impl PluginService {
         self.io.app_menus().sync(menus);
         let mut state = self.io.peers();
         if state.plugins == metas {
+            drop(state);
+            // A permission change may still move `relay.status()`.
+            self.relay_refresh();
             return;
         }
         let now = Instant::now();
@@ -446,6 +463,8 @@ impl PluginService {
             }
         }
         state.plugins = metas;
+        drop(state);
+        self.relay_refresh();
     }
 
     /// How peers tell this plugin's source apart (FR-6.35); `None` for a repository that is

@@ -22,6 +22,9 @@ pub const ENVELOPE_VERSION: u8 = 1;
 pub const HOST_FRAME_VERSION: u8 = 0x81;
 /// Host kind of the stage frames (`stage::announce`).
 pub const HOST_KIND_STAGE: u8 = 1;
+/// Host kind of a `relay` message sent through the Mumble fallback (FR-9.61): the body is the
+/// plugin's payload, delivered as `relay-message`.
+pub const HOST_KIND_RELAY: u8 = 2;
 /// Bit 7 of the API major byte: the message was sent to one user, not the whole channel.
 pub const DIRECT_FLAG: u8 = 0x80;
 /// The bits of byte 1 that hold the plugin API major.

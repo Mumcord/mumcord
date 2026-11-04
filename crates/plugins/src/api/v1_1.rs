@@ -764,16 +764,44 @@ impl wit::app_menu::Host for PluginState {
 
 impl wit::relay::Host for PluginState {
     fn status(&mut self) -> wit::relay::RelayStatus {
-        wit::relay::RelayStatus::NotAllowed
+        relay_status(crate::api::relay::status_of(self))
     }
 
-    fn send_channel(&mut self, _data: Vec<u8>, _fallback: bool) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+    fn send_channel(&mut self, data: Vec<u8>, fallback: bool) -> Result<(), Error> {
+        relay_result(crate::api::relay::send(
+            self,
+            crate::messaging::Target::Channel,
+            data,
+            fallback,
+        ))
     }
 
-    fn send_direct(&mut self, _peer: u32, _data: Vec<u8>, _fallback: bool) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+    fn send_direct(&mut self, peer: u32, data: Vec<u8>, fallback: bool) -> Result<(), Error> {
+        relay_result(crate::api::relay::send(
+            self,
+            crate::messaging::Target::Direct(peer),
+            data,
+            fallback,
+        ))
     }
+}
+
+/// The WIT `relay-status` of a status.
+pub fn relay_status(status: crate::api::relay::RelayStatus) -> wit::relay::RelayStatus {
+    use crate::api::relay::RelayStatus as S;
+    match status {
+        S::Available => wit::relay::RelayStatus::Available,
+        S::NotAllowed => wit::relay::RelayStatus::NotAllowed,
+        S::NoRelay => wit::relay::RelayStatus::NoRelay,
+        S::SwitchedOff => wit::relay::RelayStatus::SwitchedOff,
+    }
+}
+
+fn relay_result(result: Result<(), crate::api::relay::SendError>) -> Result<(), Error> {
+    result.map_err(|e| match e {
+        crate::api::relay::SendError::Error(e) => e.up(),
+        crate::api::relay::SendError::Unavailable => Error::RelayUnavailable,
+    })
 }
 
 impl wit::audio::Host for PluginState {

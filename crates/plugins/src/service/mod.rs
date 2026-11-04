@@ -99,6 +99,15 @@ pub enum ServiceEvent {
         plugin: String,
         outgoing: crate::messaging::Outgoing,
     },
+    /// A `relay` message to one person through the relay pair session (`Engine::plugin_relay_send`
+    /// with `api` for the envelope). `data` is the plugin's opaque payload: never log it.
+    RelaySend {
+        server: mumcord_store::ServerId,
+        plugin: String,
+        session: u32,
+        api: (u8, u8),
+        data: Vec<u8>,
+    },
     /// An Apps-menu item was enabled or disabled: list the items again with
     /// [`PluginService::app_menu`].
     AppMenuChanged,
@@ -475,6 +484,14 @@ impl PluginService {
             replayed: replay::Seen::default(),
             listings: Vec::new(),
         };
+        let relay_on = service.store().settings().map_or_else(
+            |e| {
+                tracing::warn!(error = %e, "relay data switch not readable; it stays on");
+                true
+            },
+            |s| s.plugins.relay_data_enabled,
+        );
+        service.io.relay().switch_on = relay_on;
         Ok((service, host_rx, events_rx))
     }
 

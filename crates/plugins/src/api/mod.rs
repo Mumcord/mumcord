@@ -11,6 +11,7 @@ pub mod log;
 pub mod notify;
 pub mod peers;
 pub mod random;
+pub mod relay;
 pub mod secrets;
 pub mod stage;
 pub mod storage;

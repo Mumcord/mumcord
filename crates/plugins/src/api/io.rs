@@ -8,6 +8,7 @@ use std::fmt::Debug;
 use mumcord_store::ServerId;
 
 use crate::api::host_calls::{Picture, PostOutcome, Waiter};
+use crate::api::relay::{RelayStatus, SendError as RelaySendError};
 use crate::api::webview::WebviewPlace;
 use crate::runtime::wit::peers::Target;
 use crate::runtime::wit::types::{BotInfo, Error, Peer};
@@ -189,5 +190,20 @@ pub trait PluginIo: Send + Sync + Debug {
         _server: Option<ServerId>,
     ) -> Result<Waiter<Result<PostOutcome, Error>>, Error> {
         Err(Error::NotPermitted)
+    }
+    /// `relay.status()` for a plugin holding `peers.relay` (FR-9.57).
+    fn relay_status(&self, _plugin: &str) -> RelayStatus {
+        RelayStatus::NoRelay
+    }
+    /// `relay.send-channel` / `relay.send-direct`: the caller checked `peers.relay` and the
+    /// 64 KiB limit. Checks reach, the plugin's rate and the path (relay or Mumble fallback).
+    fn relay_send(
+        &self,
+        _plugin: &str,
+        _target: crate::messaging::Target,
+        _data: Vec<u8>,
+        _fallback: bool,
+    ) -> Result<(), RelaySendError> {
+        Err(RelaySendError::Unavailable)
     }
 }

@@ -374,6 +374,18 @@ impl PluginHost {
             .is_some_and(|worker| worker.queue.push(event))
     }
 
+    /// Queues a relay event (`relay-message`, `relay-status-changed`) for plugin `id` if it is
+    /// running and holds `peers.relay` (1.1 events, past the 1.0 path).
+    pub fn send_relay(&self, id: &str, event: crate::runtime::PluginEvent) -> bool {
+        if !self.ctx.grants.allows(id, crate::api::relay::PERMISSION) {
+            return false;
+        }
+        self.plugins
+            .get(id)
+            .and_then(|slot| slot.worker.as_ref())
+            .is_some_and(|worker| worker.queue.push(event))
+    }
+
     /// Queues `surface-closed` for plugin `id` if it is running and holds `ui.webview` (a 1.1
     /// event: a 1.0 plugin never sees it).
     pub fn send_surface_closed(&self, id: &str, place: crate::api::webview::WebviewPlace) -> bool {
