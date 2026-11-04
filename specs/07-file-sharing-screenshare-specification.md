@@ -1,7 +1,7 @@
 # Epic 4.1 – File sharing and screen-sharing upgrade · Specification
 
-> Status: Final (written directly from the agreed issues, no brainstorming file; open points in section 13 carry a recommended default) · As of: 2026-11-02
-> Sources: issue #348 (file sharing: concept and mockups, branch `mockups/file-sharing`), issue #355 with its comments (screen-sharing upgrade, AV1 per OS, Intel Quick Sync and hardware VP9; mockups on branch `mockups/screenshare-41`), issue #331 (origin of file sharing), issue #372 (malware check, not part of this epic), user decisions of 2026-11-02 (section 12). There is no `specs/roadmap.md`; the issues are the roadmap.
+> Status: Final (written directly from the agreed issues, no brainstorming file; open points in section 13 carry a recommended default; addendum for application and desktop audio in `specs/07-file-sharing-screenshare-brainstorming.md`) · As of: 2026-11-04
+> Sources: issue #348 (file sharing: concept and mockups, branch `mockups/file-sharing`), issue #355 with its comments (screen-sharing upgrade, AV1 per OS, Intel Quick Sync and hardware VP9; mockups on branch `mockups/screenshare-41`), issue #331 (origin of file sharing), issue #372 (malware check, not part of this epic), user decisions of 2026-11-02 (section 12), issue #435 with the user decisions of 2026-11-04 (application and desktop audio, brainstorming addendum QA.1 … QA.4). There is no `specs/roadmap.md`; the issues are the roadmap.
 > Builds on: `specs/01-foundation-specification.md`, `specs/02-multi-server-themes-specification.md` (P2P signalling `mumcord.p2p`, FR-2.35 … FR-2.37), `specs/03-comfort-polish-specification.md` (blocking, notification centre, Settings window, packet inspector), `specs/04-mumpeer-relay-specification.md` (relay, mumbot `peer`, `mumcord.peer`, relay handshake and API), `specs/06-plugin-system-specification.md` (plugin data budget FR-6.36, hello feature limit).
 > Repositories: `Mumcord/mumcord` (client), `Mumcord/mumpeer` (relay: broadcast sessions, allowed uses), `Mumcord/mumbot` (module `peer`: broadcast admission, allowed uses in the announcement).
 > Numbering: requirements and criteria use the spec file number (`FR-7.n`, `AC-7.n`) so they never clash with Epic 4's `FR-4.n`. Where this spec and an issue differ, this spec wins.
@@ -27,6 +27,7 @@ Two things people ask for most after the relay arrived: sending files to the cha
 
 **Screen-sharing upgrade (#355)**
 - Share start dialog: Resolution (Auto, 720p, 1080p, 1440p), Frame rate (15, 30, 60), Optimize for (Balanced, Sharp text, Smooth motion), Codec (Automatic, AV1, VP9), Upload limit (Auto, 2, 5, 10, 20 Mbit/s), Sound, "Use these settings next time", live "Viewers get" line.
+- Share sound chosen automatically from the system picker on all three systems (#435): a whole screen shares the desktop sound, a window shares only that app's sound; Mumcord's own sound is always excluded. Linux needs PipeWire.
 - Quick "Quality" menu in the live share bar, applied without restarting the share.
 - AV1 encode and decode; encoder order AV1 hardware → AV1 software (SVT-AV1, self-test) → VP9 hardware (Intel Quick Sync) → VP9 software (libvpx); hardware probe with smoke test, cached; live load monitoring with automatic fallback; manual Automatic / AV1 / VP9 choice; active encoder shown in Settings and the share bar.
 - Codec negotiation with viewers (codec list in `Watch`, codec field in media frames, wire version 2); old viewers keep working on VP9.
@@ -54,7 +55,9 @@ Two things people ask for most after the relay arrived: sending files to the cha
 - Screen share resolution above 1440p ("Source up to 4K") – later (open point Q-SS3).
 - Viewer resolution choice (simulcast or spatial layers) – later; viewers see "Quality set by sharer".
 - A second VP9 encode for old viewers inside an AV1 share – later.
-- Share sound on Linux (PipeWire) – later. Windows and macOS keep today's share sound.
+- A separate sound picker on every share (desktop, one app or no sound) – not planned; the picker choice decides (#435, QA.1). The "Which app's sound?" list appears only on Linux when the app can't be matched (FR-7.82).
+- Including Mumcord's own sound in the share – never (QA.2).
+- Share sound on Linux without PipeWire (PulseAudio only, ALSA only) – not planned.
 - H.264 and VP8.
 - Per-channel media heights, custom snap presets, a separate default height for the camera room (revisit with the camera spec) – later.
 - Any change to the Mumble server.
@@ -128,7 +131,7 @@ The client only displays; access decisions on the relay are made by the bot (who
 
 ### 4.5 Screen sharing: start dialog and live quality
 
-- **FR-7.35** Pressing Share opens the **share start dialog** (mockup 01) before the system's window/screen picker, every time. Fields and defaults: Resolution **Auto** (720p, 1080p, 1440p), Frame rate **30** (15, 30, 60), Optimize for **Balanced** (Sharp text, Smooth motion), Codec **Automatic** (AV1, VP9), Upload limit **Auto** (2, 5, 10, 20 Mbit/s), Sound **on** (Windows and macOS only; hidden on Linux), "Use these settings next time" (stores them as the defaults of Settings → Screen sharing). Buttons **Start sharing** (default) and **Cancel**. The codec line names the encoder that would be used, e.g. "AV1 (graphics card)", "AV1 (software · higher CPU load)", "VP9 (graphics card)", "VP9".
+- **FR-7.35** Pressing Share opens the **share start dialog** (mockup 01) before the system's window/screen picker, every time. Fields and defaults: Resolution **Auto** (720p, 1080p, 1440p), Frame rate **30** (15, 30, 60), Optimize for **Balanced** (Sharp text, Smooth motion), Codec **Automatic** (AV1, VP9), Upload limit **Auto** (2, 5, 10, 20 Mbit/s), Sound **on** (shown on all systems; what it shares and when it is unavailable: FR-7.76 … FR-7.84), "Use these settings next time" (stores them as the defaults of Settings → Screen sharing). Buttons **Start sharing** (default) and **Cancel**. The codec line names the encoder that would be used, e.g. "AV1 (graphics card)", "AV1 (software · higher CPU load)", "VP9 (graphics card)", "VP9".
 - **FR-7.36** The **"Viewers get"** line updates live: "{resolution} · {fps} fps · {codec} · about {x} Mbit/s · {path}", where path is "sent once via relay, up to {n} viewers" (fan-out available, FR-7.40) or "one copy per viewer, up to 8".
 - **FR-7.37** Quality steps (target bitrates AV1 / VP9): 1440p60 ≈ 9 / 12 Mbit/s, 1440p30 ≈ 6 / 8, 1080p60 ≈ 6 / 8, 1080p30 ≈ 4 / 4, 720p30 ≈ 2 / 2, 720p15 ≈ 1.2 / 1.2, 480p15 ≈ 0.7 / 0.7. 60 fps adds a fourth temporal layer (60 → 30 → 15 → 7.5). Software AV1 is capped at 1080p30; a higher pick with software AV1 makes the dialog show "AV1 in software is limited to 1080p30 on this PC" and Automatic picks VP9 instead.
 - **FR-7.38** A manual resolution / frame rate is a **ceiling**: when the upload or the encoder can't keep up, the share steps down below it (as today) and the bar shows "Lowered to {step}: {reason}" (reasons: upload too slow, encoder too slow, many viewers). Auto = today's automatic behaviour with the new steps. Optimize for: **Sharp text** keeps resolution and drops fps first and turns on AV1 screen-content tools (palette, intra block copy); **Smooth motion** keeps fps and drops resolution first; **Balanced** alternates. Upload limit caps the total upload of the share.
@@ -190,6 +193,22 @@ The media area is the shared media frame above the chat that shows a screen-shar
 - **FR-7.73** Reduce motion: dragging is never animated. Snap, reset and collapse animate over 120 ms only when the system allows motion (`prefers-reduced-motion: no-preference`); otherwise they jump.
 - **FR-7.74** Camera room: uses the same frame and handle with the same Auto default; the camera grid fills the chosen height and re-arranges its tiles.
 
+### 4.10 Screen sharing: application and desktop audio (#435)
+
+- **FR-7.76** **The picker decides the sound.** When Sound is on, the share's sound follows what the user picked in the system picker: a **whole screen** (display) shares the **desktop sound** (everything the computer plays, minus Mumcord); **one window** shares **only the sound of the app that owns that window**; on macOS an **app** pick shares that app's sound. There is no separate sound picker in the normal case. The choice is made once at share start; picking a new source (the system's "change source" where it exists) re-applies this rule.
+- **FR-7.77** **Mumcord is always excluded.** Nothing Mumcord itself plays is ever part of the share sound: other people's voices, notification and sound-theme sounds, watch-party sound, plugin sounds and the share sound of shares the sharer is watching. The exclusion covers Mumcord's whole process tree, including its web view. It is not switchable, so viewers never hear an echo of themselves.
+- **FR-7.78** **The Sound switch stays** in the share start dialog (FR-7.35) and in Settings → Screen sharing (FR-7.60) as on/off on top of the automatic choice: on = share the sound chosen by FR-7.76, off = no share sound at all (no audio frames are sent). Default on; stored as `screen_sound` (§7.1). The switch is now shown on Linux too. Below the switch the dialog shows the info line "Whole screen: desktop sound without Mumcord. One window: only that app's sound."
+- **FR-7.79** **Windows** (Windows 10 version 2004 or newer): a window share captures the owning app's process tree with per-process loopback (include mode); a whole-screen share captures the whole system output with process loopback in exclude mode on Mumcord's own process tree. Both follow the default output device, including when it changes during the share.
+- **FR-7.80** **macOS** (macOS 13 or newer): the system screen capture delivers the sound of the chosen window, app or display with Mumcord's own process excluded. On macOS 13 (whole main screen only, as today) this means the desktop sound minus Mumcord. It uses the existing "Screen & System Audio Recording" permission; no new permission prompt.
+- **FR-7.81** **Linux, whole screen** (PipeWire, on Wayland and on X11): Mumcord records every audio playback stream of the desktop **except Mumcord's own streams** (matched by its process ids, never by name alone), mixed into the share sound. Streams that start during the share are added automatically; streams that end are dropped. Device monitors are not used, so Mumcord's own output never enters the mix.
+- **FR-7.82** **Linux, one window** (Wayland portal): the portal doesn't say which app owns the shared window. Mumcord matches it to a PipeWire playback app: the match is **clear** when exactly one running app (other than Mumcord) has an application name, binary name or desktop id that equals the window's app id or the app name the portal or compositor reports (case-insensitive). A clear match is used silently. In every other case (no hint, no match, several matches) Mumcord shows the **"Which app's sound?" list** (FR-7.83) right after the system picker. A chosen app is followed by process id and binary, so new streams of the same app during the share are included and other apps never are.
+- **FR-7.83** **"Which app's sound?" list** (Linux only, mockup needed, §5): a small dialog titled "Which app's sound?" listing the apps that currently have a PipeWire playback stream (app icon if available, app name; Mumcord itself is never listed), sorted by name, plus the entry **"No sound"**. Buttons **Share sound** (default, disabled until an entry is chosen) and **Cancel** (= no sound; the share continues). If no app plays sound yet, the list says "No app is playing sound right now" and refreshes live while open. The choice is not stored; it is asked again on the next window share without a clear match.
+- **FR-7.84** **Unavailable sound.** Below the minimum version, or on Linux without a running PipeWire, the share works without sound: the Sound switch is shown off and disabled, with the note "No sound: needs Windows 10 version 2004 or newer", "No sound: needs macOS 13 or newer" or "No sound: needs PipeWire" respectively. The stored `screen_sound` value is not changed. If audio capture fails at share start or during the share (device lost, permission revoked), the video share continues, the live bar's sound line shows "No sound" with the reason, and the error is logged without user data (FR-7.87).
+- **FR-7.85** **Sound line in the live share bar** (mockup needed, §5): shows what is shared: "Sound: desktop", "Sound: {app name}" or "No sound" (switch off, unavailable, or "No sound" chosen), with the reason as tooltip and accessible description. The app name comes only from local data and is shown only to the sharer.
+- **FR-7.86** **During the share:** if the shared app stops playing or quits, the share sound is silent (no frames or silence frames, as for the existing share sound) and resumes when that app plays again; the sharer's own voice is never part of the share sound (it travels as normal Mumble voice).
+- **FR-7.87** **Privacy.** Only the source chosen by FR-7.76 … FR-7.83 is captured; no other app's sound and no microphone. App names, window titles, process ids and binary names stay on the sharer's device: they are never sent to viewers, the relay or the server, never stored, and never logged. Logs contain only the mode (`desktop`, `app`, `none`) and a reason code at `info`.
+- **FR-7.88** **Transport unchanged.** The new sources feed the existing share-sound path: Opus encode, the same direct path and the encrypted audio frames of broadcasts (FR-7.43), and the viewers' own share volume. Viewers notice no difference between systems.
+
 ## 5. UI & UX
 
 > **The mockups are binding.** The UI must match the mockups in the issues: layout, texts, states, icons, spacing and both themes (dark and light).
@@ -198,6 +217,8 @@ The media area is the shared media frame above the chat that shows a screen-shar
 > - Resizable media area: issue #386, mockups 01–06 (default with handle, dragged small, dragged large, collapse hint, mini bar, keyboard focus; dark and light). Sources are in `docs/mockups/epic-4.1-resize/` on the branch `mockups/media-resize`.
 >
 > The malware mockups (2b, 10, 11, 14) are not part of this epic (#372). If a mockup and this text disagree, or a state has no mockup, ask before building; don't invent a different design. Verification compares screenshots of the running client with the mockups.
+>
+> **Mockups needed before building (#435, not yet designed):** (a) the "Which app's sound?" list (FR-7.83), including the empty state and the "No sound" entry; (b) the sound line in the share start dialog (FR-7.78, FR-7.84): switch, info line and the three "No sound: needs …" notes; (c) the sound line in the live share bar (FR-7.85). Dark and light theme each. Until they exist, these parts must not be built from guesswork.
 
 ```mermaid
 flowchart LR
@@ -257,6 +278,7 @@ Optimize for [ Balanced ▾ ]
 Codec        [ Automatic ▾ ]  AV1 (graphics card)
 Upload limit [ Auto ▾ ]
 [x] Share sound
+    Whole screen: desktop sound without Mumcord. One window: only that app's sound.
 Viewers get: 1080p · 30 fps · AV1 · about 4 Mbit/s · sent once via relay, up to 25 viewers
 [ ] Use these settings next time
                                [Cancel] [Start sharing]
@@ -289,7 +311,15 @@ Viewers get: 1080p · 30 fps · AV1 · about 4 Mbit/s · sent once via relay, up
 
 ### 6.1 Audio
 
-Share sound (Windows, macOS) is unchanged in capture and codec (Opus). In a broadcast it travels as encrypted audio frames next to the video (FR-7.43). Voice never uses the relay.
+Share sound is chosen from the system picker on all systems (FR-7.76 … FR-7.88); its codec stays Opus.
+
+| System | Whole screen | One window (or app on macOS) | Below the minimum |
+|---|---|---|---|
+| **Windows 10 version 2004 or newer** | Desktop sound: system loopback excluding Mumcord's process tree | Only that app's sound: per-process loopback of the owning app | Windows 10 1903 / 1909: no sound, note in the dialog |
+| **macOS 13 or newer** | Desktop sound minus Mumcord (system screen capture with audio) | Only that window's or app's sound, Mumcord excluded | macOS 12.3: no sound, note in the dialog |
+| **Linux with PipeWire (Wayland and X11)** | Every playback stream except Mumcord's own | Matched PipeWire app; "Which app's sound?" list when unclear (Wayland; X11 shares whole screens only) | No PipeWire: no sound, note in the dialog |
+
+Mumcord's own sound is never captured (FR-7.77). In a broadcast it travels as encrypted audio frames next to the video (FR-7.43). Voice never uses the relay.
 
 ### 6.2 Codecs and quality
 
@@ -527,16 +557,17 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 - **Frame encryption** with AES-128-GCM from `ring` (already used by rustls); key exchange with X25519 (`ring`) signed by the Mumble client certificate key (`rustls`/`rcgen` key types already present). SFrame-style framing per RFC 9605, own minimal implementation (no extra dependency).
 - **Module layout (client):** `mumcord-engine` `files/` (offer codec, sanitizing, risky types, share registry and queue, transfer, hash check, mark-of-the-web); `screen_share/encoder/` (probe, self-test, selection, monitor, one module per vendor API (`nvenc.rs`, `amf.rs`, `qsv.rs`, `vaapi.rs`), `svt.rs`, existing libvpx); `screen_share/broadcast.rs` (publisher/subscriber link, frame crypto, key exchange); `peer.rs` extended (uses, `bc`, broadcast messages). `mumcord-p2p`: `peer` message types extended, relay link gains the publisher/subscriber role. UI: `ui/src/features/files/` (tray chips, cards, dialogs), screen share dialog and settings tab; UI talks to the engine only through Tauri commands and events.
 - **mumpeer:** new module `broadcast` (sessions, per-subscriber queues with the `fanout.rs` policy, control forwarding), `uses` in `config` and `api`. **mumbot `peer`:** uses/bc pass-through, `use` on pairs, broadcast messages and admission checks.
+- **Share sound capture per system (#435):** Windows WASAPI process loopback (`ActivateAudioInterfaceAsync` with process-loopback parameters, include or exclude target process tree; Windows 10 version 2004 is the first release with it); macOS ScreenCaptureKit audio with "exclude current process audio" (macOS 13 is the first release with it); Linux PipeWire through the `pipewire` crate (libpipewire loaded at runtime, so no package dependency and no failure without PipeWire), linking capture to the matching playback stream nodes. New module `screen_share/sound/` in `mumcord-engine` with one file per system plus a pure, tested matcher for FR-7.82. Capture runs on its own thread and hands audio to the existing share-sound encoder through the existing lock-free queue; nothing new on the voice audio thread.
 - Threads: encoding on its existing dedicated thread; probes and self-tests on a background worker at low priority; file I/O and hashing on tokio blocking tasks. Nothing new on the audio thread.
 
 ## 9. Non-functional requirements
 
 - **Security:** file and media data only ever end-to-end encrypted (inner QUIC, or frame encryption in broadcasts); relay and bot can't read them. Every offer, `mumcord.file`, `mumcord.peer` and broadcast control message is untrusted: size-checked before parsing, fields validated. File names sanitized (FR-7.23); no path from the network ever reaches the file system unsanitized. Downloads never open automatically. Risky-type warning. Mark-of-the-web.
-- **Privacy:** no file names, checksums, sizes of specific files, user names or chat content in logs; only counts (transfers started/finished/failed, bytes) at `info`. The relay operator sees: who transfers to whom (certificate hashes), volume, timing, IP addresses, and the allowed-use of each session; not names or contents. PRIVACY.md gets a file-sharing section and the broadcast note.
+- **Privacy:** no file names, checksums, sizes of specific files, user names or chat content in logs; only counts (transfers started/finished/failed, bytes) at `info`. The relay operator sees: who transfers to whom (certificate hashes), volume, timing, IP addresses, and the allowed-use of each session; not names or contents. PRIVACY.md gets a file-sharing section and the broadcast note. Share sound (#435): only the chosen source is captured, Mumcord's own sound and the microphone never; app names, window titles and process ids never leave the device and are never logged (FR-7.87); PRIVACY.md gets a short "Screen-share sound" note.
 - **Performance:** hashing ≥ 300 MB/s on a modern CPU; a 2 GB file hash finishes in under 10 s; UI stays responsive during zip/hash. Hardware probe and self-test never block startup; probe ≤ 3 s, self-test ≤ 2 s per (resolution, fps). Software AV1 1080p30 ≤ 4 cores at 100 %; load monitoring prevents sustained overload. mumpeer: one broadcast of 25 viewers at 6 Mbit/s on a 2-vCPU VPS with < 50 % CPU.
 - **Battery:** on battery power Automatic skips software AV1 (FR-7.53).
 - **Accessibility:** section 5.
-- **Platforms:** Windows 10+, macOS 12+, Linux (all Mumcord targets). Hardware encoders as listed in FR-7.53; macOS has only software AV1 and software VP9.
+- **Platforms:** Windows 10+, macOS 12+, Linux (all Mumcord targets). Share sound: Windows 10 version 2004+, macOS 13+, Linux with PipeWire; below that a share has no sound and says why (FR-7.84). Hardware encoders as listed in FR-7.53; macOS has only software AV1 and software VP9.
 - **Logging:** encoder choice, probe and fallback reasons at `info` (no user data); relay logging rules of spec 04 apply to broadcasts (broadcast id, viewer count, bytes, end reason; never hashes in full, IPs or keys).
 
 ## 10. Build, packaging & release
@@ -547,6 +578,8 @@ In memory: Broadcast (`id`, publisher hash, token hashes, `max_viewers`, subscri
 - **mumbot:** release with the `peer` extensions; CHANGELOG.
 - **mumcord-p2p:** version bump on crates.io for the extended `mumcord.peer` types.
 - **Test hooks** (debug builds only, environment variables): force encoder probe results, add artificial encode delay, fake battery state. Never in release builds.
+- **README (#435):** the table "Screen sharing (Beta): what each system supports" changes its Sound column: Windows "Whole screen: desktop sound without Mumcord; one window: only that app's sound; Windows 10 version 2004 or newer"; macOS "Whole screen: desktop sound without Mumcord; window or app: only its sound; macOS 13 or newer"; Linux Wayland "With PipeWire: whole screen = desktop sound without Mumcord, window = that app's sound (asks when unclear); no sound without PipeWire"; Linux X11 "With PipeWire: desktop sound without Mumcord; no sound without PipeWire". The "No sound" lines for Linux go away. CHANGELOG entry under [Unreleased].
+- **E2E (Linux, #435):** the CI Linux E2E image runs a headless PipeWire with WirePlumber; test apps are `pw-play` instances with distinct sine tones and distinct `application.name`; a debug-only test hook selects the picker result (screen or window with a given app hint) and another reports the dominant frequencies of the share sound a viewer receives. Never in release builds.
 - Local test setup for all ACs: mumpeer `testenv/` (mumble-server, mumbot peer, mumpeer) plus Mumcord clients A, B, C with different identities; `netns.sh` from spec 04 where noted.
 
 ## 11. Acceptance criteria (verifiable in the running client)
@@ -623,6 +656,19 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 59. **AC-7.59** An official Mumble client and a 0.6.2 Mumcord client in the channel see only the plain line "📎 A shared a file …"; no error and no raw attribute text appears.
 60. **AC-7.60** Test CLI sends B a `data-mumcord-file` value that is not valid base64, a truncated Bovnar document, a document with a wrong field type and an oversized `mumcord.file` payload → B shows no card (or ignores the message), nothing crashes or hangs, and the log has one line per rejection without file names or payload content. The same offer as old JSON is also not shown (the offer is Bovnar only).
 
+**Application and desktop audio (#435)** (Linux ACs automated in the E2E setup of §10; Windows and macOS are **manual checks on real devices**)
+61. **AC-7.61** Linux with PipeWire: test apps P1 (440 Hz) and P2 (660 Hz) play; A's Mumcord plays a 1 kHz test notification and B talks → A shares a whole screen; B receives 440 Hz and 660 Hz in the share sound and never 1 kHz or B's own voice; the same through a relay broadcast (inspector shows encrypted audio frames as before).
+62. **AC-7.62** Linux window share where the hint matches P1 clearly → no list appears; B receives only 440 Hz. A third app P3 starting during the share is not heard; P1 opening a second stream is heard.
+63. **AC-7.63** Linux window share without a clear match → the "Which app's sound?" list appears, lists P1 and P2 but not Mumcord, and is keyboard operable; choosing P2 → B receives only 660 Hz; choosing "No sound" or Cancel → no share audio, video continues; live bar shows "Sound: {app}" or "No sound".
+64. **AC-7.64** Linux whole-screen share, then P3 starts and P1 stops → B hears P3 within 1 s and no longer P1; Mumcord's own sounds stay absent throughout.
+65. **AC-7.65** Sound switch off (dialog and, separately, Settings default) → no share audio frames are sent on any system; the setting is remembered across restarts.
+66. **AC-7.66** Linux without PipeWire (test container with PulseAudio only) → the Sound switch is off and disabled with "No sound: needs PipeWire"; the share works without sound; the stored setting is unchanged once PipeWire is back.
+67. **AC-7.67** Manual, Windows 10 version 2004+ and Windows 11: window share of a browser playing music → viewer hears only that browser, not a second player; whole-screen share → viewer hears both players but not Mumcord's voices, notifications or a running watch party; no echo of the viewer's voice; changing the default output device during the share keeps the sound.
+68. **AC-7.68** Manual, Windows 10 version 1909: Sound switch disabled with "No sound: needs Windows 10 version 2004 or newer"; share works.
+69. **AC-7.69** Manual, macOS 13 and 14+: window, app and screen shares each carry only the matching sound and never Mumcord's own; no new permission prompt beyond "Screen & System Audio Recording"; macOS 12.3: switch disabled with "No sound: needs macOS 13 or newer".
+70. **AC-7.70** Privacy: after AC-7.61 … AC-7.64 the client log (debug level too) contains no app names, window titles, binary names or process ids, only mode and reason; the packet inspector and the relay see no app name.
+71. **AC-7.71** Accessibility and looks: the sound line in the start dialog, the "Which app's sound?" list and the live bar's sound line match their mockups in dark and light, are keyboard operable with screen-reader labels (the reason is read for "No sound"), and show translated texts in one non-English locale.
+
 ## 12. Decision log
 
 | Question | Decision | Note |
@@ -646,7 +692,7 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Old viewer in AV1 share (#355 Q5) | Whole share switches to VP9 | MVP choice of #355 |
 | Viewer resolution (#355 Q6) | Later; frame-rate choice only | Recommendation of #355 |
 | Settings location (#355 Q7) | Own "Screen sharing" tab | Mockup 05 |
-| Linux share sound (#355 Q8) | Later | Issue table "Later" |
+| Linux share sound (#355 Q8) | Later; superseded by #435: in 0.7.0 | Issue table "Later"; see the #435 rows below |
 | Encoder library | Direct vendor APIs for hardware (NVENC, AMF, oneVPL/libvpl, VA-API), SVT-AV1 software, dav1d decode, libvpx VP9 | #355 §3 / §3b |
 | No FFmpeg | No FFmpeg; direct vendor encoder APIs | User decision 2026-11-03 |
 | Battery | On battery, Automatic skips software AV1 | #355 risks |
@@ -659,6 +705,11 @@ Setup for all unless stated otherwise: local mumble-server ≥ 1.4, local mumpee
 | Snap bypass (#386 Q6) | Hold Alt; keyboard users are not affected | User approval 2026-11-03; FR-7.64, FR-7.67 |
 | Camera room default height (#386 Q7) | Same Auto default now; revisit with the camera spec | User approval 2026-11-03; FR-7.74 |
 | Offer wire format (#400) | The file offer and `mumcord.file` use **Bovnar** via a thin Rust wrapper around the upstream C library (fork Mumcord/bovnar, branch `rust-binding`, pinned git dependency). Existing message channels (`mumcord.peer`, history sync, hello, poll/dice data and the like) stay JSON/binary, so 0.6.2 and mumbot keep working; one channel never mixes formats. | user, 2026-11-03; FR-7.75, §6.4. Base64 for the HTML attribute is an assumption of this spec |
+| Share sound source (#435, QA.1) | Automatic from the system picker: whole screen = desktop sound, window = that app's sound; no separate sound picker in the normal case | User decision 2026-11-04; FR-7.76 |
+| Mumcord's own sound (#435, QA.2) | Always excluded (voices, notifications, every Mumcord sound); not switchable | User decision 2026-11-04; FR-7.77 |
+| Systems (#435, QA.3) | All three in 0.7.0: macOS 13+ system capture with audio; Windows 10 version 2004+ per-process loopback, or system loopback excluding Mumcord for a whole screen; Linux with PipeWire, desktop minus Mumcord, window matched by app name/process with a "Which app's sound?" list when unclear; no PipeWire = no sound | User decision 2026-11-04; FR-7.79 … FR-7.84 |
+| Sound switch (#435, QA.4) | Stays as on/off on top of the automatic choice | User decision 2026-11-04; FR-7.78 |
+| Below the minimum version | No sound, Sound switch disabled with a note naming the needed version or PipeWire | Derived from QA.3; FR-7.84 |
 | Default save folder (mockup 8) | `<system Downloads>/Mumcord`, created on the first download; a user-chosen folder is used as-is | mockup 8 wins over the spec text (user decision 2); FR-7.25 |
 
 ## 13. Open points & risks
@@ -671,6 +722,8 @@ Open points (the recommended answer is already written into this spec):
 - **Q-SS3** 4K ("Source") later? Owner: user.
 - **Q-SS4** Start dialog on every share, or only on demand? Owner: user.
 - **Q-F3** Retention of finished file cards: kept with chat history (this spec). Owner: user.
+- **Q-SA1** "Which app's sound?" list: does it also offer "Whole desktop sound" as an entry? This spec says no (apps plus "No sound"), to keep a window share from leaking other apps' sound. Owner: user.
+- **Q-SA2** Linux window match: which hint the portal/compositor provides varies (GNOME, KDE, wlroots); if none provides any, the list appears on every window share. This spec accepts that. Owner: user.
 
 Risks:
 - **Relay bandwidth:** one 25-viewer share needs up to 150–225 Mbit/s out; small community VPS relays can carry few. Defaults stay conservative (`max_broadcasts = 4`, `total_mbit = 200`); the client handles "relay full" by falling back.
@@ -681,6 +734,8 @@ Risks:
 - **Build size and CI time:** SVT-AV1 + dav1d + the vendor SDK headers add 10–20 MB and new cached build steps per OS.
 - **Patents:** AV1/VP9 royalty-free under AOMedia/Google licences; a third-party pool (Sisvel) claims royalties, so far from hardware makers. H.264 left out.
 - **Large files over a 10 Mbit/s relay session:** 2 GB takes about 30 minutes; the sender must stay online and serves one transfer at a time, so queues can be long. Accepted for 4.1.
+- **Linux window sound matching (#435):** desktop portals don't reveal the window's app, so matching is a heuristic; apps that play through a helper process (e.g. browsers' audio service, Flatpak sandboxes) may not match and fall back to the list. Wrong matches are limited by requiring exactly one candidate.
+- **Windows exclusion of the web view:** Mumcord's web view runs in its own processes; they must be inside the excluded process tree, or a watch party would be shared. Covered by AC-7.67.
 - **Offer spoofing:** anyone can post a hand-made offer message; the card always shows the real Mumble sender, and the download is only accepted from that sender's session and checked against the hash.
 
 ## 14. Impact on the roadmap
@@ -689,7 +744,8 @@ Risks:
 - **Mumcord/mumpeer** gets a new minor release with broadcasts and `[uses]`; its README gains operator guidance on bandwidth.
 - **Mumcord/mumbot** module `peer` gains broadcast admission and uses pass-through.
 - **#355 table "Hardware VP9 encode: Later"** is pulled into 4.1 (Intel Quick Sync).
-- **Later epics:** files in private messages; malware check plugin (#372); viewer resolution choice (simulcast); 4K; Linux share sound; second VP9 encode for old viewers.
+- **Later epics:** files in private messages; malware check plugin (#372); viewer resolution choice (simulcast); 4K; second VP9 encode for old viewers. Linux share sound moved into 0.7.0 (#435).
+- **README** "Screen sharing (Beta): what each system supports": Sound column updated, the "No sound" lines for Linux removed (§10).
 - **Epic 4.1 camera spec** reuses the resizable media area (FR-7.74) and must not add its own handle.
 - New hello features `files` and `screen-broadcast` count toward the hello limit of 16 features (spec 06).
 
@@ -700,4 +756,5 @@ Risks:
 | Step 0 | — | — | `mumcord-p2p`: extended `mumcord.peer` types (`u`, `bc`, `use`, broadcast messages); publish |
 | Step 1 (parallel) | `[uses]` config, `/v1/status` fields, `use` on pairs | uses/bc pass-through, `use` on pairs | File sharing end to end (offer, cards, settings, queue, transfer through the relay, hash, sanitizing, MOTW); allowed-uses handling (FR-7.7) |
 | Step 2 (parallel) | Broadcast API, publisher/subscriber binding, per-subscriber queues, control forwarding, `bcast-sim`, live tests | Broadcast admission messages and checks | Share start dialog, Quality menu, Settings tab; encoder probe, self-test, SVT-AV1/dav1d/vendor-SDK builds, selection and load monitoring; codec negotiation (wire v2) |
+| Step 2b (parallel) | — | — | Share sound sources (#435): Windows process loopback, macOS capture audio, Linux PipeWire capture and matcher, "Which app's sound?" list, dialog and live-bar sound lines (after the mockups); E2E AC-7.61 … AC-7.66, AC-7.70, AC-7.71; README, PRIVACY.md, CHANGELOG |
 | Step 3 | Release + README | Release | Broadcast publisher/subscriber, frame encryption, key exchange, fallback logic, viewer list; E2E along AC-7.1 … AC-7.43; PRIVACY.md, licences, 24 locales |
