@@ -9,7 +9,9 @@
   var host = parent;
   // Taken before the page's code runs, which may replace prototype methods and getters later.
   var uncurry = Function.prototype.bind.bind(Function.prototype.call);
-  var messageSource = uncurry(Object.getOwnPropertyDescriptor(MessageEvent.prototype, "source").get);
+  var messageSource = uncurry(
+    Object.getOwnPropertyDescriptor(MessageEvent.prototype, "source").get,
+  );
   var messageData = uncurry(Object.getOwnPropertyDescriptor(MessageEvent.prototype, "data").get);
   var stopEvent = uncurry(Event.prototype.stopImmediatePropagation);
   var dateNow = Date.now;
@@ -17,11 +19,8 @@
   // Backup for the WebRTC browser flag on Windows (a WebRTC peer connection can leak the user's
   // IP addresses past the frame proxy): the page never sees the WebRTC constructors.
   ["RTCPeerConnection", "webkitRTCPeerConnection", "RTCDataChannel"].forEach(function (name) {
-    try {
-      delete window[name];
-    } catch (e) {
-      // A non-configurable property cannot be removed; the browser flag still applies.
-    }
+    // Returns false instead of throwing for a non-configurable property; the browser flag still applies then.
+    Reflect.deleteProperty(window, name);
   });
 
   function post(kind) {

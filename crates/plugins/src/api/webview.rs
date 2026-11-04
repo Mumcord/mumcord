@@ -847,7 +847,7 @@ mod tests {
         ] {
             assert!(BOOTSTRAP.contains(name), "{name} must be deleted");
         }
-        assert!(BOOTSTRAP.contains("delete window[name]"));
+        assert!(BOOTSTRAP.contains("Reflect.deleteProperty(window, name)"));
         // It is inlined into a <script> element, which this would end early.
         assert!(!BOOTSTRAP.contains("</"));
     }
