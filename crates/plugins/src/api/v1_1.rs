@@ -5,7 +5,7 @@
 //! with [`Up`] (1.0 to 1.1, always possible) or [`Down`] (1.1 to 1.0, `None` for a case 1.1
 //! added, such as the `stage` slot). The conversions are generated from the 1.0 WIT with the
 //! `record!` and `variant!` macros below; bindgen's `with` cannot share plain types between
-//! packages. The new 1.1 calls answer `not-permitted` until their feature tasks implement them.
+//! packages.
 //!
 //! Events are queued as 1.1 events (the superset): a 1.1 plugin gets them as they are, a 1.0
 //! plugin gets them converted back and never sees a 1.1-only event (FR-9.8).
@@ -813,11 +813,20 @@ fn relay_result(result: Result<(), crate::api::relay::SendError>) -> Result<(), 
 }
 
 impl wit::audio::Host for PluginState {
-    fn play(&mut self, _sound: String, _gain: Option<f32>) -> Result<(), Error> {
-        Err(Error::NotPermitted)
+    fn play(&mut self, sound: String, gain: Option<f32>) -> Result<(), Error> {
+        self.ctx
+            .grants
+            .check(&self.id, crate::api::audio::PERMISSION)
+            .map_err(Up::up)?;
+        self.ctx
+            .audio
+            .play(&self.id, &sound, gain, std::time::Instant::now())
     }
 
-    fn stop_all(&mut self) {}
+    fn stop_all(&mut self) {
+        // Without the permission nothing of this plugin plays.
+        self.ctx.audio.stop_all(&self.id);
+    }
 }
 
 impl wit::files::Host for PluginState {

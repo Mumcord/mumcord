@@ -155,6 +155,8 @@ pub struct HostContext {
     pub files: Files,
     /// Carries out `ui`, `peers` and `chat` calls; `None` refuses them with `not-permitted`.
     pub io: Option<Arc<dyn PluginIo>>,
+    /// `audio` (1.1): declared sounds per plugin and the player.
+    pub audio: api::audio::Audio,
 }
 
 /// One wasmtime engine for all plugins plus the thread that ticks the CPU clock.

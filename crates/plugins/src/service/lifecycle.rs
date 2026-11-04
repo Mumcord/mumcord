@@ -309,6 +309,7 @@ impl PluginService {
     pub(super) fn stop(&mut self, id: &str) {
         // Failures while stopping are logged by the host; the plugin is off either way.
         let _ = self.host.disable(id);
+        self.ctx.audio.stop_all(id);
     }
 
     /// Stops and forgets a plugin in the runtime and the permission gate.
@@ -327,6 +328,7 @@ impl PluginService {
         self.ctx.grants.forget(id);
         self.ctx.notify.forget(id);
         self.ctx.http.forget(id);
+        self.ctx.audio.forget(id);
         self.io.forget(id);
     }
 
@@ -345,6 +347,8 @@ impl PluginService {
         dir: &Path,
         granted: &[String],
     ) {
+        // Every place that roots a package's web content roots its declared sounds too.
+        self.ctx.audio.set_sounds(id, dir, self.host.manifest(id));
         let places = self
             .host
             .manifest(id)
