@@ -1557,7 +1557,7 @@ fn image_grants_end_when_sharing_or_offering_stops() {
     assert_eq!(holder.core.image_for(&holder.env, 2, &hash, now), None);
     holder.env.sharing = true;
     assert!(holder.core.image_for(&holder.env, 2, &hash, now).is_some());
-    let later = now + 11 * 60 * 1000;
+    let later = now + 61 * 60 * 1000;
     assert_eq!(
         holder.core.image_for(&holder.env, 2, &hash, later),
         None,

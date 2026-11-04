@@ -75,8 +75,9 @@ const PEER_BURST: f64 = 6.0;
 /// (4 per second, burst 15).
 const SEND_RATE: f64 = 3.0;
 const SEND_BURST: f64 = 10.0;
-/// How long a requester may fetch the images of an answer after it was sent or last used.
-const GRANT_TTL_MS: i64 = 10 * 60 * 1000;
+/// How long a requester may fetch the images of an answer after it was sent or last used;
+/// requesters space their fetches to the full-image rate limit, so many images take a while.
+const GRANT_TTL_MS: i64 = 60 * 60 * 1000;
 /// Most image bytes held for answers at the same time; further images stay inline.
 const MAX_GRANT_BYTES: usize = 32 * 1024 * 1024;
 

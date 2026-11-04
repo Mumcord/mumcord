@@ -441,6 +441,7 @@ mod tests {
                 "chat-request",
                 "files",
                 "full-image",
+                "histimg",
                 "now-gaming",
                 "now-playing",
                 "p2p",

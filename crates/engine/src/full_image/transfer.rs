@@ -21,8 +21,8 @@ use super::wire::{CHUNK_LEN, FullRef, Msg};
 use crate::session::lock;
 
 /// Requests served per requester within [`REQUEST_WINDOW`]; more are ignored unanswered.
-const MAX_REQUESTS: usize = 6;
-const REQUEST_WINDOW: Duration = Duration::from_secs(60);
+pub(crate) const MAX_REQUESTS: usize = 6;
+pub(crate) const REQUEST_WINDOW: Duration = Duration::from_secs(60);
 /// Requests waiting behind the running transfer; more are answered "unavailable".
 const MAX_QUEUE: usize = 4;
 /// Transfers this client receives at the same time.
