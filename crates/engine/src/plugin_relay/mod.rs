@@ -1,11 +1,13 @@
 //! Plugin data through the server's relay (spec 09 §4.9, FR-9.57 … FR-9.63), engine side:
 //! whether the relay can carry plugin data, and the 1:1 transport over a relay pair session
-//! with use `plg` ([`pair`]). Channel broadcasts follow in their own module.
+//! with use `plg` ([`pair`]), and channel sends through one relay broadcast per sender
+//! ([`broadcast`]).
 //!
 //! The plugin service decides what may be sent (permission, reach, size, the plugin's rate,
 //! the Mumble fallback) and hands each 1:1 message here. Payloads are opaque bytes: never
 //! parsed or logged (FR-9.94).
 
+mod broadcast;
 mod envelope;
 mod pair;
 mod rate;
@@ -53,6 +55,7 @@ pub(crate) struct PluginRelay {
     /// The user switched relay plugin data off (FR-9.63).
     off: AtomicBool,
     state: Mutex<State>,
+    broadcasts: Mutex<broadcast::Broadcasts>,
 }
 
 #[derive(Debug, Default)]
@@ -168,6 +171,8 @@ impl Engine {
             // sequences keep counting: receivers remember the last one they delivered.
             state.queues.clear();
             state.order = Order::default();
+            drop(state);
+            self.end_plugin_broadcasts(None);
         }
     }
 

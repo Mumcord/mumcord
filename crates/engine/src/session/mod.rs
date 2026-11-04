@@ -2715,6 +2715,9 @@ impl Inner {
                         user.session,
                     );
                 }
+                if change.moved_from.is_some() {
+                    self.direct.moved(ctx, user.session, own);
+                }
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
                     self.on_own_channel(ctx, user.channel_id);

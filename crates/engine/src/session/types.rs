@@ -594,6 +594,12 @@ pub enum EngineEvent {
         api: (u8, u8),
         data: crate::plugin_relay::Opaque,
     },
+    /// The receivers in the own plugin-data broadcast changed (spec 09 FR-9.59, FR-9.61): the
+    /// plugin service sends fallback-sized channel messages through Mumble plugin data to the
+    /// members that are not in `joined`.
+    PluginRelayJoined {
+        joined: Vec<u32>,
+    },
     /// A P2P connection to `session` opened (`Some`, with how it travels) or closed (`None`)
     /// (FR-4.19).
     P2pLinkChanged {

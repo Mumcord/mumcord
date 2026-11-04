@@ -469,11 +469,31 @@ impl Direct {
         }
         state.offers.remove(&key);
         state.attempts.remove(&key);
+        drop(state);
+        if let Some(engine) = self.engine() {
+            engine.plugin_relay_left(server_id, session);
+        }
     }
 
     /// The connection to `server_id` (re)synced or ended: sessions are no longer valid.
     pub(crate) fn reset(&self, server_id: ServerId) {
         self.close_where(|(id, _)| *id == server_id);
+        if let Some(engine) = self.engine() {
+            engine.plugin_relay_reset(server_id);
+        }
+    }
+
+    /// `session` moved to another channel (`own`: the user did): plugin-data broadcasts
+    /// follow the user's channel (FR-9.58).
+    pub(crate) fn moved(&self, ctx: &crate::session::SessionCtx, session: u32, own: bool) {
+        let Some(engine) = self.engine() else {
+            return;
+        };
+        if own {
+            engine.plugin_relay_reset(ctx.server_id);
+        } else {
+            engine.plugin_relay_moved(ctx, session);
+        }
     }
 
     fn close_where(&self, mut matches: impl FnMut(&Key) -> bool) {
