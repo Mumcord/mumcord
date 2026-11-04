@@ -216,8 +216,11 @@ impl From<peer::RelayUse> for RelayUse {
     fn from(u: peer::RelayUse) -> Self {
         match u {
             peer::RelayUse::Images => Self::Images,
-            // Plugin data has no UI variant until the plugin host lands (spec 09, R3a).
-            peer::RelayUse::Files | peer::RelayUse::PluginData => Self::Files,
+            // Plugin data has no UI variant until the plugin host lands (spec 09, R3a); cameras
+            // get theirs with the availability task (spec 08, C-7).
+            peer::RelayUse::Files | peer::RelayUse::PluginData | peer::RelayUse::Camera => {
+                Self::Files
+            }
             peer::RelayUse::ScreenShare => Self::ScreenShare,
         }
     }
