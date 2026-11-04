@@ -91,6 +91,12 @@ pub trait SoundSource: Send {
     /// silent. Called on the share's sound thread, never on the audio thread; the source paces
     /// the frames, at the rate the OS delivers them.
     fn next_frame(&mut self, frame: &mut Frame, timeout: Duration) -> bool;
+
+    /// The capture broke for good during the share (device lost, permission revoked, a format
+    /// it cannot send): no more sound comes, and the share says why (FR-7.84).
+    fn failed(&self) -> bool {
+        false
+    }
 }
 
 /// A steady sine for tests: what the viewer hears has to match its level.

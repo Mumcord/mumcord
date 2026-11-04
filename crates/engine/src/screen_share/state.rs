@@ -11,7 +11,7 @@ use super::broadcast::Fanout;
 use super::encoder::ActiveEncoder;
 use super::media::{Media, ViewerLink};
 use super::signal::{CodecName, MAX_VIEWERS};
-use super::sound::SoundStatus;
+use super::sound::{SoundStatus, SoundUnavailable};
 use super::watch::WatchLink;
 use super::{ScreenShareView, ShareKind, WatchBlock};
 
@@ -102,6 +102,16 @@ impl OwnShare {
             reannounce: BTreeMap::new(),
             fanout: None,
         }
+    }
+
+    /// The sound capture broke during the share (FR-7.84): no sound from now on, with the
+    /// reason for the live bar; the stored `screen_sound` stays as it is.
+    pub fn sound_failed(&mut self) {
+        self.sound = false;
+        self.sound_status = SoundStatus {
+            unavailable: Some(SoundUnavailable::CaptureFailed),
+            ..SoundStatus::default()
+        };
     }
 
     /// `newcomer` was just told about the share; they hear of it again after [`REANNOUNCE`].
@@ -423,7 +433,7 @@ fn elapsed(then: Instant, now: Instant) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::screen_share::sound::{AppName, ShareSoundMode, SoundUnavailable};
+    use crate::screen_share::sound::{AppName, ShareSoundMode};
 
     const NEW: ViewerCaps = ViewerCaps {
         av1: true,
@@ -529,6 +539,33 @@ mod tests {
 
         shares.own = Some(OwnShare::new(false, app));
         assert!(!shares.views(1)[0].sound, "switched off");
+    }
+
+    #[test]
+    fn a_broken_sound_capture_turns_the_sound_off_with_its_reason() {
+        let mut own = OwnShare::new(
+            true,
+            SoundStatus {
+                mode: ShareSoundMode::App,
+                app: Some(AppName::new("Player")),
+                unavailable: None,
+            },
+        );
+        own.sound_failed();
+        assert!(!own.sound);
+        assert_eq!(own.sound_status.mode, ShareSoundMode::None);
+        assert_eq!(
+            own.sound_status.app, None,
+            "the app name is gone with the sound"
+        );
+        assert_eq!(
+            own.sound_status.unavailable,
+            Some(SoundUnavailable::CaptureFailed)
+        );
+        assert!(
+            !own.sound_status.available(),
+            "the switch cannot turn it back on"
+        );
     }
 
     #[test]
