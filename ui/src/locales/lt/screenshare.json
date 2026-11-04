@@ -157,7 +157,17 @@
     "switched": "Switched to {{codec}} to reduce load",
     "switchedFor": "Switched to {{codec}} for {{name}}",
     "undo": "Undo",
-    "details": "Details"
+    "details": "Details",
+    "undoFailed": "Undo didn't work. Your share keeps running with {{codec}}.",
+    "detailsTitle": "Why your share switched encoders",
+    "detailsEncoder": "Encoder",
+    "detailsFromTo": "{{from}} → {{to}}",
+    "detailsEncodeTime": "Encode time per frame",
+    "detailsBudget": "Time available per frame",
+    "detailsDropped": "Dropped frames",
+    "detailsMs": "{{ms}} ms",
+    "detailsUnknown": "Not measured",
+    "close": "Close"
   },
   "settings": {
     "title": "Screen sharing",

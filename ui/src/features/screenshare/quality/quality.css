@@ -1,0 +1,146 @@
+/* The badges in the sharer's live bar (FR-7.39, mockups 02, 06, 07). */
+.share-badges {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  margin-left: var(--space-1);
+  vertical-align: middle;
+}
+
+.share-badge {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+}
+
+.share-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.share-badge[data-tone="accent"] {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.share-badge[data-tone="ok"] {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.share-badge[data-tone="warn"] {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+/* The Quality menu under its button (mockup 02). */
+.share-quality {
+  position: relative;
+  display: inline-flex;
+}
+
+.share-quality__popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  width: 17rem;
+  max-width: calc(100vw - 2 * var(--space-4));
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-raised);
+}
+
+.share-quality__menu,
+.share-quality__menu [role="group"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.share-quality__title {
+  margin: var(--space-1) var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.share-quality__item {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-1) var(--space-2) var(--space-1) 1.75rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.share-quality__item:hover {
+  background: var(--color-bg-hover);
+}
+
+.share-quality__item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.share-quality__item[aria-checked="true"] {
+  padding-left: var(--space-2);
+  background: var(--color-bg-selected);
+  font-weight: var(--font-weight-bold);
+}
+
+.share-quality__item svg {
+  flex: none;
+  color: var(--color-accent-text);
+}
+
+.share-quality__hint {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+.share-quality__separator {
+  margin: var(--space-1) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.share-quality__note {
+  margin: var(--space-2) var(--space-2) var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (forced-colors: active) {
+  .share-badge,
+  .share-badge[data-tone] {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+
+  .share-quality__item[aria-checked="true"] {
+    outline: 1px solid Highlight;
+  }
+
+  .share-quality__item svg {
+    color: CanvasText;
+  }
+}
