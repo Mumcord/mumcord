@@ -34,6 +34,20 @@
   object-fit: cover;
 }
 
+/*
+ * Tile for plugins without an icon image (mockup 06): a gradient from the plugin's own hue. The
+ * fixed lightness keeps white initials above 4.5:1 contrast for every hue, in light and dark.
+ */
+.appmenu__icon--tile {
+  background: oklch(0.5 0.16 var(--appmenu-hue, 250));
+  background: linear-gradient(
+    135deg,
+    oklch(0.5 0.16 var(--appmenu-hue, 250)),
+    oklch(0.5 0.16 calc(var(--appmenu-hue, 250) + 60))
+  );
+  color: #fff;
+}
+
 .appmenu__text {
   display: flex;
   flex-direction: column;
@@ -57,7 +71,8 @@
     color: GrayText;
   }
 
-  .appmenu__icon {
+  .appmenu__icon,
+  .appmenu__icon--tile {
     border: 1px solid CanvasText;
     background: Canvas;
     color: CanvasText;

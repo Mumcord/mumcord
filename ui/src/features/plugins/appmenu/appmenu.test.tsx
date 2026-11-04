@@ -40,6 +40,19 @@ function Menu({ onChosen = () => undefined }: { onChosen?: () => void }) {
 }
 
 describe("PluginMenuItems", () => {
+  it("gives icon-less plugins a stable, plugin-specific tile colour", async () => {
+    api.appMenu = () =>
+      Promise.resolve([entry("brawl", "a"), entry("brawl", "b"), entry("dice", "roll")]);
+    const { container } = render(<Menu />);
+    await screen.findByRole("menuitem", { name: /dice roll/ });
+    const hues = Array.from(container.querySelectorAll<HTMLElement>(".appmenu__icon--tile")).map(
+      (tile) => tile.style.getPropertyValue("--appmenu-hue"),
+    );
+    expect(hues).toHaveLength(3);
+    expect(hues[0]).toBe(hues[1]);
+    expect(hues[0]).not.toBe(hues[2]);
+  });
+
   it("renders nothing without items", async () => {
     api.appMenu = () => Promise.resolve([]);
     render(<Menu />);

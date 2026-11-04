@@ -42,9 +42,9 @@ describe("sharer control bar (#163)", () => {
     expect(await $("//span[contains(@class,'live-badge')]").isExisting()).toBe(false);
     await $("button.chat-apps__button").click();
     const entry = await $(
-      "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+      "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]",
     );
-    await entry.waitForExist({ timeout: 20_000, timeoutMsg: "the Apps menu has no Share screen entry" });
+    await entry.waitForExist({ timeout: 20_000, timeoutMsg: "the Apps menu has no Share your screen entry" });
     await browser.keys("Escape");
   });
 

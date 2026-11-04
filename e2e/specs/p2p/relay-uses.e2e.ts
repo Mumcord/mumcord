@@ -86,7 +86,7 @@ async function expectShareReason(expected: string | null): Promise<void> {
   await button.waitForClickable({ timeout: 20_000 });
   await button.click();
   const item = $(
-    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]",
+    "//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]",
   );
   await item.waitForDisplayed();
   const read = async (): Promise<string | null> => {

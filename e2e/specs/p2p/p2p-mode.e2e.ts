@@ -132,7 +132,7 @@ async function shareReason(expected: string | null): Promise<void> {
   const apps = $("button.chat-apps__button");
   await apps.waitForClickable({ timeout: 20_000 });
   await apps.click();
-  const item = $("//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share screen')]");
+  const item = $("//div[contains(@class,'chat-apps__menu')]//*[@role='menuitem'][starts-with(normalize-space(),'Share your screen')]");
   await item.waitForDisplayed();
   const read = async () => {
     const reason = item.$(".chat-apps__reason");
