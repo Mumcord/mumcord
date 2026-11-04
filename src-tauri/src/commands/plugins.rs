@@ -441,6 +441,12 @@ pub enum PluginUiInput {
         place: PluginWebviewPlace,
         text: String,
     },
+    /// A genuine click or key press inside the plugin's page in `place` (FR-9.45), reported by
+    /// the page's bootstrap with the frame's key, which the UI checked. Counts as a user gesture
+    /// for the plugin; dropped when that frame is not open or the reports come too fast.
+    WebviewGesture {
+        place: PluginWebviewPlace,
+    },
     /// The user closed the plugin's frame in `place` (its close button).
     SurfaceClosed {
         place: PluginWebviewPlace,
@@ -1680,6 +1686,7 @@ pub async fn plugin_ui_event(app: AppHandle, id: String, input: PluginUiInput) -
             place: place.into(),
             text,
         },
+        PluginUiInput::WebviewGesture { place } => UiInput::WebviewGesture(place.into()),
         PluginUiInput::SurfaceClosed { place } => {
             plugins
                 .trees()

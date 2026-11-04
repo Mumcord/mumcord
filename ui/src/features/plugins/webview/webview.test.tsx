@@ -2,7 +2,14 @@ import { act, fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { PluginUi, PluginWebviewPlace } from "../../../api";
 import { applyChange, type PluginUiState } from "../render/pluginUiStore";
-import { createBridge, fitsBridge, MAX_MESSAGE_BYTES, rateLimiter } from "./bridge";
+import {
+  createBridge,
+  fitsBridge,
+  isGestureReport,
+  MAX_MESSAGE_BYTES,
+  newGestureKey,
+  rateLimiter,
+} from "./bridge";
 import { PluginWebView } from "./PluginWebView";
 
 const sendEvent = vi.fn(() => Promise.resolve(null));
@@ -57,7 +64,13 @@ describe("bridge limits", () => {
     const frame = { postMessage } as unknown as Window;
     const toPlugin = vi.fn();
     const onEscape = vi.fn();
-    const bridge = createBridge({ frame: () => frame, toPlugin, onEscape });
+    const bridge = createBridge({
+      frame: () => frame,
+      toPlugin,
+      onEscape,
+      gestureKey: "k",
+      onGesture: vi.fn(),
+    });
     bridge.receive(new MessageEvent("message", { data: "hi", source: window }));
     bridge.receive(new MessageEvent("message", { data: "hi", source: frame }));
     bridge.receive(new MessageEvent("message", { data: { other: 1 }, source: frame }));
@@ -70,8 +83,36 @@ describe("bridge limits", () => {
     expect(postMessage).not.toHaveBeenCalled();
     bridge.loaded();
     bridge.post("late");
-    expect(postMessage).toHaveBeenNthCalledWith(1, "early", "*");
-    expect(postMessage).toHaveBeenNthCalledWith(2, "late", "*");
+    expect(postMessage).toHaveBeenNthCalledWith(1, { mumcordWebview: "key", key: "k" }, "*");
+    expect(postMessage).toHaveBeenNthCalledWith(2, "early", "*");
+    expect(postMessage).toHaveBeenNthCalledWith(3, "late", "*");
+  });
+
+  it("counts only gesture reports that carry the frame's key", () => {
+    const frame = { postMessage: vi.fn() } as unknown as Window;
+    const toPlugin = vi.fn();
+    const onGesture = vi.fn();
+    const key = newGestureKey();
+    expect(key).toMatch(/^[0-9a-f]{32}$/);
+    expect(newGestureKey()).not.toBe(key);
+    const bridge = createBridge({
+      frame: () => frame,
+      toPlugin,
+      onEscape: vi.fn(),
+      gestureKey: key,
+      onGesture,
+    });
+    const report = (data: unknown, source: Window = frame) => {
+      bridge.receive(new MessageEvent("message", { data, source }));
+    };
+    report({ mumcordWebview: "gesture" });
+    report({ mumcordWebview: "gesture", key: "guess" });
+    report({ mumcordWebview: "gesture", key }, window);
+    expect(onGesture).not.toHaveBeenCalled();
+    expect(toPlugin).not.toHaveBeenCalled();
+    report({ mumcordWebview: "gesture", key });
+    expect(onGesture).toHaveBeenCalledTimes(1);
+    expect(isGestureReport({ mumcordWebview: "escape", key }, key)).toBe(false);
   });
 });
 
@@ -141,8 +182,38 @@ describe("PluginWebView", () => {
       post("snacks", "stage only", ["stage"]);
       post("snacks", "go", ["stage", "panelPopover"]);
     });
-    expect(post).toHaveBeenCalledTimes(1);
-    expect(post).toHaveBeenCalledWith("go", "*");
+    const strings = post.mock.calls.filter(([message]) => typeof message === "string");
+    expect(strings).toEqual([["go", "*"]]);
+  });
+
+  it("hands the page its key once and reports keyed gestures for its place", () => {
+    sendEvent.mockClear();
+    const { container, rerender } = render(
+      <PluginWebView plugin="snacks" webview={view} title="Snacks" />,
+    );
+    const frame = frameOf(container);
+    const page = pageOf(container);
+    const post = vi.spyOn(page, "postMessage");
+    fireEvent.load(frame);
+    rerender(<PluginWebView plugin="snacks" webview={view} title="Snacks!" />);
+    const keys = post.mock.calls.map(([message]) => message as { key?: string });
+    expect(keys).toHaveLength(1);
+    const key = keys[0]?.key;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent("message", { data: { mumcordWebview: "gesture" }, source: page }),
+      );
+    });
+    expect(sendEvent).not.toHaveBeenCalled();
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent("message", { data: { mumcordWebview: "gesture", key }, source: page }),
+      );
+    });
+    expect(sendEvent).toHaveBeenCalledWith("snacks", {
+      type: "webviewGesture",
+      place: "panelPopover",
+    });
   });
 
   it("moves focus out of the frame on the page's Escape signal", () => {
