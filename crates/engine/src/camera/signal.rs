@@ -236,18 +236,10 @@ pub fn receive(
 
 /// State of the camera channel for all servers: the join limits.
 #[derive(Default)]
-#[expect(
-    dead_code,
-    reason = "the camera session (C-5, C-7) is the first caller"
-)]
 pub(crate) struct CameraSignals {
     limits: Mutex<HashMap<crate::ServerId, JoinLimiter>>,
 }
 
-#[expect(
-    dead_code,
-    reason = "the camera session (C-5, C-7) is the first caller"
-)]
 impl CameraSignals {
     /// `mumcord.camera` data arrived (session task). Returns the event for the camera session;
     /// anything refused is logged with its reason code and dropped. Data from blocked people
@@ -297,10 +289,6 @@ impl CameraSignals {
 
 /// The sessions in the own channel that announced [`FEATURE`], without the own session. Callers
 /// drop blocked people (FR-8.59) before sending `cam-join`; `on` and `off` go to everyone here.
-#[expect(
-    dead_code,
-    reason = "the camera session (C-5, C-7) is the first caller"
-)]
 pub(crate) fn channel_peers(ctx: &SessionCtx, peers: &ServerPeers) -> Vec<u32> {
     let in_channel: Vec<u32> = ctx.handle.with_state(|s| {
         let Some(own) = s.session else {
@@ -331,10 +319,6 @@ pub(crate) fn channel_peers(ctx: &SessionCtx, peers: &ServerPeers) -> Vec<u32> {
 
 /// Sends `message` to `receivers`. Returns false if nothing was sent: no receivers, an invalid
 /// message or a failed send (logged by reason only).
-#[expect(
-    dead_code,
-    reason = "the camera session (C-5, C-7) is the first caller"
-)]
 pub(crate) fn send(ctx: &SessionCtx, receivers: &[u32], message: &CameraMessage) -> bool {
     if receivers.is_empty() {
         return false;
@@ -354,10 +338,6 @@ pub(crate) fn send(ctx: &SessionCtx, receivers: &[u32], message: &CameraMessage)
 
 /// Answers a newcomer in the channel with the own `on` (FR-2.75: the sender answers). Does
 /// nothing unless the newcomer is in the own channel and announced [`FEATURE`].
-#[expect(
-    dead_code,
-    reason = "the camera session (C-5, C-7) is the first caller"
-)]
 pub(crate) fn announce_to_newcomer(
     ctx: &SessionCtx,
     peers: &ServerPeers,

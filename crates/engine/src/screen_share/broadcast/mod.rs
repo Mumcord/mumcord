@@ -156,7 +156,7 @@ fn relay_reason(e: &P2pError) -> RelayUnavailable {
     }
 }
 
-fn cert_key(identity: &mumcord_store::Identity) -> Option<CertKey> {
+pub(crate) fn cert_key(identity: &mumcord_store::Identity) -> Option<CertKey> {
     CertKey::new(identity.cert_der().to_vec(), identity.key_pkcs8_der())
         .inspect_err(|e| tracing::warn!(error = %e, "certificate not usable for a broadcast"))
         .ok()
@@ -227,7 +227,9 @@ impl Engine {
             .ok_or(FanoutUnavailable::NoCertificate)?;
         let me = cert_key(&identity).ok_or(FanoutUnavailable::NoCertificate)?;
         self.with_fanout(server_id, token, |fanout| *fanout = Some(Fanout::Starting));
-        let (ann, id, relay_token) = self.relay_broadcast_request(server_id, limit).await?;
+        let (ann, id, relay_token) = self
+            .relay_broadcast_request(server_id, limit, RelayUse::ScreenShare)
+            .await?;
         let link = p2p
             .broadcast(&ann, &relay_token, BindRole::Publisher)
             .await
@@ -403,7 +405,10 @@ impl Engine {
     pub(super) fn admit_to_broadcast(&self, server_id: ServerId, id: BroadcastId, viewer: u32) {
         let engine = self.clone();
         self.runtime().spawn(async move {
-            let Err(reason) = engine.relay_broadcast_admit(server_id, id, viewer).await else {
+            let Err(reason) = engine
+                .relay_broadcast_admit(server_id, id, viewer, RelayUse::ScreenShare)
+                .await
+            else {
                 return;
             };
             tracing::info!(?reason, "viewer not admitted to the broadcast");

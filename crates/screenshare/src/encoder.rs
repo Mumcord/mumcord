@@ -55,7 +55,18 @@ pub struct Encoder {
 unsafe impl Send for Encoder {}
 
 impl Encoder {
+    /// An encoder tuned for screen content (text, sharp edges).
     pub fn new(config: EncoderConfig) -> Result<Self> {
+        Self::open(config, true)
+    }
+
+    /// An encoder tuned for natural video such as a camera picture (spec 08, FR-8.43): the
+    /// screen-content tuning would waste bits on camera noise.
+    pub fn natural(config: EncoderConfig) -> Result<Self> {
+        Self::open(config, false)
+    }
+
+    fn open(config: EncoderConfig, screen_content: bool) -> Result<Self> {
         validate(&config)?;
         // SAFETY: plain libvpx calls on locally owned, correctly sized structs; every status is
         // checked before the context is used further.
@@ -118,7 +129,7 @@ impl Encoder {
                 cfg,
                 fps: config.fps,
             };
-            encoder.configure_controls()?;
+            encoder.configure_controls(screen_content)?;
             Ok(encoder)
         }
     }
@@ -242,14 +253,18 @@ impl Encoder {
         check(&mut *self.ctx, status, operation)
     }
 
-    fn configure_controls(&mut self) -> Result<()> {
+    fn configure_controls(&mut self, screen_content: bool) -> Result<()> {
         let multithreaded = c_int::from(self.cfg.g_threads > 1);
         let controls: [(ffi::vp8e_enc_control_id, c_int, &'static str); 9] = [
             (ffi::VP8E_SET_CPUUSED, CPU_USED, "set speed"),
             (
                 ffi::VP9E_SET_TUNE_CONTENT,
-                ffi::VP9E_CONTENT_SCREEN as c_int,
-                "tune for screen content",
+                if screen_content {
+                    ffi::VP9E_CONTENT_SCREEN as c_int
+                } else {
+                    ffi::VP9E_CONTENT_DEFAULT as c_int
+                },
+                "tune for the content",
             ),
             // Cyclic refresh: spreads quality updates over frames instead of keyframe spikes.
             (ffi::VP9E_SET_AQ_MODE, 3, "set aq mode"),

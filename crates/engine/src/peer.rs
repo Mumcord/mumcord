@@ -375,6 +375,7 @@ type BroadcastReply = Result<Option<(BroadcastId, RelayToken)>, BroadcastErrorRe
 enum BroadcastTokenRoute {
     ScreenShare,
     PluginData,
+    Camera,
     /// No side takes it; only the reason is logged.
     Ignore(&'static str),
 }
@@ -708,6 +709,11 @@ impl Relays {
                     engine.plugin_data_broadcast_token(ctx, sharer, id, token);
                 }
             }
+            BroadcastTokenRoute::Camera => {
+                if let Some(engine) = engine() {
+                    engine.camera_broadcast_token(ctx, sharer, id, token);
+                }
+            }
             BroadcastTokenRoute::Ignore(reason) => {
                 tracing::debug!("ignoring a broadcast token: {reason}");
             }
@@ -732,31 +738,39 @@ impl Relays {
         match kind {
             BroadcastKind::ScreenShare => BroadcastTokenRoute::ScreenShare,
             BroadcastKind::PluginData => BroadcastTokenRoute::PluginData,
-            BroadcastKind::Camera => {
-                BroadcastTokenRoute::Ignore("no camera broadcast is waiting on this client")
-            }
+            BroadcastKind::Camera => BroadcastTokenRoute::Camera,
         }
     }
 
-    /// The announcement of the relay usable for screen sharing, with the bot to ask.
+    /// The announcement of the relay usable for `relay_use` broadcasts, with the bot to ask.
     fn broadcast_bot(
         &self,
         server_id: ServerId,
+        relay_use: RelayUse,
     ) -> Result<(u32, RelayAnnouncement), RelayUnavailable> {
         lock(&self.state)
             .servers
             .get(&server_id)
             .ok_or(RelayUnavailable::NoRelay)?
-            .usable_for(RelayUse::ScreenShare)
+            .usable_for(relay_use)
             .map(|a| (a.session, a.ann.clone()))
     }
 
-    /// The relay announcement for joining a broadcast as a viewer.
+    /// The relay announcement for joining a screen-share broadcast as a viewer.
     pub(crate) fn broadcast_announcement(
         &self,
         server_id: ServerId,
     ) -> Result<RelayAnnouncement, RelayUnavailable> {
-        self.broadcast_bot(server_id).map(|(_, ann)| ann)
+        self.broadcast_announcement_for(server_id, RelayUse::ScreenShare)
+    }
+
+    /// The relay announcement for a `relay_use` broadcast (camera sharing uses `Camera`).
+    pub(crate) fn broadcast_announcement_for(
+        &self,
+        server_id: ServerId,
+        relay_use: RelayUse,
+    ) -> Result<RelayAnnouncement, RelayUnavailable> {
+        self.broadcast_bot(server_id, relay_use).map(|(_, ann)| ann)
     }
 
     /// Sends a broadcast message to `bot` and registers `rid` for the answer.
@@ -1171,26 +1185,28 @@ impl Engine {
         Ok((ann, token))
     }
 
-    /// Asks the relay bot for a broadcast of the own screen share for up to `max` viewers
-    /// (`bcast-req`, FR-7.40). Returns the relay to bind to, the broadcast and the publisher
-    /// token, or why fan-out is not available.
+    /// Asks the relay bot for a broadcast of the own screen share (`relay_use` `ScreenShare`,
+    /// sent without `k` as before spec 08) or camera (`Camera`, `k = cam`, FR-8.42) for up to
+    /// `max` viewers (`bcast-req`, FR-7.40). Returns the relay to bind to, the broadcast and the
+    /// publisher token, or why fan-out is not available.
     pub(crate) async fn relay_broadcast_request(
         &self,
         server_id: ServerId,
         max: u16,
+        relay_use: RelayUse,
     ) -> Result<(RelayAnnouncement, BroadcastId, RelayToken), FanoutUnavailable> {
         let ctx = self
             .session_ctx_for(server_id)
             .map_err(|_| FanoutUnavailable::Relay(RelayUnavailable::NotConnected))?;
         let (bot, ann) = self
             .relays()
-            .broadcast_bot(server_id)
+            .broadcast_bot(server_id, relay_use)
             .map_err(FanoutUnavailable::Relay)?;
         let rid = RequestId::random();
         let message = PeerMessage::BroadcastRequest {
             rid,
             max,
-            kind: None,
+            kind: (relay_use != RelayUse::ScreenShare).then_some(relay_use),
         };
         let rx = self
             .relays()
@@ -1216,13 +1232,14 @@ impl Engine {
         server_id: ServerId,
         id: BroadcastId,
         viewer: u32,
+        relay_use: RelayUse,
     ) -> Result<(), BroadcastErrorReason> {
         let ctx = self
             .session_ctx_for(server_id)
             .map_err(|_| BroadcastErrorReason::RelayDown)?;
         let (bot, _) = self
             .relays()
-            .broadcast_bot(server_id)
+            .broadcast_bot(server_id, relay_use)
             .map_err(|_| BroadcastErrorReason::RelayDown)?;
         let rid = RequestId::random();
         let message = PeerMessage::BroadcastAdmit { rid, id, viewer };
@@ -1241,11 +1258,17 @@ impl Engine {
     }
 
     /// Tells the relay bot that `viewer` left broadcast `id` (`bcast-kick`); no answer.
-    pub(crate) fn relay_broadcast_kick(&self, server_id: ServerId, id: BroadcastId, viewer: u32) {
+    pub(crate) fn relay_broadcast_kick(
+        &self,
+        server_id: ServerId,
+        id: BroadcastId,
+        viewer: u32,
+        relay_use: RelayUse,
+    ) {
         let Ok(ctx) = self.session_ctx_for(server_id) else {
             return;
         };
-        let Ok((bot, _)) = self.relays().broadcast_bot(server_id) else {
+        let Ok((bot, _)) = self.relays().broadcast_bot(server_id, relay_use) else {
             return;
         };
         let sent = PeerMessage::BroadcastKick { id, viewer }
@@ -1786,10 +1809,10 @@ mod tests {
             relays.broadcast_token_route(1, 5, BroadcastKind::PluginData),
             BroadcastTokenRoute::PluginData
         );
-        assert!(matches!(
+        assert_eq!(
             relays.broadcast_token_route(1, 5, BroadcastKind::Camera),
-            BroadcastTokenRoute::Ignore(_)
-        ));
+            BroadcastTokenRoute::Camera
+        );
     }
 
     #[test]

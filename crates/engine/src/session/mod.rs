@@ -276,6 +276,8 @@ struct Inner {
     watch_parties: crate::watch_party::ServerParties,
     /// Screen shares in the user's channels (FR-2.42).
     screen_shares: crate::screen_share::ServerShares,
+    cameras: crate::camera::session::ServerCameras,
+    camera_signals: crate::camera::signal::CameraSignals,
     /// Screen share encoder probe and self-tests (FR-7.55, FR-7.56).
     screen_encoders: Arc<crate::screen_share::encoder::Encoders>,
     /// Packet inspector capture, shared by every connection (issue #60).
@@ -606,6 +608,8 @@ impl Engine {
             mumble_import: Mutex::default(),
             watch_parties: Mutex::default(),
             screen_shares: Mutex::default(),
+            cameras: Mutex::default(),
+            camera_signals: crate::camera::signal::CameraSignals::default(),
             screen_encoders: Arc::default(),
             inspector: Arc::default(),
             positional: crate::positional::Positional::new(
@@ -619,6 +623,7 @@ impl Engine {
         engine.inner.files.bind(&engine);
         engine.inner.history_images.bind(&engine);
         lock(&engine.inner.screen_shares).engine = Some(engine.downgrade());
+        lock(&engine.inner.cameras).engine = Some(engine.downgrade());
         engine.positional_poll_restart();
         engine
             .link_previews()
@@ -869,6 +874,10 @@ impl Engine {
 
     pub(crate) fn screen_share_state(&self) -> &crate::screen_share::ServerShares {
         &self.inner.screen_shares
+    }
+
+    pub(crate) fn camera_state(&self) -> &crate::camera::session::ServerCameras {
+        &self.inner.cameras
     }
 
     pub(crate) fn screen_encoders(&self) -> &crate::screen_share::encoder::Encoders {
@@ -1917,6 +1926,17 @@ impl Inner {
                     .for_server(server_id)
                     .emit(EngineEvent::ScreenSharesChanged(Vec::new()));
             }
+            if crate::camera::session::on_connection_reset(
+                &self.cameras,
+                &self.camera_signals,
+                server_id,
+            ) {
+                self.events
+                    .for_server(server_id)
+                    .emit(EngineEvent::CameraChanged(crate::camera::CameraView::off(
+                        server_id,
+                    )));
+            }
             session.handle.disconnect();
         }
         self.rebind_audio(core);
@@ -1943,6 +1963,16 @@ impl Inner {
         if crate::screen_share::reset(&self.screen_shares, ctx.server_id) {
             ctx.events
                 .emit(EngineEvent::ScreenSharesChanged(Vec::new()));
+        }
+        if crate::camera::session::on_connection_reset(
+            &self.cameras,
+            &self.camera_signals,
+            ctx.server_id,
+        ) {
+            ctx.events
+                .emit(EngineEvent::CameraChanged(crate::camera::CameraView::off(
+                    ctx.server_id,
+                )));
         }
     }
 
@@ -2482,6 +2512,7 @@ impl Inner {
                 _ = tick.tick() => {
                     crate::watch_party::on_tick(&self.watch_parties, &ctx);
                     crate::screen_share::on_tick(&self.screen_shares, &self.mumcord, &ctx);
+                    crate::camera::session::on_tick(&self.cameras, &ctx);
                     let audio = self.is_audio_server(server_id);
                     if audio {
                         let mut core = lock(&self.core);
@@ -2727,6 +2758,12 @@ impl Inner {
                         ctx,
                         user.session,
                     );
+                    crate::camera::session::on_user_moved(
+                        &self.cameras,
+                        &self.mumcord,
+                        ctx,
+                        user.session,
+                    );
                 }
                 if own && change.moved_from.is_some() {
                     self.remember_channel(ctx, user.channel_id);
@@ -2773,6 +2810,12 @@ impl Inner {
                 crate::screen_share::on_user_removed(
                     &self.screen_shares,
                     &self.mumcord,
+                    ctx,
+                    user.session,
+                );
+                crate::camera::session::on_user_removed(
+                    &self.cameras,
+                    &self.camera_signals,
                     ctx,
                     user.session,
                 );
@@ -2855,9 +2898,21 @@ impl Inner {
                         ctx,
                         session,
                     );
+                    crate::camera::session::on_peer_known(
+                        &self.cameras,
+                        &self.mumcord,
+                        ctx,
+                        session,
+                    );
                 }
                 crate::watch_party::on_plugin_data(&self.watch_parties, ctx, data);
                 crate::screen_share::on_plugin_data(&self.screen_shares, &self.mumcord, ctx, data);
+                crate::camera::session::on_plugin_data(
+                    &self.cameras,
+                    &self.camera_signals,
+                    ctx,
+                    data,
+                );
                 crate::history_sync::on_plugin_data(
                     &self.history_sync,
                     &self.history_images,

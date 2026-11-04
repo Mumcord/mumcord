@@ -274,7 +274,7 @@ fn software_limit(cached: &[CachedSelftest], optimize: ScreenOptimize) -> Option
 }
 
 /// The self-tests run right after the probe: the Settings defaults, and 720p30 as the usual
-/// step below, both with the default Optimize for.
+/// step below, both with the default Optimize for, and the camera's.
 fn startup_tests(settings: &Settings) -> Vec<TestKey> {
     let prefs = QualityPrefs::from_settings(settings);
     let (height, fps) = select::ceiling(select::cap_for_software_av1(prefs));
@@ -282,8 +282,15 @@ fn startup_tests(settings: &Settings) -> Vec<TestKey> {
     if (height, fps) != (720, 30) {
         keys.push((720, 30, prefs.optimize));
     }
+    if !keys.contains(&CAMERA_SELFTEST) {
+        keys.push(CAMERA_SELFTEST);
+    }
     keys
 }
+
+/// The camera's self-test: 720p30 natural video, run once like the screen-share ones
+/// (FR-8.43). "Motion" is the Optimize for without screen-content tools.
+pub(crate) const CAMERA_SELFTEST: TestKey = (720, 30, ScreenOptimize::Motion);
 
 struct Worker<'a> {
     encoders: &'a Encoders,
@@ -409,11 +416,28 @@ pub(crate) fn factory(
     candidates: Vec<Candidate>,
     active: Arc<Mutex<Option<ActiveEncoder>>>,
 ) -> EncoderFactory {
+    factory_for(candidates, active, false)
+}
+
+/// [`factory`] for natural video (camera sharing, FR-8.43): the software encoders run without
+/// their screen-content tuning.
+pub(crate) fn natural_factory(
+    candidates: Vec<Candidate>,
+    active: Arc<Mutex<Option<ActiveEncoder>>>,
+) -> EncoderFactory {
+    factory_for(candidates, active, true)
+}
+
+fn factory_for(
+    candidates: Vec<Candidate>,
+    active: Arc<Mutex<Option<ActiveEncoder>>>,
+    natural: bool,
+) -> EncoderFactory {
     let offers_av1 = candidates.iter().any(|c| c.codec == Codec::Av1);
     let open = Box::new(move |config, optimize, av1: bool| {
         let mut last = None;
         for candidate in candidates.iter().filter(|c| av1 || c.codec != Codec::Av1) {
-            match open(*candidate, config, optimize) {
+            match open(*candidate, config, optimize, natural) {
                 Ok(encoder) => {
                     let opened = ActiveEncoder {
                         codec: candidate.codec,
@@ -439,15 +463,19 @@ fn open(
     candidate: Candidate,
     config: EncoderConfig,
     optimize: ScreenOptimize,
+    natural: bool,
 ) -> mumcord_screenshare::Result<Box<dyn VideoEncoder>> {
     match (candidate.kind, candidate.codec) {
         (Kind::Hardware(encoder, _), codec) => open_hardware_encoder(encoder, codec, config),
         (Kind::FakeHardware | Kind::Software, Codec::Av1) => Ok(Box::new(Av1Encoder::new(
             config,
             Av1Options {
-                screen_content: optimize == ScreenOptimize::Text,
+                screen_content: !natural && optimize == ScreenOptimize::Text,
             },
         )?)),
+        (Kind::FakeHardware | Kind::Software, Codec::Vp9) if natural => {
+            Ok(Box::new(Encoder::natural(config)?))
+        }
         (Kind::FakeHardware | Kind::Software, Codec::Vp9) => Ok(Box::new(Encoder::new(config)?)),
     }
 }
@@ -682,12 +710,21 @@ mod tests {
     }
 
     #[test]
-    fn the_startup_tests_cover_the_defaults_and_720p30() {
+    fn the_startup_tests_cover_the_defaults_720p30_and_the_camera() {
         let settings = Settings::default();
         let optimize = settings.screen_optimize;
         assert_eq!(
             startup_tests(&settings),
-            [(1080, 30, optimize), (720, 30, optimize)]
+            [(1080, 30, optimize), (720, 30, optimize), CAMERA_SELFTEST]
+        );
+        let motion = Settings {
+            screen_optimize: ScreenOptimize::Motion,
+            ..Settings::default()
+        };
+        // The camera's key is the 720p30 one of "Motion": measured once, not twice.
+        assert_eq!(
+            startup_tests(&motion),
+            [(1080, 30, ScreenOptimize::Motion), CAMERA_SELFTEST]
         );
     }
 

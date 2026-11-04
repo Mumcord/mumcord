@@ -589,6 +589,9 @@ pub enum EngineEvent {
     WatchPartyChanged(Option<crate::watch_party::WatchPartyView>),
     /// The screen shares in the user's channel changed; the full list (FR-2.42 – FR-2.46).
     ScreenSharesChanged(Vec<crate::screen_share::ScreenShareView>),
+    /// The own camera changed state, viewers or error (spec 08, section 6.4); `Off` once it
+    /// is off.
+    CameraChanged(crate::camera::CameraView),
     /// The screen share encoder status changed: a probe or self-test started or finished
     /// (Settings → Screen sharing, FR-7.60).
     ScreenEncoderStatusChanged(crate::screen_share::EncoderStatus),

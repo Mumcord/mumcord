@@ -115,6 +115,55 @@ async fn send_chunks(
 // Publisher
 // ---------------------------------------------------------------------------------------------
 
+/// Where a [`Publisher`] takes its frames from: the screen share's media hub
+/// ([`Subscription`]) or the camera's encoder (spec 08).
+pub(crate) trait FrameSource: Send + Sync + 'static {
+    /// The next frame to seal and send.
+    fn next(&self) -> impl Future<Output = Arc<Frame>> + Send;
+
+    /// The relay asked for a keyframe (a new subscriber, or one that lost frames).
+    fn request_keyframe(&self);
+
+    /// The next frame must be a keyframe: a new key takes effect only there (FR-7.44).
+    fn force_keyframe(&self);
+
+    /// The viewers that hold the keys changed, or one reported a new tile height (camera
+    /// `want`, FR-8.45): `viewers` is how many hold the keys, `max_want` the largest height any
+    /// of them reported. A screen share encodes one size for all and ignores this.
+    fn viewers_changed(&self, viewers: usize, max_want: Option<u16>) {
+        let _ = (viewers, max_want);
+    }
+}
+
+impl FrameSource for Subscription {
+    async fn next(&self) -> Arc<Frame> {
+        Subscription::next(self).await
+    }
+
+    fn request_keyframe(&self) {
+        Subscription::request_keyframe(self);
+    }
+
+    fn force_keyframe(&self) {
+        Subscription::force_keyframe(self);
+    }
+}
+
+/// The tile height in a `want` from the relay (slot already split off); `None` when malformed.
+fn want_height(payload: &[u8]) -> Option<u16> {
+    let bytes: [u8; 2] = payload.try_into().ok()?;
+    Some(u16::from_be_bytes(bytes))
+}
+
+/// The largest tile height wanted by a slot that holds the keys.
+fn max_want<C>(channels: &HashMap<u16, C>, wants: &HashMap<u16, u16>) -> Option<u16> {
+    wants
+        .iter()
+        .filter(|(slot, _)| channels.contains_key(slot))
+        .map(|(_, height)| *height)
+        .max()
+}
+
 enum PubCommand {
     /// A viewer left or was removed: drop its key channel and rekey (FR-7.44).
     Removed(String),
@@ -132,12 +181,12 @@ pub(crate) struct Publisher {
 impl Publisher {
     /// Starts sending the share taken from `frames` over `link` as broadcast `id`. `on_end`
     /// runs when the link ends by itself (the relay or the network).
-    pub fn start(
+    pub fn start<S: FrameSource>(
         rt: &tokio::runtime::Handle,
         id: BroadcastId,
         me: CertKey,
         link: BroadcastLink,
-        frames: Subscription,
+        frames: S,
         on_end: OnEnd,
     ) -> Result<Self, super::crypto::CryptoError> {
         let sealer = Arc::new(Mutex::new(FrameSealer::new()?));
@@ -153,6 +202,7 @@ impl Publisher {
                 frames,
                 admitted: admitted.clone(),
                 channels: HashMap::new(),
+                wants: HashMap::new(),
                 reassembler: Reassembler::new(),
                 set_id: 0,
             }
@@ -193,8 +243,8 @@ impl Drop for Publisher {
     }
 }
 
-async fn write_units(
-    frames: Arc<Subscription>,
+async fn write_units<S: FrameSource>(
+    frames: Arc<S>,
     sealer: Arc<Mutex<FrameSealer>>,
     units: mpsc::Sender<Vec<u8>>,
 ) {
@@ -215,18 +265,20 @@ async fn write_units(
     }
 }
 
-struct PublisherControl {
+struct PublisherControl<S> {
     id: BroadcastId,
     me: CertKey,
     sealer: Arc<Mutex<FrameSealer>>,
-    frames: Arc<Subscription>,
+    frames: Arc<S>,
     admitted: Arc<Mutex<HashSet<String>>>,
     channels: HashMap<u16, ViewerChannel>,
+    /// The last tile height each slot asked for (`want`, camera only).
+    wants: HashMap<u16, u16>,
     reassembler: Reassembler<u16>,
     set_id: u8,
 }
 
-impl PublisherControl {
+impl<S: FrameSource> PublisherControl<S> {
     async fn run(
         mut self,
         mut link: BroadcastLink,
@@ -245,7 +297,15 @@ impl PublisherControl {
                     Err(end) => break end,
                 },
                 Some(PubCommand::Removed(hash)) = commands.recv() => {
-                    self.channels.retain(|_, ch| ch.cert_hash() != hash);
+                    let wants = &mut self.wants;
+                    self.channels.retain(|slot, ch| {
+                        let keep = ch.cert_hash() != hash;
+                        if !keep {
+                            wants.remove(slot);
+                        }
+                        keep
+                    });
+                    self.viewers_changed();
                     self.rekey(&units).await;
                 }
             }
@@ -265,7 +325,9 @@ impl PublisherControl {
             ControlKind::Gone => {
                 if let Some((slot, _)) = split_slot(unit.payload()) {
                     self.reassembler.forget(&slot);
+                    self.wants.remove(&slot);
                     if self.channels.remove(&slot).is_some() {
+                        self.viewers_changed();
                         return self.rekey(units).await;
                     }
                 }
@@ -280,11 +342,25 @@ impl PublisherControl {
                     Err(e) => tracing::debug!(error = %e, "broadcast key request chunk dropped"),
                 }
             }
-            // `want` is camera sharing's resolution hint; a screen share encodes one size for all.
+            ControlKind::Want => {
+                if let Some((slot, height)) = split_slot(unit.payload())
+                    .and_then(|(slot, rest)| Some((slot, want_height(rest)?)))
+                {
+                    self.wants.insert(slot, height);
+                    self.viewers_changed();
+                }
+            }
             // Not the publisher's to receive: `key` and `layers`.
-            ControlKind::Want | ControlKind::Key | ControlKind::Layers => {}
+            ControlKind::Key | ControlKind::Layers => {}
         }
         true
+    }
+
+    /// Tells the source how many viewers hold the keys and the largest tile height they want.
+    /// A `want` may come before the keys; it counts once its slot holds them.
+    fn viewers_changed(&self) {
+        self.frames
+            .viewers_changed(self.channels.len(), max_want(&self.channels, &self.wants));
     }
 
     async fn answer(&mut self, slot: u16, request: &[u8], units: &mpsc::Sender<Vec<u8>>) -> bool {
@@ -300,6 +376,7 @@ impl PublisherControl {
         match answered {
             Ok((channel, answer)) => {
                 self.channels.insert(slot, channel);
+                self.viewers_changed();
                 self.set_id = self.set_id.wrapping_add(1);
                 send_chunks(units, ControlKind::Key, Some(slot), &answer, self.set_id).await
             }
@@ -773,6 +850,19 @@ mod tests {
             }
         );
         assert_eq!(frame_of(&plain[..plain.len() - 1]), None, "short payload");
+    }
+
+    #[test]
+    fn a_want_counts_only_for_slots_holding_the_keys() {
+        assert_eq!(want_height(&[0x02, 0xd0]), Some(720));
+        assert_eq!(want_height(&[0x02]), None);
+        assert_eq!(want_height(&[0, 1, 2]), None);
+        let channels: HashMap<u16, ()> = [(1, ()), (2, ())].into();
+        let mut wants = HashMap::from([(1, 360), (3, 720)]);
+        assert_eq!(max_want(&channels, &wants), Some(360));
+        wants.insert(2, 540);
+        assert_eq!(max_want(&channels, &wants), Some(540));
+        assert_eq!(max_want(&HashMap::<u16, ()>::new(), &wants), None);
     }
 
     #[test]

@@ -64,6 +64,7 @@ pub use broadcast::{FanoutInfo, FanoutUnavailable, FanoutView, RelayViewer};
 pub use capture::{CaptureSource, SoundSource, TestPattern, TestTone};
 pub use encoder::monitor::LoadDetails;
 pub use encoder::{ActiveEncoder, Av1Skipped, EncoderStatus, GpuVendor, SoftwareLimit};
+pub(crate) use media::EncoderFactory;
 pub use media::{EncoderSwitch, ScreenMediaStats, SwitchReason, ViewerMediaStats, ViewerPath};
 pub use mumcord_audio::mixer::share::ShareSoundStats;
 /// Why the bot refused a broadcast, part of [`FanoutUnavailable::Refused`].
@@ -456,7 +457,7 @@ pub(crate) fn on_plugin_data(
             engine.admit_to_broadcast(ctx.server_id, id, sender);
         }
         if let Some(id) = kick {
-            engine.relay_broadcast_kick(ctx.server_id, id, sender);
+            engine.relay_broadcast_kick(ctx.server_id, id, sender, RelayUse::ScreenShare);
         }
         if relink {
             engine.screen_share_relink(ctx.server_id, sender);
@@ -598,7 +599,7 @@ fn forget(state: &ServerShares, peers: &ServerPeers, ctx: &SessionCtx, session: 
         (forgot, left.flatten(), engine)
     };
     if let (Some(id), Some(engine)) = (kick, engine) {
-        engine.relay_broadcast_kick(ctx.server_id, id, session);
+        engine.relay_broadcast_kick(ctx.server_id, id, session, RelayUse::ScreenShare);
     }
     if forgot.own_viewers
         && let Some(here) = here(&ctx.handle)
