@@ -45,6 +45,7 @@
 
 ### Internal
 
+- Release and CI builds of the app run with `--locked`: the shipped binary is built from exactly the dependencies in Cargo.lock, the ones the third-party notices were generated from, or the build fails
 - File offers and the file-sharing messages between Mumcord clients use the Bovnar data format through a pinned build of the Bovnar library; the plain line that official Mumble clients and older Mumcord versions see is unchanged, and the licences window lists Bovnar (#400)
 - File transfer over the relay (not yet visible in the app): files travel only through the relay on their own stream with a size check, and a screen share or full-size image download continues when that switches the connection from direct to the relay
 - Build scripts and cached CI steps for the AV1 screen-sharing libraries (SVT-AV1 encoder, dav1d decoder, and the NVIDIA, AMD, Intel and VA-API interfaces for graphics-card encoders); the licences window and third-party notices list them with their licence texts
