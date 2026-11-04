@@ -466,3 +466,25 @@
   display: flex;
   gap: var(--space-2);
 }
+
+/* The source of the plugin, as in the update mockup: unofficial sources get a dashed amber chip. */
+.plugin-review__chip {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+.plugin-review__chip--unofficial {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--color-warning) 60%, transparent);
+  color: var(--color-warning);
+}
+
+@media (forced-colors: active) {
+  .plugin-review__chip,
+  .plugin-review__chip--unofficial {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+}

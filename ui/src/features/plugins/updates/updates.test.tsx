@@ -378,10 +378,41 @@ describe("UpdatesTab: held updates and the review (FR-9.18, FR-9.82, FR-9.83)", 
     expect(dialog).toHaveTextContent("No other permissions change.");
     expect(dialog).toHaveTextContent("Skipping keeps 1.0.0 working.");
     expect(await axeViolations(dialog)).toEqual([]);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Allow and update" })).toBeEnabled();
+    });
     fireEvent.click(screen.getByRole("button", { name: "Allow and update" }));
     await waitFor(() => {
       expect(apply).toHaveBeenCalledWith("poll", ["ui.panel"]);
     });
+  });
+
+  it("reads the new websites' purposes from the prepared review and quotes the off-domain one", async () => {
+    setup([websites]);
+    const prepare = vi.spyOn(getApi(), "pluginUpdateReviewPrepare").mockResolvedValue({
+      ...websites.review,
+      origins: [
+        { origin: "https://api.poll.example", new: false, purpose: "match history" },
+        { origin: "https://stats.poll.example", new: true, purpose: "rankings" },
+        { origin: "wss://voice-lab.example", new: true, purpose: "experimental features" },
+      ],
+    });
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    const dialog = await screen.findByRole("dialog");
+    expect(await screen.findByText("rankings")).toBeInTheDocument();
+    expect(prepare).toHaveBeenCalledWith("poll", "1.2.0");
+    expect(screen.getByText("“experimental features”")).toBeInTheDocument();
+    expect(screen.getByText("match history")).toBeInTheDocument();
+    expect(dialog).not.toHaveTextContent("“rankings”");
+  });
+
+  it("shows an unofficial source as a dashed chip", async () => {
+    setup([held]);
+    renderTab();
+    fireEvent.click(await screen.findByRole("button", { name: /^Review and update\s+Poll/u }));
+    const chip = await screen.findByText("Unofficial · Lantern Plugin Garden");
+    expect(chip).toHaveClass("plugin-review__chip--unofficial");
   });
 
   it("keeps the old version when the user skips", async () => {

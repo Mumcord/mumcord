@@ -1,11 +1,11 @@
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { getApi, type PluginUpdate } from "../../../api";
+import { getApi, type PluginUpdate, type PluginUpdateReview } from "../../../api";
 import { ModalDialog } from "../../settings/components/ModalDialog";
 import { usePermissionText } from "../permissions/usePermissionText";
 import "../permissions/permissions.css";
 import { EffectText, ScoreChip, ScoreMeter } from "../score";
-import { newOriginCount, newPermissionsOf, scoredOf } from "./reviewData";
+import { newPermissionsOf, offDomainOrigins, scoredOf } from "./reviewData";
 
 /** Versions the score looks back on for a recently added permission (term H of the spec 09 score). */
 const RECENT_VERSIONS = 5;
@@ -34,12 +34,34 @@ export function UpdateReviewDialog({
   const { t: tPerm } = useTranslation("pluginPermissions");
   const permissionText = usePermissionText();
   const tickId = useId();
-  const review = update.review;
+  // The listing carries no purposes for new websites; the prepared review reads them from the
+  // verified new package. Until it arrives (or if it fails) the listing's review is shown.
+  const [prepared, setPrepared] = useState<PluginUpdateReview | null>(null);
+  const [preparing, setPreparing] = useState(true);
+  useEffect(() => {
+    let cancelled = false;
+    getApi()
+      .pluginUpdateReviewPrepare(update.id, update.to)
+      .then((result) => {
+        if (!cancelled) setPrepared(result);
+      })
+      .catch((error: unknown) => {
+        console.error("Preparing the plugin update review failed", error);
+      })
+      .finally(() => {
+        if (!cancelled) setPreparing(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [update.id, update.to]);
+  const review = prepared ?? update.review;
   const [ticked, setTicked] = useState(review.highRiskConfirmed);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const newOrigins = newOriginCount(update);
+  const newOrigins = review.origins.filter((origin) => origin.new).length;
+  const offDomain = offDomainOrigins(review);
   const newPermissions = newPermissionsOf(update);
   const risk = review.risk;
   const riskUp = risk !== null && risk.toValue > risk.fromValue;
@@ -48,18 +70,20 @@ export function UpdateReviewDialog({
   const permissionPoints = review.permissionEffects.reduce((sum, p) => sum + p.points, 0);
 
   const source =
-    update.source.kind === "repo"
-      ? tBrowse("unofficial", { repository: update.source.name })
-      : update.source.kind === "official"
-        ? tBrowse("official")
-        : null;
-  const subtitle = [
-    source,
-    t("dialog.now", { version: update.from }),
-    update.approval?.kind === "newAuthorKey" ? t("dialog.newKey") : t("dialog.sameKey"),
-  ]
-    .filter((part) => part !== null)
-    .join(" · ");
+    update.source.kind === "repo" ? (
+      <span className="plugin-review__chip plugin-review__chip--unofficial">
+        {tBrowse("unofficial", { repository: update.source.name })}
+      </span>
+    ) : update.source.kind === "official" ? (
+      <span className="plugin-review__chip">{tBrowse("official")}</span>
+    ) : null;
+  const subtitle = (
+    <>
+      {source !== null && <>{source} · </>}
+      {t("dialog.now", { version: update.from })} ·{" "}
+      {update.approval?.kind === "newAuthorKey" ? t("dialog.newKey") : t("dialog.sameKey")}
+    </>
+  );
 
   const install = async () => {
     setBusy(true);
@@ -162,7 +186,9 @@ export function UpdateReviewDialog({
                   </code>
                   {origin.new && <span className="plugin-review__new">{t("dialog.new")}</span>}
                   {origin.purpose !== null && origin.purpose !== "" && (
-                    <span className="plugin-review__purpose">{origin.purpose}</span>
+                    <span className="plugin-review__purpose">
+                      {offDomain.has(origin.origin) ? `“${origin.purpose}”` : origin.purpose}
+                    </span>
                   )}
                 </li>
               ))}
@@ -268,7 +294,7 @@ export function UpdateReviewDialog({
           <button
             type="button"
             className="settings-button settings-button--danger"
-            disabled={busy || (highRisk && !ticked)}
+            disabled={busy || preparing || (highRisk && !ticked)}
             onClick={() => void install()}
           >
             {highRisk ? t("dialog.updateAnyway") : t("dialog.allow")}
