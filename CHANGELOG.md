@@ -30,6 +30,7 @@
 
 ### Fixed
 
+- Starting a watch party or adding a video from the Apps menu no longer reloads the app when you confirm the link
 - A mumbot shows as "Mumbot <version>" in the profile preview and the connection details instead of "Mumcord <version>", from what it announces about itself; older mumbots get the same label from their name and version (#459)
 - A middle click on a link, or a click with Ctrl, Cmd or Shift held, opens it in your browser like a normal click. It used to load the page inside Mumcord, in a window of its own or in place of the whole app, and no page from outside ever gets a Mumcord window now (#418)
 - A chat message you send now stays in the right time order: a message someone else wrote while yours was being sent no longer ends up above yours, before or after a restart
