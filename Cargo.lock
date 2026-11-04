@@ -4013,6 +4013,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mumcord-camera"
+version = "0.6.2"
+dependencies = [
+ "crossbeam-queue",
+ "thiserror 2.0.21",
+ "tracing",
+]
+
+[[package]]
 name = "mumcord-codec"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
