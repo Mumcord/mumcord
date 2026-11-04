@@ -22,6 +22,8 @@
   "leave": "Poistu: {{plugin}}",
   "join": "Liity",
   "joinLabel": "Liity: {{plugin}}",
+  "open": "Avaa",
+  "openLabel": "Avaa: {{plugin}}",
   "getPlugin": "Hae laajennus",
   "getPluginLabel": "Hae {{plugin}}",
   "activityStarted": "{{name}} aloitti {{plugin}}",

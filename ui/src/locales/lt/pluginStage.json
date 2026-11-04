@@ -22,6 +22,8 @@
   "leave": "Palikti {{plugin}}",
   "join": "Prisijungti",
   "joinLabel": "Prisijungti: {{plugin}}",
+  "open": "Atidaryti",
+  "openLabel": "Atidaryti: {{plugin}}",
   "getPlugin": "Gauti papildinį",
   "getPluginLabel": "Gauti {{plugin}}",
   "activityStarted": "{{name}} pradėjo {{plugin}}",

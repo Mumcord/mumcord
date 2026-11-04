@@ -22,6 +22,8 @@
   "leave": "Opustiť {{plugin}}",
   "join": "Pripojiť sa",
   "joinLabel": "Pripojiť sa k {{plugin}}",
+  "open": "Otvoriť",
+  "openLabel": "Otvoriť: {{plugin}}",
   "getPlugin": "Získať plugin",
   "getPluginLabel": "Získať {{plugin}}",
   "activityStarted": "{{name}} spustil {{plugin}}",

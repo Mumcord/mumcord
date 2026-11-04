@@ -22,6 +22,8 @@
   "leave": "Ħalli {{plugin}}",
   "join": "Ingħaqad",
   "joinLabel": "Ingħaqad ma' {{plugin}}",
+  "open": "Iftaħ",
+  "openLabel": "Iftaħ: {{plugin}}",
   "getPlugin": "Ikseb il-plugin",
   "getPluginLabel": "Ikseb {{plugin}}",
   "activityStarted": "{{name}} beda {{plugin}}",

@@ -65,6 +65,7 @@ vi.mock("../../../api", async (orig) => {
         soundVolume: 70,
         soundMuted: false,
       }),
+    serversList: () => Promise.resolve([{ id: 1, label: "Study Club" }]),
     mediaPopoutState: () => Promise.resolve(api.popouts),
     mediaPopoutOpen: api.popOut,
     mediaPopoutClose: api.popIn,
@@ -426,7 +427,7 @@ describe("connection chip and no-relay banner", () => {
     expect(screen.getByText("Relay · end-to-end encrypted")).toBeInTheDocument();
   });
 
-  it("names the server after its root channel in the pop-out and has no Details there", async () => {
+  it("names the server by its saved label in the pop-out", async () => {
     api.relay = { kind: "useNotAllowed" };
     render(
       <InPopout value>
@@ -434,10 +435,7 @@ describe("connection chip and no-relay banner", () => {
       </InPopout>,
     );
     await settle();
-    expect(
-      screen.getByText(/Study Club Root's relay doesn't allow plugin data/),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Details" })).toBeNull();
+    expect(screen.getByText(/Study Club's relay doesn't allow plugin data/)).toBeInTheDocument();
   });
 });
 

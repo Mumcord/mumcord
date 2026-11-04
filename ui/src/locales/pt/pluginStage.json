@@ -22,6 +22,8 @@
   "leave": "Sair de {{plugin}}",
   "join": "Entrar",
   "joinLabel": "Juntar-se a {{plugin}}",
+  "open": "Abrir",
+  "openLabel": "Abrir: {{plugin}}",
   "getPlugin": "Obter plugin",
   "getPluginLabel": "Obter {{plugin}}",
   "activityStarted": "{{name}} iniciou {{plugin}}",

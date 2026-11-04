@@ -3,10 +3,9 @@
  * data chip in the stage header, and the "No relay for plugin data on this server." banner under
  * it while the server's relay cannot carry plugin data.
  */
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import type { InstalledPlugin } from "../../../api";
-import { useServerStateOf } from "../../channels";
+import { getApi, type InstalledPlugin } from "../../../api";
 import { useInPopout } from "../../media/popoutStore";
 import { useServers } from "../../servers/store";
 import { usePlatformSettings } from "../platformSettings";
@@ -39,8 +38,7 @@ export function NoRelayBanner({ serverId, plugin }: { serverId: number | null; p
   const availability = useRelayAvailability(serverId);
   const inPopout = useInPopout();
   if (serverId === null || availability === null || availability.kind === "available") return null;
-  // The pop-out window cannot read the saved servers (nor open the settings), so it names the
-  // server after its root channel and leaves "Details" to the main window.
+  // The pop-out window cannot open the settings, so "Details" stays with the main window.
   return inPopout ? (
     <PopoutBanner serverId={serverId} plugin={plugin} />
   ) : (
@@ -67,7 +65,24 @@ function MainBanner({ serverId, plugin }: { serverId: number; plugin: string }) 
 }
 
 function PopoutBanner({ serverId, plugin }: { serverId: number; plugin: string }) {
-  const server = useServerStateOf(serverId).channels.get(0)?.name ?? "";
+  // The pop-out never loads the servers store, so it reads the saved label itself.
+  const [server, setServer] = useState("");
+  useEffect(() => {
+    let live = true;
+    getApi()
+      .serversList()
+      .then(
+        (servers) => {
+          if (live) setServer(servers.find((s) => s.id === serverId)?.label ?? "");
+        },
+        (error: unknown) => {
+          console.error("Loading the server name failed", error);
+        },
+      );
+    return () => {
+      live = false;
+    };
+  }, [serverId]);
   return <Banner server={server} plugin={plugin} />;
 }
 

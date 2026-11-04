@@ -22,6 +22,8 @@
   "leave": "Lämna {{plugin}}",
   "join": "Gå med",
   "joinLabel": "Gå med i {{plugin}}",
+  "open": "Öppna",
+  "openLabel": "Öppna: {{plugin}}",
   "getPlugin": "Hämta plugin",
   "getPluginLabel": "Hämta {{plugin}}",
   "activityStarted": "{{name}} startade {{plugin}}",

@@ -22,6 +22,8 @@
   "leave": "{{plugin}} verlaten",
   "join": "Meedoen",
   "joinLabel": "Deelnemen aan {{plugin}}",
+  "open": "Openen",
+  "openLabel": "Openen: {{plugin}}",
   "getPlugin": "Plugin downloaden",
   "getPluginLabel": "{{plugin}} downloaden",
   "activityStarted": "{{name}} startte {{plugin}}",

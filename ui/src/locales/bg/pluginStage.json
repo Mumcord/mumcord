@@ -22,6 +22,8 @@
   "leave": "Напусни {{plugin}}",
   "join": "Присъедини се",
   "joinLabel": "Присъединяване към {{plugin}}",
+  "open": "Отваряне",
+  "openLabel": "Отваряне: {{plugin}}",
   "getPlugin": "Вземи добавката",
   "getPluginLabel": "Вземи {{plugin}}",
   "activityStarted": "{{name}} стартира {{plugin}}",

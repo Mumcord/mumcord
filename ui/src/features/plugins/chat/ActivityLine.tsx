@@ -72,11 +72,11 @@ export function ActivityLine({ activity }: { activity: StageActivityView }) {
         <button
           type="button"
           className="plugin-activity__action"
-          aria-label={t("joinLabel", { plugin })}
+          aria-label={t(activity.joined ? "openLabel" : "joinLabel", { plugin })}
           aria-disabled={busy || undefined}
           onClick={busy ? undefined : join}
         >
-          {t("join")}
+          {t(activity.joined ? "open" : "join")}
         </button>
       )}
       {error !== null && (

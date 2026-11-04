@@ -22,6 +22,8 @@
   "leave": "Esci da {{plugin}}",
   "join": "Partecipa",
   "joinLabel": "Unisciti a {{plugin}}",
+  "open": "Apri",
+  "openLabel": "Apri: {{plugin}}",
   "getPlugin": "Ottieni plugin",
   "getPluginLabel": "Ottieni {{plugin}}",
   "activityStarted": "{{name}} ha avviato {{plugin}}",

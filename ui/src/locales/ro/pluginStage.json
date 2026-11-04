@@ -22,6 +22,8 @@
   "leave": "Părăsește {{plugin}}",
   "join": "Alătură-te",
   "joinLabel": "Alătură-te la {{plugin}}",
+  "open": "Deschide",
+  "openLabel": "Deschide: {{plugin}}",
   "getPlugin": "Obține pluginul",
   "getPluginLabel": "Obține {{plugin}}",
   "activityStarted": "{{name}} a pornit {{plugin}}",

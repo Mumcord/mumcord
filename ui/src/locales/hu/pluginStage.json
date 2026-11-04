@@ -22,6 +22,8 @@
   "leave": "Kilépés innen: {{plugin}}",
   "join": "Csatlakozás",
   "joinLabel": "Csatlakozás: {{plugin}}",
+  "open": "Megnyitás",
+  "openLabel": "Megnyitás: {{plugin}}",
   "getPlugin": "Bővítmény beszerzése",
   "getPluginLabel": "Beszerzés: {{plugin}}",
   "activityStarted": "{{name}} elindította: {{plugin}}",

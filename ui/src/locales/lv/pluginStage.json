@@ -22,6 +22,8 @@
   "leave": "Pamest {{plugin}}",
   "join": "Pievienoties",
   "joinLabel": "Pievienoties: {{plugin}}",
+  "open": "Atvērt",
+  "openLabel": "Atvērt: {{plugin}}",
   "getPlugin": "Iegūt spraudni",
   "getPluginLabel": "Iegūt {{plugin}}",
   "activityStarted": "{{name}} sāka {{plugin}}",

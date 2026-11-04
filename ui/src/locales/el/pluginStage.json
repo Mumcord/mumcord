@@ -22,6 +22,8 @@
   "leave": "Αποχώρηση από το {{plugin}}",
   "join": "Συμμετοχή",
   "joinLabel": "Συμμετοχή στο {{plugin}}",
+  "open": "Άνοιγμα",
+  "openLabel": "Άνοιγμα: {{plugin}}",
   "getPlugin": "Λήψη προσθέτου",
   "getPluginLabel": "Λήψη {{plugin}}",
   "activityStarted": "Ο/Η {{name}} ξεκίνησε το {{plugin}}",

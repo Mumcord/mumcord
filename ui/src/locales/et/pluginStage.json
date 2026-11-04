@@ -22,6 +22,8 @@
   "leave": "Lahku: {{plugin}}",
   "join": "Liitu",
   "joinLabel": "Liitu: {{plugin}}",
+  "open": "Ava",
+  "openLabel": "Ava: {{plugin}}",
   "getPlugin": "Hangi pistikprogramm",
   "getPluginLabel": "Hangi {{plugin}}",
   "activityStarted": "{{name}} käivitas {{plugin}}",

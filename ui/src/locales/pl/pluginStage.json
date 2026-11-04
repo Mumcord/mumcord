@@ -22,6 +22,8 @@
   "leave": "Opuść {{plugin}}",
   "join": "Dołącz",
   "joinLabel": "Dołącz do {{plugin}}",
+  "open": "Otwórz",
+  "openLabel": "Otwórz: {{plugin}}",
   "getPlugin": "Pobierz wtyczkę",
   "getPluginLabel": "Pobierz {{plugin}}",
   "activityStarted": "{{name}} uruchomił(a) {{plugin}}",

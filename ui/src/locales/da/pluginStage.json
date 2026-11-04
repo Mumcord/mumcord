@@ -22,6 +22,8 @@
   "leave": "Forlad {{plugin}}",
   "join": "Deltag",
   "joinLabel": "Deltag i {{plugin}}",
+  "open": "Åbn",
+  "openLabel": "Åbn: {{plugin}}",
   "getPlugin": "Hent plugin",
   "getPluginLabel": "Hent {{plugin}}",
   "activityStarted": "{{name}} startede {{plugin}}",

@@ -22,6 +22,8 @@
   "leave": "Fág {{plugin}}",
   "join": "Bain leis",
   "joinLabel": "Glac páirt in {{plugin}}",
+  "open": "Oscail",
+  "openLabel": "Oscail: {{plugin}}",
   "getPlugin": "Faigh an breiseán",
   "getPluginLabel": "Faigh {{plugin}}",
   "activityStarted": "Thosaigh {{name}} {{plugin}}",

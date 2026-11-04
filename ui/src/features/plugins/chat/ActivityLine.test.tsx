@@ -94,7 +94,8 @@ describe("activity line", () => {
     api.activities = [{ ...STARTED, joined: true }];
     render(<PluginActivityLines />);
     await settle();
-    fireEvent.click(screen.getByRole("button", { name: "Join Board Brawl" }));
+    expect(screen.queryByRole("button", { name: "Join Board Brawl" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Open Board Brawl" }));
     expect(api.join).not.toHaveBeenCalled();
     expect(mediaView().cinema).toBe("plugin:brawl");
   });

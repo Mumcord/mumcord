@@ -22,6 +22,8 @@
   "leave": "Zapusti {{plugin}}",
   "join": "Pridruži se",
   "joinLabel": "Pridruži se {{plugin}}",
+  "open": "Odpri",
+  "openLabel": "Odpri: {{plugin}}",
   "getPlugin": "Pridobi vtičnik",
   "getPluginLabel": "Pridobi {{plugin}}",
   "activityStarted": "{{name}} je začel {{plugin}}",
