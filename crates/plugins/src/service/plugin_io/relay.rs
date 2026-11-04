@@ -5,7 +5,10 @@
 //! ([`PluginService::set_relay_availability`]); the app passes the global switch
 //! ([`PluginService::set_relay_data_enabled`]). A 1:1 message through the relay leaves as
 //! [`ServiceEvent::RelaySend`] for the engine's pair session and comes back on the other side
-//! through [`PluginService::relay_received`]. Fallback messages are host frames
+//! through [`PluginService::relay_received`]. A channel message through the relay leaves as
+//! [`ServiceEvent::RelayBroadcast`] for the sender's relay broadcast; the members that have not
+//! joined it ([`PluginService::set_relay_broadcast_joined`]) get it as fallback when it fits
+//! (FR-9.61). Fallback messages are host frames
 //! ([`HOST_KIND_RELAY`]) on the plugin's Mumble plugin-data id. Payloads are opaque: never
 //! parsed or logged (FR-9.94).
 
@@ -16,7 +19,9 @@ use std::time::Instant;
 use mumcord_store::ServerId;
 
 use super::{PeersState, ServiceIo, wit_peer};
-use crate::api::relay::{self, Availability, Bucket, ENVELOPE_API, Path, RelayStatus, SendError};
+use crate::api::relay::{
+    self, Availability, Bucket, ENVELOPE_API, MAX_FALLBACK, Path, RelayStatus, SendError,
+};
 use crate::api::v1_1::{Up, relay_status};
 use crate::messaging::envelope::{self, HOST_KIND_RELAY};
 use crate::messaging::{Member, PluginRef, Target};
@@ -34,6 +39,8 @@ pub(in crate::service) struct RelayState {
     usage: HashMap<String, u64>,
     /// The status each plugin was last told about.
     told: HashMap<String, RelayStatus>,
+    /// Receivers in the own relay broadcast per server, as the engine reports them.
+    joined: HashMap<ServerId, Vec<u32>>,
 }
 
 impl Default for RelayState {
@@ -44,6 +51,7 @@ impl Default for RelayState {
             buckets: HashMap::new(),
             usage: HashMap::new(),
             told: HashMap::new(),
+            joined: HashMap::new(),
         }
     }
 }
@@ -61,7 +69,9 @@ impl RelayState {
 impl ServiceIo {
     /// The connection to `server` ended: no relay there any more.
     pub(in crate::service) fn relay_forget_server(&self, server: ServerId) {
-        self.relay().availability.remove(&server);
+        let mut relay = self.relay();
+        relay.availability.remove(&server);
+        relay.joined.remove(&server);
     }
 
     pub(in crate::service) fn relay(&self) -> MutexGuard<'_, RelayState> {
@@ -119,20 +129,22 @@ impl ServiceIo {
         let status = self.relay().status(Some(server));
         let path =
             relay::path(status, target, data.len(), fallback).ok_or(SendError::Unavailable)?;
+        let now = Instant::now();
+        let take_rate = |relay: &mut RelayState| {
+            if !relay
+                .buckets
+                .entry(plugin.to_owned())
+                .or_insert_with(|| Bucket::new(now))
+                .take(data.len(), now)
+            {
+                return Err(SendError::Error(Error::RateLimited));
+            }
+            *relay.usage.entry(plugin.to_owned()).or_default() += data.len() as u64;
+            Ok(())
+        };
         match path {
             Path::Relay => {
-                let mut relay = self.relay();
-                let now = Instant::now();
-                if !relay
-                    .buckets
-                    .entry(plugin.to_owned())
-                    .or_insert_with(|| Bucket::new(now))
-                    .take(data.len(), now)
-                {
-                    return Err(Error::RateLimited.into());
-                }
-                *relay.usage.entry(plugin.to_owned()).or_default() += data.len() as u64;
-                drop(relay);
+                take_rate(&mut self.relay())?;
                 drop(peers);
                 for session in receivers {
                     self.emit(ServiceEvent::RelaySend {
@@ -143,6 +155,48 @@ impl ServiceIo {
                         data: data.clone(),
                     });
                 }
+            }
+            Path::Broadcast => {
+                let joined = self
+                    .relay()
+                    .joined
+                    .get(&server)
+                    .cloned()
+                    .unwrap_or_default();
+                let outside: Vec<Member<'_>> = members
+                    .iter()
+                    .filter(|m| receivers.contains(&m.session) && !joined.contains(&m.session))
+                    .copied()
+                    .collect();
+                // The members outside the broadcast first, so a refused fallback (its rate)
+                // sends nothing at all.
+                let outgoing = if fallback && data.len() <= MAX_FALLBACK && !outside.is_empty() {
+                    let frame = envelope::encode_host(HOST_KIND_RELAY, &data);
+                    Some(
+                        connection
+                            .messenger
+                            .send_host(&plugin_ref, target, &outside, frame, now)
+                            .map_err(super::wit_error)?,
+                    )
+                } else {
+                    None
+                };
+                take_rate(&mut self.relay())?;
+                drop(peers);
+                if let Some(outgoing) = outgoing {
+                    self.emit(ServiceEvent::PeerSend {
+                        server,
+                        plugin: plugin.to_owned(),
+                        outgoing,
+                    });
+                }
+                self.emit(ServiceEvent::RelayBroadcast {
+                    server,
+                    plugin: plugin.to_owned(),
+                    api: ENVELOPE_API,
+                    data,
+                    receivers,
+                });
             }
             Path::Fallback => {
                 let frame = envelope::encode_host(HOST_KIND_RELAY, &data);
@@ -168,6 +222,11 @@ impl PluginService {
     pub fn set_relay_availability(&mut self, server: ServerId, availability: Availability) {
         self.io.relay().availability.insert(server, availability);
         self.relay_refresh();
+    }
+
+    /// The receivers in the own relay broadcast on `server` (engine `PluginRelayJoined`).
+    pub fn set_relay_broadcast_joined(&mut self, server: ServerId, joined: Vec<u32>) {
+        self.io.relay().joined.insert(server, joined);
     }
 
     /// The global switch (FR-9.63). The app ends the engine's relay streams itself.
@@ -305,14 +364,14 @@ mod tests {
 
     use super::super::{Connection, MessagingMeta, PeerInfo, PluginMeta};
     use super::*;
-    use crate::api::relay::{MAX_FALLBACK, MAX_MESSAGE};
+    use crate::api::relay::MAX_MESSAGE;
     use crate::manifest::Visibility;
     use crate::messaging::announce::{AnnounceEntry, SourceTag};
 
     const SERVER: ServerId = 1;
     const AVAILABLE: Availability = Availability::Available { kbps: Some(512) };
 
-    /// The user with session 2 (runs `dice`) and session 3 (does not) in the channel.
+    /// The user with sessions 2 and 4 (run `dice`) and session 3 (does not) in the channel.
     fn io() -> (ServiceIo, UnboundedReceiver<ServiceEvent>) {
         let (events, rx) = unbounded_channel();
         let io = ServiceIo::new(None, events);
@@ -321,7 +380,7 @@ mod tests {
             peers.focused = Some(SERVER);
             let mut connection = Connection::new(Instant::now());
             connection.supported = true;
-            for session in [2, 3] {
+            for session in [2, 3, 4] {
                 connection.members.insert(
                     session,
                     PeerInfo {
@@ -332,14 +391,16 @@ mod tests {
                     },
                 );
             }
-            connection.announced.insert(
-                2,
-                vec![AnnounceEntry {
-                    id: "dice".into(),
-                    api_major: 1,
-                    source: SourceTag::Official,
-                }],
-            );
+            for session in [2, 4] {
+                connection.announced.insert(
+                    session,
+                    vec![AnnounceEntry {
+                        id: "dice".into(),
+                        api_major: 1,
+                        source: SourceTag::Official,
+                    }],
+                );
+            }
             peers.connections.insert(SERVER, connection);
             peers.plugins.insert(
                 "dice".into(),
@@ -481,20 +542,89 @@ mod tests {
         ));
     }
 
+    /// The fallback receivers and the broadcast's receivers of the drained events.
+    fn split(rx: &mut UnboundedReceiver<ServiceEvent>) -> (Vec<u32>, Vec<u32>) {
+        let mut fallback = Vec::new();
+        let mut broadcast = Vec::new();
+        for event in drain(rx) {
+            match event {
+                ServiceEvent::PeerSend { outgoing, .. } => fallback.extend(outgoing.receivers),
+                ServiceEvent::RelayBroadcast {
+                    server: SERVER,
+                    api: (1, 1),
+                    receivers,
+                    ..
+                } => broadcast.extend(receivers),
+                other => panic!("{other:?}"),
+            }
+        }
+        (fallback, broadcast)
+    }
+
     #[test]
-    fn channel_sends_use_the_fallback_for_now() {
+    fn channel_sends_go_through_the_broadcast_and_fall_back_for_members_outside() {
         let (io, mut rx) = io();
         available(&io);
+        // Nobody joined yet: everyone with the plugin gets the fallback too.
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+            .expect("sent");
+        assert_eq!(split(&mut rx), (vec![2, 4], vec![2, 4]));
+        // Only the member outside the broadcast gets the fallback.
+        io.relay().joined.insert(SERVER, vec![2]);
+        io.relay_send_to("dice", Target::Channel, vec![1; MAX_FALLBACK], true)
+            .expect("sent");
+        assert_eq!(split(&mut rx), (vec![4], vec![2, 4]));
+        // Too large for Mumble plugin data, or no fallback allowed: the broadcast only.
+        io.relay_send_to("dice", Target::Channel, vec![1; MAX_FALLBACK + 1], true)
+            .expect("sent");
+        assert_eq!(split(&mut rx), (vec![], vec![2, 4]));
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], false)
+            .expect("sent");
+        assert_eq!(split(&mut rx), (vec![], vec![2, 4]));
+        // Everyone joined: no fallback.
+        io.relay().joined.insert(SERVER, vec![2, 4]);
+        io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
+            .expect("sent");
+        assert_eq!(split(&mut rx), (vec![], vec![2, 4]));
+        assert_eq!(
+            io.relay().usage.get("dice"),
+            Some(&(31 + 2 * MAX_FALLBACK as u64))
+        );
+    }
+
+    #[test]
+    fn channel_sends_share_the_plugin_rate() {
+        let (io, mut rx) = io();
+        available(&io);
+        io.relay().joined.insert(SERVER, vec![2, 4]);
+        for _ in 0..16 {
+            io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false)
+                .expect("within the burst");
+        }
+        assert_eq!(
+            io.relay_send_to("dice", Target::Channel, vec![0; MAX_MESSAGE], false),
+            Err(SendError::Error(Error::RateLimited))
+        );
+        assert_eq!(drain(&mut rx).len(), 16);
+    }
+
+    #[test]
+    fn without_the_relay_channel_sends_fall_back_when_they_fit() {
+        let (io, mut rx) = io();
         io.relay_send_to("dice", Target::Channel, vec![1; 10], true)
             .expect("fallback");
-        let events = drain(&mut rx);
-        let [ServiceEvent::PeerSend { outgoing, .. }] = events.as_slice() else {
-            panic!("{events:?}");
-        };
-        assert_eq!(outgoing.receivers, [2]);
+        assert_eq!(split(&mut rx), (vec![2, 4], vec![]));
         assert_eq!(
             io.relay_send_to("dice", Target::Channel, vec![1; 2000], true),
             Err(SendError::Unavailable)
         );
+    }
+
+    #[test]
+    fn a_lost_connection_forgets_the_joined_receivers() {
+        let (io, _rx) = io();
+        io.relay().joined.insert(SERVER, vec![2]);
+        io.relay_forget_server(SERVER);
+        assert!(io.relay().joined.is_empty());
     }
 }

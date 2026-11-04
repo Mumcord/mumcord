@@ -985,7 +985,7 @@ fn emit_engine_event(
             .emit(app)
         }
         // The plugin service takes it (`plugins::on_engine_event`); the UI never sees payloads.
-        EngineEvent::PluginRelayData { .. } => Ok(()),
+        EngineEvent::PluginRelayData { .. } | EngineEvent::PluginRelayJoined { .. } => Ok(()),
         EngineEvent::RelayChanged(info) => commands::p2p::RelayChanged {
             server_id,
             info: info.into(),

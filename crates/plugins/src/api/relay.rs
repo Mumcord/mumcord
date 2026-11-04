@@ -70,15 +70,20 @@ pub fn status(availability: Availability, switch_on: bool, permitted: bool) -> R
 pub enum Path {
     /// Through the relay pair session to the one receiver.
     Relay,
+    /// Through the sender's relay broadcast to the channel; members that did not join it get
+    /// the fallback when the message fits (FR-9.61).
+    Broadcast,
     /// Through Mumble plugin data, under the `peers.messages` rate rules (FR-6.36).
     Fallback,
 }
 
-/// The path for a message of `len` bytes, or `None` for `relay-unavailable`. Channel sends
-/// use the fallback until relay broadcasts carry plugin data.
+/// The path for a message of `len` bytes, or `None` for `relay-unavailable`.
 pub fn path(status: RelayStatus, target: Target, len: usize, fallback: bool) -> Option<Path> {
-    if status == RelayStatus::Available && matches!(target, Target::Direct(_)) {
-        Some(Path::Relay)
+    if status == RelayStatus::Available {
+        Some(match target {
+            Target::Direct(_) => Path::Relay,
+            Target::Channel => Path::Broadcast,
+        })
     } else if fallback && len <= MAX_FALLBACK {
         Some(Path::Fallback)
     } else {
@@ -209,14 +214,21 @@ mod tests {
     }
 
     #[test]
-    fn channel_messages_fall_back_until_relay_broadcasts_exist() {
+    fn channel_messages_take_the_broadcast_when_the_relay_is_available() {
         let channel = Target::Channel;
         assert_eq!(
-            path(RelayStatus::Available, channel, 997, true),
+            path(RelayStatus::Available, channel, MAX_MESSAGE, false),
+            Some(Path::Broadcast)
+        );
+        assert_eq!(
+            path(RelayStatus::NoRelay, channel, MAX_FALLBACK, true),
             Some(Path::Fallback)
         );
-        assert_eq!(path(RelayStatus::Available, channel, 998, true), None);
-        assert_eq!(path(RelayStatus::Available, channel, 10, false), None);
+        assert_eq!(
+            path(RelayStatus::NoRelay, channel, MAX_FALLBACK + 1, true),
+            None
+        );
+        assert_eq!(path(RelayStatus::SwitchedOff, channel, 10, false), None);
     }
 
     #[test]
