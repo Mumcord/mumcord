@@ -1053,5 +1053,17 @@
     "switch": "Developer mode",
     "hint": "Adds a Developer tab to Plugins where you can load unsigned plugins from a folder. Only turn it on if you build plugins yourself."
   },
-  "newBadge": "New"
+  "newBadge": "New",
+  "pluginSafety": {
+    "title": "Plugin safety",
+    "blockHighRisk": "Don't allow high-risk plugins",
+    "hint": "Hides the Install button for plugins with a score of 60 or more, and stops updates that would push an installed plugin there. Plugins you already installed keep working.",
+    "note": "Off by default. Official plugins and developer plugins are never affected. Scores are estimates, not a guarantee."
+  },
+  "pluginSounds": {
+    "title": "Plugin sounds",
+    "volume": "Plugin sound volume",
+    "mute": "Mute plugin sounds",
+    "hint": "Applies to every sound a plugin plays. Plugin sounds are quieter while people talk."
+  }
 }

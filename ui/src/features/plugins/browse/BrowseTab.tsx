@@ -19,6 +19,7 @@ import { CATEGORIES, visiblePlugins, type Category } from "./filter";
  */
 export function BrowseTab() {
   const { t, i18n } = useTranslation("pluginBrowse");
+  const { t: tScore } = useTranslation("pluginScore");
   // The plugin list texts follow the UI language.
   const language = i18n.language;
   const state = usePluginIndex(language);
@@ -32,6 +33,8 @@ export function BrowseTab() {
   const searchId = useId();
   const plugins = useMemo(() => (state.status === "loaded" ? state.index.plugins : []), [state]);
   const find = (id: string | null) => plugins.find((plugin) => plugin.id === id) ?? null;
+  // Scores only exist for unofficial plugins; without any, the notes would explain nothing.
+  const scoresShown = plugins.some((plugin) => plugin.source.kind !== "official");
   const isInstalled = (id: string) => installed.some((plugin) => plugin.id === id);
 
   const detailsRequest = usePendingPluginRequest("details");
@@ -163,6 +166,7 @@ export function BrowseTab() {
               ))}
             </div>
           </div>
+          {scoresShown && <p className="plugin-browse-scorenote">{tScore("browseNote")}</p>}
           <BrowseList
             plugins={plugins}
             visible={visiblePlugins(plugins, category, search)}
@@ -170,6 +174,7 @@ export function BrowseTab() {
             onDetails={setDetailsId}
             onInstall={setPromptId}
           />
+          {scoresShown && <p className="plugin-browse-footer">{tScore("browseFootnote")}</p>}
           <p className="plugin-browse-footer">{t("footer")}</p>
         </>
       )}

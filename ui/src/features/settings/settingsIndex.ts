@@ -458,6 +458,19 @@ export const SETTINGS_INDEX: readonly SettingEntry[] = [
     terms: ["developerMode.hint"],
   },
   { section: "plugins", group: "sections.plugins", terms: ["sectionDescriptions.plugins"] },
+  {
+    section: "plugins",
+    group: "pluginSafety.title",
+    control: "pluginSafety.blockHighRisk",
+    terms: ["pluginSafety.hint", "pluginSafety.note"],
+  },
+  {
+    section: "plugins",
+    group: "pluginSounds.title",
+    control: "pluginSounds.volume",
+    terms: ["pluginSounds.hint"],
+  },
+  { section: "plugins", group: "pluginSounds.title", control: "pluginSounds.mute" },
   { section: "advanced", group: "diagnostics.title", control: "diagnostics.logLevel" },
   {
     section: "advanced",

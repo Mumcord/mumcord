@@ -5,6 +5,7 @@ import { Group } from "../settings/components/Section";
 import { Switch } from "../settings/components/Switch";
 import { consumeRequestedPluginTab, useRequestedPluginTab } from "./pluginRequestStore";
 import { setAllPluginsOff, usePlugins } from "./pluginStore";
+import { PluginSafetyGroup, PluginSoundsGroup } from "./PlatformSettingsGroups";
 import { RepositoriesTab, type MirrorSetting } from "./repos";
 import { UpdatesTab } from "./updates";
 import { useUpdatesCount } from "./updates/useUpdatesCount";
@@ -140,6 +141,8 @@ export function PluginsSection({
           TAB_CONTENT[active]
         )}
       </div>
+      {active === "installed" && <PluginSafetyGroup />}
+      {active === "installed" && <PluginSoundsGroup />}
       {active === "installed" && (
         <Group title={t("tabs.installed")}>
           <Switch

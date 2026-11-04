@@ -10,6 +10,7 @@ import {
   useRequestedPluginTab,
 } from "../pluginRequestStore";
 import { resetPluginStore } from "../pluginStore";
+import { forgetListingScores } from "../score/useListingScore";
 import { InstalledTab } from "./InstalledTab";
 import { initials, permissionChips, sourceLabel, stateLabel } from "./labels";
 
@@ -69,6 +70,7 @@ const foo = plugin({
 beforeEach(async () => {
   await applyLanguage("en");
   resetPluginStore();
+  forgetListingScores();
   resetPluginRequestStore();
   api = createMockApi();
   setApi(api);
@@ -373,5 +375,19 @@ describe("InstalledTab", () => {
     expect(
       await screen.findByRole("button", { name: "Permissions", description: "foo" }),
     ).toHaveAttribute("aria-expanded", "true");
+  });
+});
+
+describe("score chip", () => {
+  it("shows a chip on unofficial rows only", async () => {
+    withPlugins([echolings, foo]);
+    const score = vi.spyOn(api, "pluginScore").mockResolvedValue({
+      kind: "scored",
+      score: { value: 37, band: "medium", e: 0, f: 1, h: 0, factors: [], version: 1 },
+    });
+    render(<InstalledTab />);
+    expect(await screen.findByText(/Security score 37 out of 100/)).toBeInTheDocument();
+    expect(score).toHaveBeenCalledTimes(1);
+    expect(score).toHaveBeenCalledWith("foo", foo.version, "listing");
   });
 });
