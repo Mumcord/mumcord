@@ -1884,7 +1884,7 @@ RUST DEPENDENCIES
 Mumcord links the following Rust crates. Each crate is listed with the
 license(s) it is distributed under, followed by the license text(s).
 
-* MIT License (672 crates)
+* MIT License (674 crates)
 * Apache License 2.0 (43 crates)
 * BSD 3-Clause "New" or "Revised" License (32 crates)
 * ISC License (21 crates)
@@ -12152,6 +12152,24 @@ MIT License
 --------------------------------------------------------------------------------
 
 Used by:
+  - v4l 0.14.0 (https://github.com/raymanfx/libv4l-rs)
+
+MIT License
+
+Copyright (c) 2020 Christopher N. Hesse.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+MIT License
+--------------------------------------------------------------------------------
+
+Used by:
   - embed_plist 1.2.2 (https://github.com/nvzqz/embed-plist-rs)
 
 MIT License
@@ -12846,6 +12864,7 @@ Used by:
   - tauri-plugin-single-instance 2.5.5 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-plugin-updater 2.14.1 (https://github.com/tauri-apps/plugins-workspace)
   - tauri-winrt-notification 0.8.1 (https://github.com/tauri-apps/winrt-notification)
+  - v4l2-sys-mit 0.3.0
   - webview2-com-macros 0.8.1 (https://github.com/wravery/webview2-rs)
   - webview2-com-sys 0.39.1 (https://github.com/wravery/webview2-rs)
   - webview2-com 0.39.1 (https://github.com/wravery/webview2-rs)
