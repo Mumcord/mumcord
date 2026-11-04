@@ -10,6 +10,7 @@
 
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
+use std::time::Duration;
 
 use mumcord_store::{Conversation, ServerId};
 
@@ -24,6 +25,9 @@ use crate::web::fetch::ImageKind;
 
 /// Most stored messages updated for one arrived image.
 const MAX_RESTORED: u32 = 500;
+/// Time between two image requests: a holder answers a requester one image at a time, pauses
+/// after each upload, and takes at most `MAX_REQUESTS` per `REQUEST_WINDOW` from it.
+const SPACING: Duration = Duration::from_millis(10_500);
 
 /// An image waiting for a manual load: where it can be fetched and which channel needs it.
 #[derive(Clone)]
@@ -38,8 +42,8 @@ struct Waiting {
 #[derive(Default)]
 pub(crate) struct HistoryImages {
     engine: OnceLock<WeakEngine>,
-    /// One fetch at a time: a holder serves one image per requester at a time.
-    turn: tokio::sync::Mutex<()>,
+    /// One fetch at a time, [`SPACING`] apart: when the last one started.
+    turn: tokio::sync::Mutex<Option<tokio::time::Instant>>,
     /// Images that wait for a manual load, by server and image hash.
     waiting: Mutex<HashMap<(ServerId, [u8; 32]), Waiting>>,
 }
@@ -95,7 +99,11 @@ async fn load(engine: &Engine, server_id: ServerId, waiting: Waiting, manual: bo
             return;
         }
         None => {
-            let _turn = images.turn.lock().await;
+            let mut last = images.turn.lock().await;
+            if let Some(at) = *last {
+                tokio::time::sleep_until(at + SPACING).await;
+            }
+            *last = Some(tokio::time::Instant::now());
             engine
                 .full_image_download(server_id, image.full, waiting.holder)
                 .await
@@ -251,6 +259,13 @@ impl Engine {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn fetches_stay_within_the_holders_request_limit() {
+        use crate::full_image::transfer::{MAX_REQUESTS, REQUEST_WINDOW};
+        let requests = u32::try_from(MAX_REQUESTS).expect("small");
+        assert!(SPACING * requests > REQUEST_WINDOW);
+    }
 
     #[test]
     fn only_the_exact_image_fits_its_reference() {
