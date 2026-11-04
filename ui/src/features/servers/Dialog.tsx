@@ -5,6 +5,8 @@ interface DialogProps {
   /** Shown before the title text, hidden from screen readers (the title already names it). */
   titleLead?: ReactNode;
   onClose: () => void;
+  /** Accessible name of a visible close button (×) in the header; no button when omitted. */
+  closeLabel?: string | undefined;
   children: ReactNode;
   /** "alertdialog" for blocking warnings such as a changed certificate. */
   role?: "dialog" | "alertdialog";
@@ -15,7 +17,8 @@ interface DialogProps {
   className?: string | undefined;
 }
 
-const FOCUSABLE = "input, select, textarea, button";
+// The header close button is skipped so opening the dialog does not park focus on "close".
+const FOCUSABLE = "input, select, textarea, button:not(.servers-dialog__close)";
 
 /**
  * Modal dialog on the native `<dialog>` element: `showModal()` makes the rest of the window inert
@@ -25,6 +28,7 @@ export function Dialog({
   title,
   titleLead,
   onClose,
+  closeLabel,
   children,
   role = "dialog",
   initialFocus,
@@ -66,10 +70,28 @@ export function Dialog({
       aria-labelledby={titleId}
       aria-describedby={describedBy}
     >
-      <h2 id={titleId} className="servers-dialog__title">
-        {titleLead}
-        {title}
-      </h2>
+      {closeLabel === undefined ? (
+        <h2 id={titleId} className="servers-dialog__title">
+          {titleLead}
+          {title}
+        </h2>
+      ) : (
+        <div className="servers-dialog__head">
+          <h2 id={titleId} className="servers-dialog__title">
+            {titleLead}
+            {title}
+          </h2>
+          <button
+            type="button"
+            className="servers-dialog__close"
+            aria-label={closeLabel}
+            data-tooltip={closeLabel}
+            onClick={onClose}
+          >
+            <span aria-hidden="true">✕</span>
+          </button>
+        </div>
+      )}
       {children}
     </dialog>
   );
