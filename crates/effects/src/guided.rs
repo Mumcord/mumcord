@@ -10,7 +10,7 @@ use crate::ops::box_filter;
 /// Window radius at quarter resolution (4 px there is about 16 px in the 720p frame).
 const RADIUS: usize = 4;
 /// Regularisation: larger values smooth more and follow weak edges less.
-const EPS: f32 = 1e-3;
+const EPS: f32 = 1e-2;
 
 #[derive(Debug, Default)]
 pub struct GuidedFilter {

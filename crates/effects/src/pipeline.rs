@@ -33,10 +33,11 @@ use crate::segmenter::{ModelShape, Segmenter};
 
 /// Light level: the model runs at 15 fps; frames in between reuse the smoothed mask.
 const LIGHT_MODEL_INTERVAL: Duration = Duration::from_millis(62);
-/// Mask remap: values below `LO` are background, above `HI` person. The midpoint above 0.5
-/// pulls the edge slightly inwards against halos.
-const REMAP_LO: f32 = 0.35;
-const REMAP_HI: f32 = 0.85;
+/// Mask remap: values up to `LO` are background, from `HI` person. The model leaves a soft
+/// fringe of about 0.3–0.5 around hair and ears that would show as a halo; the midpoint 0.7
+/// also pulls the edge slightly inwards.
+const REMAP_LO: f32 = 0.5;
+const REMAP_HI: f32 = 0.9;
 /// Temporal smoothing: weight of the new result in still areas, and how fast motion raises it.
 const STILL_WEIGHT: f32 = 0.3;
 const MOTION_GAIN: f32 = 10.0;
