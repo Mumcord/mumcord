@@ -360,7 +360,7 @@ jobs:
       # Linux is covered by the E2E build job, which builds the same app.
       - name: Tauri debug build
         if: matrix.task == 'check' && runner.os != 'Linux'
-        run: npm run tauri build -- --debug --no-bundle
+        run: npm run tauri build -- --debug --no-bundle -- --locked
 
   # The UI checks are platform-independent (vitest runs in jsdom), so they run once, on Linux, in
   # parallel with the Rust jobs. The ubuntu-24.04 result check below requires this job.
