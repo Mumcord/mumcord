@@ -13,6 +13,8 @@ import { announce } from "../../../a11y";
 import { getApi, toEngineError } from "../../../api";
 import { useMembersColumn } from "../../../app/membersCollapse";
 import { ResizeHandle } from "../../../app/ResizeHandle";
+import { ContextMenu, type MenuPosition } from "../../../components/ContextMenu";
+import { requestPluginScreen } from "../notifications/pluginRequests";
 import { usePlugins } from "../pluginStore";
 import { usePluginIcon } from "../render/usePluginIcon";
 import { usePluginUi, type PluginWebview } from "../render/pluginUiStore";
@@ -20,15 +22,24 @@ import { PluginFrame } from "../webview";
 import {
   clampSideWidth,
   dismissSidePanel,
-  loadSideWidth,
   minWidthForHint,
-  saveSideWidth,
   SIDE_PANEL_DEFAULT_REM,
   SIDE_PANEL_MAX_REM,
   SIDE_PANEL_STEP_REM,
   useDismissedSidePanels,
 } from "./sidePanelStore";
 import "./sidepanel.css";
+
+const ICON = {
+  viewBox: "0 0 24 24",
+  width: 16,
+  height: 16,
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+} as const;
 
 interface Open {
   readonly plugin: string;
@@ -68,13 +79,43 @@ function SidePanel({ open }: { readonly open: Open }) {
   const name = installed?.name || plugin;
   const unofficial = installed !== undefined && installed.source.kind !== "official";
   const icon = usePluginIcon(plugin);
-  const hint = usePluginUi().sizeHints?.get(plugin);
+  const ui = usePluginUi();
+  const hint = ui.sizeHints?.get(plugin);
+  const status = ui.sidePanelStatus?.get(plugin);
   const column = useMembersColumn();
 
   const min = minWidthForHint(hint?.minWidth);
-  const [chosen, setChosen] = useState(() => loadSideWidth(plugin) ?? SIDE_PANEL_DEFAULT_REM);
+  const [chosen, setChosen] = useState(SIDE_PANEL_DEFAULT_REM);
+  const [menu, setMenu] = useState<MenuPosition | null>(null);
   const width = Math.max(chosen, min);
   const root = useRef<HTMLElement>(null);
+
+  // The width is the engine's setting; the panel opens at the default until it answers.
+  useEffect(() => {
+    let live = true;
+    getApi()
+      .pluginSidePanelWidth(plugin)
+      .then((saved) => {
+        if (live && saved !== null) setChosen(clampSideWidth(saved));
+      })
+      .catch((error: unknown) => {
+        console.error("Reading the side panel width failed", toEngineError(error).code);
+      });
+    return () => {
+      live = false;
+    };
+  }, [plugin]);
+
+  const saveWidth = useCallback(
+    (rem: number) => {
+      getApi()
+        .pluginSetSidePanelWidth(plugin, rem)
+        .catch((error: unknown) => {
+          console.error("Saving the side panel width failed", toEngineError(error).code);
+        });
+    },
+    [plugin],
+  );
 
   // The member column must show for the panel to be seen; it goes back as it was on close.
   const columnRef = useRef(column);
@@ -147,7 +188,7 @@ function SidePanel({ open }: { readonly open: Open }) {
           const remPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
           // Dragging left widens the panel.
           const next = resizeTo(start - deltaPx / remPx);
-          if (done) saveSideWidth(plugin, next);
+          if (done) saveWidth(next);
         }}
         onKey={(key) => {
           const target =
@@ -161,11 +202,11 @@ function SidePanel({ open }: { readonly open: Open }) {
                     ? SIDE_PANEL_MAX_REM
                     : null;
           if (target === null) return false;
-          saveSideWidth(plugin, resizeTo(target));
+          saveWidth(resizeTo(target));
           return true;
         }}
         onReset={() => {
-          saveSideWidth(plugin, resizeTo(SIDE_PANEL_DEFAULT_REM));
+          saveWidth(resizeTo(SIDE_PANEL_DEFAULT_REM));
         }}
       />
       <header className="plugin-sidepanel__head">
@@ -178,31 +219,61 @@ function SidePanel({ open }: { readonly open: Open }) {
         )}
         <h2 className="plugin-sidepanel__name">{name}</h2>
         {unofficial && <span className="plugin-sidepanel__chip">{tStage("unofficial")}</span>}
-        <button
-          type="button"
-          className="plugin-sidepanel__close"
-          aria-label={t("close", { plugin: name })}
-          data-tooltip={t("close", { plugin: name })}
-          onClick={close}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="16"
-            height="16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+        <span className="plugin-sidepanel__tools">
+          <button
+            type="button"
+            className="plugin-sidepanel__tool"
+            aria-label={t("options", { plugin: name })}
+            data-tooltip={t("options", { plugin: name })}
+            aria-haspopup="menu"
+            aria-expanded={menu !== null}
+            onClick={(event) => {
+              const button = event.currentTarget;
+              const rect = button.getBoundingClientRect();
+              setMenu({ x: rect.right, y: rect.bottom, opener: button });
+            }}
           >
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
+            <svg {...ICON} aria-hidden="true">
+              <circle cx="5" cy="12" r="1" />
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="19" cy="12" r="1" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="plugin-sidepanel__tool"
+            aria-label={t("close", { plugin: name })}
+            data-tooltip={t("close", { plugin: name })}
+            onClick={close}
+          >
+            <svg {...ICON} aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </span>
       </header>
       <div className="plugin-sidepanel__body">
         <PluginFrame plugin={plugin} webview={webview} />
       </div>
+      {status !== undefined && status !== "" && <p className="plugin-sidepanel__foot">{status}</p>}
+      {menu !== null && (
+        <ContextMenu
+          menu={menu}
+          label={t("options", { plugin: name })}
+          onClose={() => {
+            setMenu(null);
+          }}
+          items={[
+            {
+              label: t("details"),
+              onSelect: () => {
+                requestPluginScreen({ kind: "installed", plugin });
+              },
+            },
+            { label: t("closePanel"), onSelect: close },
+          ]}
+        />
+      )}
     </section>
   );
 }

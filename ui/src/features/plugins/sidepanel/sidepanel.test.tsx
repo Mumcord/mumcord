@@ -1,23 +1,25 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axe from "axe-core";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { applyLanguage } from "../../../i18n";
+import { requestPluginScreen } from "../notifications/pluginRequests";
 import { SidePanelHost } from "./SidePanelHost";
-import {
-  clampSideWidth,
-  loadSideWidth,
-  minWidthForHint,
-  resetSidePanelDismissals,
-  saveSideWidth,
-} from "./sidePanelStore";
+import { clampSideWidth, minWidthForHint, resetSidePanelDismissals } from "./sidePanelStore";
 
 const api = vi.hoisted(() => ({
   sendEvent: vi.fn<(plugin: string, event: unknown) => Promise<null>>(() => Promise.resolve(null)),
   listeners: new Map<string, (payload: unknown) => void>(),
+  widths: new Map<string, number>(),
 }));
+vi.mock("../notifications/pluginRequests", () => ({ requestPluginScreen: vi.fn() }));
 vi.mock("../../../api", async (orig) => {
   const mocked = {
     pluginUiEvent: api.sendEvent,
+    pluginSidePanelWidth: (plugin: string) => Promise.resolve(api.widths.get(plugin) ?? null),
+    pluginSetSidePanelWidth: (plugin: string, width: number) => {
+      api.widths.set(plugin, width);
+      return Promise.resolve(null);
+    },
     pluginFramesMute: () => Promise.resolve(null),
     pluginsList: () =>
       Promise.resolve({
@@ -75,7 +77,8 @@ beforeAll(async () => {
 });
 beforeEach(() => {
   api.sendEvent.mockClear();
-  localStorage.clear();
+  api.widths.clear();
+  vi.mocked(requestPluginScreen).mockClear();
   resetSidePanelDismissals();
 });
 afterEach(() => {
@@ -92,10 +95,15 @@ describe("width", () => {
     expect(minWidthForHint(9000)).toBe(32);
   });
 
-  it("remembers the width per plugin", () => {
-    saveSideWidth("sketch", 27);
-    expect(loadSideWidth("sketch")).toBe(27);
-    expect(loadSideWidth("dice")).toBeUndefined();
+  it("opens at the width the engine remembers for the plugin", async () => {
+    api.widths.set("sketch", 27);
+    const { container } = mount();
+    show("sketch");
+    await screen.findByRole("region", { name: "Sketchboard side panel" });
+    const shell = container.querySelector<HTMLElement>(".shell");
+    await waitFor(() => {
+      expect(shell?.style.getPropertyValue("--plugin-side-width")).toBe("27rem");
+    });
   });
 });
 
@@ -146,9 +154,33 @@ describe("side panel", () => {
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     fireEvent.keyDown(handle, { key: "ArrowRight" });
     expect(shell?.style.getPropertyValue("--plugin-side-width")).toBe("23rem");
-    expect(loadSideWidth("sketch")).toBe(23);
+    await waitFor(() => {
+      expect(api.widths.get("sketch")).toBe(23);
+    });
     fireEvent.keyDown(handle, { key: "End" });
     expect(handle).toHaveAttribute("aria-valuenow", "32");
+  });
+
+  it("has an options menu with the plugin details and a close entry", async () => {
+    mount();
+    show("sketch");
+    fireEvent.click(await screen.findByRole("button", { name: "Sketchboard options" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Plugin details" }));
+    expect(requestPluginScreen).toHaveBeenCalledWith({ kind: "installed", plugin: "sketch" });
+    fireEvent.click(screen.getByRole("button", { name: "Sketchboard options" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Close panel" }));
+    expect(api.sendEvent).toHaveBeenCalledWith("sketch", {
+      type: "surfaceClosed",
+      place: "sidePanel",
+    });
+    expect(screen.queryByRole("region", { name: "Sketchboard side panel" })).toBeNull();
+  });
+
+  it("shows no status line while the plugin sent none", async () => {
+    const { container } = mount();
+    show("sketch");
+    await screen.findByRole("region", { name: "Sketchboard side panel" });
+    expect(container.querySelector(".plugin-sidepanel__foot")).toBeNull();
   });
 
   it("returns focus to the opener on close", async () => {

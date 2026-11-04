@@ -1348,6 +1348,35 @@ pub async fn plugin_set_platform_settings(
     Ok(())
 }
 
+/// The width in rem the user last gave `plugin`'s side panel (FR-9.39), if any.
+#[tauri::command]
+#[specta::specta]
+pub fn plugin_side_panel_width(
+    engine: State<'_, Engine>,
+    plugin: String,
+) -> ApiResult<Option<f32>> {
+    Ok(engine
+        .settings()?
+        .plugins
+        .side_panel_width
+        .get(&plugin)
+        .copied())
+}
+
+/// Remembers `plugin`'s side panel width; the store clamps it to 18–32 rem.
+#[tauri::command]
+#[specta::specta]
+pub async fn plugin_set_side_panel_width(
+    engine: State<'_, Engine>,
+    plugin: String,
+    width: f32,
+) -> ApiResult<()> {
+    let mut stored = engine.settings()?;
+    stored.plugins.side_panel_width.insert(plugin, width);
+    engine.update_settings(stored).await?;
+    Ok(())
+}
+
 /// Whether `server`'s relay can carry plugin data right now (FR-9.57), before the global
 /// switch and a plugin's own permission.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]

@@ -669,6 +669,10 @@ export const commands = {
 	pluginPlatformSettings: () => typedError<PluginPlatformSettings, ApiError>(__TAURI_INVOKE("plugin_platform_settings")),
 	/**  Saves the plugin platform's settings; the volume is clamped to 0–100. */
 	pluginSetPlatformSettings: (settings: PluginPlatformSettings) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_platform_settings", { settings })),
+	/**  The width in rem the user last gave `plugin`'s side panel (FR-9.39), if any. */
+	pluginSidePanelWidth: (plugin: string) => typedError<number | null, ApiError>(__TAURI_INVOKE("plugin_side_panel_width", { plugin })),
+	/**  Remembers `plugin`'s side panel width; the store clamps it to 18–32 rem. */
+	pluginSetSidePanelWidth: (plugin: string, width: number | null) => typedError<null, ApiError>(__TAURI_INVOKE("plugin_set_side_panel_width", { plugin, width })),
 	/**
 	 *  The relay's plugin-data availability on `server_id`; kept current by the
 	 *  `plugins://relay-availability` event.

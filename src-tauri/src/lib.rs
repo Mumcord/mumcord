@@ -250,6 +250,8 @@ fn specta_builder() -> Builder<tauri::Wry> {
             commands::plugins::plugin_websites,
             commands::plugins::plugin_platform_settings,
             commands::plugins::plugin_set_platform_settings,
+            commands::plugins::plugin_side_panel_width,
+            commands::plugins::plugin_set_side_panel_width,
             commands::plugins::plugin_relay_availability,
             commands::plugins::plugin_relay_usage,
             commands::plugins::plugin_check_now,

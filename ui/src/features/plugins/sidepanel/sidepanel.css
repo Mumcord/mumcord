@@ -23,6 +23,7 @@
   height: 100%;
   padding: var(--space-3);
   box-sizing: border-box;
+  border-left: 1px solid var(--color-border);
   background: var(--color-bg-sidebar);
 }
 
@@ -74,13 +75,18 @@
   white-space: nowrap;
 }
 
-.plugin-sidepanel__close {
+.plugin-sidepanel__tools {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.plugin-sidepanel__tool {
   display: grid;
   flex: none;
   place-items: center;
   width: 1.9rem;
   height: 1.9rem;
-  margin-left: auto;
   border: 0;
   border-radius: var(--radius-md);
   background: transparent;
@@ -88,8 +94,14 @@
   cursor: pointer;
 }
 
-.plugin-sidepanel__close:hover {
+.plugin-sidepanel__tool:hover {
   background: var(--color-bg-hover);
+}
+
+.plugin-sidepanel__foot {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .plugin-sidepanel__body {

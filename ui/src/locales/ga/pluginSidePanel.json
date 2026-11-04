@@ -2,5 +2,8 @@
   "region": "Painéal taobh {{plugin}}",
   "close": "Dún painéal taobh {{plugin}}",
   "resize": "Athraigh méid phainéal taobh {{plugin}}",
-  "failed": "Níorbh fhéidir painéal taobh {{plugin}} a dhúnadh. Bain triail eile as."
+  "failed": "Níorbh fhéidir painéal taobh {{plugin}} a dhúnadh. Bain triail eile as.",
+  "options": "Roghanna {{plugin}}",
+  "details": "Sonraí an bhreiseáin",
+  "closePanel": "Dún an painéal"
 }

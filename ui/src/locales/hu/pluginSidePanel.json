@@ -2,5 +2,8 @@
   "region": "{{plugin}} oldalpanelje",
   "close": "{{plugin}} oldalpanelének bezárása",
   "resize": "{{plugin}} oldalpanelének átméretezése",
-  "failed": "A(z) {{plugin}} oldalpanelét nem sikerült bezárni. Próbáld újra."
+  "failed": "A(z) {{plugin}} oldalpanelét nem sikerült bezárni. Próbáld újra.",
+  "options": "{{plugin}} beállításai",
+  "details": "A bővítmény részletei",
+  "closePanel": "Panel bezárása"
 }

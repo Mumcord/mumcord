@@ -2,5 +2,8 @@
   "region": "Panel boczny wtyczki {{plugin}}",
   "close": "Zamknij panel boczny wtyczki {{plugin}}",
   "resize": "Zmień rozmiar panelu bocznego wtyczki {{plugin}}",
-  "failed": "Nie udało się zamknąć panelu bocznego wtyczki {{plugin}}. Spróbuj ponownie."
+  "failed": "Nie udało się zamknąć panelu bocznego wtyczki {{plugin}}. Spróbuj ponownie.",
+  "options": "Opcje wtyczki {{plugin}}",
+  "details": "Szczegóły wtyczki",
+  "closePanel": "Zamknij panel"
 }

@@ -2,5 +2,8 @@
   "region": "Bočna ploča dodatka {{plugin}}",
   "close": "Zatvori bočnu ploču dodatka {{plugin}}",
   "resize": "Promijeni veličinu bočne ploče dodatka {{plugin}}",
-  "failed": "Bočnu ploču dodatka {{plugin}} nije bilo moguće zatvoriti. Pokušaj ponovno."
+  "failed": "Bočnu ploču dodatka {{plugin}} nije bilo moguće zatvoriti. Pokušaj ponovno.",
+  "options": "Mogućnosti dodatka {{plugin}}",
+  "details": "Pojedinosti o dodatku",
+  "closePanel": "Zatvori ploču"
 }

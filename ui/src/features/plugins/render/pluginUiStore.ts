@@ -32,6 +32,8 @@ export interface PluginUiState {
   readonly webviews: ReadonlyMap<string, ReadonlyMap<PluginWebviewPlace, PluginWebview>>;
   /** plugin id → the smallest size its side panel page asked for (FR-9.39). */
   readonly sizeHints?: ReadonlyMap<string, PluginWebviewSizeHint>;
+  /** plugin id → the status line its side panel shows under the page (FR-9.39). */
+  readonly sidePanelStatus?: ReadonlyMap<string, string>;
   /** The latest open/close request for a panel popover; `seq` changes on every request. */
   readonly popoverRequest?: PluginPopoverRequest | null;
 }

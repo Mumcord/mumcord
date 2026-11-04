@@ -2,5 +2,8 @@
   "region": "Zijpaneel van {{plugin}}",
   "close": "Zijpaneel van {{plugin}} sluiten",
   "resize": "Grootte van het zijpaneel van {{plugin}} aanpassen",
-  "failed": "Het zijpaneel van {{plugin}} kon niet worden gesloten. Probeer het opnieuw."
+  "failed": "Het zijpaneel van {{plugin}} kon niet worden gesloten. Probeer het opnieuw.",
+  "options": "Opties van {{plugin}}",
+  "details": "Plugindetails",
+  "closePanel": "Paneel sluiten"
 }

@@ -1096,6 +1096,7 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     soundVolume: 70,
     soundMuted: false,
   };
+  const sidePanelWidths = new Map<string, number>();
   let nextRepositoryId = 1;
   function previewRepository(url: string, expectedKey: string | null): RepositoryPreview {
     if (!url.startsWith("https://"))
@@ -3236,6 +3237,11 @@ export function createMockApi(options: MockOptions = {}): MockApi {
     pluginPlatformSettings: () => Promise.resolve(platformSettings),
     pluginSetPlatformSettings: (settings) => {
       platformSettings = { ...settings };
+      return Promise.resolve(null);
+    },
+    pluginSidePanelWidth: (plugin) => Promise.resolve(sidePanelWidths.get(plugin) ?? null),
+    pluginSetSidePanelWidth: (plugin, width) => {
+      sidePanelWidths.set(plugin, Math.min(32, Math.max(18, width)));
       return Promise.resolve(null);
     },
     pluginExportData: () => fail("notFound", "no such plugin"),

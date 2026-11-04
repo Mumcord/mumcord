@@ -2,5 +2,8 @@
   "region": "Pannell tal-ġenb ta' {{plugin}}",
   "close": "Agħlaq il-pannell tal-ġenb ta' {{plugin}}",
   "resize": "Biddel id-daqs tal-pannell tal-ġenb ta' {{plugin}}",
-  "failed": "Ma setgħetx tagħlaq il-pannell tal-ġenb ta' {{plugin}}. Erġa' pprova."
+  "failed": "Ma setgħetx tagħlaq il-pannell tal-ġenb ta' {{plugin}}. Erġa' pprova.",
+  "options": "Għażliet ta' {{plugin}}",
+  "details": "Dettalji tal-plugin",
+  "closePanel": "Agħlaq il-pannell"
 }

@@ -2,5 +2,8 @@
   "region": "Panoul lateral al {{plugin}}",
   "close": "Închide panoul lateral al {{plugin}}",
   "resize": "Redimensionează panoul lateral al {{plugin}}",
-  "failed": "Panoul lateral al {{plugin}} nu a putut fi închis. Încearcă din nou."
+  "failed": "Panoul lateral al {{plugin}} nu a putut fi închis. Încearcă din nou.",
+  "options": "Opțiunile {{plugin}}",
+  "details": "Detaliile pluginului",
+  "closePanel": "Închide panoul"
 }

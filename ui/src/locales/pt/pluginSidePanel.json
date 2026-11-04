@@ -2,5 +2,8 @@
   "region": "Painel lateral de {{plugin}}",
   "close": "Fechar o painel lateral de {{plugin}}",
   "resize": "Redimensionar o painel lateral de {{plugin}}",
-  "failed": "Não foi possível fechar o painel lateral de {{plugin}}. Tenta novamente."
+  "failed": "Não foi possível fechar o painel lateral de {{plugin}}. Tenta novamente.",
+  "options": "Opções de {{plugin}}",
+  "details": "Detalhes do plugin",
+  "closePanel": "Fechar o painel"
 }

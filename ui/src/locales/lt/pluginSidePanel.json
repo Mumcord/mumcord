@@ -2,5 +2,8 @@
   "region": "„{{plugin}}“ šoninė juosta",
   "close": "Uždaryti „{{plugin}}“ šoninę juostą",
   "resize": "Keisti „{{plugin}}“ šoninės juostos dydį",
-  "failed": "Nepavyko uždaryti „{{plugin}}“ šoninės juostos. Bandyk dar kartą."
+  "failed": "Nepavyko uždaryti „{{plugin}}“ šoninės juostos. Bandyk dar kartą.",
+  "options": "„{{plugin}}“ parinktys",
+  "details": "Papildinio informacija",
+  "closePanel": "Uždaryti juostą"
 }

@@ -2,5 +2,8 @@
   "region": "{{plugin}}s sidopanel",
   "close": "Stäng {{plugin}}s sidopanel",
   "resize": "Ändra storlek på {{plugin}}s sidopanel",
-  "failed": "{{plugin}}s sidopanel kunde inte stängas. Försök igen."
+  "failed": "{{plugin}}s sidopanel kunde inte stängas. Försök igen.",
+  "options": "Alternativ för {{plugin}}",
+  "details": "Information om tillägget",
+  "closePanel": "Stäng panelen"
 }
