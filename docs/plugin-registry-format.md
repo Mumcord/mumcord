@@ -177,9 +177,35 @@ Version entry:
 | `origins`      | array of strings | no       | Format 2. The web origins the version's manifest declares (at most 8); a score input.                                                                                                               |
 | `modules`      | int              | no       | Format 2. Number of WASM modules in the package; a score input.                                                                                                                                     |
 | `reproducible` | bool             | no       | Format 2. The author claims a reproducible build; a score input.                                                                                                                                    |
+| `notes_url`    | URL              | no       | Format 2. Where the author explains what changed in this version. `https` only, at most 512 characters; anything else is ignored. Shown as "What's new in <version>" in the update review.          |
 
 **Format 2** (`"format": 2`, the `v1.1` index) equals format 1 except for the version entry fields
-marked above. Mumcord 0.7.0 reads both formats.
+marked above (`min_mumcord`, `origins`, `modules`, `reproducible`, `notes_url`). The plugin-level
+`min_mumcord` stays as a fallback for versions without their own. Mumcord 0.7.0 reads both formats;
+a format 1 `api: 1` counts as `"1.0"`. Fields Mumcord does not know are ignored.
+
+A format 2 version entry:
+
+```json
+{
+  "version": "1.3.0",
+  "api": "1.1",
+  "min_mumcord": "0.7",
+  "url": "https://github.com/Mumcord/plugins/releases/download/board-v1.3.0/board-1.3.0.mcplugin",
+  "size": 182044,
+  "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+  "permissions": ["ui.stage", "ui.webview", "net.origins", "peers.relay"],
+  "origins": ["https://api.example"],
+  "modules": 1,
+  "reproducible": true,
+  "notes_url": "https://example.org/board/releases/1.3.0"
+}
+```
+
+`origins`, `modules` and `reproducible` are inputs of the [security score](plugin-score.md). The
+index can only repeat what the package's manifest says: the install prompt scores the verified
+package, and says so when it scores higher than the listing. A missing field counts as zero extra
+points. `reproducible` is shown as "claimed by the repository".
 
 ### Version choice
 
@@ -280,6 +306,10 @@ the website (FR-6.80). It is generated from the client's permission catalogue an
 `risk` is `green`, `yellow` or `red`; `text` maps language tags to the text shown in the install
 prompt (English only for now).
 
+`v1.1/permissions.json` holds the full API 1.1 catalogue, including `ui.stage`, `ui.side-panel`,
+`ui.app-menu`, `net.origins`, `peers.relay`, `audio.effects`, `files.save`, `files.import-picture`
+and `chat.post-image`; `v1/permissions.json` stays unchanged for older clients.
+
 ## Registry source
 
 The official registry is generated from files in `Mumcord/plugins` (FR-6.54) by
@@ -352,15 +382,17 @@ commit = "4f1c…"
 path = "dice"
 ```
 
-| Field                                             | Meaning                                                                                                                                           |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for.                                                   |
-| `api`                                             | `1` (API 1.0, listed in both indexes) or `"1.1"` (listed only in `v1.1/index.json`). `mumcord-plugin check` compares it with the package imports. |
-| `min_mumcord`                                     | Optional, e.g. `"0.7"`. Must not be lower than the first release with the API (0.6 for `1`, 0.7 for `"1.1"`). Written into the `v1.1` index only. |
-| `origins`                                         | Optional; the origins the manifest declares. Written into the `v1.1` index only.                                                                  |
-| `published`                                       | `YYYY-MM-DD`; the newest version's date becomes `updated`.                                                                                        |
-| `signature`                                       | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`.                          |
-| `source`                                          | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash.                   |
+| Field                                             | Meaning                                                                                                                                                      |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `version`, `api`, `size`, `sha256`, `permissions` | Become the version entry of the index. `permissions` is every permission the manifest asks for.                                                              |
+| `api`                                             | `1` (API 1.0, listed in both indexes) or `"1.1"` (listed only in `v1.1/index.json`). `mumcord-plugin check` compares it with the package imports.            |
+| `min_mumcord`                                     | Optional, e.g. `"0.7"`. Must not be lower than the first release with the API (0.6 for `1`, 0.7 for `"1.1"`). Written into the `v1.1` index only.            |
+| `origins`                                         | Optional; the origins the manifest declares. Written into the `v1.1` index only.                                                                             |
+| `modules`, `reproducible`                         | Not written by `mumcord-plugin site-data` yet: a registry that wants these score inputs adds them to its index by other means. Absent means no extra points. |
+| `notes_url`                                       | Optional `https` link to release notes (at most 512 characters). Written into the `v1.1` index only.                                                         |
+| `published`                                       | `YYYY-MM-DD`; the newest version's date becomes `updated`.                                                                                                   |
+| `signature`                                       | The author's detached minisign signature over the package; published as the release asset `<id>-<ver>.mcplugin.minisig`.                                     |
+| `source`                                          | Git repository, commit and folder the package is rebuilt from with `mumcord-plugin build --reproducible`; CI compares the hash.                              |
 
 The package itself is not in the repository: the publish workflow rebuilds it from `source` and
 attaches it to the release `<id>-v<ver>`, so the index URL is
