@@ -6,6 +6,7 @@ import {
   hasSavedPassword,
   permissionList,
   shortDescription,
+  movablePeople,
   userCount,
 } from "./channelModel";
 
@@ -86,6 +87,23 @@ describe("channel header model", () => {
     ]);
     expect(userCount(users, 2)).toBe(2);
     expect(userCount(users, 0)).toBe(0);
+  });
+
+  it("counts and moves no bot without voice (issue #458)", () => {
+    const relay = { session: 5, channelId: 2, bot: { voice: false, modules: ["peer"] } } as User;
+    const dj = { session: 6, channelId: 2, bot: { voice: true, modules: ["music"] } } as User;
+    const users = new Map([
+      [5, relay],
+      [6, dj],
+    ]);
+    expect(userCount(users, 2)).toBe(1);
+    const movable = new Map(
+      [...channels].map(([id, c]) => [
+        id,
+        { ...c, permissions: { ...c.permissions, moveUsers: true } },
+      ]),
+    );
+    expect(movablePeople(users, movable, null, 1).map((u) => u.session)).toEqual([6]);
   });
 
   it("finds a saved password only for a channel that still matches", () => {

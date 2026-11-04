@@ -4,6 +4,7 @@
  * A mention is plain `@Name` text, so other Mumble clients just see that text.
  */
 import type { Conversation, User } from "../../api";
+import { isHiddenBot } from "../channels/mumcord";
 
 /** DOM id of option `index` of the suggestion list `listId`. */
 export function optionId(listId: string, index: number): string {
@@ -51,7 +52,8 @@ export function rankMentionCandidates(
   const wanted = foldName(query);
   const matches: { user: User; folded: string; here: boolean }[] = [];
   for (const user of users) {
-    if (user.session === selfSession || user.name === "") continue;
+    // Bots without voice are never suggested (issue #458).
+    if (user.session === selfSession || user.name === "" || isHiddenBot(user)) continue;
     const folded = foldName(user.name);
     if (folded.startsWith(wanted)) {
       matches.push({ user, folded, here: channelId !== null && user.channelId === channelId });

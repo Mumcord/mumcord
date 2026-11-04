@@ -7,6 +7,7 @@ import { Avatar } from "../members/Avatar";
 import { Dialog } from "../servers/Dialog";
 import { displayName } from "../servers/format";
 import { useServers as useSavedServers } from "../servers/store";
+import { isHiddenBot } from "../channels/mumcord";
 
 /** "Start a new conversation": pick anyone on any connected server, found by name. */
 export function NewConversationDialog({ onClose }: { onClose: () => void }) {
@@ -28,7 +29,7 @@ export function NewConversationDialog({ onClose }: { onClose: () => void }) {
     .map(([serverId, state]) => {
       const saved = servers.find((s) => s.id === serverId);
       const people: User[] = [...state.users.values()]
-        .filter((u) => u.session !== state.selfSession)
+        .filter((u) => u.session !== state.selfSession && !isHiddenBot(u))
         .filter((u) => q === "" || u.name.toLocaleLowerCase().includes(q))
         .sort((a, b) => a.name.localeCompare(b.name));
       return { serverId, name: saved ? displayName(saved) : "", people };

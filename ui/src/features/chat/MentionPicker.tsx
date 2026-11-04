@@ -8,6 +8,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { User } from "../../api";
 import { Avatar } from "../members/Avatar";
+import { BotBadge } from "../channels/BotBadge";
+import { isBot } from "../channels/mumcord";
 import { optionId, type GroupMention } from "./mentions";
 
 export type MentionOption = { kind: "group"; group: GroupMention } | { kind: "user"; user: User };
@@ -80,6 +82,7 @@ export function MentionPicker({
           <>
             <Avatar name={option.user.name} src={avatarOf(option.user)} size="sm" />
             <span className="mention-picker__name">{option.user.name}</span>
+            {isBot(option.user) && <BotBadge />}
           </>
         )}
       </div>

@@ -36,6 +36,17 @@
     "unregistered": "ikke registreret"
   },
   "mumcordBadge": "Bruger Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Bots på denne server ({{total}})",
+    "inChannel": "i {{channel}}",
+    "modules": {
+      "peer": "Relæ",
+      "music": "Spiller musik",
+      "history": "Chathistorik",
+      "webhook": "Webhooks"
+    }
+  },
   "statusTip": {
     "registered": "Registreret på denne server",
     "listening": "Lytter kun",

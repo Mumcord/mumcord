@@ -25,3 +25,35 @@ export function announcedClient(
   if (!user?.bot || !user.product) return null;
   return user.version ? `${user.product} ${user.version}` : user.product;
 }
+
+/** Whether the person is a bot by its hello (issue #458); the tester bot sends none and counts as a person. */
+export function isBot(user: Pick<User, "bot"> | undefined): boolean {
+  return user?.bot != null;
+}
+
+/**
+ * A bot that never talks, e.g. the relay (issue #458). It is listed only under "Bots on this
+ * server", never in the channel tree, the member list or any people picker.
+ */
+export function isHiddenBot(user: Pick<User, "bot"> | undefined): boolean {
+  return user?.bot != null && !user.bot.voice;
+}
+
+/** Modules in the order the line names them: the bot's main job first. */
+export const BOT_MODULES = ["peer", "music", "history", "webhook"];
+
+/** The bots on the server, by name. */
+export function serverBots(users: ReadonlyMap<number, User>): User[] {
+  return [...users.values()]
+    .filter((user) => isBot(user))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+}
+
+/** Known modules first in `BOT_MODULES`, unknown ones after them alphabetically. */
+export function orderedModules(modules: readonly string[]): string[] {
+  const rank = (module: string) => {
+    const index = BOT_MODULES.indexOf(module);
+    return index === -1 ? BOT_MODULES.length : index;
+  };
+  return [...modules].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+}

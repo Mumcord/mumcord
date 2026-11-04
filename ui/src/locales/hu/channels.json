@@ -36,6 +36,17 @@
     "unregistered": "nem regisztrált"
   },
   "mumcordBadge": "Mumcordot használ",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Botok ezen a szerveren ({{total}})",
+    "inChannel": "csatorna: {{channel}}",
+    "modules": {
+      "peer": "Átjátszó",
+      "music": "Zenét játszik",
+      "history": "Csevegési előzmények",
+      "webhook": "Webhookok"
+    }
+  },
   "statusTip": {
     "registered": "Regisztrált ezen a szerveren",
     "listening": "Csak hallgat",

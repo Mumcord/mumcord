@@ -36,6 +36,17 @@
     "unregistered": "niet geregistreerd"
   },
   "mumcordBadge": "Gebruikt Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Bots op deze server ({{total}})",
+    "inChannel": "in {{channel}}",
+    "modules": {
+      "peer": "Relay",
+      "music": "Speelt muziek",
+      "history": "Chatgeschiedenis",
+      "webhook": "Webhooks"
+    }
+  },
   "statusTip": {
     "registered": "Geregistreerd op deze server",
     "listening": "Alleen luisteren",

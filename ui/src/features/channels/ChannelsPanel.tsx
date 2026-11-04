@@ -8,6 +8,7 @@ import { displayName } from "../servers/format";
 import { joinChannel, useReadOnly } from "../userpanel/readOnly";
 import { useServerAnnouncements } from "./announcements";
 import { BigServerGate } from "./BigServerGate";
+import { BotsSection } from "./BotsSection";
 import { ChannelSearch } from "./ChannelSearch";
 import {
   ChannelTree,
@@ -16,6 +17,7 @@ import {
   type ChannelTreeHandle,
 } from "./ChannelTree";
 import { JumpToChannelButton } from "./JumpToChannelButton";
+import { isHiddenBot } from "./mumcord";
 import { ServerSectionHeader } from "./ServerSectionHeader";
 import { useSelectedConversation } from "./selection";
 import { selfUser, useServerState } from "./serverStore";
@@ -157,7 +159,8 @@ export function ChannelsPanel({
       <ServerSectionHeader
         name={serverName}
         connection={state.connection.state}
-        online={state.users.size}
+        // Bots without voice are not counted as people online (issue #458).
+        online={[...state.users.values()].filter((user) => !isHiddenBot(user)).length}
         collapsed={collapsed}
         onToggle={() => {
           setCollapsedServers((ids) => {
@@ -217,6 +220,7 @@ export function ChannelsPanel({
           {joinError}
         </p>
       )}
+      {!collapsed && <BotsSection state={state} />}
       <PluginStrip />
     </div>
   );

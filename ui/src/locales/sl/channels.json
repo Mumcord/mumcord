@@ -42,6 +42,17 @@
     "unregistered": "ni registriran"
   },
   "mumcordBadge": "Uporablja Mumcord",
+  "botBadge": "Bot",
+  "bots": {
+    "title": "Boti na tem strežniku ({{total}})",
+    "inChannel": "v kanalu {{channel}}",
+    "modules": {
+      "peer": "Rele",
+      "music": "Predvaja glasbo",
+      "history": "Zgodovina klepeta",
+      "webhook": "Spletni kavlji"
+    }
+  },
   "statusTip": {
     "registered": "Registriran na tem strežniku",
     "listening": "Samo posluša",
