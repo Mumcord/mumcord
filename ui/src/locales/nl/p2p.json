@@ -45,6 +45,7 @@
     "unreachable": "De relay was niet bereikbaar via UDP of TCP 443.",
     "peerCannotRelay": "De ander kan de relay niet gebruiken (oudere Mumcord of relay uitgeschakeld).",
     "denied": "De relaybot heeft het verzoek geweigerd.",
+    "notRegistered": "De relay van deze server is alleen beschikbaar voor geregistreerde gebruikers. Registreer je op deze server om hem te gebruiken.",
     "peerGone": "De ander heeft de server verlaten.",
     "rateLimited": "Te veel relayverzoeken. Probeer het over een minuut opnieuw."
   },

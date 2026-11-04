@@ -45,6 +45,7 @@
     "unreachable": "Ir-relay ma setax jintlaħaq la permezz ta' UDP u lanqas ta' TCP 443.",
     "peerCannotRelay": "Il-persuna l-oħra ma tistax tuża r-relay (Mumcord eqdem jew relay mitfi).",
     "denied": "Il-bot tar-relay irrifjuta t-talba.",
+    "notRegistered": "Ir-relay ta' dan is-server huwa disponibbli biss għal utenti rreġistrati. Irreġistra fuq dan is-server biex tużah.",
     "peerGone": "Il-persuna l-oħra ħalliet is-server.",
     "rateLimited": "Wisq talbiet tar-relay. Erġa' pprova fi ftit minuti."
   },

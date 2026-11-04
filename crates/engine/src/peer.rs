@@ -60,6 +60,11 @@ pub enum RelayUnavailable {
     PeerCannotRelay,
     /// The bot refused the token (`denied`).
     Denied,
+    /// This client is not registered on the server, and the relay only serves registered users
+    /// (#406): "This server's relay is only available to registered users. …". The bot's
+    /// `not-registered` answer, or its `denied` while this client is a guest (`denied` is then
+    /// almost always the default `registered_only` rule).
+    NotRegistered,
     /// The other person left the server before the bot answered (`peer-gone`).
     PeerGone,
     /// Too many token requests (`rate-limited`).
@@ -72,10 +77,13 @@ pub enum RelayUnavailable {
 }
 
 impl RelayUnavailable {
-    /// The bot's `token-err` for a token request made for `relay_use`.
-    fn of_token_error(reason: TokenErrorReason, relay_use: RelayUse) -> Self {
+    /// The bot's `token-err` for a token request made for `relay_use`; `registered` tells
+    /// whether this client is registered on the server.
+    fn of_token_error(reason: TokenErrorReason, relay_use: RelayUse, registered: bool) -> Self {
         match reason {
+            TokenErrorReason::Denied if !registered => Self::NotRegistered,
             TokenErrorReason::Denied => Self::Denied,
+            TokenErrorReason::NotRegistered => Self::NotRegistered,
             TokenErrorReason::UseNotAllowed => Self::UseNotAllowed(relay_use),
             TokenErrorReason::PeerGone => Self::PeerGone,
             TokenErrorReason::PeerNotMumcord => Self::PeerCannotRelay,
@@ -140,6 +148,15 @@ impl Default for RelayTimings {
             token_wait: Duration::from_secs(5),
         }
     }
+}
+
+/// Whether this client is registered on the server of `ctx` (has a user id).
+pub(crate) fn self_registered(ctx: &SessionCtx) -> bool {
+    ctx.handle.with_state(|s| {
+        s.session
+            .and_then(|own| s.users.get(&own))
+            .is_some_and(|u| u.user_id.is_some())
+    })
 }
 
 /// Inspector note for announcements of unregistered users (FR-4.8).
@@ -526,7 +543,8 @@ impl Relays {
                 self.on_token(ctx.server_id, own, sender, rid, a, b, token, ttl);
             }
             PeerMessage::TokenError { rid, reason } => {
-                self.on_token_error(ctx.server_id, sender, rid, reason);
+                let registered = self_registered(ctx);
+                self.on_token_error(ctx.server_id, sender, rid, reason, registered);
             }
             PeerMessage::Broadcast { rid, id, token, .. } => {
                 self.on_broadcast_reply(ctx.server_id, sender, rid, Ok(Some((id, token))));
@@ -749,6 +767,7 @@ impl Relays {
         sender: u32,
         rid: RequestId,
         reason: TokenErrorReason,
+        registered: bool,
     ) {
         let mut state = lock(&self.state);
         let key = (server_id, rid);
@@ -758,6 +777,7 @@ impl Relays {
             let _ = pending.reply.send(Err(RelayUnavailable::of_token_error(
                 reason,
                 pending.relay_use,
+                registered,
             )));
         }
     }
@@ -1481,9 +1501,10 @@ mod tests {
             R::RelayDown,
             R::RelayFull,
             R::UseNotAllowed,
+            R::NotRegistered,
         ]
         .into_iter()
-        .map(|r| RelayUnavailable::of_token_error(r, RelayUse::Files))
+        .map(|r| RelayUnavailable::of_token_error(r, RelayUse::Files, true))
         .collect();
         assert_eq!(
             mapped,
@@ -1495,7 +1516,25 @@ mod tests {
                 RelayUnavailable::RelayDown,
                 RelayUnavailable::RelayFull,
                 RelayUnavailable::UseNotAllowed(RelayUse::Files),
+                RelayUnavailable::NotRegistered,
             ]
+        );
+    }
+
+    #[test]
+    fn a_guest_denied_a_token_is_told_to_register() {
+        let guest = |r| RelayUnavailable::of_token_error(r, RelayUse::Files, false);
+        assert_eq!(
+            guest(TokenErrorReason::Denied),
+            RelayUnavailable::NotRegistered
+        );
+        assert_eq!(
+            guest(TokenErrorReason::NotRegistered),
+            RelayUnavailable::NotRegistered
+        );
+        assert_eq!(
+            guest(TokenErrorReason::RelayFull),
+            RelayUnavailable::RelayFull
         );
     }
 
@@ -1546,8 +1585,8 @@ mod tests {
         let (_, _, rx) = relays
             .begin_request(1, 2, RequestId(2), RelayUse::Images)
             .expect("usable");
-        relays.on_token_error(1, 6, RequestId(2), TokenErrorReason::RelayFull);
-        relays.on_token_error(1, 5, RequestId(2), TokenErrorReason::PeerNotMumcord);
+        relays.on_token_error(1, 6, RequestId(2), TokenErrorReason::RelayFull, true);
+        relays.on_token_error(1, 5, RequestId(2), TokenErrorReason::PeerNotMumcord, true);
         assert_eq!(
             relays.finish_request(1, RequestId(2), rx).await,
             Err(RelayUnavailable::PeerCannotRelay)
@@ -1758,7 +1797,7 @@ mod tests {
         let (_, _, rx) = relays
             .begin_request(1, 2, RequestId(1), RelayUse::ScreenShare)
             .expect("usable");
-        relays.on_token_error(1, 5, RequestId(1), TokenErrorReason::UseNotAllowed);
+        relays.on_token_error(1, 5, RequestId(1), TokenErrorReason::UseNotAllowed, true);
         assert_eq!(
             relays.finish_request(1, RequestId(1), rx).await,
             Err(RelayUnavailable::UseNotAllowed(RelayUse::ScreenShare))

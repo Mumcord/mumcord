@@ -45,6 +45,7 @@
     "unreachable": "Relettä ei tavoitettu UDP:llä eikä TCP 443:lla.",
     "peerCannotRelay": "Toinen henkilö ei voi käyttää relettä (vanhempi Mumcord tai rele pois päältä).",
     "denied": "Rele-botti hylkäsi pyynnön.",
+    "notRegistered": "Tämän palvelimen rele on vain rekisteröityneiden käyttäjien käytettävissä. Rekisteröidy tälle palvelimelle käyttääksesi sitä.",
     "peerGone": "Toinen henkilö poistui palvelimelta.",
     "rateLimited": "Liian monta relepyyntöä. Yritä minuutin kuluttua uudelleen."
   },

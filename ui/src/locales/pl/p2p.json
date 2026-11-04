@@ -45,6 +45,7 @@
     "unreachable": "Nie udało się połączyć z przekaźnikiem ani przez UDP, ani przez TCP 443.",
     "peerCannotRelay": "Druga osoba nie może użyć przekaźnika (starszy Mumcord lub wyłączony przekaźnik).",
     "denied": "Bot przekaźnika odrzucił prośbę.",
+    "notRegistered": "Przekaźnik tego serwera jest dostępny tylko dla zarejestrowanych użytkowników. Zarejestruj się na tym serwerze, aby z niego korzystać.",
     "peerGone": "Druga osoba opuściła serwer.",
     "rateLimited": "Zbyt wiele próśb do przekaźnika. Spróbuj ponownie za minutę."
   },
