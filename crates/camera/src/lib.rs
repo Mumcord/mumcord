@@ -10,6 +10,9 @@
 //! same trait, so all later pipeline stages run unchanged.
 
 mod device;
+// The pure helpers in `macos::mode` are unit tested on every platform.
+#[cfg(any(target_os = "macos", test))]
+mod macos;
 mod pool;
 mod testcam;
 
@@ -17,6 +20,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 pub use device::{CameraDevice, DeviceEvent, DeviceId, DeviceList};
+#[cfg(target_os = "macos")]
+pub use macos::{MacCamera, PRIVACY_SETTINGS_URL};
 pub use pool::{FramePool, PooledBuffer};
 pub use testcam::{TEST_CAMERA_NAME, TestCamera, TestCameraMode};
 

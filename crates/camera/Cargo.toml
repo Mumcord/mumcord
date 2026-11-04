@@ -12,5 +12,16 @@ crossbeam-queue.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 
+[target.'cfg(target_os = "macos")'.dependencies]
+# AVFoundation capture (FR-8.25): device list, permission, capture session; CoreMedia/CoreVideo
+# for the delivered NV12 pixel buffers.
+objc2.workspace = true
+block2.workspace = true
+dispatch2.workspace = true
+objc2-foundation = { workspace = true, features = ["NSArray", "NSDictionary", "NSEnumerator", "NSError", "NSNotification", "NSObject", "NSOperation", "NSString", "NSValue", "block2"] }
+objc2-av-foundation = { workspace = true, features = ["AVCaptureDevice", "AVCaptureInput", "AVCaptureOutputBase", "AVCaptureSession", "AVCaptureVideoDataOutput", "AVMediaFormat", "block2", "dispatch2", "objc2-core-media", "objc2-core-video"] }
+objc2-core-media = { workspace = true, features = ["CMBase", "CMFormatDescription", "CMSampleBuffer", "CMTime", "objc2-core-video"] }
+objc2-core-video = { workspace = true, features = ["CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVReturn"] }
+
 [lints]
 workspace = true

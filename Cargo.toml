@@ -141,6 +141,8 @@ objc2-core-media = { version = "0.3", default-features = false, features = ["std
 objc2-core-video = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-graphics = { version = "0.3", default-features = false, features = ["std"] }
 objc2-core-audio-types = { version = "0.3", default-features = false, features = ["std"] }
+# macOS camera capture (spec 08, FR-8.25): AVFoundation capture session and device list.
+objc2-av-foundation = { version = "0.3", default-features = false, features = ["std"] }
 
 # Plugins (Epic 3.1, #268): WebAssembly components run in wasmtime without WASI, so a plugin can
 # only call what Mumcord defines. Only the runtime, the Cranelift compiler and the component model:
