@@ -89,7 +89,7 @@ fn failed(message: impl std::fmt::Display) -> OpenError {
 pub(super) async fn open_source() -> Result<Box<dyn CaptureSource>, OpenError> {
     #[cfg(feature = "test-backend")]
     {
-        Ok(Box::new(TestPattern::default()))
+        Ok(Box::new(TestPattern::with_pick(crate::test_hooks::share_pick())))
     }
     #[cfg(not(feature = "test-backend"))]
     open_backend(current_backend()).await
