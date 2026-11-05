@@ -203,7 +203,8 @@
     "screenTitle": "Écran de {{name}}",
     "screenLive": "En direct",
     "partyTitle": "Watch party",
-    "partyStarted": "Lancée par {{name}}"
+    "partyStarted": "Lancée par {{name}}",
+    "label": "{{title}} avec la salle des caméras"
   },
   "settings": {
     "title": "Caméra",

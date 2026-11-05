@@ -196,7 +196,8 @@
     "screenTitle": "{{name}} képernyője",
     "screenLive": "Élő",
     "partyTitle": "Közös nézés",
-    "partyStarted": "Indította: {{name}}"
+    "partyStarted": "Indította: {{name}}",
+    "label": "{{title}} a kameraszobával"
   },
   "settings": {
     "title": "Kamera",

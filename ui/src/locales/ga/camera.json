@@ -217,7 +217,8 @@
     "screenTitle": "Scáileán {{name}}",
     "screenLive": "Beo",
     "partyTitle": "Féachaint le chéile",
-    "partyStarted": "Tosaithe ag {{name}}"
+    "partyStarted": "Tosaithe ag {{name}}",
+    "label": "{{title}} le seomra na ceamaraí"
   },
   "settings": {
     "title": "Ceamara",

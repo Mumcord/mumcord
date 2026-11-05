@@ -203,7 +203,8 @@
     "screenTitle": "Ecranul lui {{name}}",
     "screenLive": "Live",
     "partyTitle": "Vizionare comună",
-    "partyStarted": "Pornită de {{name}}"
+    "partyStarted": "Pornită de {{name}}",
+    "label": "{{title}} cu camera de camere"
   },
   "settings": {
     "title": "Cameră",

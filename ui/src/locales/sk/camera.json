@@ -210,7 +210,8 @@
     "screenTitle": "Obrazovka používateľa {{name}}",
     "screenLive": "Naživo",
     "partyTitle": "Spoločné sledovanie",
-    "partyStarted": "Spustil(a) {{name}}"
+    "partyStarted": "Spustil(a) {{name}}",
+    "label": "{{title}} s miestnosťou s kamerami"
   },
   "settings": {
     "title": "Kamera",

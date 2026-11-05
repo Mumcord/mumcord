@@ -203,7 +203,8 @@
     "screenTitle": "Lietotāja {{name}} ekrāns",
     "screenLive": "Tiešraide",
     "partyTitle": "Kopīga skatīšanās",
-    "partyStarted": "Sāka {{name}}"
+    "partyStarted": "Sāka {{name}}",
+    "label": "{{title}} ar kameru istabu"
   },
   "settings": {
     "title": "Kamera",

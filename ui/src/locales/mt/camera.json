@@ -217,7 +217,8 @@
     "screenTitle": "L-iskrin ta' {{name}}",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Beda {{name}}"
+    "partyStarted": "Beda {{name}}",
+    "label": "{{title}} mal-kamra tal-kameras"
   },
   "settings": {
     "title": "Kamera",
