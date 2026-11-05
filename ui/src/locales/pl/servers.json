@@ -313,6 +313,7 @@
     "line": "Przekaźnik zezwala na: {{uses}}",
     "images": "Obrazy",
     "files": "Pliki",
-    "screen": "Udostępnianie ekranu"
+    "screen": "Udostępnianie ekranu",
+    "cameras": "Kamery"
   }
 }

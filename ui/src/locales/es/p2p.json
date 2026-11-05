@@ -26,6 +26,7 @@
     "noRelay": "Este servidor no tiene relé, así que no se pueden compartir archivos.",
     "filesDisallowed": "El relé de este servidor no permite compartir archivos.",
     "screenDisallowed": "El relé de este servidor no permite compartir pantalla.",
+    "camerasDisallowed": "El relé de este servidor no permite compartir la cámara.",
     "imagesDisallowed": "Tamaño completo no disponible: el relé de este servidor no permite imágenes",
     "noCertificate": "Compartir archivos requiere un certificado de cliente.",
     "modeNeedsRelay": "Compartir archivos requiere el relé; tu ajuste de peer-to-peer es {{mode}}.",

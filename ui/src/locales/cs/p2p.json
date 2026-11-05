@@ -26,6 +26,7 @@
     "noRelay": "Tento server nemá relay, takže sdílení souborů není dostupné.",
     "filesDisallowed": "Relay tohoto serveru sdílení souborů nepovoluje.",
     "screenDisallowed": "Relay tohoto serveru sdílení obrazovky nepovoluje.",
+    "camerasDisallowed": "Relay tohoto serveru nepovoluje sdílení kamery.",
     "imagesDisallowed": "Plná velikost není dostupná: relay tohoto serveru nepovoluje obrázky",
     "noCertificate": "Sdílení souborů vyžaduje klientský certifikát.",
     "modeNeedsRelay": "Sdílení souborů potřebuje relay; tvé nastavení peer-to-peer je {{mode}}.",

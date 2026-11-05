@@ -53,7 +53,8 @@ pub struct Args {
     #[arg(long)]
     pub sequence: Option<u64>,
     /// tampered-hash:<id>, lower-sequence, wrong-key, extra-permission:<id>,
-    /// revoke:<id>[@<version>][:warn], key-change[:rotate], no-v1.1. Repeatable.
+    /// revoke:<id>[@<version>][:warn], key-change[:rotate], no-v1.1,
+    /// min-mumcord:<id>[@<version>]=<release>, index-api:<id>=<major.minor>. Repeatable.
     #[arg(long = "scenario")]
     pub scenarios: Vec<String>,
 }
@@ -77,6 +78,15 @@ enum Scenario {
     KeyChange { rotate: bool },
     /// Only `v1/` is served, like a repository that never published a `v1.1` index (FR-9.19).
     NoV1_1,
+    /// The index sets `min_mumcord` on one version (or every version) of the plugin (FR-9.15).
+    MinMumcord {
+        id: String,
+        version: Option<String>,
+        release: String,
+    },
+    /// The index lists another API than the package declares, so only the client's check of the
+    /// downloaded package can refuse it (FR-9.17).
+    IndexApi { id: String, api: ApiMinor },
 }
 
 impl Scenario {
@@ -108,6 +118,32 @@ impl Scenario {
             ("key-change", None) => Self::KeyChange { rotate: false },
             ("key-change", Some("rotate")) => Self::KeyChange { rotate: true },
             ("no-v1.1", None) => Self::NoV1_1,
+            ("min-mumcord", Some(arg)) => {
+                let (target, release) = arg
+                    .split_once('=')
+                    .with_context(|| format!("{text}: expected <id>[@<version>]=<release>"))?;
+                let (id, version) = match target.split_once('@') {
+                    Some((id, version)) => (id, Some(version.to_owned())),
+                    None => (target, None),
+                };
+                Self::MinMumcord {
+                    id: id.to_owned(),
+                    version,
+                    release: release.to_owned(),
+                }
+            }
+            ("index-api", Some(arg)) => {
+                let (id, api) = arg
+                    .split_once('=')
+                    .with_context(|| format!("{text}: expected <id>=<major.minor>"))?;
+                Self::IndexApi {
+                    id: id.to_owned(),
+                    api: api
+                        .parse()
+                        .ok()
+                        .with_context(|| format!("{text}: invalid API"))?,
+                }
+            }
             _ => bail!("unknown scenario {text}"),
         })
     }
@@ -183,6 +219,27 @@ impl Registry {
             if self.has(&Scenario::TamperedHash(id.clone())) {
                 for version in &mut plugin.versions {
                     version.sha256 = tamper(&version.sha256);
+                }
+            }
+            for scenario in &self.scenarios {
+                match scenario {
+                    Scenario::MinMumcord {
+                        id: target,
+                        version,
+                        release,
+                    } if *target == id => {
+                        for listed in &mut plugin.versions {
+                            if version.as_ref().is_none_or(|v| *v == listed.version) {
+                                listed.min_mumcord = Some(release.clone());
+                            }
+                        }
+                    }
+                    Scenario::IndexApi { id: target, api } if *target == id => {
+                        for listed in &mut plugin.versions {
+                            listed.api = *api;
+                        }
+                    }
+                    _ => {}
                 }
             }
             if self.has(&Scenario::ExtraPermission(id.clone())) {
@@ -614,6 +671,23 @@ mod tests {
             }
         );
         assert_eq!(Scenario::parse("no-v1.1").expect("ok"), Scenario::NoV1_1);
+        assert_eq!(
+            Scenario::parse("min-mumcord:test-versions@3.0.0=0.8").expect("ok"),
+            Scenario::MinMumcord {
+                id: "test-versions".into(),
+                version: Some("3.0.0".into()),
+                release: "0.8".into(),
+            }
+        );
+        assert_eq!(
+            Scenario::parse("index-api:test-api12=1.1").expect("ok"),
+            Scenario::IndexApi {
+                id: "test-api12".into(),
+                api: ApiMinor::V1_1,
+            }
+        );
+        assert!(Scenario::parse("min-mumcord:test-versions").is_err());
+        assert!(Scenario::parse("index-api:test-api12=one").is_err());
         assert!(Scenario::parse("wrong-key:x").is_err());
         assert!(Scenario::parse("melt-down").is_err());
         assert!(parse_scenarios(["", " "]).expect("ok").is_empty());

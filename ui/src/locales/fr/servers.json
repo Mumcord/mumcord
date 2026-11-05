@@ -313,6 +313,7 @@
     "line": "Le relais autorise : {{uses}}",
     "images": "Images",
     "files": "Fichiers",
-    "screen": "Partage d’écran"
+    "screen": "Partage d’écran",
+    "cameras": "Caméras"
   }
 }

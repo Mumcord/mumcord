@@ -26,6 +26,7 @@
     "noRelay": "Dieser Server hat kein Relay, daher ist der Dateiaustausch nicht verfügbar.",
     "filesDisallowed": "Das Relay dieses Servers erlaubt keinen Dateiaustausch.",
     "screenDisallowed": "Das Relay dieses Servers erlaubt keine Bildschirmfreigabe.",
+    "camerasDisallowed": "Das Relay dieses Servers erlaubt keine Kamerafreigabe.",
     "imagesDisallowed": "Originalgröße nicht verfügbar: Das Relay dieses Servers erlaubt keine Bilder",
     "noCertificate": "Für den Dateiaustausch ist ein Client-Zertifikat nötig.",
     "modeNeedsRelay": "Der Dateiaustausch braucht das Relay; deine Peer-to-Peer-Einstellung ist {{mode}}.",

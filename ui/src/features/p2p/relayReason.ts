@@ -12,11 +12,12 @@ type P2pT = TFunction<"p2p">;
 /** The p2p text key explaining that the relay doesn't allow a use (FR-7.7). */
 const USE_REASON_KEY: Record<
   RelayUse,
-  "imagesDisallowed" | "filesDisallowed" | "screenDisallowed"
+  "imagesDisallowed" | "filesDisallowed" | "screenDisallowed" | "camerasDisallowed"
 > = {
   images: "imagesDisallowed",
   files: "filesDisallowed",
   screenShare: "screenDisallowed",
+  cameras: "camerasDisallowed",
 };
 
 export function relayReasonText(t: P2pT, reason: RelayUnavailable): string {
