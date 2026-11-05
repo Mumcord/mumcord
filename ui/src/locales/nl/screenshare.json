@@ -236,5 +236,14 @@
     "valueUnavailable": "Niet beschikbaar",
     "checkAgain": "Opnieuw controleren",
     "checking": "Controleren…"
+  },
+  "soundPicker": {
+    "title": "Het geluid van welke app?",
+    "noSound": "Geen geluid",
+    "share": "Geluid delen",
+    "cancel": "Annuleren",
+    "empty": "Er speelt nu geen app geluid af",
+    "gone": "Die app speelt geen geluid meer af. Kies een andere.",
+    "failed": "Je keuze kon niet worden toegepast."
   }
 }

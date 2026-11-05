@@ -244,5 +244,14 @@
     "valueUnavailable": "Není k dispozici",
     "checkAgain": "Zkontrolovat znovu",
     "checking": "Kontroluji…"
+  },
+  "soundPicker": {
+    "title": "Zvuk které aplikace?",
+    "noSound": "Bez zvuku",
+    "share": "Sdílet zvuk",
+    "cancel": "Zrušit",
+    "empty": "Právě nehraje žádná aplikace",
+    "gone": "Tato aplikace už nepřehrává zvuk. Vyberte jinou.",
+    "failed": "Váš výběr se nepodařilo použít."
   }
 }

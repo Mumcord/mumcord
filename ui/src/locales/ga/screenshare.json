@@ -248,5 +248,14 @@
     "valueUnavailable": "Ní ar fáil",
     "checkAgain": "Seiceáil arís",
     "checking": "Ag seiceáil…"
+  },
+  "soundPicker": {
+    "title": "Fuaim cén aip?",
+    "noSound": "Gan fuaim",
+    "share": "Comhroinn fuaim",
+    "cancel": "Cealaigh",
+    "empty": "Níl aip ar bith ag seinm fuaime faoi láthair",
+    "gone": "Tá an aip sin éirithe as fuaim a sheinm. Roghnaigh ceann eile.",
+    "failed": "Níorbh fhéidir do rogha a chur i bhfeidhm."
   }
 }

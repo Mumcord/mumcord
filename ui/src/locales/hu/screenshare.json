@@ -236,5 +236,14 @@
     "valueUnavailable": "Nem elérhető",
     "checkAgain": "Újraellenőrzés",
     "checking": "Ellenőrzés…"
+  },
+  "soundPicker": {
+    "title": "Melyik alkalmazás hangja?",
+    "noSound": "Nincs hang",
+    "share": "Hang megosztása",
+    "cancel": "Mégse",
+    "empty": "Jelenleg egyik alkalmazás sem játszik le hangot",
+    "gone": "Az alkalmazás már nem játszik le hangot. Válassz másikat.",
+    "failed": "A választásodat nem sikerült alkalmazni."
   }
 }

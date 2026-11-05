@@ -236,5 +236,14 @@
     "valueUnavailable": "Nicht verfügbar",
     "checkAgain": "Erneut prüfen",
     "checking": "Prüfe…"
+  },
+  "soundPicker": {
+    "title": "Welche App soll zu hören sein?",
+    "noSound": "Kein Ton",
+    "share": "Ton teilen",
+    "cancel": "Abbrechen",
+    "empty": "Gerade gibt keine App Ton wieder",
+    "gone": "Diese App gibt keinen Ton mehr wieder. Wähle eine andere.",
+    "failed": "Deine Auswahl konnte nicht übernommen werden."
   }
 }

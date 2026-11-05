@@ -248,5 +248,14 @@
     "valueUnavailable": "Mhux disponibbli",
     "checkAgain": "Iċċekkja mill-ġdid",
     "checking": "Qed jiċċekkja…"
+  },
+  "soundPicker": {
+    "title": "Il-ħoss ta’ liema app?",
+    "noSound": "Bla ħoss",
+    "share": "Qassam il-ħoss",
+    "cancel": "Ikkanċella",
+    "empty": "Bħalissa l-ebda app mhi qed tindaq ħoss",
+    "gone": "Din l-app waqfet tindaq ħoss. Agħżel oħra.",
+    "failed": "L-għażla tiegħek ma setgħetx tiġi applikata."
   }
 }
