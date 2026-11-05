@@ -1869,7 +1869,11 @@ mod tests {
     #[test]
     fn broadcast_tokens_go_to_the_side_of_their_kind() {
         let relays = relays_with_uses(
-            Some(vec![RelayUse::ScreenShare, RelayUse::PluginData]),
+            Some(vec![
+                RelayUse::ScreenShare,
+                RelayUse::PluginData,
+                RelayUse::Camera,
+            ]),
             Some(10),
         );
         // A sender with a screen share, plugin data and a camera broadcast at once: each token

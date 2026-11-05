@@ -648,6 +648,8 @@ impl Engine {
 
     /// Waits for the bot's token to `sharer`'s camera on `server_id` (the viewer side, C-8):
     /// register before sending `cam-join`. A later call replaces an earlier one.
+    /// Only the test viewer uses it until C-8.
+    #[cfg(feature = "test-backend")]
     pub(crate) fn camera_await_token(
         &self,
         server_id: ServerId,
