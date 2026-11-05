@@ -11,7 +11,7 @@ import { type ChildProcess, spawn } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { startHttpsFixture, type HttpsFixture } from "../fixtures/https/server.ts";
+import { startHttpsFixture, type FixtureHit, type HttpsFixture } from "../fixtures/https/server.ts";
 import { repoRoot } from "./paths.ts";
 import { runOk } from "./run.ts";
 
@@ -195,6 +195,16 @@ export async function setScenarios(
     method: "POST",
   });
   if (!response.ok) throw new Error(`scenario switch failed: HTTP ${String(response.status)}`);
+}
+
+/** What reached the HTTPS fixture (and its STUN listener) since the start or `clearHttpsLog()`. */
+export function httpsLog(): FixtureHit[] {
+  if (state?.https === undefined) throw new Error("the HTTPS fixture is not running");
+  return state.https.log();
+}
+
+export function clearHttpsLog(): void {
+  state?.https?.clearLog();
 }
 
 /** Test hooks of the running fixtures (registry URL and key, CA) plus `extra` (e.g. KEY_AGE). */
