@@ -33,7 +33,7 @@ pub mod verify;
 pub mod version;
 
 pub use api::io::PluginIo;
-pub use diag::{DiagSnapshot, Diagnostics};
+pub use diag::{DiagSnapshot, Diagnostics, LoadIssue};
 pub use health::{BACKOFF, Health, Recovery};
 pub use host::{HostError, HostEvent, LoadError, PluginHost, RunState};
 pub use manifest::{Manifest, ManifestError, Source};

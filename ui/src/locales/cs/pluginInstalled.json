@@ -56,6 +56,8 @@
     "incomingRateDropped": "Příchozí zprávy zahozené limitem rychlosti",
     "incomingInvalid": "Neplatné příchozí zprávy",
     "uiFreezes": "Kolikrát Mumcord zamrzl při otevřeném webovém obsahu",
+    "refusedAppMenuLabel": "Tento plugin byl odmítnut: popisek v nabídce Aplikace je stejný jako vlastní popisek Mumcordu nebo začíná slovem „Mumcord“.",
+    "fieldWithoutPermission": "Tento plugin byl odmítnut: používá „{{field}}“ bez oprávnění „{{permission}}“.",
     "webDisabled": "Webový obsah je vypnutý, protože Mumcord přestal reagovat, když byl otevřený.",
     "reenableWeb": "Zapnout webový obsah",
     "reenableFailed": "Webový obsah se nepodařilo zapnout.",

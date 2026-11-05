@@ -3336,6 +3336,8 @@ export type PluginDiagnostics = {
 	uiFreezes: number | null,
 	/**  The plugin's web content is turned off after a freeze, until the user re-enables it. */
 	webDisabled: boolean,
+	/**  Why the plugin was refused at load, when Diagnostics lists that reason. */
+	loadIssue: PluginLoadIssue | null,
 	/**  The plugin's own log lines (in memory only). */
 	log: PluginLogLine[],
 };
@@ -3502,6 +3504,16 @@ export type PluginInstallStage =
 export type PluginJustify = "start" | "end" | "spaceBetween" | 
 /**  Rows: the first child takes the free width, the others keep their natural width. */
 "fillFirst";
+
+/**
+ *  Why a plugin was refused at load, as Diagnostics lists it (FR-9.90). Only fixed names, never
+ *  the plugin's own text.
+ */
+export type PluginLoadIssue = 
+/**  A manifest field was used without the permission it needs. */
+{ kind: "field_without_permission", field: string, permission: string } | 
+/**  An Apps-menu label equal to a built-in one or starting with "Mumcord". */
+{ kind: "refused_app_menu_label" };
 
 export type PluginLogLevel = "debug" | "info" | "warn" | "error";
 

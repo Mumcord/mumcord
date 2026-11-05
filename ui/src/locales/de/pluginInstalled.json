@@ -56,6 +56,8 @@
     "incomingRateDropped": "Durch das Ratenlimit verworfene eingehende Nachrichten",
     "incomingInvalid": "Ungültige eingehende Nachrichten",
     "uiFreezes": "Wie oft Mumcord bei geöffnetem Webinhalt eingefroren ist",
+    "refusedAppMenuLabel": "Dieses Plugin wurde abgelehnt: Eine Bezeichnung im Apps-Menü ist gleich einer von Mumcord selbst oder beginnt mit „Mumcord“.",
+    "fieldWithoutPermission": "Dieses Plugin wurde abgelehnt: Es verwendet „{{field}}“ ohne die Berechtigung „{{permission}}“.",
     "webDisabled": "Der Webinhalt ist ausgeschaltet, weil Mumcord nicht mehr reagiert hat, während er geöffnet war.",
     "reenableWeb": "Webinhalt einschalten",
     "reenableFailed": "Der Webinhalt konnte nicht eingeschaltet werden.",

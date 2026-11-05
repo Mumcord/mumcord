@@ -56,6 +56,8 @@
     "incomingRateDropped": "Teachtaireachtaí isteach a scaoileadh ag an teorainn ráta",
     "incomingInvalid": "Teachtaireachtaí isteach neamhbhailí",
     "uiFreezes": "Líon na n-uaireanta a reoigh Mumcord agus a ábhar gréasáin oscailte",
+    "refusedAppMenuLabel": "Diúltaíodh don bhreiseán seo: tá lipéad i roghchlár na nAipeanna mar an gcéanna le ceann de chuid Mumcord féin nó tosaíonn sé le \"Mumcord\".",
+    "fieldWithoutPermission": "Diúltaíodh don bhreiseán seo: úsáideann sé \"{{field}}\" gan an cead \"{{permission}}\".",
     "webDisabled": "Tá a ábhar gréasáin múchta mar gur stop Mumcord ag freagairt agus é oscailte.",
     "reenableWeb": "Cas air an t-ábhar gréasáin",
     "reenableFailed": "Níorbh fhéidir an t-ábhar gréasáin a chasadh air.",

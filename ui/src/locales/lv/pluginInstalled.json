@@ -56,6 +56,8 @@
     "incomingRateDropped": "Ar ātruma ierobežojumu izmestie ienākošie ziņojumi",
     "incomingInvalid": "Nederīgi ienākošie ziņojumi",
     "uiFreezes": "Cik reizes Mumcord sastinga, kamēr tīmekļa saturs bija atvērts",
+    "refusedAppMenuLabel": "Šis spraudnis tika noraidīts: Lietotņu izvēlnes etiķete ir tāda pati kā kāda no paša Mumcord etiķetēm vai sākas ar „Mumcord”.",
+    "fieldWithoutPermission": "Šis spraudnis tika noraidīts: tas izmanto „{{field}}” bez atļaujas „{{permission}}”.",
     "webDisabled": "Tīmekļa saturs ir izslēgts, jo Mumcord pārstāja reaģēt, kamēr tas bija atvērts.",
     "reenableWeb": "Ieslēgt tīmekļa saturu",
     "reenableFailed": "Tīmekļa saturu neizdevās ieslēgt.",

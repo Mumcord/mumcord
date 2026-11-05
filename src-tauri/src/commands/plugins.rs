@@ -472,6 +472,31 @@ pub struct PluginLogLine {
     pub text: String,
 }
 
+/// Why a plugin was refused at load, as Diagnostics lists it (FR-9.90). Only fixed names, never
+/// the plugin's own text.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum PluginLoadIssue {
+    /// A manifest field was used without the permission it needs.
+    FieldWithoutPermission { field: String, permission: String },
+    /// An Apps-menu label equal to a built-in one or starting with "Mumcord".
+    RefusedAppMenuLabel,
+}
+
+impl From<mumcord_plugins::LoadIssue> for PluginLoadIssue {
+    fn from(issue: mumcord_plugins::LoadIssue) -> Self {
+        match issue {
+            mumcord_plugins::LoadIssue::FieldWithoutPermission { field, permission } => {
+                Self::FieldWithoutPermission {
+                    field: field.to_owned(),
+                    permission: permission.to_owned(),
+                }
+            }
+            mumcord_plugins::LoadIssue::RefusedAppMenuLabel => Self::RefusedAppMenuLabel,
+        }
+    }
+}
+
 /// The Diagnostics section of a plugin (counts only, never payloads).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
@@ -492,6 +517,8 @@ pub struct PluginDiagnostics {
     pub ui_freezes: f64,
     /// The plugin's web content is turned off after a freeze, until the user re-enables it.
     pub web_disabled: bool,
+    /// Why the plugin was refused at load, when Diagnostics lists that reason.
+    pub load_issue: Option<PluginLoadIssue>,
     /// The plugin's own log lines (in memory only).
     pub log: Vec<PluginLogLine>,
 }
@@ -1611,6 +1638,7 @@ pub async fn plugin_diagnostics(app: AppHandle, id: String) -> ApiResult<PluginD
                 incoming_invalid: m.incoming_invalid as f64,
                 ui_freezes: d.ui_freezes as f64,
                 web_disabled: service.web_disabled(&id),
+                load_issue: service.load_issue(&id).map(PluginLoadIssue::from),
                 log,
             })
         })

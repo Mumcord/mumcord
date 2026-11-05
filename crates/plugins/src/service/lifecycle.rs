@@ -239,10 +239,14 @@ impl PluginService {
     /// list; they never stop the other plugins.
     pub(super) fn load_record(&mut self, record: &PluginRecord) {
         self.load_errors.remove(&record.id);
+        self.load_issues.remove(&record.id);
         if let Err(error) = self.try_load(record) {
             tracing::warn!(plugin = record.id.as_str(), %error, "could not load a plugin");
             self.load_errors
                 .insert(record.id.clone(), error.to_string());
+            if let Some(issue) = error.load_issue() {
+                self.load_issues.insert(record.id.clone(), issue);
+            }
             return;
         }
         self.start_if_on(record);
@@ -320,6 +324,7 @@ impl PluginService {
             tracing::warn!(plugin = id, %error, "plugin failed while unloading");
         }
         self.load_errors.remove(id);
+        self.load_issues.remove(id);
         self.forget_runtime(id);
     }
 
