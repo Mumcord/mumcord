@@ -156,7 +156,8 @@
     "cameras": "Fotocamere",
     "label_other": "Stanza delle fotocamere, {{count}} fotocamere attive",
     "miniBar_other": "{{count}} fotocamere attive",
-    "fullTitle": "La stanza è piena con 9 videocamere"
+    "fullTitle": "La stanza è piena con 9 videocamere",
+    "backgroundPicker": "Cambia sfondo"
   },
   "position": {
     "label": "Fotocamere",
@@ -180,7 +181,8 @@
     "hidden": "Video nascosto",
     "showVideo": "Mostra video",
     "viewing": "In visione",
-    "weak": "Connessione debole"
+    "weak": "Connessione debole",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Fissa per me",

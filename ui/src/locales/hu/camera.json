@@ -149,7 +149,8 @@
     "cameras": "Kamerák",
     "label_other": "Kameraszoba, {{count}} kamera bekapcsolva",
     "miniBar_other": "{{count}} kamera bekapcsolva",
-    "fullTitle": "A szoba 9 kamerával megtelt"
+    "fullTitle": "A szoba 9 kamerával megtelt",
+    "backgroundPicker": "Háttér módosítása"
   },
   "position": {
     "label": "Kamerák",
@@ -173,7 +174,8 @@
     "hidden": "Videó elrejtve",
     "showVideo": "Videó megjelenítése",
     "viewing": "Nézed",
-    "weak": "Gyenge kapcsolat"
+    "weak": "Gyenge kapcsolat",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Kitűzés nekem",

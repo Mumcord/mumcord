@@ -156,7 +156,8 @@
     "cameras": "Caméras",
     "label_other": "Salle des caméras, {{count}} caméras activées",
     "miniBar_other": "{{count}} caméras activées",
-    "fullTitle": "La salle est pleine à 9 caméras"
+    "fullTitle": "La salle est pleine à 9 caméras",
+    "backgroundPicker": "Changer d’arrière-plan"
   },
   "position": {
     "label": "Caméras",
@@ -180,7 +181,8 @@
     "hidden": "Vidéo masquée",
     "showVideo": "Afficher la vidéo",
     "viewing": "Visionnage",
-    "weak": "Connexion faible"
+    "weak": "Connexion faible",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Épingler pour moi",

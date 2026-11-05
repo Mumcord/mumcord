@@ -156,7 +156,8 @@
     "label_few": "Camera de grup, {{count}} camere pornite",
     "label_other": "Camera de grup, {{count}} de camere pornite",
     "miniBar_other": "{{count}} de camere pornite",
-    "fullTitle": "Camera este plină la 9 camere video"
+    "fullTitle": "Camera este plină la 9 camere video",
+    "backgroundPicker": "Schimbă fundalul"
   },
   "position": {
     "label": "Camere",
@@ -180,7 +181,8 @@
     "hidden": "Video ascuns",
     "showVideo": "Arată video",
     "viewing": "Vizionezi",
-    "weak": "Conexiune slabă"
+    "weak": "Conexiune slabă",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Fixează pentru mine",

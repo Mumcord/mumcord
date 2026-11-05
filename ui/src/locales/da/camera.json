@@ -149,7 +149,8 @@
     "cameras": "Kameraer",
     "label_other": "Kamerarum, {{count}} kameraer tændt",
     "miniBar_other": "{{count}} kameraer tændt",
-    "fullTitle": "Rummet er fuldt ved 9 kameraer"
+    "fullTitle": "Rummet er fuldt ved 9 kameraer",
+    "backgroundPicker": "Skift baggrund"
   },
   "position": {
     "label": "Kameraer",
@@ -173,7 +174,8 @@
     "hidden": "Video skjult",
     "showVideo": "Vis video",
     "viewing": "Ser med",
-    "weak": "Svag forbindelse"
+    "weak": "Svag forbindelse",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "pin": "Fastgør for mig",

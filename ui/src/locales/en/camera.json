@@ -149,7 +149,8 @@
     "cameras": "Cameras",
     "label_other": "Camera room, {{count}} cameras on",
     "miniBar_other": "{{count}} cameras on",
-    "fullTitle": "The room is full at 9 cameras"
+    "fullTitle": "The room is full at 9 cameras",
+    "backgroundPicker": "Change background"
   },
   "position": {
     "label": "Cameras",
@@ -173,7 +174,8 @@
     "hidden": "Video hidden",
     "showVideo": "Show video",
     "viewing": "Viewing",
-    "weak": "Weak connection"
+    "weak": "Weak connection",
+    "format": "{{height}}p · {{codec}}"
   },
   "tileMenu": {
     "options": "Options for {{name}}",
