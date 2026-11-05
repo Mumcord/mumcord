@@ -3,10 +3,14 @@
 //   node scripts/e2e-shards.js [--shards N]       rebalance shards.json from the durations file
 //   node scripts/e2e-shards.js --measure RUN_ID…  first update the durations from E2E runs (gh CLI)
 // The network resilience spec is pinned alone to shard 1: it is the longest spec and needs the
-// netsim proxy for its whole run. The other specs are spread longest-first, each onto the shard
-// with the least time so far. A spec without a measured duration counts with the median.
+// netsim proxy for its whole run. The relay specs (the ones that start the mumpeer testenv) go to
+// as few shards as the balance allows, because only those shards load the relay images, and run
+// first there, ordered by relay profile, so they share one environment (e2e/helpers/relayenv.ts).
+// The other specs are spread longest-first, each onto the shard with the least time so far. A
+// spec without a measured duration counts with the median.
 import { execFileSync } from "node:child_process";
-import { globSync, readFileSync, writeFileSync } from "node:fs";
+import { globSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -17,8 +21,9 @@ const durationsFile = join(e2eDir, "spec-durations.json");
 const shardsFile = join(e2eDir, "shards.json");
 const workflowFile = join(repo, ".github/workflows/e2e.yml");
 const pinned = "specs/network/network-resilience.e2e.ts";
-// Colour codes in the job logs, which "gh api --allow-escape-sequences" keeps.
-const ansiColour = new RegExp(String.fromCharCode(27) + "\\[[0-9;]*m", "g");
+// Loading the relay images and the first start of the relay environment: a relay shard's cost
+// that is in no spec's measured time.
+const relaySetup = 20;
 
 const { values: opt, positionals: runIds } = parseArgs({
   allowPositionals: true,
@@ -32,41 +37,29 @@ const median = (xs) => {
 };
 
 /**
- * Seconds per spec file from the shard logs of the given workflow runs: from a spec's "RUNNING"
- * line to its "PASSED" line, plus the ~1 s until the next spec starts. Failed specs are skipped.
+ * Seconds per spec file from the "e2e-durations-shard-N" artifacts of the given workflow runs
+ * (wdio.conf.ts writes them; only passed spec files are in there). The median per spec is kept.
  */
 function measure(ids) {
   const samples = new Map();
-  for (const id of ids) {
-    const jobs = JSON.parse(
-      execFileSync("gh", ["run", "view", id, "--json", "jobs"], { encoding: "utf8" }),
-    ).jobs.filter((j) => j.name.startsWith("E2E shard") && j.conclusion === "success");
-    for (const job of jobs) {
-      const log = execFileSync(
-        "gh",
-        [
-          "api",
-          "--allow-escape-sequences",
-          `repos/{owner}/{repo}/actions/jobs/${job.databaseId}/logs`,
-        ],
-        { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 },
-      );
-      const started = new Map();
-      for (const line of log.split("\n")) {
-        const m = /^(\S+Z) .*(RUNNING|PASSED) in .*\/e2e\/(specs\/\S+\.e2e\.ts)/.exec(
-          line.replace(ansiColour, ""),
-        );
-        if (!m) continue;
-        const [, time, state, spec] = m;
-        if (state === "RUNNING") started.set(spec, Date.parse(time));
-        else if (started.has(spec)) {
-          const s = (Date.parse(time) - started.get(spec)) / 1000 + 1.25;
+  const tmp = mkdtempSync(join(tmpdir(), "e2e-durations-"));
+  try {
+    for (const id of ids) {
+      const dir = join(tmp, id);
+      execFileSync("gh", ["run", "download", id, "--pattern", "e2e-durations-*", "--dir", dir], {
+        stdio: ["ignore", "ignore", "inherit"],
+      });
+      for (const file of globSync("*/spec-durations.json", { cwd: dir })) {
+        const { seconds } = JSON.parse(readFileSync(join(dir, file), "utf8"));
+        for (const [spec, s] of Object.entries(seconds)) {
           samples.set(spec, [...(samples.get(spec) ?? []), s]);
         }
       }
     }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
   }
-  if (samples.size === 0) throw new Error("no passed spec found in the shard logs of these runs");
+  if (samples.size === 0) throw new Error("no spec durations in the artifacts of these runs");
   const seconds = Object.fromEntries(
     [...samples]
       .sort(([a], [b]) => a.localeCompare(b))
@@ -96,22 +89,57 @@ if (unmeasured.length > 0) {
 }
 const cost = (s) => seconds[s] ?? fallback;
 
-// Longest-processing-time-first: each spec goes to the shard with the least time so far.
-const rest = Array.from({ length: count - 1 }, () => ({ total: 0, specs: [] }));
-for (const spec of specs.filter((s) => s !== pinned).sort((a, b) => cost(b) - cost(a))) {
-  const shard = rest.reduce((min, s) => (s.total < min.total ? s : min));
-  shard.specs.push(spec);
-  shard.total += cost(spec);
+/** Whether a spec starts the mumpeer relay environment, and with which profile first. */
+const profiles = new Map(
+  specs.map((s) => [
+    s,
+    /relayenv\.startRelay\(\s*"([\w-]+)"/.exec(readFileSync(join(e2eDir, s), "utf8"))?.[1],
+  ]),
+);
+const firstProfile = (spec) => profiles.get(spec);
+
+/** Longest-processing-time-first: each spec goes to the shard with the least time so far. */
+function spread(list, shards) {
+  for (const spec of [...list].sort((a, b) => cost(b) - cost(a))) {
+    const shard = shards.reduce((min, s) => (s.total < min.total ? s : min));
+    shard.specs.push(spec);
+    shard.total += cost(spec);
+  }
+  return shards;
 }
+const empty = (n, total = 0) => Array.from({ length: n }, () => ({ total, specs: [] }));
+
+const others = specs.filter((s) => s !== pinned);
+const relaySpecs = others.filter((s) => firstProfile(s) !== undefined);
+const target = Math.max(
+  ...others.map(cost),
+  (others.reduce((sum, s) => sum + cost(s), 0) + relaySetup) / (count - 1),
+);
+// The fewest relay shards whose relay specs stay within the target time of a shard.
+let relayShards = [];
+for (let k = 1; k <= count - 1; k++) {
+  relayShards = spread(relaySpecs, empty(k, relaySetup));
+  if (Math.max(...relayShards.map((s) => s.total)) <= target) break;
+}
+const rest = spread(
+  others.filter((s) => !relaySpecs.includes(s)),
+  [...relayShards, ...empty(count - 1 - relayShards.length)],
+);
 rest.sort((a, b) => b.total - a.total);
-const shards = [[pinned], ...rest.map((s) => s.specs.sort())];
+// Relay specs first, by profile, then the others; wdio runs a shard's files in this order.
+const order = (a, b) =>
+  Number(firstProfile(a) === undefined) - Number(firstProfile(b) === undefined) ||
+  (firstProfile(a) ?? "").localeCompare(firstProfile(b) ?? "") ||
+  a.localeCompare(b);
+const shards = [[pinned], ...rest.map((s) => s.specs.sort(order))];
 writeFileSync(shardsFile, JSON.stringify({ shards }, null, 2) + "\n");
 // The repository formats JSON with Prettier (npm run lint checks it).
 execFileSync("npx", ["prettier", "--write", shardsFile, durationsFile], { stdio: "ignore" });
 
 [cost(pinned), ...rest.map((s) => s.total)].forEach((t, i) => {
+  const relay = shards[i].some((s) => firstProfile(s) !== undefined) ? ", relay" : "";
   console.log(
-    `shard ${String(i + 1)}: ${String(Math.round(t))} s, ${String(shards[i].length)} specs`,
+    `shard ${String(i + 1)}: ${String(Math.round(t))} s, ${String(shards[i].length)} specs${relay}`,
   );
 });
 const matrix = /shard: \[([\d, ]+)\]/.exec(readFileSync(workflowFile, "utf8"));
