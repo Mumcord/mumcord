@@ -6,7 +6,7 @@
 //            plugin) sees "Alice started Test Stage · Join", C (without it) sees nothing.
 //   AC-9.12  Test Stage Official (official fixture registry): C sees "Alice is playing … · Get
 //            plugin", which opens the install prompt.
-//   AC-9.13  a start past the 8 s gesture window gets NotPermitted, an Apps-menu click works.
+//   AC-9.13  a start past the 8 s gesture window gets not-permitted, an Apps-menu click works.
 //   AC-9.14  a second activity of one plugin and a fourth in the channel show the limit text; a
 //            third participant (max_participants 2) gets "This activity is full".
 //   AC-9.15  full screen (banner, Esc), pop-out window (resize, pop in), mini bar, leave, the
@@ -109,6 +109,13 @@ async function setUp(name: string, repoUrl: string): Promise<void> {
   await developer.waitForExist({ timeout: 10_000 });
   await developer.click();
   await expect(developer).toBeSelected();
+  // Watching B's screen share is the first direct connection; deciding here keeps the one-time
+  // "Allow direct connections?" prompt (FR-2.36) from covering the window mid-test.
+  await openSettingsGroup("Privacy & Connections");
+  const direct = $("//input[@role='switch'][@id=//label[.='Allow direct connections to other Mumcord users']/@for]");
+  await direct.waitForExist({ timeout: 10_000 });
+  await direct.click();
+  await expect(direct).toBeSelected();
   await browser.keys("Escape");
   await $(".settings__nav").waitForExist({ reverse: true, timeout: 10_000 });
   await browser.waitUntil(
@@ -142,18 +149,34 @@ async function openPanel(plugin: string): Promise<void> {
   if ((await icon.getAttribute("aria-pressed")) !== "true") await icon.click();
 }
 
+/**
+ * The lines of the open plugin panel's event log (its text rows). Read from the DOM, because the log sits at the
+ * bottom of the panel's scroll area and WebDriver's visible text leaves out what is scrolled away.
+ */
+async function panelLog(): Promise<string> {
+  return browser.execute(() =>
+    Array.from(document.querySelectorAll(".pstrip-body li .pr-text"))
+      .map((line) => line.textContent.trim())
+      .join("\n"),
+  );
+}
+
 /** Waits until the plugin's panel (its event log) shows a line containing `text`. */
 async function waitLog(plugin: string, text: string, timeout = 20_000): Promise<void> {
   await openPanel(plugin);
   let seen = "";
-  await browser.waitUntil(
-    async () => {
-      const body = $(".pstrip-body");
-      seen = (await body.isExisting()) ? await body.getText() : "";
-      return seen.includes(text);
-    },
-    { timeout, interval: 250, timeoutMsg: `${plugin} panel never showed "${text}"; it shows:\n${seen}` },
-  );
+  // timeoutMsg is fixed when the wait starts, so the panel text seen last is reported by hand.
+  await browser
+    .waitUntil(
+      async () => {
+        seen = await panelLog();
+        return seen.includes(text);
+      },
+      { timeout, interval: 250 },
+    )
+    .catch(() => {
+      throw new Error(`${plugin} panel never showed "${text}"; it shows:\n${seen}`);
+    });
 }
 
 /** The activity line of a plugin in the channel ("X started P · Join" / "X is playing P"). */
@@ -237,7 +260,7 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
     await chooseApp("Start Test Stage later");
     await waitLog(STAGE, "app-menu: late");
     // The plugin starts 10 s after the click, past the 8 s window.
-    await waitLog(STAGE, "late-start: NotPermitted", 30_000);
+    await waitLog(STAGE, "late-start: not-permitted", 30_000);
     expect((await activities()).some((a) => a.plugin === "test-stage")).toBe(false);
   });
 
@@ -318,7 +341,7 @@ describe("plugins 1.1: stage and activities (AC-9.11 … AC-9.15)", function () 
 
   it("AC-9.14: one activity per plugin, three per channel, and a full activity", async () => {
     await chooseApp("Start Test Stage");
-    await waitLog(STAGE, "start: TooMany");
+    await waitLog(STAGE, "start: quota-exceeded");
     await expectToast(TOO_MANY);
 
     await chooseApp("Start Test Surface");
