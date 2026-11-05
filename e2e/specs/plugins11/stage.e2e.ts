@@ -185,8 +185,10 @@ async function waitLog(plugin: string, text: string, timeout = 20_000): Promise<
 
 /** The activity line of a plugin in the channel ("X started P · Join" / "X is playing P"). */
 function activityLine(plugin: string) {
+  // "Test Stage" is a prefix of "Test Stage Official", which peers now see as well.
+  const notLonger = plugin === STAGE ? `[not(contains(normalize-space(),'${OFFICIAL}'))]` : "";
   return $(
-    `//li[contains(@class,'plugin-activity')][.//span[contains(@class,'plugin-activity__text')][contains(normalize-space(),'${plugin}')]]`,
+    `//li[contains(@class,'plugin-activity')][.//span[contains(@class,'plugin-activity__text')][contains(normalize-space(),'${plugin}')]${notLonger}]`,
   );
 }
 
