@@ -914,7 +914,9 @@ impl PluginService {
         self.host.load(dir, Version::parse(previous).ok())?;
         self.store().save_plugin(record)?;
         self.ctx.grants.set(&record.id, &record.granted);
-        // Unloading the old version forgot its web folder; the new one may bring its own.
+        // Unloading the old version forgot its web folder and websites; the new one may bring its
+        // own.
+        self.set_origins(&record.id, source);
         self.set_webview_root(&record.id, source, dir, &record.granted);
         self.ctx
             .notify

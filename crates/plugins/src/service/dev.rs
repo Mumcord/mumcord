@@ -48,7 +48,7 @@ impl PluginService {
             id: id.clone(),
             version: manifest.version.to_string(),
             previous_version: None,
-            source: Origin::Dev(folder).to_db(),
+            source: Origin::Dev(folder.clone()).to_db(),
             sha256: None,
             author_key: None,
             enabled: true,
@@ -66,6 +66,8 @@ impl PluginService {
             return Err(error.into());
         }
         self.ctx.grants.set(&id, &record.granted);
+        self.set_origins(&id, Source::Dev);
+        self.set_webview_root(&id, Source::Dev, &folder, &record.granted);
         self.ctx.notify.set_enabled(&id, true);
         self.sync_peers();
         // A developer wants to see a failing start in the log, so the plugin stays loaded.

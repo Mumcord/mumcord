@@ -105,8 +105,12 @@ fn signed(id: &str, start: &str, extra: &str, optional: &[&str]) -> Signed {
 }
 
 fn signed_wasm(id: &str, wasm: &[u8], extra: &str, optional: &[&str]) -> Signed {
+    signed_package(id, &manifest(id, "1.0.0", extra), wasm, optional)
+}
+
+fn signed_package(id: &str, manifest: &str, wasm: &[u8], optional: &[&str]) -> Signed {
     let author = KeyPair::generate_unencrypted_keypair().expect("keypair");
-    let bytes = package(&manifest(id, "1.0.0", extra), wasm);
+    let bytes = package(manifest, wasm);
     let signature = minisign::sign(Some(&author.pk), &author.sk, &bytes[..], None, None)
         .expect("sign")
         .into_string();
@@ -605,6 +609,58 @@ fn developer_folders_follow_developer_mode() {
     service.developer_mode_changed(false).expect("unloads");
     assert!(service.list().expect("list").iter().all(|p| p.id != id));
     assert!(service.dir(&id).is_none());
+}
+
+/// A 1.1 plugin declaring one website (FR-9.23), and that website as the frame policy lists it.
+const WEBSITE: &str = r#","permissions":{"required":["net.origins"]},"net":{"origins":[{"origin":"https://api.example.org","purpose":"origins.api"}]}"#;
+const DECLARED: &str = "https://api.example.org";
+
+fn manifest_1_1(id: &str, extra: &str) -> String {
+    manifest(id, "1.0.0", extra).replace("\"^1.0\"", "\"^1.1\"")
+}
+
+fn component_1_1() -> Vec<u8> {
+    let core = include_str!("fixtures/plugin.wat")
+        .replace("@1.0.0", "@1.1.0")
+        .replace("{{START}}", OK_START)
+        .replace("{{EVENT}}", "")
+        .replace("{{STOP}}", "");
+    encode_for(&core, "1.1.0")
+}
+
+fn declared_websites(service: &PluginService, id: &str) -> Vec<String> {
+    service
+        .webviews()
+        .origins(id)
+        .iter()
+        .map(|origin| origin.ascii())
+        .collect()
+}
+
+#[test]
+fn declared_websites_apply_right_after_install_and_developer_load() {
+    let fx = Fixture::new();
+    let (mut service, _events) = fx.service();
+    let mut weather = signed_package(
+        "weather",
+        &manifest_1_1("weather", WEBSITE),
+        &component_1_1(),
+        &[],
+    );
+    weather.request.entry.permissions = vec!["net.origins".into()];
+    service
+        .install(&weather.request, &weather.download)
+        .expect("installs");
+    assert_eq!(declared_websites(&service, "weather"), [DECLARED]);
+
+    fx.set_developer_mode(true);
+    let dir = fx.root.path().join("src-radar");
+    std::fs::create_dir_all(dir.join("i18n")).expect("mkdir");
+    std::fs::write(dir.join("manifest.json"), manifest_1_1("radar", WEBSITE)).expect("manifest");
+    std::fs::write(dir.join("plugin.wasm"), component_1_1()).expect("wasm");
+    std::fs::write(dir.join("i18n/en.json"), "{}").expect("i18n");
+    let id = service.load_dev(&dir).expect("loads");
+    assert_eq!(declared_websites(&service, &id), [DECLARED]);
 }
 
 /// Core module: `start` sends "hi" (kind 5) to the channel with `peers.send`. On an error it

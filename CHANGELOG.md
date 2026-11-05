@@ -70,6 +70,7 @@
 
 ### Fixed
 
+- A plugin that talks to websites could not reach them right after it was installed, updated or loaded from a developer folder: its requests were refused until Mumcord was restarted
 - A screen share sent with VP9 no longer risks crashing Mumcord when the shared window grows or the quality steps up to a size larger than the one the share started at; the encoder now restarts at the new size with a fresh keyframe.
 - Mumcord no longer crashes at start-up on older x86 processors without AVX2 (for example AMD FX or Intel Core of the Sandy and Ivy Bridge generations). The AV1 encoder that screen sharing tests at start-up crashed on these processors; screen sharing now uses VP9 there. If the AV1 test ever ends the app, the next start counts it as failed and does not run it again.
 - Screen share sound polish (#435): the "Which app's sound?" list shows each app's own icon on Linux (a coloured square where the app has none), the live bar's sound line says "The Sound switch is off" or "“No sound” was chosen for this window" correctly instead of mixing the two up, the disabled Sound button names the real reason, and the speaker icons are drawn as outlines as in the design
