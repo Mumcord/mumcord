@@ -440,7 +440,11 @@ fn playback_thread_plays_share_sound_at_its_level() {
 
     let mut encoder = share_encoder().expect("encoder");
     let mut out = [0u8; crate::codec::MAX_PACKET_BYTES];
-    let started = Instant::now();
+    // The feeder follows the playback thread instead of the wall clock: on a loaded runner a
+    // starved playback thread would otherwise let the backlog pass the ring's cap, which skips
+    // ahead by design and is not what this test is about.
+    const KEEP_AHEAD: u64 = 15 * FRAME_SAMPLES as u64; // 150 ms, below the 200 ms cap
+    let mut pushed = 0u64;
     for n in 0..100 {
         let mut frame = [0.0; FRAME_SAMPLES];
         for (i, s) in frame.iter_mut().enumerate() {
@@ -448,11 +452,13 @@ fn playback_thread_plays_share_sound_at_its_level() {
             *s = AMPLITUDE * (std::f32::consts::TAU * 440.0 * t).sin();
         }
         if let Some(len) = encoder.push_frame(&frame, &mut out).expect("encode") {
+            let wait_until = Instant::now() + Duration::from_secs(10);
+            while pushed.saturating_sub(stats.snapshot().played_samples) > KEEP_AHEAD {
+                assert!(Instant::now() < wait_until, "{:?}", stats.snapshot());
+                std::thread::sleep(Duration::from_millis(1));
+            }
             writer.push_packet(&out[..len]).expect("decode");
-        }
-        let due = started + Duration::from_millis(10 * (n as u64 + 1));
-        if let Some(wait) = due.checked_duration_since(Instant::now()) {
-            std::thread::sleep(wait);
+            pushed += 2 * FRAME_SAMPLES as u64;
         }
     }
     drop(writer);
@@ -473,6 +479,7 @@ fn playback_thread_plays_share_sound_at_its_level() {
         .map(|f| rms(&f[..]))
         .filter(|level| *level > 0.05)
         .collect();
+    assert_eq!(stats.snapshot().skipped_samples, 0, "nothing was skipped");
     assert!(audible.len() >= 80, "{} audible frames", audible.len());
     let steady = &audible[10..audible.len() - 5];
     let level = steady.iter().sum::<f32>() / steady.len() as f32;

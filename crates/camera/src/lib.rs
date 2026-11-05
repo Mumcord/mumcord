@@ -10,15 +10,28 @@
 //! same trait, so all later pipeline stages run unchanged.
 
 // Format choice, 16:9 crop, conversion to NV12 and MJPEG decoding for the backends that
-// negotiate camera formats themselves. AVFoundation converts and scales on its own.
-#[cfg(any(target_os = "linux", windows))]
+// negotiate camera formats themselves. AVFoundation converts and scales on its own, so macOS
+// only uses the crop geometry and the NV12 path.
+#[cfg(any(target_os = "linux", windows, target_os = "macos"))]
+#[cfg_attr(
+    target_os = "macos",
+    allow(dead_code, reason = "macOS only reads NV12")
+)]
 mod convert;
 mod device;
+// The pure helpers in `macos::mode` are unit tested on every platform.
+#[cfg(any(target_os = "macos", test))]
+mod macos;
+
 #[cfg(target_os = "linux")]
 mod linux;
 #[cfg(any(target_os = "linux", windows))]
 mod mjpeg;
-#[cfg(any(target_os = "linux", windows))]
+#[cfg(any(target_os = "linux", windows, target_os = "macos"))]
+#[cfg_attr(
+    target_os = "macos",
+    allow(dead_code, reason = "macOS only uses the crop geometry")
+)]
 mod mode;
 mod pool;
 #[cfg(any(target_os = "linux", windows))]
@@ -32,6 +45,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 pub use device::{CameraDevice, DeviceEvent, DeviceId, DeviceList};
+#[cfg(target_os = "macos")]
+pub use macos::{MacCamera, PRIVACY_SETTINGS_URL};
+
 #[cfg(target_os = "linux")]
 pub use linux::LinuxCamera;
 pub use pool::{FramePool, PooledBuffer};
