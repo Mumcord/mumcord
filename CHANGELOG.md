@@ -77,6 +77,7 @@
 
 ### Fixed
 
+- Ctrl+C on selected chat text could leave the clipboard empty on Linux (X11): the web engine and the app both took the clipboard at once, and the app could then drop the text it had just been given. Ctrl+C now copies through the app alone, like the right-click Copy (#114)
 - Settings → Plugins → Diagnostics now says why a plugin was refused at load, for example "an Apps-menu label is the same as one of Mumcord's own", instead of showing nothing.
 - A plugin that talks to websites could not reach them right after it was installed, updated or loaded from a developer folder: its requests were refused until Mumcord was restarted
 - Plugin SDK: a Bovnar document with one text of 64 KB or more is now refused as `too-large` instead of `malformed`, so plugins can tell the player the message is too big.

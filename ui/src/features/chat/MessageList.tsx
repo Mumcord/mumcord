@@ -75,7 +75,7 @@ import { ContextMenu, type MenuPosition } from "../../components/ContextMenu";
 import { findOriginal, parseReply, quoteFor, replyOf, type ReplyQuote } from "./reply";
 import { SAFE_LINK, sanitizeHtml } from "./sanitize";
 import { ImageMenu, type ImageMenuState } from "./ImageMenu";
-import { selectedText } from "./selectionText";
+import { isCopyShortcut, selectedText } from "./selectionText";
 import { revealDone, usePendingReveal } from "./reveal";
 import { CollapsedMessage } from "../blocking/CollapsedMessage";
 import { LeadingPluginCards, PluginLine } from "../plugins/chat";
@@ -671,6 +671,13 @@ export function MessageList({
   }
 
   function onListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (isCopyShortcut(event) && copySelection(event.currentTarget)) {
+      // The webview's own copy would put the text on the clipboard too. On X11 that makes two
+      // owners take the clipboard in quick succession, and the engine's clipboard can then lose
+      // the text it was just given: the paste comes out empty (#114). One writer avoids that.
+      event.preventDefault();
+      return;
+    }
     if (event.key === "End" && event.ctrlKey && !event.defaultPrevented) {
       event.preventDefault();
       jumpToNewest();
@@ -757,14 +764,23 @@ export function MessageList({
     },
   });
 
-  // Ctrl+C: plain text with line breaks, without the hidden labels the browser would copy too.
+  /**
+   * Copies the selected chat text through the engine, like the menu: plain text with line breaks,
+   * without the hidden labels the browser would copy too. False when nothing in `root` is selected.
+   */
+  function copySelection(root: HTMLElement): boolean {
+    const text = selectedText(window.getSelection(), root);
+    if (text === "") return false;
+    copyText(text, null, "the selected text");
+    return true;
+  }
+
+  // A copy the keyboard shortcut did not handle, such as the macOS Edit menu.
   function onCopy(event: ClipboardEvent<HTMLDivElement>) {
     const text = selectedText(window.getSelection(), event.currentTarget);
     if (text === "") return;
     event.preventDefault();
     event.clipboardData.setData("text/plain", text);
-    // Also through the engine, like the menu: the webview's copy may not reach the desktop.
-    copyText(text, null, "the selected text");
   }
 
   /** The image menu for a right-click (or the menu key) on a chat image; false elsewhere. */
