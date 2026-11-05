@@ -1,10 +1,10 @@
 import { globSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { browser } from "@wdio/globals";
 import { capabilities, driverPort, prepareFresh, stopDriver, withTimeout } from "./helpers/app.ts";
 import { browserB, browserC, runningB, runningC, stopB, stopC } from "./helpers/apps.ts";
-import { netsim } from "./helpers/index.ts";
+import { netsim, relayenv } from "./helpers/index.ts";
 import { artifactsDir } from "./helpers/paths.ts";
 
 const e2eDir = dirname(fileURLToPath(import.meta.url));
@@ -38,6 +38,11 @@ function shardSpecs(shard: string): string[] {
 
 const shard = process.env.MUMCORD_E2E_SHARD;
 
+// Seconds per passed spec file of this run, written to e2e/artifacts/spec-durations.json at the
+// end; CI uploads it per shard and `scripts/e2e-shards.js --measure` balances the shards with it.
+const workerStarted = new Map<string, number>();
+const durations: Record<string, number> = {};
+
 // Each spec file = one worker = one fresh install (new profile, empty keyring, and no app or
 // driver process left over from the previous spec – see killStrays). Specs run one at a
 // time because they share the test servers, the keyring and the netsim ports.
@@ -55,6 +60,30 @@ export const config: WebdriverIO.Config = {
   framework: "mocha",
   mochaOpts: { ui: "bdd", timeout: 180_000 },
   reporters: ["spec"],
+
+  onWorkerStart: (cid) => {
+    workerStarted.set(cid, Date.now());
+  },
+
+  onWorkerEnd: (cid, exitCode, specs) => {
+    const started = workerStarted.get(cid);
+    if (exitCode !== 0 || started === undefined) return;
+    for (const spec of specs) {
+      const path = spec.startsWith("file:") ? fileURLToPath(spec) : spec;
+      const file = relative(e2eDir, path).split(sep).join("/");
+      durations[file] = Math.round((Date.now() - started) / 100) / 10;
+    }
+  },
+
+  // The relay environment outlives the spec files that share it (helpers/relayenv.ts).
+  onComplete: async () => {
+    mkdirSync(artifactsDir, { recursive: true });
+    writeFileSync(
+      join(artifactsDir, "spec-durations.json"),
+      JSON.stringify({ shard: shard ?? null, seconds: durations }, null, 2) + "\n",
+    );
+    await relayenv.stopRelay();
+  },
 
   beforeSession: async () => {
     await prepareFresh();
