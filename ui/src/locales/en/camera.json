@@ -196,7 +196,8 @@
     "screenTitle": "{{name}}'s screen",
     "screenLive": "Live",
     "partyTitle": "Watch party",
-    "partyStarted": "Started by {{name}}"
+    "partyStarted": "Started by {{name}}",
+    "label": "{{title}} with the camera room"
   },
   "settings": {
     "title": "Camera",

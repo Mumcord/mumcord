@@ -19,6 +19,7 @@ import {
   type MediaRoom,
 } from "../../app/mediaHeight";
 import { ResizeHandle } from "../../app/ResizeHandle";
+import { StripLayout } from "../camera/room/StripLayout";
 import { leaveCinema } from "./mediaView";
 import { setMediaDrag, setMediaHeight, useMediaResize } from "./mediaResize";
 import { StagePanel } from "./StagePanel";
@@ -304,12 +305,15 @@ export function MediaArea({ children }: { children: ReactNode }) {
         }
       >
         <StageTabs />
-        {children}
-        {[...plugins].map(([id, item]) => (
-          <StagePanel key={id} id={id}>
-            {item.render()}
-          </StagePanel>
-        ))}
+        {/* A share or party with cameras on gets the camera strip around it (spec 08 FR-8.71). */}
+        <StripLayout>
+          {children}
+          {[...plugins].map(([id, item]) => (
+            <StagePanel key={id} id={id}>
+              {item.render()}
+            </StagePanel>
+          ))}
+        </StripLayout>
       </div>
       {handle !== null && (
         <div
