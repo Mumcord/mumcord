@@ -30,6 +30,7 @@ import {
   chipLevel,
   chipScore,
   chipText,
+  elementRef,
   closeSettings,
   openPlugins,
   officialLabel,
@@ -109,7 +110,7 @@ async function backToBrowse(): Promise<void> {
 async function formulaLine(scope: ReturnType<typeof $>): Promise<string> {
   const text = await browser.execute(
     (el) => ((el as unknown as Element).textContent as string | null) ?? "",
-    (await scope.$("p.risk-formula").getElement()) as unknown as HTMLElement,
+    (await elementRef(scope.$("p.risk-formula"))) as unknown as HTMLElement,
   );
   return text.replace(/\s+/g, " ").trim();
 }
@@ -129,7 +130,7 @@ async function effects(scope: ReturnType<typeof $>, table: number): Promise<stri
         return (copy.textContent as string | null)?.replace(/\s+/g, " ").trim() ?? "";
       });
     },
-    (await scope.getElement()) as unknown as HTMLElement,
+    (await elementRef(scope)) as unknown as HTMLElement,
     table,
   );
 }
